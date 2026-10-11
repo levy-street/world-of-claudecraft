@@ -9,7 +9,10 @@ import { TargetAurasWindow } from '../src/ui/target_auras_window';
 const MARKUP = `
   <div id="ui">
     <div id="target-auras-window" class="panel mt-panel ta-panel">
-      <div class="panel-title"><span class="ta-title"></span></div>
+      <div class="panel-title">
+        <span class="ta-title"></span>
+        <button type="button" class="x-btn ta-close-btn" aria-label="Close target aura window"></button>
+      </div>
       <div class="ta-target"></div>
       <div class="ta-filters">
         <button type="button" data-aura-filter="all">All</button>
@@ -177,6 +180,32 @@ function setup(
 
 describe('TargetAurasWindow', () => {
   beforeEach(() => window.localStorage.clear());
+
+  it('keeps a filtered panel custom width after login and reapplies visual geometry after UI scaling', () => {
+    const geometry = {
+      left: 400,
+      top: 80,
+      width: 500,
+      height: 240,
+      vw: window.innerWidth,
+      vh: window.innerHeight,
+    };
+    localStorage.setItem('woc_target_auras_filter', 'debuffs');
+    localStorage.setItem('woc_target_auras_frame', JSON.stringify(geometry));
+    let scale = 1;
+    const { panel, root } = setup(
+      undefined,
+      () => false,
+      () => scale,
+    );
+    expect(root.style.width).toBe('500px');
+    expect(JSON.parse(localStorage.getItem('woc_target_auras_frame')!)).toEqual(geometry);
+    scale = 2;
+    panel.reapplyFrame();
+    expect(root.style.width).toBe('250px');
+    expect(root.style.left).toBe('200px');
+    expect(JSON.parse(localStorage.getItem('woc_target_auras_frame')!)).toEqual(geometry);
+  });
 
   it('starts disabled and hidden until the player enables it', () => {
     const { panel, root } = setup();
@@ -593,6 +622,33 @@ describe('TargetAurasWindow', () => {
     expect(disabled.root.style.display).toBe('none');
   });
 
+  it('closes from its title-bar button and remembers the closed state', () => {
+    const { panel, root } = setup();
+    const title = root.querySelector('.panel-title') as HTMLElement;
+    const close = root.querySelector<HTMLButtonElement>('.ta-close-btn');
+    // The markup button is moved behind the minted title controls.
+    expect(title.lastElementChild).toBe(close);
+
+    panel.toggle();
+    root.querySelector<HTMLButtonElement>('.ta-rows-config-btn')?.click();
+    root.querySelector<HTMLButtonElement>('.ta-move-btn')?.click();
+    expect(root.classList.contains('ta-unlocked')).toBe(true);
+
+    close?.click();
+
+    expect(panel.isVisible).toBe(false);
+    expect(root.style.display).toBe('none');
+    expect(root.classList.contains('ta-unlocked')).toBe(false);
+    expect(root.querySelector<HTMLElement>('.ta-visible-rows-control')?.style.display).toBe('none');
+    expect(window.localStorage.getItem('woc_target_auras_visible')).toBe('0');
+    expect(setup().panel.isVisible).toBe(false);
+
+    // The keybind still reopens it after a button close.
+    const reopened = setup();
+    expect(reopened.panel.toggle()).toBe(true);
+    expect(reopened.root.style.display).toBe('flex');
+  });
+
   it('clears retained rows before re-enabling after a hidden target change', () => {
     const { panel, root } = setup();
     panel.toggle();
@@ -887,4 +943,22 @@ describe('TargetAurasWindow', () => {
     expect(active?.querySelector('.ta-stacks')?.classList.contains('empty')).toBe(true);
     expect(recycled.style.display).toBe('none');
   });
+});
+
+it('reloads aura window visibility, filters and custom width without reloading the page', () => {
+  const { panel, root } = setup();
+  localStorage.setItem('woc_target_auras_visible', '1');
+  localStorage.setItem('woc_target_auras_filter', 'buffs');
+  localStorage.setItem('woc_target_auras_frame', '{"left":80,"top":100,"width":500,"height":240}');
+  panel.restoreSavedLayout();
+  expect(root.style.display).not.toBe('none');
+  expect(root.style.width).toBe('500px');
+  expect(root.querySelector('[data-aura-filter="buffs"]')?.getAttribute('aria-pressed')).toBe(
+    'true',
+  );
+  localStorage.removeItem('woc_target_auras_visible');
+  localStorage.removeItem('woc_target_auras_frame');
+  panel.restoreSavedLayout();
+  expect(root.style.display).toBe('none');
+  expect(root.style.width).not.toBe('500px');
 });

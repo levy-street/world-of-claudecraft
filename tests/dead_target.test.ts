@@ -238,12 +238,15 @@ describe('ClientWorld.targetEntity with a dead player', () => {
         [viewer.id, viewer],
         [fallen.id, fallen],
       ]),
+      // The 'target' command draws its seq from the input seq counter
+      // (src/net/target_echo.ts), so the fixture carries the counter's default.
+      inputSeq: 0,
       cmd: vi.fn(),
     });
 
     client.targetEntity(fallen.id);
 
     expect(viewer.targetId).toBe(fallen.id);
-    expect(client.cmd).toHaveBeenCalledWith({ cmd: 'target', id: fallen.id });
+    expect(client.cmd).toHaveBeenCalledWith({ cmd: 'target', id: fallen.id, seq: 1 });
   });
 });

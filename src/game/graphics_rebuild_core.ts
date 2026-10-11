@@ -15,6 +15,7 @@ export const GRAPHICS_REBUILD_KEYS = Object.freeze([
   'characterDetail',
   'dynamicLights',
   'particleEffects',
+  'ghostFade',
 ] as const);
 
 export type GraphicsSettingsKey = (typeof GRAPHICS_REBUILD_KEYS)[number];
@@ -122,6 +123,7 @@ const ADVANCED_DIAL_SEEDS: Readonly<Record<number, Readonly<Record<GraphicsDialK
     characterDetail: 0,
     dynamicLights: 1,
     particleEffects: 1,
+    ghostFade: 0,
   }),
   2: Object.freeze({
     terrainDetail: 0.5,
@@ -140,6 +142,7 @@ const ADVANCED_DIAL_SEEDS: Readonly<Record<number, Readonly<Record<GraphicsDialK
     characterDetail: 1,
     dynamicLights: 1,
     particleEffects: 1,
+    ghostFade: 0,
   }),
   3: Object.freeze({
     terrainDetail: 0.5,
@@ -155,6 +158,7 @@ const ADVANCED_DIAL_SEEDS: Readonly<Record<number, Readonly<Record<GraphicsDialK
     characterDetail: 1,
     dynamicLights: 1,
     particleEffects: 1,
+    ghostFade: 1,
   }),
   4: Object.freeze({
     terrainDetail: 2,
@@ -170,6 +174,7 @@ const ADVANCED_DIAL_SEEDS: Readonly<Record<number, Readonly<Record<GraphicsDialK
     characterDetail: 1,
     dynamicLights: 1,
     particleEffects: 1,
+    ghostFade: 1,
   }),
   6: Object.freeze({
     terrainDetail: 2,
@@ -185,6 +190,7 @@ const ADVANCED_DIAL_SEEDS: Readonly<Record<number, Readonly<Record<GraphicsDialK
     characterDetail: 1,
     dynamicLights: 1,
     particleEffects: 1,
+    ghostFade: 1,
   }),
 };
 

@@ -163,4 +163,31 @@ describe('meter bar rows', () => {
     );
     expect(rows).toEqual([]);
   });
+
+  it('computes 1-based rank and share percent of total', () => {
+    const tallies = [tally(1, 'Hero', { dmg: 600 }), tally(2, 'Pal', { dmg: 400 })];
+    const rows = buildMeterRows(input({ tallies, tab: 'dmg' }));
+    expect(rows[0].rank).toBe(1);
+    expect(rows[0].percent).toBe(0.6);
+    expect(rows[1].rank).toBe(2);
+    expect(rows[1].percent).toBe(0.4);
+  });
+
+  it('ranks and filters damageTaken, interrupts, and deaths tabs', () => {
+    const tallies = [
+      tally(1, 'Hero', { dmgTaken: 800, interrupts: 3, deaths: 1 }),
+      tally(2, 'Pal', { dmgTaken: 200, interrupts: 0 }),
+    ];
+    const dtRows = buildMeterRows(input({ tallies, tab: 'dmgTaken' }));
+    expect(dtRows.map((r) => [r.tally.name, r.value, r.percent])).toEqual([
+      ['Hero', 800, 0.8],
+      ['Pal', 200, 0.2],
+    ]);
+
+    const intRows = buildMeterRows(input({ tallies, tab: 'interrupts' }));
+    expect(intRows.map((r) => [r.tally.name, r.value])).toEqual([['Hero', 3]]);
+
+    const deathRows = buildMeterRows(input({ tallies, tab: 'deaths' }));
+    expect(deathRows.map((r) => [r.tally.name, r.value])).toEqual([['Hero', 1]]);
+  });
 });

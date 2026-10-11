@@ -974,6 +974,50 @@ describe('guildBankDepositGoldFor / guildBankWithdrawGoldFor', () => {
 });
 
 describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
+  it('round-trips a permanent loot quality descriptor through deposit, save, reload, withdraw', () => {
+    // The guild bank is the third persisted container (bags and the personal
+    // bank are pinned in tests/loot_quality_transfers.test.ts): the same load
+    // sanitizer keeps the exact descriptor, never re-rolls or merges it.
+    const lootQuality = {
+      version: 1 as const,
+      tier: 3 as const,
+      weights: [4, 900, 200, 6, 7] as [number, number, number, number, number],
+    };
+    const sim = makeOfficerSim();
+    expect(ITEMS.greyjaw_hide_boots.soulbound).toBeFalsy(); // fixture guard
+    sim.addItemInstance('greyjaw_hide_boots', { lootQuality: structuredClone(lootQuality) });
+    sim.guildBankDepositFor(
+      sim.playerId,
+      meta(sim).inventory.findIndex((s) => s.itemId === 'greyjaw_hide_boots'),
+    );
+    expect(meta(sim).inventory.some((s) => s.itemId === 'greyjaw_hide_boots')).toBe(false);
+    expect(book(sim).inventory[0]).toEqual({
+      itemId: 'greyjaw_hide_boots',
+      count: 1,
+      instance: { lootQuality },
+    });
+    const save = JSON.parse(JSON.stringify(sim.serializeGuildBank(GUILD_ID)));
+    // A fresh boot loads the saved book once (makeOfficerSim would already
+    // have loaded an empty one for this guild).
+    const restored = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      autoEquip: false,
+      world: GUILD_BANK_TEST_WORLD,
+    });
+    moveToBanker(restored);
+    restored.setPlayerGuildMembership(restored.playerId, { guildId: GUILD_ID, rank: 'officer' });
+    restored.loadGuildBank(GUILD_ID, save);
+    expect(book(restored).inventory[0].instance).toEqual({ lootQuality });
+    restored.guildBankWithdrawFor(restored.playerId, 0, 1);
+    expect(book(restored).inventory).toHaveLength(0);
+    const withdrawn = meta(restored).inventory.find((s) => s.itemId === 'greyjaw_hide_boots');
+    expect(withdrawn?.instance).toEqual({ lootQuality });
+    // The withdrawn copy is its own object: editing it never reaches the save.
+    withdrawn!.instance!.lootQuality!.weights[1] = 1;
+    expect(save.inventory[0].instance).toEqual({ lootQuality });
+  });
+
   it('refuses quest items with the GUILD-worded error, never the personal-bank line', () => {
     const sim = makeOfficerSim();
     meta(sim).inventory.push({ itemId: 'boar_hide', count: 2 }); // kind: 'quest'
@@ -1551,6 +1595,33 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     sim.guildBankWithdrawFor(sim.playerId, 0);
     expect(book(sim).inventory).toEqual([]);
     expect(meta(sim).inventory.find((s) => s.craftedRecipeId === 'r_test')?.count).toBe(2);
+  });
+
+  it('round-trips a whole LOCKED material stack as ONE book row, never one per unit', () => {
+    // The guild-bank twin of the personal-bank and vault cases: guildBankDepositFor
+    // reuses bags.ts addStacked for the book write, so the fresh-slot-sizing fix
+    // must hold here too, including through the escrow delta log this op replays.
+    const sim = makeOfficerSim();
+    sim.addItem('wolf_fang', 20);
+    const idx = meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    sim.setItemLocked('wolf_fang', true, sim.playerId, idx);
+    expect(meta(sim).inventory[idx].instance).toEqual({ locked: true });
+
+    sim.guildBankDepositFor(sim.playerId, idx);
+
+    const banked = book(sim).inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(banked).toHaveLength(1);
+    expect(banked[0].count).toBe(20);
+    expect(banked[0].instance).toEqual({ locked: true });
+
+    sim.guildBankWithdrawFor(
+      sim.playerId,
+      book(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang'),
+    );
+    const carried = meta(sim).inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(carried).toHaveLength(1);
+    expect(carried[0].count).toBe(20);
+    expect(carried[0].instance).toEqual({ locked: true });
   });
 });
 

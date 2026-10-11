@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { type GroundAimGeometryState, sameGroundAimGeometry } from './ground_aim_reticle_core';
 
 const SEGMENTS = 96;
@@ -71,7 +72,7 @@ export class GroundAimReticleVisual {
 
     for (const object of [this.band, this.outer, this.inner, this.ticks]) {
       object.frustumCulled = false;
-      object.renderOrder = 3;
+      object.renderOrder = floorVfxRenderOrder('reticle', 0);
       this.group.add(object);
     }
     this.scene.add(this.group);

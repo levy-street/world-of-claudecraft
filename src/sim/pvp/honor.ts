@@ -42,25 +42,28 @@ export const FIESTA_WIN_BONUS_HONOR = 40;
 // completion consolation (a draw pays the loss amount to both sides). Both
 // decay per repeated opposing-team via BATTLEGROUND_RESULT_DR, the battleground's
 // OWN curve; forfeits pay nothing (social/battleground.ts).
-// 60/20 are DELIBERATE owner tuning, not a documented classic-era curve (the
+// 120/40 are DELIBERATE owner tuning, not a documented classic-era curve (the
 // one deliberate exception to the real-formulas rule, flagged in review):
-// sized against the arena payouts so a played-out battleground beats queue
-// value without dwarfing it. Revisit against live match data.
-export const BATTLEGROUND_WIN_HONOR = 60;
-export const BATTLEGROUND_LOSS_HONOR = 20;
+// first sized at 60/20 against the arena payouts, then DOUBLED with every
+// Thornhollow Fields award (owner tuning 2026-09-25, alongside King of the
+// Hill) so Warfare Season 2 gear is a weeks-long goal, not a season-long one.
+// Revisit against live match data.
+export const BATTLEGROUND_WIN_HONOR = 120;
+export const BATTLEGROUND_LOSS_HONOR = 40;
 // Per-kill honor, the classic battleground drip: a small, immediate "+N honor"
 // on every killing blow, so fighting away from the flag is still worth doing.
 // Deliberately small next to the result award (a 15-kill match pays about a
 // win) and decayed per REPEATED VICTIM on the same curve as everything else,
 // so farming one player in a graveyard pays out four times and then nothing.
 // An assist pays less than the blow, on its own separate victim counter.
-export const BATTLEGROUND_KILL_HONOR = 5;
-export const BATTLEGROUND_ASSIST_HONOR = 2;
+export const BATTLEGROUND_KILL_HONOR = 10;
+export const BATTLEGROUND_ASSIST_HONOR = 4;
 // The first Thornhollow Fields WIN of each UTC day pays a bonus on top of the
 // ordinary win award: the classic-era daily-battleground quest convention, where
 // the day's first win is the thing that gets a player to queue at all.
 //
-// A FLAT authored 20, not a multiple of the win award. The earlier shape derived
+// A FLAT authored bonus (20, doubled to 40 on 2026-09-25), not a multiple of the
+// win award. The earlier shape derived
 // it (win x 2 = 120, so the day's first win paid 180, three times a routine one),
 // which measured as paying "log in, win once, log off" far better than it paid
 // playing a session: the opposite of what a battleground queue needs. On a day
@@ -71,11 +74,12 @@ export const BATTLEGROUND_ASSIST_HONOR = 2;
 // Flat because the number is a judgment about what a daily hook is worth, not a
 // function of what a win is worth: reaching 20 through the old shape would need a
 // "bonus multiplier" of about 0.33, which reads as nonsense for something with
-// that name. The day's first win now pays 80 against a 60 repeat, a 1.33x ratio,
+// that name. The day's first win pays 160 against a 120 repeat (both doubled
+// 2026-09-25), the same 1.33x ratio,
 // in line with the delve daily (`meta.delveDaily.firstClearXp`,
 // src/sim/delves/runs.ts grantDelveClearTo), the one in-repo precedent, which
 // SWAPS one authored reward for another for a first/repeat ratio near 1.6x.
-export const BATTLEGROUND_FIRST_WIN_BONUS_HONOR = 20;
+export const BATTLEGROUND_FIRST_WIN_BONUS_HONOR = 40;
 
 // Arena is especially easy to coordinate in 1v1, so only the first win against
 // the same opponent/team pays each UTC day. Fiesta uses softer decay because its

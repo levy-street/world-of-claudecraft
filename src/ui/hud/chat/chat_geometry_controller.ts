@@ -109,6 +109,14 @@ export class ChatGeometryController {
     const tabs = this.deps.document.getElementById('chatlog-tabs');
     const frame = this.deps.document.getElementById('chatlog-frame');
     if (!wrap || !tabs || !frame) return;
+    try {
+      wrap.classList.toggle(
+        'frame-user-hidden',
+        this.deps.storage.getItem('woc_chat_frame_hidden') === '1',
+      );
+    } catch {
+      /* unavailable storage */
+    }
 
     // A real named button, not a decorative div: the SE grip is the chat
     // box's one resize affordance, so it takes arrow keys (Shift for the
@@ -293,13 +301,58 @@ export class ChatGeometryController {
     this.apply();
   }
 
+  /** Restore CSS dimensions while retaining the current screen position. */
+  resetSize(): void {
+    const wrap = this.deps.document.getElementById('chatlog-wrap');
+    const tabs = this.deps.document.getElementById('chatlog-tabs');
+    const frame = this.deps.document.getElementById('chatlog-frame');
+    if (!wrap || !tabs || !frame || this.deps.isMobileLayout()) return;
+    this.ensureGeometry(wrap, tabs);
+    const box = this.chatBox;
+    if (!box) return;
+    wrap.style.removeProperty('width');
+    frame.style.removeProperty('height');
+    this.chatBox = {
+      ...box,
+      width: wrap.getBoundingClientRect().width,
+      height: frame.getBoundingClientRect().height,
+    };
+    this.apply();
+    this.persist();
+  }
+
+  restoreSavedLayout(): void {
+    this.deps.document.body.classList.remove('chat-box-dragging');
+    this.chatBoxGesture = null;
+    this.wrapRect = null;
+    this.clearGeometryStyles();
+    this.chatBox = this.loadSaved();
+    try {
+      this.deps.document
+        .getElementById('chatlog-wrap')
+        ?.classList.toggle(
+          'frame-user-hidden',
+          this.deps.storage.getItem('woc_chat_frame_hidden') === '1',
+        );
+    } catch {
+      /* unavailable storage */
+    }
+    this.apply();
+  }
+
   reset(): void {
     this.chatBox = null;
+    this.deps.document.getElementById('chatlog-wrap')?.classList.remove('frame-user-hidden');
     try {
+      this.deps.storage.removeItem('woc_chat_frame_hidden');
       this.deps.storage.removeItem(CHAT_GEOMETRY_KEY);
     } catch {
-      // Storage can be unavailable in private browsing modes.
+      /* unavailable storage */
     }
+    this.clearGeometryStyles();
+  }
+
+  private clearGeometryStyles(): void {
     for (const id of ['chatlog-wrap', 'chatlog-frame', 'chat-input']) {
       const element = this.deps.document.getElementById(id);
       if (!element) continue;

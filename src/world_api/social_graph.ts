@@ -1,9 +1,14 @@
 // Persistent social state, mirrored from the server's SocialService. Mirrors
 // server/social.ts shapes; kept here so the HUD has no server-side imports.
 import type { PlayerFlair } from '../sim/account_flair';
+import type { GuildRankDef, GuildRankId } from '../sim/guild_ranks';
 
 export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead' | 'afk';
-export type GuildRank = 'leader' | 'officer' | 'member';
+// A rank id on the guild's ladder (GuildInfo.ranks): 'leader' and 'member' at
+// the two ends, 'officer' on the default ladder, custom 'r1'..'r99' between
+// (src/sim/guild_ranks.ts owns the vocabulary and every permission rule).
+export type GuildRank = GuildRankId;
+export type { GuildRankDef };
 
 export interface FriendInfo {
   id: number;
@@ -79,6 +84,11 @@ export interface GuildInfo {
   id: number;
   name: string;
   rank: GuildRank;
+  // The guild's rank ladder, most senior first (docs/prd/guild-custom-ranks.md):
+  // each rank's title and permissions. Optional on the mirror because a frame
+  // from an older server carries none; readers resolve it through
+  // resolveGuildRankLadder, which yields the default ladder then.
+  ranks?: GuildRankDef[];
   // The guild billboard: a short officer-set message pinned atop the Guild tab
   // ('' when unset), with the setter's display name for attribution. Rendered
   // as plain escaped text only (player-controlled; never linkified).
@@ -200,6 +210,11 @@ export interface IWorldSocialGraph {
   // refuses everyone else (socialInfo.guild.nextRosterPrice is the UX price,
   // never the charged one). Inert offline.
   guildBuyRosterPage(): void;
+  // Guild custom ranks: replace the guild's whole rank ladder (titles, order,
+  // permissions). Guild Master only; the server re-validates the ladder with
+  // the same sanitizer the client ran and refuses everyone else. Members on a
+  // rank the new ladder drops fall back to the joining rank. Inert offline.
+  guildSetRanks(ranks: readonly GuildRankDef[]): void;
   // The Who tab's roster mirror: null until the first `who` answer lands (and
   // forever offline, the socialInfo idiom). whoRequest asks the server for the
   // roster narrowed by a name / zone / guild substring ('' for everyone); the

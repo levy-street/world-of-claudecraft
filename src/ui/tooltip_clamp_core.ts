@@ -11,7 +11,9 @@
 // (mobTooltipCornerPlacement below). ONE box serves all three paths, so the
 // height cap belongs to the module rather than to a path: the mob path never
 // wrote one, which left it painting under whatever cap the last cursor tooltip
-// computed, stale the moment the viewport resized.
+// computed, stale the moment the viewport resized. The movable Tooltip frame
+// (unitTooltipAnchorPlacement) later let the player re-seat that corner card on
+// a draggable anchor; its stock seat reproduces the fixed corner exactly.
 //
 // Coordinates: the pointer arrives in VISUAL (zoomed) space; the box is laid
 // out in AUTHOR space (offsetWidth/Height are zoom-immune), so the pointer is
@@ -99,6 +101,42 @@ export function mobTooltipCornerPlacement(
   return {
     left: Math.max(TOOLTIP_EDGE_GAP, viewport.w / z - box.w - MOB_TOOLTIP_MARGIN_RIGHT),
     top: Math.max(TOOLTIP_EDGE_GAP, viewport.h / z - box.h - MOB_TOOLTIP_MARGIN_BOTTOM),
+  };
+}
+
+/** The movable unit-tooltip anchor's visual-space box (its
+ *  getBoundingClientRect), the seat the "Unlock interface" Tooltip frame
+ *  places. Only the four edges the placement reads. */
+export interface TooltipAnchorRect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
+/** Author-space top-left for the mouseover unit tooltip seated on the movable
+ *  anchor. The card grows AWAY from the screen edge the anchor sits nearest:
+ *  an anchor in the right half pins the card's right edge to its own (the card
+ *  grows leftward), one in the bottom half pins the bottom edges (the card grows
+ *  upward), and the mirror arms pin the left / top edges. That keeps a card of
+ *  any height on screen wherever the player parks the anchor, and it is why the
+ *  anchor's stock seat (the bottom-right slot, right MOB_TOOLTIP_MARGIN_RIGHT and
+ *  bottom MOB_TOOLTIP_MARGIN_BOTTOM) lands the card exactly where
+ *  mobTooltipCornerPlacement always put it. Both axes then clamp inside the edge
+ *  gap, floor-last, the same overflow rule as the cursor path. */
+export function unitTooltipAnchorPlacement(
+  box: TooltipBox,
+  viewport: TooltipViewport,
+  anchor: TooltipAnchorRect,
+): TooltipPlacement {
+  const z = viewport.scale;
+  const growLeft = anchor.left + anchor.right >= viewport.w;
+  const growUp = anchor.top + anchor.bottom >= viewport.h;
+  const left = growLeft ? anchor.right / z - box.w : anchor.left / z;
+  const top = growUp ? anchor.bottom / z - box.h : anchor.top / z;
+  return {
+    left: Math.max(TOOLTIP_EDGE_GAP, Math.min(viewport.w / z - box.w - TOOLTIP_EDGE_GAP, left)),
+    top: Math.max(TOOLTIP_EDGE_GAP, Math.min(viewport.h / z - box.h - TOOLTIP_EDGE_GAP, top)),
   };
 }
 

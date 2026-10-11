@@ -62,6 +62,9 @@ const MOB_IDS = [
   'mudfin_murloc',
   'tunnel_rat',
   'vale_bandit',
+  'eastbrook_freight_caravan',
+  'willowfen_remedy_caravan',
+  'frostveil_supply_caravan',
   'restless_bones',
   'gorrak',
   'mire_prowler',
@@ -69,6 +72,7 @@ const MOB_IDS = [
   'mire_widow',
   'mirefen_broodmother',
   'drowned_dead',
+  'fenbridge_infiltrator',
   'fen_troll',
   'grubjaw',
   'gravecaller_cultist',
@@ -170,6 +174,21 @@ const MOB_IDS = [
   'stable_horse',
   // Procedural Rift creature pool (src/sim/content/rift/mobs.ts). Dev/endless
   // content; English names come from the MOBS table like every other id here.
+  'hoard_brood_egg',
+  'hoard_brood_hatchling',
+  'hoard_healing_tide_totem',
+  'hoard_bound_pulsar',
+  'hoard_abyssal_tentacle',
+  'hoard_silk_cocoon',
+  'hoard_brood_cocoon',
+  'hoard_coinsack_scurrier',
+  'hoard_boss_mushroom',
+  'hoard_sporeling',
+  'hoard_bloat_cap',
+  'hoard_boss_mole',
+  'hoard_boss_bat',
+  'hoard_boss_mimic',
+  'hoard_bat_swarmling',
   'rift_spawnling',
   'rift_bonewalker',
   'rift_frost_revenant',
@@ -180,6 +199,7 @@ const MOB_IDS = [
   'rift_thornback',
   'rift_boneclad',
   'rift_marrow_troll',
+  'rift_marrow_golem',
   'rift_void_acolyte',
   'rift_dread_stalker',
   'rift_storm_caller',
@@ -323,6 +343,28 @@ const MOB_IDS = [
 ] as const;
 
 const NPC_IDS = [
+  'glider_instructor',
+  'glider_apprentice',
+  'shadow_cloak_scout',
+  'shadow_guard_north',
+  'shadow_guard_south',
+  'shadow_guard_east',
+  'shadow_guard_west',
+  'shadow_sentry_south',
+  'shadow_sentry_north',
+  'shadow_watch_west',
+  'shadow_watch_east',
+  'forge_instructor',
+  'infiltrator_captain',
+  'infiltrator_nella',
+  'infiltrator_orin',
+  'infiltrator_bram',
+  'infiltrator_tessa',
+  'wisp_maze_keeper',
+  'weekly_emissary',
+  'calligraphy_instructor',
+  'calligraphy_apprentice_1',
+  'calligraphy_apprentice_2',
   'the_merchant',
   'marshal_redbrook',
   'trader_wilkes',
@@ -347,7 +389,8 @@ const NPC_IDS = [
   'warmarshal_draven_kole', // Master of the Warfare Stores, the WARFARE vendor (Highwatch, zone 3)
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
-  'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)
+  'bursar_fernando',
+  'eastbrook_vault_keeper', // Gilded Strongbox banker (Eastbrook, zone 1)
   'card_master', // Card Duel minigame queue desk (Eastbrook, zone 1)
   'bursar_petra_vell', // Gilded Strongbox banker (Fenbridge, zone 2)
   'bursar_aldous_crane', // Gilded Strongbox banker (Highwatch, zone 3)
@@ -378,6 +421,7 @@ const NPC_IDS = [
   'gatecaptain_brannoc',
   'quartermaster_sela',
   'scout_yerrin',
+  'harbormaster_tamsin', // the Harbormaster's House at the Wyrmwatch cliff harbor
   // Lanternmere, the Amberfall
   'reeve_ottoline',
   'waywatcher_sorrel',
@@ -421,6 +465,12 @@ const NPC_IDS = [
   'bellkeeper_tam',
   'fisher_nell',
   'riftwright_maelis', // the Rift Forge (Gullhaven, Farshore)
+  // The faction quartermasters and the World Quest taskmaster
+  // (src/sim/content/faction_vendors.ts).
+  'npc_rift_watch_quartermaster',
+  'npc_church_order_quartermaster',
+  'npc_automaton_quartermaster',
+  'npc_wq_taskmaster',
   'forgemistress_darva', // crafting-station master: forge (Eastbrook, zone 1)
   'cook_marlow', // crafting-station master: kitchens (Eastbrook, zone 1)
   'weaver_ottilie', // crafting-station master: loom (Eastbrook, zone 1)
@@ -767,6 +817,7 @@ const LETTER_IDS = [
   'woc_market_delivery',
   'woc_market_return',
   'woc_market_sold',
+  'hoard_vault_reward',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];
@@ -788,7 +839,12 @@ type QuestTranslation = {
 type QuestTranslations = Record<QuestId, QuestTranslation>;
 type ZoneTranslations = Record<
   ZoneId,
-  { name: string; welcome: string; pois: Record<number, { label: string }> }
+  {
+    name: string;
+    welcome: string;
+    welcomeDone?: string;
+    pois: Record<number, { label: string }>;
+  }
 >;
 type DungeonTranslations = Record<
   DungeonId,
@@ -882,6 +938,9 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     zones[zone.id as ZoneId] = {
       name: zone.name,
       welcome: normalizeSourceText(zone.welcome),
+      ...(zone.welcomeDone !== undefined
+        ? { welcomeDone: normalizeSourceText(zone.welcomeDone) }
+        : {}),
       pois: poiRecord,
     };
   });

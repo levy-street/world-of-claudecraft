@@ -178,7 +178,7 @@ describe('hud.ts unit-frame text sites route through unitFrameCurrentMaxText', (
   });
 
   it('calls unitFrameHealthText at the three player/target/target-of-target hp sites', () => {
-    const calls = src.match(/unitFrameHealthText\(/g) ?? [];
+    const calls = (src + targetDescriptor).match(/unitFrameHealthText\(/g) ?? [];
     expect(calls.length).toBe(3);
   });
 

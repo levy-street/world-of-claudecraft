@@ -275,6 +275,13 @@ const KEEP_EXEMPTIONS: { entry: string; value: string; fieldIncludes: string }[]
   // 'Taunt'), operator-approved keeps, NOT the renamed priest/warrior abilities.
   { entry: 'Heal', value: 'Heal', fieldIncludes: 'meters.healingShort' },
   { entry: 'Taunt', value: 'Taunt', fieldIncludes: 'pet.taunt' },
+  // PROVISIONAL, pending the operator's ruling (rename or keep): the release's
+  // authored rift set piece (src/sim/content/rift/infernal_citadel.ts) shipped this
+  // name from sim content, which this scan never read; the Buried Hoards merge
+  // (2026-09-28) moved rift place names into the catalog, so the scan sees it now.
+  // Scoped to exactly these two fields: any other 'Infernal' still fails the gate.
+  { entry: 'Infernal', value: 'The Infernal Citadel', fieldIncludes: 'rift.place.infernalCitadel' },
+  { entry: 'Infernal', value: 'Infernal Citadel', fieldIncludes: 'rift.place.theme.infernal' },
 ];
 function isKeptException(field: string, value: string, entry: string): boolean {
   return KEEP_EXEMPTIONS.some(

@@ -108,9 +108,12 @@ describe('gathering goal tracker: real MovableFrame + InterfaceUnlock wiring', (
     expect(parseFloat(unlockedStyle.minHeight)).toBeGreaterThanOrEqual(48);
     expect(unlockedStyle.outlineStyle).toBe('dashed');
     expect(unlockedStyle.touchAction).toBe('none');
+    const grip = panel.querySelector<HTMLElement>('.mf-resize-grip')!;
+    expect(getComputedStyle(grip).display).not.toBe('none');
 
     unlock.setUnlocked(false);
     expect(getComputedStyle(panel).display).toBe('none');
+    expect(getComputedStyle(grip).display).toBe('none');
   });
 
   it('detaches to #ui with an absolute, width-bounded box on a real keyboard move', () => {

@@ -245,3 +245,52 @@ describe('the renderer governor hold on hidden frames (phase 4 QA F6)', () => {
     expect(statements).toEqual(['if (present) this.updateAdaptiveResolution(dt);']);
   });
 });
+
+describe('the frame rate ceiling call site in main.ts', () => {
+  function frameDeclaration(): ts.FunctionDeclaration {
+    let frame: ts.FunctionDeclaration | undefined;
+    const visit = (node: ts.Node): void => {
+      if (ts.isFunctionDeclaration(node) && node.name?.text === 'frame') {
+        frame = node;
+        return;
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(sourceFile);
+    if (!frame?.body) throw new Error('src/main.ts frame() was not found');
+    return frame;
+  }
+
+  /** Calls of `requestAnimationFrame(frame)` under a node: AST calls, so a
+   *  mention in a comment or a string never counts. */
+  function bareFrameArms(root: ts.Node): number {
+    let count = 0;
+    const visit = (node: ts.Node): void => {
+      if (
+        ts.isCallExpression(node) &&
+        flat(node.getText(sourceFile)) === 'requestAnimationFrame(frame)'
+      ) {
+        count++;
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(root);
+    return count;
+  }
+
+  it('opens frame() with the ceiling arm, ahead of everything else', () => {
+    const frame = frameDeclaration();
+    expect(flat(frame.getText(sourceFile))).toMatch(/^function frame\(now: number\): void \{/);
+    const first = frame.body?.statements[0];
+    expect(first && flat(first.getText(sourceFile))).toBe(
+      'if (armFrameAndSkip(frame, now, gateInput)) return;',
+    );
+  });
+
+  it('arms through the ceiling exactly once, and never re-arms bare inside frame()', () => {
+    expect(callTexts('armFrameAndSkip')).toHaveLength(1);
+    expect(bareFrameArms(frameDeclaration())).toBe(0);
+    // The boot seed outside frame() is the one bare arm left in the file.
+    expect(bareFrameArms(sourceFile)).toBe(1);
+  });
+});

@@ -1,7 +1,7 @@
 // The shared plank-walkway builder (src/render/deck_render.ts) rails every
 // deck edge over the deck's whole length. Where two decks JOIN (the Palmreach
 // lagoon boardwalk meeting its pier at a T, the jungle-pool stair running into
-// its platform, the harbor stairs landing on the boardwalk) that laid a fence
+// its platform) that laid a fence
 // straight across the walkway the player is meant to walk: at world
 // (-309, 947) the boardwalk's rails ran across the mouth of the pier.
 //
@@ -11,11 +11,9 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { buildDeckWood, deckRailRuns } from '../src/render/deck_render';
-import { GALE_HARBOR_DECKS, type GaleDeckDef } from '../src/sim/gale_harbor';
+import type { GaleDeckDef } from '../src/sim/gale_harbor';
 import { REACH_DECKS } from '../src/sim/reach_decks';
-import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
-const SEED = 20061;
 // the lagoon sits on level shore: a flat world keeps the decks level, so the
 // rails under test are the railAll runs, not stair handrails
 const FLAT_GROUND = 2;
@@ -122,13 +120,5 @@ describe('deck railings at walkway junctions', () => {
     }
     expect(spans.length, 'the lagoon decks keep their rail bars').toBeGreaterThanOrEqual(20);
     expect(Math.max(...spans), 'longest rail bar').toBeLessThan(1.5);
-  });
-
-  it('keeps the harbor stair handrails, none of them on the boardwalk', () => {
-    const terrain = (x: number, z: number): number => terrainHeight(x, z, SEED);
-    const { posts } = buildDeckWood(GALE_HARBOR_DECKS, terrain, WATER_LEVEL, { bollards: true });
-    const rails = railPosts(posts);
-    expect(rails.length, 'the bluff stairs keep their handrails').toBeGreaterThanOrEqual(12);
-    expect(straddling(GALE_HARBOR_DECKS, rails)).toEqual([]);
   });
 });

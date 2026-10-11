@@ -27,7 +27,8 @@ describe('Eastbrook town grass exclusion', () => {
     // signpost (content/noticeboards.ts): the island board rides the same
     // canonical def, so it enters the built-in service list and earns its
     // own grass exclusion like any other civic prop.
-    expect(BUILTIN_NOTICEBOARDS).toHaveLength(15);
+    // Includes the glider rankings sign at the mountain wharf.
+    expect(BUILTIN_NOTICEBOARDS).toHaveLength(16);
     // Includes Eastbrook footprints plus Fenbridge rebuild aprons (see fenbridge_layout).
     // Re-pinned 2026-08: the harbor-move layout v3 retired the ring wall
     // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), dropping the
@@ -51,7 +52,8 @@ describe('Eastbrook town grass exclusion', () => {
     // and reading-spot exclusions add two more on top.
     // The 13 town guild boards (content/noticeboards.ts, one per hub
     // settlement) each add a footprint and a reading-spot exclusion: 26 more.
-    expect(exclusions).toHaveLength(123);
+    // The glider sign adds its footprint and reading-spot exclusions too.
+    expect(exclusions).toHaveLength(125);
     expect(exclusions.some((item) => item.id.startsWith('eastbrook_grand_armoury'))).toBe(false);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,

@@ -16,6 +16,10 @@ export const THUNDER_CHARGES_ID = 'shaman_thunder_charges';
 export const PRIMAL_MASTERY_ID = 'elemental_mastery';
 export const PRIMAL_MASTERY_INSTANT_ID = 'elemental_mastery_instant';
 export const PRIMAL_MASTERY_VENT_ID = 'elemental_mastery_vent';
+// Magma Surge (combat/shaman_thundercall_kit.ts): the instant, reset-cooldown
+// Magma Burst a Cinder Jolt tick can proc. Declared here so the spec-change
+// clear below owns it without an import cycle.
+export const MAGMA_SURGE_ID = 'shaman_magma_surge';
 export const THUNDER_CHARGE_CAP = 5;
 export const THUNDER_BANK_DURATION = 86_400;
 export const EARTHEN_JOLT_BONUS_PER_CHARGE = 0.25;
@@ -31,6 +35,7 @@ const THUNDERCALL_STATE_IDS: ReadonlySet<string> = new Set([
   PRIMAL_MASTERY_ID,
   PRIMAL_MASTERY_INSTANT_ID,
   PRIMAL_MASTERY_VENT_ID,
+  MAGMA_SURGE_ID,
 ]);
 
 function isThundercall(ctx: SimContext, player: Entity): boolean {
@@ -56,11 +61,15 @@ export function thunderCharges(player: Entity): number {
   return Math.max(0, Math.min(THUNDER_CHARGE_CAP, stacks));
 }
 
-/** Pure action-bar predicate for the persistent full-bank payoff cue. */
+/**
+ * Pure action-bar predicate for Thundercall's proc glows: the persistent
+ * full-bank payoff cue on both vents, and a Magma Surge proc on Magma Burst.
+ */
 export function thundercallPayoffGlowActive(
   auras: readonly { id?: string; stacks?: number }[],
   abilityId: string,
 ): boolean {
+  if (abilityId === 'lava_burst') return auras.some((aura) => aura.id === MAGMA_SURGE_ID);
   if (!THUNDER_VENTS.has(abilityId)) return false;
   return auras.some(
     (aura) => aura.id === THUNDER_CHARGES_ID && (aura.stacks ?? 0) >= THUNDER_CHARGE_CAP,
@@ -112,10 +121,15 @@ export function thundercallDamageMultiplier(
 ): number {
   if (!isThundercall(ctx, player)) return 1;
   const charges = thunderCharges(player);
-  if (charges < THUNDER_CHARGE_CAP) return 1;
-  const primalBonus = player.auras.some((aura) => aura.id === PRIMAL_MASTERY_VENT_ID)
-    ? PRIMAL_MASTERY_VENT_BONUS
-    : 0;
+  // v0.44 rework: a partial bank vents too (the PRD's "vent early when
+  // immediate damage matters"), scaling per Thunder. Only the FULL-bank
+  // riders (Primal Mastery's vent bonus, the capstone talents) need all five.
+  if (charges <= 0) return 1;
+  const primalBonus =
+    charges === THUNDER_CHARGE_CAP &&
+    player.auras.some((aura) => aura.id === PRIMAL_MASTERY_VENT_ID)
+      ? PRIMAL_MASTERY_VENT_BONUS
+      : 0;
   if (abilityId === 'earth_shock') {
     // Stormkindled 4pc (the Crucible set doc): the per-Thunder bonus rises
     // 0.25 -> 0.30 for wearers (the full 5-charge vent goes 2.25x -> 2.5x).
@@ -157,10 +171,15 @@ export function consumeThunderVent(
 ): number {
   if (!isThundercall(ctx, player) || !THUNDER_VENTS.has(abilityId)) return 0;
   const charges = thunderCharges(player);
-  if (charges < THUNDER_CHARGE_CAP) return 0;
+  if (charges <= 0) return 0;
   const index = player.auras.findIndex((aura) => aura.id === THUNDER_CHARGES_ID);
   if (index >= 0) removeAuraAt(ctx, player, index);
-  const primalVentIndex = player.auras.findIndex((aura) => aura.id === PRIMAL_MASTERY_VENT_ID);
+  // Primal Mastery's vent bonus rides the next FULL vent only, so a partial
+  // vent inside the window leaves it armed.
+  const primalVentIndex =
+    charges === THUNDER_CHARGE_CAP
+      ? player.auras.findIndex((aura) => aura.id === PRIMAL_MASTERY_VENT_ID)
+      : -1;
   if (primalVentIndex >= 0) {
     removeAuraAt(ctx, player, primalVentIndex);
     ctx.emit({

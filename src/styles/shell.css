@@ -2644,6 +2644,85 @@
     margin-top: 2px;
     line-height: 1.3;
   }
+  /* Raid lockouts the character still carries: a native <details> disclosure
+     (the news panel's pattern) whose summary is the label plus the locked
+     count behind a rotating triangle, and whose body lists one line per
+     locked raid (name + countdown), so a narrow roster column never wraps a
+     raid name away from its timer. */
+  .char-row .char-lockout-hint {
+    max-width: 340px;
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  /* The summary is a tap target: min-height plus line-height bring it to the
+     24px WCAG 2.2 SC 2.5.8 absolute floor on desktop and the 40px touch floor
+     under body.mobile-touch (the gathering goal's Sources summary sets the
+     same two floors), without changing the visible text. */
+  .char-row .char-lockout-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 24px;
+    padding: 2px 0;
+    line-height: 20px;
+    cursor: pointer;
+    list-style: none;
+    color: var(--color-accent);
+    user-select: none;
+  }
+  body.mobile-touch .char-row .char-lockout-label {
+    min-height: 40px;
+    line-height: 40px;
+    padding: 0;
+  }
+  .char-row .char-lockout-label::-webkit-details-marker {
+    display: none;
+  }
+  .char-row .char-lockout-label::before {
+    content: "\25b8";
+    display: inline-block;
+    width: 10px;
+    color: var(--gold-dim);
+    transition: transform 0.15s ease;
+  }
+  .char-row .char-lockout-hint[open] > .char-lockout-label::before {
+    transform: rotate(90deg);
+  }
+  .char-row .char-lockout-label:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .char-row .char-lockout-group {
+    display: block;
+    padding-left: 10px;
+  }
+  .char-row .char-lockout-group-name {
+    display: block;
+    margin-top: 2px;
+    color: var(--color-text-muted);
+    font-variant: small-caps;
+    letter-spacing: 0.04em;
+  }
+  /* Inline flow (name, then the countdown) rather than a two-column row: the
+     roster's text column is narrow, so a right-aligned timer left most of a
+     wrapped raid name's lines empty. */
+  .char-row .char-lockout-item {
+    display: block;
+    padding-left: 12px;
+    text-indent: -6px;
+  }
+  .char-row .char-lockout-item::before {
+    content: "\00b7";
+    margin-right: 3px;
+    opacity: 0.6;
+  }
+  .char-row .char-lockout-time {
+    white-space: nowrap;
+    color: var(--color-warning);
+  }
   .char-row .char-inworld-hint {
     display: block;
     color: #ffbf66;
@@ -3369,6 +3448,18 @@
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-name {
       overflow-wrap: anywhere;
+    }
+    /* The grid track (minmax(0, 1fr)) is the text column's true width: the
+       flex layout's 150px floor overflowed it under the action buttons, which
+       only showed once the lockout rows right-aligned their countdowns. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-id {
+      min-width: 0;
+    }
+    /* With the column at its true track width the level line may no longer
+       fit on one line at the narrow end of the desktop range; wrap it rather
+       than let the nowrap flex rule overflow it under the action buttons. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-sub {
+      white-space: normal;
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions {
       display: grid;
@@ -4756,6 +4847,275 @@
     transform: none;
     width: auto;
     margin-top: var(--spacing-sm);
+  }
+
+  /* ---------- Char-select $WOC Exchange panel ---------- */
+  /* Docks in the same .cs-news-panel slot as the news feed and the reroll
+     editor above (box/position/mobile treatment shared for free); this
+     section is only the content inside that box. src/ui/charselect_woc_market_panel.ts. */
+  #charselect-woc-market {
+    display: flex;
+    flex-direction: column;
+  }
+  .csm-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    flex: none;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  .csm-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin: 0;
+  }
+  #csm-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .csm-tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex: none;
+    margin-bottom: var(--spacing-sm);
+  }
+  .csm-tab {
+    flex: 1 1 0;
+    padding: 6px 10px;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    background: var(--color-chrome-ground);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-xs);
+    cursor: var(--cursor-point);
+  }
+  .csm-tab-selected {
+    color: var(--color-white);
+    border-color: var(--gold-dim);
+    background: var(--panel-bg-strong);
+  }
+  .csm-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .csm-filter {
+    flex: none;
+    margin-bottom: var(--spacing-sm);
+  }
+  .csm-filter-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .csm-filter-input {
+    font-size: 13px;
+    padding: 6px 8px;
+    background: var(--color-chrome-ground);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-xs);
+    color: var(--color-text-light);
+  }
+  .csm-pager {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex: none;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-xs);
+  }
+  .csm-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: var(--color-chrome-glyph);
+    background: var(--color-chrome-ground);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-xs);
+    cursor: var(--cursor-point);
+  }
+  .csm-page-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .csm-page-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .csm-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  /* The shared status faces (loading/error/empty, woc_market_chrome.ts): same
+     reasoning as the item cell below, this module's own CSS is scoped to
+     #woc-market-window. */
+  #charselect-woc-market .wm-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg) var(--spacing-md);
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+  #charselect-woc-market .wm-status-error {
+    color: var(--color-text-error);
+  }
+  #charselect-woc-market .wm-status .ui-icon {
+    width: 18px;
+    height: 18px;
+  }
+  /* The shared icon-plus-name pair the Exchange window itself uses
+     (wocItemCellHtml, woc_market_chrome.ts): that module's own CSS is scoped
+     to #woc-market-window, so this panel repeats the same three rules under
+     its own id rather than reusing markup with no layout. */
+  #charselect-woc-market .wm-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    vertical-align: middle;
+  }
+  #charselect-woc-market .wm-icon {
+    flex: none;
+  }
+  #charselect-woc-market .wm-name {
+    font-weight: 700;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .csm-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 8px 4px;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border-default) 60%, transparent);
+    font-size: 12px;
+  }
+  .csm-row .wm-item {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+  .csm-seller {
+    color: var(--color-text-muted);
+  }
+  .csm-price {
+    color: var(--color-text-light);
+    font-weight: 600;
+  }
+  .csm-buynow {
+    color: var(--gold-dim);
+  }
+  .csm-time {
+    margin-left: auto;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .csm-web {
+    flex: none;
+    padding-top: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border-default);
+    text-align: center;
+  }
+  .csm-web-link {
+    color: var(--gold-dim);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  .csm-web-link:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .csm-web-note {
+    margin: 4px 0 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .csm-back {
+    flex: none;
+  }
+  /* The Sales History tab reuses the Exchange window's own table builder
+     (wocSalesTableHtml, woc_market_sales_html.ts) verbatim, so its markup
+     needs the same table/seller-link rules that module's CSS scopes to
+     #woc-market-window. */
+  #charselect-woc-market .wm-history {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+  #charselect-woc-market .wm-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+  #charselect-woc-market .wm-table th,
+  #charselect-woc-market .wm-table td {
+    padding: 6px var(--spacing-xs);
+    text-align: left;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  #charselect-woc-market .wm-table th {
+    font: 700 11px / 14px var(--font-ui);
+    color: var(--color-text-muted);
+    border-bottom-color: var(--border);
+  }
+  #charselect-woc-market .wm-table.wm-sales-table th:nth-child(1) {
+    width: 30%;
+  }
+  #charselect-woc-market .wm-table.wm-sales-table th:nth-child(2),
+  #charselect-woc-market .wm-table.wm-sales-table th:nth-child(3) {
+    width: 15%;
+  }
+  #charselect-woc-market .wm-table.wm-sales-table th:nth-child(4) {
+    width: 16%;
+  }
+  #charselect-woc-market .wm-table.wm-sales-table th:nth-child(5) {
+    width: 12%;
+  }
+  #charselect-woc-market button.wm-seller-link {
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    background: none;
+    border: 0;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: var(--cursor-point);
+  }
+  #charselect-woc-market button.wm-seller-link:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
 
   .class-details-content {

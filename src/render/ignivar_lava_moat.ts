@@ -14,6 +14,7 @@ import {
 } from '../sim/ignivar_arena';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { sharedUniforms } from './gfx';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
 
@@ -345,7 +346,7 @@ export function buildIgnivarLavaMoat(options: IgnivarLavaMoatOptions): THREE.Gro
   const surface = new THREE.Mesh(sharedLavaGeometry(), lavaMaterial(textures, options.lowGfx));
   surface.name = 'ignivarLavaSurface';
   surface.position.y = -IGNIVAR_LAVA_MOAT_DEPTH + 0.03;
-  surface.renderOrder = 1;
+  surface.renderOrder = floorVfxRenderOrder('encounter', 0);
   surface.userData.source = 'project-generated:drive-referenced-lava';
   surface.userData.actionable = true;
   surface.userData.hazard = 'lava';
@@ -358,7 +359,7 @@ export function buildIgnivarLavaMoat(options: IgnivarLavaMoatOptions): THREE.Gro
   const embers = new THREE.Points(emberGeometry(tier), emberMaterial(tier));
   embers.name = 'ignivarLavaEmbers';
   embers.frustumCulled = false;
-  embers.renderOrder = 2;
+  embers.renderOrder = floorVfxRenderOrder('encounter', 1);
   embers.userData.collision = 'none';
   embers.userData.actionable = false;
 

@@ -646,7 +646,11 @@ describe('foliage field bark consumers', () => {
           file !== 'render/foliage_field_models.ts',
       ),
     ).toEqual([]);
-    expect(importing).toEqual(['render/foliage.ts']);
+    // The Buried Hoard cavern's hero trees (the 2026-09-28 release/v0.44.0 merge
+    // into feature/buried-hoards) stand at the field's own scale and share the
+    // field's loaded oak_1 and pine_1 sources, so they read the table too rather
+    // than naming a copy.
+    expect(importing.sort()).toEqual(['render/foliage.ts', 'render/hoard_cavern_foliage.ts']);
   });
 
   it('keeps the Thornhollow dressing and the oakTree prop on the originals', () => {

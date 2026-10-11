@@ -113,6 +113,7 @@ const KNOWN_CODES = [
   'deeds.invalid_input',
   'guilds.invalid_roster_name',
   'guilds.unknown',
+  'world_quests.unknown_board',
   'steam.disabled',
   'steam.invalid_ticket',
   'steam.banned',

@@ -1,0 +1,157 @@
+{
+  "checks": [
+    {
+      "board": "candy",
+      "name": "desktop",
+      "rootOverflow": false,
+      "viewportOverflow": false,
+      "rootWidth": 584,
+      "rootHeight": 856,
+      "minTarget": 60
+    },
+    {
+      "board": "candy",
+      "name": "phone",
+      "rootOverflow": false,
+      "viewportOverflow": false,
+      "rootWidth": 370,
+      "rootHeight": 768,
+      "minTarget": 42.65625
+    },
+    {
+      "board": "candy",
+      "name": "landscape",
+      "rootOverflow": false,
+      "viewportOverflow": false,
+      "rootWidth": 824,
+      "rootHeight": 314,
+      "minTarget": 60
+    },
+    {
+      "board": "candy",
+      "name": "large-ui",
+      "rootOverflow": false,
+      "viewportOverflow": false,
+      "rootWidth": 370,
+      "rootHeight": 768,
+      "minTarget": 42.65625
+    },
+    {
+      "board": "candy",
+      "name": "clear-sample",
+      "requested": 3,
+      "cleared": 3
+    },
+    {
+      "board": "candy",
+      "name": "clear-sample",
+      "requested": 5,
+      "cleared": 5
+    },
+    {
+      "board": "candy",
+      "name": "clear-sample",
+      "requested": 8,
+      "cleared": 9
+    },
+    {
+      "board": "candy",
+      "name": "outcome",
+      "outcome": "lost",
+      "resultVisible": true,
+      "title": "Bitter defeat",
+      "animations": 20,
+      "maxFiniteDuration": 1400
+    },
+    {
+      "board": "candy",
+      "name": "outcome",
+      "outcome": "won",
+      "resultVisible": true,
+      "title": "Sweet victory",
+      "animations": 114,
+      "maxFiniteDuration": 5525
+    },
+    {
+      "board": "candy",
+      "name": "close-reopen",
+      "closed": true,
+      "reopened": true,
+      "outcome": "won"
+    },
+    {
+      "board": "candy",
+      "name": "reduced-motion",
+      "animations": 0,
+      "visible": true
+    },
+    {
+      "board": "ley",
+      "name": "desktop",
+      "rootOverflow": false,
+      "viewportOverflow": false,
+      "rootWidth": 568,
+      "rootHeight": 817.28125,
+      "minTarget": 92
+    },
+    {
+      "board": "ley",
+      "name": "phone",
+      "rootOverflow": false,
+      "viewportOverflow": false,
+      "rootWidth": 370,
+      "rootHeight": 713.296875,
+      "minTarget": 78.65625
+    },
+    {
+      "board": "ley",
+      "name": "landscape",
+      "rootOverflow": false,
+      "viewportOverflow": false,
+      "rootWidth": 824,
+      "rootHeight": 314,
+      "minTarget": 92
+    },
+    {
+      "board": "ley",
+      "name": "large-ui",
+      "rootOverflow": false,
+      "viewportOverflow": false,
+      "rootWidth": 362,
+      "rootHeight": 768,
+      "minTarget": 56.796875
+    },
+    {
+      "board": "ley",
+      "name": "outcome",
+      "outcome": "lost",
+      "resultVisible": true,
+      "title": "Alignment lost",
+      "animations": 21,
+      "maxFiniteDuration": 1600
+    },
+    {
+      "board": "ley",
+      "name": "outcome",
+      "outcome": "won",
+      "resultVisible": true,
+      "title": "Perfect alignment",
+      "animations": 69,
+      "maxFiniteDuration": 5250
+    },
+    {
+      "board": "ley",
+      "name": "close-reopen",
+      "closed": true,
+      "reopened": true,
+      "outcome": "won"
+    },
+    {
+      "board": "ley",
+      "name": "reduced-motion",
+      "animations": 0,
+      "visible": true
+    }
+  ],
+  "errors": []
+}

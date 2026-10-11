@@ -1,10 +1,18 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DELVES, NPCS, QUESTS, STATIONS } from '../src/sim/data';
+import {
+  INVESTIGATION_CLUES,
+  INVESTIGATION_NPC_IDS,
+  INVESTIGATION_NPCS,
+  INVESTIGATION_QUEST_ID,
+} from '../src/sim/content/world_quest_investigation';
+import { DELVES, ITEMS, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
+import { WEEKLY_KEEPER_ENTITY_ID, WEEKLY_KEEPER_ID } from '../src/sim/weekly_rewards';
 import { craftNameText } from '../src/ui/char_window';
+import { itemDisplayName } from '../src/ui/entity_i18n';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { QuestDialogController } from '../src/ui/hud/quest/quest_dialog_controller';
 import { ensureLocaleLoaded, setLanguage, supportedLanguages, t } from '../src/ui/i18n';
@@ -34,6 +42,7 @@ function harness(
   entity = npc(10, ordinaryNpcId()),
   questState = 'available',
   identityExtra: Record<string, unknown> = {},
+  worldExtra: Record<string, unknown> = {},
 ) {
   document.body.innerHTML = '';
   const element = document.createElement('div');
@@ -77,6 +86,8 @@ function harness(
     turnInQuest,
     reportTelemetry,
     convertHusks,
+    clueHunt: null,
+    ...worldExtra,
   } as unknown as IWorld;
   const release = vi.fn();
   const focusFirst = vi.fn();
@@ -100,6 +111,7 @@ function harness(
   const openCrucibleVendor = vi.fn();
   const openWarfareVendor = vi.fn();
   const openMarket = vi.fn();
+  const openWorldQuestBoard = vi.fn();
   const openDelveBoard = vi.fn();
   const openCardDuel = vi.fn();
   const openTrain = vi.fn();
@@ -137,6 +149,7 @@ function harness(
     openCrucibleVendor,
     openWarfareVendor,
     openMarket,
+    openWorldQuestBoard,
     openDelveBoard,
     openCardDuel,
     openTrain,
@@ -170,6 +183,7 @@ function harness(
     openCrucibleVendor,
     openWarfareVendor,
     openMarket,
+    openWorldQuestBoard,
     openDelveBoard,
     openCardDuel,
     openTrain,
@@ -290,6 +304,93 @@ describe('QuestDialogController', () => {
     expect(row.getAttribute('aria-label')).toBe(
       t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
     );
+  });
+
+  it('routes the Weekly Vault Keeper through authoritative interaction without gossip', () => {
+    const keeper = harness(npc(WEEKLY_KEEPER_ENTITY_ID, WEEKLY_KEEPER_ID));
+    keeper.controller.open(WEEKLY_KEEPER_ENTITY_ID);
+    expect(keeper.targetEntity).toHaveBeenCalledWith(WEEKLY_KEEPER_ENTITY_ID);
+    expect(keeper.interact).toHaveBeenCalledTimes(1);
+    expect(keeper.element.style.display).not.toBe('block');
+  });
+
+  it('a clue hand-over at an ordinary quest giver renders the row and the click sends the interact', () => {
+    // The 2026-09-22 playtest bug: the fenwitch salt hunt's first step is a
+    // hand-over of one cooking salt at Mother Sedge, an ORDINARY quest giver.
+    // The gossip menu only sent the interact for service NPCs or an active
+    // quest's discuss row, so the sim's clue check (talkToNpc runs
+    // onNpcTalkedForClueHunt first on every host) was never reached and the
+    // salt was never taken. The row is the one affordance that sends it.
+    const sedge = harness(
+      npc(77, 'mother_sedge'),
+      'none',
+      {},
+      {
+        clueHunt: { huntId: 'hunt_willowfen_fenwitch_salt', step: 0 },
+      },
+    );
+    sedge.controller.open(77);
+    expect(sedge.element.style.display).toBe('block');
+    const row = sedge.element.querySelector<HTMLButtonElement>('[data-clue-step]');
+    expect(row).not.toBeNull();
+    const salt = itemDisplayName(ITEMS.cooking_salt);
+    expect(row?.textContent).toContain(t('questUi.dialog.clueDeliver', { count: '1', item: salt }));
+    expect(row?.getAttribute('aria-label')).toBe(
+      t('questUi.dialog.clueDeliverAria', { count: '1', item: salt, name: 'npc:mother_sedge' }),
+    );
+    // The English literals once, beside the t() form.
+    expect(row?.textContent).toContain(`Hand over 1 ${salt}.`);
+    expect(row?.getAttribute('aria-label')).toBe(`Hand over 1 ${salt} to npc:mother_sedge`);
+    expect(sedge.interact).not.toHaveBeenCalled();
+    row?.click();
+    expect(sedge.targetEntity).toHaveBeenCalledWith(77);
+    expect(sedge.interact).toHaveBeenCalledTimes(1);
+    // No successor window: close WITH the trap's own focus restore (the husk
+    // trade shape), never the bindRoute release(false).
+    expect(sedge.release).toHaveBeenCalledWith(true);
+    expect(sedge.release).not.toHaveBeenCalledWith(false);
+    expect(sedge.controller.isOpen).toBe(false);
+  });
+
+  it('the clue row is absent for another NPC, a non-talk step, or no hunt', () => {
+    // Same hunt, wrong NPC: the step names mother_sedge, not widow_tansy.
+    const tansy = harness(
+      npc(78, 'widow_tansy'),
+      'none',
+      {},
+      {
+        clueHunt: { huntId: 'hunt_willowfen_fenwitch_salt', step: 0 },
+      },
+    );
+    tansy.controller.open(78);
+    expect(tansy.element.querySelector('[data-clue-step]')).toBeNull();
+    // Right NPC, no hunt (the harness default): nothing to hand over.
+    const idle = harness(npc(77, 'mother_sedge'), 'none');
+    idle.controller.open(77);
+    expect(idle.element.querySelector('[data-clue-step]')).toBeNull();
+    expect(idle.interact).not.toHaveBeenCalled();
+  });
+
+  it('refreshIfChanged repaints the open dialog when the clue step moves off this NPC', () => {
+    const sedge = harness(
+      npc(77, 'mother_sedge'),
+      'none',
+      {},
+      {
+        clueHunt: { huntId: 'hunt_willowfen_fenwitch_salt', step: 0 },
+      },
+    );
+    sedge.controller.open(77);
+    expect(sedge.element.querySelector('[data-clue-step]')).not.toBeNull();
+    // Unchanged state: no repaint (the DOM node identity survives).
+    const before = sedge.element.querySelector('[data-clue-step]');
+    sedge.controller.refreshIfChanged();
+    expect(sedge.element.querySelector('[data-clue-step]')).toBe(before);
+    // The hunt ended (or advanced past this NPC): the row must go. The
+    // harness world is the live object the controller reads.
+    (sedge.world as unknown as { clueHunt: unknown }).clueHunt = null;
+    sedge.controller.refreshIfChanged();
+    expect(sedge.element.querySelector('[data-clue-step]')).toBeNull();
   });
 
   it('routes bankers and chroniclers through authoritative interaction without gossip', () => {
@@ -505,6 +606,15 @@ describe('QuestDialogController', () => {
     market.controller.open(41);
     market.element.querySelector<HTMLButtonElement>('[data-market]')?.click();
     expect(market.openMarket).toHaveBeenCalledTimes(1);
+
+    // The World Quest taskmaster offers the board row and nothing else; the
+    // row routes to the map rail through openWorldQuestBoard.
+    const boardId = Object.values(NPCS).find((definition) => definition.worldQuestBoard)?.id;
+    if (!boardId) throw new Error('world quest board fixture not found');
+    const taskmaster = harness(npc(45, boardId));
+    taskmaster.controller.open(45);
+    taskmaster.element.querySelector<HTMLButtonElement>('[data-world-quest-board]')?.click();
+    expect(taskmaster.openWorldQuestBoard).toHaveBeenCalledTimes(1);
 
     const heroic = harness(npc(42, heroicId));
     heroic.controller.open(42);
@@ -847,5 +957,108 @@ describe('QuestDialogController', () => {
     test.controller.refreshIfChanged();
 
     expect(test.element.querySelector('[data-prof-intro-hint]')).toBe(hintNode);
+  });
+
+  it('opens a caravan briefing and confirms through target then interact', () => {
+    const caravan = {
+      ...npc(80, 'eastbrook_freight_caravan'),
+      kind: 'mob',
+      dead: false,
+    } as Entity;
+    const test = harness(caravan);
+    test.world.player.level = 60;
+    test.world.player.dead = false;
+    test.world.worldQuestLog = new Map([
+      ['wq_eastbrook_caravan', { questId: 'wq_eastbrook_caravan', state: 'active', count: 0 }],
+    ]);
+
+    test.controller.open(caravan.id);
+    const start = test.element.querySelector<HTMLButtonElement>('[data-start-wq]');
+    expect(test.controller.isOpen).toBe(true);
+    expect(start).not.toBeNull();
+    expect(start?.hidden).toBe(false);
+    start?.click();
+    expect(test.targetEntity).toHaveBeenCalledWith(caravan.id);
+    expect(test.interact).toHaveBeenCalledTimes(1);
+    expect(test.targetEntity.mock.invocationCallOrder[0]).toBeLessThan(
+      test.interact.mock.invocationCallOrder[0],
+    );
+  });
+});
+
+describe('investigation quest dialogue', () => {
+  it('opens records using existing dialogue chrome and distance dismissal', () => {
+    const clue = INVESTIGATION_CLUES[0];
+    const entity = {
+      ...npc(clue.entityId, `ground_${clue.objectItemId}`),
+      kind: 'object',
+    } as Entity;
+    const h = harness(entity);
+    h.world.worldQuestCycle = 'wq3_0';
+    h.world.worldQuestLog = new Map([
+      [
+        INVESTIGATION_QUEST_ID,
+        {
+          questId: INVESTIGATION_QUEST_ID,
+          state: 'active',
+          count: 0,
+          investigation: { heard: 0, clues: 1, cleared: 0 },
+        },
+      ],
+    ]);
+    h.controller.open(entity.id);
+    expect(h.controller.isOpen).toBe(true);
+    expect(h.element.querySelector('#quest-dialog-title')?.textContent).toBe('Standing Orders');
+    expect(h.element.querySelector('[data-close]')).not.toBeNull();
+    expect(h.element.querySelector('[data-accuse]')).toBeNull();
+    const title = h.element.querySelector('#quest-dialog-title');
+    h.controller.refreshIfChanged();
+    expect(h.element.querySelector('#quest-dialog-title')).toBe(title);
+    h.world.player.pos.x = 100;
+    h.controller.updateProximity();
+    expect(h.controller.isOpen).toBe(false);
+    expect(h.release).toHaveBeenCalled();
+  });
+  it('refreshes after online snapshot arrival, emits only accusation intent and restores correction', () => {
+    const entity = npc(INVESTIGATION_NPC_IDS[0], INVESTIGATION_NPCS[0].id);
+    const h = harness(entity);
+    h.world.worldQuestCycle = 'wq3_0';
+    const progress = {
+      questId: INVESTIGATION_QUEST_ID,
+      state: 'active' as const,
+      count: 0,
+      investigation: { heard: 7, clues: 3, cleared: 0, mobId: undefined as number | undefined },
+    };
+    h.world.worldQuestLog = new Map([[INVESTIGATION_QUEST_ID, progress]]);
+    h.world.accuseWorldQuestSuspect = vi.fn();
+    h.controller.open(entity.id);
+    expect(h.element.querySelector('[data-accuse]')).toBeNull();
+    progress.investigation.heard = 15;
+    h.controller.refreshIfChanged();
+    // One option per guard, in post order, each naming the guard.
+    const options = Array.from(h.element.querySelectorAll<HTMLButtonElement>('[data-accuse]'));
+    expect(options.map((b) => Number(b.dataset.accuse))).toEqual(INVESTIGATION_NPC_IDS.slice(1));
+    expect(options[0].textContent).toBe('Accuse npc:infiltrator_nella');
+    options[1].click();
+    expect(h.world.accuseWorldQuestSuspect).toHaveBeenCalledWith(INVESTIGATION_NPC_IDS[2]);
+    expect(progress.investigation.cleared).toBe(0);
+    expect(h.controller.isOpen).toBe(false);
+    progress.investigation.cleared = 2;
+    h.controller.open(entity.id);
+    expect(h.element.textContent).toContain('try again');
+    expect(
+      Array.from(h.element.querySelectorAll<HTMLButtonElement>('[data-accuse]')).map((b) =>
+        Number(b.dataset.accuse),
+      ),
+    ).toEqual([INVESTIGATION_NPC_IDS[1], INVESTIGATION_NPC_IDS[3], INVESTIGATION_NPC_IDS[4]]);
+    // A guard's own dialog never carries the option.
+    const guard = npc(INVESTIGATION_NPC_IDS[2], INVESTIGATION_NPCS[2].id);
+    h.world.entities.set(guard.id, guard);
+    h.controller.open(guard.id);
+    expect(h.element.querySelector('[data-accuse]')).toBeNull();
+    h.controller.open(entity.id);
+    progress.investigation.mobId = 500;
+    h.controller.refreshIfChanged();
+    expect(h.controller.isOpen).toBe(false);
   });
 });

@@ -22,6 +22,11 @@ export function applySelfCombatScalars(e: Entity, s: any): void {
   // wiring (the swing timers already ride the snapshot).
   e.spellHaste = s.sh ?? e.spellHaste;
   e.critChance = s.crit ?? e.critChance;
+  // The shared crit core (server/self_scalar_wire.ts `scb`): the one input of the
+  // spell crit pool the self mirror lacked (Intellect and the auras already
+  // ride), so the sheet's Spell Crit reads combat/spell_combat.ts spellCritChance
+  // here exactly as it does offline.
+  e.sharedCritBonus = s.scb ?? e.sharedCritBonus;
   e.dodgeChance = s.dodge ?? e.dodgeChance;
   e.blockChance = s.blk ?? e.blockChance;
   e.blockValue = s.bval ?? e.blockValue;

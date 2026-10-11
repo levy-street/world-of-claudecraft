@@ -538,6 +538,44 @@ const mergeStringsEn = {
       rift_storm_strike: "Stormcaller's Wrath",
       rift_tide_execution: 'Abyssal Maw',
       rift_tide_strike: 'Crushing Depth',
+      // Buried Hoard control casts (src/sim/rift/hoard_control_casts.ts): a fear,
+      // stun, silence or hex a hoard mob CASTS, so it can be interrupted.
+      hoard_cast_fear: 'Terrifying Roar',
+      hoard_cast_stun: 'Stunning Blow',
+      hoard_cast_drowning_hook: 'Drowning Hook',
+      hoard_cast_rime_beam: 'Rime Beam',
+      hoard_cast_cinder_bolt: 'Cinder Bolt',
+      hoard_cast_void_empower: 'Void Empowerment',
+      hoard_cast_webbing: 'Webbing',
+      hoard_cast_doom_ritual: 'Doom Ritual',
+      hoard_cast_charge: 'Headlong Charge',
+      hoard_cast_silk_snare: 'Silk Snare',
+      hoard_cast_silence: 'Silencing Shriek',
+      hoard_cast_hex: 'Hex',
+      hoard_lightning_strike: 'Lightning Strike',
+      // Hoarfrost's survival cast (src/sim/rift/hoard_ice_age.ts): read, never kicked.
+      hoard_ice_age: 'Ice Age',
+      // Nyxaris's pulsar phase (src/sim/rift/hoard_pulsars.ts): the bar is the
+      // deadline the orbs must die by.
+      hoard_pulsar_overload: 'Pulsar Overload',
+      // Grask's throw (src/sim/rift/hoard_boulder.ts): read and answered, never kicked.
+      hoard_rolling_boulder: 'Rolling Boulder',
+      // The Coinsack Scurrier's bar (src/sim/rift/hoard_goblin.ts): when it ends,
+      // the goblin is gone with the gold. Never kicked.
+      hoard_goblin_escape: 'Escaping',
+      // The cave bosses of the common and rare hoards (hoard_mole.ts, hoard_bat.ts,
+      // hoard_mimic.ts). Only the Deafening Screech can be kicked.
+      hoard_cast_mole_rake: 'Claw Rake',
+      hoard_cast_burrow: 'Burrow',
+      hoard_cast_tunnel: 'Tunneling',
+      hoard_cast_emerge: 'Eruption',
+      hoard_cast_collapse: 'Ceiling Collapse',
+      hoard_cast_bat_dive_aim: 'Plunging Dive',
+      hoard_cast_bat_dive: 'Diving',
+      hoard_cast_screech: 'Deafening Screech',
+      hoard_cast_mimic_bite: 'Voracious Bite',
+      hoard_cast_mimic_leap: 'Crushing Leap',
+      hoard_cast_coin_spit: 'Cursed Coins',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
@@ -698,7 +736,7 @@ const mergeStringsEn = {
       emptyTheirs: 'Nothing offered yet',
       money: 'Money',
       copper: 'copper',
-      hint: 'Click an offered item to remove it. Both sides must press Accept Trade.',
+      hint: 'Click an offered item to remove some or all of it. Both sides must press Accept Trade.',
       accept: 'Accept Trade',
       waiting: 'Waiting...',
       cancel: 'Cancel',
@@ -3928,14 +3966,18 @@ const mergeExtraEn = {
     [
       'bear_charge',
       'Bruin Rush',
-      'Rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Bruin Form only.',
+      'Shift into Bruin Form if you are not already, then rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Usable in any form.',
     ],
     [
       'demoralizing_roar',
       'Craven Roar',
       'Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bruin Form only.',
     ],
-    ['prowl', 'Stalk', 'Enter stealth while in Cat Form. Cannot be used in combat.'],
+    [
+      'prowl',
+      'Stalk',
+      'Shift into Cat Form if you are not already, and enter stealth. Usable in any form. Cannot be used in combat.',
+    ],
     [
       'rake',
       'Flense',

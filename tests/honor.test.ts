@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import type { TalentAllocation } from '../src/sim/content/talents';
+import { DUNGEON_X_THRESHOLD, MOBS } from '../src/sim/data';
+import { bestEpicGearFor } from '../src/sim/dev/bis_gear';
+import { createMob } from '../src/sim/entity';
 import {
   ARENA_DAILY_TAPER_START,
   ARENA_LOSS_HONOR_SHARE,
@@ -20,6 +24,10 @@ import {
   FIESTA_WIN_BONUS_HONOR,
   grantHonor,
   HONOR_REPEAT_DR,
+  PVP_VITALITY_CAP,
+  PVP_VITALITY_RATING_PER_PCT,
+  pvpVitalityAppliesTo,
+  pvpVitalityFromRating,
   RANKED_ARENA_LOSS_HONOR,
   RANKED_ARENA_WIN_HONOR,
   repeatHonorMultiplier,
@@ -28,6 +36,7 @@ import type { ArenaMatch } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import * as arena from '../src/sim/social/arena';
 import * as fiesta from '../src/sim/social/fiesta';
+import { armorReduction, type Entity, type EquipSlot, type PlayerClass } from '../src/sim/types';
 import { RL_TEST_WORLD } from './sim_shared';
 
 function world(): Sim {
@@ -500,17 +509,17 @@ describe('Thornhollow Fields honor income', () => {
     return { sim, meta: sim.meta(pid)! };
   }
 
-  it("pays 80 for the day's first win and 60 for the next", () => {
+  it("pays 160 for the day's first win and 120 for the next", () => {
     const { sim, meta } = bgPlayer();
     const first = awardBattlegroundHonor(sim.ctx, meta, '["character:1"]', 'win');
     expect(first.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
-    expect(first.total).toBe(80);
+    expect(first.total).toBe(160);
     // A fresh opposing identity, so the repeat curve is not what is measured:
     // only the bonus should be missing the second time.
     const second = awardBattlegroundHonor(sim.ctx, meta, '["character:2"]', 'win');
     expect(second.firstWinBonus).toBe(0);
     expect(second.total).toBe(BATTLEGROUND_WIN_HONOR);
-    expect(second.total).toBe(60);
+    expect(second.total).toBe(120);
   });
 
   it('neither arms nor claims the daily bonus on a loss or a draw', () => {
@@ -535,9 +544,9 @@ describe('Thornhollow Fields honor income', () => {
     for (let i = 0; i < 3; i++) awardBattlegroundHonor(sim.ctx, meta, key, 'loss');
     const win = awardBattlegroundHonor(sim.ctx, meta, key, 'win');
     // Base is floored at 0.25 (60 -> 15); the bonus is NOT decayed with it.
-    expect(win.total - win.firstWinBonus).toBe(15);
+    expect(win.total - win.firstWinBonus).toBe(30);
     expect(win.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
-    expect(win.total).toBe(35);
+    expect(win.total).toBe(70);
   });
 
   it('floors the result curve at a quarter and never reaches zero', () => {
@@ -548,7 +557,7 @@ describe('Thornhollow Fields honor income', () => {
       { length: 10 },
       () => awardBattlegroundHonor(sim.ctx, meta, key, 'loss').total,
     );
-    expect(paid).toEqual([20, 10, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(paid).toEqual([40, 20, 10, 10, 10, 10, 10, 10, 10, 10]);
     expect(paid.every((amount) => amount > 0)).toBe(true);
 
     const wins = bgPlayer();
@@ -557,7 +566,7 @@ describe('Thornhollow Fields honor income', () => {
       () => awardBattlegroundHonor(wins.sim.ctx, wins.meta, key, 'win').total,
     );
     // The first carries the +20 daily bonus; the rest are the floored base.
-    expect(winPaid).toEqual([80, 30, 15, 15, 15, 15]);
+    expect(winPaid).toEqual([160, 60, 30, 30, 30, 30]);
   });
 
   it('keeps the battleground result curve separate from the shared Fiesta one', () => {
@@ -593,18 +602,18 @@ describe('Thornhollow Fields honor income', () => {
     const kills = new Map<string, number>();
     expect(
       Array.from({ length: 5 }, () => awardBattlegroundKillHonor(sim.ctx, meta, 99, kills)),
-    ).toEqual([5, 2, 1, 0, 0]);
-    expect(BATTLEGROUND_KILL_HONOR).toBe(5);
+    ).toEqual([10, 5, 2, 0, 0]);
+    expect(BATTLEGROUND_KILL_HONOR).toBe(10);
 
     const assists = new Map<string, number>();
     expect(
       Array.from({ length: 5 }, () => awardBattlegroundAssistHonor(sim.ctx, meta, 99, assists)),
-    ).toEqual([2, 1, 0, 0, 0]);
-    expect(BATTLEGROUND_ASSIST_HONOR).toBe(2);
+    ).toEqual([4, 2, 1, 0, 0]);
+    expect(BATTLEGROUND_ASSIST_HONOR).toBe(4);
 
     // The counters live on the MATCH, so a new match starts the curve over.
     const nextMatch = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 99, nextMatch)).toBe(5);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 99, nextMatch)).toBe(10);
   });
 });
 
@@ -620,11 +629,11 @@ describe('weekly Double Honor', () => {
     const kills = new Map<string, number>();
     expect(
       Array.from({ length: 5 }, () => awardBattlegroundKillHonor(sim.ctx, meta, 99, kills)),
-    ).toEqual([10, 5, 2, 0, 0]);
+    ).toEqual([20, 10, 5, 0, 0]);
     const assists = new Map<string, number>();
     expect(
       Array.from({ length: 5 }, () => awardBattlegroundAssistHonor(sim.ctx, meta, 99, assists)),
-    ).toEqual([4, 2, 1, 0, 0]);
+    ).toEqual([8, 4, 2, 0, 0]);
     expect(sim.events).toContainEqual({
       type: 'honor',
       pid,
@@ -635,10 +644,10 @@ describe('weekly Double Honor', () => {
     // Sunday is still inside the window; the Monday rollover closes it.
     sim.resetDay = '2026-08-16';
     const sunday = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, sunday)).toBe(10);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, sunday)).toBe(20);
     sim.resetDay = '2026-08-17';
     const monday = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, monday)).toBe(5);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, monday)).toBe(10);
   });
 
   it('opens 12 hours early: Friday pays double once the lead probe reads Saturday', () => {
@@ -650,13 +659,13 @@ describe('weekly Double Honor', () => {
 
     // Before the probe crosses, Friday is an ordinary weekday.
     const morning = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, morning)).toBe(5);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, morning)).toBe(10);
 
     // From 3 PM realm time the host's probe reads Saturday: every award path
     // doubles, and the loss boost opens with the same window.
     sim.eventLeadDay = '2026-08-22';
     const evening = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, evening)).toBe(10);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, evening)).toBe(20);
     const loss = awardBattlegroundHonor(sim.ctx, meta, '["character:fri"]', 'loss');
     expect(loss.total).toBe(BATTLEGROUND_WIN_HONOR * 2);
     expect(loss.firstWinBonus, 'a loss never claims the daily bonus').toBe(0);
@@ -767,6 +776,59 @@ describe('WARFARE damage', () => {
     expect(target.hp).toBe(900);
   });
 
+  it("applies to ALL PvP combat: pets fight with their owner's WARFARE, and PvE never moves", () => {
+    const sim = world();
+    const ownerPid = sim.addPlayer('hunter', 'Owner');
+    const foePid = sim.addPlayer('mage', 'Foe');
+    const owner = sim.entities.get(ownerPid)!;
+    const foe = sim.entities.get(foePid)!;
+    owner.stats.pvpOffense = 0.1;
+    owner.stats.pvpDefense = 0.2;
+    foe.stats.pvpOffense = 0.1;
+    foe.stats.pvpDefense = 0.2;
+    foe.maxHp = foe.hp = 1_000;
+    const pet = createMob(sim.nextId++, MOBS.forest_wolf, owner.level, { ...owner.pos });
+    pet.ownerId = owner.id;
+    pet.hostile = false;
+    pet.maxHp = pet.hp = 1_000;
+    sim.addEntity(pet);
+    sim.duels.set(ownerPid, {
+      a: ownerPid,
+      b: foePid,
+      state: 'active',
+      timer: 0,
+      controlled: new Map(),
+    });
+    sim.duels.set(foePid, sim.duels.get(ownerPid)!);
+
+    // The pet hits the foe with its owner's Offense against the foe's Defense:
+    // 100 x 1.1 x 0.8 = 88.
+    (sim as any).dealDamage(pet, foe, 100, false, 'physical', null, 'hit');
+    expect(foe.hp).toBe(912);
+    // The foe hits the pet, which takes it with its owner's Defense.
+    (sim as any).dealDamage(foe, pet, 100, false, 'arcane', null, 'hit');
+    expect(pet.hp).toBe(912);
+
+    // PvE never moves: the pet against a wild mob, and a wild mob against the pet.
+    const mob = [...sim.entities.values()].find(
+      (entity) => entity.kind === 'mob' && entity.ownerId === null,
+    )!;
+    mob.maxHp = mob.hp = 1_000;
+    (sim as any).dealDamage(pet, mob, 100, false, 'physical', null, 'hit');
+    expect(mob.hp).toBe(900);
+    pet.hp = 1_000;
+    (sim as any).dealDamage(mob, pet, 100, false, 'physical', null, 'hit');
+    expect(pet.hp).toBe(900);
+
+    // Nor does a pet's damage to a player it is not hostile to (no fight between them).
+    const bystanderPid = sim.addPlayer('priest', 'Bystander');
+    const bystander = sim.entities.get(bystanderPid)!;
+    bystander.stats.pvpDefense = 0.2;
+    bystander.maxHp = bystander.hp = 1_000;
+    (sim as any).dealDamage(pet, bystander, 100, false, 'physical', null, 'hit');
+    expect(bystander.hp).toBe(900);
+  });
+
   it('clamps oversized derived fractions on the applied damage path', () => {
     const sim = world();
     const sourcePid = sim.addPlayer('warrior', 'Source');
@@ -788,5 +850,143 @@ describe('WARFARE damage', () => {
     (sim as any).dealDamage(source, target, 100, false, 'arcane', null, 'hit');
     // 100 x (1 + 0.30) x (1 - 0.30) = 91 at the raised WARFARE caps.
     expect(target.hp).toBe(909);
+  });
+});
+
+// WARFARE Vitality (owner rule, 2026-09-24): honor gear raises maximum health
+// everywhere except PvE instances, so PvP gear gives players far more health than
+// players without it while raid gear stays the raid pick.
+describe('WARFARE Vitality', () => {
+  const STR_KIT: Partial<Record<EquipSlot, string>> = {
+    mainhand: 'final_argument_greatblade',
+    helmet: 'furyforged_warhelm',
+    shoulder: 'furyforged_warspaulders',
+    chest: 'furyforged_warplate',
+    waist: 'furyforged_girdle',
+    legs: 'furyforged_legguards',
+    gloves: 'furyforged_gauntlets',
+    feet: 'furyforged_sabatons',
+    neck: 'final_oath_medallion',
+    ring1: 'iron_vow_band',
+    ring2: 'unbroken_circle',
+  };
+  const AGI_KIT: Partial<Record<EquipSlot, string>> = {
+    mainhand: 'first_blood_razor',
+    helmet: 'ashstalker_cowl',
+    shoulder: 'ashstalker_shoulderguards',
+    chest: 'ashstalker_harness',
+    waist: 'ashstalker_waistband',
+    legs: 'ashstalker_legguards',
+    gloves: 'ashstalker_grips',
+    feet: 'ashstalker_treads',
+    neck: 'razorwind_torque',
+    ring1: 'fleetblood_band',
+    ring2: 'last_step_signet',
+  };
+  const INSTANCE_X = DUNGEON_X_THRESHOLD + 900;
+
+  function geared(cls: PlayerClass, spec: string, kit: Partial<Record<EquipSlot, string>>) {
+    const sim = world();
+    const pid = sim.addPlayer(cls, `V${cls}`);
+    sim.setPlayerLevel(20, pid);
+    sim.applyTalents({ spec, rows: {} } as TalentAllocation, pid);
+    for (const [slot, id] of Object.entries(kit)) {
+      sim.addItem(id, 1, pid);
+      sim.equipItemToSlot(id, slot as EquipSlot, pid);
+    }
+    for (let i = 0; i < 12; i++) sim.tick();
+    return { sim, pid, e: sim.entities.get(pid)! };
+  }
+
+  function standAt(sim: Sim, e: Entity, x: number): void {
+    e.pos = { ...e.pos, x };
+    e.prevPos = { ...e.pos };
+    for (let i = 0; i < 12; i++) sim.tick();
+  }
+
+  it('reads the Warfare Defense Rating at six per percent, capped at +80%', () => {
+    // A full Season 1 kit (302 rating) lands at about +50%; only the Warfare
+    // Season 2 pieces carry the rating to reach the +80% cap.
+    expect(PVP_VITALITY_RATING_PER_PCT).toBe(6);
+    expect(PVP_VITALITY_CAP).toBe(0.8);
+    expect(pvpVitalityFromRating(0)).toBe(0);
+    expect(pvpVitalityFromRating(-40)).toBe(0);
+    expect(pvpVitalityFromRating(60)).toBeCloseTo(0.1, 10);
+    expect(pvpVitalityFromRating(182)).toBeCloseTo(182 / 600, 10);
+    expect(pvpVitalityFromRating(302)).toBeCloseTo(302 / 600, 10);
+    expect(pvpVitalityFromRating(480)).toBeCloseTo(0.8, 10);
+    expect(pvpVitalityFromRating(9_999)).toBe(0.8);
+  });
+
+  it('applies in the open world and never on dungeon ground, keeping the health fraction', () => {
+    const { sim, e } = geared('warrior', 'arms', STR_KIT);
+    // The full Season 1 kit's 302 rating.
+    expect(e.stats.pvpVitality).toBeCloseTo(302 / 600, 10);
+    const open = e.maxHp;
+    // Walking onto the instance plane (a dungeon band) switches it off; the
+    // health FRACTION survives the switch.
+    e.hp = Math.round(open * 0.6);
+    standAt(sim, e, INSTANCE_X);
+    expect(e.pvpVitalityActive).toBe(false);
+    expect(e.maxHp).toBe(Math.round(open / (1 + 302 / 600)));
+    expect(e.hp / e.maxHp).toBeCloseTo(0.6, 2);
+    // Back in the open world it returns.
+    standAt(sim, e, 0);
+    expect(e.maxHp).toBe(open);
+  });
+
+  it('counts a live arena match as PvP, though the arena sits on the instance plane', () => {
+    const { sim, a } = liveArena();
+    const e = sim.entities.get(a)!;
+    for (let i = 0; i < 12; i++) sim.tick();
+    expect(e.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
+    expect(pvpVitalityAppliesTo(sim.ctx, e)).toBe(true);
+    expect(e.pvpVitalityActive).not.toBe(false);
+    // The same ground outside a match is an instance: off.
+    sim.arenaMatches.delete(a);
+    expect(pvpVitalityAppliesTo(sim.ctx, e)).toBe(false);
+    // A battleground match counts the same way (the membership is all the
+    // context check reads; no tick runs against the placeholder match).
+    (sim.bgMatches as Map<number, unknown>).set(a, {});
+    expect(pvpVitalityAppliesTo(sim.ctx, e)).toBe(true);
+    sim.bgMatches.delete(a);
+    expect(pvpVitalityAppliesTo(sim.ctx, e)).toBe(false);
+  });
+
+  it('never makes honor gear the raid pick: in an instance every tank kit has less effective health than raid best-in-slot', () => {
+    // Effective health against a level-22 boss's physical hit: health over the
+    // share of the hit that survives armor. Raw health alone is the wrong
+    // measure (a feral's honor kit carries 52 more health in bear form but about
+    // a thousand less armor, so 872 less effective health), and the tier also
+    // carries no hit, crit or haste rating at all (tests/warfare_gear_tier.test.ts).
+    const BOSS_LEVEL = 22;
+    const ehp = (e: Entity) => e.maxHp / (1 - armorReduction(e.stats.armor, BOSS_LEVEL));
+    for (const [cls, spec, kit, bear] of [
+      ['warrior', 'prot', STR_KIT, false],
+      ['paladin', 'protection', STR_KIT, false],
+      ['druid', 'feral', AGI_KIT, true],
+    ] as [PlayerClass, string, Partial<Record<EquipSlot, string>>, boolean][]) {
+      const sides = [kit, bestEpicGearFor(cls, spec)].map((k) => {
+        const side = geared(cls, spec, k);
+        if (bear) {
+          side.e.auras.push({
+            id: 'bear_form',
+            name: 'Bear Form',
+            kind: 'form_bear',
+            remaining: 9999,
+            duration: 9999,
+            value: 0,
+          } as never);
+        }
+        standAt(side.sim, side.e, INSTANCE_X);
+        side.sim.ctx.recalcPlayer(side.e);
+        return side.e;
+      });
+      const [honor, raid] = sides;
+      expect(honor.pvpVitalityActive, `${cls}/${spec}`).toBe(false);
+      expect(ehp(honor), `${cls}/${spec} honor kit effective health in an instance`).toBeLessThan(
+        ehp(raid),
+      );
+    }
   });
 });

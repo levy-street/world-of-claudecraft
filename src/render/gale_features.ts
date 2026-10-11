@@ -3,14 +3,14 @@
 // cap, with a slowly turning light, the realm's landmark from anywhere on
 // the downs, plus the grey stone stair the sim's beaconSpiralLift makes
 // walkable, hugging the column up to the C balcony, on the masonry plinth
-// that fills the volume the same lift field walls off), the stilt piers and
-// boardwalk of Wickharbor's harbor (drawn from the SAME sim/gale_harbor.ts
-// decks the player walks, with steep ramps drawn as stepped stairs), and
-// the ribs of old hulls half-buried on the Wreckfields. Same contract as the sibling
-// realm modules: build once, update(time) turns the beacon.
+// that fills the volume the same lift field walls off), and the ribs of old
+// hulls half-buried on the Wreckfields. Wickharbor's wooden harbor is its own
+// Blender model (render/wickharbor_harbor.ts, with the ferry wharf,
+// render/wickharbor_wharf.ts). Same contract as the sibling realm modules:
+// build once, update(time) turns the beacon.
 import * as THREE from 'three';
 import { BEACON_SPIRAL, beaconSpiralLift } from '../sim/beacon_spiral';
-import { GALE_HARBOR_DECKS } from '../sim/gale_harbor';
+import { GLIDER_WHARF, GLIDER_WHARF_DECKS } from '../sim/glider_wharf_layout';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -274,23 +274,6 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
     group.add(light);
   }
 
-  // --- Wickharbor's harbor: plank decks on stilts over the bay ---
-  // Drawn from the same GALE_HARBOR_DECKS rectangles groundHeight walks, so
-  // the plank plane underfoot is exactly the plank plane on screen (the
-  // shared walkway builder in deck_render.ts).
-  {
-    const wood = mat(0x8a6a4a, 0.9);
-    const postWood = mat(0x6b523d, 0.92);
-    const { planks, posts } = buildDeckWood(
-      GALE_HARBOR_DECKS,
-      (x, z) => terrainHeight(x, z, seed),
-      WATER_LEVEL,
-      { bollards: true },
-    );
-    group.add(mergeBoxes(planks, wood));
-    group.add(mergeBoxes(posts, postWood));
-  }
-
   // --- the Wreckfields: hull ribs arcing out of the shingle ---
   {
     const ribGeo = new THREE.TorusGeometry(1, 0.08, 5, 10, Math.PI);
@@ -329,12 +312,83 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
     group.add(mesh);
   }
 
+  // Zephyr's pier on the existing western mountain. Shared rectangles keep
+  // the visible planks and walkable deck aligned.
+  const updraftGroup = new THREE.Group();
+  {
+    const wood = mat(0x8a6a4a, 0.9);
+    const postWood = mat(0x6b523d, 0.92);
+    const { planks, posts } = buildDeckWood(
+      GLIDER_WHARF_DECKS,
+      (x, z) => terrainHeight(x, z, seed),
+      WATER_LEVEL,
+      { railAll: true },
+    );
+    group.add(mergeBoxes(planks, wood));
+    group.add(mergeBoxes(posts, postWood));
+
+    // A wind-sock pennant at the pier root, pointing the way the course opens.
+    const bannerBlue = mat(0x38bdf8, 0.75);
+    const poleGeo = new THREE.CylinderGeometry(0.09, 0.11, 4.2, 6);
+    const rootDeck = GLIDER_WHARF_DECKS[0];
+    const poleX = rootDeck.ax + 2.6;
+    const poleZ = rootDeck.az + 1.5;
+    const poleY = terrainHeight(poleX, poleZ, seed);
+    const pole = new THREE.Mesh(poleGeo, mat(0x4b4f56, 0.8));
+    pole.position.set(poleX, poleY + 2.1, poleZ);
+    group.add(pole);
+    const pennantGeo = new THREE.ConeGeometry(0.4, 2.2, 3);
+    pennantGeo.rotateZ(Math.PI / 2);
+    pennantGeo.rotateY(Math.PI / 2);
+    const pennant = new THREE.Mesh(pennantGeo, bannerBlue);
+    pennant.position.set(poleX + 0.9, poleY + 3.9, poleZ);
+    group.add(pennant);
+
+    // The return updraft beside the landing pad (GLIDER_WHARF.updraft):
+    // a stone ring on the ground and a spiralling wind funnel the update() arm
+    // turns. The sim's updateGliderLaunchUpdraft carries a player standing in
+    // it back up to Zephyr.
+    const ux = GLIDER_WHARF.updraft.x;
+    const uz = GLIDER_WHARF.updraft.z;
+    const uy = terrainHeight(ux, uz, seed);
+
+    const stoneRingGeo = new THREE.TorusGeometry(1.6, 0.22, 8, 24);
+    stoneRingGeo.rotateX(Math.PI / 2);
+    const stoneRing = new THREE.Mesh(stoneRingGeo, mat(0x7c828a, 0.95));
+    stoneRing.position.set(ux, uy + 0.12, uz);
+    group.add(stoneRing);
+
+    const updraftMat = new THREE.MeshBasicMaterial({
+      color: 0x67e8f9,
+      transparent: true,
+      opacity: 0.5,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+    for (const [ry, r] of [
+      [0.6, 1.4],
+      [1.8, 1.7],
+      [3.2, 2.0],
+      [4.8, 2.3],
+    ]) {
+      const ringGeo = new THREE.TorusGeometry(r, 0.06, 6, 20);
+      ringGeo.rotateX(Math.PI / 2);
+      const rMesh = new THREE.Mesh(ringGeo, updraftMat);
+      rMesh.position.set(0, ry, 0);
+      updraftGroup.add(rMesh);
+    }
+    updraftGroup.position.set(ux, uy, uz);
+    group.add(updraftGroup);
+  }
+
   return {
     group,
     glowLights,
     update(time: number): void {
       // the beacon turns, slow and steady, the way it always has
       beam.rotation.y = time * 0.45;
+      updraftGroup.rotation.y = time * 2.2;
     },
   };
 }

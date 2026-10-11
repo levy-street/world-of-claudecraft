@@ -116,6 +116,8 @@ function approachAngle(current: number, target: number, maxStep: number): number
 }
 
 export interface KeyboardTurnArgs {
+  /** A scripted lane consumes held turn flags as lateral intent, not heading. */
+  rawTurnIntent?: boolean;
   turnLeft: boolean;
   turnRight: boolean;
   /** False while turning is blocked (stun family / corpse): hold, then correct. */
@@ -148,6 +150,12 @@ export function stepKeyboardTurnFacing(
   state: KeyboardTurnState,
   args: KeyboardTurnArgs,
 ): number | null {
+  if (args.rawTurnIntent) {
+    state.facing = state.pendingReleaseCommit = state.wireFacing = null;
+    state.releaseMs = state.handoffStableMs = 0;
+    state.mirrorDerived = state.suppressTurnFlags = state.wasTurning = false;
+    return null;
+  }
   const facing = stepFacing(state, args);
   // Wire turn-flag gating (see suppressTurnFlags): zero the flags while a
   // local heading owns the display, except the one engage-edge frame.
@@ -155,6 +163,16 @@ export function stepKeyboardTurnFacing(
   state.suppressTurnFlags = facing !== null && !(turning && !state.wasTurning);
   state.wasTurning = turning;
   return facing;
+}
+
+/** Copy movement and apply exactly the turn channel's authoritative ownership. */
+export function applyKeyboardTurnInput<T extends { turnLeft: boolean; turnRight: boolean }>(
+  target: T,
+  source: T,
+  state: Pick<KeyboardTurnState, 'suppressTurnFlags'>,
+): void {
+  Object.assign(target, source);
+  if (state.suppressTurnFlags) target.turnLeft = target.turnRight = false;
 }
 
 function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | null {

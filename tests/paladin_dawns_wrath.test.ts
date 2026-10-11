@@ -257,9 +257,9 @@ describe("Retribution Paladin Dawn's Wrath", () => {
       chances: [0.068, 0.15, 0.068, 0.15, 0.96, 0.0756],
       autoHp: 49976,
       autoAura: 8,
-      finalHp: 49880,
+      finalHp: 49785,
       finalAura: 8,
-      hammerHp: 49640,
+      hammerHp: 49365,
       procActive: false,
       hammerCooldown: 0,
       devotion: 2,
@@ -297,8 +297,10 @@ describe("Retribution Paladin Dawn's Wrath", () => {
     }
 
     const normalDamage = castDamage(false);
-    expect(normalDamage).toBeGreaterThan(0);
-    expect(castDamage(true)).toBe(Math.round(normalDamage * DAWNS_WRATH_DAMAGE_MULT));
+    // Both factors apply before the final round; scaling the rounded normal hit
+    // would introduce a second rounding step and overstate this empowered hit.
+    expect(normalDamage).toBe(410);
+    expect(castDamage(true)).toBe(491);
   });
 
   it('bypasses a running Hammer cooldown without clearing or restarting it', () => {

@@ -8,9 +8,11 @@
 
 import type { ArenaFormat, ArenaInfo, BgInfo } from '../world_api';
 
-/** The merged window's tabs, in display order: Thornhollow Fields is primary. */
-export type PvpTabId = 'ravenrift' | '1v1' | '2v2';
-export const PVP_TABS: readonly PvpTabId[] = ['ravenrift', '1v1', '2v2'];
+/** The merged window's tabs, in display order: Thornhollow Fields is primary.
+ *  `world` is the World PvP flag tab (src/ui/hud/world_pvp/): not a queue mode,
+ *  so it never pins and never locks (raising the flag while queued is fine). */
+export type PvpTabId = 'ravenrift' | '1v1' | '2v2' | 'world';
+export const PVP_TABS: readonly PvpTabId[] = ['ravenrift', '1v1', '2v2', 'world'];
 
 export interface PvpTabState {
   id: PvpTabId;
@@ -55,7 +57,11 @@ export function buildPvpTabs(input: PvpTabsInput): PvpTabsModel {
   const active = pinned ?? input.selected;
   const busy = bgBusy || arenaBusyBracket !== null;
   return {
-    tabs: PVP_TABS.map((id) => ({ id, active: id === active, locked: busy && id !== active })),
+    tabs: PVP_TABS.map((id) => ({
+      id,
+      active: id === active,
+      locked: busy && id !== active && id !== 'world',
+    })),
     active,
     commit: pinned !== null,
   };

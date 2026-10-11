@@ -6,10 +6,11 @@ describe('armor type catalog coverage', () => {
   it('assigns every non-jewelry armor item a concrete armor type', () => {
     // Jewelry (neck/ring slots) is the one deliberate exception: it is kind
     // 'armor' with NO armor class, so any class can wear it (JewelryItemDef,
-    // equipment_rules falls through the armorType gate).
+    // equipment_rules falls through the armorType gate). The trinket slot
+    // (PR 4173) wears the same way: no armor class, any class.
     const missing = Object.values(ITEMS)
       .filter((item) => item.kind === 'armor')
-      .filter((item) => item.slot !== 'neck' && item.slot !== 'ring')
+      .filter((item) => item.slot !== 'neck' && item.slot !== 'ring' && item.slot !== 'trinket')
       .filter((item) => !armorTypeForItem(item))
       .map((item) => item.id);
 
@@ -18,7 +19,7 @@ describe('armor type catalog coverage', () => {
 
   it('jewelry carries no armor class', () => {
     const jewelry = Object.values(ITEMS).filter(
-      (item) => item.slot === 'neck' || item.slot === 'ring',
+      (item) => item.slot === 'neck' || item.slot === 'ring' || item.slot === 'trinket',
     );
     expect(jewelry.length).toBeGreaterThan(0);
     for (const item of jewelry) expect(armorTypeForItem(item), item.id).toBeNull();

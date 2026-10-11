@@ -38,15 +38,15 @@ export interface AutoEquipWornState {
  * reasoning about which worn piece a swap would free. That makes this gate
  * strictly more conservative than the explicit path, never less.
  *
- * The incoming copy is peeked with NO slotIndex, matching auto-equip's own
- * consume: it lifts the highest-index matching unit, so that is the copy whose
- * payload and rolled quality both rules must judge.
+ * Ordinary grants keep the highest-index fallback. A payload-bearing quality
+ * grant supplies its resolved slotIndex to both this peek and the equip consume.
  */
 export function autoEquipFamilyConflict(
   def: ItemDef,
   itemId: string,
   worn: AutoEquipWornState,
   lookup: (id: string) => ItemDef | undefined,
+  slotIndex?: number,
 ): boolean {
   if (
     uniqueEquipConflictSlot(
@@ -55,7 +55,7 @@ export function autoEquipFamilyConflict(
       lookup,
       [],
       worn.equipmentInstance,
-      equipCandidateInstance(worn.inventory, itemId),
+      equipCandidateInstance(worn.inventory, itemId, slotIndex),
     )
   ) {
     return true;
@@ -67,7 +67,7 @@ export function autoEquipFamilyConflict(
       lookup,
       [],
       worn.equipmentInstance,
-      def.masterwrought ? equipCandidateQuality(worn.inventory, itemId, def) : undefined,
+      def.masterwrought ? equipCandidateQuality(worn.inventory, itemId, def, slotIndex) : undefined,
     ) !== null
   );
 }

@@ -127,6 +127,13 @@ function findHillside(seed: number): { x: number; z: number; uphill: { x: number
         const s = terrainSteepnessAt(px, pz, seed);
         if (s > 1.3) clear = false;
       }
+      // The trap this suite exists for needs the disc's uphill rim ABOVE the prop
+      // top (the assertion below), so the finder demands it rather than trusting
+      // steepness: an authored calm pad can flatten the pick and leave the scan on
+      // a hillside whose rim sits under the disc, which is a changed scenario, not
+      // a glue failure.
+      if (clear && groundHeight(x + ux * 3, z + uz * 3, seed) <= groundHeight(x, z, seed) + 1.5)
+        clear = false;
       if (clear) return { x, z, uphill: { x: ux, z: uz } };
     }
   }

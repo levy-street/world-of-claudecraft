@@ -17,13 +17,21 @@
 // drives directly; the per-call cost is bounded by the memoized helpers in
 // raid_reset.ts (each recomputes at most once per minute / per window).
 
-import { dailyResetRemainingSec, eventLeadDayKey, resetDayKey } from './raid_reset';
+import {
+  dailyResetRemainingSec,
+  eventLeadDayKey,
+  nextWorldQuestRotationMs,
+  resetDayKey,
+} from './raid_reset';
 
 export interface SimCalendarSink {
   utcDay: string;
   resetDay: string;
   eventLeadDay: string;
   dailyResetRemainingSec: number;
+  // The world-quest rotation boundary (epoch ms) the tracker counts down to and
+  // the rotation rolls at; the offline twin derives it from the local zone.
+  worldQuestExpiresAtMs: number;
 }
 
 export function feedRealmCalendar(sim: SimCalendarSink, nowMs: number, zone: string): void {
@@ -31,4 +39,5 @@ export function feedRealmCalendar(sim: SimCalendarSink, nowMs: number, zone: str
   sim.resetDay = resetDayKey(nowMs, zone);
   sim.eventLeadDay = eventLeadDayKey(nowMs, zone);
   sim.dailyResetRemainingSec = dailyResetRemainingSec(nowMs, zone);
+  sim.worldQuestExpiresAtMs = nextWorldQuestRotationMs(nowMs, zone);
 }

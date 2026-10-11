@@ -176,7 +176,7 @@ describe('marketBuy / marketCancel: the payload crosses intact', () => {
     sim.marketListInstance(BOOTS, 1000, ENCHANTED, pid);
     const id = playerListings(sim)[0].id;
     sim.drainEvents();
-    sim.marketBuy(id, buyer);
+    sim.marketBuy(id, undefined, buyer);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
     const got = slotsOf(sim, buyer, BOOTS);
     expect(got).toHaveLength(1);
@@ -216,7 +216,7 @@ describe('marketBuy / marketCancel: the payload crosses intact', () => {
     expect(buyerMeta.inventory).toHaveLength(16);
 
     sim.drainEvents();
-    sim.marketBuy(id, buyer);
+    sim.marketBuy(id, undefined, buyer);
 
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
     expect(playerListings(sim)).toHaveLength(0);
@@ -245,14 +245,14 @@ describe('marketBuy / marketCancel: the payload crosses intact', () => {
     fillBackpack(sim, buyer);
 
     sim.drainEvents();
-    sim.marketBuy(id, buyer);
+    sim.marketBuy(id, undefined, buyer);
     expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
     expect(playerListings(sim)).toHaveLength(1);
     expect(sim.players.get(buyer)!.copper).toBe(100000);
 
     // Free a slot and the same buy lands with its payload intact.
     buyerMeta.inventory.pop();
-    sim.marketBuy(id, buyer);
+    sim.marketBuy(id, undefined, buyer);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
     const got = slotsOf(sim, buyer, HIDE).filter((s) => s.instance?.enchant);
     expect(got).toHaveLength(1);
@@ -274,14 +274,14 @@ describe('marketBuy / marketCancel: the payload crosses intact', () => {
     fillBackpack(sim, buyer);
 
     sim.drainEvents();
-    sim.marketBuy(id, buyer);
+    sim.marketBuy(id, undefined, buyer);
     expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
     expect(sim.players.get(buyer)!.copper).toBe(100000);
 
     // A byte-equal signed stack with room IS instanced room, as it always was.
     const plainIdx = buyerMeta.inventory.findIndex((s) => s.itemId === BREAD && !s.instance);
     buyerMeta.inventory[plainIdx] = { itemId: BREAD, count: 1, instance: { ...SIGNED } };
-    sim.marketBuy(id, buyer);
+    sim.marketBuy(id, undefined, buyer);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
     const merged = slotsOf(sim, buyer, BREAD).filter((s) => s.instance);
     expect(merged).toHaveLength(1);

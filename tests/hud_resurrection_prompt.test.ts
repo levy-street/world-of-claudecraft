@@ -2,6 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Hud } from '../src/ui/hud';
+import { t } from '../src/ui/i18n';
 
 interface PromptHarness {
   promptSequence: number;
@@ -105,6 +106,25 @@ describe('HUD resurrection confirmation prompt', () => {
 
     expect(document.querySelector('#prompt-stack')?.childElementCount).toBe(1);
     expect(hud.resurrectionPromptEl).not.toBe(null);
+  });
+});
+
+describe('the respawn chat line', () => {
+  // The sim tags a Keeper revive's respawn event with sickness: 'resurrection'
+  // exactly when The Keeper's Toll landed; the HUD reads that tag to say the
+  // character is back but weaker, and keeps the penalty-free line otherwise.
+  it('says weaker for a tagged respawn and rested for a plain one', () => {
+    const tagged = eventHarness({ dead: false });
+    tagged.handleEvents([{ type: 'respawn', pid: 17, sickness: 'resurrection' }]);
+    expect(tagged.log).toHaveBeenCalledTimes(1);
+    expect(tagged.log.mock.calls[0][0]).toBe(t('hud.system.respawnKeeperToll'));
+    expect(tagged.log.mock.calls[0][0]).toMatch(/weaker/);
+
+    const plain = eventHarness({ dead: false });
+    plain.handleEvents([{ type: 'respawn', pid: 17 }]);
+    expect(plain.log).toHaveBeenCalledTimes(1);
+    expect(plain.log.mock.calls[0][0]).toBe(t('hud.system.respawn'));
+    expect(plain.log.mock.calls[0][0]).not.toMatch(/weaker|Toll/);
   });
 });
 

@@ -18,6 +18,7 @@ import {
 import { authoredWallSegments, doorRampHalf } from '../../../sim/rift/authored';
 import { generateRiftFloor } from '../../../sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../../../sim/rift/types';
+import type { VaultZoneId } from '../../../sim/rift/vault_seed';
 import type { RiftTier } from '../../../sim/types';
 import type { IWorld, RiftFloorView } from '../../../world_api';
 import { isLiveMapEntityDisclosed } from '../../map_entity_disclosure_core';
@@ -109,7 +110,15 @@ export interface RiftStaticGeometry {
 
 export type RiftObjectSemantic = Exclude<
   MapMarkerSemantic,
-  { kind: 'dungeon' | 'rift-entrance' | 'delve-passage' | 'delve-surface' | 'delve-reward' }
+  {
+    kind:
+      | 'dungeon'
+      | 'rift-entrance'
+      | 'hoard-entrance'
+      | 'delve-passage'
+      | 'delve-surface'
+      | 'delve-reward';
+  }
 >;
 
 export interface RiftMobMarker extends RiftMapPoint {
@@ -136,10 +145,48 @@ export interface RiftPlayerMarker extends RiftMapPoint {
   angle: number;
 }
 
+export type RiftMapValleyGround =
+  | 'autumn'
+  | 'ash'
+  | 'coast'
+  | 'dark-forest'
+  | 'marsh'
+  | 'moonlit-meadow'
+  | 'sand'
+  | 'snow';
+
+export type RiftMapTerrain =
+  | { kind: 'interior' }
+  | { kind: 'valley'; zoneId: VaultZoneId; ground: RiftMapValleyGround };
+
+const RIFT_MAP_VALLEY_GROUND_BY_ZONE = Object.freeze({
+  amberfall: 'autumn',
+  drakelands: 'ash',
+  frostveil: 'snow',
+  galecrest: 'coast',
+  nightbloom: 'moonlit-meadow',
+  palmreach: 'sand',
+  willowfen: 'marsh',
+  wraithwood: 'dark-forest',
+} as const satisfies Readonly<Record<VaultZoneId, RiftMapValleyGround>>);
+
+/** Stable cartographic material for the frozen Buried Hoard zone set. */
+export function riftMapValleyGround(zoneId: VaultZoneId): RiftMapValleyGround {
+  return RIFT_MAP_VALLEY_GROUND_BY_ZONE[zoneId];
+}
+
+function riftMapTerrainForFloor(floor: RiftFloorPlan): RiftMapTerrain {
+  const outdoor = floor.outdoor;
+  return outdoor
+    ? { kind: 'valley', zoneId: outdoor.zoneId, ground: riftMapValleyGround(outdoor.zoneId) }
+    : { kind: 'interior' };
+}
+
 export interface RiftMapModel {
   staticKey: string;
   staticGeometry: RiftStaticGeometry;
   transform: RiftMapTransform;
+  terrain: RiftMapTerrain;
   mobs: RiftMobMarker[];
   objects: RiftObjectMarker[];
   party: RiftPartyMarker[];
@@ -513,6 +560,9 @@ function cachedRiftObjectSemantic(
   semanticCache: Map<string, MapMarkerSemantic | null>,
   riftExitCache: Map<RiftTier | null, MapMarkerSemantic | null>,
 ): RiftObjectSemantic | null {
+  if (entity.templateId === 'hoard_entrance') {
+    return { kind: 'rift-return', route: 'hoard', rank: null };
+  }
   if (entity.templateId === 'rift_exit') {
     const rank = entity.riftTier ?? null;
     const cached = riftExitCache.get(rank);
@@ -651,11 +701,13 @@ export function createRiftMapView(fit: RiftMapFit = 'rect'): RiftMapView {
         const floor = generateRiftFloor(view.seed, view.baseLevel, view.floorIndex, view.upgrade);
         const transform = riftMapTransform(riftLayoutBounds(floor.layout), canvasSize, pad, fit);
         const staticGeometry = buildRiftStaticGeometry(floor, transform);
+        const terrain = riftMapTerrainForFloor(floor);
         if (!model) {
           model = {
             staticKey: floorKey,
             staticGeometry,
             transform,
+            terrain,
             mobs,
             objects,
             party,
@@ -667,6 +719,7 @@ export function createRiftMapView(fit: RiftMapFit = 'rect'): RiftMapView {
         } else {
           model.staticGeometry = staticGeometry;
           model.transform = transform;
+          model.terrain = terrain;
         }
         staticSurfaceKey = nextSurfaceKey;
       }

@@ -100,7 +100,10 @@ describe('resolveNearbyInteractionCandidate', () => {
     // An idle escortee at its post (quest active) beats the node beside it:
     // escort start sits above the node arm. With the quest inactive the same
     // escortee is no candidate at all, and the node beside it wins.
-    const escortDef = Object.values(ESCORTS)[0];
+    // A quest-backed escort: the world quest caravans share ESCORTS but start
+    // from their own log and carry no questId.
+    const escortDef = Object.values(ESCORTS).find((def) => typeof def.questId === 'string');
+    if (!escortDef?.questId) throw new Error('expected a quest-backed escort in ESCORTS');
     const post = escortDef.start;
     const escortee = entity({
       id: 7,

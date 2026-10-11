@@ -1,7 +1,8 @@
 // Paired overworld portals: the seamless cave transitions between zone bands
 // that no road connects (the Veiled Hollow). A portal is pure data (PORTALS in
-// data.ts) checked per live player in the tick, right after dungeon door
-// triggers: no entities, no instance slots, and no rng draws, so it runs
+// data.ts) checked per live player AND per released spirit in the tick, right
+// after dungeon door triggers (the ghost arm rides spirit_run_triggers.ts):
+// no entities, no instance slots, and no rng draws, so it runs
 // byte-identically in the offline browser, the server, and the headless env.
 //
 // The teleport recipe mirrors instances/dungeons.ts enterDungeon: reground,

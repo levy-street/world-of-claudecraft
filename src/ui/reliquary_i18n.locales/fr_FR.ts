@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'La Faille',
     desc: 'Butins emblématiques de la Faille changeante, de ses horreurs errantes aux deux trésors de la chasse de rang S.',
   },
+  conquerors_buried_hoards: {
+    name: 'Les trésors enfouis',
+    desc: 'Butin des trésors auxquels mènent les cartes au trésor, quatre pièces pour chaque gardien qui en protège un.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Rares du royaume',
     desc: 'La preuve de chaque rare nommé abattu à travers le royaume.',
@@ -142,6 +146,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Armurerie de Guerre',
     desc: 'Bijoux et armes de Guerre achetés avec un honneur durement gagné.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galerie de l’Avant-garde',
+    desc: 'Les ensembles de spécialisation et les armes de la saison 2 de Guerre, achetés avec l’honneur.',
+  },
   horizons_vault_of_ages: {
     name: 'Chambre forte des âges',
     desc: "Trésors retirés d'une époque révolue. Ces reliques ne peuvent plus être gagnées ; la chambre forte rend hommage aux vétérans qui les conservent.",
@@ -156,7 +164,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Héroïque : Creuset de la Dernière Source',
-    desc: 'Armes exclusives au mode héroïque d’Ignivar, Héraut de la Dernière Flamme.',
+    desc: 'Armes exclusives au mode héroïque et bijoux du raid d’Ignivar, Héraut de la Dernière Flamme.',
   },
   conquerors_varkhul: {
     name: 'Le Creuset intérieur',
@@ -164,7 +172,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Héroïque : le Creuset intérieur',
-    desc: 'Boucliers et armes exclusifs au mode héroïque de Varkhul, Père de la Forge de la Dernière Flamme.',
+    desc: 'Boucliers et armes exclusifs au mode héroïque et bijoux du raid de Varkhul, Père de la Forge de la Dernière Flamme.',
   },
   conquerors_set_bramblehide: {
     name: 'Peau de Ronces de Roots',

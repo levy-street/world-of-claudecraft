@@ -21,6 +21,14 @@
 // color literal here) and the two typeahead timings are named constants.
 
 import { CLASSES } from '../sim/data';
+import {
+  GUILD_RANK_MAX,
+  GUILD_RANK_NAME_MAX,
+  GUILD_RANK_PERMISSIONS,
+  type GuildRankDef,
+  type GuildRankPermission,
+  sanitizeGuildRankLadder,
+} from '../sim/guild_ranks';
 import { GUILD_ROSTER_PAGE_SEATS } from '../sim/guild_roster';
 import type { PlayerClass } from '../sim/types';
 import type { IWorld, WhoRosterInfo } from '../world_api';
@@ -31,6 +39,17 @@ import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { loadGuildHideOffline, saveGuildHideOffline } from './guild_hide_offline';
+import {
+  addGuildRank,
+  type GuildRankLabel,
+  type GuildRanksPanelView,
+  guildLadder,
+  guildRankLabel,
+  guildRanksPanelView,
+  moveGuildRank,
+  removeGuildRank,
+  viewerGuildCan,
+} from './guild_ranks_view';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 import { classColorCss } from './inspect_view';
 import { moneyHtml } from './money_html';
@@ -38,10 +57,10 @@ import { localizeZone } from './server_i18n';
 import {
   blockRows,
   friendRows,
-  type GuildDisplayedRole,
+  type GuildRosterChip,
   type GuildRow,
   type GuildView,
-  guildDisplayedRole,
+  guildRosterChip,
   guildRosterItems,
   guildRosterView,
   guildView,
@@ -157,21 +176,153 @@ function dotTitle(online: boolean, status: string | undefined, zone: string | un
   return zone ? t('hud.social.statusWithZone', { status: label, zone: localizeZone(zone) }) : label;
 }
 
-function rankLabel(rank: string): string {
-  return rank === 'leader'
+/** A keyed rank label (guild_ranks_view.ts guildRankLabel) as display text:
+ *  the guild's own title verbatim (player text: callers escape it), a
+ *  built-in rank's localized default, or 'Rank N' for an untitled custom rank. */
+export function rankLabelText(label: GuildRankLabel): string {
+  if (label.kind === 'custom') return label.name;
+  if (label.kind === 'numbered')
+    return t('hudChrome.guildRanks.numbered', {
+      n: formatNumber(label.n, { maximumFractionDigits: 0 }),
+    });
+  return label.rank === 'leader'
     ? t('hud.social.ranks.leader')
-    : rank === 'officer'
+    : label.rank === 'officer'
       ? t('hud.social.ranks.officer')
       : t('hud.social.ranks.member');
 }
 
-// Displayed-role chip text for a keyed role from the pure core
-// (guildDisplayedRole): the two tenure tiers get their tier labels, every
-// rank role maps through rankLabel, so the core stays i18n-free.
-function roleLabel(role: GuildDisplayedRole): string {
-  if (role === 'recruit') return t('hud.social.tenure.recruit');
-  if (role === 'veteran') return t('hud.social.tenure.veteran');
-  return rankLabel(role);
+// Displayed-role chip text for a keyed chip from the pure core
+// (guildRosterChip): the two tenure tiers get their tier labels, every rank
+// chip maps through rankLabelText, so the core stays i18n-free.
+function chipLabel(chip: GuildRosterChip): string {
+  if (chip.kind === 'rank') return rankLabelText(chip.label);
+  return chip.tier === 'recruit' ? t('hud.social.tenure.recruit') : t('hud.social.tenure.veteran');
+}
+
+// The Ranks tab's permission columns: label + hover keys per permission,
+// typed against the vocabulary so a permission added to
+// GUILD_RANK_PERMISSIONS without a column fails tsc.
+const PERM_LABEL: Record<GuildRankPermission, { label: () => string; hint: () => string }> = {
+  invite: {
+    label: () => t('hudChrome.guildRanks.perm.invite'),
+    hint: () => t('hudChrome.guildRanks.permHint.invite'),
+  },
+  remove: {
+    label: () => t('hudChrome.guildRanks.perm.remove'),
+    hint: () => t('hudChrome.guildRanks.permHint.remove'),
+  },
+  promote: {
+    label: () => t('hudChrome.guildRanks.perm.promote'),
+    hint: () => t('hudChrome.guildRanks.permHint.promote'),
+  },
+  bank: {
+    label: () => t('hudChrome.guildRanks.perm.bank'),
+    hint: () => t('hudChrome.guildRanks.permHint.bank'),
+  },
+  officerChat: {
+    label: () => t('hudChrome.guildRanks.perm.officerChat'),
+    hint: () => t('hudChrome.guildRanks.permHint.officerChat'),
+  },
+  motd: {
+    label: () => t('hudChrome.guildRanks.perm.motd'),
+    hint: () => t('hudChrome.guildRanks.permHint.motd'),
+  },
+  events: {
+    label: () => t('hudChrome.guildRanks.perm.events'),
+    hint: () => t('hudChrome.guildRanks.permHint.events'),
+  },
+};
+
+/** The data-field a rank title input / permission checkbox carries, keyed by
+ *  the stable rank id (never the row index) so a draft survives a reorder. */
+const rankNameField = (id: string): string => `rank-name:${id}`;
+const rankPermField = (id: string, perm: GuildRankPermission): string => `rank-perm:${id}:${perm}`;
+
+/**
+ * The Ranks tab body (docs/prd/guild-custom-ranks.md): the guild's rank table,
+ * one row per rank (most senior first), one column per permission, like a
+ * classic guild-control sheet. Every member reads it; for the Guild Master the
+ * titles are inputs, the permissions live checkboxes, and each middle rank
+ * carries reorder and remove controls, with Add and Save under the table.
+ * Inputs render their SERVER value as the default so the delegated refresh
+ * can tell a draft from a stale paint (refreshList's defaultValue check).
+ * A stateless builder, exported so the render arm is behavior-testable.
+ */
+export function guildRanksPanelHtml(view: GuildRanksPanelView): string {
+  const head =
+    `<tr><th scope="col" class="soc-ranks-idx">${esc(t('hudChrome.guildRanks.colRank'))}</th>` +
+    `<th scope="col" class="soc-ranks-title">${esc(t('hudChrome.guildRanks.colTitle'))}</th>` +
+    GUILD_RANK_PERMISSIONS.map(
+      (p) =>
+        `<th scope="col" class="soc-ranks-perm" title="${esc(PERM_LABEL[p].hint())}">${esc(PERM_LABEL[p].label())}</th>`,
+    ).join('') +
+    `<th scope="col" class="soc-ranks-count">${esc(t('hudChrome.guildRanks.colMembers'))}</th>` +
+    (view.editable
+      ? `<th scope="col" class="soc-ranks-order">${esc(t('hudChrome.guildRanks.colActions'))}</th>`
+      : '') +
+    `</tr>`;
+  const rows = view.rows
+    .map((r) => {
+      const label = rankLabelText(r.label);
+      const defaultLabel = rankLabelText(r.name === '' ? r.label : defaultRankLabel(r));
+      const title = view.editable
+        ? `<input class="ui-input" maxlength="${GUILD_RANK_NAME_MAX}" value="${esc(r.name)}" placeholder="${esc(defaultLabel)}" aria-label="${esc(t('hudChrome.guildRanks.titleLabel', { rank: label }))}" data-field="${esc(rankNameField(r.id))}" autocomplete="off" spellcheck="false"/>`
+        : `<span class="soc-ranks-name">${esc(label)}</span>`;
+      const perms = GUILD_RANK_PERMISSIONS.map((p) => {
+        const aria = esc(
+          t('hudChrome.guildRanks.permLabel', { perm: PERM_LABEL[p].label(), rank: label }),
+        );
+        const lockTip = r.locked ? ` title="${esc(t('hudChrome.guildRanks.leaderLocked'))}"` : '';
+        const disabled = !view.editable || r.locked ? ' disabled' : '';
+        return `<td class="soc-ranks-perm"${lockTip}><input class="ui-check" type="checkbox" data-field="${esc(rankPermField(r.id, p))}" aria-label="${aria}"${r.perms[p] ? ' checked' : ''}${disabled}/></td>`;
+      }).join('');
+      const order = view.editable
+        ? `<td class="soc-ranks-order">` +
+          (r.canMoveUp
+            ? `<button type="button" class="soc-x ui-disc" data-act="rank-up" data-rank="${esc(r.id)}" title="${esc(t('hudChrome.guildRanks.moveUp', { rank: label }))}" aria-label="${esc(t('hudChrome.guildRanks.moveUp', { rank: label }))}">${svgIcon('promote')}</button>`
+            : '') +
+          (r.canMoveDown
+            ? `<button type="button" class="soc-x ui-disc" data-act="rank-down" data-rank="${esc(r.id)}" title="${esc(t('hudChrome.guildRanks.moveDown', { rank: label }))}" aria-label="${esc(t('hudChrome.guildRanks.moveDown', { rank: label }))}">${svgIcon('demote')}</button>`
+            : '') +
+          (r.canRemove
+            ? `<button type="button" class="soc-x ui-disc" data-act="rank-remove" data-rank="${esc(r.id)}" data-count="${r.memberCount}" title="${esc(t('hudChrome.guildRanks.remove', { rank: label }))}" aria-label="${esc(t('hudChrome.guildRanks.remove', { rank: label }))}">${svgIcon('trash')}</button>`
+            : '') +
+          `</td>`
+        : '';
+      return (
+        `<tr>` +
+        `<td class="soc-ranks-idx">${esc(formatNumber(r.index, { maximumFractionDigits: 0 }))}</td>` +
+        `<th scope="row" class="soc-ranks-title">${title}</th>` +
+        perms +
+        `<td class="soc-ranks-count">${esc(formatNumber(r.memberCount, { maximumFractionDigits: 0 }))}</td>` +
+        order +
+        `</tr>`
+      );
+    })
+    .join('');
+  const actions = view.editable
+    ? `<div class="soc-ranks-actions">` +
+      `<button type="button" class="btn ui-btn" data-act="rank-add"${view.canAdd ? '' : ' disabled'}>${esc(t('hudChrome.guildRanks.add'))}</button>` +
+      `<button type="button" class="btn ui-btn" data-act="rank-save">${esc(t('hudChrome.guildRanks.save'))}</button>` +
+      `</div>`
+    : '';
+  return (
+    `<div class="soc-ranks ui-card">` +
+    `<div class="soc-ranks-intro">${esc(t(view.editable ? 'hudChrome.guildRanks.introEdit' : 'hudChrome.guildRanks.introView'))}</div>` +
+    `<div class="soc-ranks-scroll"><table class="soc-ranks-table"><thead>${head}</thead><tbody>${rows}</tbody></table></div>` +
+    actions +
+    `</div>`
+  );
+}
+
+/** A titled rank's DEFAULT label (the input placeholder a cleared title falls
+ *  back to): the built-in default for the three built-in ids, 'Rank N' for a
+ *  custom rank. */
+function defaultRankLabel(row: { id: string; index: number }): GuildRankLabel {
+  return row.id === 'leader' || row.id === 'officer' || row.id === 'member'
+    ? { kind: 'default', rank: row.id }
+    : { kind: 'numbered', n: row.index };
 }
 
 // The roster-expansion confirm body. The price is coin-icon markup (gold and
@@ -226,8 +377,8 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
   // break the cold-window "no repeating driver" contract).
   // All five role labels share the one .rank chip treatment (user call: the
   // label alone distinguishes the tiers; no per-tier tint).
-  const role = guildDisplayedRole(m.rank, tenureTier(m.joinedAt, now));
-  const nameInner = `${esc(m.name)}<span class="rank">${esc(roleLabel(role))}</span>${memberTitleSpan}`;
+  const chip = guildRosterChip(m.rankLabel, tenureTier(m.joinedAt, now));
+  const nameInner = `${esc(m.name)}<span class="rank">${esc(chipLabel(chip))}</span>${memberTitleSpan}`;
   const name =
     m.online && !m.self
       ? `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(m.cls)}" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
@@ -237,10 +388,12 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
     : '';
   if (m.canTransfer)
     actions += `<button type="button" class="soc-x ui-disc" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
-  if (m.canPromote)
-    actions += `<button type="button" class="soc-x ui-disc" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">${svgIcon('promote')}</button>`;
-  if (m.canDemote)
-    actions += `<button type="button" class="soc-x ui-disc" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">${svgIcon('demote')}</button>`;
+  // The hovers name the rank the click moves the member to (the guild's own
+  // title, or the localized default).
+  if (m.canPromote && m.promoteLabel)
+    actions += `<button type="button" class="soc-x ui-disc" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hudChrome.guildRanks.promoteTo', { name: m.name, rank: rankLabelText(m.promoteLabel) }))}">${svgIcon('promote')}</button>`;
+  if (m.canDemote && m.demoteLabel)
+    actions += `<button type="button" class="soc-x ui-disc" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hudChrome.guildRanks.demoteTo', { name: m.name, rank: rankLabelText(m.demoteLabel) }))}">${svgIcon('demote')}</button>`;
   if (m.canKick)
     actions += `<button type="button" class="soc-x ui-disc" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
   const tip = esc(dotTitle(m.online, m.status, m.zone));
@@ -496,6 +649,10 @@ export class SocialWindow {
     // pattern).
     const pledgePanel = pledgePanelView(w.socialInfo);
     if (this.tab === 'pledges' && !pledgePanel) this.tab = 'guild';
+    // The Ranks tab exists for every guild member (read-only below the Guild
+    // Master); leaving the guild while it is selected falls back the same way.
+    const guilded = !!w.socialInfo?.guild;
+    if (this.tab === 'ranks' && !guilded) this.tab = 'guild';
     const tab = this.tab;
     const online = w.socialInfo !== null;
     const realmTag =
@@ -518,6 +675,7 @@ export class SocialWindow {
           tabs: [
             { id: 'friends', label: t('hud.social.friendsTab') },
             { id: 'guild', label: t('hud.social.guildTab') },
+            ...(guilded ? [{ id: 'ranks', label: t('hudChrome.guildRanks.tab') }] : []),
             { id: 'who', label: t('hudChrome.social.who.tab') },
             // Officer-plus only: the pledge dashboard. The label carries the
             // live open-pledge count (the count is in the structural
@@ -546,9 +704,10 @@ export class SocialWindow {
       ) +
       `<div class="soc-body" id="soc-body-panel" role="tabpanel"></div>` +
       `<div class="soc-notice"></div>` +
-      // The raid tab has no footer; the pledges tab's actions all live in the
-      // body (the settings editor + per-row decisions), so it takes none either.
-      (tab === 'raid' || tab === 'pledges' ? '' : online ? this.footer() : '');
+      // The raid tab has no footer; the pledges and ranks tabs' actions all
+      // live in the body (their editors + per-row decisions), so they take
+      // none either.
+      (tab === 'raid' || tab === 'pledges' || tab === 'ranks' ? '' : online ? this.footer() : '');
     this.wireChrome(el);
     // Delegate every row action to ONE listener on the persistent body, so a
     // content refresh (innerHTML swap) never re-attaches per-row handlers.
@@ -567,6 +726,9 @@ export class SocialWindow {
         } else if (target.matches?.('input[data-field="pnote"], input[data-field="pminlvl"]')) {
           ke.preventDefault();
           this.savePledgeSettings();
+        } else if (target.matches?.('.soc-ranks input[data-field^="rank-name:"]')) {
+          ke.preventDefault();
+          this.sendRanks(this.readRanksDraft());
         }
       });
       // The Who tab's class chip is a native select inside the body (rebuilt
@@ -599,8 +761,9 @@ export class SocialWindow {
     // (a guildmate's presence, party hp), which would otherwise clobber typing.
     // defaultValue is the value rendered at the last paint, so an untouched
     // input (value === defaultValue, unfocused) takes the fresh server value.
-    // Covers the billboard edit (gmotd) and the pledge settings editor
-    // (pnote / pminlvl text-likes, popen checkbox via defaultChecked).
+    // Covers the billboard edit (gmotd), the pledge settings editor
+    // (pnote / pminlvl text-likes, popen checkbox via defaultChecked), and the
+    // Ranks tab's titles and permission checkboxes (keyed by rank id).
     const drafts: {
       field: string;
       value: string;
@@ -612,7 +775,7 @@ export class SocialWindow {
     }[] = [];
     for (const prev of Array.from(
       body.querySelectorAll<HTMLInputElement>(
-        'input[data-field="gmotd"], .soc-pledge-settings input[data-field]',
+        'input[data-field="gmotd"], .soc-pledge-settings input[data-field], .soc-ranks input[data-field]',
       ),
     )) {
       const isCheckbox = prev.type === 'checkbox';
@@ -655,11 +818,13 @@ export class SocialWindow {
               ? this.whoHtml()
               : this.tab === 'guild'
                 ? this.guildHtml()
-                : this.tab === 'pledges'
-                  ? this.pledgesHtml()
-                  : this.tab === 'block'
-                    ? this.blockHtml()
-                    : this.ignoreHtml();
+                : this.tab === 'ranks'
+                  ? this.ranksHtml()
+                  : this.tab === 'pledges'
+                    ? this.pledgesHtml()
+                    : this.tab === 'block'
+                      ? this.blockHtml()
+                      : this.ignoreHtml();
     for (const draft of drafts) {
       const next = body.querySelector(
         `input[data-field="${draft.field}"]`,
@@ -727,6 +892,10 @@ export class SocialWindow {
       this.savePledgeSettings();
       return;
     }
+    if (node.dataset.act?.startsWith('rank-')) {
+      this.onRankAction(node);
+      return;
+    }
     const w = this.deps.world();
     const act = node.dataset.act;
     const name = node.dataset.name ?? '';
@@ -760,6 +929,91 @@ export class SocialWindow {
       w.convertRaidToParty();
       this.tab = 'raid';
       this.render();
+    }
+  }
+
+  // The Ranks tab body: null (hidden tab) falls back to the empty state.
+  private ranksHtml(): string {
+    const view = guildRanksPanelView(this.deps.world().socialInfo);
+    if (!view) return `<div class="soc-empty">${esc(t('hud.social.noGuild'))}</div>`;
+    return guildRanksPanelHtml(view);
+  }
+
+  // The Ranks tab's editor, read from the live DOM over the server ladder:
+  // each rank's title input and permission checkboxes (the Guild Master's
+  // permissions are fixed and never read). Structure (ids, order) always comes
+  // from the server ladder, so a draft can only differ in titles and grants.
+  private readRanksDraft(): GuildRankDef[] {
+    const root = this.deps.root();
+    return guildLadder(this.deps.world().socialInfo?.guild).map((rank, index) => {
+      const input = root.querySelector(
+        `input[data-field="${rankNameField(rank.id)}"]`,
+      ) as HTMLInputElement | null;
+      const perms =
+        index === 0
+          ? [...rank.perms]
+          : GUILD_RANK_PERMISSIONS.filter((p) => {
+              const box = root.querySelector(
+                `input[data-field="${rankPermField(rank.id, p)}"]`,
+              ) as HTMLInputElement | null;
+              return box ? box.checked : rank.perms.includes(p);
+            });
+      return { id: rank.id, name: input ? input.value : rank.name, perms };
+    });
+  }
+
+  // Send a ladder up through IWorld after the same validation the server runs
+  // (sanitizeGuildRankLadder). Structure comes from the server ladder and the
+  // pure edits, so a refusal here can only be a title outside the alphabet or
+  // over length: say so locally instead of sending a frame the server drops.
+  private sendRanks(ladder: GuildRankDef[] | null): void {
+    if (!ladder) return;
+    const clean = sanitizeGuildRankLadder(ladder);
+    if (!clean) {
+      this.setNotice(t('hudChrome.guildRanks.invalidTitle', { max: GUILD_RANK_NAME_MAX }), true);
+      return;
+    }
+    this.deps.world().guildSetRanks(clean);
+  }
+
+  // Add / reorder / remove: each applies to the CURRENT draft (so unsaved
+  // title and permission edits ride along) and sends at once, the Save
+  // button's contract. Removing a rank that members hold asks first, since
+  // its holders fall back to the joining rank.
+  private onRankAction(node: HTMLElement): void {
+    const act = node.dataset.act;
+    if (act === 'rank-save') {
+      this.sendRanks(this.readRanksDraft());
+      return;
+    }
+    const draft = this.readRanksDraft();
+    const id = node.dataset.rank ?? '';
+    if (act === 'rank-add') {
+      const next = addGuildRank(draft);
+      if (!next) this.setNotice(t('hudChrome.guildRanks.full', { max: GUILD_RANK_MAX }), true);
+      else this.sendRanks(next);
+    } else if (act === 'rank-up' || act === 'rank-down') {
+      this.sendRanks(moveGuildRank(draft, id, act === 'rank-up' ? -1 : 1));
+    } else if (act === 'rank-remove') {
+      const next = removeGuildRank(draft, id);
+      if (!next) return;
+      if (Number(node.dataset.count) > 0) {
+        const guild = this.deps.world().socialInfo?.guild;
+        const ladder = guildLadder(guild);
+        this.deps.showPrompt(
+          esc(
+            t('hudChrome.guildRanks.removeConfirm', {
+              rank: rankLabelText(guildRankLabel(ladder, id)),
+              fallback: rankLabelText(guildRankLabel(ladder, ladder[ladder.length - 1].id)),
+            }),
+          ),
+          t('hudChrome.guildRanks.removeAccept'),
+          () => this.sendRanks(next),
+          () => {
+            /* keep */
+          },
+        );
+      } else this.sendRanks(next);
     }
   }
 
@@ -889,7 +1143,7 @@ export class SocialWindow {
         cap: formatNumber(g.memberCap, { maximumFractionDigits: 0 }),
       }),
     );
-    const head = `<div class="soc-guild-head"><span class="guild-tier-${g.tier}">${esc(g.name)}</span> <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', g.memberCount, { rank: rankLabel(g.rank), count: guildCount }))}</span> <span class="gm" data-field="roster-seats">${seats}</span></div>`;
+    const head = `<div class="soc-guild-head"><span class="guild-tier-${g.tier}">${esc(g.name)}</span> <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', g.memberCount, { rank: rankLabelText(g.rankLabel), count: guildCount }))}</span> <span class="gm" data-field="roster-seats">${seats}</span></div>`;
     // The persisted "hide offline" toggle: a pressed-state button (a single click event
     // through the delegated body handler, unlike a label+checkbox that double-fires).
     const toggle =
@@ -1165,7 +1419,7 @@ export class SocialWindow {
         false,
       );
     let foot = '';
-    if (guild.rank !== 'member')
+    if (viewerGuildCan(guild, 'invite'))
       foot += this.addRow(
         'ginvite',
         'guild-invite',

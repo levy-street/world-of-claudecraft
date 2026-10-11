@@ -5,14 +5,15 @@ import {
   createFireLightAdopter,
   pruneFireLights,
   reparentStrandedLightsToScene,
+  runFireLightBudgetPass,
 } from '../src/render/fire_light_registry';
 import {
   applyPointLightBudget,
-  countDrawnPointLights,
   flickerContributingFireLights,
-  pointLightPadCount,
   type RankedPointLight,
+  reconcileViewPointLights,
 } from '../src/render/point_light_budget';
+import { POINT_LIGHT_SOURCE_MASK } from '../src/render/point_light_carriers_core';
 import { freezeStaticMatrices } from '../src/render/static_matrix';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
@@ -42,6 +43,17 @@ function budgetFireLightsBody(renderer: string): string {
   return renderer.slice(start, end);
 }
 
+/** The `runFireLightBudgetPass` body alone, closed by the function's own
+ *  brace, so a pin cannot match past it. */
+function budgetPassBody(): string {
+  const source = sourceOf('../src/render/fire_light_registry.ts');
+  const start = source.indexOf('export function runFireLightBudgetPass(');
+  expect(start, 'runFireLightBudgetPass was renamed; re-anchor these pins').toBeGreaterThan(-1);
+  const end = source.indexOf('\n}\n', start);
+  expect(end).toBeGreaterThan(start);
+  return source.slice(start, end);
+}
+
 function rankedLight(x: number, z: number, base: number | null = 5): RankedPointLight {
   const light = new THREE.PointLight(0xffffff, base ?? 5, 10, 2);
   light.position.set(x, 0, z);
@@ -52,29 +64,13 @@ function visibleCount(ranked: RankedPointLight[]): number {
   return ranked.filter((entry) => entry.light.visible).length;
 }
 
-describe('pointLightPadCount', () => {
-  it('fills the whole budget when no real lights exist', () => {
-    expect(pointLightPadCount(0, 6)).toBe(6);
-  });
-
-  it('tops up when fewer real lights than the budget exist', () => {
-    expect(pointLightPadCount(4, 6)).toBe(2);
-  });
-
-  it('adds nothing once the budget is met or exceeded', () => {
-    expect(pointLightPadCount(6, 6)).toBe(0);
-    expect(pointLightPadCount(9, 6)).toBe(0);
-  });
-});
-
 describe('applyPointLightBudget', () => {
-  it('keeps exactly min(ranked, visibleCount) lights visible, pads pin the total', () => {
+  it('keeps exactly min(ranked, visibleCount) lights visible', () => {
     for (const count of [0, 2, 6, 9]) {
       const ranked: RankedPointLight[] = [];
       for (let i = 0; i < count; i++) ranked.push(rankedLight(i * 2, 0));
-      applyPointLightBudget(ranked, 0, 0, 6, 6, RANGE_SQ);
+      expect(applyPointLightBudget(ranked, 0, 0, 6, 6, RANGE_SQ)).toBe(Math.min(count, 6));
       expect(visibleCount(ranked)).toBe(Math.min(count, 6));
-      expect(visibleCount(ranked) + pointLightPadCount(ranked.length, 6)).toBe(6);
     }
   });
 
@@ -259,7 +255,7 @@ describe('applyPointLightBudget', () => {
       expect(detached.light.visible).toBe(false);
     });
 
-    it('returns the drawn count so pads can pin the render-visible total', () => {
+    it('returns the drawn count, ancestry included', () => {
       const scene = new THREE.Scene();
       const hidden = new THREE.Group();
       hidden.visible = false;
@@ -272,10 +268,7 @@ describe('applyPointLightBudget', () => {
 
       const drawn = applyPointLightBudget(ranked, 0, 0, 6, 6, RANGE_SQ, scene);
 
-      // One eligible light drawn; pads must fill the remaining five so the
-      // scene's traverseVisible point-light count stays exactly visibleCount.
       expect(drawn).toBe(1);
-      expect(pointLightPadCount(drawn, 6)).toBe(5);
     });
 
     it('re-admits a light the frame its ancestor is revealed', () => {
@@ -305,121 +298,80 @@ describe('applyPointLightBudget', () => {
     });
   });
 
-  describe('countDrawnPointLights (the bounded prewarm mask)', () => {
-    function addTo(parent: THREE.Object3D, entry: RankedPointLight): RankedPointLight {
-      parent.add(entry.light);
-      return entry;
-    }
-
-    it('re-derives the drawn count when a transient mask hides chosen ancestors', () => {
-      // The zone-prewarm bounded render hides most top-level scene children
-      // transiently, OUT OF BAND of the budget pass: view lights under those
-      // children leave Three's counted set, NUM_POINT_LIGHTS drifts below the
-      // pinned total, and the bounded render synchronously links a program
-      // variant the live render never draws (measured: prewarm units with a
-      // link cost ~119 ms on a 3090; units without, 0.3 ms).
-      const scene = new THREE.Scene();
-      const viewGroup = new THREE.Group();
-      scene.add(viewGroup);
-      const viewLight = addTo(viewGroup, rankedLight(1, 0));
-      const rootLight = addTo(scene, rankedLight(2, 0));
-      const ranked = [viewLight, rootLight];
-      applyPointLightBudget(ranked, 0, 0, 6, 6, RANGE_SQ, scene);
-      expect(countDrawnPointLights(ranked, scene)).toBe(2);
-
-      // The bounded mask hides the view group; no budget pass runs in between.
-      viewGroup.visible = false;
-      const boundedDrawn = countDrawnPointLights(ranked, scene);
-      expect(boundedDrawn).toBe(1);
-      // The pad top-up restores the exact pinned total the compile lane
-      // linked against, so the bounded render draws the same variant.
-      expect(boundedDrawn + pointLightPadCount(boundedDrawn, 6)).toBe(6);
-    });
-
-    it('does not count a light the budget itself turned off', () => {
-      const scene = new THREE.Scene();
-      const near = addTo(scene, rankedLight(1, 0));
-      const far = addTo(scene, rankedLight(9, 0));
-      const ranked = [near, far];
-      applyPointLightBudget(ranked, 0, 0, 1, 1, RANGE_SQ, scene);
-      expect(far.light.visible).toBe(false);
-      expect(countDrawnPointLights(ranked, scene)).toBe(1);
-    });
-
-    it('does not count a detached light', () => {
-      const scene = new THREE.Scene();
-      const attached = addTo(scene, rankedLight(1, 0));
-      const detached = rankedLight(2, 0);
-      attached.light.visible = true;
-      detached.light.visible = true;
-      expect(countDrawnPointLights([attached, detached], scene)).toBe(1);
-    });
-  });
-
-  it('wires the bounded prewarm render to re-pin the pads in its masked state', () => {
-    // The bounded render's visibility mask hides entity views (and their
-    // lights) without a budget pass: it must recount drawn lights in ITS
-    // state, pad up to the same pinned total the compile lane linked against
-    // BEFORE rendering, and restore the live pad state afterwards. Dropping
-    // any half silently reinstates the synchronous mid-unit program links.
+  it('keeps every top-level light in the bounded prewarm mask, so the carriers stay counted', () => {
+    // The bounded render hides most top-level scene children out of band of
+    // the budget pass. The carriers are top-level lights, and the count they
+    // pin is every lit program's NUM_POINT_LIGHTS: hiding one would link a
+    // variant the live render never draws. The sources it hides only go dark.
     const source = rendererSource();
     const methodStart = source.indexOf('private renderBoundedPrewarmRoot(');
     const methodEnd = source.indexOf('private renderPrewarmPass(', methodStart);
     expect(methodStart).toBeGreaterThan(-1);
     expect(methodEnd).toBeGreaterThan(methodStart);
     const method = source.slice(methodStart, methodEnd);
-    expect(method).toContain('countDrawnPointLights(this.lightRank, this.scene)');
-    expect(method).toContain('pointLightPadCount(');
-    expect(method).toContain('GFX.maxPointLights');
-    const sceneMaskIndex = method.indexOf('boundedPrewarmVisibility');
-    // The recount must observe BOTH mask levels: the scene-level mask and the
-    // group-level one (a recount between the two would still miss the drift).
-    const groupMaskIndex = method.indexOf('entry === childRoot');
-    const countIndex = method.indexOf('countDrawnPointLights');
-    const padWriteIndex = method.indexOf('this.lightPads[i].visible = i < boundedPadCount');
-    const renderIndex = method.indexOf('this.webgl.render(');
-    const finallyIndex = method.indexOf('} finally {');
-    const restoreIndex = method.indexOf('previousPadVisibility[');
-    expect(sceneMaskIndex).toBeGreaterThan(-1);
-    expect(groupMaskIndex).toBeGreaterThan(sceneMaskIndex);
-    expect(countIndex).toBeGreaterThan(groupMaskIndex);
-    // The pad WRITE must land between the recount and the render, pinned as
-    // its own ordering step rather than folded into the recount pin.
-    expect(padWriteIndex).toBeGreaterThan(countIndex);
-    expect(renderIndex).toBeGreaterThan(padWriteIndex);
-    // The pad restore must live in the finally: restored only after the render
-    // would leak raised pads into live frames on a throw.
-    expect(finallyIndex).toBeGreaterThan(renderIndex);
-    expect(restoreIndex).toBeGreaterThan(finallyIndex);
+    expect(method).toContain('const isLight = (entry as THREE.Light).isLight === true;');
+    expect(method).toContain('const keepVisible = entry === group || isLight ||');
+    expect(method).not.toMatch(/\bpads?\b|lightPads/i);
+    expect(source).not.toContain('lightPads');
   });
 
-  it('wires the drawn-count pin: scene root in, pads on the drawn count out', () => {
-    // The whole-scene relink fix has two wiring halves that no unit case can
-    // see: the renderer must pass its scene so ancestry is checked against the
-    // real root, and the pads must fill against the DRAWN count, not the
-    // chosen count. Dropping either silently reinstates the arrival freeze.
-    // The pass moved out of renderer.ts into fire_light_registry.ts under the
-    // monolith ratchet; the two halves are pinned where they now live, and the
-    // renderer half is pinned to the scene it hands in.
-    const source = sourceOf('../src/render/fire_light_registry.ts');
-    const methodStart = source.indexOf('export function runFireLightBudgetPass(');
-    const methodEnd = source.indexOf('pass.pads[i].visible = i < padCount;', methodStart);
-    // A renamed end marker must fail here, never silently widen the slice to
-    // the rest of the file (which would let the pins match anywhere).
-    expect(methodStart).toBeGreaterThan(-1);
-    expect(methodEnd).toBeGreaterThan(methodStart);
-    const method = source.slice(methodStart, methodEnd);
-
-    expect(method).toContain('const drawnCount = applyPointLightBudget(');
+  it('wires the drawn-eligibility root: the renderer hands in its own scene', () => {
+    // Ancestry must be checked against the real root, or a light under a
+    // hidden group holds a counted slot it never draws. The pass moved out of
+    // renderer.ts into fire_light_registry.ts under the monolith ratchet; the
+    // halves are pinned where they now live.
+    const method = budgetPassBody();
+    expect(method).toContain('applyPointLightBudget(');
     expect(method).toContain('pass.scene,');
-    expect(method).toContain('pointLightPadCount(drawnCount, pass.visibleCount)');
-    expect(method).not.toContain('pointLightPadCount(ranked.length');
 
     // The renderer must still hand its OWN scene in, so ancestry is checked
     // against the real root rather than a detached one. Anchored to the budget
     // method: `scene: this.scene,` is an ordinary line to write anywhere in a
     // 13k-line coordinator, so a whole-file match would pass on an unrelated one.
     expect(budgetFireLightsBody(rendererSource())).toContain('scene: this.scene,');
+  });
+
+  it('makes a view light a carrier source the moment it is reconciled, visible or not', () => {
+    // View lights are often born visible (delve props, the quest circle, the
+    // soulwell), and a render or compile before the next rank rebuild would
+    // gather one beside the carriers.
+    const group = new THREE.Group();
+    const born = new THREE.PointLight(0x44ff88, 1.2, 6, 2);
+    group.add(born);
+    const all: THREE.PointLight[] = [];
+    reconcileViewPointLights(group, [], all);
+    expect(all).toEqual([born]);
+    expect(born.visible).toBe(true);
+    expect(born.layers.mask).toBe(POINT_LIGHT_SOURCE_MASK);
+  });
+
+  it('ranks every fire and view light as a carrier source before it can show one', () => {
+    // A ranked light the budget shows while it still sits on a camera layer is
+    // gathered by three beside the carriers: the count moves, and it lands
+    // behind a black carrier where the shader loop has already stopped.
+    const scene = new THREE.Scene();
+    const fire = new THREE.PointLight(0xffaa66, 8, 12, 2);
+    const view = new THREE.PointLight(0x66aaff, 4, 9, 2);
+    fire.visible = false;
+    view.visible = false;
+    scene.add(fire, view);
+    runFireLightBudgetPass({
+      rank: [],
+      rankDirty: true,
+      fireLights: [fire],
+      viewLights: [view],
+      px: 0,
+      pz: 0,
+      visibleCount: 6,
+      liveBudget: 6,
+      rangeSq: RANGE_SQ,
+      scene,
+      flickerTime: null,
+    });
+    expect(fire.visible).toBe(true);
+    expect(view.visible).toBe(true);
+    expect(fire.layers.mask).toBe(POINT_LIGHT_SOURCE_MASK);
+    expect(view.layers.mask).toBe(POINT_LIGHT_SOURCE_MASK);
   });
 
   it('wires mid-session fx lights into the same ranked budget', () => {
@@ -438,8 +390,11 @@ describe('applyPointLightBudget', () => {
     expect(budgetStart).toBeGreaterThan(releaseStart);
 
     const register = source.slice(registerStart, releaseStart);
-    expect(register).toContain('light.userData.budgetDynamic = true;');
+    expect(register).toContain(
+      "if (typeof light.userData.budgetBase !== 'number') light.userData.budgetDynamic = true;",
+    );
     expect(register).toContain('light.visible = false;');
+    expect(register).toContain('markPointLightSource(light);');
     expect(register).toContain('this.viewLights.push(light);');
     expect(register).toContain('this.lightRankDirty = true;');
 
@@ -448,22 +403,32 @@ describe('applyPointLightBudget', () => {
     expect(release).toContain('this.viewLights.splice(index, 1);');
     expect(release).toContain('this.lightRankDirty = true;');
 
-    // And the warlock meteor fx is actually handed that seam.
+    // The seam object, and the two owners actually handed it: the warlock
+    // meteor fx and every placed-GLB view (the editor's live one included).
+    const seamStart = source.indexOf('private readonly budgetLights = {');
+    expect(seamStart).toBeGreaterThan(-1);
+    const seam = source.slice(seamStart, source.indexOf('};', seamStart));
+    expect(seam).toContain(
+      'register: (light: THREE.PointLight) => this.registerBudgetPointLight(light),',
+    );
+    expect(seam).toContain(
+      'release: (light: THREE.PointLight) => this.releaseBudgetPointLight(light),',
+    );
     const fxStart = source.indexOf('this.warlockMeteorFx = new WarlockMeteorFx(');
     const fxEnd = source.indexOf('this.necromancyGroundFx = new NecromancyGroundFx(', fxStart);
     expect(fxStart).toBeGreaterThan(-1);
     expect(fxEnd).toBeGreaterThan(fxStart);
-    const construction = source.slice(fxStart, fxEnd);
-    expect(construction).toContain('register: (light) => this.registerBudgetPointLight(light),');
-    expect(construction).toContain('release: (light) => this.releaseBudgetPointLight(light),');
+    expect(source.slice(fxStart, fxEnd)).toContain('this.budgetLights,');
+    const placed = [...source.matchAll(/new PlacedAssetsView\(([^)]*)\)/g)].map((m) => m[1]);
+    expect(placed).toHaveLength(2);
+    for (const args of placed) expect(args).toMatch(/, this\.budgetLights$/);
   });
 
-  it('a post-pass fx lifecycle change re-run restores the pinned total (landing and expiry)', () => {
+  it('a post-pass fx lifecycle re-run ranks the landing light on the frame it lands', () => {
     // Frame order on a meteor landing: budget pass first, then the fx update
     // releases the visible fall light and registers the hidden impact light.
-    // Without a recovery pass the frame renders one light short of the pinned
-    // total, numPointLights moves, and every lit material relinks. The
-    // recovery re-run (budget plus pads) must restore the total in-frame.
+    // Without the recovery re-run the impact light stays hidden, so no
+    // carrier draws it until the next frame.
     const VISIBLE = 4;
     const ranked: RankedPointLight[] = [];
     for (let i = 0; i < 6; i++) ranked.push(rankedLight(i * 2 + 2, 0));
@@ -477,9 +442,9 @@ describe('applyPointLightBudget', () => {
     };
     ranked.push(fallEntry);
 
-    let drawn = applyPointLightBudget(ranked, 0, 0, VISIBLE, VISIBLE, RANGE_SQ);
+    applyPointLightBudget(ranked, 0, 0, VISIBLE, VISIBLE, RANGE_SQ);
     expect(fall.visible).toBe(true);
-    expect(visibleCount(ranked) + pointLightPadCount(drawn, VISIBLE)).toBe(VISIBLE);
+    expect(visibleCount(ranked)).toBe(VISIBLE);
 
     // Landing: the fx releases the visible fall light and registers the
     // impact light hidden (the registration seam hides it on the way in).
@@ -494,22 +459,24 @@ describe('applyPointLightBudget', () => {
       dynamic: true,
     });
 
-    // The defect: without the recovery pass the rendered total dips by one.
-    expect(visibleCount(ranked) + pointLightPadCount(drawn, VISIBLE)).toBe(VISIBLE - 1);
+    // The defect: without the recovery pass the impact light stays dark.
+    expect(impact.visible).toBe(false);
+    expect(visibleCount(ranked)).toBe(VISIBLE - 1);
 
-    drawn = applyPointLightBudget(ranked, 0, 0, VISIBLE, VISIBLE, RANGE_SQ);
-    expect(visibleCount(ranked) + pointLightPadCount(drawn, VISIBLE)).toBe(VISIBLE);
+    applyPointLightBudget(ranked, 0, 0, VISIBLE, VISIBLE, RANGE_SQ);
+    expect(impact.visible).toBe(true);
+    expect(visibleCount(ranked)).toBe(VISIBLE);
 
-    // Impact expiry releases its light too; the re-run restores again.
+    // Impact expiry releases its light too; the re-run hands its slot on.
     ranked.pop();
-    drawn = applyPointLightBudget(ranked, 0, 0, VISIBLE, VISIBLE, RANGE_SQ);
-    expect(visibleCount(ranked) + pointLightPadCount(drawn, VISIBLE)).toBe(VISIBLE);
+    applyPointLightBudget(ranked, 0, 0, VISIBLE, VISIBLE, RANGE_SQ);
+    expect(visibleCount(ranked)).toBe(VISIBLE);
   });
 
   it('both frame paths re-run the budget after the meteor fx update', () => {
     // The meteor fx is the one budget-light owner updating after the pass: a
     // landing or expiry frame must re-run the budget before rendering, or the
-    // pinned visible total dips for exactly that frame.
+    // landing light is drawn one frame late.
     const source = rendererSource();
     const sites = [
       ...source.matchAll(/this\.warlockMeteorFx\.update\(dt, this\.reducedMotion\(\)\);/g),
@@ -532,16 +499,11 @@ describe('applyPointLightBudget', () => {
   });
 
   it('wires contributor flicker after the renderer completes selection', () => {
-    const source = sourceOf('../src/render/fire_light_registry.ts');
-    const methodStart = source.indexOf('export function runFireLightBudgetPass(');
-    const methodEnd = source.indexOf('pass.pads[i].visible = i < padCount;', methodStart);
-    const method = source.slice(methodStart, methodEnd);
+    const method = budgetPassBody();
     const selection = method.indexOf('applyPointLightBudget(');
     const flickerGate = method.indexOf('if (pass.flickerTime !== null) {');
     const flickerCall = method.indexOf('flickerContributingFireLights(');
 
-    expect(methodStart).toBeGreaterThan(-1);
-    expect(methodEnd).toBeGreaterThan(methodStart);
     expect(selection).toBeGreaterThan(-1);
     expect(flickerGate).toBeGreaterThan(selection);
     expect(flickerCall).toBeGreaterThan(flickerGate);
@@ -579,6 +541,7 @@ describe('fire-light adoption sink', () => {
     adopter.adopt(light);
 
     expect(light.visible).toBe(false);
+    expect(light.layers.mask).toBe(POINT_LIGHT_SOURCE_MASK);
     expect(registry).toEqual([light]);
     expect(dirtyCount()).toBe(1);
   });
@@ -706,6 +669,7 @@ describe('fire-light adoption sink', () => {
     // the hide has to be one of these sanctioned READS, so a new reach fails by
     // default and arrives here to be declared.
     const SANCTIONED_READS = [
+      /^\s*\(\) => this\.fireLights,$/,
       /^\s*if \(pruneFireLights\(this\.fireLights,/,
       /^\s*fireLights: this\.fireLights,$/,
       /^\s*fireLights: this\.fireLightAdopter\.sink,$/,
@@ -730,10 +694,11 @@ describe('fire-light adoption sink', () => {
       .slice(massHide + MASS_HIDE.length)
       .split('\n')
       .filter((line) => /\bfireLights\b/.test(line));
-    // The prune, the two raw handoffs (battleground, budget pass), the sink
+    // The carrier sources (a read-only list the carriers pack from), the
+    // prune, the two raw handoffs (battleground, budget pass), the sink
     // handoff, and the station-props adoption loop. A floor keeps the loop from
     // passing vacuously if the name ever moves wholesale.
-    expect(reaches).toHaveLength(5);
+    expect(reaches).toHaveLength(6);
     for (const line of reaches) {
       expect(isSanctioned(line), `unsanctioned reach past the adoption seam: ${line.trim()}`).toBe(
         true,
@@ -784,8 +749,8 @@ describe('fire-light adoption sink', () => {
     // Adoption alone was not enough. The budget ranks against the ancestry it
     // SEES, and updateVisibility writes jailScene.group.visible AFTER the
     // frame's budget pass, so on the frame the group flips from shown to hidden
-    // a counted light silently leaves the render light list and numPointLights
-    // moves. The renderer half is pinned below; this is the mechanism.
+    // a counted light silently goes dark for that frame. The renderer half is
+    // pinned below; this is the mechanism.
     const scene = new THREE.Scene();
     const group = new THREE.Group();
     group.position.set(100, 5, -40);
@@ -804,9 +769,9 @@ describe('fire-light adoption sink', () => {
       { light, d2: 0, worldPos: new THREE.Vector3(), base: 9, dynamic: false },
     ];
 
-    // Inside the group, the cull toggle takes the light out of the count.
+    // Inside the group, the cull toggle takes the light out of the drawn set.
     group.visible = false;
-    expect(countDrawnPointLights(ranked, scene)).toBe(0);
+    expect(applyPointLightBudget(ranked, 0, 0, 6, 6, RANGE_SQ, scene)).toBe(0);
     group.visible = true;
 
     const moved = reparentStrandedLightsToScene(scene, group);
@@ -816,7 +781,7 @@ describe('fire-light adoption sink', () => {
     // Same place in the world, so the gate still glows where it was authored.
     expect(light.getWorldPosition(new THREE.Vector3()).toArray()).toEqual([102, 11, -37]);
     group.visible = false;
-    expect(countDrawnPointLights(ranked, scene)).toBe(1);
+    expect(applyPointLightBudget(ranked, 0, 0, 6, 6, RANGE_SQ, scene)).toBe(1);
   });
 
   it('refuses a light a world position cannot describe, instead of moving it wrong', () => {

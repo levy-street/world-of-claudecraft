@@ -153,6 +153,39 @@ describe('join CTA + presence', () => {
   });
 });
 
+describe('link-error notice', () => {
+  it('defaults to false when no linkError input is given', () => {
+    const v = buildDiscordWidgetView({
+      enabled: true,
+      status: UNLINKED,
+      presence: NO_PRESENCE,
+      inviteUrl: 'u',
+    });
+    expect(v.linkError).toBe(false);
+  });
+
+  it('passes a true linkError through unchanged, unlinked or linked', () => {
+    expect(
+      buildDiscordWidgetView({
+        enabled: true,
+        status: UNLINKED,
+        presence: NO_PRESENCE,
+        inviteUrl: 'u',
+        linkError: true,
+      }).linkError,
+    ).toBe(true);
+    expect(
+      buildDiscordWidgetView({
+        enabled: true,
+        status: linked(),
+        presence: NO_PRESENCE,
+        inviteUrl: 'u',
+        linkError: true,
+      }).linkError,
+    ).toBe(true);
+  });
+});
+
 describe('swag claimability', () => {
   it('counts claimable rows for the widget badge', () => {
     // Champion tier (5) + plenty of points: the free title and several others claimable.

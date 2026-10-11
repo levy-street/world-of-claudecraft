@@ -38,6 +38,7 @@
 // linked program this group exists to keep.
 
 import * as THREE from 'three';
+import { ditherFadeEnabled } from './occluder_dither_fade';
 import { buildOccluderFadeTwin } from './occluder_fade_gate';
 import {
   isOccluderGhostMaterial,
@@ -91,6 +92,8 @@ export function buildGhostVariantPrewarmGroup(root: THREE.Object3D): THREE.Group
   // this group is for (three's compile() traverses regardless of visibility).
   group.visible = false;
   group.userData.renderCategory = 'prewarm';
+  // The dithered prototype never flips `transparent`: there is no twin to warm.
+  if (ditherFadeEnabled()) return group;
   const seen = new Set<string>();
   for (const target of collectOccluderGhostTargets(root)) {
     const key = occluderGhostVariantKey(target);

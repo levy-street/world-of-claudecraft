@@ -2,22 +2,15 @@
 // bonus proven at the seam it rides. Emberscreed 2pc and Vesperash 4pc's mana
 // half are flag-gated module bends (unit fake-ctx pairs plus live Sim control
 // pairs); Emberscreed 4pc rides the generic shieldConsumed proc with the new
-// trigger-level internal cooldown; Benison 2pc and Vesperash 2pc are RESOLVED
-// ability rewrites; Benison 4pc is the bespoke mend at the vigil-trigger
-// point in damage.ts. No priest bend touches the rng draw count or order for
-// anyone: no bonus here rolls a chance, and every bend gates on the wearer
-// flag before doing anything.
+// trigger-level internal cooldown; Vesperash 2pc rewrites the resolved ability.
+// Benison prayer behavior is covered in benison_dawnweave.test.ts. No bonus
+// here rolls a chance, and every bend gates on the wearer flag first.
 import { describe, expect, it } from 'vitest';
-import { benisonMendOnVigilTriggered } from '../src/sim/combat/priest/benison';
 import { DOCTRINE_AURA_ID, placeDoctrineLink } from '../src/sim/combat/priest/doctrine';
 import { TITHEFIEND_MANA_RETURN_RATE, vespersEchoDamage } from '../src/sim/combat/priest/vespers';
 import { onCastCompleted, onShieldConsumed, tickProcState } from '../src/sim/combat/talent_procs';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import {
-  BENISON_2PC_VIGIL_RESCUE_HEAL,
-  BENISON_4PC_MEND_DURATION_SEC,
-  BENISON_4PC_MEND_PCT_MAX,
-  BENISON_4PC_MEND_TICK_INTERVAL_SEC,
   EMBERSCREED_2PC_DOCTRINE_CONVERSION_BONUS,
   EMBERSCREED_4PC_HYMN_ICD_SEC,
   EMBERSCREED_4PC_HYMN_WINDOW_SEC,
@@ -313,173 +306,6 @@ describe('Emberscreed 4pc: consumed Psalm arms an instant Scouring Hymn, once pe
   });
 });
 
-describe("Benison 2pc: Seraphic Vigil's rescue heals for 270, exact and flat", () => {
-  it('the resolved buffTarget value: 270 for wearers, 180 base (no rounding drift)', () => {
-    const base = computeCharacterModifiers('priest', { spec: 'holy', rows: {} }, 25, {});
-    const setw = computeCharacterModifiers(
-      'priest',
-      { spec: 'holy', rows: {} },
-      25,
-      worn('benison_dawnweave', 2),
-    );
-    const vigilOf = (mods: typeof base) => {
-      const entry = expectDefined(
-        abilitiesKnownAt('priest', 25, mods).find((known) => known.def.id === 'seraphic_vigil'),
-      );
-      const eff = expectDefined(entry.effects.find((e) => e.type === 'buffTarget'));
-      return (eff as { value: number }).value;
-    };
-    expect(vigilOf(base)).toBe(180);
-    expect(vigilOf(setw)).toBe(BENISON_2PC_VIGIL_RESCUE_HEAL);
-    // heal_echo sits in neither the integral nor the scalable buff-kind sets,
-    // so the 1.5 buffPct row lands as exactly the flat printed 270.
-    expect(BENISON_2PC_VIGIL_RESCUE_HEAL).toBe(180 * 1.5);
-  });
-
-  it('live rescue: the consumed Vigil heals 270 for wearers (control 180)', () => {
-    function rescueHeal(wearer: boolean): number {
-      const sim = new Sim({ seed: 358, playerClass: 'priest', autoEquip: true });
-      sim.setPlayerLevel(20);
-      expect(sim.setSpec('holy')).toBe(true);
-      if (wearer) equipSet(sim, 'benison_dawnweave', 2);
-      const ally = addAlly(sim, 'Watched');
-      const mob = addHostileMob(sim);
-      sim.player.resource = sim.player.maxResource;
-      sim.targetEntity(ally.id);
-      sim.castAbility('seraphic_vigil');
-      expect(ally.auras.some((aura) => aura.id === 'seraphic_vigil')).toBe(true);
-      // Crits stubbed off so the rescue lands at its exact flat value.
-      sim.rng.next = () => 0.5;
-      sim.rng.chance = () => false;
-      sim.drainEvents();
-      // Drop the ally below the 35 percent threshold through the real pipeline.
-      sim.ctx.dealDamage(
-        mob,
-        ally,
-        Math.ceil(ally.maxHp * 0.75),
-        false,
-        'physical',
-        'Test Blow',
-        'hit',
-      );
-      expect(ally.auras.some((aura) => aura.id === 'seraphic_vigil')).toBe(false);
-      const rescue = sim
-        .drainEvents()
-        .filter(
-          (event): event is Extract<typeof event, { type: 'heal2' }> => event.type === 'heal2',
-        )
-        .find((event) => event.ability === 'Seraphic Vigil');
-      return rescue?.amount ?? 0;
-    }
-    expect(rescueHeal(true)).toBe(BENISON_2PC_VIGIL_RESCUE_HEAL);
-    expect(rescueHeal(false)).toBe(180);
-  });
-});
-
-describe('Benison 4pc: the triggered Vigil also mends its ally', () => {
-  function mendHarness(equipment: Partial<Record<string, string>>) {
-    const mods = priestMods('holy', equipment);
-    const applied: Aura[] = [];
-    const priest = { id: 1, kind: 'player' } as unknown as Entity;
-    const ally = { id: 2, kind: 'player', maxHp: 1_000, auras: [] } as unknown as Entity;
-    const ctx = {
-      players: new Map([[1, { cls: 'priest' }]]),
-      playerMods: () => mods,
-      applyAura: (_target: Entity, aura: Aura) => {
-        applied.push(aura);
-      },
-      emit: () => {},
-    } as unknown as SimContext;
-    return { ctx, priest, ally, applied };
-  }
-
-  it('wearers apply the 15 percent-of-ally-max HoT over 10 sec; others nothing', () => {
-    const wearer = mendHarness(worn('benison_dawnweave', 4));
-    benisonMendOnVigilTriggered(wearer.ctx, wearer.priest, wearer.ally);
-    const mend = expectDefined(wearer.applied[0]);
-    expect(mend.id).toBe('benison_dawnweave_mend');
-    expect(mend.kind).toBe('hot');
-    expect(mend.duration).toBe(BENISON_4PC_MEND_DURATION_SEC);
-    expect(mend.tickInterval).toBe(BENISON_4PC_MEND_TICK_INTERVAL_SEC);
-    const ticks = BENISON_4PC_MEND_DURATION_SEC / BENISON_4PC_MEND_TICK_INTERVAL_SEC;
-    expect(mend.value).toBe(Math.round((1_000 * BENISON_4PC_MEND_PCT_MAX) / ticks));
-
-    const control = mendHarness(worn('benison_dawnweave', 2));
-    benisonMendOnVigilTriggered(control.ctx, control.priest, control.ally);
-    expect(control.applied.length).toBe(0);
-  });
-
-  it('live: the mend rides the REAL vigil trigger and pays 15 percent over 10 sec', () => {
-    const sim = new Sim({ seed: 358, playerClass: 'priest', autoEquip: true });
-    sim.setPlayerLevel(20);
-    expect(sim.setSpec('holy')).toBe(true);
-    equipSet(sim, 'benison_dawnweave', 4);
-    const ally = addAlly(sim, 'Mended');
-    const mob = addHostileMob(sim);
-    sim.player.resource = sim.player.maxResource;
-    sim.targetEntity(ally.id);
-    sim.castAbility('seraphic_vigil');
-    const allyMaxHp = ally.maxHp;
-    sim.ctx.dealDamage(
-      mob,
-      ally,
-      Math.ceil(allyMaxHp * 0.75),
-      false,
-      'physical',
-      'Test Blow',
-      'hit',
-    );
-    const mend = expectDefined(ally.auras.find((aura) => aura.id === 'benison_dawnweave_mend'));
-    expect(mend.name).toBe('Seraphic Vigil');
-    const ticks = BENISON_4PC_MEND_DURATION_SEC / BENISON_4PC_MEND_TICK_INTERVAL_SEC;
-    expect(mend.value).toBe(Math.round((allyMaxHp * BENISON_4PC_MEND_PCT_MAX) / ticks));
-    // Sum the mend's own tick events (regen-proof; tick() drains the event
-    // buffer per tick, so accumulate as we advance), then confirm the total
-    // is the promised 15 percent of the ally's max health across 5 ticks.
-    sim.drainEvents();
-    let mended = 0;
-    for (let tick = 0; tick < BENISON_4PC_MEND_DURATION_SEC * 20 + 20; tick++) {
-      for (const event of sim.tick()) {
-        if (event.type === 'heal2' && event.abilityId === 'benison_dawnweave_mend') {
-          mended += event.amount;
-        }
-      }
-    }
-    expect(mended).toBe(mend.value * ticks);
-    expect(ally.auras.some((aura) => aura.id === 'benison_dawnweave_mend')).toBe(false);
-  });
-
-  it('Twin Covenant coexistence: each triggered Vigil mends its own ally', () => {
-    const sim = new Sim({ seed: 359, playerClass: 'priest', autoEquip: true });
-    sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: 'holy', rows: { 20: 'pri_r20_twin_covenant' } })).toBe(true);
-    sim.tick();
-    equipSet(sim, 'benison_dawnweave', 4);
-    const first = addAlly(sim, 'FirstWard');
-    const second = addAlly(sim, 'SecondWard');
-    const mob = addHostileMob(sim);
-    sim.player.resource = sim.player.maxResource;
-    sim.targetEntity(first.id);
-    sim.castAbility('seraphic_vigil');
-    sim.player.gcdRemaining = 0;
-    sim.targetEntity(second.id);
-    sim.castAbility('seraphic_vigil'); // the Twin Covenant second charge
-    for (const ally of [first, second]) {
-      sim.ctx.dealDamage(
-        mob,
-        ally,
-        Math.ceil(ally.maxHp * 0.75),
-        false,
-        'physical',
-        'Test Blow',
-        'hit',
-      );
-    }
-    expect(first.auras.some((aura) => aura.id === 'benison_dawnweave_mend')).toBe(true);
-    expect(second.auras.some((aura) => aura.id === 'benison_dawnweave_mend')).toBe(true);
-  });
-});
-
 describe("Vesperash 2pc: Call Tithefiend's cooldown drops 30 to 24", () => {
   it('the resolved cooldown: 24 for wearers, 30 base', () => {
     const cooldownOf = (equipment: Partial<Record<string, string>>) => {
@@ -566,7 +392,5 @@ describe('Vesperash 4pc: calling the fiend resets Mindfracture and doubles its m
     expect(EMBERSCREED_2PC_DOCTRINE_CONVERSION_BONUS).toBeCloseTo(0.1, 10);
     expect(EMBERSCREED_4PC_HYMN_WINDOW_SEC).toBe(10);
     expect(EMBERSCREED_4PC_HYMN_ICD_SEC).toBe(15);
-    expect(BENISON_4PC_MEND_PCT_MAX).toBeCloseTo(0.15, 10);
-    expect(BENISON_4PC_MEND_DURATION_SEC).toBe(10);
   });
 });

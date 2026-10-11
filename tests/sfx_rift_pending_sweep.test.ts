@@ -24,7 +24,7 @@ function seedPending(id: string, key: string): void {
   maps.pendingLoopVariants.set(id, 0);
 }
 
-describe('ambience() dynamic rift pending sweep', () => {
+describe('ambience() dynamic entity pending sweep', () => {
   it('drops a vanished rift source from all three pending maps together', () => {
     // Arrange: a portal that vanished mid-load, a roller still present this
     // frame (the listener sits at the origin, so (0,0,0) is in range), and a
@@ -47,5 +47,11 @@ describe('ambience() dynamic rift pending sweep', () => {
       map.delete('rift_roller:active');
       map.delete('campfire:7');
     }
+  });
+
+  it('drops a vanished hoard hum from all three pending maps together', () => {
+    seedPending('hoard_entrance:gone', 'hoard_entrance_hum');
+    sfx.ambience('vale', false, null, false, 0, []);
+    for (const map of allThree) expect(map.has('hoard_entrance:gone')).toBe(false);
   });
 });

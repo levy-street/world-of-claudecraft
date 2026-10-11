@@ -871,6 +871,11 @@ duty, but the conversion is not enough. As a primary healer it does not function
 
 # Tanks
 
+> **v0.44 THREAT RETUNE (2026-09-22):** Oathward went 40% to 100% and Recompense 80% to
+> 110% after live 0.42/0.43 parses showed the paladin at 234 generated threat/s against the
+> warrior's 330; the heroic threat line below (warrior 276 / paladin 296) predates that and
+> reads roughly 326 / 423 on the same harness now. Evidence: `docs/design/tank-threat-v044.md`.
+>
 > **v0.38 RETUNE (2026-08-15):** the threat and survivability numbers in this
 > section describe the pre-v0.38 tree and motivated the tank balance pass. The
 > 3.6x threat gap and the Stonebound heroic one-shot below are FIXED: heroic

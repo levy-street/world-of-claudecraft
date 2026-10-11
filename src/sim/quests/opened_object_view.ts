@@ -1,5 +1,5 @@
-// Per-viewer "this object is spent" read for interact-objective ground
-// objects (the wreck line's castaway crates). The sim keeps every object
+// Per-viewer "this object is spent" read for credited ground objects,
+// including the wreck line's castaway crates and delivered freight. The sim keeps every object
 // alive for sharing (interact_object_credit.ts: the ledger, not the object,
 // stops double credit), so a player who already opened a crate used to walk
 // back into it, get the "You have already done this one." refusal, and read
@@ -18,14 +18,18 @@ import { interactObjectCreditKey } from './interact_object_credit';
 
 /**
  * The ground-object classes that VANISH for a player who already credited
- * them. Deliberately an opt-in list, not "every interact objective": most
+ * them. Deliberately an opt-in list: most
  * interact targets are meant to stay visible after their credit (the three
  * watchbells each stand on their own headland, and a player walking the
  * coast should still see the one they rang). The castaway crates are the
  * exception the playtest asked for: they line one path, they are identical,
- * and an opened one that still glints reads as a bug.
+ * and an opened one that still glints reads as a bug. Freight crates use the
+ * same rule once delivered, while remaining available to other players.
  */
-export const OPENED_OBJECT_HIDE_ITEM_IDS: ReadonlySet<string> = new Set(['ps_castaway_crate']);
+export const OPENED_OBJECT_HIDE_ITEM_IDS: ReadonlySet<string> = new Set([
+  'ps_castaway_crate',
+  'eastbrook_freight_crate',
+]);
 
 /** The minimal entity shape the check reads (IWorld.entities values). */
 export interface OpenedObjectEntity {
@@ -51,9 +55,17 @@ export interface OpenedObjectQuestRow {
 export function isObjectOpenedByViewer(
   entity: OpenedObjectEntity,
   questLog: ReadonlyMap<string, OpenedObjectQuestRow>,
+  worldQuestLog?: ReadonlyMap<string, OpenedObjectQuestRow>,
 ): boolean {
   const itemId = entity.objectItemId;
   if (!itemId || !OPENED_OBJECT_HIDE_ITEM_IDS.has(itemId)) return false;
+  if (itemId === 'eastbrook_freight_crate') {
+    const freight = worldQuestLog?.get('wq_eastbrook_bandits');
+    return (
+      freight?.state === 'active' &&
+      freight.creditedObjects?.includes(interactObjectCreditKey(0, entity.pos)) === true
+    );
+  }
   for (const [questId, qp] of questLog) {
     if (qp.state !== 'active' && qp.state !== 'ready') continue;
     if (!qp.creditedObjects?.length) continue;

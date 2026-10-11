@@ -35,6 +35,7 @@ import {
   COLDSIGHT_READ_FELL_SHOT_MULT,
   COLDSIGHT_READ_LONG_DRAW_MULT,
 } from '../sim/combat/hunter_coldsight_read';
+import { BENISON_WHISPER_AURA_ID } from '../sim/combat/priest/benison_dawnweave';
 import {
   GLOAM_STAGES,
   KNOCKOUT_PER_PIP,
@@ -116,6 +117,7 @@ import {
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC,
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
 } from '../sim/varkhul_shared_pyre';
+import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
 
 export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 
@@ -165,7 +167,16 @@ const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
  * Describe an aura's gameplay effect. This switch is intentionally exhaustive:
  * adding an AuraKind without player-facing explanation is a compile-time error.
  */
-export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
+export function auraEffectDescriptor(
+  a: AuraEffectInput,
+  // The local player, for their own trinket auras whose amount scales with
+  // their live power (trinket_aura_effect.ts); omitted, those read number-free.
+  viewer?: TrinketAuraViewer,
+): AuraEffectDescriptor | null {
+  // Every trinket aura explains itself in full (its generic kind line would
+  // not say what the trinket does with it).
+  const trinket = trinketAuraEffectDescriptor(a, viewer);
+  if (trinket) return trinket;
   // This is a four-second placement marker, not a damage-taken modifier. Its
   // countdown and localized name are the complete tooltip; the generic
   // vulnerability copy would misleadingly claim that it adds 0% damage taken.
@@ -451,6 +462,12 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.id === 'bg_carried_flag' && a.kind === 'flag_carried') {
     return { key: `${KEY}.carriedFlag`, nums: {} };
   }
+  if (a.id === 'world_quest_delivery_cargo' && a.kind === 'world_quest_cargo') {
+    return {
+      key: `${KEY}.carryingFreight`,
+      nums: { pct: pctFromMult(a.value) },
+    };
+  }
   switch (a.kind) {
     case 'dot':
       return {
@@ -525,7 +542,15 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
     case 'next_execute_free':
       return { key: `${KEY}.freeExecute` };
     case 'next_cast_instant':
+      if (a.id === BENISON_WHISPER_AURA_ID) {
+        return { key: `${KEY}.benisonWhisper`, nums: { pct: pctFromFrac(a.value) } };
+      }
       return { key: `${KEY}.instantCast`, nums: {} };
+    case 'benison_prayers':
+      return {
+        key: `${KEY}.benisonPrayers`,
+        nums: { pct: pctFromFrac(a.value) },
+      };
     case 'next_cast_cheap':
       return { key: `${KEY}.cheapCast`, nums: { pct: pctFromFrac(a.value) } };
     case 'paladin_radiant_resonance':

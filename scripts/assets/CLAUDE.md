@@ -120,7 +120,12 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   scans `src/` so only the field model table and the media manifest name a copy; after an
   intended change run `--write-pins`, paste the printed pins into the table and the test's
   `EXPECTED` with the printed bark counts, then `node scripts/build_media_manifest.mjs
-  generate`, the steps the script prints), and
+  generate`, the steps the script prints), `decimated_prop_swap.mjs` (lands a
+  Blender decimation pass over shipped scatter props: transplants only the export's
+  primitive geometry onto the shipped GLB so names, materials and bounds stay what
+  consumers key on, downsizes maps above `--cap` with the codec each map shipped with,
+  re-applies the original's meshopt/quantization, and verifies before writing; the
+  export dir is maintainer-local, the recipe is the header), and
   `ravenrift_blueprint.mjs` (run via `tsx`: renders the battleground blueprint diagram FROM
   the authoritative layout records, so the docs image cannot drift from what players
   collide with).

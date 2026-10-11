@@ -395,6 +395,41 @@ describe('procedural bob math', () => {
     expect(mountBobY(spec, 0.7, true)).toBe(0);
   });
 
+  it('the avian mount keeps its authored forward, reverse, and jump clips', () => {
+    const spec = MOUNT_VISUAL_SPECS.avian_strider;
+    const def = VISUALS.mount_avian_strider;
+    expect(spec).toMatchObject({
+      visualKey: 'mount_avian_strider',
+      seat: 2.62,
+      seatFwd: 0.2,
+      rigged: true,
+      bobAmp: 0,
+      fx: null,
+      // no seatBone: the rig's saddle bone is static (0.0007 world units
+      // across every clip), so the authored lift places the rider
+      seatBone: null,
+    });
+    expect(def).toMatchObject({
+      url: 'models/mounts/avian_strider.glb',
+      height: 4.32,
+      yaw: Math.PI / 2,
+      walkRef: 5.52,
+      runRef: 7.16,
+      // raised from the stock 1.8/1.6: at a mount's fixed speed the ceiling,
+      // not the reference, is what binds (see manifest.ts)
+      walkTimeScaleMax: 2.0,
+      runTimeScaleMax: 2.0,
+      lazyPreload: true,
+      clips: {
+        idle: 'Idle',
+        walk: 'Run',
+        run: 'Run',
+        walkBack: 'WalkBackward',
+        jump: 'Jump',
+      },
+    });
+  });
+
   it('parks the rocket sled still, seats its rider lower, and clears terrain while moving', () => {
     const spec = MOUNT_SKIN_VISUAL_SPECS.goblin_rocket_sled;
     expect(spec.seat).toBe(1.29);

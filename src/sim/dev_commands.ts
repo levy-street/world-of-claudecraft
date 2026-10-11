@@ -5,12 +5,29 @@ import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_SKIN_IDS } from './content/mount_skins';
 import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
-import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS } from './data';
+import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { displacePlayerForDev } from './dev/dev_displace';
+import { handleFerryDevChat } from './dev/ferry_dev';
+import { handleDevHoardTravel } from './dev/hoard_travel';
 import { devTownList, resolveDevTown } from './dev/town_teleport';
+import { prepareWeeklyVaultPlaytest } from './dev/weekly_vault_playtest';
+import { handleDevClueCommand } from './dev_clue_scrolls';
 import { applyDevKit } from './dev_kit';
+import { handleDevTreasureMapCommand } from './dev_treasure_map';
+import { armWeeklyQuestForDev } from './dev_weekly_quest';
+import { armWorldQuestForDev, listWorldQuestsForDev } from './dev_world_quest';
+import { armWorldQuestCannonForDev } from './dev_world_quest_cannon';
+import { armWorldQuestCaravanForDev } from './dev_world_quest_caravan';
+import { armDailyWorldQuestForDev } from './dev_world_quest_daily';
+import { armWorldQuestForgingForDev } from './dev_world_quest_forging';
+import { armWorldQuestGliderForDev } from './dev_world_quest_glider';
+import { armWorldQuestInvestigationForDev } from './dev_world_quest_investigation';
+import { armWorldQuestShadowForDev } from './dev_world_quest_shadow';
+import { armWorldQuestTracingForDev } from './dev_world_quest_tracing';
+import { armWorldQuestWispMazeForDev } from './dev_world_quest_wisp_maze';
 import { createGroundObject, createMob } from './entity';
+import { awardFactionReputation, FACTION_IDS } from './factions';
 import {
   ignivarDevRaidTravelRoster,
   setupIgnivarDevRaid,
@@ -27,6 +44,8 @@ import {
 } from './nythraxis_dev_raid';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
+import { endHillNow, riseHillNow, spawnHillNow, warnNextHillNow } from './pvp/hill';
+import { HILL_DEV_USAGE, isHillDevCommand, parseHillDevCommand } from './pvp/hill_dev';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
@@ -37,10 +56,15 @@ import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleg
 import { revivePlayerAt } from './spirit';
 import { MAX_LEVEL, type RiftTier } from './types';
 import { setupVarkhulDevRaid } from './varkhul_dev_raid';
+import {
+  worldQuestCycleOfferingQuest,
+  worldQuestPuzzleVariantForCycle,
+} from './world_quest_rotation';
 
 const MAX_DEV_SPAWNS = 20;
 const DEV_SPAWN_RADIUS = 4;
 const DEV_SPAWN_RING_SIZE = 8;
+const MAX_ORDINARY_RIFT_SEED = 1_000_000_000;
 
 function clampInteger(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, Math.floor(value)));
@@ -149,6 +173,12 @@ export function handleDevChat(
   raw: string,
   pid: number,
 ): SentChat | null | undefined {
+  const weeklyVaultMatch = /^\/dev\s+weeklyvault(?:\s+(rollover))?\s*$/i.exec(raw);
+  if (weeklyVaultMatch) {
+    prepareWeeklyVaultPlaytest(ctx, pid, !!weeklyVaultMatch[1]);
+    return null;
+  }
+  if (handleFerryDevChat(ctx, raw, pid)) return null; // /dev ferry (dev/ferry_dev.ts)
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
   if (levelMatch) {
     const level = Number(levelMatch[1]);
@@ -170,6 +200,216 @@ export function handleDevChat(
         Number(teleportMatch[2]),
       );
       emitDevLog(ctx, pid, `[dev] Teleported to ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`);
+    }
+    return null;
+  }
+
+  if (/^\/(?:dev\s+salvage|devsalvage)\s*$/i.test(raw)) {
+    const meta = ctx.players.get(pid);
+    const quest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
+    const rotation = ctx.currentWorldQuestRotation();
+    const devCycle = worldQuestCycleOfferingQuest(rotation.cycle, quest?.id ?? '');
+    if (!meta || !quest || quest.objective.type !== 'salvage' || !devCycle) {
+      ctx.error(pid, '[dev] Shipwreck salvage is unavailable in this host.');
+      return null;
+    }
+    meta.devWorldQuestCycle = devCycle;
+    if (meta.worldQuestCycle !== devCycle) {
+      meta.worldQuestCycle = devCycle;
+      meta.worldQuestLog.clear();
+      meta.worldQuestAreas.clear();
+    }
+    // Keep the calendar's current weekly layout even when the dev command must
+    // project a nearby offer cycle so the online client's active-id filter admits it.
+    const variant = worldQuestPuzzleVariantForCycle(rotation.cycle, quest.objective.layouts.length);
+    meta.worldQuestLog.set(quest.id, {
+      questId: quest.id,
+      count: 0,
+      state: 'active',
+      puzzleVariant: variant,
+    });
+    meta.worldQuestAreas.delete(quest.id);
+    meta.wireRev++;
+    ctx.setPlayerLevel(Math.max(quest.minLevel, ctx.entities.get(pid)?.level ?? 1), pid);
+    ctx.emit({ type: 'worldQuestStarted', questId: quest.id, pid });
+    emitDevLog(ctx, pid, '[dev] Shipwreck salvage armed. Use /dev tp 320 103 (beside the wreck).');
+    return null;
+  }
+
+  if (/^\/dev\s+shadow\s*$/i.test(raw)) {
+    armWorldQuestShadowForDev(ctx, pid);
+    return null;
+  }
+  const caravanMatch = /^\/(?:dev\s+caravan|devcaravan)(?:\s+(\S+))?\s*$/i.exec(raw);
+  const cannonMatch = /^\/dev\s+cannon(?:\s+(wyrmwatch|last_keep))?\s*$/i.exec(raw);
+  if (/^\/dev\s+(?:infiltrator|investigation|amongus)\s*$/i.test(raw)) {
+    armWorldQuestInvestigationForDev(ctx, pid);
+    return null;
+  }
+  const gliderMatch = /^\/dev\s+(?:glider|slalom|windrider)(?:\s+(start))?\s*$/i.exec(raw);
+  if (gliderMatch) {
+    armWorldQuestGliderForDev(ctx, pid, Boolean(gliderMatch[1]));
+    return null;
+  }
+  const weeklyMatch = /^\/dev\s+weekly(?:\s+(credit))?\s*$/i.exec(raw);
+  if (weeklyMatch) {
+    armWeeklyQuestForDev(ctx, pid, Boolean(weeklyMatch[1]));
+    return null;
+  }
+  if (/^\/dev\s+forge\s*$/i.test(raw)) {
+    armWorldQuestForgingForDev(ctx, pid);
+    return null;
+  }
+  if (cannonMatch) {
+    armWorldQuestCannonForDev(ctx, pid, cannonMatch[1]?.toLowerCase());
+    return null;
+  }
+  if (/^\/dev\s+calligraphy\s*$/i.test(raw)) {
+    armWorldQuestTracingForDev(ctx, pid);
+    return null;
+  }
+  if (caravanMatch) {
+    armWorldQuestCaravanForDev(ctx, pid, (caravanMatch[1] ?? 'eastbrook').toLowerCase());
+    return null;
+  }
+
+  // /dev rep <rift_watch|church_order|automatons|all> <amount>: award faction
+  // standing the way a world-quest turn-in does (same level cap), so the
+  // quartermasters' standing gates can be exercised without the daily grind.
+  const repMatch = /^\/dev\s+rep\s+(\S+)\s+(\d+)\s*$/i.exec(raw);
+  if (repMatch) {
+    const meta = ctx.players.get(pid);
+    const player = ctx.entities.get(pid);
+    if (!meta || !player) return null;
+    const key = repMatch[1].toLowerCase();
+    const factionIds = key === 'all' ? FACTION_IDS : FACTION_IDS.filter((id) => id === key);
+    if (factionIds.length === 0) {
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Unknown faction "${repMatch[1]}": rift_watch, church_order, automatons or all.`,
+      );
+      return null;
+    }
+    for (const factionId of factionIds) {
+      const result = awardFactionReputation(meta, factionId, Number(repMatch[2]), player.level);
+      // Same full-pass mark the world-quest turn-in requests, so the standing
+      // deeds grant on the tick the cheat crosses a tier.
+      if (result.gained > 0) ctx.markDeedsDirty(pid);
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] ${factionId}: +${result.gained} standing, now ${result.total} (${result.tier})${
+          result.capped ? ', capped by level' : ''
+        }.`,
+      );
+    }
+    return null;
+  }
+
+  // /dev clue [hunt <huntId> | solve | casket]: the Clue Scroll playtest
+  // family (src/sim/dev_clue_scrolls.ts owns every arm).
+  const clueMatch = /^\/dev\s+clue(?:\s+(\S+))?(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (clueMatch) {
+    handleDevClueCommand(ctx, pid, (clueMatch[1] ?? '').toLowerCase(), clueMatch[2] ?? '');
+    return null;
+  }
+
+  const hoardMatch = /^\/dev\s+hoard(?:\s+(\S+))?(?:\s+(\S+))?(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (hoardMatch) {
+    handleDevHoardTravel(
+      ctx,
+      pid,
+      hoardMatch[1] ?? 'list',
+      hoardMatch[2] ?? '',
+      hoardMatch[3] ?? '',
+    );
+    return null;
+  }
+
+  // /dev map [rarity | site | coin <n>]: the treasure map playtest family.
+  const mapMatch = /^\/dev\s+map(?:\s+(\S+))?(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (mapMatch) {
+    handleDevTreasureMapCommand(ctx, pid, (mapMatch[1] ?? '').toLowerCase(), mapMatch[2] ?? '');
+    return null;
+  }
+
+  const dailyWqMatch = /^\/dev\s+wq\s+(candy|ley)(?:\s+(.*?))?\s*$/i.exec(raw);
+  if (dailyWqMatch) {
+    armDailyWorldQuestForDev(ctx, pid, dailyWqMatch[1].toLowerCase(), dailyWqMatch[2] ?? '');
+    return null;
+  }
+  const gliderLevelMatch = /^\/dev\s+wq\s+glider(?:\s+(.*?))?\s*$/i.exec(raw);
+  if (gliderLevelMatch) {
+    armWorldQuestGliderForDev(ctx, pid, true, gliderLevelMatch[1] ?? '1');
+    return null;
+  }
+
+  const wispsMatch = /^\/dev\s+(?:wq\s+)?wisps(?:\s+(easy|normal|hard))?\s*$/i.exec(raw);
+  if (wispsMatch) {
+    armWorldQuestWispMazeForDev(
+      ctx,
+      pid,
+      wispsMatch[1]?.toLowerCase() as 'easy' | 'normal' | 'hard' | undefined,
+    );
+    return null;
+  }
+  const wqMatch = /^\/dev\s+wq(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (wqMatch) {
+    const questKey = wqMatch[1];
+    if (!questKey) {
+      listWorldQuestsForDev(ctx, pid);
+    } else {
+      armWorldQuestForDev(ctx, pid, questKey);
+    }
+    return null;
+  }
+
+  // King of the Hill test levers (grammar in pvp/hill_dev.ts): stage a risen
+  // hill or a countdown and stand the caller on its rim, skip a countdown, end
+  // the hill, or run the real schedule's next hill now.
+  if (isHillDevCommand(raw)) {
+    const cmd = parseHillDevCommand(raw);
+    if (!cmd) {
+      emitDevLog(ctx, pid, HILL_DEV_USAGE);
+      return null;
+    }
+    if (cmd.kind === 'rise' || cmd.kind === 'end') {
+      const hill = cmd.kind === 'rise' ? riseHillNow(ctx) : endHillNow(ctx);
+      emitDevLog(
+        ctx,
+        pid,
+        hill
+          ? `[dev] Hill in ${hill.zoneId} ${cmd.kind === 'rise' ? 'risen' : 'ended'}.`
+          : `[dev] No ${cmd.kind === 'rise' ? 'hill is counting down' : 'hill stands'}.`,
+      );
+      return null;
+    }
+    const hill =
+      cmd.kind === 'next'
+        ? warnNextHillNow(ctx)
+        : spawnHillNow(ctx, cmd.zoneId, {
+            warn: cmd.kind === 'warn',
+            warningSeconds: cmd.kind === 'warn' ? cmd.seconds : undefined,
+          });
+    const entity = ctx.entities.get(pid);
+    if (!hill) {
+      emitDevLog(
+        ctx,
+        pid,
+        '[dev] No hill could rise there (no free-for-all zone, or no open ground).',
+      );
+    } else if (entity) {
+      const pos = displacePlayerForDev(ctx, entity, hill.x + hill.radius - 5, hill.z);
+      const what =
+        hill.phase === 'warning'
+          ? `announced (rises in ${Math.ceil(hill.risesAt - ctx.time)} s)`
+          : 'risen';
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Hill ${what} in ${hill.zoneId} at ${hill.x.toFixed(1)}, ${hill.z.toFixed(1)}; you stand at ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`,
+      );
     }
     return null;
   }
@@ -229,6 +469,15 @@ export function handleDevChat(
         `[dev] Teleported to ${town.name} (${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}).`,
       );
     }
+    return null;
+  }
+
+  const classicWqMatch =
+    /^\/dev\s+(eastbrook_bandits|hollow_sporelings|drakelands_brood|frostveil_howlers|amberfall_lurkers|willowfen_ore|nightbloom_barrow|wraithwood_restless|evergarden_watch|proving_shore_scuttlers)\s*$/i.exec(
+      raw,
+    );
+  if (classicWqMatch) {
+    armWorldQuestForDev(ctx, pid, classicWqMatch[1]);
     return null;
   }
 
@@ -757,7 +1006,17 @@ export function handleDevChat(
   if (portalMatch) {
     const e = ctx.entities.get(pid);
     if (!e) return null;
-    let seed = (portalMatch[1] ? Number(portalMatch[1]) : ctx.rng.int(1, 1_000_000_000)) >>> 0;
+    const suppliedSeed = portalMatch[1] ? Number(portalMatch[1]) : null;
+    if (
+      suppliedSeed !== null &&
+      (!Number.isSafeInteger(suppliedSeed) ||
+        suppliedSeed < 1 ||
+        suppliedSeed > MAX_ORDINARY_RIFT_SEED)
+    ) {
+      ctx.error(pid, `[dev] Portal seed must be between 1 and ${MAX_ORDINARY_RIFT_SEED}.`);
+      return null;
+    }
+    let seed = suppliedSeed ?? ctx.rng.int(1, MAX_ORDINARY_RIFT_SEED);
     const kind = portalMatch[4]?.toLowerCase();
     if (kind) {
       const wantSetPiece = kind === 'infernal' || kind === 'citadel';
@@ -1158,7 +1417,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }

@@ -28,19 +28,28 @@ const error = (key: TranslationKey): UnstuckFeedback => ({
 
 const seconds = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
 
+type Completed = Extract<Event, { phase: 'completed' }>;
+
 /**
- * The two live outcomes both end at the graveyard under Unstuck Sickness and differ only in
- * whether a revive happened, so they get their own keys. The retired reasons keep their
- * shipped keys: 'nearest_safe_position' (short-range teleport, historical telemetry) and
- * 'nearest_graveyard' (the pre-0.32.1 kill-and-release outcome, still emitted by a
- * not-yet-updated server when an OTA bundle runs ahead of it).
+ * The two live outcomes both end at the graveyard and differ only in whether a revive
+ * happened, so they get their own keys; each then splits on whether Unstuck Sickness was
+ * charged (a repeat inside the hour window) or not (the first use in an hour, which
+ * instead warns that a repeat will charge it). `sickness` is absent from a pre-window
+ * server's events, which always charged, so absent reads as charged. The retired reasons
+ * keep their shipped keys: 'nearest_safe_position' (short-range teleport, historical
+ * telemetry) and 'nearest_graveyard' (the pre-0.32.1 kill-and-release outcome, still
+ * emitted by a not-yet-updated server when an OTA bundle runs ahead of it).
  */
-function completedKey(reason: Extract<Event, { phase: 'completed' }>['reason']): TranslationKey {
+function completedKey(reason: Completed['reason'], sickness: boolean): TranslationKey {
   switch (reason) {
     case 'moved_to_graveyard':
-      return 'hudChrome.unstuck.movedToGraveyard';
+      return sickness
+        ? 'hudChrome.unstuck.movedToGraveyard'
+        : 'hudChrome.unstuck.movedToGraveyardFree';
     case 'revived_at_graveyard':
-      return 'hudChrome.unstuck.revivedAtGraveyardUnstuck';
+      return sickness
+        ? 'hudChrome.unstuck.revivedAtGraveyardUnstuck'
+        : 'hudChrome.unstuck.revivedAtGraveyardFree';
     case 'nearest_graveyard':
       return 'hudChrome.unstuck.completedAtGraveyard';
     case 'nearest_safe_position':
@@ -72,7 +81,7 @@ export function unstuckFeedback(event: Event): UnstuckFeedback {
   }
   if (event.phase === 'completed') {
     return {
-      key: completedKey(event.reason),
+      key: completedKey(event.reason, event.sickness !== false),
       kind: 'success',
       banner: true,
       log: true,

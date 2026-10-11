@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { IWorld } from '../world_api';
 import {
   type AfflictionFamiliarPose,
+  afflictionFamiliarClass,
   afflictionFamiliarLookYaw,
   isAfflictionFamiliarPossessed,
   shouldShowAfflictionFamiliar,
@@ -9,6 +10,7 @@ import {
 } from './affliction_familiar_core';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { attachSceneGroupGated } from './gated_scene_attach';
 
 const MODEL_HEIGHT = 0.65;
 const MODEL_FORWARD_YAW = -Math.PI / 2;
@@ -31,12 +33,12 @@ interface AfflictionFamiliarHostView {
   group: THREE.Group;
 }
 
-interface FamiliarEntry {
-  host: THREE.Group;
-  root: THREE.Group;
-}
-
 export type AfflictionFamiliarModelFactory = () => THREE.Object3D | null;
+/** The renderer's world compile gate, read at attach time; undefined without
+ *  parallel compile, where the attach is a plain add. */
+export type AfflictionFamiliarCompileGate = () =>
+  | ((target: THREE.Object3D) => Promise<unknown>)
+  | undefined;
 
 function buildApprovedMaledictEye(): THREE.Object3D | null {
   if (!loadedMaledictEye) return null;
@@ -51,11 +53,38 @@ function buildApprovedMaledictEye(): THREE.Object3D | null {
 }
 
 /**
+ * The familiar's boot prewarm stand-in, staged with the player archetypes for a
+ * LOCAL warlock of any spec. It is the clone the live familiar draws, so it
+ * wears the loader cache's materials: the program linked here is the one every
+ * attach reuses, held for the session because those materials are never
+ * disposed. Null for any other class (the familiar is local-only) and before
+ * the deferred model has loaded, where the first attach's gate covers it.
+ */
+export function buildAfflictionFamiliarPrewarmStandIn(
+  localClass: string,
+  modelFactory: AfflictionFamiliarModelFactory = buildApprovedMaledictEye,
+): THREE.Object3D | null {
+  if (!afflictionFamiliarClass(localClass)) return null;
+  const model = modelFactory();
+  if (!model) return null;
+  const root = new THREE.Group();
+  root.name = 'affliction-familiar:prewarm';
+  root.add(model);
+  return root;
+}
+
+/**
  * Presentation-only companion for the local Affliction warlock.
  * It is deliberately not a sim entity, target, pet, collider, or gameplay actor.
  */
 export class AfflictionFamiliar {
-  private entry: FamiliarEntry | null = null;
+  // Built once and re-attached on every show: its clone shares the loader
+  // cache's materials, so a re-attach after a spec switch links nothing, and
+  // only the first attach rides the compile gate (a pending gate keeps the
+  // root hidden across a re-attach too, since the gate owns its visibility).
+  private root: THREE.Group | null = null;
+  private host: THREE.Group | null = null;
+  private gated = false;
   private readonly pose: AfflictionFamiliarPose = {
     x: 0,
     y: 0,
@@ -66,6 +95,7 @@ export class AfflictionFamiliar {
   };
 
   constructor(
+    private readonly compileGate: AfflictionFamiliarCompileGate = () => undefined,
     private readonly modelFactory: AfflictionFamiliarModelFactory = buildApprovedMaledictEye,
   ) {}
 
@@ -80,27 +110,26 @@ export class AfflictionFamiliar {
     const visible =
       !!owner && !!host && shouldShowAfflictionFamiliar(owner, world.playerId, world.talentSpec);
 
-    if (
-      this.entry &&
-      (!visible || this.entry.host !== host || this.entry.root.parent !== this.entry.host)
-    ) {
+    if (this.host && (!visible || this.host !== host || this.root?.parent !== this.host)) {
       this.clear();
     }
     if (!visible || !owner || !host) return;
 
-    if (!this.entry) {
-      const model = this.modelFactory();
-      if (!model) return;
-      const root = new THREE.Group();
-      root.name = 'affliction-familiar';
-      root.add(model);
-      host.add(root);
-      this.entry = { host, root };
+    if (!this.host) {
+      const root = this.root ?? this.buildRoot();
+      if (!root) return;
+      this.host = host;
+      if (this.gated) {
+        host.add(root);
+      } else {
+        this.gated = true;
+        void attachSceneGroupGated(host, root, this.compileGate());
+      }
     }
 
     writeAfflictionFamiliarPose(this.pose, timeSeconds, owner.id, reducedMotion);
     const possessed = isAfflictionFamiliarPossessed(owner);
-    const root = this.entry.root;
+    const root = this.root as THREE.Group;
     root.position.set(this.pose.x, this.pose.y, this.pose.z);
     const targetView = views.get(owner.castTargetId ?? owner.targetId ?? -1);
     const yaw =
@@ -118,7 +147,17 @@ export class AfflictionFamiliar {
   }
 
   clear(): void {
-    this.entry?.root.removeFromParent();
-    this.entry = null;
+    this.root?.removeFromParent();
+    this.host = null;
+  }
+
+  private buildRoot(): THREE.Group | null {
+    const model = this.modelFactory();
+    if (!model) return null;
+    const root = new THREE.Group();
+    root.name = 'affliction-familiar';
+    root.add(model);
+    this.root = root;
+    return root;
   }
 }

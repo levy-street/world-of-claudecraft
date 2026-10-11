@@ -1,5 +1,12 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_ENGINE,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxEngine,
+} from '../cast_vfx_family';
 import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
+import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { drapeRingLocalY } from '../selection_ring';
 import { DRAPE_AXIS_Z, DRAPED_VERTEX_SHADER } from './draped_shader';
 import type { AbilityVfxTextures } from './fx_textures';
@@ -55,6 +62,8 @@ interface RingSlot {
 }
 
 export class ShockRings {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private slots: RingSlot[] = [];
   private next = 0;
   private disposed = false;
@@ -148,8 +157,8 @@ export class ShockRings {
       };
       const mesh = slot.mesh;
       mesh.visible = false;
-      mesh.renderOrder = 5;
-      mesh.userData.renderCategory = 'vfx';
+      mesh.renderOrder = floorVfxRenderOrder('player', 2);
+      tagCastVfxEngine(mesh);
       // Culled again: the flat quad is permanent now, and the sphere is
       // refreshed from the drape extent at every spawn (see spawn).
       mesh.frustumCulled = true;
@@ -192,7 +201,7 @@ export class ShockRings {
     intensity: number,
     vertical = false,
   ): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % RING_SLOTS;
     slot.active = true;

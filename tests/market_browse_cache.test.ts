@@ -223,7 +223,7 @@ describe('World Market browse revision (the server rebuild gate signal)', () => 
     rev = at();
     const mine = sim.marketListings.find((l) => !l.house && l.sellerKey === String(seller));
     if (!mine) throw new Error('missing seller listing');
-    sim.marketBuy(mine.id, buyer);
+    sim.marketBuy(mine.id, undefined, buyer);
     expect(at()).toBeGreaterThan(rev);
 
     // collect (the seller takes the proceeds the buy just credited)
@@ -304,7 +304,7 @@ describe('World Market browse revision (the server rebuild gate signal)', () => 
     if (!listed) throw new Error('missing listing');
     // Warm the memo with a browse, then buy, then browse again.
     expect(marketInfo(sim, buyer).listings.some((l) => l.id === listed.id)).toBe(true);
-    sim.marketBuy(listed.id, buyer);
+    sim.marketBuy(listed.id, undefined, buyer);
     expect(marketInfo(sim, buyer).listings.some((l) => l.id === listed.id)).toBe(false);
   });
 });

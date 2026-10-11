@@ -116,19 +116,21 @@ describe('characterBlobSizeWarning: the pure decision', () => {
     // and one 32-KiB step below the 262,144-byte guild-bank row scale. The
     // database review approved this re-mint from 163,840 after measuring legal
     // Crucible payloads through serialize/load. Moving it means re-measuring.
-    expect(CHARACTER_BLOB_WARN_BYTES).toBe(229_376);
+    // Re-minted 229,376 -> 262,144 (256 KiB) at the 2026-09-28 Buried Hoards merge:
+    // the whole-character fixture measured 233,360 bytes (server/character_blob_size.ts).
+    expect(CHARACTER_BLOB_WARN_BYTES).toBe(262_144);
   });
 
   it('stays silent below the threshold and AT it (the bound is inclusive)', () => {
     expect(characterBlobSizeWarning(1, 0)).toBeNull();
     expect(characterBlobSizeWarning(1, 38_900)).toBeNull();
     expect(characterBlobSizeWarning(1, 209_261)).toBeNull();
-    expect(characterBlobSizeWarning(1, 229_375)).toBeNull();
-    expect(characterBlobSizeWarning(1, 229_376)).toBeNull();
+    expect(characterBlobSizeWarning(1, 262_143)).toBeNull();
+    expect(characterBlobSizeWarning(1, 262_144)).toBeNull();
   });
 
   it('warns one byte past the threshold and above', () => {
-    expect(characterBlobSizeWarning(1, 229_377)).not.toBeNull();
+    expect(characterBlobSizeWarning(1, 262_145)).not.toBeNull();
     expect(characterBlobSizeWarning(1, 1_000_000)).not.toBeNull();
   });
 
@@ -136,7 +138,7 @@ describe('characterBlobSizeWarning: the pure decision', () => {
     const warning = characterBlobSizeWarning(4291, 300_000);
     expect(warning).toContain('4291');
     expect(warning).toContain('300000');
-    expect(warning).toContain('229376-byte');
+    expect(warning).toContain('262144-byte');
   });
 
   it('leaves a real freshly serialized character far under the threshold', () => {

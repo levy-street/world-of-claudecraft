@@ -103,6 +103,8 @@ vi.mock('../src/render/characters/visual', async () => {
 import type { ModularLook } from '../src/render/characters/modular';
 import {
   COMPOSED_PORTRAIT_SKIN,
+  cachedPortraitByKey,
+  composedPortraitKey,
   MODULAR_PORTRAIT_CACHE_MAX,
   modularPortraitDataUrl,
   onPortraitUpdate,
@@ -289,6 +291,12 @@ describe('live portrait capture', () => {
       expect(updated).toHaveBeenCalledWith(MODULAR_KEY, COMPOSED_PORTRAIT_SKIN, modKey('notify')),
     );
     expect(modularPortraitDataUrl(MODULAR_KEY, look)).toBe(ASYNC_URL);
+    // The key a consumer derives to recognize that landing IS the reported
+    // key, and the by-key peek answers the same entry: the two halves of the
+    // frame and chip matching, exercised against the real module.
+    expect(composedPortraitKey(MODULAR_KEY, look)).toBe(modKey('notify'));
+    expect(cachedPortraitByKey(modKey('notify'))).toBe(ASYNC_URL);
+    expect(cachedPortraitByKey(modKey('never-captured'))).toBeNull();
   });
 
   it('keeps two-argument listeners valid across a composed update', async () => {
@@ -339,6 +347,29 @@ describe('live portrait capture', () => {
     expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('cap0'))).toBeNull();
     // That miss kicked its own capture; settle it so no case inherits one.
     await settleCapture(modTag('cap0'));
+  });
+
+  it('keeps a look a frame keeps asking for: a hit re-touches it past newer entries', async () => {
+    // A targeted crowd wider than the cap: under plain FIFO the viewer's own
+    // face, asked for every paint, would be evicted by the newcomers and
+    // re-captured on every pass.
+    const sigs = Array.from({ length: MODULAR_PORTRAIT_CACHE_MAX }, (_, i) => `lru${i}`);
+    for (const sig of sigs) expect(modularPortraitDataUrl(MODULAR_KEY, lookOf(sig))).toBeNull();
+    await vi.waitFor(() => expect(rig.encodes).toHaveLength(sigs.length));
+    for (const sig of sigs) await settleCapture(modTag(sig));
+    await vi.waitFor(() =>
+      expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('lru0'))).toBe(ASYNC_URL),
+    );
+    // The oldest entry is asked for again (touched), then one more look lands.
+    expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('lru0'))).toBe(ASYNC_URL);
+    expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('lruNew'))).toBeNull();
+    await settleCapture(modTag('lruNew'));
+    await vi.waitFor(() =>
+      expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('lruNew'))).toBe(ASYNC_URL),
+    );
+    expect(cachedPortraitByKey(modKey('lru0'))).toBe(ASYNC_URL);
+    // The least-recently-asked entry went instead.
+    expect(cachedPortraitByKey(modKey('lru1'))).toBeNull();
   });
 
   it('a graphics rebuild clears the composed FIFO, so a re-captured look survives', async () => {

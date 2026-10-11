@@ -1,0 +1,8 @@
+{
+  "frames": 600,
+  "avgMs": 9.027499999920522,
+  "p95Ms": 13.900000000001455,
+  "adapter": "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002487) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "mobCount": 25,
+  "fixture": "3 simultaneous cosmetic waves, 25 living idle mobs, ticking simulation"
+}

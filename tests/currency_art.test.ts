@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
@@ -11,6 +11,21 @@ import {
 } from '../src/ui/currency_art';
 import { iconDataUrl } from '../src/ui/icons';
 
+// The v0.39 painted cohort, recorded in the accepted-currency-art manifest.
+const V039_COHORT_IDS = [
+  'coin_gold',
+  'coin_silver',
+  'coin_copper',
+  'woc_token',
+  'honor',
+  'delve_mark',
+];
+// The three faction reward currencies (world-quests faction reputation line):
+// each mark reuses its faction's reward item icon byte for byte, recorded in
+// mapping.json with that item art as its source rather than in the v0.39
+// accepted cohort.
+const FACTION_MARK_IDS = ['rift_watch_mark', 'church_order_crest', 'automaton_cog'];
+
 const ACCEPTED_CURRENCY_ART_SHA256 =
   'd71254050852510a7d1eb374e6693d360291bc5db261a55e146be67d9d7a3cb4';
 
@@ -18,14 +33,7 @@ describe('currency art', () => {
   const artDir = path.join(process.cwd(), 'public/ui/currency');
 
   it('owns the complete painted currency family', () => {
-    expect([...CURRENCY_IMAGE_IDS]).toEqual([
-      'coin_gold',
-      'coin_silver',
-      'coin_copper',
-      'woc_token',
-      'honor',
-      'delve_mark',
-    ]);
+    expect([...CURRENCY_IMAGE_IDS]).toEqual([...V039_COHORT_IDS, ...FACTION_MARK_IDS]);
   });
 
   it('returns stable raw-public URLs only for registered currency identities', () => {
@@ -141,7 +149,18 @@ describe('currency art', () => {
     const hashes = new Set<string>();
     for (const asset of mapping.assets) {
       expect(asset.output).toBe(`${asset.id}.webp`);
-      expect(asset.source).toBe('OpenAI built-in image generation');
+      if (FACTION_MARK_IDS.includes(asset.id)) {
+        // A faction mark was cut from its faction's reward item icon. The item
+        // art has been repainted since, so the recorded source is a lineage
+        // pointer that must still exist; the shipped bytes are pinned by the
+        // accepted hash below like every other currency icon.
+        expect(asset.source).toBe('World of ClaudeCraft faction rewards pipeline');
+        expect(asset.sourceFile).toMatch(/^public\/ui\/items\/[a-z0-9_]+\.webp$/);
+        expect(existsSync(path.join(process.cwd(), asset.sourceFile)), asset.id).toBe(true);
+        expect(asset.sourceSha256, asset.id).toBe(asset.acceptedSha256);
+      } else {
+        expect(asset.source).toBe('OpenAI built-in image generation');
+      }
       expect(asset.owner).toBe('World of ClaudeCraft');
       expect(asset.license).toContain('project asset');
       expect(asset.sourceSha256).toMatch(/^[0-9a-f]{64}$/);
@@ -212,10 +231,10 @@ describe('currency art', () => {
         circularCropScales: [128, 48, 32, 16, 11],
       },
     });
-    expect(acceptedRecord.assets.map(({ id }) => id).sort()).toEqual(ids);
+    expect(acceptedRecord.assets.map(({ id }) => id).sort()).toEqual([...V039_COHORT_IDS].sort());
 
     const referencesById = new Map(acceptedRecord.visualReferences.map((ref) => [ref.id, ref]));
-    for (const asset of mapping.assets) {
+    for (const asset of mapping.assets.filter(({ id }) => V039_COHORT_IDS.includes(id))) {
       const accepted = acceptedRecord.assets.find(({ id }) => id === asset.id);
       expect(accepted, asset.id).toBeDefined();
       expect(accepted?.prompt, asset.id).toContain('Use case: stylized-concept.');

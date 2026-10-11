@@ -79,11 +79,12 @@ describe('reliquary_i18n English resolution', () => {
     // render English to a CJK or Cyrillic reader. The 39 original pages plus
     // the Roots' Bramblehide set page keep all-locale coverage (40); the
     // Crucible collection and Forgebreaker personal-hammer pages add two more.
-    expect(pageCount).toBe(42);
-    expect(descCount).toBe(42);
+    // The Buried Hoards page joins them: 44.
+    expect(pageCount).toBe(44);
+    expect(descCount).toBe(44);
     expect(manifest.length).toBe(pageCount + descCount);
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(42);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(42);
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(44);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(44);
     expect(manifest).toContainEqual({
       id: 'professions_forgebreaker',
       field: 'name',
@@ -176,12 +177,13 @@ describe('reliquary locale chunks (all shipped locales)', () => {
 
   it('carries only real catalog page ids, and no empty values', () => {
     for (const lang of tableLocales()) {
-      // Preserve the 40 original pages plus both profession pages in every
-      // locale. Release fill now includes all names and narrative descriptions.
+      // Preserve the 40 original pages plus the Warfare Season 2 and Buried Hoards
+      // pages, and both profession pages, in every locale. Release fill includes all names and
+      // narrative descriptions.
       expect(
         Object.keys(tables[lang]).filter((id) => !NEW_PROFESSION_PAGES.has(id)).length,
         `${lang} original row count`,
-      ).toBe(40);
+      ).toBe(42);
       for (const id of NEW_PROFESSION_PAGES) {
         expect(Object.hasOwn(tables[lang], id), `${lang}.${id}`).toBe(true);
         const description = tables[lang][id]?.desc;

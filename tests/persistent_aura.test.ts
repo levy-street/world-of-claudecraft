@@ -9,6 +9,7 @@ describe('persistent class engine auras', () => {
       'hunter_fang_chorus_counter',
       'hunter_overdraw_counter',
       'stampede_ready',
+      'priest_benison_prayers',
       'shaman_flow_state_progress',
       'shaman_flow_state_ready',
       'shaman_pyrebrand_mastery',
@@ -19,5 +20,6 @@ describe('persistent class engine auras', () => {
     }
     expect(isPersistentEngineAura('shaman_primal_exaltation')).toBe(false);
     expect(isPersistentEngineAura('hunter_apex_instinct')).toBe(false);
+    expect(isPersistentEngineAura('priest_benison_whisper')).toBe(false);
   });
 });

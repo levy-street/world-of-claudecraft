@@ -405,15 +405,27 @@ describe('the density model covers the shipped world', () => {
       .sort();
     expect(noXp).toEqual([
       'dragonkin_egg',
+      'hoard_abyssal_tentacle',
+      'hoard_bloat_cap',
+      'hoard_bound_pulsar',
+      'hoard_brood_cocoon',
+      'hoard_brood_egg',
+      'hoard_coinsack_scurrier',
+      'hoard_healing_tide_totem',
+      'hoard_silk_cocoon',
       'nythraxis_bone_spike',
       'spider_egg',
       'spider_egg_sac',
       'yumi_cat',
     ]);
-    // Two are camp-spawned: the sac is placed by delve room logic, the ball
-    // and the cat are battleground objectives, and the Nythraxis Bone Spike is
-    // raised by the raid encounter script under an impaled raider, so no camp
-    // cluster can ever hold those and the density model never sees them.
+    // Two are camp-spawned: the sac is placed by delve room logic, the cat is a
+    // battleground objective, the Nythraxis Bone Spike is raised by the raid
+    // encounter script, and the Healing Tide Totem, the Brood Clutch and the Bound
+    // Pulsars are raised by Hoard bosses, the Bloated Cap is grown by the Mother
+    // of Mushrooms (src/sim/rift/hoard_mushroom_core.ts) and the Coinsack
+    // Scurrier slips into a hoard room on its own roll (src/sim/rift/hoard_goblin.ts;
+    // both pinned at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards),
+    // so no camp cluster can ever hold those and the density model never sees them.
     //
     // spider_egg is the second, and it is deliberately NOT added to the
     // dense-by-design exemption: the Broodmother clutch sits in ordinary Widow

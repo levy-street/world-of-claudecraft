@@ -2,8 +2,14 @@
 // aura value itself, so ticking and Chain Heal consumption share one authority.
 
 import { SPRINGMENDER_4PC_CHAIN_HARVEST_MULT } from '../content/ignivar_set_bonuses';
+import {
+  VANGUARD_RESTO_SHAMAN_2PC_CAST_CUT_SEC,
+  VANGUARD_RESTO_SHAMAN_2PC_HEALTH_BELOW,
+  VANGUARD_RESTO_SHAMAN_4PC_SHIELD_DURATION_SEC,
+  VANGUARD_RESTO_SHAMAN_4PC_SHIELD_PCT_MAX,
+} from '../content/vanguard_set_bonuses_b';
 import type { SimContext } from '../sim_context';
-import type { Aura, Entity } from '../types';
+import { type Aura, type Entity, MIN_GCD } from '../types';
 
 export { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from '../content/shaman_tuning';
 
@@ -16,6 +22,8 @@ import {
 } from './shaman_talents';
 
 export const MENDING_CURRENT_ID = 'shaman_mending_current';
+/** The Brineward 4pc shield aura id (distinct from Tidecall's own heal). */
+export const BRINEWARD_SHIELD_ID = 'set_vanguard_shaman_restoration_4pc';
 export const LIFESPRING_WEAPON_ID = 'lifespring_weapon';
 export const MENDING_CURRENT_DURATION = 12;
 export const MENDING_CURRENT_INTERVAL = 3;
@@ -184,7 +192,50 @@ export function depositMendingCurrent(
     }
     if (best) depositRawMendingCurrent(ctx, source, best, calculatedHealing * 0.5);
   }
+  if (abilityId === 'tidecall') applyBrinewardShield(ctx, source, target);
   return added;
+}
+
+/** Brineward Chainmail 4pc (Warfare Season 2): Tidecall also shields its
+ *  target for a fraction of the SHAMAN's max health. Called from the one
+ *  Tidecall heal site above, so an echoed or chained heal never re-grants it;
+ *  a second Tidecall refreshes the shield (same id and source). No rng. */
+function applyBrinewardShield(ctx: SimContext, source: Entity, target: Entity): void {
+  if (!wearsSetBonus(ctx, source, 'vanguard_shaman_restoration', 4)) return;
+  const amount = Math.round(source.maxHp * VANGUARD_RESTO_SHAMAN_4PC_SHIELD_PCT_MAX);
+  if (amount <= 0) return;
+  ctx.applyAura(target, {
+    id: BRINEWARD_SHIELD_ID,
+    name: 'Tidecall',
+    kind: 'absorb',
+    remaining: VANGUARD_RESTO_SHAMAN_4PC_SHIELD_DURATION_SEC,
+    duration: VANGUARD_RESTO_SHAMAN_4PC_SHIELD_DURATION_SEC,
+    value: amount,
+    sourceId: source.id,
+    school: 'nature',
+  });
+}
+
+/** Brineward Chainmail 2pc (Warfare Season 2): Mending Waters casts 0.5 sec
+ *  faster when its target is below 50 percent health at cast start (the
+ *  caster itself on a self-cast, since the friendly resolve falls back to it).
+ *  Called at the cast-time resolve in casting_lifecycle.ts with the unstretched
+ *  cast time; the result never drops below MIN_GCD. An instant (0) cast and
+ *  every other ability or caster pass through untouched. No rng. */
+export function brinewardMendingCastTime(
+  ctx: SimContext,
+  caster: Entity,
+  abilityId: string,
+  target: Entity | null,
+  castTime: number,
+): number {
+  if (abilityId !== 'healing_wave' || castTime <= 0) return castTime;
+  if (!wearsSetBonus(ctx, caster, 'vanguard_shaman_restoration', 2)) return castTime;
+  const subject = target ?? caster;
+  if (subject.maxHp <= 0 || subject.hp >= subject.maxHp * VANGUARD_RESTO_SHAMAN_2PC_HEALTH_BELOW) {
+    return castTime;
+  }
+  return Math.max(MIN_GCD, castTime - VANGUARD_RESTO_SHAMAN_2PC_CAST_CUT_SEC);
 }
 
 /**

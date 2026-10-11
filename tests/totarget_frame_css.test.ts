@@ -54,6 +54,29 @@ describe('target-of-target frame sits BESIDE the target frame', () => {
     expect(rule(hudCss, '#target-frame > #tf-debuffs')).not.toContain('top:');
   });
 
+  // Players who move the target frame off the stock seat get the classic
+  // below-frame strip back through their own setting (targetAurasBelowFrame,
+  // src/ui/aura_bar_side.ts): keyed on the setting's body class, never on the
+  // frame's move state, mirroring the player buff row's auraBarBelowFrame.
+  // NOTE: rule() matches the FIRST occurrence of the selector text, and the
+  // base '#target-frame > #tf-debuffs {' rule must stay authored ABOVE the
+  // body-class override, or the base pin above silently reads the override.
+  it('hangs the strip below the frame only via body.target-auras-below-frame', () => {
+    const below = rule(hudCss, 'body.target-auras-below-frame #target-frame > #tf-debuffs');
+    expect(below).toContain('top: calc(100% + 8px);');
+    expect(below).toContain('bottom: auto;');
+    expect(hudCss).not.toMatch(/#target-frame\.tf-detached[^{]*#tf-debuffs/);
+  });
+
+  // The touch seat pins the target frame to the top edge, so an above-frame
+  // strip is off screen there: the mobile sheet hangs it below unconditionally
+  // (a device never sheds target debuff timers, a signal a player reacts to).
+  it('mobile hangs the strip below the frame regardless of the setting', () => {
+    const touch = rule(hudMobileCss, 'body.mobile-touch #target-frame > #tf-debuffs');
+    expect(touch).toContain('top: calc(100% + 8px);');
+    expect(touch).toContain('bottom: auto;');
+  });
+
   it('reads portrait-left like every other unit frame (mirror overrides dropped)', () => {
     // The #target-frame prefix outranks the LATER #target-frame .portrait-wrap /
     // .uf-bars mirror rules, which otherwise win the same-specificity tie on
@@ -98,5 +121,87 @@ describe('target-of-target frame sits BESIDE the target frame', () => {
     // later mobile mirror rules cannot win the same-specificity tie.
     expect(mobile).toContain('left: calc(100% + 4px / (0.74 * var(--target-frame-scale, 1)));');
     expect(mobile).toContain('top: calc(4px / (0.74 * var(--target-frame-scale, 1)));');
+  });
+});
+
+// The mini frame joined the "Unlock interface" frame table (interface_unlock_core.ts
+// HUD_FRAME_SPECS), so a player can give it a spot of its own instead of it riding
+// wherever the target frame was dragged. Positioning it re-homes it onto #ui
+// (detachToUiRoot), which drops EVERY `#target-frame > #totarget-frame` rule pinned
+// above at once: these pins are the detached arm that has to restate them.
+describe('target-of-target frame: the moved (detached) arm', () => {
+  const detached = rule(hudCss, '#totarget-frame.hud-frame-detached');
+
+  it('positions off its own left/top with the other re-homed frames', () => {
+    // The shared block, so a dragged mini cannot be left stuck at its docked spot
+    // with its saved coordinates silently ignored (what #pet-frame's own
+    // `position: relative` used to do before it was id-qualified here).
+    expect(hudCss).toContain('#totarget-frame.hud-frame-detached, #stancebar.hud-frame-detached,');
+  });
+
+  it('moves the mini zoom onto the CHILDREN, never the positioned frame itself', () => {
+    // zoom on a positioned frame also multiplies its used left/top, which is
+    // exactly what would break the MovableFrame drag math; the player and target
+    // frames zoom their children for the same reason. The mini factor and the
+    // targetFrameScale compounding are unchanged from the docked arm above.
+    expect(
+      rule(hudCss, '#totarget-frame.hud-frame-detached > :not(.mf-resize-grip, .tf-frame-label)'),
+    ).toContain('zoom: calc(0.74 * var(--target-frame-scale, 1));');
+    expect(detached).not.toContain('zoom:');
+  });
+
+  it('restates the bar-height var it no longer inherits from #target-frame', () => {
+    // #target-frame declares --uf-bar-height for its subtree; re-homed onto #ui
+    // the mini would fall back to the 15px default and stop tracking the Target
+    // Frame Height setting.
+    expect(detached).toContain('--uf-bar-height: var(--target-frame-height, 15px);');
+  });
+
+  it('restates portrait-left, which the re-home leaves nothing else to supply', () => {
+    // Deliberately NOT a specificity story (PR review caught the earlier wording):
+    // makeUiRootDetacher re-parents the frame onto #ui, so the docked rule and the
+    // LATER #target-frame .portrait-wrap / .uf-bars mirror rules are ALL descendant
+    // selectors with no ancestor left to match. They drop out together, nothing
+    // contests anything, and the order has to be declared again from scratch.
+    expect(rule(hudCss, '#totarget-frame.hud-frame-detached .portrait-wrap')).toContain(
+      'order: 1;',
+    );
+    const bars = rule(hudCss, '#totarget-frame.hud-frame-detached .uf-bars');
+    expect(bars).toContain('order: 2;');
+    expect(bars).toContain('width: 232px;');
+    expect(bars).toContain('margin-left: -14px;');
+    expect(bars).toContain('margin-right: 0;');
+    expect(bars).not.toContain('border-radius:');
+  });
+
+  it('shows an empty mini as an arrangeable placeholder while the interface is unlocked', () => {
+    // Otherwise the frame is display:none whenever the target has no target,
+    // which is most of the time, and there would be nothing to drag.
+    expect(hudCss).toContain(
+      'body.interface-unlocked #totarget-frame.tf-unlocked, body.interface-unlocked #pet-frame.tf-unlocked,',
+    );
+  });
+});
+
+// The mini is the ONE governed frame nested inside another one, so the two rules
+// that assume governed frames are siblings both had to learn about it. Caught by
+// re-shooting the arrange-mode screenshot: the frame showed its name chip but no
+// drag ever started, and the press fell through to the world.
+describe('target-of-target frame: reachable while the interface is unlocked', () => {
+  it('is carved out of the unlocked-frame pointer-inert rule', () => {
+    // body.interface-unlocked .tf-unlocked :not(...) is a DESCENDANT selector and
+    // #target-frame is itself governed, so the mini matched it and became
+    // pointer-events: none !important, the one arrangeable frame nothing could grab.
+    expect(hudCss).toContain(
+      'body.interface-unlocked .tf-unlocked :not(.tf-move-btn):not(.mf-resize-grip):not(#totarget-frame) { pointer-events: none !important; }',
+    );
+  });
+
+  it("leaves the mini's own CONTENTS inert, so a grab anywhere on it drags the mini", () => {
+    // Only the frame itself is carved out: its portrait and bars still match the
+    // rule through it, which is what makes the whole mini one drag handle rather
+    // than a portrait that swallows the press.
+    expect(hudCss).not.toContain(':not(#totarget-frame *)');
+    expect(hudCss).not.toContain('#totarget-frame :not(.tf-move-btn) { pointer-events: auto');
   });
 });

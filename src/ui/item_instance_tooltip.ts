@@ -25,6 +25,7 @@ import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { ITEM_QUALITY_LABEL_KEYS } from './item_kind_label';
 import { itemNameColor } from './item_name_color';
+import { lootQualityTooltipLine } from './loot_quality_view';
 import {
   boundedMaterialSourceRows,
   materialSourceSummary,
@@ -51,7 +52,7 @@ function cap(s: string): string {
  *  (hud.ts), the affix lines (item_affix_tooltip.ts), and the per-copy bonus
  *  lines below, so a stat key spells its label in exactly one place. */
 export function compareStatLabelKey(stat: string): string {
-  return stat === 'healPower'
+  return stat === 'healPower' || stat === 'healingPower'
     ? 'hudChrome.statInfo.names.healPower'
     : statNameKey(stat as Parameters<typeof statNameKey>[0]);
 }
@@ -64,6 +65,7 @@ const LABELLED_BONUS_KEYS: ReadonlySet<string> = new Set([
   'hitRating',
   'spellPower',
   'healPower',
+  'healingPower',
   'warfare',
 ]);
 
@@ -108,6 +110,7 @@ export function wornTooltipInstance(
   // immutable Perfecting contribution remain private and are never copied here.
   if (instance.perfected !== undefined) worn.perfected = instance.perfected;
   if (instance.rift !== undefined) worn.rift = instance.rift;
+  if (instance.lootQuality !== undefined) worn.lootQuality = instance.lootQuality;
   return worn;
 }
 
@@ -238,7 +241,7 @@ export function instanceLockLine(instance?: ItemInstancePayload): string {
  *     future widening) render nothing rather than a wrong rank. */
 export function instanceBadgeLines(instance?: ItemInstancePayload): string {
   if (!instance) return '';
-  let html = '';
+  let html = lootQualityTooltipLine(instance);
   if (instance.rolled?.masterwork) {
     html += `<div class="tt-sub tt-masterwork-seal" style="color:var(--gold)"><img class="tt-masterwork-seal-icon" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false"><span>${esc(t('hudChrome.crafting.masterworkSeal'))}</span></div>`;
   }
@@ -280,9 +283,9 @@ function statLine(key: TranslationKey, value: number, stat: string): string {
  *   - a masterwork-only copy renders exactly what it rendered before.
  *  The suffix is its own key with its own fills, never concatenated onto the
  *  plain line's output. */
-export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
+export function instanceBonusStatLines(instance?: ItemInstancePayload, item?: ItemDef): string {
   if (!instance) return '';
-  const bonusStats = activeItemInstanceStats(instance);
+  const bonusStats = activeItemInstanceStats(instance, item);
   const active = isItemEnchantActive(instance);
   const enchant = instance.enchant ? ENCHANTS[instance.enchant] : undefined;
   const enchantShare = active ? enchant?.statBonus : undefined;

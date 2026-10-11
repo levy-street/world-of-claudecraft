@@ -129,3 +129,35 @@ export function castNythraxisDreadCurse(
   });
   return stacks === NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS ? 'swapCall' : 'applied';
 }
+
+/**
+ * Strip every live Dread Curse stack from the room. The swap cadence already
+ * holds off NEW applications for as long as the boss storms (the driver's
+ * `!storming` gate), but a stack landed just before Bone Storm began keeps
+ * amplifying damage FROM Nythraxis (the aura's `vuln_source` kind), which
+ * covers the storm's own whirl ticks and Bone Slams: the raid cannot predict
+ * or react to the storm's hash-ranked charge landing back on the raider who
+ * is still carrying stacks, so the two majors overlapping could stack into a
+ * hit nobody can heal through. Called once, the instant the storm begins.
+ */
+export function clearNythraxisDreadCurse(
+  ctx: SimContext,
+  boss: Entity,
+  targets: readonly Entity[],
+): void {
+  for (const target of targets) {
+    const held = target.auras.some(
+      (aura) => aura.id === NYTHRAXIS_DREAD_CURSE_AURA_ID && aura.sourceId === boss.id,
+    );
+    if (!held) continue;
+    target.auras = target.auras.filter(
+      (aura) => !(aura.id === NYTHRAXIS_DREAD_CURSE_AURA_ID && aura.sourceId === boss.id),
+    );
+    ctx.emit({
+      type: 'aura',
+      targetId: target.id,
+      name: NYTHRAXIS_DREAD_CURSE_CAST_ID,
+      gained: false,
+    });
+  }
+}

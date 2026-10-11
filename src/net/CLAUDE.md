@@ -57,6 +57,10 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
   itself) and deliberately bucket-agnostic: `src/net` never imports `src/game`;
   `src/main.ts` is the junction that drains the digest into the perf monitor once per
   animation frame.
+- `target_echo.ts`: the pure decision behind the `pendingTargetEcho` optimism (scope in
+  Never, below): the optimistic target holds until the first snapshot whose input `ack`
+  covers the `target` command's `seq`, with a snapshot-count valve for a seq nothing ever
+  covers (`tests/target_echo_core.test.ts`; the wiring in `tests/target_echo_client.test.ts`).
 - `quest_state_optimistic.ts`: the pure resolution behind the `pendingQuestCommands`
   optimism (scope in Never, below): while a `turnin` is in flight, prerequisite checks
   treat that quest as done, so a follow-up quest appears in the same gossip re-render
@@ -236,12 +240,16 @@ failure, kept as stable English that `main.ts` re-localizes.
   client-side anticipation of combat, casts, resources, loot, aggro, or anything
   else the server resolves. The only sanctioned optimism inside `net/` is the
   trivial local UI nudges already present (`targetEntity` setting `targetId`,
-  shielded from stale in-flight snapshots by `pendingTargetEcho`;
-  `pendingQuestCommands`, whose resolution logic is the pure
+  shielded from stale in-flight snapshots by `pendingTargetEcho`, whose decision
+  core is the pure `target_echo.ts`: the `target` command carries a `seq` from the
+  input counter, and the hold releases on the first snapshot whose `ack` covers it,
+  never on a snapshot count, so a long round trip cannot bounce the frame back to
+  the previous target; `pendingQuestCommands`, whose resolution logic is the pure
   `quest_state_optimistic.ts`); keep that scope. Both follow the same
   reconcile-on-snapshot contract: display-only, and the server's value always
-  wins within a bounded window (`tests/target_echo_client.test.ts` pins the
-  target one).
+  wins, from the first post-command snapshot for the target (a valve bounds the
+  no-ack case) and within a bounded window for quests (`tests/target_echo_client.test.ts`
+  and `tests/target_echo_core.test.ts` pin the target one).
 - **Local-player movement prediction is the one sanctioned prediction**, and it
   lives OUTSIDE `net/` (`src/render/self_prediction.ts` + `self_prediction_core.ts`
   on movement wire v2; design authority `docs/design/movement-reconciliation.md`):

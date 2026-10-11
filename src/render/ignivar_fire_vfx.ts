@@ -22,6 +22,7 @@
 
 import * as THREE from 'three';
 import { assetUrl } from './assets/media';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { sharedUniforms } from './gfx';
 
 // NOTE: three.js's GLTFLoader sanitizes node names (dots are reserved chars
@@ -1190,7 +1191,7 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
   );
   disc.name = 'ground_fire_aoe__disc';
   disc.position.y = 0.02 * localFlameScale;
-  disc.renderOrder = 1;
+  disc.renderOrder = floorVfxRenderOrder('encounter', 0);
   group.add(disc);
 
   const flameMat = new THREE.ShaderMaterial({
@@ -1218,7 +1219,7 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
   flameMat.name = 'groundFireAoe:flames';
   const flames = new THREE.Mesh(getAoeFlameGeo(count), flameMat);
   flames.name = 'ground_fire_aoe__flames';
-  flames.renderOrder = 2;
+  flames.renderOrder = floorVfxRenderOrder('encounter', 1);
   group.add(flames);
 
   let heatTarget = 0;

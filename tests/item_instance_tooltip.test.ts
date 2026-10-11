@@ -698,7 +698,7 @@ describe('hud.itemTooltip composition order (source pins)', () => {
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
   const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
   const badges = hud.indexOf('instanceBadgeLines(instance)');
-  const bonus = hud.indexOf('instanceBonusStatLines(instance)');
+  const bonus = hud.indexOf('itemCombatTooltipLines(item, instance)');
   // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site, now
   // wrapped in materialMakersMarkLines alongside the per-unit material
@@ -712,7 +712,7 @@ describe('hud.itemTooltip composition order (source pins)', () => {
     expect(bonus).toBeGreaterThan(-1);
     expect(mark).toBeGreaterThan(-1);
     expect(hud.indexOf('instanceBadgeLines(instance)', badges + 1)).toBe(-1);
-    expect(hud.indexOf('instanceBonusStatLines(instance)', bonus + 1)).toBe(-1);
+    expect(hud.indexOf('itemCombatTooltipLines(item, instance)', bonus + 1)).toBe(-1);
     expect(hud.indexOf('materialMakersMarkLines(', mark + 1)).toBe(-1);
   });
 

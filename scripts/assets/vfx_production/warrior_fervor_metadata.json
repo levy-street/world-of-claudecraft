@@ -1,0 +1,9 @@
+{
+  "frames": 64,
+  "frame_size": 248,
+  "gutter": 4,
+  "camera_span": 5.6,
+  "pivot_content_top_origin": [0.24107142857142855, 0.6428571428571429],
+  "provenance": "Original Blender-authored ragged pressure sheets and angular flecks",
+  "baked_bloom": false
+}

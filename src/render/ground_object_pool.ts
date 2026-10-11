@@ -1,5 +1,6 @@
 import type * as THREE from 'three';
 import type { Entity } from '../sim/types';
+import { isFarshoreSalvageEntity, worldQuestSalvageVisualIndex } from '../sim/world_quest_salvage';
 
 // Ground-object pool: Renderer.createView's generic ground-quest-object branch
 // (the `e.kind === 'object'` arm past the bespoke door/rift/mailbox/noticeboard/
@@ -36,6 +37,9 @@ export interface PooledObjectView {
 export function groundObjectPoolKey(e: Entity): string | null {
   if (e.kind !== 'object' || !e.objectItemId) return null;
   if (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit') return null;
+  if (isFarshoreSalvageEntity(e)) {
+    return `object:${e.objectItemId}:salvage-${worldQuestSalvageVisualIndex(e.id)}`;
+  }
   return `object:${e.objectItemId}`;
 }
 

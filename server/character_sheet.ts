@@ -24,6 +24,7 @@ import {
 } from '../src/sim/content/talents';
 import { ITEMS, zoneAt } from '../src/sim/data';
 import { completionCounts } from '../src/sim/deeds_completion';
+import { DEV_BADGE_TITLE_ENGLISH, devBadgeTitleTier } from '../src/sim/dev_badge_titles';
 import { characterDerivedStats } from '../src/sim/entity';
 import { bagOwnedMounts } from '../src/sim/mounts';
 import {
@@ -138,12 +139,16 @@ export interface SheetDeeds {
 }
 
 /** English display text for a selected title (sheet.deeds.activeTitle, a deed
- *  id from the state blob), or null when unset, stale/content-drifted, or not
+ *  id or a developer-badge rung title id from the state blob), or null when unset, stale/content-drifted, or not
  *  a title reward. English by design: the only consumer is the
  *  English-by-design /c/ SSR page; client surfaces localize the id through
  *  deed_i18n instead, and the JSON sheet keeps carrying the raw id. */
 export function sheetTitleText(activeTitle: string | null): string | null {
   if (!activeTitle) return null;
+  // A developer-badge rung title is not a deed (src/sim/dev_badge_titles.ts):
+  // its English text is the rung name.
+  const rung = devBadgeTitleTier(activeTitle);
+  if (rung) return DEV_BADGE_TITLE_ENGLISH[rung.key];
   const reward = DEEDS[activeTitle]?.reward;
   return reward?.kind === 'title' ? reward.text : null;
 }

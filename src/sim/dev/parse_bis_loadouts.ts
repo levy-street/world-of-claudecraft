@@ -302,20 +302,19 @@ const LOADOUTS: Readonly<Record<PlayerClass, ClassParseGear>> = Object.freeze({
     }),
   }),
   mage: Object.freeze({
-    // Heroic HPS rank 1, build 0.39.0, fight 29902.
+    // Heroic HPS rank 1, build 0.43.0, fight 88229 (Crucible Chronoweave Tier 2).
     arcane: Object.freeze({
-      feet: 'necromancers_soulsteps',
-      legs: 'necromancers_legwraps',
-      neck: 'zense_meridian',
-      chest: 'necromancers_starshroud',
-      ring1: 'architects_cornerstone',
-      ring2: 'architects_cornerstone',
-      waist: 'soulflame_cord',
-      gloves: 'soulflame_gloves',
-      helmet: 'heroic_soulflame_cowl',
-      offhand: 'heroic_wraithfire_orb',
-      mainhand: 'scepter_of_the_deathless_court',
-      shoulder: 'heroic_soulflame_mantle',
+      helmet: 'chronoweave_helmet',
+      shoulder: 'chronoweave_shoulder',
+      chest: 'chronoweave_chest',
+      gloves: 'chronoweave_gloves',
+      legs: 'chronoweave_legs',
+      feet: 'steps_of_quiet_water',
+      waist: 'springbinder_sash',
+      neck: 'heartspring_amulet',
+      ring1: 'loop_of_quiet_springs',
+      ring2: 'circle_of_cinders',
+      mainhand: 'staff_of_the_last_spring',
     }),
     // Heroic DPS rank 1, build 0.40.1, fight 51084.
     fire: Object.freeze({

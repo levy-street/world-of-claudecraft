@@ -21,6 +21,25 @@ describe('shouldAutoTarget', () => {
     expect(shouldAutoTarget({ requiresTarget: true, targetType: 'friendly' }, false)).toBe(false);
   });
 
+  it('treats a dual-purpose heal as a heal while an ally is held', () => {
+    const solarInvocation = {
+      requiresTarget: true,
+      targetType: 'any',
+      effects: [{ type: 'heal' }, { type: 'directDamage' }],
+    };
+    expect(shouldAutoTarget(solarInvocation, false, true)).toBe(false);
+    // With no ally held it still needs a target like any other press.
+    expect(shouldAutoTarget(solarInvocation, false, false)).toBe(true);
+    expect(shouldAutoTarget(solarInvocation, false)).toBe(true);
+    // A dual-purpose ability that cannot heal keeps picking an enemy.
+    const shadeslip = {
+      requiresTarget: true,
+      targetType: 'any',
+      effects: [{ type: 'blinkForward' }],
+    };
+    expect(shouldAutoTarget(shadeslip, false, true)).toBe(true);
+  });
+
   it('leaves an untargeted AoE untargeted', () => {
     // Abilities that need no target are legal to cast into thin air, and choosing
     // one for them would change where they land.

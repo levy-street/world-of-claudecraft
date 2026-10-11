@@ -27,7 +27,7 @@ describe('offensiveAbilityBonus', () => {
   });
 
   it('gives Thundercall (shaman/elemental) the offensive spell bonus on a non-physical ability', () => {
-    expect(offensiveAbilityBonus(ability('shaman', 'nature'), mods('elemental'))).toBeCloseTo(0.13);
+    expect(offensiveAbilityBonus(ability('shaman', 'nature'), mods('elemental'))).toBeCloseTo(0.05);
   });
 
   it('gives Ruination (warlock/destruction) the offensive spell bonus, not the physical bucket', () => {

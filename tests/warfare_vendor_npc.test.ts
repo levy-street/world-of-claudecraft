@@ -16,7 +16,9 @@ import {
   FURY_NPC,
   FURY_NPC_ID,
   FURY_STOCK,
+  HONOR_QUARTERMASTER_STOCK,
   HONOR_VENDOR_STOCK,
+  WARFARE_TRINKET_STOCK,
 } from '../src/sim/content/pvp_honor';
 import { ZONE3_NPCS, ZONE3_ZONE } from '../src/sim/content/zone3';
 import { BUILTIN_WORLD, ITEMS, NPCS, PROPS, setActiveWorldContent } from '../src/sim/data';
@@ -63,11 +65,20 @@ describe('Warmarshal Draven Kole: the definition', () => {
   });
 
   it('sells the one canonical WARFARE stock rather than a second copy of it', () => {
-    // One GEAR list, two placements. FURY keeps the identical stock in
-    // Eastbrook, so a divergence here means someone forked the item table.
+    // One list, two placements. FURY keeps the identical stock in Eastbrook, so
+    // a divergence here means someone forked the item table.
+    // Both sell the one canonical honor stock (the entry tier, the trinkets, then
+    // Warfare Season 2) plus the one companion whistle.
     expect(KOLE.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
     expect(NPCS[FURY_NPC_ID].vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
-    expect(HONOR_VENDOR_STOCK).toEqual([...FURY_STOCK, HONOR_COMPANION_ITEM_ID]);
+    expect(HONOR_VENDOR_STOCK).toEqual([...HONOR_QUARTERMASTER_STOCK, HONOR_COMPANION_ITEM_ID]);
+    expect(HONOR_QUARTERMASTER_STOCK.slice(0, FURY_STOCK.length)).toEqual([...FURY_STOCK]);
+    expect(
+      HONOR_QUARTERMASTER_STOCK.slice(
+        FURY_STOCK.length,
+        FURY_STOCK.length + WARFARE_TRINKET_STOCK.length,
+      ),
+    ).toEqual([...WARFARE_TRINKET_STOCK]);
     expect(FURY_STOCK.length).toBeGreaterThan(0);
     // The companion is not gear.
     expect(ITEMS[HONOR_COMPANION_ITEM_ID].kind).toBe('buddy');
@@ -84,7 +95,10 @@ describe('Warmarshal Draven Kole: the definition', () => {
     expect(FURY_NPC.warfareVendor, 'FURY, the Eastbrook mirror').toBe(true);
     // Both placements keep the canonical gear list alongside the companion.
     expect(gearRows(KOLE.vendorItems)).toEqual(gearRows(FURY_NPC.vendorItems));
-    expect(gearRows(KOLE.vendorItems)).toEqual([...FURY_STOCK]);
+    expect(gearRows(KOLE.vendorItems)).toEqual([...HONOR_QUARTERMASTER_STOCK]);
+    // And the two really do sell the same list, not a copy that can drift.
+    expect(KOLE.vendorItems).toEqual(FURY_NPC.vendorItems);
+    expect(KOLE.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
   });
 
   it('is an honor vendor purely by virtue of its priced stock, not by a flag', () => {

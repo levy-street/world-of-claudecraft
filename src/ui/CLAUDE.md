@@ -347,7 +347,13 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   is the quest seal, bag-only because quest items cannot enter either bank. This rule exists
   because the fine mark shipped bag-only and losing the mark on deposit was reported as a bug
   (the same shape as the earlier bank-missed masterwork seal): a mark describes the ITEM, so no
-  window it appears in may drop it.
+  window it appears in may drop it. One documented exception to WHERE the markup lives: the
+  permanent loot-quality tier badge (`loot_quality_view.ts`) is minted beside the family, not in
+  `item_instance_glyph_mark.ts`, because it is a text mark that composes WITH the corner marks
+  and also paints on surfaces the family never does (worn slots, loot rows, roll prompts, the
+  Exchange); it still follows the all-surfaces rule (the `.vault-row` placement rule included)
+  and the one-accessible-channel rule (decorative where the cell name carries the quality word
+  through `lootQualityAriaName`, labelled where the badge is the only channel).
 - **`Hud` stays the orchestrator.** Keep `open<Window>`/`close<Window>` in `Hud` (cross-window
   coordination needs its private state); the per-render method shrinks to: resolve the entity,
   build the view, call the module with `deps`.

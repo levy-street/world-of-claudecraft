@@ -351,6 +351,17 @@ export function bagShiftLinks(mode: BagMode): boolean {
   return !mode.vendorOpen && !mode.bankDeposit && !mode.guildBankDeposit && !mode.vaultDeposit;
 }
 
+/** Whether a click in trade mode opens the offer-quantity prompt (the bank
+ *  withdraw prompt's trade twin, with the vault's stack step buttons) rather
+ *  than staging one unit. Only a fungible stack with room for MORE than one
+ *  further unit earns the prompt (`headroom` is the live tradeOfferHeadroom:
+ *  held total minus already staged); an instanced copy stages as itself,
+ *  exactly like the deposit rule (bankDepositOpensPrompt), and a single
+ *  remaining unit just stages. Shift-click keeps its chat link here. */
+export function tradeOfferOpensPrompt(slot: InvSlot, headroom: number): boolean {
+  return !slot.instance && headroom > 1;
+}
+
 /** Resolve the exact inventory index of a clicked bag stack by REFERENCE identity,
  *  never a first-match-by-itemId: duplicate fungible stacks and distinct instanced
  *  copies share an itemId, so only reference identity targets the stack the player

@@ -44,7 +44,7 @@ export const combat: GuidePage = {
         )}
         ${sectionPair('guide.combat.deathTitle', 'guide.combat.deathBody')}
         ${sectionPair('guide.combat.allyRezTitle', 'guide.combat.allyRezBody')}
-        ${sectionPair('guide.combat.unstuckTitle', 'guide.combat.unstuckBody')}
+        ${sectionPair('guide.combat.unstuckTitle', 'guide.combat.unstuckBodyWindow')}
         ${related([
           { href: hrefFor('reference/stats'), key: 'guide.nav.stats' },
           { href: hrefFor('classes'), key: 'guide.nav.classes' },

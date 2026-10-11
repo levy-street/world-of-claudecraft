@@ -16,12 +16,11 @@ import { dist2d, type Entity, NYTHRAXIS_ADD_ID } from '../src/sim/types';
 // A plain rectangular floor-0 room (no shell polygon) keeps the wall face at a
 // known |x| = wallX so the pin geometry is exact, and a modest wallX keeps the
 // outside spot within the rift collision region.
-function rectSeed(): number {
+function* rectSeeds(): Generator<number> {
   for (let s = 1; s < 800; s++) {
     const f = generateRiftFloor(s, 20, 0);
-    if (!f.isBoss && !f.layout.shellPolygon && (f.layout.wallX ?? 99) <= 33) return s;
+    if (!f.isBoss && !f.layout.shellPolygon && (f.layout.wallX ?? 99) <= 33) yield s;
   }
-  throw new Error('no rectangular floor-0 rift seed found');
 }
 
 function activeInstance(sim: Sim) {
@@ -30,25 +29,51 @@ function activeInstance(sim: Sim) {
   return inst;
 }
 
+// A plain melee trash mob: no pet, no channeled heal, and a body small enough
+// (scale 1.3 or under) that its scaled melee reach cannot cross the 8 yd pin gap.
+const isPlainMeleeTrash = (e: Entity): boolean =>
+  !MOBS[e.templateId]?.petSpell && !MOBS[e.templateId]?.channelHeal && e.scale <= 1.3;
+
+function enterRiftAt(seed: number) {
+  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  sim.enterRift(seed, 20, sim.player.id);
+  const inst = activeInstance(sim);
+  const mobs = inst.mobIds
+    .map((id) => sim.entities.get(id))
+    .filter((e): e is Entity => !!e && !e.dead);
+  return { sim, inst, mobs };
+}
+
+// The first rectangular seed whose floor-0 room actually spawns a plain melee
+// trash mob. Found by entering each candidate (spawn scales jitter per spawn),
+// then memoized so every case pins the same seed. It stopped being the first
+// rectangular seed at the 2026-09-28 release/v0.44.0 merge into
+// feature/buried-hoards, which grew rift_marrow_troll (1.2 to 1.45) and
+// rift_stone_ogre (1.3 to 1.6): seed 7's brute room now holds only big bodies.
+let pinSeed: number | null = null;
+function plainMeleeSeed(): number {
+  if (pinSeed !== null) return pinSeed;
+  for (const seed of rectSeeds()) {
+    if (enterRiftAt(seed).mobs.some(isPlainMeleeTrash)) {
+      pinSeed = seed;
+      return seed;
+    }
+  }
+  throw new Error('no rectangular floor-0 rift seed with a plain melee trash mob');
+}
+
 // Enter a rift, keep exactly one melee trash mob alive, and stand the player on
 // the far side of the room's side wall: in aggro range, out of melee reach,
 // unreachable by the straight-line chase.
 function pinnedSetup() {
-  const seed = rectSeed();
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true });
-  sim.enterRift(seed, 20, sim.player.id);
-  const inst = activeInstance(sim);
+  const seed = plainMeleeSeed();
+  const { sim, inst, mobs } = enterRiftAt(seed);
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const floor = generateRiftFloor(seed, 20, 0);
   const wallX = floor.layout.wallX;
   if (wallX === undefined) throw new Error('rectangular layout without wallX');
 
-  const mobs = inst.mobIds
-    .map((id) => sim.entities.get(id))
-    .filter((e): e is Entity => !!e && !e.dead);
-  const mob = mobs.find(
-    (e) => !MOBS[e.templateId]?.petSpell && !MOBS[e.templateId]?.channelHeal && e.scale <= 1.3,
-  );
+  const mob = mobs.find(isPlainMeleeTrash);
   if (!mob) throw new Error('no plain melee trash mob on the floor');
   for (const e of mobs) {
     if (e.id !== mob.id) {

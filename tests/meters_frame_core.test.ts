@@ -5,9 +5,12 @@ import {
   initialMeterFrame,
   METER_FRAME_LIMITS,
   type MeterFrameGeometry,
+  oppositeDockSide,
   parseMeterFrame,
   placeMeterFrame,
   serializeMeterFrame,
+  snapFrameToTargets,
+  syncDockedResize,
   TABBED_METER_FRAME_LIMITS,
 } from '../src/ui/meters_frame_core';
 
@@ -147,6 +150,74 @@ describe('meter frame geometry', () => {
         left: 3500,
         top: 1900,
       });
+    });
+  });
+
+  describe('meter frame docking and snapping', () => {
+    it('oppositeDockSide returns correct inverse sides', () => {
+      expect(oppositeDockSide('right')).toBe('left');
+      expect(oppositeDockSide('left')).toBe('right');
+      expect(oppositeDockSide('bottom')).toBe('top');
+      expect(oppositeDockSide('top')).toBe('bottom');
+    });
+
+    it('snaps to the right edge of an adjacent target within threshold', () => {
+      const target = { id: 'main', geo: geo(100, 100, 240, 180) };
+      const moving = geo(345, 105, 200, 160); // right edge is 340, moving left is 345 (diff 5 <= 18)
+      const res = snapFrameToTargets(moving, [target]);
+      expect(res.dockedTo).toEqual({ id: 'main', side: 'right' });
+      expect(res.geo.left).toBe(340);
+      expect(res.geo.top).toBe(100);
+      expect(res.geo.height).toBe(180);
+      expect(res.geo.width).toBe(200);
+    });
+
+    it('snaps to the left edge of an adjacent target within threshold', () => {
+      const target = { id: 'main', geo: geo(400, 100, 240, 180) };
+      const moving = geo(195, 105, 200, 160); // moving right is 395, target left is 400 (diff 5 <= 18)
+      const res = snapFrameToTargets(moving, [target]);
+      expect(res.dockedTo).toEqual({ id: 'main', side: 'left' });
+      expect(res.geo.left).toBe(200); // 400 - 200
+      expect(res.geo.top).toBe(100);
+      expect(res.geo.height).toBe(180);
+    });
+
+    it('snaps to the bottom edge of an adjacent target within threshold', () => {
+      const target = { id: 'main', geo: geo(100, 100, 240, 180) };
+      const moving = geo(105, 285, 200, 150); // target bottom is 280, moving top is 285 (diff 5 <= 18)
+      const res = snapFrameToTargets(moving, [target]);
+      expect(res.dockedTo).toEqual({ id: 'main', side: 'bottom' });
+      expect(res.geo.top).toBe(280);
+      expect(res.geo.left).toBe(100);
+      expect(res.geo.width).toBe(240);
+    });
+
+    it('leaves moving frame unchanged when beyond threshold', () => {
+      const target = { id: 'main', geo: geo(100, 100, 240, 180) };
+      const moving = geo(500, 500, 200, 160);
+      const res = snapFrameToTargets(moving, [target]);
+      expect(res.dockedTo).toBeNull();
+      expect(res.geo).toEqual(moving);
+    });
+
+    it('syncDockedResize synchronizes height and position for side-by-side dock', () => {
+      const parent = geo(100, 100, 260, 220);
+      const child = geo(340, 100, 200, 180); // was at left: 340 (prev width 240)
+      const synced = syncDockedResize(parent, child, 'right');
+      expect(synced.left).toBe(360); // 100 + 260
+      expect(synced.top).toBe(100);
+      expect(synced.height).toBe(220); // matched parent height
+      expect(synced.width).toBe(200); // kept its own width
+    });
+
+    it('syncDockedResize synchronizes width and position for stacked dock', () => {
+      const parent = geo(100, 100, 260, 220);
+      const child = geo(100, 280, 240, 150);
+      const synced = syncDockedResize(parent, child, 'bottom');
+      expect(synced.top).toBe(320); // 100 + 220
+      expect(synced.left).toBe(100);
+      expect(synced.width).toBe(260); // matched parent width
+      expect(synced.height).toBe(150); // kept its own height
     });
   });
 });

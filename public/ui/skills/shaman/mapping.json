@@ -335,6 +335,81 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Springwell (healing_stream)\nCanonical mechanic: Springwell restores 120 health to a friendly over 12 sec, ticking every 3 sec.\nSubject: A small spirit spring pouring four blue streams into a green heart.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "lava_burst",
+      "sourcePack": "woc_openai_thundercall_rework_icons_2026_09_24",
+      "sourceFile": "public/ui/skills/shaman/lava_burst.png (converted in place by assets:skills, original deleted)",
+      "output": "lava_burst.webp",
+      "source": "OpenAI gpt-image-2 (images/edits, style-referenced)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A heavy glowing bolt of molten lava and cracked magma rock bursting forward, trailing embers, orange and deep red with black crust.",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/flame_shock.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/shaman/lightning_bolt.webp",
+          "role": "palette reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted ability art for Magma Burst (lava_burst)\nCanonical mechanic: a 2 sec cast hurling a molten bolt of lava that always critically strikes a burning target.\nSubject: A heavy glowing bolt of molten lava and cracked magma rock bursting forward, trailing embers, orange and deep red with black crust.\nStyle: match the hand-painted dark-fantasy MMORPG ability icon style of the reference images (painterly, rich saturated accents on deep values)\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "lightning_overload",
+      "sourcePack": "woc_openai_thundercall_rework_icons_2026_09_24",
+      "sourceFile": "public/ui/skills/shaman/lightning_overload.png (converted in place by assets:skills, original deleted)",
+      "output": "lightning_overload.webp",
+      "source": "OpenAI gpt-image-2 (images/edits, style-referenced)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Two parallel crackling blue-white lightning bolts, one bright and one fainter echo behind it, overloading with arcing sparks.",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/lightning_bolt.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/shaman/thunder_reservoir.webp",
+          "role": "palette reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted ability art for Arc Overload (lightning_overload)\nCanonical mechanic: passive; a lightning bolt sometimes fires a second echoing bolt at the same target.\nSubject: Two parallel crackling blue-white lightning bolts, one bright and one fainter echo behind it, overloading with arcing sparks.\nStyle: match the hand-painted dark-fantasy MMORPG ability icon style of the reference images (painterly, rich saturated accents on deep values)\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "thunderstorm",
+      "sourcePack": "woc_openai_thundercall_rework_icons_2026_09_24",
+      "sourceFile": "public/ui/skills/shaman/thunderstorm.png (converted in place by assets:skills, original deleted)",
+      "output": "thunderstorm.webp",
+      "source": "OpenAI gpt-image-2 (images/edits, style-referenced)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A ring-shaped shockwave of storm energy and lightning exploding outward from a central point beneath dark thunderclouds, violet and electric blue.",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/earth_shock.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/shaman/chain_lightning.webp",
+          "role": "palette reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted ability art for Stormbreak (thunderstorm)\nCanonical mechanic: an instant thunderclap around the shaman that blasts nearby enemies and slows them.\nSubject: A ring-shaped shockwave of storm energy and lightning exploding outward from a central point beneath dark thunderclouds, violet and electric blue.\nStyle: match the hand-painted dark-fantasy MMORPG ability icon style of the reference images (painterly, rich saturated accents on deep values)\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
   "deferredStayProcedural": {},

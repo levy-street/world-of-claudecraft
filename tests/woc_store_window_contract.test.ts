@@ -849,7 +849,11 @@ describe('WOC Store window contract', () => {
     expect(storeWindow).not.toContain('this.deps.confirmDialog?.(');
     expect(storeWindow).toContain('private readonly storeRuntime = new StoreSurfaceRuntime');
     expect(storeSurfaceRuntime).toContain('this.prompts = new StoreDecisionPrompts(root)');
-    expect(storeDecisionPrompt).toContain("document.getElementById('prompt-stack')");
+    // Mounted through the host resolver (#prompt-stack, or the body-level host
+    // over an inspect overlay, src/ui/store_prompt_host.ts), never a direct
+    // #prompt-stack lookup: both the decision and the nonmodal result.
+    expect(storeDecisionPrompt).not.toContain("document.getElementById('prompt-stack')");
+    expect(storeDecisionPrompt.match(/const stack = resolveStorePromptHost\(\);/g)).toHaveLength(2);
     expect(storeDecisionPrompt).toContain("prompt.id = 'confirm-dialog'");
     expect(storeDecisionPrompt).toContain('installPromptDialog(prompt, opener, close');
     expect(storeDecisionPrompt).toContain("result.setAttribute('role', 'status')");

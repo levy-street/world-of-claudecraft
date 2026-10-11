@@ -217,8 +217,11 @@ describe('materialProfessionHintText', () => {
   });
 
   it('fine grades name every craft beside the Fine grade purpose line, in ring order', () => {
+    // Leatherworking joined at the 2026-09-28 release/v0.44.0 merge into
+    // feature/buried-hoards: pattern_reinforced_armor_kit takes iron_ore, and
+    // the fine grade inherits its base consumers.
     expect(materialProfessionHintText('fine_iron_ore')).toBe(
-      'Used by Engineering, Jewelcrafting, Weaponcrafting, and Armorcrafting.',
+      'Used by Engineering, Leatherworking, Jewelcrafting, Weaponcrafting, and Armorcrafting.',
     );
   });
 
@@ -267,7 +270,7 @@ describe('itemTooltip integration for profession material tags', () => {
     const html = tooltipHtml('fine_iron_ore');
     const hintAt = html.indexOf('Fine grade.');
     const usedByAt = html.indexOf(
-      'Used by Engineering, Jewelcrafting, Weaponcrafting, and Armorcrafting.',
+      'Used by Engineering, Leatherworking, Jewelcrafting, Weaponcrafting, and Armorcrafting.',
     );
     const sellAt = html.indexOf('Sell price');
     expect(hintAt).toBeGreaterThanOrEqual(0);

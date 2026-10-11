@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
+import { EASTBROOK_FERRY_HULL } from '../src/sim/content/transport_ships';
 import { PROPS } from '../src/sim/data';
 import { buildDecorPropColliders } from '../src/sim/decor_prop_colliders';
-import { groundHeight } from '../src/sim/world';
+import { shipHullColliders } from '../src/sim/transport_ship';
+import { groundHeight, WATER_LEVEL } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // Direct unit coverage for src/sim/decor_prop_colliders.ts, extracted out of
 // src/sim/colliders.ts (see that module's header for the contract). These
@@ -61,6 +64,39 @@ describe('buildDecorPropColliders', () => {
     if (c.type !== 'obb') return;
     expect(c.standable).toBe(true);
     expect(c.moveTopY).toBeCloseTo(groundHeight(X, Z, SEED) + 1.6, 6);
+  });
+
+  it('a floating standable top follows the waterline, not the seabed', () => {
+    // open water in the Eastbrook cove, well below the waterline
+    const x = -130;
+    const z = -60;
+    const [c] = buildDecorPropColliders(WORLD_SEED, [
+      { key: 'raft', x, z, float: 0.25, hw: 1.5, hd: 2, standableTop: 0.6 },
+    ]);
+    expect(groundHeight(x, z, WORLD_SEED)).toBeLessThan(WATER_LEVEL - 0.25);
+    expect(c.moveTopY).toBeCloseTo(WATER_LEVEL - 0.25 + 0.6, 6);
+  });
+
+  it('an inherited object key never reaches the hull path (never throws)', () => {
+    for (const key of ['constructor', 'toString', '__proto__', 'hasOwnProperty']) {
+      expect(() => buildDecorPropColliders(SEED, [{ key, x: X, z: Z }])).not.toThrow();
+      expect(buildDecorPropColliders(SEED, [{ key, x: X, z: Z }])).toEqual([]);
+    }
+  });
+
+  it('a transport ship key moors its hull layout instead of the row footprint', () => {
+    const x = -130;
+    const z = -60;
+    const row = { key: 'eastbrookFerry', x, z, rot: 0.3, float: 0, r: 9, hw: 2, hd: 2 };
+    const colliders = buildDecorPropColliders(WORLD_SEED, [row]);
+    const expected = shipHullColliders(EASTBROOK_FERRY_HULL, {
+      x,
+      z,
+      rot: 0.3,
+      baseY: WATER_LEVEL,
+    });
+    expect(colliders).toEqual(expected);
+    expect(colliders).toHaveLength(EASTBROOK_FERRY_HULL.volumes.length);
   });
 
   it('standableTop with no footprint at all warns and degrades to walk-through, never throws', () => {

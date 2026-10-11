@@ -68,6 +68,7 @@ describe('the live cycle contract', () => {
 describe('open-air instances follow the live cycle (source pins)', () => {
   it('includes the overworld and battleground, but no authored interior rig', () => {
     expect(usesLiveDayNightLighting('outdoor')).toBe(true);
+    expect(usesLiveDayNightLighting('hoardValley')).toBe(true);
     expect(usesLiveDayNightLighting('battleground')).toBe(true);
     expect(usesLiveDayNightLighting('dungeon')).toBe(false);
     expect(usesLiveDayNightLighting('wildheartField')).toBe(false);

@@ -69,12 +69,11 @@ describe('classifyGpuBackend', () => {
     expect(compilesOffThread('unknown')).toBe(false);
   });
 
-  it('pins where the worker is worth its cost: off-thread compile AND something to warm', () => {
-    // Vulkan compiles off-thread and is still out: a cold link there is as
-    // cheap as a hit and the worker's own links cost more (2026-08-30).
-    expect(WORKER_WORTH_BACKENDS).toEqual(['d3d11']);
-    expect(workerWorthWarming('d3d11')).toBe(true);
-    // Metal: unmeasured in game, and its one reading (11 ms cold) is Vulkan's.
+  it('pins that auto starts the worker on no backend: none is measured worth it', () => {
+    // D3D11 was the one candidate, and the 0.43 fleet experiment found no gain
+    // it could detect; only the explicit setting starts the worker.
+    expect(WORKER_WORTH_BACKENDS).toEqual([]);
+    expect(workerWorthWarming('d3d11')).toBe(false);
     expect(workerWorthWarming('metal')).toBe(false);
     expect(workerWorthWarming('vulkan')).toBe(false);
     expect(workerWorthWarming('opengl')).toBe(false);

@@ -1955,7 +1955,7 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     expect(sim.events).toContainEqual(
       expect.objectContaining({
         type: 'log',
-        text: 'A rare catch! Something gleams on your line.',
+        text: 'Something golden flashes beneath the surface!',
       }),
     );
     sim.ctx.markDeedsDirty(meta.entityId);

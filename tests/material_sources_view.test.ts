@@ -8,7 +8,9 @@ import type { MaterialComposition, MaterialSource } from '../src/sim/material_so
 import { materialSourceKey } from '../src/sim/material_sources';
 import {
   boundedMaterialSourceRows,
+  materialFungibleUnitCount,
   materialSourceSummary,
+  materialSourcesForDisplay,
   suppressesLegacyGatheredLine,
 } from '../src/ui/material_sources_view';
 
@@ -176,5 +178,70 @@ describe('bounded material source rows', () => {
       hiddenSources: 0,
       hiddenUnits: 0,
     });
+  });
+});
+
+describe('material fungible unit count (World Market sell-quantity cap)', () => {
+  // Bug: the Sell tab's quantity cap (fungibleBagCount, market_window.ts) summed
+  // a stack's raw slot.count, ignoring that a premium/signed bucket is excluded
+  // from the plain bulk-listing pool sim-side (material_exchange_transfer.ts's
+  // eligibleSource, the same gate countFungibleItem applies). A 20-unit stack
+  // with several gatherers but no signature is fully plain and sells fine; a
+  // stack that also holds a signed bucket (a "several benefactors" stack in the
+  // player's words) advertised the WHOLE stack as sellable, so submitting it
+  // always bounced off the sim's "You do not have that many to sell" denial.
+  it('counts a fully plain, multi-gatherer stack as entirely fungible', () => {
+    const slot = { itemId: 'copper_ore', count: 7, materialSources: [held(ANA, 3), held(BRU, 4)] };
+    expect(materialFungibleUnitCount(slot)).toBe(7);
+  });
+
+  it('excludes a signed bucket even when its gatherer matches a plain bucket in the same stack', () => {
+    // The exact reported shape: 9 plain "Collected by Wicca" plus 11 more from
+    // Wicca that also carry a signature, merged into one 20-unit stack.
+    const wicca = gatherer(21, 'Wicca');
+    const wiccaSigned: MaterialSource = { ...wicca, signer: 'Wicca' };
+    const slot = {
+      itemId: 'copper_ore',
+      count: 20,
+      materialSources: [held(wicca, 9), held(wiccaSigned, 11)],
+    };
+    expect(materialFungibleUnitCount(slot)).toBe(9);
+  });
+
+  it('excludes legacy signer-only stock entirely, matching the sim denial for a wholly-signed stack', () => {
+    const slot = { itemId: 'copper_ore', count: 5, instance: { signer: 'Cyd' } };
+    expect(materialFungibleUnitCount(slot)).toBe(0);
+  });
+
+  it('excludes an empty-string legacy signer even though it is not a premium signature', () => {
+    // isPremiumMaterialSource('') is false, but materialSourceUnitPayload still
+    // reports a payload for it (a legal legacy value, never silently merged
+    // with unrecorded stock), so the sell cap must exclude it too, not just
+    // whatever isPremiumMaterialSource would.
+    const slot = {
+      itemId: 'copper_ore',
+      count: 4,
+      materialSources: [held(UNRECORDED, 1), held({ signer: '' }, 3)],
+    };
+    expect(materialFungibleUnitCount(slot)).toBe(1);
+  });
+
+  it('excludes an empty-string legacy signer even when display projects no row', () => {
+    // Display intentionally keeps the old no-row behavior for an empty signer,
+    // but the sell cap mirrors the sim's legacy projection, where signer: ''
+    // is its own non-plain payload bucket.
+    const slot = { itemId: 'copper_ore', count: 3, instance: { signer: '' } };
+    expect(materialSourcesForDisplay(slot)).toBeUndefined();
+    expect(materialFungibleUnitCount(slot)).toBe(0);
+  });
+
+  it('excludes locked legacy material stacks from the plain sell cap', () => {
+    const slot = { itemId: 'copper_ore', count: 4, instance: { locked: true } };
+    expect(materialFungibleUnitCount(slot)).toBe(0);
+  });
+
+  it('returns the plain slot count for a non-material item (no composition to exclude)', () => {
+    const slot = { itemId: 'worn_sword', count: 3 };
+    expect(materialFungibleUnitCount(slot)).toBe(3);
   });
 });

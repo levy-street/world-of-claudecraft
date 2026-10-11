@@ -165,6 +165,11 @@ of the increase is catalog growth and correcting previously omitted legitimate
 payload/identity state. No rank-exchange
 ledger, new timer, or additional save/query path is introduced.
 
+Update 2026-09-28: the Buried Hoards merge into release/v0.44.0 moved the
+storage-rich whole-character fixture to 233,360 bytes, so the warning threshold
+moved one more 32 KiB step to **262,144 bytes (256 KiB)**, level with the
+guild-bank scale. The history below is kept as recorded.
+
 The database review approved the **229,376-byte (224 KiB)** warning threshold,
 the next 32 KiB step above this measurement. It leaves 20,115 bytes of headroom
 and remains one 32 KiB step below the 256 KiB guild-bank scale. The previous

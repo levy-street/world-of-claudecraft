@@ -85,10 +85,11 @@ describe('remint registry completeness', () => {
     // all (every leaf lives one directory down), so a non-empty result is
     // itself proof the walk recursed. The floor sits at the shipped count so a
     // family that moves or disappears cannot shrink the corpus silently.
-    expect(families.length, `families found: ${families.join(', ')}`).toBeGreaterThanOrEqual(9);
+    expect(families.length, `families found: ${families.join(', ')}`).toBeGreaterThanOrEqual(10);
     expect(families).toContain('eastbrook_town');
     expect(families).toContain('fenbridge_town');
     expect(families).toContain('farm_props');
+    expect(families).toContain('hoard_entrance');
     // The leaf really is a directory down, never a file sitting in the root.
     for (const family of families) {
       expect(
@@ -114,7 +115,7 @@ describe('remint registry completeness', () => {
     // (a refactor to a different import spelling) cannot pass the arm above by
     // emptying the family side instead of the registry side. Held at the
     // shipped count, so a family dropped from BOTH sides still reds.
-    expect(registered.size, 'families wired into the registry').toBe(8);
+    expect(registered.size, 'families wired into the registry').toBe(9);
   });
 
   it('every family the registry imports still exists on disk', () => {

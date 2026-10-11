@@ -11,6 +11,7 @@
 import { BUDDY_ART_PENDING_ITEM_IDS } from '../sim/content/buddies';
 import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
+import { SEASON2_SETS } from '../sim/content/pvp_honor_season2';
 import {
   BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
@@ -22,6 +23,7 @@ import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { professionImageUrl } from './hud/professions/profession_art';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
+import { TRINKET_AURA_IMAGE_URLS } from './trinket_aura_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
 export { PROFESSION_IMAGE_IDS, professionImageUrl } from './hud/professions/profession_art';
@@ -2947,6 +2949,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   tidecall: r('nature', 'sky', ['sunburst', { p: 'droplet', ...BR }], ['arcs']),
   stoneward: r('earth', 'earthBrown', ['shield', { p: 'gem', ...TR }], ['crack', 'glow']),
   primal_exaltation: r('storm', 'gold', ['sunburst', { p: 'lightning', ...BR }], ['glow', 'arcs']),
+  // v0.44 Thundercall rework kit.
+  lava_burst: r('fire', 'ember', ['flame', { p: 'sunburst', ...BR }], ['glow']),
+  lightning_overload: r('storm', 'sky', ['lightning', { p: 'lightning', ...BR }], ['arcs']),
+  thunderstorm: r('storm', 'sky', ['sunburst', { p: 'lightning', ...BR }], ['arcs', 'glow']),
   // warlock
   shadow_bolt: r('shadow', 'shadowPurple', ['bolt'], ['glow']),
   demon_skin: r('shadow', 'venom', [{ p: 'chestplate', pal: 'venom' }]),
@@ -3462,6 +3468,9 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   frenzied_regeneration: r('nature', 'blood', ['heart', { p: 'paw', ...BR }], ['glow']),
   berserk: r('fury', 'blood', ['paw', { p: 'fist', ...BR }], ['glow']),
   tranquility: r('nature', 'silverWhite', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
+  // Buried Hoards: the Clockwork Shock Bomb's thrown cast (the Automatons
+  // quartermaster's engineering item): a clockwork gear crackling with shock.
+  clockwork_shock_bomb: r('storm', 'sky', ['gear', { p: 'lightning', ...BR }], ['arcs', 'glow']),
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
@@ -4829,6 +4838,10 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'stoneward',
   'primal_exaltation',
   'ancestor_return',
+  // v0.44 Thundercall rework (project-generated, style-referenced).
+  'lava_burst',
+  'lightning_overload',
+  'thunderstorm',
   // cross-class fills from the two generic CraftPix "100 RPG/skill icon" packs — abilities
   // their own class pack couldn't cover but a generic icon fit. (warrior taunt completes warrior.)
   'aspect_of_the_hawk',
@@ -4963,6 +4976,9 @@ export const ABILITY_ART_PENDING = new Set<string>([
   // Wildfang kit pass 2: the VFX and art retune owns the final paintings.
   'lunge',
   'hamstring_bite',
+  // Buried Hoards: the Clockwork Shock Bomb's thrown cast draws its glyph until
+  // its skill painting ships (the item itself already ships painted art).
+  'clockwork_shock_bomb',
 ]);
 
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
@@ -5105,6 +5121,8 @@ const EXTERNAL_AURA_IMAGE_URLS: ReadonlyMap<string, string> = new Map([
   ['pow_colossus', '/ui/fiesta/powerups/pow_colossus.webp'],
   ['pow_moon_boots', '/ui/fiesta/powerups/pow_moon_boots.webp'],
   ['pow_speed_demon', '/ui/fiesta/powerups/pow_speed_demon.webp'],
+  // Every trinket aura paints its trinket's item icon (trinket_aura_art.ts).
+  ...TRINKET_AURA_IMAGE_URLS,
 ]);
 
 /** All exact aura-art identities, including assets shared from another UI family. */
@@ -5243,6 +5261,10 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'crimson_amber_armor_plate',
   'cyan_magenta_armor_plate',
   'event_skin_token',
+  'emissary_cache',
+  // Clue Scrolls (world quests, Stage 3): the scroll and the casket.
+  'clue_scroll',
+  'treasure_casket',
   'forest_pink_armor_plate',
   'imperial_crimson_armor_plate',
   'imperial_gold_armor_plate',
@@ -5477,6 +5499,27 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_thunderstrut_gobbler',
   'reins_terrorspark_groundshaker',
   'reins_lanternback_troll',
+  // trinkets (src/sim/content/trinkets.ts; opaque woc-item-icon-v1 paintings from the
+  // trinket-slot-icons-2026-09-23 batch in mapping.json)
+  'bastion_sigil',
+  'mooring_stone',
+  'menders_hourglass',
+  'wellspring_seed',
+  'paired_talons',
+  'hunters_tally',
+  'stormjar',
+  'echoing_lens',
+  'gamblers_die',
+  'sundered_prism',
+  'wayfarers_lodestone',
+  'medallion_of_defiance',
+  'duelists_brand',
+  // raid trinkets (Crucible of the Last Spring), same batch
+  'forgefathers_temper',
+  'kindling_orb',
+  'molten_fletching',
+  'last_flame_lantern',
+  'heart_of_the_crucible',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the
@@ -5502,6 +5545,10 @@ export const ITEM_ART_PENDING = new Set<string>([
   ...BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   ...NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
   ...BUDDY_ART_PENDING_ITEM_IDS,
+  // Warfare Season 2 armor: painted icons owned by a follow-up art pass; the
+  // procedural icon stands in until then. The season weapons never park here:
+  // an unpainted weapon already draws its procedural icon.
+  ...SEASON2_SETS.flatMap((set) => set.itemIds),
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
@@ -5536,6 +5583,33 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_varkhul_flawless',
   // Hidden self-craft celebration; 512px RGBA commission brief in docs/achievements/icon-brief.md.
   'hid_forgebreaker',
+  // Arcane Calligraphy's completion and Gold-rating deeds are both
+  // 'exploration'. They use the category crest until their commissioned
+  // paintings land (docs/achievements/icon-brief.md).
+  'exp_arcane_calligraphy',
+  'exp_arcane_calligraphy_gold',
+  // World-quest completion deeds use the exploration category crest pending art.
+  'exp_forge_helper',
+  'exp_last_barricade',
+  'exp_borrowed_face',
+  'exp_windrider_slalom',
+  'exp_duskweave_dispatches',
+  'exp_wisp_maze',
+  // Faction standing deeds use the progression category crest pending art.
+  'prog_rift_watch_trusted',
+  'prog_church_order_trusted',
+  'prog_automatons_trusted',
+  'prog_rift_watch_champion',
+  'prog_church_order_champion',
+  'prog_automatons_champion',
+  'prog_faction_champion_all',
+  // Clue Scroll casket deeds use the exploration category crest pending art.
+  'exp_clue_first_casket',
+  'exp_clue_ten_caskets',
+  // The Buried Hoard goblin catch uses the combat category crest pending art.
+  'cmb_coinsack_caught',
+  // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
+  'exp_harbor_to_harbor',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

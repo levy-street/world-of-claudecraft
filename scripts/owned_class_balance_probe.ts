@@ -673,18 +673,23 @@ function castFieldcraft(state: RunState): void {
 }
 
 function castThundercall(state: RunState): void {
-  const thunder =
-    state.sim.player.auras.find((aura) => aura.id === 'shaman_thunder_charges')?.stacks ?? 0;
+  const player = state.sim.player;
+  const thunder = player.auras.find((aura) => aura.id === 'shaman_thunder_charges')?.stacks ?? 0;
   if (tryCast(state, 'primal_exaltation')) return;
   if (tryCast(state, 'elemental_mastery')) return;
+  // Stormbreak is the spec's Mana button; the fixture spends it when low.
+  if (player.resource < player.maxResource * 0.5 && tryCast(state, 'thunderstorm')) return;
+  // A Magma Surge proc is an instant, guaranteed-crit Magma Burst: take it first.
+  if (hasAura(player, 'shaman_magma_surge') && tryCast(state, 'lava_burst')) return;
   if (thunder >= 5) {
     if (state.targets.length === 3 && tryCast(state, 'earthquake', state.primary, true)) return;
     if (tryCast(state, 'earth_shock')) return;
   }
-  const missingCinder = state.targets.find(
-    (target) => !ownAura(target, 'flame_shock', state.sim.playerId),
-  );
-  if (missingCinder && thunder < 4 && tryCast(state, 'flame_shock', missingCinder)) return;
+  // Cinder Jolt shares the shock cooldown, so it is refreshed only while the
+  // bank is still filling (a full bank vents first, above).
+  const cinder = ownAura(state.primary, 'flame_shock', state.sim.playerId);
+  if ((!cinder || cinder.remaining <= 2) && thunder < 5 && tryCast(state, 'flame_shock')) return;
+  if (cinder && tryCast(state, 'lava_burst')) return;
   if (state.targets.length === 3 && tryCast(state, 'chain_lightning')) return;
   tryCast(state, 'lightning_bolt');
 }

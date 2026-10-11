@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { GROUND_PICKUP_LINES } from '../src/sim/content/ground_pickup_lines';
+import { WORLD_QUEST_ITEMS } from '../src/sim/content/world_quests';
 import { supportedLanguages } from '../src/ui/i18n';
 import { DICT, localizeSimText } from '../src/ui/sim_i18n';
 
@@ -78,6 +79,13 @@ const PENDING_LOCALE_KEYS = new Set<string>([
   // the refusal when a multi-count `interact` objective has already taken this
   // object's credit. Not a deny/enough pair, so it has no partner key.
   'groundPickup.objectAlreadyCredited',
+  'groundPickup.leylineCacheDeny',
+  'groundPickup.confectionGameBoxDeny',
+  'groundPickup.leylineCacheEnough',
+  'groundPickup.confectionGameBoxEnough',
+  'groundPickup.freightOrderDeny',
+  'groundPickup.freightCrateEnough',
+  'groundPickup.freightWagonEnough',
 ]);
 
 describe('ground-pickup line localization (the S3-invisible surface)', () => {
@@ -88,12 +96,18 @@ describe('ground-pickup line localization (the S3-invisible surface)', () => {
     }
   });
 
-  it('covers 89 distinct lines with groundPickup.* keys', () => {
+  it('covers 96 distinct lines with groundPickup.* keys', () => {
     // 42 through the Veiled Hollow merge, plus 40 (20 deny/enough pairs) from
     // the new-realm quest pass, plus the murloc hut pair from the quest-dedupe
     // pass and the item-agnostic already-credited refusal, plus the tutorial
     // island's castaway crate pair.
-    expect(GROUND_PICKUP_KEYS.length).toBe(89);
+    expect(GROUND_PICKUP_KEYS.length).toBe(96);
+  });
+
+  it('recognizes every world-quest activator denial through the sim matcher', () => {
+    for (const item of Object.values(WORLD_QUEST_ITEMS)) {
+      expect(localizeSimText(item.pickupDeny ?? ''), `deny line for ${item.id}`).not.toBeNull();
+    }
   });
 
   it('recognizes the already-credited refusal via the EXACT matcher', () => {

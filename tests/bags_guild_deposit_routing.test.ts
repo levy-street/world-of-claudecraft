@@ -148,6 +148,7 @@ function harness(
     closeBank: noop,
     onClosed: noop,
     addItemToTrade: noop,
+    tradeOfferHeadroom: () => 0,
     stageMarketSell: noop,
     stageMailParcel: noop,
     insertItemChatLink: noop,

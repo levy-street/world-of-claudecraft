@@ -1,0 +1,181 @@
+{
+  "rows": [
+    {
+      "name": "desktop",
+      "root": {
+        "x": 274,
+        "y": 31.5,
+        "width": 552,
+        "height": 782.5,
+        "right": 826,
+        "bottom": 814
+      },
+      "grid": {
+        "x": 340,
+        "y": 277,
+        "width": 420,
+        "height": 420,
+        "right": 760,
+        "bottom": 697
+      },
+      "frame": {
+        "x": 317,
+        "y": 254,
+        "width": 466,
+        "height": 466,
+        "right": 783,
+        "bottom": 720
+      },
+      "cell": {
+        "x": 349,
+        "y": 286,
+        "width": 62,
+        "height": 62,
+        "right": 411,
+        "bottom": 348
+      },
+      "scrollWidth": 548,
+      "clientWidth": 548,
+      "scrollHeight": 779,
+      "clientHeight": 779,
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "animations": 0
+    },
+    {
+      "name": "phone",
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 370,
+        "height": 620.53125,
+        "right": 380,
+        "bottom": 630.53125
+      },
+      "grid": {
+        "x": 45.03125,
+        "y": 229.59375,
+        "width": 299.9375,
+        "height": 299.9375,
+        "right": 344.96875,
+        "bottom": 529.53125
+      },
+      "frame": {
+        "x": 30.03125,
+        "y": 214.59375,
+        "width": 329.9375,
+        "height": 329.9375,
+        "right": 359.96875,
+        "bottom": 544.53125
+      },
+      "cell": {
+        "x": 54.03125,
+        "y": 238.59375,
+        "width": 43.65625,
+        "height": 43.65625,
+        "right": 97.6875,
+        "bottom": 282.25
+      },
+      "scrollWidth": 366,
+      "clientWidth": 366,
+      "scrollHeight": 617,
+      "clientHeight": 617,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "animations": 0
+    },
+    {
+      "name": "landscape",
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 824,
+        "height": 370,
+        "right": 834,
+        "bottom": 380
+      },
+      "grid": {
+        "x": 223,
+        "y": 203.296875,
+        "width": 398,
+        "height": 398,
+        "right": 621,
+        "bottom": 601.296875
+      },
+      "frame": {
+        "x": 208,
+        "y": 188.296875,
+        "width": 428,
+        "height": 428,
+        "right": 636,
+        "bottom": 616.296875
+      },
+      "cell": {
+        "x": 232,
+        "y": 212.296875,
+        "width": 60,
+        "height": 60,
+        "right": 292,
+        "bottom": 272.296875
+      },
+      "scrollWidth": 820,
+      "clientWidth": 820,
+      "scrollHeight": 688,
+      "clientHeight": 366,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "animations": 0
+    },
+    {
+      "name": "large-ui",
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 370,
+        "height": 732.265625,
+        "right": 380,
+        "bottom": 742.265625
+      },
+      "grid": {
+        "x": 45.03125,
+        "y": 317.34375,
+        "width": 299.9375,
+        "height": 299.9375,
+        "right": 344.96875,
+        "bottom": 617.28125
+      },
+      "frame": {
+        "x": 30.03125,
+        "y": 302.34375,
+        "width": 329.9375,
+        "height": 329.9375,
+        "right": 359.96875,
+        "bottom": 632.28125
+      },
+      "cell": {
+        "x": 54.03125,
+        "y": 326.34375,
+        "width": 43.65625,
+        "height": 43.65625,
+        "right": 97.6875,
+        "bottom": 370
+      },
+      "scrollWidth": 261,
+      "clientWidth": 261,
+      "scrollHeight": 520,
+      "clientHeight": 520,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "animations": 0
+    }
+  ],
+  "errors": []
+}

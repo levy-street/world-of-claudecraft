@@ -24,8 +24,10 @@
 export interface TrackerHeaderWiring {
   /** The header control's selector; the shared tracker chrome's by default. */
   header?: string;
-  /** Flip the tracker's persisted collapse (the desktop header action). */
-  toggle(): void;
+  /** Flip the tracker's persisted collapse (the desktop header action). The
+   *  activated header is handed over for a tracker with several section
+   *  headers (the quest tracker's Quests and World Quests). */
+  toggle(header: HTMLElement): void;
   /** Optional row controls inside the strip and what activating one does.
    *  Returns whether the row really acted: a row the callback declines (the
    *  quest tracker's title with no quest id) leaves the key to the game binds,
@@ -40,9 +42,10 @@ export interface TrackerHeaderWiring {
 /** The single activation path both arms share: header first, then a row.
  *  Returns false when the target was neither (the event is left alone). */
 function activate(target: HTMLElement, wiring: TrackerHeaderWiring): boolean {
-  if (target.closest(wiring.header ?? '.dt-header')) {
+  const header = target.closest<HTMLElement>(wiring.header ?? '.dt-header');
+  if (header) {
     if (wiring.openCompact && wiring.isCompact?.() === true) wiring.openCompact();
-    else wiring.toggle();
+    else wiring.toggle(header);
     return true;
   }
   const row = wiring.rows ? target.closest<HTMLElement>(wiring.rows.selector) : null;

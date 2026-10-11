@@ -1,5 +1,6 @@
 import { classifyGpuRenderer, isWeakIntegratedGpu } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
+import { type FrameHealthCadence, isBadFrameWindow } from './perf_frame_health_core';
 
 export type PerfSuggestionSeverity = 'info' | 'warning' | 'critical';
 
@@ -33,6 +34,8 @@ export interface PerfSuggestion {
 export interface PerfDoctorSnapshot {
   frameMs: { p95: number; long50: number };
   windows: { last10s: { frames: number; fps: number; frameMs: { p95: number; long50: number } } };
+  /** The chosen frame rate ceiling, when one paces the frames. */
+  cadence?: FrameHealthCadence | null;
   renderer: {
     tier: string;
     pixelRatio: number;
@@ -67,11 +70,6 @@ function lowGraphicsHref(search: string): string {
   return `${path}${qs ? `?${qs}` : ''}${hash}`;
 }
 
-function isBadFrameWindow(s: PerfDoctorSnapshot): boolean {
-  const w = s.windows.last10s;
-  return w.frames !== 0 && (w.fps < 45 || w.frameMs.p95 >= 28 || w.frameMs.long50 >= 3);
-}
-
 /**
  * An adapter name that classifies as an INTEGRATED part via gfx.ts's GPU
  * classification (ruling R15): the named mid-integrated families (Iris Xe,
@@ -95,7 +93,7 @@ export function analyzePerfSuggestions(
   env: { desktopShell: boolean } = { desktopShell: false },
 ): PerfSuggestion[] {
   const out: PerfSuggestion[] = [];
-  const badFrames = isBadFrameWindow(s);
+  const badFrames = isBadFrameWindow(s.windows.last10s, s.cadence);
   const renderer = s.renderer;
 
   if (renderer && isSoftwareRendererName(renderer.glRenderer)) {

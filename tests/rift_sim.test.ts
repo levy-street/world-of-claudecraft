@@ -77,6 +77,18 @@ describe('rift sim: dev portal + entry', () => {
     expect(portal?.riftBaseLevel).toBe(12);
   });
 
+  it('/dev portal rejects seeds outside the ordinary Rift namespace', () => {
+    const sim = makeSim();
+    sim.chat('/dev portal 2147483647 20', sim.player.id);
+    expect([...sim.entities.values()].some((e) => e.templateId === 'rift_portal')).toBe(false);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'error',
+        text: '[dev] Portal seed must be between 1 and 1000000000.',
+      }),
+    );
+  });
+
   // The rank letter IS the difficulty. It used to set only the badge while the
   // instance opened at the player's level (rank C at the cap), which silently
   // downgraded every ranked playtest. The letter now selects the canonical

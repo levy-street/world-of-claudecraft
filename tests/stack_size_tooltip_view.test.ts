@@ -136,6 +136,17 @@ describe('stackSizeTooltipLine', () => {
     );
   });
 
+  it('a LOCKED but uncharged payload keeps the line: it still shares the def cap', () => {
+    // Locking is one flag over the WHOLE counted stack (item_lock.ts
+    // setItemLocked), not a per-unit identity, so unlike the charge case
+    // above a locked stack really does share the def cap; hiding the line
+    // here would be the exact stale assumption the packing-core fix removed
+    // elsewhere (material_stack_packing.ts, bags.ts).
+    expect(stackSizeTooltipLine(ITEMS.minor_healing_potion, { locked: true })).toBe(
+      '<div class="tt-sub">Max stack: 20</div>',
+    );
+  });
+
   it('the five M16 non-Latin fills resolve through the live t() path', async () => {
     // One probe per required fill so a wrong overlay key path (which would
     // silently show English) goes red. Native punctuation is part of the
@@ -168,7 +179,7 @@ describe('stackSizeTooltipLine', () => {
       path.join(__dirname, '../src/ui/stack_size_tooltip_view.ts'),
       'utf8',
     ).replace(/^\s*\/\/.*$/gm, '');
-    expect(viewSrc).toContain('${esc(text)}');
+    expect(viewSrc).toContain('$' + '{esc(text)}');
   });
 
   it('Hud.itemTooltip composes the max-stack line (method-scoped source pin)', () => {

@@ -8,6 +8,8 @@ import {
   castHoldStep,
   desiredBaseState,
   drivesPose,
+  GAIT_WIND_DOWN_SETTLE,
+  gaitWindDownTimeScale,
   isSubmergedAtHeadHeight,
   isWadingAtDepth,
   locomotionTimeScale,
@@ -299,6 +301,84 @@ describe('locomotionTimeScale', () => {
   it('matches foot speed against the run reference, clamped', () => {
     expect(locomotionTimeScale('run', { speed: 7, backwards: false })).toBeCloseTo(1);
     expect(locomotionTimeScale('run', { speed: 99, backwards: false })).toBeCloseTo(1.6);
+  });
+
+  it('lets a rig raise the cadence ceilings past the stock clamp', () => {
+    // A mount travels at ONE fixed speed, so its time scale is a constant and
+    // the CEILING binds, not the reference: past that point lowering the ref
+    // changes nothing and the knob reads as dead. The Valestrider's real
+    // numbers, forward at RUN_SPEED 7 * 1.8 = 12.6 yd/s.
+    const fast = { speed: 12.6, backwards: false };
+    // stock ceiling: 12.6/7.64 and 12.6/7.16 both saturate to the same 1.6
+    expect(locomotionTimeScale('run', fast, undefined, 7.64)).toBeCloseTo(1.6);
+    expect(locomotionTimeScale('run', fast, undefined, 7.16)).toBeCloseTo(1.6);
+    // raised ceiling: the reference is live again and the two differ
+    expect(
+      locomotionTimeScale(
+        'run',
+        fast,
+        undefined,
+        7.64,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        2,
+      ),
+    ).toBeCloseTo(1.649);
+    expect(
+      locomotionTimeScale(
+        'run',
+        fast,
+        undefined,
+        7.16,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        2,
+      ),
+    ).toBeCloseTo(1.76);
+    // reverse: 12.6 * BACKPEDAL_MULT 0.65 = 8.19 against the walk band
+    expect(locomotionTimeScale('walkBack', { speed: 8.19, backwards: true }, 5.52)).toBeCloseTo(
+      1.484,
+    );
+    // a raised ceiling never LOWERS anything: below it, nothing changes
+    expect(
+      locomotionTimeScale(
+        'run',
+        { speed: 7, backwards: false },
+        undefined,
+        7,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        2,
+      ),
+    ).toBeCloseTo(1);
+  });
+
+  it('brakes an outgoing gait to a HOLD early in its crossfade', () => {
+    const fade = 0.22;
+    const brake = fade * GAIT_WIND_DOWN_SETTLE; // 0.044s
+    // Full cadence on the frame the fade starts, then straight down.
+    expect(gaitWindDownTimeScale(1.76, 0, fade)).toBeCloseTo(1.76);
+    expect(gaitWindDownTimeScale(1.76, brake / 2, fade)).toBeCloseTo(0.88);
+    // Frozen by the end of the brake, which is a fifth of the way in: the
+    // REST of the crossfade blends a still pose, so the legs return to idle
+    // from wherever they were instead of playing out the cycle.
+    expect(gaitWindDownTimeScale(1.76, brake, fade)).toBeCloseTo(0);
+    expect(gaitWindDownTimeScale(1.76, fade / 2, fade)).toBeCloseTo(0);
+    expect(gaitWindDownTimeScale(1.76, fade, fade)).toBeCloseTo(0);
+    // Never goes NEGATIVE however long the caller keeps ticking: a negative
+    // scale would run the outgoing clip backwards under the blend.
+    expect(gaitWindDownTimeScale(1.76, 99, fade)).toBe(0);
+    // A zero-length fade freezes immediately rather than dividing by zero.
+    expect(gaitWindDownTimeScale(1.2, 0, 0)).toBe(0);
+    // The brake is proportional to the cadence the clip was actually at, so a
+    // sprint and an amble both take the same TIME to stop.
+    expect(gaitWindDownTimeScale(0.6, brake / 2, fade)).toBeCloseTo(0.3);
   });
 
   it('returns null for every non-locomotion pose', () => {

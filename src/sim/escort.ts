@@ -25,7 +25,12 @@
 
 import { ESCORTS, MOBS, QUESTS } from './data';
 import { createMob } from './entity';
-import { emitMobYell } from './mob/yells';
+import {
+  emitEscortSpeech,
+  interruptEscortStory,
+  startEscortStory,
+  updateEscortStory,
+} from './escort_story';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { addThreat } from './threat';
@@ -96,6 +101,9 @@ function spawnEscortee(ctx: SimContext, def: EscortDef, state: EscortRunState): 
 // of world generation and draws no rng, so existing spawns stay byte-stable.
 export function initEscorts(ctx: SimContext): void {
   for (const def of Object.values(ESCORTS)) {
+    // A public caravan exists only while at least one player has entered its
+    // active world-quest area. updateEscorts materializes it on that tick.
+    if (def.worldQuestId !== undefined) continue;
     spawnEscortee(ctx, def, escortState(ctx, def.id));
   }
 }
@@ -126,7 +134,11 @@ export function tryStartEscort(ctx: SimContext, p: Entity, meta: PlayerMeta): bo
     if (d2 >= bestD2) continue;
     const def = ESCORTS[state.escortId];
     if (!def) continue;
-    if (meta.questLog.get(def.questId)?.state !== 'active') continue;
+    const active =
+      def.worldQuestId !== undefined
+        ? ctx.hasActiveWorldQuest(meta, def.worldQuestId)
+        : meta.questLog.get(def.questId)?.state === 'active';
+    if (!active) continue;
     best = { def, npc };
     bestD2 = d2;
   }
@@ -141,7 +153,8 @@ export function tryStartEscort(ctx: SimContext, p: Entity, meta: PlayerMeta): bo
     lastZ: best.npc.pos.z,
     stuckTicks: 0,
   };
-  emitMobYell(ctx, best.npc, best.def.startText);
+  startEscortStory(ctx, best.def, state.run);
+  emitEscortSpeech(ctx, best.def, best.npc, best.def.startText);
   return true;
 }
 
@@ -154,6 +167,7 @@ function fireAmbushes(ctx: SimContext, def: EscortDef, state: EscortRunState, np
     run.fired[a] = true;
     const template = MOBS[ambush.mobId];
     if (!template) continue;
+    interruptEscortStory(ctx, def, run, npc);
     const radius = ambush.radius ?? ESCORT_AMBUSH_RADIUS;
     for (let i = 0; i < ambush.count; i++) {
       // Evenly spaced ring, rng-free (see the header note on draw order).
@@ -162,7 +176,7 @@ function fireAmbushes(ctx: SimContext, def: EscortDef, state: EscortRunState, np
         npc.pos.x + Math.sin(angle) * radius,
         npc.pos.z + Math.cos(angle) * radius,
       );
-      const mob = createMob(ctx.nextId++, template, template.minLevel, pos);
+      const mob = createMob(ctx.nextId++, template, ambush.level ?? template.minLevel, pos);
       // A slain wave mob unravels once its corpse decays (the summoned-add arm
       // in mob/locomotion.ts) instead of riding the generic in-place respawn:
       // a wave that respawned 25s after being cut down would re-enter
@@ -233,7 +247,9 @@ function endRun(
   npc: Entity | null,
   outcome: 'success' | 'fail',
 ): void {
-  if (npc) emitMobYell(ctx, npc, outcome === 'success' ? def.successText : def.failText);
+  if (npc && (outcome !== 'success' || state.run?.story?.finaleAt === undefined)) {
+    emitEscortSpeech(ctx, def, npc, outcome === 'success' ? def.successText : def.failText);
+  }
   // Ambush mobs leave with the run, DEAD ONES INCLUDED (a failed wave never
   // lingers to camp the respawned escortee, and a slain one must not be left as
   // a permanent corpse now that it can no longer respawn away). Dropping by id
@@ -248,6 +264,14 @@ function endRun(
 }
 
 function creditEscort(ctx: SimContext, def: EscortDef, npc: Entity): void {
+  if (def.worldQuestId !== undefined) {
+    for (const meta of ctx.players.values()) {
+      const p = ctx.entities.get(meta.entityId);
+      if (!p || p.dead || dist2d(p.pos, npc.pos) > def.creditRadius) continue;
+      ctx.completeWorldQuestEscort(meta, def.worldQuestId, def.id, npc);
+    }
+    return;
+  }
   const quest = QUESTS[def.questId];
   if (!quest) return;
   const objectiveIndex = quest.objectives.findIndex(
@@ -280,9 +304,31 @@ function creditEscort(ctx: SimContext, def: EscortDef, npc: Entity): void {
 // Per-tick driver, called from the Sim tick body. Runs are rare and the def
 // set is small, so the whole pass is a few map lookups per tick.
 export function updateEscorts(ctx: SimContext): void {
-  for (const state of ctx.escortRuns.values()) {
-    const def = ESCORTS[state.escortId];
-    if (!def) continue;
+  for (const def of Object.values(ESCORTS)) {
+    const state = escortState(ctx, def.id);
+    if (def.worldQuestId !== undefined) {
+      const worldQuestId = def.worldQuestId;
+      const active = [...ctx.players.values()].some((meta) =>
+        ctx.hasActiveWorldQuest(meta, worldQuestId),
+      );
+      if (!active) {
+        if (state.run) {
+          endRun(
+            ctx,
+            def,
+            state,
+            state.npcId === null ? null : (ctx.entities.get(state.npcId) ?? null),
+            'fail',
+          );
+        } else if (state.npcId !== null) {
+          ctx.dropEntity(state.npcId);
+          state.npcId = null;
+          state.respawnAt = 0;
+        }
+        continue;
+      }
+      if (state.npcId === null && state.respawnAt === 0) spawnEscortee(ctx, def, state);
+    }
     if (state.npcId === null) {
       if (state.respawnAt > 0 && ctx.time >= state.respawnAt) spawnEscortee(ctx, def, state);
       continue;
@@ -311,6 +357,7 @@ export function updateEscorts(ctx: SimContext): void {
     // Past the last waypoint with every wave down (a final-waypoint ambush
     // resolves here on the tick after its wave dies): the escort succeeds.
     if (run.waypointIndex >= def.waypoints.length) {
+      if (!updateEscortStory(ctx, def, run, npc)) continue;
       creditEscort(ctx, def, npc);
       endRun(ctx, def, state, npc, 'success');
       continue;
@@ -330,6 +377,7 @@ export function updateEscorts(ctx: SimContext): void {
       run.waypointIndex++;
       continue;
     }
+    updateEscortStory(ctx, def, run, npc);
     ctx.moveToward(npc, ctx.groundPos(wp.x, wp.z), def.moveSpeed);
   }
 }

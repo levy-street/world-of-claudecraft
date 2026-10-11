@@ -75,9 +75,10 @@ describe('Soul Rend marker core', () => {
     expect(nythraxisSoulRendMarkOf(raider(1, 0, 0, true))?.remaining).toBe(6);
     expect(nythraxisSoulRendMarkOf(raider(1, 0, 0, false))).toBeNull();
     expect(nythraxisSoulRendMarkOf(raider(1, 0, 0, true, { dead: true }))).toBeNull();
-    // The aura id is the one the driver applies.
+    // The aura id is the one the driver applies (the shared sim constant).
+    expect(NYTHRAXIS_SOUL_REND_AURA_ID).toBe('nythraxis_soul_rend');
     expect(readSource('../src/sim/encounters/nythraxis.ts')).toContain(
-      `id: '${NYTHRAXIS_SOUL_REND_AURA_ID}'`,
+      'id: NYTHRAXIS_SOUL_REND_AURA_ID,',
     );
   });
 

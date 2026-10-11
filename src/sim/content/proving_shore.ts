@@ -56,6 +56,7 @@ export function isOnProvingShore(x: number, z: number): boolean {
 
 export const PROVING_SHORE_ZONE: ZoneDef = {
   id: 'proving_shore',
+  worldPvp: 'sanctuary',
   name: 'The Proving Shore',
   ...PROVING_SHORE_RECT,
   levelRange: [1, 2],

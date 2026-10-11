@@ -89,6 +89,7 @@ function setup() {
     join: vi.fn(() => session),
     drainBuddyGrants: vi.fn(async () => {}),
     clients: { size: 1 },
+    sim: { resetDay: '2026-09-24' },
     handleMessage: vi.fn(),
     leave: vi.fn(async () => {}),
     socketClosed: vi.fn(() => true),
@@ -137,6 +138,7 @@ function setup() {
     // meta. The default returns an empty grant so every existing case reaches game.join
     // unchanged; the stamp/resume branches are pinned in the bank-bonus block below.
     bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [] })),
+    guestPayoutsForCycle: vi.fn(async () => 0),
     isConnectionRefused: vi.fn(() => false),
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),
@@ -327,6 +329,8 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
 
   it.each([
     'auth-world',
+    'auth-world-42', // previous Farshore salvage layout and model mapping
+    'auth-world-43', // hull was still a collectible entity
     // one epoch AHEAD of the live discriminator, derived so a layout-version
     // bump can never turn this row into the current epoch by accident (the
     // hardcoded 'auth-world-21' row did exactly that when 20 became 21)
@@ -367,6 +371,16 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expect(resume.game.join).toHaveBeenCalledTimes(1);
     expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
     expect(resume.ws.send).not.toHaveBeenCalled();
+    expect(fresh.deps.guestPayoutsForCycle).toHaveBeenCalledTimes(1);
+    expect(resume.deps.guestPayoutsForCycle).not.toHaveBeenCalled();
+  });
+
+  it('passes the ledger guest usage into a fresh join before admission', async () => {
+    const { ws, game, deps, req } = setup();
+    vi.mocked(deps.guestPayoutsForCycle).mockResolvedValue(3);
+    await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(deps.guestPayoutsForCycle).toHaveBeenCalledWith(7, 'wq1_24');
+    expect(joinedMeta(game).vaultGuestUsage).toEqual({ cycle: 'wq1_24', payouts: 3 });
   });
 
   it('3. rejects a null account with "not authenticated"', async () => {

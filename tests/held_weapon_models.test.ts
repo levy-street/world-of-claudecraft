@@ -223,6 +223,10 @@ describe('held weapon models', () => {
       .map((item) => item.id)
       .sort();
     expect(unmapped).toEqual([
+      // The Buried Hoard held offhands (a chalice and a void orb, each in its three
+      // map-rarity tiers) are the orb class of gap: the shared art set has no
+      // chalice or orb model, so they need new art, not a table row.
+      'chalice_of_living_tides',
       // The two Crucible held offhands follow the wraithfire_orb precedent
       // (a held orb/censer with no dedicated GLB yet).
       'cinder_of_the_first_design',
@@ -250,8 +254,13 @@ describe('held weapon models', () => {
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',
+      'legendary_chalice_of_living_tides',
+      'legendary_orb_collapsing_void',
       'moggers_hide_quiver',
+      'orb_collapsing_void',
       'orb_of_the_last_spring',
+      'rare_chalice_of_living_tides',
+      'rare_orb_collapsing_void',
       'valefire_lantern',
       'wraithfire_orb',
     ]);

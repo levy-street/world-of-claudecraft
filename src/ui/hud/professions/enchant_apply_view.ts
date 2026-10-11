@@ -281,6 +281,8 @@ export function enchantTier(enchantId: string): EnchantTier {
  *  them. An unlisted slot sorts after every listed one. */
 const SLOT_SORT_ORDER: readonly string[] = [
   'mainhand',
+  // The off-hand etching (the Church Order quartermaster formula) sits with the weapon.
+  'offhand',
   'helmet',
   'neck',
   'shoulder',

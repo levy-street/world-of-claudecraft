@@ -1,8 +1,9 @@
 import type { InputTickFrame } from '../game/input_tick_sampler';
 import { type MovementWireClient, MovementWireGlue } from '../game/movement_wire_glue';
-import { stepPlayerMotion } from '../sim/player_motion';
-import type { Entity, MoveInput } from '../sim/types';
-import { createClientPlayerMotionDeps } from './client_player_motion';
+import type { DelveMotionState } from '../sim/delves/geometry';
+import { DT, type Entity, type FerryDeckMirror, type MoveInput } from '../sim/types';
+import { type ClientDelveMotionState, createClientPlayerMotionDeps } from './client_player_motion';
+import { createDeckAwareStep } from './deck_prediction';
 import {
   copyMotionState,
   type MotionState,
@@ -22,6 +23,11 @@ export interface SelfPredictionWire extends MovementWireClient {
   reconOverrideEpoch: number;
   reconOverrideActive: boolean;
   reconMoveSpeedMult: number;
+  /** The acknowledged pose in a sailing ship's frame, when aboard one. */
+  reconDeck?: FerryDeckMirror | null;
+  /** The ferry timetable at the newest snapshot (IWorld.ferryView): its
+   *  schedule clock times the deck-aware prediction. */
+  ferryView?(): { clock: number } | null;
   netPipeline(): {
     noteReconcileOutcome(outcome: 'match' | 'replayed' | 'ignore' | 'stale' | 'suspend'): void;
   };
@@ -37,14 +43,17 @@ function hasAuthoritativePose(wire: SelfPredictionWire): boolean {
 }
 
 function motionState(self: Entity, wire: SelfPredictionWire): MotionState {
-  const x = wire.reconAuthoritativeX ?? self.pos.x;
-  const y = wire.reconAuthoritativeY ?? self.pos.y;
-  const z = wire.reconAuthoritativeZ ?? self.pos.z;
+  // aboard a sailing ship the prediction starts in its frame (deck_prediction.ts)
+  const deck = wire.reconDeck ?? null;
+  const x = deck ? deck.x : (wire.reconAuthoritativeX ?? self.pos.x);
+  const y = deck ? deck.y : (wire.reconAuthoritativeY ?? self.pos.y);
+  const z = deck ? deck.z : (wire.reconAuthoritativeZ ?? self.pos.z);
   return {
+    deck: deck ? deck.route : null,
     id: self.id,
     pos: { x, y, z },
     prevPos: { x, y, z },
-    facing: wire.reconAuthoritativeFacing ?? self.facing,
+    facing: deck ? deck.f : (wire.reconAuthoritativeFacing ?? self.facing),
     vx: 0,
     vy: 0,
     vz: 0,
@@ -82,15 +91,22 @@ export class MovementPredictionPipeline {
   private wire: SelfPredictionWire | null = null;
   private self: Entity | null = null;
   private enabled = false;
+  private delve: DelveMotionState = { delveRun: null, delveSolids: [] };
   private predicted: MotionState | null = null;
   private lastEpoch: number | null = null;
   private lastAckClientTick = -1;
   private lastPredictedClientTick = -1;
   private pendingResidual: ReconciledSelfPrediction['residual'] = null;
+  // The schedule clock of the snapshot that carried the newest acknowledged
+  // client tick: the deck-aware step estimates the server tick (and so the
+  // ship's pose) each predicted frame will be consumed at from it.
+  private ackClock: number | null = null;
+  private ackCt = -1;
   private readonly displayOutput: ReconciledSelfPrediction = {
     kind: 'reconciled',
     position: { x: 0, y: 0, z: 0 },
     residual: null,
+    deck: null,
   };
 
   constructor(seed: number, riftCollisionToken = 0) {
@@ -98,8 +114,10 @@ export class MovementPredictionPipeline {
       seed,
       () => this.wire?.reconMoveSpeedMult ?? 1,
       riftCollisionToken,
+      (): ClientDelveMotionState | null =>
+        this.delve.delveRun ? { run: this.delve.delveRun, solids: this.delve.delveSolids } : null,
     );
-    this.stepFn = (state, frame) => stepPlayerMotion(deps, state as Entity, frame.mi);
+    this.stepFn = createDeckAwareStep(deps, (ct) => this.clockFor(ct));
     this.wireGlue.onFrame = (frame) => this.predictFrame(frame);
     this.wireGlue.onNegotiated = () => this.reset();
   }
@@ -116,10 +134,16 @@ export class MovementPredictionPipeline {
     this.wireGlue.resume();
   }
 
-  prepare(client: SelfPredictionWire, self: Entity, enabled: boolean): void {
+  prepare(
+    client: SelfPredictionWire,
+    self: Entity,
+    enabled: boolean,
+    delve: DelveMotionState = { delveRun: null, delveSolids: [] },
+  ): void {
     this.wire = client;
     this.self = self;
     this.enabled = enabled;
+    this.delve = delve;
   }
 
   advance(
@@ -150,16 +174,22 @@ export class MovementPredictionPipeline {
       return null;
     }
     if (wire.reconAckClientTick !== this.lastAckClientTick && wire.reconAckClientTick >= 0) {
+      this.ackCt = wire.reconAckClientTick;
+      this.ackClock = wire.ferryView?.()?.clock ?? null;
       const acknowledgedPrediction = this.ring.find(wire.reconAckClientTick);
+      const deck = wire.reconDeck ?? null;
       const result = reconcile(
         this.ring,
         wire.reconAckClientTick,
-        {
-          x: wire.reconAuthoritativeX as number,
-          y: wire.reconAuthoritativeY as number,
-          z: wire.reconAuthoritativeZ as number,
-          facing: wire.reconAuthoritativeFacing as number,
-        },
+        deck
+          ? { x: deck.x, y: deck.y, z: deck.z, facing: deck.f, deck: deck.route }
+          : {
+              x: wire.reconAuthoritativeX as number,
+              y: wire.reconAuthoritativeY as number,
+              z: wire.reconAuthoritativeZ as number,
+              facing: wire.reconAuthoritativeFacing as number,
+              deck: null,
+            },
         wire.reconOverrideEpoch,
         this.lastEpoch,
         this.stepFn,
@@ -189,8 +219,16 @@ export class MovementPredictionPipeline {
     output.position.z =
       this.predicted.prevPos.z + (this.predicted.pos.z - this.predicted.prevPos.z) * alpha;
     output.residual = this.pendingResidual;
+    output.deck = this.predicted.deck ?? null;
     this.pendingResidual = null;
     return output;
+  }
+
+  /** The schedule clock the server most likely consumes client tick `ct` at. */
+  private clockFor(ct: number): number {
+    const wire = this.wire;
+    if (this.ackClock !== null && this.ackCt >= 0) return this.ackClock + (ct - this.ackCt) * DT;
+    return wire?.ferryView?.()?.clock ?? 0;
   }
 
   private predictFrame(frame: InputTickFrame): void {
@@ -229,5 +267,7 @@ export class MovementPredictionPipeline {
     this.resetPrediction();
     this.lastEpoch = null;
     this.lastAckClientTick = -1;
+    this.ackClock = null;
+    this.ackCt = -1;
   }
 }

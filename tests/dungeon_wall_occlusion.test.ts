@@ -10,6 +10,7 @@ import {
   type WallHideable,
   type WallPropBinding,
 } from '../src/render/dungeon_wall_occlusion';
+import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { occluderFadeMat, occluderFadeReady } from '../src/render/occluder_fade';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
@@ -22,6 +23,10 @@ import {
   occluderGhostVariantKey,
 } from '../src/render/occluder_ghost_variant_key';
 import { IGNIVAR_LAYOUT, SANCTUM_LAYOUT } from '../src/sim/dungeon_layout';
+
+// This suite pins the BLENDED camera ghost (the transparent flip and its gate);
+// the dithered arm is pinned by tests/occluder_dither_fade.test.ts.
+beforeEach(() => setDitherFadeEnabledForTest(false));
 
 const DT = 1 / 60;
 

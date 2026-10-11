@@ -538,7 +538,7 @@ export function maybeSyncCuratorRankDeeds(
  * @returns true when a new firstFind entry was written.
  */
 export function noteRelicItemFind(
-  meta: PlayerMeta,
+  meta: Pick<PlayerMeta, 'deedStats' | 'delveClears' | 'reliquary'>,
   itemId: string,
   opts?: Readonly<{ retro?: boolean; movement?: boolean }>,
 ): boolean {
@@ -596,7 +596,11 @@ export function noteRelicItemFind(
  * Deliberately quiet: no event, no recent push, no saveCharacter, no rank
  * sync. The tally rides the sparse blob's 30s autosave like the rest.
  */
-export function noteRelicObtain(meta: PlayerMeta, itemId: string, copies = 1): void {
+export function noteRelicObtain(
+  meta: Pick<PlayerMeta, 'reliquary'>,
+  itemId: string,
+  copies = 1,
+): void {
   if (!(copies >= 1)) return;
   const state = meta.reliquary;
   const units = Math.floor(copies);
@@ -630,7 +634,8 @@ export function noteRelicObtain(meta: PlayerMeta, itemId: string, copies = 1): v
       if (state.firstFind[id] === undefined) state.firstFind[id] = {};
       wrote = true;
     }
-    id = def.heroicOf;
+    // A relicOf tier (content/hoard_loot.ts) tallies on its piece the same way.
+    id = def.heroicOf ?? def.relicOf;
   }
   if (wrote) bumpReliquaryWireRev(state);
 }

@@ -31,7 +31,7 @@ describe('i18n Translation Foundation', () => {
     expect(t('highscores.title')).toBe('High Scores Leaderboard');
     expect(t('wiki.title')).toBe('Game Wiki & Guide');
     expect(t('news.title')).toBe('News & Updates');
-    expect(t('download.title')).toBe('Download Desktop Launcher');
+    expect(t('download.title')).toBe('Download the desktop app');
     expect(t('game.talents.comingSoonTitle')).toBe('Talents coming soon');
     expect(t('game.talents.comingSoonBody')).toContain('does not have talent trees yet');
   });
@@ -54,7 +54,7 @@ describe('i18n Translation Foundation', () => {
     expect(t('highscores.title')).toBe('Clasificaciones de Puntuación');
     expect(t('wiki.title')).toBe('Wiki y Guía del Juego');
     expect(t('news.title')).toBe('Noticias y Actualizaciones');
-    expect(t('download.title')).toBe('Descargar Lanzador de Escritorio');
+    expect(t('download.title')).toBe('Descarga la app de escritorio');
   });
 
   it('supports and retrieves translations for all newly added locales', async () => {

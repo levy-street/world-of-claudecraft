@@ -1,0 +1,47 @@
+{
+  "results": [
+    {
+      "name": "jewels",
+      "blend": "normal",
+      "opacity": "1",
+      "pointerEvents": "none",
+      "hidden": "true",
+      "comparisons": [
+        {
+          "blend": "normal",
+          "count": 45179,
+          "changed": 0,
+          "maxDelta": 0
+        },
+        {
+          "blend": "screen",
+          "count": 45179,
+          "changed": 45133,
+          "maxDelta": 255
+        }
+      ]
+    },
+    {
+      "name": "lock",
+      "blend": "normal",
+      "opacity": "1",
+      "pointerEvents": "none",
+      "hidden": "true",
+      "comparisons": [
+        {
+          "blend": "normal",
+          "count": 55829,
+          "changed": 0,
+          "maxDelta": 0
+        },
+        {
+          "blend": "screen",
+          "count": 55829,
+          "changed": 55827,
+          "maxDelta": 255
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

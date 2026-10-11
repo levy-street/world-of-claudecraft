@@ -256,11 +256,29 @@ describe('craftIdsForMaterialItem', () => {
   it('a fine grade inherits its base consumers and keeps fine-only crafts', () => {
     // fine_iron_ore is a tool-recipe reagent (engineering) and stands in for
     // iron_ore (jewelcrafting + weaponcrafting + armorcrafting since the
-    // Masterwrought phase 05 catalog's rung-25 recipes).
+    // Masterwrought phase 05 catalog's rung-25 recipes). Since the
+    // 2026-09-28 release/v0.44.0 merge into feature/buried-hoards, iron_ore
+    // also feeds three FACTION_REWARD_RECIPES rows: engineering
+    // (schematic_clockwork_shock_bomb), leatherworking
+    // (pattern_reinforced_armor_kit) and weaponcrafting
+    // (plans_dense_sharpening_stone), so the base gains engineering and
+    // leatherworking and the fine grade gains leatherworking.
     const fine = craftIdsForMaterialItem('fine_iron_ore');
     const base = craftIdsForMaterialItem('iron_ore');
-    expect(base).toEqual(['jewelcrafting', 'weaponcrafting', 'armorcrafting']);
-    expect(fine).toEqual(['engineering', 'jewelcrafting', 'weaponcrafting', 'armorcrafting']);
+    expect(base).toEqual([
+      'engineering',
+      'leatherworking',
+      'jewelcrafting',
+      'weaponcrafting',
+      'armorcrafting',
+    ]);
+    expect(fine).toEqual([
+      'engineering',
+      'leatherworking',
+      'jewelcrafting',
+      'weaponcrafting',
+      'armorcrafting',
+    ]);
     for (const craftId of base) {
       expect(fine, `fine inherits ${craftId}`).toContain(craftId);
     }

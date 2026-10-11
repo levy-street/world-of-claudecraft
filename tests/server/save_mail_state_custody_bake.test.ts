@@ -37,7 +37,7 @@ vi.mock('pg', () => {
     }
     async query(text: string, values?: readonly unknown[]) {
       rec.poolDirect.push({ text, values });
-      return { rows: [], rowCount: 0 };
+      return { rows: [], rowCount: text.includes('INSERT INTO mail_custody_parcels') ? 1 : 0 };
     }
     on() {
       return this;

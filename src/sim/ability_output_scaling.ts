@@ -2,11 +2,14 @@
 import { DIRGE_ABILITY_ID } from './combat/priest/dirge_refresh';
 import { VESPERS_DOT_DAMAGE_MULT } from './combat/priest/vespers';
 import type { TalentModifiers } from './content/talents';
+import { dawnreaverDamageMultiplier } from './dawnreaver_damage';
 import { primaryHealingMultiplier } from './spec_output_tuning';
 import { resolveTalentHitMult } from './talent_hit_mult';
 import type { AbilityDef, PlayerClass } from './types';
 
 export interface AbilityOutputScaling {
+  /** Complete primary-hit factor; copied damage such as Dawn Echo inherits it once. */
+  primaryDamage?: number;
   /** Direct damage power rider. */
   damage: number;
   /** Direct healing power rider. */
@@ -32,6 +35,7 @@ export function buildAbilityOutputScaling(
       ? VESPERS_DOT_DAMAGE_MULT
       : 1;
   return {
+    primaryDamage: dawnreaverDamageMultiplier(cls, mods.spec, ability.id),
     damage: hit.dmgMult,
     healing: hit.healMult,
     dot: hit.dmgMult * (1 + mods.global.dotDmgPct) * vespersDirgeSp,

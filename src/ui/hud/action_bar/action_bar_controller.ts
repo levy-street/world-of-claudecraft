@@ -1,3 +1,6 @@
+import { DRUID_FORM_ENTRY } from '../../../sim/combat/druid_form_entry';
+import { NATURES_BOON_ABILITIES } from '../../../sim/combat/druid_natures_boon';
+import { abilityBelongsToForm, hasFormRequirement } from '../../../sim/combat/form_requirement';
 import { classTalentChoiceAbilityGroups } from '../../../sim/content/talents';
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
@@ -42,12 +45,27 @@ import {
   ownedDruidFormDefaultAbilityIds,
   shouldSeedOwnedSpecDefault,
 } from './owned_class_spec_defaults';
+import { isUsableTrinketId } from './trinket_slot_core';
 
 export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
 export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth';
 
 const FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']);
+// Buttons that seed onto EVERY form kit bar:
+//   - the three form toggles,
+//   - the form-entry buttons (Stalk, Lunge, Bruin Rush), which since v0.43
+//     enter their form from any form and so are reachable (and wanted) on
+//     every form bar, even though none of them is a toggle,
+//   - the two spells an armed Nature's Boon pays for (sim/combat/
+//     druid_natures_boon.ts). The window's whole point is that they are
+//     castable without leaving the form, which is unreachable on a default
+//     bar if the form kit never seeds a button for them.
+const FORM_BAR_ALWAYS_IDS = new Set([
+  ...FORM_TOGGLE_IDS,
+  ...Object.keys(DRUID_FORM_ENTRY),
+  ...NATURES_BOON_ABILITIES,
+]);
 
 export interface ActionBarControllerDeps {
   storage: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
@@ -58,6 +76,8 @@ export interface ActionBarControllerDeps {
   knownAbilityIds(): readonly string[];
   hasAura(kind: string): boolean;
   showAttackButton(): boolean;
+  // A broader owner-presentation hold, including the first snapshot after reconnect.
+  readOnly?(): boolean;
   // The input-surface profile this controller arranges (the desktop keyboard
   // row or the touch ring), read LIVE like every sibling dep because the
   // Interface Mode setting can flip the surface mid-session (syncProfile follows
@@ -71,6 +91,16 @@ export interface ActionBarControllerDeps {
   // save. Optional so an offline/test controller with no server persistence just
   // skips it and keeps its byte-identical localStorage behavior.
   persistLayout?(profile: ActionBarLayoutProfile, layout: ActionBarLayout): void;
+  // True while this session views ANOTHER character (a moderator's /spectate):
+  // the live deps above (spec, level, known abilities) then describe the
+  // watched character, not the owner of this bar. Every per-frame sync AND every
+  // user-driven mutator (drop, spellbook add/remove, reset, loadout apply, the
+  // saves behind them) freezes until the view returns, so a foreign kit never
+  // prunes, re-seeds, or uploads the moderator's own layout. The ClientWorld
+  // holds the flag through the exit frame until its own presentation is
+  // rebuilt, so "not spectating" always means the deps describe this bar's
+  // owner. Absent means never spectating (offline, tests).
+  spectating?(): boolean;
 }
 
 /** Owns action-bar pages, migrations, persistence, and attack-slot assignment. */
@@ -109,6 +139,14 @@ export class ActionBarController {
   private unsavedChanges = false;
 
   constructor(private readonly deps: ActionBarControllerDeps) {
+    // A reconnect can be read-only after the spectate label has cleared.
+    // Compose both live signals without changing the caller's dependency bag.
+    if (deps.readOnly) {
+      this.deps = {
+        ...deps,
+        spectating: () => deps.readOnly?.() === true || deps.spectating?.() === true,
+      };
+    }
     this.activeProfile = this.resolveProfile();
     this.activeSpecState = this.deps.talentSpec();
   }
@@ -202,6 +240,7 @@ export class ActionBarController {
    *  the bar in view, never uploaded (the "follow until edited" rule). Later
    *  activations reload the profile's own keys. Returns true on a switch. */
   syncProfile(): boolean {
+    if (this.isSpectating()) return false;
     const next = this.resolveProfile();
     if (next === this.activeProfile) return false;
     // Flush the outgoing profile to storage, as a form swap does, so an
@@ -249,6 +288,7 @@ export class ActionBarController {
   }
 
   replaceActions(actions: HotbarAction[]): void {
+    if (this.isSpectating()) return;
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
     this.unsavedChanges = true;
   }
@@ -257,6 +297,7 @@ export class ActionBarController {
     actions: HotbarAction[],
     targetKnownAbilityIds: ReadonlySet<string>,
   ): void {
+    if (this.isSpectating()) return;
     this.activeSpecState = this.deps.talentSpec();
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
     this.unsavedChanges = true;
@@ -272,6 +313,7 @@ export class ActionBarController {
   }
 
   replaceAttackAction(action: HotbarAction): void {
+    if (this.isSpectating()) return;
     this.attackActionState = sanitizeHotbarAction(action, (id) =>
       this.isAbilityPlacementAllowed(id),
     );
@@ -291,6 +333,7 @@ export class ActionBarController {
   }
 
   syncActiveForm(): boolean {
+    if (this.isSpectating()) return false;
     const next = this.resolveActiveForm();
     if (next === this.activeFormState) return false;
     this.saveActions();
@@ -306,6 +349,7 @@ export class ActionBarController {
   }
 
   syncSpec(): boolean {
+    if (this.isSpectating()) return false;
     const next = this.deps.talentSpec();
     if (next === this.activeSpecState) return false;
     this.saveActions();
@@ -318,6 +362,7 @@ export class ActionBarController {
   }
 
   syncKnownAbilities(): void {
+    if (this.isSpectating()) return;
     const liveKnownAbilityIds = [...this.deps.knownAbilityIds()];
     if (
       this.pendingLoadoutKnownAbilityIds &&
@@ -382,6 +427,10 @@ export class ActionBarController {
     this.playerLevelAtLastSync = playerLevel;
   }
 
+  private isSpectating(): boolean {
+    return this.deps.spectating?.() === true;
+  }
+
   private trySeedOwnedSpecDefault(
     knownAbilityIds: readonly string[],
     talentSpec: string | null,
@@ -425,6 +474,7 @@ export class ActionBarController {
   }
 
   addAbility(abilityId: string): boolean {
+    if (this.isSpectating()) return false;
     // A passive is never castable: reject a manual drag/spellbook add so it
     // cannot occupy a dead action slot (auto-place already skips passives).
     if (!this.isAbilityPlacementAllowed(abilityId)) return false;
@@ -443,6 +493,7 @@ export class ActionBarController {
   }
 
   removeAbility(abilityId: string): boolean {
+    if (this.isSpectating()) return false;
     const target = this.actionState.findIndex(
       (action) => action?.type === 'ability' && action.id === abilityId,
     );
@@ -453,6 +504,7 @@ export class ActionBarController {
   }
 
   resetActiveBar(): void {
+    if (this.isSpectating()) return;
     const knownAbilityIds = [...this.deps.knownAbilityIds()];
     const ownedSpecDefault =
       this.activeFormState === 'normal'
@@ -500,8 +552,11 @@ export class ActionBarController {
     // Elixirs: same useItem dispatch (kind 'elixir' -> applyAura), usable in
     // combat with no shared potion cooldown, so they are placeable exactly
     // like a potion; the view paints no cooldown swipe on their slot.
+    // Trinkets with a use effect: pressed through the same useItem, which uses
+    // the WORN copy (the slot state reads the equipment, trinket_slot_core.ts).
     const item = ITEMS[itemId];
     return (
+      isUsableTrinketId(itemId) ||
       item?.kind === 'food' ||
       item?.kind === 'drink' ||
       item?.kind === 'potion' ||
@@ -545,12 +600,14 @@ export class ActionBarController {
   }
 
   saveActions(): void {
+    if (this.isSpectating()) return;
     this.writeActions();
     this.persist();
     this.unsavedChanges = false;
   }
 
   saveAttackAction(): void {
+    if (this.isSpectating()) return;
     this.writeAttackAction();
     this.persist();
     this.unsavedChanges = false;
@@ -593,10 +650,11 @@ export class ActionBarController {
     // Passives never castable: keep them off every seeded/form kit bar too.
     if (!this.isAbilityPlacementAllowed(id)) return false;
     if (this.isStealthForm(form)) return false;
+    const def = ABILITIES[id];
     if (form === 'bear' || form === 'cat') {
-      return ABILITIES[id]?.requiresForm === form || FORM_TOGGLE_IDS.has(id);
+      return (def !== undefined && abilityBelongsToForm(def, form)) || FORM_BAR_ALWAYS_IDS.has(id);
     }
-    return !ABILITIES[id]?.requiresForm;
+    return def === undefined || !hasFormRequirement(def);
   }
 
   private isFormKitBar(form: HotbarForm = this.activeFormState): boolean {

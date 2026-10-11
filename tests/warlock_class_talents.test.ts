@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { castAbility, updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { dealDamage } from '../src/sim/combat/damage';
 import { gainRuin, spendRuin } from '../src/sim/combat/destruction';
 import { consumeFreeCostFor } from '../src/sim/combat/empower_next';
@@ -7,6 +8,7 @@ import { canUseForbiddenReflection } from '../src/sim/combat/warlock_talents';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
 
@@ -104,6 +106,37 @@ describe('warlock class talent tree', () => {
         stacks: 1,
       });
     }
+  });
+
+  it('does not aggro an idle mob until a Leaden Hex-triggering bolt actually lands', () => {
+    const { sim, player } = rig({ 8: 'wlk_r8_curse_of_exhaustion' });
+    const target = addTarget(sim, 6);
+    const meta = sim.players.get(player.id);
+    if (!meta) throw new Error('missing player meta');
+    expect(target.aiState).toBe('idle');
+
+    // Drive the cast directly through castAbility/updateCasting (not sim.tick()) so
+    // this stays isolated from the rest of the live world simulation, matching the
+    // pattern in tests/spell_resist.test.ts.
+    castAbility(ctxOf(sim), 'shadow_bolt', player.id);
+    let guard = 0;
+    while (player.castingAbility && guard++ < 1000) updateCasting(ctxOf(sim), player, meta);
+
+    // The cast has completed: Leaden Hex's slow applies immediately (by design), but
+    // shadow_bolt fires a homing projectile, so the bolt is still in flight here. The
+    // mob must not have been pulled into combat yet.
+    expect(target.auras.some((aura) => aura.id === 'wlk_leaden_hex_slow')).toBe(true);
+    expect(target.aiState).toBe('idle');
+    expect(target.inCombat).toBe(false);
+    expect(player.inCombat).toBe(false);
+
+    for (let i = 0; i < 200 && ctxOf(sim).pendingProjectiles.length > 0; i++) {
+      advancePendingProjectiles(ctxOf(sim));
+    }
+
+    // Once the bolt actually lands, the hit resolves normally and engages combat.
+    expect(target.inCombat).toBe(true);
+    expect(target.aiState).not.toBe('idle');
   });
 
   it('keeps the class interrupt and grants its level 8 control version', () => {

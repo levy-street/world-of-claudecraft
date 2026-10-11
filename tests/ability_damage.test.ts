@@ -20,6 +20,7 @@ import {
   type AbilityScaling,
   abilityBuffValue,
   abilityDamageBonus,
+  abilityPrimaryHealingTotal,
   abilityTemporalHourglassValues,
   auraBuffDisplayValue,
 } from '../src/ui/ability_damage';
@@ -62,6 +63,64 @@ const PROT_MODS = computeTalentModifiers('warrior', {
 } as never);
 
 describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
+  it('shows the one-stack Choirmend bonus when the online snapshot omits stacks', () => {
+    const res = known('priest', 'prayer_of_healing', { ...emptyModifiers(), spec: 'holy' });
+    const eff = required(res.effects.find((effect) => effect.type === 'aoeHeal'));
+    if (eff.type !== 'aoeHeal') throw new Error('expected group heal');
+    const online = { ...SC, auras: [{ id: 'priest_benison_prayers', remaining: 0 }] };
+    const offline = { ...SC, auras: [{ id: 'priest_benison_prayers', stacks: 1, remaining: 0 }] };
+    const bonus = abilityDamageBonus(res, eff, online);
+    expect(abilityPrimaryHealingTotal(res, eff, online)).toEqual({
+      min: Math.round((eff.min + bonus) * 1.1),
+      max: Math.round((eff.max + bonus) * 1.1),
+    });
+    expect(abilityEffectText(res, online)).toBe(abilityEffectText(res, offline));
+  });
+
+  it.each([0, 200])(
+    'includes Dawnweave in the complete heal preview at %i healing power',
+    (healPower) => {
+      const auras = [
+        { id: 'priest_benison_prayers', stacks: 3, remaining: 0 },
+        { id: 'priest_benison_whisper', remaining: 60 },
+      ];
+      const scaling = { ...SC, healPower, auras };
+      for (const [id, factor] of [
+        ['prayer_of_healing', 1.3],
+        ['lesser_heal', 2],
+      ] as const) {
+        const res = known('priest', id, { ...emptyModifiers(), spec: 'holy' });
+        const eff = required(
+          res.effects.find((effect) => effect.type === 'heal' || effect.type === 'aoeHeal'),
+        );
+        if (eff.type !== 'heal' && eff.type !== 'aoeHeal') throw new Error('expected direct heal');
+        const bonus = abilityDamageBonus(res, eff, scaling);
+        expect(abilityPrimaryHealingTotal(res, eff, scaling)).toEqual({
+          min: Math.round(
+            Math.round((eff.min + bonus) * factor) * (res.outputScaling?.primaryHealing ?? 1),
+          ),
+          max: Math.round(
+            Math.round((eff.max + bonus) * factor) * (res.outputScaling?.primaryHealing ?? 1),
+          ),
+        });
+      }
+      const unempowered = known('priest', 'heal');
+      const eff = required(unempowered.effects.find((effect) => effect.type === 'heal'));
+      expect(abilityPrimaryHealingTotal(unempowered, eff, scaling)).toBeNull();
+      const whisper = known('priest', 'lesser_heal');
+      expect(
+        abilityPrimaryHealingTotal(
+          whisper,
+          required(whisper.effects.find((effect) => effect.type === 'heal')),
+          {
+            ...scaling,
+            auras: [{ id: 'priest_benison_whisper', remaining: 0 }],
+          },
+        ),
+      ).toBeNull();
+    },
+  );
+
   it('shows Hexcraft-resolved Litany of Guilt damage at every rank', () => {
     // Authored 5/9/14 through the 10% Hexcraft mastery plus the 2026-08-23
     // viability floor's affliction spellDmgPct 0.07.

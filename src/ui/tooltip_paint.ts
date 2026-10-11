@@ -10,9 +10,11 @@
 // box; see that module's header for why one cap serves both paths.
 import {
   mobTooltipCornerPlacement,
+  type TooltipAnchorRect,
   type TooltipViewport,
   tooltipMaxHeight,
   tooltipPlacementAt,
+  unitTooltipAnchorPlacement,
 } from './tooltip_clamp_core';
 
 // Narrowed to what this module actually touches (mirrors touch_tap.ts's
@@ -49,18 +51,29 @@ export function paintTooltipAt(
   return box;
 }
 
+// `readAnchor` reads the movable Tooltip frame's seat (desktop only): when it
+// yields a rect the card grows from it (unitTooltipAnchorPlacement); the touch
+// minimap slot always wins, and no seat at all falls back to the fixed corner.
+// It is a READER, called only after the one box measure below, so the seat's
+// rect comes off the layout that measure already settled instead of forcing a
+// second one ahead of the content write.
 export function paintMobTooltipBottomRight(
   tooltipEl: TooltipPaintTarget,
   html: string,
   viewport: TooltipViewport,
   minimapRect: { left: number; top: number } | null,
+  readAnchor: (() => TooltipAnchorRect | null) | null = null,
 ): void {
   tooltipEl.classList.add('mob-tooltip');
   tooltipEl.innerHTML = html;
   tooltipEl.style.display = 'block';
   tooltipEl.style.maxHeight = `${tooltipMaxHeight(viewport)}px`;
   const box = { w: tooltipEl.offsetWidth, h: tooltipEl.offsetHeight };
-  const at = mobTooltipCornerPlacement(box, viewport, minimapRect);
+  const anchorRect = minimapRect === null && readAnchor !== null ? readAnchor() : null;
+  const at =
+    anchorRect !== null
+      ? unitTooltipAnchorPlacement(box, viewport, anchorRect)
+      : mobTooltipCornerPlacement(box, viewport, minimapRect);
   tooltipEl.style.left = `${at.left}px`;
   tooltipEl.style.top = `${at.top}px`;
 }

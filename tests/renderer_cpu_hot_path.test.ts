@@ -63,11 +63,37 @@ describe('renderer CPU hot path', () => {
     expect(renderer).toContain('this.nameplatePainter.remove(id);');
   });
 
-  it('manually updates the camera once on ordinary frames', () => {
+  it('manually updates the camera once on ordinary frames, and un-shakes the frozen matrix after a shifted draw', () => {
     expect(renderer).toContain('this.camera.matrixWorldAutoUpdate = false');
-    expect(renderer).toContain(
-      'if (shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera)',
+    expect(renderer).toContain('const warriorShifted = this.warriorCameraImpact.beginDraw(');
+    expect(renderer).toContain('this.warriorCameraImpact.endDraw(this.camera);');
+    // The pre-draw refresh bakes the shaken/shifted offset into the frozen
+    // camera's matrixWorld for the draw; endDraw then reverts camera.position
+    // without touching matrixWorld, so a POST-endDraw refresh under the same
+    // guard is what stops anything reading matrixWorld before the next
+    // frame's beginDraw (offline pose extrapolation, aim) from seeing the
+    // draw-only offset. Both refreshes reuse the SAME frame-local booleans,
+    // so an ordinary shake- and impact-free frame still pays for neither.
+    const guard =
+      'if (warriorShifted || shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera);';
+    const guardMatches = renderer.match(
+      new RegExp(guard.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
     );
+    expect(guardMatches).toHaveLength(2);
+    const endDrawStatement = 'this.warriorCameraImpact.endDraw(this.camera);';
+    const endDrawIndex = renderer.indexOf(endDrawStatement);
+    expect(endDrawIndex).toBeGreaterThan(-1);
+    const guardAfterEndDraw = renderer.indexOf(guard, endDrawIndex);
+    expect(guardAfterEndDraw).toBeGreaterThan(endDrawIndex);
+    // Nothing but comments between them: the post-draw refresh is the very
+    // next STATEMENT after endDraw, not merely somewhere later in the frame.
+    const between = renderer.slice(endDrawIndex + endDrawStatement.length, guardAfterEndDraw);
+    expect(
+      between
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0 && !line.startsWith('//')),
+    ).toEqual([]);
   });
 
   it('preserves completed submit and total timings through the reused frame-start buffers', () => {

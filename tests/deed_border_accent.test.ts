@@ -1143,11 +1143,21 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     }
     // 96 -> 97: the target frame's raid-marker badge (.uf-raid-marker) scales its
     // drop-shadow bloom by the tier token; the symbol itself renders at every tier.
+    // 97 -> 101: Nature's Boon's golden action rim adds two glow composites in
+    // tokens.css (--glow-action-natures-boon and its -strong pulse frame), two
+    // tier-scaled blur radii each. Only the decorative BLUR rides the tier; the
+    // rim colour and the inset border do not, so the proc stays equally
+    // readable at every preset (the fairness rule the loop above enforces).
     expect(
       allTierShadowDeclarations,
-      // Shipped uses plus the two library glow composites in tokens.css.
-      'the style graph owns 97 reviewed tier-shadow uses',
-    ).toHaveLength(97);
+      // Shipped uses plus the four library glow composites in tokens.css. The
+      // weekly vault opening (components.css, weekly rewards) owns its halo,
+      // ring, streak, star and wide-ray blooms here, all box-shadow or
+      // drop-shadow scaled by the tier, never a blur. Base 97; the release's
+      // two extra library composites (+4) and the world-quests branch's vault
+      // blooms (+11) compose to 112 at the release/v0.44.0 base merge.
+      'the style graph owns 112 reviewed tier-shadow uses',
+    ).toHaveLength(112);
 
     for (const [name, body] of [
       [

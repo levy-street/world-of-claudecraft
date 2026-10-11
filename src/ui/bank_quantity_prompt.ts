@@ -50,6 +50,11 @@ export interface QuantityPromptOpts {
   titleText: string;
   inputAriaText: string;
   confirmText: string;
+  /** Optional second confirm that submits `maxCount` in one press (the trade
+   *  prompt's "Offer all"); absent on the bank prompts, which keep the
+   *  single confirm. Goes through the same resolveCount clamp as a typed
+   *  count, so a stale ceiling still lands on the live one. */
+  confirmAllText?: string;
   cancelText: string;
   maxCount: number;
   /** Re-resolve the live target at submit: null refuses (stale), else the
@@ -86,6 +91,12 @@ export function showQuantityPrompt(wiring: QuantityPromptWiring, opts: QuantityP
   const cancel = document.createElement('button');
   cancel.className = 'btn ui-btn';
   cancel.textContent = opts.cancelText;
+  const confirmAll = opts.confirmAllText === undefined ? null : document.createElement('button');
+  if (confirmAll) {
+    confirmAll.className = 'btn ui-btn';
+    confirmAll.textContent = opts.confirmAllText ?? '';
+  }
+  const actions = confirmAll ? [confirm, confirmAll, cancel] : [confirm, cancel];
   if (opts.step) {
     const { size, downAriaText, upAriaText, unitDownAriaText, unitUpAriaText } = opts.step;
     const steps = document.createElement('div');
@@ -110,15 +121,15 @@ export function showQuantityPrompt(wiring: QuantityPromptWiring, opts: QuantityP
       stepper.buttons.unitUp,
       stepper.buttons.bigUp,
     );
-    prompt.append(steps, confirm, cancel);
+    prompt.append(steps, ...actions);
   } else {
-    prompt.append(input, confirm, cancel);
+    prompt.append(input, ...actions);
   }
   const { dismiss, dismissAndReturn } = wiring.installPromptDialog(prompt, opener, () =>
     prompt.remove(),
   );
-  const submit = (): void => {
-    const count = opts.resolveCount(Math.floor(Number(input.value) || 0));
+  const submitRequested = (requested: number): void => {
+    const count = opts.resolveCount(requested);
     if (count === null) {
       dismiss();
       opts.afterClose(false);
@@ -128,7 +139,9 @@ export function showQuantityPrompt(wiring: QuantityPromptWiring, opts: QuantityP
     dismiss();
     opts.afterClose(true);
   };
+  const submit = (): void => submitRequested(Math.floor(Number(input.value) || 0));
   confirm.addEventListener('click', submit);
+  confirmAll?.addEventListener('click', () => submitRequested(opts.maxCount));
   cancel.addEventListener('click', dismissAndReturn);
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submit();

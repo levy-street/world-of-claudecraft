@@ -4,6 +4,7 @@
 // whatever the content modules currently export, so they hold as zones grow.
 import { describe, expect, it } from 'vitest';
 import { CHOICE_ROW_LEVELS, CHOICE_ROWS } from '../src/sim/content/choice_rows';
+import { FACTION_VENDOR_GATES } from '../src/sim/content/faction_vendors';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import {
   ABILITIES,
@@ -240,7 +241,12 @@ describe('content referential integrity', () => {
     for (const npc of Object.values(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         if (!ITEMS[itemId]) problems.push(`${npc.id}: vendor item ${itemId} missing`);
-        else if (!ITEMS[itemId].buyValue && !ITEMS[itemId].priceHonor)
+        // A faction quartermaster row is priced in marks (FACTION_VENDOR_GATES).
+        else if (
+          !ITEMS[itemId].buyValue &&
+          !ITEMS[itemId].priceHonor &&
+          !((FACTION_VENDOR_GATES[itemId]?.currencyCost ?? 0) > 0)
+        )
           problems.push(`${npc.id}: vendor item ${itemId} has no purchase price`);
       }
       for (const qid of npc.questIds) {

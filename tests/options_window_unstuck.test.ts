@@ -44,6 +44,10 @@ class FakeElement {
     return null;
   }
 
+  getBoundingClientRect() {
+    return { left: 0, top: 0, width: 0, height: 0 };
+  }
+
   setAttribute(_name: string, _value: string): void {}
 
   removeAttribute(_name: string): void {}

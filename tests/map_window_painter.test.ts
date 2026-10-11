@@ -20,10 +20,13 @@ import {
   STRIP_MAX_X,
   STRIP_MIN_X,
   setActiveWorldContent,
+  WORLD_QUESTS,
   ZONES,
+  zoneAt,
 } from '../src/sim/data';
 import { isProfessionQuest } from '../src/sim/quests/ambient_quest_marker';
 import { emptyZoneProps, isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
+import { WORLD_BOSSES } from '../src/sim/world_boss';
 import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
 import {
   MAP_MARKER_SIZES,
@@ -445,6 +448,8 @@ function mapWorld(): IWorld {
     farmPatches: [],
     civicServicePlacements: [],
     nodeHarvestableByMe: () => true,
+    raidLockouts: () => [],
+    worldBossActive: () => false,
   } as unknown as IWorld;
 }
 
@@ -488,6 +493,7 @@ describe('map_window_painter: no magic values', () => {
     for (const tok of Object.values(PAINTER_TOKEN_TABLE)) {
       expect(tokens, `tokens.css missing live table entry ${tok}`).toContain(`${tok}:`);
     }
+    expect(tokens).toContain('--color-map-world-boss: #a970ff;');
     for (const tok of MAP_COLOR_TOKENS) {
       expect(
         Object.values(PAINTER_TOKEN_TABLE),
@@ -570,6 +576,102 @@ describe('map_window_painter: no magic values', () => {
       },
     ]);
     expect(trace.styleReads.filter((token) => token.endsWith('building-armoury'))).toHaveLength(2);
+  });
+
+  it('paints a blue available emblem and reveals its area only when selected', () => {
+    const quest = WORLD_QUESTS.find((candidate) => candidate.zoneId === ZONES[0].id);
+    if (!quest) throw new Error('expected a world quest in the first zone');
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const paint = (active: boolean, selected = false) => {
+      const trace = newTrace();
+      installMapStyleGlobals(trace);
+      const base = mapWorld();
+      const world = {
+        ...(base as unknown as Record<string, unknown>),
+        player: { ...base.player, level: quest.minLevel },
+        worldQuestCycle: '2026-08-31',
+        worldQuestLog: active
+          ? new Map([[quest.id, { questId: quest.id, count: 1, state: 'active' as const }]])
+          : new Map(),
+      } as unknown as IWorld;
+      const result = new MapWindowPainter(classColor).paintOverworld(fakeMapContext(trace), world, {
+        ...zonePaintOptions(ZONES[0]),
+        selectedWorldQuestId: selected ? quest.id : null,
+      });
+      return { trace, result };
+    };
+
+    const available = paint(false);
+    expect(available.result.worldQuests).toEqual([
+      expect.objectContaining({ questId: quest.id, state: 'available' }),
+    ]);
+    expect(
+      available.trace.fills.some(
+        (fill) =>
+          fill.style === 'paint:--color-map-world-quest-area-fill' &&
+          fill.commands.join() === 'arc',
+      ),
+    ).toBe(false);
+    expect(
+      available.trace.strokes.some(
+        (stroke) => stroke.style === 'paint:--color-map-world-quest-area-stroke',
+      ),
+    ).toBe(false);
+    expect(
+      available.trace.fills.some(
+        (fill) =>
+          fill.style === 'paint:--color-map-world-quest-available' &&
+          fill.commands.join() === 'arc',
+      ),
+    ).toBe(true);
+
+    const selected = paint(false, true);
+    expect(
+      selected.trace.fills.some(
+        (fill) =>
+          fill.style === 'paint:--color-map-world-quest-area-fill' &&
+          fill.commands.join() === 'arc',
+      ),
+    ).toBe(true);
+
+    const active = paint(true);
+    expect(active.result.worldQuests[0].state).toBe('active');
+    expect(
+      active.trace.fills.some(
+        (fill) => fill.style === 'paint:--color-map-player' && fill.commands.join() === 'arc',
+      ),
+    ).toBe(true);
+    expect(
+      active.trace.strokes.some((stroke) => stroke.commands.join() === 'moveTo,lineTo,lineTo'),
+    ).toBe(true);
+  });
+
+  it('paints an active loot-eligible world boss as a purple skull without an area', () => {
+    const boss = WORLD_BOSSES[0];
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    const base = mapWorld();
+    const world = {
+      ...(base as unknown as Record<string, unknown>),
+      raidLockouts: () => [],
+      worldBossActive: (bossId: string) => bossId === boss.templateId,
+    } as unknown as IWorld;
+    const result = new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      world,
+      zonePaintOptions(zoneAt(boss.pos.x, boss.pos.z)),
+    );
+
+    expect(result.worldBosses).toEqual([expect.objectContaining({ bossId: boss.templateId })]);
+    expect(
+      trace.fills.some(
+        (fill) => fill.style === 'paint:--color-map-world-boss' && fill.commands.join() === 'arc',
+      ),
+    ).toBe(true);
+    expect(
+      trace.fills.some((fill) => fill.style === 'paint:--color-map-world-quest-area-fill'),
+    ).toBe(false);
   });
 });
 
@@ -1416,6 +1518,58 @@ describe('map_window_painter: painted stable marker sprites', () => {
     expect(
       trace.markerBlits.filter((blit) => blit.sprite.markerId === 'rift-entrance')[0]?.sprite,
     ).toEqual({ markerId: 'rift-entrance', sizeId: 'mapNavigationRankS' });
+  });
+
+  it('draws a nearby Buried Hoard as a procedural treasure X, never Rift art', () => {
+    const world = mapWorld() as unknown as {
+      player: { pos: { x: number; z: number } };
+      entities: Map<number, unknown>;
+    };
+    world.player.pos = { x: 0, z: LABEL_ZONE_CZ };
+    world.entities = new Map([
+      [
+        100,
+        {
+          id: 100,
+          kind: 'object',
+          templateId: 'hoard_entrance',
+          name: 'Ember Buried Hoard',
+          riftTier: 'S',
+          pos: { x: 20, z: LABEL_ZONE_CZ },
+        },
+      ],
+    ]);
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      world as unknown as IWorld,
+      labelPaintOptions(),
+    );
+
+    const marker = result.navigation.find((candidate) => candidate.kind === 'hoard-entrance');
+    expect(marker).toBeDefined();
+    expect(markerArt.calls.filter((call) => call.id === 'rift-entrance')).toEqual([]);
+    const crosses = trace.strokes.filter(
+      (stroke) =>
+        marker &&
+        stroke.commands.join() === 'moveTo,lineTo,moveTo,lineTo' &&
+        stroke.args.includes(marker.mx) === false &&
+        stroke.args.length === 8,
+    );
+    expect(crosses).toHaveLength(2);
+    expect(
+      trace.fills.filter(
+        (fill) =>
+          marker &&
+          fill.commands.join() === 'arc' &&
+          fill.args[0] === marker.mx &&
+          fill.args[1] === marker.my,
+      ),
+    ).toEqual([]);
   });
 
   it('centers station art at mapStation and draws the quest painting over it', () => {

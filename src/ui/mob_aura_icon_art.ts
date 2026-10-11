@@ -47,6 +47,7 @@ const MOB_AURA_ICON_IDENTITIES: ReadonlyMap<string, string> = new Map([
   ['mortal_wound_voskar_emberwing', 'mob_mortal_strike'],
   ['pack_frenzy', 'mob_pack_frenzy'],
   ['plague_drowned_dead', 'mob_plague'],
+  ['plague_fenbridge_infiltrator', 'mob_plague'],
   ['plague_drowned_warlord', 'mob_plague'],
   ['raise_bone_mage', 'mob_spell_vuln'],
   ['rally_ironvein_foreman', 'mob_rally'],

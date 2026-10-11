@@ -120,6 +120,32 @@ export function parseStoredHotbarAction(
   }
 }
 
+/** Write a dragged action onto a drag's DataTransfer (the action bar reads it
+ *  back on drop): the encoded action plus the id as plain text. Shared by the
+ *  bar's own slot drag and the paperdoll's worn-trinket drag. */
+export function writeHotbarDragData(
+  dt: Pick<DataTransfer, 'setData'> | null,
+  action: Exclude<HotbarAction, null>,
+): void {
+  if (!dt) return;
+  dt.setData(HOTBAR_ACTION_MIME, encodeHotbarAction(action));
+  dt.setData('text/plain', action.id);
+}
+
+/** Read the dragged action back off a drop's DataTransfer, or null when it
+ *  carries none (or one that no longer resolves). */
+export function readHotbarDragData(
+  dt: Pick<DataTransfer, 'getData'> | null,
+  abilityExists: (id: string) => boolean,
+  itemExists: (id: string) => boolean,
+): Exclude<HotbarAction, null> | null {
+  return parseStoredHotbarAction(
+    dt?.getData(HOTBAR_ACTION_MIME) || null,
+    abilityExists,
+    itemExists,
+  );
+}
+
 export function attackSlotStorageKey(formSlotMapKey: string): string {
   return `${formSlotMapKey}:s0`;
 }

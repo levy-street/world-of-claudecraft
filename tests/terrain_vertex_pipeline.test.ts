@@ -66,8 +66,14 @@ describe('terrain vertex pipeline', () => {
     // no calm pad and this probe reads the heightfield only. Computed twice in
     // separate processes on the live tree,
     // identical both times.
+    // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
+    // branch: the stone hall's late terrain pad and the coast road re-threaded
+    // around its entrance regrade the harbour quarter, and the flipped diagonal
+    // splits follow the moved heights (the 4 yd lattice probe puts every moved
+    // height inside x 0..64, z -148..-20). Measured on the merged tree; CI
+    // shard 3 read the same fingerprint.
     expect(triangleMultisetFingerprint(state.indices)).toBe(
-      'dee8a8eb173860b070e3ae337b36bdcfdd67ae3c1661b5691a0e930b96c638d6',
+      'b98465349b97538018dd906b2b456b705d9e16ec252a77b8964b5a90634906f8',
     );
     const tiledAcmr = acmr(state.indices, 16);
     expect(tiledAcmr).toBeLessThan(0.7);

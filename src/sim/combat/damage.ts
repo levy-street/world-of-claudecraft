@@ -36,6 +36,7 @@ import {
   spawnBossExitPortal,
 } from '../instances/dungeons';
 import { isImmuneInPlace } from '../instances/instance_combat_hold';
+import { isKillParticipant, killParticipationPos } from '../loot/kill_participation';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
@@ -50,7 +51,12 @@ import {
   recordCorpseHarvestDeath,
   releaseCorpseHarvest,
 } from '../professions/corpse_harvest_session';
-import { pvpDamageMultiplier } from '../pvp';
+import {
+  pvpDamageMultiplier,
+  worldPvpOnOwnedPetDamaged,
+  worldPvpOnPlayerDamaged,
+  worldPvpOnPlayerDeath,
+} from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import { computeCharacterModifiers } from '../set_bonus_mods';
@@ -78,7 +84,10 @@ import {
   virtualLevel,
   xpForLevel,
 } from '../types';
+import { onWorldBossKilledForWeeklyQuests } from '../weekly_quests';
+import { recordWeeklyBossKill } from '../weekly_rewards';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
+import { emitAbsorbCredit } from './absorb_credit';
 import {
   afflictionOnDeath,
   clearAfflictionState,
@@ -133,7 +142,6 @@ import { stripPaladinDevotionsFromSource } from './paladin_support';
 import { masteredPaladinAuraValue } from './paladin_talents';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { veilboundMarkDamageMultiplier } from './paladin_veilbound_march';
-import { benisonMendOnVigilTriggered } from './priest/benison';
 import { doctrineConvertDamage } from './priest/doctrine';
 import { cleanupPriestState } from './priest/lifecycle';
 import {
@@ -141,7 +149,7 @@ import {
   priestOnShieldConsumed,
   priestOnVigilTriggered,
 } from './priest/talents';
-import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
+import { duskhymnChannelStopped, vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
 import { questGateBlocksDamage } from './quest_damage_gate';
 import { foulPlayGuardsBreak } from './rogue_talents';
 import { applySetProcs } from './set_procs';
@@ -149,6 +157,7 @@ import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiri
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { elementalTranceManaFromDamage } from './shaman_warspirit';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
+import { onTrinketDamage } from './trinkets';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -549,20 +558,25 @@ export function dealDamage(
   }
 
   const sourcePlayer = ctx.pvpController(source);
+  const targetPlayer = ctx.pvpController(target);
 
-  // WARFARE is a hostile player-vs-player modifier only. Pets, self-damage,
-  // friendly effects, player-vs-mob, and mob-vs-player damage stay byte-identical.
-  // dealDamage receives post-mitigation damage, so this deterministic step sits
-  // after the upstream armor/resist roll and before absorb shields.
+  // WARFARE applies to ALL hostile player-vs-player combat and never to PvE
+  // (owner rule). Both sides resolve to the player who controls them, so a pet,
+  // guardian or totem fights with its owner's Offense and takes hits with its
+  // owner's Defense. Self-damage, friendly effects, and anything touching a mob
+  // no player controls stay byte-identical. dealDamage receives post-mitigation
+  // damage, so this deterministic step sits after the upstream armor/resist roll
+  // and before absorb shields.
   if (
     !resolvedHpLoss &&
     amount > 0 &&
-    source?.kind === 'player' &&
-    target.kind === 'player' &&
-    source.id !== target.id &&
+    source &&
+    sourcePlayer &&
+    targetPlayer &&
+    sourcePlayer.id !== targetPlayer.id &&
     ctx.isHostileTo(source, target)
   ) {
-    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(source, target)));
+    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(sourcePlayer, targetPlayer)));
   }
 
   if (
@@ -602,6 +616,7 @@ export function dealDamage(
       if (answer && source) {
         amount -= answer.soaked;
         totalAbsorbed += answer.soaked;
+        emitAbsorbCredit(ctx, armed, target, answer.soaked);
         target.auras.splice(target.auras.indexOf(armed), 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: armed.name, gained: false });
         if (target.kind === 'player') grantAbilityDevotion(target, DEBT_OF_LIGHT_DEVOTION);
@@ -623,6 +638,7 @@ export function dealDamage(
       a.value -= soaked;
       amount -= soaked;
       totalAbsorbed += soaked;
+      emitAbsorbCredit(ctx, a, target, soaked);
       // Unleash Weapon protects against one damage event only. Any unused
       // protection falls away after that hit instead of behaving like a
       // conventional multi-hit absorb shield.
@@ -1071,9 +1087,6 @@ export function dealDamage(
         const healed = ctx.applyHeal(healer, target, aura.value, aura.name);
         if (aura.id === 'seraphic_vigil') {
           priestOnVigilTriggered(ctx, healer, target, healed);
-          // Benison Dawnweave 4pc rides the same trigger POINT (never that
-          // talent-gated function): the set arm is wearer-flag-gated inside.
-          benisonMendOnVigilTriggered(ctx, healer, target);
         }
         ctx.emit({
           type: 'spellfx',
@@ -1096,6 +1109,7 @@ export function dealDamage(
 
   if (source && source.id !== target.id) ctx.enterCombat(source, target);
   onCraftedCollectionDamage(ctx, source, target, craftedHpLoss, school, direct, copiedHit);
+  if (!copiedHit) onTrinketDamage(ctx, source, target, craftedHpLoss, school, direct, ability);
   if (direct) ctx.refreshMobLeashFromAction(source, target);
 
   // classic threat: damage (and the ability's flat bonus) lands on the mob's
@@ -1169,6 +1183,12 @@ export function dealDamage(
   // assist window); this hub only reports the hit.
   if (source && amount > 0 && target.kind === 'player' && !target.dead) {
     ctx.bgOnPlayerDamaged(target, source);
+    // World PvP assists: the same idea for a flagged victim in the open world
+    // (src/sim/pvp/world_pvp.ts owns the flag, the pair, and the window rules).
+    worldPvpOnPlayerDamaged(ctx, target, source);
+  } else if (source && amount > 0 && target.kind === 'mob' && target.ownerId !== null) {
+    // A hit on a player's PET marks an aggressor as a hit on the owner would.
+    worldPvpOnOwnedPetDamaged(ctx, target, source);
   }
 
   if (source && source.kind === 'player' && source.id !== target.id) {
@@ -1419,6 +1439,9 @@ export function handleDeath(
   // called explicitly here too, before the field it reads is cleared.
   // Idempotent: a no-op for every death that was never mid-harvest.
   releaseCorpseHarvest(ctx, e.id);
+  // The Duskhymn 2pc channel slow (Warfare Season 2) likewise leaves the
+  // target with the channel; a no-op unless mid-Litany of Woe.
+  duskhymnChannelStopped(ctx, e);
   e.castingAbility = null;
   e.castTargetId = null;
   // Death is a cast cancel: mirror cancelCast's teardown of the channel and
@@ -1561,6 +1584,11 @@ export function handleDeath(
     // lies where it fell and the player's own Release press sends the spirit to
     // the warded keep graveyard, where the team wave clock raises it.
     ctx.bgOnPlayerDeath(e, killer);
+    // World PvP: a flagged player's death in the open world moves the gold
+    // stake and pays the honor pool to everyone who worked for the kill. Pure
+    // ledger arithmetic on the sim clock, zero rng; a no-op for every death
+    // that was not a flagged player's at a flagged player's hands.
+    worldPvpOnPlayerDeath(ctx, e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
         // turn on the next nearby attacker; go home only if nobody is left
@@ -1729,23 +1757,25 @@ export function handleDeath(
       if (party) {
         for (const mPid of party.members) {
           const mMeta = ctx.players.get(mPid);
-          const mE = ctx.entities.get(mPid);
           // A released player entity stands at the graveyard, but their body is
-          // still where they fell. Use that corpse position for the kill-time
-          // participation snapshot so releasing during the final seconds does
-          // not erase XP, loot-roll, or Heroic Mark rights.
-          const matchingInstanceCorpse =
-            mE?.ghost &&
-            mE.corpsePos &&
-            (!claimedInst || mE.corpseInstanceId === claimedInst.exitId)
-              ? mE.corpsePos
-              : null;
-          const participationPos = matchingInstanceCorpse ?? mE?.pos;
+          // still where they fell: the corpse is their participation position
+          // (loot/kill_participation.ts), so releasing during the final seconds
+          // does not erase XP, loot-roll, or Heroic Mark rights. Inside a
+          // claimed instance the whole claim footprint shares the kill.
+          const participationPos = killParticipationPos(
+            ctx.entities.get(mPid),
+            claimedInst?.exitId ?? null,
+          );
           if (
             mMeta &&
             !mMeta.leaving &&
             participationPos &&
-            dist2d(participationPos, e.pos) <= PARTY_XP_RANGE
+            isKillParticipant(
+              participationPos,
+              e.pos,
+              claimedInst !== null &&
+                ctx.instanceClaimIdAt(participationPos) === claimedInst.exitId,
+            )
           )
             eligible.push(mMeta);
         }
@@ -1838,6 +1868,7 @@ export function handleDeath(
         );
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
         ctx.onMobKilledForQuests(e, member);
+        ctx.onMobKilledForWorldQuests(e, member);
       }
       // A destroyed Broodmother egg may hatch a widow that swarms the killer.
       if (e.templateId === 'spider_egg' && killer) spawnWidowHatchlingOnEggDeath(ctx, e, killer);
@@ -1855,6 +1886,7 @@ export function handleDeath(
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
+    recordWeeklyBossKill(ctx, e, heroicRewardRecipients, claimedInst);
     // Boss pets and their challenge looks (content/buddy_sources.ts): one
     // independent roll per credited player, never a corpse item, then the
     // speed/dps looks for the same roster. World bosses roll on the
@@ -1883,6 +1915,7 @@ export function handleDeath(
       rollBossBuddyDrops(ctx, e, worldBossContribs, null);
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
+      onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);
     }
     // Masterwrought materials (phase 04): Wyrmfall Cores and the weekly ember
     // check for the same participation snapshot. Deliberately BELOW every loot

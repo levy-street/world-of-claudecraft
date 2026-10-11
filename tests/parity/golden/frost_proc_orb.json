@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "9830d2d3",
+      "nextId": 1011,
+      "state": "008aa627",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -45,7 +45,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -63,13 +65,16 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1003,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -98,6 +103,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -114,7 +121,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 54,
-          "id": 999,
+          "id": 1003,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -158,9 +165,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1008,
-      "state": "8b7a1c94",
-      "events": "c1b96fc5",
+      "nextId": 1012,
+      "state": "aac4dc82",
+      "events": "83d03f60",
       "rng": {
         "draws": 1,
         "digest": "cf5e57a1"
@@ -169,9 +176,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1008,
-      "state": "5c99fad7",
-      "events": "7f24b18b",
+      "nextId": 1012,
+      "state": "abaa190e",
+      "events": "06d8aa46",
       "rng": {
         "draws": 2,
         "digest": "6d172bb5"
@@ -180,9 +187,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1008,
-      "state": "910aa5ca",
-      "events": "6c6fa3a5",
+      "nextId": 1012,
+      "state": "fb4d533b",
+      "events": "9364a499",
       "rng": {
         "draws": 150,
         "digest": "478ace8d"
@@ -191,9 +198,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1008,
-      "state": "c5bdbd22",
-      "events": "a81d41cd",
+      "nextId": 1012,
+      "state": "76dcae86",
+      "events": "a15e8a4a",
       "rng": {
         "draws": 316,
         "digest": "650546d2"
@@ -202,9 +209,9 @@
     {
       "tick": 84,
       "time": 4.2,
-      "nextId": 1008,
-      "state": "ea910b53",
-      "events": "1c34679c",
+      "nextId": 1012,
+      "state": "b1a5d144",
+      "events": "667f5ae2",
       "rng": {
         "draws": 356,
         "digest": "6ca1a356"
@@ -232,7 +239,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -287,13 +296,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1003,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -325,6 +337,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -340,7 +354,7 @@
               "name": "Icicles",
               "remaining": 29.95,
               "school": "frost",
-              "sourceId": 999,
+              "sourceId": 1003,
               "stacks": 5
             }
           ],
@@ -360,7 +374,7 @@
           "fiveSecondRule": 0.25,
           "healPower": 41,
           "hp": 665,
-          "id": 999,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -393,7 +407,7 @@
             "sta": 52,
             "str": 10
           },
-          "targetId": 1007,
+          "targetId": 1011,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -411,7 +425,7 @@
               "name": "Frostglobe",
               "remaining": 2.25,
               "school": "frost",
-              "sourceId": 999,
+              "sourceId": 1003,
               "value": 0.7
             },
             {
@@ -421,7 +435,7 @@
               "name": "Rimelance",
               "remaining": 8.95,
               "school": "frost",
-              "sourceId": 999,
+              "sourceId": 1003,
               "value": 0.6
             }
           ],
@@ -434,7 +448,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 499781,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -460,11 +474,11 @@
             "z": -54
           },
           "stats": {},
-          "tappedById": 999,
+          "tappedById": 1003,
           "templateId": "training_dummy",
           "threat": [
             [
-              999,
+              1003,
               219
             ]
           ],
@@ -477,8 +491,8 @@
     {
       "tick": 84,
       "time": 4.2,
-      "nextId": 1008,
-      "state": "ea910b53",
+      "nextId": 1012,
+      "state": "b1a5d144",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -507,7 +521,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -562,13 +578,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1003,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -600,6 +619,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -615,7 +636,7 @@
               "name": "Icicles",
               "remaining": 29.95,
               "school": "frost",
-              "sourceId": 999,
+              "sourceId": 1003,
               "stacks": 5
             }
           ],
@@ -635,7 +656,7 @@
           "fiveSecondRule": 0.25,
           "healPower": 41,
           "hp": 665,
-          "id": 999,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -668,7 +689,7 @@
             "sta": 52,
             "str": 10
           },
-          "targetId": 1007,
+          "targetId": 1011,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -686,7 +707,7 @@
               "name": "Frostglobe",
               "remaining": 2.25,
               "school": "frost",
-              "sourceId": 999,
+              "sourceId": 1003,
               "value": 0.7
             },
             {
@@ -696,7 +717,7 @@
               "name": "Rimelance",
               "remaining": 8.95,
               "school": "frost",
-              "sourceId": 999,
+              "sourceId": 1003,
               "value": 0.6
             }
           ],
@@ -709,7 +730,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 499781,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -735,11 +756,11 @@
             "z": -54
           },
           "stats": {},
-          "tappedById": 999,
+          "tappedById": 1003,
           "templateId": "training_dummy",
           "threat": [
             [
-              999,
+              1003,
               219
             ]
           ],

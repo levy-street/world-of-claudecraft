@@ -115,6 +115,9 @@ export class PartyFramesPainter {
   // Active rows by member key (pid). One persistent node per key, reused across
   // rebuilds; the keyed pool this painter requires.
   private readonly pool = new Map<number, PartyRow>();
+  // DOM removal and collapse need not dispatch mouseleave. Keep the hovered
+  // identity here so detaching its row also clears Hud's cast-target override.
+  private hoveredPid: number | null = null;
   // Detached rows kept for reuse (recycling a departed row to a new pid). The row's
   // listeners stay attached and read the live slot, so a recycled row is safe.
   private readonly free: PartyRow[] = [];
@@ -165,7 +168,10 @@ export class PartyFramesPainter {
     this.rowDeps = {
       onTarget: deps.onTarget,
       onContextMenu: deps.onContextMenu,
-      onHover: deps.onHover,
+      onHover: (pid) => {
+        this.hoveredPid = pid;
+        deps.onHover(pid);
+      },
       onTargetPet: deps.onTargetPet,
     };
   }
@@ -192,6 +198,9 @@ export class PartyFramesPainter {
     this.mobile = mobile;
     this.headerCollapsed = collapsed;
     const state = partyChipState({ inParty, mobile, collapsed, chatOpen });
+    // Desktop's own header also hides the rows when collapsed; the chat
+    // overlay only hides them on mobile (partyChipState leaves desktop alone).
+    if (!inParty || collapsed || (mobile && chatOpen)) this.clearHover();
     if (state.chipVisible) {
       const chip = this.ensureChip();
       this.chipShown = true;
@@ -291,6 +300,7 @@ export class PartyFramesPainter {
     // Detach rows whose member left; keep them (listeners intact) for reuse.
     for (const [pid, row] of this.pool) {
       if (!next.has(pid)) {
+        if (pid === this.hoveredPid) this.clearHover();
         row.el.remove();
         this.free.push(row);
         this.pool.delete(pid);
@@ -403,6 +413,7 @@ export class PartyFramesPainter {
   /** Empty the frames (no party): detach every row and both disclosure controls.
    *  Keeps the detached rows in the free list so a re-formed party reuses them. */
   clear(): void {
+    this.clearHover();
     for (const [pid, row] of this.pool) {
       row.el.remove();
       this.free.push(row);
@@ -428,6 +439,12 @@ export class PartyFramesPainter {
     this.writers.toggleClass(this.container, PARTY_PRESENT_CLASS, false);
     this.writers.toggleClass(this.container, RAID_STYLE_CLASS, false);
     this.writers.toggleClass(this.container, HEADER_COLLAPSED_CLASS, false);
+  }
+
+  private clearHover(): void {
+    if (this.hoveredPid === null) return;
+    this.hoveredPid = null;
+    this.deps.onHover(null);
   }
 
   private paintRow(

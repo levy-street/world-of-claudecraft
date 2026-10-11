@@ -246,4 +246,9 @@ export const HEROIC_VENDOR_STOCK: readonly HeroicVendorOffer[] = [
   { itemId: 'evergarden_greens_seed', marks: 12 },
   { itemId: 'gilded_yam_seed', marks: 12 },
   { itemId: 'evergarden_pumpkin_seed', marks: 12 },
+  // The marks-vendor trinket (content/trinkets.ts): an epic accessory read at
+  // the same item level 26 as the jewelry above (trinket budget 11, the ring
+  // slot weight), priced at the neck point (16) because its use effect is a
+  // second lane of value on top of the stats. No new price point is minted.
+  { itemId: 'wayfarers_lodestone', marks: 16 },
 ];

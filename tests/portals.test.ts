@@ -105,6 +105,53 @@ describe('the Duskfall passage', () => {
     expect(zoneAt(p.pos.x, p.pos.z).id).toBe('veiled_hollow');
   });
 
+  // A released spirit uses the passage like a living player: a death near the
+  // Thornpeak side of the zone line rises at Eldershine Rest in the Hollow (the
+  // nearest graveyard by distance), and the sealed border leaves the passage as
+  // the ghost's only way back to its corpse.
+  it('carries a released ghost through the Hollow cave back to Thornpeak', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    // Die on the Thornpeak side of the zone line, closer to the Hollow's yard
+    // than to any Thornpeak yard: the spirit rises in the Hollow.
+    teleport(sim, a, 10, 895);
+    const p = sim.entities.get(a)!;
+    expect(zoneAt(p.pos.x, p.pos.z).id).toBe('thornpeak_heights');
+    (sim as any).dealDamage(p, p, p.hp + 1000);
+    sim.tick();
+    sim.releaseSpirit(a);
+    sim.tick();
+    expect(p.ghost).toBe(true);
+    expect(zoneAt(p.pos.x, p.pos.z).id).toBe('veiled_hollow');
+    // The ghost runs into the Hollow cave mouth.
+    teleport(sim, a, PORTAL.b.x, PORTAL.b.z);
+    const events = sim.tick();
+    expect(zoneAt(p.pos.x, p.pos.z).id).toBe('thornpeak_heights');
+    expect(p.pos.x).toBeCloseTo(PORTAL.a.landing.x, 5);
+    expect(p.pos.z).toBeCloseTo(PORTAL.a.landing.z, 5);
+    expect(logTexts(events)).toContain(PORTAL.leaveText);
+    // Still a spirit on arrival: the passage moves the ghost, it never revives it.
+    expect(p.dead).toBe(true);
+    expect(p.ghost).toBe(true);
+  });
+
+  it('leaves an unreleased corpse where it fell even on a cave mouth', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    teleport(sim, a, PORTAL.b.x + 5, PORTAL.b.z);
+    const p = sim.entities.get(a)!;
+    (sim as any).dealDamage(p, p, p.hp + 1000);
+    sim.tick();
+    expect(p.dead).toBe(true);
+    teleport(sim, a, PORTAL.b.x, PORTAL.b.z);
+    sim.tick();
+    expect(p.ghost).toBe(false);
+    expect(p.pos.x).toBeCloseTo(PORTAL.b.x, 5);
+    expect(p.pos.z).toBeCloseTo(PORTAL.b.z, 5);
+  });
+
   it('keeps two same-seed worlds identical through a portal crossing', () => {
     const run = () => {
       const sim = makeWorld();

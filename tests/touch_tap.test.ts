@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  bindMobileFrameLongPress,
   bindTouchDoubleTap,
   bindTouchTap,
   CLICK_SUPPRESS_MS,
   DOUBLE_TAP_MS,
+  MOBILE_CONTEXT_LONG_PRESS_MS,
   TAP_SLOP_PX,
 } from '../src/ui/touch_tap';
 
@@ -240,5 +242,147 @@ describe('bindTouchDoubleTap', () => {
     expect(single).toHaveBeenCalledTimes(2);
     expect(dbl).toHaveBeenCalledTimes(1);
     vi.useRealTimers();
+  });
+});
+
+// bindMobileFrameLongPress moved here from the Hud coordinator when the
+// target-of-target frame became its third consumer. It is the touch stand-in for
+// right-click on the player, target and target-of-target frames, so what it must
+// keep is the desktop refusal, the slop cancel, and the post-press suppression of
+// the click AND contextmenu the browser fires next.
+describe('bindMobileFrameLongPress', () => {
+  const frameEl = fakeButton;
+  const press = (el: ReturnType<typeof fakeButton>, opts: { mobile?: boolean } = {}) => {
+    const onLongPress = vi.fn();
+    bindMobileFrameLongPress(
+      el as unknown as HTMLElement,
+      () => opts.mobile !== false,
+      onLongPress,
+    );
+    return onLongPress;
+  };
+  // A finger resting past the threshold, with no target element in the way.
+  const restingTouch = (id: number, x = 100, y = 100) => ({ ...touch(id, x, y), target: null });
+
+  it('fires once the finger has rested past the long-press threshold', () => {
+    vi.useFakeTimers();
+    const el = frameEl();
+    const onLongPress = press(el);
+    el.dispatch('pointerdown', restingTouch(1, 120, 64));
+    expect(onLongPress).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(MOBILE_CONTEXT_LONG_PRESS_MS);
+    // The press POINT is passed through so the caller can anchor its menu there.
+    expect(onLongPress).toHaveBeenCalledWith(120, 64);
+    vi.useRealTimers();
+  });
+
+  it('never fires on the desktop layout, however long the pointer rests', () => {
+    vi.useFakeTimers();
+    const el = frameEl();
+    const onLongPress = press(el, { mobile: false });
+    el.dispatch('pointerdown', restingTouch(1));
+    vi.advanceTimersByTime(MOBILE_CONTEXT_LONG_PRESS_MS * 4);
+    expect(onLongPress).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('never fires for a MOUSE pointer, which has its own contextmenu path', () => {
+    vi.useFakeTimers();
+    const el = frameEl();
+    const onLongPress = press(el);
+    el.dispatch('pointerdown', { pointerType: 'mouse', pointerId: 1, clientX: 0, clientY: 0 });
+    vi.advanceTimersByTime(MOBILE_CONTEXT_LONG_PRESS_MS * 2);
+    expect(onLongPress).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('cancels when the finger slides past the tap slop (a frame drag, not a press)', () => {
+    vi.useFakeTimers();
+    const el = frameEl();
+    const onLongPress = press(el);
+    el.dispatch('pointerdown', restingTouch(1, 100, 100));
+    el.dispatch('pointermove', restingTouch(1, 100 + TAP_SLOP_PX + 1, 100));
+    vi.advanceTimersByTime(MOBILE_CONTEXT_LONG_PRESS_MS * 2);
+    expect(onLongPress).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('cancels when the finger lifts before the threshold (an ordinary tap)', () => {
+    vi.useFakeTimers();
+    const el = frameEl();
+    const onLongPress = press(el);
+    el.dispatch('pointerdown', restingTouch(1));
+    el.dispatch('pointerup', restingTouch(1));
+    vi.advanceTimersByTime(MOBILE_CONTEXT_LONG_PRESS_MS * 2);
+    expect(onLongPress).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('swallows the click AND contextmenu the browser fires right after the press', () => {
+    // Both frames underneath bind their own click / contextmenu handlers, so an
+    // unswallowed pair would select the unit (or open a second menu) as well.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(1_000_000));
+    const el = frameEl();
+    press(el);
+    el.dispatch('pointerdown', restingTouch(1));
+    vi.advanceTimersByTime(MOBILE_CONTEXT_LONG_PRESS_MS);
+    for (const type of ['click', 'contextmenu']) {
+      const prevented = vi.fn();
+      const stopped = vi.fn();
+      el.dispatch(type, { preventDefault: prevented, stopImmediatePropagation: stopped });
+      expect(prevented, `${type} not prevented`).toHaveBeenCalled();
+      expect(stopped, `${type} not stopped`).toHaveBeenCalled();
+    }
+    vi.useRealTimers();
+  });
+
+  it('lets a plain click through when no long press happened', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(1_000_000));
+    const el = frameEl();
+    press(el);
+    const prevented = vi.fn();
+    el.dispatch('click', { preventDefault: prevented, stopImmediatePropagation: vi.fn() });
+    expect(prevented).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+});
+
+describe('bindMobileFrameLongPress stopBubble (a frame nested in another bound frame)', () => {
+  it('stops the accepted touch pointerdown so the outer frame never arms a press', () => {
+    // The target-of-target mini sits inside #target-frame, which binds the same
+    // gesture: without this the outer press also fires and its menu opens over
+    // the mini's own.
+    const el = fakeButton();
+    const onLongPress = vi.fn();
+    const stopped = vi.fn();
+    bindMobileFrameLongPress(el as unknown as HTMLElement, () => true, onLongPress, {
+      stopBubble: true,
+    });
+    el.dispatch('pointerdown', { ...touch(1), target: null, stopPropagation: stopped });
+    expect(stopped).toHaveBeenCalled();
+  });
+
+  it('leaves the bubble alone without the option, and for a press it refused', () => {
+    const plain = fakeButton();
+    const plainStopped = vi.fn();
+    bindMobileFrameLongPress(plain as unknown as HTMLElement, () => true, vi.fn());
+    plain.dispatch('pointerdown', { ...touch(1), target: null, stopPropagation: plainStopped });
+    expect(plainStopped).not.toHaveBeenCalled();
+
+    // Desktop layout: the gesture bails before the stop, so an ordinary
+    // right-click path on the outer frame is untouched.
+    const desktop = fakeButton();
+    const desktopStopped = vi.fn();
+    bindMobileFrameLongPress(desktop as unknown as HTMLElement, () => false, vi.fn(), {
+      stopBubble: true,
+    });
+    desktop.dispatch('pointerdown', {
+      ...touch(1),
+      target: null,
+      stopPropagation: desktopStopped,
+    });
+    expect(desktopStopped).not.toHaveBeenCalled();
   });
 });

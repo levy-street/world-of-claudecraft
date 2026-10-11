@@ -47,6 +47,7 @@ import {
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
+import { lootQualityBadgeHtml } from './loot_quality_view';
 import { vaultMaterialWithdrawSelection } from './material_source_storage_actions';
 import {
   appendMaterialSourcesActionAfter,
@@ -58,6 +59,7 @@ import {
 import { materialSourcesForDisplay } from './material_sources_view';
 import { StorageRungEchoLatch } from './storage_rung_echo_core';
 import { unknownItemIconHtml } from './unknown_item_icon';
+import { filterVaultRows, vaultSearchTerm } from './vault_search';
 import {
   buildVaultView,
   hasVaultDepositable,
@@ -158,6 +160,13 @@ export class VaultTab {
   private depositAllTimer: number | null = null;
   private readonly purchaseEcho: StorageRungEchoLatch;
 
+  // The name search's raw box value, remembered across the full rebuild every
+  // keystroke causes (BankWindow.render re-installs it onto the fresh input
+  // and carries focus + caret via bank_search_focus.ts, the guild history
+  // precedent). Session-scoped, not persisted: a reopened bank shows the whole
+  // vault again, so a forgotten query can never make it look emptied.
+  private search = '';
+
   constructor(private readonly deps: VaultTabDeps) {
     this.purchaseEcho = new StorageRungEchoLatch(
       {
@@ -195,6 +204,7 @@ export class VaultTab {
   reset(): void {
     this.clearStatus();
     this.clearDepositAllPending();
+    this.search = '';
   }
 
   /** The bank data signature moved: any in-flight deposit-all has echoed, so
@@ -250,17 +260,31 @@ export class VaultTab {
     });
     panel.appendChild(note);
     this.appendStatusLine(panel);
+    // The search box only matters once the vault holds materials (the bank's
+    // filter-bar rule), so an empty vault keeps its plain empty line.
+    if (!model.empty) panel.appendChild(this.buildSearch());
     const scroll = document.createElement('div');
     scroll.className = 'bank-scroll';
+    // Narrow to the rows whose DISPLAYED name contains the query (the label
+    // rule rowName owns, so what the player reads is what typing finds).
+    const rows = filterVaultRows(model.rows, this.search, (row) => this.rowName(row));
     if (model.empty) {
       const empty = document.createElement('div');
       empty.className = 'bank-empty';
       empty.textContent = t('hudChrome.bank.vaultEmpty');
       scroll.appendChild(empty);
+    } else if (rows.length === 0) {
+      // A stocked vault filtered down to nothing: say so, or the pane reads
+      // as emptied. role=status so a screen reader hears the miss as they type.
+      const none = document.createElement('div');
+      none.className = 'bank-empty vault-search-empty';
+      none.setAttribute('role', 'status');
+      none.textContent = t('hudChrome.bank.vaultSearchNoMatch');
+      scroll.appendChild(none);
     } else {
       const list = document.createElement('div');
       list.className = 'vault-list';
-      for (const row of model.rows) this.appendRow(list, row);
+      for (const row of rows) this.appendRow(list, row);
       scroll.appendChild(list);
     }
     panel.appendChild(scroll);
@@ -327,6 +351,45 @@ export class VaultTab {
   // storable-material set, plus one per special slot), and this is a cold
   // path: rows mint only when BankWindow's refreshIfChanged signature moves
   // (the HUD's 500ms slow band while the tab is open), never per frame.
+  // The name search row: one `.bag-search` input in the bank family's
+  // .bag-tools row (the personal bank's toolbar minus chips and sort). The
+  // class is load-bearing: BankWindow.render captures and restores focus and
+  // caret for exactly that class across the full rebuild every keystroke
+  // requests here (the guild history's rule), and the value is re-installed
+  // from the remembered query, never read back off the old node. The bags'
+  // placeholder is reused; only the aria is vault-specific.
+  private buildSearch(): HTMLElement {
+    const tools = document.createElement('div');
+    tools.className = 'bag-tools vault-tools';
+    const input = document.createElement('input');
+    input.type = 'search';
+    input.className = 'bag-search ui-input vault-search';
+    input.placeholder = t('hudChrome.bags.searchPlaceholder');
+    input.setAttribute('aria-label', t('hudChrome.bank.vaultSearchAria'));
+    input.autocomplete = 'off';
+    input.value = this.search;
+    input.addEventListener('input', () => {
+      if (vaultSearchTerm(input.value) === vaultSearchTerm(this.search)) {
+        // Whitespace-only edits change nothing visible: remember the raw
+        // value for the re-install but skip the whole-window rebuild.
+        this.search = input.value;
+        return;
+      }
+      this.search = input.value;
+      this.deps.requestRender();
+    });
+    tools.appendChild(input);
+    return tools;
+  }
+
+  /** The name a vault row's label shows, the ONE rule its search matches on:
+   *  the def's localized display name, or (stale-client guard, R34) the raw
+   *  id the row paints for a dormant id this bundle predates. */
+  private rowName(model: VaultRowModel): string {
+    const item = model.known ? knownItemDef(ITEMS, model.itemId) : undefined;
+    return item ? itemDisplayName(item) : model.itemId;
+  }
+
   private appendRow(list: HTMLElement, model: VaultRowModel): void {
     const { itemId, count, storedTotal, cap } = model;
     const ordinal = list.childElementCount;
@@ -354,7 +417,7 @@ export class VaultTab {
     // Stale-client guard (R34): a dormant id this bundle predates still holds
     // real recoverable stock, so it renders (fallback icon, raw id label) and
     // its withdraw stays live (the server resolves by itemId, no def needed).
-    const name = item ? itemDisplayName(item) : itemId;
+    const name = this.rowName(model);
     const countLabel = formatCount(count);
     const totalLabel = formatCount(storedTotal);
     const capLabel = formatCount(cap);
@@ -383,10 +446,13 @@ export class VaultTab {
         : '';
     row.innerHTML =
       `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(itemId)}` +
+      lootQualityBadgeHtml(model.kind === 'special' ? model.instance : undefined, {
+        labelled: true,
+      }) +
       cornerMarkHtml(cornerMark) +
       lockMarkHtml(locked) +
       `<span class="vault-row-name">${esc(name)}</span>` +
-      (model.kind === 'special'
+      (model.showCount
         ? `<span class="vault-row-stack-count ui-chip">${esc(t('itemUi.bags.stackCount', { count: countLabel }))}</span>`
         : '') +
       `<span class="vault-row-count">${esc(t('hudChrome.bank.capacity', { used: totalLabel, total: capLabel }))}</span>` +

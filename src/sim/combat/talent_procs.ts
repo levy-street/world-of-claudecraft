@@ -146,8 +146,8 @@ function fireOne(
       break;
     }
     case 'aura':
-      ctx.applyAura(player, {
-        id: def.id,
+      ctx.applyAura(response.target === 'subject' ? subject : player, {
+        id: response.auraId ?? def.id,
         name: response.name,
         kind: response.auraKind,
         remaining: response.duration,

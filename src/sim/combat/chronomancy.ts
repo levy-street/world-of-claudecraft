@@ -27,6 +27,10 @@ import {
   TEMPORAL_ECHO_ROTATION_CONVERSION_MULTIPLIER,
   TEMPORAL_ECHO_SINGLE_CONVERSION,
 } from '../content/chronomancy_tuning';
+import {
+  VANGUARD_ARCANE_4PC_SPEED_DURATION_SEC,
+  VANGUARD_ARCANE_4PC_SPEED_MULT,
+} from '../content/vanguard_set_bonuses_b';
 import { ABILITIES } from '../data';
 import { recordCascadeConversion, recordCascadeDamage } from '../dev/cascade_playtest';
 import type { SimContext } from '../sim_context';
@@ -34,6 +38,7 @@ import type { Aura, Entity } from '../types';
 import { allocateGroupEchoEmergencyBonusRates } from './chronomancy_echo_distribution';
 import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import { consumeHealAbsorb, healingTakenMult, healingThreat } from './heal';
+import { wearsSetBonus } from './set_bonus_wearer';
 
 // The mark aura kind and ability id (they share one string so the buff bar and
 // the tooltip resolve the icon/name straight from ABILITIES['temporal_echo']).
@@ -390,6 +395,19 @@ export function applyTemporalAegis(
  * capped at 20% of the ally's max health.
  * Emits a `heal2` (the number + heal-glow pulse over the ally on both hosts).
  */
+/**
+ * Scaling divisor for Chronomancy Echo conversion from the caster's Healing Power.
+ * With divisor 1200, gear with Healing Power (such as the Aetherweave raid set)
+ * provides gentle scaling on converted Echo healing without inflating enemy damage.
+ */
+export const CHRONOMANCY_ECHO_HEAL_POWER_DIVISOR = 1200;
+
+export function echoHealPowerMultiplier(source: Entity): number {
+  const bonusHealing = Math.max(0, (source.healPower ?? 0) - (source.spellPower ?? 0));
+  if (bonusHealing <= 0) return 1;
+  return 1 + bonusHealing / CHRONOMANCY_ECHO_HEAL_POWER_DIVISOR;
+}
+
 function applyEchoHeal(
   ctx: SimContext,
   source: Entity,
@@ -398,7 +416,8 @@ function applyEchoHeal(
   rate: number,
 ): void {
   if (ally.dead) return;
-  let healed = Math.round(dealt * rate * healingTakenMult(ctx, ally));
+  const hpMult = echoHealPowerMultiplier(source);
+  let healed = Math.round(dealt * rate * hpMult * healingTakenMult(ctx, ally));
   if (healed <= 0) return;
   healed = consumeHealAbsorb(ctx, ally, healed);
   const preClamp = healed;
@@ -670,4 +689,34 @@ export function aetherDartsBoltBonus(ctx: SimContext, caster: Entity, ticks: num
     caster.aetherDartsBonusPerBolt = bolts > 0 ? Math.round(total / bolts) : 0;
   }
   return caster.aetherDartsBonusPerBolt ?? 0;
+}
+
+/** The Hourbinder's 4pc speed aura id: its own id, because a buffTarget row
+ *  would take the bare 'temporal_barrier' id and replace the barrier absorb. */
+export const HOURBINDER_HASTE_ID = 'set_vanguard_mage_arcane_4pc';
+
+/** Hourbinder's Vestments 4pc (Warfare Season 2): Temporal Barrier also
+ *  quickens the shielded target (self when cast with no friendly target).
+ *  Called once per resolved Temporal Barrier from the mage post-cast rider
+ *  (frostMageAfterCast); a recast refreshes it. Draws no rng. */
+export function hourbinderBarrierHaste(
+  ctx: SimContext,
+  caster: Entity,
+  abilityId: string,
+  target: Entity | null,
+): void {
+  if (abilityId !== 'temporal_barrier') return;
+  if (!wearsSetBonus(ctx, caster, 'vanguard_mage_arcane', 4)) return;
+  const shielded = target ?? caster;
+  if (shielded.dead) return;
+  ctx.applyAura(shielded, {
+    id: HOURBINDER_HASTE_ID,
+    name: 'Temporal Barrier',
+    kind: 'buff_speed',
+    remaining: VANGUARD_ARCANE_4PC_SPEED_DURATION_SEC,
+    duration: VANGUARD_ARCANE_4PC_SPEED_DURATION_SEC,
+    value: VANGUARD_ARCANE_4PC_SPEED_MULT,
+    sourceId: caster.id,
+    school: 'arcane',
+  });
 }

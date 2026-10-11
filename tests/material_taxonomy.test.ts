@@ -837,6 +837,9 @@ describe('no src/sim importer (presentation-only taxonomy scope)', () => {
       name: 'material_profession_affinity',
       liveImporter: '../src/ui/hud/professions/material_profession_hint_view.ts',
     },
+    // The zone-entry town-done decision: a presentation rule over the quest
+    // tables, read by the HUD's entry-line core and nothing in the tick.
+    { name: 'town_quests', liveImporter: '../src/ui/zone_entry_line_core.ts' },
   ] as const;
 
   // Matches import SPECIFIERS in every realistic form: from clauses (single or

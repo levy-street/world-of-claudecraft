@@ -72,6 +72,10 @@ export interface DiscordWidgetView {
   voiceChannelName: string | null;
   voice: DiscordVoiceMember[];
   inviteUrl: string;
+  /** A link or relink attempt just failed; the consumer shows the retry notice.
+   *  Transient client-only state (src/net/discord_oauth_flow.ts owns it), not
+   *  part of the server-sourced DiscordAccountStatus. */
+  linkError: boolean;
 }
 
 export function buildDiscordWidgetView(input: {
@@ -83,6 +87,8 @@ export function buildDiscordWidgetView(input: {
   characterName?: string | null;
   /** Origin for building the character profile URL (defaults to '' in tests). */
   origin?: string;
+  /** See DiscordWidgetView.linkError. Defaults to false. */
+  linkError?: boolean;
 }): DiscordWidgetView {
   const { enabled, status, presence, inviteUrl } = input;
   const characterName = input.characterName?.trim() || null;
@@ -138,5 +144,6 @@ export function buildDiscordWidgetView(input: {
     voiceChannelName: presence.voiceChannelName,
     voice: presence.voice,
     inviteUrl,
+    linkError: input.linkError ?? false,
   };
 }

@@ -465,6 +465,42 @@ describe('the stocked pane', () => {
     );
   });
 
+  it('a special row wears the loot-quality tier badge as its own labelled mark (mark family)', () => {
+    // The all-surfaces mark rule reaches the vault strip too: a special row
+    // whose payload carries a permanent quality descriptor paints the same
+    // tier badge the bag, bank and guild bank cells paint, positioned by a
+    // .vault-row rule of its own (the row is a wide flex button, so the cell
+    // corner rule cannot reach it). The badge is the row's only channel for
+    // the quality word, so it is labelled here (decorative in named cells).
+    const h = harness(
+      vaultInfo({
+        special: [
+          {
+            itemId: 'copper_ore',
+            count: 1,
+            instance: {
+              signer: 'Ada',
+              lootQuality: { version: 1, tier: 3, weights: [1, 2, 3, 4, 5] },
+            },
+          },
+          { itemId: 'copper_ore', count: 1, instance: { signer: 'Rin' } },
+        ],
+      }),
+    );
+    h.window.open();
+    clickVaultTab(h);
+    const marked = h.root.querySelector<HTMLElement>('[data-vault-special-index="0"]');
+    const plain = h.root.querySelector<HTMLElement>('[data-vault-special-index="1"]');
+    const badge = marked?.querySelector<HTMLElement>(':scope > .loot-quality-badge');
+    expect(badge).not.toBeNull();
+    expect(badge?.textContent).toBe('III');
+    expect(badge?.getAttribute('role')).toBe('img');
+    expect(badge?.getAttribute('aria-label')).toBe('Magnificent');
+    expect(plain?.querySelector('.loot-quality-badge')).toBeNull();
+    const css = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
+    expect(css).toMatch(/\.vault-row > \.loot-quality-badge \{\s*position: absolute;/);
+  });
+
   it('renders a special instance with canonical glyph/lock marks and withdraws its exact ref whole', () => {
     const h = harness(
       vaultInfo({
@@ -1031,7 +1067,40 @@ describe('signature-driven repaints', () => {
 
     const fresh = h.root.querySelector('.vault-row-special') as HTMLElement;
     expect(fresh.dataset.probe).toBeUndefined();
-    expect(fresh.querySelector('.vault-row-stack-count')?.textContent).toContain('2');
+    expect(fresh.querySelector('.vault-row-count')?.textContent).toBe('2/40');
+  });
+
+  it('a row that is the whole material stock renders no x-count chip; a split material chips every row', () => {
+    // The chip would read x2 beside 2/40: the same number twice on one row.
+    // When pooled and signed stock share a material, both rows print their
+    // own count beside the shared total. The readout and the hidden aria
+    // copy always carry the MATERIAL total, on every row, chip or not.
+    const h = harness(
+      vaultInfo({
+        stock: { tin_ore: 5 },
+        special: [
+          { itemId: 'copper_ore', count: 2, instance: { signer: 'Ada' } },
+          { itemId: 'tin_ore', count: 3, instance: { signer: 'Ada' } },
+        ],
+      }),
+    );
+    h.window.open();
+    clickVaultTab(h);
+    h.window.refreshIfChanged();
+    const rows = Array.from(h.root.querySelectorAll<HTMLElement>('.vault-row'));
+    const copper = rows.find((r) => r.dataset.itemId === 'copper_ore');
+    const tinPooled = rows.find(
+      (r) => r.dataset.itemId === 'tin_ore' && !r.dataset.vaultSpecialIndex,
+    );
+    const tinSigned = rows.find(
+      (r) => r.dataset.itemId === 'tin_ore' && r.dataset.vaultSpecialIndex,
+    );
+    expect(copper?.querySelector('.vault-row-stack-count')).toBeNull();
+    expect(copper?.querySelector('.vault-row-count')?.textContent).toBe('2/40');
+    expect(tinPooled?.querySelector('.vault-row-stack-count')?.textContent).toBe('x5');
+    expect(tinSigned?.querySelector('.vault-row-stack-count')?.textContent).toBe('x3');
+    expect(tinSigned?.querySelector('.vault-row-count')?.textContent).toBe('8/40');
+    expect(tinSigned?.querySelector('.visually-hidden')?.textContent).toContain(': 8 of 40 stored');
   });
 
   it('a special-row reorder repaints exact index selectors even when fingerprints duplicate', () => {
@@ -1406,5 +1475,130 @@ describe('the personal footer meter and the vault tab (phase 08 QA)', () => {
     // And back: the personal pane returns with its one footer.
     (h.root.querySelector('.bank-tab[data-tab="personal"]') as HTMLElement).click();
     expect(h.root.querySelectorAll('.bank-footer')).toHaveLength(1);
+  });
+});
+
+describe('the name search (the personal bank search, on the vault pane)', () => {
+  const stocked = () =>
+    harness(vaultInfo({ stock: { copper_ore: 5, frost_lotus: 2, not_a_real_id: 3 } }));
+  const searchBox = (h: Harness): HTMLInputElement | null =>
+    h.root.querySelector<HTMLInputElement>('.vault-pane .vault-search.bag-search');
+  const rowIds = (h: Harness): string[] =>
+    Array.from(h.root.querySelectorAll<HTMLElement>('.vault-row')).map(
+      (r) => r.dataset.itemId ?? '',
+    );
+  const type = (input: HTMLInputElement, value: string): void => {
+    input.value = value;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+
+  it('renders the box over a stocked vault with the vault aria and the bags placeholder', () => {
+    const h = stocked();
+    h.window.open();
+    clickVaultTab(h);
+    const box = searchBox(h);
+    expect(box).not.toBeNull();
+    expect(box?.type).toBe('search');
+    expect(box?.getAttribute('aria-label')).toBe('Search vault materials by name');
+    expect(box?.placeholder).toBe('Search items');
+    // Above the scroller, so it stays put while the list scrolls.
+    expect(h.root.querySelector('.vault-pane .vault-tools + .bank-scroll')).not.toBeNull();
+  });
+
+  it('an EMPTY vault mounts no search box (nothing to filter), keeping its empty line', () => {
+    const h = harness(vaultInfo());
+    h.window.open();
+    clickVaultTab(h);
+    expect(searchBox(h)).toBeNull();
+    expect(h.root.querySelector('.bank-empty')?.textContent).toBe(
+      'Your vault is empty. Click a material in your bags to deposit it.',
+    );
+  });
+
+  it('typing narrows the rows to the DISPLAYED names containing the query, case-insensitively', () => {
+    const h = stocked();
+    h.window.open();
+    clickVaultTab(h);
+    expect(rowIds(h)).toEqual(['copper_ore', 'frost_lotus', 'not_a_real_id']);
+    type(searchBox(h) as HTMLInputElement, 'ORE');
+    expect(rowIds(h)).toEqual(['copper_ore']);
+    // The dormant unknown id is searched under the raw id its label paints.
+    type(searchBox(h) as HTMLInputElement, 'real_id');
+    expect(rowIds(h)).toEqual(['not_a_real_id']);
+    // Clearing restores every row.
+    type(searchBox(h) as HTMLInputElement, '');
+    expect(rowIds(h)).toEqual(['copper_ore', 'frost_lotus', 'not_a_real_id']);
+  });
+
+  it('keeps focus and caret in the box across the keystroke rebuild, and re-installs the value', () => {
+    const h = stocked();
+    h.window.open();
+    clickVaultTab(h);
+    const box = searchBox(h) as HTMLInputElement;
+    box.focus();
+    type(box, 'cop');
+    box.setSelectionRange(1, 2);
+    type(box, 'copp');
+    const fresh = searchBox(h) as HTMLInputElement;
+    expect(fresh).not.toBe(box); // a full rebuild replaced the node
+    expect(fresh.value).toBe('copp');
+    expect(document.activeElement).toBe(fresh);
+    expect(rowIds(h)).toEqual(['copper_ore']);
+  });
+
+  it('a query matching nothing shows the no-match status line instead of an emptied pane', () => {
+    const h = stocked();
+    h.window.open();
+    clickVaultTab(h);
+    type(searchBox(h) as HTMLInputElement, 'osmium');
+    expect(rowIds(h)).toEqual([]);
+    const none = h.root.querySelector('.vault-search-empty');
+    expect(none?.textContent).toBe('No material in your vault matches your search.');
+    expect(none?.getAttribute('role')).toBe('status');
+    // Never the plain empty-vault line: the stock is still there.
+    expect(h.root.textContent).not.toContain('Your vault is empty');
+    // The box survives the miss so the player can correct the query.
+    expect(searchBox(h)).not.toBeNull();
+  });
+
+  it('a whitespace-only query is no search: every row stays', () => {
+    const h = stocked();
+    h.window.open();
+    clickVaultTab(h);
+    type(searchBox(h) as HTMLInputElement, '   ');
+    expect(rowIds(h)).toEqual(['copper_ore', 'frost_lotus', 'not_a_real_id']);
+  });
+
+  it('a live stock change (the signature repaint) keeps the query applied', () => {
+    const h = stocked();
+    h.window.open();
+    clickVaultTab(h);
+    type(searchBox(h) as HTMLInputElement, 'ore');
+    h.world.vaultInfo = vaultInfo({ stock: { copper_ore: 5, frost_lotus: 2, iron_ore: 1 } });
+    h.window.refreshIfChanged();
+    expect(rowIds(h)).toEqual(['copper_ore', 'iron_ore']);
+    expect((searchBox(h) as HTMLInputElement).value).toBe('ore');
+  });
+
+  it('closing the bank forgets the query: a reopened vault shows everything', () => {
+    const h = stocked();
+    h.window.open();
+    clickVaultTab(h);
+    type(searchBox(h) as HTMLInputElement, 'ore');
+    expect(rowIds(h)).toEqual(['copper_ore']);
+    h.window.close();
+    h.window.open();
+    clickVaultTab(h);
+    expect((searchBox(h) as HTMLInputElement).value).toBe('');
+    expect(rowIds(h)).toEqual(['copper_ore', 'frost_lotus', 'not_a_real_id']);
+  });
+
+  it('the filtered rows stay actionable: a click withdraws the shown material by its own id', () => {
+    const h = stocked();
+    h.window.open();
+    clickVaultTab(h);
+    type(searchBox(h) as HTMLInputElement, 'lotus');
+    (h.root.querySelector('.vault-row') as HTMLElement).click();
+    expect(h.calls).toEqual(['vaultWithdraw:frost_lotus']);
   });
 });

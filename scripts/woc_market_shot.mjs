@@ -49,7 +49,7 @@ const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/woc-market';
 // capture set would sweep it in.
 const DEBUG_OUT = process.env.DEBUG_DIR ?? 'tmp';
 const STRESS = process.env.STRESS === '1';
-// The server's chat token bucket (server/game.ts CHAT_RATE_BURST /
+// The server's chat token bucket (server/chat_rate_limit.ts CHAT_RATE_BURST /
 // CHAT_RATE_REFILL_PER_SECOND / CHAT_COOLDOWN_SECONDS): a dev command is a
 // chat message, so the seeder paces itself to it rather than losing gifts.
 const CHAT_BURST = 4;

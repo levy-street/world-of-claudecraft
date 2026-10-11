@@ -14,6 +14,7 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import type { ClientWorld } from '../src/net/online';
+import { createGroundObject } from '../src/sim/entity';
 import type { Entity } from '../src/sim/types';
 import { bareClient } from './helpers/bare_client';
 
@@ -533,6 +534,44 @@ describe('client crowd protocol', () => {
     expect(e.kind).toBe('player');
     expect(e.level).toBeGreaterThan(0);
     expect(e.pos.x).toBe(rec.x);
+  });
+
+  it('sends buried hoard rarity as identity, preserves it on lite, and clears it with a full record', () => {
+    const viewerEntity = server.sim.entities.get(viewer.pid)!;
+    const pos = besideViewer(viewerEntity, 30);
+    const entrance = createGroundObject(
+      90_002,
+      '',
+      'Buried Hoard',
+      server.sim.groundPos(pos.x, pos.z),
+    );
+    entrance.templateId = 'hoard_entrance';
+    entrance.vaultRarity = 'legendary';
+    server.sim.entities.set(entrance.id, entrance);
+    server.sim.grid.insert(entrance);
+
+    broadcast(server);
+    let snap = apply();
+    let rec = entRecord(snap, entrance.id);
+    expect(rec).toMatchObject({ k: 'object', tid: 'hoard_entrance', vr: 'legendary' });
+    expect(client.entities.get(entrance.id)?.vaultRarity).toBe('legendary');
+
+    viewerFc.sent.length = 0;
+    step(server, [entrance.id]);
+    snap = apply();
+    rec = entRecord(snap, entrance.id);
+    expect(rec.k).toBeUndefined();
+    expect(rec.vr).toBeUndefined();
+    expect(client.entities.get(entrance.id)?.vaultRarity).toBe('legendary');
+
+    entrance.vaultRarity = undefined;
+    viewerFc.sent.length = 0;
+    step(server);
+    snap = apply();
+    rec = entRecord(snap, entrance.id);
+    expect(rec.k).toBe('object');
+    expect(rec).not.toHaveProperty('vr');
+    expect(client.entities.get(entrance.id)?.vaultRarity).toBeUndefined();
   });
 
   it('ignores lite records for unknown ids without creating ghosts', () => {

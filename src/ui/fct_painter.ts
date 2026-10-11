@@ -55,6 +55,30 @@
 //    pointer-events:none), so the capture-by-value hazard cannot occur; the only
 //    mutable slot state is read synchronously inside spawn() / step().
 //
+// BEAT STAGING (the one reason a floater is not spawned on the frame it arrives):
+// an ability whose authored contacts land AFTER the cast tick that resolved them carries
+// a delaySec on its spawn shape, and this painter holds the entry until that beat. Red
+// Harvest is the case: the sim resolves all three weapon strikes on the cast tick, while
+// the client plays the three blade contacts at FURY_AUDIO.red_harvest.times, so without
+// staging all three numbers pop at once, ahead of every blade. The rules mirror the node
+// pool's, for the same reasons:
+//  - FIXED CAP: FCT_PENDING_CAP slots are pre-allocated and rewritten in place, so
+//    holding allocates nothing; at the cap the oldest held entry is RELEASED immediately
+//    rather than dropped (a number is never lost, it only arrives early).
+//  - NO TIMER: held entries advance from the same step() the TTL recycle runs on, off the
+//    frame clock hud.update() already passes. There is no setTimeout anywhere here.
+//  - RELEASED, THEN DESCRIBED: a held entry claims no node and is neither described nor
+//    projected until release, so the number appears over where the unit stands AT CONTACT,
+//    and a behind-camera cull is decided then too.
+//  - ORDERED BY BEAT: the queue is kept in due order, so two overlapping casts still
+//    release their numbers in the order the blades actually land.
+//  - DISPOSE CLEARS: a held entry references the entity it floats over, so dispose()
+//    drops the queue and detaches the live nodes for a host that tears its painter
+//    down (the tests, a future HUD teardown); the live HUD keeps one painter for the
+//    page's life and never calls it.
+// Only the FCT number is staged. Nothing a player reacts to (target HP, nameplates, cast
+// bars, the combat log line) is delayed by any of this.
+//
 // ACCESSIBILITY: FCT divs are decorative transient text (not focusable,
 // pointer-events:none, world-anchored over the 3D scene), so this painter introduces no
 // focus trap and no announced text. Every pooled node is marked aria-hidden at build (see
@@ -68,9 +92,19 @@
 // emit a textual chat line via hud.log() (which the #chat-live region announces), so routing
 // the float into a live region too would double-announce.
 
+import { FURY_AUDIO } from '../game/fury_audio_core';
 import type { UiEffectsTier } from '../game/ui_effects_profile';
 import { fctMaxConcurrent, fctTtlScale } from '../game/ui_tier_knobs';
-import { describeFct, type FctColorToken, type FctDescriptor, type FctEvent } from './fct_core';
+import {
+  describeFct,
+  type FctAnchorSource,
+  type FctColorToken,
+  type FctDescriptor,
+  type FctEvent,
+  type FctKind,
+} from './fct_core';
+import { type FctSpawnShape, type FctSpawnSource, fctSpawnShape } from './fct_event';
+import { FctBeatStager, type FctBeatStrike } from './fct_stage_core';
 import type { PainterHostWriters } from './painter_host';
 
 /**
@@ -91,6 +125,24 @@ export type FctProject = (
  * bounded (the old createElement path had no ceiling at all).
  */
 export const FCT_POOL_CAP = 64;
+
+/**
+ * Max floaters HELD for a later contact beat at once (see BEAT STAGING above). A hard
+ * bound on a pre-allocated queue, like the node pool: at the cap the oldest held entry is
+ * released immediately rather than dropped, so a number is never lost, it only arrives
+ * early. Sized well above the real case (three strikes per cast, a handful of visible
+ * casters) while staying far below the node pool it feeds.
+ */
+export const FCT_PENDING_CAP = 16;
+
+/** Seconds to milliseconds: the beat table is authored in seconds, the frame clock is ms. */
+const MS_PER_SEC = 1000;
+
+/**
+ * The anchor a FREE pending slot points at, so a released slot drops its reference to the
+ * entity it was floating over instead of pinning it until the slot is next used.
+ */
+const FCT_EMPTY_ANCHOR: FctAnchorSource = { pos: { x: 0, y: 0, z: 0 }, scale: 1 };
 
 // Class / style-property names the painter drives. Named (not inlined) so the painter
 // references no bare DOM string magic and -- crucially -- no hex / px colour literal:
@@ -125,12 +177,34 @@ interface FctSlot {
   ttlMs: number;
 }
 
+/**
+ * One pre-allocated HELD floater: an FctEvent whose fields are rewritten in place (so
+ * holding allocates nothing) plus the frame-clock instant it is due. It is deliberately
+ * FctEvent-shaped, because releasing it is just the ordinary spawn path with the slot
+ * passed as the event.
+ */
+interface FctPending {
+  kind: FctKind;
+  text: string;
+  target: FctAnchorSource;
+  crit: boolean;
+  isSelf: boolean;
+  dueAt: number;
+}
+
 export class FctPainter {
   // Free slots (detached nodes ready to reuse). A slot is in exactly one of free / live.
   private readonly free: FctSlot[] = [];
   // Live slots in spawn order: new spawns append, TTL / eviction removes while preserving
   // order, so live[0] is always the oldest -> the eviction victim.
   private readonly live: FctSlot[] = [];
+  // Free held-entry slots, and the entries currently waiting for their beat, kept in
+  // dueAt order so releases always run in beat order (see insertPending).
+  private readonly pendingFree: FctPending[] = [];
+  private readonly pending: FctPending[] = [];
+  // The per-frame strike-ordinal tracker, fed the ONE authored beat table (src/game
+  // owns it; the pure core takes it injected so it stays game-layer-free).
+  private readonly beats = new FctBeatStager(FURY_AUDIO.red_harvest.times);
   private readonly random: () => number;
   // The pre-allocated pool size. On the full tiers this is also the live cap, so eviction
   // fires only at pool-full (the pre-tiering behavior); on low fctMaxConcurrent caps the
@@ -148,6 +222,7 @@ export class FctPainter {
     private readonly getScale: () => number,
     opts: {
       cap?: number;
+      pendingCap?: number;
       doc?: Document;
       random?: () => number;
       getFxTier?: () => UiEffectsTier;
@@ -155,6 +230,7 @@ export class FctPainter {
   ) {
     const {
       cap = FCT_POOL_CAP,
+      pendingCap = FCT_PENDING_CAP,
       doc = document,
       random = Math.random,
       // Default to the full tier so a painter built without the accessor (e.g. a Node
@@ -176,16 +252,57 @@ export class FctPainter {
       node.setAttribute('aria-hidden', 'true');
       this.free.push({ node, colorClass: null, bornAt: 0, ttlMs: 0 });
     }
+    // Held-entry slots are pre-allocated the same way, so a beat-staged floater costs
+    // no object on the event path either.
+    for (let i = 0; i < pendingCap; i++) {
+      this.pendingFree.push({
+        kind: 'self-note',
+        text: '',
+        target: FCT_EMPTY_ANCHOR,
+        crit: false,
+        isSelf: false,
+        dueAt: 0,
+      });
+    }
   }
 
   /**
-   * Spawn a floater for `event` at frame clock `now`. Builds the pure descriptor with an
-   * injected jitter draw, projects the head anchor ONCE and behind-culls exactly as the live
-   * fct() did (no slot claimed if behind), claims a free slot or evicts the oldest, writes the
-   * text + colour / crit classes, positions the node in author space, attaches it, and (only
-   * when an attached node was evicted) replays the CSS rise.
+   * Resolve the spawn shape for a damage occasion (fct_event owns that discrimination)
+   * and stamp the authored contact BEAT this strike belongs to onto it, so the spawn
+   * sites carry the delay with the rest of the shape. The ordinal is consumed even when
+   * the shape is null (a hit between two other entities floats nothing), so a later
+   * strike of the same cast still lands on its own beat rather than sliding forward.
+   */
+  stagedShape(strike: FctBeatStrike, now: number, src: FctSpawnSource): FctSpawnShape | null {
+    const delaySec = this.beats.delaySec(strike, now);
+    const shape = fctSpawnShape(src);
+    if (shape === null || delaySec <= 0) return shape;
+    return { ...shape, delaySec };
+  }
+
+  /**
+   * Spawn a floater for `event` at frame clock `now`, or HOLD it when the event carries a
+   * `delaySec` (an authored contact beat: see BEAT STAGING above). A held entry claims no
+   * node and is not described or projected until it is released, so the number appears over
+   * where the unit is AT CONTACT rather than where it stood on the cast tick.
    */
   spawn(event: FctEvent, now: number): void {
+    const delayMs = (event.delaySec ?? 0) * MS_PER_SEC;
+    if (delayMs > 0) {
+      this.hold(event, now, now + delayMs);
+      return;
+    }
+    this.spawnNow(event, now);
+  }
+
+  /**
+   * The undelayed spawn: builds the pure descriptor with an injected jitter draw, projects
+   * the head anchor ONCE and behind-culls exactly as the live fct() did (no slot claimed if
+   * behind), claims a free slot or evicts the oldest, writes the text + colour / crit
+   * classes, positions the node in author space, attaches it, and (only when an attached
+   * node was evicted) replays the CSS rise.
+   */
+  private spawnNow(event: FctEvent, now: number): void {
     const tier = this.getFxTier();
     // Every FCT floater is spawned on every tier: the low preset sheds FCT cost purely
     // through the bounded pool (a tighter live cap + a shorter TTL below), never by refusing
@@ -237,6 +354,11 @@ export class FctPainter {
    * perf gate by construction.
    */
   step(now: number): void {
+    // Held floaters are released BEFORE the TTL walk, never after. The FRAME-ORDERING
+    // CONTRACT above requires every spawn of a frame to run ahead of that frame's
+    // recycling: a node this walk frees and a release then reused would be a same-tick
+    // detach + re-append, which does not restart the CSS rise and renders invisible.
+    this.releaseDue(now);
     if (this.live.length === 0) return;
     // Reverse walk so splicing an expired slot does not skip its neighbour.
     for (let i = this.live.length - 1; i >= 0; i--) {
@@ -254,7 +376,82 @@ export class FctPainter {
     return this.live.length;
   }
 
+  /** Floaters currently HELD for a later contact beat (bounded by the pending cap). */
+  heldCount(): number {
+    return this.pending.length;
+  }
+
+  /**
+   * Tear down: drop every held floater and detach every live node, returning both pools
+   * to their free lists. A held entry keeps a reference to the entity it floats over, so
+   * clearing is what stops a disposed painter from pinning the world it was showing; and a
+   * delayed number must never arrive after the HUD that asked for it is gone.
+   */
+  dispose(): void {
+    while (this.pending.length > 0) this.recyclePending(this.pending.pop() as FctPending);
+    this.beats.reset();
+    for (let i = this.live.length - 1; i >= 0; i--) {
+      const slot = this.live[i];
+      slot.node.remove();
+      this.free.push(slot);
+    }
+    this.live.length = 0;
+  }
+
   // --- internals ---
+
+  /**
+   * Hold `event` until `dueAt`, copying its fields into a pre-allocated slot (no per-event
+   * allocation). At the cap the OLDEST held entry is released immediately rather than
+   * dropped: a number the player earned is never lost to a queue bound, it only arrives
+   * ahead of its beat.
+   */
+  private hold(event: FctEvent, now: number, dueAt: number): void {
+    let slot = this.pendingFree.pop();
+    if (slot === undefined) {
+      slot = this.pending.shift() as FctPending;
+      this.spawnNow(slot, now);
+    }
+    slot.kind = event.kind;
+    slot.text = event.text;
+    slot.target = event.target;
+    slot.crit = event.crit;
+    slot.isSelf = event.isSelf;
+    slot.dueAt = dueAt;
+    this.insertPending(slot);
+  }
+
+  /**
+   * Insert a held slot in dueAt order, by shifting references over a tiny array (nothing
+   * allocated). Order matters because two casts can overlap: a later frame's FIRST beat
+   * can fall due before an earlier frame's LAST one, and releases must still run in the
+   * order the beats actually land.
+   */
+  private insertPending(slot: FctPending): void {
+    let i = this.pending.length;
+    this.pending.push(slot);
+    while (i > 0 && this.pending[i - 1].dueAt > slot.dueAt) {
+      this.pending[i] = this.pending[i - 1];
+      this.pending[i - 1] = slot;
+      i--;
+    }
+  }
+
+  /** Spawn every held floater whose beat has arrived, in beat order. */
+  private releaseDue(now: number): void {
+    while (this.pending.length > 0 && this.pending[0].dueAt <= now) {
+      const slot = this.pending.shift() as FctPending;
+      this.spawnNow(slot, now);
+      this.recyclePending(slot);
+    }
+  }
+
+  /** Return a held slot to the free list, dropping its text and entity reference. */
+  private recyclePending(slot: FctPending): void {
+    slot.text = '';
+    slot.target = FCT_EMPTY_ANCHOR;
+    this.pendingFree.push(slot);
+  }
 
   /** Text + colour-token class + crit class, all through the elided writers. Switches the
    *  colour class by toggling the previous one off and the new one on (so a recycled node

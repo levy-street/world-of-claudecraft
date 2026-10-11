@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
 import { ITEM_ART_AUDIT_RENDERER_FINGERPRINT } from '../scripts/lib/item_art_audit.mjs';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
+import { HOARD_ITEMS } from '../src/sim/content/hoard_loot';
 import { ITEMS } from '../src/sim/data';
 import { ITEM_ART_PENDING } from '../src/ui/icons';
 
@@ -300,6 +301,15 @@ function reportShipping(record: Record<string, unknown>): Record<string, unknown
     throw new Error(`report record ${String(record.id)} has no shipping or final record`);
   }
   return shipping as Record<string, unknown>;
+}
+
+/** The trinket slot's icon batch: additive beyond the whole historical chain,
+ *  like the Field Kit and the reins icons. */
+const TRINKET_ICON_BATCH_ID = 'trinket-slot-icons-2026-09-23';
+function trinketIconIds(batches: Array<{ batchId?: unknown; itemIds: string[] }>): string[] {
+  const ids = batches.find(({ batchId }) => batchId === TRINKET_ICON_BATCH_ID)?.itemIds ?? [];
+  expect(ids).toHaveLength(18);
+  return ids;
 }
 
 describe('item-art consistency accepted-art provenance', () => {
@@ -839,10 +849,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // (14 base pieces + their 14 auto-generated heroic variants) = 1,299. The
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
-    // The buddy companion merge adds 32 whistles + 2 charm looks: 1,335, and
-    // the Horse companion's whistle (art pending, BUDDY_ART_PENDING_ITEM_IDS)
-    // one more: 1,336; the Sapling whistle brings the total to 1,337.
-    expect(Object.keys(ITEMS)).toHaveLength(1337);
+    // The wq-reputation merge's 15 faction quartermaster items: 1,320.
+    // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
+    // treasure_casket): 1,323. The faction ladder rework's 17 new rows
+    // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
+    // 1,653 with the buddy companion branch's 36 item definitions (release/v0.45.0 merge).
+    expect(Object.keys(ITEMS)).toHaveLength(1653);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -996,14 +1008,23 @@ describe('item-art consistency accepted-art provenance', () => {
     // release's 25 Nythraxis gap-fill and Bramblehide mapping owners
     // (nythraxis-gap-weapon-renders-2026-09-04 + roots-bramblehide-icons-2026-09-07)
     // = 1,281. The OSSBrain PR #3781 reconcile's two disjoint reins owners
-    // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283.
-    // + the buddy merge's 31 rendered whistles and 2 charm dyes: 1,316; Sapling adds one.
-    expect(new Set(currentOwnerIds).size).toBe(1317);
-    expect(shippingIds).toHaveLength(1317);
-    // The buddy companion merge adds 32 whistles + 2 charm looks: 1,335, and
-    // the Horse companion's whistle (art pending, BUDDY_ART_PENDING_ITEM_IDS)
-    // one more: 1,336; the Sapling whistle brings the total to 1,337.
-    expect(Object.keys(ITEMS)).toHaveLength(1337);
+    // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283. The
+    // release's Viridian Valestrider reins (reins_avian_strider) adds one: 1,284.
+    // The world-quest branch's two batches (four quest-object icons) join at the
+    // release/v0.43.0 merge: 1,288.
+    // The faction quartermaster icons (faction-vendor-icons-2026-09-16, 15
+    // SVG compositions) join at the wq-reputation merge: 1,302.
+    // The Emissary's Cache chest (feature/weekly-quests): 1,303. The Clue
+    // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
+    // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
+    // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
+    // + the buddy companion branch at its release/v0.45.0 merge: 34 rendered
+    // whistle and charm icons (buddy-whistle-icons-2026-08-28,
+    // buddy-charm-icons-2026-09-09) and 36 item definitions (the 34 plus the
+    // Horse and Emberfall Phoenix whistles, whose art is enumerated debt).
+    expect(new Set(currentOwnerIds).size).toBe(1498);
+    expect(shippingIds).toHaveLength(1498);
+    expect(Object.keys(ITEMS)).toHaveLength(1653);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1028,16 +1049,147 @@ describe('item-art consistency accepted-art provenance', () => {
           ].includes(batchId),
       )
       .flatMap(({ itemIds }) => itemIds);
+    // 59 with the buddy companion branch's two batches (34 ids) in the filter above.
     expect(releaseBatchIds).toHaveLength(59);
+    // The world-quest branch's two batches are additive beyond the dated chain
+    // as well (release/v0.43.0 merge into feature/world-quests).
+    const worldQuestBatchIds = mapping.generatedBatches
+      .filter(
+        ({ batchId }) =>
+          typeof batchId === 'string' &&
+          [
+            'world-quest-puzzle-activators-2026-09-01',
+            'world-quest-freight-icons-2026-09-01',
+          ].includes(batchId),
+      )
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(worldQuestBatchIds)).toEqual([
+      'confection_game_box',
+      'eastbrook_freight_crate',
+      'eastbrook_freight_wagon',
+      'leyline_cache',
+    ]);
+    // The wq-reputation merge's faction quartermaster stock, one SVG batch
+    // (faction-vendor-icons-2026-09-16), additive beyond the chain the same way.
+    const factionVendorBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(factionVendorBatchIds)).toEqual([
+      'artificers_welding_cowl',
+      'automaton_cog_ring',
+      'champion_dawn_medallion',
+      'champion_forged_loop',
+      'champion_rift_band',
+      'clockwork_tinkers_pack',
+      'dawnkeeper_consecrated_mace',
+      'forgemaster_crag_cleaver',
+      'order_prayer_beads',
+      'rift_surveyors_satchel',
+      'rift_watchers_band',
+      'riftwalkers_tunic',
+      'riftwarden_voidblade',
+      'templar_dawn_shield',
+      'vestments_of_the_acolyte',
+    ]);
+    // The faction ladder rework's periphery rows and formulas, one SVG batch
+    // (faction-ladder-icons-2026-09-23), additive beyond the chain the same way.
+    const factionLadderBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'faction-ladder-icons-2026-09-23')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(factionLadderBatchIds)).toEqual([
+      'acolytes_signet',
+      'champions_dawn_loop',
+      'cogwork_choker',
+      'cord_of_the_dawn',
+      'dawnkeepers_circle',
+      'dawnlit_slippers',
+      'forgemasters_girdle',
+      'forgemasters_sabatons',
+      'forgewall_gorget',
+      'formula_dawnfire_etching',
+      'formula_dawns_benediction',
+      'formula_piston_drive',
+      'formula_riftwalkers_grace',
+      'riftwalkers_cord',
+      'riftwalkers_treads',
+      'riftwardens_pendant',
+      'tidewatchers_locket',
+    ]);
+    // The Clue Scroll items, one SVG batch (clue-scroll-icons-2026-09-17),
+    // additive beyond the chain the same way.
+    const clueScrollBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(clueScrollBatchIds)).toEqual(['clue_scroll', 'treasure_casket']);
+    // The faction reward items, one SVG batch (faction-rewards-icons-2026-09-17),
+    // additive beyond the chain the same way.
+    const factionRewardBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'faction-rewards-icons-2026-09-17')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(factionRewardBatchIds)).toEqual([
+      'allied_hearthstone',
+      'allied_vanguard_duffel',
+      'clockwork_shock_bomb',
+      'clockwork_target_dummy',
+      'dawn_battle_standard',
+      'dense_sharpening_stone',
+      'elixir_of_mana_regeneration',
+      'formula_enchant_feet_shadowstride',
+      'formula_enchant_gloves_forged_might',
+      'formula_enchant_offhand_spirit',
+      'pattern_reinforced_armor_kit',
+      'plans_dense_sharpening_stone',
+      'potion_of_invisibility',
+      'recipe_elixir_of_mana_regeneration',
+      'recipe_potion_of_invisibility',
+      'reinforced_armor_kit',
+      'rift_feather_glider',
+      'schematic_clockwork_shock_bomb',
+    ]);
+    // The treasure maps and Cartographer's Ink (buried-hoard-treasure-maps-2026-09-19).
+    const treasureMapBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'buried-hoard-treasure-maps-2026-09-19')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(treasureMapBatchIds)).toEqual([
+      'cartographers_ink',
+      'treasure_map_common',
+      'treasure_map_epic',
+      'treasure_map_legendary',
+      'treasure_map_rare',
+    ]);
+    // The Buried Hoard boss loot (hoard-boss-loot-icons-2026-09-20): one icon per
+    // generated item id, 32 pieces at three tiers, pinned against the live table
+    // rather than as 96 literals.
+    const hoardLootBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'hoard-boss-loot-icons-2026-09-20')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(hoardLootBatchIds).toHaveLength(96);
+    expect(sorted(hoardLootBatchIds)).toEqual(sorted(Object.keys(HOARD_ITEMS)));
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
     // this whole historical chain too, the same way the Field Kit is.
     expect(
       sorted([
         ...oldPassIds,
         ...releaseBatchIds,
+        ...worldQuestBatchIds,
+        ...factionVendorBatchIds,
+        ...factionLadderBatchIds,
+        ...clueScrollBatchIds,
+        ...factionRewardBatchIds,
+        ...treasureMapBatchIds,
+        ...hoardLootBatchIds,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        ...trinketIconIds(mapping.generatedBatches),
+        // The weekly emissary's cache chest, additive the same way.
+        'emissary_cache',
+        'reins_avian_strider',
+        // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
+        'vanguard_verdict_greatsword',
+        'vanguard_oath_blade',
+        'vanguard_fang_dagger',
+        'vanguard_warstaff',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1189,15 +1341,26 @@ describe('item-art consistency accepted-art provenance', () => {
     ).toBeUndefined();
     // The completion wave consolidates 68 interim per-entry/SVG owners into
     // one generated batch. The surviving ordinary-art cohort stays explicit.
-    expect(mapping.entries).toHaveLength(43);
+    // 43 -> 44 at the weekly emissary: the Emissary's Cache chest; 45 with
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge).
+    expect(mapping.entries).toHaveLength(45);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
     // (nythraxis-gap-weapon-renders-2026-09-04, roots-bramblehide-icons-2026-09-07) = 29.
     // OSSBrain PR #3781 reconcile adds its own 2 disjoint batches
     // (goblin-rocket-sled-icon-2026-08-12, rallycart-rxt-icon-2026-08-20) = 31.
-    // The buddy companion merge adds its two batches (whistles, charms) = 33.
-    expect(mapping.generatedBatches).toHaveLength(33);
+    // The world-quest branch adds its 2 batches (world-quest-puzzle-activators and
+    // world-quest-freight-icons, 2026-09-01) at the release/v0.43.0 merge = 33.
+    // The wq-reputation merge adds the faction quartermaster icons' batch
+    // (faction-vendor-icons-2026-09-16) = 34. The Clue Scroll items add their
+    // batch (clue-scroll-icons-2026-09-17) = 35. The faction ladder rework adds
+    // its batch (faction-ladder-icons-2026-09-23) = 36. The trinket slot's icon batch
+    // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
+    // batch (warfare-season2-weapons-2026-09-25) = 38.
+    // The buddy companion branch's two batches (whistles, charms) at its
+    // release/v0.45.0 merge = 43.
+    expect(mapping.generatedBatches).toHaveLength(43);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1258,15 +1421,24 @@ describe('item-art consistency accepted-art provenance', () => {
     // Nythraxis gap-fill weapon renders and 22 Bramblehide wave paintings
     // (+25) = 753. OSSBrain PR #3781 reconcile adds its own two disjoint
     // batches (goblin-rocket-sled-icon-2026-08-12,
-    // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755.
-    // The buddy merge and Sapling add 32 whistle renders + 2 charm dyes.
-    expect(priorGeneratedIds).toHaveLength(789);
+    // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755. The
+    // world-quest branch's two batches add four ids at the release/v0.43.0
+    // merge: 759. The faction quartermaster batch adds 15 at the
+    // wq-reputation merge: 774. The Clue Scroll batch adds 2: 776. The faction
+    // ladder batch (faction-ladder-icons-2026-09-23) adds 17: 793. The
+    // trinket-slot-icons-2026-09-23 batch adds its 18 trinkets: 811. Warfare
+    // Season 2's weapon batch adds 4: 815. The Buried Hoards branch's three
+    // batches (18 faction reward paintings, 5 treasure-map family, 96 hoard boss
+    // loot) add 119 at the 2026-09-28 release merge: 934.
+    // The buddy companion branch's 34 whistle and charm renders (release/v0.45.0
+    // merge): 968.
+    expect(priorGeneratedIds).toHaveLength(968);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1317);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1317);
+    expect(allCurrentOwnerIds).toHaveLength(1498);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1498);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1274,8 +1446,14 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      entries: 43,
-      priorGenerated: 789,
+      // 45 entries (the release's mapping entries; the hoard batches own no entries).
+      entries: 45,
+      // + the 2 Clue Scroll ids = 776 + the 17 faction ladder ids = 793.
+      // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
+      // + the 4 Warfare Season 2 weapons = 815.
+      // + the Buried Hoards branch's 119 paintings (three batches) = 934.
+      // + the buddy companion branch's 34 renders (release/v0.45.0 merge) = 968.
+      priorGenerated: 968,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1332,7 +1510,8 @@ describe('item-art consistency accepted-art provenance', () => {
           (id) =>
             !completionIdSet.has(id) &&
             id !== 'reins_goblin_rocket_sled' &&
-            id !== 'reins_rallycart_rxt',
+            id !== 'reins_rallycart_rxt' &&
+            id !== 'reins_avian_strider',
         ),
         ...(completionBatch?.itemIds ?? []),
         ...(crucibleBatch?.itemIds ?? []),
@@ -1345,12 +1524,42 @@ describe('item-art consistency accepted-art provenance', () => {
       sorted([
         ...datedMasterwroughtVerdict.visualVerdict.passIds,
         ...releaseBatchIdsForCatalog,
+        // The world-quest branch's two batches (release/v0.43.0 merge).
+        ...mapping.generatedBatches
+          .filter(
+            ({ batchId }) =>
+              typeof batchId === 'string' &&
+              [
+                'world-quest-puzzle-activators-2026-09-01',
+                'world-quest-freight-icons-2026-09-01',
+                // The faction quartermaster stock (wq-reputation merge).
+                'faction-vendor-icons-2026-09-16',
+                // The faction ladder rework's periphery rows and formulas.
+                'faction-ladder-icons-2026-09-23',
+                // The Clue Scroll items.
+                'clue-scroll-icons-2026-09-17',
+                'faction-rewards-icons-2026-09-17',
+                'buried-hoard-treasure-maps-2026-09-19',
+                'hoard-boss-loot-icons-2026-09-20',
+              ].includes(batchId),
+          )
+          .flatMap(({ itemIds }) => itemIds),
         ...buddyBatchIdsForCatalog,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        ...trinketIconIds(mapping.generatedBatches),
+        // The weekly emissary's cache chest (feature/weekly-quests), additive
+        // beyond the historical chain like the Field Kit.
+        'emissary_cache',
+        'reins_avian_strider',
+        // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
+        'vanguard_verdict_greatsword',
+        'vanguard_oath_blade',
+        'vanguard_fang_dagger',
+        'vanguard_warstaff',
       ]),
-      'the dated catalog plus the release batches, the buddy batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
+      'the dated catalog plus the release batches, the world-quest, faction-vendor, faction-ladder and clue-scroll batches, the Field Kit, the OSSBrain reins icons and the Emissary Cache and the trinket icons is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1478,11 +1687,16 @@ describe('item-art consistency accepted-art provenance', () => {
     const violations: string[] = [];
     // Matches the mapping-owner sum above: 43 entries + 755 prior-generated
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
-    // batch ids + 46 Crucible-professions batch ids = 1283, + the buddy merge's
-    // 34 rendered whistle and charm icons = 1317.
-    if (ownerIds.length !== 1317)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1317`);
-    if (fileIds.length !== 1317) violations.push(`shipping WebP count: ${fileIds.length} != 1317`);
+    // batch ids + 46 Crucible-professions batch ids = 1283.
+    // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
+    // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
+    // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464.
+    // Plus the buddy companion branch's 34 rendered whistle and charm icons at
+    // its release/v0.45.0 merge = 1498.
+    if (ownerIds.length !== 1498)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1498`);
+    if (fileIds.length !== 1498) violations.push(`shipping WebP count: ${fileIds.length} != 1498`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

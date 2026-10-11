@@ -19,8 +19,10 @@
  * `target`; the applied `level` slews toward it at a fixed rate, so a step
  * is a short crossfade of the relief instead of a one-frame pop at a chunk
  * edge (the consumers scale their existing distance fades by the level, and
- * worn-stone weighs its marginal refinement tap by the fractional tap count).
- * The ladder is not even across the three knobs: at ultra the first step
+ * worn-stone weighs its refining height read by clamp(taps - 1, 0, 1) and
+ * fades its offset by min(taps, 1); the read itself is not gated, so the
+ * shed changes what the walk shows, not what it fetches). The ladder is not
+ * even across the three knobs: at ultra the first step
  * (0.32) thins the worn-stone walk (taps 3 -> 0.96), dims the micro
  * sun-shadow and starts fading the terrain parallax (relief 1.64); the floor
  * removes what is left. Read a capture with that in mind.

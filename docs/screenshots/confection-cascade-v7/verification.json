@@ -1,0 +1,8 @@
+[
+  {
+    "name": "tests",
+    "command": "npx vitest run tests/world_quest_confection_window.test.ts tests/architecture.test.ts tests/css_layer_containment.test.ts tests/css_value_validity.test.ts tests/css_token_resolution.test.ts --maxWorkers=1",
+    "exitCode": 0,
+    "log": "tmp/puzzle-preview/v7-tests.log"
+  }
+]

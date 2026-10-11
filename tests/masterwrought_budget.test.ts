@@ -1277,7 +1277,11 @@ describe('masterwrought apex budget sweep', () => {
     // ruling amended) is an OPEN maintainer ruling: re-tighten this to
     // toBeLessThan and drop the tie set if the bag is re-distinguished; the
     // rescoped pin below IS the final shape if the position is amended.
-    const APEX_TIE_BAGS = ['resonant_weave_bag', 'wayfarers_backpack'];
+    // allied_vanguard_duffel joins the named ties at the 2026-09-28
+    // release/v0.44.0 merge into feature/buried-hoards: the Vanguard-standing
+    // quartermaster bag (content/faction_vendors.ts) is unique and soulbound, so
+    // it never competes with the tradable apex bag on the market.
+    const APEX_TIE_BAGS = ['allied_vanguard_duffel', 'resonant_weave_bag', 'wayfarers_backpack'];
     const ties: string[] = [];
     for (const def of Object.values(ITEMS)) {
       if (def.kind !== 'bag' || def.id === APEX_BAG_ID) continue;
@@ -1567,19 +1571,74 @@ describe('masterwrought apex budget sweep', () => {
         d.pvpOffenseRating === undefined &&
         RATING_FIELDS.some((f) => typeof d[f] === 'number'),
     );
-    // Exactly four, named: wyrmfall_pendant, warhewn_signet, prismglass_loop
-    // and abysswrought_band. A floor under the real count is what lets a row
-    // leave the sweep silently, so the uniqueness law below would then be
-    // enforced over a quietly smaller band.
+    // Exactly nine, named: the four apex rows (wyrmfall_pendant,
+    // warhewn_signet, prismglass_loop and abysswrought_band) plus, since the
+    // 2026-09-28 release/v0.44.0 merge into feature/buried-hoards, the five
+    // epic-tier Buried Hoard jewels (content/hoard_loot.ts, ilvl 31, one 20
+    // rating each). A floor under the real count is what lets a row leave the
+    // sweep silently, so the uniqueness law below would then be enforced over
+    // a quietly smaller band.
     expect(
-      bandRows.length,
-      `the apex jewelry band is four rows: ${bandRows.map((d) => d.id).join(', ')}`,
-    ).toBe(4);
+      bandRows.map((d) => d.id).sort(),
+      `the ilvl-31 jewelry band: ${bandRows.map((d) => d.id).join(', ')}`,
+    ).toEqual(
+      [
+        'abysswrought_band',
+        'prismglass_loop',
+        'warhewn_signet',
+        'wyrmfall_pendant',
+        'band_mountains_weight',
+        'chained_ember_choker',
+        'collapsar_band_of_nyxaris',
+        'pendant_continuous_flow',
+        'seal_of_the_cryptwalker',
+      ].sort(),
+    );
     const shapeOf = (d: ItemDef & Record<string, unknown>): string =>
       `${d.slot}|${Object.keys(d.stats as Record<string, number>)
         .sort()
         .join(',')}|${soleRating(d.id)[0]}`;
-    const shapes = bandRows.map(shapeOf);
+    // The relationship of each Buried Hoard jewel to the apex band, STATED.
+    // Three are complements (a shape no other band row carries):
+    // chained_ember_choker (neck, str/sta, crit), collapsar_band_of_nyxaris
+    // (ring, int/sta, haste) and seal_of_the_cryptwalker (ring, int/sta, crit).
+    // Two share an apex row's shape on purpose, each with a different stat
+    // emphasis, so neither is strictly the better and the choice stays a
+    // choice: band_mountains_weight is the stamina-first tank ring beside the
+    // strength-first warhewn_signet, and pendant_continuous_flow trades five
+    // rating and one stamina for one intellect against wyrmfall_pendant. The
+    // law below is unchanged for every other row: any twin outside these two
+    // named pairs reds, and each named pair must stay mutually non-dominating.
+    const SHAPE_SHARING_PAIRS: Array<[string, string]> = [
+      ['band_mountains_weight', 'warhewn_signet'],
+      ['pendant_continuous_flow', 'wyrmfall_pendant'],
+    ];
+    const axesOf = (id: string): Record<string, number> => {
+      const def = ITEMS[id] as ItemDef & Record<string, unknown>;
+      const [field, value] = soleRating(id);
+      return { ...(def.stats as Record<string, number>), [field]: value };
+    };
+    for (const [hoard, apex] of SHAPE_SHARING_PAIRS) {
+      const h = bandRows.find((d) => d.id === hoard);
+      const a = bandRows.find((d) => d.id === apex);
+      if (!h || !a) throw new Error(`${hoard} and ${apex} must both sit in the band`);
+      expect(shapeOf(h), `${hoard} shares ${apex}'s shape`).toBe(shapeOf(a));
+      const hAxes = axesOf(hoard);
+      const aAxes = axesOf(apex);
+      const axes = Object.keys(hAxes);
+      expect(
+        axes.some((k) => hAxes[k] > aAxes[k]),
+        `${hoard} leads ${apex} on some axis`,
+      ).toBe(true);
+      expect(
+        axes.some((k) => aAxes[k] > hAxes[k]),
+        `${apex} leads ${hoard} on some axis`,
+      ).toBe(true);
+    }
+    // The sweep runs over the band minus the hoard half of each named pair,
+    // so a THIRD row sharing either shape still reds.
+    const namedHoardSide = new Set(SHAPE_SHARING_PAIRS.map(([hoard]) => hoard));
+    const shapes = bandRows.filter((d) => !namedHoardSide.has(d.id)).map(shapeOf);
     expect(new Set(shapes).size, `two ilvl-31 jewelry twins: ${shapes.join(' / ')}`).toBe(
       shapes.length,
     );

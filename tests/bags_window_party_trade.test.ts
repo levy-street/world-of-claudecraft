@@ -62,6 +62,7 @@ function clickHarness(
     closeBank: noop,
     onClosed: noop,
     addItemToTrade: (itemId) => staged.push(itemId),
+    tradeOfferHeadroom: () => 0,
     stageMarketSell: noop,
     stageMailParcel: noop,
     insertItemChatLink: noop,

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { makeVaultSeed } from '../src/sim/rift/vault_seed';
 import { RiftMapPainter } from '../src/ui/hud/rift/rift_map_painter';
 import type { MapMarkerArt } from '../src/ui/map_marker_icon_art';
 import type { PainterHostWriters } from '../src/ui/painter_host';
@@ -370,6 +371,59 @@ function isolatedObjectOps(ctx: FakeContext): FakeCanvasOp[] {
 }
 
 describe('RiftMapPainter', () => {
+  it.each(['minimap', 'map'] as const)(
+    'paints valley ground and its collision outline as a natural cliff rim on the $surface',
+    (surface) => {
+      const created = installBrowser();
+      const ctx = fakeContext();
+      const painter = new RiftMapPainter(
+        writers,
+        () => 'class',
+        (name) => name,
+        markerArt,
+      );
+      const valley: RiftFloorView = {
+        ...FLOOR,
+        seed: makeVaultSeed(3, 17, { open: true, zoneId: 'palmreach' }),
+        floorIndex: 0,
+        floorCount: 1,
+        contentHash: 'palmreach-valley',
+      };
+
+      if (surface === 'minimap') {
+        painter.paintMinimap(
+          ctx as unknown as CanvasRenderingContext2D,
+          world(valley),
+          {} as HTMLElement,
+          162,
+        );
+      } else {
+        painter.paintWorldMap(ctx as unknown as CanvasRenderingContext2D, world(valley), 560);
+      }
+
+      const background = created[0];
+      expect(background.ops.find((operation) => operation.kind === 'fill')?.fillStyle).toBe(
+        'resolved:--color-map-tent',
+      );
+      expect(
+        background.ops.some(
+          (operation) =>
+            operation.kind === 'stroke' &&
+            operation.strokeStyle === 'resolved:--color-map-rock' &&
+            operation.lineWidth === 6,
+        ),
+      ).toBe(true);
+      expect(
+        background.ops.some(
+          (operation) =>
+            operation.kind === 'stroke' &&
+            operation.strokeStyle === 'resolved:--color-map-building-outline' &&
+            operation.lineWidth === 1.25,
+        ),
+      ).toBe(true);
+    },
+  );
+
   it('builds each surface background once and redraws live state without rebuilding', () => {
     const created = installBrowser();
     const ctx = fakeContext();

@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "f07d182e",
+      "nextId": 1011,
+      "state": "3e336b9c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -45,7 +45,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -62,14 +64,17 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -94,6 +99,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -111,7 +118,7 @@
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 62,
-          "id": 999,
+          "id": 1003,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -163,9 +170,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1021,
-      "state": "fe1edbb9",
-      "events": "9be39354",
+      "nextId": 1025,
+      "state": "0a332681",
+      "events": "fcf5ee1c",
       "rng": {
         "draws": 3,
         "digest": "8261aa7c"
@@ -174,9 +181,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1021,
-      "state": "7354fc77",
-      "events": "82b32424",
+      "nextId": 1025,
+      "state": "ffb5bc97",
+      "events": "6cb80331",
       "rng": {
         "draws": 3,
         "digest": "8261aa7c"
@@ -185,8 +192,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1021,
-      "state": "390d38b1",
+      "nextId": 1025,
+      "state": "36d46be9",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -196,8 +203,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1021,
-      "state": "94b6aa43",
+      "nextId": 1025,
+      "state": "35dd39a3",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -207,8 +214,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1021,
-      "state": "4a6353d9",
+      "nextId": 1025,
+      "state": "35010d21",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -218,8 +225,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1021,
-      "state": "50726e67",
+      "nextId": 1025,
+      "state": "37a05e67",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -229,9 +236,9 @@
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 1022,
-      "state": "6c45f60f",
-      "events": "7e72f7eb",
+      "nextId": 1026,
+      "state": "46766d3d",
+      "events": "eb7d8eb2",
       "rng": {
         "draws": 5,
         "digest": "50aeceb5"
@@ -259,7 +266,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 10,
@@ -317,14 +326,17 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 999,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -351,6 +363,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {},
           "xp": 898
         }
@@ -368,7 +382,7 @@
           "fiveSecondRule": 102.45,
           "healPower": 6,
           "hp": 50000,
-          "id": 999,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -425,7 +439,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1020,
+          "id": 1024,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -458,8 +472,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 1022,
-      "state": "a985ce55",
+      "nextId": 1026,
+      "state": "a7f8fd5b",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -469,8 +483,8 @@
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 1022,
-      "state": "41302ec7",
+      "nextId": 1026,
+      "state": "07be1505",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -499,7 +513,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 10,
@@ -557,14 +573,17 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 999,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -591,6 +610,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {},
           "xp": 898
         }
@@ -608,7 +629,7 @@
           "fiveSecondRule": 102.55,
           "healPower": 6,
           "hp": 50000,
-          "id": 999,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -665,7 +686,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1020,
+          "id": 1024,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

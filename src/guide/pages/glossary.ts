@@ -70,7 +70,7 @@ export const GLOSSARY_TERMS: { slug: string; term: TranslationKey; def: Translat
   {
     slug: 'unstuck-sickness',
     term: 'guide.glossary.unstuckTerm',
-    def: 'guide.glossary.unstuckDef',
+    def: 'guide.glossary.unstuckDefWindow',
   },
   { slug: 'pet-bar', term: 'guide.glossary.petBarTerm', def: 'guide.glossary.petBarDef' },
   { slug: 'loadout', term: 'guide.glossary.loadoutTerm', def: 'guide.glossary.loadoutDef' },

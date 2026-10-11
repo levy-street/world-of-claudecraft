@@ -115,7 +115,7 @@
   }
   .window.window-resize-hot,
   .window.window-resizing {
-    cursor: nwse-resize;
+    cursor: var(--cursor-resize-nwse, nwse-resize);
   }
   .window.window-resizing {
     user-select: none;

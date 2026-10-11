@@ -135,6 +135,14 @@ export function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosti
   obj.userData.renderCategory = category;
 }
 
+// The ability-VFX prewarm walk (ability_vfx/prewarm.ts) selects on each
+// object's OWN tag, never an inherited one, so a pool whose root group alone
+// carries 'vfx' hands it no drawable. Call once the pool is fully built: an
+// object added later is not tagged.
+export function tagVfxSubtree(root: THREE.Object3D): void {
+  root.traverse((obj) => setRenderCategory(obj, 'vfx'));
+}
+
 function materialLabels(material: THREE.Material | THREE.Material[] | undefined): string[] {
   const mats = Array.isArray(material) ? material : material ? [material] : [];
   return mats.map((mat) => `${mat.name || mat.type}:${mat.uuid.slice(0, 8)}`);

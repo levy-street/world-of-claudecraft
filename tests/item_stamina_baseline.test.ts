@@ -5,7 +5,8 @@
 // allowlist may only shrink. Measurements and the decision record:
 // docs/design/gear-stamina-baseline-2026-09-10.md.
 import { describe, expect, it } from 'vitest';
-import { FURY_STOCK } from '../src/sim/content/pvp_honor';
+import { FURY_STOCK, WARFARE_TRINKET_STOCK } from '../src/sim/content/pvp_honor';
+import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import {
@@ -18,8 +19,10 @@ import {
   primaryStatSum,
   realizedLineBudget,
   STAMINA_BASELINE_SHARE,
+  STAMINA_MODEL_EXEMPT_SLOTS,
   slotStatMultForItem,
   staminaBaseline,
+  staminaModelExempt,
   statIdentity,
 } from '../src/sim/item_level';
 import { craftBonusStatsFor } from '../src/sim/professions/crafting';
@@ -34,7 +37,9 @@ import type { ItemDef } from '../src/sim/types';
 // (content/pvp_honor.ts, tests/pvp_honor_gear.test.ts): off its line by design,
 // permanently, and exempt from the exact-line check here. It still meets the
 // stamina floor like everything else.
-const FRACTIONAL_BY_DESIGN: ReadonlySet<string> = new Set(FURY_STOCK);
+// Warfare Season 2 (content/pvp_honor_season2.ts) is priced by the same
+// fraction rule at item level 35, so it joins the exemption on the same terms.
+const FRACTIONAL_BY_DESIGN: ReadonlySet<string> = new Set([...FURY_STOCK, ...SEASON2_STOCK]);
 
 // Items whose primary total was off their budget BEFORE the stamina model landed
 // (the 2026-09-10 inventory: the level-18 crafted set 1 to 3 over, leveling drift
@@ -151,9 +156,15 @@ const STAT_DRIFT_ALLOWLIST: ReadonlySet<string> = new Set([
 // The ratchet ceiling for the allowlist above and the count of untiered items the
 // proxy floor binds on (see the catalog test).
 const STAT_DRIFT_ALLOWLIST_CEILING = 103;
-const UNTIERED_WITH_PROXY_FLOOR = 51;
+// 63 with the faction quartermaster stock: 12 untiered pieces whose own line
+// rounds to a floor (the Order Prayer Beads' spi 1 rounds to none). 77 with
+// the faction ladder rework: 28 untiered equipment rows, every one carrying a
+// real line now (the two untiered feet rows carry sta 6, one over their tiered
+// raid mirror, because the proxy floor rounds an 11-point line up to 6).
+const UNTIERED_WITH_PROXY_FLOOR = 77;
 const GENERATED_ITEM_COUNT = 111;
 const WARFARE_STOCK_COUNT = 47;
+const SEASON2_STOCK_COUNT = 139;
 const HEROIC_VARIANT_COUNT = 78;
 
 // Items with no derivable source (vendor, starter and quest oddities) have no
@@ -167,7 +178,11 @@ function proxyBaseline(item: ItemDef): number {
     : Math.round(((s.str ?? 0) + (s.agi ?? 0)) / 2);
 }
 
-const eligible = (Object.values(ITEMS) as ItemDef[]).filter(isItemLevelEligible);
+// The model-exempt slots (STAMINA_MODEL_EXEMPT_SLOTS: the trinket, one attribute
+// by owner decision) are pinned by their own block at the bottom of this file.
+const eligible = (Object.values(ITEMS) as ItemDef[]).filter(
+  (item) => isItemLevelEligible(item) && !staminaModelExempt(item),
+);
 const tiered = eligible.filter((item) => expectedLineBudget(item) !== undefined);
 const untiered = eligible.filter((item) => expectedLineBudget(item) === undefined);
 
@@ -362,7 +377,7 @@ describe('stamina baseline model: the merged catalog', () => {
 
   it('the WARFARE exemption is real: every honor piece is off its line and not on the drift list', () => {
     // Pinned exactly: a new honor piece must not join the exemption unseen.
-    expect(FRACTIONAL_BY_DESIGN.size).toBe(WARFARE_STOCK_COUNT);
+    expect(FRACTIONAL_BY_DESIGN.size).toBe(WARFARE_STOCK_COUNT + SEASON2_STOCK_COUNT);
     for (const id of FRACTIONAL_BY_DESIGN) {
       expect(STAT_DRIFT_ALLOWLIST.has(id), `${id} is on both lists`).toBe(false);
       const item = ITEMS[id];
@@ -473,5 +488,37 @@ describe('stamina baseline model: the merged catalog', () => {
     }
     expect(checked).toBeGreaterThanOrEqual(40);
     expect(failures).toEqual([]);
+  });
+});
+
+describe('stamina baseline model: the exempt trinket slot', () => {
+  const trinkets = (Object.values(ITEMS) as ItemDef[]).filter(
+    (item) => isItemLevelEligible(item) && item.slot === 'trinket',
+  );
+
+  it('exempts exactly the trinket slot', () => {
+    expect([...STAMINA_MODEL_EXEMPT_SLOTS]).toEqual(['trinket']);
+    expect(trinkets.length).toBeGreaterThan(0);
+    for (const item of trinkets) expect(staminaModelExempt(item), item.id).toBe(true);
+  });
+
+  it('every trinket carries exactly one attribute, the whole line budget, no baseline on top', () => {
+    // The honor trinkets (WARFARE_TRINKET_STOCK) are priced at the WARFARE
+    // jewelry fraction of the line instead, like the rest of the honor gear;
+    // tests/pvp_honor_gear.test.ts pins them.
+    const honor = new Set<string>(WARFARE_TRINKET_STOCK);
+    expect(trinkets.filter((item) => honor.has(item.id))).toHaveLength(honor.size);
+    for (const item of trinkets) {
+      if (honor.has(item.id)) continue;
+      const line = expectedLineBudget(item);
+      expect(line, `${item.id} has a tier`).toBeGreaterThan(0);
+      const attrs = Object.entries(item.stats ?? {}).filter(
+        ([k, v]) => k !== 'armor' && (v ?? 0) > 0,
+      );
+      expect(attrs, `${item.id} one attribute`).toHaveLength(1);
+      expect(attrs[0][1], `${item.id} attribute == line`).toBe(line);
+      expect(expectedStatBudget(item), item.id).toBe(line);
+      expect(primaryStatSum(item), item.id).toBe(line);
+    }
   });
 });

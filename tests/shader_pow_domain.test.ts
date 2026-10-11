@@ -123,12 +123,25 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/battleground_rune_vfx.ts': 3,
   'src/render/battleground_ward.ts': 1,
   'scripts/asset_pipeline/weapon_vfx.js': 4,
+  // Authored Warrior materials are part of the same fail-closed domain scan.
+  'src/render/ability_vfx/baked_impact_layers.ts': 1,
+  'src/render/ability_vfx/ribbons.ts': 1,
+  'src/render/ability_vfx/signature_crests.ts': 4,
+  'src/render/ability_vfx/solid_impact_fragments.ts': 2,
+  'src/render/ability_vfx/warrior_rage_material.ts': 1,
+  'src/render/characters/surface_response.ts': 5,
   'src/render/ability_vfx/rings.ts': 1,
   'src/render/ability_vfx/shells.ts': 1,
   // the armour-dye sRGB<->linear pair (bases clamped with max(c, 0))
   'src/render/characters/armor_dye.ts': 2,
   'src/render/dungeon.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
+  'src/render/hoard_entrance.ts': 3,
+  // the Buried Hoard glow cards, sparks, reward-chest rays and column (bases
+  // clamped with max(0., x)), at the 2026-09-28 release/v0.44.0 merge into
+  // feature/buried-hoards
+  'src/render/hoard_fx_materials.ts': 2,
+  'src/render/hoard_reward_chest.ts': 4,
   'src/render/ignivar_fire_vfx.ts': 10,
   'src/render/ignivar_model_vfx.ts': 1,
   'src/render/nythraxis_soft_fire.ts': 1,

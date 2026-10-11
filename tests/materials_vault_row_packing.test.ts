@@ -1,8 +1,8 @@
-// The Materials Vault's identity rows are ONE row per material identity,
-// however many units it holds: the vault has no bag cells, so a row is bounded
-// by the per-material ceiling (materials_vault.ts), never by the carried bag
-// stack size (vault_slot_ops.ts VAULT_ROW_STACK_SIZE). Eighty sourced herbs are
-// one row of eighty, not four rows of twenty.
+// The Materials Vault's mergeable identity rows are ONE row per material
+// identity, however many units they hold: the vault has no bag cells, so such a
+// row is bounded by the per-material ceiling (materials_vault.ts), never by the
+// carried bag stack size (vault_slot_ops.ts VAULT_ROW_STACK_SIZE). Eighty
+// sourced herbs are one row of eighty, not four rows of twenty.
 //
 // - A deposit tops up the compatible row instead of opening a capped sibling.
 // - A save written while rows WERE capped at the bag stack size folds back into
@@ -11,7 +11,8 @@
 // - Which payloads split is the ONE rule vaultRowMovesWhole states: a
 //   charge-bearing or locked payload moves whole; a signer or bind-on-trade
 //   payload (the disenchant secondaries) splits on deposit and withdraw the
-//   way the bags already split it.
+//   way the bags already split it. A tolerated over-cap locked DEPOSIT still
+//   opens capped fresh rows rather than one over-cap vault row.
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { materialItemIds } from '../src/sim/material_ids';
@@ -26,6 +27,7 @@ import { Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, WorldContent } from '../src/sim/types';
 import {
   coalesceVaultRows,
+  planVaultRowAdd,
   VAULT_ROW_STACK_SIZE,
   vaultRowMovesWhole,
 } from '../src/sim/vault_slot_ops';
@@ -187,6 +189,19 @@ describe('a save with bag-stack-capped rows folds on load', () => {
     const lockedAgain: InvSlot = { itemId: ORE, count: 2, instance: { locked: true } };
     const dormant: InvSlot = { itemId: 'not_a_material', count: 20 };
     expect(coalesceVaultRows([locked, lockedAgain, dormant], materialItemIds())).toBeNull();
+  });
+
+  it('plans a tolerated over-cap locked deposit as capped fresh rows', () => {
+    const plan = planVaultRowAdd(
+      [],
+      { itemId: ORE, count: 25, instance: { locked: true } },
+      materialItemIds(),
+    );
+    expect(plan?.appended.map((slot) => slot.count)).toEqual([20, 5]);
+    expect(plan?.appended.map((slot) => slot.instance)).toEqual([
+      { locked: true },
+      { locked: true },
+    ]);
   });
 });
 

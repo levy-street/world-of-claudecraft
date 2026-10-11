@@ -19,8 +19,10 @@ const shell = read('shell.css');
 const mobile = read('hud.mobile.css');
 
 describe('character sheet showcase CSS', () => {
-  it('the window uses the approved 900px two-pane board width', () => {
-    expect(components).toContain('#char-window { width: 900px; height: 720px;');
+  it('the window uses the approved 1060px two-pane board width', () => {
+    // Widened from the 7 Sep redesign's 900x720 with the World Quest follow-ups
+    // (PR 3847): the 48px profession cards and the wider stats rail need the room.
+    expect(components).toContain('#char-window { width: 1060px; height: 860px;');
   });
 
   it('the character model stage uses the approved compact 180px sidebar-board width', () => {

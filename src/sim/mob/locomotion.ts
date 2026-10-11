@@ -1,3 +1,6 @@
+import { gliderActionsLocked } from '../glider_action_lock';
+import { deferHoardTerrify } from '../rift/hoard_control_casts';
+import { hasShadowCloak } from '../shadow_action_lock';
 // Mob locomotion (M2), extracted from the Sim monolith.
 //
 // This module owns the mob-AI locomotion core: the updateMob dispatcher (its
@@ -64,6 +67,7 @@ import { holdPetCorpseForBgWave } from '../pet/pet_corpse_hold';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
 import { corpseHasDecayed } from '../respawn_policy';
+import { isHoardGoblin, updateHoardGoblinMotion } from '../rift/hoard_goblin';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
@@ -111,6 +115,7 @@ import { applyBroodBurn } from './dragonkin_brood';
 import { resetDungeonMinibossStomp, updateDungeonMinibossStomp } from './dungeon_miniboss_stomp';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetIgnivarTrashAutomaton, updateIgnivarTrashAutomaton } from './ignivar_trash_automata';
+import { immobileEvadeSnapsHome } from './immobile_evade';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -299,6 +304,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   mob.combatTimer += DT;
+
+  // The Coinsack Scurrier (rift/hoard_goblin.ts) never aggroes or swings: it
+  // only runs, and its own tick owns the escape bar and the payout.
+  if (isHoardGoblin(mob)) {
+    updateHoardGoblinMotion(ctx, mob);
+    return;
+  }
 
   const dummyTemplate = MOBS[mob.templateId];
   if (dummyTemplate?.dummy) {
@@ -549,7 +561,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         // pad. Ruled acceptable: one 50 ms deferral, uniform across hosts.
         ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
           counters.aggroScanPlayerVisits++;
-          if (e.dead) return;
+          if (
+            e.dead ||
+            hasShadowCloak(e) ||
+            gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog)
+          )
+            return;
           const radius = Math.max(
             4,
             Math.min(MAX_AGGRO_RADIUS, template.aggroRadius + (mob.level - e.level) * 1.5),
@@ -570,7 +587,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const counters = ctx.mobScanCounters;
       ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
         counters.aggroScanPlayerVisits++;
-        if (e.dead) return;
+        if (
+          e.dead ||
+          hasShadowCloak(e) ||
+          gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog)
+        )
+          return;
         if (isTrivialTo(mob, e)) return;
         let radius = Math.max(
           4,
@@ -674,7 +696,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // countdown itself ticks inside runMobAttackMechanics with the other
       // boss mechanics (melee-gated), so a kited boss does not bank channels.
       if (updateInfernoChannel(ctx, mob)) break;
-      const result = updateMobCombatProfile(ctx, mob, () => {
+      const result = updateMobCombatProfile(ctx, mob, (mode) => {
         // The anti-kite snare, loud battle cries, and the heroic charge trigger
         // fire once per engaged tick, from either engaged state (mid-chase is
         // the kite case they exist for). The windup ticker runs AFTER the
@@ -682,7 +704,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         // holds, so a slow can never land the same instant as the blast.
         pulseAntiKiteSnare(ctx, mob);
         pulseLoudYell(ctx, mob);
-        tryStartMobCharge(ctx, mob);
+        if (mode === 'normal') tryStartMobCharge(ctx, mob);
         tickRiftMechanicWindups(ctx, mob);
       });
       if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);
@@ -735,6 +757,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       break;
     }
     case 'evade': {
+      // An immobile mob (moveSpeed 0) cannot walk home and a zero step never
+      // arrives: snap it onto its spawn point instead (mob/immobile_evade.ts)
+      // and run the same reset, so a shoved egg is never immune forever.
+      if (immobileEvadeSnapsHome(mob)) {
+        resetEvadingMob(ctx, mob);
+        break;
+      }
       // moveToward has no pathfinding: a straight line home that crosses a prop
       // (the camp tent/crate/campfire) or deep water makes no progress, so the
       // mob stays evading — and therefore immune — forever. Walk home normally,
@@ -1326,16 +1355,19 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
     if (mob.terrifyTimer <= 0 && !mechanicSlotHeld(mob, 'terrify')) {
       mob.terrifyTimer = terrify.every;
       claimMechanicSpacing(mob);
+      // Inside a Buried Hoard the wail is an interruptible cast, never instant.
+      const deferred = deferHoardTerrify(ctx, mob, terrify);
       const school = terrify.school ?? 'shadow';
-      ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-      if (!MOBS[mob.templateId]?.quietMechanics)
+      if (!deferred)
+        ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+      if (!deferred && !MOBS[mob.templateId]?.quietMechanics)
         ctx.emit({
           type: 'log',
           text: `${mob.name} unleashes ${terrify.name}!`,
           color: '#ff9933',
           entityId: mob.id,
         });
-      for (const meta of ctx.players.values()) {
+      for (const meta of deferred ? [] : ctx.players.values()) {
         const pe = ctx.entities.get(meta.entityId);
         if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > terrify.radius) continue;
         const remaining = ctx.diminishedCrowdControlDuration(mob, pe, 'fear', terrify.duration);

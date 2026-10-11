@@ -787,7 +787,12 @@ describe('tracker chrome', () => {
     // phantom gap.
     expect(hudCss).toMatch(/#right-tracker-stack > :empty \{\s*display: none;/);
     const questController = read('../src/ui/hud/quest/quest_tracker_controller.ts');
-    expect(stripComments(questController)).toContain("if (!view.visible) return '';");
+    // The two-section tracker (Quests + World Quests, the Buried Hoards merge) keeps
+    // the empty-string render by construction: only a visible section enters the
+    // list (quest_tracker.ts), and an empty list renders ''.
+    const sections = read('../src/ui/hud/quest/quest_tracker.ts');
+    expect(stripComments(sections)).toContain('if (view.visible) sections.push(');
+    expect(stripComments(questController)).toContain("let html = '';");
   });
 
   // An invisible ::after hit extension only works while it is a live, painted
@@ -939,7 +944,9 @@ describe('tracker chrome', () => {
     );
     expect(wiring).toContain('e.preventDefault();');
     expect(wiring).toContain('e.stopPropagation();');
-    expect(stripComments(wiring)).toContain("target.closest(wiring.header ?? '.dt-header')");
+    expect(stripComments(wiring)).toContain(
+      "target.closest<HTMLElement>(wiring.header ?? '.dt-header')",
+    );
   });
 
   it('persists the tracker collapse as its own settings row', () => {

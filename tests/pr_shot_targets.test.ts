@@ -28,7 +28,10 @@ describe('classifyDiff', () => {
       4,
     );
     expect(script).toContain('localStorage.removeItem(key)');
-    expect(script).toContain("waitUntil: variant.landing ? 'domcontentloaded' : 'networkidle0'");
+    // The weekly-vault target (PR 4052) overrides the wait with navigationWaitUntil;
+    // the landing default stays the fallback.
+    expect(script).toContain('variant.navigationWaitUntil ??');
+    expect(script).toContain("(variant.landing ? 'domcontentloaded' : 'networkidle0')");
 
     const sliceBetween = (start: string, end: string, from = 0) => {
       const startIndex = script.indexOf(start, from);
@@ -338,7 +341,7 @@ describe('classifyDiff', () => {
     }
   });
 
-  it('captures the market overview, browse collapse, sell price ref, collect ledger, buy confirmation, and expanded armor filters for market window changes', () => {
+  it('captures the market overview, browse collapse, sell price ref, collect ledger, history ledger, buy confirmation, and expanded armor filters for market window changes', () => {
     const plan = classifyDiff(['src/ui/market_window.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
@@ -347,6 +350,7 @@ describe('classifyDiff', () => {
       'market-sweep',
       'market-sell-price-ref',
       'market-collect-ledger',
+      'market-history-ledger',
       'market-buy-confirm',
       'market-armor-filters',
     ]);
@@ -397,6 +401,7 @@ describe('classifyDiff', () => {
       'src/sim/combat/auto_attack.ts',
       'src/sim/combat/poison_coating.ts',
       'src/ui/ability_imbue_text.ts',
+      'src/sim/combat/shaman_thundercall_kit.ts',
     ]) {
       const plan = classifyDiff([file]);
       expect(
@@ -417,6 +422,11 @@ describe('classifyDiff', () => {
       'eye-jab',
       'shadeslip',
       'shadeslip-mobile',
+      'thundercall-magma-burst',
+      'thundercall-arc-overload',
+      'thundercall-stormbreak',
+      'thundercall-earthen-jolt',
+      'thundercall-magma-burst-mobile',
     ]);
     // The tooltip is the point, so the recipe must hover the row and prove the
     // shared #tooltip actually painted rather than shooting the row alone.

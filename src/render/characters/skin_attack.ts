@@ -31,7 +31,13 @@ export function playerRangedAttackStartsAtLaunch(
   return sourceKind === 'player' && attackAnimation === 'ranged-shot';
 }
 
-export function playerRangedAttackAlreadyStarted(
+/** Whether a player's attack animation for this swing already started at
+ *  launch (the sim-side `attackAnimationStarted` flag), so the later damage
+ *  event must not restart a fresh one: a ranged shot's launch and its impact
+ *  are separate events, and a melee swing (auto-attack, or an ability like
+ *  Red Harvest) carries the same flag for the same reason. Not ranged-only,
+ *  despite the sibling `playerRangedAttackStartsAtLaunch` above. */
+export function playerAttackAnimationAlreadyStarted(
   sourceKind: string | undefined,
   attackAnimationStarted: boolean | undefined,
 ): boolean {

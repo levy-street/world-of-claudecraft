@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { updateAuras } from '../src/sim/combat/auras';
-import { meleeSwing, rangedSwing } from '../src/sim/combat/auto_attack';
+import { meleeSwing, rangedSwing, tryPlayerSwing } from '../src/sim/combat/auto_attack';
+import { NATURES_BOON_CHANCE } from '../src/sim/combat/druid_natures_boon';
 import { runWeaponProcs } from '../src/sim/combat/equip_procs';
 import { baseSwingSpeed } from '../src/sim/combat/form_swing';
 import { ENCHANTS } from '../src/sim/content/enchants';
@@ -516,5 +517,101 @@ describe("Last Flame's Zeal", () => {
     raw.players.get(wielder.id)!.equipmentInstance.mainhand.enchant = '';
     runWeaponProcs(ctx, wielder, target, 'weaponHit', wielder.mainhandItemId, 'mainhand');
     expect(raw.rng.chance).not.toHaveBeenCalled();
+  });
+
+  // A live report claimed the enchant never procs for a Feral druid in Cat
+  // (then called Wolf) or Bear (Bruin) Form. The form arm above applies the
+  // form aura by hand and calls meleeSwing directly, and already fails if the
+  // proc hub gates on a form; what it does not cover is the path a shifted
+  // druid actually takes: the cat_form / bear_form ability cast (which recalcs
+  // stats against the worn enchanted staff), the swing attempt behind the
+  // per-tick driver (tryPlayerSwing under updatePlayerAutoAttack, the loop the
+  // server runs), and the enchant roll at the form's own base speed. The
+  // report did not reproduce; this pins that path so a form change cannot
+  // break it silently.
+  describe.each([
+    ['cat_form', 'form_cat', 1],
+    ['bear_form', 'form_bear', 2.9],
+  ] as const)('through a real %s cast', (abilityId, formKind, speed) => {
+    function shiftedFeral() {
+      const sim = new Sim({
+        seed: 44,
+        playerClass: 'druid',
+        autoEquip: false,
+        world: EMPTY_TEST_WORLD,
+      });
+      sim.setPlayerLevel(20);
+      expect(sim.setSpec('feral')).toBe(true);
+      const source = sim.player;
+      const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+      const meta = sim.players.get(source.id)!;
+      meta.equipment.mainhand = 'gnarled_staff';
+      meta.equipmentInstance.mainhand = { enchant: ENCHANT };
+      // Bear keeps the staff's own base speed on the roll; cat ignores it.
+      expect(ITEMS.gnarled_staff.weapon?.speed).toBe(2.9);
+      recalcPlayerStats(source, 'druid', meta.equipment, meta.talentMods, meta.equipmentInstance);
+      const target = trainingTarget(sim, 10_000_000);
+      source.resource = source.maxResource;
+      sim.castAbility(abilityId);
+      expect(source.auras.some((aura) => aura.kind === formKind)).toBe(true);
+      expect(source.mainhandItemId).toBe('gnarled_staff');
+      source.targetId = target.id;
+      source.facing = 0;
+      sim.startAutoAttack();
+      return { sim, ctx, source, meta, target };
+    }
+
+    it('rolls the enchant once on the driven swing, grants the buff, and heals', () => {
+      const { ctx, source, meta, target } = shiftedFeral();
+      const strBefore = source.stats.str;
+      const hpBefore = target.hp;
+      source.hp = source.maxHp - 250;
+      const next = vi.spyOn(ctx.rng, 'next').mockReturnValue(0.5);
+      const chance = vi.spyOn(ctx.rng, 'chance').mockReturnValue(true);
+      source.swingTimer = 0;
+      tryPlayerSwing(ctx, source, meta);
+      expect(target.hp).toBeLessThan(hpBefore);
+      // White crit, Wildfang Nature's Boon, then exactly ONE enchant roll at
+      // the form speed. This still catches a duplicated Last Flame roll.
+      expect(chance).toHaveBeenCalledTimes(3);
+      expect(chance.mock.calls[1]?.[0]).toBe(NATURES_BOON_CHANCE);
+      expect(chance.mock.calls[2]?.[0]).toBe(speed / 60);
+      expect(source.swingTimer).toBeCloseTo(speed, 10);
+      const buff = source.auras.find((aura) => aura.id === ENCHANT);
+      expect(buff).toMatchObject({ kind: 'buff_str', value: 50, remaining: 15, duration: 15 });
+      expect(source.stats.str).toBe(strBefore + 50);
+      expect(source.hp).toBe(source.maxHp - 50);
+      expect(source.auras.some((aura) => aura.kind === formKind)).toBe(true);
+      next.mockRestore();
+      chance.mockRestore();
+    });
+
+    it('rolls the form speed on every landed swing of a real Rng run and fires', () => {
+      const { sim, ctx, source, target } = shiftedFeral();
+      const chance = vi.spyOn(ctx.rng, 'chance');
+      let swings = 0;
+      let procs = 0;
+      let hadBuff = false;
+      for (let tick = 0; tick < 20 * 60 * 3; tick++) {
+        const hpBefore = target.hp;
+        sim.tick();
+        if (target.hp < hpBefore) swings++;
+        const has = source.auras.some((aura) => aura.id === ENCHANT);
+        if (has && !hadBuff) procs++;
+        hadBuff = has;
+      }
+      // Structural: one enchant roll per landed swing at the form speed, no
+      // more and no fewer, so a rate change or a skipped roll both fail.
+      const enchantRolls = chance.mock.calls.filter(([p]) => p === speed / 60).length;
+      expect(swings).toBeGreaterThan(30);
+      expect(enchantRolls).toBe(swings);
+      // 1 ppm over three minutes: about three successes expected; "never"
+      // is the reported bug. Counted as rising edges of the 15 s buff.
+      expect(procs).toBeGreaterThanOrEqual(1);
+      expect(source.dead).toBe(false);
+      expect(source.autoAttack).toBe(true);
+      expect(source.auras.some((aura) => aura.kind === formKind)).toBe(true);
+      chance.mockRestore();
+    });
   });
 });

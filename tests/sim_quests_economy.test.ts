@@ -724,7 +724,12 @@ describe('food, drink, vendor', () => {
     for (let i = 0; i < 400 && !sawRare; i++) {
       sim.events = [];
       completeFishing(sim.ctx, sim.player, meta);
-      if (sim.events.some((e) => e.type === 'log' && /rare catch/i.test((e as any).text))) {
+      if (
+        sim.events.some(
+          (e) =>
+            e.type === 'log' && (e as any).text === 'Something golden flashes beneath the surface!',
+        )
+      ) {
         sawRare = true;
         expect(sim.countItem('glimmerfin_koi')).toBeGreaterThan(0);
       }

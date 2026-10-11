@@ -25,6 +25,9 @@ export interface ClientPerfReportInsert {
   shaderWarmWorkerActive: boolean;
   shaderWarmRefusal: string;
   targetFps: number;
+  frameCapIntent: number;
+  cadenceDivisor: number;
+  refreshHz: number;
   renderScale: number;
   effectiveRenderScale: number;
   fpsAvg: number;
@@ -64,6 +67,18 @@ export interface ClientPerfReportInsert {
   worst10sFrameP95Ms: number;
   suggestionIds: string[];
   rawSummary: Record<string, unknown>;
+  // "Host essentials", desktop shell only (server/perf_report_host.ts): null
+  // and '' are "no evidence", which is what every web and mobile row carries.
+  hostMemTotalMb: number | null;
+  hostMemFreeMb: number | null;
+  appWorkingSetMb: number | null;
+  appRendererWsMb: number | null;
+  appGpuWsMb: number | null;
+  hostOnBattery: boolean | null;
+  hostPowerPlan: string;
+  hostPowerMode: string;
+  hostHags: boolean | null;
+  hostGameMode: boolean | null;
 }
 
 export async function insertClientPerfReport(row: ClientPerfReportInsert): Promise<void> {
@@ -80,7 +95,10 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        suggestion_ids, raw_summary,
        gl_renderer_raw, gl_model, gl_laptop, gpu_hp_adapter,
        shader_warm_worker_active, shader_warm_refusal,
-       desktop_shell
+       desktop_shell,
+       frame_cap_intent, cadence_divisor, refresh_hz,
+       host_mem_total_mb, host_mem_free_mb, app_working_set_mb, app_renderer_ws_mb, app_gpu_ws_mb,
+       host_on_battery, host_power_plan, host_power_mode, host_hags, host_game_mode
      ) VALUES (
        $1, $2, $3, $4, $5, $6, $7,
        $8, $9, $10, $11, $12, $13,
@@ -90,7 +108,10 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38,
        $39, $40, $41, $42, $43,
        $44, $45, $46, $47, $48, $49, $50, $51,
-       $52
+       $52,
+       $53, $54, $55,
+       $56, $57, $58, $59, $60,
+       $61, $62, $63, $64, $65
      )`,
     [
       row.schemaVersion,
@@ -145,6 +166,22 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
       row.shaderWarmWorkerActive,
       row.shaderWarmRefusal,
       row.desktopShell,
+      row.frameCapIntent,
+      row.cadenceDivisor,
+      row.refreshHz,
+      // Appended at the END of both lists, never interleaved: the positional
+      // $n numbering is what makes this statement correct, and inserting a
+      // column mid-list renumbers every parameter after it.
+      row.hostMemTotalMb,
+      row.hostMemFreeMb,
+      row.appWorkingSetMb,
+      row.appRendererWsMb,
+      row.appGpuWsMb,
+      row.hostOnBattery,
+      row.hostPowerPlan,
+      row.hostPowerMode,
+      row.hostHags,
+      row.hostGameMode,
     ],
   );
 }

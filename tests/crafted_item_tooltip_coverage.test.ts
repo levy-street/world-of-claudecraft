@@ -17,6 +17,7 @@ import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
+import { factionRewardTooltipLines } from '../src/ui/hud/faction_reward_tooltip_view';
 import { cookingCatchHintKey } from '../src/ui/hud/professions/cooking_catch_hint_view';
 import { elixirTooltipLines } from '../src/ui/hud/professions/elixir_tooltip_view';
 import { feastTooltipLines } from '../src/ui/hud/professions/feast_tooltip_view';
@@ -50,6 +51,14 @@ const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
   ['drink use line', (def) => (def.drinkMana ?? 0) > 0],
   ['potion use line', (def) => (def.potionHp ?? 0) > 0 || (def.potionMana ?? 0) > 0],
   ['elixir use line', (def) => elixirTooltipLines(def) !== ''],
+  // The Buried Hoards faction consumables and kits (the quartermaster
+  // FACTION_REWARD_RECIPES outputs: the mana elixir, the invisibility potion,
+  // the armor kit, the shock bomb, the sharpening stone). Hud.itemTooltip
+  // renders their use line from this pure sibling view right after the elixir
+  // row, so the predicate is the view itself (added at the 2026-09-28
+  // release/v0.44.0 merge into feature/buried-hoards). The attunement arg only
+  // flavours the hearthstone line, so its absence is the faithful mirror here.
+  ['faction reward use line', (def) => factionRewardTooltipLines(def) !== ''],
   ['feast use line', (def) => feastTooltipLines(def) !== ''],
   ['gathering tool lines', (def) => gatherToolTooltipLines(def) !== ''],
   ['tool effect charm lines', (def) => toolEffectTooltipLines(def) !== ''],

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { DungeonLayout } from '../src/sim/dungeon_layout';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
+import { makeVaultSeed, VAULT_ZONE_IDS } from '../src/sim/rift/vault_seed';
 import {
   buildRiftStaticGeometry,
   createRiftMapView,
@@ -9,6 +10,7 @@ import {
   riftLayoutBounds,
   riftLocalToCanvas,
   riftMapTransform,
+  riftMapValleyGround,
 } from '../src/ui/hud/rift/rift_map_core';
 import { mapWindowMode } from '../src/ui/map_window_view';
 import { minimapMode } from '../src/ui/minimap_markers';
@@ -417,6 +419,47 @@ describe('rift map geometry', () => {
 });
 
 describe('rift map live model', () => {
+  it('assigns a stable natural ground family to every persisted hoard zone', () => {
+    expect(VAULT_ZONE_IDS.map((zoneId) => [zoneId, riftMapValleyGround(zoneId)])).toEqual([
+      ['drakelands', 'ash'],
+      ['frostveil', 'snow'],
+      ['amberfall', 'autumn'],
+      ['willowfen', 'marsh'],
+      ['nightbloom', 'moonlit-meadow'],
+      ['wraithwood', 'dark-forest'],
+      ['palmreach', 'sand'],
+      ['galecrest', 'coast'],
+    ]);
+  });
+
+  it('carries valley terrain into the reusable map model while caves and Rifts stay interior', () => {
+    const view = createRiftMapView();
+    const ordinary = view.build(worldWith(), 162, 8, 'Ordinary Rift');
+    expect(ordinary?.terrain).toEqual({ kind: 'interior' });
+
+    const caveView: RiftFloorView = {
+      ...VIEW,
+      seed: makeVaultSeed(0, 11, { open: false, zoneId: 'frostveil' }),
+      floorIndex: 0,
+      floorCount: 1,
+      contentHash: 'frostveil-cave',
+    };
+    const cave = view.build(worldWith([], caveView), 162, 8, 'Frostveil Hoard');
+    expect(cave).toBe(ordinary);
+    expect(cave?.terrain).toEqual({ kind: 'interior' });
+
+    const valleyView: RiftFloorView = {
+      ...VIEW,
+      seed: makeVaultSeed(3, 17, { open: true, zoneId: 'palmreach' }),
+      floorIndex: 0,
+      floorCount: 1,
+      contentHash: 'palmreach-valley',
+    };
+    const valley = view.build(worldWith([], valleyView), 162, 8, 'Palmreach Hoard');
+    expect(valley).toBe(cave);
+    expect(valley?.terrain).toEqual({ kind: 'valley', zoneId: 'palmreach', ground: 'sand' });
+  });
+
   it('routes an active Rift descriptor ahead of coordinate-band fallbacks', () => {
     const world = worldWith();
     expect(minimapMode(world)).toBe('rift');
@@ -468,6 +511,27 @@ describe('rift map live model', () => {
     expect(live?.objects).toEqual([
       expect.objectContaining({
         semantic: { kind: 'rift-mechanic', mechanic: 'gate', state: 'open' },
+      }),
+    ]);
+  });
+
+  it('shows the Hoard entry hatch as its own return marker inside the floor', () => {
+    const model = createRiftMapView().build(
+      worldWith([
+        {
+          id: 7,
+          kind: 'object',
+          templateId: 'hoard_entrance',
+          pos: { x: VIEW.origin.x, y: 0, z: VIEW.origin.z - 8 },
+        },
+      ]),
+      162,
+      8,
+      'Buried Hoard',
+    );
+    expect(model?.objects).toEqual([
+      expect.objectContaining({
+        semantic: { kind: 'rift-return', route: 'hoard', rank: null },
       }),
     ]);
   });

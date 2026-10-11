@@ -49,6 +49,15 @@ describe('developer command view', () => {
     }
   });
 
+  it('offers the King of the Hill levers as fixed scenario commands', () => {
+    expect(buildDevCommand('hillwarn', {})).toBe('/dev hill warn');
+    expect(buildDevCommand('hillnow', {})).toBe('/dev hill');
+    expect(buildDevCommand('hillrise', {})).toBe('/dev hill rise');
+    expect(buildDevCommand('hillend', {})).toBe('/dev hill end');
+    const ids = filteredDevActions('scenarios', '').map((action) => action.id);
+    expect(ids).toEqual(expect.arrayContaining(['hillwarn', 'hillnow', 'hillrise', 'hillend']));
+  });
+
   it('recognizes only the exact GUI command', () => {
     expect(isDevGuiCommand('/dev gui')).toBe(true);
     expect(isDevGuiCommand('  /DEV GUI  ')).toBe(true);

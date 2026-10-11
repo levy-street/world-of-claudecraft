@@ -40,6 +40,24 @@ describe('Ignivar Searing Torrent frontal telegraph', () => {
     expectInsideFrontal(frontal);
   });
 
+  it('reuses the complete model at an encounter-specific range and angle', () => {
+    const frontal = buildIgnivarFrontalTelegraph({ range: 13, halfAngle: 0.42 });
+    expect(frontal.userData.range).toBe(13);
+    expect(frontal.userData.halfAngle).toBe(0.42);
+    frontal.traverse((child) => {
+      const geometry = (child as THREE.Mesh).geometry;
+      if (!geometry) return;
+      const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
+      for (let index = 0; index < positions.count; index++) {
+        const x = positions.getX(index);
+        const z = positions.getZ(index);
+        expect(Math.hypot(x, z)).toBeLessThanOrEqual(13 + 2e-6);
+        if (Math.hypot(x, z) > 1e-6)
+          expect(Math.abs(Math.atan2(x, z))).toBeLessThanOrEqual(0.42 + 2e-6);
+      }
+    });
+  });
+
   it('ramps toward impact without compounding material opacity per frame', () => {
     const frontal = buildIgnivarFrontalTelegraph();
     const fill = frontal.getObjectByName(IGNIVAR_FRONTAL_FILL_NAME) as THREE.Mesh;

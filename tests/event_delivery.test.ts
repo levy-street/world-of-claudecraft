@@ -32,4 +32,19 @@ describe('combat event delivery', () => {
       false,
     );
   });
+
+  it('scopes an absorb credit to the shielder, the shielded, and their party, like a heal', () => {
+    const credit: SimEvent = {
+      type: 'absorb',
+      sourceId: 10,
+      targetId: 20,
+      amount: 45,
+      ability: 'Temporal Aegis',
+      abilityId: 'temporal_aegis',
+    };
+    expect(shouldDeliverCombatEventToViewer(credit, 10, null, ownerOf)).toBe(true);
+    expect(shouldDeliverCombatEventToViewer(credit, 20, null, ownerOf)).toBe(true);
+    expect(shouldDeliverCombatEventToViewer(credit, 11, { members: [10, 11] }, ownerOf)).toBe(true);
+    expect(shouldDeliverCombatEventToViewer(credit, 12, { members: [12] }, ownerOf)).toBe(false);
+  });
 });

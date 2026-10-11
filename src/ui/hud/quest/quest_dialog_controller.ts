@@ -5,6 +5,7 @@ import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
 import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
 import { dist2d, type Entity, type ItemDef, questObjectiveRequired } from '../../../sim/types';
+import { WEEKLY_KEEPER_ID } from '../../../sim/weekly_rewards';
 import type { IWorld } from '../../../world_api';
 import { archetypeTitleText, craftNameText } from '../../char_window';
 import { currencyIconHtml, heroicMarkIconHtml } from '../../currency_art';
@@ -13,15 +14,27 @@ import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import type { FocusTrapHandle } from '../../focus_manager';
-import { t } from '../../i18n';
+import { type TranslationKey, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
 import type { PainterHostPresentation } from '../../painter_host';
+import { clueHuntTitle } from '../../quest_event_view';
 import { svgIcon } from '../../ui_icons';
+import {
+  isWorldQuestInstructorOrEscort,
+  worldQuestInstructorDialog,
+} from '../../world_quest_instructor_view';
+import {
+  investigationDialogue,
+  investigationSignature,
+  isInvestigationTarget,
+} from '../../world_quest_investigation_view';
 import { archetypeImageUrl } from '../professions/profession_art';
 import { buildAttunementPreview } from '../professions/profession_identity_view';
 import { isStationMasterNpc } from '../vendor/train_view';
 import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
+import { clueStepRowFor, clueStepRowSig } from './clue_step_row_view';
+import { clueReplyKey, clueTalkFor } from './clue_talk_row_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
@@ -81,6 +94,8 @@ export interface QuestDialogControllerDeps {
    *  master's Crafting shortcut; master_craft_core.ts resolves the craft). */
   openCrafting(craftId: string): void;
   openMarket(): void;
+  /** The World Quest taskmaster's board: the map window with its rail unfolded. */
+  openWorldQuestBoard(): void;
   openDelveBoard(npcId: number): void;
   openCardDuel(): void;
   onOpenChange(open: boolean): void;
@@ -99,6 +114,7 @@ interface ProfessionPreviewContent {
 /** Owns gossip, quest details, shared quest links, focus, and dialogue voice state. */
 export class QuestDialogController {
   private npcId: number | null = null;
+  private investigationSig: string | null = null;
   private detailQuestId: string | null = null;
   // The staleness signature refreshIfChanged watches, as of the last gossip
   // render (null = no gossip list currently painted): the profession-intro
@@ -106,7 +122,12 @@ export class QuestDialogController {
   // signature (a cadence lapse re-offers a work order by a pure
   // tick-threshold crossing, with NO quest event to repaint through).
   private lastIntroHintVisible: boolean | null = null;
+  private clueReplyOpen = false;
   private lastGossipRowSig: string | null = null;
+  // The Clue Scroll row's staleness signature (clue_step_row_view.ts): the row reads
+  // LIVE hunt state, so it joins the refreshIfChanged watch (a step can advance
+  // or the hunt end while the dialog is open).
+  private lastClueRowSig = '';
   private trap: FocusTrapHandle | null = null;
   private openedAt = 0;
   private voiceNpcId: number | null = null;
@@ -121,10 +142,19 @@ export class QuestDialogController {
   open(npcId: number): void {
     const world = this.deps.world();
     const npc = world.entities.get(npcId);
-    if (npc?.kind !== 'npc') return;
-    // The banker and the Riftwright both short-circuit the gossip menu: the
+    if (
+      !npc ||
+      (npc.kind !== 'npc' && !isInvestigationTarget(npcId) && !isWorldQuestInstructorOrEscort(npc))
+    )
+      return;
+    // Service NPCs short-circuit the gossip menu:
     // sim's interact emits the window-opening event, identical on every host.
-    if (NPCS[npc.templateId]?.banker || NPCS[npc.templateId]?.riftForge) {
+    if (
+      NPCS[npc.templateId]?.banker ||
+      NPCS[npc.templateId]?.riftForge ||
+      NPCS[npc.templateId]?.weeklyEmissary ||
+      npc.templateId === WEEKLY_KEEPER_ID
+    ) {
       world.targetEntity(npc.id);
       world.interact();
       return;
@@ -200,9 +230,12 @@ export class QuestDialogController {
   close(restoreFocus = true): void {
     this.deps.element.style.display = 'none';
     this.npcId = null;
+    this.clueReplyOpen = false;
     this.detailQuestId = null;
+    this.investigationSig = null;
     this.lastIntroHintVisible = null;
     this.lastGossipRowSig = null;
+    this.lastClueRowSig = '';
     this.deps.hideTooltip();
     this.trap?.release(restoreFocus);
     this.trap = null;
@@ -214,6 +247,9 @@ export class QuestDialogController {
 
   refresh(): void {
     if (this.npcId === null || this.deps.element.style.display !== 'block') return;
+    // The clue reply stays up until the player moves on (the step advance that
+    // follows it would otherwise repaint the gossip list over it).
+    if (this.clueReplyOpen) return;
     const npc = this.deps.world().entities.get(this.npcId);
     if (npc) this.renderGossip(npc);
     else this.close();
@@ -231,12 +267,19 @@ export class QuestDialogController {
    *  (the dialog holds focus-trapped buttons). */
   refreshIfChanged(): void {
     if (this.npcId === null || this.deps.element.style.display !== 'block') return;
+    if (this.clueReplyOpen) return;
+    if (this.investigationSig !== null) {
+      if (investigationSignature(this.deps.world()) !== this.investigationSig) this.refresh();
+      return;
+    }
     if (this.detailQuestId !== null || this.lastIntroHintVisible === null) return;
     const npc = this.deps.world().entities.get(this.npcId);
     if (!npc) return;
     if (
       this.introHintVisibleFor(npc) !== this.lastIntroHintVisible ||
-      gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig
+      gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig ||
+      clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !==
+        this.lastClueRowSig
     ) {
       this.refresh();
     }
@@ -332,6 +375,10 @@ export class QuestDialogController {
 
   private renderGossip(npc: Entity, closeIfEmpty = false): void {
     const world = this.deps.world();
+    if (this.renderInvestigation(npc)) return;
+    this.investigationSig = null;
+    if (this.renderWorldQuestInstructor(npc)) return;
+    this.clueReplyOpen = false;
     const definition = NPCS[npc.templateId];
     const interesting = this.offerableRows(npc);
     this.lastGossipRowSig = gossipRowSig(interesting);
@@ -347,6 +394,15 @@ export class QuestDialogController {
         ),
       )
       .map((progress) => progress.questId);
+    // The Clue Scroll talk or hand-over row: the active hunt's current step
+    // targets this NPC (clue_step_row_view.ts). The sim resolves it first inside
+    // talkToNpc on every host; this row is what makes the client SEND that
+    // interact for an ordinary quest giver, which the gossip menu never did.
+    const clueRowRaw = clueStepRowFor(world.clueHunt, npc.templateId);
+    this.lastClueRowSig = clueStepRowSig(clueRowRaw);
+    // A hand-over of an item the catalog does not know draws no row: its id is
+    // never player-visible text, and the row could not be acted on anyway.
+    const clueRow = clueRowRaw?.kind === 'deliver' && !ITEMS[clueRowRaw.itemId] ? null : clueRowRaw;
     // The WARFARE quartermaster REPLACES the generic goods row with its sectioned
     // window (gated on the NpcDef flag, never a hard-coded id).
     //
@@ -381,6 +437,7 @@ export class QuestDialogController {
     // crafting station (stations content masterNpcId) offers recipe training.
     const hasTraining = isStationMasterNpc(npc.templateId, world.stationPlacements);
     const hasMarket = !!definition?.market;
+    const hasWorldQuestBoard = !!definition?.worldQuestBoard;
     const hasHeroicVendor = !!definition?.heroicVendor;
     const hasCrucibleVendor = !!definition?.crucibleVendor;
     const hasDelveBoard = Object.values(DELVES).some(
@@ -409,6 +466,8 @@ export class QuestDialogController {
         hasCardMaster,
         hasTraining,
         hasFarmer,
+        hasWorldQuestBoard,
+        hasClueStep: clueRow !== null,
       })
     ) {
       this.close();
@@ -462,6 +521,24 @@ export class QuestDialogController {
       const title = this.deps.text.questTitle(questId);
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-discuss="${esc(questId)}" aria-label="${esc(t('questUi.dialog.discussQuestAria', { name: title }))}"><span class="gold">?</span> ${esc(t('questUi.dialog.discussQuest', { name: title }))}</button>`;
     }
+    if (clueRow) {
+      const clueLabel =
+        clueRow.kind === 'talk'
+          ? t('questUi.dialog.clueTalk')
+          : t('questUi.dialog.clueDeliver', {
+              count: this.deps.text.number(clueRow.count),
+              item: itemDisplayName(ITEMS[clueRow.itemId]),
+            });
+      const clueAria =
+        clueRow.kind === 'talk'
+          ? t('questUi.dialog.clueTalkAria', { name: npcName })
+          : t('questUi.dialog.clueDeliverAria', {
+              count: this.deps.text.number(clueRow.count),
+              item: itemDisplayName(ITEMS[clueRow.itemId]),
+              name: npcName,
+            });
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-clue-step="1" aria-label="${esc(clueAria)}"><span class="gold">${svgIcon('questlog')}</span> ${esc(clueLabel)}</button>`;
+    }
     if (hasVendor) {
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${currencyIconHtml('coin_gold')} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
@@ -494,6 +571,9 @@ export class QuestDialogController {
     if (hasMarket) {
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
+    if (hasWorldQuestBoard) {
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-world-quest-board="1" aria-label="${esc(t('questUi.dialog.worldQuestBoardAria'))}"><span class="gold">${svgIcon('map')}</span> ${esc(t('questUi.dialog.worldQuestBoard'))}</button>`;
+    }
     if (hasHeroicVendor) {
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${heroicMarkIconHtml()} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
@@ -525,6 +605,7 @@ export class QuestDialogController {
     this.deps.element.querySelectorAll<HTMLElement>('[data-quest]').forEach((item) => {
       item.addEventListener('click', () => this.renderQuestDetail(npc, item.dataset.quest ?? ''));
     });
+    // The clue talk and the quest discussion send the same sim talk.
     this.deps.element.querySelectorAll<HTMLButtonElement>('[data-discuss]').forEach((item) => {
       item.addEventListener('click', () => {
         const liveWorld = this.deps.world();
@@ -545,6 +626,7 @@ export class QuestDialogController {
     }
     this.bindRoute('[data-unbind]', () => this.deps.openUnbind(npc.id));
     this.bindRoute('[data-market]', this.deps.openMarket);
+    this.bindRoute('[data-world-quest-board]', this.deps.openWorldQuestBoard);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
     // The husk trade goes straight to the world (IWorldFarming.convertHusks,
@@ -559,6 +641,20 @@ export class QuestDialogController {
     this.deps.element.querySelector('[data-husk-trade]')?.addEventListener('click', () => {
       this.deps.world().convertHusks();
       this.close(true);
+    });
+    // The Clue Scroll row sends the SAME authoritative interact the discuss
+    // row does (sim talkToNpc runs onNpcTalkedForClueHunt first on every
+    // host; online it is the interact command). A talk step the sim will
+    // accept is answered in the NPC's own voice (clue_talk_row_core.ts);
+    // anything else opens no successor window (the sim's clue log line or
+    // refusal is the feedback), so it closes WITH the trap's focus restore.
+    this.deps.element.querySelector('[data-clue-step]')?.addEventListener('click', () => {
+      const liveWorld = this.deps.world();
+      const talk = clueTalkFor(liveWorld.clueHunt, npc.templateId, liveWorld.inventory ?? []);
+      liveWorld.targetEntity(npc.id);
+      liveWorld.interact();
+      if (talk?.ready) this.renderClueReply(npc, talk.huntId, talk.step);
+      else this.close(true);
     });
     this.bindClose();
     this.showAndFocus();
@@ -751,6 +847,115 @@ export class QuestDialogController {
     if (row && rewardItemId) {
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(ITEMS[rewardItemId]));
     }
+  }
+
+  private renderInvestigation(target: Entity): boolean {
+    const world = this.deps.world();
+    const view = investigationDialogue(world, target.id);
+    if (!view) return false;
+    if (view.finished) {
+      this.close();
+      return true;
+    }
+    this.npcId = target.id;
+    this.detailQuestId = null;
+    this.investigationSig = investigationSignature(world);
+    markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
+    const title = target.kind === 'npc' ? this.deps.text.npcName(target.templateId) : view.title;
+    this.deps.element.innerHTML = `<div class="panel-title"><span id="quest-dialog-title">${esc(title)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div><div class="qd-sub">${esc(view.title)}</div><div class="qd-text">${esc(view.text)}</div><div class="qd-req">${esc(view.hint)}</div>`;
+    // The sergeant's dialog: one option per guard still under suspicion. A
+    // wrong name clears that guard server-side and reopens this dialog with
+    // the shorter list; the right one closes it as the creature sheds its face.
+    for (const suspect of view.suspects) {
+      const name = this.deps.text.npcName(suspect.templateId);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'qd-list-item';
+      button.dataset.accuse = String(suspect.npcId);
+      button.textContent = t('questUi.worldQuest.investigation.accuseOption', { name });
+      button.addEventListener('click', () => {
+        this.close();
+        this.deps.world().accuseWorldQuestSuspect(suspect.npcId);
+      });
+      this.deps.element.appendChild(button);
+    }
+    this.bindClose();
+    this.showAndFocus();
+    return true;
+  }
+
+  private renderWorldQuestInstructor(npc: Entity): boolean {
+    const world = this.deps.world();
+    const view = worldQuestInstructorDialog(world, npc);
+    if (!view) return false;
+    this.npcId = npc.id;
+    this.detailQuestId = null;
+    markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
+    const subtitle = view.speakerTitle
+      ? `<span class="quest-muted"> &lt;${esc(view.speakerTitle)}&gt;</span>`
+      : '';
+    let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(view.speakerName)}${subtitle}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
+    if (view.greeting) {
+      html += `<div class="qd-text">"${esc(view.greeting)}"</div>`;
+    }
+    if (view.questTitle) {
+      html += `<div class="qd-sub">${esc(view.questTitle)}</div>`;
+    }
+    if (view.objectiveText) {
+      html += `<div class="qd-obj">${esc(view.objectiveText)}</div>`;
+    }
+    if (view.hint) {
+      html += `<div class="qd-req">${esc(view.hint)}</div>`;
+    }
+    this.deps.element.innerHTML = html;
+    if (view.canStart && view.difficulties && view.questId) {
+      // One button per profile; the pick travels as its own command so the
+      // server starts the kernel with that profile after its own revalidation.
+      const questId = view.questId;
+      for (const choice of view.difficulties) {
+        const button = this.makeButton(choice.label);
+        button.dataset.startWq = String(npc.id);
+        button.dataset.difficulty = choice.difficulty;
+        button.addEventListener('click', () => {
+          this.close();
+          this.deps.world().targetEntity(npc.id);
+          this.deps.world().startWorldQuestActivity(questId, choice.difficulty);
+        });
+        this.deps.element.appendChild(button);
+      }
+    } else if (view.canStart) {
+      const button = this.makeButton(view.buttonLabel);
+      button.dataset.startWq = String(npc.id);
+      button.addEventListener('click', () => {
+        this.close();
+        this.deps.world().targetEntity(npc.id);
+        this.deps.world().interact();
+      });
+      this.deps.element.appendChild(button);
+    }
+    this.bindClose();
+    this.showAndFocus();
+    return true;
+  }
+
+  /** The NPC's answer to a solved clue talk or delivery, then back to the gossip
+   *  list (or closed, if nothing else is left to say). */
+  private renderClueReply(npc: Entity, huntId: string, step: number): void {
+    this.clueReplyOpen = true;
+    const definition = NPCS[npc.templateId];
+    const npcName = definition
+      ? this.deps.text.npcName(npc.templateId)
+      : this.deps.text.mobName(npc.templateId);
+    const npcTitle = definition ? this.deps.text.npcTitle(definition.id) : '';
+    let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(npcName)}<span class="quest-muted ui-win-sub"> &lt;${esc(npcTitle)}&gt;</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
+    html += `<div class="qd-sub">${esc(clueHuntTitle(huntId))}</div>`;
+    html += `<div class="qd-text" data-clue-reply="1">"${esc(t(clueReplyKey(huntId, step) as TranslationKey))}"</div>`;
+    this.deps.element.innerHTML = html;
+    const button = this.makeButton(t('questUi.dialog.continue'));
+    button.addEventListener('click', () => this.renderGossip(npc, true));
+    this.deps.element.appendChild(button);
+    this.bindClose();
+    this.showAndFocus();
   }
 
   private makeButton(label: string): HTMLButtonElement {

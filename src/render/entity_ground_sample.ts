@@ -3,6 +3,7 @@ import { isRiftPos } from '../sim/data';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import { groundHeight } from '../sim/world';
 import type { RiftFloorView } from '../world_api/dungeons';
+import { drawnDeckSupportAt } from './deck_frame';
 import {
   commitEntityGroundSample,
   type EntityGroundSample,
@@ -11,6 +12,8 @@ import {
 
 /** Radius of the standable-prop query under a body's feet, in yards. */
 const STAND_SUPPORT_RADIUS = 0.5;
+/** Feet within this of a drawn deck's top stand on it (yards). */
+const DECK_STAND_TOLERANCE = 0.1;
 
 /** Half-span of the terrain-gradient stencil under a body, in yards. */
 const TILT_SAMPLE_SPAN = 0.55;
@@ -116,14 +119,17 @@ export function sampleStandingSurface(
   dt: number,
   force: boolean,
 ): number {
+  // A scheduled ship's deck as drawn (render/deck_frame.ts) counts too: under
+  // way it is in no collider grid, so without it a passenger reads airborne.
+  // Read every frame (a handful of volumes near a ship, one distance test
+  // elsewhere): a body standing on it is served straight from it, since a
+  // deck under way carries the body past the cache's displacement gate every
+  // frame and would resample the terrain below for the whole voyage.
+  const deck = drawnDeckSupportAt(world, x, y, z, STAND_SUPPORT_RADIUS);
+  if (y - deck <= DECK_STAND_TOLERANCE) return deck;
   if (force || entityGroundSampleDue(sample, x, y, z, dt)) {
-    commitEntityGroundSample(
-      sample,
-      x,
-      y,
-      z,
-      standingSurfaceAt(world.cfg.seed, world.riftFloor, x, y, z),
-    );
+    const surface = standingSurfaceAt(world.cfg.seed, world.riftFloor, x, y, z);
+    commitEntityGroundSample(sample, x, y, z, Math.max(surface, deck));
   }
   return sample.standY;
 }

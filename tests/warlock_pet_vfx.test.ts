@@ -83,6 +83,7 @@ describe('Warlock pet signature VFX', () => {
       expect.any(Number),
       1,
       expect.any(Number),
+      false,
     );
     expect(h.triggerAttack).toHaveBeenCalledWith(1, 'emberkin_felbolt');
   });

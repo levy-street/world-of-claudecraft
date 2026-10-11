@@ -115,9 +115,14 @@ describe('the renderer runs each build on an idle slot behind the GPU arbiter', 
   const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 
   it('wires the scheduler into the serial spirit build lane', () => {
-    expect(renderer).toContain(
-      'this.abilityVfxFx.setSpiritBuildScheduler((build) => this.queueSpiritPuppetBuild(build));',
+    const factory = readFileSync(
+      new URL('../src/render/renderer_ability_presentation.ts', import.meta.url),
+      'utf8',
     );
+    expect(renderer).toContain('const abilityPresentation = createRendererAbilityPresentation({');
+    expect(renderer).toContain('spiritBuild: (build) => this.queueSpiritPuppetBuild(build),');
+    expect(factory).toContain('fx.setSpiritBuildScheduler(h.spiritBuild);');
+    expect(renderer).toContain('this.abilityVfxFx = abilityPresentation.fx;');
     const start = renderer.indexOf('private queueSpiritPuppetBuild(');
     expect(start).toBeGreaterThan(-1);
     const method = renderer.slice(start, renderer.indexOf('\n  }', start));

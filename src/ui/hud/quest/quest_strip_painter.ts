@@ -51,6 +51,7 @@ export interface QuestStripObjectiveLine {
   /** Already-localized "label current/total" line. */
   text: string;
   done: boolean;
+  instruction?: boolean;
 }
 
 /** Everything the painter renders, all of it already localized. */
@@ -127,6 +128,7 @@ export class QuestStripPainter {
       if (!line) continue;
       this.writers.setText(el, line.text);
       this.writers.toggleClass(el, CLASS_DONE, line.done);
+      this.writers.toggleClass(el, 'instruction', line.instruction === true);
     }
     this.writers.setText(d.more, model.more);
     this.writers.setStyleProp(d.more, DISPLAY_PROP, model.more === '' ? HIDDEN : SHOWN);

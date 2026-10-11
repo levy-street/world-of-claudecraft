@@ -1,5 +1,7 @@
+// @vitest-environment happy-dom
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
+import { describe, expect, it, vi } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
 import {
   attackAbilityId,
@@ -28,28 +30,57 @@ describe('winning Warrior attack animation routing', () => {
       dualwield: 'Dualwield_Melee_Attack_Chop',
     });
     expect(VISUALS.player_warrior.clips.attackByAbility).toMatchObject({
-      mortal_strike: '2H_Melee_Attack_Chop',
-      execute: '2H_Melee_Attack_Chop',
-      slam: '2H_Melee_Attack_Chop',
-      red_harvest: '2H_Melee_Attack_Chop',
-      breachmaker: '2H_Melee_Attack_Chop',
-      // Shieldcrack drives the offhand SHIELD arm (synthesized clip,
-      // scripts/_add_shield_bash_anim.mjs), never a sword chop.
-      shield_slam: 'Shield_Bash',
-      raging_gale: 'Dualwield_Melee_Attack_Chop',
-      bloodthirst: 'Dualwield_Melee_Attack_Chop',
-      // The two frontal-arc AoE strikes reap sideways (synthesized clip,
-      // scripts/_add_sweep_slice_anim.mjs), never the top-to-bottom chop.
-      cleave: '1H_Melee_Attack_Slice_Horizontal',
-      revenge: '1H_Melee_Attack_Slice_Horizontal',
-      thunder_clap: '1H_Melee_Attack_Chop',
-      faultline: '1H_Melee_Attack_Chop',
-      heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
-      overpower: '1H_Melee_Attack_Slice_Diagonal',
-      hamstring: '1H_Melee_Attack_Slice_Diagonal',
-      sanguine_aura: 'Spellcast_Raise',
-      raised_guard: 'Block',
+      mortal_strike: 'Warrior_Maiming_Strike',
+      execute: 'Warrior_Early_Grave',
+      slam: 'Warrior_Brute_Swing',
+      red_harvest: 'Fury_Red_Harvest',
+      breachmaker: 'Warrior_Breachmaker',
+      // Shieldcrack retains its offhand shield drive in the authored donor.
+      shield_slam: 'Warrior_Shieldcrack',
+      raging_gale: 'Fury_Twinstrike',
+      bloodthirst: 'Warrior_Bloodletting',
+      // Reaping Arc turns through the area; Revenge stays a frontal sweep.
+      cleave: 'Warrior_Reaping_Arc',
+      revenge: 'Warrior_Revenge',
+      thunder_clap: 'Warrior_Quaking_Blow',
+      faultline: 'Warrior_Faultline',
+      heroic_strike: 'Warrior_Reaver_Strike',
+      overpower: 'Warrior_Redhand',
+      hamstring: 'Warrior_Hobbling_Cut',
+      sanguine_aura: 'Warrior_Sanguine_Aura',
+      raised_guard: 'Warrior_Raised_Guard',
+      storm_bolt: 'Warrior_Storm_Bolt',
+      pummel: 'Warrior_Jawcrack',
+      avatar: 'Warrior_Avatar',
+      whirlwind: 'Warrior_Bladed_Gyre',
     });
+  });
+
+  it('resolves every authored Warrior gesture from its shipped donors on fixed and modular bodies', () => {
+    for (const key of ['player_warrior', 'player_warrior_modular']) {
+      const def = VISUALS[key];
+      const names = new Set<string>();
+      for (const url of [def.url, ...(def.animUrls ?? [])]) {
+        const bytes = readFileSync(`public/${url}`);
+        const doc = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString('utf8'));
+        for (const animation of doc.animations ?? []) names.add(animation.name);
+      }
+      for (const [id, name] of Object.entries(def.clips.attackByAbility ?? {})) {
+        expect(names.has(name), `${key}: ${id} must bind its shipped clip ${name}`).toBe(true);
+      }
+      const channel = def.clips.castByAbility?.bladestorm;
+      expect(channel).toBe('Warrior_Bladestorm_Loop');
+      expect(names.has(channel ?? '')).toBe(true);
+    }
+  });
+
+  it('does not route another class through Warrior-only authored clips', () => {
+    for (const [key, def] of Object.entries(VISUALS)) {
+      if (!key.startsWith('player_') || key.startsWith('player_warrior')) continue;
+      for (const name of Object.values(def.clips.attackByAbility ?? {})) {
+        expect(/^(Warrior_|Fury_)/.test(name), `${key}: ${name}`).toBe(false);
+      }
+    }
   });
 
   it('routes Final Edict to its dedicated one-handed Templar verdict clip at authored speed', () => {
@@ -190,5 +221,58 @@ describe('spellfx dispatch order: mob engage cue vs warrior cast plan', () => {
       expect(isMobEngageCue('shout', kind), String(kind)).toBe(false);
       expect(isMobEngageCue('flourish', kind), String(kind)).toBe(false);
     }
+  });
+});
+
+describe('Signature_ clip binding is keyed on the warrior rig, not the clip name', () => {
+  // Signature_* is a warrior-only naming convention (warrior_ability_clips.ts,
+  // warrior_action_fallbacks.ts). visual.ts used to bind ANY shipped clip
+  // whose name started with it, on every rig: a non-warrior GLB that happened
+  // to ship a same-named clip (an authored donor, a future asset) would have
+  // it silently wired up and playable through hasAttackClipOverride even
+  // though the class never authored that override.
+  function stubGltfWithSignatureClip(abilityId: string) {
+    const scene = new THREE.Group();
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
+    mesh.name = 'body';
+    scene.add(mesh);
+    return {
+      scene,
+      animations: [
+        new THREE.AnimationClip('Idle', 1, []),
+        new THREE.AnimationClip(`Signature_${abilityId}`, 1, []),
+      ],
+    };
+  }
+
+  async function buildVisual(key: string, abilityId: string) {
+    vi.resetModules();
+    vi.doMock('../src/render/assets/loader', () => ({
+      loadGltf: vi.fn(() => Promise.resolve(stubGltfWithSignatureClip(abilityId))),
+      loadHdr: vi.fn(() => new Promise(() => undefined)),
+      loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      releaseGltf: vi.fn(),
+    }));
+    const { charactersReady } = await import('../src/render/characters/assets');
+    await charactersReady();
+    const { CharacterVisual } = await import('../src/render/characters/visual');
+    const visual = new CharacterVisual(key, 0xffffff, 0);
+    vi.doUnmock('../src/render/assets/loader');
+    return visual;
+  }
+
+  it('binds a shipped Signature_ clip on the warrior rig', async () => {
+    const visual = await buildVisual('player_warrior', 'qa_probe_ability');
+    // No real attackByAbility entry for this synthetic id: true here can only
+    // come from the Signature_ clip itself resolving to a live action.
+    expect(VISUALS.player_warrior.clips.attackByAbility?.qa_probe_ability).toBeUndefined();
+    expect(visual.hasAttackClipOverride('qa_probe_ability')).toBe(true);
+  });
+
+  it('leaves the same shipped Signature_ clip unbound on a non-warrior rig', async () => {
+    const visual = await buildVisual('player_priest', 'qa_probe_ability');
+    expect(VISUALS.player_priest.clips.attackByAbility?.qa_probe_ability).toBeUndefined();
+    expect(visual.hasAttackClipOverride('qa_probe_ability')).toBe(false);
   });
 });

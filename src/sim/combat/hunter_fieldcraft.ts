@@ -3,13 +3,15 @@ import {
   SLAGSNARE_4PC_MOMENTUM_ICD_SEC,
   setBonusFlag,
 } from '../content/ignivar_set_bonuses';
-import { GRAVITY, JUMP_VELOCITY } from '../player_motion';
+import { VANGUARD_SURVIVAL_4PC_MOMENTUM_STACKS } from '../content/vanguard_set_bonuses_a';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d } from '../types';
 import { hasUnbreakableMovementLock } from './cc';
 import { grantHunterFocus, onHunterTrailbreak } from './hunter_shared';
+import { trailbreakArcFor } from './hunter_trailbreak_arc';
+import { wearsSetBonus } from './set_bonus_wearer';
 
 export const BLOODHOOK_BLEED_ID = 'bloodhook_bleed';
 export const HUNTING_MOMENTUM_ID = 'hunting_momentum';
@@ -169,6 +171,14 @@ export function finishBloodhook(
     );
     removeAura(ctx, hunter, FIELDCRAFT_REENTRY_ID);
     if (stacks >= 3) removeAura(ctx, hunter, HUNTING_MOMENTUM_ID);
+  }
+  // Snaretooth Mail 4pc (Warfare Season 2): a Bloodhook that arrives grants
+  // Hunting Momentum through the same setter Gutting Strike uses (8 sec
+  // window, 3 stack cap). After the Re-entry payoff above, so the grant never
+  // feeds the strike that consumes it. Draws no rng.
+  if (wearsSetBonus(ctx, hunter, 'vanguard_hunter_survival', 4)) {
+    const current = hunter.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID)?.stacks ?? 0;
+    setMomentum(ctx, hunter, Math.min(3, current + VANGUARD_SURVIVAL_4PC_MOMENTUM_STACKS));
   }
 }
 
@@ -363,12 +373,14 @@ export function runShrapnelCharge(
 
 export function trailbreak(ctx: SimContext, hunter: Entity, distance: number): void {
   onHunterTrailbreak(ctx, hunter);
-  const flightSeconds = (2 * JUMP_VELOCITY) / GRAVITY;
-  const horizontalSpeed = distance / flightSeconds;
-  hunter.vx = -Math.sin(hunter.facing) * horizontalSpeed;
-  hunter.vz = -Math.cos(hunter.facing) * horizontalSpeed;
-  hunter.vy = JUMP_VELOCITY;
+  // Airborne BEFORE the plan: the sweep resolves the body with the mantle
+  // lift the kernel grants a jumping body, so a low crate behind the hunter
+  // is footing to carry onto, not a wall that ends the leap at its face.
   hunter.onGround = false;
+  const arc = trailbreakArcFor(ctx, hunter, distance);
+  hunter.vx = arc.vx;
+  hunter.vz = arc.vz;
+  hunter.vy = arc.vy;
   hunter.jumping = true;
   hunter.fallStartY = hunter.pos.y;
   const momentum = hunter.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID);

@@ -1,50 +1,81 @@
-import { describe, it, expect } from 'vitest';
-import { RUN_SPEED } from '../src/sim/types';
+import { describe, expect, it } from 'vitest';
 import {
-  targetIntensity,
-  stepIntensity,
-  speedStreaks,
-  speedStreaksInto,
-  vignetteAlpha,
   FX_SPEED_FLOOR,
   FX_SPEED_FULL,
   FX_SPEED_MAX_PLAUSIBLE,
+  groundSpeedFromFrame,
+  hasTravelFormAura,
+  speedStreaks,
+  speedStreaksInto,
+  stepIntensity,
+  targetIntensity,
+  trackLocalPos,
+  vignetteAlpha,
 } from '../src/render/travel_speed_fx';
+import { RUN_SPEED } from '../src/sim/types';
 
 describe('travel speed fx (pure core)', () => {
   it('shows nothing when not in travel form, even at top speed', () => {
-    expect(targetIntensity({ inTravelForm: false, speed: FX_SPEED_FULL, reducedMotion: false })).toBe(0);
+    expect(
+      targetIntensity({ inTravelForm: false, speed: FX_SPEED_FULL, reducedMotion: false }),
+    ).toBe(0);
   });
 
   it('shows nothing while in form but standing still or walking below the floor', () => {
     expect(targetIntensity({ inTravelForm: true, speed: 0, reducedMotion: false })).toBe(0);
-    expect(targetIntensity({ inTravelForm: true, speed: FX_SPEED_FLOOR, reducedMotion: false })).toBe(0);
+    expect(
+      targetIntensity({ inTravelForm: true, speed: FX_SPEED_FLOOR, reducedMotion: false }),
+    ).toBe(0);
     expect(targetIntensity({ inTravelForm: true, speed: RUN_SPEED, reducedMotion: false })).toBe(0);
   });
 
   it('ramps up as travel-form speed approaches the +40% top speed', () => {
-    const mid = targetIntensity({ inTravelForm: true, speed: (FX_SPEED_FLOOR + FX_SPEED_FULL) / 2, reducedMotion: false });
-    const full = targetIntensity({ inTravelForm: true, speed: FX_SPEED_FULL, reducedMotion: false });
+    const mid = targetIntensity({
+      inTravelForm: true,
+      speed: (FX_SPEED_FLOOR + FX_SPEED_FULL) / 2,
+      reducedMotion: false,
+    });
+    const full = targetIntensity({
+      inTravelForm: true,
+      speed: FX_SPEED_FULL,
+      reducedMotion: false,
+    });
     expect(mid).toBeGreaterThan(0);
     expect(full).toBeGreaterThan(mid);
     expect(full).toBeCloseTo(1, 5);
   });
 
   it('clamps above the top speed and never exceeds 1', () => {
-    expect(targetIntensity({ inTravelForm: true, speed: FX_SPEED_FULL * 2, reducedMotion: false })).toBeCloseTo(1, 5);
+    expect(
+      targetIntensity({ inTravelForm: true, speed: FX_SPEED_FULL * 2, reducedMotion: false }),
+    ).toBeCloseTo(1, 5);
   });
 
   it('is fully suppressed under prefers-reduced-motion', () => {
-    expect(targetIntensity({ inTravelForm: true, speed: FX_SPEED_FULL, reducedMotion: true })).toBe(0);
+    expect(targetIntensity({ inTravelForm: true, speed: FX_SPEED_FULL, reducedMotion: true })).toBe(
+      0,
+    );
   });
 
   it('rejects implausible teleport / displacement speed spikes', () => {
     // A one-frame zone transition or knockback reads as an enormous speed; the cue
     // must draw nothing rather than flash to full for that frame.
-    expect(targetIntensity({ inTravelForm: true, speed: FX_SPEED_MAX_PLAUSIBLE + 0.01, reducedMotion: false })).toBe(0);
+    expect(
+      targetIntensity({
+        inTravelForm: true,
+        speed: FX_SPEED_MAX_PLAUSIBLE + 0.01,
+        reducedMotion: false,
+      }),
+    ).toBe(0);
     expect(targetIntensity({ inTravelForm: true, speed: 10_000, reducedMotion: false })).toBe(0);
     // Just below the ceiling still reads as (clamped) real travel.
-    expect(targetIntensity({ inTravelForm: true, speed: FX_SPEED_MAX_PLAUSIBLE - 0.01, reducedMotion: false })).toBeCloseTo(1, 5);
+    expect(
+      targetIntensity({
+        inTravelForm: true,
+        speed: FX_SPEED_MAX_PLAUSIBLE - 0.01,
+        reducedMotion: false,
+      }),
+    ).toBeCloseTo(1, 5);
   });
 
   it('eases intensity toward the target and is frame-rate independent in direction', () => {
@@ -96,5 +127,25 @@ describe('travel speed fx (pure core)', () => {
   it('vignette scales with intensity', () => {
     expect(vignetteAlpha(0)).toBe(0);
     expect(vignetteAlpha(1)).toBeGreaterThan(vignetteAlpha(0.5));
+  });
+
+  it('samples ground speed from the remembered position and tracks it without reallocating', () => {
+    expect(groundSpeedFromFrame(null, 3, 4, 0.05)).toBe(0);
+    const first = trackLocalPos(null, 0, 0);
+    expect(first).toEqual({ x: 0, z: 0 });
+    // 3-4-5 over 0.05 s is 100 yd/s; a zero or negative dt never divides.
+    expect(groundSpeedFromFrame(first, 3, 4, 0.05)).toBeCloseTo(100, 6);
+    expect(groundSpeedFromFrame(first, 3, 4, 0)).toBe(0);
+    expect(groundSpeedFromFrame(first, 3, 4, -1)).toBe(0);
+    const again = trackLocalPos(first, 3, 4);
+    expect(again).toBe(first);
+    expect(first).toEqual({ x: 3, z: 4 });
+    expect(groundSpeedFromFrame(first, 3, 4, 0.05)).toBe(0);
+  });
+
+  it('recognises the travel-form aura among any others', () => {
+    expect(hasTravelFormAura([])).toBe(false);
+    expect(hasTravelFormAura([{ kind: 'form_cat' }, { kind: 'buff' }])).toBe(false);
+    expect(hasTravelFormAura([{ kind: 'buff' }, { kind: 'form_travel' }])).toBe(true);
   });
 });

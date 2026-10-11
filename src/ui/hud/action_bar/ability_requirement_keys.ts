@@ -15,6 +15,7 @@
 // requirement. Cheap Trick bakes ignoreStealthRequirement onto the resolved
 // Gut Punch (content/classes.ts applyTalentMods) and the sim's cast gate honors
 // it (combat/casting_lifecycle.ts), so the line must go with it.
+import { type DruidCombatForm, requiredForms } from '../../../sim/combat/form_requirement';
 import type { AbilityDef } from '../../../sim/types';
 import { isSelfOnlyAbility } from './ability_self_only';
 
@@ -40,8 +41,10 @@ export interface AbilityRequirementKey {
     | 'enemyTarget'
     | 'anyTarget'
     | 'selfOnly';
-  /** Set only for key 'requiresForm'. */
-  form?: NonNullable<AbilityDef['requiresForm']>;
+  /** Set only for key 'requiresForm': every form the ability may be used in,
+   *  in authored order (one entry for a single-form button, two for a shared
+   *  one such as Savage Mending). */
+  forms?: readonly DruidCombatForm[];
   /** Set only for key 'requiresTargetHealthBelow' (already a 0-100 percent). */
   percent?: number;
 }
@@ -52,7 +55,8 @@ export function abilityRequirementKeys(
   resolved?: AbilityRequirementResolve,
 ): AbilityRequirementKey[] {
   const out: AbilityRequirementKey[] = [];
-  if (def.requiresForm) out.push({ key: 'requiresForm', form: def.requiresForm });
+  const forms = requiredForms(def);
+  if (forms.length > 0) out.push({ key: 'requiresForm', forms });
   if (def.requiresStealth && !resolved?.ignoreStealthRequirement) {
     out.push({
       key:

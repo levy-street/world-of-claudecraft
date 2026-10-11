@@ -15,8 +15,28 @@
 // not paint, and why the tiers / ownedPieces / nextTier fields below survive
 // anyway).
 
+import { SEASON2_SETS, SEASON2_STOCK } from '../../../sim/content/pvp_honor_season2';
 import type { ItemDef, ItemSet } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
+
+/** Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts): the top tier,
+ *  listed above the entry tier in its own group. */
+const SEASON2_IDS: ReadonlySet<string> = new Set(SEASON2_STOCK);
+
+/** Season 2 set id to the class and spec it is built for, so the painter can
+ *  name the spec beside the set (Bladewake Battlegear, Arms). */
+const SEASON2_SPEC_BY_SET: ReadonlyMap<string, WarfareShopSetSpec> = new Map(
+  SEASON2_SETS.map((set) => [set.setId, { cls: set.cls, spec: set.spec }]),
+);
+
+/** The class and spec a Season 2 set is built for (ids; the painter translates). */
+export interface WarfareShopSetSpec {
+  cls: string;
+  spec: string;
+}
+
+/** The two groups the shop lists, top tier first. */
+export type WarfareShopGroup = 'season2' | 'entry';
 
 /** The five WARFARE armor families, in the order the shop lists them. Any set
  *  the stock carries that is NOT named here still gets a section, appended in
@@ -36,6 +56,7 @@ export const WARFARE_SHOP_SET_ORDER: readonly string[] = [
  *  so every key in one view is unique and safe to build a focus key from. */
 export const WARFARE_SHOP_JEWELRY_KEY = 'jewelry';
 export const WARFARE_SHOP_WEAPONS_KEY = 'weapons';
+export const WARFARE_SHOP_SEASON2_WEAPONS_KEY = 'season2_weapons';
 /** Direct buddy unlocks (kind 'buddy'), currently Horse at both honor vendors. Its own section rather than the jewelry
  *  fallback: a companion is not gear, carries no slot and no stats, and must
  *  never read as a piece a set-completion count is waiting on. */
@@ -85,9 +106,13 @@ export interface WarfareShopNextTier {
 
 export interface WarfareShopSetSection {
   kind: 'set';
+  group: WarfareShopGroup;
   /** The set id, which is also this section's unique key. */
   key: string;
   setId: string;
+  /** The spec a Season 2 set is built for; absent on the entry tier, whose
+   *  families serve every spec of an armor type. */
+  spec?: WarfareShopSetSpec;
   offers: WarfareShopOffer[];
   /** Every authored tier the set can actually reach, ascending. Piece-count
    *  agnostic: no 2/3/4 literal anywhere, so the 2/4/7 breakpoints render. */
@@ -106,6 +131,7 @@ export interface WarfareShopSetSection {
 
 export interface WarfareShopPlainSection {
   kind: 'jewelry' | 'weapons' | 'companions';
+  group: WarfareShopGroup;
   key: string;
   offers: WarfareShopOffer[];
 }
@@ -131,6 +157,10 @@ export interface WarfareShopViewer {
    *  row here falls back to the distinct slots this shop actually sells, so the
    *  denominator is never zero and never invented. */
   setMemberCounts?: Readonly<Record<string, number>>;
+  /** The viewer's class. Season 2 sets and weapons are class-locked, so the
+   *  shop lists only the ones this class can wear (three spec sets out of 27);
+   *  absent, nothing is filtered. The entry tier is never filtered. */
+  viewerClass?: string;
 }
 
 /** The `IWorld` reads the viewer derivation needs, as a Pick rather than the
@@ -139,7 +169,7 @@ export interface WarfareShopViewer {
  *  could quietly diverge. */
 export type WarfareShopWorld = Pick<
   IWorld,
-  'honor' | 'inventory' | 'equipment' | 'ownedBuddies' | 'pendingBuddies'
+  'honor' | 'inventory' | 'equipment' | 'cfg' | 'ownedBuddies' | 'pendingBuddies'
 >;
 
 /**
@@ -159,13 +189,22 @@ export type WarfareShopWorld = Pick<
  */
 export function warfareShopViewer(
   world: WarfareShopWorld,
-): Pick<WarfareShopViewer, 'honor' | 'ownedItemIds' | 'equippedItemIds' | 'acquiredBuddyKeys'> {
+): Pick<
+  WarfareShopViewer,
+  'honor' | 'ownedItemIds' | 'equippedItemIds' | 'acquiredBuddyKeys' | 'viewerClass'
+> {
   const equippedItemIds = new Set(
     Object.values(world.equipment).filter((id): id is string => !!id),
   );
   const ownedItemIds = new Set([...equippedItemIds, ...world.inventory.map((slot) => slot.itemId)]);
   const acquiredBuddyKeys = new Set([...world.ownedBuddies(), ...world.pendingBuddies()]);
-  return { honor: world.honor, ownedItemIds, equippedItemIds, acquiredBuddyKeys };
+  return {
+    honor: world.honor,
+    ownedItemIds,
+    equippedItemIds,
+    acquiredBuddyKeys,
+    viewerClass: world.cfg.playerClass,
+  };
 }
 
 function offerFor(itemId: string, item: ItemDef, viewer: WarfareShopViewer): WarfareShopOffer {
@@ -191,10 +230,16 @@ function distinctSlots(offers: readonly WarfareShopOffer[], ids: ReadonlySet<str
   return slots.size;
 }
 
+function wearableBy(item: ItemDef, viewerClass: string | undefined): boolean {
+  if (!viewerClass || !item.requiredClass) return true;
+  return (item.requiredClass as readonly string[]).includes(viewerClass);
+}
+
 /**
- * Build the sectioned shop view: the honor stock split into its five set
- * families plus jewelry and weapons, each offer resolved against the item table,
- * the viewer's honor balance, and what they already own.
+ * Build the sectioned shop view: Warfare Season 2 first (the viewer's class
+ * sets, then its weapons), then the entry tier's five set families, jewelry and
+ * weapons, each offer resolved against the item table, the viewer's honor
+ * balance, and what they already own.
  *
  * Unknown item ids and priceless rows are dropped (never render a row the sim
  * would refuse to sell), matching buildVendorView's own two drop rules.
@@ -209,6 +254,7 @@ export function buildWarfareVendorView(
   const jewelry: WarfareShopOffer[] = [];
   const weapons: WarfareShopOffer[] = [];
   const companions: WarfareShopOffer[] = [];
+  const seasonWeapons: WarfareShopOffer[] = [];
   for (const itemId of stock) {
     const item = items[itemId];
     if (!item) continue;
@@ -218,6 +264,12 @@ export function buildWarfareVendorView(
       // Checked before the set arm on purpose: a whistle carries no set tag
       // today, and if one ever did it would still not be a gear piece.
       companions.push(offer);
+      continue;
+    }
+    // Season 2 is class-locked: list only what this viewer can wear.
+    if (SEASON2_IDS.has(itemId) && !wearableBy(item, viewer.viewerClass)) continue;
+    if (SEASON2_IDS.has(itemId) && item.kind === 'weapon') {
+      seasonWeapons.push(offer);
     } else if (item.set) {
       const existing = bySet.get(item.set);
       if (existing) existing.push(offer);
@@ -231,14 +283,30 @@ export function buildWarfareVendorView(
     }
   }
 
-  // Authored order first, then any family the stock carries that the order does
-  // not name, in first-seen order (Map preserves insertion).
+  // Season 2 sets first, in stock order (class, then spec). Then the entry
+  // tier: authored order first, then any family the stock carries that the
+  // order does not name, in first-seen order (Map preserves insertion).
+  const seasonSetIds = [...bySet.keys()].filter((setId) =>
+    SEASON2_IDS.has((bySet.get(setId) as WarfareShopOffer[])[0].itemId),
+  );
+  const entrySetIds = [...bySet.keys()].filter((setId) => !seasonSetIds.includes(setId));
   const orderedSetIds = [
-    ...WARFARE_SHOP_SET_ORDER.filter((setId) => bySet.has(setId)),
-    ...[...bySet.keys()].filter((setId) => !WARFARE_SHOP_SET_ORDER.includes(setId)),
+    ...seasonSetIds,
+    ...WARFARE_SHOP_SET_ORDER.filter((setId) => entrySetIds.includes(setId)),
+    ...entrySetIds.filter((setId) => !WARFARE_SHOP_SET_ORDER.includes(setId)),
   ];
 
   const sections: WarfareShopSection[] = [];
+  const pushSeasonWeapons = () => {
+    if (seasonWeapons.length === 0) return;
+    sections.push({
+      kind: 'weapons',
+      group: 'season2',
+      key: WARFARE_SHOP_SEASON2_WEAPONS_KEY,
+      offers: seasonWeapons,
+    });
+  };
+  if (seasonSetIds.length === 0) pushSeasonWeapons();
   for (const setId of orderedSetIds) {
     const offers = bySet.get(setId) as WarfareShopOffer[];
     const ownedPieces = distinctSlots(offers, viewer.ownedItemIds);
@@ -256,6 +324,8 @@ export function buildWarfareVendorView(
     const pending = tiers.find((tier) => ownedPieces < tier.pieces);
     sections.push({
       kind: 'set',
+      group: seasonSetIds.includes(setId) ? 'season2' : 'entry',
+      spec: SEASON2_SPEC_BY_SET.get(setId),
       key: setId,
       setId,
       offers,
@@ -267,16 +337,33 @@ export function buildWarfareVendorView(
         ? { pieces: pending.pieces, remaining: pending.pieces - ownedPieces }
         : null,
     });
+    // Season 2 weapons close the Season 2 group, before the entry tier starts.
+    if (setId === seasonSetIds[seasonSetIds.length - 1]) pushSeasonWeapons();
   }
   if (jewelry.length > 0) {
-    sections.push({ kind: 'jewelry', key: WARFARE_SHOP_JEWELRY_KEY, offers: jewelry });
+    sections.push({
+      kind: 'jewelry',
+      group: 'entry',
+      key: WARFARE_SHOP_JEWELRY_KEY,
+      offers: jewelry,
+    });
   }
   if (weapons.length > 0) {
-    sections.push({ kind: 'weapons', key: WARFARE_SHOP_WEAPONS_KEY, offers: weapons });
+    sections.push({
+      kind: 'weapons',
+      group: 'entry',
+      key: WARFARE_SHOP_WEAPONS_KEY,
+      offers: weapons,
+    });
   }
   // Last: the cosmetic row never pushes a gear section down the window.
   if (companions.length > 0) {
-    sections.push({ kind: 'companions', key: WARFARE_SHOP_COMPANIONS_KEY, offers: companions });
+    sections.push({
+      kind: 'companions',
+      group: 'entry',
+      key: WARFARE_SHOP_COMPANIONS_KEY,
+      offers: companions,
+    });
   }
   return { sections, balance: Math.max(0, Math.floor(viewer.honor)) };
 }

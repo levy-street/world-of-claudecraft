@@ -106,7 +106,10 @@ describe('woc_market_window: no magic color values', () => {
     // and the Object.hasOwn guard, so a raw QUALITY_COLOR index (whose ??
     // never fires on a prototype-key quality) must not come back.
     expect(painter).toContain("import { itemNameColor } from './item_name_color';");
-    expect(painter).toContain('itemNameColor({ quality })');
+    const chrome = readFileSync(new URL('../src/ui/woc_market_chrome.ts', import.meta.url), 'utf8');
+    expect(painter).toContain('return wocItemCellHtml(');
+    expect(chrome).toContain('itemNameColor({ quality })');
+    expect(chrome).not.toContain('QUALITY_COLOR[');
     expect(painter).toContain('itemNameColor({');
     expect(painter).not.toContain('QUALITY_COLOR[');
   });

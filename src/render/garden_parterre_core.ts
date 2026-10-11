@@ -20,6 +20,7 @@ import {
   inDawnholdCourt,
 } from '../sim/dawnhold_layout';
 import { fbm2, hash2 } from '../sim/rng';
+import { inWispMazeFootprint } from '../sim/wisp_maze_ground';
 import {
   gardenLandness,
   gardenMazeCellPieces,
@@ -132,6 +133,10 @@ const GARDEN_X1 = EVERGARDEN_ZONE.xMax ?? 540;
 const GARDEN_Z0 = EVERGARDEN_ZONE.zMin;
 const GARDEN_Z1 = EVERGARDEN_ZONE.zMax;
 const MAZE_MARGIN = 6;
+// The wisp maze trial's lawn (sim/wisp_maze_ground.ts) grows nothing: its
+// private hedges and flagstones stand there for the player inside, and any
+// planting would show through them. Yards of bare lawn kept past its edge.
+const WISP_MAZE_CLEAR = 1;
 const MAZE_X1 = MAZE_X0 + MAZE_COLS * MAZE_CELL;
 // the maze bloom band: how far off a hedge face the white and gold border
 // grows (NEAR keeps flowers out of the hedge itself)
@@ -254,6 +259,7 @@ function dawnholdCourtTintAt(x: number, z: number): number {
  * procedural ring beds; the gate border and walk ribbons carry on unchanged.
  */
 export function parterreFlowerTintAt(x: number, z: number): number {
+  if (inWispMazeFootprint(x, z, WISP_MAZE_CLEAR)) return -1;
   // Dawnhold: nothing grows on the paved bailey, and the walled court south
   // of it is solid flower field. Both answered before the general plan.
   if (inDawnholdBailey(x, z, 1)) return -1;
@@ -350,6 +356,7 @@ const MEADOW_TINTS = [0xffffff, 0xf7c6d9, 0xf2c94c, 0xc9b8e8, 0xf27ba6, 0x7b9bd8
  * -1, sampled per candidate flower position.
  */
 export function gardenMeadowTintAt(x: number, z: number): number {
+  if (inWispMazeFootprint(x, z, WISP_MAZE_CLEAR)) return -1;
   if (x < GARDEN_X0 + 12 || x > GARDEN_X1 - 12 || z < GARDEN_Z0 + 10 || z > GARDEN_Z1 - 10) {
     return -1;
   }
@@ -408,11 +415,14 @@ function flatDryLawn(x: number, z: number, seed: number): boolean {
 export function parterreBushSpots(seed: number): ParterreBushSpot[] {
   const out: ParterreBushSpot[] = [];
   const hedge = (x: number, z: number): void => {
+    // the wisp maze trial's lawn: a road-edge hedge would stand in its corridors
+    if (inWispMazeFootprint(x, z, WISP_MAZE_CLEAR + 1)) return;
     // never grow a hedge through a wall, floor, or well
     if (!clearOfGardenBuildings(x, z, 0.8)) return;
     if (flatDryLawn(x, z, seed)) out.push({ x, z, kind: 'bush', scale: 0.82 });
   };
   const rose = (x: number, z: number, scale: number, tint: number): void => {
+    if (inWispMazeFootprint(x, z, WISP_MAZE_CLEAR + 1)) return;
     if (flatDryLawn(x, z, seed)) out.push({ x, z, kind: 'bushFlowers', scale, bloomTint: tint });
   };
   const hedgeRing = (cx: number, cz: number, radius: number): void => {
@@ -482,6 +492,7 @@ export function parterreBushSpots(seed: number): ParterreBushSpot[] {
  * where the flowers stop, so both read lush instead of clipped edges.
  */
 export function gardenLushGrassAt(x: number, z: number): boolean {
+  if (inWispMazeFootprint(x, z, WISP_MAZE_CLEAR)) return false;
   if (inParterrePlot(x, z, 1.8)) return !inParterrePlot(x, z, -1);
   if (x < GARDEN_X0 + 12 || x > GARDEN_X1 - 12 || z < GARDEN_Z0 + 10 || z > GARDEN_Z1 - 10) {
     return false;

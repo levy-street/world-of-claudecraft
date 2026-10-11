@@ -30,6 +30,7 @@
 // `src/sim`-pure; no rng, no clock.
 
 import type { TalentEffect } from './talents';
+import { VANGUARD_SET_ENGINE_BONUSES } from './vanguard_set_bonuses';
 
 export interface SetEngineBonusTier {
   pieces: number;
@@ -138,17 +139,11 @@ export const EMBERSCREED_2PC_DOCTRINE_CONVERSION_BONUS = 0.1;
 export const EMBERSCREED_4PC_HYMN_WINDOW_SEC = 10;
 /** Emberscreed 4pc: the internal cooldown between empower grants. */
 export const EMBERSCREED_4PC_HYMN_ICD_SEC = 15;
-/** Benison Dawnweave 2pc: Seraphic Vigil's resolved rescue heal (base 180
- *  x the 1.5 buffPct row; heal_echo is in neither the integral nor the
- *  scalable buff-kind sets, so the resolved value is exactly this flat 270). */
-export const BENISON_2PC_VIGIL_RESCUE_HEAL = 270;
-/** Benison Dawnweave 4pc: the mend on the Vigil's ally, as a fraction of the
- *  ALLY'S max health, paid over the duration below. */
-export const BENISON_4PC_MEND_PCT_MAX = 0.15;
-/** Benison Dawnweave 4pc: mend duration in seconds. */
-export const BENISON_4PC_MEND_DURATION_SEC = 10;
-/** Benison Dawnweave 4pc: seconds between mend ticks (5 ticks total). */
-export const BENISON_4PC_MEND_TICK_INTERVAL_SEC = 2;
+/** Benison Dawnweave: direct prayers prepare Choirmend and an instant follow-up. */
+export const BENISON_2PC_HEAL_PER_STACK = 0.1;
+export const BENISON_2PC_MAX_STACKS = 3;
+export const BENISON_4PC_WHISPER_HEAL_BONUS = 1;
+export const BENISON_4PC_WHISPER_WINDOW_SEC = 60;
 /** Vesperash 2pc: seconds cut from Call Tithefiend's cooldown (base 30). */
 export const VESPERASH_2PC_TITHEFIEND_COOLDOWN_CUT_SEC = 6;
 /** Vesperash 4pc: multiplier on the Tithefiend's per-hit mana return (base
@@ -157,15 +152,22 @@ export const VESPERASH_4PC_MANA_RETURN_MULT = 2;
 
 // Audited constants for the bespoke shaman bends (read by the class-module
 // call sites AND pinned by tests, so the copy cannot drift from the code).
-/** Stormkindled 2pc: Thunder granted by Unleash Weapon on Pyrebrand (base
- *  PYREBRAND_UNLEASH_THUNDER 2). With 3 or more already banked part of the
- *  grant overcaps at the 5-charge cap (disclosed by the set doc). */
-export const STORMKINDLED_2PC_UNLEASH_THUNDER = 3;
+/** Stormkindled 2pc (v0.44 Thundercall rework): Arc Overload's proc chance
+ *  (base ARC_OVERLOAD_CHANCE 0.2 in combat/shaman_thundercall_kit.ts). Replaced
+ *  the Unleash-only Thunder bend, which live wearers barely pressed. */
+export const STORMKINDLED_2PC_ARC_OVERLOAD_CHANCE = 0.3;
 /** Stormkindled 4pc: Earthen Jolt's per-Thunder vent bonus (base
  *  EARTHEN_JOLT_BONUS_PER_CHARGE 0.25): the full 5-charge vent goes
  *  2.25x -> 2.5x, and Primal Mastery's 1.25 vent window still MULTIPLIES the
  *  result (3.125x in-window, disclosed). Faultwake stays untouched. */
 export const STORMKINDLED_4PC_EARTHEN_JOLT_BONUS_PER_CHARGE = 0.3;
+/** Stormkindled 4pc (v0.44 Thundercall rework): the lava_burst dmgPct row. The
+ *  printed number is 20 percent DELIVERED: the accumulator is additive
+ *  (talent_hit_mult.ts, 1 + spellDmgPct + dmgPct) and a committed Thundercall at
+ *  the raid's level 20+ carries the fully scaled Earthen Fury mastery's 0.15
+ *  spellDmgPct plus the 0.05 offense-only bonus, so the baseline is 1.2 and the
+ *  row is 0.2 x 1.2 = 0.24 (1.44 / 1.2 = 1.2 exactly), the Moonscorch shape. */
+export const STORMKINDLED_4PC_MAGMA_BURST_DMG_PCT = 0.24;
 /** Warspirit Emberscale 2pc: cadence steps per Ancestral Strike (base 2 at
  *  the combat/auto_attack.ts call site). */
 export const WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS = 3;
@@ -329,6 +331,8 @@ export const GROVESPRING_4PC_VERDANCE_BANK = 1;
 /** The engine payloads, keyed by set id (the `set` tag on each member item
  *  and the ItemSet id in item_sets.ts). Tiers ascend by pieces. */
 export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> = {
+  // Warfare Season 2 (content/vanguard_set_bonuses.ts).
+  ...VANGUARD_SET_ENGINE_BONUSES,
   // ---- Warrior ----
   slagbreaker: [
     {
@@ -700,32 +704,20 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
   benison_dawnweave: [
     {
       pieces: 2,
-      // Seraphic Vigil's rescue 180 -> 270: buffPct 0.5 scales the RESOLVED
-      // buffTarget heal_echo value (heal_echo is in neither the integral nor
-      // the scalable buff-kind sets, so the resolved value is exactly the
-      // flat 270 the tooltip promises). The {buff} description splice
-      // reads the same resolved value, so the printed number stays honest
-      // for wearers and everyone else. Deterministic, no rng involved.
       effect: {
-        ability: [{ ability: 'seraphic_vigil', buffPct: 0.5 }],
         global: { castPushbackReduction: 1 },
-        tuning: { vigilRescueHeal: BENISON_2PC_VIGIL_RESCUE_HEAL },
+        tuning: {
+          prayerHealPerStack: BENISON_2PC_HEAL_PER_STACK,
+          prayerMaxStacks: BENISON_2PC_MAX_STACKS,
+        },
       },
     },
     {
       pieces: 4,
-      // Bespoke: when a Vigil triggers, its ally is also mended for 15
-      // percent of the ALLY'S max health over 10 sec. Hooked at the
-      // vigil-trigger POINT in damage.ts beside priestOnVigilTriggered
-      // (which stays talent-gated for Incarnate Spirit; the set arm is
-      // flag-gated instead, combat/priest/benison.ts). Replaces the killed
-      // cooldown-reset idea: Twin Covenant's charge model deletes the
-      // cooldowns entry, making cooldownRefund a hard no-op. Draws no rng.
       effect: {
         tuning: {
-          mendPctMaxHp: BENISON_4PC_MEND_PCT_MAX,
-          mendDurationSec: BENISON_4PC_MEND_DURATION_SEC,
-          mendTickIntervalSec: BENISON_4PC_MEND_TICK_INTERVAL_SEC,
+          whisperHealBonus: BENISON_4PC_WHISPER_HEAL_BONUS,
+          whisperWindowSec: BENISON_4PC_WHISPER_WINDOW_SEC,
         },
       },
     },
@@ -771,16 +763,15 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
   stormkindled: [
     {
       pieces: 2,
-      // Unleash Weapon on Pyrebrand grants 3 Thunder instead of 2: a constant
-      // bend at the ONE grant site (combat/shaman_unleash_weapon.ts,
-      // applyPyrebrandUnleash). With 3 or more already banked part of the
-      // grant overcaps at the 5-charge cap (disclosed). The caster 2pc
-      // pushback rider rides the generic global knob. Deterministic for
-      // everyone: the Unleash damage and crit rolls are unchanged, only the
-      // rng-free grant amount moves.
+      // v0.44 Thundercall rework: Arc Overload procs 30 percent of the time
+      // instead of 20, read at the ONE roll site (rollArcOverload in
+      // combat/shaman_thundercall_kit.ts). Same single draw per landed hit for
+      // wearers and non-wearers; only the threshold moves, so the rng stream
+      // position never changes. The caster 2pc pushback rider rides the
+      // generic global knob.
       effect: {
         global: { castPushbackReduction: 1 },
-        tuning: { pyrebrandUnleashThunder: STORMKINDLED_2PC_UNLEASH_THUNDER },
+        tuning: { arcOverloadChance: STORMKINDLED_2PC_ARC_OVERLOAD_CHANCE },
       },
     },
     {
@@ -796,8 +787,11 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
       // literals static (the paladin vowkeeper chances, the warrior Enrage
       // duration), so they are flagged to the maintainer rather than given
       // new tooltip plumbing here.
+      // v0.44 Thundercall rework adds the Magma Burst row: 20 percent more
+      // damage DELIVERED (see STORMKINDLED_4PC_MAGMA_BURST_DMG_PCT). Draws no rng.
       effect: {
         tuning: { earthenJoltBonusPerThunder: STORMKINDLED_4PC_EARTHEN_JOLT_BONUS_PER_CHARGE },
+        ability: [{ ability: 'lava_burst', dmgPct: STORMKINDLED_4PC_MAGMA_BURST_DMG_PCT }],
       },
     },
   ],

@@ -40,7 +40,9 @@ export function restoreBookOfDeeds(meta: PlayerMeta, player: Entity, s: Characte
   meta.reliquary = restoreReliquaryState(s.reliquary);
   unionLegacyMilestones(meta);
   recomputeRenown(meta);
-  setActiveTitle(meta, player, typeof s.activeTitle === 'string' ? s.activeTitle : null);
+  setActiveTitle(meta, player, typeof s.activeTitle === 'string' ? s.activeTitle : null, {
+    restore: true,
+  });
   setActiveBorder(meta, player, typeof s.activeBorder === 'string' ? s.activeBorder : null);
 }
 

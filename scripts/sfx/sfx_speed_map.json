@@ -1,6 +1,7 @@
 {
   "version": 1,
   "rateByKey": {
+    "impact_warrior_red_harvest_finish": 0.96,
     "mount_run_drakemaw_raptor": 0.92
   }
 }

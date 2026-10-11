@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 // The "Unlock interface" coordinator (src/ui/interface_unlock.ts): one press
 // loosens every LIVE frame at once, a second press locks them all back
 // (including any that went inactive meanwhile), the body class the stylesheet
@@ -59,6 +60,13 @@ class FakeMover {
 // handler map an assertion can fire, and the few properties the code writes.
 class FakeEl {
   tag: string;
+  dataset: Record<string, string> = {};
+  replaceChildren(...children: FakeEl[]): void {
+    this.children = children;
+  }
+  querySelectorAll(): FakeEl[] {
+    return this.children.filter((child) => child.tag === 'details');
+  }
   type = '';
   id = '';
   className = '';
@@ -168,13 +176,14 @@ function harness(
   // The show/hide rows live inside the details sub-menu's rows container:
   // menu > details(.frames-menu-sub) > [summary, div.frames-menu-rows]. Each
   // entry is a WRAP: [checkRow label (checkbox, span), per-frame reset btn].
-  const frameRows = () => byId('interface-frames-menu')?.children[0]?.children[1]?.children ?? [];
+  const frameRows = () =>
+    byId('interface-visibility-menu')?.children.flatMap(
+      (group) => group.children[1]?.children ?? [],
+    ) ?? [];
   const rowBox = (wrap: FakeEl | undefined) => wrap?.children[0]?.children[0];
   const rowName = (wrap: FakeEl | undefined) => wrap?.children[0]?.children[1]?.textContent;
   const rowReset = (wrap: FakeEl | undefined) => wrap?.children[1];
-  const settingRows = () =>
-    byId('interface-frames-menu')?.children.find((c) => c.className === 'frames-menu-settings')
-      ?.children ?? [];
+  const settingRows = () => byId('interface-frames-menu')?.children ?? [];
   return {
     unlock,
     movers,
@@ -193,6 +202,36 @@ function harness(
 }
 
 describe('InterfaceUnlock', () => {
+  it('synchronizes settings-backed visibility and editor chrome without another unlock', () => {
+    const { unlock } = harness({});
+    const mover = new FakeMover();
+    let enabled = true;
+    unlock.register({
+      id: 'reliquaryTracker',
+      mover: mover as unknown as MovableFrame,
+      isActive: () => enabled,
+      rowOverride: {
+        listed: () => true,
+        value: () => enabled,
+        set: (v) => {
+          enabled = v;
+        },
+      },
+    });
+    unlock.setUnlocked(true);
+    enabled = false;
+    unlock.refreshSettings();
+    expect(mover.hidden).toBe(true);
+    expect(mover.last).toBe(false);
+    enabled = true;
+    unlock.refreshSettings();
+    expect(mover.hidden).toBe(false);
+    expect(mover.last).toBe(true);
+    unlock.setUnlocked(false);
+    enabled = false;
+    unlock.refreshSettings();
+    expect(mover.hidden).toBe(true);
+  });
   it('starts locked and reports the flag it flips to', () => {
     const { unlock } = harness({ actionBar1: true });
     expect(unlock.isUnlocked).toBe(false);
@@ -291,6 +330,8 @@ describe('InterfaceUnlock frames menu', () => {
       'interface-lock-all',
       'interface-frames-toggle',
       'interface-frames-menu',
+      'interface-visibility-toggle',
+      'interface-visibility-menu',
     ]);
     // Collapsed until the button opens it.
     expect(byId('interface-frames-menu')?.hidden).toBe(true);
@@ -309,15 +350,15 @@ describe('InterfaceUnlock frames menu', () => {
     });
     movers.get('minimap')?.setUserHidden(true);
     unlock.setUnlocked(true);
-    byId('interface-frames-toggle')?.fire('click');
-    const menu = byId('interface-frames-menu');
+    byId('interface-visibility-toggle')?.fire('click');
+    const menu = byId('interface-visibility-menu');
     expect(menu?.hidden).toBe(false);
-    expect(byId('interface-frames-toggle')?.attrs.get('aria-expanded')).toBe('true');
+    expect(byId('interface-visibility-toggle')?.attrs.get('aria-expanded')).toBe('true');
     // The show/hide list folds into a details sub-menu with its own summary.
     const sub = menu?.children[0];
     expect(sub?.tag).toBe('details');
     expect(sub?.children[0]?.tag).toBe('summary');
-    expect(sub?.children[0]?.textContent).toBe('Show or Hide Frames');
+    expect(sub?.children[0]?.textContent).toBe('Action Bars');
     const rows = frameRows();
     expect(rows.map((r) => rowName(r))).toEqual(['actionBar1', 'minimap']);
     // The checkbox state mirrors the mover: hidden rides unticked, which is the
@@ -351,7 +392,7 @@ describe('InterfaceUnlock frames menu', () => {
 
     // Flipping the Snap to Grid row in the open menu shows the grid at once.
     made.find((el) => el.id === 'interface-frames-toggle')?.fire('click');
-    const settings = made.find((el) => el.className === 'frames-menu-settings');
+    const settings = made.find((el) => el.id === 'interface-frames-menu');
     const box = settings?.children[0]?.children.find((c) => c.tag === 'input');
     expect(box).toBeTruthy();
     if (!box) return;
@@ -368,7 +409,7 @@ describe('InterfaceUnlock frames menu', () => {
   it('toggling a row drives the mover hidden state both ways', () => {
     const { unlock, movers, byId, frameRows, rowBox } = harness({ actionBar1: true });
     unlock.setUnlocked(true);
-    byId('interface-frames-toggle')?.fire('click');
+    byId('interface-visibility-toggle')?.fire('click');
     const box = rowBox(frameRows()[0]);
     expect(box).toBeTruthy();
     if (!box) return;
@@ -386,7 +427,7 @@ describe('InterfaceUnlock frames menu', () => {
       minimap: true,
     });
     unlock.setUnlocked(true);
-    byId('interface-frames-toggle')?.fire('click');
+    byId('interface-visibility-toggle')?.fire('click');
     const rows = frameRows();
     // Visible text is the shared action word; the accessible name carries
     // WHICH frame the button resets.
@@ -463,19 +504,19 @@ describe('InterfaceUnlock frames menu', () => {
   it('keeps the sub-menu expanded state across a rebuild (a mid-session refresh)', () => {
     const { unlock, byId, active } = harness({ actionBar1: true, actionBar2: false });
     unlock.setUnlocked(true);
-    byId('interface-frames-toggle')?.fire('click');
-    const sub = byId('interface-frames-menu')?.children[0];
-    expect(sub?.open).toBe(false);
+    byId('interface-visibility-toggle')?.fire('click');
+    const sub = byId('interface-visibility-menu')?.children[0];
+    expect(sub?.open).toBe(true);
     if (!sub) return;
-    sub.open = true;
+    sub.open = false;
     sub.fire('toggle');
     // A bar enabled mid-unlock refreshes the coordinator, which rebuilds the
     // open menu; the fold the player just opened must not snap shut.
     active.actionBar2 = true;
     unlock.refresh();
-    const rebuilt = byId('interface-frames-menu')?.children[0];
+    const rebuilt = byId('interface-visibility-menu')?.children[0];
     expect(rebuilt).not.toBe(sub);
-    expect(rebuilt?.open).toBe(true);
+    expect(rebuilt?.open).toBe(false);
   });
 
   it('a rowOverride entry lists on listed(), reads value(), writes set(), never the hidden flag', () => {
@@ -499,8 +540,11 @@ describe('InterfaceUnlock frames menu', () => {
       };
     }
     unlock.setUnlocked(true);
-    byId('interface-frames-toggle')?.fire('click');
-    const rowsOf = () => byId('interface-frames-menu')?.children[0]?.children[1]?.children ?? [];
+    byId('interface-visibility-toggle')?.fire('click');
+    const rowsOf = () =>
+      byId('interface-visibility-menu')?.children.flatMap(
+        (group) => group.children[1]?.children ?? [],
+      ) ?? [];
     const nameOf = (wrap: FakeEl) => wrap.children[0]?.children[1]?.textContent;
     let row = rowsOf().find((r) => nameOf(r) === 'actionBar2');
     expect(row, 'inactive overridden bar still listed').toBeTruthy();

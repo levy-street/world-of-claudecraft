@@ -80,6 +80,7 @@ import { attachSceneGroupGated, GatedSceneAttachCancelledError } from './gated_s
 import { surfaceMat } from './gfx';
 import { addInstancedParts, type GlbTemplatePart, glbTemplateParts } from './glb_instanced_props';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { MobileStationVisuals } from './mobile_stations';
 import { materialProgramSignature } from './prewarm_policy';
 import { setRenderCategory } from './renderer_diagnostics';
 
@@ -415,6 +416,10 @@ export class FarmPatchVisuals {
   // KHR_parallel_shader_compile or a headless suite). Without one, attaches are
   // immediate and no anchors are staged.
   private readonly compileGate: FarmCompileGate | null;
+  // The placed mobile-station props (mobile_stations.ts) ride this driver's
+  // throttled entity read and per-frame update for the same reason the feast
+  // does: a real snapshot entity everyone sees, with no renderer.ts wiring.
+  private readonly mobileStations: MobileStationVisuals;
   // The hidden program anchors (module header), built at construction and staged after the first-paint boundary is installed.
   private readonly anchors: THREE.Group | null;
   // Fallback-arm BufferGeometries the anchors own (glb_instanced_props.ts mints
@@ -434,6 +439,7 @@ export class FarmPatchVisuals {
     compileGate: FarmCompileGate | null = null,
   ) {
     this.compileGate = compileGate;
+    this.mobileStations = new MobileStationVisuals(scene, compileGate);
     const anchors = this.compileGate ? buildFarmProgramAnchors() : null;
     this.anchors = anchors?.root ?? null;
     this.ownedAnchorGeometries = anchors?.ownedGeometries ?? [];
@@ -500,6 +506,7 @@ export class FarmPatchVisuals {
     // dirty flag: the arming exists for the viewer's own plot rows, and a
     // feast appearing within the normal half-second cadence is fine.
     this.applyFeasts(world.entities, world.cfg.seed);
+    this.mobileStations.sync(world.entities, world.cfg.seed);
     // The event-forced read stays armed until it actually observes a change
     // (see the field comment: online the changed rows ride a LATER message
     // than the event), bounded at one interval so the normal cadence is the
@@ -610,6 +617,7 @@ export class FarmPatchVisuals {
    *  Map iterator per frame is the family idiom shared with the sibling
    *  visuals). */
   update(dt: number): void {
+    this.mobileStations.update(dt);
     for (const visual of this.plots.values()) {
       if (visual.sway === 0) continue;
       visual.phase = (visual.phase + dt * SWAY_SPEED) % (Math.PI * 2);
@@ -663,6 +671,7 @@ export class FarmPatchVisuals {
     this.disposed = true;
     for (const [bedId, visual] of this.plots) this.disposePlot(bedId, visual);
     for (const [id, visual] of this.feasts) this.disposeFeast(id, visual);
+    this.mobileStations.dispose();
     // The anchors wear the GLB cache's own materials (shared with the
     // instanced beds and every later template read) and the deduped gfx
     // surface materials, so they are detached, never disposed. A loaded

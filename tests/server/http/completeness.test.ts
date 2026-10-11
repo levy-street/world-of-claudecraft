@@ -110,6 +110,7 @@ const EXCLUDED_PATHS = new Set<string>(ORPHAN_DEVIATION?.routes ?? []);
 const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/rarity',
   '/api/guilds/roster',
+  '/api/world-quests/leaderboard',
   '/api/reliquary/rarity',
   '/api/deeds/broadcasts',
   '/api/discord/queue-pings',
@@ -352,6 +353,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // The signpost guild board's roster drill-in (server/guild_roster.ts):
     // registry-only on the same terms as the deeds family.
     { method: 'GET', path: '/api/guilds/roster' },
+    // The world-quest scoreboards read (server/world_quest_leaderboard.ts):
+    // registry-only on the same terms as the deeds family.
+    { method: 'GET', path: '/api/world-quests/leaderboard' },
     { method: 'GET', path: '/api/deeds/broadcasts' },
     { method: 'POST', path: '/api/deeds/broadcasts' },
     // The queue-pop Discord DM opt-in toggle (server/discord_queue_pings.ts):

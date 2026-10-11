@@ -15,6 +15,7 @@ import type { NythraxisCageBossLike } from './nythraxis_bound_cage_core';
 import { NythraxisBoundCageVisuals } from './nythraxis_bound_cage_visual';
 import { NythraxisGraveFlameVisuals } from './nythraxis_grave_flame_visual';
 import { NythraxisGravefireVisuals } from './nythraxis_gravefire_visual';
+import type { HazardPaletteMode } from './nythraxis_hazard_palette_core';
 import { NythraxisBindingSigilVisuals } from './nythraxis_sigil_visual';
 import { NythraxisSoulRendMarkers } from './nythraxis_soul_rend_marker';
 import type { NythraxisSoulRendEntityLike } from './nythraxis_soul_rend_marker_core';
@@ -50,24 +51,51 @@ export function nythraxisPainterRoster(
 export const NYTHRAXIS_GROUND_CUE_RADIUS = NYTHRAXIS_SIGIL_RADIUS_NORMAL;
 
 export class NythraxisMechanicVisuals {
-  private readonly flames: NythraxisGraveFlameVisuals;
-  private readonly gravefires: NythraxisGravefireVisuals;
+  private flames: NythraxisGraveFlameVisuals;
+  private gravefires: NythraxisGravefireVisuals;
   private readonly sigils: NythraxisBindingSigilVisuals;
   private readonly cages: NythraxisBoundCageVisuals;
-  private readonly soulRendMarkers: NythraxisSoulRendMarkers;
+  private soulRendMarkers: NythraxisSoulRendMarkers;
   private readonly painterRoster = { entities: EMPTY_ROSTER };
+  private readonly cueY: (x: number, z: number) => number;
 
-  constructor(scene: THREE.Scene, groundY: (x: number, z: number) => number) {
+  constructor(
+    private readonly scene: THREE.Scene,
+    private readonly groundY: (x: number, z: number) => number,
+    /** The player's hazard palette (Options > Interface > Colorblind Mode);
+     *  materials are tinted once per row, so a flip rebuilds the hazard painters. */
+    private paletteMode: HazardPaletteMode = 'classic',
+  ) {
     // Flat one-sample decals (the flame patch, the sigil, the cage) read the
     // tallest plateau under their footprint so a flanking-platform rim
     // (v0.42.2) never hides part of them; the per-vertex visuals (the
     // gravefire strips, the Soul Rend markers) drape themselves.
-    const cueY = (x: number, z: number) => groundCueY(groundY, x, z, NYTHRAXIS_GROUND_CUE_RADIUS);
-    this.flames = new NythraxisGraveFlameVisuals(scene, cueY);
-    this.gravefires = new NythraxisGravefireVisuals(scene, groundY);
-    this.sigils = new NythraxisBindingSigilVisuals(scene, cueY);
-    this.cages = new NythraxisBoundCageVisuals(scene, cueY);
-    this.soulRendMarkers = new NythraxisSoulRendMarkers(scene, groundY);
+    this.cueY = (x, z) => groundCueY(groundY, x, z, NYTHRAXIS_GROUND_CUE_RADIUS);
+    this.flames = new NythraxisGraveFlameVisuals(scene, this.cueY, paletteMode);
+    this.gravefires = new NythraxisGravefireVisuals(scene, groundY, paletteMode);
+    this.sigils = new NythraxisBindingSigilVisuals(scene, this.cueY);
+    this.cages = new NythraxisBoundCageVisuals(scene, this.cueY);
+    this.soulRendMarkers = new NythraxisSoulRendMarkers(scene, groundY, paletteMode);
+  }
+
+  /** The palette family in force (Colorblind Mode on or off). */
+  get hazardPaletteMode(): HazardPaletteMode {
+    return this.paletteMode;
+  }
+
+  /** Colorblind Mode flip: the three hazard painters tint their materials at
+   *  build, so they are disposed and rebuilt; the next syncWorld repaints every
+   *  live row from its authoritative state (same radius, same countdown) in the
+   *  new family. The friendly sigil and the cage keep their one palette. */
+  setPaletteMode(mode: HazardPaletteMode): void {
+    if (mode === this.paletteMode) return;
+    this.paletteMode = mode;
+    this.flames.dispose();
+    this.gravefires.dispose();
+    this.soulRendMarkers.dispose();
+    this.flames = new NythraxisGraveFlameVisuals(this.scene, this.cueY, mode);
+    this.gravefires = new NythraxisGravefireVisuals(this.scene, this.groundY, mode);
+    this.soulRendMarkers = new NythraxisSoulRendMarkers(this.scene, this.groundY, mode);
   }
 
   syncWorld(world: NythraxisMechanicWorld): void {

@@ -25,11 +25,12 @@ vi.mock('../src/render/render_dev_flags', () => ({
   renderLayerDisabled: (name: string) => disabledLayers.has(name),
 }));
 
-function rendererStub(width = 1280, height = 720): THREE.WebGLRenderer {
+function rendererStub(width = 1280, height = 720, pixelRatio = 1): THREE.WebGLRenderer {
   return {
     capabilities: { isWebGL2: true },
     getDrawingBufferSize: (out: THREE.Vector2) => out.set(width, height),
-    getPixelRatio: () => 1,
+    getPixelRatio: () => pixelRatio,
+    initRenderTarget: vi.fn(),
   } as unknown as THREE.WebGLRenderer;
 }
 
@@ -494,5 +495,87 @@ describe('live post pipeline', () => {
 
     for (const dispose of passDisposals) expect(dispose).toHaveBeenCalledTimes(1);
     expect(composerDispose).toHaveBeenCalledTimes(1);
+  });
+  it('builds the VFX opaque capture only on a scene pass that owns sampled depth', async () => {
+    const { buildComposer } = await import('../src/render/post');
+    const renderer = rendererStub();
+    const gradeScene = new THREE.Scene();
+    const gradeOnlyPost = buildComposer(
+      renderer,
+      gradeScene,
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+      { gradeOnly: true },
+    );
+
+    // Medium (the mobile target): no capture sentinel in the scene, no second
+    // full-resolution target initialized, and the composer target keeps the
+    // plain depth renderbuffer it has always had.
+    expect(gradeScene.getObjectByName('opaqueVfxCapture')).toBeUndefined();
+    expect(renderer.initRenderTarget).not.toHaveBeenCalled();
+    expect(gradeOnlyPost.composer.renderTarget1.depthTexture).toBeNull();
+    gradeOnlyPost.dispose();
+
+    // The SMAA tail is irrelevant here and needs a DOM Image to construct.
+    disabledLayers.add('smaa');
+    const aoScene = new THREE.Scene();
+    const aoPost = buildComposer(renderer, aoScene, new THREE.PerspectiveCamera(), 1280, 720);
+    expect(aoPost.composer.passes[0].constructor.name).toBe('StaticOpaqueN8AOPass');
+
+    // High and above: the capture exists, and its attachments are allocated
+    // here at build time rather than inside the first eligible draw.
+    const sentinel = aoScene.getObjectByName('opaqueVfxCapture');
+    expect(sentinel).toBeDefined();
+    expect(renderer.initRenderTarget).toHaveBeenCalledTimes(1);
+    const captureTarget = vi.mocked(renderer.initRenderTarget).mock
+      .calls[0][0] as THREE.WebGLRenderTarget;
+    expect([captureTarget.width, captureTarget.height]).toEqual([1280, 720]);
+    expect(captureTarget.depthTexture).not.toBeNull();
+
+    // A resize reallocates from post's own sizing path, still outside a draw.
+    aoPost.setSize(640, 360, 1);
+    expect(renderer.initRenderTarget).toHaveBeenCalledTimes(2);
+    expect([captureTarget.width, captureTarget.height]).toEqual([640, 360]);
+
+    aoPost.dispose();
+    aoPost.dispose();
+    expect(aoScene.getObjectByName('opaqueVfxCapture')).toBeUndefined();
+  });
+
+  it('sizes the VFX opaque copy from the target the scene is drawn into', async () => {
+    disabledLayers.add('smaa');
+    const { buildComposer } = await import('../src/render/post');
+    // A capped DPR over an odd CSS width: the product is not a whole number.
+    const cssWidth = 1439;
+    const pixelRatio = 1.75;
+    expect(Number.isInteger(cssWidth * pixelRatio)).toBe(false);
+    const renderer = rendererStub(
+      Math.floor(cssWidth * pixelRatio),
+      Math.floor(809 * pixelRatio),
+      pixelRatio,
+    );
+    const post = buildComposer(
+      renderer,
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      cssWidth,
+      809,
+    );
+    const beauty = (post.ao as unknown as N8AOInternals).beautyRenderTarget;
+    const captureTarget = vi.mocked(renderer.initRenderTarget).mock
+      .calls[0][0] as THREE.WebGLRenderTarget;
+
+    // three's EffectComposer.addPass sizes a pass from an UNFLOORED
+    // width*pixelRatio while the composer floors its own buffers, so those two
+    // extents genuinely disagree here. The copy follows the scene target it
+    // reads, never the composer buffer, or the extent guard in
+    // scene_sampling.ts would silence it for the whole session.
+    expect(beauty.width).not.toBe(post.composer.renderTarget1.width);
+    expect([captureTarget.width, captureTarget.height]).toEqual([beauty.width, beauty.height]);
+
+    post.setSize(cssWidth, 809, pixelRatio);
+    expect([captureTarget.width, captureTarget.height]).toEqual([beauty.width, beauty.height]);
+    post.dispose();
   });
 });

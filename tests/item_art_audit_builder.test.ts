@@ -846,36 +846,50 @@ describe('item-art audit builder', () => {
     // from `node scripts/item_art_audit.mjs --verify-only` run on the merged
     // tree, not invented or derived from either parent.
     // PR3941: measured again after retiring the five premium reins.
-    // release/v0.44.0 merge of feature/buddy-companions-v43: the 34 buddy
-    // whistles and two charm looks over the release's 1283 / 1301, minus the
-    // two enumerated as art debt (whistle_emberfall_phoenix, whistle_horse):
-    // 1317 / 1335, two more sheet pages and groups. Measured directly from
-    // `node scripts/item_art_audit.mjs --verify-only` on the merged tree.
+    // Clue Scrolls (2026-09-17): measured again on the tree carrying the 15
+    // faction quartermaster items (which landed without moving this block)
+    // plus the two clue items (clue_scroll, treasure_casket): 1304 / 1322,
+    // the sha/bytes straight from `--verify-only` on this tree.
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1306 / 1324, re-minted on the merged tree.
+    // Warfare Season 2: measured again with its four painted weapons, 1288 / 1306 on the release.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: 'b80ea9e85bb5307d2ea6b0debeb49ed8dcab9887971785aa5860f20ef170c3cd',
-      catalogBytes: 718162,
+      // Re-minted on the quests integration branch: the catalog carries the 15
+      // faction quartermaster owners, the Emissary's Cache chest and the two
+      // Clue Scroll items (1305 / 1323). Re-minted again with the faction
+      // ladder rework's 17 rows (faction-ladder-icons-2026-09-23): 1322 /
+      // 1340, sha and bytes straight from `--verify-only` on this tree; 1323 / 1341
+      // with the Viridian Valestrider's reins (release/v0.44.0 base merge), re-measured the same way. 1341 / 1359 with the trinket slot's 18 trinkets (PR 4173) landed on the integration branch (a 26th group and a 32nd sheet page), sha and bytes re-measured with `--verify-only` on the merged tree.
+      // 1345 / 1498 with Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four
+      // painted weapons, re-measured with `--verify-only` on the merged tree.
+      // 1464 / 1482 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+      // (the hoard boss loot and map paintings on 36 sheet pages), re-measured the same way.
+      // 1498 / 1516 at the release/v0.45.0 merge into the buddy companions branch
+      // (34 rendered whistle and charm icons, two more groups and sheet pages),
+      // re-measured with `--verify-only` on the merged tree.
+      catalogSha256: 'f3915782c2d91d865bb2d239e53595911e904e3580f1d125985a7b8523658c37',
+      catalogBytes: 820319,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1317,
-      liveItemCount: 1335,
+      catalogCount: 1498,
+      liveItemCount: 1516,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
-      groupCount: 27,
-      sheetPageCount: 33,
-      sheetCount: 264,
+      groupCount: 28,
+      sheetPageCount: 38,
+      sheetCount: 304,
       sheetModeCounts: {
-        '128-color': 33,
-        '40-color': 33,
-        '28-color': 33,
-        '22-color': 33,
-        '28-grayscale': 33,
-        '64-circle': 33,
-        'small-multiview': 33,
-        identity: 33,
+        '128-color': 38,
+        '40-color': 38,
+        '28-color': 38,
+        '22-color': 38,
+        '28-grayscale': 38,
+        '64-circle': 38,
+        'small-multiview': 38,
+        identity: 38,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '3e7242236f9107df1d4ddd2232435a16c8a1d1c3b7eddfda7c8f7fda17e83a0f',
+      shippingCatalogSha256: 'cc00bb5b5dec45312c1f71f0f353e423ade2ba2d1304ecb1d6f75fe21d22a5ed',
       machineChecksPassed: true,
       verdict: null,
     });

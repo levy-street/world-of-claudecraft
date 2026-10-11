@@ -18,7 +18,7 @@ standard at `DESIGN.md`.
 | Shelf | Top-level category: Conquerors, Professions, Horizons (and Overview). |
 | Page | One boss, dungeon, delve, raid wing, profession gallery, or horizon group. |
 | Relic | One unique slot on a page (item id, profession mark, mount, skin, title). |
-| Clear count | Lifetime clears / kills credited for that page's source. |
+| Clear count | Lifetime clears / kills credited for that page's source. A dungeon page's meter counts every difficulty that pays the page: the five-man base pages and the Nythraxis base page read Normal plus Heroic (`difficulty: 'any'`), because their Heroic claim drops every relic on them; a heroic-only epic page reads Heroic alone, and a base page whose Normal table holds relics Heroic never pays (the Crucible raid pages) reads Normal alone. Derived from the live loot tables and pinned by `tests/reliquary_content.test.ts` ("count every difficulty that pays the page"). |
 | Illumination | Completing every relic on a page (first-time celebration). |
 | Curator rank | Cosmetic completion tiers over catalogued fills (items, marks, mounts, titles). Account weapon skins never score rank. Five ranks at 1 / 10 / 25 / 50 / 100 owned (`apprentice`, `keeper`, `master`, `grand`, `eternal`, in `src/sim/reliquary.ts`). The thresholds are deliberately NOT rescaled as the catalog grows: rank 5 stays at 100 owned. Both DISPLAY and the rank-bridge GRANTS read the account-wide union with the account ledger (below): every character on the account earns a bridge the account qualifies for, and each is recorded as an earner. |
 | Account ledger | The account-wide record behind both books (`src/sim/account_ledger.ts`): which characters on the account found each relic (`IWorldReliquary.reliquaryAccountFinds`, keys `item:<id>` / `mark:<id>` / `mount:<key>`) and earned each deed. Every ownership read the window, tracker, character sheet, and inspect card make is the union of the character's own surfaces and the ledger, and so is the grant read behind the rank bridges and the completion ladder (every character on the account earns them, each recorded); an owned cell names its finders (`hudChrome.reliquary.foundBy`). Persisted in `account_relic_finds` (the `character_deeds` sibling, minus the character FK plus a name snapshot, so a find outlives its character), loaded per join, fanned out live to the account's other sessions, written and decoded catalog-bounded, and read by the public character sheet through an ids-only TTL cache (`server/account_ledger_keys_cache.ts`). The deletion survival, catalog bounding, public-sheet read, scope tooltip, and the reworded guide sentence follow jgyy's PR #3933. Full model: `docs/design/deeds.md`, "The account ledger". |
@@ -108,7 +108,7 @@ sparse Reliquary fields; no per-relic SQL table and no per-drop save storm.
 | Wire thrift | Presentation: id-only `reliquaryUnlock` (or reuse a narrow discovery signal). Do not re-send full inventory on every loot when the id was already known. Heavy self may carry a **small** sparse Reliquary blob that changes only when membership grows. Prefer digests / counts for overview while the window is closed. The blob is **memoized** (`reliquaryWireJson`): built once per state CHANGE, not once per heavy tick, so a staggered refresh with nothing moved re-serializes nothing. Delta semantics are unchanged by that: an absent key still means "unchanged, keep the mirror". |
 | Obtain counts cost | Read this production-absolute, not against the branch: the Reliquary has never shipped, so **no production row carries the key at all today** and every byte below is new. Measured worst case, a veteran with the whole catalog as of v0.36.0 (135 item relics then, 10 marks, a full recent ring; the byte figures date the same way and re-measure at catalog growth): the character row grows about **+1,772 stored bytes** under pglz, and character autosave rewrites the full JSONB, so that is paid every `AUTOSAVE_SECONDS` (30) per online session rather than once. The percentage figure this row once carried is retired: the v0.36.0 gear-set loadouts (`SavedLoadout.gear`, bounded by `MAX_LOADOUTS` x the equip slots x a full-JSON `itemCopyPin`) added a second variable-size surface to the same JSONB, so the row-share denominator is no longer stable; size the Reliquary against its own absolute bound. The headline is distribution-sensitive: it assumes the measured mix of stamped and unstamped entries, and an independent second model (Phase 17 QA migration review) with every entry carrying a clears stamp and multi-digit tallies lands nearer +2,460 stored. **Re-measured at the Phase 21 catalog** (237 catalogued item ids, 29 marks, 35 pages), by taking worst-case `SavedReliquaryState` raw JSON on both trees and scaling the Phase 17 stored figures by the raw ratio: raw goes 6,121 to 10,191 bytes (mid model) and 7,731 to 13,025 (all-stamped), a 1.67x ratio on both, which puts the scaled stored estimates near **+2,950 (mid)** and **+4,150 (all-stamped)**. So size the autosave write amplification against a **4.2 KB bound** (was 2.5 KB) rather than against the mid case. The bound stays catalog-MEMBERSHIP by design even though the realistic ceiling is lower: a character holds at most one of the three Riftbound bands, so two of those ids are unreachable for everyone, and the four Vault of Ages ids are reachable only for pre-v0.25.0 veterans. The component deltas reproduce exactly across both models (dropping pageId and zero-clears gives back 881 stored bytes to the byte). Raw size lands about 15 percent below the pre-fix branch shape, which is the half that helps: cheaper detoast for the seq-scan readers. Carrier vector to watch: for a character whose relics were discovered before the Reliquary ships, the re-obtain carrier entry is the ONLY way `firstFind` entries ever accrue, bounded by the catalog size (v0.36.0: about 2.2 KB stored when full). Intra-branch, kept for the design record: counts cost 371 bytes where dropping the dead `pageId` stamp and the zero-clears entries gave back 881, which is why the tally folds onto the first-find entry instead of shipping as a sibling map. |
 | Cold UI | Window is cold: signature-gated rebuild when open (Book of Deeds pattern). No per-frame full grid rebuild. The always-on HUD tracker shipped in Phase 15 and is a separate pure core (`src/ui/reliquary_tracker_view.ts`) plus a write-elided painter (`src/ui/reliquary_tracker_painter.ts`), holding pins under `woc_reliquary_pins_<class>_<name>` with a cap equal to `DEED_WATCH_CAP`. |
-| Catalog growth is the bound | Every new relic id is a permanent potential blob key for veterans who obtain it. Author pages deliberately; do not auto-include every loot table row without review. |
+| Catalog growth is the bound | Every new relic id is a permanent potential blob key for veterans who obtain it. Author pages deliberately; do not auto-include every loot table row without review. The Buried Hoards page (`conquerors_buried_hoards`) was authored on that rule: it catalogues the 32 PIECES and never their three tiers (a Tarnished or Sovereign copy discovers its piece through `ItemDef.relicOf`), so it adds 32 potential blob keys rather than 96. The byte figures in the obtain-counts row predate it and re-measure at the next catalog pass. |
 
 Character autosave today rewrites full JSONB for every online session every
 `AUTOSAVE_SECONDS` (30). Reliquary must not make that worse: keep added
@@ -140,8 +140,9 @@ repo's anchor rule):
   its primary, so The Rift shows lifetime clears and S-rank clears together.
 - **Kill-proof mark pages.** The realm-rares page fills from `slain:*` marks
   rather than item ids, one mark per authored rare.
-- **Honor-stock pages.** The warfare pages list purchasable honor gear, which
-  has no class gate and no drop roll.
+- **Honor-stock pages.** The warfare pages list purchasable honor gear with no
+  drop roll. The entry-tier Warfare stock has no class gate; the Warfare Season 2
+  Vanguard Gallery is class-locked, so it sits outside completion ('personal').
 - **Outside-completion pages.** Rule 7's `excludeFromCompletion` pages
   (retired and personal) render their own local pair and drop out of both
   sides of every completion pair.
@@ -151,6 +152,14 @@ lowers the live read for players who had finished it, so a completed page
 shows as incomplete again until they find the new relic. This is inherent to
 a growing catalog (earned deeds stay sticky, live page reads do not) and will
 repeat at every growth. It owes a release-note line whenever a growth ships.
+The trinket wave (`src/sim/content/trinkets.ts`) is one such growth: every
+dropped or honor-sold trinket is catalogued on the page of the place it comes
+from (its five-man heroic boss page, the Heroic Nythraxis page, The Rift, the
+Warfare Armory, or for the raid trinkets both the Normal and the Heroic page
+of their Crucible boss, since they drop on both difficulties and rule 5 fills
+every page that lists an id), pinned in `tests/reliquary_content.test.ts`. The
+one marks-priced trinket (the Heroic Quartermaster's Wayfarer's Lodestone) has
+no page, like the rest of that vendor's stock.
 
 ## Adding a page (the recipe)
 
@@ -654,8 +663,9 @@ None of these is a defect. Each is a product decision with no ruling yet.
 - **The Conquerors capstone grew a long tail**, and the Book completion feat
   behind it with it: the honor stock, the realm-rare drops, and the two
   S-rank-only Rift legendaries at a very low roll per clear. Everything is
-  verified reachable (the heroic pool draws class-agnostically and the honor
-  stock has no class gate), so this is a difficulty escalation to accept or
+  verified reachable (the heroic pool draws class-agnostically and the
+  entry-tier honor stock has no class gate; the class-locked Season 2 Vanguard
+  Gallery sits outside completion), so this is a difficulty escalation to accept or
   soften deliberately, not a defect.
 - **The unfillable-slot nudge.** Because the two pages holding the three
   unfillable slots are not `excludeFromCompletion`, they permanently satisfy the

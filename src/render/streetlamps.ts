@@ -48,6 +48,7 @@ import { lampFixtureYaw, type PlacedStreetlamp } from '../sim/streetlamp_layout'
 import type { StreetlampStyleId } from '../sim/streetlamp_style';
 import { terrainHeight } from '../sim/world';
 import { attachBiomeHaze } from './biome_haze_field';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { GFX } from './gfx';
 import { buildDrapedGlowGeometry, type GlowPatchSite } from './ground_glow_patch';
 import { hasNightLightField, registerStaticNightLights } from './night_light_field';
@@ -366,7 +367,7 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
           poolMat,
         );
         pools.geometry.computeBoundingSphere();
-        pools.renderOrder = 1;
+        pools.renderOrder = floorVfxRenderOrder('ground', 0);
         pools.visible = false;
         poolMeshes.push(pools);
         styleGroup.add(pools);

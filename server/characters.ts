@@ -44,6 +44,7 @@
 import type * as http from 'node:http';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
+import { activeRaidLockouts } from '../src/sim/raid_lockout_state';
 import { savedZoneId } from '../src/sim/saved_pos_exit';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
@@ -367,11 +368,15 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
  * both stay byte-identical. `isOnline` comes from the injected runtime (a live-session
  * scan). The retained legacy arm (main.ts characterListPayload) DELEGATES here, so the
  * two dispatch modes share one implementation and cannot diverge in payload shape.
+ * `nowMs` is the wall clock the raid lockouts are filtered against (the live
+ * Sim's lockoutNowMs in server/sim_boot_config.ts is Date.now() too); injectable
+ * for tests.
  */
 export function buildCharacterList(
   chars: CharacterRow[],
   isOnline: (characterId: number) => boolean,
   weaponSkinLoadout: Record<string, string>,
+  nowMs: number = Date.now(),
 ): unknown {
   return {
     realm: REALM,
@@ -422,6 +427,10 @@ export function buildCharacterList(
       // for a mid-match battleground save that resumes at the world start).
       // Character select labels the roster row with it.
       zoneId: savedZoneId(c.state?.pos),
+      // The raid lockouts this character still carries (lockout id -> unlock
+      // epoch ms), filtered against the host clock the same way addPlayer
+      // loads them, so character select can list them without a login.
+      raidLockouts: activeRaidLockouts(c.state?.raidLockouts, nowMs),
     })),
   };
 }

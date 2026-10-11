@@ -62,6 +62,7 @@ export const economy: GuidePage = {
 
         ${related([
           { href: hrefFor('gear'), key: 'guide.nav.gear' },
+          { href: hrefFor('factions'), key: 'guide.nav.factions' },
           { href: hrefFor('delves'), key: 'guide.nav.delves' },
           { href: hrefFor('arena'), key: 'guide.nav.arena' },
           { href: hrefFor('social'), key: 'guide.nav.social' },

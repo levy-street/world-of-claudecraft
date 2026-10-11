@@ -22,8 +22,11 @@ describe('material_profession_affinity as the first-evaluated sim module', () =>
       'weaponcrafting',
       'armorcrafting',
     ]);
+    // leatherworking joined at the 2026-09-28 release/v0.44.0 merge into
+    // feature/buried-hoards (the iron_ore bill of pattern_reinforced_armor_kit).
     expect(craftIdsForMaterialItem('fine_iron_ore')).toEqual([
       'engineering',
+      'leatherworking',
       'jewelcrafting',
       'weaponcrafting',
       'armorcrafting',

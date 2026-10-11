@@ -10,6 +10,10 @@
     "other": 0
   },
   "keyTrimDb": {
+    "melee_warrior_red_harvest_release": -1.2,
+    "impact_warrior_red_harvest_first": 0.4,
+    "impact_warrior_red_harvest_second": 0.9,
+    "impact_warrior_red_harvest_finish": 1.8,
     "amb_forge": 5,
     "ambush": 5.1,
     "arcane_blast": 6,
@@ -164,6 +168,7 @@
     "mount_run_terrorspark_groundshaker": 6.2,
     "mount_run_terrorspark_groundshaker_start": 5.3,
     "mount_run_terrorspark_groundshaker_stop": 5.3,
+    "mount_summon_avian_strider": 7,
     "mount_summon_rallycart_rxt": 7.5,
     "mount_summon_rickshaw_mount": 6.3,
     "move_jump": 4.6,
@@ -211,6 +216,8 @@
     "mount_run_mech_bird": 1.6,
     "mount_idle_mech_bird": 1.6,
     "mount_jump_mech_bird": 1.6,
-    "mount_land_mech_bird": 1.6
+    "mount_land_mech_bird": 1.6,
+    "mount_squawk_avian_strider": 4.5,
+    "mount_flap_avian_strider": 4.5
   }
 }

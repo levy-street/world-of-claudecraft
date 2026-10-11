@@ -37,6 +37,7 @@ import type { TranslationKey } from './i18n';
 import { formatDateTime, formatDuration, formatNumber, t, tPlural } from './i18n';
 import { iconDataUrl } from './icons';
 import { itemNameColor } from './item_name_color';
+import { lootQualityAriaName } from './loot_quality_view';
 import { createNativeSelectHold, type NativeSelectHold } from './native_select_hold';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
@@ -57,6 +58,7 @@ import {
   wocBuyNowHtml,
   wocEndsAtText,
   wocErrorStatusHtml,
+  wocItemCellHtml,
   wocLoadingStatusHtml,
   wocMarketBannersHtml,
   wocMarketFootHtml,
@@ -779,20 +781,13 @@ export class WocMarketWindow {
     key: string,
     instance?: ItemInstancePayload,
   ): string {
-    const icon = iconDataUrl('item', itemId);
-    // itemNameColor family (vendor/bags): hasOwn parks prototype-key qualities on the fallback.
-    const color = itemNameColor({ quality });
-    // The .q-<rung> frame class: the same charset guard the shared icon helper
-    // applies (the quality is server-sent on the wire; an unknown rung takes
-    // the neutral frame).
-    const rung = /^[a-z]+$/.test(quality) ? quality : 'common';
     this.tooltipTargets.set(key, { itemId, instance });
-    const tag = ` data-tt-key="${esc(key)}"`;
-    return (
-      `<span class="wm-item">` +
-      `<img class="wm-icon item-icon q-${rung}"${tag} src="${icon}" alt="" draggable="false" />` +
-      `<span class="wm-name"${tag} style="color: ${color}">${esc(this.itemName(itemId))}</span>` +
-      `</span>`
+    return wocItemCellHtml(
+      this.itemName(itemId),
+      iconDataUrl('item', itemId),
+      quality,
+      key,
+      instance,
     );
   }
 
@@ -1001,7 +996,7 @@ export class WocMarketWindow {
           // what it does (opens the listing), never 'place a bid' on a listing
           // that takes none.
           `<td><button type="button" class="wm-row-open" data-listing="${r.id}" ` +
-          `data-focus-key="wm-row-${r.id}" aria-label="${esc(t('hudChrome.wocMarket.rowOpenAria', { item: this.itemName(r.itemId) }))}">` +
+          `data-focus-key="wm-row-${r.id}" aria-label="${esc(t('hudChrome.wocMarket.rowOpenAria', { item: lootQualityAriaName(this.itemName(r.itemId), r.instance) }))}">` +
           `${this.itemCellHtml(r.itemId, r.quality, `browse:${r.id}`, r.instance)}</button>${mine}${locked}</td>` +
           // The seller cell is the click-through into their recent trades
           // (its own data-action, so closest() takes it before the row).
@@ -1143,7 +1138,7 @@ export class WocMarketWindow {
                 `data-sell-index="${r.index}" data-opt="${i}">` +
                 `<img class="wm-combo-icon item-icon q-${rung}" data-tt-key="opt:${r.index}" src="${iconDataUrl('item', r.itemId)}" alt="" draggable="false" />` +
                 `<span class="wm-combo-name" style="color: ${clr}">` +
-                `${esc(this.itemName(r.itemId))}</span></div>`
+                `${esc(lootQualityAriaName(this.itemName(r.itemId), r.instance))}</span></div>`
               );
             })
             .join('');

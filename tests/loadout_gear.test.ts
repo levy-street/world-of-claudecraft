@@ -10,7 +10,7 @@
 // Pure leaf, so this drives the whole decision with plain arrays: no Sim, no
 // SimContext, no equip command.
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { slotAcceptsItem } from '../src/sim/equipment_rules';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
@@ -309,6 +309,22 @@ describe('the worn-slot limitation is real and pinned', () => {
 });
 
 describe('every equip slot survives save, serialize, repair and apply', () => {
+  // The additive trinket slot has no authored drops yet. Supply a real runtime
+  // definition only inside this sweep, so it still exercises every live slot.
+  const trinketId = 'test_loadout_trinket';
+  beforeEach(() => {
+    ITEMS[trinketId] = {
+      ...ITEMS.seal_of_the_nine_oaths,
+      id: trinketId,
+      kind: 'armor',
+      slot: 'trinket',
+      armorType: undefined,
+      weapon: undefined,
+    };
+  });
+  afterEach(() => {
+    delete ITEMS[trinketId];
+  });
   // The reviewer's closing point, as a test. Both rounds of blockers lived in a
   // slot family the fixtures never reached: multi-piece first, then rings and
   // offhand weapons, which the earlier `realFor` helper could not produce because

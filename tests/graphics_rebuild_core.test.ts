@@ -59,6 +59,7 @@ describe('graphics rebuild settings snapshot', () => {
       'characterDetail',
       'dynamicLights',
       'particleEffects',
+      'ghostFade',
     ]);
     expect(Object.isFrozen(GRAPHICS_REBUILD_KEYS)).toBe(true);
   });
@@ -86,6 +87,7 @@ describe('graphics rebuild settings snapshot', () => {
       characterDetail: SETTING_RANGES.characterDetail.def,
       dynamicLights: SETTING_RANGES.dynamicLights.def,
       particleEffects: SETTING_RANGES.particleEffects.def,
+      ghostFade: SETTING_RANGES.ghostFade.def,
     });
     expect(Object.isFrozen(snapshot)).toBe(true);
   });
@@ -140,6 +142,7 @@ describe('per-system dial staging (round 12)', () => {
       characterDetail: 0,
       dynamicLights: 1,
       particleEffects: 1,
+      ghostFade: 0,
     });
     expect(advancedDialSeed(2)).toEqual({
       terrainDetail: 0.5,
@@ -155,6 +158,7 @@ describe('per-system dial staging (round 12)', () => {
       characterDetail: 1,
       dynamicLights: 1,
       particleEffects: 1,
+      ghostFade: 0,
     });
     expect(advancedDialSeed(3)).toEqual({
       terrainDetail: 0.5,
@@ -170,6 +174,7 @@ describe('per-system dial staging (round 12)', () => {
       characterDetail: 1,
       dynamicLights: 1,
       particleEffects: 1,
+      ghostFade: 1,
     });
     expect(advancedDialSeed(4)).toEqual({
       terrainDetail: 2,
@@ -185,6 +190,7 @@ describe('per-system dial staging (round 12)', () => {
       characterDetail: 1,
       dynamicLights: 1,
       particleEffects: 1,
+      ghostFade: 1,
     });
     expect(advancedDialSeed(6)).toEqual({
       terrainDetail: 2,
@@ -200,6 +206,7 @@ describe('per-system dial staging (round 12)', () => {
       characterDetail: 1,
       dynamicLights: 1,
       particleEffects: 1,
+      ghostFade: 1,
     });
     // Advanced itself (and anything unknown) seeds the stored defaults.
     const defaults = Object.fromEntries(
@@ -504,5 +511,38 @@ describe('dial seeds versus the real gfx.ts tier ladder', () => {
     expect(lowVfx.bucketBaselines.vfx).toBe(base.bucketBands.vfx.min);
     // Non-vfx buckets are untouched by the dial.
     expect(lowVfx.bucketBands.grass).toEqual(base.bucketBands.grass);
+  });
+});
+
+describe('camera ghost style', () => {
+  const { settingsFor } = gfxInternalsForTest;
+  const desktop = {
+    search: '',
+    maxTouchPoints: 0,
+    coarsePointer: false,
+    narrowViewport: false,
+    platform: 'other' as const,
+  };
+
+  it('dithers on the low and medium tiers and blends above them', () => {
+    expect(settingsFor('low', desktop).ditheredGhostFade).toBe(true);
+    expect(settingsFor('medium', desktop).ditheredGhostFade).toBe(true);
+    expect(settingsFor('high', desktop).ditheredGhostFade).toBe(false);
+    expect(settingsFor('ultra', desktop).ditheredGhostFade).toBe(false);
+    expect(settingsFor('insane', desktop).ditheredGhostFade).toBe(false);
+  });
+
+  it('lets the Advanced dial pick either style on any base tier', () => {
+    const advanced = (tier: 'low' | 'ultra', ghostFade: number) =>
+      settingsFor(tier, { ...desktop, graphicsPreset: 5, ...advancedDialSeed(4), ghostFade });
+    expect(advanced('ultra', 0).ditheredGhostFade).toBe(true);
+    expect(advanced('low', 1).ditheredGhostFade).toBe(false);
+  });
+
+  it('seeds the dial from the preset the player leaves, so switching to Advanced changes nothing', () => {
+    expect(advancedDialSeed(1).ghostFade).toBe(0);
+    expect(advancedDialSeed(2).ghostFade).toBe(0);
+    expect(advancedDialSeed(3).ghostFade).toBe(1);
+    expect(advancedDialSeed(4).ghostFade).toBe(1);
   });
 });

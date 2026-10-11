@@ -131,10 +131,23 @@ export function hasDevotion(e: Entity, amount: number): boolean {
   return !!devotion && devotion.value >= Math.max(0, Math.floor(amount));
 }
 
-export function paladinExecuteWindowActive(e: Entity, abilityId: string): boolean {
+/** The fields the execute-window bypass reads: a structural subset of Entity that the
+ *  action bar's player input also satisfies (combat/execute_threshold.ts). Devotion only
+ *  exists on paladins, so the class guard in isDivineAscensionActive is implied. */
+export interface PaladinExecuteWindowOwner {
+  auras: readonly { id?: string }[];
+  paladinDevotion?: { ascensionCharges: number; ascensionRemaining: number } | null;
+}
+
+export function paladinExecuteWindowActive(
+  e: PaladinExecuteWindowOwner,
+  abilityId: string,
+): boolean {
+  const devotion = e.paladinDevotion;
   return (
     abilityId === 'hammer_of_wrath' &&
-    (isDivineAscensionActive(e) || e.auras.some((aura) => aura.id === 'avenging_wrath'))
+    ((!!devotion && devotion.ascensionCharges > 0 && devotion.ascensionRemaining > 0) ||
+      e.auras.some((aura) => aura.id === 'avenging_wrath'))
   );
 }
 

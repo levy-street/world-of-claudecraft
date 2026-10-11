@@ -317,7 +317,12 @@ describe('banker chest renderer integration', () => {
       "import { attachBankerChestToNpcView } from './banker_chest';",
     );
     const attachAt = rendererSource.indexOf('const bankerChest = attachBankerChestToNpcView(');
-    const clickTargetAt = rendererSource.indexOf('let clickTarget: THREE.Object3D;', attachAt);
+    // Click-target selection moved into attachEntityViewBody with the world-quest
+    // caravan bodies (src/render/quest_entity_presentation.ts); its call is the anchor.
+    const clickTargetAt = rendererSource.indexOf(
+      'const clickTarget = attachEntityViewBody(',
+      attachAt,
+    );
     expect(attachAt).toBeGreaterThan(
       rendererSource.indexOf('private createView(e: Entity, opts?: AssembleOptions): void'),
     );

@@ -1,6 +1,7 @@
 import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { HarvestAdmissionReason } from '../sim/professions/harvest_admission';
 import type { HarvestPreference } from '../sim/professions/harvest_preference';
+import type { TownFocusPendingView } from '../sim/professions/town_focus_pending';
 
 export type WorldInteractionOutcome = boolean | Promise<boolean>;
 
@@ -52,6 +53,12 @@ export interface IWorldInteraction {
   // #1143: the caller's persistent town focus allocation (component type ->
   // points spent). Empty when unset.
   townFocus: Record<string, number>;
+  // #1144: the caller's QUEUED re-spec ('time'/'timeAndPartial' tiers), or
+  // null while nothing is waiting: the allocation Save took plus whole
+  // seconds until it commits onto `townFocus`. Persisted with the character
+  // (professions/town_focus_pending.ts); the panel shows it in place of the
+  // committed allocation so a saved re-spec never reads as "did nothing".
+  townFocusPending: TownFocusPendingView | null;
   // Sets the persistent town focus allocation, charged at the #1144 re-spec
   // cost model's chosen payment tier (professions/focus.ts computeRespecCost).
   // Rejected (out of town, malformed, over the point budget, or the tier's

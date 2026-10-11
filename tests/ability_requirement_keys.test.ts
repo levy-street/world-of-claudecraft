@@ -128,7 +128,13 @@ describe('abilityRequirementKeys: the moved truth table holds', () => {
 
   it('resolves form, swing, and percent params as before', () => {
     const maul = abilityRequirementKeys(ABILITIES.maul, 'feral');
-    expect(maul.find((r) => r.key === 'requiresForm')?.form).toBe('bear');
+    expect(maul.find((r) => r.key === 'requiresForm')?.forms).toEqual(['bear']);
     expect(maul.some((r) => r.key === 'onNextSwing')).toBe(true);
+  });
+
+  it('lists every form of an ability several forms share', () => {
+    // Savage Mending is the Wildfang heal both Bruin and Cat press (v0.43).
+    const mending = abilityRequirementKeys(ABILITIES.frenzied_regeneration, 'feral');
+    expect(mending.find((r) => r.key === 'requiresForm')?.forms).toEqual(['bear', 'cat']);
   });
 });

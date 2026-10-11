@@ -144,6 +144,10 @@ export const table: ReliquaryLocaleTable = {
     name: '균열',
     desc: '끊임없이 변하는 균열의 상징적인 전리품. 떠도는 공포부터 S등급 사냥의 두 보물까지.',
   },
+  conquerors_buried_hoards: {
+    name: '묻힌 보물',
+    desc: '보물 지도가 이끄는 보물의 전리품. 보물을 지키는 수호자마다 네 점씩.',
+  },
   // Rares of the Realm pages (Phase 21): composed in the chronicle rare
   // deeds' register (chr_marsh_rares ko reads 안개 속의 이름들); no mob names
   // inside page names.
@@ -167,6 +171,10 @@ export const table: ReliquaryLocaleTable = {
     name: '워페어 무기고',
     desc: '힘겹게 모은 명예로 구입하는 전쟁 장신구와 무기.',
   },
+  conquerors_vanguard_gallery: {
+    name: '선봉대 갤러리',
+    desc: '명예로 구입하는 워페어 시즌 2 전문화 세트와 무기.',
+  },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 보물고의 큐레이터).
   horizons_vault_of_ages: {
@@ -186,7 +194,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: '영웅: 마지막 샘의 도가니',
-    desc: '이그니바르, 마지막 불꽃의 전령에게서 영웅 난이도에서만 나오는 무기.',
+    desc: '이그니바르, 마지막 불꽃의 전령에게서 영웅 난이도에서만 나오는 무기와 공격대 장신구.',
   },
   conquerors_varkhul: {
     name: '내부 용광로',
@@ -194,7 +202,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: '영웅: 내부 용광로',
-    desc: '마지막 불꽃의 대장장이 발쿨에게서 영웅 난이도에서만 나오는 방패와 무기.',
+    desc: '마지막 불꽃의 대장장이 발쿨에게서 영웅 난이도에서만 나오는 방패, 보조 장비와 무기.',
   },
   professions_forgebreaker: {
     name: '화로파괴자',

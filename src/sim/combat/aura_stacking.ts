@@ -21,6 +21,7 @@ export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new S
   'aspect_of_the_wild_ap',
   'battle_shout',
   'blessing_of_might',
+  'blessing_of_the_dawn',
   'devotion_aura',
   // The overhauled Paladin aura kit. Every one is a persistent party buff, so a
   // second Paladin running the SAME aura refreshes it instead of granting the

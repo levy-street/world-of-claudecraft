@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
 //
-// The on-bar key-binding banner as a HUD-root element: built by its own module,
-// its buttons wired to the caller, and placed against the LIVE primary bar in
-// HUD author px (the #ui zoom divided out) so a bar moved with Interface Unlock
-// never paints over its own Done / Reset buttons (the stuck-mode bug).
+// The on-bar key-binding banner's DOM: built by its own module, its buttons
+// wired to the caller, and its status line. Placement and drag are pinned in
+// tests/action_bar_bind_banner_placement.test.ts.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   mountActionBarBindBanner,
@@ -75,4 +74,28 @@ describe('mountActionBarBindBanner', () => {
     const banner = mountActionBarBindBanner(null, { onReset: () => {}, onDone: () => {} });
     expect(banner.isConnected).toBe(false);
   });
+});
+
+it('reclamps a manually moved banner when the viewport shrinks', () => {
+  const parent = document.createElement('div');
+  document.body.append(parent);
+  const banner = mountActionBarBindBanner(parent, { onReset: () => {}, onDone: () => {} });
+  Object.defineProperty(banner, 'offsetWidth', { value: 200 });
+  Object.defineProperty(banner, 'offsetHeight', { value: 80 });
+  banner.style.left = '700px';
+  banner.style.top = '500px';
+  banner.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+  const width = window.innerWidth,
+    height = window.innerHeight;
+  try {
+    Object.defineProperty(window, 'innerWidth', { value: 400, configurable: true });
+    Object.defineProperty(window, 'innerHeight', { value: 300, configurable: true });
+    window.dispatchEvent(new Event('resize'));
+    expect(Number.parseFloat(banner.style.left) + 200).toBeLessThanOrEqual(400);
+    expect(Number.parseFloat(banner.style.top) + 80).toBeLessThanOrEqual(300);
+  } finally {
+    Object.defineProperty(window, 'innerWidth', { value: width, configurable: true });
+    Object.defineProperty(window, 'innerHeight', { value: height, configurable: true });
+    parent.remove();
+  }
 });

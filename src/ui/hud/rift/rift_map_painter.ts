@@ -19,6 +19,7 @@ import {
   type RiftMapPoint,
   type RiftMapPolygon,
   type RiftMapPrimitive,
+  type RiftMapValleyGround,
   type RiftObjectMarker,
 } from './rift_map_core';
 
@@ -29,6 +30,8 @@ const MINIMAP_MAX_MARKER_HALF = MAP_MARKER_SIZES.minimapNavigationCompact / 2;
 const MINIMAP_PAD = MINIMAP_CLIP_INSET + Math.ceil(MINIMAP_MAX_MARKER_HALF * Math.SQRT2);
 const WORLD_MAP_PAD_RATIO = 0.06;
 const STATIC_WALL_WIDTH = 2;
+const VALLEY_CLIFF_WIDTH = 6;
+const VALLEY_CLIFF_EDGE_WIDTH = 1.25;
 const STATIC_DASH_LENGTH = 5;
 const STATIC_DASH_GAP = 4;
 const FULL_CIRCLE = Math.PI * 2;
@@ -136,9 +139,30 @@ const RIFT_COLOR_TOKENS = {
   active: '--color-minimap-gather-ready',
   inactive: '--color-minimap-gather-cooldown',
   corpse: '--color-minimap-corpse',
+  valleyAutumn: '--color-map-stall',
+  valleyAsh: '--color-map-mine',
+  valleyCoast: '--color-map-oak',
+  valleyDarkForest: '--color-map-tree',
+  valleyMarsh: '--color-map-mudhut',
+  valleyMoonlitMeadow: '--color-map-ocean',
+  valleySand: '--color-map-tent',
+  valleySnow: '--color-minimap-corpse',
+  valleyCliff: '--color-map-rock',
+  valleyCliffEdge: '--color-map-building-outline',
 } as const;
 
 type RiftColors = Record<keyof typeof RIFT_COLOR_TOKENS, string>;
+
+const VALLEY_GROUND_COLOR = Object.freeze({
+  autumn: 'valleyAutumn',
+  ash: 'valleyAsh',
+  coast: 'valleyCoast',
+  'dark-forest': 'valleyDarkForest',
+  marsh: 'valleyMarsh',
+  'moonlit-meadow': 'valleyMoonlitMeadow',
+  sand: 'valleySand',
+  snow: 'valleySnow',
+} as const satisfies Readonly<Record<RiftMapValleyGround, keyof RiftColors>>);
 
 interface SurfaceCache {
   key: string;
@@ -206,6 +230,19 @@ function drawSemanticFallback(
     return;
   }
   if (semantic.kind === 'rift-return') {
+    if (semantic.route === 'hoard') {
+      for (let pass = 0; pass < 2; pass++) {
+        ctx.strokeStyle = pass === 0 ? colors.outline : colors.reward;
+        ctx.lineWidth = outlineWidth * (pass === 0 ? 4 : 2);
+        ctx.beginPath();
+        ctx.moveTo(marker.cx - radius, marker.cy - radius);
+        ctx.lineTo(marker.cx + radius, marker.cy + radius);
+        ctx.moveTo(marker.cx + radius, marker.cy - radius);
+        ctx.lineTo(marker.cx - radius, marker.cy + radius);
+        ctx.stroke();
+      }
+      return;
+    }
     ctx.beginPath();
     ctx.arc(marker.cx, marker.cy, radius, 0, FULL_CIRCLE);
     ctx.stroke();
@@ -367,7 +404,8 @@ export class RiftMapPainter {
     canvas.height = size;
     const ctx = canvas.getContext('2d');
     if (!ctx) return canvas;
-    ctx.fillStyle = colors.room;
+    const valley = model.terrain.kind === 'valley' ? model.terrain : null;
+    ctx.fillStyle = valley ? colors[VALLEY_GROUND_COLOR[valley.ground]] : colors.room;
     ctx.beginPath();
     for (const outline of model.staticGeometry.walkable) appendPolygonPath(ctx, outline);
     ctx.fill();
@@ -408,7 +446,18 @@ export class RiftMapPainter {
     for (const primitive of model.staticGeometry.structures) {
       ctx.beginPath();
       appendPrimitivePath(ctx, primitive);
-      if (primitive.role === 'wall' || primitive.role === 'illusion-wall') {
+      if (valley && primitive.role === 'wall') {
+        // Wide rock-colored shoulders make the collision edge read as a cliff
+        // rim while the fine dark crest preserves the exact playable outline.
+        ctx.strokeStyle = colors.valleyCliff;
+        ctx.lineWidth = VALLEY_CLIFF_WIDTH;
+        ctx.stroke();
+        ctx.strokeStyle = colors.valleyCliffEdge;
+        ctx.lineWidth = VALLEY_CLIFF_EDGE_WIDTH;
+        ctx.stroke();
+        ctx.strokeStyle = colors.label;
+        ctx.lineWidth = STATIC_WALL_WIDTH;
+      } else if (primitive.role === 'wall' || primitive.role === 'illusion-wall') {
         // An illusion wall looks solid in the world. Cartography must preserve
         // that appearance and never advertise the hidden traversability.
         ctx.stroke();

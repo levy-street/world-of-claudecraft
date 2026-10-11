@@ -295,7 +295,8 @@ describe('material source storage cost: the real caps', () => {
     // by the Crucible integration database review (server/character_blob_size.ts);
     // this is a warning-only threshold, never a save limit. The whole-character
     // suite verifies this warning remains above its combined gear fixture.
-    expect(CHARACTER_BLOB_WARN_BYTES).toBe(229_376);
+    // Re-minted to 262,144 (256 KiB) at the 2026-09-28 Buried Hoards merge.
+    expect(CHARACTER_BLOB_WARN_BYTES).toBe(262_144);
 
     // Per-container unit ceilings, which differ and must not be conflated:
     //   bank slot  -> the item's stack size (20 for every shipped material)

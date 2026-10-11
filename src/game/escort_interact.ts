@@ -22,6 +22,7 @@ import {
   type EscortDef,
   INTERACT_RANGE,
   type QuestProgress,
+  type WorldQuestProgress,
 } from '../sim/types';
 import type { InteractionOutcome } from './interaction_autorun';
 
@@ -52,9 +53,16 @@ export function isEscorteeEntity(e: Entity | undefined): boolean {
   return !!e && e.kind === 'mob' && !e.dead && ESCORT_NPC_TEMPLATE_IDS.has(e.templateId);
 }
 
-function isQuestActive(questLog: ReadonlyMap<string, QuestProgress>, questId: string): boolean {
-  // Mirrors the sim's own gate in tryStartEscort: only an active quest starts a run.
-  return questLog.get(questId)?.state === 'active';
+function isQuestActive(
+  def: EscortDef,
+  questLog: ReadonlyMap<string, QuestProgress>,
+  worldQuestLog: ReadonlyMap<string, WorldQuestProgress>,
+): boolean {
+  // Mirrors the sim's own gate in tryStartEscort: only an active ordinary or
+  // world quest starts a run.
+  return def.worldQuestId !== undefined
+    ? worldQuestLog.get(def.worldQuestId)?.state === 'active'
+    : questLog.get(def.questId)?.state === 'active';
 }
 
 function escorteeFor(def: EscortDef, entities: ReadonlyMap<number, Entity>): Entity | null {
@@ -71,12 +79,13 @@ export function decideEscortPress(
   playerPos: { x: number; y: number; z: number },
   entities: ReadonlyMap<number, Entity>,
   questLog: ReadonlyMap<string, QuestProgress>,
+  worldQuestLog: ReadonlyMap<string, WorldQuestProgress> = new Map(),
 ): EscortPressVerdict {
   let away = false;
   let startId: number | null = null;
   let startDistance = INTERACT_RANGE;
   for (const def of ESCORT_DEFS) {
-    if (!isQuestActive(questLog, def.questId)) continue;
+    if (!isQuestActive(def, questLog, worldQuestLog)) continue;
     const post = { x: def.start.x, y: playerPos.y, z: def.start.z };
     const escortee = escorteeFor(def, entities);
     const atPost = escortee !== null && dist2d(escortee.pos, post) <= ESCORT_POST_RADIUS;

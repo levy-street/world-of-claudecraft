@@ -45,6 +45,12 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
  * per-process memory ceiling) and must stay skipped. An id here is by
  * construction NOT in CONSTRAINED_PREWARM_KEEP.
  *
+ * vfx.cast-first-reads rides the same arm for the same reason: its small
+ * programs (the hard-CC band's overlay cloud, the area ring, the particle
+ * cloud) are the ones a closed cast gate still draws, so on the minimal
+ * manifest they resume as `programs.` debt ahead of the ability primitives'
+ * instead of linking cold on the first stun or area cast.
+ *
  * vfx.mount-programs is deliberately NOT here. Its units force nine skinned
  * GLB rigs resident (roughly 10 MB of VRAM after KTX2 transcode, plus an
  * equal retained CPU copy, since `mounts` is exempt from mip release), and
@@ -54,7 +60,10 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
  * src/render/CLAUDE.md is reason enough to require a real measurement from a
  * constrained device before opting this entry in.
  */
-export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primitives'];
+export const CONSTRAINED_PREWARM_RESUME: readonly string[] = [
+  'vfx.cast-first-reads',
+  'vfx.ability-primitives',
+];
 
 /** Whole-scene GPU submits that can synchronously link every visible program
  * when KHR_parallel_shader_compile is unavailable. They cannot be interrupted

@@ -1,117 +1,126 @@
-// Clique-style mouseover casting (src/ui/mouseover_cast_core.ts): which unit a
-// friendly ability pressed over a party/raid frame lands on.
-//
-// The regression this pins: a raid member who RELEASES waits as a ghost at the
-// graveyard, far outside the online client's ~120 yd interest scope, so
-// ClientWorld holds no entity for them. The old "entity must be in scope" gate
-// dropped the redirect there and the combat resurrection fell through to the
-// current target (the boss). Interest scope is a rendering budget, never a
-// targeting rule: the party roster is what vouches for the hovered member.
-
+// mouseover_cast_core.ts: the Clique-style redirect rule shared by party /
+// raid rows, focus frames and the target-of-target frame. Every gate gets a
+// negative case, because the rule is as much about what it refuses to redirect:
+// an offensive press must never be stolen off the current target by a cursor
+// resting on a friendly frame.
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
-import { mouseoverCastTargetPid } from '../src/ui/mouseover_cast_core';
+import {
+  type MouseoverCastAbility,
+  mouseoverCastTarget,
+  mouseoverCastTargetPid,
+} from '../src/ui/mouseover_cast_core';
 
-const RES = ABILITIES.temporal_reversal;
-const HEAL = ABILITIES.healing_wave;
-const BOLT = ABILITIES.lightning_bolt;
+const HEAL: MouseoverCastAbility = { requiresTarget: true, targetType: 'friendly' };
+const alive = (id: number) => id === 7;
+const simLikeEntities = (ids: readonly number[]) => (pid: number) => ids.includes(pid);
 
-// The two hosts the core has to serve identically: the offline Sim knows every
-// entity in the world, ClientWorld only the ones inside the interest scope.
-const simLikeEntities = (ids: number[]) => (pid: number) => ids.includes(pid);
+describe('mouseoverCastTarget', () => {
+  it('redirects a friendly targeted ability onto the hovered unit', () => {
+    expect(mouseoverCastTarget(7, { enabled: true, ability: HEAL, exists: alive })).toBe(7);
+  });
 
-describe('mouseoverCastTargetPid', () => {
-  it('redirects a friendly cast to the hovered member the client can see', () => {
+  it('does not redirect when nothing is hovered', () => {
+    expect(mouseoverCastTarget(null, { enabled: true, ability: HEAL, exists: alive })).toBeNull();
+  });
+
+  it('does not redirect while the mouseoverCast option is off', () => {
+    expect(mouseoverCastTarget(7, { enabled: false, ability: HEAL, exists: alive })).toBeNull();
+  });
+
+  it('does not redirect an offensive ability, so a hovered frame never steals a nuke', () => {
+    const nuke: MouseoverCastAbility = { requiresTarget: true, targetType: 'enemy' };
+    expect(mouseoverCastTarget(7, { enabled: true, ability: nuke, exists: alive })).toBeNull();
+  });
+
+  it("does not redirect an 'any' ability with no heal effect", () => {
+    const either: MouseoverCastAbility = { requiresTarget: true, targetType: 'any' };
+    expect(mouseoverCastTarget(7, { enabled: true, ability: either, exists: alive })).toBeNull();
+  });
+
+  it('does not redirect an ability with no targetType at all', () => {
+    const untyped: MouseoverCastAbility = { requiresTarget: true };
+    expect(mouseoverCastTarget(7, { enabled: true, ability: untyped, exists: alive })).toBeNull();
+  });
+
+  it('does not redirect a targetless ability', () => {
+    const aoe: MouseoverCastAbility = { requiresTarget: false, targetType: 'friendly' };
+    expect(mouseoverCastTarget(7, { enabled: true, ability: aoe, exists: alive })).toBeNull();
+  });
+
+  it('falls back to the normal cast when a non-party hovered unit went stale', () => {
+    expect(mouseoverCastTarget(99, { enabled: true, ability: HEAL, exists: alive })).toBeNull();
+  });
+
+  it('redirects a combat resurrection to a party member outside interest scope', () => {
+    // The ClientWorld-shaped host can lose the released ghost's entity at the
+    // graveyard, but the party wire still vouches for the member.
     expect(
-      mouseoverCastTargetPid(7, HEAL, {
+      mouseoverCastTarget(7, {
         enabled: true,
-        hasEntity: simLikeEntities([1, 7]),
+        ability: ABILITIES.temporal_reversal,
+        exists: () => false,
         partyMemberPids: () => [1, 7],
       }),
     ).toBe(7);
-  });
-
-  it('redirects a combat resurrection to a RELEASED member outside interest scope', () => {
-    // The ClientWorld-shaped host: no entity for the ghost at the graveyard, but
-    // the party wire still lists them.
-    expect(
-      mouseoverCastTargetPid(7, RES, {
-        enabled: true,
-        hasEntity: () => false,
-        partyMemberPids: () => [1, 7],
-      }),
-    ).toBe(7);
-    // Same inputs on the Sim-shaped host (entity present) resolve to the same pid.
-    expect(
-      mouseoverCastTargetPid(7, RES, {
-        enabled: true,
-        hasEntity: simLikeEntities([1, 7]),
-        partyMemberPids: () => [1, 7],
-      }),
-    ).toBe(7);
-  });
-
-  it('refuses a hovered pid that is neither in scope nor on the roster', () => {
-    // A stale hover (the member left the group between the mouseenter and the
-    // keypress): fall back to the classic current-target-else-self path rather
-    // than casting at an ex-member.
-    expect(
-      mouseoverCastTargetPid(7, HEAL, {
-        enabled: true,
-        hasEntity: () => false,
-        partyMemberPids: () => [1, 2],
-      }),
-    ).toBeNull();
-    expect(
-      mouseoverCastTargetPid(7, HEAL, {
-        enabled: true,
-        hasEntity: () => false,
-        partyMemberPids: () => null,
-      }),
-    ).toBeNull();
-  });
-
-  it('never redirects a hostile cast, an untargeted cast, or a disabled option', () => {
-    const inScope = {
-      enabled: true,
-      hasEntity: simLikeEntities([7]),
-      partyMemberPids: () => [1, 7],
-    };
-    expect(mouseoverCastTargetPid(7, BOLT, inScope)).toBeNull();
-    expect(mouseoverCastTargetPid(7, ABILITIES.collective_reversal, inScope)).toBeNull();
-    expect(mouseoverCastTargetPid(7, undefined, inScope)).toBeNull();
-    expect(mouseoverCastTargetPid(null, HEAL, inScope)).toBeNull();
-    expect(mouseoverCastTargetPid(7, HEAL, { ...inScope, enabled: false })).toBeNull();
   });
 
   it('reads the roster only when the entity is out of scope', () => {
-    // The offline Sim rebuilds its whole party model on every partyInfo read
-    // (aura + aggro sweeps over the world), and this runs on every ability press:
-    // the in-scope answer must never pay for it.
     let rosterReads = 0;
     const roster = () => {
       rosterReads++;
       return [1, 7];
     };
     expect(
-      mouseoverCastTargetPid(7, HEAL, {
+      mouseoverCastTarget(7, {
         enabled: true,
-        hasEntity: simLikeEntities([7]),
+        ability: HEAL,
+        exists: alive,
         partyMemberPids: roster,
       }),
     ).toBe(7);
     expect(rosterReads).toBe(0);
-    // No hover at all: neither callback is consulted.
+  });
+
+  it('redirects a dual-purpose heal like a friendly one', () => {
+    // Solar Invocation (the paladin's instant heal) and Scouring Mercy are
+    // targetType 'any': heal a friend or strike a foe. Leaving them off the
+    // redirect meant a raid-frame mouseover fell through to the current target
+    // and answered "You have no target." with nothing selected.
+    const inScope = {
+      enabled: true,
+      hasEntity: simLikeEntities([7]),
+      partyMemberPids: () => [1, 7],
+    };
+    for (const id of ['solar_invocation', 'scouring_mercy'] as const) {
+      expect(ABILITIES[id].targetType, id).toBe('any');
+      expect(mouseoverCastTargetPid(7, ABILITIES[id], inScope), id).toBe(7);
+    }
+    // A live member outside interest scope rides the roster, as for a friendly heal.
     expect(
-      mouseoverCastTargetPid(null, HEAL, {
+      mouseoverCastTargetPid(7, ABILITIES.solar_invocation, {
         enabled: true,
-        hasEntity: () => {
-          throw new Error('entity lookup on an unhovered press');
-        },
-        partyMemberPids: roster,
+        hasEntity: () => false,
+        partyMemberPids: () => [1, 7],
       }),
+    ).toBe(7);
+    expect(
+      mouseoverCastTargetPid(7, ABILITIES.solar_invocation, { ...inScope, enabled: false }),
     ).toBeNull();
-    expect(rosterReads).toBe(0);
+  });
+
+  it('never redirects a dual-purpose ability that cannot heal', () => {
+    // Shadeslip and the two dispel-steals also cast on either side, but a press
+    // meant for the enemy must not jump to whichever frame the cursor rests on.
+    const inScope = {
+      enabled: true,
+      hasEntity: simLikeEntities([7]),
+      partyMemberPids: () => [1, 7],
+    };
+    for (const id of ['shadowstep', 'spellsteal', 'voidfeast'] as const) {
+      expect(ABILITIES[id].targetType, id).toBe('any');
+      expect(mouseoverCastTargetPid(7, ABILITIES[id], inScope), id).toBeNull();
+    }
   });
 
   it('keeps the two resurrections on the friendly-targeted path the redirect covers', () => {
@@ -123,12 +132,25 @@ describe('mouseoverCastTargetPid', () => {
       expect(ability.requiresTarget).toBe(true);
       expect(ability.targetType).toBe('friendly');
       expect(
-        mouseoverCastTargetPid(7, ability, {
+        mouseoverCastTarget(7, {
           enabled: true,
-          hasEntity: () => false,
+          ability,
+          exists: () => false,
           partyMemberPids: () => [1, 7],
         }),
       ).toBe(7);
     }
+  });
+});
+
+describe('mouseoverCastTargetPid', () => {
+  it('keeps the existing focus-target controller wrapper behavior', () => {
+    expect(
+      mouseoverCastTargetPid(7, HEAL, {
+        enabled: true,
+        hasEntity: alive,
+        partyMemberPids: () => null,
+      }),
+    ).toBe(7);
   });
 });

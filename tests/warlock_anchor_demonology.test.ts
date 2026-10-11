@@ -44,8 +44,15 @@ describe('demonology 200 DPS anchors at 120 seconds', () => {
     // baseline pet bonus 0.15 -> 0.42, docs/design/class-balance-v042-results.md).
     // Measured 228.25 on this frozen kit; about plus or minus 5% around
     // that, same as every prior re-anchor here.
-    expect(mean('dps')).toBeGreaterThanOrEqual(217);
-    expect(mean('dps')).toBeLessThanOrEqual(240);
+    // Re-anchored at the release/v0.43.0 merge into feature/world-quests: the
+    // branch's hedge_knight camp move (src/sim/content/evergarden.ts,
+    // c43178a68c) places its spawns from the shared Rng at Sim construction, so
+    // it forks the stream for every later draw, exactly as it does for the
+    // parity goldens. No warlock number changed: with that one line reverted on
+    // this tip the old band passes. Measured 213.84 over the four seeds; the
+    // band keeps its plus or minus 5% width.
+    expect(mean('dps')).toBeGreaterThanOrEqual(203);
+    expect(mean('dps')).toBeLessThanOrEqual(225);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 

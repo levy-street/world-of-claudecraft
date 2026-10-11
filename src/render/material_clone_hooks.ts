@@ -23,6 +23,7 @@ import type * as THREE from 'three';
 import { reattachBiomeHazeToClone } from './biome_haze_field';
 import { reapplyArmorDyeToClone } from './characters/armor_dye';
 import { addRimGlow, hasRimGlow } from './gfx';
+import { reapplyInstancedDitherFadeToClone } from './instanced_dither_fade';
 import { reapplyVertexColorEmissiveToClone } from './vertex_color_emissive';
 import { reapplySurfaceDetailToClone } from './worn_stone';
 
@@ -30,8 +31,8 @@ import { reapplySurfaceDetailToClone } from './worn_stone';
  * Re-attach to `clone` the onBeforeCompile layers `source` carried, in the
  * order the material factories apply them (armour dye first, then rim glow,
  * then zone haze as surfaceMat attaches it at creation, then surface detail,
- * then the vertex-colour emissive layer: each later layer chains the previous
- * hook into its own cache key). Only layers the source actually had are
+ * then the vertex-colour emissive layer, then the per-instance ghost dither:
+ * each later layer chains the previous hook into its own cache key). Only layers the source actually had are
  * re-attached, so a clone never gains a patch its source never carried, which
  * would break program identity just as badly.
  *
@@ -58,6 +59,9 @@ export function reattachClonedMaterialHooks(source: THREE.Material, clone: THREE
   // factories decorate their emissive building materials here, and those
   // materials are exactly the ones the occluder fade re-clones.
   reapplyVertexColorEmissiveToClone(clone);
+  // Every batch factory attaches the per-instance ghost dither to a finished
+  // material (instanced_dither_fade.ts), so it is the outermost layer.
+  reapplyInstancedDitherFadeToClone(clone);
 }
 
 /** clone() plus reattachClonedMaterialHooks: the program-preserving clone. */

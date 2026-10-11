@@ -60,6 +60,7 @@ import {
   onDeedRecorded as onSteamDeedRecorded,
   reconcileOnLogin as reconcileSteamOnLogin,
 } from '../server/steam/mirror';
+import { defaultGuildRankLadder } from '../src/sim/guild_ranks';
 
 const insertDeedsMock = vi.mocked(insertCharacterDeeds);
 const onDeedRecordedMock = vi.mocked(onSteamDeedRecorded);
@@ -285,6 +286,7 @@ describe('reconcile through GameServer.join', () => {
       id: 1,
       name: 'The Vanguard',
       rank: 'member' as const,
+      ranks: defaultGuildRankLadder(),
       motd: '',
       motdSetBy: '',
       members: [],

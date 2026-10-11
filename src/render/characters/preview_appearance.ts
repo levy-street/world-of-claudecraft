@@ -44,6 +44,35 @@ export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
   };
 }
 
+/** The subset of a char-select/char-sheet roster row this needs. Structural
+ *  (the net layer's `CharacterSummary` satisfies it) so this module never
+ *  imports net/ for the type, the same seam charselect_redesign.ts's
+ *  `RedesignTarget` uses. */
+export interface AppearancePreviewRow {
+  class: PlayerClass;
+  skin?: number;
+  skinCatalog?: 'class' | 'mech';
+  mainhandItemId?: string | null;
+  offhandItemId?: string | null;
+  weaponSkinId?: string | null;
+}
+
+/** A roster row's real, in-world PreviewAppearance (offhand/skin default to
+ *  the unarmed/base-class reading an older summary would carry). Pure: the
+ *  caller is responsible for any asset prefetch the weapon skin needs
+ *  (`ensureCharacterUrl(weaponSkinModelUrl(...))`), which is a side effect
+ *  this module does not perform. */
+export function previewAppearanceForRow(c: AppearancePreviewRow): PreviewAppearance {
+  return {
+    cls: c.class,
+    skin: c.skin ?? 0,
+    skinCatalog: c.skinCatalog ?? 'class',
+    mainhandItemId: c.mainhandItemId ?? null,
+    offhandItemId: c.offhandItemId ?? null,
+    weaponSkinId: c.weaponSkinId ?? null,
+  };
+}
+
 /** The mainhand item the Armory inspect turntable should hold while trying on
  *  `skinId`: the real mainhand when either hand already shows that skin (the
  *  offhand mirror covers a mace held in the offhand), otherwise a stand-in

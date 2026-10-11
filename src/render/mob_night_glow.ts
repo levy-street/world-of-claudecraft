@@ -26,6 +26,7 @@
 // NIGHT_LIGHT_DYNAMIC_SLOTS on the nearest bodies where the pool here holds
 // MOB_GLOW_POOL discs.
 import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { MOB_GLOW_POOL, MOB_GLOW_RANGE, mobGlowStrength } from './night_lighting_core';
 import { radialGlowTexture } from './textures';
 
@@ -105,7 +106,7 @@ export function buildMobNightGlow(): MobNightGlowView {
   // Instances are rewritten every frame from anywhere in the draw band, so a
   // baked bounding sphere is stale the moment it is computed.
   mesh.frustumCulled = false;
-  mesh.renderOrder = 1; // over the ground, under the world's own decals
+  mesh.renderOrder = floorVfxRenderOrder('ground', 0); // over the ground, under the world's own decals
   mesh.count = 0;
   // Seed every matrix once so an unwritten slot can never inherit a factory
   // zero and collapse a disc onto the world origin.

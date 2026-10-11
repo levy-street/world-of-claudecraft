@@ -376,6 +376,34 @@ describe('routeEvents frame bytes and session mutations', () => {
     expect(fFar.sent).toEqual([]);
   });
 
+  it('delivers a Buried Hoard cue only to its instance member', () => {
+    const server = new GameServer();
+    const fNear = fakeWs();
+    const near = joinServer(server, fNear, 1, 'Near');
+    const fFar = fakeWs();
+    joinServer(server, fFar, 2, 'Far');
+    const nearPos = entityPos(server, near.pid);
+    fNear.sent.length = 0;
+    fFar.sent.length = 0;
+    const cue: SimEvent = {
+      type: 'hoardBossCue',
+      pid: near.pid,
+      instanceId: 19,
+      cueId: 7,
+      kind: 'mark',
+      variant: 'frost-ring',
+      phase: 'warning',
+      x: nearPos.x,
+      z: nearPos.z,
+      radius: 13,
+      innerRadius: 4.5,
+      durationSecs: 1.45,
+    };
+    routeRaw(server, [cue]);
+    expect(fNear.sent).toEqual([eventsFrame(cue)]);
+    expect(fFar.sent).toEqual([]);
+  });
+
   it('serializes a high-volume mixed batch byte-identically across a 20+ session crowd', () => {
     const server = new GameServer();
     const crowd: { fc: FakeClient; session: ClientSession }[] = [];
@@ -504,7 +532,7 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
     expect(typeof spy.mock.calls[0][2]).toBe('number');
   });
 
-  it('prefilters consumer-less vaultCraftConsume before serialization: never stringified, never delivered', () => {
+  it('prefilters internal vault events before serialization: never stringified or delivered', () => {
     const server = new GameServer();
     const sessions: ClientSession[] = [];
     for (let i = 0; i < 3; i++) {
@@ -528,6 +556,18 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
         upgrades: 1,
       } as SimEvent,
       {
+        type: 'treasureVaultOutcomePending',
+        attemptId: 'secret-attempt',
+        ownerCharacterId: 1,
+        claims: [{ characterId: 1, recipientName: 'Secret', items: [], copper: 987654 }],
+      } as SimEvent,
+      {
+        type: 'treasureVaultClaimRequested',
+        attemptId: 'secret-attempt',
+        characterId: 1,
+        pid: speaker.pid,
+      } as SimEvent,
+      {
         type: 'chat',
         fromPid: speaker.pid,
         from: 'Vaulter0',
@@ -547,12 +587,54 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
       const fc = (session as unknown as { fc: FakeClient }).fc;
       for (const frame of fc.sent) {
         expect(frame).not.toContain('vaultCraftConsume');
+        expect(frame).not.toContain('treasureVaultOutcomePending');
+        expect(frame).not.toContain('treasureVaultClaimRequested');
+        expect(frame).not.toContain('secret-attempt');
+        expect(frame).not.toContain('987654');
       }
       // The surrounding chat still arrives: the filter removed one event, not
       // the batch.
       expect(fc.sent.some((frame) => frame.includes('before'))).toBe(true);
       expect(fc.sent.some((frame) => frame.includes('after'))).toBe(true);
     }
+  });
+
+  it('prefilters the server-only craftRoll audit event: never stringified, never delivered', () => {
+    // craft_roll_events (server/craft_roll_events.ts) is the only consumer of
+    // craftRoll; the roll values it carries must never reach a client frame,
+    // its own recipient included.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const crafter = joinServer(server, fc, 1, 'Roller');
+    fc.sent.length = 0;
+    const batch: SimEvent[] = [
+      {
+        type: 'craftRoll',
+        kind: 'perfecting',
+        recipeId: 'recipe_wyrmfall_pendant',
+        itemId: 'wyrmfall_pendant',
+        roll: 0.91,
+        chance: 0.8,
+        success: false,
+        rankBefore: 0,
+        rankAfter: 0,
+        pid: crafter.pid,
+      },
+      {
+        type: 'chat',
+        fromPid: crafter.pid,
+        from: 'Roller',
+        channel: 'general',
+        text: 'after',
+      },
+    ];
+    const stringifySpy = vi.spyOn(JSON, 'stringify');
+    stringifySpy.mockClear();
+    routeRaw(server, batch);
+    expect(stringifySpy).toHaveBeenCalledTimes(1);
+    stringifySpy.mockRestore();
+    for (const frame of fc.sent) expect(frame).not.toContain('craftRoll');
+    expect(fc.sent.some((frame) => frame.includes('after'))).toBe(true);
   });
 
   it('serializes each event exactly once for the whole batch, not once per session', () => {
@@ -599,6 +681,20 @@ describe('event_frame pure assembly', () => {
     ] as unknown as SimEvent[];
     expect(filterRoutableEvents(events)).toBe(events);
     expect(filterRoutableEvents([])).toEqual([]);
+  });
+
+  it('filterRoutableEvents drops the server-only lootRollAwarded (its consumer is the Discord card, never a client)', () => {
+    const award = {
+      type: 'lootRollAwarded',
+      rollId: 3,
+      itemId: 'greyjaw_hide_boots',
+      itemName: 'Greyjaw Hide Boots',
+      quality: 'uncommon',
+      pid: 7,
+    };
+    const loot = { type: 'loot', text: 'Aaa wins [[i:greyjaw_hide_boots]] (88)', pid: 7 };
+    const events = [loot, award] as unknown as SimEvent[];
+    expect(filterRoutableEvents(events)).toEqual([loot]);
   });
 
   it('serializeEventFragments stringifies each event once, index-aligned', () => {

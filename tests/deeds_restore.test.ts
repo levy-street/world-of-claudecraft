@@ -66,6 +66,23 @@ describe('restoreBookOfDeeds (driven directly)', () => {
   });
 });
 
+describe('restoreBookOfDeeds: developer-badge rung titles (not deeds)', () => {
+  // The badge tier resolves server-side AFTER join, so the restore takes a
+  // saved rung title as-is (the server's first badge refresh re-checks it via
+  // reconcileDevBadgeTitle). Dropping the restore option would silently lose
+  // every worn rung title on join.
+  it('keeps a saved rung title although no tier has resolved yet, and drops an unknown rung', () => {
+    const { meta, player, state } = rig();
+    expect(player.devTier ?? 0).toBe(0);
+    restoreBookOfDeeds(meta, player, { ...state, activeTitle: 'dev:artificer' });
+    expect(meta.activeTitle).toBe('dev:artificer');
+    expect(player.title).toBe('dev:artificer');
+    const bogus = rig();
+    restoreBookOfDeeds(bogus.meta, bogus.player, { ...bogus.state, activeTitle: 'dev:bogus' });
+    expect(bogus.meta.activeTitle).toBeNull();
+  });
+});
+
 describe('runBookOfDeedsJoinRetro (driven directly)', () => {
   it('ends with the self seed: own deeds carry their blob day, own relics are undated, and the pass is retro-only', () => {
     const { sim, meta, player, state } = rig();

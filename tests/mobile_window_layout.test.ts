@@ -487,3 +487,75 @@ describe('mobile: the sheet stays the single scroller', () => {
     );
   });
 });
+
+// The Exchange browse table's one-column portrait sheet (~342px) squeezed every
+// money/time column under 40px, so an ordinary value ("19 minutes", a seller name)
+// had nowhere to break except mid-word (overflow-wrap: anywhere breaks at any
+// character once a column is too narrow, not just at a word boundary). Dropping
+// Buy Now (still shown in the row's own detail pane) gives the rest of the row
+// enough room to wrap at word boundaries instead.
+describe('mobile: the $WOC Exchange browse table sheds Buy Now in portrait', () => {
+  // hud.mobile.css indents this block's own rules at 4 spaces and closes the
+  // outer @media at 2, like every other block in the sheet; matching on that
+  // exact indent (rather than a fixed lookahead comment) keeps this from
+  // silently spanning into whatever rule follows once mobileCss's own
+  // comment-stripping above removes the boundary comment this test would
+  // otherwise anchor on.
+  const portraitBlockRe = /@media \(orientation: portrait\) \{([\s\S]*?)\n {2}\}/;
+
+  function portraitBlock(): string {
+    const hit = portraitBlockRe.exec(mobileCss);
+    expect(hit, 'a @media (orientation: portrait) block in hud.mobile.css').toBeTruthy();
+    return hit ? hit[1] : '';
+  }
+
+  it('hides the Buy Now column only in portrait, only on the browse table', () => {
+    const block = portraitBlock();
+    expect(block).toContain(
+      'body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(4),',
+    );
+    expect(block).toContain(
+      'body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) td:nth-child(4) {\n      display: none;\n    }',
+    );
+    // The unconditional (both-orientation) rules above this block still carry
+    // the padding/floor pins but must NOT also hide column 4 outside portrait.
+    const beforePortrait = mobileCss.slice(
+      0,
+      mobileCss.indexOf('@media (orientation: portrait) {'),
+    );
+    const wocSection = beforePortrait.slice(
+      beforePortrait.indexOf('#woc-market-window .wm-browse {'),
+    );
+    expect(wocSection).not.toContain('td:nth-child(4)');
+  });
+
+  it('rebalances the four remaining columns to sum to 100%', () => {
+    const block = portraitBlock();
+    const widths = [1, 2, 3, 5].map((n) => {
+      const m = new RegExp(
+        `wm-table:not\\(\\.wm-sales-table\\) th:nth-child\\(${n}\\) \\{\\s*width: (\\d+)%;`,
+      ).exec(block);
+      expect(m, `a width for th:nth-child(${n}) in the portrait block`).toBeTruthy();
+      return m ? Number(m[1]) : 0;
+    });
+    expect(widths).toEqual([40, 18, 22, 20]);
+    expect(widths.reduce((a, b) => a + b, 0)).toBe(100);
+  });
+
+  it('leaves the Sales History table (its own six-column split) alone', () => {
+    const block = portraitBlock();
+    expect(block).not.toContain('wm-sales-table th:nth-child');
+  });
+
+  it('leaves the landscape table untouched (anti-vacuity: the desktop split still stands)', () => {
+    const components = readFileSync(
+      new URL('../src/styles/components.css', import.meta.url),
+      'utf8',
+    );
+    // The desktop five-column split (42/16/18/12/12) is what portrait overrides;
+    // if it ever moves, this rebalance's premise (a 12% Buy Now/Time Left column)
+    // should be re-derived too.
+    expect(components).toMatch(/#woc-market-window \.wm-table th:nth-child\(4\) \{\s*width: 12%;/);
+    expect(components).toMatch(/#woc-market-window \.wm-table th:nth-child\(5\) \{\s*width: 12%;/);
+  });
+});

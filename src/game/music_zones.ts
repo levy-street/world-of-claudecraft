@@ -94,6 +94,12 @@ const RIFT_MUSIC: Record<string, MusicZone> = {
   Sunken: 'rift_tide',
   // The authored set piece: hellfire halls read as the forge archetype.
   'Infernal Citadel': 'rift_ember',
+  // The cave bosses of the common and rare hoards (content/rift/cave_themes.ts)
+  // borrow the archetype crawl that fits their cave.
+  'Spore Hollow': 'rift_venom',
+  'Deep Burrow': 'rift_brute',
+  'Bat Roost': 'rift_bone',
+  'False Vault': 'rift_ember',
 };
 
 /** Crawl cue for a procedural Rift floor, from RiftFloorView.themeName. */

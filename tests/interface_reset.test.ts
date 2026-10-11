@@ -67,7 +67,13 @@ describe('the Interface panel Reset to Defaults restores the layout too', () => 
     // rest of the file, and the containment pins below lose their scoping.
     expect(end, 'transferRows() was renamed or moved; re-point this pin').toBeGreaterThan(start);
     const body = source.slice(start, end);
-    expect(body).toContain('this.settingsViewFooter(interfaceControlsForTab(controls, tab)');
-    expect(body).toContain(`if (tab === 'frames') this.deps.resetUnitFrames()`);
+    expect(body).toContain('const shownControls = this.frameOptionsId');
+    expect(body).toContain('frameSettingRelated(this.frameOptionsId!, control.key)');
+    expect(body).toContain(': interfaceControlsForTab(controls, tab)');
+    expect(body).toContain('this.settingsViewFooter(shownControls,');
+    expect(body).toContain('interfaceResetKeys(tab, this.frameOptionsId, keys)');
+    expect(body).toContain(
+      `if (tab === 'frames' && !this.frameOptionsId) this.deps.resetUnitFrames()`,
+    );
   });
 });

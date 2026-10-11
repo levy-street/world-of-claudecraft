@@ -124,29 +124,39 @@ const build = await buildItemArtAudit({
     // 1071 / 1089 (its two disjoint reins items, reins_goblin_rocket_sled and
     // reins_rallycart_rxt, on the shared 1069 / 1087 base); both deltas are
     // additive over that shared base, so 1069 + 212 + 2 = 1283 and
-    // 1087 + 212 + 2 = 1301. Verified with `node scripts/item_art_audit.mjs
+    // 1087 + 212 + 2 = 1301, plus the Viridian Valestrider's reins on both
+    // sides = 1284 / 1302. Verified with `node scripts/item_art_audit.mjs
     // --verify-only` against the merged tree.
-    // The buddy companion merge (feature/buddy-companions-v43): 32 whistle
-    // defs plus the two charm looks join the live catalog (1301 + 33 = 1334; the audit counts the pending phoenix out),
-    // 33 of them with rendered-from-GLB art (1283 + 33 = 1316); the Emberfall
-    // Phoenix whistle is the one enumerated debt (content/buddies.ts
-    // BUDDY_ART_PENDING_ITEM_IDS). Measured with `node scripts/item_art_audit.mjs
-    // --verify-only` on the merged tree.
-    // release/v0.44.0 merge of feature/buddy-companions-v43: the Horse and
-    // Sapling whistles (the branch's own work-in-progress commit) join the
-    // live catalog (1334 + 2 = 1336 minus whistle_horse, now enumerated as
-    // art debt beside the phoenix = 1335 live, 1317 with rendered art, 2
-    // pending).
-    // Measured with `node scripts/item_art_audit.mjs --verify-only` on the
-    // merged tree.
-    catalogCount: 1317,
-    liveItemCount: 1335,
-    pendingArtCount: 2,
+    // + the World Quests branch merge (release/v0.43.0 sync): its two painted
+    // puzzle activators and two Eastbrook freight icons join both counts.
+    // + the 15 faction quartermaster items (faction-vendor-icons-2026-09-16),
+    // which landed without moving this block (1302 / 1320), + the two Clue
+    // Scroll items (clue_scroll, treasure_casket; clue-scroll-icons-2026-09-17):
+    // 1304 / 1322, measured with `node scripts/item_art_audit.mjs --verify-only`.
+    // + the 18 faction reward paintings and the five Buried Hoard map-family
+    // paintings: 1327 catalog records and 1345 live definitions, measured with
+    // the same verifier run.
+    // + the 96 Buried Hoard boss loot paintings (hoard-boss-loot-icons-2026-09-20)
+    // and, at the release/v0.44.0 merge into feature/buried-hoards, the
+    // release's Viridian Valestrider reins (1284 / 1302 on its own arm):
+    // 1424 catalog records and 1442 live definitions on 34 sheet pages,
+    // measured with the same verifier run on the merged tree.
+    // Re-measured at the 2026-09-28 release/v0.44.0 merge into
+    // feature/buried-hoards: the release's faction ladder, trinket slot and
+    // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
+    // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
+    // + the buddy companion branch at its release/v0.45.0 merge: 34 rendered
+    // whistle and charm icons (two batches, two groups) and the two enumerated
+    // art debts (whistle_emberfall_phoenix, whistle_horse): 1498 / 1516 with
+    // 137 pending, on 38 sheet pages, measured with the same verifier run.
+    catalogCount: 1498,
+    liveItemCount: 1516,
+    pendingArtCount: 137,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 33,
-    groupCount: 27,
+    sheetPageCount: 38,
+    groupCount: 28,
   },
 });
 assertItemArtAuditPass(build);

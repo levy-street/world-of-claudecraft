@@ -821,11 +821,26 @@ describe('stock rows: the phase 11n pulls', () => {
       farmer_hollis: 6,
       farmer_verbena: 6,
       provisioner_fenna: 7,
-      armorer_hode: 6, // + the Gilded Charm buddy look
-      warmarshal_draven_kole: 48, // + the Proud Grunt whistle (honor)
-      fury: 47,
+      armorer_hode: 5,
+      // The two honor trinkets (WARFARE_TRINKET_STOCK) joined both honor
+      // counters: 47 to 49 each.
+      // Plus the 139 Warfare Season 2 rows (second release/v0.44.0 base merge): 188.
+      // Plus the one honor companion whistle (HONOR_VENDOR_STOCK): 189.
+      warmarshal_draven_kole: 189,
+      fury: 189,
       stablemaster_marla: 2,
       wardsmith_orun: 3,
+      // The three faction quartermasters (faction_vendors.ts): the standing
+      // ladder, ten to twelve rows each (FACTION_VENDOR_STOCK).
+      // Re-measured at the 2026-09-28 release/v0.44.0 merge into
+      // feature/buried-hoards: each quartermaster gained the three allied rows
+      // (cartographers_ink, allied_hearthstone, allied_vanguard_duffel), its
+      // faction toy, and its Buried Hoards recipes and formulas (Rift Watch 3,
+      // Church Order 2, Automatons 3): 11 to 18, 12 to 18, 10 to 17. No row
+      // was lost (verified against the merged lists by id).
+      npc_rift_watch_quartermaster: 18,
+      npc_church_order_quartermaster: 18,
+      npc_automaton_quartermaster: 17,
     });
   });
 });

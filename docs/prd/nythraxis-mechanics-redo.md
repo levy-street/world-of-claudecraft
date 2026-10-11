@@ -658,7 +658,7 @@ after the 6 s mark can differ from before. A spike cast shortly before a storm
 can still leave its victims pinned into it: a storm-lead hold on the regular
 cadence is a separate knob, not taken here.
 
-## 18. Opening Bone Slam softened (2026-09-16)
+## 18. Opening Bone Slam softened (2026-09-16, superseded by section 19)
 
 Same parse read as section 17. Bone Slam was 7.5% of heroic wipe killing blows
 and 17% of the damage in the pre-death windows, and its first landing is the
@@ -672,3 +672,18 @@ later slam keeps 35% / 55%, so not spreading later still costs the same.
 `nythraxisBoneStormSlamMaxHp` (`src/sim/nythraxis_bone_storm.ts`) owns the
 fraction, the `openingSlamSpent` storm flag marks the first landing, and the
 raid boss guide row states both numbers.
+
+## 19. Hotfix v0.43.1 (2026-09-17): every Bone Slam softened
+
+Section 18 softened only the storm's first landed slam and kept 35% / 55%
+for every later window. The intent behind the v0.43.0 retune was a softer
+Bone Slam across the storm, not a softer opening only, and the release notes
+made the gap visible. Every Bone Slam of a storm, whichever window lands it,
+now deals 23% of max HP on normal and 37% on heroic. The opening-slam
+split is gone with it: `NYTHRAXIS_BONE_SLAM_MAX_HP_*` carry the softer
+values, `nythraxisBoneSlamDamageMaxHp` is the one fraction the driver reads,
+and the `openingSlamSpent` storm flag, the opening constants and
+`nythraxisBoneStormSlamMaxHp` are removed. The raid boss guide row states one
+slam number per difficulty; the sentence about the first slam is deleted
+from the English copy and every locale overlay. Whirl tick, cadence, charge
+count and radius are unchanged.

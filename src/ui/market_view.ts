@@ -32,7 +32,7 @@ import {
   type MarketSubtypeFilter,
 } from './market_filters';
 
-export type MarketTab = 'browse' | 'sell' | 'collect';
+export type MarketTab = 'browse' | 'sell' | 'collect' | 'orders' | 'history';
 
 /** Copper in one gold / one silver, for splitting a suggested ask into coins. */
 export const COPPER_PER_GOLD = 10000;
@@ -112,11 +112,11 @@ export interface MarketCollectRow {
 }
 
 /**
- * One Collect row on the SALES side: a completed sale the proceeds line sums up.
- * Distinct from MarketCollectRow above, which is goods coming BACK (an expired or
- * reclaimed listing); these goods are gone and what waits is the gold.
+ * One row on the History tab: a completed sale. Distinct from MarketCollectRow
+ * above, which is goods coming BACK (an expired or reclaimed listing); these
+ * goods are gone and what the row explains is the gold they brought in.
  */
-export interface MarketCollectSaleRow {
+export interface MarketSaleRow {
   item: ItemDef;
   /** The sold copy's own CHOSEN name, when the sale stamped one. The row
    *  describes a past transaction with no copy left to inspect, so the ledger
@@ -130,19 +130,36 @@ export interface MarketCollectSaleRow {
   buyerName: string;
 }
 
-/** The Collect tab body: nothing to collect, or proceeds + item stacks. */
+/**
+ * The Collect tab body: nothing to collect, or proceeds + returned item stacks.
+ * The itemized sale ledger behind `proceeds` is the separate History tab
+ * (below), not this body: Collect is the action tab (claim the purse, reclaim
+ * returned goods), History is the read-only record of what sold.
+ */
 export type MarketCollectBody =
   | { state: 'empty' }
   | {
       state: 'items';
       proceeds: number;
-      /** Itemized sales behind `proceeds`, oldest first. */
-      sales: MarketCollectSaleRow[];
-      /** Sales not listed in `sales`: dropped by the sim's ledger cap, or skipped
-       *  here because the item id no longer resolves. Their gold is still in
-       *  `proceeds`, so the tab reports the count instead of quietly under-listing. */
-      salesOmitted: number;
       rows: MarketCollectRow[];
+    };
+
+/**
+ * The History tab body: the itemized ledger of the player's own recent sales
+ * (split out of Collect so a sale stays visible here after its proceeds are
+ * claimed, not only while the purse is still unpaid).
+ */
+export type MarketHistoryBody =
+  | { state: 'empty' }
+  | {
+      state: 'items';
+      /** Itemized sales, oldest first. */
+      sales: MarketSaleRow[];
+      /** Sales not listed in `sales`: dropped by the sim's ledger cap, or skipped
+       *  here because the item id no longer resolves. Their gold is still counted
+       *  in the Collect tab's proceeds, so this tab reports the count instead of
+       *  quietly under-listing. */
+      salesOmitted: number;
     };
 
 /**
@@ -153,7 +170,11 @@ export type MarketView =
   | { kind: 'no-data' }
   | { kind: 'browse'; body: MarketBrowseBody }
   | { kind: 'sell'; body: MarketSellBody; meta: MarketSellMeta }
-  | { kind: 'collect'; body: MarketCollectBody };
+  | { kind: 'collect'; body: MarketCollectBody }
+  // The Wanted tab builds its own body in market_orders_core.ts (buildMarketOrders
+  // needs the viewer's bag counts, which this builder does not take).
+  | { kind: 'orders' }
+  | { kind: 'history'; body: MarketHistoryBody };
 
 /** Inputs the painter feeds the builder each render. */
 export interface MarketViewInput {
@@ -265,8 +286,10 @@ export function buildMarketSell(
 
 /** Build the Collect tab body from a snapshot. */
 export function buildMarketCollect(info: MarketInfo): MarketCollectBody {
-  // A sale whose proceeds floored to 0 copper still leaves a ledger row, so the
-  // empty test reads the ledger too: an empty body would strand it unshown.
+  // A sale whose proceeds floored to 0 copper still needs a live "Collect All" to
+  // clear it: the ledger the History tab itemizes rides the SAME collection object
+  // this tab's button flushes, so the empty check reads it too even though the
+  // rows themselves are shown on the History tab instead of here.
   if (
     info.collectionCopper <= 0 &&
     info.collectionItems.length === 0 &&
@@ -280,10 +303,15 @@ export function buildMarketCollect(info: MarketInfo): MarketCollectBody {
     if (!item) continue;
     rows.push({ item, count: slot.count, ...(slot.instance ? { instance: slot.instance } : {}) });
   }
-  const sales: MarketCollectSaleRow[] = [];
-  // An id a content edit retired can no longer be named, so the row is dropped
-  // like the returns above; it counts as omitted rather than vanishing, because
-  // its gold is still inside the proceeds total this list is explaining.
+  return { state: 'items', proceeds: info.collectionCopper, rows };
+}
+
+/** Build the History tab body from a snapshot: the itemized sale ledger. */
+export function buildMarketHistory(info: MarketInfo): MarketHistoryBody {
+  const sales: MarketSaleRow[] = [];
+  // An id a content edit retired can no longer be named, so the row is dropped;
+  // it counts as omitted rather than vanishing, because its gold is still inside
+  // the Collect tab's proceeds total.
   let salesOmitted = info.collectionSalesOmitted;
   for (const sale of info.collectionSales) {
     const item = ITEMS[sale.itemId];
@@ -299,7 +327,8 @@ export function buildMarketCollect(info: MarketInfo): MarketCollectBody {
       buyerName: sale.buyerName,
     });
   }
-  return { state: 'items', proceeds: info.collectionCopper, sales, salesOmitted, rows };
+  if (sales.length === 0 && salesOmitted === 0) return { state: 'empty' };
+  return { state: 'items', sales, salesOmitted };
 }
 
 /**
@@ -325,7 +354,9 @@ export function buildMarketView(input: MarketViewInput): MarketView {
       },
     };
   }
-  return { kind: 'collect', body: buildMarketCollect(info) };
+  if (tab === 'orders') return { kind: 'orders' };
+  if (tab === 'collect') return { kind: 'collect', body: buildMarketCollect(info) };
+  return { kind: 'history', body: buildMarketHistory(info) };
 }
 
 /**

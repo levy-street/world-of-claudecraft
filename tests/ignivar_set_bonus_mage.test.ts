@@ -18,6 +18,7 @@ import {
   ECHO_CONVERT_SINGLE,
   ECHO_GROUP_CONVERT_SINGLE,
   ECHO_ROTATION_CONVERSION_MULT,
+  echoHealPowerMultiplier,
   placeGroupEcho,
   placeTemporalEcho,
 } from '../src/sim/combat/chronomancy';
@@ -160,8 +161,9 @@ describe('Chronoweave 2pc: Temporal Echo converts 50 percent of single-target Ar
       ally.hp = Math.max(1, ally.maxHp - 800);
       const before = ally.hp;
       chronomancyConvertArcaneDamage(sim.ctx, sim.player, 1000, 'arcane', false);
+      const baseRate = wearer ? CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE : ECHO_CONVERT_SINGLE;
       expect(ally.hp - before).toBe(
-        Math.round(1000 * (wearer ? CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE : ECHO_CONVERT_SINGLE)),
+        Math.round(1000 * baseRate * echoHealPowerMultiplier(sim.player)),
       );
     }
   });
@@ -177,8 +179,9 @@ describe('Chronoweave 2pc: Temporal Echo converts 50 percent of single-target Ar
     }
     expect(ECHO_ROTATION_CONVERSION_MULT).toBe(4);
     expect(healing[0]).toBe(160);
-    expect(healing[1]).toBe(200);
-    expect(healing[1] / healing[0]).toBeCloseTo(1.25, 10);
+    // 200 base from 50% rate x 4 rotation mult, scaled by 2pc gear healing power (+24 healPower = 1.02x)
+    expect(healing[1]).toBe(204);
+    expect(healing[1] / healing[0]).toBeCloseTo(1.275, 2);
     expect(ITEM_SETS.chronoweave.bonuses[0]?.text).toContain('200 percent');
     expect(ITEM_SETS.chronoweave.bonuses[0]?.text).toContain('Aether Surge and Aether Darts');
   });
@@ -188,7 +191,9 @@ describe('Chronoweave 2pc: Temporal Echo converts 50 percent of single-target Ar
     ally.hp = Math.max(1, ally.maxHp - 800);
     const before = ally.hp;
     chronomancyConvertArcaneDamage(sim.ctx, sim.player, 1000, 'arcane', true);
-    expect(ally.hp - before).toBe(Math.round(1000 * ECHO_CONVERT_AOE));
+    expect(ally.hp - before).toBe(
+      Math.round(1000 * ECHO_CONVERT_AOE * echoHealPowerMultiplier(sim.player)),
+    );
     // A group echo placed BY a wearer keeps the 13 percent group coefficient:
     // the copy promises the single-target mark only.
     const second = addAlly(sim, 'Grouped', 6);
@@ -204,7 +209,9 @@ describe('Chronoweave 2pc: Temporal Echo converts 50 percent of single-target Ar
     ally.hp = Math.max(1, ally.maxHp - 800);
     const before = ally.hp;
     chronomancyConvertArcaneDamage(sim.ctx, sim.player, 1000, 'arcane', false);
-    expect(ally.hp - before).toBe(Math.round(1000 * CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE));
+    expect(ally.hp - before).toBe(
+      Math.round(1000 * CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE * echoHealPowerMultiplier(sim.player)),
+    );
     // Re-placing without the tier snaps back to base.
     placeTemporalEcho(sim.ctx, sim.player, ally, 15);
     expect(expectDefined(echoAuraOn(ally, sim.player.id)).echoConvertRate).toBe(

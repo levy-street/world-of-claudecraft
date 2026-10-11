@@ -264,9 +264,14 @@ describe('three degenerate normal guard patch', () => {
   // (the sample direction through geometryNormal, and material.roughness
   // through geometryRoughness = dFdx/dFdy of nonPerturbedNormal) and the bloom
   // blur smears it frame wide, so OutputGradePass tonemapped the whole frame to
-  // black on Linux + NVIDIA + Chrome (ANGLE-GL). The guard resets the normal to
-  // a valid unit vector when its squared length is zero; it is a no-op for
-  // finite normals.
+  // black on Linux + NVIDIA + Chrome (ANGLE-GL). The guard tests the squared
+  // length of the FINITE input before normalize and takes a valid unit vector
+  // when it is zero, so no NaN is ever produced or compared (GLSL ES leaves NaN
+  // comparisons implementation-defined). The test is > 0.0, not a threshold:
+  // the flat arm's cross product scales with the pixel footprint squared, so a
+  // close-up flat normal has a legitimately tiny squared length. A squared
+  // length in the normal float range normalizes to a finite vector
+  // (inversesqrt of the smallest normal float is about 9e18).
   it('keeps the guard applied on both normal_fragment_begin arms', () => {
     const source = readFileSync(
       new URL('../node_modules/three/build/three.module.js', import.meta.url),
@@ -274,13 +279,13 @@ describe('three degenerate normal guard patch', () => {
     );
     // The smooth arm, pinned TOGETHER with the #ifdef DOUBLE_SIDED that follows
     // it: the guard has to sit BEFORE the faceDirection flip, so the fallback
-    // normal is flipped too. Guarding after the flip would still catch the NaN
-    // (dot(NaN,NaN) > 0.0 is false) but would hand a back face a front-facing
-    // fallback, so the order is the assertion, not just the presence.
+    // normal is flipped too. Guarding after the flip would hand a back face a
+    // front-facing fallback, so the order is the assertion, not just the
+    // presence.
     expect(
       source.includes(
-        'vec3 normal = normalize( vNormal ); normal = dot( normal, normal ) > 0.0 ' +
-          '? normal : vec3( 0.0, 0.0, 1.0 );\\n\\t#ifdef DOUBLE_SIDED\\n\\t\\tnormal *= faceDirection;',
+        'vec3 normal = dot( vNormal, vNormal ) > 0.0 ? normalize( vNormal ) ' +
+          ': vec3( 0.0, 0.0, 1.0 );\\n\\t#ifdef DOUBLE_SIDED\\n\\t\\tnormal *= faceDirection;',
       ),
       'the degenerate-normal guard is missing on the smooth arm, or no longer precedes the DOUBLE_SIDED flip; re-run pnpm install',
     ).toBe(true);
@@ -288,11 +293,21 @@ describe('three degenerate normal guard patch', () => {
     // vViewPosition degenerates the same way on a zero-area fragment quad.
     expect(
       source.includes(
-        'vec3 normal = normalize( cross( fdx, fdy ) ); normal = dot( normal, normal ) > 0.0 ' +
-          '? normal : vec3( 0.0, 0.0, 1.0 );\\n#else',
+        'vec3 wocFlatN = cross( fdx, fdy );\\n\\tvec3 normal = dot( wocFlatN, wocFlatN ) > 0.0 ' +
+          '? normalize( wocFlatN ) : vec3( 0.0, 0.0, 1.0 );\\n#else',
       ),
       'the degenerate-normal guard is missing on the FLAT_SHADED arm; re-run pnpm install',
     ).toBe(true);
+    // The earlier form compared the normalized (possibly NaN) result instead.
+    // Positive control: the needle matches that earlier form's literal text.
+    const earlierForm =
+      'vec3 normal = normalize( vNormal ); normal = dot( normal, normal ) > 0.0 ? normal : vec3( 0.0, 0.0, 1.0 );';
+    const earlierNeedle = 'dot( normal, normal ) > 0.0';
+    expect(earlierForm.includes(earlierNeedle)).toBe(true);
+    expect(
+      source.includes(earlierNeedle),
+      'the degenerate-normal guard compares the normalized result again; test the finite input',
+    ).toBe(false);
   });
 
   it('leaves no unguarded normalize spelling behind on either arm', () => {
@@ -330,68 +345,40 @@ describe('three degenerate normal guard patch', () => {
   });
 });
 
-describe('three low-tier NaN output scrub patch', () => {
-  // Sixth patch hunk (opaque_fragment): the degenerate-normal guard above
-  // closes the one KNOWN NaN source on this driver family, but it is only
-  // proven for the composer/gradePass path (medium tier and up), which also
-  // carries OutputGradePass's own sanitizeFinite scrub as defense in depth
-  // (src/render/post_output_grade.ts). Low tier (GfxTier 'low') builds no
-  // composer at all (renderer.ts: "low renders direct", a bare
-  // webgl.render(scene, camera) straight to the canvas backbuffer) and so has
-  // ZERO NaN defense of any kind: any other NaN source on an ANGLE-adjacent
-  // driver reaches gl_FragColor unscrubbed and paints black, with no
-  // composer stage downstream to catch it. opaque_fragment is the one
-  // fragment-shader chunk EVERY lit material includes right before writing
-  // gl_FragColor (MeshLambertMaterial and MeshStandardMaterial/Physical
-  // alike), so guarding it there closes the gap for every tier and every
-  // material kind in one place, the same per-component NaN-to-zero technique
-  // OutputGradePass already uses, applied one stage earlier and universally
-  // instead of tier-gated.
-  it('keeps the guard applied, scrubbing outgoingLight before gl_FragColor', () => {
-    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
-    // Anchored on the gl_FragColor assignment that immediately follows it, so
-    // the guard's POSITION is asserted, not just its presence: scrubbing
-    // after this point would be too late, and scrubbing earlier (before
-    // USE_TRANSMISSION's alpha multiply) would miss nothing here since alpha
-    // is a separate channel, but keeping it last is what makes it the final
-    // word on outgoingLight before the write.
-    expect(
-      patch.includes(
-        '+var opaque_fragment = "#ifdef OPAQUE\\ndiffuseColor.a = 1.0;\\n#endif\\n#ifdef USE_TRANSMISSION\\n' +
-          'diffuseColor.a *= material.transmissionAlpha;\\n#endif\\n' +
-          'outgoingLight.x = ( outgoingLight.x < 0.0 || outgoingLight.x >= 0.0 ) ? outgoingLight.x : 0.0;\\n' +
-          'outgoingLight.y = ( outgoingLight.y < 0.0 || outgoingLight.y >= 0.0 ) ? outgoingLight.y : 0.0;\\n' +
-          'outgoingLight.z = ( outgoingLight.z < 0.0 || outgoingLight.z >= 0.0 ) ? outgoingLight.z : 0.0;\\n' +
-          'gl_FragColor = vec4( outgoingLight, diffuseColor.a );";',
-      ),
-      'the low-tier NaN output scrub is missing from patches/three@0.185.1.patch, ' +
-        'or no longer immediately precedes gl_FragColor',
-    ).toBe(true);
-  });
-
-  it('leaves no unguarded opaque_fragment spelling behind', () => {
-    // The patch REPLACES the stock chunk string, it does not add a second one:
-    // the stock spelling must be absent from added patch lines. The removed
-    // upstream line remains in the patch by design, so the check is scoped to
-    // additions rather than the whole diff text.
-    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
-    const addedPatchLines = patch
-      .split('\n')
-      .filter((line) => line.startsWith('+') && !line.startsWith('+++'))
-      .join('\n');
-    const unpatchedSibling = readFileSync(
-      new URL('../node_modules/three/build/three.cjs', import.meta.url),
+describe('three opaque_fragment stays stock', () => {
+  // The patch used to rewrite opaque_fragment with a comparison NaN scrub
+  // ((x < 0.0 || x >= 0.0) ? x : 0.0) on outgoingLight. The runtime guard
+  // (src/render/final_color_nan_guard.ts) scrubs NaN AND Inf from the same
+  // values before the same gl_FragColor write, so the patch copy only added
+  // link time on ANGLE D3D11 (fxc). The chunk stays stock and the guard is the
+  // one scrub.
+  const readChunk = (bundle: string): string => {
+    const source = readFileSync(
+      new URL(`../node_modules/three/build/${bundle}`, import.meta.url),
       'utf8',
     );
-    const stock = '#endif\\ngl_FragColor = vec4( outgoingLight, diffuseColor.a );';
-    expect(
-      addedPatchLines.includes(stock),
-      'the patch adds an unguarded opaque_fragment spelling; the NaN scrub no longer replaces it',
-    ).toBe(false);
-    expect(
-      unpatchedSibling.split(stock).length - 1,
-      'the unpatched three.cjs control no longer matches the stock needle; the GONE pin above may be vacuous',
-    ).toBe(1);
+    const match = /var opaque_fragment = ("(?:[^"\\]|\\.)*");/.exec(source);
+    expect(match, `opaque_fragment declaration not found in ${bundle}`).not.toBeNull();
+    return JSON.parse(match?.[1] ?? '""') as string;
+  };
+
+  it('ships the patched three.module.js chunk byte-identical to the unpatched three.cjs', () => {
+    const patched = readChunk('three.module.js');
+    expect(patched).toBe(readChunk('three.cjs'));
+    expect(patched.endsWith('gl_FragColor = vec4( outgoingLight, diffuseColor.a );')).toBe(true);
+    expect(patched.includes('outgoingLight.x < 0.0 || outgoingLight.x >= 0.0')).toBe(false);
+  });
+
+  it('adds no opaque_fragment or comparison scrub line in the checked-in patch', () => {
+    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
+    const changedLines = patch
+      .split('\n')
+      .filter((line) => /^[+-](?![+-]{2} )/.test(line))
+      .join('\n');
+    expect(changedLines.includes('var opaque_fragment')).toBe(false);
+    expect(changedLines.includes('outgoingLight.x < 0.0 || outgoingLight.x >= 0.0')).toBe(false);
+    // Control: the changed-line filter does see the normal guard hunk.
+    expect(changedLines.includes('+var normal_fragment_begin')).toBe(true);
   });
 });
 

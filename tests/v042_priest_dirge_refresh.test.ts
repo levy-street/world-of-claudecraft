@@ -636,15 +636,23 @@ describe('v0.42.0 Vespers: Dirge fan-out event order', () => {
     if (!meta) throw new Error('priest meta missing');
     const primary = addDummy(sim, priest, 0, 8);
     pushOwnDirge(primary, priest.id);
+    // Both sit at dz -6: the Eastbrook ferry berth's route marker post
+    // (content/harbor_route_markers.ts, at -100.2, -55.75) stands about 6.6
+    // yards off the authored spawn (-94, -58) and blocks the sight line to
+    // (-20, +6), which would drop the west dummy for LOS and hide the
+    // ordering this pins.
     // Lower id, placed EAST (larger x -> larger spatial-grid cx bucket).
-    const lowerIdEast = addDummy(sim, priest, 20, 6);
+    const lowerIdEast = addDummy(sim, priest, 20, -6);
     pushOwnDirge(lowerIdEast, priest.id, { remaining: 4, duration: 4 });
     // Higher id, placed WEST (smaller cx bucket, visited FIRST by
     // hostilesInRadius's cx-ascending walk): grid order would visit this
     // HIGHER id before the lower one above, the opposite of ascending-id order.
-    const higherIdWest = addDummy(sim, priest, -20, 6);
+    const higherIdWest = addDummy(sim, priest, -20, -6);
     pushOwnDirge(higherIdWest, priest.id, { remaining: 4, duration: 4 });
     expect(higherIdWest.id).toBeGreaterThan(lowerIdEast.id);
+    // Precondition: both are in sight, so only the ORDER can fail below.
+    expect(ctx.hasLineOfSight(priest, lowerIdEast)).toBe(true);
+    expect(ctx.hasLineOfSight(priest, higherIdWest)).toBe(true);
 
     sim.drainEvents();
     recastDirge(ctx, priest, meta, primary, 90);

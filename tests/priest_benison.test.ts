@@ -53,6 +53,48 @@ describe('Benison baseline loop', () => {
     expect(ABILITIES.holy_nova.effects.some((effect) => effect.type === 'aoeHeal')).toBe(true);
   });
 
+  it('puts Choirmend on the Radiant Chorus cooldown so Solemn Prayer is the filler between casts', () => {
+    // 12 sec, pinned to the holy paladin's group heal (docs/balance/choirmend-cooldown.md).
+    expect(ABILITIES.prayer_of_healing.cooldown).toBe(12);
+    expect(ABILITIES.prayer_of_healing.cooldown).toBe(ABILITIES.radiant_chorus.cooldown);
+    const { sim, priest } = benisonPriest();
+    const resolved = sim.meta(priest.id)?.known.find((k) => k.def.id === 'prayer_of_healing');
+    expect(resolved?.cooldown).toBe(12);
+
+    const ally = addAlly(sim, 'Choir Ally', 4);
+    ally.hp = Math.floor(ally.maxHp * 0.3);
+    priest.gcdRemaining = 0;
+    priest.resource = priest.maxResource;
+    sim.castAbility('prayer_of_healing', priest.id);
+    expect(priest.castingAbility).toBe('prayer_of_healing');
+    for (let tick = 0; tick < 61; tick++) sim.tick();
+    expect(priest.castingAbility).toBeFalsy();
+    const remaining = priest.cooldowns.get('prayer_of_healing') ?? 0;
+    expect(remaining).toBeGreaterThan(8);
+    expect(remaining).toBeLessThanOrEqual(12);
+
+    // Inside the cooldown a recast is refused; Solemn Prayer still casts.
+    priest.gcdRemaining = 0;
+    priest.resource = priest.maxResource;
+    sim.castAbility('prayer_of_healing', priest.id);
+    expect(priest.castingAbility).toBeFalsy();
+    sim.targetEntity(ally.id, priest.id);
+    sim.castAbility('heal', priest.id);
+    expect(priest.castingAbility).toBe('heal');
+
+    // The cooldown runs out within 12 sec and Choirmend casts again.
+    let waited = 0;
+    while ((priest.cooldowns.get('prayer_of_healing') ?? 0) > 0 && waited < 300) {
+      sim.tick();
+      waited++;
+    }
+    expect(waited).toBeLessThanOrEqual(240);
+    priest.gcdRemaining = 0;
+    priest.resource = priest.maxResource;
+    sim.castAbility('prayer_of_healing', priest.id);
+    expect(priest.castingAbility).toBe('prayer_of_healing');
+  });
+
   it('executes Choirmend as a committed cast and Sunburst as immediate recovery', () => {
     const { sim, priest } = benisonPriest();
     const ally = addAlly(sim, 'Choir Ally', 4);

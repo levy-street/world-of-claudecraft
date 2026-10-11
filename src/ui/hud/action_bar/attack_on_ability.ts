@@ -188,6 +188,21 @@ export function abilityStartsAutoAttack(effects: AbilityEffect[]): boolean {
 }
 
 /**
+ * The press-level engage decision. A press the mouseover core redirected onto a
+ * hovered party frame (src/ui/mouseover_cast_core.ts) lands on an ALLY, so it never
+ * engages the current target, even for an ability that could strike one: a
+ * dual-purpose heal (Solar Invocation, Scouring Mercy) carries directDamage for its
+ * enemy arm, and engaging would start swinging at the selected enemy while the heal
+ * went to the party frame.
+ */
+export function pressStartsAutoAttack(
+  effects: AbilityEffect[],
+  redirectedToAlly: boolean,
+): boolean {
+  return !redirectedToAlly && abilityStartsAutoAttack(effects);
+}
+
+/**
  * Whether the player's current target is a live target a white swing would actually
  * engage: either a hostile MOB (`hostile:true`; players/NPCs default false, and the
  * server mirrors the flag onto the wire, so the same read holds for the offline Sim and

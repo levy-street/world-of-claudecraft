@@ -200,7 +200,10 @@ describe('reveal gate wiring (source pins)', () => {
     const vistaAt = rendererSource.indexOf('if (vista) {', demandAt);
     expect(vistaAt).toBeGreaterThan(demandAt);
     const ambience = rendererSource.slice(demandAt, vistaAt);
-    expect(ambience).toContain('this.renderBudgetState.externalFrameCap,');
+    // A chosen frame rate limit is pacing the client knows about, read the same way.
+    expect(ambience).toContain(
+      'this.renderBudgetState.externalFrameCap || chosenCadenceMissShare() >= 0,',
+    );
   });
 
   it('props threads the gate into the per-frame far-cell and band updates', () => {

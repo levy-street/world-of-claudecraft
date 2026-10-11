@@ -17,7 +17,8 @@ export {
 export {
   type AbilityVfxCompileTarget,
   type AbilityVfxPrewarmTextureStep,
-  abilityVfxCompileMaterials,
+  abilityVfxFamilyMaterials,
+  abilityVfxGateMaterials,
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
 } from './prewarm';

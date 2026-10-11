@@ -14,6 +14,7 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { buildFarshoreShipwreck } from './farshore_shipwreck';
 import { bakedPalmVariant } from './jungle_features';
 
 export interface FarshoreFeaturesView {
@@ -121,6 +122,9 @@ export function buildFarshoreFeatures(seed: number): FarshoreFeaturesView {
       group.add(mesh);
     }
   }
+
+  const shipwreck = buildFarshoreShipwreck();
+  if (shipwreck) group.add(shipwreck);
 
   return {
     group,

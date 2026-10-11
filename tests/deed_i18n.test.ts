@@ -89,10 +89,25 @@ describe('deed_i18n English resolution', () => {
     // set collection (col_set_bramblehide, no title reward; the release's own
     // chain read 282 * 2 + 43), so the title count stays at 46.
     // Retired Vale Cup and Fiesta deeds keep names but drop 19 descriptions.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(300);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(281);
-    expect(manifest.length).toBe(627);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(46);
+    // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
+    // 315 with the seven faction standing deeds (Trusted and Champion per
+    // allied faction plus the all-factions meta), each with a name and desc.
+    // 317 with the two Clue Scroll casket deeds, each with a name and desc;
+    // the tenth carries the Treasure Hunter title.
+    // 318 with the release's Eastbrook ferry round trip (exp_harbor_to_harbor: a
+    // name and a desc, no title) at the fourth release/v0.44.0 base merge.
+    // 319 with the Buried Hoards Coinsack catch (cmb_coinsack_caught: a name and a
+    // desc, no title) at the 2026-09-28 merge into feature/buried-hoards.
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(319);
+    // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
+    // 296 with the seven faction standing deeds. 298 with the two Clue Scroll
+    // casket deeds.
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(300);
+    // 668 rows: 318 names + 299 descs + 51 titles (the three faction Champion
+    // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
+    // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc.
+    expect(manifest.length).toBe(670);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(51);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([
       { id: 'hid_forgebreaker', field: 'name', source: 'A Spring Unchained' },
       {

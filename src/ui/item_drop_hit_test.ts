@@ -4,14 +4,18 @@
 //
 // One shared hit test so both arms of the gesture agree on what "over the paperdoll"
 // and "over the world" mean: a paperdoll socket is any element carrying
-// data-equip-slot (char_window stamps it), the world is the game canvas, and every
-// other surface (a window, the HUD chrome, the action bar) is inert, so releasing a
-// stack over the chat box never destroys it.
+// data-equip-slot (char_window stamps it), the world is the game canvas (or the
+// touch HUD's dim over it while a window is open), and every other surface (a
+// window, the HUD chrome, the action bar) is inert, so releasing a stack over the
+// chat box never destroys it. A world release only OPENS the destroy prompt.
 
 import { type EquipSlot, isEquipSlot } from '../sim/types';
 
-/** The world surface: the one element the destroy drop accepts. */
-const WORLD_CANVAS_SELECTOR = '#game-canvas';
+/** The world surface: the one element the destroy drop accepts. On the touch
+ *  HUD an open window raises #mobile-window-backdrop, a full-screen dim over the
+ *  canvas, so every visible bit of world under the finger is that backdrop, and
+ *  it counts as the world (without it the touch world drop could never land). */
+const WORLD_SURFACE_SELECTOR = '#game-canvas, #mobile-window-backdrop';
 
 export type DropTargetAt =
   | { kind: 'equip'; slot: EquipSlot }
@@ -71,6 +75,6 @@ export function resolveDropTargetAt(
   if (ringBtn && Number.isInteger(ringIndex) && ringIndex >= 0) {
     return { kind: 'actionRingSlot', ringIndex };
   }
-  if (el.closest?.(WORLD_CANVAS_SELECTOR)) return { kind: 'world' };
+  if (el.closest?.(WORLD_SURFACE_SELECTOR)) return { kind: 'world' };
   return { kind: 'none' };
 }

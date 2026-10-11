@@ -17,8 +17,17 @@ function deps() {
         },
         refreshDayNightDial: () => {},
       },
-      scene: { add() {}, remove() {}, traverse() {} } as never,
-      world: { player: undefined, chat: () => {} },
+      renderer: {
+        scene: { add() {}, remove() {}, traverse() {} } as never,
+        worldCompileGate: () => undefined,
+      },
+      world: {
+        player: undefined,
+        chat: () => {},
+        entities: new Map(),
+        worldQuestLog: new Map(),
+        worldQuestCycle: '',
+      },
     },
   };
 }

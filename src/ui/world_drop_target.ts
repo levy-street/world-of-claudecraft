@@ -63,8 +63,8 @@ export function installWorldDropTarget(deps: WorldDropTargetDeps): void {
   });
 }
 
-/** The touch arm of the same gesture: the pointer released over the world (no
- *  window, no paperdoll socket under the finger). Shares the decision + prompt
+/** The touch arm of the same gesture: the pointer released over the world (the
+ *  canvas or the open-window dim over it, no paperdoll socket under the finger). Shares the decision + prompt
  *  with the HTML5 drop above so the two gestures can never diverge. */
 export function dropOnWorld(
   deps: Pick<WorldDropTargetDeps, 'destroyAction' | 'promptDestroy' | 'showBlocked'>,

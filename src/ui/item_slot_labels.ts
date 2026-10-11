@@ -23,6 +23,7 @@ import type { TranslationKey } from './i18n.catalog';
 export const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
   mainhand: 'itemUi.slots.mainhand',
   offhand: 'itemUi.slots.offhand',
+  trinket: 'hudChrome.paperdoll.trinketSlot',
   helmet: 'itemUi.slots.helmet',
   neck: 'itemUi.slots.neck',
   shoulder: 'itemUi.slots.shoulder',

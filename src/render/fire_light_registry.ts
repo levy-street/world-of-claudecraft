@@ -1,13 +1,15 @@
-// The renderer-side owner of the CONSTANT visible point-light count.
+// The renderer-side owner of the point-light budget: which fire and view
+// lights are counted and which of them shine.
 //
-// three.js bakes the light counts into every material's program cache key, lit
-// materials and unlit ones alike, so the number of VISIBLE point lights must
-// never change for the renderer's lifetime: one changed count relinks every
-// material drawn in that frame, a measured 100 to 200 ms synchronous stall
-// each. `renderer.ts` keeps the registries and the pads; this module owns the
-// operations that must not be open-coded per call site: adoption into the
-// budget, the reparent that keeps a light out of a cull-toggled group, and the
-// pass itself.
+// three.js bakes the light counts into every material's program cache key, so
+// the number of point lights three gathers must never change for the
+// renderer's lifetime: one changed count relinks every material drawn in that
+// frame, a measured 100 to 200 ms synchronous stall each. The carriers
+// (point_light_carriers.ts) pin that count; every light ranked here is a
+// carrier source three never gathers itself. `renderer.ts` keeps the
+// registries; this module owns the operations that must not be open-coded per
+// call site: adoption into the budget, the reparent that keeps a light out of
+// a cull-toggled group, and the pass itself.
 //
 // Extracted from `renderer.ts` under the monolith ratchet (tests/monolith_budget).
 import * as THREE from 'three';
@@ -15,9 +17,9 @@ import {
   applyPointLightBudget,
   type FireLightSink,
   flickerContributingFireLights,
-  pointLightPadCount,
   type RankedPointLight,
 } from './point_light_budget';
+import { markPointLightSource } from './point_light_carriers_core';
 
 const reparentScratch = new THREE.Vector3();
 
@@ -26,17 +28,17 @@ const reparentScratch = new THREE.Vector3();
  * position.
  *
  * A point light rides the budget, NEVER a cull-toggled group (the Sowfield
- * brazier rule). A light left inside such a group leaves the render light list
- * the moment the toggle hides its ancestor, and the budget cannot compensate on
- * that frame: it ranks against the ancestry it sees, while the cull sweeps run
- * AFTER the frame's budget pass. So a group flipping from shown to hidden while
- * one of its lights holds a counted slot drops numPointLights for that frame and
- * relinks every lit material drawn in it. Distance does not save it either: the
- * budget counts the nearest `visibleCount` ELIGIBLE lights whatever their range,
- * which only gates whether they shine.
+ * brazier rule). A light left inside such a group goes dark the moment the
+ * toggle hides its ancestor, and the budget cannot compensate on that frame:
+ * it ranks against the ancestry it sees, while the cull sweeps run AFTER the
+ * frame's budget pass. So a group flipping from shown to hidden while one of
+ * its lights holds a counted slot blinks that light out and wastes the slot.
+ * Distance does not save it either: the budget counts the nearest
+ * `visibleCount` ELIGIBLE lights whatever their range, which only gates
+ * whether they shine.
  *
  * Applied mechanically at attach, so the NEXT builder that parents a glow into
- * its own group cannot reintroduce the stall.
+ * its own group cannot reintroduce it.
  */
 export function reparentStrandedLightsToScene(
   scene: THREE.Object3D,
@@ -113,6 +115,7 @@ export function createFireLightAdopter(
 ): FireLightAdopter {
   const adopt = (light: THREE.PointLight): void => {
     light.visible = false;
+    markPointLightSource(light);
     fireLights().push(light);
     markRankDirty();
   };
@@ -157,10 +160,9 @@ export interface FireLightBudgetPass {
   rankDirty: boolean;
   fireLights: readonly THREE.PointLight[];
   viewLights: readonly THREE.PointLight[];
-  pads: readonly THREE.PointLight[];
   px: number;
   pz: number;
-  /** The tier constant. This is the pinned count, never the live governor. */
+  /** The tier constant: the budget's share of the carriers, never the live governor. */
   visibleCount: number;
   /** How many of the counted lights may SHINE, which never changes the count. */
   liveBudget: number;
@@ -172,9 +174,8 @@ export interface FireLightBudgetPass {
 
 /**
  * One budget pass. Ranks the union of static fire lights and entity-view lights
- * (a view light counted separately would change numPointLights as it streams in
- * and out), keeps the nearest `visibleCount` visible, and tops the total up with
- * pad lights so the count holds even when fewer real lights exist.
+ * and keeps the nearest `visibleCount` visible. A light joins the rank as a
+ * carrier source, off every camera layer, before the budget can ever show it.
  *
  * The caller owns the dirty flag; a completed pass always leaves the rank
  * current, so there is nothing to hand back.
@@ -186,6 +187,7 @@ export function runFireLightBudgetPass(pass: FireLightBudgetPass): void {
     ranked.length = 0;
     for (let fireIndex = 0; fireIndex < pass.fireLights.length; fireIndex++) {
       const light = pass.fireLights[fireIndex];
+      markPointLightSource(light);
       ranked.push({
         light,
         d2: 0,
@@ -196,6 +198,7 @@ export function runFireLightBudgetPass(pass: FireLightBudgetPass): void {
       });
     }
     for (const light of pass.viewLights) {
+      markPointLightSource(light);
       const stored = light.userData.budgetBase;
       const base = typeof stored === 'number' ? stored : light.intensity;
       const dynamic = light.userData.budgetDynamic === true;
@@ -210,8 +213,8 @@ export function runFireLightBudgetPass(pass: FireLightBudgetPass): void {
   }
   // Ancestry-aware: a chosen light under a group the world hid (zone streaming,
   // far-LOD wraps, compile gates) is not drawn, so it must not hold a counted
-  // slot; the returned drawn count is what the pad fill below keys on.
-  const drawnCount = applyPointLightBudget(
+  // slot.
+  applyPointLightBudget(
     ranked,
     pass.px,
     pass.pz,
@@ -229,6 +232,4 @@ export function runFireLightBudgetPass(pass: FireLightBudgetPass): void {
       pass.rangeSq,
     );
   }
-  const padCount = pointLightPadCount(drawnCount, pass.visibleCount);
-  for (let i = 0; i < pass.pads.length; i++) pass.pads[i].visible = i < padCount;
 }

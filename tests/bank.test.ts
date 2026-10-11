@@ -401,6 +401,59 @@ describe('deposit rules', () => {
     expect(carried[0].materialSources).toEqual(mixed);
   });
 
+  it('round-trips a whole LOCKED material stack as ONE bank slot, never one per unit', () => {
+    // Locking a stack is one flag over its WHOLE count (item_lock.ts
+    // setItemLocked locks every unit in place, no split); a deposit into the
+    // bank must land it as ONE slot carrying the full count, not one slot per
+    // unit (the material_stack_packing.ts perFreshSlot regression a player hit
+    // locking a stack of 20 and depositing it).
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItem(MATERIAL, 20);
+    const idx = m.inventory.findIndex((s) => s.itemId === MATERIAL);
+    sim.setItemLocked(MATERIAL, true, sim.playerId, idx);
+    expect(m.inventory[idx].instance).toEqual({ locked: true });
+
+    sim.bankDeposit(idx);
+
+    const banked = m.bank.inventory.filter((s) => s.itemId === MATERIAL);
+    expect(banked).toHaveLength(1);
+    expect(banked[0].count).toBe(20);
+    expect(banked[0].instance).toEqual({ locked: true });
+
+    sim.bankWithdraw(m.bank.inventory.findIndex((s) => s.itemId === MATERIAL));
+    const carried = m.inventory.filter((s) => s.itemId === MATERIAL);
+    expect(carried).toHaveLength(1);
+    expect(carried[0].count).toBe(20);
+    expect(carried[0].instance).toEqual({ locked: true });
+  });
+
+  it('round-trips a whole LOCKED non-material stack as ONE bank slot too (bags.ts sibling fix)', () => {
+    // The non-material twin of the case above: bags.ts countFit/addStacked
+    // had the identical fresh-slot-sizing bug for a locked stackable item
+    // that is NOT a material (a food/consumable stack here), since it is a
+    // separate code path from the material packing core.
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItem(NON_MATERIAL_SIM, 20);
+    const idx = m.inventory.findIndex((s) => s.itemId === NON_MATERIAL_SIM);
+    sim.setItemLocked(NON_MATERIAL_SIM, true, sim.playerId, idx);
+    expect(m.inventory[idx].instance).toEqual({ locked: true });
+
+    sim.bankDeposit(idx);
+
+    const banked = m.bank.inventory.filter((s) => s.itemId === NON_MATERIAL_SIM);
+    expect(banked).toHaveLength(1);
+    expect(banked[0].count).toBe(20);
+    expect(banked[0].instance).toEqual({ locked: true });
+
+    sim.bankWithdraw(m.bank.inventory.findIndex((s) => s.itemId === NON_MATERIAL_SIM));
+    const carried = m.inventory.filter((s) => s.itemId === NON_MATERIAL_SIM);
+    expect(carried).toHaveLength(1);
+    expect(carried[0].count).toBe(20);
+    expect(carried[0].instance).toEqual({ locked: true });
+  });
+
   it('a differently-signed deposit still lands in its own bank slot', () => {
     const sim = makeSim();
     const m = meta(sim);

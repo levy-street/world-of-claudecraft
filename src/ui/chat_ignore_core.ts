@@ -18,6 +18,7 @@
 // the caller owns the localStorage read/write and passes the parsed set in.
 
 import type { SocialInfo } from '../world_api';
+import { viewerGuildCan } from './guild_ranks_view';
 
 export interface PlayerSocialFlags {
   ignored: boolean;
@@ -60,7 +61,7 @@ export function resolvePlayerSocialFlags(
     ignored: hasName(social.ignores, name),
     blocked: hasName(social.blocks, name),
     isFriend: hasName(social.friends, name),
-    canGuildInvite: !!social.guild && social.guild.rank !== 'member',
+    canGuildInvite: viewerGuildCan(social.guild, 'invite'),
     alreadyGuilded: hasName(social.guild?.members, name),
     online: true,
   };

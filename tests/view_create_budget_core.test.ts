@@ -47,6 +47,30 @@ describe('runtimeViewCreateBudget', () => {
     expect(runtimeViewCreateBudget(input(), state)).toBe(VIEW_CREATE_BUDGET_HIGH);
   });
 
+  it('judges the load reading instead of the delta when the client paces its own frames', () => {
+    // One held 30 fps interval, read three ways.
+    const dt = 1 / 30;
+    const held = { backoffSeconds: 0 };
+    expect(runtimeViewCreateBudget(input({ dt, frameLoadMs: 16.7 }), held)).toBe(
+      VIEW_CREATE_BUDGET_HIGH,
+    );
+    expect(held.backoffSeconds).toBe(0);
+
+    const late = { backoffSeconds: 0 };
+    expect(runtimeViewCreateBudget(input({ dt, frameLoadMs: 50 }), late)).toBe(1);
+    expect(late.backoffSeconds).toBeCloseTo(VIEW_CREATE_BACKOFF_SECONDS - dt, 6);
+
+    const raw = { backoffSeconds: 0 };
+    expect(runtimeViewCreateBudget(input({ dt }), raw)).toBe(4);
+    expect(raw.backoffSeconds).toBe(0);
+    // The backoff still drains by the real delta, never by the load reading.
+    const hitch = { backoffSeconds: 0 };
+    expect(runtimeViewCreateBudget(input({ dt: 0.05, frameLoadMs: 16.7 }), hitch)).toBe(
+      VIEW_CREATE_BUDGET_HIGH,
+    );
+    expect(hitch.backoffSeconds).toBe(0);
+  });
+
   it('follows the constrained-memory entry ramp and ignores a non-finite dt', () => {
     const state = { backoffSeconds: 0 };
     expect(

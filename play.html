@@ -11,7 +11,7 @@
 <meta name="screen-orientation" content="landscape" />
 <meta name="orientation" content="landscape" />
 <title data-i18n="seo.title">World of ClaudeCraft: Classic-Style Web MMO</title>
-<meta name="description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!" />
+<meta name="description" data-i18n-content="seo.description" content="Play World of ClaudeCraft, a free browser MMO. Explore, complete quests, and run dungeons with friends. No download required." />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="manifest" href="/manifest.webmanifest" />
 
@@ -83,14 +83,14 @@
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="World of ClaudeCraft" />
 <meta property="og:title" data-i18n-content="seo.title" content="World of ClaudeCraft: Classic-Style Web MMO" />
-<meta property="og:description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!" />
+<meta property="og:description" data-i18n-content="seo.description" content="Play World of ClaudeCraft, a free browser MMO. Explore, complete quests, and run dungeons with friends. No download required." />
 <meta property="og:image" content="https://worldofclaudecraft.com/woc_logo_square.webp" />
 <meta property="og:url" content="https://worldofclaudecraft.com/play" />
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" data-i18n-content="seo.title" content="World of ClaudeCraft: Classic-Style Web MMO" />
-<meta name="twitter:description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!" />
+<meta name="twitter:description" data-i18n-content="seo.description" content="Play World of ClaudeCraft, a free browser MMO. Explore, complete quests, and run dungeons with friends. No download required." />
 <meta name="twitter:image" content="https://worldofclaudecraft.com/woc_logo_square.webp" />
 
 <!-- Structured Data (Schema.org JSON-LD VideoGame) -->
@@ -106,7 +106,7 @@
   "operatingSystem": "Web Browser",
   "url": "https://worldofclaudecraft.com/play",
   "image": "https://worldofclaudecraft.com/woc_logo_square.webp",
-  "description": "Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!",
+  "description": "Play World of ClaudeCraft, a free browser MMO. Explore, complete quests, and run dungeons with friends. No download required.",
   "inLanguage": "en",
   "sameAs": [
     "https://github.com/levy-street/world-of-claudecraft",
@@ -150,7 +150,7 @@
      linked above. This inline block is intentionally empty. */
 </style>
 </head>
-<body class="steam-wishlist-pending start-screen-open" data-start-panel="mode-select">
+<body class="steam-wishlist-pending start-screen-open" data-start-panel="mode-select" data-website-redesign>
   <!-- Skip links: the first focusable elements, visually hidden until focused (a11y
        infra). Targets live inside #game-ui-template, cloned into the page in-game. -->
   <a class="hud-skip" href="#ui" data-i18n="hudChrome.skipLinks.mainHud">Skip to Main HUD</a>
@@ -232,7 +232,7 @@
            compounds the target frame scale into its own mini zoom. Its own unit_frame
            painter toggles it flex/none when the target-of-target is known/unknown.
            Portrait + name + hp bar only (no resource/cast/debuffs). -->
-      <div id="totarget-frame" class="unitframe totarget" role="group" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Mark's Mark">
+      <div id="totarget-frame" class="unitframe totarget" role="button" tabindex="0" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Target of Target" style="display: none">
         <div class="portrait-wrap ui-portrait-wrap">
           <div class="portrait ui-portrait"><canvas id="totf-portrait" width="54" height="54"></canvas></div>
           <div class="level-chip ui-medal" id="totf-level"></div>
@@ -240,6 +240,7 @@
         <div class="uf-bars">
           <div class="uf-name ui-ribbon" id="totf-name"></div>
           <div class="bar hp ui-bevel"><div class="bar-fill ui-bevel-fill" id="totf-hp"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="totf-hp-text"></div></div>
+          <div class="bar resource ui-bevel" id="totf-resource"><div class="bar-fill ui-bevel-fill" id="totf-res"></div><div class="bar-text ui-bevel-text" id="totf-res-text"></div></div>
         </div>
       </div>
     </div>
@@ -332,7 +333,7 @@
       <div id="recipe-tracker"></div>
       <div id="delve-tracker"><div id="delve-body"></div></div>
       <div id="rift-tracker"><div id="rift-body"></div></div>
-      <div id="practice-tracker"></div>
+      <div id="practice-tracker"><div id="practice-body"></div></div>
       <div id="hub-lesson-coach"></div>
       <div id="gathering-goal-tracker" class="gathering-goal-panel">
         <div id="gathering-goal-body"></div>
@@ -402,6 +403,7 @@
         <div id="target-auras-window" class="panel mt-panel ta-panel ui-window" role="region" aria-labelledby="target-auras-title" style="display: none">
           <div class="panel-title ui-win-head">
             <span id="target-auras-title" class="mt-title-label ta-title ui-win-title" data-i18n="hudChrome.targetAuras.title">Target Auras</span>
+            <button type="button" class="x-btn ta-close-btn ui-x-btn" data-i18n-title="hudChrome.targetAuras.close" data-i18n-aria="hudChrome.targetAuras.close" title="Close target aura window" aria-label="Close target aura window" data-icon="close"></button>
           </div>
           <div class="ta-target ui-meta ui-muted"></div>
           <div class="ta-filters ui-seg">
@@ -430,6 +432,10 @@
           <div class="panel-title">
             <span class="mt-title-label ui-cin" data-i18n="hud.meters.healing">Healing</span>
             <span>
+              <button type="button" class="x-btn mt-mode-btn ui-disc" data-i18n-title="hud.meters.selectMode" title="Select mode" data-icon="menu"></button>
+              <button type="button" class="x-btn mt-new-window ui-disc" data-i18n-title="hud.meters.newWindow" title="New window">+</button>
+              <button type="button" class="x-btn mt-reset ui-disc" data-i18n-title="hud.meters.resetHint" title="Reset fight (right-click: reset all)" data-icon="trash"></button>
+              <button type="button" class="x-btn mt-settings ui-disc" data-i18n-title="hudChrome.meters.settingsTitle" data-i18n-aria="hudChrome.meters.settingsTitle" title="Details / Meters Settings" aria-label="Details / Meters Settings" data-icon="gear"></button>
               <button type="button" class="x-btn mt-prev ui-disc" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
               <button type="button" class="x-btn mt-next ui-disc" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
               <button type="button" class="x-btn mt-close ui-x-btn" data-i18n-title="hudChrome.meters.dock" data-i18n-aria="hudChrome.meters.dock" title="Dock back into the meters window" aria-label="Dock back into the meters window" data-icon="close"></button>
@@ -444,6 +450,10 @@
           <div class="panel-title">
             <span class="mt-title-label ui-cin" data-i18n="hud.meters.threat">Threat</span>
             <span>
+              <button type="button" class="x-btn mt-mode-btn ui-disc" data-i18n-title="hud.meters.selectMode" title="Select mode" data-icon="menu"></button>
+              <button type="button" class="x-btn mt-new-window ui-disc" data-i18n-title="hud.meters.newWindow" title="New window">+</button>
+              <button type="button" class="x-btn mt-reset ui-disc" data-i18n-title="hud.meters.resetHint" title="Reset fight (right-click: reset all)" data-icon="trash"></button>
+              <button type="button" class="x-btn mt-settings ui-disc" data-i18n-title="hudChrome.meters.settingsTitle" data-i18n-aria="hudChrome.meters.settingsTitle" title="Details / Meters Settings" aria-label="Details / Meters Settings" data-icon="gear"></button>
               <button type="button" class="x-btn mt-prev ui-disc" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
               <button type="button" class="x-btn mt-next ui-disc" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
               <button type="button" class="x-btn mt-close ui-x-btn" data-i18n-title="hudChrome.meters.dock" data-i18n-aria="hudChrome.meters.dock" title="Dock back into the meters window" aria-label="Dock back into the meters window" data-icon="close"></button>
@@ -459,9 +469,15 @@
             <span class="mt-tabs ui-seg">
               <button type="button" class="mt-tab on ui-seg-tab is-on" data-tab="dmg" data-i18n="hud.meters.damageShort">Dmg</button>
               <button type="button" class="mt-tab ui-seg-tab" data-tab="heal" data-i18n="hud.meters.healingShort">Heal</button>
+              <button type="button" class="mt-tab ui-seg-tab" data-tab="dmgTaken" data-i18n="hud.meters.damageTakenShort">Taken</button>
+              <button type="button" class="mt-tab ui-seg-tab" data-tab="interrupts" data-i18n="hud.meters.interruptsShort">Int</button>
               <button type="button" class="mt-tab ui-seg-tab" data-tab="threat" data-i18n="hud.meters.threat">Threat</button>
             </span>
             <span>
+              <button type="button" class="x-btn mt-mode-btn ui-disc" data-i18n-title="hud.meters.selectMode" title="Select mode" data-icon="menu"></button>
+              <button type="button" class="x-btn mt-new-window ui-disc" data-i18n-title="hud.meters.newWindow" title="New window">+</button>
+              <button type="button" class="x-btn mt-reset ui-disc" data-i18n-title="hud.meters.resetHint" title="Reset fight (right-click: reset all)" data-icon="trash"></button>
+              <button type="button" class="x-btn mt-settings ui-disc" data-i18n-title="hudChrome.meters.settingsTitle" data-i18n-aria="hudChrome.meters.settingsTitle" title="Details / Meters Settings" aria-label="Details / Meters Settings" data-icon="gear"></button>
               <button type="button" class="x-btn mt-prev ui-disc" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
               <button type="button" class="x-btn mt-next ui-disc" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
               <button type="button" class="x-btn mt-close ui-x-btn" data-i18n-title="hud.meters.close" data-i18n-aria="hud.meters.close" title="Close meters" aria-label="Close meters" data-icon="close"></button>
@@ -539,9 +555,11 @@
     <div id="dfinder-proposal-popup" class="panel ui-panel"></div>
     <div id="bg-proposal-popup" class="panel ui-panel"></div>
     <div id="leaderboard-window" class="window panel ui-window"></div>
+    <div id="world-quest-leaderboard-window" class="window panel"></div>
     <div id="guild-board-window" class="window panel"></div>
     <div id="rift-forge-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel ui-window"></div>
+    <div id="weekly-quests-window" class="window panel"></div>
     <div id="claudium-window" class="window panel ui-window"></div>
     <div id="market-window" class="window panel ui-window"></div>
     <div id="woc-market-window" class="window panel ui-window"></div>
@@ -595,6 +613,7 @@
       </div>
     </div>
     <div id="tooltip" class="panel"></div>
+    <div id="unit-tooltip-anchor" class="panel"></div>
 
     <div id="error-msg"></div>
     <div id="quest-banner" aria-hidden="true"></div>
@@ -614,17 +633,27 @@
     <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <div class="death-panel ui-panel-strong">
         <h2 class="ui-cin" data-i18n="hud.core.deathTitle">You have died.</h2>
-        <button type="button" class="btn ui-btn ui-btn--red ui-btn--lg" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+        <div class="death-actions">
+          <button type="button" class="btn ui-btn ui-btn--red ui-btn--lg" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+          <button type="button" class="btn ui-btn ui-btn--lg" id="death-recap-btn" data-i18n="hud.core.deathRecap">Recap</button>
+        </div>
       </div>
     </div>
+    <div id="death-recap-dialog" class="window panel" role="dialog" aria-modal="true" aria-labelledby="death-recap-title" style="display: none"></div>
     <!-- Ghost (spirit released): runs freely; this small non-blocking prompt appears
-         only when in reach of the corpse or the Pale Keeper. Mirrors index.html. -->
+         only when in reach of the corpse. The Pale Keeper's raise has no button here:
+         the ghost talks to the Keeper (world click or the interact key), and both
+         routes go through Hud.requestSpiritHealerResurrect's confirm gate. Mirrors
+         index.html. -->
     <div id="ghost-prompt" data-pad-nav-root>
       <div class="ghost-panel">
         <button type="button" class="btn ui-btn" id="resurrect-corpse-btn" data-i18n="hudChrome.death.resurrectAtCorpse">Resurrect at Corpse</button>
-        <button type="button" class="btn ui-btn" id="resurrect-healer-btn" data-i18n="hudChrome.death.resurrectAtHealer">The Pale Keeper (Keeper's Toll)</button>
       </div>
     </div>
+    <!-- Ghost hint: the standing top-of-screen line that names both ways back while
+         the spirit is out (hud.ts shows it for a ghost outside a battleground match).
+         Pointer-inert, so it never eats a click meant for the world. Mirrors index.html. -->
+    <div id="ghost-hint" class="ui-cin" role="status" aria-live="polite" data-i18n="hudChrome.death.ghostHint">Run to the location of your death or talk to the Pale Keeper to revive</div>
     <!-- Interact affordance: a small non-blocking line, hidden until an interact press
          is ambiguous between two farming targets in reach (a placed feast over a garden
          bed). role=status so a screen reader hears the ambiguity the sighted line shows;
@@ -710,13 +739,20 @@
     </div>
     <!-- Keep the backdrop here at the top level so it spans the entire screen behind content -->
     <div id="start-screen-backdrop" aria-hidden="true">
+      <!-- Cinematic website slideshow. The original trailer is reserved for native shells. -->
+      <div class="website-cinematic-art">
+        <div class="website-scene website-scene-eastbrook"></div>
+        <div class="website-scene website-scene-galecrest"></div>
+        <div class="website-scene website-scene-drakelands"></div>
+        <div class="website-scene website-scene-thornpeak"></div>
+      </div>
       <!-- Looping cinematic background video; poster = static key-art for instant paint + fallback. -->
-      <!-- Same backdrop as the landing-page hero (index.html). The poster paints
-           instantly; the looping trailer is NOT eagerly fetched (no autoplay, no
-           preload, no <source>): main.ts attaches the source and plays only on
-           capable devices (see applyLandingBackdrop). Phones, Save-Data, reduced
-           motion, and high contrast keep the poster only. -->
+      <!-- The poster (static key-art) paints instantly. The 5.7 MB looping trailer
+           is NOT eagerly fetched: no autoplay/preload/source here, main.ts attaches
+           the source and plays only on capable devices (see applyLandingBackdrop).
+           Phones / Save-Data / reduced-motion / high-contrast keep the poster only. -->
       <video id="bg-home" class="bg-trailer bg-home" loop muted playsinline preload="none" poster="/home-bg.png" aria-hidden="true" data-trailer-src="/home-bg.mp4"></video>
+      <div class="website-cinematic-atmosphere"></div>
       <div class="bg-trailer-scrim"></div>
       <div class="portal-ring"></div>
       <div class="portal-ring-reverse"></div>
@@ -727,6 +763,7 @@
       <div class="header-logo-container">
         <button type="button" class="header-logo-btn" id="header-logo-btn" data-i18n-aria="a11y.goHome" data-i18n-title="a11y.goHome" aria-label="Go to homepage" title="Go to homepage">
           <img class="header-logo" src="/icon-192.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+          <span class="website-wordmark" data-i18n="guide.brand">World of ClaudeCraft</span>
         </button>
       </div>
       
@@ -740,23 +777,33 @@
         <nav data-i18n-aria="a11y.mainNavigation" aria-label="Main navigation" class="homepage-nav">
           <ul class="nav-list" role="list">
             <li class="nav-item">
-              <button type="button" class="nav-link active" id="nav-btn-play" aria-selected="true" aria-pressed="true" data-i18n="nav.play">Play</button>
+              <button type="button" class="nav-link active" id="nav-btn-play" aria-pressed="true" data-i18n="nav.play">Play</button>
             </li>
             <li class="nav-item">
-              <button type="button" class="nav-link" id="nav-btn-highscores" aria-selected="false" aria-pressed="false" data-i18n="nav.highscores">High Scores</button>
+              <button type="button" class="nav-link" id="nav-btn-highscores" aria-pressed="false" data-i18n="nav.highscores">High Scores</button>
             </li>
             <li class="nav-item">
-              <button type="button" class="nav-link" id="nav-btn-wiki" aria-selected="false" aria-pressed="false" data-i18n="nav.wiki">Wiki</button>
+              <button type="button" class="nav-link" id="nav-btn-wiki" aria-pressed="false" data-i18n="nav.wiki">Wiki</button>
             </li>
             <li class="nav-item">
-              <button type="button" class="nav-link" id="nav-btn-news" aria-selected="false" aria-pressed="false" data-i18n="nav.news">News</button>
+              <button type="button" class="nav-link" id="nav-btn-news" aria-pressed="false" data-i18n="nav.news">News</button>
             </li>
             <li class="nav-item">
-              <button type="button" class="nav-link" id="nav-btn-download" aria-selected="false" aria-pressed="false" data-i18n="nav.download">Download</button>
+              <button type="button" class="nav-link" id="nav-btn-download" aria-pressed="false" data-i18n="nav.download">Download</button>
             </li>
             <li class="nav-item">
-              <button type="button" class="nav-link" id="nav-btn-login" aria-selected="false" aria-pressed="false" data-i18n="nav.loginRegister">Login/Register</button>
+              <button type="button" class="nav-link" id="nav-btn-login" aria-pressed="false" data-i18n="nav.loginRegister">Login/Register</button>
             </li>
+              <li class="nav-item website-tools-item">
+                <details class="website-tools">
+                  <summary class="website-tools-toggle" data-i18n="landing.tools">Tools</summary>
+                  <ul class="website-tools-links">
+                    <li><a href="https://records.worldofclaudecraft.com/" target="_blank" rel="noopener noreferrer" data-i18n="landing.records">WoC Records</a></li>
+                    <li><a href="https://scout.worldofclaudecraft.com/" target="_blank" rel="noopener noreferrer" data-i18n="landing.scout">WoC Scout</a></li>
+                    <li><a href="https://parses.worldofclaudecraft.com/" target="_blank" rel="noopener noreferrer" data-i18n="landing.parseService">WoC Parse Service</a></li>
+                  </ul>
+                </details>
+              </li>
           </ul>
         </nav>
 
@@ -789,12 +836,34 @@
 
     <div id="homepage-views-container">
       <section id="hero-view" class="view-section" aria-hidden="false">
-        <h1 class="visually-hidden">World of ClaudeCraft</h1>
-        
-        <!-- Main Logo -->
-        <img class="main-logo" id="title-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+        <h1 class="visually-hidden" data-i18n="guide.brand">World of ClaudeCraft</h1>
+        <div class="website-story">
+          <img class="main-logo" id="title-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+          <p class="website-genre">
+            <span data-i18n="guide.home.eyebrow">Classic-style browser MMO</span>
+          </p>
+          <h2 class="website-headline" data-i18n="landing.headline">Adventure with friends.</h2>
+          <p class="website-intro" data-i18n="guide.home.subtitle">Explore the world, take on quests, and tackle dungeons with friends.</p>
+          <div class="website-community-links">
+          <a class="website-community" href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener noreferrer">
+            <span data-i18n="footer.discordLabel">Join the Discord</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
+          </a>
+          <a class="website-community" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer">
+            <span data-i18n="landing.contribute">Contribute to the game</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
+          </a>
+          </div>
+        </div>
 
-        <div id="mode-select">
+        <div id="mode-select" class="website-entry-card">
+          <div class="website-card-heading">
+            <div class="website-card-eyebrow">
+              <span class="website-card-emblem" aria-hidden="true"><img src="/icon-192.png" alt="" /></span>
+              <span data-i18n="mode.serverOnline">Online</span>
+            </div>
+            <h2 data-i18n="auth.enterRealm">Enter the World</h2>
+          </div>
           <div class="play-console play-console-solo">
             <!-- /play goes straight to the online realm: no Online/Offline selector on
                  this entry (the landing page keeps it). The Play button commits directly
@@ -802,10 +871,17 @@
             <button type="button" class="btn-play" id="btn-play" data-i18n-aria="mode.playAria" aria-label="Play World of ClaudeCraft">
               <span class="btn-play-sheen" aria-hidden="true"></span>
               <span class="btn-play-label" data-i18n="mode.play">Play</span>
+              <span class="website-play-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
+              </span>
             </button>
             <div class="play-online-status">
               <span class="server-dot" data-mode="online" aria-hidden="true"></span>
               <b class="stats-value js-stat-characters">…</b> <span data-i18n="stats.charactersCreated">Characters Created</span>
+            </div>
+            <div class="website-performance">
+              <span class="website-tip-label" data-i18n="mode.tipTitle">TIP:</span>
+              <p class="website-performance-tip"><span data-i18n="mode.tipText">Game running slowly? Try disabling your ad blocker for this site.</span></p>
             </div>
           </div>
 
@@ -816,7 +892,7 @@
 
           <!-- Tip — part of the same play container (divider above). -->
           <div class="play-tip">
-            <p id="performance-tip"><b data-i18n="mode.tipTitle">TIP:</b> <span data-i18n="mode.tipText">For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.</span></p>
+            <p id="performance-tip"><b data-i18n="mode.tipTitle">TIP:</b> <span data-i18n="mode.tipText">Game running slowly? Try disabling your ad blocker for this site.</span></p>
           </div>
         </div>
 
@@ -1039,6 +1115,9 @@
                 <button type="button" class="btn btn-primary" id="btn-charselect-enter" data-i18n="auth.enterWorld">Enter World</button>
                 <button type="button" class="btn btn-secondary" id="btn-charselect-back" data-i18n="auth.back">Back</button>
                 <button type="button" class="btn btn-primary cs-new-btn" id="btn-new-character" data-i18n="auth.newCharacter">New Character</button>
+                <!-- Read-only $WOC Exchange browsing: no character needed, revealed once
+                     src/game/charselect_woc_market_wiring.ts confirms the platform allows it. -->
+                <button type="button" class="btn btn-secondary" id="btn-charselect-woc-market" data-i18n="hudChrome.wocMarket.launcherLabel" hidden>$WOC Exchange</button>
               </div>
             </div>
             <!-- Right: selected character showcase -->
@@ -1068,6 +1147,10 @@
               </div>
               <div id="charselect-reroll-error" class="auth-error" aria-live="polite"></div>
             </div>
+            <!-- Read-only $WOC Exchange browsing, docked where the news panel sits
+                 (src/ui/charselect_woc_market_panel.ts). Painter-built: hidden by
+                 default, replaces the news panel's spot while open. -->
+            <div id="charselect-woc-market" class="cs-news-panel cs-woc-market-panel" role="region" aria-labelledby="charselect-woc-market-title" hidden></div>
           </div>
         </div>
 
@@ -1155,19 +1238,19 @@
               <path fill="currentColor" d="M5 20h14v-2H5v2m14-9h-4V3H9v8H5l7 7l7-7z"/>
             </svg>
           </div>
-          <h2 class="skeleton-title" data-i18n="download.title">Download Desktop Launcher</h2>
-          <p class="skeleton-desc" data-i18n="download.desc">Get the standalone launcher for optimized performance and full-screen play.</p>
+          <h2 class="skeleton-title" data-i18n="download.title">Download the desktop app</h2>
+          <p class="skeleton-desc" data-i18n="download.desc">Play on Windows, macOS, or Linux with the same account and characters.</p>
           <div class="desktop-download-actions">
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.44.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.45.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.44.0-win-x64.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.45.0-win-x64.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
           </div>
@@ -1192,6 +1275,13 @@
 
     <footer class="homepage-footer">
       <div class="footer-bar">
+      <div class="website-footer-brand">
+        <div class="website-footer-lockup">
+          <img src="/icon-192.png" width="52" height="52" alt="" aria-hidden="true" />
+          <span data-i18n="guide.brand">World of ClaudeCraft</span>
+        </div>
+        <p data-i18n="guide.tagline">A classic-style MMO you play free in your browser.</p>
+      </div>
       <div class="footer-left">
       <div class="footer-social-row">
         <a class="social-link steam-wishlist steam-wishlist-social" href="https://store.steampowered.com/app/4897790/World_of_ClaudeCraft/" target="_blank" rel="noopener noreferrer" data-icon="steam" data-i18n-title="hudChrome.steam.wishlistAria" data-i18n-aria="hudChrome.steam.wishlistAria" title="Wishlist on Steam: open the World of ClaudeCraft store page" aria-label="Wishlist on Steam: open the World of ClaudeCraft store page">
@@ -1210,7 +1300,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.44.0</div>
+      <div id="game-version">v0.45.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>

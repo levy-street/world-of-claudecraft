@@ -198,6 +198,7 @@ export function collectPartyInfo(ctx: SimContext): PartyInfo | null {
               group: party.raidGroups.get(mPid) ?? 1,
               absorb: partyFrameAbsorb(e.auras),
               role: partyFrameRole(meta.talentMods.role, meta.cls, e.auras),
+              spec: meta.talentMods.spec ?? meta.talents.spec ?? null,
               // Effective health Rewind could currently restore to this member
               // (combat/rewind.ts); 0 for members with no recent recorded loss.
               rewind: rewindHealAmount(damageTakenWithin(e, ctx.tickCount), e.hp, e.maxHp),

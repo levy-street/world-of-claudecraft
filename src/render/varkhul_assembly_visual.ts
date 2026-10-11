@@ -10,6 +10,7 @@ import {
   VARKHUL_ASSEMBLY_RUNE_COUNT,
   VARKHUL_ASSEMBLY_RUNE_TRACK_RADIUS,
 } from '../sim/varkhul_assembly';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   type VarkhulAssemblyFocusPlan,
   type VarkhulAssemblyRuneVisualMode,
@@ -204,6 +205,8 @@ function buildForge(): {
   const barrier = additive(0xff6b13, 0.54);
   const ring = new THREE.Mesh(floorGeometry(new THREE.RingGeometry(3.15, 3.55, 64), 0.12), barrier);
   ring.name = 'varkhul-assembly-forge-boundary';
+  // Shipped with no order: the band floor, per legacy minus one.
+  ring.renderOrder = floorVfxRenderOrder('encounter', 0);
   group.add(ring);
 
   const segments: THREE.Mesh[] = [];
@@ -249,7 +252,7 @@ function buildPlayerGuideArrow(): THREE.Mesh {
     additive(0xffffff, 0.94),
   );
   arrow.name = 'varkhul-rune-player-guide';
-  arrow.renderOrder = 18;
+  arrow.renderOrder = floorVfxRenderOrder('encounter', 17);
   arrow.visible = false;
   (arrow.material as THREE.MeshBasicMaterial).depthTest = false;
   return arrow;
@@ -265,7 +268,7 @@ function buildRuneFocusHalo(): THREE.Mesh {
     additive(0xffffff, 0.8),
   );
   halo.name = 'varkhul-rune-focus-halo';
-  halo.renderOrder = 14;
+  halo.renderOrder = floorVfxRenderOrder('encounter', 13);
   halo.visible = false;
   return halo;
 }
@@ -290,7 +293,7 @@ function buildRuneGuideBeam(): THREE.Group {
   }
   const effect = new THREE.Mesh(mergeFloorGeometries(geometries), additive(0xffffff, 0.62));
   effect.name = 'varkhul-rune-guide-beam-effect';
-  effect.renderOrder = 15;
+  effect.renderOrder = floorVfxRenderOrder('encounter', 14);
   group.add(effect);
   return group;
 }
@@ -322,7 +325,7 @@ function buildRuneStationTrack(symbol: number): THREE.Mesh {
   material.userData.baseOpacity = 0.24;
   const track = new THREE.Mesh(mergeFloorGeometries(geometries), material);
   track.name = 'varkhul-rune-station-track';
-  track.renderOrder = 4;
+  track.renderOrder = floorVfxRenderOrder('encounter', 3);
   return track;
 }
 
@@ -342,7 +345,7 @@ function buildControlPad(symbol: number, control: 'counterclockwise' | 'clockwis
   const mesh = new THREE.Mesh(geometry, additive(SYMBOL_COLORS[symbol], 0.38));
   mesh.name = `varkhul-rune-control-${control}`;
   mesh.userData.control = control;
-  mesh.renderOrder = 8;
+  mesh.renderOrder = floorVfxRenderOrder('encounter', 7);
   return mesh;
 }
 
@@ -371,7 +374,7 @@ function buildRune(symbol: number): RuneVisual {
     additive(color, 0.96),
   );
   socket.name = 'varkhul-rune-target-socket';
-  socket.renderOrder = 9;
+  socket.renderOrder = floorVfxRenderOrder('encounter', 8);
   const stabilizer = new THREE.Mesh(
     new THREE.CylinderGeometry(0.24, 0.72, 3.2, 18, 1, true).translate(0, 1.6, 0),
     additive(0xffe4a0, 0.25),
@@ -390,7 +393,7 @@ function buildRune(symbol: number): RuneVisual {
     additive(color, 1),
   );
   glyph.name = 'varkhul-rune-moving-glyph';
-  glyph.renderOrder = 10;
+  glyph.renderOrder = floorVfxRenderOrder('encounter', 9);
   const embers = new THREE.InstancedMesh(
     new THREE.IcosahedronGeometry(0.09, 0),
     additive(color, 0.82),
@@ -418,11 +421,11 @@ function buildRune(symbol: number): RuneVisual {
   );
   ownerCrest.name = 'varkhul-rune-owner-crest';
   ownerCrest.position.y = 0.2;
-  ownerCrest.renderOrder = 12;
+  ownerCrest.renderOrder = floorVfxRenderOrder('encounter', 11);
 
   const thread = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.045, 1), additive(color, 0.56));
   thread.name = 'varkhul-rune-thread';
-  thread.renderOrder = 7;
+  thread.renderOrder = floorVfxRenderOrder('encounter', 6);
 
   const focusHalo = buildRuneFocusHalo();
   const guideBeam = buildRuneGuideBeam();

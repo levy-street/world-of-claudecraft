@@ -1,6 +1,7 @@
 // The painter's cast gate (src/render/ability_vfx/painter.ts, castVfxAdmit):
-// while a cast program is still unlinked the painter claims the event and
-// draws nothing, so a first cast never links a program cold on a live frame.
+// while a program of a family the cast draws from is still unlinked the
+// painter claims the event and draws nothing, so a first cast never links a
+// program cold on a live frame.
 // The exceptions are the reads a player ACTS on, which the gate must never
 // hold: the terrain-draped area ring, point-anchored and entity-anchored alike
 // (the blast area the player steps out of, whose pool is not a cast program),
@@ -11,6 +12,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import { AbilityVfx, type AbilityVfxEntityState } from '../src/render/ability_vfx/painter';
+import { CAST_VFX_ENGINE, CAST_VFX_KIT } from '../src/render/cast_vfx_family';
+import { ABILITIES } from '../src/sim/data';
 
 /** An engine that records every method the painter reaches for, in order. */
 function recordingFx(): {
@@ -39,7 +42,7 @@ function recordingFx(): {
   return { fx, touched, calls };
 }
 
-function painterWith(admit: () => boolean, ready: () => boolean = admit) {
+function painterWith(admit: (mask: number) => boolean, ready: (mask: number) => boolean = admit) {
   const { fx, touched, calls } = recordingFx();
   const vfx = {
     projectile: vi.fn(),
@@ -188,18 +191,21 @@ describe('the cast gate', () => {
   });
 
   it('keeps the per-entity held state in sync without drawing while closed', () => {
-    // The per-frame consult is the uncounted read: a counted refusal is a cast.
+    // The per-frame consult is the uncounted read: a counted refusal is a
+    // cast, so the cast bar counts once, on the frame the cast is first seen,
+    // and never again however many frames it is held.
     // This entity wears no hard-CC aura, so the band exception below never
     // applies to it and the closed gate really does draw nothing.
-    const admit = vi.fn(() => false);
+    const admit = vi.fn((_mask: number) => false);
     const { painter, touched } = painterWith(admit, () => false);
-    painter.syncEntity({
-      id: 7,
-      castingAbility: 'frostbolt',
-      castRemaining: 1,
-      castTotal: 2,
-      auras: [{ id: 'frost_armor' }],
-    });
+    for (let frame = 0; frame < 3; frame++)
+      painter.syncEntity({
+        id: 7,
+        castingAbility: 'frostbolt',
+        castRemaining: 1 - frame * 0.1,
+        castTotal: 2,
+        auras: [{ id: 'frost_armor' }],
+      });
     // The exact set, the way the closed-gate cases above assert it: a denylist
     // over `touched` is non-vacuous only because sleepEntity happens to land in
     // it, and would keep passing if the sleep itself disappeared. The sleep is
@@ -207,7 +213,122 @@ describe('the cast gate', () => {
     // cosmetic pools), so it is named, and every other engine call is excluded
     // by the equality rather than by a pattern.
     expect(touched).toEqual(new Set(['sleepEntity']));
-    expect(admit).not.toHaveBeenCalled();
+    expect(admit.mock.calls).toEqual([[CAST_VFX_ENGINE]]);
+  });
+
+  it('asks each cast for its own families: a Warrior cast waits on the kit, a Mage cast never does', () => {
+    const asked: number[] = [];
+    const { painter, touched } = painterWith((mask) => {
+      asked.push(mask);
+      return (mask & ~CAST_VFX_ENGINE) === 0;
+    });
+    expect(
+      painter.handleSpellfx({
+        sourceId: 1,
+        targetId: 2,
+        school: 'physical',
+        fx: 'selfCast',
+        ability: 'shield_slam',
+      }),
+    ).toBe(true);
+    expect(touched.size).toBe(0);
+    expect(painter.handleSpellfx(frostbolt)).toBe(true);
+    expect(touched.size).toBeGreaterThan(0);
+    expect(asked).toEqual([CAST_VFX_ENGINE | CAST_VFX_KIT, CAST_VFX_ENGINE]);
+  });
+});
+
+describe('the Warrior follow-through the renderer routes to the painter', () => {
+  const kitClosed = (mask: number) => (mask & CAST_VFX_KIT) === 0;
+
+  it('claims a control mark and draws nothing while the kit is not ready', () => {
+    const { painter, touched } = painterWith(kitClosed);
+    const sunder = {
+      type: 'aura' as const,
+      targetId: 2,
+      sourceId: 1,
+      name: 'Sunder Armor',
+      gained: true,
+      abilityId: 'sunder_armor',
+      auraKind: 'sunder' as const,
+    };
+    expect(painter.onWarriorControlAura(sunder)).toBe(true);
+    expect(touched).toEqual(new Set());
+    // Any other aura is not the painter's, gate or not.
+    expect(painter.onWarriorControlAura({ ...sunder, abilityId: 'frost_armor' })).toBe(false);
+    // The same mark, kit ready, queues its authored peel.
+    const open = painterWith(() => true);
+    expect(open.painter.onWarriorControlAura(sunder)).toBe(true);
+    expect(open.touched).toEqual(new Set(['queueWarriorControl']));
+  });
+
+  it('claims Bloodletting and suppresses the generic bloom while the kit is not ready', () => {
+    const { painter, touched } = painterWith(kitClosed);
+    const heal = {
+      type: 'heal2' as const,
+      sourceId: 1,
+      targetId: 1,
+      amount: 40,
+      crit: false,
+      ability: 'Bloodthirst',
+      abilityId: 'bloodthirst',
+    };
+    expect(painter.warriorRecovery(heal, 400)).toBe(true);
+    expect(touched).toEqual(new Set());
+    // A heal that is no Warrior recovery reaches the engine's own answer.
+    painter.warriorRecovery({ ...heal, abilityId: 'flash_heal', ability: 'Flash Heal' }, 400);
+    expect(touched).toEqual(new Set(['warriorRecovery']));
+    // The same recovery, kit ready, reaches the engine's bloom.
+    const open = painterWith(() => true);
+    open.painter.warriorRecovery(heal, 400);
+    expect(open.calls.map((call) => call.name)).toEqual(['warriorRecovery']);
+    expect(open.calls[0].args[0]).toBe(heal);
+  });
+});
+
+describe('events that name their cast loosely', () => {
+  const kitClosed = (mask: number) => (mask & CAST_VFX_KIT) === 0;
+
+  it('asks a contact for the families of the ability its name draws, not only its own id', () => {
+    // The draws below the gate resolve the id off the display name, so a
+    // proc id beside a Warrior name must wait on the kit too.
+    const { painter, touched } = painterWith(kitClosed);
+    painter.onDamage({
+      sourceId: 1,
+      targetId: 2,
+      school: 'physical',
+      ability: ABILITIES.shield_slam.name,
+      abilityId: 'no_such_proc_for_the_gate',
+      kind: 'hit',
+      crit: false,
+      amount: 40,
+    });
+    expect(touched).toEqual(new Set());
+    // The same contact, kit ready, draws its authored strike.
+    const open = painterWith(() => true);
+    open.painter.onDamage({
+      sourceId: 1,
+      targetId: 2,
+      school: 'physical',
+      ability: ABILITIES.shield_slam.name,
+      abilityId: 'no_such_proc_for_the_gate',
+      kind: 'hit',
+      crit: false,
+      amount: 40,
+    });
+    expect(open.calls.map((call) => call.name)).toEqual(['sequenceInstant']);
+    expect(open.calls[0].args[0]).toBe('shield_slam');
+  });
+
+  it('decides a point landing that names no caster on its own, with no latch to share', () => {
+    let open = false;
+    const { painter, touched } = painterWith(() => open);
+    const landing = { x: 0, z: 0, school: 'frost', fx: 'nova', ability: 'frost_nova' };
+    expect(painter.handleSpellfxAt(landing)).toBe(true);
+    expect(touched).toEqual(new Set());
+    open = true;
+    expect(painter.handleSpellfxAt(landing)).toBe(true);
+    expect(touched.size).toBeGreaterThan(0);
   });
 });
 

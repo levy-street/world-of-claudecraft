@@ -625,7 +625,7 @@ export class GuildBankTab {
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
       const mark = slot.dormant ? `<span class="gbank-dormant-mark">${svgIcon('lock')}</span>` : '';
-      cell.innerHTML = `${this.deps.itemIcon(item, parts?.quality)}${instanceMark}${lockSeal}<span class="bank-count">${
+      cell.innerHTML = `${this.deps.itemIcon(item, parts?.quality)}${parts?.qualityBadge ?? ''}${instanceMark}${lockSeal}<span class="bank-count">${
         slot.showCount ? esc(t('itemUi.bags.stackCount', { count })) : ''
       }</span>${mark}`;
       this.deps.attachTooltip(cell, () => {
@@ -696,7 +696,7 @@ export class GuildBankTab {
                 ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
                 : 'itemUi.bags.itemAria',
             {
-              item: itemName,
+              item: parts?.ariaName ?? itemName,
               count,
             },
           ),

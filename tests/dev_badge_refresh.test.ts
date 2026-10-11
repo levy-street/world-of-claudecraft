@@ -27,6 +27,7 @@ vi.mock('../server/db', () => ({
 
 import { GameServer } from '../server/game';
 import { resetContributorsCache } from '../server/github_contributors';
+import { setActiveTitle } from '../src/sim/deeds';
 
 interface FakeClient {
   sent: any[];
@@ -153,5 +154,120 @@ describe('GameServer.refreshDevBadge (real DB + contributor-cache resolution)', 
     expect(sent.self.dvt).toBe(3);
     expect(sent.self.dvc).toBe(15);
     expect(sent.self.dgl).toBe('jgyy');
+  });
+
+  // The rung titles are NOT deeds (src/sim/dev_badge_titles.ts): wearability is
+  // the live resolved tier, checked by the one title validator and re-checked on
+  // every refresh.
+  async function joinWith(login: string | null, mergedPrs: number) {
+    dbMock.query.mockImplementation(githubLinksRouter(login));
+    mockMergedPrsFetch(login ?? 'nobody', mergedPrs);
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = server.join(fc.ws, 1, 1, 'Devvy', 'warrior', null);
+    if ('error' in session) throw new Error(session.error);
+    session.blockListLoaded = true;
+    const meta = server.sim.meta(session.pid)!;
+    const e = server.sim.entities.get(session.pid)!;
+    return { server, session, meta, e, fc };
+  }
+
+  it('the title validator offers every rung up to the resolved tier and refuses above it', async () => {
+    const { server, session, meta, e } = await joinWith('jgyy', 15); // Runesmith (rung 3)
+    // Before the tier resolves, no rung title can be picked.
+    setActiveTitle(meta, e, 'dev:tinkerer');
+    expect(e.title ?? null).toBe(null);
+
+    await (server as any).refreshDevBadge(session);
+
+    setActiveTitle(meta, e, 'dev:artificer');
+    expect(e.title).toBe('dev:artificer');
+    expect(meta.activeTitle).toBe('dev:artificer');
+    setActiveTitle(meta, e, 'dev:runesmith');
+    expect(e.title).toBe('dev:runesmith');
+    setActiveTitle(meta, e, 'dev:architect'); // above the tier: silent no-op
+    expect(e.title).toBe('dev:runesmith');
+    setActiveTitle(meta, e, 'dev:not_a_rung');
+    expect(e.title).toBe('dev:runesmith');
+    // Nothing touched the Book of Deeds.
+    expect([...meta.deedsEarned.keys()].some((id) => id.includes('dev'))).toBe(false);
+  });
+
+  it('keeps a restored rung title the resolved tier still reaches', async () => {
+    const { server, session, meta, e } = await joinWith('jgyy', 15);
+    // The join restore takes the persisted id as saved (the tier is unknown yet).
+    setActiveTitle(meta, e, 'dev:artificer', { restore: true });
+    expect(e.title).toBe('dev:artificer');
+
+    await (server as any).refreshDevBadge(session);
+
+    expect(e.title).toBe('dev:artificer');
+    expect(meta.activeTitle).toBe('dev:artificer');
+  });
+
+  it('clears a restored rung title above the resolved tier', async () => {
+    const { server, session, meta, e } = await joinWith('jgyy', 15);
+    setActiveTitle(meta, e, 'dev:worldwright', { restore: true });
+
+    await (server as any).refreshDevBadge(session);
+
+    expect(e.title ?? null).toBe(null);
+    expect(meta.activeTitle).toBe(null);
+  });
+
+  it('clears a worn rung title once the GitHub link is gone, and leaves a deed title alone', async () => {
+    const { server, session, meta, e } = await joinWith(null, 0);
+    setActiveTitle(meta, e, 'dev:tinkerer', { restore: true });
+    await (server as any).refreshDevBadge(session);
+    expect(meta.activeTitle).toBe(null);
+    expect(e.title ?? null).toBe(null);
+
+    // A deed title is never the badge refresh's business.
+    meta.activeTitle = 'prog_veteran';
+    e.title = 'prog_veteran';
+    await (server as any).refreshDevBadge(session);
+    expect(meta.activeTitle).toBe('prog_veteran');
+    expect(e.title).toBe('prog_veteran');
+  });
+
+  it('a cold GitHub outage (no snapshot loaded yet) never clears a worn rung title', async () => {
+    const { server, session, meta, e } = await joinWith('jgyy', 15);
+    vi.restoreAllMocks();
+    vi.spyOn(globalThis, 'fetch' as any).mockResolvedValue({
+      ok: false,
+      status: 503,
+      headers: { get: () => null },
+      json: () => Promise.resolve({}),
+    } as any);
+    setActiveTitle(meta, e, 'dev:runesmith', { restore: true });
+
+    await (server as any).refreshDevBadge(session);
+
+    // The failure reads as 0 merged PRs (the badge hides, as before), but that
+    // is "unknown", not "zero": the worn title survives for the next refresh.
+    expect(e.devTier ?? 0).toBe(0);
+    expect(meta.activeTitle).toBe('dev:runesmith');
+    expect(e.title).toBe('dev:runesmith');
+
+    // Once a real snapshot loads and still says the rung is out of reach, it clears.
+    resetContributorsCache();
+    vi.restoreAllMocks();
+    mockMergedPrsFetch('jgyy', 5); // Artificer only
+    await (server as any).refreshDevBadge(session);
+    expect(meta.activeTitle).toBe(null);
+  });
+
+  it('a cleared rung title reaches the owner over the self wire', async () => {
+    const { server, session, meta, e, fc } = await joinWith(null, 0);
+    setActiveTitle(meta, e, 'dev:runesmith', { restore: true });
+    (server as any).broadcastSnapshots();
+    const before = fc.sent.filter((m) => m.t === 'snap').at(-1);
+    expect(before.self.atitle).toBe('dev:runesmith');
+
+    await (server as any).refreshDevBadge(session);
+    (server as any).broadcastSnapshots();
+
+    const after = fc.sent.filter((m) => m.t === 'snap').at(-1);
+    expect(after.self.atitle).toBe(null);
   });
 });

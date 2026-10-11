@@ -291,7 +291,7 @@ describe('Nythraxis Grave Flame rendering', () => {
     expect(
       renderer.match(/this\.nythraxisMechanicVisuals\?\.update\(dt, this\.reducedMotion\(\)\);/g),
     ).toHaveLength(2);
-    expect(renderer).toContain('new NythraxisMechanicVisuals(this.scene');
+    expect(renderer).toMatch(/new NythraxisMechanicVisuals\(\s*this\.scene/);
     expect(renderer.match(/this\.nythraxisMechanicVisuals\?\.dispose\(\)/g)).toHaveLength(2);
     const facade = readSource('../src/render/nythraxis_mechanic_visuals.ts');
     expect(facade).toContain('this.flames.syncWorld(world)');

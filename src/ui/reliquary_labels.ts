@@ -192,6 +192,7 @@ const ACTIVITY_SOURCE_KEYS: Readonly<Record<string, TranslationKey>> = {
   corpse_harvest: 'hudChrome.reliquary.sourceActivityCorpseHarvest',
   masterwork_craft: 'hudChrome.reliquary.sourceActivityMasterworkCraft',
   rift_first_clear: 'hudChrome.reliquary.sourceActivityRiftFirstClear',
+  buried_hoard: 'hudChrome.reliquary.sourceActivityBuriedHoard',
 };
 
 /** Label key for a page's display-only SECONDARY clear meter, by the

@@ -14,15 +14,24 @@ import {
   NYTHRAXIS_BONE_STORM_CAST_ID,
   NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
   NYTHRAXIS_BONE_STORM_RADIUS,
+  NYTHRAXIS_BONE_STORM_SECONDS,
   nythraxisBoneStormCadence,
 } from '../src/sim/nythraxis_bone_storm';
-import { NYTHRAXIS_DREAD_CURSE_AURA_ID } from '../src/sim/nythraxis_dread_curse';
+import {
+  castNythraxisDreadCurse,
+  NYTHRAXIS_DREAD_CURSE_AURA_ID,
+  nythraxisDreadCurseStacks,
+} from '../src/sim/nythraxis_dread_curse';
 import {
   NYTHRAXIS_CROWN_ENDURES_AURA_ID,
   NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID,
 } from '../src/sim/nythraxis_enrage_clock';
 import { NYTHRAXIS_GRAVEFIRE_CAST_ID } from '../src/sim/nythraxis_gravefire';
 import { NYTHRAXIS_KINGS_WRATH_AURA_ID } from '../src/sim/nythraxis_kings_wrath';
+import {
+  NYTHRAXIS_SOUL_REND_AURA_ID,
+  NYTHRAXIS_SOUL_REND_SETTLE_SECONDS,
+} from '../src/sim/nythraxis_soul_rend';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { DT, type Entity, NYTHRAXIS_BOSS_ID, type SimEvent } from '../src/sim/types';
@@ -203,7 +212,7 @@ describe('Nythraxis Bone Storm', () => {
     expect(charged[0].pid).toBe(st.boneStorm!.chargeTargetId);
   });
 
-  it('opens with a softened slam on arrival (no Gravefire line since v0.42.2) and whirls 10% (heroic 20%) inside 9 yd', () => {
+  it('slams on arrival (no Gravefire line since v0.42.2) and whirls 10% (heroic 20%) inside 9 yd', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, tank, raiders, damageBy } = setup({ difficulty });
       // A storm already running with the tank as its charge, 3 yd away (reached
@@ -223,8 +232,8 @@ describe('Nythraxis Bone Storm', () => {
       const tankHp = tank.hp;
       const outsideHp = raiders[0].hp;
       nythraxis.updateNythraxisEncounter(ctx, boss);
-      // Bone Slam on arrival on everyone in 9 yd. This is the storm's opening
-      // window, so it lands at the softened opening fraction.
+      // Bone Slam on arrival on everyone in 9 yd, at the one fraction every
+      // window of the storm shares (the softer opening slam became the slam).
       const slams = damageBy(NYTHRAXIS_BONE_SLAM_CAST_ID) as { targetId: number; amount: number }[];
       expect(
         slams.map((e) => e.targetId),
@@ -256,12 +265,12 @@ describe('Nythraxis Bone Storm', () => {
     }
   });
 
-  it('softens only the first landed slam of a storm, whichever window lands it', () => {
+  it('lands every slam of a storm at the same fraction, whichever window lands it', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, tank, damageBy } = setup({ difficulty });
       teleport(sim, tank, boss.pos.x + 3, boss.pos.z, boss.pos.y);
       // The second window opens with no slam landed yet (the first charge never
-      // reached anyone): its slam is still the storm's first, so it is softened.
+      // reached anyone): its slam lands at the one fraction every window shares.
       const storm = beginNythraxisBoneStorm(7);
       storm.chargeIndex = 1;
       storm.elapsed = 3;
@@ -278,9 +287,9 @@ describe('Nythraxis Bone Storm', () => {
       expect(slams()[0].amount, difficulty).toBe(
         Math.ceil(tank.maxHp * (difficulty === 'heroic' ? 0.37 : 0.23)),
       );
-      expect(storm.openingSlamSpent, difficulty).toBe(true);
-      // The next landing of the same storm hits for the full fraction (the
-      // tank is topped up so the second slam lands on a living target).
+      // The next landing of the same storm hits for the same fraction: no
+      // slam of a storm is harder than another (the tank is topped up so the
+      // second slam lands on a living target).
       tank.hp = tank.maxHp;
       storm.chargeIndex = 2;
       storm.elapsed = 6;
@@ -289,7 +298,7 @@ describe('Nythraxis Bone Storm', () => {
       nythraxis.updateNythraxisEncounter(ctx, boss);
       expect(slams().length, difficulty).toBe(2);
       expect(slams()[1].amount, difficulty).toBe(
-        Math.ceil(tank.maxHp * (difficulty === 'heroic' ? 0.55 : 0.35)),
+        Math.ceil(tank.maxHp * (difficulty === 'heroic' ? 0.37 : 0.23)),
       );
     }
   });
@@ -436,6 +445,32 @@ describe('Nythraxis Bone Storm', () => {
     expect(st2.boneStormTimer).toBe(3);
   });
 
+  it('strips a live Dread Curse stack the instant the storm begins (issue: unhealable Curse + Bone Storm overlap)', () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      const { sim, ctx, boss, st, tank } = setup({ difficulty });
+      teleport(sim, tank, boss.pos.x + 3, boss.pos.z, boss.pos.y);
+      // Two stacks up, exactly the state a raid is in mid tank-swap when Bone
+      // Storm's cadence lands right behind Dread Curse's.
+      castNythraxisDreadCurse(ctx, boss, tank, difficulty);
+      castNythraxisDreadCurse(ctx, boss, tank, difficulty);
+      tank.hp = tank.maxHp;
+      expect(nythraxisDreadCurseStacks(tank, boss.id), difficulty).toBe(2);
+      st.dreadCurseHolderId = tank.id;
+      st.boneStormTimer = DT / 2;
+      nythraxis.updateNythraxisEncounter(ctx, boss);
+      expect(st.boneStorm, difficulty).not.toBeNull();
+      // The storm already holds new Curse applications; a stack landed just
+      // before it began must not ride along either, or its vuln_source
+      // amplifier would double onto the storm's own whirl/slam damage the
+      // moment the hash-ranked charge reaches the same raider.
+      expect(
+        tank.auras.some((a: { id: string }) => a.id === NYTHRAXIS_DREAD_CURSE_AURA_ID),
+        difficulty,
+      ).toBe(false);
+      expect(st.dreadCurseHolderId, difficulty).toBeNull();
+    }
+  });
+
   it('is dropped by a reset and by the kill', () => {
     const { ctx, boss, st, aura } = setup();
     st.boneStormTimer = DT / 2;
@@ -483,6 +518,107 @@ describe('Nythraxis Bone Storm vs other majors (same-tick admission overlap)', (
         expect(st.boneStorm, `${difficulty} storm`).not.toBeNull();
         expect(st.soulRendMarks, `${difficulty} soul rend`).toHaveLength(0);
       }
+    }
+  });
+});
+
+describe('Nythraxis Bone Storm releases live Soul Rend marks', () => {
+  // Bug report (HC Nythraxis, 2026-09): the storm began while the raid was
+  // stacked for Soul Rend and the whirl plus the opening slam killed the
+  // whole huddle. Soul Rend says stack, Bone Storm says spread; they cannot
+  // both be answered, so the storm's first tick releases every live mark
+  // without resolving it.
+  it('strips the marks and their auras the instant the storm begins, dealing nothing', () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      const { ctx, boss, st, raiders, damageBy } = setup({ difficulty });
+      st.soulRendTimer = DT / 2;
+      nythraxis.updateNythraxisEncounter(ctx, boss);
+      const expectedMarks =
+        difficulty === 'heroic'
+          ? nythraxis.NYTHRAXIS_SOUL_REND_MARKS_HEROIC
+          : nythraxis.NYTHRAXIS_SOUL_REND_MARKS;
+      expect(st.soulRendMarks, `${difficulty} marks armed`).toHaveLength(expectedMarks);
+      const marked = st.soulRendMarks.map((m: { playerId: number }) =>
+        raiders.find((r) => r.id === m.playerId),
+      ) as AnyEntity[];
+      expect(
+        marked.every((p) => p !== undefined),
+        `${difficulty} bearers`,
+      ).toBe(true);
+      for (const p of marked)
+        expect(
+          p.auras.some((a: { id: string }) => a.id === NYTHRAXIS_SOUL_REND_AURA_ID),
+          `${difficulty} aura on`,
+        ).toBe(true);
+      // Marks are live and unstacked (the raid is spread 8 yd apart). The
+      // storm is now due: before the fix the marks survived it and resolved
+      // into the storm.
+      st.boneStormTimer = DT / 2;
+      nythraxis.updateNythraxisEncounter(ctx, boss);
+      expect(st.boneStorm, `${difficulty} storm`).not.toBeNull();
+      expect(st.soulRendMarks, `${difficulty} marks released`).toHaveLength(0);
+      for (const p of marked)
+        expect(
+          p.auras.some((a: { id: string }) => a.id === NYTHRAXIS_SOUL_REND_AURA_ID),
+          `${difficulty} aura off`,
+        ).toBe(false);
+      // Run out what would have been the fuse: the released marks never
+      // detonate (the storm's own whirl and slams are the only damage).
+      tickDriver(ctx, boss, nythraxis.NYTHRAXIS_SOUL_REND_DURATION + 1);
+      expect(damageBy('Soul Rend'), `${difficulty} no detonation`).toHaveLength(0);
+    }
+  });
+
+  it('leaves the Soul Rend cadence alone: the next marks come on their timer after the storm', () => {
+    const { ctx, boss, st } = setup({ difficulty: 'normal' });
+    st.soulRendTimer = DT / 2;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(st.soulRendMarks).toHaveLength(nythraxis.NYTHRAXIS_SOUL_REND_MARKS);
+    st.boneStormTimer = DT / 2;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(st.soulRendMarks).toHaveLength(0);
+    // The cast re-armed the cadence when it marked, the storm freezes it (the
+    // storm owns his body), and the release did not touch it.
+    expect(st.soulRendTimer).toBe(nythraxis.NYTHRAXIS_SOUL_REND_EVERY);
+    // Drive the storm to its end: still no marks, the cadence still frozen.
+    tickDriver(ctx, boss, NYTHRAXIS_BONE_STORM_SECONDS + 1);
+    expect(st.boneStorm).toBeNull();
+    expect(st.soulRendMarks).toHaveLength(0);
+    // Then the cadence runs again and the next marks land on schedule, well
+    // before the next storm (50 s normal) can release them.
+    tickDriver(ctx, boss, nythraxis.NYTHRAXIS_SOUL_REND_EVERY - 1);
+    expect(st.soulRendMarks).toHaveLength(nythraxis.NYTHRAXIS_SOUL_REND_MARKS);
+    expect(st.boneStorm).toBeNull();
+  });
+
+  it('holds the storm off for the settle after a detonation, including one on the storm tick', () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      // Marks armed, then their fuse runs out on the very tick the storm is
+      // due: updateNythraxisSoulRend detonates first (the marks resolve, the
+      // raid is huddled), so the storm must NOT open on that raid.
+      const { ctx, boss, st, damageBy } = setup({ difficulty });
+      st.soulRendTimer = DT / 2;
+      nythraxis.updateNythraxisEncounter(ctx, boss);
+      const marks = st.soulRendMarks as { remaining: number }[];
+      expect(marks.length, `${difficulty} marks`).toBeGreaterThan(0);
+      for (const m of marks) m.remaining = DT;
+      st.boneStormTimer = DT / 2;
+      nythraxis.updateNythraxisEncounter(ctx, boss);
+      expect(damageBy('Soul Rend').length, `${difficulty} detonated`).toBe(marks.length);
+      expect(st.soulRendMarks, `${difficulty} marks gone`).toHaveLength(0);
+      expect(st.boneStorm, `${difficulty} storm held`).toBeNull();
+      // The settle counts its arming tick (the countdown runs after the
+      // resolution in the same tick).
+      expect(st.soulRendSettleTimer, `${difficulty} settle armed`).toBeCloseTo(
+        NYTHRAXIS_SOUL_REND_SETTLE_SECONDS - DT,
+        9,
+      );
+      // The storm stays held for the whole settle (each deferral re-arms the
+      // storm 1 s out), then opens within that second.
+      tickDriver(ctx, boss, NYTHRAXIS_SOUL_REND_SETTLE_SECONDS - 2 * DT);
+      expect(st.boneStorm, `${difficulty} still held`).toBeNull();
+      tickDriver(ctx, boss, 1 + 2 * DT);
+      expect(st.boneStorm, `${difficulty} storm opens after the settle`).not.toBeNull();
     }
   });
 });

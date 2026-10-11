@@ -1,0 +1,337 @@
+{
+  "rows": [
+    {
+      "name": "phone-small",
+      "outcome": "won",
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 340,
+        "height": 724,
+        "right": 350,
+        "bottom": 734
+      },
+      "result": {
+        "x": 53,
+        "y": 362.0625,
+        "width": 254,
+        "height": 184.875,
+        "right": 307,
+        "bottom": 546.9375
+      },
+      "action": {
+        "x": 102.296875,
+        "y": 699.5,
+        "width": 147.390625,
+        "height": 44,
+        "right": 249.6875,
+        "bottom": 743.5
+      },
+      "cell": {
+        "x": 50,
+        "y": 327.5,
+        "width": 40,
+        "height": 40,
+        "right": 90,
+        "bottom": 367.5
+      },
+      "scrollWidth": 338,
+      "clientWidth": 338,
+      "focused": true,
+      "animations": 0,
+      "copy": "Sweet victory\n\nThe enchanted collection is complete.",
+      "actionScrolled": {
+        "y": 672.5,
+        "bottom": 716.5,
+        "toolbar": 749
+      }
+    },
+    {
+      "name": "phone-small",
+      "outcome": "lost",
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 340,
+        "height": 724,
+        "right": 350,
+        "bottom": 734
+      },
+      "result": {
+        "x": 53,
+        "y": 362.0625,
+        "width": 254,
+        "height": 184.875,
+        "right": 307,
+        "bottom": 546.9375
+      },
+      "action": {
+        "x": 101.46875,
+        "y": 699.5,
+        "width": 149.046875,
+        "height": 44,
+        "right": 250.515625,
+        "bottom": 743.5
+      },
+      "cell": {
+        "x": 50,
+        "y": 327.5,
+        "width": 40,
+        "height": 40,
+        "right": 90,
+        "bottom": 367.5
+      },
+      "scrollWidth": 338,
+      "clientWidth": 338,
+      "focused": true,
+      "animations": 0,
+      "copy": "Bitter defeat\n\nYour moves are spent. A fresh collection awaits.",
+      "actionScrolled": {
+        "y": 672.5,
+        "bottom": 716.5,
+        "toolbar": 749
+      }
+    },
+    {
+      "name": "large-ui",
+      "outcome": "won",
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 370,
+        "height": 768,
+        "right": 380,
+        "bottom": 778
+      },
+      "result": {
+        "x": 64.8359375,
+        "y": 447.1875,
+        "width": 260.328125,
+        "height": 257.96875,
+        "right": 325.1640625,
+        "bottom": 705.15625
+      },
+      "action": {
+        "x": 86.640625,
+        "y": 837.125,
+        "width": 205.53125,
+        "height": 61.59375,
+        "right": 292.171875,
+        "bottom": 898.71875
+      },
+      "cell": {
+        "x": 57.03125,
+        "y": 441.203125,
+        "width": 42.65625,
+        "height": 42.65625,
+        "right": 99.6875,
+        "bottom": 483.859375
+      },
+      "scrollWidth": 263,
+      "clientWidth": 263,
+      "focused": true,
+      "animations": 0,
+      "copy": "Sweet victory\n\nThe enchanted collection is complete.",
+      "actionScrolled": {
+        "y": 699.125,
+        "bottom": 760.71875,
+        "toolbar": 793
+      }
+    },
+    {
+      "name": "large-ui",
+      "outcome": "lost",
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 370,
+        "height": 768,
+        "right": 380,
+        "bottom": 778
+      },
+      "result": {
+        "x": 64.8359375,
+        "y": 447.1875,
+        "width": 260.328125,
+        "height": 257.96875,
+        "right": 325.1640625,
+        "bottom": 705.15625
+      },
+      "action": {
+        "x": 85.46875,
+        "y": 837.125,
+        "width": 207.859375,
+        "height": 61.59375,
+        "right": 293.328125,
+        "bottom": 898.71875
+      },
+      "cell": {
+        "x": 57.03125,
+        "y": 441.203125,
+        "width": 42.65625,
+        "height": 42.65625,
+        "right": 99.6875,
+        "bottom": 483.859375
+      },
+      "scrollWidth": 263,
+      "clientWidth": 263,
+      "focused": true,
+      "animations": 0,
+      "copy": "Bitter defeat\n\nYour moves are spent. A fresh collection awaits.",
+      "actionScrolled": {
+        "y": 699.125,
+        "bottom": 760.71875,
+        "toolbar": 793
+      }
+    },
+    {
+      "name": "landscape",
+      "outcome": "won",
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 824,
+        "height": 314,
+        "right": 834,
+        "bottom": 324
+      },
+      "result": {
+        "x": 252,
+        "y": 68.859375,
+        "width": 340,
+        "height": 163.28125,
+        "right": 592,
+        "bottom": 232.140625
+      },
+      "action": {
+        "x": 344.296875,
+        "y": 455.5,
+        "width": 147.390625,
+        "height": 44,
+        "right": 491.6875,
+        "bottom": 499.5
+      },
+      "cell": {
+        "x": 232,
+        "y": -36.5,
+        "width": 60,
+        "height": 60,
+        "right": 292,
+        "bottom": 23.5
+      },
+      "scrollWidth": 822,
+      "clientWidth": 822,
+      "focused": true,
+      "animations": 0,
+      "copy": "Sweet victory\n\nThe enchanted collection is complete.",
+      "actionScrolled": {
+        "y": 262.5,
+        "bottom": 306.5,
+        "toolbar": 339
+      }
+    },
+    {
+      "name": "landscape",
+      "outcome": "lost",
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 824,
+        "height": 314,
+        "right": 834,
+        "bottom": 324
+      },
+      "result": {
+        "x": 252,
+        "y": 94.859375,
+        "width": 340,
+        "height": 163.28125,
+        "right": 592,
+        "bottom": 258.140625
+      },
+      "action": {
+        "x": 343.46875,
+        "y": 481.5,
+        "width": 149.046875,
+        "height": 44,
+        "right": 492.515625,
+        "bottom": 525.5
+      },
+      "cell": {
+        "x": 232,
+        "y": -10.5,
+        "width": 60,
+        "height": 60,
+        "right": 292,
+        "bottom": 49.5
+      },
+      "scrollWidth": 822,
+      "clientWidth": 822,
+      "focused": true,
+      "animations": 0,
+      "copy": "Bitter defeat\n\nYour moves are spent. A fresh collection awaits.",
+      "actionScrolled": {
+        "y": 262.5,
+        "bottom": 306.5,
+        "toolbar": 339
+      }
+    },
+    {
+      "mode": "system",
+      "outcome": "won",
+      "effects": 0,
+      "animations": 0,
+      "visible": true,
+      "action": "Continue"
+    },
+    {
+      "mode": "system",
+      "outcome": "lost",
+      "effects": 0,
+      "animations": 0,
+      "visible": true,
+      "action": "Try again"
+    },
+    {
+      "mode": "setting",
+      "outcome": "won",
+      "effects": 0,
+      "animations": 0,
+      "visible": true,
+      "action": "Continue"
+    },
+    {
+      "mode": "setting",
+      "outcome": "lost",
+      "effects": 0,
+      "animations": 0,
+      "visible": true,
+      "action": "Try again"
+    },
+    {
+      "mode": "low",
+      "outcome": "won",
+      "effects": 0,
+      "animations": 0,
+      "visible": true,
+      "action": "Continue"
+    },
+    {
+      "mode": "low",
+      "outcome": "lost",
+      "effects": 0,
+      "animations": 0,
+      "visible": true,
+      "action": "Try again"
+    },
+    {
+      "case": "actual accepted final swap",
+      "state": "completed",
+      "count": 72,
+      "moves": 20,
+      "outcome": "won",
+      "action": "Continue"
+    }
+  ],
+  "errors": []
+}

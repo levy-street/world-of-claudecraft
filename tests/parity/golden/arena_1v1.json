@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1006,
+      "nextId": 1010,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1008,
-      "state": "aae79037",
-      "events": "bb8af97a",
+      "nextId": 1012,
+      "state": "71ed0b42",
+      "events": "34d94ab2",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1008,
-      "state": "8e494a6c",
-      "events": "e3796e7e",
+      "nextId": 1012,
+      "state": "8b1f8569",
+      "events": "582e601c",
       "rng": {
         "draws": 70,
         "digest": "2db3d6b8"
@@ -50,9 +50,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1008,
-      "state": "857fc212",
-      "events": "32c6eb3c",
+      "nextId": 1012,
+      "state": "6679a287",
+      "events": "403dc396",
       "rng": {
         "draws": 292,
         "digest": "c9b87784"
@@ -61,9 +61,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1008,
-      "state": "cc742b35",
-      "events": "cf5d7986",
+      "nextId": 1012,
+      "state": "d8e810c4",
+      "events": "313e7cc4",
       "rng": {
         "draws": 530,
         "digest": "1cb4e884"
@@ -72,9 +72,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1008,
-      "state": "ce16fdaa",
-      "events": "a75de131",
+      "nextId": 1012,
+      "state": "0a860e6b",
+      "events": "7b881f5b",
       "rng": {
         "draws": 781,
         "digest": "bba8277e"
@@ -83,8 +83,8 @@
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 1008,
-      "state": "cff6e36f",
+      "nextId": 1012,
+      "state": "0e9705e0",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -113,7 +113,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -159,14 +161,17 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -202,6 +207,23 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "weeklyRewards": {
+            "bossUnlocks": {},
+            "pvp": 1,
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604805049
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -225,7 +247,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -273,13 +297,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -319,6 +346,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -334,7 +363,7 @@
               "name": "Battle Stance",
               "remaining": 3597.95,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -347,7 +376,7 @@
           "fiveSecondRule": 106.1,
           "healPower": 5,
           "hp": 632,
-          "id": 1006,
+          "id": 1010,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -397,7 +426,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
           "healPower": 34,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",

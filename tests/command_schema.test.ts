@@ -170,14 +170,26 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // realm roster answered by the `who` frame; the chat /who stays as it was).
 // Market Sweep composes on top of it with `market_sweep_quote` and
 // `market_sweep`, both client-sent and server-dispatched.
-// Re-measured on the buddy merge (feature/buddy-companions-v43): the four
-// buddy commands (buddy_toggle, buddy_summon, buddy_cosmetic, buddy_autoloot)
-// each have a client send and a dispatch, so +4 on both axes over the
-// release/v0.44.0 base (225 / 239).
-// The retired buddy_cosmetic token remains dispatchable but is no longer sent.
-// Buddy renaming adds one client-send / server-dispatch pair.
-const EXPECTED_SEND_COUNT = 229;
-const EXPECTED_DISPATCH_COUNT = 244;
+// RE-PINNED at the third release/v0.43.0 merge into feature/world-quests:
+// the release's 225/239 plus the branch's eleven world-quest and vehicle
+// commands, plus world_quest_reroll: 237/251/14. Plus the weekly emissary's
+// pick and commendation (world_quest_weekly_choose, world_quest_weekly_commend):
+// 239/253/14.
+// +1 send / +1 dispatch for the Clue Scrolls tracker abandon
+// (`clue_hunt_abandon`, sent by QuestWorldWireState.abandonClueHunt and
+// routed through the delegated world-quest switch); on the quests
+// integration branch (weekly + clue scrolls together): 240/254/14.
+// +2 send / +2 dispatch for the Weekly Vault (weekly_reward_claim,
+// weekly_reward_open; PR 4052) on the quests integration branch: 242/256/14.
+// World PvP adds pvp_flag to both sets (sent by ClientWorld.setWorldPvpFlag,
+// dispatched beside bg_flag), at the second release/v0.44.0 base merge: 243/257/14.
+// The third release/v0.44.0 base merge adds the market buy orders (three
+// commands) and guild custom ranks (guild_set_ranks): 247/261/14.
+// Plus the buddy companion merge (codex/buddy-companions-restored): four
+// client-send/dispatch pairs (buddy_toggle, buddy_autoloot, buddy_summon,
+// buddy_rename) and the retired dispatch-only buddy_cosmetic: 251/266/15.
+const EXPECTED_SEND_COUNT = 251;
+const EXPECTED_DISPATCH_COUNT = 266;
 const EXPECTED_DISPATCH_ONLY_COUNT = 15;
 
 // The chat sub-channel routing switch (server/game.ts `switch
@@ -208,10 +220,8 @@ function readSource(relPath: string): string {
   return stripComments(readFileSync(join(repoRoot, relPath), 'utf8'));
 }
 
-// Distinct `cmd:'X'` literals ClientWorld sends. Every send funnels through the
-// single private cmd() helper as an object literal, including the handshake send
-// (`challengeResponse`) outside the IWorld-commands block, so a whole-file scan
-// captures the complete send-set. There is no dynamic/computed cmd value.
+// Distinct `cmd:'X'` literals ClientWorld sends. Commands are authored as object
+// literals in online.ts and its wire-state bases; there is no dynamic cmd value.
 function scanSendSet(src: string): Set<string> {
   const tokens = new Set<string>();
   for (const m of src.matchAll(/cmd:\s*'([^']+)'/g)) tokens.add(m[1]);
@@ -260,6 +270,25 @@ function scanDispatchSet(src: string): Set<string> {
   return labels;
 }
 
+// The world-quest-only command family is routed out of dispatchMessage before
+// its switch (`if (questWire.isWorldQuestWireCommand(command)) return void
+// questWire.dispatchWorldQuestWire(...)`), so its `case 'X':` labels live in
+// server/quest_command_wire.ts. Scan that one delegated switch, bounded by the
+// dispatcher's own body, and require the guard in game.ts so the family cannot
+// be counted as dispatched after the route is removed.
+function scanDelegatedWorldQuestDispatchSet(gameSrc: string, wireSrc: string): Set<string> {
+  if (!gameSrc.includes('questWire.dispatchWorldQuestWire(')) {
+    throw new Error('dispatchMessage no longer routes the world-quest wire family');
+  }
+  const start = wireSrc.indexOf('export function dispatchWorldQuestWire(');
+  if (start === -1) throw new Error('dispatchWorldQuestWire not found');
+  const end = wireSrc.indexOf('\n}\n', start);
+  if (end === -1) throw new Error('dispatchWorldQuestWire body end not found');
+  const labels = new Set<string>();
+  for (const m of wireSrc.slice(start, end).matchAll(/\bcase\s+'([^']+)'\s*:/g)) labels.add(m[1]);
+  return labels;
+}
+
 function difference<T>(a: Set<T>, b: Set<T>): Set<T> {
   const out = new Set<T>();
   for (const v of a) if (!b.has(v)) out.add(v);
@@ -267,7 +296,11 @@ function difference<T>(a: Set<T>, b: Set<T>): Set<T> {
 }
 
 const sendSet = scanNetSendSet();
-const dispatchSet = scanDispatchSet(readSource('server/game.ts'));
+const gameSource = readSource('server/game.ts');
+const dispatchSet = new Set([
+  ...scanDispatchSet(gameSource),
+  ...scanDelegatedWorldQuestDispatchSet(gameSource, readSource('server/quest_command_wire.ts')),
+]);
 const tableSet = new Set<CommandName>(COMMAND_NAMES);
 const allowlistSet = new Set<CommandName>(DISPATCH_ONLY_COMMANDS);
 

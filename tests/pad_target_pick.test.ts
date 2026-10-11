@@ -36,7 +36,7 @@ function harness(
     known: player.known ?? [],
     targetEntity,
   };
-  return { pick: createPadTargetPick({ world, interactKey }), targetEntity, interactKey };
+  return { pick: createPadTargetPick({ world, interactKey }), targetEntity, interactKey, world };
 }
 
 // A learned action whose button transforms into a targeted one while an aura is up.
@@ -134,6 +134,31 @@ describe('padTargetPick.autoTarget', () => {
     expect(targetEntity).not.toHaveBeenCalled();
   });
 
+  it('keeps a held ally for a dual-purpose heal instead of turning it on an enemy', () => {
+    // Solar Invocation heals a friend or strikes a foe: with an ally held it is a
+    // heal on that ally, the pad twin of the raid-frame mouseover fix.
+    const { pick, targetEntity } = harness([entity(4, 'player', 2), entity(5, 'mob', 3)], 4);
+    pick.autoTarget({ type: 'ability', id: 'solar_invocation' });
+    expect(targetEntity).not.toHaveBeenCalled();
+  });
+
+  it('still picks an enemy for a dual-purpose heal with no ally held', () => {
+    const empty = harness([entity(5, 'mob', 3)]);
+    empty.pick.autoTarget({ type: 'ability', id: 'solar_invocation' });
+    expect(empty.targetEntity).toHaveBeenCalledWith(5);
+    // A dead ally is not an ally to heal, so it is replaced like any dead selection.
+    const deadAlly = harness([entity(4, 'player', 2, { dead: true }), entity(5, 'mob', 3)], 4);
+    deadAlly.pick.autoTarget({ type: 'ability', id: 'solar_invocation' });
+    expect(deadAlly.targetEntity).toHaveBeenCalledWith(5);
+  });
+
+  it('keeps the old pick for a dual-purpose ability that cannot heal', () => {
+    // Shadeslip steps to either side; nothing about it is a heal on the held ally.
+    const { pick, targetEntity } = harness([entity(4, 'player', 2), entity(5, 'mob', 3)], 4);
+    pick.autoTarget({ type: 'ability', id: 'shadowstep' });
+    expect(targetEntity).toHaveBeenCalledWith(5);
+  });
+
   it('leaves an untargeted ability untargeted', () => {
     const { pick, targetEntity } = harness([entity(5, 'mob', 3)]);
     pick.autoTarget({ type: 'ability', id: 'aura_mastery' });
@@ -168,4 +193,29 @@ describe('padTargetPick.autoTarget', () => {
     pick.autoTarget({ type: 'ability', id: CROSS_HOTBAR_ATTACK_ID });
     expect(targetEntity).not.toHaveBeenCalled();
   });
+});
+
+it('ignores a selected disguise after reveal and talks to a visible guard', () => {
+  const { pick, targetEntity, interactKey, world } = harness(
+    [entity(2146900022, 'npc', 1), entity(2146900021, 'npc', 2)],
+    2146900022,
+  );
+  Object.assign(world, {
+    // A cycle whose story names Orin (2146900022): variant 0 of the rotation.
+    worldQuestCycle: 'wq3_0',
+    worldQuestLog: new Map([
+      [
+        'wq_mirefen_infiltrator',
+        {
+          questId: 'wq_mirefen_infiltrator',
+          state: 'active',
+          count: 0,
+          investigation: { heard: 15, clues: 3, cleared: 0, mobId: 90 },
+        },
+      ],
+    ]),
+  });
+  pick.interact();
+  expect(targetEntity).toHaveBeenCalledWith(2146900021);
+  expect(interactKey).toHaveBeenCalledWith(2146900021);
 });

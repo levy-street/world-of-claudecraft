@@ -646,6 +646,7 @@ export function bestBoostBag(): string {
     // boosted character 4 sockets of materials capacity and a bare 16-slot
     // backpack for their gear, which is the opposite of what the boost is for.
     if (isMaterialsOnlyBag(item)) continue;
+    if (item.unique) continue;
     const slots = item.bagSlots ?? 0;
     const bestSlots = best ? (best.bagSlots ?? 0) : Number.NEGATIVE_INFINITY;
     if (slots > bestSlots || (slots === bestSlots && best !== null && item.id < best.id)) {

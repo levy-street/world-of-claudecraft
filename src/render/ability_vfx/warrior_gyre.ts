@@ -1,0 +1,66 @@
+import type { SeqSlot, SequencerHost } from './sequencer';
+import { warriorGyrePoint } from './warrior_gyre_shape';
+
+const origin = { x: 0, y: 0, z: 0 },
+  point = { x: 0, y: 0, z: 0 };
+/** One paired sweep per cast. Real recipient events separately own every
+ * body imprint, including blocks; follow-through never invents extra hits. */
+export function drawWarriorGyre(host: SequencerHost, slot: SeqSlot, beat: number): boolean {
+  if (slot.abilityId !== 'whirlwind') return false;
+  if (beat !== 0 || slot.physicalSecondary) return true;
+  const at = host.anchorOf(slot.casterId, 0, origin);
+  if (!at) return true;
+  // Retained ribbons belong to this cast, not the reusable anchor scratch.
+  const xAt = at.x,
+    yAt = at.y,
+    zAt = at.z;
+  const angle = host.facingAt?.(slot.casterId) ?? 0,
+    dx = Math.sin(angle),
+    dz = Math.cos(angle);
+  const contactAngle = angle + 0.137 * Math.PI * 2,
+    contactX = Math.sin(contactAngle),
+    contactZ = Math.cos(contactAngle);
+  for (let blade = 0; blade < 2; blade++)
+    host.pathRibbon(
+      0xe8edf0,
+      0.22,
+      0.08,
+      (points) => {
+        for (let i = 0; i < points.length; i++) {
+          warriorGyrePoint(blade, i / (points.length - 1), 0, point);
+          points[i].set(
+            xAt + point.x * contactZ + point.z * contactX,
+            yAt + point.y,
+            zAt - point.x * contactX + point.z * contactZ,
+          );
+        }
+        return points.length;
+      },
+      true,
+      null,
+      false,
+      1,
+    );
+  host.crestAt?.(xAt, yAt, zAt, 1, 1, 0x941d32, 0xe7eff2, 'blood_gyre', angle, 0.4);
+  for (const side of [-1, 1]) {
+    const x = xAt + dz * side * 3.6,
+      z = zAt - dx * side * 3.6,
+      y = host.groundYAt(x, z) + 0.08;
+    host.bakedAt?.('shout_dust', x, y, z, 3.4, 0xb7a494, 0xe1c4ab, 0.38, 0, 0, angle + side * 0.9);
+    if (slot.tier === 0)
+      host.fragmentsAt?.(
+        'metal_splinter',
+        x,
+        y + 0.45,
+        z,
+        0xbca3a5,
+        12,
+        1.2,
+        dx * side,
+        dz * side,
+        0.3,
+      );
+  }
+  host.countPrimitive('whirlwind', slot.tier === 0 ? 7 : 5);
+  return true;
+}

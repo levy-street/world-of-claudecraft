@@ -380,4 +380,32 @@ describe('buildVendorView count multiples (phase 21)', () => {
     expect(view.goods[0].affordable).toBe(true);
     expect(view.goods[1].customBuy).toBeUndefined();
   });
+
+  it('lists faction vendor goods with factionMarks price and checks faction currency affordability', () => {
+    const view = buildVendorView(['rift_feather_glider'], [], ITEMS, {
+      ...RICH,
+      factions: { rift_watch: 500, church_order: 0, automatons: 0 },
+      factionCurrencies: { rift_watch: 10, church_order: 0, automatons: 0 },
+      vendorFactionId: 'rift_watch',
+    });
+    expect(view.goods).toHaveLength(1);
+    expect(view.goods[0].price.copper).toBe(0);
+    expect(view.goods[0].price.honor).toBe(0);
+    expect(view.goods[0].price.factionMarks).toEqual({
+      factionId: 'rift_watch',
+      amount: 40,
+    });
+    expect(view.goods[0].affordable).toBe(false);
+    expect(view.vendorFactionId).toBe('rift_watch');
+    expect(view.factionCurrencyBalance).toBe(10);
+
+    const affordableView = buildVendorView(['rift_feather_glider'], [], ITEMS, {
+      ...RICH,
+      factions: { rift_watch: 500, church_order: 0, automatons: 0 },
+      factionCurrencies: { rift_watch: 50, church_order: 0, automatons: 0 },
+      vendorFactionId: 'rift_watch',
+    });
+    expect(affordableView.goods[0].affordable).toBe(true);
+    expect(affordableView.factionCurrencyBalance).toBe(50);
+  });
 });

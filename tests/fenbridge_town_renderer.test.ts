@@ -3,7 +3,7 @@ import path from 'node:path';
 import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   FENBRIDGE_EXPORTER_PALETTE_SEMANTICS,
   FENBRIDGE_SURFACE_ANISOTROPY,
@@ -37,11 +37,16 @@ import {
 } from '../src/render/fenbridge_town_visibility_core';
 import { GFX, gfxInternalsForTest } from '../src/render/gfx';
 import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
+import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { createRevealGateCore } from '../src/render/reveal_gate_core';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT, localToWorld } from '../src/sim/fenbridge_layout';
 import { terrainHeight } from '../src/sim/world';
+
+// This suite pins the BLENDED camera ghost (the transparent flip and its gate);
+// the dithered arm is pinned by tests/occluder_dither_fade.test.ts.
+beforeEach(() => setDitherFadeEnabledForTest(false));
 
 const ORIGINAL_GFX = {
   standardMaterials: GFX.standardMaterials,

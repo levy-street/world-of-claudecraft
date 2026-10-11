@@ -39,6 +39,7 @@ import { DELVE_SHOPS } from '../src/sim/content/delves';
 import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
 import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { FACTION_VENDOR_NPCS, FACTION_VENDOR_STOCK } from '../src/sim/content/faction_vendors';
 import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_NPC_ID, HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_NPC_ID, CRUCIBLE_VENDOR_STOCK } from '../src/sim/content/ignivar_loot';
@@ -50,6 +51,7 @@ import {
   APEX_ARMOR_RECIPES,
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
+  FACTION_REWARD_RECIPES,
   FARM_RECIPES,
   ROD_RECIPES,
   recipeById,
@@ -111,6 +113,28 @@ const CRUCIBLE_SCROLL_IDS = [
 //                       pattern-free on purpose; 11f's DECISION E is what puts
 //                       a pattern there, so the exception is named rather than
 //                       the sweep being dropped.
+//   the faction REPUTATION channel  the three quartermasters' marks stock
+//                       (content/faction_vendors.ts FACTION_VENDOR_STOCK): the
+//                       release's four faction formulas plus the eight Buried
+//                       Hoards recipes and formulas named below. Not apex
+//                       patterns and not a drop pillar, so each is named here.
+//
+// The Buried Hoards quartermaster recipes and formulas, named at the
+// 2026-09-28 release/v0.44.0 merge into feature/buried-hoards. The five
+// recipes and plans teach the FACTION_REWARD_RECIPES rows (content/recipes.ts)
+// and the three formulas teach learned enchants (acquisition 'drop') the same
+// way the release's four faction formulas do; all eight sell for marks behind
+// a Proven standing gate and never leave the three quartermasters' lists.
+const HOARD_QUARTERMASTER_RECIPE_ITEM_IDS = [
+  'formula_enchant_feet_shadowstride',
+  'formula_enchant_gloves_forged_might',
+  'formula_enchant_offhand_spirit',
+  'pattern_reinforced_armor_kit',
+  'plans_dense_sharpening_stone',
+  'recipe_elixir_of_mana_regeneration',
+  'recipe_potion_of_invisibility',
+  'schematic_clockwork_shock_bomb',
+];
 const FARM_RAID_GROUP = 'nythraxis_farm';
 const FARM_HEROIC_GROUP = FARM_HEROIC_PATTERN_GROUP;
 const SANCTIONED_MOB_LOOT_GROUPS = new Set([RAID_GROUP, FARM_RAID_GROUP]);
@@ -144,6 +168,7 @@ const CRUCIBLE_RAID_CHANNEL_IDS = new Set(
     .flatMap((entry) => (entry.itemId ? [entry.itemId] : [])),
 );
 const CRUCIBLE_VENDOR_CHANNEL_IDS = new Set(CRUCIBLE_VENDOR_STOCK.map((offer) => offer.itemId));
+const QUARTERMASTER_CHANNEL_IDS = new Set<string>(Object.values(FACTION_VENDOR_STOCK).flat());
 
 // The farm set's three surfaces, read live the same way. Each is filtered to
 // PATTERN ids: the raid and rift channels carry seeds too, which are ordinary
@@ -173,7 +198,9 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
     // apex rod's schematic, the first pattern teaching a row outside the
     // three APEX_* tables. 40 since masterwrought Phase 11k, which retired
     // 11i's capstone feast row and minted three apex role feasts in its place.
-    expect(apexDropRecipes).toHaveLength(73);
+    // 78 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (was 73): the five FACTION_REWARD_RECIPES rows the quartermasters teach.
+    expect(apexDropRecipes).toHaveLength(78);
     const gear = apexDropRecipes.filter((r) => APEX_GEAR_RECIPES.includes(r));
     const armor = apexDropRecipes.filter((r) => APEX_ARMOR_RECIPES.includes(r));
     const consumable = apexDropRecipes.filter((r) => APEX_CONSUMABLE_RECIPES.includes(r));
@@ -186,6 +213,10 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
     // how the consumable literal moved.
     const rod = apexDropRecipes.filter((r) => ROD_RECIPES.includes(r));
     const crucible = apexDropRecipes.filter((r) => CRUCIBLE_COLLECTION_RECIPES.includes(r));
+    // A SEVENTH family since the Buried Hoards merge: the quartermaster
+    // recipes, the first drop-acquisition rows taught off the reputation
+    // channel rather than a drop pillar or a marks valve.
+    const faction = apexDropRecipes.filter((r) => FACTION_REWARD_RECIPES.includes(r));
     expect(gear).toHaveLength(10);
     expect(armor).toHaveLength(10);
     // THIRTEEN: the eight phase-11 consumables, 11i's two surviving angler
@@ -194,17 +225,30 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
     expect(farm).toHaveLength(6);
     expect(rod).toHaveLength(1);
     expect(crucible).toHaveLength(33);
-    // No drop recipe outside the five families: one with no assigned channel
+    expect(faction).toHaveLength(5);
+    // No drop recipe outside the families: one with no assigned channel
     // would slip every family loop, so it fails here.
     expect(
-      gear.length + armor.length + consumable.length + farm.length + rod.length + crucible.length,
+      gear.length +
+        armor.length +
+        consumable.length +
+        farm.length +
+        rod.length +
+        crucible.length +
+        faction.length,
     ).toBe(apexDropRecipes.length);
     // And the families are DISJOINT, which a bare sum cannot show: a recipe
     // counted by two filters would balance the equality above while meaning
     // something quite different.
-    const familyIds = [...gear, ...armor, ...consumable, ...farm, ...rod, ...crucible].map(
-      (r) => r.id,
-    );
+    const familyIds = [
+      ...gear,
+      ...armor,
+      ...consumable,
+      ...farm,
+      ...rod,
+      ...crucible,
+      ...faction,
+    ].map((r) => r.id);
     expect(new Set(familyIds).size).toBe(familyIds.length);
   });
 
@@ -216,6 +260,35 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
     // is therefore a SET per family rather than a single name, and the farm
     // rows are still pinned to exactly one DROP pillar apiece.
     for (const recipe of apexDropRecipes) {
+      if (FACTION_REWARD_RECIPES.includes(recipe)) {
+        // The Buried Hoards quartermaster rows: the teaching item is named by
+        // the recipe it teaches, not pattern_<output>, and it must be one of
+        // the eight named items, riding the quartermaster channel ONLY.
+        const teachers = Object.values(ITEMS).filter(
+          (def) => def.kind === 'recipe' && def.teachesRecipeId === recipe.id,
+        );
+        expect(
+          teachers.map((def) => def.id),
+          recipe.id,
+        ).toHaveLength(1);
+        const teacherId = teachers[0].id;
+        expect(HOARD_QUARTERMASTER_RECIPE_ITEM_IDS, recipe.id).toContain(teacherId);
+        const hosts = [
+          RAID_CHANNEL_IDS,
+          FARM_RAID_CHANNEL_IDS,
+          FARM_DUNGEON_CHANNEL_IDS,
+          RIFT_CHANNEL_IDS,
+          FARM_RIFT_CHANNEL_IDS,
+          VENDOR_CHANNEL_IDS,
+          CRUCIBLE_RAID_CHANNEL_IDS,
+          CRUCIBLE_VENDOR_CHANNEL_IDS,
+        ].filter((set) => set.has(teacherId));
+        expect(hosts, `${recipe.id} via ${teacherId} rides no drop pillar`).toEqual([]);
+        expect(QUARTERMASTER_CHANNEL_IDS.has(teacherId), `${recipe.id} via ${teacherId}`).toBe(
+          true,
+        );
+        continue;
+      }
       const isCrucible = CRUCIBLE_COLLECTION_RECIPES.includes(recipe);
       const patternId = `pattern_${isCrucible ? ITEMS[recipe.resultItemId].set : recipe.resultItemId}`;
       const isFarm = FARM_RECIPES.includes(recipe);
@@ -471,17 +544,46 @@ describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourt
   it('no NPC vendorItems list carries a pattern id', () => {
     // The quartermaster's marks stock is NOT a vendorItems list (he carries
     // none); a pattern in any coin vendorItems row would be a fourth channel.
+    // The one sanctioned exception is the faction REPUTATION channel: the four
+    // faction formulas (content/faction_vendors.ts FACTION_VENDOR_STOCK) teach
+    // learned enchants and sell for marks behind a Proven standing gate, the
+    // classic faction-formula shape (docs/design/factions.md). They are not
+    // apex patterns and never leave the three quartermasters' lists. The eight
+    // Buried Hoards quartermaster recipes and formulas join them at the
+    // 2026-09-28 release/v0.44.0 merge into feature/buried-hoards, on the
+    // same terms (HOARD_QUARTERMASTER_RECIPE_ITEM_IDS above).
+    const FACTION_FORMULA_IDS = new Set([
+      'formula_dawnfire_etching',
+      'formula_dawns_benediction',
+      'formula_piston_drive',
+      'formula_riftwalkers_grace',
+      ...HOARD_QUARTERMASTER_RECIPE_ITEM_IDS,
+    ]);
+    const factionQuartermasters = new Set(
+      Object.values(FACTION_VENDOR_NPCS)
+        .filter((npc) => (npc.vendorItems?.length ?? 0) > 0)
+        .map((npc) => npc.id),
+    );
     const vendors = Object.values(NPCS).filter((npc) => (npc.vendorItems?.length ?? 0) > 0);
     expect(vendors.length).toBeGreaterThanOrEqual(17);
     let idsWalked = 0;
+    let formulasWalked = 0;
     const leaks: string[] = [];
     for (const npc of vendors) {
       for (const itemId of npc.vendorItems ?? []) {
         idsWalked++;
+        if (FACTION_FORMULA_IDS.has(itemId)) {
+          expect(factionQuartermasters.has(npc.id), `${itemId} outside a quartermaster`).toBe(true);
+          formulasWalked++;
+          continue;
+        }
         if (isPatternId(itemId)) leaks.push(`NPCS.${npc.id}: ${itemId}`);
       }
     }
     expect(idsWalked).toBeGreaterThanOrEqual(205);
+    // 12 since the Buried Hoards merge: the four faction formulas plus the
+    // eight quartermaster recipes and formulas, one quartermaster each.
+    expect(formulasWalked).toBe(12);
     expect(leaks).toEqual([]);
   });
 
@@ -662,15 +764,32 @@ describe('the phase 02 sweep floor', () => {
     const recipeDefs = Object.values(ITEMS).filter((def) => def.kind === 'recipe');
     // 38 since masterwrought Phase 11i (the angler's endgame block), 40 since
     // Phase 11k (three apex feast recipes in, 11i's capstone feast out).
-    expect(recipeDefs).toHaveLength(52);
-    expect(recipeDefs.filter((def) => !CRUCIBLE_SCROLL_IDS.includes(def.id))).toHaveLength(40);
+    // 56 with the four faction formulas (the reputation channel, see the
+    // vendorItems sweep above); they teach learned enchants like Zeal does.
+    // 64 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards:
+    // the eight quartermaster items (three enchant formulas plus five recipes
+    // teaching the FACTION_REWARD_RECIPES rows).
+    expect(recipeDefs).toHaveLength(64);
+    expect(recipeDefs.filter((def) => !CRUCIBLE_SCROLL_IDS.includes(def.id))).toHaveLength(52);
+    const ENCHANT_FORMULAS: Record<string, string> = {
+      formula_lastflame_zeal: 'enchant_weapon_lastflame_zeal',
+      formula_riftwalkers_grace: 'enchant_weapon_riftwalkers_grace',
+      formula_dawnfire_etching: 'enchant_weapon_dawnfire_etching',
+      formula_dawns_benediction: 'enchant_weapon_dawns_benediction',
+      formula_piston_drive: 'enchant_weapon_piston_drive',
+      // The Buried Hoards quartermaster formulas (learned, acquisition 'drop').
+      formula_enchant_feet_shadowstride: 'enchant_feet_shadowstride',
+      formula_enchant_gloves_forged_might: 'enchant_gloves_forged_might',
+      formula_enchant_offhand_spirit: 'enchant_offhand_spirit',
+    };
     let recipesTaught = 0;
     let enchantsTaught = 0;
     for (const def of recipeDefs) {
       if (def.kind !== 'recipe') continue; // narrow for teachesRecipeId
       if (def.teachesEnchantId !== undefined) {
-        expect(def.id).toBe('formula_lastflame_zeal');
-        expect(def.teachesEnchantId).toBe('enchant_weapon_lastflame_zeal');
+        expect(ENCHANT_FORMULAS[def.id], `${def.id} is a known enchant formula`).toBe(
+          def.teachesEnchantId,
+        );
         expect(ENCHANTS[def.teachesEnchantId]?.acquisition).toBe('drop');
         enchantsTaught++;
         continue;
@@ -682,8 +801,10 @@ describe('the phase 02 sweep floor', () => {
         recipesTaught++;
       }
     }
-    expect(recipesTaught).toBe(73);
-    expect(enchantsTaught).toBe(1);
+    // 78 / 8 since the Buried Hoards merge: five quartermaster recipes and
+    // three quartermaster enchant formulas.
+    expect(recipesTaught).toBe(78);
+    expect(enchantsTaught).toBe(8);
   });
 });
 

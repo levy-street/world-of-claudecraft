@@ -4,10 +4,18 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../src/render/characters', async () => {
   const MockThree = await import('three');
   return {
-    createMountVisual: () => ({
-      root: new MockThree.Group(),
-      dispose: () => {},
-    }),
+    createMountVisual: () => {
+      const root = new MockThree.Group();
+      // Every mock rig carries the sled GLB's two exhaust sockets
+      // (tests/goblin_rocket_sled_fx.test.ts reads them off the shipped file),
+      // so only the mount's visual key decides whether a plume is built.
+      for (const side of ['L', 'R']) {
+        const socket = new MockThree.Object3D();
+        socket.name = `Socket_Exhaust_${side}`;
+        root.add(socket);
+      }
+      return { root, dispose: () => {} };
+    },
   };
 });
 
@@ -22,6 +30,8 @@ vi.mock('../src/render/mount_glow', () => ({
 }));
 
 import type { CharacterVisual } from '../src/render/characters';
+import { linkPiecesOf } from '../src/render/compile_gate_pieces';
+import { goblinRocketSledPlumeMaterials } from '../src/render/goblin_rocket_sled_fx';
 import { attachMountGlows, disposeMountGlows, type MountGlows } from '../src/render/mount_glow';
 import {
   disposeMountView,
@@ -86,6 +96,7 @@ function rig(): { v: MountViewState; rider: THREE.Object3D; chair: THREE.Object3
     mountVisualKey: 'mount_lanternback_troll',
     mountLamps: null,
     mountGlows: null,
+    goblinRocketSledFx: null,
     mountCompilePending: false,
     mountSeatBone: null,
     mountPullerVisual: null,
@@ -260,6 +271,110 @@ describe('mount compile ownership', () => {
     expect(v.mountGlows).toBeNull();
     expect(v.mountVisual).toBeNull();
     expect(v.mountVisualKey).toBe('');
+  });
+});
+
+describe('the rocket sled plume inside the mount gate', () => {
+  const sled = (): MountVisualSpec => {
+    const spec = mountVisualSpecFor('valorsteed', 'goblin_rocket_sled');
+    if (spec?.visualKey !== 'mount_goblin_rocket_sled') throw new Error('the sled skin spec');
+    return spec;
+  };
+
+  /** A gate host that records what the gate lists at the moment it is asked,
+   *  the way linkPieceWork enumerates the root inside compileGate. */
+  function recordingHost() {
+    const listed: THREE.Material[][] = [];
+    const host = {
+      reconcileViewLights: vi.fn(),
+      gateSwapFlagOnCompile: (root: THREE.Object3D, done: () => void): void => {
+        listed.push(
+          linkPiecesOf(root).map(
+            ([representative]) => (representative as THREE.Mesh).material as THREE.Material,
+          ),
+        );
+        done();
+      },
+      recordBuild: vi.fn(),
+    };
+    return { host, listed };
+  }
+
+  function emptyView(): MountViewState {
+    const { v } = rig();
+    v.mountVisual = null;
+    v.mountVisualKey = '';
+    return v;
+  }
+
+  it('lists both shared plume materials among the pieces the gate links', () => {
+    const v = emptyView();
+    const { host, listed } = recordingHost();
+    syncMountVisual(v, sled(), host);
+    expect(v.goblinRocketSledFx).not.toBeNull();
+    const shared = goblinRocketSledPlumeMaterials();
+    expect(listed).toHaveLength(1);
+    expect(listed[0]).toContain(shared.outer);
+    expect(listed[0]).toContain(shared.core);
+    // Held back behind that gate like the rig it hangs off.
+    expect(mountRoot(v).getObjectByName('GoblinRocketPlume_L')?.visible).toBe(false);
+  });
+
+  it('builds no plume for any other catalog mount or skin', () => {
+    const specs: MountVisualSpec[] = [];
+    for (const key of MOUNT_KEYS) {
+      const spec = mountVisualSpec(key);
+      if (spec) specs.push(spec);
+    }
+    for (const id of MOUNT_SKIN_IDS) specs.push(MOUNT_SKIN_VISUAL_SPECS[id]);
+    const others = specs.filter((spec) => spec.visualKey !== 'mount_goblin_rocket_sled');
+    expect(others.length).toBe(specs.length - 1);
+    for (const spec of others) {
+      // The rickshaw composes a second rig from the real characters module,
+      // which this file mocks away; its key is not the sled's either way.
+      if (spec.visualKey === 'mount_rickshaw_mount') continue;
+      const v = emptyView();
+      syncMountVisual(v, spec, recordingHost().host);
+      expect(v.mountVisual, spec.visualKey).not.toBeNull();
+      expect(v.goblinRocketSledFx, spec.visualKey).toBeNull();
+    }
+  });
+
+  it('releases the plume on dismount, swap and view removal, never the shared pair', () => {
+    const shared = goblinRocketSledPlumeMaterials();
+    let materialDisposals = 0;
+    for (const material of [shared.outer, shared.core]) {
+      material.addEventListener('dispose', () => materialDisposals++);
+    }
+    const v = emptyView();
+    const { host, listed } = recordingHost();
+
+    syncMountVisual(v, sled(), host);
+    const firstRoot = mountRoot(v);
+    syncMountVisual(v, null, host);
+    expect(v.goblinRocketSledFx).toBeNull();
+    expect(firstRoot.getObjectByName('GoblinRocketPlume_L')).toBeUndefined();
+
+    syncMountVisual(v, sled(), host);
+    const remounted = v.goblinRocketSledFx;
+    expect(remounted).not.toBeNull();
+    const swappedRoot = mountRoot(v);
+    syncMountVisual(v, horse(), host);
+    expect(v.goblinRocketSledFx).toBeNull();
+    expect(swappedRoot.getObjectByName('GoblinRocketPlume_L')).toBeUndefined();
+
+    syncMountVisual(v, sled(), host);
+    const lastRoot = mountRoot(v);
+    disposeMountView(v);
+    expect(v.goblinRocketSledFx).toBeNull();
+    expect(lastRoot.getObjectByName('GoblinRocketPlume_R')).toBeUndefined();
+
+    // Every sled build listed the same two shared materials.
+    const sledGates = listed.filter((pieces) => pieces.includes(shared.outer));
+    expect(sledGates).toHaveLength(3);
+    for (const pieces of sledGates) expect(pieces).toContain(shared.core);
+    expect(goblinRocketSledPlumeMaterials()).toBe(shared);
+    expect(materialDisposals).toBe(0);
   });
 });
 

@@ -120,9 +120,12 @@ describe('constrained renderer integration', () => {
     expect(source).toContain('this.fixedLowDayBiome = biome;');
     expect(source).toContain(`} else {
       this.fixedLowDayBiome = null;`);
+    // The dome's camera anchor goes through the Buried Hoard seam
+    // (hoard_valley_frame.ts setSkyCamera: the camera outside a valley, the dig
+    // zone's sky point inside one), still on every tier ahead of the LOW gate.
     expect(
       source.match(
-        /this\.skyView\.setCameraPos\(this\.camera\.position\.x, this\.camera\.position\.z, dt\);\n\s+if \(!this\.lowGfx\) \{/g,
+        /hoardValley\.setSkyCamera\(this\.skyView, this\.sim\.riftFloor, this\.camera\.position, dt\);\n\s+if \(!this\.lowGfx\) \{/g,
       ),
     ).toHaveLength(2);
   });

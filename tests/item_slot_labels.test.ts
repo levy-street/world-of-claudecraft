@@ -25,7 +25,9 @@ describe('item_slot_labels: the label table', () => {
     expect(slots).toContain('ring');
     for (const slot of ALL_EQUIP_SLOTS) expect(slots).toContain(slot);
     for (const slot of slots) {
-      expect(ITEM_SLOT_LABEL_KEYS[slot], `key for ${slot}`).toMatch(/^itemUi\.slots\./);
+      expect(ITEM_SLOT_LABEL_KEYS[slot], `key for ${slot}`).toMatch(
+        /^(itemUi\.slots\.|hudChrome\.paperdoll\.trinketSlot$)/,
+      );
       expect(itemSlotLabel(slot).length, `label for ${slot}`).toBeGreaterThan(0);
     }
   });
@@ -41,6 +43,8 @@ describe('item_slot_labels: the label table', () => {
     // selective rather than blanket: a dual-wielded copy is already told apart
     // by its slot label alone.
     expect(itemSlotLabel('mainhand')).not.toBe(itemSlotLabel('offhand'));
+    expect(itemSlotLabel('trinket')).toBe('Trinket');
+    expect(sharedSlotLabelIndex('trinket')).toBeUndefined();
   });
 });
 

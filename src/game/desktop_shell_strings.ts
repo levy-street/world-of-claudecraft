@@ -18,6 +18,12 @@ export function desktopShellStringsPayload(): Record<string, string> {
     crashQuit: t('desktop.crash.quit'),
     fatalTitle: t('desktop.crash.title'),
     fatalBody: t('desktop.crash.fatalBody'),
+    // The host diagnostic's native save dialog (electron/host_diag.cjs). Pushed
+    // with the crash strings at boot, so the labels are already localized by the
+    // time a player reaches the panel that triggers a run.
+    hostDiagSaveTitle: t('desktop.hostDiag.saveTitle'),
+    hostDiagSaveButton: t('desktop.hostDiag.saveButton'),
+    hostDiagFileType: t('desktop.hostDiag.fileType'),
   };
 }
 

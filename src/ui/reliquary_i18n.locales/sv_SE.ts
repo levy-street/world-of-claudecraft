@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Revan',
     desc: 'Utmärkande byte ur den skiftande Revan, från dess kringströvande fasor till de två skatterna i jakten på S-rang.',
   },
+  conquerors_buried_hoards: {
+    name: 'De nedgrävda skatterna',
+    desc: 'Byte från skatterna som skattkartorna leder till, fyra från varje väktare som vaktar en.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Rikets sällsyntheter',
     desc: 'Beviset på varje namngiven sällsynthet som fällts i riket.',
@@ -142,6 +146,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Krigföringens vapenkammare',
     desc: 'Smycken och vapen för Krigföring, köpta för hårt vunnen ära.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Förtruppsgalleri',
+    desc: 'Krigföringens säsong 2-set för varje specialisering och vapen, köpta för ära.',
+  },
   horizons_vault_of_ages: {
     name: 'Tidsåldrarnas valv',
     desc: 'Utgångna skatter från en svunnen tid. Dessa reliker går inte längre att vinna; valvet hedrar de veteraner som behållit dem.',
@@ -156,7 +164,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroisk: Degeln vid Sistakällan',
-    desc: 'Vapen enbart från heroiskt läge, från Ignivar, den sista lågans härold.',
+    desc: 'Vapen enbart från heroiskt läge samt raidens trinkets, från Ignivar, den sista lågans härold.',
   },
   conquerors_varkhul: {
     name: 'Den inre Smältdegeln',
@@ -164,7 +172,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroisk: Den inre Smältdegeln',
-    desc: 'Sköldar och vapen enbart från heroiskt läge, från Varkhul, den sista lågans smedjefader.',
+    desc: 'Sköldar och vapen enbart från heroiskt läge samt raidens trinkets, från Varkhul, den sista lågans smedjefader.',
   },
   conquerors_set_bramblehide: {
     name: "Roots' Törnehud",

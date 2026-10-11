@@ -18,6 +18,7 @@
 
 import { sanitizeItemInstancePayloadOnLoad } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
+import { cloneLootQuality } from './loot_quality/types';
 import { isMaterialItemId, materialItemIds } from './material_ids';
 import { countMaterialInventoryForHub } from './material_inventory_hub';
 import { applyMaterialInventoryTake, planMaterialInventoryTake } from './material_inventory_take';
@@ -73,6 +74,12 @@ export function publicInstanceView(instance: ItemInstancePayload): ItemInstanceP
   }
   if (instance.name !== undefined) pub.name = instance.name;
   if (instance.perfected === true) pub.perfected = instance.perfected;
+  // Guard on the validated clone, not the source: a present-but-malformed
+  // descriptor must not materialize `lootQuality: undefined` as an own key,
+  // since itemInstancePayloadsEqual compares every present key and the
+  // projection would stop matching its escrowed twin.
+  const lootQuality = cloneLootQuality(instance.lootQuality);
+  if (lootQuality) pub.lootQuality = lootQuality;
   if (instance.rift !== undefined) {
     pub.rift = {
       ...instance.rift,
@@ -221,21 +228,20 @@ export function grantCopies(
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
   materialSources?: MaterialComposition,
+  worldSourced = false,
 ): void {
-  // movement: every pipe that shares this grant hands over copies that already
-  // existed in somebody's hands (a market purchase, a cancelled or collected
-  // listing coming home, a mail attachment), so none of them is a world-sourced
-  // acquisition for the Reliquary tally. Discovery still fires as it always has.
+  // Market, trade, and ordinary mail move held copies. A vault reward letter
+  // carries fresh world loot, so its Reliquary obtain tally must advance.
   if (instance)
     ctx.addItemInstance(itemId, cloneItemInstancePayload(instance), pid, count, {
       craftedRecipeId,
-      movement: true,
+      movement: !worldSourced,
       ...(materialSources === undefined ? {} : { materialSources }),
     });
   else
     ctx.addItem(itemId, count, pid, {
       craftedRecipeId,
-      movement: true,
+      movement: !worldSourced,
       ...(materialSources === undefined ? {} : { materialSources }),
     });
 }

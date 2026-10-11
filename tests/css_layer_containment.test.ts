@@ -98,6 +98,18 @@ const LAYERED_MODULES: { file: string; layer: string }[] = [
 ];
 
 describe('src/styles layer containment', () => {
+  it('keeps weekly puzzle boards inside the component layer so touch overrides can win', () => {
+    const css = read('src/styles/components.css');
+    const marker = '/* ---------- world quest: weekly minigames ---------- */';
+    expect(css).toContain(marker);
+    const firstLine = css.slice(0, css.indexOf(marker)).split('\n').length;
+    const violations = unlayeredTopLevelOpeners(css, 'components').filter((entry) => {
+      const line = Number(/^line (\d+):/.exec(entry)?.[1]);
+      return line >= firstLine;
+    });
+    expect(violations).toEqual([]);
+  });
+
   it.each(LAYERED_MODULES)(
     'every top-level rule in $file sits inside @layer $layer',
     ({ file, layer }) => {

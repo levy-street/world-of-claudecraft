@@ -21,7 +21,7 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   // hudChrome.statInfo.* overrides.
   'seo.title': 'World of ClaudeCraft: MMO Web de style classique',
   'seo.description':
-    'Lancez-vous dans une aventure épique dans World of ClaudeCraft, un micro-MMO de style classique jouable directement dans votre navigateur. Rejoignez un monde partagé et persistant, faites monter vos classes en niveau et terrassez vos ennemis.',
+    'Jouez à World of ClaudeCraft, un MMO gratuit sur navigateur. Explorez, accomplissez des quêtes et parcourez des donjons entre amis. Aucun téléchargement nécessaire.',
   'seo.operatingSystem': 'Navigateur Web',
   'a11y.toggleMenu': 'Ouvrir ou fermer le menu',
   'loading.assetsFailed': 'Le chargement des ressources a échoué: rechargez la page. {error}',

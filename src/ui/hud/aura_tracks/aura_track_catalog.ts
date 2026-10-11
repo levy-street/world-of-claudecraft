@@ -84,14 +84,18 @@ export const AURA_TRACK_DURATION_CEILING_SEC = 60;
  *  shortest defensive cooldown is 60s and the longest rotational one is 45s. */
 export const DEFENSIVE_COOLDOWN_SEC = 60;
 
-// Aura kinds that read as protection rather than healing or output. buff_armor
-// and buff_dodge only qualify at a short duration, which the ceiling handles:
-// the 1800s Aspects and armor buffs never reach this table.
+// Aura kinds that read as protection rather than healing or output. The armor
+// and dodge kinds only qualify at a short duration, which the ceiling handles:
+// the 1800s Aspects and armor buffs never reach this table. buff_armor_pct is
+// here for the same reason buff_armor is: Oakhide became a percentage in v0.43
+// (content/classes.ts) and would otherwise have dropped out of the tracker
+// entirely, which is exactly what tests/aura_track_catalog.test.ts caught.
 const GUARD_KINDS: ReadonlySet<string> = new Set([
   'buff_dr',
   'buff_dr_phys',
   'shield_wall',
   'buff_armor',
+  'buff_armor_pct',
   'buff_dodge',
   'buff_block',
   // Total immunity (Cold Coffin, the mage's Ice Block). Its own kind because it

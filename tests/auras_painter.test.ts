@@ -958,15 +958,92 @@ describe('AurasPainter: a toggle aura suppresses the tooltip countdown', () => {
   });
 
   it('the HOST builds the seconds line ONLY on the non-toggle arm', () => {
-    // The painter threads the flag through (above); this pins that hud.ts actually
-    // branches on it, so the two halves cannot drift into a tooltip that renders
-    // "720 seconds remaining" under an aura whose label deliberately shows nothing.
-    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-    const start = hud.indexOf('renderTooltip: (name, remaining, effectHtml, toggle) =>');
+    // The painter threads the flag through (above) into aura_tooltip.ts's
+    // auraTooltipFooterHtml (hud.ts wires it in via aurasPainterDeps.renderTooltip);
+    // this pins that the footer composer actually branches on it, so the two
+    // halves cannot drift into a tooltip that renders "720 seconds remaining"
+    // under an aura whose label deliberately shows nothing.
+    const src = readFileSync(new URL('../src/ui/aura_tooltip.ts', import.meta.url), 'utf8');
+    const start = src.indexOf('export function auraTooltipFooterHtml');
     expect(start).toBeGreaterThan(-1);
-    const dep = hud.slice(start, hud.indexOf('attachTooltip:', start));
-    expect(dep).toContain('toggle');
-    expect(dep).toContain("? ''");
-    expect(dep).toContain("tPlural('hudChrome.plurals.secondsRemaining'");
+    const body = src.slice(start, src.indexOf('\n}', start));
+    expect(body).toContain('toggle');
+    expect(body).toContain("? ''");
+    expect(body).toContain('secondsRemainingText(remaining)');
+    // hud.ts supplies the localized text (esc + tPlural) through that dep, never
+    // hardcoding its own copy of the countdown line.
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    expect(hud).toContain("tPlural('hudChrome.plurals.secondsRemaining'");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Feature: "See who buffs" (player thread) - the aura's caster id threads into
+// the tooltip so a raid can tell apart several casters of the same buff (two
+// paladins' Blessings, two druids' Briarguards) without opening the separate
+// detailed target-aura panel.
+// ---------------------------------------------------------------------------
+describe('AurasPainter: the aura sourceId threads into renderTooltip', () => {
+  it('passes the LIVE sourceId to renderTooltip, and re-reads it on recycle', () => {
+    const container = fakeEl('div');
+    const facet = recordingFacet();
+    const tooltips = recordingTooltips();
+    const seen: Array<{ name: string; sourceId: number | undefined }> = [];
+    const deps: AurasPainterDeps = {
+      resolveIconUrl: (key) => `url(${key})`,
+      renderTooltip: (name, _remaining, _effectHtml, _toggle, sourceId) => {
+        seen.push({ name, sourceId });
+        return sourceId === undefined ? name : `${name}|src:${sourceId}`;
+      },
+      attachTooltip: tooltips.attachTooltip,
+      attachCancel: () => {},
+    };
+    const painter = new AurasPainter(
+      facet.writers,
+      container as unknown as HTMLElement,
+      deps,
+      fakeDoc,
+    );
+
+    painter.paint(
+      state([
+        slot({ key: 'blessing_of_might', name: 'Blessing of Might', remaining: 30, sourceId: 7 }),
+        slot({ key: 'thorns', name: 'Thorns', remaining: 60 }), // no caster carried
+      ]),
+    );
+    const html = tooltips.attached.map((a) => a.html());
+    expect(html[0]).toBe('Blessing of Might|src:7');
+    expect(html[1]).toBe('Thorns');
+    expect(seen.map((s) => s.sourceId)).toEqual([7, undefined]);
+
+    // The pooled node is recycled to an aura from a DIFFERENT caster: the closure
+    // must re-read the live record, never keep the previous aura's caster (the
+    // same stale-capture hazard the toggle flag guards against above).
+    painter.paint(state([]));
+    painter.paint(
+      state([slot({ key: 'briarguard', name: 'Briarguard', remaining: 45, sourceId: 9 })]),
+    );
+    expect(tooltips.attached.map((a) => a.html())).toContain('Briarguard|src:9');
+  });
+
+  it('the HOST resolves the caster line ONLY when the player opted in, via the shared target-aura resolver', () => {
+    // Pins that hud.ts's auraTooltipFooterDeps actually gates the "Cast by" line
+    // on the showAuraCaster setting and reuses targetAuraSourceName (the same
+    // resolver the detailed target-aura window uses), so the two surfaces can
+    // never disagree on how a caster is named or blanked.
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const start = hud.indexOf('auraTooltipFooterDeps: AuraTooltipFooterDeps');
+    expect(start).toBeGreaterThan(-1);
+    const body = hud.slice(start, hud.indexOf('\n  };', start));
+    expect(body).toContain("this.boolSetting('showAuraCaster')");
+    expect(body).toContain('targetAuraSourceName(');
+    expect(body).toContain("t('hudChrome.auraTooltip.caster'");
+    // aura_tooltip.ts is what actually withholds the line: the resolved caster
+    // name is falsy ('') unless showCaster() says so.
+    const src = readFileSync(new URL('../src/ui/aura_tooltip.ts', import.meta.url), 'utf8');
+    const fnStart = src.indexOf('export function auraTooltipFooterHtml');
+    expect(fnStart).toBeGreaterThan(-1);
+    const fnBody = src.slice(fnStart, src.indexOf('\n}', fnStart));
+    expect(fnBody).toContain('deps.showCaster()');
   });
 });

@@ -244,12 +244,15 @@ describe('mobile window coverage (Phase 5 parity)', () => {
       // carries the four-edge body.mobile-touch pin in hud.mobile.css.
       'hud/professions/perfecting_window.ts',
       'hud/professions/profession_tutorial_window.ts',
+      // The Buried Hoard treasure map parchment (a phone sheet in hud.mobile.css).
+      'hud/treasure/treasure_map_window.ts',
       'hud.ts',
       // The extracted input modal (the other half of the shared
       // #confirm-dialog id; the exception row below covers the id).
       'input_controller.ts',
       'keyboard_map_window.ts',
       'tutorial_greeting_window.ts',
+      'world_quest_puzzle_window.ts',
     ]);
     expect([...dyn.ids].sort()).toEqual([
       'confirm-dialog',
@@ -257,7 +260,9 @@ describe('mobile window coverage (Phase 5 parity)', () => {
       'keyboard-map-window',
       'perfecting-window',
       'profession-tutorial',
+      'treasure-map-window',
       'tutorial-greeting',
+      'world-quest-puzzle-window',
     ]);
   });
 

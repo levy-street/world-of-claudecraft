@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/hoard_entrance/hoard_entrance-final.glb",
+      "out": "models/props/hoard_entrance.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

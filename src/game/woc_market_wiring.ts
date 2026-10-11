@@ -100,18 +100,28 @@ export function wocMarketBrowserHandoffAllowed(shell: WocMarketShell): boolean {
   return shell.desktopApp && !shell.nativeApp;
 }
 
+/** The live shell probe (NATIVE_APP/DESKTOP_APP plus the real desktop and
+ *  Solana Mobile bridges), factored out so a second caller (the
+ *  character-select read-only panel, charselect_woc_market_wiring.ts) can
+ *  gate on the SAME platform verdict as the real Exchange without
+ *  re-deriving it. Evaluated fresh per call, matching the old inline default
+ *  parameter this replaced. */
+export function defaultWocMarketShell(): WocMarketShell {
+  return {
+    nativeApp: NATIVE_APP,
+    desktopApp: DESKTOP_APP,
+    bridge: desktopBridge(),
+    mobileBridge: NATIVE_APP ? nativeSolanaMobileBridge : null,
+  };
+}
+
 /** Attach the $WOC Exchange hooks on browser web, verified Seeker Solana-store
  *  Android, and website-distributed desktop; reveal the browser-hand-off
  *  launcher on a denied wrapped desktop shell. Resolves to whether the real
  *  Exchange attached. */
 export async function attachWocMarketExchange(
   deps: WocMarketWiringDeps,
-  shell: WocMarketShell = {
-    nativeApp: NATIVE_APP,
-    desktopApp: DESKTOP_APP,
-    bridge: desktopBridge(),
-    mobileBridge: NATIVE_APP ? nativeSolanaMobileBridge : null,
-  },
+  shell: WocMarketShell = defaultWocMarketShell(),
 ): Promise<boolean> {
   if (!(await wocMarketAttachAllowed(shell))) {
     if (wocMarketBrowserHandoffAllowed(shell)) deps.hud.attachWocMarketBrowserOnlyNotice?.();

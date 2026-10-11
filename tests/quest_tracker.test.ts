@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { questTrackerView, type TrackedQuest } from '../src/ui/hud/quest/quest_tracker';
+import {
+  questTrackerSectionOf,
+  questTrackerSections,
+  questTrackerView,
+  type TrackedQuest,
+} from '../src/ui/hud/quest/quest_tracker';
 
 // Titles/labels are already resolved before the tracker receives them.
 const QUESTS: TrackedQuest[] = [
@@ -121,5 +126,57 @@ describe('questTrackerView', () => {
     // returned shared references would be a bug; assert the copy is distinct.
     expect(v.quests[0]).not.toBe(input[0]);
     expect(v.quests[0].objectives[0]).not.toBe(input[0].objectives[0]);
+  });
+});
+
+describe('questTrackerSections', () => {
+  const WORLD_QUEST: TrackedQuest = {
+    id: 'wq_bandits',
+    number: 3,
+    title: 'Bandit Trouble',
+    complete: false,
+    worldQuest: true,
+    objectives: [{ label: 'Bandits defeated', current: 2, total: 10 }],
+  };
+
+  it('splits a world quest and a normal quest into their own sections, Quests first', () => {
+    const sections = questTrackerSections([WORLD_QUEST, QUESTS[0]], () => false);
+    expect(sections.map((s) => s.section)).toEqual(['quests', 'worldQuests']);
+    expect(sections[0].quests.map((q) => q.id)).toEqual(['wolves']);
+    expect(sections[0].count).toBe(1);
+    expect(sections[1].quests.map((q) => q.id)).toEqual(['wq_bandits']);
+    expect(sections[1].count).toBe(1);
+    expect(sections[1].quests[0].objectives[0]).toMatchObject({
+      current: 2,
+      total: 10,
+      done: false,
+      counted: true,
+    });
+  });
+
+  it('keeps arrival order inside a section and leaves an empty section out', () => {
+    const only = questTrackerSections(QUESTS, () => false);
+    expect(only.map((s) => s.section)).toEqual(['quests']);
+    expect(only[0].quests.map((q) => q.id)).toEqual(['wolves', 'webwood']);
+    const wqOnly = questTrackerSections([WORLD_QUEST], () => false);
+    expect(wqOnly.map((s) => s.section)).toEqual(['worldQuests']);
+    expect(questTrackerSections([], () => false)).toEqual([]);
+  });
+
+  it('collapses each section independently while keeping its count', () => {
+    const sections = questTrackerSections(
+      [...QUESTS, WORLD_QUEST],
+      (section) => section === 'worldQuests',
+    );
+    expect(sections[0]).toMatchObject({ section: 'quests', collapsed: false, count: 2 });
+    expect(sections[0].quests).toHaveLength(2);
+    expect(sections[1]).toMatchObject({ section: 'worldQuests', collapsed: true, count: 1 });
+    expect(sections[1].quests).toEqual([]);
+  });
+
+  it('maps a header section attribute back to its section', () => {
+    expect(questTrackerSectionOf('worldQuests')).toBe('worldQuests');
+    expect(questTrackerSectionOf(undefined)).toBe('quests');
+    expect(questTrackerSectionOf('bogus')).toBe('quests');
   });
 });

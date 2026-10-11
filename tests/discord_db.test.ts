@@ -159,6 +159,29 @@ describe('linkDiscordToAccount', () => {
       'discord_joined_at = CASE WHEN discord_links.discord_user_id = EXCLUDED.discord_user_id THEN discord_links.discord_joined_at ELSE NULL END',
     );
   });
+
+  it('can atomically refuse an account repoint for same-Discord refresh flows', async () => {
+    const { pool, calls } = makePool((s) => {
+      if (s.includes('SELECT account_id FROM discord_links WHERE discord_user_id')) return NONE;
+      if (s.includes('INSERT INTO discord_links')) return { rows: [], rowCount: 0 };
+      return NONE;
+    });
+    const ok = await linkDiscordToAccount(
+      pool,
+      1,
+      {
+        discordUserId: '80351110224678912',
+        username: 'maxp',
+        avatar: null,
+        email: null,
+        guildMember: true,
+      },
+      { allowRepoint: false },
+    );
+    expect(ok).toBe(false);
+    const insert = calls.find((c) => c.sql.includes('INSERT INTO discord_links'));
+    expect(insert!.sql).toContain('WHERE discord_links.discord_user_id = EXCLUDED.discord_user_id');
+  });
 });
 
 describe('discordIdsWithGuildFlair', () => {
@@ -1205,6 +1228,7 @@ describe('/api/discord status cache busts ride the real write paths (Phase 9)', 
     };
     const ok = makePool((s) => {
       if (s.includes('SELECT account_id FROM discord_links WHERE discord_user_id')) return NONE;
+      if (s.includes('INSERT INTO discord_links')) return { rows: [], rowCount: 1 };
       return NONE;
     });
     await warm(42);

@@ -569,8 +569,8 @@ describe('Thornhollow structures join the occluder-fade family', () => {
 
   it('consumes the shared fade core and routes reduced motion, and the renderer drives it', () => {
     const placements = readFileSync(`${ROOT}src/render/battleground_placements.ts`, 'utf8');
-    // The same three-part consumption every sibling family uses: the pure step
-    // policy, the settle test, and the segment/box hit test.
+    // The same consumption every sibling family uses: the settle test and the
+    // segment/box hit test from the core, the step through the ghost pool.
     expect(placements).toContain("from './occluder_fade_core'");
     expect(placements).toContain('occluderSegmentHitsBox(');
     expect(placements).toContain('occluderFadeSettled(');
@@ -579,7 +579,7 @@ describe('Thornhollow structures join the occluder-fade family', () => {
     expect(placements).toContain('InstancedOccluderGhosts');
     // Reduced motion has to reach the step, exactly as
     // graphics_overhaul_integration pins for the other consumers.
-    expect(placements).toMatch(/stepOccluderFade\([^)]+,\s*reducedMotion\)/s);
+    expect(placements).toMatch(/ghosts\.step\([^)]+,\s*reducedMotion\)/s);
     const renderer = readFileSync(`${ROOT}src/render/renderer.ts`, 'utf8');
     const start = renderer.indexOf('updateBattlegroundOccluderFades(\n');
     expect(start, 'the renderer never drives the battleground fade').toBeGreaterThan(-1);

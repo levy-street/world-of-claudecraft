@@ -23,6 +23,9 @@ export const CLICK_SUPPRESS_MS = 700;
 /** Two touch taps within this window count as a double-tap (matches the camera
  *  recenter double-tap in mobile_controls.ts). */
 export const DOUBLE_TAP_MS = 300;
+/** How long a finger must rest on a frame before it counts as a long press,
+ *  the touch stand-in for right-click. */
+export const MOBILE_CONTEXT_LONG_PRESS_MS = 650;
 
 interface TapTarget {
   addEventListener(type: string, listener: (e: PointerEvent & MouseEvent) => void): void;
@@ -110,4 +113,82 @@ export function bindTouchDoubleTap(
   el.addEventListener('pointercancel', (e) => {
     if (e.pointerId === downId) downId = null;
   });
+}
+
+/**
+ * Bind `onLongPress` so a resting finger opens what right-click opens on a
+ * desktop: the unit menus behind the player, target and target-of-target
+ * frames. Mobile-only by design (`isMobileLayout` is re-read per event, so a
+ * live desktop-to-mobile flip is honoured), and the press point is passed
+ * through so the caller can anchor its menu exactly where the finger sat.
+ * `stopBubble` is for a frame nested inside another bound frame: it stops the
+ * accepted touch pointerdown so the outer frame never arms a competing press.
+ *
+ * Extracted from the Hud coordinator on its third frame: it captures the
+ * suppression window as well as the timer, and a copy per frame would drift.
+ * Both suppressors are CAPTURE-phase and stopImmediatePropagation, because the
+ * frames underneath already bind their own click / contextmenu handlers and a
+ * long press must not also fire those.
+ */
+export function bindMobileFrameLongPress(
+  el: HTMLElement,
+  isMobileLayout: () => boolean,
+  onLongPress: (x: number, y: number) => void,
+  opts: { ignoreSelector?: string; stopBubble?: boolean } = {},
+): void {
+  let timer: ReturnType<typeof globalThis.setTimeout> | undefined;
+  let downId: number | null = null;
+  let downX = 0;
+  let downY = 0;
+  let suppressUntil = 0;
+  const clear = () => {
+    if (timer !== undefined) globalThis.clearTimeout(timer);
+    timer = undefined;
+    downId = null;
+  };
+  el.addEventListener('pointerdown', (ev) => {
+    if (ev.pointerType !== 'touch' || !isMobileLayout()) return;
+    const target = ev.target as HTMLElement | null;
+    if (opts.ignoreSelector && target?.closest(opts.ignoreSelector)) return;
+    // A NESTED frame (the target-of-target mini inside the target frame) must not
+    // also arm its parent's press, or two menus open and the outer one wins.
+    if (opts.stopBubble) ev.stopPropagation();
+    clear();
+    downId = ev.pointerId;
+    downX = ev.clientX;
+    downY = ev.clientY;
+    timer = globalThis.setTimeout(() => {
+      timer = undefined;
+      suppressUntil = Date.now() + CLICK_SUPPRESS_MS;
+      onLongPress(downX, downY);
+    }, MOBILE_CONTEXT_LONG_PRESS_MS);
+  });
+  el.addEventListener('pointermove', (ev) => {
+    if (ev.pointerType !== 'touch' || ev.pointerId !== downId) return;
+    if (Math.hypot(ev.clientX - downX, ev.clientY - downY) > TAP_SLOP_PX) clear();
+  });
+  el.addEventListener('pointerup', (ev) => {
+    if (ev.pointerId === downId) clear();
+  });
+  el.addEventListener('pointercancel', (ev) => {
+    if (ev.pointerId === downId) clear();
+  });
+  el.addEventListener(
+    'click',
+    (ev) => {
+      if (Date.now() > suppressUntil) return;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+    },
+    true,
+  );
+  el.addEventListener(
+    'contextmenu',
+    (ev) => {
+      if (!isMobileLayout() || Date.now() > suppressUntil) return;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+    },
+    true,
+  );
 }

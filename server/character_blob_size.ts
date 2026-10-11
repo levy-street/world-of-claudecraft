@@ -54,7 +54,12 @@
 // whole-character relation require a reviewed re-measurement if the threshold
 // changes or content outgrows it. A crossing may be an unbounded field, or
 // simply a character who owns a great deal.
-export const CHARACTER_BLOB_WARN_BYTES = 229_376;
+// RE-MINTED to 262,144 (256 KiB) at the 2026-09-28 Buried Hoards merge into
+// release/v0.44.0: the storage-rich whole-character fixture measured 233,360
+// bytes (the release 227,869 plus the hoard and faction-quartermaster content,
+// +5,491, itemized in tests/professions_blob_growth.test.ts), past 224 KiB. The
+// next 32-KiB step, now level with the guild-bank row scale; still warn-only.
+export const CHARACTER_BLOB_WARN_BYTES = 262_144;
 
 // The decision, kept pure so it is unit-testable without a database: returns the
 // dev-channel log line for an oversized blob, or null when the size is

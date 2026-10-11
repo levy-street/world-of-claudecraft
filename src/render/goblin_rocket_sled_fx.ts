@@ -73,6 +73,64 @@ function flameMaterial(color: number, reverseColor: number, hdr: number): THREE.
   });
 }
 
+interface PlumeMaterials {
+  outer: THREE.ShaderMaterial;
+  core: THREE.ShaderMaterial;
+}
+
+// One pair for every sled, never disposed while its profile lives. three keys a
+// ShaderMaterial's program on its shader stages, which die with the last
+// material compiled from them: a per-rider pair disposed on dismount made the
+// next plume relink, and the retained-program FIFO can never serve it again.
+// Its home is the mount gate at the first sighting (mount_lifecycle.ts), never
+// a boot warm-up.
+let plumeMaterials: PlumeMaterials | null = null;
+
+export function resetGoblinRocketSledProfileCaches(): void {
+  plumeMaterials = null;
+}
+
+export function goblinRocketSledPlumeMaterials(): PlumeMaterials {
+  if (plumeMaterials) return plumeMaterials;
+  plumeMaterials = {
+    outer: flameMaterial(0xff5a16, 0x70bfff, GFX.composer ? 2.1 : 1),
+    core: flameMaterial(0xffd36a, 0xedfbff, GFX.composer ? 2.6 : 1),
+  };
+  return plumeMaterials;
+}
+
+interface PlumeLayerValues {
+  time: number;
+  intensity: number;
+  opacity: number;
+  reverseBlend: number;
+  ignition: number;
+  airborneHeat: number;
+}
+
+const layerValues = (): PlumeLayerValues => ({
+  time: 0,
+  intensity: 0,
+  opacity: 0,
+  reverseBlend: 0,
+  ignition: 0,
+  airborneHeat: 0,
+});
+
+// The shared pair draws for every rider, so each mesh writes its own rider's
+// values right before its draw; three uploads a ShaderMaterial's uniforms
+// whenever uniformsNeedUpdate is set (the src/render/ability_vfx/ground_auras.ts idiom).
+function pushLayer(material: THREE.ShaderMaterial, values: PlumeLayerValues): void {
+  const uniforms = material.uniforms;
+  uniforms.uTime.value = values.time;
+  uniforms.uIntensity.value = values.intensity;
+  uniforms.uOpacity.value = values.opacity;
+  uniforms.uReverseBlend.value = values.reverseBlend;
+  uniforms.uIgnition.value = values.ignition;
+  uniforms.uAirborneHeat.value = values.airborneHeat;
+  material.uniformsNeedUpdate = true;
+}
+
 interface PlumePair {
   group: THREE.Group;
   outer: THREE.Mesh;
@@ -120,8 +178,11 @@ export class GoblinRocketSledFx {
   // gap when the reverse flame contracts.
   private readonly outerGeometry = new THREE.ConeGeometry(0.5, 1, 8, 1, true).translate(0, 0.5, 0);
   private readonly innerGeometry = new THREE.ConeGeometry(0.42, 1, 8, 1, true).translate(0, 0.5, 0);
-  private readonly outerMaterial = flameMaterial(0xff5a16, 0x70bfff, GFX.composer ? 2.1 : 1);
-  private readonly innerMaterial = flameMaterial(0xffd36a, 0xedfbff, GFX.composer ? 2.6 : 1);
+  private readonly materials = goblinRocketSledPlumeMaterials();
+  private readonly outerValues = layerValues();
+  private readonly innerValues = layerValues();
+  private readonly pushOuter = (): void => pushLayer(this.materials.outer, this.outerValues);
+  private readonly pushInner = (): void => pushLayer(this.materials.core, this.innerValues);
   private readonly plumes: readonly [PlumePair, PlumePair];
   private readonly leftWorld = new THREE.Vector3();
   private readonly rightWorld = new THREE.Vector3();
@@ -150,17 +211,19 @@ export class GoblinRocketSledFx {
     group.rotation.x = -Math.PI / 2;
     group.visible = false;
 
-    const outer = new THREE.Mesh(this.outerGeometry, this.outerMaterial);
+    const outer = new THREE.Mesh(this.outerGeometry, this.materials.outer);
     outer.name = `${group.name}_Outer`;
     outer.renderOrder = 4;
     outer.frustumCulled = false;
+    outer.onBeforeRender = this.pushOuter;
     group.add(outer);
 
-    const inner = new THREE.Mesh(this.innerGeometry, this.innerMaterial);
+    const inner = new THREE.Mesh(this.innerGeometry, this.materials.core);
     inner.name = `${group.name}_Core`;
     inner.position.y = -0.03;
     inner.renderOrder = 5;
     inner.frustumCulled = false;
+    inner.onBeforeRender = this.pushInner;
     group.add(inner);
 
     socket.add(group);
@@ -185,19 +248,20 @@ export class GoblinRocketSledFx {
       this.plan,
     );
 
-    this.outerMaterial.uniforms.uTime.value = time;
-    this.outerMaterial.uniforms.uIntensity.value = this.plan.intensity;
-    this.outerMaterial.uniforms.uOpacity.value = this.plan.opacity * 0.72;
-    this.outerMaterial.uniforms.uReverseBlend.value = this.plan.reverseBlend;
-    this.outerMaterial.uniforms.uIgnition.value = this.plan.ignition;
-    this.outerMaterial.uniforms.uAirborneHeat.value =
-      this.plan.airborneOverburn * 0.18 + this.plan.stationaryPressure * 0.42;
-    this.innerMaterial.uniforms.uTime.value = time + 0.37;
-    this.innerMaterial.uniforms.uIntensity.value = this.plan.intensity;
-    this.innerMaterial.uniforms.uOpacity.value = this.plan.opacity * 0.92;
-    this.innerMaterial.uniforms.uReverseBlend.value = this.plan.reverseBlend;
-    this.innerMaterial.uniforms.uIgnition.value = this.plan.ignition;
-    this.innerMaterial.uniforms.uAirborneHeat.value = Math.min(
+    const outer = this.outerValues;
+    outer.time = time;
+    outer.intensity = this.plan.intensity;
+    outer.opacity = this.plan.opacity * 0.72;
+    outer.reverseBlend = this.plan.reverseBlend;
+    outer.ignition = this.plan.ignition;
+    outer.airborneHeat = this.plan.airborneOverburn * 0.18 + this.plan.stationaryPressure * 0.42;
+    const inner = this.innerValues;
+    inner.time = time + 0.37;
+    inner.intensity = this.plan.intensity;
+    inner.opacity = this.plan.opacity * 0.92;
+    inner.reverseBlend = this.plan.reverseBlend;
+    inner.ignition = this.plan.ignition;
+    inner.airborneHeat = Math.min(
       1,
       this.plan.airborneOverburn * 0.72 + this.plan.stationaryPressure,
     );
@@ -269,8 +333,6 @@ export class GoblinRocketSledFx {
     for (const plume of this.plumes) plume.group.removeFromParent();
     this.outerGeometry.dispose();
     this.innerGeometry.dispose();
-    this.outerMaterial.dispose();
-    this.innerMaterial.dispose();
   }
 }
 

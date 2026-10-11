@@ -14,7 +14,18 @@
 // transparent clone is a program of its own, linked cold on the first frame
 // a trunk blocked the camera. `ready` asks the gate before the first acquire
 // for a source mesh, so the instance keeps drawing until the twin links.
+//
+// On the DITHERED style (occluder_dither_fade.ts ditherFadeEnabled) none of
+// that exists: the instance stays in its batch and drops fragments from a
+// per-instance attribute (instanced_dither_fade.ts), so `hide` acquires no
+// stand-in and swaps no matrix, and `ready` / `prefetch` never reach the gate.
+// The pool picks its arm once, at construction, and `hide` / `fade` / `show` /
+// `step` are the whole surface a consumer needs on either arm.
 import * as THREE from 'three';
+import { attachInstancedDitherFade, writeInstanceGhostAlpha } from './instanced_dither_fade';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { ditherFadeEnabled } from './occluder_dither_fade';
+import { stepOccluderFade } from './occluder_fade_core';
 import { type OccluderFadeConsult, occluderFadeTwinReady } from './occluder_fade_gate';
 import { markOccluderGhostTwin, occluderGhostVariantKey } from './occluder_ghost_variant_key';
 
@@ -23,6 +34,35 @@ export interface InstancedGhostHandle {
   mesh: THREE.Mesh;
   source: THREE.InstancedMesh;
   baseOpacity: number;
+}
+
+/** One hidden instance: where it lives, the matrix it returns to, and its
+ *  stand-in on the blended arm (null on the dithered one). */
+export interface InstancedGhostHide {
+  source: THREE.InstancedMesh;
+  index: number;
+  visible: THREE.Matrix4;
+  standIn: InstancedGhostHandle | null;
+}
+
+const ditherTwins = new WeakMap<THREE.Material, THREE.Material>();
+
+/**
+ * The material a hideable batch draws with when its source is not the
+ * caller's to decorate (a surfaceMat cache entry, a GLB cache material other
+ * views draw with): on the dithered style, ONE hook-preserving clone per
+ * source wearing the per-instance dither layer, kept for the page so every
+ * rebuild lands on the same program and nothing ever releases it. The source
+ * itself on the blended style.
+ */
+export function ghostFadeBatchMaterial(source: THREE.Material): THREE.Material {
+  if (!ditherFadeEnabled()) return source;
+  let twin = ditherTwins.get(source);
+  if (!twin) {
+    twin = attachInstancedDitherFade(cloneMaterialWithHooks(source));
+    ditherTwins.set(source, twin);
+  }
+  return twin;
 }
 
 /** The material a source mesh's ghosts clone from (foliage buckets and the
@@ -100,14 +140,21 @@ export function instancedGhostTwin(source: THREE.InstancedMesh): THREE.Mesh {
   return mesh;
 }
 
+const ZERO_SCALE = new THREE.Vector3(0, 0, 0);
+
 export class InstancedOccluderGhosts {
+  /** The page's ghost style, read once: it is baked into the batch materials. */
+  readonly dithered = ditherFadeEnabled();
   private pools = new Map<THREE.InstancedMesh, InstancedGhostHandle[]>();
+  private freeHides: InstancedGhostHide[] = [];
   private tint = new THREE.Color();
+  private hiddenMatrix = new THREE.Matrix4();
 
   /** May a ghost of `source` draw now? False while the gate links its
    *  program; the caller keeps the instance visible and asks again next
    *  frame. An edge consult by default. */
   ready(source: THREE.InstancedMesh, consult: OccluderFadeConsult = 'edge'): boolean {
+    if (this.dithered) return true;
     return occluderFadeTwinReady(instancedGhostKey(source), consult, instancedGhostTwin, source);
   }
 
@@ -126,6 +173,53 @@ export class InstancedOccluderGhosts {
 
   prefetchAll(parts: readonly { mesh: THREE.InstancedMesh }[]): void {
     for (let i = 0; i < parts.length; i++) this.prefetch(parts[i].mesh);
+  }
+
+  /** Advance a hideable's alpha. The dithered ghost restores in ONE step, like
+   *  the dithered buildings (occluder_fade.ts advanceOccluderFade): an eased
+   *  return walks the stipple through every density. */
+  step(alpha: number, occluded: boolean, dt: number, reducedMotion: boolean): number {
+    return stepOccluderFade(alpha, occluded, dt, reducedMotion || this.dithered);
+  }
+
+  /** Start ghosting `source`'s instance at `index`, whose authored matrix is
+   *  `visible` (kept by reference). Blended: the instance is zero-scaled and a
+   *  stand-in takes its place. Dithered: nothing moves until `fade` writes. */
+  hide(source: THREE.InstancedMesh, index: number, visible: THREE.Matrix4): InstancedGhostHide {
+    const hide = this.freeHides.pop() ?? { source, index, visible, standIn: null };
+    hide.source = source;
+    hide.index = index;
+    hide.visible = visible;
+    if (!this.dithered) {
+      this.writeMatrix(source, index, this.hiddenMatrix.copy(visible).scale(ZERO_SCALE));
+      hide.standIn = this.acquire(source, index, visible);
+    }
+    return hide;
+  }
+
+  /** Set a hidden instance's fade alpha (1 = fully drawn). */
+  fade(hide: InstancedGhostHide, alpha: number): void {
+    if (hide.standIn) this.setAlpha(hide.standIn, alpha);
+    else writeInstanceGhostAlpha(hide.source, hide.index, alpha);
+  }
+
+  /** Return a hidden instance to its authored state. The handle is recycled:
+   *  the caller drops it. */
+  show(hide: InstancedGhostHide): void {
+    if (hide.standIn) {
+      this.writeMatrix(hide.source, hide.index, hide.visible);
+      this.release(hide.standIn);
+      hide.standIn = null;
+    } else {
+      writeInstanceGhostAlpha(hide.source, hide.index, 1);
+    }
+    this.freeHides.push(hide);
+  }
+
+  private writeMatrix(source: THREE.InstancedMesh, index: number, matrix: THREE.Matrix4): void {
+    source.setMatrixAt(index, matrix);
+    source.instanceMatrix.addUpdateRange(index * 16, 16);
+    source.instanceMatrix.needsUpdate = true;
   }
 
   /** Attach a ghost for `source`'s instance at `index`, placed at `matrix`. */

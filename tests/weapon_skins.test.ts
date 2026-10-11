@@ -376,15 +376,17 @@ describe('offhand weapon-skin mirror rule', () => {
 
 describe('bow skin attack animation (hunter draw instead of crossbow aim)', () => {
   it('starts every typed player ranged shot at launch and suppresses its impact replay', async () => {
-    const { playerRangedAttackAlreadyStarted, playerRangedAttackStartsAtLaunch } = await import(
+    const { playerAttackAnimationAlreadyStarted, playerRangedAttackStartsAtLaunch } = await import(
       '../src/render/characters/skin_attack'
     );
     expect(playerRangedAttackStartsAtLaunch('player', 'ranged-shot')).toBe(true);
     expect(playerRangedAttackStartsAtLaunch('player', undefined)).toBe(false);
     expect(playerRangedAttackStartsAtLaunch('mob', 'ranged-shot')).toBe(false);
-    expect(playerRangedAttackAlreadyStarted('player', true)).toBe(true);
-    expect(playerRangedAttackAlreadyStarted('player', undefined)).toBe(false);
-    expect(playerRangedAttackAlreadyStarted('mob', true)).toBe(false);
+    // Not ranged-only: the same flag also covers a melee swing already started
+    // at launch (an auto-attack, or an ability like Red Harvest).
+    expect(playerAttackAnimationAlreadyStarted('player', true)).toBe(true);
+    expect(playerAttackAnimationAlreadyStarted('player', undefined)).toBe(false);
+    expect(playerAttackAnimationAlreadyStarted('mob', true)).toBe(false);
   });
 
   it('bow skins substitute the authored draw clip; every other type keeps its attack', async () => {
@@ -776,7 +778,7 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
       join(ROOT, 'src/render/characters/damage_attack_animation.ts'),
       'utf8',
     );
-    expect(damageGate).toContain('playerRangedAttackAlreadyStarted(');
+    expect(damageGate).toContain('playerAttackAnimationAlreadyStarted(');
     expect(launch).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
     expect(damage).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
   });

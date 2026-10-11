@@ -3,6 +3,7 @@ import {
   AFFLICTION_FAMILIAR_LOCAL_X,
   AFFLICTION_FAMILIAR_LOCAL_Z,
 } from './affliction_familiar_core';
+import { tagVfxSubtree } from './renderer_diagnostics';
 import type { VfxOffsetAnchorResolver } from './vfx_anchor';
 
 const CHANNEL_POOL_SIZE = 12;
@@ -156,9 +157,9 @@ export class DrainLifeVfx {
       veil.renderOrder = 5;
       const group = new THREE.Group();
       group.name = 'drain-life-vfx-slot';
-      group.userData.renderCategory = 'vfx';
       group.userData.flowDirection = 'target-to-caster';
       group.add(veil, flow, core);
+      tagVfxSubtree(group);
       group.visible = false;
       scene.add(group);
       this.slots.push({

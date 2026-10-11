@@ -88,9 +88,20 @@ interface TemplateInfo {
   radiusSrc: number; // source-unit horizontal half-extent (selection ring)
 }
 
+/** The world's point-light budget: a placed GLB's glTF lights join it like
+ *  every other world light, ranked by distance and drawn through a carrier.
+ *  Ranking reads a light's position when the rank last rebuilt, so a placement
+ *  moved in the editor ranks at its old spot until the next registry change;
+ *  the carrier still draws it where it is. */
+export interface PlacedLightRegistry {
+  register(light: THREE.PointLight): void;
+  release(light: THREE.PointLight): void;
+}
+
 interface Entry {
   placement: PlacedAsset;
   model: THREE.Object3D | null; // null until the GLB resolves (async pop-in)
+  lights: THREE.PointLight[];
   info: TemplateInfo | null;
   footprint: THREE.Mesh | null;
   // Set by removePlacement so an in-flight GLB load drops its clone. Checked by
@@ -101,6 +112,7 @@ interface Entry {
 export class PlacedAssetsView {
   readonly group: THREE.Group;
   private readonly seed: number;
+  private readonly lights: PlacedLightRegistry;
   private readonly entries = new Map<number, Entry>();
   private readonly templates = new Map<string, Promise<TemplateInfo | null>>();
   private footprintsOn = false;
@@ -121,10 +133,15 @@ export class PlacedAssetsView {
     side: THREE.DoubleSide,
   });
 
-  constructor(placements: readonly (PlacedAsset | null)[], seed: number) {
+  constructor(
+    placements: readonly (PlacedAsset | null)[],
+    seed: number,
+    lights: PlacedLightRegistry,
+  ) {
     this.group = new THREE.Group();
     this.group.name = 'placed-assets';
     this.seed = seed;
+    this.lights = lights;
     this.rebuildAll(placements, true);
   }
 
@@ -134,6 +151,7 @@ export class PlacedAssetsView {
     const entry: Entry = {
       placement: { ...placedAsset },
       model: null,
+      lights: [],
       info: null,
       footprint: null,
       removed: false,
@@ -151,7 +169,13 @@ export class PlacedAssetsView {
           m.castShadow = true;
           m.receiveShadow = true;
         }
+        const light = o as THREE.PointLight;
+        if (light.isPointLight) entry.lights.push(light);
       });
+      for (const light of entry.lights) {
+        light.userData.budgetBase = light.intensity;
+        this.lights.register(light);
+      }
       entry.model = model;
       entry.info = info;
       this.group.add(model);
@@ -197,6 +221,8 @@ export class PlacedAssetsView {
     entry.removed = true;
     this.entries.delete(index);
     if (entry.model) this.group.remove(entry.model);
+    for (const light of entry.lights) this.lights.release(light);
+    entry.lights.length = 0;
     // Clones share the loader-cached template geometry/materials: never dispose
     // them here. The draped rings are per-entry allocations, so those we do.
     this.dropFootprint(entry);

@@ -25,6 +25,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
 import { MOUNTS } from '../src/sim/content/mounts';
+import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
 import {
   FIELD_NOTE_PROFESSIONS,
   RELIQUARY_HORIZON_TITLES,
@@ -188,10 +189,19 @@ describe('title relics resolve the deed crest', () => {
     // A shelf title without committed art must be an enumerated DEED_ART_PENDING
     // member (the docs/design/deeds.md "art can trail the deed" contract), never
     // an unreviewed fallback; those route to their category crest until the
-    // commissioned painting lands. Exactly the Crucible flawless title today.
+    // commissioned painting lands. The Arcane Calligraphy gold title (world
+    // quests, still art-pending) and the Crucible flawless title today.
     const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
+    // The three faction Champion titles (world quests, art-pending on the
+    // progression crest) follow them on the shelf, then the Clue Scroll
+    // Treasure Hunter title (art-pending on the exploration crest).
     expect(pending, 'artless shelf titles must be the pinned art-pending set').toEqual([
+      'exp_arcane_calligraphy_gold',
       'dgn_varkhul_flawless',
+      'prog_rift_watch_champion',
+      'prog_church_order_champion',
+      'prog_automatons_champion',
+      'exp_clue_ten_caskets',
     ]);
     for (const id of pending) expect(DEED_ART_PENDING.has(id), id).toBe(true);
     for (const id of RELIQUARY_HORIZON_TITLES) {
@@ -548,13 +558,16 @@ describe('unknown ids fall through to the caller fallback', () => {
         `${itemId} has only procedural art and is not an enumerated ITEM_ART_PENDING member`,
       ).toBe(true);
     }
-    // The completion wave leaves no catalogued relic on procedural art. Any
+    // The completion wave left no catalogued relic on procedural art. Any
     // future growth is a deliberate exact-set edit here and in the debt ledger.
+    // Open wave: the 135 Warfare Season 2 armor pieces (Vanguard Gallery),
+    // parked on ITEM_ART_PENDING for the follow-up art pass.
+    const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(
-      procedural,
+      [...procedural].sort(),
       `catalogued item relics with only procedural art (park them here deliberately):\n${procedural.join('\n')}`,
-    ).toEqual([]);
-    expect(procedural).toHaveLength(0);
+    ).toEqual([...season2Armor].sort());
+    expect(procedural).toHaveLength(135);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {

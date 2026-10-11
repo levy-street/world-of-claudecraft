@@ -6,6 +6,7 @@ import { itemDisplayName } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { MARKET_ITEM_TYPE_FILTERS } from '../src/ui/market_filters';
 import { MarketWindow } from '../src/ui/market_window';
+import { PRESET_ORDER, resolveTheme, themeCssVars } from '../src/ui/theme';
 
 // The market window painter is a DOM module; driving the live DOM + events is the
 // opt-in browser suite. This is the no-DOM-suite equivalent: it
@@ -108,10 +109,10 @@ describe('market_window: instance-effective icon rims (phase 13 fix round)', () 
   });
 
   it('the def-only negative: the sale LEDGER row has no payload and keeps the def icon', () => {
-    // renderCollectSales rows are historical records whose model carries no
-    // instance, so the rim is the def's, stated rather than defaulted.
+    // renderHistory/renderSalesList rows are historical records whose model
+    // carries no instance, so the rim is the def's, stated rather than defaulted.
     const ledger = painterCode.slice(
-      painterCode.indexOf('private renderCollectSales('),
+      painterCode.indexOf('private renderHistory('),
       painterCode.indexOf('private fungibleBagCount('),
     );
     expect(ledger).toContain('this.deps.itemIcon(item, item.quality)');
@@ -120,7 +121,33 @@ describe('market_window: instance-effective icon rims (phase 13 fix round)', () 
   });
 });
 
-describe('market_window: the Collect tab sale ledger', () => {
+// Bug: the Sell tab's quantity cap summed a stack's raw slot.count, so a
+// gathered-material stack holding a premium/signed bucket (several
+// benefactors merged into one slot) advertised the WHOLE stack as sellable
+// even though the sim excludes a signed bucket from the plain bulk-listing
+// pool (material_exchange_transfer.ts's eligibleSource / countFungibleItem).
+// Submitting the advertised quantity always bounced off "You do not have
+// that many to sell." The fix routes the sum through materialFungibleUnitCount
+// (tests/material_sources_view.test.ts), the client-side mirror of that same
+// sim gate, so the cap can never promise more than marketList will escrow.
+describe('market_window: Sell tab quantity cap matches the sim escrow gate', () => {
+  it('imports the source-aware unit counter instead of summing raw slot.count', () => {
+    expect(painter).toContain(
+      "import { materialFungibleUnitCount, materialSourcesForDisplay } from './material_sources_view';",
+    );
+  });
+
+  it('fungibleBagCount sums materialFungibleUnitCount per slot, not the raw stack count', () => {
+    const method = painterCode.slice(
+      painterCode.indexOf('private fungibleBagCount('),
+      painterCode.indexOf('private fungibleBagCount(') + 300,
+    );
+    expect(method).toContain('materialFungibleUnitCount(s)');
+    expect(method).not.toContain('n + s.count');
+  });
+});
+
+describe('market_window: the History tab sale ledger', () => {
   // The ledger is its own repaint axis: a sale whose proceeds floor to 0 copper
   // moves neither collectionCopper nor collectionItems, so a signature watching
   // only those two would leave an open Collect tab showing a stale list.
@@ -146,17 +173,17 @@ describe('market_window: the Collect tab sale ledger', () => {
 
   it('builds the rows in the pure core, leaving the painter no item resolution', () => {
     expect(core).toContain('collectionSales');
-    // The painter consumes MarketCollectSaleRow; it never reaches into ITEMS to
+    // The painter consumes MarketSaleRow; it never reaches into ITEMS to
     // resolve a LEDGER ROW.
-    expect(painter).toContain('MarketCollectSaleRow');
+    expect(painter).toContain('MarketSaleRow');
     // Scoped to the ledger's own render, not the whole file. The painter does
     // now import ITEMS, for one unrelated seam: it hands the catalog to the
     // localized-search resolver (effectiveSearch), which is a pure core that
     // imports no data of its own and must be given it by its composition point.
     // A blanket file-wide import ban would have to fail that or be deleted, and
     // neither answers what this pin is actually for, so it reads the region.
-    const at = painterCode.indexOf('renderCollect');
-    expect(at, 'the collect render must exist to be scoped').toBeGreaterThan(-1);
+    const at = painterCode.indexOf('renderSalesList');
+    expect(at, 'the sales-list render must exist to be scoped').toBeGreaterThan(-1);
     const ledger = painterCode.slice(at, painterCode.indexOf('\n  private ', at + 1));
     expect(ledger, 'the ledger render resolves no item itself').not.toContain('ITEMS');
   });
@@ -484,13 +511,101 @@ describe('market_window: behavior preserved through the core', () => {
     // Buy now lands behind the confirm prompt (the id it sends is the one the
     // prompt captured and rechecked); the behavior itself is driven end to end in
     // tests/market_buy_confirm.test.ts. Reclaim is unchanged: one click.
-    expect(painter).toContain('this.promptBuy(l, itemName)');
-    expect(painter).toContain('.marketBuy(pending.listingId)');
+    // The prompt names the row's resolved copy (quality label included), the
+    // same aria name the buy button announces.
+    expect(painter).toContain('this.promptBuy(l, parts.ariaName)');
+    // A whole-stack buy sends no count (byte-identical to the pre-partial-buy
+    // wire shape); a partial buy (tests/market_buy_confirm.test.ts) names one.
+    expect(painter).toContain('.marketBuy(');
+    expect(painter).toContain('pending.listingId,');
+    expect(painter).toContain('pending.buyCount < pending.count ? pending.buyCount : undefined');
     expect(painter).toContain('.marketCancel(l.id)');
     expect(painter).toContain('.marketList(view.form.itemId, qty, each * qty)');
     expect(painter).toContain('.marketCollect()');
     expect(painter).toContain('this.deps.moneyHtml(');
     expect(painter).toContain('formatLocalizedMoney(');
+  });
+});
+
+describe('market_window: filter menus float on a solid surface', () => {
+  // Every Browse filter menu (type, subtype, armor, stat, rarity, sort) opens OVER the
+  // filters and listing rows. They used to wear the .ui-card plate, a 28 percent keyline
+  // wash meant for in-flow rows, so the labels and tabs behind an open menu read straight
+  // through its options. A floating menu takes the library's strong panel instead: the
+  // same --panel-bg-strong fill the shared gold dropdown (.ui-dd-menu) paints.
+  const libraryCss = readFileSync(new URL('../src/styles/library.css', import.meta.url), 'utf8');
+  const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+  const MIN_MENU_ALPHA = 0.95;
+  // The alpha of every colour stop in a linear-gradient. A stop that is not a plain
+  // rgba() (a hex alpha, hsla, color-mix, transparent) yields NaN, so it fails the
+  // threshold instead of being skipped.
+  const stopAlphas = (fill: string): number[] => {
+    const body = fill.trim().match(/^linear-gradient\(([\s\S]*)\)$/)?.[1];
+    if (!body) return [];
+    const args: string[] = [];
+    let depth = 0;
+    let start = 0;
+    for (let i = 0; i < body.length; i++) {
+      if (body[i] === '(') depth++;
+      else if (body[i] === ')') depth--;
+      else if (body[i] === ',' && depth === 0) {
+        args.push(body.slice(start, i).trim());
+        start = i + 1;
+      }
+    }
+    args.push(body.slice(start).trim());
+    return args
+      .filter((arg) => !/^-?[\d.]+deg$/.test(arg))
+      .map((stop) =>
+        Number(stop.match(/^rgba\(\s*\d+,\s*\d+,\s*\d+,\s*([\d.]+)\s*\)(\s+[\d.]+%)?$/)?.[1]),
+      );
+  };
+  const menuRules = (css: string) =>
+    [
+      ...css
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .matchAll(/([^{}]*\.mkt-select-menu[^{}]*)\{([^}]*)\}/g),
+    ].map((m) => ({ selector: m[1].trim(), body: m[2] }));
+
+  it('composes the strong panel primitive on the menu, never the translucent card', () => {
+    const menu = painterCode.match(/<div class="mkt-select-menu[^"]*"/)?.[0];
+    expect(menu, 'the filter menu markup must exist').toBeTruthy();
+    expect(menu).toContain('ui-panel-strong');
+    expect(menu).not.toContain('ui-card');
+  });
+
+  it('keeps the menu look on the primitive, not re-declared in any component rule', () => {
+    // Every rule naming the menu, compound selectors and the mobile sheet included.
+    const rules = [...menuRules(componentsCss), ...menuRules(mobileCss)];
+    expect(rules.length, 'the .mkt-select-menu geometry rule must exist').toBeGreaterThan(0);
+    for (const { selector, body } of rules) {
+      expect(body, `${selector} must not re-declare the fill`).not.toMatch(
+        /\bbackground(-color|-image)?\s*:/,
+      );
+    }
+    expect(libraryCss.match(/\.ui-panel-strong\s*\{[^}]*\}/)?.[0]).toContain(
+      'background: var(--panel-bg-strong);',
+    );
+  });
+
+  it('paints --panel-bg-strong near-opaque in the static default and on every preset', () => {
+    const staticFill = tokensCss.match(/--panel-bg-strong:\s*([^;]+);/)?.[1] ?? '';
+    const fills = [
+      staticFill,
+      ...PRESET_ORDER.map(
+        (preset) => themeCssVars(resolveTheme({ preset, custom: {} }))['--panel-bg-strong'],
+      ),
+    ];
+    for (const fill of fills) {
+      const stops = stopAlphas(fill);
+      expect(stops.length, `no gradient stops parsed from ${fill}`).toBeGreaterThan(0);
+      for (const a of stops) expect(a, `a stop of ${fill}`).toBeGreaterThanOrEqual(MIN_MENU_ALPHA);
+    }
+    // The parser itself fails closed: a translucent or unparseable stop cannot slip by.
+    expect(stopAlphas('linear-gradient(170deg, rgba(1, 2, 3, 0.97) 0%, #0000 100%)')[1]).toBeNaN();
+    expect(
+      stopAlphas('linear-gradient(170deg, rgba(1, 2, 3, 0.97) 0%, rgba(1, 2, 3, 0.5) 100%)'),
+    ).toEqual([0.97, 0.5]);
   });
 });
 

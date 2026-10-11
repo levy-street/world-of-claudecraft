@@ -25,6 +25,7 @@ export const EASTBROOK_HARBOR_DECKS: GaleDeckDef[] = [
   // the quay boardwalk, laid along the pad's east lip; every pier roots on it
   { x: -97.5, z: -54, rot: 0, hl: 16, hw: 1.5, ax: -94, az: -54 },
   // the ferry berth: the long middle pier, reaching the cove's deep water
+  // (the Eastbrook ferry moors across its T-head, content/zone1.ts)
   { x: -107, z: -54, rot: -Math.PI / 2, hl: 10, hw: 2.2, ax: -94, az: -54 },
   // Round 6 (owner + team): the two working piers re-laid square to the quay on
   // an even 14 yd pitch (roots at z -40, -54, -68) and run out to 8 yd. They

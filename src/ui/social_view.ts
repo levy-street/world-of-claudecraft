@@ -12,6 +12,13 @@
 // UI_PURE_CORES); world types are imported type-only from world_api so the same
 // model is derived from a Sim and a ClientWorld mirror.
 
+import {
+  GUILD_RANK_LEADER_ID,
+  guildRankCan,
+  guildRankCanRemove,
+  guildRankDemoteTo,
+  guildRankPromoteTo,
+} from '../sim/guild_ranks';
 import { GUILD_ROSTER_BASE_MEMBERS } from '../sim/guild_roster';
 import type {
   FriendInfo,
@@ -22,11 +29,27 @@ import type {
   PartyMemberInfo,
   SocialInfo,
 } from '../world_api';
+import {
+  type GuildRankLabel,
+  guildLadder,
+  guildRankLabel,
+  viewerGuildCan,
+} from './guild_ranks_view';
 
-export type SocialTab = 'friends' | 'guild' | 'who' | 'pledges' | 'ignore' | 'block' | 'raid';
+export type SocialTab =
+  | 'friends'
+  | 'guild'
+  | 'ranks'
+  | 'who'
+  | 'pledges'
+  | 'ignore'
+  | 'block'
+  | 'raid';
 
 /** Structural identity of the panel: which tab, online or not, and the guild
- *  membership/rank (which changes the footer AND the officer-only Pledges tab)
+ *  membership/rank plus whether that rank may recruit (which changes the
+ *  footer's invite row AND the recruiters-only Pledges tab; a ladder edit can
+ *  flip it without the rank id moving)
  *  plus the open-pledge count (the Pledges tab label carries it), the roster
  *  cap and next page price (the footer's buy button is rendered from them, so
  *  a bought page must rebuild it or it keeps advertising the old price), and
@@ -43,7 +66,8 @@ export function socialStructSig(
     ? `${party.raid ? 1 : 0}:${party.leader}:${party.members.map((m) => `${m.pid}.${m.group}`).join(',')}`
     : 'solo';
   const rosterSig = `${g?.memberCap ?? 0}:${g?.nextRosterPrice ?? 'none'}`;
-  return `${tab}|${social !== null}|${g?.id ?? 0}|${g?.rank ?? ''}|${g?.pledges?.length ?? 0}|${rosterSig}|${raidSig}`;
+  const recruit = viewerGuildCan(g, 'invite') ? 1 : 0;
+  return `${tab}|${social !== null}|${g?.id ?? 0}|${g?.rank ?? ''}:${recruit}|${g?.pledges?.length ?? 0}|${rosterSig}|${raidSig}`;
 }
 
 /** The status dot kind for a presence row: 'off' when offline, otherwise the
@@ -116,20 +140,27 @@ export interface GuildRow {
   /** The selected Book of Deeds title as a DEED ID (null untitled), as on
    *  FriendRow. */
   activeTitle: string | null;
-  /** This member's guild rank key ('leader' | 'officer' | 'member'). */
+  /** This member's rank id on the guild's ladder. */
   rank: string;
+  /** The rank's keyed display label (the painter localizes). */
+  rankLabel: GuildRankLabel;
   /** True when this row is the viewing player. */
   self: boolean;
   /** Whisper button is shown (online + not self). */
   canWhisper: boolean;
   /** Hand over leadership (viewer is leader, target is not self). */
   canTransfer: boolean;
-  /** Promote member -> officer (viewer is leader, target a member). */
+  /** Promote one rank up (the viewer's rank holds 'promote', the target sits
+   *  strictly below it, and the next rank is still below the viewer; never to
+   *  Guild Master, which is a transfer). promoteLabel names that next rank. */
   canPromote: boolean;
-  /** Demote officer -> member (viewer is leader, target an officer). */
+  promoteLabel: GuildRankLabel | null;
+  /** Demote one rank down (same reach rule; never below the joining rank).
+   *  demoteLabel names that next rank. */
   canDemote: boolean;
-  /** Remove from guild: leaders may remove members + officers; officers may
-   *  remove only members; never self or another leader. */
+  demoteLabel: GuildRankLabel | null;
+  /** Remove from guild: the viewer's rank holds 'remove' and the target sits
+   *  strictly below it (so never self, the leader, or an equal rank). */
   canKick: boolean;
 }
 
@@ -138,13 +169,18 @@ export interface GuildView {
   guild: {
     name: string;
     rank: string;
+    /** The viewer's own rank label (the guild head line). */
+    rankLabel: GuildRankLabel;
+    /** The viewer's rank may invite (the footer's invite row). */
+    canInvite: boolean;
     memberCount: number;
     /** The guild billboard message ('' when unset) and its setter's display
      *  name ('' when unset). The painter escapes the text; never linkified. */
     motd: string;
     motdSetBy: string;
-    /** True iff the viewer may edit the billboard (rank leader or officer);
-     *  UX only, the server enforces the real gate. */
+    /** True iff the viewer's rank holds the 'motd' permission (the Guild
+     *  Master and officers on the default ladder); UX only, the server
+     *  enforces the real gate. */
     canEditMotd: boolean;
     /** The guild's lifetime-XP colour tier (guildTierForLifetimeXp, mirrored
      *  from the server): styles the guild-head name, matching the nameplate
@@ -164,16 +200,17 @@ export interface GuildView {
 }
 
 /** Guild-tab view: the header (name + viewer rank + count) and per-member rows
- *  with each action button's permission resolved against the viewer's rank. */
+ *  with each action button's permission resolved against the viewer's rank on
+ *  the guild's ladder (src/sim/guild_ranks.ts, the rules the server enforces). */
 export function guildView(social: SocialInfo | null, myName: string): GuildView {
   const guild = social?.guild ?? null;
   if (!guild) return { guild: null };
+  const ladder = guildLadder(guild);
   const me = guild.rank;
   const rows = guild.members.map((m: GuildMemberInfo) => {
     const self = m.name === myName;
-    const canKick =
-      !self &&
-      ((me === 'leader' && m.rank !== 'leader') || (me === 'officer' && m.rank === 'member'));
+    const promoteTo = self ? null : guildRankPromoteTo(ladder, me, m.rank);
+    const demoteTo = self ? null : guildRankDemoteTo(ladder, me, m.rank);
     return {
       name: m.name,
       cls: m.cls,
@@ -186,22 +223,27 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       joinedAt: m.joinedAt ?? null,
       activeTitle: m.activeTitle ?? null,
       rank: m.rank,
+      rankLabel: guildRankLabel(ladder, m.rank),
       self,
       canWhisper: m.online && !self,
-      canTransfer: !self && me === 'leader',
-      canPromote: !self && me === 'leader' && m.rank === 'member',
-      canDemote: !self && me === 'leader' && m.rank === 'officer',
-      canKick,
+      canTransfer: !self && me === GUILD_RANK_LEADER_ID,
+      canPromote: promoteTo !== null,
+      promoteLabel: promoteTo === null ? null : guildRankLabel(ladder, promoteTo),
+      canDemote: demoteTo !== null,
+      demoteLabel: demoteTo === null ? null : guildRankLabel(ladder, demoteTo),
+      canKick: !self && guildRankCanRemove(ladder, me, m.rank),
     };
   });
   return {
     guild: {
       name: guild.name,
       rank: me,
+      rankLabel: guildRankLabel(ladder, me),
+      canInvite: guildRankCan(ladder, me, 'invite'),
       memberCount: guild.members.length,
       motd: guild.motd ?? '',
       motdSetBy: guild.motdSetBy ?? '',
-      canEditMotd: me === 'leader' || me === 'officer',
+      canEditMotd: guildRankCan(ladder, me, 'motd'),
       tier: guild.tier ?? 0,
       ...rosterOf(guild),
       rows,
@@ -258,15 +300,16 @@ export interface PledgePanelView {
 }
 
 /**
- * The Pledges tab (settings editor + accept/reject rows) exists only for the
- * Guild Master and officers of a guild: null hides the tab entirely (plain
- * members and the unguilded never see it; the server enforces the real gate,
- * and only sends the pledge list to officer-plus anyway). Rows keep the
- * server's order (oldest pledge first).
+ * The Pledges tab (settings editor + accept/reject rows) exists only for ranks
+ * that may recruit (the 'invite' permission: the Guild Master and officers on
+ * the default ladder): null hides the tab entirely (other ranks and the
+ * unguilded never see it; the server enforces the real gate, and only sends
+ * the pledge list to recruiters anyway). Rows keep the server's order (oldest
+ * pledge first).
  */
 export function pledgePanelView(social: SocialInfo | null): PledgePanelView | null {
   const guild = social?.guild ?? null;
-  if (!guild || (guild.rank !== 'leader' && guild.rank !== 'officer')) return null;
+  if (!guild || !viewerGuildCan(guild, 'invite')) return null;
   return {
     settings: guild.pledgeSettings ?? {
       enabled: true,
@@ -316,23 +359,26 @@ export function tenureTier(joinedAt: number | null, now: number): TenureTier | n
   return null;
 }
 
-/** The one keyed role label a guild-roster row displays: a rank for officers
- *  and the leader, a tenure-derived role for everyone else. */
-export type GuildDisplayedRole = 'leader' | 'officer' | 'member' | 'recruit' | 'veteran';
+/** The one role chip a guild-roster row displays: a rank label, or a
+ *  tenure-derived role for a plain member. */
+export type GuildRosterChip =
+  | { kind: 'rank'; label: GuildRankLabel }
+  | { kind: 'tenure'; tier: TenureTier };
 
 /**
  * Resolve the ONE role chip a guild-roster row shows (one chip per row, by
- * design): officers and the leader display their rank label exactly as
- * before and never a tenure label; a regular member displays the tenure tier
- * AS the role ('recruit' under 7 days, 'veteran' at 30 days or more) and the
- * plain 'member' role in between or when joinedAt is unknown (a null tier).
+ * design): every rank above the joining one, and a joining rank the guild
+ * titled itself, displays its rank label and never a tenure label; a member
+ * of the UNTITLED joining rank displays the tenure tier AS the role
+ * ('recruit' under 7 days, 'veteran' at 30 days or more) and the plain
+ * member label in between or when joinedAt is unknown (a null tier).
  * DISPLAY-ONLY: the underlying rank, every permission computation, and the
  * roster sort are untouched; this only picks the chip's keyed label, which
  * the painter localizes.
  */
-export function guildDisplayedRole(rank: string, tier: TenureTier | null): GuildDisplayedRole {
-  if (rank === 'leader' || rank === 'officer') return rank;
-  return tier ?? 'member';
+export function guildRosterChip(label: GuildRankLabel, tier: TenureTier | null): GuildRosterChip {
+  if (tier && label.kind === 'default' && label.rank === 'member') return { kind: 'tenure', tier };
+  return { kind: 'rank', label };
 }
 
 export type GuildRosterGroup = 'online' | 'offline';

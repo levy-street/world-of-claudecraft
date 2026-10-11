@@ -1140,7 +1140,8 @@ async function cmdSkinmodel() {
  *  output carries the reference rig's ENTIRE clip library natively (all 22
  *  KayKit clips for the knight) plus the real handslot bones, at zero Tripo
  *  cost. Assumes a Tripo-style raw mesh (T-pose, facing +X); --pre-rotated
- *  skips the yaw for meshes already facing +Z. */
+ *  skips the yaw for meshes already facing +Z; --center-torso centres the depth
+ *  on the torso rather than the bounds (a tail or snout drags those off). */
 async function cmdRigManual() {
   const raw = opt('raw');
   const name = opt('name');
@@ -1158,6 +1159,7 @@ async function cmdRigManual() {
     const { manualRigOntoReference } = await import('./lib/manual_rig.mjs');
     return manualRigOntoReference(resolve(raw), reference, built, {
       preRotated: flag('pre-rotated'),
+      centerTorso: flag('center-torso'),
     });
   });
   job.log(`manual rig: scale ${fit.scale}, ${fit.verts} verts skinned, ${fit.clips} native clips`);

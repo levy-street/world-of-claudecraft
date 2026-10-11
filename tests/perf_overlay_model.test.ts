@@ -92,6 +92,26 @@ describe('perf overlay metric registry', () => {
     expect(apm?.read(sample({ apm: 42 }))).toEqual({ kind: 'int', v: 42 });
   });
 
+  it('colours the frame rows against a chosen Frame Rate Limit, and as before with none', () => {
+    const sev = (key: string, over: Partial<MetricsSample>) =>
+      METRIC_REGISTRY.find((m) => m.key === key)?.severity(sample(over));
+    const held30 = { fps: 30, frameTimeMs: 33.4, fps1Low: 28, fps01Low: 25 };
+    // No limit: a 30 fps session is a warning on fps and red on frame time.
+    expect(sev('fps', held30)).toBe('warn');
+    expect(sev('frameTime', held30)).toBe('bad');
+    // A limit of 30 on a 60 Hz display: the same numbers are the goal.
+    const limited = { ...held30, chosenFrameMs: 1000 / 30 };
+    expect(sev('fps', limited)).toBe('good');
+    expect(sev('frameTime', limited)).toBe('good');
+    expect(sev('fps1Low', limited)).toBe('good');
+    expect(sev('fps01Low', limited)).toBe('good');
+    // A limit the machine cannot hold still reads as a problem.
+    expect(sev('fps', { ...limited, fps: 14 })).toBe('bad');
+    expect(sev('frameTime', { ...limited, frameTimeMs: 70 })).toBe('bad');
+    // A limit faster than 60 (72 on a 144 Hz display) never tightens the rows.
+    expect(sev('frameTime', { fps: 60, frameTimeMs: 16.7, chosenFrameMs: 1000 / 72 })).toBe('good');
+  });
+
   it('renders the server tick rate (network group) at one decimal, off by default', () => {
     expect(defaultMetricsMap().serverTick).toBe(false);
     const def = METRIC_REGISTRY.find((d) => d.key === 'serverTick');

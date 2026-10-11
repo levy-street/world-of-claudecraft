@@ -3,7 +3,8 @@
 // dispose because three drops a program when its last material is disposed.
 import * as THREE from 'three';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
-import { CLASSES } from '../sim/data';
+import { CLASSES, MOBS } from '../sim/data';
+import { VARKHUL_BOSS_ID } from '../sim/ignivar_raid_ids';
 import { ALL_CLASSES, type PlayerClass } from '../sim/types';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { type CharacterVisual, createCharacterVisual } from './characters';
@@ -13,13 +14,16 @@ import { buildIgnivarEncounterPrewarmVisual } from './ignivar_encounter';
 import { buildIgnivarForgeJudgmentPrewarmVisual } from './ignivar_forge_judgment';
 import { buildIgnivarRotatingRaysPrewarmVisual } from './ignivar_rotating_rays';
 import {
+  type EncounterPrewarmSet,
   encounterPrewarmDisabled,
   encounterPrewarmForInterior,
+  encounterPrewarmSpecForSets,
   type InteriorEncounterPrewarmSpec,
   type LiveSoulRendLook,
   liveSoulRendPrewarmIdentity,
   planInteriorEncounterPrewarm,
   shouldQueueLiveSoulRendPrewarm,
+  unclaimedEncounterPrewarmSets,
   vfxWeaponSkinIds,
 } from './interior_encounter_prewarm';
 import type { InteriorEncounterPrewarmHost } from './interior_encounter_prewarm_host';
@@ -34,11 +38,12 @@ import { setRenderCategory } from './renderer_diagnostics';
 import { buildVarkhulAssemblyPrewarmVisual } from './varkhul_assembly_visual';
 import { buildVarkhulEncounterPrewarmVisual } from './varkhul_encounter';
 import { buildVarkhulForgeBeamPrewarmVisual } from './varkhul_forge_beam_visual';
+import { buildVarkhulForgestormPrewarmVisual } from './varkhul_forgestorm_visual';
 import { buildVarkhulInterceptBeamPrewarmVisual } from './varkhul_intercept_beam_visual';
 import { buildVarkhulWorldfirePrewarmVisual } from './varkhul_worldfire_visual';
 import { WEAPON_VFX } from './weapon_vfx';
 
-const startedByHost = new WeakMap<object, Set<string>>();
+const startedByHost = new WeakMap<object, Set<EncounterPrewarmSet>>();
 const keepAliveByHost = new WeakMap<object, CharacterVisual[]>();
 const varkhulKeepAliveByHost = new WeakMap<object, THREE.Group[]>();
 const varkhulPortalKeepAliveByHost = new WeakMap<object, VarkhulForgePortalPrewarmVisual[]>();
@@ -73,20 +78,23 @@ export function startInteriorEncounterPrewarm(interior: string, host: object): v
   if (!spec || typed.shutdownStarted) return;
   // The attach is the earliest honest answer to "which interior is live".
   setEncounterPrewarmInterior(host, interior);
-  // Held as a const so the failure arm below can close over it.
-  const started = startedByHost.get(host) ?? new Set<string>();
+  const started = startedByHost.get(host) ?? new Set<EncounterPrewarmSet>();
   startedByHost.set(host, started);
-  if (!started.has(interior)) {
-    started.add(interior);
+  // Claimed per SET, not per interior: the raid reaches the Varkhul and Ignivar
+  // sets from several interiors, and a set an earlier room is still building
+  // must not be built a second time beside it.
+  const sets = unclaimedEncounterPrewarmSets(spec, started);
+  if (sets.length > 0) {
+    for (const set of sets) started.add(set);
     // Handled the moment it exists: the background GPU queue REJECTS every
     // pending unit when the renderer shuts down (logout, graphics rebuild), and
     // a rejection sitting un-awaited across that window is reported as an
     // unhandledrejection, which is the client's fatal overlay.
-    // Forget the interior again on failure: the key is claimed BEFORE the work,
-    // so a rejected pass (a shutdown mid-flight, a compile that threw) would
-    // otherwise leave the catalog cold for the session and link it at first draw.
-    void runInteriorEncounterPrewarm(spec, typed).catch(() => {
-      started.delete(interior);
+    // Forget the sets again on failure: they are claimed BEFORE the work, so a
+    // rejected pass (a shutdown mid-flight, a compile that threw) would
+    // otherwise leave them cold for the session and link them at first draw.
+    void runInteriorEncounterPrewarm(encounterPrewarmSpecForSets(spec, sets), typed).catch(() => {
+      for (const set of sets) started.delete(set);
     });
   }
   for (const [id, view] of typed.views) {
@@ -211,29 +219,73 @@ async function runInteriorEncounterPrewarm(
     place(visual);
   };
 
+  // Varkhul stands in the Inner Crucible before the pull, and his view keeps
+  // drawing while its compile gate is pending (raidEncounterViewVisibleDuringCompile
+  // re-shows it every frame), so its programs link in a live frame unless a
+  // twin linked them earlier (the harvest caught two body programs doing so). Same
+  // factory and entity shape as the live view, so the same visual key and
+  // program keys. Constrained devices skip it: the rig is held for the session
+  // and creature bodies stream there, so it may not even be resident.
+  const buildVarkhulRig = (): void => {
+    if (GFX.constrainedMemory) return;
+    const template = MOBS[VARKHUL_BOSS_ID];
+    if (!template) return;
+    const entity = host.prewarmEntity('mob', template.id, template.color, template.scale);
+    const visual = createCharacterVisual(entity);
+    if (!visual) return;
+    keepAlive.push(visual);
+    place(visual);
+  };
+
   // Each catalog rig is a skinned clone plus a full material clone pass, a few
   // ms of pure CPU. Built in one loop the whole catalog lands on the frame that
   // attaches the interior (measured: a >150ms stall at arena entry), so the
   // build drains across idle slots exactly like the compile below.
   const units: Array<() => void> = [
+    // Nythraxis's eruption, flame patches, Gravefire strip, and Binding Sigil:
+    // actionable floor visuals built lazily by per-frame encounter sync, so
+    // their first appearance must not link programs inside live combat. FIRST,
+    // so it is also compiled first: the eruption lands seconds after the pull,
+    // and behind the Soul Rend catalog it waited for every rig's compile.
+    ...(spec.nythraxisGraveVisuals
+      ? [
+          () => {
+            const grave = buildNythraxisGravePrewarmVisual();
+            grave.position.set(-24, 0, 0);
+            group.add(grave);
+            varkhulKeepAlive.push(grave);
+          },
+        ]
+      : []),
     ...plan.playerClasses.map((cls) => () => buildPlayerClass(cls)),
     ...plan.weaponSkinIds.map((skinId) => () => buildWeaponSkin(skinId)),
     ...(spec.varkhulVisuals
       ? [
+          buildVarkhulRig,
           () => {
             const encounter = buildVarkhulEncounterPrewarmVisual();
+            const forgestorm = buildVarkhulForgestormPrewarmVisual();
             const forgeBeams = buildVarkhulForgeBeamPrewarmVisual();
             const interceptBeam = buildVarkhulInterceptBeamPrewarmVisual();
             const forgePortals = buildVarkhulForgePortalPrewarmVisual();
             const worldfire = buildVarkhulWorldfirePrewarmVisual();
             encounter.position.set(-12, 0, 0);
+            forgestorm.position.set(-12, 0, 12);
             forgeBeams.position.set(12, 0, 0);
             interceptBeam.position.set(0, 0, 12);
             forgePortals.root.position.set(0, 0, 12);
             worldfire.position.set(0, 0, -12);
-            group.add(encounter, forgeBeams, interceptBeam, forgePortals.root, worldfire);
+            group.add(
+              encounter,
+              forgestorm,
+              forgeBeams,
+              interceptBeam,
+              forgePortals.root,
+              worldfire,
+            );
             varkhulKeepAlive.push(
               encounter,
+              forgestorm,
               forgeBeams,
               interceptBeam,
               forgePortals.root,
@@ -280,19 +332,6 @@ async function runInteriorEncounterPrewarm(
           },
         ]
       : []),
-    // Nythraxis's eruption, flame patches, Gravefire strip, and Binding Sigil:
-    // actionable floor visuals built lazily by per-frame encounter sync, so
-    // their first appearance must not link programs inside live combat.
-    ...(spec.nythraxisGraveVisuals
-      ? [
-          () => {
-            const grave = buildNythraxisGravePrewarmVisual();
-            grave.position.set(-24, 0, 0);
-            group.add(grave);
-            varkhulKeepAlive.push(grave);
-          },
-        ]
-      : []),
   ];
   await runIdleQueue(units, (unit) => unit(), {
     batchSize: 1,
@@ -330,10 +369,14 @@ async function runInteriorEncounterPrewarm(
 // the pass would link each program without ever paying its first DRAW. The zone
 // prewarm plants its group in front of the player for the same reason.
 function placeHiddenPrewarmGroup(host: InteriorEncounterPrewarmHost, group: THREE.Group): void {
-  const pos = host.sim.player.pos;
-  group.position.set(pos.x, pos.y, pos.z - 24);
+  placeAtPlayer(host, group);
   setRenderCategory(group, 'prewarm');
   group.visible = false;
+}
+
+function placeAtPlayer(host: InteriorEncounterPrewarmHost, group: THREE.Group): void {
+  const pos = host.sim.player.pos;
+  group.position.set(pos.x, pos.y, pos.z - 24);
 }
 
 function liveSoulRendProxyMesh(
@@ -425,7 +468,13 @@ async function compileEncounterPrewarmGroup(
         }
         units.push({
           label: `encounter-prewarm-render:${childRoot.name || childRoot.type}`,
-          run: () => host.renderBoundedPrewarmRoot(groupLike as THREE.Group, childRoot),
+          run: () => {
+            // A pass that starts in the Forge-Lift can still be draining when
+            // the raid walks into the Halls, another instance origin: placed
+            // once, its later children would be culled from their first draw.
+            placeAtPlayer(host, groupLike as THREE.Group);
+            host.renderBoundedPrewarmRoot(groupLike as THREE.Group, childRoot);
+          },
         });
         return units;
       },

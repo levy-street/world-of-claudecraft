@@ -132,6 +132,14 @@ than free, so ask before you rely on it.
 | Biome backdrop panoramas (vale_backdrop.webp, marsh_backdrop.webp, peaks_backdrop.webp and 4K variants) | World of ClaudeCraft | Project-generated procedural painterly sky panorama art | Project asset | With the project only |
 | Fel meteor POWERFUL VFX sprite (`public/vfx/fel_meteor_impact.png`) | World of ClaudeCraft | Original project art generated with OpenAI image generation from a text-only prompt, converted to a grayscale additive 512px runtime texture and tinted in-engine | Project asset | With the project only |
 | Loading-screen artwork (`public/textures/loading/*.webp`) | World of ClaudeCraft | Project-generated with OpenAI image generation from World of ClaudeCraft gameplay captures and project-owned character and creature references, maintainer-selected and optimized locally | Project asset | With the project only |
+| Website fractured portal (`public/website-fractured-portal-v1.svg`, `public/website-fractured-portal-v2.svg`, `public/website-fractured-portal-v3.svg`, `public/website-fractured-portal-v4.webp`, `public/website-fractured-portal-v5.webp`) | World of ClaudeCraft | OpenAI built-in image generation; v1 to v3 use authored SVG transparency masks; v4 is a native-alpha hollow frame; v5 contains a dark magical interior with transparent exterior and displays the original project logo separately; prompts in `docs/design/website-fractured-portal.md` | Project asset, rights reserved | **No, permission required** |
+| Website feature icons (`public/website-feature-classes-v1.webp`, `public/website-feature-open-v1.webp`) | World of ClaudeCraft | OpenAI built-in image generation; transparent artwork optimized to WebP; prompts in `docs/design/website-feature-icons.md` | Project asset, rights reserved | **No, permission required** |
+| Website stone gateway (`public/website-stone-gateway-v2.svg`) | World of ClaudeCraft | OpenAI built-in image generation referencing the project logo and Eastbrook loading artwork; optimized WebP embedded in an authored SVG silhouette; prompt in `docs/design/website-stone-gateway.md` | Project asset, rights reserved | **No, permission required** |
+| Website parchment scroll (`public/website-parchment-scroll-v1.svg`, `public/website-parchment-scroll-v2.svg`) | World of ClaudeCraft | OpenAI built-in image generation; v2 references first-party Eastbrook loading artwork; optimized locally to WebP and embedded in an authored SVG silhouette; prompts in `docs/design/website-parchment-scroll.md` | Project asset, rights reserved | **No, permission required** |
+| Eastbrook website hero (`public/website-hero-eastbrook-v1.webp`) | World of ClaudeCraft | OpenAI built-in image generation using first-party Eastbrook loading art and an in-game town screenshot, preserving the blue-roofed town square, hall, well and market motifs; optimized locally to WebP | Project asset, rights reserved | **No, permission required** |
+| Galecrest website hero (`public/website-hero-galecrest-v1.webp`) | World of ClaudeCraft | OpenAI built-in image generation using first-party loading art style and the canonical Galecrest zone description: Wickharbor, sheltered fishing cove, grey sea cliffs and the Old Beacon; optimized locally to WebP | Project asset, rights reserved | **No, permission required** |
+| Drakelands website hero (`public/website-hero-drakelands-v1.webp`) | World of ClaudeCraft | OpenAI built-in image generation using first-party Drakemaw Caldera loading art and canonical Bloodglass Fields/Drakemaw zone motifs; optimized locally to WebP | Project asset, rights reserved | **No, permission required** |
+| Thornpeak website hero (`public/website-hero-thornpeak-v1.webp`) | World of ClaudeCraft | OpenAI built-in image generation using first-party Thornpeak loading art and canonical Highwatch mountain-zone motifs; optimized locally to WebP | Project asset, rights reserved | **No, permission required** |
 | Elite dragon rank emblem (`public/ui/ranks/elite-dragon-frame.webp`) | World of ClaudeCraft | Project-generated with OpenAI image generation and optimized locally | Project asset, rights reserved | **No, permission required** |
 | Leaderboard podium medals (`public/ui/leaderboard/medal_{gold,silver,bronze}.webp`) | World of ClaudeCraft | Project-generated with OpenAI image generation (ChatGPT) from a text-only prompt, downscaled to 256px WebP locally; the bronze disc is the generated gold disc with only its rim and laurel recolored to copper | Project asset, rights reserved | **No, permission required** |
 | Eastbrook Vale rebuild master concept, nine turnaround sheets, full-color surface-atlas source, and comparison evidence (`docs/screenshots/eastbrook-vale-rebuild/concepts/`, `turnarounds/`, and `materials/`) | World of ClaudeCraft | Original project art generated with OpenAI image generation using only World of ClaudeCraft captures and project-generated style/scale anchors; the full-color atlas source and any comparison containing it are provenance evidence, not the redistributable shipping texture; prompts and provenance are committed under `docs/design/eastbrook-vale-rebuild/` | Project asset, rights reserved | **No, permission required** |
@@ -202,6 +210,12 @@ than free, so ask before you rely on it.
 | Chimeglass Tortoise reins icon (`public/ui/items/reins_chimeglass_tortoise.webp`) | World of ClaudeCraft | Three-quarter head render of the shipped mount model, background keyed and downscaled to the 128px woc-item-icon-v1 shipping format | Project asset, rights reserved | **No, permission required** |
 | Rift dimensional gate model (`public/models/props/rift_portal.glb`) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D), owned under the Meshy paid-plan license | Project asset | With the project only |
 | Rift arcane flame + rune monolith props (`public/models/props/rift_flame.glb`, `rift_rune.glb`) | World of ClaudeCraft | Project-generated via Tripo AI (text-to-3D), owned under the Tripo paid-plan license | Project asset | With the project only |
+| Eastbrook ferry transport ship (`public/models/props/eastbrook_ferry.glb`: hull, sails, sea-serpent figurehead, compass emblem, its LODs and idle clip) | World of ClaudeCraft | Original project art built procedurally in Blender for this game; no third-party mesh, texture or reference image entered the build. Deterministic source, builder and fingerprint under `scripts/assets/eastbrook_ferry/`, contract test `tests/eastbrook_ferry_asset.test.ts` | Project asset, rights reserved | **No, permission required** |
+| Harbor route marker signpost (`public/models/props/harbor_route_marker.glb`: post, arrow board, anchor roundel, metal trim, lantern, chain and rope; the destination name is drawn at runtime) | World of ClaudeCraft | Original project art built procedurally in Blender for this game, in the Eastbrook ferry's palette; no third-party mesh, texture or reference image entered the build. Deterministic source, builder and fingerprint under `scripts/assets/harbor_route_marker/`, contract test `tests/harbor_route_marker_asset.test.ts` | Project asset, rights reserved | **No, permission required** |
+| Harbormaster Tamsin's sea gear (`public/models/chars/npc_gear/harbormaster_tricorne.glb`: navy tricorne with brass lace and an anchor cockade, and a briar pipe; `public/models/chars/npc_gear/harbormaster_spyglass.glb`: brass spyglass in a leather frog) | World of ClaudeCraft | Original project art built procedurally in Blender for this game, in the Eastbrook ferry's palette, fitted to the modular body in each bone's bind frame; no third-party mesh, texture or reference image entered the build. Deterministic source, builder and fingerprint under `scripts/assets/harbormaster_gear/`, contract test `tests/harbormaster_gear_asset.test.ts` | Project asset, rights reserved | **No, permission required** |
+| Wyrmwatch cliff harbor (`public/models/props/wyrmwatch_harbor.glb`: the Drakelands ferry berth's quays, switchback stair, landings, railings, harbor gate, the walk-in Harbormaster's House with its furnishings and wall map of the ferry routes, lanterns, cargo, dressing and path flagstones) | World of ClaudeCraft | Original project art built procedurally in Blender for this game from the sim's own layout, in the Eastbrook ferry's palette; no third-party mesh, texture or reference image entered the build. Deterministic source, builder and fingerprint under `scripts/assets/wyrmwatch_harbor/`, contract test `tests/wyrmwatch_harbor_asset.test.ts` | Project asset, rights reserved | **No, permission required** |
+| Wickharbor ferry wharf (`public/models/props/wickharbor_wharf.glb`: the Wickharbor ferry berth's plank wharf, its pier, berth head, arm and flight, frame and piles, railings, lanterns, cargo, trim and dressing) | World of ClaudeCraft | Original project art built procedurally in Blender for this game from the sim's own layout, in the Wyrmwatch cliff harbor's recipe and palette; no third-party mesh, texture or reference image entered the build. Deterministic source, builder and fingerprint under `scripts/assets/wickharbor_wharf/`, contract test `tests/wickharbor_wharf_asset.test.ts` | Project asset, rights reserved | **No, permission required** |
+| Wickharbor harbor (`public/models/props/wickharbor_harbor.glb`: Wickharbor's shore boardwalk, the great quay with its crane and cargo shelter, its two piers, the two stairs up the bluff and the Old Beacon's dock and stair, plank fields, frame and piles, stone footings, railings, lanterns, cargo, trim and dressing) | World of ClaudeCraft | Original project art built procedurally in Blender for this game from the sim's own layout, in the Wickharbor ferry wharf's and the Wyrmwatch cliff harbor's recipe and palette; no third-party mesh, texture or reference image entered the build. Deterministic source, builder and fingerprint under `scripts/assets/wickharbor_harbor/`, contract test `tests/wickharbor_harbor_asset.test.ts` | Project asset, rights reserved | **No, permission required** |
 | Ignivar raid forge-mech dressing props (`public/models/dungeon/ignivar_prop_*.glb`: beams, pillars, the rusty gear wall, vault door, reactor, lava face, forge, anvil, chains, lava and steam machinery) | World of ClaudeCraft | Project-generated via Tripo AI (text-to-3D) from the maintainer's environment drop, owned under the Tripo paid-plan license, optimized to KTX2/meshopt via `scripts/assets/build_ignivar_props.mjs` | Project asset | With the project only |
 | Drakelands rebuild kit props (`public/models/drakelands_kit/*.glb`: town buildings and bases, church, barracks, stables, castle door, fence, gravestones, signpost, tavern sign, horse-head sign, notice board, shield and weapon racks, training dummy, well pump, dragon statue) | World of ClaudeCraft | Project-generated via Tripo AI (text-to-3D) from the maintainer's environment drop, owned under the Tripo paid-plan license, optimized to KTX2/meshopt via `scripts/assets/build_drakelands_kit.mjs` (the full-quality drop stays with the maintainer outside the repo; `grain_drakelands_kit_textures.mjs` re-bakes from it) | Project asset | With the project only |
 | Realm sky HDRIs (hollow_dusk, ember_storm, frost_twilight, amber_sunset, fen_day, nightbloom_dream, wraithwood_gloom; 2k and 1k) | World of ClaudeCraft | Project-generated equirect sky panoramas, converted to RGBE with HDR sun re-injection | Project asset | With the project only |
@@ -321,6 +335,11 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated creature model + animations (emberkin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 | Generated creature model + animations (pyre_colossus) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 | Generated creature model + animations (gloomshade_abyssal_guardian) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
+| Generated creature models + animations (hoard_abyssal_maw, hoard_hoarfrost_warden) | World of ClaudeCraft | Models project-generated via scripts/asset_pipeline (Tripo AI 3D). The Maw is rigged and animated by the project in Blender (`scripts/assets/hoard_bosses/maw_rig.py`); the Warden rides the Tripo auto-rig with its preset retargets repaired and an authored attack (`scripts/assets/hoard_bosses/frost_fix.py`) | Project asset | With the project only |
+| Generated creature models (hoard_emberforge_tyrant, hoard_archon_nyxaris, hoard_tempest_vharok) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D), edited in Blender (`scripts/assets/hoard_bosses/`: Nyxaris legs removed so he floats; Emberforge two generated textures mixed and the generated hands replaced by project-modelled forge gauntlets; Vharok arms lengthened), then rigged locally onto the KayKit skeleton with `rig-manual`, carrying the KayKit (Kay Lousberg, CC0) clips | Project asset | With the project only |
+| Generated hoard room creatures (hoard_tide_thrall, hoard_frost_revenant, hoard_ember_fiend, hoard_magma_brute, hoard_void_acolyte, hoard_storm_caller, hoard_boneclad_warrior; hoard_deep_lurker, hoard_dread_stalker, hoard_stormscale_drake, hoard_thornback_stalker, hoard_venom_weaver, hoard_rime_elemental, hoard_coinsack_scurrier) | World of ClaudeCraft | Models project-generated via scripts/asset_pipeline (Tripo AI 3D) from project concept images (the last four concepts are Tripo text-to-image). The eight humanoids are rigged locally onto the KayKit skeleton with `rig-manual` (the Coinsack Scurrier's sack and face made rigid by `scripts/assets/hoard_mobs/rigid_pack.mjs`), carrying the KayKit (Kay Lousberg, CC0) clips; the six creatures are rigged and animated by the project in Blender (`scripts/assets/hoard_mobs/quadruped_rig.py`, the spider's legs found by `spider_spec.py`) | Project asset | With the project only |
+| Generated cave boss models (hoard_boss_mushroom, hoard_bloat_cap) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D): the Mother of Mushrooms from a project concept image, rigged locally onto a long-armed copy of the KayKit skeleton (`scripts/assets/hoard_mobs/stretch_arms.mjs`, then `rig-manual`, her cap and growths made rigid by `rigid_pack.mjs` and `rigid_islands.mjs`), carrying the KayKit (Kay Lousberg, CC0) clips; her Bloated Cap a Tripo text-to-model static prop | Project asset | With the project only |
+| Generated cave boss models (hoard_boss_mole, hoard_boss_bat, hoard_boss_mimic) | World of ClaudeCraft | Models project-generated via scripts/asset_pipeline (Tripo AI 3D) from project concept images, rigged and animated by the project in Blender: Deeprake with `scripts/assets/hoard_mobs/quadruped_rig.py` (claw, rear-up and burrow clips), the Colossal Bat with `bat_rig.py` (wing chains, flying clips), the Voracious Chest with `mimic_rig.py` (lid cut free along the teeth and hinged as a jaw) | Project asset | With the project only |
 | Generated Fenbridge town kit (`fenbridge_warden_gatehouse`, `fenbridge_crooked_reed_inn`, `fenbridge_lantern_chapel`, `fenbridge_moonwort_apothecary`, `fenbridge_gilded_strongbox`, `fenbridge_hesk_tannery`, `fenbridge_scout_lodge`, `fenbridge_mirelight_cistern`, `fenbridge_provision_stall`, `fenbridge_palisade_wing`, `fenbridge_gate_arch`, `fenbridge_boardwalk`, `fenbridge_muster_board`, and quest pickup `fenbridge_muster_order`) | World of ClaudeCraft | Original deterministic procedural Three.js models produced through the img2threejs workflow and `scripts/assets/fenbridge_town` from the project-generated Fenbridge turnaround sheets; exterior-only building shells preserve the canonical gameplay and collision contracts | Project asset | With the project only |
 
 | Generated prop model (wildheart_jaguar_gate) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
@@ -357,10 +376,24 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Druid cat form model and animations (`public/models/creatures/druid_cat_form.glb`) | World of ClaudeCraft maintainer handoff | Maintainer-provided cat mesh and packed Tripo texture; animal Rigify controls, proxy-transferred skin weights and 26 clips authored locally in Blender through `scripts/assets/druid_cat/` (17 ship in the compact set), then baked and optimized with meshopt and ETC1S KTX2 | Project asset | With the project only |
 | Ignivar Ashcaller creature model + animations (`public/models/creatures/ignivar_ashcaller.glb`) | World of ClaudeCraft contributor handoff | Contributor-provided `Ignivar_Ashcaller.zip` (SHA-256 `aa7aac6ddd2eedefdaec7e0c645558701236e60081f74f45a1e4cf088711eda9`), optimized locally with meshopt and KTX2 for shipping | Project asset | With the project only |
 | Generated prop model (varkhul_grand_forge) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_broken_planks) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_waterlogged_barrel) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_damaged_crate) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_fallen_anchor) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_hull_fragment) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_capsized_rowboat) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| World Quests shipwreck placement kit (`public/models/world_quests/shipwreck/`) | World of ClaudeCraft contributor handoff | Owner-provided `shipwreck-quest` GLBs, identified as Tripo exports in their source metadata; optimized using `scripts/assets/specs/world_quest_shipwreck.json` and the meshopt/KTX2 pipeline | Project asset | With the project only |
+| Confection Cascade candy atlas (`public/ui/minigames/confection-candies.webp`) | World of ClaudeCraft | Project-generated with OpenAI built-in image generation; [provenance and prompts](docs/screenshots/confection-cascade/README.md) | Project asset | With the project only |
+| Confection Cascade walnut coffer material (`public/ui/minigames/confection-walnut.webp`) | World of ClaudeCraft | Original project art generated with OpenAI built-in image generation from a text-only prompt, optimized to WebP; [provenance and exact prompt](docs/screenshots/confection-cascade-v3/material-provenance.md) | Project asset | With the project only |
+| Confection Cascade artisan frame, brass hardware and result seals (`public/ui/minigames/*-v4.webp`) | World of ClaudeCraft | Original project art generated and background-edited with OpenAI built-in image generation, optimized to WebP; [frame prompts](docs/screenshots/confection-cascade-v4/frame-provenance.md), [hardware prompts](docs/screenshots/confection-cascade-v4/hardware-provenance.md), [seal prompts](docs/screenshots/confection-cascade-v4/seals-provenance.md) | Project asset | With the project only |
+| Confection Cascade symmetrical emerald ornament (`public/ui/minigames/confection-jewels-v5.webp`) | World of ClaudeCraft | Original project art generated with OpenAI built-in image generation using the existing project crest as a style reference, optimized to WebP; [provenance and exact prompt](docs/screenshots/confection-cascade-v5/jewel-provenance.md) | Project asset | With the project only |
+| Confection Cascade solid emerald and winged lock hardware (`public/ui/minigames/*-v6.webp`) | World of ClaudeCraft | Original project art generated and background-edited with OpenAI built-in image generation, optimized to WebP; [provenance and exact prompts](docs/screenshots/confection-cascade-v6/hardware-provenance.md) | Project asset | With the project only |
+| Confection Cascade polished gold hardware mounts (`public/ui/minigames/*-v7.webp`) | World of ClaudeCraft | Project art edited with OpenAI built-in image generation using the v6 hardware, optimized to WebP; [provenance and exact prompts](docs/screenshots/confection-cascade-v7/hardware-provenance.md) | Project asset | With the project only |
 | Generated prop model (nythraxis_bone_spike) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (nythraxis_binding_cage) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated buddy model + animations (horse, the low-poly pony companion, `public/models/buddies/horse.glb`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline creature lane (Tripo AI 3D sculpt + quadruped auto-rig), owned under the Tripo paid-plan license; Idle/Walk gait clips authored locally by scripts/bake_buddy_horse_gaits.mjs | Project asset | With the project only |
 | Generated buddy model, animations and whistle icon (sapling, `public/models/buddies/sapling.glb`) | World of ClaudeCraft | User-approved lavender-eye concept, Tripo sculpt and biped rig; locally authored Idle/Walk/Run waddle clips; prepared by scripts/prepare_buddy_sapling.mjs and rendered by scripts/assets/render_buddy_item_icons.mjs. Generation task 210d80e7-3360-4f16-8682-3eac128249e7; rig task b0e39abb-708f-4e53-987e-a0970ffda400. | Project asset | With the project only |
+| Generated prop model (windrider_glider_flight) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 
 Crucible profession collection equipment, manuals, and enchant formula paintings are project-generated art, made with OpenAI's built-in image generation for World of ClaudeCraft. Provenance: `docs/achievements/crucible-professions-2026-09-05/`. Project asset, with the project only.
 
@@ -390,3 +423,95 @@ MIT License covering the source code.
 
 If you are unsure whether you may use an asset, or you want permission for
 something this file marks as restricted, ask first: tony@levystreet.com.
+| Ley Beam Alignment celestial frame and crystal heart (`public/ui/minigames/ley-*-v1.webp`) | World of ClaudeCraft | Project art generated with OpenAI built-in image generation, optimized to WebP; [provenance and prompts](docs/screenshots/ley-beam-v1/art-provenance.md) | Project asset | With the project only |
+
+### Orbital Lightning
+
+- `public/vfx/orbital-lightning/{orb,impact}.glb`: original procedural Blender art
+  authored for World of ClaudeCraft from the user's Orbital Lightning brief.
+  No third-party models or textures. Project asset, with the project only.
+  Source and provenance: `docs/design/orbital-lightning/shipping-assets.md`.
+
+### Bone Reaper (Wandering Scythe and Soul Harvest)
+
+- `public/vfx/bone-reaper/{scythe,soul}.glb`: original procedural Blender art
+  authored for World of ClaudeCraft from the owner's Bonelord Xarreth briefs. No
+  third-party mesh, texture or reference image is used.
+  Source and provenance: `docs/design/bone-reaper/README.md`.
+
+### Ice Age (Hoarfrost's fallen icicles)
+
+- `public/vfx/ice-age/pillars.glb`: original procedural Blender art authored for
+  World of ClaudeCraft from the owner's Ice Age brief. No third-party mesh,
+  texture or reference image is used.
+  Source and provenance: `docs/design/ice-age/README.md`.
+
+### Bound Pulsars (Archon Nyxaris's orbs)
+
+- `public/vfx/pulsars/{orb,core}.glb`: original procedural Blender art authored for
+  World of ClaudeCraft from the owner's orb brief. No third-party mesh, texture or
+  reference image is used, and the design copies no other game's orbs.
+  Source and provenance: `docs/design/pulsars/README.md`.
+
+### Hammer of the Forge (Emberforge's falling hammer)
+
+- `public/vfx/forge-hammer/hammer.glb`: original procedural Blender art authored
+  for World of ClaudeCraft from the owner's forge hammer brief. No third-party
+  mesh, texture or reference image is used.
+  Source and provenance: `docs/design/forge-hammer/README.md`.
+
+### Tentacles of the Abyss (the Abyssal Maw's tentacles)
+
+- `public/vfx/tentacles/tentacle.glb` and `public/models/creatures/hoard_tentacle_trunk.glb`: original procedural Blender art
+  authored for this project (the Abyssal Maw's tentacle: one instanced segment, its
+  tip, the heaved flagstones and pool, and the attackable mob's root collar). No
+  third-party mesh, texture or reference image.
+  Source and provenance: `docs/design/tentacles/README.md`.
+
+### Rolling Boulder (Warlord Grask's boulder)
+
+- `public/vfx/boulder/boulder.glb`: original procedural Blender art authored for
+  this project (the iron-banded rock, its glowing fissures and the nine pieces it
+  breaks into). No third-party mesh, texture or reference image.
+  Source and provenance: `docs/design/boulder/README.md`.
+
+### Emberforge room kit (the Emberforge Tyrant's hoard room)
+
+- `public/models/props/hoard_forge_kit.glb`: original procedural Blender art authored
+  for this project (the Great Forge, an anvil, a crucible, an ingot stack, a vent, a
+  forge post, a chain and hook, an iron brace). No third-party mesh, texture or
+  reference image. Source and provenance: `docs/design/forge-room/README.md`.
+- `public/models/weapons/hoard_forge_maul.glb`: the held variant of the project's own
+  Hammer of the Forge model (`scripts/assets/hoard_bosses/held_forge_maul.mjs`).
+
+### Buried Hoard boss room kits
+
+- `public/models/props/hoard_abyss_kit.glb`, `hoard_frost_kit.glb`, `hoard_void_kit.glb`,
+  `hoard_storm_kit.glb`, `hoard_warcamp_kit.glb`, `hoard_nest_kit.glb` and
+  `hoard_crypt_kit.glb`: original procedural Blender art authored for this project (the
+  room dressing of the Abyssal Maw, Hoarfrost Warden, Archon Nyxaris, Tempest Vharok,
+  Warlord Grask, Broodmother Vysska and Xarreth). No third-party mesh, texture or
+  reference image. Source and provenance: `docs/design/boss-rooms/README.md`.
+
+### Cocoon (Broodmother Vysska's cocoons)
+
+- `public/models/creatures/hoard_{silk,brood}_cocoon.glb`: original procedural Blender art authored
+  for this project (the silk cocoon a wrapped player stands inside, and the brood
+  cocoon spun for a lone player). No third-party mesh, texture or reference image.
+  Source and provenance: `docs/design/cocoon/README.md`.
+
+### Buried Hoard reward chest
+
+- `public/models/props/hoard_reward_chest.glb`: original procedural Blender art
+  authored for World of ClaudeCraft from the owner's reward chest brief. No
+  third-party mesh, texture or reference image is used.
+  Source and provenance: `docs/design/reward-chest/README.md`.
+
+### Buried Hoard entrance
+
+- `public/models/props/hoard_entrance.glb`: original procedural model authored for
+  World of ClaudeCraft from the user design brief, 2026-09-19. No third-party model
+  or image reference. Source and deterministic exporter: `scripts/assets/hoard_entrance/`.
+  Provenance: `docs/design/buried-hoard-entrance/asset-provenance.md`.
+
+Weekly Vault milestone illustrations (public/ui/weekly-vault/) are project-generated art made with OpenAI's built-in image generation for World of ClaudeCraft. Matching square front-face doors with antique-gold trim and corners, plus bronze empty, silver Normal, or gold Heroic center accents; completed doors remain closed with matching light glowing through their seams. Project asset, with the project only.

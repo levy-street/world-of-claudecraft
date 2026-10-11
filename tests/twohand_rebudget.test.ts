@@ -5,6 +5,7 @@
 // assumed the offhand slot was sacrificed, and Titan's Grip filled BOTH slots with
 // double-budget two-handers (86 weapon stat points vs 38 for a dual-1H pair).
 import { describe, expect, it } from 'vitest';
+import { SEASON2_WEAPON_IDS } from '../src/sim/content/pvp_honor_season2';
 import { ITEMS } from '../src/sim/data';
 import {
   SLOT_STAT_MULT,
@@ -36,6 +37,9 @@ describe('v0.27.1 two-hand re-budget', () => {
     let checked = 0;
     for (const item of twoHanders()) {
       if (itemLevel(item) === undefined) continue;
+      // Warfare Season 2 weapons carry the honor discount instead (0.9 of the
+      // line plus the stamina floor), pinned in tests/warfare_season2.test.ts.
+      if ((SEASON2_WEAPON_IDS as readonly string[]).includes(item.id)) continue;
       expect(primaryStatSum(item), item.id).toBe(expectedStatBudget(item));
       checked++;
     }

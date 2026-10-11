@@ -11,6 +11,14 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es_ES: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.forge.failed':
+    '¡Demasiados errores! El metal se agrietó. Habla con Mara para volver a intentarlo.',
+  'questUi.worldQuest.forge.replay':
+    'Habla con Mara para volver a intentarlo. Las recompensas se ganan una vez por rotación.',
+  'questUi.worldQuest.horde.failed': 'Defensa fallida. ¡Vuelve a intentarlo!',
+  'questUi.worldQuest.investigation.cleared':
+    'Sargento Alric: Ese soldado está localizado. Compara las demás historias con nuestros registros e vuelve a intentarlo.',
+  'questUi.worldQuest.traceRetry': 'Habla con el instructor para volver a intentarlo.',
   'hud.errors.tradeAlreadyTrading': 'Ese jugador ya está tradeando.',
   'hudChrome.emotes.question': '¿Tío?',
   'hudChrome.professions.ctaRaiseSpecialized':
@@ -26,7 +34,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'highscores.title': 'Tabla de clasificaciones',
   'wiki.title': 'Wiki y guía del juego',
   'news.title': 'Noticias y actualizaciones',
-  'download.title': 'Descargar lanzador de escritorio',
+  'download.title': 'Descarga la aplicación de escritorio',
   'download.macCta': 'Descargar version macOS',
   'download.windowsPending': 'Compilacion de Windows pendiente.',
   'mode.onlineTitle': 'Jugar en línea',
@@ -64,7 +72,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'controls.friends': 'Amigos y hermandad',
   'controls.chat': 'Abrir chat',
   'seo.description':
-    'Emprende una aventura épica en World of ClaudeCraft, un micro-MMO de estilo clásico jugable directamente en tu navegador. Únete a un mundo compartido persistente, sube de nivel tus clases y derrota a tus enemigos.',
+    'Juega a World of ClaudeCraft, un MMO de navegador gratuito. Explora, completa misiones y recorre mazmorras con amigos. No hace falta descargar nada.',
   'a11y.goHome': 'Ir a la página de inicio',
   'a11y.characterActions': 'Acciones del personaje',
   'a11y.githubProject': 'Abrir el proyecto World of ClaudeCraft en GitHub',

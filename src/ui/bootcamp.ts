@@ -558,16 +558,12 @@ export class BootcampOverlay {
     syncGlow('#quest-dialog .qd-list-item[data-vendor="1"]', () => vendorItem !== null);
 
     // The death lesson's own screen. While the island is teaching the corpse
-    // run, the button that ends it pulses the moment it appears, and the
-    // Keeper's paid alternative is dimmed out of the way: a first-timer
-    // offered two buttons will take whichever they see first, and the whole
-    // lesson is that the walk back is free (CX).
+    // run, the button that ends it pulses the moment it appears. The Keeper's
+    // paid alternative has no button on that screen any more (the ghost talks
+    // to the Keeper for it), so nothing competes with the walk back (CX).
     const teachingCorpseRun =
       this.deathPhase !== 'alive' && this.lastFocus?.questId === DEATH_LESSON_QUEST_ID;
     syncGlow('#resurrect-corpse-btn', () => teachingCorpseRun);
-    for (const el of document.querySelectorAll<HTMLElement>('#resurrect-healer-btn')) {
-      el.classList.toggle('bc-dimmed', teachingCorpseRun);
-    }
   }
 
   /** Re-localize after an in-game language switch (the Hud's woc:languagechange

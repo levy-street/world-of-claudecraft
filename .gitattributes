@@ -24,3 +24,14 @@ src/ui/i18n.catalog/translation_keys.generated.ts linguist-generated
 # Windows batch scripts keep their CRLF endings: exempt from text conversion so an
 # LF-normalized checkout (core.autocrlf=input) neither flags nor rewrites them.
 *.bat -text
+
+# Host diagnostic (electron/host_diag/): the shipped single-file script is pinned by
+# the SHA-256 in dist/manifest.json, so git must never rewrite its bytes. Its sources
+# are byte-faithful copies of the tool's upstream sandbox (mixed LF/CRLF) that the
+# bundler normalizes at build time; exempt them too so a checkout cannot change them.
+# The manifest is compared byte for byte by `host_diag_build.mjs --check` in the
+# desktop build, so a Windows runner's core.autocrlf=true checkout (CRLF) failed the
+# v0.44.0 Windows publish as "dist is stale"; it is exempt for the same reason.
+electron/host_diag/dist/HostDiag.ps1 -text
+electron/host_diag/dist/manifest.json -text
+electron/host_diag/win/** -text

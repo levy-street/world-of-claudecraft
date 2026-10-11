@@ -17,6 +17,7 @@
 import * as THREE from 'three';
 import { getActiveWorldContent, zoneAt } from '../sim/data';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { buildDrapedGlowGeometry } from './ground_glow_patch';
 import { campfireEmberSites } from './night_accents_core';
 import { hasNightLightField, registerStaticNightLights } from './night_light_field';
@@ -103,7 +104,7 @@ export function buildEmberPools(seed = 0): EmberPoolsView {
       material,
     );
     mesh.geometry.computeBoundingSphere();
-    mesh.renderOrder = 1; // over the ground it drapes on
+    mesh.renderOrder = floorVfxRenderOrder('ground', 0); // over the ground it drapes on
     mesh.visible = false; // nothing until the embers light
     meshes.push(mesh);
     zoneGroup.add(mesh);

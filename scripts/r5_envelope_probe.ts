@@ -305,6 +305,11 @@ function dress(
     instances[slot] = { itemId, rolled: { stats } };
   }
   meta.equipmentInstance = instances;
+  // The envelope is a raid fight, where WARFARE Vitality (honor gear health)
+  // is always off (src/sim/pvp/vitality.ts). The probe anchors in the open
+  // field for terrain reasons, so switch it off here or the tank's honor chest
+  // would read open-world health no raid tank carries.
+  p.pvpVitalityActive = false;
   const recalc = () =>
     recalcPlayerStats(
       p,

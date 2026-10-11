@@ -65,11 +65,14 @@ function standAt(sim: Sim, pid: number, target: { x: number; z: number }): Entit
 
 function stableTownNpcPayload(): Record<string, Omit<NpcDef, 'pos' | 'facing'> | NpcDef> {
   return Object.fromEntries(
-    Object.entries(ZONE1_NPCS).map(([id, def]) => {
-      if (def.dynamic) return [id, def];
-      const { pos: _pos, facing: _facing, ...stable } = def;
-      return [id, stable];
-    }),
+    // The new independent keeper has its own placement and service tests.
+    Object.entries(ZONE1_NPCS)
+      .filter(([id]) => id !== 'eastbrook_vault_keeper')
+      .map(([id, def]) => {
+        if (def.dynamic) return [id, def];
+        const { pos: _pos, facing: _facing, ...stable } = def;
+        return [id, stable];
+      }),
   );
 }
 
@@ -277,9 +280,10 @@ describe('Eastbrook authored gameplay data integration', () => {
     // swap; the building table is exactly the authored layout lots now, and
     // the KayKit barracks + watch tower garrison the old lot as decorProps
     // (pinned in tests/eastbrook_grand_armoury.test.ts).
-    expect(ZONE1_PROPS.buildings.map((building) => building.id)).toEqual(
-      EASTBROOK_LAYOUT.buildings.map((building) => building.id),
-    );
+    expect(ZONE1_PROPS.buildings.map((building) => building.id)).toEqual([
+      ...EASTBROOK_LAYOUT.buildings.map((building) => building.id),
+      EASTBROOK_LAYOUT.weeklyVault.id,
+    ]);
     expect(ZONE1_PROPS.buildings.some((building) => building.landmark)).toBe(false);
     // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md): the well beacon moved with
@@ -417,6 +421,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       'smith_haldren',
       'fisherman_brandt',
       'foreman_odell',
+      'eastbrook_vault_keeper',
       'bursar_fernando',
       'card_master',
       'chronicler_saul',

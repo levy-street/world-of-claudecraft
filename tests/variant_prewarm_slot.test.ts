@@ -145,6 +145,49 @@ describe('createPrewarmGroupSlot', () => {
     expect(h.scene.children).toEqual([]);
   });
 
+  it('links a named live root between the stage and the pieces, the weather resume', async () => {
+    // A dropped weather entry resumed as stage + uploads only, so nothing
+    // linked the hidden precipitation draw and the first rain linked it live.
+    const h = host();
+    const points = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial());
+    const events: string[] = [];
+    const api = {
+      scene: h.scene,
+      compileColorPrograms: async (root: THREE.Object3D) => {
+        events.push(root === points ? 'link:points' : 'link:other');
+      },
+    };
+    const slot = createPrewarmGroupSlot(api, 'weather.materials', {
+      stage: () => {
+        events.push('stage');
+        return ['flake', 'streak'];
+      },
+      hide: () => void events.push('hide'),
+      units: (maps) => maps.map((map) => ({ id: map, run: () => void events.push(map) })),
+      linkRoot: () => points,
+    });
+    const units = slot.resumeUnits();
+    expect(units.map((unit) => unit.id)).toEqual([
+      'weather.materials:stage',
+      'weather.materials:compile',
+      'weather.materials:units',
+    ]);
+    expect(units[1].roots).toEqual([]);
+    await expect(units[1].run()).rejects.toThrow('weather.materials');
+    await units[0].run();
+    expect(units[1].roots).toEqual([points]);
+    expect(units[1].roots?.[0]).toBe(points);
+    await units[1].run();
+    await units[2].run();
+    expect(events).toEqual(['stage', 'hide', 'link:points', 'flake', 'streak']);
+    // The manifest entry itself is unchanged: its link stays the compile
+    // pass's scene recollect, so run() stages and uploads only.
+    events.length = 0;
+    await slot.run();
+    expect(events).toEqual(['stage', 'flake', 'streak']);
+    expect(h.scene.children).toEqual([]);
+  });
+
   it('runs the per-piece work inline at the manifest entry, staged VISIBLE', async () => {
     // The boot pass draws behind the loading screen, so the entry stages the
     // artifact as it stands and does its own piece work; only a resume hides.

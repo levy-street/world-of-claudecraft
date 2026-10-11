@@ -27,6 +27,9 @@ import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
+import type { HillState } from './pvp/hill';
+import type { HillSpotProbe } from './pvp/hill_rules';
+import type { WorldPvpBooks } from './pvp/world_pvp';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
@@ -81,6 +84,7 @@ import type {
   VaultConsumptionReservation,
   VaultConsumptionTake,
   Vec3,
+  WorldQuestDef,
 } from './types';
 
 /** Shared inert success handle for hosts with no durable audit sink. Reused by
@@ -105,7 +109,10 @@ export type RuntimeSimConfig = Required<
     | 'gathererIdentity'
   >
 > &
-  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'> & {
+    vaultOpenNeedsSave?: boolean;
+    vaultRewardNeedsSave?: boolean;
+  };
 
 export interface DamageResolution {
   landedHpLoss: number;
@@ -211,6 +218,10 @@ export interface SimContextPrimitives {
   riftPortalSpawnCount: number;
   // Deterministically sampled next scheduler deadline (sim seconds).
   riftPortalNextAt: number;
+  // Dev-only skip for the ferry timetable (transport_ferry.ts transportClock):
+  // seconds added to `time` for the schedule. 0 in play; only /dev ferry
+  // writes it (dev/ferry_dev.ts).
+  transportClockOffset: number;
   // live arena bouts keyed by every participant pid (A2); release-spirit early-bails
   // when the dead player is mid-bout.
   readonly arenaMatches: Map<number, ArenaMatch>;
@@ -264,6 +275,15 @@ export interface SimContextPrimitives {
   readonly bgMatches: Map<number, BgMatch>;
   readonly bgBusySlots: Set<number>;
   nextBgMatchId: number;
+  // World PvP (pvp/world_pvp.ts): the assist recency books and the per-pair
+  // diminishing-returns rows behind the /pvp flag's kill resolution, mutated
+  // in place by that module only. Backing field stays on Sim.
+  readonly worldPvpBooks: WorldPvpBooks;
+  // King of the Hill (pvp/hill.ts): the standing hill, the schedule and the
+  // hour's accruals, one live view like the books above (session-only).
+  readonly hillState: HillState;
+  // The hill's spot probe, bound by the Sim (pvp/hill_probe.ts); tests bind fakes.
+  readonly hillProbe: HillSpotProbe;
   // Resolved-match records the authoritative host drains post-tick
   // (social/battleground_outcomes.ts). Observability only: no gameplay branch
   // reads it and nothing here draws rng. Live view; the array stays on Sim.
@@ -342,6 +362,9 @@ export interface SimContextPrimitives {
   // backing field stays Sim-owned (the Market instance owns it), exposed here as a live
   // read-only view (never reassigned by the readout).
   readonly devCommands: boolean;
+  // World PvP realm kill switch (server env WORLD_PVP_DISABLED=1, pvp/world_pvp.ts):
+  // raising the /pvp flag is refused and a saved flag loads down. Exactly the Sim field.
+  readonly worldPvpDisabled: boolean;
   // The compulsory-tutorial host opt-in (SimConfig.compulsoryTutorial): the
   // greeting sweep only force-ferries fresh characters where a live world
   // turned it on; tests, parity traces, and the RL env keep it off.
@@ -983,6 +1006,7 @@ export interface SimContextCallbacks {
       cannotBeDodged?: boolean;
       normalizedInstant?: boolean;
       weaponMult?: number;
+      primaryDamageMult?: number;
       threatFlat?: number;
       threatMult?: number;
       forceCrit?: boolean;
@@ -990,6 +1014,7 @@ export interface SimContextCallbacks {
       onDealt?: (amount: number) => void;
       onEffectiveDamage?: (amount: number) => void;
       abilityId?: string | null;
+      attackAnimationStarted?: boolean;
     },
   ): boolean;
   effectiveAttackPower(e: Entity): number;
@@ -1175,6 +1200,19 @@ export interface SimContextCallbacks {
    *  affordance rather than a plain buff, so the generic aura splice must not
    *  run for it (a carrier's cancel drops the flag; anyone else's is a no-op). */
   bgCancelFlagAura(e: Entity, auraId: string): boolean;
+
+  // World-quest credit and activation seam. Append-only after the prior callback tail.
+  onMobKilledForWorldQuests(mob: Entity, meta: PlayerMeta): void;
+  onNodeGatheredForWorldQuests(node: GatherNodeDef, meta: PlayerMeta): void;
+  onObjectInteractedForWorldQuests(object: Entity, meta: PlayerMeta): boolean;
+  currentWorldQuestRotation(): Readonly<{ cycle: string; quests: readonly WorldQuestDef[] }>;
+  hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean;
+  completeWorldQuestEscort(
+    meta: PlayerMeta,
+    questId: string,
+    escortId: string,
+    escortee: Entity,
+  ): void;
 }
 
 // The seam consumed by extracted modules.
@@ -1334,6 +1372,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     set riftPortalNextAt(v) {
       host.riftPortalNextAt = v;
     },
+    get transportClockOffset() {
+      return host.transportClockOffset;
+    },
+    set transportClockOffset(v) {
+      host.transportClockOffset = v;
+    },
     get arenaMatches() {
       return host.arenaMatches;
     },
@@ -1408,6 +1452,15 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get bgBusySlots() {
       return host.bgBusySlots;
+    },
+    get hillState() {
+      return host.hillState;
+    },
+    get hillProbe() {
+      return host.hillProbe;
+    },
+    get worldPvpBooks() {
+      return host.worldPvpBooks;
     },
     get bgProposals() {
       return host.bgProposals;
@@ -1489,6 +1542,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get devCommands() {
       return host.devCommands;
+    },
+    get worldPvpDisabled() {
+      return host.worldPvpDisabled;
     },
     get compulsoryTutorial() {
       return host.compulsoryTutorial;
@@ -1787,6 +1843,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     bgOnPlayerDamaged: host.bgOnPlayerDamaged,
     bgOnPlayerHealed: host.bgOnPlayerHealed,
     bgCancelFlagAura: host.bgCancelFlagAura,
+    onMobKilledForWorldQuests: host.onMobKilledForWorldQuests,
+    onNodeGatheredForWorldQuests: host.onNodeGatheredForWorldQuests,
+    onObjectInteractedForWorldQuests: host.onObjectInteractedForWorldQuests,
+    currentWorldQuestRotation: host.currentWorldQuestRotation,
+    hasActiveWorldQuest: host.hasActiveWorldQuest,
+    completeWorldQuestEscort: host.completeWorldQuestEscort,
   };
 }
 

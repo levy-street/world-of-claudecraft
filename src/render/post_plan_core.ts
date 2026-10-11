@@ -193,6 +193,16 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
     );
   }
 
+  // The opaque-scene copy the ability VFX sample (scene_sampling.ts). It exists
+  // ONLY where the scene pass already rasterizes into a sampled depth texture,
+  // which is the n8ao beauty target and so high and above. The grade-only chain
+  // (medium, the mobile target) keeps its depth renderbuffer and allocates
+  // neither this target nor a depth texture; its consumers fall back unsampled
+  // exactly as they do on low, where there is no composer at all.
+  if (useAo) {
+    renderTargets.push(target('vfx-opaque-copy', 1, 'rgba16f', 0, 'depth32ui-texture'));
+  }
+
   if (useBloom) {
     renderTargets.push(target('bloom-bright', 0.5, 'rgba16f'));
     fullscreenStages.push(stage('bloom-high-pass', 0.5, [sceneTarget], 'bloom-bright'));

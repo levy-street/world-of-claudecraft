@@ -12,6 +12,25 @@ export function spellCritBonusFromAuras(p: Entity): number {
   return bonus;
 }
 
+// Spell crit is its own pool, separate from the melee/ranged Entity.critChance:
+// the same 5% base, Intellect in place of Agility, then the class-agnostic crit
+// core both hit tables share (crit rating, talent/set crit, flat crit auras;
+// recalcPlayerStats) and the spell-only crit auras above. Every spell and heal
+// crit roll reads this through Sim.spellCrit, and the character sheet's Spell
+// Crit cell calls it on both hosts (the online self mirror carries the shared
+// core as the `scb` self scalar), so the sheet can never drift from the roll.
+export const SPELL_CRIT_BASE = 0.05;
+export const SPELL_CRIT_PER_INT = 0.0008;
+
+export function spellCritChance(p: Entity): number {
+  return (
+    SPELL_CRIT_BASE +
+    p.stats.int * SPELL_CRIT_PER_INT +
+    (p.sharedCritBonus ?? 0) +
+    spellCritBonusFromAuras(p)
+  );
+}
+
 export function spellDamageMultFromAuras(p: Entity): number {
   let bonus = 0;
   for (const aura of p.auras) {

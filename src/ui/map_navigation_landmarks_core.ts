@@ -90,3 +90,23 @@ export function isNearbyLiveRiftZoneMapEntity(
   if (entity.templateId !== 'rift_portal' || entity.kind !== 'object') return false;
   return isLiveMapEntityDisclosed(playerPosition.x, playerPosition.z, entity.pos.x, entity.pos.z);
 }
+
+/** Live treasure and Rift entrances share disclosure limits, never their identity. */
+export function classifyNearbyLiveZoneMapEntrance(
+  entity: LiveRiftZoneMapEntity,
+  playerPosition: Readonly<{ x: number; z: number }>,
+): 'hoard-entrance' | 'rift-entrance' | null {
+  if (entity.kind !== 'object') return null;
+  const kind =
+    entity.templateId === 'hoard_entrance'
+      ? 'hoard-entrance'
+      : entity.templateId === 'rift_portal'
+        ? 'rift-entrance'
+        : null;
+  if (
+    !kind ||
+    !isLiveMapEntityDisclosed(playerPosition.x, playerPosition.z, entity.pos.x, entity.pos.z)
+  )
+    return null;
+  return kind;
+}

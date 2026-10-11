@@ -53,10 +53,15 @@ export function detectActivityEvent<S extends ActivityDetectSession>(
       now,
     );
   } else if (
-    (ev.type === 'lootRoll' || ev.type === 'masterLoot') &&
+    ev.type === 'lootRollAwarded' &&
     (ev.quality === 'epic' || ev.quality === 'legendary')
   ) {
-    // A genuinely rare item dropped (roll-worthy); one card per drop (rollId).
+    // A genuinely rare item was GRANTED by a party roll; one card per drop
+    // (rollId), tagging the winner. The award event (not the `lootRoll` or
+    // `masterLoot` prompt) is the only signal that names a recipient: the
+    // prompt fans one copy out per candidate before anyone has rolled, and
+    // reading it here tagged whichever candidate's copy came first, a player
+    // who then hunted their bags and mail for an item they never won.
     const s = ev.pid !== undefined ? deps.clients.get(ev.pid) : undefined;
     enqueueActivity(
       {

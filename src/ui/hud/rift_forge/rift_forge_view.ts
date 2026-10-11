@@ -19,6 +19,7 @@ import {
   type RiftGemId,
 } from '../../../sim/content/rift/items';
 import type { PlayerEquipmentInstances } from '../../../sim/entity';
+import { lootQualityItemLevelBonus } from '../../../sim/loot_quality';
 import {
   RIFT_GEM_RATING,
   RIFT_GEM_RATING_STAT,
@@ -110,8 +111,11 @@ function row(
     tier: rift.tier,
     upgradeLevel: rift.upgradeLevel,
     maxUpgradeLevel: rift.maxUpgradeLevel,
-    itemLevel: riftBandItemLevel(rift.tier, rift.upgradeLevel),
-    nextItemLevel: atMax ? null : riftBandItemLevel(rift.tier, rift.upgradeLevel + 1),
+    itemLevel:
+      riftBandItemLevel(rift.tier, rift.upgradeLevel) + lootQualityItemLevelBonus(instance),
+    nextItemLevel: atMax
+      ? null
+      : riftBandItemLevel(rift.tier, rift.upgradeLevel + 1) + lootQualityItemLevelBonus(instance),
     nextUpgradeCost,
     canUpgrade: !worn && nextUpgradeCost !== null && essence >= nextUpgradeCost,
     gems,

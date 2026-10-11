@@ -91,7 +91,8 @@ function easeOutCubic(t: number): number {
 }
 
 export class FrozenOrbFx {
-  private readonly scene: THREE.Scene;
+  // Only add/remove are used, so a plain Group can host the boot stand-in.
+  private readonly scene: Pick<THREE.Object3D, 'add' | 'remove'>;
   private readonly groundY: (x: number, z: number) => number;
   private readonly orbs: OrbFx[] = [];
   // Shared geometry, built lazily on the first spawn and reused for every orb.
@@ -105,7 +106,10 @@ export class FrozenOrbFx {
   private readonly shardPool: THREE.MeshStandardMaterial[] = [];
   private readonly trailPool: THREE.PointsMaterial[] = [];
 
-  constructor(scene: THREE.Scene, groundY: (x: number, z: number) => number) {
+  constructor(
+    scene: Pick<THREE.Object3D, 'add' | 'remove'>,
+    groundY: (x: number, z: number) => number,
+  ) {
     this.scene = scene;
     this.groundY = groundY;
   }
@@ -201,7 +205,7 @@ export class FrozenOrbFx {
       pooled.opacity = SHELL_OPACITY;
       return pooled;
     }
-    return new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshStandardMaterial({
       color: frost,
       emissive: frost.clone().multiplyScalar(0.55),
       roughness: 0.18,
@@ -210,6 +214,8 @@ export class FrozenOrbFx {
       opacity: SHELL_OPACITY,
       depthWrite: false,
     });
+    material.name = 'frozenOrb:shell';
+    return material;
   }
 
   private acquireCoreMat(frost: THREE.Color): THREE.MeshBasicMaterial {
@@ -219,13 +225,15 @@ export class FrozenOrbFx {
       pooled.opacity = CORE_OPACITY;
       return pooled;
     }
-    return new THREE.MeshBasicMaterial({
+    const material = new THREE.MeshBasicMaterial({
       color: frost.clone().multiplyScalar(1.9),
       transparent: true,
       opacity: CORE_OPACITY,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
+    material.name = 'frozenOrb:core';
+    return material;
   }
 
   private acquireShardMat(frost: THREE.Color): THREE.MeshStandardMaterial {
@@ -236,7 +244,7 @@ export class FrozenOrbFx {
       pooled.opacity = SHARD_OPACITY;
       return pooled;
     }
-    return new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshStandardMaterial({
       color: 0xcfeaff,
       emissive: frost.clone().multiplyScalar(0.35),
       roughness: 0.25,
@@ -244,6 +252,8 @@ export class FrozenOrbFx {
       transparent: true,
       opacity: SHARD_OPACITY,
     });
+    material.name = 'frozenOrb:shards';
+    return material;
   }
 
   private acquireTrailMat(frost: THREE.Color): THREE.PointsMaterial {
@@ -253,7 +263,7 @@ export class FrozenOrbFx {
       pooled.opacity = 0.85;
       return pooled;
     }
-    return new THREE.PointsMaterial({
+    const material = new THREE.PointsMaterial({
       color: frost.clone().multiplyScalar(1.7),
       size: TRAIL_SIZE,
       transparent: true,
@@ -262,6 +272,8 @@ export class FrozenOrbFx {
       depthWrite: false,
       sizeAttenuation: true,
     });
+    material.name = 'frozenOrb:trail';
+    return material;
   }
 
   // Return a released material to its role's pool, up to the fixed cap; past
@@ -383,6 +395,51 @@ export class FrozenOrbFx {
     this.coreGeo = null;
     this.shardGeo = null;
   }
+}
+
+/**
+ * The boot manifest's stand-in: one visual of its own, holding one orb that is
+ * never updated and so never expires, so the programs a live Frostglobe draws
+ * (shell, core, shards, sparkle trail) are linked behind the loading cover and
+ * stay referenced for the session. The live pools mint their own materials,
+ * but a program is shared by cache key and these are never released. The
+ * shell and shards are MeshStandard on every tier, so on Low nothing else held
+ * their program and the first orb linked it live. Registered in
+ * ABILITY_MATERIAL_SOURCES.
+ */
+interface FrozenOrbStandIn {
+  root: THREE.Group;
+  materials: THREE.Material[];
+}
+let frozenOrbStandIn: FrozenOrbStandIn | null = null;
+
+export function buildFrozenOrbStandIn(): FrozenOrbStandIn {
+  if (!frozenOrbStandIn) {
+    const root = new THREE.Group();
+    root.name = 'frozen-orb-stand-in';
+    new FrozenOrbFx(root, () => 0).spawn({
+      sourceId: -1,
+      x: 0,
+      z: 0,
+      dirX: 0,
+      dirZ: 1,
+      speed: 0,
+      duration: Number.MAX_SAFE_INTEGER,
+    });
+    const materials: THREE.Material[] = [];
+    root.traverse((object) => {
+      const material = (object as THREE.Mesh).material;
+      if (material && !Array.isArray(material) && !materials.includes(material)) {
+        materials.push(material);
+      }
+    });
+    frozenOrbStandIn = { root, materials };
+  }
+  return frozenOrbStandIn;
+}
+
+export function frozenOrbStandInMaterials(): readonly THREE.Material[] {
+  return buildFrozenOrbStandIn().materials;
 }
 
 /** The 'spellfxAt' fields the orb flight reads; the fx union keeps a typo in

@@ -143,6 +143,10 @@ export const table: ReliquaryLocaleTable = {
     name: '裂隙',
     desc: '變幻不定的裂隙的標誌性戰利品，從遊蕩其中的恐怖造物，到S級追逐的兩件珍寶。',
   },
+  conquerors_buried_hoards: {
+    name: '埋藏的寶藏',
+    desc: '藏寶圖所指引的寶藏中的戰利品，每位寶藏守護者各有四件。',
+  },
   // Rares of the Realm pages (Phase 21): composed in the chronicle rare
   // deeds' register (chr_vale_rares zh_TW reads 溪谷惡煞, chr_marsh_rares
   // 霧中之名); no mob names inside page names.
@@ -166,6 +170,10 @@ export const table: ReliquaryLocaleTable = {
     name: '戰爭兵器庫',
     desc: '以來之不易的榮譽購得的戰爭飾品與武器。',
   },
+  conquerors_vanguard_gallery: {
+    name: '先鋒展廳',
+    desc: '戰爭第二賽季的專精套裝與武器，用榮譽購買。',
+  },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 寶庫策展人).
   horizons_vault_of_ages: {
@@ -185,7 +193,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: '英雄：最後泉源熔爐',
-    desc: '伊格尼瓦，末焰使者身上僅限英雄難度掉落的武器。',
+    desc: '伊格尼瓦，末焰使者身上僅限英雄難度掉落的武器，以及團隊副本飾品。',
   },
   conquerors_varkhul: {
     name: '內環熔爐',
@@ -193,7 +201,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: '英雄：內環熔爐',
-    desc: '末焰鍛父瓦爾庫爾身上僅限英雄難度掉落的盾牌與武器。',
+    desc: '末焰鍛父瓦爾庫爾身上僅限英雄難度掉落的盾牌、副手聖物與武器。',
   },
   professions_forgebreaker: {
     name: '碎爐者',

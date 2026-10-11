@@ -562,7 +562,7 @@ export class MailboxWindow {
           const cell = wornItemCellParts(item, slot.instance);
           const stack =
             slot.count > 1 ? ` x${formatNumber(slot.count, { maximumFractionDigits: 0 })}` : '';
-          chip.innerHTML = `<span class="ui-socket ui-socket--bag">${this.deps.itemIcon(item, cell.quality)}</span><span style="color:${cell.color}">${esc(cell.name)}${esc(stack)}</span>`;
+          chip.innerHTML = `<span class="ui-socket ui-socket--bag">${this.deps.itemIcon(item, cell.quality)}${cell.qualityBadgeLabelled}</span><span style="color:${cell.color}">${esc(cell.name)}${esc(stack)}</span>`;
           // An attached material stack keeps its contributors on the way
           // through the post: the letter's slot IS the stack.
           displayedName = cell.name;
@@ -909,7 +909,7 @@ export class MailboxWindow {
       // Keyboard-focusable so Tab can reach it: attachTooltip's keyboard path
       // is a focusin listener on this exact element.
       name.tabIndex = 0;
-      name.innerHTML = `<span class="ui-socket ui-socket--bag">${this.deps.itemIcon(item, cell.quality)}</span><span style="color:${cell.color}">${esc(cell.name)}</span>`;
+      name.innerHTML = `<span class="ui-socket ui-socket--bag">${this.deps.itemIcon(item, cell.quality)}${cell.qualityBadgeLabelled}</span><span style="color:${cell.color}">${esc(cell.name)}</span>`;
       const displayedSources = displayedSourcePlan?.[chipIdx];
       this.deps.attachTooltip(name, () =>
         this.deps.itemTooltip(item, slot.instance, this.currentParcelSources(chipIdx)),

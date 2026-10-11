@@ -1,3 +1,4 @@
+import { canDualWield } from '../sim/equipment_rules';
 // Pure, host-agnostic core for the "Unlock interface" option: the declarative
 // table of which HUD frames the toggle governs, and the two decisions the
 // coordinator makes on every flip (which label the option row shows, and which
@@ -29,6 +30,8 @@ export interface HudFrameSpec {
   elementId: string;
   /** localStorage key its chosen position + size persist under. */
   storageKey: string;
+  /** Older keys read as migration fallbacks when the durable key changes. */
+  legacyStorageKeys?: readonly string[];
   /** Name chip shown on the frame while unlocked, so a dimmed placeholder is
    *  never an anonymous floating box. Reuses an existing key where one already
    *  names the frame (the unit-frame aria labels, the target-aura tab names). */
@@ -54,6 +57,11 @@ export interface HudFrameSpec {
   /** This frame's own zoom ceiling, replacing the shared FRAME_SCALE_MAX
    *  (see MovableFrameConfig.maxScale); Infinity means no upper limit. */
   maxScale?: number;
+  /** False for a frame that only MOVES: no resize grip and no edge or corner
+   *  resize. Absent means scalable, like every other row. Only a seat whose box
+   *  is a placement proxy (the tooltip anchor) opts out, since resizing it
+   *  would read as resizing the card it seats while changing nothing on it. */
+  scalable?: false;
   /**
    * The stock slot a detaching frame returns to, RESOLVED at release time rather
    * than remembered from detach time. Only a frame whose stock parent holds
@@ -67,6 +75,11 @@ export interface HudFrameSpec {
   stockHome?: { parentId: string; slot: 'first' | 'last' };
 }
 
+/** The mouseover unit tooltip's movable seat in index.html / play.html: an
+ *  invisible box the 'unitTooltip' row below places and the tooltip paint
+ *  path (unit_tooltip_seat.ts) grows the card from. */
+export const UNIT_TOOLTIP_ANCHOR_ELEMENT_ID = 'unit-tooltip-anchor';
+
 /**
  * Every frame the "Unlock interface" option moves and scales, in the order the
  * coordinator registers them. The three unit frames that predate this option
@@ -75,6 +88,40 @@ export interface HudFrameSpec {
  * storage keys and labels already live in frame_pos_reset.ts.
  */
 export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
+  ...([1, 2, 3] as const).map((slot) => ({
+    id: `focusTarget${slot}`,
+    elementId: `focus-target-${slot}`,
+    storageKey: `woc_hud_frame_focus_target_${slot}`,
+    labelKey: `hudChrome.focusTargets.frame${slot}` as TranslationKey,
+    fallbackSize: { w: 240, h: 140 },
+    detachToUiRoot: false,
+  })),
+  {
+    id: 'practiceTracker',
+    elementId: 'practice-tracker',
+    storageKey: 'woc_hud_frame_practice_tracker',
+    labelKey: 'hudChrome.practiceDps.title',
+    fallbackSize: { w: 240, h: 160 },
+    detachToUiRoot: true,
+  },
+  {
+    id: 'trackerGroup',
+    elementId: 'tracker-group',
+    storageKey: 'woc_hud_frame_tracker_group',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.trackerGroup',
+    fallbackSize: { w: 240, h: 240 },
+    detachToUiRoot: true,
+    resizeMode: 'box',
+  },
+  {
+    id: 'auraGroup',
+    elementId: 'aura-track-group',
+    storageKey: 'woc_hud_frame_aura_group',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.auraGroup',
+    fallbackSize: { w: 236, h: 240 },
+    detachToUiRoot: false,
+    resizeMode: 'box',
+  },
   {
     id: 'actionBar1',
     elementId: 'actionbar',
@@ -181,6 +228,22 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
   },
   // The stance-style choice bar (warrior stances, paladin auras) sits inside
   // the transformed #actionbar-stack like the action bars, so it detaches too.
+  // The target-of-target mini frame. Unlike the three unit frames above it has
+  // no corner button of its own, so the global toggle is its ONLY route to a
+  // spot of its own; until it had one, the mini could only ride wherever the
+  // target frame was dragged. It lives inside #target-frame (which is also its
+  // containing block), so it re-homes onto #ui while positioned exactly like the
+  // frames under a transformed ancestor do.
+  {
+    id: 'targetOfTarget',
+    elementId: 'totarget-frame',
+    storageKey: 'woc_hud_frame_target_of_target',
+    legacyStorageKeys: ['woc_hud_frame_totarget'],
+    labelKey: 'hudChrome.unitFrame.targetOfTargetLabel',
+    fallbackSize: { w: 240, h: 64 },
+    detachToUiRoot: true,
+    stockHome: { parentId: 'target-frame', slot: 'last' },
+  },
   {
     id: 'stanceBar',
     elementId: 'stancebar',
@@ -413,6 +476,23 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
       resizeMode: 'box',
     }),
   ),
+  // The mouseover unit tooltip (the mob and player hover card). The card itself
+  // is the shared transient #tooltip box, so the frame is its SEAT: an
+  // invisible anchor whose stock spot is the classic bottom-right slot, which
+  // the card grows from wherever the player parks it (tooltip_clamp_core.ts
+  // unitTooltipAnchorPlacement). Move-only: the anchor's box is a placement
+  // proxy, so a grip would resize nothing the player sees. Hiding the row from
+  // the frames menu suppresses the hover card (unit_tooltip_seat.ts). Already a
+  // #ui child, so no re-home.
+  {
+    id: 'unitTooltip',
+    elementId: UNIT_TOOLTIP_ANCHOR_ELEMENT_ID,
+    storageKey: 'woc_hud_frame_unit_tooltip',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.unitTooltip',
+    fallbackSize: { w: 220, h: 72 },
+    detachToUiRoot: false,
+    scalable: false,
+  },
 ] as const;
 
 /** Every storage key the option owns, so a reset can clear the whole set. */
@@ -460,6 +540,8 @@ export function frameRowSettingKey(
   | 'showThirdActionBar'
   | 'showReliquaryTracker'
   | 'showTargetDots'
+  | 'showTargetOfTarget'
+  | 'showPetFrame'
   | AuraTrackSettingKey
   | null {
   if (id === 'actionBar2') return 'showSecondaryActionBar';
@@ -470,6 +552,8 @@ export function frameRowSettingKey(
   // switch for the same reason: two checkboxes over one tracker must be one
   // state.
   if (id === 'targetDots') return 'showTargetDots';
+  if (id === 'petFrame') return 'showPetFrame';
+  if (id === 'targetOfTarget') return 'showTargetOfTarget';
   // Each aura track has its own master switch as well (all six ship off), so
   // the same rule holds: the row is generated from the descriptor table and
   // resolves back to it here, which is why a seventh track needs no arm.
@@ -540,4 +624,27 @@ export function framesToLock(
   unlocked: boolean,
 ): { id: string; unlocked: boolean }[] {
   return candidates.map((c) => ({ id: c.id, unlocked: unlocked && c.isActive() }));
+}
+
+/** Whether a registered frame can participate in the editor for the current character. */
+export function hudFrameActive(
+  id: string,
+  state: {
+    playerClass: PlayerClass;
+    talentSpec?: string | null;
+    combined: boolean;
+    bar2: boolean;
+    bar3: boolean;
+    enabled(key: NonNullable<ReturnType<typeof frameRowSettingKey>>): boolean;
+  },
+): boolean {
+  if (id === 'swingBarOffhand') return canDualWield(state.playerClass, state.talentSpec);
+  if (id === 'actionBarGroup') return state.combined;
+  if (id === 'actionBar1') return !state.combined;
+  if (id === 'actionBar2') return !state.combined && state.bar2;
+  if (id === 'actionBar3') return !state.combined && state.bar3;
+  const classGate = classGatedFrameActive(id, state.playerClass);
+  if (classGate !== null) return classGate;
+  const setting = frameRowSettingKey(id);
+  return setting ? state.enabled(setting) : true;
 }

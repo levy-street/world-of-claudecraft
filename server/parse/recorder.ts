@@ -175,6 +175,9 @@ export class ParseRecorder {
         case 'heal2':
           if (ev.cueOnly !== true) this.routeHeal2(ev, tick);
           break;
+        case 'absorb':
+          this.routeAbsorb(ev, tick);
+          break;
         case 'heal': {
           const fight = this.fightsByEntity.get(ev.targetId);
           if (fight !== undefined) fight.recordEvent(tick, ev as Record<string, unknown>);
@@ -300,6 +303,24 @@ export class ParseRecorder {
     fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
     const creditSource = sourceOwnerId ?? ev.sourceId;
     fight.noteHeal(tick, creditSource, ev.amount, ev.overheal ?? 0);
+  }
+
+  // An absorb credit is healing done by the shielder: it lands in the fight's
+  // healing rollup exactly like a heal2 (no overheal: a soak is never clamped),
+  // so a parse's healing agrees with the in-game Healing tab.
+  private routeAbsorb(ev: SimEvent & { type: 'absorb' }, tick: number): void {
+    const bySource = this.fightFor(ev.sourceId);
+    const match = bySource ?? this.fightFor(ev.targetId);
+    if (match === null) return;
+    const { fight } = match;
+    this.ensureParticipant(fight, ev.sourceId, tick);
+    this.ensureParticipant(fight, ev.targetId, tick);
+    const sourceOwnerId = bySource?.ownerId ?? null;
+    const enrichment: EventEnrichment | undefined =
+      sourceOwnerId !== null ? { ownerId: sourceOwnerId } : undefined;
+    fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
+    const creditSource = sourceOwnerId ?? ev.sourceId;
+    fight.noteHeal(tick, creditSource, ev.amount, 0);
   }
 
   private routeAura(ev: SimEvent & { type: 'aura' }, tick: number): void {

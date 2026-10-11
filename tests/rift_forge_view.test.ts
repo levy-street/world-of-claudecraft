@@ -134,3 +134,29 @@ describe('buildRiftForgeView', () => {
     expect(view.essence).toBe(0);
   });
 });
+
+it('quotes permanent quality on both sides of an Essence upgrade for mixed copies', () => {
+  const ordinary = band('S');
+  const enhanced = {
+    ...ordinary.instance,
+    lootQuality: {
+      version: 1 as const,
+      tier: 4 as const,
+      weights: [900, 100, 250, 750, 500] as [number, number, number, number, number],
+    },
+  };
+  const view = buildRiftForgeView({
+    inventory: [
+      { itemId: ordinary.itemId, count: 1, instance: ordinary.instance },
+      { itemId: ordinary.itemId, count: 1, instance: enhanced },
+      { itemId: RIFT_ESSENCE_ITEM_ID, count: 20 },
+    ],
+    equipment: {},
+    equipmentInstances: {},
+  });
+  expect(view.rings.map((row) => [row.itemLevel, row.nextItemLevel])).toEqual([
+    [29, 30],
+    [37, 38],
+  ]);
+  expect(view.rings[1].source).toEqual({ kind: 'bag', slotIndex: 1 });
+});

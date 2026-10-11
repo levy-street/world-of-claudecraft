@@ -40,7 +40,10 @@ Spikes remain, as the impale mechanic rather than adds.
 `/dev nyx <mechanic>` sets that mechanic's timer to the next tick. The
 encounter's own rules still apply: a sigil waits out the 6 s major gap, a Rage
 waits out a live sigil and live Soul Rend marks, a storm waits out any other
-major.
+major. A storm does NOT wait for live Soul Rend marks: the instant it begins,
+any live marks are released unresolved (the aura leaves, no damage), because
+"stack" and "spread and run" cannot both be answered at once. It does wait out
+the 6 s settle after a Soul Rend detonation, so it never opens on the huddle.
 
 | Command | What you should see |
 |---|---|

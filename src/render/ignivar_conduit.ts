@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { IGNIVAR_WATER_CLEANSE_RADIUS } from '../sim/encounters/ignivar';
 import { type IgnivarConduitState, ignivarConduitStateForTemplate } from '../sim/ignivar_arena';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { GFX, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
@@ -78,12 +79,12 @@ function addReadyVisual(group: THREE.Group): void {
   core.name = 'ignivarWaterReadyCore';
   core.castShadow = false;
   core.receiveShadow = false;
-  core.renderOrder = 3;
+  core.renderOrder = floorVfxRenderOrder('encounter', 2);
   marker.add(core);
 
   const halo = horizontalMesh(new THREE.TorusGeometry(0.62, 0.065, 6, 24), readyMaterial, 1.58);
   halo.name = 'ignivarWaterReadyHalo';
-  halo.renderOrder = 2;
+  halo.renderOrder = floorVfxRenderOrder('encounter', 1);
   marker.add(halo);
 
   const lowerHalo = horizontalMesh(
@@ -99,7 +100,7 @@ function addReadyVisual(group: THREE.Group): void {
   // player camera instead of being hidden inside its own base.
   const aimRing = horizontalMesh(new THREE.RingGeometry(1.48, 1.72, 32), readyMaterial, 0.94);
   aimRing.name = IGNIVAR_CONDUIT_READY_AIM_RING_NAME;
-  aimRing.renderOrder = 2;
+  aimRing.renderOrder = floorVfxRenderOrder('encounter', 1);
   marker.add(aimRing);
   group.add(marker);
 }
@@ -134,13 +135,13 @@ function buildActivationRune(): THREE.Group {
 
   const outer = horizontalMesh(new THREE.RingGeometry(2.5, 2.78, 8), runeMaterial, 0.055);
   outer.name = 'ignivarWaterActivationRuneGlow';
-  outer.renderOrder = 4;
+  outer.renderOrder = floorVfxRenderOrder('encounter', 3);
   rune.add(outer);
 
   const inner = horizontalMesh(new THREE.RingGeometry(1.03, 1.17, 8), runeMaterial, 0.915);
   inner.name = 'ignivarWaterActivationRuneInner';
   inner.rotation.z = Math.PI / 8;
-  inner.renderOrder = 4;
+  inner.renderOrder = floorVfxRenderOrder('encounter', 3);
   rune.add(inner);
 
   const spokeGeometry = new THREE.BoxGeometry(0.085, 0.025, 1.35);
@@ -150,7 +151,7 @@ function buildActivationRune(): THREE.Group {
     spoke.rotation.y = (index * Math.PI) / 4;
     spoke.castShadow = false;
     spoke.receiveShadow = false;
-    spoke.renderOrder = 4;
+    spoke.renderOrder = floorVfxRenderOrder('encounter', 3);
     rune.add(spoke);
   }
   return rune;
@@ -174,7 +175,7 @@ function buildSteamEnergy(material: THREE.Material): THREE.Group {
     halo.name = haloSpec.name;
     halo.rotation.y = haloSpec.tilt;
     halo.rotation.z = index * 0.42;
-    halo.renderOrder = 5;
+    halo.renderOrder = floorVfxRenderOrder('encounter', 4);
     steam.add(halo);
   }
   return steam;
@@ -192,17 +193,17 @@ function buildActiveBeacon(): THREE.Group {
   outer.name = 'ignivarWaterActiveBeaconOuter';
   outer.castShadow = false;
   outer.receiveShadow = false;
-  outer.renderOrder = 6;
+  outer.renderOrder = floorVfxRenderOrder('encounter', 5);
 
   const core = mesh(new THREE.CylinderGeometry(0.16, 0.25, 6.5, 12, 1, true), coreMaterial, 3.65);
   core.name = 'ignivarWaterActiveBeaconCore';
   core.castShadow = false;
   core.receiveShadow = false;
-  core.renderOrder = 7;
+  core.renderOrder = floorVfxRenderOrder('encounter', 6);
 
   const crown = horizontalMesh(new THREE.TorusGeometry(1.18, 0.1, 8, 32), crownMaterial, 6.65);
   crown.name = 'ignivarWaterActiveBeaconCrown';
-  crown.renderOrder = 7;
+  crown.renderOrder = floorVfxRenderOrder('encounter', 6);
   beacon.add(outer, core, crown);
   return beacon;
 }
@@ -228,7 +229,7 @@ function addActiveVisual(group: THREE.Group): void {
     0.025,
   );
   footprint.name = IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME;
-  footprint.renderOrder = 1;
+  footprint.renderOrder = floorVfxRenderOrder('encounter', 0);
   cleanseZone.add(footprint);
 
   const boundary = horizontalMesh(
@@ -241,7 +242,7 @@ function addActiveVisual(group: THREE.Group): void {
     0.04,
   );
   boundary.name = IGNIVAR_CONDUIT_CLEANSE_BOUNDARY_NAME;
-  boundary.renderOrder = 3;
+  boundary.renderOrder = floorVfxRenderOrder('encounter', 2);
   cleanseZone.add(boundary, buildActivationRune());
   group.add(cleanseZone);
 
@@ -256,14 +257,14 @@ function addActiveVisual(group: THREE.Group): void {
   outer.name = 'ignivarWaterColumnOuter';
   outer.castShadow = false;
   outer.receiveShadow = false;
-  outer.renderOrder = 4;
+  outer.renderOrder = floorVfxRenderOrder('encounter', 3);
   jet.add(outer);
 
   const core = mesh(new THREE.CylinderGeometry(0.34, 0.46, 2.95, 14, 1, true), coreMaterial, 2.15);
   core.name = 'ignivarWaterColumnCore';
   core.castShadow = false;
   core.receiveShadow = false;
-  core.renderOrder = 5;
+  core.renderOrder = floorVfxRenderOrder('encounter', 4);
   jet.add(core, buildSteamEnergy(steamMaterial));
   group.add(jet, buildActiveBeacon());
 }

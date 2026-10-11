@@ -365,31 +365,29 @@ async function completeLink(
   mode: DiscordLinkMode,
 ): Promise<void> {
   if (accountId === null) return respond(400, { ok: false, mode, error: 'no_session' });
-  // Read the existing link before the upsert: linkDiscordToAccount returns only a
-  // boolean, so this is the one chance to learn that this account is REPOINTING off
-  // an older Discord id. One extra query on a rare, user-initiated OAuth path.
+  // In-game relink is a same-Discord refresh only. A player who wants to move
+  // this game account to another Discord identity must use the explicit
+  // unlink/keep-account/reauth path instead of the HUD relink shortcut.
   const previousLink = await discordForAccount(pool, accountId);
-  const linked = await linkDiscordToAccount(pool, accountId, {
-    discordUserId: user.id,
-    username: discordDisplayName(user),
-    avatar: user.avatar,
-    email: user.email,
-    guildMember,
-  });
-  if (!linked) {
+  if (previousLink && previousLink.discord_user_id !== user.id) {
     note('discord.link.conflict');
     return respond(409, { ok: false, mode, error: 'already_linked' });
   }
-  // A repoint strands the old Discord user, so it is an unlink of that id plus a
-  // link of the new one. The feed dedupes per account, so these two normally merge
-  // into a single item carrying kinds ['unlink','link'] and the OLD id (first id
-  // observed wins); that is the designed shape, and the drain resolves the
-  // authoritative link anyway.
-  if (previousLink && previousLink.discord_user_id !== user.id) {
-    enqueueLinkChange(
-      { accountId, discordId: previousLink.discord_user_id, kinds: ['unlink'] },
-      Date.now(),
-    );
+  const linked = await linkDiscordToAccount(
+    pool,
+    accountId,
+    {
+      discordUserId: user.id,
+      username: discordDisplayName(user),
+      avatar: user.avatar,
+      email: user.email,
+      guildMember,
+    },
+    { allowRepoint: false },
+  );
+  if (!linked) {
+    note('discord.link.conflict');
+    return respond(409, { ok: false, mode, error: 'already_linked' });
   }
   enqueueLinkChange({ accountId, discordId: user.id, kinds: ['link'] }, Date.now());
   await captureDiscordEmail(accountId, user.email, user.emailVerified);

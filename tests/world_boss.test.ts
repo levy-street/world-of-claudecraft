@@ -90,6 +90,34 @@ describe('world boss loot lockout gate (pure helpers)', () => {
 });
 
 describe('world boss scheduler', () => {
+  it('reports the fixed boss active only while its scheduled entity is alive', () => {
+    const sim = makeSim();
+    expect(sim.worldBossActive(BOSS_ID)).toBe(false);
+    expect(sim.worldBossActive('missing_world_boss')).toBe(false);
+
+    const { boss } = spawnBossNow(sim);
+    expect(sim.worldBossActive(BOSS_ID)).toBe(true);
+
+    boss.dead = true;
+    expect(sim.worldBossActive(BOSS_ID)).toBe(false);
+  });
+
+  it('reports the boss active again when the scheduler replaces its expired corpse', () => {
+    const sim = makeSim();
+    const { boss } = spawnBossNow(sim);
+    const slainId = boss.id;
+    boss.dead = true;
+    boss.corpseTimer = 0;
+    (sim as any).worldBossNextAt[0] = sim.time;
+
+    sim.tick();
+
+    const replacement = findBoss(sim);
+    expect(replacement?.id).not.toBe(slainId);
+    expect(replacement?.dead).toBe(false);
+    expect(sim.worldBossActive(BOSS_ID)).toBe(true);
+  });
+
   it('spawns on the interval and announces server-wide', () => {
     const sim = makeSim();
     expect(findBoss(sim)).toBeUndefined();

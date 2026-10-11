@@ -286,3 +286,197 @@ describe('final color NaN guard actually scrubs a NaN (not just compiles)', () =
     expect(a).toBe(0);
   });
 });
+
+// The three patch leaves opaque_fragment stock, so this guard is the only
+// scrub on the final write. One material per ShaderLib family that includes
+// <opaque_fragment> (the set tests/final_color_nan_guard.test.ts pins), each
+// fed NaN, +Inf and -Inf in outgoingLight, read back from a FloatType target
+// that keeps whatever the shader wrote.
+type Family =
+  | 'basic'
+  | 'lambert'
+  | 'phong'
+  | 'standard'
+  | 'physical'
+  | 'toon'
+  | 'matcap'
+  | 'points'
+  | 'dashed'
+  | 'sprite';
+const FAMILIES: Family[] = [
+  'basic',
+  'lambert',
+  'phong',
+  'standard',
+  'physical',
+  'toon',
+  'matcap',
+  'points',
+  'dashed',
+  'sprite',
+];
+// uA / uB from uniforms, so the driver cannot fold the value at compile time.
+const NON_FINITE: { name: string; a: number; b: number }[] = [
+  { name: 'NaN', a: 0, b: 0 },
+  { name: '+Inf', a: 1, b: 0 },
+  { name: '-Inf', a: -1, b: 0 },
+];
+const FAMILY_SIZE = 4;
+const FLT_MAX = 3.4028234663852886e38;
+
+// Unscrubbed, the injection arrives non-finite (a driver may also turn an
+// infinity into NaN), except on the blended sprite, which ANGLE D3D11 and
+// ANGLE Vulkan (NVIDIA) store as +/-FLT_MAX. None of these is the 0 a missed
+// draw would leave.
+function reachesTargetUnscrubbed(component: number): boolean {
+  return !Number.isFinite(component) || Math.abs(component) >= FLT_MAX;
+}
+
+function familyMaterial(family: Family): THREE.Material {
+  const color = 0x336633;
+  switch (family) {
+    case 'basic':
+      return new THREE.MeshBasicMaterial({ color });
+    case 'lambert':
+      return new THREE.MeshLambertMaterial({ color });
+    case 'phong':
+      return new THREE.MeshPhongMaterial({ color });
+    case 'standard':
+      return new THREE.MeshStandardMaterial({ color });
+    case 'physical':
+      return new THREE.MeshPhysicalMaterial({ color, clearcoat: 0.5, sheen: 0.3 });
+    case 'toon':
+      return new THREE.MeshToonMaterial({ color });
+    case 'matcap':
+      return new THREE.MeshMatcapMaterial({ color });
+    case 'points':
+      return new THREE.PointsMaterial({ color, size: 64, sizeAttenuation: false });
+    case 'dashed':
+      return new THREE.LineDashedMaterial({ color, dashSize: 100, gapSize: 0 });
+    case 'sprite':
+      return new THREE.SpriteMaterial({ color });
+  }
+}
+
+function familyObject(family: Family, material: THREE.Material): THREE.Object3D {
+  if (family === 'points') {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0], 3));
+    return new THREE.Points(geometry, material);
+  }
+  if (family === 'sprite') {
+    const sprite = new THREE.Sprite(material as THREE.SpriteMaterial);
+    sprite.scale.set(4, 4, 1);
+    return sprite;
+  }
+  if (family === 'dashed') {
+    // One horizontal segment per half texel row, so every texel is covered.
+    const points: number[] = [];
+    for (let i = 0; i < FAMILY_SIZE * 4; i++) {
+      const y = -1 + ((i + 0.5) * 2) / (FAMILY_SIZE * 4);
+      points.push(-2, y, 0, 2, y, 0);
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+    const lines = new THREE.LineSegments(geometry, material);
+    lines.computeLineDistances();
+    return lines;
+  }
+  return new THREE.Mesh(new THREE.PlaneGeometry(4, 4), material);
+}
+
+/** Render one family with outgoingLight forced to uA / uB; returns the center rgb and the linked fragment source. */
+function renderFamily(
+  family: Family,
+  value: { name: string; a: number; b: number },
+  cacheTag: string,
+): { rgb: number[]; fragmentSource: string } {
+  const material = familyMaterial(family);
+  material.customProgramCacheKey = () => `nan-guard-family:${cacheTag}:${family}`;
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uA = { value: value.a };
+    shader.uniforms.uB = { value: value.b };
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nuniform float uA;\nuniform float uB;')
+      .replace(
+        '#include <opaque_fragment>',
+        'outgoingLight = vec3( uA / uB );\n#include <opaque_fragment>',
+      );
+  };
+  const scene = new THREE.Scene();
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+  sun.position.set(3, 4, 5);
+  scene.add(sun);
+  scene.add(familyObject(family, material));
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+  camera.position.set(0, 0, 5);
+  camera.lookAt(0, 0, 0);
+
+  const rt = new THREE.WebGLRenderTarget(FAMILY_SIZE, FAMILY_SIZE, {
+    depthBuffer: true,
+    type: THREE.FloatType,
+  });
+  const prev = renderer.getRenderTarget();
+  renderer.setRenderTarget(rt);
+  renderer.clear();
+  renderer.render(scene, camera);
+  const out = new Float32Array(FAMILY_SIZE * FAMILY_SIZE * 4);
+  renderer.readRenderTargetPixels(rt, 0, 0, FAMILY_SIZE, FAMILY_SIZE, out);
+  renderer.setRenderTarget(prev);
+  rt.dispose();
+
+  const gl = renderer.getContext();
+  const linked = (
+    renderer.properties.get(material) as { currentProgram?: { program: WebGLProgram } }
+  ).currentProgram;
+  let fragmentSource = '';
+  for (const shader of linked ? (gl.getAttachedShaders(linked.program) ?? []) : []) {
+    if (gl.getShaderParameter(shader, gl.SHADER_TYPE) === gl.FRAGMENT_SHADER) {
+      fragmentSource = gl.getShaderSource(shader) ?? '';
+    }
+  }
+  material.dispose();
+  return { rgb: centerTexel(out, FAMILY_SIZE).slice(0, 3), fragmentSource };
+}
+
+describe('final color NaN guard alone scrubs every opaque_fragment family', () => {
+  it.each(FAMILIES)('%s: NaN, +Inf and -Inf in outgoingLight come out as exactly 0', (family) => {
+    for (const value of NON_FINITE) {
+      const { rgb, fragmentSource } = renderFamily(family, value, `guard:${value.name}`);
+      expect(shaderError, `${family} ${value.name}`).toBeNull();
+      expect(fragmentSource, `${family} ${value.name}`).toContain('WOC_OPAQUE_NAN_GUARD');
+      expect(
+        fragmentSource.includes('outgoingLight.x < 0.0 || outgoingLight.x >= 0.0'),
+        `${family} ${value.name}: the comparison scrub is back in the linked program`,
+      ).toBe(false);
+      expect(rgb, `${family} ${value.name}`).toEqual([0, 0, 0]);
+    }
+  });
+
+  // Per family, so a draw that misses the sampled texel (the target clears to
+  // 0, the expected value) cannot pass the case above vacuously.
+  it.each(FAMILIES)(
+    '%s control: without the guard the same injection reaches the target unscrubbed',
+    (family) => {
+      const guarded = THREE.ShaderChunk.opaque_fragment;
+      THREE.ShaderChunk.opaque_fragment = guarded.replace(
+        /\/\/ WOC_OPAQUE_NAN_GUARD\n(?:.*floatBitsToUint.*\n){4}/,
+        '',
+      );
+      try {
+        expect(THREE.ShaderChunk.opaque_fragment).not.toContain('floatBitsToUint');
+        for (const value of NON_FINITE) {
+          const { rgb } = renderFamily(family, value, `control:${value.name}`);
+          expect(shaderError, `${family} ${value.name}`).toBeNull();
+          expect(
+            rgb.every((component) => reachesTargetUnscrubbed(component)),
+            `${family} ${value.name}: ${rgb.join(',')}`,
+          ).toBe(true);
+        }
+      } finally {
+        THREE.ShaderChunk.opaque_fragment = guarded;
+      }
+    },
+  );
+});

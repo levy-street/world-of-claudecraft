@@ -16,9 +16,11 @@
 // (ctx.lockoutNowMs() / ctx.raidResetMs(), the same pair the dungeon raid lockouts
 // use; the host wall clock on the server, the sim clock offline). The
 // personal-loot roller draws rng in a FIXED order (contributors sorted by entityId,
-// loot entries in array order) so the parity gate's rng draw-order log stays stable.
+// loot entries in array order). Quality follows all contributors' authored draws,
+// preserving this kill's ordinary selections before advancing the shared stream.
 
 import { MOBS } from './data';
+import { rollEnemyLootQuality } from './loot/enemy_quality';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity, LootSlot } from './types';
@@ -195,7 +197,7 @@ export function scaleWorldBossHp(ctx: SimContext, boss: Entity, def: WorldBossDe
 export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: PlayerMeta[]): void {
   const template = MOBS[mob.templateId];
   if (!template) return;
-  const items: LootSlot[] = mob.loot?.items ?? [];
+  const items: LootSlot[] = [];
   const copper = mob.loot?.copper ?? 0;
   // contributors arrive sorted by entityId (worldBossLootContributors); iterate in
   // that fixed order so the rng draw order is deterministic for the parity gate.
@@ -236,8 +238,9 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
         items.push({ itemId: entry.itemId, count: 1, personalFor: [meta.entityId] });
     }
   }
-  if (copper > 0 || items.length > 0) {
-    mob.loot = { copper, items };
+  const selected = [...(mob.loot?.items ?? []), ...rollEnemyLootQuality(ctx.rng, mob, items)];
+  if (copper > 0 || selected.length > 0) {
+    mob.loot = { copper, items: selected };
     mob.lootable = true;
   }
 }

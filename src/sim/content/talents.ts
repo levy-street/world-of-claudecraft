@@ -263,8 +263,20 @@ export type ProcResponse =
     }
   // A plain self-aura (Deathless Will's escape burst): applied to the proc
   // owner with the def's school; value semantics follow the aura kind (a
-  // buff_speed of 1.4 is +40% movement).
-  | { kind: 'aura'; auraKind: AuraKind; value: number; duration: number; name: string };
+  // buff_speed of 1.4 is +40% movement). auraId overrides the aura id (default:
+  // the proc id), so one proc can grant several auras that never replace each
+  // other (applyAura replaces by id and source). target 'subject' lands it on
+  // the trigger subject instead of the owner (the Veilpsalm 4pc: the shielded
+  // ally of a shieldConsumed proc); omitted, it stays on the owner.
+  | {
+      kind: 'aura';
+      auraKind: AuraKind;
+      value: number;
+      duration: number;
+      name: string;
+      auraId?: string;
+      target?: 'subject';
+    };
 
 export interface ProcDef {
   id: string;

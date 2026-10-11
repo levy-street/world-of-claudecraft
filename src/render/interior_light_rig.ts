@@ -16,6 +16,7 @@ import { RIM_GLOW_DEFAULT_COLOR } from './pbr_fragment_shader';
 /** Every fog scene state the renderer resolves to (single source of truth). */
 export type FogSceneState =
   | 'outdoor'
+  | 'hoardValley'
   | 'dungeon'
   | 'temple'
   | 'nythraxis'
@@ -37,7 +38,12 @@ export type FogSceneState =
  *  black void above the ramparts); every interior, the maze, the rift and the
  *  water hide it. */
 export function isOpenAirFogState(state: FogSceneState): boolean {
-  return state === 'outdoor' || state === 'wildheartField' || state === 'battleground';
+  return (
+    state === 'outdoor' ||
+    state === 'hoardValley' ||
+    state === 'wildheartField' ||
+    state === 'battleground'
+  );
 }
 
 // dungeon interiors: kill the daylight so torchlight carries the scene

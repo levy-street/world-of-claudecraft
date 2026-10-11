@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { loadGltf, releaseGltf } from '../render/assets/loader';
+import { hideBlackPointLights } from '../render/point_light_carriers';
 import { assetById } from './asset_catalog.generated';
 import { hashHue, ThumbBook, thumbPose } from './asset_thumbs_core';
 import { userAssetPath } from './user_assets';
@@ -175,6 +176,7 @@ async function snapshot(assetId: string): Promise<void> {
   // Cache results are immutable: clone before adding to the offscreen scene
   // (SkeletonUtils so skinned character/creature GLBs keep a valid bind).
   const model = cloneSkinned(gltf.scene);
+  hideBlackPointLights(model);
   // Thumbnails are one-shot: drop the parse cache entry so browsing hundreds
   // of assets does not pin every parsed scene (a later placement re-fetches).
   releaseGltf(path);

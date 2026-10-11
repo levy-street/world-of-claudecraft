@@ -42,4 +42,10 @@ export interface CharacterSummary {
    *  Null when the save resumes at the world start; absent on an older server.
    *  Character select renders it, localized, under the level line. */
   zoneId?: string | null;
+  /** The raid lockouts this character still carries: lockout id (a dungeon id,
+   *  `<dungeon>:heroic`, or `worldboss:<mobId>`) to the absolute unlock epoch
+   *  ms, already filtered to still-locked entries by the server clock (the
+   *  snapshot `lockouts` shape). Absent on an older server. Character select
+   *  lists them under the zone line with a countdown. */
+  raidLockouts?: Record<string, number>;
 }

@@ -837,6 +837,9 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['cryptplate_helm', 0.34],
       ['shadowpulse_slippers', 0.33],
       ['bonechill_cord', 0.33],
+      // Trinkets (content/trinkets.ts): one per heroic final boss, each in a
+      // different dungeon, inside the one guaranteed equipment slot.
+      ['bastion_sigil', 0.25],
     ]).map(preserveBaseLootSource),
     { itemId: 'gravewoven_bag', chance: 0.2, preserveSourceTier: true },
     { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
@@ -861,6 +864,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['tideguard_faceguard', 0.25],
       ['sunken_court_mantle', 0.25],
       ['dreamroot_boots', 0.25],
+      ['stormjar', 0.25],
     ]).map(preserveBaseLootSource),
     { itemId: 'mistcallers_duffel', chance: 0.1, preserveSourceTier: true },
     { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
@@ -879,6 +883,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['lunar_choir_leggings', 0.34],
       ['choir_blessed_spaulders', 0.33],
       ['tideworn_warboots', 0.33],
+      ['menders_hourglass', 0.25],
     ]).map(preserveBaseLootSource),
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
     ...heroicFarmPatternRows(),
@@ -933,6 +938,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['greatfang_of_the_basin', 0.34],
       ['sunbone_oracles_crown', 0.33],
       ['bloodmane_war_legguards', 0.33],
+      ['paired_talons', 0.25],
     ]).map(preserveBaseLootSource),
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
@@ -944,16 +950,22 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // raid-tier (item level 33/37) heroic variants in a heroic claim
     // (loot/loot_roll.ts + heroic_variants.ts). This table adds only the
     // heroic-ONLY extras the normal table never carries: the three bespoke raid
-    // weapons, one of which drops per heroic kill (chances sum to 1.0), plus the
+    // weapons and the four raid trinkets (content/trinkets.ts), one of which
+    // drops per heroic kill (chances sum to 1.0; weapons half, trinkets half,
+    // so the kill still pays exactly two equipment items), plus the
     // blue and green mount secondary paths (same per-mount rate as their five-man
     // sources; the raid offers both of each so every heroic raider has a path).
-    { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'deathless_greatblade', chance: 0.17, rollGroup: 'nythraxis_heroic_weapon' },
     {
       itemId: 'scepter_of_the_deathless_court',
-      chance: 0.33,
+      chance: 0.17,
       rollGroup: 'nythraxis_heroic_weapon',
     },
-    { itemId: 'stormcallers_focus', chance: 0.33, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'stormcallers_focus', chance: 0.16, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'mooring_stone', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'wellspring_seed', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'hunters_tally', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'echoing_lens', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
     // Blue mount secondary paths on the heroic raid (0.1% each, equal per-mount
     // to the five-man rate; both blues available so aggregate ~0.2%); the primary
     // path for each is its five-man heroic boss. Epic mounts are rift S-only.
@@ -976,31 +988,58 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   // default source. Re-cut 2026-09-02 from the launch appends (one robe group
   // plus one weapon group per boss, plus Varkhul's shield group); from here the
   // partition is APPEND-only, never reorder.
+  // Crucible of the Last Spring (docs/prd/ignivar-raid-loot.md, "Boss loot
+  // tables"): a Heroic kill pays TWO guaranteed groups here, on top of the
+  // boss's shared sigil slot. The exclusive slot is gear only (marquee
+  // weapons, and Varkhul's shields); the Robe sigil has its OWN guaranteed
+  // group, appended after it. Re-cut 2026-09-11: the Robes used to share the
+  // exclusive slot, so a Heroic kill could roll a second sigil and no weapon
+  // (the same two-sigil haul Normal pays). Draw order is parity-sensitive on
+  // a heroic claim: the exclusive group keeps its position, the Robe group
+  // draws after it, entries APPEND, never reorder.
   [IGNIVAR_BOSS_ID]: [
-    // Robes 0.50 / marquee weapons 0.50; Anvil 0.34 / Ember 0.33 / Tempest 0.33.
-    { itemId: 'sigil_anvil_chest', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
-    { itemId: 'sigil_ember_chest', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
-    { itemId: 'sigil_tempest_chest', chance: 0.16, rollGroup: 'ignivar_h_exclusive' },
-    // Three weapons, not four: the Emberflight Longbow was pulled from the
-    // tier (bows wait for the hunter ranged-slot rework; maintainer decision
-    // 2026-08-28), and the hunter ranged marquee returns with that rework.
-    { itemId: 'forgefathers_warhammer', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
-    { itemId: 'anvilguard_blade', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
-    { itemId: 'springtouched_crozier', chance: 0.16, rollGroup: 'ignivar_h_exclusive' },
+    // Seven Heroic gear rows, one guaranteed: the three marquee weapons plus
+    // Wand of Quenched Sparks (redistributed from Ignivar's Normal off-set
+    // partition on 2026-09-07) at 5/32 each, and the three raid trinkets
+    // (content/trinkets.ts, item level 35 like every exclusive here) at 1/8
+    // each: binary fractions, so the group sums to EXACTLY 1 in row order.
+    // Three weapons, not four before the wand: Emberflight Longbow waits for
+    // the hunter ranged-slot rework.
+    { itemId: 'forgefathers_warhammer', chance: 0.15625, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'anvilguard_blade', chance: 0.15625, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'springtouched_crozier', chance: 0.15625, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'wand_of_quenched_sparks', chance: 0.15625, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'kindling_orb', chance: 0.125, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'molten_fletching', chance: 0.125, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'last_flame_lantern', chance: 0.125, rollGroup: 'ignivar_h_exclusive' },
+    // The Robe sigil, one guaranteed per Heroic kill: Anvil 0.34 / Ember 0.33
+    // / Tempest 0.33, the same family balance as the merged sigil slot.
+    { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'ignivar_h_robe' },
+    { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'ignivar_h_robe' },
+    { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'ignivar_h_robe' },
   ],
   [VARKHUL_BOSS_ID]: [
-    // Robes 0.35 / shields 0.30 / marquee weapons 0.35. Emberward keeps its
-    // ABSOLUTE 3 percent per heroic kill inside the shield share (the two epic
-    // shields split the remaining 0.27 evenly), so the legendary's odds did not
-    // move with the re-cut and the group still adds no extra heroic rng draw.
-    { itemId: 'sigil_anvil_chest', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'sigil_ember_chest', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'sigil_tempest_chest', chance: 0.11, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'bulwark_of_the_inner_crucible', chance: 0.135, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'ember_wardens_barrier', chance: 0.135, rollGroup: 'varkhul_h_exclusive' },
+    // Shields 0.354 / marquee weapons 0.301 / held offhands 0.075 / raid
+    // trinkets 0.24, with Emberward at its ABSOLUTE 3 percent per heroic kill
+    // inside the shield share (the two epic shields split the rest evenly). The
+    // held offhands came over from Varkhul's Normal off-set partition; the two
+    // raid trinkets (content/trinkets.ts, item level 35) are appended at 0.12
+    // each with every other non-legendary row scaled down together. Every
+    // weight is chosen so the group sums to EXACTLY 1 in floating point in this
+    // row order (tests/ignivar_loot.test.ts pins it with toBe(1)).
+    { itemId: 'bulwark_of_the_inner_crucible', chance: 0.177, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'ember_wardens_barrier', chance: 0.177, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'varkhul_emberward', chance: 0.03, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'heart_of_the_end_greatblade', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'forgefire_spire', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'staff_of_the_last_spring', chance: 0.11, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'heart_of_the_end_greatblade', chance: 0.1045, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'forgefire_spire', chance: 0.098, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'staff_of_the_last_spring', chance: 0.0985, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'orb_of_the_last_spring', chance: 0.0375, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'cinder_of_the_first_design', chance: 0.0375, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'forgefathers_temper', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'heart_of_the_crucible', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
+    // The Robe sigil, one guaranteed per Heroic kill (see Ignivar above).
+    { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'varkhul_h_robe' },
+    { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'varkhul_h_robe' },
+    { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'varkhul_h_robe' },
   ],
 };

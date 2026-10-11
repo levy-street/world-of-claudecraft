@@ -970,12 +970,18 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     // satchel) and reduce nothing anywhere, so goldleaf goes 30 to 33 and
     // sunpetal 46 to 58 while silverleaf holds; every delta is a named
     // release bill, verified against BAG_RECIPES row by row.
+    // RE-MEASURED at the 2026-09-28 release/v0.44.0 merge into
+    // feature/buried-hoards: two FACTION_REWARD_RECIPES alchemy rows carry
+    // herbs (recipe_elixir_of_mana_regeneration silverleaf 3,
+    // recipe_potion_of_invisibility silverleaf 3 + goldleaf 3) and reduce
+    // nothing anywhere, so silverleaf goes 28 to 34 and goldleaf 33 to 36
+    // while sunpetal holds.
     // The claim this arm makes has never been "the numbers do not move"; it is
     // "herbalism loses nothing", and a total that only ever climbs is what says
     // so.
     expect(totals).toEqual({
-      silverleaf_herb: 28,
-      goldleaf_herb: 33,
+      silverleaf_herb: 34,
+      goldleaf_herb: 36,
       sunpetal_herb: 58,
     });
   });

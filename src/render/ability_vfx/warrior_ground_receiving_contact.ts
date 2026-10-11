@@ -1,0 +1,113 @@
+import {
+  type MeleeImpactProfile,
+  meleeContactHeight,
+  meleeContactPoint,
+} from '../melee_impact_core';
+import type { SeqPoint, SequencerHost } from './sequencer';
+
+/** Ground pressure is cast-owned; only this compact compression belongs to
+ * each real recipient. Its retained seam owns its scratch and body facing. */
+export function drawWarriorGroundReceivingContact(
+  host: SequencerHost,
+  id: string,
+  sourceId: number,
+  targetId: number,
+  tier: number,
+  at: SeqPoint,
+  profile: MeleeImpactProfile,
+): void {
+  const body = { x: 0, y: 0, z: 0 },
+    point = { x: 0, y: 0, z: 0 };
+  const from = host.anchorOf(sourceId, 0.5, body);
+  const facing = from ? Math.atan2(at.x - from.x, at.z - from.z) : 0;
+  const relative = facing - (host.facingAt?.(targetId) ?? facing);
+  const dx = Math.sin(facing),
+    dz = Math.cos(facing);
+  const quake = id === 'thunder_clap',
+    rupture = id === 'faultline',
+    compression = quake || rupture,
+    surface = compression ? 0.26 : 0;
+  const x = at.x - dx * surface,
+    y = at.y,
+    z = at.z - dz * surface;
+  let count = 2;
+  const floor = host.groundYAt(x, z);
+  if (
+    Number.isFinite(floor) &&
+    host.bakedAt?.(
+      'shout_dust',
+      x,
+      floor + 0.08,
+      z,
+      rupture ? 6.8 : quake ? 4.8 : 6.2,
+      0x858b90,
+      0xc5cbd0,
+      rupture ? 0.34 : 0.28,
+      0,
+      0,
+      facing,
+    ) !== false &&
+    host.bakedAt
+  )
+    count++;
+  host.flipbookAt(
+    x,
+    y,
+    z,
+    rupture ? 13 : quake ? 11 : 10,
+    0xc1d8e7,
+    'warrior_crush_flash',
+    rupture ? 5.6 : 4.5,
+    rupture ? 0.38 : 0.32,
+    compression ? 0 : 0.3,
+    rupture ? 1.3 : quake ? 1.2 : 1,
+  );
+  host.pathRibbon(
+    compression ? 0x334650 : 0xa8b3b5,
+    rupture ? 0.46 : quake ? 0.34 : 0.18,
+    0.2,
+    (points) => {
+      const origin = host.anchorOf(targetId, meleeContactHeight(profile, 0), body);
+      if (!origin) return 0;
+      const yaw = (host.facingAt?.(targetId) ?? facing) + relative;
+      const sx = Math.sin(yaw),
+        sz = Math.cos(yaw);
+      for (let i = 0; i < points.length; i++) {
+        const u = i / (points.length - 1);
+        if (compression) {
+          point.x = (u - 0.5) * (rupture ? 2.45 : 1.95);
+          point.y = Math.abs(u - 0.46) * (rupture ? 0.46 : 0.32) + Math.sin(u * 19) * 0.035;
+          point.z = -surface;
+        } else meleeContactPoint(profile, u, 0, 0, point);
+        points[i].set(
+          origin.x + sz * point.x + sx * point.z,
+          origin.y + point.y,
+          origin.z - sx * point.x + sz * point.z,
+        );
+      }
+      return points.length;
+    },
+    true,
+    null,
+    true,
+    0,
+    null,
+    true,
+  );
+  if (tier === 0)
+    host.fragmentsAt?.(
+      'stone_chip',
+      x,
+      Number.isFinite(floor) ? floor + 0.15 : y,
+      z,
+      0x9da4a7,
+      8,
+      rupture ? 1.6 : quake ? 1.4 : 1.5,
+      dx,
+      dz,
+      0.34,
+      true,
+    );
+  host.contact?.(sourceId, targetId, 'physical', profile.force, id, 0);
+  host.countPrimitive(id, count + (tier === 0 ? 1 : 0));
+}

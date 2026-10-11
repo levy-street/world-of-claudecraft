@@ -13,13 +13,16 @@ import {
 import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
 import { selectedInventorySlot } from '../item_copy_ref';
+import { isEligibleEnemyQualitySource, rollEnemyLootQuality } from '../loot/enemy_quality';
+import { createLootQuality, isEligibleLootQualityItem } from '../loot_quality/core';
+import { cloneLootQuality } from '../loot_quality/types';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload, PlayerClass, RiftTier } from '../types';
 import {
   RIFT_BAND_GEM_SLOTS,
   RIFT_BAND_MAX_UPGRADE,
-  type RiftBandShell,
+  RIFT_BAND_SHELLS,
   riftBandRolledStats,
 } from './band_ladder';
 import { nearRiftForge, RIFT_FORGE_TOO_FAR_TEXT } from './forge_gate';
@@ -67,11 +70,7 @@ export interface RiftForgeResult {
  *  prices the ring (band_ladder.ts). A band also takes an ordinary ring
  *  enchant (professions/enchanting.ts) at any rung: the marker rides the
  *  rebuild and its bonus is re-added on top of the ladder line every time. */
-const SHELL_STATS: Readonly<Record<string, RiftBandShell>> = {
-  riftbound_band_of_might: { primary: 'str', secondary: 'sta' },
-  riftbound_band_of_insight: { primary: 'int', secondary: 'spi' },
-  riftbound_band_of_guile: { primary: 'agi', secondary: 'sta' },
-};
+const SHELL_STATS = RIFT_BAND_SHELLS;
 
 function shellItemIdForClass(cls: PlayerClass): string {
   if (MELEE_CLASSES.has(cls)) return 'riftbound_band_of_might';
@@ -156,6 +155,11 @@ export function sanitizeRiftGearInstance(
   const gems = (Array.isArray(source.gems) ? source.gems : [])
     .filter((gem): gem is RiftGemId => (RIFT_GEM_IDS as readonly string[]).includes(gem))
     .slice(-gemSlots);
+  // The permanent per-copy `lootQuality` descriptor (docs/design/loot-quality.md)
+  // rides the rebuild VALIDATED, below the record: this supersedes the
+  // release's unread pass-through (PR 4138, the rollback safety net for a
+  // binary without this feature), so a malformed descriptor is dropped here
+  // exactly as the load bound drops it, never carried by reference.
   const clean: ItemInstancePayload = {
     boundTo: ownerId,
     // The player item lock (item_lock.ts) is the owner's own safety mark and
@@ -175,6 +179,8 @@ export function sanitizeRiftGearInstance(
       gems,
     },
   };
+  const lootQuality = cloneLootQuality(input.lootQuality);
+  if (lootQuality) clean.lootQuality = lootQuality;
   rebuildRolledStats(itemId, clean);
   return clean;
 }
@@ -350,12 +356,14 @@ export const FARM_RIFT_DROP_CHANCE = RIFT_PATTERN_CHANCE;
 export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: number): void {
   const rank = riftRankForBaseLevel(baseLevel);
   const loot = boss.loot ?? { copper: 0, items: [] };
+  const firstNewSlot = loot.items.length;
 
   // --- Draw 0: C-rank guaranteed normal-dungeon drop + coin (exits here) ---
   if (rank === 'C') {
     const pool = riftNormalClearPool();
     loot.items.push({ itemId: pool[ctx.rng.int(0, pool.length - 1)], count: 1 });
     loot.copper = (loot.copper ?? 0) + RIFT_COIN_BONUS_C;
+    loot.items = rollRiftClearQualities(ctx, boss, loot.items, firstNewSlot);
     boss.loot = loot;
     boss.lootable = true;
     return;
@@ -426,9 +434,23 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
   const coinBonus =
     rank === 'B' ? RIFT_COIN_BONUS_B : rank === 'A' ? RIFT_COIN_BONUS_A : RIFT_COIN_BONUS_S;
   loot.copper = (loot.copper ?? 0) + coinBonus;
+  loot.items = rollRiftClearQualities(ctx, boss, loot.items, firstNewSlot);
 
   boss.loot = loot;
   if (loot.items.length > 0 || loot.copper > 0) boss.lootable = true;
+}
+
+/** Only newly selected clear rewards draw quality; static corpse gear is already
+ * rolled. The roller itself is the enemy one (loot/enemy_quality.ts): one draw
+ * per copy, a stack split per copy, a deep-cloned payload, and the source gate,
+ * so a clear reward and a corpse drop can never diverge in how they mint. */
+function rollRiftClearQualities(
+  ctx: SimContext,
+  boss: Entity,
+  items: NonNullable<Entity['loot']>['items'],
+  start: number,
+): NonNullable<Entity['loot']>['items'] {
+  return [...items.slice(0, start), ...rollEnemyLootQuality(ctx.rng, boss, items.slice(start))];
 }
 
 /** First-clear personal loot. Every winner gets a class-appropriate non-fungible
@@ -453,6 +475,15 @@ export function addRiftProgressionLoot(
     const meta = ctx.players.get(pid);
     if (!meta) continue;
     const gear = createRiftGearInstance(eventId, tier, meta.cls, pid);
+    // Both gates the sibling rollers apply: the source AND the item. Bands are
+    // epic armor today, so the item gate is inert, but a shell def change must
+    // never stamp a descriptor that reads as enhanced with zero bonus.
+    const shell = ITEMS[gear.itemId];
+    const lootQuality =
+      isEligibleEnemyQualitySource(boss) && shell !== undefined && isEligibleLootQualityItem(shell)
+        ? createLootQuality(ctx.rng)
+        : undefined;
+    if (lootQuality) gear.instance.lootQuality = lootQuality;
     loot.items.push({
       itemId: gear.itemId,
       count: 1,

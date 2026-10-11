@@ -20,6 +20,8 @@
 
 import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { isFeastTemplateId } from '../sim/professions/feast';
+import { isMobileStationTemplateId } from '../sim/professions/mobile_station_object';
+import { HOARD_BROOD_EGG_TEMPLATE } from '../sim/rift/hoard_boss_kits';
 import type { Entity } from '../sim/types';
 import { INTERACT_RANGE } from '../sim/types';
 import { comboPipsFor } from './nameplate_combo';
@@ -132,6 +134,7 @@ export function nameplatePlanInto(
   const isDelveInteract =
     e.templateId === 'delve_locked_chest' ||
     e.templateId === 'delve_reward_chest' ||
+    e.templateId === 'hoard_reward_chest' ||
     e.templateId === 'delve_surface_exit' ||
     e.templateId === 'delve_drowned_reliquary' ||
     e.templateId === 'delve_drowned_reliquary_open' ||
@@ -157,11 +160,16 @@ export function nameplatePlanInto(
   // frame, farmDenied 'feast_expired', since masterwrought Phase 18), so the
   // title is already up as a player walks into eating range and never
   // flickers at the exact boundary.
+  // A placed mobile station shares the pad: its title names the owner and
+  // the tool, which is what a player walking up to it wants to read.
   const feastNear =
-    isFeastTemplateId(e.templateId) && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
+    (isFeastTemplateId(e.templateId) || isMobileStationTemplateId(e.templateId)) &&
+    d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
+    // Encounter scenery (Vysska's clutch hatches on HER health): no plate, no bar.
+    e.templateId === HOARD_BROOD_EGG_TEMPLATE ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
     // A buddy's own dedicated toggle, unconditional even over standIn: it is

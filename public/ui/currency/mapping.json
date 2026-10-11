@@ -96,6 +96,45 @@
       "sourceSha256": "c85353a603a3d2d1ababffb9f673089d475a6c1ba845df7be2980eee9b8305db",
       "acceptedSha256": "e0b09823043d2caf88f9088845b638fca65f0ccd9245f44f404904c8909e958d",
       "acceptedBytes": 3920
+    },
+    {
+      "id": "rift_watch_mark",
+      "output": "rift_watch_mark.webp",
+      "sourceFile": "public/ui/items/rift_watchers_band.webp",
+      "source": "World of ClaudeCraft faction rewards pipeline",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Rift Watch Mark: a glowing cyan void and ocean crest for the Rift Watch faction.",
+      "references": ["public/ui/items/rift_watchers_band.webp"],
+      "sourceSha256": "f3482bcabc765aedfef2f326c4996821f33ecad8b37c84136df0c678f6ecdacd",
+      "acceptedSha256": "f3482bcabc765aedfef2f326c4996821f33ecad8b37c84136df0c678f6ecdacd",
+      "acceptedBytes": 1820
+    },
+    {
+      "id": "church_order_crest",
+      "output": "church_order_crest.webp",
+      "sourceFile": "public/ui/items/order_prayer_beads.webp",
+      "source": "World of ClaudeCraft faction rewards pipeline",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Order Crest: a holy golden sun and dawn medallion for the Church Order faction.",
+      "references": ["public/ui/items/order_prayer_beads.webp"],
+      "sourceSha256": "fa9332ba194d2099e1e8b1f87263cb00dfab939943cd49097d0a8e3d3cd1ab65",
+      "acceptedSha256": "fa9332ba194d2099e1e8b1f87263cb00dfab939943cd49097d0a8e3d3cd1ab65",
+      "acceptedBytes": 1402
+    },
+    {
+      "id": "automaton_cog",
+      "output": "automaton_cog.webp",
+      "sourceFile": "public/ui/items/automaton_cog_ring.webp",
+      "source": "World of ClaudeCraft faction rewards pipeline",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Automaton Cog: an intricate bronze clockwork gear for the Automaton faction.",
+      "references": ["public/ui/items/automaton_cog_ring.webp"],
+      "sourceSha256": "456434f5e071a95005d0e094df18a88d49324293f787a6cab02e21075347ee14",
+      "acceptedSha256": "456434f5e071a95005d0e094df18a88d49324293f787a6cab02e21075347ee14",
+      "acceptedBytes": 1708
     }
   ]
 }

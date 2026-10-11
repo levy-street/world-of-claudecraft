@@ -55,14 +55,28 @@
 // server-driven and unmirrored (self.riftSliding suspends prediction the same
 // way a ledge climb does, below), and a closed switch-gated portcullis is a
 // runtime clamp rather than a static collider, so it is left leash-bounded
-// instead of locally resolved. Delves remain excluded (a separate, tracked
-// gap: their door/prop state is not mirrored client-side).
+// instead of locally resolved.
+//
+// Delves (issue #3480): also predicted now, chaining the same three layers
+// Sim.resolveMove runs server-side (src/sim/delves/geometry.ts:
+// clampDelveModuleBounds then clampDelveDoorSolids), fed by frame.delveRun
+// (the mirrored DelveRunInfo, IWorld.delveRun) and frame.delveSolids (this
+// frame's door/prop solids, derived from the mirrored entity roster by
+// delveDoorClampSolidsFromEntities). Null/empty outside a delve, so nothing
+// else changes.
 
 import { moverHeight, resolveMovement } from '../sim/colliders';
 import { hasValkyrsCallingFlightAura } from '../sim/combat/paladin_valkyrs_calling_state';
 import { isRiftPos } from '../sim/data';
+import {
+  clampDelveDoorSolids,
+  clampDelveModuleBounds,
+  type DelveDoorClampSolid,
+} from '../sim/delves/geometry';
+import { isFerryPassenger } from '../sim/ferry_passenger';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
+import type { DelveRunInfo } from '../world_api/delves';
 import type { RiftFloorView } from '../world_api/dungeons';
 import { resolvedRiftFloorPlan, riftLiftFor } from './self_motion_rift_lift';
 
@@ -142,6 +156,12 @@ export interface SelfMotionFrame {
    *  does (self_motion_rift_lift.ts), so a platform or ramp never reads as
    *  airborne or fights the servo. */
   riftFloor: RiftFloorView | null;
+  /** The active delve run (IWorld.delveRun), or null outside a delve. Lets the
+   *  kernel apply the same module-shell + door/prop clamp the server runs. */
+  delveRun: DelveRunInfo | null;
+  /** This frame's delve door/prop solids, derived from the mirrored entity
+   *  roster (delveDoorClampSolidsFromEntities). Empty outside a delve. */
+  delveSolids: readonly DelveDoorClampSolid[];
 }
 
 export interface Vec3Like {
@@ -229,6 +249,11 @@ export class SelfMotionPredictor {
   }
 
   private readonly deps: PlayerMotionDeps;
+  // Set at the top of each step() from the frame; read by deps.resolveMove
+  // below (a plain field read, matching how the whole kernel closure treats
+  // per-frame inputs elsewhere in this class).
+  private delveRun: DelveRunInfo | null = null;
+  private delveSolids: readonly DelveDoorClampSolid[] = [];
   private actor: Entity | null = null;
   private lastSelfId = -1;
   private lastDead = false;
@@ -267,19 +292,21 @@ export class SelfMotionPredictor {
   private readonly out: Vec3Like = { x: 0, y: 0, z: 0 };
 
   constructor(seed: number, riftCollisionToken = 0) {
-    // The client dep shape: pure static collision (delves are gated off by the
-    // enabled flag), aura-only speed (the Fiesta augment is not mirrored; the
-    // leash absorbs that bounded divergence), and no-op live-Sim callbacks.
-    // riftCollisionToken is IWorld.riftCollisionToken (a fixed per-world value,
-    // same as the live Sim closes over its own this.riftCollisionToken): the
-    // online client registers the current rift floor's colliders under it
-    // (src/net/online.ts applyRiftStateEvent), so a rift wall resolves here the
-    // same way it does for the server and for the offline Sim.
+    // The client dep shape: pure static collision plus the delve module-shell/
+    // door clamp chain below, aura-only speed (the Fiesta augment is not
+    // mirrored; the leash absorbs that bounded divergence), and no-op
+    // live-Sim callbacks. riftCollisionToken is IWorld.riftCollisionToken (a
+    // fixed per-world value, same as the live Sim closes over its own
+    // this.riftCollisionToken): the online client registers the current rift
+    // floor's colliders under it (src/net/online.ts applyRiftStateEvent), so
+    // a rift wall resolves here the same way it does for the server and for
+    // the offline Sim.
     this.deps = {
       seed,
       moveSpeedMult: (e) => moveSpeedMult(e, 0),
-      resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
-        resolveMovement(
+      resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) => {
+        const run = this.delveRun;
+        const res = resolveMovement(
           seed,
           fromX,
           fromZ,
@@ -287,10 +314,14 @@ export class SelfMotionPredictor {
           nz,
           r,
           ignoreFences,
-          undefined,
+          run?.modules,
           moverHeight(e),
           riftCollisionToken,
-        ),
+        );
+        if (!run) return res;
+        const bounded = clampDelveModuleBounds(run, res.x, res.z, r);
+        return clampDelveDoorSolids(this.delveSolids, bounded.x, bounded.z, r);
+      },
       resolvedAbility: () => null,
       cancelCast: () => {},
       standUp: () => {},
@@ -357,6 +388,8 @@ export class SelfMotionPredictor {
    * path, which shares the same selfRenderPosition so the handoff is seamless).
    */
   step(self: Entity, frame: SelfMotionFrame, authoritativeDiscontinuity = false): Vec3Like | null {
+    this.delveRun = frame.delveRun;
+    this.delveSolids = frame.delveSolids;
     // Valkyr's Calling is server-driven movement. Let authoritative snapshot
     // interpolation render the full ascent and approach instead of predicting
     // ordinary grounded input over it.
@@ -364,7 +397,16 @@ export class SelfMotionPredictor {
     // input): only the boolean rides the wire, never a direction to mirror, so
     // predicting it would invent a heading. Suspend like a ledge climb; the
     // slide's own authoritative interpolation carries the display instead.
-    if (!frame.enabled || hasValkyrsCallingFlightAura(self) || self.riftSliding) {
+    // A ferry passenger rides a moving deck this world-frame extrapolator
+    // does not carry: stand down and let the deck-framed authoritative pose
+    // (render/deck_frame.ts) draw them (the reconciling pipeline predicts
+    // aboard; this legacy one does not).
+    if (
+      !frame.enabled ||
+      hasValkyrsCallingFlightAura(self) ||
+      self.riftSliding ||
+      isFerryPassenger(self)
+    ) {
       this.reset();
       return null;
     }

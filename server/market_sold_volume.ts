@@ -4,10 +4,13 @@
 // HOW A SALE IS DETECTED. `Sim.marketBuy` returns void and emits no success
 // event (the ledger stays server-only, src/sim untouched), exactly like the
 // bank ops that server/bank_ledger.ts observes, so this uses the same
-// technique: read the listing row BEFORE the call, look for it again AFTER,
-// and a row that left the book was bought. Every refusal arm inside marketBuy
-// (too far from the Merchant, not enough copper, bags full, unknown id) leaves
-// the row exactly where it was, so an unchanged book is an honest no-sale.
+// technique: read the listing row BEFORE the call, look for it again AFTER.
+// A row that left the book entirely was bought outright; a row that is STILL
+// there but with a smaller `count`/`price` than before was partially bought
+// (a bulk stack peeled down instead of sold whole); an unchanged row is an
+// honest no-sale. Every refusal arm inside marketBuy (too far from the
+// Merchant, not enough copper, bags full, unknown id) leaves the row exactly
+// where it was.
 //
 // The one blind spot, deliberate and tested: HOUSE stock. The Merchant's own
 // standing listings are never spliced (marketBuy guards the whole
@@ -67,7 +70,21 @@ export interface SoldVolumeListing {
 /** The slice of `Sim` the wrapper drives. */
 export interface SoldVolumeSim {
   readonly marketListings: readonly SoldVolumeListing[];
-  marketBuy(listingId: number, pid?: number): void;
+  marketBuy(listingId: number, count?: number, pid?: number): void;
+}
+
+/** The sim surface the two order arms read; `Sim` satisfies it. An order fill
+ *  by a deliverer settles no listing row, so the sim reports the units and
+ *  gross copper directly (zero on refusal). */
+export interface SoldVolumeOrderSim {
+  marketOrderPlace(
+    itemId: string,
+    count: number,
+    unitPrice: number,
+    pid?: number,
+  ): readonly SoldVolumeListing[];
+  marketOrderFill(orderId: number, count: number, pid?: number): { units: number; copper: number };
+  readonly marketOrders: readonly { id: number; itemId: string }[];
 }
 
 /** The sim surface sweepWithSoldVolume reads; `Sim` satisfies it. */
@@ -94,11 +111,19 @@ export function marketSaleFromBuy(
   after: SoldVolumeListing | null,
 ): MarketSoldVolumeEntry | null {
   if (before === null) return null;
-  // See the module header: a house row survives its own sale, so its
-  // disappearance test carries no information either way.
+  // See the module header: a house row never shrinks or splices on its own
+  // sale, so neither disappearance nor a count drop carries any information
+  // for one.
   if (before.house) return null;
-  if (after !== null) return null;
-  return { itemId: before.itemId, quantity: before.count, copper: before.price };
+  if (after === null) {
+    // The whole row left the book: a full-stack buy.
+    return { itemId: before.itemId, quantity: before.count, copper: before.price };
+  }
+  // Still present: either untouched (a refusal) or peeled down by a partial
+  // buy, which shrinks `count`/`price` in place rather than splicing the row.
+  const quantity = before.count - after.count;
+  if (quantity <= 0) return null;
+  return { itemId: before.itemId, quantity, copper: before.price - after.price };
 }
 
 function findListing(
@@ -283,17 +308,26 @@ function enqueue(entry: MarketSoldVolumeEntry): void {
  * The buy itself is never guarded: if `marketBuy` throws, that throw belongs to
  * the caller exactly as before and nothing is recorded.
  */
-export function buyWithSoldVolume(sim: SoldVolumeSim, listingId: number, pid: number): void {
-  const before = findListing(sim.marketListings, listingId);
-  const countBefore = sim.marketListings.length;
-  sim.marketBuy(listingId, pid);
-  // One scan, not two (the D147 hot-path note): a successful non-house buy
-  // splices the whole listing out (src/sim/market.ts) and nothing else mutates
-  // the book in this synchronous call, so a length drop IS this buy landing. A
-  // house row survives its own sale, which marketSaleFromBuy rejects on
-  // before.house regardless, so length-stable-and-house both resolve to null.
-  const bought = sim.marketListings.length < countBefore;
-  const entry = bought ? marketSaleFromBuy(before, null) : null;
+export function buyWithSoldVolume(
+  sim: SoldVolumeSim,
+  listingId: number,
+  count: number | undefined,
+  pid: number,
+): void {
+  const beforeRow = findListing(sim.marketListings, listingId);
+  // Snapshot the primitive fields rather than keeping the live reference: a
+  // partial buy shrinks the row IN PLACE (src/sim/market.ts settleBuy), so a
+  // bare reference captured here would observe its own post-buy count/price
+  // once marketBuy runs below, always reading a no-op diff against itself.
+  const before: SoldVolumeListing | null = beforeRow === null ? null : { ...beforeRow };
+  sim.marketBuy(listingId, count, pid);
+  // A partial buy shrinks the row in place rather than splicing it out (a bulk
+  // stack peeled down instead of sold whole), so the old length-drop shortcut
+  // (the D147 hot-path note) no longer distinguishes every sale from every
+  // refusal; marketSaleFromBuy reads the row's own before/after count and price
+  // instead, at the cost of one more scan on this comparatively rare path.
+  const after = findListing(sim.marketListings, listingId);
+  const entry = marketSaleFromBuy(before, after);
   if (entry === null) return;
   if (classifyMarketMetricsItem(entry.itemId) === null) return;
   enqueue(entry);
@@ -321,4 +355,44 @@ export function sweepWithSoldVolume(
     const entry = marketSaleFromBuy(row, null);
     if (entry !== null) enqueue(entry);
   }
+}
+
+/**
+ * A placed order's IMMEDIATE fills are listing sales exactly like a sweep's
+ * (the sim returns the rows it settled), so they book the same way. The open
+ * remainder is escrow, not volume: nothing has changed hands yet.
+ */
+export function orderPlaceWithSoldVolume(
+  sim: SoldVolumeOrderSim,
+  itemId: string,
+  count: number,
+  unitPrice: number,
+  pid: number,
+): void {
+  const settled = sim.marketOrderPlace(itemId, count, unitPrice, pid);
+  if (settled.length === 0) return;
+  if (classifyMarketMetricsItem(itemId) === null) return;
+  for (const row of settled) {
+    const entry = marketSaleFromBuy(row, null);
+    if (entry !== null) enqueue(entry);
+  }
+}
+
+/**
+ * A deliverer filling an order is one sale of `units` at the order's bid: the
+ * item id is read off the order BEFORE the fill (a completed fill removes the
+ * row), and the sim's returned units/copper are the settled figures (zero on
+ * any refusal, so a refused frame books nothing).
+ */
+export function orderFillWithSoldVolume(
+  sim: SoldVolumeOrderSim,
+  orderId: number,
+  count: number,
+  pid: number,
+): void {
+  const itemId = sim.marketOrders.find((o) => o.id === orderId)?.itemId ?? null;
+  const { units, copper } = sim.marketOrderFill(orderId, count, pid);
+  if (units === 0 || itemId === null) return;
+  if (classifyMarketMetricsItem(itemId) === null) return;
+  enqueue({ itemId, quantity: units, copper });
 }

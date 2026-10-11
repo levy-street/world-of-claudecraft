@@ -494,7 +494,7 @@ describe('ui library: hover states and the orphan tokens', () => {
 
   it('reads --tracker-w and --chat-w at the sites that hard-coded them', () => {
     for (const [token, literal, count] of [
-      ['--tracker-w', '240px', 3],
+      ['--tracker-w', '240px', 5],
       ['--chat-w', '370px', 2],
     ] as const) {
       expect(tokens, `${token} must still be declared`).toContain(`${token}:`);

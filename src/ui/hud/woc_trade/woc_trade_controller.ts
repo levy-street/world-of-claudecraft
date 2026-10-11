@@ -15,15 +15,17 @@
 // read, no repeating driver: the estimate debounce is a one-shot timeout).
 
 import type { WocQuoteView } from '../../../net/woc_market_sdk';
+import { stackSizeOf } from '../../../sim/bags';
 import { ITEMS } from '../../../sim/data';
 import type { MaterialComposition } from '../../../sim/material_sources';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { userFacingApiError } from '../../api_error_i18n';
+import { showQuantityPrompt } from '../../bank_quantity_prompt';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
-import { formatDateTime, formatMoney as formatLocalizedMoney, t } from '../../i18n';
+import { formatDateTime, formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
 import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
@@ -34,8 +36,15 @@ import {
   type MaterialSourcesDialogOpener,
 } from '../../material_sources_dialog';
 
+import { dismissInstalledPrompt, installPromptDialog } from '../../prompt_dialog';
 import { termsUrlFor } from '../../terms_link';
-import { buildTradeItemRow, tradeRowTooltipTarget } from '../../trade_view';
+import {
+  buildTradeItemRow,
+  removeTradeOfferUnits,
+  resolveTradeOfferRemove,
+  tradeOfferRemoveOpensPrompt,
+  tradeRowTooltipTarget,
+} from '../../trade_view';
 import {
   refreshWocTradeArm,
   restoreWocTradeFocus,
@@ -77,6 +86,20 @@ import {
 // windows use for a quality the wire did not rank.
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
+
+/** The remove prompt's own class: NOT in the bags window's teardown selector,
+ *  so a bags close or mobile cluster-close cannot sweep a modal that belongs
+ *  to the trade window (only the trade window is inert under it). */
+const TRADE_REMOVE_PROMPT_CLASS = 'trade-remove-prompt';
+
+/** Tear down every trade quantity prompt, this window's remove prompt AND the
+ *  bags' offer prompt (a trade that closes takes both with it), through each
+ *  one's own dismiss() so whichever root it made inert is cleared. */
+function dismissTradeOfferPrompts(): void {
+  for (const p of document.querySelectorAll(`.trade-offer-prompt, .${TRADE_REMOVE_PROMPT_CLASS}`)) {
+    dismissInstalledPrompt(p);
+  }
+}
 
 /** How often the trade window re-reads the standing $WOC offer. Slow on
  *  purpose: it is a REST read on a short-lived surface, and two seconds of lag
@@ -1222,6 +1245,64 @@ export class WocTradeController {
    *  before the shell's windows are wired. */
   private tradeWindowEl: HTMLElement | null = null;
 
+  /** A click on one of this side's offered rows: the same quantity prompt the
+   *  bags open (bank_quantity_prompt.ts), in REMOVE mode. The number is how
+   *  many units to take off the line (capped at the line's count, with the
+   *  vault's unit and whole-stack step pairs), Remove takes that many, Remove
+   *  all takes the whole line. A one-unit line has no quantity to choose and
+   *  unstages directly (tradeOfferRemoveOpensPrompt, the bags gate's twin).
+   *  The window is the inert root; the submit re-resolves the live line so a
+   *  prompt left open across a vanished line refuses. */
+  private showOfferRemovePrompt(itemId: string): void {
+    const line = this.stagedTrade.items.find((s) => s.itemId === itemId);
+    if (!line) return;
+    if (!tradeOfferRemoveOpensPrompt(line)) {
+      if (removeTradeOfferUnits(this.stagedTrade.items, itemId, 1)) this.pushTradeOffer();
+      return;
+    }
+    const el = this.tradeWindow();
+    const item = knownItemDef(ITEMS, itemId);
+    const itemName = item ? itemDisplayName(item) : itemId;
+    const stepSize = stackSizeOf(item);
+    const count = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });
+    showQuantityPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          installPromptDialog(prompt, opener, close, {
+            inertRoot: el,
+            idPrefix: 'trade-prompt-title',
+          }),
+        dismissSiblings: dismissTradeOfferPrompts,
+      },
+      {
+        className: TRADE_REMOVE_PROMPT_CLASS,
+        step: {
+          size: stepSize,
+          downAriaText: t('hudChrome.bank.quantityStepDownAria', { count: count(stepSize) }),
+          upAriaText: t('hudChrome.bank.quantityStepUpAria', { count: count(stepSize) }),
+          unitDownAriaText: t('hudChrome.bank.quantityStepDownAria', { count: count(1) }),
+          unitUpAriaText: t('hudChrome.bank.quantityStepUpAria', { count: count(1) }),
+        },
+        titleText: t('hudChrome.trade.offerRemoveTitle', { item: itemName }),
+        inputAriaText: t('hudChrome.trade.offerRemoveInput'),
+        confirmText: t('hudChrome.trade.offerRemove'),
+        confirmAllText: t('hudChrome.trade.offerRemoveAll'),
+        cancelText: t('itemUi.vendor.sellQuantityCancel'),
+        maxCount: Math.max(1, Math.floor(line.count)),
+        resolveCount: (requested) =>
+          resolveTradeOfferRemove(this.stagedTrade.items, itemId, requested),
+        send: (taken) => {
+          if (removeTradeOfferUnits(this.stagedTrade.items, itemId, taken)) this.pushTradeOffer();
+        },
+        afterClose: () => {
+          // The push repaints the window wholesale (the opener row is gone),
+          // so land on its always-present close button.
+          el.querySelector<HTMLElement>('[data-close]')?.focus();
+        },
+      },
+    );
+  }
+
   private tradeWindow(): HTMLElement {
     if (this.tradeWindowEl === null || !this.tradeWindowEl.isConnected) {
       this.tradeWindowEl = $('#trade-window');
@@ -1235,6 +1316,11 @@ export class WocTradeController {
     if (!info) {
       if (this.tradeWasOpen) {
         closeMaterialSourcesDialogForOwner(el);
+        // The adjust prompt cannot outlive its window: tear it down through
+        // its own dismiss() (inert cleared), and clear inert once more as the
+        // force-close backstop the prompt recipe asks every owner for.
+        dismissTradeOfferPrompts();
+        el.inert = false;
         el.style.display = 'none';
         this.tradeWasOpen = false;
         this.stagedTrade = { items: [], copper: 0 };
@@ -1454,7 +1540,7 @@ export class WocTradeController {
           item && parts
             ? itemNameColor({ kind: item.kind, quality: parts.quality ?? 'common' })
             : QUALITY_DEFAULT_COLOR;
-        const inner = `<span class="ui-socket ui-socket--bag">${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}</span><span style="color:${qColor}">${esc(label)}</span>`;
+        const inner = `<span class="ui-socket ui-socket--bag">${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}${parts?.qualityBadgeLabelled ?? ''}</span><span style="color:${qColor}">${esc(label)}</span>`;
         return mine
           ? `<button type="button" class="trade-item mine ui-card" data-item="${esc(s.itemId)}">${inner}</button>`
           : `<div class="trade-item ui-card">${inner}</div>`;
@@ -1550,13 +1636,7 @@ export class WocTradeController {
       restoreWocTradeFocus(el, keptFocusKey);
       el.querySelectorAll('.trade-item.mine').forEach((row) => {
         row.addEventListener('click', () => {
-          const itemId = (row as HTMLElement).dataset.item ?? '';
-          const idx = this.stagedTrade.items.findIndex((s) => s.itemId === itemId);
-          if (idx >= 0) {
-            this.stagedTrade.items[idx].count--;
-            if (this.stagedTrade.items[idx].count <= 0) this.stagedTrade.items.splice(idx, 1);
-            this.pushTradeOffer();
-          }
+          this.showOfferRemovePrompt((row as HTMLElement).dataset.item ?? '');
         });
       });
       // Wire the same stat tooltip bag/vendor/bank slots use onto both offer

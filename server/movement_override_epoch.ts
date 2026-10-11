@@ -1,5 +1,6 @@
 import type { PlayerMeta, Sim } from '../src/sim/sim';
 import { DT, type Entity, RUN_SPEED, type Vec3 } from '../src/sim/types';
+import { ferryMovementFrame } from './transport_head';
 
 const OVERRIDE_CC_KINDS = new Set(['stun', 'root', 'incapacitate', 'polymorph']);
 const POSITION_EPSILON = 1e-9;
@@ -11,6 +12,7 @@ export interface MovementOverrideSignature {
   heroicLeaping: boolean;
   valkyrsCalling: boolean;
   mountRaceLocked: boolean;
+  vehicleLocked?: boolean;
   climbing: boolean;
   moveSpeedMult: number;
 }
@@ -23,6 +25,9 @@ export interface MovementOverrideSessionState {
   movementOverrideActive: boolean;
   movementMoveSpeedMult: number;
   movementAuthoritativePosition: Vec3 | null;
+  /** The frame movementAuthoritativePosition is in: -1 the world, else the
+   *  route index of the sailing ship the player rides (its hull frame). */
+  movementAuthoritativeFrame?: number;
 }
 
 export function createMovementOverrideSessionState(): Pick<
@@ -32,6 +37,7 @@ export function createMovementOverrideSessionState(): Pick<
   | 'movementOverrideActive'
   | 'movementMoveSpeedMult'
   | 'movementAuthoritativePosition'
+  | 'movementAuthoritativeFrame'
 > {
   return {
     movementOverrideSignature: null,
@@ -39,12 +45,13 @@ export function createMovementOverrideSessionState(): Pick<
     movementOverrideActive: false,
     movementMoveSpeedMult: 1,
     movementAuthoritativePosition: null,
+    movementAuthoritativeFrame: -1,
   };
 }
 
 export function computeOverrideSignature(
   entity: Entity,
-  meta: Pick<PlayerMeta, 'mountRace'>,
+  meta: Pick<PlayerMeta, 'mountRace' | 'vehicle'>,
   moveSpeedMult: number,
 ): MovementOverrideSignature {
   return fillOverrideSignature(
@@ -67,7 +74,7 @@ export function computeOverrideSignature(
 export function fillOverrideSignature(
   target: MovementOverrideSignature,
   entity: Entity,
-  meta: Pick<PlayerMeta, 'mountRace'>,
+  meta: Pick<PlayerMeta, 'mountRace' | 'vehicle'>,
   moveSpeedMult: number,
 ): MovementOverrideSignature {
   // Fear uses kind incapacitate, so it rides the crowd-control arm.
@@ -77,6 +84,7 @@ export function fillOverrideSignature(
   target.heroicLeaping = entity.leap != null;
   target.valkyrsCalling = entity.valkyrsCalling != null;
   target.mountRaceLocked = meta.mountRace?.phase === 'countdown';
+  target.vehicleLocked = !!meta.vehicle;
   target.climbing = entity.climb != null;
   target.moveSpeedMult = moveSpeedMult;
   return target;
@@ -90,7 +98,8 @@ function overrideBits(signature: MovementOverrideSignature): number {
     (signature.heroicLeaping ? 8 : 0) |
     (signature.valkyrsCalling ? 16 : 0) |
     (signature.mountRaceLocked ? 32 : 0) |
-    (signature.climbing ? 64 : 0)
+    (signature.climbing ? 64 : 0) |
+    (signature.vehicleLocked ? 128 : 0)
   );
 }
 
@@ -100,15 +109,16 @@ export function overrideActive(signature: MovementOverrideSignature): boolean {
 
 function positionDiscontinuous(
   entity: Entity,
+  position: Vec3,
   previousPosition: Vec3,
   active: boolean,
   moveSpeedMult: number,
   previousActive: boolean,
   previousMoveSpeedMult: number,
 ): boolean {
-  const dx = entity.pos.x - previousPosition.x;
-  const dy = entity.pos.y - previousPosition.y;
-  const dz = entity.pos.z - previousPosition.z;
+  const dx = position.x - previousPosition.x;
+  const dy = position.y - previousPosition.y;
+  const dz = position.z - previousPosition.z;
   const movedSq = dx * dx + dy * dy + dz * dz;
   if (movedSq <= POSITION_EPSILON) return false;
   if (
@@ -124,6 +134,14 @@ function positionDiscontinuous(
   const maxIntentStep = RUN_SPEED * Math.max(moveSpeedMult, previousMoveSpeedMult) * DT;
   return Math.hypot(dx, dz) > maxIntentStep + POSITION_EPSILON;
 }
+
+// The position the step-size check compares, in the player's movement frame:
+// a ferry passenger is measured in the sailing ship's hull frame, so the
+// ship's own way (a yard a tick at cruise) never reads as a server-driven
+// move, while their own steps on its deck still do. Boarding or leaving the
+// deck changes the frame, which does bump the epoch: the client's prediction
+// restarts cleanly in the new frame (render/deck_prediction.ts).
+const framePosition: Vec3 = { x: 0, y: 0, z: 0 };
 
 export function updateMovementOverrideEpochs(
   sim: Pick<Sim, 'entities' | 'meta' | 'moveSpeedMult'>,
@@ -146,26 +164,33 @@ export function updateMovementOverrideEpochs(
     const signatureChanged =
       signature !== null &&
       (previousBits !== overrideBits(nextSignature) || previousMoveSpeedMult !== moveSpeedMult);
+    const frame = ferryMovementFrame(entity, framePosition);
+    const frameChanged =
+      session.movementAuthoritativeFrame !== undefined &&
+      session.movementAuthoritativeFrame !== frame;
     const discontinuous =
       session.movementAuthoritativePosition !== null &&
-      positionDiscontinuous(
-        entity,
-        session.movementAuthoritativePosition,
-        active,
-        moveSpeedMult,
-        previousActive,
-        previousMoveSpeedMult,
-      );
+      (frameChanged ||
+        positionDiscontinuous(
+          entity,
+          framePosition,
+          session.movementAuthoritativePosition,
+          active,
+          moveSpeedMult,
+          previousActive,
+          previousMoveSpeedMult,
+        ));
     if (signatureChanged || discontinuous) session.movementOverrideEpoch++;
     session.movementOverrideSignature = nextSignature;
     session.movementOverrideActive = active;
     session.movementMoveSpeedMult = moveSpeedMult;
+    session.movementAuthoritativeFrame = frame;
     if (session.movementAuthoritativePosition) {
-      session.movementAuthoritativePosition.x = entity.pos.x;
-      session.movementAuthoritativePosition.y = entity.pos.y;
-      session.movementAuthoritativePosition.z = entity.pos.z;
+      session.movementAuthoritativePosition.x = framePosition.x;
+      session.movementAuthoritativePosition.y = framePosition.y;
+      session.movementAuthoritativePosition.z = framePosition.z;
     } else {
-      session.movementAuthoritativePosition = { ...entity.pos };
+      session.movementAuthoritativePosition = { ...framePosition };
     }
   }
 }

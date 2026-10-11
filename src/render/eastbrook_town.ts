@@ -25,6 +25,7 @@ import {
   eastbrookRoofVisibilityPlanInto,
   newEastbrookRoofVisibilityPlan,
 } from './eastbrook_town_visibility_core';
+import { buildEastbrookWeeklyVault, WEEKLY_VAULT_TRIANGLES } from './eastbrook_weekly_vault';
 import { indexExactVertexTuples } from './exact_index_geometry';
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
 import { type KitWindowPane, kitWindowPanes } from './kit_window_panes_core';
@@ -199,6 +200,7 @@ export interface EastbrookTownDrawStats {
 export interface EastbrookTownTriangleBudget {
   assetTriangles: number;
   maximumFoundationTriangles: number;
+  proceduralTriangles: number;
   maximumRuntimeTriangles: number;
   hardCeiling: number;
   target: number;
@@ -1209,6 +1211,10 @@ function buildFromTemplates(
     roofHideTargets.push(built.hideTarget);
     buildingGroups.push(built.group);
   }
+  const weeklyVault = buildEastbrookWeeklyVault(groundAt);
+  group.add(weeklyVault.group);
+  roofHideTargets.push(weeklyVault.hideTarget);
+  buildingGroups.push(weeklyVault.group);
   const microBuild = buildMicroBatches(templates, groundAt, atlas);
   const microBatches = microBuild.batches;
   for (const batch of microBatches) group.add(batch);
@@ -1285,7 +1291,10 @@ function buildFromTemplates(
   );
   const roofVisibilityPlan = newEastbrookRoofVisibilityPlan();
 
-  group.userData.buildingIds = EASTBROOK_LAYOUT.buildings.map((building) => building.id);
+  group.userData.buildingIds = [
+    ...EASTBROOK_LAYOUT.buildings.map((building) => building.id),
+    EASTBROOK_LAYOUT.weeklyVault.id,
+  ];
   group.userData.microBatchNames = microBatches.map((batch) => batch.name);
   group.userData.wallBatchNames = wallBatches.map((batch) => batch.name);
   group.userData.mirroredWallSegmentIds = wallBatches.find(
@@ -1435,6 +1444,7 @@ function sameNumber(left: number, right: number): boolean {
 }
 
 export function isEastbrookRebuildBuilding(building: BuildingDef): boolean {
+  if (building.id === EASTBROOK_LAYOUT.weeklyVault.id) return true;
   return EASTBROOK_LAYOUT.buildings.some(
     (candidate) =>
       candidate.kind === building.kind &&
@@ -1534,7 +1544,8 @@ export function eastbrookTownTriangleBudget(
   });
   const assetTriangles = assets.reduce((sum, asset) => sum + asset.repeatedTriangles, 0);
   const maximumFoundationTriangles = EASTBROOK_LAYOUT.buildings.length * 12;
-  const maximumRuntimeTriangles = assetTriangles + maximumFoundationTriangles;
+  const proceduralTriangles = WEEKLY_VAULT_TRIANGLES;
+  const maximumRuntimeTriangles = assetTriangles + maximumFoundationTriangles + proceduralTriangles;
   const hardCeiling = 40_000;
   // Round 8 (owner): raised 30,000 to 33,000 to pay for the Realm Builder
   // monument at full sculpt resolution and double size. The earlier pass
@@ -1548,6 +1559,7 @@ export function eastbrookTownTriangleBudget(
   return {
     assetTriangles,
     maximumFoundationTriangles,
+    proceduralTriangles,
     maximumRuntimeTriangles,
     hardCeiling,
     target,

@@ -23,6 +23,7 @@
 // attribute, which our writes change once, so a value change costs exactly one
 // extra (idempotent, then elided) re-measure before the key settles.
 
+import { TARGET_AURAS_BELOW_CLASS } from './aura_bar_side';
 import type { PainterHostWriters } from './painter_host';
 import { belowTargetSlot, partyBelowTargetBottom, safeScale } from './party_below_target_core';
 import { getUiScale } from './ui_scale';
@@ -154,6 +155,13 @@ export class PartyBelowTargetPainter {
       this.win.innerWidth,
       this.win.innerHeight,
       debuffs?.childElementCount ?? 0,
+      // The strip's side (targetAurasBelowFrame) moves the union bottom without
+      // touching any other input, so the toggle must re-run the sensors.
+      (frame?.ownerDocument.body?.getAttribute('class') ?? '')
+        .split(' ')
+        .includes(TARGET_AURAS_BELOW_CLASS)
+        ? 1
+        : 0,
       frame?.getAttribute('class') ?? '',
       frame?.getAttribute('style') ?? '',
       container?.getAttribute('class') ?? '',

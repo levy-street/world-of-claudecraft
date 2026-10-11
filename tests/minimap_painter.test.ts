@@ -9,6 +9,7 @@
 // cadence + the '#zone-label' setText preserved from the inline site.
 
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BG_HALF_X, BG_HALF_Z, bgFieldPlanWalls } from '../src/sim/battleground_layout';
 import { battlegroundOrigin, GATHER_NODES, NPCS, QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
@@ -78,6 +79,9 @@ const MINIMAP_COLOR_TOKENS = [
   '--color-minimap-party-pip',
   '--color-minimap-player',
   '--color-minimap-outline',
+  '--color-minimap-world-quest-available',
+  '--color-minimap-world-quest-active',
+  '--color-minimap-world-boss',
 ];
 
 describe('minimap_painter: no magic values (canvas sub-rule)', () => {
@@ -116,6 +120,8 @@ describe('minimap_painter: no magic values (canvas sub-rule)', () => {
       expect(code, `painter never reads ${tok}`).toContain(tok);
       expect(tokens, `missing ${tok}`).toContain(`${tok}:`);
     }
+    expect(tokens).toContain('--color-minimap-world-quest-available: #4aa3ff;');
+    expect(tokens).toContain('--color-minimap-world-boss: #a970ff;');
     // The hand list above cannot see a table entry it was never told about,
     // and resolveColors freezes the WHOLE color set on first resolve, so one
     // token absent from tokens.css draws default ink for the session. Pin
@@ -153,6 +159,21 @@ describe('minimap_painter: cached background + ~10Hz cadence preserved', () => {
 
   it("routes the '#zone-label' text through the elided setText (the one DOM write)", () => {
     expect(code).toContain('this.writers.setText(zoneLabelEl');
+  });
+
+  it('wires the small emblem through the touch-safe 40px hit target and opens its zone', () => {
+    const tap = readFileSync(
+      fileURLToPath(new URL('../src/ui/hud/map/minimap_objective_tap.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(hud).toContain('bindMinimapObjectiveTap(mm, this);');
+    expect(tap).toContain('bindTouchTap(mm,');
+    expect(tap).toContain('h.minimapPainter.worldObjectiveAt(');
+    expect(tap.replace(/\s+/g, ' ')).toContain(
+      'MINIMAP_OBJECTIVE_TAP_RADIUS_PX * Math.max(canvas.width / rect.width, canvas.height / rect.height)',
+    );
+    expect(tap).toContain('h.mapZoneOverride = marker.zoneId;');
+    expect(tap).toContain("marker.kind === 'world-quest' ? marker.questId : null");
   });
 
   it('keeps the cached Thornhollow Fields sheet bounded for the 240x452yd field', () => {
@@ -689,6 +710,22 @@ afterEach(() => {
 });
 
 describe('minimap_painter: tiny procedural symbols carry identity without hue', () => {
+  it('draws the world boss as an outlined badge with a skull silhouette', () => {
+    const trace = drawSymbols([
+      { kind: 'world-boss', mx: 20, my: 30, bossId: 'boss', zoneId: 'zone' },
+    ]);
+
+    expect(trace.strokedArcs).toContainEqual({
+      x: 20,
+      y: 30,
+      radius: 6.5,
+      strokeStyle: 'paint:outline',
+      lineWidth: 1.5,
+    });
+    expect(trace.filledArcs.map((arc) => arc.radius)).toEqual([6.5, 4, 1.1, 1.1]);
+    expect(trace.rects.filter((rect) => rect.op === 'fill')).toHaveLength(2);
+  });
+
   it('draws a friend as an outlined circle and a guildmate as an outlined diamond', () => {
     const friend = drawSymbols([{ kind: 'ally', mx: 20, my: 30, ally: 'friend' }]);
     const guild = drawSymbols([{ kind: 'ally', mx: 20, my: 30, ally: 'guild' }]);
@@ -931,6 +968,7 @@ describe('minimap_painter: tiny procedural symbols carry identity without hue', 
 
   it('draws every semantic-object family and rift mechanic without canvas text', () => {
     const semantics: MinimapObjectSemantic[] = [
+      { kind: 'hoard-entrance' },
       { kind: 'rift-entrance', rank: 'S' },
       { kind: 'rift-descent' },
       { kind: 'rift-return', route: 'beacon', rank: null },
@@ -972,6 +1010,23 @@ describe('minimap_painter: tiny procedural symbols carry identity without hue', 
       expect(trace.minimapTextCalls, JSON.stringify(semantic)).toBe(0);
       expect(trace.minimapFontWrites, JSON.stringify(semantic)).toBe(0);
     }
+  });
+
+  it('draws the Buried Hoard as a treasure X without requesting Rift art', () => {
+    const markerArt = fakeMarkerArt([...MAP_MARKER_ART_IDS]);
+    const hoard = drawSymbols(
+      [{ kind: 'semantic-object', mx: 20, my: 30, semantic: { kind: 'hoard-entrance' } }],
+      'standard',
+      markerArt.art,
+    );
+    const rift = drawSymbols([
+      { kind: 'semantic-object', mx: 20, my: 30, semantic: { kind: 'rift-entrance', rank: null } },
+    ]);
+    expect(markerArt.calls).toEqual([]);
+    expect(hoard.segments).not.toEqual(rift.segments);
+    expect(hoard.strokedArcs).toEqual([]);
+    expect(hoard.segments).toHaveLength(4);
+    expect(hoard.minimapTextCalls).toBe(0);
   });
 
   it.each([

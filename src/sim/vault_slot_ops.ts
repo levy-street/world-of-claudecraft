@@ -29,7 +29,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now. Draws NO rng.
 
-import { instancedCountCap } from './bags';
+import { instancedCountCap, stackSizeOf } from './bags';
 import { ITEMS } from './data';
 import {
   boundCraftedRecipeIdOnLoad,
@@ -82,18 +82,24 @@ export function vaultRowMovesWhole(instance: ItemInstancePayload | undefined): b
 }
 
 /** Decide adding `grant` to the identity rows: the compatible row tops up,
- *  else one fresh row opens, at the vault's row size. Null when the shared
- *  model cannot read the grant or an existing same-item row. */
+ *  else fresh rows open. Mergeable identities pack at the vault's row size.
+ *  Whole-move payloads (locked or charged) keep the carried item's fresh-row
+ *  cap, so a tolerated over-cap locked deposit becomes capped rows instead of
+ *  one over-cap row. Null when the shared model cannot read the grant or an
+ *  existing same-item row. */
 export function planVaultRowAdd(
   special: readonly InvSlot[],
   grant: MaterialStackSlot,
   materialIds: ReadonlySet<string>,
 ): MaterialAddPlan | null {
+  const stackSize = vaultRowMovesWhole(grant.instance)
+    ? stackSizeOf(ITEMS[grant.itemId])
+    : VAULT_ROW_STACK_SIZE;
   const plan = planMaterialStackAdd({
     inventory: special,
     incoming: grant,
     materialIds,
-    stackSize: VAULT_ROW_STACK_SIZE,
+    stackSize,
     maxNewSlots: grant.count,
   });
   return plan.ok ? plan.value : null;

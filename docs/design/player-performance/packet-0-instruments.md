@@ -432,6 +432,35 @@ rulings, code, tests, and baselines.md do not already carry.
   presumption, the production peak tick capture, and the 48 h schema-2 perf
   summary.
 
+## Post-packet payload additions
+
+Fields added to the report payload after the packet closed. They follow the same
+rules the packet set: a fleet-queryable dimension is a TOP-LEVEL payload field and a
+typed column, never a `rawSummary` key (that block is shed under the size cap), and
+anything that could fingerprint a machine is coarsened before it leaves the client.
+
+- **Host essentials (desktop shell only).** Ten scalars the browser sandbox cannot
+  see, collected by `electron/host_essentials.cjs`, cached and narrowed by
+  `src/game/desktop_host_essentials.ts` (`createHostEssentialsProbe`), spread into
+  the payload by `payloadFromSnapshot` in `src/game/perf_reporter.ts`, narrowed
+  again on ingest by `hostEssentialsRow` in `server/perf_report_host.ts`, and stored
+  by the ADD COLUMN block in `server/client_perf_reports_schema.ts`:
+  `hostMemTotalMb`, `hostMemFreeMb` (physical RAM and free RAM, rounded to 256 MB
+  and 64 MB), `appWorkingSetMb`, `appRendererWsMb`, `appGpuWsMb` (this app's own
+  process memory, rounded to 16 MB so no figure in the row is left at full
+  entropy, and bounded by a 64 GiB ceiling of their own rather than the 4 TiB
+  host ceiling, so one absurd anonymous value cannot skew a future aggregate),
+  `hostOnBattery`, `hostPowerPlan`, `hostPowerMode` (closed
+  vocabularies, never the raw Windows GUID: same fingerprint rule that rounds
+  `refreshHz` to whole Hz), `hostHags` and `hostGameMode`.
+  An absent field is OMITTED from the payload rather than sent as null, so a web
+  payload is byte-identical to one built before the dimension existed, and the
+  ingest ignores the whole block unless the same report is a desktop-shell report.
+  The three copies of the vocabularies, and the two megabyte ceilings, are pinned
+  equal by `tests/host_essentials_vocabulary_parity.test.ts`, the same pattern as
+  `tests/perf_suggestion_id_parity.test.ts`. No grouped summary dimension and no
+  Prometheus label yet: the columns land first, the fleet reads come later.
+
 ## Packet-level notes
 
 - Consequence ledger (player-visible): the nudge toast (new, informational, i18n'd,

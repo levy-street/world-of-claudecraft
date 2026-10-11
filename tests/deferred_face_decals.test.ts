@@ -34,6 +34,7 @@ import {
   decalTextureFromData,
   ensureDecalGeometry,
 } from '../src/render/characters/stubble';
+import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
 import { CharacterVisual, type FarBakeGate } from '../src/render/characters/visual';
 
 const DEF = VISUALS[MODULAR_WARRIOR_KEY];
@@ -263,6 +264,9 @@ describe('CharacterVisual.attachDeferredDecals', () => {
       ferocityStage: 0,
       ascended: false,
       runeTint: null,
+      // Object.create skips the real class field initializer. Keep its inert
+      // material-response collaborator rather than bypassing the overlay chain.
+      surfaceResponse: new CharacterSurfaceResponse(),
       auraGlowIntensity: 0,
     });
     return { fake, root, head };

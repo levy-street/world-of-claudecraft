@@ -18,6 +18,7 @@
 // tests/ability_damage.test.ts and tests/v042_balance_tooltips.test.ts;
 // hud.ts is the thin consumer.
 import type { AbilityOutputScaling } from '../sim/ability_output_scaling';
+import { benisonPrayerHealingMultiplier } from '../sim/combat/priest/benison_dawnweave';
 import type { ResolvedAbility } from '../sim/sim';
 import {
   abilityScalingPower,
@@ -50,18 +51,21 @@ export interface AbilityScaling {
   healPower: number;
   rangedPower: number;
   attackPower: number;
+  auras?: readonly { id?: string; stacks?: number; remaining?: number }[];
 }
 
 /** Build the scaling snapshot from a live entity: the ONE constructor, so a
  *  consumer (the HUD tooltips) can never miss a scaling field. */
 export function abilityScalingOf(
-  e: Pick<Entity, 'spellPower' | 'healPower' | 'rangedPower' | 'attackPower'>,
+  e: Pick<Entity, 'spellPower' | 'healPower' | 'rangedPower' | 'attackPower'> &
+    Partial<Pick<Entity, 'auras'>>,
 ): AbilityScaling {
   return {
     spellPower: e.spellPower,
     healPower: e.healPower,
     rangedPower: e.rangedPower,
     attackPower: e.attackPower,
+    auras: e.auras,
   };
 }
 
@@ -195,23 +199,32 @@ export function abilityPrimaryHealingTotal(
   eff: AbilityEffect,
   scaling: AbilityScaling,
 ): { min: number; max: number } | null {
-  const factor = res.outputScaling?.primaryHealing ?? 1;
+  // Dawnweave modifies the whole direct-healing packet, including its power
+  // contribution, before the primary-healer factor just as combat does.
+  const primaryFactor = res.outputScaling?.primaryHealing ?? 1;
+  const benisonFactor =
+    scaling.auras && (eff.type === 'heal' || eff.type === 'aoeHeal')
+      ? benisonPrayerHealingMultiplier(scaling.auras, res.def.id)
+      : 1;
+  const factor = primaryFactor * benisonFactor;
   if (factor === 1) return null;
+  const directTotal = (amount: number): number =>
+    Math.round((benisonFactor === 1 ? amount : Math.round(amount * benisonFactor)) * primaryFactor);
   switch (eff.type) {
     case 'heal': {
       if (eff.casterMaxHpPct !== undefined) return null;
       const bonus = abilityDamageBonus(res, eff, scaling);
       return {
-        min: Math.round((eff.min + bonus) * factor),
-        max: Math.round((eff.max + bonus) * factor),
+        min: directTotal(eff.min + bonus),
+        max: directTotal(eff.max + bonus),
       };
     }
     case 'chainHeal':
     case 'aoeHeal': {
       const bonus = abilityDamageBonus(res, eff, scaling);
       return {
-        min: Math.round((eff.min + bonus) * factor),
-        max: Math.round((eff.max + bonus) * factor),
+        min: directTotal(eff.min + bonus),
+        max: directTotal(eff.max + bonus),
       };
     }
     case 'consumeAura': {

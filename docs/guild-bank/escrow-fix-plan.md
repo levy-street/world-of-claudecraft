@@ -614,8 +614,12 @@ should become a finding the auditor reports).
 
 ### Deferred, recorded only
 
-- Take the autosave arm off the market serial writer (section 3.6), retiring the documented
-  concurrency-collapse risk.
+- ~~Take the autosave arm off the market serial writer (section 3.6), retiring the documented
+  concurrency-collapse risk.~~ DONE: `server/game.ts` `saveCharacter` now runs a guild-book-only
+  save (`opts.withMarket` false) directly instead of queueing it on `enqueueMarketWrite`; the
+  leave flush (`opts.withMarket` true, market+mail+books in one transaction) still rides it. See
+  `enqueueMarketWrite`'s own comment and `tests/snapshots.test.ts` ("a guild-book-only autosave no
+  longer waits on the market FIFO").
 - Strong Direction B: refuse rather than clamp on forward apply (section 5).
 
 ### Doc debt

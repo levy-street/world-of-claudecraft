@@ -13,7 +13,9 @@
 // other system that reads ZONES/ROADS/CAMPS.
 
 import { describe, expect, it } from 'vitest';
+import { STRIP_MAX_X } from '../src/sim/data';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
+import { applyGardenwalkWestPass } from '../src/sim/thornpeak_walk_grades';
 import { terrainHeight, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -56,5 +58,20 @@ describe('the Gardenwalk: Thornpeak Heights to the Evergarden', () => {
     // pass-flattened toward the ~6 to 8 floor the corridor itself settles to.
     expect(terrainHeight(173, 700, WORLD_SEED)).toBeGreaterThan(15);
     expect(terrainHeight(173, 650, WORLD_SEED)).toBeGreaterThan(15);
+  });
+
+  it('the applier itself: full pass floor at the border, identity outside its window', () => {
+    // applyGardenwalkWestPass lives in the Thornpeak walk-grades leaf
+    // (thornpeak_walk_grades.ts). At the border line, mid-pass, its weight
+    // is 1: the height is pulled onto the ~6 floor keeping 8% of its relief.
+    for (const h of [-2, 6, 30]) {
+      expect(applyGardenwalkWestPass(STRIP_MAX_X, 800, h)).toBeCloseTo(6 + (h - 6) * 0.08, 12);
+    }
+    // past the z band (|z - 800| >= 52) or the x reach (|x - border| >= 58)
+    // it returns the height untouched, bit for bit
+    expect(applyGardenwalkWestPass(STRIP_MAX_X, 852, 30)).toBe(30);
+    expect(applyGardenwalkWestPass(STRIP_MAX_X, 748, 30)).toBe(30);
+    expect(applyGardenwalkWestPass(STRIP_MAX_X - 58, 800, 30)).toBe(30);
+    expect(applyGardenwalkWestPass(STRIP_MAX_X + 58, 800, 30)).toBe(30);
   });
 });

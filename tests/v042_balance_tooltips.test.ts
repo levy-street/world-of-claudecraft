@@ -100,7 +100,15 @@ describe('buildAbilityOutputScaling (src/sim/ability_output_scaling.ts)', () => 
   it('is the all-1 identity for a no-spec character', () => {
     const healingTouch = known('druid', 'healing_touch', NO_SPEC_MODS);
     const out = buildAbilityOutputScaling(healingTouch.def, 'druid', NO_SPEC_MODS);
-    expect(out).toEqual({ damage: 1, healing: 1, dot: 1, hot: 1, absorb: 1, primaryHealing: 1 });
+    expect(out).toEqual({
+      primaryDamage: 1,
+      damage: 1,
+      healing: 1,
+      dot: 1,
+      hot: 1,
+      absorb: 1,
+      primaryHealing: 1,
+    });
   });
 
   it('returns primaryHealing 1 for a non-player caster (cls null)', () => {

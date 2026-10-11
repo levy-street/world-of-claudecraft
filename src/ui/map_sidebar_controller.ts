@@ -25,6 +25,8 @@ import type { IWorld } from '../world_api';
 import { questObjectiveLabel, questTitle } from './entity_display_core';
 import { zoneDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { worldQuestRailSectionHtml } from './hud/map/world_quest_rail_section';
+import { buildWorldQuestRailView } from './hud/map/world_quest_rail_view';
 import { formatNumber, getI18nRevision, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
 import {
@@ -38,6 +40,8 @@ import {
   toggleMapAtlasFilter,
 } from './map_sidebar_view';
 import { type QuestTrackingState, sharedQuestTracking } from './quest_tracking_core';
+import { svgIcon } from './ui_icons';
+import { worldQuestDisplayName } from './world_quest_view';
 
 const FILTERS: readonly MapAtlasFilterId[] = [
   'quests',
@@ -62,6 +66,7 @@ const FILTER_KEYS: Record<MapAtlasFilterId, TranslationKey> = {
  *  match order, and every one of them is a literal from this list, so the
  *  attribute selector the focus restore builds can never carry player data. */
 const FOCUS_ATTRS = [
+  'data-map-sidebar-toggle',
   'data-map-filter',
   'data-map-quest',
   'data-map-route',
@@ -82,6 +87,15 @@ function mapQuestTitle(questId: string): string {
     : t('questUi.tracker.unknownQuest', { id: questId });
 }
 
+/** The rail collapse's persistence port, the quest-tracker collapse shape
+ *  (QuestTrackerControllerDeps in hud/quest/quest_tracker_controller.ts):
+ *  `available()` guards against toggling before Hud.attachOptions has run. */
+export interface MapSidebarSettingsPort {
+  available(): boolean;
+  collapsed(): boolean;
+  setCollapsed(collapsed: boolean): void;
+}
+
 export interface MapSidebarControllerDeps {
   root(): HTMLElement;
   click(): void;
@@ -91,6 +105,23 @@ export interface MapSidebarControllerDeps {
   onShowRoute(route: MapAtlasRoute): void;
   /** Injectable tracking set; production leaves it out and shares the HUD's one. */
   tracking?: QuestTrackingState;
+  /** The world-quest section (src/ui/hud/map/): selection is shared with the
+   *  map's marker selection, and the daily reroll always goes through the
+   *  HUD's confirm dialog before it reaches the world. Absent on a host that
+   *  ships no world quests (the section is then omitted). */
+  worldQuests?: {
+    selectedId(): string | null;
+    select(questId: string | null): void;
+    confirmDialog(
+      title: string,
+      body: string,
+      okText: string,
+      cancelText: string,
+      onOk: () => void,
+    ): void;
+    nowMs(): number;
+  };
+  settings: MapSidebarSettingsPort;
 }
 
 export class MapSidebarController {
@@ -180,6 +211,41 @@ export class MapSidebarController {
     return root;
   }
 
+  /** The world-quest section's two controls: select a row (shared with the map
+   *  marker selection) and replace the selected quest, always behind the confirm. */
+  private handleWorldQuestClick(target: HTMLElement): boolean {
+    const wq = this.deps.worldQuests;
+    const world = this.world;
+    if (!wq || !world) return false;
+    const reroll = target.closest<HTMLElement>('[data-map-wq-reroll]');
+    if (reroll) {
+      const questId = reroll.dataset.mapWqReroll ?? '';
+      if (!questId || reroll.hasAttribute('disabled')) return true;
+      this.deps.click();
+      wq.confirmDialog(
+        t('hudChrome.mapAtlas.worldQuests.confirmTitle'),
+        t('hudChrome.mapAtlas.worldQuests.confirmBody', { quest: worldQuestDisplayName(questId) }),
+        t('hudChrome.mapAtlas.worldQuests.confirmOk'),
+        t('hudChrome.mapAtlas.worldQuests.confirmCancel'),
+        () => {
+          if (!this.world?.rerollWorldQuest?.(questId)) return;
+          wq.select(null);
+          this.deps.onRepaintMap();
+          this.render();
+        },
+      );
+      return true;
+    }
+    const row = target.closest<HTMLElement>('[data-map-wq]');
+    if (!row) return false;
+    const questId = row.dataset.mapWq ?? '';
+    this.deps.click();
+    wq.select(wq.selectedId() === questId ? null : questId);
+    this.deps.onRepaintMap();
+    this.render();
+    return true;
+  }
+
   private render(): void {
     const world = this.world;
     const zone = this.zone;
@@ -196,12 +262,35 @@ export class MapSidebarController {
     if (this.route !== null) {
       this.route = model.route?.questId === this.route.questId ? model.route : null;
     }
+    const wq = this.deps.worldQuests;
+    const nowMs = wq ? wq.nowMs() : 0;
+    const wqView = wq
+      ? buildWorldQuestRailView({
+          worldQuestCycle: world.worldQuestCycle,
+          worldQuestLog: world.worldQuestLog,
+          worldQuestReplacements: world.worldQuestReplacements,
+          worldQuestRerollCycle: world.worldQuestRerollCycle,
+          worldQuestExpiresAtMs: world.worldQuestExpiresAtMs,
+          playerLevel: world.player.level,
+          selectedWorldQuestId: wq.selectedId(),
+          canReroll: world.canRerollWorldQuest
+            ? (questId) => world.canRerollWorldQuest?.(questId) ?? { canReroll: false }
+            : undefined,
+        })
+      : null;
+    const collapsed = this.deps.settings.collapsed();
     const signature = mapSidebarSignature(model, {
       shownRouteQuestId: this.route?.questId ?? null,
       i18nRevision: getI18nRevision(),
       // Untracking moves nothing in the view a walking player also moves, so the
       // rail would keep painting the row it just dropped without this counter.
       trackingRevision: tracking.revision(),
+      // The world-quest section: its rows plus the expiry countdown's minute,
+      // so the countdown moves once a minute and never per update.
+      worldQuests: wqView
+        ? { view: wqView, minute: Math.floor(Math.max(0, wqView.expiresAtMs - nowMs) / 60_000) }
+        : null,
+      sidebarCollapsed: collapsed,
     });
     if (signature === this.lastSig) return;
     this.lastSig = signature;
@@ -238,14 +327,26 @@ export class MapSidebarController {
         return `<div class="map-atlas-nearby-row"><span>${esc(mapQuestTitle(quest.questId))}</span><span>${esc(zoneDisplayName(quest.zoneId))}${level} · ${esc(t('hudChrome.mapAtlas.distance', { distance: formatNumber(bucketMapAtlasDistance(quest.distance), { maximumFractionDigits: 0 }) }))}</span></div>`;
       })
       .join('');
+    const toggleLabel = esc(
+      t(collapsed ? 'hudChrome.mapAtlas.expandHint' : 'hudChrome.mapAtlas.collapseHint'),
+    );
+    const toggle =
+      `<button type="button" class="map-atlas-sidebar-toggle ui-disc" data-map-sidebar-toggle ` +
+      `aria-expanded="${!collapsed}" aria-controls="map-atlas-body" title="${toggleLabel}" aria-label="${toggleLabel}">` +
+      `${svgIcon('prev')}</button>`;
     const root = this.mount();
+    root.classList.toggle('is-collapsed', collapsed);
     const html =
+      toggle +
+      `<div id="map-atlas-body" class="map-atlas-body">` +
       `<header class="map-atlas-zone"><h2 class="ui-cin">${esc(zoneDisplayName(model.zoneId))}</h2><p class="ui-meta ui-muted">${esc(levelRange)} · ${esc(t('hudChrome.mapAtlas.landmarkCount', { count: formatNumber(model.landmarkCount, { maximumFractionDigits: 0 }) }))}</p></header>` +
       `<div class="map-atlas-filters ui-seg" role="group" aria-label="${esc(t('hudChrome.mapAtlas.filtersAria'))}">${filters}</div>` +
       `<section class="map-atlas-section"><h3 class="map-atlas-heading">${esc(t('hudChrome.mapAtlas.trackedQuests'))}</h3><div class="map-atlas-quest-list">${quests || `<p class="map-atlas-empty">${esc(t('hudChrome.mapAtlas.noTrackedQuests'))}</p>`}</div></section>` +
       `<div class="map-atlas-actions"><button type="button" class="map-atlas-route ui-btn ui-btn--red" data-map-route aria-pressed="${this.route?.questId === model.selectedQuestId}"${model.route ? '' : ' disabled'}>${esc(t('hudChrome.mapAtlas.showRoute'))}</button><button type="button" class="map-atlas-untrack ui-btn" data-map-untrack${model.selectedQuestId ? '' : ' disabled'}>${esc(t('hudChrome.mapAtlas.untrack'))}</button></div>` +
+      (wqView ? worldQuestRailSectionHtml(wqView, nowMs) : '') +
       `<section class="map-atlas-section map-atlas-nearby"><h3 class="map-atlas-heading is-secondary">${esc(t('hudChrome.mapAtlas.availableNearby'))}</h3>${nearby || `<p class="map-atlas-empty">${esc(t('hudChrome.mapAtlas.noNearbyQuests'))}</p>`}</section>` +
-      `<footer class="map-atlas-legend"><span><i class="map-atlas-legend-mark is-dungeon" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.dungeon'))}</span><span><i class="map-atlas-legend-mark is-ore" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.ore'))}</span><span><i class="map-atlas-legend-mark is-herb" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.herb'))}</span><span><i class="map-atlas-legend-mark is-mail" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.mail'))}</span><span><i class="map-atlas-legend-mark is-passage" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.passage'))}</span></footer>`;
+      `<footer class="map-atlas-legend"><span><i class="map-atlas-legend-mark is-dungeon" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.dungeon'))}</span><span><i class="map-atlas-legend-mark is-ore" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.ore'))}</span><span><i class="map-atlas-legend-mark is-herb" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.herb'))}</span><span><i class="map-atlas-legend-mark is-mail" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.mail'))}</span><span><i class="map-atlas-legend-mark is-passage" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.passage'))}</span></footer>` +
+      `</div>`;
     if (html === this.lastHtml) return;
     this.lastHtml = html;
     const focus = this.capturedFocus(root);
@@ -255,6 +356,14 @@ export class MapSidebarController {
 
   private readonly onClick = (event: Event): void => {
     const target = event.target as HTMLElement;
+    if (target.closest('[data-map-sidebar-toggle]')) {
+      if (!this.deps.settings.available()) return;
+      this.deps.settings.setCollapsed(!this.deps.settings.collapsed());
+      this.deps.click();
+      this.render();
+      return;
+    }
+    if (this.handleWorldQuestClick(target)) return;
     const filter = target.closest<HTMLElement>('[data-map-filter]')?.dataset.mapFilter as
       | MapAtlasFilterId
       | undefined;

@@ -5,7 +5,7 @@
 
 import { BANK_BAG_SOCKETS, BANK_EXPANSION_SLOTS, BANK_PURCHASED_SLOTS_MAX } from '../sim/bank';
 import { MAX_INSTANCE_STRING_LENGTH } from '../sim/item_instance_load';
-import type { BankBonusSource, BankInfo, VaultInfo } from '../world_api';
+import type { BankBonusSource, BankInfo, GuildBankInfo, VaultInfo } from '../world_api';
 // isRecord is the ONE record predicate both snapshot wire decoders share (the
 // strict prototype-checking form; see its comment in vault_snapshot_wire.ts).
 import { decodeVaultInfoWire, isRecord, isWireBankSlot } from './vault_snapshot_wire';
@@ -261,5 +261,32 @@ export function applyBankSelfWire(
   if (s.bpsl !== undefined) {
     const decoded = decodeBankPurchasedSlotsWire(s.bpsl);
     if (decoded !== undefined) target.bankPurchasedSlots = decoded;
+  }
+}
+
+export function applyGuildBankSelfWire(
+  target: { guildBankInfo: GuildBankInfo | null },
+  s: { guildBank?: GuildBankInfo | null },
+  resetLog: () => void,
+): void {
+  // `guildBank` follows the same delta contract; the server encodes null
+  // away from a banker, on death, and outside a guild (the proximity +
+  // membership gate lives in sim guildBankInfoFor; any rank sees it, the
+  // snapshot's canEdit flag marks officer-plus).
+  if (s.guildBank !== undefined) {
+    // BOTH EDGES of the gate reset the activity log, not just the losing
+    // one. Losing it (walked away, died, left or switched guild)
+    // invalidates the rows: they are one guild's history
+    // read under a membership this client may no longer hold, so they are
+    // dropped rather than left to paint into the next pane that opens.
+    // REGAINING it
+    // has to reset too, because the answer this client is holding was taken
+    // while the gate was shut: a member who opened the log away from the
+    // banker got a `refused`, and without this the pane went on saying
+    // refused for the rest of the TTL after they walked up. Re-arming on
+    // the transition makes it self-correct in one frame.
+    const hadGate = target.guildBankInfo !== null;
+    target.guildBankInfo = s.guildBank;
+    if (hadGate !== (target.guildBankInfo !== null)) resetLog();
   }
 }

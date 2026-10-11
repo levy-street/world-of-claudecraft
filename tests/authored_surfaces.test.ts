@@ -135,6 +135,35 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_ignivar_crucible_warden',
   'mob_ignivar_ember_sentinel',
   'mob_ignivar_cinder_artificer',
+  'mob_healing_tide_totem',
+  'mob_hoard_abyssal_maw',
+  'mob_hoard_hoarfrost_warden',
+  'mob_hoard_emberforge_tyrant',
+  'mob_hoard_archon_nyxaris',
+  'mob_hoard_tempest_vharok',
+  // The Buried Hoard room mobs, the Coinsack Scurrier, and the cave bosses with
+  // their adds: Tripo and Blender bodies with their own authored atlases.
+  'mob_hoard_tide_thrall',
+  'mob_hoard_deep_lurker',
+  'mob_hoard_frost_revenant',
+  'mob_hoard_ember_fiend',
+  'mob_hoard_magma_brute',
+  'mob_hoard_void_acolyte',
+  'mob_hoard_storm_caller',
+  'mob_hoard_boneclad_warrior',
+  'mob_hoard_dread_stalker',
+  'mob_hoard_stormscale_drake',
+  'mob_hoard_venom_weaver',
+  'mob_hoard_thornback_stalker',
+  'mob_hoard_rime_elemental',
+  'mob_hoard_coinsack_scurrier',
+  'mob_hoard_boss_mushroom',
+  'mob_hoard_sporeling',
+  'mob_hoard_bloat_cap',
+  'mob_hoard_boss_mole',
+  'mob_hoard_boss_bat',
+  'mob_hoard_bat_swarmling',
+  'mob_hoard_boss_mimic',
   'mob_varkhul_forgefather',
   'mount_mech_bird',
   'mob_dragonkin_whelp',
@@ -144,12 +173,27 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_dragon_egg',
   'mount_goblin_rocket_sled',
   'mount_rallycart_rxt',
+  'mount_avian_strider',
 ];
 
 describe('authored surfaces', () => {
   it('routes both Varkhul drops through the authored held-model arm', () => {
     expect(isAuthoredHeldModelUrl(itemWeaponModelUrl('varkhul_forgebreaker') ?? '')).toBe(true);
     expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('varkhul_emberward') ?? '')).toBe(true);
+  });
+
+  it('routes the harbormaster gear through the authored arm, from its own directory', () => {
+    // vertex-coloured felt, brass and leather: the weapon polish would glaze them to one sheen
+    for (const key of ['harbormaster_tricorne', 'harbormaster_spyglass']) {
+      expect(AUTHORED_HELD_MODELS.has(key), key).toBe(true);
+      expect(isAuthoredHeldModelUrl(`models/chars/npc_gear/${key}.glb`), key).toBe(true);
+    }
+    for (const att of VISUALS.npc_modular_harbormaster.attach ?? []) {
+      expect(isAuthoredHeldModelUrl(att.url), att.url).toBe(true);
+    }
+    // the directory alone opts nothing in, and no other models/chars path matches
+    expect(isAuthoredHeldModelUrl('models/chars/npc_gear/some_other_hat.glb')).toBe(false);
+    expect(isAuthoredHeldModelUrl('models/chars/modular/harbormaster_tricorne.glb')).toBe(false);
   });
 
   it('leaves every other held model on the polish', () => {
@@ -164,7 +208,7 @@ describe('authored surfaces', () => {
     // a creature or player GLB can never match the held-model set
     expect(isAuthoredHeldModelUrl('models/creatures/ogre.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('')).toBe(false);
-    expect(AUTHORED_HELD_MODELS.size).toBe(2);
+    expect(AUTHORED_HELD_MODELS.size).toBe(4);
   });
 
   it('flags exactly the replaced creature and mount rigs, never a player body', () => {

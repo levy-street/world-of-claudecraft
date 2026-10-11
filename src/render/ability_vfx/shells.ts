@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_ENGINE,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxEngine,
+} from '../cast_vfx_family';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 
 // Translucent buff/barrier shells (the gallery's receiver shell): a soft
@@ -43,6 +49,8 @@ interface ShellSlot {
 }
 
 export class BuffShells {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private slots: ShellSlot[] = [];
   private readonly geometry: THREE.SphereGeometry;
   private readonly material: THREE.ShaderMaterial;
@@ -108,7 +116,7 @@ export class BuffShells {
     this.mesh.count = 0;
     this.mesh.visible = false;
     this.mesh.renderOrder = 6;
-    this.mesh.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(this.mesh);
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     // Refreshed from the packed instances each frame (see pack): three caches
     // an InstancedMesh's own sphere once and would never notice a shell move.
@@ -133,7 +141,7 @@ export class BuffShells {
 
   // Timed shell (buff shellDur): plays once and fades out on its own.
   flash(entityId: number, colorHex: number, dur: number): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return;
     const slot =
       this.slots.find((s) => s.active && s.entityId === entityId) ??
       this.slots.find((s) => !s.active) ??
@@ -153,7 +161,7 @@ export class BuffShells {
   // Held shell (barrier auras): refreshed every frame while the aura lives;
   // hold() marks it seen, endFrame() releases the ones that stopped arriving.
   hold(entityId: number, colorHex: number, frame: number): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return;
     let slot = this.slots.find((s) => s.active && s.entityId === entityId);
     let activated = false;
     if (!slot) {

@@ -36,6 +36,7 @@ import {
   takeFarBakeBudget,
 } from '../src/render/characters/assets';
 import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
+import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
 import { CharacterVisual } from '../src/render/characters/visual';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
@@ -407,6 +408,9 @@ describe('buildComposedFar catches a fresh far mesh up on effect state', () => {
       moonkin: false,
       shadowform: false,
       runeTint: null,
+      // Object.create skips the real class field initializer. Keep its inert
+      // material-response collaborator rather than bypassing the overlay chain.
+      surfaceResponse: new CharacterSurfaceResponse(),
       auraGlowIntensity: 0,
       ...overrides,
     });
@@ -534,6 +538,9 @@ describe('attemptComposedFar keeps farBakeTried in step with a refused budget', 
       moonkin: false,
       shadowform: false,
       runeTint: null,
+      // Object.create skips the real class field initializer. Keep its inert
+      // material-response collaborator rather than bypassing the overlay chain.
+      surfaceResponse: new CharacterSurfaceResponse(),
       auraGlowIntensity: 0,
       ...overrides,
     });

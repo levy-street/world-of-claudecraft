@@ -67,6 +67,27 @@ export class GroundAimController {
 
   constructor(private readonly deps: GroundAimControllerDeps) {}
 
+  /** Shared position-ability press for a saved bar slot and an XHB-only action. */
+  pressPosition(abilityId: string, slot: number, aimAllowed: boolean, mobile: boolean): void {
+    if (aimAllowed) {
+      this.begin(abilityId, slot);
+      return;
+    }
+    const resolved = this.deps.resolveAbility(abilityId);
+    if (!resolved) return;
+    this.deps.castAt(
+      abilityId,
+      quickAimPoint(
+        this.deps.player(),
+        this.deps.seedTargetPoint(),
+        this.deps.fallbackPoint(),
+        resolved.def.range,
+        resolved.def.minRange,
+        mobile,
+      ),
+    );
+  }
+
   private projectedPoint(abilityId: string, aim: AimPoint, from: AimPoint): AimPoint {
     const memo = this.projMemo;
     if (

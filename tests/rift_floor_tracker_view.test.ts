@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { riftFloorTrackerModel, riftTimerParts } from '../src/ui/hud/rift/rift_floor_tracker_view';
+import {
+  hoardTrackerStage,
+  riftFloorTrackerModel,
+  riftTimerParts,
+} from '../src/ui/hud/rift/rift_floor_tracker_view';
 import type { IWorld } from '../src/world_api';
 import type { RiftFloorView } from '../src/world_api/dungeons';
 
@@ -28,6 +32,15 @@ function world(riftFloor: RiftFloorView | null, msRemaining: number | null): Wor
   return { riftFloor, riftEventMsRemaining: () => msRemaining };
 }
 
+describe('hoardTrackerStage', () => {
+  it('asks for the keeper, then the chest it leaves, then nothing more', () => {
+    expect(hoardTrackerStage(null)).toBe('keeper');
+    expect(hoardTrackerStage(undefined)).toBe('keeper');
+    expect(hoardTrackerStage({ templateId: 'hoard_reward_chest' })).toBe('chest');
+    expect(hoardTrackerStage({ templateId: 'hoard_reward_chest_open' })).toBe('claimed');
+  });
+});
+
 describe('riftFloorTrackerModel', () => {
   it('is null outside a rift, regardless of what riftEventMsRemaining answers', () => {
     expect(riftFloorTrackerModel(world(null, 12_345))).toBeNull();
@@ -36,7 +49,13 @@ describe('riftFloorTrackerModel', () => {
 
   it('reports the 1-based floor (issue #2655 worked example: floorIndex 1 of 5 -> "Floor 2 of 5")', () => {
     const model = riftFloorTrackerModel(world(floor({ floorIndex: 1, floorCount: 5 }), null));
-    expect(model).toEqual({ floor: 2, floorCount: 5, timerSeconds: null });
+    expect(model).toEqual({
+      floor: 2,
+      floorCount: 5,
+      timerSeconds: null,
+      hoard: false,
+      hoardStage: 'keeper',
+    });
   });
 
   it('reports the first floor as 1 of N', () => {

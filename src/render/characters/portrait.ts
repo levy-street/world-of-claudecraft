@@ -412,15 +412,19 @@ async function capturePortrait(request: PortraitCaptureRequest): Promise<void> {
  * Keyed on the look's full signature, which is what makes "the picture of me is
  * me" true after every change in the customizer. That key is unbounded (a
  * colour wheel has a lot of values in it), so unlike the class portraits these
- * entries are capped and evicted oldest-first: a creation session that drags a
- * slider around would otherwise hold a PNG per position.
+ * entries are capped and evicted least-recently-asked: a creation session that
+ * drags a slider around would otherwise hold a PNG per position. The cap is a
+ * raid (40) plus headroom, and a hit re-touches its entry, because every
+ * targeted peer composes now: a crowd wider than the cap under plain FIFO
+ * would re-capture (43 to 201 ms of paced work each) on every tab through it,
+ * where an entry costs about 65 KB to keep.
  *
  * Never blocks the calling frame either: a miss answers null, kicks the async
  * capture, and both consumers (the chip's crest, the unit frame's class
  * portrait) already draw their fallback until {@link onPortraitUpdate} says the
  * composed headshot landed.
  */
-export const MODULAR_PORTRAIT_CACHE_MAX = 24;
+export const MODULAR_PORTRAIT_CACHE_MAX = 48;
 const MODULAR_KEY_SEGMENT = ':mod:';
 const modularKeys: string[] = [];
 
@@ -431,10 +435,23 @@ export function modularPortraitDataUrl(
 ): string | null {
   const key = modularPortraitKey(visualKey, look, framing);
   const cached = cache.get(key);
-  if (cached) return cached;
+  if (cached) {
+    touchModularPortrait(key);
+    return cached;
+  }
   if (!assetsAreReady) return null;
   requestLiveModularCapture(key, visualKey, look, framing);
   return null;
+}
+
+/** Move a composed entry a hit just answered to the young end of the eviction
+ *  order (the cap's why above). Composed keys only: the class half is unbounded
+ *  and never in the FIFO, and the by-key peek deliberately never touches. */
+function touchModularPortrait(key: string): void {
+  const at = modularKeys.indexOf(key);
+  if (at === -1 || at === modularKeys.length - 1) return;
+  modularKeys.splice(at, 1);
+  modularKeys.push(key);
 }
 
 function modularPortraitKey(
@@ -443,6 +460,27 @@ function modularPortraitKey(
   framing: PortraitFraming,
 ): string {
   return `${visualKey}${MODULAR_KEY_SEGMENT}${modularSignature(look.app, look.worn)}:${framing}`;
+}
+
+/**
+ * The cache key {@link modularPortraitDataUrl} files a composed capture under,
+ * for a consumer that has to RECOGNIZE that capture landing: a frame matches
+ * the third argument of {@link onPortraitUpdate} against it, a chip carries it
+ * in a data attribute. Pure string work: it never starts a capture.
+ */
+export function composedPortraitKey(
+  visualKey: string,
+  look: ModularLook,
+  framing: PortraitFraming = 'headshot',
+): string {
+  return modularPortraitKey(visualKey, look, framing);
+}
+
+/** The portrait filed under a composed `key`, or null. A PEEK like
+ *  {@link cachedPortraitDataUrl}: never kicks a capture on a miss, so a
+ *  listener can answer a landed key without re-deriving the look. */
+export function cachedPortraitByKey(key: string): string | null {
+  return cache.get(key) ?? null;
 }
 
 /**
@@ -480,8 +518,9 @@ function requestLiveModularCapture(
 }
 
 /** Commit a composed portrait and keep the composed half of the cache bounded
- *  (see the cap's why above). Every path that fills a composed entry commits
- *  through here, so the FIFO can never miss one. */
+ *  (see the cap's why above): the least-recently-asked entry leaves first.
+ *  Every path that fills a composed entry commits through here, so the
+ *  eviction order can never miss one. */
 function rememberModularPortrait(key: string, url: string): void {
   cache.set(key, url);
   modularKeys.push(key);

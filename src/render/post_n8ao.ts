@@ -315,6 +315,13 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
     return (this as unknown as N8AOStaticFrameInternals).accumulationRenderTarget;
   }
 
+  /** The target the scene is rasterized into, and so the one the VFX opaque
+   *  copy reads (post.ts, scene_sampling.ts). Read it fresh each time: n8ao
+   *  replaces the target on a stencil change. */
+  get sceneTarget(): WebGLRenderTarget {
+    return (this as unknown as N8AOStaticFrameInternals).beautyRenderTarget;
+  }
+
   constructor(scene: Scene, camera: Camera, width: number, height: number) {
     super(scene, camera, width, height);
     assertStaticShaderConfiguration(this.configuration as unknown as N8AOStaticConfiguration);

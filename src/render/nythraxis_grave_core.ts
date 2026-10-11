@@ -76,6 +76,22 @@ export function isNythraxisGraveEruption(ability: string | undefined): boolean {
   return ability === NYTHRAXIS_GRAVE_ERUPTION_CAST_ID;
 }
 
+/** The eruption warning ring's outline width, in world yards: real band
+ *  geometry rather than a 1px WebGL line, so the rim reads clearly at melee
+ *  range against the crypt's own purple torchlight and the raid's purple
+ *  buffs (Discord raid feedback, "Nythraxis Meteor Colour Change": "the
+ *  outlines of the impending meteor / ground aoe is very thin"). A fraction
+ *  of the radius, floored so a small circle still gets a visible band. */
+export const NYTHRAXIS_GRAVE_ERUPTION_RIM_THICKNESS_FRACTION = 0.14;
+export const NYTHRAXIS_GRAVE_ERUPTION_RIM_MIN_THICKNESS = 0.4;
+
+export function nythraxisGraveEruptionRimThickness(radius: number): number {
+  return Math.max(
+    NYTHRAXIS_GRAVE_ERUPTION_RIM_MIN_THICKNESS,
+    radius * NYTHRAXIS_GRAVE_ERUPTION_RIM_THICKNESS_FRACTION,
+  );
+}
+
 const GOLDEN_ANGLE = 2.39996;
 
 // ---------------------------------------------------------------------------

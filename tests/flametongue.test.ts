@@ -57,7 +57,9 @@ describe('Flametongue Weapon (shaman fire imbue)', () => {
     // Thundercall offense-only spec bonus (+0.13 spell, spec_output_tuning.ts)
     // on top of the pre-existing Elemental Mastery scaling: legacyDmgMult 1.125
     // -> dmgMult 1.255. Rank 1: 8 * 1.255 = 10.04 -> 10 (was 8 * 1.125 = 9).
-    expect(imbue?.value).toBe(10);
+    // v0.44.0 Thundercall rework: the offense-only bonus drops 0.13 -> 0.05, so
+    // dmgMult 1.175. Rank 1: 8 * 1.175 = 9.4 -> 9.
+    expect(imbue?.value).toBe(9);
     // a pure damage weapon imbue
     expect(imbue?.value2).toBeUndefined();
   });
@@ -70,7 +72,8 @@ describe('Flametongue Weapon (shaman fire imbue)', () => {
       .get(pid)
       ?.auras.find((a) => a.kind === 'imbue' && a.id === 'flametongue_weapon');
     // Rank 2: 13 * 1.255 = 16.315 -> 16 (was 13 * 1.125 = 14.625 -> 15).
-    expect(imbue?.value).toBe(16);
+    // v0.44.0: 13 * 1.175 = 15.275 -> 15.
+    expect(imbue?.value).toBe(15);
   });
 
   it('isolation: Thundercall never touches a sibling flat-magnitude buff on the same spec', () => {

@@ -23,9 +23,28 @@
 export interface BreakdownEntry {
   /** ability name as the combat event reported it; null = a white/melee swing */
   ability: string | null;
+  /** stable content id of the ability when known */
+  abilityId?: string | null;
   /** display name of the pet that dealt it, or null when the member did */
   petName: string | null;
   amount: number;
+  hits?: number;
+  crits?: number;
+  maxHit?: number;
+  minHit?: number;
+  hitTotal?: number;
+  critTotal?: number;
+  overheal?: number;
+  absorbed?: number;
+  casts?: number;
+  /** target name -> damage or healing amount */
+  targets?: Map<string, number>;
+  /** source name -> damage taken amount */
+  sources?: Map<string, number>;
+  /** interrupted ability name -> count */
+  interruptedSpells?: Map<string, number>;
+  /** dispelled aura name -> count */
+  dispelledAuras?: Map<string, number>;
 }
 
 export interface BreakdownRow extends BreakdownEntry {
@@ -110,6 +129,8 @@ function rankRows(
   const shown = rowCap > 0 && kept.length > rowCap ? kept.slice(0, rowCap - 1) : kept;
   const rows: BreakdownRow[] = shown.map((entry) => ({
     ...entry,
+    abilityId: entry.abilityId,
+    targets: entry.targets,
     share: shareOf(entry.amount),
     fill: fillOf(entry.amount),
     folded: 0,
@@ -118,10 +139,14 @@ function rankRows(
   const folded = kept.slice(shown.length);
   if (folded.length > 0) {
     const amount = folded.reduce((sum, entry) => sum + entry.amount, 0);
+    const hits = folded.reduce((sum, entry) => sum + (entry.hits ?? 0), 0);
+    const crits = folded.reduce((sum, entry) => sum + (entry.crits ?? 0), 0);
     rows.push({
       ability: null,
       petName: null,
       amount,
+      hits: hits > 0 ? hits : undefined,
+      crits: crits > 0 ? crits : undefined,
       share: shareOf(amount),
       fill: fillOf(amount),
       folded: folded.length,

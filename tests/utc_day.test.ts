@@ -4,12 +4,20 @@ import {
   eventLeadDayOf,
   feedSimCalendar,
   nextResetMsOf,
+  nextWorldQuestRotationOf,
   resetDayOf,
   resetRemainingSecOf,
 } from '../src/game/utc_day';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quests';
 
 function freshSim() {
-  return { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
+  return {
+    utcDay: '',
+    resetDay: '',
+    eventLeadDay: '',
+    dailyResetRemainingSec: 0,
+    worldQuestExpiresAtMs: 0,
+  };
 }
 
 describe('the utcDay feed', () => {
@@ -177,7 +185,13 @@ describe('feedSimCalendar', () => {
     // Friday 2026-08-21, 8 PM local: inside the early-open lead window.
     const at = new Date(2026, 7, 21, 20, 0);
     vi.setSystemTime(at);
-    const sim = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
+    const sim = {
+      utcDay: '',
+      resetDay: '',
+      eventLeadDay: '',
+      dailyResetRemainingSec: 0,
+      worldQuestExpiresAtMs: 0,
+    };
     feedSimCalendar(sim);
     expect(sim.utcDay).toBe(at.toISOString().slice(0, 10));
     expect(sim.resetDay).toBe('2026-08-21');
@@ -186,6 +200,29 @@ describe('feedSimCalendar', () => {
     // >= 1 so the sim's 0 = "no calendar" sentinel is never fed from a live
     // clock.
     expect(sim.dailyResetRemainingSec).toBe(7 * 3600);
+    expect(sim.worldQuestExpiresAtMs).toBeGreaterThan(at.getTime());
+  });
+
+  it('targets the next local reset that changes the daily rotation', () => {
+    const at = new Date(2026, 7, 31, 12, 0);
+    const expiry = nextWorldQuestRotationOf(at);
+    expect(expiry).toBeGreaterThan(at.getTime());
+    expect(expiry - at.getTime()).toBeLessThanOrEqual(24 * 60 * 60_000);
+    expect(worldQuestCycleForResetDay(resetDayOf(new Date(expiry)))).not.toBe(
+      worldQuestCycleForResetDay(resetDayOf(at)),
+    );
+  });
+
+  it('expires the opening rotation exactly at local 03:00', () => {
+    const expiry = new Date(nextWorldQuestRotationOf(new Date(2026, 8, 1, 12, 0, 0)));
+    expect([
+      expiry.getFullYear(),
+      expiry.getMonth(),
+      expiry.getDate(),
+      expiry.getHours(),
+      expiry.getMinutes(),
+      expiry.getSeconds(),
+    ]).toEqual([2026, 8, 2, 3, 0, 0]);
   });
 
   it('feeds all four values from ONE instant: the set is always self-consistent', () => {
@@ -216,7 +253,13 @@ describe('feedSimCalendar', () => {
     vi.useFakeTimers();
     const first = new Date(2026, 7, 7, 2, 59, 59, 700);
     vi.setSystemTime(first);
-    const sim = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
+    const sim = {
+      utcDay: '',
+      resetDay: '',
+      eventLeadDay: '',
+      dailyResetRemainingSec: 0,
+      worldQuestExpiresAtMs: 0,
+    };
     feedSimCalendar(sim);
     expect(sim.resetDay).toBe('2026-08-06');
     expect(sim.dailyResetRemainingSec).toBe(1);

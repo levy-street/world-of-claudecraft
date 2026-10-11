@@ -69,7 +69,8 @@ export function preloadForSfx(key) {
     // buffer-not-ready fallback only replays if the fetch+decode finishes
     // within 250ms of the request, so a lazily-loaded quest cue risks
     // silently never playing on exactly the play's most important moments.
-    key.startsWith('quest_')
+    key.startsWith('quest_') ||
+    key === 'hoard_entrance_open'
   ) {
     return 'startup';
   }

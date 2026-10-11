@@ -9,9 +9,10 @@
 // Node-only (RENDER_PURE_CORES): no three.js, no DOM, no randomness.
 
 import { NYTHRAXIS_SOUL_REND_STACK_RANGE } from '../sim/encounters/nythraxis';
+import { NYTHRAXIS_SOUL_REND_AURA_ID } from '../sim/nythraxis_soul_rend';
 
-/** The aura the encounter puts on a marked raider (encounters/nythraxis.ts). */
-export const NYTHRAXIS_SOUL_REND_AURA_ID = 'nythraxis_soul_rend';
+/** The aura the encounter puts on a marked raider (sim/nythraxis_soul_rend.ts). */
+export { NYTHRAXIS_SOUL_REND_AURA_ID };
 /** The floor ring is the stack range itself: overlapping rings means a shared hit. */
 export const NYTHRAXIS_SOUL_REND_MARKER_RADIUS = NYTHRAXIS_SOUL_REND_STACK_RANGE;
 /** Metres above the raider's feet the sigil floats (scaled by the entity). */

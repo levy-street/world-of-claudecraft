@@ -14,6 +14,7 @@ import {
   wocBrowseStripHtml,
   wocEndsAtText,
   wocErrorStatusHtml,
+  wocItemCellHtml,
   wocLoadingStatusHtml,
   wocMarketBannersHtml,
   wocSalesHistoryHtml,
@@ -402,5 +403,25 @@ describe('woc_market_chrome: the standing banners', () => {
     expect(html.indexOf('wm-banner-paused')).toBeGreaterThan(-1);
     expect(html.indexOf('wm-banner-paused')).toBeLessThan(html.indexOf('wm-banner-wallet'));
     expect(html).toContain(t('hudChrome.wocMarket.pausedBanner'));
+  });
+});
+
+describe('Exchange exact-copy item cells', () => {
+  it('escapes names and tooltip keys while keeping enhanced tier independent of rarity', () => {
+    const instance = {
+      lootQuality: {
+        version: 1 as const,
+        tier: 3 as const,
+        weights: [900, 100, 250, 750, 500] as [number, number, number, number, number],
+      },
+    };
+    const html = wocItemCellHtml('<rare>', 'item.webp', 'rare', 'key" onclick="bad', instance);
+    expect(html).toContain('q-rare');
+    expect(html).toContain('&lt;rare&gt;');
+    expect(html).toContain('aria-label="Magnificent"');
+    expect(html).not.toContain(' onclick="bad');
+    expect(wocItemCellHtml('ordinary', 'item.webp', 'rare', 'key')).not.toContain(
+      'loot-quality-badge',
+    );
   });
 });

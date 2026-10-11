@@ -33,6 +33,9 @@ export function crossHotbarActionSlot(
 
 export class EmpowerHold {
   private charge: EmpowerCharge | null = null;
+  cancel(): void {
+    this.charge = null;
+  }
 
   get active(): boolean {
     return this.charge !== null;

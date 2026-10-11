@@ -1,6 +1,7 @@
 // World Market wire surface: the command bodies of the Merchant's auction house
 // (market_search, market_sell_price_check, market_list, market_list_instance,
-// market_buy, market_sweep_quote, market_sweep, market_cancel, market_collect),
+// market_buy, market_sweep_quote, market_sweep, market_cancel, market_collect,
+// market_order_place, market_order_fill, market_order_cancel),
 // extracted whole from server/game.ts with the Market Sweep (the monolith
 // ratchet; the farming_commands precedent). The case labels stay in game.ts:
 // the command-schema suite scans that switch for the dispatch universe, and the
@@ -10,7 +11,31 @@
 import { sanitizeMarketQuery } from '../src/sim/market_query';
 import type { Sim } from '../src/sim/sim';
 import type { ItemInstancePayload } from '../src/sim/types';
-import { buyWithSoldVolume, sweepWithSoldVolume } from './market_sold_volume';
+import {
+  buyWithSoldVolume,
+  orderFillWithSoldVolume,
+  orderPlaceWithSoldVolume,
+  sweepWithSoldVolume,
+} from './market_sold_volume';
+
+const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
+  'market_search',
+  'market_sell_price_check',
+  'market_list',
+  'market_list_instance',
+  'market_buy',
+  'market_sweep_quote',
+  'market_sweep',
+  'market_cancel',
+  'market_collect',
+  'market_order_place',
+  'market_order_fill',
+  'market_order_cancel',
+]);
+
+export function marketWirePromptCommand(command: string): boolean {
+  return MARKET_WIRE_PROMPT_CMDS.has(command);
+}
 
 /** Routes one market command frame. `msg` is the already-parsed client frame
  *  (game.ts's ClientMessage, structurally a string-keyed record); every field is
@@ -72,7 +97,12 @@ export function dispatchMarketCommand(
       return false;
     case 'market_buy':
       if (typeof msg.id === 'number') {
-        buyWithSoldVolume(sim, msg.id, pid);
+        // `count` is optional wire-side (a whole-stack buy sends none); the sim
+        // re-sanitizes it (marketBuy's own clamp), so a junk value here just
+        // falls through to the whole-stack default rather than being laundered.
+        const count =
+          typeof msg.count === 'number' && Number.isFinite(msg.count) ? msg.count : undefined;
+        buyWithSoldVolume(sim, msg.id, count, pid);
         return true;
       }
       return false;
@@ -106,6 +136,32 @@ export function dispatchMarketCommand(
     case 'market_collect':
       sim.marketCollect(pid);
       return true;
+    case 'market_order_place':
+      // `price` is per unit; the sim re-sanitizes count (sanitizeOrderCount) and
+      // clamps the bid to the market's price band, so a junk frame is refused
+      // with the same error a typed one would get.
+      if (
+        typeof msg.item === 'string' &&
+        typeof msg.count === 'number' &&
+        typeof msg.price === 'number' &&
+        Number.isFinite(msg.price)
+      ) {
+        orderPlaceWithSoldVolume(sim, msg.item, msg.count, msg.price, pid);
+        return true;
+      }
+      return false;
+    case 'market_order_fill':
+      if (typeof msg.id === 'number' && typeof msg.count === 'number') {
+        orderFillWithSoldVolume(sim, msg.id, msg.count, pid);
+        return true;
+      }
+      return false;
+    case 'market_order_cancel':
+      if (typeof msg.id === 'number') {
+        sim.marketOrderCancel(msg.id, pid);
+        return true;
+      }
+      return false;
     default:
       return false;
   }

@@ -75,6 +75,28 @@ const CRUCIBLE_SCROLL_IDS = [
   ...CRUCIBLE_COLLECTIONS.map((collection) => `pattern_${collection.id}`),
   'formula_lastflame_zeal',
 ];
+// The four faction formulas (content/faction_vendors.ts, docs/design/factions.md):
+// recipe-kind items that teach a LEARNED enchant, sold for marks behind a
+// standing gate rather than dropped. They are the reputation channel, not the
+// apex pattern universe, so they are named here and subtracted from the union.
+// The eight Buried Hoards quartermaster items join them at the 2026-09-28
+// release/v0.44.0 merge into feature/buried-hoards, on the same terms: three
+// enchant formulas (learned, acquisition 'drop') and five recipes teaching the
+// FACTION_REWARD_RECIPES rows (content/recipes.ts), all quartermaster stock.
+const FACTION_FORMULA_IDS = [
+  'formula_dawnfire_etching',
+  'formula_dawns_benediction',
+  'formula_piston_drive',
+  'formula_riftwalkers_grace',
+  'formula_enchant_feet_shadowstride',
+  'formula_enchant_gloves_forged_might',
+  'formula_enchant_offhand_spirit',
+  'pattern_reinforced_armor_kit',
+  'plans_dense_sharpening_stone',
+  'recipe_elixir_of_mana_regeneration',
+  'recipe_potion_of_invisibility',
+  'schematic_clockwork_shock_bomb',
+];
 
 describe('apex pattern defs (the drop-taught pattern universe)', () => {
   it('covers every drop-taught apex recipe, one pattern_<output> def per recipe, and no strays', () => {
@@ -105,9 +127,14 @@ describe('apex pattern defs (the drop-taught pattern universe)', () => {
     // what keeps the pin non-vacuous as the universe spans more content
     // modules.
     const shippedRecipeKind = Object.values(ITEMS)
-      .filter((def) => def.kind === 'recipe')
+      .filter((def) => def.kind === 'recipe' && !FACTION_FORMULA_IDS.includes(def.id))
       .map((def) => def.id)
       .sort();
+    // 12 since the Buried Hoards merge: the four faction formulas plus the
+    // eight quartermaster recipes and formulas.
+    expect(Object.values(ITEMS).filter((def) => FACTION_FORMULA_IDS.includes(def.id))).toHaveLength(
+      12,
+    );
     expect(shippedRecipeKind).toEqual([...EVERY_PATTERN_ID, ...CRUCIBLE_SCROLL_IDS].sort());
     expect(EVERY_PATTERN_ID).toHaveLength(40);
     expect(CRUCIBLE_SCROLL_IDS).toHaveLength(12);

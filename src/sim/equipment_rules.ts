@@ -413,6 +413,9 @@ export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
 }
 
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
+  // Class-locked gear (Warfare Season 2 spec sets) honors its class list before
+  // any armor-type or weapon rule, so another class can never wear it.
+  if (item.classLocked && !(item.requiredClass ?? []).includes(cls)) return false;
   if (isShieldItem(item)) {
     return !item.requiredClass || item.requiredClass.includes(cls);
   }

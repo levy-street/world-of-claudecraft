@@ -139,11 +139,25 @@ describe('isObjectOpenedByViewer', () => {
     expect(crates(sim).some((c) => c.id === first.id && !c.dead)).toBe(true);
   });
 
+  it('hides delivered freight for its loader while leaving fresh crates visible', () => {
+    const first = { objectItemId: 'eastbrook_freight_crate', pos: { x: -63, z: -90 } };
+    const second = { objectItemId: 'eastbrook_freight_crate', pos: { x: -66, z: -94 } };
+    const loaded = new Map([
+      ['wq_eastbrook_bandits', { state: 'active', creditedObjects: ['0@-63.0,-90.0'] }],
+    ]);
+    const fresh = new Map([['wq_eastbrook_bandits', { state: 'active', creditedObjects: [] }]]);
+    expect(isObjectOpenedByViewer(first, new Map(), loaded)).toBe(true);
+    expect(isObjectOpenedByViewer(second, new Map(), loaded)).toBe(false);
+    expect(isObjectOpenedByViewer(first, new Map(), fresh)).toBe(false);
+    const mirrored: typeof loaded = new Map(JSON.parse(JSON.stringify([...loaded])));
+    expect(isObjectOpenedByViewer(first, new Map(), mirrored)).toBe(true);
+  });
+
   it("hides ONLY the crate class, never another quest's interact object", () => {
     // The scope decision: the predicate keys on an opt-in content list, so
     // ringing one watchbell of three does not make it vanish (its quest
     // wants you to see all three), while an opened crate does disappear.
-    expect(OPENED_OBJECT_HIDE_ITEM_IDS).toEqual(new Set([CRATE_ITEM]));
+    expect(OPENED_OBJECT_HIDE_ITEM_IDS).toEqual(new Set([CRATE_ITEM, 'eastbrook_freight_crate']));
     const qp = new Map([
       ['q_fs_the_three_bells', { state: 'active', creditedObjects: ['0@256.0,0.0'] } as const],
     ]);

@@ -145,7 +145,9 @@ These assets make the options below much cheaper here than in a typical engine:
   problem, not a porting problem.
 - **Sequence numbers and acks already exist.** Every input frame carries `seq`; the
   server folds it into `session.lastInputSeq` and echoes it back as `snap.self.ack`
-  (`server/game.ts`). The client already converts acks into a round-trip latency EMA
+  (`server/game.ts` through `server/input_seq.ts`; the client's `target` command rides
+  the same counter, which is how the online mirror tells a post-command snapshot from
+  a stale one, see `src/net/target_echo.ts`). The client already converts acks into a round-trip latency EMA
   (`onlineInputEchoMs`, `src/main.ts`) used for click-to-move stop padding and the perf
   overlay. This is half the plumbing of a reconciliation system, today used only as
   telemetry.

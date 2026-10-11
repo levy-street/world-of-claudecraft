@@ -68,6 +68,17 @@ interface VaultRowBase {
    *  icon, keeping the stock visibly recoverable. */
   known: boolean;
   qualityKey: string; // item quality ?? 'common' (bagQualityKey semantics)
+  /** Whether the painter prints this row's OWN count (the x{count} chip,
+   *  the guild pane's showCount concept under the vault's rule). Every row
+   *  already carries the MATERIAL total in its count/cap readout and in its
+   *  hidden aria copy, so the own count is worth printing only when the
+   *  material is split across more than one stocked row (a pooled stack
+   *  beside a signed one, two differently signed stacks): a row that IS the
+   *  whole stock would print the same number twice (x200 beside 200/200).
+   *  Decided on the actual row set, never by comparing count to total, so a
+   *  tolerated degenerate zero-count sibling can neither hide a real row's
+   *  count nor earn an x0 of its own. */
+  showCount: boolean;
   /** This id is a fine grade (bag_fine_mark_view): the painter composes the
    *  fine seal and rim exactly like the bags/bank/guild-bank cells, the
    *  release's all-surfaces mark-family rule. */
@@ -159,18 +170,18 @@ export function buildVaultView(info: VaultInfo | null, lookup: BankItemLookup): 
   }
   const cap = info.perMaterialCap;
   const storedTotals = new Map<string, number>();
-  for (const [itemId, count] of Object.entries(info.stock)) {
-    storedTotals.set(itemId, saneStoredCount(count));
-  }
-  for (const slot of info.special) {
+  // Stocked (positive-count) rows per material: the showCount rule's input.
+  const stockedRows = new Map<string, number>();
+  const tally = (itemId: string, count: number): void => {
+    const sane = saneStoredCount(count);
     storedTotals.set(
-      slot.itemId,
-      Math.min(
-        Number.MAX_SAFE_INTEGER,
-        (storedTotals.get(slot.itemId) ?? 0) + saneStoredCount(slot.count),
-      ),
+      itemId,
+      Math.min(Number.MAX_SAFE_INTEGER, (storedTotals.get(itemId) ?? 0) + sane),
     );
-  }
+    if (sane > 0) stockedRows.set(itemId, (stockedRows.get(itemId) ?? 0) + 1);
+  };
+  for (const [itemId, count] of Object.entries(info.stock)) tally(itemId, count);
+  for (const slot of info.special) tally(slot.itemId, slot.count);
   // Base-grade-adjacent order (see VaultRowModel): group key is the base id
   // (a fine grade sorts under its base), base leads inside a group, groups
   // and every other tie in plain itemId order.
@@ -189,6 +200,7 @@ export function buildVaultView(info: VaultInfo | null, lookup: BankItemLookup): 
       overCap: storedTotal > cap,
       known: item !== undefined,
       qualityKey: bagQualityKey(item ?? {}),
+      showCount: saneStoredCount(count) > 0 && (stockedRows.get(itemId) ?? 0) > 1,
       fine: bagFineMark(itemId),
     };
   };

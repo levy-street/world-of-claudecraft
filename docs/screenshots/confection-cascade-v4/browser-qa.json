@@ -1,0 +1,213 @@
+{
+  "rows": [
+    {
+      "name": "desktop",
+      "lid": {
+        "x": 317,
+        "y": 99.59375,
+        "width": 466,
+        "height": 171.1875,
+        "right": 783,
+        "bottom": 270.78125
+      },
+      "root": {
+        "x": 258,
+        "y": 21.09375,
+        "width": 584,
+        "height": 796,
+        "right": 842,
+        "bottom": 817.09375
+      },
+      "grid": {
+        "x": 346,
+        "y": 323.78125,
+        "width": 408,
+        "height": 408,
+        "right": 754,
+        "bottom": 731.78125
+      },
+      "frame": {
+        "x": 317,
+        "y": 294.78125,
+        "width": 466,
+        "height": 466,
+        "right": 783,
+        "bottom": 760.78125
+      },
+      "cell": {
+        "x": 355,
+        "y": 332.78125,
+        "width": 60,
+        "height": 60,
+        "right": 415,
+        "bottom": 392.78125
+      },
+      "scrollWidth": 582,
+      "clientWidth": 582,
+      "scrollHeight": 881,
+      "clientHeight": 794,
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "animations": 0
+    },
+    {
+      "name": "phone",
+      "lid": {
+        "x": 30,
+        "y": 85.046875,
+        "width": 330,
+        "height": 156.5,
+        "right": 360,
+        "bottom": 241.546875
+      },
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 370,
+        "height": 710.484375,
+        "right": 380,
+        "bottom": 720.484375
+      },
+      "grid": {
+        "x": 48.03125,
+        "y": 283.546875,
+        "width": 293.9375,
+        "height": 293.9375,
+        "right": 341.96875,
+        "bottom": 577.484375
+      },
+      "frame": {
+        "x": 30.03125,
+        "y": 265.546875,
+        "width": 329.9375,
+        "height": 329.9375,
+        "right": 359.96875,
+        "bottom": 595.484375
+      },
+      "cell": {
+        "x": 57.03125,
+        "y": 292.546875,
+        "width": 42.65625,
+        "height": 42.65625,
+        "right": 99.6875,
+        "bottom": 335.203125
+      },
+      "scrollWidth": 368,
+      "clientWidth": 368,
+      "scrollHeight": 708,
+      "clientHeight": 708,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "animations": 0
+    },
+    {
+      "name": "landscape",
+      "lid": {
+        "x": 205,
+        "y": 67,
+        "width": 434,
+        "height": 156.5,
+        "right": 639,
+        "bottom": 223.5
+      },
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 824,
+        "height": 314,
+        "right": 834,
+        "bottom": 324
+      },
+      "grid": {
+        "x": 223,
+        "y": 265.5,
+        "width": 398,
+        "height": 398,
+        "right": 621,
+        "bottom": 663.5
+      },
+      "frame": {
+        "x": 205,
+        "y": 247.5,
+        "width": 434,
+        "height": 434,
+        "right": 639,
+        "bottom": 681.5
+      },
+      "cell": {
+        "x": 232,
+        "y": 274.5,
+        "width": 60,
+        "height": 60,
+        "right": 292,
+        "bottom": 334.5
+      },
+      "scrollWidth": 822,
+      "clientWidth": 822,
+      "scrollHeight": 793,
+      "clientHeight": 312,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "animations": 0
+    },
+    {
+      "name": "large-ui",
+      "lid": {
+        "x": 30,
+        "y": 86.1875,
+        "width": 330,
+        "height": 251.015625,
+        "right": 360,
+        "bottom": 337.203125
+      },
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 370,
+        "height": 768,
+        "right": 380,
+        "bottom": 778
+      },
+      "grid": {
+        "x": 48.03125,
+        "y": 379.203125,
+        "width": 293.9375,
+        "height": 293.9375,
+        "right": 341.96875,
+        "bottom": 673.140625
+      },
+      "frame": {
+        "x": 30.03125,
+        "y": 361.203125,
+        "width": 329.9375,
+        "height": 329.9375,
+        "right": 359.96875,
+        "bottom": 691.140625
+      },
+      "cell": {
+        "x": 57.03125,
+        "y": 388.203125,
+        "width": 42.65625,
+        "height": 42.65625,
+        "right": 99.6875,
+        "bottom": 430.859375
+      },
+      "scrollWidth": 263,
+      "clientWidth": 263,
+      "scrollHeight": 591,
+      "clientHeight": 547,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "animations": 0
+    }
+  ],
+  "errors": []
+}

@@ -12,6 +12,10 @@ import {
   CINDERFANG_2PC_VENOM_STAGE_REFUND,
   setBonusFlag,
 } from '../content/ignivar_set_bonuses';
+import {
+  VANGUARD_COMBAT_4PC_BONUS_COMBO,
+  VANGUARD_SUBTLETY_4PC_BONUS_COMBO,
+} from '../content/vanguard_set_bonuses_a';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { AuraKind, Entity } from '../types';
@@ -128,6 +132,30 @@ function venomStageRefund(ctx: SimContext, p: Entity): number {
 // at-grant snapshot the paladin beacon and Dawn's Wrath bakes use).
 function veiledEdgeArmValue(ctx: SimContext, p: Entity): number {
   return wearsSetBonus(ctx, p, 'ashveil', 4) ? ASHVEIL_4PC_VEILED_EDGE_BONUS : VEILED_EDGE_BONUS;
+}
+
+// Warfare Season 2 set combo bends, both read at the builder award sites in
+// effect_dispatch.ts. Called once per cast BEFORE the cast breaks stealth, so
+// the Smokefade check sees the stealth the Gut Punch was thrown from.
+//  - Brawlmark (Combat) 4pc: while the Swift Heels speed aura runs, a landed
+//    Wicked Slash or its Redline transform Haymaker awards 1 more point.
+//  - Shadewalk (Subtlety) 4pc: a Gut Punch thrown from the Smokefade stealth
+//    (the vanish aura, not Duskveil) awards 2 more points.
+// The award sites clamp at the combo cap as usual. Draws no rng.
+export function rogueSetComboBonus(ctx: SimContext, p: Entity, abilityId: string): number {
+  if (abilityId === 'sinister_strike' || abilityId === BODY_BLOW_ID) {
+    const sprinting = p.auras.some((aura) => aura.id === 'sprint' && aura.kind === 'buff_speed');
+    return sprinting && wearsSetBonus(ctx, p, 'vanguard_rogue_combat', 4)
+      ? VANGUARD_COMBAT_4PC_BONUS_COMBO
+      : 0;
+  }
+  if (abilityId === 'cheap_shot') {
+    const fromSmokefade = p.auras.some((aura) => aura.id === 'vanish' && aura.kind === 'stealth');
+    return fromSmokefade && wearsSetBonus(ctx, p, 'vanguard_rogue_subtlety', 4)
+      ? VANGUARD_SUBTLETY_4PC_BONUS_COMBO
+      : 0;
+  }
+  return 0;
 }
 
 function addStage(

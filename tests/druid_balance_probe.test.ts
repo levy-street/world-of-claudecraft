@@ -50,6 +50,9 @@ const BALANCE_LOADOUT = {
   feet: 'heroic_bramblehide_treads',
   ring1: 'circle_of_cinders',
   ring2: 'loop_of_quiet_springs',
+  // The trinket slot (PR 4173): the reference epic kit fills it with the
+  // Varkhul caster trinket; the live-mob bands below held at the same seed.
+  trinket: 'heart_of_the_crucible',
 } as const;
 const FERAL_LOADOUT = {
   mainhand: 'wand_of_quenched_sparks',
@@ -63,6 +66,8 @@ const FERAL_LOADOUT = {
   feet: 'heroic_bramblehide_treads',
   ring1: 'band_of_marked_strikes',
   ring2: 'seal_of_the_forgewall',
+  // The trinket slot (PR 4173): the reference epic kit's physical pick.
+  trinket: 'forgefathers_temper',
 } as const;
 
 // MEASURED 2026-09-08 on the merged release catalog (integration dca7476) at
@@ -82,9 +87,28 @@ const FERAL_LOADOUT = {
 // jewelry (5896 to 6378 and 2803 to 3082, payoffs 10 to 12 and 3 to 4). The
 // Bruin tank probe below did not leave its bands (snap threat 990.99 to
 // 1003.86) and keeps its 2026-09-08 anchors.
+// RE-MEASURED 2026-09-20 for the wildfang arm only, at the v0.43 feral pass:
+// Nature's Boon (src/sim/combat/druid_natures_boon.ts) draws one rng per
+// LANDED feral melee auto-attack, so every feral trace after the first landed
+// swing re-rolls. Not a rotation or tuning change: with that one draw
+// commented out this seed reproduces the 2026-09-10 row exactly (6378/286/
+// 7473.827/12), and across seeds 42421 to 42425 the same rotation lands 6316
+// to 6801 with the draw and 5299 to 6928 without it, so seed 42420 simply
+// re-rolled onto a low trace (8 payoffs, 4921). Moongrove is Balance (the
+// draw is feral-gated) and Bruin stayed inside its bands, so both keep their
+// 2026-09-10 anchors.
+// RE-MEASURED 2026-09-24 for the wildfang arm only, at the release/v0.44.0
+// base merge into integration/world-quests-v0440 (65d4218ba1 + 7054645a6b):
+// the same seed on the merged world (the branch's quartermasters, taskmaster
+// and world-quest content beside the release's Boon draw) re-rolls the feral
+// trace onto a higher one (damage 4921 to 5315, incoming 159 to 201, threat
+// 5766.952 to 6228.5225), still 8 payoffs, so the rotation did not change.
+// Measured identically on the integration tip and on the faction ladder
+// branch (PR 4169). Moongrove (5982/225/5983/7) and Bruin (3060/139/
+// 10541.4575/4) stayed inside their bands and keep their anchors.
 const LIVE_MOB_MEASURED = {
   moongrove: { damage: 5956, incomingDamage: 212, threat: 5957, payoffs: 7 },
-  wildfang: { damage: 6378, incomingDamage: 286, threat: 7473.827, payoffs: 12 },
+  wildfang: { damage: 5315, incomingDamage: 201, threat: 6228.5225, payoffs: 8 },
   bruin: { damage: 3082, incomingDamage: 131, threat: 10651.925, payoffs: 4 },
 } as const;
 const BRUIN_TANK_MEASURED = {

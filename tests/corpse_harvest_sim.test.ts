@@ -2535,9 +2535,18 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // Bone Spike above: they are struck or healed, never harvested, so they grow MOBS
     // without touching `tagged` either. Plus the five Eastbrook healing-training
     // role dummies (src/sim/content/healing_training.ts), which are friendly
-    // practice targets, not corpses to butcher: 196. The four retained cosmetic
-    // buddies are also untagged, bringing the measured complement to 199.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(199);
+    // practice targets, not corpses to butcher: 196.
+    // 200, not 196: the world-quest infiltrator and the three regional freight
+    // caravans ship untagged the same way (a disguised NPC and three wagons).
+    // 216, not 200, at the 2026-09-28 release/v0.44.0 merge into
+    // feature/buried-hoards: the sixteen Buried Hoards templates (content/rift/mobs.ts:
+    // the fifteen hoard_* bosses, adds and summons, the Healing Tide Totem among
+    // them, plus the Boneyard's rift_marrow_golem) ship untagged like every rift
+    // template the release already carries, so they grow MOBS without touching
+    // `tagged`.
+    // 219 at the release/v0.45.0 merge into the buddy companions branch: the
+    // three retained cosmetic buddy templates also ship untagged.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(219);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(
@@ -2853,7 +2862,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );
     expect(fixtures).toEqual({ spent: 10, refused: 6 });
-  });
+    // The sweep builds a fresh Sim per harvest (about 280 of them): roughly 15 s
+    // alone, so a loaded CI shard pushed it past the 20 s default.
+  }, 60_000);
 
   // The ten mapped families and their item ids, spelled out. Deriving them
   // from HARVEST_COMPONENT_ITEMS would compare the table with itself and pass

@@ -21,6 +21,7 @@ import { emptyZoneProps } from '../types';
 
 export const FROSTVEIL_ZONE: ZoneDef = {
   id: 'frostveil',
+  worldPvp: 'ffa',
   name: 'The Frostveil Reach',
   riftPortalEligible: true,
   riftTierWeights: { B: 0.45, A: 0.4, S: 0.15 },
@@ -640,17 +641,21 @@ export const FROSTVEIL_OBJECTS: GroundObjectDef[] = [
     itemId: 'sprung_trap',
     name: 'Sprung Fen Trap',
     // Brosk's scattered trapline in the Shiverfen reeds. The reeds ring a
-    // pool (-90,1760); every trap sits on dry ground, never on the pool
-    // floor, or it is a swim-deep click target the player cannot see (the
-    // swim-depth arm of tests/ground_object_placement.test.ts). Each authored
-    // spot also anchors a terrain calm pad (terrain_calm_anchors.ts), so the
-    // west trap stands far enough up the bank that its pad ring never reaches
-    // the water and cannot raise a sandbar in the pool.
+    // pool (-90,1760) whose banks are steep: the first placements put two
+    // traps perched on that bank (2.4 to 2.7 yd above their neighbours) and one
+    // at the waterline, so they read as hard-to-reach boxes on a slope (world
+    // quests round 2 playtest). Each trap now stands on the flat reed shelf
+    // that rings the pool, one to the north (inside the fen sprites' haunt, the
+    // sprites being what springs them), west, south and east, every one 21 yd
+    // or more from the pool centre so its terrain calm pad
+    // (terrain_calm_anchors.ts, 3.5 yd pad, 9 yd skirt) never reaches the 12 yd
+    // water and cannot raise a sandbar. Dry, level, unobstructed and not
+    // swim-deep, per tests/ground_object_placement.test.ts.
     positions: [
-      { x: -92, z: 1750 },
-      { x: -116, z: 1756 },
-      { x: -80, z: 1770 },
-      { x: -72, z: 1756 },
+      { x: -90, z: 1733 },
+      { x: -111, z: 1754 },
+      { x: -87, z: 1781 },
+      { x: -69, z: 1766 },
     ],
   },
 ];

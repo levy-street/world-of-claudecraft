@@ -1,4 +1,6 @@
+import { furyAudioClaimed } from '../game/fury_audio_core';
 import type { SfxId } from '../game/sfx_manifest.generated';
+import { warriorRecoveryAudio } from '../game/warrior_recovery_core';
 import { ABILITIES, MOBS } from '../sim/data';
 import type { Aura, Entity, SimEvent } from '../sim/types';
 import { isAuraDebuff } from './auras_view';
@@ -200,6 +202,7 @@ const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   psychic_scream: 'fear_shout',
   howl_of_terror: 'fear_shout',
   intimidating_shout: 'intimidating_shout',
+  piercing_howl: 'piercing_howl',
   frost_nova: 'frost_nova',
   flamestrike: 'flamestrike',
 };
@@ -237,6 +240,13 @@ export function groundTickAbilityCue(ability: string | undefined): SfxId | null 
 // Every other fire spell (Fireball, the rest of the bolt/burst family)
 // keeps the shared impact_fire.
 const IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  // Decisive single-hit weapon attacks use the prepared heavy contact take.
+  // Compound hits retain their material cues to avoid stacking that full take.
+  mortal_strike: 'impact_masterwork_execution',
+  execute: 'impact_masterwork_execution',
+  slam: 'impact_masterwork_execution',
+  breachmaker: 'impact_masterwork_execution',
+  shield_slam: 'impact_metal',
   scorch: 'scorch',
   pyroblast: 'pyroblast',
   frozen_orb: 'frozen_orb',
@@ -457,6 +467,7 @@ export function materialImpactCue(target: Entity): SfxId {
 const RIFT_HAZARD_ABILITY_IDS = new Set(['rift_hazard_molten', 'rift_hazard_boulder']);
 
 export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | null {
+  if (furyAudioClaimed(event)) return null;
   if (event.abilityId && RIFT_HAZARD_ABILITY_IDS.has(event.abilityId)) return null;
   // Keyed off the stable abilityId, not the display-label `ability` field:
   // a display rename (Scald/Pyrelance/Aether Surge/Dirt Nap/Wicked Slash/
@@ -474,6 +485,7 @@ export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | 
 }
 
 export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number } | null {
+  if (furyAudioClaimed(event)) return null;
   if (event.fx === 'projectile') {
     if (event.school === 'physical') return { key: 'melee_bow', anchorId: event.sourceId };
     const school = magicSchool(event.school);
@@ -484,7 +496,13 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
     return { key, anchorId: event.sourceId };
   }
   if (event.fx === 'nova') {
-    return { key: novaAbilityCue(event.ability), anchorId: event.targetId };
+    return {
+      key: novaAbilityCue(event.ability),
+      anchorId:
+        event.ability === 'piercing_howl' || event.ability === 'intimidating_shout'
+          ? event.sourceId
+          : event.targetId,
+    };
   }
   if (event.fx === 'fearImpact') return { key: 'fear', anchorId: event.targetId };
   if (event.fx === 'ccImpact') {
@@ -548,11 +566,43 @@ const BUFF_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
 
 export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null {
   if (!event.gained || !aura || SILENT_ASCENSION_AURA_IDS.has(aura.id)) return null;
+  // The authored defensive clench owns Mending's activation in both clients.
+  if (aura.id === 'furious_mending' && aura.kind === 'buff_dr') return null;
   if (isAuraDebuff(aura)) return 'debuff_apply';
   return BUFF_APPLY_ABILITY_CUES[aura.id] ?? 'buff_apply';
 }
 
 type HealEvent = Extract<SimEvent, { type: 'heal' }>;
+
+/** Sound ownership for direct heals, consumables and periodic recovery.
+ * Extracted from the HUD heal arm (hud.ts) unchanged; the rules it carries:
+ * - A potion/eat/drink heal (items.ts / combat/auras.ts) plays its own dedicated
+ *   cue instead of the generic heal_impact; consumeHealCue returns null for every
+ *   other heal source (leech, second wind, companion heals, ...), which falls
+ *   through to heal_impact unchanged. A `heal` with a source and no cue is an
+ *   eat/drink tick that is not a sound tick.
+ * - A HoT tick fires every couple of seconds for its whole duration; the one-shot
+ *   application cue (Sim.applyAura) covers the "heal landed" moment instead, so
+ *   ticks stay silent. Frenzied Regeneration is fully exempt (a Bear Form
+ *   self-heal, never aimed at anyone else, so the repeat does not read as spammy
+ *   the way a party HoT does): it keeps its old tick-only sound, so the one-shot
+ *   application emit is skipped for it too. Confirmed in-game on Priest (Renew)
+ *   and Druid (Rejuvenation, Regrowth, Frenzied Regeneration).
+ * - Only after those gates does an actual Warrior Bloodletting recovery take its
+ *   own quieter cue (warriorRecoveryAudio), or stay silent when nothing was
+ *   restored; it never bypasses the tick rules above. */
+export function healAudioPlan(
+  ev: Extract<SimEvent, { type: 'heal' | 'heal2' }>,
+): { cue: string; gain: number } | null {
+  const cue = ev.type === 'heal' ? consumeHealCue(ev) : null;
+  if (ev.type === 'heal' && ev.source && !cue) return null;
+  const hot = ev.type === 'heal2' && ev.hot === true;
+  const regeneration = ev.type === 'heal2' && ev.abilityId === 'frenzied_regeneration';
+  if (hot ? !regeneration : regeneration) return null;
+  const recovery = ev.type === 'heal2' ? warriorRecoveryAudio(ev) : undefined;
+  if (recovery !== undefined) return recovery ? { cue: recovery, gain: 0.75 } : null;
+  return { cue: cue ?? 'heal_impact', gain: 1 };
+}
 
 // A potion, eat, or drink heal (items.ts / combat/auras.ts) plays its own
 // dedicated cue instead of the generic heal_impact every other heal source
@@ -593,6 +643,7 @@ export function weaponSwingCue(entity: Entity): SfxId {
 }
 
 export function playerSwingCueForDamage(event: DamageEvent, source: Entity | null): SfxId | null {
+  if (furyAudioClaimed(event)) return null;
   if (
     source?.kind !== 'player' ||
     (event.school && event.school !== 'physical') ||

@@ -211,3 +211,147 @@ export function initialMeterFrame(
     ? { left: rect.left, top: rect.top, width: rect.width, height: rect.height }
     : { ...fallback };
 }
+
+export type DockSide = 'right' | 'left' | 'bottom' | 'top';
+
+export interface SnapTarget {
+  id: string;
+  geo: MeterFrameGeometry;
+}
+
+export interface SnapResult {
+  geo: MeterFrameGeometry;
+  dockedTo: { id: string; side: DockSide } | null;
+}
+
+export const SNAP_THRESHOLD = 18;
+
+export function oppositeDockSide(side: DockSide): DockSide {
+  switch (side) {
+    case 'right':
+      return 'left';
+    case 'left':
+      return 'right';
+    case 'bottom':
+      return 'top';
+    case 'top':
+      return 'bottom';
+  }
+}
+
+/**
+ * Snap a moving frame geometry to adjacent target geometries within SNAP_THRESHOLD.
+ * When snapped side-by-side (right/left), matches top and height.
+ * When snapped stacked (bottom/top), matches left and width.
+ */
+export function snapFrameToTargets(
+  moving: MeterFrameGeometry,
+  targets: readonly SnapTarget[],
+  threshold = SNAP_THRESHOLD,
+): SnapResult {
+  let bestDist = threshold + 1;
+  let bestDock: { id: string; side: DockSide } | null = null;
+  let bestGeo: MeterFrameGeometry = { ...moving };
+
+  for (const target of targets) {
+    const t = target.geo;
+
+    // Check RIGHT of target (moving left near target right)
+    const distRight = Math.abs(moving.left - (t.left + t.width));
+    if (distRight < bestDist && Math.abs(moving.top - t.top) < threshold * 2) {
+      bestDist = distRight;
+      bestDock = { id: target.id, side: 'right' };
+      bestGeo = {
+        ...moving,
+        left: t.left + t.width,
+        top: Math.abs(moving.top - t.top) <= threshold ? t.top : moving.top,
+        height: Math.abs(moving.top - t.top) <= threshold ? t.height : moving.height,
+      };
+    }
+
+    // Check LEFT of target (moving right near target left)
+    const distLeft = Math.abs(moving.left + moving.width - t.left);
+    if (distLeft < bestDist && Math.abs(moving.top - t.top) < threshold * 2) {
+      bestDist = distLeft;
+      bestDock = { id: target.id, side: 'left' };
+      bestGeo = {
+        ...moving,
+        left: t.left - moving.width,
+        top: Math.abs(moving.top - t.top) <= threshold ? t.top : moving.top,
+        height: Math.abs(moving.top - t.top) <= threshold ? t.height : moving.height,
+      };
+    }
+
+    // Check BOTTOM of target (moving top near target bottom)
+    const distBottom = Math.abs(moving.top - (t.top + t.height));
+    if (distBottom < bestDist && Math.abs(moving.left - t.left) < threshold * 2) {
+      bestDist = distBottom;
+      bestDock = { id: target.id, side: 'bottom' };
+      bestGeo = {
+        ...moving,
+        top: t.top + t.height,
+        left: Math.abs(moving.left - t.left) <= threshold ? t.left : moving.left,
+        width: Math.abs(moving.left - t.left) <= threshold ? t.width : moving.width,
+      };
+    }
+
+    // Check TOP of target (moving bottom near target top)
+    const distTop = Math.abs(moving.top + moving.height - t.top);
+    if (distTop < bestDist && Math.abs(moving.left - t.left) < threshold * 2) {
+      bestDist = distTop;
+      bestDock = { id: target.id, side: 'top' };
+      bestGeo = {
+        ...moving,
+        top: t.top - moving.height,
+        left: Math.abs(moving.left - t.left) <= threshold ? t.left : moving.left,
+        width: Math.abs(moving.left - t.left) <= threshold ? t.width : moving.width,
+      };
+    }
+  }
+
+  return { geo: bestGeo, dockedTo: bestDock };
+}
+
+/**
+ * When frame A is resized, update docked frame B's geometry to stay attached and match size.
+ * - If B is on the right of A: sync height and align top, shift B.left to A.left + A.width.
+ * - If B is on the left of A: sync height and align top, shift B.left to A.left - B.width.
+ * - If B is on the bottom of A: sync width and align left, shift B.top to A.top + A.height.
+ * - If B is on the top of A: sync width and align left, shift B.top to A.top - B.height.
+ */
+export function syncDockedResize(
+  parentGeo: MeterFrameGeometry,
+  childGeo: MeterFrameGeometry,
+  side: DockSide,
+): MeterFrameGeometry {
+  if (side === 'right') {
+    return {
+      ...childGeo,
+      left: parentGeo.left + parentGeo.width,
+      top: parentGeo.top,
+      height: parentGeo.height,
+    };
+  }
+  if (side === 'left') {
+    return {
+      ...childGeo,
+      left: parentGeo.left - childGeo.width,
+      top: parentGeo.top,
+      height: parentGeo.height,
+    };
+  }
+  if (side === 'bottom') {
+    return {
+      ...childGeo,
+      top: parentGeo.top + parentGeo.height,
+      left: parentGeo.left,
+      width: parentGeo.width,
+    };
+  }
+  return {
+    ...childGeo,
+    top: parentGeo.top - childGeo.height,
+    left: parentGeo.left,
+    width: parentGeo.width,
+  };
+}

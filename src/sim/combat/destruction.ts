@@ -131,14 +131,21 @@ export function spendRuin(ctx: SimContext, player: Entity, amount: number): bool
   return true;
 }
 
-export function hasBurningPact(player: Entity, target: Entity | null): boolean {
+/** Structural so the action bar can ask it too (its aura input carries the same
+ *  id / kind / sourceId / remaining fields the live Aura does). */
+export function hasBurningPact(
+  player: { id: number },
+  target: {
+    auras: readonly { id?: string; kind: string; sourceId?: number; remaining?: number }[];
+  } | null,
+): boolean {
   return (
     target?.auras.some(
       (aura) =>
         aura.id === 'immolate' &&
         aura.kind === 'dot' &&
         aura.sourceId === player.id &&
-        aura.remaining > 0,
+        (aura.remaining ?? 0) > 0,
     ) ?? false
   );
 }

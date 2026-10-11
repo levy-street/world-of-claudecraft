@@ -4,6 +4,7 @@
 // timers. Driven over a tiny hand-rolled fake DOM (no jsdom) + fake timers.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  BANNER_PLATE_FADE_MS,
   QUEST_BANNER_FADE_MS,
   QUEST_BANNER_LINE_MS,
   QUEST_BANNER_MAX_LINES,
@@ -103,5 +104,42 @@ describe('QuestProgressBanner', () => {
     // both timers fire; the evicted line's remove() is a no-op, never a throw
     vi.advanceTimersByTime(QUEST_BANNER_LINE_MS + QUEST_BANNER_FADE_MS);
     expect(host.children).toHaveLength(0);
+  });
+
+  it('yields its lane to the world quest plate, then replays the held lines in order', () => {
+    const host = fakeEl();
+    const banner = new QuestProgressBanner(host as unknown as HTMLElement);
+    banner.show('Forest Wolf slain: 1/8');
+    const plateMs = 3500;
+    banner.yieldToPlate(plateMs);
+    // The lane is empty the moment the plate paints, and stays empty while it
+    // holds and fades, even as new progress arrives.
+    expect(host.children).toHaveLength(0);
+    banner.show('Forest Wolf slain: 2/8');
+    vi.advanceTimersByTime(plateMs + BANNER_PLATE_FADE_MS - 1);
+    expect(host.children).toHaveLength(0);
+    vi.advanceTimersByTime(1);
+    expect(host.children.map((c) => c.textContent)).toEqual([
+      'Forest Wolf slain: 1/8',
+      'Forest Wolf slain: 2/8',
+    ]);
+    // Replayed lines take their own full visible window.
+    vi.advanceTimersByTime(QUEST_BANNER_LINE_MS + QUEST_BANNER_FADE_MS);
+    expect(host.children).toHaveLength(0);
+  });
+
+  it('lets a line already fading go, and a second plate extends the hold', () => {
+    const host = fakeEl();
+    const banner = new QuestProgressBanner(host as unknown as HTMLElement);
+    banner.show('old');
+    vi.advanceTimersByTime(QUEST_BANNER_LINE_MS); // 'old' is now fading
+    banner.show('fresh');
+    banner.yieldToPlate(1000);
+    vi.advanceTimersByTime(500);
+    banner.yieldToPlate(1000);
+    vi.advanceTimersByTime(1000 + BANNER_PLATE_FADE_MS - 1);
+    expect(host.children).toHaveLength(0);
+    vi.advanceTimersByTime(1);
+    expect(host.children.map((c) => c.textContent)).toEqual(['fresh']);
   });
 });

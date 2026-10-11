@@ -37,6 +37,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
+import { updateDawnBattleStandards } from '../content/faction_rewards';
 import { pctValue, recalcPlayerStats } from '../entity';
 import { manaRegenPer2s } from '../mana_regen';
 import { CHEATER_MARK_AURA_ID } from '../moderation';
@@ -46,6 +47,7 @@ import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { applyWellFedOnMealComplete } from '../wellfed';
 import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
+import { regenParkedCatEnergy } from './cat_form_energy';
 import { isStunned } from './cc';
 import {
   cleanupCraftedCollectionAuras,
@@ -62,10 +64,12 @@ import {
   regenerateSoulFragmentsOutOfCombat,
 } from './necromancy';
 import { tickPaladinOathChainPull } from './paladin_control';
+import { periodicHarmStands } from './periodic_harm';
 import { priestOnAuraEnded } from './priest/talents';
 import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
 import { tickShamanTalentAura } from './shaman_talents';
+import { thundercallOnDotTick } from './shaman_thundercall_kit';
 import { stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
@@ -104,6 +108,7 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
 
 export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
+  updateDawnBattleStandards(ctx, p, meta);
   regenerateRuinOutOfCombat(ctx, p, meta);
   regenerateSoulFragmentsOutOfCombat(ctx, p, meta);
   // Lifesap restores whichever resource bar is currently live, including across
@@ -115,6 +120,9 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
       }
     }
   }
+  // A druid out of Cat Form keeps regenerating the energy parked on the way out,
+  // at the base tick, so shifting back returns what staying in Cat would have.
+  if (p.resourceType !== 'energy') regenParkedCatEnergy(p);
   if (p.resourceType === 'mana') {
     // Spirit regen: the FULL amount out of combat (past the five-second rule),
     // and COMBAT_SPIRIT_REGEN_FRACTION of it while the rule is active, so Spirit
@@ -278,6 +286,20 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     e.stealthed = e.auras.some((a) => a.kind === 'stealth');
     return;
   }
+  if (e.inCombat || e.onGround) {
+    const gIdx = e.auras.findIndex((a) => a.id === 'rift_feather_glider');
+    if (gIdx >= 0) {
+      const removed = e.auras.splice(gIdx, 1)[0];
+      ctx.emit({
+        type: 'aura',
+        targetId: e.id,
+        name: removed.name,
+        gained: false,
+        sourceId: removed.sourceId,
+        abilityId: removed.id,
+      });
+    }
+  }
   let statsDirty = false;
   // Talent-proc internal cooldowns age at the same cadence as auras.
   tickProcState(e, DT);
@@ -325,6 +347,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           tickTemporalHourglassHealing(ctx, e, a);
         } else if (a.id === 'sacrilegious_march' && a.kind === 'buff_speed') {
           tickSacrilegiousMarch(ctx, e, a);
+        } else if (
+          (a.kind === 'dot' || a.kind === 'affliction_eye' || a.kind === 'affliction_violence') &&
+          !periodicHarmStands(ctx, ctx.entities.get(a.sourceId) ?? null, e)
+        ) {
+          // The verdict lapsed since the aura landed (the victim left the
+          // free-for-all ground, entered a sanctuary, or the duel ended): no
+          // tick, and the expiry below prunes the aura this pass
+          // (periodic_harm.ts).
+          a.remaining = 0;
         } else if (a.kind === 'affliction_eye') {
           tickMaledictGaze(ctx, e, a);
         } else if (a.kind === 'affliction_violence') {
@@ -346,7 +377,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             school: a.school,
             fx: 'tick',
           });
-          ctx.dealDamage(
+          const tickLanded = ctx.dealDamage(
             dotSource,
             e,
             tickDamage,
@@ -379,6 +410,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.finalDamage === true,
           );
           vespersOnDotTick(ctx, e, a);
+          thundercallOnDotTick(ctx, dotSource, a, tickLanded);
           druidEngineOnBleedTick(ctx, dotSource, a);
           if (a.leechPct !== undefined) {
             const src = dotSource;

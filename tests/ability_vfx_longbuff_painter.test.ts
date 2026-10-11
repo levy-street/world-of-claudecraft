@@ -17,6 +17,7 @@ function makePainter(now: () => number = () => 12.5) {
     warmSpiritsForClass: vi.fn(),
     windup: vi.fn().mockReturnValue(false),
     holdShell: vi.fn(),
+    holdQueuedWeapon: vi.fn().mockReturnValue(true),
     holdGroundAura: vi.fn().mockReturnValue(true),
     orbit: vi.fn().mockReturnValue(true),
     bodyGlow: vi.fn(),
@@ -203,11 +204,13 @@ describe('everything else keeps its held read', () => {
 
     // Precondition, so the reader sees the gate is not what this exercises:
     // hamstring grants no >= 300s buff aura, so the policy holds its VFX and
-    // the victim-worn band reads through the debuff block as before. No
-    // content today authors BOTH a debuff block and a long buff aura.
+    // the physical Warrior route now owns a dedicated ankle mark. Feed the
+    // real slow kind and duration rather than an incomplete aura stub.
     expect(holdsBuffVfxWhileWorn('hamstring', ABILITY_VFX_FULL_SPECS.hamstring)).toBe(true);
 
-    painter.syncEntity(ent(['hamstring_slow']));
+    const victim = ent([]);
+    victim.auras = [{ id: 'hamstring_slow', kind: 'slow', remaining: 6 }];
+    painter.syncEntity(victim);
 
     expect(fx.orbit).toHaveBeenCalledTimes(1);
     expect(vfx.buffSwirl).not.toHaveBeenCalled();
@@ -227,13 +230,14 @@ describe('silenced buffs free their band and disc slots', () => {
     expect(fx.orbit).toHaveBeenCalledTimes(1);
   });
 
-  it('the queued-on-swing tell keeps band headroom under three long buffs', () => {
+  it('the queued-on-swing tell keeps its weapon read under three long buffs', () => {
     const { painter, fx } = makePainter();
 
     painter.syncEntity(
       ent(['arcane_intellect', 'power_word_fortitude', 'mark_of_the_wild'], 7, 'heroic_strike'),
     );
 
-    expect(fx.orbit).toHaveBeenCalledTimes(1);
+    expect(fx.holdQueuedWeapon).toHaveBeenCalledExactlyOnceWith(7, expect.any(Number), 0);
+    expect(fx.orbit).not.toHaveBeenCalled();
   });
 });

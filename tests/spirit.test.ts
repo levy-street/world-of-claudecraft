@@ -472,6 +472,12 @@ describe('spirit: forced facing reset also resets prevFacing (camera-follow conv
   // window) then jumps from the old heading, which the follow camera's rigid
   // term reads as a huge instantaneous turn (it spins to a wrong yaw and
   // sticks there if the player does not move right after).
+  //
+  // The forced reset itself only applies to a revive that MOVES the body. A
+  // revive in place (corpse, Spirit Healer) keeps the ghost's heading, paired
+  // into prevFacing, so a player running at the moment of resurrection keeps
+  // going the way they were headed instead of snapping to face north
+  // (src/sim/revive_facing.ts).
   it('releasing the spirit resets prevFacing along with facing', () => {
     const sim = makeSim();
     sim.setPlayerLevel(10);
@@ -484,7 +490,7 @@ describe('spirit: forced facing reset also resets prevFacing (camera-follow conv
     expect(p.prevFacing).toBe(0);
   });
 
-  it('resurrecting at the corpse resets prevFacing along with facing', () => {
+  it('resurrecting at the corpse keeps the ghost heading, paired into prevFacing', () => {
     const sim = makeSim();
     sim.setPlayerLevel(10);
     const p = sim.player as AnyEntity;
@@ -494,14 +500,28 @@ describe('spirit: forced facing reset also resets prevFacing (camera-follow conv
     p.pos = { x: corpse.x, y: corpse.y, z: corpse.z };
     p.prevPos = { ...p.pos };
     p.facing = Math.PI / 2;
-    p.prevFacing = Math.PI / 2;
+    p.prevFacing = 1.1;
     sim.rebucket(p);
     sim.resurrectAtCorpse();
-    expect(p.facing).toBe(0);
-    expect(p.prevFacing).toBe(0);
+    expect(p.dead).toBe(false);
+    expect(p.facing).toBe(Math.PI / 2);
+    expect(p.prevFacing).toBe(Math.PI / 2);
   });
 
-  it('resurrecting at the Spirit Healer resets prevFacing along with facing', () => {
+  it('resurrecting at the Spirit Healer keeps the ghost heading, paired into prevFacing', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.dead = true;
+    sim.releaseSpirit();
+    p.facing = Math.PI / 2;
+    p.prevFacing = 1.1;
+    expect(sim.resurrectAtSpiritHealer()).toBe(true);
+    expect(p.facing).toBe(Math.PI / 2);
+    expect(p.prevFacing).toBe(Math.PI / 2);
+  });
+
+  it('a revive that moves the body still resets facing and prevFacing to 0', () => {
     const sim = makeSim();
     sim.setPlayerLevel(10);
     const p = sim.player as AnyEntity;
@@ -509,7 +529,8 @@ describe('spirit: forced facing reset also resets prevFacing (camera-follow conv
     sim.releaseSpirit();
     p.facing = Math.PI / 2;
     p.prevFacing = Math.PI / 2;
-    expect(sim.resurrectAtSpiritHealer()).toBe(true);
+    sim.revivePlayerAt(sim.playerId, { x: p.pos.x + 30, y: p.pos.y, z: p.pos.z }, 1);
+    expect(p.dead).toBe(false);
     expect(p.facing).toBe(0);
     expect(p.prevFacing).toBe(0);
   });

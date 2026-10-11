@@ -1,6 +1,8 @@
 import type { corpseLootAvailability } from '../../../game/corpse_loot_availability';
 import { HARVEST_BODY_RANGE, pickHarvestBody } from '../../../game/harvest_body_pick';
 import { ITEMS } from '../../../sim/data';
+import { lootQualityTier } from '../../../sim/loot_quality';
+import type { ItemInstancePayload } from '../../../sim/types';
 import { dist2d, type Entity, type ItemDef } from '../../../sim/types';
 import type { CorpseHarvestInfo, IWorld, WorldInteractionOutcome } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
@@ -9,6 +11,7 @@ import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
 import { knownItemDef } from '../../known_item';
+import { lootQualityBadgeHtml } from '../../loot_quality_view';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
 import { unknownItemIconHtml } from '../../unknown_item_icon';
@@ -46,6 +49,7 @@ interface PendingHarvestRequest {
 export interface LootWindowItemStack {
   itemId: string;
   count: number;
+  instance?: ItemInstancePayload;
 }
 
 type CorpseAvailability = ReturnType<typeof corpseLootAvailability>;
@@ -65,7 +69,7 @@ export interface LootWindowControllerDeps {
    *  rather than re-typed; the quality parameter is shape uniformity only
    *  here, since no copy payload reaches this surface, and is never passed. */
   itemIcon: PainterHostPresentation['itemIcon'];
-  itemTooltip(item: ItemDef): string;
+  itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   /** The shared HUD confirm dialog (Hud.confirmDialog: focus-trapped,
    *  aria-named), for the bind-on-pickup warning before Take Loot. */
@@ -117,9 +121,13 @@ type CorpseFocus =
  *  the loot rows. Two snapshots with the same digest paint the same body, so the
  *  per-frame refresh compares this and rewrites nothing while it holds. Text is
  *  deliberately NOT part of it (the repaint-signature idiom); a language switch
- *  reaches the body through relocalize() instead. */
+ *  reaches the body through relocalize() instead. A copy's payload contributes
+ *  only its quality tier, the one per-copy fact a row renders, so an incidental
+ *  payload change never forces a body rebuild mid-refresh. */
 function corpseAvailabilitySignature(availability: CorpseAvailability): string {
-  const items = availability.visibleItems.map((stack) => `${stack.itemId}:${stack.count}`);
+  const items = availability.visibleItems.map(
+    (stack) => `${stack.itemId}:${stack.count}:${lootQualityTier(stack.instance)}`,
+  );
   return `${availability.hasLoot ? 'L' : '-'}${availability.harvestable ? 'H' : '-'}|${availability.visibleCopper}|${items.join(',')}`;
 }
 
@@ -259,7 +267,7 @@ export class LootWindowController {
     this.deps.element.innerHTML =
       this.titleHtml(title) + items.map((stack) => this.itemRowHtml(stack)).join('');
     markDialogRoot(this.deps.element, { label: title });
-    this.attachItemTooltips();
+    this.attachItemTooltips(items);
     this.appendTakeButton(t('itemUi.loot.takeAll'), () => {
       this.deps.world().collectDelveChestLoot(chestId);
       this.close();
@@ -544,7 +552,7 @@ export class LootWindowController {
     }
     html += visibleItems.map((stack) => this.itemRowHtml(stack)).join('');
     this.deps.element.innerHTML = html;
-    this.attachItemTooltips();
+    this.attachItemTooltips(visibleItems);
 
     if (hasLoot) {
       // "Take Loot", not "Take All": the old label promised the harvest too.
@@ -769,11 +777,11 @@ export class LootWindowController {
         ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(stack.count, { maximumFractionDigits: 0 }) }))}`
         : '';
     const qualityClass = item?.kind === 'quest' ? 'q-quest' : `q-${item?.quality ?? 'common'}`;
-    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}<span class="loot-item-name ${qualityClass}">${esc(item ? itemDisplayName(item) : stack.itemId)}${count}</span></div>`;
+    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}${lootQualityBadgeHtml(stack.instance, { labelled: true })}<span class="loot-item-name ${qualityClass}">${esc(item ? itemDisplayName(item) : stack.itemId)}${count}</span></div>`;
   }
 
-  private attachItemTooltips(): void {
-    this.deps.element.querySelectorAll<HTMLElement>('[data-item]').forEach((row) => {
+  private attachItemTooltips(items: readonly LootWindowItemStack[]): void {
+    this.deps.element.querySelectorAll<HTMLElement>('[data-item]').forEach((row, index) => {
       const itemId = row.dataset.item ?? '';
       const item: ItemDef | undefined = knownItemDef(ITEMS, itemId);
       // An unknown id gets the same minimal tooltip its bag and bank
@@ -781,7 +789,7 @@ export class LootWindowController {
       // def-derived body.
       this.deps.attachTooltip(row, () =>
         item
-          ? this.deps.itemTooltip(item)
+          ? this.deps.itemTooltip(item, items[index]?.instance)
           : `<div class="tt-title">${esc(itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`,
       );
     });

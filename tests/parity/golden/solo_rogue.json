@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
-      "state": "f07d182e",
+      "nextId": 1011,
+      "state": "3e336b9c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,7 +44,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -61,14 +63,17 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -93,6 +98,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -110,7 +117,7 @@
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 62,
-          "id": 999,
+          "id": 1003,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -162,9 +169,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1008,
-      "state": "d5064598",
-      "events": "21d375e2",
+      "nextId": 1012,
+      "state": "1a84c590",
+      "events": "253fd465",
       "rng": {
         "draws": 12,
         "digest": "f30c489f"
@@ -173,9 +180,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1008,
-      "state": "bf880561",
-      "events": "10dc6fe5",
+      "nextId": 1012,
+      "state": "064189ab",
+      "events": "e020dcba",
       "rng": {
         "draws": 19,
         "digest": "d68c35cb"
@@ -184,9 +191,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1008,
-      "state": "74071d4a",
-      "events": "57ebf831",
+      "nextId": 1012,
+      "state": "8dce4ca0",
+      "events": "215c7314",
       "rng": {
         "draws": 162,
         "digest": "fe151d49"
@@ -195,8 +202,8 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 1008,
-      "state": "23e23158",
+      "nextId": 1012,
+      "state": "d0b9376e",
       "events": "741638a5",
       "rng": {
         "draws": 249,
@@ -225,7 +232,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -265,14 +274,17 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -299,6 +311,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -319,7 +333,7 @@
           "fiveSecondRule": 102.6,
           "healPower": 6,
           "hp": 49992,
-          "id": 999,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -361,7 +375,7 @@
             "str": 26
           },
           "swingTimer": 0.05,
-          "targetId": 1007,
+          "targetId": 1011,
           "templateId": "rogue",
           "weapon": {
             "dagger": true,
@@ -371,7 +385,7 @@
           }
         },
         {
-          "aggroTargetId": 999,
+          "aggroTargetId": 1003,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 1.2,
@@ -384,7 +398,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8896,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -414,12 +428,12 @@
             "armor": 40
           },
           "swingTimer": 0.45,
-          "tappedById": 999,
-          "targetId": 999,
+          "tappedById": 1003,
+          "targetId": 1003,
           "templateId": "forest_wolf",
           "threat": [
             [
-              999,
+              1003,
               105
             ]
           ],

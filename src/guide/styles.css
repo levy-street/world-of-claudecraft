@@ -274,17 +274,17 @@
 /* ------------------------------------------------------------------ tokens */
 :root {
   /* Dark chrome palette (header, footer, hero, controls). */
-  --g-gold: #ffd100;
-  --g-gold-dim: #c8a838;
-  --g-bg: #08080d;
-  --g-bg-2: #0d0d15;
-  --g-panel: linear-gradient(170deg, #15151ff2 0%, #0b0b12f2 60%, #08080df2 100%);
-  --g-border: #6f5a2a;
-  --g-border-soft: #2a2418;
-  --g-text: #f0ebd8;
-  --g-text-dim: #c9be98;
-  --g-text-muted: #9a8f6c;
-  --g-focus: #ffe98a;
+  --g-gold: #efd594;
+  --g-gold-dim: #c8af7a;
+  --g-bg: #0c1016;
+  --g-bg-2: #11151b;
+  --g-panel: #1a2029;
+  --g-border: #675c45;
+  --g-border-soft: #34383f;
+  --g-text: #f1eee4;
+  --g-text-dim: #c9cbd0;
+  --g-text-muted: #b6b9bf;
+  --g-focus: #efd594;
 
   /* Ink-on-gold foreground (CTA, skip link, step counters): dark text on the gold fill. */
   --g-on-gold: #1a1405;
@@ -300,8 +300,8 @@
      tinted callout fills so a theme tweak is one line. */
   --g-wash: #ffffff0f;
   --g-wash-soft: #ffffff0a;
-  --g-wash-gold: #ffd1000f;
-  --g-wash-gold-strong: #ffd1001a;
+  --g-wash-gold: #c8af7a0f;
+  --g-wash-gold-strong: #c8af7a1a;
   --g-wash-note: #7ab8ff12;
   --g-wash-warn: #e8b84b14;
 
@@ -326,8 +326,8 @@
 
   /* Radii. */
   --g-radius-sm: 4px;
-  --g-radius: 8px;
-  --g-radius-lg: 14px;
+  --g-radius: 4px;
+  --g-radius-lg: 8px;
   --g-radius-pill: 999px;
 
   /* Control + touch sizing. Every tappable target is at least --g-touch tall.
@@ -405,9 +405,9 @@
   --g-ink-edge: #00000066;
 
   /* CTA gold gradient stops (rest and hover), shared by every solid gold control. */
-  --g-cta-hi: #ffef9e;
-  --g-cta-hover-hi: #fff7d1;
-  --g-cta-hover-lo: #ffe24a;
+  --g-cta-hi: #efd594;
+  --g-cta-hover-hi: #f5e1b4;
+  --g-cta-hover-lo: #d9bc7e;
 
   /* Surface tiers. Tier 1 is the flat bg-2 card; RAISED is the panel gradient with a
      faint top keyline for primary content cards; the hover shadow pairs with a small
@@ -521,14 +521,15 @@ img {
   position: sticky;
   inset-block-start: 0;
   z-index: var(--g-z-header);
-  background: var(--g-scrim-strong);
-  border-block-end: 1px solid var(--g-border-soft);
+  background: var(--g-bg-2);
+  border-block-end: 1px solid var(--g-border);
+  box-shadow: inset 0 -4px var(--g-bg);
 }
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .guide-header {
-    background: var(--g-scrim-glass);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
+    background: var(--g-bg-2);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 
@@ -628,12 +629,12 @@ img {
   gap: var(--g-sm);
   min-height: var(--g-control-h);
   padding-inline: var(--g-lg);
-  background: linear-gradient(180deg, var(--g-cta-hi) 0%, var(--g-gold) 100%);
+  background: var(--g-gold-dim);
   color: var(--g-on-gold);
   font-family: var(--g-font-display);
   font-weight: 700;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
+  text-transform: none;
   font-size: var(--g-text-base);
   border: 1px solid var(--g-gold-dim);
   border-radius: var(--g-radius);
@@ -642,11 +643,9 @@ img {
     filter var(--g-motion-fast),
     box-shadow var(--g-motion-fast);
 }
-/* One hover for every solid CTA (header, footer, hero): the gold fill lifts to a brighter
-   gradient with a stronger glow. Uses an explicit gradient, not filter:brightness, so the
-   change reads clearly and is identical everywhere. */
+/* A quiet antique-gold fill shared by header, footer and hero actions. */
 .guide-cta:hover {
-  background: linear-gradient(180deg, var(--g-cta-hover-hi) 0%, var(--g-cta-hover-lo) 100%);
+  background: var(--g-cta-hi);
   box-shadow: var(--g-shadow-cta-hover);
   text-decoration: none;
 }
@@ -1322,7 +1321,7 @@ body.guide-has-sidebar .guide-layout {
   z-index: -1;
   background:
     linear-gradient(180deg, rgba(8, 8, 13, 0.5) 0%, rgba(8, 8, 13, 0.78) 62%, var(--g-bg) 100%),
-    url("/loading-screen.jpg") center / cover no-repeat;
+    url("/website-hero-eastbrook-v1.webp") center / cover no-repeat;
 }
 /* Portrait phones: the wide art's center crop is empty sky, so pull the framing toward
    the foreground figures and trim the height so the CTAs sit near the art, not below a
@@ -1556,8 +1555,8 @@ body[data-guide-route="home"] .guide-main {
 
 /* ----------------------------------------------------------------- footer */
 .guide-footer {
-  border-block-start: 1px solid var(--g-border-soft);
-  background: var(--g-bg-2);
+  border-block-start: 1px solid var(--g-border);
+  background: var(--g-bg);
 }
 .guide-footer-inner {
   max-width: var(--g-maxw);

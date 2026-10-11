@@ -14,6 +14,7 @@ import { ABILITIES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
+import { isMeleeAudioId, meleeAudioSample } from './fury_audio_core';
 import {
   advanceInterruptibleMountEngine,
   advanceMountEngine,
@@ -130,6 +131,7 @@ const SUMMON_CROSSFADE_SEC = 0.45;
 // an open portal should read as a clear nearby presence, not a wallpaper bed
 // like campfire/forge, but must still sit under foreground one-shots.
 const RIFT_AMBIENCE_GAIN = 0.4;
+const HOARD_AMBIENCE_GAIN = 0.12;
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
   dirt: 'foot_dirt',
@@ -161,7 +163,7 @@ function retainDecodedBuffer(
 
 export interface PlayOpts {
   gain?: number; // 0..1 multiplier (default 1)
-  rate?: number; // playback-rate multiplier (default 1); ±6% jitter added
+  rate?: number; // playback-rate multiplier (default 1); Â±6% jitter added
   cooldown?: number; // min seconds between plays of this key (default 0.03)
   cooldownKey?: string; // optional namespace when one asset serves unrelated cues
   jitter?: boolean; // randomize rate/gain slightly (default true)
@@ -220,7 +222,13 @@ interface PendingLoop {
 // same pattern, no changes needed to the override mechanism itself.
 interface AmbientPointSource {
   readonly id: string;
-  readonly kind: 'campfire' | 'forge' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
+  readonly kind:
+    | 'campfire'
+    | 'forge'
+    | 'rift_portal'
+    | 'rift_roller'
+    | 'rift_ice_glide'
+    | 'hoard_entrance';
   readonly x: number;
   readonly y: number;
   readonly z: number;
@@ -326,13 +334,9 @@ class Sfx {
         });
       }
       void this.preloadStartup();
-      // The ability layer is procedural only. An ElevenLabs-generated sample
-      // pack briefly rode on top of it and was dropped (44b928819) for
-      // bypassing the audio contract: scripts/sfx_conform.mjs only sees .mp3,
-      // so its 118 takes shipped with no loudness, bitrate or true-peak check.
-      // Any future sampled layer ships as conformed MP3s through scripts/sfx/
-      // (docs/design/sound_effects.md), and must respect ability_sfx_coverage.ts
-      // so it never doubles a hand-recorded cue the way that pack did.
+      // Warrior contacts use conformed catalog recordings on the retained
+      // presentation clock. Other ability moments keep their recorded-cue
+      // suppression and procedural fallback through ability_sfx_coverage.ts.
     } catch {
       this.ctx = null;
     }
@@ -1054,10 +1058,10 @@ class Sfx {
   }
 
   // --- SpatialAudioSink surface (driven by the renderer) -------------------
-  // Implemented here so the surface→clip and ambience→loop mappings live in one
+  // Implemented here so the surfaceâ†’clip and ambienceâ†’loop mappings live in one
   // place; the renderer depends only on the SpatialAudioSink interface.
 
-  /** One footfall. `surface` ∈ grass|dirt|stone|wood|snow|water → foot_<surface>.
+  /** One footfall. `surface` âˆˆ grass|dirt|stone|wood|snow|water â†’ foot_<surface>.
    *  Footsteps fire every ~0.22s at a run but the clips are ~0.48s, so a flat
    *  retrigger would overlap two pitch-jittered copies of one sample and
    *  comb-filter into a metallic "jingle". Two fixes: a short `release` shapes
@@ -1507,6 +1511,10 @@ class Sfx {
       const key = this.mountMovementKey(kind, mountKey, '');
       if (key) this.preload(key);
     }
+    for (const kind of ['squawk', 'flap'] as const) {
+      const key = `mount_${kind}_${mountKey}`;
+      if (key in SFX_CLIPS) this.preload(key);
+    }
     const keys = this.engineClipKeys(mountKey);
     if (!keys) return;
     this.preload(keys.startKey);
@@ -1519,6 +1527,23 @@ class Sfx {
         this.preload(reverse.loopKey);
         this.preload(reverse.stopKey);
       }
+    }
+  }
+
+  /** A mount's call at the top of its jump. Silent for a mount that ships no
+   *  squawk/flap takes, so this is opt-in per mount with nothing to wire.
+   *
+   *  MOVE_GAIN, the same level as the takeoff it answers: the apex is the
+   *  quiet top of the arc, and the two takes stack, so anything hotter reads
+   *  as the bird shouting over its own landing a moment later. Each key's
+   *  authored trim in sfx_gain_map.json does the per-take shaping.
+   *
+   *  A cooldown matches the takeoff's: the caller fires this once per jump,
+   *  and the guard only catches a mount bouncing on a ledge seam. */
+  mountApex(x: number, y: number, z: number, mountKey: string): void {
+    for (const kind of ['squawk', 'flap'] as const) {
+      const key = `mount_${kind}_${mountKey}`;
+      if (key in SFX_CLIPS) this.playAt(key, x, y, z, { gain: MOVE_GAIN, cooldown: 0.08 });
     }
   }
 
@@ -1705,6 +1730,10 @@ class Sfx {
         key = 'amb_forge';
         gain = FORGE_AMBIENCE_GAIN;
         break;
+      case 'hoard_entrance':
+        key = 'hoard_entrance_hum';
+        gain = HOARD_AMBIENCE_GAIN;
+        break;
       case 'rift_portal':
         key = 'rift_portal_drone';
         gain = RIFT_AMBIENCE_GAIN;
@@ -1791,23 +1820,24 @@ class Sfx {
       this.pointAmbient(points[i]);
     }
     // Unlike the static campfire/forge set (the same fixed sources every frame,
-    // culled only by distance), a rift portal/roller/gliding-player source can
+    // culled only by distance), a rift or buried-hoard source can
     // disappear entirely between frames (instance ends, portal expires, the
     // glide stops) without ever crossing the tooFar threshold: sweep any such
     // loop no longer present.
-    const isDynamicRiftId = (id: string): boolean =>
+    const isDynamicEntityId = (id: string): boolean =>
       id.startsWith('rift_portal:') ||
       id.startsWith('rift_roller:') ||
-      id.startsWith('rift_ice_glide:');
+      id.startsWith('rift_ice_glide:') ||
+      id.startsWith('hoard_entrance:');
     for (const id of this.loops.keys()) {
-      if (isDynamicRiftId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
+      if (isDynamicEntityId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
     }
     for (const id of this.pendingLoops.keys()) {
       // unloop drops all three pending maps together, and delegating keeps
       // that contract in ONE place: hand-deleting only pendingLoops here is
       // the exact drift that once stranded a load/variant pair for every rift
       // source that vanished mid-load, for the rest of the session.
-      if (isDynamicRiftId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
+      if (isDynamicEntityId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
     }
   }
 
@@ -1889,6 +1919,18 @@ class Sfx {
       master = this.master;
     if (!ctx || !master) return;
     if (this.tooFar(x, z)) return;
+    if (isMeleeAudioId(opts?.abilityId)) {
+      // Retained presentation-clock events own these recordings. Ordinary
+      // sequencer accents carry no sample and must not double the same cut.
+      if (opts.sample && meleeAudioSample(opts.abilityId, opts.sample))
+        this.playAt(opts.sample, x, y, z, {
+          gain: opts.lite ? 0.3 : opts.finisher ? 0.95 : kind === 'impact' ? 0.78 : 0.6,
+          cooldown: 0,
+          rate: 1,
+          jitter: false,
+        });
+      return;
+    }
     const arch = opts?.archetype ?? '';
     // A hand-recorded studio cue already sounds several of these moments from
     // src/ui/combat_sfx.ts: proj_<school> at the launch, impact_<school> or a

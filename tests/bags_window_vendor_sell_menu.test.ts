@@ -66,6 +66,7 @@ function harness(
     sellConfirmPolicy: () => ({ enabled: true, minQualityRank: 1 }),
     isVaultBankTab: () => false,
     addItemToTrade: noop,
+    tradeOfferHeadroom: () => 0,
     stageMarketSell: noop,
     stageMailParcel: noop,
     insertItemChatLink: noop,

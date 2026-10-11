@@ -211,13 +211,17 @@ describe('gfx override application', () => {
     // (the post-processing shed, post_shed_core.ts): every profile gains the
     // band record in bucketBands and its baseline of 1 in bucketBaselines;
     // no pre-existing value moves.
+    // Regenerated across the board for `ditheredGhostFade`, the camera-ghost
+    // style (occluder_dither_fade.ts). It moves a VALUE: true on low and medium,
+    // false on high, ultra, insane and the Advanced default mix (no dial hint,
+    // so it inherits the high base). Named pins: tests/graphics_rebuild_core.test.ts.
     expect(hashes).toEqual({
-      low: '7dc57596b0820d548a826592de1bffd69d9ba2ce0af78048c524f4ac663c3686',
-      medium: 'fb9c5c7cdd877d7fba34c05e99823e8e7af0bb128a88e1544ed29965565fcbe4',
-      high: '6e28cce36902fa461b0d459a95a1fd13763d838beb31887f3c15a8557b0e5e31',
-      ultra: '596161ef604ac83a31cb6ebc71c35146ff84d766255798de5079a204b35d712b',
-      insane: '498703d3245f7069597541e4f957c8005c3b28c5dd12a169be903808be4dea0a',
-      advanced: '4e785a654eac0e113bdb8b52a4e08964186011b5b3fe40cde235b7d0cd0af9ac',
+      low: '0748e49e6ecb9bb2081cfa4ca45601ab831eb95a847c8c5c3034f311e8d20bab',
+      medium: '67edab8d72816c12af258dd60217db55751b57aa358a1a4c5df4fac1fb77d63d',
+      high: '0e135d2bc6a726fc190b0d52a8bb670369a7df5f142266c09150ce4a3d6ce1fd',
+      ultra: '72f80b79fdc37c36bd66133eafeb438f9fe091c3c4b16de256f74da1c1dfa857',
+      insane: '30ff1f03d0134187f92f3e71daeaf24d2fec937cba2a8b3630b228f81595825d',
+      advanced: '00214f627cbe2b5082c28d45e06911b445ef1ef3ca271a95d1998c3281fb0248',
     });
   });
 

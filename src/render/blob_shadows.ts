@@ -12,6 +12,7 @@
 // write-elided upload (a still scene re-uploads nothing).
 import * as THREE from 'three';
 import type { BlobShadowSlot } from './blob_shadow_core';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 /**
  * Instance capacity. The night-glow disc pool (mob_night_glow.ts) does the same
@@ -100,7 +101,7 @@ export class BlobShadows {
     // baked bounding sphere is stale the moment it is computed, and recomputing
     // it per frame costs more than the draw it would save.
     this.mesh.frustumCulled = false;
-    this.mesh.renderOrder = 1; // over the ground, under the world's own decals
+    this.mesh.renderOrder = floorVfxRenderOrder('ground', 0); // over the ground, under the world's own decals
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     this.mesh.count = 0;
     this.mesh.visible = false;

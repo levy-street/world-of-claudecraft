@@ -368,22 +368,48 @@ describe('i18n Localization Key Coverage', () => {
     ability: 'Fireball',
     action: 'Open Chat',
     amount: 42,
+    // The map hover item line (questUi.worldQuest.itemRewardWithLevels).
+    itemLevel: 24,
+    requiredLevel: 20,
+    // The map hover faction line and standing text (questUi.worldQuest.factionLine, standingReward).
+    faction: 'Rift Watch',
     answered: 6,
     // The elixir use line's granted-buff name (itemUi.tooltip.useElixirAura).
     aura: 'Might of the Boar',
     base: 14,
     rested: 18,
     buyer: 'Mira',
+    seller: 'Bramblefoot',
     channel: 'World',
     classes: 'Warrior, Mage',
+    candy: 'berry crystal',
+    cell: 4,
+    cleared: '12 tiles cleared',
+    column: 2,
     className: 'Mage',
     command: '/dance',
     completed: 12,
+    completion: 'Arcane Calligraphy complete.',
+    connectors: 'north and east',
     count: 5,
+    row: 3,
+    rotation: '90 degrees',
     cost: 30,
     current: 120,
     cut: 5,
+    // Resolved Dawnreaver damage details, including the active Ascension splash.
+    damage: '116 to 146',
+    radius: 6,
+    cap: 5,
+    weaponPercent: 336,
+    verdictSingleDamage: '540 to 630',
+    verdictAreaDamage: '225 to 270',
+    verdictAreaRadius: 8,
+    verdictAreaCap: 5,
     delta: '+13',
+    detail: 'The ritual is complete.',
+    reach: 'Crystals reached: 4',
+    title: 'Perfect alignment',
     direction: 'north',
     distance: 'near',
     dps: '7.4',
@@ -403,6 +429,9 @@ describe('i18n Localization Key Coverage', () => {
     moveKeys: 'W/A/S/D',
     questKey: 'L',
     item: 'Rough Bracers',
+    // The casket contents list (questUi.logs.clueCasketOpened): a formatted
+    // item-name list, not a count.
+    items: 'Heroic Mark and Rough Bracers',
     key: 'K',
     // The death recap's slayer (hud.system.deathRecapKiller[Ability]): a mob
     // or player display name spliced verbatim. One sample only, the base and
@@ -420,24 +449,52 @@ describe('i18n Localization Key Coverage', () => {
     max: 25,
     message: 'Meet at the inn',
     min: 16,
+    minimum: 18,
+    // World-quest workshop, horde and flight readouts use these values.
+    barrier: 100,
+    shadows: 7,
+    floor: 35,
+    maximum: 90,
+    gold: 52,
+    kills: 20,
+    mistakes: 1,
+    next: 'Water',
+    penalty: 2,
+    silver: 68,
+    step: 1,
+    steps: 3,
+    upgrade: 'Rapid fire',
+    weapon: 'Crossbow',
     // The elixir use line's buff duration in whole minutes (itemUi.tooltip.useElixir*).
     minutes: 10,
+    // The treasure map a log line names (questUi.logs.treasureMap*).
+    map: 'Inked Treasure Map',
     money: '12 copper',
+    moves: '3 moves remaining',
     name: 'Aki',
     needed: 400,
     perCombo: 7,
     percent: 30,
+    pct: '85%',
     position: 3,
+    power: 'powered',
     price: '1g 20s',
     proceeds: '95s',
+    progress: '3 / 5',
     quality: 'Rare',
     quest: 'A Trade for Every Hand',
+    reward: '12 copper',
     rating: 1513,
     range: 30,
     rank: 2,
+    round: 2,
+    rings: 20,
+    rate: '12.5k/s',
     realm: 'Eastbrook',
     requirement: 'Requires Mining 40',
     resource: 'Mana',
+    result: 'Gold: 96/100.',
+    score: 96,
     seconds: 7,
     servings: 10,
     shown: 120,
@@ -447,8 +504,12 @@ describe('i18n Localization Key Coverage', () => {
     stat: 'Strength',
     status: 'Complete',
     summary: '30 Mana / Instant',
+    shape: 'Square',
+    instruction: 'Follow the glowing corners',
     tab: 'Damage',
     target: 'Wolf',
+    tile: 4,
+    time: '2 days',
     view: 'Current',
     wins: 9,
     winner: 'Rook',
@@ -1025,8 +1086,9 @@ describe('i18n Localization Key Coverage', () => {
     // sets x (name + bonus2/bonus4). The druid wave completed the Crucible
     // rollout, so all 29 sets are registered (the ledger in
     // tests/ignivar_loot.test.ts). The eleven crafted collections each carry
-    // a name plus one two-piece bonus, not another raid four-piece tier.
-    expect(itemSetEntries).toHaveLength(8 * 4 + 3 * 2 + 5 * 4 + 29 * 3 + 11 * 2);
+    // a name plus one two-piece bonus, not another raid four-piece tier. The
+    // 27 Warfare Season 2 spec sets carry name + bonus2/bonus4.
+    expect(itemSetEntries).toHaveLength(8 * 4 + 3 * 2 + 5 * 4 + 29 * 3 + 11 * 2 + 27 * 3);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -1090,6 +1152,8 @@ describe('i18n Localization Key Coverage', () => {
       Object.keys(QUESTS).length * 3 +
       Object.values(QUESTS).reduce((sum, quest) => sum + quest.objectives.length, 0) +
       ZONES.length * 2 +
+      // The optional town-done line (ZoneDef.welcomeDone) only where authored.
+      ZONES.filter((zone) => zone.welcomeDone !== undefined).length +
       ZONES.reduce((sum, zone) => sum + zone.pois.length, 0) +
       Object.keys(DUNGEONS).length * 3 +
       Object.keys(DELVES).length * 3 +
@@ -1098,11 +1162,12 @@ describe('i18n Localization Key Coverage', () => {
       // at once but entity_i18n's own registry only at the phase 10 QA, which
       // is when this hand count grew from 3 to 4) + mastery reset notice + the
       // three $WOC Exchange custody letters (the release side, joined at the
-      // Phase 11k QA sync: 4 + 3 = 7) + quest letters + Guild trend letters +
+      // Phase 11k QA sync: 4 + 3 = 7) + the Buried Hoards vault reward letter
+      // (hoard_vault_reward: 8) + quest letters + Guild trend letters +
       // master tier letters (keyed pair -> tier), 3 fields each. Counted by
       // hand on purpose: deriving it from authoredLettersById would compare the
       // manifest with itself.
-      (7 +
+      (8 +
         Object.keys(QUEST_LETTERS).length +
         Object.keys(GUILD_TREND_LETTERS).length +
         Object.values(MASTER_TIER_LETTERS).reduce(

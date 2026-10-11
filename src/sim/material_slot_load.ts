@@ -1,5 +1,6 @@
 // Material provenance is validated before legacy load coercions can erase it.
 import { ITEMS } from './data';
+import { isChargeBearingPayload } from './item_instance_merge';
 import { isMaterialItemId, materialItemIds } from './material_ids';
 import { normalizeMaterialStack } from './material_stack';
 import { cloneInvSlot, type InvSlot } from './types';
@@ -22,7 +23,7 @@ export function validateMaterialSlotSourcesOnLoad(raw: unknown): void {
   if (typeof raw.itemId !== 'string' || raw.itemId === '') throw new Error(LOAD_REFUSED);
   if (raw.instance !== undefined && !record(raw.instance)) throw new Error(LOAD_REFUSED);
   const slot = raw as unknown as InvSlot;
-  if (slot.instance?.charges !== undefined && slot.count !== 1) throw new Error(LOAD_REFUSED);
+  if (isChargeBearingPayload(slot.instance) && slot.count !== 1) throw new Error(LOAD_REFUSED);
   const ids = slotMaterialIds(slot);
   if (!ids || !normalizeMaterialStack(slot, ids).ok) throw new Error(LOAD_REFUSED);
 }
@@ -41,7 +42,7 @@ export function validateCharacterMaterialSourcesOnLoad(raw: unknown): void {
 export function preservesMaterialCountOnLoad(
   slot: Pick<InvSlot, 'itemId' | 'materialSources' | 'instance'>,
 ): boolean {
-  if (slot.materialSources === undefined && slot.instance?.charges !== undefined) return false;
+  if (slot.materialSources === undefined && isChargeBearingPayload(slot.instance)) return false;
   return isMaterialItemId(slot.itemId) || slot.materialSources !== undefined;
 }
 

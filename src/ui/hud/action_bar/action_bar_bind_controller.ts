@@ -15,7 +15,11 @@
 import { audio } from '../../../game/audio';
 import { type Keybinds, keyLabel } from '../../../game/keybinds';
 import { t } from '../../i18n';
-import { mountActionBarBindBanner, setActionBarBindBannerStatus } from './action_bar_bind_banner';
+import {
+  mountActionBarBindBanner,
+  removeActionBarBindBanner,
+  setActionBarBindBannerStatus,
+} from './action_bar_bind_banner';
 import {
   type ActionBarBindState,
   actionBarBindEnter,
@@ -42,7 +46,8 @@ export interface ActionBarBindControllerDeps {
   actionName: (actionId: string) => string;
   /** Close the options window: the mode plays out on the live bar, not in a menu. */
   closeOptions: () => void;
-  /** Where the banner mounts (#actionbar-stack). */
+  /** Where the banner mounts: the HUD root (#ui), never #actionbar-stack (a
+   *  moved bar is reparented to #ui and would paint over a stack child). */
   bannerParent: () => HTMLElement | null;
   /** Mark the selected slot (or none) and whether the mode is active at all. */
   syncSlotClasses: (selected: number | null, active: boolean) => void;
@@ -65,7 +70,7 @@ export class ActionBarBindController {
     if (this.state) return;
     this.deps.closeOptions();
     this.state = actionBarBindEnter();
-    this.bannerEl?.remove();
+    removeActionBarBindBanner(this.bannerEl);
     this.bannerEl = mountActionBarBindBanner(this.deps.bannerParent(), {
       onReset: () => this.confirmReset(),
       onDone: () => this.end(),
@@ -77,7 +82,7 @@ export class ActionBarBindController {
     if (!this.state) return;
     this.cancelPendingCapture();
     this.state = null;
-    this.bannerEl?.remove();
+    removeActionBarBindBanner(this.bannerEl);
     this.bannerEl = null;
     this.sync();
   }

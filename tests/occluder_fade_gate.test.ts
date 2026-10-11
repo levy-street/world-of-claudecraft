@@ -20,6 +20,7 @@ import {
   instancedGhostTwin,
 } from '../src/render/instanced_occluder_ghosts';
 import { cloneMaterialWithHooks } from '../src/render/material_clone_hooks';
+import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import {
   advanceOccluderFade,
   applyOccluderFade,
@@ -48,6 +49,10 @@ import {
   occluderGhostTargetOf,
   occluderGhostVariantKey,
 } from '../src/render/occluder_ghost_variant_key';
+
+// These suites pin the BLENDED arm (the transparent twin and its gate); the
+// dithered arm has its own suite, tests/occluder_dither_fade.test.ts.
+beforeEach(() => setDitherFadeEnabledForTest(false));
 
 const ROOT = new URL('../', import.meta.url);
 /** Source with its line comments stripped, so a commented-out line cannot

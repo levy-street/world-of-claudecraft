@@ -8,6 +8,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   canStackInstancePayloads,
+  isChargeBearingPayload,
   isMergeableInstancePayload,
   itemInstancePayloadsEqual,
 } from '../src/sim/item_instance_merge';
@@ -154,13 +155,40 @@ describe('isMergeableInstancePayload', () => {
     expect(isMergeableInstancePayload(undefined)).toBe(true);
   });
 
-  // Issue #3042: a player-locked copy stays one-per-slot for the same reason
-  // charges does, a different one, so merging it into a plain or
-  // differently-locked stack never taints or launders the player's choice.
+  // Issue #3042: a player-locked copy never TOPS UP an existing slot, so
+  // merging it into a plain or differently-locked stack never taints or
+  // launders the player's choice. This is the top-up question ONLY; see
+  // isChargeBearingPayload below for the separate fresh-slot-sizing question
+  // a locked (but uncharged) payload answers differently.
   it('refuses a locked payload; locked: false is mergeable like any other shape', () => {
     expect(isMergeableInstancePayload({ locked: true })).toBe(false);
     expect(isMergeableInstancePayload({ signer: 'Ana', locked: true })).toBe(false);
     expect(isMergeableInstancePayload({ locked: false })).toBe(true);
+  });
+});
+
+describe('isChargeBearingPayload', () => {
+  // The fresh-slot-sizing question every packing core (bags.ts countFit/
+  // addStacked, material_stack_packing.ts) answers separately from
+  // isMergeableInstancePayload's top-up question: only a charge-bearing
+  // payload has real per-unit mutate-in-place identity, so only it forces
+  // one unit per fresh slot. A locked-but-uncharged payload answers false
+  // here even though it answers false to isMergeableInstancePayload too,
+  // which is the exact split the vault/bank whole-locked-stack fix rests on.
+  it('is true only for a payload carrying charges', () => {
+    expect(isChargeBearingPayload({ charges: { fireball: 3 } })).toBe(true);
+    expect(isChargeBearingPayload({ signer: 'Ana', charges: { zap: 1 } })).toBe(true);
+    expect(isChargeBearingPayload({ locked: true })).toBe(false);
+    expect(isChargeBearingPayload({ signer: 'Ana', locked: true })).toBe(false);
+    expect(isChargeBearingPayload({ signer: 'Ana' })).toBe(false);
+    expect(isChargeBearingPayload({})).toBe(false);
+    expect(isChargeBearingPayload(undefined)).toBe(false);
+  });
+
+  it('diverges from isMergeableInstancePayload on a locked-but-uncharged payload', () => {
+    const locked: ItemInstancePayload = { locked: true };
+    expect(isMergeableInstancePayload(locked)).toBe(false);
+    expect(isChargeBearingPayload(locked)).toBe(false);
   });
 });
 

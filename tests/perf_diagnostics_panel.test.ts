@@ -22,6 +22,7 @@ function snapshot(): PerfSnapshot {
     visibleSeconds: 20,
     frames: 1200,
     hiddenPresentSkips: 0,
+    cadence: null,
     fps: 60,
     frameMs,
     windows: {

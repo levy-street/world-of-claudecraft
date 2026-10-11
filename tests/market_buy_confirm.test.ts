@@ -62,6 +62,10 @@ function info(listings: MarketListingView[], over: Partial<MarketInfo> = {}): Ma
     sellPriceItemId: null,
     sellLowestPrice: null,
     sweepQuote: null,
+    orders: [],
+    myOrderCount: 0,
+    maxOrders: 6,
+    unlistedMaterials: [],
     ...over,
   };
 }
@@ -81,6 +85,9 @@ interface Harness {
   setInfo(next: MarketInfo | null): void;
   confirms: Confirm[];
   bought: number[];
+  /** The `count` argument each marketBuy call carried, in the same order as
+   *  `bought` (undefined for a whole-stack buy, the pre-partial-buy shape). */
+  boughtCounts: (number | undefined)[];
   cancelled: number[];
   errors: string[];
 }
@@ -90,6 +97,7 @@ function harness(initial: MarketInfo): Harness {
   document.body.appendChild(root);
   const confirms: Confirm[] = [];
   const bought: number[] = [];
+  const boughtCounts: (number | undefined)[] = [];
   const cancelled: number[] = [];
   const errors: string[] = [];
   const world = {
@@ -99,7 +107,10 @@ function harness(initial: MarketInfo): Harness {
     marketSearch: () => {},
     marketSellPriceCheck: () => {},
     marketList: () => {},
-    marketBuy: (id: number) => bought.push(id),
+    marketBuy: (id: number, count?: number) => {
+      bought.push(id);
+      boughtCounts.push(count);
+    },
     marketCancel: (id: number) => cancelled.push(id),
     marketCollect: () => {},
   };
@@ -129,6 +140,7 @@ function harness(initial: MarketInfo): Harness {
     },
     confirms,
     bought,
+    boughtCounts,
     cancelled,
     errors,
   };
@@ -142,6 +154,21 @@ function rowButton(root: HTMLElement, index = 0): HTMLButtonElement {
   return el;
 }
 
+/** The Nth row's partial-buy quantity field + its own Buy trigger (a bulk
+ *  stack's alternative to buying the whole row via `rowButton`). */
+function rowPartialBuy(
+  root: HTMLElement,
+  index = 0,
+): { input: HTMLInputElement; button: HTMLButtonElement } {
+  const groups = [...root.querySelectorAll<HTMLElement>('.mkt-row .mkt-buy-partial')];
+  const group = groups[index];
+  expect(group, `browse row ${index} partial-buy control missing`).toBeTruthy();
+  const input = group.querySelector<HTMLInputElement>('.mkt-buy-partial-qty')!;
+  const button = group.querySelector<HTMLButtonElement>('.mkt-buy-partial-btn')!;
+  expect(input && button, `browse row ${index} partial-buy field/button missing`).toBeTruthy();
+  return { input, button };
+}
+
 describe('market_buy_confirm_core', () => {
   it('captures the listing terms, with no per-unit ask for a single', () => {
     expect(marketBuyConfirm(listing())).toEqual({
@@ -150,6 +177,8 @@ describe('market_buy_confirm_core', () => {
       count: 1,
       price: 12345,
       unitPrice: null,
+      buyCount: 1,
+      buyPrice: 12345,
     });
   });
 
@@ -160,6 +189,42 @@ describe('market_buy_confirm_core', () => {
     expect(captured.unitPrice).toBe(334);
     expect(captured.count).toBe(3);
     expect(captured.price).toBe(1000);
+    // No requestedCount: a whole-stack buy, byte-identical to before partial buys.
+    expect(captured.buyCount).toBe(3);
+    expect(captured.buyPrice).toBe(1000);
+  });
+
+  // A buyer may take fewer than the whole stack of a bulk listing (the sim's own
+  // marketBuy, src/sim/market.ts). This core's rounding must agree with the sim's
+  // byte for byte, or the confirm prompt quotes a price the server would not honor.
+  it('quotes a partial buy: rounds the buyer share UP, capped below the full price', () => {
+    // price 1000 over 3 units: per-unit ceil is 334. Buying 1 of 3 costs
+    // ceil(1000*1/3) = 334, buying 2 of 3 costs ceil(1000*2/3) = 667.
+    const stack = listing({ count: 3, price: 1000 });
+    expect(marketBuyConfirm(stack, 1)).toMatchObject({ buyCount: 1, buyPrice: 334 });
+    expect(marketBuyConfirm(stack, 2)).toMatchObject({ buyCount: 2, buyPrice: 667 });
+  });
+
+  it('a requestedCount at or above the stack size buys it whole', () => {
+    const stack = listing({ count: 3, price: 1000 });
+    expect(marketBuyConfirm(stack, 3)).toMatchObject({ buyCount: 3, buyPrice: 1000 });
+    expect(marketBuyConfirm(stack, 99)).toMatchObject({ buyCount: 3, buyPrice: 1000 });
+  });
+
+  it('clamps a non-finite or sub-1 requestedCount to a sane partial buy', () => {
+    const stack = listing({ count: 5, price: 100 });
+    expect(marketBuyConfirm(stack, Number.NaN)).toMatchObject({ buyCount: 5, buyPrice: 100 });
+    expect(marketBuyConfirm(stack, 0)).toMatchObject({ buyCount: 1, buyPrice: 20 });
+    expect(marketBuyConfirm(stack, -4)).toMatchObject({ buyCount: 1, buyPrice: 20 });
+  });
+
+  it('never prices a partial buy remainder below 1 copper', () => {
+    // price 7 over 5 units, buying 4: naive ceil(7*4/5) = ceil(5.6) = 6, leaving
+    // the remaining 1 unit exactly 1 copper (the floor), not 0.
+    const stack = listing({ count: 5, price: 7 });
+    const captured = marketBuyConfirm(stack, 4);
+    expect(captured.buyPrice).toBe(6);
+    expect(stack.price - captured.buyPrice).toBeGreaterThanOrEqual(1);
   });
 
   it('passes when the captured listing is still live, in both world shapes', () => {
@@ -265,5 +330,80 @@ describe('market window: buying asks first', () => {
     rowButton(h.root).click();
     expect(h.cancelled).toEqual([7]);
     expect(h.confirms).toEqual([]);
+  });
+
+  it('offers no partial-buy control for a single-copy listing', () => {
+    const h = harness(info([listing()])); // count: 1
+    h.window.open();
+    expect(h.root.querySelector('.mkt-buy-partial')).toBeNull();
+  });
+
+  it("offers no partial-buy control on the viewer's own bulk listing", () => {
+    const h = harness(info([listing({ itemId: ORE, count: 5, price: 100, mine: true })]));
+    h.window.open();
+    expect(h.root.querySelector('.mkt-buy-partial')).toBeNull();
+  });
+
+  it('the main Buy button still buys a bulk stack whole (no count sent)', () => {
+    const h = harness(info([listing({ itemId: ORE, count: 5, price: 100 })]));
+    h.window.open();
+    rowButton(h.root).click();
+    h.confirms[0].onOk();
+    expect(h.bought).toEqual([7]);
+    expect(h.boughtCounts).toEqual([undefined]);
+  });
+
+  it('the partial-buy control defaults to a quantity of 1 and states it in the prompt', () => {
+    const h = harness(info([listing({ itemId: ORE, count: 5, price: 100 })]));
+    h.window.open();
+    const { input, button } = rowPartialBuy(h.root);
+    expect(input.value).toBe('1');
+    button.click();
+    expect(h.bought, 'must wait for confirmation like the main Buy button').toEqual([]);
+    expect(h.confirms).toHaveLength(1);
+    expect(h.confirms[0].body).toBe(
+      t('itemUi.market.buyConfirmBodyPartial', {
+        item: itemDisplayName(ITEMS[ORE]),
+        count: '1',
+        total: '5',
+        price: formatMoney(20), // ceil(100 * 1 / 5)
+        each: formatMoney(20), // ceil(100 / 5), same as the whole-stack per-unit ask
+      }),
+    );
+    h.confirms[0].onOk();
+    expect(h.bought).toEqual([7]);
+    expect(h.boughtCounts).toEqual([1]);
+  });
+
+  it('the partial-buy control honors a raised quantity, clamped to the stack size', () => {
+    const h = harness(info([listing({ itemId: ORE, count: 5, price: 100 })]));
+    h.window.open();
+    const { input, button } = rowPartialBuy(h.root);
+    input.value = '3';
+    button.click();
+    expect(h.confirms[0].body).toContain(formatMoney(60)); // ceil(100 * 3 / 5)
+    h.confirms[0].onOk();
+    expect(h.boughtCounts).toEqual([3]);
+
+    // A raised quantity at or above the full stack size buys it whole (the
+    // same clamp the sim itself applies), sending no count.
+    const h2 = harness(info([listing({ itemId: ORE, count: 5, price: 100 })]));
+    h2.window.open();
+    const partial2 = rowPartialBuy(h2.root);
+    partial2.input.value = '999';
+    partial2.button.click();
+    h2.confirms[0].onOk();
+    expect(h2.boughtCounts).toEqual([undefined]);
+  });
+
+  it('refuses a partial buy at confirm time when the stack changed under the open prompt', () => {
+    const h = harness(info([listing({ itemId: ORE, count: 5, price: 100 })]));
+    h.window.open();
+    const { button } = rowPartialBuy(h.root); // defaults to quantity 1
+    button.click();
+    h.setInfo(info([listing({ itemId: ORE, count: 4, price: 80 })]));
+    h.confirms[0].onOk();
+    expect(h.bought).toEqual([]);
+    expect(h.errors).toEqual([t('itemUi.market.buyChanged')]);
   });
 });

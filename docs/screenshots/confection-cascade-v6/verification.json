@@ -1,0 +1,71 @@
+{
+  "rows": [
+    {
+      "command": "npx vitest run tests/world_quest_confection_window.test.ts tests/world_quest_confection_view.test.ts tests/world_quest_confection_fx_controller.test.ts tests/world_quest_confection_fx_view.test.ts tests/architecture.test.ts tests/css_layer_containment.test.ts tests/css_value_validity.test.ts tests/css_token_resolution.test.ts tests/css_corpus.test.ts tests/focus_visible_guard.test.ts --maxWorkers=1",
+      "exitCode": 0,
+      "result": "236 passed across 10 files"
+    },
+    {
+      "command": "npx tsc --noEmit",
+      "exitCode": 0,
+      "result": "Passed"
+    },
+    {
+      "command": "npm run ci:changed",
+      "exitCode": 0,
+      "result": "Passed; 1091 existing warnings and 2 infos"
+    },
+    {
+      "command": "PATH=\"$PWD/tmp/puzzle-preview/bin:$PATH\" npm run gate",
+      "exitCode": 1,
+      "result": "Stopped at existing i18n freshness diff against intentionally unstaged generated translations; no staging or bypass"
+    },
+    {
+      "command": "npm run security:gate",
+      "exitCode": 0,
+      "result": "7754 files, 419 flags, 0 high after priors"
+    },
+    {
+      "command": "node tmp/puzzle-preview/build-v6.mjs",
+      "exitCode": 0,
+      "result": "Production bundle, backdrop guard, 1696 byte-verified hashed media assets, nine v4/v5/v6 UI art hashes passed using APFS clones"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "Passed"
+    },
+    {
+      "command": "node tmp/puzzle-preview/browser-qa-v6.mjs",
+      "exitCode": 0,
+      "result": "4 responsive and hardware-clearance cases"
+    },
+    {
+      "command": "node tmp/puzzle-preview/hardware-qa-v6.mjs",
+      "exitCode": 0,
+      "result": "2 opaque-hardware comparisons, with injected screen-blend fault detection"
+    },
+    {
+      "command": "node tmp/puzzle-preview/outcomes-qa-v6.mjs",
+      "exitCode": 0,
+      "result": "13 ending, motion-setting and last-move boundary cases"
+    },
+    {
+      "command": "node tmp/puzzle-preview/forced-outcomes-v6.mjs",
+      "exitCode": 0,
+      "result": "3 preview control and forced-color ending cases"
+    },
+    {
+      "command": "node tmp/puzzle-preview/capture-v6.mjs",
+      "exitCode": 0,
+      "result": "Board, victory and defeat captured from the component"
+    }
+  ],
+  "notes": [
+    "Initial browser captures exhausted temporary disk space. Final browser checks ran serially with a bounded disk cache, disabled HTTP caching and component updates.",
+    "The sequential verification wrapper ran out of disk when opening the build log after security scanning. The individual completed checks remained green; the delivery check was then run separately and passed.",
+    "The production delivery check uses the same process-local APFS copying adapter documented in v5. Repository build scripts are unchanged. Only its own untracked dist output was removed afterwards.",
+    "All 22 browser cases reported zero page errors. Frontend review found no actionable gaps.",
+    "Full merge readiness: NOT READY due to existing i18n freshness block. Local visual refinement is available."
+  ]
+}

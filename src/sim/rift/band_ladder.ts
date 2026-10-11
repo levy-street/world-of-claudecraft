@@ -4,9 +4,9 @@
 // from a drop table the way it does for every other piece. The level is a
 // property of the COPY instead: the rank the rift was cleared at sets the base
 // (RIFT_BAND_TIER_BASE_ILVL), every Rift Essence upgrade raises it by one, and
-// RIFT_BAND_ILVL_CAP holds the whole ladder one step under the current raid
-// ring line (Ignivar epics are item level 35), so a maxed band is the best ring
-// outside the raid and never the best ring in the game. Primary stats come
+// RIFT_BAND_ILVL_CAP holds the ordinary ladder one step under the current raid
+// ring line (Ignivar epics are item level 35). Exceptional drop quality adds a
+// separate permanent lane above this base, in loot_quality/. Primary stats come
 // straight off the shared epic-ring budget curve (item_budget.ts
 // primaryStatBudget) at that level, split on the class shell's 3:2
 // primary-to-secondary identity, so a band at level N carries exactly what an
@@ -25,7 +25,7 @@ import type { RiftGemId } from '../content/rift/items';
 import { normalizeToStaminaModel, type PrimaryStat, primaryStatBudget } from '../item_budget';
 import type { RiftTier } from '../types';
 
-/** The ladder ceiling: one under the raid ring line, so the raid stays best. */
+/** The ordinary ladder ceiling, before any permanent loot-quality bonus. */
 export const RIFT_BAND_ILVL_CAP = 34;
 
 /** Essence upgrades a band can take; each raises the item level by one. */
@@ -66,6 +66,13 @@ export interface RiftBandShell {
   primary: PrimaryStat;
   secondary: PrimaryStat;
 }
+
+/** Static shells are shared by persistence and the independent quality lane. */
+export const RIFT_BAND_SHELLS: Readonly<Record<string, RiftBandShell>> = {
+  riftbound_band_of_might: { primary: 'str', secondary: 'sta' },
+  riftbound_band_of_insight: { primary: 'int', secondary: 'spi' },
+  riftbound_band_of_guile: { primary: 'agi', secondary: 'sta' },
+};
 
 /** The item level of a band at `upgradeLevel` essence upgrades, capped. */
 export function riftBandItemLevel(tier: RiftTier, upgradeLevel: number): number {

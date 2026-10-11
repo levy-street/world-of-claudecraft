@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { spellCritChance } from '../src/sim/combat/spell_combat';
 import { warriorParryChance } from '../src/sim/combat/warrior_hit_table';
 import { CLASSES } from '../src/sim/content/classes';
 import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
@@ -49,7 +50,9 @@ function inputFor(cls: PlayerClass, p: ReturnType<typeof freshPlayer>): StatTool
     level: p.level,
     attackPower: p.attackPower,
     spellPower: p.spellPower,
+    healPower: p.healPower,
     critChance: p.critChance,
+    spellCritChance: spellCritChance(p),
     dodgeChance: p.dodgeChance,
     critRating: p.critRating,
     hasteRating: p.hasteRating,
@@ -320,8 +323,13 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
     const gear = [];
     for (const id of Object.values(sim.equipment)) {
       const item = id ? ITEMS[id] : null;
-      if (!item || (!item.stats && !item.spellPower)) continue;
-      gear.push({ name: item.id, stats: item.stats, spellPower: item.spellPower });
+      if (!item || (!item.stats && !item.spellPower && !item.healPower)) continue;
+      gear.push({
+        name: item.id,
+        stats: item.stats,
+        spellPower: item.spellPower,
+        healPower: item.healPower,
+      });
     }
     const buffs = p.auras.map((a) => ({ kind: a.kind, value: a.value, name: a.name }));
     return {
@@ -330,7 +338,9 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
       level: p.level,
       attackPower: p.attackPower,
       spellPower: p.spellPower,
+      healPower: p.healPower,
       critChance: p.critChance,
+      spellCritChance: spellCritChance(p),
       dodgeChance: p.dodgeChance,
       critRating: p.critRating,
       hasteRating: p.hasteRating,
@@ -351,7 +361,9 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
     'armor',
     'attackPower',
     'spellPower',
+    'healPower',
     'critChance',
+    'spellCrit',
     'dodge',
   ];
 
@@ -366,7 +378,8 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
           const sum = model.sources.reduce((acc, s) => acc + s.value, 0);
           // Whole-number stats reconcile exactly; the crit/dodge percents carry the
           // 0.05%/agi curve so allow a hair of float slack.
-          const eps = stat === 'critChance' || stat === 'dodge' ? 1e-6 : 0.5;
+          const eps =
+            stat === 'critChance' || stat === 'spellCrit' || stat === 'dodge' ? 1e-6 : 0.5;
           expect(Math.abs(sum - model.statValue)).toBeLessThan(eps);
         }
       });
@@ -397,6 +410,36 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
     expect(buffLine?.value).toBe(20);
     const sum = sta.sources.reduce((acc, s) => acc + s.value, 0);
     expect(sum).toBe(sta.statValue);
+  });
+
+  it('itemizes a spell crit buff by name on Spell Crit, never on the weapon Crit Chance', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'mage', world: STAT_TEST_WORLD });
+    sim.setPlayerLevel(20);
+    const p = sim.player;
+    // A +5% spell-only crit aura (buff_spellcrit is read live at roll time by
+    // spellCritChance, so no recalc is needed for it to count).
+    p.auras.push({
+      id: 'arcane_focus_test',
+      name: 'Arcane Focus',
+      kind: 'buff_spellcrit',
+      remaining: 10,
+      duration: 10,
+      value: 0.05,
+      sourceId: p.id,
+      school: 'arcane',
+    });
+    const input = inputWithGear(sim, 'mage');
+    const spell = buildStatTooltip('spellCrit', input);
+    const buffLine = spell.sources.find((s) => s.kind === 'buff');
+    expect(buffLine?.name).toBe('Arcane Focus');
+    expect(buffLine?.value).toBeCloseTo(5, 10);
+    expect(spell.statValue).toBeCloseTo(spellCritChance(p) * 100, 10);
+    const sum = spell.sources.reduce((acc, s) => acc + s.value, 0);
+    expect(sum).toBeCloseTo(spell.statValue, 10);
+    // The weapon pool neither gains the aura nor lists it.
+    const weapon = buildStatTooltip('critChance', input);
+    expect(weapon.statValue).toBeCloseTo(p.critChance * 100, 10);
+    expect(weapon.sources.some((s) => s.kind === 'buff')).toBe(false);
   });
 
   it('spellPower breaks down into Intellect + flat gear/buff Spell Power', () => {

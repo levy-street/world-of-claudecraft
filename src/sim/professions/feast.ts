@@ -64,7 +64,14 @@ import { countUnlockedInSlots, isItemLocked, removeUnlockedFromSlots } from '../
 import { riftInstanceAtPos } from '../rift/runs';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, isConsuming, isNonSpellCast } from '../types';
+import {
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  isConsuming,
+  isNonSpellCast,
+} from '../types';
 import {
   type FeastMatchScope,
   type FeastObjectOwner,
@@ -192,6 +199,30 @@ export function feastOwnerKey(meta: PlayerMeta): string {
   return meta.characterId == null ? `entity:${meta.entityId}` : `character:${meta.characterId}`;
 }
 
+/** The feast id a NAMED place_feast means. The dedicated `place_feast`
+ *  command carries a slot but no item id (the bags window sends it for EVERY
+ *  `item.feast`, apex tiers included), so the slot itself is the only thing
+ *  that says which feast the player clicked. Before this resolver the action
+ *  re-resolved every named slot against the PARTY feast id, so a clicked
+ *  Sageleaf, Stonepot or Warspice Feast failed its own slot check and the
+ *  player read "You have no feast to set out" with the feast in bags.
+ *  A slot that is absent, out of range, or holds anything without a `feast`
+ *  payload answers the party feast id, which keeps the bare command's pinned
+ *  meaning (it places a harvest_feast and can never place an apex feast) and
+ *  lets placeFeastAction's own slot re-resolve refuse a non-feast slot
+ *  exactly as before. Pure: it reads the slot array and the catalog only. */
+export function feastItemIdAtSlot(
+  inventory: readonly Pick<InvSlot, 'itemId'>[],
+  slotIndex: number | undefined,
+): string {
+  if (slotIndex === undefined || !Number.isInteger(slotIndex)) return FARM_FEAST_ITEM_ID;
+  if (slotIndex < 0 || slotIndex >= inventory.length) return FARM_FEAST_ITEM_ID;
+  const itemId = inventory[slotIndex].itemId;
+  if (!itemId) return FARM_FEAST_ITEM_ID;
+  const def = ITEMS[itemId];
+  return def && 'feast' in def && def.feast ? itemId : FARM_FEAST_ITEM_ID;
+}
+
 /** Set out a feast at the caller's feet, spending one feast item from bags.
  *  Gate order mirrors plantCrop: the family's shared ctx.error
  *  sentences for dead/busy (deviation (bq): no new wire enum arm for a
@@ -219,7 +250,7 @@ export function placeFeastAction(
   p: Entity,
   meta: PlayerMeta,
   slotIndex?: number,
-  itemId: string = FARM_FEAST_ITEM_ID,
+  itemId: string = feastItemIdAtSlot(meta.inventory, slotIndex),
 ): void {
   if (p.dead) {
     ctx.error(meta.entityId, "You can't do that while dead.");

@@ -51,6 +51,7 @@ function harness(inventory: InvSlot[]): { root: HTMLElement; w: BagsWindow; inv:
     closeBank: noop,
     onClosed: noop,
     addItemToTrade: noop,
+    tradeOfferHeadroom: () => 0,
     stageMarketSell: noop,
     stageMailParcel: noop,
     insertItemChatLink: noop,

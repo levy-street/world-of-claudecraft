@@ -1,0 +1,40 @@
+{
+  "name": "Deeprake",
+  "key": "hoard_boss_mole",
+  "rotateZ": 0,
+  "attackStyle": "claws",
+  "castStyle": "rear",
+  "extraClips": ["Burrow", "Underground", "Emerge"],
+  "motion": {
+    "chestUp": 0,
+    "headUp": 0,
+    "walkStride": 16,
+    "runStride": 26,
+    "bob": 0.006,
+    "deathDrop": -0.13,
+    "deathRoll": 70,
+    "groundTilt": 3.5,
+    "rearPitch": 30,
+    "attackSeconds": 0.9,
+    "castSeconds": 1.8,
+    "burrowSeconds": 1.1,
+    "emergeSeconds": 0.8,
+    "burrowDepth": 0.64
+  },
+  "bones": [
+    ["Root", null, [-0.2, 0, -0.282], [-0.2, 0, -0.22], 0.0],
+    ["Hips", "Root", [-0.3, 0, -0.03], [-0.08, 0, 0.04], 0.16],
+    ["Spine", "Hips", [-0.08, 0, 0.04], [0.1, 0, 0.08], 0.18],
+    ["Chest", "Spine", [0.1, 0, 0.08], [0.28, 0, 0.04], 0.17],
+    ["Head", "Chest", [0.28, 0, 0.02], [0.5, 0, -0.06], 0.11],
+    ["Tail1", "Hips", [-0.3, 0, -0.03], [-0.38, 0, -0.08], 0.09],
+    ["Tail2", "Tail1", [-0.38, 0, -0.08], [-0.45, 0, -0.12], 0.08],
+    ["Tail3", "Tail2", [-0.45, 0, -0.12], [-0.51, 0, -0.16], 0.07],
+    ["HindThigh.*", "Hips", [-0.16, 0.14, -0.02], [-0.18, 0.24, -0.13], 0.08],
+    ["HindShin.*", "HindThigh.*", [-0.18, 0.24, -0.13], [-0.22, 0.28, -0.21], 0.06],
+    ["HindFoot.*", "HindShin.*", [-0.22, 0.28, -0.21], [-0.1, 0.3, -0.24], 0.05],
+    ["ForeUpper.*", "Chest", [0.14, 0.2, 0.04], [0.24, 0.32, -0.08], 0.08],
+    ["ForeLower.*", "ForeUpper.*", [0.24, 0.32, -0.08], [0.28, 0.34, -0.18], 0.07],
+    ["ForeFoot.*", "ForeLower.*", [0.28, 0.34, -0.18], [0.44, 0.27, -0.26], 0.07]
+  ]
+}

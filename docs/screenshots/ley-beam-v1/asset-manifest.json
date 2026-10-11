@@ -1,0 +1,50 @@
+[
+  {
+    "source": "/Users/demihenderson/.codex/generated_images/01a0755a-4bc1-7141-94b0-39009ed6a4b8/exec-94c4fd92-c7db-4dfa-948f-7cb43ed8ae18.png",
+    "sourceHash": "959ee7ab5e4161e6d202d547f8e6a764ce6f93ba5ff4e42da477b14b31ae348c",
+    "dest": "public/ui/minigames/ley-frame-v1.webp",
+    "hash": "b4e64964fc3579650639710ac61c88bc71514c3d7370721adc3ddaf8808aae2e",
+    "bytes": 173404,
+    "metadata": {
+      "format": "webp",
+      "mediaType": "image/webp",
+      "width": 1024,
+      "height": 1024,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "isProgressive": false,
+      "isPalette": false,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 1024,
+        "height": 1024
+      }
+    }
+  },
+  {
+    "source": "/Users/demihenderson/.codex/generated_images/01a0755a-4bc1-7141-94b0-39009ed6a4b8/exec-935f9101-56bc-49d9-8962-ff074747c549.png",
+    "sourceHash": "52ed2a115b9dd29873bc8e3c4643a80f360ece1169d2f9e7d25f82686af6f5f5",
+    "dest": "public/ui/minigames/ley-heart-v1.webp",
+    "hash": "c3b1f900217fb4e81ecd9431f43c3980d23cbaa3caec3d68a104a972135d3e3c",
+    "bytes": 88134,
+    "metadata": {
+      "format": "webp",
+      "mediaType": "image/webp",
+      "width": 512,
+      "height": 512,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "isProgressive": false,
+      "isPalette": false,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 512,
+        "height": 512
+      }
+    }
+  }
+]

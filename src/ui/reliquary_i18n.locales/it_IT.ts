@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Lo Squarcio',
     desc: 'Bottini distintivi dello Squarcio mutevole, dai suoi orrori erranti ai due tesori della caccia di rango S.',
   },
+  conquerors_buried_hoards: {
+    name: 'I tesori sepolti',
+    desc: 'Bottino dei tesori a cui conducono le mappe del tesoro, quattro pezzi per ogni custode che ne sorveglia uno.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Rari del reame',
     desc: 'La prova di ogni raro con nome abbattuto in tutto il reame.',
@@ -142,6 +146,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Armeria di Guerra',
     desc: 'Gioielli e armi di Guerra acquistati con onore sudato.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galleria dell’Avanguardia',
+    desc: 'I set di specializzazione e le armi della stagione 2 di Guerra, acquistati con l’onore.',
+  },
   horizons_vault_of_ages: {
     name: 'Camera del Tesoro delle Ere',
     desc: "Tesori ritirati di un'epoca passata. Queste reliquie non si possono più conquistare; la camera rende onore ai veterani che le conservano.",
@@ -156,7 +164,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Eroico: Crogiolo dell’Ultima Fonte',
-    desc: 'Armi esclusive della modalità eroica di Ignivar, Araldo dell’Ultima Fiamma.',
+    desc: 'Armi esclusive della modalità eroica e monili dell’incursione di Ignivar, Araldo dell’Ultima Fiamma.',
   },
   conquerors_varkhul: {
     name: 'Il Crogiolo Interiore',
@@ -164,7 +172,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Eroico: Il Crogiolo Interiore',
-    desc: 'Scudi e armi esclusivi della modalità eroica di Varkhul, Padre della Forgia dell’Ultima Fiamma.',
+    desc: 'Scudi e armi esclusivi della modalità eroica e monili dell’incursione di Varkhul, Padre della Forgia dell’Ultima Fiamma.',
   },
   conquerors_set_bramblehide: {
     name: 'Pelle di Rovo di Roots',

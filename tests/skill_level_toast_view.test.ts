@@ -472,6 +472,7 @@ interface DrainHarness {
     craftingIdentity: { synced: boolean };
     craftSkills: Record<string, number>;
     gatheringProficiency: Record<string, number>;
+    factions: Record<string, number>;
   };
   bannerEl: HTMLElement;
   bannerTimer: number | undefined;
@@ -481,6 +482,7 @@ interface DrainHarness {
   craftTierUpDrains: number;
   prevCraftSkillLevels: Record<string, number> | null;
   prevGatheringSkillLevels: Record<string, number> | null;
+  prevFactionStanding: Record<string, number> | null;
   handleEvents(events: SimEvent[]): void;
 }
 
@@ -491,6 +493,8 @@ function drainHud(synced: boolean): DrainHarness {
     craftingIdentity: { synced },
     craftSkills: {},
     gatheringProficiency: {},
+    // The faction tier observer rides the same drain tail (and sync flag).
+    factions: { rift_watch: 0, church_order: 0, automatons: 0 },
     // The concrete worlds carry far more; handleEvents with an empty drain
     // reads only this slice (the six sibling harnesses are the precedent).
   };
@@ -501,6 +505,7 @@ function drainHud(synced: boolean): DrainHarness {
   hud.prevCraftSkills = null;
   hud.craftTierUpDrains = 0;
   hud.prevCraftSkillLevels = null;
+  hud.prevFactionStanding = null;
   hud.prevGatheringSkillLevels = null;
   return hud;
 }

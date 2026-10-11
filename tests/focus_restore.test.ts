@@ -489,6 +489,8 @@ describe('bare containment reads of the active element stay out of repaint ladde
     'hud/vendor/buy_quantity_prompt_window.ts': 'do-not-steal-focus check, never focuses anything',
     'map_sidebar_controller.ts':
       'focus capture before the atlas rail innerHTML swap; restores by data-map-* identity only',
+    'market_orders_panel.ts':
+      'place-order card focus capture before tab repaint; restores by stable field id only',
     'mount_inspect_controller.ts': 'overlay Tab-trap boundary check, not a restore ladder',
     'spellbook_window.ts':
       'dataset/class-keyed read with no Close rung; a parked root resolves nothing',

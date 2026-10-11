@@ -295,6 +295,10 @@ describe('rift and delve painted map marker catalog', () => {
     for (const id of NEW_ART_IDS) expect(MAP_MARKER_ART_IDS).toContain(id);
   });
 
+  it('keeps the Buried Hoard entrance on its dedicated procedural treasure X', () => {
+    expect(semanticMapMarkerArt({ kind: 'hoard-entrance' })).toBeNull();
+  });
+
   it('enumerates every valid Rift and Delve generated-art semantic exactly once', () => {
     expect(SEMANTIC_ROUTE_CASES).toHaveLength(43);
     expect(new Set(SEMANTIC_ROUTE_CASES.map(({ semantic }) => JSON.stringify(semantic))).size).toBe(

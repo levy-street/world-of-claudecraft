@@ -236,6 +236,22 @@ describe('Necromancy renderer routing', () => {
     });
   });
 
+  it('opens the necromancer portal for a Buried Hoard skeleton wave', () => {
+    const spawn = vi.fn();
+    spawnArmyPortalBurstEvent(
+      { spawn } as unknown as NecromancyArmyPortalFx,
+      { ability: 'Hoard Bone Legion', fx: 'burst', x: 10, z: 20, sourceId: 5, duration: 3.2 },
+      (id) => (id === 5 ? { pos: { x: 13, z: 24 }, facing: 1.1 } : undefined),
+    );
+    expect(spawn).toHaveBeenCalledWith({
+      x: 10,
+      z: 20,
+      facing: 1.1,
+      duration: 3.2,
+      palette: 'necromancy',
+    });
+  });
+
   it('routes Lich transformation feedback and suppresses the burst for reduced motion', () => {
     const normal = makeHarness();
     normal.renderer.handleEvent({

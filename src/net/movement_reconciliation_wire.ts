@@ -1,4 +1,8 @@
-export class ReconWireState {
+import type { FerryDeckMirror } from '../sim/types';
+import { QuestWorldWireState } from './quest_world_wire_state';
+import { parseFerryDeck } from './transport_wire';
+
+export class ReconWireState extends QuestWorldWireState {
   reconAuthoritativeX: number | null = null;
   reconAuthoritativeY: number | null = null;
   reconAuthoritativeZ: number | null = null;
@@ -8,6 +12,10 @@ export class ReconWireState {
   reconOverrideEpoch = 0;
   reconOverrideActive = false;
   reconMoveSpeedMult = 1;
+  /** The acknowledged pose in a sailing ship's frame (`rdk`), when the
+   *  player rides one: the frame the deck-aware prediction replays in. Its
+   *  height is the WORLD height (server transport_head.ts ferryDeckReconWire). */
+  reconDeck: FerryDeckMirror | null = null;
 
   resetReconWireState(): void {
     this.reconAuthoritativeX = null;
@@ -19,6 +27,7 @@ export class ReconWireState {
     this.reconOverrideEpoch = 0;
     this.reconOverrideActive = false;
     this.reconMoveSpeedMult = 1;
+    this.reconDeck = null;
   }
 }
 
@@ -31,6 +40,7 @@ interface MovementReconciliationSelfWire {
   ovE?: unknown;
   ovA?: unknown;
   msm?: unknown;
+  rdk?: unknown;
 }
 
 function finiteNumber(value: unknown): value is number {
@@ -66,4 +76,5 @@ export function applyReconSelfWire(
   target.reconOverrideEpoch = self.ovE as number;
   target.reconOverrideActive = self.ovA === 1;
   target.reconMoveSpeedMult = self.msm === undefined ? 1 : self.msm;
+  target.reconDeck = parseFerryDeck(self.rdk);
 }

@@ -119,6 +119,10 @@ const EXEMPT: ReadonlyArray<{ cmd: string; why: string }> = [
     why: 'a read-only price lookup keyed by item id (issue 3043), not an action on a held copy: it never touches bags or escrow, so there is no copy to address',
   },
   {
+    cmd: 'market_order_place',
+    why: 'places a wanted order by fungible item id and escrows copper, not a player-held bag copy; delivery uses the separate order-fill path',
+  },
+  {
     cmd: 'market_sweep_quote',
     why: 'a read-only Market Sweep quote over live auction rows keyed by item id and filters; it neither selects nor consumes a player-held bag copy',
   },

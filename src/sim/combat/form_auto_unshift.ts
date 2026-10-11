@@ -30,6 +30,8 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { AbilityDef, AbilityEffect, Aura, Entity } from '../types';
 import { isFormAuraKind } from '../types';
+import { naturesBoonArmedFor } from './druid_natures_boon';
+import { hasFormRequirement } from './form_requirement';
 import { isResourceShiftFormAuraKind } from './forms';
 
 type EffectType = AbilityEffect['type'];
@@ -80,9 +82,17 @@ export function isFormToggleAbility(def: AbilityDef): boolean {
  *  question the cast gate asks and the action bar asks when it decides which
  *  pool a slot is affordable against. Mirrors the cast gate's refusal exactly,
  *  so the two can never disagree about which presses are allowed. */
-export function willAutoUnshift(auras: readonly Pick<Aura, 'kind'>[], def: AbilityDef): boolean {
-  if (def.requiresForm !== undefined || def.usableInForm || isFormToggleAbility(def)) return false;
+export function willAutoUnshift(
+  auras: readonly (Pick<Aura, 'kind'> & { id?: string; empowerAbilities?: readonly string[] })[],
+  def: AbilityDef,
+): boolean {
+  if (hasFormRequirement(def) || def.usableInForm || isFormToggleAbility(def)) return false;
   if (!auras.some((a) => isResourceShiftFormAuraKind(a.kind))) return false;
+  // An armed Nature's Boon window casts its spell FROM the form: the whole
+  // point of the passive is that the druid does not leave Cat or Bruin to
+  // spend it, so the auto-unshift stands down and the cast gate lets it
+  // through instead (combat/druid_natures_boon.ts).
+  if (naturesBoonArmedFor(auras, def.id)) return false;
   return isHealingOrDamagingAbility(def);
 }
 
@@ -118,8 +128,9 @@ export function applyAutoUnshift(
     p.auras.splice(i, 1);
     ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
   }
-  // Stalk is Cat Form's stealth (requiresForm: 'cat'), so it goes out with the
-  // form. Pressing the form button by hand already ends it, though only as a
+  // Stalk is Cat Form's stealth (the button shifts you into Cat to enter it, see
+  // combat/druid_form_entry.ts), so it goes out with the form. Pressing the form
+  // button by hand already ends it, though only as a
   // side effect: casting an ability breaks stealth when its effects resolve.
   // An auto-unshift casts no form button, so without this the druid would keep
   // Stalk through the whole spell and only lose it at the cast's own commit,

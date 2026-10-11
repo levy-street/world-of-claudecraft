@@ -39,10 +39,10 @@ describe('live map disclosure policy ownership', () => {
       expectedCalls: 1,
     },
     {
-      name: 'zone-map live Rift landmark',
+      name: 'zone-map live Rift and hoard landmarks',
       path: '../src/ui/map_navigation_landmarks_core.ts',
       importPath: './map_entity_disclosure_core',
-      expectedCalls: 1,
+      expectedCalls: 2,
     },
   ] as const;
 

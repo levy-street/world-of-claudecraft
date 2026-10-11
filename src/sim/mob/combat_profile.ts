@@ -7,6 +7,14 @@ import {
   releasePin,
 } from '../instances/instance_combat_hold';
 import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from '../mob_combat';
+import { holdHoardBoneReaper } from '../rift/hoard_bone_reaper';
+import { holdHoardBoulder } from '../rift/hoard_boulder';
+import { holdHoardCaveBoss } from '../rift/hoard_cave_kit';
+import { holdHoardCharge } from '../rift/hoard_charge';
+import { holdHoardIceAge } from '../rift/hoard_ice_age';
+import { holdHoardOrbitalLightning } from '../rift/hoard_orbital_lightning';
+import { holdHoardPulsars } from '../rift/hoard_pulsars';
+import { holdHoardSilkSnare } from '../rift/hoard_silk_snare';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import {
@@ -27,7 +35,7 @@ import { retargetMob, updateMobTarget } from './targeting';
 
 export type MobCombatProfileResult = 'done' | 'runAttackMechanics';
 
-type EngagedTickHook = () => void;
+type EngagedTickHook = (mode: 'normal' | 'stationary') => void;
 
 // Drop the pull and walk home: the shared evade entry used by the leash breaks
 // and the unreachable-target stall. The evade arm in locomotion.ts handles the
@@ -154,7 +162,27 @@ export function updateMobCombatProfile(
     return 'done';
   }
 
-  onEngagedTick?.();
+  if (
+    holdHoardOrbitalLightning(ctx, mob) ||
+    holdHoardBoneReaper(ctx, mob) ||
+    holdHoardIceAge(ctx, mob) ||
+    holdHoardPulsars(ctx, mob) ||
+    holdHoardBoulder(ctx, mob) ||
+    holdHoardCharge(ctx, mob) ||
+    holdHoardSilkSnare(ctx, mob)
+  ) {
+    onEngagedTick?.('stationary');
+    mob.swingTimer = Math.max(0, mob.swingTimer - DT);
+    tryMobMeleeSwingInRange(ctx, mob, target);
+    return 'done';
+  }
+  // A cave boss its module is moving (a leap, a dive) or has underground swings
+  // at nobody: it is in the air or under the floor (src/sim/rift/hoard_cave_kit.ts).
+  if (holdHoardCaveBoss(ctx, mob)) {
+    onEngagedTick?.('stationary');
+    return 'done';
+  }
+  onEngagedTick?.('normal');
 
   // Dragonkin engage shout: the brood bellows BEFORE it walks. Fires once per
   // pull (shoutFired resets on evade/respawn with the other pull state); for

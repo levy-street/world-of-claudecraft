@@ -8,6 +8,7 @@
 import { describe, expect, it } from 'vitest';
 import { isRiftPos } from '../src/sim/data';
 import { resetEvadingMob } from '../src/sim/mob/locomotion';
+import { spawnNaturalRiftPortal } from '../src/sim/rift/portals';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -137,5 +138,34 @@ describe('rift mid-combat exit is a classic zone-out reset', () => {
     sim.enterRift(SEED, 20, pid);
 
     expect(isRiftPos(p.pos.x), 'the existing in-combat ghost gate still bars entry').toBe(false);
+  });
+});
+
+describe('rift exit uses a predefined facing, not whatever way the player was looking inside', () => {
+  it('walking out through a natural portal faces the player away from it, never their last interior facing', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Wayfarer');
+    const p = sim.entities.get(pid) as AnyEntity;
+    sim.setPlayerLevel(20, pid); // walk-in requires RIFT_MIN_LEVEL when entering through a real portal
+    expect(spawnNaturalRiftPortal(sim.ctx, 0)).toBe(true);
+    const portal = sim.entities.get(sim.naturalRiftPortals[0].id)!;
+
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, pid, undefined, portal);
+    const inst = sim.riftInstances.find((i: any) => i.partyKey !== null)!;
+    const dx = inst.returnPos.x - portal.pos.x;
+    const dz = inst.returnPos.z - portal.pos.z;
+    const expectedFacing = Math.atan2(dx, dz);
+
+    // Some arbitrary facing picked up while exploring the floor, unrelated to
+    // the portal's own orientation in the overworld.
+    p.facing = -1.4;
+    p.prevFacing = -1.4;
+
+    sim.leaveRift(pid);
+
+    expect(isRiftPos(p.pos.x)).toBe(false);
+    expect(p.facing).not.toBe(-1.4);
+    expect(p.facing).toBeCloseTo(expectedFacing, 10);
+    expect(p.prevFacing).toBeCloseTo(expectedFacing, 10);
   });
 });

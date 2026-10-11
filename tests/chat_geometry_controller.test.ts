@@ -409,3 +409,19 @@ function keyEvent(key: string, shiftKey = false): Event {
   }
   return event;
 }
+
+it('replaces chat geometry and visibility immediately, including default layouts', () => {
+  const h = makeHarness({ woc_chat_geometry: '{"left":120,"top":90,"width":420,"height":210}' });
+  h.controller.init();
+  h.storage.setItem('woc_chat_geometry', '{"left":200,"top":100,"width":500,"height":250}');
+  h.storage.setItem('woc_chat_frame_hidden', '1');
+  h.controller.restoreSavedLayout();
+  expect(h.wrap.style.left).toBe('200px');
+  expect(h.wrap.style.width).toBe('500px');
+  expect(h.wrap.classList.contains('frame-user-hidden')).toBe(true);
+  h.storage.removeItem('woc_chat_geometry');
+  h.storage.removeItem('woc_chat_frame_hidden');
+  h.controller.restoreSavedLayout();
+  expect(h.wrap.style.left).toBe('');
+  expect(h.wrap.classList.contains('frame-user-hidden')).toBe(false);
+});

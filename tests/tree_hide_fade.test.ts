@@ -5,7 +5,7 @@
 // frame in the state the linear walk over the whole registry left it in.
 import { describe, expect, it, vi } from 'vitest';
 import type { InstancedOccluderGhosts } from '../src/render/instanced_occluder_ghosts';
-import { OCCLUDER_FADE_PREFETCH_YD } from '../src/render/occluder_fade_core';
+import { OCCLUDER_FADE_PREFETCH_YD, stepOccluderFade } from '../src/render/occluder_fade_core';
 import {
   cameraSegmentHitsTree,
   stepTreeHide,
@@ -38,14 +38,16 @@ function fakeGhosts(): InstancedOccluderGhosts & {
     prefetchAll: (parts: readonly unknown[]) => {
       pool.prefetched += parts.length;
     },
-    acquire: () => {
+    hide: () => {
       pool.acquired++;
-      return { alpha: 1 } as unknown as ReturnType<InstancedOccluderGhosts['acquire']>;
+      return { alpha: 1 } as unknown as ReturnType<InstancedOccluderGhosts['hide']>;
     },
-    setAlpha: (handle: { alpha: number }, alpha: number) => {
+    step: (alpha: number, occluded: boolean, dt: number, reducedMotion: boolean) =>
+      stepOccluderFade(alpha, occluded, dt, reducedMotion),
+    fade: (handle: { alpha: number }, alpha: number) => {
       handle.alpha = alpha;
     },
-    release: () => {
+    show: () => {
       pool.released++;
     },
   };
@@ -69,16 +71,12 @@ function field(count: number, spacing: number): TreeHideable[] {
       alpha: 1,
       ghosts: [],
       // One part on a fake instanced mesh: the ghost pool is what is exercised,
-      // the matrix writes land on inert stand-ins.
+      // and the pool owns every write to the batch.
       parts: [
         {
-          mesh: {
-            setMatrixAt: () => {},
-            instanceMatrix: { addUpdateRange: () => {}, needsUpdate: false },
-          } as unknown as TreeHideable['parts'][number]['mesh'],
+          mesh: {} as unknown as TreeHideable['parts'][number]['mesh'],
           index: 0,
           visibleMatrix: {} as TreeHideable['parts'][number]['visibleMatrix'],
-          hiddenMatrix: {} as TreeHideable['parts'][number]['hiddenMatrix'],
         },
       ],
       prefetched: false,

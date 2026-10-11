@@ -4,15 +4,12 @@
 // pool size shrinks with the static fx tier, so no tier gains information.
 //
 // The whole pool is created eagerly in the constructor and every light stays
-// `visible` forever at intensity 0: Three bakes numPointLights into every lit
-// material's program cache key and counts a light iff `visible` (intensity is
-// irrelevant), so toggling visibility on the first pulse would synchronously
-// recompile ALL lit materials mid-combat, the same constant-count invariant
-// the renderer's budgetFireLights keeps for campfires. The pool is built in
-// the renderer constructor before prewarmInitialScene, so the constant-count
-// program variant compiles once during boot.
+// `visible` forever at intensity 0. The pulses are carrier sources
+// (point_light_carriers.ts): three never gathers them, the carriers draw the
+// live ones, and the pool size is part of the pinned carrier count.
 import * as THREE from 'three';
 import { GFX } from './gfx';
+import { markPointLightSource } from './point_light_carriers_core';
 
 interface Pulse {
   light: THREE.PointLight;
@@ -31,8 +28,14 @@ const SCHOOL_LIGHT: Record<string, number> = {
   physical: 0xffd9b0,
 };
 
+/** Composer-off tiers keep at most one live pulse; richer tiers a few. */
+export function lightPulsePoolSize(): number {
+  return GFX.composer ? 4 : 1;
+}
+
 export class LightPulses {
   private pool: Pulse[] = [];
+  readonly lights: THREE.PointLight[] = [];
 
   constructor(scene: THREE.Scene) {
     // GFX is final by construction time (initGfxTier runs before any scene
@@ -40,14 +43,15 @@ export class LightPulses {
     // still consulted per pulse and clamped to the pool as a guard.
     for (let i = 0; i < this.capacity(); i++) {
       const light = new THREE.PointLight(0xffffff, 0, 7, 2);
+      markPointLightSource(light);
       scene.add(light);
       this.pool.push({ light, remaining: 0, duration: 1, peak: 1 });
+      this.lights.push(light);
     }
   }
 
   private capacity(): number {
-    // Composer-off tiers keep at most one live pulse; richer tiers a few.
-    return GFX.composer ? 4 : 1;
+    return lightPulsePoolSize();
   }
 
   /** Flash a short-lived point light at a world position. */

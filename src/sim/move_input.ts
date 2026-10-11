@@ -39,6 +39,11 @@ export function sanitizeMoveInput(raw: unknown): MoveInput {
     input[field as MoveField] = isMoveFlag(raw[field]) || isMoveFlag(raw[compact]);
   }
   input.swimSteer = sanitizeSwimSteer(raw);
+  const pitch = raw.gliderPitch ?? raw.gp;
+  input.gliderPitch =
+    typeof pitch === 'number' && Number.isFinite(pitch)
+      ? Math.min(1, Math.max(-1, pitch))
+      : undefined;
   return input;
 }
 

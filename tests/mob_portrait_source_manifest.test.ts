@@ -94,7 +94,16 @@ describe('mob portrait source manifest', () => {
     // (hub_training_dummy, hub_healing_dummy).
     // 250: plus the five Eastbrook healing-training role dummies, each with
     // its own rendered portrait.
-    expect(liveIds).toHaveLength(250);
+    // 254: plus the world quest branch's Fenbridge infiltrator and its three
+    // regional freight caravans (Eastbrook, Willowfen, Frostveil). The Hoard
+    // Healing Tide Totem is the 255th live target portrait; the Buried Hoard
+    // mechanics add six attackable bodies (brood egg and hatchling, bound pulsar,
+    // Maw tentacle, silk and brood cocoons). 263: the Coinsack Scurrier, the
+    // goblin that sometimes runs through a hoard with a sack of gold. 266: the
+    // Mother of Mushrooms, the first cave boss, with her sporeling and her
+    // Bloated Cap. 270: the other three cave bosses (Deeprake, the Colossal Bat,
+    // the Voracious Chest) and the bat's swarm.
+    expect(liveIds).toHaveLength(270);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

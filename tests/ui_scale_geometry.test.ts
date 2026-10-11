@@ -14,9 +14,17 @@ describe('live UI Scale geometry refresh', () => {
   // same fan-out rather than an explicit line.
   it('reapplies chat and every registered frame through the live Hud seam', () => {
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-    expect(hud).toMatch(
-      /reapplySavedGeometry\(\): void {\s*this\.chatGeometry\.reapply\(\);\s*this\.interfaceUnlock\.reapplyAll\(\);\s*}/,
-    );
+    const start = hud.indexOf('reapplySavedGeometry(replace = false): void {');
+    expect(start).toBeGreaterThan(-1);
+    const body = hud.slice(start, hud.indexOf('\n  }', start));
+    expect(body).toContain('applySavedFrameLayout(this.optionsHooks, replace, {');
+    for (const owner of [
+      'frames: this.interfaceUnlock',
+      'chat: this.chatGeometry',
+      'meters: this.meters',
+      'auras: this.targetAurasWindow',
+    ])
+      expect(body).toContain(owner);
   });
 
   it('routes the unit-frame reset fanout through the registry', () => {
@@ -39,7 +47,9 @@ describe('live UI Scale geometry refresh', () => {
       /\[\s*'playerFrame',\s*this\.playerFrameMover,[\s\S]*?'targetFrame',\s*this\.targetFrameMover,[\s\S]*?'partyFrames',\s*this\.partyFrameMover,/;
     expect(hud).toMatch(registration);
     // ... and that the list is actually handed to the coordinator.
-    expect(hud).toMatch(/this\.interfaceUnlock\.register\(\{\s*id,\s*mover,\s*isActive\s*\}\)/);
+    expect(hud).toMatch(
+      /this\.interfaceUnlock\.register\(\{\s*id,\s*mover,\s*isActive,\s*geometryActive: isActive\s*\}\)/,
+    );
   });
 
   it('refreshes saved geometry immediately after publishing the new CSS scale', () => {

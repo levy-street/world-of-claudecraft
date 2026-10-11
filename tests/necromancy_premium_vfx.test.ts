@@ -37,6 +37,7 @@ function fakeTextures(): AbilityVfxTextures {
     ember: texture(),
     rime: texture(),
     crack: texture(),
+    leapFracture: texture(),
     char: texture(),
     overlay: texture(),
   };
@@ -154,6 +155,7 @@ describe('Necromancy premium VFX', () => {
       0,
       1,
       expect.any(Number),
+      false,
     );
   });
 
@@ -256,6 +258,7 @@ describe('Necromancy premium VFX', () => {
       0,
       1,
       expect.any(Number),
+      false,
     );
     expect(SOUL_LANCE_VFX_SPEC).toMatchObject({
       p: 'shadow',
@@ -469,6 +472,7 @@ describe('Necromancy premium VFX', () => {
       0,
       1,
       expect.any(Number),
+      false,
     );
     expect(REAPING_COMMAND_VFX_SPEC).toMatchObject({ pw: 1.38, fin: 1 });
     expect(REAPING_COMMAND_VFX_FULL_SPEC).toMatchObject({

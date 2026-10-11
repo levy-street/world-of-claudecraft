@@ -24,6 +24,7 @@
 // Node, the browser, and the headless RL env.
 
 import { bagPools, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
+import { WISP_MAZE_QUEST_ID } from '../content/world_quest_wisp_maze';
 import { ITEMS, QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import { removePreferFungible } from '../items';
@@ -45,6 +46,7 @@ import {
   questObjectiveRequired,
   questTurnInNpcIds,
 } from '../types';
+import { leaveWispMaze } from '../world_quest_wisp_maze';
 import {
   applyProfessionQuestEffect,
   isIdentityTransitionQuest,
@@ -332,6 +334,11 @@ export function abandonQuest(ctx: SimContext, questId: string, pid?: number): vo
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta } = r;
+  // The maze's Leave button reuses the quest verb, retaining personal collection.
+  if (questId === WISP_MAZE_QUEST_ID) {
+    leaveWispMaze(ctx, meta, r.e);
+    return;
+  }
   if (!meta.questLog.has(questId)) return;
   stripRequiredItems(ctx, QUESTS[questId], meta);
   meta.questLog.delete(questId);

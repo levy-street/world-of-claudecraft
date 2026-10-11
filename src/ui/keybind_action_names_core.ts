@@ -8,7 +8,7 @@
 // (the caller's slotActionName, an ability or item name) and fall back to the
 // numbered slot label; slot 0 is always Attack.
 
-import { type TranslationKey, t } from './i18n';
+import { formatNumber, type TranslationKey, t } from './i18n';
 
 // Localized labels for the keybind category headers + action rows.
 export const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
@@ -19,6 +19,12 @@ export const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> =
   Pet: 'hudChrome.keybinds.categoryPet',
 };
 export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
+  setFocus1: 'hudChrome.focusTargets.assign',
+  setFocus2: 'hudChrome.focusTargets.assign',
+  setFocus3: 'hudChrome.focusTargets.assign',
+  targetFocus1: 'hudChrome.focusTargets.target',
+  targetFocus2: 'hudChrome.focusTargets.target',
+  targetFocus3: 'hudChrome.focusTargets.target',
   forward: 'hud.keybinds.actions.forward',
   back: 'hud.keybinds.actions.back',
   turnLeft: 'hud.keybinds.actions.turnLeft',
@@ -101,6 +107,10 @@ export function bindActionDisplayName(
   fallback: string | undefined,
   slotActionName: (slot: number) => string | null,
 ): string {
+  const focus = /^(set|target)Focus([1-3])$/.exec(actionId);
+  const focusKey = BIND_ACTION_LABEL_KEYS[actionId];
+  if (focus && focusKey)
+    return t(focusKey, { slot: formatNumber(Number(focus[2]), { maximumFractionDigits: 0 }) });
   if (!actionId.startsWith('slot')) {
     const key = BIND_ACTION_LABEL_KEYS[actionId];
     return key ? t(key) : (fallback ?? actionId);

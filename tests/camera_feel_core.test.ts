@@ -6,8 +6,16 @@ import {
   resolveCameraFov,
   stepCameraFeel,
   stepLandingDetector,
+  underwaterCameraCeiling,
 } from '../src/render/camera_feel_core';
 import { RUN_SPEED } from '../src/sim/types';
+
+it('keeps the submerged chase eye under water, with no ceiling on dry or non-finite water', () => {
+  expect(underwaterCameraCeiling(true, 4)).toBe(3.5);
+  expect(underwaterCameraCeiling(false, 4)).toBe(Infinity);
+  expect(underwaterCameraCeiling(true, Number.NaN)).toBe(Infinity);
+  expect(underwaterCameraCeiling(true, -Infinity)).toBe(Infinity);
+});
 
 describe('FOV kicks', () => {
   it('gives no speed kick at base run speed, near-max at travel-form speed', () => {

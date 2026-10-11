@@ -13,10 +13,16 @@
 
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { foliageGhostPrewarmDraws } from '../src/render/foliage_ghost_prewarm';
 import { foliageProgramKey } from '../src/render/foliage_prewarm_twins_core';
 import { InstancedOccluderGhosts } from '../src/render/instanced_occluder_ghosts';
+import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
+
+// The stand-in and its twin belong to the blended style; a Node env resolves a
+// tier whose default is the dithered one.
+beforeEach(() => setDitherFadeEnabledForTest(false));
+afterEach(() => setDitherFadeEnabledForTest(null));
 
 /** A bucket-shaped source: instanced, tinted, with the foliage attribute set
  *  and a hook stack whose composed cache key the ghost clone drops. */
@@ -48,6 +54,11 @@ function liveGhostMaterial(source: THREE.InstancedMesh): THREE.Material {
 }
 
 describe('foliage ghost prewarm twins', () => {
+  it('stages nothing on the dithered style, which draws no stand-in', () => {
+    setDitherFadeEnabledForTest(true);
+    expect(foliageGhostPrewarmDraws([bucketMesh('Bark_NormalTree')])).toEqual([]);
+  });
+
   it('builds the twin on the LIVE ghost material recipe, not a reproduction', () => {
     const source = bucketMesh('Bark_NormalTree');
     const live = liveGhostMaterial(source) as THREE.MeshStandardMaterial;

@@ -217,9 +217,19 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
     // here and never pasted from prose: a second row landing in the band reds
     // this arm instead of leaving the amendment quietly false.
     const jewelry = pool((d) => d.kind === 'armor' && (d.slot === 'neck' || d.slot === 'ring'));
-    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(34);
+    // 34 to 40 and 24 to 30 at the wq-reputation merge: the six faction
+    // quartermaster necks and rings (content/faction_vendors.ts) all sell above
+    // 600 and none sits inside the band, so the one-row amendment holds.
+    // 40 to 47 and 30 to 37 at the faction ladder rework: thirteen faction
+    // jewels now (a neck and a ring per lower tier, the Champion gap jewels),
+    // every one selling above 600 and none inside the band, same amendment.
+    // 47 to 62 and 37 to 52 at the 2026-09-28 release/v0.44.0 merge into
+    // feature/buried-hoards: the fifteen Buried Hoard jewels (content/hoard_loot.ts,
+    // five neck and ring bases at the rare, epic and legendary tiers) all sell
+    // above 600 (4950, 11000, 15400) and none sits inside the band, same amendment.
+    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(62);
     expect(jewelry.filter((d) => d.sellValue === 0).length, 'honor pieces at 0').toBe(9);
-    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(24);
+    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(52);
     // Exactly one row sits here, and the amended record names it.
     expect(
       jewelry.filter((d) => inBand(d, 25, 460)).map((d) => d.id),

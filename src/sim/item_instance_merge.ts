@@ -56,12 +56,35 @@ export function itemInstancePayloadsEqual(
  *  counted stack shares ONE payload object, so charge-bearing payloads stay
  *  one-per-slot as a structural safety (no shipped stackable item carries
  *  charges today; this is a forward guard). A locked copy (issue 3042,
- *  item_lock.ts isItemLocked) stays one-per-slot for a different reason: the
- *  player locked exactly ONE unit, and merging it into a plain or
- *  differently-locked stack would silently taint or launder that choice. An
- *  absent payload is trivially mergeable. */
+ *  item_lock.ts setItemLocked) never tops up an EXISTING slot for a
+ *  different reason: locking is one flag over the WHOLE counted stack
+ *  (setItemLocked mutates the selected slot in place, no split), and
+ *  merging it into a plain or differently-locked stack would silently taint
+ *  or launder which lock (or which provenance) a unit came from. An absent
+ *  payload is trivially mergeable.
+ *
+ *  This is the TOP-UP question ("may this payload share an EXISTING slot"),
+ *  answered separately from `isChargeBearingPayload`'s FRESH-SLOT SIZING
+ *  question ("how many units may one NEWLY CREATED slot hold"): conflating
+ *  the two split a whole locked material stack into one row per unit on
+ *  every deposit into a new container (vault/bank/guild bank), since a
+ *  locked payload answers no to THIS question but should still answer no
+ *  (not charge-bearing) to that one. */
 export function isMergeableInstancePayload(p: ItemInstancePayload | undefined): boolean {
   return p?.charges === undefined && p?.locked !== true;
+}
+
+/** True when the payload carries `charges`: the one payload field with
+ *  mutate-in-place per-unit semantics (see `isMergeableInstancePayload`), so
+ *  distinct units genuinely cannot share a slot. This is the FRESH-SLOT
+ *  SIZING answer every packing core (`bags.ts` countFit/addStacked,
+ *  `material_stack_packing.ts`) uses to decide how many units one newly
+ *  created slot may absorb: only a charge-bearing payload forces one unit
+ *  per slot. A locked-but-uncharged payload packs a fresh slot up to the
+ *  item's normal stack cap, exactly like an unlocked stack, matching the
+ *  load-path cap `bags.ts` `instancedCountCap` already grants it. */
+export function isChargeBearingPayload(p: ItemInstancePayload | undefined): boolean {
+  return p?.charges !== undefined;
 }
 
 /** The single merge predicate every stacking site consumes: both payloads

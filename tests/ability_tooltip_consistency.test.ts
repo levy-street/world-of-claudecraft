@@ -54,6 +54,10 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Bruin Rush also cites its Pin rider (combat/druid_engines.ts: the 3 sec
   // window, the 50% slow, the 4 sec Pin), engine constants like the 9 and 1.
   bear_charge: [9, 1, 3, 50, 4],
+  // Slinkstrike cites the Old Blood cap it banks toward. That 3 is
+  // OLD_BLOOD_STAGES (combat/druid_engines.ts), an engine constant the bank
+  // site enforces, not a field on the stun effect that could drift by rank.
+  pounce: [3],
   // "30% more threat": the stance threat multiplier inside threatModifier.
   // Bear form's "armor +110%" and "maximum health +30%" are the
   // recalcPlayerStats multipliers (2.1 and 1.3, the v0.38 tank-parity pass)
@@ -125,7 +129,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Thundercall and Stonebound values live in their spec runtime modules.
   lightning_bolt: [1, 5],
   rockbiter_weapon: [3, 10, 15, 20, 40],
-  earth_shock: [3, 5, 125],
+  earth_shock: [3, 5, 25, 125],
   // Spiritmend deposits are calculated after the direct heal resolves.
   healing_wave: [12, 30, 50],
   // Unleash Weapon dispatches to four spec enchant implementations. Their

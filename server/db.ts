@@ -78,6 +78,7 @@ import {
 } from './community_test_accounts';
 import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
+import { CRAFT_ROLL_EVENTS_SCHEMA } from './craft_roll_events_db';
 import { cancelDetachedBackend } from './db_backend_cancel';
 import { dbConnectionBudgetWarning } from './db_connection_budget';
 import type { RankedDeedsAccount } from './deeds_board';
@@ -99,6 +100,7 @@ import {
   confirmBakedCustodyRefs,
   deleteBakedCustodyRefsIn,
   MAIL_CUSTODY_PARCELS_SCHEMA,
+  MAIL_PARTITION_CUSTODY_BAKE,
   snapshotPendingCustodyRefs,
 } from './mail_custody_overlay';
 import {
@@ -149,9 +151,11 @@ import {
 import { SUSPICION_FLAGS_SCHEMA } from './suspicion_flags_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
+import { VAULT_REWARDS_SCHEMA } from './vault_rewards_db';
 import { bustWocAuthGuardAccount, bustWocAuthGuardToken } from './woc_auth_guard_cache';
 import { WOC_MARKET_SCHEMA } from './woc_market_db';
 import { bustWocMarketActivity } from './woc_market_read_cache';
+import { WORLD_QUEST_SCORES_SCHEMA } from './world_quest_scores_db';
 
 export type { BankLedgerSaveEffects } from './bank_ledger_save_effects_db';
 export { GUILD_BANK_ROW_MAX_BYTES } from './guild_bank_receipt_db';
@@ -1282,6 +1286,10 @@ export async function ensureSchema(): Promise<void> {
     // FK-references accounts(id) and characters(id), so they run after SCHEMA.
     // Applied unconditionally (idempotent), like the other schema modules.
     await client.query(PROGRESS_EVENTS_SCHEMA);
+    await client.query(WORLD_QUEST_SCORES_SCHEMA);
+    // The chance-based crafting outcome audit (craft_roll_events). Same FK
+    // shape as the progress logs, so it runs after SCHEMA; idempotent.
+    await client.query(CRAFT_ROLL_EVENTS_SCHEMA);
     // First-touch signup attribution (one row per account, written at
     // registration). FK-references accounts(id), so it runs after SCHEMA.
     await client.query(ACCOUNT_ATTRIBUTION_SCHEMA);
@@ -1346,6 +1354,7 @@ export async function ensureSchema(): Promise<void> {
     // bakes it. No FK on purpose: rows must survive character deletion long
     // enough for an operator to attribute them.
     await client.query(MAIL_CUSTODY_PARCELS_SCHEMA);
+    await client.query(VAULT_REWARDS_SCHEMA);
     // Map editor tables: saved/forked custom maps and uploaded GLB assets.
     // Both FK-reference accounts(id), so they run after SCHEMA. Applied
     // unconditionally (idempotent), like the other schema modules.
@@ -1455,7 +1464,6 @@ export async function ensureSchema(): Promise<void> {
     await client.end().catch(() => {});
   }
 }
-
 /**
  * The post-commit CONCURRENTLY index builds. Split out of ensureSchema and run
  * AFTER the realm is listening (server/main.ts), which is a deliberate change
@@ -1539,7 +1547,6 @@ export async function runConcurrentIndexMigrations(): Promise<void> {
     await client.end().catch(() => {});
   }
 }
-
 export interface AccountRow {
   id: number;
   username: string;
@@ -2410,6 +2417,18 @@ export async function exportAccountData(
        FROM ftue_events WHERE account_id = $1 ORDER BY occurred_at`,
     [accountId],
   );
+  // The raw `roll` is deliberately NOT exported: the world rng is mulberry32
+  // (src/sim/rng.ts), whose 32-bit state is recoverable from one exact
+  // output, so handing a player their own draws at full precision would be
+  // an rng oracle (the account_export_state.ts farm-plot roll strip is the
+  // same rule). The verdict, the chance and the rank walked are the player's
+  // record; the draw itself is the operator's evidence.
+  const craftRollEvents = await pool.query(
+    `SELECT character_id, kind, recipe_id, item_id, chance, success,
+            rank_before, rank_after, rolled_at
+       FROM craft_roll_events WHERE account_id = $1 ORDER BY rolled_at, id`,
+    [accountId],
+  );
   return {
     exportedAt: new Date().toISOString(),
     account: {
@@ -2425,6 +2444,7 @@ export async function exportAccountData(
     signupAttribution: attribution,
     levelUpEvents: levelUpEvents.rows,
     ftueEvents: ftueEvents.rows,
+    craftRollEvents: craftRollEvents.rows,
     characters: characters.map((c) => ({
       id: c.id,
       name: c.name,
@@ -3341,7 +3361,7 @@ export async function saveCharacterAndMarketState(
   characterId: number,
   level: number,
   state: CharacterState,
-  market: MarketSave,
+  market: MarketSave | null,
   mailPartitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
   leaseNonce?: string,
   // Optional guild-book escrow halves dirtied by this session.
@@ -3351,22 +3371,23 @@ export async function saveCharacterAndMarketState(
   storageEffects: readonly StorageAppliedEffect[] = [],
   ledgerEffects?: BankLedgerSaveEffects,
   signal?: AbortSignal,
+  capturedCustodyRefs?: readonly string[],
 ): Promise<boolean> {
-  // Custody overlay bake, the saveMailState contract adjusted for partitioned
-  // mail: snapshot at entry before anything awaits, then delete only on the
-  // committed arm below when this transaction actually persisted mail
-  // partitions. The fence-refused false arm and every rollback keep the rows.
-  const bakedCustodyRefs = snapshotPendingCustodyRefs();
+  // Only the recipient partitions carried by this save may bake their refs.
+  // A fence refusal or rollback keeps those refs pending for a later write.
+  const bakedCustodyRefs =
+    capturedCustodyRefs ??
+    snapshotPendingCustodyRefs(mailPartitions.map((partition) => partition.recipientKey));
   const ledger = prepareCharacterSaveEffects(
     characterId,
     storageEffects,
     ledgerEffects,
     guildBanks?.map((book) => book.guildId),
   );
-  // Gate the escrow flush on the boot backfill just like saveMarketState:
-  // this writes the realm-market row, so it must not run before ensureSchema
-  // has confirmed the marker and opened the gate. Checked before any pool work.
-  assertMarketWriteGateOpen();
+  // Market escrow needs its boot gate; a vault-mail take passes null and
+  // atomically saves only the character, recipient partition and dirty books.
+  // Never serialize or rewrite the global Market for that local mail action.
+  if (market) assertMarketWriteGateOpen();
   const guildReplay = prepareGuildBankReceiptReplay(guildBanks ?? [], ledger?.batches ?? []);
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
@@ -3396,7 +3417,7 @@ export async function saveCharacterAndMarketState(
     // Same realm-scoped key loadMarketState/saveMarketState use: the leave
     // flush must land where the market is read back, or the escrowed listing
     // is written to a key nothing loads and the item is stranded on next boot.
-    await upsertWorldStateRowIn(inTx, marketStateKey(REALM), market);
+    if (market) await upsertWorldStateRowIn(inTx, marketStateKey(REALM), market);
     const wroteMailPartitions = mailPartitions.length > 0;
     if (wroteMailPartitions) {
       // Same writeMailPartitions shape as saveMailPartitions (the periodic
@@ -3412,13 +3433,9 @@ export async function saveCharacterAndMarketState(
     // the character, market, mail, and book halves together.
     await writeClaimedGuildBankEffectsOnClient(transaction, guildReplay, ledgerWrite, results);
     await writeStorageAppliedEffectsOnClient(transaction, storageEffects);
-    // The custody bake and the watermark advance ride the same fenced
-    // transaction as the mail partition write (see saveMailState), so they land
-    // after every other effect and immediately before COMMIT.
-    if (wroteMailPartitions) {
-      await deleteBakedCustodyRefsIn(inTx, bakedCustodyRefs);
-      await advanceCustodyWatermarkIn(inTx);
-    }
+    // A partial mailbox write cannot advance the realm-wide watermark: an
+    // older parcel for another recipient may not be durable yet.
+    if (wroteMailPartitions) await deleteBakedCustodyRefsIn(inTx, bakedCustodyRefs);
     await transaction.commit();
     if (wroteMailPartitions) confirmBakedCustodyRefs(bakedCustodyRefs);
     return true;
@@ -4241,7 +4258,7 @@ export async function saveMailPartitions(
 ): Promise<void> {
   if (partitions.length === 0) return;
   assertMailPartitionWriteGateOpen();
-  await writeMailPartitionsInTransaction(pool, REALM, partitions);
+  await writeMailPartitionsInTransaction(pool, REALM, partitions, MAIL_PARTITION_CUSTODY_BAKE);
 }
 
 // Shared Rift event history/scheduler, realm-scoped. Runtime group instances are

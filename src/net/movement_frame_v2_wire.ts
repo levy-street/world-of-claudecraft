@@ -12,6 +12,16 @@ export interface MovementFrameSocket {
   send(payload: string): void;
 }
 
+/** Optional analog movement channels shared by both input send paths. */
+export function encodeAnalogMoveInput(mi: MoveInput): Record<string, number> {
+  const fields: Record<string, number> = {};
+  // Swim camera steer is sparse: absent means full rate and preserves the
+  // legacy land-frame wire shape.
+  if (mi.swimSteer !== undefined && mi.swimSteer !== 1) fields.ss = mi.swimSteer;
+  if (mi.gliderPitch !== undefined) fields.gp = mi.gliderPitch;
+  return fields;
+}
+
 // Six frames align with the server timeline, with two more for transport headroom.
 export const MOVEMENT_FRAME_V2_PENDING_CAP = 8;
 
@@ -123,9 +133,7 @@ export function sendMovementFrameV2(
       sf: mi.surface ? 1 : 0,
     },
   };
-  if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
-    (msg.mi as Record<string, number>).ss = mi.swimSteer;
-  }
+  Object.assign(msg.mi as object, encodeAnalogMoveInput(mi));
   if (facing !== null) msg.facing = facing;
   socket.send(JSON.stringify(msg));
   return true;

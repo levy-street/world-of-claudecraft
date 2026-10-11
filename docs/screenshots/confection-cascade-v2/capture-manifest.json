@@ -1,0 +1,60 @@
+{
+  "sourceCommit": "0abacf03af5d11862609b6476f3c78465560eb3b",
+  "method": "Current component/CSS mounted with authored level-one board; final-state fixtures allow direct outcome comparison. Neutral background, no 3D world. Actual accepted final-move behavior separately verified in outcomes-qa.json.",
+  "captures": [
+    {
+      "name": "confection-cascade",
+      "file": "/Users/demihenderson/.codex/visualizations/2026/09/06/01a0755a-4bc1-7141-94b0-39009ed6a4b8/confection-cascade-v2/confection-cascade.png",
+      "bounds": {
+        "x": 258,
+        "y": 23.5,
+        "height": 856.6875,
+        "width": 584
+      },
+      "state": {
+        "title": "Confection Cascade",
+        "cells": 36,
+        "tiles": 0,
+        "powered": 0,
+        "fonts": true,
+        "animations": 0
+      }
+    },
+    {
+      "name": "victory",
+      "file": "/Users/demihenderson/.codex/visualizations/2026/09/06/01a0755a-4bc1-7141-94b0-39009ed6a4b8/confection-cascade-v2/victory.png",
+      "bounds": {
+        "x": 258,
+        "y": 23.5,
+        "height": 856.6875,
+        "width": 584
+      },
+      "state": {
+        "title": "Confection Cascade",
+        "cells": 36,
+        "tiles": 0,
+        "powered": 0,
+        "fonts": true,
+        "animations": 0
+      }
+    },
+    {
+      "name": "defeat",
+      "file": "/Users/demihenderson/.codex/visualizations/2026/09/06/01a0755a-4bc1-7141-94b0-39009ed6a4b8/confection-cascade-v2/defeat.png",
+      "bounds": {
+        "x": 258,
+        "y": 23.5,
+        "height": 856.6875,
+        "width": 584
+      },
+      "state": {
+        "title": "Confection Cascade",
+        "cells": 36,
+        "tiles": 0,
+        "powered": 0,
+        "fonts": true,
+        "animations": 0
+      }
+    }
+  ]
+}

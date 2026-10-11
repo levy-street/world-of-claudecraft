@@ -8,9 +8,11 @@
 // working with no enemy present.
 import { describe, expect, it } from 'vitest';
 import {
+  CHRONOMANCY_ECHO_HEAL_POWER_DIVISOR,
   ECHO_CONVERT_AOE,
   ECHO_CONVERT_SINGLE,
   ECHO_ROTATION_CONVERSION_MULT,
+  echoHealPowerMultiplier,
   TEMPORAL_AEGIS_ID,
   TEMPORAL_AEGIS_NAME,
 } from '../src/sim/combat/chronomancy';
@@ -569,5 +571,48 @@ describe('Temporal Echo: overheal-to-shield (Temporal Aegis)', () => {
     const shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
     expect(shield).toBeDefined();
     expect(shield?.value).toBe(13);
+  });
+});
+
+describe('Temporal Echo: Healing Power scaling', () => {
+  it('echoHealPowerMultiplier returns 1 when bonus healing is zero or negative', () => {
+    const dummy = { spellPower: 100, healPower: 100 } as Entity;
+    expect(echoHealPowerMultiplier(dummy)).toBe(1);
+
+    const pureSp = { spellPower: 150, healPower: 100 } as Entity;
+    expect(echoHealPowerMultiplier(pureSp)).toBe(1);
+
+    const empty = {} as Entity;
+    expect(echoHealPowerMultiplier(empty)).toBe(1);
+  });
+
+  it('scales gently based on bonus healing over spell power (divisor 1200)', () => {
+    expect(CHRONOMANCY_ECHO_HEAL_POWER_DIVISOR).toBe(1200);
+
+    // 120 bonus healing power -> 1 + 120 / 1200 = 1.10x (10% boost to conversion)
+    const plus120 = { spellPower: 50, healPower: 170 } as Entity;
+    expect(echoHealPowerMultiplier(plus120)).toBeCloseTo(1.1, 6);
+
+    // 300 bonus healing power -> 1 + 300 / 1200 = 1.25x (25% boost to conversion)
+    const plus300 = { spellPower: 0, healPower: 300 } as Entity;
+    expect(echoHealPowerMultiplier(plus300)).toBeCloseTo(1.25, 6);
+  });
+
+  it('amplifies echo conversion heals in live sim damage conversion', () => {
+    const { sim, p } = chronoMage();
+    const ally = addAlly(sim, 'CuradoHp');
+    const mob = addHostile(sim);
+    markEcho(sim, ally);
+
+    ally.hp = ally.maxHp - 500;
+    const hp0 = ally.hp;
+
+    // Give the mage +240 bonus healing power (1.20x multiplier)
+    p.spellPower = 0;
+    p.healPower = 240;
+
+    // 100 Arcane damage -> 40 base heal * 1.20 multiplier = 48 heal
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
+    expect(ally.hp - hp0).toBe(48);
   });
 });

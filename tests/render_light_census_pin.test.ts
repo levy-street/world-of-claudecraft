@@ -6,11 +6,10 @@
 // scene's light census (numDirLights, numHemiLights, numSpotLights,
 // numRectAreaLights, numPointLights), so adding, removing, or hiding one of
 // them relinks every lit material in view, measured at 100 to 200 ms per
-// relink. Point lights already answer to a budget that keeps their count
-// pinned (pointLightPadCount pads the census back up, see
-// tests/point_light_budget.test.ts), so THEY have a scheduler; these four have
-// no pad, and the only safe number of them is the number the renderer's
-// constructor built.
+// relink. Point lights already reach three through a fixed set of carriers
+// that keeps their count pinned (see tests/point_light_carriers.test.ts), so
+// THEY have a scheduler; these four have none, and the only safe number of
+// them is the number the renderer's constructor built.
 //
 // The pin is a source scan because there is no unit seam a light producer must
 // pass through: a builder can write `new THREE.DirectionalLight(...)` anywhere
@@ -287,7 +286,7 @@ describe('the src/render light census', () => {
       'RectAreaLight',
       'SpotLight',
     ]);
-    // A point light is out of scope here: it has a pad budget of its own.
+    // A point light is out of scope here: the carriers pin its count.
     expect(censusHits('const p = new THREE.PointLight(0xffffff, 5, 10, 2);')).toEqual([]);
     // A CLONE is a producer too, whatever the receiver is called.
     expect(censusHits('const extra = sunLight.clone();')).toEqual(['clone']);

@@ -19,6 +19,7 @@ import {
   varkhulWorldfireStage,
 } from '../sim/varkhul_worldfire';
 import { formatDuration, getI18nRevision } from '../ui/i18n';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
 
 const WORLDFIRE_FLAMES = 168;
@@ -91,7 +92,7 @@ function buildCountdown(): {
   );
   sprite.name = 'varkhul-worldfire-countdown';
   sprite.scale.set(7.2, 2.52, 1);
-  sprite.renderOrder = 21;
+  sprite.renderOrder = floorVfxRenderOrder('encounter', 20);
   sprite.userData.actionable = true;
   return { sprite, canvas, texture };
 }
@@ -155,7 +156,7 @@ function createVisual(bossId: number): WorldfireVisual {
   );
   boundaryRing.name = 'varkhul-worldfire-safe-edge';
   boundaryRing.position.y = 0.07;
-  boundaryRing.renderOrder = 14;
+  boundaryRing.renderOrder = floorVfxRenderOrder('encounter', 13);
   root.add(boundaryRing);
 
   const countdown = buildCountdown();

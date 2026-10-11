@@ -460,6 +460,86 @@ describe('Ruincaller 2pc: Conflagrate holds 3 charges', () => {
     expect(sim.player.abilityCharges?.conflagrate?.maxCharges).toBe(3);
     expect(sim.player.abilityCharges?.conflagrate?.charges).toBe(2);
   });
+
+  it('an unequip on an empty pool keeps one recharge timer per missing charge', () => {
+    const sim = liveWarlock(521, 'destruction');
+    equipSet(sim, 'ruincaller', 2);
+    const target = addHostileTarget(sim);
+    sim.targetEntity(target.id);
+    for (let use = 0; use < 3; use++) {
+      ensurePact(sim, target);
+      sim.player.gcdRemaining = 0;
+      sim.player.resource = sim.player.maxResource;
+      sim.castAbility('conflagrate');
+      for (let tick = 0; tick < 10; tick++) sim.tick();
+    }
+    const spent = sim.player.abilityCharges?.conflagrate;
+    expect(spent?.charges).toBe(0);
+    expect(spent?.recharges).toHaveLength(3);
+    const soonest = [...(spent?.recharges ?? [])].slice(0, 2);
+    sim.unequipItem('helmet'); // the cap drops 3 -> 2 with every use spent
+    const pool = sim.player.abilityCharges?.conflagrate;
+    expect(pool?.maxCharges).toBe(2);
+    expect(pool?.charges).toBe(0);
+    // A third timer would pay out a charge the clamped pool no longer owes
+    // (early, on top of the next spend's own timer). The two oldest spends
+    // keep their schedule.
+    expect(pool?.recharges).toEqual(soonest);
+    expect(pool?.recharge).toBe(soonest[0]);
+  });
+
+  it('an unequip keeps no timer on a full pool and one per missing charge otherwise', () => {
+    const conflagratePool = (charges: number, recharges: number[]) => {
+      const sim = liveWarlock(522, 'destruction');
+      equipSet(sim, 'ruincaller', 2);
+      // Extra timers beside the missing charges: the shape a pre-fix reset
+      // could leave (a live pool, or one restored from such a save).
+      sim.player.abilityCharges = {
+        conflagrate: {
+          charges,
+          maxCharges: 3,
+          recharge: recharges[0],
+          rechargeLength: 18,
+          recharges,
+        },
+      };
+      sim.unequipItem('helmet'); // the cap drops 3 -> 2
+      return sim.player.abilityCharges?.conflagrate;
+    };
+    const full = conflagratePool(3, [5, 9]);
+    expect(full?.charges).toBe(2);
+    expect(full?.recharges ?? []).toEqual([]);
+    const partial = conflagratePool(2, [4, 8, 12]);
+    expect(partial?.charges).toBe(1);
+    expect(partial?.recharges).toEqual([4]);
+  });
+
+  it('an unequip that empties the pool blocks a cast before the next tick', () => {
+    const sim = liveWarlock(523, 'destruction');
+    equipSet(sim, 'ruincaller', 2);
+    const target = addHostileTarget(sim);
+    sim.targetEntity(target.id);
+    for (let use = 0; use < 2; use++) {
+      ensurePact(sim, target);
+      sim.player.gcdRemaining = 0;
+      sim.player.resource = sim.player.maxResource;
+      sim.castAbility('conflagrate');
+      for (let tick = 0; tick < 10; tick++) sim.tick();
+    }
+    expect(sim.player.abilityCharges?.conflagrate?.charges).toBe(1);
+    sim.unequipItem('helmet'); // cap 3 -> 2 with 2 spent: the pool is now empty
+    const pool = sim.player.abilityCharges?.conflagrate;
+    expect(pool?.charges).toBe(0);
+    expect(sim.player.cooldowns.get('conflagrate')).toBe(pool?.recharge);
+    // Same command batch, no tick between: the empty pool refuses the cast and
+    // no third timer lands on the 2-charge pool.
+    ensurePact(sim, target);
+    sim.player.gcdRemaining = 0;
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('conflagrate');
+    expect(sim.player.resource).toBe(sim.player.maxResource);
+    expect(pool?.recharges).toHaveLength(2);
+  });
 });
 
 describe('Ruincaller 4pc: Ruinbolt strikes 20 percent harder, delivered', () => {

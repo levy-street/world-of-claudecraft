@@ -378,7 +378,9 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
       const guildId = await makeGuild();
       await grantLease(charId, 'nonce-leave');
       const market = { listings: [] } as never;
-      const mail = { mail: [] } as never;
+      // The save's mail argument is the recipient-partition array (no partitions
+      // here), not a MailSave object: the save maps it to snapshot custody refs.
+      const mail: { recipientKey: string; letters: never[] }[] = [];
 
       expect(
         await db.saveCharacterAndMarketState(

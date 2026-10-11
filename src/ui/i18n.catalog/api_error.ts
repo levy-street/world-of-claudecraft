@@ -187,6 +187,10 @@ export const apiErrorStrings = {
     invalid_roster_name: 'Invalid guild name.',
     unknown: 'No guild by that name.',
   },
+  // The public world-quest scoreboard read (server/world_quest_leaderboard.ts).
+  world_quests: {
+    unknown_board: 'No scoreboard by that name.',
+  },
   // steam: the env-gated Steam link family (server/steam/). Linking mirrors
   // deed unlocks to Steam achievements; it is never a sign-in method.
   steam: {

@@ -6,6 +6,7 @@
 // on a ClientWorld-mirrored entity used to read NaN). These close over no
 // Hud state, so a Vitest imports them directly.
 
+import type { DruidCombatForm } from '../sim/combat/form_requirement';
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityDef, Entity, ResourceType } from '../sim/types';
 import { formatAbilityNumber } from './ability_description';
@@ -29,10 +30,19 @@ const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
   focus: 'abilityUi.resources.focus',
 };
 
-const FORM_LABEL_KEYS: Record<'bear' | 'cat', TranslationKey> = {
+const FORM_LABEL_KEYS: Record<DruidCombatForm, TranslationKey> = {
   bear: 'abilityUi.forms.bear',
   cat: 'abilityUi.forms.cat',
 };
+
+/** The one label for a requirement naming several forms. Only Bruin-and-Cat
+ *  exists today, so the phrase is a key rather than a runtime list join: an
+ *  "or" list is not word-order or separator portable across locales. */
+const MULTI_FORM_LABEL_KEY: TranslationKey = 'abilityUi.forms.bearOrCat';
+
+function formLabel(forms: readonly DruidCombatForm[]): string {
+  return t(forms.length === 1 ? FORM_LABEL_KEYS[forms[0]] : MULTI_FORM_LABEL_KEY);
+}
 
 export function resourceDisplayName(resourceType: ResourceType | null): string {
   return t(RESOURCE_LABEL_KEYS[resourceType ?? 'mana']);
@@ -129,8 +139,8 @@ export function abilityRequirementLines(
   return abilityRequirementKeys(def, spec, resolved).map((req) => {
     switch (req.key) {
       case 'requiresForm':
-        if (req.form) {
-          return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form]) });
+        if (req.forms && req.forms.length > 0) {
+          return t('abilityUi.tooltip.requiresForm', { form: formLabel(req.forms) });
         }
         return t('abilityUi.tooltip.selfOnly');
       case 'requiresStealth':

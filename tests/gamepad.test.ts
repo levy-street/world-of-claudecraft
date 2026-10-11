@@ -76,6 +76,44 @@ function gamepadWithPressed(...pressed: number[]): Gamepad {
 }
 
 describe('GamepadManager', () => {
+  it('temporary cloak actions preserve walking and camera while consuming cross-hotbar presses', () => {
+    let pad = gamepadWithPressed();
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+    const input = {
+      applyGamepadLook: vi.fn(),
+      setGamepadLookActive: vi.fn(),
+      setGamepadMove: vi.fn(),
+      triggerGamepadJump: vi.fn(),
+    } as unknown as Input;
+    const onTemporaryBarSlot = vi.fn();
+    const callbacks = {
+      onAction: vi.fn(),
+      onInputEdge: vi.fn(),
+      isPointerMode: () => false,
+      isTemporaryBarActive: () => true,
+      onTemporaryBarSlot,
+    } satisfies GamepadCallbacks;
+    const manager = new GamepadManager(input, new GamepadBindings(), callbacks);
+    (manager as unknown as { index: number }).index = 0;
+    manager.poll(1 / 60);
+    pad = { ...gamepadWithPressed(GP.X, GP.LT), axes: [0, -1, 0.8, 0] } as Gamepad;
+    manager.poll(1 / 60);
+    expect(onTemporaryBarSlot).toHaveBeenCalledWith(0);
+    expect(input.setGamepadMove).toHaveBeenLastCalledWith(
+      expect.objectContaining({ forward: true }),
+    );
+    expect(input.setGamepadLookActive).toHaveBeenLastCalledWith(true);
+    expect(callbacks.onAction).not.toHaveBeenCalled();
+    manager.poll(1 / 60);
+    expect(onTemporaryBarSlot).toHaveBeenCalledTimes(1);
+    pad = gamepadWithPressed(GP.Y);
+    manager.poll(1 / 60);
+    expect(onTemporaryBarSlot).toHaveBeenLastCalledWith(1);
+  });
+
   it('reports each button rising edge once for the APM meter', () => {
     let pad = gamepadWithPressed();
     Object.defineProperty(globalThis, 'navigator', {

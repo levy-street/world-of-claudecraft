@@ -5,6 +5,7 @@
 
 import { ABILITIES } from '../sim/data';
 import {
+  ALLIED_HEARTHSTONE_CAST_ID,
   CORPSE_HARVEST_CAST_ID,
   CRAFT_CAST_ID,
   DISENCHANT_CAST_ID,
@@ -15,7 +16,7 @@ import {
   SUNDER_CAST_ID,
   TOOL_RECHARGE_CAST_ID,
 } from '../sim/types';
-import { abilityDisplayName } from './ability_display_name';
+import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { type TranslationKey, t } from './i18n';
 
 // Rift boss one-shot mechanic cast IDs: keyed by their authored mechanic name.
@@ -38,6 +39,35 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.rift_storm_strike': true,
   'abilityUi.cast.rift_tide_execution': true,
   'abilityUi.cast.rift_tide_strike': true,
+  // Buried Hoard control casts (src/sim/rift/hoard_control_casts.ts).
+  'abilityUi.cast.hoard_cast_fear': true,
+  'abilityUi.cast.hoard_cast_stun': true,
+  'abilityUi.cast.hoard_cast_drowning_hook': true,
+  'abilityUi.cast.hoard_cast_rime_beam': true,
+  'abilityUi.cast.hoard_cast_cinder_bolt': true,
+  'abilityUi.cast.hoard_cast_void_empower': true,
+  'abilityUi.cast.hoard_cast_webbing': true,
+  'abilityUi.cast.hoard_cast_doom_ritual': true,
+  'abilityUi.cast.hoard_cast_charge': true,
+  'abilityUi.cast.hoard_cast_silk_snare': true,
+  'abilityUi.cast.hoard_cast_silence': true,
+  'abilityUi.cast.hoard_cast_hex': true,
+  'abilityUi.cast.hoard_lightning_strike': true,
+  'abilityUi.cast.hoard_ice_age': true,
+  'abilityUi.cast.hoard_pulsar_overload': true,
+  'abilityUi.cast.hoard_rolling_boulder': true,
+  'abilityUi.cast.hoard_goblin_escape': true,
+  'abilityUi.cast.hoard_cast_mole_rake': true,
+  'abilityUi.cast.hoard_cast_burrow': true,
+  'abilityUi.cast.hoard_cast_tunnel': true,
+  'abilityUi.cast.hoard_cast_emerge': true,
+  'abilityUi.cast.hoard_cast_collapse': true,
+  'abilityUi.cast.hoard_cast_bat_dive_aim': true,
+  'abilityUi.cast.hoard_cast_bat_dive': true,
+  'abilityUi.cast.hoard_cast_screech': true,
+  'abilityUi.cast.hoard_cast_mimic_bite': true,
+  'abilityUi.cast.hoard_cast_mimic_leap': true,
+  'abilityUi.cast.hoard_cast_coin_spit': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
@@ -55,10 +85,21 @@ export const castDisplayName = (id: string): string => {
   // pre-extraction resolver order (between SALVAGE and TOOL_RECHARGE).
   if (id === SUNDER_CAST_ID) return t('abilityUi.cast.sundering');
   if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
+  if (id === ALLIED_HEARTHSTONE_CAST_ID) return t('entities.items.allied_hearthstone.name');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
   const riftKey = `abilityUi.cast.${id}` as TranslationKey;
   if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
   const ability = ABILITIES[id];
   return ability ? abilityDisplayName(ability) : id;
+};
+
+/** The TARGET cast bar's label. A mob's cast label is usually an authored
+ *  mechanic NAME (resolved by abilityDisplayNameFromSource), but the Buried
+ *  Hoard and rift boss wind-ups carry a cast ID (hoard_cast_mole_rake), which
+ *  must read as its localized name there too, never the raw id. */
+export const targetCastDisplayName = (label: string): string => {
+  const riftKey = `abilityUi.cast.${label}` as TranslationKey;
+  if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
+  return abilityDisplayNameFromSource(label);
 };

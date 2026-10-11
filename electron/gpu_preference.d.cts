@@ -74,6 +74,56 @@ export function mergeHighPerformancePreference(existingData: unknown): string;
 export function alreadyHighPerformance(regQueryStdout: unknown): boolean;
 export function hasUnparseableValueType(regQueryStdout: unknown): boolean;
 
+/** The frozen options bag every queryRegValue execFile call is given. */
+export const REG_QUERY_OPTIONS: Readonly<{
+  timeout: number;
+  windowsHide: boolean;
+  encoding: string;
+  maxBuffer: number;
+}>;
+
+/** The exact (key, valueName) pairs queryRegValue may read. Nothing else runs. */
+export const REG_QUERY_ALLOWLIST: readonly Readonly<{ key: string; valueName: string }>[];
+
+export function isAllowedRegRead(key: unknown, valueName: unknown): boolean;
+
+export const POWER_SCHEMES_KEY: string;
+export const GRAPHICS_DRIVERS_KEY: string;
+export const GAME_BAR_KEY: string;
+export const ACTIVE_POWER_SCHEME_VALUE: string;
+export const ACTIVE_OVERLAY_AC_VALUE: string;
+export const ACTIVE_OVERLAY_DC_VALUE: string;
+export const HW_SCH_MODE_VALUE: string;
+export const AUTO_GAME_MODE_VALUE: string;
+
+export type RegValueReading =
+  | { type: 'sz'; value: string }
+  | { type: 'dword'; value: number }
+  | { absent: true }
+  | null;
+
+export function parseRegQueryValue(
+  regQueryStdout: unknown,
+): { type: 'sz'; value: string } | { type: 'dword'; value: number } | null;
+
+export type RegExecFile = (
+  command: string,
+  args: string[],
+  options: unknown,
+  callback: (err: unknown, stdout: string, stderr?: string) => void,
+) => unknown;
+
+export interface QueryRegValueDeps {
+  execFile?: RegExecFile;
+  regExe?: string;
+  env?: Record<string, string | undefined>;
+}
+
+export function queryRegValue(
+  request: { key: string; valueName: string },
+  deps?: QueryRegValueDeps,
+): Promise<RegValueReading>;
+
 export interface GpuDeviceSummary {
   vendorId: string;
   deviceId: string;

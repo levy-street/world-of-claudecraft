@@ -2441,6 +2441,18 @@ describe('the cvault wire signature premise: stock writers are confined', () => 
     const sanctioned = readFileSync(join(root, 'materials_vault.ts'), 'utf8');
     expect(writes.some((pattern) => pattern.test(sanctioned))).toBe(true);
     expect(wholeRecordWrite.test(sanctioned)).toBe(true);
+    // Fields that are merely NAMED vault but are not the materials vault record,
+    // matched by their exact assignment (never by file): a Buried Hoard Rift
+    // instance's vault descriptor (RiftInstance.vault, src/sim/rift/runs.ts) and
+    // the server's hoard-vault service object (GameServer.vault, server/game.ts).
+    // Each is stripped before the patterns run, so any OTHER `.vault = ` in the
+    // same file still reds, and each must match exactly once so a stale entry
+    // reds too.
+    const notTheMaterialsVault = [
+      /\binst\.vault\s*=\s*vaultForPortal\(/g,
+      /\bthis\.vault\s*=\s*new VaultGameServices\(/g,
+    ];
+    const exemptionHits = notTheMaterialsVault.map(() => 0);
     const offenders: string[] = [];
     const walk = (dir: string): void => {
       for (const entry of readdirSync(dir)) {
@@ -2450,7 +2462,11 @@ describe('the cvault wire signature premise: stock writers are confined', () => 
           continue;
         }
         if (!entry.endsWith('.ts') || entry === 'materials_vault.ts') continue;
-        const src = readFileSync(full, 'utf8');
+        let src = readFileSync(full, 'utf8');
+        notTheMaterialsVault.forEach((exempt, i) => {
+          exemptionHits[i] += src.match(exempt)?.length ?? 0;
+          src = src.replace(exempt, '');
+        });
         // WRITES only: an indexed or whole-field assignment, a compound
         // assignment, an array mutator, a delete, or the whole-record
         // `meta.vault = ...` replacement. Plain reads (quest_item_presence's
@@ -2463,6 +2479,7 @@ describe('the cvault wire signature premise: stock writers are confined', () => 
     walk(root);
     const serverRoot = fileURLToPath(new URL('../server', import.meta.url));
     walk(serverRoot);
+    expect(exemptionHits).toEqual(notTheMaterialsVault.map(() => 1));
     expect(offenders).toEqual([]);
   });
 });

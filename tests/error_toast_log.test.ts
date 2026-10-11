@@ -68,8 +68,8 @@ describe('hud.ts showError: mirrors into the chat log', () => {
     expect(body).toContain('this.chatAnnouncer.push(localized, performance.now())');
   });
 
-  it('keeps the existing 1600ms toast fade timing unchanged', () => {
+  it('uses the shared error display with its default timing', () => {
     const body = showErrorBody();
-    expect(body).toContain('}, 1600);');
+    expect(body).toContain('this.errorToast.show(localized);');
   });
 });

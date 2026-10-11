@@ -376,6 +376,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
   let painter: PartyFramesPainter;
   let targeted: number[];
   let toggles: number;
+  let hovered: number | null;
 
   beforeEach(() => {
     container = fakeEl('div');
@@ -383,6 +384,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     calls = facet.calls;
     targeted = [];
     toggles = 0;
+    hovered = null;
     painter = new PartyFramesPainter(
       facet.writers,
       container as unknown as HTMLElement,
@@ -390,7 +392,9 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
         classCss: () => 'var(--cls)',
         onTarget: (pid) => targeted.push(pid),
         onContextMenu: () => {},
-        onHover: () => {},
+        onHover: (pid) => {
+          hovered = pid;
+        },
         onTargetPet: () => {},
         petLabel: (name: string, frac: number) => `${name} ${Math.round(frac * 100)}%`,
         chipLabel: () => 'Party',
@@ -494,6 +498,51 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(rowB.listeners.click).toHaveLength(1); // NOT re-attached
     rowB.fire('click', {});
     expect(targeted).toEqual([9]); // the live slot, not the stale Alice (pid 2)
+  });
+
+  it('clears hover when its row is detached, recycled, or the party is cleared', () => {
+    painter.sync([member({ pid: 2 })], 1, false);
+    rows()[0].fire('mouseenter', {});
+    expect(hovered).toBe(2);
+
+    // Removing a hovered DOM node need not dispatch mouseleave. Its old pid
+    // must not redirect the next heal, even if the entity still exists.
+    painter.sync([member({ pid: 3 })], 1, false);
+    expect(hovered).toBeNull();
+    rows()[0].fire('mouseenter', {});
+    expect(hovered).toBe(3);
+
+    painter.clear();
+    expect(hovered).toBeNull();
+  });
+
+  it('keeps the hovered member when a different row leaves', () => {
+    painter.sync([member({ pid: 2 }), member({ pid: 3 })], 1, false);
+    rows()[0].fire('mouseenter', {});
+    painter.sync([member({ pid: 2 })], 1, false);
+    expect(hovered).toBe(2);
+  });
+
+  it('clears hover when party frames are hidden by collapse or mobile chat', () => {
+    painter.sync([member({ pid: 2 })], 1, false);
+    const row = rows()[0];
+    row.fire('mouseenter', {});
+    painter.setCollapse(true, false, false, false);
+    expect(hovered).toBe(2);
+    painter.setCollapse(true, false, true, false);
+    expect(hovered).toBeNull();
+
+    row.fire('mouseenter', {});
+    painter.setCollapse(true, true, false, true);
+    expect(hovered).toBeNull();
+
+    // The mobile chat flag does not hide desktop frames when expanded.
+    row.fire('mouseenter', {});
+    painter.setCollapse(true, false, false, true);
+    expect(hovered).toBe(2);
+
+    painter.setCollapse(false, false, false, false);
+    expect(hovered).toBeNull();
   });
 
   it('paints each member aura strip (one icon per wire aura) and re-syncs it on a set change', () => {

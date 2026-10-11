@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_ENGINE,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxEngine,
+} from '../cast_vfx_family';
 
 // Vertical light pillars (the gallery's shaft/skybeam/pillars read): a tapered
 // additive column that rises, holds, and fades. Used by the pillars motif,
@@ -36,6 +42,8 @@ interface PillarSlot {
 }
 
 export class LightPillars {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private slots: PillarSlot[] = [];
   private next = 0;
   private readonly geometry: THREE.CylinderGeometry;
@@ -87,7 +95,7 @@ export class LightPillars {
     this.mesh.count = 0;
     this.mesh.visible = false;
     this.mesh.renderOrder = 6;
-    this.mesh.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(this.mesh);
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     // Refreshed from the packed instances each frame (see pack): three caches
     // an InstancedMesh's own sphere once and would never notice a column move.
@@ -120,7 +128,7 @@ export class LightPillars {
     colorHex: number,
     dur: number,
   ): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % PILLAR_SLOTS;
     slot.active = true;

@@ -22,12 +22,24 @@ const ALL_REASONS: HonorReason[] = [
   'battleground_complete',
   'battleground_kill',
   'battleground_assist',
+  'world_kill',
+  'world_assist',
+  'hill_hold',
 ];
 
 // The two the drip pays plus the once-a-day bonus (which lands in the same
 // instant as the ordinary win award and must say which float is which), and the
 // six that keep the plain float.
-const NAMED: HonorReason[] = ['battleground_kill', 'battleground_assist', 'battleground_first_win'];
+// The World PvP kill and assist (src/sim/pvp/world_pvp.ts) are the same fast
+// mid-fight drip and reuse the same two short labels.
+const NAMED: HonorReason[] = [
+  'battleground_kill',
+  'battleground_assist',
+  'battleground_first_win',
+  'world_kill',
+  'world_assist',
+  'hill_hold',
+];
 const PLAIN = ALL_REASONS.filter((r) => !NAMED.includes(r));
 
 afterEach(() => setLanguage('en'));

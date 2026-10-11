@@ -165,6 +165,42 @@ describe('npcs', () => {
 });
 
 describe('objects', () => {
+  it('round-trips optional authored transforms and bounds untrusted values', () => {
+    const doc = sanitizeMapDoc(
+      rawDoc({
+        objects: [
+          {
+            itemId: 'debris',
+            name: 'Debris',
+            positions: [
+              { x: 302.7, y: -6, z: 117.75, facing: (11 * Math.PI) / 6, scale: 6 },
+              { x: 2, y: 0, z: 3, facing: 0, scale: 1 },
+              { x: 4, z: 5 },
+              { x: 6, y: 1e8, z: 7, facing: 5 * Math.PI, scale: 1e8 },
+              {
+                x: 8,
+                y: Number.NaN,
+                z: 9,
+                facing: Number.POSITIVE_INFINITY,
+                scale: Number.NEGATIVE_INFINITY,
+              },
+              { x: 10, z: 11, scale: -1 },
+            ],
+          },
+        ],
+      }),
+    );
+    expect(doc?.content.objects[0].positions).toEqual([
+      { x: 302.7, y: -6, z: 117.75, facing: (11 * Math.PI) / 6, scale: 6 },
+      { x: 2, y: 0, z: 3, facing: 0, scale: 1 },
+      { x: 4, z: 5 },
+      { x: 6, y: MAX_WORLD_COORD, z: 7, facing: Math.PI, scale: 40 },
+      { x: 8, z: 9 },
+      { x: 10, z: 11, scale: 0.05 },
+    ]);
+    expect(sanitizeMapDoc(JSON.stringify(doc))?.content.objects).toEqual(doc?.content.objects);
+  });
+
   it('requires a string itemId and finite positions, and caps the position list', () => {
     const doc = sanitizeMapDoc(
       rawDoc({

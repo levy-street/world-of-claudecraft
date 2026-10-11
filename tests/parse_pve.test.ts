@@ -295,6 +295,33 @@ describe('DungeonSegmenter via ParseRecorder', () => {
     expect(join).toMatchObject({ tick: 12 });
     expect((join as { participant: FightParticipant }).participant.entityId).toBe(7);
   });
+
+  test('a shielder never on the threat table late-joins on their first absorb', () => {
+    const sim = fakeSim();
+    seedDungeon(sim);
+    sim.entities.set(7, player(7));
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 500, 120)]);
+    sim.tickCount = 12;
+    recorder.observe([
+      {
+        type: 'absorb',
+        sourceId: 7,
+        targetId: 5,
+        amount: 250,
+        ability: 'Power Word: Shield',
+        abilityId: 'power_word_shield',
+      },
+    ]);
+
+    const join = records.find((r) => r.t === 'join');
+    expect(join).toMatchObject({ tick: 12 });
+    expect((join as { participant: FightParticipant }).participant.entityId).toBe(7);
+  });
 });
 
 describe('RiftSegmenter via ParseRecorder', () => {

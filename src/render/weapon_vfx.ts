@@ -37,6 +37,7 @@ import {
   type WeaponEmissiveTint,
   weaponEmissiveCacheKey,
 } from './weapon_vfx_emissive_core';
+import { applyRiggedWornDetail } from './worn_stone';
 
 // ---------------------------------------------------------------------------
 // Palettes + tier presets (colors from the Armory Codex swatches)
@@ -3242,6 +3243,74 @@ function weaponVfxPrewarmHostMap(): THREE.Texture {
 }
 
 /**
+ * The shipped GLB material shape of each catalog skin, as far as it reaches a
+ * program cache key. Every skin's main material carries base colour,
+ * metal-rough, normal and occlusion textures and is opaque; what varies is
+ * `doubleSided`, and one GLB adds an untextured part. Pinned against each
+ * GLB's own JSON by tests/weapon_skin_prewarm_host.test.ts, so a re-exported
+ * skin that changes either fails there instead of linking live.
+ */
+export const WEAPON_VFX_DOUBLE_SIDED_SKINS: ReadonlySet<string> = new Set([
+  'ice_fang',
+  'solheim_last_light_of_the_dawn',
+  'skyrender_the_firmament_s_wound',
+  'cosmarch_spire_of_the_endless_void',
+  'meteorlatch_the_sky_s_last_judgment',
+  'rude_awakening_sword',
+  'rimecrusher',
+  'frostbite',
+  'shard_of_everwinter',
+  'forgeheart_stave',
+]);
+
+/** Untextured, single-sided extra materials, by GLB material name. */
+export const WEAPON_VFX_UNTEXTURED_PARTS: Readonly<Record<string, readonly string[]>> = {
+  astravyr_fang_of_the_fallen_star: ['ring_gold'],
+};
+
+/**
+ * The textured host surface, in the class and texture slots the worn skin
+ * draws on this tier (characters/assets.ts buildTintedClone): a Lambert with
+ * its map on the Lambert tier; otherwise the GLB's standard material with its
+ * normal and occlusion maps plus the silhouette rim glow, which
+ * characters/visual.ts carries into its hook-preserving isolation clone. The
+ * metal-rough maps are left out because deriveEmissive nulls them on the live
+ * weapon too. Only slot presence reaches the key, so the one-pixel map fills
+ * every slot.
+ */
+function prewarmHostTexturedMaterial(side: THREE.Side): THREE.Material {
+  const map = weaponVfxPrewarmHostMap();
+  const name = 'weapon-vfx-prewarm-host:textured';
+  if (!GFX.standardMaterials) {
+    return new THREE.MeshLambertMaterial({ name, color: 0xffffff, map, side });
+  }
+  const material = new THREE.MeshStandardMaterial({
+    name,
+    color: 0xffffff,
+    map,
+    normalMap: map,
+    aoMap: map,
+    side,
+  });
+  addRimGlow(material);
+  return material;
+}
+
+/** An untextured part: deriveEmissive takes its flat-tint arm, and the GLB
+ *  name routes the same worn layer buildTintedClone gives that name. The
+ *  routing reads the name once, and three's key never does, so the host takes
+ *  its own name afterwards and a program label tells it from the live part. */
+function prewarmHostUntexturedMaterial(part: string): THREE.Material {
+  const name = `weapon-vfx-prewarm-host:${part}`;
+  if (!GFX.standardMaterials) return new THREE.MeshLambertMaterial({ name, color: 0xffffff });
+  const material = new THREE.MeshStandardMaterial({ color: 0xffffff, name: part });
+  addRimGlow(material);
+  applyRiggedWornDetail(material);
+  material.name = name;
+  return material;
+}
+
+/**
  * Builds one deterministic, hidden prewarm unit for a real catalog skin.
  *
  * The unit boundary is intentionally the skin, not a component family. A
@@ -3259,33 +3328,41 @@ export function buildWeaponVfxPrewarmSkinGroup(key: string): THREE.Group {
   group.name = `weapon-vfx-program-prewarm:${key}`;
   group.userData.renderCategory = 'prewarm';
 
-  // The host material must be the SHAPE of a live weapon-skin material, hooks
-  // included: a worn rig material carries the silhouette rim glow
-  // (characters/assets.ts buildTintedClone, on the GFX.standardMaterials arm),
-  // characters/visual.ts hands the isolated weapon a hook-PRESERVING clone of
-  // it, and three's program cache key carries customProgramCacheKey. A
-  // hook-less host would warm a key no live sighting ever asks for and leave
-  // the real one to link on the first arrival. Applied under the same tier
-  // predicate the rig factory uses, so the twin follows it either way.
-  const hostMaterial = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    map: weaponVfxPrewarmHostMap(),
-  });
-  if (GFX.standardMaterials) addRimGlow(hostMaterial);
-  const host = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.1), hostMaterial);
-  host.name = `prewarm-skin-host:${key}`;
-  host.frustumCulled = false;
-
+  const surfaces: THREE.Mesh[] = [];
   let handle: WeaponVfxHandle | null = null;
   let disposed = false;
   const cleanup = (): void => {
     if (disposed) return;
     disposed = true;
     handle?.dispose();
-    host.geometry.dispose();
-    (host.material as THREE.Material).dispose();
+    for (const surface of surfaces) {
+      surface.geometry.dispose();
+      (surface.material as THREE.Material).dispose();
+    }
   };
   try {
+    // The host is the SHAPE of the worn skin's material on this tier, one
+    // surface per GLB material: a host keyed differently warms a program no
+    // live sighting asks for and leaves the real one to link on the first
+    // arrival.
+    const side = WEAPON_VFX_DOUBLE_SIDED_SKINS.has(key) ? THREE.DoubleSide : THREE.FrontSide;
+    const host = new THREE.Mesh(
+      new THREE.BoxGeometry(0.1, 1, 0.1),
+      prewarmHostTexturedMaterial(side),
+    );
+    host.name = `prewarm-skin-host:${key}`;
+    host.frustumCulled = false;
+    surfaces.push(host);
+    for (const part of WEAPON_VFX_UNTEXTURED_PARTS[key] ?? []) {
+      // The GLB part has no UVs; neither does its twin.
+      const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+      geometry.deleteAttribute('uv');
+      const surface = new THREE.Mesh(geometry, prewarmHostUntexturedMaterial(part));
+      surface.name = `prewarm-skin-host:${key}:${part}`;
+      surface.frustumCulled = false;
+      host.add(surface);
+      surfaces.push(surface);
+    }
     handle = createWeaponVfx(host, spec, { grounded: false });
     // A visible light would change the scene's light counts, and those counts
     // are part of every program cache key: one extra point light here and the

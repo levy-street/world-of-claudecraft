@@ -1,4 +1,5 @@
 import type * as THREE from 'three';
+import { markPointLightSource } from './point_light_carriers_core';
 
 /**
  * The append-only face of the fire-light registry that a subsystem is handed.
@@ -40,7 +41,9 @@ function sameLights(
   return left.length === right.length && left.every((light, index) => light === right[index]);
 }
 
-/** Reconcile one streamed entity view's point lights with the renderer-wide pool. */
+/** Reconcile one streamed entity view's point lights with the renderer-wide pool.
+ *  A view light is often born visible, so it becomes a carrier source here,
+ *  before any render or compile can gather it beside the carriers. */
 export function reconcileViewPointLights(
   root: THREE.Object3D,
   current: readonly THREE.PointLight[],
@@ -58,6 +61,7 @@ export function reconcileViewPointLights(
     if (index >= 0) all.splice(index, 1);
   }
   for (const light of next) {
+    markPointLightSource(light);
     const dynamic = light.userData.budgetDynamic === true;
     if (!dynamic && typeof light.userData.budgetBase !== 'number') {
       light.userData.budgetBase = light.intensity;
@@ -68,13 +72,12 @@ export function reconcileViewPointLights(
 }
 
 /**
- * Three's render counts a point light into numPointLights iff the light AND
- * its whole ancestor chain are visible. The budget owns light.visible, but the
- * world owns the ancestors (zone streaming, far-LOD wraps, compile gates), so
- * a chosen light under a hidden group would keep its counted slot while the
- * render dropped it, and the drawn count (part of every lit material's program
- * cache key) would drift. A light is drawn-eligible only if walking its
- * parents reaches `sceneRoot` through visible nodes.
+ * A light draws only if it AND its whole ancestor chain are visible. The
+ * budget owns light.visible, but the world owns the ancestors (zone streaming,
+ * far-LOD wraps, compile gates), so a chosen light under a hidden group would
+ * hold a counted slot the render never draws, starving a light that could
+ * shine. A light is drawn-eligible only if walking its parents reaches
+ * `sceneRoot` through visible nodes.
  */
 function isDrawnEligible(light: THREE.PointLight, sceneRoot: THREE.Object3D): boolean {
   let node = light.parent;
@@ -87,8 +90,7 @@ function isDrawnEligible(light: THREE.PointLight, sceneRoot: THREE.Object3D): bo
 }
 
 /** Apply a fixed-count nearest-light budget without reallocating rank entries.
- *  Returns the number of counted, drawn-eligible lights so the caller can pad
- *  the render-visible total up to `visibleCount`. */
+ *  Returns the number of counted, drawn-eligible lights. */
 export function applyPointLightBudget(
   ranked: RankedPointLight[],
   px: number,
@@ -141,27 +143,6 @@ export function applyPointLightBudget(
   return drawn;
 }
 
-/**
- * Count the ranked lights the render would draw in the CURRENT visibility
- * state: budget-visible AND ancestry-visible down from `sceneRoot`. The
- * bounded prewarm render hides most top-level scene children transiently,
- * out of band of the budget pass, so it re-derives the drawn count with this
- * and raises the pads to keep the render-visible total pinned. Without the
- * re-pin, NUM_POINT_LIGHTS drifts below the pinned total during that render
- * and every first-drawn material links a program variant synchronously, one
- * the live render never draws (the measured 100-280 ms prewarm-unit stalls).
- */
-export function countDrawnPointLights(
-  ranked: readonly RankedPointLight[],
-  sceneRoot: THREE.Object3D,
-): number {
-  let drawn = 0;
-  for (const entry of ranked) {
-    if (entry.light.visible && isDrawnEligible(entry.light, sceneRoot)) drawn++;
-  }
-  return drawn;
-}
-
 /** Flicker only fire lights that the completed budget says can contribute. */
 export function flickerContributingFireLights(
   ranked: readonly RankedPointLight[],
@@ -178,17 +159,4 @@ export function flickerContributingFireLights(
     const base = (entry.light.userData.baseIntensity as number | undefined) ?? 11;
     entry.light.intensity = base + Math.sin(time * 11 + fireIndex * 1.7) * 2.5 * (base / 11);
   }
-}
-
-/**
- * How many renderer-owned pad lights must be visible so the TOTAL visible
- * point-light count stays pinned at `visibleCount` even when fewer real lights
- * than the budget exist (boot before props stream in, sparse custom maps,
- * dungeon interiors). Three counts a light into numPointLights iff `visible`,
- * and that count is part of every lit material's program cache key, so any
- * drift recompiles every lit material in view: the open-world travel freeze.
- * Pad lights carry intensity 0 / distance 0, so they shade nothing.
- */
-export function pointLightPadCount(rankedCount: number, visibleCount: number): number {
-  return Math.max(0, visibleCount - Math.min(visibleCount, rankedCount));
 }

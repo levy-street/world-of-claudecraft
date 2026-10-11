@@ -8,17 +8,25 @@
 
 export const shellStrings = {
   en: {
+    landing: {
+      headline: 'Adventure with friends.',
+      contribute: 'Contribute to the game',
+      tools: 'Tools',
+      records: 'WoC Records',
+      scout: 'WoC Scout',
+      parseService: 'WoC Parse Service',
+    },
     seo: {
       title: 'World of ClaudeCraft: Classic-Style Web MMO',
       description:
-        'Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared world, level up classes, and defeat enemies!',
+        'Play World of ClaudeCraft, a free browser MMO. Explore, complete quests, and run dungeons with friends. No download required.',
       genre: 'MMORPG',
       playMode: 'Multiplayer',
       applicationCategory: 'Game',
       operatingSystem: 'Web browser',
       officialLabel: 'Official World of ClaudeCraft website',
       officialBody:
-        'worldofclaudecraft.com is the official free browser MMO for the Claudemoon world. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site.',
+        'The official home of World of ClaudeCraft. Play online, read the wiki, and find community links here.',
     },
     a11y: {
       goHome: 'Go to homepage',
@@ -114,6 +122,9 @@ export const shellStrings = {
         alreadyInWorld: 'Character is already in world.',
         accountSessionLimit: 'Too many characters on this account are already in the world.',
         takenOver: 'Your character was taken over by another session.',
+        // A fresh join while the character's vault reward mail is still being
+        // restored (server/vault_mail_take_guard.ts joinError).
+        vaultMailRecovering: 'Your vault reward mail is being restored. Try again shortly.',
         renameBeforeEntering: 'This character must be renamed before entering the world.',
         renameNotPermitted: 'Renaming this character is not allowed.',
         unsupportedMediaType: 'Unsupported request format.',
@@ -159,6 +170,16 @@ export const shellStrings = {
         reload: 'Reload',
         quit: 'Quit',
         fatalBody: 'World of ClaudeCraft hit an unexpected error and needs to close.',
+      },
+      // The host diagnostic's native save dialog (electron/host_diag.cjs): the
+      // shell opens an OS file dialog, which has no i18n runtime of its own, so
+      // these ride the same push as the crash strings above
+      // (src/game/desktop_shell_strings.ts -> DEFAULT_SHELL_STRINGS).
+      hostDiag: {
+        saveTitle: 'Save system report',
+        saveButton: 'Save',
+        // The label of the format row in the dialog's type dropdown.
+        fileType: 'JSON file',
       },
       // Borderless-mode title-bar control (index.html / play.html pre-game
       // headers): the only way out when the shell hides the native window
@@ -247,6 +268,15 @@ export const shellStrings = {
       inWorld: 'in world',
       takeOver: 'Take Over',
       inWorldHint: 'Already in world. Log out elsewhere, or take over.',
+      // The roster row's zone line ({zone} = the localized zone name).
+      currentLocation: 'Current location: {zone}',
+      // Summary of the roster row's collapsible lockout list ({count} = how
+      // many are locked), then its three group headings; each locked entry
+      // inside reads "<name> <countdown>" (hudChrome.raidLockout templates).
+      lockouts: 'Lockouts ({count})',
+      lockoutRaids: 'Raids',
+      lockoutDungeons: 'Dungeons',
+      lockoutWorldBosses: 'World bosses',
       takeOverConfirm:
         'This will disconnect this character from another session and bring it here. Continue?',
       renameRequired: 'rename required',

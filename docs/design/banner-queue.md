@@ -52,6 +52,15 @@ the Hud drives with its own timers). Two behavior classes:
 - The attunement banner rides the `deed` celebration class (its epic
   zone-broadcast log line was always the durable record; classed ambient
   it could vanish in the latest-wins seat behind a live level-up).
+- The world quest entry banner (`worldQuestStarted`, the 'worldQuest'
+  plate in `src/ui/hud/quest/world_quest_banner_view.ts`) rides the `deed`
+  celebration class too: classed ambient it would replace a live
+  zone-entry name or be replaced by one. It holds for less time than the
+  ambient deferral window, so a zone name parked behind the LIVE plate
+  still shows. Its plate is bottom-anchored above the `#subzone-banner`
+  line so a landmark name shown in the same moment stacks under it, and
+  the quest-progress flash above it yields its lane while the plate is up
+  (`QuestProgressBanner.yieldToPlate`).
 - Accessibility is unchanged: the banner div carries no live semantics;
   the polite `#combat-live` region push and the chat-log line stay the
   announced and durable records, emitted before the banner is scheduled.

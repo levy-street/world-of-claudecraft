@@ -127,6 +127,12 @@ describe('abilityRequirementLines', () => {
         def: { ...base, requiresForm: 'bear' } as AbilityDef,
         line: 'Requires Bruin Form',
       },
+      {
+        // The shared-form arm (Savage Mending, v0.43): one label key, not a
+        // runtime join, so the phrase stays translatable as a unit.
+        def: { ...base, requiresForm: ['bear', 'cat'] } as AbilityDef,
+        line: 'Requires Bruin or Cat Form',
+      },
       { def: { ...base, spendsCombo: true } as AbilityDef, line: 'Consumes combo points' },
       {
         def: { ...base, requiresDodgeProc: true } as AbilityDef,

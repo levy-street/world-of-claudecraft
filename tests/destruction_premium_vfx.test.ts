@@ -80,6 +80,7 @@ describe('Destruction premium VFX', () => {
       0,
       1,
       expect.any(Number),
+      false,
     );
   });
 

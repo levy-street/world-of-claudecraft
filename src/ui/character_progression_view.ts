@@ -17,9 +17,11 @@ import {
 } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { deedName, deedTitleText } from './deed_i18n';
+import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { t } from './i18n';
 import { buildReliquarySheetModel, reliquarySheetProgressionHtml } from './reliquary_sheet_view';
+import { specIconUrl } from './spec_icon_art';
 import { roleLabel, tTalent } from './talent_i18n';
 import { formatXp } from './xp_bar';
 
@@ -55,6 +57,30 @@ export function talentSummaryHtml(sim: IWorld): string {
   html += `</div>`;
   if (sp)
     html += `<div class="cp-milestones"><span class="cp-ms-label">${esc(t('game.talents.mastery'))}:</span> <b style="color:var(--gold)">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b> <span class="cp-none">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}</span></div>`;
+  return `${html}</div>`;
+}
+
+// The Specialization board on the character sheet's stats rail, seated under
+// Defense: the chosen specialization and its role as stat-style rows, then the
+// mastery line. Same shape as the Offense and Defense boards (stat-panel,
+// sp-title, stat-cell rows) so the rail reads as one column. The talents
+// window owns the picker; this is the readout.
+export function specializationPanelHtml(sim: IWorld): string {
+  const ct = talentsFor(sim.cfg.playerClass);
+  if (!ct) return '';
+  const sp = ct.specs.find((s) => s.id === sim.talentSpec);
+  const row = (label: string, value: string): string =>
+    `<span class="stat-cell ui-stat-row char-spec-row">${esc(label)}<b>${esc(value)}</b></span>`;
+  let html = `<div class="stat-panel ui-card char-spec-panel"><div class="sp-title">${esc(t('game.talents.specTab'))}</div>`;
+  const emblem = sp ? specIconUrl(sp) : null;
+  const specName = sp
+    ? tTalent({ kind: 'talentSpec', spec: sp, field: 'name' })
+    : t('game.talents.noSpec');
+  html += `<div class="char-spec-identity">${emblem ? `<img class="char-spec-emblem" src="${esc(emblem)}" alt="" draggable="false">` : ''}<div class="char-spec-copy"><b class="char-spec-name">${esc(specName)}</b><span class="char-spec-class">${esc(classDisplayName(sim.cfg.playerClass))}</span></div></div>`;
+  if (sp) {
+    html += row(t('game.talents.role'), roleLabel(sp.role));
+    html += `<div class="char-spec-mastery"><span>${esc(t('game.talents.mastery'))}: <b>${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b></span><span class="cp-none">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}</span></div>`;
+  }
   return `${html}</div>`;
 }
 

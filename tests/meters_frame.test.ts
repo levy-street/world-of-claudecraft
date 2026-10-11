@@ -216,3 +216,17 @@ describe('MeterFrame', () => {
     });
   });
 });
+
+it('replaces a meter layout immediately and clears geometry absent from the next preset', () => {
+  const harness = makeHarness({ [KEY]: '{"left":80,"top":90,"width":300,"height":240}' });
+  harness.frame.init();
+  harness.storage.setItem(KEY, '{"left":200,"top":100,"width":400,"height":260}');
+  harness.frame.restoreSavedLayout();
+  expect(harness.panel.style.left).toBe('200px');
+  expect(harness.panel.style.width).toBe('400px');
+  harness.storage.removeItem(KEY);
+  harness.frame.restoreSavedLayout();
+  expect(harness.panel.style.left).toBe('');
+  expect(harness.panel.style.width).toBe('');
+  expect(harness.storage.getItem(KEY)).toBeNull();
+});

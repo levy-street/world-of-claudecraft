@@ -43,6 +43,9 @@ function rendererStub(clears: RecordedClear[]): THREE.WebGLRenderer {
     capabilities: { isWebGL2: true },
     getDrawingBufferSize: (out: THREE.Vector2) => out.set(1280, 720),
     getPixelRatio: () => 1,
+    // The composer chain allocates the VFX opaque copy at build time
+    // (scene_sampling.ts), so the stub has to answer this.
+    initRenderTarget: () => {},
     // What OutputGradePass.render reads when the twin prewarm draws it once.
     outputColorSpace: THREE.SRGBColorSpace,
     toneMapping: THREE.ACESFilmicToneMapping,

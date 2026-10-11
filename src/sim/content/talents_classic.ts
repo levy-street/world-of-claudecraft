@@ -52,15 +52,18 @@ const PALADIN_SPECS: SpecDef[] = [
     'A shield-bearing defender who converts Holy power into threat and mitigation.',
     'sunward_disc',
     'Oathward',
-    'Increases all threat you generate by 40%, your armor by 20% and your Stamina by 35%.',
+    'Increases all threat you generate by 100%, your armor by 20% and your Stamina by 35%.',
     // staPct 0.35 carries the 2026-07 tank-parity pass that used to live in
     // SPEC_BASELINES: with no stamina multiplier the paladin sat at 76% of the
     // prot warrior's effective HP. The mastery is where an overhauled class
     // keeps its floor (see Recompense on the warrior), so it lands here.
-    // threatPct 0.5 -> 0.4 (v0.38 tank threat parity): one layer of the
-    // Faithwarden triple stack (ability mult x mastery x Burning Oath) trimmed
-    // so the composed total lands near the other tanks.
-    { global: { threatPct: 0.4 }, stats: { armorPct: 0.2, staPct: 0.35 } },
+    // threatPct 1.0 (v0.44 tank threat parity, docs/design/tank-threat-v044.md):
+    // live 0.42/0.43 raid parses put the Faithwarden at 234 generated threat/s
+    // against the Ironguard's 330, so the composed holy multiplier now runs
+    // 2.0 x Burning Oath 1.3 = 2.6 (physical 2.0). Earlier values, for the
+    // record: 0.5 at launch, trimmed to 0.4 in the v0.38 parity pass when the
+    // triple stack (ability mult x mastery x Burning Oath) overshot the other tanks.
+    { global: { threatPct: 1.0 }, stats: { armorPct: 0.2, staPct: 0.35 } },
   ),
   spec(
     'retribution',
@@ -394,7 +397,7 @@ const DRUID_SPECS: SpecDef[] = [
     'Wildfang',
     'tank',
     'x',
-    'A shapeshifter whose landed hits build Old Blood in both forms: Cat spends it for damage, Bruin spends it to tank.',
+    "A shapeshifter whose landed hits build Old Blood in both forms: Cat spends it for damage, Bruin spends it to tank. Reaches 1 yd further with every melee attack, and melee autoattacks grant Nature's Boon about every 15 sec: for 10 sec, one free Wildbloom castable in any form, or one free Oakhide in Bruin Form, either 25% stronger.",
     'feral_charge',
     'Primal Heart',
     // The +15% armor carries the v0.27 Dire Bruin retune (the old feral_choice_bear

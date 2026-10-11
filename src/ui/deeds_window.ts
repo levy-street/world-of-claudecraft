@@ -330,6 +330,7 @@ export class DeedsWindow {
       category: this.category,
       watchRev: this.watchRev,
       statsDigest: deedStatsDigest(world.deedStats),
+      devTier: world.player.devTier ?? 0,
     });
   }
 
@@ -456,6 +457,7 @@ export class DeedsWindow {
       renown: world.renown,
       activeTitle: world.activeTitle,
       activeBorder: world.activeBorder,
+      devTier: world.player.devTier ?? 0,
       deeds: DEEDS,
       order: DEED_ORDER,
       category: this.category,
@@ -706,8 +708,9 @@ export class DeedsWindow {
         headingKey: 'hudChrome.deeds.titlesSection',
         emptyKey: 'hudChrome.deeds.titlesEmpty',
         options: model.titles,
-        // A title deed carries its own display text; a border deed carries a
-        // slug with no player-facing words, so its option is named by the deed.
+        // A title deed (or a developer-badge rung title) carries its own display
+        // text; a border deed carries a slug with no player-facing words, so its
+        // option is named by the deed.
         label: (id) => (id === null ? t('hudChrome.deeds.titlesNone') : deedTitleText(id)),
       }) +
       this.pickerGroupHtml({

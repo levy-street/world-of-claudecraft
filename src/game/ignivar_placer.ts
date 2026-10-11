@@ -1,11 +1,11 @@
-// Dev-only in-game placement rig for the Ignivar forge-mech dressing props
+// Dev-only in-game placement rig for Ignivar dressing and World Quests props
 // (local branch tooling, dev builds only: /dev placer or /placer toggles it).
 // Pick a prop, place it in front of the player, tune scale, rotation (45
 // and 15 degree steps), and position with nudge buttons; every edit
-// re-renders live through the SAME appendIgnivarEnvProps path the shipped
-// dressing uses and persists to localStorage per room. Export dumps the
-// instance-local records used to bake the authored plan
-// (ignivar_dressing_plan_core.ts).
+// re-renders live and persists to localStorage per authoring site. Raid props
+// use the shipped appendIgnivarEnvProps path; quest props clone full GLB scenes.
+// Export dumps records for later integration into the authored placement plans.
+
 import * as THREE from 'three';
 import { addIgnivarPlacedTorchFires } from '../render/dungeon_torch_rig';
 import {
@@ -22,6 +22,30 @@ import {
   IGNIVAR_ENV_PROP_URLS,
   prepareIgnivarEnvProps,
 } from '../render/ignivar_env_props';
+import {
+  createWorldQuestPlacerModel,
+  prepareWorldQuestPlacerAssets,
+  warmWorldQuestPlacerAssets,
+  worldQuestPlacerNative,
+} from '../render/world_quest_placer_assets';
+import {
+  isWorldQuestPlacerKey,
+  WORLD_QUEST_PLACER_ASSETS,
+  WORLD_QUEST_PLACER_KEYS,
+  type WorldQuestPlacerKey,
+} from '../render/world_quest_placer_catalog';
+import { setWorldQuestPlacerMask } from '../render/world_quest_placer_mask';
+import {
+  CURRENT_QUEST_ASSETS,
+  type CurrentQuestAssetKey,
+  type CurrentQuestPlacement,
+  createCurrentQuestModel,
+  currentQuestAssetNative,
+  disposeQuestPlacerInstances,
+  isCurrentQuestAssetKey,
+  prepareCurrentQuestAssets,
+  warmCurrentQuestAssets,
+} from '../render/world_quest_placer_sources';
 import { DUNGEON_X_THRESHOLD } from '../sim/data';
 import {
   IGNIVAR_FORGE_APPROACH_LAYOUT,
@@ -31,9 +55,12 @@ import {
 } from '../sim/dungeon_layout';
 import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../sim/forgefather_fortress';
 import type { Entity } from '../sim/types';
+import { adoptShippedShipwreckDraft } from './world_quest_placer_adoption';
 
 export interface IgnivarPlacerDeps {
   scene: THREE.Scene;
+  compilePreview?: (target: THREE.Object3D) => Promise<unknown>;
+  getCurrentQuestPlacements?: () => CurrentQuestPlacement[];
   getPlayer: () => Entity | undefined;
   log: (text: string, color?: string) => void;
   /** the chat send path, for the dev commands the rig drives itself
@@ -41,13 +68,18 @@ export interface IgnivarPlacerDeps {
   chat: (text: string) => void;
 }
 
+type PlacerAssetKey = IgnivarEnvPropKey | WorldQuestPlacerKey | CurrentQuestAssetKey;
+
 interface PlacedEntry {
-  key: IgnivarEnvPropKey;
+  key: PlacerAssetKey;
   x: number;
   y: number;
   z: number;
   /** degrees, kept in 45 and 15 degree steps by the two button pairs */
   rot: number;
+  pitch?: number;
+  roll?: number;
+  sourceId?: string;
   scale: number;
 }
 
@@ -108,11 +140,20 @@ const EXTERIOR_SITE: PlacerRoom = {
   exterior: true,
   plan: () => [],
 };
+// Quest authoring has its own save/export set, separate from fortress work.
+const WORLD_QUEST_SITE: PlacerRoom = {
+  interior: 'world_quests_shipwreck',
+  label: 'World Quests: Shipwreck Salvage (world space)',
+  ox: 0,
+  oz: 0,
+  exterior: true,
+  plan: () => [],
+};
 const ROOM_RANGE = 90;
 const SCALES = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 20, 26, 32];
 
-/** The two asset kits are picker FILTERS only: any key renders, saves, and
- *  exports identically wherever it is placed. The exterior kit is the
+/** The Ignivar asset kits are picker filters sharing their room saves.
+ *  World Quests selects its own authoring site. The exterior kit is the
  *  architecture face of the roster (gate walls, gears, pillars, chains,
  *  lava, torches) for overworld entrance work; new exterior assets (the
  *  Drakelands bridge) join this list as they land. */
@@ -185,24 +226,35 @@ const CUSTOM_KIT: readonly IgnivarEnvPropKey[] = [
   'well_pump',
 ];
 
-type AssetKit = 'interior' | 'exterior' | 'custom';
+type AssetKit = 'interior' | 'exterior' | 'custom' | 'world_quests';
 
-const KIT_CYCLE: readonly AssetKit[] = ['interior', 'exterior', 'custom'];
+const KIT_CYCLE: readonly AssetKit[] = ['interior', 'exterior', 'custom', 'world_quests'];
 
 /** null = follow the site (exterior site shows the exterior kit); the panel
- *  button cycles the three kits so any of them is reachable anywhere. */
+ *  button cycles the kits so any of them is reachable anywhere. */
 let kitOverride: AssetKit | null = null;
 
 function activeKit(): AssetKit {
   return kitOverride ?? (state.room?.exterior ? 'exterior' : 'interior');
 }
 
-function kitKeys(): readonly IgnivarEnvPropKey[] {
+function kitKeys(): readonly PlacerAssetKey[] {
   const kit = activeKit();
+  if (kit === 'world_quests') return WORLD_QUEST_PLACER_KEYS;
   if (kit === 'custom') return CUSTOM_KIT;
   return kit === 'exterior'
     ? EXTERIOR_KIT
     : (Object.keys(IGNIVAR_ENV_PROP_URLS) as IgnivarEnvPropKey[]);
+}
+
+function assetNative(key: PlacerAssetKey): { len: number; hei: number; dep: number } {
+  if (isCurrentQuestAssetKey(key)) return currentQuestAssetNative(key);
+  return isWorldQuestPlacerKey(key) ? worldQuestPlacerNative(key) : IGNIVAR_PROP_NATIVE[key];
+}
+
+function assetLabel(key: PlacerAssetKey): string {
+  if (isCurrentQuestAssetKey(key)) return CURRENT_QUEST_ASSETS[key];
+  return isWorldQuestPlacerKey(key) ? WORLD_QUEST_PLACER_ASSETS[key].label : key;
 }
 const DRESSING_GROUP_NAMES = [
   'ignivarForgeApproachDressing',
@@ -248,6 +300,10 @@ const state: {
 };
 
 const storageKey = (interior: string) => `woc_ignivar_placer:${interior}`;
+// Persist the imported IDs even when a row is removed, so loading again never
+// resurrects deleted originals or overwrites an already edited placement.
+let importedQuestSources: string[] = [];
+let replaceQuestSelection = false;
 
 // The placement work light: a flat ambient lift so prop placement stays
 // readable inside the deliberately dim forge grades. AmbientLight by design:
@@ -299,7 +355,15 @@ function loadEntries(interior: string): PlacedEntry[] | null {
   try {
     const raw = localStorage.getItem(storageKey(interior));
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as { entries?: PlacedEntry[] };
+    const parsed = JSON.parse(raw) as { entries?: PlacedEntry[]; importedSources?: string[] };
+    if (interior === WORLD_QUEST_SITE.interior) {
+      importedQuestSources = Array.isArray(parsed.importedSources) ? parsed.importedSources : [];
+      const adopted = Array.isArray(parsed.entries) && adoptShippedShipwreckDraft(parsed.entries);
+      if (adopted) {
+        importedQuestSources = adopted.importedSources;
+        return adopted.entries;
+      }
+    }
     return Array.isArray(parsed.entries) ? parsed.entries : null;
   } catch {
     return null;
@@ -309,11 +373,34 @@ function loadEntries(interior: string): PlacedEntry[] | null {
 function saveEntries(): void {
   if (!state.room) return;
   try {
-    localStorage.setItem(
-      storageKey(state.room.interior),
-      JSON.stringify({ interior: state.room.interior, entries: state.entries }),
-    );
+    localStorage.setItem(storageKey(state.room.interior), JSON.stringify(placementPayload()));
   } catch {}
+}
+
+function placementPayload(): object {
+  return {
+    interior: state.room?.interior,
+    entries: state.entries,
+    ...(state.room === WORLD_QUEST_SITE && importedQuestSources.length
+      ? { importedSources: importedQuestSources }
+      : {}),
+  };
+}
+
+function importCurrentQuest(): void {
+  if (state.room !== WORLD_QUEST_SITE) return;
+  const rows = state.deps?.getCurrentQuestPlacements?.() ?? [];
+  for (const row of rows) {
+    if (importedQuestSources.includes(row.sourceId)) continue;
+    importedQuestSources.push(row.sourceId);
+    state.entries.push({ ...row });
+  }
+  if (state.selected < 0) state.selected = state.entries.findIndex((row) => row.sourceId);
+  rebuildGroup();
+  state.deps?.log(
+    '[placer] current quest assets loaded. Select a row to move it, or enable replace selected and choose a new asset.',
+    '#8fd0ff',
+  );
 }
 
 function prefillFromPlan(room: PlacerRoom): PlacedEntry[] {
@@ -334,6 +421,7 @@ function prefillFromPlan(room: PlacerRoom): PlacedEntry[] {
 
 function roomForPlayer(player: Entity | undefined): PlacerRoom | null {
   if (!player) return null;
+  if (kitOverride === 'world_quests') return WORLD_QUEST_SITE;
   for (const room of ROOMS) {
     if (
       Math.abs(player.pos.x - room.ox) <= ROOM_RANGE &&
@@ -347,7 +435,9 @@ function roomForPlayer(player: Entity | undefined): PlacerRoom | null {
   return null;
 }
 
-function toPlacement(entry: PlacedEntry): IgnivarPropPlacement {
+function toPlacement(entry: PlacedEntry): Omit<IgnivarPropPlacement, 'key'> & {
+  key: PlacerAssetKey;
+} {
   return {
     key: entry.key,
     x: entry.x,
@@ -368,6 +458,7 @@ function rebuildGroup(): void {
     deps.scene.add(state.group);
   }
   state.group.position.set(room.ox, 0, room.oz);
+  disposeQuestPlacerInstances(state.group);
   state.group.clear();
   // A street_lamp row already baked into the fortress table renders through
   // the world's streetlamp fixture pipeline (brazier model, night light, post
@@ -381,8 +472,29 @@ function rebuildGroup(): void {
     FORGEFATHER_FORTRESS_PLACEMENTS.some(
       (b) => b.key === 'street_lamp' && Math.abs(b.x - p.x) < 0.01 && Math.abs(b.z - p.z) < 0.01,
     );
-  const placements = state.entries.map(toPlacement).filter((p) => !bakedLampAt(p));
+  const placements = state.entries
+    .map(toPlacement)
+    .filter(
+      (p): p is IgnivarPropPlacement =>
+        !isWorldQuestPlacerKey(p.key) && !isCurrentQuestAssetKey(p.key),
+    )
+    .filter((p) => !bakedLampAt(p));
   appendIgnivarEnvProps(state.group, placements, false);
+  for (const entry of state.entries) {
+    if (!isWorldQuestPlacerKey(entry.key) && !isCurrentQuestAssetKey(entry.key)) continue;
+    const model = isCurrentQuestAssetKey(entry.key)
+      ? createCurrentQuestModel(entry.key)
+      : createWorldQuestPlacerModel(entry.key);
+    model.position.set(entry.x, entry.y, entry.z);
+    model.rotation.set(
+      THREE.MathUtils.degToRad(entry.pitch ?? 0),
+      THREE.MathUtils.degToRad(entry.rot),
+      THREE.MathUtils.degToRad(entry.roll ?? 0),
+    );
+    model.scale.setScalar(entry.scale);
+    state.group.add(model);
+  }
+  setWorldQuestPlacerMask(deps.scene, room === WORLD_QUEST_SITE ? importedQuestSources : []);
   // Live fire preview for placed torches so lighting can be judged while
   // placing. Preview lights bypass the renderer's fire-light budget (throwaway
   // sink arrays), which is fine for a dev tool with a handful of torches.
@@ -425,7 +537,7 @@ function rebuildGroup(): void {
       marker.add(ring, box);
       state.marker = marker;
     }
-    const native = IGNIVAR_PROP_NATIVE[selected.key];
+    const native = assetNative(selected.key);
     const ry = (selected.rot * Math.PI) / 180;
     const ring = state.marker.getObjectByName('ring');
     const box = state.marker.getObjectByName('bounds');
@@ -459,11 +571,11 @@ function renderSelectedInfo(): void {
     info.textContent = 'nothing selected';
     return;
   }
-  const native = IGNIVAR_PROP_NATIVE[entry.key];
+  const native = assetNative(entry.key);
   const w = (native.len * entry.scale).toFixed(1);
   const h = (native.hei * entry.scale).toFixed(1);
   const d = (native.dep * entry.scale).toFixed(1);
-  info.textContent = `${entry.key}  size ${w}w x ${h}h x ${d}d  at (${entry.x.toFixed(1)}, ${entry.z.toFixed(1)}) y${entry.y} rot${entry.rot} x${entry.scale}`;
+  info.textContent = `${assetLabel(entry.key)}  size ${w}w x ${h}h x ${d}d  at (${entry.x.toFixed(1)}, ${entry.z.toFixed(1)}) y${entry.y.toFixed(2)} rot${entry.rot.toFixed(1)} x${entry.scale}`;
 }
 
 function renderList(): void {
@@ -477,7 +589,7 @@ function renderList(): void {
     }`;
     const label = document.createElement('span');
     label.style.cssText = 'flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
-    label.textContent = `${entry.key} (${entry.x.toFixed(1)}, ${entry.z.toFixed(1)}) x${entry.scale} r${entry.rot}`;
+    label.textContent = `${assetLabel(entry.key)} (${entry.x.toFixed(1)}, ${entry.z.toFixed(1)}) x${entry.scale} r${entry.rot.toFixed(1)}`;
     row.appendChild(label);
     const del = document.createElement('button');
     del.textContent = 'x';
@@ -518,7 +630,14 @@ function localPlayerPos(): { x: number; z: number; facing: number } | null {
   return { x: player.pos.x - room.ox, z: player.pos.z - room.oz, facing: player.facing };
 }
 
-function placeProp(key: IgnivarEnvPropKey): void {
+function placeProp(key: PlacerAssetKey): void {
+  if (state.room === WORLD_QUEST_SITE && replaceQuestSelection && isWorldQuestPlacerKey(key)) {
+    mutateSelected((entry) => {
+      entry.key = key;
+      entry.scale = WORLD_QUEST_PLACER_ASSETS[key].scale;
+    });
+    return;
+  }
   const local = localPlayerPos();
   if (!local) return;
   // Two units ahead of the player, facing back at them, so the new prop is
@@ -531,7 +650,8 @@ function placeProp(key: IgnivarEnvPropKey): void {
   // ground under the player's feet, then tune with the Y nudges.
   const player = state.deps?.getPlayer();
   const y = state.room?.exterior && player ? Math.max(0, Math.round(player.pos.y * 10) / 10) : 0;
-  state.entries.push({ key, x, y, z, rot, scale: 8 });
+  const scale = isWorldQuestPlacerKey(key) ? WORLD_QUEST_PLACER_ASSETS[key].scale : 8;
+  state.entries.push({ key, x, y, z, rot, scale });
   state.selected = state.entries.length - 1;
   rebuildGroup();
 }
@@ -552,14 +672,24 @@ function setDressingHidden(hidden: boolean): void {
   }
 }
 
-const kitLabel = (): string => `kit: ${activeKit()}`;
+const kitLabel = (): string =>
+  `kit: ${activeKit() === 'world_quests' ? 'World Quests' : activeKit()}`;
 
 function renderPicker(): void {
   const picker = state.pickerEl;
   if (!picker) return;
   picker.textContent = '';
   const keys = kitKeys();
-  for (const key of keys) picker.appendChild(button(key, () => placeProp(key)));
+  for (const key of keys) picker.appendChild(button(assetLabel(key), () => placeProp(key)));
+  if (activeKit() === 'world_quests') {
+    picker.appendChild(button('load current quest assets', importCurrentQuest));
+    picker.appendChild(
+      button(replaceQuestSelection ? 'replace selected: on' : 'replace selected: off', () => {
+        replaceQuestSelection = !replaceQuestSelection;
+        renderPicker();
+      }),
+    );
+  }
   if (keys.length === 0) {
     const empty = document.createElement('div');
     empty.style.cssText = 'font-size:11px;color:#9a917f;padding:2px 0;';
@@ -589,11 +719,7 @@ function buttonRow(parent: HTMLElement, buttons: HTMLButtonElement[]): void {
 
 function exportEntries(): void {
   if (!state.room) return;
-  const payload = JSON.stringify(
-    { interior: state.room.interior, entries: state.entries },
-    null,
-    1,
-  );
+  const payload = JSON.stringify(placementPayload(), null, 1);
   console.log(`[placer] ${state.room.interior} export:\n${payload}`);
   try {
     void navigator.clipboard?.writeText(payload);
@@ -606,6 +732,8 @@ function exportEntries(): void {
 
 function enterRoom(room: PlacerRoom): void {
   state.room = room;
+  importedQuestSources = [];
+  replaceQuestSelection = false;
   state.entries = loadEntries(room.interior) ?? prefillFromPlan(room);
   state.selected = -1;
   setDressingHidden(true);
@@ -627,7 +755,7 @@ function buildPanel(): void {
   state.statusEl = status;
 
   const pickerLabel = document.createElement('div');
-  pickerLabel.textContent = 'Place prop (spawns in front of you):';
+  pickerLabel.textContent = 'Asset picker:';
   pickerLabel.style.cssText = 'margin-top:2px;font-weight:bold;';
   panel.appendChild(pickerLabel);
   const picker = document.createElement('div');
@@ -688,7 +816,9 @@ function buildPanel(): void {
     button('dup', () => {
       const entry = selectedEntry();
       if (!entry) return;
-      state.entries.push({ ...entry, x: entry.x + 2 });
+      const copy = { ...entry, x: entry.x + 2 };
+      delete copy.sourceId;
+      state.entries.push(copy);
       state.selected = state.entries.length - 1;
       rebuildGroup();
     }),
@@ -738,6 +868,10 @@ function buildPanel(): void {
     button('export JSON', exportEntries, true),
     button('reload plan', () => {
       if (!state.room) return;
+      if (state.room === WORLD_QUEST_SITE) {
+        importCurrentQuest();
+        return;
+      }
       state.entries = prefillFromPlan(state.room);
       state.selected = -1;
       rebuildGroup();
@@ -762,6 +896,7 @@ function buildPanel(): void {
   });
   const kitBtn = button(kitLabel(), () => {
     kitOverride = KIT_CYCLE[(KIT_CYCLE.indexOf(activeKit()) + 1) % KIT_CYCLE.length];
+    tickStatus();
     renderPicker();
   });
   state.kitBtn = kitBtn;
@@ -788,6 +923,9 @@ function tickStatus(): void {
   const player = state.deps?.getPlayer();
   const room = roomForPlayer(player);
   if (room && room !== state.room) enterRoom(room);
+  if (state.deps && state.room === WORLD_QUEST_SITE && importedQuestSources.length) {
+    setWorldQuestPlacerMask(state.deps.scene, importedQuestSources);
+  }
   if (!state.statusEl) return;
   if (!room || !player) {
     state.statusEl.textContent =
@@ -800,6 +938,7 @@ function tickStatus(): void {
 }
 
 function closePlacer(): void {
+  if (state.deps) setWorldQuestPlacerMask(state.deps.scene, []);
   if (state.timer !== null) {
     window.clearInterval(state.timer);
     state.timer = null;
@@ -816,6 +955,7 @@ function closePlacer(): void {
   state.pickerEl = null;
   state.kitBtn = null;
   if (state.group) {
+    disposeQuestPlacerInstances(state.group);
     state.group.parent?.remove(state.group);
     state.group = null;
   }
@@ -825,34 +965,62 @@ function closePlacer(): void {
   state.deps?.log('[placer] closed (placements stay saved locally)', '#8fd0ff');
 }
 
+let opening = false;
+
 function openPlacer(deps: IgnivarPlacerDeps): void {
+  if (opening) return;
+  opening = true;
   state.deps = deps;
-  void prepareIgnivarEnvProps().then(() => {
-    if (state.panel) return;
-    buildPanel();
-    applyWorklight();
-    sendFreeze(true);
-    // The freeze is sim-wide: on a shared dev realm every mob stops for
-    // everyone connected until this rig closes, so say so where the other
-    // players' "mobs stopped moving" report would otherwise start a hunt.
-    deps.log(
-      '[placer] mobs frozen realm-wide while the rig is open (/dev freezemobs); released on close.',
-    );
-    const room = roomForPlayer(deps.getPlayer());
-    if (room) enterRoom(room);
-    tickStatus();
-    state.timer = window.setInterval(tickStatus, 300);
-    deps.log(
-      '[placer] open. Walk somewhere, click a prop to place it, tune with the panel. Export when done.',
-      '#8fd0ff',
-    );
-  });
+  deps.log('[placer] loading placement kits...', '#8fd0ff');
+  void Promise.all([
+    prepareIgnivarEnvProps(),
+    prepareWorldQuestPlacerAssets(),
+    prepareCurrentQuestAssets(),
+  ])
+    .then(() => warmWorldQuestPlacerAssets(deps.compilePreview))
+    .then(() => warmCurrentQuestAssets(deps.compilePreview))
+    .then(() => {
+      if (state.panel) return;
+      buildPanel();
+      applyWorklight();
+      sendFreeze(true);
+      // The freeze is sim-wide: on a shared dev realm every mob stops for
+      // everyone connected until this rig closes, so say so where the other
+      // players' "mobs stopped moving" report would otherwise start a hunt.
+      deps.log(
+        '[placer] mobs frozen realm-wide while the rig is open (/dev freezemobs); released on close.',
+      );
+      const room = roomForPlayer(deps.getPlayer());
+      if (room) enterRoom(room);
+      tickStatus();
+      state.timer = window.setInterval(tickStatus, 300);
+      deps.log(
+        '[placer] open. Walk somewhere, click a prop to place it, tune with the panel. Export when done.',
+        '#8fd0ff',
+      );
+    })
+    .catch((error: unknown) => {
+      console.error('[placer] could not prepare placement kits', error);
+      deps.log('[placer] assets could not load. Use /placer to retry.', '#ffcf6a');
+    })
+    .finally(() => {
+      opening = false;
+    });
 }
 
 /** Chat hook: `/dev placer` or `/placer` toggles the rig. Dev builds only. */
 export function tryIgnivarPlacerCommand(raw: string, deps: IgnivarPlacerDeps): boolean {
-  if (!/^\/(?:dev\s+placer|placer)\s*$/i.test(raw.trim())) return false;
+  const match = /^\/(?:dev\s+placer|placer)(?:\s+(quests|worldquests))?\s*$/i.exec(raw.trim());
+  if (!match) return false;
   if (!import.meta.env.DEV) return false;
+  if (match[1]) {
+    kitOverride = 'world_quests';
+    if (state.panel) {
+      tickStatus();
+      renderPicker();
+    } else openPlacer(deps);
+    return true;
+  }
   if (state.panel) closePlacer();
   else openPlacer(deps);
   return true;

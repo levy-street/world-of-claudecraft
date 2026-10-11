@@ -5,7 +5,7 @@ import { setRenderCategory } from './renderer_diagnostics';
 /** What a prewarm slot needs from the renderer. */
 export interface VariantPrewarmSlotHost {
   scene: THREE.Object3D;
-  compileColorPrograms(group: THREE.Group): Promise<unknown>;
+  compileColorPrograms(root: THREE.Object3D): Promise<unknown>;
 }
 
 /** How one boot-manifest slot builds, links, hides and tears down its artifact.
@@ -19,8 +19,12 @@ export interface PrewarmGroupSlotOptions<T> {
   stage: () => T;
   /** The resume lane's link step. Default: compileColorPrograms on a group. */
   link?: (artifact: T) => Promise<unknown>;
-  /** Per-piece resume work (one unit per texture). Replaces the link step. */
+  /** Per-piece resume work (one unit per texture). Replaces the link step,
+   *  unless the slot also names a `linkRoot`. */
   units?: (artifact: T) => readonly PrewarmResumeUnit[];
+  /** The live object a group-less artifact draws on. Declaring it adds a
+   *  link step between the stage and the pieces. */
+  linkRoot?: (artifact: T) => THREE.Object3D;
   /** Make the staged artifact undrawable, for artifacts with no group flag. */
   hide?: (artifact: T) => void;
   /** Release the staged artifact. Never dispose: a disposed material releases
@@ -97,14 +101,16 @@ export function createPrewarmGroupSlot<T>(
     if (artifact === null) throw new Error(`prewarm slot ${stageId} has no artifact to ${step}`);
     return artifact;
   };
+  const linkTarget = (): THREE.Object3D | null =>
+    groupNow() ?? (artifact !== null && options.linkRoot ? options.linkRoot(artifact) : null);
   const link = async (): Promise<void> => {
     const staged = stagedArtifact('link');
     if (options.link) {
       await options.link(staged);
       return;
     }
-    const group = groupNow();
-    if (group) await host.compileColorPrograms(group);
+    const root = linkTarget();
+    if (root) await host.compileColorPrograms(root);
   };
   // The piece list is only knowable once stage() has run, and the resume
   // ledger fixes an entry's unit count when it is scheduled, so the pieces
@@ -125,23 +131,20 @@ export function createPrewarmGroupSlot<T>(
     // its link (prewarm_resume_runner.ts): read when the unit runs, since the
     // group exists only once the stage unit before it has run. Without it the
     // resumed link was the one link in the lane the worker never saw.
-    resumeUnits: () =>
-      options.units
-        ? [
-            { id: `${stageId}:stage`, run: stageHidden },
-            { id: `${stageId}:units`, run: runUnits },
-          ]
-        : [
-            { id: `${stageId}:group`, run: stageHidden },
-            {
-              id: `${stageId}:compile`,
-              run: link,
-              get roots() {
-                const group = groupNow();
-                return group ? [group] : [];
-              },
-            },
-          ],
+    resumeUnits: () => {
+      const compile: PrewarmResumeUnit = {
+        id: `${stageId}:compile`,
+        run: link,
+        get roots() {
+          const root = linkTarget();
+          return root ? [root] : [];
+        },
+      };
+      if (!options.units) return [{ id: `${stageId}:group`, run: stageHidden }, compile];
+      const stageUnit = { id: `${stageId}:stage`, run: stageHidden };
+      const unitsUnit = { id: `${stageId}:units`, run: runUnits };
+      return options.linkRoot ? [stageUnit, compile, unitsUnit] : [stageUnit, unitsUnit];
+    },
     run: () => {
       stage();
       if (options.units) return runUnits();

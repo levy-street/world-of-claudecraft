@@ -3,6 +3,7 @@ import {
   IGNIVAR_FORGE_WAVE_GAP_HALF_ANGLE,
   IGNIVAR_FORGE_WAVE_RANGE,
 } from '../sim/ignivar_forge_wave';
+import { applyFloorVfxLayer } from './floor_vfx_layer';
 
 export const IGNIVAR_FORGE_WAVE_VISUAL_NAME = 'ignivarForgeWave';
 export const IGNIVAR_FORGE_WAVE_PREVIEW_NAME = 'ignivarForgeWavePreview';
@@ -213,6 +214,11 @@ export function buildIgnivarForgeWaveVisual(): THREE.Group {
   );
 
   root.add(preview, safeLanes, wall);
+  // Every piece shipped with no order: the encounter band floor, per legacy
+  // minus one. The vertical flame wall rides along so a player floor effect
+  // can never paint over its base; all additive, so mutual order is
+  // colour-invariant.
+  applyFloorVfxLayer(root, 'encounter', 0);
   root.visible = false;
   preview.visible = false;
   safeLanes.visible = false;

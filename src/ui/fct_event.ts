@@ -66,6 +66,15 @@ export interface FctSpawnShape {
   /** Drives the miss/dodge colour token (self #bbb vs other #fff); ignored by every other kind. */
   readonly isSelf: boolean;
   readonly crit: boolean;
+  /**
+   * Seconds to hold this floater before it appears, for an ability whose authored
+   * contacts land after the cast tick (Red Harvest's three blades). Never set by
+   * fctSpawnShape, which is a pure discrimination: the painter stamps it from the beat
+   * stager (fct_stage_core.ts) and honours it, and the spawn sites carry it onto the
+   * FctEvent with the rest of the shape. Absent or 0 means spawn at once, which is
+   * every other floater in the game.
+   */
+  readonly delaySec?: number;
 }
 
 /**
