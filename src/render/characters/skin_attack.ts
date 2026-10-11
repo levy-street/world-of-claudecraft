@@ -94,6 +94,13 @@ export function weaponSkinAttackClips(weaponSkinId: string | null): SkinAttackCl
   return handling === 'crossbow' ? RANGED_ATTACK : null;
 }
 
+/** Whether a displayed weapon skin is held and fired as a bow (its handling, so a
+ *  bow-slot gun that aims like a crossbow is not). Independent of what a rig binds:
+ *  the WOC bodies answer a bow skin with their own keyed bow shot. */
+export function weaponSkinDrawsBow(weaponSkinId: string | null): boolean {
+  return weaponSkinAttackClips(weaponSkinId) === BOW_ATTACK;
+}
+
 /** The substitution above, resolved against the clips a RIG actually bound.
  *  `has` answers whether a clip name resolved to a live action on this visual.
  *

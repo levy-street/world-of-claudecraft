@@ -113,7 +113,9 @@ async function settled(p: Promise<unknown>): Promise<'pending' | 'resolved' | 'r
   return state;
 }
 
-const isWoc = (url: string): boolean => url.startsWith(`${WOC_SPLIT_DIR}/`);
+// The split files, and the hand-keyed library that rides on them beside that directory.
+const KEYED = new Set((['male', 'female'] as const).map(wocKeyedAnimsUrl));
+const isWoc = (url: string): boolean => url.startsWith(`${WOC_SPLIT_DIR}/`) || KEYED.has(url);
 const BODIES = wocEntryBodyUrls();
 const CORES = wocEntryHeadCoreUrls();
 const CRITICAL = [...BODIES, ...CORES];
@@ -180,7 +182,7 @@ describe('the WOC entry file sets (woc_entry_core.ts)', () => {
     expect(NOT_ENTRY.length).toBeGreaterThan(0);
     for (const url of NOT_ENTRY) expect(all, url).not.toContain(url);
     for (const url of all) {
-      expect(url.startsWith(`${WOC_SPLIT_DIR}/`), url).toBe(true);
+      expect(isWoc(url), url).toBe(true);
       expect(parseWocArmorPackUrl(url), `${url} is an armor file`).toBeNull();
       expect(existsSync(publicPath(url)), `${url} is not on disk`).toBe(true);
       expect(MEDIA_ASSETS[url], `${url} is not in the media manifest`).toBeTruthy();

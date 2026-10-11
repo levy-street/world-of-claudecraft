@@ -4,7 +4,8 @@ Movement, emote and autoattack clips hand-keyed on the WOC male and female bind
 rigs, separately for each fit. `catalog.mjs` lists every keyed clip; the ones the
 game plays (`SHIPPED_CLIPS`) ship as one meshless library per fit:
 
-- `public/models/chars/players/woc/woc_male.glb` and `woc_female.glb`
+- `public/models/chars/players/woc_keyed/woc_male.glb` and `woc_female.glb`, beside
+  (not inside) the artist's delivery directory `players/woc/`
 
 The bodies load them after the rig's own library (`anims_<fit>.glb`), and two
 runtime modules map them: `src/render/characters/woc_keyed_animations.ts` (idle,

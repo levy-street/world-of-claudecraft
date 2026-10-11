@@ -1,7 +1,7 @@
 // Builds the hand-keyed animation libraries for the WOC male and female rigs.
 //
 //   node scripts/assets/woc_keyed_anims/build.mjs           the shipped libraries:
-//       public/models/chars/players/woc/woc_{male,female}.glb (SHIPPED_CLIPS only)
+//       public/models/chars/players/woc_keyed/woc_{male,female}.glb (SHIPPED_CLIPS only)
 //   node scripts/assets/woc_keyed_anims/build.mjs --all [dir]   every keyed clip,
 //       into dir (default tmp/woc_keyed_anims) for review
 //
@@ -22,7 +22,8 @@ import { CATALOG, SHIPPED_CLIPS } from './catalog.mjs';
 import { rigFromDocument } from './kinematics.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-export const SHIPPED_DIR = path.join(ROOT, 'public/models/chars/players/woc');
+const RIG_DIR = path.join(ROOT, 'public/models/chars/players/woc');
+export const SHIPPED_DIR = path.join(ROOT, 'public/models/chars/players/woc_keyed');
 
 export async function glbIO() {
   await MeshoptDecoder.ready;
@@ -35,7 +36,7 @@ export async function glbIO() {
 
 /** The bind rig of a WOC body fit, read from its shipped base. */
 export async function wocRig(io, fit) {
-  return rigFromDocument(await io.read(path.join(SHIPPED_DIR, `base_${fit}.glb`)));
+  return rigFromDocument(await io.read(path.join(RIG_DIR, `base_${fit}.glb`)));
 }
 
 /** One fit's library of the named clips, compressed and ready to write. */

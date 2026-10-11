@@ -4,7 +4,9 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { AnimState } from '../src/render/characters/anim_state';
 import { VISUALS, type VisualDef } from '../src/render/characters/manifest';
 import type { CharacterVisual } from '../src/render/characters/visual';
+import wocAutoAttackContacts from '../src/render/characters/woc_autoattack_contacts.json';
 import { WOC_WARRIOR_MANIFEST } from '../src/render/characters/woc_character_manifest';
+import { WOC_KEYED_CLIP_NAMES } from '../src/render/characters/woc_keyed_animations';
 import { wocAllPartNames } from '../src/render/characters/woc_parts_core';
 import { landWocBodies } from './helpers/woc_streamed';
 
@@ -34,7 +36,7 @@ function fixtureGltf(url: string) {
   }
   return {
     scene,
-    animations: WOC_WARRIOR_MANIFEST.animationNames.map((name) => {
+    animations: [...WOC_WARRIOR_MANIFEST.animationNames, ...WOC_KEYED_CLIP_NAMES].map((name) => {
       const duration = name === 'Climb' ? 0.3 : 1;
       return new THREE.AnimationClip(name, duration, [
         new THREE.VectorKeyframeTrack(
@@ -119,13 +121,13 @@ describe('WOC authored movement and held props', () => {
     visual.setClimbing(false);
     tick(visual, { moving: true, running: true, speed: 7 }, 60);
     expect(climb?.isRunning()).toBe(false);
-    expect(peek(visual).current.getClip().name).toBe('Run');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Run');
     expect(peek(visual).current.getEffectiveWeight()).toBe(1);
     expect(visual.root.getObjectByName('hips')?.position.y).toBeCloseTo(0);
     // Jump yielded under the climb before Run became current. Its cached
     // action must recover too, or the next jump returns to a zero-weight pose.
     tick(visual, { airborne: true }, 20);
-    expect(peek(visual).current.getClip().name).toBe('Jump');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Jump');
     expect(peek(visual).current.getEffectiveWeight()).toBe(1);
   });
 
@@ -140,7 +142,7 @@ describe('WOC authored movement and held props', () => {
       expect(holders).toHaveLength(2);
       expect(holders.every((holder) => holder.visible)).toBe(true);
       tick(visual, { swimming: true, moving: true });
-      expect(peek(visual).current.getClip().name).toBe('Swim');
+      expect(peek(visual).current.getClip().name).toBe('Woc_Swim');
       expect(holders.every((holder) => !holder.visible)).toBe(true);
       tick(visual);
       expect(holders.every((holder) => holder.visible)).toBe(true);
@@ -153,22 +155,26 @@ describe('WOC attack and shout routing', () => {
     const visual = create();
     visual.setWeapon('worn_sword');
     visual.setOffhand('rusty_dagger');
-    for (const clip of ['Dual_Chop#main', 'Dual_Chop#off', 'Dual_Chop#main']) {
+    // white swings play the hand-keyed dual set (woc_autoattack_core.ts)
+    for (const clip of ['Woc_Attack_Dual#main', 'Woc_Attack_Dual#off', 'Woc_Attack_Dual#main']) {
       visual.playAttack();
       expect(peek(visual).current.getClip().name).toBe(clip);
       expect(peek(visual).current.timeScale).toBe(1);
       tick(visual);
     }
-    // both hands in one frame: the X-slash, then (next pair) the one-two of the whole clip
+    // both hands in one frame: the whole keyed pair; a third cue that frame rides it
     visual.playAttack();
-    expect(peek(visual).current.getClip().name).toBe('Dual_Chop#off');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Attack_Dual#off');
     visual.playAttack();
-    expect(peek(visual).current.getClip().name).toBe('Dual_Cross');
+    const pair = peek(visual).current;
+    expect(pair.getClip().name).toBe('Woc_Attack_Dual');
+    visual.playAttack();
+    expect(peek(visual).current).toBe(pair);
     tick(visual);
     visual.playAttack();
-    expect(peek(visual).current.getClip().name).toBe('Dual_Chop#main');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Attack_Dual#main');
     visual.playAttack();
-    expect(peek(visual).current.getClip().name).toBe('Dual_Chop');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Attack_Dual');
   });
 
   it('a same-frame pair blends in from the pose the rig was in, not a hard cut', () => {
@@ -180,13 +186,13 @@ describe('WOC attack and shout routing', () => {
     visual.playAttack();
     visual.playAttack();
     const pair = peek(visual).current;
-    expect(pair.getClip().name).toBe('Dual_Cross');
+    expect(pair.getClip().name).toBe('Woc_Attack_Dual');
     // the base keeps driving while the pair fades in (the replaced half never drove a pose)
     tick(visual, {}, 1);
     expect(pair.getEffectiveWeight()).toBeLessThan(1);
     expect(base.getEffectiveWeight()).toBeGreaterThan(0);
     expect(pair.getEffectiveWeight() + base.getEffectiveWeight()).toBeCloseTo(1, 5);
-    expect(peek(visual).actions.get('Dual_Chop#main')?.isRunning()).toBe(false);
+    expect(peek(visual).actions.get('Woc_Attack_Dual#main')?.isRunning()).toBe(false);
   });
 
   it('reports each swing blade contact for the presentation hold (ClipMap.contacts)', () => {
@@ -194,9 +200,10 @@ describe('WOC attack and shout routing', () => {
     visual.setWeapon('worn_sword');
     visual.setOffhand('rusty_dagger');
     const contacts = peek(visual).def.clips.contacts ?? {};
-    expect(visual.playAttack()).toBeCloseTo(contacts['Dual_Chop#main'][0], 6);
+    const keyed = wocAutoAttackContacts.male;
+    expect(visual.playAttack()).toBeCloseTo(keyed['Woc_Attack_Dual#main'][0], 6);
     // the second hand of a same-frame pair lands on the pair clip's second contact
-    expect(visual.playAttack()).toBeCloseTo(contacts.Dual_Cross[1], 6);
+    expect(visual.playAttack()).toBeCloseTo(keyed.Woc_Attack_Dual[1], 6);
     tick(visual);
     // an ability routed through the one-hand slash plays the X-slash with two blades
     expect(visual.playAttack('overpower')).toBeCloseTo(contacts.Dual_Cross[0], 6);
@@ -224,9 +231,9 @@ describe('WOC attack and shout routing', () => {
   });
 
   it.each([
-    [null, 'Run'],
+    [null, 'Woc_Run'],
     [undefined, 'Cheer'],
-    ['flex', 'Flex'],
+    ['flex', 'Woc_Emote_Flex'],
   ] as const)(
     'shoutEmote %s preserves suppression, default cheer, or the requested emote',
     (shoutEmote, clip) => {
@@ -250,7 +257,8 @@ describe('WOC attack and shout routing', () => {
 // sword and fights on the single set (the shield set without the shield hand raised), through
 // the real playAttack / playHit / brace path. The fixture binds exactly the shipped library's
 // clips (the *_2H set left it the same day), so a map still pointing at a *_2H name would fall
-// back to the default one-hand clip and fail the single-set expectations here.
+// back to the default one-hand clip and fail the single-set expectations here. White swings
+// play the hand-keyed one-hand set (woc_autoattack_core.ts); named strikes keep the single set.
 describe('WOC two-hand weapon: the single set, no two-hand stance', () => {
   const clip = (visual: CharacterVisual) => peek(visual).current.getClip().name;
 
@@ -258,17 +266,15 @@ describe('WOC two-hand weapon: the single set, no two-hand stance', () => {
     const visual = create();
     visual.setWeapon('eastbrook_greatsword');
     tick(visual, {}, 20);
-    expect(clip(visual)).toBe('Idle');
-    const contacts = peek(visual).def.clips.contacts ?? {};
-    // the auto attack swings like the one-hand sword (the sword-and-board set, no shield hand):
-    // the default chop/slash alternation, never the both-fists 2H_Chop of attackByHand.twohand,
-    // and the presentation waits for ITS blade
-    expect(visual.playAttack()).toBeCloseTo(contacts['1H_Chop_Single'][0], 6);
-    expect(clip(visual)).toBe('1H_Chop_Single');
+    expect(clip(visual)).toBe('Woc_Idle');
+    // the auto attack swings like the one-hand sword: the keyed one-hand pair in turn, never
+    // the both-fists two-hand swing, and the presentation waits for ITS blade
+    expect(visual.playAttack()).toBeCloseTo(wocAutoAttackContacts.male.Woc_Attack_1H_0[0], 6);
+    expect(clip(visual)).toBe('Woc_Attack_1H_0');
     tick(visual, {}, 90);
     expect(clip(visual)).toBe('Combat_Idle_Single');
     visual.playAttack();
-    expect(clip(visual)).toBe('1H_Slash_Single');
+    expect(clip(visual)).toBe('Woc_Attack_1H_1');
     tick(visual, {}, 90);
     expect(clip(visual)).toBe('Combat_Idle_Single');
     for (const [ability, strike] of [
@@ -294,7 +300,7 @@ describe('WOC two-hand weapon: the single set, no two-hand stance', () => {
       visual.setWeapon('ridgebreaker');
       tick(visual, {}, 20);
       visual.playAttack();
-      expect(clip(visual), key).toBe('1H_Chop_Single');
+      expect(clip(visual), key).toBe('Woc_Attack_1H_0');
       tick(visual, {}, 90);
       expect(clip(visual), key).toBe('Combat_Idle_Single');
     }
@@ -311,7 +317,7 @@ describe('WOC two-hand weapon: the single set, no two-hand stance', () => {
     visual.setOffhand('eastbrook_greatsword');
     tick(visual, {}, 20);
     visual.playAttack();
-    expect(clip(visual)).toBe('Dual_Chop#main');
+    expect(clip(visual)).toBe('Woc_Attack_Dual#main');
     tick(visual, {}, 90);
     expect(clip(visual)).toBe('Combat_Idle_Dual');
     visual.playAttack('mortal_strike');
@@ -323,13 +329,13 @@ describe('WOC two-hand weapon: the single set, no two-hand stance', () => {
     priest.setWeapon('gnarled_staff');
     tick(priest, {}, 20);
     priest.playAttack();
-    expect(clip(priest)).toBe('2H_Chop');
+    expect(clip(priest)).toBe('Woc_Attack_2H_0');
     // flagged two-hand, so the shaman swings attackByHand.twohand, but a staff is the single set
     const shaman = create('player_shaman');
     shaman.setWeapon('briarroot_staff');
     tick(shaman, {}, 20);
     shaman.playAttack();
-    expect(clip(shaman)).toBe('2H_Chop');
+    expect(clip(shaman)).toBe('Woc_Attack_2H_0');
   });
 });
 
@@ -373,7 +379,7 @@ describe('hunter cast-to-shot state transitions', () => {
     // this exercise the cast-state guard independently of its pause guard.
     peek(visual).baseState = 'idle';
     visual.playAttack();
-    expect(peek(visual).current.getClip().name).toBe('Ranged_Shoot');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Attack_Rifle');
   });
 
   it('releases a cancelled hold back to locomotion and does not reuse its tail for the next auto shot', () => {
@@ -383,8 +389,8 @@ describe('hunter cast-to-shot state transitions', () => {
     expect(aim.paused).toBe(true);
     tick(visual, { moving: true, running: true, speed: 7 }, 20);
     expect(aim.paused).toBe(false);
-    expect(peek(visual).current.getClip().name).toBe('Run');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Run');
     visual.playAttack();
-    expect(peek(visual).current.getClip().name).toBe('Ranged_Shoot');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Attack_Rifle');
   });
 });

@@ -12,7 +12,10 @@ import {
   WOC_AUTO_ATTACK_NAMES,
 } from '../src/render/characters/woc_autoattack_core';
 import { wocEntryBodyUrls } from '../src/render/characters/woc_entry_core';
-import { wocKeyedAnimsUrl } from '../src/render/characters/woc_keyed_animations';
+import {
+  WOC_KEYED_CLIP_NAMES,
+  wocKeyedAnimsUrl,
+} from '../src/render/characters/woc_keyed_animations';
 
 const args = () => ({
   def: VISUALS.player_warrior,
@@ -96,11 +99,9 @@ describe.each(['male', 'female'] as const)('%s shipped hand-keyed library', (fit
     await MeshoptDecoder.ready;
     const defs = Object.values(VISUALS).filter((d) => d.wocCharacter?.fit === fit);
     expect(defs.length).toBeGreaterThan(0);
-    const bound = new Set<string>();
     for (const def of defs) {
       expect(def.animUrls).toContain(wocKeyedAnimsUrl(fit));
-      expect(clipNamesOf(def)).toEqual(expect.arrayContaining([...WOC_AUTO_ATTACK_NAMES]));
-      for (const name of clipNamesOf(def)) if (name.startsWith('Woc_')) bound.add(name);
+      expect(clipNamesOf(def)).toEqual(expect.arrayContaining([...WOC_KEYED_CLIP_NAMES]));
     }
     expect(wocEntryBodyUrls()).toContain(wocKeyedAnimsUrl(fit));
     const bytes = fs.readFileSync(`public/${wocKeyedAnimsUrl(fit)}`);
@@ -108,7 +109,7 @@ describe.each(['male', 'female'] as const)('%s shipped hand-keyed library', (fit
       .setMeshoptDecoder(MeshoptDecoder)
       .parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
     // Every keyed clip a body binds ships, and nothing it never plays rides along.
-    expect(gltf.animations.map((c) => c.name).sort()).toEqual([...bound].sort());
+    expect(gltf.animations.map((c) => c.name).sort()).toEqual([...WOC_KEYED_CLIP_NAMES].sort());
     const table = contacts[fit] as Record<string, number[]>;
     const melee = WOC_AUTO_ATTACK_NAMES.filter((n) => !/Rifle|Bow/.test(n));
     expect(Object.keys(table).sort()).toEqual([...melee].sort());

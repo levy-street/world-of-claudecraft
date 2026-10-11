@@ -139,8 +139,8 @@ import {
   pickSkinAttackClips,
   rangedSkinAiming,
   SKIN_ATTACK_CLIP_NAMES,
-  weaponSkinAttackClips,
   weaponSkinCastClip,
+  weaponSkinDrawsBow,
   weaponSkinOrientPin,
 } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
@@ -2764,23 +2764,24 @@ export class CharacterVisual {
       this.loadoutSwap !== null &&
       this.loadoutSwap === this.def.clips.loadoutSwaps?.twohand;
     // A WOC body's white swings play its hand-keyed autoattacks (woc_autoattack_core.ts),
-    // unless a displayed weapon skin substitutes a clip this rig has bound.
-    const auto = skinAttack
-      ? null
-      : pickWocAutoAttack({
-          def: this.def,
-          abilityId,
-          kind,
-          style,
-          singleSetTwoHander,
-          bowSkin:
-            weaponSkinAttackClips(this.weaponSkinId)?.clips.includes('Bow_Draw_Shot') ?? false,
-          unarmed: this.bareWhenUnarmed && !this.weaponItemId,
-          index: this.attackIdx,
-          mixerTime: this.mixer.time,
-          dual: this.dualSwing,
-          has: (name) => this.action(name) !== null,
-        });
+    // unless a displayed weapon skin substitutes a clip this rig has bound, or the shot
+    // releases a cast the rig's own aim is holding (it finishes on the rig's own shot).
+    const auto =
+      skinAttack || this.baseState === 'cast'
+        ? null
+        : pickWocAutoAttack({
+            def: this.def,
+            abilityId,
+            kind,
+            style,
+            singleSetTwoHander,
+            bowSkin: weaponSkinDrawsBow(this.weaponSkinId),
+            unarmed: this.bareWhenUnarmed && !this.weaponItemId,
+            index: this.attackIdx,
+            mixerTime: this.mixer.time,
+            dual: this.dualSwing,
+            has: (name) => this.action(name) !== null,
+          });
     if (auto) {
       // A third swing this frame: the pair clip already playing carries it.
       if (!auto.clip) return auto.delay;

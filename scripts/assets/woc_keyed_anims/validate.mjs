@@ -20,7 +20,7 @@ const all = process.argv[2] === '--all';
 const writeContacts = process.argv.includes('--write-contacts');
 const output = all
   ? path.resolve(root, process.argv[3] ?? 'tmp/woc_keyed_anims')
-  : path.join(root, 'public/models/chars/players/woc');
+  : path.join(root, 'public/models/chars/players/woc_keyed');
 const expected = all ? Object.keys(CATALOG) : [...SHIPPED_CLIPS];
 await MeshoptDecoder.ready;
 const contactsByFit = {};

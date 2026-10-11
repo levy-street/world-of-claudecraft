@@ -232,7 +232,10 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   still waits hidden behind the injected compile gate
   (`tests/form_adornments.test.ts`, `tests/character_form_adornments.test.ts`).
 - WOC split character files (the player bodies, 2026-09-28): one base and one
-  animation library per body fit, and per armor set and fit a low file, a medium
+  animation library per body fit, plus the hand-keyed library over it
+  (`woc_keyed_animations.ts`: `players/woc_keyed/woc_<fit>.glb`, keyed on the same bind
+  pose by `scripts/assets/woc_keyed_anims/`, for the idle, gaits, swim, jump take-off,
+  death, four emotes and the white swings), and per armor set and fit a low file, a medium
   file and a TOP file (`woc_armor_core.ts`: file names, the tier a character
   draws, the stand-in tier, the idle rule and its ledger; pure). Since 2026-10-03 the
   medium file carries every map of the set's one full layout at half its size and
@@ -349,7 +352,11 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `tests/woc_export.test.ts`), so no hairstyle or helm can change a character's
   size. Blade-contact timing for the
   hit presentation: `attack_swing_core.ts` (`ClipMap.contacts`, measured off
-  the shipped library by `tests/woc_character.test.ts`). The renderer holds the
+  the shipped library by `tests/woc_character.test.ts`). A WOC body's white swings
+  instead play the hand-keyed set (`woc_autoattack_core.ts`, pure): `playAttack` asks it
+  after the held-shot tail and skin checks and before the hand clip, and it times each
+  swing by `woc_autoattack_contacts.json` (written by the keyed build's validator,
+  pinned by `tests/woc_autoattacks.test.ts`). The renderer holds the
   target-side effects until that contact (`../contact_queue.ts`), a kill's
   collapse included, and the mount under a seated rider and a paladin's wings
   read the same hold, so they go on the frame the blade lands (`collapsed`,
@@ -801,7 +808,8 @@ told so, which drops a far bake still queued for it) are
   `attach[].url` + `animUrls` (skipping `lazyPreload` defs), so drop the GLB
   under `public/models/...` and run the media-manifest build.
 - **New animation state:** add the field to `AnimState`, extend `BaseState` +
-  `desiredBaseState()` (`anim_state.ts`), `baseAction()`, and `ClipMap`/`clipNamesOf()`,
+  `desiredBaseState()` (`anim_state.ts`), `baseAction()`, and `ClipMap`/`clipNamesOf()`
+  (`clip_names.ts`, the one list a visual binds actions from),
   then have the renderer set the new flag. New pose LOGIC goes in the pure
   `anim_state.ts` half a Vitest imports directly, never inline in `visual.ts`.
 - **Tests:** `tests/visual_manifest.test.ts` pins the `VISUALS`/clip contract,

@@ -59,8 +59,9 @@ function withoutTextures(file: Buffer): ArrayBuffer {
   return out.buffer.slice(out.byteOffset, out.byteOffset + out.byteLength) as ArrayBuffer;
 }
 
-/** The shipped files this suite reads for real; every other url gets an empty scene. */
-const SHIPPED = /models\/chars\/players\/woc\/(base_|anims_|head_type_[ab]_core)/;
+/** The shipped files this suite reads for real (the bodies, both animation libraries and
+ *  the head cores); every other url gets an empty scene. */
+const SHIPPED = /models\/chars\/players\/(woc\/(base_|anims_|head_type_[ab]_core)|woc_keyed\/woc_)/;
 
 /** The game's own parse of a shipped file: the meshopt decoder and the level-of-detail
  *  plugin, as assets/loader.ts registers them. */
