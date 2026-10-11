@@ -149,6 +149,67 @@ describe('A Borrowed Face', () => {
     expect(sim.worldQuestLog.has(ID)).toBe(false);
   });
 
+  it('puts a rider own mount away and hears the accusation instead of ignoring it', () => {
+    const sim = setup();
+    investigate(sim);
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim);
+    expect(sim.player.mountKey).toBe('');
+    const mob = sim.entities.get(sim.worldQuestLog.get(ID)!.investigation!.mobId!)!;
+    expect(mob.templateId).toBe(INVESTIGATION_MOB_ID);
+  });
+
+  it('keeps a rider mounted when the accusation is refused', () => {
+    const sim = setup();
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim);
+    expect(sim.worldQuestLog.get(ID)?.investigation?.mobId).toBeUndefined();
+    expect(sim.player.mountKey).toBe('valorsteed');
+  });
+
+  it('dismounts a rider who names the wrong guard and clears that guard', () => {
+    const sim = setup();
+    investigate(sim);
+    const correct = culprit(sim);
+    const wrong = INVESTIGATION_NPC_IDS.slice(1).find((id) => id !== correct)!;
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim, wrong);
+    const state = sim.worldQuestLog.get(ID)!.investigation!;
+    expect(sim.player.mountKey).toBe('');
+    expect(state.cleared).toBe(1 << (INVESTIGATION_NPC_IDS.indexOf(wrong) - 1));
+    expect(state.mobId).toBeUndefined();
+  });
+
+  it('keeps a rider mounted when the named guard is already cleared or the infiltrator is up', () => {
+    const sim = setup();
+    investigate(sim);
+    const correct = culprit(sim);
+    const wrong = INVESTIGATION_NPC_IDS.slice(1).find((id) => id !== correct)!;
+    accuse(sim, wrong);
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim, wrong);
+    expect(sim.player.mountKey).toBe('valorsteed');
+    sim.player.mountKey = '';
+    accuse(sim, correct);
+    const mobId = sim.worldQuestLog.get(ID)!.investigation!.mobId;
+    expect(mobId).toBeDefined();
+    sim.player.inCombat = false;
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim, correct);
+    expect(sim.player.mountKey).toBe('valorsteed');
+    expect(sim.worldQuestLog.get(ID)!.investigation!.mobId).toBe(mobId);
+  });
+
+  it('refuses a rider in a mount race without dismounting them', () => {
+    const sim = setup();
+    investigate(sim);
+    sim.player.mountKey = 'valorsteed';
+    sim.meta(sim.playerId)!.mountRace = {} as never;
+    accuse(sim);
+    expect(sim.player.mountKey).toBe('valorsteed');
+    expect(sim.worldQuestLog.get(ID)?.investigation?.mobId).toBeUndefined();
+  });
+
   it('keeps clues after wrong accusations and prevents duplicate summons even after movement', () => {
     const sim = setup();
     investigate(sim);

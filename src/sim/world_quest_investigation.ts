@@ -12,6 +12,7 @@ import { createGroundObject, createNpc } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, type WorldQuestInvestigationState } from './types';
+import { dismountForWorldQuestInstructor } from './world_quest_mount_gate';
 import { activeWorldQuestsForCycle, worldQuestPuzzleVariantForCycle } from './world_quest_rotation';
 
 function contentEnabled(ctx: SimContext): boolean {
@@ -146,13 +147,7 @@ export function accuseInvestigationSuspect(
   meta: PlayerMeta,
   player: Entity,
 ): void {
-  if (
-    !Number.isSafeInteger(npcId) ||
-    !active(ctx, meta, player) ||
-    player.inCombat ||
-    player.mountKey
-  )
-    return;
+  if (!Number.isSafeInteger(npcId) || !active(ctx, meta, player) || player.inCombat) return;
   // The accusation is spoken to the sergeant (the player stands at his post
   // and names a guard); the named guard is resolved only for the reveal.
   const captain = ctx.entities.get(INVESTIGATION_NPC_IDS[0]);
@@ -164,6 +159,9 @@ export function accuseInvestigationSuspect(
   const state = stateFor(meta);
   if (state.heard !== 15 || state.clues !== 3 || state.mobId || state.cleared & (1 << index))
     return;
+  // The sergeant hears a rider too: the mount is put away only once the
+  // accusation is accepted, the way every instructor start does it.
+  if (!dismountForWorldQuestInstructor(ctx, player, meta)) return;
   const variant =
     INVESTIGATION_VARIANTS[
       worldQuestPuzzleVariantForCycle(meta.worldQuestCycle, INVESTIGATION_VARIANTS.length)
