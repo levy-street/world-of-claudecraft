@@ -1000,6 +1000,53 @@ describe('dungeon death checkpoints: the table', () => {
     );
   });
 
+  it('answers only for the dungeons it lists, never for an inherited key', () => {
+    expect(Object.keys(DUNGEON_CHECKPOINTS).sort()).toEqual([
+      'drowned_temple',
+      'gravewyrm_sanctum',
+      'hollow_crypt',
+      'sunken_bastion',
+      'wildheart_basin',
+    ]);
+    const sim = new Sim({
+      seed: 99,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
+    });
+    const pid = sim.addPlayer('warrior', 'Runner');
+    expect(sim.enterDungeon('the_last_keep', pid)).toBe(true);
+    const inst = sim.instances.find((i) => i.dungeonId === 'the_last_keep' && i.partyKey !== null)!;
+    const player = sim.entities.get(pid)!;
+    release(sim, pid);
+    expect(player.corpseInstanceId).toBe(inst.exitId);
+    const entry = DUNGEONS.the_last_keep.entry;
+    // A row that would apply at once. As an own key of the table it is honoured,
+    // so the point itself is a good one...
+    const row: DungeonCheckpoint[] = [{ bosses: [], gates: [], pos: { x: 0, z: 20 } }];
+    const table = DUNGEON_CHECKPOINTS as Record<string, readonly DungeonCheckpoint[]>;
+    table.the_last_keep = row;
+    try {
+      expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: 0, z: 20 });
+    } finally {
+      delete table.the_last_keep;
+    }
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(entry);
+    // ...and reachable only through the prototype chain it is not.
+    Object.defineProperty(Object.prototype, 'the_last_keep', {
+      value: row,
+      configurable: true,
+      enumerable: false,
+    });
+    try {
+      expect(table.the_last_keep, 'the fixture is visible through the chain').toBe(row);
+      expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(entry);
+    } finally {
+      delete (Object.prototype as Record<string, unknown>).the_last_keep;
+    }
+    expect(table.the_last_keep).toBeUndefined();
+  });
+
   // The walk is a flood fill over a one-yard grid that asks the real collision
   // seam (the same one the per-dungeon route suites walk), with exactly the listed
   // gates open: the point must be reachable from the door, and no listed gate may

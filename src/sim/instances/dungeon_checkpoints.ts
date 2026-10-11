@@ -101,9 +101,8 @@ export function dungeonReentryPoint(
   player: Entity,
 ): { x: number; z: number } {
   const dungeon = DUNGEONS[inst.dungeonId];
-  const checkpoints = DUNGEON_CHECKPOINTS[inst.dungeonId];
   if (
-    !checkpoints ||
+    !Object.hasOwn(DUNGEON_CHECKPOINTS, inst.dungeonId) ||
     inst.partyKey === null ||
     inst.exitId === null ||
     !player.dead ||
@@ -112,6 +111,7 @@ export function dungeonReentryPoint(
     player.corpseInstanceId !== inst.exitId
   )
     return dungeon.entry;
+  const checkpoints = DUNGEON_CHECKPOINTS[inst.dungeonId];
 
   // Include appended encounter adds (Knellwyrm, Bonewalkers, etc.). A return
   // during a pull never grants a shortcut back into that ongoing fight.
