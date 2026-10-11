@@ -44,7 +44,7 @@ import {
 import { updateIgnivarRaidProgression } from '../ignivar_raid_progression';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
-import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from '../raid_rooms';
+import { DAILY_LOCKOUT_RAID_ROOMS, isRaidRoom, WEEKLY_LOCKOUT_RAID_ROOMS } from '../raid_rooms';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';
@@ -76,6 +76,12 @@ import {
 import { ignivarExitRoom, ignivarExitSealed } from './ignivar_exit';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
 import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
+import {
+  durableMemberKey,
+  finalBossAlive,
+  isClearedReturnRoom,
+  raidReturnRoute,
+} from './raid_return';
 import { RAID_REQUIRED_DUNGEON_IDS, resetCooldownApplies } from './reset_cooldown_policy';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
@@ -96,9 +102,10 @@ export { RAID_REQUIRED_DUNGEON_IDS };
 // being fought, or freed and reclaimed at a new difficulty) keeps the
 // shorter, standard timeout so an abandoned attempt frees its slot promptly.
 // clearedBy is the cheap "the final boss is genuinely dead" signal: heroic
-// kills stamp it via lockToHeroicClaim, and the weekly raid rooms' NORMAL
-// kills stamp it via awardHeroicMarks' weekly arm, so both take this longer
-// grace. An ordinary normal-difficulty kill stamps nothing and still relies
+// kills stamp it via lockToHeroicClaim, the weekly raid rooms' NORMAL kills
+// via awardHeroicMarks' weekly arm, and the Nythraxis arena's kills via
+// grantNythraxisLockout (all through recordClearedRaidParticipant), so all
+// three take this longer grace. An ordinary normal-difficulty kill stamps nothing and still relies
 // on the shorter INSTANCE_EMPTY_TIMEOUT alone; extending that further would
 // need its own finalBossDeadAt-style marker on every InstanceSlot.
 export const INSTANCE_CLEARED_EMPTY_TIMEOUT = 15 * 60;
@@ -364,8 +371,8 @@ export function enterDungeon(
   options: { ignivarBacktrack?: boolean } = {},
 ): boolean {
   const r = ctx.resolve(pid);
-  // The Ignivar checkpoint redirect below may re-point the entry at a deeper
-  // room the group already claims, so both bindings stay reassignable.
+  // The raid return route and the Ignivar checkpoint redirect below may
+  // re-point the entry at another room, so both bindings stay reassignable.
   let dungeonId = requestedDungeonId;
   let dungeon = DUNGEONS[dungeonId];
   if (!r || !dungeon) return false;
@@ -375,6 +382,40 @@ export function enterDungeon(
   // cannot move, so it never reaches the door.
   if (r.e.dead && !r.e.ghost) return false;
   const party = ctx.partyOf(r.meta.entityId);
+  // The raid return route (instances/raid_return.ts): a raider who cleared a
+  // run and still holds its lock, but no longer belongs to a raid that owns
+  // it (they left, were removed, or it reformed under a new party id or as a
+  // plain party), is routed back into THAT run under its owning key, so a
+  // corpse run or loot left on a corpse stays reachable. From outside they
+  // land straight in the cleared boss room; inside, they may only step into
+  // another room they cleared, or back out through the backtrack exits.
+  // Every rule below then applies to the routed key as it would to a member.
+  // A dev teleport names its room explicitly, so the route never applies.
+  const ownKey = instanceKeyFor(ctx, r.meta.entityId);
+  const returnRoute = bypass
+    ? null
+    : raidReturnRoute(ctx, r.meta.entityId, dungeonId, ownKey, (claim) =>
+        instanceClaimContains(claim, r.e.pos),
+      );
+  if (returnRoute !== null && options.ignivarBacktrack !== true) {
+    const insideRun = ctx.instances.some(
+      (claim) => claim.partyKey === returnRoute.partyKey && instanceClaimContains(claim, r.e.pos),
+    );
+    if (!insideRun) {
+      dungeonId = returnRoute.roomId;
+      dungeon = DUNGEONS[dungeonId];
+    } else if (!isClearedReturnRoom(ctx, r.meta.entityId, returnRoute.partyKey, dungeonId)) {
+      // Throttled like the Ignivar entry denial: the walk-in trigger fires at 20 Hz.
+      if (
+        ctx.time >=
+        (r.e.ignivarEntryDeniedAt ?? -Infinity) + IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS
+      ) {
+        r.e.ignivarEntryDeniedAt = ctx.time;
+        ctx.error(r.meta.entityId, 'The forge gate is sealed to you.');
+      }
+      return false;
+    }
+  }
   const raidAllowed = RAID_ALLOWED_DUNGEON_IDS.has(dungeonId);
   const raidRequired = RAID_REQUIRED_DUNGEON_IDS.has(dungeonId);
   if (party?.raid && !raidAllowed) {
@@ -383,8 +424,10 @@ export function enterDungeon(
   }
   // Dev builds (ALLOW_DEV_COMMANDS) let a solo walker board a raid door so
   // the maintainer can experience the walk-in; the undersized-party
-  // warning below still fires. Production keeps the hard raid gate.
-  if (!party?.raid && raidRequired && !bypass && !ctx.devCommands) {
+  // warning below still fires. Production keeps the hard raid gate. A
+  // returning raider is going back to a run their old raid already cleared,
+  // so they need no raid group of their own.
+  if (!party?.raid && raidRequired && !bypass && !ctx.devCommands && returnRoute === null) {
     ctx.error(r.meta.entityId, 'You must convert your party to a raid group first.');
     return false;
   }
@@ -392,16 +435,14 @@ export function enterDungeon(
     ctx.error(r.meta.entityId, 'The royal door is sealed to you.');
     return false;
   }
+  const key = returnRoute?.partyKey ?? ownKey;
   if (dungeonId === 'nythraxis_boss_arena') {
-    const engaged = ctx.instances.find(
-      (i) => i.dungeonId === dungeonId && i.partyKey === instanceKeyFor(ctx, r.meta.entityId),
-    );
+    const engaged = ctx.instances.find((i) => i.dungeonId === dungeonId && i.partyKey === key);
     if (engaged && nythraxisInstanceSealed(ctx, engaged)) {
       ctx.error(r.meta.entityId, 'Nythraxis is engaged — the royal door has sealed shut.');
       return false;
     }
   }
-  const key = instanceKeyFor(ctx, r.meta.entityId);
   // The Ignivar door rules (modeled on the Rift door, deliberately broader:
   // the rift bars only dead entrants): NO entrant from OUTSIDE the raid,
   // living or ghost, may zone in while any of the group's rooms still has a
@@ -544,16 +585,16 @@ export function enterDungeon(
   }
   const corpseRunClaim = defeatedNythraxisCorpseRunClaim(ctx, key, r.e);
   const returningForLoot = inst !== undefined && corpseRunClaim === inst;
-  // The cleared-run door exception, the heroic idiom extended to the weekly
-  // rooms: the live claim this kill's own lock came from stays re-enterable
-  // for loot and corpse runs once its final boss is down. raidReturnKeys
-  // holds exactly that kill's participants who actually entered, on the
-  // DURABLE key, so a relog after a wipe cannot strand a raider outside
-  // their own cleared claim; a player locked by an EARLIER run still cannot
-  // walk into someone else's cleared claim, and a claim whose boss is up is
-  // a fresh farm no locked player may join.
+  // The cleared-run door exception, the heroic idiom extended to every raid
+  // boss room (weekly and daily): the live claim this kill's own lock came
+  // from stays re-enterable for loot and corpse runs once its final boss is
+  // down. raidReturnKeys holds exactly that kill's participants who actually
+  // entered, on the DURABLE key, so a relog after a wipe cannot strand a
+  // raider outside their own cleared claim; a player locked by an EARLIER run
+  // still cannot walk into someone else's cleared claim, and a claim whose
+  // boss is up is a fresh farm no locked player may join.
   const returningToClearedClaim =
-    WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId) &&
+    isRaidRoom(dungeonId) &&
     inst !== undefined &&
     !finalBossAlive(ctx, inst) &&
     inst.raidReturnKeys.has(durableMemberKey(ctx, r.meta.entityId));
@@ -621,9 +662,12 @@ export function enterDungeon(
   // no player-facing way to switch difficulty short of disbanding and
   // reforming the party under a fresh key, which also skipped the conflicting-
   // reset-lock check above entirely). Ghosts are corpse-running back to the
-  // run they already know, so they get no advice.
+  // run they already know, and a routed returner is going back to the run
+  // they cleared, so neither gets advice.
   const mismatchedClaimDifficulty =
-    !r.e.ghost && inst !== undefined && inst.difficulty !== difficulty ? inst.difficulty : null;
+    !r.e.ghost && returnRoute === null && inst !== undefined && inst.difficulty !== difficulty
+      ? inst.difficulty
+      : null;
   if (!inst) {
     // Heroic five-mans lock on the KILL: a locked player can still corpse-run
     // back into a cleared live claim (gated on the boss being down, above), but
@@ -726,21 +770,6 @@ function isRaidLocked(ctx: SimContext, meta: PlayerMeta, dungeonId: string): boo
   return true;
 }
 
-// Is the claimed instance's final boss still up? Difficulty-agnostic (the
-// tuning table names the final boss for both difficulties). Gates the
-// locked-player door rules in enterDungeon: a cleared run (boss down, or its
-// corpse already swept) stays re-enterable for loot and corpse-runs; a run
-// with the boss alive is a fresh farm a locked player must not join.
-function finalBossAlive(ctx: SimContext, inst: InstanceSlot): boolean {
-  const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
-  if (!tuning) return false;
-  for (const id of inst.mobIds) {
-    const e = ctx.entities.get(id);
-    if (e && e.templateId === tuning.finalBossId && !e.dead) return true;
-  }
-  return false;
-}
-
 // The royal door seals once Nythraxis is engaged (pulled, alive, pre-death).
 // It reopens on his death or a full raid wipe (handled in the encounter loop).
 export function nythraxisInstanceSealed(ctx: SimContext, inst: InstanceSlot): boolean {
@@ -797,8 +826,11 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   const dungeon = dungeonAt(p.pos.x);
   if (!dungeon) return false;
   if (dungeon.id === 'nythraxis_boss_arena') {
+    // The arena the leaver STANDS in, not their own group's: a routed raid
+    // returner (instances/raid_return.ts) stands in another group's arena,
+    // and must not be held by a fight in their new group's arena.
     const inst = ctx.instances.find(
-      (i) => i.dungeonId === dungeon.id && i.partyKey === instanceKeyFor(ctx, p.id),
+      (i) => i.partyKey !== null && i.dungeonId === dungeon.id && instanceClaimContains(i, p.pos),
     );
     if (inst && nythraxisInstanceSealed(ctx, inst)) {
       ctx.error(r.meta.entityId, 'The royal door is sealed — Nythraxis must fall first.');
@@ -1278,24 +1310,33 @@ export function instanceLockoutMetas(ctx: SimContext, inst: InstanceSlot): Playe
   return out;
 }
 
-// The durable per-player membership key for a claim's session ledgers: the
-// server's stable character id when present (it survives the relog or
-// character-select Take Over that mints a new entity id), the entity id for
-// offline and sim-only callers (the raidBossWelcomeKeys idiom).
-function durableMemberKey(ctx: SimContext, entityId: number): string {
-  const characterId = ctx.players.get(entityId)?.characterId;
-  return characterId === undefined ? `entity:${entityId}` : `character:${characterId}`;
+// Record one final-boss kill participant on the claim, BEFORE their lock is
+// stamped. A player whose `lockId` lock FIRST lands with this kill joins the
+// claim's `clearedBy` set: the heroic door's cleared-run exception
+// (enterDungeon) admits only them, so a player locked by an EARLIER run can
+// never treat someone else's cleared claim as their own loot run (corpse loot
+// rights ride the tapper's current party, so an open door would hand them the
+// epics too). Participants who actually stepped through the door also mint a
+// durable raidReturnKeys entry, the key the raid rooms' door exception and
+// the raid return route (instances/raid_return.ts) read (a parked alt the
+// lockout strikes without pay never entered, so it earns no return key
+// either). Shared by the heroic lock, the weekly raid rooms' normal lock, and
+// the Nythraxis lock (encounters/nythraxis.ts grantNythraxisLockout).
+export function recordClearedRaidParticipant(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  meta: PlayerMeta,
+  lockId: string,
+): void {
+  if (isRaidLocked(ctx, meta, lockId)) return;
+  inst.clearedBy.add(meta.entityId);
+  if (inst.enteredBy.has(meta.entityId)) {
+    inst.raidReturnKeys.add(durableMemberKey(ctx, meta.entityId));
+  }
 }
 
-// Stamp one player's heroic daily lockout for this claim. A player whose lock
-// FIRST lands with this kill also joins the claim's `clearedBy` set: the
-// heroic door's cleared-run exception (enterDungeon) admits only them, so a
-// player locked by an EARLIER run can never treat someone else's cleared claim
-// as their own loot run (corpse loot rights ride the tapper's current party,
-// so an open door would hand them the epics too). Participants who actually
-// stepped through the door also mint a durable raidReturnKeys entry, the key
-// the weekly rooms' door exception reads (a parked alt the lockout strikes
-// without pay never entered, so it earns no return key either).
+// Stamp one player's heroic daily lockout for this claim, recording them as a
+// cleared participant first (recordClearedRaidParticipant).
 function lockToHeroicClaim(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -1303,12 +1344,7 @@ function lockToHeroicClaim(
   lockedUntil: number,
 ): void {
   const lockId = heroicLockoutId(inst.dungeonId);
-  if (!isRaidLocked(ctx, meta, lockId)) {
-    inst.clearedBy.add(meta.entityId);
-    if (inst.enteredBy.has(meta.entityId)) {
-      inst.raidReturnKeys.add(durableMemberKey(ctx, meta.entityId));
-    }
-  }
+  recordClearedRaidParticipant(ctx, inst, meta, lockId);
   meta.raidLockouts.set(lockId, lockedUntil);
 }
 
@@ -1389,12 +1425,7 @@ export function awardHeroicMarks(
         // The cleared-run door exception admits exactly this kill's own
         // participants back for loot and corpse runs (the heroic idiom).
         // Only players who actually entered mint the durable return key.
-        if (!isRaidLocked(ctx, meta, inst.dungeonId)) {
-          inst.clearedBy.add(meta.entityId);
-          if (inst.enteredBy.has(meta.entityId)) {
-            inst.raidReturnKeys.add(durableMemberKey(ctx, meta.entityId));
-          }
-        }
+        recordClearedRaidParticipant(ctx, inst, meta, inst.dungeonId);
         meta.raidLockouts.set(inst.dungeonId, lockedUntil);
       }
     }

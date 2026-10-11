@@ -5891,6 +5891,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  Captured synchronously when loot rolls, so a later disconnect cannot
    *  erase a kill-eligible character from the copy's transfer group. */
   lootPartyTradeEligibility?: { names: string[]; characterIds: number[] };
+  /** Runtime-only: the durable character behind each entity id a full-bags
+   *  award is held on this corpse for (loot/awarded_loot_hold.ts). A relog
+   *  mints a new entity id, so the join re-points the held slots through it.
+   *  Never on the wire: the snapshot sends the loot slots, not this map. */
+  heldLootOwners?: Map<number, number>;
   xpValue: number;
   // npc
   questIds: string[];
