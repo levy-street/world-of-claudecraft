@@ -103,8 +103,13 @@ export const NEUTRAL_DAY_GRADE: DayNightGrade = {
  * light (below) stays genuinely dim so night still reads as night. The two halves
  * answer different questions and now carry their own floors. This value is the
  * HALF-MOON reference; the moon's phase swings it a little (moonNightFloors).
+ *
+ * Then lifted again, 0.49 to 0.60, on continued "night is too dark" reports:
+ * the split held, but its ambient half still left the open world murky. The key
+ * light and the night fog came up with it (below), so the night cue (the gap
+ * between ambient and moonlight, and the navy sky) survives the lift.
  */
-export const NIGHT_AMBIENT_FLOOR = 0.49;
+export const NIGHT_AMBIENT_FLOOR = 0.6;
 
 /**
  * The key light (sun handing over to moon) floor, deliberately far under the
@@ -118,7 +123,7 @@ export const NIGHT_AMBIENT_FLOOR = 0.49;
  * the ambient (moonNightFloors), because a full moon is felt as brighter cast
  * light and longer shadows, not a flatter fill.
  */
-const NIGHT_KEY_TO_AMBIENT = 0.33;
+const NIGHT_KEY_TO_AMBIENT = 0.36;
 export const NIGHT_LIGHT_FLOOR = NIGHT_AMBIENT_FLOOR * NIGHT_KEY_TO_AMBIENT;
 
 /**
@@ -272,8 +277,12 @@ export function realmLightTint(
   ];
 }
 
-const NIGHT_SKY: [number, number, number] = [0.045, 0.06, 0.15];
-const NIGHT_FOG: [number, number, number] = [0.14, 0.18, 0.31];
+// The neutral night's sky and fog multipliers. Every realm palette is levelled
+// to these luminances (realmNight), so lifting them lifts every realm's night
+// alike. Both sit about 20 percent above their first cut, so distant ground
+// fades into a lighter navy instead of near-black.
+const NIGHT_SKY: [number, number, number] = [0.054, 0.072, 0.18];
+const NIGHT_FOG: [number, number, number] = [0.17, 0.22, 0.37];
 const NIGHT_FAR_SCALE = 0.82;
 
 /** A signature realm's own night: per-channel sky/fog endpoints replacing the

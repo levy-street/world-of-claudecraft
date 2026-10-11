@@ -650,6 +650,36 @@ describe('lunarPhase / moonTerminator (the moon runs real phases)', () => {
   });
 });
 
+describe('the night brightness level (lifted after "night is too dark" reports)', () => {
+  // Floors under the lifted level, so a later retune cannot quietly sink night
+  // back to the old 0.49 ambient / 0.16 key / 0.18 fog-luma look.
+  const luma = (c: readonly number[]) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+
+  it('holds the half-moon midnight ambient at or above 0.6', () => {
+    expect(NIGHT_AMBIENT_FLOOR).toBeGreaterThanOrEqual(0.6);
+    expect(dayNightGrade(0).ambientScale).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it('keeps the half-moon moonlight key at or above 0.2', () => {
+    expect(NIGHT_LIGHT_FLOOR).toBeGreaterThanOrEqual(0.2);
+    expect(dayNightGrade(0).lightScale).toBeGreaterThanOrEqual(0.2);
+  });
+
+  it('keeps even a new-moon midnight ambient at or above 0.45', () => {
+    expect(dayNightGrade(0, undefined, 0).ambientScale).toBeGreaterThanOrEqual(0.45);
+  });
+
+  it('lifts the midnight fog so distant ground fades into a lighter navy', () => {
+    expect(luma(dayNightGrade(0).fog)).toBeGreaterThanOrEqual(0.215);
+  });
+
+  it('still reads as night: a full moon stays well under daylight', () => {
+    const full = dayNightGrade(0, undefined, 1);
+    expect(full.ambientScale).toBeLessThanOrEqual(0.8);
+    expect(full.lightScale).toBeLessThanOrEqual(0.5);
+  });
+});
+
 describe('the moon phase lifts the night floor (brighter nights under a fuller moon)', () => {
   it('centers on the half-moon reference, so the average night is the authored floor', () => {
     // litFrac 0.5 is the lunar-cycle average, so a half moon reproduces the plain
