@@ -76,6 +76,7 @@ import {
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from './difficulty';
+import { dungeonReentryPoint } from './dungeon_checkpoints';
 import { tickDungeonGates } from './dungeon_gates';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
 import {
@@ -383,7 +384,7 @@ export function enterDungeon(
   if (!r || !dungeon) return false;
   const bypass = devBypass && ctx.devCommands;
   // A living player enters normally; a ghost that has run its spirit back re-enters to
-  // resurrect at the entrance (below). A fresh corpse (dead, spirit not yet released)
+  // resurrect at its arrival point (below). A fresh corpse (dead, spirit not yet released)
   // cannot move, so it never reaches the door.
   if (r.e.dead && !r.e.ghost) return false;
   const party = ctx.partyOf(r.meta.entityId);
@@ -683,9 +684,10 @@ export function enterDungeon(
   }
   const origin = instanceOriginOf(inst);
   const p = r.e;
+  const entry = dungeonReentryPoint(ctx, inst, p);
   // A live gather/fishing session never survives the door (R28 family).
   cancelProfessionSessionOnDisplacement(ctx, p);
-  p.pos = ctx.groundPos(origin.x + dungeon.entry.x, origin.z + dungeon.entry.z);
+  p.pos = ctx.groundPos(origin.x + entry.x, origin.z + entry.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   settleTeleportArrival(p);
@@ -706,9 +708,9 @@ export function enterDungeon(
   // a player standing in an instance and teleport them back inside fully restored
   // (issue #1600). No-op if they were not queued; notifies any 2v2 teammate.
   arenaQueueLeave(ctx, r.meta.entityId);
-  // A ghost that ran its spirit back and re-entered resurrects at the entrance,
-  // penalty-free: the re-entry IS the corpse run under the instance death model (no
-  // Spirit Healer inside an instance).
+  // A ghost that ran its spirit back resurrects where it arrives (the entrance, or a
+  // cleared arena: dungeon_checkpoints.ts), penalty-free: the re-entry IS the corpse
+  // run under the instance death model (no Spirit Healer inside an instance).
   // Nythraxis has a nested entrance: a returning ghost must cross the approach crypt
   // before reaching the royal door. Keep that spirit released through the outer
   // transition and resurrect only after it reaches its defeated arena claim.
@@ -1064,8 +1066,8 @@ function claimInstance(
   ctx.addEntity(exit);
   inst.exitId = exit.id;
   // No Spirit Healer is spawned inside an instance: a ghost releases at the OUTDOOR
-  // graveyard nearest the door and runs its spirit back to re-enter and resurrect at
-  // the entrance (see enterDungeon / spirit.ts ghostGraveyard).
+  // graveyard nearest the door and runs its spirit back to re-enter and resurrect where
+  // it arrives (see enterDungeon / spirit.ts ghostGraveyard).
 }
 
 // Exported for the dev practice raids only (nythraxis_dev_raid.ts switches a
