@@ -2763,22 +2763,28 @@ export class CharacterVisual {
       style === 'twohand' &&
       this.loadoutSwap !== null &&
       this.loadoutSwap === this.def.clips.loadoutSwaps?.twohand;
-    // A WOC body's white swings play its hand-keyed autoattacks (woc_autoattack_core.ts).
-    const auto = pickWocAutoAttack({
-      def: this.def,
-      abilityId,
-      kind,
-      style,
-      singleSetTwoHander,
-      bowSkin: weaponSkinAttackClips(this.weaponSkinId)?.clips.includes('Bow_Draw_Shot') ?? false,
-      unarmed: this.bareWhenUnarmed && !this.weaponItemId,
-      index: this.attackIdx,
-      mixerTime: this.mixer.time,
-      dual: this.dualSwing,
-      has: (name) => this.action(name) !== null,
-    });
+    // A WOC body's white swings play its hand-keyed autoattacks (woc_autoattack_core.ts),
+    // unless a displayed weapon skin substitutes a clip this rig has bound.
+    const auto = skinAttack
+      ? null
+      : pickWocAutoAttack({
+          def: this.def,
+          abilityId,
+          kind,
+          style,
+          singleSetTwoHander,
+          bowSkin:
+            weaponSkinAttackClips(this.weaponSkinId)?.clips.includes('Bow_Draw_Shot') ?? false,
+          unarmed: this.bareWhenUnarmed && !this.weaponItemId,
+          index: this.attackIdx,
+          mixerTime: this.mixer.time,
+          dual: this.dualSwing,
+          has: (name) => this.action(name) !== null,
+        });
     if (auto) {
-      if (auto.clip) this.playOneShot(auto.clip, this.def.attackTimeScale ?? 1.3);
+      // A third swing this frame: the pair clip already playing carries it.
+      if (!auto.clip) return auto.delay;
+      this.playOneShot(auto.clip, this.def.attackTimeScale ?? 1.3);
       this.attackIdx++;
       this.currentOneShotIsAttack = true;
       return auto.delay;

@@ -1,7 +1,7 @@
 # Hand-keyed WOC body animations
 
 Movement, emote and autoattack clips hand-keyed on the WOC male and female bind
-rigs, separately for each fit. `catalog.mjs` lists all 54 keyed clips; the 23 the
+rigs, separately for each fit. `catalog.mjs` lists every keyed clip; the ones the
 game plays (`SHIPPED_CLIPS`) ship as one meshless library per fit:
 
 - `public/models/chars/players/woc/woc_male.glb` and `woc_female.glb`
@@ -12,8 +12,8 @@ walk, run, backpedal, swim, tread, jump, death, and the wave, laugh, flex and bo
 emotes) and `woc_autoattack_core.ts` (one-hand, two-hand, unarmed, rifle, bow and
 dual-wield white swings, timed by `woc_autoattack_contacts.json`). Combat idles,
 casting, strafes, climbing, sitting and weapon transitions keep the rig's own
-clips. The other 31 keyed clips (crouch, flying, the remaining emotes and
-attacks, backward run and swim directions) stay buildable for when they are wired.
+clips. The rest of the catalog (crouch, flying, the remaining emotes and attacks,
+backward run and swim directions) stays buildable for when it is wired.
 
 ## Rebuild
 
