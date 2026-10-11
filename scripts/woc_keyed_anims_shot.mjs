@@ -42,19 +42,21 @@ const booted = await enterOfflineGame(page, {
   selectorTimeoutMs: 60000,
 });
 if (!booted) throw new Error('offline world did not boot');
-// The stills are of the body, so the HUD is hidden.
+// The stills are of the body, so the HUD and the software-rendering notice are hidden.
 await page.evaluate(() => {
   const ui = document.querySelector('#ui');
   if (ui) ui.style.visibility = 'hidden';
-  window.__game.sim.setPlayerLevel(60);
+  for (const b of document.querySelectorAll('button'))
+    if (b.textContent?.trim() === 'Dismiss') b.click();
 });
 
-/** Turns the camera to look at the player from `side` radians off its facing. */
+/** Turns the camera to look at the player from `side` radians off its front (the
+ *  camera yaw equal to the facing looks from behind). */
 async function frameCamera(side, dist = 4.2) {
   await page.evaluate(
     (side, dist) => {
       const { input, sim } = window.__game;
-      input.camYaw = sim.player.facing + side;
+      input.camYaw = sim.player.facing + Math.PI + side;
       input.camPitch = 0.12;
       input.camDist = dist;
     },
@@ -71,9 +73,10 @@ await shot('idle');
 
 // Running, from the side.
 await page.keyboard.down('KeyW');
-await sleep(600);
+await sleep(1200);
+// The follow camera swings back behind a runner, so the side view is set just before the shot.
 await frameCamera(Math.PI / 2, 5);
-await sleep(700);
+await sleep(60);
 await shot('run');
 await page.keyboard.up('KeyW');
 await sleep(1500);
@@ -99,7 +102,7 @@ const swung = await page.evaluate(() => {
   return true;
 });
 if (!swung) throw new Error('no hostile in range to swing at');
-await frameCamera(0.6, 4.6);
+await frameCamera(-1.15, 5);
 for (let i = 0; i < 8; i++) {
   await sleep(140);
   await shot(`swing-${i}`);
