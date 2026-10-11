@@ -15,6 +15,7 @@ import {
 } from '../src/sim/content/sunken_bastion_layout';
 import { WILDHEART_BASIN_FIELD } from '../src/sim/content/wildheart_basin_layout';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
+import { dropEncounterBody } from '../src/sim/encounters/sunken_bastion/claim';
 import { createMob } from '../src/sim/entity';
 import { dungeonReentryPoint } from '../src/sim/instances/dungeon_checkpoints';
 import {
@@ -80,6 +81,7 @@ function setup(dungeonId = 'hollow_crypt', heroic = false, idleMobTickRadius = 0
   }
   expect(sim.enterDungeon(dungeonId, pid)).toBe(true);
   const inst = sim.instances.find((i) => i.dungeonId === dungeonId && i.partyKey !== null)!;
+  expect(inst.difficulty).toBe(heroic ? 'heroic' : 'normal');
   return { sim, pid, inst, player: sim.entities.get(pid)! };
 }
 
@@ -567,6 +569,39 @@ describe('dungeon death checkpoints', () => {
       probe.mockRestore();
     }
   });
+
+  it('keeps the static boss ordinals when an appended encounter body is dropped', () => {
+    const { sim, pid, inst, player } = setup();
+    earn(sim, inst, 'sexton_marrow');
+    const spawns = DUNGEONS[inst.dungeonId].spawns;
+    const far = localOf(inst, 0, 60);
+    const bodies = [0, 1].map(() => {
+      const body = createMob(
+        sim.ctx.nextId++,
+        MOBS.crypt_shambler,
+        8,
+        sim.ctx.groundPos(far.x, far.z),
+      );
+      sim.ctx.addEntity(body);
+      inst.mobIds.push(body.id);
+      return body;
+    });
+    expect(inst.mobIds.length).toBe(spawns.length + 2);
+    // The first of two appended bodies goes, so the second one shifts down a slot.
+    dropEncounterBody(sim.ctx, inst, null, bodies[0].id);
+    expect(sim.entities.has(bodies[0].id)).toBe(false);
+    expect(inst.mobIds.length).toBe(spawns.length + 1);
+    expect(inst.mobIds[spawns.length]).toBe(bodies[1].id);
+    spawns.forEach((spawn, i) => {
+      expect(sim.entities.get(inst.mobIds[i])?.templateId, `ordinal ${i}`).toBe(spawn.mobId);
+    });
+    dropEncounterBody(sim.ctx, inst, null, bodies[1].id);
+    release(sim, pid);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: -82, z: 116 });
+    // A dead boss that left its own ordinal is no longer proof of anything.
+    dropEncounterBody(sim.ctx, inst, null, rosterMob(sim, inst, 'sexton_marrow').id);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(DUNGEONS[inst.dungeonId].entry);
+  });
 });
 
 describe('dungeon death checkpoints: gates', () => {
@@ -934,6 +969,35 @@ describe('dungeon death checkpoints: arrival clearance', () => {
     handleDeath(sim.ctx, prop, null);
     expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(yard);
   });
+
+  it('a member who dies at depth is delivered to the cleared arena and left alone', () => {
+    const { sim, pid, inst, player } = setup();
+    earn(sim, inst, 'sexton_marrow');
+    // Die for real, deep in the dungeon, to a living mob of the Processional.
+    const killer = livingMob(sim, inst);
+    const deep = localOf(inst, 0, 60);
+    standAt(sim, player, deep.x, deep.z);
+    handleDeath(sim.ctx, player, killer);
+    expect(player.dead).toBe(true);
+    expect(player.ghost).toBe(false);
+    sim.releaseSpirit(pid);
+    expect(player.ghost).toBe(true);
+    expect(player.corpseInstanceId).toBe(inst.exitId);
+    expect(player.corpsePos!.x).toBe(deep.x);
+    expect(player.corpsePos!.z).toBe(deep.z);
+    // The spirit rose at the outdoor graveyard and runs back to the door.
+    expect(sim.instanceSlotAt(player.pos)).toBeNull();
+    const door = doorOf(sim, inst.dungeonId);
+    standAt(sim, player, door.pos.x, door.pos.z);
+    // The ghost arm of the real tick carries it through.
+    sim.tick();
+    expect(player.ghost).toBe(false);
+    expect(player.dead).toBe(false);
+    expect(player.corpsePos).toBeNull();
+    expectLocal(sim, pid, inst, -82, 116);
+    expect(tickAndWatch(sim, inst, player, 10)).toBe(false);
+    expectLocal(sim, pid, inst, -82, 116);
+  });
 });
 
 describe('dungeon death checkpoints: the table', () => {
@@ -1094,5 +1158,86 @@ describe('dungeon death checkpoints: the table', () => {
       },
       120_000,
     );
+  });
+});
+
+describe('dungeon death checkpoints: instances outside the table', () => {
+  function soloSim() {
+    const sim = new Sim({
+      seed: 99,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
+    });
+    return { sim, pid: sim.addPlayer('warrior', 'Runner') };
+  }
+
+  it('a ghost re-entering a dungeon with no checkpoints rises at its entrance', () => {
+    const { sim, pid } = soloSim();
+    expect(DUNGEON_CHECKPOINTS.the_last_keep).toBeUndefined();
+    expect(sim.enterDungeon('the_last_keep', pid)).toBe(true);
+    const inst = sim.instances.find((i) => i.dungeonId === 'the_last_keep' && i.partyKey !== null)!;
+    const player = sim.entities.get(pid)!;
+    const deep = localOf(inst, 0, 20);
+    standAt(sim, player, deep.x, deep.z);
+    release(sim, pid);
+    expect(player.corpseInstanceId).toBe(inst.exitId);
+    expect(sim.instanceSlotAt(player.pos)).toBeNull();
+    expect(sim.enterDungeon('the_last_keep', pid)).toBe(true);
+    const entry = DUNGEONS.the_last_keep.entry;
+    expectLocal(sim, pid, inst, entry.x, entry.z);
+    expect(player.ghost).toBe(false);
+    expect(player.dead).toBe(false);
+  });
+
+  it('a raid ghost crosses the nested crypt as a spirit and rises at the arena entrance', () => {
+    const { sim, pid: tank } = soloSim();
+    sim.players.get(tank)!.questsDone.add('q_nythraxis_bound_guardian');
+    const raiders = [tank];
+    for (let i = 0; i < 4; i++) {
+      const pid = sim.addPlayer('mage', `Dps${i}`);
+      sim.players.get(pid)!.questsDone.add('q_nythraxis_bound_guardian');
+      sim.partyInvite(pid, tank);
+      sim.partyAccept(pid);
+      raiders.push(pid);
+    }
+    sim.convertPartyToRaid(tank);
+    for (const pid of raiders) {
+      sim.enterDungeon('nythraxis_crypt', pid);
+      sim.enterDungeon('nythraxis_boss_arena', pid);
+    }
+    expect(DUNGEON_CHECKPOINTS.nythraxis_crypt).toBeUndefined();
+    expect(DUNGEON_CHECKPOINTS.nythraxis_boss_arena).toBeUndefined();
+    const arena = sim.instances.find(
+      (i) => i.dungeonId === 'nythraxis_boss_arena' && i.partyKey !== null,
+    )!;
+    const boss = arena.mobIds.map((id) => sim.entities.get(id)!)[0];
+    const body = sim.entities.get(tank)!;
+    const deep = { x: boss.pos.x + 6, z: boss.pos.z - 6 };
+    standAt(sim, body, deep.x, deep.z);
+    handleDeath(sim.ctx, body, boss);
+    expect(body.dead).toBe(true);
+    handleDeath(sim.ctx, boss, sim.entities.get(raiders[1])!);
+    expect(boss.dead).toBe(true);
+    sim.releaseSpirit(tank);
+    expect(body.ghost).toBe(true);
+    expect(body.corpseInstanceId).toBe(arena.exitId);
+    expect(sim.instanceSlotAt(body.pos)).toBeNull();
+
+    expect(sim.enterDungeon('nythraxis_crypt', tank)).toBe(true);
+    const crypt = sim.instances.find(
+      (i) => i.dungeonId === 'nythraxis_crypt' && i.partyKey !== null,
+    )!;
+    const cryptEntry = DUNGEONS.nythraxis_crypt.entry;
+    expectLocal(sim, tank, crypt, cryptEntry.x, cryptEntry.z);
+    expect(body.ghost).toBe(true);
+    expect(body.dead).toBe(true);
+
+    expect(sim.enterDungeon('nythraxis_boss_arena', tank)).toBe(true);
+    const arenaEntry = DUNGEONS.nythraxis_boss_arena.entry;
+    expectLocal(sim, tank, arena, arenaEntry.x, arenaEntry.z);
+    expect(body.ghost).toBe(false);
+    expect(body.dead).toBe(false);
+    expect(body.corpsePos).toBeNull();
   });
 });
