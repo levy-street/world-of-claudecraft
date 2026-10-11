@@ -23,6 +23,7 @@ import type * as THREE from 'three';
 import { reattachBiomeHazeToClone } from './biome_haze_field';
 import { reapplyArmorDyeToClone } from './characters/armor_dye';
 import { reapplyEnvSheenToClone } from './characters/env_sheen';
+import { reattachGloamClimbToClone } from './characters/gloam_climb';
 import { reapplyWocHeadTintToClone } from './characters/woc_head_tint';
 import { addRimGlow, hasRimGlow } from './gfx';
 import { reapplyInstancedDitherFadeToClone } from './instanced_dither_fade';
@@ -32,6 +33,7 @@ import { reapplySurfaceDetailToClone } from './worn_stone';
 /**
  * Re-attach to `clone` the onBeforeCompile layers `source` carried, in the
  * order the material factories apply them (armour dye first, then rim glow,
+ * then the dormant Gloamveil climb every lit rig material carries,
  * then zone haze as surfaceMat attaches it at creation, then surface detail,
  * then the vertex-colour emissive layer, then the per-instance ghost dither, then
  * the env sheen, then the WOC head tint:
@@ -42,8 +44,9 @@ import { reapplySurfaceDetailToClone } from './worn_stone';
  * The dye goes FIRST because that is the order the rig factory composes them:
  * characters/assets.ts buildTintedClone re-attaches the outfit dye, then calls
  * addRimGlow (on every rig material but a flat held plate, which draws without
- * the rim: manifest RIMLESS_HELD_MODELS), then applySurfaceDetail (the three
- * calls sit together in its GFX.standardMaterials arm). No material carries both the dye and the biome
+ * the rim: manifest RIMLESS_HELD_MODELS), then attachGloamClimb, then
+ * applySurfaceDetail (the four calls sit together in its GFX.standardMaterials
+ * arm; the Lambert arm takes the climb alone). No material carries both the dye and the biome
  * haze: the dye is rig-only and the haze is world-surface-only, so no source
  * in the tree orders those two against each other.
  */
@@ -54,6 +57,9 @@ export function reattachClonedMaterialHooks(source: THREE.Material, clone: THREE
   // half of the same bug the cache key is the invisible half of.
   reapplyArmorDyeToClone(clone);
   if (hasRimGlow(source)) addRimGlow(clone);
+  // Right after the rim, where the rig factory attaches it (assets.ts
+  // buildTintedClone): the dormant Gloamveil climb every lit rig material carries.
+  reattachGloamClimbToClone(source, clone);
   reattachBiomeHazeToClone(source, clone);
   // Reads the JSON spec applySurfaceDetail records in userData, which clone()
   // did copy; a no-op for clones of undetailed materials.

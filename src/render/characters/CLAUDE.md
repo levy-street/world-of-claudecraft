@@ -49,7 +49,37 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   gate is replaced (`setFarBakeGate`, a pooled body handed out again) is
   planned again behind the new gate, never dropped and forgotten; the Soul
   Rend mark is exempt and commits at once, being actionable raid information
-  (`tests/character_effect_compile_gate.test.ts`).
+  (`tests/character_effect_compile_gate.test.ts`). Shadowform (Gloamveil) alone
+  never waits to SHOW: it has a program-free stand-in set the visual mounts on
+  the frame of the shift and keeps while the body swims (next entry).
+- Gloamveil, the Shadow priest's form (`setShadowform`): a look on the body's
+  own materials, no bone and no adornment. `gloam_climb_core.ts` is the pure
+  half (the tongue tables, the cast surge and entry, the shader text and its
+  CPU twin, the cue for the floor layer); `gloam_climb.ts` is the layer and the
+  per-rig `GloamPresence`. Three rules hold it together:
+  - **Every lit rig material carries the climb as a dormant layer**, attached
+    in `assets.ts` `buildTintedClone` on both tier arms right after the rim and
+    re-attached by `material_clone_hooks.ts`. A body out of the form pays one
+    uniform branch; a body in it rebinds two uniform objects per material
+    (`dressGloamClone`), so the form has NO program of its own. A new way to
+    build a rig material keeps that property only by going through the factory
+    or `cloneMaterialWithHooks` (`tests/character_gloam_form.test.ts` checks a
+    built priest).
+  - **A rebind wrapper pins its clone's program key.** A hook chain whose first
+    layer sat on three's default key reads `onBeforeCompile.toString()` lazily,
+    so wrapping the hook after the chain is built changes the key unless the
+    value is captured first (`tests/gloam_climb.test.ts`).
+  - **Two clone sets, one look** (`effect_materials.ts`). The settled form is
+    the transparent clone (solid, depth written): in the transparent pass the
+    body draws after the sun-shaft overlay and its dark stays deep, which is
+    the approved look, and its program is the ghost variant the boot twin
+    already links. The stand-in is the same look on a clone that flips
+    nothing. `applyVisualMaterials` mounts the stand-in while the transparent
+    set is behind its gate, and for as long as the body swims (a body in the
+    transparent pass would draw over the water it is in).
+  The pool, the wake, the smoke and the entry burst are world-space and live
+  in `../gloam_field.ts` (see `src/render/CLAUDE.md`); the rig tells that layer
+  what to show through `CharacterVisual.gloamCue()`, never the other way.
 - `halo.ts`: the class halo (`buildHalo`, driven by `VisualDef.halo` +
   `haloUpOffset`/`haloRadius` overrides). Texture, per-color materials, and
   per-radius geometries are shared never-disposed caches, so radii MUST come
@@ -225,7 +255,7 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   painter, `moonwing_adornment.ts` (antlers, crescent, wings), with its canvas
   art in `form_adornment_textures.ts` and the shared marker and glow recipe in
   `rig_fx.ts`. Moonwing is the only form that wears one: Gloamveil's face veil
-  was sized for one head and is gone. Pieces
+  was sized for one head and is gone (see the Gloamveil entry above). Pieces
   ride the rig's `head`/`chest` bones, carry the
   `weaponVfxMesh` marker so no overlay swap, prewarm twin or caster sweep
   touches them, hide under a ghost or stealth body, and their shared kits are
@@ -467,9 +497,10 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   renderer never gated, a prewarm or speculative build whose stand-in nothing
   would prove), so a crowd arriving at once mounts a few a frame. Never mount
   inside `apply` or a part pass: both run within the host's own material
-  sweeps. A translucent effect (the ghost run, stealth, Shadowform, the Soul
-  Rend mark) keeps the pieces for as long as it lasts: one merged mesh cannot
-  blend what three sorts piece by piece.
+  sweeps. A translucent effect (the ghost run, stealth, the settled Shadowform
+  clones, the Soul Rend mark) keeps the pieces for as long as it lasts: one
+  merged mesh cannot blend what three sorts piece by piece. (Shadowform's
+  stand-in clones are opaque, so a merged head or kit stays merged under them.)
   - The head (`woc_head_merge.ts`, pure `woc_head_merge_core.ts`: the fold rule,
     the slot table, the cache identity): one mesh on the head bone with the
     face morphs baked, each vertex carrying the SLOT of its material; one

@@ -16,6 +16,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createMoonkinEffectMaterial,
   createShadowformEffectMaterial,
+  createShadowformStandInMaterial,
 } from '../src/render/characters/effect_materials';
 import { applyEnvSheen } from '../src/render/characters/env_sheen';
 import { applySoulRendOverlay } from '../src/render/characters/soul_rend_overlay';
@@ -443,9 +444,10 @@ describe('the hair and brow transfer reads a texel by its luminance alone', () =
   const GREY: Rgb = [lum(AUBURN), lum(AUBURN), lum(AUBURN)];
   // the colours a hair material draws with: white on every normal draw (the packs' hair
   // materials are white, and the low tier's lift lerps toward white), and each effect overlay
+  // that recolours it. Shadowform is no longer one: it keeps the material's own colour and
+  // darkens in the shader, by height (the last test of this block pins that it stays white).
   const NORMAL: Rgb = [1, 1, 1];
   const OVERLAYS: Record<string, Rgb> = {
-    shadowform: colourOf(createShadowformEffectMaterial(new THREE.MeshStandardMaterial())),
     moonkin: colourOf(createMoonkinEffectMaterial(new THREE.MeshStandardMaterial())),
     soulRend: colourOf(applySoulRendOverlay(new THREE.MeshStandardMaterial())),
   };
@@ -492,6 +494,13 @@ describe('the hair and brow transfer reads a texel by its luminance alone', () =
       // now: they draw alike, the overlay darkening by its luminance alone
       close(transfer(AUBURN, colour, target, ref), transfer(GREY, colour, target, ref));
       close(transfer(GREY, colour, target, ref), scaled(target, lum(GREY) * lum(colour), ref));
+    }
+  });
+
+  it('is left alone by Shadowform, which draws hair with its normal colour', () => {
+    for (const mint of [createShadowformEffectMaterial, createShadowformStandInMaterial]) {
+      const colour = colourOf(mint(new THREE.MeshStandardMaterial()));
+      expect(colour).toEqual(NORMAL);
     }
   });
 
