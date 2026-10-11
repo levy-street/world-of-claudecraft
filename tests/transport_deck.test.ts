@@ -133,10 +133,7 @@ describe('the deck platform (pure)', () => {
       const at = deckToWorld(pose, v.x, v.z, { x: 0, z: 0 });
       expect(colliders[i].x).toBeCloseTo(at.x, 9);
       expect(colliders[i].z).toBeCloseTo(at.z, 9);
-      const movementTop =
-        v.kind === 'rail' || v.kind === 'gate' ? v.top - HULL.railHeight + 0.9 : v.top;
-      expect(colliders[i].moveTopY).toBeCloseTo(WATER_LEVEL + movementTop, 9);
-      expect(colliders[i].cameraTopY).toBeCloseTo(WATER_LEVEL + (v.sightTop ?? v.top), 9);
+      expect(colliders[i].moveTopY).toBeCloseTo(WATER_LEVEL + v.top, 9);
       expect(colliders[i].standable === true).toBe(v.standable);
     });
     // the same pose hands back the same live list; a new pose re-places it
@@ -266,12 +263,12 @@ describe('walking the deck under way (the real Sim and kernel)', () => {
     expect(Math.hypot(end.x - start.x, end.z - start.z)).toBeLessThan(0.2);
   });
 
-  it('the rails hold a passenger walking into either side', () => {
+  it('the rails hold a passenger on deck (walking and jumping into them)', () => {
     const sim = sailingSim(60);
     const p = sim.player;
     // face starboard (-x in the ship frame is the bow's right: facing -PI/2)
     placeOnDeck(sim, p, -2.5, 4, -Math.PI / 2);
-    hold(sim, { forward: true }, 3);
+    hold(sim, { forward: true, jump: true }, 3);
     const at = local(sim, p);
     expect(at.x).toBeGreaterThan(-HULL.beam / 2 + 0.3);
     expect(at.y).toBeGreaterThanOrEqual(HULL.mainDeckY - 0.01);
@@ -281,41 +278,6 @@ describe('walking the deck under way (the real Sim and kernel)', () => {
     hold(sim, { forward: true }, 2);
     expect(local(sim, p).x).toBeLessThan(HULL.beam / 2 - 0.3);
     expect(p.ferryRide).toBeTruthy();
-  });
-
-  it.each([
-    ['docked', 1],
-    ['sailing', DEPART_EAST + 60],
-  ] as const)('can jump off either side while %s, with walking still blocked', (_phase, clock) => {
-    for (const side of [-1, 1]) {
-      const sim = sailingSim(60);
-      setClock(sim, clock);
-      const p = sim.player;
-      // Closed waist rails, clear of the boarding opening and the benches.
-      placeOnDeck(sim, p, side * 3.5, 3, (side * Math.PI) / 2);
-      hold(sim, { forward: true }, 1);
-      const before = local(sim, p);
-      expect(Math.abs(before.x)).toBeLessThan(HULL.beam / 2 - 0.3);
-      expect(p.onGround).toBe(true);
-      hold(sim, { forward: true, jump: true }, 0.7);
-      expect(side * local(sim, p).x).toBeGreaterThan(HULL.beam / 2 + 0.5);
-      expect(aboardDeck(HULL, poseAt(sim), WATER_LEVEL, p.pos.x, p.pos.y, p.pos.z)).toBe(false);
-      hold(sim, {}, 2);
-      expect(p.ferryRide ?? null).toBeNull();
-    }
-  });
-
-  it('can jump over the closed starboard gangway bar under way', () => {
-    const sim = sailingSim(60);
-    const p = sim.player;
-    placeOnDeck(sim, p, -3.5, 0.8, -Math.PI / 2);
-    hold(sim, { forward: true }, 1);
-    expect(local(sim, p).x).toBeGreaterThan(-HULL.beam / 2 + 0.3);
-    hold(sim, { forward: true, jump: true }, 0.7);
-    expect(local(sim, p).x).toBeLessThan(-HULL.beam / 2 - 0.5);
-    hold(sim, {}, 2);
-    expect(sim.isSwimming(p)).toBe(true);
-    expect(p.ferryRide ?? null).toBeNull();
   });
 
   it('climbs the quarterdeck stair under way', () => {

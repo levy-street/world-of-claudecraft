@@ -58,9 +58,7 @@ describe('shipHullColliders', () => {
     HULL.volumes.forEach((v, i) => {
       const c = colliders[i];
       expect(c.type).toBe(v.shape);
-      const movementTop =
-        v.kind === 'rail' || v.kind === 'gate' ? v.top - HULL.railHeight + 0.9 : v.top;
-      expect(c.moveTopY).toBeCloseTo(pose.baseY + movementTop, 9);
+      expect(c.moveTopY).toBeCloseTo(pose.baseY + v.top, 9);
       expect(c.cameraTopY).toBeCloseTo(pose.baseY + (v.sightTop ?? v.top), 9);
       expect(c.standable === true).toBe(v.standable);
       const at = shipToWorld(pose, v.x, v.z);
@@ -134,7 +132,7 @@ describe('the Eastbrook ferry hull', () => {
     expect(TRANSPORT_SHIP_HULLS.eastbrookFerry).toBe(HULL);
   });
 
-  it('keeps edge dressing as walls rather than launchable floors', () => {
+  it('never gives a jump a floor to launch over a rail from: edge dressing is a wall', () => {
     const floors = HULL.volumes.filter((v) => v.kind === 'prop' && v.standable);
     expect(floors.map((v) => v.id)).toEqual(['hatch_main']);
     for (const v of floors) {
@@ -161,7 +159,7 @@ describe('the Eastbrook ferry hull', () => {
     expect(tops[tops.length - 1]).toBeCloseTo(HULL.captainDeckY, 9);
   });
 
-  it('preserves the authored rail silhouette above the deck they guard', () => {
+  it('rails stand above a jump and above a stride from the deck they guard', () => {
     expect(HULL.railHeight).toBeGreaterThan(JUMP_APEX);
     expect(HULL.railHeight).toBeGreaterThan(MAX_STEP_HEIGHT);
     const floors = [HULL.mainDeckY, HULL.captainDeckY, HULL.forecastleY];

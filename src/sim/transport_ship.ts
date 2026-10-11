@@ -15,9 +15,9 @@
 // open-world collider (colliders.ts): a STANDABLE volume is a floor a mover
 // walks on (decks, stair treads, the gangplank), a blocking one is a wall a
 // grounded mover cannot step over (rails at waist height, masts). Blocking
-// tops feed the movement model's passes-over rule. Rails and gates keep
-// grounded bodies aboard, with a lower movement top that a normal jump
-// clears. Sight checks (`cameraTopY`) keep the authored tops, so a player
+// tops still feed the movement model's passes-over rule, so a rail at
+// deck + 1.2 stays above a jump's apex (1.125) and a player on foot cannot
+// hop the side; sight checks (`cameraTopY`) read the same tops, so a player
 // sees over a rail but not through a mast.
 //
 // Pure leaf: deterministic, no SimContext, no three.js. The content rows
@@ -119,23 +119,12 @@ export function worldToShip(pose: ShipPose, x: number, z: number): { x: number; 
   return { x: dx * c - dz * s, z: dx * s + dz * c };
 }
 
-/** Rail clearance below the normal fixed-tick jump apex (0.98 yards).
- *  Rails remain nonstandable walls, so walking cannot step up over them. */
-const SHIP_RAIL_MOVE_HEIGHT = 0.9;
-
-/** The shared movement top for moored hulls and moving deck platforms.
- *  Preserve the visual/sight top, and never raise an authored low rail. */
-export function shipVolumeMoveTop(layout: ShipHullLayout, volume: ShipVolume): number {
-  if (volume.kind !== 'rail' && volume.kind !== 'gate') return volume.top;
-  return volume.top - Math.max(0, layout.railHeight - SHIP_RAIL_MOVE_HEIGHT);
-}
-
 /** The hull's volumes as world colliders for one placed ship. */
 export function shipHullColliders(layout: ShipHullLayout, pose: ShipPose): Collider[] {
   const out: Collider[] = [];
   for (const v of layout.volumes) {
     const at = shipToWorld(pose, v.x, v.z);
-    const top = pose.baseY + shipVolumeMoveTop(layout, v);
+    const top = pose.baseY + v.top;
     const cameraTopY = pose.baseY + (v.sightTop ?? v.top);
     const stand = v.standable ? { moveTopY: top, standable: true as const } : { moveTopY: top };
     if (v.shape === 'circle') {
