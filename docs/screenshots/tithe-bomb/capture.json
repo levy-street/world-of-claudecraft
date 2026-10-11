@@ -1,0 +1,19 @@
+{
+  "evidence": {
+    "rootCount": 4,
+    "visible": 1,
+    "caster": {
+      "x": -281,
+      "y": -3.398267380525904,
+      "z": -18
+    },
+    "anchor": [
+      -281,
+      -3.398267380525904,
+      -18
+    ],
+    "calls": 178
+  },
+  "errors": [],
+  "note": "Real accepted Shadow Priest cast in the offline scene, frozen at charge and impact for visual inspection. Lowest preset, desktop and mobile landscape."
+}

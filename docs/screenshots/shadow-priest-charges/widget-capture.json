@@ -1,0 +1,45 @@
+{
+  "evidence": [
+    {
+      "name": "desktop",
+      "bombWidth": 114.171875,
+      "bombHeight": 40,
+      "gloomWidth": 87.828125,
+      "gloomHeight": 40,
+      "bottom": 155,
+      "viewportHeight": 540,
+      "value": "20",
+      "count": "20 / 20",
+      "countOverflow": false,
+      "labelFont": "10px"
+    },
+    {
+      "name": "mobile",
+      "bombWidth": 120.19001007080078,
+      "bombHeight": 46.716796875,
+      "gloomWidth": 120.19001007080078,
+      "gloomHeight": 39.99517822265625,
+      "bottom": 489.25384521484375,
+      "viewportHeight": 540,
+      "value": "20",
+      "count": "20 / 20",
+      "countOverflow": false,
+      "labelFont": "16.8067px"
+    },
+    {
+      "name": "mobile-smallest",
+      "bombWidth": 63.102535247802734,
+      "bombHeight": 42.170623779296875,
+      "gloomWidth": 63.102535247802734,
+      "gloomHeight": 39.995147705078125,
+      "bottom": 464.7542419433594,
+      "viewportHeight": 540,
+      "value": "20",
+      "count": "20 / 20",
+      "countOverflow": false,
+      "labelFont": "32.0128px"
+    }
+  ],
+  "errors": [],
+  "note": "Production meter factory and CSS rendered in an isolated unit frame; not a full game or device performance capture."
+}

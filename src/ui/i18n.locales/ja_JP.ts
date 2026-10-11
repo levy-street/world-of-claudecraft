@@ -13407,7 +13407,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_block.description':
     '8秒間自身を堅い氷に封じ、あらゆるダメージを無効化します。すでにかかっている通常の有害な効果を取り除き、新たな通常の行動阻害効果の付与を防ぎます。スタンまたは変身中でも使用できます。氷の中では行動できません。再使用すると解除します。（メイジ）',
   'entities.abilities.inner_focus.description':
-    '次のプリーストの呪文を無償かつ中断されないものにします。60秒続きます。',
+    '次のプリーストの呪文はマナを消費せず、中断されません。60秒間持続します。',
   'entities.abilities.innervate.description':
     '生命の樹液が10秒間あふれ、現在のリソースを波状に20回復する。マナ、怒り、エナジーに対応し、変身しても中断されない。睡眠、スタン、ステイシス中は樹液が止まる。（ドルイドのタレント）',
   'entities.abilities.mend_pet.name': '手当て',
@@ -19721,4 +19721,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'errors.updateUnavailable':
     'ゲームストアで更新するか、最新のクライアントをダウンロードしてください。',
   'errors.updateSearchFailed': '更新を確認できませんでした。もう一度お試しください。',
+  'entities.abilities.vampiric_touch.name': '吸血の接触',
+  'entities.abilities.vampiric_touch.description':
+    '15秒間、3秒ごとに合計{damage}の暗影ダメージを与える。ダメージは呪文威力で増加し、各回のダメージはクリティカル可能。各回で敵が実際に失ったHPの20%を回復量とし、自分と30ヤード以内の負傷したパーティメンバーに均等に分配する。レイドでは自分のサブグループのみが対象。闇の献納が2チャージ以上ある場合、効果の付与時に2チャージを消費し、効果全体のダメージを30%増加させる。',
+  'entities.abilities.spirit_bomb.name': '献納の爆弾',
+  'entities.abilities.spirit_bomb.description':
+    '敵を中心に霊魂の爆弾を爆発させ、その敵から8ヤード以内の敵に{damage}のシャドウダメージを与えます。ダメージはスペルパワーで増加し、クリティカルが発生します。対象が5体を超えるとダメージが減少します。闇の献納を合計20生成すると爆弾が1個準備されます。上限の5スタックを保持している間の生成も加算されます。消費は不要で、消費しても進捗は増えません。進捗は戦闘の間も保持され、準備できる爆弾は1個までです。死亡すると進捗と準備済みの爆弾がリセットされます。詠唱が完了すると、抵抗されても爆弾を消費します。キャンセルや中断では保持されます。レイドボスとの戦闘開始時に進捗と準備済みの爆弾がリセットされます。この呪文でレイドボスとの戦闘を開始することはできません。',
+  'hudChrome.priest.gloomtitheLabel': '闇の献納',
+  'hudChrome.priest.bombLabel': '献納の爆弾',
+  'hudChrome.priest.gloomtitheStatus': '闇の献納 {value} / {max}',
+  'hudChrome.priest.bombStatus': '献納の爆弾のチャージ {value} / {max}',
+  'hudChrome.priest.bombReady': '準備完了',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    '闇の献納：消費できるチャージを最大5まで保持。虚空の裂傷は3チャージを消費する。吸血の接触は2チャージを消費してダメージを30%増加させ、タイスフィーンド招来は全チャージを消費する。チャージの生成は献納の爆弾の進捗も増やし、5チャージ保持中でも加算される。',
+  'hudChrome.priest.bombTooltip':
+    '献納の爆弾：闇の献納を20生成すると爆弾を1個準備できます。闇の献納を消費しても進捗は増えません。進捗は戦闘の間も保持されます。死亡時またはレイドボスとの戦闘開始時にリセットされます。詠唱が完了すると爆弾を消費し、キャンセルすると保持されます。',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    '15秒間、自分の暗影ダメージで敵が実際に失ったHPの20%を回復量とし、自分を含む30ヤード以内の負傷したパーティメンバーに分配する。レイドでは自分のサブグループのみを回復する。即時発動し、黄昏の帳のまま攻撃を続けられる。吸収されたダメージと敵の残りHPを超えたダメージは回復量に含まれない。',
+  'entities.abilities.void_rupture.name': '虚空の裂傷',
+  'entities.abilities.void_rupture.description':
+    '闇の献納を3スタック消費して敵を引き裂き、{damage}のシャドウダメージを与えます。ダメージはスペルパワーで増加し、クリティカルが発生します。3スタックが必要で、抵抗されても消費します。',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'さらに、60秒以内に使う次の精神粉砕または虚空の裂傷は、命中すると必ずクリティカルになります。他の呪文はこの効果を消費しません。虚空の裂傷は引き続き闇の献納を3スタック消費します。抵抗されてもクリティカル効果は消費されます。',
+  'hudChrome.auraEffect.stilledMindCrit':
+    '次の精神粉砕または虚空の裂傷は、命中すると必ずクリティカルになります。他の呪文はこの効果を消費しません。虚空の裂傷は引き続き闇の献納を3スタック消費します。抵抗されてもこの効果は消費されます。',
 };

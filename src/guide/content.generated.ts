@@ -1249,12 +1249,24 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Gloamveil"
       },
       {
+        "id": "vampiric_touch",
+        "name": "Vampiric Touch"
+      },
+      {
+        "id": "void_rupture",
+        "name": "Void Rupture"
+      },
+      {
         "id": "summon_tithefiend",
         "name": "Call Tithefiend"
       },
       {
         "id": "prayer_of_returning",
         "name": "Prayer of Returning"
+      },
+      {
+        "id": "spirit_bomb",
+        "name": "Tithe Bomb"
       }
     ],
     "model": "player_priest",

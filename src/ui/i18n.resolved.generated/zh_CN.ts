@@ -576,6 +576,16 @@ export const zh_CN: EnTranslations = {
       "fateThreadsConsumeReady": "三层命运丝线：吞噬可将其编织为额外的谴罪。",
       "fateThreadsSentenceReady": "三层命运丝线：裁决可消耗它们以提高18%的伤害。"
     },
+    "priest": {
+      "gloomtitheLabel": "幽暗什一",
+      "bombLabel": "献纳灵魂炸弹",
+      "gloomtitheStatus": "幽暗什一：{value} / {max}",
+      "bombStatus": "献纳灵魂炸弹充能：{value} / {max}",
+      "bombReady": "就绪",
+      "chargeCount": "{value} / {max}",
+      "gloomtitheTooltip": "幽暗什一：最多保有5层可消耗的层数。虚空破裂消耗3层；吸血之触消耗2层，使伤害提高30%；召唤什一魔消耗全部层数。生成层数也会增加献纳灵魂炸弹的进度，即使已保有5层也会增加。",
+      "bombTooltip": "献纳灵魂炸弹：生成20层幽暗什一即可准备一枚炸弹。消耗幽暗什一不会增加进度。进度在战斗之间保留。死亡或开始与团队副本首领战斗时会清零。完成施法会消耗炸弹，取消施法则会保留。"
+    },
     "procOverlay": {
       "soulFragmentsMeter": "灵魂碎片",
       "ruinMeter": "毁灭",
@@ -3953,6 +3963,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "auraEffect": {
+      "stilledMindCrit": "你的下一次碎心术或虚空破裂命中时必定暴击。其他法术不会消耗此加成。虚空破裂仍会消耗3层幽暗什一。施法被抵抗也会消耗此加成。",
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -13822,6 +13833,18 @@ export const zh_CN: EnTranslations = {
         "name": "悲苦连祷",
         "description": "引导 3 秒，每秒造成 {damage} 点暗影伤害。伤害随法术强度提升。"
       },
+      "vampiric_touch": {
+        "name": "吸血之触",
+        "description": "在15秒内造成{damage}点暗影伤害，每3秒一次。伤害随法术强度提升，每次伤害均可暴击。每次伤害将敌人实际损失生命值的20%转化为治疗，平均分配给你和30码内受伤的小队成员；在团队中，仅治疗你所在的小队。若你拥有至少2层幽暗什一，施加此效果会消耗2层，使其全部伤害提高30%。"
+      },
+      "void_rupture": {
+        "name": "虚空破裂",
+        "description": "消耗3层幽暗什一，撕裂一名敌人并造成{damage}暗影伤害。伤害随法术强度提高，且可以暴击。需要3层，即使被抵抗也会消耗。"
+      },
+      "spirit_bomb": {
+        "name": "献纳灵魂炸弹",
+        "description": "在敌人身上引爆灵魂炸弹，对目标周围8码内的敌人造成{damage}暗影伤害。伤害随法术强度提高，可以暴击，目标超过5个时伤害降低。累计生成20层幽暗什一，可准备一枚炸弹。即使已持有上限5层，生成仍会增加进度。无需消耗层数，消耗也不会增加进度。进度在战斗之间保留，最多储存一枚准备好的炸弹。死亡会清除进度和准备好的炸弹。完成施法会消耗炸弹，即使被抵抗也是如此。取消或打断施法会保留炸弹。开始与团队副本首领战斗时，进度和准备好的炸弹都会清零。此法术无法用于开启团队副本首领战斗。"
+      },
       "flash_heal": {
         "name": "紧急祈祷",
         "description": "治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。"
@@ -14642,7 +14665,8 @@ export const zh_CN: EnTranslations = {
       },
       "inner_focus": {
         "name": "静心",
-        "description": "使你的下一个牧师法术免费且无法被打断。持续 60 秒。"
+        "description": "你的下一个牧师法术不消耗法力值，且无法被打断。持续60秒。",
+        "specNote_shadow": "此外，在60秒内，你的下一次碎心术或虚空破裂命中时必定暴击。其他法术不会消耗此加成。虚空破裂仍会消耗3层幽暗什一。施法被抵抗也会消耗此暴击加成。"
       },
       "innervate": {
         "name": "生命树液",
@@ -14839,7 +14863,8 @@ export const zh_CN: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "救赎圣咏团",
-        "description": "引导6秒，每2秒为30码内的队伍成员恢复{damage}点生命值。治疗量随法术强度提高。"
+        "description": "引导6秒，每2秒为30码内的队伍成员恢复{damage}点生命值。治疗量随法术强度提高。",
+        "specNote_shadow": "在15秒内，将敌人因你的暗影伤害实际损失生命值的20%转化为治疗，分配给30码内受伤的小队成员，包括你自己。在团队中，仅治疗你所在的小队。瞬间施放，且你可在暮色帷幕下继续攻击。被吸收的伤害及超出敌人剩余生命值的伤害不会产生治疗。"
       },
       "bear_charge": {
         "name": "巨熊冲锋",

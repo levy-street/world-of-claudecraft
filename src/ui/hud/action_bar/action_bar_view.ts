@@ -856,6 +856,7 @@ export function createActionBarView(
           for (const a of player.auras) {
             if (
               a.kind === def.requiresAuraKind &&
+              (!def.requiresOwnAura || a.sourceId === player.id) &&
               (a.stacks ?? 1) >= (def.requiresAuraStacks ?? 1)
             ) {
               windowOpen = true;

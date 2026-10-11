@@ -1,6 +1,7 @@
 import type { SimContext } from '../../sim_context';
 import type { Aura, Entity } from '../../types';
 import { isUnbreakableControlAura } from '../cc';
+import { grantShadowStilledMind } from './stilled_mind';
 
 export const PRIEST_TALENT_IDS = {
   shelteringStep: 'pri_r5_improved_renew',
@@ -28,6 +29,7 @@ export function priestAfterAbility(
   abilityId: string,
   target: Entity | null,
 ): void {
+  grantShadowStilledMind(ctx, priest, abilityId);
   if (
     abilityId === 'power_word_shield' &&
     target &&

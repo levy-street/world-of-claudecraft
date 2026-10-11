@@ -31,6 +31,12 @@ function entry(id: string): UnlockEntry {
 }
 
 describe('frame menus', () => {
+  it('groups the independent Shadow charge medallion with combat frames', () => {
+    expect(frameMenuGroup('priestCharge')).toBe('combat');
+    expect(frameSettingRelated('priestCharge', 'frameSnapToGrid')).toBe(true);
+    expect(frameSettingRelated('priestCharge', 'playerFrameHealthText')).toBe(false);
+  });
+
   it('offers frame controls without the general health text choices', () => {
     const settings = new Settings();
     const onSettingChange = vi.fn();

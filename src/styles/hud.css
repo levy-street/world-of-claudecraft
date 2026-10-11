@@ -2254,6 +2254,7 @@
   .gathering-goal-panel.tf-unlocked,
   #swingbar-offhand.tf-unlocked,
   #paladin-devotion-frame.tf-unlocked,
+  #priest-charge-frame.tf-unlocked,
   #proc-overlay.tf-unlocked,
   #talking-head.tf-unlocked,
   #unit-tooltip-anchor.tf-unlocked,
@@ -2274,6 +2275,7 @@
   #rift-tracker.tf-unlocked,
   #practice-tracker.tf-unlocked,
   #paladin-devotion-frame.tf-unlocked,
+  #priest-charge-frame.tf-unlocked,
   #proc-overlay.tf-unlocked,
   #talking-head.tf-unlocked {
     pointer-events: auto;
@@ -2378,6 +2380,7 @@
   .gathering-goal-panel .tf-move-btn,
   #swingbar-offhand .tf-move-btn,
   #paladin-devotion-frame .tf-move-btn,
+  #priest-charge-frame .tf-move-btn,
   #proc-overlay .tf-move-btn,
   .hud-frame-group > .tf-move-btn,
   .focus-target-row > .tf-move-btn,
@@ -2415,6 +2418,7 @@
   .gathering-goal-panel .tf-move-btn:focus-visible,
   #swingbar-offhand .tf-move-btn:focus-visible,
   #paladin-devotion-frame .tf-move-btn:focus-visible,
+  #priest-charge-frame .tf-move-btn:focus-visible,
   #petbar .tf-move-btn:focus-visible,
   #proc-overlay .tf-move-btn:focus-visible,
   .hud-frame-group > .tf-move-btn:focus-visible,
@@ -2572,6 +2576,7 @@
   body.interface-unlocked #petbar.tf-unlocked,
   body.interface-unlocked #stancebar.tf-unlocked,
   body.interface-unlocked #paladin-devotion-frame.tf-unlocked,
+  body.interface-unlocked #priest-charge-frame.tf-unlocked,
   body.interface-unlocked .warlock-doom-frame.tf-unlocked,
   body.interface-unlocked #talking-head.tf-unlocked {
     display: flex !important;

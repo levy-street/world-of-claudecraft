@@ -507,3 +507,5 @@ something this file marks as restricted, ask first: tony@levystreet.com.
   Provenance: `docs/design/buried-hoard-entrance/asset-provenance.md`.
 
 Weekly Vault milestone illustrations (public/ui/weekly-vault/) are project-generated art made with OpenAI's built-in image generation for World of ClaudeCraft. Matching square front-face doors with antique-gold trim and corners, plus bronze empty, silver Normal, or gold Heroic center accents; completed doors remain closed with matching light glowing through their seams. Project asset, with the project only.
+
+Tithe Bomb and Void Rupture ability paintings (public/ui/skills/priest/spirit_bomb.webp and void_rupture.webp) are original project art generated with OpenAI built-in image generation through Codex. Exact prompts and source/shipping hashes are recorded in public/ui/skills/priest/mapping.json. World of ClaudeCraft project assets, rights reserved; with the project only.

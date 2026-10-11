@@ -520,6 +520,7 @@ export type AuraKind =
   // Vespers Priest: source-owned self resource built by Mindfracture and
   // Effigy-bound Dirge ticks, consumed whole by Call Tithefiend.
   | 'gloomtithe'
+  | 'spirit_bomb_charge'
   // Benison Dawnweave: up to three direct-prayer stacks, consumed by Choirmend.
   | 'benison_prayers'
   // Destruction warlock secondary-resource and cast-shaping state.
@@ -809,6 +810,10 @@ export interface Aura {
   // Vespers duplicate guard: one Dirge aura can mint at most one Gloomtithe
   // stack in a simulation tick even if a hook is accidentally dispatched twice.
   gloomtitheTick?: number;
+  // Second Verse counts natural VT pulses on its own Effigy per application.
+  shadowVerseTicks?: number;
+  // Effigy eligibility at the aura phase's start, independent of expiry order.
+  shadowVerseEffigyTick?: number;
   // Periodic effects may author an explicit threat multiplier without creating
   // a parallel tick runner. Undefined keeps the classic 1x DoT threat.
   threatMult?: number;
@@ -3418,6 +3423,8 @@ export type AbilityEffect =
       min: number;
       max: number;
       radius: number;
+      /** Detonate around the selected enemy instead of the caster or ground aim. */
+      centerOnTarget?: boolean;
       // The blast can critically strike: ONE crit decision per CAST (a single
       // rng draw once at least one target is struck; fireGuaranteedCrit
       // overrides the outcome), applied to every struck enemy together, and
@@ -3904,6 +3911,10 @@ export interface AbilityDef {
   // full 5-stack Icicles buff). Absent means any presence of the aura suffices.
   // The whole aura is still consumed on cast (consumeAuraKind removes it).
   requiresAuraStacks?: number;
+  // Resource banks can require the caster's own aura, excluding borrowed stacks.
+  requiresOwnAura?: boolean;
+  // Partial bank payment at cast commitment. Absent preserves full-aura consumption.
+  consumesRequiredAuraStacks?: number;
   // Aura gates normally represent a bank that the successful cast consumes.
   // Set false for persistent state requirements such as a shapeshift form.
   consumesRequiredAura?: boolean;
@@ -5785,6 +5796,7 @@ export interface Entity extends ClientMirroredEntityFields {
   ignivarTrashSpell?: 'cinderLance';
   ignivarTrashCastKey?: number;
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
+  spiritBombRaidPullStarted?: boolean; // one bank reset per raid boss attempt, sim-only
   ignivar?: IgnivarEncounterState; // sim-only state for the Ignivar raid encounter
   varkhul?: VarkhulEncounterState; // sim-only state for the Varkhul raid encounter
   varkhulAssemblyAttempt?: number; // survives encounter resets so Heroic rune slots reshuffle per pull

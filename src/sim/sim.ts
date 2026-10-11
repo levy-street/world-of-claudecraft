@@ -140,6 +140,7 @@ import {
   updateVeilboundMarchMovement,
 } from './combat/paladin_veilbound_march';
 import { cleanupPriestState } from './combat/priest/lifecycle';
+import { beginSpiritBombRaidPull } from './combat/priest/spirit_bomb_raid';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { duskLingerOnStealthBreak } from './combat/rogue_talents';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
@@ -7551,10 +7552,8 @@ export class Sim {
       const run = this.delveRunForPlayer(target.id);
       if (run) this.maybeCompanionBark(run, target.id, 'boss_pull');
     }
-    // Boss engage bark: once per pull, on the first player-driven aggro. A
-    // player-owned pet pull counts (a hunter opening with the pet still wakes
-    // the boss); yelledEngage resets with the other per-pull state on
-    // evade/respawn.
+    beginSpiritBombRaidPull(this.ctx, mob);
+    // Engage bark includes pets; yelledEngage resets on evade/respawn.
     const engageYell = MOBS[mob.templateId]?.yells?.engage;
     const playerPull = target.kind === 'player' || target.ownerId !== null;
     if (engageYell && playerPull && !mob.yelledEngage) {

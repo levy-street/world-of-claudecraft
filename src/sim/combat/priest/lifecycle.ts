@@ -1,13 +1,19 @@
 import type { SimContext } from '../../sim_context';
 import { stripOtherSeraphicVigils } from './benison';
 import { stripDoctrineLinks } from './doctrine';
+import { resetSpiritBombProgress } from './spirit_bomb';
+import { clearSpiritBombResidual } from './spirit_bomb_residual';
 import { cleanupVespers } from './vespers';
 
 function stripPriestTalentAuras(ctx: SimContext, priestId: number): void {
   for (const entity of ctx.entities.values()) {
     for (let index = entity.auras.length - 1; index >= 0; index--) {
       const aura = entity.auras[index];
-      if (aura.sourceId !== priestId || !aura.id.startsWith('priest_')) continue;
+      if (
+        aura.sourceId !== priestId ||
+        (!aura.id.startsWith('priest_') && aura.id !== 'choir_of_deliverance')
+      )
+        continue;
       ctx.applyNonPlayerStatAura(entity, aura, -1);
       entity.auras.splice(index, 1);
       ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
@@ -22,4 +28,7 @@ export function cleanupPriestState(ctx: SimContext, priestId: number): void {
   stripDoctrineLinks(ctx, priestId);
   stripOtherSeraphicVigils(ctx, priestId, -1);
   cleanupVespers(ctx, priestId);
+  clearSpiritBombResidual(ctx, priestId);
+  const priest = ctx.entities.get(priestId);
+  if (priest) resetSpiritBombProgress(ctx, priest);
 }

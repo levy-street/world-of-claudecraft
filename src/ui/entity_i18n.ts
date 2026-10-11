@@ -90,7 +90,8 @@ export type AbilitySpecNoteField =
   | 'specNote_subtlety'
   | 'specNote_balance'
   | 'specNote_feral'
-  | 'specNote_restoration';
+  | 'specNote_restoration'
+  | 'specNote_shadow';
 
 export type EntityTranslationRequest =
   | { kind: 'class'; id: PlayerClass; field: 'name' | 'description'; values?: InterpolationValues }

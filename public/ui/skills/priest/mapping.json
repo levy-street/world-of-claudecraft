@@ -342,6 +342,45 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Prayer of Returning (prayer_of_returning)\nCanonical mechanic: Prayer of Returning is a 7 sec out-of-combat prayer that calls every fallen group or raid member within 40 yd back to life at the caster with 30% health and mana; 5 min cooldown.\nSubject: A great downturned hand of golden light drawing three faint rising spirits upward from their fallen bodies.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "vampiric_touch",
+      "sourcePack": "woc_openai_vampiric_touch_2026_10_07",
+      "sourceFile": "tmp/imagegen/vampiric-touch/source.png",
+      "output": "vampiric_touch.webp",
+      "source": "OpenAI built-in image generation through Codex (new image)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A spectral violet hand drawing crimson life essence into its palm.",
+      "generationPrompt": "Original square painted dark-fantasy MMORPG ability icon for Vampiric Touch. Spectral violet hand with elongated fingers curling around a glowing crimson-violet heart-shaped mote of life essence; pale lavender energy flows inward into the palm. Full-bleed opaque midnight-purple background, saturated violet/crimson and cool highlights, painterly sculpted shading, dominant hand and bright central life mote readable at 32px. No frame, text, logos, watermark, panels, numbers, modern objects or anatomical gore."
+    },
+    {
+      "abilityId": "spirit_bomb",
+      "sourcePack": "woc_openai_shadow_spenders_2026_10_11",
+      "sourceFile": "exec-94836c15-fa2b-44db-bbd4-45920f3da013.png",
+      "output": "spirit_bomb.webp",
+      "source": "OpenAI built-in image generation through Codex (new image)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A round violet spirit-energy bomb wrapped in luminous plasma streams.",
+      "generationPrompt": "Create one square painted dark fantasy MMORPG ability icon, full bleed opaque artwork, no text, no border, no watermark, no UI. Subject: TITHE BOMB, a massive spherical spirit-energy bomb condensed from violet shadow souls. One unmistakable perfectly round luminous purple orb fills 75% of frame, dark indigo core, swirling ghostlike vapor within, intense lilac-white rim and two curved plasma streams orbiting it, tiny magenta sparks, deep midnight purple background. Premium hand-painted game skill art, sculpted volume, bold silhouette, controlled high contrast, readable at 32px, few large shapes rather than noisy fine detail. Orb centered slightly above middle, powerful energy, no hands, no characters, no skull, no lettering. Output one square icon.",
+      "sourceSha256": "6aad6b21259a49b885c8d985ea0c76fa6e30a4a20e7603990f7c12d010743b9c",
+      "acceptedSha256": "0dba378ee76c4af2a24cce3c3569e7a4b65e9a56e1261e9a08ef851187c56c64",
+      "acceptedBytes": 6100
+    },
+    {
+      "abilityId": "void_rupture",
+      "sourcePack": "woc_openai_shadow_spenders_2026_10_11",
+      "sourceFile": "exec-8bc0cef1-e003-4ad9-b457-64c54e9631f1.png",
+      "output": "void_rupture.webp",
+      "source": "OpenAI built-in image generation through Codex (new image)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A bright jagged vertical violet fissure pulling angular obsidian shards inward.",
+      "generationPrompt": "Create one square hand-painted dark fantasy MMORPG skill icon, full bleed opaque artwork, no text, no border, no watermark, no UI. Subject VOID RUPTURE: a single jagged vertical rift violently splitting dense midnight-indigo darkness. Bold violet-white lightning fissure in the center, thick torn purple edges curling inward, several large angular obsidian shards sucked toward it, compact radial magenta shock streaks. A long sharp irregular slit, absolutely NOT an orb or round portal. Strong contrast, premium painterly fantasy game ability art with tangible magical energy. Legible silhouette at 32x32 pixels, central fissure fills 80% height, simple large shapes with controlled detail, darker corners. No person, no scenery, no symbols or writing. One square icon.",
+      "sourceSha256": "8455e69a55fec2a49e132973eb2c13e744fe0316a91649eadbce05b032e9f914",
+      "acceptedSha256": "07a3d2fdcc6bf40b05ff3815b5354ba7046836171a0fcbe53b09e59af6b10ba8",
+      "acceptedBytes": 5052
     }
   ],
   "deferredStayProcedural": {},

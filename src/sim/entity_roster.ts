@@ -25,6 +25,7 @@ import { isTemporaryNecromancyUndead } from './combat/necromancy';
 import { cleanupPaladinAegis } from './combat/paladin_aegis';
 import { stripSunGodVerdicts } from './combat/paladin_sun_verdict';
 import { stripPaladinDevotionsFromSource } from './combat/paladin_support';
+import { tickSpiritBombResidual } from './combat/priest/spirit_bomb_residual';
 import { tickRingOfFrost } from './combat/ring_of_frost';
 import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
 import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
@@ -128,6 +129,12 @@ export type GroundAoE = {
     createdTick: number;
     sourceOrigin: Vec3;
     sourceZoneId: string;
+  };
+  spiritBombResidual?: {
+    sourceClaim: string | null;
+    sourceOrigin: Vec3;
+    sourceZoneId: string;
+    pulses: number;
   };
 };
 
@@ -304,6 +311,13 @@ export function tickGroundAoEs(ctx: SimContext): void {
       continue;
     }
     effect.remaining -= DT;
+    if (effect.spiritBombResidual) {
+      if (tickSpiritBombResidual(ctx, effect)) {
+        const liveIndex = ctx.groundAoEs.indexOf(effect);
+        if (liveIndex >= 0) ctx.groundAoEs.splice(liveIndex, 1);
+      }
+      continue;
+    }
     if (effect.frostRing) {
       if (effect.remaining > CAST_COMPLETE_EPS) tickRingOfFrost(ctx, effect);
       if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);

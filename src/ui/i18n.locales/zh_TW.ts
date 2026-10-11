@@ -12748,7 +12748,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_block.description':
     '將你封入堅冰8秒，使你免疫所有傷害。移除已存在的一般有害效果，並阻止新的一般控制效果施加於你。可在昏迷或變形狀態下使用。被封凍期間無法行動。再次施放可取消。（法師）',
   'entities.abilities.inner_focus.description':
-    '使你的下一個牧師法術免費且無法被打斷。持續 60 秒。',
+    '你的下一個牧師法術不消耗法力，且無法被打斷。持續60秒。',
   'entities.abilities.innervate.description':
     '生命樹液在你體內湧動10秒，分波恢復20點當前資源，可恢復法力、怒氣或能量。變形不會中斷效果。睡眠、昏迷或停滯會使樹液停止湧動。（德魯伊天賦）',
   'entities.abilities.mend_pet.name': '修補',
@@ -18759,4 +18759,29 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'errors.noUpdateFound': '未找到更新。請稍後再試。',
   'errors.updateUnavailable': '請透過遊戲商店更新，或下載最新用戶端。',
   'errors.updateSearchFailed': '無法檢查更新。請重試。',
+  'entities.abilities.vampiric_touch.name': '吸血之觸',
+  'entities.abilities.vampiric_touch.description':
+    '在15秒內造成{damage}點暗影傷害，每3秒一次。傷害隨法術強度提升，每次傷害均可致命一擊。每次傷害將敵人實際損失生命值的20%轉化為治療，平均分配給你和30碼內受傷的小隊成員；在團隊中，僅治療你所在的小隊。若你擁有至少2層幽暗什一，施加此效果會消耗2層，使其全部傷害提高30%。',
+  'entities.abilities.spirit_bomb.name': '獻納靈魂炸彈',
+  'entities.abilities.spirit_bomb.description':
+    '在敵人身上引爆靈魂炸彈，對目標周圍8碼內的敵人造成{damage}暗影傷害。傷害隨法術能量提高，可以致命一擊，目標超過5個時傷害降低。累計生成20層幽暗什一，可準備一枚炸彈。即使已持有上限5層，生成仍會增加進度。無需消耗層數，消耗也不會增加進度。進度在戰鬥之間保留，最多儲存一枚準備好的炸彈。死亡會清除進度和準備好的炸彈。完成施法會消耗炸彈，即使被抵抗也是如此。取消或中斷施法會保留炸彈。開始與團隊副本首領戰鬥時，進度和準備好的炸彈都會歸零。此法術無法用於開啟團隊副本首領戰鬥。',
+  'hudChrome.priest.gloomtitheLabel': '幽暗什一',
+  'hudChrome.priest.bombLabel': '獻納靈魂炸彈',
+  'hudChrome.priest.gloomtitheStatus': '幽暗什一：{value} / {max}',
+  'hudChrome.priest.bombStatus': '獻納靈魂炸彈充能：{value} / {max}',
+  'hudChrome.priest.bombReady': '就緒',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    '幽暗什一：最多保有5層可消耗的層數。虛空破裂消耗3層；吸血之觸消耗2層，使傷害提高30%；召喚什一魔消耗全部層數。生成層數也會增加獻納靈魂炸彈的進度，即使已保有5層也會增加。',
+  'hudChrome.priest.bombTooltip':
+    '獻納靈魂炸彈：生成20層幽暗什一即可準備一枚炸彈。消耗幽暗什一不會增加進度。進度在戰鬥之間保留。死亡或開始與團隊副本首領戰鬥時會歸零。完成施法會消耗炸彈，取消施法則會保留。',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    '在15秒內，將敵人因你的暗影傷害實際損失生命值的20%轉化為治療，分配給30碼內受傷的小隊成員，包括你自己。在團隊中，僅治療你所在的小隊。立即施放，且你可在暮色帷幕下繼續攻擊。被吸收的傷害及超出敵人剩餘生命值的傷害不會產生治療。',
+  'entities.abilities.void_rupture.name': '虛空破裂',
+  'entities.abilities.void_rupture.description':
+    '消耗3層幽暗什一，撕裂一名敵人並造成{damage}暗影傷害。傷害隨法術能量提高，且可造成致命一擊。需要3層，即使被抵抗也會消耗。',
+  'entities.abilities.inner_focus.specNote_shadow':
+    '此外，在60秒內，你的下一次裂心術或虛空破裂命中時必定造成致命一擊。其他法術不會消耗此加成。虛空破裂仍會消耗3層幽暗什一。施法被抵抗也會消耗此致命一擊加成。',
+  'hudChrome.auraEffect.stilledMindCrit':
+    '你的下一次裂心術或虛空破裂命中時必定造成致命一擊。其他法術不會消耗此加成。虛空破裂仍會消耗3層幽暗什一。施法被抵抗也會消耗此加成。',
 };

@@ -4,6 +4,78 @@ import type { AbilityDef } from '../types';
 // evolve without growing the shared class catalog. Their custom combat effects
 // are wired by the spec modules in src/sim/combat/priest/.
 export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
+  void_rupture: {
+    id: 'void_rupture',
+    name: 'Void Rupture',
+    class: 'priest',
+    learnLevel: 16,
+    specs: ['shadow'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'shadow',
+    requiresTarget: true,
+    requiresAuraKind: 'gloomtithe',
+    requiresAuraStacks: 3,
+    requiresOwnAura: true,
+    consumesRequiredAuraStacks: 3,
+    projectile: false,
+    // Provisional: 12 base damage per gem, below Vampiric Touch's 13.5 bonus
+    // per gem. The standard instant coefficient gives 1/7 Spell Power per gem,
+    // also below Touch's 0.15, in exchange for immediate damage and mobility.
+    effects: [{ type: 'directDamage', min: 36, max: 36 }],
+    description:
+      'Consume 3 Gloomtithe charges to rupture an enemy for $d Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted.',
+  },
+  spirit_bomb: {
+    id: 'spirit_bomb',
+    name: 'Tithe Bomb',
+    class: 'priest',
+    learnLevel: 20,
+    specs: ['shadow'],
+    cost: 0,
+    castTime: 3,
+    cooldown: 0,
+    range: 30,
+    school: 'shadow',
+    requiresTarget: true,
+    requiresAuraKind: 'spirit_bomb_charge',
+    requiresAuraStacks: 20,
+    projectile: false,
+    // Initial tuning: the base budget is three full unempowered Vampiric Touch
+    // casts (3 x 90). Use the shared classic AoE Spell Power coefficient.
+    effects: [
+      {
+        type: 'aoeDamage',
+        min: 270,
+        max: 270,
+        radius: 8,
+        centerOnTarget: true,
+        canCrit: true,
+        softCap: 5,
+      },
+    ],
+    description:
+      'Detonate a spirit bomb on an enemy, dealing $d Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell.',
+  },
+  vampiric_touch: {
+    id: 'vampiric_touch',
+    name: 'Vampiric Touch',
+    class: 'priest',
+    learnLevel: 16,
+    specs: ['shadow'],
+    cost: 60,
+    castTime: 1.5,
+    cooldown: 0,
+    range: 30,
+    school: 'shadow',
+    requiresTarget: true,
+    projectile: false,
+    effects: [{ type: 'dot', total: 90, duration: 15, interval: 3 }],
+    description:
+      'Deal $d Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%.',
+  },
   veilstep: {
     id: 'veilstep',
     name: 'Veilstep',
@@ -75,7 +147,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     consumesRequiredAura: false,
     effects: [],
     description:
-      'Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',
+      'Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It attacks only enemies within 35 yards that have your Dirge of Decay, preferring your Effigy. Without a target, it waits until one becomes available or its duration ends. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',
   },
   martyrs_aegis: {
     id: 'martyrs_aegis',
@@ -107,6 +179,10 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'aoeHeal', min: 90, max: 110, radius: 30 }],
     description:
       'Channel for 6 sec, healing party members within 30 yards for $d every 2 sec. Healing increases with Spell Power.',
+    specNotes: {
+      shadow:
+        'For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing.',
+    },
   },
   // Both healer specs share the out-of-combat group resurrection.
   prayer_of_returning: {

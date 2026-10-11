@@ -12748,7 +12748,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_block.description':
     '将你封入坚冰8秒，使你免疫所有伤害。移除已存在的普通有害效果，并阻止新的普通控制效果施加于你。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）',
   'entities.abilities.inner_focus.description':
-    '使你的下一个牧师法术免费且无法被打断。持续 60 秒。',
+    '你的下一个牧师法术不消耗法力值，且无法被打断。持续60秒。',
   'entities.abilities.innervate.description':
     '生命树液在你体内涌动10秒，分波恢复20点当前资源，可恢复法力、怒气或能量。变形不会中断效果。睡眠、昏迷或停滞会使树液停止涌动。（德鲁伊天赋）',
   'entities.abilities.mend_pet.name': '修补',
@@ -18742,4 +18742,29 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'errors.noUpdateFound': '未找到更新。请稍后再试。',
   'errors.updateUnavailable': '请通过游戏商店更新，或下载最新客户端。',
   'errors.updateSearchFailed': '无法检查更新。请重试。',
+  'entities.abilities.vampiric_touch.name': '吸血之触',
+  'entities.abilities.vampiric_touch.description':
+    '在15秒内造成{damage}点暗影伤害，每3秒一次。伤害随法术强度提升，每次伤害均可暴击。每次伤害将敌人实际损失生命值的20%转化为治疗，平均分配给你和30码内受伤的小队成员；在团队中，仅治疗你所在的小队。若你拥有至少2层幽暗什一，施加此效果会消耗2层，使其全部伤害提高30%。',
+  'entities.abilities.spirit_bomb.name': '献纳灵魂炸弹',
+  'entities.abilities.spirit_bomb.description':
+    '在敌人身上引爆灵魂炸弹，对目标周围8码内的敌人造成{damage}暗影伤害。伤害随法术强度提高，可以暴击，目标超过5个时伤害降低。累计生成20层幽暗什一，可准备一枚炸弹。即使已持有上限5层，生成仍会增加进度。无需消耗层数，消耗也不会增加进度。进度在战斗之间保留，最多储存一枚准备好的炸弹。死亡会清除进度和准备好的炸弹。完成施法会消耗炸弹，即使被抵抗也是如此。取消或打断施法会保留炸弹。开始与团队副本首领战斗时，进度和准备好的炸弹都会清零。此法术无法用于开启团队副本首领战斗。',
+  'hudChrome.priest.gloomtitheLabel': '幽暗什一',
+  'hudChrome.priest.bombLabel': '献纳灵魂炸弹',
+  'hudChrome.priest.gloomtitheStatus': '幽暗什一：{value} / {max}',
+  'hudChrome.priest.bombStatus': '献纳灵魂炸弹充能：{value} / {max}',
+  'hudChrome.priest.bombReady': '就绪',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    '幽暗什一：最多保有5层可消耗的层数。虚空破裂消耗3层；吸血之触消耗2层，使伤害提高30%；召唤什一魔消耗全部层数。生成层数也会增加献纳灵魂炸弹的进度，即使已保有5层也会增加。',
+  'hudChrome.priest.bombTooltip':
+    '献纳灵魂炸弹：生成20层幽暗什一即可准备一枚炸弹。消耗幽暗什一不会增加进度。进度在战斗之间保留。死亡或开始与团队副本首领战斗时会清零。完成施法会消耗炸弹，取消施法则会保留。',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    '在15秒内，将敌人因你的暗影伤害实际损失生命值的20%转化为治疗，分配给30码内受伤的小队成员，包括你自己。在团队中，仅治疗你所在的小队。瞬间施放，且你可在暮色帷幕下继续攻击。被吸收的伤害及超出敌人剩余生命值的伤害不会产生治疗。',
+  'entities.abilities.void_rupture.name': '虚空破裂',
+  'entities.abilities.void_rupture.description':
+    '消耗3层幽暗什一，撕裂一名敌人并造成{damage}暗影伤害。伤害随法术强度提高，且可以暴击。需要3层，即使被抵抗也会消耗。',
+  'entities.abilities.inner_focus.specNote_shadow':
+    '此外，在60秒内，你的下一次碎心术或虚空破裂命中时必定暴击。其他法术不会消耗此加成。虚空破裂仍会消耗3层幽暗什一。施法被抵抗也会消耗此暴击加成。',
+  'hudChrome.auraEffect.stilledMindCrit':
+    '你的下一次碎心术或虚空破裂命中时必定暴击。其他法术不会消耗此加成。虚空破裂仍会消耗3层幽暗什一。施法被抵抗也会消耗此加成。',
 };

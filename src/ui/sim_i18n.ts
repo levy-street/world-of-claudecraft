@@ -17872,6 +17872,7 @@ const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
 // ability's localized name here so the buff bar and combat log never paint
 // raw English in a non-English locale.
 const ABILITY_NAMED_AURA_IDS: Readonly<Record<string, string>> = {
+  'Tithe Bomb': 'spirit_bomb',
   'Bruin Rush': 'bear_charge',
   Lunge: 'lunge',
   // Thundercall's Magma Surge proc aura carries its ability's name.

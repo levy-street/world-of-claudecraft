@@ -48,10 +48,13 @@ type OptionalRetainedRowDescriptionId =
   | 'pal_r5_divine_steed'
   | 'pal_r5_radiant_stride'
   | 'pal_r8_recurring_grace'
+  | 'pri_r11_inner_focus'
   | 'pri_r11_vampiric_embrace'
   | 'pri_r14_pain_and_suffering'
   | 'pri_r20_incarnate_spirit'
   | 'pri_r20_second_verse'
+  | 'pri_r20_twin_covenant'
+  | 'pri_r17_choir_of_deliverance'
   | 'pri_r5_improved_renew'
   | 'pri_r5_searing_light'
   | 'pri_r5_twisted_faith'
@@ -162,11 +165,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Un enemigo que consume por completo el Salmo de Protección queda inmovilizado durante 2 s, una vez por enemigo cada 12 s.',
     pri_r14_pain_and_suffering:
-      'La sanación por daño de Doctrina restaura el Salmo de Protección por un 20% de la sanación realizada, hasta su absorción original. Bendición convierte el exceso de sanación de Coro Sanador en una absorción de 10 s con un tope del 10% de la salud máxima. Cada eco de Efigie de Vísperas extiende la Endecha de Descomposición 1 s, hasta 6 s por objetivo.',
+      'La sanación por daño de Doctrina restaura el Salmo de Protección por un 20% de la sanación realizada, hasta su absorción original. Bendición convierte el exceso de sanación de Coro Sanador en una absorción de 10 s con un tope del 10% de la salud máxima. Sombra: los impactos de Fractura Mental en tu Efigie prolongan tu Endecha de Descomposición y Toque vampírico 1 s, hasta 3 s por aplicación. Las extensiones conservan el siguiente pulso y no generan Diezmo sombrío. Los ecos prolongan la Endecha en otros enemigos 1 s, hasta 6 s por aplicación.',
     pri_r20_incarnate_spirit:
-      'Un Salmo de Protección totalmente consumido sana a su objetivo por un 40% de la absorción original. La sanación de la Vigilia de Bendición también sana hasta a 3 miembros del grupo en un radio de 15 metros por un 40%. Un Diezmademonio de Vísperas con 5 acumulaciones inflige un 50% más de daño y dura un 50% más.',
+      'Un Salmo de Protección totalmente consumido sana a su objetivo por un 40% de la absorción original. La sanación de la Vigilia de Bendición también sana hasta a 3 miembros del grupo en un radio de 15 metros por un 40%. Sombra: Bomba del diezmo deja una zona de 8 metros durante 6 s. Inflige un 20% adicional de su daño no crítico en 3 pulsos, uno cada 2 s. El daño se reduce por encima de 5 objetivos. Los enemigos deben permanecer en la zona.',
     pri_r20_second_verse:
-      'Después de 2 s, repite un 40% de la sanación de Misericordia Purgante de Doctrina, la sanación grupal de Bendición, o el daño del eco de Efigie de Vísperas. La repetición no puede desencadenarse a sí misma.',
+      'Doctrina repite el 40% de la sanación de Misericordia Purgante tras 2 s. Bendición repite el 40% de la sanación grupal tras 2 s. Sombra: cada quinto pulso normal de Toque vampírico sobre tu Efigie añade un pulso de daño, con su sanación normal según la salud perdida por el enemigo. Renovar tu Toque vampírico antes de que expire conserva la cuenta sobre ese enemigo. Si expira, la cuenta se reinicia. Los pulsos adicionales no pueden activarse a sí mismos.',
     pri_r5_improved_renew:
       'El Salmo de Protección otorga a su objetivo un 40% de velocidad de movimiento durante 3 s.',
     pri_r5_searing_light:
@@ -202,6 +205,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'La represalia de la Égida de Truenos otorga un 10% de reducción de daño durante 3 s.',
     wlk_r11_demon_armor:
       'La primera vez que cada miembro del grupo toca tu Pozo de Almas, los protege con un escudo equivalente al 15% de su salud máxima durante 30 s. Cada jugador puede obtener este escudo una vez por Pozo de Almas.',
+    pri_r20_twin_covenant:
+      'Doctrina puede vincular a 2 aliados y convierte el 70% del daño Sagrado en sanación para cada uno. Bendición almacena 2 usos de Vigilia Seráfica y puede proteger a 2 aliados. Sombra puede vincular a 2 enemigos como Efigies mediante Endecha de Descomposición y Fractura Mental. Los pulsos de Endecha de ambos generan Diezmo sombrío para la misma reserva y Bomba del diezmo.',
+    pri_r17_choir_of_deliverance:
+      'Aprende Coro de Liberación. Sombra: obtienes al instante un efecto de 15 s que reparte el 20% de la salud que tus enemigos pierden por tu daño de Sombras como sanación entre los miembros heridos del grupo a 30 metros. En bandas, solo sana a tu subgrupo. Puedes seguir atacando en Forma de las Sombras. Sagrado y Disciplina: canalizas durante 6 s y sanas al grupo a 30 metros cada 2 s. Reutilización de 180 s.',
+    pri_r11_inner_focus:
+      'Otorga Mente Serena. Tu siguiente hechizo de Sacerdote en 60 s no cuesta maná y no puede interrumpirse. Sombra: reserva por separado un crítico garantizado para tu siguiente Fractura Mental o Void Rupture en 60 s, si impacta. Otros hechizos no consumen esta bonificación. Void Rupture sigue consumiendo 3 cargas de Diezmo sombrío. Un lanzamiento resistido consume la bonificación de crítico. Reutilización de 90 s.',
   },
   es_ES: {
     wlk_r17_death_coil:
@@ -285,11 +294,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Un enemigo que consume por completo el Salmo de Protección queda inmovilizado durante 2 s, una vez por enemigo cada 12 s.',
     pri_r14_pain_and_suffering:
-      'La sanación por daño de Doctrina restaura tu Salmo de Protección en un 20% de lo sanado, hasta su absorción original. Bendición convierte la sobrecuración de Coro Sanador en una absorción de 10 s, limitada al 10% de la salud máxima. Cada eco de la Efigie de Vísperas extiende la Endecha de Descomposición 1 s, hasta 6 s por objetivo.',
+      'La sanación por daño de Doctrina restaura tu Salmo de Protección en un 20% de lo sanado, hasta su absorción original. Bendición convierte la sobrecuración de Coro Sanador en una absorción de 10 s, limitada al 10% de la salud máxima. Sombra: los impactos de Fractura Mental en tu Efigie prolongan tu Endecha de Descomposición y Toque vampírico 1 s, hasta 3 s por aplicación. Las extensiones conservan el siguiente pulso y no generan Diezmo sombrío. Los ecos prolongan la Endecha en otros enemigos 1 s, hasta 6 s por aplicación.',
     pri_r20_incarnate_spirit:
-      'Un Salmo de Protección totalmente consumido sana a su objetivo por un 40% de la absorción original. La sanación de la Vigilia de Bendición también sana hasta a 3 miembros del grupo en 15 m por un 40%. Un Diezmademonio de Vísperas con 5 acumulaciones inflige un 50% más de daño y dura un 50% más.',
+      'Un Salmo de Protección totalmente consumido sana a su objetivo por un 40% de la absorción original. La sanación de la Vigilia de Bendición también sana hasta a 3 miembros del grupo en 15 m por un 40%. Sombra: Bomba del diezmo deja una zona de 8 metros durante 6 s. Inflige un 20% adicional de su daño no crítico en 3 pulsos, uno cada 2 s. El daño se reduce por encima de 5 objetivos. Los enemigos deben permanecer en la zona.',
     pri_r20_second_verse:
-      'Tras 2 s, repite un 40% de la sanación de Misericordia Purgante de Doctrina, la sanación grupal de Bendición, o el daño del eco de la Efigie de Vísperas. La repetición no puede activarse a sí misma.',
+      'Doctrina repite el 40% de la sanación de Misericordia Purgante tras 2 s. Bendición repite el 40% de la sanación grupal tras 2 s. Sombra: cada quinto pulso normal de Toque vampírico sobre tu Efigie añade un pulso de daño, con su sanación normal según la salud perdida por el enemigo. Renovar tu Toque vampírico antes de que expire conserva la cuenta sobre ese enemigo. Si expira, la cuenta se reinicia. Los pulsos adicionales no pueden activarse a sí mismos.',
     pri_r5_improved_renew:
       'El Salmo de Protección otorga a su objetivo un 40% de velocidad de movimiento durante 3 s.',
     pri_r5_searing_light:
@@ -326,6 +335,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'La represalia de la Égida de Truenos otorga una reducción del daño recibido del 10% durante 3 s.',
     wlk_r11_demon_armor:
       'La primera vez que cada miembro del grupo toca tu Soulwell, los escuda por un 15% de su salud máxima durante 30 s. Cada jugador puede obtener este escudo una vez por Soulwell.',
+    pri_r20_twin_covenant:
+      'Doctrina puede vincular a 2 aliados y convierte el 70% del daño Sagrado en sanación para cada uno. Bendición almacena 2 usos de Vigilia Seráfica y puede proteger a 2 aliados. Sombra puede vincular a 2 enemigos como Efigies mediante Endecha de Descomposición y Fractura Mental. Los pulsos de Endecha de ambos generan Diezmo sombrío para la misma reserva y Bomba del diezmo.',
+    pri_r17_choir_of_deliverance:
+      'Aprende Coro de Liberación. Sombra: obtienes al instante un efecto de 15 s que reparte el 20% de la salud que tus enemigos pierden por tu daño de Sombras como sanación entre los miembros heridos del grupo a 30 metros. En bandas, solo sana a tu subgrupo. Puedes seguir atacando en Forma de las Sombras. Sagrado y Disciplina: canalizas durante 6 s y sanas al grupo a 30 metros cada 2 s. Reutilización de 180 s.',
+    pri_r11_inner_focus:
+      'Otorga Mente Serena. Tu siguiente hechizo de Sacerdote en 60 s no cuesta maná y no puede interrumpirse. Sombra: reserva por separado un crítico garantizado para tu siguiente Fractura Mental o Void Rupture en 60 s, si impacta. Otros hechizos no consumen esta bonificación. Void Rupture sigue consumiendo 3 cargas de Diezmo sombrío. Un lanzamiento resistido consume la bonificación de crítico. Reutilización de 90 s.',
   },
   fr_FR: {
     mag_r5_blink_cast:
@@ -405,11 +420,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Un ennemi qui consomme entièrement le Psaume de protection est immobilisé pendant 2 s, une fois par ennemi toutes les 12 s.',
     pri_r14_pain_and_suffering:
-      "Les soins par les dégâts de la Doctrine restaurent le Psaume de protection de 20% des soins prodigués, jusqu'à son absorption d'origine. La Bénison transforme la surguérison du Soin du chœur en une absorption de 10 s plafonnée à 10% des points de vie maximum. Chaque écho de l'Effigie des Vêpres prolonge la Complainte de décrépitude de 1 s, jusqu'à 6 s par cible.",
+      "Les soins par les dégâts de la Doctrine restaurent le Psaume de protection de 20% des soins prodigués, jusqu'à son absorption d'origine. La Bénison transforme la surguérison du Soin du chœur en une absorption de 10 s plafonnée à 10% des points de vie maximum. Ombre : les impacts de Fracture mentale sur votre Effigie prolongent votre Complainte de décrépitude et Toucher vampirique de 1 s, jusqu'à 3 s par application. Les prolongations préservent la prochaine pulsation et ne génèrent pas de Gloomtithe. Les échos prolongent la Complainte sur les autres ennemis de 1 s, jusqu'à 6 s par application.",
     pri_r20_incarnate_spirit:
-      "Un Psaume de protection entièrement consommé soigne sa cible de 40% de l'absorption d'origine. Les soins de la Veille de la Bénison soignent aussi jusqu'à 3 membres du groupe dans un rayon de 15 m de 40%. À 5 cumuls, le Démon de dîme des Vêpres inflige 50% de dégâts en plus et dure 50% plus longtemps.",
+      "Un Psaume de protection entièrement consommé soigne sa cible de 40% de l'absorption d'origine. Les soins de la Veille de la Bénison soignent aussi jusqu'à 3 membres du groupe dans un rayon de 15 m de 40%. Ombre : Bombe de dîme laisse une zone de 8 mètres pendant 6 s, infligeant 20% de dégâts supplémentaires non critiques en 3 pulsations, une toutes les 2 s. Les dégâts sont réduits au-delà de 5 cibles. Les ennemis doivent rester dans la zone.",
     pri_r20_second_verse:
-      "Après 2 s, répète 40% des soins de Miséricorde purifiante de la Doctrine, des soins de groupe de la Bénison, ou des dégâts d'écho de l'Effigie des Vêpres. La répétition ne peut pas se déclencher elle-même.",
+      "La Doctrine répète 40% des soins de Miséricorde purifiante après 2 s. La Bénison répète 40% des soins de groupe après 2 s. Ombre : chaque cinquième pulsation normale de Toucher vampirique sur votre Effigie ajoute une pulsation de dégâts avec ses soins habituels selon les points de vie perdus par l'ennemi. Renouveler votre Toucher vampirique avant son expiration conserve le compteur sur cet ennemi. Son expiration remet le compteur à zéro. Les pulsations supplémentaires ne peuvent pas se déclencher elles-mêmes.",
     pri_r5_improved_renew:
       'Psaume de protection octroie à sa cible 40% de vitesse de déplacement pendant 3 s.',
     pri_r5_searing_light:
@@ -446,6 +461,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Les représailles de la Garde de tonnerre octroient 10% de réduction des dégâts pendant 3 s.',
     wlk_r11_demon_armor:
       "La première fois que chaque membre du groupe touche votre Puits d'âmes, il le protège d'un bouclier égal à 15% de ses points de vie maximum pendant 30 s. Chaque joueur ne peut obtenir ce bouclier qu'une fois par Puits d'âmes.",
+    pri_r20_twin_covenant:
+      "La Doctrine peut lier 2 alliés et convertit 70% des dégâts du Sacré en soins pour chacun. La Bénison stocke 2 utilisations de Veille séraphique et peut protéger 2 alliés. L'Ombre peut lier 2 ennemis comme Effigies avec Complainte de décrépitude et Fracture mentale. Les pulsations des deux Complaintes génèrent du Gloomtithe pour la même réserve et Bombe de dîme.",
+    pri_r17_choir_of_deliverance:
+      "Apprenez Chœur de délivrance. Ombre : gagnez instantanément un effet de 15 s qui répartit 20% des points de vie perdus par les ennemis à cause de vos dégâts d'Ombre en soins entre les membres blessés du groupe à 30 mètres. En raid, seul votre sous-groupe est soigné. Vous pouvez continuer à attaquer en Forme d'Ombre. Sacré et Discipline : canalisez pendant 6 s pour soigner le groupe à 30 mètres toutes les 2 s. Recharge de 180 s.",
+    pri_r11_inner_focus:
+      'Accorde Esprit apaisé. Votre prochain sort de Prêtre dans les 60 s ne coûte aucun mana et ne peut être interrompu. Ombre : réserve séparément un coup critique garanti pour votre prochain Fracture mentale ou Void Rupture dans les 60 s, si le sort touche. Les autres sorts ne consomment pas ce bonus. Void Rupture consomme toujours 3 charges de Gloomtithe. Un sort résisté consomme le bonus critique. Recharge de 90 s.',
   },
   fr_CA: {
     mag_r5_blink_cast:
@@ -524,11 +545,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Un ennemi qui consomme entièrement Psaume de protection est enraciné pendant 2 s, une fois par ennemi toutes les 12 s.',
     pri_r14_pain_and_suffering:
-      "Les soins de dégâts de Doctrine restaurent Psaume de protection de 20% des soins prodigués, jusqu'à son absorption d'origine. Bénison transforme la surguérison de Soin du chœur en une absorption de 10 s plafonnée à 10% des points de vie maximum. Chaque écho d'Effigie de Vêpres prolonge Chant funèbre de pourriture de 1 s, jusqu'à 6 s par cible.",
+      "Les soins de dégâts de Doctrine restaurent Psaume de protection de 20% des soins prodigués, jusqu'à son absorption d'origine. Bénison transforme la surguérison de Soin du chœur en une absorption de 10 s plafonnée à 10% des points de vie maximum. Ombre : les impacts de Fracture mentale sur votre Effigie prolongent votre Chant funèbre de pourriture et Toucher vampirique de 1 s, jusqu'à 3 s par application. Les prolongations préservent la prochaine pulsation et ne génèrent pas de Gloomtithe. Les échos prolongent le Chant funèbre sur les autres ennemis de 1 s, jusqu'à 6 s par application.",
     pri_r20_incarnate_spirit:
-      "Un Psaume de protection entièrement consommé soigne sa cible de 40% de l'absorption d'origine. Les soins de la Veille séraphique de Bénison guérissent aussi jusqu'à 3 membres du groupe dans un rayon de 15 m de 40%. Un Démon de dîme de Vêpres à 5 cumuls inflige 50% de dégâts en plus et dure 50% plus longtemps.",
+      "Un Psaume de protection entièrement consommé soigne sa cible de 40% de l'absorption d'origine. Les soins de la Veille séraphique de Bénison guérissent aussi jusqu'à 3 membres du groupe dans un rayon de 15 m de 40%. Ombre : Bombe de dîme laisse une zone de 8 mètres pendant 6 s, infligeant 20% de dégâts supplémentaires non critiques en 3 pulsations, une toutes les 2 s. Les dégâts sont réduits au-delà de 5 cibles. Les ennemis doivent rester dans la zone.",
     pri_r20_second_verse:
-      "Après 2 s, répète 40% des soins de Miséricorde purifiante de Doctrine, des soins de groupe de Bénison, ou des dégâts d'écho d'Effigie de Vêpres. La répétition ne peut pas se déclencher elle-même.",
+      "La Doctrine répète 40% des soins de Miséricorde purifiante après 2 s. La Bénison répète 40% des soins de groupe après 2 s. Ombre : chaque cinquième pulsation normale de Toucher vampirique sur votre Effigie ajoute une pulsation de dégâts avec ses soins habituels selon les points de vie perdus par l'ennemi. Renouveler votre Toucher vampirique avant son expiration conserve le compteur sur cet ennemi. Son expiration remet le compteur à zéro. Les pulsations supplémentaires ne peuvent pas se déclencher elles-mêmes.",
     pri_r5_improved_renew:
       'Psaume de protection confère à sa cible 40% de vitesse de déplacement pendant 3 s.',
     pri_r5_searing_light:
@@ -566,6 +587,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Les représailles de Garde de tonnerre confèrent 10% de réduction des dégâts pendant 3 s.',
     wlk_r11_demon_armor:
       "La première fois que chaque membre du groupe touche votre Puits d'âmes, il le protège d'un bouclier égal à 15% de ses points de vie maximum pendant 30 s. Chaque joueur ne peut gagner ce bouclier qu'une fois par Puits d'âmes.",
+    pri_r20_twin_covenant:
+      "La Doctrine peut lier 2 alliés et convertit 70% des dégâts du Sacré en soins pour chacun. La Bénison stocke 2 utilisations de Veille séraphique et peut protéger 2 alliés. L'Ombre peut lier 2 ennemis comme Effigies avec Chant funèbre de pourriture et Fracture mentale. Les pulsations des deux chants génèrent du Gloomtithe pour la même réserve et Bombe de dîme.",
+    pri_r17_choir_of_deliverance:
+      "Apprenez Chœur de délivrance. Ombre : gagnez instantanément un effet de 15 s qui répartit 20% des points de vie perdus par les ennemis à cause de vos dégâts d'Ombre en soins entre les membres blessés du groupe à 30 mètres. En raid, seul votre sous-groupe est soigné. Vous pouvez continuer à attaquer en Forme d'Ombre. Sacré et Discipline : canalisez pendant 6 s pour soigner le groupe à 30 mètres toutes les 2 s. Recharge de 180 s.",
+    pri_r11_inner_focus:
+      'Accorde Esprit apaisé. Votre prochain sort de Prêtre dans les 60 s ne coûte aucun mana et ne peut être interrompu. Ombre : réserve séparément un coup critique garanti pour votre prochain Fracture mentale ou Void Rupture dans les 60 s, si le sort touche. Les autres sorts ne consomment pas ce bonus. Void Rupture consomme toujours 3 charges de Gloomtithe. Un sort résisté consomme le bonus critique. Recharge de 90 s.',
   },
   it_IT: {
     mag_r5_blink_cast: 'Puoi usare Passo Baleno nel mezzo di un incantesimo senza interromperlo.',
@@ -642,11 +669,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Un nemico che consuma interamente il Salmo di Protezione viene radicato per 2 sec, una volta per nemico ogni 12 sec.',
     pri_r14_pain_and_suffering:
-      "Le cure generate dai danni di Dottrina ripristinano il Salmo di Protezione del 20% della cura inflitta, fino al suo assorbimento originale. Benedizione trasforma le cure in eccesso di Cura del Coro in un assorbimento di 10 sec, limitato al 10% della salute massima. Ogni eco dell'Effigie di Vespri estende il Canto Funebre della Putrefazione di 1 sec, fino a 6 sec per bersaglio.",
+      'Le cure generate dai danni di Dottrina ripristinano il Salmo di Protezione del 20% della cura inflitta, fino al suo assorbimento originale. Benedizione trasforma le cure in eccesso di Cura del Coro in un assorbimento di 10 sec, limitato al 10% della salute massima. Ombra: i colpi di Frattura Mentale sulla tua Effigie prolungano il tuo Canto Funebre della Putrefazione e Tocco Vampirico di 1 sec, fino a 3 sec per applicazione. Le estensioni preservano il prossimo impulso e non generano Gloomtithe. Gli echi prolungano il Canto Funebre sugli altri nemici di 1 sec, fino a 6 sec per applicazione.',
     pri_r20_incarnate_spirit:
-      "Un Salmo di Protezione consumato interamente cura il suo bersaglio del 40% dell'assorbimento originale. La cura della Veglia di Benedizione cura anche fino a 3 membri del gruppo entro 15 metri del 40%. Con 5 accumuli di Vespri, il Demone della Decima infligge il 50% di danni in più e dura il 50% più a lungo.",
+      "Un Salmo di Protezione consumato interamente cura il suo bersaglio del 40% dell'assorbimento originale. La cura della Veglia di Benedizione cura anche fino a 3 membri del gruppo entro 15 metri del 40%. Ombra: Bomba della Decima lascia una zona di 8 metri per 6 sec, infliggendo un ulteriore 20% dei suoi danni non critici in 3 impulsi, uno ogni 2 sec. I danni sono ridotti oltre 5 bersagli. I nemici devono restare nella zona.",
     pri_r20_second_verse:
-      "Dopo 2 sec, ripeti il 40% delle cure di Misericordia Purificatrice da Dottrina, delle cure di gruppo da Benedizione, o dei danni dell'eco dell'Effigie da Vespri. La ripetizione non può attivare se stessa.",
+      'Dottrina ripete il 40% delle cure di Misericordia Purificatrice dopo 2 sec. Benedizione ripete il 40% delle cure di gruppo dopo 2 sec. Ombra: ogni quinto impulso normale di Tocco Vampirico sulla tua Effigie aggiunge un impulso di danni con la normale cura basata sulla salute persa dal nemico. Rinnovare il tuo Tocco Vampirico prima che scada conserva il conteggio su quel nemico. Alla scadenza il conteggio si azzera. Gli impulsi aggiuntivi non possono attivarsi da soli.',
     pri_r5_improved_renew:
       'Salmo di Protezione concede al suo bersaglio il 40% di velocità di movimento per 3 sec.',
     pri_r5_searing_light:
@@ -683,6 +710,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'La rappresaglia di Barriera di Tuono concede il 10% di riduzione danni per 3 sec.',
     wlk_r11_demon_armor:
       'La prima volta che ogni membro del gruppo tocca il tuo Soulwell, li protegge con uno scudo pari al 15% della loro salute massima per 30 sec. Ogni giocatore può ottenere questo scudo una sola volta per Soulwell.',
+    pri_r20_twin_covenant:
+      'Dottrina può legare 2 alleati e converte il 70% dei danni Sacri in cure per ciascuno. Benedizione conserva 2 usi di Veglia Serafica e può proteggere 2 alleati. Ombra può legare 2 nemici come Effigi con Canto Funebre della Putrefazione e Frattura Mentale. Gli impulsi dei due canti generano Gloomtithe per la stessa riserva e Bomba della Decima.',
+    pri_r17_choir_of_deliverance:
+      "Impari Coro della Liberazione. Ombra: ottieni subito un effetto di 15 sec che distribuisce il 20% della salute persa dai nemici per i tuoi danni d'Ombra come cure tra i membri feriti del gruppo entro 30 metri. Nelle incursioni cura solo il tuo sottogruppo. Puoi continuare ad attaccare in Forma d'Ombra. Sacro e Disciplina: canalizzi per 6 sec, curando il gruppo entro 30 metri ogni 2 sec. Recupero di 180 sec.",
+    pri_r11_inner_focus:
+      'Conferisce Mente Quietata. Il tuo prossimo incantesimo da Sacerdote entro 60 sec non costa mana e non può essere interrotto. Ombra: riserva separatamente un critico garantito per il prossimo Frattura Mentale o Void Rupture entro 60 sec, se colpisce. Gli altri incantesimi non consumano questo bonus. Void Rupture consuma ancora 3 cariche di Gloomtithe. Un lancio resistito consuma il bonus critico. Recupero di 90 sec.',
   },
   de_DE: {
     mag_r5_blink_cast:
@@ -761,11 +794,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Ein Gegner, der Psalm der Abschirmung vollständig verbraucht, wird 2 Sek. lang verwurzelt, einmal pro Gegner alle 12 Sek.',
     pri_r14_pain_and_suffering:
-      'Die Schadensheilung der Doktrin stellt Psalm der Abschirmung um 20% der geleisteten Heilung wieder her, bis zu seinem ursprünglichen Absorptionswert. Der Segensspruch verwandelt Überheilung durch Chorheilung in einen 10 Sek. langen Schild, gedeckelt bei 10% der maximalen Gesundheit. Jedes Echo Eures Vesper-Abbilds verlängert das Klagelied des Verfalls um 1 Sek., bis zu 6 Sek. pro Ziel.',
+      'Die Schadensheilung der Doktrin stellt Psalm der Abschirmung um 20% der geleisteten Heilung wieder her, bis zu seinem ursprünglichen Absorptionswert. Der Segensspruch verwandelt Überheilung durch Chorheilung in einen 10 Sek. langen Schild, gedeckelt bei 10% der maximalen Gesundheit. Schatten: Treffer mit Gedankenbruch auf Euer Abbild verlängern Euer Klagelied des Verfalls und Vampirische Berührung um 1 Sek., bis zu 3 Sek. pro Anwendung. Verlängerungen bewahren den nächsten Impuls und erzeugen keinen Gloomtithe. Echos verlängern das Klagelied auf anderen Gegnern um 1 Sek., bis zu 6 Sek. pro Anwendung.',
     pri_r20_incarnate_spirit:
-      'Ein vollständig verbrauchter Psalm der Abschirmung heilt sein Ziel um 40% des ursprünglichen Absorptionswerts. Die Heilung der Seraphischen Wacht aus dem Segensspruch heilt außerdem bis zu 3 Gruppenmitglieder im Umkreis von 15 Metern um 40%. Ein Zehntteufel der Vesper mit 5 Stapeln verursacht 50% mehr Schaden und hält 50% länger.',
+      'Ein vollständig verbrauchter Psalm der Abschirmung heilt sein Ziel um 40% des ursprünglichen Absorptionswerts. Die Heilung der Seraphischen Wacht aus dem Segensspruch heilt außerdem bis zu 3 Gruppenmitglieder im Umkreis von 15 Metern um 40%. Schatten: Zehntbombe hinterlässt für 6 Sek. ein Gebiet von 8 Metern. Es verursacht zusätzlich 20% ihres nichtkritischen Schadens in 3 Impulsen, alle 2 Sek. einen. Der Schaden wird bei mehr als 5 Zielen verringert. Gegner müssen im Gebiet bleiben.',
     pri_r20_second_verse:
-      'Nach 2 Sek. wiederholt sich 40% der Heilung von Läuternder Gnade aus der Doktrin, der Gruppenheilung aus dem Segensspruch, oder des Echoschadens des Abbilds aus der Vesper. Die Wiederholung kann sich nicht selbst erneut auslösen.',
+      'Doktrin wiederholt nach 2 Sek. 40% der Heilung von Läuternder Gnade. Segensspruch wiederholt nach 2 Sek. 40% der Gruppenheilung. Schatten: Jeder fünfte reguläre Impuls von Vampirischer Berührung auf Eurem Abbild fügt einen Schadensimpuls mit der üblichen Heilung aus verlorener Gegnergesundheit hinzu. Erneuert Ihr Eure Vampirische Berührung vor ihrem Ablauf, bleibt der Zähler auf diesem Gegner erhalten. Läuft sie ab, wird der Zähler zurückgesetzt. Zusatzimpulse können sich nicht selbst auslösen.',
     pri_r5_improved_renew:
       'Psalm der Abschirmung gewährt seinem Ziel 3 Sek. lang 40% Bewegungstempo.',
     pri_r5_searing_light:
@@ -802,6 +835,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Eine Vergeltung des Donnerschilds gewährt 3 Sek. lang 10% Schadensreduzierung.',
     wlk_r11_demon_armor:
       'Beim ersten Berühren Eures Soulwell schützt es jedes Gruppenmitglied 30 Sek. lang mit einem Schild von 15% seiner maximalen Gesundheit. Jeder Spieler kann diesen Schild einmal pro Soulwell erhalten.',
+    pri_r20_twin_covenant:
+      'Doktrin kann 2 Verbündete verbinden und wandelt für jeden 70% des Heiligschadens in Heilung um. Segensspruch speichert 2 Anwendungen von Seraphischer Wacht und kann 2 Verbündete schützen. Schatten kann mit Klagelied des Verfalls und Gedankenbruch 2 Gegner als Abbilder binden. Die Impulse beider Klagelieder erzeugen Gloomtithe für denselben Vorrat und Zehntbombe.',
+    pri_r17_choir_of_deliverance:
+      'Erlernt Chor der Erlösung. Schatten: Gewährt sofort einen Effekt für 15 Sek., der 20% der durch Euren Schattenschaden verlorenen Gegnergesundheit als Heilung unter verletzten Gruppenmitgliedern innerhalb von 30 Metern verteilt. Im Schlachtzug heilt er nur Eure Untergruppe. Ihr könnt in Schattengestalt weiter angreifen. Heilig und Disziplin: Kanalisiert 6 Sek. lang und heilt die Gruppe innerhalb von 30 Metern alle 2 Sek. Abklingzeit: 180 Sek.',
+    pri_r11_inner_focus:
+      'Gewährt Stiller Geist. Euer nächster Priesterzauber innerhalb von 60 Sek. kostet kein Mana und kann nicht unterbrochen werden. Schatten: Gewährt separat einen garantierten kritischen Treffer für Euer nächstes Geistesbruch oder Void Rupture innerhalb von 60 Sek., sofern es trifft. Andere Zauber verbrauchen diesen Bonus nicht. Void Rupture verbraucht weiterhin 3 Gloomtithe-Aufladungen. Ein widerstandener Zauber verbraucht den kritischen Bonus. 90 Sek. Abklingzeit.',
   },
   pt_BR: {
     mag_r5_blink_cast: 'Você pode usar Passo Cintilante durante uma conjuração sem interrompê-la.',
@@ -878,11 +917,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Um inimigo que consome totalmente o Salmo de Proteção fica enraizado por 2 s, uma vez por inimigo a cada 12 s.',
     pri_r14_pain_and_suffering:
-      'A cura por dano da Doutrina restaura o Salmo de Proteção em 20% da cura realizada, até seu valor original de absorção. A Bênção transforma o excesso de cura de Cura do Coro em uma absorção de 10 s, limitada a 10% da vida máxima. Cada eco da Efígie de Vésperas estende o Canto de Decadência em 1 s, até 6 s por alvo.',
+      'A cura por dano da Doutrina restaura o Salmo de Proteção em 20% da cura realizada, até seu valor original de absorção. A Bênção transforma o excesso de cura de Cura do Coro em uma absorção de 10 s, limitada a 10% da vida máxima. Sombra: acertos de Fratura Mental na sua Efígie prolongam seu Canto de Decadência e Toque Vampírico em 1 s, até 3 s por aplicação. As extensões preservam o próximo pulso e não geram Gloomtithe. Os ecos prolongam o Canto em outros inimigos em 1 s, até 6 s por aplicação.',
     pri_r20_incarnate_spirit:
-      'Um Salmo de Proteção totalmente consumido cura seu alvo em 40% do valor original de absorção. A cura da Vigília Seráfica da Bênção também cura até 3 membros do grupo num raio de 15 m em 40%. Um Demônio do Dízimo de Vésperas com 5 acúmulos causa 50% mais dano e dura 50% mais.',
+      'Um Salmo de Proteção totalmente consumido cura seu alvo em 40% do valor original de absorção. A cura da Vigília Seráfica da Bênção também cura até 3 membros do grupo num raio de 15 m em 40%. Sombra: Bomba do Dízimo deixa uma área de 8 metros por 6 s, causando mais 20% do seu dano não crítico em 3 pulsos, um a cada 2 s. O dano é reduzido acima de 5 alvos. Os inimigos devem permanecer na área.',
     pri_r20_second_verse:
-      'Após 2 s, repita 40% da cura de Misericórdia Purificadora da Doutrina, da cura em grupo da Bênção, ou do dano do eco da Efígie de Vésperas. A repetição não pode acionar a si mesma.',
+      'Doutrina repete 40% da cura de Misericórdia Purificadora após 2 s. Bênção repete 40% da cura em grupo após 2 s. Sombra: cada quinto pulso normal de Toque Vampírico na sua Efígie acrescenta um pulso de dano, com a cura normal baseada na vida perdida pelo inimigo. Renovar seu Toque Vampírico antes de expirar mantém a contagem nesse inimigo. Se expirar, a contagem é reiniciada. Pulsos extras não podem ativar a si mesmos.',
     pri_r5_improved_renew:
       'O Salmo de Proteção concede ao seu alvo 40% de velocidade de movimento por 3 s.',
     pri_r5_searing_light:
@@ -918,6 +957,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'A retaliação da Salvaguarda do Trovão concede 10% de redução de dano por 3 s.',
     wlk_r11_demon_armor:
       'Na primeira vez que cada membro do grupo toca seu Soulwell, ele os escuda em 15% da vida máxima deles por 30 s. Cada jogador pode obter esse escudo uma vez por Soulwell.',
+    pri_r20_twin_covenant:
+      'Doutrina pode vincular 2 aliados e converte 70% do dano Sagrado em cura para cada um. Bênção armazena 2 usos de Vigília Seráfica e pode proteger 2 aliados. Sombra pode vincular 2 inimigos como Efígies com Canto de Decadência e Fratura Mental. Os pulsos dos dois cantos geram Gloomtithe para a mesma reserva e Bomba do Dízimo.',
+    pri_r17_choir_of_deliverance:
+      'Aprenda Coro da Libertação. Sombra: recebe instantaneamente um efeito de 15 s que distribui 20% da vida perdida pelos inimigos pelo seu dano de Sombra como cura entre membros feridos do grupo a 30 metros. Em raides, cura apenas seu subgrupo. Você pode continuar atacando em Forma de Sombra. Sagrado e Disciplina: canaliza por 6 s, curando o grupo a 30 metros a cada 2 s. Recarga de 180 s.',
+    pri_r11_inner_focus:
+      'Concede Mente Serena. Seu próximo feitiço de Sacerdote em até 60 s não custa mana e não pode ser interrompido. Sombra: reserva separadamente um crítico garantido para seu próximo Fratura Mental ou Void Rupture em até 60 s, se acertar. Outros feitiços não consomem esse bônus. Void Rupture ainda consome 3 cargas de Diezmo sombrío. Um lançamento resistido consome o bônus crítico. Recarga de 90 s.',
   },
   ru_RU: {
     mag_r5_blink_cast:
@@ -1001,11 +1046,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Враг, полностью поглотивший «Псалом ограждения», обездвиживается на 2 сек., не чаще раза в 12 сек. на одного врага.',
     pri_r14_pain_and_suffering:
-      'Исцеление, которое Доктрина создает из вашего урона, восстанавливает «Псалом ограждения» на 20% от совершенного исцеления, вплоть до исходного объема поглощения. Благословение превращает избыточное исцеление «Хорового исцеления» в поглощающий щит на 10 сек., ограниченный 10% максимального здоровья. Каждое эхо Изваяния Вечерни продлевает «Панихиду распада» на 1 сек., вплоть до 6 сек. на цель.',
+      'Исцеление, которое Доктрина создает из вашего урона, восстанавливает «Псалом ограждения» на 20% от совершенного исцеления, вплоть до исходного объема поглощения. Благословение превращает избыточное исцеление «Хорового исцеления» в поглощающий щит на 10 сек., ограниченный 10% максимального здоровья. Тьма: попадания «Разлома разума» по вашему Изваянию продлевают вашу «Панихиду распада» и «Прикосновение вампира» на 1 сек., до 3 сек. за наложение. Продление сохраняет время следующего срабатывания и не создаёт Мрачную десятину. Эхо продлевает панихиду на других врагах на 1 сек., до 6 сек. за наложение.',
     pri_r20_incarnate_spirit:
-      'Полностью поглощенный «Псалом ограждения» исцеляет свою цель на 40% от исходного объема поглощения. Исцеление от Бдения Благословения также исцеляет до 3 участников группы в пределах 15 ярдов на 40%. Демон десятины Вечерни при 5 стадиях наносит на 50% больше урона и длится на 50% дольше.',
+      'Полностью поглощенный «Псалом ограждения» исцеляет свою цель на 40% от исходного объема поглощения. Исцеление от Бдения Благословения также исцеляет до 3 участников группы в пределах 15 ярдов на 40%. Тьма: «Бомба подношения» оставляет область радиусом 8 ярдов на 6 сек. Она наносит дополнительно 20% некритического урона бомбы за 3 импульса, по одному каждые 2 сек. При числе целей свыше 5 урон уменьшается. Враги должны оставаться в области.',
     pri_r20_second_verse:
-      'Через 2 сек. повторяется 40% исцеления «Карающего милосердия» Доктрины, группового исцеления Благословения или урона эха Изваяния Вечерни. Повтор не может запустить сам себя.',
+      'Доктрина повторяет 40% исцеления «Карающего милосердия» через 2 сек. Благословение повторяет 40% группового исцеления через 2 сек. Тьма: каждое пятое обычное срабатывание «Прикосновения вампира» на вашем Изваянии добавляет одно срабатывание урона с обычным исцелением от потерянного врагом здоровья. Обновление вашего «Прикосновения вампира» до окончания действия сохраняет счётчик на этом враге. Окончание действия сбрасывает счётчик. Дополнительные срабатывания не могут запускать сами себя.',
     pri_r5_improved_renew:
       '«Псалом ограждения» дает своей цели 40% скорости передвижения на 3 сек.',
     pri_r5_searing_light:
@@ -1042,6 +1087,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Ответный удар «Громового оберега» дает снижение получаемого урона на 10% на 3 сек.',
     wlk_r11_demon_armor:
       'Когда участник группы впервые взаимодействует с вашим «Колодцем душ», он получает щит на 15% максимального здоровья на 30 сек. Каждый игрок может получить этот щит лишь один раз за «Колодец душ».',
+    pri_r20_twin_covenant:
+      'Доктрина может связать 2 союзников и преобразует 70% урона Света в исцеление для каждого. Благословение хранит 2 заряда «Серафимского бдения» и может защитить 2 союзников. Тьма может связать 2 врагов как Изваяния с помощью «Панихиды распада» и «Разлома разума». Срабатывания обеих панихид создают Мрачную десятину для общего запаса и «Бомбы подношения».',
+    pri_r17_choir_of_deliverance:
+      'Изучите «Хор избавления». Тьма: мгновенно получите эффект на 15 сек., который распределяет 20% здоровья, потерянного врагами от вашего урона Тьмы, как исцеление между ранеными участниками группы в пределах 30 ярдов. В рейде исцеляется только ваша подгруппа. Можно продолжать атаковать в Облике Тьмы. Свет и Послушание: поддерживайте заклинание 6 сек., исцеляя группу в пределах 30 ярдов каждые 2 сек. Восстановление: 180 сек.',
+    pri_r11_inner_focus:
+      'Даёт Утихший разум. Ваше следующее заклинание Жреца в течение 60 сек. не требует маны и не может быть прервано. Тьма: отдельно гарантирует критический удар следующего Раскол разума или Void Rupture в течение 60 сек., если оно попадёт. Другие заклинания не расходуют этот бонус. Void Rupture по-прежнему расходует 3 заряда Gloomtithe. Сопротивление заклинанию также расходует бонус критического удара. Восстановление: 90 сек.',
   },
   cs_CZ: {
     mag_r5_blink_cast: 'Mihokrok můžeš použít uprostřed sesílání kouzla, aniž by bylo přerušeno.',
@@ -1115,11 +1166,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Nepřítel, který plně spotřebuje Žalm ochrany, je zakořeněn na 2 s, nejvýše jednou za nepřítele každých 12 s.',
     pri_r14_pain_and_suffering:
-      'Léčení, které Doktrína vytváří z poškození, obnoví Žalm ochrany o 20 % vykonaného léčení, nejvýše na jeho původní hodnotu pohlcení. Požehnání promění přeléčení ze Sborového zacelení v 10s pohlcení omezené na 10 % maximálního zdraví. Každá ozvěna, která zasáhne tvou Podobiznu, prodlouží Žalozpěv rozkladu o 1 s, až na 6 s na cíl.',
+      'Léčení, které Doktrína vytváří z poškození, obnoví Žalm ochrany o 20 % vykonaného léčení, nejvýše na jeho původní hodnotu pohlcení. Požehnání promění přeléčení ze Sborového zacelení v 10s pohlcení omezené na 10 % maximálního zdraví. Stín: zásahy Zlomu mysli do tvé Podobizny prodlouží tvůj Žalozpěv rozkladu a Upíří dotek o 1 s, nejvýše o 3 s na aplikaci. Prodloužení zachovává další tik a nevytváří Gloomtithe. Ozvěny prodlužují žalozpěv na ostatních nepřátelích o 1 s, nejvýše o 6 s na aplikaci.',
     pri_r20_incarnate_spirit:
-      'Plně spotřebovaný Žalm ochrany vyléčí svůj cíl za 40 % původní hodnoty pohlcení. Léčení Serafínské stráže Požehnání navíc vyléčí až 3 členy skupiny do 15 yardů za 40 %. Desátkový běs Nešpor s 5 nánosy způsobí o 50 % více poškození a vydrží o 50 % déle.',
+      'Plně spotřebovaný Žalm ochrany vyléčí svůj cíl za 40 % původní hodnoty pohlcení. Léčení Serafínské stráže Požehnání navíc vyléčí až 3 členy skupiny do 15 yardů za 40 %. Stín: Desátková bomba zanechá oblast o poloměru 8 yardů na 6 s. Způsobí navíc 20 % svého nekritického poškození ve 3 pulzech, jeden každé 2 s. Nad 5 cílů se poškození snižuje. Nepřátelé musí zůstat v oblasti.',
     pri_r20_second_verse:
-      'Po 2 s zopakuje 40 % léčení Očistného milosrdenství z Doktríny, skupinového léčení z Požehnání, nebo poškození ozvěny Podobizny z Nešpor. Opakování nemůže spustit samo sebe.',
+      'Doktrína po 2 s zopakuje 40 % léčení Očistného milosrdenství. Požehnání po 2 s zopakuje 40 % skupinového léčení. Stín: každý pátý běžný tik Upířího doteku na tvé Podobizně přidá jeden tik poškození s běžným léčením podle zdraví ztraceného nepřítelem. Obnovení tvého Upířího doteku před vypršením zachová počítadlo na daném nepříteli. Po vypršení se počítadlo vynuluje. Dodatečné tiky nemohou spustit samy sebe.',
     pri_r5_improved_renew: 'Žalm ochrany udělí svému cíli 40 % rychlosti pohybu na 3 s.',
     pri_r5_searing_light:
       'Krok závoje odstraní zakořenění a zpomalení, poté udělí 50 % rychlosti pohybu na 3 s.',
@@ -1153,6 +1204,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Odveta Hromové ochrany udělí 10 % snížení poškození na 3 s.',
     wlk_r11_demon_armor:
       'Poprvé, co se člen skupiny dotkne tvého Soulwellu, získá štít za 15 % svého maximálního zdraví na 30 s. Každý hráč může tento štít získat jednou za Soulwell.',
+    pri_r20_twin_covenant:
+      'Doktrína může propojit 2 spojence a každému převádí 70 % Svatého poškození na léčení. Požehnání uchovává 2 použití Serafínské stráže a může chránit 2 spojence. Stín může pomocí Žalozpěvu rozkladu a Zlomu mysli svázat 2 nepřátele jako Podobizny. Tiky obou žalozpěvů vytvářejí Gloomtithe do stejné zásoby i pro Desátkovou bombu.',
+    pri_r17_choir_of_deliverance:
+      'Naučíš se Sbor vysvobození. Stín: okamžitě získáš účinek na 15 s, který rozdělí 20 % zdraví ztraceného nepřáteli tvým Stínovým poškozením jako léčení mezi zraněné členy skupiny do 30 yardů. V raidu léčí pouze tvou podskupinu. Můžeš dál útočit ve Stínové formě. Svatý a Disciplína: sesíláš po dobu 6 s a léčíš skupinu do 30 yardů každé 2 s. Obnova 180 s.',
+    pri_r11_inner_focus:
+      'Poskytuje Ztišená mysl. Tvé příští kněžské kouzlo do 60 s nestojí manu a nelze ho přerušit. Stín: samostatně zaručuje kritický zásah pro příští Zlomení mysli nebo Void Rupture do 60 s, pokud zasáhne. Jiná kouzla tento bonus nespotřebují. Void Rupture stále spotřebuje 3 náboje Gloomtithe. Odolané seslání spotřebuje kritický bonus. Obnova: 90 s.',
   },
   nl_NL: {
     mag_r5_blink_cast:
@@ -1228,11 +1285,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Een vijand die Psalm van Bescherming volledig verbruikt, wordt 2 sec lang geworteld, hoogstens eenmaal per vijand per 12 sec.',
     pri_r14_pain_and_suffering:
-      'Schade-genezing van de Leer herstelt Psalm van Bescherming met 20% van de genezing die is uitgevoerd, tot het oorspronkelijke absorptiebedrag. Zegen verandert overgenezing van Koorherstel in een absorptie van 10 sec, met een maximum van 10% maximale gezondheid. Elke Beeltenis-echo van Vesper verlengt Klaagzang van Verval met 1 sec, tot 6 sec per doelwit.',
+      'Schade-genezing van de Leer herstelt Psalm van Bescherming met 20% van de genezing die is uitgevoerd, tot het oorspronkelijke absorptiebedrag. Zegen verandert overgenezing van Koorherstel in een absorptie van 10 sec, met een maximum van 10% maximale gezondheid. Schaduw: treffers van Geestbreuk op je Beeltenis verlengen je Klaagzang van Verval en Vampirische Aanraking met 1 sec, tot 3 sec per toepassing. Verlengingen behouden de volgende puls en genereren geen Gloomtithe. Echo’s verlengen de Klaagzang op andere vijanden met 1 sec, tot 6 sec per toepassing.',
     pri_r20_incarnate_spirit:
-      'Een volledig verbruikte Psalm van Bescherming geneest zijn doelwit voor 40% van de oorspronkelijke absorptie. De genezing van de Wake van Zegen geneest ook tot 3 groepsleden binnen 15 m voor 40%. Een Tiendduivel van Vesper met 5 stapels brengt 50% meer schade toe en houdt 50% langer stand.',
+      'Een volledig verbruikte Psalm van Bescherming geneest zijn doelwit voor 40% van de oorspronkelijke absorptie. De genezing van de Wake van Zegen geneest ook tot 3 groepsleden binnen 15 m voor 40%. Schaduw: Tiendbom laat 6 sec een gebied met een straal van 8 meter achter en brengt nog eens 20% van zijn niet-kritieke schade toe in 3 pulsen, elke 2 sec één. Boven 5 doelwitten wordt de schade verminderd. Vijanden moeten in het gebied blijven.',
     pri_r20_second_verse:
-      'Na 2 sec herhaalt zich 40% van de genezing van Louterende Genade van de Leer, de groepsgenezing van Zegen, of de schade van de Beeltenis-echo van Vesper. De herhaling kan zichzelf niet activeren.',
+      'Leer herhaalt na 2 sec 40% van de genezing van Louterende Genade. Zegen herhaalt na 2 sec 40% van de groepsgenezing. Schaduw: elke vijfde normale puls van Vampirische Aanraking op je Beeltenis voegt één schadepuls toe met de normale genezing op basis van verloren vijandelijke gezondheid. Je Vampirische Aanraking vernieuwen voordat die afloopt behoudt de teller op die vijand. Bij afloop wordt de teller teruggezet. Extra pulsen kunnen zichzelf niet activeren.',
     pri_r5_improved_renew:
       'Psalm van Bescherming verleent zijn doelwit 3 sec lang 40% bewegingssnelheid.',
     pri_r5_searing_light:
@@ -1268,6 +1325,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'De vergelding van Donderwering verleent 3 sec lang 10% schadevermindering.',
     wlk_r11_demon_armor:
       'De eerste keer dat een groepslid je Soulwell aanraakt, beschermt het hen 30 sec lang met een schild van 15% van hun maximale gezondheid. Elke speler kan dit schild eenmaal per Soulwell krijgen.',
+    pri_r20_twin_covenant:
+      'Leer kan 2 bondgenoten verbinden en zet voor ieder 70% van Heilige schade om in genezing. Zegen bewaart 2 gebruiken van Serafijnse Wake en kan 2 bondgenoten beschermen. Schaduw kan 2 vijanden als Beeltenissen binden met Klaagzang van Verval en Geestbreuk. De pulsen van beide klaagzangen genereren Gloomtithe voor dezelfde voorraad en Tiendbom.',
+    pri_r17_choir_of_deliverance:
+      'Leer Koor van Verlossing. Schaduw: verkrijg direct een effect van 15 sec dat 20% van de gezondheid die vijanden verliezen door je Schaduwschade als genezing verdeelt over gewonde groepsleden binnen 30 meter. In raids wordt alleen je subgroep genezen. Je kunt in Schaduwvorm blijven aanvallen. Heilig en Discipline: kanaliseer 6 sec om de groep binnen 30 meter elke 2 sec te genezen. Afkoeltijd 180 sec.',
+    pri_r11_inner_focus:
+      'Geeft Gestilde geest. Je volgende Priester-spreuk binnen 60 sec kost geen mana en kan niet worden onderbroken. Schaduw: reserveert apart een gegarandeerde kritieke treffer voor je volgende Geestbreuk of Void Rupture binnen 60 sec, als die raakt. Andere spreuken verbruiken deze bonus niet. Void Rupture verbruikt nog steeds 3 Gloomtithe-ladingen. Een weerstane spreuk verbruikt de kritieke bonus. Afkoeltijd: 90 sec.',
   },
   pl_PL: {
     mag_r5_blink_cast:
@@ -1345,11 +1408,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Wróg, który w pełni zużyje Psalm ochrony, zostaje unieruchomiony na 2 sekundy, najwyżej raz na wroga co 12 sekund.',
     pri_r14_pain_and_suffering:
-      'Leczenie z obrażeń Doktryny przywraca Psalm ochrony o 20% wykonanego leczenia, do jego pierwotnej wartości pochłaniania. Błogosławieństwo zamienia nadwyżkę leczenia z Chóralnego Uzdrowienia w 10-sekundową tarczę pochłaniającą, ograniczoną do 10% maksymalnego zdrowia. Każde echo Kukły Nieszporów przedłuża Pieśń rozkładu o 1 sekundę, maksymalnie do 6 sekund na cel.',
+      'Leczenie z obrażeń Doktryny przywraca Psalm ochrony o 20% wykonanego leczenia, do jego pierwotnej wartości pochłaniania. Błogosławieństwo zamienia nadwyżkę leczenia z Chóralnego Uzdrowienia w 10-sekundową tarczę pochłaniającą, ograniczoną do 10% maksymalnego zdrowia. Cień: trafienia Pęknięciem Umysłu w twoją Kukłę przedłużają twoją Pieśń rozkładu i Wampiryczny Dotyk o 1 sekundę, do 3 sekund na nałożenie. Przedłużenia zachowują następne tyknięcie i nie generują Gloomtithe. Echa przedłużają pieśń na innych wrogach o 1 sekundę, do 6 sekund na nałożenie.',
     pri_r20_incarnate_spirit:
-      'W pełni zużyty Psalm ochrony leczy swój cel za 40% pierwotnej wartości pochłaniania. Leczenie z Serafinowej Straży Błogosławieństwa leczy też do 3 członków drużyny w promieniu 15 m za 40%. Dziesięcinnik Nieszporów przy 5 ładunkach zadaje o 50% więcej obrażeń i trwa o 50% dłużej.',
+      'W pełni zużyty Psalm ochrony leczy swój cel za 40% pierwotnej wartości pochłaniania. Leczenie z Serafinowej Straży Błogosławieństwa leczy też do 3 członków drużyny w promieniu 15 m za 40%. Cień: Bomba Dziesięciny pozostawia obszar o promieniu 8 jardów na 6 sekund. Zadaje dodatkowo 20% jej niekrytycznych obrażeń w 3 pulsach, co 2 sekundy. Powyżej 5 celów obrażenia są zmniejszane. Wrogowie muszą pozostać w obszarze.',
     pri_r20_second_verse:
-      'Po 2 sekundach powtarza 40% leczenia Oczyszczającego Miłosierdzia z Doktryny, grupowego leczenia z Błogosławieństwa lub obrażeń echa Kukły z Nieszporów. Powtórzenie nie może wyzwolić samego siebie.',
+      'Doktryna powtarza po 2 sekundach 40% leczenia Oczyszczającego Miłosierdzia. Błogosławieństwo powtarza po 2 sekundach 40% leczenia grupowego. Cień: każde piąte zwykłe tyknięcie Wampirycznego Dotyku na twojej Kukle dodaje tyknięcie obrażeń z normalnym leczeniem według zdrowia utraconego przez wroga. Odświeżenie twojego Wampirycznego Dotyku przed wygaśnięciem zachowuje licznik na tym wrogu. Wygaśnięcie zeruje licznik. Dodatkowe tyknięcia nie mogą wyzwalać samych siebie.',
     pri_r5_improved_renew:
       'Psalm ochrony przyznaje swojemu celowi 40% prędkości ruchu na 3 sekundy.',
     pri_r5_searing_light:
@@ -1385,6 +1448,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Odwet Osłony gromu przyznaje 10% redukcji obrażeń na 3 sekundy.',
     wlk_r11_demon_armor:
       'Za pierwszym razem, gdy członek grupy skorzysta z twojego Soulwell, osłania go tarczą równą 15% jego maksymalnego zdrowia na 30 sekund. Każdy gracz może zyskać tę tarczę raz na Soulwell.',
+    pri_r20_twin_covenant:
+      'Doktryna może połączyć 2 sojuszników i zamienia dla każdego 70% Świętych obrażeń w leczenie. Błogosławieństwo przechowuje 2 użycia Serafinowej Straży i może chronić 2 sojuszników. Cień może związać 2 wrogów jako Kukły za pomocą Pieśni rozkładu i Pęknięcia Umysłu. Tykania obu pieśni generują Gloomtithe do wspólnego zapasu i dla Bomby Dziesięciny.',
+    pri_r17_choir_of_deliverance:
+      'Uczysz się Chóru Wyzwolenia. Cień: natychmiast otrzymujesz efekt na 15 sekund, który rozdziela 20% zdrowia utraconego przez wrogów od twoich obrażeń Cienia jako leczenie między rannych członków grupy w promieniu 30 jardów. W rajdzie leczy tylko twoją podgrupę. Możesz nadal atakować w Formie Cienia. Święty i Dyscyplina: podtrzymujesz przez 6 sekund, lecząc grupę w promieniu 30 jardów co 2 sekundy. Odnowienie: 180 sekund.',
+    pri_r11_inner_focus:
+      'Daje Wyciszony Umysł. Twoje następne zaklęcie Kapłana w ciągu 60 sek. nie kosztuje many i nie można go przerwać. Cień: osobno gwarantuje trafienie krytyczne następnego Roztrzaskanie umysłu lub Void Rupture w ciągu 60 sek., jeśli trafi. Inne zaklęcia nie zużywają tej premii. Void Rupture nadal zużywa 3 ładunki Gloomtithe. Odparte zaklęcie zużywa premię krytyczną. Czas odnowienia: 90 sek.',
   },
   id_ID: {
     mag_r5_blink_cast:
@@ -1463,11 +1532,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Musuh yang menghabiskan seluruh Mazmur Penangkal akan terakar selama 2 dtk, sekali per musuh setiap 12 dtk.',
     pri_r14_pain_and_suffering:
-      'Penyembuhan-kerusakan Doktrin memulihkan Mazmur Penangkal sebesar 20% dari penyembuhan yang diberikan, hingga penyerapan awalnya. Berkat mengubah kelebihan penyembuhan Penyembuhan Koor menjadi penyerap 10 dtk yang dibatasi hingga 10% nyawa maksimum. Setiap gema Patung Vesper memperpanjang Ratapan Pembusukan selama 1 dtk, hingga 6 dtk per target.',
+      'Penyembuhan-kerusakan Doktrin memulihkan Mazmur Penangkal sebesar 20% dari penyembuhan yang diberikan, hingga penyerapan awalnya. Berkat mengubah kelebihan penyembuhan Penyembuhan Koor menjadi penyerap 10 dtk yang dibatasi hingga 10% nyawa maksimum. Bayangan: serangan Retakan Pikiran yang mengenai Patung milikmu memperpanjang Ratapan Pembusukan dan Sentuhan Vampir milikmu selama 1 dtk, hingga 3 dtk per penerapan. Perpanjangan mempertahankan waktu denyut berikutnya dan tidak menghasilkan Gloomtithe. Gema memperpanjang ratapan pada musuh lain selama 1 dtk, hingga 6 dtk per penerapan.',
     pri_r20_incarnate_spirit:
-      'Mazmur Penangkal yang habis terpakai sepenuhnya menyembuhkan targetnya sebesar 40% dari penyerapan awalnya. Penyembuhan Jaga dari Berkat juga menyembuhkan hingga 3 anggota grup dalam radius 15 m sebesar 40%. Iblis Persepuluhan Vesper pada 5 tumpukan memberikan 50% kerusakan lebih besar dan bertahan 50% lebih lama.',
+      'Mazmur Penangkal yang habis terpakai sepenuhnya menyembuhkan targetnya sebesar 40% dari penyerapan awalnya. Penyembuhan Jaga dari Berkat juga menyembuhkan hingga 3 anggota grup dalam radius 15 m sebesar 40%. Bayangan: Bom Persepuluhan meninggalkan area beradius 8 yard selama 6 dtk, menimbulkan tambahan 20% kerusakan nonkritisnya dalam 3 denyut, satu setiap 2 dtk. Kerusakan berkurang di atas 5 target. Musuh harus tetap berada di area.',
     pri_r20_second_verse:
-      'Setelah 2 dtk, ulangi 40% dari penyembuhan Belas Kasih Pembersih dari Doktrin, penyembuhan grup dari Berkat, atau kerusakan gema Patung dari Vesper. Pengulangan ini tidak dapat memicu dirinya sendiri.',
+      'Doktrin mengulangi 40% penyembuhan Belas Kasih Pembersih setelah 2 dtk. Berkat mengulangi 40% penyembuhan grup setelah 2 dtk. Bayangan: setiap denyut normal kelima Sentuhan Vampir pada Patung milikmu menambahkan satu denyut kerusakan dengan penyembuhan normal berdasarkan nyawa yang hilang dari musuh. Memperbarui Sentuhan Vampir milikmu sebelum berakhir mempertahankan hitungan pada musuh itu. Saat efek berakhir, hitungan diatur ulang. Denyut tambahan tidak dapat memicu dirinya sendiri.',
     pri_r5_improved_renew: 'Mazmur Penangkal memberi targetnya 40% kecepatan gerak selama 3 dtk.',
     pri_r5_searing_light:
       'Langkah Tabir menghapus akar dan pelambatan, lalu memberi 50% kecepatan gerak selama 3 dtk.',
@@ -1501,6 +1570,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Balasan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk.',
     wlk_r11_demon_armor:
       'Saat setiap anggota grup pertama kali menyentuh Soulwell-mu, mereka mendapat perisai sebesar 15% dari nyawa maksimum selama 30 dtk. Setiap pemain hanya dapat memperoleh perisai ini sekali per Soulwell.',
+    pri_r20_twin_covenant:
+      'Doktrin dapat menghubungkan 2 sekutu dan mengubah 70% kerusakan Suci menjadi penyembuhan untuk masing-masing. Berkat menyimpan 2 penggunaan Jaga Serafim dan dapat melindungi 2 sekutu. Bayangan dapat mengikat 2 musuh sebagai Patung dengan Ratapan Pembusukan dan Retakan Pikiran. Denyut kedua ratapan menghasilkan Gloomtithe untuk cadangan yang sama dan Bom Persepuluhan.',
+    pri_r17_choir_of_deliverance:
+      'Pelajari Koor Pembebasan. Bayangan: langsung mendapat efek selama 15 dtk yang membagikan 20% nyawa yang hilang dari musuh akibat kerusakan Bayanganmu sebagai penyembuhan kepada anggota grup terluka dalam 30 yard. Dalam raid, hanya subgrupmu yang disembuhkan. Kamu dapat terus menyerang dalam Wujud Bayangan. Suci dan Disiplin: salurkan selama 6 dtk untuk menyembuhkan grup dalam 30 yard setiap 2 dtk. Jeda 180 dtk.',
+    pri_r11_inner_focus:
+      'Memberikan Pikiran Hening. Mantra Priest berikutnya dalam 60 dtk tidak memerlukan Mana dan tidak dapat diinterupsi. Bayangan: secara terpisah menjamin serangan kritis untuk Retak Pikiran atau Void Rupture berikutnya dalam 60 dtk, jika mengenai sasaran. Mantra lain tidak menghabiskan bonus ini. Void Rupture tetap menghabiskan 3 muatan Gloomtithe. Mantra yang ditahan menghabiskan bonus kritis. Waktu pulih: 90 dtk.',
   },
   tr_TR: {
     mag_r5_blink_cast:
@@ -1573,11 +1648,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       "Koruma Mezmurunu tamamen tüketen bir düşman 2 sn köklenir, düşman başına en fazla 12 sn'de bir.",
     pri_r14_pain_and_suffering:
-      "Öğretinin hasar-iyileştirmesi, Koruma Mezmurunu verilen iyileştirmenin %20'si kadar geri kazandırır, orijinal emme miktarına kadar. Lütuf, Koro Şifasının fazla iyileştirmesini azami canın %10'uyla sınırlı 10 sn'lik bir emmeye dönüştürür. Her Akşam Duası Heykel yankısı, Çürüme Ağıdını hedef başına en fazla 6 sn'ye kadar 1 sn uzatır.",
+      "Öğretinin hasar-iyileştirmesi, Koruma Mezmurunu verilen iyileştirmenin %20'si kadar geri kazandırır, orijinal emme miktarına kadar. Lütuf, Koro Şifasının fazla iyileştirmesini azami canın %10'uyla sınırlı 10 sn'lik bir emmeye dönüştürür. Gölge: Heykeline isabet eden Zihin Kırılması, Çürüme Ağıdını ve Vampirik Dokunuşunu 1 sn uzatır; uygulama başına en fazla 3 sn. Uzatmalar sonraki atımın zamanını korur ve Gloomtithe üretmez. Yankılar diğer düşmanlardaki ağıdı 1 sn uzatır; uygulama başına en fazla 6 sn.",
     pri_r20_incarnate_spirit:
-      "Tamamen tüketilen bir Koruma Mezmuru, hedefini orijinal emme miktarının %40'ı kadar iyileştirir. Lütuf Nöbeti iyileştirmesi ayrıca 15 yarda içindeki en fazla 3 grup üyesini %40 iyileştirir. 5 katmanlı bir Akşam Duası Öşür İfriti %50 daha fazla hasar verir ve %50 daha uzun sürer.",
+      "Tamamen tüketilen bir Koruma Mezmuru, hedefini orijinal emme miktarının %40'ı kadar iyileştirir. Lütuf Nöbeti iyileştirmesi ayrıca 15 yarda içindeki en fazla 3 grup üyesini %40 iyileştirir. Gölge: Öşür Bombası 6 sn boyunca 8 yarda yarıçaplı bir alan bırakır. Kritik olmayan hasarının ek %20'sini 3 atımda, her 2 sn'de bir verir. 5 hedefin üzerinde hasar azalır. Düşmanlar alanda kalmalıdır.",
     pri_r20_second_verse:
-      "2 sn sonra, Öğretiden gelen Arındıran Merhamet iyileştirmesinin, Lütuftan gelen grup iyileştirmesinin ya da Akşam Duasından gelen Heykel yankı hasarının %40'ını tekrarlar. Tekrar kendini tetikleyemez.",
+      "Öğreti, Arındıran Merhamet iyileştirmesinin %40'ını 2 sn sonra tekrarlar. Lütuf, grup iyileştirmesinin %40'ını 2 sn sonra tekrarlar. Gölge: Heykelindeki Vampirik Dokunuşun her beşinci normal atımı, düşmanın kaybettiği cana dayalı normal iyileştirmeyle birlikte bir hasar atımı ekler. Kendi Vampirik Dokunuşunu süresi dolmadan yenilemek o düşmandaki sayacı korur. Süresi dolarsa sayaç sıfırlanır. Ek atımlar kendilerini tetikleyemez.",
     pri_r5_improved_renew: 'Koruma Mezmuru, hedefine 3 sn boyunca %40 hareket hızı kazandırır.',
     pri_r5_searing_light:
       'Perde Adımı kökleri ve yavaşlatmaları kaldırır, ardından 3 sn boyunca %50 hareket hızı kazandırır.',
@@ -1613,6 +1688,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Gök Gürültüsü Siperinin misillemesi 3 sn boyunca %10 hasar azaltımı kazandırır.',
     wlk_r11_demon_armor:
       "Her grup üyesi Ruh Kuyuna ilk kez dokunduğunda, 30 sn boyunca azami canının %15'i kadar onu kalkanlar. Her oyuncu bu kalkanı Ruh Kuyusu başına yalnızca bir kez kazanabilir.",
+    pri_r20_twin_covenant:
+      "Öğreti 2 müttefiki bağlayabilir ve her biri için Kutsal hasarın %70'ini iyileştirmeye çevirir. Lütuf 2 Serafik Nöbet kullanımı saklar ve 2 müttefiki koruyabilir. Gölge, Çürüme Ağıdı ve Zihin Kırılması ile 2 düşmanı Heykel olarak bağlayabilir. İki ağıdın atımları aynı birikim ve Öşür Bombası için Gloomtithe üretir.",
+    pri_r17_choir_of_deliverance:
+      "Kurtuluş Korosunu öğren. Gölge: anında 15 sn'lik bir etki kazanırsın; Gölge hasarınla düşmanların kaybettiği canın %20'sini, 30 yarda içindeki yaralı grup üyelerine paylaştırılmış iyileştirmeye dönüştürür. Baskınlarda yalnızca alt grubunu iyileştirir. Gölge Biçiminde saldırmaya devam edebilirsin. Kutsal ve Disiplin: 6 sn kanalize ederek 30 yarda içindeki grubu her 2 sn'de iyileştirir. Bekleme süresi 180 sn.",
+    pri_r11_inner_focus:
+      'Dingin Zihin kazandırır. 60 sn içindeki sonraki Rahip büyün Mana harcamaz ve kesilemez. Gölge: 60 sn içindeki sonraki Zihin Kırılması veya Void Rupture için ayrıca, isabet ederse garantili kritik vuruş sağlar. Diğer büyüler bu bonusu tüketmez. Void Rupture hâlâ 3 Gloomtithe yükü tüketir. Direnilen bir büyü kritik bonusunu tüketir. Bekleme süresi: 90 sn.',
   },
   sv_SE: {
     mag_r5_blink_cast: 'Du kan använda Flimmersteg mitt i en besvärjelse utan att avbryta den.',
@@ -1685,11 +1766,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'En fiende som helt förbrukar Värnpsalm rotas fast i 2 sek, en gång per fiende var 12:e sek.',
     pri_r14_pain_and_suffering:
-      'Läras skadeläkning återställer Värnpsalm med 20% av den gjorda läkningen, upp till dess ursprungliga absorption. Välsignelse gör Körläknings överläkning till en 10 sekunders absorption, begränsad till 10% av maximal hälsa. Varje Aftonsångens Bildstod-eko förlänger Förruttnelsens klagosång med 1 sek, upp till 6 sek per mål.',
+      'Läras skadeläkning återställer Värnpsalm med 20% av den gjorda läkningen, upp till dess ursprungliga absorption. Välsignelse gör Körläknings överläkning till en 10 sekunders absorption, begränsad till 10% av maximal hälsa. Skugga: träffar med Sinnesbrott på din Bildstod förlänger din Förruttnelsens klagosång och Vampyrisk beröring med 1 sek, upp till 3 sek per applicering. Förlängningar behåller nästa puls och skapar inte Gloomtithe. Ekon förlänger klagosången på andra fiender med 1 sek, upp till 6 sek per applicering.',
     pri_r20_incarnate_spirit:
-      'Ett helt förbrukat Värnpsalm läker sitt mål för 40% av den ursprungliga absorptionen. Välsignelsens Vaka-läkning läker även upp till 3 gruppmedlemmar inom 15 meter för 40%. En Aftonsångens tiondedemon med 5 staplar gör 50% mer skada och varar 50% längre.',
+      'Ett helt förbrukat Värnpsalm läker sitt mål för 40% av den ursprungliga absorptionen. Välsignelsens Vaka-läkning läker även upp till 3 gruppmedlemmar inom 15 meter för 40%. Skugga: Tiondebomb lämnar ett område med 8 meters radie i 6 sek och gör ytterligare 20% av sin icke-kritiska skada i 3 pulser, en varannan sekund. Skadan minskas över 5 mål. Fiender måste stanna i området.',
     pri_r20_second_verse:
-      'Efter 2 sek upprepas 40% av Rensande nåds läkning från Lära, gruppläkning från Välsignelse, eller Bildstod-ekoskada från Aftonsång. Upprepningen kan inte utlösa sig själv.',
+      'Lära upprepar 40% av Rensande nåds läkning efter 2 sek. Välsignelse upprepar 40% av gruppläkningen efter 2 sek. Skugga: var femte vanlig puls av Vampyrisk beröring på din Bildstod ger en extra skadepuls med dess vanliga läkning från fiendens förlorade hälsa. Förnyar du din Vampyriska beröring innan den löper ut behålls räknaren på den fienden. När den löper ut nollställs räknaren. Extra pulser kan inte utlösa sig själva.',
     pri_r5_improved_renew: 'Värnpsalm ger sitt mål 40% förflyttningshastighet i 3 sek.',
     pri_r5_searing_light:
       'Slöjsteg tar bort rötter och nedsaktningar, och ger sedan 50% förflyttningshastighet i 3 sek.',
@@ -1723,6 +1804,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Åskvärns vedergällning ger 10% minskad mottagen skada i 3 sek.',
     wlk_r11_demon_armor:
       'Första gången varje gruppmedlem rör din Soulwell skyddar den dem med en sköld på 15% av deras maximala hälsa i 30 sek. Varje spelare kan få denna sköld en gång per Soulwell.',
+    pri_r20_twin_covenant:
+      'Lära kan länka 2 allierade och omvandlar 70% av Helig skada till läkning för var och en. Välsignelse lagrar 2 användningar av Serafisk vaka och kan skydda 2 allierade. Skugga kan binda 2 fiender som Bildstoder med Förruttnelsens klagosång och Sinnesbrott. Båda klagosångernas pulser skapar Gloomtithe till samma förråd och Tiondebomb.',
+    pri_r17_choir_of_deliverance:
+      'Lär dig Befrielsens kör. Skugga: få omedelbart en effekt i 15 sek som fördelar 20% av hälsan fiender förlorar av din Skuggskada som läkning mellan skadade gruppmedlemmar inom 30 meter. I räder läks bara din undergrupp. Du kan fortsätta attackera i Skuggform. Helig och Disciplin: kanalisera i 6 sek och läk gruppen inom 30 meter varannan sekund. Nedkylning 180 sek.',
+    pri_r11_inner_focus:
+      'Ger Stillat sinne. Din nästa Prästbesvärjelse inom 60 sek kostar ingen mana och kan inte avbrytas. Skugga: reserverar separat en garanterad kritisk träff för nästa Sinnessplittring eller Void Rupture inom 60 sek, om den träffar. Andra besvärjelser förbrukar inte bonusen. Void Rupture förbrukar fortfarande 3 Gloomtithe-laddningar. En motstådd besvärjelse förbrukar den kritiska bonusen. Återhämtning: 90 sek.',
   },
   vi_VN: {
     mag_r5_blink_cast:
@@ -1795,11 +1882,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'Kẻ địch tiêu hết toàn bộ Thánh Thi Hộ Mệnh sẽ bị trói chân trong 2 giây, tối đa một lần cho mỗi kẻ địch mỗi 12 giây.',
     pri_r14_pain_and_suffering:
-      'Sát thương hồi máu của Giáo Lý khôi phục Thánh Thi Hộ Mệnh bằng 20% lượng máu đã hồi, tối đa bằng lượng hấp thụ ban đầu của nó. Phúc Lành biến lượng hồi máu dư của Hồi Phục Hợp Xướng thành một khiên hấp thụ trong 10 giây, tối đa 10% máu tối đa. Mỗi tiếng vọng từ Hình Nộm Kinh Chiều của bạn kéo dài Ai Ca Mục Rữa thêm 1 giây, tối đa 6 giây cho mỗi mục tiêu.',
+      'Sát thương hồi máu của Giáo Lý khôi phục Thánh Thi Hộ Mệnh bằng 20% lượng máu đã hồi, tối đa bằng lượng hấp thụ ban đầu của nó. Phúc Lành biến lượng hồi máu dư của Hồi Phục Hợp Xướng thành một khiên hấp thụ trong 10 giây, tối đa 10% máu tối đa. Bóng Tối: đòn Vỡ Tâm Trí trúng Hình Nộm của bạn kéo dài Ai Ca Mục Rữa và Chạm Hút Máu của bạn thêm 1 giây, tối đa 3 giây mỗi lần áp dụng. Việc kéo dài giữ nguyên thời điểm nhịp kế tiếp và không tạo Gloomtithe. Tiếng vọng kéo dài ai ca trên các kẻ địch khác thêm 1 giây, tối đa 6 giây mỗi lần áp dụng.',
     pri_r20_incarnate_spirit:
-      'Một Thánh Thi Hộ Mệnh bị tiêu hết hoàn toàn sẽ hồi cho mục tiêu của nó 40% lượng hấp thụ ban đầu. Lượng hồi máu Canh Thức của Phúc Lành cũng hồi cho tối đa 3 thành viên tổ đội trong bán kính 15 thước với 40%. Một Quỷ Thập Phân của Kinh Chiều ở 5 lớp gây thêm 50% sát thương và tồn tại lâu hơn 50%.',
+      'Một Thánh Thi Hộ Mệnh bị tiêu hết hoàn toàn sẽ hồi cho mục tiêu của nó 40% lượng hấp thụ ban đầu. Lượng hồi máu Canh Thức của Phúc Lành cũng hồi cho tối đa 3 thành viên tổ đội trong bán kính 15 thước với 40%. Bóng Tối: Bom Thập Phân để lại vùng bán kính 8 thước trong 6 giây, gây thêm 20% sát thương không chí mạng của nó qua 3 nhịp, mỗi 2 giây một nhịp. Sát thương giảm khi vượt quá 5 mục tiêu. Kẻ địch phải ở trong vùng.',
     pri_r20_second_verse:
-      'Sau 2 giây, lặp lại 40% lượng hồi máu của Từ Bi Thanh Tẩy từ Giáo Lý, lượng hồi máu nhóm từ Phúc Lành, hoặc sát thương vọng từ Hình Nộm của Kinh Chiều. Lần lặp lại này không thể tự kích hoạt chính nó.',
+      'Giáo Lý lặp lại 40% lượng hồi máu của Từ Bi Thanh Tẩy sau 2 giây. Phúc Lành lặp lại 40% lượng hồi máu nhóm sau 2 giây. Bóng Tối: mỗi nhịp thường thứ năm của Chạm Hút Máu trên Hình Nộm của bạn tạo thêm một nhịp sát thương với lượng hồi máu thường dựa trên máu kẻ địch đã mất. Làm mới Chạm Hút Máu của bạn trước khi hết hiệu lực giữ nguyên bộ đếm trên kẻ địch đó. Khi hết hiệu lực, bộ đếm đặt lại. Nhịp bổ sung không thể tự kích hoạt.',
     pri_r5_improved_renew:
       'Thánh Thi Hộ Mệnh ban cho mục tiêu của nó 40% tốc độ di chuyển trong 3 giây.',
     pri_r5_searing_light:
@@ -1835,6 +1922,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Đòn phản công của Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây.',
     wlk_r11_demon_armor:
       'Lần đầu tiên mỗi thành viên nhóm chạm vào Giếng Linh Hồn của bạn, nó sẽ tạo khiên cho họ bằng 15% máu tối đa trong 30 giây. Mỗi người chơi chỉ có thể nhận khiên này một lần cho mỗi Giếng Linh Hồn.',
+    pri_r20_twin_covenant:
+      'Giáo Lý có thể liên kết 2 đồng minh và chuyển 70% sát thương Thánh thành hồi máu cho từng người. Phúc Lành lưu 2 lần dùng Canh Thức Thiên Thần và có thể bảo vệ 2 đồng minh. Bóng Tối có thể trói 2 kẻ địch thành Hình Nộm bằng Ai Ca Mục Rữa và Vỡ Tâm Trí. Nhịp của cả hai ai ca tạo Gloomtithe cho cùng nguồn dự trữ và Bom Thập Phân.',
+    pri_r17_choir_of_deliverance:
+      'Học Hợp Xướng Giải Thoát. Bóng Tối: nhận ngay hiệu ứng 15 giây, chia 20% máu kẻ địch mất do sát thương Bóng Tối của bạn thành hồi máu cho các thành viên bị thương trong nhóm ở phạm vi 30 thước. Trong đoàn, chỉ hồi máu cho nhóm nhỏ của bạn. Bạn có thể tiếp tục tấn công trong Dạng Bóng Tối. Thánh và Kỷ Luật: vận sức 6 giây, hồi máu cho nhóm trong 30 thước mỗi 2 giây. Hồi chiêu 180 giây.',
+    pri_r11_inner_focus:
+      'Cho phép dùng Tâm Trí Tĩnh. Phép Linh Mục tiếp theo trong 60 giây không tốn năng lượng và không thể bị ngắt. Bóng Tối: dành riêng một đòn chí mạng chắc chắn cho Nứt Vỡ Tâm Trí hoặc Void Rupture tiếp theo trong 60 giây, nếu trúng. Phép khác không tiêu hao hiệu ứng này. Void Rupture vẫn tiêu hao 3 tích lũy Gloomtithe. Phép bị kháng vẫn tiêu hao hiệu ứng chí mạng. Hồi chiêu: 90 giây.',
   },
   da_DK: {
     mag_r5_blink_cast: 'Du kan bruge Flimmertrin midt i en besværgelse uden at afbryde den.',
@@ -1908,11 +2001,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       'En fjende, der forbruger Værnets Salme fuldstændigt, rodfæstes i 2 sek., højst én gang pr. fjende hvert 12. sek.',
     pri_r14_pain_and_suffering:
-      'Læres skade-helbredelse genopretter Værnets Salme med 20% af den udførte helbredelse, op til dens oprindelige absorption. Velsignelse forvandler Korhelbredelses overhelbredelse til en 10 sek. absorption med et loft på 10% af maksimalt helbred. Hvert Aftensangs Billede-ekko forlænger Forfaldets Klagesang med 1 sek., op til 6 sek. pr. mål.',
+      'Læres skade-helbredelse genopretter Værnets Salme med 20% af den udførte helbredelse, op til dens oprindelige absorption. Velsignelse forvandler Korhelbredelses overhelbredelse til en 10 sek. absorption med et loft på 10% af maksimalt helbred. Skygge: træffere med Sindbrud på dit Billede forlænger din Forfaldets Klagesang og Vampyrisk Berøring med 1 sek., op til 3 sek. pr. påføring. Forlængelser bevarer næste puls og skaber ikke Gloomtithe. Ekkoer forlænger klagesangen på andre fjender med 1 sek., op til 6 sek. pr. påføring.',
     pri_r20_incarnate_spirit:
-      'En fuldstændigt forbrugt Værnets Salme helbreder sit mål for 40% af den oprindelige absorption. Velsignelses Vagt-helbredelse helbreder også op til 3 gruppemedlemmer inden for 15 m for 40%. En 5-stak Aftensangs Tiendedæmon gør 50% mere skade og varer 50% længere.',
+      'En fuldstændigt forbrugt Værnets Salme helbreder sit mål for 40% af den oprindelige absorption. Velsignelses Vagt-helbredelse helbreder også op til 3 gruppemedlemmer inden for 15 m for 40%. Skygge: Tiendebombe efterlader et område med 8 meters radius i 6 sek. og giver yderligere 20% af sin ikke-kritiske skade i 3 pulser, én hver 2. sek. Skaden reduceres over 5 mål. Fjender skal blive i området.',
     pri_r20_second_verse:
-      'Efter 2 sek. gentages 40% af Rensende Nådes helbredelse fra Lære, gruppehelbredelse fra Velsignelse, eller Billede-ekkoskade fra Aftensang. Gentagelsen kan ikke udløse sig selv.',
+      'Lære gentager 40% af Rensende Nådes helbredelse efter 2 sek. Velsignelse gentager 40% af gruppehelbredelsen efter 2 sek. Skygge: hver femte normale puls af Vampyrisk Berøring på dit Billede tilføjer én skadepuls med den normale helbredelse fra fjendens tabte helbred. Fornyer du din Vampyriske Berøring, før den udløber, bevares tælleren på den fjende. Når den udløber, nulstilles tælleren. Ekstra pulser kan ikke udløse sig selv.',
     pri_r5_improved_renew: 'Værnets Salme giver sit mål 40% bevægelseshastighed i 3 sek.',
     pri_r5_searing_light:
       'Slørskridt fjerner rødder og nedsættelser og giver derefter 50% bevægelseshastighed i 3 sek.',
@@ -1946,6 +2039,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Tordenværns gengældelse giver 10% reduceret skade i 3 sek.',
     wlk_r11_demon_armor:
       'Første gang hvert gruppemedlem rører ved din Soulwell, skjoldes de for 15% af deres maksimale helbred i 30 sek. Hver spiller kan få dette skjold én gang pr. Soulwell.',
+    pri_r20_twin_covenant:
+      'Lære kan forbinde 2 allierede og omdanner 70% af Hellig skade til helbredelse for hver. Velsignelse gemmer 2 brug af Serafisk Vagt og kan beskytte 2 allierede. Skygge kan binde 2 fjender som Billeder med Forfaldets Klagesang og Sindbrud. Pulserne fra begge klagesange skaber Gloomtithe til samme beholdning og Tiendebombe.',
+    pri_r17_choir_of_deliverance:
+      'Lær Befrielsens Kor. Skygge: få straks en effekt i 15 sek., som fordeler 20% af det helbred, fjender mister fra din Skyggeskade, som helbredelse mellem sårede gruppemedlemmer inden for 30 meter. I raids helbredes kun din undergruppe. Du kan fortsat angribe i Skyggeform. Hellig og Disciplin: kanaliser i 6 sek. og helbred gruppen inden for 30 meter hver 2. sek. Nedkøling 180 sek.',
+    pri_r11_inner_focus:
+      'Giver Stillet sind. Din næste Præstebesværgelse inden for 60 sek koster ingen mana og kan ikke afbrydes. Skygge: reserverer separat et garanteret kritisk træf til din næste Sindsbrud eller Void Rupture inden for 60 sek, hvis den rammer. Andre besværgelser forbruger ikke bonussen. Void Rupture forbruger stadig 3 Gloomtithe-ladninger. En modstået besværgelse forbruger den kritiske bonus. Nedkøling: 90 sek.',
   },
   zh_CN: {
     mag_r5_blink_cast: '你可以在施法过程中使用闪烁步，而不会打断当前施法。',
@@ -2012,11 +2111,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       '完全消耗守护圣咏护盾的敌人会被定身 2 秒，对同一敌人每 12 秒最多触发一次。',
     pri_r14_pain_and_suffering:
-      '教义的伤害转治疗效果会以所治疗量的 20% 恢复守护圣咏的护盾值，上限为其原本的吸收量。赐福会将圣歌愈疗产生的过量治疗转化为持续 10 秒的吸收护盾，上限为最大生命值的 10%。每次晚祷塑像的回响都会使腐朽挽歌延长 1 秒，每个目标最多延长 6 秒。',
+      '教义的伤害转治疗效果会以所治疗量的 20% 恢复守护圣咏的护盾值，上限为其原本的吸收量。赐福会将圣歌愈疗产生的过量治疗转化为持续 10 秒的吸收护盾，上限为最大生命值的 10%。 暗影：心智裂伤命中你的塑像时，使你施加的腐朽挽歌和吸血之触延长 1 秒，每次施加最多延长 3 秒。延长不会改变下次跳伤时间，也不会产生幽暗什一。 回响使其他敌人身上的挽歌延长 1 秒，每次施加最多延长 6 秒。',
     pri_r20_incarnate_spirit:
-      '完全消耗的守护圣咏会为其目标恢复相当于原吸收量 40% 的生命值。赐福的炽天使守望治疗还会为 15 码内至多 3 名小队成员恢复其 40% 的治疗量。5 层的晚祷什一魔造成的伤害提高 50%，持续时间延长 50%。',
+      '完全消耗的守护圣咏会为其目标恢复相当于原吸收量 40% 的生命值。赐福的炽天使守望治疗还会为 15 码内至多 3 名小队成员恢复其 40% 的治疗量。 暗影：献纳灵魂炸弹留下半径 8 码的区域，持续 6 秒。区域分 3 次脉冲造成额外伤害，总量为炸弹非暴击伤害的 20%，每 2 秒一次。超过 5 个目标时伤害降低。敌人必须留在区域内。',
     pri_r20_second_verse:
-      '2 秒后，重复 40% 的效果：教义的涤罪慈悲治疗、赐福的群体治疗，或晚祷的塑像回响伤害。此重复效果无法再次触发自身。',
+      '教义在 2 秒后重复涤罪慈悲治疗量的 40%。赐福在 2 秒后重复群体治疗量的 40%。暗影：吸血之触在你的塑像上每第 5 次正常跳伤会追加一次伤害，并按敌人失去的生命值产生正常治疗。在你自己的吸血之触到期前刷新，会保留该敌人上的计数。效果到期则重置计数。追加跳伤不会自行触发。',
     pri_r5_improved_renew: '守护圣咏使其目标的移动速度提高 40%，持续 3 秒。',
     pri_r5_searing_light: '帷幕步会解除定身和减速效果，随后使移动速度提高 50%，持续 3 秒。',
     pri_r5_twisted_faith: '帷幕步使牧师能够在移动中施法，持续 4 秒。',
@@ -2047,6 +2146,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: '雷霆护罩的反击效果触发时，使你受到的伤害降低 10%，持续 3 秒。',
     wlk_r11_demon_armor:
       '小队成员首次触碰你的灵魂之井时，会获得一个吸收量为其最大生命值 15% 的护盾，持续 30 秒。每名玩家对每口灵魂之井只能获得一次该护盾。',
+    pri_r20_twin_covenant:
+      '教义可以连接 2 名盟友，并为每人将神圣伤害的 70% 转为治疗。赐福储存 2 次炽天使守望使用次数，可保护 2 名盟友。暗影可通过腐朽挽歌和心智裂伤将 2 个敌人绑定为塑像。两个目标的挽歌跳伤都为同一幽暗什一储备和献纳灵魂炸弹充能。',
+    pri_r17_choir_of_deliverance:
+      '学会解脱圣歌。暗影：立即获得持续 15 秒的效果，将敌人因你的暗影伤害失去的生命值的 20% 转为治疗，在 30 码内受伤的小队成员间分摊。团队中只治疗自己的小队。可保持暗影形态继续攻击。神圣和戒律：引导 6 秒，每 2 秒治疗 30 码内的小队成员。冷却时间 180 秒。',
+    pri_r11_inner_focus:
+      '获得静心。60 秒内你的下一个牧师法术不消耗法力且无法被打断。暗影：另外为 60 秒内的下一次碎心术或Void Rupture保留必定暴击的效果，前提是命中。其他法术不会消耗此效果。Void Rupture仍消耗 3 层 Gloomtithe。法术被抵抗也会消耗暴击效果。冷却时间 90 秒。',
   },
   zh_TW: {
     mag_r5_blink_cast: '你可以在施法過程中使用閃爍步，而不會打斷詠唱。',
@@ -2113,11 +2218,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       '恩典之錘的過量治療會轉化為一層護盾，持續 10 秒，上限為你最大生命值的 10%。',
     pri_r11_vampiric_embrace: '完全消耗守護聖詠的敵人會被定身 2 秒，每個敵人每 12 秒最多觸發一次。',
     pri_r14_pain_and_suffering:
-      '教義的傷害轉治療會以其治療量的 20% 恢復守護聖詠，上限為其原始吸收量。賜福會使聖歌癒療的過量治療轉化為持續 10 秒的護盾，上限為最大生命值的 10%。每次晚禱塑像迴響都會使腐朽輓歌延長 1 秒，每個目標最多延長 6 秒。',
+      '教義的傷害轉治療會以其治療量的 20% 恢復守護聖詠，上限為其原始吸收量。賜福會使聖歌癒療的過量治療轉化為持續 10 秒的護盾，上限為最大生命值的 10%。 暗影：心智裂傷命中你的塑像時，使你施加的腐朽輓歌和吸血之觸延長 1 秒，每次施加最多延長 3 秒。延長不會改變下次跳傷時間，也不會產生幽暗什一。 迴響使其他敵人身上的輓歌延長 1 秒，每次施加最多延長 6 秒。',
     pri_r20_incarnate_spirit:
-      '完全消耗的守護聖詠會為其目標恢復相當於原始吸收量 40% 的生命值。賜福守望的治療同時也會為 15 碼內最多 3 名隊伍成員恢復 40% 的治療量。5 層的晚禱什一魔造成的傷害提高 50%，持續時間延長 50%。',
+      '完全消耗的守護聖詠會為其目標恢復相當於原始吸收量 40% 的生命值。賜福守望的治療同時也會為 15 碼內最多 3 名隊伍成員恢復 40% 的治療量。 暗影：獻納靈魂炸彈留下半徑 8 碼的區域，持續 6 秒。區域分 3 次脈衝造成額外傷害，總量為炸彈非致命一擊傷害的 20%，每 2 秒一次。超過 5 個目標時傷害降低。敵人必須留在區域內。',
     pri_r20_second_verse:
-      '2 秒後，重複 40% 來自教義的滌罪慈悲治療、來自賜福的群體治療，或來自晚禱塑像迴響的傷害。此重複效果無法觸發自身。',
+      '教義在 2 秒後重複滌罪慈悲治療量的 40%。賜福在 2 秒後重複群體治療量的 40%。暗影：吸血之觸在你的塑像上每第 5 次正常跳傷會追加一次傷害，並依敵人失去的生命值產生正常治療。在你自己的吸血之觸到期前刷新，會保留該敵人上的計數。效果到期則重設計數。追加跳傷不會自行觸發。',
     pri_r5_improved_renew: '守護聖詠會給予其目標 40% 移動速度，持續 3 秒。',
     pri_r5_searing_light: '帷幕步會解除定身與減速效果，接著給予 50% 移動速度，持續 3 秒。',
     pri_r5_twisted_faith: '帷幕步使牧師能在移動中施法，持續 4 秒。',
@@ -2148,6 +2253,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: '雷霆守護的反擊會給予 10% 傷害降低，持續 3 秒。',
     wlk_r11_demon_armor:
       '每位隊伍成員首次使用你的靈魂之井時，會獲得一層護盾，吸收相當於其最大生命值 15% 的傷害，持續 30 秒。每位玩家對每口靈魂之井只能獲得一次此護盾。',
+    pri_r20_twin_covenant:
+      '教義可以連結 2 名盟友，並為每人將神聖傷害的 70% 轉為治療。賜福儲存 2 次熾天使守望使用次數，可保護 2 名盟友。暗影可透過腐朽輓歌和心智裂傷將 2 個敵人綁定為塑像。兩個目標的輓歌跳傷都為同一幽暗什一儲備和獻納靈魂炸彈充能。',
+    pri_r17_choir_of_deliverance:
+      '學會解脫聖歌。暗影：立即獲得持續 15 秒的效果，將敵人因你的暗影傷害失去的生命值的 20% 轉為治療，在 30 碼內受傷的隊伍成員間分攤。團隊中只治療自己的小隊。可保持暗影形態繼續攻擊。神聖和戒律：引導 6 秒，每 2 秒治療 30 碼內的隊伍成員。冷卻時間 180 秒。',
+    pri_r11_inner_focus:
+      '獲得靜心。60 秒內你的下一個牧師法術不消耗法力且無法被打斷。暗影：另外為 60 秒內的下一次裂心術或Void Rupture保留必定爆擊的效果，前提是命中。其他法術不會消耗此效果。Void Rupture仍消耗 3 層 Gloomtithe。法術被抵抗也會消耗爆擊效果。冷卻時間 90 秒。',
   },
   ja_JP: {
     mag_r5_blink_cast: '詠唱の途中でも、それを中断せずに瞬き歩みを使用できます。',
@@ -2218,11 +2329,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       '守りの聖歌を完全に消費させた敵を2秒間足止めする。同じ敵への発動は12秒に1回まで。',
     pri_r14_pain_and_suffering:
-      'ドクトリンによるダメージ回復は、その回復量の20%分だけ守りの聖歌を回復する（元の吸収量が上限）。ベネディクションでは、聖歌の癒しのオーバーヒール分が10秒間の吸収シールドに変わる（上限は最大体力の10%）。ヴェスパーのエフィジーへの反響が発生するたびに、腐朽の葬送歌の持続時間が1秒延長される（対象1体につき最大6秒まで）。',
+      'ドクトリンによるダメージ回復は、その回復量の20%分だけ守りの聖歌を回復する（元の吸収量が上限）。ベネディクションでは、聖歌の癒しのオーバーヒール分が10秒間の吸収シールドに変わる（上限は最大体力の10%）。 影：自分のエフィジーへの精神破砕の命中で、自分の腐朽の葬送歌と吸血の接触が1秒延長される。1回の付与につき最大3秒。延長しても次のダメージ発生時刻は変わらず、闇の献納も生成しない。 反響は他の敵の葬送歌を1秒延長する。1回の付与につき最大6秒。',
     pri_r20_incarnate_spirit:
-      '守りの聖歌を完全に消費させると、対象を元の吸収量の40%分回復する。ベネディクションの熾天使の見守りによる回復は、15ヤード以内のパーティメンバー最大3人にも40%の量を回復する。5スタックのヴェスパーのタイスフィーンドは、与えるダメージが50%増加し、持続時間が50%延びる。',
+      '守りの聖歌を完全に消費させると、対象を元の吸収量の40%分回復する。ベネディクションの熾天使の見守りによる回復は、15ヤード以内のパーティメンバー最大3人にも40%の量を回復する。 影：献納の爆弾が半径8ヤードの領域を6秒間残す。爆弾の非クリティカルダメージの20%を追加ダメージとして、2秒ごとに計3回与える。対象が5体を超えるとダメージが減少する。敵は領域内に留まる必要がある。',
     pri_r20_second_verse:
-      '2秒後、ドクトリンによる浄罪の慈悲の回復、ベネディクションによる範囲回復、またはヴェスパーのエフィジーへの反響ダメージの40%を再度発動する。この再発動が自身を再度誘発することはない。',
+      'ドクトリンは浄罪の慈悲の回復量の40%を2秒後に繰り返す。ベネディクションはグループ回復の40%を2秒後に繰り返す。影：自分のエフィジー上で吸血の接触が通常5回発動するたびに、追加ダメージが1回発生し、敵の失った体力に応じた通常の回復を行う。自分の吸血の接触が切れる前に更新すると、その敵のカウントを維持する。効果が切れるとカウントはリセットされる。追加発動は自身を誘発しない。',
     pri_r5_improved_renew: '守りの聖歌は対象に、3秒間移動速度を40%上昇させる効果を与える。',
     pri_r5_searing_light:
       'ヴェイルステップは足止めと減速効果を解除し、その後3秒間移動速度を50%上昇させる。',
@@ -2257,6 +2368,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: '雷の守りの反撃が発動すると、3秒間受けるダメージが10%軽減される。',
     wlk_r11_demon_armor:
       'グループメンバーが初めて魂の泉に触れると、30秒間、最大体力の15%分のシールドを得る。このシールドは魂の泉1つにつき、各プレイヤーが1回だけ得られる。',
+    pri_r20_twin_covenant:
+      'ドクトリンは味方2人を繋ぎ、それぞれに聖なるダメージの70%を回復として変換する。ベネディクションは熾天使の見守りを2回分蓄え、味方2人を守れる。影は腐朽の葬送歌と精神破砕で敵2体をエフィジーとして繋げる。両方の葬送歌の発動が、同じ闇の献納の蓄えと献納の爆弾を充填する。',
+    pri_r17_choir_of_deliverance:
+      '解放の合唱を習得する。影：即座に15秒間の効果を得る。自分の影ダメージで敵が失った体力の20%を回復として、30ヤード以内の負傷したグループメンバーで分け合う。レイドでは自分の小隊のみを回復する。影の姿で攻撃を続けられる。聖と戒律：6秒間チャネルし、2秒ごとに30ヤード以内のグループを回復する。再使用まで180秒。',
+    pri_r11_inner_focus:
+      '静まる心を習得する。60秒以内の次のプリースト呪文はマナを消費せず、中断されない。影：これとは別に、60秒以内の次の精神粉砕またはVoid Ruptureが命中すれば必ずクリティカルになる。他の呪文はこの効果を消費しない。Void Ruptureは引き続きGloomtitheを3チャージ消費する。呪文が抵抗された場合もクリティカル効果を消費する。クールダウン90秒。',
   },
   ko_KR: {
     mag_r5_blink_cast: '시전 도중에도 섬광걸음을 사용할 수 있으며, 시전이 끊기지 않습니다.',
@@ -2327,11 +2444,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r11_vampiric_embrace:
       '수호의 성가를 완전히 소진시킨 적은 2초 동안 이동 불가 상태가 되며, 동일한 적에게는 12초에 한 번만 적용됩니다.',
     pri_r14_pain_and_suffering:
-      '교리로 발생한 피해 전환 치유는 치유량의 20%만큼 수호의 성가를 회복시키며, 원래 흡수량을 넘지 않습니다. 축복은 성가 치유의 초과 치유량을 최대 생명력의 10%까지 흡수하는 10초짜리 보호막으로 전환합니다. 만과의 형상에서 메아리가 발생할 때마다 부패의 만가의 지속시간이 1초 늘어나며, 대상당 최대 6초까지 늘어납니다.',
+      '교리로 발생한 피해 전환 치유는 치유량의 20%만큼 수호의 성가를 회복시키며, 원래 흡수량을 넘지 않습니다. 축복은 성가 치유의 초과 치유량을 최대 생명력의 10%까지 흡수하는 10초짜리 보호막으로 전환합니다. 암흑: 자신의 형상에 정신 균열이 적중하면 자신이 건 부패의 만가와 흡혈의 손길이 1초 연장되며, 적용당 최대 3초까지 연장됩니다. 연장해도 다음 피해 주기의 시점은 유지되며 암흑 십일조를 생성하지 않습니다. 메아리는 다른 적의 만가를 1초 연장하며, 적용당 최대 6초까지 연장됩니다.',
     pri_r20_incarnate_spirit:
-      '수호의 성가를 완전히 소진시키면 대상의 생명력을 원래 흡수량의 40%만큼 회복시킵니다. 축복의 수호로 인한 치유는 15야드 이내의 파티원 최대 3명에게도 40%만큼 적용됩니다. 5단계까지 쌓인 만과의 십일조 악마는 피해가 50% 증가하고 지속시간도 50% 늘어납니다.',
+      '수호의 성가를 완전히 소진시키면 대상의 생명력을 원래 흡수량의 40%만큼 회복시킵니다. 축복의 수호로 인한 치유는 15야드 이내의 파티원 최대 3명에게도 40%만큼 적용됩니다. 암흑: 헌납 폭탄이 반경 8야드의 영역을 6초 동안 남깁니다. 폭탄의 치명타가 아닌 피해량의 20%를 추가 피해로 2초마다 총 3회 가합니다. 대상이 5명을 넘으면 피해가 감소합니다. 적은 영역 안에 있어야 합니다.',
     pri_r20_second_verse:
-      '2초 후, 교리로 발생한 정화의 자비의 치유량, 축복의 광역 치유량, 만과의 형상 메아리 피해량 중 40%를 다시 발생시킵니다. 이 반복 효과는 스스로를 다시 발동시키지 않습니다.',
+      '교리는 정화의 자비 치유량의 40%를 2초 후 반복합니다. 축복은 그룹 치유량의 40%를 2초 후 반복합니다. 암흑: 자신의 형상에 걸린 흡혈의 손길의 일반 피해가 5회 발생할 때마다 추가 피해를 한 번 가하고, 적이 잃은 생명력에 따른 일반 치유를 적용합니다. 자신의 흡혈의 손길이 만료되기 전에 갱신하면 해당 적의 횟수를 유지합니다. 만료되면 횟수가 초기화됩니다. 추가 피해는 스스로를 발동시키지 않습니다.',
     pri_r5_improved_renew: '수호의 성가가 대상에게 3초 동안 이동 속도 40% 증가 효과를 부여합니다.',
     pri_r5_searing_light:
       '장막걸음을 사용하면 속박과 감속 효과가 사라지고, 3초 동안 이동 속도가 50% 증가합니다.',
@@ -2366,5 +2483,11 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: '천둥 결계의 반격 효과가 발동하면 3초 동안 받는 피해가 10% 감소합니다.',
     wlk_r11_demon_armor:
       '파티원이 자신의 영혼샘을 처음 사용할 때, 대상에게 30초 동안 최대 생명력의 15%를 흡수하는 보호막을 부여합니다. 각 플레이어는 영혼샘 하나당 이 보호막을 한 번만 얻을 수 있습니다.',
+    pri_r20_twin_covenant:
+      '교리는 아군 2명을 연결하고 각각에게 신성 피해의 70%를 치유로 전환합니다. 축복은 천사의 수호를 2회 저장하며 아군 2명을 보호할 수 있습니다. 암흑은 부패의 만가와 정신 균열로 적 2명을 형상으로 묶을 수 있습니다. 두 만가의 주기적 피해 모두 동일한 암흑 십일조 저장량과 헌납 폭탄을 충전합니다.',
+    pri_r17_choir_of_deliverance:
+      '해방의 합창을 배웁니다. 암흑: 즉시 15초 효과를 얻으며, 자신의 암흑 피해로 적이 잃은 생명력의 20%를 30야드 안의 부상당한 그룹원에게 치유로 나눕니다. 공격대에서는 자신의 파티만 치유합니다. 암흑 형상으로 계속 공격할 수 있습니다. 신성과 수양: 6초 동안 정신 집중하여 2초마다 30야드 안의 그룹을 치유합니다. 재사용 대기시간 180초.',
+    pri_r11_inner_focus:
+      '고요한 마음을 배웁니다. 60초 안에 사용하는 다음 사제 주문은 마나를 소모하지 않으며 차단되지 않습니다. 암흑: 별도로 60초 안에 사용하는 다음 정신 파열 또는 Void Rupture가 적중하면 반드시 치명타가 됩니다. 다른 주문은 이 효과를 소모하지 않습니다. Void Rupture는 여전히 Gloomtithe 3중첩을 소모합니다. 주문이 저항되어도 치명타 효과는 소모됩니다. 재사용 대기시간 90초.',
   },
 };

@@ -3,6 +3,10 @@
 // and GroundAoE snapshots.
 
 import { isLockedOut, isSilenced } from '../combat/cc';
+import {
+  beginSpiritBombRaidPull,
+  resetSpiritBombRaidPull,
+} from '../combat/priest/spirit_bomb_raid';
 import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { MOBS } from '../data';
 import { createMob } from '../entity';
@@ -2698,6 +2702,7 @@ function updateMasterpieceUnbound(
 }
 
 export function resetVarkhulEncounter(ctx: SimContext, boss: Entity): void {
+  resetSpiritBombRaidPull(boss);
   for (const meta of ctx.players.values()) {
     const player = ctx.entities.get(meta.entityId);
     if (player?.kind !== 'player') continue;
@@ -2843,12 +2848,14 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     // before the fight exists.
     boss.inCombat = false;
     boss.aiState = 'idle';
+    if (st.engage.phase === 'forging') resetSpiritBombRaidPull(boss);
     if (varkhulForgingHammerTick(st.engage, DT)) emitVarkhulForgeHammerStrike(ctx, boss);
     return;
   }
   boss.aggroTargetId = target.id;
   boss.inCombat = true;
   boss.aiState = 'attack';
+  beginSpiritBombRaidPull(ctx, boss);
   recordVarkhulAttemptParticipants(st, arenaPlayers);
 
   if (!st.assemblyTriggered && boss.hp / boss.maxHp <= VARKHUL_MASTERS_ASSEMBLY_HP_THRESHOLD) {

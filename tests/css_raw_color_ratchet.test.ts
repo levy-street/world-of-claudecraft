@@ -156,6 +156,7 @@ const CEILINGS: Record<string, number> = {
   // New sheet from the release arm (the gathering goal tracker), tokenized as
   // authored: it joins the ratchet pinned at zero.
   'hud.gathering-goal.css': 0,
+  'hud.priest.css': 0,
   'hud.mobile.css': 29,
   'index.css': 0,
   'index.extra.css': 43,
