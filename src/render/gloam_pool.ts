@@ -424,6 +424,13 @@ export class GloamPool {
     this.present = false;
   }
 
+  /** The ground it was laid on is no longer the ground here: lay it again. */
+  forgetLay(): void {
+    this.laidX = this.laidY = this.laidZ = Number.NaN;
+    this.laidFlat = false;
+    this.laidWhole = false;
+  }
+
   /** Back into the scene for a new wearer, as a pool that was never laid. */
   revive(): void {
     for (const stain of this.stains()) this.parent.add(stain.mesh);

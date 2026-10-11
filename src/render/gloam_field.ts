@@ -80,6 +80,12 @@ export interface GloamCloudHost {
 /** The renderer's compile gate, absent where nothing links asynchronously. */
 export type GloamCompileGate = (target: THREE.Object3D) => Promise<unknown>;
 
+/** The floor's height at a spot. A sampler whose ground can be swapped under
+ *  the same coordinates (rift_ground_sample.ts) says so through `epoch`. */
+export type GloamGroundSampler = ((x: number, z: number) => number) & {
+  epoch?: () => number;
+};
+
 /** Smoke puffs and haze motes a second off one body, at full strength. */
 const SMOKE_RATE = 9;
 const HAZE_RATE = 5;
@@ -115,6 +121,7 @@ export class GloamField {
   private readonly budget = new GloamDrapeBudget();
   /** The floor as the pools have learned it, on the grid of the tier's pool. */
   private ground = new GloamGround(GLOAM_POOL_SIZE);
+  private groundEpoch = 0;
   private readonly at = new THREE.Vector3();
   /** One reused description: emitting a puff allocates nothing. */
   private readonly puff: GloamPuff = {
@@ -150,14 +157,15 @@ export class GloamField {
   /**
    * `anchor` resolves a wearer's displayed pose, `cloud` is the shared additive
    * cloud the glints are emitted into, `groundY` is the renderer's seed-bound
-   * ground sampler, and `compileGate` holds the layer hidden until its
-   * programs are linked.
+   * ground sampler (its `epoch`, when it has one, says the ground was swapped
+   * and the remembered floor is forgotten), and `compileGate` holds the layer
+   * hidden until its programs are linked.
    */
   constructor(
     private readonly scene: THREE.Scene,
     private readonly anchor: VfxAnchorResolver,
     private readonly cloud: GloamCloudHost,
-    private readonly groundY: (x: number, z: number) => number,
+    private readonly groundY: GloamGroundSampler,
     private readonly compileGate?: GloamCompileGate,
   ) {
     this.root.name = 'gloam_field';
@@ -278,6 +286,13 @@ export class GloamField {
     // The floor is remembered on the pool's own grid: another tier, another grid.
     const cell = GLOAM_POOL_SIZE / plan.poolCells;
     if (this.ground.cell !== cell) this.ground = new GloamGround(cell);
+    // Another Rift floor (or leaving one) lifts the same spot to another height.
+    const epoch = this.groundY.epoch?.() ?? 0;
+    if (epoch !== this.groundEpoch) {
+      this.groundEpoch = epoch;
+      this.ground.clear();
+      for (let i = 0; i < this.roster.size; i++) this.roster.at(i).pool?.forgetLay();
+    }
     this.budget.refill();
     // Whoever was served first last frame goes last this one, so a crowd of
     // moving pools shares the ground-sample allowance instead of starving its tail.

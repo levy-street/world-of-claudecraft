@@ -46,7 +46,7 @@ interface Rig {
   bodies: Map<number, { x: number; y: number; z: number }>;
   glints: number[];
   samples: { count: number };
-  ground: { y: (x: number, z: number) => number };
+  ground: { y: (x: number, z: number) => number; epoch: number };
   quality: { value: number };
 }
 
@@ -55,7 +55,7 @@ function rig(gate?: (target: THREE.Object3D) => Promise<unknown>): Rig {
   const bodies = new Map<number, { x: number; y: number; z: number }>();
   const glints: number[] = [];
   const samples = { count: 0 };
-  const ground = { y: (_x: number, _z: number) => 0 };
+  const ground = { y: (_x: number, _z: number) => 0, epoch: 0 };
   const quality = { value: 1 };
   const cloud: GloamCloudHost = {
     sprites: [10, 20, 30],
@@ -72,10 +72,13 @@ function rig(gate?: (target: THREE.Object3D) => Promise<unknown>): Rig {
       return (out ?? new THREE.Vector3()).set(body.x, body.y + 2.45 * frac, body.z);
     },
     cloud,
-    (x, z) => {
-      samples.count += 1;
-      return ground.y(x, z);
-    },
+    Object.assign(
+      (x: number, z: number) => {
+        samples.count += 1;
+        return ground.y(x, z);
+      },
+      { epoch: () => ground.epoch },
+    ),
     gate,
   );
   return { scene, field, bodies, glints, samples, ground, quality };
@@ -507,6 +510,43 @@ describe('GloamField: the cost of the floor', () => {
       // Draped on the slope, not left flat: it was laid at least once.
       expect(tilt).toBeGreaterThan(0.1);
     }
+    field.dispose();
+  });
+
+  it('forgets the remembered floor when the sampler says the ground was swapped', () => {
+    onTier('high');
+    const { scene, field, bodies, samples, ground } = rig();
+    const tilt = { value: 0.2 };
+    ground.y = (x, _z) => x * tilt.value;
+    const stand = () => {
+      bodies.set(1, { x: 0, y: 0, z: 0 });
+      field.wearer(1, GLOAM_CUE_PRESENT, true, 0, 0);
+      samples.count = 0;
+      field.update(1 / 60, false);
+      return samples.count;
+    };
+    /** The laid pool's height at its vertex farthest along +x. */
+    const edgeRise = () => {
+      const at = shown(scene, 'gloam_pool')[0].geometry.getAttribute('position');
+      let far = 0;
+      for (let i = 1; i < at.count; i++) if (at.getX(i) > at.getX(far)) far = i;
+      return at.getY(far) / at.getX(far);
+    };
+    for (let i = 0; i < 6; i++) stand();
+    expect(stand()).toBe(1);
+    expect(edgeRise()).toBeCloseTo(0.2, 2);
+    const known = field.stats().groundNodes;
+    expect(known).toBeGreaterThan(100);
+    // The same spot now reads another floor (the next Rift floor's lift), and
+    // without a new epoch the pool keeps the heights it remembers.
+    tilt.value = -0.1;
+    for (let i = 0; i < 6; i++) stand();
+    expect(edgeRise()).toBeCloseTo(0.2, 2);
+    ground.epoch += 1;
+    expect(stand()).toBeGreaterThan(1);
+    for (let i = 0; i < 6; i++) stand();
+    expect(edgeRise()).toBeCloseTo(-0.1, 2);
+    expect(field.stats().groundNodes).toBe(known);
     field.dispose();
   });
 

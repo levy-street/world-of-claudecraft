@@ -17,7 +17,7 @@
 //   WHAT A LAY COSTS (GloamGround, GloamDrapeBudget). The ground sampler is
 //     the expensive part: about ten microseconds a call, so sampling it once
 //     per vertex per frame cost a running priest two milliseconds a frame.
-//     The floor does not move, so its height is remembered on a world-aligned
+//     The floor holds still, so its height is remembered on a world-aligned
 //     grid of the pool's own cell and a vertex reads it between four nodes.
 //     A pool laid a hand farther on needs only the row of nodes it has just
 //     reached, so it can be laid every frame it moves, as exactly as the grid
@@ -274,8 +274,9 @@ const NODE_SPAN = 2 ** 21;
 
 /**
  * The floor's height, remembered on a world-aligned grid of one cell size.
- * The ground under the game does not move, so a node sampled once is right for
- * good. Two generations bound the memory without a stall: when the recent one
+ * A node sampled once stays right until the ground itself is swapped (another
+ * Rift floor on the same spot), which the owner answers with clear(). Two
+ * generations bound the memory without a stall: when the recent one
  * is full it becomes the older one, and a node read from the older one is
  * carried forward, so what a pool is standing on is never forgotten.
  */
