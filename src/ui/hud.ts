@@ -869,7 +869,6 @@ import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
-import { nearestSubzone } from './subzone';
 import { SwingTimerBars } from './swing_timer_bars';
 import { localizeSystemText } from './system_text_i18n';
 import { TalentsWindow } from './talents_window';
@@ -945,6 +944,7 @@ import { WorldQuestPuzzleWindow } from './world_quest_puzzle_window';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
+import { ZoneAnnouncementCore } from './zone_announcement_core';
 import { zoneEntryLine } from './zone_entry_line_core';
 
 let lpAdvancedLast = -1;
@@ -1985,6 +1985,7 @@ export class Hud {
   private lastNythraxisCombatEventAt = 0;
   private lastResting: boolean | null = false;
   private lastZoneId = '';
+  private readonly zoneAnnouncements = new ZoneAnnouncementCore();
   private mapZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
   private mapCenter: { x: number; z: number } | null = null; // pan target; null = follow player
@@ -3198,9 +3199,11 @@ export class Hud {
     const startZoneName = zoneDisplayName(startZone.id);
     this.lastZoneId = startZone.id;
     this.prewarmMapBg(startZone.id); // render the spawn-zone map bg during idle, not on first open
-    this.showBanner(startZoneName);
-    this.log(t('hud.core.welcomeZone', { zone: startZoneName }), HUD_LOG.NOTICE);
-    this.logZoneWelcome(startZone);
+    if (this.zoneAnnouncements.initialize(startZone.id, sim.player)) {
+      this.showBanner(startZoneName);
+      this.log(t('hud.core.welcomeZone', { zone: startZoneName }), HUD_LOG.NOTICE);
+      this.logZoneWelcome(startZone);
+    }
     this.log(t('hudChrome.tips.joinChannels'), HUD_LOG.TIP);
   }
 
@@ -9403,35 +9406,29 @@ export class Hud {
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
     const currentZone = zoneAt(p.pos.x, p.pos.z);
     if (mediumHud) {
-      // zone transitions: banner + welcome hint when crossing into a new band.
+      // Ferry announcements wait for docking; map tracking stays live at sea.
+      if (!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)) {
+        const currentZoneName = zoneDisplayName(currentZone.id);
+        this.showBanner(currentZoneName);
+        this.log(t('hud.core.enteringZone', { zone: currentZoneName }), HUD_LOG.NOTICE);
+        this.logZoneWelcome(currentZone);
+        // Recent events cover combat arriving before its matching self snapshot.
+        const recentlyInCombat = performance.now() - this.lastCombatEventAt < 5000;
+        if (!p.dead && !p.inCombat && !recentlyInCombat) this.renderer.vistaPan();
+      }
       if (!inDungeon && currentZone.id !== this.lastZoneId) {
-        // commit the moment zoneAt flips: the old 1D z deadband never fired
-        // on an east-west crossing (the grid's column borders share the z
-        // band), so the banner and map lagged the border by a whole realm.
-        // Re-crossing costs only a banner re-emit; the map bg is cached.
-        if (this.lastZoneId !== '') {
-          const currentZoneName = zoneDisplayName(currentZone.id);
-          this.showBanner(currentZoneName);
-          this.log(t('hud.core.enteringZone', { zone: currentZoneName }), HUD_LOG.NOTICE);
-          this.logZoneWelcome(currentZone);
-          // Zone-entry vista: a slow up-and-out camera sweep over the new
-          // zone alongside the banner. Display-only, cancelled by any
-          // camera input, skipped in combat/while dead and under reduced
-          // motion (the renderer gates the latter). Recent local combat events
-          // cover the online frame where events have arrived before the matching
-          // self cbt snapshot.
-          const recentlyInCombat = performance.now() - this.lastCombatEventAt < 5000;
-          if (!p.dead && !p.inCombat && !recentlyInCombat) this.renderer.vistaPan();
-        }
         this.lastZoneId = currentZone.id;
         this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
       }
 
       // subzone text: a smaller banner when you step into a named landmark
       // (classic "subzone" display). POIs are the same labels the minimap pins.
-      const subzone = inDungeon
-        ? null
-        : nearestSubzone(p.pos.x, p.pos.z, currentZone.pois, this.lastSubzone);
+      const subzone = this.zoneAnnouncements.subzone(
+        p,
+        inDungeon,
+        currentZone.pois,
+        this.lastSubzone,
+      );
       if (subzone !== this.lastSubzone) {
         this.lastSubzone = subzone;
         if (subzone) {

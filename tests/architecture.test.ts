@@ -564,6 +564,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/professions/professions_view.ts',
   'src/ui/tutorial_greeting_view.ts',
   'src/ui/bootcamp_view.ts',
+  'src/ui/zone_announcement_core.ts',
   'src/ui/coach_prompt_view.ts',
   'src/ui/objective_glow_view.ts',
   'src/ui/vendor_stock_gate_core.ts',

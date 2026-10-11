@@ -537,7 +537,9 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // Ferry announcement history moved to zone_announcement_core; the map
+    // keeps tracking physical zone changes while notices wait for docking.
+    ceiling: 18090,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -875,28 +875,28 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.showBanner',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone banner on a real zone crossing, committed the moment zoneAt flips (the old z-only dead band never fired on an east-west realm crossing)',
   },
   {
     call: 'this.log',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone-entry chat line',
   },
   {
     call: 'this.logZoneWelcome',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone welcome blurb in chat',
   },
   {
     call: 'this.renderer.vistaPan',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== '' && !p.dead && !p.inCombat && !recentlyInCombat",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p) && !p.dead && !p.inCombat && !recentlyInCombat',
     surface: 'none',
     why: 'the zone-entry camera sweep; a renderer call, not a HUD write',
   },
@@ -938,6 +938,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'vehicle integrity, aiming and cooldowns use the shared eliding writer facet',
+  },
+  {
+    call: 'this.zoneAnnouncements.subzone',
+    band: 'medium',
+    gate: '',
+    surface: 'none',
+    why: 'resolves landmark announcements with ferry and dungeon suppression',
   },
   {
     call: 'this.showSubzone',
@@ -1872,7 +1879,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // surface (51 / 96 measured on the merged tree). The release's Eastbrook
       // ferry countdown panel (hud ferryHud) is one more chrome surface at the
       // fourth release/v0.44.0 base merge (97 measured on the merged tree).
-    ).toEqual({ window: 51, chrome: 97, none: 18 });
+      // none 18 -> 19: the extracted ferry-aware landmark decision.
+    ).toEqual({ window: 51, chrome: 97, none: 19 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
