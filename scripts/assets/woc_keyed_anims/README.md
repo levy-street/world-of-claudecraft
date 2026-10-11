@@ -25,8 +25,12 @@ node scripts/assets/woc_keyed_anims/build.mjs                    # the shipped l
 node scripts/assets/woc_keyed_anims/validate.mjs --write-contacts
 node scripts/build_media_manifest.mjs generate
 npx vitest run tests/woc_autoattacks.test.ts
+node scripts/assets/woc_keyed_anims/build.mjs --all              # solves every keyed clip
 WOC_KEYED_AUTHORING=1 npx vitest run tests/woc_keyed_anims_authoring.test.mjs
 ```
+
+The authoring test runs on a solved cache and stops at once, naming the build to run, when
+any clip is not solved yet.
 
 `build.mjs --all [dir]` builds every keyed clip into `tmp/woc_keyed_anims` for
 review instead. Solving reach and blade keys dominates a build, so each solved

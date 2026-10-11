@@ -1,8 +1,9 @@
 // The hand-keyed animation libraries (scripts/assets/woc_keyed_anims): every
 // keyed clip re-solved and baked on both fits, checked for continuity, contact
 // and grip quality, and the committed libraries checked against a fresh build.
-// Re-solving every clip takes about ten minutes on a cold cache, so this runs on
-// demand, not in CI:
+// It runs on demand, not in CI, on a solved cache (the build fills it; solving every
+// clip from cold takes about ten minutes, far past any test allowance):
+//   node scripts/assets/woc_keyed_anims/build.mjs --all
 //   WOC_KEYED_AUTHORING=1 npx vitest run tests/woc_keyed_anims_authoring.test.mjs
 // CI checks the shipped libraries themselves (tests/woc_autoattacks.test.ts).
 import fs from 'node:fs';
@@ -17,7 +18,7 @@ import {
 } from '../scripts/assets/woc_keyed_anims/build.mjs';
 import { CATALOG, SHIPPED_CLIPS } from '../scripts/assets/woc_keyed_anims/catalog.mjs';
 import { bindModel } from '../scripts/assets/woc_keyed_anims/keyed/anatomy.mjs';
-import { keyedSpec } from '../scripts/assets/woc_keyed_anims/keyed/index.mjs';
+import { keyedSpec, keyedSpecCached } from '../scripts/assets/woc_keyed_anims/keyed/index.mjs';
 import { jointPoint, worldPose } from '../scripts/assets/woc_keyed_anims/kinematics.mjs';
 
 const AUTHORING = Boolean(process.env.WOC_KEYED_AUTHORING);
@@ -28,6 +29,16 @@ beforeAll(async () => {
   if (!AUTHORING) return;
   io = await glbIO();
   for (const fit of ['male', 'female']) rigs[fit] = await wocRig(io, fit);
+  const cold = [];
+  for (const fit of ['male', 'female']) {
+    const model = bindModel(rigs[fit]);
+    for (const name of CLIPS) if (!keyedSpecCached(model, fit, name)) cold.push(`${fit}/${name}`);
+  }
+  if (cold.length)
+    throw new Error(
+      `${cold.length} keyed clips are not solved yet (${cold[0]}, ...): run ` +
+        'node scripts/assets/woc_keyed_anims/build.mjs --all first, then rerun',
+    );
 });
 
 it('solves a bent two-bone chain without changing either segment length', () => {
@@ -158,7 +169,7 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
         previous = now;
       }
     }
-  }, 240000);
+  }, 20000);
 
   it('moves each planted run foot back at the runtime run speed and lifts it clear to swing', () => {
     const rig = rigs[fit],
@@ -196,7 +207,7 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
       expect(planted[side], side).toBeGreaterThanOrEqual(6);
       expect(airborne[side], side).toBeGreaterThan(planted[side]);
     }
-  }, 120000);
+  }, 20000);
 
   it('closes every keyed loop exactly, in pose and in joint velocity', () => {
     const rig = rigs[fit];
@@ -220,7 +231,7 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
         );
       }
     }
-  }, 240000);
+  }, 20000);
 
   it('resolves every held-prop key within its forearm and wrist limits', () => {
     const model = bindModel(rigs[fit]);
@@ -254,7 +265,7 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
         }
     }
     expect(checked).toBeGreaterThan(20);
-  }, 240000);
+  }, 20000);
 
   it('keeps sword tips out of the floor beyond the reference clearance', () => {
     // The tip sits 0.62 rig units out along the grip's +Y (measured on the real
@@ -282,7 +293,7 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
         }
       }
     }
-  }, 240000);
+  }, 20000);
 
   it('keeps the support hand on the haft through every keyed two-handed swing', () => {
     const model = bindModel(rigs[fit]);
@@ -328,7 +339,7 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
         previous = fromHaft;
       }
     }
-  }, 240000);
+  }, 20000);
 });
 
 describe.skipIf(!AUTHORING)('shipped hand-keyed libraries', () => {
@@ -339,7 +350,7 @@ describe.skipIf(!AUTHORING)('shipped hand-keyed libraries', () => {
       const committed = fs.readFileSync(`${SHIPPED_DIR}/woc_${fit}.glb`);
       expect(fresh.equals(committed), `woc_${fit}.glb is stale: rebuild it (README)`).toBe(true);
     }
-  }, 600000);
+  }, 60000);
 });
 
 describe.skipIf(!AUTHORING)('keyed clips differ by fit', () => {
@@ -355,5 +366,5 @@ describe.skipIf(!AUTHORING)('keyed clips differ by fit', () => {
       );
       expect(differs, name).toBe(true);
     }
-  }, 240000);
+  }, 20000);
 });

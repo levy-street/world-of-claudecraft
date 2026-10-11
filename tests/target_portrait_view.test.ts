@@ -92,29 +92,29 @@ const CLASS_BODY_PORTRAITS = {
   apprentice_wren: [
     'player_mage_female',
     'models/chars/players/woc/base_female.glb',
-    'a7666ba1f82ab975aee8a4f583b4deb88ac79b3471784f8df78b90e03dcec125',
+    '53ef1d9667513542999485680c0ce0abcf5c9f177456e48e849560387e2be69f',
   ],
   castaway_navigator: [
     'player_rogue',
     'models/chars/players/woc/base_male.glb',
-    '1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1',
+    '4613747a1d7e35c1501d487d2555201c5fddbeffca2398228f01730ad4f9f6ec',
   ],
   fisher_bram: [
     'player_rogue',
     'models/chars/players/woc/base_male.glb',
-    '1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1',
+    '4613747a1d7e35c1501d487d2555201c5fddbeffca2398228f01730ad4f9f6ec',
   ],
   gravedigger_mosley: [
     'player_rogue',
     'models/chars/players/woc/base_male.glb',
-    '1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1',
+    '4613747a1d7e35c1501d487d2555201c5fddbeffca2398228f01730ad4f9f6ec',
   ],
   // the one enemy whose old portrait was pinned (a tinted barbarian stand-in): now on
   // the warrior's class body with the rest of the humanoid enemies
   the_wreck_warden: [
     'player_warrior',
     'models/chars/players/woc/base_male.glb',
-    '3f83e55ce408fc82ae8de4af2252e349da02977c2876900458909e604bb61634',
+    '8d55ef633a86b34d12b6651ff3d3654438b3aaafe40db9ca4b07fc6c9aa7e1de',
   ],
 } as const;
 

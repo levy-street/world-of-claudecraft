@@ -121,8 +121,7 @@ const SOLVERS = ['anatomy.mjs', 'reach.mjs', 'blade.mjs', 'spline.mjs']
   .join('\n');
 const rigDigests = new WeakMap();
 
-function solvedOnDisk(model, fit, name, raw, solve) {
-  if (process.env.WOC_KEYED_NO_CACHE) return solve(raw);
+function cachePath(model, fit, name, raw) {
   if (!rigDigests.has(model))
     rigDigests.set(model, createHash('sha256').update(JSON.stringify(model.rig)).digest('hex'));
   const hash = createHash('sha256')
@@ -132,7 +131,18 @@ function solvedOnDisk(model, fit, name, raw, solve) {
     .update(JSON.stringify(raw, (_, v) => (typeof v === 'function' ? v.toString() : v)))
     .digest('hex')
     .slice(0, 32);
-  const file = path.join(CACHE_DIR, `${hash}.json`);
+  return path.join(CACHE_DIR, `${hash}.json`);
+}
+
+/** Whether a clip's solved spec is already on disk, without solving it. */
+export function keyedSpecCached(model, fit, name) {
+  if (process.env.WOC_KEYED_NO_CACHE) return false;
+  return fs.existsSync(cachePath(model, fit, name, KEYED[name].clip(fit, model)));
+}
+
+function solvedOnDisk(model, fit, name, raw, solve) {
+  if (process.env.WOC_KEYED_NO_CACHE) return solve(raw);
+  const file = cachePath(model, fit, name, raw);
   if (fs.existsSync(file)) {
     const saved = JSON.parse(fs.readFileSync(file, 'utf8'));
     return { ...saved, spec: { ...raw, keys: saved.keys, lag: saved.lag } };
