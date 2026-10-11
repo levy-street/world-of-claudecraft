@@ -1,7 +1,8 @@
 // The THREE half of the shapeshift form adornments: Moonwing Form's antlers,
-// crescent and wings (moonwing_adornment.ts), Gloamveil's veil
-// (gloamveil_veil.ts), and the per-rig owner CharacterVisual holds
-// (form_adornments.ts). Driven on a bare synthetic rig (a `chest` bone with a
+// crescent and wings (moonwing_adornment.ts) and the per-rig owner
+// CharacterVisual holds (form_adornments.ts). Gloamveil mounts nothing on a
+// rig (its look is a shader layer and a floor layer, tests/gloam_*.test.ts),
+// which the owner block below pins. Driven on a bare synthetic rig (a `chest` bone with a
 // `head` child, the KayKit names every player rig carries), so each pin reads
 // the real painters without loading a GLB.
 import * as THREE from 'three';
@@ -11,12 +12,6 @@ import {
   MOONWING_UNFURL_SECONDS,
 } from '../src/render/characters/form_adornment_core';
 import { FormAdornments } from '../src/render/characters/form_adornments';
-import {
-  buildGloamveilStandIn,
-  GloamveilVeil,
-  gloamveilMaterials,
-  VEIL_EYES,
-} from '../src/render/characters/gloamveil_veil';
 import {
   buildMoonwingStandIn,
   CRESCENT_REST,
@@ -148,37 +143,6 @@ describe('MoonwingAdornment', () => {
   });
 });
 
-describe('GloamveilVeil', () => {
-  it('veils the face with a shell and two mirrored eyes in front of it', () => {
-    const { model, head } = rig();
-    const veil = new GloamveilVeil(model);
-    expect(veil.root?.parent).toBe(head);
-    expect(names(head)).toEqual(['gloamveil_eye_left', 'gloamveil_eye_right', 'gloamveil_shell']);
-    const left = head.getObjectByName('gloamveil_eye_left') as THREE.Mesh;
-    const right = head.getObjectByName('gloamveil_eye_right') as THREE.Mesh;
-    expect(left.position.x).toBeCloseTo(-right.position.x, 6);
-    expect(right.position.z).toBe(VEIL_EYES.z);
-    const shell = head.getObjectByName('gloamveil_shell') as THREE.Mesh;
-    shell.geometry.computeBoundingBox();
-    const box = shell.geometry.boundingBox as THREE.Box3;
-    // The shell covers the FRONT of the head (+Z), and the eyes sit on it.
-    expect(box.max.z).toBeGreaterThan(0.53);
-    expect(box.min.z).toBeGreaterThan(-0.3);
-    expect(right.position.z).toBeGreaterThanOrEqual(box.max.z - 0.01);
-    // The additive eyes draw after the gloom.
-    expect(left.renderOrder).toBeGreaterThan(shell.renderOrder);
-    for (const mesh of meshesUnder(head)) {
-      expect(mesh.userData.weaponVfxMesh).toBe(true);
-      expect(mesh.castShadow).toBe(false);
-    }
-    veil.apply(0.9);
-    expect(left.scale.x).toBeCloseTo(0.9, 6);
-    expect(right.scale.y).toBeCloseTo(0.9, 6);
-    veil.dispose();
-    expect(meshesUnder(model)).toEqual([]);
-  });
-});
-
 /** A recording stand-in for the visual's compile gate: nothing settles until
  *  the test says so, like an async link still in flight. */
 function recordingGate(): { gate: FarBakeGate; targets: THREE.Object3D[]; settleAll(): void } {
@@ -201,43 +165,35 @@ const noGate = (): FarBakeGate | null => null;
 function shownRoots(model: THREE.Object3D): string[] {
   const out: string[] = [];
   model.traverse((object) => {
-    if (
-      /^(moonwing|gloamveil)_(head|wing_left|wing_right|veil)$/.test(object.name) &&
-      object.visible
-    )
+    if (/^moonwing_(head|wing_left|wing_right)$/.test(object.name) && object.visible) {
       out.push(object.name);
+    }
   });
   return out.sort();
 }
 
 describe('FormAdornments (the per-rig owner)', () => {
-  it('mounts and unmounts each form set on its edge, idempotently', () => {
+  it('mounts and unmounts the Moonwing set on its edge, idempotently', () => {
     const { model, head } = rig();
     const owner = new FormAdornments(model, 'composed', noGate);
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     expect(head.getObjectByName('moonwing_antlers')).toBeDefined();
     const antlers = head.getObjectByName('moonwing_antlers');
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     expect(meshesUnder(model).length).toBe(5);
     expect(head.getObjectByName('moonwing_antlers')).toBe(antlers);
-    owner.sync(false, false, false);
-    expect(meshesUnder(model)).toEqual([]);
-    owner.sync(false, true, false);
-    expect(names(model)).toEqual(['gloamveil_eye_left', 'gloamveil_eye_right', 'gloamveil_shell']);
-    owner.sync(false, false, false);
+    owner.sync(false, false);
     expect(meshesUnder(model)).toEqual([]);
   });
 
-  it('grows antlers only on a composed body, and veils no replacement body', () => {
+  it('grows antlers only on a composed body', () => {
     const fixed = rig();
-    new FormAdornments(fixed.model, 'classRig', noGate).sync(true, false, false);
+    new FormAdornments(fixed.model, 'classRig', noGate).sync(true, false);
     expect(fixed.head.getObjectByName('moonwing_antlers')).toBeUndefined();
     expect(fixed.head.getObjectByName('moonwing_crescent')).toBeDefined();
     const mech = rig();
     const owner = new FormAdornments(mech.model, 'replacement', noGate);
-    owner.sync(false, true, false);
-    expect(meshesUnder(mech.model)).toEqual([]);
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     expect(names(mech.model)).toEqual([
       'moonwing_crescent',
       'moonwing_wing_left_feathers',
@@ -248,7 +204,7 @@ describe('FormAdornments (the per-rig owner)', () => {
   it('unfurls the wings over time only while the rig is shown', () => {
     const { model, chest } = rig();
     const owner = new FormAdornments(model, 'composed', noGate);
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     const wing = chest.getObjectByName('moonwing_wing_right') as THREE.Object3D;
     const folded = wing.rotation.y;
     // Hidden (culled or far LOD): no pose work, the clock holds.
@@ -263,7 +219,7 @@ describe('FormAdornments (the per-rig owner)', () => {
   it('shows the open wings at once under reduced motion', () => {
     const { model, chest } = rig();
     const owner = new FormAdornments(model, 'composed', noGate);
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     const wing = chest.getObjectByName('moonwing_wing_right') as THREE.Object3D;
     const folded = wing.rotation.y;
     owner.update(0.001, false, false, true, true);
@@ -276,10 +232,10 @@ describe('FormAdornments (the per-rig owner)', () => {
   it('re-arms the unfurl on every new shift', () => {
     const { model, chest } = rig();
     const owner = new FormAdornments(model, 'composed', noGate);
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     owner.update(5, false, false, false, true);
-    owner.sync(false, false, false);
-    owner.sync(true, false, false);
+    owner.sync(false, false);
+    owner.sync(true, false);
     const wing = chest.getObjectByName('moonwing_wing_right') as THREE.Object3D;
     const reshift = wing.rotation.y;
     owner.update(5, false, false, false, true);
@@ -290,7 +246,7 @@ describe('FormAdornments (the per-rig owner)', () => {
     const { model, chest } = rig();
     const recorder = recordingGate();
     const owner = new FormAdornments(model, 'composed', () => recorder.gate);
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     // Every root this set parented into the rig went through the gate, hidden.
     expect(recorder.targets.map((target) => target.name).sort()).toEqual([
       'moonwing_head',
@@ -315,8 +271,8 @@ describe('FormAdornments (the per-rig owner)', () => {
     // Revealed folded: the unfurl clock only starts once the wings show.
     expect(wing.rotation.y).toBeGreaterThan(1);
     // Linked once on this rig: the next shift shows at once, no second hold.
-    owner.sync(false, false, false);
-    owner.sync(true, false, false);
+    owner.sync(false, false);
+    owner.sync(true, false);
     expect(recorder.targets.length).toBe(3);
     expect(shownRoots(model).length).toBe(3);
   });
@@ -325,39 +281,43 @@ describe('FormAdornments (the per-rig owner)', () => {
     const { model } = rig();
     const recorder = recordingGate();
     const owner = new FormAdornments(model, 'classRig', () => recorder.gate);
-    owner.sync(false, true, false);
-    owner.sync(false, false, false);
+    owner.sync(true, false);
+    const firstMount = recorder.targets.length;
+    expect(firstMount).toBe(3);
+    owner.sync(false, false);
     recorder.settleAll();
     owner.update(0.01, false, false, false, true);
     expect(meshesUnder(model)).toEqual([]);
     // The dropped set never proved a link, so the next shift is held again.
-    owner.sync(false, true, false);
-    expect(recorder.targets.length).toBe(2);
+    owner.sync(true, false);
+    expect(recorder.targets.length).toBe(firstMount * 2);
     expect(shownRoots(model)).toEqual([]);
   });
 
   it('hides the pieces while the body is a ghost and restores them after', () => {
     const { model } = rig();
     const owner = new FormAdornments(model, 'composed', noGate);
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     expect(shownRoots(model).length).toBe(3);
-    owner.sync(true, false, true);
+    owner.sync(true, true);
     expect(shownRoots(model)).toEqual([]);
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     expect(shownRoots(model).length).toBe(3);
     // A set mounted while ghosted starts hidden too.
-    owner.sync(true, true, true);
+    owner.sync(false, true);
+    owner.sync(true, true);
+    expect(meshesUnder(model).length).toBe(5);
     expect(shownRoots(model)).toEqual([]);
-    owner.sync(true, true, false);
-    expect(shownRoots(model)).toContain('gloamveil_veil');
+    owner.sync(true, false);
+    expect(shownRoots(model).length).toBe(3);
   });
 
   it('is inert after dispose: a late edge mounts nothing', () => {
     const { model } = rig();
     const owner = new FormAdornments(model, 'composed', noGate);
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     owner.dispose();
-    owner.sync(true, true, false);
+    owner.sync(true, false);
     owner.update(1, false, false, false, true);
     expect(meshesUnder(model)).toEqual([]);
   });
@@ -365,54 +325,45 @@ describe('FormAdornments (the per-rig owner)', () => {
 
 describe('prewarm stand-ins', () => {
   it('stage every material each kit can hand a live rig, on plain meshes', () => {
-    for (const [build, materials] of [
-      [buildMoonwingStandIn, moonwingMaterials],
-      [buildGloamveilStandIn, gloamveilMaterials],
-    ] as const) {
-      const staged = new Set(meshesUnder(build()).map((mesh) => mesh.material));
-      const produced = materials();
-      expect(produced.length).toBeGreaterThan(0);
-      for (const material of produced) expect(staged.has(material)).toBe(true);
-      for (const mesh of meshesUnder(build())) {
-        expect((mesh as THREE.Mesh & { isSkinnedMesh?: boolean }).isSkinnedMesh).not.toBe(true);
-        expect((mesh as THREE.Mesh & { isInstancedMesh?: boolean }).isInstancedMesh).not.toBe(true);
-      }
+    const staged = new Set(meshesUnder(buildMoonwingStandIn()).map((mesh) => mesh.material));
+    const produced = moonwingMaterials();
+    expect(produced.length).toBeGreaterThan(0);
+    for (const material of produced) expect(staged.has(material)).toBe(true);
+    for (const mesh of meshesUnder(buildMoonwingStandIn())) {
+      expect((mesh as THREE.Mesh & { isSkinnedMesh?: boolean }).isSkinnedMesh).not.toBe(true);
+      expect((mesh as THREE.Mesh & { isInstancedMesh?: boolean }).isInstancedMesh).not.toBe(true);
     }
   });
 
   it('tag the stand-in meshes for the boot texture upload, never the live pieces', () => {
-    for (const build of [buildMoonwingStandIn, buildGloamveilStandIn]) {
-      const meshes = meshesUnder(build());
-      expect(meshes.length).toBeGreaterThan(0);
-      for (const mesh of meshes) expect(mesh.userData.renderCategory).toBe('vfx');
-    }
+    const meshes = meshesUnder(buildMoonwingStandIn());
+    expect(meshes.length).toBeGreaterThan(0);
+    for (const mesh of meshes) expect(mesh.userData.renderCategory).toBe('vfx');
     const { model } = rig();
     new MoonwingAdornment(model, true);
-    new GloamveilVeil(model);
     for (const mesh of meshesUnder(model)) expect(mesh.userData.renderCategory).toBeUndefined();
   });
 
   it('mark every kit material, map and geometry shared, and name the glow materials', () => {
     const { model } = rig();
     new MoonwingAdornment(model, true);
-    new GloamveilVeil(model);
     for (const mesh of meshesUnder(model)) {
       expect(isSharedGeometry(mesh.geometry)).toBe(true);
       const material = mesh.material as THREE.MeshBasicMaterial;
       expect(isSharedMaterial(material)).toBe(true);
       if (material.isMeshBasicMaterial) {
-        expect(material.name).toMatch(/^(moonwing_adornment|gloamveil_veil):/);
+        expect(material.name).toMatch(/^moonwing_adornment:/);
         expect(isSharedTexture(material.map as THREE.Texture)).toBe(true);
       }
     }
   });
 
-  it('share one unlit glow program recipe across the wings, crescent, veil and eyes', () => {
-    const glow = [...moonwingMaterials(), ...gloamveilMaterials()].filter(
+  it('share one unlit glow program recipe across the wings and the crescent', () => {
+    const glow = moonwingMaterials().filter(
       (material): material is THREE.MeshBasicMaterial =>
         (material as THREE.MeshBasicMaterial).isMeshBasicMaterial === true,
     );
-    expect(glow.length).toBe(4);
+    expect(glow.length).toBe(2);
     for (const material of glow) {
       expect(material.map).not.toBeNull();
       expect(material.transparent).toBe(true);

@@ -395,7 +395,6 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/eye_ward_badge.ts',
   // vertical or body-anchored class VFX
   'src/render/burning_pact_markers.ts',
-  'src/render/characters/gloamveil_veil.ts',
   'src/render/characters/moonwing_adornment.ts',
   'src/render/characters/paladin_templars_verdict_fx.ts',
   'src/render/characters/visual.ts',

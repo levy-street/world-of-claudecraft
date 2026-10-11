@@ -109,7 +109,6 @@ const REGISTERED_MODULES = [
   'warlock_meteor_fx.ts',
   'coach_trail_materials.ts',
   'moonwing_adornment.ts',
-  'gloamveil_veil.ts',
   'balgath_ranged_fx.ts',
   'balgath_starwake_fx.ts',
   'effigy_rig.ts',
@@ -270,8 +269,11 @@ describe('the lazy-material sweep', () => {
     // world-boss branch's three (Balgath's ranged kit, his Wake of the Fallen Star and
     // the muster effigy's rig): 21 / 20.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 23, 22.
-    expect(hits.length).toBeGreaterThanOrEqual(23);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(22);
+    // Minus Gloamveil's face-veil kit, retired with the veil (the form's look
+    // now mints no lazy module cache: gloam_field.ts builds its three
+    // materials in its constructor): 22, 21.
+    expect(hits.length).toBeGreaterThanOrEqual(22);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(21);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

@@ -1368,7 +1368,7 @@ export class CharacterVisual {
   private soulRend = false;
   private shadowform = false;
   private moonkin = false;
-  /** Moonwing's antlers, crescent and wings; Gloamveil's veil (form_adornments.ts).
+  /** Moonwing's antlers, crescent and wings (form_adornments.ts).
    *  Built on the first form edge, so a rig that never shifts pays nothing. */
   private formAdornments: FormAdornments | null = null;
   private ferocityStage = 0;
@@ -3656,7 +3656,6 @@ export class CharacterVisual {
   setShadowform(on: boolean): void {
     if (on === this.shadowform) return;
     this.shadowform = on;
-    this.syncFormAdornments();
     this.applyVisualMaterials();
   }
 
@@ -3668,13 +3667,13 @@ export class CharacterVisual {
   }
 
   private syncFormAdornments(): void {
-    if (this.disposed || (!this.formAdornments && !this.moonkin && !this.shadowform)) return;
+    if (this.disposed || (!this.formAdornments && !this.moonkin)) return;
     this.formAdornments ??= new FormAdornments(
       this.model,
       this.look ? 'composed' : this.key === 'player_mech' ? 'replacement' : 'classRig',
       () => this.farBakeGate,
     );
-    this.formAdornments.sync(this.moonkin, this.shadowform, this.ghosted);
+    this.formAdornments.sync(this.moonkin, this.ghosted);
   }
 
   pulseMetamorphosis(strength = 1): void {
