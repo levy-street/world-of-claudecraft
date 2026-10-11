@@ -309,6 +309,7 @@ import {
 } from './leaderboard_page';
 import { entityLineOfSightClear } from './line_of_sight_elevation';
 import type { Ante, PickAction } from './lockpick';
+import { rebindHeldAwardsOnJoin } from './loot/awarded_loot_hold';
 import { retirePartyTradeOnLoad, retirePartyTradeOnSave } from './loot/bop_trade_persistence';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
 import { replacementTapperForLeave } from './loot/kill_participation';
@@ -2931,6 +2932,7 @@ export class Sim {
       }
     }
     this.players.set(player.id, meta);
+    rebindHeldAwardsOnJoin(this.ctx, player.id); // awards held on a corpse across a relog
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
     player.mountSkinId = meta.mountSkinId;

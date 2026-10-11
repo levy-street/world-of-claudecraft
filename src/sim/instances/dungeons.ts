@@ -76,7 +76,12 @@ import {
 import { ignivarExitRoom, ignivarExitSealed } from './ignivar_exit';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
 import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
-import { durableMemberKey, finalBossAlive, raidReturnRoute } from './raid_return';
+import {
+  durableMemberKey,
+  finalBossAlive,
+  isClearedReturnRoom,
+  raidReturnRoute,
+} from './raid_return';
 import { RAID_REQUIRED_DUNGEON_IDS, resetCooldownApplies } from './reset_cooldown_policy';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
@@ -97,9 +102,10 @@ export { RAID_REQUIRED_DUNGEON_IDS };
 // being fought, or freed and reclaimed at a new difficulty) keeps the
 // shorter, standard timeout so an abandoned attempt frees its slot promptly.
 // clearedBy is the cheap "the final boss is genuinely dead" signal: heroic
-// kills stamp it via lockToHeroicClaim, and the weekly raid rooms' NORMAL
-// kills stamp it via awardHeroicMarks' weekly arm, so both take this longer
-// grace. An ordinary normal-difficulty kill stamps nothing and still relies
+// kills stamp it via lockToHeroicClaim, the weekly raid rooms' NORMAL kills
+// via awardHeroicMarks' weekly arm, and the Nythraxis arena's kills via
+// grantNythraxisLockout (all through recordClearedRaidParticipant), so all
+// three take this longer grace. An ordinary normal-difficulty kill stamps nothing and still relies
 // on the shorter INSTANCE_EMPTY_TIMEOUT alone; extending that further would
 // need its own finalBossDeadAt-style marker on every InstanceSlot.
 export const INSTANCE_CLEARED_EMPTY_TIMEOUT = 15 * 60;
@@ -365,8 +371,8 @@ export function enterDungeon(
   options: { ignivarBacktrack?: boolean } = {},
 ): boolean {
   const r = ctx.resolve(pid);
-  // The Ignivar checkpoint redirect below may re-point the entry at a deeper
-  // room the group already claims, so both bindings stay reassignable.
+  // The raid return route and the Ignivar checkpoint redirect below may
+  // re-point the entry at another room, so both bindings stay reassignable.
   let dungeonId = requestedDungeonId;
   let dungeon = DUNGEONS[dungeonId];
   if (!r || !dungeon) return false;
@@ -376,16 +382,32 @@ export function enterDungeon(
   // cannot move, so it never reaches the door.
   if (r.e.dead && !r.e.ghost) return false;
   const party = ctx.partyOf(r.meta.entityId);
+  // The raid return route (instances/raid_return.ts): a raider who cleared a
+  // run and still holds its lock, but no longer belongs to a raid that owns
+  // it (they left, were removed, or it reformed under a new party id or as a
+  // plain party), is routed back into THAT run under its owning key, so a
+  // corpse run or loot left on a corpse stays reachable. From outside they
+  // land straight in the cleared boss room; inside, they may only step into
+  // another room they cleared, or back out through the backtrack exits.
+  // Every rule below then applies to the routed key as it would to a member.
+  const ownKey = instanceKeyFor(ctx, r.meta.entityId);
+  const returnRoute = raidReturnRoute(ctx, r.meta.entityId, dungeonId, ownKey, (claim) =>
+    instanceClaimContains(claim, r.e.pos),
+  );
+  if (returnRoute !== null && options.ignivarBacktrack !== true) {
+    const insideRun = ctx.instances.some(
+      (claim) => claim.partyKey === returnRoute.partyKey && instanceClaimContains(claim, r.e.pos),
+    );
+    if (!insideRun) {
+      dungeonId = returnRoute.roomId;
+      dungeon = DUNGEONS[dungeonId];
+    } else if (!isClearedReturnRoom(ctx, r.meta.entityId, returnRoute.partyKey, dungeonId)) {
+      ctx.error(r.meta.entityId, 'The forge gate is sealed to you.');
+      return false;
+    }
+  }
   const raidAllowed = RAID_ALLOWED_DUNGEON_IDS.has(dungeonId);
   const raidRequired = RAID_REQUIRED_DUNGEON_IDS.has(dungeonId);
-  // The raid return route (instances/raid_return.ts): a raider who cleared a
-  // run and took its lockout, but no longer belongs to the group that owns
-  // it (they left the raid, or it disbanded and reformed under a new party
-  // id), is routed back into THAT run under its owning key, so a corpse run
-  // or loot left on a corpse stays reachable. Every rule below then applies
-  // to the routed key exactly as it would to a member of that group.
-  const ownKey = instanceKeyFor(ctx, r.meta.entityId);
-  const returnRoute = raidReturnRoute(ctx, r.meta.entityId, dungeonId, ownKey);
   if (party?.raid && !raidAllowed) {
     ctx.error(r.meta.entityId, 'Raid groups cannot enter standard dungeons.');
     return false;
@@ -480,15 +502,10 @@ export function enterDungeon(
     ctx.error(r.meta.entityId, 'The forge gate is sealed to you.');
     return false;
   }
-  // A returner's own selection is irrelevant: any room of the old run they
-  // still have to claim is minted at that run's difficulty.
   const selectedDifficulty =
     bypass && isIgnivarRaidRoom(dungeonId)
       ? ctx.dungeonDifficulty(r.meta.entityId)
-      : claimDifficultyForDungeon(
-          dungeonId,
-          returnRoute?.difficulty ?? ctx.dungeonDifficulty(r.meta.entityId),
-        );
+      : claimDifficultyForDungeon(dungeonId, ctx.dungeonDifficulty(r.meta.entityId));
   const difficulty = bypass
     ? selectedDifficulty
     : (ignivarSourceClaim?.difficulty ?? selectedDifficulty);

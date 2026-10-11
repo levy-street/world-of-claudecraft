@@ -13,8 +13,11 @@ import { DUNGEON_X_THRESHOLD, ITEMS } from '../src/sim/data';
 import {
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_LIFT_ROOM_ID,
+  IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_RAID_ROOM_IDS,
+  IGNIVAR_SECOND_WING_ID,
+  VARKHUL_BOSS_ID,
 } from '../src/sim/ignivar_raid_ids';
 import {
   enterDungeon,
@@ -24,7 +27,7 @@ import {
   updateInstances,
 } from '../src/sim/instances/dungeons';
 import { raidFamilyOf, raidReturnClaimFor } from '../src/sim/instances/raid_return';
-import { grantOrHoldAwardedLoot } from '../src/sim/loot/awarded_loot_hold';
+import { grantOrHoldAwardedLoot, rebindHeldAwardsOnJoin } from '../src/sim/loot/awarded_loot_hold';
 import { type InstanceSlot, type PlayerMeta, Sim } from '../src/sim/sim';
 import {
   type DungeonDifficulty,
@@ -34,6 +37,7 @@ import {
 } from '../src/sim/types';
 
 const ARENA_LOCKED_ERROR = 'You are locked to Crucible of the Last Spring.';
+const GATE_SEALED_ERROR = 'The forge gate is sealed to you.';
 const NEEDS_RAID_ERROR = 'You must convert your party to a raid group first.';
 const HELD_ITEM = 'worn_sword';
 const NYTHRAXIS_ATTUNEMENT = 'q_nythraxis_bound_guardian';
@@ -339,6 +343,196 @@ describe('raid return route: a cleared Ignivar raider who left the raid', () => 
 
     expect(errors).toContain(ARENA_LOCKED_ERROR);
   });
+
+  it('lands in the cleared arena, never in the deeper rooms the raid pushed on into', () => {
+    const sim = makeSim();
+    const { lead, ally, raidKey } = clearIgnivarArena(sim);
+    // The raid moves on: the Molten Assembly and the inner crucible, Varkhul alive.
+    expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, lead.entityId, true)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, lead.entityId, true)).toBe(true);
+    const crucible = liveClaim(sim, IGNIVAR_SECOND_WING_ID, raidKey);
+    expect(bossIn(sim, crucible, VARKHUL_BOSS_ID).dead).toBe(false);
+    stepOutside(sim, ally.entityId);
+    sim.partyLeave(ally.entityId);
+    productionDoor(sim);
+    const claimsBefore = sim.instances.filter((i) => i.partyKey !== null).length;
+    const errors = captureErrors(sim);
+
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally.entityId)).toBe(true);
+    expect(sim.instanceInfoAt(entityOf(sim, ally).pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+    // From inside the cleared arena, the way forward stays shut to them.
+    expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, ally.entityId)).toBe(false);
+
+    expect(errors).toEqual([GATE_SEALED_ERROR]);
+    expect(sim.instanceInfoAt(entityOf(sim, ally).pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+    expect(sim.instances.filter((i) => i.partyKey !== null).length).toBe(claimsBefore);
+  });
+
+  it('a raider whose raid was converted back to a party still reaches the room they cleared', () => {
+    const sim = makeSim();
+    const { lead, ally, raidKey, arena } = clearIgnivarArena(sim);
+    stepOutside(sim, ally.entityId);
+    sim.convertRaidToParty(lead.entityId);
+    expect(sim.ctx.partyOf(ally.entityId)?.raid).toBe(false);
+    expect(instanceKeyFor(sim.ctx, ally.entityId)).toBe(raidKey);
+    productionDoor(sim);
+    const errors = captureErrors(sim);
+
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally.entityId)).toBe(true);
+
+    expect(errors).toEqual([]);
+    expect(sim.instanceInfoAt(entityOf(sim, ally).pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+    expect(liveClaim(sim, IGNIVAR_RAID_ARENA_ID, raidKey)).toBe(arena);
+  });
+
+  it('a heroic clear routes back into its heroic run', () => {
+    const sim = makeSim();
+    const { ally, raidKey, arena } = clearIgnivarArena(sim, 'heroic');
+    expect(arena.difficulty).toBe('heroic');
+    expect(ally.raidLockouts.has(`${IGNIVAR_RAID_ARENA_ID}:heroic`)).toBe(true);
+    stepOutside(sim, ally.entityId);
+    sim.partyLeave(ally.entityId);
+    productionDoor(sim);
+
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally.entityId)).toBe(true);
+
+    expect(sim.instanceInfoAt(entityOf(sim, ally).pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+    expect(liveClaim(sim, IGNIVAR_RAID_ARENA_ID, raidKey)).toBe(arena);
+  });
+
+  it('a released ghost corpse-runs back in and resurrects in the cleared run', () => {
+    const sim = makeSim();
+    const { ally, arena } = clearIgnivarArena(sim);
+    const e = entityOf(sim, ally);
+    const corpsePos = { ...e.pos };
+    stepOutside(sim, ally.entityId);
+    e.dead = true;
+    e.ghost = true;
+    e.corpsePos = corpsePos;
+    e.corpseInstanceId = arena.exitId;
+    sim.partyLeave(ally.entityId);
+    productionDoor(sim);
+
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally.entityId)).toBe(true);
+
+    expect(e.dead).toBe(false);
+    expect(e.ghost).toBe(false);
+    expect(sim.instanceInfoAt(e.pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+  });
+
+  it('once their lock lapses at the reset the route lets go of them', () => {
+    const sim = makeSim();
+    const { ally } = clearIgnivarArena(sim);
+    stepOutside(sim, ally.entityId);
+    sim.partyLeave(ally.entityId);
+    // The door treats a lock as lapsed once now reaches it (isRaidLocked).
+    ally.raidLockouts.set(IGNIVAR_RAID_ARENA_ID, sim.ctx.lockoutNowMs());
+    productionDoor(sim);
+    const errors = captureErrors(sim);
+
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally.entityId)).toBe(false);
+
+    expect(errors).toEqual([NEEDS_RAID_ERROR]);
+  });
+
+  it('walks back out through the old run even after their new raid claims the lift', () => {
+    const sim = makeSim();
+    const { ally, raidKey } = clearIgnivarArena(sim);
+    stepOutside(sim, ally.entityId);
+    sim.partyLeave(ally.entityId);
+    productionDoor(sim);
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally.entityId)).toBe(true);
+    expect(sim.instanceInfoAt(entityOf(sim, ally).pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+    // While they stand in the old arena, a new raid of theirs claims the lift.
+    const newKey = formRaid(sim, ally.entityId, []);
+    const recruit = sim.ctx.partyOf(ally.entityId)!.members.find((m) => m !== ally.entityId)!;
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, recruit)).toBe(true);
+    const newLift = liveClaim(sim, IGNIVAR_LIFT_ROOM_ID, newKey);
+    const errors = captureErrors(sim);
+
+    // The arena exit steps BACK a floor, into the old run's Halls, then out.
+    expect(leaveDungeon(sim.ctx, ally.entityId)).toBe(true);
+    expect(sim.instanceInfoAt(entityOf(sim, ally).pos)?.dungeonId).toBe(IGNIVAR_FORGE_APPROACH_ID);
+    expect(
+      liveClaim(sim, IGNIVAR_FORGE_APPROACH_ID, raidKey).dungeonId,
+      'the old run, not the new one',
+    ).toBe(IGNIVAR_FORGE_APPROACH_ID);
+    stepOutside(sim, ally.entityId);
+
+    expect(errors).toEqual([]);
+    expect(newLift.enteredBy.has(ally.entityId)).toBe(false);
+  });
+
+  it('a relog on the way back still takes the held award off the corpse', () => {
+    const sim = makeSim();
+    const raid = ignivarRaid(sim, 4242);
+    const { boss } = clearArenaFor(sim, raid.lead, raid.ally, 'normal');
+    fillBags(sim, raid.ally);
+    grantOrHoldAwardedLoot(sim.ctx, boss.id, HELD_ITEM, raid.ally.entityId, {
+      names: [],
+      characterIds: [],
+    });
+    stepOutside(sim, raid.ally.entityId);
+    sim.partyLeave(raid.ally.entityId);
+    const lockedUntil = raid.ally.raidLockouts.get(IGNIVAR_RAID_ARENA_ID)!;
+    const oldId = raid.ally.entityId;
+    sim.removePlayer(oldId);
+    const back = addMeta(sim, 'Ally', 4242);
+    back.raidLockouts.set(IGNIVAR_RAID_ARENA_ID, lockedUntil);
+    expect(back.entityId).not.toBe(oldId);
+    const held = boss.loot?.items.find((s) => s.itemId === HELD_ITEM && s.personalFor);
+    expect(held?.personalFor).toEqual([back.entityId]);
+    productionDoor(sim);
+
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, back.entityId)).toBe(true);
+    const backEntity = entityOf(sim, back);
+    backEntity.pos = { ...boss.pos };
+    backEntity.prevPos = { ...boss.pos };
+    sim.rebucket(backEntity);
+    sim.lootCorpse(boss.id, back.entityId);
+
+    expect(sim.countItem(HELD_ITEM, back.entityId)).toBe(1);
+  });
+});
+
+describe('rebindHeldAwardsOnJoin: held awards follow the character across a relog', () => {
+  it('leaves a slot alone while its previous entity id is still a live session', () => {
+    const sim = makeSim();
+    const { ally, boss } = clearIgnivarArena(sim);
+    boss.loot = {
+      copper: 0,
+      items: [{ itemId: HELD_ITEM, count: 1, personalFor: [ally.entityId] }],
+    };
+    boss.heldLootOwners = new Map([[ally.entityId, 4242]]);
+    const twin = addMeta(sim, 'Twin', 4242);
+
+    rebindHeldAwardsOnJoin(sim.ctx, twin.entityId);
+
+    expect(boss.loot.items[0].personalFor).toEqual([ally.entityId]);
+  });
+
+  it('re-points only the slots of the joining character', () => {
+    const sim = makeSim();
+    const { boss } = clearIgnivarArena(sim);
+    boss.loot = {
+      copper: 0,
+      items: [
+        { itemId: HELD_ITEM, count: 1, personalFor: [9001] },
+        { itemId: HELD_ITEM, count: 1, personalFor: [9002] },
+      ],
+    };
+    boss.heldLootOwners = new Map([
+      [9001, 4242],
+      [9002, 5353],
+    ]);
+    const back = addMeta(sim, 'Back', 4242);
+
+    expect(boss.loot.items.map((s) => s.personalFor)).toEqual([[back.entityId], [9002]]);
+    expect([...boss.heldLootOwners]).toEqual([
+      [9002, 5353],
+      [back.entityId, 4242],
+    ]);
+  });
 });
 
 describe('raid return route: a cleared Nythraxis raider who left the raid', () => {
@@ -390,7 +584,7 @@ describe('raid return route: a cleared Nythraxis raider who left the raid', () =
     }
   });
 
-  it('crosses the approach crypt back into the cleared arena run, solo', () => {
+  it('walks the crypt door straight back into the cleared arena run, solo', () => {
     const sim = new Sim({ seed: 77, playerClass: 'warrior', noPlayer: true });
     const { raiders, raidKey, arena } = nythraxisRaid(sim);
     const leaver = raiders[2];
@@ -400,9 +594,6 @@ describe('raid return route: a cleared Nythraxis raider who left the raid', () =
     const errors = captureErrors(sim);
 
     expect(sim.enterDungeon('nythraxis_crypt', leaver)).toBe(true);
-    expect(sim.instanceInfoAt(sim.entities.get(leaver)!.pos)?.dungeonId).toBe('nythraxis_crypt');
-    expect(liveClaim(sim, 'nythraxis_crypt', raidKey)).toBeDefined();
-    expect(sim.enterDungeon('nythraxis_boss_arena', leaver)).toBe(true);
 
     expect(errors).toEqual([]);
     expect(sim.instanceInfoAt(sim.entities.get(leaver)!.pos)).toEqual({
@@ -410,6 +601,31 @@ describe('raid return route: a cleared Nythraxis raider who left the raid', () =
       dungeonId: 'nythraxis_boss_arena',
     });
     expect(liveClaim(sim, 'nythraxis_boss_arena', raidKey)).toBe(arena);
+  });
+
+  it('a returner in a five-player party runs the attunement crypt with that party', () => {
+    const sim = new Sim({ seed: 77, playerClass: 'warrior', noPlayer: true });
+    const { raiders, raidKey } = nythraxisRaid(sim);
+    const leaver = raiders[2];
+    expect(sim.leaveDungeon(leaver)).toBe(true);
+    sim.partyLeave(leaver);
+    for (let i = 0; i < 2; i += 1) {
+      const pid = sim.addPlayer('mage', `Friend${i}`);
+      sim.partyInvite(pid, leaver);
+      sim.partyAccept(pid);
+    }
+    const partyKey = instanceKeyFor(sim.ctx, leaver);
+    expect(sim.ctx.partyOf(leaver)?.raid).toBe(false);
+    const oldCrypt = liveClaim(sim, 'nythraxis_crypt', raidKey);
+
+    expect(sim.enterDungeon('nythraxis_crypt', leaver)).toBe(true);
+
+    const own = liveClaim(sim, 'nythraxis_crypt', partyKey);
+    expect(own).not.toBe(oldCrypt);
+    expect(sim.instanceInfoAt(sim.entities.get(leaver)!.pos)).toEqual({
+      slot: own.slot,
+      dungeonId: 'nythraxis_crypt',
+    });
   });
 });
 
