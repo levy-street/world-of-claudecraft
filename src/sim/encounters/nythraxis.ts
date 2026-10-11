@@ -38,6 +38,7 @@ import {
   claimedInstanceForMob,
   heroicLockoutId,
   instanceLockoutMetas,
+  recordClearedRaidParticipant,
 } from '../instances/dungeons';
 import {
   NYTHRAXIS_ASCENSION_AURA_ID,
@@ -932,6 +933,11 @@ export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
     for (const meta of instanceLockoutMetas(ctx, inst)) lockoutMetas.set(meta.entityId, meta);
   }
   for (const meta of lockoutMetas.values()) {
+    // Before the stamp: a participant whose lock first lands with this kill
+    // earns the claim's cleared-run record, so they can walk back into this
+    // exact arena for a corpse run or loot (instances/raid_return.ts), and
+    // the cleared claim takes the longer empty-instance grace.
+    if (inst) recordClearedRaidParticipant(ctx, inst, meta, lockId);
     meta.raidLockouts.set(lockId, until);
   }
   // Raid deed credit stays scoped to the boss room roster.
