@@ -376,7 +376,11 @@ export const TALENT_ABILITIES_V2_A = {
       { type: 'selfBuff', kind: 'next_cast_free', value: 1, duration: 60 },
       { type: 'selfBuff', kind: 'cast_shield', value: 1, duration: 60 },
     ],
-    description: 'Makes your next Priest spell free and uninterruptible. Lasts 60 sec.',
+    description: 'Your next Priest spell costs no Mana and cannot be interrupted. Lasts 60 sec.',
+    specNotes: {
+      shadow:
+        'Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus.',
+    },
   },
   desperate_prayer: {
     id: 'desperate_prayer',

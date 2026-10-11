@@ -350,6 +350,14 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     fallbackSize: { w: 96, h: 96 },
     detachToUiRoot: false,
   },
+  {
+    id: 'priestCharge',
+    elementId: 'priest-charge-frame',
+    storageKey: 'woc_hud_frame_priest_charge',
+    labelKey: 'hudChrome.priest.bombLabel',
+    fallbackSize: { w: 180, h: 144 },
+    detachToUiRoot: false,
+  },
   // The doom meter docks beside the player frame inside the transformed
   // #actionbar-stack, so it detaches like the action bars. Its storage key is
   // the one its pre-registry MovableFrame persisted under, so every saved
@@ -516,6 +524,8 @@ export function classGatedFrameActive(id: string, playerClass: PlayerClass): boo
       return playerClass === 'warrior' || playerClass === 'paladin';
     case 'paladinDevotion':
       return playerClass === 'paladin';
+    case 'priestCharge':
+      return playerClass === 'priest';
     case 'doomMeter':
       return playerClass === 'warlock';
     case 'procOverlay':
@@ -638,6 +648,7 @@ export function hudFrameActive(
     enabled(key: NonNullable<ReturnType<typeof frameRowSettingKey>>): boolean;
   },
 ): boolean {
+  if (id === 'priestCharge') return state.playerClass === 'priest' && state.talentSpec === 'shadow';
   if (id === 'swingBarOffhand') return canDualWield(state.playerClass, state.talentSpec);
   if (id === 'actionBarGroup') return state.combined;
   if (id === 'actionBar1') return !state.combined;

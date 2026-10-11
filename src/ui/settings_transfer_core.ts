@@ -108,6 +108,7 @@ const FULL_KEYS = [
   'paladinDevotionAnchor',
   'procOverlayAnchor',
   'warlockDoomAnchor',
+  'priestChargeAnchor',
   'woc_perf_overlay',
   'wocc.charSort',
   'woc.tutorial.v1',

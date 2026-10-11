@@ -23,7 +23,7 @@ export function renderAuraTooltipBodyHtml<T extends AuraTooltipInput>(
 ): string {
   const description = suppressAbilityDescription(aura)
     ? null
-    : deps.abilityDescription(aura.id)?.trim();
+    : deps.abilityDescription(aura.id === 'spirit_bomb_progress' ? 'spirit_bomb' : aura.id)?.trim();
   const descriptionHtml = description
     ? `<div class="tt-desc">${deps.escapeHtml(description)}</div>`
     : '';

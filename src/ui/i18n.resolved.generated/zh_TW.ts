@@ -576,6 +576,16 @@ export const zh_TW: EnTranslations = {
       "fateThreadsConsumeReady": "三層命運絲線：吞噬可將其編織為額外的譴罪。",
       "fateThreadsSentenceReady": "三層命運絲線：裁決可消耗它們以提高18%的傷害。"
     },
+    "priest": {
+      "gloomtitheLabel": "幽暗什一",
+      "bombLabel": "獻納靈魂炸彈",
+      "gloomtitheStatus": "幽暗什一：{value} / {max}",
+      "bombStatus": "獻納靈魂炸彈充能：{value} / {max}",
+      "bombReady": "就緒",
+      "chargeCount": "{value} / {max}",
+      "gloomtitheTooltip": "幽暗什一：最多保有5層可消耗的層數。吸血之觸消耗2層，使傷害提高30%；召喚什一魔消耗全部層數。生成層數也會增加獻納靈魂炸彈的進度，即使已保有5層也會增加。",
+      "bombTooltip": "獻納靈魂炸彈：生成20層幽暗什一即可準備一枚炸彈。消耗幽暗什一不會增加進度。進度在戰鬥之間及死亡後保留。開始與團隊副本首領戰鬥時會歸零。完成施法會消耗炸彈，取消施法則會保留。"
+    },
     "procOverlay": {
       "soulFragmentsMeter": "靈魂碎片",
       "ruinMeter": "毀滅",
@@ -3952,6 +3962,7 @@ export const zh_TW: EnTranslations = {
       }
     },
     "auraEffect": {
+      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。",
       "makersBrand": "持續 {duration} 秒，每層使你受到瓦爾庫爾的傷害提高 {pct}%。最多疊加 {max} 層。坦克應在 {swap} 層時換坦。",
@@ -13820,6 +13831,18 @@ export const zh_TW: EnTranslations = {
         "name": "哀禍連禱",
         "description": "引導 3 秒，每秒造成 {damage} 點暗影傷害。傷害隨法術強度提升。"
       },
+      "vampiric_touch": {
+        "name": "吸血之觸",
+        "description": "在15秒內造成{damage}點暗影傷害，每3秒一次。傷害隨法術強度提升，每次傷害均可致命一擊。每次傷害將敵人實際損失生命值的20%轉化為治療，平均分配給你和30碼內受傷的小隊成員；在團隊中，僅治療你所在的小隊。若你擁有至少2層幽暗什一，施加此效果會消耗2層，使其全部傷害提高30%。"
+      },
+      "void_rupture": {
+        "name": "Void Rupture",
+        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+      },
+      "spirit_bomb": {
+        "name": "獻納靈魂炸彈",
+        "description": "在敵人身上引爆靈魂炸彈，對目標周圍8碼內的敵人造成{damage}暗影傷害。傷害隨法術能量提高，可以致命一擊，目標超過5個時傷害降低。累計生成20層幽暗什一，可準備一枚炸彈。即使已持有上限5層，生成仍會增加進度。無需消耗層數，消耗也不會增加進度。進度在戰鬥之間及死亡後保留，最多儲存一枚準備好的炸彈。完成施法會消耗炸彈，即使被抵抗也是如此。取消或中斷施法會保留炸彈。開始與團隊副本首領戰鬥時，進度和準備好的炸彈都會歸零。此法術無法用於開啟團隊副本首領戰鬥。"
+      },
       "flash_heal": {
         "name": "急切祈禱",
         "description": "治療一個友方目標 {damage} 點生命。治療量隨法術強度提升。"
@@ -14640,7 +14663,8 @@ export const zh_TW: EnTranslations = {
       },
       "inner_focus": {
         "name": "靜心",
-        "description": "使你的下一個牧師法術免費且無法被打斷。持續 60 秒。"
+        "description": "使你的下一個牧師法術免費且無法被打斷。持續 60 秒。",
+        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
       },
       "innervate": {
         "name": "生命樹液",
@@ -14837,7 +14861,8 @@ export const zh_TW: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "救贖聖詠團",
-        "description": "引導6秒，每2秒為30碼內的隊伍成員恢復{damage}點生命值。治療量隨法術強度提高。"
+        "description": "引導6秒，每2秒為30碼內的隊伍成員恢復{damage}點生命值。治療量隨法術強度提高。",
+        "specNote_shadow": "在15秒內，將敵人因你的暗影傷害實際損失生命值的20%轉化為治療，分配給30碼內受傷的小隊成員，包括你自己。在團隊中，僅治療你所在的小隊。立即施放，且你可在暮色帷幕下繼續攻擊。被吸收的傷害及超出敵人剩餘生命值的傷害不會產生治療。"
       },
       "bear_charge": {
         "name": "巨熊衝鋒",

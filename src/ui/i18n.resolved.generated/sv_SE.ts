@@ -576,6 +576,16 @@ export const sv_SE: EnTranslations = {
       "fateThreadsConsumeReady": "Tre Ödestrådar: Förtär kan väva in dem till ytterligare Fördömelse.",
       "fateThreadsSentenceReady": "Tre Ödestrådar: Sentence kan förbruka dem för 18% ökad skada."
     },
+    "priest": {
+      "gloomtitheLabel": "Gloomtithe",
+      "bombLabel": "Tithe Bomb",
+      "gloomtitheStatus": "{value} of {max} Gloomtithe",
+      "bombStatus": "{value} of {max} Tithe Bomb charges",
+      "bombReady": "Ready",
+      "chargeCount": "{value} / {max}",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+    },
     "procOverlay": {
       "soulFragmentsMeter": "Själfragment",
       "ruinMeter": "Wrack",
@@ -3952,6 +3962,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "auraEffect": {
+      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
       "sharedPyre": "Gör {total}% av varje spelares maximala hälsa, uppdelat på antalet spelare inuti cirkeln ({perPlayer}% var med {players} spelare).",
       "varkhulSharedPyre": "Gör {total}% av varje spelares maximala hälsa, uppdelat mellan spelarna inuti cirkeln ({perPlayer}% var med {players} spelare). Varje spelare som saknas gör dessutom {missingPenalty}% av maximal hälsa i skada mot hela raiden, inklusive spelare inuti cirkeln.",
       "makersBrand": "I {duration} sek ökar varje stapel skadan du tar från Varkhul med {pct}%. Staplas upp till {max} gånger. Tankar bör byta vid {swap} staplar.",
@@ -13820,6 +13831,18 @@ export const sv_SE: EnTranslations = {
         "name": "Sorgens litania",
         "description": "Kanaliserar i 3 sek och vållar {damage} Skuggskada varje sekund. Skadan ökar med Besvärjelsekraft."
       },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+      },
+      "void_rupture": {
+        "name": "Void Rupture",
+        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+      },
+      "spirit_bomb": {
+        "name": "Tithe Bomb",
+        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+      },
       "flash_heal": {
         "name": "Brådskande bön",
         "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft."
@@ -14640,7 +14663,8 @@ export const sv_SE: EnTranslations = {
       },
       "inner_focus": {
         "name": "Stillat sinne",
-        "description": "Gör er nästa prästbesvärjelse gratis och omöjlig att avbryta. Varar 60 sek."
+        "description": "Gör er nästa prästbesvärjelse gratis och omöjlig att avbryta. Varar 60 sek.",
+        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
       },
       "innervate": {
         "name": "Livssav",
@@ -14837,7 +14861,8 @@ export const sv_SE: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Befrielsens kör",
-        "description": "Kanaliserar i 6 sek och läker gruppmedlemmar inom 30 meter för {damage} varannan sekund. Läkningen ökar med besvärjelsekraft."
+        "description": "Kanaliserar i 6 sek och läker gruppmedlemmar inom 30 meter för {damage} varannan sekund. Läkningen ökar med besvärjelsekraft.",
+        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
       },
       "bear_charge": {
         "name": "Bruinrusning",

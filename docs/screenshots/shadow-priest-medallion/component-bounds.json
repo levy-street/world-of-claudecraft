@@ -1,0 +1,30 @@
+[
+  {
+    "name": "partial",
+    "contained": true,
+    "bombHeight": 104,
+    "gloomHeight": 40,
+    "value": "12"
+  },
+  {
+    "name": "ready",
+    "contained": true,
+    "bombHeight": 104,
+    "gloomHeight": 40,
+    "value": "20"
+  },
+  {
+    "name": "empty",
+    "contained": true,
+    "bombHeight": 104,
+    "gloomHeight": 40,
+    "value": "0"
+  },
+  {
+    "name": "mobile",
+    "contained": true,
+    "bombHeight": 72,
+    "gloomHeight": 40,
+    "value": "20"
+  }
+]

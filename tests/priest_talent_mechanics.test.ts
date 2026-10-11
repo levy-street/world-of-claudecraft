@@ -345,7 +345,7 @@ describe('Priest v0.29 talent mechanics', () => {
     ).toHaveLength(2);
   });
 
-  it('schedules one non-recursive Second Verse for all three spec payoffs', () => {
+  it('keeps healer Second Verse payoffs and removes the old Shadow echo repeat', () => {
     const doctrine = priest('discipline', { 20: 'pri_r20_second_verse' });
     const ally = addAlly(doctrine.sim, 'Second Mercy');
     ally.hp = Math.floor(ally.maxHp * 0.5);
@@ -379,10 +379,10 @@ describe('Priest v0.29 talent mechanics', () => {
     vespersEchoDamage(shadow.ctx, shadow.p, primary, 100, 'mind_blast');
     expect(
       secondary.auras.some((effect) => effect.id.startsWith('priest_second_verse_effigy')),
-    ).toBe(true);
+    ).toBe(false);
   });
 
-  it('manifests every Incarnate Spirit branch, including the five-stack guardian bonus', () => {
+  it('preserves healer Incarnate Spirit and the baseline five-stack guardian bonus', () => {
     const doctrine = priest('discipline', { 20: 'pri_r20_incarnate_spirit' });
     const owner = addAlly(doctrine.sim, 'Incarnate Shield');
     owner.hp = Math.floor(owner.maxHp * 0.5);
@@ -435,7 +435,8 @@ describe('Priest v0.29 talent mechanics', () => {
     const guardian = [...shadow.sim.entities.values()].find(
       (entity) => entity.guardianState?.key === 'tithefiend',
     );
-    expect(guardian?.guardianState?.minDamage).toBe(98);
-    expect(guardian?.guardianState?.remaining).toBeGreaterThan(22);
+    expect(guardian?.guardianState?.minDamage).toBe(65);
+    expect(guardian?.guardianState?.remaining).toBeGreaterThan(14);
+    expect(guardian?.guardianState?.remaining).toBeLessThanOrEqual(15);
   });
 });

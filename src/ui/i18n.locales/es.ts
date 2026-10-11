@@ -20219,4 +20219,19 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.mapAtlas.resizeRailAria': 'Ancho de la barra lateral del mapa',
   'hudChrome.mapAtlas.resizeRailHint':
     'Arrastra para cambiar el tamaño de la barra lateral del mapa. Haz doble clic para restablecer.',
+  'entities.abilities.vampiric_touch.name': 'Toque vampírico',
+  'entities.abilities.vampiric_touch.description':
+    'Inflige {damage} de daño de Sombras durante 15 s, una vez cada 3 s. El daño aumenta con el poder con hechizos y los pulsos pueden ser críticos. Cada pulso reparte una sanación equivalente al 20% de la vida perdida por el enemigo entre tú y los miembros heridos de tu grupo a 30 yardas o menos; en una banda, solo recibe esta sanación tu subgrupo. Si tienes al menos 2 cargas de Diezmo sombrío, aplicar el efecto consume 2 para aumentar todo su daño un 30%.',
+  'hudChrome.priest.gloomtitheLabel': 'Diezmo sombrío',
+  'hudChrome.priest.bombLabel': 'Bomba del diezmo',
+  'hudChrome.priest.gloomtitheStatus': '{value} de {max} cargas de Diezmo sombrío',
+  'hudChrome.priest.bombStatus': '{value} de {max} cargas de Bomba del diezmo',
+  'hudChrome.priest.bombReady': 'Lista',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Diezmo sombrío: hasta 5 cargas que puedes gastar. Toque vampírico consume 2 para infligir un 30% más de daño; Invocar Diezmademonio consume todas las cargas. Generar cargas también llena Bomba del diezmo, incluso cuando ya tienes las 5.',
+  'hudChrome.priest.bombTooltip':
+    'Bomba del diezmo: genera 20 cargas de Diezmo sombrío para preparar una bomba. Gastar Diezmo sombrío no aumenta el progreso. El progreso se conserva entre combates y después de morir. Se reinicia al comenzar un jefe de banda. Completar el lanzamiento consume la bomba; cancelarlo la conserva.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Durante 15 s, reparte una sanación equivalente al 20% de la vida que pierden los enemigos por tu daño de Sombras entre los miembros heridos de tu grupo a 30 yardas o menos, incluido tú. En una banda, solo sana a tu subgrupo. Se lanza al instante y puedes seguir atacando en Velo Crepuscular. El daño absorbido y el daño que excede la vida restante no generan sanación.',
 };

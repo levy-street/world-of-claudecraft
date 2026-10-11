@@ -576,6 +576,16 @@ export const es_ES: EnTranslations = {
       "fateThreadsConsumeReady": "Tres Hilos del destino: Consumir puede tejerlos en Condena adicional.",
       "fateThreadsSentenceReady": "Tres Hilos del destino: Sentencia puede consumirlos para un 18% más de daño."
     },
+    "priest": {
+      "gloomtitheLabel": "Diezmo sombrío",
+      "bombLabel": "Bomba del diezmo",
+      "gloomtitheStatus": "{value} de {max} cargas de Diezmo sombrío",
+      "bombStatus": "{value} de {max} cargas de Bomba del diezmo",
+      "bombReady": "Lista",
+      "chargeCount": "{value} / {max}",
+      "gloomtitheTooltip": "Diezmo sombrío: hasta 5 cargas que puedes gastar. Toque vampírico consume 2 para infligir un 30% más de daño; Invocar Diezmademonio consume todas las cargas. Generar cargas también llena Bomba del diezmo, incluso cuando ya tienes las 5.",
+      "bombTooltip": "Bomba del diezmo: genera 20 cargas de Diezmo sombrío para preparar una bomba. Gastar Diezmo sombrío no aumenta el progreso. El progreso se conserva entre combates y después de morir. Se reinicia al comenzar un jefe de banda. Completar el lanzamiento consume la bomba; cancelarlo la conserva."
+    },
     "procOverlay": {
       "soulFragmentsMeter": "Fragmentos de alma",
       "ruinMeter": "Ruina",
@@ -3952,6 +3962,7 @@ export const es_ES: EnTranslations = {
       }
     },
     "auraEffect": {
+      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
       "sharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, dividido entre el número de jugadores dentro del círculo (un {perPlayer}% cada uno con {players} jugadores).",
       "varkhulSharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, repartido entre quienes estén dentro del círculo ({perPlayer}% por persona con {players} jugadores). Cada plaza ausente también inflige un {missingPenalty}% de la salud máxima a toda la banda, incluidos los jugadores dentro del círculo.",
       "makersBrand": "Durante {duration} s, cada acumulación aumenta el daño recibido de Varkhul en un {pct}%. Se acumula hasta {max} veces. Los tanques deben rotar a las {swap} acumulaciones.",
@@ -13820,6 +13831,18 @@ export const es_ES: EnTranslations = {
         "name": "Letanía de Aflicción",
         "description": "Canaliza durante 3 s, infligiendo {damage} de daño de Sombra cada segundo. El daño aumenta con el poder con hechizos."
       },
+      "vampiric_touch": {
+        "name": "Toque vampírico",
+        "description": "Inflige {damage} de daño de Sombras durante 15 s, una vez cada 3 s. El daño aumenta con el poder con hechizos y los pulsos pueden ser críticos. Cada pulso reparte una sanación equivalente al 20% de la vida perdida por el enemigo entre tú y los miembros heridos de tu grupo a 30 yardas o menos; en una banda, solo recibe esta sanación tu subgrupo. Si tienes al menos 2 cargas de Diezmo sombrío, aplicar el efecto consume 2 para aumentar todo su daño un 30%."
+      },
+      "void_rupture": {
+        "name": "Void Rupture",
+        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+      },
+      "spirit_bomb": {
+        "name": "Tithe Bomb",
+        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+      },
       "flash_heal": {
         "name": "Plegaria Urgente",
         "description": "Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder con hechizos."
@@ -14640,7 +14663,8 @@ export const es_ES: EnTranslations = {
       },
       "inner_focus": {
         "name": "Mente Serena",
-        "description": "Hace que tu próximo hechizo de sacerdote sea gratuito e ininterrumpible. Dura 60 s."
+        "description": "Hace que tu próximo hechizo de sacerdote sea gratuito e ininterrumpible. Dura 60 s.",
+        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
       },
       "innervate": {
         "name": "Savia Vital",
@@ -14837,7 +14861,8 @@ export const es_ES: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Coro de Liberación",
-        "description": "Canaliza durante 6 s y sana a los miembros del grupo en un radio de 30 metros por {damage} cada 2 s. La sanación aumenta con el poder con hechizos."
+        "description": "Canaliza durante 6 s y sana a los miembros del grupo en un radio de 30 metros por {damage} cada 2 s. La sanación aumenta con el poder con hechizos.",
+        "specNote_shadow": "Durante 15 s, reparte una sanación equivalente al 20% de la vida que pierden los enemigos por tu daño de Sombras entre los miembros heridos de tu grupo a 30 yardas o menos, incluido tú. En una banda, solo sana a tu subgrupo. Se lanza al instante y puedes seguir atacando en Velo Crepuscular. El daño absorbido y el daño que excede la vida restante no generan sanación."
       },
       "bear_charge": {
         "name": "Embestida de Bruin",

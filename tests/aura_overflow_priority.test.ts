@@ -29,6 +29,17 @@ function shedKeys(slots: AuraSlotState[], cap: number): string[] {
 }
 
 describe('aura_overflow_priority: selectShedSlots', () => {
+  it('keeps partial and prepared bomb progress visible beyond the Low buff cap', () => {
+    for (const stacksText of ['1', '29', '30']) {
+      const slots = [
+        ...Array.from({ length: 9 }, (_, i) => slot({ key: `b${i}`, shortDuration: true })),
+        slot({ key: 'spirit_bomb_progress', toggle: true, shortDuration: true, stacksText }),
+      ];
+      expect(shedKeys(slots, 8)).toEqual(['b8']);
+      expect(shedKeys(slots, 0)).not.toContain('spirit_bomb_progress');
+    }
+  });
+
   it('sheds nothing when count is within the cap', () => {
     const slots = Array.from({ length: 3 }, (_, i) => slot({ key: `b${i}` }));
     expect(shedKeys(slots, 8)).toEqual([]);

@@ -1820,6 +1820,7 @@ export const VISUALS: Record<string, VisualDef> = {
         // Lingering Grace is a blessing, not a staff swing: the one-hand
         // raise (a stock mage.glb clip) reads as the priest offering the HoT.
         renew: 'Spellcast_Raise',
+        void_rupture: 'Spellcast_Shoot',
       },
     },
     // The priest's Light: a warm golden halo ring above the crown. The mage

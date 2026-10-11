@@ -711,6 +711,7 @@ export class AbilityVfx {
   // drop for a bar that leaves with time left, since not every stop emits one.
   castInterrupted(casterId: number): void {
     this.admission.interrupted(casterId);
+    this.deps.fx.cancelSpiritBomb?.(casterId);
   }
 
   // Bloodletting's recovery heal, which the renderer routes here before its
@@ -968,6 +969,14 @@ export class AbilityVfx {
         break;
       }
       case 'nova': {
+        if (ability === 'spirit_bomb') {
+          // Damage already resolved on this cue. The radius appears now;
+          // only the giant orb's short travel and detonation are cosmetic.
+          this.spawnRing(ev.targetId, plan, ev.school);
+          if (fx.releaseSpiritBomb(ev.sourceId, ev.targetId)) this.spawned++;
+          this.releaseGesture(ev.sourceId, ability);
+          break;
+        }
         if (isWarriorAreaInstant(ability) && isMeleeAudioId(ability) && this.deps.audioReady)
           fx.reserveFuryAudio(ev, ability, ev.sourceId, ev.sourceId, 1, this.deps.audioReady);
         const sequenceTier = isWarriorAreaInstant(ability) && tier === 2 ? 1 : tier;
@@ -1464,6 +1473,15 @@ export class AbilityVfx {
       )
     )
       return;
+    if (castId === 'void_rupture') {
+      if (ev.kind === 'hit' && ev.amount > 0) {
+        if (this.castTier(ev.sourceId, castId) < 2)
+          this.deps.fx.spawnVoidRupture(ev.sourceId, ev.targetId);
+        this.releaseGesture(ev.sourceId, castId);
+      }
+      // Keep the ordinary victim flinch and hit feedback, including when full.
+      return;
+    }
     // The resource payment is already presented by selfCast. Claim only this
     // self cost so the renderer retains health text without a duplicate hit.
     if (
@@ -1950,18 +1968,23 @@ export class AbilityVfx {
         glowColor = rimColorOf(full, spec);
         // Preserve armour and skin detail throughout the cast. Physical
         // channels carry weapon motion, never an emissive whole-body wash.
-        glowStrength = full?.physical ? 0 : 1.2 * (full?.power ?? 1);
+        glowStrength =
+          full?.physical || e.castingAbility === 'spirit_bomb' ? 0 : 1.2 * (full?.power ?? 1);
         // the local player is priority: guaranteed a windup slot even when
         // a crowded hub saturates the pool
-        const windupStarted = fx.windup(
-          e.id,
-          abilityVfxColor(spec),
-          progress,
-          style,
-          this.deps.localPlayerId?.() === e.id,
-          abilityVfxChargeStreams(full),
-          rimColorOf(full, spec),
-        );
+        const windupStarted =
+          e.castingAbility === 'spirit_bomb'
+            ? !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }) &&
+              fx.holdSpiritBomb(e.id, progress, this.deps.localPlayerId?.() === e.id)
+            : fx.windup(
+                e.id,
+                abilityVfxColor(spec),
+                progress,
+                style,
+                this.deps.localPlayerId?.() === e.id,
+                abilityVfxChargeStreams(full),
+                rimColorOf(full, spec),
+              );
         if (windupStarted && !castingWasHeld) {
           this.spawned = 1;
           this.recordStat(e.castingAbility, false);

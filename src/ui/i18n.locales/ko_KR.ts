@@ -19694,4 +19694,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'errors.noUpdateFound': '업데이트를 찾지 못했습니다. 잠시 후 다시 시도하세요.',
   'errors.updateUnavailable': '게임 스토어에서 업데이트하거나 최신 클라이언트를 다운로드하세요.',
   'errors.updateSearchFailed': '업데이트를 확인할 수 없습니다. 다시 시도하세요.',
+  'entities.abilities.vampiric_touch.name': '흡혈의 손길',
+  'entities.abilities.vampiric_touch.description':
+    '15초 동안 3초마다 총 {damage}의 암흑 피해를 입힙니다. 피해는 주문력에 따라 증가하며 각 피해는 치명타가 될 수 있습니다. 매번 적이 실제로 잃은 생명력의 20%를 치유량으로 전환하여 자신과 30미터 내의 부상당한 파티원에게 균등하게 나눕니다. 공격대에서는 자신의 하위 파티만 치유합니다. 암흑 십일조가 2회 이상 충전되어 있으면 효과를 적용할 때 2회를 소모하여 전체 피해를 30% 증가시킵니다.',
+  'entities.abilities.spirit_bomb.name': '헌납 폭탄',
+  'entities.abilities.spirit_bomb.description':
+    '적에게 영혼 폭탄을 터뜨려 대상 주위 8미터 내의 적에게 {damage}의 암흑 피해를 줍니다. 피해는 주문력에 따라 증가하며 극대화될 수 있고 대상이 5명을 초과하면 감소합니다. 암흑 십일조 중첩을 총 20개 생성하면 폭탄 하나가 준비됩니다. 최대 5중첩을 보유한 상태에서 생성해도 진행도가 증가합니다. 중첩을 소모할 필요는 없으며 소모해도 진행도는 증가하지 않습니다. 진행도는 전투 사이와 사망 후에도 유지되며 준비된 폭탄은 하나까지만 저장됩니다. 시전을 완료하면 저항당해도 폭탄을 소모합니다. 취소하거나 차단당하면 보존됩니다. 공격대 우두머리 전투가 시작되면 진행도와 준비된 폭탄이 초기화됩니다. 이 주문으로 공격대 우두머리 전투를 시작할 수 없습니다.',
+  'hudChrome.priest.gloomtitheLabel': '암흑 십일조',
+  'hudChrome.priest.bombLabel': '헌납 폭탄',
+  'hudChrome.priest.gloomtitheStatus': '암흑 십일조 {value} / {max}',
+  'hudChrome.priest.bombStatus': '헌납 폭탄 충전 {value} / {max}',
+  'hudChrome.priest.bombReady': '준비 완료',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    '암흑 십일조: 소모할 수 있는 충전을 최대 5개까지 보유합니다. 흡혈의 손길은 2개를 소모해 피해가 30% 증가하고, 십일조 악마 소환은 모든 충전을 소모합니다. 충전을 생성하면 헌납 폭탄 진행도도 증가하며, 이미 5개를 보유한 상태에서도 증가합니다.',
+  'hudChrome.priest.bombTooltip':
+    '헌납 폭탄: 암흑 십일조를 20개 생성하면 폭탄 하나가 준비됩니다. 암흑 십일조를 소모해도 진행도는 증가하지 않습니다. 진행도는 전투 사이와 사망 후에도 유지됩니다. 공격대 우두머리 전투가 시작되면 초기화됩니다. 시전을 완료하면 폭탄을 소모하며, 취소하면 보존됩니다.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    '15초 동안 자신의 암흑 피해로 적이 실제로 잃은 생명력의 20%를 치유량으로 전환하여 자신을 포함한 30미터 내의 부상당한 파티원에게 나눕니다. 공격대에서는 자신의 하위 파티만 치유합니다. 즉시 시전하며 황혼의 장막으로 계속 공격할 수 있습니다. 흡수된 피해와 적의 남은 생명력을 초과한 피해는 치유량에 포함되지 않습니다.',
 };

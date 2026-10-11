@@ -268,6 +268,13 @@ export function abilityDisplayDescription(
   auraOverride?: { kind: string; value: number },
   spec?: string | null,
 ): string {
+  if (
+    res.def.id === 'choir_of_deliverance' &&
+    res.def.school === 'shadow' &&
+    res.def.channel === undefined
+  ) {
+    return tEntity({ kind: 'ability', id: res.def.id, field: 'specNote_shadow' });
+  }
   const buff = auraOverride ? auraBuffDisplayValue(auraOverride) : abilityBuffValue(res);
   const duration = abilityDurationValue(res);
   const hourglass = abilityTemporalHourglassValues(res);

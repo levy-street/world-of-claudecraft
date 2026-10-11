@@ -18757,4 +18757,22 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'errors.noUpdateFound': '未找到更新。請稍後再試。',
   'errors.updateUnavailable': '請透過遊戲商店更新，或下載最新用戶端。',
   'errors.updateSearchFailed': '無法檢查更新。請重試。',
+  'entities.abilities.vampiric_touch.name': '吸血之觸',
+  'entities.abilities.vampiric_touch.description':
+    '在15秒內造成{damage}點暗影傷害，每3秒一次。傷害隨法術強度提升，每次傷害均可致命一擊。每次傷害將敵人實際損失生命值的20%轉化為治療，平均分配給你和30碼內受傷的小隊成員；在團隊中，僅治療你所在的小隊。若你擁有至少2層幽暗什一，施加此效果會消耗2層，使其全部傷害提高30%。',
+  'entities.abilities.spirit_bomb.name': '獻納靈魂炸彈',
+  'entities.abilities.spirit_bomb.description':
+    '在敵人身上引爆靈魂炸彈，對目標周圍8碼內的敵人造成{damage}暗影傷害。傷害隨法術能量提高，可以致命一擊，目標超過5個時傷害降低。累計生成20層幽暗什一，可準備一枚炸彈。即使已持有上限5層，生成仍會增加進度。無需消耗層數，消耗也不會增加進度。進度在戰鬥之間及死亡後保留，最多儲存一枚準備好的炸彈。完成施法會消耗炸彈，即使被抵抗也是如此。取消或中斷施法會保留炸彈。開始與團隊副本首領戰鬥時，進度和準備好的炸彈都會歸零。此法術無法用於開啟團隊副本首領戰鬥。',
+  'hudChrome.priest.gloomtitheLabel': '幽暗什一',
+  'hudChrome.priest.bombLabel': '獻納靈魂炸彈',
+  'hudChrome.priest.gloomtitheStatus': '幽暗什一：{value} / {max}',
+  'hudChrome.priest.bombStatus': '獻納靈魂炸彈充能：{value} / {max}',
+  'hudChrome.priest.bombReady': '就緒',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    '幽暗什一：最多保有5層可消耗的層數。吸血之觸消耗2層，使傷害提高30%；召喚什一魔消耗全部層數。生成層數也會增加獻納靈魂炸彈的進度，即使已保有5層也會增加。',
+  'hudChrome.priest.bombTooltip':
+    '獻納靈魂炸彈：生成20層幽暗什一即可準備一枚炸彈。消耗幽暗什一不會增加進度。進度在戰鬥之間及死亡後保留。開始與團隊副本首領戰鬥時會歸零。完成施法會消耗炸彈，取消施法則會保留。',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    '在15秒內，將敵人因你的暗影傷害實際損失生命值的20%轉化為治療，分配給30碼內受傷的小隊成員，包括你自己。在團隊中，僅治療你所在的小隊。立即施放，且你可在暮色帷幕下繼續攻擊。被吸收的傷害及超出敵人剩餘生命值的傷害不會產生治療。',
 };

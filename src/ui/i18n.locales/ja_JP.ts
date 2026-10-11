@@ -19719,4 +19719,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'errors.updateUnavailable':
     'ゲームストアで更新するか、最新のクライアントをダウンロードしてください。',
   'errors.updateSearchFailed': '更新を確認できませんでした。もう一度お試しください。',
+  'entities.abilities.vampiric_touch.name': '吸血の接触',
+  'entities.abilities.vampiric_touch.description':
+    '15秒間、3秒ごとに合計{damage}の暗影ダメージを与える。ダメージは呪文威力で増加し、各回のダメージはクリティカル可能。各回で敵が実際に失ったHPの20%を回復量とし、自分と30ヤード以内の負傷したパーティメンバーに均等に分配する。レイドでは自分のサブグループのみが対象。闇の献納が2チャージ以上ある場合、効果の付与時に2チャージを消費し、効果全体のダメージを30%増加させる。',
+  'entities.abilities.spirit_bomb.name': '献納の爆弾',
+  'entities.abilities.spirit_bomb.description':
+    '敵を中心に霊魂の爆弾を爆発させ、その敵から8ヤード以内の敵に{damage}のシャドウダメージを与えます。ダメージはスペルパワーで増加し、クリティカルが発生します。対象が5体を超えるとダメージが減少します。闇の献納を合計20生成すると爆弾が1個準備されます。上限の5スタックを保持している間の生成も加算されます。消費は不要で、消費しても進捗は増えません。進捗は戦闘の間と死亡後も保持され、準備できる爆弾は1個までです。詠唱が完了すると、抵抗されても爆弾を消費します。キャンセルや中断では保持されます。レイドボスとの戦闘開始時に進捗と準備済みの爆弾がリセットされます。この呪文でレイドボスとの戦闘を開始することはできません。',
+  'hudChrome.priest.gloomtitheLabel': '闇の献納',
+  'hudChrome.priest.bombLabel': '献納の爆弾',
+  'hudChrome.priest.gloomtitheStatus': '闇の献納 {value} / {max}',
+  'hudChrome.priest.bombStatus': '献納の爆弾のチャージ {value} / {max}',
+  'hudChrome.priest.bombReady': '準備完了',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    '闇の献納：消費できるチャージを最大5まで保持。吸血の接触は2チャージを消費してダメージを30%増加させ、タイスフィーンド招来は全チャージを消費する。チャージの生成は献納の爆弾の進捗も増やし、5チャージ保持中でも加算される。',
+  'hudChrome.priest.bombTooltip':
+    '献納の爆弾：闇の献納を20生成すると爆弾を1個準備できる。闇の献納を消費しても進捗は増えない。進捗は戦闘の間と死亡後も保持され、レイドボスとの戦闘開始時にリセットされる。詠唱が完了すると爆弾を消費し、キャンセルすると保持される。',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    '15秒間、自分の暗影ダメージで敵が実際に失ったHPの20%を回復量とし、自分を含む30ヤード以内の負傷したパーティメンバーに分配する。レイドでは自分のサブグループのみを回復する。即時発動し、黄昏の帳のまま攻撃を続けられる。吸収されたダメージと敵の残りHPを超えたダメージは回復量に含まれない。',
 };

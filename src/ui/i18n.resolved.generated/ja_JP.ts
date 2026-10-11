@@ -576,6 +576,16 @@ export const ja_JP: EnTranslations = {
       "fateThreadsConsumeReady": "運命の糸が3本: 喰らうで追加の断罪へ紡げます。",
       "fateThreadsSentenceReady": "運命の糸が3本: 宣告で消費するとダメージが18%増加します。"
     },
+    "priest": {
+      "gloomtitheLabel": "闇の献納",
+      "bombLabel": "献納の爆弾",
+      "gloomtitheStatus": "闇の献納 {value} / {max}",
+      "bombStatus": "献納の爆弾のチャージ {value} / {max}",
+      "bombReady": "準備完了",
+      "chargeCount": "{value} / {max}",
+      "gloomtitheTooltip": "闇の献納：消費できるチャージを最大5まで保持。吸血の接触は2チャージを消費してダメージを30%増加させ、タイスフィーンド招来は全チャージを消費する。チャージの生成は献納の爆弾の進捗も増やし、5チャージ保持中でも加算される。",
+      "bombTooltip": "献納の爆弾：闇の献納を20生成すると爆弾を1個準備できる。闇の献納を消費しても進捗は増えない。進捗は戦闘の間と死亡後も保持され、レイドボスとの戦闘開始時にリセットされる。詠唱が完了すると爆弾を消費し、キャンセルすると保持される。"
+    },
     "procOverlay": {
       "soulFragmentsMeter": "魂の欠片",
       "ruinMeter": "破滅",
@@ -3952,6 +3962,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "auraEffect": {
+      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
@@ -13820,6 +13831,18 @@ export const ja_JP: EnTranslations = {
         "name": "嘆きの連祷",
         "description": "3秒間詠唱を維持し、毎秒{damage}の影ダメージを与えます。ダメージは呪文威力とともに上がります。"
       },
+      "vampiric_touch": {
+        "name": "吸血の接触",
+        "description": "15秒間、3秒ごとに合計{damage}の暗影ダメージを与える。ダメージは呪文威力で増加し、各回のダメージはクリティカル可能。各回で敵が実際に失ったHPの20%を回復量とし、自分と30ヤード以内の負傷したパーティメンバーに均等に分配する。レイドでは自分のサブグループのみが対象。闇の献納が2チャージ以上ある場合、効果の付与時に2チャージを消費し、効果全体のダメージを30%増加させる。"
+      },
+      "void_rupture": {
+        "name": "Void Rupture",
+        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+      },
+      "spirit_bomb": {
+        "name": "献納の爆弾",
+        "description": "敵を中心に霊魂の爆弾を爆発させ、その敵から8ヤード以内の敵に{damage}のシャドウダメージを与えます。ダメージはスペルパワーで増加し、クリティカルが発生します。対象が5体を超えるとダメージが減少します。闇の献納を合計20生成すると爆弾が1個準備されます。上限の5スタックを保持している間の生成も加算されます。消費は不要で、消費しても進捗は増えません。進捗は戦闘の間と死亡後も保持され、準備できる爆弾は1個までです。詠唱が完了すると、抵抗されても爆弾を消費します。キャンセルや中断では保持されます。レイドボスとの戦闘開始時に進捗と準備済みの爆弾がリセットされます。この呪文でレイドボスとの戦闘を開始することはできません。"
+      },
       "flash_heal": {
         "name": "緊急の祈り",
         "description": "味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。"
@@ -14640,7 +14663,8 @@ export const ja_JP: EnTranslations = {
       },
       "inner_focus": {
         "name": "静まる心",
-        "description": "次のプリーストの呪文を無償かつ中断されないものにします。60秒続きます。"
+        "description": "次のプリーストの呪文を無償かつ中断されないものにします。60秒続きます。",
+        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
       },
       "innervate": {
         "name": "生命の樹液",
@@ -14837,7 +14861,8 @@ export const ja_JP: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "救済の聖歌隊",
-        "description": "6秒間チャネルし、30ヤード以内のパーティメンバーを2秒ごとに{damage}回復します。回復量はスペルパワーで増加します。"
+        "description": "6秒間チャネルし、30ヤード以内のパーティメンバーを2秒ごとに{damage}回復します。回復量はスペルパワーで増加します。",
+        "specNote_shadow": "15秒間、自分の暗影ダメージで敵が実際に失ったHPの20%を回復量とし、自分を含む30ヤード以内の負傷したパーティメンバーに分配する。レイドでは自分のサブグループのみを回復する。即時発動し、黄昏の帳のまま攻撃を続けられる。吸収されたダメージと敵の残りHPを超えたダメージは回復量に含まれない。"
       },
       "bear_charge": {
         "name": "ブルーインラッシュ",

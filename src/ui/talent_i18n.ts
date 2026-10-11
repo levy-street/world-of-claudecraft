@@ -10836,6 +10836,11 @@ function authoredChoiceDescription(choice: TalentRowOption): string {
   // already sees Abyssal Gag on their action bar. The authored source carries that
   // framing plus the real numbers, so use it verbatim instead.
   if (grantId === 'spell_lock') return choice.description;
+  // Stilled Mind's Shadow critical bonus is a runtime rider, absent from the
+  // generic grant description. Keep the authored choice's consumption rules.
+  if (choice.id === 'pri_r11_inner_focus') {
+    return [choice.description, grantAbilityMetadata(grantId)].filter(Boolean).join(' ');
+  }
   const lang = getLanguage();
   const riderDescriptions = (choice.effect.ability ?? [])
     .filter((mod) => mod.ability === grantId)

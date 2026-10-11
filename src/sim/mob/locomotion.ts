@@ -1526,6 +1526,7 @@ function pulseLoudYell(ctx: SimContext, mob: Entity): void {
 // An evading mob has reached its spawn (walking or phasing): drop the pull
 // entirely and return to idle at full health, ready to be pulled again.
 export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
+  mob.spiritBombRaidPullStarted = undefined;
   mob.aiState = 'idle';
   mob.hp = mob.maxHp;
   mob.auras = [];

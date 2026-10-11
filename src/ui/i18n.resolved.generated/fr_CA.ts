@@ -576,6 +576,16 @@ export const fr_CA: EnTranslations = {
       "fateThreadsConsumeReady": "Trois Fils du destin : Consumer peut les tisser en Condamnation supplémentaire.",
       "fateThreadsSentenceReady": "Trois Fils du destin : Sentence peut les consommer pour 18% de dégâts supplémentaires."
     },
+    "priest": {
+      "gloomtitheLabel": "Gloomtithe",
+      "bombLabel": "Tithe Bomb",
+      "gloomtitheStatus": "{value} of {max} Gloomtithe",
+      "bombStatus": "{value} of {max} Tithe Bomb charges",
+      "bombReady": "Ready",
+      "chargeCount": "{value} / {max}",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+    },
     "procOverlay": {
       "soulFragmentsMeter": "Fragments d'âme",
       "ruinMeter": "Ruine",
@@ -3952,6 +3962,7 @@ export const fr_CA: EnTranslations = {
       }
     },
     "auraEffect": {
+      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
       "sharedPyre": "Inflige {total}% des points de vie maximum de chaque joueur, divisé par le nombre de joueurs à l'intérieur du cercle ({perPlayer}% chacun avec {players} joueurs).",
       "varkhulSharedPyre": "Inflige {total}% des points de vie maximum de chaque joueur, réparti entre les joueurs à l'intérieur du cercle ({perPlayer}% chacun avec {players} joueurs). Chaque joueur manquant inflige aussi {missingPenalty}% des points de vie maximum à tout le raid, y compris les joueurs à l'intérieur du cercle.",
       "makersBrand": "Pendant {duration} s, chaque cumul accroît les dégâts subis de la part de Varkhul de {pct}%. Cumul jusqu'à {max} fois. Les tanks doivent échanger à {swap} cumuls.",
@@ -13820,6 +13831,18 @@ export const fr_CA: EnTranslations = {
         "name": "Litanie du malheur",
         "description": "Canalise pendant 3 s, infligeant {damage} points de dégâts d'Ombre chaque seconde. Les dégâts augmentent avec la puissance des sorts."
       },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+      },
+      "void_rupture": {
+        "name": "Void Rupture",
+        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+      },
+      "spirit_bomb": {
+        "name": "Tithe Bomb",
+        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+      },
       "flash_heal": {
         "name": "Prière urgente",
         "description": "Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance des sorts."
@@ -14640,7 +14663,8 @@ export const fr_CA: EnTranslations = {
       },
       "inner_focus": {
         "name": "Esprit apaisé",
-        "description": "Rend votre prochain sort de prêtre gratuit et ininterruptible. Dure 60 s."
+        "description": "Rend votre prochain sort de prêtre gratuit et ininterruptible. Dure 60 s.",
+        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
       },
       "innervate": {
         "name": "Sève vitale",
@@ -14837,7 +14861,8 @@ export const fr_CA: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Chœur de délivrance",
-        "description": "Canalise pendant 6 s et soigne les membres du groupe dans un rayon de 30 mètres de {damage} toutes les 2 s. Le soin augmente avec la puissance des sorts."
+        "description": "Canalise pendant 6 s et soigne les membres du groupe dans un rayon de 30 mètres de {damage} toutes les 2 s. Le soin augmente avec la puissance des sorts.",
+        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
       },
       "bear_charge": {
         "name": "Ruée de Bruin",

@@ -436,8 +436,11 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'holy_nova',
       'seraphic_vigil',
       'shadowform',
+      'vampiric_touch',
+      'void_rupture',
       'summon_tithefiend',
       'prayer_of_returning',
+      'spirit_bomb',
     ],
     color: 0xc6d4f0,
   },
@@ -4459,7 +4462,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers already includes 10% more damage and grants 1 Gloomtithe per tick on your Effigy. Reapplying your active Dirge to an enemy mob refreshes your existing Dirges on all living hostile mobs within 30 yards of you and in line of sight. This does not spread Dirge to new targets.',
+      'Deal $d total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers ticks can critically strike, using your spell critical chance and critical damage bonus. Vespers already includes 10% more damage and grants 1 Gloomtithe per tick on your Effigy. Reapplying your active Dirge to an enemy mob refreshes your existing Dirges on all living hostile mobs within 30 yards of you and in line of sight. This does not spread Dirge to new targets.',
   },
   power_word_shield: {
     id: 'power_word_shield',
@@ -4581,12 +4584,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     channel: { duration: 3, ticks: 3 },
     cooldown: 0,
-    range: 20,
+    range: 30,
     school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0 }],
     description:
-      'Channel for 3 sec, dealing $d Shadow damage each second. Damage increases with Spell Power.',
+      'Channel for 3 sec, dealing $d Shadow damage each second. Damage increases with Spell Power. Vespers ticks can critically strike, using your spell critical chance and critical damage bonus.',
   },
   flash_heal: {
     id: 'flash_heal',
