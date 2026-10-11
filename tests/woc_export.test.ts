@@ -11,7 +11,9 @@ import {
   wocArmorPackUrl,
   wocBaseUrl,
 } from '../src/render/characters/woc_armor_core';
+import { wocAutoAttacksUrl } from '../src/render/characters/woc_autoattack_core';
 import { wocManifestSets } from '../src/render/characters/woc_parts_core';
+import { wocWowAnimsUrl } from '../src/render/characters/woc_wow_animations';
 
 // The accepted WOC character delivery, split the way the artist delivers it (the 2026-09-25
 // character size gameplan, step 4): one base and one animation library per body fit, per set
@@ -42,7 +44,11 @@ describe('the September 2026 WOC character delivery (the 51-clip animation rig, 
       expected.add(wocBaseUrl(manifest.fit));
       expected.add(wocAnimsUrl(manifest.fit));
       expect(def.url).toBe(wocBaseUrl(manifest.fit));
-      expect(def.animUrls).toEqual([wocAnimsUrl(manifest.fit)]);
+      expect(def.animUrls).toEqual([
+        wocAnimsUrl(manifest.fit),
+        wocWowAnimsUrl(manifest.fit),
+        wocAutoAttacksUrl(manifest.fit),
+      ]);
       for (const set of wocManifestSets(manifest)) {
         for (const tier of WOC_ARMOR_TIERS) expected.add(wocArmorPackUrl(manifest.fit, set, tier));
       }

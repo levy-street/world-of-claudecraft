@@ -28,6 +28,7 @@ import {
   wocArmorPackUrl,
   wocBaseUrl,
 } from '../src/render/characters/woc_armor_core';
+import { wocAutoAttacksUrl } from '../src/render/characters/woc_autoattack_core';
 import {
   WOC_PALADIN_FEMALE_MANIFEST,
   WOC_PALADIN_MANIFEST,
@@ -53,6 +54,7 @@ import {
   wocWornFromEquipment,
   wocWornSets,
 } from '../src/render/characters/woc_parts_core';
+import { wocWowAnimsUrl } from '../src/render/characters/woc_wow_animations';
 import { ITEMS } from '../src/sim/data';
 import { ALL_CLASSES, type EquipSlot } from '../src/sim/types';
 
@@ -206,8 +208,12 @@ describe('the shipped WOC split files', () => {
       const def = VISUALS[key];
       expect(manifest.fit, key).toBe(key.endsWith('_female') ? 'female' : 'male');
       expect(def.url, key).toBe(wocBaseUrl(manifest.fit));
-      // the rig's own library is its ONLY clip source: no KayKit donor is ever layered on
-      expect(def.animUrls, key).toEqual([wocAnimsUrl(manifest.fit)]);
+      // Both libraries use this exact bind pose; no unretargeted donor may bind by name.
+      expect(def.animUrls, key).toEqual([
+        wocAnimsUrl(manifest.fit),
+        wocWowAnimsUrl(manifest.fit),
+        wocAutoAttacksUrl(manifest.fit),
+      ]);
       expect(def.lazyPreload, key).toBe(true);
       expect(def.authoredAtlas, key).toBe(true);
       expect(def.modular, key).toBeUndefined();
@@ -927,7 +933,11 @@ describe('the seven class equipment sets (2026-09-18) on the shared bodies', () 
         const key = fit === 'female' ? `player_${cls}_female` : `player_${cls}`;
         const def = VISUALS[key];
         expect(def.url, key).toBe(wocBaseUrl(fit));
-        expect(def.animUrls, key).toEqual([wocAnimsUrl(fit)]);
+        expect(def.animUrls, key).toEqual([
+          wocAnimsUrl(fit),
+          wocWowAnimsUrl(fit),
+          wocAutoAttacksUrl(fit),
+        ]);
         const manifest = def.wocCharacter;
         expect(manifest, key).toBeDefined();
         if (!manifest) return;
@@ -972,7 +982,7 @@ describe('the seven class equipment sets (2026-09-18) on the shared bodies', () 
         expect(def.swimRise, key).toEqual({ stroke: -0.65, tread: -1.0 });
         expect(def.clips.shoutEmote, key).toBeNull();
         expect(def.clips.climb, key).toBe('Climb');
-        expect(def.clips.swim, key).toBe('Swim');
+        expect(def.clips.swim, key).toBe('WoW_a_swimN');
         expect(def.height, key).toBe(VISUALS.player_warrior.height);
       }
       expect({ ...VISUALS[`player_${cls}_female`].clips, contacts: undefined }).toEqual({
