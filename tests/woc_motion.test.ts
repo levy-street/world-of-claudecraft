@@ -8,6 +8,7 @@ import wocAutoAttackContacts from '../src/render/characters/woc_autoattack_conta
 import { WOC_WARRIOR_MANIFEST } from '../src/render/characters/woc_character_manifest';
 import { WOC_KEYED_CLIP_NAMES } from '../src/render/characters/woc_keyed_animations';
 import { wocAllPartNames } from '../src/render/characters/woc_parts_core';
+import { CLASSES } from '../src/sim/content/classes';
 import { landWocBodies } from './helpers/woc_streamed';
 
 // Keep the runtime assembly, attachment and mixer paths real. Only the disk/
@@ -134,20 +135,26 @@ describe('WOC authored movement and held props', () => {
   // The rig's look-around fidget opens and closes on the rig's own Idle, so firing it over the
   // keyed idle put the old stance back on screen for seconds at a time (owner report 2026-10-12,
   // on the character-select turntable, which stands the same body the world does).
-  it('stands in the keyed idle alone: no rig fidget breaks in', () => {
+  it('stands every class body, both fits, in the keyed idle alone: no rig fidget breaks in', () => {
     const wocBodies = Object.entries(VISUALS).filter(([, def]) => def.wocCharacter);
-    expect(wocBodies.length).toBeGreaterThanOrEqual(18);
+    // every class in both fits, plus the bodies borrowing them (the Drowned Temple's reflections)
+    expect(wocBodies.map(([key]) => key)).toEqual(
+      expect.arrayContaining(
+        Object.keys(CLASSES).flatMap((cls) => [`player_${cls}`, `player_${cls}_female`]),
+      ),
+    );
     for (const [key, def] of wocBodies) {
       expect(def.clips.idle, key).toBe('Woc_Idle');
       expect(def.clips.idleVariants, key).toBeUndefined();
+      // past the longest gap the old fidget ever waited (14 s plus up to 8 s of jitter)
+      const visual = create(key);
+      const played = new Set<string>();
+      for (let frame = 0; frame < 60 * 25; frame++) {
+        tick(visual);
+        played.add(peek(visual).current.getClip().name);
+      }
+      expect([...played], key).toEqual(['Woc_Idle']);
     }
-    const visual = create('player_shaman');
-    const played = new Set<string>();
-    for (let frame = 0; frame < 60 * 45; frame++) {
-      tick(visual);
-      played.add(peek(visual).current.getClip().name);
-    }
-    expect([...played]).toEqual(['Woc_Idle']);
   });
 
   it('hides both equipped hands while swimming and restores drawn or stowed props on exit', () => {
