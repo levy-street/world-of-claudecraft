@@ -129,11 +129,13 @@ describe('ability icons', () => {
     // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite).
     // 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
     // release/v0.44.0 merge into feature/buried-hoards).
-    expect(ids).toHaveLength(473);
+    // 474: plus the Scratch glyph (the Cat Form sweep builder).
+    // 475: plus Groveheart's Sporemender Form (sporemender_form).
+    expect(ids).toHaveLength(475);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('6fa8b2c16d3459d5f09768545d08e8f6778c00a2ac3973cd0d9361ee3d08971c');
+    expect(hash).toBe('16ef9940f7812cb46143d59e6bce2cba4284e80687e7b5c08210ea65c31830dc');
   });
 });

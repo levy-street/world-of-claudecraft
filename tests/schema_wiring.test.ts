@@ -753,6 +753,25 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS realm_builder_honours');
   });
 
+  it('applies the realm message of the day schema after the core accounts table', async () => {
+    // REALM_MOTD_SCHEMA (server/realm_motd_db.ts) backs the admin /motd. The
+    // live-server suite fakes the pool, so without this pin deleting the
+    // ensureSchema line in server/db.ts would fail nowhere until the first
+    // /motd threw "relation does not exist". set_by references accounts(id).
+    await ensureSchema();
+    const motdAt = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS realm_motd'),
+    );
+    const accountsAt = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS accounts'),
+    );
+    expect(motdAt).toBeGreaterThan(-1);
+    expect(h.calls[motdAt]).toContain('CREATE TABLE IF NOT EXISTS realm_motd_changes');
+    expect(accountsAt).toBeGreaterThan(-1);
+    expect(motdAt).toBeGreaterThan(accountsAt);
+    expect(h.calls.indexOf('COMMIT')).toBeGreaterThan(motdAt);
+  });
+
   it('applies the $WOC Exchange schema (listings plus a dependent table)', async () => {
     // WOC_MARKET_SCHEMA (server/woc_market_db.ts) backs every marketplace
     // table. Same defined-but-unwired hazard as the DISCORD_SCHEMA lesson:

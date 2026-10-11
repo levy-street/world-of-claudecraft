@@ -157,4 +157,26 @@ describe('world quest snapshot wire', () => {
       puzzleVariant: 0,
     });
   });
+
+  it('keeps the row of a replacement quest, which is not on the base board', () => {
+    // wq1_101 offers the stealth heist in Eastbrook; calligraphy is the reroll.
+    const cycle = 'wq1_101';
+    const row = { questId: 'wq_eastbrook_calligraphy', count: 1, state: 'active' as const };
+    const target = mirrors();
+    applyQuestSelfWire(target, {
+      wqday: cycle,
+      wqrep: { wq_eastbrook_shadow: row.questId },
+      wqlog: [row],
+    });
+    expect(target.worldQuestLog.get(row.questId)).toMatchObject(row);
+
+    // A later delta carries the row alone; the mirrored replacement still admits it.
+    const later = { ...row, count: 2 };
+    applyQuestSelfWire(target, { wqlog: [later] });
+    expect(target.worldQuestLog.get(row.questId)).toMatchObject(later);
+
+    // A rollover never carries yesterday's replacement onto the new board.
+    applyQuestSelfWire(target, { wqday: 'wq1_102', wqlog: [later] });
+    expect(target.worldQuestLog.has(row.questId)).toBe(false);
+  });
 });

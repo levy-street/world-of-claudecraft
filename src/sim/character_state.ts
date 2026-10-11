@@ -3,6 +3,7 @@
 // gameplay module. New fields remain optional unless every historical save can
 // supply them.
 
+import type { SavedAura } from './aura_persist';
 import type { SavedBankState } from './bank';
 import type { SavedLoadout, TalentAllocation } from './content/talents';
 import type { SavedCooldowns } from './cooldown_persist';
@@ -184,6 +185,12 @@ export interface CharacterState {
   // saves load cleanly with no cooldowns). Persisted so logging out and back in no
   // longer wipes cooldowns and lets a player bypass them by relogging.
   cooldowns?: SavedCooldowns;
+  // Buffs (food, elixirs, flasks, and the class maintenance buffs) as
+  // remaining-time records (JSONB; optional so pre-fix saves load with no buffs,
+  // and absent while none is worn). Persisted so a logout no longer strips them;
+  // timers freeze while offline, the classic behavior. The allowlist, caster
+  // re-anchoring, and load re-validation live in aura_persist.ts.
+  auras?: SavedAura[];
   // Per-player gather-node respawn timers as remaining-time deltas (D6; JSONB,
   // nodeId -> remaining seconds, the cooldowns scheme above applied to node
   // readiness). Optional with zero-default omission: absent for pre-D6 saves
@@ -384,6 +391,8 @@ export interface CharacterState {
 export interface PetState {
   templateId: string;
   name: string;
+  /** Non-template cosmetic size of a tamed beast. Older saves omit it. */
+  scale?: number;
   level: number;
   hp: number;
   dead: boolean;

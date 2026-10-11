@@ -69,6 +69,12 @@ export const hudChromeStrings = {
     castingOff: 'The ferry to {dest} is casting off',
     boardHint: 'Stand on its deck when it sails. The crossing is free.',
     sailing: 'Sailing to {dest}',
+    portLabel: '{port} ferry to {dest}',
+    portTitle: '{port} ferry port',
+    destination: 'Destination: {dest}',
+    boardNow: 'Board now',
+    arrivesIn: 'Ferry arrives in {time}',
+    scheduleUnavailable: 'Ferry timetable unavailable.',
   },
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
   vehicle: {
@@ -145,6 +151,18 @@ export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
   },
+  // The realm message of the day (/motd, server/realm_motd.ts): the chat line
+  // every player sees at login and whenever an admin changes it ({text} is the
+  // admin's message, spliced verbatim), plus the admin's command feedback.
+  realmMotd: {
+    line: 'Message of the day: {text}',
+    updated: 'Message of the day updated.',
+    cleared: 'Message of the day cleared.',
+    none: 'No message of the day is set.',
+    usage: 'Usage: /motd "<message>" to set it, /motd clear to remove it.',
+    tooLong: 'The message of the day is limited to {max} characters.',
+    saveFailed: 'The message of the day could not be saved and will not survive a restart.',
+  },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
   readyCheck: {
@@ -207,6 +225,13 @@ export const hudChromeStrings = {
       "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
+  },
+  // The note over the 3D view while a WebGL context restore holds the world
+  // draw (src/ui/graphics_restore_note_controller.ts): the browser lost and
+  // gave back the graphics context, and the visible scene is being prepared
+  // again. A status line, not a warning: the HUD stays live under it.
+  graphicsRestore: {
+    note: 'Restoring graphics',
   },
   // Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray). The
   // button label reuses nav.wiki; these are the confirm dialog's strings
@@ -2002,6 +2027,13 @@ export const hudChromeStrings = {
     reportSent: 'Report copied and sent to chat',
     reportNoData: 'No data recorded.',
     noDetailedData: 'No detailed data',
+    // The ability drill-down subtitle. Effective is the healing that landed;
+    // the overheal percent is its share of total output (effective + overheal).
+    // Wordy (M16): the five non-Latin fills land in this same change.
+    detailHealSubtitle:
+      'Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)',
+    detailHitSubtitle:
+      'Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}',
     noDeathEvents: 'No events logged before death',
     killedBy: 'Killed by {killer} ({ability})',
     lethalHit: 'Lethal Hit',
@@ -2427,6 +2459,7 @@ export const hudChromeStrings = {
     },
   },
   options: {
+    spellTooltipOnHover: 'Spell Tooltips on Hover',
     clickMoveLeft: 'Left Click',
     clickMoveRight: 'Right Click',
     // Running client version + build id, shown as small secondary text at the foot
@@ -2488,6 +2521,9 @@ export const hudChromeStrings = {
     interfaceModeTouch: 'Touch',
     interfaceModeNote:
       'Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.',
+    // Audio panel slider for the environment bus (wind, birds, rain, water,
+    // dungeon air, campfires, forges), separate from the Sound Effects slider.
+    ambienceVolume: 'Ambience Volume',
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: 'Footstep Sounds',
     // Audio panel toggle for the discrete interface and feedback cues (loot, level,
@@ -2663,6 +2699,12 @@ export const hudChromeStrings = {
     confirmVendorSellMinQuality: 'Confirm Sales From Quality',
     confirmVendorSellMinQualityNote:
       'Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.',
+    // Successor of confirmVendorSellMinQualityNote, which now has no consumer
+    // and keeps its reviewed overlay rows: plain gray junk no longer records a
+    // buyback row (items.ts skipsVendorBuyback), so the old promise was false
+    // for exactly the items this threshold always sells instantly.
+    confirmVendorSellMinQualityNoteGray:
+      'Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
     // Interface panel toggle that reveals the optional second action bar row (off
@@ -2716,11 +2758,18 @@ export const hudChromeStrings = {
     showUtilityModes: 'Include Stealth and Travel Modes',
     showFriendlyTrack: 'Show My Buffs on Allies',
     showShieldTrack: 'Show My Shields',
+    // Interface > Combat opt-out of the vivid floating combat text (school colours,
+    // fan-out, crit and big-hit emphasis) back to the classic white and gold.
+    classicCombatText: 'Classic Combat Text',
     // Graphics-panel opt-in (default off) for the interactive wake/ripple
     // simulation on water surfaces; bubbles and splash particles do not key
     // off it. It sits in the Display card beside Weather because it costs
     // GPU passes, not because it is a comfort toggle.
     waterRipples: 'Water Ripples (Wakes)',
+    // Graphics-panel switch (default on) for the spell visual effects that
+    // players and their pets cast in the 3D world. Off keeps everything an
+    // enemy casts, area telegraph rings, crowd-control bands and cast bars.
+    spellEffects: 'Spell Effects',
     // Camera card opt-in (default off): the over-the-shoulder Action Cam, plus
     // the shoulder slider (full left .. center .. full right) that only shows
     // while it is on. The slider readout: {pct} is a formatted percent.
@@ -3350,6 +3399,8 @@ export const hudChromeStrings = {
       worldKill: 'world kill',
       worldAssist: 'world kill assisted',
       hillHold: 'holding the hill',
+      // The day's Honor world quests (src/sim/world_quest_honor_slots.ts).
+      worldQuest: 'world quest',
     },
     // Short labels for the floating text over your own character. Kept apart from
     // `reasons` above, which are mid-sentence fragments for the chat line.
@@ -3365,6 +3416,12 @@ export const hudChromeStrings = {
   // number is a resolved value from src/sim/pvp/world_pvp_rules.ts, never a
   // literal in the copy, so a retune never strands the text.
   worldPvp: {
+    rewardTitles:
+      'Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.',
+    rewardPaused: 'Current PvP streak: {time} played (paused in a sanctuary)',
+    rewardPausedDead: 'Current PvP streak: {time} played (paused while dead)',
+    rewardPausedInstance: 'Current PvP streak: {time} played (paused inside PvE instances)',
+    rewardProgress: 'Current PvP streak: {time} played',
     tab: 'World PvP',
     title: 'World PvP',
     blurb:
@@ -3395,6 +3452,11 @@ export const hudChromeStrings = {
       'Attacking an unflagged player there raises your own flag; attacking a flagged one never does.',
     aidLine: 'Healing, shielding or buffing a flagged player in a world fight raises your flag.',
     stakeLine: 'The loser pays {cap} or {percent} of their purse, whichever is less.',
+    spoilsLine:
+      "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+    // One looted trophy skull (src/sim/pvp/world_pvp_spoils.ts): {name} is the
+    // defeated player's name, carried on the copy.
+    skullName: "{name}'s Skull",
     noStakeLine: 'An unflagged player killed on free-for-all ground loses no gold.',
     noTakeLine:
       'An unflagged fighter takes no gold either: it only moves between two flagged players.',
@@ -3536,7 +3598,9 @@ export const hudChromeStrings = {
     delveMark: 'Delve Mark',
     wocToken: 'WoC Token',
     heroicMarkNote: 'Heroic dungeons . spend at the heroic quartermaster',
-    honorNote: 'Battlegrounds and the arena',
+    // Every Honor source a player can reach, the day's Honor world quests
+    // included (src/sim/world_quest_honor_slots.ts).
+    honorNote: 'Battlegrounds, the arena, and world quests',
     delveMarkNote: 'Delves completed',
     wocTokenNote: 'Linked wallet balance',
     walletNotLinked: 'No wallet linked',
@@ -4613,6 +4677,9 @@ export const hudChromeStrings = {
     resetDone: 'All instances have been reset.',
     resetNone: 'You have no instances to reset.',
     resetOccupied: 'You cannot reset instances while someone is still inside.',
+    queuedOccupied:
+      'Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.',
+    queuedCancelled: 'Queued difficulty change cancelled because the party or leader changed.',
     resetSameDifficulty:
       'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
     resetLoot: 'You cannot reset instances while loot remains inside.',
@@ -4648,6 +4715,9 @@ export const hudChromeStrings = {
     // that grid is a derived list, its squares hold no bag position, so honoring the drop
     // would move a stack the player never aimed at. Say so instead of doing nothing.
     reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
+    // Refusal when a drag would move a locked stack, or drop onto one: a locked
+    // item is pinned to its bag slot (src/sim/inventory_order.ts isCellPinned).
+    reorderLocked: 'Locked items stay in their bag slot. Unlock it to move it.',
     // Accessible-name arm of the instanced-slot corner marker: the
     // visual tab is aria-hidden, so the per-copy flag rides the cell's label
     // (the tooltip on focus stays the detail surface).
@@ -5260,7 +5330,7 @@ export const hudChromeStrings = {
     oldBlood:
       'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
     verdance:
-      'Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom',
+      "Verdance {stacks}/{max}. Each Sporemending, Second Bloom, or Wildmend you cast adds 1, and each one shortens Wildmend's cast. At {max}, Fleetmend becomes Overbloom",
     freeExecute: 'Your next eligible execute ability costs nothing',
     resourceSap: 'Restores {value} of your current resource every {interval} sec',
     nextAttackCrit: 'Your next attack is guaranteed to critically strike',
@@ -5400,6 +5470,8 @@ export const hudChromeStrings = {
     formFireball: 'Ember Form: movement speed increased by {pct}%; attacks and spells are disabled',
     formMoonkin:
       'Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%',
+    formSporemender:
+      'Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%',
     formShadow: 'Gloamveil Form: Shadow damage increased by {pct}%',
     resourceCount: '{value} of {max}',
     formLich: 'Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage',
@@ -5545,6 +5617,10 @@ export const hudChromeStrings = {
     afkTag: 'AFK',
     // The World PvP flag tag, same bracket convention as afkTag.
     pvpTag: 'PvP',
+    // The World PvP bounty tag (src/sim/pvp/world_pvp_bounty.ts), same bracket
+    // convention: the non-colour read of the blood-red bounty name tag. Wordy
+    // (M16), so the five non-Latin fills ship in this same change.
+    bountyTag: 'Bounty',
     // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
     // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
     // afkTag the brackets are part of the VALUE, so a locale that punctuates a
@@ -6011,6 +6087,8 @@ export const hudChromeStrings = {
     // so it says so plainly and names the signer AS the signer instead of
     // inventing an attribution for units nobody recorded.
     materialSourceGatherer: '{count} × Collected by {name}',
+    // A World PvP trophy skull stack's provenance row: {name} is the victim.
+    trophySkullSource: '{count} × Taken from {name}',
     materialSourceGathererSigned: '{count} × Collected by {name}, signed by {signer}',
     materialSourceUnrecorded: '{count} × No gatherer recorded',
     materialSourceUnrecordedSigned: '{count} × No gatherer recorded, signed by {name}',
@@ -7606,9 +7684,9 @@ export const hudChromeStrings = {
   },
   enchantDescription: {
     enchant_weapon_lastflame_zeal:
-      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. In Cat Form, auto attacks roll at the 1 sec paw speed instead. Cat Form and Bruin Form strikes and finishers roll at the weapon's own speed; Sweeping Claws rolls once per cast, not once per target.",
     enchant_weapon_riftwalkers_grace:
-      "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+      "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. In Cat Form, auto attacks roll at the 1 sec paw speed instead. Cat Form and Bruin Form strikes and finishers roll at the weapon's own speed; Sweeping Claws rolls once per cast, not once per target.",
     enchant_weapon_dawnfire_etching:
       'Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.',
     enchant_weapon_dawns_benediction:
@@ -7629,7 +7707,7 @@ export const hudChromeStrings = {
     targetDummyUse:
       'Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)',
     battleStandardUse:
-      'Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)',
+      'Use: Plants the Consecrated Dawn Battle Standard for 5 min. Players out of combat within 15 yards of it regenerate 10% more health, and mana users also restore mana equal to 5% of their Spirit, every 2 sec. Staying near it for 10 sec grants Blessing of the Dawn, increasing Strength, Agility, Stamina, Intellect, and Spirit by 5% for 30 min. (5 min cooldown)',
     shockBombUse:
       'Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)',
     invisibilityUse: 'Use: Shrouds you in stealth for 6 sec. (2 min cooldown)',
@@ -8381,6 +8459,11 @@ export const hudChromeStrings = {
   pattern: {
     teaches: 'Use: Teaches you how to craft {item}.',
     teachesEnchant: 'Use: Teaches you how to apply {enchant}.',
+    // The materials line under each taught product: {label} is the crafting
+    // window's own crafting.reagentsNeeded ("Requires:") and {list} a
+    // formatList of reagent entries, so neither gets a second wording.
+    reagents: '{label} {list}',
+    reagent: '{name} x{count}',
   },
   // Maker's Bond unbind service window + result lines (Professions 2.0):
   // the station master's second gossip service beside training.
@@ -9227,6 +9310,10 @@ export const hudChromeStrings = {
     // hudChrome.deeds.collapseHint / expandHint).
     collapseHint: 'Collapse map sidebar',
     expandHint: 'Expand map sidebar',
+    // The divider between the sidebar and the map (map_rail_resize_controller.ts):
+    // its accessible name, and the hover hint saying how to use it.
+    resizeRailAria: 'Map sidebar width',
+    resizeRailHint: 'Drag to resize the map sidebar. Double-click to reset.',
   },
   // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
   // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note

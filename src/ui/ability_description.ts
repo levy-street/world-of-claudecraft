@@ -170,7 +170,7 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       }
       return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'hot': {
-      // v0.42 (docs/design/class-balance-v042.md): a pure-HoT $d (Wildbloom
+      // v0.42 (docs/design/class-balance-v042.md): a pure-HoT $d (Sporemending
       // has no primary hit, so its total renders here, not in the primary
       // switch above) takes the same combined-total treatment as $o.
       const combined = scaling ? abilityPrimaryHealingTotal(res, secondary, scaling) : null;

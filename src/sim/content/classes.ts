@@ -61,7 +61,7 @@ export interface ClassDef {
   // Consumables in a fresh character's bags: every class carries food; the
   // mana classes also carry water. Saved characters load their own bags.
   startItems: { itemId: string; count: number }[];
-  // hunters: auto shot (8yd deadzone). casters: wand (wand:true → no deadzone,
+  // hunters: auto shot (4yd deadzone). casters: wand (wand:true → no deadzone,
   // fires a magic-school bolt so they don't run into melee to auto-attack, #94)
   ranged?: WeaponInfo & {
     maxRange: number;
@@ -364,7 +364,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'rusty_hatchet',
     startChest: 'footpad_jerkin',
     startItems: START_RATIONS,
-    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 8 },
+    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 4 },
     abilities: [
       'raptor_strike',
       'pack_command',
@@ -568,7 +568,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startChest: 'footpad_jerkin',
     startItems: START_RATIONS_MANA,
     // The same fixed class wand the other casters carry, in the druid's nature
-    // school. Form-aware: available only in caster form and Moonwing Form; the
+    // school. Form-aware: available only in caster, Moonwing and Sporemender Form; the
     // bear/cat/travel shapeshifts fight with claws (see combat/form_swing.ts
     // rangedAutoProfile, which the auto-attack loop resolves through).
     ranged: {
@@ -600,6 +600,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'prowl',
       'rake',
       'claw',
+      'scratch',
       'regrowth',
       'ferocious_bite',
       'barkskin',
@@ -621,6 +622,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'primal_reflexes',
       'wildwake',
       'grove_awakening',
+      'sporemender_form',
     ],
     color: 0xff8c1a,
   },
@@ -2641,8 +2643,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // requiresOutOfCombat is a real gate: the engaged pass (combat/engaged_combat.ts)
   // holds everyone a live mob still carries on its hate table, and an engaged boss
   // holds every nearby member of its attackers' group, so a backline caster cannot
-  // drop combat mid-fight by idling through the 5s linger. The five-minute cooldown
-  // is the throttle across encounters (and after a wipe, once the boss resets).
+  // drop combat mid-fight by idling through the 5s linger.
   collective_reversal: {
     id: 'collective_reversal',
     name: 'Collective Reversal',
@@ -2651,7 +2652,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['arcane'],
     cost: 250,
     castTime: 7,
-    cooldown: 300,
+    cooldown: 0,
     range: 0,
     school: 'arcane',
     requiresTarget: false,
@@ -3938,7 +3939,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 1.5,
     cooldown: 0,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     projectile: true,
     scalesWith: 'ranged',
@@ -3988,7 +3989,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 0,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -4019,7 +4020,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 6,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'arcane',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -4044,7 +4045,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 12,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     projectile: true, // a fired shot: damage/slow resolve when the bolt lands
     // A fired shot: its flat damage scales off Ranged AP like the other shots,
@@ -4163,7 +4164,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     exclusiveGroup: 'aspect',
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.3, duration: 1800 }],
     description:
-      "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze).",
+      "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 2 sec (each hit refreshes the daze).",
   },
   pack_rally: {
     id: 'pack_rally',
@@ -4194,7 +4195,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 2.5,
     cooldown: 0,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
@@ -4215,7 +4216,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     channel: { duration: 2.4, ticks: 6 },
     cooldown: 12,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     projectile: true,
     scalesWith: 'ranged',
@@ -4278,14 +4279,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 4,
     cost: 0,
     castTime: 0,
-    cooldown: 15,
+    cooldown: 20,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'hunterTrailbreak', distance: 12 }],
+    effects: [{ type: 'hunterTrailbreak', distance: 25 }],
     description:
-      'Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
+      'Leap 25 yards backward and break free of roots and movement slows. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
   },
   wildheart: {
     id: 'wildheart',
@@ -4658,7 +4659,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
+      'Passive: Arc Bolt, Skybranch, and Magma Burst grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
   },
   // Thundercall v0.44 rework (docs/prd/shaman-thundercall-elemental-v028.md,
   // "v0.44.0 rework"): the classic Lightning Overload talent at its 5/5 value,
@@ -4705,7 +4706,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
+      'Deal $d Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
   },
   // The Wrath-era Thunderstorm: the spec's panic button. The 8% mana return
   // is applied by combat/shaman_thundercall_kit.ts; the knockback is not
@@ -4875,12 +4876,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Heal a friendly target for $d, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritcall signature)',
   },
-  // ---- Spiritmend out-of-combat mass resurrection, the Chronomancy
-  // collective_reversal twin. requiresOutOfCombat is a real gate (the engaged pass in
-  // combat/engaged_combat.ts holds a backline healer in combat for the whole
-  // encounter), and the five-minute cooldown is the throttle across encounters. Kept
-  // equal to collective_reversal so the two mass rezzes cannot be played against each
-  // other; both are pinned to that equality.
+  // ---- Spiritmend out-of-combat mass resurrection. Like Collective Reversal,
+  // the combat hold prevents casting during an active encounter.
   ancestor_return: {
     id: 'ancestor_return',
     name: "Ancestors' Return",
@@ -4889,7 +4886,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 250,
     castTime: 7,
-    cooldown: 300,
+    cooldown: 0,
     range: 0,
     school: 'nature',
     requiresTarget: false,
@@ -5075,7 +5072,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Fire damage, then $o Fire damage over 12 sec. The initial hit increases with Spell Power.',
+      'Deal $d Fire damage, then $o Fire damage over $t sec. The initial hit increases with Spell Power.',
   },
   flametongue_weapon: {
     id: 'flametongue_weapon',
@@ -6287,6 +6284,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description: 'Heals a friendly target for $d.',
+    specNotes: {
+      // The three cast times are VERDANCE_WILDMEND_CAST_TIMES
+      // (combat/druid_engines.ts), pinned to this note by
+      // tests/druid_engines.test.ts.
+      restoration:
+        "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3. Nature's Boon makes it instant, free, and 25% stronger.",
+    },
   },
   mark_of_the_wild: {
     id: 'mark_of_the_wild',
@@ -6385,7 +6389,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   rejuvenation: {
     id: 'rejuvenation',
-    name: 'Wildbloom',
+    name: 'Sporemending',
     class: 'druid',
     learnLevel: 3,
     cost: 25,
@@ -6419,7 +6423,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Heals the target for $d over 12 sec.',
     specNotes: {
       restoration:
-        'Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Fleetmend becomes Overbloom.',
+        'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking. At 3 Verdance, Fleetmend becomes Overbloom.',
     },
   },
   thorns: {
@@ -6491,7 +6495,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_bear', value: 0.65, duration: 3600 }],
     description:
-      'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
+      'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
   },
   bear_charge: {
     id: 'bear_charge',
@@ -6548,7 +6552,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'A mauling attack that increases melee damage by $d and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage.',
+        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
     },
   },
   growl: {
@@ -6711,6 +6715,42 @@ export const ABILITIES: Record<string, AbilityDef> = {
       feral: 'Each hit that lands adds 1 Old Blood (max 3).',
     },
   },
+  scratch: {
+    id: 'scratch',
+    name: 'Scratch',
+    class: 'druid',
+    // The Cat Form sweep builder: Rendclaw's damage profile (the same flat
+    // bonus per rank, the same Wildfang baseline row in spec_baselines.ts) and
+    // Rendclaw's price, baseline for every druid, but every enemy within 6 yd
+    // takes its own swing (combat/druid_scratch.ts), each landed hit paying a
+    // combo point. Usable with nobody in reach: the sweep still goes off and
+    // spots any stealthed enemy inside it. Learned at 8, the first ding past
+    // the early-curve cap (tests/early_ability_curve.test.ts: levels 4 to 7
+    // already teach two core actives each).
+    learnLevel: 8,
+    cost: 45,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    awardsCombo: 1,
+    requiresForm: 'cat',
+    effects: [{ type: 'weaponStrike', bonus: 25, sweepRadius: 6 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 18,
+        cost: 45,
+        effects: [{ type: 'weaponStrike', bonus: 55, sweepRadius: 6 }],
+      },
+    ],
+    description:
+      'Scratch through nearby targets within 6 yards for weapon damage plus $d. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
+    specNotes: {
+      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+    },
+  },
   ferocious_bite: {
     id: 'ferocious_bite',
     name: 'Gorebite',
@@ -6768,7 +6808,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [
       { type: 'heal', min: 52, max: 62 },
-      { type: 'hot', total: 49, duration: 21, interval: 3 },
+      { type: 'hot', total: 49, duration: 15, interval: 3, closingHealFromDirect: true },
     ],
     ranks: [
       {
@@ -6777,13 +6817,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 72,
         effects: [
           { type: 'heal', min: 75, max: 90 },
-          { type: 'hot', total: 71, duration: 21, interval: 3 },
+          { type: 'hot', total: 71, duration: 15, interval: 3, closingHealFromDirect: true },
         ],
       },
     ],
-    description: 'Heals a friendly target for $d and an additional amount over 21 sec.',
+    description:
+      'Heals a friendly target for $d and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.',
     specNotes: {
-      restoration: 'Planting a NEW bloom adds 1 Verdance (max 5).',
+      restoration:
+        'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
     },
   },
   barkskin: {
@@ -6963,7 +7005,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 50,
     castTime: 0,
     cooldown: 0,
-    range: 8,
+    // 0 to 25 yd: the stealth opener reaches from range, so the cat can open
+    // on a target without first creeping to melee.
+    range: 25,
+    minRange: 0,
     school: 'physical',
     requiresTarget: true,
     awardsCombo: 1,
@@ -7066,6 +7111,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
+    // A burst-window button pressed alongside the rotation, not instead of it.
+    offGcd: true,
     requiresForm: 'cat',
     effects: [
       { type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 6 },
@@ -7653,7 +7700,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 15,
     range: 25,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     requiresTarget: true,
     effects: [
@@ -7692,7 +7739,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 60,
     range: 30,
-    minRange: 8,
+    minRange: 4,
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -7960,6 +8007,30 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Balance signature)',
   },
+  // Groveheart's caster form, the healer twin of Moonwing Form: a Groveheart
+  // signature beside Fleetmend (granted on the spec pick, talents_classic.ts),
+  // still spec-gated to Restoration through `specs`, a toggle like every form,
+  // and it keeps the whole spellbook and the mana bar. The +20% healing done,
+  // the +40% armor and the 20% slower pace read the form aura live
+  // (combat/druid_sporemender.ts, entity.ts, player_motion.ts); Loping Stride
+  // rides the druid FORM_ABILITY_IDS set (combat/druid_engines.ts).
+  sporemender_form: {
+    id: 'sporemender_form',
+    tooltipOmitEffectLines: true,
+    name: 'Sporemender Form',
+    class: 'druid',
+    specs: ['restoration'],
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'form_sporemender', value: 0, duration: 3600 }],
+    description:
+      'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
+  },
   feral_charge: {
     id: 'feral_charge',
     name: 'Primal Surge',
@@ -7990,9 +8061,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'consumeAura', auraKind: 'hot', heal: { min: 105, max: 125 } }],
-    actionReplacement: { abilityId: 'overbloom', auraKind: 'verdance', minStacks: 5 },
+    actionReplacement: { abilityId: 'overbloom', auraKind: 'verdance', minStacks: 3 },
     description:
-      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Sporemending, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
   },
   moonlash: {
     id: 'moonlash',
@@ -8113,10 +8184,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     threat: { flat: 110, mult: 2 },
     effects: [
       { type: 'directDamage', min: 78, max: 96 },
-      { type: 'druidMarrowbreakGuard', belowFrac: 0.5, absorbPctMaxHp: 0.18, rage: 15 },
+      { type: 'druidMarrowbreakGuard', belowFrac: 0.5, healPctMaxHp: 0.18, rage: 15 },
     ],
     description:
-      'Spends your 3 Old Blood for a heavy, high-threat strike of $d damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage.',
+      'Spends your 3 Old Blood for a heavy, high-threat strike of $d damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
   },
   overbloom: {
     id: 'overbloom',
@@ -8132,17 +8203,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     requiresAuraKind: 'verdance',
-    requiresAuraStacks: 5,
+    requiresAuraStacks: 3,
     effects: [{ type: 'druidOverbloom', harvestPct: 0.6 }],
     // The harvest fraction is the $b splice (the resolved druidOverbloom
     // harvestPct, see abilityBuffValue): Grovespring 4pc wearers read 75
     // there, everyone else the base 60.
     description:
-      'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+      'Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending.',
   },
 
-  // Groveheart resurrection parity: the combat single revive and the
-  // out-of-combat group revive share the five-minute healer cooldown.
+  // Groveheart combat resurrection retains its five-minute cooldown.
   wildwake: {
     id: 'wildwake',
     name: 'Wildwake',
@@ -8169,7 +8239,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 250,
     castTime: 7,
-    cooldown: 300,
+    cooldown: 0,
     range: 0,
     school: 'nature',
     requiresTarget: false,
@@ -8223,7 +8293,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 20,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: true,

@@ -122,8 +122,8 @@ const EXPECTED: Record<string, Row[]> = {
     { level: 20, cost: 80, effects: 'hot 168/12' }, // revalued cap (was 116)
   ],
   regrowth: [
-    { level: 14, cost: 55, effects: 'heal 52-62 + hot 49/21' },
-    { level: 20, cost: 72, effects: 'heal 75-90 + hot 71/21' }, // NEW cap rank
+    { level: 14, cost: 55, effects: 'heal 52-62 + hot 49/15' },
+    { level: 20, cost: 72, effects: 'heal 75-90 + hot 71/15' }, // NEW cap rank
   ],
   // ---- paladin
   // The paladin overhaul owns Mending Light's mana curve: it tuned the rank costs

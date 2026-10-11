@@ -137,7 +137,7 @@ function spellName(abilityId: string): string {
 
 /** A catalog aura's player-facing name, through the localized path its label
  *  names (the buff bar's own sim aura-name matcher for engines and seen auras). */
-function auraEntryName(entry: CooldownAuraEntry): string {
+export function auraEntryName(entry: CooldownAuraEntry): string {
   const label = entry.label;
   switch (label.type) {
     case 'ability':

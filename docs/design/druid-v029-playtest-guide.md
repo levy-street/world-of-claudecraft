@@ -107,15 +107,16 @@ nearly full bleeds.
 Bruin loop: keep Craven Roar up and maintain threat with Sweeping Claws and
 Bonecrush. Old Blood is shared with Wolf, so a bank built before shifting
 remains available. At three stages Bonecrush becomes Marrowbreak. Above half
-health it must deal its burst and snap threat without an absorb. Below half
-health it must deal no burst or snap threat and instead grant the absorb and
-rage refund.
+health it must deal its burst and snap threat without a heal. Below half
+health it must deal no burst or snap threat and instead heal for 18% of maximum
+health and refund rage.
 
 ## Groveheart
 
-Cast Wildbloom and Second Bloom deliberately across injured allies. Only casts
-that plant a new owned HoT add Verdance; refreshing the same owned HoT must not.
-Five plants transform Swiftmend into Overbloom. Let several owned HoTs retain
+Cast Wildbloom, Second Bloom, and Wildmend across injured allies. Every cast
+adds Verdance, including a refresh of the same owned HoT. Each stage should
+shorten the next Wildmend (2.2, 1.9, then 1.5 sec before haste), and three
+stages transform Swiftmend into Overbloom. Let several owned HoTs retain
 meaningful duration before spending: every affected ally should receive one
 immediate harvest heal, the old HoTs should disappear, and a fresh Wildbloom
 should appear on the selected target. With Seedspread, each harvested ally

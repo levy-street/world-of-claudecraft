@@ -508,7 +508,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.heroicMarkNote':
     'Heroïsche kerkers . besteed bij de heroïsche kwartiermeester',
   'hudChrome.currencies.honor': 'Eer',
-  'hudChrome.currencies.honorNote': 'Slagvelden en de arena',
+  'hudChrome.currencies.honorNote': 'Slagvelden, de arena en wereldquests',
   'hudChrome.currencies.intro':
     'Geen van deze nemen rugzakruimte in beslag. Munten blijven altijd in je rugzak.',
   'hudChrome.currencies.lifetime': 'Totaal {amount}',
@@ -1873,7 +1873,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Kondig nu een heuvel aan; zij rijst na de volledige waarschuwing.',
   'devCommand.actions.hillwarn.label': 'Heuvelaftelling',
   'entities.abilities.lava_burst.description':
-    'Veroorzaak {damage} Vuurschade. Slaat altijd kritiek toe op doelen die branden van jouw Sintelschok. Magmastroom: elke Sintelschok-slag heeft 20% kans dit afkoelingseffect opnieuw in te stellen en je volgende Magma Burst binnen 10 sec onmiddellijk uit te voeren. Schade neemt toe met Spreukenkracht. (Donderoproep)',
+    'Veroorzaak {damage} Vuurschade. Een treffer verleent 1 Donder. Slaat altijd kritiek toe op doelen die branden van jouw Sintelschok. Een kritieke treffer doet 24% van de normale schade extra. Magmastroom: elke Sintelschok-slag heeft 20% kans dit afkoelingseffect opnieuw in te stellen en je volgende Magma Burst binnen 10 sec onmiddellijk uit te voeren. Schade neemt toe met Spreukenkracht. (Donderoproep)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     'Passief: Boogbliksem en Gevorkte bliksem hebben 20% kans om Overbelast te raken, wat hun eerste doel opnieuw aanvalt voor 50% van de schade en geeft je 1 Donder. (Donderoproep)',
@@ -1882,7 +1882,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Roep een donderslag op die {damage} Natuurschade toebrengt aan vijanden binnen 10 meter en vertraagt hen 50% voor 5 sec. Herstelt 8% van je maximale Mana. Schade neemt toe met Spreukenkracht. (Donderoproep)',
   'entities.abilities.thunderstorm.name': 'Stormbreuk',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Werptijd van Grijpende Wortels is 0.5 sec korter.',
+    'Werptijd van Grijpende Wortels is 0.5 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Grijpende Wortels casten laat je bewegen en verhoogt je bewegingssnelheid 20% voor 4 sec. Kan niet meer dan eens per 20 sec gebeuren.',
   'entities.itemSets.vanguard_druid_balance.name': 'Sterrenwacht Gewaad',
@@ -1892,7 +1892,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Bruin-stormloop beschermt je voor 6% van je maximale gezondheid voor 6 sec.',
   'entities.itemSets.vanguard_druid_feral.name': 'Bloedmaan Huid',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Afkoelingseffect van Vleegheling is 1 sec korter.',
+    'Afkoelingseffect van Vleegheling is 1 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Vleegheling verhoogt je bewegingssnelheid ook 30% voor 3 sec.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Distelbloeiem Gewaad',
@@ -1911,20 +1911,22 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Bloedhaak geeft je 1 Jachtvaart.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Striktetand Harnas',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Afkoelingseffect van Tijdbarriere is 2 sec korter.',
+    'Afkoelingseffect van Tijdbarriere is 2 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Tijdbarriere verhoogt bewegingssnelheid van het afgeschermde doel ook 20% voor 3 sec.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Uurbinder Gewaden',
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Sintelval laadt 3 sec sneller op.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Sintelval laadt 3 sec sneller op. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Sintelval casten vermindert het resterende afkoelingseffect van Vlammende barriere 2 sec.',
   'entities.itemSets.vanguard_mage_fire.name': 'Gloeiende Gliering',
-  'entities.itemSets.vanguard_mage_frost.bonus2': 'Afkoelingseffect van IJsboei is 2 sec korter.',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    'Afkoelingseffect van IJsboei is 2 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'IJsboei casten vermindert het resterende afkoelingseffect van Flitsstap 5 sec.',
   'entities.itemSets.vanguard_mage_frost.name': 'Rijpwacht Mantel',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'Afkoelingseffect van Verbond van Leven is 30 sec korter.',
+    'Afkoelingseffect van Verbond van Leven is 30 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Verbond van Leven beschermt de bondgenoot ook voor 8% van hun maximale gezondheid voor 6 sec.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Zonnewacht Gliering',
@@ -1939,17 +1941,17 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Valkyrs Roeping stelt het afkoelingseffect van Laatste Edict opnieuw in, en je volgende Laatste Edict binnen 6 sec na het landen doet 15% meer schade.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Lichtbrand Krijgsplaat',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Afkoelingseffect van Terrorkantilene is 3 sec korter.',
+    'Afkoelingseffect van Terrorkantilene is 3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Wanneer je Psalm van Bewaking volledig is gebruikt, krijgt het afgeschermde gilde 20% bewegingssnelheid voor 3 sec. Kan niet meer dan eens per 8 sec gebeuren.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Sluierpsalm Gewaad',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'Afkoelingseffect van Sluierstap is 6 sec korter.',
+    'Afkoelingseffect van Sluierstap is 6 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Sluierstap beschermt je ook voor 8% van je maximale gezondheid voor 6 sec.',
   'entities.itemSets.vanguard_priest_holy.name': 'Genadsvleugel Gewaad',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litanie van Leed vertraagt beweging van het doel ook 30% terwijl je het canaliseren.',
+    'Litanie van Leed vertraagt beweging van het doel ook 30% terwijl je het canaliseren. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Roep Tithefiend beschermt je ook voor 10% van je maximale gezondheid voor 8 sec.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Schemerhymne Gliering',
@@ -1968,7 +1970,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Buikstoot geeft 2 extra combopunten wanneer gebruikt van Rookvlucht.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Schaduwgang Leder',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'Afkoelingseffect van Wapen Losmaken is 3 sec korter.',
+    'Afkoelingseffect van Wapen Losmaken is 3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Wapen Losmaken laat je bewegen en verhoogt je bewegingssnelheid 20% voor 4 sec. Kan niet meer dan eens per 20 sec gebeuren.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Onweergeschrift Strijdpantser',
@@ -1978,22 +1980,22 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Voorouderlijke Slag vermindert het resterende afkoelingseffect van Elementaire Trance 4 sec.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Stormgeborens Strijdpantser',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Helende Wateren casten 0.5 sec sneller op een bondgenoot onder 50% gezondheid.',
+    'Helende Wateren casten 0.5 sec sneller op een bondgenoot onder 50% gezondheid. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Tidenoproep beschermt zijn doel ook voor 5% van je maximale gezondheid voor 6 sec.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Ziltwacht Kettingpantser',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Werptijd van Teisteren is 0.3 sec korter.',
+    'Werptijd van Teisteren is 0.3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Verteren geneest je 30% meer en kan gekanaliseerd worden terwijl je beweegt.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Angstqvill Gewaden',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'Afkoelingseffect van Beenaarmering is 10 sec korter.',
+    'Afkoelingseffect van Beenaarmering is 10 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Oogstcommando vermindert het resterende afkoelingseffect van Beenaarmering 2 sec.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Merggebonden Gliering',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Afkoelingseffect van Cinderhide is 30 sec korter.',
+    'Afkoelingseffect van Cinderhide is 30 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Elke tweede Ontvlamming maakt je volgende Ruinenschicht binnen 8 sec onmiddellijk.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Slakkenkroon Gewaden',
@@ -4744,7 +4746,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhoogt de Oorlogvoering-Aanvals- en Verdedigingswaardering met 80. Een vijandige speler doden verleent Asstap, wat de bewegingssnelheid 6 sec lang met 40% verhoogt.',
   'entities.itemSets.warfare_ashstalker.name': 'Uitrusting van de Asjager',
   'entities.itemSets.warfare_cinderweave.bonus2':
-    'Verhoogt de Oorlogvoering-Verdedigingswaardering met 40.',
+    'Verhoogt de Oorlogvoering-Verdedigingswaardering met 40. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Verhoogt de Oorlogvoering-Aanvalswaardering met 40, en beheersing die vijandige spelers op u leggen duurt 15% korter.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4758,14 +4760,14 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhoogt de Oorlogvoering-Aanvals- en Verdedigingswaardering met 80. Een vijandige speler doden verleent Ongebroken Eed, wat 10 sec lang 200 schade absorbeert.',
   'entities.itemSets.warfare_furyforged.name': 'Woedgesmede Strijduitrusting',
   'entities.itemSets.warfare_stormbound.bonus2':
-    'Verhoogt de Oorlogvoering-Verdedigingswaardering met 40.',
+    'Verhoogt de Oorlogvoering-Verdedigingswaardering met 40. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Verhoogt de Oorlogvoering-Aanvalswaardering met 40, en beheersing die vijandige spelers op u leggen duurt 15% korter.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Verhoogt de Oorlogvoering-Aanvals- en Verdedigingswaardering met 80. Uw spreuken hebben 15% kans om Sintelwacht te verlenen, wat 8 sec lang 120 schade absorbeert.',
   'entities.itemSets.warfare_stormbound.name': 'Stormgebonden Gewaden',
   'entities.itemSets.warfare_thornhide.bonus2':
-    'Verhoogt de Oorlogvoering-Verdedigingswaardering met 40.',
+    'Verhoogt de Oorlogvoering-Verdedigingswaardering met 40. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Verhoogt de Oorlogvoering-Aanvalswaardering met 40, en beheersing die vijandige spelers op u leggen duurt 15% korter.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -7909,7 +7911,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Schiet het doelwit voor {damage} Arcane schade. De schade stijgt met de aanvalskracht op afstand.',
   'entities.abilities.arcane_shot.name': 'Boosaardig Schot',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Neem de gedaante van de renner aan en verhoog uw bewegingssnelheid 30 min lang met 30%. Zolang actief, verdooft opgelopen schade u, wat uw bewegingssnelheid 4 sec lang halveert (elke treffer vernieuwt de verdoving).',
+    'Neem de gedaante van de renner aan en verhoog uw bewegingssnelheid 30 min lang met 30%. Zolang actief, verdooft opgelopen schade u, wat uw bewegingssnelheid 2 sec lang halveert (elke treffer vernieuwt de verdoving).',
   'entities.abilities.aspect_of_the_cheetah.name': 'Gedaante van de Renner',
   'entities.abilities.aspect_of_the_hawk.description':
     'Neem de gedaante van de blauwe kiekendief aan en verhoog uw aanvalskracht 30 min lang met {buff}.',
@@ -7931,7 +7933,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Gedurende 3 sec daarna is Wolfsgedaante gratis en pint het doelwit vast, wat het 4 sec lang 50% vertraagt. Bereik 8-25 m. Alleen in Bruingedaante.',
   'entities.abilities.bear_charge.name': 'Bruin-stormloop',
   'entities.abilities.bear_form.description':
-    'Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Bij het aannemen van een gedaante krijg je Sluipdraf, een korte uitbarsting van bewegingssnelheid. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante.',
+    'Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Je slaat twee keer zo snel voor de helft van de schade per slag, en elke slag bouwt dubbel zoveel woede op. Bij het aannemen van een gedaante krijg je Sluipdraf, een korte uitbarsting van bewegingssnelheid. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante.',
   'entities.abilities.bear_form.name': 'Bruingedaante',
   'entities.abilities.berserker_rage.description':
     'Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)',
@@ -8054,7 +8056,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Roept een vuurexplosie op in het doelgebied die vijanden in de explosie {damage} Vuurschade toebrengt.',
   'entities.abilities.flame_shock.description':
-    'Brengt {damage} Vuurschade toe, daarna in 12 sec {overTime} Vuurschade. De eerste treffer stijgt met de Spreukkracht.',
+    'Brengt {damage} Vuurschade toe, daarna in {duration} sec {overTime} Vuurschade. De eerste treffer stijgt met de Spreukkracht.',
   'entities.abilities.flame_shock.name': 'Sintelschok',
   'entities.abilities.flametongue_weapon.description':
     'Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra Vuurschade toe.',
@@ -8100,6 +8102,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht.',
   'entities.abilities.heal.name': 'Plechtig Gebed',
   'entities.abilities.healing_touch.description': 'Geneest een bevriend doelwit voor {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Elke voltooide spreuk voegt 1 Groenkracht toe (max 3). Opgebouwde Groenkracht verkort deze spreuk: 2,2 sec bij 1 Groenkracht, 1,9 sec bij 2 en 1,5 sec bij 3. Zegening der Natuur maakt hem direct, gratis en 25% sterker.',
   'entities.abilities.healing_touch.name': 'Wildheling',
   'entities.abilities.healing_wave.description':
     'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht. Herstel: bewaart 50% van de volle genezing vóór overgenezing 12 sec lang als Helende Stroom, tot 30% van de maximale gezondheid van het doelwit.',
@@ -8195,7 +8199,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Slaat toe voor 10% wapenschade plus {damage}. Een treffer herstelt 15 Focus en verleent 1 Jachtvaart. De schade stijgt via de wapenschade met de aanvalskracht.',
   'entities.abilities.raptor_strike.name': 'Ontweiende Slag',
   'entities.abilities.regrowth.name': 'Tweede Bloei',
-  'entities.abilities.rejuvenation.name': 'Wildbloei',
   'entities.abilities.renew.description':
     'Geneest het doelwit in 15 sec voor {damage}, eens per 3 sec. De genezing stijgt met de Spreukkracht.',
   'entities.abilities.renew.name': 'Aanhoudende Genade',
@@ -15891,7 +15894,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     'Roept 12 sec. lang 3 beesten op. Elk valt elke 2 sec. aan voor {damage} fysieke schade. De getoonde schade bevat 8% van je afstandsaanvalskracht vóór huisdierschadebonussen. De beesten leggen de Roedelfelheid vast bij het oproepen en winnen 10% schade per stapel. Terwijl de Stormloop afkoelt, hebben geslaagde Roedelbevelen 20% kans om hem te herstellen, gegarandeerd na 5 mislukte kansen. Hij kan niet herstellen zolang de beesten actief zijn. (Roedelheer)',
   'entities.abilities.trailbreak.description':
-    'Spring 12 meter achterwaarts. Als je Jachtvaart hebt, wordt die vernieuwd en maakt de Terugkeer 12 sec. gereed.',
+    'Spring 25 meter achterwaarts en bevrijd je van wortels en vertragingen. Als je Jachtvaart hebt, wordt die vernieuwd en maakt de Terugkeer 12 sec. gereed.',
   'entities.abilities.unleash_beast.description':
     'Verbruikt 3 Roedelfelheid nadat je huisdier heeft toegeslagen voor 83 tot 105 fysieke schade en elke vijand binnen 6 meter heeft geschud voor 26 tot 34. De slag en de schok gebruiken de volledige huisdierschadebonus van 30% van Roedelfelheid en stijgen met de aanvalskracht van het huisdier. De volgende 8 sec. richt het huisdier 25% meer schade aan, valt 35% sneller aan en laat het Boosaardig Schot tot 2 nabije vijanden raken.',
   'entities.abilities.wildheart.description': 'Herstelt direct 30% van je maximale gezondheid.',
@@ -15918,7 +15921,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passief: terwijl de Voorouderslag afkoelt, heeft het verbruiken van een Stormteken 25% kans om hem te herstellen. Als de eerste 3 kansen mislukken, herstelt de 4e hem altijd. (Krijgsgeest)',
   'entities.abilities.thunder_reservoir.description':
-    'Passief: de Boogbliksem en de Gevorkte bliksem verlenen Donder, tot 5. Bij 5 Donder richt de Aardse Schok 125% meer schade aan of de Aardbeving 100% meer, en dan wordt alle Donder verbruikt. (Donderroep)',
+    'Passief: de Boogbliksem, de Gevorkte bliksem en Magma Burst verlenen Donder, tot 5. Bij 5 Donder richt de Aardse Schok 125% meer schade aan of de Aardbeving 100% meer, en dan wordt alle Donder verbruikt. (Donderroep)',
   'entities.abilities.tidecall.description':
     'Geneest een bevriend doelwit voor {damage}. De genezing neemt toe met spreukkracht. Voegt de volledige genezing vóór overgenezing toe aan de Herstelstroom, tot 30% van de maximale gezondheid van het doelwit.',
   'entities.abilities.unleash_weapon.description':
@@ -15990,7 +15993,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Mergbreker',
   'entities.abilities.marrowbreak.description':
-    'Verbruikt je 3 Oud Bloed voor een zware slag met hoge dreiging van {damage} schade. Onder de helft van je gezondheid beschermt hij je in plaats daarvan met een schild van 18% van je maximale gezondheid gedurende 8 sec en geeft 15 woede terug.',
+    'Verbruikt je 3 Oud Bloed voor een zware slag met hoge dreiging van {damage} schade. Onder de helft van je gezondheid geneest hij je in plaats daarvan voor 18% van je maximale gezondheid en geeft 15 woede terug.',
   'entities.abilities.moonlash.name': 'Maangolf',
   'entities.abilities.moonlash.description':
     'Verbruikt je 3 Maanvloed voor een zware slag van {damage} Arcane-schade: de schadekeuze. Zonnespoor verbruikt dezelfde 3 Maanvloed, dus kies er een.',
@@ -15999,7 +16002,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Alleen in Maanuilvorm. Slaat toe voor {damage} Arcane-schade, voegt een Maanvloed-stadium toe en verlengt je Maanstorm met 6 sec, tot {duration} sec per toepassing. Bij volle Maanvloed wordt Maanzaad Maangolf.',
   'entities.abilities.overbloom.name': 'Overbloei',
   'entities.abilities.overbloom.description':
-    'Verbruikt 5 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit.',
+    'Verbruikt 3 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Sporemending op het doelwit.',
   'entities.abilities.redharvest.name': 'Rode Oogst',
   'entities.abilities.redharvest.description':
     'Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en {rage} energie herstelt. Werkt ook zonder combopunten.',
@@ -16013,7 +16016,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Oud Bloed: stadium {stacks} van {max}. Gelande Kat- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen',
   'hudChrome.auraEffect.verdance':
-    'Groenkracht: stadium {stacks} van {max}. Voltooide Wildbloei- en Tweede Bloei-spreuken vullen haar; bij {max} wordt Snelle genezing Overbloei',
+    'Groenkracht: stadium {stacks} van {max}. Elke Sporemending, Tweede Bloei of Wildheling die je uitspreekt voegt 1 toe, en elk stadium verkort de spreektijd van Wildheling; bij {max} wordt Snelle genezing Overbloei',
   'sim.rift.allUnstable': 'Alle rifts zijn op dit moment onstabiel. Probeer het straks opnieuw.',
   'sim.rift.alreadyCleared': 'Deze rift is al opgeruimd door {names}.',
   'sim.rift.deadEntry': 'Je kunt geen rift betreden terwijl je dood bent.',
@@ -16572,7 +16575,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Een verpletterende aanval die je meleeschade met {damage} verhoogt en veel dreiging veroorzaakt. Wordt geactiveerd bij je volgende slag. Alleen in Bruingedaante.',
   'entities.abilities.maul.specNote_feral':
-    'Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Mergbreker: een slag voor 78 tot 96 schade met hoge dreiging; onder de helft van je gezondheid beschermt hij je in plaats daarvan met een schild van 18% van je maximale gezondheid en geeft 15 woede terug.',
+    'Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Mergbreker: een slag voor 78 tot 96 schade met hoge dreiging; onder de helft van je gezondheid geneest hij je in plaats daarvan voor 18% van je maximale gezondheid en geeft 15 woede terug.',
   'entities.abilities.moonfire.description':
     'Verbrandt de vijand met maanvuur voor {damage} Arcaneschade plus schade over tijd.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16605,12 +16608,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Besteedt 2 Zielfragmenten om elke ondode dienaar te bevelen gelijktijdig toe te slaan. Grafwachten tarten en schrap zich, Skeletkrijgers zetten vast, Botmagiërs stellen magische verdediging bloot, en Grafvleugels verscheuren alle geraakte vijanden.',
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Geneest een bevriend doelwit voor {damage} en een extra hoeveelheid over 21 sec.',
+    'Geneest een bevriend doelwit voor {damage} en een extra hoeveelheid over 15 sec. Als het effect zijn volledige duur aanhoudt, geneest het het doelwit opnieuw voor hetzelfde bedrag als de eerste genezing.',
   'entities.abilities.regrowth.specNote_restoration':
-    'Het planten van een NIEUWE bloei voegt 1 Groenkracht toe (max 5).',
+    'Elke spreuk voegt 1 Groenkracht toe (max 3), ook als hij een bloei vernieuwt die al actief is.',
   'entities.abilities.rejuvenation.description': 'Geneest het doelwit voor {damage} over 12 sec.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Het planten van een NIEUWE bloei voegt 1 Groenkracht toe (max 5). Bij 5 Groenkracht wordt Snelle genezing Overbloei.',
+    'Elke spreuk voegt 1 Groenkracht toe (max 3), ook als hij een bloei vernieuwt die al actief is. Bij 3 Groenkracht wordt Snelle genezing Overbloei.',
   'entities.abilities.rip.description':
     'Afmaakactie die het doelwit elke 2 sec laat bloeden gedurende 24 sec: 36 schade plus 24 per besteed combopunt (5 combopunten: {damage} totaal). Alleen in Katgedaante.',
   'entities.abilities.rip.specNote_feral': 'De gelande treffer voegt 1 Oud Bloed toe (max 3).',
@@ -16653,7 +16656,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Elke opener die je vanuit Schemersluier gebruikt, voegt 1 Schemer toe (max 3).',
   'entities.abilities.swiftmend.description':
-    'Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het te genezen voor {damage}. Het planten van Wildbloei en Tweede Bloei voegt Groenkracht toe; bij 5 Groenkracht wordt deze knop Overbloei, die onmiddellijk elke bondgenoot met jouw genezing-over-tijd-effecten geneest voor 60% van wat die effecten nog over hadden. (Boshart-kenmerk)',
+    'Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het te genezen voor {damage}. Elke spreuk van Sporemending, Tweede Bloei en Wildheling voegt 1 Groenkracht toe; bij 3 Groenkracht wordt deze knop Overbloei, die onmiddellijk elke bondgenoot met jouw genezing-over-tijd-effecten geneest voor 60% van wat die effecten nog over hadden. (Boshart-kenmerk)',
   'entities.abilities.swipe.description':
     'Veeg met je klauwen door nabije vijanden voor {damage} schade. Veroorzaakt extra dreiging. Alleen in Bruingedaante.',
   'entities.abilities.swipe.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
@@ -17760,8 +17763,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'De unisono-aanvallen van Reaping Command richten 25 procent meer schade aan.',
   'entities.itemSets.gravebrand.name': 'Grafmerk-Regalia',
-  'entities.itemSets.grovespring.bonus2':
-    'Snelle genezing verbruikt eerst je eigen Wildbloom of Second Bloom en geneest 25 procent meer. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',
   'entities.itemSets.grovespring.bonus4':
     'Overbloom oogst 75 procent van je resterende effecten en slaat daarna 1 Verdance op.',
   'entities.itemSets.grovespring.name': 'Bosbron-Kledij',
@@ -19547,7 +19548,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     "Een overwinning met rating betaalt Eer, de speler-tegen-speler-valuta, en een nederlaag die je tot het einde speelt betaalt er nog steeds een kleiner deel van, net als een gelijkspel, dus rating is het enige dat een nederlaag echt kost. Eer beloont echte wedstrijden: dezelfde tegenstander of hetzelfde team opnieuw op dezelfde dag verslaan levert niets extra's op, en opnieuw van hen verliezen evenmin. Een lange overwinningsdag betaalt volledig voor de eerste reeks overwinningen, halveert daarna de beloning en halveert haar verderop nogmaals, waarna die laag blijft. Een wedstrijd die je tegenstander opgeeft verschuift je rating nog steeds, maar betaalt helemaal geen Eer. Die dag hoort bij het rijk zelf: hij rolt om op het nachtelijke resetuur van het rijk, dezelfde grens waarop elke dagelijkse uitsluiting wordt gewist.",
   'guide.arenaPage.warfareBodyStatsStay':
-    'Elk Oorlogsstuk draagt een aanvals- en verdedigingsrating voor Oorlogsvoering, en die twee ratings doen helemaal niets tegen monsters. Ze gelden alleen wanneer je tegen een andere speler vecht, in een duel, de arena of het slagveld. Aanval verhoogt daar de schade die je toebrengt en Verdediging verlaagt de schade die je ontvangt, elk tot zijn eigen plafond. Elke pantserfamilie is ook een verzameling en haar setbonussen zijn eveneens ratings of effecten voor Oorlogsvoering die alleen tegen spelers werken, dus de setbonussen van een volledige Eerset tellen niets tegen een kerkerbaas. De stukken zelf dragen nog steeds hun gewone statistieken, pantser en wapenschade, en die werken overal. Het zijn de ratings en setbonussen voor Oorlogsvoering die tegen een monster stilvallen.',
+    'Elk Oorlogsstuk draagt een aanvals- en verdedigingsrating voor Oorlogsvoering, en die twee ratings doen helemaal niets tegen monsters. Ze gelden alleen wanneer je tegen een andere speler vecht, in een duel, de arena of het slagveld. Aanval verhoogt daar de schade die je toebrengt en Verdediging verlaagt de schade die je ontvangt, elk tot zijn eigen plafond. Elke pantserfamilie is ook een verzameling en haar setbonussen zijn eveneens ratings of effecten voor Oorlogsvoering die alleen tegen spelers werken, dus de setbonussen van een volledige Eerset tellen niets tegen een kerkerbaas. De stukken zelf dragen nog steeds hun gewone statistieken, pantser en wapenschade, en die werken overal. Het zijn de ratings en setbonussen voor Oorlogsvoering die tegen een monster stilvallen. Eén uitzondering werkt overal: twee delen van een spreukwerkersset zorgen er ook voor dat opgelopen schade je spreuken niet meer vertraagt.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Dat is de bewuste ruil. Oorlogsuitrusting is gemaakt om tegen spelers te vechten, niet als sluiproute langs de kerkerlagen. Een Oorlogsstuk draagt nooit de gevechtsratings die een episch kerkerstuk op dezelfde plek heeft, en de rating en setbonussen voor Oorlogsvoering die het in plaats daarvan draagt, worden volledig tegen andere spelers ingezet. Als je je in de arena wilt weren, koop het dan. Als je heroïsche kerkers sneller wilt voltooien, verdien je uitrusting dan in de kerkers.',
   'guide.controls.harvestJournal': 'Oogstdagboek',
@@ -20032,4 +20033,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Effectief: {effective} | Overhealing: {overheal} ({overhealPercent}) | Treffers: {hits} ({critPercent} crit.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Treffers: {hits} | Kritiek: {crits} ({critPercent}) | Gemiddeld: {average} | Min./max.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Omgevingsvolume',
+  'hudChrome.mapAtlas.resizeRailAria': 'Breedte van kaartzijbalk',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Sleep om de kaartzijbalk te vergroten of te verkleinen. Dubbelklik om te resetten.',
 };

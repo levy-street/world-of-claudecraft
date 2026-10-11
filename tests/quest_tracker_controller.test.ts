@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { QUESTS, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { createForgeWorkshop } from '../src/sim/minigames/forge_workshop';
 import { createGliderFlightState, scoreGliderFlight } from '../src/sim/minigames/glider_flight';
-import type { QuestProgress, WorldQuestProgress } from '../src/sim/types';
+import type { QuestProgress, WeeklyQuestProgress, WorldQuestProgress } from '../src/sim/types';
 import * as questStrip from '../src/ui/hud/quest/quest_strip_controller';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
 import { makeWriterFacet } from '../src/ui/painter_host';
@@ -52,6 +52,7 @@ function harness(
   entries: QuestProgress[] = [],
   worldEntries: WorldQuestProgress[] = [],
   clueHunt: { huntId: string; step: number } | null = null,
+  weeklyQuest: WeeklyQuestProgress | null = null,
 ) {
   // The World Quests section lists a quest only while the player stands in
   // its area, so the rig's player stands at the first world quest's centre.
@@ -119,6 +120,7 @@ function harness(
         questLog,
         worldQuestLog,
         clueHunt,
+        weeklyQuest,
       }) as unknown as Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog' | 'clueHunt'>,
     settings,
     tracking,
@@ -128,6 +130,9 @@ function harness(
   });
   return {
     controller,
+    setWeeklyQuest: (next: WeeklyQuestProgress | null) => {
+      weeklyQuest = next;
+    },
     playerPos,
     questLog,
     tracking,
@@ -149,6 +154,58 @@ function harness(
 }
 
 describe('QuestTrackerController', () => {
+  it('tracks the emissary charge live without a quest-log button or map badge', () => {
+    const weekly: WeeklyQuestProgress = {
+      questId: 'wk_dungeons',
+      week: 'wk_1',
+      count: 0,
+      state: 'active',
+    };
+    const test = harness([], [], null, weekly);
+    test.controller.update(0);
+    expect(test.html()).toContain('Weekly quest: Dungeons');
+    expect(test.html()).toContain('Dungeons completed: 0/3');
+    expect(test.html()).not.toContain('data-quest=');
+    expect(test.html()).not.toContain('qt-num');
+    test.controller.update(1);
+    expect(test.writes()).toBe(1);
+    weekly.count = 2;
+    test.controller.update(2);
+    expect(test.html()).toContain('Dungeons completed: 2/3');
+    weekly.state = 'completed';
+    test.controller.update(3);
+    expect(test.html()).toBe('');
+    test.setWeeklyQuest({ ...weekly, count: 0, state: 'active' });
+    test.controller.update(4);
+    expect(test.html()).toContain('Dungeons completed: 0/3');
+    test.setWeeklyQuest(null);
+    test.controller.update(5);
+    expect(test.html()).toBe('');
+  });
+
+  it('keeps the weekly row in the shared touch projection alongside ordinary quests', () => {
+    const update = vi.fn();
+    const spy = vi.spyOn(questStrip, 'buildQuestStrip').mockReturnValue({
+      active: () => true,
+      update,
+    } as unknown as questStrip.QuestStripController);
+    try {
+      const test = harness([progress('q_boars')], [], null, {
+        questId: 'wk_raid',
+        week: 'wk_1',
+        count: 0,
+        state: 'active',
+      });
+      test.controller.update(0);
+      const rows = update.mock.calls[0][0];
+      expect(rows.map((row: { id: string }) => row.id)).toEqual(['q_boars', 'wk_raid']);
+      expect(rows[0].number).toBe(1);
+      expect(rows[1].objectives[0].label).toBe('Raids completed: 0/1');
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
   it('drops an untracked quest from the tracker and reserves its acceptance number', () => {
     // The map badges number every LOG entry, so an untracked quest must leave a
     // gap rather than renumber the rows after it; otherwise a tracker row and the
@@ -564,6 +621,21 @@ describe('QuestTrackerController', () => {
     entry.count = 4;
     test.controller.update(1);
     expect(test.html()).toContain(`${worldQuestObjectiveLabel(questId)}: 4/${total}`);
+  });
+
+  it('does not list a reward-free practice replay as an active world quest', () => {
+    const questId = 'wq_eastbrook_bandits';
+    const entry: WorldQuestProgress = {
+      questId,
+      count: 0,
+      state: 'active',
+      practiceOnly: true,
+    };
+    const test = harness([], [entry]);
+
+    test.controller.update(0);
+
+    expect(test.html()).not.toContain(worldQuestDisplayName(questId));
   });
 
   it('collapses each section on its own header and persists it in its own setting', () => {

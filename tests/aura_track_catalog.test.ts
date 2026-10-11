@@ -145,7 +145,7 @@ describe('aura track catalog: what it derives', () => {
       // Chronomancy's ally mark. The content models it with its own effect type
       // rather than `hot` (an echo converts the mage's Arcane damage into healing
       // instead of ticking a stored total), which is exactly how it fell out of
-      // every track while Wildbloom and Renew sailed through.
+      // every track while Sporemending and Renew sailed through.
       ['temporal_echo', 'hot'],
       ['power_word_shield', 'absorb'],
       ['ice_barrier', 'absorb'],
@@ -233,8 +233,8 @@ describe('aura track catalog: what it derives', () => {
     // Chronomancy's Temporal Echo went missing from all six tracks that way: the
     // content models the mark with its own effect type (an echo converts the
     // mage's Arcane damage into healing on the marked ally rather than ticking a
-    // stored total), so the `type === 'hot'` rule never saw it, while Wildbloom
-    // sailed through. Wildbloom is the control arm here for exactly that reason:
+    // stored total), so the `type === 'hot'` rule never saw it, while Sporemending
+    // sailed through. Sporemending is the control arm here for exactly that reason:
     // a run where only the mage arm fails is the player report ("the druid's
     // shows up and the chronomancer's does not") reproduced.
     //

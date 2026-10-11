@@ -1,3 +1,5 @@
+import { parseRealmMotdArguments, type RealmMotdCommand } from './realm_motd';
+
 export const MODERATION_COMMAND_REASON_MAX = 500;
 export const MODERATION_COMMAND_MINUTES_MAX = 10 * 365 * 24 * 60;
 
@@ -19,7 +21,8 @@ export type ModerationChatCommand =
       reason: string | null;
       malformed: boolean;
     }
-  | { kind: 'unjail'; name: string | null; malformed: boolean };
+  | { kind: 'unjail'; name: string | null; malformed: boolean }
+  | { kind: 'motd'; command: RealmMotdCommand };
 
 function cleanReason(raw: string): string {
   const reason = raw.trim().slice(0, MODERATION_COMMAND_REASON_MAX);
@@ -155,5 +158,7 @@ export function parseModerationChatCommand(text: string): ModerationChatCommand 
   if (unjail) {
     return { kind: 'unjail', ...parseOptionalQuotedName(unjail[1] ?? '') };
   }
+  const motd = /^\/motd(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (motd) return { kind: 'motd', command: parseRealmMotdArguments(motd[1] ?? '') };
   return null;
 }

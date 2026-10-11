@@ -1159,4 +1159,8 @@ export const table: DeedLocaleTable = {
     name: '현행범',
     desc: '묻힌 보물에서 동전자루 좀도둑이 금화를 들고 도망치기 전에 처치하세요.',
   },
+  exp_wisp_maze_hard: {
+    name: '그림자보다 밝게',
+    desc: '어려움 난이도에서 훔쳐 간 동전 주머니를 되찾고 상록 정원의 미로를 탈출하십시오.',
+  },
 };

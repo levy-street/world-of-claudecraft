@@ -177,6 +177,10 @@ describe('weekly reward pane', () => {
     });
     pane.renderInto(root);
     expect(root.querySelectorAll('.weekly-track-pvp .weekly-earned').length).toBeGreaterThan(0);
+    const pvpLabels = [...root.querySelectorAll('.weekly-track-pvp .weekly-milestone-label')].map(
+      (label) => label.textContent,
+    );
+    expect(pvpLabels).toEqual(['1 PvP Win', '3 PvP Wins', '5 PvP Wins']);
     expect(root.querySelectorAll('.weekly-track-world .weekly-earned')).toHaveLength(0);
     expect(root.querySelector('.weekly-confirm')).toBeNull();
     expect(root.querySelector('.weekly-choice')).toBeNull();

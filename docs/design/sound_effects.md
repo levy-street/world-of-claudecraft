@@ -99,8 +99,13 @@ apart; verify by ear or against the source before treating a hit as a defect.
 
 ### `src/game/sfx.ts` — `Sfx` (singleton `sfx`)
 A decoupled 3D engine with **its own `AudioContext` + `AudioListener`** (siblings:
-`audio`/`music`/`voice`). Driven by the `sfxVolume` setting (wired alongside
-`audio.setVolume` in `main.ts`). API:
+`audio`/`music`/`voice`). Two output buses, one per Audio panel slider: the
+effects master driven by the `sfxVolume` setting (wired alongside
+`audio.setVolume` in `main.ts`) and the ambience bus driven by `ambientVolume`.
+`sfxMixBus` (`src/game/sfx_mix_bus.ts`) picks the bus per clip key: the
+manifest's `ambience` category plus the procedural crowd bed go to ambience;
+everything else, including the point emitters of gameplay objects (rift portal,
+buried hoard, rift hazards), stays on effects. API:
 - `init()` — gated on the same user gesture as `audio.init()` (`enterWorld`);
   preloads the startup working set and lazily deduplicates fetch/decode work for
   contextual cues.

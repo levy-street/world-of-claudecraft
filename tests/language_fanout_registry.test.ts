@@ -627,6 +627,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'hud.ts',
+    memos: ['lastInstanceDifficulty', 'lastInstanceDungeonId'],
+    answer: 'this.relocalizeCoordinatorMemos',
+    why: 'the instance difficulty badge signature: dungeon id plus normal/heroic state. Both fields are text-independent, but past the gate the badge title and aria-label resolve dungeonDisplayName() and hudChrome.finder.*. Cleared to null so the next HUD update rewrites the labels in the active language even if the player remains in the same instance',
+  },
+  {
+    file: 'hud.ts',
     memos: ['lastCraftingCastSig', 'lastCraftingReagentSig', 'lastCraftingStationSig'],
     answer: 'this.renderCrafting',
     why: "the crafting window's cast, reagent and station signatures: cast ids and integer progress, reagent ids and counts, the station set. All text-independent, and the fan-out already forces one full renderCrafting rebuild on a switch when the window is open, which re-runs every t() including the identity card",
@@ -1402,6 +1408,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       lastMailUnread: { value: '-1', why: 'mailIndicatorView clamps the count at 0' },
       lastLootSettingsSig: { value: "''", why: 'every real sig carries / separators' },
       lastPetBarSig: { value: "''", why: 'every real sig starts with the pet id and a colon' },
+      lastInstanceDifficulty: {
+        value: 'this.lastInstanceDungeonId = null',
+        why: 'the chained assignment leaves both fields null',
+      },
+      lastInstanceDungeonId: { value: 'null', why: 'dungeon id is a string or null' },
       lastCompassFacing: { value: 'Number.NaN', why: 'facing is a float; NaN never equals itself' },
       lastCompassHeading: { value: "''", why: 'a heading is one of the eight rose ids' },
     };

@@ -45,6 +45,8 @@ const ADDRESSED_COMMANDS: ReadonlyArray<{
    *  whose game.ts case is a delegating label group (the vault_wire.ts /
    *  bank_wire.ts seam). Defaults to server/game.ts. */
   dispatchIn?: string;
+  /** Optional orchestration hop between game.ts and the field parser. */
+  dispatchVia?: { module: string; symbol: string };
 }> = [
   { cmd: 'salvage_item', field: 'slot' },
   { cmd: 'disenchant_item', field: 'slot', why: 'the original precise surface' },
@@ -62,7 +64,12 @@ const ADDRESSED_COMMANDS: ReadonlyArray<{
   // The bank-aimed twin of equip_bag (Bank Storage phase 07): the bags-side
   // socket click always names the exact carried copy. Its parse arm lives in
   // the delegated dispatch module, not game.ts's label group.
-  { cmd: 'bank_socket_bag', field: 'slot', dispatchIn: 'server/bank_wire.ts' },
+  {
+    cmd: 'bank_socket_bag',
+    field: 'slot',
+    dispatchIn: 'server/bank_wire.ts',
+    dispatchVia: { module: 'server/bank_storage_command.ts', symbol: 'dispatchBankStorageCommand' },
+  },
   // The forge pair: game.ts labels fall through to server/rift_forge_dispatch.ts,
   // where each arm parses msg.slot. rift_enchant_item is absent on purpose:
   // retired with the band item-level ladder, it has no ClientWorld sender (a
@@ -261,7 +268,7 @@ describe('every item command can name the copy it acts on', () => {
 
   it.each(ADDRESSED_COMMANDS)(
     '$cmd is parsed and forwarded server-side',
-    ({ cmd, field, dispatchIn }) => {
+    ({ cmd, field, dispatchIn, dispatchVia }) => {
       // The client being able to SEND it is half the contract; the server arm has
       // to read it, or the selection is silently dropped at the authority boundary,
       // which is indistinguishable from the bug.
@@ -284,19 +291,31 @@ describe('every item command can name the copy it acts on', () => {
       if (dispatchIn) {
         const labelAt = SERVER.indexOf(`case '${cmd}':`);
         expect(labelAt, `no game.ts label for delegated ${cmd}`).toBeGreaterThan(-1);
-        const group = SERVER.slice(labelAt, labelAt + 400);
+        const group = stripComments(SERVER.slice(labelAt)).split(/\bbreak\s*;/, 1)[0];
         // The expected dispatcher is DERIVED from the row's own module name
         // (bank_wire.ts -> dispatchBankCommand), never the generic
-        // dispatch\w+Command pattern: the window is a char count, so a
-        // NEIGHBORING group's delegation call (vault_wire's sits ~150 chars
-        // past the edge today) could drift inside it under comment shrinkage
-        // and satisfy a generic match while THIS command's call was deleted.
-        // Naming the dispatcher makes the wrong module's call unable to pass.
+        // dispatch\w+Command pattern. Bound the fall-through group at its
+        // break so a neighboring group's call cannot satisfy the assertion.
+        // An orchestration hop must forward the same host, owner, command and
+        // frame to the parser; naming the hop alone would lose that proof.
         const domain = dispatchIn.replace(/^server\//, '').split('_')[0];
         const dispatcher = `dispatch${domain[0].toUpperCase()}${domain.slice(1)}Command(`;
-        expect(group, `${cmd}'s game.ts group must delegate to ${dispatcher}`).toContain(
-          dispatcher,
-        );
+        const entry = dispatchVia ? `${dispatchVia.symbol}(` : dispatcher;
+        expect(group, `${cmd}'s game.ts group must delegate to ${entry}`).toContain(entry);
+        if (dispatchVia) {
+          expect(group.replace(/\s+/g, ' ')).toContain(`${entry}sim, session, command, msg,`);
+          const module = dispatchVia.module.replace(/^server\//, './').replace(/\.ts$/, '');
+          expect(SERVER_STRIPPED).toContain(`import { ${dispatchVia.symbol} } from '${module}';`);
+          const via = stripComments(
+            readFileSync(new URL(`../${dispatchVia.module}`, import.meta.url), 'utf8'),
+          );
+          const viaAt = via.indexOf(`case '${cmd}':`);
+          expect(viaAt, `no orchestration label for ${cmd}`).toBeGreaterThan(-1);
+          const viaGroup = via.slice(viaAt).split(/\bbreak\s*;/, 1)[0];
+          expect(viaGroup.replace(/\s+/g, ' ')).toContain(
+            `${dispatcher}sim, session, command, msg, session.pid, admission);`,
+          );
+        }
       }
       const src = dispatchIn
         ? readFileSync(new URL(`../${dispatchIn}`, import.meta.url), 'utf8')

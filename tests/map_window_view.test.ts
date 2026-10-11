@@ -1,3 +1,4 @@
+import { FERRY_PORTS } from '../src/ui/ferry_port_map_core';
 // Tests for the overworld map window pure core (map_window_view.ts):
 //  - the mode discriminator (delve vs overworld) under both world shapes,
 //  - the pure overworld draw model: Sim-vs-ClientWorld parity + determinism,
@@ -1169,8 +1170,11 @@ describe('world-quest zone markers', () => {
     return found;
   })();
 
-  function progress(state: WorldQuestProgress['state']): Map<string, WorldQuestProgress> {
-    return new Map([[quest.id, { questId: quest.id, count: 2, state }]]);
+  function progress(
+    state: WorldQuestProgress['state'],
+    extras: Partial<WorldQuestProgress> = {},
+  ): Map<string, WorldQuestProgress> {
+    return new Map([[quest.id, { questId: quest.id, count: 2, state, ...extras }]]);
   }
 
   it('projects the daily objectives, including both Galecrest challenges', () => {
@@ -1231,6 +1235,19 @@ describe('world-quest zone markers', () => {
       input(makeOverworldWorld('sim', new Map(), quest.minLevel, progress('completed')), 1),
     );
     expect(completed.worldQuests).toEqual([]);
+
+    const practice = buildOverworldMapModel(
+      input(
+        makeOverworldWorld(
+          'sim',
+          new Map(),
+          quest.minLevel,
+          progress('active', { practiceOnly: true }),
+        ),
+        1,
+      ),
+    );
+    expect(practice.worldQuests).toEqual([]);
 
     const atQuest = (zoom: number) => {
       const world = makeOverworldWorld('sim', new Map(), quest.minLevel);
@@ -2452,5 +2469,36 @@ describe('building footprint corners', () => {
       expect(buildingContainsPoint(inn, inward.x, inward.z)).toBe(true);
       expect(buildingContainsPoint(inn, outward.x, outward.z)).toBe(false);
     });
+  });
+});
+
+describe('ferry ports on the zone map', () => {
+  it.each(['sim', 'client'] as const)(
+    'shows distant ports on the %s world with route identity',
+    (shape) => {
+      const world = makeOverworldWorld(shape);
+      world.ferryView = () => ({ clock: 0 }) as ReturnType<IWorld['ferryView']>;
+      for (const port of FERRY_PORTS) {
+        const zone = ZONES.find((candidate) => candidate.id === port.zoneId)!;
+        const model = buildOverworldMapModel({ ...input(world, 1), zone });
+        const marker = model.navigation.find((candidate) => candidate.kind === 'ferry-port');
+        expect(marker).toMatchObject(port);
+        expect(marker?.mx).toBeGreaterThanOrEqual(0);
+        expect(marker?.mx).toBeLessThanOrEqual(CANVAS);
+        expect(marker?.my).toBeGreaterThanOrEqual(0);
+        expect(marker?.my).toBeLessThanOrEqual(CANVAS);
+      }
+    },
+  );
+
+  it('omits ports when the world runs no ferries and when panned out of view', () => {
+    const world = makeOverworldWorld('client');
+    world.ferryView = () => null;
+    expect(
+      buildOverworldMapModel(input(world, 1)).navigation.some((m) => m.kind === 'ferry-port'),
+    ).toBe(false);
+    world.ferryView = () => ({ clock: 0 }) as ReturnType<IWorld['ferryView']>;
+    const model = buildOverworldMapModel(input(world, MAP_MAX_ZOOM));
+    expect(model.navigation.some((m) => m.kind === 'ferry-port')).toBe(false);
   });
 });

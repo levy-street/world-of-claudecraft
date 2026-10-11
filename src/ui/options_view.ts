@@ -728,6 +728,11 @@ export function buildGraphicsSections(
       ? choice(s, 'displayMode', 'hud.options.displayMode', displayModeOptions)
       : toggle(s, 'fullscreen', 'hud.options.fullscreen'),
     toggle(s, 'weather', 'game.settings.weather'),
+    // Spell effects cast by players and their pets (default on). Off keeps
+    // every enemy effect and every read a player acts on (area rings,
+    // crowd-control bands, cast bars); it sits beside Weather as the other
+    // "calm the screen" switch.
+    boolToggle(s, 'spellEffects', 'hudChrome.options.spellEffects'),
     // Opt-in wake/ripple simulation on water (default off): the one water effect
     // that runs extra GPU passes; bubbles and splashes are unaffected. It sits
     // beside Weather in GRAPHICS rather than in Interface (Troy, 2026-08-07):
@@ -899,12 +904,13 @@ export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv)
 // Audio panel (cluster 4)
 // ---------------------------------------------------------------------------
 
-/** Body control rows for the Audio sub-panel: three volume sliders, the bespoke
+/** Body control rows for the Audio sub-panel: four volume sliders, the bespoke
  *  music on/off toggle (reads the live MusicDirector), then the three audio bool
  *  toggles. The painter appends the footer. */
 export function buildAudioControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
     slider(s, 'sfxVolume', 'hud.options.soundEffects'),
+    slider(s, 'ambientVolume', 'hudChrome.options.ambienceVolume'),
     slider(s, 'musicVolume', 'hud.options.musicVolume'),
     slider(s, 'voiceVolume', 'hud.options.voiceVolume'),
     { control: 'musicToggle', labelKey: 'hud.options.music' },
@@ -978,6 +984,7 @@ export function buildInterfaceControls(
     { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
     slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
+    boolToggle(s, 'spellTooltipOnHover', 'hudChrome.options.spellTooltipOnHover'),
     boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
     boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
     boolToggle(s, 'colorblindMode', 'hud.options.colorblindMode'),
@@ -1003,7 +1010,7 @@ export function buildInterfaceControls(
       'hudChrome.options.confirmVendorSellMinQuality',
       SELL_CONFIRM_QUALITY_CHOICES,
     ),
-    note('hudChrome.options.confirmVendorSellMinQualityNote'),
+    note('hudChrome.options.confirmVendorSellMinQualityNoteGray'),
   ];
   // The desktop shell's GPU preference, last in the tab so the web arm's row
   // order is untouched. Gated on the bridge CAPABILITY, so it renders only in a
@@ -1108,6 +1115,9 @@ export function buildInterfaceControls(
       boolToggle(s, 'showFriendlyTrack', 'hudChrome.options.showFriendlyTrack'),
       boolToggle(s, 'showShieldTrack', 'hudChrome.options.showShieldTrack'),
       slider(s, 'fctScale', 'hud.options.fctScale'),
+      // Opt back into the shipped white / gold combat text (the vivid school-coloured
+      // look is the default); directly under the size slider for the same numbers.
+      boolToggle(s, 'classicCombatText', 'hudChrome.options.classicCombatText'),
       // The secondary/third bar toggles deliberately have NO menu rows: the
       // plus/minus buttons on the primary action bar are the one control for
       // adding and removing the optional rows (the settings and the central

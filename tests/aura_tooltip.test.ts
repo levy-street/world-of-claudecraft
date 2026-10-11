@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { abilitiesKnownAt } from '../src/sim/content/classes';
+import type { Entity } from '../src/sim/types';
+import { MAX_LEVEL } from '../src/sim/types';
 import { renderAuraTooltipBodyHtml } from '../src/ui/aura_tooltip';
+import { resolvedAuraTooltipBodyHtml } from '../src/ui/aura_tooltip_body';
 import type { AuraInput } from '../src/ui/auras_view';
 
 const aura = (overrides: Partial<AuraInput> = {}): AuraInput => ({
@@ -12,6 +16,41 @@ const aura = (overrides: Partial<AuraInput> = {}): AuraInput => ({
 });
 
 describe('renderAuraTooltipBodyHtml', () => {
+  it('resolves known ability prose with the current character power', () => {
+    const ability = abilitiesKnownAt('priest', MAX_LEVEL).find((entry) => entry.def.id === 'renew');
+    if (!ability) throw new Error('missing renew fixture');
+    const effect = aura({ id: 'renew', kind: 'hot', value: 0 });
+    const player = {
+      spellPower: 0,
+      healPower: 0,
+      rangedPower: 0,
+      attackPower: 0,
+      auras: [],
+    } as unknown as Entity;
+    const render = () =>
+      resolvedAuraTooltipBodyHtml(
+        effect,
+        player,
+        () => ability,
+        () => '<div class="tt-effect">Effect</div>',
+      );
+    const lowPower = render();
+    player.healPower = 500;
+    const highPower = render();
+    expect(lowPower).toContain('tt-desc');
+    expect(highPower).toContain('<div class="tt-effect">Effect</div>');
+    expect(highPower).not.toBe(lowPower);
+  });
+
+  it('keeps effect-only aura bodies when no source ability can be resolved', () => {
+    const player = {} as Entity;
+    const effectHtml = () => '<div class="tt-effect">Runtime effect</div>';
+    expect(resolvedAuraTooltipBodyHtml(aura(), player, () => null, effectHtml)).toBe(effectHtml());
+    const { id: _id, ...withoutId } = aura();
+    expect(resolvedAuraTooltipBodyHtml(withoutId, player, () => null, effectHtml)).toBe(
+      effectHtml(),
+    );
+  });
   it('shows a known source ability description even when its aura kind has no descriptor', () => {
     expect(
       renderAuraTooltipBodyHtml(aura(), {

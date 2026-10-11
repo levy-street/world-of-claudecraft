@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { BOOL_SETTINGS, SETTING_RANGES, Settings } from '../src/game/settings';
-import type { AuraKind } from '../src/sim/types';
+import type { AuraKind, Entity } from '../src/sim/types';
 import {
   createTargetDotsView,
   TARGET_DOTS_DECIMAL_BELOW_SEC,
@@ -16,6 +16,7 @@ import {
   type TargetDotsAuraInput,
   type TargetDotsEntityInput,
 } from '../src/ui/hud/target_dots';
+import { isPvpHostilePlayer, type PvpHostileWorld } from '../src/ui/pvp_hostile_core';
 
 const MINE = 4;
 const THEIRS = 11;
@@ -115,7 +116,7 @@ describe('createTargetDotsView', () => {
     expect(state.count).toBe(4);
   });
 
-  it('skips players, corpses, and enemies carrying nothing', () => {
+  it('skips players without a hostility verdict, corpses, and enemies carrying nothing', () => {
     const view = makeView();
     const state = view.tick({
       entities: [
@@ -321,5 +322,148 @@ describe('target dots settings surface', () => {
     expect(settings.nameplateDotRenderScale()).toBe(3);
     settings.set('nameplateDotScale', 0.1);
     expect(settings.nameplateDotRenderScale()).toBe(1);
+  });
+});
+
+// PvP: a dot the player puts on an opposing PLAYER tracks like one on a mob, gated
+// by the host's hostility verdict (duel, battleground, arena, open-world /pvp), so
+// a friendly player (Bloodlust's party-wide exhaustion lockout) never becomes a row.
+describe('createTargetDotsView: hostile players', () => {
+  const SELF = MINE;
+
+  function player(id: number, name: string, auras: TargetDotsAuraInput[], dead = false) {
+    return { id, kind: 'player', name, dead, auras } satisfies TargetDotsEntityInput;
+  }
+
+  function makePvpView(hostile: ReadonlySet<number>, asked: number[] = []) {
+    return createTargetDotsView<TargetDotsEntityInput>({
+      isOwn: (a) => a.sourceId === MINE,
+      auraName: (a) => `name:${a.id}`,
+      targetName: (e) => `target:${e.name}`,
+      iconKey: (a) => `icon:${a.id}`,
+      isHostilePlayer: (e) => {
+        asked.push(e.id);
+        return hostile.has(e.id);
+      },
+    });
+  }
+
+  it('lists the player s own dots on a hostile player, beside the mobs', () => {
+    const view = makePvpView(new Set([20]));
+    const state = view.tick({
+      entities: [
+        mob(1, 'Dummy', [aura({ id: 'corruption' })]),
+        player(20, 'Rival', [aura({ id: 'agony' }), aura({ id: 'corruption' })]),
+      ],
+      targetId: null,
+      enabled: true,
+    });
+    expect(state.rows.slice(0, state.count).map((r) => r.key)).toEqual([
+      '1:corruption',
+      '20:agony',
+      '20:corruption',
+    ]);
+    expect(state.rows[1].targetName).toBe('target:Rival');
+  });
+
+  it('keeps the ownership and harm rules on a hostile player', () => {
+    const view = makePvpView(new Set([20]));
+    const state = view.tick({
+      entities: [
+        player(20, 'Rival', [
+          aura({ id: 'agony', sourceId: THEIRS }),
+          aura({ id: 'renew', kind: 'hot' as AuraKind, value: 5 }),
+          aura({ id: 'corruption' }),
+        ]),
+      ],
+      targetId: null,
+      enabled: true,
+    });
+    expect(state.count).toBe(1);
+    expect(state.rows[0].key).toBe('20:corruption');
+  });
+
+  it('never lists a friendly player, the local player, or a dead hostile player', () => {
+    const view = makePvpView(new Set([20, 21]));
+    const state = view.tick({
+      entities: [
+        player(SELF, 'Me', [aura({ id: 'sated', kind: 'sated' as AuraKind })]),
+        player(10, 'Ally', [aura({ id: 'sated', kind: 'sated' as AuraKind })]),
+        player(21, 'Fallen', [aura({ id: 'corruption' })], true),
+      ],
+      targetId: null,
+      enabled: true,
+    });
+    expect(state.count).toBe(0);
+  });
+
+  it('leads with a hostile player who is the current target', () => {
+    const view = makePvpView(new Set([20]));
+    const state = view.tick({
+      entities: [
+        mob(1, 'Dummy', [aura({ id: 'corruption' })]),
+        player(20, 'Rival', [aura({ id: 'corruption' })]),
+      ],
+      targetId: 20,
+      enabled: true,
+    });
+    expect(state.rows.slice(0, 2).map((r) => r.entityId)).toEqual([20, 1]);
+    expect(state.rows[0].onCurrentTarget).toBe(true);
+  });
+
+  // The verdict is the full PvP pair rule and nearly every player carries a buff,
+  // so it is asked only about a player carrying one of OUR live debuffs.
+  it('asks the verdict only about a player carrying one of our live debuffs', () => {
+    const asked: number[] = [];
+    const view = makePvpView(new Set([20]), asked);
+    view.tick({
+      entities: [
+        player(20, 'Rival', []),
+        player(21, 'Dotted', [aura({ id: 'corruption' })]),
+        player(22, 'Buffed', [aura({ id: 'renew', kind: 'hot' as AuraKind, value: 5 })]),
+        player(23, 'Theirs', [aura({ id: 'agony', sourceId: THEIRS })]),
+        player(24, 'Lapsed', [aura({ id: 'corruption', remaining: 0 })]),
+      ],
+      targetId: null,
+      enabled: true,
+    });
+    expect(asked).toEqual([21]);
+  });
+
+  it('with the real shared verdict: an opposing battleground player is tracked, a teammate is not', () => {
+    const entities = new Map<number, Entity>();
+    const add = (id: number, auras: TargetDotsAuraInput[]) =>
+      entities.set(id, { id, kind: 'player', name: `P${id}`, dead: false, auras } as never);
+    add(SELF, []);
+    add(30, [aura({ id: 'corruption' })]);
+    add(31, [aura({ id: 'corruption' })]);
+    const world = {
+      playerId: SELF,
+      entities,
+      duelInfo: null,
+      arenaInfo: null,
+      partyInfo: null,
+      worldPvpInfo: null,
+      bgInfo: {
+        match: {
+          state: 'active',
+          myTeam: 0,
+          players: [
+            { pid: SELF, team: 0 },
+            { pid: 30, team: 1 },
+            { pid: 31, team: 0 },
+          ],
+        },
+      },
+    } as unknown as PvpHostileWorld;
+    const view = createTargetDotsView<Entity>({
+      isOwn: (a) => a.sourceId === MINE,
+      auraName: (a) => a.id,
+      targetName: (e) => e.name,
+      iconKey: (a) => a.id,
+      isHostilePlayer: (e) => isPvpHostilePlayer(world, e),
+    });
+    const state = view.tick({ entities: entities.values(), targetId: null, enabled: true });
+    expect(state.rows.slice(0, state.count).map((r) => r.key)).toEqual(['30:corruption']);
   });
 });

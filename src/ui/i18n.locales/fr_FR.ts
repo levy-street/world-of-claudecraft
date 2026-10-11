@@ -529,7 +529,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.heroicMarkNote':
     "Donjons héroïques . à dépenser auprès de l'intendant héroïque",
   'hudChrome.currencies.honor': 'Honneur',
-  'hudChrome.currencies.honorNote': 'Champs de bataille et arène',
+  'hudChrome.currencies.honorNote': 'Champs de bataille, arène et quêtes mondiales',
   'hudChrome.currencies.intro':
     "Aucune de ces monnaies n'occupe de place dans vos sacs. Les pièces restent dans votre sac comme toujours.",
   'hudChrome.currencies.lifetime': 'À vie : {amount}',
@@ -1925,7 +1925,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Annonce une colline immédiatement ; elle apparaît après le délai d'avertissement complet.",
   'devCommand.actions.hillwarn.label': 'Compte à rebours de la colline',
   'entities.abilities.lava_burst.description':
-    "Inflige {damage} points de dégâts de Feu. Assène toujours un coup critique sur une cible brûlant sous l'effet de votre Secousse de braises. Magma Surge : chaque tic de Secousse de braises a 20 % de chances de réinitialiser ce temps de recharge et de rendre votre prochain Magma Burst instantané dans les 10 s qui suivent. Les dégâts augmentent avec la puissance des sorts. (Thundercall)",
+    "Inflige {damage} points de dégâts de Feu. Un coup au but accorde 1 Tonnerre. Assène toujours un coup critique sur une cible brûlant sous l'effet de votre Secousse de braises. Un coup critique inflige 24 % supplémentaires des dégâts normaux. Magma Surge : chaque tic de Secousse de braises a 20 % de chances de réinitialiser ce temps de recharge et de rendre votre prochain Magma Burst instantané dans les 10 s qui suivent. Les dégâts augmentent avec la puissance des sorts. (Thundercall)",
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     "Passif : Éclair d'arc et Éclair fourchu ont 20 % de chances de surcharger, frappant à nouveau leur première cible pour 50 % des dégâts infligés et accordant 1 Tonnerre. (Thundercall)",
@@ -1934,7 +1934,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Appelle un coup de tonnerre, infligeant {damage} points de dégâts de Nature aux ennemis dans un rayon de 10 mètres et les ralentissant de 50 % pendant 5 s. Restaure 8 % de votre mana maximum. Les dégâts augmentent avec la puissance des sorts. (Thundercall)',
   'entities.abilities.thunderstorm.name': 'Stormbreak',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    "Le temps d'incantation de Racines agrippantes est réduit de 0,5 s.",
+    "Le temps d'incantation de Racines agrippantes est réduit de 0,5 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_druid_balance.bonus4':
     "Lancer Racines agrippantes vous permet d'incanter en mouvement et augmente votre vitesse de déplacement de 20 % pendant 4 s. Ne peut se produire plus d'une fois toutes les 20 s.",
   'entities.itemSets.vanguard_druid_balance.name': 'Tenue du Garde-étoiles',
@@ -1944,7 +1944,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Ruée de Bruin vous octroie un bouclier égal à 6 % de vos points de vie maximum pendant 6 s.',
   'entities.itemSets.vanguard_druid_feral.name': 'Peau de Crin-sang',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Le temps de recharge de Prompte guérison est réduit de 1 s.',
+    'Le temps de recharge de Prompte guérison est réduit de 1 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Prompte guérison augmente aussi votre vitesse de déplacement de 30 % pendant 3 s.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Tenue de Fleur-de-chardon',
@@ -1963,21 +1963,22 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Croc sanglant accorde 1 Élan de chasse.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Harnais Croc-piège',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Le temps de recharge de Barrière temporelle est réduit de 2 s.',
+    'Le temps de recharge de Barrière temporelle est réduit de 2 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Barrière temporelle augmente aussi de 20 % la vitesse de déplacement de la cible protégée pendant 3 s.',
   'entities.itemSets.vanguard_mage_arcane.name': "Tenue du Lieur d'Heures",
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Pluie de braises se recharge 3 s plus vite.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Pluie de braises se recharge 3 s plus vite. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Lancer Pluie de braises réduit de 2 s le temps de recharge restant de Barrière flamboyante.',
   'entities.itemSets.vanguard_mage_fire.name': 'Tenue Fouet-de-braise',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    "Le temps de recharge d'Entrave de glace est réduit de 2 s.",
+    "Le temps de recharge d'Entrave de glace est réduit de 2 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Lancer Entrave de glace réduit de 5 s le temps de recharge restant de Pas fulgurant.',
   'entities.itemSets.vanguard_mage_frost.name': 'Tenue du Garde-givre',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'Le temps de recharge de Pacte de vie est réduit de 30 s.',
+    'Le temps de recharge de Pacte de vie est réduit de 30 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     "Pacte de vie octroie aussi à l'allié un bouclier égal à 8 % de ses points de vie maximum pendant 6 s.",
   'entities.itemSets.vanguard_paladin_holy.name': 'Tenue Veille-soleil',
@@ -1992,17 +1993,17 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'Appel de la valkyrie réinitialise le temps de recharge d'Édit final, et votre prochain Édit final lancé dans les 6 s qui suivent inflige 15 % de dégâts en plus.",
   'entities.itemSets.vanguard_paladin_retribution.name': 'Armure de guerre Marque-de-lumière',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Le temps de recharge de Cri psychique est réduit de 3 s.',
+    'Le temps de recharge de Cri psychique est réduit de 3 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     "Quand votre Psaume de protection est entièrement consommé, l'allié protégé gagne 20 % de vitesse de déplacement pendant 3 s. Ne peut se produire plus d'une fois toutes les 8 s.",
   'entities.itemSets.vanguard_priest_discipline.name': 'Tenue Psaume-voilé',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'Le temps de recharge de Pas du voile est réduit de 6 s.',
+    'Le temps de recharge de Pas du voile est réduit de 6 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Pas du voile vous octroie aussi un bouclier égal à 8 % de vos points de vie maximum pendant 6 s.',
   'entities.itemSets.vanguard_priest_holy.name': 'Tenue Aile-de-grâce',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litanie du malheur ralentit aussi de 30 % le déplacement de la cible tant que vous la canalisez.',
+    'Litanie du malheur ralentit aussi de 30 % le déplacement de la cible tant que vous la canalisez. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Invoquer un Démon de dîme vous octroie aussi un bouclier égal à 10 % de vos points de vie maximum pendant 8 s.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Tenue Hymne-du-crépuscule',
@@ -2022,7 +2023,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Coup au ventre accorde 2 points de combo supplémentaires quand il est utilisé depuis Disparition enfumée.',
   'entities.itemSets.vanguard_rogue_subtlety.name': "Cuirs Marche-d'ombre",
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    "Le temps de recharge de Déchaîner l'arme est réduit de 3 s.",
+    "Le temps de recharge de Déchaîner l'arme est réduit de 3 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     "Déchaîner l'arme vous permet d'incanter en mouvement et augmente votre vitesse de déplacement de 20 % pendant 4 s. Ne peut se produire plus d'une fois toutes les 20 s.",
   'entities.itemSets.vanguard_shaman_elemental.name': 'Mailles de guerre Écrit-de-tempête',
@@ -2032,22 +2033,22 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Frappe ancestrale réduit de 4 s le temps de recharge restant de Transe élémentaire.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Mailles de guerre Né-du-vent',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    "Eaux guérisseuses s'incante 0,5 s plus vite sur un allié sous 50 % de points de vie.",
+    "Eaux guérisseuses s'incante 0,5 s plus vite sur un allié sous 50 % de points de vie. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Appel des marées octroie aussi à sa cible un bouclier égal à 5 % de vos points de vie maximum pendant 6 s.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cotte de mailles Garde-saumâtre',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    "Le temps d'incantation de Tourment est réduit de 0,3 s.",
+    "Le temps d'incantation de Tourment est réduit de 0,3 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumer vous soigne 30 % de plus et peut être canalisé en mouvement.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Tenue Plume-de-terreur',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    "Le temps de recharge d'Armure d'os est réduit de 10 s.",
+    "Le temps de recharge d'Armure d'os est réduit de 10 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     "Commandement de la moisson réduit de 2 s le temps de recharge restant d'Armure d'os.",
   'entities.itemSets.vanguard_warlock_demonology.name': 'Tenue Lié-à-la-moelle',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Le temps de recharge de Peau de braise est réduit de 30 s.',
+    'Le temps de recharge de Peau de braise est réduit de 30 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Un Conflagration sur deux rend votre prochain Trait de ruine instantané dans les 8 s qui suivent.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Tenue Couronne-de-scories',
@@ -4862,7 +4863,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Tuer un joueur hostile accorde Pas de cendre, augmentant la vitesse de déplacement de 40% pendant 6 s.",
   'entities.itemSets.warfare_ashstalker.name': 'Équipement du traque-cendres',
   'entities.itemSets.warfare_cinderweave.bonus2':
-    "Augmente de 40 le score de Défense d'Art de la guerre.",
+    "Augmente de 40 le score de Défense d'Art de la guerre. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.warfare_cinderweave.bonus4':
     "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4876,14 +4877,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Tuer un joueur hostile accorde Serment inbrisé, absorbant 200 points de dégâts pendant 10 s.",
   'entities.itemSets.warfare_furyforged.name': 'Tenue de guerre forgée par la fureur',
   'entities.itemSets.warfare_stormbound.bonus2':
-    "Augmente de 40 le score de Défense d'Art de la guerre.",
+    "Augmente de 40 le score de Défense d'Art de la guerre. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.warfare_stormbound.bonus4':
     "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
   'entities.itemSets.warfare_stormbound.bonus7':
     "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Vos sorts ont 15% de chances d'accorder Garde de braise, absorbant 120 points de dégâts pendant 8 s.",
   'entities.itemSets.warfare_stormbound.name': "Vêtements liés à l'orage",
   'entities.itemSets.warfare_thornhide.bonus2':
-    "Augmente de 40 le score de Défense d'Art de la guerre.",
+    "Augmente de 40 le score de Défense d'Art de la guerre. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.warfare_thornhide.bonus4':
     "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -10017,7 +10018,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Adopte l'aspect de la martre et augmente vos chances d'esquive de 8% pendant 30 min.",
   'entities.abilities.aspect_of_the_cheetah.name': 'Aspect du coursier',
   'entities.abilities.aspect_of_the_cheetah.description':
-    "Adopte l'aspect du coursier et augmente votre vitesse de déplacement de 30% pendant 30 min. Tant que cet aspect est actif, subir des dégâts vous étourdit, réduisant de moitié votre vitesse de déplacement pendant 4 s (chaque coup renouvelle l'étourdissement).",
+    "Adopte l'aspect du coursier et augmente votre vitesse de déplacement de 30% pendant 30 min. Tant que cet aspect est actif, subir des dégâts vous étourdit, réduisant de moitié votre vitesse de déplacement pendant 2 s (chaque coup renouvelle l'étourdissement).",
   'entities.abilities.aimed_shot.name': 'Tir tendu',
   'entities.abilities.aimed_shot.description':
     "Tire sur la cible pour {damage} points de dégâts Physiques. Les dégâts augmentent avec la puissance d'attaque à distance.",
@@ -10071,7 +10072,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Vous entoure d'éclairs pendant 10 min. Les 3 prochaines attaques de mêlée contre vous infligent {buff} points de dégâts de Nature à l'attaquant, au plus une fois toutes les 5 s.",
   'entities.abilities.flame_shock.name': 'Secousse de braises',
   'entities.abilities.flame_shock.description':
-    'Inflige {damage} points de dégâts de Feu, puis {overTime} points de dégâts de Feu en 12 s. Le coup initial augmente avec la puissance des sorts.',
+    'Inflige {damage} points de dégâts de Feu, puis {overTime} points de dégâts de Feu en {duration} s. Le coup initial augmente avec la puissance des sorts.',
   'entities.abilities.flametongue_weapon.name': 'Arme Pyrebrand',
   'entities.abilities.flametongue_weapon.description':
     'Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts de Feu supplémentaires.',
@@ -10119,11 +10120,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.name': 'Trait sauvage',
   'entities.abilities.healing_touch.name': 'Soin sauvage',
   'entities.abilities.healing_touch.description': 'Rend {damage} points de vie à une cible alliée.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Chaque incantation achevée ajoute 1 Verdoyance (maximum 3). La Verdoyance accumulée raccourcit cette incantation : 2,2 s à 1 Verdoyance, 1,9 s à 2 et 1,5 s à 3. Bienfait de la nature le rend instantané, gratuit et 25% plus puissant.',
   'entities.abilities.mark_of_the_wild.name': 'Garde sauvage',
   'entities.abilities.mark_of_the_wild.description':
     'Place le Wildward sur une cible alliée et augmente son armure de {buff} pendant 30 min.',
   'entities.abilities.moonfire.name': 'Tempête lunaire',
-  'entities.abilities.rejuvenation.name': 'Floraison sauvage',
   'entities.abilities.thorns.name': 'Garde de ronces',
   'entities.abilities.thorns.description':
     'Des épines jaillissent de la cible: les assaillants en mêlée subissent {buff} points de dégâts de Nature.',
@@ -10132,7 +10134,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Enracine la cible sur place pendant un maximum de 12 s.',
   'entities.abilities.bear_form.name': 'Forme de Bruin',
   'entities.abilities.bear_form.description':
-    "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Relancez pour reprendre votre forme de lanceur.",
+    "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Vous frappez deux fois plus vite pour moitié moins de dégâts par coup, et chaque coup génère deux fois plus de rage. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Relancez pour reprendre votre forme de lanceur.",
   'entities.abilities.maul.name': 'Brise-os',
   'entities.abilities.growl.name': 'Menacer',
   'entities.abilities.growl.description':
@@ -16695,7 +16697,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     "Invoque 3 bêtes pendant 12 s. Chacune attaque toutes les 2 s pour {damage} points de dégâts Physiques. Les dégâts affichés incluent 8% de votre puissance d'attaque à distance avant les bonus de dégâts de familier. Les bêtes figent la Férocité de meute à l'invocation et gagnent 10% de dégâts par cumul. Tant que la Ruée sauvage est en recharge, les Ordres de meute réussis ont 20% de chances de la réinitialiser, garanti après 5 échecs. Elle ne peut pas se réinitialiser tant que les bêtes sont actives. (Seigneur de meute)",
   'entities.abilities.trailbreak.description':
-    "Bondissez de 12 mètres en arrière. Si vous avez l'Élan de chasse, il est rafraîchi et prépare la Rentrée pendant 12 s.",
+    "Bondissez de 25 mètres en arrière et libérez-vous des immobilisations et des ralentissements. Si vous avez l'Élan de chasse, il est rafraîchi et prépare la Rentrée pendant 12 s.",
   'entities.abilities.unleash_beast.description':
     "Consomme 3 Férocité de meute après que votre familier a frappé pour 83 à 105 points de dégâts Physiques et secoué tous les ennemis à moins de 6 mètres pour 26 à 34. La frappe et la secousse utilisent le bonus complet de 30% de dégâts de familier de la Férocité de meute et augmentent avec la puissance d'attaque du familier. Pendant les 8 s suivantes, le familier inflige 25% de dégâts en plus, attaque 35% plus vite et fait que le Tir funeste touche jusqu'à 2 ennemis proches.",
   'entities.abilities.wildheart.description':
@@ -16723,7 +16725,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passif : tant que la Frappe ancestrale est en recharge, consommer un Présage de tempête a 25% de chances de la réinitialiser. Si les 3 premières tentatives échouent, la 4e la réinitialise toujours. (Esprit guerrier)',
   'entities.abilities.thunder_reservoir.description':
-    "Passif : le Éclair d'arc et l'Éclair fourchu octroient du Tonnerre, jusqu'à 5. À 5 Tonnerre, la Secousse tellurique inflige 125% de dégâts en plus ou le Tremblement de terre 100% de plus, puis consomme tout le Tonnerre. (Appel du tonnerre)",
+    "Passif : le Éclair d'arc, l'Éclair fourchu et Magma Burst octroient du Tonnerre, jusqu'à 5. À 5 Tonnerre, la Secousse tellurique inflige 125% de dégâts en plus ou le Tremblement de terre 100% de plus, puis consomme tout le Tonnerre. (Appel du tonnerre)",
   'entities.abilities.tidecall.description':
     "Soigne une cible alliée de {damage}. Le soin augmente avec la puissance des sorts. Ajoute le soin complet avant surguérison au Courant réparateur, jusqu'à 30% des points de vie maximum de la cible.",
   'entities.abilities.unleash_weapon.description':
@@ -16797,7 +16799,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Brise-moelle',
   'entities.abilities.marrowbreak.description':
-    "Consomme vos 3 Sang ancien pour une frappe lourde à haute menace de {damage} points de dégâts. Sous la moitié des points de vie, vous protège à la place d'un bouclier égal à 18% de vos points de vie maximum pendant 8 s et rembourse 15 points de rage.",
+    'Consomme vos 3 Sang ancien pour une frappe lourde à haute menace de {damage} points de dégâts. Sous la moitié des points de vie, vous soigne à la place de 18% de vos points de vie maximum et rembourse 15 points de rage.',
   'entities.abilities.moonlash.name': 'Déferlante lunaire',
   'entities.abilities.moonlash.description':
     "Consomme vos 3 Marée lunaire pour une frappe lourde de {damage} points de dégâts d'Arcane : le choix des dégâts. Sillage solaire consomme les mêmes 3 Marée lunaire, alors choisissez-en un.",
@@ -16806,7 +16808,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à {duration} s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire.",
   'entities.abilities.overbloom.name': 'Surfloraison',
   'entities.abilities.overbloom.description':
-    'Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible.',
+    'Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Sporemending fraîche sur la cible.',
   'entities.abilities.redharvest.name': 'Moisson rouge',
   'entities.abilities.redharvest.description':
     "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend {rage} points d'énergie. Fonctionne sans aucun point de combo.",
@@ -16820,7 +16822,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme',
   'hudChrome.auraEffect.verdance':
-    'Verdoyance : cran {stacks} sur {max}. Les incantations achevées de Floraison sauvage et de Seconde floraison la remplissent ; à {max}, Prompte guérison devient Surfloraison',
+    "Verdoyance : cran {stacks} sur {max}. Chaque Sporemending, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
   'hudChrome.riftTracker.title': 'Faille',
   'hudChrome.riftTracker.floor': 'Étage {current} sur {total}',
   'hudChrome.riftTracker.closesIn': 'Se ferme dans {time}',
@@ -16995,7 +16997,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     "Une attaque brutale qui augmente les dégâts de mêlée de {damage} et cause une forte menace. S'active à votre prochain coup. Forme de Bruin uniquement.",
   'entities.abilities.maul.specNote_feral':
-    "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une frappe de 78 à 96 dégâts à forte menace ; sous la moitié des points de vie, elle vous protège à la place d'un bouclier égal à 18% de vos points de vie maximum et rembourse 15 rage.",
+    'Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une frappe de 78 à 96 dégâts à forte menace ; sous la moitié des points de vie, elle vous soigne à la place de 18% de vos points de vie maximum et rembourse 15 rage.',
   'entities.abilities.moonfire.description':
     "Brûle l'ennemi avec le feu lunaire pour {damage} points de dégâts d'Arcane plus des dégâts sur la durée.",
   'entities.abilities.moonfire.specNote_balance':
@@ -17028,12 +17030,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Guerriers squelettes clouent leur cible, les Mages d’os exposent les défenses magiques, et l’Aile funéraire déchire tous les ennemis touchés.",
   'entities.abilities.reaping_command.name': 'Commandement de la moisson',
   'entities.abilities.regrowth.description':
-    "Soigne une cible alliée de {damage} et d'un montant supplémentaire sur 21 s.",
+    "Soigne une cible alliée de {damage} et d'un montant supplémentaire sur 15 s. Si l'effet arrive à son terme, il soigne de nouveau la cible du même montant que le soin initial.",
   'entities.abilities.regrowth.specNote_restoration':
-    'Planter une NOUVELLE floraison ajoute 1 Verdoyance (maximum 5).',
+    "Chaque incantation ajoute 1 Verdoyance (maximum 3), même lorsqu'elle renouvelle une floraison déjà active.",
   'entities.abilities.rejuvenation.description': 'Soigne la cible de {damage} sur 12 s.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Planter une NOUVELLE floraison ajoute 1 Verdoyance (maximum 5). À 5 Verdoyance, Prompte guérison devient Surfloraison.',
+    "Chaque incantation ajoute 1 Verdoyance (maximum 3), même lorsqu'elle renouvelle une floraison déjà active. À 3 Verdoyance, Prompte guérison devient Surfloraison.",
   'entities.abilities.rip.description':
     'Technique de finition qui fait saigner la cible toutes les 2 s pendant 24 s : 36 dégâts plus 24 par point de combo dépensé (5 points de combo : {damage} au total). Forme de chat uniquement.',
   'entities.abilities.rip.specNote_feral': 'Le coup porté ajoute 1 Sang ancien (maximum 3).',
@@ -17077,7 +17079,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Chaque ouverture utilisée depuis le Voile du crépuscule ajoute 1 Pénombre (maximum 3).',
   'entities.abilities.swiftmend.description':
-    "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Les plantations de Floraison sauvage et de Seconde floraison ajoutent de la Verdoyance ; à 5 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)",
+    "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Chaque incantation de Sporemending, de Seconde floraison et de Soin sauvage ajoute 1 Verdoyance ; à 3 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)",
   'entities.abilities.swipe.description':
     'Balayez vos griffes à travers les ennemis proches pour {damage} points de dégâts. Cause une menace supplémentaire. Forme de Bruin uniquement.',
   'entities.abilities.swipe.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
@@ -18061,8 +18063,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Les frappes à l’unisson de Commandement faucheur infligent 25 % de dégâts supplémentaires.',
   'entities.itemSets.gravebrand.name': 'Régalia de la marque funèbre',
-  'entities.itemSets.grovespring.bonus2':
-    'Rétablissement rapide consomme d’abord votre Floraison sauvage ou Seconde floraison et soigne 25 % davantage. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.grovespring.bonus4':
     'Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdure.',
   'entities.itemSets.grovespring.name': 'Habillement de la Source sylvestre',
@@ -19805,7 +19805,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Une victoire classée rapporte de l’Honneur, la monnaie joueur contre joueur, et une défaite jouée jusqu’au bout en rapporte encore une petite part, comme un match nul. La cote est donc le seul vrai coût d’une défaite. L’Honneur récompense les vrais matchs : battre le même adversaire ou la même équipe une seconde fois le même jour ne rapporte plus rien, pas plus qu’une nouvelle défaite contre eux. Une longue journée de victoires paie entièrement la première série, puis les gains sont divisés par deux, puis encore par deux plus loin, où ils restent. Un match abandonné par l’adversaire modifie quand même votre cote mais ne rapporte aucun Honneur. La journée du royaume se réinitialise à l’heure nocturne habituelle, la même limite qui efface les verrouillages quotidiens.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Chaque pièce de guerre porte une cote d’offensive de guerre et une cote de défense de guerre, et ces cotes n’ont absolument aucun effet contre les monstres. Elles ne s’appliquent que lorsque vous combattez un autre joueur, en duel, dans l’arène ou sur le champ de bataille : l’offensive augmente les dégâts infligés et la défense réduit les dégâts reçus, chacune jusqu’à son propre plafond. Chaque famille d’armure est aussi un ensemble, dont les bonus sont également des cotes ou des effets qui ne fonctionnent que contre les joueurs. Les bonus d’un équipement d’honneur complet ne comptent donc pas contre un boss de donjon. Les pièces gardent leurs statistiques ordinaires, leur armure et leurs dégâts d’arme, qui fonctionnent partout ; seules les cotes et les bonus d’ensemble restent inactifs contre les monstres.',
+    "Chaque pièce de guerre porte une cote d’offensive de guerre et une cote de défense de guerre, et ces cotes n’ont absolument aucun effet contre les monstres. Elles ne s’appliquent que lorsque vous combattez un autre joueur, en duel, dans l’arène ou sur le champ de bataille : l’offensive augmente les dégâts infligés et la défense réduit les dégâts reçus, chacune jusqu’à son propre plafond. Chaque famille d’armure est aussi un ensemble, dont les bonus sont également des cotes ou des effets qui ne fonctionnent que contre les joueurs. Les bonus d’un équipement d’honneur complet ne comptent donc pas contre un boss de donjon. Les pièces gardent leurs statistiques ordinaires, leur armure et leurs dégâts d’arme, qui fonctionnent partout ; seules les cotes et les bonus d’ensemble restent inactifs contre les monstres. Une exception fonctionne partout : deux pièces d'un ensemble de lanceur de sorts empêchent aussi les dégâts subis de retarder vos incantations.",
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'C’est le compromis voulu. L’équipement de guerre sert à combattre les joueurs et ne permet pas de sauter les paliers de donjon : une pièce de guerre ne porte jamais les cotes de combat d’un épique de donjon dans le même emplacement, et les cotes et bonus qu’elle porte sont entièrement consacrés aux autres joueurs. Pour tenir votre rang dans l’arène, achetez-le. Pour terminer les donjons héroïques plus vite, gagnez votre équipement dans les donjons.',
   'guide.controls.harvestJournal': 'Journal des récoltes',
@@ -20279,4 +20279,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Effectif : {effective} | Sursoin : {overheal} ({overhealPercent}) | Touches : {hits} ({critPercent} crit.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Touches : {hits} | Critiques : {crits} ({critPercent}) | Moyenne : {average} | Min./max. : {min} / {max}',
+  'hudChrome.options.ambienceVolume': "Volume de l'ambiance",
+  'hudChrome.mapAtlas.resizeRailAria': 'Largeur de la barre latérale de la carte',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Faites glisser pour redimensionner la barre latérale de la carte. Double-cliquez pour réinitialiser.',
 };

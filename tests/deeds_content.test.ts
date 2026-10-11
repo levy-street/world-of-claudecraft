@@ -146,8 +146,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 10 and the tenth at 25: +35).
     // 318 / 3535 with the release's Eastbrook ferry round trip
     // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
-    expect(DEED_ORDER.length).toBe(319);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3545);
+    // 320 / 3595 with the sixth lifetime-XP rung (prog_titan at renown 50).
+    // 325 / 3695 with the five World PvP title deeds (+100 Renown).
+    // 326 / 3705 with the hard Wisp Maze deed.
+    expect(DEED_ORDER.length).toBe(326);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3705);
   });
 
   it('ships the audited per-category counts', () => {
@@ -165,8 +168,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release/v0.41.0 merge (the release's own chain read 58), then
       // +1 the Phase 13 promotion capstone prog_legendmaker, then
       // +7 the faction standing ladder (a Trusted and a Champion deed per
-      // allied faction plus the all-factions meta).
-      progression: 75,
+      // allied faction plus the all-factions meta), then
+      // +1 the sixth lifetime-XP rung (prog_titan).
+      progression: 76,
       // +1 the Buried Hoard goblin catch (cmb_coinsack_caught).
       combat: 11,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
@@ -181,14 +185,15 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release side added independently. UNION MERGE: base plus both deltas.
       collection: 41,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
-      pvp: 35,
+      pvp: 40,
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
       // +2 the Clue Scroll casket pair (exp_clue_first_casket and
       // exp_clue_ten_caskets, both on the clueCasketsOpened meter).
-      // +1 the release's ferry round trip (exp_harbor_to_harbor).
-      exploration: 22,
+      // +1 the release's ferry round trip (exp_harbor_to_harbor), then +1
+      // the hard Wisp Maze deed.
+      exploration: 23,
       feat: 3,
       hidden: 10,
     });
@@ -409,6 +414,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // The release's Eastbrook ferry round trip, appended last at the fourth
       // release/v0.44.0 base merge.
       'exp_harbor_to_harbor',
+      // The sixth lifetime-XP rung (10,000,000 lifetime XP, the Titan title).
+      'prog_titan',
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
+      'exp_wisp_maze_hard',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -805,12 +818,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // the 2026-08-30 release/v0.41.0 sync merge) one more, and the three
     // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
-    // one more.
-    expect(titles.length).toBe(51);
+    // one more, the sixth lifetime-XP rung (Titan) one more, and the five
+    // World PvP titles five more.
+    expect(titles.length).toBe(57);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(51);
+    expect(new Set(titleTexts).size).toBe(57);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1040,7 +1054,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // shipped trigger or renown value was touched.
   // Re-baselined at the 2026-09-28 release merge into feature/buried-hoards: one NEW
   // deed (cmb_coinsack_caught) joins; no existing trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  // Re-minted for the sixth lifetime-XP rung plus five World PvP title deeds:
+  // six NEW deeds append at the tail; no existing trigger or renown changed.
+  // Re-minted for the hard Wisp Maze deed: one NEW deed appends at the tail; no
+  // existing trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '848807438e0f05d13e50dc1a90d48ec07ce80a4d3942b6e2ca8cf5a8ccde9575';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1107,22 +1125,25 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // after exp_clue_ten_caskets at the fourth release/v0.44.0 base merge; the
   // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
   // and stripping the one id must reproduce it exactly.
+  //
+  // The hard Wisp Maze deed now appends after the World PvP title ladder.
+  // Stripping it reproduces the previous 325-deed mint.
   const PRE_APPEND_CATALOG_SHA256 =
-    '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
-  const APPENDED_SINCE: readonly string[] = ['cmb_coinsack_caught', 'exp_harbor_to_harbor'];
+    '7a65668e503ea5acecb9487d5963740b5ed59cb50c73dfec788e1cad3967f308';
+  const APPENDED_SINCE: readonly string[] = ['exp_wisp_maze_hard'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The ferry round trip sits at the true tail after the Clue Scroll casket
-    // pair. Pin its two predecessors too: this is an append into a
-    // known seat, never a scattered insert or a retro-edit (the digest below
-    // proves it).
+    // The hard Wisp Maze deed sits at the true tail after the World PvP title
+    // ladder. Pin its two predecessors too: this is an
+    // append into a known seat, never a scattered insert or a retro-edit (the
+    // digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'exp_clue_first_casket',
-      'exp_clue_ten_caskets',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1341,9 +1362,10 @@ describe('table shape', () => {
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
-    // Clue Scroll casket pair, then the release's ferry round trip as the
-    // final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_harbor_to_harbor');
+    // Clue Scroll casket pair, then the Coinsack and ferry deeds, then the
+    // sixth lifetime-XP rung, five World PvP titles ending in Indomitable, and
+    // the hard Wisp Maze deed.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_wisp_maze_hard');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -2146,6 +2168,31 @@ describe('milestone unification', () => {
     expect(DEEDS.prog_paragon.reward).toEqual({ kind: 'title', text: 'Paragon' });
     expect(DEEDS.prog_mythic.reward).toEqual({ kind: 'title', text: 'Mythic' });
     expect(DEEDS.prog_eternal.reward).toEqual({ kind: 'title', text: 'Eternal' });
+  });
+
+  it('the sixth rung (Titan) is a deed-only title at 10,000,000 lifetime XP', () => {
+    const deed = DEEDS.prog_titan;
+    expect(deed.category).toBe('progression');
+    expect(deed.renown).toBe(50);
+    expect(deed.trigger).toEqual({ kind: 'lifetimeXp', amount: 10_000_000 });
+    expect(deed.reward).toEqual({ kind: 'title', text: 'Titan' });
+    expect(deed.hidden).toBeFalsy();
+    expect(deed.feat).toBeFalsy();
+    // Deed-only: the frozen legacy milestone mirror does not grow.
+    expect(MILESTONE_DEED_TO_LEGACY.prog_titan).toBeUndefined();
+    expect(MILESTONES.some((m) => m.lifetimeXp === 10_000_000)).toBe(false);
+    // The ladder stays strictly ascending: the new rung sits above Eternal.
+    const ladder = ALL.filter((d) => d.trigger.kind === 'lifetimeXp').map((d) =>
+      d.trigger.kind === 'lifetimeXp' ? [d.id, d.trigger.amount] : [d.id, 0],
+    );
+    expect(ladder).toEqual([
+      ['prog_veteran', 250000],
+      ['prog_champion', 500000],
+      ['prog_paragon', 1000000],
+      ['prog_mythic', 2500000],
+      ['prog_eternal', 5000000],
+      ['prog_titan', 10000000],
+    ]);
   });
 });
 

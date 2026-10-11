@@ -12,7 +12,9 @@
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
+import { TRANSPORT_ROUTES } from '../src/sim/content/transport_ships';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES, zoneAt } from '../src/sim/data';
+import { emptyTransportFerryView } from '../src/sim/transport_schedule';
 import {
   buildContinentMapModel,
   CONTINENT_FALLBACK_ASPECT,
@@ -37,6 +39,7 @@ function worldAt(shape: 'sim' | 'client', x: number, z: number): IWorld {
     playerId: 1,
     questState: () => 'unavailable',
     questLog: new Map(),
+    ferryView: () => null,
   } as unknown as IWorld;
 }
 
@@ -60,6 +63,40 @@ function projectPoint(
     my: image.my + ((WORLD_MAX_Z - z) / (WORLD_MAX_Z - WORLD_MIN_Z)) * image.h,
   };
 }
+
+describe('buildContinentMapModel: ferry ports', () => {
+  it.each(['sim', 'client'] as const)('projects all route landings for a %s world', (shape) => {
+    const world = worldAt(shape, 0, 0);
+    world.ferryView = () => emptyTransportFerryView(TRANSPORT_ROUTES[0]);
+    const model = buildContinentMapModel(input(world, CONTINENT_FALLBACK_ASPECT));
+    const landings = TRANSPORT_ROUTES.flatMap((route) =>
+      route.berths.map((berth) => ({ route, berth })),
+    );
+    expect(new Set(landings.map(({ route }) => route.id)).size).toBe(2);
+    expect(model.ports).toHaveLength(landings.length);
+    for (const { route, berth } of landings) {
+      const port = model.ports.find(
+        (marker) => marker.routeId === route.id && marker.berthId === berth.id,
+      );
+      expect(port).toMatchObject({
+        kind: 'ferry-port',
+        routeId: route.id,
+        berthId: berth.id,
+        zoneId: berth.poi.split(':')[1],
+        x: berth.landing.x,
+        z: berth.landing.z,
+      });
+      const projected = projectPoint(berth.landing.x, berth.landing.z, model.image);
+      expect(port?.mx).toBeCloseTo(projected.mx, 6);
+      expect(port?.my).toBeCloseTo(projected.my, 6);
+    }
+  });
+
+  it('omits ferry markers when the world has no ferry service', () => {
+    const model = buildContinentMapModel(input(worldAt('client', 0, 0), CONTINENT_FALLBACK_ASPECT));
+    expect(model.ports).toEqual([]);
+  });
+});
 
 describe('buildContinentMapModel: image contain-fit rect', () => {
   it('a portrait aspect fits the height and centres horizontally', () => {

@@ -3,6 +3,7 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { ABILITIES } from '../../sim/data';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { loadGltf } from '../assets/loader';
+import { registerContextRestoreReset } from '../context_restore_registry';
 import { noteSpiritSpawnRefused } from '../gpu_prep_events';
 import { clamp01 } from '../num_clamp';
 
@@ -289,6 +290,18 @@ export class SpiritApparitions {
     this.compileGroup.position.set(0, -80, 0);
     this.compileGroup.visible = false;
     scene.add(this.compileGroup);
+    registerContextRestoreReset('spirit-apparitions', this, (owner) => owner.forgetContext());
+  }
+
+  /** A WebGL context restore: every warmed puppet's program belonged to the
+   *  lost context, so each one queues for its warm-up (and its gate) again. */
+  forgetContext(): void {
+    if (this.disposed) return;
+    for (const puppet of this.puppets.values()) {
+      if (!puppet.compiled) continue;
+      puppet.compiled = false;
+      if (!this.compileQueue.includes(puppet)) this.compileQueue.unshift(puppet);
+    }
   }
 
   /**

@@ -9,6 +9,7 @@ import type { BankBonusSource, BankInfo, GuildBankInfo, VaultInfo } from '../wor
 // isRecord is the ONE record predicate both snapshot wire decoders share (the
 // strict prototype-checking form; see its comment in vault_snapshot_wire.ts).
 import { decodeVaultInfoWire, isRecord, isWireBankSlot } from './vault_snapshot_wire';
+import { decodeWeeklyRewardInfo, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
 export { BANK_PURCHASED_SLOTS_MAX };
 
@@ -240,9 +241,12 @@ export interface BankSelfMirrors {
  *  must stay inert data, never reach a prototype-setting keyed assignment).
  *  The malformed policies differ per key and are noted against each below. */
 export function applyBankSelfWire(
-  target: BankSelfMirrors,
-  s: { bank?: unknown; vault?: unknown; cvault?: unknown; bpsl?: unknown },
+  target: BankSelfMirrors & { weeklyRewardInfo?: WeeklyRewardInfo | null },
+  s: { bank?: unknown; vault?: unknown; cvault?: unknown; bpsl?: unknown; weeklyRewards?: unknown },
 ): void {
+  // The Weekly Vault closes on malformed data, and omission retains its mirror.
+  if (s.weeklyRewards !== undefined)
+    target.weeklyRewardInfo = decodeWeeklyRewardInfo(s.weeklyRewards);
   // `bank`: malformed RETAINS the last valid mirror (undefined from the decoder).
   if (s.bank !== undefined) {
     const decoded = decodeBankInfoWire(s.bank);

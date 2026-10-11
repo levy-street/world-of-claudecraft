@@ -25,8 +25,8 @@ import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_a
 // "a rule was dropped during extraction" regression we want to catch.
 //
 // The extraction is now COMPLETE, so today the union is lopsided: both inline
-// <style> blocks are comment-only (pinned by tests/per_entry_css_wiring.test.ts) and
-// carry no ten-dash banner, so every pinned section below is accounted for by
+// <style> blocks hold only the boot splash (pinned by tests/per_entry_css_wiring.test.ts)
+// and carry no ten-dash banner, so every pinned section below is accounted for by
 // src/styles alone. The union side stays because it is what makes the guard
 // indifferent to WHERE a section lives, which is the property being guarded, but it
 // means the src/styles read below is now the whole corpus rather than a supplement

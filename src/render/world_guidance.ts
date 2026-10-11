@@ -3,6 +3,7 @@
 import type * as THREE from 'three';
 import type { IWorld } from '../world_api';
 import { CannonEncounterVisual } from './cannon_encounter_visual';
+import { GFX } from './gfx';
 import { GliderCourseVisual } from './glider_course_visual';
 import { IslandGuidance } from './island_guidance';
 import { MountBeacon } from './mount_beacon';
@@ -28,6 +29,8 @@ export class WorldGuidance {
     compileGate?: (target: THREE.Object3D, requiredForEntry?: boolean) => Promise<unknown>,
     isQuestTracked?: (questId: string) => boolean,
     isEastbrookGuidanceEnabled?: () => boolean,
+    // The renderer's own Low rule, read once like the renderer reads it.
+    lowGfx = !GFX.standardMaterials,
   ) {
     // Show-jumping racing line: self-scoped course guidance, hidden outside the
     // player's own race (driven per frame from world.mountRaceView() below).
@@ -54,6 +57,7 @@ export class WorldGuidance {
       scene,
       groundAt,
       compileGate && ((root) => compileGate(root, true)),
+      lowGfx,
     );
     this.glider = new GliderCourseVisual(
       scene,

@@ -293,4 +293,31 @@ describe('A Borrowed Face', () => {
     expect(interact).toHaveBeenCalledOnce();
     expect(hud.openQuestDialog).not.toHaveBeenCalled();
   });
+
+  it('runs the investigation when it arrives as a reroll, off the base board', () => {
+    // wq1_101 offers the drowned dead in Mirefen; the infiltrator is the reroll.
+    const cycle = 'wq1_101';
+    expect(activeWorldQuestsForCycle(cycle).some((quest) => quest.id === ID)).toBe(false);
+    const sim = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      devCommands: true,
+      world: {
+        ...BUILTIN_WORLD,
+        camps: [],
+        npcs: Object.fromEntries(INVESTIGATION_NPCS.map((npc) => [npc.id, npc])),
+        groundObjects: [],
+      },
+    });
+    sim.resetDay = '2026-09-06';
+    sim.chat('/dev infiltrator');
+    const meta = sim.meta(sim.playerId)!;
+    meta.devWorldQuestCycle = cycle;
+    sim.tick();
+    meta.worldQuestReplacements = { wq_mirefen_drowned: ID };
+    sim.tick();
+    expect(sim.worldQuestLog.get(ID)?.state).toBe('active');
+    investigate(sim);
+    expect(sim.worldQuestLog.get(ID)?.investigation).toEqual({ heard: 15, clues: 3, cleared: 0 });
+  });
 });

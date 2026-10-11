@@ -700,7 +700,37 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted for the integrated WebGL context restore, spirit-veil, and
+  // trinket relics merge: the merged renderer and view-priority leaves match
+  // no parent. No capture was retaken.
+  // Re-minted after formatting the merged renderer helper: same content path,
+  // new renderer bytes. No capture was retaken.
+  // Re-minted after compressing that helper for the monolith ratchet: same
+  // content path, new renderer bytes. No capture was retaken.
+  // Re-minted for the GLTF parser release (the LoadedGltf type swap in mailbox.ts and
+  // noticeboard.ts). No capture was retaken.
+  // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
+  // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
+  // one tree. No capture was retaken.
+  // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
+  // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
+  // was retaken.
+  // Re-minted for PR #4279 on top of the v0.45 candidate: Spell Effects
+  // moves the renderer leaf and extracts world cue spell gating. No capture
+  // was retaken.
+  // Re-minted for the v0.45 release batch after entity-view policy moved.
+  // No capture was retaken.
+  // Re-minted for PR #4379 on top of that v0.45 batch: the renderer leaf now
+  // carries the dungeon/arena static interior retry tracker beside the batch's
+  // spirit-veil and Spell Effects imports. No capture was retaken.
+  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
+  // Re-minted for Sporemender Form: the renderer leaf gained the Sporemender form-rig slot and the form-slot loops. No capture was retaken.
+  // Re-minted for the Sporemender spores: the renderer leaf gained the Sporemender particle-aura call. No capture was retaken.
+  // Re-minted for the Sporemender rework: the renderer leaf moved the spores onto a character-effect flag (form or Wildbloom HoT). No capture was retaken.
+  // Re-minted for the spore drift split: the renderer leaf picks the form or the sparser HoT drift through characterSporeAura. No capture was retaken.
+  // Re-minted for the v0.45 release batch after the merged Eastbrook runtime
+  // inputs settled. No capture was retaken.
+  'eed86f0423e147ce1ffc782f9947bfa6f63480a344363294de97745bad9bb96a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

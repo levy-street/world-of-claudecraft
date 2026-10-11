@@ -81,17 +81,27 @@ locks out is a dead button). The bleeds run long (Flense 18 sec, Bloodrift
 24 sec, totals unchanged) so building a point or two before detonating no
 longer forfeits the first bleed. In Bruin Form, Bonecrush becomes
 Marrowbreak. Above half health, Marrowbreak deals a burst with snap threat.
-Below half health, it instead converts the bank into an absorb based on maximum
-health and restores rage.
+Below half health, it instead converts the bank into an instant heal for 18% of
+maximum health and restores rage (an 8 sec absorb before the Groveheart rework
+pass 2).
 
 Wildfang may select either tank or damage in Dungeon Finder. Bruin remains the
 tank form and Cat has a full damage budget.
 
 ## Groveheart
 
-Completed Wildbloom and Second Bloom casts that plant a new owned HoT add one
-Verdance, to five. HoT ticks and casts that refresh an existing owned HoT do not
-add stages. At full Verdance, Swiftmend becomes Overbloom.
+Every completed Wildbloom, Second Bloom, and Wildmend cast adds one Verdance, to
+three (`VERDANCE_STAGES`). A Wildbloom or Second Bloom that refreshes an existing
+owned HoT counts the same as a fresh plant; HoT ticks never add stages. At full
+Verdance, Swiftmend becomes Overbloom.
+
+Banked Verdance speeds Wildmend to a defined pre-haste cast time
+(`VERDANCE_WILDMEND_CAST_TIMES`): 2.2 sec at one, 1.9 sec at two, 1.5 sec at
+three. The rule lives in the shared ability resolution chain, so the tooltip,
+the cast bar, and the server's cast start agree, and it never lengthens a cast
+that already resolves faster.
+
+Gladesong (the level 17 major cooldown) costs 240 mana on a 60 sec cooldown.
 
 Overbloom removes every HoT the caster owns on every friendly ally and
 immediately heals each ally for 60% of that HoT's remaining healing. Overhealing
@@ -119,8 +129,8 @@ Nature's Echo seeds the next engine cycle with one stage. Wild Apex increases
 every engine payoff by 25%. Quickening restores the resource matching the
 Druid's current form whenever an engine stage is banked.
 
-Wild Apex scales the Marrowbreak guard absorb too (18% of maximum health
-becomes 22.5% with the capstone). The absorb IS the payoff in the guard arm,
+Wild Apex scales the Marrowbreak guard heal too (18% of maximum health
+becomes 22.5% with the capstone). The heal IS the payoff in the guard arm,
 and a capstone that serves all three engines cannot go dead for the tank half
 of Wildfang; the direction PDF's 15 to 20% band describes the base value, and
 the tank profile probe owns whether the scaled value holds up.
@@ -176,7 +186,8 @@ and finisher share of the feral profile.
 
 Deliberate scope decisions, made with the standardization:
 
-- Bruin Form keeps weapon-speed swings; only `form_cat` standardizes.
+- Bruin Form swings at half its weapon's speed since the Groveheart rework pass 2
+  (see that section below); only `form_cat` uses the fixed paw cadence.
 - Cat weaponStrike specials (Rendclaw, Flense) keep their RAW weapon roll,
   the classic non-normalized special shape: only the auto arm rescales its
   roll. Their attack-power-per-swing term follows the shared
@@ -193,3 +204,39 @@ Deliberate scope decisions, made with the standardization:
 Pinned by `tests/form_swing.test.ts` (cadence, normalization closed forms,
 the special arm, the Requital rescale) and the `cat_form_auto_swing` parity
 scenario (the swing cadence in the deterministic golden net).
+
+## Groveheart rework pass 2
+
+- Nature's Boon (Wildfang) procs at about 4 per minute in every form: the
+  per-swing chance is `NATURES_BOON_PPM` times the swing's base interval over
+  60 (`naturesBoonChanceAt`), so Cat Form's 1.0 sec swing keeps its 1 in 15 and
+  Bruin Form's faster swing rolls a matching smaller chance. Every proc also
+  clears Oakhide's cooldown, so a window that lands while Oakhide is cooling
+  down can still be spent on it.
+- Bruin Form swings twice as fast (`BEAR_FORM_SWING_MULT`) for half the damage
+  per swing (`BEAR_FORM_AUTO_DAMAGE_MULT`, with the attack power term following
+  the new cadence), and each white swing mints double rage
+  (`BEAR_FORM_AUTO_RAGE_MULT`). White damage and white threat are unchanged;
+  rage per second doubles. Weapon-enchant procs per minute read the real Bruin
+  cadence (`combat/equip_procs.ts`), so the faster swing does not double them.
+- Groveheart gets its own Nature's Boon: each tick of a heal-over-time effect
+  the druid owns has a `GROVEHEART_BOON_TICK_CHANCE` (10%) chance, behind a
+  `GROVEHEART_BOON_ICD` (10 sec) internal cooldown, to arm a 10 sec window in
+  which Wildmend is instant, free, 25% stronger, and castable in any form. The
+  heal still scales off the pre-boon cast time (`scalingCastTime`).
+- Second Bloom heals the same HoT total over 15 sec (was 21). If the HoT runs
+  its full duration it heals the target again for the amount the opening heal
+  produced (`closingHealFromDirect`, `combat/druid_second_bloom.ts`). A
+  Fleetmend consume, an Overbloom harvest, a dispel, or a recast ends it early
+  and pays no closing heal.
+- Marrowbreak's below-half-health guard heals for 18% of maximum health
+  (`healPctMaxHp`) instead of raising an 8 sec absorb; it cannot critically
+  strike, so it draws no rng.
+- Bruin Form halves only its WHITE swings: a queued Bonecrush (or any strike
+  riding the swing) keeps the full weapon roll and the weapon-speed Attack
+  Power term.
+- A Bonecrush queued on the next swing still lands as Bonecrush when Old Blood
+  fills before the swing (the button turning into Marrowbreak no longer drops
+  the parked strike).
+
+Pinned by `tests/groveheart_rework_pass2.test.ts`.

@@ -875,12 +875,17 @@ describe('real catalog integration', () => {
     // none feat or hidden).
     // 286 with the release's ferry round trip (exp_harbor_to_harbor).
     // 287 with the Buried Hoards Coinsack catch (cmb_coinsack_caught, visible).
-    expect(view.summary.visibleTotal).toBe(287);
+    // 288 with the sixth lifetime-XP rung (prog_titan, visible).
+    // Five visible World PvP streak deeds and the hard Wisp Maze deed extend
+    // the completion denominator.
+    expect(view.summary.visibleTotal).toBe(294);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
     // from visibleTotal): 268 + 22 = 290, then 298, 305, 307 and 308 by the same
-    // four appends, then 309 with the Buried Hoards Coinsack catch.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(309);
+    // four appends, then 309 with the Buried Hoards Coinsack catch, then 310
+    // with the sixth lifetime-XP rung (prog_titan), 315 with World PvP, then
+    // 316 with the hard Wisp Maze deed.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(316);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

@@ -27,6 +27,8 @@ import { warriorKitAssetsState } from './ability_vfx/production_assets';
 import { CAST_VFX_FAMILIES, type CastVfxFamilyId } from './cast_vfx_family';
 import { type CastVfxReadiness, createCastVfxReadiness } from './cast_vfx_readiness_core';
 import { type CompileArmHost, linkColorPrograms } from './compile_arms';
+import { registerContextRestoreReset } from './context_restore_registry';
+import { GFX } from './gfx';
 import { isProgramKnownReady, markProgramsReadyUnder } from './linked_program_readiness';
 import type { LinkedProgramLike } from './linked_program_touch';
 import type { PrewarmManifestEntry } from './prewarm_entry';
@@ -73,18 +75,29 @@ function linkUnit(
   };
 }
 
-/** One link unit per distinct pooled program, the engine family's first,
- *  then the kit's (the programs the gate waits on), then one for the staged
- *  lazy stand-ins (null before their stage), which never hold a cast.
- *  `compile` is the test seam. */
+/** The device declines the Warrior kit's assets: the renderer hands this same
+ *  answer to ensureWarriorKitAssets, and no graphics switch changes it. Such a
+ *  device (a phone) never draws a kit piece, since every one waits on a sheet,
+ *  a geometry or a preparation the declined load never provides. */
+export function warriorKitDeclinedByDevice(): boolean {
+  return GFX.constrainedMemory;
+}
+
+/** One link unit per distinct pooled program, the engine family's first, then
+ *  the kit's unless the device declines it, then the relics' (the programs the
+ *  gate waits on), then one for the staged lazy stand-ins (null before their
+ *  stage), which never hold a cast. `compile` and `kitDeclined` are the test
+ *  seams. */
 export function castVfxProgramUnits(
   scene: THREE.Object3D,
   standIns: THREE.Object3D | null,
   host: CompileArmHost,
   webgl: LinkedProgramSource,
   compile: CompileRoot = colourArm(host),
+  kitDeclined: boolean = warriorKitDeclinedByDevice(),
 ): PrewarmResumeUnit[] {
-  const units = collectAbilityVfxCompileTargets(scene).map((target) =>
+  const declined: CastVfxFamilyId[] = kitDeclined ? ['kit'] : [];
+  const units = collectAbilityVfxCompileTargets(scene, declined).map((target) =>
     linkUnit(`program:${target.id}`, target.object, webgl, compile),
   );
   if (standIns) units.push(linkUnit('ability-materials:compile', standIns, webgl, compile));
@@ -113,6 +126,19 @@ export function castVfxStandInSlot(
         markProgramsReadyUnder(webgl.properties, group);
       }),
   });
+}
+
+/** After a WebGL context restore closed the cast gate again: the first-read
+ *  links (the reads a player acts on) ahead of every pooled program, engine
+ *  then kit, each recording its proof on the restored context. */
+export function castVfxRestoreUnits(
+  scene: THREE.Object3D,
+  firstReadRoots: readonly (THREE.Object3D | null | undefined)[],
+  host: CompileArmHost,
+  webgl: LinkedProgramSource,
+): PrewarmResumeUnit[] {
+  const firstReads = castVfxFirstReadsEntry(firstReadRoots, host, webgl).resumeProgramUnits?.();
+  return [...(firstReads ?? []), ...castVfxProgramUnits(scene, null, host, webgl)];
 }
 
 export const CAST_VFX_FIRST_READS_ENTRY_ID = 'vfx.cast-first-reads';
@@ -171,21 +197,23 @@ export interface CastVfxGateHost extends LinkedProgramSource {
 
 /** The gate over each family's programs in the scene. Their pools are built
  *  with the renderer, before any consult, so each set is read once and nothing
- *  waits on a stage. The kit family stands down on a device that declined the
- *  kit's assets (warriorKitAssetsState), where its pools never draw. */
+ *  waits on a stage. The kit family stands down on a device that declines the
+ *  kit, from the first read: its programs get no unit there, so a consult
+ *  before the first Warrior sighting must not wait on them. */
 export function createSceneCastVfxReadiness(
   scene: THREE.Object3D,
   webgl: CastVfxGateHost,
   now: () => number = () => performance.now(),
   deadlineMs: number = CAST_VFX_READY_DEADLINE_MS,
-  kitDeclined: () => boolean = () => warriorKitAssetsState() === 'declined',
+  kitDeclined: () => boolean = () =>
+    warriorKitDeclinedByDevice() || warriorKitAssetsState() === 'declined',
 ): CastVfxReadiness {
   let byFamily: Map<CastVfxFamilyId, THREE.Material[]> | null = null;
   const materialsOf = (id: CastVfxFamilyId): THREE.Material[] => {
     byFamily ??= abilityVfxFamilyMaterials(scene);
     return byFamily.get(id) ?? [];
   };
-  return createCastVfxReadiness<THREE.Material>({
+  const readiness = createCastVfxReadiness<THREE.Material>({
     now,
     frame: () => webgl.info?.render.frame ?? Number.NaN,
     deadlineMs,
@@ -205,4 +233,6 @@ export function createSceneCastVfxReadiness(
       return program && isProgramKnownReady(program) ? program : null;
     },
   });
+  registerContextRestoreReset('cast-vfx-readiness', readiness, (gate) => gate.reset());
+  return readiness;
 }

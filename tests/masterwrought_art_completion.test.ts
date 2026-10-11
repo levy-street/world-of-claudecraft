@@ -824,7 +824,8 @@ describe('Masterwrought art completion evidence', () => {
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
     // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
     // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
-    expect(currentOwnerIds).toHaveLength(1464);
+    // + the World PvP trophy skull (pvp_trophy_skull), likewise outside it.
+    expect(currentOwnerIds).toHaveLength(1465);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -984,6 +985,8 @@ describe('Masterwrought art completion evidence', () => {
         // beyond the dated completion union, like the Field Kit.
         id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
+        // The World PvP trophy skull, additive the same way.
+        id !== 'pvp_trophy_skull' &&
         !season2WeaponIds.has(id) &&
         !hoardBranchIds.has(id),
     );

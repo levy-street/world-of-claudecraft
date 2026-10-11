@@ -7,6 +7,7 @@ import {
   rowTreeFor,
   type SpecDef,
   type StatModEffect,
+  specSignatureIds,
   TALENTS,
   type TalentEffect,
   type TalentRowOption,
@@ -15,6 +16,7 @@ import { ABILITIES, CLASSES } from '../sim/data';
 import type { AbilityEffect, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import {
+  formatList,
   getLanguage,
   type InterpolationValues,
   languageTag,
@@ -10661,6 +10663,12 @@ function abilityName(id: string): string {
   return tEntity({ kind: 'ability', id, field: 'name' });
 }
 
+// Every signature a spec grants, as one localized list ("Fleetmend and
+// Sporemender Form"); a single signature is just its name.
+function signatureNames(spec: SpecDef, lang: SupportedLanguage): string {
+  return formatList(specSignatureIds(spec).map(abilityName), lang);
+}
+
 type GrantEffectShape = {
   type: string;
   min?: number;
@@ -11271,10 +11279,12 @@ export function tTalent(request: TalentTranslationRequest): string {
     if (request.kind === 'talentSpec') {
       // The description names the signature spell so the spec card tooltip always
       // tells the player which spell picking this spec grants (parity with the
-      // localized specDescription arms, pinned by talent_tooltip_accuracy).
-      return request.field === 'name'
-        ? request.spec.name
-        : `${request.spec.description} Signature: ${abilityName(request.spec.signature)}.`;
+      // localized specDescription arms, pinned by talent_tooltip_accuracy). A spec
+      // with a second signature (Groveheart) lists both, primary first.
+      if (request.field === 'name') return request.spec.name;
+      const signatures = specSignatureIds(request.spec);
+      const label = signatures.length > 1 ? 'Signatures' : 'Signature';
+      return `${request.spec.description} ${label}: ${signatureNames(request.spec, lang)}.`;
     }
     if (request.kind === 'talentChoice') {
       return request.field === 'name'
@@ -11302,7 +11312,7 @@ export function tTalent(request: TalentTranslationRequest): string {
       localeText[lang].specDescription(
         className(request.spec.class),
         localeText[lang].roleLabels[request.spec.role],
-        abilityName(request.spec.signature),
+        signatureNames(request.spec, lang),
       )
     );
   }

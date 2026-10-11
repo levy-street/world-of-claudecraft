@@ -973,7 +973,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1015,
-      "state": "a0a3cca4",
+      "state": "2231eff6",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -984,7 +984,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1015,
-      "state": "a0a3cca4",
+      "state": "2231eff6",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -1274,7 +1274,6 @@
           }
         },
         {
-          "aggroTargetId": 1014,
           "aiState": "idle",
           "ccImmune": true,
           "combatTimer": 0.05,
@@ -1390,7 +1389,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1015,
-      "state": "a0a3cca4",
+      "state": "2231eff6",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -1680,7 +1679,6 @@
           }
         },
         {
-          "aggroTargetId": 1014,
           "aiState": "idle",
           "ccImmune": true,
           "combatTimer": 0.05,

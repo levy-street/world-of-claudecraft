@@ -402,7 +402,9 @@ const dungeons = Object.values(DUNGEONS)
 // Druid shapeshift forms: player-worn models a reader meets constantly, shown as their own
 // gallery group. Labels are guide.models.form* keys on the client, not baked names.
 // form_sheep stays out: it is the polymorph victim model, not a druid form.
-const DRUID_FORM_KEYS = ['form_bear', 'form_cat', 'form_travel'];
+// form_sporemender is the Groveheart-only shape (Moonwing has no model, so it
+// stays prose on the class page).
+const DRUID_FORM_KEYS = ['form_bear', 'form_cat', 'form_travel', 'form_sporemender'];
 const druidForms = DRUID_FORM_KEYS.map((vk) => {
   const model = modelKeyFor(vk);
   if (!model) throw new Error(`druid form visual missing from the manifest: ${vk}`);

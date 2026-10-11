@@ -559,7 +559,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           if (
             e.dead ||
             hasShadowCloak(e) ||
-            gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog)
+            gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog) ||
+            e.auras.some((a) => a.id === 'rift_feather_glider')
           )
             return;
           const radius = Math.max(
@@ -585,7 +586,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         if (
           e.dead ||
           hasShadowCloak(e) ||
-          gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog)
+          gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog) ||
+          e.auras.some((a) => a.id === 'rift_feather_glider')
         )
           return;
         if (isTrivialTo(mob, e)) return;

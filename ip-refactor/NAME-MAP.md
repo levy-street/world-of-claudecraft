@@ -280,7 +280,7 @@ zero extra rows were needed (verified by G0, recorded in 02-WORKING-MEMORY.md).
 | `healing_touch` | Healing Touch | Wildmend | ability | rename |
 | `mark_of_the_wild` | Mark of the Wild | Wildward | ability | rename |
 | `moonfire` | Moonfire | Lunar Tempest | ability | rename |
-| `rejuvenation` | Rejuvenation | Wildbloom | ability | rename |
+| `rejuvenation` | Rejuvenation | Sporemending | ability | rename |
 | `thorns` | Thorns | Briarguard | ability | rename |
 | `entangling_roots` | Entangling Roots | Gripping Roots | ability | rename |
 | `bear_form` | Bear Form | Bruin Form | ability | rename |

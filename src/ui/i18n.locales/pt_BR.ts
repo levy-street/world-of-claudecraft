@@ -522,7 +522,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Facções',
   'hudChrome.currencies.heroicMarkNote': 'Masmorras heroicas. Use com o intendente heroico',
   'hudChrome.currencies.honor': 'Honra',
-  'hudChrome.currencies.honorNote': 'Campos de batalha e arena',
+  'hudChrome.currencies.honorNote': 'Campos de batalha, arena e missões de mundo',
   'hudChrome.currencies.intro':
     'Nenhuma delas ocupa espaço na mochila. As moedas continuam na sua mochila como sempre.',
   'hudChrome.currencies.lifetime': 'Acumulado: {amount}',
@@ -2107,7 +2107,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Ladrões esconderam seu ouro roubado por todo o meu labirinto, e agora as sombras o protegem. Recupere todas as bolsas de moedas. Evite os guardiões, ou pegue um lampejo radiante para bani-los. Perder três vidas te devolve à entrada, mas as bolsas que você já recolheu permanecem seguras.',
   'entities.itemSets.vanguard_druid_balance.name': 'Vestimenta do Guarda-Estelar',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'O tempo de conjuração de Raízes Agarradoras é reduzido em 0,5 s.',
+    'O tempo de conjuração de Raízes Agarradoras é reduzido em 0,5 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Conjurar Raízes Agarradoras permite conjurar em movimento e aumenta sua velocidade de movimento em 20% por 4 s. Não pode ocorrer mais de uma vez a cada 20 s.',
   'entities.itemSets.vanguard_druid_feral.name': 'Pelagem da Juba de Sangue',
@@ -2117,7 +2117,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Investida de Bruin te escuda em 6% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Veste da Flor de Cardo',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'O tempo de recarga de Recuperação Rápida é reduzido em 1 s.',
+    'O tempo de recarga de Recuperação Rápida é reduzido em 1 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Recuperação Rápida também aumenta sua velocidade de movimento em 30% por 3 s.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Arreios do Guarda da Matilha',
@@ -2137,22 +2137,22 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Gancho Sangrento concede 1 de Ímpeto de Caça.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Vestes do Vínculo das Horas',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'O tempo de recarga de Barreira Temporal é reduzido em 2 s.',
+    'O tempo de recarga de Barreira Temporal é reduzido em 2 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Barreira Temporal também aumenta a velocidade de movimento do alvo escudado em 20% por 3 s.',
   'entities.itemSets.vanguard_mage_fire.name': 'Regália do Chicote de Brasa',
   'entities.itemSets.vanguard_mage_fire.bonus2':
-    'O tempo de recarga de Chuva de Brasas é reduzido em 3 s.',
+    'O tempo de recarga de Chuva de Brasas é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Conjurar Chuva de Brasas reduz o tempo de recarga restante de Barreira Flamejante em 2 s.',
   'entities.itemSets.vanguard_mage_frost.name': 'Traje do Guarda da Geada',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    'O tempo de recarga de Grilhão de Gelo é reduzido em 2 s.',
+    'O tempo de recarga de Grilhão de Gelo é reduzido em 2 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Conjurar Grilhão de Gelo reduz em 5 s o tempo de recarga restante de Passo Ligeiro.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Regália da Vigília Solar',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'O tempo de recarga de Pacto da Vida é reduzido em 30 s.',
+    'O tempo de recarga de Pacto da Vida é reduzido em 30 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Pacto da Vida também escuda o aliado em 8% da vida máxima dele por 6 s.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Bastião do Voto do Escudo',
@@ -2167,17 +2167,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Chamado da Valquíria reinicia o tempo de recarga de Édito Final, e seu próximo Édito Final conjurado em até 6 s causa 15% mais dano.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Vestimenta do Salmo do Véu',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'O tempo de recarga de Grito Psíquico é reduzido em 3 s.',
+    'O tempo de recarga de Grito Psíquico é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Quando seu Salmo de Proteção é totalmente consumido, o aliado escudado ganha 20% de velocidade de movimento por 3 s. Não pode ocorrer mais de uma vez a cada 8 s.',
   'entities.itemSets.vanguard_priest_holy.name': 'Vestimenta da Asa da Graça',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'O tempo de recarga de Passo do Véu é reduzido em 6 s.',
+    'O tempo de recarga de Passo do Véu é reduzido em 6 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Passo do Véu também te escuda em 8% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Regália do Hino do Crepúsculo',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litania da Aflição também reduz a velocidade de movimento do alvo em 30% enquanto você a canaliza.',
+    'Litania da Aflição também reduz a velocidade de movimento do alvo em 30% enquanto você a canaliza. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Invocar Demônio do Dízimo também te escuda em 10% da sua vida máxima por 8 s.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Couros do Corte Noturno',
@@ -2197,7 +2197,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Soco no Estômago concede 2 pontos de combo adicionais quando usado a partir de Fumaça Dissipante.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Malha de Batalha do Desígnio da Tempestade',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'O tempo de recarga de Desencadear Arma é reduzido em 3 s.',
+    'O tempo de recarga de Desencadear Arma é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Desencadear Arma permite conjurar em movimento e aumenta sua velocidade de movimento em 20% por 4 s. Não pode ocorrer mais de uma vez a cada 20 s.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Malha de Guerra do Filho do Vendaval',
@@ -2207,22 +2207,22 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Golpe Ancestral reduz em 4 s o tempo de recarga restante de Elemental Trance.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cota de Malha do Guarda da Salmoura',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Águas Restauradoras é conjurada 0,5 s mais rápido em um aliado abaixo de 50% de vida.',
+    'Águas Restauradoras é conjurada 0,5 s mais rápido em um aliado abaixo de 50% de vida. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Chamado da Maré também escuda seu alvo em 5% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vestes da Pena do Pavor',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'O tempo de conjuração de Atormentar é reduzido em 0,3 s.',
+    'O tempo de conjuração de Atormentar é reduzido em 0,3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumir cura 30% a mais e pode ser canalizado em movimento.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Regália do Vínculo da Medula',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'O tempo de recarga de Bone Armor é reduzido em 10 s.',
+    'O tempo de recarga de Bone Armor é reduzido em 10 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command reduz em 2 s o tempo de recarga restante de Bone Armor.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Vestes da Coroa de Escória',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'O tempo de recarga de Cinderhide é reduzido em 30 s.',
+    'O tempo de recarga de Cinderhide é reduzido em 30 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'A cada segunda conjuração de Conflagrar, sua próxima Seta da Ruína em até 8 s se torna instantânea.',
   'entities.itemSets.vanguard_warrior_arms.name': 'Equipamento de Batalha do Rastro da Lâmina',
@@ -2255,7 +2255,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Anuncia uma colina agora; ela surge após o aviso completo.',
   'devCommand.actions.hillwarn.label': 'Contagem regressiva da colina',
   'entities.abilities.lava_burst.description':
-    'Causa {damage} de dano de Fogo. Sempre acerta criticamente um alvo que estiver queimando com seu Abalo de Brasa. Surto de Magma: cada tique de Abalo de Brasa tem 20% de chance de reiniciar este tempo de recarga e tornar seu próximo Magma Burst instantâneo em até 10 s. O dano aumenta com o Poder Mágico. (Distintivo de Chamado do Trovão)',
+    'Causa {damage} de dano de Fogo. Um acerto concede 1 de Trovão. Sempre acerta criticamente um alvo que estiver queimando com seu Abalo de Brasa. Um acerto crítico causa 24% adicionais do dano normal. Surto de Magma: cada tique de Abalo de Brasa tem 20% de chance de reiniciar este tempo de recarga e tornar seu próximo Magma Burst instantâneo em até 10 s. O dano aumenta com o Poder Mágico. (Distintivo de Chamado do Trovão)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     'Passiva: Raio em Arco e Relâmpago Bifurcado têm 20% de chance de sofrer Sobrecarga, atingindo o primeiro alvo novamente por 50% do dano causado e concedendo 1 de Trovão. (Distintivo de Chamado do Trovão)',
@@ -4762,7 +4762,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Matar um jogador hostil concede Passo de Cinzas, aumentando a velocidade de movimento em 40% por 6 s.',
   'entities.itemSets.warfare_ashstalker.name': 'Equipamento Ashstalker',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4774,13 +4775,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Matar um jogador hostil concede Juramento Inquebrado, absorvendo 200 de dano por 10 s.',
   'entities.itemSets.warfare_furyforged.name': 'Traje de Batalha Furyforged',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Vossas magias têm 15% de chance de conceder Guarda de Brasa, absorvendo 120 de dano por 8 s.',
   'entities.itemSets.warfare_stormbound.name': 'Vestes Stormbound',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -9360,7 +9363,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Assumi o aspecto da marta e aumentai vossa chance de esquiva em 8% por 30 min.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Forma do Corcel',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Assumi o aspecto do corcel e aumentai vossa velocidade de movimento em 30% por 30 min. Enquanto estiver ativo, sofrer dano vos desnorteia, reduzindo vossa velocidade de movimento pela metade por 4 s (cada acerto renova a duração).',
+    'Assumi o aspecto do corcel e aumentai vossa velocidade de movimento em 30% por 30 min. Enquanto estiver ativo, sofrer dano vos desnorteia, reduzindo vossa velocidade de movimento pela metade por 2 s (cada acerto renova a duração).',
   'entities.abilities.aimed_shot.name': 'Puxada Longa',
   'entities.abilities.aimed_shot.description':
     'Atira no alvo causando {damage} de dano Físico. O dano aumenta com o poder de ataque à distância.',
@@ -9414,7 +9417,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Envolve-vos em relâmpagos por 10 min. Os 3 próximos ataques corpo a corpo contra vós causam {buff} de dano de Natureza ao atacante, no máximo uma vez a cada 5 s.',
   'entities.abilities.flame_shock.name': 'Abalo de Brasa',
   'entities.abilities.flame_shock.description':
-    'Causa {damage} de dano de Fogo, e depois {overTime} de dano de Fogo ao longo de 12 s. O acerto inicial aumenta com o Poder Mágico.',
+    'Causa {damage} de dano de Fogo, e depois {overTime} de dano de Fogo ao longo de {duration} s. O acerto inicial aumenta com o Poder Mágico.',
   'entities.abilities.flametongue_weapon.name': 'Arma Flamígera',
   'entities.abilities.flametongue_weapon.description':
     'Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano de Fogo adicional.',
@@ -9462,11 +9465,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.name': 'Raio Selvagem',
   'entities.abilities.healing_touch.name': 'Cura Selvagem',
   'entities.abilities.healing_touch.description': 'Cura um alvo aliado em {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Cada lançamento concluído adiciona 1 de Verdor (máx. 3). O Verdor acumulado encurta este lançamento: 2,2 s com 1 de Verdor, 1,9 s com 2 e 1,5 s com 3. Dádiva da Natureza o torna instantâneo, gratuito e 25% mais forte.',
   'entities.abilities.mark_of_the_wild.name': 'Guarda Selvagem',
   'entities.abilities.mark_of_the_wild.description':
     'Coloca o Wildward em um alvo aliado, aumentando a armadura em {buff} por 30 min.',
   'entities.abilities.moonfire.name': 'Tempestade Lunar',
-  'entities.abilities.rejuvenation.name': 'Florescer Selvagem',
   'entities.abilities.thorns.name': 'Guarda de Espinhos',
   'entities.abilities.thorns.description':
     'Espinhos brotam do alvo: atacantes corpo a corpo sofrem {buff} de dano de Natureza.',
@@ -9474,7 +9478,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': 'Enraíza o alvo no lugar por até 12 s.',
   'entities.abilities.bear_form.name': 'Forma de Bruin',
   'entities.abilities.bear_form.description':
-    'Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Transformar-se em qualquer forma concede Passada Solta, um breve aumento de velocidade de movimento. Lance de novo para voltar à forma de conjurador.',
+    'Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Você ataca duas vezes mais rápido com metade do dano por golpe, e cada golpe gera o dobro de raiva. Transformar-se em qualquer forma concede Passada Solta, um breve aumento de velocidade de movimento. Lance de novo para voltar à forma de conjurador.',
   'entities.abilities.maul.name': 'Esmaga-Ossos',
   'entities.abilities.growl.name': 'Ameaçar',
   'entities.abilities.growl.description':
@@ -16251,7 +16255,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     'Invoca 3 feras por 12 s. Cada uma ataca a cada 2 s causando {damage} de dano Físico. O dano exibido inclui 8% do seu poder de ataque à distância antes dos bônus de dano de companheiro. As feras fixam a Ferocidade da Matilha ao serem invocadas, ganhando 10% de dano por acúmulo. Enquanto a Debandada está em recarga, Comandos da Matilha bem-sucedidos têm 20% de chance de reiniciá-la, garantido após 5 chances falhas. Ela não pode reiniciar enquanto as feras estiverem ativas. (Senhor da Matilha)',
   'entities.abilities.trailbreak.description':
-    'Salta 12 metros para trás. Se você tiver Ímpeto de Caça, ele é renovado e prepara a Reentrada por 12 s.',
+    'Salta 25 metros para trás e liberta você de enraizamentos e lentidões de movimento. Se você tiver Ímpeto de Caça, ele é renovado e prepara a Reentrada por 12 s.',
   'entities.abilities.unleash_beast.description':
     'Consome 3 de Ferocidade da Matilha depois que seu companheiro golpeia causando de 83 a 105 de dano Físico e sacode todos os inimigos a até 6 metros causando de 26 a 34. O golpe e a sacudida usam o bônus completo de 30% de dano de companheiro da Ferocidade da Matilha e aumentam com o poder de ataque do companheiro. Pelos 8 s seguintes, o companheiro causa 25% mais dano, ataca 35% mais rápido e faz o Tiro Vil atingir até 2 inimigos próximos.',
   'entities.abilities.wildheart.description': 'Restaura instantaneamente 30% da sua vida máxima.',
@@ -16278,7 +16282,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passiva: enquanto o Golpe Ancestral está em recarga, consumir um Presságio de Tempestade tem 25% de chance de reiniciá-lo. Se as 3 primeiras chances falharem, a 4.ª sempre o reinicia. (Espírito Guerreiro)',
   'entities.abilities.thunder_reservoir.description':
-    'Passiva: o Raio em Arco e o Relâmpago Bifurcado concedem Trovão, até 5. Com 5 de Trovão, o Abalo Terreno causa 125% mais dano ou o Terremoto causa 100% mais, e então consome todo o Trovão. (Chamado do Trovão)',
+    'Passiva: o Raio em Arco, o Relâmpago Bifurcado e o Magma Burst concedem Trovão, até 5. Com 5 de Trovão, o Abalo Terreno causa 125% mais dano ou o Terremoto causa 100% mais, e então consome todo o Trovão. (Chamado do Trovão)',
   'entities.abilities.tidecall.description':
     'Cura um alvo aliado em {damage}. A cura aumenta com o poder mágico. Adiciona a cura completa antes do excesso à Corrente Restauradora, até 30% da vida máxima do alvo.',
   'entities.abilities.unleash_weapon.description':
@@ -16352,7 +16356,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Quebra-Medula',
   'entities.abilities.marrowbreak.description':
-    'Consome seus 3 de Sangue Antigo para um golpe pesado de alta ameaça com {damage} de dano. Abaixo de metade da vida, em vez disso protege você com um escudo de 18% da sua vida máxima por 8 s e devolve 15 de fúria.',
+    'Consome seus 3 de Sangue Antigo para um golpe pesado de alta ameaça com {damage} de dano. Abaixo de metade da vida, em vez disso cura você em 18% da sua vida máxima e devolve 15 de fúria.',
   'entities.abilities.moonlash.name': 'Onda Lunar',
   'entities.abilities.moonlash.description':
     'Consome seus 3 de Maré Lunar para um golpe pesado de {damage} de dano Arcano: a escolha de dano. Esteira Solar consome os mesmos 3 de Maré Lunar, então escolha um.',
@@ -16361,7 +16365,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até {duration} s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar.',
   'entities.abilities.overbloom.name': 'Superflorescência',
   'entities.abilities.overbloom.description':
-    'Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo.',
+    'Consome 3 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Sporemending novo no alvo.',
   'entities.abilities.redharvest.name': 'Colheita Vermelha',
   'entities.abilities.redharvest.description':
     'Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura {rage} de energia. Funciona sem pontos de combo.',
@@ -16976,7 +16980,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
     'O destaque da coleção congelada e a primeira peça que todo colecionador procura. Presa de Gelo foi entalhada, não forjada, de uma presa da geleira que coroa Thornpeak acima de Highwatch; seu núcleo ciano arde frio como a luz sobre Glimmermere. Ela congela o próprio ar que corta. Os guardas da muralha juram que um soldado a carregou na noite em que as neves altas seguraram os Juramentados da Ninhada e “compraram um inverno para a muralha”.',
   'hudChrome.auraEffect.verdance':
-    'Verdance {stacks}/{max}. Cada Florescer Selvagem ou Segundo Florescer NOVO que você plantar adiciona 1. Em {max}, Recuperação Rápida vira Superflorescência',
+    'Verdor {stacks}/{max}. Cada Sporemending, Segundo Florescer ou Cura Selvagem que você lançar adiciona 1, e cada ponto encurta o lançamento de Cura Selvagem. Com {max}, Recuperação Rápida vira Superflorescência',
   'hudChrome.continentMap.levels': 'Níveis {min} a {max}',
   'hudChrome.continentMap.summary': 'Mapa do mundo. Escolha uma zona para abrir seu mapa.',
   'hudChrome.continentMap.title': 'Mapa do Mundo',
@@ -17214,7 +17218,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Um ataque brutal que aumenta o dano corpo a corpo em {damage} e causa uma grande quantidade de ameaça. Ativa no seu próximo golpe. Apenas Forma de Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Quebra-Medula: um golpe de 78 a 96 de dano com alta ameaça; abaixo de metade da vida, ele em vez disso escuda você em 18% da sua vida máxima e reembolsa 15 de raiva.',
+    'Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Quebra-Medula: um golpe de 78 a 96 de dano com alta ameaça; abaixo de metade da vida, ele em vez disso cura você em 18% da sua vida máxima e reembolsa 15 de raiva.',
   'entities.abilities.moonfire.description':
     'Queima o inimigo com fogo lunar causando {damage} de dano Arcano mais dano ao longo do tempo.',
   'entities.abilities.moonfire.specNote_balance':
@@ -17247,12 +17251,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Gasta 2 Fragmentos de Alma para comandar todos os servos mortos-vivos a golpear em uníssono. Guardas Tumulares provocam e se preparam, Guerreiros imobilizam, Magos de Ossos expõem defesas mágicas, e a Asa Tumular dilacera todos os inimigos atingidos.',
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Cura um alvo aliado em {damage} e uma quantidade adicional ao longo de 21 s.',
+    'Cura um alvo aliado em {damage} e uma quantidade adicional ao longo de 15 s. Se o efeito durar até o fim, cura o alvo novamente na mesma quantidade da cura inicial.',
   'entities.abilities.regrowth.specNote_restoration':
-    'Plantar uma NOVA floração adiciona 1 Verdance (máx. 5).',
+    'Cada lançamento adiciona 1 de Verdor (máx. 3), inclusive ao renovar uma floração que já está ativa.',
   'entities.abilities.rejuvenation.description': 'Cura o alvo em {damage} ao longo de 12 s.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Plantar uma NOVA floração adiciona 1 Verdance (máx. 5). Em 5 Verdance, Recuperação Rápida se torna Superflorescência.',
+    'Cada lançamento adiciona 1 de Verdor (máx. 3), inclusive ao renovar uma floração que já está ativa. Com 3 de Verdor, Recuperação Rápida se torna Superflorescência.',
   'entities.abilities.rip.description':
     'Movimento finalizador que faz o alvo sangrar a cada 2 s por 24 s: 36 de dano mais 24 por ponto de combo gasto (5 pontos de combo: {damage} no total). Apenas Forma de Gato.',
   'entities.abilities.rip.specNote_feral': 'O acerto adiciona 1 de Sangue Antigo (máx. 3).',
@@ -17296,7 +17300,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Cada abertura usada a partir de Duskveil adiciona 1 Gloam (máx. 3).',
   'entities.abilities.swiftmend.description':
-    'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. Plantios de Florescer Selvagem e Segundo Florescer adicionam Verdance; em 5 Verdance, este botão se torna Superflorescência, que cura instantaneamente cada aliado portando seus efeitos de cura ao longo do tempo em 60% do que restava desses efeitos. (assinatura de Coração do Bosque)',
+    'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. Cada lançamento de Sporemending, Segundo Florescer e Cura Selvagem adiciona 1 de Verdor; com 3 de Verdor, este botão se torna Superflorescência, que cura instantaneamente cada aliado portando seus efeitos de cura ao longo do tempo em 60% do que restava desses efeitos. (assinatura de Coração do Bosque)',
   'entities.abilities.swipe.description':
     'Varre com suas garras os inimigos próximos causando {damage} de dano. Causa ameaça extra. Apenas Forma de Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
@@ -18390,8 +18394,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Os golpes uníssonos do Comando Ceifador causam 25% a mais de dano.',
   'entities.itemSets.gravebrand.name': 'Regalia da Marca Tumular',
-  'entities.itemSets.grovespring.bonus2':
-    'Cura Rápida consome primeiro sua própria Florescência Selvagem ou Segunda Florescência e cura 25% a mais. Dano sofrido não atrasa mais suas conjurações.',
   'entities.itemSets.grovespring.bonus4':
     'Florescência Excedente colhe 75% dos seus efeitos restantes e armazena 1 Verdância depois.',
   'entities.itemSets.grovespring.name': 'Paramento da Nascente do Bosque',
@@ -19563,7 +19565,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Uma vitória ranqueada paga Honra, a moeda de jogador contra jogador, e uma derrota jogada até o fim ainda paga uma parte menor, assim como um empate, então a classificação é o único custo real de uma derrota. Honra deve recompensar partidas reais: vencer o mesmo oponente ou a mesma equipe outra vez no mesmo dia não paga nada além, nem perder para eles novamente, uma longa sequência de vitórias paga por inteiro no primeiro trecho e depois reduz pela metade o pagamento de uma vitória, reduzindo-o de novo mais adiante e permanecendo assim, e uma partida abandonada pelo oponente ainda move sua classificação, mas não paga Honra. O dia é do reino: ele reinicia na hora do reset noturno, o mesmo limite em que toda restrição diária é liberada.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros.',
+    'Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros. Há uma exceção que funciona em todo lugar: duas peças de um conjunto de conjurador também fazem com que o dano recebido não atrase mais suas conjurações.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Essa é a troca deliberada. O equipamento de Guerra foi feito para lutar contra jogadores, não para pular os níveis das masmorras: uma peça de Guerra nunca traz as classificações de combate que um épico de masmorra no mesmo espaço traz, e as classificações de Guerra e os bônus de conjunto que ela traz são gastos inteiramente contra outros jogadores. Se quiser se garantir na arena, compre-o. Se quiser limpar heroicas mais rápido, conquiste seu equipamento nas masmorras.',
   'guide.controls.harvestJournal': 'Diário de Colheita',
@@ -20037,4 +20039,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Efetiva: {effective} | Sobrecura: {overheal} ({overhealPercent}) | Acertos: {hits} ({critPercent} crítico)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Acertos: {hits} | Críticos: {crits} ({critPercent}) | Média: {average} | Mín./máx.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Volume do ambiente',
+  'hudChrome.mapAtlas.resizeRailAria': 'Largura da barra lateral do mapa',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Arraste para redimensionar a barra lateral do mapa. Clique duas vezes para redefinir.',
 };

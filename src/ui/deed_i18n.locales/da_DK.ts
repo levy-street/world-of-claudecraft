@@ -1162,4 +1162,8 @@ export const table: DeedLocaleTable = {
     name: 'Pågrebet på Fersk Gerning',
     desc: 'Fang en Møntposekryber i en Begravet Hoard, før den stikker af med guldet.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Klarere end skyggerne',
+    desc: 'Find de stjalne pengepunge og undslip Evergarden-labyrinten pa Hard.',
+  },
 };

@@ -1,9 +1,9 @@
 # Resurrection coverage and cooldowns
 
-Owner directive (2026-09-01): every primary healer spec fields a resurrection,
-and every healer resurrection shares one five-minute cooldown. Recorded here so
-the numbers stop being folklore; `tests/healer_rez_parity.test.ts` pins all of
-it.
+Every primary healer spec fields a resurrection. Out-of-combat resurrection
+abilities have no cooldown (owner directive, 2026-10-05). Combat resurrection
+keeps its existing cooldown. `tests/healer_rez_parity.test.ts` pins the roster,
+cooldowns, and successive casts.
 
 ## The roster
 
@@ -19,16 +19,14 @@ it.
 
 ## The cooldown rule
 
-- Every healer resurrection above runs on a five-minute cooldown, and the group
-  revives are pinned equal to Collective Reversal's so no mass revive outclasses
-  another.
-- `requiresOutOfCombat` blocks group resurrection while the hate-table or
-  boss-group combat hold remains active. The five-minute cooldown limits
-  repeated resurrection across encounters and after the boss resets.
-- The one deliberate exception: Temporal Reversal keeps its ten-minute
-  cooldown. Chronomancy fielded the game's first combat resurrection and its
-  longer clock keeps a death costly there; Wildwake's five minutes follows the
-  shared healer rule instead.
+- Recall the Fallen, Prayer of Returning, Ancestors' Return, Grove Awakening,
+  and Collective Reversal have no cooldown. This includes Recall the Fallen's
+  Sunmender group upgrade.
+- `requiresOutOfCombat` still blocks resurrection while the hate-table or
+  boss-group combat hold remains active. Cast times, mana costs, and reach
+  restrictions remain unchanged.
+- Wildwake keeps its five-minute combat resurrection cooldown, and Temporal
+  Reversal keeps its ten-minute combat resurrection cooldown.
 
 ## Mechanics shared by every revive
 

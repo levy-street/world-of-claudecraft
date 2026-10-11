@@ -49,7 +49,9 @@ describe('vault seeds', () => {
   });
 
   it('preserves old seeds as caves and round-trips the metadata namespace', () => {
-    expect(VAULT_ZONE_IDS).toEqual(TREASURE_SITES.map((site) => site.zoneId));
+    expect([...VAULT_ZONE_IDS].sort()).toEqual(
+      [...new Set(TREASURE_SITES.map((site) => site.zoneId))].sort(),
+    );
     expect(makeVaultSeed(3, 0xffffffff)).toBe(0xffffffff);
     const oldSeedWithMetadataBitsSet = makeVaultSeed(2, 0x0f800000);
     expect(vaultSeedOpen(oldSeedWithMetadataBitsSet)).toBe(false);

@@ -14529,11 +14529,18 @@
   /* The atlas: a 300px plated rail beside the map stage. An absolutely
      positioned child resolves against the PADDING box, so inset: 0 would cover
      the --window-pad band, and that band is the only drag handle a headerless
-     map window has (Hud.isWindowDragHandle grabs #map-window itself). Both
-     panes therefore inset by --window-pad on every edge they touch, and the
-     stage's left edge is that pad plus the 300px rail plus the 12px gutter. */
+     map window has (src/ui/window_drag_handle.ts grabs #map-window itself).
+     Both panes therefore inset by --window-pad on every edge they touch, and
+     the stage's left edge is that pad plus the 300px rail plus the 12px
+     gutter. The resize corner overlaps that band; a press there resizes. */
+  /* --map-rail-width is the atlas rail's width: 300px shipped, and the player
+     sets it with the divider between the rail and the stage
+     (src/ui/hud/map/map_rail_resize_controller.ts writes it inline). The
+     window grows with the rail (624px is the shipped stage share plus the
+     pads and gutter), so the map keeps its size. */
   #map-window {
-    width: 924px;
+    --map-rail-width: 300px;
+    width: calc(624px + var(--map-rail-width));
     max-width: calc(100vw - 24px);
     --window-pad: 14px;
   }
@@ -14544,7 +14551,7 @@
     position: absolute;
     inset: var(--window-pad) auto var(--window-pad) var(--window-pad);
     box-sizing: border-box;
-    width: 300px;
+    width: var(--map-rail-width);
     padding: 14px 12px;
     display: flex;
     flex-direction: column;
@@ -14573,12 +14580,52 @@
   .map-atlas-stage {
     position: absolute;
     inset: var(--window-pad) var(--window-pad) var(--window-pad)
-      calc(var(--window-pad) + 300px + 12px);
+      calc(var(--window-pad) + var(--map-rail-width) + 12px);
     min-width: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+  }
+  /* The divider between the rail and the stage: it fills the 12px gutter, and
+     dragging it (or its arrow keys, Home and End; a double-click resets)
+     widens the rail so long quest titles and the world-quest board stop
+     truncating. A thin rule marks it; hover, focus and a live drag brighten
+     it. It stands down wherever the rail is collapsed, empty, or hidden. */
+  .map-atlas-splitter {
+    position: absolute;
+    top: var(--window-pad);
+    bottom: var(--window-pad);
+    left: calc(var(--window-pad) + var(--map-rail-width));
+    width: 12px;
+    cursor: ew-resize;
+    touch-action: none;
+    z-index: 1;
+  }
+  .map-atlas-splitter::before {
+    content: "";
+    position: absolute;
+    top: 25%;
+    bottom: 25%;
+    left: 5px;
+    width: 2px;
+    border-radius: 1px;
+    background: var(--gold-dim);
+    opacity: 0.45;
+  }
+  .map-atlas-splitter:hover::before,
+  .map-atlas-splitter.is-dragging::before,
+  .map-atlas-splitter:focus-visible::before {
+    opacity: 1;
+  }
+  .map-atlas-splitter:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  #map-window:has(> .map-atlas-sidebar:empty) .map-atlas-splitter,
+  #map-window:has(> .map-atlas-sidebar.is-collapsed) .map-atlas-splitter,
+  body.mobile-touch .map-atlas-splitter {
+    display: none;
   }
   /* Until the rail is fed (Hud wiring), the empty plate collapses and the map
      keeps the whole window rather than shipping a blank column. */
@@ -14615,6 +14662,57 @@
   body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar.is-collapsed) .map-atlas-stage {
     inset: var(--window-pad) var(--window-pad) var(--window-pad)
       calc(var(--window-pad) + 44px + 12px);
+  }
+  /* A player-resized map (the shared corner grip, src/ui/window_resize.ts,
+     stamps .window-sized and writes an inline width and height). The stage
+     becomes a size container and the canvas grows into the largest square it
+     fits, while map_canvas_size_controller.ts resizes the backing store to
+     match so the map stays crisp. The overlay controls are pinned to that
+     square face rather than the stage corners, through the face offsets
+     below; the unregistered custom properties substitute their tokens at each
+     child, so the container units resolve against the stage. The minimum
+     sizes keep a roughly 300px face beside the rail in each rail state, but
+     never more than the viewport allows (the shell's own max-width cap). The
+     face sheds the canvas border (2px a side, the #map-canvas rule below) to
+     size its content box. Unsized, the shipped 560px layout above is
+     untouched. Desktop only: the touch sheet never takes the grip, and
+     map_canvas_size_controller.ts drops a desktop size left on the window
+     when the HUD switches to touch. */
+  body:not(.mobile-touch) #map-window.window-sized {
+    min-width: min(calc(340px + var(--map-rail-width)), calc(100vw - 24px));
+    min-height: 360px;
+  }
+  body:not(.mobile-touch) #map-window.window-sized:has(> .map-atlas-sidebar.is-collapsed) {
+    min-width: min(384px, calc(100vw - 24px));
+  }
+  body:not(.mobile-touch) #map-window.window-sized:has(> .map-atlas-sidebar:empty) {
+    min-width: min(328px, calc(100vw - 24px));
+  }
+  body:not(.mobile-touch) #map-window.window-sized .map-atlas-stage {
+    container-type: size;
+    --map-face: min(100cqw, 100cqh);
+    --map-face-x: calc((100cqw - var(--map-face)) / 2);
+    --map-face-y: calc((100cqh - var(--map-face)) / 2);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-canvas {
+    width: calc(var(--map-face) - 4px);
+    height: calc(var(--map-face) - 4px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-close {
+    top: calc(var(--map-face-y) + 8px);
+    right: calc(var(--map-face-x) + 8px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-level-toggle {
+    top: calc(var(--map-face-y) + 8px);
+    left: calc(var(--map-face-x) + 8px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-zoom {
+    right: calc(var(--map-face-x) + 22px);
+    bottom: calc(var(--map-face-y) + 22px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized .map-atlas-compass {
+    top: calc(var(--map-face-y) + 52px);
+    right: calc(var(--map-face-x) + 14px);
   }
   /* Touch keeps the shipped single-pane map: the rail and the map-face chrome
      the atlas adds have no room on a 330px sheet (W13 owns the touch rail). */
@@ -14976,6 +15074,16 @@
     display: none;
     flex-direction: column;
     max-height: min(700px, 80vh);
+  }
+  /* Inside the zoomed #ui: viewport lengths divide by --window-scale (raw vh
+     re-multiplies by the zoom and runs the vault off the bottom). The top is
+     the shared .window 10vh restated in the same units, so the sheet ends at
+     98% of the screen at any UI scale. */
+  #dungeon-finder-window.df-vault-mode {
+    top: calc(var(--app-vh, 100vh) * 0.1 / var(--window-scale));
+    width: min(980px, calc(var(--app-vw, 100vw) * 0.96 / var(--window-scale)));
+    height: min(780px, calc(var(--app-vh, 100vh) * 0.88 / var(--window-scale)));
+    max-height: min(780px, calc(var(--app-vh, 100vh) * 0.88 / var(--window-scale)));
   }
   .df-tabs {
     display: flex;
@@ -22947,6 +23055,7 @@
   }
   .weekly-choice-status {
     font-size: 13px;
+    margin: 0;
   }
   .weekly-tracks {
     display: flex;
@@ -23171,7 +23280,35 @@
   }
   .weekly-vault-toolbar {
     display: flex;
-    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+  .weekly-vault-toolbar .weekly-choice-status {
+    flex: 999 1 260px;
+    min-width: min(100%, 220px);
+  }
+  .weekly-loot-focus {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-width: 0;
+    flex: 1 1 280px;
+  }
+  .weekly-loot-focus .ui-input {
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+    flex: 1 1 180px;
+  }
+  .weekly-loot-focus-help {
+    flex-basis: 100%;
+    font-size: 12px;
+  }
+  .weekly-rolled-focus {
+    font-size: 12px;
   }
   .weekly-possible-loot-button {
     min-height: 44px;
@@ -24362,11 +24499,19 @@
     justify-content: flex-end;
   }
   @media (min-width: 1100px) and (min-height: 700px) {
+    /* #bank-window lives inside the zoomed #ui (`zoom: var(--ui-scale)`), so
+       every viewport length divides by --window-scale, exactly as the base
+       rule above does: raw vw/vh here re-multiply by the zoom and push the
+       vault off-screen at any UI scale above 1. The 1080px cap is an author
+       length (already zoom space) and centres against the scaled viewport. */
     body.weekly-vault-open #bank-window {
-      left: 2vw;
-      top: max(2vh, calc((100vh - 1080px) / 2));
-      width: 96vw;
-      height: min(96vh, 1080px);
+      left: calc(var(--app-vw, 100vw) * 0.02 / var(--window-scale));
+      top: max(
+        calc(var(--app-vh, 100vh) * 0.02 / var(--window-scale)),
+        calc((var(--app-vh, 100vh) / var(--window-scale) - 1080px) / 2)
+      );
+      width: calc(var(--app-vw, 100vw) * 0.96 / var(--window-scale));
+      height: min(calc(var(--app-vh, 100vh) * 0.96 / var(--window-scale)), 1080px);
     }
     #weekly-rewards-panel {
       flex: 1;
@@ -24398,11 +24543,28 @@
     .weekly-reset strong {
       font-size: 16px;
     }
+    /* The loot controls and status share one flex row, so the button scrolls
+       with the panel and follows a header that wraps taller at high UI scale.
+       Lifted above the status text so the row never swallows its clicks. */
     .weekly-vault-toolbar {
-      position: absolute;
-      right: 18px;
-      top: 118px;
+      position: relative;
       z-index: 2;
+      align-self: stretch;
+      justify-content: flex-end;
+    }
+    .weekly-vault-toolbar .weekly-choice-status {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      box-sizing: border-box;
+      padding-right: min(56%, 560px);
+      min-height: 48px;
+      pointer-events: none;
+    }
+    .weekly-vault-toolbar .weekly-loot-focus {
+      flex: 0 1 430px;
+      margin-left: auto;
     }
     .weekly-possible-loot-button {
       min-height: 30px;
@@ -24410,7 +24572,7 @@
       font-size: 12px;
     }
     .weekly-choice-status {
-      padding: 3px 165px 3px 0;
+      padding: 3px 0;
       font-size: 12px;
       min-height: 30px;
     }
@@ -24429,6 +24591,15 @@
       grid-template-rows: repeat(2, minmax(0, 1fr));
       gap: 12px;
       container-type: size;
+    }
+    /* A floor for the full-screen sheet's vault art: the illustration width
+       below derives from this container's height, so on a short scaled
+       viewport (this media gate reads the real, unzoomed viewport) the tracks
+       hold their size and the panel scrolls instead of collapsing every vault
+       to a sliver. Scoped to the bank sheet; the Dungeon Finder's read-only
+       vault keeps its fit-to-window sizing. */
+    body.weekly-vault-open #bank-window .weekly-tracks {
+      min-height: 480px;
     }
     .weekly-track,
     .weekly-track:last-child {
@@ -24492,6 +24663,25 @@
       height: auto;
       aspect-ratio: 1;
       place-self: start center;
+    }
+    /* The overview tiles fill the art row the tile grid actually leaves, so a
+       label that wraps (a narrow tile at a high UI scale, a long locale) takes
+       height from the art instead of the square art spilling under the
+       footer. The art image is object-fit: contain, so it stays square and
+       centred; the earned glow sizes from the cell's shorter side to match. */
+    .weekly-tracks .weekly-vault-illustration {
+      container-type: size;
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+    }
+    .weekly-tracks .weekly-earned .weekly-vault-illustration::after {
+      inset: auto;
+      top: 50%;
+      left: 50%;
+      width: calc(min(100cqw, 100cqh) * 0.72);
+      aspect-ratio: 1;
+      translate: -50% -50%;
     }
     .weekly-milestone-footer {
       padding: 2px;

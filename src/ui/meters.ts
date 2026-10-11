@@ -42,6 +42,7 @@ import { iconDataUrl } from './icons';
 import { PlayerActivityTracker } from './meters_activity';
 import { AuraUptimeTracker } from './meters_auras';
 import {
+  abilityDetailStats,
   type BreakdownEntry,
   type BreakdownGroup,
   type BreakdownRow,
@@ -286,21 +287,13 @@ export function inferSpecFromAbility(cls: string | null, ability: string | null)
   return classSpecs[key] ?? null;
 }
 
-function addBreakdown(
+// The ability's breakdown entry, created empty on first use.
+function breakdownEntry(
   map: Map<string, BreakdownEntry>,
   petName: string | null,
   ability: string | null,
-  amount: number,
-  opts?: {
-    crit?: boolean;
-    absorbed?: number;
-    overheal?: number;
-    targetName?: string;
-    sourceName?: string;
-    abilityId?: string | null;
-    interruptedSpell?: string;
-  },
-): void {
+  abilityId: string | null | undefined,
+): BreakdownEntry {
   const key = breakdownKey(petName, ability);
   let entry = map.get(key);
   if (!entry) {
@@ -314,7 +307,7 @@ function addBreakdown(
     Object.defineProperty(entry, 'overheal', { value: 0, writable: true, enumerable: false });
     Object.defineProperty(entry, 'absorbed', { value: 0, writable: true, enumerable: false });
     Object.defineProperty(entry, 'abilityId', {
-      value: opts?.abilityId ?? null,
+      value: abilityId ?? null,
       writable: true,
       enumerable: false,
     });
@@ -335,7 +328,25 @@ function addBreakdown(
     });
     map.set(key, entry);
   }
+  return entry;
+}
 
+function addBreakdown(
+  map: Map<string, BreakdownEntry>,
+  petName: string | null,
+  ability: string | null,
+  amount: number,
+  opts?: {
+    crit?: boolean;
+    absorbed?: number;
+    overheal?: number;
+    targetName?: string;
+    sourceName?: string;
+    abilityId?: string | null;
+    interruptedSpell?: string;
+  },
+): void {
+  const entry = breakdownEntry(map, petName, ability, opts?.abilityId);
   entry.amount += amount;
   entry.hits = (entry.hits ?? 0) + 1;
   if (opts?.crit) {
@@ -828,7 +839,12 @@ export class MeterData {
       const targetEntity = world.entities.get(ev.targetId);
       const targetName = targetEntity?.name ?? `#${ev.targetId}`;
 
-      if (targetInParty) {
+      // A periodic tick that landed as pure overheal (a HoT on a full-health
+      // target) would only add a "+0" row that pushes real damage out of the
+      // short death recap, so it stays out.
+      const passiveOverhealTick =
+        ev.type === 'heal2' && ev.hot === true && ev.amount === 0 && !(ev.absorbed ?? 0);
+      if (targetInParty && !passiveOverhealTick) {
         const hpBefore = targetEntity?.hp;
         const maxHp = targetEntity?.maxHp;
         const hpAfter = Math.min(maxHp ?? (hpBefore ?? 0) + ev.amount, (hpBefore ?? 0) + ev.amount);
@@ -884,6 +900,21 @@ export class MeterData {
             overheal: 'overheal' in ev ? ev.overheal : undefined,
             targetName,
           });
+        }
+      } else if (
+        sourceInParty &&
+        ev.type === 'heal2' &&
+        ev.amount === 0 &&
+        (ev.overheal ?? 0) > 0
+      ) {
+        // A heal that landed entirely as overheal (a direct heal on a full-health
+        // target) healed nothing, so it adds no healing, hit, or crit; only its
+        // overheal counts toward the ability's overheal share.
+        const who = this.attribute(world, ev.sourceId, partyPids);
+        for (const enc of [this.current, this.allTime]) {
+          const t = this.tally(enc, who.pid, who.name, who.cls, partyPids, who.spec);
+          const entry = breakdownEntry(t.healByAbility, who.petName, ev.ability, ev.abilityId);
+          entry.overheal = (entry.overheal ?? 0) + (ev.overheal ?? 0);
         }
       }
     } else if (
@@ -2313,19 +2344,26 @@ export class MetersPanel {
       return;
     }
 
-    const hits = entry.hits ?? 1;
-    const crits = entry.crits ?? 0;
-    const critPct = hits > 0 ? Math.round((crits / hits) * 100) : 0;
-    const avg = hits > 0 ? Math.round(entry.amount / hits) : entry.amount;
-
-    if (this.tab === 'heal') {
-      const over = entry.overheal ?? 0;
-      const eff = Math.max(0, entry.amount - over);
-      const overPct = entry.amount > 0 ? Math.round((over / entry.amount) * 100) : 0;
-      this.subEl.textContent = `Efectiva: ${fmtNum(eff)} | Sobrecuración: ${fmtNum(over)} (${overPct}%) | Hits: ${hits} (${critPct}% crit)`;
-    } else {
-      this.subEl.textContent = `Hits: ${hits} | Crits: ${crits} (${critPct}%) | Media: ${fmtNum(avg)} | Mín/Máx: ${fmtNum(entry.minHit ?? avg)} / ${fmtNum(entry.maxHit ?? avg)}`;
-    }
+    const stats = abilityDetailStats(entry);
+    // Exact counts: fmtNum would compact an all-time hit count to "10.0k".
+    const count = (n: number) => formatNumber(n, { maximumFractionDigits: 0, useGrouping: false });
+    this.subEl.textContent =
+      this.tab === 'heal'
+        ? t('hudChrome.meters.detailHealSubtitle', {
+            effective: fmtNum(stats.effective),
+            overheal: fmtNum(stats.overheal),
+            overhealPercent: fmtPercent(stats.overhealShare),
+            hits: count(stats.hits),
+            critPercent: fmtPercent(stats.critShare),
+          })
+        : t('hudChrome.meters.detailHitSubtitle', {
+            hits: count(stats.hits),
+            crits: count(stats.crits),
+            critPercent: fmtPercent(stats.critShare),
+            average: fmtNum(stats.avg),
+            min: fmtNum(stats.minHit),
+            max: fmtNum(stats.maxHit),
+          });
 
     interface DetailRowItem {
       label: string;

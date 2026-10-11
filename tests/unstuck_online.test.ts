@@ -263,7 +263,7 @@ describe('online unstuck command wiring', () => {
 
   it('ClientWorld sends the dedicated append-only wire command', () => {
     const cmd = vi.fn();
-    ClientWorld.prototype.unstuck.call({ cmd } as never);
+    ClientWorld.prototype.unstuck.call({ cmd, movementWireVersion: 1 } as never);
     expect(cmd).toHaveBeenCalledWith({ cmd: 'unstuck' });
   });
 
@@ -682,9 +682,6 @@ describe('online unstuck command wiring', () => {
     spectator.session.spectating = {
       characterId: 2,
       name: 'Target',
-      savedPos: { x: 0, y: 0, z: 0 },
-      priorGm: false,
-      stowedPet: null,
     };
     send(server, spectator.session, { cmd: 'unstuck' });
     expect(unstuckEvents(spectator.sent)).toContainEqual({

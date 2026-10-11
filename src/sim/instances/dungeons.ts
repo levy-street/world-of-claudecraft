@@ -66,6 +66,8 @@ import {
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from './difficulty';
+import { retryPendingDifficultyChanges } from './difficulty_selection';
+import { nearestDungeonDoor } from './dungeon_door_selection';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
 import {
   IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS,
@@ -254,7 +256,7 @@ function instanceContains(origin: { x: number; z: number }, pos: Vec3): boolean 
   );
 }
 
-function instanceClaimContains(inst: InstanceSlot, pos: Vec3): boolean {
+export function instanceClaimContains(inst: InstanceSlot, pos: Vec3): boolean {
   const origin = instanceOriginOf(inst);
   if (instanceContains(origin, pos)) return true;
   if (inst.dungeonId !== WIDE_CLAIM_DUNGEON_ID) return false;
@@ -344,13 +346,17 @@ export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
       if (e.templateId === 'dungeon_door') ctx.dungeonDoorIds.push(e.id);
     }
   }
-  for (const doorId of ctx.dungeonDoorIds) {
-    const door = ctx.entities.get(doorId);
-    if (door?.dungeonId && dist2d(p.pos, door.pos) < DOOR_TRIGGER_RADIUS) {
-      enterDungeon(ctx, door.dungeonId, p.id);
-      return;
-    }
-  }
+  const corpseClaim = p.ghost && p.corpsePos ? claimedInstanceAt(ctx, p.corpsePos) : null;
+  const corpseDungeonId =
+    corpseClaim?.exitId === p.corpseInstanceId ? (corpseClaim?.dungeonId ?? null) : null;
+  const door = nearestDungeonDoor(
+    ctx.entities,
+    ctx.dungeonDoorIds,
+    p.pos,
+    DOOR_TRIGGER_RADIUS,
+    corpseDungeonId,
+  );
+  if (door?.dungeonId) enterDungeon(ctx, door.dungeonId, p.id);
 }
 
 export function enterDungeon(
@@ -1102,20 +1108,38 @@ export function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
 // unit: a member three rooms deep blocks resetting the lift, and a difficulty
 // transition abandons deeper checkpoints instead of preserving them at the new
 // difficulty.
-export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
+export type InstanceResetResult =
+  | { status: 'reset' | 'noClaims' | 'unchanged' }
+  | {
+      status: 'blocked';
+      reason: 'occupancy' | 'loot' | 'cooldown' | 'lockout' | 'authority';
+      text: string;
+    };
+
+export function resetDungeonInstances(
+  ctx: SimContext,
+  pid?: number,
+  options: { quiet?: boolean; occupied?: ReadonlySet<InstanceSlot> } = {},
+): InstanceResetResult {
   const r = ctx.resolve(pid);
-  if (!r) return;
+  if (!r) return { status: 'noClaims' };
+  const blocked = (
+    reason: 'occupancy' | 'loot' | 'cooldown' | 'lockout' | 'authority',
+    text: string,
+  ): InstanceResetResult => {
+    if (!options.quiet) ctx.error(r.meta.entityId, text);
+    return { status: 'blocked', reason, text };
+  };
   const party = ctx.partyOf(r.meta.entityId);
   if (party && party.leader !== r.meta.entityId) {
-    ctx.error(r.meta.entityId, 'You are not the party leader.');
-    return;
+    return blocked('authority', 'You are not the party leader.');
   }
 
   const key = instanceKeyFor(ctx, r.meta.entityId);
   const owned = ctx.instances.filter((inst) => inst.partyKey === key);
   if (owned.length === 0) {
-    ctx.error(r.meta.entityId, 'You have no instances to reset.');
-    return;
+    if (!options.quiet) ctx.error(r.meta.entityId, 'You have no instances to reset.');
+    return { status: 'noClaims' };
   }
   // Reset is a difficulty-transition escape hatch, not a same-difficulty farming
   // loop. The v0.26 durable key intentionally stopped relog from respawning Normal
@@ -1136,52 +1160,13 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
   }
   const resettable = owned.filter((inst) => resettableSet.has(inst));
   if (resettable.length === 0) {
-    ctx.error(
-      r.meta.entityId,
-      'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
-    );
-    return;
+    if (!options.quiet)
+      ctx.error(
+        r.meta.entityId,
+        'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
+      );
+    return { status: 'unchanged' };
   }
-  const ownerPids = resetOwnerPids(ctx, r.meta.entityId);
-  if (
-    resettable.some(
-      (inst) =>
-        inst.resetAvailableAt > ctx.time ||
-        ownerPids.some((ownerPid) => {
-          const lock = activeResetLock(ctx, ownerPid, inst.dungeonId);
-          return lock !== null && lock.claimId !== inst.exitId;
-        }),
-    )
-  ) {
-    ctx.error(r.meta.entityId, 'Instances can only be reset once every 5 minutes.');
-    return;
-  }
-  if (selected === 'heroic') {
-    const locked = resettable.find((inst) =>
-      isRaidLocked(ctx, r.meta, heroicLockoutId(inst.dungeonId)),
-    );
-    if (locked) {
-      ctx.error(r.meta.entityId, `You are locked to Heroic ${DUNGEONS[locked.dungeonId].name}.`);
-      return;
-    }
-  } else {
-    // The raid rooms ALSO gate a fresh NORMAL claim on their own weekly/daily
-    // lockout (a normal kill there pays Heroic-Mark-style rewards, unlike an
-    // ordinary five-man); no other dungeon carries one, so this is a no-op
-    // for every claim outside DAILY_LOCKOUT_RAID_ROOMS/WEEKLY_LOCKOUT_RAID_ROOMS,
-    // mirroring the at-the-door check in enterDungeon above.
-    const locked = resettable.find(
-      (inst) =>
-        (DAILY_LOCKOUT_RAID_ROOMS.has(inst.dungeonId) ||
-          WEEKLY_LOCKOUT_RAID_ROOMS.has(inst.dungeonId)) &&
-        isRaidLocked(ctx, r.meta, inst.dungeonId),
-    );
-    if (locked) {
-      ctx.error(r.meta.entityId, `You are locked to ${DUNGEONS[locked.dungeonId].name}.`);
-      return;
-    }
-  }
-
   // Validate every claim before freeing any so Reset All is atomic. A living player,
   // an unreleased corpse, or a released spirit still bound to a corpse in the claim
   // keeps it alive for recovery and loot instead of being stranded by the reset. The
@@ -1196,25 +1181,67 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
     const familyClaims = isIgnivarRaidRoom(inst.dungeonId)
       ? ignivarRaidClaimsForKey(ctx, key)
       : [inst];
-    for (const meta of ctx.players.values()) {
-      const player = ctx.entities.get(meta.entityId);
-      if (!player) continue;
-      const corpsePos = player.ghost ? player.corpsePos : null;
-      const bodyInside = familyClaims.some((claim) => instanceClaimContains(claim, player.pos));
-      const corpseInside =
-        corpsePos !== null &&
-        familyClaims.some(
-          (claim) =>
-            claim.exitId === player.corpseInstanceId && instanceClaimContains(claim, corpsePos),
-        );
-      if (bodyInside || corpseInside) {
-        ctx.error(r.meta.entityId, 'You cannot reset instances while someone is still inside.');
-        return;
-      }
+    if (options.occupied && familyClaims.some((claim) => options.occupied?.has(claim))) {
+      return blocked('occupancy', 'You cannot reset instances while someone is still inside.');
     }
+    if (!options.occupied)
+      for (const meta of ctx.players.values()) {
+        const player = ctx.entities.get(meta.entityId);
+        if (!player) continue;
+        const corpsePos = player.ghost ? player.corpsePos : null;
+        const bodyInside = familyClaims.some((claim) => instanceClaimContains(claim, player.pos));
+        const corpseInside =
+          corpsePos !== null &&
+          familyClaims.some(
+            (claim) =>
+              claim.exitId === player.corpseInstanceId && instanceClaimContains(claim, corpsePos),
+          );
+        if (bodyInside || corpseInside) {
+          return blocked('occupancy', 'You cannot reset instances while someone is still inside.');
+        }
+      }
+  }
+
+  const ownerPids = resetOwnerPids(ctx, r.meta.entityId);
+  if (
+    resettable.some(
+      (inst) =>
+        inst.resetAvailableAt > ctx.time ||
+        ownerPids.some((ownerPid) => {
+          const lock = activeResetLock(ctx, ownerPid, inst.dungeonId);
+          return lock !== null && lock.claimId !== inst.exitId;
+        }),
+    )
+  ) {
+    return blocked('cooldown', 'Instances can only be reset once every 5 minutes.');
+  }
+  if (selected === 'heroic') {
+    const locked = resettable.find((inst) =>
+      isRaidLocked(ctx, r.meta, heroicLockoutId(inst.dungeonId)),
+    );
+    if (locked) {
+      return blocked('lockout', `You are locked to Heroic ${DUNGEONS[locked.dungeonId].name}.`);
+    }
+  } else {
+    // The raid rooms ALSO gate a fresh NORMAL claim on their own weekly/daily
+    // lockout (a normal kill there pays Heroic-Mark-style rewards, unlike an
+    // ordinary five-man); no other dungeon carries one, so this is a no-op
+    // for every claim outside DAILY_LOCKOUT_RAID_ROOMS/WEEKLY_LOCKOUT_RAID_ROOMS,
+    // mirroring the at-the-door check in enterDungeon above.
+    const locked = resettable.find(
+      (inst) =>
+        (DAILY_LOCKOUT_RAID_ROOMS.has(inst.dungeonId) ||
+          WEEKLY_LOCKOUT_RAID_ROOMS.has(inst.dungeonId)) &&
+        isRaidLocked(ctx, r.meta, inst.dungeonId),
+    );
+    if (locked) {
+      return blocked('lockout', `You are locked to ${DUNGEONS[locked.dungeonId].name}.`);
+    }
+  }
+
+  for (const inst of resettable) {
     if (inst.mobIds.some((id) => ctx.entities.get(id)?.lootable)) {
-      ctx.error(r.meta.entityId, 'You cannot reset instances while loot remains inside.');
-      return;
+      return blocked('loot', 'You cannot reset instances while loot remains inside.');
     }
   }
 
@@ -1252,7 +1279,9 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
       });
     }
   }
-  ctx.error(r.meta.entityId, 'All instances have been reset.');
+  ctx.pendingDifficultyChanges.delete(r.meta.entityId);
+  if (!options.quiet) ctx.error(r.meta.entityId, 'All instances have been reset.');
+  return { status: 'reset' };
 }
 
 // Kill-time lockout recipients for a claimed instance: every CURRENT member of
@@ -1474,6 +1503,7 @@ export function awardHeroicMarks(
 // by tests/dungeon_instance_disconnect_reset.test.ts.
 export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
+  retryPendingDifficultyChanges(ctx);
   updateIgnivarRaidProgression(ctx);
   updateIgnivarForgeLift(ctx);
   tickIgnivarLavaHazard(ctx);

@@ -24,6 +24,7 @@ import type {
 import type { GroundAimPointXZ } from '../world_api/combat';
 import { abilityNeedsLineOfSight } from './ability_line_of_sight';
 import { offlineActionBarRestore } from './action_bar_restore';
+import { auraSaveFragment, restorePersistedAuras } from './aura_persist';
 import { maybeAutoEquip } from './auto_equip';
 import * as bagsMod from './bags';
 import {
@@ -31,7 +32,7 @@ import {
   BAG_SOCKETS,
   bagCapacity,
   bagPools,
-  canAddItem,
+  canGrantCopies,
   instancedCountCap,
   migrationBagsFor,
 } from './bags';
@@ -44,6 +45,10 @@ import type { CharacterState, PetState } from './character_state';
 import { restoreCharacterStorage, savedCharacterStorage } from './character_storage';
 import type { TreasureMapProgress } from './content/treasure_maps';
 import type { FactionId } from './factions';
+import {
+  type PendingDifficultyChange,
+  setDungeonDifficulty as setDungeonDifficultyImpl,
+} from './instances/difficulty_selection';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import * as treasureVaultMod from './treasure_vault';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
@@ -67,7 +72,6 @@ import { clearAfflictionState } from './combat/affliction';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
-  cleanseFriendlyNpcAuras,
   isRejectedFriendlyNpcAura,
   updateAuras,
   updateComboExpiry,
@@ -120,7 +124,7 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
-import { advanceHeroicLeap, heroicLeapPlacementPreview } from './combat/heroic_leap';
+import { heroicLeapPlacementPreview } from './combat/heroic_leap';
 import { clearFieldcraftState } from './combat/hunter_fieldcraft';
 import { clearPacklordState } from './combat/hunter_packlord';
 import { clearHunterTalentState, hunterPetDamageMultiplier } from './combat/hunter_shared';
@@ -203,7 +207,6 @@ import { type AbilityChargeState, applyCooldowns, serializeCooldowns } from './c
 import { dailyRewardsStub } from './daily_rewards_stub';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
-  ABILITIES,
   ALL_RECIPES,
   abilitiesKnownAt,
   arenaOrigin,
@@ -211,7 +214,6 @@ import {
   DELVE_COMPANIONS,
   DELVE_LIST,
   DELVE_SLOT_COUNT,
-  DUNGEON_LIST,
   delveOrigin,
   dungeonAt,
   getActiveWorldContent,
@@ -291,7 +293,6 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isChargeBearingPayload } from './item_instance_merge';
-import { meetsLevelRequirement } from './item_level_req';
 import { countRawInSlots, setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import { applyKnockback as applyKnockbackImpl } from './knockback';
@@ -308,6 +309,7 @@ import {
   paginateLeaderboard,
 } from './leaderboard_page';
 import { entityLineOfSightClear } from './line_of_sight_elevation';
+import { cloneGearSet } from './loadout_gear';
 import type { Ante, PickAction } from './lockpick';
 import { retirePartyTradeOnLoad, retirePartyTradeOnSave } from './loot/bop_trade_persistence';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
@@ -406,6 +408,7 @@ import {
   mountTrainBegin as mountTrainBeginImpl,
   tickMountTraining as tickMountTrainingImpl,
 } from './mounts_training';
+import { updateNpc } from './npc_update';
 import * as nythraxisReadouts from './nythraxis_raid_readouts';
 import {
   grantDevotionFromBlock,
@@ -677,13 +680,11 @@ import * as tradeMod from './social/trade';
 import {
   applyResurrectionSickness,
   applyUnstuckSickness,
-  RESURRECTION_SICKNESS_ID,
   releasePlayerSpirit,
   resurrectAtCorpse,
   resurrectAtSpiritHealer,
   revivePlayerAt,
   spawnOverworldSpiritHealers,
-  UNSTUCK_SICKNESS_ID,
 } from './spirit';
 import { resolveStoragePrices, type StoragePrices } from './storage_prices';
 import { repairTalentLoadouts } from './talent_loadouts';
@@ -767,6 +768,7 @@ import {
 } from './rift/rift_lockpick';
 import {
   advanceRiftRollers as advanceRiftRollersImpl,
+  emitRiftDeparture as emitRiftDepartureImpl,
   enterRift as enterRiftImpl,
   hoardBossCueViewsForPlayer,
   leaveRift as leaveRiftImpl,
@@ -778,6 +780,7 @@ import {
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
+import { riftSaveCorpsePos, riftSavePlacement } from './rift/save_position';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import { updateSpiritRunTriggers } from './spirit_run_triggers';
 import * as weeklyQuestMod from './weekly_quests';
@@ -834,7 +837,6 @@ import { Targeting } from './targeting';
 import { addThreat, TAUNT_FORCE_SECONDS, topThreatValue } from './threat';
 import {
   type AbilityDef,
-  type AbilityEffect,
   type ArenaCombatant,
   type ArenaFormat,
   type ArenaStanding,
@@ -868,7 +870,6 @@ import {
   type ItemInstancePayload,
   type ItemUseResult,
   isConsuming,
-  isDungeonDifficulty,
   isEquipSlot,
   isNonSpellCast,
   isPetClass,
@@ -880,7 +881,6 @@ import {
   MAX_LEVEL,
   type MasterLootPrompt,
   type MasterLootThreshold,
-  MELEE_RANGE,
   type MountRaceSession,
   type MountTrainingSession,
   type MoveInput,
@@ -2019,6 +2019,7 @@ export class Sim {
   private channelSubs = new Map<number, Set<JoinableChannel>>();
   // dungeon instances
   instances: InstanceSlot[] = [];
+  pendingDifficultyChanges = new Map<number, PendingDifficultyChange>();
   dungeonResetLocks = new Map<string, { availableAt: number; claimId: number }>();
   // procedural rift instances (separate slot pool + coordinate band from dungeons)
   riftInstances: RiftInstance[] = [];
@@ -3383,6 +3384,7 @@ export class Sim {
     // resolver below consume it (they only ever read these flat numbers).
     meta.talentMods = computeCharacterModifiers(cls, meta.talents, player.level, meta.equipment);
     this.refreshKnownAbilities(meta, false);
+    player.auras.push(...restorePersistedAuras(savedState?.auras, player.id)); // before the stat pass
     recalcPlayerStats(player, cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
     if (savedState) {
       player.hp = Math.max(1, Math.min(player.maxHp, savedState.hp));
@@ -3697,9 +3699,11 @@ export class Sim {
   }
 
   removePlayer(pid: number): void {
+    this.pendingDifficultyChanges.delete(pid);
     vehicleMod.leaveVehicle(this.ctx, pid);
     const meta = this.players.get(pid);
     if (!meta) return;
+    honorMod.settleWorldPvpSpoilsOnLeave(this.ctx, pid); // no-op after preparePlayerLeave
     // Offline/headless removals have no GameServer lifecycle hook. End an
     // accepted recovery explicitly so every accepted attempt has one terminal
     // event; the online server calls the same delegate earlier so it can attach
@@ -3783,6 +3787,7 @@ export class Sim {
   preparePlayerLeave(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
+    honorMod.settleWorldPvpSpoilsOnLeave(this.ctx, pid); // before `leaving` (world_pvp_spoils.ts)
     if (!meta.leaving) {
       const leavingEntity = this.entities.get(pid);
       if (leavingEntity?.castingAbility === 'rain_of_fire') cancelCastImpl(this.ctx, leavingEntity);
@@ -3840,6 +3845,7 @@ export class Sim {
     // forces a fresh re-summon instead of laundering the summon cooldown for free.
     // Hunter pets (non-demon) persist. See pet_commands.isDemonPetState.
     const petSnapshot = this.serializePet(pid);
+    const riftExit = riftSavePlacement(this.ctx, e.pos); // a rift save resumes at its portal
     // One fold serves both persisted proficiency keys below: the live counters
     // plus any still-queued grants (foldPendingGatherGrants), so a leave-time
     // save landing between the tick that queued a grant and the tick that
@@ -3882,17 +3888,15 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: ferryMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
-      facing: e.facing,
+      pos: riftExit?.pos ?? ferryMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
+      facing: riftExit?.facing ?? e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
       dead: e.dead,
       ghost: e.ghost,
-      corpsePos: e.corpsePos ? { x: e.corpsePos.x, z: e.corpsePos.z } : null,
-      // The Keeper's Toll persists across logout (it cannot be shed by relogging).
-      resSickness: e.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID)?.remaining ?? null,
-      // Unstuck Sickness persists across logout for the same reason.
-      unstuckSickness: e.auras.find((a) => a.id === UNSTUCK_SICKNESS_ID)?.remaining ?? null,
+      corpsePos: riftSaveCorpsePos(this.ctx, e.corpsePos),
+      // The two sicknesses and the buffs, as remaining time (aura_persist.ts).
+      ...auraSaveFragment(e, restore !== null),
       equipment: { ...meta.equipment },
       equipmentInstance: Object.fromEntries(
         Object.entries(meta.equipmentInstance).map(([slot, inst]) => [
@@ -3970,6 +3974,7 @@ export class Sim {
         name: l.name,
         alloc: cloneAllocation(l.alloc),
         bar: [...l.bar],
+        ...(l.gear ? { gear: cloneGearSet(l.gear) } : {}),
       })),
       activeLoadout: meta.activeLoadout,
       raidLockouts: Object.fromEntries(
@@ -4973,6 +4978,9 @@ export class Sim {
       set dungeonDoorIds(v) {
         sim.dungeonDoorIds = v;
       },
+      get pendingDifficultyChanges() {
+        return sim.pendingDifficultyChanges;
+      },
       get instances() {
         return sim.instances;
       },
@@ -5344,10 +5352,7 @@ export class Sim {
       summonPet: sim.summonPet.bind(sim),
       petOf: sim.petOf.bind(sim),
       completeTame: sim.completeTame.bind(sim),
-      // partyOf stays bound to Sim's thin delegate (it forwards to this.party);
-      // removeFromParty routes to the moved machine (points-at social/party, A1).
-      // clearEntityMarker + dropPartyMarkers now route to the moved marker store
-      // (points-at targeting, T1); lazy arrows since `sim.targeting` is built after ctx.
+      // Party and marker callbacks resolve lazily after their machines are built.
       clearEntityMarker: (id: number) => sim.targeting.clearEntityMarker(id),
       // P1b new shared-helper bindings; both STAY on Sim. error/playerGcdFor/
       // healingThreat/countItem are bound elsewhere in this host (C4a/C2/C3/Q1) - deduped.
@@ -5364,6 +5369,9 @@ export class Sim {
       pullTimerStart: (rawCommand: string, pid?: number) => sim.pullTimerStart(rawCommand, pid),
       pullTimerCancel: (pid?: number) => sim.pullTimerCancel(pid),
       removeFromParty: (pid: number, verb: string) => sim.party.removeFromParty(pid, verb),
+      hillPartyDisband: (partyId: number, survivorPid: number) =>
+        hillMod.hillPartyDisband(sim.ctx, partyId, survivorPid),
+      hillPartyJoin: (pid: number) => hillMod.hillPartyJoin(sim.ctx, pid),
       // Dungeon Finder formation seam (points at the party machine); lazy arrow
       // since `sim.party` is built after ctx.
       formDungeonFinderGroup: (units, opts) => sim.party.formDungeonFinderGroup(units, opts),
@@ -5406,6 +5414,7 @@ export class Sim {
       leaveDungeon: sim.leaveDungeon.bind(sim),
       enterRift: sim.enterRift.bind(sim),
       leaveRift: sim.leaveRift.bind(sim),
+      emitRiftDeparture: (pid, from) => emitRiftDepartureImpl(sim.ctx, pid, from),
       riftOpenTreasure: sim.riftOpenTreasure.bind(sim),
       resetDungeonInstances: sim.resetDungeonInstances.bind(sim),
       inheritDungeonResetLocks: sim.inheritDungeonResetLocks.bind(sim),
@@ -5465,8 +5474,8 @@ export class Sim {
       resolveMovePoint: sim.resolveMovePoint.bind(sim),
       resolvePlayerMove: sim.resolveMove.bind(sim),
       resolveMove: sim.resolveMove.bind(sim),
-      // P1a pet AI lives in src/sim/pet/pet_ai.ts; locomotion.updateMob reaches it
-      // through this seam binding (late-bound arrow so sim.ctx resolves at call time).
+      platformFor: (p) => ferryMod.ferryDeckPlatform(sim.ctx, p),
+      // P1a pet AI lives in src/sim/pet/pet_ai.ts; late-bound so sim.ctx resolves at call time.
       updatePet: (pet) => petAi.updatePet(sim.ctx, pet),
       isDelveCompanionMob: companionMod.isDelveCompanionMob,
       // I2c delve companion AI lives in src/sim/delves/companion.ts; locomotion.updateMob's
@@ -6063,7 +6072,7 @@ export class Sim {
         updateAuras(this.ctx, e);
         lap?.('mob.auras');
       } else if (e.kind === 'npc') {
-        cleanseFriendlyNpcAuras(this.ctx, e);
+        updateNpc(this.ctx, e);
       } else if (e.kind === 'object') {
         if (!e.lootable) {
           e.respawnTimer -= DT;
@@ -6142,7 +6151,7 @@ export class Sim {
     lap?.('battleground');
     worldPvpMod.updateWorldPvp(this.ctx); // the /pvp clock, zone pass + books sweep; zero rng
     lap?.('worldPvp');
-    hillMod.updateHill(this.ctx); // King of the Hill (pvp/hill.ts): spawns draw a PRIVATE rng
+    hillMod.updateHill(this.ctx, weeklyMod.recordWeeklyPvpWin); // King of the Hill (pvp/hill.ts): PRIVATE rng
     lap?.('hill');
     // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
     // matching on the sim clock), so appending it here cannot fork the draw order.
@@ -8205,11 +8214,11 @@ export class Sim {
   // True when `count` copies of the item fit the player's pooled bag budget
   // (existing stacks top up first). The capacity gate every blocking command
   // path (buy, loot, pickup, fish, conjure, collect, trade, turn-in) pre-checks.
-  canAddItem(itemId: string, count: number, pid?: number): boolean {
+  canAddItem(itemId: string, count: number, pid?: number, copy?: InvSlot['instance']): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
     const { meta } = r;
-    return canAddItem(meta.inventory, bagPools(meta.bags), itemId, count);
+    return canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, count, copy);
   }
 
   equipBag(
@@ -10587,30 +10596,14 @@ export class Sim {
     return this.dungeonDifficultyForPid(r.meta.entityId);
   }
 
+  activeDungeonDifficulty(pid?: number): DungeonDifficulty | null {
+    const r = this.resolve(pid),
+      claimId = r ? this.instanceClaimIdAt(r.e.pos) : null;
+    return this.instances.find((instance) => instance.exitId === claimId)?.difficulty ?? null;
+  }
+
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void {
-    if (!isDungeonDifficulty(difficulty)) return;
-    const r = this.resolve(pid);
-    if (!r) return;
-    const party = this.partyOf(r.meta.entityId);
-    if (party && party.leader !== r.meta.entityId) {
-      this.error(r.meta.entityId, 'You are not the party leader.');
-      return;
-    }
-    // Only the SETTER's own preference is stamped: members mirror the party via
-    // dungeonDifficultyForPid while grouped and keep their own prior preference
-    // after leaving, so a stale stamp can never leak into another group.
-    if (difficulty === 'normal') delete r.meta.dungeonDifficulty;
-    else r.meta.dungeonDifficulty = difficulty;
-    if (party) {
-      if (difficulty === 'normal') delete party.dungeonDifficulty;
-      else party.dungeonDifficulty = difficulty;
-    }
-    this.error(
-      r.meta.entityId,
-      difficulty === 'heroic'
-        ? 'Dungeon difficulty set to Heroic.'
-        : 'Dungeon difficulty set to Normal.',
-    );
+    setDungeonDifficultyImpl(this.ctx, difficulty, pid);
   }
 
   // Owned by instances/dungeons (heroic final-boss reward + lockout settlement);
@@ -10685,10 +10678,7 @@ export class Sim {
   }
 
   get duelInfo(): import('../world_api').DuelInfo | null {
-    const d = this.duelFor(this.primaryId);
-    if (!d) return null;
-    const otherPid = d.a === this.primaryId ? d.b : d.a;
-    return { otherPid, otherName: this.players.get(otherPid)?.name ?? '?', state: d.state };
+    return duelMod.duelInfoFor(this.ctx, this.primaryId);
   }
 
   get arenaInfo(): import('../world_api').ArenaInfo | null {
@@ -10757,6 +10747,9 @@ export class Sim {
   }
   openWeeklyReward(choice: string, table?: string | readonly string[], pid?: number): void {
     weeklyMod.openWeeklyReward(this.ctx, choice, table, pid);
+  }
+  setWeeklyLootSpec(spec: string | null, pid?: number): void {
+    weeklyMod.setWeeklyLootSpec(this.ctx, spec, pid);
   }
   get vaultInfo(): import('../world_api').VaultInfo | null {
     return this.primaryId === -1 ? null : this.vaultInfoFor(this.primaryId);

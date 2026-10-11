@@ -31,6 +31,9 @@ export interface MaterialSourceTables {
   recipes: typeof ALL_RECIPES;
   enchants: typeof ENCHANTS;
   recipePendingMaterialItemIds: readonly string[];
+  /** Keepsakes that stack with per-unit provenance like a material, though no
+   *  recipe consumes them (the World PvP trophy skull, pvp/world_pvp_trophy.ts). */
+  trophyMaterialItemIds: readonly string[];
   items: typeof ITEMS;
 }
 
@@ -107,5 +110,9 @@ export function deriveMaterialItemIds(tables: MaterialSourceTables): ReadonlySet
   // source is temporary by contract and disappears once reagent derivation
   // can classify each id.
   for (const id of tables.recipePendingMaterialItemIds) sources.add(id);
+  // Trophies: the World PvP skull stacks across victims and remembers whose
+  // skull each unit is through the same per-unit source buckets a gathered
+  // material uses, so it rides every custody path those buckets already ride.
+  for (const id of tables.trophyMaterialItemIds) sources.add(id);
   return readonlySetView([...sources].filter((id) => tables.items[id]?.kind === 'junk'));
 }

@@ -1141,7 +1141,10 @@ async function cmdSkinmodel() {
  *  KayKit clips for the knight) plus the real handslot bones, at zero Tripo
  *  cost. Assumes a Tripo-style raw mesh (T-pose, facing +X); --pre-rotated
  *  skips the yaw for meshes already facing +Z; --center-torso centres the depth
- *  on the torso rather than the bounds (a tail or snout drags those off). */
+ *  on the torso rather than the bounds (a tail or snout drags those off).
+ *  --rigid-head-from <frac> binds
+ *  everything above that fraction of the body height to the head joint (an
+ *  oversized cap or helm whose rim would otherwise bend with the arms). */
 async function cmdRigManual() {
   const raw = opt('raw');
   const name = opt('name');
@@ -1160,6 +1163,8 @@ async function cmdRigManual() {
     return manualRigOntoReference(resolve(raw), reference, built, {
       preRotated: flag('pre-rotated'),
       centerTorso: flag('center-torso'),
+      ...(opt('rigid-head-from') ? { rigidHeadFrom: Number(opt('rigid-head-from')) } : {}),
+      ...(opt('rigid-head-blend') ? { rigidHeadBlend: Number(opt('rigid-head-blend')) } : {}),
     });
   });
   job.log(`manual rig: scale ${fit.scale}, ${fit.verts} verts skinned, ${fit.clips} native clips`);

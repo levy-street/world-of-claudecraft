@@ -335,3 +335,66 @@ describe('the result event describes the swap that actually happened', () => {
     expect(r?.notHeld).toBe(0);
   });
 });
+
+describe('gear sets survive serializeCharacter and reconnect', () => {
+  it('preserves saved gear sets across serializeCharacter and addPlayer reconnect round-trip', async () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('no meta');
+    const itemId = await chestItemId();
+
+    meta.equipment.chest = itemId;
+    meta.equipmentInstance = { chest: ENCHANT };
+    const pvpSaved = sim.saveLoadout('PvP', [], pid, undefined, true);
+    expect(pvpSaved, 'pvp loadout saved').toBeGreaterThanOrEqual(0);
+
+    const talentsOnlySaved = sim.saveLoadout('TalentsOnly', [], pid);
+    expect(talentsOnlySaved, 'talents-only loadout saved').toBeGreaterThanOrEqual(0);
+
+    // Serialize character state as the server does when persisting to DB
+    const serialized = sim.serializeCharacter(pid);
+    if (!serialized) throw new Error('serializeCharacter returned null');
+
+    expect(
+      serialized.loadouts?.[pvpSaved]?.gear,
+      'gear set preserved in serialized CharacterState',
+    ).toBeDefined();
+    expect(serialized.loadouts?.[pvpSaved]?.gear?.chest?.itemId).toBe(itemId);
+    expect(
+      Object.hasOwn(serialized.loadouts?.[talentsOnlySaved] ?? {}, 'gear'),
+      'gear key omitted on talent-only loadout',
+    ).toBe(false);
+
+    // Simulate reconnect: new Sim, addPlayer with serialized state (JSON round-trip safe)
+    const jsonState = JSON.parse(JSON.stringify(serialized));
+    const sim2 = makeSim();
+    const pid2 = sim2.addPlayer('warrior', 'ReconnectedWarrior', { state: jsonState });
+    const meta2 = sim2.players.get(pid2);
+    if (!meta2) throw new Error('no meta2');
+
+    expect(meta2.loadouts[pvpSaved]?.gear, 'gear set restored after reconnect').toBeDefined();
+    expect(meta2.loadouts[pvpSaved]?.gear?.chest?.itemId).toBe(itemId);
+    expect(
+      Object.hasOwn(meta2.loadouts[talentsOnlySaved] ?? {}, 'gear'),
+      'gear key remains omitted on talents-only loadout after reconnect',
+    ).toBe(false);
+
+    // Unequip chest and place enchanted copy in inventory
+    delete meta2.equipment.chest;
+    meta2.equipmentInstance = {};
+    meta2.inventory.length = 0;
+    meta2.inventory.push({ itemId, count: 1, instance: ENCHANT });
+    sim2.drainEvents();
+
+    // Switch to PvP loadout in the reconnected session
+    expect(sim2.switchLoadout(pvpSaved, pid2), 'switchLoadout succeeds after reconnect').toBe(true);
+    expect(
+      meta2.equipment.chest,
+      'saved chest is equipped upon switching in reconnected session',
+    ).toBe(itemId);
+    expect(meta2.equipmentInstance?.chest, 'saved enchant is preserved and equipped').toBeDefined();
+    const results = gearResults(sim2.drainEvents());
+    expect(results[0]?.equipped, 'one piece equipped').toBe(1);
+  });
+});

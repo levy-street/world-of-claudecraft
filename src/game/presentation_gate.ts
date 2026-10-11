@@ -16,8 +16,10 @@ export interface PresentationGateInput {
   /** A blocking arrival holds the world draw: the loading screen is up over
    *  an unprepared destination, so a submitted frame is unseen work that races
    *  the zone prepare for the main thread and pays the landing's cold links
-   *  before the screen can even paint. Everything else in the frame runs. */
-  worldDrawHeld: boolean;
+   *  before the screen can even paint. A WebGL context restore holds it the
+   *  same way while the visible set links off-thread. Everything else in the
+   *  frame runs. */
+  readonly worldDrawHeld: boolean;
 }
 
 export interface PresentationGateDecision {
@@ -69,20 +71,27 @@ const ALL_ON: PresentationGateDecision = Object.freeze({
 
 /** The one mutable input the frame loop refreshes in place (no per-frame
  *  allocation), with the arrival chain's hold as a bound setter so main.ts can
- *  hand it over without growing. */
+ *  hand it over without growing. The world draw has TWO independent owners:
+ *  the blocking arrival (that setter) and a WebGL context restore
+ *  (`contextRestoreHeld`: main.ts hands src/render/context_restore_hold.ts
+ *  contextRestoreDrawHeld, read live and bounded by its own deadline), so
+ *  neither can release the other's hold. */
 export function newPresentationGateInput(
   desktopApp: boolean,
+  contextRestoreHeld: () => boolean = () => false,
 ): PresentationGateInput & { holdWorldDraw: (held: boolean) => void } {
-  const input = {
+  let arrivalHeld = false;
+  return {
     hidden: false,
     desktopApp,
     graphicsRebuildPaused: false,
-    worldDrawHeld: false,
+    get worldDrawHeld(): boolean {
+      return arrivalHeld || contextRestoreHeld();
+    },
     holdWorldDraw: (held: boolean): void => {
-      input.worldDrawHeld = held;
+      arrivalHeld = held;
     },
   };
-  return input;
 }
 
 /**

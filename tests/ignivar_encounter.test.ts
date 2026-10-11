@@ -175,6 +175,16 @@ function addEncounterPlayer(
   return player;
 }
 
+// Brand never targets the player Ignivar is attacking, so a test that wants
+// the local player branded hands aggro to a stand-in main tank first.
+function handAggroToStandInTank(sim: Sim, boss: Entity): Entity {
+  const tank = addEncounterPlayer(sim, boss, 'Stand-in Tank', 'warrior');
+  tank.devGod = true;
+  boss.aggroTargetId = tank.id;
+  boss.threat.set(tank.id, 1e9);
+  return tank;
+}
+
 function applyIgnivarBrand(player: Entity, boss: Entity): void {
   player.auras.push({
     id: IGNIVAR_BRAND_AURA_ID,
@@ -1723,10 +1733,12 @@ describe('Ignivar encounter', () => {
     const activeTankMeta = sim.players.get(sim.player.id);
     if (!activeTankMeta) throw new Error('Active tank metadata is missing');
     activeTankMeta.talentMods.role = 'tank';
+    activeTankMeta.talentMods.spec = 'prot';
     const offTank = addEncounterPlayer(sim, boss, 'Off Tank', 'paladin');
     const offTankMeta = sim.players.get(offTank.id);
     if (!offTankMeta) throw new Error('Off tank metadata is missing');
     offTankMeta.talentMods.role = 'tank';
+    offTankMeta.talentMods.spec = 'protection';
     const firstNonTank = addEncounterPlayer(sim, boss, 'Brand Candidate One');
     const secondNonTank = addEncounterPlayer(sim, boss, 'Brand Candidate Two', 'mage');
     updateIgnivarEncounter(sim.ctx, boss);
@@ -1764,6 +1776,7 @@ describe('Ignivar encounter', () => {
       const activeTankMeta = sim.players.get(sim.player.id);
       if (!activeTankMeta) throw new Error('Active tank metadata is missing');
       activeTankMeta.talentMods.role = 'tank';
+      activeTankMeta.talentMods.spec = 'prot';
       const eligible = Array.from({ length: nonTankCount }, (_, index) =>
         addEncounterPlayer(sim, boss, `Brand RNG Candidate ${index}`, 'mage'),
       );
@@ -1793,6 +1806,7 @@ describe('Ignivar encounter', () => {
 
   it('ramps each uncleansed Brand tick from one to three stacks without exceeding the cap', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
@@ -1826,6 +1840,7 @@ describe('Ignivar encounter', () => {
 
   it('does not reset an uncleansed Brand when that player is selected again', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
@@ -2299,6 +2314,7 @@ describe('Ignivar encounter', () => {
 
   it('runs the encounter through the production mob tick dispatcher', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     sim.player.devGod = true;
 
     for (let i = 0; i < 45; i++) sim.tick();
@@ -2953,6 +2969,7 @@ describe('Ignivar encounter', () => {
 
   it('removes encounter-owned player auras immediately when leaving the development raid', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
@@ -3766,6 +3783,7 @@ describe('Ignivar encounter', () => {
 
   it('keeps the Apocalypse add stationary and non-attacking while Ignivar stays active', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     sim.player.devGod = true;
     boss.hp = Math.floor(boss.maxHp * IGNIVAR_APOCALYPSE_HP_THRESHOLD);
     updateIgnivarEncounter(sim.ctx, boss);

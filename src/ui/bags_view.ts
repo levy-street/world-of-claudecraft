@@ -11,7 +11,7 @@
 
 import { poolCapacityOf, poolOccupancyOf } from '../sim/bag_pools';
 import { BACKPACK_SLOTS } from '../sim/bags';
-import { type BagCells, layoutBagCells } from '../sim/inventory_order';
+import { type BagCells, isCellPinned, layoutBagCells } from '../sim/inventory_order';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import type { Quality } from '../sim/loot_master';
 import { isMaterialItemId } from '../sim/material_ids';
@@ -738,6 +738,20 @@ export function buildBagGrid(
   if (visible.length === 0)
     return { state: 'noMatch', cells: [], visible: [], emptyCells: 0, overflow };
   return { state: 'items', cells, visible, emptyCells, overflow };
+}
+
+/** True when a drag from inventory index `from` onto bag cell `to` would move or
+ *  displace a player-locked stack, which the sim refuses (inventory_order.ts
+ *  moveStackToCell, the same isCellPinned rule). The drop handler toasts on it
+ *  instead of dispatching a reorder that silently does nothing. */
+export function bagReorderBlockedByLock(
+  inventory: readonly InvSlot[],
+  capacity: number,
+  from: number,
+  to: number,
+): boolean {
+  if (isCellPinned(inventory[from])) return true;
+  return isCellPinned(layoutBagCells(inventory, capacity)[to]);
 }
 
 /** Stable key over exactly what the sort command changes: each stack's id,

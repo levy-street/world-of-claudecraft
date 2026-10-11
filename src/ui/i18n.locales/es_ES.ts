@@ -430,19 +430,15 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Un ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y causa una gran cantidad de amenaza. Se activa en tu siguiente golpe. Solo en forma de Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te protege con un escudo equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
+    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te sana el equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
   'entities.abilities.ossuary_mark.description':
     'Marca a un enemigo durante 15 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 Fragmento de alma.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.rake.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.regrowth.description':
-    'Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 21 s.',
-  'entities.abilities.regrowth.specNote_restoration':
-    'Plantar una NUEVA floración añade 1 de Verdor (máx. 5).',
+    'Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 15 s. Si el efecto dura todo su tiempo, vuelve a sanar al objetivo por la misma cantidad que la sanación inicial.',
   'entities.abilities.rejuvenation.description': 'Sana al objetivo por {damage} durante 12 s.',
-  'entities.abilities.rejuvenation.specNote_restoration':
-    'Plantar una NUEVA floración añade 1 de Verdor (máx. 5). Con 5 de Verdor, Alivio presto se convierte en Sobrefloración.',
   'entities.abilities.rip.description':
     'Movimiento de remate que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.',
   'entities.abilities.ruinous_brand.description':
@@ -470,7 +466,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.description':
     'Te oculta entre las sombras: los enemigos apenas te perciben, pero te mueves un 50% más lento. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarlo para salir de él.',
   'entities.abilities.swiftmend.description':
-    'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Las plantaciones de Floración Silvestre y Segundo Florecer añaden Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por el 60% de su sanación restante. (habilidad distintiva de Restauración)',
+    'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Cada lanzamiento de Sporemending, Segundo Florecer y Cura Silvestre añade 1 de Verdor; con 3 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por el 60% de su sanación restante. (habilidad distintiva de Restauración)',
   'entities.abilities.swipe.description':
     'Barre con tus garras a los enemigos cercanos infligiendo {damage} de daño. Causa amenaza adicional. Solo en forma de Bruin.',
   'entities.abilities.swipe.specNote_feral':

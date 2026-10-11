@@ -36,6 +36,16 @@ UNION `src/styles/*.css`), and `tests/css_value_validity.test.ts` walks every mo
 malformed declarations (e.g. a stray token after `var()`, which makes the whole declaration
 silently drop in the browser).
 
+## The boot splash is the one inline exception
+The inline `<style>` of `index.html` and `play.html` holds only the boot splash: the dark
+screen with the logo and a gold sweep bar that paints before any sheet here arrives. It is
+unlayered, so every rule is scoped to `#boot-splash`, `.boot-splash-*` or the boot-only
+`body.boot-pending` class (pinned by `tests/per_entry_css_wiring.test.ts`, which also
+requires both blocks to be identical). Game styles never go there. The Vite plugin
+`woc-boot-splash-stylesheets` (`scripts/lib/boot_splash_stylesheets.mjs`) moves every head
+stylesheet `<link>` of an entry carrying the splash to the end of `<body>`, so the splash is
+not stuck behind them; `src/ui/boot_splash.ts` waits for those sheets and lifts it.
+
 ## This directory is FLAT, and two guards enforce it
 Every sheet sits at the top level, because that is what ships: the `index.css` barrel, the
 modules it `@import`s, and the two per-entry `.extra.css`. **A subdirectory here hard-fails

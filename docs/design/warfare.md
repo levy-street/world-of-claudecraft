@@ -215,9 +215,15 @@ Breakpoints are 2, 4 and 7 of the seven armor pieces, the same in every family:
 
 | Tier | Bonus |
 | --- | --- |
-| 2 pieces | +40 Warfare Defense Rating |
+| 2 pieces | +40 Warfare Defense Rating (the caster families, Stormbound, Cinderweave and Thornhide, also grant immunity to damage cast pushback) |
 | 4 pieces | +40 Warfare Offense Rating, and crowd control cast on you by hostile players lasts 15 percent less |
 | 7 pieces | +80 Warfare Offense and Defense Rating, plus the family signature |
+
+The caster families' pushback immunity (`PVP_CASTER_SET_2PC_PUSHBACK_REDUCTION` in
+`content/item_sets.ts`) is the one set effect that is not PvP-gated: it folds into
+`Entity.castPushbackReduction` like any stat-set knob, so it works against monsters
+too. The Season 2 caster sets carry the same rider. Pinned by
+`tests/pvp_caster_set_pushback.test.ts`.
 
 The 4-piece wording is deliberate: no pet applies hard crowd control today (pet
 abilities apply slows, damage over time and a spell-vulnerability mark, none of
@@ -337,6 +343,13 @@ Phase 1 starts with these owner-selected values:
   against a routine 120, a ratio of 1.33x.
 - Killing blow 10, assist 4 (`BATTLEGROUND_KILL_HONOR`,
   `BATTLEGROUND_ASSIST_HONOR`).
+- The day's Honor world quests: two of the rotating world quests each realm
+  cycle pay a flat 150 Honor on completion (`WORLD_QUEST_HONOR_REWARD`,
+  `WORLD_QUEST_HONOR_SLOTS_PER_CYCLE`, `src/sim/world_quest_honor_slots.ts`).
+  The same two for the whole realm, re-picked at the realm reset with the rest
+  of the rotation, and shown on the world map hover. Owner tuning: a PvE head
+  start toward Warfare gear for players who have not queued yet, capped at 300
+  Honor a day per character since a world quest completes once per cycle.
 
 Every Thornhollow Fields award above was DOUBLED on 2026-09-25 (owner tuning,
 alongside King of the Hill's ramp) so Warfare Season 2 gear is a goal of weeks,
@@ -433,6 +446,21 @@ them. A flag takes `WORLD_PVP_DISARM_SECONDS` (300, the classic five minutes) to
 come down and the drop waits for combat to end, so switching off can never fizzle
 the blow already on its way. Raising it needs `WORLD_PVP_MIN_LEVEL` (10).
 
+World PvP also tracks a capped played-time streak for five permanent cosmetic
+titles: Bold at 1 hour (5 Renown), Defiant at 3 hours (10), Dauntless at 6 hours
+(10), Unyielding at 24 hours (25), and Indomitable at 168 hours (50).
+`world_pvp_rewards.ts` advances the timer using simulation ticks while the flag
+is fully armed. Alive, connected players accumulate time in contested or
+free-for-all open-world ground and in registered battleground, ranked arena,
+Fiesta and Yumi arena matches, including preparation and the result countdown.
+Membership in the live match map is required; instance coordinates alone never
+qualify. Sanctuary, PvE instances, death (including ghost travel) and logout
+pause the streak. Disconnect grace also pauses it until reconnect. The precise
+tick total survives character saves; offline time never counts, and it caps at
+168 hours. Requesting World PvP off resets progress immediately, even if the
+disarm countdown is later cancelled. Earned deeds and titles remain permanent.
+The World PvP panel shows elapsed whole minutes and the current pause reason.
+
 Three kinds of ground, declared per zone as `ZoneDef.worldPvp` (data-as-code in
 `src/sim/content/`) and resolved by `worldPvpZonePolicyAt` through the strict
 rectangle containment, so the instance plane reads as contested rather than as
@@ -508,6 +536,22 @@ alone is the owner's stated shape.
   flagged strangers in a free-for-all zone earns the honor and nothing else, so
   gold only ever moves between two players who both carry the stake, and
   hunting flags from behind no flag is never the best play.
+- Spoils (`src/sim/pvp/world_pvp_spoils.ts`): when the victim AND the killing
+  blow are both flagged, the killing blow's gold share does not go straight to
+  their purse; it drops on the victim's body beside a trophy skull
+  (`pvp_trophy_skull`, a vendor-worthless keepsake so skull camping can never
+  mint gold). The killer loots both through the ordinary corpse path. Skulls
+  stack like gathered materials: every skull shares one bag stack, and the stack
+  remembers whose each one is (the victim recorded exactly as a gatherer is), so
+  its tooltip reads "2 x Taken from Bet, 1 x Taken from Gimel" and a stack of one
+  victim's skulls is named "<name>'s Skull". Every other contributor is still paid purse to
+  purse. A player's body lies only until its owner releases or is revived, so
+  the body is SETTLED then: anything unlooted goes to the killer at once (their
+  skull only if it fits their bags), or back to the victim's purse if the killer
+  has left the world. The victim can never deny the drop, and no gold is ever
+  destroyed by an unlooted body. The grey rule, the raid rule and the per-pair
+  diminishing returns gate the drop exactly as they gate the payout: no paid
+  killing blow, no spoils.
 - Honor: `WORLD_PVP_KILL_HONOR` (10) per kill, the whole pool, split as above.
   Deliberately BELOW the instanced faucets: a Thornhollow Fields win pays 120 plus
   its drip and a ranked 1v1 win pays 25, so a player who wants Warfare gear
@@ -561,6 +605,55 @@ and nothing here draws rng, so the offline Sim, the server and the headless env
 resolve every kill identically (`tests/world_pvp.test.ts`,
 `tests/world_pvp_rules.test.ts`, `tests/world_pvp_zones.test.ts`).
 
+## World PvP bounties
+
+A hot streak in the open world earns a price on its owner's head
+(`src/sim/pvp/world_pvp_bounty.ts`, rules in `world_pvp_bounty_rules.ts`): the
+King of the Hill's "worth taking" incentive, carried off the hill to every
+flagged player, so playing with the flag up pays more and so does hunting the
+players who do.
+
+- Earning one: a FLAGGED player paid for `WORLD_PVP_BOUNTY_STREAK` (5) world
+  kills in a row without dying earns a bounty. Any kill that actually PAID the
+  contributor counts, the killing blow or an assist; a kill that paid nothing (a
+  grey kill, a fully decayed repeat, an assist whose share of a large group's
+  split floors to zero) counts for nothing, which keeps the streak honest
+  against camping and zerg-farming. An assist credited after the contributor
+  already died never restarts the streak their own death ended.
+  The realm is told whose head carries one, and the holder is told what it
+  means. Every player can carry a bounty at the same time: it is a mark a
+  streak earns for itself, never a single realm prize that passes between
+  players.
+- The mark: the holder's whole name tag (the name row with its tags, the
+  guild or pledge line and the deed title) paints blood red on every client
+  (`Entity.bounty`, the `bty` bit of the entity wire, painted by
+  `src/render/nameplate_tag_fill_core.ts`), darker than the hostile-name red so
+  the two never read alike, and the name carries a `<Bounty>` tag as the
+  non-colour cue (forced colours and colour blindness both flatten the red).
+  The chips that mean something else keep their own colour (the AI chip, the
+  Cheater sanction, the badges).
+- The holder's own kills: the per-victim curve is `WORLD_PVP_BOUNTY_HOLDER_DR`
+  (1.5, 1, 0.5, then 0) instead of `HONOR_REPEAT_DR` (1, 0.5, 0.25, then 0), so
+  a solo holder is paid 15, then 10, then 5 honor for the first three kills of
+  one victim inside the hour where an ordinary player gets 10, 5 and 2 (owner
+  spec). The fourth still pays nothing. Gold stays on the ordinary curve: a
+  bounty never raises what a victim's purse is charged.
+- Killing a holder: the honor pool of that kill is doubled
+  (`WORLD_PVP_BOUNTY_KILL_HONOR_MULT`, 2: 20 instead of 10), split among the
+  contributors exactly like the ordinary pool, and the realm is told who
+  collected the bounty (the killing blow when it was paid, else the first paid
+  assist; a kill that paid nobody collects nothing and only tells the holder it
+  lapsed). The bounty does not pass to the killer. A holder who kills a holder
+  takes both rules at once: a solo kill pays floor(20 x 1.5) = 30.
+- Ending one: any death ends the streak and the bounty, a world kill or not, and
+  so does the flag coming down (a holder can never step out of reach and keep
+  the better curve). A lapse that was not a world kill tells only the holder.
+- Session-only: the streak and the bounty live on `PlayerMeta.worldPvp` beside
+  the flag but are never persisted, so a relog ends a streak the way a death
+  does (which only ever costs the holder). No rng, sim clock only
+  (`tests/world_pvp_bounty.test.ts`, `tests/nameplate_bounty.test.ts`,
+  `tests/entity_status_wire.test.ts`).
+
 ## King of the Hill
 
 Once every `HILL_WINDOW_SECONDS` (three hours) a hill rises somewhere in one of
@@ -589,7 +682,12 @@ A hill has three moments, each announced to the whole realm:
 2. **The rise** (`hillRiseLine`), `HILL_WARNING_SECONDS` (15 minutes) after the
    warning. The contest and the payouts run from here.
 3. **The fall** (`hillFallenLine`), `HILL_DURATION_SECONDS` (45 minutes) after
-   the rise. Banked seconds short of a payout are lost with it.
+   the rise. Banked seconds short of a payout are lost with it. The final
+   standings follow (see below).
+
+While the hill stands, every `HILL_NOTICE_SECONDS` (five minutes; owner spec
+2026-09-29) after the rise the realm hears where it still stands and when it
+falls (`hillStillStandsLine`), followed by the hold standings.
 
 The realm's `WORLD_PVP_DISABLED` switch turns the hill off with the rest of
 world PvP. A realm that slept through whole windows plans the current one.
@@ -621,6 +719,36 @@ hill for its whole stand earns about 380 each, about three Thornhollow Fields wi
 at the doubled award; two held hills a day is about 760, so 10,000 Honor is about
 13 days, level with a committed battleground day at the live result floor. No
 diminishing returns: the cap and the pace are the limit.
+
+The hold ranking (`src/sim/pvp/hill_ranking.ts`, owner spec 2026-09-29): every
+group that takes the hill opens a record (`ActiveHill.holds`) that banks each
+pass it holds the hill WITH A MEMBER STANDING INSIDE (a group that walks away
+keeps the hill until beaten but banks no rank, so an empty hill on a quiet realm
+cannot be won from afar), summed across every separate hold of the same stand,
+and banks each member's own seconds inside while it held. A party is named by
+its leader, a lone player by their own name. The standings (`hillRanking`,
+longest first, a tie in first-held order, `HILL_RANKING_SHOWN` deep, each hold
+in whole minutes rounded up, `hillRankLine`) are announced with each five-minute
+reminder and once more after the fall line. When the hill falls on its own or
+through `/dev hill end`, and the longest hold lasted `HILL_VAULT_MIN_HOLD_SECONDS`
+(ten minutes) in total, every player who stood inside for
+`HILL_VAULT_MIN_INSIDE_SECONDS` (a minute) for the group that held it longest
+(every group tied at the top, `hillVaultPayees`, each player once) and is still
+in the realm and in that group earns one win on the Weekly Vault's PvP row
+(`recordWeeklyPvpWin`, capped at the row's five, the same credit a rated
+battleground or ranked arena win gives) and is told (`HILL_VAULT_LINE`, only
+when the row actually moved). Requiring membership at the fall caps the payees
+at a party's size: a player cycled through the party cannot carry a point away.
+The hold floor (owner decision 2026-10-05) closes the quiet-realm farm: a lone
+player who captures an empty hill and stands a minute still tops the standings,
+but five such visits must not fill the PvP row, so a hold under ten minutes pays
+nobody.
+Unlike a developer-ended battleground, `/dev hill end` does pay: it is the test
+lever for this award, on dev realms only. The credit is injected by the host
+(`HillVaultCredit`: the Sim passes it into `updateHill`, the dev arm into
+`endHillNow`) because the vault module reaches `entity.ts`, which imports the
+pvp barrel. A realm switched off mid-stand drops the hill silently: no
+standings, no credit.
 
 The readout (`IWorld.hillInfo`, the `hill` self key) carries the geometry, the
 phase, the holder from the viewer's seat, whether the viewer counts

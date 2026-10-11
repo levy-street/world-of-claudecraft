@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.spellTooltipOnHover': 'マウスオーバーで呪文ツールチップを表示',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分',
   'abilityUi.cast.hoard_cast_rime_beam': '霜光線',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount}{currency}',
@@ -582,6 +583,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}、{quality}',
   'hudChrome.mapAtlas.collapseHint': 'マップサイドバーを折りたたむ',
   'hudChrome.mapAtlas.expandHint': 'マップサイドバーを展開',
+  'hudChrome.mapAtlas.resizeRailAria': 'マップサイドバーの幅',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'ドラッグしてマップサイドバーの幅を変更します。ダブルクリックで元に戻します。',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': 'アクティブなプロファイル',
   'hudChrome.meters.activeProfileDesc':
@@ -654,6 +658,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '同時に表示するバーの数です（0＝無制限、ウィンドウの高さに自動調整）。',
   'hudChrome.meters.noDeathEvents': '死亡前に記録されたイベントはありません',
   'hudChrome.meters.noDetailedData': '詳細データがありません',
+  'hudChrome.meters.detailHealSubtitle':
+    '有効：{effective} | 過剰回復：{overheal}（{overhealPercent}） | ヒット数：{hits}（クリティカル {critPercent}）',
+  'hudChrome.meters.detailHitSubtitle':
+    'ヒット数：{hits} | クリティカル：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}',
   'hudChrome.meters.noTargetData': 'この対象のプレイヤーデータがありません',
   'hudChrome.meters.numCompact': '数値：省略表記（k/M）',
   'hudChrome.meters.numDetailed': '数値：詳細表記',
@@ -744,6 +752,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': 'ウィンドウのスケール',
   'hudChrome.meters.windowScaleDesc': 'メーター全体のスケールを拡大・縮小します。',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': '賞金首',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': 'カメラゴースト',
@@ -771,6 +780,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.hillHold': '丘の保持',
   'hudChrome.warfare.reasons.worldAssist': 'ワールドPvP撃破のアシスト',
   'hudChrome.warfare.reasons.worldKill': 'ワールドPvP撃破',
+  'hudChrome.warfare.reasons.worldQuest': 'ワールドクエスト',
   'hudChrome.warfareShop.groupEntry': 'ウォーフェア シーズン1',
   'hudChrome.warfareShop.groupSeason2': 'ウォーフェア シーズン2：ヴァンガード',
   'hudChrome.worldPvp.aidLine':
@@ -809,8 +819,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': '戦績：撃破{kills}、死亡{deaths}',
   'hudChrome.worldPvp.repeatLine':
     '同じプレイヤーを繰り返し倒すと、2回目は{second}、3回目は{third}、以降は何も得られません。カウントは最初の撃破から{reset}後にリセットされます。',
+  'hudChrome.worldPvp.skullName': '{name}の頭蓋骨',
   'hudChrome.worldPvp.splitLine':
     '純粋な1対1なら報酬を独占できます。加勢した仲間とそのヒーラーは分配します。',
+  'hudChrome.worldPvp.spoilsLine':
+    '双方がフラグを立てている場合、とどめを刺した者の取り分の金貨が敗者の頭蓋骨と共に遺体に落ちます。',
   'hudChrome.worldPvp.stakeLine': '敗者は所持金の{percent}か{cap}のうち、少ない方を支払います。',
   'hudChrome.worldPvp.statusDisarming':
     'フラグは{time}後、または現在の戦闘が終わり次第下がります。',
@@ -820,6 +833,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'PvPフラグは下がっていますが、無差別戦闘地帯では引き続き攻撃することも、攻撃されることもあります。',
   'hudChrome.worldPvp.statusOn':
     'PvPフラグは立っています。フラグを立てたプレイヤーから攻撃を受ける可能性があります。',
+  'hudChrome.worldPvp.rewardTitles':
+    'ワールドPvPを有効にした状態で、オープンワールドまたはPvPインスタンスでのプレイ時間が{thresholds}に達すると、永続的な称号を獲得します。ログアウト中、死亡中、PvEインスタンス内、聖域ではタイマーが停止します。PvPを無効にするとリセットされます。',
+  'hudChrome.worldPvp.rewardPaused': '現在のPvP継続時間：{time}（聖域で一時停止中）',
+  'hudChrome.worldPvp.rewardPausedDead': '現在のPvP継続時間：{time}（死亡中のため一時停止中）',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    '現在のPvP継続時間：{time}（PvEインスタンス内で一時停止中）',
+  'hudChrome.worldPvp.rewardProgress': '現在のPvP継続時間：{time}',
   'hudChrome.worldPvp.tab': 'ワールドPvP',
   'hudChrome.worldPvp.title': 'ワールドPvP',
   'hudChrome.worldPvp.zoneContested': '係争地：ここで戦えるのはフラグを立てたプレイヤーのみです。',
@@ -898,7 +918,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '丘を今すぐ告知します。丘は予告期間が終わると出現します。',
   'devCommand.actions.hillwarn.label': '丘を予告',
   'entities.abilities.lava_burst.description':
-    '{damage}の火炎ダメージを与えます。灰燼の衝撃で燃えている対象には必ずクリティカルヒットします。マグマの奔流：灰燼の衝撃がダメージを与えるたびに20%の確率でこのクールダウンをリセットし、10秒以内に使用する次のマグマバーストを即座の詠唱にします。ダメージは呪文威力とともに上がります。（サンダーコール）',
+    '{damage}の火炎ダメージを与えます。命中すると雷が1得られます。灰燼の衝撃で燃えている対象には必ずクリティカルヒットします。クリティカルヒットは通常ダメージの24%を追加で与えます。マグマの奔流：灰燼の衝撃がダメージを与えるたびに20%の確率でこのクールダウンをリセットし、10秒以内に使用する次のマグマバーストを即座の詠唱にします。ダメージは呪文威力とともに上がります。（サンダーコール）',
   'entities.abilities.lava_burst.name': 'マグマバースト',
   'entities.abilities.lightning_overload.description':
     'パッシブ：電弧の矢とスカイブランチには20%の確率でオーバーロードする効果があり、最初の対象に与えたダメージの50%で再度攻撃し、雷鳴を1得ます。（サンダーコール）',
@@ -1069,6 +1089,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.selectedTable': 'テーブルを{count}件選択中',
   'hudChrome.weeklyRewards.selectedTables': 'テーブルを{count}件選択中',
   'hudChrome.weeklyRewards.noLevelLoot': '現在のレベルで対象となる戦利品はありません。',
+  'hudChrome.weeklyRewards.lootFocus': '戦利品の専門分野',
+  'hudChrome.weeklyRewards.allClassGear': 'クラスの全装備',
+  'hudChrome.weeklyRewards.lootFocusHelp': '未開封の宝庫にのみ適用されます。',
+  'hudChrome.weeklyRewards.noFocusedLoot':
+    '対象の戦利品がありません。他の専門分野を選んでください。',
+  'hudChrome.weeklyRewards.rolledFocus': '抽選時の専門分野：{focus}',
   'hudChrome.weeklyRewards.tableItem': 'アイテム{count}個',
   'hudChrome.weeklyRewards.tableItemCount': 'アイテム{count}個',
   'hudChrome.weeklyRewards.previouslyRolled': '抽選済みの報酬',
@@ -1130,6 +1156,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.ferry.castingOff': '{dest}行きの渡し船が出航します',
   'hudChrome.ferry.boardHint': '出航の時に甲板に立っていれば一緒に出発できます。運賃は無料です。',
   'hudChrome.ferry.sailing': '{dest}へ航行中',
+  'hudChrome.ferry.portLabel': '{port}発{dest}行きの渡し船',
+  'hudChrome.ferry.portTitle': '{port}の渡し船乗り場',
+  'hudChrome.ferry.destination': '行き先：{dest}',
+  'hudChrome.ferry.boardNow': '今すぐ乗船できます',
+  'hudChrome.ferry.arrivesIn': '渡し船の到着まで{time}',
+  'hudChrome.ferry.scheduleUnavailable': '渡し船の時刻表を取得できません。',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'landing.contribute': 'ゲーム開発に参加する',
@@ -2031,6 +2063,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name}を観戦中',
+  'hudChrome.realmMotd.line': '本日のお知らせ：{text}',
+  'hudChrome.realmMotd.updated': '本日のお知らせを更新しました。',
+  'hudChrome.realmMotd.cleared': '本日のお知らせを削除しました。',
+  'hudChrome.realmMotd.none': '本日のお知らせは設定されていません。',
+  'hudChrome.realmMotd.usage': '使い方：/motd "<メッセージ>" で設定、/motd clear で削除します。',
+  'hudChrome.realmMotd.tooLong': '本日のお知らせは最大{max}文字です。',
+  'hudChrome.realmMotd.saveFailed':
+    '本日のお知らせを保存できませんでした。サーバーを再起動すると失われます。',
   'hudChrome.readyCheck.prompt': '{name} が準備確認を開始しました。準備はいいですか？',
   'hudChrome.readyCheck.ready': '準備完了',
   'hudChrome.readyCheck.notReady': '準備未完了',
@@ -2525,6 +2565,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetNone': 'リセットできるインスタンスがありません。',
   'hudChrome.dungeonDifficulty.resetOccupied':
     '中にプレイヤーがいる間はインスタンスをリセットできません。',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'プレイヤーかその死体がまだインスタンス内にあるため、難易度の変更を予約しました。インスタンス内に誰もおらず、死体もなくなれば変更を適用します。',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'パーティーまたはリーダーが変更されたため、予約していた難易度の変更をキャンセルしました。',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'インスタンスをリセットする前にダンジョン難易度を変更してください。空のインスタンスは5分後に自動的にリセットされます。',
   'hudChrome.dungeonDifficulty.resetUsage':
@@ -2826,6 +2870,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
   'guide.worldPvpPage.hillBodyRamp':
     '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分名誉を得て、同じパーティが占拠し続けるほど1分ごとの名誉は増えていきます。満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利およそ3回分の名誉になります。丘の持ち主が変わると、新しい持ち主の積み上げは最初から始まります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
+  'guide.worldPvpPage.hillBodyRanked':
+    '3時間に1度、無差別戦闘地帯のいずれかに丘が現れます。丘が立っている間は5分ごとに、その場所と各グループの占拠時間ランキングがレルム全体に告知されます。丘が消えると、合計占拠時間が最も長いグループが合計10分以上占拠していた場合、そのグループに属し、そのグループの占拠中に円内に1分以上立っており、終了時にも同じグループに残っているプレイヤーは、週間宝物庫のPvP進捗に1勝を獲得します。',
   'guide.worldPvpPage.limitsBodyRaids':
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。レイドはワールドでの撃破から何も得られません。レイドのメンバーは名誉もゴールドも受け取らず、他の人の取り分も減らさないため、報酬を得るにはパーティで戦いましょう。',
   'guide.worldPvpPage.hillHeading': '丘の王',
@@ -3060,6 +3106,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': 'タッチ操作',
   'hudChrome.options.gfxCustomNote':
     'ダイヤルを変更すると画質プリセットが「詳細」に切り替わります。「高」品質ベースの上に、現在のプリセットに表示されているレベルを起点として組み立てるカスタム設定です。',
+  'hudChrome.options.ambienceVolume': '環境音の音量',
   'hudChrome.options.footstepSounds': '足音',
   'hudChrome.options.interfaceSounds': 'インターフェースとフィードバック音',
   'hudChrome.options.clickFeedback': 'クリックマーカー',
@@ -3126,6 +3173,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': '確認する売却品質の下限',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     'この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せます。',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せますが、署名のない灰色アイテムは除きます。',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.showThirdActionBar': '3本目のアクションバーを表示',
   'hudChrome.options.hideUnusedActionSlots': '未使用のアクションスロットを非表示',
@@ -4702,6 +4751,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunkAria': '{price}ですべての不要品を売却',
   'itemUi.vendor.sellJunkHint':
     'クエストアイテムを除くバッグ内のすべての灰色アイテムを売却します。',
+  'itemUi.vendor.sellJunkNoBuyback':
+    '署名のない灰色アイテムは買い戻しリストに入らないため、売却は取り消せません。',
   'itemUi.market.title': 'ワールドマーケット',
   'itemUi.market.subtitle': '商人の取引所',
   'itemUi.market.close': '市場を閉じる',
@@ -5094,7 +5145,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'テンの姿をまとい、回避率を30分間8%高めます。',
   'entities.abilities.aspect_of_the_cheetah.name': '駿馬の相',
   'entities.abilities.aspect_of_the_cheetah.description':
-    '駿馬の姿をまとい、移動速度を30分間30%高めます。効果中はダメージを受けるとよろめき、移動速度が4秒間半減します（被弾のたびによろめきが更新されます）。',
+    '駿馬の姿をまとい、移動速度を30分間30%高めます。効果中はダメージを受けるとよろめき、移動速度が2秒間半減します（被弾のたびによろめきが更新されます）。',
   'entities.abilities.aimed_shot.name': '引き絞り',
   'entities.abilities.aimed_shot.description':
     '対象を撃ち、{damage}の物理ダメージを与えます。ダメージは遠隔攻撃力とともに上がります。',
@@ -5151,7 +5202,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '10分間、稲妻をまといます。次にあなたへ向かう近接攻撃3回は、攻撃者に{buff}の自然ダメージを与えます。最短で5秒に1回です。',
   'entities.abilities.flame_shock.name': '灰燼の衝撃',
   'entities.abilities.flame_shock.description':
-    '{damage}の火炎ダメージを与え、続けて12秒かけて{overTime}の火炎ダメージを与えます。最初の命中は呪文威力とともに上がります。',
+    '{damage}の火炎ダメージを与え、続けて{duration}秒かけて{overTime}の火炎ダメージを与えます。最初の命中は呪文威力とともに上がります。',
   'entities.abilities.flametongue_weapon.name': '火焔烙印の武器',
   'entities.abilities.flametongue_weapon.description':
     '武器に30分間力を宿します。一振りごとに{damage}の追加火炎ダメージを与えます。',
@@ -5201,13 +5252,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。',
   'entities.abilities.healing_touch.name': '野生の癒し',
   'entities.abilities.healing_touch.description': '味方対象の体力を {damage} 回復します。',
+  'entities.abilities.healing_touch.specNote_restoration':
+    '詠唱を完了するたびに翠成が1段階進む（最大3）。蓄えた翠成がこの詠唱を短縮する：翠成1で2.2秒、2で1.9秒、3で1.5秒。自然の恵みにより、詠唱が即時・無料になり、効果が25%上昇する。',
   'entities.abilities.mark_of_the_wild.name': 'ワイルドワード',
   'entities.abilities.mark_of_the_wild.description':
     '味方対象にワイルドワードを付与し、30分間アーマーを{buff}増加させます。',
   'entities.abilities.moonfire.name': '月の嵐',
   'entities.abilities.moonfire.description':
     '月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。',
-  'entities.abilities.rejuvenation.name': '野生の芽吹き',
+  'entities.abilities.rejuvenation.name': 'スポアメンディング',
   'entities.abilities.rejuvenation.description': '12秒間で対象の体力を {damage} 回復します。',
   'entities.abilities.thorns.name': '茨の守り',
   'entities.abilities.thorns.description':
@@ -5216,7 +5269,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '対象を最大12秒間その場に根付かせます。',
   'entities.abilities.bear_form.name': 'ブルーインフォーム',
   'entities.abilities.bear_form.description':
-    '熊に変身します。アーマー +110%、最大体力 +30%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再度使用すると術者形態に戻ります。',
+    '熊に変身します。アーマー +110%、最大体力 +30%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。攻撃速度が2倍になる代わりに1回あたりのダメージは半分になり、各攻撃が生成する怒りは2倍になります。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再度使用すると術者形態に戻ります。',
   'entities.abilities.maul.name': '骨砕き',
   'entities.abilities.maul.description':
     '近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。次のスイングで発動します。ブルーインフォーム専用。',
@@ -5232,6 +5285,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
     '敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。キャットフォーム専用。',
+  'entities.abilities.scratch.name': 'スクラッチ',
+  'entities.abilities.scratch.description':
+    '6ヤード以内の周囲の対象を引っかき、武器ダメージに {damage} を加えたダメージを与えます。命中した対象1体ごとにコンボポイントを1獲得します。範囲内のステルス中の敵を暴きます。キャットフォーム専用。',
   'entities.abilities.ferocious_bite.name': '血噛み',
   'entities.abilities.ferocious_bite.description':
     '{damage}を与えるフィニッシュムーブです。キャットフォーム専用。',
@@ -5240,7 +5296,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ブルーインフォーム専用。',
   'entities.abilities.regrowth.name': '二度目の開花',
   'entities.abilities.regrowth.description':
-    '味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。',
+    '味方対象の体力を {damage} 回復し、さらに15秒間追加で回復します。効果が最後まで持続すると、最初の回復と同じ量だけ対象を再び回復します。',
   'entities.abilities.barkskin.name': '樫の肌',
   'entities.abilities.barkskin.description':
     '肌が樹皮のように硬くなり、15秒間アーマーが150増加します。',
@@ -5396,7 +5452,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '原初の力を解き放ちます。キャットフォームでは、10秒間エネルギーの再生速度が100%上昇します。ブルーインフォームでは、即座に怒りを50生成します。（フェラル特性のシグネチャ）',
   'entities.abilities.swiftmend.name': 'スウィフトメンド',
   'entities.abilities.swiftmend.description':
-    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。野生の芽吹きと二度目の開花の植え付けは青翠を貯め、青翠5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
+    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディング、二度目の開花、野生の癒しを詠唱するたびに翠成が1段階進み、翠成3でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
+  'entities.abilities.swiftmend.specNote_restoration':
+    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディングと二度目の開花は翠成を蓄えます。翠成5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
   'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
   'entities.abilities.crusader_strike.description':
     '対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）',
@@ -8115,6 +8173,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.dragDestroyHint': '世界へドラッグして破壊',
   'hudChrome.bags.reorderNeedsRecent':
     '絞り込みを解除し並び順を「最近」にすると持ち物を並べ替えられます',
+  'hudChrome.bags.reorderLocked':
+    'ロック中のアイテムはバッグ内の位置に固定されます。移動するにはロックを解除してください。',
   'hudChrome.bags.filterGroupAria': 'バッグをカテゴリーで絞り込む',
   'hudChrome.bags.filterAll': 'すべて',
   'hudChrome.bags.filterWeapon': '武器',
@@ -9004,6 +9064,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'コインは世界全体の潤滑油です。装備や物資、旅の道具を買い、プレイヤー間でやり取りされます。これらはすべて遊んでいるだけで身につくので、このページはお金がどこから来てどこへ行くのかを示す地図だと思ってください。',
   'guide.economy.junkBody':
     '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。商人の「売却」タブには、粗悪品の半端物をまとめて一括で売れるワンクリックのボタンまで用意されています。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。',
+  'guide.economy.junkBodyFinal':
+    '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。商人の「売却」タブには、粗悪品の半端物をまとめて一括で売れるワンクリックのボタンまで用意されています。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。こうして売った署名のない灰色アイテムは買い戻しリストに入らないので、押す前に残したい物がないか確かめましょう。',
   'guide.economy.junkTitle': 'がらくたの整理',
   'guide.economy.mailBody':
     'どの拠点の町にも、ワタリガラスを彫った柱が立っています。レルムの手紙配達、レイヴンポストのメールボックスです。その前に立てば、オンラインの友人にも長くオフラインの相手にも、名前を指定してどのキャラクターへも手紙を書け、わずかな郵送料でコインや品物を手紙に添えられます。ワタリガラスが飛ぶには少し時間がかかります。届くと、封筒の印が受取人に何かが待っていると知らせてくれます。',
@@ -10269,7 +10331,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '骨髄砕きのダメージが30%増加し、緊急時の護りが攻撃を置き換えなくなります。',
   'entities.itemSets.grovespring.name': 'グローヴスプリングの法衣',
   'entities.itemSets.grovespring.bonus2':
-    'スウィフトメンドが自分の野生の芽吹きまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。',
+    'スウィフトメンドが自分のスポアメンディングまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.grovespring.bonus4': '満開が残りの効果の75%を収穫し、その後翠成を1蓄えます。',
   'entities.items.lastflame_core.name': '最後の炎の核',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
@@ -10344,7 +10406,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。敵対プレイヤーを倒すと灰の歩みを得て、移動速度が6秒間40%上がります。',
   'entities.itemSets.warfare_cinderweave.name': 'シンダーウィーヴの法衣',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -10356,13 +10419,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。敵対プレイヤーを倒すと不断の誓いを得て、10秒間200のダメージを吸収します。',
   'entities.itemSets.warfare_stormbound.name': 'ストームバウンドの法衣',
-  'entities.itemSets.warfare_stormbound.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_stormbound.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_stormbound.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。呪文に15%の確率で燠火の守りが宿り、8秒間120のダメージを吸収します。',
   'entities.itemSets.warfare_thornhide.name': 'ソーンハイドの装束',
-  'entities.itemSets.warfare_thornhide.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_thornhide.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -13207,6 +13272,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': 'ブルーインフォーム',
   'guide.models.formCat': 'キャットフォーム',
   'guide.models.formTravel': 'フリートフォーム',
+  'guide.models.formSporemender': 'スポアメンダーフォーム',
   'guide.models.groupForms': 'ドルイドの変身形態',
   'guide.nav.sidebarLabel': 'ガイドの項目',
   'guide.professions.craftHowTitle': '製作ウィンドウ',
@@ -13612,6 +13678,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': 'ステルスと移動形態を含める',
   'hudChrome.options.showFriendlyTrack': '味方へのバフを表示',
   'hudChrome.options.showShieldTrack': '自分のシールドを表示',
+  'hudChrome.options.classicCombatText': 'クラシック戦闘テキスト',
   'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',
   'hudChrome.options.showNameplateDots': 'ネームプレートに自分のデバフを表示',
   'hudChrome.options.nameplateDotScale': 'ネームプレートのデバフ表示サイズ',
@@ -15670,6 +15737,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '兜を隠す',
   'hudChrome.paperdoll.showHelmAria': '兜を表示',
   'hudChrome.options.waterRipples': '水面の波紋（航跡）',
+  'hudChrome.options.spellEffects': '呪文エフェクト',
   'hudChrome.options.actionCam': 'アクションカメラ',
   'hudChrome.options.actionCamShoulder': 'アクションカメラの肩',
   'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
@@ -15735,6 +15803,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。',
   'entities.abilities.cinderhide.name': '燼皮',
   'entities.abilities.claw.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
+  'entities.abilities.scratch.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
   'entities.abilities.cold_focus.description':
     '12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）',
   'entities.abilities.cold_focus.name': '冷徹集中',
@@ -15840,12 +15909,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。',
   'entities.abilities.maledict_gaze.name': '呪眼の凝視',
   'entities.abilities.marrowbreak.description':
-    '古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を8秒間得て、怒りを15回復する。',
+    '古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を回復し、怒りを15回復する。',
   'entities.abilities.marrowbreak.name': '骨髄砕き',
   'entities.abilities.martyrs_aegis.description': '味方1体が受けるダメージを8秒間40%軽減する。',
   'entities.abilities.martyrs_aegis.name': '殉教者の盾',
   'entities.abilities.maul.specNote_feral':
-    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：78から96のダメージを与える高脅威の一撃。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を得て、怒りを15回復する。',
+    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：78から96のダメージを与える高脅威の一撃。体力が半分未満のときは、代わりに最大体力の18%を回復し、怒りを15回復する。',
   'entities.abilities.measured_shot.description':
     '慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。',
   'entities.abilities.measured_shot.name': '精密射撃',
@@ -15869,7 +15938,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に15秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。',
   'entities.abilities.ossuary_mark.name': '納骨の印',
   'entities.abilities.overbloom.description':
-    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。',
+    '翠成を3消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。',
+  'entities.abilities.overbloom.specNote_restoration':
+    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。',
   'entities.abilities.overbloom.name': '満開',
   'entities.abilities.pack_command.description':
     '生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。',
@@ -15912,9 +15983,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。',
   'entities.abilities.redharvest.name': '血の収穫',
   'entities.abilities.regrowth.specNote_restoration':
-    '新しい花を植えると翠成が1段階進む（最大5）。',
+    '詠唱するたびに翠成が1段階進む（最大3）。すでに効果中の花を上書きした場合も含む。',
   'entities.abilities.rejuvenation.specNote_restoration':
-    '新しい花を植えると翠成が1段階進む（最大5）。翠成が5段階のとき、スウィフトメンドは満開に変化する。',
+    '詠唱するたびに翠成が1段階進む（最大3）。すでに効果中の花を上書きした場合も含む。翠成が3段階のとき、スウィフトメンドは満開に変化する。',
   'entities.abilities.rip.specNote_feral': '命中した一撃が古き血を1蓄える（最大3）。',
   'entities.abilities.ruinous_brand.description':
     '敵に15秒間の烙印を刻みます。次の3回の直接呪文は、烙印のついた敵に対して25%のダメージで反響し、別の対象に使用した場合はその敵へ50%のダメージを複製します。破滅の矢の反響も、追加のクリティカルダメージ倍率を伴わずにクリティカルヒットとして扱われます。',
@@ -15993,13 +16064,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '口笛の合図でグループを鼓舞し、10秒間、攻撃・詠唱・チャネリング速度を10%上昇させる。最近グループ速度上昇を受けた味方は疲労しており、効果を受けられない。（ローグのタレント）',
   'entities.abilities.thieves_chorus.name': '盗賊の合唱',
   'entities.abilities.thunder_reservoir.description':
-    'パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）',
+    'パッシブ：アークボルト、スカイブランチ、マグマバーストで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）',
   'entities.abilities.thunder_reservoir.name': '雷鳴の貯蔵',
   'entities.abilities.tidecall.description':
     '味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。',
   'entities.abilities.tidecall.name': '潮呼び',
   'entities.abilities.trailbreak.description':
-    '専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。',
+    '後方へ25ヤード跳び、移動不能効果と移動速度低下効果を解除します。狩猟の勢いがある場合はそれを更新し、再突入準備を12秒間付与します。',
   'entities.abilities.trailbreak.name': '離脱跳躍',
   'entities.abilities.umbral_anchor.description':
     '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。',
@@ -16122,11 +16193,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '近接ダメージの姿です。ローグと同じくエナジーとコンボポイントで戦い、脅威ははるかに低く抑えられます。',
   'guide.classPage.formLine.form_travel':
     '移動のための姿です。地上をはるかに速く駆けられますが、変身を解くまで他のアビリティは使えません。',
+  'guide.classPage.formLine.form_sporemender':
+    '回復特性の癒しの姿です。より頑丈な外皮と強い回復を備えますが歩みは遅くなり、すべての呪文とマナをそのまま使えます。',
   'guide.classPage.formName.form_bear': 'ブルーインフォーム',
   'guide.classPage.formName.form_travel': 'フリートフォーム',
+  'guide.classPage.formName.form_sporemender': 'スポアメンダーフォーム',
   'guide.classPage.formsHeading': '変身',
   'guide.classPage.formsMoonwing':
-    '均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。獣の姿でありながら呪文を保てる唯一の形であり、ワンドもこの姿か、通常の術者の姿でしか使えません。',
+    '均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。回復特性のスポアメンダーフォームと同じく呪文をそのまま使え、ワンドはこの二つの姿か、通常の術者の姿でしか使えません。',
   'guide.classPage.formsWolfEngage':
     '狼はブルーインラッシュで戦いを開き、すぐにウルフフォームへ変身して対象を押さえ込み、ステルスでないときはランジで距離を詰め、テイクダウンで敵を足止めする。',
   'guide.classPage.formsAutoUnshift':
@@ -16788,6 +16862,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     '2段目のアクションバーを表示し、2段目をオンにすると3段目も現れます。段が隠れているあいだも、スロットはキー割り当てから使えます。',
   'guide.settingsPage.ifFctScale': 'ターゲットから浮かび上がるダメージと回復の数字の大きさです。',
+  'guide.settingsPage.ifClassicCombatText':
+    'まっすぐ上昇する白と淡い金色のシンプルなダメージ数字に戻します。オフ（デフォルト）のままにすると、数字がより目立って左右に広がり、クリティカルや特に大きなヒットが輝きます。',
   'guide.settingsPage.ifFramesIntro':
     '自分のフレーム、ターゲットフレーム、そしてパーティのレイアウト全体です。パーティのまとまりには大きさ、幅、高さ、間隔、列数のスライダーもあるので、レイド用のグリッドを画面に合わせられます。タブの最下部にあるリセットボタンで、すべてのフレームを元の位置に戻せます。',
   'guide.settingsPage.ifGeneralIntro':
@@ -16885,6 +16961,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '世界が遠くまでどこまで描かれてから霞んでいくかです。自分で動かすまでは、各プリセットが値を決めてくれます。',
   'guide.settingsPage.rowWaterQuality':
     '湖、川、大海原の表現です。平板で軽いものから、完全に反射するものまで選べます。',
+  'guide.settingsPage.rowSpellEffects':
+    'プレイヤーとそのペットが放つ呪文の光、火花、飛翔体、着弾時の炸裂です（自分のものも含みます）。オフにすると画面が落ち着き、大人数の戦闘で数フレーム稼げます。敵が放つものはすべて表示されたままで、離れるべき範囲を示すリング、スタン・恐怖・移動不能状態の対象の頭上マーカー、すべての詠唱バーも残ります。',
   'guide.settingsPage.rowWaterRipples':
     '泳いでいるときに背後へ広がる航跡と波紋です。初期設定はオフで、実際にフレームを食う唯一の水面エフェクトです。水しぶきや泡はどちらの設定でも影響を受けません。',
   'guide.settingsPage.valueUltraOrInsane': 'ウルトラ、すべてを求めるなら極限',
@@ -17014,6 +17092,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '悪魔形態：体格が{pct}%大きくなる。ほかのボーナスは別のバフで表示される',
   'hudChrome.auraEffect.formMoonkin':
     'ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する',
+  'hudChrome.auraEffect.formSporemender':
+    'スポアメンダーフォーム：与える回復量が{pct}%、アーマーが{armorPct}%増加し、移動速度が{slowPct}%低下する',
   'hudChrome.auraEffect.formShadow': 'グロームヴェイル形態：影ダメージが{pct}%増加する',
   'hudChrome.auraEffect.freeExecute': '次の対象となる処刑アビリティはコストを消費しない',
   'hudChrome.auraEffect.funeralHarvestLock':
@@ -17079,7 +17159,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     '毒の儀式:{stacks}/{max}段階。「卑劣な突き」「邪悪な斬撃」「毒針」で1段階ずつ進む。{max}段階で「永の眠り」が「毒裂き」に変化する',
   'hudChrome.auraEffect.verdance':
-    '翠成：{stacks}/{max}段階。新しく植えた野生の芽吹きまたは二度目の開花ごとに1段階進む。{max}段階でスウィフトメンドが満開に変化する',
+    '翠成：{stacks}/{max}段階。スポアメンディング、二度目の開花、野生の癒しを詠唱するたびに1段階進み、1段階ごとに野生の癒しの詠唱時間が短くなる。{max}段階でスウィフトメンドが満開に変化する',
   'hudChrome.auraEffect.warlockAnchor':
     '{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する',
   'hudChrome.auraEffect.wintersChill':
@@ -18284,7 +18364,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'ランクマッチに勝てば、プレイヤー対プレイヤーの通貨である名誉が支払われ、最後まで戦い抜いた負け試合にもそれより少ない額の名誉が支払われます。引き分けも同様です。ですから、負けて本当に失うものはレーティングだけです。名誉は本物の試合に報いるためのものです。同じ日に同じ相手や同じチームをもう一度倒しても追加の支払いはなく（もう一度負けても同じです）、勝ち続けた長い一日でも最初の何勝かまでは満額が支払われ、その後は一勝あたりが半分になり、さらに勝ち進むともう一度半分になってそこで下げ止まり、相手が棄権した試合はレーティングこそ動きますが名誉はまったく支払われません。この「一日」はワールド自身の一日で、ワールドの夜間リセット時刻に切り替わります。日次のロックアウトがすべて解けるのと同じ境目です。',
   'guide.arenaPage.warfareBodyStatsStay':
-    'ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。',
+    'ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。ただし例外が一つあり、どこでも有効です。術者用セットを2つ装備すると、被ダメージで詠唱が遅れなくなります。',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。',
   'guide.social.calendarBodyDoubleHonor':
@@ -18320,6 +18400,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': 'この素材の選択は利用できなくなりました。',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × {name}が採集',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × {name}から奪取',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × {name}が採集、{signer}が署名',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 採集者の記録なし',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned':
@@ -18515,6 +18596,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': '裂け目の監視者の指輪',
   'entities.items.rift_surveyors_satchel.name': '裂け目測量士の鞄',
   'entities.items.emissary_cache.name': '使者の宝箱',
+  'entities.items.pvp_trophy_skull.name': '戦利品の頭蓋骨',
   'entities.npcs.weekly_emissary.name': 'チャム・ピート',
   'entities.npcs.weekly_emissary.title': '使者',
   'entities.npcs.weekly_emissary.greeting':
@@ -18575,7 +18657,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': 'デルブの印',
   'hudChrome.currencies.wocToken': 'WoCトークン',
   'hudChrome.currencies.heroicMarkNote': 'ヒロイックダンジョン . ヒロイック補給官で使用',
-  'hudChrome.currencies.honorNote': '戦場とアリーナ',
+  'hudChrome.currencies.honorNote': '戦場、アリーナ、ワールドクエスト',
   'hudChrome.currencies.delveMarkNote': '完了したデルブ',
   'hudChrome.currencies.wocTokenNote': '連携済みウォレットの残高',
   'hudChrome.currencies.walletNotLinked': 'ウォレット未連携',
@@ -18863,6 +18945,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（回復）',
   'entities.abilities.grove_awakening.name': '樹林の覚醒',
+  'entities.abilities.sporemender_form.name': 'スポアメンダーフォーム',
+  'entities.abilities.sporemender_form.description':
+    'スポアメンダーになり、与える回復量が20%、アーマーが40%増加しますが、移動速度が20%低下します。通常形態で使える呪文はすべてそのまま使えます。姿を戻すまで持続します。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再び唱えると通常形態に戻ります。（回復の象徴）',
   'entities.abilities.prayer_of_returning.description':
     'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（聖なる・ディシプリン）',
   'entities.abilities.prayer_of_returning.name': '帰還の祈り',
@@ -19513,7 +19598,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warrior_prot.bonus4':
     '4点：Faultlineで受けるダメージが6秒間10%低下。',
   'entities.itemSets.vanguard_paladin_holy.name': 'ヴァンガード：Sunvigil Regalia',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': '2点：Life Covenantのクールダウンが30秒短縮。',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    '2点：Life Covenantのクールダウンが30秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     '4点：Life Covenantが対象に最大体力8%のシールドを6秒付与。',
   'entities.itemSets.vanguard_paladin_protection.name': 'ヴァンガード：Shieldvow Bastion',
@@ -19554,20 +19640,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '4点：SmokefadeからのGut Punchがコンボポイントを追加で2得る。',
   'entities.itemSets.vanguard_priest_discipline.name': 'ヴァンガード：Veilpsalm Raiment',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    '2点：Terror Canticleのクールダウンが3秒短縮。',
+    '2点：Terror Canticleのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     '4点：Psalm of Warding消費時、守られた味方の移動速度が3秒間20%上昇。8秒に1回まで。',
   'entities.itemSets.vanguard_priest_holy.name': 'ヴァンガード：Gracewing Raiment',
-  'entities.itemSets.vanguard_priest_holy.bonus2': '2点：Veilstepのクールダウンが6秒短縮。',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    '2点：Veilstepのクールダウンが6秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_priest_holy.bonus4': '4点：Veilstepが最大体力8%のシールドを6秒付与。',
   'entities.itemSets.vanguard_priest_shadow.name': 'ヴァンガード：Duskhymn Regalia',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    '2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。',
+    '2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     '4点：Call Tithefiendが最大体力10%のシールドを8秒付与。',
   'entities.itemSets.vanguard_shaman_elemental.name': 'ヴァンガード：Tempestwrit Battlemail',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    '2点：Unleash Weaponのクールダウンが3秒短縮。',
+    '2点：Unleash Weaponのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     '4点：Unleash Weaponで移動詠唱可能になり、4秒間移動速度20%上昇。20秒に1回まで。',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'ヴァンガード：Galeborn Warmail',
@@ -19577,33 +19664,37 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '4点：Ancestral StrikeでElemental Tranceの残りクールダウンが4秒短縮。',
   'entities.itemSets.vanguard_shaman_restoration.name': 'ヴァンガード：Brineward Chainmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    '2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。',
+    '2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     '4点：Tidecallが対象にあなたの最大体力5%のシールドを6秒付与。',
   'entities.itemSets.vanguard_mage_arcane.name': 'ヴァンガード：Hourbinder Vestments',
-  'entities.itemSets.vanguard_mage_arcane.bonus2': '2点：Temporal Barrierのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    '2点：Temporal Barrierのクールダウンが2秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     '4点：Temporal Barrierが守った対象の移動速度を3秒間20%上昇。',
   'entities.itemSets.vanguard_mage_fire.name': 'ヴァンガード：Emberlash Regalia',
-  'entities.itemSets.vanguard_mage_fire.bonus2': '2点：Cinderfallの再使用が3秒速くなる。',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    '2点：Cinderfallの再使用が3秒速くなる。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     '4点：Cinderfall詠唱でBlazing Barrierの残りクールダウンが2秒短縮。',
   'entities.itemSets.vanguard_mage_frost.name': 'ヴァンガード：Rimewarden Garb',
-  'entities.itemSets.vanguard_mage_frost.bonus2': '2点：Icebindのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    '2点：Icebindのクールダウンが2秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     '4点：Icebind詠唱でFlitstepの残りクールダウンが5秒短縮。',
   'entities.itemSets.vanguard_warlock_affliction.name': 'ヴァンガード：Dreadquill Vestments',
-  'entities.itemSets.vanguard_warlock_affliction.bonus2': '2点：Harrowの詠唱時間が0.3秒短縮。',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    '2点：Harrowの詠唱時間が0.3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。',
   'entities.itemSets.vanguard_warlock_demonology.name': 'ヴァンガード：Marrowbound Regalia',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    '2点：Bone Armorのクールダウンが10秒短縮。',
+    '2点：Bone Armorのクールダウンが10秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     '4点：Reaping CommandでBone Armorの残りクールダウンが2秒短縮。',
   'entities.itemSets.vanguard_warlock_destruction.name': 'ヴァンガード：Slagcrown Vestments',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '2点：Cinderhideのクールダウンが30秒短縮。',
+    '2点：Cinderhideのクールダウンが30秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     '4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。',
   'entities.itemSets.vanguard_druid_feral.name': '血たてがみの皮装',
@@ -19611,10 +19702,23 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_feral.bonus4':
     '4点：Bruin Rushが最大体力6%のシールドを6秒付与。',
   'entities.itemSets.vanguard_druid_restoration.name': 'アザミ花の祭服',
-  'entities.itemSets.vanguard_druid_restoration.bonus2': '2点：Fleetmendのクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    '2点：Fleetmendのクールダウンが1秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_druid_restoration.bonus4': '4点：Fleetmendで移動速度が3秒間30%上昇。',
   'entities.itemSets.vanguard_druid_balance.name': '星守りの装束',
-  'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
+  'entities.itemSets.vanguard_druid_balance.bonus2':
+    '絡み根の詠唱時間が0.5秒短縮される。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
+  'entities.letters.world_quest_reward.sender': 'カラス便',
+  'entities.letters.world_quest_reward.subject': 'ワールドクエストの報酬',
+  'entities.letters.world_quest_reward.body':
+    'このワールドクエストの報酬を獲得したとき、バッグがいっぱいでした。そのため、カラスがここまで届けました。空きを作ってから、どのワタリガラスの石柱でも受け取れます。\n\n- カラス便',
+  'questUi.logs.worldQuestRewardMailed':
+    'バッグがいっぱいです。報酬はメールボックスに送られました: {items}。',
+  'errors.searchUpdates': '更新を検索',
+  'errors.noUpdateFound': '更新が見つかりませんでした。しばらくしてから再試行してください。',
+  'errors.updateUnavailable':
+    'ゲームストアで更新するか、最新のクライアントをダウンロードしてください。',
+  'errors.updateSearchFailed': '更新を確認できませんでした。もう一度お試しください。',
 };

@@ -14,9 +14,8 @@
 // building's ghost fade, prefetched once the camera comes within reach.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { loadGltf, releaseGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { dequantizeAttribute } from './characters/dequantize_attribute';
 import { GFX, surfaceMat } from './gfx';
@@ -70,7 +69,7 @@ export function isTransportShipKey(key: string): boolean {
   return key in TRANSPORT_SHIP_MODELS;
 }
 
-const loaded = new Map<string, GLTF>();
+const loaded = new Map<string, LoadedGltf>();
 /** Prepared templates by `url|tier`: the Standard and Lambert tiers convert the
  *  materials differently, so a graphics rebuild never reuses the other tier's. */
 const templates = new Map<string, ShipTemplate>();
@@ -106,12 +105,29 @@ export function resetTransportShipCaches(): void {
   convertedMaterials.clear();
 }
 
+interface ShipPart {
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material;
+}
+
+function attributeLayout(geometry: THREE.BufferGeometry): string {
+  return Object.keys(geometry.attributes)
+    .sort()
+    .map((n) => `${n}${geometry.getAttribute(n).itemSize}`)
+    .join(',');
+}
+
 interface ShipTemplate {
   root: THREE.Object3D;
   /** One (geometry, material) per distinct program the ship draws: the props
    *  material prewarm stages these so a ship first seen after the curtain
    *  links nothing in a live frame. */
-  prewarmParts: { geometry: THREE.BufferGeometry; material: THREE.Material }[];
+  prewarmParts: ShipPart[];
+  /** The first built view's fading clones whose program differs from their
+   *  source's (the dithered ghost hook, below High), one per source material
+   *  and attribute layout: null until a view is built. The ghost style is not
+   *  in the template key; a style change rebuilds through resetTransportShipCaches. */
+  fadeParts: ShipPart[] | null;
   clip: THREE.AnimationClip | null;
   /** Each fading sail's box in the ship frame. */
   sailBoxes: Map<string, ShipLocalBox>;
@@ -194,11 +210,7 @@ function mergeStatic(anchor: THREE.Object3D, live: ReadonlySet<THREE.Object3D>):
         const mat = mesh.material as THREE.Material;
         const toAnchor = new THREE.Matrix4().multiplyMatrices(inverse, mesh.matrixWorld);
         const geo = floatGeometry(mesh, toAnchor);
-        const layout = Object.keys(geo.attributes)
-          .sort()
-          .map((n) => `${n}${geo.getAttribute(n).itemSize}`)
-          .join(',');
-        const key = `${mat.uuid}|${layout}|${geo.index ? 'i' : 'n'}`;
+        const key = `${mat.uuid}|${attributeLayout(geo)}|${geo.index ? 'i' : 'n'}`;
         let bucket = buckets.get(key);
         if (!bucket) {
           bucket = { material: mat, geos: [] };
@@ -224,7 +236,7 @@ function mergeStatic(anchor: THREE.Object3D, live: ReadonlySet<THREE.Object3D>):
   }
 }
 
-function buildTemplate(gltf: GLTF): ShipTemplate {
+function buildTemplate(gltf: LoadedGltf): ShipTemplate {
   const root = gltf.scene.clone(true);
   root.traverse((node) => {
     const mesh = node as THREE.Mesh;
@@ -294,29 +306,26 @@ function buildTemplate(gltf: GLTF): ShipTemplate {
     const mesh = node as THREE.Mesh;
     if (!mesh.isMesh) return;
     const material = mesh.material as THREE.Material;
-    const layout = Object.keys(mesh.geometry.attributes)
-      .sort()
-      .map((n) => `${n}${mesh.geometry.getAttribute(n).itemSize}`)
-      .join(',');
-    const key = `${material.uuid}|${layout}`;
+    const key = `${material.uuid}|${attributeLayout(mesh.geometry)}`;
     if (seenParts.has(key)) return;
     seenParts.add(key);
     prewarmParts.push({ geometry: mesh.geometry, material });
   });
-  return { root, clip, sailBoxes, prewarmParts, sockets };
+  return { root, clip, sailBoxes, prewarmParts, fadeParts: null, sockets };
 }
 
 /** The prepared ships' distinct (geometry, material) programs at the live tier,
- *  for the props material prewarm (props.ts buildPropMaterialPrewarmGroup).
- *  Empty until buildProps has placed a ship. */
-export function transportShipPrewarmParts(): readonly {
-  geometry: THREE.BufferGeometry;
-  material: THREE.Material;
-}[] {
-  const out: { geometry: THREE.BufferGeometry; material: THREE.Material }[] = [];
+ *  for the props material prewarm (props.ts buildPropMaterialPrewarmGroup): the
+ *  template's, plus the first view's fading clones where the dithered ghost gives
+ *  them a program of their own. Empty until buildProps has placed a ship (it
+ *  builds the moored and scheduled ships before the prewarm entry runs). */
+export function transportShipPrewarmParts(): readonly ShipPart[] {
+  const out: ShipPart[] = [];
   for (const url of new Set(Object.values(TRANSPORT_SHIP_MODELS))) {
     const template = templates.get(templateKey(url));
-    if (template) out.push(...template.prewarmParts);
+    if (!template) continue;
+    out.push(...template.prewarmParts);
+    if (template.fadeParts) out.push(...template.fadeParts);
   }
   return out;
 }
@@ -419,8 +428,11 @@ export function buildTransportShipView(
   });
 
   // Every sail wears its own clone of the cloth material, so one sail fades
-  // without ghosting the others (the clone keeps the source's program).
+  // without ghosting the others (the clone keeps the source's program, unless
+  // the dithered ghost hooks it: those programs join the props prewarm).
   const sails: SailFade[] = [];
+  const fadeParts: ShipPart[] | null = template.fadeParts ? null : [];
+  const fadeSeen = new Set<string>();
   for (const [name, box] of template.sailBoxes) {
     const sail = root.getObjectByName(name);
     if (!sail) continue;
@@ -437,9 +449,15 @@ export function buildTransportShipView(
       }
       mesh.material = clone;
       occluderFadeRecordFor(mats, clone, mesh);
+      if (!fadeParts || clone.customProgramCacheKey() === src.customProgramCacheKey()) return;
+      const key = `${src.uuid}|${attributeLayout(mesh.geometry)}`;
+      if (fadeSeen.has(key)) return;
+      fadeSeen.add(key);
+      fadeParts.push({ geometry: mesh.geometry, material: clone });
     });
     sails.push({ box, mats, alpha: 1 });
   }
+  if (fadeParts) template.fadeParts = fadeParts;
 
   const mixer = template.clip ? new THREE.AnimationMixer(root) : null;
   // The renderer freezes the whole props tree after build (freezeStaticMatrices:
@@ -531,7 +549,7 @@ export const transportShipInternalsForTest = {
   buildTemplate,
   mergeStatic,
   /** Hand a parsed GLB to the preload map (Node tests have no fetch path). */
-  setLoadedGltfForTest(url: string, gltf: GLTF | null): void {
+  setLoadedGltfForTest(url: string, gltf: LoadedGltf | null): void {
     templates.delete(templateKey(url));
     if (gltf) loaded.set(url, gltf);
     else loaded.delete(url);

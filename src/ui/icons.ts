@@ -3252,6 +3252,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   prowl: r('nature', 'leafGreen', ['paw'], ['arcs']),
   rake: r('nature', 'leafGreen', ['claw_slash'], ['drips']),
   claw: r('nature', 'leafGreen', ['claw_slash'], ['motion']),
+  scratch: r('nature', 'leafGreen', ['claw_slash', { p: 'paw', ...BR }], ['arcs']),
   ferocious_bite: r('blood', 'blood', ['fang'], ['drips']),
   swipe: r('earth', 'earthBrown', ['claw_slash'], ['arcs']),
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
@@ -3279,6 +3280,9 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   siphon_life: r('shadow', 'venom', ['heart'], ['drips']),
   conflagrate: r('fire', 'ember', ['flame', { p: 'skull', ...BR }], ['crack']),
   moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
+  // Groveheart's Sporemender Form: the healer's cross inside the druid leaf
+  // (procedural fallback; owner-provided painted art ships beside it).
+  sporemender_form: r('nature', 'leafGreen', ['leaf', { p: 'cross', ...BR }], ['sparkle']),
   feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),
   swiftmend: r('nature', 'leafGreen', ['droplet'], ['glow']),
   // Groveheart resurrections: the in-combat single rez (a heart bursting back
@@ -4890,6 +4894,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'typhoon',
   'wildwake',
   'grove_awakening',
+  'sporemender_form',
   // hunter
   'aspect_of_the_wild',
   'bestial_wrath',
@@ -4975,6 +4980,8 @@ export const ABILITY_ART_PENDING = new Set<string>([
   // Wildfang kit pass 2: the VFX and art retune owns the final paintings.
   'lunge',
   'hamstring_bite',
+  // Scratch, the Cat Form sweep builder: its procedural glyph until the painting ships.
+  'scratch',
   // Buried Hoards: the Clockwork Shock Bomb's thrown cast draws its glyph until
   // its skill painting ships (the item itself already ships painted art).
   'clockwork_shock_bomb',
@@ -5608,6 +5615,16 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'cmb_coinsack_caught',
   // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
   'exp_harbor_to_harbor',
+  // The sixth lifetime-XP rung (prog_titan): procedural progression crest until commissioned.
+  'prog_titan',
+  // World PvP streak titles use the PvP category crest until commissioned.
+  'pvp_flag_1h',
+  'pvp_flag_3h',
+  'pvp_flag_6h',
+  'pvp_flag_24h',
+  'pvp_flag_168h',
+  // The Hard wisp maze clear: exploration category crest pending art.
+  'exp_wisp_maze_hard',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

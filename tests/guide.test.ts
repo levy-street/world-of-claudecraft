@@ -1787,10 +1787,16 @@ describe('Guide model stills', () => {
     );
   });
 
-  it('publishes exactly the three named druid forms (the gallery label map mirrors this)', () => {
-    // models.ts labels forms through its FORM_NAME literal map; a fourth form added in
+  it('publishes exactly the four named druid forms (the gallery label map mirrors this)', () => {
+    // models.ts labels forms through its FORM_NAME literal map; a fifth form added in
     // the generator would silently render as "Druid Forms" unless this pin reds first.
-    expect(GUIDE_DRUID_FORMS.map((d) => d.id)).toEqual(['form_bear', 'form_cat', 'form_travel']);
+    // Groveheart's Sporemender Form is the fourth (Moonwing has no model, so it is prose).
+    expect(GUIDE_DRUID_FORMS.map((d) => d.id)).toEqual([
+      'form_bear',
+      'form_cat',
+      'form_travel',
+      'form_sporemender',
+    ]);
   });
 });
 
@@ -6165,6 +6171,12 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
         if (proc) expect(proc.pvpOnly, `${setId} ${tier.pieces}pc proc`).toBe(true);
         for (const [key, value] of Object.entries(rest)) {
           if (value === undefined) continue;
+          // The one tier that works everywhere: the caster families' 2-piece
+          // pushback immunity, which the prose names as its exception.
+          if (key === 'castPushbackReduction' && tier.pieces === 2) {
+            expect(body).toContain('two pieces of a caster set also stop damage from delaying');
+            continue;
+          }
           expect(
             ['pvpOffenseRating', 'pvpDefenseRating', 'ccDurationReduction'],
             `${setId} ${tier.pieces}pc ${key}`,

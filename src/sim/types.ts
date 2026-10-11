@@ -134,7 +134,10 @@ export type HonorReason =
   | 'world_assist'
   // King of the Hill (pvp/hill.ts): the once-a-minute trickle to a holder
   // standing inside the circle.
-  | 'hill_hold';
+  | 'hill_hold'
+  // The day's Honor world quests (src/sim/world_quest_honor_slots.ts): two
+  // rotating world quests per realm cycle pay a flat Honor bonus on completion.
+  | 'world_quest';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
@@ -459,6 +462,10 @@ export type AuraKind =
   | 'form_travel'
   | 'form_fireball'
   | 'form_moonkin'
+  // Groveheart's Sporemender Form: a caster form that keeps the full kit and
+  // mana bar (+20% healing done, +40% armor, 20% slower movement;
+  // combat/druid_sporemender.ts).
+  | 'form_sporemender'
   | 'form_shadow'
   // Necromancy secondary resource and signature transformation.
   | 'soul_fragments'
@@ -699,6 +706,7 @@ export const FORM_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'form_travel',
   'form_fireball',
   'form_moonkin',
+  'form_sporemender',
   'form_shadow',
   'form_lich',
 ]);
@@ -722,6 +730,9 @@ export interface Aura {
   tickTimer?: number;
   tickDamage?: number;
   tickDoom?: number;
+  // HoT only: a one-time heal paid when the aura runs its full duration
+  // (Second Bloom's closing heal, combat/druid_second_bloom.ts).
+  closingHeal?: number;
   // Sim-only periodic ramp: after each resolved DoT tick, increase `stacks`
   // and recompute `value` as per-stack damage times stacks, up to this cap.
   // The wire already mirrors the resulting value/stacks, so clients do not
@@ -763,8 +774,9 @@ export interface Aura {
   // effect kind, so only one flask ever rides at a time), the downward-refusal
   // guard (a same-family elixir or scroll is refused rather than allowed to
   // overwrite a flask), and death persistence (aurasSurvivingDeath in
-  // ./resurrection.ts keeps it). DEATH only: auras are session state and are
-  // not persisted, so a flask does not survive a logout or a restart. The
+  // ./resurrection.ts keeps it). A flask also persists through a logout or a
+  // restart like every other consumable buff (./aura_persist.ts, which keeps
+  // this marker and the undispellable stamp on the saved record). The
   // elixir/scroll sources of the same aura id never set it, so a plain elixir
   // stays mortal and stays outside the singleton. The mint also stamps
   // `undispellable` BESIDE this marker (the phase 10 QA STK-2 ruling; see
@@ -3074,6 +3086,10 @@ export type AbilityEffect =
       // high-per-hit weapon cannot inflate an energy-gated instant it is pressed
       // at will. Off by default (the un-normalized classic-era behavior).
       normalized?: boolean;
+      // Sweep variant (Scratch, combat/druid_scratch.ts): strike EVERY hostile
+      // within this many yards of the caster instead of one target, each hit
+      // rolling its own swing and awarding the ability's combo points.
+      sweepRadius?: number;
     } // instant special attack (sinister strike, overpower, backstab)
   | {
       type: 'directDamage';
@@ -3302,7 +3318,17 @@ export type AbilityEffect =
   // pctOfMax: when set, the heal total is this fraction of the TARGET's max
   // health at cast time instead of the flat total, so the heal scales with
   // gear and any future pool retune (Savage Mending is the first user).
-  | { type: 'hot'; total: number; duration: number; interval: number; pctOfMax?: number } // renew, rejuvenation
+  | {
+      type: 'hot';
+      total: number;
+      duration: number;
+      interval: number;
+      pctOfMax?: number;
+      // Second Bloom: when the HoT runs its full duration, heal the target again
+      // for the amount this cast's direct heal produced (combat/
+      // druid_second_bloom.ts). Needs a 'heal' effect earlier in the list.
+      closingHealFromDirect?: boolean;
+    } // renew, rejuvenation
   | {
       type: 'absorb';
       amount: number;
@@ -3364,13 +3390,13 @@ export type AbilityEffect =
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
   | { type: 'consumeDot'; dot: string }
   // Wildfang Marrowbreak (combat/druid_engines.ts): the bear cash-out's
-  // survival arm. Below the health fraction, the spent bank raises an absorb
-  // of absorbPctMaxHp and refunds rage instead of striking; above it the strike
+  // survival arm. Below the health fraction, the spent bank heals the druid for
+  // healPctMaxHp of maximum health and refunds rage instead of striking; above it the strike
   // alone carries the payoff. Deterministic, druid-only.
-  | { type: 'druidMarrowbreakGuard'; belowFrac: number; absorbPctMaxHp: number; rage: number }
+  | { type: 'druidMarrowbreakGuard'; belowFrac: number; healPctMaxHp: number; rage: number }
   // Groveheart Overbloom (combat/druid_engines.ts): harvest every HoT the
   // caster owns for harvestPct of its remaining healing, then replant a
-  // Wildbloom on the cast target (or on every harvested ally with the
+  // Sporemending on the cast target (or on every harvested ally with the
   // Seedspread row lean).
   | { type: 'druidOverbloom'; harvestPct: number }
   | { type: 'slow'; mult: number; duration: number }
@@ -5831,6 +5857,14 @@ export interface Entity extends ClientMirroredEntityFields {
    *  unflagged, so an unflagged character samples and serializes exactly as
    *  before the flag existed. */
   pvpFlag?: boolean;
+  /** Host-only disconnect grace marker; absent for offline/headless players. Never persisted. */
+  pvpRewardsPaused?: boolean;
+  /** World PvP bounty (src/sim/pvp/world_pvp_bounty.ts): this player's kill
+   *  streak earned a bounty, so every client paints their whole name tag blood
+   *  red. The DISPLAY mirror of PlayerMeta.worldPvp.bounty, written only by
+   *  that module, and it rides the entity wire (`bty`). Absent/false is no
+   *  bounty, so a character without one samples and serializes as before. */
+  bounty?: boolean;
   /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
    *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
    *  gear's health bonus never reaches raid content. Absent means the open
@@ -6888,6 +6922,39 @@ export type SimEvent = { pid?: number } & (
       itemName: string;
       quality: ItemDef['quality'];
     }
+  // A King of the Hill phase was announced to the realm: fired beside the
+  // realm's `log` line in hill.ts announcePhase, once per phase change.
+  // SERVER-ONLY like worldPvpKill: its one consumer is the Discord PvP feed
+  // (server/discord_hill_feed.ts), and server/event_frame.ts strips it from
+  // every client frame (clients already get the log line). Carries no pid and
+  // no absolute sim time: the seconds are RELATIVE to the moment of the
+  // announcement, so a host maps them onto its own clock.
+  | {
+      type: 'hillAnnounced';
+      phase: 'warning' | 'risen' | 'fallen';
+      zoneId: string;
+      secondsUntilRise: number;
+      secondsUntilFall: number;
+    }
+  // A World PvP (/pvp flag) death resolved: fired exactly once per death, from
+  // worldPvpOnPlayerDeath behind its paid-death guard, and only for a death at
+  // a world-hostile player's hands (duels, battlegrounds and arenas never
+  // fire it). SERVER-ONLY: its one consumer is the Discord PvP kill feed
+  // (server/discord_pvp_feed.ts), and server/event_frame.ts strips it from
+  // every client frame. Carries no pid. `zoneId` is the victim's zone (null
+  // off the zone table); `assists` counts the credited contributors other
+  // than the killing blow; `copper` is the stake actually taken from the
+  // victim, never the nominal stake.
+  | {
+      type: 'worldPvpKill';
+      killerName: string;
+      victimName: string;
+      killerLevel: number;
+      victimLevel: number;
+      zoneId: string | null;
+      assists: number;
+      copper: number;
+    }
   | {
       type: 'error';
       text: string;
@@ -6972,7 +7039,12 @@ export type SimEvent = { pid?: number } & (
   // Treasure maps and vaults (src/sim/treasure_vault.ts). The sim emits ids
   // only; the client resolves the prose and opens the map window on a read.
   | { type: 'treasureMapEarned'; rarity: TreasureMapRarity }
+  /** Retired: the slate's map now waits in the mailbox when the bags are full
+   *  (worldQuestRewardMailed). Kept so the client case and its key still resolve. */
   | { type: 'treasureMapLost' }
+  /** World quest reward items that did not fit in the bags and were posted to
+   *  the Ravenpost instead (src/sim/world_quest_reward_mail.ts). Ids only. */
+  | { type: 'worldQuestRewardMailed'; itemIds: string[] }
   | { type: 'treasureMapRead'; rarity: TreasureMapRarity; siteId: string; fresh: boolean }
   | { type: 'treasureMapUpgraded'; rarity: TreasureMapRarity; inks: number }
   | { type: 'treasureVaultOpened'; rarity: TreasureMapRarity }
@@ -7265,7 +7337,14 @@ export type SimEvent = { pid?: number } & (
   | { type: 'duelRequest'; fromPid: number; fromName: string }
   | { type: 'duelCountdown'; seconds: number }
   | { type: 'duelStart' }
-  | { type: 'duelEnd'; winnerName: string; loserName: string }
+  | {
+      type: 'duelEnd';
+      winnerName: string;
+      loserName: string;
+      winnerPid: number;
+      loserPid: number;
+      zoneId: string | null;
+    }
   // Dungeon Finder: a 30s availability proposal opened for this player (the
   // client pops the finder window; state rides the `df` self snapshot).
   | { type: 'dfProposal' }
@@ -7446,10 +7525,12 @@ export type SimEvent = { pid?: number } & (
       // health" and "a blight ate the whole heal", and those need opposite
       // feedback. See src/ui/heal_landing_feedback_core.ts.
       absorbed?: number;
-      // Set only by a HoT's periodic tick (auras.ts), never a direct cast or the
-      // one-shot application emit below: the client uses this to silence the
+      // Set only by a periodic tick (auras.ts), never a direct cast or the
+      // one-shot application emit below: every HoT tick, plus a DoT leech tick
+      // that landed as pure overheal. The client uses this to silence the
       // repeated per-tick sound (see hud.ts), since a HoT fires this every couple
-      // seconds for its whole duration and the full heal_impact hit read as spam.
+      // seconds for its whole duration and the full heal_impact hit read as spam;
+      // the meters and the parse recorder treat a hot tick as passive activity.
       hot?: boolean;
       // The aura's ability id (Aura.id), set on both the per-tick emit and the
       // one-shot application emit (Sim.applyAura) so the client can except one
@@ -7465,8 +7546,9 @@ export type SimEvent = { pid?: number } & (
       // Healing lost to the missing-hp clamp (parse fidelity 7.1), omitted
       // when zero. Computed AFTER heal-absorb consumption, so absorbed and
       // overheal never double-count the same lost healing. Set at every
-      // clamped heal2 emit site; a tick whose heal fully overheals without
-      // draining a heal-absorb shield still emits nothing.
+      // clamped heal2 emit site. A HoT or DoT-leech tick that fully overheals
+      // still emits (amount 0, hot: true); a few other periodic heals (Temporal
+      // Hourglass, Demon Heal, Drain Life) still emit nothing in that case.
       overheal?: number;
     }
   // One absorb shield soaking part of one hit. Emitted per shield drained

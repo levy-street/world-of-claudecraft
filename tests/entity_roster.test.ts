@@ -123,6 +123,7 @@ function makeCtx() {
     instances: [],
     riftInstances: [],
     riftPortalIds: null,
+    pendingDifficultyChanges: new Map(),
     dungeonResetLocks: new Map(),
     get arenaMatches() {
       return arenaMatches;
@@ -160,6 +161,7 @@ function makeCtx() {
       recentDamage: new Map(),
       recentSupport: new Map(),
       paidDeaths: new Set(),
+      spoils: new Map(),
       killsByPair: new Map(),
       zoneOf: new Map(),
       nextDisarmAt: Number.POSITIVE_INFINITY,
@@ -245,6 +247,8 @@ function makeCtx() {
     removeFungibleItem: vi.fn(),
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
+    hillPartyDisband: vi.fn(),
+    hillPartyJoin: vi.fn(),
     dropPartyMarkers: vi.fn(),
     formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
@@ -275,6 +279,7 @@ function makeCtx() {
     leaveDungeon: vi.fn(),
     enterRift: vi.fn(),
     leaveRift: vi.fn(),
+    emitRiftDeparture: vi.fn(),
     riftOpenTreasure: vi.fn(),
     resetDungeonInstances: vi.fn(),
     inheritDungeonResetLocks: vi.fn(),

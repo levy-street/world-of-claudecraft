@@ -55,6 +55,7 @@ const HELPFUL: AuraKind[] = [
   'form_bear',
   'form_cat',
   'form_moonkin',
+  'form_sporemender',
   'form_shadow',
   'form_travel',
   'form_fireball',

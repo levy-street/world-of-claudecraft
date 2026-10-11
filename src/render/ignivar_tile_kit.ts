@@ -91,7 +91,10 @@ export function ensureIgnivarTileAssets(
         loadModuleAsset(`${IGNIVAR_TILE_PREFIX}${name}`, ignivarTilePack(name)),
       ),
     );
-  })();
+  })().catch((error) => {
+    ignivarTileAssetsPromise = null;
+    throw error;
+  });
   return ignivarTileAssetsPromise;
 }
 

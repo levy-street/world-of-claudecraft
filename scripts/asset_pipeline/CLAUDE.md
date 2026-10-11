@@ -170,7 +170,8 @@ cents of gpt-image-2.
 ### 7. rig-manual (zero-cost local rigging onto the KayKit skeleton)
 ```
 node scripts/asset_pipeline/pipeline.mjs rig-manual --raw <raw.glb> --name <snake_case> \
-  [--reference public/models/chars/players/knight.glb] [--pre-rotated] [--job id]
+  [--reference public/models/chars/players/knight.glb] [--pre-rotated] \
+  [--rigid-head-from <frac> [--rigid-head-blend <frac>]] [--job id]
 ```
 Skips Tripo's rig + retarget entirely: the raw generated mesh (every skinmodel
 job keeps its `raw.glb`) is transformed into the reference rig's BIND space
@@ -185,8 +186,16 @@ vertices must be authored in the space of inverse(IBM) (the rig's REST pose is
 NOT its bind pose; using rest-world coordinates shreds every animated frame),
 and the raw mesh must be a T-pose. Best on humanoids whose proportions are
 close to the reference (the skinmodel lane's redesigns are, by construction);
-review the clip previews for weight bleed on outlier silhouettes. Run `qa
---job` after, like every lane.
+review the clip previews for weight bleed on outlier silhouettes. An oversized head
+silhouette (a mushroom cap, a big helm) whose rim overhangs the shoulders picks up arm
+weight and bends with every swing: `--rigid-head-from <frac>` binds every vertex above
+that fraction of the fitted height to the head joint outright (blended over
+`--rigid-head-blend`, default 0.03, below it); set it at the chin line, or at the
+scarf line on a short-torso chibi, where the KayKit shoulders sit at face height and
+a cut at the chin lets them shear the face. A very short torso is a poor fit for
+this lane altogether: the borrowed shoulder pivot sits far above the real shoulder,
+so relaxed poses fold the arms into the body. Sporemender Form hit exactly that and
+shipped on Tripo's own fitted rig instead. Run `qa --job` after, like every lane.
 
 ## Fit Studio (designer anchors for modular hair + piercings)
 ```

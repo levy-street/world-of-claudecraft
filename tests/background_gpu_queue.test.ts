@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   createBackgroundGpuQueue,
   GPU_QUEUE_SHUTDOWN_ERROR_NAME,
@@ -1421,7 +1421,16 @@ describe('createBackgroundGpuQueue', () => {
     const sky = method('private async prepareZoneSky(', '\n  /**\n   * Materialize the terrain');
     const features = method('prepareZoneAt(', '\n  /** Stage wall-times');
     const archetypes = method('async prewarmZoneAt(', '\n  /** Blocking-path neighborhood prepare');
-    const texture = method('private prewarmTextureInIdle(', '\n  private prewarmMaterialTextures(');
+    // The chunked texture uploads live in the residency ledger, bound to the
+    // renderer's queue (src/render/texture_residency_ledger.ts).
+    const ledger = readFileSync(
+      new URL('../src/render/texture_residency_ledger.ts', import.meta.url),
+      'utf8',
+    );
+    const texture = ledger.slice(
+      ledger.indexOf('  prewarmInIdle('),
+      ledger.indexOf('  forgetContext('),
+    );
     const initial = method('async prewarmInitialScene(', '\n  // Visual reactions to sim events');
     expect(source).toContain(
       'readonly backgroundGpuWork = createBackgroundGpuQueue({\n    admission: createGpuPrepAdmission(this.gpuPrepBudget),\n  });',
@@ -1429,7 +1438,10 @@ describe('createBackgroundGpuQueue', () => {
     expect(sky).toContain('this.backgroundGpuWork.run(');
     expect(features).toContain('this.backgroundGpuWork.run(');
     expect(archetypes).toContain('this.backgroundGpuWork.run(');
-    expect(texture).toContain('this.backgroundGpuWork.run(');
+    expect(texture).toContain('this.host.queue.run(');
+    expect(
+      method('private readonly textureResidency = new TextureResidencyLedger({', '});'),
+    ).toContain('queue: this.backgroundGpuWork,');
     // The resume lane's per-unit policy lives in the runner module the
     // renderer binds its queue to (src/render/prewarm_resume_runner.ts).
     expect(initial).toContain('runResumeUnit(unit, entry, {');
@@ -1481,6 +1493,60 @@ describe('createBackgroundGpuQueue', () => {
 // The AMOUNT half of the lane (see the queue header's admission paragraph):
 // order is decided above, and this decides how much of it fits in the frame
 // about to be drawn.
+describe('createBackgroundGpuQueue pause', () => {
+  const flushQueue = async (): Promise<void> => {
+    for (let i = 0; i < 20; i++) await Promise.resolve();
+  };
+
+  it('holds every unit that has not started, in order, until it is resumed', async () => {
+    const queue = createBackgroundGpuQueue();
+    const ran: string[] = [];
+    queue.setPaused(true);
+    expect(queue.isPaused()).toBe(true);
+    const low = queue.run(() => ran.push('low'), GPU_WORK_PRIORITY.BACKGROUND, 'low');
+    const high = queue.run(() => ran.push('high'), GPU_WORK_PRIORITY.ACTIONABLE_VIEW, 'high');
+    await flushQueue();
+    expect(ran).toEqual([]);
+    queue.setPaused(false);
+    await Promise.all([low, high]);
+    // Resumed in the queue's own order: priority first.
+    expect(ran).toEqual(['high', 'low']);
+  });
+
+  it('lets the unit already running finish, and parks the next one', async () => {
+    const queue = createBackgroundGpuQueue();
+    let release!: () => void;
+    const running = queue.run(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'running',
+    );
+    await flushQueue();
+    queue.setPaused(true);
+    const next = vi.fn();
+    const queued = queue.run(next, GPU_WORK_PRIORITY.LIVE_VIEW, 'next');
+    release();
+    await running;
+    await flushQueue();
+    expect(next).not.toHaveBeenCalled();
+    queue.setPaused(false);
+    await queued;
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+
+  it('a shutdown while paused rejects what waits and settles', async () => {
+    const queue = createBackgroundGpuQueue();
+    queue.setPaused(true);
+    const waiting = queue.run(() => 'never', GPU_WORK_PRIORITY.LIVE_VIEW, 'waiting');
+    await flushQueue();
+    await queue.shutdown();
+    await expect(waiting).rejects.toThrow();
+  });
+});
+
 describe('createBackgroundGpuQueue admission', () => {
   const settle = async (rounds = 12): Promise<void> => {
     for (let index = 0; index < rounds; index++) await Promise.resolve();

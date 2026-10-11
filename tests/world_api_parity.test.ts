@@ -374,6 +374,7 @@ export const IWORLD_MEMBERS = [
   { name: 'weeklyRewardInfo', kind: 'data' },
   { name: 'claimWeeklyReward', kind: 'method' },
   { name: 'openWeeklyReward', kind: 'method' },
+  { name: 'setWeeklyLootSpec', kind: 'method' },
   { name: 'vaultInfo', kind: 'data' },
   { name: 'vaultDeposit', kind: 'method' },
   { name: 'vaultWithdraw', kind: 'method' },
@@ -479,6 +480,7 @@ export const IWORLD_MEMBERS = [
   { name: 'hoardBossCues', kind: 'method' }, // live Buried Hoard boss telegraphs
   { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
+  { name: 'activeDungeonDifficulty', kind: 'method' }, // active claim read, null outside
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'buyHeroicVendorItem', kind: 'method' },
   { name: 'buyCrucibleVendorItem', kind: 'method' },
@@ -937,9 +939,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
-    expect(IWORLD_MEMBERS.length).toBe(424);
+    // Plus the Weekly Vault loot-focus surface at the v0.45 release batch:
+    // 426/126/300.
+    expect(IWORLD_MEMBERS.length).toBe(426);
     expect(DATA_MEMBERS.length).toBe(126);
-    expect(METHOD_MEMBERS.length).toBe(298);
+    expect(METHOD_MEMBERS.length).toBe(300);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -964,6 +968,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'actionBarReadOnly',
       'activeBorder',
       'activeConsecrations',
+      'activeDungeonDifficulty',
       'activeFrostRings',
       'activeIgnivarMeteors',
       'activeLoadout',
@@ -1301,6 +1306,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
       'slotToolEffect',
@@ -1518,6 +1524,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptQuest',
       'accountFlair',
       'accuseWorldQuestSuspect',
+      'activeDungeonDifficulty',
       'activeLootRolls',
       'activeMasterLootRolls',
       'applyEnchant',
@@ -1762,6 +1769,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
       'slotToolEffect',
@@ -2253,6 +2261,7 @@ const FACET_BANK = [
   'weeklyRewardInfo',
   'claimWeeklyReward',
   'openWeeklyReward',
+  'setWeeklyLootSpec',
   'bankInfo',
   'bankPurchasedSlots',
   'bankDeposit',
@@ -2295,6 +2304,7 @@ const FACET_DUNGEONS = [
   'hoardBossCues',
   'riftEventMsRemaining',
   'dungeonDifficulty',
+  'activeDungeonDifficulty',
   'setDungeonDifficulty',
   'buyHeroicVendorItem',
   'buyCrucibleVendorItem',
@@ -2619,10 +2629,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(424);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(424);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(426);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(426);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

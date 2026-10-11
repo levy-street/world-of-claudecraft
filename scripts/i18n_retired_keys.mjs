@@ -64,6 +64,7 @@ export const RETIRED_KEYS = [
   'guide.worldPvpPage.limitsBody', // -> guide.worldPvpPage.limitsBodyHour
   'guide.worldPvpPage.limitsBodyHour', // -> guide.worldPvpPage.limitsBodyRaids (the raid rule)
   'guide.worldPvpPage.hillBody', // -> guide.worldPvpPage.hillBodyRamp (the hold ramp)
+  'guide.worldPvpPage.hillBodyRamp', // -> guide.worldPvpPage.hillBodyRanked (2 h, 30 min, ranking)
   'guide.commandsPage.pvp', // -> guide.commandsPage.pvpZones
 
   // -- Content the game no longer has, so the wiki must not define it.
@@ -207,6 +208,11 @@ export const RETIRED_KEYS = [
   // successor honorFinalNoteSoldBack says so, and its five non-Latin fills rode
   // the same change; this key keeps its reviewed overlay rows.
   'guide.arenaPage.honorFinalNote',
+  // Plain gray junk stopped recording vendor buyback rows (items.ts
+  // skipsVendorBuyback), and this page did not say the Sell Junk sweep was
+  // final. The successor junkBodyFinal says so, and its five non-Latin fills
+  // rode the same change; this key keeps its reviewed overlay rows.
+  'guide.economy.junkBody',
   // Phase 20 (2026-09-03, the wiki completeness audit): the arena rewards prose
   // said a loss 'costs you nothing but rating' and that Honor's day 'rolls over
   // on its own clock'; a played-out loss and a draw pay RANKED_ARENA_LOSS_HONOR

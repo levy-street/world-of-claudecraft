@@ -1202,9 +1202,12 @@ describe('two-pool capacity through the real gates and the real taxonomy', () =>
     // material in on its own side, the Crucible's lastflame_core, and the two
     // sides' additions are disjoint, so the merged catalog measures 117 (both
     // parents' own derivations, one union; no rule changed).
+    // 117 -> 118 with the World PvP trophy skull (pvp/world_pvp_trophy.ts): a
+    // keepsake no recipe consumes, ruled IN so its stack keeps per-victim
+    // provenance through the material-source machinery.
     const lazy = materialItemIds();
-    expect(lazy.size).toBe(117);
-    expect(MATERIAL_ITEM_IDS.size).toBe(117);
+    expect(lazy.size).toBe(118);
+    expect(MATERIAL_ITEM_IDS.size).toBe(118);
     expect(lazy.size).toBe(MATERIAL_ITEM_IDS.size);
     for (const id of lazy) expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
     for (const id of MATERIAL_ITEM_IDS) expect(lazy.has(id), id).toBe(true);

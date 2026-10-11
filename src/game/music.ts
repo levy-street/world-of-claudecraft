@@ -10,6 +10,7 @@
 // download. Each fight opens on one of the two battle themes at random.
 
 import { resumeWhenAllowed } from './audio_unlock';
+import { bossPcmPrefetchAllowed } from './boss_music_residency';
 import { CRUCIBLE_STREAM_URLS, type CrucibleFloor } from './crucible_music';
 import { dungeonMusicZoneForDungeon } from './dungeon_music_zones';
 import { minigameLayerFor } from './minigame_music_layer';
@@ -4347,7 +4348,7 @@ export class MusicDirector {
       return;
     }
     this.bossActive = on;
-    if (on) this.ensureBossBuffer();
+    if (on && bossPcmPrefetchAllowed()) this.ensureBossBuffer();
     if (!on) this.stopBossSource();
     this.applyBossPlayback();
     if (this.ctx && this.master)

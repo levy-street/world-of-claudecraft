@@ -500,7 +500,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Frakcje',
   'hudChrome.currencies.heroicMarkNote': 'Lochowiska heroiczne. Wydaj w kwatermistrzu heroicznym',
   'hudChrome.currencies.honor': 'Honor',
-  'hudChrome.currencies.honorNote': 'Pola Bitwy i Arena',
+  'hudChrome.currencies.honorNote': 'Pola Bitwy, Arena i zadania światowe',
   'hudChrome.currencies.intro':
     'Żadne z nich nie zajmuje miejsca w plecaku. Monety zostają w plecaku jak zawsze.',
   'hudChrome.currencies.lifetime': 'Całkowicie {amount}',
@@ -1870,7 +1870,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ogłoś wzgórze teraz; podniesie się po pełnym ostrzeżeniu.',
   'devCommand.actions.hillwarn.label': 'Odliczanie wzgórza',
   'entities.abilities.lava_burst.description':
-    'Zadaj {damage} obrażeń ogniowych. Zawsze krytycznie trafia cel palący się z Twojego Żarowego Wstrząsu. Przypływ Magmy: każdy Żarowy Wstrząs ma 20% szansy na zresetowanie tej regeneracji i sprawienie, że Twoja następna Fala Magmy w ciągu 10 sek będzie natychmiastowa. Obrażenia rosną wraz z Mocą Zaklęć.',
+    'Zadaj {damage} obrażeń ogniowych. Trafienie daje 1 Grom. Zawsze krytycznie trafia cel palący się z Twojego Żarowego Wstrząsu. Trafienie krytyczne zadaje dodatkowo 24% zwykłych obrażeń. Przypływ Magmy: każdy Żarowy Wstrząs ma 20% szansy na zresetowanie tej regeneracji i sprawienie, że Twoja następna Fala Magmy w ciągu 10 sek będzie natychmiastowa. Obrażenia rosną wraz z Mocą Zaklęć.',
   'entities.abilities.lava_burst.name': 'Fala Magmy',
   'entities.abilities.lightning_overload.description':
     'Pasywne: Łukowy pocisk i Rozgałęziona Błyskawica mają 20% szansy na Przeładowanie, ponownie trafiając cel pierwszy za 50% zadanych obrażeń i przyznając 1 Grzmot.',
@@ -1879,7 +1879,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przywołaj grzmot, zadając {damage} obrażeń Natury wrogom w promieniu 10 jardów i spowalniając ich o 50% na 5 sek. Przywraca 8% maksymalnej Many. Obrażenia rosną wraz z Mocą Zaklęć.',
   'entities.abilities.thunderstorm.name': 'Łamacz Burzy',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Czas rzucania Chwytających Korzeni jest zmniejszony o 0.5 sek.',
+    'Czas rzucania Chwytających Korzeni jest zmniejszony o 0.5 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Rzucanie Chwytających Korzeni pozwala Ci rzucać zaklęcia podczas ruchu i zwiększa Twoją prędkość ruchu o 20 procent na 4 sek. Nie może się zdarzyć częściej niż raz na 20 sek.',
   'entities.itemSets.vanguard_druid_balance.name': 'Szata Strażnika Gwiazd',
@@ -1889,7 +1889,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Szarża Bruina chroni Ciebie tarczą na 6 procent maksymalnego zdrowia na 6 sek.',
   'entities.itemSets.vanguard_druid_feral.name': 'Skóra Krwawej Grzywy',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Regeneracja umiejętności Fleetmend jest zmniejszona o 1 sek.',
+    'Regeneracja umiejętności Fleetmend jest zmniejszona o 1 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Fleetmend również zwiększa Twoją prędkość ruchu o 30 procent na 3 sek.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Szata Ostów w Rozkwicie',
@@ -1908,21 +1908,22 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Krwawy Hak przyznaje 1 Rozpęd Łowów.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Zbroja Sidełkowatych Zębów',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Regeneracja umiejętności Bariera Czasowa jest zmniejszona o 2 sek.',
+    'Regeneracja umiejętności Bariera Czasowa jest zmniejszona o 2 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Bariera Czasowa również zwiększa prędkość ruchu chronionego celu o 20 procent na 3 sek.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Szata Wiązacza Godzin',
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Deszcz Żaru ładuje się 3 sek szybciej.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Deszcz Żaru ładuje się 3 sek szybciej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Rzucanie Deszczu Żaru zmniejsza pozostałą regenerację umiejętności Płonącej Bariery o 2 sek.',
   'entities.itemSets.vanguard_mage_fire.name': 'Regalia Żarowego Bича',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    'Regeneracja umiejętności Lodowych Okowów jest zmniejszona o 2 sek.',
+    'Regeneracja umiejętności Lodowych Okowów jest zmniejszona o 2 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Rzucanie Lodowych Okowów zmniejsza pozostałą regenerację umiejętności Mignięcia o 5 sek.',
   'entities.itemSets.vanguard_mage_frost.name': 'Szata Strażnika Szronu',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'Regeneracja umiejętności Przymierza Życia jest zmniejszona o 30 sek.',
+    'Regeneracja umiejętności Przymierza Życia jest zmniejszona o 30 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Przymierze Życia również chroni sojusznika tarczą na 8 procent ich maksymalnego zdrowia na 6 sek.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Regalia Czuwania Słońca',
@@ -1937,17 +1938,17 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wezwanie Walkir resetuje regenerację umiejętności Ostatniego Edyktu, a Twój następny Ostatni Edykt w ciągu 6 sek od trafienia zadaje 15 procent więcej obrażeń.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Zbroja Wojenna Znaku Światła',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Regeneracja umiejętności Kantyka Terroru jest zmniejszona o 3 sek.',
+    'Regeneracja umiejętności Kantyka Terroru jest zmniejszona o 3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Gdy Twój Psalm Ochrony jest w pełni pochłonięty, chroniony sojusznik zyskuje 20 procent prędkości ruchu na 3 sek. Nie może się zdarzyć częściej niż raz na 8 sek.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Szata Kantyka Zasłon',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'Regeneracja umiejętności Kroku Zasłony jest zmniejszona o 6 sek.',
+    'Regeneracja umiejętności Kroku Zasłony jest zmniejszona o 6 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Krok Zasłony również chroni Ciebie tarczą na 8 procent maksymalnego zdrowia na 6 sek.',
   'entities.itemSets.vanguard_priest_holy.name': 'Szata Skrzydeł Łaski',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litania Niedoli również spowalnia ruch celu o 30 procent, gdy ją canujesz.',
+    'Litania Niedoli również spowalnia ruch celu o 30 procent, gdy ją canujesz. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Wezwanie Dziesięcinika również chroni Ciebie tarczą na 10 procent maksymalnego zdrowia na 8 sek.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Regalia Kantyka Mroku',
@@ -1967,7 +1968,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Cios w Brzuch przyznaje 2 dodatkowe punkty kombinacji, gdy jest używany z Zanęty Dymu.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Skóry Marszu Cieni',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'Regeneracja umiejętności Uwolnij Broń jest zmniejszona o 3 sek.',
+    'Regeneracja umiejętności Uwolnij Broń jest zmniejszona o 3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Uwolnij Broń pozwala Ci rzucać zaklęcia podczas ruchu i zwiększa Twoją prędkość ruchu o 20 procent na 4 sek. Nie może się zdarzyć częściej niż raz na 20 sek.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Pancerz Bitewny Pisma Burzy',
@@ -1977,22 +1978,22 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Atak Przodków zmniejsza pozostałą regenerację umiejętności Transu Żywiołowego o 4 sek.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Pancerz Bitewny Wytworzony z Wichru',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Kojące Wody rzucają się 0.5 sek szybciej na sojusznika poniżej 50 procent zdrowia.',
+    'Kojące Wody rzucają się 0.5 sek szybciej na sojusznika poniżej 50 procent zdrowia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Wezwanie Pływu również chroni cel tarczą na 5 procent maksymalnego zdrowia na 6 sek.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Pancerz Kolczasty Gwardy Słoni',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Czas rzucania Trwogi jest zmniejszony o 0.3 sek.',
+    'Czas rzucania Trwogi jest zmniejszony o 0.3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Pochłonięcie uzdrawia Ciebie o 30 procent więcej i może być kanalizowane podczas ruchu.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Szata Pióra Grozy',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'Regeneracja umiejętności Pancerza Kości jest zmniejszona o 10 sek.',
+    'Regeneracja umiejętności Pancerza Kości jest zmniejszona o 10 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Rozkaz Żniwiarz zmniejsza pozostałą regenerację umiejętności Pancerza Kości o 2 sek.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Regalia Związana Szpikiem',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Regeneracja umiejętności Cinderhide jest zmniejszona o 30 sek.',
+    'Regeneracja umiejętności Cinderhide jest zmniejszona o 30 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Każdy drugi Pożoga sprawia, że Twój następny Pocisk Ruiny w ciągu 8 sek jest natychmiastowy.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Szata Korony Żużla',
@@ -4722,7 +4723,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Zwiększa Atak i Obronę wojenną o 80. Zabicie wrogiego gracza daje Popielny Krok, który zwiększa szybkość ruchu o 40% na 6 s.',
   'entities.itemSets.warfare_ashstalker.name': 'Zestaw Ashstalker',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Zwiększa Obronę wojenną o 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4734,13 +4736,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'Zwiększa Atak i Obronę wojenną o 80. Zabicie wrogiego gracza daje Niezłomną Przysięgę, która pochłania 200 obrażeń przez 10 s.',
   'entities.itemSets.warfare_furyforged.name': 'Rynsztunek bojowy Furyforged',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Zwiększa Obronę wojenną o 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Żarową Straż, która pochłania 120 obrażeń przez 8 s.',
   'entities.itemSets.warfare_stormbound.name': 'Szaty Stormbound',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Zwiększa Obronę wojenną o 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -7842,7 +7846,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Strzela w cel za {damage} obrażeń arkanicznych. Obrażenia rosną z mocą ataku dystansowego.',
   'entities.abilities.arcane_shot.name': 'Plugawy strzał',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Przyjmij postać rumaka, zwiększając swoją szybkość ruchu o 30% na 30 min. Gdy jest aktywna, otrzymanie obrażeń oszałamia cię, zmniejszając twoją prędkość ruchu o połowę na 4 sek. (każde trafienie odświeża oszołomienie).',
+    'Przyjmij postać rumaka, zwiększając swoją szybkość ruchu o 30% na 30 min. Gdy jest aktywna, otrzymanie obrażeń oszałamia cię, zmniejszając twoją prędkość ruchu o połowę na 2 sek. (każde trafienie odświeża oszołomienie).',
   'entities.abilities.aspect_of_the_cheetah.name': 'Postać rumaka',
   'entities.abilities.aspect_of_the_hawk.description':
     'Przyjmij postać błotniaka, zwiększając swoją moc ataku o {buff} na 30 min.',
@@ -7863,7 +7867,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Przez 3 sek. potem Postać wilka jest darmowa i przygważdża cel, spowalniając go o 50% na 4 sek. Zasięg 8-25 jardów. Tylko w postaci Bruina.',
   'entities.abilities.bear_charge.name': 'Szarża Bruina',
   'entities.abilities.bear_form.description':
-    'Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu. Rzuć ponownie, aby wrócić do postaci rzucającego.',
+    'Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Atakujesz dwa razy szybciej za połowę obrażeń na cios, a każdy cios buduje podwójną wściekłość. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu. Rzuć ponownie, aby wrócić do postaci rzucającego.',
   'entities.abilities.bear_form.name': 'Postać Bruina',
   'entities.abilities.berserker_rage.description':
     'Wpadnij w kipiącą furię, generując 20 wściekłości. (Talent wojownika)',
@@ -7984,7 +7988,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Sprowadza wybuch płomieni na wybrany obszar, zadając {damage} obrażeń od ognia wrogom w zasięgu eksplozji.',
   'entities.abilities.flame_shock.description':
-    'Zadaje {damage} obrażeń od ognia, a następnie {overTime} obrażeń od ognia przez 12 s. Pierwsze trafienie rośnie z mocą zaklęć.',
+    'Zadaje {damage} obrażeń od ognia, a następnie {overTime} obrażeń od ognia przez {duration} s. Pierwsze trafienie rośnie z mocą zaklęć.',
   'entities.abilities.flame_shock.name': 'Żarowy wstrząs',
   'entities.abilities.flametongue_weapon.description':
     'Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń od ognia.',
@@ -8029,6 +8033,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.heal.name': 'Uroczysta modlitwa',
   'entities.abilities.healing_touch.description': 'Leczy sprzymierzony cel o {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Każde ukończone rzucenie dodaje 1 Zieleń (maks. 3). Zgromadzona Zieleń skraca to rzucenie: 2,2 s przy 1 Zieleni, 1,9 s przy 2 i 1,5 s przy 3. Dar przyrody czyni je natychmiastowym, darmowym i o 25% silniejszym.',
   'entities.abilities.healing_touch.name': 'Dzikie ukojenie',
   'entities.abilities.healing_wave.description':
     'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć. Odnowienie: zachowuje 50% pełnego leczenia przed przeleczeniem jako Leczniczy Prąd na 12 s, do 30% maksymalnego zdrowia celu.',
@@ -8124,7 +8130,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Uderza za 10% obrażeń broni plus {damage}. Trafienie przywraca 15 Skupienia i daje 1 Rozpęd Łowów. Obrażenia rosną z mocą ataku poprzez obrażenia broni.',
   'entities.abilities.raptor_strike.name': 'Patroszące uderzenie',
   'entities.abilities.regrowth.name': 'Drugi rozkwit',
-  'entities.abilities.rejuvenation.name': 'Dziki rozkwit',
   'entities.abilities.renew.description':
     'Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.renew.name': 'Trwająca łaska',
@@ -16124,7 +16129,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     'Przyzywa 3 bestie na 12 s. Każda atakuje co 2 s za {damage} obrażeń Fizycznych. Pokazane obrażenia zawierają 8% twojej mocy ataku dystansowego przed premiami do obrażeń towarzysza. Bestie utrwalają Zaciekłość Sfory przy przyzwaniu, zyskując 10% obrażeń za ładunek. Gdy Tratowanie jest w odnowieniu, udane Rozkazy Sfory mają 20% szans je zresetować, gwarantowane po 5 nieudanych szansach. Nie może się zresetować, gdy bestie są aktywne. (Władca Sfory)',
   'entities.abilities.trailbreak.description':
-    'Skacz 12 metrów w tył. Jeśli masz Rozpęd Łowów, zostaje odnowiony i przygotowuje Powrót na 12 s.',
+    'Skacz 25 metrów w tył i uwolnij się od unieruchomień oraz spowolnień ruchu. Jeśli masz Rozpęd Łowów, zostaje odnowiony i przygotowuje Powrót na 12 s.',
   'entities.abilities.unleash_beast.description':
     'Zużywa 3 Zaciekłości Sfory po tym, jak twój towarzysz uderzy za 83 do 105 obrażeń Fizycznych i wstrząśnie każdym wrogiem w promieniu 6 metrów za 26 do 34. Uderzenie i wstrząs korzystają z pełnej 30% premii do obrażeń towarzysza z Zaciekłości Sfory i rosną wraz z mocą ataku towarzysza. Przez kolejne 8 s towarzysz zadaje o 25% więcej obrażeń, atakuje o 35% szybciej i sprawia, że Plugawy strzał trafia do 2 pobliskich wrogów.',
   'entities.abilities.wildheart.description':
@@ -16152,7 +16157,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Pasywna: gdy Uderzenie Przodków jest w odnowieniu, zużycie Znaku Burzy ma 25% szans je zresetować. Jeśli pierwsze 3 szanse zawiodą, 4. zawsze je resetuje. (Duch Wojny)',
   'entities.abilities.thunder_reservoir.description':
-    'Pasywna: Łukowy pocisk i Rozgałęziona Błyskawica przyznają Grom, do 5. Przy 5 Gromach Ziemny wstrząs zadaje o 125% więcej obrażeń albo Trzęsienie ziemi o 100% więcej, a następnie zużywa cały Grom. (Wezwanie Gromu)',
+    'Pasywna: Łukowy pocisk, Rozgałęziona Błyskawica i Fala Magmy przyznają Grom, do 5. Przy 5 Gromach Ziemny wstrząs zadaje o 125% więcej obrażeń albo Trzęsienie ziemi o 100% więcej, a następnie zużywa cały Grom. (Wezwanie Gromu)',
   'entities.abilities.tidecall.description':
     'Leczy przyjazny cel za {damage}. Leczenie rośnie wraz z mocą zaklęć. Dodaje pełne leczenie sprzed nadleczenia do Nurtu Cerowania, do 30% maksymalnego zdrowia celu.',
   'entities.abilities.unleash_weapon.description':
@@ -16226,7 +16231,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Łamacz szpiku',
   'entities.abilities.marrowbreak.description':
-    'Zużywa twoje 3 Starej Krwi na ciężki cios o wysokim zagrożeniu, zadający {damage} obrażeń. Poniżej połowy zdrowia zamiast tego osłania cię tarczą równą 18% maksymalnego zdrowia na 8 s i zwraca 15 szału.',
+    'Zużywa twoje 3 Starej Krwi na ciężki cios o wysokim zagrożeniu, zadający {damage} obrażeń. Poniżej połowy zdrowia zamiast tego leczy cię o 18% maksymalnego zdrowia i zwraca 15 szału.',
   'entities.abilities.moonlash.name': 'Księżycowy przybór',
   'entities.abilities.moonlash.description':
     'Zużywa twoje 3 Księżycowego przypływu na ciężki cios zadający {damage} obrażeń tajemnych: wybór obrażeń. Słoneczny ślad zużywa te same 3 Księżycowego przypływu, więc wybierz jeden.',
@@ -16235,7 +16240,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do {duration} s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem.',
   'entities.abilities.overbloom.name': 'Nadrozkwit',
   'entities.abilities.overbloom.description':
-    'Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu.',
+    'Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Sporemending na celu.',
   'entities.abilities.redharvest.name': 'Czerwone Żniwa',
   'entities.abilities.redharvest.description':
     'Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca {rage} energii. Działa bez punktów combo.',
@@ -16249,7 +16254,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Stara Krew: stopień {stacks} z {max}. Trafione ciosy kota i Bruina dzielą tę rezerwę; przy {max} przemienia się Krwawe ukąszenie lub Kruszenie kości',
   'hudChrome.auraEffect.verdance':
-    'Zieleń {stacks}/{max}. Każdy NOWO zasadzony Dziki rozkwit lub Drugi rozkwit dodaje 1. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit',
+    'Zieleń {stacks}/{max}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu lub Dzikiego ukojenia dodaje 1, a każdy punkt skraca czas rzucania Dzikiego ukojenia. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit',
   'hudChrome.continentMap.levels': 'Poziomy od {min} do {max}',
   'hudChrome.continentMap.summary': 'Mapa świata. Wybierz strefę, aby otworzyć jej mapę.',
   'hudChrome.continentMap.title': 'Mapa Świata',
@@ -16523,7 +16528,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Miażdżący atak, który zwiększa obrażenia w walce wręcz o {damage} i wzbudza wysokie zagrożenie. Aktywuje się przy twoim następnym zamachu. Tylko w Postaci Bruina.',
   'entities.abilities.maul.specNote_feral':
-    'Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: cios zadający od 78 do 96 obrażeń przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego osłania cię tarczą równą 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości.',
+    'Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: cios zadający od 78 do 96 obrażeń przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego leczy cię o 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości.',
   'entities.abilities.moonfire.description':
     'Podpala wroga księżycowym ogniem, zadając {damage} obrażeń od Arkanów plus obrażenia w czasie.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16556,12 +16561,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zużywa 2 Odłamki Duszy, rozkazując wszystkim nieumarłym sługom uderzyć jednocześnie. Grobowi Strażnicy prowokują i przygotowują się na cios, Wojownicy przygważdżają, Kościani Magowie obnażają magiczne osłony, a Grobowe Skrzydło rozrywa wszystkich trafionych wrogów.',
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Leczy przyjazny cel za {damage} oraz dodatkową ilość w ciągu 21 sekund.',
+    'Leczy przyjazny cel za {damage} oraz dodatkową ilość w ciągu 15 sekund. Jeśli efekt utrzyma się przez pełny czas, ponownie leczy cel o tę samą wartość co początkowe leczenie.',
   'entities.abilities.regrowth.specNote_restoration':
-    'Zasadzenie NOWEGO rozkwitu dodaje 1 Zieleń (maks. 5).',
+    'Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa.',
   'entities.abilities.rejuvenation.description': 'Leczy cel za {damage} w ciągu 12 sekund.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Zasadzenie NOWEGO rozkwitu dodaje 1 Zieleń (maks. 5). Przy 5 Zieleni, Szybkie uzdrowienie zmienia się w Nadrozkwit.',
+    'Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa. Przy 3 Zieleni Szybkie uzdrowienie zmienia się w Nadrozkwit.',
   'entities.abilities.rip.description':
     'Umiejętność kończąca, która sprawia, że cel krwawi co 2 sekundy przez 24 sekundy: 36 obrażeń plus 24 za wydany punkt combo (5 punktów combo: {damage} łącznie). Tylko w Postaci kota.',
   'entities.abilities.rip.specNote_feral': 'Trafiony cios dodaje 1 Starą Krew (maks. 3).',
@@ -16604,7 +16609,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Każdy otwierający cios użyty z Zasłony zmierzchu dodaje 1 Mrok (maks. 3).',
   'entities.abilities.swiftmend.description':
-    'Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. Zasadzenia Dzikiego rozkwitu i Drugiego rozkwitu dodają Zieleń; przy 5 Zieleni ten przycisk zmienia się w Nadrozkwit, który natychmiast leczy każdego sojusznika noszącego twoje efekty leczenia w czasie za 60% tego, co z nich zostało. (Sygnatura Serca Gaju)',
+    'Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu i Dzikiego ukojenia dodaje 1 Zieleń; przy 3 Zieleni ten przycisk zmienia się w Nadrozkwit, który natychmiast leczy każdego sojusznika noszącego twoje efekty leczenia w czasie za 60% tego, co z nich zostało. (Sygnatura Serca Gaju)',
   'entities.abilities.swipe.description':
     'Zamaszyście przeczesz pazurami pobliskich wrogów, zadając {damage} obrażeń. Wzbudza dodatkowe zagrożenie. Tylko w Postaci Bruina.',
   'entities.abilities.swipe.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
@@ -17750,8 +17755,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Zjednoczone trafienia Rozkazu Żniw zadają o 25 procent większe obrażenia.',
   'entities.itemSets.gravebrand.name': 'Regalia Grobowego Znaku',
-  'entities.itemSets.grovespring.bonus2':
-    'Szybkie Uzdrowienie najpierw zużywa twój własny Dzikokwiat lub Drugi Rozkwit i leczy o 25 procent więcej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.grovespring.bonus4':
     'Nadrozkwit zbiera 75 procent twoich pozostałych efektów, a następnie zachowuje 1 punkt Zieloności.',
   'entities.itemSets.grovespring.name': 'Strój Gajowego Źródła',
@@ -19409,7 +19412,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Zwycięstwo rankingowe daje Honor, walutę gracz kontra gracz, a porażka rozegrana do końca nadal daje jego mniejszą część, podobnie jak remis, więc jedynym prawdziwym kosztem porażki jest ranking. Honor ma nagradzać prawdziwe mecze: ponowne pokonanie tego samego przeciwnika albo tej samej drużyny tego samego dnia nie daje nic więcej, podobnie jak ponowna porażka z nimi. Długi dzień zwycięstw płaci pełną stawkę za pierwszy ciąg wygranych, potem ją zmniejsza o połowę, a jeszcze głębiej zmniejsza ponownie i pozostaje na tym poziomie. Mecz poddany przez przeciwnika nadal zmienia twój ranking, ale nie daje w ogóle Honoru. Ten dzień należy do królestwa i kończy się o nocnej godzinie resetu, tej samej granicy, przy której czyszczą się wszystkie dzienne blokady.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Każda część sprzętu Wojny ma Ofensywę wojenną i ocenę Obrony wojennej, a te dwie oceny nie działają w ogóle przeciw potworom. Działają wyłącznie podczas walki z innym graczem, w pojedynku, na arenie albo na polu bitwy, gdzie Ofensywa zwiększa zadawane obrażenia, a Obrona zmniejsza otrzymywane, każda do własnego limitu. Każda rodzina pancerza jest także zestawem, a jej premie zestawu również są ocenami Wojny lub efektami działającymi wyłącznie przeciw graczom, więc pełna premia zestawu za honor nie ma znaczenia przeciw bossowi lochu. Same części nadal mają zwykłe statystyki, pancerz i obrażenia broni, które działają wszędzie; przeciw potworowi wyciszają się tylko oceny Wojny i premie zestawu.',
+    'Każda część sprzętu Wojny ma Ofensywę wojenną i ocenę Obrony wojennej, a te dwie oceny nie działają w ogóle przeciw potworom. Działają wyłącznie podczas walki z innym graczem, w pojedynku, na arenie albo na polu bitwy, gdzie Ofensywa zwiększa zadawane obrażenia, a Obrona zmniejsza otrzymywane, każda do własnego limitu. Każda rodzina pancerza jest także zestawem, a jej premie zestawu również są ocenami Wojny lub efektami działającymi wyłącznie przeciw graczom, więc pełna premia zestawu za honor nie ma znaczenia przeciw bossowi lochu. Same części nadal mają zwykłe statystyki, pancerz i obrażenia broni, które działają wszędzie; przeciw potworowi wyciszają się tylko oceny Wojny i premie zestawu. Jeden wyjątek działa wszędzie: dwie części zestawu dla rzucających zaklęcia sprawiają też, że otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'To zamierzona wymiana. Sprzęt Wojny służy do walki z graczami, a nie do omijania poziomów lochów: część sprzętu Wojny nigdy nie ma ocen bojowych, które ma epicki przedmiot z lochu w tym samym miejscu, lecz zamiast tego całą swoją ocenę Wojny i premie zestawu przeznacza na innych graczy. Jeśli chcesz utrzymać się na arenie, kup go. Jeśli chcesz szybciej czyścić tryby heroiczne, zdobądź sprzęt w lochach.',
   'guide.controls.harvestJournal': 'Dziennik zbiorów',
@@ -19937,4 +19940,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Efektywne: {effective} | Nadleczenie: {overheal} ({overhealPercent}) | Trafienia: {hits} ({critPercent} kryt.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Trafienia: {hits} | Krytyczne: {crits} ({critPercent}) | Średnia: {average} | Min./maks.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Głośność otoczenia',
+  'hudChrome.mapAtlas.resizeRailAria': 'Szerokość panelu bocznego mapy',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Przeciągnij, aby zmienić szerokość panelu bocznego mapy. Kliknij dwukrotnie, aby zresetować.',
 };

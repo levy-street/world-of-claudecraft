@@ -33,6 +33,7 @@ export const SELF_SCALAR_KEYS = [
   'hrat',
   'hirat',
   'ddiff',
+  'adiff',
   'cbt',
 ] as const;
 
@@ -43,6 +44,7 @@ export function emitSelfScalarKeys(
   meta: PlayerMeta,
   p: Entity,
   dungeonDifficulty: string,
+  activeDungeonDifficulty: string | null = null,
 ): void {
   emit('xp', meta.xp);
   emit('lxp', meta.lifetimeXp);
@@ -66,6 +68,7 @@ export function emitSelfScalarKeys(
   emit('hrat', p.hasteRating);
   emit('hirat', p.hitRating);
   emit('ddiff', dungeonDifficulty);
+  emit('adiff', activeDungeonDifficulty);
   // The sim's authoritative in-combat flag (the engaged pass in sim.ts: held on
   // a live mob's hate table, or the player's own 5 s linger). Without it the
   // online SELF mirror stayed at blankEntity's false forever, so the player

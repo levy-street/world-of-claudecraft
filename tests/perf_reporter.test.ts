@@ -516,6 +516,7 @@ function snapshot(): PerfSnapshot {
             'live-program': 0,
             arrival: 0,
             'touch-unproven': 0,
+            'context-restore': 0,
           },
           events: [],
           reveal: {

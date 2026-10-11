@@ -302,7 +302,11 @@ describe('enemy-only quality generation', () => {
     mob.templateId = 'thunzharr_waking_peak';
     const existing = { itemId: ITEM, count: 1 };
     mob.loot!.items = [existing];
-    vi.spyOn(MOBS[mob.templateId], 'loot', 'get').mockReturnValue([{ itemId: ITEM, chance: 1 }]);
+    // A tradeable piece: ITEM is soulbound and warrior-locked, so the class-lock
+    // gate (loot/class_locked_drop.ts) would rightly withhold the mage's copy.
+    vi.spyOn(MOBS[mob.templateId], 'loot', 'get').mockReturnValue([
+      { itemId: 'pendant_of_the_first_tempering', chance: 1 },
+    ]);
     const calls: string[] = [];
     vi.spyOn(sim.ctx.rng, 'chance').mockImplementation(() => {
       calls.push('table');

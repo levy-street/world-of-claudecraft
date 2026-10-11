@@ -12,7 +12,7 @@ import { createGroundObject, createNpc } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, type WorldQuestInvestigationState } from './types';
-import { activeWorldQuestsForCycle, worldQuestPuzzleVariantForCycle } from './world_quest_rotation';
+import { worldQuestPuzzleVariantForCycle } from './world_quest_rotation';
 
 function contentEnabled(ctx: SimContext): boolean {
   return !ctx.cfg.world || !!ctx.cfg.world.npcs[INVESTIGATION_NPCS[0].id];
@@ -53,10 +53,8 @@ function active(ctx: SimContext, meta: PlayerMeta, player: Entity): boolean {
     !player.dead &&
     player.level >= WORLD_QUEST_INVESTIGATION.minLevel &&
     Math.hypot(player.pos.x - area.x, player.pos.z - area.z) <= area.radius &&
-    meta.worldQuestLog.get(INVESTIGATION_QUEST_ID)?.state === 'active' &&
-    activeWorldQuestsForCycle(meta.worldQuestCycle).some(
-      (quest) => quest.id === INVESTIGATION_QUEST_ID,
-    )
+    // The player's board, so a rerolled-in investigation runs like an offered one.
+    ctx.hasActiveWorldQuest(meta, INVESTIGATION_QUEST_ID)
   );
 }
 function stateFor(meta: PlayerMeta): WorldQuestInvestigationState {

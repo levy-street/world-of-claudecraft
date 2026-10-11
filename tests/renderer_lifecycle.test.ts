@@ -108,12 +108,9 @@ describe('Renderer lifecycle wiring', () => {
       '  private beginRendererShutdown(): void',
       '\n  private disposeRendererResources(): void',
     );
-    expect(shutdown).toContain(
-      "this.canvas.removeEventListener('webglcontextlost', this.onWebGLContextLost)",
-    );
-    expect(shutdown).toContain(
-      "this.canvas.removeEventListener('webglcontextrestored', this.onWebGLContextRestored)",
-    );
+    // The loss and restore listeners belong to the restore host, which removes
+    // them on dispose (src/render/context_restore.ts).
+    expect(shutdown).toContain('this.contextRestore?.dispose();');
     expect(shutdown).toContain(
       "window.removeEventListener('orientationchange', this.onOrientationChange)",
     );
@@ -319,7 +316,7 @@ describe('Renderer lifecycle wiring', () => {
     };
     renderer.pendingZonePrepares = new Map();
     renderer.pendingZonePrewarms = new Map();
-    renderer.textureUploadTaskSet = new Set();
+    renderer.textureResidency = { tasks: new Set() };
     renderer.backgroundGpuWork = { shutdown: async () => events.push('queue:shutdown') };
     renderer.beginRendererShutdown = () => events.push('shutdown:begin');
     renderer.post = null;

@@ -84,7 +84,7 @@ describe('Crucible healer participation through real combat healing', () => {
     expect(CRUCIBLE_SIGNATURE_TEXT.healer).not.toContain('you or the shielded ally');
   });
 
-  it('a real Wildbloom cannot shield before the pull but its later combat tick can', () => {
+  it('a real Sporemending cannot shield before the pull but its later combat tick can', () => {
     const { healer, ally, enemy, ctx } = groveheart();
     castAbility(ctx, 'rejuvenation', healer.id);
     expect(ally.auras.some((aura) => aura.id === 'rejuvenation')).toBe(true);

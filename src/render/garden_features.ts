@@ -19,15 +19,13 @@ import {
   planGardenMazePieces,
 } from './garden_maze_core';
 import { GFX } from './gfx';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface GardenFeaturesView {
   group: THREE.Group;
   update(time: number): void;
 }
-
-const GARDEN_ZMIN = 700;
-const GARDEN_ZMAX = 1260;
 
 // The specimen elders reuse the twisted-elder model the Hollow, the
 // Wraithwood, and the Palmreach already preload, regrown into clipped
@@ -64,12 +62,34 @@ registerDeferredPreload(() =>
 
 export const gardenFeaturesPreloadInternalsForTest = {
   mazeAssetUrl: { wall: MAZE_WALL_URL, arch: MAZE_ARCH_URL },
+  setMazeScenes(wall: THREE.Group | null, arch: THREE.Group | null): void {
+    mazeWallScene = wall;
+    mazeArchScene = arch;
+  },
 };
 
 function mat(color: number, rough = 0.85): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {
   return GFX.standardMaterials
     ? new THREE.MeshStandardMaterial({ color, roughness: rough, flatShading: true })
     : new THREE.MeshLambertMaterial({ color, flatShading: true });
+}
+
+function mazeMaterial(source: THREE.Material): THREE.Material {
+  if (GFX.standardMaterials) return cloneMaterialWithHooks(source);
+  const from = source as THREE.Material & {
+    map?: THREE.Texture | null;
+    color?: THREE.Color;
+    emissive?: THREE.Color;
+    side?: THREE.Side;
+  };
+  const out = new THREE.MeshLambertMaterial({
+    map: from.map ?? null,
+    color: from.color?.clone() ?? new THREE.Color(0xffffff),
+    side: from.side ?? THREE.FrontSide,
+  });
+  if (from.emissive) out.emissive = from.emissive.clone();
+  out.name = source.name;
+  return out;
 }
 
 function mergeGeos(parts: THREE.BufferGeometry[]): THREE.BufferGeometry {
@@ -224,9 +244,12 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
       scene.traverse((obj) => {
         const src = obj as THREE.Mesh;
         if (!src.isMesh) return;
+        const material = Array.isArray(src.material)
+          ? src.material.map((m) => mazeMaterial(m))
+          : mazeMaterial(src.material);
         for (const band of bands) {
           if (band.length === 0) continue;
-          const mesh = new THREE.InstancedMesh(src.geometry, src.material, band.length);
+          const mesh = new THREE.InstancedMesh(src.geometry, material, band.length);
           const m = new THREE.Matrix4();
           const q = new THREE.Quaternion();
           const up = new THREE.Vector3(0, 1, 0);

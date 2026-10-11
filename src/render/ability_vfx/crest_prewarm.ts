@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { registerContextRestoreReset } from '../context_restore_registry';
 import { isProgramKnownReady } from '../linked_program_readiness';
 import {
   collectLinkedPrograms,
@@ -47,10 +48,19 @@ export class CrestPrewarm {
       this.carriers.set(kind, carrier);
     }
     scene.add(this.group);
+    registerContextRestoreReset('crest-prewarm', this, (owner) => owner.forgetContext());
   }
 
   ready(kind: CrestKind): boolean {
     return !this.disposed && this.uploaded.has(kind);
+  }
+
+  /** A WebGL context restore: every kind's programs, touched tables and
+   *  upload belonged to the lost context (see GuardPrewarm.forgetContext). */
+  forgetContext(): void {
+    this.compiled.clear();
+    this.touched.clear();
+    this.uploaded.clear();
   }
 
   units(host: CrestPrewarmHost, kinds?: readonly CrestKind[]): PrewarmResumeUnit[] {

@@ -80,6 +80,7 @@ const FORM_NAME: Record<string, TranslationKey> = {
   form_bear: 'guide.models.formBear',
   form_cat: 'guide.models.formCat',
   form_travel: 'guide.models.formTravel',
+  form_sporemender: 'guide.models.formSporemender',
 };
 
 function formOptions(): ModelOption[] {

@@ -1322,4 +1322,8 @@ export const table: DeedLocaleTable = {
     name: 'Apanhado em Flagrante',
     desc: 'Capture um Corredor Bolsa-de-moedas em um Tesouro Enterrado antes que escape com o ouro.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Mais brilhante que as sombras',
+    desc: 'Recupere as bolsas de moedas roubadas e escape do labirinto de Evergarden no modo Hard.',
+  },
 };

@@ -1,3 +1,4 @@
+import { duelEndVisibleToViewer } from '../src/sim/social/duel_zone';
 import type { SimEvent, Vec3 } from '../src/sim/types';
 
 type CombatEventParty = {
@@ -44,6 +45,17 @@ export function shouldDeliverCombatEventToViewer(
   if (ev.type === 'absorb')
     return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
   return true;
+}
+
+export function shouldDeliverEventToViewer(
+  ev: SimEvent,
+  viewerPid: number,
+  viewerParty: CombatEventParty | null,
+  ownerOf: CombatEventOwnerLookup,
+  viewerPos: Vec3,
+): boolean {
+  if (ev.type === 'duelEnd') return duelEndVisibleToViewer(ev, viewerPid, viewerPos);
+  return shouldDeliverCombatEventToViewer(ev, viewerPid, viewerParty, ownerOf);
 }
 
 // The live-entity lookup eventAnchor scopes entity-anchored events with; the

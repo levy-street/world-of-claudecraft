@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.spellTooltipOnHover': '마우스를 올리면 주문 툴팁 표시',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}분',
   'abilityUi.cast.hoard_cast_rime_beam': '상고대 광선',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -581,6 +582,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}, {quality}',
   'hudChrome.mapAtlas.collapseHint': '지도 사이드바 접기',
   'hudChrome.mapAtlas.expandHint': '지도 사이드바 펼치기',
+  'hudChrome.mapAtlas.resizeRailAria': '지도 사이드바 너비',
+  'hudChrome.mapAtlas.resizeRailHint':
+    '드래그하여 지도 사이드바 크기를 조절합니다. 두 번 클릭하면 초기화됩니다.',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': '활성 프로필',
   'hudChrome.meters.activeProfileDesc':
@@ -652,6 +656,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '동시에 표시할 막대 수입니다 (0 = 무제한, 창 높이에 맞춰 자동 조정).',
   'hudChrome.meters.noDeathEvents': '사망 이전에 기록된 이벤트가 없습니다',
   'hudChrome.meters.noDetailedData': '상세 데이터 없음',
+  'hudChrome.meters.detailHealSubtitle':
+    '유효: {effective} | 초과 치유: {overheal} ({overhealPercent}) | 타격: {hits} (치명타 {critPercent})',
+  'hudChrome.meters.detailHitSubtitle':
+    '타격: {hits} | 치명타: {crits} ({critPercent}) | 평균: {average} | 최소/최대: {min} / {max}',
   'hudChrome.meters.noTargetData': '이 대상에 대한 플레이어 데이터가 없습니다',
   'hudChrome.meters.numCompact': '숫자: 축약 (k/M)',
   'hudChrome.meters.numDetailed': '숫자: 상세',
@@ -740,6 +748,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': '창 크기',
   'hudChrome.meters.windowScaleDesc': '측정기 전체 크기를 늘리거나 줄입니다.',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': '현상금',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': '카메라 투과',
@@ -767,6 +776,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.hillHold': '언덕 점거',
   'hudChrome.warfare.reasons.worldAssist': '월드 처치 도움',
   'hudChrome.warfare.reasons.worldKill': '월드 처치',
+  'hudChrome.warfare.reasons.worldQuest': '전역 퀘스트',
   'hudChrome.warfareShop.groupEntry': '워페어 시즌 1',
   'hudChrome.warfareShop.groupSeason2': '워페어 시즌 2: 선봉대',
   'hudChrome.worldPvp.aidLine':
@@ -806,8 +816,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': '전적: 처치 {kills}, 사망 {deaths}',
   'hudChrome.worldPvp.repeatLine':
     '같은 플레이어를 반복해서 처치하면 두 번째는 {second}, 세 번째는 {third}를 주고 그 뒤로는 없습니다; 이 횟수는 첫 처치로부터 {reset} 후 초기화됩니다.',
+  'hudChrome.worldPvp.skullName': '{name}의 해골',
   'hudChrome.worldPvp.splitLine':
     '순수한 1대1은 전액을 지급하며, 도운 이와 그 치유사가 함께 나눕니다.',
+  'hudChrome.worldPvp.spoilsLine':
+    '둘 다 PvP 상태라면 결정타를 넣은 쪽의 골드가 패자의 해골과 함께 시체에 떨어집니다.',
   'hudChrome.worldPvp.stakeLine': '패자는 {cap}이나 소지금의 {percent} 중 더 적은 쪽을 지불합니다.',
   'hudChrome.worldPvp.statusDisarming': '{time} 후 또는 현재 전투가 끝나면 깃발이 내려갑니다.',
   'hudChrome.worldPvp.statusOff':
@@ -816,6 +829,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     'PvP 깃발이 내려가 있지만, 자유 전투 지역에서는 여전히 공격하거나 공격받을 수 있습니다.',
   'hudChrome.worldPvp.statusOn':
     'PvP 깃발이 올라가 있습니다. 깃발을 올린 플레이어가 당신을 공격할 수 있습니다.',
+  'hudChrome.worldPvp.rewardTitles':
+    '월드 PvP를 켠 상태로 오픈 월드 또는 PvP 인스턴스에서 플레이한 시간이 {thresholds}에 도달하면 영구 칭호를 얻습니다. 로그아웃, 사망, PvE 인스턴스 및 성역에서는 타이머가 일시 정지됩니다. PvP를 끄면 시간이 초기화됩니다.',
+  'hudChrome.worldPvp.rewardPaused': '현재 PvP 유지 시간: {time} (성역에서 일시 정지)',
+  'hudChrome.worldPvp.rewardPausedDead': '현재 PvP 유지 시간: {time} (사망 상태에서 일시 정지)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    '현재 PvP 유지 시간: {time} (PvE 인스턴스에서 일시 정지)',
+  'hudChrome.worldPvp.rewardProgress': '현재 PvP 유지 시간: {time}',
   'hudChrome.worldPvp.tab': '월드 PvP',
   'hudChrome.worldPvp.title': '월드 PvP',
   'hudChrome.worldPvp.zoneContested': '분쟁 지역: 이곳에서는 깃발을 올린 플레이어만 싸웁니다.',
@@ -895,7 +915,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '지금 언덕을 예고합니다. 예고 시간이 다 지나면 솟아오릅니다.',
   'devCommand.actions.hillwarn.label': '언덕 카운트다운',
   'entities.abilities.lava_burst.description':
-    '{damage}의 화염 피해를 입힙니다. 대상이 잉걸 충격으로 불타고 있으면 항상 치명타로 적중합니다. 마그마 급증: 잉걸 충격이 피해를 줄 때마다 20% 확률로 이 재사용 대기시간을 초기화하고, 10초 안에 시전하는 다음 마그마 폭발을 즉시 시전 가능하게 합니다. 피해량은 주문력에 따라 증가합니다. (천둥소환)',
+    '{damage}의 화염 피해를 입힙니다. 명중하면 천둥을 1 얻습니다. 대상이 잉걸 충격으로 불타고 있으면 항상 치명타로 적중합니다. 치명타는 일반 피해의 24%를 추가로 입힙니다. 마그마 급증: 잉걸 충격이 피해를 줄 때마다 20% 확률로 이 재사용 대기시간을 초기화하고, 10초 안에 시전하는 다음 마그마 폭발을 즉시 시전 가능하게 합니다. 피해량은 주문력에 따라 증가합니다. (천둥소환)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     '지속 효과: 전격 화살과 갈래 번개는 20% 확률로 과부하가 발동하여 첫 번째 대상에게 입힌 피해의 50%만큼 다시 적중시키고 천둥을 1 얻습니다. (천둥소환)',
@@ -1066,6 +1086,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.selectedTable': '전리품 목록 {count}개 선택됨',
   'hudChrome.weeklyRewards.selectedTables': '전리품 목록 {count}개 선택됨',
   'hudChrome.weeklyRewards.noLevelLoot': '현재 레벨에 맞는 전리품이 없습니다.',
+  'hudChrome.weeklyRewards.lootFocus': '전리품 전문화',
+  'hudChrome.weeklyRewards.allClassGear': '직업의 모든 장비',
+  'hudChrome.weeklyRewards.lootFocusHelp': '열지 않은 보관함에만 적용됩니다.',
+  'hudChrome.weeklyRewards.noFocusedLoot':
+    '조건에 맞는 전리품이 없습니다. 다른 전문화를 선택하세요.',
+  'hudChrome.weeklyRewards.rolledFocus': '추첨 당시 전문화: {focus}',
   'hudChrome.weeklyRewards.tableItem': '아이템 {count}개',
   'hudChrome.weeklyRewards.tableItemCount': '아이템 {count}개',
   'hudChrome.weeklyRewards.previouslyRolled': '이미 추첨된 보상',
@@ -1126,6 +1152,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.ferry.castingOff': '{dest}행 여객선이 출항하고 있습니다',
   'hudChrome.ferry.boardHint': '출항할 때 갑판 위에 서 있으면 함께 떠납니다. 운임은 무료입니다.',
   'hudChrome.ferry.sailing': '{dest}(으)로 항해 중',
+  'hudChrome.ferry.portLabel': '{port} 출발, {dest}행 여객선',
+  'hudChrome.ferry.portTitle': '{port} 여객선 선착장',
+  'hudChrome.ferry.destination': '목적지: {dest}',
+  'hudChrome.ferry.boardNow': '지금 승선 가능',
+  'hudChrome.ferry.arrivesIn': '여객선 도착까지 {time}',
+  'hudChrome.ferry.scheduleUnavailable': '여객선 운항 시간표를 확인할 수 없습니다.',
   'hudChrome.noticeboard.officerEntry': '{name}({rank})',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'landing.contribute': '게임 개발에 기여하기',
@@ -2025,6 +2057,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '일일 보상 참여가 앞으로 {remaining} 동안 금지됩니다. 해제 시각: {until}. 사유: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name} 관전 중',
+  'hudChrome.realmMotd.line': '오늘의 메시지: {text}',
+  'hudChrome.realmMotd.updated': '오늘의 메시지를 업데이트했습니다.',
+  'hudChrome.realmMotd.cleared': '오늘의 메시지를 삭제했습니다.',
+  'hudChrome.realmMotd.none': '설정된 오늘의 메시지가 없습니다.',
+  'hudChrome.realmMotd.usage': '사용법: /motd "<메시지>"로 설정하고, /motd clear로 삭제합니다.',
+  'hudChrome.realmMotd.tooLong': '오늘의 메시지는 최대 {max}자까지 입력할 수 있습니다.',
+  'hudChrome.realmMotd.saveFailed':
+    '오늘의 메시지를 저장하지 못했습니다. 서버를 재시작하면 사라집니다.',
   'hudChrome.readyCheck.prompt': '{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?',
   'hudChrome.readyCheck.ready': '준비 완료',
   'hudChrome.readyCheck.notReady': '준비 안 됨',
@@ -2512,6 +2552,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetNone': '초기화할 인스턴스가 없습니다.',
   'hudChrome.dungeonDifficulty.resetOccupied':
     '아직 안에 플레이어가 있으면 인스턴스를 초기화할 수 없습니다.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    '아직 인스턴스 안에 플레이어 또는 그 시체가 있어 난이도 변경을 대기열에 등록했습니다. 인스턴스가 비면 변경이 적용됩니다.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    '파티 또는 파티장이 변경되어 대기 중인 난이도 변경이 취소되었습니다.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     '인스턴스를 초기화하기 전에 던전 난이도를 변경하세요. 비어 있는 인스턴스는 5분 후 자동으로 초기화됩니다.',
   'hudChrome.dungeonDifficulty.resetUsage':
@@ -2809,6 +2853,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다.',
   'guide.worldPvpPage.hillBodyRamp':
     '세 시간에 한 번, 아무도 예측할 수 없는 때에 자유 전투 지역 가운데 한 곳에 15분 뒤 언덕이 솟아오른다는 소식이 서버 전체에 알려지고, 언덕이 설 원이 탁 트인 땅에 표시됩니다. 솟아오른 언덕은 45분 동안 서 있다가 사라집니다. 원 안에 선 플레이어가 가장 많은 파티가 언덕을 두고 다투며, 1분 동안 끊이지 않고 다수를 유지하면 언덕은 그 파티의 것이 됩니다. 혼자인 플레이어는 1인 파티로 세지만, 공격대원은 전혀 세지 않습니다. 한 파티가 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 명예를 얻으며, 같은 파티가 오래 지킬수록 1분마다 얻는 명예가 늘어납니다. 가득 찬 파티가 아무런 다툼 없이 언덕이 서 있는 내내 지키면 전장 승리 약 세 번에 해당하는 명예를 얻습니다. 언덕의 주인이 바뀌면 새 주인의 누적은 처음부터 시작됩니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.',
+  'guide.worldPvpPage.hillBodyRanked':
+    '세 시간마다 자유 전투 지역 중 한 곳에 언덕이 나타납니다. 언덕이 서 있는 동안 5분마다 그 위치와 각 그룹의 점령 시간 순위가 서버 전체에 알려집니다. 언덕이 사라질 때 총 점령 시간이 가장 긴 그룹이 총 10분 이상 점령했다면, 그 그룹에 속해 있고, 그 그룹이 점령한 동안 원 안에 적어도 1분 동안 서 있었으며, 종료 시에도 같은 그룹에 남아 있는 플레이어는 주간 금고의 PvP 진행도에 1승을 얻습니다.',
   'guide.worldPvpPage.limitsBodyRaids':
     '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다. 공격대는 월드 처치에서 아무것도 얻지 못합니다. 공격대원은 명예도 골드도 받지 않으며 다른 사람의 몫도 줄이지 않으니, 보상을 받으려면 파티로 싸우세요.',
   'guide.worldPvpPage.hillHeading': '언덕의 왕',
@@ -3045,6 +3091,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': '터치 조작',
   'hudChrome.options.gfxCustomNote':
     '다이얼을 조정하면 품질 프리셋이 고급으로 전환됩니다. "높음" 품질 기반 위에 현재 프리셋에 표시된 수준에서 시작하는 사용자 지정 조합입니다.',
+  'hudChrome.options.ambienceVolume': '환경음 음량',
   'hudChrome.options.footstepSounds': '발소리',
   'hudChrome.options.interfaceSounds': '인터페이스 및 피드백 소리',
   'hudChrome.options.clickFeedback': '클릭 표시',
@@ -3111,6 +3158,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': '판매 확인 최소 품질',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     '이 품질 미만의 아이템은 한 번의 클릭으로 판매됩니다. 잘못 판매한 아이템은 상인에게서 되살 수 있습니다.',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    '이 품질 미만의 아이템은 한 번의 클릭으로 판매됩니다. 잘못 판매한 아이템은 상인에게서 되살 수 있지만, 서명이 없는 회색 아이템은 예외입니다.',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
   'hudChrome.options.showThirdActionBar': '세 번째 액션 바 표시',
   'hudChrome.options.hideUnusedActionSlots': '사용하지 않는 행동 칸 숨기기',
@@ -4669,6 +4718,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunk': '잡동사니 판매',
   'itemUi.vendor.sellJunkAria': '모든 잡동사니를 {price}에 판매',
   'itemUi.vendor.sellJunkHint': '퀘스트 아이템을 제외한 가방의 모든 회색 아이템을 판매합니다.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    '서명이 없는 회색 아이템은 재구매 목록에 들어가지 않으므로 판매를 되돌릴 수 없습니다.',
   'itemUi.market.title': '세계 시장',
   'itemUi.market.subtitle': '상인의 거래소',
   'itemUi.market.close': '시장 닫기',
@@ -5058,7 +5109,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '담비의 모습을 취해 회피 확률을 30분 동안 8% 높입니다.',
   'entities.abilities.aspect_of_the_cheetah.name': '준마의 상',
   'entities.abilities.aspect_of_the_cheetah.description':
-    '준마의 모습을 취해 이동 속도를 30분 동안 30% 높입니다. 적용 중에는 피해를 받으면 둔화되어 4초 동안 이동 속도가 50% 감소합니다(적중할 때마다 둔화가 갱신됩니다).',
+    '준마의 모습을 취해 이동 속도를 30분 동안 30% 높입니다. 적용 중에는 피해를 받으면 둔화되어 2초 동안 이동 속도가 50% 감소합니다(적중할 때마다 둔화가 갱신됩니다).',
   'entities.abilities.aimed_shot.name': '긴 시위',
   'entities.abilities.aimed_shot.description':
     '대상을 쏘아 {damage}의 물리 피해를 입힙니다. 피해량은 원거리 전투력에 따라 증가합니다.',
@@ -5115,7 +5166,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '10분 동안 번개로 당신을 두릅니다. 당신을 향한 다음 근접 공격 3회는 공격자에게 {buff}의 자연 피해를 입히며, 최대 5초에 한 번입니다.',
   'entities.abilities.flame_shock.name': '잉걸 충격',
   'entities.abilities.flame_shock.description':
-    '{damage}의 화염 피해를 입히고, 이어 12초에 걸쳐 {overTime}의 화염 피해를 입힙니다. 첫 명중은 주문력에 따라 증가합니다.',
+    '{damage}의 화염 피해를 입히고, 이어 {duration}초에 걸쳐 {overTime}의 화염 피해를 입힙니다. 첫 명중은 주문력에 따라 증가합니다.',
   'entities.abilities.flametongue_weapon.name': '화염낙인 무기',
   'entities.abilities.flametongue_weapon.description':
     '무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 화염 피해를 입힙니다.',
@@ -5165,13 +5216,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '자연 에너지의 화살을 던져 {damage}의 자연 피해를 입힙니다.',
   'entities.abilities.healing_touch.name': '야생 치유',
   'entities.abilities.healing_touch.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    '시전을 완료할 때마다 푸른 생장이 1단계 쌓입니다(최대 3단계). 쌓인 푸른 생장이 이 주문의 시전 시간을 줄입니다: 1단계 2.2초, 2단계 1.9초, 3단계 1.5초. 자연의 은총이 이 주문을 즉시 시전, 무료로 만들고 효과를 25% 높입니다.',
   'entities.abilities.mark_of_the_wild.name': '야생의 수호',
   'entities.abilities.mark_of_the_wild.description':
     '아군 대상에게 야생의 수호를 걸어 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
   'entities.abilities.moonfire.name': '달빛 폭풍',
   'entities.abilities.moonfire.description':
     '달빛불로 적을 태워 {damage}의 비전 피해와 지속 피해를 입힙니다.',
-  'entities.abilities.rejuvenation.name': '야생 개화',
+  'entities.abilities.rejuvenation.name': '포자치유',
   'entities.abilities.rejuvenation.description':
     '12초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.thorns.name': '가시 수호',
@@ -5181,7 +5234,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '대상을 최대 12초 동안 제자리에 묶습니다.',
   'entities.abilities.bear_form.name': '큰곰 변신',
   'entities.abilities.bear_form.description':
-    "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다. 다시 시전하면 시전자 형태로 돌아갑니다.",
+    "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 공격 속도가 두 배가 되는 대신 타격당 피해가 절반이 되며, 각 타격은 두 배의 분노를 생성합니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다. 다시 시전하면 시전자 형태로 돌아갑니다.",
   'entities.abilities.maul.name': '뼈 분쇄',
   'entities.abilities.maul.description':
     '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
@@ -5197,6 +5250,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': '찢는 발톱',
   'entities.abilities.claw.description':
     '적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 표범 변신 전용.',
+  'entities.abilities.scratch.name': '할퀴기',
+  'entities.abilities.scratch.description':
+    '6미터 내 주위 대상을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 적중한 대상 하나당 연계 점수 1점을 얻습니다. 범위 내 은신 중인 적을 드러냅니다. 표범 변신 전용.',
   'entities.abilities.ferocious_bite.name': '유혈 물어뜯기',
   'entities.abilities.ferocious_bite.description':
     '결정타로 {damage}의 피해를 입힙니다. 표범 변신 전용.',
@@ -5205,7 +5261,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주위 적을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 큰곰 변신 전용.',
   'entities.abilities.regrowth.name': '두 번째 개화',
   'entities.abilities.regrowth.description':
-    '아군 대상의 생명력을 {damage}만큼 회복시키고 21초에 걸쳐 추가로 회복시킵니다.',
+    '아군 대상의 생명력을 {damage}만큼 회복시키고 15초에 걸쳐 추가로 회복시킵니다. 효과가 끝까지 지속되면 처음 치유와 같은 양만큼 대상을 다시 치유합니다.',
   'entities.abilities.barkskin.name': '참나무 가죽',
   'entities.abilities.barkskin.description':
     '피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다.',
@@ -5361,7 +5417,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '원시의 힘을 폭발시킵니다. 표범 변신 상태에서는 10초 동안 기력 회복 속도가 100% 증가합니다. 큰곰 변신 상태에서는 즉시 분노를 50 생성합니다. (야성 전문화 상징)',
   'entities.abilities.swiftmend.name': '신속한 치유',
   'entities.abilities.swiftmend.description':
-    '아군 대상에게 걸린 지속 치유 효과 하나를 소모해 {damage}만큼 치유합니다. 야생 개화와 두 번째 개화의 심기는 푸르름을 쌓고, 푸르름 5에서 이 버튼은 만개가 되어, 당신의 지속 치유 효과를 지닌 모든 아군을 그 효과에 남은 양의 60%만큼 즉시 치유합니다. (회복 상징 기술)',
+    '아군 대상에게 걸린 지속 치유 효과 하나를 소모해 {damage}만큼 치유합니다. 포자치유, 두 번째 개화, 야생 치유를 시전할 때마다 푸른 생장이 1단계 쌓이고, 푸른 생장 3단계에서 이 버튼은 만개가 되어, 당신의 지속 치유 효과를 지닌 모든 아군을 그 효과에 남은 양의 60%만큼 즉시 치유합니다. (회복 상징 기술)',
+  'entities.abilities.swiftmend.specNote_restoration':
+    '아군 대상에게 걸린 지속 치유 효과 하나를 소모해 {damage}만큼 치유합니다. 포자치유와 두 번째 개화 시전은 푸른 생장을 쌓습니다. 푸른 생장 5단계에서 이 버튼은 만개가 되어, 당신의 지속 치유 효과를 지닌 모든 아군을 그 효과에 남은 양의 60%만큼 즉시 치유합니다. (회복 상징 기술)',
   'entities.abilities.crusader_strike.name': '성전사의 일격',
   'entities.abilities.crusader_strike.description':
     '대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)',
@@ -8084,6 +8142,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.dragEquipHint': '캐릭터로 끌어다 놓아 장착',
   'hudChrome.bags.dragDestroyHint': '세계로 끌어내어 파괴',
   'hudChrome.bags.reorderNeedsRecent': '가방을 정리하려면 필터를 해제하고 최근 순으로 정렬하세요',
+  'hudChrome.bags.reorderLocked': '잠긴 아이템은 가방 칸에 고정됩니다. 옮기려면 잠금을 해제하세요.',
   'hudChrome.bags.filterGroupAria': '가방을 분류별로 필터링',
   'hudChrome.bags.filterAll': '전체',
   'hudChrome.bags.filterWeapon': '무기',
@@ -8981,6 +9040,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '동전은 온 세계를 움직이는 기름입니다. 장비와 보급품, 여행 장비를 사고, 플레이어들 사이에서 손을 바꿉니다. 이 모든 것은 그저 플레이하는 것만으로 익히게 되니, 이 페이지를 돈이 어디서 들어오고 어디로 나가는지 보여 주는 지도라 여기세요.',
   'guide.economy.junkBody':
     '쓸모없는 전리품도 어느 상인에게나 팔 수 있으니, 마을을 지날 때마다 가방을 가득 채워 두지 말고 비워 두세요. 상인의 판매 탭에는 열등 품질 잡동사니를 한 번에 파는 클릭 한 번짜리 버튼까지 있습니다. 정말로 값어치 없는 잡동사니는 아예 버려서 자리를 마련할 수도 있습니다.',
+  'guide.economy.junkBodyFinal':
+    '쓸모없는 전리품도 어느 상인에게나 팔 수 있으니, 마을을 지날 때마다 가방을 가득 채워 두지 말고 비워 두세요. 상인의 판매 탭에는 열등 품질 잡동사니를 한 번에 파는 클릭 한 번짜리 버튼까지 있습니다. 정말로 값어치 없는 잡동사니는 아예 버려서 자리를 마련할 수도 있습니다. 이렇게 판 서명 없는 회색 아이템은 재구매 목록에 들어가지 않으니, 누르기 전에 남겨 둘 물건이 없는지 확인하세요.',
   'guide.economy.junkTitle': '잡동사니 정리',
   'guide.economy.mailBody':
     '모든 거점 마을에는 조각한 까마귀 석주가 서 있습니다. 왕국의 편지 배달부, 레이븐포스트의 우편함입니다. 그 앞에 서면 접속 중인 친구든 오래 접속하지 않은 이든 어떤 캐릭터에게나 이름으로 편지를 쓸 수 있고, 약간의 우편 요금으로 동전이나 물건을 편지에 첨부할 수 있습니다. 까마귀가 날아가는 데는 잠시 시간이 걸리며, 도착하면 봉투 표시가 받는 이에게 무언가 기다리고 있음을 알려 줍니다.',
@@ -10256,7 +10317,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '골수분쇄의 피해가 30% 증가하며, 비상 보호막이 더 이상 타격을 대체하지 않습니다.',
   'entities.itemSets.grovespring.name': '숲샘 예복',
   'entities.itemSets.grovespring.bonus2':
-    '신속한 치유가 자신의 야생 개화나 두 번째 개화를 먼저 소모하며, 치유량이 25% 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+    '신속한 치유가 자신의 포자치유나 두 번째 개화를 먼저 소모하며, 치유량이 25% 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.grovespring.bonus4':
     '만개가 남은 효과의 75%를 수확하고, 그 후 푸른 생장을 1단계 쌓습니다.',
   'entities.items.lastflame_core.name': '마지막 불꽃의 핵',
@@ -10331,7 +10392,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     '워페어 공격 및 방어 등급이 80 증가합니다. 적대 플레이어를 처치하면 잿빛 걸음을 얻어 이동 속도가 6초 동안 40% 증가합니다.',
   'entities.itemSets.warfare_cinderweave.name': '잿불직물 의복',
-  'entities.itemSets.warfare_cinderweave.bonus2': '워페어 방어 등급이 40 증가합니다.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    '워페어 방어 등급이 40 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     '워페어 공격 등급이 40 증가하고, 적대 플레이어가 당신에게 거는 군중 제어의 지속시간이 15% 짧아집니다.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -10343,13 +10405,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     '워페어 공격 및 방어 등급이 80 증가합니다. 적대 플레이어를 처치하면 꺾이지 않는 맹세를 얻어 10초 동안 200의 피해를 흡수합니다.',
   'entities.itemSets.warfare_stormbound.name': '폭풍결속 의복',
-  'entities.itemSets.warfare_stormbound.bonus2': '워페어 방어 등급이 40 증가합니다.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    '워페어 방어 등급이 40 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.warfare_stormbound.bonus4':
     '워페어 공격 등급이 40 증가하고, 적대 플레이어가 당신에게 거는 군중 제어의 지속시간이 15% 짧아집니다.',
   'entities.itemSets.warfare_stormbound.bonus7':
     '워페어 공격 및 방어 등급이 80 증가합니다. 주문에 15% 확률로 잉걸불 수호가 깃들어 8초 동안 120의 피해를 흡수합니다.',
   'entities.itemSets.warfare_thornhide.name': '가시가죽 의복',
-  'entities.itemSets.warfare_thornhide.bonus2': '워페어 방어 등급이 40 증가합니다.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    '워페어 방어 등급이 40 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.warfare_thornhide.bonus4':
     '워페어 공격 등급이 40 증가하고, 적대 플레이어가 당신에게 거는 군중 제어의 지속시간이 15% 짧아집니다.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -13168,6 +13232,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': '큰곰 변신',
   'guide.models.formCat': '표범 변신',
   'guide.models.formTravel': '쾌속 형태',
+  'guide.models.formSporemender': '포자치유사 변신',
   'guide.models.groupForms': '드루이드 변신',
   'guide.nav.sidebarLabel': '가이드 주제',
   'guide.professions.craftHowTitle': '제작 창',
@@ -13570,6 +13635,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': '은신 및 이동 형태 포함',
   'hudChrome.options.showFriendlyTrack': '아군에게 건 내 버프 표시',
   'hudChrome.options.showShieldTrack': '내 보호막 표시',
+  'hudChrome.options.classicCombatText': '클래식 전투 문자',
   'hudChrome.options.stickyTarget': '지면 클릭 시 대상 유지',
   'hudChrome.options.showNameplateDots': '이름표에 내 디버프 표시',
   'hudChrome.options.nameplateDotScale': '이름표 디버프 아이콘 크기',
@@ -15627,6 +15693,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '투구 숨기기',
   'hudChrome.paperdoll.showHelmAria': '투구 표시',
   'hudChrome.options.waterRipples': '수면 물결 (물살)',
+  'hudChrome.options.spellEffects': '주문 효과',
   'hudChrome.options.actionCam': '액션 카메라',
   'hudChrome.options.actionCamShoulder': '액션 카메라 어깨',
   'hudChrome.options.actionCamShoulderLeft': '왼쪽 {pct}',
@@ -15692,6 +15759,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '피부를 식은 용암 찌꺼기처럼 10초 동안 굳혀 받는 모든 피해를 25% 감소시킵니다.',
   'entities.abilities.cinderhide.name': '잿가죽',
   'entities.abilities.claw.specNote_feral': '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
+  'entities.abilities.scratch.specNote_feral':
+    '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.cold_focus.description':
     '12초 동안 정밀 사격이 더 많은 집중을 생성하고, 장궁 당기기가 더 빠르고 저렴해집니다. (냉철한 시야 상징)',
   'entities.abilities.cold_focus.name': '냉정한 집중',
@@ -15797,13 +15866,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '저주의 눈이 선택한 주 사안 대상을 2.5초마다 공격해 암흑 피해를 줍니다. 사안 빙의 중에는 공격 속도가 두 배가 됩니다.',
   'entities.abilities.maledict_gaze.name': '저주의 응시',
   'entities.abilities.marrowbreak.description':
-    '오랜 피 3단계를 소모해 {damage}의 피해를 입히는 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 8초 동안 최대 생명력의 18%를 흡수하는 보호막을 얻고 분노 15를 돌려받습니다.',
+    '오랜 피 3단계를 소모해 {damage}의 피해를 입히는 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 최대 생명력의 18%를 회복하고 분노 15를 돌려받습니다.',
   'entities.abilities.marrowbreak.name': '골수분쇄',
   'entities.abilities.martyrs_aegis.description':
     '아군 한 명이 받는 피해를 8초 동안 40% 감소시킵니다.',
   'entities.abilities.martyrs_aegis.name': '순교자의 방패',
   'entities.abilities.maul.specNote_feral':
-    '적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 골수분쇄로 변합니다: 78에서 96의 피해를 입히는 높은 위협 수준의 강타이며, 생명력이 절반 미만이면 대신 최대 생명력의 18%를 흡수하는 보호막을 얻고 분노 15를 돌려받습니다.',
+    '적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 골수분쇄로 변합니다: 78에서 96의 피해를 입히는 높은 위협 수준의 강타이며, 생명력이 절반 미만이면 대신 최대 생명력의 18%를 회복하고 분노 15를 돌려받습니다.',
   'entities.abilities.measured_shot.description':
     '신중하게 조준한 사격으로 {damage}의 물리 피해를 주고, 적중 시 집중 20을 얻습니다.',
   'entities.abilities.measured_shot.name': '정밀 사격',
@@ -15828,7 +15897,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6야드 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
   'entities.abilities.ossuary_mark.name': '납골 표식',
   'entities.abilities.overbloom.description':
-    '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다.',
+    '푸른 생장 3단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 포자치유를 심습니다.',
+  'entities.abilities.overbloom.specNote_restoration':
+    '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 포자치유를 심습니다.',
   'entities.abilities.overbloom.name': '만개',
   'entities.abilities.pack_command.description':
     '살아 있는 소환수에게 공격을 명령합니다. 적중하면 집중 20과 무리 흉포 1단계를 얻습니다.',
@@ -15871,9 +15942,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히며, 두 출혈 효과를 제거하고 기력을 {rage}만큼 회복합니다. 연계 점수가 없어도 사용할 수 있습니다.',
   'entities.abilities.redharvest.name': '피의 수확',
   'entities.abilities.regrowth.specNote_restoration':
-    '개화를 새로 심으면 푸른 생장이 1단계 쌓입니다(최대 5단계).',
+    '시전할 때마다 푸른 생장이 1단계 쌓입니다(최대 3단계). 이미 효과가 지속 중인 개화를 갱신해도 쌓입니다.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    '개화를 새로 심으면 푸른 생장이 1단계 쌓입니다(최대 5단계). 푸른 생장 5단계에서 신속한 치유가 만개로 변합니다.',
+    '시전할 때마다 푸른 생장이 1단계 쌓입니다(최대 3단계). 이미 효과가 지속 중인 개화를 갱신해도 쌓입니다. 푸른 생장 3단계에서 신속한 치유가 만개로 변합니다.',
   'entities.abilities.rip.specNote_feral': '적중하면 오랜 피가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.ruinous_brand.description':
     '적에게 15초 동안 낙인을 새깁니다. 다음 3회의 직접 주문은 낙인이 새겨진 적에게 25%의 피해로 메아리치며, 다른 대상에게 시전하면 그 피해의 50%를 낙인이 새겨진 적에게도 입힙니다. 파멸 화살의 메아리는 추가적인 치명타 피해 배수 없이 치명타로도 처리됩니다.',
@@ -15954,13 +16025,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '휘파람 신호가 파티를 고무시켜 10초 동안 공격, 시전, 정신 집중 속도를 10% 증가시킵니다. 최근 파티 가속 효과를 받은 아군은 너무 지쳐 효과를 받을 수 없습니다. (도적 특성)',
   'entities.abilities.thieves_chorus.name': '도적의 합창',
   'entities.abilities.thunder_reservoir.description':
-    '지속 효과: 비전 화살과 하늘가지가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)',
+    '지속 효과: 비전 화살, 하늘가지, Magma Burst가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)',
   'entities.abilities.thunder_reservoir.name': '천둥 비축',
   'entities.abilities.tidecall.description':
     '아군 대상의 생명력을 {damage}만큼 회복시킵니다. 치유량은 주문력에 따라 증가합니다. 초과 치유 전의 전체 치유량을 치유의 물결에 더하며, 대상 최대 생명력의 30%까지 저장합니다.',
   'entities.abilities.tidecall.name': '해일 부름',
   'entities.abilities.trailbreak.description':
-    '전문화 상태를 잃지 않고 뒤로 도약합니다. 야전술은 다음 재진입도 준비합니다.',
+    '뒤로 25미터 도약하며 이동 불가 효과와 이동 속도 감소 효과를 해제합니다. 사냥의 기세가 있으면 이를 갱신하고 12초 동안 재진입 준비를 부여합니다.',
   'entities.abilities.trailbreak.name': '흔적 끊기',
   'entities.abilities.umbral_anchor.description':
     '처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다.',
@@ -16091,11 +16162,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '근접 피해를 맡는 형태입니다. 도적처럼 기력과 연계 점수를 쓰고, 위협 수준은 훨씬 적게 쌓습니다.',
   'guide.classPage.formLine.form_travel':
     '이동을 위한 형태입니다. 땅 위를 훨씬 빠르게 달리지만, 형태를 풀기 전까지는 다른 능력을 쓸 수 없습니다.',
+  'guide.classPage.formLine.form_sporemender':
+    '회복 드루이드의 치유 형태입니다. 더 단단한 가죽과 더 강한 치유를 지니지만 걸음이 느려지며, 모든 주문과 마나를 그대로 사용합니다.',
   'guide.classPage.formName.form_bear': '큰곰 변신',
   'guide.classPage.formName.form_travel': '쾌속 형태',
+  'guide.classPage.formName.form_sporemender': '포자치유사 변신',
   'guide.classPage.formsHeading': '변신',
   'guide.classPage.formsMoonwing':
-    '조화 전문화 드루이드는 형태를 하나 더 얻습니다. 조화 드루이드가 싸울 때 쓰는 시전자 형태인 달빛야수 변신입니다. 주문을 그대로 쓸 수 있는 유일한 동물 형태이며, 마법봉은 이 형태나 평범한 시전자 모습에서만 쓸 수 있습니다.',
+    '조화 전문화 드루이드는 형태를 하나 더 얻습니다. 조화 드루이드가 싸울 때 쓰는 시전자 형태인 달빛야수 변신입니다. 회복 전문화의 포자치유사 변신처럼 주문을 그대로 쓸 수 있으며, 마법봉은 이 두 형태나 평범한 시전자 모습에서만 쓸 수 있습니다.',
   'guide.classPage.formsWolfEngage':
     '늑대는 큰곰 돌진으로 싸움을 열고, 곧바로 늑대 변신으로 바꿔 대상을 고정하며, 은신하지 않을 때는 도약 습격으로 거리를 좁히고, 쓰러뜨리기로 적을 붙잡아 둡니다.',
   'guide.classPage.formsAutoUnshift':
@@ -16753,6 +16827,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     '두 번째 행동 단축바 행을 드러내고, 두 번째가 켜지면 세 번째도 나타납니다. 행이 숨겨져 있어도 슬롯은 단축키로 계속 쓸 수 있습니다.',
   'guide.settingsPage.ifFctScale': '대상에게서 떠오르는 피해량과 치유량 숫자의 크기입니다.',
+  'guide.settingsPage.ifClassicCombatText':
+    '곧게 떠오르는 흰색과 옅은 금색의 단순한 피해 숫자로 되돌립니다. 끈 상태(기본값)로 두면 숫자가 더 또렷하게 양옆으로 퍼지고, 치명타와 유난히 큰 타격이 빛납니다.',
   'guide.settingsPage.ifFramesIntro':
     '내 프레임, 대상 프레임, 그리고 파티 배치 전체를 다룹니다. 파티 묶음에는 크기, 너비, 높이, 간격, 열 슬라이더도 있어 공격대 격자를 화면에 맞출 수 있으며, 탭 맨 아래의 초기화 버튼은 모든 프레임을 처음 자리로 되돌립니다.',
   'guide.settingsPage.ifGeneralIntro':
@@ -16845,6 +16921,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '세계가 흐려지기 전까지 얼마나 멀리까지 그릴지 정합니다. 직접 움직이기 전까지는 각 프리셋이 대신 정해 줍니다.',
   'guide.settingsPage.rowWaterQuality':
     '호수와 강, 그리고 넓은 바다를 어떻게 표현할지 정합니다. 평평하고 가벼운 표현부터 완전한 반사까지 있습니다.',
+  'guide.settingsPage.rowSpellEffects':
+    '플레이어와 그 소환수가 사용하는 주문의 빛, 불꽃, 투사체, 명중 폭발입니다(내 것도 포함). 끄면 화면이 차분해지고 대규모 파티 전투에서 프레임을 조금 더 확보할 수 있습니다. 적이 사용하는 효과는 모두 그대로 보이며, 벗어나야 할 범위를 알리는 원, 기절·공포·이동 불가 상태인 대상 위의 표시, 모든 시전 바도 유지됩니다.',
   'guide.settingsPage.rowWaterRipples':
     '헤엄칠 때 뒤로 번져 나가는 물결과 잔물결입니다. 기본값은 꺼짐이며, 실제로 프레임을 잡아먹는 유일한 물 효과입니다. 물보라와 거품은 어느 쪽이든 영향을 받지 않습니다.',
   'guide.settingsPage.valueUltraOrInsane': '울트라, 전부를 원한다면 극한',
@@ -16972,6 +17050,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '악마 형상: 몸집이 {pct}% 커지며 다른 보너스는 별도 강화 효과로 표시됩니다',
   'hudChrome.auraEffect.formMoonkin':
     '달날개 변신: 주문 공격력이 {pct}%, 방어도가 {armorPct}% 증가합니다',
+  'hudChrome.auraEffect.formSporemender':
+    '포자치유사 변신: 주는 치유량이 {pct}%, 방어도가 {armorPct}% 증가하고 이동 속도가 {slowPct}% 감소합니다',
   'hudChrome.auraEffect.formShadow': '어스름장막 변신: 암흑 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.freeExecute': '다음 적용 가능한 처형 기술이 자원을 소모하지 않습니다',
   'hudChrome.auraEffect.funeralHarvestLock': '장례 수확이 아직 다음 영혼 조각을 생성할 수 없습니다',
@@ -17041,7 +17121,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     '맹독 의식: {stacks}/{max} 단계. 비겁한 찌르기, 사악한 베기, 맹독 다트가 각각 1단계를 쌓으며, {max} 단계가 되면 영면이 맹독 찢기로 바뀝니다',
   'hudChrome.auraEffect.verdance':
-    '푸른 생장: {stacks}/{max}단계. 새로 심는 야생 개화와 두 번째 개화가 각각 1단계를 쌓으며, {max}단계에서 신속한 치유가 만개로 변합니다',
+    '푸른 생장: {stacks}/{max}단계. 포자치유, 두 번째 개화, 야생 치유를 시전할 때마다 1단계가 쌓이고, 단계마다 야생 치유의 시전 시간이 줄어듭니다. {max}단계에서 신속한 치유가 만개로 변합니다',
   'hudChrome.auraEffect.warlockAnchor':
     '{range}미터 안에서 다시 사용하면 이곳으로 돌아오고 닻을 소모합니다',
   'hudChrome.auraEffect.wintersChill':
@@ -18242,7 +18322,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     '등급전에서 이기면 플레이어 대 플레이어 화폐인 명예를 받고, 끝까지 치른 시합은 지더라도 그보다 적은 몫을 여전히 받으며 무승부도 그러하니, 패배로 정말 잃는 것은 평점뿐입니다. 명예는 진짜 시합에 보답하도록 만들어졌습니다. 같은 날 같은 상대나 같은 팀을 다시 이겨도 더 주어지지 않고(그 상대에게 다시 져도 마찬가지입니다), 하루 종일 이기는 날이라도 처음 몇 승까지는 온전히 받다가 그 뒤로는 한 승에 절반만 받고, 더 이기면 다시 절반으로 줄어 거기서 멈추며, 상대가 기권한 시합은 평점은 움직여도 명예는 전혀 주지 않습니다. 그 하루는 왕국의 하루여서 왕국의 밤 초기화 시각에 넘어가는데, 이는 모든 하루 잠금이 풀리는 바로 그 경계입니다.',
   'guide.arenaPage.warfareBodyStatsStay':
-    '모든 워페어 장비에는 워페어 공격 등급과 워페어 방어 등급이 붙어 있는데, 이 두 등급은 몬스터에게는 아무런 효과가 없습니다. 오직 다른 플레이어와 싸울 때, 즉 결투와 투기장, 전장에서만 작동해 공격 등급은 주는 피해를 올리고 방어 등급은 받는 피해를 깎아 주며, 각각 자체 상한이 있습니다. 방어구 계열은 저마다 세트이기도 한데, 세트 효과 역시 워페어 등급이거나 플레이어에게만 통하는 효과입니다. 그러니 명예로 맞춘 한 벌의 세트 효과는 던전 우두머리 앞에서는 아무 값어치가 없습니다. 장비 자체는 여전히 보통의 능력치와 방어도, 무기 피해를 지니고 있고 그것들은 어디서나 통합니다. 몬스터 앞에서 잠잠해지는 것은 워페어 등급과 세트 효과입니다.',
+    '모든 워페어 장비에는 워페어 공격 등급과 워페어 방어 등급이 붙어 있는데, 이 두 등급은 몬스터에게는 아무런 효과가 없습니다. 오직 다른 플레이어와 싸울 때, 즉 결투와 투기장, 전장에서만 작동해 공격 등급은 주는 피해를 올리고 방어 등급은 받는 피해를 깎아 주며, 각각 자체 상한이 있습니다. 방어구 계열은 저마다 세트이기도 한데, 세트 효과 역시 워페어 등급이거나 플레이어에게만 통하는 효과입니다. 그러니 명예로 맞춘 한 벌의 세트 효과는 던전 우두머리 앞에서는 아무 값어치가 없습니다. 장비 자체는 여전히 보통의 능력치와 방어도, 무기 피해를 지니고 있고 그것들은 어디서나 통합니다. 몬스터 앞에서 잠잠해지는 것은 워페어 등급과 세트 효과입니다. 단, 어디서나 적용되는 예외가 하나 있습니다. 시전자 세트를 2부위 착용하면 피해를 입어도 주문 시전이 지연되지 않습니다.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     '이는 의도된 맞바꿈입니다. 워페어 장비는 플레이어와 싸우기 위한 것이지, 던전 등급을 건너뛰는 지름길이 아닙니다. 같은 부위의 던전 영웅 장비가 지닌 전투 등급을 워페어 장비는 결코 갖지 못하며, 그 대신 지닌 워페어 등급과 세트 효과는 온전히 다른 플레이어를 상대로 쓰입니다. 투기장에서 제 몫을 하고 싶다면 사세요. 영웅 던전을 더 빨리 밀고 싶다면 던전에서 장비를 구하세요.',
   'guide.social.calendarBodyDoubleHonor':
@@ -18278,6 +18358,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': '해당 재료 선택을 더 이상 사용할 수 없습니다.',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × {name} 채집',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × {name}에게서 획득',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × {name} 채집, {signer} 서명',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 채집자 기록 없음',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned': '{count} × 채집자 기록 없음, {name} 서명',
@@ -18476,6 +18557,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': '균열 감시자의 반지',
   'entities.items.rift_surveyors_satchel.name': '균열 측량사의 가방',
   'entities.items.emissary_cache.name': '사절의 보관함',
+  'entities.items.pvp_trophy_skull.name': '전리품 해골',
   'entities.npcs.weekly_emissary.name': '참 피트',
   'entities.npcs.weekly_emissary.title': '사절',
   'entities.npcs.weekly_emissary.greeting':
@@ -18536,7 +18618,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': '델브 징표',
   'hudChrome.currencies.wocToken': 'WoC 토큰',
   'hudChrome.currencies.heroicMarkNote': '영웅 던전 . 영웅 보급관에게서 사용',
-  'hudChrome.currencies.honorNote': '전장과 투기장',
+  'hudChrome.currencies.honorNote': '전장, 투기장, 전역 퀘스트',
   'hudChrome.currencies.delveMarkNote': '완료한 델브',
   'hudChrome.currencies.wocTokenNote': '연동된 지갑 잔액',
   'hudChrome.currencies.walletNotLinked': '연동된 지갑 없음',
@@ -18820,6 +18902,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     '파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (회복)',
   'entities.abilities.grove_awakening.name': '숲의 각성',
+  'entities.abilities.sporemender_form.name': '포자치유사 변신',
+  'entities.abilities.sporemender_form.description':
+    "포자치유사로 변신해 주는 치유량이 20%, 방어도가 40% 증가하지만 이동 속도가 20% 감소합니다. 일반 형상에서 쓰던 모든 주문을 그대로 사용할 수 있습니다. 형상을 되돌릴 때까지 지속됩니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다. 다시 시전하면 일반 형상으로 돌아옵니다. (회복 상징 기술)",
   'entities.abilities.prayer_of_returning.description':
     '파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (신성 및 수양)',
   'entities.abilities.prayer_of_returning.name': '귀환의 기도',
@@ -19483,7 +19568,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Faultline이 6초 동안 받는 피해를 10% 줄입니다.',
   'entities.itemSets.vanguard_paladin_holy.name': '선봉대: Sunvigil Regalia',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    '2세트: Life Covenant의 재사용 대기시간이 30초 감소합니다.',
+    '2세트: Life Covenant의 재사용 대기시간이 30초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     '4세트: Life Covenant가 대상에게 최대 생명력 8%의 보호막을 6초 동안 부여합니다.',
   'entities.itemSets.vanguard_paladin_protection.name': '선봉대: Shieldvow Bastion',
@@ -19528,22 +19613,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Smokefade에서 사용한 Gut Punch가 연계 점수 2를 추가로 부여합니다.',
   'entities.itemSets.vanguard_priest_discipline.name': '선봉대: Veilpsalm Raiment',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    '2세트: Terror Canticle의 재사용 대기시간이 3초 감소합니다.',
+    '2세트: Terror Canticle의 재사용 대기시간이 3초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     '4세트: Psalm of Warding이 완전히 소모되면 보호막을 받은 아군의 이동 속도가 3초 동안 20% 증가합니다. 8초에 한 번만 발동합니다.',
   'entities.itemSets.vanguard_priest_holy.name': '선봉대: Gracewing Raiment',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    '2세트: Veilstep의 재사용 대기시간이 6초 감소합니다.',
+    '2세트: Veilstep의 재사용 대기시간이 6초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     '4세트: Veilstep이 최대 생명력 8%의 보호막을 6초 동안 부여합니다.',
   'entities.itemSets.vanguard_priest_shadow.name': '선봉대: Duskhymn Regalia',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    '2세트: Litany of Woe를 정신 집중하는 동안 대상의 이동 속도도 30% 감소합니다.',
+    '2세트: Litany of Woe를 정신 집중하는 동안 대상의 이동 속도도 30% 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     '4세트: Call Tithefiend가 최대 생명력 10%의 보호막을 8초 동안 부여합니다.',
   'entities.itemSets.vanguard_shaman_elemental.name': '선봉대: Tempestwrit Battlemail',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    '2세트: Unleash Weapon의 재사용 대기시간이 3초 감소합니다.',
+    '2세트: Unleash Weapon의 재사용 대기시간이 3초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     '4세트: Unleash Weapon으로 이동 중 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다.',
   'entities.itemSets.vanguard_shaman_enhancement.name': '선봉대: Galeborn Warmail',
@@ -19553,36 +19638,37 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Ancestral Strike가 Elemental Trance의 남은 재사용 대기시간을 4초 줄입니다.',
   'entities.itemSets.vanguard_shaman_restoration.name': '선봉대: Brineward Chainmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    '2세트: 생명력 50% 미만의 아군에게 Mending Waters를 0.5초 더 빠르게 시전합니다.',
+    '2세트: 생명력 50% 미만의 아군에게 Mending Waters를 0.5초 더 빠르게 시전합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     '4세트: Tidecall이 대상에게 자신의 최대 생명력 5%의 보호막을 6초 동안 부여합니다.',
   'entities.itemSets.vanguard_mage_arcane.name': '선봉대: Hourbinder Vestments',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    '2세트: Temporal Barrier의 재사용 대기시간이 2초 감소합니다.',
+    '2세트: Temporal Barrier의 재사용 대기시간이 2초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     '4세트: Temporal Barrier가 보호한 대상의 이동 속도를 3초 동안 20% 증가시킵니다.',
   'entities.itemSets.vanguard_mage_fire.name': '선봉대: Emberlash Regalia',
-  'entities.itemSets.vanguard_mage_fire.bonus2': '2세트: Cinderfall이 3초 더 빠르게 충전됩니다.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    '2세트: Cinderfall이 3초 더 빠르게 충전됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     '4세트: Cinderfall 시전 시 Blazing Barrier의 남은 재사용 대기시간이 2초 감소합니다.',
   'entities.itemSets.vanguard_mage_frost.name': '선봉대: Rimewarden Garb',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    '2세트: Icebind의 재사용 대기시간이 2초 감소합니다.',
+    '2세트: Icebind의 재사용 대기시간이 2초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     '4세트: Icebind 시전 시 Flitstep의 남은 재사용 대기시간이 5초 감소합니다.',
   'entities.itemSets.vanguard_warlock_affliction.name': '선봉대: Dreadquill Vestments',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    '2세트: Harrow의 시전 시간이 0.3초 감소합니다.',
+    '2세트: Harrow의 시전 시간이 0.3초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4세트: Consume의 치유량이 30% 증가하고 이동 중에도 정신 집중할 수 있습니다.',
   'entities.itemSets.vanguard_warlock_demonology.name': '선봉대: Marrowbound Regalia',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    '2세트: Bone Armor의 재사용 대기시간이 10초 감소합니다.',
+    '2세트: Bone Armor의 재사용 대기시간이 10초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     '4세트: Reaping Command가 Bone Armor의 남은 재사용 대기시간을 2초 줄입니다.',
   'entities.itemSets.vanguard_warlock_destruction.name': '선봉대: Slagcrown Vestments',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '2세트: Cinderhide의 재사용 대기시간이 30초 감소합니다.',
+    '2세트: Cinderhide의 재사용 대기시간이 30초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     '4세트: 두 번째 Conflagrate마다 8초 안의 다음 Ruinbolt를 즉시 시전하게 합니다.',
   'entities.itemSets.vanguard_druid_feral.name': '피갈기 가죽',
@@ -19592,12 +19678,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Bruin Rush가 최대 생명력 6%의 보호막을 6초 동안 부여합니다.',
   'entities.itemSets.vanguard_druid_restoration.name': '엉겅꽃 의복',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    '2세트: Fleetmend의 재사용 대기시간이 1초 감소합니다.',
+    '2세트: Fleetmend의 재사용 대기시간이 1초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     '4세트: Fleetmend가 이동 속도를 3초 동안 30% 증가시킵니다.',
   'entities.itemSets.vanguard_druid_balance.name': '별수호자 예복',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    '옭아매는 뿌리의 시전 시간이 0.5초 감소합니다.',
+    '옭아매는 뿌리의 시전 시간이 0.5초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '옭아매는 뿌리를 시전하면 이동 중에도 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다.',
+  'entities.letters.world_quest_reward.sender': '까마귀 우편국',
+  'entities.letters.world_quest_reward.subject': '전역 퀘스트 보상',
+  'entities.letters.world_quest_reward.body':
+    '이 전역 퀘스트 보상을 획득했을 때 가방이 가득 차 있어서 까마귀가 이곳으로 배달했습니다. 공간을 비운 뒤 아무 까마귀 석주에서나 받으세요.\n\n- 까마귀 우편국',
+  'questUi.logs.worldQuestRewardMailed':
+    '가방이 가득 찼습니다. 보상이 우편함으로 발송되었습니다: {items}.',
+  'errors.searchUpdates': '업데이트 검색',
+  'errors.noUpdateFound': '업데이트를 찾지 못했습니다. 잠시 후 다시 시도하세요.',
+  'errors.updateUnavailable': '게임 스토어에서 업데이트하거나 최신 클라이언트를 다운로드하세요.',
+  'errors.updateSearchFailed': '업데이트를 확인할 수 없습니다. 다시 시도하세요.',
 };

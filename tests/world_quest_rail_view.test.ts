@@ -137,4 +137,33 @@ describe('world quest rail view', () => {
     expect(view.rows.length).toBe(board.length);
     expect(view.rows.some((row) => row.belowLevel)).toBe(board.some((q) => q.minLevel > 5));
   });
+
+  it('reads reward-free practice replays as completed instead of active', () => {
+    const target = board[0];
+    const view = buildWorldQuestRailView({
+      worldQuestCycle: cycle,
+      worldQuestLog: new Map([
+        [
+          target.id,
+          {
+            questId: target.id,
+            count: 0,
+            state: 'active',
+            practiceOnly: true,
+          } as WorldQuestProgress,
+        ],
+      ]),
+      worldQuestExpiresAtMs: 0,
+      playerLevel: 20,
+      selectedWorldQuestId: target.id,
+      canReroll: () => ({
+        canReroll: false,
+        reason: 'Completed world quests cannot be rerolled.',
+      }),
+    });
+
+    expect(view.rows.find((row) => row.questId === target.id)?.state).toBe('completed');
+    expect(view.completed).toBe(1);
+    expect(view.reroll.reason).toBe('completed');
+  });
 });

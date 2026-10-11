@@ -537,7 +537,26 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // LOWERED 18093 -> 18090 by the Social row right-click menu: the by-name pid
+    // lookup moved to src/ui/social_row_menu_core.ts (livePlayerPid) and the row
+    // routing lives in social_window.ts, so hud.ts keeps only one-line menu deps.
+    // Re-pinned at the v0.45.0 release batch after approved PR #4357 added the
+    // instance difficulty badge wiring to the coordinator. Exact count measured
+    // on the merged tree after the release integration repair (wc -l after biome).
+    // Lowered from 18178 by the resizable world map: the window drag-handle
+    // predicate moved out to src/ui/window_drag_handle.ts and the map canvas
+    // sizing landed as src/ui/hud/map/map_canvas_size_controller.ts behind a
+    // one-line install. Exact merged count after the release batch, zero slack.
+    // LOWERED 18164 -> 18156: the death-screen surface decisions (Release
+    // overlay, ghost hint, corpse prompt) moved to src/ui/death_screen_view.ts
+    // together with the Release input hold. Exact merged count, zero slack.
+    // Ferry announcement history moved to zone_announcement_core; the map
+    // keeps tracking physical zone changes while notices wait for docking.
+    // Exact merged count after #4413 composed with the current release batch.
+    // Re-pinned at the v0.45.0 release batch after #4419's hover-tooltip
+    // options and #4433's mounted-form stride guard composed with the existing
+    // coordinator. Exact merged count after biome, zero slack.
+    ceiling: 18060,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -995,7 +1014,38 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // On the veil branch, 12684 -> 12606: every translucent look moved onto the spirit
+    // veil (the per-entity ghost-look decision into ghost_style_core.ts),
+    // deleting the lit twin group's slot and manifest entry, the local self
+    // warm and the Nythraxis Soul Rend live arm. Exact count, zero slack.
+    // HELD at 12614 by the integrated WebGL context restore plus spirit-veil
+    // merge: the restore lifecycle composes with the veil deletions, measured
+    // with wc -l on the merged tree. Exact count, zero slack.
+    // RE-PINNED 12614 -> 12615 in the v0.45.0 release batch: trinket relics
+    // share the cast-VFX first-read roots with context-restore relink, while
+    // the spirit-veil branch's renderer deletion and the restore branch's
+    // lifecycle wiring still compose in one file. The helper was compressed
+    // after formatting; wc -l on the resolved tree measures 12615. Exact
+    // count, zero slack.
+    // RE-PINNED 12615 -> 12642 in the v0.45.0 release batch after restoring
+    // PR #4241's self-spirit prewarm wiring that the first conflict pass left
+    // half-applied (context-restore kept the hook but the renderer had lost the
+    // prewarmer field/observe call). The helper modules and tests are extracted;
+    // these are the renderer's remaining call sites. Exact count, zero slack.
+    // LOWERED 12642 -> 12637 by PR #4282 on top of that integrated v0.45
+    // batch: the Drakelands kit lane adds the approach prefetch while moving
+    // the visible-zone recheck cadence into zone_streaming.ts. Exact count,
+    // zero slack.
+    // LOWERED 12637 -> 12625 by PR #4279 on top of the v0.45 candidate:
+    // Spell Effects keeps the event-scope wrapper while extracting world cue
+    // arms from renderer.ts. Exact count, zero slack.
+    // LOWERED 12625 -> 12620 by this v0.45.0 PR #4379 merge: dungeon/arena
+    // async build tracking stays extracted in static_interior_tracker.ts while
+    // the release batch's spirit-veil and Spell Effects extractions remain.
+    // Exact count measured with wc -l on the resolved tree. Zero slack.
+    // LOWERED 12620 -> 12617 after resolving the Sporemender Form rig-slot
+    // extraction with the release batch. Exact count.
+    ceiling: 12617,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1207,7 +1257,20 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Re-pinned at the v0.45.0 release batch after the active instance difficulty
+    // IWorld method landed to make PR #4357's badge read the claim difficulty.
+    // PR #4387 then moved difficulty selection behind its SimContext sibling.
+    // Weekly loot focus composes with that release candidate and keeps the
+    // resolved sim.ts at the exact merged count after biome. Zero slack.
+    // Re-pinned at the continued v0.45.0 release batch after the approved PRs
+    // already on this line composed with the weekly loot focus candidate; no
+    // new sim logic lands in this resizable-map merge. Exact merged count, zero
+    // slack.
+    // Down to 11629 with buff persistence composed on the release candidate:
+    // the sickness save fields moved into src/sim/aura_persist.ts's
+    // auraSaveFragment beside the new buff list, while the candidate's
+    // rift-safe corpse save path remains in sim.ts. Exact count, zero slack.
+    ceiling: 11629,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1431,7 +1494,11 @@ const MONOLITHS: MonolithRow[] = [
     // Colorblind Mode's interface body-class extraction also composes with
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
-    ceiling: 11140,
+    // Fatal screen DOM moved to fatal_overlay_controller for update recovery.
+    // Re-pinned at the v0.45.0 release batch after #4420's client-update
+    // recovery flow composed with the current entrypoint. Exact merged count
+    // after biome, zero slack.
+    ceiling: 10981,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1689,7 +1756,22 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED 9840 -> 9831 by the rift-floor fix for moderation moves: the
+    // jail / visit / cage-gate teleport body and its revive branches moved to
+    // server/moderation_moves.ts (wc -l after biome). Exact count, zero slack.
+    // Re-pinned 9831 -> 9835 for v0.45.0 active instance difficulty wire
+    // (adiff): thin self-snapshot wiring only, measured with wc -l after biome.
+    // PvP played-time rewards: pet reconnect reconciliation moved to the
+    // disconnected-player helper alongside the transient timer pause marker.
+    // Bank and vault commands share admission and save scheduling in
+    // bank_storage_command. Combined merge measures 9816 lines, exact count
+    // and zero slack.
+    // LOWERED 9816 -> 9769 after composing the spectate-body fix with this
+    // release candidate: /spectate stopped parking the moderator's body in
+    // limbo (the camera moves, the body stays in the world), retiring the
+    // saved position, GM toggle and pet stow while entry idle moved to
+    // server/spectate_body.ts. Exact count, zero slack.
+    ceiling: 9769,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1868,7 +1950,15 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // LOWERED 5356 -> 5328 by the spectate rift-floor fix: the floor mirror and
+    // its collision-region swap moved to src/net/rift_floor_mirror.ts, which the
+    // event arm, the spectate frame, the reconnect, and endSession now share
+    // (wc -l after biome). Exact count, zero slack.
+    // Re-pinned 5328 -> 5332 for v0.45.0 active instance difficulty mirror
+    // (adiff): thin ClientWorld decode/read only, measured with wc -l after biome.
+    // Weekly Vault self-decode joins the bank_snapshot_wire owner-only cohort.
+    // Combined merge measures 5330 lines, exact count and zero slack.
+    ceiling: 5330,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2105,8 +2195,9 @@ const MONOLITHS: MonolithRow[] = [
     // both parents' additions combine, so keep the exact merged count.
     // Lowered after extracting the world trees' camera-occluder fade (the
     // hideable records, the trunk hit test, the gated instance/ghost swap)
-    // into src/render/tree_hide_fade.ts.
-    ceiling: 3996,
+    // into src/render/tree_hide_fade.ts. Lowered again when the Evergarden
+    // scatter curation moved to the sim generator (decoration_exclusions.ts).
+    ceiling: 3992,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -2156,7 +2247,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 827 -> 826 at World PvP (PR 4146 review): the state gained the pvpFlag
     // the name row was built with, paid for by three comment trims. Exact count
     // (wc -l < src/render/nameplate_canvas.ts), zero slack.
-    ceiling: 826,
+    // LOWERED 826 -> 823 at World PvP bounties: the state gained the bounty bit
+    // and the name row its blood-red fills, paid for by moving every tag fill
+    // rule (the guild colour tiers included) to nameplate_tag_fill_core.ts.
+    // Exact count (wc -l < src/render/nameplate_canvas.ts), zero slack.
+    ceiling: 823,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

@@ -46,6 +46,7 @@ import { type Decoration, generateDecorationsInBounds } from '../sim/world';
 import type { IWorld } from '../world_api';
 import type { CastlePlanMarker } from './castle_plan_core';
 import { dungeonDisplayName, riftFloorLabel, zoneDisplayName, zonePoiLabel } from './entity_i18n';
+import { drawFerryPortMapMarker } from './ferry_port_map_painter';
 import { formatNumber } from './i18n';
 import {
   EMPTY_MAP_MARKER_ART,
@@ -439,6 +440,10 @@ function drawMapNavigationFallback(
   ctx.fillStyle = colors.portalDot;
   ctx.strokeStyle = colors.outline;
   ctx.lineWidth = geometry.markerOutlineWidth;
+  if (marker.kind === 'ferry-port') {
+    drawFerryPortMapMarker(ctx, marker, size, colors.player, colors.outline);
+    return;
+  }
   if (marker.kind === 'hoard-entrance') {
     for (let pass = 0; pass < 2; pass++) {
       ctx.strokeStyle = pass === 0 ? colors.outline : colors.questBadgeFill;
@@ -926,7 +931,7 @@ export class MapWindowPainter {
     // Long labels would collide with POIs at the full-zone scale; hover/tap owns
     // the localized name while this high-salience layer stays immediately legible.
     for (const marker of model.navigation) {
-      if (marker.kind === 'hoard-entrance') {
+      if (marker.kind === 'hoard-entrance' || marker.kind === 'ferry-port') {
         const size =
           MAP_MARKER_SIZES[profile === 'compact' ? 'mapNavigationCompact' : 'mapNavigation'];
         drawMapNavigationFallback(ctx, marker, size, colors, geometry);

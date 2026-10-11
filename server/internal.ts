@@ -24,10 +24,16 @@ import {
   setDiscordMemberMetaBulk,
 } from './discord_db';
 import {
+  drainHillAnnouncements,
+  type QueuedHillAnnouncement,
+  requeueHillAnnouncements,
+} from './discord_hill_feed';
+import {
   drainLinkChanges,
   type QueuedLinkChange,
   requeueLinkChanges,
 } from './discord_link_changes';
+import { drainPvpKills, type QueuedPvpKill, requeuePvpKills } from './discord_pvp_feed';
 import {
   drainQueuePops,
   type QueuedQueuePop,
@@ -566,9 +572,9 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  *  - `winners` is an IDEMPOTENT READ. It stays unannounced until the bot calls
  *    the mark endpoint, so it is delivered at-least-once across retries and a
  *    repeated poll simply re-reads the same days.
- *  - The three in-memory streams are PRESERVED ON ERROR and CONSUMED ON SUCCESS.
+ *  - The in-memory streams are PRESERVED ON ERROR and CONSUMED ON SUCCESS.
  *    Everything from the identity read to the response build runs inside a try
- *    whose catch requeues all three drains at the front of their queues, in
+ *    whose catch requeues every drain at the front of its queue, in
  *    order, before rethrowing. So a failed poll answers 500 with nothing lost and
  *    the next poll carries the same items; a 200 is the only outcome that
  *    consumes them, which is exactly what makes a bot-side retry safe.
@@ -577,7 +583,11 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  *    resync, not to this endpoint.
  *
  * The envelope field order is relay, activity, winners, linkChanges, queuePops,
- * and each stream keeps its queue's FIFO order. The relay and activity streams keep the
+ * pvpKills, hillAnnouncements, and each stream keeps its queue's FIFO order.
+ * pvpKills (the World PvP kill feed, server/discord_pvp_feed.ts) and
+ * hillAnnouncements (the King of the Hill spawn calls,
+ * server/discord_hill_feed.ts) carry names only and are served verbatim: they
+ * add nothing to the identity read. The relay and activity streams keep the
  * item shapes their retired per-endpoint GETs served (invariant D11, now this
  * poll's own contract with the bot); the winners stream dropped the fields
  * announcing never used when the standalone GET's byte-parity pin retired with
@@ -592,11 +602,16 @@ export const outboxHandler: RouteHandler = async (ctx) => {
   let activityItems: QueuedActivity[] = [];
   let linkChangeItems: QueuedLinkChange[] = [];
   let queuePopItems: QueuedQueuePop[] = [];
+  let pvpKillItems: QueuedPvpKill[] = [];
+  let hillItems: QueuedHillAnnouncement[] = [];
   try {
     relayItems = drainRelay();
     activityItems = drainActivity();
     linkChangeItems = drainLinkChanges(OUTBOX_LINK_CHANGE_PAGE);
     queuePopItems = drainQueuePops(Date.now());
+    // Names only, no account ids: this stream never reaches the identity read.
+    pvpKillItems = drainPvpKills();
+    hillItems = drainHillAnnouncements();
     const accountIds = new Set<number>();
     for (const it of relayItems) accountIds.add(it.accountId);
     for (const it of activityItems) {
@@ -681,6 +696,8 @@ export const outboxHandler: RouteHandler = async (ctx) => {
       winners,
       linkChanges: { items: linkChanges },
       queuePops: { items: queuePops, watching: queuePopsWatching() },
+      pvpKills: { items: pvpKillItems },
+      hillAnnouncements: { items: hillItems },
     });
   } catch (err) {
     // The queues are the bot's only copy of these items, so a failed response
@@ -690,6 +707,8 @@ export const outboxHandler: RouteHandler = async (ctx) => {
     requeueActivity(activityItems);
     requeueLinkChanges(linkChangeItems);
     requeueQueuePops(queuePopItems);
+    requeuePvpKills(pvpKillItems);
+    requeueHillAnnouncements(hillItems);
     throw err;
   }
 };

@@ -12,6 +12,10 @@ import { BalancedSequencer } from './scripts/ci_balanced_sequencer.mjs';
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
 import {
+  headStylesheetsBlockingBootSplash,
+  moveHeadStylesheetsBehindBootSplash,
+} from './scripts/lib/boot_splash_stylesheets.mjs';
+import {
   diagnosticsCaptureAllowed,
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
@@ -166,6 +170,31 @@ function i18nModulepreloadPlugin() {
       console.log(
         `[i18n] modulepreload: templated ${Object.keys(map).length} locale chunk URLs into index.html`,
       );
+    },
+  };
+}
+
+// Runs after Vite injects the built CSS <link>s, so those move too; dev and build share it.
+// The build re-reads its own output, so a Vite upgrade that injects CSS later fails loudly.
+function bootSplashStylesheetsPlugin() {
+  let outDir = path.resolve(root, 'dist');
+  return {
+    name: 'woc-boot-splash-stylesheets',
+    transformIndexHtml: { order: 'post' as const, handler: moveHeadStylesheetsBehindBootSplash },
+    configResolved(cfg: { root: string; build: { outDir: string } }) {
+      outDir = path.resolve(cfg.root, cfg.build.outDir);
+    },
+    closeBundle() {
+      for (const entry of ['index.html', 'play.html']) {
+        const file = path.join(outDir, entry);
+        if (!existsSync(file)) continue;
+        const blocking = headStylesheetsBlockingBootSplash(readFileSync(file, 'utf8'));
+        if (blocking.length > 0) {
+          throw new Error(
+            `${entry}: stylesheets left in <head> block the boot splash: ${blocking}`,
+          );
+        }
+      }
     },
   };
 }
@@ -405,6 +434,7 @@ export default defineConfig({
     ...(process.env.VITEST ? [svelteTesting({ autoCleanup: false })] : []),
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
+    bootSplashStylesheetsPlugin(),
     musicEditorSavePlugin(),
     ...(process.env.WOC_DIAGNOSTICS_CAPTURE === '1' ? [diagnosticsCapturePlugin()] : []),
   ],

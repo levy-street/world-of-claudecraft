@@ -1764,7 +1764,9 @@
     zoom: var(--target-frame-scale, 1);
   }
   /* Every extra action row lifts the docked player frame by one socket row, so
-     the mirrored target seat lifts by the same step and the pair stays level. */
+     the mirrored target seat lifts by the same step and the pair stays level
+     (except with targetAurasBelowFrame, where the target seat sits one aura
+     strip row higher; see the bottom-anchored seat below). */
   body.show-actionbar2 #target-frame,
   body.show-actionbar3 #target-frame {
     top: calc(
@@ -1784,6 +1786,54 @@
       (var(--socket-size) + var(--socket-row-gap)) -
       var(--stance-row-lift, 0px) -
       var(--pet-row-lift, 0px)
+    );
+  }
+  /* Target Auras Below the Frame (targetAurasBelowFrame) on the stock seat.
+     The seat sits directly over the action bar, so a strip hung below it
+     would paint across the hotbar. With the setting on (desktop only; the
+     touch sheet pins its own seat), the seat rises by exactly one strip row
+     (the 8px hang, an own-aura icon and its 13px timer, all under the
+     children zoom), so the strip's first row lands where the frame's bottom
+     edge used to be and keeps the full bar gap above the hotbar. The seat is
+     anchored by its BOTTOM edge here, so the target's own cast bar and swing
+     timer (in-flow .uf-bars children) grow the frame upward instead of
+     pushing the strip down onto the hotbar. A moved frame is untouched: its
+     inline top (and MovableFrame's inline bottom: auto) outranks this seat.
+     The lift is body-wide because the player's cast bar and swing timers
+     rise by the same step below, keeping the lifted frame clear of them. */
+  body.target-auras-below-frame:not(.mobile-touch) {
+    --target-aura-band-lift: calc(
+      (8px + var(--aura-size-own) + 13px) *
+      var(--target-frame-scale, 1)
+    );
+  }
+  body.target-auras-below-frame:not(.mobile-touch) #target-frame {
+    top: auto;
+    bottom: calc(
+      var(--unit-frame-seat-floor) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--target-aura-band-lift)
+    );
+  }
+  body.target-auras-below-frame.show-actionbar2:not(.mobile-touch) #target-frame {
+    bottom: calc(
+      var(--unit-frame-seat-floor) +
+      var(--socket-size) +
+      var(--socket-row-gap) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--target-aura-band-lift)
+    );
+  }
+  body.target-auras-below-frame.show-actionbar2.show-actionbar3:not(.mobile-touch) #target-frame {
+    bottom: calc(
+      var(--unit-frame-seat-floor) +
+      2 *
+      (var(--socket-size) + var(--socket-row-gap)) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--target-aura-band-lift)
     );
   }
   /* The target's debuff strip hangs off the frame instead of living inside the
@@ -3226,6 +3276,22 @@
     position: relative;
     min-width: 0;
     overflow: hidden;
+  }
+  #pf-name-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  #pf-name {
+    flex: 1;
+    min-width: 0;
+  }
+  #pf-pvp {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    --color-danger: var(--color-hostile-rim);
+    white-space: nowrap;
   }
   /* The bordered plaque keeps the .ui-ribbon inset on the PORTRAIT side (30px:
      the medallion overlaps the bar stack by 18px and its joint seal reaches
@@ -4720,6 +4786,29 @@
   }
   body.show-actionbar3 #swingbar-offhand {
     bottom: 272px;
+  }
+  /* Target Auras Below the Frame lifts the stock target seat by one strip
+     row (--target-aura-band-lift, set above with the seat), which would park
+     the frame on these centred timers. They rise by the same step so every
+     stock layout keeps the clearance it had. A moved bar keeps its inline
+     position; the var is unset (0) with the setting off and on touch. */
+  body.target-auras-below-frame:not(.mobile-touch) #castbar {
+    bottom: calc(260px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame:not(.mobile-touch) #swingbar {
+    bottom: calc(234px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame:not(.mobile-touch) #swingbar-offhand {
+    bottom: calc(220px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame.show-actionbar3:not(.mobile-touch) #castbar {
+    bottom: calc(312px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame.show-actionbar3:not(.mobile-touch) #swingbar {
+    bottom: calc(286px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame.show-actionbar3:not(.mobile-touch) #swingbar-offhand {
+    bottom: calc(272px + var(--target-aura-band-lift));
   }
 
   #actionbar,
@@ -8460,6 +8549,39 @@
     display: inline-block;
     line-height: 0;
   }
+  #minimap-disc.pvp-risk::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border: 3px solid var(--color-hostile);
+    border-radius: 50%;
+    box-shadow: 0 0 12px 3px var(--color-hostile-rim);
+    pointer-events: none;
+    animation: minimap-pvp-risk 1.4s ease-in-out infinite alternate;
+  }
+  @keyframes minimap-pvp-risk {
+    from {
+      opacity: 0.6;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #minimap-disc.pvp-risk::after {
+      animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    #minimap-disc.pvp-risk::after {
+      border-color: Highlight;
+      animation: none;
+    }
+    #pf-pvp {
+      color: CanvasText;
+      border-color: CanvasText;
+    }
+  }
   /* The board's conic-bronze bezel, painted BEHIND the canvas and outside the
      disc's own layout box (inset -6px, z-index -1), so the canvas covers the
      centre and only the outer band reads as a ring: the four guarded rim seats
@@ -8533,6 +8655,60 @@
     color: var(--gold);
     border-color: var(--gold-dim);
     box-shadow: var(--glow-gold-soft), var(--edge-glint);
+  }
+  /* instance-difficulty badge: satellite indicator on the minimap cluster
+     (top-left rim, classic WoW instance difficulty indicator placement). Visible
+     only while inside a dungeon or raid instance. Normal shows the dungeon
+     arch gate; Heroic lights up as a golden skull with gold border and glow. */
+  #instance-difficulty {
+    position: absolute;
+    left: 8px;
+    top: 35px;
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: default;
+    color: var(--color-text-muted);
+    border-color: var(--color-control-border);
+    background: radial-gradient(
+      circle at 45% 35%,
+      var(--color-socket-hi) 0%,
+      var(--color-instance-difficulty-mid) 70%,
+      var(--color-ink-deep) 100%
+    );
+    background-color: var(--color-instance-difficulty-bg);
+    box-shadow: var(--shadow-instance-difficulty), var(--edge-glint);
+  }
+  #instance-difficulty[hidden] {
+    display: none;
+  }
+  #instance-difficulty svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+  #instance-difficulty.heroic {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    box-shadow: var(--glow-gold-soft), var(--shadow-instance-difficulty), var(--edge-glint);
+  }
+  #instance-difficulty.normal {
+    color: var(--color-text-light);
+    border-color: var(--color-control-border);
+    box-shadow: var(--shadow-instance-difficulty), var(--edge-glint);
+  }
+  #instance-difficulty:hover,
+  #instance-difficulty:focus-visible {
+    border-color: var(--gold);
+  }
+  #instance-difficulty:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   /* The store chest occupies a normal menu slot, including compact mode. */
   #daily-rewards-button {
@@ -9131,8 +9307,10 @@
     padding-top: 5px;
     border-top: 1px solid #3a3526;
   }
-  /* item comparison block (hover an equippable item to see the worn one + deltas) */
-  #tooltip .tt-cmp {
+  /* item comparison block (hover an equippable item to see the worn one + deltas),
+     and the crafted product card a recipe pattern embeds under its teaches line */
+  #tooltip .tt-cmp,
+  #tooltip .tt-recipe-product {
     margin-top: 6px;
     padding-top: 5px;
     border-top: 1px solid #3a3526;
@@ -9292,6 +9470,198 @@
   }
   .fct-self-note {
     color: var(--color-fct-self-note);
+  }
+  /* Vivid combat text, the default look (Interface > Combat > Classic Combat Text turns
+     it off: the painter then adds none of these classes, so every rule above renders
+     byte-identical to the shipped floater). What it borrows, and why:
+       - ability damage in a saturated gold beside the white auto-attacks, so the two
+         separate at a glance (the shipped pale parchment read as grey);
+       - a heavier keyline, so a number holds its colour on a grey scene;
+       - a hold-then-fade that keeps the number fully opaque for over half its life
+         (the plain rise fades from the first frame, which is what read as grey);
+       - outgoing numbers dealt into four lanes (near / far, alternating sides) that
+         arc out and up, so a burst fans out instead of stacking in one column;
+       - a louder crit that pops in the free centre column as the headline number
+         (overshoot pop, a small twist, a glow in the hit's own colour);
+       - a big-hit flag for a hit well above your own running average (fct_emphasis_core).
+     Presentation only: every number still shows on every tier; the low tier sheds only
+     the crit pop (a vivid crit falls back to the hold-then-fade rise, never the plain
+     fade-from-frame-one rise) and fits the animations to its shorter floater life. */
+  .fct.fct-vivid {
+    text-shadow: var(--fct-vivid-outline);
+  }
+  .fct.fct-vivid.fct-damage-done-ability {
+    color: var(--color-fct-vivid-ability);
+  }
+  .fct.fct-out-l,
+  .fct.fct-out-r,
+  .fct.fct-out-ll,
+  .fct.fct-out-rr {
+    font-size: calc(19px * var(--fct-scale, 1));
+    animation-duration: 1.25s;
+  }
+  .fct.fct-out-l {
+    animation-name: fct-out-l;
+  }
+  .fct.fct-out-r {
+    animation-name: fct-out-r;
+  }
+  .fct.fct-out-ll {
+    animation-name: fct-out-ll;
+  }
+  .fct.fct-out-rr {
+    animation-name: fct-out-rr;
+  }
+  /* A crit (in any lane, or incoming) pops in place. Declared after the lanes so the
+     equal-specificity lane rules above never pull a crit off centre stage. */
+  .fct.fct-vivid.crit {
+    font-size: calc(30px * var(--fct-scale, 1));
+    text-shadow: var(--glow-fct-crit);
+    animation-name: fct-vivid-crit;
+    animation-duration: 1.25s;
+  }
+  .fct.fct-big {
+    font-size: calc(23px * var(--fct-scale, 1));
+    text-shadow: var(--glow-fct-big);
+  }
+  .fct.fct-big.crit {
+    font-size: calc(35px * var(--fct-scale, 1));
+    text-shadow: var(--glow-fct-big-crit);
+  }
+  /* Incoming damage keeps its straight rise over the player, but with the same
+     hold-then-fade, so the hit you just took does not wash out before you read it. */
+  .fct.fct-vivid.fct-damage-taken:not(.crit),
+  .fct.fct-vivid.fct-damage-taken-block:not(.crit) {
+    animation-name: fct-vivid-rise;
+    animation-duration: 1.25s;
+  }
+  /* Low tier: shed the pop (and the twist) exactly as the classic crit does, but keep
+     the hold-then-fade, so a low-tier crit is not the one number that goes grey. This
+     outranks both the vivid crit above and the shipped low-tier crit shed. */
+  :root[data-fx-level="low"] .fct.fct-vivid.crit {
+    animation-name: fct-vivid-rise;
+  }
+  /* The low tier also recycles every floater sooner (FCT_TTL_MS x FCT_TTL_SCALE_LOW =
+     0.75s, src/game/ui_tier_knobs.ts). A vivid animation holds full opacity until 60%, so
+     at its 1.25s length the node would be removed at full opacity the instant its fade
+     began; compressing the vivid animations to the low TTL keeps the fade on screen. XP,
+     heals and every classic floater keep their own durations. */
+  :root[data-fx-level="low"]
+    .fct.fct-vivid:is(
+      .fct-out-l,
+      .fct-out-r,
+      .fct-out-ll,
+      .fct-out-rr,
+      .crit,
+      .fct-damage-taken,
+      .fct-damage-taken-block
+    ) {
+    animation-duration: 0.75s;
+  }
+  /* Static keyframes per lane (never a var() inside keyframes, so the rise stays on the
+     compositor). Each number bows out sideways first and then climbs, an arc rather
+     than a straight diagonal, and holds full opacity until 60% before fading. */
+  @keyframes fct-out-l {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 30px) calc(-50% - 24px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 46px) calc(-50% - 84px);
+    }
+  }
+  @keyframes fct-out-r {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% + 30px) calc(-50% - 24px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% + 46px) calc(-50% - 84px);
+    }
+  }
+  @keyframes fct-out-ll {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 62px) calc(-50% - 16px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 88px) calc(-50% - 70px);
+    }
+  }
+  @keyframes fct-out-rr {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% + 62px) calc(-50% - 16px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% + 88px) calc(-50% - 70px);
+    }
+  }
+  @keyframes fct-vivid-rise {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 80px);
+    }
+  }
+  @keyframes fct-vivid-crit {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 0.6;
+      rotate: -8deg;
+    }
+    12% {
+      scale: 1.7;
+      rotate: 4deg;
+    }
+    26% {
+      scale: 1;
+      rotate: 0deg;
+    }
+    65% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 86px);
+      scale: 1;
+      rotate: 0deg;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .fct {
@@ -13473,12 +13843,17 @@
   }
   .cdm-btn {
     flex: none;
+    pointer-events: auto;
     opacity: var(--cdm-idle-opacity, 0.55);
     transition: opacity 0.16s ease;
   }
   .cdm-btn.is-ready,
   .cdm-btn.is-proc {
     opacity: 1;
+  }
+  /* Touch camera gestures pass through readouts outside placement mode. */
+  body.mobile-touch #cooldown-manager:not(.placement) .cdm-btn {
+    pointer-events: none;
   }
   /* A transformed button (Gorebite armed as Redharvest) or a class proc pulses
      with the action bar's own proc rim. Actionable: never tier-gated; only the
@@ -15260,6 +15635,44 @@
   .ferry-hud-hint {
     font-size: 12px;
     color: var(--color-text-secondary);
+  }
+  /* ---------- graphics restore note ---------- */
+  /* The status line over the 3D view while a WebGL context restore holds the
+     world draw (src/ui/graphics_restore_note_controller.ts). Composes
+     .ui-pill; this section sets geometry only. Centred: the view under it is
+     blank for the whole hold, so it hides nothing. The fade waits a beat, so
+     a hold of a few frames does not flash it. */
+  .graphics-restore-note {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 30;
+    white-space: nowrap;
+    animation: graphics-restore-note-in 200ms ease-out 250ms both;
+  }
+  .graphics-restore-note[hidden] {
+    display: none;
+  }
+  @keyframes graphics-restore-note-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  /* Reduced motion drops the fade, never the delay: a hold of a few frames
+     still must not flash the note. Hide Interface (Alt+Z) hides it with the
+     rest of #ui on purpose: the player asked for no chrome. */
+  @media (prefers-reduced-motion: reduce) {
+    .graphics-restore-note {
+      animation-duration: 0s;
+    }
+  }
+  body.reduce-motion .graphics-restore-note {
+    animation-duration: 0s;
   }
   /* ---------- Hide Interface (Alt+Z, interface_visibility_core.ts) ---------- */
   /* One body class hides every HUD surface for a clean screenshot or video:

@@ -1267,4 +1267,8 @@ export const table: DeedLocaleTable = {
     name: 'Colto con le mani nel sacco',
     desc: "Cattura uno Scansafatiche Coinsack in un Tesoro Sepolto prima che scappi con l'oro.",
   },
+  exp_wisp_maze_hard: {
+    name: 'Piu luminosa delle ombre',
+    desc: 'Recupera i borselli rubati e fuggi dal labirinto di Evergarden in modalita Hard.',
+  },
 };

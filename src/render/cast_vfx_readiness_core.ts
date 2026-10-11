@@ -144,6 +144,11 @@ export interface CastVfxReadiness {
   /** Diagnostics: never starts a clock, so a readout taken at construction
    *  does not shorten the deadline. */
   snapshot(): CastVfxReadinessSnapshot;
+  /** The context the families' programs were proved on is gone (a WebGL
+   *  context restore): every family closes again and its deadline clock
+   *  restarts at its next consult. A declined family stays declined: that is
+   *  a device decision, not a proof. The counters are kept. */
+  reset(): void;
 }
 
 interface FamilyState<M> {
@@ -250,6 +255,15 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
         break;
       }
       return false;
+    },
+    reset: () => {
+      readyBits = 0;
+      refreshedAt = Number.NaN;
+      for (const family of families) {
+        family.firstConsultAt = null;
+        family.pending = null;
+        family.forced = false;
+      }
     },
     snapshot: () => {
       refresh(0, true);

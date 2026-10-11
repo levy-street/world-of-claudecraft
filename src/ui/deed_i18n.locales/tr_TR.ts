@@ -1197,4 +1197,8 @@ export const table: DeedLocaleTable = {
     name: 'Suçüstü Yakalandı',
     desc: 'Bir Para Kesesi Fasulyesini Gömülü Hazineden kaçmadan önce yakala.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Golgelerden Daha Parlak',
+    desc: 'Calinan para keselerini geri al ve Evergarden labirentinden Hard zorlugunda kac.',
+  },
 };

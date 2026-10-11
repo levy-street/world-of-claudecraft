@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import { type BackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import * as characters from '../src/render/characters';
 import {
   buildFarmPatchProps,
@@ -14,6 +14,7 @@ import {
 } from '../src/render/prewarm_depth_material';
 import { pieceMaterialsOf } from '../src/render/program_variant_settle';
 import { type EntityView, Renderer } from '../src/render/renderer';
+import { TextureResidencyLedger } from '../src/render/texture_residency_ledger';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { Entity } from '../src/sim/types';
 
@@ -54,6 +55,12 @@ function harness(): CompileGateHarness & Record<string, unknown> {
   renderer.shutdownStarted = false;
   // the shadow arm's depth-twin cache, read by every gate piece's variant settle
   renderer.prewarmDepthMaterials = new Map();
+  // the texture prep lane joins the ledger's chunked uploads in flight
+  renderer.textureResidency = new TextureResidencyLedger({
+    webgl: () => renderer.webgl as THREE.WebGLRenderer,
+    queue: { run: (...args) => (renderer.backgroundGpuWork as BackgroundGpuQueue).run(...args) },
+    idleSlot: () => Promise.resolve(),
+  });
   return renderer;
 }
 
@@ -981,13 +988,14 @@ describe('the far-bake compile gate handed to character visuals', () => {
     // ...and one crowd bake links at a time: the gate is enqueued on the
     // renderer's SerialGateLane. The settle hands the caller a LAZY proof
     // thunk instead of an eagerly computed boolean, so a crowd bake whose
-    // settle callback ignores it (every consumer but the sanguine weapon
-    // sheath) never pays compileTargetPrepared's target traverse.
+    // settle callback ignores it never pays compileTargetPrepared's target
+    // traverse; a host without parallel compile hands no proof at all
+    // (compileProof, pinned in tests/sanguine_weapon_sheath.test.ts).
     expect(rendererSource).toContain(
       'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
         '    this.farBakeLane.enqueue(\n' +
         '      (settled) => this.gateSwapFlagOnCompile(target, settled),\n' +
-        '      () => onSettled(() => compileTargetPrepared(this.webgl.properties, target)),\n' +
+        '      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl, target)),\n' +
         '    );',
     );
     expect(rendererSource).toContain('private readonly farBakeLane = new SerialGateLane();');

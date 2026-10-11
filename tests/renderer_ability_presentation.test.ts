@@ -19,17 +19,57 @@ vi.mock('../src/render/assets/preload', () => ({
   registerDeferredPreload: vi.fn(),
 }));
 
-import { CAST_VFX_ENGINE, CAST_VFX_KIT } from '../src/render/cast_vfx_family';
+import {
+  abilityVfxFamilyMaterials,
+  collectAbilityVfxCompileTargets,
+} from '../src/render/ability_vfx/prewarm';
+import {
+  CAST_VFX_ENGINE,
+  CAST_VFX_FAMILIES,
+  CAST_VFX_KIT,
+  CAST_VFX_RELIC,
+  castVfxFamilyBitOf,
+} from '../src/render/cast_vfx_family';
+import { drawProgramSignature } from '../src/render/draw_program_signature_core';
 import type { EntityView } from '../src/render/renderer';
 import { createRendererAbilityPresentation } from '../src/render/renderer_ability_presentation';
 import type { Vfx } from '../src/render/vfx';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
+import { buildCastVfxBasicStandIns } from '../src/render/vfx_basic_materials';
+import { TRINKET_AURA } from '../src/sim/content/trinkets';
 import type { IWorld } from '../src/world_api';
 import { installCastVfxCanvasStub } from './helpers/cast_vfx_headless';
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
+
+/** A player wearing the Kindling Orb and standing in their Last Flame Lantern. */
+const WEARER = {
+  id: 4,
+  kind: 'player',
+  templateId: 'priest',
+  facing: 0,
+  dead: false,
+  auras: [
+    {
+      id: TRINKET_AURA.kindlingOrb,
+      kind: 'internal_cd',
+      remaining: 15,
+      duration: 20,
+      value: 0,
+    },
+    {
+      id: TRINKET_AURA.lantern,
+      kind: 'internal_cd',
+      remaining: 10,
+      duration: 12,
+      value: 0.3,
+      value2: 8,
+      value3: 0,
+    },
+  ],
+};
 
 function presentation(open: number) {
   installCastVfxCanvasStub();
@@ -52,10 +92,11 @@ function presentation(open: number) {
       return (bit & open) !== 0;
     },
   };
-  const entities = new Map([
+  const entities = new Map<number, object>([
     [1, { id: 1, kind: 'player', templateId: 'mage', facing: 0 }],
     [2, { id: 2, kind: 'mob', templateId: 'wolf', facing: 0 }],
     [3, { id: 3, kind: 'player', templateId: 'warrior', facing: 0 }],
+    [WEARER.id, WEARER],
   ]);
   const world = {
     entities,
@@ -74,14 +115,21 @@ function presentation(open: number) {
     return true;
   });
   const vfx = new Proxy({}, { get: () => () => {} }) as unknown as Vfx;
+  const scene = new THREE.Scene();
+  // Added before the presentation, as the renderer does: untagged pools the
+  // warm-up links after the gated families.
+  scene.add(buildCastVfxBasicStandIns());
+  const views = new Map<number, EntityView>([
+    [WEARER.id, { group: new THREE.Group() } as unknown as EntityView],
+  ]);
   const { fx, painter } = createRendererAbilityPresentation({
-    scene: new THREE.Scene(),
+    scene,
     camera,
     vfx,
     anchor,
     world: () => world,
     time: () => 0,
-    views: new Map<number, EntityView>(),
+    views,
     visual: () => null,
     textureReady: () => true,
     ground: () => 0,
@@ -102,7 +150,20 @@ function presentation(open: number) {
       screenImpact: () => {},
     },
   });
-  return { fx, painter, gate };
+  return { fx, painter, gate, scene };
+}
+
+/** Every drawable the trinket relics built, and which of them show now. */
+function relics(scene: THREE.Scene) {
+  const root = scene.getObjectByName('trinket-relics') as THREE.Object3D;
+  const drawables: THREE.Mesh[] = [];
+  root.traverse((object) => {
+    if ((object as THREE.Mesh).material) drawables.push(object as THREE.Mesh);
+  });
+  const shown = (name?: string) =>
+    root.children.filter((child) => child.visible && (name ? child.name === name : !child.name))
+      .length;
+  return { drawables, cosmetic: () => shown(), lights: () => shown('lantern-light') };
 }
 
 describe('the ability presentation the renderer builds', () => {
@@ -160,6 +221,73 @@ describe('the ability presentation the renderer builds', () => {
     // A pool reached directly still asks the same gate and is refused.
     fx.ringAt(0, 0, 0, 4, 1, 0xffffff, 1, false);
     expect(gate.spawns).toEqual([CAST_VFX_ENGINE]);
+  });
+});
+
+describe('the Crucible trinket relics the presentation builds', () => {
+  const ALL = CAST_VFX_FAMILIES.reduce((mask, family) => mask | family.bit, 0);
+
+  it('shows the relics on the ready bit of the family their programs are linked in', () => {
+    const closed = presentation(0);
+    const bits = new Set(relics(closed.scene).drawables.map(castVfxFamilyBitOf));
+    expect(bits.size).toBe(1);
+    const [bit] = bits;
+    expect(bit).not.toBe(0);
+    const held = presentation(ALL & ~bit);
+    held.painter.update(0.2);
+    expect(relics(held.scene).cosmetic()).toBe(0);
+    const open = presentation(bit);
+    open.painter.update(0.2);
+    expect(relics(open.scene).cosmetic()).toBe(2);
+    // Their own family: no cast waits on the relics, and they wait on no cast family.
+    expect(CAST_VFX_FAMILIES.map((family) => [family.id, family.bit])).toEqual([
+      ['engine', 1],
+      ['kit', 2],
+      ['relic', 4],
+    ]);
+    expect(bit).toBe(CAST_VFX_RELIC);
+    expect(open.gate.ready).toContain(CAST_VFX_RELIC);
+  });
+
+  it('gates every relic program on that family, one program per material', () => {
+    const { scene } = presentation(0);
+    const listed = abilityVfxFamilyMaterials(scene).get('relic') ?? [];
+    const bySignature = new Map<string, Set<THREE.Material>>();
+    const byMaterial = new Map<THREE.Material, Set<string>>();
+    for (const drawable of relics(scene).drawables) {
+      const material = drawable.material as THREE.Material;
+      const signature = drawProgramSignature(drawable, material);
+      bySignature.set(signature, (bySignature.get(signature) ?? new Set()).add(material));
+      byMaterial.set(material, (byMaterial.get(material) ?? new Set()).add(signature));
+    }
+    expect(bySignature.size).toBeGreaterThan(0);
+    for (const materials of bySignature.values()) {
+      expect([...materials].some((material) => listed.includes(material))).toBe(true);
+    }
+    for (const signatures of byMaterial.values()) expect(signatures.size).toBe(1);
+    // Linked with the gated families, ahead of every untagged pool, never in their tail.
+    const drawn = new Set<THREE.Object3D>(relics(scene).drawables);
+    const targets = collectAbilityVfxCompileTargets(scene);
+    const relicAt = targets.flatMap((target, i) => (drawn.has(target.object) ? [i] : []));
+    const untaggedAt = targets.flatMap((target, i) =>
+      castVfxFamilyBitOf(target.object) === 0 ? [i] : [],
+    );
+    expect(relicAt.length).toBe(bySignature.size);
+    expect(untaggedAt.length).toBeGreaterThan(0);
+    expect(Math.max(...relicAt)).toBeLessThan(Math.min(...untaggedAt));
+  });
+
+  it('never holds the lantern light, and hands it to the first reads with the CC band', () => {
+    const { fx, painter, scene } = presentation(0);
+    painter.update(0.2);
+    expect(relics(scene).lights()).toBe(1);
+    expect(relics(scene).cosmetic()).toBe(0);
+    const [band, lantern, ...rest] = painter.firstReadDrawables();
+    expect(band).toBe(fx.ccBandDrawable());
+    expect(rest).toEqual([]);
+    expect(lantern.name).toBe('lantern-light');
+    expect(relics(scene).drawables).toContain(lantern);
+    expect(lantern.visible).toBe(true);
   });
 });
 

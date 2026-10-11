@@ -109,7 +109,11 @@ const FERAL_LOADOUT = {
 const LIVE_MOB_MEASURED = {
   moongrove: { damage: 5956, incomingDamage: 212, threat: 5957, payoffs: 7 },
   wildfang: { damage: 5315, incomingDamage: 201, threat: 6228.5225, payoffs: 8 },
-  bruin: { damage: 3082, incomingDamage: 131, threat: 10651.925, payoffs: 4 },
+  // Re-measured for the Groveheart rework pass 2 Bruin cadence: twice the swings
+  // at half the damage each and double white-swing rage. White damage is
+  // unchanged; the extra rage buys more Bonecrush and Marrowbreak (was 3082
+  // damage, 131 incoming, 10651.925 threat, 4 payoffs).
+  bruin: { damage: 3467, incomingDamage: 151, threat: 12282.66125, payoffs: 6 },
 } as const;
 const BRUIN_TANK_MEASURED = {
   wolfIncomingDamage: 220,

@@ -9,6 +9,7 @@ import { formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
 import { WeeklyRewardClaimController } from './weekly_reward_claim_controller';
 import { appendWeeklyLootCategory } from './weekly_reward_loot_catalog_controller';
+import { appendWeeklyLootFocus } from './weekly_reward_loot_focus_controller';
 import { buildWeeklyRewardsView, weeklyCountdown } from './weekly_rewards_view';
 
 export const WEEKLY_TAB_ID = 'weekly-rewards-tab';
@@ -131,10 +132,6 @@ export class WeeklyRewardsTab {
       if (allPools.hidden) this.expanded.delete('all-loot');
       else this.expanded.add('all-loot');
     });
-    const toolbar = document.createElement('div');
-    toolbar.className = 'weekly-vault-toolbar';
-    toolbar.appendChild(lootButton);
-    panel.append(toolbar, allPools);
     const status = document.createElement('p');
     status.className = 'weekly-choice-status';
     status.tabIndex = -1;
@@ -144,7 +141,12 @@ export class WeeklyRewardsTab {
       info.readyWeeks ? 'hudChrome.weeklyRewards.readyWeeks' : 'hudChrome.weeklyRewards.waiting',
       { count: formatNumber(info.readyWeeks) },
     );
-    panel.appendChild(status);
+    const toolbar = document.createElement('div');
+    toolbar.className = 'weekly-vault-toolbar';
+    toolbar.appendChild(status);
+    appendWeeklyLootFocus(toolbar, world);
+    toolbar.appendChild(lootButton);
+    panel.append(toolbar, allPools);
     if (info.state.overflowed || info.readyWeeks >= WEEKLY_BACKLOG_LIMIT) {
       const warning = document.createElement('p');
       warning.textContent = t('hudChrome.weeklyRewards.backlogFull');
@@ -168,15 +170,17 @@ export class WeeklyRewardsTab {
             heroicRemaining,
           }) => {
             const art = earned ? (difficulty === 'heroic' ? 'heroic' : 'normal') : 'closed';
+            // The PvP row counts King of the Hill holds as well as rated wins.
+            const task = row.category === 'pvp' ? 'pvpWin' : row.category;
             const label = !row.available
               ? t('hudChrome.weeklyRewards.unavailable')
               : earned
                 ? t(
-                    `hudChrome.weeklyRewards.completedTask.${row.category}${threshold === 1 ? 'One' : 'Many'}`,
+                    `hudChrome.weeklyRewards.completedTask.${task}${threshold === 1 ? 'One' : 'Many'}`,
                     { count: formatNumber(threshold) },
                   )
                 : t(
-                    `hudChrome.weeklyRewards.requiredTask.${row.category}${threshold === 1 ? 'One' : 'Many'}`,
+                    `hudChrome.weeklyRewards.requiredTask.${task}${threshold === 1 ? 'One' : 'Many'}`,
                     {
                       count: formatNumber(threshold),
                     },

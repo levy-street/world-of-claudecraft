@@ -30,7 +30,7 @@ import {
 } from './data';
 import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockSurfaceHeight, onHarborPlanks } from './deck_surfaces';
-import { isExcludedDecoration } from './decoration_exclusions';
+import { isCuratedGardenScatter, isExcludedDecoration } from './decoration_exclusions';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
 import { applyEastbrookVaultPad } from './eastbrook_vault_terrain';
@@ -1212,7 +1212,7 @@ const GARDEN_LAND_LOBES = [
 // the pad-flattening loop in terrainHeight so no bed sinks into a slope.
 // Every satellite ANCHORS to its parent square bed (ax, az), so a whole
 // ensemble levels to one shared terrace height and overlapping pads never
-// fight. The render plan (garden_parterre_core PARTERRE_PLOTS) and the
+// fight. The plot table (garden_parterre_plots PARTERRE_PLOTS) and the
 // collide decor entries (content/evergarden decorProps) carry the SAME
 // sites; the parterre test pins all three against each other.
 export interface GardenBedPad {
@@ -5051,7 +5051,7 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * DECORATION_STEP;
   const x = gx + ox,
     z = gz + oz;
-  if (isExcludedDecoration(x, z)) return null;
+  if (isExcludedDecoration(x, z) || isCuratedGardenScatter(kind, x, z, zoneBiomeAt)) return null;
   // The Galecrest paddock is a worked yard and race course. Keep the same
   // deterministic decoration field out of its apron so no tree becomes an
   // invisible obstacle across a jump line.

@@ -1213,4 +1213,8 @@ export const table: DeedLocaleTable = {
     name: 'Auf frischer Tat ertappt',
     desc: 'Schnap dir einen Münzsakk-Ratte in einem Begrabenen Hort, bevor er mit dem Gold entwischt.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Heller als die Schatten',
+    desc: 'Hol die gestohlenen Geldborsen zuruck und entkomme dem Evergarden-Labyrinth auf Hard.',
+  },
 };

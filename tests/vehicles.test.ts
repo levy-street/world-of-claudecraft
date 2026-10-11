@@ -173,8 +173,14 @@ describe('authoritative personal vehicles', () => {
       );
       const awarded = sim.copper;
       // Leaving during endless play ends the session with no second reward and
-      // no retry lockout; a fresh entry starts a fresh authored defense.
-      if (sim.vehicleSession) sim.leaveVehicle();
+      // no retry lockout; a fresh entry starts a fresh authored defense. The
+      // endless run's result and ladder row post once on the way out.
+      if (sim.vehicleSession) {
+        sim.leaveVehicle();
+        const left = sim.tick();
+        expect(left.filter((e) => e.type === 'cannonResult')).toHaveLength(1);
+        expect(left.filter((e) => e.type === 'worldQuestScore')).toHaveLength(1);
+      }
       expect(sim.vehicleSession).toBeNull();
       expect(meta.vehicleRetryAtTick ?? 0).toBeLessThanOrEqual(sim.ctx.tickCount);
       expect(sim.enterVehicle(station.id)).toBe(true);
@@ -226,5 +232,26 @@ describe('authoritative personal vehicles', () => {
     expect(save).not.toHaveProperty('vehicle');
     expect(save).not.toHaveProperty('vehicleRetryAtTick');
     expect(JSON.stringify(save)).not.toContain('slowUntilTick');
+  });
+
+  it('opens the station for a cannon quest rerolled onto the board', () => {
+    // wq1_102 offers the Drakelands raiders; the cannon arrives as the reroll.
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'mage' });
+    const player = sim.player;
+    const meta = sim.meta(player.id)!;
+    sim.setPlayerLevel(WORLD_QUESTS_BY_ID[NORTH_WATCH_CANNON.questId].minLevel);
+    meta.devWorldQuestCycle = 'wq1_102';
+    sim.tick();
+    meta.worldQuestReplacements = { wq_drakelands_raiders: NORTH_WATCH_CANNON.questId };
+    player.pos = {
+      x: NORTH_WATCH_CANNON.x,
+      z: NORTH_WATCH_CANNON.z + 2,
+      y: terrainHeight(NORTH_WATCH_CANNON.x, NORTH_WATCH_CANNON.z + 2, WORLD_SEED),
+    };
+    player.prevPos = { ...player.pos };
+    sim.tick();
+    expect(meta.worldQuestLog.get(NORTH_WATCH_CANNON.questId)?.state).toBe('active');
+    expect(sim.entities.has(NORTH_WATCH_CANNON.entityId)).toBe(true);
+    expect(sim.enterVehicle(NORTH_WATCH_CANNON.id)).toBe(true);
   });
 });

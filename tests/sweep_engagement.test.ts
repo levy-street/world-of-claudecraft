@@ -16,7 +16,7 @@ import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The row sweep used to walk every class to melee reach, which put the hunter inside
-// the 8 yard dead zone its whole ranged kit refuses to fire from, so the sweep
+// the dead zone its ranged kit refuses to fire from (8 yards then), so the sweep
 // measured a hunter as a bad melee class. These pin the standoff rule that replaced
 // it, including the deliberate no-op for every class that has no dead zone.
 
@@ -24,6 +24,20 @@ const TICKS_PER_SECOND = 20;
 const APPROACH_SPEED = 7;
 
 describe('engagementDistance', () => {
+  it('stands outside a non-wand ranged auto-attack dead zone even past every ability floor', () => {
+    // The hunter shape: shots with a 4 yard minimum, Auto Shot with an 8 yard one.
+    expect(engagementDistance([{ minRange: 4, range: 35 }], { maxRange: 35, minRange: 8 })).toBe(
+      8 + DEAD_ZONE_MARGIN,
+    );
+    expect(engagementDistance([{ range: 30 }], { maxRange: 35, minRange: 8 })).toBe(
+      8 + DEAD_ZONE_MARGIN,
+    );
+    // A wand fires at any range, so its authored minimum is ignored.
+    expect(engagementDistance([{ range: 30 }], { maxRange: 30, minRange: 8, wand: true })).toBe(
+      MELEE_REACH,
+    );
+  });
+
   it('holds melee reach when nothing in the kit has a minimum range', () => {
     expect(engagementDistance([{ range: 30 }, { range: 0 }], { maxRange: 30 })).toBe(MELEE_REACH);
   });
@@ -99,9 +113,10 @@ describe('engagementDistance against the kits the sweep actually runs', () => {
     engagementDistance(sweptKit(cls, rows), CLASSES[cls].ranged);
 
   it('stations the hunter outside its dead zone', () => {
+    // Shots and Auto Shot both refuse inside 4 yards since the v0.45 hunter pass.
     const stand = standoff('hunter');
-    expect(stand).toBeGreaterThan(8);
-    expect(stand).toBe(10);
+    expect(stand).toBeGreaterThan(CLASSES.hunter.ranged?.minRange ?? 0);
+    expect(stand).toBe(4 + DEAD_ZONE_MARGIN);
     expect(stand).toBeLessThanOrEqual(CLASSES.hunter.ranged?.maxRange ?? 35);
   });
 

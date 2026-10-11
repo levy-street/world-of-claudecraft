@@ -1086,4 +1086,29 @@ describe('extracted heal audio ownership', () => {
     >;
     expect(healAudioPlan(ev)).toEqual(audible ? { cue: 'heal_impact', gain: 1 } : null);
   });
+
+  // A periodic tick on a full-health target heals nothing and arrives as amount 0
+  // with only overheal. Frenzied Regeneration's tick-sound exemption must not turn
+  // that into a heal sound every tick while the bear sits at full health; a tick a
+  // heal-absorb shield ate (absorbed, amount 0) keeps its established sound.
+  it('keeps a fully overhealed Frenzied Regeneration tick silent', () => {
+    const tick = (extra: object) =>
+      ({
+        type: 'heal2',
+        targetId: 1,
+        sourceId: 1,
+        abilityId: 'frenzied_regeneration',
+        hot: true,
+        ...extra,
+      }) as Extract<SimEvent, { type: 'heal2' }>;
+    expect(healAudioPlan(tick({ amount: 0, overheal: 40 }))).toBeNull();
+    expect(healAudioPlan(tick({ amount: 0, absorbed: 40 }))).toEqual({
+      cue: 'heal_impact',
+      gain: 1,
+    });
+    expect(healAudioPlan(tick({ amount: 10, overheal: 30 }))).toEqual({
+      cue: 'heal_impact',
+      gain: 1,
+    });
+  });
 });

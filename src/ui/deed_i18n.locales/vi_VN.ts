@@ -1252,4 +1252,8 @@ export const table: DeedLocaleTable = {
     name: 'Bắt Quả Tang',
     desc: 'Bắt được một Chuột Chạy Túi Tiền trong một Kho Báu Bị Chôn trước khi nó trốn thoát với vàng.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Sang hon bong toi',
+    desc: 'Thu hoi cac tui tien bi danh cap va thoat khoi me cung Evergarden o do kho Hard.',
+  },
 };

@@ -1,3 +1,4 @@
+import type { PendingDifficultyChange } from './instances/difficulty_selection';
 // SimContext: the shared seam every extracted game-system module talks to instead
 // of reaching into the 17.5k-line `Sim` monolith.
 //
@@ -13,6 +14,7 @@
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { AccountCosmetics } from '../world_api';
+import type { Collider } from './colliders';
 import type { FrozenOrbState } from './combat/frozen_orb';
 import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
@@ -196,6 +198,8 @@ export interface SimContextPrimitives {
   // reads/finds/iterates it and mutates slot fields in place; the array identity
   // stays Sim-owned (like delayedEvents/groundAoEs), so this is a live read-only view.
   readonly instances: InstanceSlot[];
+  // Session-only leader requests, one per initiating player, cleared on departure.
+  readonly pendingDifficultyChanges: Map<number, PendingDifficultyChange>;
   // Session-only manual-reset cooldowns keyed by durable character identity and
   // dungeon id. Unlike party instance keys, these survive relogs and party reforming.
   readonly dungeonResetLocks: Map<string, { availableAt: number; claimId: number }>;
@@ -450,9 +454,9 @@ export interface SimContextCallbacks {
   // (N1, the delve slice, quest spawns, the interaction dispatchers) reaches them
   // through the seam; implemented in instances/dungeons, Sim keeps thin delegates so
   // existing `this.enterDungeon` etc. call sites resolve unchanged.
-  // dungeonDifficulty/setDungeonDifficulty are the heroic-selection commands: the
-  // body-stays-on-Sim kind (party/meta state lives on Sim), exposed so the chat
-  // slash command and instances/dungeons reach them through the seam.
+  // dungeonDifficulty reads the live preference; setDungeonDifficulty is owned by
+  // instances/difficulty_selection. The chat command and instance modules reach
+  // both through the seam.
   // awardHeroicMarks is owned by instances/dungeons: the C1 death hub calls it
   // once per death to settle a heroic final boss's direct participant rewards
   // and whole-claim realm-reset lockout together (no rng draws).
@@ -483,6 +487,9 @@ export interface SimContextCallbacks {
     portal?: Entity,
   ): void;
   leaveRift(pid?: number): void;
+  /** Tell the client a member is being moved off the rift floor at `from` by a
+   *  non-exit teleport (spirit release, /unstuck); spirit.ts cannot import rift/runs. */
+  emitRiftDeparture(pid: number, from: Vec3): void;
   /** Open an off-path hidden rift treasure chest (interact -> loot, no lockpick). */
   riftOpenTreasure(objectId: number, pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
@@ -686,6 +693,8 @@ export interface SimContextCallbacks {
   pullTimerStart(rawCommand: string, pid?: number): void;
   pullTimerCancel(pid?: number): void;
   removeFromParty(pid: number, verb: string): void;
+  hillPartyDisband(partyId: number, survivorPid: number): void;
+  hillPartyJoin(pid: number): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
   // Dungeon Finder formation seam (owned by social/party.ts): merge solo
@@ -848,6 +857,7 @@ export interface SimContextCallbacks {
     e: Entity,
     ignoreFences?: boolean,
   ): { x: number; z: number };
+  platformFor?(entity: Entity): readonly Collider[] | null;
   // --- pet / delve-companion / boss-mechanic branches (owners: P1 / delve / M3-N1 / M5) ---
   updatePet(pet: Entity): void;
   isDelveCompanionMob(mob: Entity): boolean;
@@ -1114,7 +1124,8 @@ export interface SimContextCallbacks {
   // B1 bags (src/sim/bags.ts): the capacity pre-check every blocking command
   // path calls before granting (buy/loot/pickup/fish/conjure/collect/trade/
   // turn-in). Stays on Sim next to the addItem/removeItem/countItem hub.
-  canAddItem(itemId: string, count: number, pid?: number): boolean;
+  // Pass the granted copy's payload to include only compatible stack room.
+  canAddItem(itemId: string, count: number, pid?: number, copy?: ItemInstancePayload): boolean;
 
   // Ravenpost mail (mail/post_office.ts): the quest turn-in core
   // (quests/quest_commands.ts) queues the giver's authored thank-you letter
@@ -1330,6 +1341,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     set dungeonDoorIds(v) {
       host.dungeonDoorIds = v;
+    },
+    get pendingDifficultyChanges() {
+      return host.pendingDifficultyChanges;
     },
     get instances() {
       return host.instances;
@@ -1599,6 +1613,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     leaveDungeon: host.leaveDungeon,
     enterRift: host.enterRift,
     leaveRift: host.leaveRift,
+    emitRiftDeparture: host.emitRiftDeparture,
     riftOpenTreasure: host.riftOpenTreasure,
     resetDungeonInstances: host.resetDungeonInstances,
     inheritDungeonResetLocks: host.inheritDungeonResetLocks,
@@ -1669,6 +1684,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     pullTimerStart: host.pullTimerStart,
     pullTimerCancel: host.pullTimerCancel,
     removeFromParty: host.removeFromParty,
+    hillPartyDisband: host.hillPartyDisband,
+    hillPartyJoin: host.hillPartyJoin,
     dropPartyMarkers: host.dropPartyMarkers,
     formDungeonFinderGroup: host.formDungeonFinderGroup,
     onMobKilledForQuests: host.onMobKilledForQuests,
@@ -1724,6 +1741,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     resolveMovePoint: host.resolveMovePoint,
     resolvePlayerMove: host.resolvePlayerMove,
     resolveMove: host.resolveMove,
+    ...(host.platformFor ? { platformFor: host.platformFor } : {}),
     updatePet: host.updatePet,
     isDelveCompanionMob: host.isDelveCompanionMob,
     updateDelveCompanion: host.updateDelveCompanion,

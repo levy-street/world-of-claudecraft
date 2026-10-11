@@ -9,8 +9,8 @@
     "Old Blood landed-strike bank across Wolf and Bruin with both payoffs",
     "Verdance completed-HoT bank and Overbloom harvest"
   ],
-  "draws": 10727,
-  "drawDigest": "b73c70df",
+  "draws": 10714,
+  "drawDigest": "347f8414",
   "frames": [
     {
       "tick": 0,
@@ -31,7 +31,7 @@
       "time": 1,
       "nextId": 1014,
       "state": "def4d7f8",
-      "events": "f76ae6cd",
+      "events": "47b7424f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1836,8 +1836,8 @@
       "tick": 1020,
       "time": 51,
       "nextId": 1014,
-      "state": "46fc5f36",
-      "events": "7331d2f6",
+      "state": "fb92c2ae",
+      "events": "845ec1ba",
       "rng": {
         "draws": 8909,
         "digest": "0960cb1e"
@@ -1847,7 +1847,7 @@
       "tick": 1040,
       "time": 52,
       "nextId": 1014,
-      "state": "a8068b73",
+      "state": "eca3fa3b",
       "events": "52610379",
       "rng": {
         "draws": 9099,
@@ -1858,7 +1858,7 @@
       "tick": 1060,
       "time": 53,
       "nextId": 1014,
-      "state": "a0dad211",
+      "state": "e944aedf",
       "events": "ab57bca9",
       "rng": {
         "draws": 9293,
@@ -1869,99 +1869,99 @@
       "tick": 1080,
       "time": 54,
       "nextId": 1014,
-      "state": "8f7d3088",
-      "events": "e4333285",
+      "state": "a2a5965c",
+      "events": "871efa9b",
       "rng": {
-        "draws": 9455,
-        "digest": "b6861768"
+        "draws": 9456,
+        "digest": "30b78a5f"
       }
     },
     {
       "tick": 1100,
       "time": 55,
       "nextId": 1014,
-      "state": "7a653cc7",
-      "events": "49cdb0db",
+      "state": "87adb3a5",
+      "events": "36399040",
       "rng": {
-        "draws": 9596,
-        "digest": "1a557503"
+        "draws": 9594,
+        "digest": "a2a445a9"
       }
     },
     {
       "tick": 1120,
       "time": 56,
       "nextId": 1014,
-      "state": "6deaa44c",
-      "events": "8a500c1f",
+      "state": "bda2c2d9",
+      "events": "1ab96e6b",
       "rng": {
-        "draws": 9769,
-        "digest": "90e913fb"
+        "draws": 9768,
+        "digest": "e7fb2417"
       }
     },
     {
       "tick": 1140,
       "time": 57,
       "nextId": 1014,
-      "state": "5488d685",
-      "events": "390d7b51",
+      "state": "6dd94486",
+      "events": "8fbbf693",
       "rng": {
-        "draws": 9953,
-        "digest": "f24b2c21"
+        "draws": 9947,
+        "digest": "01773f24"
       }
     },
     {
       "tick": 1160,
       "time": 58,
       "nextId": 1014,
-      "state": "7fba4622",
-      "events": "5bf0bbf7",
+      "state": "9b64622a",
+      "events": "69411459",
       "rng": {
-        "draws": 10144,
-        "digest": "456cbe85"
+        "draws": 10154,
+        "digest": "87971ceb"
       }
     },
     {
       "tick": 1180,
       "time": 59,
       "nextId": 1014,
-      "state": "ad22a41f",
-      "events": "ed572663",
+      "state": "30a6dc85",
+      "events": "b648245a",
       "rng": {
-        "draws": 10315,
-        "digest": "6b687322"
+        "draws": 10312,
+        "digest": "961e1b69"
       }
     },
     {
       "tick": 1200,
       "time": 60,
       "nextId": 1014,
-      "state": "2c704405",
-      "events": "3cc970d1",
+      "state": "10ea6171",
+      "events": "8f5678af",
       "rng": {
-        "draws": 10499,
-        "digest": "47487796"
+        "draws": 10506,
+        "digest": "33981fbe"
       }
     },
     {
       "tick": 1220,
       "time": 61,
       "nextId": 1014,
-      "state": "46cbae57",
-      "events": "5cef8f2b",
+      "state": "ac16bad0",
+      "events": "e9673cb7",
       "rng": {
-        "draws": 10694,
-        "digest": "b4582545"
+        "draws": 10677,
+        "digest": "d54d06d7"
       }
     },
     {
       "tick": 1225,
       "time": 61.25,
       "nextId": 1014,
-      "state": "96c64675",
-      "events": "a9c46f8d",
+      "state": "be0b0d53",
+      "events": "aa45c849",
       "rng": {
-        "draws": 10727,
-        "digest": "b73c70df"
+        "draws": 10714,
+        "digest": "347f8414"
       },
       "label": "groveheart-harvest",
       "players": [
@@ -2486,7 +2486,7 @@
               "duration": 12,
               "id": "rejuvenation",
               "kind": "hot",
-              "name": "Wildbloom",
+              "name": "Sporemending",
               "remaining": 11.75,
               "school": "nature",
               "sourceId": 1012,
@@ -2600,11 +2600,11 @@
       "tick": 1225,
       "time": 61.25,
       "nextId": 1014,
-      "state": "96c64675",
+      "state": "be0b0d53",
       "events": "741638a5",
       "rng": {
-        "draws": 10727,
-        "digest": "b73c70df"
+        "draws": 10714,
+        "digest": "347f8414"
       },
       "label": "final",
       "players": [
@@ -3129,7 +3129,7 @@
               "duration": 12,
               "id": "rejuvenation",
               "kind": "hot",
-              "name": "Wildbloom",
+              "name": "Sporemending",
               "remaining": 11.75,
               "school": "nature",
               "sourceId": 1012,

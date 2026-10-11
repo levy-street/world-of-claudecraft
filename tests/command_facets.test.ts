@@ -34,6 +34,10 @@ describe('command facet tags (W6)', () => {
   const dispatchOnly = new Set<string>(DISPATCH_ONLY_COMMANDS);
   const tags = COMMAND_FACETS as Readonly<Record<string, string>>;
 
+  it('tags the Weekly Vault preference to the bank facet', () => {
+    expect(tags.weekly_loot_spec).toBe('IWorldBank');
+  });
+
   it('tags only real wire tokens that exist in COMMAND_NAMES', () => {
     const orphans = Object.keys(tags)
       .filter((cmd) => !names.has(cmd))
@@ -157,8 +161,8 @@ describe('command facet tags (W8)', () => {
   });
 
   it('tags the raid markers to IWorldParty, not IWorldTargeting (the W6 exclusion)', () => {
-    expect(tags['setMarker']).toBe('IWorldParty');
-    expect(tags['clearMarker']).toBe('IWorldParty');
+    expect(tags.setMarker).toBe('IWorldParty');
+    expect(tags.clearMarker).toBe('IWorldParty');
   });
 
   it('does not tag partyInfo/markerFor (snapshot reads, no wire send)', () => {

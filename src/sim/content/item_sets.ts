@@ -94,6 +94,13 @@ export const WARFARE_CAST_DODGE = 0.15;
 export const WARFARE_CAST_DODGE_DURATION = 6;
 export const WARFARE_CAST_DODGE_CHANCE = 0.15;
 export const WARFARE_CAST_DODGE_ICD = 20;
+// The caster WARFARE families (Stormbound, Cinderweave, Thornhide) also make
+// the wearer immune to damage cast pushback at two pieces. Unlike the rating
+// tiers this is NOT PvP-gated: castPushbackReduction folds into the wearer's
+// stats in recalcPlayerStats like any stat-set knob. The Season 2 caster sets
+// carry the same rider (content/vanguard_set_bonuses.ts).
+export const PVP_CASTER_SET_2PC_PUSHBACK_REDUCTION = 1;
+export const PVP_CASTER_SET_2PC_PUSHBACK_TEXT = 'Damage taken no longer delays your spellcasting.';
 
 // Set ids. Tier-1 families drop from the Gravewyrm Sanctum; tier-2 from the
 // Nythraxis raid. The string is also the `set` tag on each member item.
@@ -338,13 +345,22 @@ const WARFARE_EMBERWARD: SetProc = {
 // applied by a player's PET is entity kind 'mob' and takes the non-hostile-pair
 // early return in Sim.diminishedCrowdControlDuration, so it is not reduced and
 // the looser wording would be false.
-function warfareBonuses(signature: SetProc, capstoneText: string): SetBonusTier[] {
+function warfareBonuses(signature: SetProc, capstoneText: string, caster = false): SetBonusTier[] {
   return [
-    {
-      pieces: 2,
-      effect: { pvpDefenseRating: WARFARE_SET_2PC_DEFENSE_RATING },
-      text: 'Increases Warfare Defense Rating by 40.',
-    },
+    caster
+      ? {
+          pieces: 2,
+          effect: {
+            pvpDefenseRating: WARFARE_SET_2PC_DEFENSE_RATING,
+            castPushbackReduction: PVP_CASTER_SET_2PC_PUSHBACK_REDUCTION,
+          },
+          text: `Increases Warfare Defense Rating by 40. ${PVP_CASTER_SET_2PC_PUSHBACK_TEXT}`,
+        }
+      : {
+          pieces: 2,
+          effect: { pvpDefenseRating: WARFARE_SET_2PC_DEFENSE_RATING },
+          text: 'Increases Warfare Defense Rating by 40.',
+        },
     {
       pieces: 4,
       effect: {
@@ -445,6 +461,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     bonuses: warfareBonuses(
       WARFARE_EMBERWARD,
       'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
+      true,
     ),
   },
   [SET_WARFARE_ASHSTALKER]: {
@@ -461,6 +478,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     bonuses: warfareBonuses(
       WARFARE_EMBERWARD,
       'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
+      true,
     ),
   },
   [SET_WARFARE_THORNHIDE]: {
@@ -469,6 +487,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     bonuses: warfareBonuses(
       WARFARE_THORNGUARD,
       'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec.',
+      true,
     ),
   },
 
@@ -966,7 +985,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
         // "Fleetmend" is the ability's shipped display name (the Phase 03 naming
         // audit renamed swiftmend; docs/design/naming-audit.md, pinned by
         // tests/ip_scrub.test.ts): player copy names the ability as players see it.
-        text: 'Fleetmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.',
+        text: 'Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,

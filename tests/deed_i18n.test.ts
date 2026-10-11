@@ -98,16 +98,22 @@ describe('deed_i18n English resolution', () => {
     // name and a desc, no title) at the fourth release/v0.44.0 base merge.
     // 319 with the Buried Hoards Coinsack catch (cmb_coinsack_caught: a name and a
     // desc, no title) at the 2026-09-28 merge into feature/buried-hoards.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(319);
+    // 320 with the sixth lifetime-XP rung (prog_titan: a name, a desc, and
+    // the Titan title). The five World PvP deeds each add a name,
+    // description and title. The hard Wisp Maze deed adds one name and desc.
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(326);
     // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
     // 296 with the seven faction standing deeds. 298 with the two Clue Scroll
-    // casket deeds.
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(300);
+    // casket deeds. 301 with the Titan rung. 306 with the World PvP title deeds.
+    // 307 with the hard Wisp Maze deed.
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(307);
     // 668 rows: 318 names + 299 descs + 51 titles (the three faction Champion
     // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
-    // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc.
-    expect(manifest.length).toBe(670);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(51);
+    // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc;
+    // 673 with the Titan rung, then 688 with the World PvP title deeds, and 690
+    // with the hard Wisp Maze deed.
+    expect(manifest.length).toBe(690);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(57);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([
       { id: 'hid_forgebreaker', field: 'name', source: 'A Spring Unchained' },
       {

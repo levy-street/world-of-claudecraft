@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.spellTooltipOnHover': 'Подсказки заклинаний при наведении',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -595,6 +596,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}, {quality}',
   'hudChrome.mapAtlas.collapseHint': 'Свернуть боковую панель карты',
   'hudChrome.mapAtlas.expandHint': 'Развернуть боковую панель карты',
+  'hudChrome.mapAtlas.resizeRailAria': 'Ширина боковой панели карты',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Перетащите, чтобы изменить ширину боковой панели карты. Двойной щелчок сбрасывает ширину.',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': 'Активный профиль',
   'hudChrome.meters.activeProfileDesc':
@@ -668,6 +672,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Одновременно отображаемые полосы (0 = без ограничений, автоподбор по высоте окна).',
   'hudChrome.meters.noDeathEvents': 'Перед гибелью не записано событий',
   'hudChrome.meters.noDetailedData': 'Нет подробных данных',
+  'hudChrome.meters.detailHealSubtitle':
+    'Эффективное исцеление: {effective} | Избыточное исцеление: {overheal} ({overhealPercent}) | Попаданий: {hits} ({critPercent} крит.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Попаданий: {hits} | Крит. ударов: {crits} ({critPercent}) | Среднее: {average} | Мин./макс.: {min} / {max}',
   'hudChrome.meters.noTargetData': 'Нет данных об игроках по этой цели',
   'hudChrome.meters.numCompact': 'Числа: сокращённые (тыс./млн)',
   'hudChrome.meters.numDetailed': 'Числа: подробные',
@@ -759,6 +767,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': 'Масштаб окна',
   'hudChrome.meters.windowScaleDesc': 'Увеличивает или уменьшает общий масштаб счётчика.',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': 'Розыск',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': 'Просвечивание препятствий',
@@ -786,6 +795,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.hillHold': 'Удержание холма',
   'hudChrome.warfare.reasons.worldAssist': 'Помощь в мировом убийстве',
   'hudChrome.warfare.reasons.worldKill': 'Мировое убийство',
+  'hudChrome.warfare.reasons.worldQuest': 'локальное задание',
   'hudChrome.warfareShop.groupEntry': 'Боевой сезон 1',
   'hudChrome.warfareShop.groupSeason2': 'Боевой сезон 2: Авангард',
   'hudChrome.worldPvp.aidLine':
@@ -824,8 +834,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': 'Счёт: {kills} убийств, {deaths} смертей',
   'hudChrome.worldPvp.repeatLine':
     'Повторные убийства одного и того же игрока приносят {second}, затем {third}, а потом ничего; счётчик сбрасывается через {reset} после первого убийства.',
+  'hudChrome.worldPvp.skullName': 'Череп игрока {name}',
   'hudChrome.worldPvp.splitLine':
     'Чистый бой один на один приносит всю награду целиком; помощники и их лекари делят её между собой.',
+  'hudChrome.worldPvp.spoilsLine':
+    'Если у обоих поднят флаг, золото нанёсшего смертельный удар падает на тело вместе с черепом проигравшего.',
   'hudChrome.worldPvp.stakeLine':
     'Проигравший платит {cap} или {percent}% от своего кошелька, в зависимости от того, что меньше.',
   'hudChrome.worldPvp.statusDisarming':
@@ -835,6 +848,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.statusOffFfa':
     'Ваш флаг PvP опущен, но на территории свободного боя вы всё равно можете атаковать и быть атакованным.',
   'hudChrome.worldPvp.statusOn': 'Ваш флаг PvP поднят. Игроки с флагом могут атаковать вас.',
+  'hudChrome.worldPvp.rewardTitles':
+    'Постоянные титулы выдаются за {thresholds} игрового времени с включенным мировым PvP в открытом мире или PvP-инстансах. Выход из игры, смерть, PvE-инстансы и святилища приостанавливают таймер. Отключение PvP сбрасывает его.',
+  'hudChrome.worldPvp.rewardPaused':
+    'Текущая серия PvP: {time} игрового времени (приостановлена в святилище)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Текущая серия PvP: {time} игрового времени (приостановлена, пока вы мертвы)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Текущая серия PvP: {time} игрового времени (приостановлена в PvE-инстансах)',
+  'hudChrome.worldPvp.rewardProgress': 'Текущая серия PvP: {time} игрового времени',
   'hudChrome.worldPvp.tab': 'Мировое PvP',
   'hudChrome.worldPvp.title': 'Мировое PvP',
   'hudChrome.worldPvp.zoneContested': 'Спорная территория: здесь сражаются только игроки с флагом.',
@@ -923,7 +945,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Боевая мощь является характеристикой снаряжения чести для боя с игроками. В боях между игроками она повышает урон, который вы и ваш питомец наносите другим игрокам и их питомцам, и снижает урон, который вы и ваш питомец получаете от них. Она также повышает ваше максимальное здоровье везде, кроме подземелий, рейдов, вылазок и разломов, поэтому игрок в снаряжении чести гораздо труднее убить, чем игрока без него. Ваш лист персонажа показывает всё это одной строкой. Она берётся от снаряжения Боевой мощи, которое вы покупаете за честь, так что это награда за игру в PvP, а не то, к чему нужно стремиться во время получения уровней.',
   'entities.abilities.lava_burst.name': 'Взрыв магмы',
   'entities.abilities.lava_burst.description':
-    'Наносит {damage} урона от огня. Всегда наносит критический удар по цели, охваченной вашим Тлеющим разрядом. Прилив магмы: каждый тик Тлеющего разряда с вероятностью 20% сбрасывает время восстановления этого умения и делает следующий Взрыв магмы в течение 10 сек. мгновенным. Урон растёт с силой заклинаний. (Стихии)',
+    'Наносит {damage} урона от огня. Попадание даёт 1 Гром. Всегда наносит критический удар по цели, охваченной вашим Тлеющим разрядом. Критический удар наносит дополнительно 24% от обычного урона. Прилив магмы: каждый тик Тлеющего разряда с вероятностью 20% сбрасывает время восстановления этого умения и делает следующий Взрыв магмы в течение 10 сек. мгновенным. Урон растёт с силой заклинаний. (Стихии)',
   'entities.abilities.lightning_overload.name': 'Дуговая перегрузка',
   'entities.abilities.lightning_overload.description':
     'Пассивно: Дуговая стрела и Разветвленная молния с вероятностью 20% вызывают Перегрузку, поражая первую цель повторно на 50% нанесённого урона и даруя 1 Гром. (Стихии)',
@@ -1084,6 +1106,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.selectedTable': 'Выбрана {count} таблица',
   'hudChrome.weeklyRewards.selectedTables': 'Выбрано таблиц: {count}',
   'hudChrome.weeklyRewards.noLevelLoot': 'На вашем текущем уровне нет подходящей добычи.',
+  'hudChrome.weeklyRewards.lootFocus': 'Специализация добычи',
+  'hudChrome.weeklyRewards.allClassGear': 'Всё снаряжение класса',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Только для ещё не открытых хранилищ.',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Нет подходящей добычи. Выберите другую специализацию.',
+  'hudChrome.weeklyRewards.rolledFocus': 'Специализация при розыгрыше: {focus}',
   'hudChrome.weeklyRewards.tableItem': '{count} предмет',
   'hudChrome.weeklyRewards.tableItemCount': 'Предметов: {count}',
   'hudChrome.weeklyRewards.previouslyRolled': 'Ранее разыгранная награда',
@@ -1107,6 +1134,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.ferry.castingOff': 'Паром на {dest} отчаливает',
   'hudChrome.ferry.boardHint': 'Стойте на палубе в момент отплытия. Переправа бесплатна.',
   'hudChrome.ferry.sailing': 'Курс на {dest}',
+  'hudChrome.ferry.portLabel': '{port}: паром на {dest}',
+  'hudChrome.ferry.portTitle': '{port}: паромный причал',
+  'hudChrome.ferry.destination': 'Пункт назначения: {dest}',
+  'hudChrome.ferry.boardNow': 'Можно садиться на паром',
+  'hudChrome.ferry.arrivesIn': 'Паром прибудет через {time}',
+  'hudChrome.ferry.scheduleUnavailable': 'Расписание парома недоступно.',
   'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
   'hudChrome.framePresets.pickerLabel': 'Профили рамок: {name}',
   'hudChrome.framePresets.overwrite': 'Перезаписать профиль',
@@ -2050,6 +2083,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Запрет на участие в ежедневных наградах действует еще {remaining}. Доступ вернется {until}. Причина: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
+  'hudChrome.realmMotd.line': 'Сообщение дня: {text}',
+  'hudChrome.realmMotd.updated': 'Сообщение дня обновлено.',
+  'hudChrome.realmMotd.cleared': 'Сообщение дня удалено.',
+  'hudChrome.realmMotd.none': 'Сообщение дня не задано.',
+  'hudChrome.realmMotd.usage':
+    'Использование: /motd "<сообщение>", чтобы задать его, /motd clear, чтобы удалить.',
+  'hudChrome.realmMotd.tooLong': 'Сообщение дня не может быть длиннее {max} символов.',
+  'hudChrome.realmMotd.saveFailed':
+    'Не удалось сохранить сообщение дня: после перезапуска оно будет потеряно.',
   'hudChrome.readyCheck.prompt': '{name} начал проверку готовности. Вы готовы?',
   'hudChrome.readyCheck.ready': 'Готов',
   'hudChrome.readyCheck.notReady': 'Не готов',
@@ -2546,6 +2588,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetNone': 'Нет подземелий для сброса.',
   'hudChrome.dungeonDifficulty.resetOccupied':
     'Нельзя сбросить подземелья, пока внутри кто-то находится.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Смена сложности поставлена в очередь: внутри подземелья ещё есть игрок или его тело. Изменение применится, когда подземелья освободятся.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Ожидающая смена сложности отменена, поскольку изменились группа или её лидер.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Смените сложность подземелья перед сбросом этих подземелий. Пустые подземелья сбрасываются сами через 5 минут.',
   'hudChrome.dungeonDifficulty.resetUsage':
@@ -2851,6 +2897,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Повторные победы над одним и тем же игроком приносят всё меньше и вскоре ничего, а ваш счёт против этого игрока начинается заново лишь примерно через час после первого из таких убийств, так что караулить одну жертву никогда не стоит ожидания. Цель, намного ниже вас по уровню, не приносит ничего. На полях боя и аренах действуют собственные правила, пока вы внутри, и они платят больше Чести, чем открытый мир, так что мировое PvP является более медленным путём к тому же торговцу.',
   'guide.worldPvpPage.hillBodyRamp':
     'Раз в три часа, в момент, который никто не может предсказать, всему миру объявляют, что через пятнадцать минут в одной из зон свободного боя поднимется холм, и круг, где он встанет, отмечается на открытой местности. Поднявшись, холм стоит сорок пять минут, а затем исчезает. Холм оспаривает та группа, у которой внутри круга стоит больше всего игроков, и после минуты непрерывного большинства холм становится её; игрок в одиночку считается группой из одного человека, а участники рейда не учитываются вовсе. Пока группа удерживает холм, каждый её участник внутри круга каждую минуту получает Честь, и чем дольше холм удерживает одна и та же группа, тем больше приносит каждая минута: полная группа, без боя удерживающая холм всё время, пока он стоит, получает примерно столько же, сколько три победы на поле боя. Когда холм переходит к другим, новые владельцы начинают отсчёт заново. Полоса над полем показывает, кто удерживает холм, ваши силы против чужих и отсчёт захвата; команда /hill в чате подскажет, где он стоит.',
+  'guide.worldPvpPage.hillBodyRanked':
+    'Раз в три часа холм появляется в одной из зон свободного боя. Пока он стоит, каждые пять минут всему миру сообщают его местоположение и рейтинг групп по времени удержания. Когда холм исчезает, если группа с самым долгим суммарным удержанием удерживала его не меньше десяти минут, игроки этой группы получают одну победу в PvP-прогресс еженедельного хранилища, если они простояли в круге не меньше минуты во время удержания своей группы и всё ещё состоят в этой группе в момент окончания.',
   'guide.worldPvpPage.limitsBodyRaids':
     'Повторные победы над одним и тем же игроком приносят всё меньше и вскоре ничего, а ваш счёт против этого игрока начинается заново лишь примерно через час после первого из таких убийств, так что караулить одну жертву никогда не стоит ожидания. Цель, намного ниже вас по уровню, не приносит ничего. На полях боя и аренах действуют собственные правила, пока вы внутри, и они платят больше Чести, чем открытый мир, так что мировое PvP является более медленным путём к тому же торговцу. Рейды ничего не получают за убийства в мире: участник рейда не получает ни Чести, ни золота и не уменьшает долю остальных, так что сражайтесь группой, чтобы получать награду.',
   'guide.worldPvpPage.hillHeading': 'Король горы',
@@ -3096,6 +3144,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': 'Сенсорное управление',
   'hudChrome.options.gfxCustomNote':
     'Изменение любого регулятора переключает пресет качества на «Расширенное»: собственный набор на основе базы «Высокое», начинающийся с уровней, показанных для текущего пресета.',
+  'hudChrome.options.ambienceVolume': 'Громкость окружения',
   'hudChrome.options.footstepSounds': 'Звуки шагов',
   'hudChrome.options.interfaceSounds': 'Звуки интерфейса и откликов',
   'hudChrome.options.clickFeedback': 'Метка клика',
@@ -3162,6 +3211,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': 'Подтверждать продажу от качества',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     'Предметы ниже этого качества продаются одним щелчком; ошибочно проданный предмет можно выкупить у торговца.',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Предметы ниже этого качества продаются одним щелчком. Ошибочно проданный предмет можно выкупить у торговца, кроме неподписанных серых предметов.',
   'hudChrome.options.showSecondaryActionBar': 'Показывать вторичную панель действий',
   'hudChrome.options.showThirdActionBar': 'Показывать третью панель действий',
   'hudChrome.options.hideUnusedActionSlots': 'Скрыть неиспользуемые ячейки действий',
@@ -4756,6 +4807,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunk': 'Продать хлам',
   'itemUi.vendor.sellJunkAria': 'Продать весь хлам за {price}',
   'itemUi.vendor.sellJunkHint': 'Продает все серые предметы в сумках, кроме предметов заданий.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Неподписанные серые предметы не попадают в список выкупа, поэтому их продажу нельзя отменить.',
   'itemUi.market.title': 'Мировой рынок',
   'itemUi.market.subtitle': 'биржа Торговца',
   'itemUi.market.close': 'Закрыть рынок',
@@ -5146,7 +5199,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы принимаете облик куницы, повышая свой шанс уклонения на 8% на 30 мин.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Облик скакуна',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Вы принимаете Облик скакуна, повышая свою скорость передвижения на 30% на 30 мин. Пока эффект активен, получение урона дезориентирует вас, вдвое снижая скорость передвижения на 4 сек (каждый удар обновляет дезориентацию).',
+    'Вы принимаете Облик скакуна, повышая свою скорость передвижения на 30% на 30 мин. Пока эффект активен, получение урона дезориентирует вас, вдвое снижая скорость передвижения на 2 сек (каждый удар обновляет дезориентацию).',
   'entities.abilities.aimed_shot.name': 'Долгий натяг',
   'entities.abilities.aimed_shot.description':
     'Стреляет в цель, нанося {damage} физического урона. Урон растёт с силой атаки в дальнем бою.',
@@ -5203,7 +5256,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Окружает вас молниями на 10 мин. Следующие 3 атаки в ближнем бою по вам наносят атакующему {buff} урона от природы, не чаще раза в 5 сек.',
   'entities.abilities.flame_shock.name': 'Пепельный толчок',
   'entities.abilities.flame_shock.description':
-    'Наносит {damage} урона от огня, затем {overTime} урона от огня за 12 сек. Первое попадание растёт с силой заклинаний.',
+    'Наносит {damage} урона от огня, затем {overTime} урона от огня за {duration} сек. Первое попадание растёт с силой заклинаний.',
   'entities.abilities.flametongue_weapon.name': 'Оружие пламенного клейма',
   'entities.abilities.flametongue_weapon.description':
     'Наполняет ваше оружие на 30 мин. Каждый удар наносит {damage} дополнительного урона от огня.',
@@ -5253,13 +5306,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Метает сгусток природной энергии, нанося {damage} ед. урона от сил природы.',
   'entities.abilities.healing_touch.name': 'Дикое заживление',
   'entities.abilities.healing_touch.description': 'Исцеляет дружественную цель на {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Каждое завершённое применение добавляет 1 стадию Зелени (максимум 3). Накопленная Зелень сокращает время применения: 2,2 сек. при 1 стадии, 1,9 сек. при 2 и 1,5 сек. при 3. Благодать природы делает его мгновенным, бесплатным и на 25% сильнее.',
   'entities.abilities.mark_of_the_wild.name': 'Оберег дикой природы',
   'entities.abilities.mark_of_the_wild.description':
     'Накладывает Оберег дикой природы на дружественную цель, повышая броню на {buff} на 30 мин.',
   'entities.abilities.moonfire.name': 'Лунная буря',
   'entities.abilities.moonfire.description':
     'Сжигает врага лунным огнем, нанося {damage} ед. урона от тайной магии и периодический урон.',
-  'entities.abilities.rejuvenation.name': 'Дикий расцвет',
+  'entities.abilities.rejuvenation.name': 'Спороисцеление',
   'entities.abilities.rejuvenation.description': 'Исцеляет цель на {damage} за 12 сек.',
   'entities.abilities.thorns.name': 'Терновая защита',
   'entities.abilities.thorns.description':
@@ -5269,7 +5324,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Оплетает цель корнями на месте на срок до 12 сек.',
   'entities.abilities.bear_form.name': 'Облик бурого',
   'entities.abilities.bear_form.description':
-    'Вы принимаете облик медведя: броня +110%, максимальное здоровье +30%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Смена облика также даёт эффект «Стремительная поступь» — краткий всплеск скорости передвижения. Примените снова, чтобы вернуться к облику заклинателя.',
+    'Вы принимаете облик медведя: броня +110%, максимальное здоровье +30%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Вы атакуете вдвое быстрее, нанося вдвое меньше урона за удар, и каждый удар накапливает вдвое больше ярости. Смена облика также даёт эффект «Стремительная поступь» — краткий всплеск скорости передвижения. Примените снова, чтобы вернуться к облику заклинателя.',
   'entities.abilities.maul.name': 'Костолом',
   'entities.abilities.maul.description':
     'Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.',
@@ -5285,6 +5340,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': 'Рвущий коготь',
   'entities.abilities.claw.description':
     'Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике кота.',
+  'entities.abilities.scratch.name': 'Царапание',
+  'entities.abilities.scratch.description':
+    'Царапает ближайшие цели в пределах 6 м, нанося урон оружием плюс {damage}. Дает 1 прием серии за каждую пораженную цель. Раскрывает врагов в незаметности в зоне удара. Только в облике кота.',
   'entities.abilities.ferocious_bite.name': 'Кровавый укус',
   'entities.abilities.ferocious_bite.description':
     'Завершающий прием, наносящий {damage}. Только в облике кота.',
@@ -5293,7 +5351,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Размахивает по ближайшим врагам, нанося {damage} ед. урона. Создает дополнительную угрозу. Только в облике бурого.',
   'entities.abilities.regrowth.name': 'Второй расцвет',
   'entities.abilities.regrowth.description':
-    'Исцеляет дружественную цель на {damage} и дополнительно в течение 21 сек.',
+    'Исцеляет дружественную цель на {damage} и дополнительно в течение 15 сек. Если эффект действует до конца, он снова исцеляет цель на ту же величину, что и первоначальное исцеление.',
   'entities.abilities.barkskin.name': 'Дубовая шкура',
   'entities.abilities.barkskin.description':
     'Ваша кожа твердеет, как кора, повышая броню на 150 на 15 сек.',
@@ -5450,7 +5508,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Высвобождает первобытную силу. В облике кота скорость восстановления энергии повышается на 100% на 10 сек. В облике бурого мгновенно дает 50 ед. ярости. (знаковое умение Силы зверя)',
   'entities.abilities.swiftmend.name': 'Быстрое восстановление',
   'entities.abilities.swiftmend.description':
-    'Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Посевы Дикого расцвета и Второго расцвета добавляют Зелень; при 5 Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)',
+    'Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Каждое применение Спороисцеления, Второго расцвета и Дикого заживления добавляет 1 стадию Зелени; при 3 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Спороисцеление и Второй расцвет накапливают Зелень; при 5 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)',
   'entities.abilities.crusader_strike.name': 'Удар воина Света',
   'entities.abilities.crusader_strike.description':
     'Бьет цель, нанося урон оружием плюс {damage} ед. урона от Света. (талант паладина)',
@@ -8255,6 +8315,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.dragDestroyHint': 'Перетащите в мир, чтобы уничтожить',
   'hudChrome.bags.reorderNeedsRecent':
     'Сбросьте фильтр и выберите сортировку «Недавние», чтобы менять порядок в сумках',
+  'hudChrome.bags.reorderLocked':
+    'Заблокированные предметы остаются в своей ячейке сумки. Чтобы переместить предмет, снимите блокировку.',
   'hudChrome.bags.filterGroupAria': 'Фильтровать сумки по категории',
   'hudChrome.bags.filterAll': 'Все',
   'hudChrome.bags.filterWeapon': 'Оружие',
@@ -9190,6 +9252,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Монеты смазывают весь мир: на них покупают снаряжение, припасы и походный набор, и они переходят из рук в руки между игроками. Всё это приходит к вам просто по ходу игры, так что считайте эту страницу картой того, откуда берутся и куда уходят ваши деньги.',
   'guide.economy.junkBody':
     'Добыча, которой вам не найти применения, всё равно продаётся любому торговцу, так что опустошайте сумки всякий раз, проходя через город, а не давайте им забиться. На вкладке продажи у торговца даже есть кнопка, что одним нажатием продаёт весь хлам плохого качества разом. Совсем уж бесполезную мелочь можно и попросту выбросить, чтобы освободить место.',
+  'guide.economy.junkBodyFinal':
+    'Добыча, которой вам не найти применения, всё равно продаётся любому торговцу, так что опустошайте сумки всякий раз, проходя через город, а не давайте им забиться. На вкладке продажи у торговца даже есть кнопка, что одним нажатием продаёт весь хлам плохого качества разом. Совсем уж бесполезную мелочь можно и попросту выбросить, чтобы освободить место. Неподписанные серые предметы, проданные так, не попадают в список выкупа, так что перед нажатием убедитесь, что среди них нет ничего нужного.',
   'guide.economy.junkTitle': 'Избавление от хлама',
   'guide.economy.mailBody':
     'В каждом узловом городе стоит резной вороний столб: почтовый ящик Вороновой почты, почтовой службы королевства. Встаньте у него, чтобы написать любому персонажу по имени, другу в сети или давно вышедшему, и приложите к письму монеты или вещи за небольшой почтовый сбор. Ворону нужно время на перелёт; когда он приземляется, значок конверта сообщает получателю, что его что-то ждёт.',
@@ -10481,7 +10545,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Дробление костей наносит на 30% больше урона, а его аварийная защита больше не заменяет удар.',
   'entities.itemSets.grovespring.name': 'Одеяние рощевого родника',
   'entities.itemSets.grovespring.bonus2':
-    'Быстрое восстановление сначала поглощает ваш собственный Дикий расцвет или Второй расцвет и исцеляет на 25% больше. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+    'Быстрое восстановление сначала поглощает ваше собственное Спороисцеление или Второй расцвет и исцеляет на 25% больше. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.grovespring.bonus4':
     'Сверхцветение собирает 75% оставшегося исцеления ваших эффектов, после чего добавляет 1 стадию Зелени.',
   'entities.items.lastflame_core.name': 'Ядро Последнего Пламени',
@@ -10561,7 +10625,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Повышает рейтинги атаки и защиты Боевой мощи на 80. Убийство враждебного игрока даёт Пепельный шаг, повышающий скорость передвижения на 40% на 6 сек.',
   'entities.itemSets.warfare_cinderweave.name': 'Регалии Тлеющего плетения',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Повышает рейтинг защиты Боевой мощи на 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Повышает рейтинг защиты Боевой мощи на 40. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -10573,13 +10638,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'Повышает рейтинги атаки и защиты Боевой мощи на 80. Убийство враждебного игрока даёт Нерушимую клятву, поглощающую 200 урона в течение 10 сек.',
   'entities.itemSets.warfare_stormbound.name': 'Одеяние Уз Бури',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Повышает рейтинг защиты Боевой мощи на 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Повышает рейтинг защиты Боевой мощи на 40. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Повышает рейтинги атаки и защиты Боевой мощи на 80. Ваши заклинания с вероятностью 15% дают Угольную стражу, поглощающую 120 урона в течение 8 сек.',
   'entities.itemSets.warfare_thornhide.name': 'Одеяние Терновой шкуры',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Повышает рейтинг защиты Боевой мощи на 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Повышает рейтинг защиты Боевой мощи на 40. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -13417,6 +13484,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': 'Облик бурого',
   'guide.models.formCat': 'Облик кота',
   'guide.models.formTravel': 'Форма скорохода',
+  'guide.models.formSporemender': 'Облик спороцелителя',
   'guide.models.groupForms': 'Облики друида',
   'guide.nav.sidebarLabel': 'Разделы руководства',
   'guide.professions.craftHowTitle': 'Окно ремесла',
@@ -13835,6 +13903,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': 'Включать скрытность и формы передвижения',
   'hudChrome.options.showFriendlyTrack': 'Показывать мои эффекты на союзниках',
   'hudChrome.options.showShieldTrack': 'Показывать мои щиты',
+  'hudChrome.options.classicCombatText': 'Классический боевой текст',
   'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',
   'hudChrome.options.showNameplateDots': 'Показывать мои эффекты на полосах имён',
   'hudChrome.options.nameplateDotScale': 'Размер эффектов на полосах имён',
@@ -15940,6 +16009,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': 'Скрыть шлем',
   'hudChrome.paperdoll.showHelmAria': 'Показать шлем',
   'hudChrome.options.waterRipples': 'Рябь на воде (кильватер)',
+  'hudChrome.options.spellEffects': 'Эффекты заклинаний',
   'hudChrome.options.actionCam': 'Экшен-камера',
   'hudChrome.options.actionCamShoulder': 'Плечо экшен-камеры',
   'hudChrome.options.actionCamShoulderLeft': 'Слева {pct}',
@@ -16005,6 +16075,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'На 10 сек. делает кожу твёрдой, как остывший шлак, и снижает весь получаемый урон на 25%.',
   'entities.abilities.cinderhide.name': 'Шлаковая кожа',
   'entities.abilities.claw.specNote_feral':
+    'Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3).',
+  'entities.abilities.scratch.specNote_feral':
     'Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3).',
   'entities.abilities.cold_focus.description':
     'На 12 сек. Выверенный выстрел дает больше концентрации, а Дальний натяг становится быстрее и дешевле. (Фирменная способность Холодного взора)',
@@ -16111,13 +16183,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваше проклятое око раз в 2,5 сек. атакует выбранную основную цель дурного глаза и наносит урон от Тьмы. Одержимость дурным глазом удваивает скорость атак.',
   'entities.abilities.maledict_gaze.name': 'Проклятый взор',
   'entities.abilities.marrowbreak.description':
-    'Расходует ваши 3 стадии Старой крови на мощный удар с высокой угрозой, наносящий {damage} ед. урона. Ниже половины здоровья вместо удара он поглощает урон в размере 18% максимального здоровья на 8 сек. и возвращает 15 ед. ярости.',
+    'Расходует ваши 3 стадии Старой крови на мощный удар с высокой угрозой, наносящий {damage} ед. урона. Ниже половины здоровья вместо удара он исцеляет вас на 18% максимального здоровья и возвращает 15 ед. ярости.',
   'entities.abilities.marrowbreak.name': 'Дробление костей',
   'entities.abilities.martyrs_aegis.description':
     'Уменьшает получаемый союзником урон на 40% на 8 сек.',
   'entities.abilities.martyrs_aegis.name': 'Эгида мученика',
   'entities.abilities.maul.specNote_feral':
-    'Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Дроблением костей: удар, наносящий от 78 до 96 ед. урона с высокой угрозой; ниже половины здоровья вместо удара он поглощает урон в размере 18% максимального здоровья и возвращает 15 ед. ярости.',
+    'Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Дроблением костей: удар, наносящий от 78 до 96 ед. урона с высокой угрозой; ниже половины здоровья вместо удара он исцеляет вас на 18% максимального здоровья и возвращает 15 ед. ярости.',
   'entities.abilities.measured_shot.description':
     'Выверенный выстрел наносит {damage} ед. физического урона и при попадании дает 20 ед. концентрации.',
   'entities.abilities.measured_shot.name': 'Выверенный выстрел',
@@ -16142,7 +16214,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Отмечает противника на 15 сек., накапливая 20% урона, нанесённого вами и вашими мертвецами. Повторное применение подрывает метку. Если отмеченный противник погибает, она взрывается в радиусе 6 ярдов и создаёт 1 осколок души.',
   'entities.abilities.ossuary_mark.name': 'Метка оссуария',
   'entities.abilities.overbloom.description':
-    'Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Дикий расцвет.',
+    'Расходует ваши 3 стадии Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Спороисцеление.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новое Спороисцеление.',
   'entities.abilities.overbloom.name': 'Сверхцветение',
   'entities.abilities.pack_command.description':
     'Приказывает вашему живому питомцу атаковать. Успешное попадание дает 20 ед. концентрации и один уровень Свирепости стаи.',
@@ -16186,9 +16260,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Расходует ваши 3 стадии Старой крови: удар на {damage} ед. урона, который мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, снимает оба кровотечения и восстанавливает {rage} ед. энергии. Работает даже без очков серии приемов.',
   'entities.abilities.redharvest.name': 'Кровавая жатва',
   'entities.abilities.regrowth.specNote_restoration':
-    'Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5).',
+    'Каждое применение добавляет 1 стадию Зелени (максимум 3), даже если обновляет уже действующий расцвет.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5). При 5 стадиях Зелени Быстрое восстановление становится Сверхцветением.',
+    'Каждое применение добавляет 1 стадию Зелени (максимум 3), даже если обновляет уже действующий расцвет. При 3 стадиях Зелени Быстрое восстановление становится Сверхцветением.',
   'entities.abilities.rip.specNote_feral':
     'Попавший удар добавляет 1 стадию Старой крови (максимум 3).',
   'entities.abilities.ruinous_brand.description':
@@ -16271,13 +16345,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Условный свист подстегивает вашу группу, увеличивая скорость атаки, произнесения заклинаний и поддержания на 10% на 10 сек. Союзники, недавно получившие групповое ускорение, слишком истощены, чтобы получить эффект. (талант разбойника)',
   'entities.abilities.thieves_chorus.name': 'Хор воров',
   'entities.abilities.thunder_reservoir.description':
-    'Пассивно: Дуга молнии и Небесная ветвь накапливают Гром, максимум 5. При 5 зарядах Земной толчок наносит на 125% больше урона, а Разлом земли на 100%, затем расходуется весь Гром. (Громовержец)',
+    'Пассивно: Дуга молнии, Небесная ветвь и Взрыв магмы накапливают Гром, максимум 5. При 5 зарядах Земной толчок наносит на 125% больше урона, а Разлом земли на 100%, затем расходуется весь Гром. (Громовержец)',
   'entities.abilities.thunder_reservoir.name': 'Грозовой запас',
   'entities.abilities.tidecall.description':
     'Исцеляет дружественную цель на {damage}. Исцеление усиливается силой заклинаний. Добавляет полный объем до избыточного исцеления в Поток исцеления, вплоть до 30% максимального здоровья цели.',
   'entities.abilities.tidecall.name': 'Зов прилива',
   'entities.abilities.trailbreak.description':
-    'Отпрыгивает назад, не теряя состояние специализации. Полевая выучка также подготавливает следующее возвращение в бой.',
+    'Отпрыгивает на 25 м назад и снимает эффекты обездвиживания и замедления. Если у вас есть Охотничий натиск, он обновляется и дает Подготовленное возвращение на 12 сек.',
   'entities.abilities.trailbreak.name': 'Разрыв следа',
   'entities.abilities.umbral_anchor.description':
     'Первое применение устанавливает у ваших ног теневой якорь на 5 мин. Повторное применение в пределах 40 м возвращает к нему, расходует якорь и запускает восстановление на 45 сек.',
@@ -16415,8 +16489,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Облик ближнего боя: энергия и приёмы серии, как у разбойника, и куда меньше угрозы.',
   'guide.classPage.formLine.form_travel':
     'Дорожный облик: по земле вы двигаетесь куда быстрее, но других способностей нет, пока не выйдете из него.',
+  'guide.classPage.formLine.form_sporemender':
+    'Целительный облик Исцеления: прочная шкура и более сильное исцеление при более медленном шаге, а все заклинания и мана остаются при вас.',
   'guide.classPage.formName.form_bear': 'Облик бурого',
   'guide.classPage.formName.form_travel': 'Форма скорохода',
+  'guide.classPage.formName.form_sporemender': 'Облик спороцелителя',
   'guide.classPage.formsHeading': 'Смена облика',
   'guide.classPage.formsMoonwing':
     'Друид ветки Баланса получает ещё один облик, Облик лунного совуха — облик заклинателя, в котором такой друид и сражается. Это единственный звериный облик, что сохраняет ваши заклинания, а ваш жезл работает лишь в нём или в обычном облике заклинателя.',
@@ -17075,6 +17152,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     'Открывает второй ряд панели способностей, а следом за ним и третий. Ячейки остаются доступны по своим горячим клавишам, даже пока ряды скрыты.',
   'guide.settingsPage.ifFctScale': 'Размер чисел урона и лечения, что всплывают над вашей целью.',
+  'guide.settingsPage.ifClassicCombatText':
+    'Возвращает простые белые и бледно-золотые числа урона, которые поднимаются прямо вверх. Если оставить выключенным (по умолчанию), числа становятся ярче и разлетаются в стороны, а критические и особо крупные удары вспыхивают.',
   'guide.settingsPage.ifFramesIntro':
     'Ваша собственная рамка, рамка цели и вся раскладка группы. У группового блока есть ещё и ползунки масштаба, ширины, высоты, отступов и числа столбцов, чтобы рейдовая сетка вписалась в ваш экран, а кнопка «Сброс» внизу вкладки возвращает все рамки на исходные места.',
   'guide.settingsPage.ifGeneralIntro':
@@ -17172,6 +17251,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Как далеко вдаль отрисовывается мир, прежде чем растаять. Каждый пресет задаёт это за вас, пока вы не сдвинете ползунок сами.',
   'guide.settingsPage.rowWaterQuality':
     'Как затеняются озёра, реки и открытое море, от плоского и дешёвого до полностью отражающего.',
+  'guide.settingsPage.rowSpellEffects':
+    'Свечение, искры, снаряды и вспышки попаданий от заклинаний игроков и их питомцев, включая ваши. Выключите их, чтобы успокоить картинку или выиграть пару кадров в крупных групповых боях. Всё, что применяют враги, по-прежнему видно, как и круги, отмечающие зону, из которой нужно выйти, метки над оглушёнными, испуганными или обездвиженными целями и все полосы чтения.',
   'guide.settingsPage.rowWaterRipples':
     'Следы и круги, что расходятся за вами, пока вы плывёте. По умолчанию выключено, и это единственный водный эффект, который правда стоит кадров; на брызги и пузыри он не влияет никак.',
   'guide.settingsPage.valueUltraOrInsane':
@@ -17306,6 +17387,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Облик демона: размер тела увеличен на {pct}%; прочие бонусы показаны отдельными эффектами',
   'hudChrome.auraEffect.formMoonkin':
     'Облик лунного крыла: урон заклинаний повышен на {pct}%, а броня на {armorPct}%',
+  'hudChrome.auraEffect.formSporemender':
+    'Облик спороцелителя: исходящее исцеление повышено на {pct}%, броня на {armorPct}%, а скорость передвижения снижена на {slowPct}%',
   'hudChrome.auraEffect.formShadow': 'Сумрачный облик: урон от темной магии повышен на {pct}%',
   'hudChrome.auraEffect.freeExecute': 'Следующее подходящее добивающее умение не требует ресурсов',
   'hudChrome.auraEffect.funeralHarvestLock':
@@ -17378,7 +17461,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     'Ядовитый ритуал: этап {stacks} из {max}. «Трусливый выпад», «Злодейский разрез» и «Ядовитый дротик» добавляют по 1 этапу; на этапе {max} «Вечный сон» превращается в «Ядовитый разрыв»',
   'hudChrome.auraEffect.verdance':
-    'Зелень: стадия {stacks} из {max}. Каждый НОВЫЙ посаженный Дикий расцвет или Второй расцвет добавляет 1. При {max} Быстрое восстановление становится Сверхцветением',
+    'Зелень: стадия {stacks} из {max}. Каждый применённый Спороисцеление, Второй расцвет или Дикое заживление добавляет 1, и каждая стадия сокращает время применения Дикого заживления. При {max} Быстрое восстановление становится Сверхцветением',
   'hudChrome.auraEffect.warlockAnchor':
     'Повторное применение в пределах {range} м возвращает сюда и поглощает якорь',
   'hudChrome.auraEffect.wintersChill':
@@ -18596,7 +18679,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Победа в рейтинговом матче приносит честь, валюту сражений игрок против игрока, а поражение в бою, который вы доиграли до конца, всё равно приносит меньшую её долю, как и ничья, так что по-настоящему поражение стоит вам одного лишь рейтинга. Честь задумана как награда за настоящие бои: победа над тем же противником или той же командой ещё раз в тот же день не приносит ничего сверх (как и повторное поражение от них), за долгий победный день первые победы платят сполна, дальше победа платит вдвое меньше, а ещё глубже в дне снова вдвое меньше, и на том останавливается, а матч, который противник сдал, всё же двигает ваш рейтинг, но чести не приносит вовсе. Этот день принадлежит самому королевству: он сменяется в его ночной час сброса, на той же границе, где спадает каждая суточная привязка.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'На каждой вещи Боевой мощи есть рейтинг атаки и рейтинг защиты Боевой мощи, и против чудовищ эти два рейтинга не делают ровным счётом ничего. Они работают лишь тогда, когда вы сражаетесь с другим игроком: на дуэли, на арене или на поле боя, где атака добавляет урона вашим ударам, а защита срезает урон по вам, и каждая до своего предела. Каждое семейство брони к тому же и комплект, а его бонусы — снова рейтинг Боевой мощи или эффекты, что работают только против игроков, так что бонусы комплекта у полного набора за честь ничего не стоят против босса подземелья. Сами же вещи по-прежнему несут обычные характеристики, броню и урон оружия, и всё это работает везде; против чудовища замолкают лишь рейтинги Боевой мощи и бонусы комплекта.',
+    'На каждой вещи Боевой мощи есть рейтинг атаки и рейтинг защиты Боевой мощи, и против чудовищ эти два рейтинга не делают ровным счётом ничего. Они работают лишь тогда, когда вы сражаетесь с другим игроком: на дуэли, на арене или на поле боя, где атака добавляет урона вашим ударам, а защита срезает урон по вам, и каждая до своего предела. Каждое семейство брони к тому же и комплект, а его бонусы — снова рейтинг Боевой мощи или эффекты, что работают только против игроков, так что бонусы комплекта у полного набора за честь ничего не стоят против босса подземелья. Сами же вещи по-прежнему несут обычные характеристики, броню и урон оружия, и всё это работает везде; против чудовища замолкают лишь рейтинги Боевой мощи и бонусы комплекта. Одно исключение действует везде: два предмета комплекта заклинателя также делают так, что получаемый урон больше не замедляет чтение ваших заклинаний.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Такова осознанная плата. Снаряжение Боевой мощи создано для боёв с игроками, а не как обходной путь мимо ступеней подземелий: вещь Боевой мощи никогда не несёт тех боевых характеристик, что несёт эпическая вещь из подземелья в том же слоте, а рейтинг Боевой мощи и бонусы комплекта, которые она несёт взамен, целиком тратятся на других игроков. Хотите держаться на арене — покупайте её. Хотите быстрее проходить героические подземелья — добывайте снаряжение в подземельях.',
   'guide.social.calendarBodyDoubleHonor':
@@ -18632,6 +18715,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': 'Этот выбор материалов больше недоступен.',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × Сборщик: {name}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Взят у игрока {name}',
   'hudChrome.itemTooltip.materialSourceGathererSigned':
     '{count} × Сборщик: {name}, подпись: {signer}',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × Сборщик не указан',
@@ -18835,6 +18919,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': 'Кольцо Стража Разлома',
   'entities.items.rift_surveyors_satchel.name': 'Сумка Разведчика Разлома',
   'entities.items.emissary_cache.name': 'Тайник эмиссара',
+  'entities.items.pvp_trophy_skull.name': 'Трофейный череп',
   'entities.npcs.weekly_emissary.name': 'Чам Пит',
   'entities.npcs.weekly_emissary.title': 'Эмиссар',
   'entities.npcs.weekly_emissary.greeting':
@@ -18896,7 +18981,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.wocToken': 'Токен WoC',
   'hudChrome.currencies.heroicMarkNote':
     'Героические подземелья . тратится у героического интенданта',
-  'hudChrome.currencies.honorNote': 'Поля боя и арена',
+  'hudChrome.currencies.honorNote': 'Поля боя, арена и локальные задания',
   'hudChrome.currencies.delveMarkNote': 'Пройденные вылазки',
   'hudChrome.currencies.wocTokenNote': 'Баланс привязанного кошелька',
   'hudChrome.currencies.walletNotLinked': 'Кошелёк не привязан',
@@ -19184,6 +19269,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     'Призывает всех погибших участников группы или рейда в пределах 40 м и в поле зрения к вам и возвращает их к жизни с 30% здоровья и маны. Нельзя применять в бою. (Исцеление)',
   'entities.abilities.grove_awakening.name': 'Пробуждение рощи',
+  'entities.abilities.sporemender_form.name': 'Облик спороцелителя',
+  'entities.abilities.sporemender_form.description':
+    'Вы принимаете Облик спороцелителя: исходящее исцеление повышается на 20%, а броня на 40%, но скорость передвижения снижается на 20%. Все заклинания обычного облика остаются доступны. Действует, пока вы не смените облик. Смена облика также даёт эффект «Стремительная поступь», краткий всплеск скорости передвижения. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Исцеления)',
   'entities.abilities.prayer_of_returning.description':
     'Призывает всех погибших участников группы или рейда в пределах 40 м и в поле зрения к вам и возвращает их к жизни с 30% здоровья и маны. Нельзя применять в бою. (Свет и Послушание)',
   'entities.abilities.prayer_of_returning.name': 'Молитва возвращения',
@@ -19860,7 +19948,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Faultline также снижает получаемый урон на 10% на 6 сек.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Авангард: Sunvigil Regalia',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    '2 предмета: время восстановления Life Covenant сокращается на 30 сек.',
+    '2 предмета: время восстановления Life Covenant сокращается на 30 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     '4 предмета: Life Covenant также накладывает на союзника щит на 8% его максимального здоровья на 6 сек.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Авангард: Shieldvow Bastion',
@@ -19905,22 +19993,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Gut Punch из Smokefade дает на 2 приема серии больше.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Авангард: Veilpsalm Raiment',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    '2 предмета: время восстановления Terror Canticle сокращается на 3 сек.',
+    '2 предмета: время восстановления Terror Canticle сокращается на 3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     '4 предмета: когда Psalm of Warding полностью поглощен, защищенный союзник получает +20% скорости на 3 сек. Не чаще раза в 8 сек.',
   'entities.itemSets.vanguard_priest_holy.name': 'Авангард: Gracewing Raiment',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    '2 предмета: время восстановления Veilstep сокращается на 6 сек.',
+    '2 предмета: время восстановления Veilstep сокращается на 6 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     '4 предмета: Veilstep также накладывает на вас щит на 8% максимального здоровья на 6 сек.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Авангард: Duskhymn Regalia',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    '2 предмета: Litany of Woe также замедляет цель на 30% во время поддержания.',
+    '2 предмета: Litany of Woe также замедляет цель на 30% во время поддержания. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     '4 предмета: Call Tithefiend также накладывает на вас щит на 10% максимального здоровья на 8 сек.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Авангард: Tempestwrit Battlemail',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    '2 предмета: время восстановления Unleash Weapon сокращается на 3 сек.',
+    '2 предмета: время восстановления Unleash Weapon сокращается на 3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     '4 предмета: Unleash Weapon позволяет произносить заклинания на ходу и повышает скорость на 20% на 4 сек. Не чаще раза в 20 сек.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Авангард: Galeborn Warmail',
@@ -19930,37 +20018,37 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Ancestral Strike сокращает оставшееся время восстановления Elemental Trance на 4 сек.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Авангард: Brineward Chainmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    '2 предмета: Mending Waters применяется на 0,5 сек. быстрее к союзнику с менее чем 50% здоровья.',
+    '2 предмета: Mending Waters применяется на 0,5 сек. быстрее к союзнику с менее чем 50% здоровья. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     '4 предмета: Tidecall также накладывает на цель щит на 5% вашего максимального здоровья на 6 сек.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Авангард: Hourbinder Vestments',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    '2 предмета: время восстановления Temporal Barrier сокращается на 2 сек.',
+    '2 предмета: время восстановления Temporal Barrier сокращается на 2 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     '4 предмета: Temporal Barrier также повышает скорость защищенной цели на 20% на 3 сек.',
   'entities.itemSets.vanguard_mage_fire.name': 'Авангард: Emberlash Regalia',
   'entities.itemSets.vanguard_mage_fire.bonus2':
-    '2 предмета: Cinderfall перезаряжается на 3 сек. быстрее.',
+    '2 предмета: Cinderfall перезаряжается на 3 сек. быстрее. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     '4 предмета: применение Cinderfall сокращает оставшееся время восстановления Blazing Barrier на 2 сек.',
   'entities.itemSets.vanguard_mage_frost.name': 'Авангард: Rimewarden Garb',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    '2 предмета: время восстановления Icebind сокращается на 2 сек.',
+    '2 предмета: время восстановления Icebind сокращается на 2 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     '4 предмета: применение Icebind сокращает оставшееся время восстановления Flitstep на 5 сек.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Авангард: Dreadquill Vestments',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    '2 предмета: время произнесения Harrow сокращается на 0,3 сек.',
+    '2 предмета: время произнесения Harrow сокращается на 0,3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4 предмета: Consume лечит на 30% больше и может поддерживаться на ходу.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Авангард: Marrowbound Regalia',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    '2 предмета: время восстановления Bone Armor сокращается на 10 сек.',
+    '2 предмета: время восстановления Bone Armor сокращается на 10 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     '4 предмета: Reaping Command сокращает оставшееся время восстановления Bone Armor на 2 сек.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Авангард: Slagcrown Vestments',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '2 предмета: время восстановления Cinderhide сокращается на 30 сек.',
+    '2 предмета: время восстановления Cinderhide сокращается на 30 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     '4 предмета: каждый второй Conflagrate делает следующий Ruinbolt в течение 8 сек. мгновенным.',
   'entities.itemSets.vanguard_druid_feral.name': 'Шкура кровавой гривы',
@@ -19970,12 +20058,23 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Bruin Rush накладывает щит на 6% максимального здоровья на 6 сек.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Облачение чертополоха',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    '2 предмета: время восстановления Fleetmend сокращается на 1 сек.',
+    '2 предмета: время восстановления Fleetmend сокращается на 1 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     '4 предмета: Fleetmend также повышает вашу скорость передвижения на 30% на 3 сек.',
   'entities.itemSets.vanguard_druid_balance.name': 'Облачение звездного стража',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Время применения Хватких корней сокращается на 0,5 сек.',
+    'Время применения Хватких корней сокращается на 0,5 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
+  'entities.letters.world_quest_reward.sender': 'Воронья почта',
+  'entities.letters.world_quest_reward.subject': 'Ваша награда за локальное задание',
+  'entities.letters.world_quest_reward.body':
+    'Когда вы получили эту награду за локальное задание, ваши сумки были полны, поэтому вороны доставили её сюда. Освободите место и заберите её у любого вороньего столба.\n\n- Воронья почта',
+  'questUi.logs.worldQuestRewardMailed':
+    'Ваши сумки полны. Награда отправлена в почтовый ящик: {items}.',
+  'errors.searchUpdates': 'Поиск обновлений',
+  'errors.noUpdateFound': 'Обновление не найдено. Повторите попытку чуть позже.',
+  'errors.updateUnavailable':
+    'Обновите игру через игровой магазин или скачайте последнюю версию клиента.',
+  'errors.updateSearchFailed': 'Не удалось проверить обновления. Повторите попытку.',
 };

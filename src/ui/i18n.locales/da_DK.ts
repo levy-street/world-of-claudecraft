@@ -497,7 +497,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Fraktioner',
   'hudChrome.currencies.heroicMarkNote': 'Heroiske fangehuse, brug hos den heroiske kvartermester',
   'hudChrome.currencies.honor': 'Heder',
-  'hudChrome.currencies.honorNote': 'Slagmarker og arenaen',
+  'hudChrome.currencies.honorNote': 'Slagmarker, arenaen og verdensopgaver',
   'hudChrome.currencies.intro':
     'Ingen af disse tager plads i din rygsæk. Mønter bliver som altid i din rygsæk.',
   'hudChrome.currencies.lifetime': 'Levetid {amount}',
@@ -1848,7 +1848,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Annoncér en høj nu; den hæves efter den fulde advarsel.',
   'devCommand.actions.hillwarn.label': 'Høj nedtælling',
   'entities.abilities.lava_burst.description':
-    'Påfør {damage} Ildskade. Slår altid kritisk en mål som brænder med din Glødstød. Magma Bølge: hver Glødstød slag har 20% chance at nulstille denne nedtælling og gøre din næste Magma Burst inden 10 sek øjeblikkelig. Skade stiger med Stavekraft. (Tordenråb)',
+    'Påfør {damage} Ildskade. Et træf giver 1 Torden. Slår altid kritisk en mål som brænder med din Glødstød. Et kritisk slag gør yderligere 24% af den normale skade. Magma Bølge: hver Glødstød slag har 20% chance at nulstille denne nedtælling og gøre din næste Magma Burst inden 10 sek øjeblikkelig. Skade stiger med Stavekraft. (Tordenråb)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     'Passiv: Lysbuelyn og Gaffellyn har 20% chance at overbelaste, slagere deres første mål igen for 50% af skaden påført og tildele 1 Torden. (Tordenråb)',
@@ -1857,7 +1857,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Kald en tordenskrald ned, der påfører {damage} Naturskade til fjender inden 10 yards og bremser dem med 50% i 5 sek. Gendanner 8% af din maksimale Mana. Skade stiger med Stavekraft. (Tordenråb)',
   'entities.abilities.thunderstorm.name': 'Stormbryder',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Gribende Rødders kasttid reduceres med 0,5 sek.',
+    'Gribende Rødders kasttid reduceres med 0,5 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Kasting af Gribende Rødder lader dig kaste mens du bevæger dig og øger din bevægelseshastighed med 20 procent i 4 sek. Kan ikke forekomme mere end én gang hver 20 sek.',
   'entities.itemSets.vanguard_druid_balance.name': 'Stjernevogter Gevandter',
@@ -1866,7 +1866,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Bruin-storm skjolder dig for 6 procent af din maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_druid_feral.name': 'Blodhane Hud',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Flugtlægning nedtælling reduceres med 1 sek.',
+    'Flugtlægning nedtælling reduceres med 1 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Flugtlægning øger også din bevægelseshastighed med 30 procent i 3 sek.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Tidstel Blomst Gevandter',
@@ -1884,19 +1884,22 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Blodkrog tildeler 1 Jagtfart.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Fælde-tand Seletøj',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Tidslig Barriere nedtælling reduceres med 2 sek.',
+    'Tidslig Barriere nedtælling reduceres med 2 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Tidslig Barriere øger også den skjermede måls bevægelseshastighed med 20 procent i 3 sek.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Timeværn Gevandter',
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Gløderfald oplades 3 sek hurtigere.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Gløderfald oplades 3 sek hurtigere. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Kasting af Gløderfald reducerer Flammende barriere resterende nedtælling med 2 sek.',
   'entities.itemSets.vanguard_mage_fire.name': 'Glødepisk Kongeligt gevandter',
-  'entities.itemSets.vanguard_mage_frost.bonus2': 'Isbinding nedtælling reduceres med 2 sek.',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    'Isbinding nedtælling reduceres med 2 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Kasting af Isbinding reducerer Flittrin resterende nedtælling med 5 sek.',
   'entities.itemSets.vanguard_mage_frost.name': 'Rimevægter Gevandter',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': 'Livets Pagt nedtælling reduceres med 30 sek.',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    'Livets Pagt nedtælling reduceres med 30 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Livets Pagt skjolder også allierede for 8 procent af deres maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Solbevagt Regalia',
@@ -1910,16 +1913,17 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Valkyriens Kald nulstiller Sidste Påbuds nedtælling, og din næste Sidste Påbud inden 6 sek efter landing påfører 15 procent mere skade.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Lysmærke Krigs-pladeudstyr',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Terror Kantike nedtælling reduceres med 3 sek.',
+    'Terror Kantike nedtælling reduceres med 3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Når din Psalme for værn er fuldt forbrugt, får den skjermede allierede 20 procent bevægelseshastighed i 3 sek. Kan ikke forekomme mere end én gang hver 8 sek.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Slørpsalm Gevandter',
-  'entities.itemSets.vanguard_priest_holy.bonus2': 'Slørspring nedtælling reduceres med 6 sek.',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    'Slørspring nedtælling reduceres med 6 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Slørspring skjolder også dig for 8 procent af din maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_priest_holy.name': 'Vinger af Nåde Gevandter',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Jammerens Litani bremser også målets bevægelse med 30 procent mens du kanaliserer den.',
+    'Jammerens Litani bremser også målets bevægelse med 30 procent mens du kanaliserer den. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Kald Tiende-afgud skjolder også dig for 10 procent af din maksimale sundhed i 8 sek.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Tusmørke Hymne Regalia',
@@ -1936,7 +1940,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Maveslag tildeler 2 yderligere kombinationspunkter når brugt fra Røgfamling.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Skygget Læder',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'Løsriv Våben nedtælling reduceres med 3 sek.',
+    'Løsriv Våben nedtælling reduceres med 3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Løsriv Våben lader dig kaste mens du bevæger dig og øger din bevægelseshastighed med 20 procent i 4 sek. Kan ikke forekomme mere end én gang hver 20 sek.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Stormskrift Kampmail',
@@ -1946,21 +1950,22 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forfædrenes Slag reducerer Elementær Trance resterende nedtælling med 4 sek.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Stormfødt Krigsmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Lægende Vande kaster 0,5 sek hurtigere på en allierede under 50 procent sundhed.',
+    'Lægende Vande kaster 0,5 sek hurtigere på en allierede under 50 procent sundhed. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Tidevandskald skjolder også sit mål for 5 procent af din maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Saltbølge Kædemail',
-  'entities.itemSets.vanguard_warlock_affliction.bonus2': 'Hjemsøg kasttid reduceres med 0,3 sek.',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    'Hjemsøg kasttid reduceres med 0,3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Fortær heler dig for 30 procent mere og kan kanaliseres mens du bevæger dig.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Dread Quill Gevandter',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'Knoglerustning nedtælling reduceres med 10 sek.',
+    'Knoglerustning nedtælling reduceres med 10 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Høsting Kommando reducerer Knoglerustning resterende nedtælling med 2 sek.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Marvbundet Regalia',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Cinderhide nedtælling reduceres med 30 sek.',
+    'Cinderhide nedtælling reduceres med 30 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Hver anden Antændelse gør din næste Undergangslyn inden 8 sek øjeblikkelig.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Slagkrone Gevandter',
@@ -4659,7 +4664,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. At dræbe en fjendtlig spiller giver Askeskridt, hvilket øger bevægelseshastigheden med 40% i 6 sek.',
   'entities.itemSets.warfare_ashstalker.name': 'Askejæger-udstyr',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Øger Krigsførelsesforsvar med 40. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4671,13 +4677,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. At dræbe en fjendtlig spiller giver Ubrudt Ed, hvilket absorberer 200 skade i 10 sek.',
   'entities.itemSets.warfare_furyforged.name': 'Raseresmedet kampudstyr',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Øger Krigsførelsesforsvar med 40. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. Jeres besværgelser har 15% chance for at give Gløderværn, hvilket absorberer 120 skade i 8 sek.',
   'entities.itemSets.warfare_stormbound.name': 'Stormbundne klæder',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Øger Krigsførelsesforsvar med 40. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -7624,7 +7632,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Skyder målet for {damage} Arkan skade. Skaden stiger med angrebsstyrke på afstand.',
   'entities.abilities.arcane_shot.name': 'Grumt Skud',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Antag gangerens skikkelse og øg jeres bevægelseshastighed med 30% i 30 min. Mens den er aktiv, omtåger skade dig, så din bevægelseshastighed reduceres med 50% i 4 sek. (hvert træf genopfrisker omtågningen).',
+    'Antag gangerens skikkelse og øg jeres bevægelseshastighed med 30% i 30 min. Mens den er aktiv, omtåger skade dig, så din bevægelseshastighed reduceres med 50% i 2 sek. (hvert træf genopfrisker omtågningen).',
   'entities.abilities.aspect_of_the_cheetah.name': 'Gangerens Skikkelse',
   'entities.abilities.aspect_of_the_hawk.description':
     'Antag kærhøgens skikkelse og øg jeres angrebsstyrke med {buff} i 30 min.',
@@ -7645,7 +7653,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. I 3 sek. derefter er Ulveform gratis og fastholder målet, hvilket nedsætter dets hastighed med 50% i 4 sek. 8-25 m rækkevidde. Kun i Bruin-form.',
   'entities.abilities.bear_charge.name': 'Bruin-storm',
   'entities.abilities.bear_form.description':
-    'Forvandl dig til en bjørn: rustning +110%, maksimalt helbred +30%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Ethvert formskifte giver Fjedrende Skridt, et kort ryk i bevægelseshastighed. Kast igen for at vende tilbage til besværgerform.',
+    'Forvandl dig til en bjørn: rustning +110%, maksimalt helbred +30%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Du slår dobbelt så hurtigt for halv skade pr. slag, og hvert slag opbygger dobbelt raseri. Ethvert formskifte giver Fjedrende Skridt, et kort ryk i bevægelseshastighed. Kast igen for at vende tilbage til besværgerform.',
   'entities.abilities.bear_form.name': 'Bruin-form',
   'entities.abilities.berserker_rage.description':
     'Gå i et sydende raseri, og generér 20 raseri. (Krigertalent)',
@@ -7765,7 +7773,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Nedkalder en flammeeksplosion på målområdet, der giver {damage} Ildskade til fjender fanget i eksplosionen.',
   'entities.abilities.flame_shock.description':
-    'Volder {damage} Ildskade, derefter {overTime} Ildskade over 12 sek. Det første træf stiger med Besværgelseskraft.',
+    'Volder {damage} Ildskade, derefter {overTime} Ildskade over {duration} sek. Det første træf stiger med Besværgelseskraft.',
   'entities.abilities.flame_shock.name': 'Glødstød',
   'entities.abilities.flametongue_weapon.description':
     'Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra Ildskade.',
@@ -7810,6 +7818,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft.',
   'entities.abilities.heal.name': 'Højtidelig Bøn',
   'entities.abilities.healing_touch.description': 'Helbreder et venligt mål for {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Hver fuldført kastning giver 1 Grønske (maks. 3). Opsparet Grønske forkorter denne kastning: 2,2 sek. ved 1 Grønske, 1,9 sek. ved 2 og 1,5 sek. ved 3. Naturens velsignelse gør den øjeblikkelig, gratis og 25% stærkere.',
   'entities.abilities.healing_touch.name': 'Vildlægning',
   'entities.abilities.healing_wave.description':
     'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft. Genoprettelse: gemmer 50% af den fulde helbredelse før overhelbredelse som Helbredende Strøm i 12 sek., op til 30% af målets maksimale helbred.',
@@ -7905,7 +7915,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Slår for 10% våbenskade plus {damage}. Et træf genopretter 15 Fokus og giver 1 Jagtfart. Skaden stiger med angrebsstyrke gennem våbenskaden.',
   'entities.abilities.raptor_strike.name': 'Sprættende Slag',
   'entities.abilities.regrowth.name': 'Anden Blomstring',
-  'entities.abilities.rejuvenation.name': 'Vildblomst',
   'entities.abilities.renew.description':
     'Helbreder målet for {damage} over 15 sek., én gang hvert 3. sek. Helbredelsen stiger med Besværgelseskraft.',
   'entities.abilities.renew.name': 'Dvælende Nåde',
@@ -15672,7 +15681,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     'Tilkalder 3 bæster i 12 sek. Hvert angriber hvert 2. sek. for {damage} fysisk skade. Den viste skade inkluderer 8% af din afstandsangrebskraft før kæledyrsskadebonusser. Bæsterne fastlåser Flokvildskabet ved tilkaldelsen og får 10% skade per stak. Mens Vildt Spring er under nedkøling, har vellykkede Flokbefalinger 20% chance for at nulstille det, garanteret efter 5 mislykkede chancer. Det kan ikke nulstilles, mens bæsterne er aktive. (Flokherre)',
   'entities.abilities.trailbreak.description':
-    'Spring 12 meter baglæns. Har du Jagtfart, fornyes den og gør Genindtræden klar i 12 sek.',
+    'Spring 25 meter baglæns og bryd fri af rodfæstelser og bevægelsesnedsættelser. Har du Jagtfart, fornyes den og gør Genindtræden klar i 12 sek.',
   'entities.abilities.unleash_beast.description':
     'Forbruger 3 Flokvildskab, efter at dit kæledyr har slået for 83 til 105 fysisk skade og rystet enhver fjende inden for 6 meter for 26 til 34. Slaget og rystelsen bruger Flokvildskabets fulde kæledyrsskadebonus på 30% og stiger med kæledyrets angrebskraft. I de følgende 8 sek. gør kæledyret 25% mere skade, angriber 35% hurtigere og får Grumt Skud til at ramme op til 2 nærliggende fjender.',
   'entities.abilities.wildheart.description': 'Genopretter straks 30% af din maksimale sundhed.',
@@ -15699,7 +15708,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passiv: mens Forfædreslaget er under nedkøling, har forbruget af et Stormtegn 25% chance for at nulstille det. Hvis de 3 første chancer mislykkes, nulstiller den 4. det altid. (Krigsånd)',
   'entities.abilities.thunder_reservoir.description':
-    'Passiv: Lysbuelynet og Gaffellynet giver Torden, op til 5. Ved 5 Torden gør Jordstødet 125% mere skade eller Jordskælvet 100% mere, og derefter forbruges al Torden. (Tordenkald)',
+    'Passiv: Lysbuelynet, Gaffellynet og Magma Burst giver Torden, op til 5. Ved 5 Torden gør Jordstødet 125% mere skade eller Jordskælvet 100% mere, og derefter forbruges al Torden. (Tordenkald)',
   'entities.abilities.tidecall.description':
     'Helbreder et venligt mål for {damage}. Helbredelsen øges med besværgelseskraft. Tilføjer hele helbredelsen før overhelbredelse til Lapningsstrømmen, op til 30% af målets maksimale helbred.',
   'entities.abilities.unleash_weapon.description':
@@ -15771,7 +15780,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Marvbrækker',
   'entities.abilities.marrowbreak.description':
-    'Forbruger dine 3 Gammelt Blod til et tungt slag med høj trussel og {damage} skade. Under halvt helbred beskytter det dig i stedet med et skjold på 18% af dit maksimale helbred i 8 sek. og refunderer 15 raseri.',
+    'Forbruger dine 3 Gammelt Blod til et tungt slag med høj trussel og {damage} skade. Under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri.',
   'entities.abilities.moonlash.name': 'Månebølge',
   'entities.abilities.moonlash.description':
     'Forbruger dine 3 Måneflod til et tungt slag med {damage} arkan skade: skadesvalget. Solspor forbruger de samme 3 Måneflod, så vælg et.',
@@ -15780,7 +15789,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til {duration} sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge.',
   'entities.abilities.overbloom.name': 'Overblomstring',
   'entities.abilities.overbloom.description':
-    'Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet.',
+    'Forbruger 3 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Sporemending på målet.',
   'entities.abilities.redharvest.name': 'Rød Høst',
   'entities.abilities.redharvest.description':
     'Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner {rage} energi. Virker uden kombopoint.',
@@ -15794,7 +15803,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Gammelt Blod: trin {stacks} af {max}. Landede Katte- og Bruin-slag deler dette forråd; ved {max} forvandles Blodbid eller Knogleknus',
   'hudChrome.auraEffect.verdance':
-    'Grønske {stacks}/{max}. Hver NY Vildblomst eller Anden Blomstring, du planter, giver 1. Ved {max} bliver Hurtig heling til Overblomstring',
+    'Grønske {stacks}/{max}. Hver Sporemending, Anden Blomstring eller Vildlægning, du kaster, giver 1, og hver Grønske forkorter Vildlægnings kastetid. Ved {max} bliver Hurtig heling til Overblomstring',
   'sim.rift.allUnstable': 'Alle rifter er ustabile lige nu. Prøv igen senere.',
   'sim.rift.alreadyCleared': 'Denne rift er allerede ryddet af {names}.',
   'sim.rift.deadEntry': 'Du kan ikke gå ind i en rift, mens du er død.',
@@ -16349,7 +16358,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Et knusende angreb, der øger nærkampsskaden med {damage} og forårsager en stor mængde trussel. Aktiveres ved dit næste sving. Kun i Bruin-form.',
   'entities.abilities.maul.specNote_feral':
-    'Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Marvbrækker: et slag for 78 til 96 skade med høj trussel; under halvt helbred beskytter det dig i stedet med et skjold på 18% af dit maksimale helbred og refunderer 15 raseri.',
+    'Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Marvbrækker: et slag for 78 til 96 skade med høj trussel; under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri.',
   'entities.abilities.moonfire.description':
     'Brænder fjenden med månebrand for {damage} arkan skade plus skade over tid.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16383,12 +16392,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Bruger 2 Sjælesplinter for at befale alle udøde tjenere at slå til i samlet flok. Gravvogtere håner og forbereder sig, Krigere fastholder, Knoglemagikere blotter magiske forsvar, og Gravvingen flænger alle ramte fjender.',
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Helbreder et venligt mål for {damage} og en yderligere mængde over 21 sek.',
+    'Helbreder et venligt mål for {damage} og en yderligere mængde over 15 sek. Hvis effekten varer hele sin varighed, helbreder den målet igen for samme mængde som den første helbredelse.',
   'entities.abilities.regrowth.specNote_restoration':
-    'At plante en NY blomstring tilføjer 1 Grønske (maks. 5).',
+    'Hver kastning giver 1 Grønske (maks. 3), også når den fornyer en blomstring, der allerede virker.',
   'entities.abilities.rejuvenation.description': 'Helbreder målet for {damage} over 12 sek.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'At plante en NY blomstring tilføjer 1 Grønske (maks. 5). Ved 5 Grønske bliver Hurtig heling til Overblomstring.',
+    'Hver kastning giver 1 Grønske (maks. 3), også når den fornyer en blomstring, der allerede virker. Ved 3 Grønske bliver Hurtig heling til Overblomstring.',
   'entities.abilities.rip.description':
     'Afsluttende manøvre, der får målet til at bløde hvert 2. sek. i 24 sek.: 36 skade plus 24 pr. brugt combopoint (5 combopoint: {damage} i alt). Kun i Katteform.',
   'entities.abilities.rip.specNote_feral': 'Det ramte slag tilføjer 1 Gammelt Blod (maks. 3).',
@@ -16431,7 +16440,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Hver åbner, du bruger fra Skumringsslør, tilføjer 1 Tusmørke (maks. 3).',
   'entities.abilities.swiftmend.description':
-    'Forbruger en helbredelse-over-tid-effekt på et venligt mål for at helbrede det for {damage}. Plantninger af Vildblomst og Anden Blomstring tilføjer Grønske; ved 5 Grønske bliver denne knap til Overblomstring, som øjeblikkeligt helbreder hver allieret, der bærer dine helbredelse-over-tid-effekter, for 60% af det, de effekter havde tilbage. (Lundhjerte-motoren)',
+    'Forbruger en helbredelse-over-tid-effekt på et venligt mål for at helbrede det for {damage}. Hver kastning af Sporemending, Anden Blomstring og Vildlægning giver 1 Grønske; ved 3 Grønske bliver denne knap til Overblomstring, som øjeblikkeligt helbreder hver allieret, der bærer dine helbredelse-over-tid-effekter, for 60% af det, de effekter havde tilbage. (Lundhjerte-motoren)',
   'entities.abilities.swipe.description':
     'Fej dine kløer gennem nærliggende fjender for {damage} skade. Forårsager ekstra trussel. Kun i Bruin-form.',
   'entities.abilities.swipe.specNote_feral':
@@ -17510,8 +17519,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Reaping Commands unisone angreb giver 25 procent mere skade.',
   'entities.itemSets.gravebrand.name': 'Gravebrand-regalier',
-  'entities.itemSets.grovespring.bonus2':
-    'Hurtig heling forbruger først din egen Wildbloom eller Second Bloom og heler 25 procent mere. Modtaget skade forsinker ikke længere dine besværgelser.',
   'entities.itemSets.grovespring.bonus4':
     'Overbloom høster 75 procent af dine resterende effekter og oplagrer derefter 1 Verdance.',
   'entities.itemSets.grovespring.name': 'Grovespring-dragt',
@@ -19278,7 +19285,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'En sejr i ranglisten giver Ære, spiller-mod-spiller-valutaen, og et nederlag, du spiller til ende, giver stadig en mindre andel, ligesom uafgjort gør, så rang er det eneste, et nederlag virkelig koster dig. Ære skal belønne rigtige kampe: at besejre den samme modstander eller det samme hold igen samme dag giver ikke mere (og det gør et nyt nederlag mod dem heller ikke), en lang sejrsdag giver fuld betaling for dagens første række sejre og halverer derefter sejrsbetalingen, halverer den igen længere inde og bliver der, og en kamp, som modstanderen opgiver, flytter stadig din rang, men giver slet ingen Ære. Dagen følger rigets egen tid: Den skifter ved rigets natlige nulstilling, den samme grænse hvor alle daglige lockouts ryddes.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Hvert krigsstykke har Krigsoffensiv og Krigsforsvarsvurdering, og de to vurderinger gør slet intet mod monstre. De gælder kun, når du kæmper mod en anden spiller, i en duel, arenaen eller slagmarken, hvor Offensiv øger den skade, du gør, og Forsvar mindsker den skade, du tager, hver op til sin egen grænse. Hver rustningsfamilie er også et sæt, og sættets bonusser er ligeledes krigsvurderinger eller effekter, der kun virker mod spillere, så et komplet æressætets sætbonusser tæller intet mod en dungeonboss. Selve delene har stadig deres almindelige egenskaber, rustning og våbenskade, og de virker overalt. Det er krigsvurderingerne og sætbonusserne, der bliver tavse mod et monster.',
+    'Hvert krigsstykke har Krigsoffensiv og Krigsforsvarsvurdering, og de to vurderinger gør slet intet mod monstre. De gælder kun, når du kæmper mod en anden spiller, i en duel, arenaen eller slagmarken, hvor Offensiv øger den skade, du gør, og Forsvar mindsker den skade, du tager, hver op til sin egen grænse. Hver rustningsfamilie er også et sæt, og sættets bonusser er ligeledes krigsvurderinger eller effekter, der kun virker mod spillere, så et komplet æressætets sætbonusser tæller intet mod en dungeonboss. Selve delene har stadig deres almindelige egenskaber, rustning og våbenskade, og de virker overalt. Det er krigsvurderingerne og sætbonusserne, der bliver tavse mod et monster. Én undtagelse virker overalt: to dele af et besværgersæt gør også, at skade ikke længere forsinker dine besværgelser.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Det er den tilsigtede handel. Krigsudstyr er bygget til at kæmpe mod spillere, ikke som en genvej forbi dungeon-niveauerne: Et krigsstykke har aldrig de kampratings, som en dungeon-episk genstand i samme plads har, og de krigsvurderinger og sætbonusser, det i stedet har, bruges fuldstændigt på andre spillere. Hvis du vil kunne klare dig i arenaen, så køb det. Hvis du vil rydde heroiske dungeons hurtigere, så tjen dit udstyr i dungeons.',
   'guide.controls.harvestJournal': 'Høstjournal',
@@ -19763,4 +19770,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Effektiv: {effective} | Overhealing: {overheal} ({overhealPercent}) | Træffere: {hits} ({critPercent} krit.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Træffere: {hits} | Kritiske: {crits} ({critPercent}) | Gennemsnit: {average} | Min./maks.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Omgivelseslydstyrke',
+  'hudChrome.mapAtlas.resizeRailAria': 'Kortets sidebjælkebredde',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Træk for at ændre størrelsen på kortets sidebjælke. Dobbeltklik for at nulstille.',
 };

@@ -2,8 +2,9 @@
 // display caller (docs/design/class-balance-v042.md): action-slot
 // replacement, the spec-gated resolvers, one post-transform talent-mod bake
 // keyed by the final id, then the Ascension/Radiant Resonance presentation
-// transforms (effect magnitudes and cast time). `mods` is the caller's own
-// precomputed TalentModifiers, never recomputed here.
+// transforms (effect magnitudes and cast time) and Groveheart's Verdance
+// Wildmend cast time. `mods` is the caller's own precomputed TalentModifiers,
+// never recomputed here.
 //
 // applyAbilityCostTail below is the resource-cost tail (draining curse
 // cost_tax, the Measured Fury arms discount, Aether Surge's per-charge ramp):
@@ -18,11 +19,13 @@ import type { ResolvedAbility } from '../sim';
 import type { Entity, PlayerClass } from '../types';
 import { resolveActionReplacement } from './action_replacement';
 import { aetherSurgeCostMult } from './chronomancy';
-import { bruinRushMakesCatFormFree } from './druid_engines';
+import { bruinRushMakesCatFormFree, verdanceWildmendCastTime } from './druid_engines';
+import { naturesBoonCastTime } from './druid_natures_boon';
 import { resolveColdsightAbilityForSpec } from './hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from './hunter_shared';
 import { radiantResonanceCastTime } from './paladin_radiant_resonance';
 import { resolveVespersAbility } from './priest/vespers';
+import { resolveThundercallAbility } from './shaman_thundercall_kit';
 
 /** The narrow slice of PlayerMeta this chain needs, so a caller with only a
  *  class + talent allocation never fakes a full PlayerMeta. */
@@ -43,6 +46,7 @@ export function resolveAbilityChain(
     found = resolveHunterSharedAbilityForTalents(found, actor, meta.talents);
   }
   found = resolveVespersAbility(found, meta);
+  found = resolveThundercallAbility(found, meta);
   // known already carries its own talent mods, baked in once at abilitiesKnownAt
   // time. A wholesale def swap above never went through that bake, so give it
   // its own pass here, exactly once, keyed by the FINAL id: comparing ids
@@ -53,7 +57,27 @@ export function resolveAbilityChain(
   // mods carries the worn-set flags (Dawnforged 4pc: instant empowered Dawn's
   // Embrace). known.def.id, not the transformed found.def.id, is the ability
   // actually requested: the same identity radiantResonanceCastTime checks.
-  const castTime = radiantResonanceCastTime(actor, known.def.id, ascensionResolved.castTime, mods);
+  const resonanceCastTime = radiantResonanceCastTime(
+    actor,
+    known.def.id,
+    ascensionResolved.castTime,
+    mods,
+  );
+  // Banked Verdance speeds Wildmend (combat/druid_engines.ts); identity
+  // for every other ability and for a druid with no Verdance. Only the cast
+  // gets faster: scalingCastTime keeps the heal's Spell Power coefficient on
+  // the cast time from before the speed-up.
+  // An armed Groveheart Nature's Boon makes Wildmend instant on top
+  // (combat/druid_natures_boon.ts). The heal still scales off the cast time
+  // from before both speed-ups.
+  const castTime = naturesBoonCastTime(
+    actor.auras,
+    known.def.id,
+    verdanceWildmendCastTime(actor, known.def.id, resonanceCastTime),
+  );
+  if (castTime !== resonanceCastTime) {
+    return { ...ascensionResolved, castTime, scalingCastTime: resonanceCastTime };
+  }
   return castTime === ascensionResolved.castTime
     ? ascensionResolved
     : { ...ascensionResolved, castTime };

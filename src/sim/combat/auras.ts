@@ -55,6 +55,9 @@ import {
 } from './crafted_collection_effects';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { druidEngineOnBleedTick } from './druid_engines';
+import { naturesBoonOnHotTick } from './druid_natures_boon';
+import { secondBloomOnHotExpired } from './druid_second_bloom';
+import { sporemenderHealingDoneMult } from './druid_sporemender';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { consumeHealAbsorb } from './heal';
 import { isColdsightInternalMarkerAuraId } from './hunter_coldsight_read';
@@ -421,11 +424,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               const intended = Math.round(tickDamage * a.leechPct * ctx.healingTakenMult(src));
               const landing = consumeHealAbsorb(ctx, src, intended);
               const absorbed = intended - landing;
-              const healed = Math.min(landing, src.maxHp - src.hp);
+              const healed = Math.min(landing, Math.max(0, src.maxHp - src.hp));
               onCraftedCollectionHeal(ctx, src, src, landing - healed);
-              if (healed > 0 || absorbed > 0) {
+              const overheal = landing - healed;
+              if (healed > 0 || absorbed > 0 || overheal > 0) {
                 if (healed > 0) src.hp += healed;
-                const overheal = landing - healed;
+                // A tick that landed as pure overheal still reports it for the
+                // meters and the parse, flagged hot so the client treats it as a
+                // silent passive tick; every other leech tick keeps its shape.
+                const passive = healed === 0 && absorbed === 0;
                 ctx.emit({
                   type: 'heal2',
                   sourceId: src.id,
@@ -433,6 +440,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
                   amount: healed,
                   crit: false,
                   ability: a.name,
+                  ...(passive ? { hot: true } : {}),
                   ...(absorbed > 0 ? { absorbed } : {}),
                   ...(overheal > 0 ? { overheal } : {}),
                 });
@@ -451,15 +459,21 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             }
           }
         } else if (a.kind === 'hot' && !tickMendingCurrent(ctx, e, a)) {
-          const intended = Math.round(a.value * ctx.healingTakenMult(e));
+          const healer = ctx.entities.get(a.sourceId);
+          // Sporemender Form scales its wearer's HoT ticks live (exactly 1 for
+          // every other healer, so their tick arithmetic is unchanged).
+          const intended = Math.round(
+            a.value * sporemenderHealingDoneMult(healer) * ctx.healingTakenMult(e),
+          );
           const landing = consumeHealAbsorb(ctx, e, intended);
           const absorbed = intended - landing;
-          const healed = Math.min(landing, e.maxHp - e.hp);
-          const healer = ctx.entities.get(a.sourceId);
+          const healed = Math.min(landing, Math.max(0, e.maxHp - e.hp));
           if (healer) onCraftedCollectionHeal(ctx, healer, e, landing - healed);
-          if (healed > 0 || absorbed > 0) {
+          const overheal = landing - healed;
+          // A tick on a full-health target emits too (amount 0, the whole tick as
+          // overheal) so overheal totals cover the at-full-health case.
+          if (healed > 0 || absorbed > 0 || overheal > 0) {
             if (healed > 0) e.hp += healed;
-            const overheal = landing - healed;
             ctx.emit({
               type: 'heal2',
               sourceId: a.sourceId,
@@ -475,6 +489,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             const src = ctx.entities.get(a.sourceId);
             if (src && healed > 0) ctx.healingThreat(src, e, healed);
           }
+          // Groveheart Nature's Boon (combat/druid_natures_boon.ts): an owned
+          // HoT tick can arm the instant, free Wildmend window. Restoration-
+          // gated and cooldown-gated inside, before any rng draw.
+          naturesBoonOnHotTick(ctx, healer ?? null, a);
         } else if (a.kind === 'buff_mana_grace' && e.resourceType === 'mana') {
           e.resource = Math.min(e.maxResource, e.resource + Math.round(a.value));
         } else if (a.kind === 'polymorph') {
@@ -521,6 +539,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
         const source = ctx.entities.get(a.sourceId);
         if (source && !source.dead && source.kind === 'player') {
           onHotExpired(ctx, source, a.id, e);
+          // Second Bloom's closing heal (combat/druid_second_bloom.ts): only
+          // this natural full-duration expiry pays it, never a consume,
+          // harvest, dispel, or overwrite.
+          secondBloomOnHotExpired(ctx, source, e, a);
         }
       }
       // debuff_ap is the one non-buff kind recalcPlayerStats folds, so it must

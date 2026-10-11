@@ -4001,6 +4001,18 @@
     width: 24px;
     height: 24px;
   }
+  body.mobile-touch #instance-difficulty {
+    left: 2px;
+    top: 26px;
+    width: var(--rim-satellite-size);
+    height: var(--rim-satellite-size);
+    border-width: 2px;
+    transform: scale(var(--rim-satellite-scale));
+  }
+  body.mobile-touch #instance-difficulty svg {
+    width: 24px;
+    height: 24px;
+  }
   body.mobile-touch #mail-indicator {
     right: var(--rim-satellite-inset);
     bottom: var(--rim-satellite-inset);
@@ -9843,6 +9855,141 @@
      so re-point the low tier at the non-crit mobile rise here too. */
   :root[data-fx-level="low"] body.mobile-touch .fct.crit {
     animation-name: fct-rise-mobile;
+  }
+  /* Vivid combat text on touch: this layer outranks hud.css, so the vivid lane and
+     big-hit sizes are restated at the compact mobile scale (colours, keyline and crit
+     flare inherit untouched). An outgoing non-crit number fans out along a shorter arc
+     in its lane; a crit keeps the mobile crit pop above; a big hit sits between the two
+     sizes. */
+  @keyframes fct-out-l-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 20px) calc(-50% - 16px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 30px) calc(-50% - 58px);
+    }
+  }
+  @keyframes fct-out-r-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% + 20px) calc(-50% - 16px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% + 30px) calc(-50% - 58px);
+    }
+  }
+  @keyframes fct-out-ll-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 40px) calc(-50% - 12px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 56px) calc(-50% - 48px);
+    }
+  }
+  @keyframes fct-out-rr-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% + 40px) calc(-50% - 12px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% + 56px) calc(-50% - 48px);
+    }
+  }
+  body.mobile-touch .fct.fct-out-l:not(.crit) {
+    font-size: calc(15px * var(--fct-scale, 1));
+    animation-name: fct-out-l-mobile;
+  }
+  body.mobile-touch .fct.fct-out-r:not(.crit) {
+    font-size: calc(15px * var(--fct-scale, 1));
+    animation-name: fct-out-r-mobile;
+  }
+  body.mobile-touch .fct.fct-out-ll:not(.crit) {
+    font-size: calc(15px * var(--fct-scale, 1));
+    animation-name: fct-out-ll-mobile;
+  }
+  body.mobile-touch .fct.fct-out-rr:not(.crit) {
+    font-size: calc(15px * var(--fct-scale, 1));
+    animation-name: fct-out-rr-mobile;
+  }
+  @keyframes fct-vivid-rise-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 58px);
+    }
+  }
+  @keyframes fct-vivid-crit-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 0.7;
+    }
+    14% {
+      scale: 1.5;
+    }
+    28% {
+      scale: 1;
+    }
+    65% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 62px);
+      scale: 1;
+    }
+  }
+  body.mobile-touch .fct.fct-vivid.fct-damage-taken:not(.crit),
+  body.mobile-touch .fct.fct-vivid.fct-damage-taken-block:not(.crit) {
+    animation-name: fct-vivid-rise-mobile;
+  }
+  body.mobile-touch .fct.fct-vivid.crit {
+    animation-name: fct-vivid-crit-mobile;
+  }
+  :root[data-fx-level="low"] body.mobile-touch .fct.fct-vivid.crit {
+    animation-name: fct-vivid-rise-mobile;
+  }
+  body.mobile-touch .fct.fct-big:not(.crit) {
+    font-size: calc(18px * var(--fct-scale, 1));
+  }
+  body.mobile-touch .fct.fct-big.crit {
+    font-size: calc(23px * var(--fct-scale, 1));
   }
   @keyframes fct-xp-pop-mobile {
     0% {

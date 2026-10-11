@@ -451,6 +451,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/pyre_colossus.glb": "/media/models/creatures/pyre_colossus.5edb7b6c76e6.glb",
   "models/creatures/spider.glb": "/media/models/creatures/spider.5becf8b6510f.glb",
   "models/creatures/spider_egg_sac.glb": "/media/models/creatures/spider_egg_sac.4a0b3718097e.glb",
+  "models/creatures/sporemender_form.glb": "/media/models/creatures/sporemender_form.d6b6dbc77d46.glb",
   "models/creatures/stag.glb": "/media/models/creatures/stag.ec967c29bd35.glb",
   "models/creatures/stag_ability_anims.glb": "/media/models/creatures/stag_ability_anims.41df789622ac.glb",
   "models/creatures/stone_cantor.glb": "/media/models/creatures/stone_cantor.a207f7ae80be.glb",

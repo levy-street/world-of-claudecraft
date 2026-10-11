@@ -4,7 +4,10 @@
 // circle on dry, open ground and stands for HILL_DURATION_SECONDS. The PARTY
 // with the most members standing inside it contests it, holds it after
 // HILL_CAPTURE_SECONDS of unbroken majority, and every holder standing inside
-// earns a slow trickle of Honor for as long as they hold it. Raid members do
+// earns a slow trickle of Honor for as long as they hold it. While it stands
+// the realm hears where it is every HILL_NOTICE_SECONDS, with the standings
+// (hill_ranking.ts): the group that held it longest earns a point toward the
+// Weekly Vault's PvP row when it falls. Raid members do
 // not count; every level does. No SimContext, no rng, no clock: every function here is a plain function of its arguments so the
 // sim (hill.ts), the HUD bar and the tests read the same verdicts. The
 // ctx-bound system that owns the schedule, the presence pass, the contest
@@ -19,6 +22,9 @@ export const HILL_WINDOW_SECONDS = 3 * 60 * 60;
 export const HILL_WARNING_SECONDS = 15 * 60;
 /** A risen hill stands this long, then falls (owner spec: 45 minutes). */
 export const HILL_DURATION_SECONDS = 45 * 60;
+/** While a hill stands the realm is reminded where it is, and told the
+ *  standings, this often (owner spec 2026-09-29: every 5 minutes). */
+export const HILL_NOTICE_SECONDS = 5 * 60;
 /** The first window opens this long after boot (the natural rift portal
  *  precedent: never at tick zero). Sim time, so offline the first window
  *  opens two minutes into a session. */
@@ -45,6 +51,16 @@ export const HILL_ACCRUAL_SECONDS = 60;
 export const HILL_RAMP_STEP_SECONDS = 300;
 export const HILL_RAMP_STEP_HONOR = 2;
 export const HILL_RAMP_MAX_HONOR = 12;
+/** The Weekly Vault point for the longest hold (hill_ranking.ts) pays only a
+ *  player who stood inside for at least this long while their group held the
+ *  hill, and who is still in that group when it falls: a one-second visit, or
+ *  a player cycled through the party, earns nothing. */
+export const HILL_VAULT_MIN_INSIDE_SECONDS = 60;
+/** The longest hold must last at least this long in total before it pays any
+ *  Weekly Vault point (owner decision 2026-10-05): a lone player who captures
+ *  an empty hill on a quiet realm and stands a minute still tops the
+ *  standings, but five such visits must not fill the PvP row. */
+export const HILL_VAULT_MIN_HOLD_SECONDS = 10 * 60;
 
 /** The Honor one payout is worth after the holding party has held the hill
  *  for `heldSeconds`: HILL_RAMP_STEP_HONOR, then that much more every

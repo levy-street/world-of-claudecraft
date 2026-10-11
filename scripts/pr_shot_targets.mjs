@@ -136,6 +136,82 @@ const targetAurasBelowSeed = async (page) => {
   );
 };
 
+/** The same setting ON, but the frame left on its STOCK seat (no persisted
+ *  position): the case a player report raised, where the below-frame strip
+ *  used to paint across the action bar. The epoch stamp keeps the one-shot
+ *  layout reset from running mid-capture; no position is written. */
+const targetAurasBelowStockSeed = async (page) => {
+  await lowGraphicsSeed(page);
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.targetAurasBelowFrame = true; s.showNameplateDots = true; localStorage.setItem(k, JSON.stringify(s)); localStorage.setItem('woc_layout_reset_epoch', '1'); localStorage.removeItem('woc_target_frame_pos'); } catch {}`,
+  );
+};
+
+/** Seeds the local player's own debuffs on the nearest hostile training dummy,
+ *  one of them a five-stack Armor Shear in the exact record shape the sim's
+ *  sunder effect applies (src/sim/combat/effect_dispatch.ts), stands the player
+ *  beside it and targets it. Seeded, not cast: the claims these shots carry
+ *  are about where the strip hangs and whether a stack count is drawn, never
+ *  about how the aura came to exist (the target-aura-side precedent). */
+async function stageStackedTargetDebuffs(page) {
+  const staged = await page.evaluate(() => {
+    const game = window.__game;
+    const sim = game?.sim;
+    const player = sim?.player;
+    if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+    const dummy = [...sim.entities.values()].find(
+      (e) => e.templateId === 'training_dummy' && !e.dead && e.hostile,
+    );
+    if (!dummy) return { ok: false, reason: 'hostile training dummy is unavailable' };
+    player.pos.x = dummy.pos.x - 4;
+    player.pos.y = dummy.pos.y;
+    player.pos.z = dummy.pos.z;
+    player.prevPos = { ...player.pos };
+    // Face plus x, straight at the dummy, with the chase camera on the same
+    // heading so its plate sits mid-frame.
+    player.facing = Math.PI / 2;
+    game.input.camYaw = player.facing;
+    game.input.camDist = 6;
+    sim.rebucket?.(player);
+    dummy.auras.length = 0;
+    const auras = [
+      ['sunder_armor', 'Armor Shear', 'sunder', 600, 40, 'physical', 5],
+      ['rend', 'Rend', 'dot', 120, 20, 'physical', undefined],
+      ['moonfire', 'Moonfire', 'dot', 120, 30, 'arcane', undefined],
+      ['crippling_poison', 'Crippling Poison', 'slow', 600, 50, 'nature', 2],
+    ];
+    for (const [id, name, kind, remaining, value, school, stacks] of auras) {
+      dummy.auras.push({
+        id,
+        name,
+        kind,
+        remaining,
+        duration: remaining,
+        value,
+        sourceId: player.id,
+        school,
+        ...(stacks === undefined ? {} : { stacks }),
+      });
+    }
+    sim.targetEntity(dummy.id, player.id);
+    return { ok: true, dummyId: dummy.id };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  await waitForCurtainStreak(page);
+  await page.waitForFunction(
+    () => {
+      const strip = document.getElementById('tf-debuffs');
+      const frame = document.getElementById('target-frame');
+      if (!strip || !frame) return false;
+      return getComputedStyle(frame).display !== 'none' && strip.children.length > 0;
+    },
+    { timeout: 30000, polling: 200 },
+  );
+  await sweepOverlays(page, 4);
+  await wait(900);
+  return staged.dummyId;
+}
+
 const lowGraphicsSeed = async (page) => {
   await page.evaluateOnNewDocument(
     `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
@@ -169,6 +245,14 @@ async function waitForCurtainStreak(page, streakMs = 3000, timeoutMs = 90000) {
 const advancedLowMixSeed = async (page) => {
   await page.evaluateOnNewDocument(
     `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); Object.assign(s, { graphicsPreset: 5, graphicsDefaultApplied: true, terrainDetail: 0, foliageDensity: 0, surfaceDetail: 0, effectsQuality: 0, shadowQuality: 0, antiAliasing: 0, bloomQuality: 0, ambientOcclusion: 0, viewDistance: 0, waterQuality: 0, characterDetail: 1, dynamicLights: 1, particleEffects: 1 }); localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+
+// The standing lowest preset, plus the Spell Effects switch at the value a
+// variant names (the option is new, so a base checkout ignores the key).
+const spellEffectsSeed = (on) => async (page) => {
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; s.spellEffects = ${on}; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
   );
 };
 
@@ -3771,6 +3855,86 @@ export const TARGETS = [
     },
   },
   {
+    key: 'target-aura-stock-seat',
+    label:
+      'Target auras below the frame on the STOCK seat: the frame rises, the strip clears the hotbar',
+    when: ['ui/aura_bar_side'],
+    // Desktop only: the touch sheet pins its own seat and already hangs the
+    // strip below unconditionally (the target-aura-side mobile leg).
+    variants: [
+      {
+        key: 'desktop',
+        beforeLoad: targetAurasBelowStockSeed,
+        // The entry flow waits for its own #btn-offline, so DOMContentLoaded
+        // is enough; networkidle0 can stall on the shell's API polling when no
+        // local server is up.
+        navigationWaitUntil: 'domcontentloaded',
+      },
+    ],
+    async capture(page) {
+      await awaitWorldPainted(page);
+      await stageStackedTargetDebuffs(page);
+      // The player frame, the target frame, its strip and the action bar in one
+      // region, so the pair shows whether the strip lands on the hotbar.
+      const region = await page.evaluate(() => {
+        const boxes = ['player-frame', 'target-frame', 'tf-debuffs', 'actionbar']
+          .map((id) => document.getElementById(id))
+          .filter(Boolean)
+          .map((el) => el.getBoundingClientRect());
+        const pad = 16;
+        const x = Math.max(0, Math.min(...boxes.map((b) => b.left)) - pad);
+        const y = Math.max(0, Math.min(...boxes.map((b) => b.top)) - pad);
+        const right = Math.min(window.innerWidth, Math.max(...boxes.map((b) => b.right)) + pad);
+        const bottom = Math.min(window.innerHeight, Math.max(...boxes.map((b) => b.bottom)) + pad);
+        return { x, y, width: right - x, height: bottom - y };
+      });
+      return { clip: region };
+    },
+  },
+  {
+    key: 'nameplate-dot-stacks',
+    label: 'Nameplate dot row: a stacking debuff badges its stack count on the icon',
+    when: ['render/nameplate_dot_row.ts', 'render/nameplate_dots_core.ts'],
+    variants: [
+      {
+        key: 'desktop',
+        beforeLoad: targetAurasBelowStockSeed,
+        // The entry flow waits for its own #btn-offline, so DOMContentLoaded
+        // is enough; networkidle0 can stall on the shell's API polling when no
+        // local server is up.
+        navigationWaitUntil: 'domcontentloaded',
+      },
+    ],
+    async capture(page) {
+      await awaitWorldPainted(page);
+      const dummyId = await stageStackedTargetDebuffs(page);
+      // Crop around the dummy's plate: at chase distance the dot row is a few
+      // dozen pixels wide in a full frame, and the claim is about one corner.
+      const spot = await page.evaluate((id) => {
+        const r = window.__game?.renderer;
+        const v = r?.views?.get?.(id);
+        if (!r || !v) return null;
+        // The plate's dot row floats well above the head (measured at about
+        // 1.9 model heights at this chase distance), not at the head itself.
+        const p = v.group.position.clone();
+        p.y += (v.height ?? 2.3) * 1.9;
+        p.project(r.camera);
+        return {
+          x: (p.x * 0.5 + 0.5) * window.innerWidth,
+          y: (-p.y * 0.5 + 0.5) * window.innerHeight,
+          w: window.innerWidth,
+          h: window.innerHeight,
+        };
+      }, dummyId);
+      if (!spot) return {};
+      const width = Math.min(320, spot.w);
+      const height = Math.min(160, spot.h);
+      const x = Math.max(0, Math.min(spot.w - width, spot.x - width / 2));
+      const y = Math.max(0, Math.min(spot.h - height, spot.y - height / 2));
+      return { clip: { x, y, width, height } };
+    },
+  },
+  {
     key: 'aura-strip',
     label: 'Player buff and debuff strips under a full raid-buff load',
     when: ['aura_strip_order', 'auras_view', 'auras_painter', 'aura_overflow'],
@@ -4514,6 +4678,129 @@ export const TARGETS = [
         { timeout: 30000, polling: 300 },
       );
       return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'graphics-options-spell-effects',
+    label: 'Graphics options panel (Display card, Spell Effects row)',
+    when: ['render/spell_effects_switch'],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="graphics"]')?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      // On a base without the row the Weather row beside it is the "before".
+      await page.evaluate(() => {
+        const row =
+          document.querySelector('[data-focus-key="spellEffects"]') ??
+          document.querySelector('[data-focus-key^="spellEffects"]') ??
+          document.querySelector('[data-focus-key^="weather"]');
+        row?.scrollIntoView({ block: 'center' });
+      });
+      await wait(300);
+      return { clip: '#options-menu' };
+    },
+  },
+  {
+    key: 'spell-effects-in-world',
+    label: 'The same scripted spell volley with Spell Effects on and off',
+    when: ['render/spell_effects_switch'],
+    variants: [
+      { key: 'on', beforeLoad: spellEffectsSeed(true) },
+      { key: 'off', beforeLoad: spellEffectsSeed(false) },
+    ],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      // One identical event stream on both variants, all cast by the player:
+      // projectiles, a beam and a nova from the generic arm, a spec'd Fireball
+      // through the ability painter, and an aimed blast whose area ring must
+      // survive the option.
+      // Refired on a short interval so a slow software rasterizer still
+      // catches the volley mid-flight when the runner shoots.
+      await page.evaluate(() => {
+        const g = window.__game;
+        const r = g?.renderer;
+        const sim = g?.sim;
+        if (!r || !sim) return;
+        const pid = sim.playerId;
+        const me = sim.entities.get(pid);
+        let target = null;
+        let best = Infinity;
+        for (const e of sim.entities.values()) {
+          if (e.id === pid || e.dead || !r.views?.get?.(e.id)) continue;
+          const d = Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z);
+          if (d > 2 && d < best) {
+            best = d;
+            target = e;
+          }
+        }
+        const tid = target?.id ?? pid;
+        const fire = () => {
+          r.handleEvent({
+            type: 'spellfx',
+            sourceId: pid,
+            targetId: tid,
+            school: 'fire',
+            fx: 'projectile',
+          });
+          r.handleEvent({
+            type: 'spellfx',
+            sourceId: pid,
+            targetId: tid,
+            school: 'arcane',
+            fx: 'beam',
+          });
+          r.handleEvent({
+            type: 'spellfx',
+            sourceId: pid,
+            targetId: tid,
+            school: 'fire',
+            fx: 'heavyBolt',
+            ability: 'fireball',
+          });
+          r.handleEvent({
+            type: 'spellfx',
+            sourceId: pid,
+            targetId: tid,
+            school: 'frost',
+            fx: 'nova',
+          });
+          r.handleEvent({
+            type: 'spellfx',
+            sourceId: pid,
+            targetId: pid,
+            school: 'holy',
+            fx: 'procSurge',
+          });
+          r.handleEvent({
+            type: 'spellfxAt',
+            sourceId: pid,
+            x: me.pos.x + 3,
+            z: me.pos.z + 3,
+            school: 'fire',
+            fx: 'burst',
+            radius: 4,
+          });
+        };
+        fire();
+        // Left running: the runner's screenshot lands after this returns, and
+        // each variant boots its own page.
+        setInterval(fire, 150);
+      });
+      await wait(1600);
+      return {};
     },
   },
   {
@@ -6825,6 +7112,51 @@ export const TARGETS = [
     },
   },
   {
+    key: 'ferry-port-map',
+    label: 'Ferry ports and live departure timetable',
+    when: ['ui/ferry_port_map', 'hud/map/map_marker_interaction_controller'],
+    variants: [
+      { key: 'zone-desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'continent-desktop', overview: true, beforeLoad: seedLowGraphicsPreset },
+      { key: 'zone-mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+      { key: 'continent-mobile', overview: true, mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, variant) {
+      await awaitVeilSettled(page);
+      await page.evaluate(() => {
+        const { sim, hud } = window.__game;
+        sim.player.pos.x = 65;
+        sim.player.pos.z = 0;
+        hud.closeAll();
+      });
+      await wait(400);
+      await awaitVeilSettled(page);
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => window.__game.hud.toggleMap());
+      if (!(await pollForSize(page, '#map-window'))) return { skip: 'map did not open' };
+      if (variant?.overview) await page.evaluate(() => window.__game.hud.setMapLevel('continent'));
+      await wait(600);
+      const point = await page.evaluate(() => {
+        const canvas = document.querySelector('#map-canvas');
+        const rect = canvas.getBoundingClientRect();
+        const marker = window.__game.hud.mapMarkerInteraction.navigation.find(
+          (port) => port.kind === 'ferry-port',
+        );
+        if (!marker) return null; // baseline capture has no ferry markers
+        return {
+          x: rect.left + (marker.mx * rect.width) / canvas.width,
+          y: rect.top + (marker.my * rect.height) / canvas.height,
+        };
+      });
+      if (point) {
+        if (variant?.mobile) await page.touchscreen.tap(point.x, point.y);
+        else await page.mouse.move(point.x, point.y);
+        await wait(1000);
+      }
+      return {};
+    },
+  },
+  {
     key: 'world-map',
     label: 'World map / zone',
     when: [
@@ -6866,6 +7198,82 @@ export const TARGETS = [
         return !!w && getComputedStyle(w).display !== 'none';
       });
       return open ? { clip: '#map-window' } : {};
+    },
+  },
+  {
+    key: 'world-map-resize',
+    label: 'World map resized by its corner grip',
+    when: ['ui/hud/map/map_canvas_size', 'ui/window_drag_handle'],
+    // Desktop only: the touch sheet stands the grip down by design, so a
+    // mobile shot would match the plain world-map one.
+    variants: [{ key: 'desktop', beforeLoad: lowGraphicsSeed }],
+    // Open the map where the character stands, then drag its SE corner with
+    // real mouse input, the way a player resizes it. On a build without the
+    // feature the press lands on the drag band instead, which is the honest
+    // "before". Clips the whole HUD so the new size reads in context.
+    async capture(page) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      if (!(await pollForSize(page, '#map-window'))) return {};
+      const corner = await page.evaluate(() => {
+        const w = document.querySelector('#map-window');
+        const r = w.getBoundingClientRect();
+        const z = r.width / Math.max(1, w.offsetWidth);
+        return {
+          x: r.left + (w.clientLeft + w.clientWidth) * z - 4,
+          y: r.top + (w.clientTop + w.clientHeight) * z - 4,
+        };
+      });
+      await page.mouse.move(corner.x, corner.y);
+      await page.mouse.down();
+      await page.mouse.move(corner.x + 8, corner.y + 8, { steps: 2 });
+      await page.mouse.move(corner.x + 380, corner.y + 220, { steps: 12 });
+      await page.mouse.up();
+      await wait(800);
+      await sweepOverlays(page, 4);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'world-map-rail-divider',
+    label: 'World map atlas rail widened with its divider',
+    when: ['ui/hud/map/map_rail', 'ui/hud/map/map_window_sizing'],
+    // Desktop only: the divider (like the whole rail) is hidden on the touch
+    // layout.
+    variants: [{ key: 'desktop', beforeLoad: lowGraphicsSeed }],
+    // Open the map, then drag the rail divider 180px to the right with real
+    // mouse input. A build without the divider has nothing to grab, so the
+    // press lands on the stage and the shot is the shipped 300px rail.
+    async capture(page) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      if (!(await pollForSize(page, '#map-window'))) return {};
+      const grip = await page.evaluate(() => {
+        const divider = document.querySelector('#map-window .map-atlas-splitter');
+        const stage = document.querySelector('#map-window .map-atlas-stage');
+        const r = (divider ?? stage)?.getBoundingClientRect();
+        if (!r) return null;
+        return divider
+          ? { x: r.left + r.width / 2, y: r.top + r.height / 2 }
+          : { x: r.left + 6, y: r.top + r.height / 2 };
+      });
+      if (grip) {
+        await page.mouse.move(grip.x, grip.y);
+        await page.mouse.down();
+        await page.mouse.move(grip.x + 180, grip.y, { steps: 12 });
+        await page.mouse.up();
+      }
+      await wait(800);
+      await sweepOverlays(page, 4);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
     },
   },
   {
@@ -17129,7 +17537,7 @@ export const TARGETS = [
     // because Oakhide is a Bruin payoff and naturesBoonFormAllows refuses it
     // out of Bruin Form. A positive frame alone would not tell a working form
     // gate from a rim painted on everything. The window's other member
-    // (Wildbloom) is not in the curated druid form-bar defaults
+    // (Sporemending) is not in the curated druid form-bar defaults
     // (ui/hud/action_bar/owned_class_spec_defaults.ts DRUID_FORM_DEFAULTS), so
     // it has no slot to light on a stock form bar and is deliberately not what
     // these frames are shot against.

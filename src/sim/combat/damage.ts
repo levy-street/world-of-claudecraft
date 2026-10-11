@@ -110,6 +110,7 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { formAutoRageMult } from './form_swing';
 import { clearFieldcraftState } from './hunter_fieldcraft';
 import { clearPacklordState } from './hunter_packlord';
 import {
@@ -154,6 +155,7 @@ import { applySetProcs } from './set_procs';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { elementalTranceManaFromDamage } from './shaman_warspirit';
+import { fallDamageKeepsStealth } from './stealth_fall';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 import { onTrinketDamage } from './trinkets';
 import { emitRainOfFireStop } from './warlock_meteor_events';
@@ -1097,9 +1099,10 @@ export function dealDamage(
     }
   }
 
-  // taking or dealing real damage breaks stealth
+  // taking or dealing real damage breaks stealth (a fall leaves Stalk and the
+  // rogue stealths up: combat/stealth_fall.ts)
   if (amount > 0) {
-    ctx.breakStealth(target);
+    if (!fallDamageKeepsStealth(source, target, ability)) ctx.breakStealth(target);
     if (source && source.id !== target.id) {
       ctx.breakStealth(source);
     }
@@ -1217,10 +1220,15 @@ export function dealDamage(
       // here, a hidden ~20% income buff that co-fed the fury overpower incident.
       const baseRage = rageFromDealing(amount, source.level);
       const talentMult = isWarrior ? 1 + ctx.playerMods(meta).global.autoRagePct : 1;
+      // Bruin Form white swings mint double rage (combat/form_swing.ts): the
+      // bear swings twice as fast for half the damage, so rage per second
+      // doubles while white damage does not.
       source.resource = Math.min(
         source.maxResource,
         source.resource +
-          baseRage * (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1),
+          baseRage *
+            (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1) *
+            formAutoRageMult(source),
       );
     }
   }
@@ -1584,8 +1592,8 @@ export function handleDeath(
     ctx.bgOnPlayerDeath(e, killer);
     // World PvP: a flagged player's death in the open world moves the gold
     // stake and pays the honor pool to everyone who worked for the kill. Pure
-    // ledger arithmetic on the sim clock, zero rng; a no-op for every death
-    // that was not a flagged player's at a flagged player's hands.
+    // ledger arithmetic on the sim clock, zero rng. Every other death only
+    // ends the victim's kill streak and any bounty it earned.
     worldPvpOnPlayerDeath(ctx, e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {

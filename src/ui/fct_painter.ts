@@ -11,21 +11,23 @@
 // SCREEN-ANCHORED, byte-faithful to the old fct() and to classic-style combat text: spawn()
 // projects the head anchor ONCE (renderer.worldToScreen + the getUiScale author-space
 // divide), writes left / top a single time, and leaves the number at that screen position
-// for its ~1.25s life while the CSS @keyframes float it straight up. It does NOT re-project
-// per frame, so a number pops over the unit and rises in SCREEN space (it does not slide
-// with the camera) -- exactly how the classic-era damage numbers read, and identical to
-// the old fct(). step() therefore only ages out expired slots; there is no per-frame
-// position write, so an unchanged frame costs nothing.
+// for its ~1.25s life while the CSS @keyframes carry it: straight up under Classic Combat
+// Text, or (the vivid default) an outgoing number arcing out along one of four fan-out
+// lanes while a crit pops in the centre. It does NOT re-project per frame, so a number
+// pops over the unit and moves in SCREEN space (it does not slide with the camera), exactly
+// how the classic-era damage numbers read. step() therefore only ages out expired slots;
+// there is no per-frame position write, so an unchanged frame costs nothing.
 //
 // WRITE ROUTING: every DOM write goes through the PainterHost
-// write-elision facet -- setText for the number, toggleClass for the colour token + crit
-// class, setStyleProp for left / top / animation. A node is shown purely by being attached
+// write-elision facet -- setText for the number, toggleClass for the colour token, the crit
+// class and the vivid-look classes (fct-vivid, the fan-out lane, fct-big), setStyleProp for
+// left / top / animation. A node is shown purely by being attached
 // (appendChild) and hidden by being detached (remove() on TTL recycle), so the spawn path
 // makes no display write at all. A no-op frame costs no DOM mutation and the skip-rate holds.
 // The per-kind colour moved off el.style.color
 // onto a CSS class token keyed by the descriptor kind; the painter never names
-// a hex (the colours live in hud.css's .fct-<token> rules). The crit rise stays on the
-// .fct.crit CSS class (the crit keyframe rises -86px, the base -76px), never a descriptor
+// a hex (the colours live in hud.css's .fct-<token> rules). Every motion (the crit rise,
+// the fan-out arcs, the vivid hold-then-fade) stays on CSS classes, never a descriptor
 // distance, exactly as the fct_core comment requires.
 //
 // POOL-LIFECYCLE RULES (the load-bearing correctness, state.md Top risk 2):
@@ -103,8 +105,16 @@ import {
   type FctEvent,
   type FctKind,
 } from './fct_core';
-import { type FctSpawnShape, type FctSpawnSource, fctSpawnShape } from './fct_event';
+import { type FctDriftLane, FctHitScale, fctDriftLane } from './fct_emphasis_core';
+import {
+  type FctDamageFlavorSource,
+  type FctSpawnShape,
+  type FctSpawnSource,
+  fctSpawnShape,
+  withDamageFlavor,
+} from './fct_event';
 import { FctBeatStager, type FctBeatStrike } from './fct_stage_core';
+import { classicCombatTextOn } from './fct_style_mode';
 import type { PainterHostWriters } from './painter_host';
 
 /**
@@ -149,9 +159,21 @@ const FCT_EMPTY_ANCHOR: FctAnchorSource = { pos: { x: 0, y: 0, z: 0 }, scale: 1 
 // the colours live in hud.css's .fct-<token> rules.
 const FCT_BASE_CLASS = 'fct';
 const FCT_CRIT_CLASS = 'crit';
+// VIVID LOOK (the default; Classic Combat Text turns every one of these off, leaving the
+// shipped floater byte-identical). `fct-vivid` carries the heavier outline and the crit
+// flare; one fan-out lane class per outgoing number picks its arc (hud.css owns one STATIC
+// keyframe per lane, because a var() inside keyframes would push the rise off the
+// compositor); `fct-big` flags a hit well above the player's own running average.
+const FCT_VIVID_CLASS = 'fct-vivid';
+const FCT_OUT_CLASS_PREFIX = 'fct-out-';
+// Every lane paired with its class once at module load, so a spawn builds no strings.
+const FCT_OUT_LANE_CLASSES: ReadonlyArray<readonly [FctDriftLane, string]> = (
+  ['l', 'r', 'll', 'rr'] as const
+).map((lane) => [lane, `${FCT_OUT_CLASS_PREFIX}${lane}`] as const);
+const FCT_BIG_CLASS = 'fct-big';
 // The colour token becomes the class `fct-<token>` (e.g. 'fct-heal'); hud.css maps each to
 // the live hex. Deriving it from the token keeps the painter and the descriptor's token
-// vocabulary (fct_core) in one place rather than duplicating an 11-row table.
+// vocabulary (fct_core) in one place rather than duplicating the per-token table.
 const FCT_COLOR_CLASS_PREFIX = 'fct-';
 const LEFT_PROP = 'left';
 const TOP_PROP = 'top';
@@ -189,6 +211,7 @@ interface FctPending {
   target: FctAnchorSource;
   crit: boolean;
   isSelf: boolean;
+  amount: number | undefined;
   dueAt: number;
 }
 
@@ -214,6 +237,13 @@ export class FctPainter {
   // preset applier, NEVER the FPS governor: the two-controller hazard). Read per spawn
   // (event-driven, not a per-frame cost) to tier the live-cap / TTL knobs.
   private readonly getFxTier: () => UiEffectsTier;
+  // The player's Classic Combat Text choice, read per spawn (event-driven, never per frame)
+  // so flipping the option restyles the very next number without a reload.
+  private readonly isClassic: () => boolean;
+  // The running baseline the big-hit emphasis weighs each outgoing hit against, and the
+  // outgoing spawn ordinal the left / right fan-out alternates on.
+  private readonly hitScale = new FctHitScale();
+  private outOrdinal = 0;
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -226,6 +256,7 @@ export class FctPainter {
       doc?: Document;
       random?: () => number;
       getFxTier?: () => UiEffectsTier;
+      isClassic?: () => boolean;
     } = {},
   ) {
     const {
@@ -236,9 +267,13 @@ export class FctPainter {
       // Default to the full tier so a painter built without the accessor (e.g. a Node
       // test) is untiered (byte-faithful to the pre-tiering behavior).
       getFxTier = () => 'ultra' as UiEffectsTier,
+      // Reads the live body class off the injected document; a fake document with no
+      // body reads as the vivid default.
+      isClassic = () => classicCombatTextOn(doc),
     } = opts;
     this.cap = cap;
     this.getFxTier = getFxTier;
+    this.isClassic = isClassic;
     // Math.random for the horizontal jitter is allowed on the PAINTER (not the pure core);
     // a test injects a deterministic draw.
     this.random = random;
@@ -261,6 +296,7 @@ export class FctPainter {
         target: FCT_EMPTY_ANCHOR,
         crit: false,
         isSelf: false,
+        amount: undefined,
         dueAt: 0,
       });
     }
@@ -273,9 +309,18 @@ export class FctPainter {
    * the shape is null (a hit between two other entities floats nothing), so a later
    * strike of the same cast still lands on its own beat rather than sliding forward.
    */
-  stagedShape(strike: FctBeatStrike, now: number, src: FctSpawnSource): FctSpawnShape | null {
+  stagedShape(
+    strike: FctBeatStrike & FctDamageFlavorSource,
+    now: number,
+    src: FctSpawnSource,
+  ): FctSpawnShape | null {
     const delaySec = this.beats.delaySec(strike, now);
-    const shape = fctSpawnShape(src);
+    // The strike IS the damage event, so its amount rides onto an outgoing
+    // hit's shape here (withDamageFlavor leaves every other shape untouched). Only the
+    // player's OWN hit carries its amount: a pet's or guardian's frequent small hits would
+    // otherwise drag the big-hit baseline down until every player hit read as big.
+    const ownHit = src.type === 'damage' && src.isPlayerSource;
+    const shape = withDamageFlavor(fctSpawnShape(src), strike, ownHit);
     if (shape === null || delaySec <= 0) return shape;
     return { ...shape, delaySec };
   }
@@ -309,8 +354,13 @@ export class FctPainter {
     // to spawn a damage number. Refusing non-crit damage used to hide the player's own hits
     // on their target -- their primary combat feedback -- so low is no longer allowed to drop
     // it. Crit EMPHASIS on low (the scale/pop) is still shed by the separate CSS gate
-    // ([data-fx-level="low"] .fct.crit); that keeps the number, only dropping the pop.
+    // ([data-fx-level="low"] .fct.crit, and .fct.fct-vivid.crit for the vivid look); that
+    // keeps the number, only dropping the pop.
+    const classic = this.isClassic();
     const d = describeFct(event, this.random());
+    // Every outgoing hit feeds the big-hit baseline, even one culled behind the camera or
+    // shown classic, so the average reflects what the player actually deals.
+    const bigHit = event.amount !== undefined && d.outgoing && this.hitScale.observe(event.amount);
     const v = this.project(d.anchor.x, d.anchor.y, d.anchor.z);
     if (v.behind) return; // faithful to the live `if (v.behind) return;` -- waste no slot.
     // Claim a slot honoring the tier's live cap. At the cap, evict the OLDEST live entry
@@ -340,6 +390,7 @@ export class FctPainter {
     // pressure); the full tier scale is exactly 1, so 1250 * 1 = 1250 is byte-identical.
     slot.ttlMs = d.ttlMs * fctTtlScale(tier);
     this.applyContent(slot, d);
+    this.applyVivid(slot.node, d, classic, bigHit);
     this.position(slot.node, v, d.jitterOffset, this.getScale());
     this.mount.appendChild(slot.node); // a detached node becomes visible on attach...
     if (evicted) this.restartAnimation(slot.node); // ...an evicted (attached) one needs the restart.
@@ -390,6 +441,8 @@ export class FctPainter {
   dispose(): void {
     while (this.pending.length > 0) this.recyclePending(this.pending.pop() as FctPending);
     this.beats.reset();
+    this.hitScale.reset();
+    this.outOrdinal = 0;
     for (let i = this.live.length - 1; i >= 0; i--) {
       const slot = this.live[i];
       slot.node.remove();
@@ -417,6 +470,7 @@ export class FctPainter {
     slot.target = event.target;
     slot.crit = event.crit;
     slot.isSelf = event.isSelf;
+    slot.amount = event.amount;
     slot.dueAt = dueAt;
     this.insertPending(slot);
   }
@@ -450,6 +504,7 @@ export class FctPainter {
   private recyclePending(slot: FctPending): void {
     slot.text = '';
     slot.target = FCT_EMPTY_ANCHOR;
+    slot.amount = undefined;
     this.pendingFree.push(slot);
   }
 
@@ -465,6 +520,21 @@ export class FctPainter {
       slot.colorClass = cls;
     }
     this.writers.toggleClass(slot.node, FCT_CRIT_CLASS, d.crit);
+  }
+
+  /** The vivid-look classes, all through the elided toggleClass (each class its own cache
+   *  slot, so a recycled node never keeps a stale one): the outline / crit flare on every
+   *  vivid floater, one fan-out lane on an outgoing number (alternating sides, so
+   *  consecutive hits never share a lane), and the big-hit flag. Classic turns all of them
+   *  off, leaving the node exactly the shipped floater. */
+  private applyVivid(node: HTMLElement, d: FctDescriptor, classic: boolean, bigHit: boolean) {
+    const lane = !classic && d.outgoing ? fctDriftLane(this.outOrdinal++) : null;
+    this.writers.toggleClass(node, FCT_VIVID_CLASS, !classic);
+    for (let i = 0; i < FCT_OUT_LANE_CLASSES.length; i++) {
+      const [l, cls] = FCT_OUT_LANE_CLASSES[i];
+      this.writers.toggleClass(node, cls, lane === l);
+    }
+    this.writers.toggleClass(node, FCT_BIG_CLASS, !classic && bigHit);
   }
 
   /** Position via left / top in author space: (projected x + jitter) / uiScale and

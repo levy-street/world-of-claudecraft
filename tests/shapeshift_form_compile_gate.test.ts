@@ -24,7 +24,7 @@ describe('shapeshift-form compile gate (#2571)', () => {
     expect(source).toContain('formCompilePending: null,');
   });
 
-  it('gates all four lazy form-visual builds (sheep, bear, cat, travel) on compile', () => {
+  it('gates all five lazy form-visual builds (sheep, bear, cat, travel, sporemender) on compile', () => {
     const source = renderer();
     const blockStart = source.indexOf('// lazy form visuals, swapped by visibility');
     const blockEnd = source.indexOf('// rideable mount under the player', blockStart);
@@ -32,7 +32,7 @@ describe('shapeshift-form compile gate (#2571)', () => {
     expect(blockEnd).toBeGreaterThan(blockStart);
     const block = source.slice(blockStart, blockEnd);
 
-    // Every form is built by the one shared builder, and the four that must not
+    // Every form is built by the one shared builder, and the five that must not
     // pop in half-linked ask it for the gate. Metamorphosis is the deliberate
     // exception: it grows out of the body it replaces.
     for (const [form, slot] of [
@@ -40,6 +40,7 @@ describe('shapeshift-form compile gate (#2571)', () => {
       ['bear', 'bearVisual'],
       ['cat', 'catVisual'],
       ['travel', 'travelVisual'],
+      ['sporemender', 'sporemenderVisual'],
     ]) {
       expect(block, `${slot} gated build`).toContain(
         `this.buildFormVisual(e, v, 'form_${form}', '${slot}', true)`,

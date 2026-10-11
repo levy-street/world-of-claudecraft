@@ -524,7 +524,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.heroicMarkNote':
     'Heroische Dungeons . beim heroischen Quartiermeister ausgeben',
   'hudChrome.currencies.honor': 'Ehre',
-  'hudChrome.currencies.honorNote': 'Schlachtfelder und die Arena',
+  'hudChrome.currencies.honorNote': 'Schlachtfelder, die Arena und Weltquests',
   'hudChrome.currencies.intro':
     'Keine davon belegt Taschenplatz. Münze bleibt wie gewohnt in deiner Tasche.',
   'hudChrome.currencies.lifetime': 'Insgesamt {amount}',
@@ -1916,7 +1916,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Kündigt sofort einen Hügel an; er entsteht nach der vollen Vorwarnzeit.',
   'devCommand.actions.hillwarn.label': 'Hügel-Countdown',
   'entities.abilities.lava_burst.description':
-    'Verursacht {damage} Feuerschaden. Trifft ein Ziel, das von Eurem Cinder-Stoß brennt, immer kritisch. Magma Surge: Bei jedem Cinder-Stoß-Tick besteht eine Chance von 20%, diese Abklingzeit zurückzusetzen und Euren nächsten Magma Burst innerhalb von 10 Sek. sofort wirkbar zu machen. Der Schaden steigt mit der Zaubermacht. (Donnerruf)',
+    'Verursacht {damage} Feuerschaden. Ein Treffer gewährt 1 Donner. Trifft ein Ziel, das von Eurem Cinder-Stoß brennt, immer kritisch. Ein kritischer Treffer verursacht zusätzlich 24% des normalen Schadens. Magma Surge: Bei jedem Cinder-Stoß-Tick besteht eine Chance von 20%, diese Abklingzeit zurückzusetzen und Euren nächsten Magma Burst innerhalb von 10 Sek. sofort wirkbar zu machen. Der Schaden steigt mit der Zaubermacht. (Donnerruf)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     'Passiv: Lichtbogenblitz und Gabelblitz haben eine Chance von 20%, sich zu überladen, ihr erstes Ziel erneut für 50% des verursachten Schadens zu treffen und 1 Donner zu gewähren. (Donnerruf)',
@@ -1926,7 +1926,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunderstorm.name': 'Stormbreak',
   'entities.itemSets.vanguard_druid_balance.name': 'Sternwächter-Gewand',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Die Zauberzeit von Greifende Wurzeln wird um 0,5 Sek. verkürzt.',
+    'Die Zauberzeit von Greifende Wurzeln wird um 0,5 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Greifende Wurzeln lässt dich während des Wirkens umherlaufen und erhöht dein Lauftempo 4 Sek. lang um 20 Prozent. Kann höchstens einmal alle 20 Sek. auftreten.',
   'entities.items.vanguard_druid_balance_chest.name': 'Sternwächter-Weste',
@@ -1946,7 +1946,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_druid_feral_shoulder.name': 'Blutmähnen-Schulterpolster',
   'entities.itemSets.vanguard_druid_restoration.name': 'Distelblüten-Gewand',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Die Abklingzeit von Rasche Heilung wird um 1 Sek. verkürzt.',
+    'Die Abklingzeit von Rasche Heilung wird um 1 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Rasche Heilung erhöht zudem dein Lauftempo 3 Sek. lang um 30 Prozent.',
   'entities.items.vanguard_druid_restoration_chest.name': 'Distelblüten-Weste',
@@ -1985,7 +1985,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_hunter_survival_shoulder.name': 'Fallenzahn-Schulterstücke',
   'entities.itemSets.vanguard_mage_arcane.name': 'Gewänder des Stundenbinders',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Die Abklingzeit von Temporale Barriere wird um 2 Sek. verkürzt.',
+    'Die Abklingzeit von Temporale Barriere wird um 2 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Temporale Barriere erhöht zudem 3 Sek. lang das Lauftempo des geschildeten Ziels um 20 Prozent.',
   'entities.items.vanguard_mage_arcane_chest.name': 'Robe des Stundenbinders',
@@ -1995,7 +1995,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_mage_arcane_shoulder.name': 'Schultertuch des Stundenbinders',
   'entities.itemSets.vanguard_mage_fire.name': 'Glutpeitschen-Ornat',
   'entities.itemSets.vanguard_mage_fire.bonus2':
-    'Die Abklingzeit von Glutsturz wird um 3 Sek. verkürzt.',
+    'Die Abklingzeit von Glutsturz wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Das Wirken von Glutsturz verringert die verbleibende Abklingzeit von Flammende Barriere um 2 Sek.',
   'entities.items.vanguard_mage_fire_chest.name': 'Glutpeitschen-Roben',
@@ -2005,7 +2005,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_mage_fire_shoulder.name': 'Glutpeitschen-Schultermantel',
   'entities.itemSets.vanguard_mage_frost.name': 'Reifwächter-Tracht',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    'Die Abklingzeit von Eisfessel wird um 2 Sek. verkürzt.',
+    'Die Abklingzeit von Eisfessel wird um 2 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Das Wirken von Eisfessel verringert die verbleibende Abklingzeit von Flitzschritt um 5 Sek.',
   'entities.items.vanguard_mage_frost_chest.name': 'Reifwächter-Gewand',
@@ -2015,7 +2015,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_mage_frost_shoulder.name': 'Reifwächter-Schulterpolster',
   'entities.itemSets.vanguard_paladin_holy.name': 'Sonnenwacht-Ornat',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'Die Abklingzeit von Bund des Lebens wird um 30 Sek. verkürzt.',
+    'Die Abklingzeit von Bund des Lebens wird um 30 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Bund des Lebens gewährt dem Verbündeten zudem 6 Sek. lang einen Schild in Höhe von 8 Prozent seiner maximalen Gesundheit.',
   'entities.items.vanguard_paladin_holy_chest.name': 'Sonnenwacht-Halsberge',
@@ -2045,7 +2045,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_paladin_retribution_shoulder.name': 'Lichtbrand-Schulterstücke',
   'entities.itemSets.vanguard_priest_discipline.name': 'Schleierpsalm-Gewand',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Die Abklingzeit von Schreckensschrei wird um 3 Sek. verkürzt.',
+    'Die Abklingzeit von Schreckensschrei wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Wird dein Psalm der Abschirmung vollständig verbraucht, erhält der geschildete Verbündete 3 Sek. lang 20 Prozent mehr Lauftempo. Kann höchstens einmal alle 8 Sek. auftreten.',
   'entities.items.vanguard_priest_discipline_chest.name': 'Schleierpsalm-Robe',
@@ -2055,7 +2055,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_priest_discipline_shoulder.name': 'Schleierpsalm-Schultermantel',
   'entities.itemSets.vanguard_priest_holy.name': 'Gnadenschwingen-Gewand',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'Die Abklingzeit von Schleierschritt wird um 6 Sek. verkürzt.',
+    'Die Abklingzeit von Schleierschritt wird um 6 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Schleierschritt gewährt dir zudem 6 Sek. lang einen Schild in Höhe von 8 Prozent deiner maximalen Gesundheit.',
   'entities.items.vanguard_priest_holy_chest.name': 'Gnadenschwingen-Robe',
@@ -2065,7 +2065,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_priest_holy_shoulder.name': 'Gnadenschwingen-Schultermantel',
   'entities.itemSets.vanguard_priest_shadow.name': 'Dämmerhymnen-Ornat',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litanei des Leids verlangsamt zudem das Lauftempo des Ziels um 30 Prozent, solange du sie kanalisierst.',
+    'Litanei des Leids verlangsamt zudem das Lauftempo des Ziels um 30 Prozent, solange du sie kanalisierst. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Zehntteufel rufen gewährt dir zudem 8 Sek. lang einen Schild in Höhe von 10 Prozent deiner maximalen Gesundheit.',
   'entities.items.vanguard_priest_shadow_chest.name': 'Dämmerhymnen-Robe',
@@ -2104,7 +2104,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_rogue_subtlety_shoulder.name': 'Schattenwandel-Schulterpolster',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Sturmschrift-Kampfkettenhemd',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'Die Abklingzeit von Waffe entfesseln wird um 3 Sek. verkürzt.',
+    'Die Abklingzeit von Waffe entfesseln wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Waffe entfesseln lässt dich während des Wirkens umherlaufen und erhöht dein Lauftempo 4 Sek. lang um 20 Prozent. Kann höchstens einmal alle 20 Sek. auftreten.',
   'entities.items.vanguard_shaman_elemental_chest.name': 'Sturmschrift-Halsberge',
@@ -2124,7 +2124,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_shaman_enhancement_shoulder.name': 'Sturmgeboren-Schulterstücke',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Brandungswacht-Kettenhemd',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Heilende Wasser wird 0,5 Sek. schneller gewirkt, wenn das Ziel unter 50 Prozent Gesundheit hat.',
+    'Heilende Wasser wird 0,5 Sek. schneller gewirkt, wenn das Ziel unter 50 Prozent Gesundheit hat. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Gezeitenruf gewährt seinem Ziel zudem 6 Sek. lang einen Schild in Höhe von 5 Prozent deiner maximalen Gesundheit.',
   'entities.items.vanguard_shaman_restoration_chest.name': 'Brandungswacht-Halsberge',
@@ -2134,7 +2134,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_shaman_restoration_shoulder.name': 'Brandungswacht-Schultermantel',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Furchtfeder-Gewänder',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Die Zauberzeit von Heimsuchung wird um 0,3 Sek. verkürzt.',
+    'Die Zauberzeit von Heimsuchung wird um 0,3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Verzehren heilt dich um 30 Prozent mehr und kann während der Bewegung kanalisiert werden.',
   'entities.items.vanguard_warlock_affliction_chest.name': 'Furchtfeder-Robe',
@@ -2144,7 +2144,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warlock_affliction_shoulder.name': 'Furchtfeder-Schultermantel',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Markgebundenes Ornat',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'Die Abklingzeit von Bone Armor wird um 10 Sek. verkürzt.',
+    'Die Abklingzeit von Bone Armor wird um 10 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command verringert die verbleibende Abklingzeit von Bone Armor um 2 Sek.',
   'entities.items.vanguard_warlock_demonology_chest.name': 'Markgebundene Robe',
@@ -2154,7 +2154,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warlock_demonology_shoulder.name': 'Markgebundene Schulterstücke',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Schlackenkronen-Gewänder',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Die Abklingzeit von Cinderhide wird um 30 Sek. verkürzt.',
+    'Die Abklingzeit von Cinderhide wird um 30 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Jede zweite Feuersbrunst lässt deinen nächsten Verderbensblitz innerhalb von 8 Sek. sofort wirken.',
   'entities.items.vanguard_warlock_destruction_chest.name': 'Schlackenkronen-Roben',
@@ -4803,7 +4803,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ascheschritt, was das Bewegungstempo 6 Sek. lang um 40% erhöht.',
   'entities.itemSets.warfare_ashstalker.name': 'Aschenpirscher-Ausrüstung',
   'entities.itemSets.warfare_cinderweave.bonus2':
-    'Erhöht Kriegsführungs-Verteidigungswertung um 40.',
+    'Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4817,13 +4817,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ungebrochenen Eid, was 10 Sek. lang 200 Schaden absorbiert.',
   'entities.itemSets.warfare_furyforged.name': 'Zorngeschmiedete Kriegstracht',
   'entities.itemSets.warfare_stormbound.bonus2':
-    'Erhöht Kriegsführungs-Verteidigungswertung um 40.',
+    'Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Glutwacht zu gewähren, was 8 Sek. lang 120 Schaden absorbiert.',
   'entities.itemSets.warfare_stormbound.name': 'Sturmgebundene Gewänder',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Erhöht Kriegsführungs-Verteidigungswertung um 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -9472,7 +9473,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Nehmt die Gestalt des Marders an und erhöht eure Ausweichchance 30 Min. lang um 8%.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Gestalt des Renners',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Nehmt die Gestalt des Renners an und erhöht euer Bewegungstempo 30 Min. lang um 30%. Solange aktiv, macht euch erlittener Schaden benommen, wodurch sich euer Bewegungstempo 4 Sek. lang um 50% verringert (jeder Treffer erneuert die Benommenheit).',
+    'Nehmt die Gestalt des Renners an und erhöht euer Bewegungstempo 30 Min. lang um 30%. Solange aktiv, macht euch erlittener Schaden benommen, wodurch sich euer Bewegungstempo 2 Sek. lang um 50% verringert (jeder Treffer erneuert die Benommenheit).',
   'entities.abilities.aimed_shot.name': 'Langer Zug',
   'entities.abilities.aimed_shot.description':
     'Beschießt das Ziel für {damage} physischen Schaden. Der Schaden steigt mit der Distanzangriffskraft.',
@@ -9526,7 +9527,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Umhüllt euch 10 Min. lang mit Blitzen. Die nächsten 3 Nahkampfangriffe gegen euch fügen dem Angreifer {buff} Naturschaden zu, höchstens einmal alle 5 Sek.',
   'entities.abilities.flame_shock.name': 'Cinder-Stoß',
   'entities.abilities.flame_shock.description':
-    'Verursacht {damage} Feuerschaden, danach über 12 Sek. {overTime} Feuerschaden. Der erste Treffer steigt mit der Zaubermacht.',
+    'Verursacht {damage} Feuerschaden, danach über {duration} Sek. {overTime} Feuerschaden. Der erste Treffer steigt mit der Zaubermacht.',
   'entities.abilities.flametongue_weapon.name': 'Pyrebrand-Waffe',
   'entities.abilities.flametongue_weapon.description':
     'Erfüllt eure Waffe 30 Min. lang. Jeder Schlag verursacht {damage} zusätzlichen Feuerschaden.',
@@ -9574,11 +9575,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.name': 'Wildblitz',
   'entities.abilities.healing_touch.name': 'Wildheilung',
   'entities.abilities.healing_touch.description': 'Heilt ein freundliches Ziel um {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Jeder abgeschlossene Zauber fügt 1 Grünkraft hinzu (max. 3). Gesammelte Grünkraft verkürzt diesen Zauber: 2,2 Sek. bei 1 Grünkraft, 1,9 Sek. bei 2 und 1,5 Sek. bei 3. Segen der Natur macht ihn sofort, kostenlos und 25% stärker.',
   'entities.abilities.mark_of_the_wild.name': 'Wildwacht',
   'entities.abilities.mark_of_the_wild.description':
     'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.moonfire.name': 'Mondsturm',
-  'entities.abilities.rejuvenation.name': 'Wildblüte',
   'entities.abilities.thorns.name': 'Dornenwacht',
   'entities.abilities.thorns.description':
     'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden {buff} Naturschaden.',
@@ -9587,7 +9589,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle.',
   'entities.abilities.bear_form.name': 'Bruin-Gestalt',
   'entities.abilities.bear_form.description':
-    'Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Das Wechseln in eine Gestalt gewährt Trabschritt, einen kurzen Schub an Lauftempo. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
+    'Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Ihr schlagt doppelt so schnell für den halben Schaden pro Schlag, und jeder Schlag erzeugt doppelt so viel Wut. Das Wechseln in eine Gestalt gewährt Trabschritt, einen kurzen Schub an Lauftempo. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.maul.name': 'Knochenmalmer',
   'entities.abilities.growl.name': 'Bedrohen',
   'entities.abilities.growl.description':
@@ -15060,7 +15062,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     'Beschwört 12 Sek. lang 3 Bestien. Jede greift alle 2 Sek. für {damage} physischen Schaden an. Der angezeigte Schaden enthält 8% Eurer Distanzangriffskraft vor Begleiterschadensboni. Die Bestien fixieren beim Beschwören die Rudelwildheit und gewinnen 10% Schaden pro Stapel. Während die Stampede abklingt, haben erfolgreiche Rudelbefehle eine Chance von 20%, sie zurückzusetzen, garantiert nach 5 fehlgeschlagenen Chancen. Sie kann sich nicht zurücksetzen, solange die Bestien aktiv sind. (Rudelfürst)',
   'entities.abilities.trailbreak.description':
-    'Springt 12 Meter rückwärts. Habt Ihr Jagdschwung, wird er erneuert und bereitet 12 Sek. lang den Wiedereintritt vor.',
+    'Springt 25 Meter rückwärts und befreit Euch von Bewegungsunfähigkeit und Verlangsamungen. Habt Ihr Jagdschwung, wird er erneuert und bereitet 12 Sek. lang den Wiedereintritt vor.',
   'entities.abilities.unleash_beast.description':
     'Verbraucht 3 Rudelwildheit, nachdem Euer Begleiter für 83 bis 105 physischen Schaden zugeschlagen und alle Gegner innerhalb von 6 Metern für 26 bis 34 erschüttert hat. Schlag und Erschütterung nutzen den vollen Begleiterschadensbonus von 30% der Rudelwildheit und steigen mit der Angriffskraft des Begleiters. In den folgenden 8 Sek. verursacht der Begleiter 25% mehr Schaden, greift 35% schneller an und lässt den Finsteren Schuss bis zu 2 nahe Gegner treffen.',
   'entities.abilities.wildheart.description':
@@ -15088,7 +15090,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passiv: Während der Ahnenschlag abklingt, hat das Verbrauchen eines Sturmzeichens eine Chance von 25%, ihn zurückzusetzen. Schlagen die ersten 3 Chancen fehl, setzt ihn die 4. immer zurück. (Kriegsgeist)',
   'entities.abilities.thunder_reservoir.description':
-    'Passiv: Der Lichtbogenblitz und der Gabelblitz gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)',
+    'Passiv: Der Lichtbogenblitz, der Gabelblitz und Magma Burst gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)',
   'entities.abilities.tidecall.description':
     'Heilt ein verbündetes Ziel um {damage}. Die Heilung steigt mit Zaubermacht. Fügt die volle Heilung vor Überheilung der Flickströmung hinzu, bis zu 30% der maximalen Gesundheit des Ziels.',
   'entities.abilities.unleash_weapon.description':
@@ -15162,7 +15164,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Markbrecher',
   'entities.abilities.marrowbreak.description':
-    'Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit für 8 Sek. und erstattet 15 Wut zurück.',
+    'Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit heilt er Euch stattdessen um 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück.',
   'entities.abilities.moonlash.name': 'Mondwoge',
   'entities.abilities.moonlash.description':
     'Verbraucht 3 Mondflut für einen schweren Schlag mit {damage} Arkanschaden: die Schadenswahl. Sonnenspur verbraucht dieselben 3 Mondflut, also wählt eine.',
@@ -15171,7 +15173,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu {duration} Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge.',
   'entities.abilities.overbloom.name': 'Überblüte',
   'entities.abilities.overbloom.description':
-    'Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel.',
+    'Verbraucht 3 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Sporemending auf das Ziel.',
   'entities.abilities.redharvest.name': 'Rote Ernte',
   'entities.abilities.redharvest.description':
     'Verbraucht 3 Altes Blut: ein Schlag für {damage}, der sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, beide Blutungen entfernt und {rage} Energie wiederherstellt. Funktioniert auch ohne Combopunkte.',
@@ -15185,7 +15187,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Altes Blut: Stufe {stacks} von {max}. Gelandete Katzen- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer',
   'hudChrome.auraEffect.verdance':
-    'Grünkraft: Stufe {stacks} von {max}. Jede NEUE Wildblüte oder Zweite Blüte, die du pflanzt, fügt 1 hinzu. Bei {max} wird Flinkheilung zu Überblüte.',
+    'Grünkraft: Stufe {stacks} von {max}. Jede Sporemending, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.',
   'abilityUi.cast.rift_arcane_execution': 'Leerenriss',
   'abilityUi.cast.rift_arcane_strike': 'Arkane Auslöschung',
   'abilityUi.cast.rift_brute_execution': 'Erdspalter',
@@ -16872,7 +16874,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Ein malmender Angriff, der den Nahkampfschaden um {damage} erhöht und hohe Bedrohung verursacht. Aktiviert sich bei Eurem nächsten Schwung. Nur in Bruin-Gestalt.',
   'entities.abilities.maul.specNote_feral':
-    'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein Schlag für 78 bis 96 Schaden bei hoher Bedrohung; unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück.',
+    'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein Schlag für 78 bis 96 Schaden bei hoher Bedrohung; unter halber Gesundheit heilt er Euch stattdessen um 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück.',
   'entities.abilities.moonfire.description':
     'Versengt den Gegner mit Mondfeuer für {damage} Arkanschaden plus Schaden über Zeit.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16906,12 +16908,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verbraucht 2 Seelenfragmente, um jedem untoten Diener zu befehlen, gemeinsam zuzuschlagen. Graveguards verspotten und wappnen sich, Warriors fesseln, Bone Mages legen magische Abwehr offen, und Gravewing zerreißt alle getroffenen Gegner.',
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Heilt ein freundliches Ziel um {damage} und einen zusätzlichen Betrag über 21 Sek.',
+    'Heilt ein freundliches Ziel um {damage} und einen zusätzlichen Betrag über 15 Sek. Läuft der Effekt seine volle Dauer, heilt er das Ziel erneut um denselben Betrag wie die anfängliche Heilung.',
   'entities.abilities.regrowth.specNote_restoration':
-    'Das Pflanzen einer NEUEN Blüte fügt 1 Grünkraft hinzu (max. 5).',
+    'Jeder Zauber fügt 1 Grünkraft hinzu (max. 3), auch wenn er eine bereits wirkende Blüte erneuert.',
   'entities.abilities.rejuvenation.description': 'Heilt das Ziel über 12 Sek. um {damage}.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Das Pflanzen einer NEUEN Blüte fügt 1 Grünkraft hinzu (max. 5). Bei 5 Grünkraft wird Rasche Heilung zu Überblüte.',
+    'Jeder Zauber fügt 1 Grünkraft hinzu (max. 3), auch wenn er eine bereits wirkende Blüte erneuert. Bei 3 Grünkraft wird Rasche Heilung zu Überblüte.',
   'entities.abilities.rip.description':
     'Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt: 36 Schaden plus 24 pro eingesetztem Combopunkt (5 Combopunkte: {damage} insgesamt). Nur in Katzengestalt.',
   'entities.abilities.rip.specNote_feral':
@@ -16955,7 +16957,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Jede Eröffnung, die Ihr aus Duskveil einsetzt, fügt 1 Dämmer hinzu (max. 3).',
   'entities.abilities.swiftmend.description':
-    'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Das Pflanzen von Wildblüte und Zweite Blüte fügt Grünkraft hinzu; bei 5 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Hainherz-Signatur)',
+    'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Jeder Zauber von Sporemending, Zweite Blüte und Wildheilung fügt 1 Grünkraft hinzu; bei 3 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Hainherz-Signatur)',
   'entities.abilities.swipe.description':
     'Fegt mit Euren Klauen durch nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin-Gestalt.',
   'entities.abilities.swipe.specNote_feral':
@@ -17936,8 +17938,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Die gemeinsamen Treffer von Erntebefehl verursachen 25 Prozent mehr Schaden.',
   'entities.itemSets.gravebrand.name': 'Insignien des Grabmals',
-  'entities.itemSets.grovespring.bonus2':
-    'Schnellheilung verbraucht zuerst deine Wildblüte oder Zweite Blüte und heilt 25 Prozent mehr. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.grovespring.bonus4':
     'Überblüte erntet 75 Prozent deiner verbleibenden Effekte und speichert danach 1 Üppigkeit.',
   'entities.itemSets.grovespring.name': 'Gewand der Hainquelle',
@@ -19737,7 +19737,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Ein gewerteter Sieg zahlt Ehre, die Währung für Spieler gegen Spieler. Eine Niederlage, die du bis zum Ende spielst, zahlt trotzdem einen kleineren Anteil, ebenso ein Unentschieden, daher ist die Wertung der einzige echte Verlust einer Niederlage. Ehre soll echte Matches belohnen: Ein Sieg gegen denselben Gegner oder dasselbe Team am selben Tag zahlt nicht noch einmal, und eine weitere Niederlage gegen sie ebenfalls nicht. Ein langer Siegestag zahlt für den ersten Abschnitt die volle Belohnung, danach halbiert sich der Siegwert und später noch einmal, bevor er auf dieser Stufe bleibt. Ein Match, das der Gegner aufgibt, bewegt deine Wertung, zahlt aber überhaupt keine Ehre. Der Tag gehört zum Reich und wechselt zur nächtlichen Resetstunde, an der auch jede tägliche Sperre gelöscht wird.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster.',
+    'Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster. Eine Ausnahme wirkt überall: Zwei Teile eines Zauberwirker-Sets sorgen außerdem dafür, dass erlittener Schaden dein Zauberwirken nicht mehr verzögert.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Kriegsführungsausrüstung ist für Spieler gegen Spieler gedacht und überspringt keine Dungeonstufen. Sie trägt nicht die Kampfbewertungen eines Dungeonepics, sondern investiert ihre Bewertungen und Setboni vollständig in Kämpfe gegen Spieler. Für die Arena kaufst du sie, für schnellere heroische Dungeons verdienst du deine Ausrüstung dort.',
   'guide.controls.harvestJournal': 'Erntejournal',
@@ -20214,4 +20214,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Effektiv: {effective} | Überheilung: {overheal} ({overhealPercent}) | Treffer: {hits} ({critPercent} Krit.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Treffer: {hits} | Kritisch: {crits} ({critPercent}) | Durchschnitt: {average} | Min./max.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Ambiente-Lautstärke',
+  'hudChrome.mapAtlas.resizeRailAria': 'Breite der Karten-Seitenleiste',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Ziehen, um die Karten-Seitenleiste zu vergrößern oder zu verkleinern. Doppelklick setzt zurück.',
 };

@@ -1229,4 +1229,8 @@ export const table: DeedLocaleTable = {
     name: 'Betrapt op Heterdaad',
     desc: 'Vang een Muntzak Haastige in een Begraven Hoard voordat het met het goud vandoor gaat.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Helderder dan de schaduwen',
+    desc: 'Haal de gestolen muntenbuidels terug en ontsnap uit het Evergarden-doolhof op Hard.',
+  },
 };

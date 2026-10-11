@@ -40,3 +40,13 @@ core plus one thin painter, behind this barrel.
 
 Cover changes in `tests/world_pvp_view.test.ts` (the core and the markup) and
 `tests/pvp_tabs_view.test.ts` (the tab never pins or locks).
+
+The played-time reward clock uses h:mm and patches only its text node through
+Hud's shared writer facet, preserving scroll and focus without entering the
+full-panel signature. Binding caches the node after each rebuild; unchanged
+minute, pause and language inputs skip all DOM and localization work. Its pause
+line reads
+`WorldPvpInfo.rewardPause`: death, a PvE instance, or sanctuary ground. PvP-focused
+instances continue accumulating time. An older server without a pause cause falls
+back to the sanctuary rule. Title thresholds resolve from
+`WORLD_PVP_TITLE_THRESHOLDS`; no experience or reputation bonus is implied.

@@ -116,6 +116,7 @@ export interface IWorldDungeons {
   // without a snapshot round trip.
   riftEventMsRemaining(): number | null;
   dungeonDifficulty(): DungeonDifficulty;
+  activeDungeonDifficulty(): DungeonDifficulty | null;
   setDungeonDifficulty(difficulty: DungeonDifficulty): void;
   // Buy one Heroic Quartermaster offer (src/sim/content/heroic_vendor.ts),
   // paying its Heroic Marks price from the buyer's bags. Server-validated.

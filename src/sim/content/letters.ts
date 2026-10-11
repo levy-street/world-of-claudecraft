@@ -186,6 +186,24 @@ export const HOARD_REWARD_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
+// World quest reward letter: a world quest reward item (the quest's fixed
+// extra, the day's item slot piece, the slate's treasure map, a treasure
+// hunt's casket, or the weekly charge's cache) that did not fit in the bags
+// when it was earned. The item rides as the attachment;
+// world_quest_reward_mail.ts fills `items` per grant, so this base carries
+// none. Body stays count-free so the letterId localizes cleanly.
+export const WORLD_QUEST_REWARD_LETTER: LetterDef = {
+  letterId: 'world_quest_reward',
+  senderName: 'The Ravenpost',
+  subject: 'Your world quest reward',
+  body:
+    'Your bags were full when you earned this world quest reward, so the ' +
+    'ravens have brought it to you here instead. Make some room and collect ' +
+    'it from any raven pillar.\n\n' +
+    '- The Ravenpost',
+  delaySeconds: 0,
+};
+
 // Quest follow-up letters: the questgiver writes to you a little while after
 // the turn-in. Keyed by quest id; quests without an entry send nothing.
 export const QUEST_LETTERS: Record<string, LetterDef> = {
@@ -600,6 +618,7 @@ export function authoredLettersById(): Record<string, LetterDef> {
     [WOC_MARKET_RETURN_LETTER.letterId]: WOC_MARKET_RETURN_LETTER,
     [WOC_MARKET_SOLD_LETTER.letterId]: WOC_MARKET_SOLD_LETTER,
     [HOARD_REWARD_LETTER.letterId]: HOARD_REWARD_LETTER,
+    [WORLD_QUEST_REWARD_LETTER.letterId]: WORLD_QUEST_REWARD_LETTER,
   };
   for (const letter of Object.values(QUEST_LETTERS)) byId[letter.letterId] = letter;
   for (const letter of Object.values(GUILD_TREND_LETTERS)) byId[letter.letterId] = letter;

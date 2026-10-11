@@ -260,7 +260,7 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     const markers = buildMarkers(world as unknown as IWorld);
     const marker = markers.find((candidate) => candidate.kind === 'world-quest');
     expect(marker).toMatchObject({ questId: quest.id, zoneId: quest.zoneId, state: 'available' });
-    if (!marker || marker.kind !== 'world-quest') throw new Error('missing world quest marker');
+    if (marker?.kind !== 'world-quest') throw new Error('missing world quest marker');
     expect(minimapWorldQuestMarkerAt(markers, marker.mx, marker.my, 10)).toBe(marker);
   });
 
@@ -281,14 +281,14 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       (candidate) => candidate.kind === 'world-quest',
     );
     expect(marker).toMatchObject({ questId: quest.id, state: 'available' });
-    if (!marker || marker.kind !== 'world-quest') throw new Error('missing rim marker');
+    if (marker?.kind !== 'world-quest') throw new Error('missing rim marker');
     expect(Math.hypot(marker.mx - S / 2, marker.my - S / 2)).toBeCloseTo(
       minimapSafeCenterRadius(S, 7),
       5,
     );
   });
 
-  it('hides below-level, completed, inactive-rotation, and distant world quests', () => {
+  it('hides below-level, completed, practice replay, inactive-rotation, and distant world quests', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     const world = makeWorld('sim') as unknown as {
       player: { level: number; pos: { x: number; z: number } };
@@ -311,6 +311,11 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     ]);
     expect(worldQuestMarkers()).toEqual([]);
 
+    world.worldQuestLog = new Map([
+      [quest.id, { questId: quest.id, count: 0, state: 'active', practiceOnly: true }],
+    ]);
+    expect(worldQuestMarkers()).toEqual([]);
+
     world.worldQuestCycle = '2026-09-03';
     world.worldQuestLog = new Map();
     expect(worldQuestMarkers()).toEqual([]);
@@ -319,6 +324,35 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     world.player.pos.x = quest.area.x + quest.area.radius + 1_000;
     expect(worldQuestMarkers()).toEqual([]);
   });
+
+  it.each(['sim', 'client'] as const)(
+    'shows the rerolled-in quest in place of the one it replaced (%s)',
+    (shape) => {
+      const replaced = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+      const replacement = WORLD_QUESTS_BY_ID.wq_eastbrook_calligraphy;
+      const world = makeWorld(shape) as unknown as {
+        player: { level: number; pos: { x: number; z: number } };
+        worldQuestCycle: string;
+        worldQuestLog: ReadonlyMap<string, never>;
+        worldQuestReplacements: Readonly<Record<string, string>>;
+      };
+      world.player.level = 20;
+      world.worldQuestCycle = '2026-08-31';
+      world.worldQuestLog = new Map<string, never>();
+      world.worldQuestReplacements = { [replaced.id]: replacement.id };
+      const questIds = () =>
+        buildMarkers(world as unknown as IWorld).flatMap((marker) =>
+          marker.kind === 'world-quest' ? [marker.questId] : [],
+        );
+
+      world.player.pos.x = replacement.area.x;
+      world.player.pos.z = replacement.area.z;
+      expect(questIds()).toContain(replacement.id);
+      world.player.pos.x = replaced.area.x;
+      world.player.pos.z = replaced.area.z;
+      expect(questIds()).not.toContain(replaced.id);
+    },
+  );
 
   it('marks an entered objective active while keeping the same small emblem', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
@@ -356,7 +390,7 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       bossId: boss.templateId,
       zoneId: zoneAt(boss.pos.x, boss.pos.z).id,
     });
-    if (!marker || marker.kind !== 'world-boss') throw new Error('missing world boss marker');
+    if (marker?.kind !== 'world-boss') throw new Error('missing world boss marker');
     expect(minimapWorldObjectiveMarkerAt(markers, marker.mx, marker.my, 10)).toBe(marker);
 
     world.raidLockouts = () => [{ id: worldBossLockoutId(boss.templateId), msRemaining: 60_000 }];
@@ -717,6 +751,42 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       markers.filter((marker) => marker.kind === 'service').map((marker) => marker.service),
     ).toEqual(['mailbox', 'noticeboard']);
     expect(markers.filter((marker) => marker.kind === 'object-loot')).toHaveLength(1);
+  });
+
+  it('keeps a reconnected owner vault portal on the minimap through the character resolver', () => {
+    const world = makeWorld('client') as unknown as {
+      player: { id: number; pos: { x: number; z: number } };
+      playerId: number;
+      partyInfo: null;
+      characterId?: number;
+      entities: Map<number, unknown>;
+    };
+    world.player.id = 20;
+    world.playerId = 20;
+    world.partyInfo = null;
+    const portal = {
+      id: 2,
+      kind: 'object',
+      templateId: 'hoard_entrance',
+      lootable: true,
+      vaultOwnerPid: 10,
+      vaultOwnerCharacterId: 701,
+      pos: { x: 1, z: PZ },
+    };
+    world.entities = new Map<number, unknown>([
+      [20, world.player],
+      [2, portal],
+    ]);
+    const hoardMarkers = () =>
+      buildMarkers(world as unknown as IWorld).filter(
+        (marker): marker is Extract<MinimapMarker, { kind: 'semantic-object' }> =>
+          marker.kind === 'semantic-object' && marker.semantic.kind === 'hoard-entrance',
+      );
+
+    world.characterId = undefined;
+    expect(hoardMarkers()).toEqual([]);
+    world.characterId = 701;
+    expect(hoardMarkers()).toHaveLength(1);
   });
 
   it('classifies rift and delve rewards before generic loot, then draw-orders navigation above rewards', () => {
@@ -1565,7 +1635,8 @@ describe('harvest marker full silhouette at the circular rim', () => {
     { profile: 'compact' as const, radius: 5.25, outline: 1.75 },
   ])('contains the bottom miter corners in $profile mode', ({ profile, radius, outline }) => {
     const world = makeWorld('client');
-    const corpse = world.entities.get(13)!;
+    const corpse = world.entities.get(13);
+    if (!corpse) throw new Error('missing corpse marker fixture');
     corpse.templateId = 'forest_wolf';
     corpse.loot = null;
     // The painter's triangle has vertices (0,-r), (r,0.7r), (-r,0.7r).

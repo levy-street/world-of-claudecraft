@@ -72,7 +72,7 @@ export interface PainterHostPresentation {
     materialSources?: MaterialComposition,
   ): string;
   /** Attach a lazily-built tooltip to an element. */
-  attachTooltip(el: HTMLElement, html: () => string): void;
+  attachTooltip(el: HTMLElement, html: () => string, isSpell?: () => boolean): void;
   /** Open the uncapped source details/picker surface when the host has mounted it. */
   openMaterialSources?(options: MaterialSourcesDialogOptions): void;
 }

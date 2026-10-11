@@ -99,6 +99,7 @@ export function chaseStalledUnreachable(
   target: Entity,
   reach: number,
   chaseSpeed: number,
+  inReach = dist2d(mob.pos, target.pos) <= reach,
 ): boolean {
   // A phasing mob walks through the geometry this probe models; its moveToward
   // always commits the straight step, so it can never be terrain-pinned.
@@ -106,7 +107,7 @@ export function chaseStalledUnreachable(
   // In reach is fighting fine: melee in swing range, casters standing at spell
   // range on purpose. Also covers a mob close enough to hit through thin walls
   // (mob melee has no line-of-sight check), which is a fight, not a stall.
-  if (dist2d(mob.pos, target.pos) <= reach) {
+  if (inReach) {
     mob.chaseStall = 0;
     return false;
   }
@@ -123,7 +124,10 @@ export function chaseStalledUnreachable(
   }
   // Stationary with open ground ahead is a transient AI hiccup, not an
   // unreachable target.
-  if (!blockedTowardTarget(ctx, mob, target.pos, chaseSpeed)) {
+  if (
+    dist2d(mob.pos, target.pos) > reach &&
+    !blockedTowardTarget(ctx, mob, target.pos, chaseSpeed)
+  ) {
     mob.chaseStall = 0;
     return false;
   }

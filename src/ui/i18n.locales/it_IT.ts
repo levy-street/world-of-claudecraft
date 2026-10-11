@@ -527,7 +527,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Fazioni',
   'hudChrome.currencies.heroicMarkNote': 'Dungeon eroici . spendi dal quartiermastro eroico',
   'hudChrome.currencies.honor': 'Onore',
-  'hudChrome.currencies.honorNote': 'Campi di battaglia e arena',
+  'hudChrome.currencies.honorNote': 'Campi di battaglia, arena e missioni mondiali',
   'hudChrome.currencies.intro':
     'Nessuna di queste occupa spazio nelle borse. Il denaro resta nella tua borsa come sempre.',
   'hudChrome.currencies.lifetime': 'Cumulativo: {amount}',
@@ -1823,7 +1823,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.wispMaze.startNormal': 'Entra nel labirinto: Normale ({shadows} ombre)',
   'questUi.worldQuest.wispMaze.title': 'Labirinto di Wispwood',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Il tempo di lancio di Radici Avvinghianti è ridotto di 0,5 sec.',
+    'Il tempo di lancio di Radici Avvinghianti è ridotto di 0,5 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Lanciare Radici Avvinghianti ti permette di lanciare incantesimi in movimento e aumenta la tua velocità di movimento del 20 percento per 4 sec. Non può verificarsi più di una volta ogni 20 sec.',
   'entities.itemSets.vanguard_druid_balance.name': 'Paramenti Guardiastelle',
@@ -1833,7 +1833,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Carica di Bruin ti protegge con uno scudo pari al 6 percento della tua salute massima per 6 sec.',
   'entities.itemSets.vanguard_druid_feral.name': 'Pelle Sanguicriniera',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Il tempo di recupero di Rapidità di Guarigione è ridotto di 1 sec.',
+    'Il tempo di recupero di Rapidità di Guarigione è ridotto di 1 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Rapidità di Guarigione aumenta inoltre la tua velocità di movimento del 30 percento per 3 sec.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Veste Cardofiore',
@@ -1853,22 +1853,22 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Uncino Sanguinario concede 1 Slancio di Caccia.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Finimenti Dentetrappola',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Il tempo di recupero di Barriera Temporale è ridotto di 2 sec.',
+    'Il tempo di recupero di Barriera Temporale è ridotto di 2 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Barriera Temporale aumenta inoltre del 20 percento la velocità di movimento del bersaglio protetto per 3 sec.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Vesti Legatempo',
   'entities.itemSets.vanguard_mage_fire.bonus2':
-    'Pioggia di Braci si ricarica 3 sec più in fretta.',
+    'Pioggia di Braci si ricarica 3 sec più in fretta. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Lanciare Pioggia di Braci riduce di 2 sec il tempo di recupero rimanente di Barriera Ardente.',
   'entities.itemSets.vanguard_mage_fire.name': 'Paramenti Sferzabraci',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    'Il tempo di recupero di Vincolo di Ghiaccio è ridotto di 2 sec.',
+    'Il tempo di recupero di Vincolo di Ghiaccio è ridotto di 2 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Lanciare Vincolo di Ghiaccio riduce di 5 sec il tempo di recupero rimanente di Passo Furtivo.',
   'entities.itemSets.vanguard_mage_frost.name': 'Tenuta Guardiabrina',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'Il tempo di recupero di Patto della Vita è ridotto di 30 sec.',
+    'Il tempo di recupero di Patto della Vita è ridotto di 30 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     "Patto della Vita protegge inoltre l'alleato con uno scudo pari all'8 percento della sua salute massima per 6 sec.",
   'entities.itemSets.vanguard_paladin_holy.name': 'Paramenti Vegliasole',
@@ -1883,17 +1883,17 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Richiamo della Valchiria azzera il tempo di recupero di Editto Finale, e il tuo prossimo Editto Finale lanciato entro 6 sec dal colpo infligge il 15 percento di danni in più.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Piastre di Guerra Marchioluce',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Il tempo di recupero di Urlo Psichico è ridotto di 3 sec.',
+    'Il tempo di recupero di Urlo Psichico è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     "Quando il tuo Salmo di Protezione viene consumato del tutto, l'alleato protetto ottiene il 20 percento di velocità di movimento in più per 3 sec. Non può verificarsi più di una volta ogni 8 sec.",
   'entities.itemSets.vanguard_priest_discipline.name': 'Paramenti Salmovelo',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'Il tempo di recupero di Passo del Velo è ridotto di 6 sec.',
+    'Il tempo di recupero di Passo del Velo è ridotto di 6 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     "Passo del Velo ti protegge inoltre con uno scudo pari all'8 percento della tua salute massima per 6 sec.",
   'entities.itemSets.vanguard_priest_holy.name': 'Paramenti Alagrazia',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litania della Sventura rallenta inoltre il movimento del bersaglio del 30 percento mentre la canalizzi.',
+    'Litania della Sventura rallenta inoltre il movimento del bersaglio del 30 percento mentre la canalizzi. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Evoca Demone della Decima ti protegge inoltre con uno scudo pari al 10 percento della tua salute massima per 8 sec.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Paramenti Innocrepuscolo',
@@ -1912,7 +1912,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Pugno allo Stomaco concede 2 punti combo aggiuntivi se usato durante Foschia Evanescente.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Cuoio Ombrapasso',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    "Il tempo di recupero di Scatena l'Arma è ridotto di 3 sec.",
+    "Il tempo di recupero di Scatena l'Arma è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     "Scatena l'Arma ti permette di lanciare incantesimi in movimento e aumenta la tua velocità di movimento del 20 percento per 4 sec. Non può verificarsi più di una volta ogni 20 sec.",
   'entities.itemSets.vanguard_shaman_elemental.name': 'Maglia da Battaglia Editempesta',
@@ -1922,22 +1922,22 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpo Ancestrale riduce di 4 sec il tempo di recupero rimanente di Elemental Trance.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Maglia di Guerra Ventonato',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Acque Risananti si lancia 0,5 sec più in fretta su un alleato sotto il 50 percento di salute.',
+    'Acque Risananti si lancia 0,5 sec più in fretta su un alleato sotto il 50 percento di salute. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Richiamo della Marea protegge inoltre il suo bersaglio con uno scudo pari al 5 percento della tua salute massima per 6 sec.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cotta di Maglia Guardiasalmastra',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Il tempo di lancio di Tormento è ridotto di 0,3 sec.',
+    'Il tempo di lancio di Tormento è ridotto di 0,3 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Divorare ti cura il 30 percento in più e può essere canalizzato in movimento.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vesti Pennaterrore',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'Il tempo di recupero di Bone Armor è ridotto di 10 sec.',
+    'Il tempo di recupero di Bone Armor è ridotto di 10 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command riduce di 2 sec il tempo di recupero rimanente di Bone Armor.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Paramenti Legamidollo',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Il tempo di recupero di Cinderhide è ridotto di 30 sec.',
+    'Il tempo di recupero di Cinderhide è ridotto di 30 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Ogni secondo lancio di Conflagrazione rende istantaneo il tuo prossimo Dardo della Rovina lanciato entro 8 sec.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Vesti Coronascoria',
@@ -2259,7 +2259,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "I ladri hanno nascosto il loro oro rubato per tutto il mio labirinto, e ora le ombre lo custodiscono. Recupera ogni borsa di monete. Evita i guardiani, oppure prendi una fiammella radiosa per bandirli. Tre vite perse ti riportano all'ingresso, ma le borse che hai raccolto restano al sicuro.",
   'entities.abilities.lava_burst.name': 'Scoppio di Magma',
   'entities.abilities.lava_burst.description':
-    'Infligge {damage} danni da Fuoco. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)',
+    'Infligge {damage} danni da Fuoco. Un colpo a segno concede 1 Tuono. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Un colpo critico infligge un ulteriore 24% dei danni normali. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)',
   'entities.abilities.lightning_overload.name': 'Sovraccarico Folgorante',
   'entities.abilities.lightning_overload.description':
     'Passiva: Dardo Folgorante e Fulmine Biforcuto hanno il 20% di probabilità di andare in Sovraccarico, colpendo di nuovo il primo bersaglio per il 50% dei danni inflitti e concedendo 1 Tuono. (Richiamo del Tuono)',
@@ -4800,7 +4800,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     "Aumenta di 80 l'Attacco e la Difesa da Guerra. Uccidere un giocatore ostile concede Passo di Cenere, aumentando la velocità di movimento del 40% per 6 sec.",
   'entities.itemSets.warfare_ashstalker.name': 'Kit Braccacenere',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Aumenta di 40 la Difesa da Guerra.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4812,13 +4813,15 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     "Aumenta di 80 l'Attacco e la Difesa da Guerra. Uccidere un giocatore ostile concede Giuramento Infranto, assorbendo 200 danni per 10 sec.",
   'entities.itemSets.warfare_furyforged.name': 'Armatura da Battaglia Forgiafuria',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Aumenta di 40 la Difesa da Guerra.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.warfare_stormbound.bonus4':
     "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
   'entities.itemSets.warfare_stormbound.bonus7':
     "Aumenta di 80 l'Attacco e la Difesa da Guerra. I vostri incantesimi hanno il 15% di probabilità di concedere Guardia di Brace, assorbendo 120 danni per 8 sec.",
   'entities.itemSets.warfare_stormbound.name': 'Paramenti Legatempesta',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Aumenta di 40 la Difesa da Guerra.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.warfare_thornhide.bonus4':
     "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -9442,7 +9445,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Assumete l'aspetto della martora e aumentate la vostra probabilità di schivata dell'8% per 30 min.",
   'entities.abilities.aspect_of_the_cheetah.name': 'Sembianze del Corsiero',
   'entities.abilities.aspect_of_the_cheetah.description':
-    "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min. Mentre è attivo, subire danni vi frastorna, dimezzando la vostra velocità di movimento per 4 sec (ogni colpo rinnova lo stordimento).",
+    "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min. Mentre è attivo, subire danni vi frastorna, dimezzando la vostra velocità di movimento per 2 sec (ogni colpo rinnova lo stordimento).",
   'entities.abilities.aimed_shot.name': 'Tiro Teso',
   'entities.abilities.aimed_shot.description':
     "Colpisce il bersaglio per {damage} danni Fisici. Il danno aumenta con la potenza d'attacco a distanza.",
@@ -9496,7 +9499,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Vi circonda di fulmini per 10 min. I 3 attacchi in mischia successivi contro di voi infliggono {buff} danni da Natura all'attaccante, al massimo una volta ogni 5 sec.",
   'entities.abilities.flame_shock.name': 'Scossa di Braci',
   'entities.abilities.flame_shock.description':
-    "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di 12 sec. Il colpo iniziale aumenta con il Potere Magico.",
+    "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di {duration} sec. Il colpo iniziale aumenta con il Potere Magico.",
   'entities.abilities.flametongue_weapon.name': 'Arma Marchiofuoco',
   'entities.abilities.flametongue_weapon.description':
     'Permea la vostra arma per 30 min. Ogni colpo infligge {damage} danni da Fuoco aggiuntivi.',
@@ -9544,11 +9547,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.name': 'Dardo Silvano',
   'entities.abilities.healing_touch.name': 'Rammendo Selvaggio',
   'entities.abilities.healing_touch.description': 'Cura un bersaglio alleato di {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Ogni lancio completato aggiunge 1 Verzura (massimo 3). La Verzura accumulata accorcia questo lancio: 2,2 s con 1 Verzura, 1,9 s con 2 e 1,5 s con 3. Favore della Natura lo rende istantaneo, gratuito e più forte del 25%.',
   'entities.abilities.mark_of_the_wild.name': 'Custodia Selvaggia',
   'entities.abilities.mark_of_the_wild.description':
     "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di {buff} per 30 min.",
   'entities.abilities.moonfire.name': 'Tempesta Lunare',
-  'entities.abilities.rejuvenation.name': 'Fioritura Selvaggia',
   'entities.abilities.thorns.name': 'Guardia di Rovi',
   'entities.abilities.thorns.description':
     'Dal bersaglio spuntano spine: gli assalitori in mischia subiscono {buff} danni da Natura.',
@@ -9557,7 +9561,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Radica il bersaglio sul posto per un massimo di 12 s.',
   'entities.abilities.bear_form.name': 'Forma di Bruin',
   'entities.abilities.bear_form.description':
-    "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore.",
+    "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Colpisci il doppio più velocemente con metà danni per colpo, e ogni colpo genera il doppio della rabbia. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.maul.name': 'Frantumaossa',
   'entities.abilities.growl.name': 'Intimidazione',
   'entities.abilities.growl.description':
@@ -16347,7 +16351,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     "Evoca 3 bestie per 12 s. Ognuna attacca ogni 2 s per {damage} danni Fisici. I danni mostrati includono l'8% della tua potenza d'attacco a distanza prima dei bonus ai danni del famiglio. Le bestie fissano la Ferocia del Branco all'evocazione, guadagnando il 10% di danni per accumulo. Mentre Fuggifuggi è in recupero, i Comandi del Branco riusciti hanno il 20% di probabilità di azzerarlo, garantito dopo 5 tentativi falliti. Non può azzerarsi mentre le bestie sono attive. (Signore del Branco)",
   'entities.abilities.trailbreak.description':
-    "Balza 12 metri all'indietro. Se hai Slancio di Caccia, lo rinnova e prepara il Rientro per 12 s.",
+    "Balza 25 metri all'indietro e liberati da immobilizzazioni e rallentamenti. Se hai Slancio di Caccia, lo rinnova e prepara il Rientro per 12 s.",
   'entities.abilities.unleash_beast.description':
     "Consuma 3 Ferocia del Branco dopo che il tuo famiglio ha colpito per 83-105 danni Fisici e scosso ogni nemico entro 6 metri per 26-34. Il colpo e la scossa usano il bonus completo del 30% ai danni del famiglio della Ferocia del Branco e aumentano con la potenza d'attacco del famiglio. Per gli 8 s successivi il famiglio infligge il 25% di danni in più, attacca il 35% più velocemente e fa sì che il Tiro Nefasto colpisca fino a 2 nemici vicini.",
   'entities.abilities.wildheart.description':
@@ -16375,7 +16379,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passiva: mentre il Colpo Ancestrale è in recupero, consumare un Presagio di Tempesta ha il 25% di probabilità di azzerarlo. Se i primi 3 tentativi falliscono, il 4° lo azzera sempre. (Spirito Guerriero)',
   'entities.abilities.thunder_reservoir.description':
-    'Passiva: il Dardo Folgorante e il Fulmine Biforcuto concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)',
+    'Passiva: il Dardo Folgorante, il Fulmine Biforcuto e lo Scoppio di Magma concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)',
   'entities.abilities.tidecall.description':
     'Cura un bersaglio alleato di {damage}. La cura aumenta con il potere magico. Aggiunge la cura completa prima delle cure in eccesso alla Corrente Risanatrice, fino al 30% della salute massima del bersaglio.',
   'entities.abilities.unleash_weapon.description':
@@ -16448,7 +16452,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Spezzamidollo',
   'entities.abilities.marrowbreak.description':
-    'Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti protegge invece con uno scudo pari al 18% della tua salute massima per 8 sec e rimborsa 15 rabbia.',
+    'Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia.',
   'entities.abilities.moonlash.name': 'Ondata Lunare',
   'entities.abilities.moonlash.description':
     'Consuma 3 Marea Lunare per un colpo pesante da {damage} danni Arcani: la scelta del danno. Scia Solare consuma le stesse 3 Marea Lunare, quindi scegline una.',
@@ -16457,7 +16461,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge uno stadio di Marea Lunare ed estende la tua Tempesta Lunare di 6 sec, fino a {duration} sec per applicazione. A Marea Lunare piena, Seme Lunare diventa Ondata Lunare.',
   'entities.abilities.overbloom.name': 'Sovrafioritura',
   'entities.abilities.overbloom.description':
-    'Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio.',
+    'Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Sporemending fresca sul bersaglio.',
   'entities.abilities.redharvest.name': 'Mietitura Rossa',
   'entities.abilities.redharvest.description':
     "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina {rage} energia. Funziona anche senza punti combo.",
@@ -17075,7 +17079,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
     'Il pezzo simbolo della collezione glaciale, quello che ogni collezionista cerca per primo. Zanna di Ghiaccio è stata scolpita, non forgiata, da una zanna del ghiacciaio che corona Thornpeak sopra Highwatch; il suo nucleo ciano brucia freddo come la luce su Glimmermere. Brina l’aria che taglia. Le guardie delle mura giurano che un soldato la portò la notte in cui le nevi alte tennero a bada i Giurati della Stirpe e “comprarono un inverno per le mura”.',
   'hudChrome.auraEffect.verdance':
-    'Verzura {stacks}/{max}. Ogni nuova Fioritura Selvaggia o Seconda Fioritura che pianti aggiunge 1. A {max}, Rapidità di Guarigione diventa Sovrafioritura',
+    'Verzura {stacks}/{max}. Ogni Sporemending, Seconda Fioritura o Rammendo Selvaggio che lanci aggiunge 1, e ogni Verzura accorcia il lancio di Rammendo Selvaggio. A {max}, Rapidità di Guarigione diventa Sovrafioritura',
   'hudChrome.continentMap.levels': 'Livelli da {min} a {max}',
   'hudChrome.continentMap.summary': 'Mappa del mondo. Scegli una zona per aprire la sua mappa.',
   'hudChrome.continentMap.title': 'Mappa del Mondo',
@@ -17312,7 +17316,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     "Un attacco lacerante che aumenta i danni in mischia di {damage} e causa un'elevata quantità di minaccia. Si attiva al tuo prossimo colpo. Solo Forma di Bruin.",
   'entities.abilities.maul.specNote_feral':
-    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti protegge invece con uno scudo pari al 18% della tua salute massima e rimborsa 15 rabbia.',
+    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia.',
   'entities.abilities.moonfire.description':
     'Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.',
   'entities.abilities.moonfire.specNote_balance':
@@ -17346,12 +17350,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Spende 2 Frammenti d'Anima per comandare ogni servitore non morto a colpire all'unisono. I Guardiani Sepolcrali provocano e si preparano, i Guerrieri bloccano, i Maghi d'Ossa espongono le difese magiche, e l'Ala Sepolcrale lacera tutti i nemici colpiti.",
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 21 s.',
+    "Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 15 s. Se l'effetto dura per tutta la sua durata, cura di nuovo il bersaglio della stessa quantità della cura iniziale.",
   'entities.abilities.regrowth.specNote_restoration':
-    'Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5).',
+    'Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva.',
   'entities.abilities.rejuvenation.description': 'Cura il bersaglio di {damage} in 12 s.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5). A 5 Verzura, Rapidità di Guarigione diventa Sovrafioritura.',
+    'Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva. A 3 Verzura, Rapidità di Guarigione diventa Sovrafioritura.',
   'entities.abilities.rip.description':
     'Mossa finale che fa sanguinare il bersaglio ogni 2 sec per 24 sec: 36 danni più 24 per punto combo speso (5 punti combo: {damage} danni totali). Solo Forma del Gatto.',
   'entities.abilities.rip.specNote_feral': 'Il colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
@@ -17395,7 +17399,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Ogni apertura furtiva che usi dal Velo Crepuscolare aggiunge 1 Caligine (massimo 3).',
   'entities.abilities.swiftmend.description':
-    'Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Piantare Fioritura Selvaggia e Seconda Fioritura aggiunge Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)',
+    'Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Ogni lancio di Sporemending, Seconda Fioritura e Rammendo Selvaggio aggiunge 1 Verzura; a 3 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)',
   'entities.abilities.swipe.description':
     'Colpisci con gli artigli i nemici vicini per {damage} danni. Causa minaccia aggiuntiva. Solo Forma di Bruin.',
   'entities.abilities.swipe.specNote_feral':
@@ -18507,8 +18511,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'I colpi all’unisono del Comando della Mietitura infliggono il 25 percento di danni in più.',
   'entities.itemSets.gravebrand.name': 'Regalia del Marchio Sepolcrale',
-  'entities.itemSets.grovespring.bonus2':
-    'Cura Rapida consuma prima la tua Fioritura Selvatica o Seconda Fioritura e cura il 25 percento in più. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.grovespring.bonus4':
     'Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Rigoglio.',
   'entities.itemSets.grovespring.name': 'Paramento Grovespring',
@@ -19702,7 +19704,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Una vittoria classificata paga Onore, la valuta giocatore contro giocatore, e anche una sconfitta giocata fino alla fine paga una parte minore, così la valutazione è l’unico vero costo della sconfitta. L’Onore serve a ricompensare partite reali: battere di nuovo lo stesso avversario o la stessa squadra nello stesso giorno non paga altro, e nemmeno perdere di nuovo contro di loro; una lunga giornata di vittorie paga per intero la prima serie, poi dimezza la ricompensa, la dimezza ancora più avanti e resta a quel livello, mentre una partita abbandonata dall’avversario muove comunque la valutazione ma non paga Onore. Il giorno è quello del reame: ricomincia all’ora del reset notturno, lo stesso confine in cui si azzerano tutti i blocchi giornalieri.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra.',
+    "Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra. Un'eccezione funziona ovunque: due pezzi di un set da incantatore fanno anche sì che i danni subiti non ritardino più il lancio degli incantesimi.",
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'È questo lo scambio voluto. L’equipaggiamento da Guerra serve a combattere i giocatori, non a saltare i livelli dei dungeon: un pezzo da Guerra non porta mai le valutazioni di combattimento che avrebbe un epico da dungeon nello stesso slot, e la valutazione da Guerra e i bonus del completo che porta sono spesi interamente contro altri giocatori. Se vuoi reggere nell’arena, compralo. Se vuoi superare più velocemente le modalità eroiche, guadagna l’equipaggiamento nei dungeon.',
   'guide.controls.harvestJournal': 'Diario del Raccolto',
@@ -20185,4 +20187,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Effettive: {effective} | Sovracura: {overheal} ({overhealPercent}) | Colpi: {hits} ({critPercent} crit.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Colpi: {hits} | Critici: {crits} ({critPercent}) | Media: {average} | Min/max: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Volume ambiente',
+  'hudChrome.mapAtlas.resizeRailAria': 'Larghezza della barra laterale della mappa',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Trascina per ridimensionare la barra laterale della mappa. Fai doppio clic per reimpostare.',
 };

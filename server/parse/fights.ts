@@ -137,8 +137,16 @@ export class OpenFight {
    * stamp, touches only chat events, which are never routed into a fight. A
    * future in-place COMBAT event edit would corrupt shipped telemetry: copy
    * here if that invariant ever softens.
+   *
+   * A `passive` event (a periodic tick that healed nothing) is logged but does
+   * not count as combat for the quiet clock that closes a trash segment.
    */
-  recordEvent(tick: number, ev: Record<string, unknown>, x?: EventEnrichment): void {
+  recordEvent(
+    tick: number,
+    ev: Record<string, unknown>,
+    x?: EventEnrichment,
+    passive = false,
+  ): void {
     if (this.eventCount >= MAX_RAW_EVENTS_PER_FIGHT) {
       if (!this.truncated) {
         this.truncated = true;
@@ -147,7 +155,7 @@ export class OpenFight {
       return;
     }
     this.eventCount++;
-    this.lastRoutedTick = tick;
+    if (!passive) this.lastRoutedTick = tick;
     this.sink.enqueue({
       t: 'ev',
       fightId: this.fightId,
@@ -220,12 +228,18 @@ export class OpenFight {
     }
   }
 
-  noteHeal(tick: number, sourceEntityId: number, amount: number, overheal: number): void {
+  noteHeal(
+    tick: number,
+    sourceEntityId: number,
+    amount: number,
+    overheal: number,
+    passive = false,
+  ): void {
     const source = this.accumByEntity(sourceEntityId);
     if (source === undefined) return;
     source.healing += amount;
     source.overheal += overheal;
-    this.markActive(source, tick);
+    if (!passive) this.markActive(source, tick);
   }
 
   noteDeath(entityId: number): void {

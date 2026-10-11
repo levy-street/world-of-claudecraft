@@ -76,6 +76,7 @@ export interface NameplatePaintFields {
   readonly currentTarget: boolean;
   readonly hostile: boolean;
   readonly deadEnemy: boolean;
+  readonly bounty: boolean;
   readonly myPet: boolean;
   readonly friendlyPet: boolean;
   readonly threat: boolean;
@@ -116,6 +117,7 @@ interface PlateRecord {
   currentTarget: boolean;
   hostile: boolean;
   deadEnemy: boolean;
+  bounty: boolean;
   myPet: boolean;
   friendlyPet: boolean;
   threat: boolean;
@@ -208,6 +210,7 @@ function plateDiffers(
     record.currentTarget !== f.currentTarget ||
     record.hostile !== f.hostile ||
     record.deadEnemy !== f.deadEnemy ||
+    record.bounty !== f.bounty ||
     record.myPet !== f.myPet ||
     record.friendlyPet !== f.friendlyPet ||
     record.threat !== f.threat ||
@@ -255,6 +258,7 @@ function writePlate(
   record.currentTarget = f.currentTarget;
   record.hostile = f.hostile;
   record.deadEnemy = f.deadEnemy;
+  record.bounty = f.bounty;
   record.myPet = f.myPet;
   record.friendlyPet = f.friendlyPet;
   record.threat = f.threat;
@@ -314,6 +318,7 @@ function newRecord(): PlateRecord {
     currentTarget: false,
     hostile: false,
     deadEnemy: false,
+    bounty: false,
     myPet: false,
     friendlyPet: false,
     threat: false,

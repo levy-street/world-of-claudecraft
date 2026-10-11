@@ -1,13 +1,13 @@
 // Guards the one non-mechanical part of the CSS extraction: the per-entry CSS wiring
-// and the #rotate-device orientation gate (in-game landscape-only). After the
-// extraction both inline <style> blocks are empty and the game CSS lives in the shared
+// and the #rotate-device orientation gate (in-game landscape-only). The inline <style>
+// blocks hold only the boot splash, and the game CSS lives in the shared
 // src/styles/* @layer modules (loaded by both entries via the src/main.ts barrel),
 // EXCEPT the #rotate-device gate which differs per entry: index suppresses the
 // rotate overlay in browser web gameplay but lets the native app show it in portrait,
 // while play shows it in portrait. Each entry loads ONLY its own per-entry .extra via
 // a <link>.
 //
-// css_corpus is blind to this (it tests inline UNION modules, so empty-inline +
+// css_corpus is blind to this (it tests inline UNION modules, so the inline splash +
 // modules passes regardless) and client_shell asserts hud.mobile.css CONTENT but
 // not the wiring. A dropped <link>, the index suppress leaking into the shared
 // barrel, or play.html re-loading index.extra would all stay green without this.
@@ -31,11 +31,32 @@ function inlineStyleBody(html: string): string {
   return css.replace(/\/\*[\s\S]*?\*\//g, '');
 }
 
+// Every selector of the inline CSS, keyframe stops excluded and @media blocks unwrapped.
+function inlineSelectors(css: string): string[] {
+  const flat = css
+    .replace(/@keyframes[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, '')
+    .replace(/@media[^{]*\{((?:[^{}]*\{[^{}]*\})*)[^{}]*\}/g, '$1');
+  return [...flat.matchAll(/([^{}]+)\{[^{}]*\}/g)].flatMap((m) =>
+    m[1].split(',').map((s) => s.trim()),
+  );
+}
+
 describe('per-entry CSS wiring + #rotate-device gate', () => {
-  it('both inline <style> blocks are empty (comment-only, zero CSS rules)', () => {
-    // No selector block (`{`) survives once the explanatory comment is stripped.
-    expect(inlineStyleBody(indexHtml)).not.toContain('{');
-    expect(inlineStyleBody(playHtml)).not.toContain('{');
+  it('both inline <style> blocks hold only the boot splash, identical in both entries', () => {
+    // Unlayered inline rules outrank every layered sheet, so a rule that is not scoped
+    // to the splash or to the boot-only body class would override the game CSS for good.
+    const indexCss = inlineStyleBody(indexHtml);
+    expect(inlineStyleBody(playHtml)).toBe(indexCss);
+    expect(indexCss).not.toContain('@layer');
+    // Outside the src/styles root-anchored :has() scan, so the cost rule is pinned here.
+    expect(indexCss).not.toMatch(/:has\(|\[style/);
+    const selectors = inlineSelectors(indexCss);
+    expect(selectors.length).toBeGreaterThan(0);
+    for (const selector of selectors) {
+      expect(selector, 'inline rule escapes the boot splash scope').toMatch(
+        /^(body\.boot-pending|#boot-splash|\.boot-splash-[a-z-]+)(?=$|[\s.:>,~+[])/,
+      );
+    }
   });
 
   it('index.html links its own index.extra.css and NOT play.extra.css', () => {

@@ -90,6 +90,7 @@ function claimedEncounter(seed: number, heroic = false, engage = true): { sim: S
   const meta = sim.players.get(sim.playerId);
   if (!meta) throw new Error('Local player metadata missing');
   meta.talentMods.role = 'tank';
+  meta.talentMods.spec = 'prot';
   return { sim, boss };
 }
 
@@ -121,6 +122,7 @@ function addEncounterPlayer(
   const player = meta ? sim.entities.get(meta.entityId) : undefined;
   if (!meta || !player) throw new Error(`${name} did not spawn`);
   meta.talentMods.role = role;
+  if (role === 'tank') meta.talentMods.spec = 'prot';
   player.damageImmune = true;
   player.pos = { x: boss.pos.x + 2, y: boss.pos.y, z: boss.pos.z - 2 };
   player.prevPos = { ...player.pos };

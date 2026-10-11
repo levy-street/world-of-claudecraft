@@ -94,6 +94,21 @@ describe('options_view: control primitive dispatch (cluster 1)', () => {
     expect(boolToggleNextValue(false)).toBe(true);
   });
 
+  it('shows the spell hover tooltip preference as a live boolean toggle in General', () => {
+    const env: OptionsEnv = { touch: false, nativeShell: false };
+    for (const on of [true, false]) {
+      const controls = buildInterfaceControls(makeSource({}, { spellTooltipOnHover: on }), env);
+      expect(
+        find(interfaceControlsForTab(controls, 'general'), 'spellTooltipOnHover'),
+      ).toMatchObject({
+        control: 'boolToggle',
+        key: 'spellTooltipOnHover',
+        labelKey: 'hudChrome.options.spellTooltipOnHover',
+        on,
+      });
+    }
+  });
+
   it('Action Cam shows its shoulder slider only while it is on', () => {
     const env: OptionsEnv = { touch: false, nativeShell: false };
     const off = buildGraphicsControls(makeSource(), env);
@@ -244,6 +259,8 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'cameraFov',
       'fullscreen',
       'weather',
+      // Spell Effects is the other "calm the screen" switch beside Weather.
+      'spellEffects',
       // The wake/ripple field is a GPU cost, so it sits with Weather in the
       // Display card rather than with the HUD comfort toggles.
       'waterRipples',
@@ -753,6 +770,7 @@ describe('options_view: audio dispatch matrix (cluster 4)', () => {
     const controls = buildAudioControls(makeSource());
     expect(keysOf(controls)).toEqual([
       'sfxVolume',
+      'ambientVolume',
       'musicVolume',
       'voiceVolume',
       'musicToggle',
@@ -762,6 +780,10 @@ describe('options_view: audio dispatch matrix (cluster 4)', () => {
       'clickFeedback',
     ]);
     expect(find(controls, 'sfxVolume')).toMatchObject({ control: 'slider' });
+    expect(find(controls, 'ambientVolume')).toMatchObject({
+      control: 'slider',
+      labelKey: 'hudChrome.options.ambienceVolume',
+    });
     expect(find(controls, 'voiceEnabled')).toMatchObject({ control: 'boolToggle' });
   });
 });
@@ -837,6 +859,7 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
     expect(keys).not.toContain('musicToggle');
     expect(keys).toEqual([
       'sfxVolume',
+      'ambientVolume',
       'musicVolume',
       'voiceVolume',
       'voiceEnabled',
@@ -863,6 +886,7 @@ const GENERAL_KEYS = [
   'uiScale',
   'hudOpacity',
   'tooltipScale',
+  'spellTooltipOnHover',
   'frostedPanels',
   'highContrastText',
   'colorblindMode',
@@ -881,7 +905,7 @@ const GENERAL_KEYS = [
   'confirmVendorSell',
   'note:hudChrome.options.confirmVendorSellNote',
   'confirmVendorSellMinQuality',
-  'note:hudChrome.options.confirmVendorSellMinQualityNote',
+  'note:hudChrome.options.confirmVendorSellMinQualityNoteGray',
 ];
 const FRAMES_KEYS = [
   'mouseoverCast',
@@ -929,6 +953,7 @@ const COMBAT_KEYS = [
   'showFriendlyTrack',
   'showShieldTrack',
   'fctScale',
+  'classicCombatText',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
   general: GENERAL_KEYS,
@@ -1050,7 +1075,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       { control: 'note', textKey: 'hudChrome.options.confirmVendorSellNote', category: 'general' },
       {
         control: 'note',
-        textKey: 'hudChrome.options.confirmVendorSellMinQualityNote',
+        textKey: 'hudChrome.options.confirmVendorSellMinQualityNoteGray',
         category: 'general',
       },
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
@@ -1620,6 +1645,7 @@ describe('options_view: the desktop display-mode picker replaces the fullscreen 
       'cameraFov',
       'displayMode',
       'weather',
+      'spellEffects',
       'waterRipples',
       'showOverflowXp',
     ]);
@@ -1675,6 +1701,7 @@ describe('options_view: the desktop display-mode picker replaces the fullscreen 
         'cameraFov',
         'fullscreen',
         'weather',
+        'spellEffects',
         'waterRipples',
         'showOverflowXp',
       ]);

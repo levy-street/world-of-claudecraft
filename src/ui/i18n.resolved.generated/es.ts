@@ -418,6 +418,13 @@ export const es: EnTranslations = {
       "heroicClears": "{count} Heroico",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "Ver el botín posible",
+      "lootFocus": "Loot focus",
+      "allClassGear": "All class gear",
+      "specRole": "{name} ({role})",
+      "mixedRole": "{first} / {second}",
+      "lootFocusHelp": "Applies to unopened vaults only.",
+      "noFocusedLoot": "No eligible loot. Choose another focus.",
+      "rolledFocus": "Rolled for: {focus}",
       "chooseTable": "Elegir en qué tabla tirar",
       "selectAllTables": "Seleccionar todo",
       "selectedTables": "{count} tablas seleccionadas",
@@ -438,7 +445,9 @@ export const es: EnTranslations = {
         "worldOne": "{count} misión de mundo completada",
         "worldMany": "{count} misiones de mundo completadas",
         "pvpOne": "{count} combate clasificatorio ganado",
-        "pvpMany": "{count} combates clasificatorios ganados"
+        "pvpMany": "{count} combates clasificatorios ganados",
+        "pvpWinOne": "{count} PvP Win",
+        "pvpWinMany": "{count} PvP Wins"
       },
       "requiredTask": {
         "raidOne": "Supera {count} encuentro de banda",
@@ -448,7 +457,9 @@ export const es: EnTranslations = {
         "worldOne": "Completa {count} misión de mundo",
         "worldMany": "Completa {count} misiones de mundo",
         "pvpOne": "Gana {count} combate clasificatorio",
-        "pvpMany": "Gana {count} combates clasificatorios"
+        "pvpMany": "Gana {count} combates clasificatorios",
+        "pvpWinOne": "Earn {count} PvP Win",
+        "pvpWinMany": "Earn {count} PvP Wins"
       },
       "readyWeeks": "Semanas sin reclamar: {count}. Reclama primero la semana completada más antigua.",
       "claimLastWeek": "Reclamar la recompensa de la semana pasada",
@@ -510,7 +521,13 @@ export const es: EnTranslations = {
       "departsIn": "El transbordador a {dest} sale en {time}",
       "castingOff": "El transbordador a {dest} está zarpando",
       "boardHint": "Súbete a su cubierta cuando zarpe. La travesía es gratis.",
-      "sailing": "Navegando hacia {dest}"
+      "sailing": "Navegando hacia {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "Esa selección de materiales ya no está disponible.",
     "vehicle": {
@@ -570,6 +587,15 @@ export const es: EnTranslations = {
     "spectate": {
       "banner": "Observando a {name}"
     },
+    "realmMotd": {
+      "line": "Message of the day: {text}",
+      "updated": "Message of the day updated.",
+      "cleared": "Message of the day cleared.",
+      "none": "No message of the day is set.",
+      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
+      "tooLong": "The message of the day is limited to {max} characters.",
+      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+    },
     "readyCheck": {
       "title": "Listo cheque",
       "close": "Cerca",
@@ -608,6 +634,9 @@ export const es: EnTranslations = {
       "keeperConfirmSparedBody": "¿Estás seguro? El Guardián Pálido te revivirá aquí. Estás por debajo del nivel 10, así que el Tañido del Guardián no te debilitará esta vez.",
       "healerConfirmAccept": "Revívame",
       "healerConfirmCancel": "Cancelar"
+    },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
     },
     "wiki": {
       "confirmTitle": "¿Abrir la Wiki?",
@@ -1853,6 +1882,8 @@ export const es: EnTranslations = {
       "reportSent": "Reporte copiado y enviado al chat",
       "reportNoData": "Sin datos registrados.",
       "noDetailedData": "Sin datos detallados",
+      "detailHealSubtitle": "Efectivo: {effective} | Sobrecuración: {overheal} ({overhealPercent}) | Golpes: {hits} ({critPercent} crítico)",
+      "detailHitSubtitle": "Golpes: {hits} | Críticos: {crits} ({critPercent}) | Promedio: {average} | Mín./máx.: {min} / {max}",
       "noDeathEvents": "Sin eventos registrados antes de la muerte",
       "killedBy": "Asesinado por {killer} ({ability})",
       "lethalHit": "Golpe Letal",
@@ -2119,6 +2150,7 @@ export const es: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Clic izquierdo",
       "clickMoveRight": "Clic derecho",
       "version": "v{version} ({build})",
@@ -2164,6 +2196,7 @@ export const es: EnTranslations = {
       "interfaceModeDesktop": "Escritorio",
       "interfaceModeTouch": "Táctil",
       "interfaceModeNote": "Auto elige los controles Desktop o Touch según tu dispositivo. Elige Desktop para forzar teclado y ratón (útil en una tableta con teclado), o Touch para los controles en pantalla.",
+      "ambienceVolume": "Volumen de ambiente",
       "footstepSounds": "Sonidos de pasos",
       "interfaceSounds": "Sonidos de interfaz y respuesta",
       "clickFeedback": "Marcador de clic",
@@ -2231,6 +2264,7 @@ export const es: EnTranslations = {
       "confirmVendorSellNote": "Si lo desactivas, los objetos se venden con un solo clic y sin confirmación, así que un espacio de bolsa desplazado podría vender el objeto equivocado.",
       "confirmVendorSellMinQuality": "Confirmar ventas de calidad",
       "confirmVendorSellMinQualityNote": "Los artículos por debajo de esta calidad se venden con un solo clic; un artículo mal vendido aún se puede volver a comprar al vendedor.",
+      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
@@ -2251,7 +2285,9 @@ export const es: EnTranslations = {
       "showUtilityModes": "Incluir modos de sigilo y viaje",
       "showFriendlyTrack": "Mostrar mis beneficios sobre aliados",
       "showShieldTrack": "Mostrar mis escudos",
+      "classicCombatText": "Classic Combat Text",
       "waterRipples": "Ondas en el agua (estelas)",
+      "spellEffects": "Spell Effects",
       "actionCam": "Cámara de acción",
       "actionCamShoulder": "Hombro de la cámara de acción",
       "actionCamShoulderLeft": "Izquierda {pct}",
@@ -2774,7 +2810,8 @@ export const es: EnTranslations = {
         "battlegroundAssist": "golpe de gracia asistido",
         "worldKill": "muerte en el mundo abierto",
         "worldAssist": "muerte en el mundo abierto asistida",
-        "hillHold": "manteniendo la colina"
+        "hillHold": "manteniendo la colina",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Baja",
@@ -2784,6 +2821,11 @@ export const es: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
+      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
+      "rewardProgress": "Current PvP streak: {time} played",
       "tab": "JcJ mundial",
       "title": "JcJ mundial",
       "blurb": "Alza tu bandera para luchar contra otros jugadores marcados en cualquier lugar del mundo abierto. Derrota a uno y llévate parte de su bolsa, más Honor hacia el equipo de guerra. Los campos de batalla y las arenas siguen pagando más.",
@@ -2802,6 +2844,8 @@ export const es: EnTranslations = {
       "markLine": "Atacar allí a un jugador sin marcar alza tu propia bandera; atacar a uno marcado nunca lo hace.",
       "aidLine": "Curar, proteger con un escudo o mejorar a un jugador marcado en un combate mundial alza tu bandera.",
       "stakeLine": "El perdedor paga {cap} o el {percent} de su bolsa, lo que sea menor.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "Un jugador sin marcar que muere en terreno de todos contra todos no pierde oro.",
       "noTakeLine": "Un combatiente sin marcar tampoco se lleva oro: este solo se mueve entre dos jugadores marcados.",
       "honorLine": "{honor} de Honor por baja, repartido entre todos los que ayudaron.",
@@ -2898,7 +2942,7 @@ export const es: EnTranslations = {
       "delveMark": "Marca de expedición",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Mazmorras heroicas . gástala con el intendente heroico",
-      "honorNote": "Campos de batalla y la arena",
+      "honorNote": "Campos de batalla, la arena y misiones de mundo",
       "delveMarkNote": "Expediciones completadas",
       "wocTokenNote": "Saldo de la cartera vinculada",
       "walletNotLinked": "Ninguna cartera vinculada",
@@ -3599,6 +3643,8 @@ export const es: EnTranslations = {
       "resetDone": "Se han restablecido todas las instancias.",
       "resetNone": "No tienes instancias que restablecer.",
       "resetOccupied": "No puedes restablecer instancias mientras alguien siga dentro.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "Cambia la dificultad de la mazmorra antes de restablecer estas instancias. Las instancias vacías se restablecen solas después de 5 minutos.",
       "resetLoot": "No puedes restablecer instancias mientras quede botín dentro.",
       "resetConfirmTitle": "¿Restablecer todas las instancias?",
@@ -3615,6 +3661,7 @@ export const es: EnTranslations = {
       "dragEquipHint": "Arrastra sobre tu personaje para equipar",
       "dragDestroyHint": "Arrastra fuera del inventario para destruir",
       "reorderNeedsRecent": "Limpia el filtro y ordena por Reciente para reorganizar tus bolsas",
+      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
       "itemAriaInstanced": "{item}, cantidad {count}, copia marcada por el creador",
       "itemAriaEnchanted": "{item}, cantidad {count}, copia encantada",
       "itemAriaBound": "{item}, cantidad {count}, copia vinculada",
@@ -4000,7 +4047,7 @@ export const es: EnTranslations = {
       "duskEconomy": "Las habilidades cuestan un {pct}% menos de energía",
       "moontide": "Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta",
       "oldBlood": "Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de lobo y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma",
-      "verdance": "Verdor {stacks}/{max}. Cada Floración Silvestre o Segundo Florecer NUEVO que plantes añade 1. Con {max}, Alivio presto se convierte en Sobrefloración",
+      "verdance": "Verdor {stacks}/{max}. Cada Sporemending, Segundo Florecer o Cura Silvestre que lances añade 1, y cada punto acorta el lanzamiento de Cura Silvestre. Con {max}, Alivio presto se convierte en Sobrefloración",
       "freeExecute": "Tu próxima facultad de ejecución válida no cuesta recursos",
       "resourceSap": "Restaura {value} de tu recurso actual cada {interval} s",
       "nextAttackCrit": "Tu próximo ataque tiene golpe crítico garantizado",
@@ -4102,6 +4149,7 @@ export const es: EnTranslations = {
       "formTravel": "Forma Fleet: velocidad de movimiento aumentada un {pct}%",
       "formFireball": "Forma de Brasa: velocidad de movimiento aumentada un {pct}%; ataques y hechizos desactivados",
       "formMoonkin": "Forma de ala lunar: daño con hechizos aumentado un {pct}% y armadura aumentada un {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Forma de velo umbrío: daño de las Sombras aumentado un {pct}%",
       "resourceCount": "{value} de {max}",
       "formLich": "Lanza de alma también golpea hasta a {targets} enemigos cercanos por un {pct}% de daño",
@@ -4188,6 +4236,7 @@ export const es: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "JcJ",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Tramposo >",
       "pledgeTag": "Juramento a {guild}",
       "npcRoleTag": "<{role}>",
@@ -4436,6 +4485,7 @@ export const es: EnTranslations = {
       "perfectedBadge": "Perfeccionado",
       "perfectingRank": "Perfeccionamiento: rango {rank} de {ranks}",
       "materialSourceGatherer": "{count} × Recolectado por {name}",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × Recolectado por {name}, firmado por {signer}",
       "materialSourceUnrecorded": "{count} × Sin recolector registrado",
       "materialSourceUnrecordedSigned": "{count} × Sin recolector registrado, firmado por {name}",
@@ -5714,7 +5764,9 @@ export const es: EnTranslations = {
     },
     "pattern": {
       "teaches": "Uso: te enseña a fabricar {item}.",
-      "teachesEnchant": "Uso: te enseña a aplicar {enchant}."
+      "teachesEnchant": "Uso: te enseña a aplicar {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Desvinculación: {name}",
@@ -6316,7 +6368,9 @@ export const es: EnTranslations = {
         "passage": "Paso"
       },
       "collapseHint": "Contraer la barra lateral del mapa",
-      "expandHint": "Expandir la barra lateral del mapa"
+      "expandHint": "Expandir la barra lateral del mapa",
+      "resizeRailAria": "Ancho de la barra lateral del mapa",
+      "resizeRailHint": "Arrastra para cambiar el tamaño de la barra lateral del mapa. Haz doble clic para restablecer."
     },
     "arenaGate": {
       "minLevelNote": "Requiere nivel {level}"
@@ -7313,6 +7367,7 @@ export const es: EnTranslations = {
       "rowCameraSpeed": "Con qué rapidez gira la cámara cuando miras alrededor con el ratón.",
       "rowTouchLookSpeed": "Lo mismo pero para el deslizamiento de la vista, y solo aparece cuando estás en una pantalla táctil.",
       "rowFullscreen": "Llena toda la pantalla con el juego.",
+      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
       "rowWaterRipples": "Estelas y ondas que se extienden detrás de ti mientras nadas. Desactivadas de forma predeterminada, y el único efecto de agua que cuesta fotogramas de verdad; las salpicaduras y burbujas no se ven afectadas de ninguna manera.",
       "rowOverflowXp": "Al nivel máximo, si tu barra sigue llenándose con experiencia sobrante o muestra en su lugar el clásico texto estático de nivel máximo.",
       "rowInterfaceMode": "Si obtienes la interfaz de escritorio o los controles táctiles en pantalla. Auto lee tu dispositivo, y puedes forzar cualquiera de los dos: una tableta con teclado puede usar el diseño de escritorio, y un portátil con pantalla táctil puede usar los controles táctiles.",
@@ -7365,6 +7420,7 @@ export const es: EnTranslations = {
       "ifMouseoverCast": "Permite que una curación o un hechizo amistoso caiga sobre el marco de grupo que sobrevuelas con el cursor, sin cambiar tu objetivo.",
       "ifStickyTarget": "Mantiene tu objetivo actual cuando haces clic en suelo vacío, en lugar de quitarlo.",
       "ifFctScale": "El tamaño de los números de daño y curación que flotan sobre tu objetivo.",
+      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
       "ifExtraBars": "Revela una segunda fila de la barra de acción, y una tercera en cuanto la segunda está activada. Las ranuras siguen siendo accesibles mediante sus atajos de teclado aunque las filas estén ocultas.",
       "ifHideUnused": "Oculta las ranuras de acción vacías para que solo se dibujen los botones que realmente usas.",
       "ifLockBars": "Bloquea tus barras para que no puedas arrastrar una habilidad fuera de una ranura por accidente.",
@@ -7794,13 +7850,15 @@ export const es: EnTranslations = {
       "formLine": {
         "form_bear": "La forma de tanque: una piel gruesa, ira en lugar de maná, y amenaza extra para que los enemigos sigan golpeándote a ti.",
         "form_cat": "La forma de daño cuerpo a cuerpo: energía y puntos de combo, como un pícaro, y mucha menos amenaza.",
-        "form_travel": "La forma de viaje: mucho más rápida por tierra, pero sin otras habilidades hasta que cambies de forma."
+        "form_travel": "La forma de viaje: mucho más rápida por tierra, pero sin otras habilidades hasta que cambies de forma.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Un hechizo de Escarcha que llama al elemental a tu lado y lo lanza contra tu objetivo.",
       "formName": {
         "form_bear": "Forma de Bruin",
         "form_cat": "Forma de lobo",
-        "form_travel": "Forma Fleet"
+        "form_travel": "Forma Fleet",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8299,7 +8357,7 @@ export const es: EnTranslations = {
       "honorFinalNoteSoldBack": "Las compras de Honor son definitivas. La lista de recompra solo contiene lo que vendiste: una compra con monedas normalmente puede venderse por su precio de venta y recuperarse de la lista si vuelves a cambiar de idea, pero el equipo de Guerra se liga al alma en cuanto lo compras, así que nunca puede intercambiarse, enviarse por correo ni venderse, y nunca llega a esa lista. La tienda pide confirmación por eso: lee la pieza antes de pulsar.",
       "warfareHeading": "Equipo de guerra",
       "warfareBody": "Toda pieza de equipo de guerra lleva Índice de Ofensiva y de Defensa de Pericia Bélica, y esos dos índices no sirven de nada contra monstruos. Solo se aplican cuando luchas contra otro jugador, en un duelo, en la arena o en el campo de batalla, donde la Ofensiva se suma al daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio tope. Cada familia de armadura es también un conjunto, y sus bonificaciones de conjunto son igualmente índice de Pericia Bélica o efectos que solo funcionan contra jugadores, así que un equipo de honor completo no vale nada contra un jefe de mazmorra.",
-      "warfareBodyStatsStay": "Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones.",
+      "warfareBodyStatsStay": "Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones. Hay una excepción que funciona en todas partes: dos piezas de un conjunto de lanzador hacen además que el daño recibido ya no retrase tus hechizos.",
       "warfareTradeBody": "Ese es el intercambio deliberado. El equipo de guerra está pensado para luchar contra jugadores, no como atajo para saltarte los niveles de mazmorra: una pieza de guerra nunca lleva los índices de combate que sí lleva un objeto épico de mazmorra en el mismo hueco, y cuanto aporta se gasta en otros jugadores. Si quieres defenderte bien en la arena, cómpralo. Si quieres superar las heroicas más rápido, gánate tu equipo en las mazmorras.",
       "warfareTradeBodyRatingSpent": "Ese es el intercambio deliberado. El equipo de Guerra está hecho para combatir jugadores, no para saltarse los niveles de mazmorra: una pieza de Guerra nunca lleva los índices de combate que tendría un épico de mazmorra en el mismo hueco, y los índices y bonificaciones de Guerra que sí lleva se gastan por completo contra otros jugadores. Si quieres competir en arena, cómpralo. Si quieres limpiar heroicas más rápido, consigue tu equipo en las mazmorras.",
       "vanguardHeading": "Equipo de Vanguardia: Guerra, temporada 2",
@@ -8324,6 +8382,7 @@ export const es: EnTranslations = {
       "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Una vez cada tres horas, en un momento que nadie puede predecir, se avisa a todo el reino de que una colina se alzará en una de las zonas de todos contra todos dentro de quince minutos, y el círculo donde se alzará queda marcado sobre terreno abierto. Al alzarse, permanece cuarenta y cinco minutos, y luego cae. El grupo con más jugadores dentro disputa la colina, y tras un minuto de mayoría ininterrumpida la colina es suya; un jugador solo cuenta como un grupo de uno, pero los miembros de banda no cuentan en absoluto. Mientras un grupo controla la colina, cada uno de sus miembros que esté dentro gana Honor cada minuto, y cuanto más tiempo la controle el mismo grupo, más paga cada minuto: un grupo completo que controle una colina sin disputa durante toda su duración gana aproximadamente lo mismo que tres victorias en Campos Espinosos. Cuando la colina cambia de manos, los nuevos controladores empiezan la cuenta desde el principio. Una barra sobre el campo muestra quién la controla, tus números frente a los suyos, y el reloj de la disputa; /hill en el chat indica dónde se encuentra.",
+      "hillBodyRanked": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyRaids": "Derrotar al mismo jugador una y otra vez paga cada vez menos y pronto no paga nada, y tu cuenta contra ese jugador solo se reinicia alrededor de una hora después de la primera de esas muertes, así que acechar a una sola víctima nunca vale la espera. Un objetivo muy por debajo de tu nivel no paga absolutamente nada. Los Campos Espinosos y las Arenas siguen sus propias reglas mientras estás dentro, y pagan más Honor que el mundo abierto, así que el JcJ mundial es el camino más lento hacia el mismo vendedor. Las bandas no ganan nada con las muertes en el mundo: un miembro de banda no recibe Honor ni oro y no reduce la parte de nadie más, así que lucha en grupo para que te paguen."
     },
     "thornhollowPage": {
@@ -8501,6 +8560,7 @@ export const es: EnTranslations = {
       "formBear": "Forma de Bruin",
       "formCat": "Forma de lobo",
       "formTravel": "Forma Fleet",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Criaturas",
       "groupPets": "Demonios de brujo",
       "pickerLabel": "Elige un modelo para ver",
@@ -9020,6 +9080,7 @@ export const es: EnTranslations = {
       "buyingBody": "Habla con un mercader y elige ver sus mercancías, y su tienda se abre con tres pestañas: Explorar, Vender y Recompra. Explorar contiene cuanto tiene en stock, tuyo si te lo puedes permitir. Vender enumera lo que de tus bolsas te pagará, y vender una pieza que lleva su propia calidad tirada te pide confirmar antes, para que un ejemplar preciado nunca se te escape por error. Si te desprendes de algo de lo que te arrepientes, la pestaña de Recompra guarda tus ventas recientes para que puedas recomprarlas por las monedas que te pagaron.",
       "junkTitle": "Despejar la chatarra",
       "junkBody": "Los objetos que recoges y no te sirven se pueden vender igualmente a cualquier vendedor, así que vacía las bolsas cada vez que pases por el pueblo en lugar de dejar que se llenen. La pestaña Vender del vendedor incluso guarda un botón de un solo clic que vende de golpe cada baratija de calidad Pobre. Las baratijas verdaderamente inútiles también se pueden descartar sin más para hacer sitio.",
+      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
       "tradeTitle": "Comerciar con otros jugadores",
       "tradeBody": "Puedes comerciar cara a cara con cualquiera que esté cerca de ti. Ambos ponéis objetos y monedas en una ventana compartida y el intercambio solo se produce cuando los dos lo confirmáis, así que ninguna de las partes puede ser engañada. Es la manera sencilla de pasarle un objeto a un amigo o cerrar un trato.",
       "mailTitle": "El Correo del Cuervo",
@@ -11108,6 +11169,10 @@ export const es: EnTranslations = {
     "selectClass": "Selecciona una clase.",
     "pickClass": "Elige una clase.",
     "returnToLogin": "Volver al inicio de sesión",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
       "usernameShape": "El usuario debe tener 3-24 caracteres y usar letras, dígitos o guion bajo.",
@@ -12671,6 +12736,7 @@ export const es: EnTranslations = {
       "clueCasketOpened": "El cofre contiene {money} y {items}.",
       "treasureMapEarned": "Todas las misiones de mundo del día están hechas: has encontrado un {map}.",
       "treasureMapLost": "Todas las misiones de mundo del día están hechas, pero no tienes sitio en las bolsas para el mapa del tesoro.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Estudias el {map}. La X está en algún lugar de {zone}.",
       "treasureMapUpgraded": "El mapa se ha redibujado con tinta más fina: ahora es un {map}.",
       "treasureVaultOpened": "El suelo cede. Un tesoro enterrado se abre ante ti.",
@@ -12848,7 +12914,8 @@ export const es: EnTranslations = {
       "sellQuantityCancel": "Cancelar",
       "sellJunk": "Vender basura",
       "sellJunkAria": "Vender toda la basura por {price}",
-      "sellJunkHint": "Vende todos los objetos grises de tus bolsas excepto los objetos de misión."
+      "sellJunkHint": "Vende todos los objetos grises de tus bolsas excepto los objetos de misión.",
+      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
     },
     "market": {
       "title": "Mercado Mundial",
@@ -13142,7 +13209,7 @@ export const es: EnTranslations = {
       },
       "trailbreak": {
         "name": "Quiebrasendas",
-        "description": "Salta 12 metros hacia atrás. Si tienes Ímpetu de Caza, lo refresca y prepara la Reentrada durante 12 s."
+        "description": "Salta 25 metros hacia atrás y te libera de los enraizamientos y las ralentizaciones de movimiento. Si tienes Ímpetu de Caza, lo refresca y prepara la Reentrada durante 12 s."
       },
       "wildheart": {
         "name": "Corazón Salvaje",
@@ -13709,7 +13776,7 @@ export const es: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Aspecto del Corcel",
-        "description": "Adoptas el aspecto del corcel y aumentas tu velocidad de movimiento un 30% durante 30 min. Mientras esté activo, recibir daño te aturde, reduciendo tu velocidad de movimiento a la mitad durante 4 s (cada golpe reinicia el aturdimiento)."
+        "description": "Adoptas el aspecto del corcel y aumentas tu velocidad de movimiento un 30% durante 30 min. Mientras esté activo, recibir daño te aturde, reduciendo tu velocidad de movimiento a la mitad durante 2 s (cada golpe reinicia el aturdimiento)."
       },
       "aimed_shot": {
         "name": "Tensado Largo",
@@ -13765,7 +13832,7 @@ export const es: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Reserva de Truenos",
-        "description": "Pasiva: el Arco Eléctrico y el Relámpago Bifurcado otorgan Trueno, hasta 5. Con 5 de Trueno, la Sacudida Terrestre inflige un 125% más de daño o el Terremoto un 100% más, y luego consume todo el Trueno. (Llamatruenos)"
+        "description": "Pasiva: el Arco Eléctrico, el Relámpago Bifurcado y Magma Burst otorgan Trueno, hasta 5. Con 5 de Trueno, la Sacudida Terrestre inflige un 125% más de daño o el Terremoto un 100% más, y luego consume todo el Trueno. (Llamatruenos)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13773,7 +13840,7 @@ export const es: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Inflige {damage} de daño de Fuego. Siempre asesta golpe crítico a un objetivo que arda con tu Sacudida de Ascuas. Oleada de Magma: cada tic de Sacudida de Ascuas tiene un 20% de probabilidad de reiniciar este tiempo de reutilización y hacer que tu próximo Magma Burst en los 10 s siguientes sea instantáneo. El daño aumenta con el poder con hechizos. (Thundercall)"
+        "description": "Inflige {damage} de daño de Fuego. Un impacto otorga 1 de Trueno. Siempre asesta golpe crítico a un objetivo que arda con tu Sacudida de Ascuas. Un golpe crítico inflige un 24% adicional del daño normal. Oleada de Magma: cada tic de Sacudida de Ascuas tiene un 20% de probabilidad de reiniciar este tiempo de reutilización y hacer que tu próximo Magma Burst en los 10 s siguientes sea instantáneo. El daño aumenta con el poder con hechizos. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13797,7 +13864,7 @@ export const es: EnTranslations = {
       },
       "flame_shock": {
         "name": "Sacudida de Ascuas",
-        "description": "Inflige {damage} de daño de Fuego, y después {overTime} de daño de Fuego durante 12 s. El impacto inicial aumenta con el poder con hechizos."
+        "description": "Inflige {damage} de daño de Fuego, y después {overTime} de daño de Fuego durante {duration} s. El impacto inicial aumenta con el poder con hechizos."
       },
       "flametongue_weapon": {
         "name": "Arma Tizón Ígneo",
@@ -13930,7 +13997,8 @@ export const es: EnTranslations = {
       },
       "healing_touch": {
         "name": "Cura Silvestre",
-        "description": "Sana a un objetivo amistoso por {damage}."
+        "description": "Sana a un objetivo amistoso por {damage}.",
+        "specNote_restoration": "Cada lanzamiento completado añade 1 de Verdor (máx. 3). El Verdor acumulado acorta este lanzamiento: 2,2 s con 1 de Verdor, 1,9 s con 2 y 1,5 s con 3. Bendición de la Naturaleza lo vuelve instantáneo, gratuito y un 25% más fuerte."
       },
       "mark_of_the_wild": {
         "name": "Resguardo Silvestre",
@@ -13946,9 +14014,9 @@ export const es: EnTranslations = {
         "description": "Solo en Forma de lechúcico lunar. Golpea por {damage} de daño Arcano, añade una fase de Marea Lunar y extiende tu Tempestad Lunar 6 s, hasta {duration} s por aplicación. Con la Marea Lunar llena, Semilla Lunar se convierte en Oleada Lunar."
       },
       "rejuvenation": {
-        "name": "Floración Silvestre",
+        "name": "Sporemending",
         "description": "Sana al objetivo por {damage} a lo largo de 12 s.",
-        "specNote_restoration": "Plantar una floración NUEVA añade 1 de Verdor (máx. 5). Con 5 de Verdor, Alivio presto se convierte en Sobrefloración."
+        "specNote_restoration": "Cada lanzamiento añade 1 de Verdor (máx. 3), incluso si renueva una floración que ya está activa. Con 3 de Verdor, Alivio presto se convierte en Sobrefloración."
       },
       "thorns": {
         "name": "Guardia de Zarzas",
@@ -13960,12 +14028,12 @@ export const es: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
+        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Golpeas el doble de rápido con la mitad de daño por golpe, y cada golpe genera el doble de ira. Lánzala de nuevo para volver a forma de taumaturgo."
       },
       "maul": {
         "name": "Rompehuesos",
         "description": "Un ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y genera una amenaza enorme. Se activa en tu siguiente golpe. Solo en Forma de Bruin.",
-        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con alta amenaza; por debajo de la mitad de salud, en su lugar te protege con un escudo del 18% de tu salud máxima y restaura 15 de ira."
+        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con alta amenaza; por debajo de la mitad de salud, en su lugar te sana un 18% de tu salud máxima y restaura 15 de ira."
       },
       "growl": {
         "name": "Amenazar",
@@ -13984,6 +14052,11 @@ export const es: EnTranslations = {
         "description": "Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.",
         "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua (máx. 3)."
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
         "description": "Movimiento final que causa {damage}. Solo en Forma de lobo.",
@@ -13996,8 +14069,8 @@ export const es: EnTranslations = {
       },
       "regrowth": {
         "name": "Segundo Florecer",
-        "description": "Sana a un objetivo amistoso por {damage} y una cantidad adicional a lo largo de 21 s.",
-        "specNote_restoration": "Plantar una floración NUEVA añade 1 de Verdor (máx. 5)."
+        "description": "Sana a un objetivo amistoso por {damage} y una cantidad adicional a lo largo de 15 s. Si el efecto dura todo su tiempo, vuelve a sanar al objetivo por la misma cantidad que la sanación inicial.",
+        "specNote_restoration": "Cada lanzamiento añade 1 de Verdor (máx. 3), incluso si renueva una floración que ya está activa."
       },
       "barkskin": {
         "name": "Piel de Roble",
@@ -14267,7 +14340,8 @@ export const es: EnTranslations = {
       },
       "swiftmend": {
         "name": "Alivio presto",
-        "description": "Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Plantar Floración Silvestre y Segundo Florecer añade Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por un 60% de lo que les quedaba por sanar. (habilidad distintiva de Corazón del Bosque)"
+        "description": "Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Cada lanzamiento de Sporemending, Segundo Florecer y Cura Silvestre añade 1 de Verdor; con 3 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por un 60% de lo que les quedaba por sanar. (habilidad distintiva de Corazón del Bosque)",
+        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Oleada Lunar",
@@ -14283,7 +14357,7 @@ export const es: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Quiebramédula",
-        "description": "Consume tus 3 de Sangre Antigua para un golpe pesado de alta amenaza que inflige {damage} de daño. Por debajo de la mitad de salud, en su lugar te protege con un escudo del 18% de tu salud máxima durante 8 s y te devuelve 15 de ira."
+        "description": "Consume tus 3 de Sangre Antigua para un golpe pesado de alta amenaza que inflige {damage} de daño. Por debajo de la mitad de salud, en su lugar te sana un 18% de tu salud máxima y te devuelve 15 de ira."
       },
       "wildwake": {
         "name": "Despertar Silvestre",
@@ -14293,9 +14367,14 @@ export const es: EnTranslations = {
         "name": "Despertar del Bosque",
         "description": "Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Corazón del Bosque)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Sobrefloración",
-        "description": "Consume 5 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Floración Silvestre nueva en el objetivo."
+        "description": "Consume 3 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Sporemending nueva en el objetivo.",
+        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Invocar Emberkin",
@@ -18933,6 +19012,9 @@ export const es: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Alijo del Emisario"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
       },
       "clue_scroll": {
         "name": "Pergamino de Pistas"
@@ -23946,6 +24028,11 @@ export const es: EnTranslations = {
         "sender": "El Correo del Cuervo",
         "subject": "Tu recompensa del cofre",
         "body": "La cámara fue despejada, pero no recogiste tu parte del cofre. Los cuervos te la han traído aquí, con los bienes y las monedas que ganaste adjuntos.\n\n- El Correo del Cuervo"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {
@@ -24081,7 +24168,7 @@ export const es: EnTranslations = {
       },
       "grovespring": {
         "name": "Atuendo de Fuente del Bosque",
-        "bonus2": "Sanación Rápida consume primero tu Floración Salvaje o Segunda Floración y sana un 25% más. El daño recibido ya no retrasa tus hechizos.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Sobrefloración cosecha el 75% de tus efectos restantes y almacena 1 Verdancia después."
       },
       "hexthread": {
@@ -24174,7 +24261,7 @@ export const es: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Vestimenta Guardaestrellas",
-        "bonus2": "El tiempo de lanzamiento de Raíces Aferradoras se reduce 0,5 s.",
+        "bonus2": "El tiempo de lanzamiento de Raíces Aferradoras se reduce 0,5 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Lanzar Raíces Aferradoras te permite lanzar hechizos en movimiento y aumenta tu velocidad de movimiento un 20% durante 4 s. No puede ocurrir más de una vez cada 20 s."
       },
       "vanguard_druid_feral": {
@@ -24184,7 +24271,7 @@ export const es: EnTranslations = {
       },
       "vanguard_druid_restoration": {
         "name": "Vestimenta Florcardo",
-        "bonus2": "El tiempo de reutilización de Alivio Presto se reduce 1 s.",
+        "bonus2": "El tiempo de reutilización de Alivio Presto se reduce 1 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Alivio Presto también aumenta tu velocidad de movimiento un 30% durante 3 s."
       },
       "vanguard_hunter_beast_mastery": {
@@ -24204,22 +24291,22 @@ export const es: EnTranslations = {
       },
       "vanguard_mage_arcane": {
         "name": "Vestiduras Atahoras",
-        "bonus2": "El tiempo de reutilización de Barrera Temporal se reduce 2 s.",
+        "bonus2": "El tiempo de reutilización de Barrera Temporal se reduce 2 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Barrera Temporal también aumenta la velocidad de movimiento del objetivo protegido un 20% durante 3 s."
       },
       "vanguard_mage_fire": {
         "name": "Galas Azoteascuas",
-        "bonus2": "Lluvia de Ascuas se recarga 3 s más rápido.",
+        "bonus2": "Lluvia de Ascuas se recarga 3 s más rápido. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Lanzar Lluvia de Ascuas reduce 2 s el tiempo de reutilización restante de Barrera Llameante."
       },
       "vanguard_mage_frost": {
         "name": "Atuendo Guardaescarcha",
-        "bonus2": "El tiempo de reutilización de Atadura de Hielo se reduce 2 s.",
+        "bonus2": "El tiempo de reutilización de Atadura de Hielo se reduce 2 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Lanzar Atadura de Hielo reduce 5 s el tiempo de reutilización restante de Paso Fugaz."
       },
       "vanguard_paladin_holy": {
         "name": "Galas Velasol",
-        "bonus2": "El tiempo de reutilización de Pacto de Vida se reduce 30 s.",
+        "bonus2": "El tiempo de reutilización de Pacto de Vida se reduce 30 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Pacto de Vida también otorga a tu aliado un escudo por el 8% de su salud máxima durante 6 s."
       },
       "vanguard_paladin_protection": {
@@ -24234,17 +24321,17 @@ export const es: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "Vestimenta Salmovelo",
-        "bonus2": "El tiempo de reutilización de Alarido Psíquico se reduce 3 s.",
+        "bonus2": "El tiempo de reutilización de Alarido Psíquico se reduce 3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Cuando tu Salmo de Protección se consume por completo, el aliado protegido gana un 20% de velocidad de movimiento durante 3 s. No puede ocurrir más de una vez cada 8 s."
       },
       "vanguard_priest_holy": {
         "name": "Vestimenta Alagracia",
-        "bonus2": "El tiempo de reutilización de Paso del Velo se reduce 6 s.",
+        "bonus2": "El tiempo de reutilización de Paso del Velo se reduce 6 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Paso del Velo también te otorga un escudo por el 8% de tu salud máxima durante 6 s."
       },
       "vanguard_priest_shadow": {
         "name": "Galas Himnocaso",
-        "bonus2": "Letanía de Aflicción también ralentiza el movimiento del objetivo un 30% mientras la canalizas.",
+        "bonus2": "Letanía de Aflicción también ralentiza el movimiento del objetivo un 30% mientras la canalizas. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Invocar Diezmademonio también te otorga un escudo por el 10% de tu salud máxima durante 8 s."
       },
       "vanguard_rogue_assassination": {
@@ -24264,7 +24351,7 @@ export const es: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Cota de Batalla Escritormenta",
-        "bonus2": "El tiempo de reutilización de Desatar Arma se reduce 3 s.",
+        "bonus2": "El tiempo de reutilización de Desatar Arma se reduce 3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Desatar Arma te permite lanzar hechizos en movimiento y aumenta tu velocidad de movimiento un 20% durante 4 s. No puede ocurrir más de una vez cada 20 s."
       },
       "vanguard_shaman_enhancement": {
@@ -24274,22 +24361,22 @@ export const es: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "Malla Guardamar",
-        "bonus2": "Aguas Reparadoras se lanza 0,5 s más rápido sobre un aliado por debajo del 50% de salud.",
+        "bonus2": "Aguas Reparadoras se lanza 0,5 s más rápido sobre un aliado por debajo del 50% de salud. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Llamada de la Marea también otorga a su objetivo un escudo por el 5% de tu salud máxima durante 6 s."
       },
       "vanguard_warlock_affliction": {
         "name": "Vestiduras Plumapavor",
-        "bonus2": "El tiempo de lanzamiento de Espanto se reduce 0,3 s.",
+        "bonus2": "El tiempo de lanzamiento de Espanto se reduce 0,3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Consumir te sana un 30% más y puede canalizarse en movimiento."
       },
       "vanguard_warlock_demonology": {
         "name": "Galas Atamédula",
-        "bonus2": "El tiempo de reutilización de Armadura de Huesos se reduce 10 s.",
+        "bonus2": "El tiempo de reutilización de Armadura de Huesos se reduce 10 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Mandato: siega reduce 2 s el tiempo de reutilización restante de Armadura de Huesos."
       },
       "vanguard_warlock_destruction": {
         "name": "Vestiduras Coronaescoria",
-        "bonus2": "El tiempo de reutilización de Piel de Escoria se reduce 30 s.",
+        "bonus2": "El tiempo de reutilización de Piel de Escoria se reduce 30 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Cada segundo lanzamiento de Conflagrar hace que tu próxima Descarga de Ruina en los 8 s siguientes sea instantánea."
       },
       "vanguard_warrior_arms": {
@@ -24320,7 +24407,7 @@ export const es: EnTranslations = {
       },
       "warfare_cinderweave": {
         "name": "Equipo de batalla Cinderweave",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Ascua, absorbiendo 120 de daño durante 8 s."
       },
@@ -24332,13 +24419,13 @@ export const es: EnTranslations = {
       },
       "warfare_stormbound": {
         "name": "Vestiduras Stormbound",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Ascua, absorbiendo 120 de daño durante 8 s."
       },
       "warfare_thornhide": {
         "name": "Atuendo Thornhide",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Espinas, aumentando la esquiva un 15% durante 6 s."
       },

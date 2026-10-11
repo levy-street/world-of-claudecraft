@@ -31,7 +31,7 @@ export interface DrawableRig {
   root: { visible: boolean };
 }
 
-/** The six character rigs one entity view can own. */
+/** The seven character rigs one entity view can own. */
 export interface CharacterFormRigSlots {
   visual: ActivatableRig | null;
   sheepVisual: ActivatableRig | null;
@@ -39,9 +39,10 @@ export interface CharacterFormRigSlots {
   catVisual: ActivatableRig | null;
   travelVisual: ActivatableRig | null;
   metamorphVisual: ActivatableRig | null;
+  sporemenderVisual: ActivatableRig | null;
 }
 
-/** The same six, plus the one bespoke body that replaces all of them. */
+/** The same seven, plus the one bespoke body that replaces all of them. */
 export interface EntityRigSlots {
   visual: DrawableRig | null;
   sheepVisual: DrawableRig | null;
@@ -49,6 +50,7 @@ export interface EntityRigSlots {
   catVisual: DrawableRig | null;
   travelVisual: DrawableRig | null;
   metamorphVisual: DrawableRig | null;
+  sporemenderVisual: DrawableRig | null;
   /** the Mage fireball travel form: a bespoke visual that takes every rig out
    *  of the frame, so its presence IS the body for that window */
   fireballTravelVisual: unknown;
@@ -73,6 +75,7 @@ export function applyCharacterFormVisibility(
   rigs.catVisual?.setActive(visibility.cat);
   rigs.travelVisual?.setActive(visibility.travel);
   rigs.metamorphVisual?.setActive(visibility.metamorph);
+  rigs.sporemenderVisual?.setActive(visibility.sporemender);
 }
 
 /** Is any body of this entity actually drawn right now? */
@@ -84,7 +87,8 @@ export function anyCharacterRigDrawing(rigs: EntityRigSlots): boolean {
     rigs.bearVisual?.root.visible ||
     rigs.catVisual?.root.visible ||
     rigs.travelVisual?.root.visible ||
-    rigs.metamorphVisual?.root.visible
+    rigs.metamorphVisual?.root.visible ||
+    rigs.sporemenderVisual?.root.visible
   );
 }
 

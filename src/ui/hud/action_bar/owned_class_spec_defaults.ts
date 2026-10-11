@@ -209,6 +209,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'thorns',
       'travel_form',
       'grove_awakening',
+      'sporemender_form',
     ],
   },
 };

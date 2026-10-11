@@ -197,7 +197,9 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // 434 with the trinket slot's seventeen character-scoped relics (PR 4173).
     // 466 at the release/v0.44.0 merge into feature/buried-hoards (2026-09-28): the 32 Buried Hoard pieces
     // (character-scoped items), the same +32 as reliquary_content.test.ts's pair.
-    expect(catalogTotal).toBe(466);
+    // 467 with the sixth lifetime-XP rung's Titan title slot on the Horizons
+    // titles page. Five permanent World PvP titles add five character-scoped relics.
+    expect(catalogTotal).toBe(472);
     // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
     // completion, so it moves nothing here.
   });

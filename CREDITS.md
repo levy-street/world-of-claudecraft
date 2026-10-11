@@ -392,6 +392,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (nythraxis_bone_spike) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (nythraxis_binding_cage) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (windrider_glider_flight) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated creature model + animations (sporemender_form) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline from owner-provided concept art (Tripo AI image-to-image T-pose redraw, 3D model, auto-rig and preset retargets; weights and arm pose post-processed) | Project asset | With the project only |
 
 Crucible profession collection equipment, manuals, and enchant formula paintings are project-generated art, made with OpenAI's built-in image generation for World of ClaudeCraft. Provenance: `docs/achievements/crucible-professions-2026-09-05/`. Project asset, with the project only.
 

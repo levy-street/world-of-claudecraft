@@ -23,6 +23,7 @@ import {
 } from '../data';
 import { layoutColliders } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
+import { gliderActionsLocked } from '../glider_action_lock';
 import type { LootTier } from '../lockpick';
 import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
 import {
@@ -30,9 +31,16 @@ import {
   grantRiftClearEmbers,
 } from '../professions/masterwrought_materials';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
+import { shadowActionsLocked } from '../shadow_action_lock';
 import type { SimContext } from '../sim_context';
-import { mayEnterVaultPortal, vaultForPortal, vaultScaledTuning } from '../treasure_vault';
+import {
+  finishLocalVaultAttempt,
+  mayEnterVaultPortal,
+  vaultForPortal,
+  vaultScaledTuning,
+} from '../treasure_vault';
 import { DT, dist2d, type Entity, type SimEvent, type Vec3 } from '../types';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { isInWaterBody } from '../world';
 import { riftFx } from './fx';
 import { tickHoardAddCasts } from './hoard_add_casts';
@@ -242,7 +250,7 @@ export function riftRecoveryPointSafe(ctx: SimContext, p: Entity, pos: Vec3): bo
   return true;
 }
 
-type RiftStateEvent = Extract<SimEvent, { type: 'riftState' }>;
+export type RiftStateEvent = Extract<SimEvent, { type: 'riftState' }>;
 
 function buildRiftStateEvent(
   ctx: SimContext,
@@ -304,6 +312,44 @@ export function riftStateEventFor(ctx: SimContext, pid: number): RiftStateEvent 
   const inst = riftInstanceAtPos(ctx, p.pos);
   if (!inst?.memberIds.has(pid)) return null;
   return buildRiftStateEvent(ctx, pid, inst, true);
+}
+
+/** Emit the riftState exit for a member about to be teleported off the floor at
+ * `from` by something other than the rift exit (a spirit release or an /unstuck
+ * to a graveyard). ClientWorld mirrors its floor from these events alone, so
+ * without the exit a ghost running back from a rift kept the rift map, minimap,
+ * and floor tracker the whole way. A no-op for a position on no member floor. */
+export function emitRiftDeparture(ctx: SimContext, pid: number, from: Vec3): void {
+  const inst = riftInstanceAtPos(ctx, from);
+  if (inst?.memberIds.has(pid)) emitRiftState(ctx, pid, inst, false);
+}
+
+/** Detach `p` from the rift floor they stand on ahead of a teleport somewhere
+ * else entirely (a Thornhollow Fields seat): the lockpick and session teardown
+ * leaveRift runs, minus the move, plus the riftState exit the online client
+ * mirrors its floor from (members only, like emitRiftDeparture). An unclaimed
+ * hoard share is left for clearHoardRewardChest at teardown, as a release or a
+ * hearth leaves it, so the seat never pulls that rng draw forward. Returns the
+ * run's own exit spot and facing as the caller's return point, so a match that
+ * ends after the run is gone never sends the player back onto its floor. The
+ * rift twin of instances/dungeons.ts detachFromDungeon; null when `p` stands on
+ * no rift floor. `deliver` replaces the event queue for a caller whose own queued
+ * events would not reach the client (server/moderation_moves.ts: a moderator
+ * entering spectate, whose router drops their own pid's events). */
+export function detachFromRift(
+  ctx: SimContext,
+  p: Entity,
+  deliver: (ev: RiftStateEvent) => void = (ev) => ctx.emit(ev),
+): { x: number; z: number; facing: number } | null {
+  const inst = riftInstanceAtPos(ctx, p.pos);
+  if (!inst) return null;
+  if (inst.lockpick) riftLockpickAbort(ctx, inst, p.id);
+  cancelProfessionSessionOnDisplacement(ctx, p);
+  p.riftSliding = false;
+  p.riftSlideDirX = 0;
+  p.riftSlideDirZ = 0;
+  if (inst.memberIds.has(p.id)) deliver(buildRiftStateEvent(ctx, p.id, inst, false));
+  return { x: inst.returnPos.x, z: inst.returnPos.z, facing: inst.returnFacing ?? 0 };
 }
 
 export function hoardBossCueViewsForPlayer(ctx: SimContext, pid: number) {
@@ -630,6 +676,18 @@ export function enterRift(
       r.e.riftDeniedAt = ctx.time;
       ctx.error(r.meta.entityId, 'All rifts are unstable right now. Try again soon.');
     }
+    return;
+  }
+  // A live world quest trial (wisp maze, shadow, glider) owns the player's
+  // movement, so a portal on its route must never pull them out mid-run. Walk-in
+  // and click both pass the portal, so this one gate covers both; no error line,
+  // since the trial already fills the screen and walk-in would repeat it.
+  if (
+    portal &&
+    (wispMazeActionsLocked(r.meta.worldQuestLog) ||
+      shadowActionsLocked(r.meta.worldQuestLog) ||
+      gliderActionsLocked(r.meta.worldQuestLog))
+  ) {
     return;
   }
   // A treasure vault is private: only the map's owner and their party may
@@ -976,11 +1034,12 @@ export function descendRift(ctx: SimContext, pid?: number): void {
   // while their body stays behind. An UNRELEASED body needs nothing here; it rides
   // the descent as an ordinary descender and stamps its corpse on arrival.
   //
-  // Two orphan routes this deliberately does NOT cover, because they are reached
-  // without a descent and want their own fix: a member who LOGGED OUT while dead has
-  // no live entity to sweep (their corpsePos persists and reloads onto the abandoned
-  // floor), and a run that ends by expiry or a lost race tears down without moving
-  // anything. Both leave the same stranded corpse this sweep exists to prevent.
+  // A member who LOGS OUT while dead has no live entity to sweep, but their save
+  // already moves a corpse on a live floor to the run's return spot
+  // (save_position.ts riftSaveCorpsePos). One orphan route this deliberately does
+  // NOT cover, because it is reached without a descent and wants its own fix: a run
+  // that ends by expiry or a lost race tears down without moving anything, leaving
+  // the same stranded corpse this sweep exists to prevent.
   for (const id of inst.memberIds) {
     const member = ctx.entities.get(id);
     if (!member?.corpsePos) continue;
@@ -1600,6 +1659,8 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   inst.rewarded = true;
   inst.outcome = 'won';
   inst.finishedAt = ctx.time;
+  if (inst.vault?.attemptId && !ctx.cfg.vaultRewardNeedsSave)
+    finishLocalVaultAttempt(ctx, inst.vault.ownerPid, inst.vault.attemptId);
   if (inst.vault?.attemptId && inst.vault.ownerCharacterId && ctx.cfg.vaultRewardNeedsSave) {
     const claims = [...(inst.vault.entrantSnapshots?.values() ?? [])].map((entrant) => {
       const reward = rollHoardReward(ctx.rng, {

@@ -2047,6 +2047,17 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
     a: 'buff',
   },
   swiftmend: { c: '#8fe86a', p: 'nature', pw: 1.1, sp: 20, vr: 1, li: 1.5, lg: 2, a: 'heal' },
+  sporemender_form: {
+    c: '#9fd36a',
+    p: 'nature',
+    pw: 0.9,
+    rg: 1.3,
+    sm: 1,
+    li: 1,
+    bo: 'leaves',
+    lg: 2.2,
+    a: 'buff',
+  },
   typhoon: {
     c: '#6fc8e8',
     p: 'nature',

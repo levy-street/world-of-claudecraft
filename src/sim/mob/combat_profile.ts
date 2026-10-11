@@ -73,8 +73,18 @@ export function mobEffectiveMeleeRange(mob: Entity): number {
   return effectiveMobMeleeRange(profile, mobMoved);
 }
 
+function mobCanReachMeleeTarget(
+  mob: Entity,
+  target: Entity,
+  reach = mobEffectiveMeleeRange(mob),
+): boolean {
+  return (
+    Math.abs(mob.pos.y - target.pos.y) <= Math.max(4, reach) && dist2d(mob.pos, target.pos) <= reach
+  );
+}
+
 export function tryMobMeleeSwingInRange(ctx: SimContext, mob: Entity, target: Entity): boolean {
-  if (dist2d(mob.pos, target.pos) > mobEffectiveMeleeRange(mob)) {
+  if (!mobCanReachMeleeTarget(mob, target)) {
     mob.autoAttack = false;
     return false;
   }
@@ -230,9 +240,17 @@ export function updateMobCombatProfile(
   }
 
   updatePursuitProfileCombat(ctx, mob, target, profile);
+  const meleeReach = mobEffectiveMeleeRange(mob);
   if (
     profile.canLeash &&
-    chaseStalledUnreachable(ctx, mob, target, profile.meleeRange, chaseSpeed)
+    chaseStalledUnreachable(
+      ctx,
+      mob,
+      target,
+      meleeReach,
+      chaseSpeed,
+      mobCanReachMeleeTarget(mob, target, meleeReach),
+    )
   ) {
     onChaseStalled(mob, instanceHold);
     return 'done';
@@ -259,11 +277,16 @@ export function holdPinnedMob(ctx: SimContext, mob: Entity): void {
     return;
   }
   const profile = mobCombatProfile(mob);
-  const reach = MOBS[mob.templateId]?.petSpell?.range ?? profile.meleeRange;
+  const spellRange = MOBS[mob.templateId]?.petSpell?.range;
+  const reach = spellRange ?? profile.meleeRange;
   const chaseSpeed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
   mob.autoAttack = false;
   mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
-  if (dist2d(mob.pos, target.pos) <= reach) {
+  const reached =
+    spellRange !== undefined
+      ? dist2d(mob.pos, target.pos) <= reach
+      : mobCanReachMeleeTarget(mob, target, reach);
+  if (reached) {
     releasePin(mob);
     return;
   }
@@ -394,7 +417,7 @@ function updatePursuitProfileCombat(
     tryMobMeleeSwingInRange(ctx, mob, target);
   }
 
-  if (dist2d(mob.pos, target.pos) > profile.desiredRange) {
+  if (!mobCanReachMeleeTarget(mob, target, profile.desiredRange)) {
     if (!ctx.isRooted(mob)) {
       ctx.moveToward(
         mob,
@@ -415,5 +438,5 @@ function updatePursuitProfileCombat(
   ) {
     tryMobMeleeSwingInRange(ctx, mob, target);
   }
-  mob.aiState = dist2d(mob.pos, target.pos) <= profile.meleeRange ? 'attack' : 'chase';
+  mob.aiState = mobCanReachMeleeTarget(mob, target) ? 'attack' : 'chase';
 }

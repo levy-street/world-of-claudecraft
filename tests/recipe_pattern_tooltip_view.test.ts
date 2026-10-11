@@ -11,6 +11,7 @@
 // below, and the result ITEM ids stay real, so the teaches line still quotes
 // the shipped catalog rather than a made-up name.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { resolvePatternLearn } from '../src/sim/professions/pattern_items';
@@ -172,10 +173,12 @@ describe('recipePatternTooltipModel', () => {
       skillReq: 50,
       skillMet: false,
       known: false,
+      reagents: [[{ itemId: 'sunpetal_herb', count: 1 }]],
     });
     // The model quotes the table, never a second copy of these numbers.
     expect(model?.skillReq).toBe(recipe?.skillReq);
     expect(model?.resultItemId).toBe(recipe?.resultItemId);
+    expect(model?.reagents[0]).toBe(recipe?.reagents);
   });
 
   it('answers null for every non-pattern kind', () => {
@@ -362,7 +365,9 @@ describe('recipePatternTooltipLines', () => {
   it('renders no requirement line for a recipe gated at 0', () => {
     const html = recipePatternTooltipLines(pattern(FREE_RECIPE), viewer());
     expect(html).toContain('Use: Teaches you how to craft');
-    expect(html).not.toContain('Requires');
+    // Scoped to the skill line: the materials line below says "Requires:" too.
+    expect(html).not.toContain('Requires Weaponcrafting');
+    expect(html).not.toContain('tt-red');
   });
 
   it('adds the trainer already-known line only when the recipe is known', () => {
@@ -392,7 +397,7 @@ describe('recipePatternTooltipLines', () => {
     expect(known).toBeGreaterThan(requires);
   });
 
-  it('renders the teaches line ALONE before the first cprof snapshot lands', () => {
+  it('renders no viewer-gated line before the first cprof snapshot lands', () => {
     // An online client's craftSkills and knownRecipes are empty defaults until
     // that snapshot arrives, so both gated lines would be answering off state
     // the client does not have. The viewer here deliberately carries state that
@@ -403,15 +408,170 @@ describe('recipePatternTooltipLines', () => {
       viewer({ synced: false, knownRecipes: [GATED_RECIPE], craftSkills: { alchemy: 0 } }),
     );
     expect(unsynced).toContain('Use: Teaches you how to craft Sunpetal Mana Draught.');
-    expect(unsynced).not.toContain('Requires');
+    expect(unsynced).not.toContain('Requires Alchemy');
     expect(unsynced).not.toContain('You already know');
+    // What the pattern makes is static content, not viewer state, so the
+    // materials line still renders unsynced.
+    expect(unsynced).toContain('Requires: Sunpetal Herb x1');
     // The same state synced renders all three, so the arm above is a real gate.
     const synced = recipePatternTooltipLines(
       pattern(GATED_RECIPE),
       viewer({ knownRecipes: [GATED_RECIPE], craftSkills: { alchemy: 0 } }),
     );
-    expect(synced).toContain('Requires');
+    expect(synced).toContain('Requires Alchemy');
     expect(synced).toContain('You already know');
+  });
+});
+
+describe('what the taught recipe makes', () => {
+  // The player-facing ask: a pattern must say what its product IS and DOES,
+  // not only its name. The host renders the product card; a stub stands in
+  // here so the pure core's placement and gating are pinned on their own.
+  const card = (product: ItemDef) => `<div class="stub-card">${product.id}</div>`;
+
+  it('embeds the product card and its materials below the gate lines', () => {
+    const html = recipePatternTooltipLines(
+      pattern(GATED_RECIPE),
+      viewer({ knownRecipes: [GATED_RECIPE] }),
+      card,
+    );
+    expect(html).toContain(
+      '<div class="tt-recipe-product"><div class="stub-card">sunpetal_mana_draught</div>' +
+        '<div class="tt-sub">Requires: Sunpetal Herb x1</div></div>',
+    );
+    // Reads top-down: teaches, skill gate, known, then what it makes.
+    const known = html.indexOf('You already know');
+    expect(known).toBeGreaterThan(html.indexOf('Requires Alchemy'));
+    expect(html.indexOf('tt-recipe-product')).toBeGreaterThan(known);
+  });
+
+  it('still lists the materials when the host supplies no card renderer', () => {
+    const html = recipePatternTooltipLines(pattern(GATED_RECIPE), viewer());
+    expect(html).toContain(
+      '<div class="tt-recipe-product"><div class="tt-sub">Requires: Sunpetal Herb x1</div></div>',
+    );
+  });
+
+  it('lists every reagent with its count, in recipe order', () => {
+    const recipe = recipeById('recipe_crucible_str_mail_chest');
+    if (!recipe) throw new Error('missing crucible recipe');
+    const html = recipePatternTooltipLines(ITEMS.pattern_crucible_str_mail, viewer());
+    for (const reagent of recipe.reagents) {
+      expect(html).toContain(`${ITEMS[reagent.itemId].name} x${reagent.count}`);
+    }
+  });
+
+  it('gives a collection manual one product block per taught recipe', () => {
+    const html = recipePatternTooltipLines(ITEMS.pattern_crucible_str_mail, viewer(), card);
+    expect(html.match(/class="tt-recipe-product"/g)?.length).toBe(3);
+    const chest = html.indexOf('crucible_str_mail_chest</div>');
+    const waist = html.indexOf('crucible_str_mail_waist</div>');
+    const feet = html.indexOf('crucible_str_mail_feet</div>');
+    expect(chest).toBeGreaterThan(-1);
+    expect(waist).toBeGreaterThan(chest);
+    expect(feet).toBeGreaterThan(waist);
+  });
+
+  it('asks every manual card but the last to omit the shared set block', () => {
+    // The three crucible pieces share one set: its bonuses must read once,
+    // on the last card, not three times down one tooltip.
+    const calls: Array<[string, boolean]> = [];
+    recipePatternTooltipLines(ITEMS.pattern_crucible_str_mail, viewer(), (product, omitSet) => {
+      calls.push([product.id, omitSet]);
+      return '';
+    });
+    expect(ITEMS.crucible_str_mail_chest.set).toBeTruthy();
+    expect(calls).toEqual([
+      ['crucible_str_mail_chest', true],
+      ['crucible_str_mail_waist', true],
+      ['crucible_str_mail_feet', false],
+    ]);
+    // A single-product pattern always keeps its set block.
+    const single: boolean[] = [];
+    recipePatternTooltipLines(pattern(GATED_RECIPE), viewer(), (_product, omitSet) => {
+      single.push(omitSet);
+      return '';
+    });
+    expect(single).toEqual([false]);
+  });
+
+  it('never embeds a card for a product that is itself a pattern', () => {
+    const id = 'recipe_tooltip_pattern_nested';
+    const nested = dropRecipe(id, { resultItemId: 'pattern_spiritweld_girdle' });
+    ALL_RECIPES.push(nested);
+    try {
+      expect(ITEMS.pattern_spiritweld_girdle?.kind).toBe('recipe');
+      const html = recipePatternTooltipLines(pattern(id), viewer(), card);
+      expect(html).not.toContain('stub-card');
+      expect(html).toContain('Requires: Sunpetal Herb x1');
+    } finally {
+      ALL_RECIPES.splice(ALL_RECIPES.indexOf(nested), 1);
+    }
+  });
+
+  it('states what a formula enchant does, then its materials, and never calls the card', () => {
+    const html = recipePatternTooltipLines(ITEMS.formula_lastflame_zeal, viewer(), () => {
+      throw new Error('a formula has no product item to render');
+    });
+    expect(html).toContain(
+      '<div class="tt-green">Your landed melee attacks can grant 50 Strength for 15 sec',
+    );
+    expect(html).toContain('Requires: Core of the Last Flame x3');
+    expect(html.indexOf('tt-green')).toBeGreaterThan(html.indexOf('Teaches you how to apply'));
+  });
+
+  it('states a stat formula as one green line per stat axis', () => {
+    // The non-proc formula arm. No shipped stat enchant is drop-taught, so a
+    // REAL id (its name key exists) is swapped for a drop-taught two-axis copy
+    // and restored afterwards.
+    const id = 'enchant_weapon_might';
+    const real = ENCHANTS[id];
+    ENCHANTS[id] = {
+      ...real,
+      reagents: [{ itemId: 'sunpetal_herb', count: 2 }],
+      statBonus: { sta: 6, int: 4 },
+      acquisition: 'drop',
+    };
+    try {
+      const formula: RecipeItemDef = { ...pattern(id), teachesEnchantId: id };
+      const html = recipePatternTooltipLines(formula, viewer());
+      expect(html).toContain('<div class="tt-green">+6 Stamina</div>');
+      expect(html).toContain('<div class="tt-green">+4 Intellect</div>');
+      expect(html).toContain('Requires: Sunpetal Herb x2');
+      expect(html.indexOf('+6 Stamina')).toBeLessThan(html.indexOf('+4 Intellect'));
+    } finally {
+      ENCHANTS[id] = real;
+    }
+  });
+
+  it('skips a reagent this bundle has no item for, and never paints an empty block', () => {
+    const id = 'recipe_tooltip_pattern_unknown_reagent';
+    const onlyUnknown = 'recipe_tooltip_pattern_only_unknown';
+    const fixtures = [
+      dropRecipe(id, {
+        reagents: [
+          { itemId: 'qa_no_such_reagent', count: 3 },
+          { itemId: 'sunpetal_herb', count: 1 },
+        ],
+      }),
+      dropRecipe(onlyUnknown, { reagents: [{ itemId: 'qa_no_such_reagent', count: 3 }] }),
+    ];
+    ALL_RECIPES.push(...fixtures);
+    try {
+      const html = recipePatternTooltipLines(pattern(id), viewer());
+      expect(html).toContain('Requires: Sunpetal Herb x1</div>');
+      expect(html).not.toContain('qa_no_such_reagent');
+      // No card renderer and no printable reagent: nothing to wrap.
+      expect(recipePatternTooltipLines(pattern(onlyUnknown), viewer())).not.toContain(
+        'tt-recipe-product',
+      );
+    } finally {
+      for (const recipe of fixtures) ALL_RECIPES.splice(ALL_RECIPES.indexOf(recipe), 1);
+    }
+  });
+
+  it('adds nothing for a non-pattern def', () => {
+    expect(recipePatternTooltipLines(ITEMS.sunpetal_mana_draught, viewer(), card)).toBe('');
   });
 });
 
@@ -505,6 +665,40 @@ describe('reachability through the real Hud tooltip', () => {
     );
     expect(html).toContain('<div class="tt-red">Requires Alchemy 50</div>');
     expect(html).toContain('<div class="tt-red">You already know that recipe.</div>');
+  });
+
+  it('embeds the REAL product item card, so the pattern states what it makes', () => {
+    const html = hudTooltip(pattern(GATED_RECIPE), viewer());
+    const block = html.slice(html.indexOf('<div class="tt-recipe-product">'));
+    expect(block.length).toBeLessThan(html.length);
+    // The potion's own use line, from the same builder its bag tooltip uses.
+    expect(block).toContain('Use: Instantly restores 425 mana.');
+    expect(block).toContain('Requires: Sunpetal Herb x1');
+    // The embedded card is compare-free: no second "Currently Equipped" block.
+    expect(block).not.toContain('tt-cmp');
+  });
+
+  it('renders a manual set block once, on its last embedded card', () => {
+    const html = hudTooltip(ITEMS.pattern_crucible_str_mail, viewer());
+    expect(html.match(/class="tt-recipe-product"/g)?.length).toBe(3);
+    expect(html.match(/class="tt-set-name"/g)?.length).toBe(1);
+    expect(html.indexOf('tt-set-name')).toBeGreaterThan(html.lastIndexOf('tt-recipe-product'));
+  });
+
+  it('keeps sell price and stack cap off the embedded card, so they read as the pattern', () => {
+    // A stackable, sellable product: its own card states both lines when
+    // hovered directly, and the pattern's embedded copy must state neither.
+    const product = hudTooltip(ITEMS.sunpetal_mana_draught, viewer());
+    const html = hudTooltip(pattern(GATED_RECIPE), viewer());
+    const start = html.indexOf('<div class="tt-recipe-product">');
+    const end = html.indexOf('Requires: Sunpetal Herb x1', start);
+    const card = html.slice(start, end);
+    expect(product).toContain('Sell price:');
+    expect(card).not.toContain('Sell price:');
+    expect(product).toContain('Max stack:');
+    expect(card).not.toContain('Max stack:');
+    // The pattern still states its OWN price, after the product block.
+    expect(html.lastIndexOf('Sell price:')).toBeGreaterThan(end);
   });
 
   it('adds nothing pattern-shaped for a non-pattern def', () => {

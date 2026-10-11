@@ -12,6 +12,8 @@ interface TimelineCounters {
   rejectedAnchoredWindow: number;
   rejectedSanityBound: number;
   resyncs: number;
+  playoutGrowths: number;
+  playoutShrinks: number;
 }
 
 export interface MovementTimelineCaptureTotals {
@@ -23,6 +25,8 @@ export interface MovementTimelineCaptureTotals {
   movementRejectedAnchoredWindowTotal: number;
   movementRejectedSanityBoundTotal: number;
   movementResyncsTotal: number;
+  movementPlayoutGrowthsTotal: number;
+  movementPlayoutShrinksTotal: number;
 }
 
 function delta(current: number, previous: number): number {
@@ -38,6 +42,8 @@ export class MovementInputTimelineTickStats {
   lastRejectedAnchoredWindow = 0;
   lastRejectedSanityBound = 0;
   lastResyncs = 0;
+  lastPlayoutGrowths = 0;
+  lastPlayoutShrinks = 0;
 
   private movementConsumedTotal = 0;
   private movementStarvedTotal = 0;
@@ -47,6 +53,8 @@ export class MovementInputTimelineTickStats {
   private movementRejectedAnchoredWindowTotal = 0;
   private movementRejectedSanityBoundTotal = 0;
   private movementResyncsTotal = 0;
+  private movementPlayoutGrowthsTotal = 0;
+  private movementPlayoutShrinksTotal = 0;
   private readonly previousByTimeline = new WeakMap<MovementInputTimeline, TimelineCounters>();
 
   fold(sessions: Iterable<MovementInputSessionState>, capturing: boolean): void {
@@ -58,6 +66,8 @@ export class MovementInputTimelineTickStats {
     let rejectedAnchoredWindow = 0;
     let rejectedSanityBound = 0;
     let resyncs = 0;
+    let playoutGrowths = 0;
+    let playoutShrinks = 0;
     for (const session of sessions) {
       const timeline = session.movementTimeline;
       if (session.movementWireVersion !== 2 || !timeline) continue;
@@ -72,6 +82,8 @@ export class MovementInputTimelineTickStats {
           rejectedAnchoredWindow: 0,
           rejectedSanityBound: 0,
           resyncs: 0,
+          playoutGrowths: 0,
+          playoutShrinks: 0,
         };
         this.previousByTimeline.set(timeline, previous);
       }
@@ -86,6 +98,8 @@ export class MovementInputTimelineTickStats {
       );
       rejectedSanityBound += delta(timeline.rejectedSanityBound, previous.rejectedSanityBound);
       resyncs += delta(timeline.resyncs, previous.resyncs);
+      playoutGrowths += delta(timeline.playoutGrowths, previous.playoutGrowths);
+      playoutShrinks += delta(timeline.playoutShrinks, previous.playoutShrinks);
       previous.consumed = timeline.consumed;
       previous.starved = timeline.starved;
       previous.extrapolated = timeline.extrapolated;
@@ -94,6 +108,8 @@ export class MovementInputTimelineTickStats {
       previous.rejectedAnchoredWindow = timeline.rejectedAnchoredWindow;
       previous.rejectedSanityBound = timeline.rejectedSanityBound;
       previous.resyncs = timeline.resyncs;
+      previous.playoutGrowths = timeline.playoutGrowths;
+      previous.playoutShrinks = timeline.playoutShrinks;
     }
     this.lastConsumed = consumed;
     this.lastStarved = starved;
@@ -103,6 +119,8 @@ export class MovementInputTimelineTickStats {
     this.lastRejectedAnchoredWindow = rejectedAnchoredWindow;
     this.lastRejectedSanityBound = rejectedSanityBound;
     this.lastResyncs = resyncs;
+    this.lastPlayoutGrowths = playoutGrowths;
+    this.lastPlayoutShrinks = playoutShrinks;
     if (!capturing) return;
     this.movementConsumedTotal += consumed;
     this.movementStarvedTotal += starved;
@@ -112,6 +130,8 @@ export class MovementInputTimelineTickStats {
     this.movementRejectedAnchoredWindowTotal += rejectedAnchoredWindow;
     this.movementRejectedSanityBoundTotal += rejectedSanityBound;
     this.movementResyncsTotal += resyncs;
+    this.movementPlayoutGrowthsTotal += playoutGrowths;
+    this.movementPlayoutShrinksTotal += playoutShrinks;
   }
 
   resetCapture(): void {
@@ -123,6 +143,8 @@ export class MovementInputTimelineTickStats {
     this.movementRejectedAnchoredWindowTotal = 0;
     this.movementRejectedSanityBoundTotal = 0;
     this.movementResyncsTotal = 0;
+    this.movementPlayoutGrowthsTotal = 0;
+    this.movementPlayoutShrinksTotal = 0;
   }
 
   captureTotals(): MovementTimelineCaptureTotals {
@@ -135,10 +157,12 @@ export class MovementInputTimelineTickStats {
       movementRejectedAnchoredWindowTotal: this.movementRejectedAnchoredWindowTotal,
       movementRejectedSanityBoundTotal: this.movementRejectedSanityBoundTotal,
       movementResyncsTotal: this.movementResyncsTotal,
+      movementPlayoutGrowthsTotal: this.movementPlayoutGrowthsTotal,
+      movementPlayoutShrinksTotal: this.movementPlayoutShrinksTotal,
     };
   }
 
   heartbeatTokens(): string {
-    return `moveConsumed=${this.lastConsumed} moveStarved=${this.lastStarved} moveExtrapolated=${this.lastExtrapolated} moveLate=${this.lastDiscardedLate} moveDropOldest=${this.lastDroppedOldest} moveRejectWindow=${this.lastRejectedAnchoredWindow} moveRejectSanity=${this.lastRejectedSanityBound} moveResyncs=${this.lastResyncs}`;
+    return `moveConsumed=${this.lastConsumed} moveStarved=${this.lastStarved} moveExtrapolated=${this.lastExtrapolated} moveLate=${this.lastDiscardedLate} moveDropOldest=${this.lastDroppedOldest} moveRejectWindow=${this.lastRejectedAnchoredWindow} moveRejectSanity=${this.lastRejectedSanityBound} moveResyncs=${this.lastResyncs} moveGrow=${this.lastPlayoutGrowths} moveShrink=${this.lastPlayoutShrinks}`;
   }
 }

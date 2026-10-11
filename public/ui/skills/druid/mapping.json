@@ -644,6 +644,15 @@
       "source": "Owner-provided original artwork",
       "owner": "Levy Street account",
       "license": "Owner-provided artwork, used with permission (Levy Street), rights reserved"
+    },
+    {
+      "abilityId": "sporemender_form",
+      "sourcePack": "owner-provided",
+      "sourceFile": "owner-provided Sporemender concept sheet (the Heal panel, cropped to a square with the label row trimmed off), re-encoded to 128px WebP by scripts/convert_skill_icons_webp.mjs",
+      "output": "sporemender_form.webp",
+      "source": "Owner-provided original artwork",
+      "owner": "Levy Street account",
+      "license": "Owner-provided artwork, used with permission (Levy Street), rights reserved"
     }
   ],
   "deferredStayProcedural": {},

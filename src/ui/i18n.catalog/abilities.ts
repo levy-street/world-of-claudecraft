@@ -218,7 +218,7 @@ const classAbilityNamesEn = {
       [
         'trailbreak',
         'Trailbreak',
-        'Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
+        'Leap 25 yards backward and break free of roots and movement slows. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
       ],
       ['wildheart', 'Wildheart', 'Immediately restore 30% of your maximum health.'],
       [
@@ -901,7 +901,7 @@ const classAbilityNamesEn = {
       [
         'aspect_of_the_cheetah',
         "Courser's Guise",
-        "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze).",
+        "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 2 sec (each hit refreshes the daze).",
       ],
       [
         'aimed_shot',
@@ -971,7 +971,7 @@ const classAbilityNamesEn = {
       [
         'thunder_reservoir',
         'Thunder Reservoir',
-        'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
+        'Passive: Arc Bolt, Skybranch, and Magma Burst grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
       ],
       [
         'lightning_overload',
@@ -981,7 +981,7 @@ const classAbilityNamesEn = {
       [
         'lava_burst',
         'Magma Burst',
-        'Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
+        'Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
       ],
       [
         'thunderstorm',
@@ -1011,7 +1011,7 @@ const classAbilityNamesEn = {
       [
         'flame_shock',
         'Cinder Jolt',
-        'Deal {damage} Fire damage, then {overTime} Fire damage over 12 sec. The initial hit increases with Spell Power.',
+        'Deal {damage} Fire damage, then {overTime} Fire damage over {duration} sec. The initial hit increases with Spell Power.',
       ],
       [
         'flametongue_weapon',
@@ -1173,7 +1173,15 @@ const classAbilityNamesEn = {
             'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
         },
       ],
-      ['healing_touch', 'Wildmend', 'Heals a friendly target for {damage}.'],
+      [
+        'healing_touch',
+        'Wildmend',
+        'Heals a friendly target for {damage}.',
+        {
+          restoration:
+            "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3. Nature's Boon makes it instant, free, and 25% stronger.",
+        },
+      ],
       [
         'mark_of_the_wild',
         'Wildward',
@@ -1192,11 +1200,11 @@ const classAbilityNamesEn = {
       ],
       [
         'rejuvenation',
-        'Wildbloom',
+        'Sporemending',
         'Heals the target for {damage} over 12 sec.',
         {
           restoration:
-            'Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Fleetmend becomes Overbloom.',
+            'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking. At 3 Verdance, Fleetmend becomes Overbloom.',
         },
       ],
       [
@@ -1208,7 +1216,7 @@ const classAbilityNamesEn = {
       [
         'bear_form',
         'Bruin Form',
-        'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
+        'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
       ],
       [
         'maul',
@@ -1216,7 +1224,7 @@ const classAbilityNamesEn = {
         'A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage.',
+            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
         },
       ],
       [
@@ -1241,6 +1249,12 @@ const classAbilityNamesEn = {
         { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
       ],
       [
+        'scratch',
+        'Scratch',
+        'Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
+        { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
+      ],
+      [
         'ferocious_bite',
         'Gorebite',
         'Finishing move that causes {damage}. Cat Form only.',
@@ -1258,8 +1272,11 @@ const classAbilityNamesEn = {
       [
         'regrowth',
         'Second Bloom',
-        'Heals a friendly target for {damage} and an additional amount over 21 sec.',
-        { restoration: 'Planting a NEW bloom adds 1 Verdance (max 5).' },
+        'Heals a friendly target for {damage} and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.',
+        {
+          restoration:
+            'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
+        },
       ],
       ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 20% for 15 sec.'],
       // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
@@ -1584,7 +1601,11 @@ const classAbilityNamesEn = {
       [
         'swiftmend',
         'Fleetmend',
-        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+        {
+          restoration:
+            'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+        },
       ],
       [
         'moonlash',
@@ -1604,7 +1625,7 @@ const classAbilityNamesEn = {
       [
         'marrowbreak',
         'Marrowbreak',
-        'Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage.',
+        'Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
       ],
       [
         'wildwake',
@@ -1617,9 +1638,18 @@ const classAbilityNamesEn = {
         'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Groveheart)',
       ],
       [
+        'sporemender_form',
+        'Sporemender Form',
+        'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
+      ],
+      [
         'overbloom',
         'Overbloom',
-        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+        'Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending.',
+        {
+          restoration:
+            'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending.',
+        },
       ],
       [
         'summon_imp',
@@ -2034,7 +2064,7 @@ const classAbilityNamesEn = {
       [
         'multi_shot',
         'Splitshot',
-        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)',
+        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 4 yd of you. (Hunter talent)',
       ],
       [
         'prayer_of_healing',

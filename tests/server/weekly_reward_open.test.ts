@@ -96,6 +96,58 @@ afterEach(() => {
 });
 
 describe('weekly vault durable opening', () => {
+  it('changes focus through the authoritative Sim without creating a save', async () => {
+    const h = setup();
+    for (const spec of ['fire', 'frost', 'arcane', null]) {
+      await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_loot_spec', { spec });
+      expect(h.meta.weeklyRewards!.lootSpec).toBe(spec ?? undefined);
+    }
+    expect(h.saveCharacter).not.toHaveBeenCalled();
+  });
+
+  it('keeps an opening reward fixed when the preference changes during its save', async () => {
+    const h = setup();
+    const work = h.open();
+    const choice = h.meta.weeklyRewards!.vaults[0].choices[0];
+    const itemId = choice.itemId;
+    expect(itemId).toBeDefined();
+    expect(choice.lootSpec).toBeUndefined();
+    await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_loot_spec', { spec: 'arcane' });
+    expect(h.meta.weeklyRewards!.lootSpec).toBe('arcane');
+    expect(choice.itemId).toBe(itemId);
+    expect(choice.lootSpec).toBeUndefined();
+    expect(h.saveCharacter).toHaveBeenCalledOnce();
+    h.resolve(true);
+    await work;
+    expect(h.choices()[0].itemId).toBe(itemId);
+    expect(h.choices()[0].lootSpec).toBeUndefined();
+  });
+
+  it('refuses malformed, unknown, and wrong-class focus without clearing the prior choice', async () => {
+    const h = setup();
+    await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_loot_spec', { spec: 'fire' });
+    const prior = JSON.stringify(h.meta.weeklyRewards);
+    for (const spec of [undefined, 0, {}, [], '', 'x'.repeat(1000), 'protection']) {
+      await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_loot_spec', { spec });
+      expect(JSON.stringify(h.meta.weeklyRewards)).toBe(prior);
+    }
+    expect(h.saveCharacter).not.toHaveBeenCalled();
+  });
+
+  it.each(['left', 'quarantined', 'replaced'])(
+    'refuses focus commands from a %s session',
+    async (condition) => {
+      const h = setup();
+      if (condition === 'left') h.session.left = true;
+      if (condition === 'quarantined') h.session.escrowQuarantined = true;
+      if (condition === 'replaced')
+        (h.host.clients as Map<number, WeeklyRewardSession>).set(h.pid, { ...h.session });
+      await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_loot_spec', { spec: 'fire' });
+      expect(h.meta.weeklyRewards!.lootSpec).toBeUndefined();
+      expect(h.saveCharacter).not.toHaveBeenCalled();
+    },
+  );
+
   it('rejects simultaneous table and tables fields without rolling or saving', async () => {
     const h = setup();
     const pick = vi.spyOn(h.sim.ctx.rng, 'pick');

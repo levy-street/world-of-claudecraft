@@ -271,6 +271,7 @@ export const TALENT_ABILITIES_V2_B = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
+    offGcd: true,
     usableInForm: true,
     effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 70, duration: 15 }],
     description: 'Increases attack power by 70 for 15 sec. (Druid talent)',
@@ -280,10 +281,12 @@ export const TALENT_ABILITIES_V2_B = {
     name: 'Gladesong',
     class: 'druid',
     learnLevel: 10,
-    cost: 120,
+    // Groveheart rework: a 60 sec cooldown (was 300) paid for with double
+    // the mana (was 120).
+    cost: 240,
     castTime: 0,
     channel: { duration: 4, ticks: 4 },
-    cooldown: 300,
+    cooldown: 60,
     range: 0,
     school: 'nature',
     requiresTarget: false,

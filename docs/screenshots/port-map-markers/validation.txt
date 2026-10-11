@@ -1,0 +1,28 @@
+Validation for port map markers
+
+PASS: npx vitest run tests/ferry_port_map_core.test.ts tests/ferry_port_map_interaction.test.ts tests/map_window_view.test.ts tests/map_window_painter.test.ts tests/continent_map_view.test.ts tests/continent_map_painter.test.ts tests/hud_map_marker_lifecycle.test.ts tests/map_marker_tooltip_content.test.ts tests/map_semantic_accessibility_core.test.ts tests/hud_perf_budget.test.ts tests/monolith_budget.test.ts --maxWorkers=1
+11 files, 545 passed, 4 skipped.
+
+PASS: npx vitest run tests/ferry_port_map_interaction.test.ts tests/map_semantic_accessibility_core.test.ts --maxWorkers=1
+2 files, 35 passed (after final accessibility test change).
+
+PASS: npx tsc --noEmit
+PASS: npm run i18n:gen
+PASS: npm run security:gate (0 high findings)
+PASS: npm run test:browser (64 files, 521 tests)
+PASS: npx turbo run check:types build:env build:server build:bot --ui=stream
+PASS: npx turbo run build:bundle --ui=stream
+PASS: explicit npx biome check on changed source, tests, and screenshot recipe (existing warnings only).
+PASS: git diff --check
+
+NOT PASSED: GATE_MAX_WORKERS=2 node scripts/gate_select.mjs
+Translation freshness now passes after staging and committing the generated artifacts.
+The broad floor reports a pre-existing Windows path assertion in tests/active_kit_prewarm.test.ts:258: the received path uses backslashes while the assertion expects forward slashes.
+Reproduced on unchanged release/v0.45.0 (55de7ffe926d781df7b2caee4314318c7ff730ac): npx vitest run tests/active_kit_prewarm.test.ts --maxWorkers=1. Result: 17 passed, 1 failed with the same path assertion.
+No full-gate success is claimed.
+
+PASS: git push -u origin codex/port-map-markers, including the required pre-push typecheck, architecture/localization guards, changed-file lint, and copy scan.
+
+Visual verification: actual offline client in Chrome, zone and continent maps on desktop and touch landscape; boat marker and destination/boarding/departure tooltip visible, stationary countdown updates.
+
+Before images were captured from the unchanged release commit using the same ferry-port-map capture target and desktop/landscape touch viewports.

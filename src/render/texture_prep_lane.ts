@@ -30,7 +30,11 @@
 // target and there is nothing to restore.
 import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
-import { collectNonResidentTextures, type TexturePropertiesLike } from './texture_prep_core';
+import {
+  collectNonResidentTextures,
+  type TexturePrepRoot,
+  type TexturePropertiesLike,
+} from './texture_prep_core';
 import { type TextureUploadTarget, uploadDataTextureInChunks } from './texture_upload';
 
 /** The slice of the background GPU queue this lane needs. */
@@ -121,7 +125,7 @@ export async function runTexturePrepLane(
   queue: TexturePrepQueue,
   properties: TexturePropertiesLike,
   host: TextureUploadTarget,
-  root: THREE.Object3D,
+  root: TexturePrepRoot,
   gatePriority: number,
   options: TexturePrepOptions = {},
 ): Promise<number> {

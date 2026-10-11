@@ -311,7 +311,7 @@ describe('druid Cat Form mobility pass (row 5 wording)', () => {
     const byId = (id: string) => expectDefined(row5.options.find((option) => option.id === id));
     expect(byId('dru_r5_improved_wrath').name).toBe('Wildshift');
     expect(byId('dru_r5_improved_wrath').description).toBe(
-      'Shapeshifting into Cat, Bruin, or Moonwing Form removes breakable roots and slows.',
+      'Shapeshifting into Cat, Bruin, Moonwing, or Sporemender Form removes breakable roots and slows.',
     );
     // Loping Stride is baseline since the Wildfang kit pass 2; the slot keeps
     // its id and is Longstride, the retune of that baseline sprint.

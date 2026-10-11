@@ -208,4 +208,22 @@ describe('clue scroll and treasure hunt events', () => {
       /^The casket holds 6g 0s and Cracked Wolf Fang and Cracked Wolf Fang\.$/,
     );
   });
+
+  it('pops a queued banner and a log line naming every mailed world quest reward', () => {
+    const mailed = questEventPresentation({
+      type: 'worldQuestRewardMailed',
+      itemIds: ['wolf_fang', 'rift_essence'],
+      pid: 1,
+    });
+    const text =
+      'Your bags are full. Your reward was sent to your mailbox: Cracked Wolf Fang and Rift Essence.';
+    // The banner is the pop-up; queued as a celebration so the completion
+    // banner on the same tick cannot replace it. The log line is the record.
+    expect(mailed).toEqual({
+      bannerText: text,
+      bannerClass: 'deed',
+      logText: text,
+      sound: 'quest_ready',
+    });
+  });
 });

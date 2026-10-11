@@ -15,6 +15,7 @@ import { isDebuffDisplayAura } from '../../../sim/aura_classify';
 import type { ResolvedAbility } from '../../../sim/sim';
 import type { AuraKind, PlayerClass } from '../../../sim/types';
 import { resolveHudAuraIconId, resolveHudAuraIconUrl } from '../../aura_icon_runtime';
+import type { AuraInput } from '../../auras_view';
 import { formatNumber } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { actionBarIconBg } from '../action_bar/action_bar_icon_bg';
@@ -54,7 +55,11 @@ import {
 /** The world slice the manager reads: a structural subset of IWorld. */
 export interface CooldownManagerWorld {
   readonly cfg: { readonly playerClass: PlayerClass };
-  readonly player: { readonly name: string; readonly inCombat: boolean };
+  readonly player: {
+    readonly name: string;
+    readonly inCombat: boolean;
+    readonly auras?: readonly AuraInput[];
+  };
   readonly known: readonly ResolvedAbility[];
   /** The entity roster (IWorld.entities). The manager takes its OWN iterator
    *  from it each frame; see paint(). */
@@ -74,6 +79,10 @@ export interface CooldownManagerControllerDeps {
   hotbarGlowAvailable?: () => boolean;
   /** The Auras panel's hotbar glow set, unioned with this manager's. */
   auraGlowIds?: () => ReadonlySet<string>;
+  /** Shared HUD tooltip, resolved from the tracked identity at hover time. */
+  attachTooltip?(element: HTMLElement, html: () => string): void;
+  tooltipHtml?(trackedId: string, auraEntry?: CooldownAuraEntry): string;
+  hideTooltip?(): void;
 }
 
 const NO_GLOW: ReadonlySet<string> = new Set();
@@ -141,6 +150,8 @@ export class CooldownManagerController {
   private readonly groupShown: boolean[] = [];
   private buttons: CooldownButtonElements[] = [];
   private placement = false;
+  private hoveredIndex = -1;
+  private hoveredGroup = -1;
   // Helpful auras seen on the player (persisted), offered in the picker so
   // anything the static aura catalog misses (a trinket, a new passive) is still
   // trackable. The id set makes the per-frame check a lookup, no allocation.
@@ -207,6 +218,13 @@ export class CooldownManagerController {
       this.buttons,
       state,
     );
+    if (
+      this.hoveredIndex >= 0 &&
+      (!(enabled || this.placement) ||
+        !this.groupShown[this.hoveredGroup] ||
+        !state.buttons[this.hoveredIndex]?.visible)
+    )
+      this.clearHover();
     this.glowIds.clear();
     this.glowOut = null;
     if (enabled) {
@@ -379,6 +397,7 @@ export class CooldownManagerController {
 
   /** Cold path: re-mint every group and button and re-arm the view. */
   private rebuild(): void {
+    this.clearHover();
     const doc = this.layer.ownerDocument;
     this.groupEls = [];
     this.buttons = [];
@@ -388,8 +407,23 @@ export class CooldownManagerController {
       root.className = `cdm-group cdm-group--${group.kind}`;
       root.dataset.group = group.id;
       this.applyGroup(root, group);
-      group.spells.forEach((_, index) => {
+      group.spells.forEach((id, index) => {
         const button = this.buildButton(doc);
+        const buttonIndex = this.buttons.length;
+        const groupIndex = this.groupEls.length;
+        button.btn.addEventListener('mouseenter', () => {
+          this.hoveredIndex = buttonIndex;
+          this.hoveredGroup = groupIndex;
+        });
+        button.btn.addEventListener('mouseleave', () => this.clearHover());
+        this.deps.attachTooltip?.(
+          button.btn,
+          () =>
+            this.deps.tooltipHtml?.(
+              id,
+              this.auraCatalog().find((entry) => entry.token === id),
+            ) ?? '',
+        );
         const cell = cooldownCell(group, index, group.spells.length);
         button.btn.style.gridColumn = String(cell.column);
         button.btn.style.gridRow = String(cell.row);
@@ -455,6 +489,12 @@ export class CooldownManagerController {
     count.className = 'ui-socket-count';
     btn.append(art, cd, cdText, count);
     return { btn, art, cd, cdText, count };
+  }
+
+  private clearHover(): void {
+    if (this.hoveredIndex >= 0) this.deps.hideTooltip?.();
+    this.hoveredIndex = -1;
+    this.hoveredGroup = -1;
   }
 
   private startDrag(event: PointerEvent, id: string, root: HTMLElement): void {

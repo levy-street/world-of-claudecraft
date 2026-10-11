@@ -19,7 +19,10 @@ import {
   CHARACTER_EFFECT_RECKLESSNESS,
   CHARACTER_EFFECT_SANGUINE,
   CHARACTER_EFFECT_SOUL_REND,
+  CHARACTER_EFFECT_SPORE_FORM,
+  CHARACTER_EFFECT_SPORE_HOT,
   characterEffectFlags,
+  characterSporeAura,
   hasCharacterEffect,
 } from '../src/render/character_effects_core';
 import type { Entity } from '../src/sim/types';
@@ -389,9 +392,27 @@ describe('character visual effects', () => {
   });
 
   it.each([
-    ['Soul Rend', { id: 'nythraxis_soul_rend', kind: 'vulnerability' }, [true, false, false]],
-    ['Sanguine', { id: 'sanguine_aura', kind: 'sanguine' }, [false, true, false]],
-    ['Recklessness', { id: 'recklessness', kind: 'buff_reckless' }, [false, false, true]],
+    [
+      'Soul Rend',
+      { id: 'nythraxis_soul_rend', kind: 'vulnerability' },
+      [true, false, false, false, false],
+    ],
+    ['Sanguine', { id: 'sanguine_aura', kind: 'sanguine' }, [false, true, false, false, false]],
+    [
+      'Recklessness',
+      { id: 'recklessness', kind: 'buff_reckless' },
+      [false, false, true, false, false],
+    ],
+    [
+      'Sporemender Form spores',
+      { id: 'sporemender_form', kind: 'form_sporemender' },
+      [false, false, false, true, false],
+    ],
+    [
+      'Sporemending HoT spores',
+      { id: 'rejuvenation', kind: 'hot' },
+      [false, false, false, false, true],
+    ],
   ] as const)(
     'keeps the %s flag independent from every other character effect',
     (_, aura, expected) => {
@@ -400,9 +421,33 @@ describe('character visual effects', () => {
         hasCharacterEffect(flags, CHARACTER_EFFECT_SOUL_REND),
         hasCharacterEffect(flags, CHARACTER_EFFECT_SANGUINE),
         hasCharacterEffect(flags, CHARACTER_EFFECT_RECKLESSNESS),
+        hasCharacterEffect(flags, CHARACTER_EFFECT_SPORE_FORM),
+        hasCharacterEffect(flags, CHARACTER_EFFECT_SPORE_HOT),
       ]).toEqual(expected);
     },
   );
+
+  it('grows spores only from the Sporemending heal-over-time, never another HoT or id', () => {
+    // Another druid HoT (Second Bloom / Regrowth's tail) and a non-HoT aura that
+    // happens to carry the rejuvenation id stay bare: the motif is Sporemending's.
+    expect(characterEffectFlags([{ id: 'regrowth', kind: 'hot' }])).toBe(0);
+    expect(characterEffectFlags([{ id: 'lifebloom', kind: 'hot' }])).toBe(0);
+    expect(characterEffectFlags([{ id: 'rejuvenation', kind: 'buff_spirit' }])).toBe(0);
+  });
+
+  it('picks one spore drift per body: the form wins, the HoT drift sheds under reduced motion', () => {
+    const form = characterEffectFlags([{ id: 'sporemender_form', kind: 'form_sporemender' }]);
+    const hot = characterEffectFlags([{ id: 'rejuvenation', kind: 'hot' }]);
+    const both = form | hot;
+    expect(characterSporeAura(form, false)).toBe('sporemender');
+    expect(characterSporeAura(both, false)).toBe('sporemender');
+    expect(characterSporeAura(hot, false)).toBe('sporemending');
+    expect(characterSporeAura(0, false)).toBeNull();
+    // Reduced motion drops the raid-wide HoT drift but keeps the form identity.
+    expect(characterSporeAura(hot, true)).toBeNull();
+    expect(characterSporeAura(form, true)).toBe('sporemender');
+    expect(characterSporeAura(both, true)).toBe('sporemender');
+  });
 
   it('pins every folded renderer flag to its intended visual consumer', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
@@ -427,6 +472,10 @@ describe('character visual effects', () => {
     expect(renderer).toContain(
       'if (hasRecklessness) {\n          this.vfx.recklessFlame(e.id, dt);',
     );
+    expect(renderer).toContain(
+      'const spores = characterSporeAura(characterEffects, this.reducedMotion());',
+    );
+    expect(renderer).toContain('if (spores) this.vfx.formAura(e.id, spores, dt);');
     expect(renderer).toContain('const nextRecklessSkullsLatch = nextRecklessnessSkullsLatch(');
     expect(renderer).toContain('v.recklessSkullsSpawned = nextRecklessSkullsLatch;');
   });

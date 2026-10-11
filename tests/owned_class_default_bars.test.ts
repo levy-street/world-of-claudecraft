@@ -230,6 +230,7 @@ const EXPECTED = {
     'thorns',
     'travel_form',
     'grove_awakening',
+    'sporemender_form',
   ],
 } as const;
 

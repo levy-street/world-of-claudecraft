@@ -1221,4 +1221,8 @@ export const table: DeedLocaleTable = {
     name: 'Przyłapany na Gorącym Uczynku',
     desc: 'Złap Scenusza Moneciaka w Zakopanych Skarbnicy zanim ucieka ze złotem.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Jasniej niz cienie',
+    desc: 'Odzyskaj skradzione sakiewki z monetami i ucieknij z labiryntu Evergarden na poziomie Hard.',
+  },
 };

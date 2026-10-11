@@ -155,9 +155,10 @@ export interface TreasureSiteDef {
   z: number;
 }
 
-/** The dig sites a map can mark: hidden spots near (never on) landmarks of the
- *  level 16+ zones, the same ground the clue hunts dig in. Ids are frozen once
- *  shipped (a read map persists its site id). */
+/** The dig sites a map can mark: hidden spots throughout the adventuring zones.
+ *  Ids and the original rows are frozen once shipped (a read map persists its
+ *  site id). New sites have dry, unobstructed walking approaches from roads,
+ *  guarded by treasure_site_accessibility.test.ts against the shipped seed. */
 export const TREASURE_SITES: readonly TreasureSiteDef[] = Object.freeze([
   { id: 'site_drakelands_ash_dunes', zoneId: 'drakelands', x: 350, z: 2085 },
   { id: 'site_frostveil_flat_snow', zoneId: 'frostveil', x: 118, z: 1790 },
@@ -167,6 +168,38 @@ export const TREASURE_SITES: readonly TreasureSiteDef[] = Object.freeze([
   { id: 'site_wraithwood_clearing', zoneId: 'wraithwood', x: 398, z: 1662 },
   { id: 'site_palmreach_heaped_sand', zoneId: 'palmreach', x: -402, z: 750 },
   { id: 'site_galecrest_cut_turf', zoneId: 'galecrest', x: 480, z: 326 },
+  { id: 'site_drakelands_south_road', zoneId: 'drakelands', x: 394, z: 1828 },
+  { id: 'site_drakelands_west_road', zoneId: 'drakelands', x: 374, z: 1925 },
+  { id: 'site_frostveil_north_road', zoneId: 'frostveil', x: 169, z: 1903 },
+  { id: 'site_frostveil_west_road', zoneId: 'frostveil', x: -84, z: 1642 },
+  { id: 'site_amberfall_south_road', zoneId: 'amberfall', x: -340, z: 1825 },
+  { id: 'site_amberfall_east_road', zoneId: 'amberfall', x: -359, z: 1928 },
+  { id: 'site_willowfen_east_road', zoneId: 'willowfen', x: -349, z: 304 },
+  { id: 'site_willowfen_west_road', zoneId: 'willowfen', x: -438, z: 363 },
+  { id: 'site_nightbloom_north_road', zoneId: 'nightbloom', x: -336, z: 1325 },
+  { id: 'site_nightbloom_south_road', zoneId: 'nightbloom', x: -311, z: 1270 },
+  { id: 'site_wraithwood_north_road', zoneId: 'wraithwood', x: 340, z: 1461 },
+  { id: 'site_wraithwood_south_road', zoneId: 'wraithwood', x: 407, z: 1294 },
+  { id: 'site_palmreach_west_road', zoneId: 'palmreach', x: -341, z: 787 },
+  { id: 'site_palmreach_north_road', zoneId: 'palmreach', x: -448, z: 866 },
+  { id: 'site_galecrest_west_road', zoneId: 'galecrest', x: 256, z: 391 },
+  { id: 'site_galecrest_north_road', zoneId: 'galecrest', x: 326, z: 381 },
+  { id: 'site_eastbrook_north_road', zoneId: 'eastbrook_vale', x: -10, z: -21 },
+  { id: 'site_eastbrook_meadow_road', zoneId: 'eastbrook_vale', x: -2, z: 44 },
+  { id: 'site_eastbrook_west_road', zoneId: 'eastbrook_vale', x: -13, z: 129 },
+  { id: 'site_mirefen_east_road', zoneId: 'mirefen_marsh', x: 52, z: 305 },
+  { id: 'site_mirefen_west_road', zoneId: 'mirefen_marsh', x: -58, z: 371 },
+  { id: 'site_mirefen_north_road', zoneId: 'mirefen_marsh', x: 102, z: 418 },
+  { id: 'site_thornpeak_west_road', zoneId: 'thornpeak_heights', x: -76, z: 699 },
+  { id: 'site_thornpeak_north_road', zoneId: 'thornpeak_heights', x: 20, z: 840 },
+  { id: 'site_hollow_west_road', zoneId: 'veiled_hollow', x: -116, z: 1006 },
+  { id: 'site_hollow_north_road', zoneId: 'veiled_hollow', x: -45, z: 1089 },
+  { id: 'site_hollow_east_road', zoneId: 'veiled_hollow', x: 12, z: 1058 },
+  { id: 'site_evergarden_south_road', zoneId: 'evergarden', x: 324, z: 851 },
+  { id: 'site_evergarden_east_road', zoneId: 'evergarden', x: 374, z: 899 },
+  { id: 'site_evergarden_north_road', zoneId: 'evergarden', x: 497, z: 798 },
+  { id: 'site_farshore_east_road', zoneId: 'farshore_isle', x: 367, z: 25 },
+  { id: 'site_farshore_south_road', zoneId: 'farshore_isle', x: 381, z: -41 },
 ]);
 
 export const TREASURE_SITES_BY_ID: Readonly<Record<string, TreasureSiteDef>> = Object.freeze(

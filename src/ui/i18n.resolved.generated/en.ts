@@ -418,6 +418,13 @@ export const en: EnTranslations = {
       "heroicClears": "{count} Heroic",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "View possible loot",
+      "lootFocus": "Loot focus",
+      "allClassGear": "All class gear",
+      "specRole": "{name} ({role})",
+      "mixedRole": "{first} / {second}",
+      "lootFocusHelp": "Applies to unopened vaults only.",
+      "noFocusedLoot": "No eligible loot. Choose another focus.",
+      "rolledFocus": "Rolled for: {focus}",
       "chooseTable": "Select which table to roll off",
       "selectAllTables": "Select all",
       "selectedTables": "{count} tables selected",
@@ -438,7 +445,9 @@ export const en: EnTranslations = {
         "worldOne": "{count} World Quest Completed",
         "worldMany": "{count} World Quests Completed",
         "pvpOne": "{count} Rated Match Won",
-        "pvpMany": "{count} Rated Matches Won"
+        "pvpMany": "{count} Rated Matches Won",
+        "pvpWinOne": "{count} PvP Win",
+        "pvpWinMany": "{count} PvP Wins"
       },
       "requiredTask": {
         "raidOne": "Clear {count} Raid Encounter",
@@ -448,7 +457,9 @@ export const en: EnTranslations = {
         "worldOne": "Complete {count} World Quest",
         "worldMany": "Complete {count} World Quests",
         "pvpOne": "Win {count} Rated Match",
-        "pvpMany": "Win {count} Rated Matches"
+        "pvpMany": "Win {count} Rated Matches",
+        "pvpWinOne": "Earn {count} PvP Win",
+        "pvpWinMany": "Earn {count} PvP Wins"
       },
       "readyWeeks": "Unclaimed weeks: {count}. Claim the oldest completed week first.",
       "claimLastWeek": "Claim last week's reward",
@@ -510,7 +521,13 @@ export const en: EnTranslations = {
       "departsIn": "The ferry to {dest} departs in {time}",
       "castingOff": "The ferry to {dest} is casting off",
       "boardHint": "Stand on its deck when it sails. The crossing is free.",
-      "sailing": "Sailing to {dest}"
+      "sailing": "Sailing to {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "That material selection is no longer available.",
     "vehicle": {
@@ -570,6 +587,15 @@ export const en: EnTranslations = {
     "spectate": {
       "banner": "Spectating {name}"
     },
+    "realmMotd": {
+      "line": "Message of the day: {text}",
+      "updated": "Message of the day updated.",
+      "cleared": "Message of the day cleared.",
+      "none": "No message of the day is set.",
+      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
+      "tooLong": "The message of the day is limited to {max} characters.",
+      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+    },
     "readyCheck": {
       "title": "Ready Check",
       "close": "Close",
@@ -608,6 +634,9 @@ export const en: EnTranslations = {
       "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Revive Me",
       "healerConfirmCancel": "Cancel"
+    },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
     },
     "wiki": {
       "confirmTitle": "Open the Wiki?",
@@ -1853,6 +1882,8 @@ export const en: EnTranslations = {
       "reportSent": "Report copied and sent to chat",
       "reportNoData": "No data recorded.",
       "noDetailedData": "No detailed data",
+      "detailHealSubtitle": "Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)",
+      "detailHitSubtitle": "Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}",
       "noDeathEvents": "No events logged before death",
       "killedBy": "Killed by {killer} ({ability})",
       "lethalHit": "Lethal Hit",
@@ -2119,6 +2150,7 @@ export const en: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Left Click",
       "clickMoveRight": "Right Click",
       "version": "v{version} ({build})",
@@ -2164,6 +2196,7 @@ export const en: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
+      "ambienceVolume": "Ambience Volume",
       "footstepSounds": "Footstep Sounds",
       "interfaceSounds": "Interface and Feedback Sounds",
       "clickFeedback": "Click Marker",
@@ -2231,6 +2264,7 @@ export const en: EnTranslations = {
       "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "confirmVendorSellMinQuality": "Confirm Sales From Quality",
       "confirmVendorSellMinQualityNote": "Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.",
+      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
@@ -2251,7 +2285,9 @@ export const en: EnTranslations = {
       "showUtilityModes": "Include Stealth and Travel Modes",
       "showFriendlyTrack": "Show My Buffs on Allies",
       "showShieldTrack": "Show My Shields",
+      "classicCombatText": "Classic Combat Text",
       "waterRipples": "Water Ripples (Wakes)",
+      "spellEffects": "Spell Effects",
       "actionCam": "Action Cam",
       "actionCamShoulder": "Action Cam Shoulder",
       "actionCamShoulderLeft": "Left {pct}",
@@ -2774,7 +2810,8 @@ export const en: EnTranslations = {
         "battlegroundAssist": "killing blow assisted",
         "worldKill": "world kill",
         "worldAssist": "world kill assisted",
-        "hillHold": "holding the hill"
+        "hillHold": "holding the hill",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Kill",
@@ -2784,6 +2821,11 @@ export const en: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
+      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
+      "rewardProgress": "Current PvP streak: {time} played",
       "tab": "World PvP",
       "title": "World PvP",
       "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
@@ -2802,6 +2844,8 @@ export const en: EnTranslations = {
       "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
       "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
       "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
       "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
       "honorLine": "{honor} Honor per kill, split between everyone who helped.",
@@ -2898,7 +2942,7 @@ export const en: EnTranslations = {
       "delveMark": "Delve Mark",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Heroic dungeons . spend at the heroic quartermaster",
-      "honorNote": "Battlegrounds and the arena",
+      "honorNote": "Battlegrounds, the arena, and world quests",
       "delveMarkNote": "Delves completed",
       "wocTokenNote": "Linked wallet balance",
       "walletNotLinked": "No wallet linked",
@@ -3599,6 +3643,8 @@ export const en: EnTranslations = {
       "resetDone": "All instances have been reset.",
       "resetNone": "You have no instances to reset.",
       "resetOccupied": "You cannot reset instances while someone is still inside.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.",
       "resetLoot": "You cannot reset instances while loot remains inside.",
       "resetConfirmTitle": "Reset All Instances?",
@@ -3615,6 +3661,7 @@ export const en: EnTranslations = {
       "dragEquipHint": "Drag onto your character to equip",
       "dragDestroyHint": "Drag out into the world to destroy",
       "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
+      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
       "itemAriaInstanced": "{item}, quantity {count}, maker-marked copy",
       "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
       "itemAriaBound": "{item}, quantity {count}, bound copy",
@@ -4000,7 +4047,7 @@ export const en: EnTranslations = {
       "duskEconomy": "Abilities cost {pct}% less energy",
       "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
       "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form",
-      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
+      "verdance": "Verdance {stacks}/{max}. Each Sporemending, Second Bloom, or Wildmend you cast adds 1, and each one shortens Wildmend's cast. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Your next eligible execute ability costs nothing",
       "resourceSap": "Restores {value} of your current resource every {interval} sec",
       "nextAttackCrit": "Your next attack is guaranteed to critically strike",
@@ -4102,6 +4149,7 @@ export const en: EnTranslations = {
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
       "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
       "resourceCount": "{value} of {max}",
       "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
@@ -4188,6 +4236,7 @@ export const en: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Cheater >",
       "pledgeTag": "Pledge of {guild}",
       "npcRoleTag": "<{role}>",
@@ -4436,6 +4485,7 @@ export const en: EnTranslations = {
       "perfectedBadge": "Perfected",
       "perfectingRank": "Perfecting: rank {rank} of {ranks}",
       "materialSourceGatherer": "{count} × Collected by {name}",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × Collected by {name}, signed by {signer}",
       "materialSourceUnrecorded": "{count} × No gatherer recorded",
       "materialSourceUnrecordedSigned": "{count} × No gatherer recorded, signed by {name}",
@@ -5339,8 +5389,8 @@ export const en: EnTranslations = {
       "enchant_weapon_piston_drive": "Weapon Etching: Piston Drive"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
-      "enchant_weapon_riftwalkers_grace": "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+      "enchant_weapon_lastflame_zeal": "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. In Cat Form, auto attacks roll at the 1 sec paw speed instead. Cat Form and Bruin Form strikes and finishers roll at the weapon's own speed; Sweeping Claws rolls once per cast, not once per target.",
+      "enchant_weapon_riftwalkers_grace": "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. In Cat Form, auto attacks roll at the 1 sec paw speed instead. Cat Form and Bruin Form strikes and finishers roll at the weapon's own speed; Sweeping Claws rolls once per cast, not once per target.",
       "enchant_weapon_dawnfire_etching": "Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.",
       "enchant_weapon_dawns_benediction": "Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.",
       "enchant_weapon_piston_drive": "Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale."
@@ -5354,7 +5404,7 @@ export const en: EnTranslations = {
       "hub_automatons": "South Reach (The Automaton Foundry)",
       "riftGliderUse": "Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)",
       "targetDummyUse": "Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)",
-      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)",
+      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 min. Players out of combat within 15 yards of it regenerate 10% more health, and mana users also restore mana equal to 5% of their Spirit, every 2 sec. Staying near it for 10 sec grants Blessing of the Dawn, increasing Strength, Agility, Stamina, Intellect, and Spirit by 5% for 30 min. (5 min cooldown)",
       "shockBombUse": "Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)",
       "invisibilityUse": "Use: Shrouds you in stealth for 6 sec. (2 min cooldown)",
       "armorKitUse": "Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.",
@@ -5714,7 +5764,9 @@ export const en: EnTranslations = {
     },
     "pattern": {
       "teaches": "Use: Teaches you how to craft {item}.",
-      "teachesEnchant": "Use: Teaches you how to apply {enchant}."
+      "teachesEnchant": "Use: Teaches you how to apply {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Unbinding: {name}",
@@ -6316,7 +6368,9 @@ export const en: EnTranslations = {
         "passage": "Passage"
       },
       "collapseHint": "Collapse map sidebar",
-      "expandHint": "Expand map sidebar"
+      "expandHint": "Expand map sidebar",
+      "resizeRailAria": "Map sidebar width",
+      "resizeRailHint": "Drag to resize the map sidebar. Double-click to reset."
     },
     "arenaGate": {
       "minLevelNote": "Requires level {level}"
@@ -7296,7 +7350,7 @@ export const en: EnTranslations = {
       "mobileBody": "On a phone or tablet the game starts you on Low. Every touch device lands there on its first launch, on purpose, so you can get into the world and play; raise it yourself from the Graphics panel any time. On an Android browser the whole ladder is open to you and your choice sticks. On iPhone and iPad you can still pick the top presets and they take hold as soon as you press Apply, but the game sets you back to High the next time you launch, because iOS can end the tab while a scene that large is being built. The downloaded app is shorter still: its preset list stops at High and the per-system dials are hidden, because the app manages those itself.",
       "touchBody": "On a touchscreen the Graphics panel grows a Touch Controls card of its own: joystick size and deadzone, on-screen button size, control opacity, an optional camera stick, a left-handed mirrored layout, and inverted touch look, so the screen fits your hands rather than the other way around.",
       "audioTitle": "Sound and language",
-      "audioBody": "The options window is not all pixels. Audio holds three volume sliders, for sound effects, music, and voice, plus a music on and off switch and four switches for the sounds that most often wear thin: NPC voices, footsteps, interface sounds, and click feedback. The Interface panel's General tab carries a language picker that relocalizes the whole interface on the spot, no reload needed, and a theme picker for the window dressing.",
+      "audioBody": "The options window is not all pixels. Audio holds four volume sliders, for sound effects, ambience, music, and voice, plus a music on and off switch and four switches for the sounds that most often wear thin: NPC voices, footsteps, interface sounds, and click feedback. The Interface panel's General tab carries a language picker that relocalizes the whole interface on the spot, no reload needed, and a theme picker for the window dressing.",
       "autolootBody": "Prefer not to click every corpse? Walk-by Autoloot, on the Interface panel's Combat tab and off by default, scoops the loot from your own kills as you walk past them.",
       "panelsMoreBody": "The two panels this page does not table are worth a look anyway. Auras is where you shape the big on-screen alerts that fire when one of your class procs comes up: which ones show, their size, color, opacity, and where they sit on screen. Performance Overlay is the readout you turn on while you tune this page, then hide again.",
       "valueUltraOrInsane": "Ultra, or Insane if you want everything",
@@ -7313,6 +7367,7 @@ export const en: EnTranslations = {
       "rowCameraSpeed": "How quickly the camera swings when you look around with the mouse.",
       "rowTouchLookSpeed": "The same thing for swipe-look, and it only appears when you are on a touchscreen.",
       "rowFullscreen": "Fills the whole screen with the game.",
+      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
       "rowWaterRipples": "Wakes and ripples that spread out behind you as you swim. Off by default, and the one water effect that costs real frames; splashes and bubbles are unaffected either way.",
       "rowOverflowXp": "At maximum level, whether your bar keeps filling with overflow experience or shows the classic static max-level text instead.",
       "rowInterfaceMode": "Whether you get the desktop interface or the on-screen touch controls. Auto reads your device, and you can force either one: a tablet with a keyboard can take the desktop layout, and a touchscreen laptop can take the touch controls.",
@@ -7347,7 +7402,7 @@ export const en: EnTranslations = {
       "ifPartyShowAuras": "Whether buffs and debuffs show on the party frames. Matching switches cover resource bars, absorbs, pets, and whether you appear in your own party list.",
       "ifAurasOnPlayerFrame": "Puts your buffs and debuffs on your own unit frame as well as the aura bar.",
       "ifAuraBarBelowFrame": "Moves the buff row below your unit frame instead of above it. Only matters while buffs are on the player frame.",
-      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
+      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame, under the target's name and health bar, instead of above it: the classic layout. On its stock seat the target frame (with your cast bar and swing timers) rises by one strip row so the strip's first row clears the action bar; a frame you have moved stays where you put it.",
       "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Shows who your target is targeting, the classic way to tell whether the tank still has it.",
@@ -7365,6 +7420,7 @@ export const en: EnTranslations = {
       "ifMouseoverCast": "Lets a heal or a friendly spell land on the unit frame you are hovering, a party or raid row or the target-of-target frame, without changing your target.",
       "ifStickyTarget": "Keeps your current target when you click on empty ground, instead of clearing it.",
       "ifFctScale": "The size of the damage and healing numbers that float off your target.",
+      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
       "ifExtraBars": "Reveals a second action bar row, and a third once the second is on. The slots stay reachable by their keybinds even while the rows are hidden.",
       "ifHideUnused": "Hides empty action slots so only the buttons you actually use are drawn.",
       "ifLockBars": "Locks your bars so you cannot drag an ability out of a slot by accident.",
@@ -7789,18 +7845,20 @@ export const en: EnTranslations = {
       "formsHeading": "Shapeshifting",
       "formsNote": "A druid fights by changing shape. Most druid abilities belong to one shape, so the form you are in decides what you can cast, and shifting costs a little mana. You can shift in or out of combat, as often as you like.",
       "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
-      "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.",
+      "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. Like the Groveheart Sporemender Form, it keeps your spells, and your wand works only in those two shapes or your normal caster form.",
       "formsWolfEngage": "A Cat opens a fight with Bruin Rush, shifts straight into Cat Form to Pin the target, closes the gap with Lunge when it is not stalking, and holds an enemy still with Takedown.",
       "formLine": {
         "form_bear": "The tanking shape: a heavy hide, rage instead of mana, and extra threat so enemies keep swinging at you.",
         "form_cat": "The melee damage shape: energy and combo points, like a rogue, and much less threat.",
-        "form_travel": "The travelling shape: far quicker across the ground, but no other abilities until you shift out."
+        "form_travel": "The travelling shape: far quicker across the ground, but no other abilities until you shift out.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "A Frost spell that calls the elemental to your side and sets it on your target.",
       "formName": {
         "form_bear": "Bruin Form",
         "form_cat": "Cat Form",
-        "form_travel": "Fleet Form"
+        "form_travel": "Fleet Form",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8299,7 +8357,7 @@ export const en: EnTranslations = {
       "honorFinalNoteSoldBack": "Honor purchases are final. The buyback list only ever holds what you sold: a coin purchase can usually be sold back for its sell price and reclaimed from that list if you change your mind again, but Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything, and it never reaches that list. The shop asks you to confirm for that reason: read the piece before you press it.",
       "warfareHeading": "Warfare gear",
       "warfareBody": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit is worth nothing on a dungeon boss.",
-      "warfareBodyStatsStay": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster.",
+      "warfareBodyStatsStay": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster. One exception works everywhere: two pieces of a caster set also stop damage from delaying your spellcasting.",
       "warfareTradeBody": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and everything it does bring is spent on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons.",
       "warfareTradeBodyRatingSpent": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and the Warfare rating and set bonuses it carries instead are spent entirely on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons.",
       "vanguardHeading": "Vanguard gear: Warfare Season 2",
@@ -8324,6 +8382,7 @@ export const en: EnTranslations = {
       "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyRanked": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyRaids": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid."
     },
     "thornhollowPage": {
@@ -8501,6 +8560,7 @@ export const en: EnTranslations = {
       "formBear": "Bruin Form",
       "formCat": "Cat Form",
       "formTravel": "Fleet Form",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Creatures",
       "groupPets": "Warlock Demons",
       "pickerLabel": "Choose a model to view",
@@ -9020,6 +9080,7 @@ export const en: EnTranslations = {
       "buyingBody": "Speak to a merchant and choose to browse their goods, and their shop opens as a single panel: everything they stock in one list, yours with a click if you can afford it. A quantity strip above the goods sets how many each click buys, one, five, or ten at a time, or a custom count, though a few special wares, mounts among them, only ever sell one at a time. Stackable coin-priced wares also carry a second offer beside the row that takes as many as your coin covers, up to a full stack, in one purchase. Selling is just as direct: while the shop is open, click an item in your bags to sell it on the spot, and what a merchant will not take, quest goods and soulbound pieces among them, simply stays put. If you part with something you regret, the shop keeps a Buyback list of your recent sales so you can buy them back for the coin you were paid.",
       "junkTitle": "Clearing out junk",
       "junkBody": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room.",
+      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
       "tradeTitle": "Trading with other players",
       "tradeBody": "You can trade face to face with anyone standing near you. Both of you put items and coin into a shared window and the swap only happens once you both confirm it, so neither side can be caught out. It is the simple way to hand a friend a drop or settle a deal.",
       "mailTitle": "The Ravenpost",
@@ -11108,6 +11169,10 @@ export const en: EnTranslations = {
     "selectClass": "Please select a class.",
     "pickClass": "Pick a class.",
     "returnToLogin": "Return to Login",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "Too many attempts. Wait a minute and try again.",
       "usernameShape": "Username must be 3-24 characters and use letters, digits, or underscore.",
@@ -12671,6 +12736,7 @@ export const en: EnTranslations = {
       "clueCasketOpened": "The casket holds {money} and {items}.",
       "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
       "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
       "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
       "treasureVaultOpened": "The ground gives way. A buried hoard lies open before you.",
@@ -12848,7 +12914,8 @@ export const en: EnTranslations = {
       "sellQuantityCancel": "Cancel",
       "sellJunk": "Sell Junk",
       "sellJunkAria": "Sell all junk for {price}",
-      "sellJunkHint": "Sells every gray item in your bags except quest items."
+      "sellJunkHint": "Sells every gray item in your bags except quest items.",
+      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
     },
     "market": {
       "title": "The World Market",
@@ -13142,7 +13209,7 @@ export const en: EnTranslations = {
       },
       "trailbreak": {
         "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "description": "Leap 25 yards backward and break free of roots and movement slows. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
       },
       "wildheart": {
         "name": "Wildheart",
@@ -13709,7 +13776,7 @@ export const en: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Courser's Guise",
-        "description": "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze)."
+        "description": "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 2 sec (each hit refreshes the daze)."
       },
       "aimed_shot": {
         "name": "Long Draw",
@@ -13765,7 +13832,7 @@ export const en: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)"
+        "description": "Passive: Arc Bolt, Skybranch, and Magma Burst grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13773,7 +13840,7 @@ export const en: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+        "description": "Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13797,7 +13864,7 @@ export const en: EnTranslations = {
       },
       "flame_shock": {
         "name": "Cinder Jolt",
-        "description": "Deal {damage} Fire damage, then {overTime} Fire damage over 12 sec. The initial hit increases with Spell Power."
+        "description": "Deal {damage} Fire damage, then {overTime} Fire damage over {duration} sec. The initial hit increases with Spell Power."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand Weapon",
@@ -13930,7 +13997,8 @@ export const en: EnTranslations = {
       },
       "healing_touch": {
         "name": "Wildmend",
-        "description": "Heals a friendly target for {damage}."
+        "description": "Heals a friendly target for {damage}.",
+        "specNote_restoration": "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3. Nature's Boon makes it instant, free, and 25% stronger."
       },
       "mark_of_the_wild": {
         "name": "Wildward",
@@ -13946,9 +14014,9 @@ export const en: EnTranslations = {
         "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to {duration} sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3."
       },
       "rejuvenation": {
-        "name": "Wildbloom",
+        "name": "Sporemending",
         "description": "Heals the target for {damage} over 12 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Fleetmend becomes Overbloom."
+        "specNote_restoration": "Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking. At 3 Verdance, Fleetmend becomes Overbloom."
       },
       "thorns": {
         "name": "Briarguard",
@@ -13960,12 +14028,12 @@ export const en: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form."
+        "description": "Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form."
       },
       "maul": {
         "name": "Bonecrush",
         "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage."
       },
       "growl": {
         "name": "Menace",
@@ -13984,6 +14052,11 @@ export const en: EnTranslations = {
         "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Cat Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "Gorebite",
         "description": "Finishing move that causes {damage}. Cat Form only.",
@@ -13996,8 +14069,8 @@ export const en: EnTranslations = {
       },
       "regrowth": {
         "name": "Second Bloom",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "description": "Heals a friendly target for {damage} and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.",
+        "specNote_restoration": "Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking."
       },
       "barkskin": {
         "name": "Oakhide",
@@ -14267,7 +14340,8 @@ export const en: EnTranslations = {
       },
       "swiftmend": {
         "name": "Fleetmend",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)",
+        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Moonsurge",
@@ -14283,7 +14357,7 @@ export const en: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Marrowbreak",
-        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage."
       },
       "wildwake": {
         "name": "Wildwake",
@@ -14293,9 +14367,14 @@ export const en: EnTranslations = {
         "name": "Grove Awakening",
         "description": "Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Groveheart)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Overbloom",
-        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
+        "description": "Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending.",
+        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Summon Emberkin",
@@ -14639,7 +14718,7 @@ export const en: EnTranslations = {
       },
       "multi_shot": {
         "name": "Splitshot",
-        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)"
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 4 yd of you. (Hunter talent)"
       },
       "prayer_of_healing": {
         "name": "Choirmend",
@@ -18933,6 +19012,9 @@ export const en: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Emissary's Cache"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
       },
       "clue_scroll": {
         "name": "Clue Scroll"
@@ -23946,6 +24028,11 @@ export const en: EnTranslations = {
         "sender": "The Ravenpost",
         "subject": "Your vault reward",
         "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {
@@ -24081,7 +24168,7 @@ export const en: EnTranslations = {
       },
       "grovespring": {
         "name": "Grovespring Raiment",
-        "bonus2": "Fleetmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
       },
       "hexthread": {
@@ -24174,7 +24261,7 @@ export const en: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Starwarden Raiment",
-        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
+        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
       },
       "vanguard_druid_feral": {
@@ -24184,7 +24271,7 @@ export const en: EnTranslations = {
       },
       "vanguard_druid_restoration": {
         "name": "Thistlebloom Vestment",
-        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
+        "bonus2": "Fleetmend's cooldown is reduced by 1 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
       },
       "vanguard_hunter_beast_mastery": {
@@ -24204,22 +24291,22 @@ export const en: EnTranslations = {
       },
       "vanguard_mage_arcane": {
         "name": "Hourbinder's Vestments",
-        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
+        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
       },
       "vanguard_mage_fire": {
         "name": "Emberlash Regalia",
-        "bonus2": "Cinderfall recharges 3 sec faster.",
+        "bonus2": "Cinderfall recharges 3 sec faster. Damage taken no longer delays your spellcasting.",
         "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
       },
       "vanguard_mage_frost": {
         "name": "Rimewarden Garb",
-        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
+        "bonus2": "Icebind's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
       },
       "vanguard_paladin_holy": {
         "name": "Sunvigil Regalia",
-        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
+        "bonus2": "Life Covenant's cooldown is reduced by 30 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
       },
       "vanguard_paladin_protection": {
@@ -24234,17 +24321,17 @@ export const en: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "Veilpsalm Raiment",
-        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
+        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
       },
       "vanguard_priest_holy": {
         "name": "Gracewing Raiment",
-        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
+        "bonus2": "Veilstep's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
       },
       "vanguard_priest_shadow": {
         "name": "Duskhymn Regalia",
-        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
+        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it. Damage taken no longer delays your spellcasting.",
         "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
       },
       "vanguard_rogue_assassination": {
@@ -24264,7 +24351,7 @@ export const en: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Tempestwrit Battlemail",
-        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
+        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
       },
       "vanguard_shaman_enhancement": {
@@ -24274,22 +24361,22 @@ export const en: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "Brineward Chainmail",
-        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
+        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health. Damage taken no longer delays your spellcasting.",
         "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
       },
       "vanguard_warlock_affliction": {
         "name": "Dreadquill Vestments",
-        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
+        "bonus2": "Harrow's cast time is reduced by 0.3 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
       },
       "vanguard_warlock_demonology": {
         "name": "Marrowbound Regalia",
-        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
+        "bonus2": "Bone Armor's cooldown is reduced by 10 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
       },
       "vanguard_warlock_destruction": {
         "name": "Slagcrown Vestments",
-        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
+        "bonus2": "Cinderhide's cooldown is reduced by 30 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
       },
       "vanguard_warrior_arms": {
@@ -24320,7 +24407,7 @@ export const en: EnTranslations = {
       },
       "warfare_cinderweave": {
         "name": "Cinderweave Regalia",
-        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus2": "Increases Warfare Defense Rating by 40. Damage taken no longer delays your spellcasting.",
         "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
         "bonus7": "Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
       },
@@ -24332,13 +24419,13 @@ export const en: EnTranslations = {
       },
       "warfare_stormbound": {
         "name": "Stormbound Vestments",
-        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus2": "Increases Warfare Defense Rating by 40. Damage taken no longer delays your spellcasting.",
         "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
         "bonus7": "Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
       },
       "warfare_thornhide": {
         "name": "Thornhide Garb",
-        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus2": "Increases Warfare Defense Rating by 40. Damage taken no longer delays your spellcasting.",
         "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
         "bonus7": "Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
       },

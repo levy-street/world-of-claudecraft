@@ -16,6 +16,13 @@ export const weeklyRewardStrings = {
   heroicClears: '{count} Heroic',
   normalClears: '{count} Normal',
   viewPossibleLoot: 'View possible loot',
+  lootFocus: 'Loot focus',
+  allClassGear: 'All class gear',
+  specRole: '{name} ({role})',
+  mixedRole: '{first} / {second}',
+  lootFocusHelp: 'Applies to unopened vaults only.',
+  noFocusedLoot: 'No eligible loot. Choose another focus.',
+  rolledFocus: 'Rolled for: {focus}',
   chooseTable: 'Select which table to roll off',
   selectAllTables: 'Select all',
   selectedTables: '{count} tables selected',
@@ -37,6 +44,10 @@ export const weeklyRewardStrings = {
     worldMany: '{count} World Quests Completed',
     pvpOne: '{count} Rated Match Won',
     pvpMany: '{count} Rated Matches Won',
+    // Successors (2026-09-29): the PvP row also counts the King of the Hill
+    // longest hold (src/sim/pvp/hill.ts), which is no rated match.
+    pvpWinOne: '{count} PvP Win',
+    pvpWinMany: '{count} PvP Wins',
   },
   requiredTask: {
     raidOne: 'Clear {count} Raid Encounter',
@@ -47,6 +58,8 @@ export const weeklyRewardStrings = {
     worldMany: 'Complete {count} World Quests',
     pvpOne: 'Win {count} Rated Match',
     pvpMany: 'Win {count} Rated Matches',
+    pvpWinOne: 'Earn {count} PvP Win',
+    pvpWinMany: 'Earn {count} PvP Wins',
   },
   readyWeeks: 'Unclaimed weeks: {count}. Claim the oldest completed week first.',
   claimLastWeek: "Claim last week's reward",

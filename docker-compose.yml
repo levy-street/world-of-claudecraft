@@ -319,6 +319,7 @@ services:
       DISCORD_RELAY_CHANNEL_ID: ${DISCORD_RELAY_CHANNEL_ID:-}
       DISCORD_ACTIVITY_CHANNEL_ID: ${DISCORD_ACTIVITY_CHANNEL_ID:-}
       DISCORD_DAILY_REWARDS_CHANNEL_ID: ${DISCORD_DAILY_REWARDS_CHANNEL_ID:-}
+      DISCORD_PVP_FEED_CHANNEL_ID: ${DISCORD_PVP_FEED_CHANNEL_ID:-}
       DISCORD_SYNC_NICKNAMES: ${DISCORD_SYNC_NICKNAMES:-1}
       # Runtime: every tuning knob the bot reads, so an operator can turn the
       # incident levers DEPLOY.md documents (the request ceiling, the ban pause,

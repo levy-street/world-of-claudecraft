@@ -50,7 +50,15 @@ function damageEvents(events: SimEvent[], ability: string) {
   );
 }
 
+// 4 yards since the v0.45 hunter pass (8 before). Read from the def so the
+// edge cases below always sit on the shipped boundary.
+const SPLITSHOT_MIN_RANGE = ABILITIES.multi_shot.minRange ?? 0;
+
 describe('position ability minimum range', () => {
+  it('ships Splitshot with a 4 yard minimum range', () => {
+    expect(SPLITSHOT_MIN_RANGE).toBe(4);
+  });
+
   it('refuses Splitshot inside its minimum range without dealing area damage', () => {
     const sim = makeHunter();
     const target = addTargetAt(sim, 3);
@@ -85,7 +93,7 @@ describe('position ability minimum range', () => {
 
   it('allows Splitshot exactly at its minimum range', () => {
     const sim = makeHunter();
-    const target = addTargetAt(sim, 8);
+    const target = addTargetAt(sim, SPLITSHOT_MIN_RANGE);
     sim.drainEvents();
 
     sim.castAbility('multi_shot', sim.playerId, { x: target.pos.x, z: target.pos.z });
@@ -97,7 +105,7 @@ describe('position ability minimum range', () => {
   it('pushes the no-aim fallback out to the minimum range along facing', () => {
     const sim = makeHunter();
     sim.player.facing = 0;
-    addTargetAt(sim, 8);
+    addTargetAt(sim, SPLITSHOT_MIN_RANGE);
     sim.drainEvents();
 
     sim.castAbility('multi_shot', sim.playerId);

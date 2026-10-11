@@ -183,6 +183,7 @@ const GUARDED_SCRIPTS = [
   'scripts/mob_stall_repro.mjs',
   'scripts/profile_recent_finds_shot.mjs',
   'scripts/profiler/geared_arrival_roster.mjs',
+  'scripts/realm_motd_shot.mjs',
   'scripts/store_intent_durability_probe.mjs',
   'scripts/store_online_ladder_probe.mjs',
 ] as const;

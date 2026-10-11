@@ -16,6 +16,7 @@ import {
   paginateDevLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
+import { settleAllWorldPvpSpoils } from '../src/sim/pvp/world_pvp_spoils';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
@@ -3729,6 +3730,7 @@ export async function startServer(): Promise<http.Server> {
   await game.loadGuildBanks();
   await game.loadRifts();
   await game.loadChatFilter();
+  await game.realmMotd.load();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
@@ -4264,6 +4266,9 @@ export async function startServer(): Promise<http.Server> {
     // it races the pool close; the next boot's first pass rebuilds the totals).
     accountWealthSweep.stop();
     game.stop();
+    // World PvP spoils live only in memory: pay every unlooted body out before
+    // the final save (src/sim/pvp/world_pvp_spoils.ts).
+    settleAllWorldPvpSpoils(game.sim.ctx);
     await game.saveAll('shutdown');
     await game.saveMarket();
     await game.saveMail();

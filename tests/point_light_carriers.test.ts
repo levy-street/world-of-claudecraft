@@ -630,6 +630,8 @@ describe('every point-light producer is a carrier source', () => {
     }
     expect(layerCalls).toEqual([]);
     expect(maskWrites.sort()).toEqual([
+      // a spirit veil's depth sibling copies its body mesh's mask
+      'render/characters/ghost_veil.ts',
       'render/characters/makeup.ts',
       'render/characters/rig_merge.ts',
       'render/characters/stubble.ts',

@@ -12,6 +12,7 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 vi.mock('../src/render/assets/loader', () => ({
   loadTexture: vi.fn(async () => ({ image: null })),
   releaseTexture: vi.fn(),
+  loadGltf: vi.fn(() => new Promise(() => {})),
 }));
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: vi.fn(),
@@ -37,6 +38,7 @@ import {
   prewarmResumeIsDebt,
   resolvePrewarmPolicy,
 } from '../src/render/prewarm_policy';
+import { TrinketRelics } from '../src/render/trinket_relics';
 import { Vfx } from '../src/render/vfx';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
@@ -137,9 +139,9 @@ describe('the cast first-reads boot entry', () => {
   });
 
   it('links and proves its roots, and the other cast units then open the gate', async () => {
-    // The engine's 10 programs and the kit's 6 (tests/cast_vfx_engine_family.test.ts).
+    // The engine's 10 programs and the kit's 7 (tests/cast_vfx_engine_family.test.ts).
     const pendingBefore = h.readiness.snapshot().pending ?? 0;
-    expect(pendingBefore).toBe(16);
+    expect(pendingBefore).toBe(17);
     for (const root of h.roots) expect(isProgramKnownReady(h.programOf(root))).toBe(false);
     await h.entry.run();
     expect(h.compiled).toEqual(h.roots);
@@ -195,6 +197,45 @@ describe('the cast first-reads boot entry', () => {
       async () => {},
     );
     expect(entry.resumeProgramUnits?.()).toHaveLength(1);
+  });
+});
+
+describe('the Last Flame Lantern light root', () => {
+  it('is a relic program the entry links and proves before the relic units', async () => {
+    const scene = new THREE.Scene();
+    const relics = new TrinketRelics({
+      scene,
+      world: () => ({ entities: new Map() }) as never,
+      views: new Map(),
+      anchor: () => null,
+      ground: () => 0,
+      vfx: { burst: () => {} },
+      time: () => 0,
+      ready: () => false,
+    });
+    const programs = new Map<THREE.Material, LinkedProgramLike>();
+    scene.traverse((object) => {
+      const material = (object as THREE.Mesh).material as THREE.Material | undefined;
+      if (material) programs.set(material, program());
+    });
+    const webgl = {
+      properties: {
+        get: (material: THREE.Material) => ({ currentProgram: programs.get(material) }),
+      },
+    };
+    const readiness = createSceneCastVfxReadiness(scene, webgl, () => 0);
+    const relicPending = () =>
+      readiness.snapshot().families.find((family) => family.id === 'relic')?.pending;
+    const before = relicPending() ?? 0;
+    expect(before).toBeGreaterThan(1);
+    const light = relics.lanternLightDrawable() as THREE.Mesh;
+    expect(light.name).toBe('lantern-light');
+    const entry = castVfxFirstReadsEntry([light], {} as CompileArmHost, webgl, async () => {});
+    await entry.run();
+    expect(
+      isProgramKnownReady(programs.get(light.material as THREE.Material) as LinkedProgramLike),
+    ).toBe(true);
+    expect(relicPending()).toBe(before - 1);
   });
 });
 
@@ -254,8 +295,10 @@ describe('the renderer wiring (source pin)', () => {
     readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
   );
 
-  it('builds the entry from the live band cloud, ring and particle cloud, right after the kit entry', () => {
-    const at = renderer.indexOf('      castVfxFirstReadsEntry(\n');
+  it('builds the entry from the painter first reads, the ring and the particle cloud, right after the kit entry', () => {
+    const call =
+      '      castVfxFirstReadsEntry(this.castVfxFirstReadRoots(), this.compileArms, this.webgl),\n';
+    const at = renderer.indexOf(call);
     expect(at).toBeGreaterThan(-1);
     const kitCall = '      activeKitPrewarmEntry(this.scene';
     const kit = renderer.indexOf(kitCall);
@@ -269,14 +312,16 @@ describe('the renderer wiring (source pin)', () => {
     const afterKit = renderer.slice(kit + kitCall.length, at);
     expect(afterKit).not.toMatch(/id: '/);
     expect(afterKit.match(factoryCall)).toBeNull();
-    const between = renderer.slice(at + 'castVfxFirstReadsEntry('.length + 6, primitives);
+    const between = renderer.slice(at + call.length, primitives);
     expect(between).not.toMatch(/id: '/);
     expect(between.match(factoryCall)).toBeNull();
-    expect(between).toContain(
-      '[this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()],',
+    // The roots are one helper, shared with the context restore's cast relink.
+    expect(renderer).toContain(
+      '  private castVfxFirstReadRoots(): (THREE.Object3D | undefined)[] {\n' +
+        '    const rings = this.aoeRings;\n' +
+        '    return [...this.abilityVfx.firstReadDrawables(), rings[0]?.ring, this.vfx.cloudDrawable()];\n' +
+        '  }',
     );
-    expect(between).toContain('this.compileArms,');
-    expect(between).toContain('this.webgl,');
   });
 
   it('runs the kit entry, this entry and the primitives in manifest order on every policy', () => {

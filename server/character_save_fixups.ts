@@ -3,25 +3,20 @@
 // snapshot, or the marketplace escrow persist's in-job one). A snapshot
 // written without these is a real defect, not cosmetics: a jailed player's
 // blob would drop the jail flag and position (a moderation escape on the next
-// load), and a spectating player's blob would persist the spectator body and
-// lose the stowed pet. GameServer.saveCharacter and
+// load), and a jail-visiting moderator's blob would persist the visitor spot
+// and lose the stowed pet. (A spectating moderator needs no fixup: /spectate
+// leaves the body where it stands, server/spectate_body.ts.)
+// GameServer.saveCharacter and
 // GameServer.serializeCharacterForPersist are the two consumers; nothing else
 // may write a character blob from a serialization that skipped this.
 import type { CharacterState } from '../src/sim/sim';
 import type { ClientSession } from './game';
 
 export function applyCharacterSaveFixups(
-  session: Pick<ClientSession, 'spectating' | 'jailVisit' | 'jailed'>,
+  session: Pick<ClientSession, 'jailVisit' | 'jailed'>,
   s: CharacterState,
   jailSpawn: () => { x: number; z: number },
 ): CharacterState {
-  if (session.spectating) {
-    s.pos = {
-      x: session.spectating.savedPos.x,
-      z: session.spectating.savedPos.z,
-    };
-    s.pet = session.spectating.stowedPet;
-  }
   if (session.jailVisit) {
     s.pos = {
       x: session.jailVisit.savedPos.x,

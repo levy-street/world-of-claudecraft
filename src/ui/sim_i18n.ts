@@ -66,6 +66,11 @@ const baseEnTable = {
   // refusal toasts; log.bankSlotsPurchased is the purchase notice.
   'error.bankQuestItem': 'You cannot store quest items in the bank.',
   'error.bankFull': 'Your bank is full.',
+  // Player item lock (src/sim/bank.ts bankDeposit, guild_bank.ts guildBankDeposit):
+  // a locked copy is pinned to its bag cell and never leaves for storage.
+  'error.bankLocked': 'That item is locked and cannot be stored in the bank.',
+  'error.guildBankLocked': 'That item is locked and cannot be stored in the guild bank.',
+  'error.vaultItemLocked': 'That item is locked and cannot be stored in the vault.',
   // The pool-honest no_fit refusal (src/sim/bank.ts bankDeposit): a
   // non-material deposit refused while only materials-only satchel capacity
   // remains, so "full" would contradict the two-pool meter on screen.
@@ -649,6 +654,13 @@ const baseEnTable = {
   'hill.readoutYou': 'The hill stands in {zone}: your group holds it. It falls in {minutes}.',
   'hill.readoutOther': 'The hill stands in {zone}: another group holds it. It falls in {minutes}.',
   'hill.readoutUnheld': 'The hill stands in {zone}: nobody holds it. It falls in {minutes}.',
+  // The standing hill's reminder every five minutes, the hold standings (a
+  // party by its leader's name, a lone player by their own) and the Weekly
+  // Vault point for the longest hold (src/sim/pvp/hill.ts, hill_ranking.ts).
+  'hill.stillStands': 'The hill still stands in {zone}: it falls in {minutes}.',
+  'hill.rankGroup': "Hill ranking #{rank}: {name}'s group, held {minutes}.",
+  'hill.rankSolo': 'Hill ranking #{rank}: {name}, held {minutes}.',
+  'hill.vaultPoint': 'Your group held the hill longest: +1 PvP progress toward the Weekly Vault.',
   // The aid refusal (WORLD_PVP_AID_REFUSED_LINE, voiced by
   // src/sim/combat/casting_lifecycle.ts): placeholder-free, EXACT-mapped too.
   'worldPvp.aidRefused': 'You cannot aid a World PvP enemy: invite them to your party first.',
@@ -666,6 +678,8 @@ const baseEnTable = {
   'worldPvp.killTake': 'You defeat {victim} and take {money} from their purse.',
   'worldPvp.killTakeSplit':
     'You defeat {victim} and take {money} from their purse (split {count} ways).',
+  // The killing blow's spoils dropped on the body (src/sim/pvp/world_pvp_spoils.ts).
+  'worldPvp.spoilsOnBody': "Loot {victim}'s body to claim your spoils.",
   'worldPvp.defeatedPlain': '{killer} defeats you.',
   'worldPvp.defeatedTake': '{killer} defeats you and takes {money} from your purse.',
   'worldPvp.defeatedPairPlain': '{killer} and 1 other defeat you.',
@@ -673,6 +687,14 @@ const baseEnTable = {
   'worldPvp.defeatedGroupPlain': '{killer} and {others} others defeat you.',
   'worldPvp.defeatedGroupTake':
     '{killer} and {others} others defeat you and take {money} from your purse.',
+  // World PvP bounties (src/sim/pvp/world_pvp_bounty.ts): the holder's two
+  // placeholder-free notices register in the EXACT matcher; the realm lines
+  // carry player names and need the RULES entries at the end of this file.
+  'worldPvp.bountyEarned':
+    'A bounty is on your head: your kills pay more Honor, and whoever slays you earns double.',
+  'worldPvp.bountyLapsed': 'Your bounty has lapsed.',
+  'worldPvp.bountyPlaced': 'A bounty has been placed on {name}! Slay them for double Honor.',
+  'worldPvp.bountyCollected': '{killer} has collected the bounty on {victim}.',
   'log.channelJoined': 'Joined the {channel} channel. Type /{channel} <message> to talk.',
   'log.channelLeft': 'Left the {channel} channel.',
   'log.dungeonDifficultyHeroic': 'Dungeon difficulty set to Heroic.',
@@ -1150,6 +1172,11 @@ const baseEnTable = {
   'aura.broodlordsWard': "Broodlord's Ward",
   'aura.matriarchsWard': "Matriarch's Ward",
   'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
+  // The Dawn Battle Standard toy (src/sim/content/faction_rewards.ts
+  // applyBlessingOfTheDawn): the once-per-stay blessing line. Placeholder-free,
+  // so it registers in the EXACT matcher automatically.
+  'log.dawnBlessing':
+    'You are bathed in the sacred light: Blessing of the Dawn (+5% to all attributes).',
   'log.veilEnter': 'A veil of dusk parts before you, and the Hollow opens ahead.',
   'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
   'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
@@ -1389,6 +1416,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
     'error.sellLocked': 'That item is locked and cannot be sold.',
+    'error.bankLocked': 'That item is locked and cannot be stored in the bank.',
+    'error.guildBankLocked': 'That item is locked and cannot be stored in the guild bank.',
+    'error.vaultItemLocked': 'That item is locked and cannot be stored in the vault.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -5623,6 +5653,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
     'error.sellLocked': 'That item is locked and cannot be sold.',
+    'error.bankLocked': 'That item is locked and cannot be stored in the bank.',
+    'error.guildBankLocked': 'That item is locked and cannot be stored in the guild bank.',
+    'error.vaultItemLocked': 'That item is locked and cannot be stored in the vault.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -8561,6 +8594,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.ffaEntered': '你进入了一处自由混战 PvP 地带：这里的任何人都可以攻击你。',
     'worldPvp.ffaLeft': '你已离开自由混战 PvP 地带。',
     'worldPvp.killPlain': '你击败了 {victim}。',
+    'worldPvp.spoilsOnBody': '拾取 {victim} 的尸体以领取你的战利品。',
     'worldPvp.killTake': '你击败了 {victim}，并从对方的钱袋中拿走了 {money}。',
     'worldPvp.killTakeSplit': '你击败了 {victim}，并从对方的钱袋中拿走了 {money}（由 {count} 人平分）。',
     'worldPvp.minLevel': '你必须至少达到等级 {level} 才能开启世界 PvP。',
@@ -9411,6 +9445,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.ffaEntered': '你已進入自由混戰 PvP 地帶：此地任何人都能攻擊你。',
     'worldPvp.ffaLeft': '你已離開自由混戰 PvP 地帶。',
     'worldPvp.killPlain': '你擊敗了 {victim}。',
+    'worldPvp.spoilsOnBody': '拾取 {victim} 的屍體以領取你的戰利品。',
     'worldPvp.killTake': '你擊敗了 {victim}，並從對方的錢袋中拿走了 {money}。',
     'worldPvp.killTakeSplit': '你擊敗了 {victim}，並從對方的錢袋中拿走了 {money}（由 {count} 人平分）。',
     'worldPvp.minLevel': '你必須至少達到 {level} 級才能啟用世界 PvP。',
@@ -10301,6 +10336,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.ffaEntered': '자유 전투 PvP 지역에 들어왔습니다: 이곳에서는 누구나 당신을 공격할 수 있습니다.',
     'worldPvp.ffaLeft': '자유 전투 PvP 지역을 벗어났습니다.',
     'worldPvp.killPlain': '{victim}을(를) 쓰러뜨렸습니다.',
+    'worldPvp.spoilsOnBody': '{victim}의 시체를 뒤져 전리품을 획득하세요.',
     'worldPvp.killTake': '{victim}을(를) 쓰러뜨리고 소지금에서 {money}을(를) 빼앗았습니다.',
     'worldPvp.killTakeSplit': '{victim}을(를) 쓰러뜨리고 소지금에서 {money}을(를) 빼앗았습니다 ({count}명이 분배).',
     'worldPvp.minLevel': '월드 PvP를 활성화하려면 최소 레벨 {level}이어야 합니다.',
@@ -11195,6 +11231,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.ffaEntered': '無差別戦闘地帯に入りました：ここでは誰もがあなたを攻撃できます。',
     'worldPvp.ffaLeft': '無差別戦闘地帯から出ました。',
     'worldPvp.killPlain': '{victim}を倒しました。',
+    'worldPvp.spoilsOnBody': '{victim}の遺体を調べて戦利品を受け取りましょう。',
     'worldPvp.killTake': '{victim}を倒し、所持金から{money}を奪いました。',
     'worldPvp.killTakeSplit': '{victim}を倒し、所持金から{money}を奪いました（{count}人で分配）。',
     'worldPvp.minLevel': 'ワールドPvPを有効化するにはレベル{level}以上である必要があります。',
@@ -13103,6 +13140,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.ffaEntered': 'Вы вошли в зону свободного боя: здесь вас может атаковать кто угодно.',
     'worldPvp.ffaLeft': 'Вы покинули зону свободного боя.',
     'worldPvp.killPlain': 'Вы побеждаете {victim}.',
+    'worldPvp.spoilsOnBody': 'Обыщите тело {victim}, чтобы забрать добычу.',
     'worldPvp.killTake': 'Вы побеждаете {victim} и забираете {money} из их кошелька.',
     'worldPvp.killTakeSplit': 'Вы побеждаете {victim} и забираете {money} из их кошелька (разделено между {count}).',
     'worldPvp.minLevel': 'Чтобы включить мировое PvP, нужен как минимум {level} уровень.',
@@ -21161,6 +21199,14 @@ const RULES: Rule[] = [
     build: () => t('hudChrome.dungeonDifficulty.resetOccupied'),
   },
   {
+    re: /^Difficulty change queued because someone or their corpse is still inside\. It will apply when the instances are clear\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.queuedOccupied'),
+  },
+  {
+    re: /^Queued difficulty change cancelled because the party or leader changed\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.queuedCancelled'),
+  },
+  {
     re: /^Change dungeon difficulty before resetting these instances\. Empty instances reset on their own after 5 minutes\.$/,
     build: () => t('hudChrome.dungeonDifficulty.resetSameDifficulty'),
   },
@@ -21510,6 +21556,10 @@ const RULES: Rule[] = [
     build: (m) => tSim('worldPvp.killPlain', { victim: m[1] }),
   },
   {
+    re: /^Loot (.+)'s body to claim your spoils\.$/,
+    build: (m) => tSim('worldPvp.spoilsOnBody', { victim: m[1] }),
+  },
+  {
     re: /^(.+) and 1 other defeat you and take (.+) from your purse\.$/,
     build: (m) =>
       tSim('worldPvp.defeatedPairTake', { killer: m[1], money: localizeSimMoneyText(m[2]) }),
@@ -21568,6 +21618,39 @@ const RULES: Rule[] = [
   {
     re: /^The hill stands in (.+): nobody holds it\. It falls in (\d+) minutes?\.$/,
     build: (m) => tSim('hill.readoutUnheld', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
+  },
+  {
+    re: /^The hill still stands in (.+): it falls in (\d+) minutes?\.$/,
+    build: (m) => tSim('hill.stillStands', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
+  },
+  // The group shape first: a lone player's name never ends in "'s group".
+  {
+    re: /^Hill ranking #(\d+): (.+)'s group, held (\d+) minutes?\.$/,
+    build: (m) =>
+      tSim('hill.rankGroup', {
+        rank: formatNumber(Number(m[1])),
+        name: m[2],
+        minutes: hillMinutes(m[3]),
+      }),
+  },
+  {
+    re: /^Hill ranking #(\d+): (.+), held (\d+) minutes?\.$/,
+    build: (m) =>
+      tSim('hill.rankSolo', {
+        rank: formatNumber(Number(m[1])),
+        name: m[2],
+        minutes: hillMinutes(m[3]),
+      }),
+  },
+  // World PvP bounties (src/sim/pvp/world_pvp_bounty.ts): the two realm
+  // announcements. Player names splice through verbatim.
+  {
+    re: /^A bounty has been placed on (.+)! Slay them for double Honor\.$/,
+    build: (m) => tSim('worldPvp.bountyPlaced', { name: m[1] }),
+  },
+  {
+    re: /^(.+) has collected the bounty on (.+)\.$/,
+    build: (m) => tSim('worldPvp.bountyCollected', { killer: m[1], victim: m[2] }),
   },
 ];
 

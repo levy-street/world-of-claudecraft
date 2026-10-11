@@ -1950,7 +1950,7 @@ describe("actionBarView: Nature's Boon is form-scoped in every highlight", () =>
     // Oakhide: dark on BOTH flags, because the window will not pay for it here.
     expect(slots[0].naturesBoonGlow).toBe(false);
     expect(slots[0].empowered).toBe(false);
-    // Wildbloom is not bear-scoped, so the same window still lights it in Cat
+    // Sporemending is not bear-scoped, so the same window still lights it in Cat
     // Form. Without this arm the test would pass on a gate that darkens the
     // whole window rather than just its bear-only member.
     expect(slots[1].naturesBoonGlow).toBe(true);

@@ -18,7 +18,9 @@
 // turned half a turn, never a mirrored one, so the name reads the right way
 // round from either side. A language switch (woc:languagechange) or the web
 // font arriving repaints the canvases in place: a texture upload, never a
-// material or program change.
+// material or program change. The canvas size (half each side on the iOS
+// memory profile) and every paint metric, scaled with the canvas, are the
+// core's (harborRouteMarkerPlateCanvasSize, harborRouteMarkerPlatePaint).
 //
 // GPU work: the markers are built into the props root at world build (props.ts),
 // so the world-entry compile links them with the rest of the props, and their
@@ -27,21 +29,23 @@
 // nothing in a live frame. Nothing here runs per frame.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {
   HARBOR_ROUTE_MARKERS,
   type HarborRouteMarkerDef,
 } from '../sim/content/harbor_route_markers';
 import { harborRouteMarkerYaw } from '../sim/harbor_route_markers';
 import { groundHeight } from '../sim/world';
-import { loadGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { harborDestinationLabel } from './entity_labels';
 import { GFX, surfaceMat } from './gfx';
 import {
   type HarborRouteMarkerPlate,
   harborRouteMarkerParts,
+  harborRouteMarkerPlateCanvasSize,
   harborRouteMarkerPlateFan,
+  harborRouteMarkerPlateFontPx,
+  harborRouteMarkerPlatePaint,
   harborRouteMarkerTextFaces,
 } from './harbor_route_marker_core';
 import {
@@ -52,9 +56,6 @@ import {
 } from './vertex_colour_glb_parts';
 
 const MARKER_URL = '/models/props/harbor_route_marker.glb';
-/** The plate canvas: wide like the painted panel (about 3 to 1). */
-const PLATE_CANVAS_W = 1024;
-const PLATE_CANVAS_H = 340;
 const PLATE_FONT_STACK = '"Cinzel", "Palatino Linotype", Palatino, Georgia, serif';
 const PLATE_PAINT_TOP = '#f1e5c3';
 const PLATE_PAINT_BOTTOM = '#e4d3a6';
@@ -70,7 +71,7 @@ const FALLBACK_PLATE: HarborRouteMarkerPlate = {
   textHeight: 0.62,
 };
 
-let loaded: GLTF | null = null;
+let loaded: LoadedGltf | null = null;
 let loadTask: Promise<void> | null = null;
 
 export function prepareHarborRouteMarkerAssets(): Promise<void> {
@@ -149,7 +150,7 @@ function plateGeometry(plate: HarborRouteMarkerPlate): THREE.BufferGeometry {
   return geo;
 }
 
-function buildTemplate(gltf: GLTF, keep: readonly string[]): MarkerTemplate {
+function buildTemplate(gltf: LoadedGltf, keep: readonly string[]): MarkerTemplate {
   // loader cache results are immutable: read a clone
   const root = gltf.scene.clone(true);
   root.updateMatrixWorld(true);
@@ -212,6 +213,7 @@ function paintPlate(p: PaintedPlate): void {
   if (!ctx) return;
   const w = p.canvas.width;
   const h = p.canvas.height;
+  const metrics = harborRouteMarkerPlatePaint(h);
   const paint = ctx.createLinearGradient(0, 0, 0, h);
   paint.addColorStop(0, PLATE_PAINT_TOP);
   paint.addColorStop(1, PLATE_PAINT_BOTTOM);
@@ -219,8 +221,9 @@ function paintPlate(p: PaintedPlate): void {
   ctx.fillRect(0, 0, w, h);
   // a thin painted keyline inside the edge, the sign-writer's frame
   ctx.strokeStyle = 'rgba(92, 62, 34, 0.45)';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(22, 22, w - 44, h - 44);
+  ctx.lineWidth = metrics.keylineWidth;
+  const inset = metrics.keylineInset;
+  ctx.strokeRect(inset, inset, w - 2 * inset, h - 2 * inset);
   const label = harborDestinationLabel(p.dest);
   if (!label) {
     // a destination content has retired: a blank plate, and a note for whoever
@@ -232,16 +235,15 @@ function paintPlate(p: PaintedPlate): void {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   const maxW = w * p.plate.textWidth;
-  let size = Math.round(h * p.plate.textHeight);
   // shrink until the (localized) name fits the plate, never clipped
-  do {
-    ctx.font = `700 ${size}px ${PLATE_FONT_STACK}`;
-    if (ctx.measureText(label).width <= maxW) break;
-    size -= 4;
-  } while (size > 28);
+  const size = harborRouteMarkerPlateFontPx(Math.round(h * p.plate.textHeight), metrics, (px) => {
+    ctx.font = `700 ${px}px ${PLATE_FONT_STACK}`;
+    return ctx.measureText(label).width <= maxW;
+  });
+  ctx.font = `700 ${size}px ${PLATE_FONT_STACK}`;
   // a pale lift under the ink, so the letters read painted rather than printed
   ctx.fillStyle = 'rgba(255, 250, 232, 0.7)';
-  ctx.fillText(label, w / 2 + 2, h / 2 + 3, maxW);
+  ctx.fillText(label, w / 2 + metrics.liftX, h / 2 + metrics.liftY, maxW);
   ctx.fillStyle = PLATE_INK;
   ctx.fillText(label, w / 2, h / 2, maxW);
   p.texture.needsUpdate = true;
@@ -269,9 +271,11 @@ function plateFor(
   const key = destKey(dest);
   let p = plates.get(key);
   if (!p) {
+    // the profile is static for a page: a plate keeps the size it was painted at
+    const size = harborRouteMarkerPlateCanvasSize(GFX);
     const canvas = document.createElement('canvas');
-    canvas.width = PLATE_CANVAS_W;
-    canvas.height = PLATE_CANVAS_H;
+    canvas.width = size.width;
+    canvas.height = size.height;
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.generateMipmaps = true;
@@ -349,7 +353,7 @@ export const harborRouteMarkerInternalsForTest = {
   assetUrl: MARKER_URL,
   destinationLabel: harborDestinationLabel,
   /** Hand a parsed GLB to the preload slot (Node tests have no fetch path). */
-  setLoadedGltfForTest(gltf: GLTF | null): void {
+  setLoadedGltfForTest(gltf: LoadedGltf | null): void {
     loaded = gltf;
     resetHarborRouteMarkerCaches();
   },

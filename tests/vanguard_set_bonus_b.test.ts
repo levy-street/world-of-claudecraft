@@ -4,6 +4,7 @@
 // effect is present when the tier is met and absent one piece below it. The
 // last block pins every number in the tooltip copy (content/
 // vanguard_item_sets.ts) to the implementation constants.
+
 import { describe, expect, it } from 'vitest';
 import { HOURBINDER_HASTE_ID } from '../src/sim/combat/chronomancy';
 import { gainRuin, ruinAmount } from '../src/sim/combat/destruction';
@@ -14,6 +15,7 @@ import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { setBonusFlag } from '../src/sim/content/ignivar_set_bonuses';
 import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
 import type { TalentModifiers } from '../src/sim/content/talents';
+import { VANGUARD_CASTER_SET_IDS } from '../src/sim/content/vanguard_set_bonuses';
 import * as B from '../src/sim/content/vanguard_set_bonuses_b';
 import { ITEM_SETS, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -156,8 +158,10 @@ describe('Vanguard B sets: registration', () => {
       const four = computeCharacterModifiers(cls, { spec, rows: {} }, 20, equipment);
       expect(four.selected[setBonusFlag(setId, 2)]).toBe(true);
       expect(four.selected[setBonusFlag(setId, 4)]).toBe(true);
-      // No Season 2 set carries the raid tier's spell pushback rider.
-      expect(four.global.castPushbackReduction).toBe(0);
+      // Only the caster Season 2 sets carry the spell pushback rider (2 pieces).
+      expect(four.global.castPushbackReduction).toBe(
+        VANGUARD_CASTER_SET_IDS.includes(setId) ? 1 : 0,
+      );
     }
   });
 

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { BUILTIN_WORLD, ITEMS, NPCS } from '../src/sim/data';
+import { canEquipItem } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, type ItemDef, type PlayerClass } from '../src/sim/types';
 import { weeklyRewardFitsClass } from '../src/sim/weekly_reward_eligibility';
@@ -27,6 +28,12 @@ const unwanted: ItemDef[] = [
 ];
 
 function expectAllowedStats(cls: PlayerClass, item: ItemDef): void {
+  expect(canEquipItem(cls, item), `${cls}: ${item.id} equipment`).toBe(true);
+  if (item.requiredClass) expect(item.requiredClass).toContain(cls);
+  if (cls === 'mage' || cls === 'priest' || cls === 'warlock') {
+    expect(item.stats?.str ?? 0, `${cls}: ${item.id} Strength`).toBeLessThanOrEqual(0);
+    expect(item.stats?.agi ?? 0, `${cls}: ${item.id} Agility`).toBeLessThanOrEqual(0);
+  }
   if (cls === 'warrior' || cls === 'rogue' || cls === 'hunter') {
     expect(item.stats?.int ?? 0, `${cls}: ${item.id} Intellect`).toBeLessThanOrEqual(0);
     expect(item.spellPower ?? 0, `${cls}: ${item.id} Spell Power`).toBeLessThanOrEqual(0);
@@ -37,6 +44,31 @@ function expectAllowedStats(cls: PlayerClass, item: ItemDef): void {
 }
 
 describe('weekly vault class restrictions', () => {
+  it.each(['mage', 'priest', 'warlock'] as const)(
+    'excludes Strength and Agility for %s across all equipment, including mixed stats',
+    (cls) => {
+      for (const stats of [{ str: 1 }, { agi: 1 }, { str: 1, int: 20 }, { agi: 1, int: 20 }]) {
+        for (const slot of ['ring', 'neck', 'trinket'] as const)
+          expect(weeklyRewardFitsClass(cls, { ...ring, slot, stats })).toBe(false);
+        expect(
+          weeklyRewardFitsClass(cls, { ...ring, slot: 'chest', armorType: 'cloth', stats }),
+        ).toBe(false);
+        expect(
+          weeklyRewardFitsClass(cls, {
+            ...ring,
+            kind: 'weapon',
+            slot: 'mainhand',
+            stats,
+            weapon: { min: 1, max: 2, speed: 2 },
+          }),
+        ).toBe(false);
+        expect(
+          weeklyRewardFitsClass(cls, { ...ring, kind: 'held_offhand', slot: 'offhand', stats }),
+        ).toBe(false);
+      }
+      expect(weeklyRewardFitsClass(cls, { ...ring, stats: { int: 4, spi: 4, sta: 4 } })).toBe(true);
+    },
+  );
   it.each(['warrior', 'rogue', 'hunter'] as const)(
     'excludes every unwanted stat for %s, including mixed-stat items',
     (cls) => {

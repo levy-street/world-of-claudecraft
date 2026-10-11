@@ -635,6 +635,10 @@ const mergeStringsEn = {
       sellJunk: 'Sell Junk',
       sellJunkAria: 'Sell all junk for {price}',
       sellJunkHint: 'Sells every gray item in your bags except quest items.',
+      // The sim keeps plain gray junk out of the buyback list (items.ts
+      // skipsVendorBuyback), so the sweep is final: say so before the click.
+      sellJunkNoBuyback:
+        'Unsigned gray items skip the buyback list, so selling them cannot be undone.',
     },
     logs: {
       ...itemNames.en.itemUi.logs,

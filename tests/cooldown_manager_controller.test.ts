@@ -9,6 +9,10 @@ import {
   type CooldownManagerWorld,
 } from '../src/ui/hud/cooldown_manager/cooldown_manager_controller';
 import { CooldownManagerSettingsPanel } from '../src/ui/hud/cooldown_manager/cooldown_manager_settings';
+import {
+  type CooldownTooltipHost,
+  cooldownTooltipHtml,
+} from '../src/ui/hud/cooldown_manager/cooldown_manager_wiring';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 
 // Additive, never bare: only the canvas-touching iconDataUrl is stubbed (the
@@ -52,11 +56,17 @@ function rig(opts: { inCombat?: boolean; extra?: string[] } = {}) {
   } as unknown as CooldownManagerWorld & { player: { inCombat: boolean } };
   const cues: [string, number][] = [];
   let auraGlow: ReadonlySet<string> = new Set();
+  const tooltips = new Map<HTMLElement, () => string>();
+  const tooltipHtml = vi.fn((id: string) => id);
+  const hideTooltip = vi.fn();
   const controller = new CooldownManagerController({
     world,
     writers,
     playCue: (id, volume) => cues.push([id, volume]),
     auraGlowIds: () => auraGlow,
+    attachTooltip: (element, html) => tooltips.set(element, html),
+    tooltipHtml,
+    hideTooltip,
   });
   const cooldowns = new Map<string, number>();
   const snapshot = {
@@ -87,6 +97,9 @@ function rig(opts: { inCombat?: boolean; extra?: string[] } = {}) {
     cooldowns,
     snapshot,
     cues,
+    tooltips,
+    tooltipHtml,
+    hideTooltip,
     setAuraGlow: (ids: string[]) => {
       auraGlow = new Set(ids);
     },
@@ -95,6 +108,74 @@ function rig(opts: { inCombat?: boolean; extra?: string[] } = {}) {
 }
 
 describe('CooldownManagerController', () => {
+  it('dismisses a hovered tooltip when its icon is hidden or rebuilt', () => {
+    const { controller, hooks, snapshot, layer, hideTooltip } = rig();
+    const group = hooks.addGroup('line');
+    hooks.assign('rake', group);
+    controller.paint(snapshot);
+    layer().querySelector('.cdm-btn')?.dispatchEvent(new MouseEvent('mouseenter'));
+    hooks.patchLayout({ enabled: false });
+    controller.paint(snapshot);
+    expect(hideTooltip).toHaveBeenCalledTimes(1);
+    controller.paint(snapshot);
+    expect(hideTooltip).toHaveBeenCalledTimes(1);
+    hooks.patchLayout({ enabled: true });
+    controller.paint(snapshot);
+    layer().querySelector('.cdm-btn')?.dispatchEvent(new MouseEvent('mouseenter'));
+    hooks.assign('claw', group);
+    expect(hideTooltip).toHaveBeenCalledTimes(2);
+  });
+
+  it('attaches a lazy tooltip to every tracked icon after group rebuilds', () => {
+    const { hooks, layer, tooltips, tooltipHtml } = rig();
+    const group = hooks.addGroup('line');
+    hooks.assign('rake', group);
+    hooks.assign('kind:old_blood', group);
+    const buttons = Array.from(layer().querySelectorAll<HTMLElement>('.cdm-btn'));
+    expect(tooltipHtml).not.toHaveBeenCalled();
+    expect(buttons.map((button) => tooltips.get(button)?.())).toEqual(['rake', 'kind:old_blood']);
+    hooks.patchGroup(group!, { orientation: 'vertical' });
+    const rebuilt = layer().querySelector<HTMLElement>('.cdm-btn')!;
+    expect(rebuilt).not.toBe(buttons[0]);
+    tooltipHtml.mockReturnValue('live tooltip');
+    expect(tooltips.get(rebuilt)?.()).toBe('live tooltip');
+  });
+
+  it('resolves spell replacements and refreshed aura details at hover time', () => {
+    const { world } = rig();
+    const abilityTooltip = vi.fn((ability: ResolvedAbility) => ability.def.id);
+    const host: CooldownTooltipHost = {
+      abilityTooltip,
+      aurasView: { auraName: (aura) => aura.name, auraEffectHtml: (aura) => String(aura.value) },
+      aurasPainter: {
+        attachTooltip: () => {},
+        renderTooltip: (name, remaining, effect, toggle) =>
+          `${name}:${remaining}:${effect}:${toggle}`,
+      },
+    };
+    expect(cooldownTooltipHtml(world, 'rake', host)).toBe('rake');
+    const replacement = resolved('claw');
+    world.resolvedAbility = () => replacement;
+    expect(cooldownTooltipHtml(world, 'rake', host)).toBe('claw');
+    const aura = {
+      id: 'old_blood',
+      kind: 'old_blood' as const,
+      name: 'Old Blood',
+      value: 2,
+      remaining: 12,
+    };
+    Object.assign(world.player, { auras: [aura] });
+    expect(cooldownTooltipHtml(world, 'kind:old_blood', host)).toContain('Old Blood:12:2:');
+    aura.remaining = 5;
+    aura.value = 3;
+    expect(cooldownTooltipHtml(world, 'aura:old_blood', host)).toContain('Old Blood:5:3:');
+    expect(cooldownTooltipHtml(world, 'aura:missing', host)).toBe('');
+    Object.assign(world.player, { auras: [] });
+    expect(cooldownTooltipHtml(world, 'kind:old_blood', host)).toContain('tt-title');
+    world.resolvedAbility = () => null;
+    expect(cooldownTooltipHtml(world, 'missing', host)).toBe('');
+  });
+
   it('builds one floating group per kind with explicit grid cells, aria-hidden', () => {
     const { hooks, layer } = rig();
     const line = hooks.addGroup('line') as string;

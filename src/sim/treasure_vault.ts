@@ -258,6 +258,19 @@ export function finishVaultAttempt(
   attemptId: string,
 ): number | null {
   const owner = [...ctx.players.values()].find((meta) => meta.characterId === ownerCharacterId);
+  return clearVaultAttempt(owner, attemptId);
+}
+
+/** Local vaults have no outcome commit to wait for once the clear is decided. */
+export function finishLocalVaultAttempt(
+  ctx: SimContext,
+  ownerPid: number,
+  attemptId: string,
+): void {
+  clearVaultAttempt(ctx.players.get(ownerPid), attemptId);
+}
+
+function clearVaultAttempt(owner: PlayerMeta | undefined, attemptId: string): number | null {
   if (owner?.vaultAttempt?.id !== attemptId) return null;
   owner.vaultAttempt = null;
   owner.vaultAttemptDurable = true;

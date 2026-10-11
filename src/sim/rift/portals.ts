@@ -27,7 +27,8 @@ import { createGroundObject } from '../entity';
 import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { RIFT_TIER_COLORS, type RiftTier, type ZoneDef } from '../types';
-import { groundHeight, terrainSteepnessAt, WATER_LEVEL } from '../world';
+import { inWispMazeFootprint } from '../wisp_maze_ground';
+import { groundHeight, inGardenMaze, terrainSteepnessAt, WATER_LEVEL } from '../world';
 import { riftFx } from './fx';
 import { RIFT_RANK_BASE_LEVEL } from './ranks';
 import { generateRiftPlan } from './rift_gen';
@@ -278,6 +279,8 @@ export function spawnNaturalRiftPortal(
     // cliffside rolls real, and a portal on one is unreachable or a fall.
     if (terrainSteepnessAt(x, z, ctx.cfg.seed) > 0.9) continue;
     if (isBlocked(ctx.cfg.seed, x, z, 1.5)) continue;
+    if (inWispMazeFootprint(x, z, 8)) continue;
+    if (inGardenMaze(x, z)) continue;
     position = { x, z };
     break;
   }

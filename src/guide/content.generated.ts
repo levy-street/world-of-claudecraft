@@ -1958,7 +1958,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "rejuvenation",
-        "name": "Wildbloom"
+        "name": "Sporemending"
       }
     ],
     "abilities": [
@@ -1984,7 +1984,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "rejuvenation",
-        "name": "Wildbloom"
+        "name": "Sporemending"
       },
       {
         "id": "thorns",
@@ -2037,6 +2037,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "claw",
         "name": "Rendclaw"
+      },
+      {
+        "id": "scratch",
+        "name": "Scratch"
       },
       {
         "id": "regrowth",
@@ -2121,6 +2125,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "grove_awakening",
         "name": "Grove Awakening"
+      },
+      {
+        "id": "sporemender_form",
+        "name": "Sporemender Form"
       }
     ],
     "model": "player_druid",
@@ -2579,6 +2587,11 @@ export const GUIDE_DRUID_FORMS: GuideDruidForm[] = [
     "id": "form_travel",
     "model": "form_travel",
     "still": "/guide-stills/form_travel.webp"
+  },
+  {
+    "id": "form_sporemender",
+    "model": "form_sporemender",
+    "still": "/guide-stills/form_sporemender.webp"
   }
 ];
 
@@ -6004,6 +6017,61 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "prog_titan",
+    "name": "Titan",
+    "category": "progression",
+    "renown": 50,
+    "feat": false,
+    "rewardTitle": "Titan"
+  },
+  {
+    "id": "pvp_flag_1h",
+    "name": "Bold",
+    "category": "pvp",
+    "renown": 5,
+    "feat": false,
+    "rewardTitle": "Bold"
+  },
+  {
+    "id": "pvp_flag_3h",
+    "name": "Defiant",
+    "category": "pvp",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Defiant"
+  },
+  {
+    "id": "pvp_flag_6h",
+    "name": "Dauntless",
+    "category": "pvp",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Dauntless"
+  },
+  {
+    "id": "pvp_flag_24h",
+    "name": "Unyielding",
+    "category": "pvp",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Unyielding"
+  },
+  {
+    "id": "pvp_flag_168h",
+    "name": "Indomitable",
+    "category": "pvp",
+    "renown": 50,
+    "feat": false,
+    "rewardTitle": "Indomitable"
+  },
+  {
+    "id": "exp_wisp_maze_hard",
+    "name": "Brighter Than the Shadows",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -7365,6 +7433,30 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Treasure Hunter"
+      },
+      {
+        "kind": "title",
+        "name": "Titan"
+      },
+      {
+        "kind": "title",
+        "name": "Bold"
+      },
+      {
+        "kind": "title",
+        "name": "Defiant"
+      },
+      {
+        "kind": "title",
+        "name": "Dauntless"
+      },
+      {
+        "kind": "title",
+        "name": "Unyielding"
+      },
+      {
+        "kind": "title",
+        "name": "Indomitable"
       }
     ]
   },
@@ -21539,6 +21631,12 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/chicken_cow.glb",
     "idle": "Idle",
     "height": 2.3
+  },
+  "form_sporemender": {
+    "url": "models/creatures/sporemender_form.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "yaw": -1.5707963267948966
   },
   "mob_emberkin": {
     "url": "models/creatures/emberkin.glb",

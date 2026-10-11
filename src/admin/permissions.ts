@@ -18,6 +18,7 @@ export const ADMIN_PERMISSIONS = [
   'ipblocks.manage',
   'chatfilter.manage',
   'content.moderate',
+  'realm.motd',
   'botdetector.read',
   'botdetector.configure',
   'guildbank.purge',

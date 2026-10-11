@@ -4,14 +4,19 @@ export {
   HILL_LOST_LINE,
   HILL_READOUT_NONE_LINE,
   HILL_TAKEN_LINE,
+  HILL_VAULT_LINE,
   type HillPhase,
   type HillState,
+  type HillVaultCredit,
   hillFallenLine,
   hillInfoFor,
   hillPlanFor,
+  hillRankLine,
   hillReadoutLine,
   hillRiseLine,
+  hillStillStandsLine,
   hillWarningLine,
+  NO_HILL_VAULT_CREDIT,
   newHillState,
   pickHillSpot,
   riseHillNow,
@@ -21,15 +26,25 @@ export {
   warnNextHillNow,
 } from './hill';
 export {
+  HILL_RANKING_SHOWN,
+  type HillHoldRecord,
+  hillLongestHolds,
+  hillRanking,
+  hillVaultPayees,
+} from './hill_ranking';
+export {
   HILL_ACCRUAL_SECONDS,
   HILL_CAPTURE_SECONDS,
   HILL_DURATION_SECONDS,
   HILL_FIRST_WINDOW_AT_SECONDS,
   HILL_LATEST_WARN_OFFSET_SECONDS,
+  HILL_NOTICE_SECONDS,
   HILL_RADIUS,
   HILL_RAMP_MAX_HONOR,
   HILL_RAMP_STEP_HONOR,
   HILL_RAMP_STEP_SECONDS,
+  HILL_VAULT_MIN_HOLD_SECONDS,
+  HILL_VAULT_MIN_INSIDE_SECONDS,
   HILL_WARNING_SECONDS,
   HILL_WINDOW_SECONDS,
   type HillSpotProbe,
@@ -139,6 +154,21 @@ export {
   worldPvpPairRepeats,
 } from './world_pvp';
 export {
+  hasWorldPvpBounty,
+  WORLD_PVP_BOUNTY_EARNED_LINE,
+  WORLD_PVP_BOUNTY_LAPSED_LINE,
+  worldPvpBountyCollectedLine,
+  worldPvpBountyPlacedLine,
+} from './world_pvp_bounty';
+export {
+  WORLD_PVP_BOUNTY_HOLDER_DR,
+  WORLD_PVP_BOUNTY_KILL_HONOR_MULT,
+  WORLD_PVP_BOUNTY_STREAK,
+  worldPvpBountyHolderMultiplier,
+  worldPvpKillHonorPool,
+  worldPvpStreakEarnsBounty,
+} from './world_pvp_bounty_rules';
+export {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
   WORLD_PVP_DR_WINDOW_SECONDS,
@@ -156,4 +186,14 @@ export {
   worldPvpStake,
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
+export {
+  placeWorldPvpSpoils,
+  settleAllWorldPvpSpoils,
+  settleWorldPvpSpoils,
+  settleWorldPvpSpoilsOnLeave,
+  sweepWorldPvpSpoils,
+  WORLD_PVP_SKULL_ITEM_ID,
+  worldPvpSkullSources,
+  worldPvpSpoilsLine,
+} from './world_pvp_spoils';
 export { worldPvpFfaZones, worldPvpZonePolicyAt, worldPvpZonePolicyOf } from './world_pvp_zones';

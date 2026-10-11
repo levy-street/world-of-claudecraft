@@ -2,7 +2,8 @@
 // Moongrove fills one Moontide bank toward a CHOSEN payoff (Moonsurge on the
 // Moonseed button or Sunwake on the Skyfall button, either spend clears it),
 // Wildfang shares Old Blood across Cat and Bruin forms, and Groveheart
-// grows Verdance toward Overbloom.
+// grows Verdance toward Overbloom (every Sporemending, Second Bloom, or Wildmend
+// cast adds 1, and each banked Verdance speeds Wildmend's cast).
 
 import { DRUID_CHOICE_ROWS } from '../content/choice_rows_classic';
 import {
@@ -18,6 +19,7 @@ import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scalin
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
 import { LUNGE_ID, startLunge } from './druid_lunge';
+import { GROVEHEART_BOON_ICD_KEY, NATURES_BOON_ID } from './druid_natures_boon';
 import {
   BRUIN_RUSH_WINDOW_ID,
   BRUIN_RUSH_WINDOW_SECONDS,
@@ -32,8 +34,17 @@ export const VERDANCE_ID = 'verdance';
 
 export const MOONTIDE_STAGES = 3;
 export const OLD_BLOOD_STAGES = 3;
-export const VERDANCE_STAGES = 5;
+export const VERDANCE_STAGES = 3;
 const ENGINE_BACKING_DURATION = 3600;
+
+// Groveheart rework: each banked Verdance speeds Wildmend to a DEFINED cast
+// time, indexed by stacks minus one (1 Verdance 2.2 sec, 2 Verdance 1.9 sec,
+// 3 Verdance 1.5 sec). Roughly 0.3 sec per stack off the Groveheart Wildmend
+// (the 3.0 sec rank cast less the spec's 16% baseline), landing exactly on
+// 1.5 at the cap. Pre-haste values: spell haste still divides the result at
+// cast start like every other cast time.
+export const WILDMEND_ID = 'healing_touch';
+export const VERDANCE_WILDMEND_CAST_TIMES: readonly number[] = [2.2, 1.9, 1.5];
 
 export const HIGHMOON_TITHE_PCT = 0.15;
 export const WILD_APEX_MULT = 1.25;
@@ -129,7 +140,13 @@ export function bruinRushMakesCatFormFree(
 }
 
 const ENGINE_AURA_IDS = new Set([MOONTIDE_ID, OLD_BLOOD_ID, VERDANCE_ID, BRUIN_RUSH_WINDOW_ID]);
-const FORM_ABILITY_IDS = new Set(['bear_form', 'cat_form', 'travel_form', 'moonkin_form']);
+const FORM_ABILITY_IDS = new Set([
+  'bear_form',
+  'cat_form',
+  'travel_form',
+  'moonkin_form',
+  'sporemender_form',
+]);
 const MOONTIDE_BUILDER_IDS = new Set(['wrath', 'starfire', 'moonseed']);
 // Every landed feral strike that banks one Old Blood. Slinkstrike ('pounce')
 // and Lunge joined the list in the v0.43 feral pass: the stealth opener banks
@@ -138,7 +155,9 @@ const MOONTIDE_BUILDER_IDS = new Set(['wrath', 'starfire', 'moonseed']);
 // its parked strike actually rolls through ctx.meleeSwing (combat/
 // druid_lunge.ts). A Lunge that ends short strikes nothing and so banks
 // nothing, exactly as it awards no combo point. The OLD_BLOOD_STAGES cap of 3
-// holds for both through addStage.
+// holds for both through addStage. Scratch (combat/druid_scratch.ts) banks
+// once per LANDED swing through the same meleeSwing hook, so a sweep that
+// lands on three enemies fills the bank in one press.
 const OLD_BLOOD_STRIKE_IDS = new Set([
   'claw',
   'rake',
@@ -146,10 +165,38 @@ const OLD_BLOOD_STRIKE_IDS = new Set([
   'ferocious_bite',
   'maul',
   'swipe',
+  'scratch',
   'pounce',
   'lunge',
 ]);
 const VERDANCE_SOWING_IDS = new Set(['rejuvenation', 'regrowth']);
+
+// Banked Verdance on this actor. Reads the aura list by kind only (the same
+// read the Fleetmend to Overbloom replacement rule makes), so the Sim and the
+// online client mirror agree.
+function verdanceStacks(actor: Pick<Entity, 'auras'>): number {
+  for (const aura of actor.auras) {
+    if (aura.kind === 'verdance') return aura.stacks ?? 1;
+  }
+  return 0;
+}
+
+/** Wildmend's cast time with banked Verdance folded in (the shared
+ *  resolution chain in combat/ability_resolution.ts calls this, so the
+ *  tooltip, the cast bar, and the server's cast start all read one number).
+ *  Min-combined: a resolve that is already faster than the defined time is
+ *  never stretched. Every other ability, and a druid with no Verdance, gets
+ *  its cast time back unchanged. Draws no rng. */
+export function verdanceWildmendCastTime(
+  actor: Pick<Entity, 'auras'>,
+  abilityId: string,
+  castTime: number,
+): number {
+  if (abilityId !== WILDMEND_ID || castTime <= 0) return castTime;
+  const stacks = Math.min(verdanceStacks(actor), VERDANCE_WILDMEND_CAST_TIMES.length);
+  if (stacks <= 0) return castTime;
+  return Math.min(castTime, VERDANCE_WILDMEND_CAST_TIMES[stacks - 1]);
+}
 
 function specOf(ctx: SimContext, player: Entity): string | null {
   if (player.kind !== 'player') return null;
@@ -264,7 +311,8 @@ function inMoonwing(player: Entity): boolean {
 
 // Strip every breakable root and slow the player wears (an aura stamped
 // unbreakableControl stays). Fleet Form runs this on every cast, baseline;
-// the other three forms run it only with Wildshift selected. Draws no rng.
+// the other forms (Cat, Bruin, Moonwing, Sporemender) run it only with
+// Wildshift selected. Draws no rng.
 // A form button reaches this hook in BOTH directions of the shift: the
 // toggle-off press that returns to caster form runs the same
 // casting_lifecycle path as the shift in, so a druid rooted while in Fleet
@@ -291,19 +339,28 @@ export function druidEngineOnCast(
 
   if (FORM_ABILITY_IDS.has(abilityId)) {
     // Fleet Form breaks control on its own (the classic travel-form escape:
-    // 30 mana, no cooldown, and no abilities while shifted). Cat, Bruin, and
-    // Moonwing keep the Wildshift gate, which is what makes the row 5 pick
+    // 30 mana, no cooldown, and no abilities while shifted). Cat, Bruin,
+    // Moonwing and Sporemender keep the Wildshift gate, which is what makes the row 5 pick
     // the in-combat option: break the root without leaving your damage form.
     if (abilityId === 'travel_form' || selectedRow(ctx, player, DRUID_TALENT_IDS.wildshift)) {
       breakMovementControl(ctx, player);
     }
     // Loping Stride is baseline: every form shift sprints, no talent check.
-    // Longstride only changes the two numbers (duration and cooldown).
+    // Longstride only changes the two numbers (duration and cooldown). A shift
+    // in the saddle (a mount-safe form, combat/forms.ts) does not sprint: the
+    // buff would stack onto the mount's speed on every toggle. The cooldown is
+    // left unspent, so the next shift on foot still sprints.
     const longstride = selectedRow(ctx, player, DRUID_TALENT_IDS.longstride);
     const strideDuration = longstride ? longstrideMetrics().duration : LOPING_STRIDE_DURATION;
     const strideIcd = longstride ? longstrideMetrics().icd : LOPING_STRIDE_ICD;
     if (!player.procState) player.procState = { counters: {}, icds: {} };
-    if (player.procState.icds[LOPING_STRIDE_ICD_KEY] === undefined) {
+    const mountSummonInFlight =
+      (player.mountCastRemaining ?? 0) > 0 && (player.mountCastKey ?? '') !== '';
+    if (
+      !player.mountKey &&
+      !mountSummonInFlight &&
+      player.procState.icds[LOPING_STRIDE_ICD_KEY] === undefined
+    ) {
       player.procState.icds[LOPING_STRIDE_ICD_KEY] = strideIcd;
       ctx.applyAura(player, {
         id: 'loping_stride',
@@ -394,8 +451,19 @@ export function druidEngineOnCast(
     }
     return;
   }
+
+  // Groveheart: every completed Wildmend banks 1 Verdance (max 3). This
+  // funnel runs after runEffects, so the heal has already landed at the
+  // current cast time and the speed-up reaches the NEXT Wildmend. Draws no rng.
+  if (spec === 'restoration' && abilityId === WILDMEND_ID) {
+    addStage(ctx, player, VERDANCE_ID, 'Verdance', 'verdance', VERDANCE_STAGES);
+  }
 }
 
+// Every Sporemending or Second Bloom application banks 1 Verdance, a fresh
+// plant and a refresh of one already ticking alike (the Groveheart rework
+// dropped the old new-plant-only rule, so a druid never has to let a bloom
+// fall off to keep the engine growing).
 export function druidEngineOnHotPlanted(ctx: SimContext, player: Entity, abilityId: string): void {
   if (!VERDANCE_SOWING_IDS.has(abilityId)) return;
   const meta = player.kind === 'player' ? ctx.players.get(player.id) : undefined;
@@ -468,7 +536,7 @@ function remainingTicks(aura: Aura): number {
     : 0;
 }
 
-function replantWildbloom(ctx: SimContext, player: Entity, target: Entity): void {
+function replantSporemending(ctx: SimContext, player: Entity, target: Entity): void {
   const resolved = ctx.resolvedAbility('rejuvenation', player.id);
   const hot = resolved?.effects.find((effect) => effect.type === 'hot');
   if (!resolved || !hot || hot.type !== 'hot') return;
@@ -579,10 +647,10 @@ export function resolveDruidOverbloom(
       false,
     );
   }
-  replantWildbloom(ctx, player, castTarget);
+  replantSporemending(ctx, player, castTarget);
   if (druidSeedspreadSelected(ctx, player)) {
     for (const ally of harvested.values()) {
-      if (ally.id !== castTarget.id) replantWildbloom(ctx, player, ally);
+      if (ally.id !== castTarget.id) replantSporemending(ctx, player, ally);
     }
   }
   if (selectedRow(ctx, player, DRUID_TALENT_IDS.naturesFury)) {
@@ -615,11 +683,17 @@ export function cleanDruidEngineState(
 ): void {
   for (let index = player.auras.length - 1; index >= 0; index--) {
     const aura = player.auras[index];
-    if (aura.sourceId !== player.id || !ENGINE_AURA_IDS.has(aura.id)) continue;
+    // A Nature's Boon window is spec-scoped too (Wildfang: Sporemending or Oakhide;
+    // Groveheart: Wildmend), so it ends with the specialization that armed it.
+    if (aura.sourceId !== player.id) continue;
+    if (!ENGINE_AURA_IDS.has(aura.id) && aura.id !== NATURES_BOON_ID) continue;
     player.auras.splice(index, 1);
     ctx.emit({ type: 'aura', targetId: player.id, name: aura.name, gained: false });
   }
-  if (player.procState) delete player.procState.icds[LOPING_STRIDE_ICD_KEY];
+  if (player.procState) {
+    delete player.procState.icds[LOPING_STRIDE_ICD_KEY];
+    delete player.procState.icds[GROVEHEART_BOON_ICD_KEY];
+  }
 }
 
 export type DruidEngineMeta = PlayerMeta;

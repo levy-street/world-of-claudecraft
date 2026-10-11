@@ -1,4 +1,4 @@
-// Trailbreak on real terrain: the backward leap has to cover its 12 yards when
+// Trailbreak on real terrain: the backward leap has to cover its full distance when
 // the ground RISES behind the hunter (a walkable hillside used to catch the
 // flat hop arc after two or three yards), while an unclimbable face or a wall
 // at the hunter's back still ends the leap at its foot instead of beaching the
@@ -8,6 +8,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { resolvePosition } from '../src/sim/colliders';
+import { ABILITIES } from '../src/sim/data';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { GRAVITY, JUMP_VELOCITY } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
@@ -16,7 +17,12 @@ import { groundHeight, terrainSteepnessAt, waterLevelAt } from '../src/sim/world
 import { WORLD_SEED } from '../src/sim/world_seed';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
-const TRAILBREAK_DISTANCE = 12;
+// Read from the shipped ability, so a retune moves every expectation here.
+const TRAILBREAK_DISTANCE = (() => {
+  const leap = ABILITIES.trailbreak.effects.find((effect) => effect.type === 'hunterTrailbreak');
+  if (!leap || leap.type !== 'hunterTrailbreak') throw new Error('trailbreak has no leap effect');
+  return leap.distance;
+})();
 const SAMPLE_STEP = 0.5;
 
 /** A hunter standing at (x, z) on the world terrain, facing AWAY from `backDir`
@@ -75,10 +81,10 @@ function flyUntilLanded(sim: Sim, p: Entity): number {
 
 describe('Trailbreak over real terrain', () => {
   it('covers its full distance up a walkable rising hillside', () => {
-    const x = -589;
-    const z = -518;
-    const backDir = 2.7489;
-    // The spot: a prop-free, dry, monotone rise of about 5 yards over the leap,
+    const x = -477;
+    const z = 614;
+    const backDir = 0;
+    // The spot: a prop-free, dry, monotone rise of about 7.5 yards over the leap,
     // every half-yard step well inside the walkable slope limit.
     const profile = riseProfile(x, z, backDir, TRAILBREAK_DISTANCE);
     expect(propFreeLine(x, z, backDir, TRAILBREAK_DISTANCE)).toBe(true);
@@ -161,6 +167,14 @@ describe('Trailbreak over real terrain', () => {
     sim.setPlayerLevel(20);
     const p = sim.player;
     const seed = sim.cfg.seed;
+    // Step 40 yards off the start, onto ground with a full-length level line
+    // behind it (the start itself has none at the leap's length).
+    p.pos.x -= 40;
+    p.pos.z -= 40;
+    p.pos.y = groundHeight(p.pos.x, p.pos.z, seed);
+    p.prevPos = { ...p.pos };
+    p.fallStartY = p.pos.y;
+    p.onGround = true;
     // The empty test world is not perfectly level: pick a backward direction
     // along which no sample sits above the start (level or falling ground),
     // the case the fix must leave byte-identical.

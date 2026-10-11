@@ -187,10 +187,11 @@ const CSP_ORIGINS = {
 // Extract a CSP source-hash (`sha256-<base64>`) for every INLINE <script> in html
 // (one with no `src` attribute and a non-empty body), matching what a browser hashes:
 // the exact text between the tags. External <script src> tags need no hash. index.html
-// ships three executable inline scripts (the i18n stored-locale bootstrap, whose body
-// varies per build, plus the analytics snippets), so the hashes are read from the built
-// file at runtime rather than hard-coded. Inline scripts never contain a literal
-// </script> (the i18n injector escapes '<'), so the non-greedy match is safe here.
+// ships several executable inline scripts (the i18n stored-locale bootstrap, whose body
+// varies per build, the analytics snippets and the boot splash fail-safe), so the
+// hashes are read from the built file at runtime rather than hard-coded. Inline
+// scripts never contain a literal </script> (the i18n injector escapes '<'), so the
+// non-greedy match is safe here.
 function extractInlineScriptHashes(html) {
   const hashes = [];
   const re = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
