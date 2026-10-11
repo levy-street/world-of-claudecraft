@@ -552,6 +552,32 @@ alone is the owner's stated shape.
   contributor pays that contributor nothing (neither honor nor gold), the
   classic grey-kill rule and the reason a capped character cannot farm flagged
   low-level purses.
+- Leaving mid-fight forfeits it (`src/sim/pvp/world_pvp_forfeit.ts`, owner
+  tuning). A player who leaves the world while a world fight is live (an enemy
+  player hit them, or they hit one, inside `WORLD_PVP_ASSIST_WINDOW`, and that
+  enemy is still standing and still world-hostile) dies to that opponent on the
+  spot, through the one shared death hub, so every rule above applies unchanged.
+  Every departure counts: a dropped socket (a closed client or a lost
+  connection, judged BEFORE the linkdead grace begins, so the body is already a
+  corpse while it lingers) and everything that runs `leave()` (a deliberate
+  logout, every kick including the message-flood one, a takeover from another
+  login, the end of the linkdead grace), via `server/world_pvp_departure.ts`.
+  The one exemption is a session whose writes can never land again (an
+  escrow-quarantined zombie displaced by a lease fence or a ledger failure):
+  its death and debit could not persist while the winner's credit would. An
+  opponent who is themselves already leaving (`PlayerMeta.leaving`) is no
+  opponent. The honor pool and the kill land on the
+  opponent at once, the leaver's record takes one death at once, and the stake
+  leaves the leaver's purse at once (their departure save carries the death and
+  the debit); the stake reaches the winner `WORLD_PVP_FORFEIT_PAYOUT_SECONDS`
+  (5 minutes) later, held on the winner's own character
+  (`WorldPvpMetaState.pending`, persisted as remaining seconds and re-anchored
+  on load like the disarm countdown, so it survives the winner logging out or a
+  restart; `src/sim/pvp/world_pvp_payouts.ts`). Walking into a sanctuary,
+  waiting out the window, or an opponent who already fell lets a player leave
+  freely, and a duel, battleground or arena is never a world fight, so their
+  own desertion rules stay in charge (`tests/world_pvp_forfeit.test.ts`,
+  `tests/world_pvp_departure.test.ts`).
 
 Deaths to a mob or the environment stake nothing, whatever the flag or the
 ground says. A flagged player inside a live battleground or arena is under that

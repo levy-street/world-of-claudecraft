@@ -45,9 +45,18 @@ import type { Entity } from '../types';
 import { grantHonor } from './honor';
 import { updatePvpVitality } from './vitality';
 import {
+  loadWorldPvpPayouts,
+  payDueWorldPvpPayouts,
+  queueWorldPvpPayout,
+  savedWorldPvpPayouts,
+  type WorldPvpPendingPayout,
+  type WorldPvpSavedPayout,
+} from './world_pvp_payouts';
+import {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
   WORLD_PVP_DR_WINDOW_SECONDS,
+  WORLD_PVP_FORFEIT_PAYOUT_SECONDS,
   WORLD_PVP_KILL_HONOR,
   WORLD_PVP_MIN_LEVEL,
   type WorldPvpZonePolicy,
@@ -78,6 +87,10 @@ export interface WorldPvpMetaState {
   /** Sim time of the last accepted raise/lower/cancel: the toggle cooldown
    *  (WORLD_PVP_TOGGLE_COOLDOWN) reads it. Session-only, never persisted. */
   changedAt?: number;
+  /** Gold owed to this character from fights their opponents forfeited by
+   *  leaving the world, each share paid when its countdown runs out
+   *  (world_pvp_payouts.ts). Absent when nothing is owed. */
+  pending?: WorldPvpPendingPayout[];
 }
 
 /** The persisted shape (CharacterState.worldPvp). The countdown is stored as
@@ -88,6 +101,7 @@ export interface WorldPvpSavedState {
   disarmRemaining?: number;
   kills?: number;
   deaths?: number;
+  pending?: WorldPvpSavedPayout[];
 }
 
 /** One contributor's kills of one victim inside the current DR window. */
@@ -132,6 +146,13 @@ export interface WorldPvpBooks {
    *  first tick, so a player is told about their ground at once. */
   zonePassTick: number;
   sweptAtTick: number;
+  /** The earliest held forfeit share (sim time), Infinity when nothing is
+   *  owed: the payout pass is skipped until then (world_pvp_payouts.ts). */
+  nextPayoutAt: number;
+  /** The pid whose death is being resolved as a FORFEIT right now (set only
+   *  for the duration of world_pvp_forfeit.ts's death call), so the death
+   *  hook holds the gold instead of paying it on the spot. */
+  forfeitVictim: number | null;
 }
 
 export function newWorldPvpBooks(): WorldPvpBooks {
@@ -144,6 +165,8 @@ export function newWorldPvpBooks(): WorldPvpBooks {
     nextDisarmAt: Number.POSITIVE_INFINITY,
     zonePassTick: Number.NEGATIVE_INFINITY,
     sweptAtTick: 0,
+    nextPayoutAt: Number.POSITIVE_INFINITY,
+    forfeitVictim: null,
   };
 }
 
@@ -368,6 +391,7 @@ export function updateWorldPvp(ctx: SimContext): void {
     }
     books.nextDisarmAt = next;
   }
+  if (ctx.time >= books.nextPayoutAt) payDueWorldPvpPayouts(ctx);
   if (ctx.tickCount - books.zonePassTick >= ZONE_PASS_TICKS) {
     books.zonePassTick = ctx.tickCount;
     // WARFARE Vitality rides this pass but not the world switch: battlegrounds
@@ -601,6 +625,14 @@ export function worldPvpKillLine(victimName: string, copper: number, contributor
   return `You defeat ${victimName} and take ${money} from their purse (split ${contributors} ways).`;
 }
 
+/** What one paid contributor is told when the victim forfeited the fight by
+ *  leaving the world: the kill now, the gold (if any) in WORLD_PVP_FORFEIT_PAYOUT_SECONDS. */
+export function worldPvpForfeitKillLine(victimName: string, copper: number): string {
+  if (copper <= 0) return `${victimName} left the fight and is defeated.`;
+  const minutes = Math.round(WORLD_PVP_FORFEIT_PAYOUT_SECONDS / 60);
+  return `${victimName} left the fight and is defeated: ${formatMoney(copper)} from their purse reaches you in ${minutes} minutes.`;
+}
+
 /** What the victim is told: the blow alone, the blow and one other, or the blow
  *  and N others (three shapes, so the plural never reads "1 others"). */
 export function worldPvpDefeatLine(
@@ -684,6 +716,9 @@ export function worldPvpOnPlayerDeath(
   }
   const gold = worldPvpSplit(victim.pvpFlag ? worldPvpStake(victimMeta.copper) : 0, n);
   const honor = worldPvpSplit(WORLD_PVP_KILL_HONOR, n);
+  // A forfeit (the victim left the world mid-fight, world_pvp_forfeit.ts) pays
+  // the honor and the record now and holds the gold for the payout delay.
+  const forfeit = books.forfeitVictim === victim.id;
   let taken = 0;
   for (const c of contributors) {
     const isKiller = c.e.id === killerPlayer.id;
@@ -693,9 +728,19 @@ export function worldPvpOnPlayerDeath(
     const honorShare = Math.floor((honor.share + (isKiller ? honor.killerBonus : 0)) * c.mult);
     notePairKill(ctx, c.meta, victimMeta);
     ensureState(c.meta).kills++;
-    c.meta.copper += goldShare;
+    if (forfeit) {
+      queueWorldPvpPayout(ctx, c.meta, goldShare, victim.name, WORLD_PVP_FORFEIT_PAYOUT_SECONDS);
+    } else {
+      c.meta.copper += goldShare;
+    }
     taken += goldShare;
-    notice(ctx, c.e.id, worldPvpKillLine(victim.name, goldShare, n));
+    notice(
+      ctx,
+      c.e.id,
+      forfeit
+        ? worldPvpForfeitKillLine(victim.name, goldShare)
+        : worldPvpKillLine(victim.name, goldShare, n),
+    );
     grantHonor(ctx, c.meta, honorShare, isKiller ? 'world_kill' : 'world_assist');
   }
   victimMeta.copper = Math.max(0, victimMeta.copper - taken);
@@ -731,13 +776,15 @@ export function worldPvpInfoFor(
 export function savedWorldPvpState(meta: PlayerMeta, now: number): WorldPvpSavedState | undefined {
   const state = meta.worldPvp;
   if (!state) return undefined;
-  if (!state.flagged && state.kills === 0 && state.deaths === 0) return undefined;
+  const pending = savedWorldPvpPayouts(state.pending, now);
+  if (!state.flagged && state.kills === 0 && state.deaths === 0 && !pending) return undefined;
   const remaining = worldPvpDisarmRemaining(meta, now);
   return {
     flagged: state.flagged,
     ...(remaining !== null ? { disarmRemaining: remaining } : {}),
     ...(state.kills > 0 ? { kills: state.kills } : {}),
     ...(state.deaths > 0 ? { deaths: state.deaths } : {}),
+    ...(pending ? { pending } : {}),
   };
 }
 
@@ -772,7 +819,10 @@ export function loadWorldPvpState(
     record.flagged === true && e.level >= WORLD_PVP_MIN_LEVEL && !ctx.worldPvpDisabled;
   const kills = nonNegativeInt(record.kills);
   const deaths = nonNegativeInt(record.deaths);
-  if (!flagged && kills === 0 && deaths === 0) return;
+  // Held forfeit gold is owed whatever the flag now says: it loads on a
+  // lowered, under-level or kill-switched character too.
+  const pending = loadWorldPvpPayouts(record.pending, ctx.time);
+  if (!flagged && kills === 0 && deaths === 0 && pending.length === 0) return;
   const remaining =
     flagged && typeof record.disarmRemaining === 'number' && Number.isFinite(record.disarmRemaining)
       ? Math.max(0, record.disarmRemaining)
@@ -780,8 +830,10 @@ export function loadWorldPvpState(
   const disarmAt = remaining === null ? null : ctx.time + remaining;
   meta.worldPvp = { flagged, disarmAt, kills, deaths };
   e.pvpFlag = flagged;
-  if (disarmAt !== null) {
-    const books = ctx.worldPvpBooks;
-    books.nextDisarmAt = Math.min(books.nextDisarmAt, disarmAt);
+  const books = ctx.worldPvpBooks;
+  if (disarmAt !== null) books.nextDisarmAt = Math.min(books.nextDisarmAt, disarmAt);
+  if (pending.length > 0) {
+    meta.worldPvp.pending = pending;
+    for (const row of pending) books.nextPayoutAt = Math.min(books.nextPayoutAt, row.dueAt);
   }
 }

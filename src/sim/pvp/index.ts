@@ -130,6 +130,7 @@ export {
   type WorldPvpSavedState,
   worldPvpDefeatLine,
   worldPvpDisarmRemaining,
+  worldPvpForfeitKillLine,
   worldPvpInfoFor,
   worldPvpKillLine,
   worldPvpOnOwnedPetDamaged,
@@ -138,10 +139,22 @@ export {
   worldPvpOnPlayerDeath,
   worldPvpPairRepeats,
 } from './world_pvp';
+export { forfeitWorldPvpFightOnDeparture, worldPvpFightOpponent } from './world_pvp_forfeit';
+export {
+  loadWorldPvpPayouts,
+  payDueWorldPvpPayouts,
+  queueWorldPvpPayout,
+  savedWorldPvpPayouts,
+  WORLD_PVP_PENDING_PAYOUT_LIMIT,
+  type WorldPvpPendingPayout,
+  type WorldPvpSavedPayout,
+  worldPvpForfeitPayoutLine,
+} from './world_pvp_payouts';
 export {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
   WORLD_PVP_DR_WINDOW_SECONDS,
+  WORLD_PVP_FORFEIT_PAYOUT_SECONDS,
   WORLD_PVP_GREY_LEVEL_GAP,
   WORLD_PVP_KILL_HONOR,
   WORLD_PVP_MIN_LEVEL,

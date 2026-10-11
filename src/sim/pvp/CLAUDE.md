@@ -98,6 +98,22 @@ ratings.
   income"; tests: `tests/world_pvp.test.ts`, `tests/world_pvp_rules.test.ts`,
   `tests/world_pvp_zones.test.ts`, `tests/world_pvp_server_dispatch.test.ts`,
   and the matcher round trip in `tests/world_pvp_view.test.ts`.
+- `world_pvp_forfeit.ts` owns the departure forfeit: `worldPvpFightOpponent`
+  (the most recent live, world-hostile enemy who hit the player inside the
+  assist window, else the one they hit) and `forfeitWorldPvpFightOnDeparture`,
+  which the SERVER calls from `socketClosed` and from `leave()` (every logout,
+  kick and takeover; skipped for an escrow-quarantined session that can no
+  longer save), via `server/world_pvp_departure.ts`; the offline Sim and the
+  RL env have no departure to judge. It kills the leaver through `ctx.handleDeath` with
+  `WorldPvpBooks.forfeitVictim` set, so `worldPvpOnPlayerDeath` resolves the
+  kill by its usual rules but HOLDS each gold share instead of paying it.
+  `world_pvp_payouts.ts` owns the held shares (`WorldPvpMetaState.pending` on
+  the WINNER, persisted as remaining seconds, capped at
+  `WORLD_PVP_PENDING_PAYOUT_LIMIT` on load) and the due pass `updateWorldPvp`
+  runs behind the `nextPayoutAt` watermark. Delay: `WORLD_PVP_FORFEIT_PAYOUT_SECONDS`
+  in `world_pvp_rules.ts`. Lines: `worldPvpForfeitKillLine`,
+  `worldPvpForfeitPayoutLine` (matcher rows in `src/ui/sim_i18n.ts`). Tests:
+  `tests/world_pvp_forfeit.test.ts`, `tests/world_pvp_departure.test.ts`.
 - `warfare_quartermaster.ts` spawns Warmarshal Draven Kole, the Highwatch
   WARFARE honor vendor, under his RESERVED entity id
   (`WARFARE_QUARTERMASTER_ENTITY_ID`, `1_000_000_002`, the singleton band
