@@ -1,7 +1,7 @@
 # Shadow Priest: Tithe Bomb
 
-Core mechanics and the dedicated giant-bomb world effect are implemented. The spell icon
-still uses its explicitly parked procedural identity.
+Core mechanics and the dedicated giant-bomb world effect are implemented. Tithe Bomb
+and Void Rupture have painted icons with procedural fallback identities.
 This implementation includes the Vampiric Touch dependency from PR #4402 on the latest
 OSSBrain v0.45.0 release base.
 

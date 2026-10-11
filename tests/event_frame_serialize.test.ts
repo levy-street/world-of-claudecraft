@@ -206,9 +206,6 @@ describe('routeEvents frame bytes and session mutations', () => {
     watcher.spectating = {
       characterId: subject.characterId,
       name: 'Subject',
-      savedPos: { ...entityPos(server, watcher.pid) },
-      priorGm: false,
-      stowedPet: null,
     };
     fWatcher.sent.length = 0;
     fSubject.sent.length = 0;
@@ -251,9 +248,6 @@ describe('routeEvents frame bytes and session mutations', () => {
     spec.spectating = {
       characterId: owner.characterId,
       name: 'Owner',
-      savedPos: { ...entityPos(server, spec.pid) },
-      priorGm: false,
-      stowedPet: null,
     };
     owner.selfHeavyDirty = false;
     spec.selfHeavyDirty = false;
@@ -508,9 +502,6 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
     watcher.spectating = {
       characterId: subject.characterId,
       name: 'Subject',
-      savedPos: { ...entityPos(server, watcher.pid) },
-      priorGm: false,
-      stowedPet: null,
     };
     const spy = vi.spyOn(botDetectorOf(server), 'observeEvent');
 
@@ -802,9 +793,6 @@ describe('routeEvents selection guards', () => {
     watcher.spectating = {
       characterId: target.characterId,
       name: 'Target',
-      savedPos: { ...entityPos(server, watcher.pid) },
-      priorGm: false,
-      stowedPet: null,
     };
     fWatcher.sent.length = 0;
     fTarget.sent.length = 0;
@@ -857,9 +845,6 @@ describe('routeEvents selection guards', () => {
     watcher.spectating = {
       characterId: target.characterId,
       name: 'Target',
-      savedPos: { ...entityPos(server, watcher.pid) },
-      priorGm: false,
-      stowedPet: null,
     };
     fWatcher.sent.length = 0;
 

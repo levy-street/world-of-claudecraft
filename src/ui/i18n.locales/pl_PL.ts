@@ -500,7 +500,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Frakcje',
   'hudChrome.currencies.heroicMarkNote': 'Lochowiska heroiczne. Wydaj w kwatermistrzu heroicznym',
   'hudChrome.currencies.honor': 'Honor',
-  'hudChrome.currencies.honorNote': 'Pola Bitwy i Arena',
+  'hudChrome.currencies.honorNote': 'Pola Bitwy, Arena i zadania światowe',
   'hudChrome.currencies.intro':
     'Żadne z nich nie zajmuje miejsca w plecaku. Monety zostają w plecaku jak zawsze.',
   'hudChrome.currencies.lifetime': 'Całkowicie {amount}',
@@ -1870,7 +1870,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ogłoś wzgórze teraz; podniesie się po pełnym ostrzeżeniu.',
   'devCommand.actions.hillwarn.label': 'Odliczanie wzgórza',
   'entities.abilities.lava_burst.description':
-    'Zadaj {damage} obrażeń ogniowych. Zawsze krytycznie trafia cel palący się z Twojego Żarowego Wstrząsu. Przypływ Magmy: każdy Żarowy Wstrząs ma 20% szansy na zresetowanie tej regeneracji i sprawienie, że Twoja następna Fala Magmy w ciągu 10 sek będzie natychmiastowa. Obrażenia rosną wraz z Mocą Zaklęć.',
+    'Zadaj {damage} obrażeń ogniowych. Trafienie daje 1 Grom. Zawsze krytycznie trafia cel palący się z Twojego Żarowego Wstrząsu. Trafienie krytyczne zadaje dodatkowo 24% zwykłych obrażeń. Przypływ Magmy: każdy Żarowy Wstrząs ma 20% szansy na zresetowanie tej regeneracji i sprawienie, że Twoja następna Fala Magmy w ciągu 10 sek będzie natychmiastowa. Obrażenia rosną wraz z Mocą Zaklęć.',
   'entities.abilities.lava_burst.name': 'Fala Magmy',
   'entities.abilities.lightning_overload.description':
     'Pasywne: Łukowy pocisk i Rozgałęziona Błyskawica mają 20% szansy na Przeładowanie, ponownie trafiając cel pierwszy za 50% zadanych obrażeń i przyznając 1 Grzmot.',
@@ -7988,7 +7988,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Sprowadza wybuch płomieni na wybrany obszar, zadając {damage} obrażeń od ognia wrogom w zasięgu eksplozji.',
   'entities.abilities.flame_shock.description':
-    'Zadaje {damage} obrażeń od ognia, a następnie {overTime} obrażeń od ognia przez 12 s. Pierwsze trafienie rośnie z mocą zaklęć.',
+    'Zadaje {damage} obrażeń od ognia, a następnie {overTime} obrażeń od ognia przez {duration} s. Pierwsze trafienie rośnie z mocą zaklęć.',
   'entities.abilities.flame_shock.name': 'Żarowy wstrząs',
   'entities.abilities.flametongue_weapon.description':
     'Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń od ognia.',
@@ -16157,7 +16157,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Pasywna: gdy Uderzenie Przodków jest w odnowieniu, zużycie Znaku Burzy ma 25% szans je zresetować. Jeśli pierwsze 3 szanse zawiodą, 4. zawsze je resetuje. (Duch Wojny)',
   'entities.abilities.thunder_reservoir.description':
-    'Pasywna: Łukowy pocisk i Rozgałęziona Błyskawica przyznają Grom, do 5. Przy 5 Gromach Ziemny wstrząs zadaje o 125% więcej obrażeń albo Trzęsienie ziemi o 100% więcej, a następnie zużywa cały Grom. (Wezwanie Gromu)',
+    'Pasywna: Łukowy pocisk, Rozgałęziona Błyskawica i Fala Magmy przyznają Grom, do 5. Przy 5 Gromach Ziemny wstrząs zadaje o 125% więcej obrażeń albo Trzęsienie ziemi o 100% więcej, a następnie zużywa cały Grom. (Wezwanie Gromu)',
   'entities.abilities.tidecall.description':
     'Leczy przyjazny cel za {damage}. Leczenie rośnie wraz z mocą zaklęć. Dodaje pełne leczenie sprzed nadleczenia do Nurtu Cerowania, do 30% maksymalnego zdrowia celu.',
   'entities.abilities.unleash_weapon.description':

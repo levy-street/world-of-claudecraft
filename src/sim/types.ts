@@ -134,7 +134,10 @@ export type HonorReason =
   | 'world_assist'
   // King of the Hill (pvp/hill.ts): the once-a-minute trickle to a holder
   // standing inside the circle.
-  | 'hill_hold';
+  | 'hill_hold'
+  // The day's Honor world quests (src/sim/world_quest_honor_slots.ts): two
+  // rotating world quests per realm cycle pay a flat Honor bonus on completion.
+  | 'world_quest';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
@@ -772,8 +775,9 @@ export interface Aura {
   // effect kind, so only one flask ever rides at a time), the downward-refusal
   // guard (a same-family elixir or scroll is refused rather than allowed to
   // overwrite a flask), and death persistence (aurasSurvivingDeath in
-  // ./resurrection.ts keeps it). DEATH only: auras are session state and are
-  // not persisted, so a flask does not survive a logout or a restart. The
+  // ./resurrection.ts keeps it). A flask also persists through a logout or a
+  // restart like every other consumable buff (./aura_persist.ts, which keeps
+  // this marker and the undispellable stamp on the saved record). The
   // elixir/scroll sources of the same aura id never set it, so a plain elixir
   // stays mortal and stays outside the singleton. The mint also stamps
   // `undispellable` BESIDE this marker (the phase 10 QA STK-2 ruling; see
@@ -5867,6 +5871,12 @@ export interface Entity extends ClientMirroredEntityFields {
   pvpFlag?: boolean;
   /** Host-only disconnect grace marker; absent for offline/headless players. Never persisted. */
   pvpRewardsPaused?: boolean;
+  /** World PvP bounty (src/sim/pvp/world_pvp_bounty.ts): this player's kill
+   *  streak earned a bounty, so every client paints their whole name tag blood
+   *  red. The DISPLAY mirror of PlayerMeta.worldPvp.bounty, written only by
+   *  that module, and it rides the entity wire (`bty`). Absent/false is no
+   *  bounty, so a character without one samples and serializes as before. */
+  bounty?: boolean;
   /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
    *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
    *  gear's health bonus never reaches raid content. Absent means the open

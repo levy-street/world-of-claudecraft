@@ -56,13 +56,26 @@ export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new S
   'aura_mastery',
 ]);
 
+// The caster of a buff restored from a save (aura_persist.ts) when that caster
+// was someone other than the wearer: entity ids are boot-local, so the original
+// caster cannot be named. 0 is never a live entity id (Sim.nextId starts at 1),
+// and isOwnAura already reads it as "unattributed". Any same-id application
+// replaces such a copy, so a relog can never let one buff stack twice.
+export const RESTORED_AURA_SOURCE_ID = 0;
+
 export function auraReplacementConflicts(auras: readonly Aura[], aura: Aura): number[] {
   const replaceAcrossSources = SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS.has(aura.id);
   const out: number[] = [];
   for (let i = auras.length - 1; i >= 0; i--) {
     const existing = auras[i];
     if (existing.id !== aura.id) continue;
-    if (replaceAcrossSources || existing.sourceId === aura.sourceId) out.push(i);
+    if (
+      replaceAcrossSources ||
+      existing.sourceId === aura.sourceId ||
+      existing.sourceId === RESTORED_AURA_SOURCE_ID
+    ) {
+      out.push(i);
+    }
   }
   return out;
 }

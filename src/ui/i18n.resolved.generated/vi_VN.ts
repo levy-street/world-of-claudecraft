@@ -583,7 +583,7 @@ export const vi_VN: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const vi_VN: EnTranslations = {
         "battlegroundAssist": "hỗ trợ đòn hạ gục",
         "worldKill": "tiêu diệt thế giới",
         "worldAssist": "hỗ trợ tiêu diệt thế giới",
-        "hillHold": "giữ đồi"
+        "hillHold": "giữ đồi",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Hạ Gục",
@@ -2951,7 +2952,7 @@ export const vi_VN: EnTranslations = {
       "delveMark": "Dấu Khai Quật",
       "wocToken": "Token WoC",
       "heroicMarkNote": "Hầm Ngục Anh Hùng - tiêu tại quản lý hậu cần Anh Hùng",
-      "honorNote": "Chiến Trường và Đấu Trường",
+      "honorNote": "Chiến Trường, Đấu Trường và Nhiệm Vụ Thế Giới",
       "delveMarkNote": "Các khai quật đã hoàn thành",
       "wocTokenNote": "Số dư ví được liên kết",
       "walletNotLinked": "Không có ví nào được liên kết",
@@ -4246,6 +4247,7 @@ export const vi_VN: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "VắngMặt",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Kẻ Gian Lận >",
       "pledgeTag": "Trung Thành Với {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const vi_VN: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Bể Sấm",
-        "description": "Bị động: Tia Hồ Quang và Sét Rẽ Nhánh ban Sấm, tối đa 5. Ở 5 Sấm, Địa Giật gây thêm 125% sát thương hoặc Động Đất gây thêm 100%, rồi tiêu hết Sấm. (Gọi Sấm)"
+        "description": "Bị động: Tia Hồ Quang, Sét Rẽ Nhánh và Magma Burst ban Sấm, tối đa 5. Ở 5 Sấm, Địa Giật gây thêm 125% sát thương hoặc Động Đất gây thêm 100%, rồi tiêu hết Sấm. (Gọi Sấm)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13861,7 +13863,7 @@ export const vi_VN: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Gây {damage} sát thương Lửa. Luôn đánh bại một lần quan trọng một mục tiêu cháy với Giật Tàn Lửa của bạn. Magma Surge: mỗi khắc Giật Tàn Lửa có cơ hội 20% để đặt lại cooldown này và làm cho Magma Burst tiếp theo của bạn trong vòng 10 giây tức thời. Sát thương tăng với Sức Mạnh Phép. (Thundercall)"
+        "description": "Gây {damage} sát thương Lửa. Một cú trúng ban 1 Sấm. Luôn đánh bại một lần quan trọng một mục tiêu cháy với Giật Tàn Lửa của bạn. Đòn chí mạng gây thêm 24% sát thương thông thường. Magma Surge: mỗi khắc Giật Tàn Lửa có cơ hội 20% để đặt lại cooldown này và làm cho Magma Burst tiếp theo của bạn trong vòng 10 giây tức thời. Sát thương tăng với Sức Mạnh Phép. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13885,7 +13887,7 @@ export const vi_VN: EnTranslations = {
       },
       "flame_shock": {
         "name": "Giật Tàn Lửa",
-        "description": "Gây {damage} sát thương Hỏa, rồi {overTime} sát thương Hỏa trong 12 giây. Cú trúng đầu tiên tăng theo Sức Mạnh Phép Thuật."
+        "description": "Gây {damage} sát thương Hỏa, rồi {overTime} sát thương Hỏa trong {duration} giây. Cú trúng đầu tiên tăng theo Sức Mạnh Phép Thuật."
       },
       "flametongue_weapon": {
         "name": "Vũ Khí Khắc Hỏa",

@@ -154,6 +154,21 @@ export {
   worldPvpPairRepeats,
 } from './world_pvp';
 export {
+  hasWorldPvpBounty,
+  WORLD_PVP_BOUNTY_EARNED_LINE,
+  WORLD_PVP_BOUNTY_LAPSED_LINE,
+  worldPvpBountyCollectedLine,
+  worldPvpBountyPlacedLine,
+} from './world_pvp_bounty';
+export {
+  WORLD_PVP_BOUNTY_HOLDER_DR,
+  WORLD_PVP_BOUNTY_KILL_HONOR_MULT,
+  WORLD_PVP_BOUNTY_STREAK,
+  worldPvpBountyHolderMultiplier,
+  worldPvpKillHonorPool,
+  worldPvpStreakEarnsBounty,
+} from './world_pvp_bounty_rules';
+export {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
   WORLD_PVP_DR_WINDOW_SECONDS,

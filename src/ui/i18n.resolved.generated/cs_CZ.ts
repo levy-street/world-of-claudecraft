@@ -583,7 +583,7 @@ export const cs_CZ: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const cs_CZ: EnTranslations = {
         "battlegroundAssist": "asistence u zabití",
         "worldKill": "světové zabití",
         "worldAssist": "asistence u světového zabití",
-        "hillHold": "držení kopce"
+        "hillHold": "držení kopce",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Zabití",
@@ -2951,7 +2952,7 @@ export const cs_CZ: EnTranslations = {
       "delveMark": "Výpravní žeton",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Hrdinské dungeony . utrácej u hrdinského intendanta",
-      "honorNote": "Bitevní pole a aréna",
+      "honorNote": "Bitevní pole, aréna a světové úkoly",
       "delveMarkNote": "Dokončené výpravy",
       "wocTokenNote": "Zůstatek propojené peněženky",
       "walletNotLinked": "Žádná propojená peněženka",
@@ -4246,6 +4247,7 @@ export const cs_CZ: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "PRYČ",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Podvodník >",
       "pledgeTag": "Přísaha cechu {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const cs_CZ: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Zásobárna hromu",
-        "description": "Pasivní: Bleskový šíp a Rozvětvený blesk udělují Hrom, až do 5. Při 5 Hromech způsobí Zemní otřes o 125% větší poškození nebo Zemětřesení o 100% větší a poté spotřebuje veškerý Hrom. (Volání hromu)"
+        "description": "Pasivní: Bleskový šíp, Rozvětvený blesk a Magma Burst udělují Hrom, až do 5. Při 5 Hromech způsobí Zemní otřes o 125% větší poškození nebo Zemětřesení o 100% větší a poté spotřebuje veškerý Hrom. (Volání hromu)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13861,7 +13863,7 @@ export const cs_CZ: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Způsobí {damage} ohnivého poškození. Vždy kriticky zasáhne cíl hořící tvým Škvárovým otřesem. Nával magmatu: každý tik Škvárového otřesu má 20% šanci obnovit tento čas obnovy a udělat tvůj příští Magmatový výbuch během 10 s okamžitým. Poškození roste se silou kouzel. (Volání hromu)"
+        "description": "Způsobí {damage} ohnivého poškození. Zásah udělí 1 Hrom. Vždy kriticky zasáhne cíl hořící tvým Škvárovým otřesem. Kritický zásah způsobí navíc 24% běžného poškození. Nával magmatu: každý tik Škvárového otřesu má 20% šanci obnovit tento čas obnovy a udělat tvůj příští Magmatový výbuch během 10 s okamžitým. Poškození roste se silou kouzel. (Volání hromu)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13885,7 +13887,7 @@ export const cs_CZ: EnTranslations = {
       },
       "flame_shock": {
         "name": "Škvárový otřes",
-        "description": "Způsobí {damage} ohnivého poškození, poté {overTime} ohnivého poškození během 12 s. První zásah roste se silou kouzel."
+        "description": "Způsobí {damage} ohnivého poškození, poté {overTime} ohnivého poškození během {duration} s. První zásah roste se silou kouzel."
       },
       "flametongue_weapon": {
         "name": "Zbraň žárové značky",

@@ -508,7 +508,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.heroicMarkNote':
     'Heroïsche kerkers . besteed bij de heroïsche kwartiermeester',
   'hudChrome.currencies.honor': 'Eer',
-  'hudChrome.currencies.honorNote': 'Slagvelden en de arena',
+  'hudChrome.currencies.honorNote': 'Slagvelden, de arena en wereldquests',
   'hudChrome.currencies.intro':
     'Geen van deze nemen rugzakruimte in beslag. Munten blijven altijd in je rugzak.',
   'hudChrome.currencies.lifetime': 'Totaal {amount}',
@@ -1873,7 +1873,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Kondig nu een heuvel aan; zij rijst na de volledige waarschuwing.',
   'devCommand.actions.hillwarn.label': 'Heuvelaftelling',
   'entities.abilities.lava_burst.description':
-    'Veroorzaak {damage} Vuurschade. Slaat altijd kritiek toe op doelen die branden van jouw Sintelschok. Magmastroom: elke Sintelschok-slag heeft 20% kans dit afkoelingseffect opnieuw in te stellen en je volgende Magma Burst binnen 10 sec onmiddellijk uit te voeren. Schade neemt toe met Spreukenkracht. (Donderoproep)',
+    'Veroorzaak {damage} Vuurschade. Een treffer verleent 1 Donder. Slaat altijd kritiek toe op doelen die branden van jouw Sintelschok. Een kritieke treffer doet 24% van de normale schade extra. Magmastroom: elke Sintelschok-slag heeft 20% kans dit afkoelingseffect opnieuw in te stellen en je volgende Magma Burst binnen 10 sec onmiddellijk uit te voeren. Schade neemt toe met Spreukenkracht. (Donderoproep)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     'Passief: Boogbliksem en Gevorkte bliksem hebben 20% kans om Overbelast te raken, wat hun eerste doel opnieuw aanvalt voor 50% van de schade en geeft je 1 Donder. (Donderoproep)',
@@ -8056,7 +8056,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Roept een vuurexplosie op in het doelgebied die vijanden in de explosie {damage} Vuurschade toebrengt.',
   'entities.abilities.flame_shock.description':
-    'Brengt {damage} Vuurschade toe, daarna in 12 sec {overTime} Vuurschade. De eerste treffer stijgt met de Spreukkracht.',
+    'Brengt {damage} Vuurschade toe, daarna in {duration} sec {overTime} Vuurschade. De eerste treffer stijgt met de Spreukkracht.',
   'entities.abilities.flame_shock.name': 'Sintelschok',
   'entities.abilities.flametongue_weapon.description':
     'Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra Vuurschade toe.',
@@ -15921,7 +15921,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passief: terwijl de Voorouderslag afkoelt, heeft het verbruiken van een Stormteken 25% kans om hem te herstellen. Als de eerste 3 kansen mislukken, herstelt de 4e hem altijd. (Krijgsgeest)',
   'entities.abilities.thunder_reservoir.description':
-    'Passief: de Boogbliksem en de Gevorkte bliksem verlenen Donder, tot 5. Bij 5 Donder richt de Aardse Schok 125% meer schade aan of de Aardbeving 100% meer, en dan wordt alle Donder verbruikt. (Donderroep)',
+    'Passief: de Boogbliksem, de Gevorkte bliksem en Magma Burst verlenen Donder, tot 5. Bij 5 Donder richt de Aardse Schok 125% meer schade aan of de Aardbeving 100% meer, en dan wordt alle Donder verbruikt. (Donderroep)',
   'entities.abilities.tidecall.description':
     'Geneest een bevriend doelwit voor {damage}. De genezing neemt toe met spreukkracht. Voegt de volledige genezing vóór overgenezing toe aan de Herstelstroom, tot 30% van de maximale gezondheid van het doelwit.',
   'entities.abilities.unleash_weapon.description':

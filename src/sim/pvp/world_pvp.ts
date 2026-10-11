@@ -48,13 +48,20 @@ import type { Entity } from '../types';
 import { TICK_RATE } from '../types';
 import { grantHonor } from './honor';
 import { updatePvpVitality } from './vitality';
+import {
+  announceWorldPvpBountyCollected,
+  clearWorldPvpBounty,
+  hasWorldPvpBounty,
+  noteWorldPvpStreakKill,
+  noticeWorldPvpBountyLapsed,
+} from './world_pvp_bounty';
+import { worldPvpBountyHolderMultiplier, worldPvpKillHonorPool } from './world_pvp_bounty_rules';
 import { updateWorldPvpRewards, worldPvpRewardPause } from './world_pvp_rewards';
 import { sanitizeWorldPvpRewardTicks } from './world_pvp_rewards_rules';
 import {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
   WORLD_PVP_DR_WINDOW_SECONDS,
-  WORLD_PVP_KILL_HONOR,
   WORLD_PVP_MIN_LEVEL,
   type WorldPvpZonePolicy,
   worldPvpGroupEarns,
@@ -87,6 +94,11 @@ export interface WorldPvpMetaState {
   /** Sim time of the last accepted raise/lower/cancel: the toggle cooldown
    *  (WORLD_PVP_TOGGLE_COOLDOWN) reads it. Session-only, never persisted. */
   changedAt?: number;
+  /** Paid world kills in a row while flagged, since the last death or flag
+   *  drop, and whether that streak earned a bounty (world_pvp_bounty.ts).
+   *  Session-only, never persisted; absent until the first counted kill. */
+  streak?: number;
+  bounty?: boolean;
 }
 
 /** The persisted shape (CharacterState.worldPvp). The countdown is stored as
@@ -407,6 +419,9 @@ export function updateWorldPvp(ctx: SimContext): void {
       state.disarmAt = null;
       e.pvpFlag = false;
       notice(ctx, meta.entityId, 'World PvP disabled.');
+      // A bounty is worn under the flag: lowering it ends the streak too, so
+      // a holder can never step out of reach and keep the better curve.
+      if (clearWorldPvpBounty(state, e)) noticeWorldPvpBountyLapsed(ctx, meta.entityId);
     }
     books.nextDisarmAt = next;
   }
@@ -644,7 +659,10 @@ function notePairKill(ctx: SimContext, contributor: PlayerMeta, victim: PlayerMe
 interface Contributor {
   e: Entity;
   meta: PlayerMeta;
+  /** The ordinary per-pair multiplier: gold always, honor for a non-holder. */
   mult: number;
+  /** The honor multiplier: the bounty curve for a holder, else `mult`. */
+  honorMult: number;
 }
 
 /** What one paid contributor is told. Exported for the client matcher tests. */
@@ -698,14 +716,23 @@ export function worldPvpOnPlayerDeath(
   const helpers = books.recentDamage.get(victim.id);
   books.recentDamage.delete(victim.id);
   books.recentSupport.delete(victim.id);
-  if (books.paidDeaths.has(victim.id)) return;
   const victimMeta = ctx.players.get(victim.id);
   if (!victimMeta) return;
+  // Any death ends the victim's streak and bounty (owner spec), whoever or
+  // whatever landed the blow. Read before the payout: a bounty standing at the
+  // moment of death doubles the pool below.
+  const victimHadBounty = clearWorldPvpBounty(victimMeta.worldPvp, victim);
   const killerPlayer = controllerOf(ctx, killer);
-  if (!killerPlayer || !isWorldPvpHostile(ctx, killerPlayer, victim)) return;
+  if (
+    books.paidDeaths.has(victim.id) ||
+    !killerPlayer ||
+    !isWorldPvpHostile(ctx, killerPlayer, victim)
+  ) {
+    if (victimHadBounty) noticeWorldPvpBountyLapsed(ctx, victim.id);
+    return;
+  }
   books.paidDeaths.add(victim.id);
   ensureState(victimMeta).deaths++;
-
   const contributors: Contributor[] = [];
   const seen = new Set<number>();
   const fresh = (at: number) => ctx.time - at <= WORLD_PVP_ASSIST_WINDOW;
@@ -716,9 +743,15 @@ export function worldPvpOnPlayerDeath(
     if (!r || !isWorldPvpHostile(ctx, r.e, victim)) return;
     if (!worldPvpGroupEarns(ctx.partyOf(pid))) return;
     if (worldPvpVictimIsGrey(r.e.level, victim.level)) return;
-    const mult = worldPvpPairMultiplier(worldPvpPairRepeats(ctx, r.meta, victimMeta));
+    const repeats = worldPvpPairRepeats(ctx, r.meta, victimMeta);
+    const mult = worldPvpPairMultiplier(repeats);
     if (mult <= 0) return;
-    contributors.push({ e: r.e, meta: r.meta, mult });
+    // A bounty holder's honor rides the bounty curve; gold stays on the
+    // ordinary one, so a bounty never raises what a victim's purse pays.
+    const honorMult = hasWorldPvpBounty(r.meta.worldPvp)
+      ? worldPvpBountyHolderMultiplier(repeats)
+      : mult;
+    contributors.push({ e: r.e, meta: r.meta, mult, honorMult });
   };
   consider(killerPlayer.id);
   if (helpers) {
@@ -733,23 +766,30 @@ export function worldPvpOnPlayerDeath(
 
   const n = contributors.length;
   if (n === 0) {
+    // Nobody earned anything (a raid, a grey or a fully decayed kill), so
+    // nobody collected the bounty either: it simply lapsed with the death.
+    if (victimHadBounty) noticeWorldPvpBountyLapsed(ctx, victim.id);
     notice(ctx, victim.id, worldPvpDefeatLine(killerPlayer.name, 0, 1), DEFEATED_COLOR);
     // Still a kill for the feed: nobody earned (grey victim, fully decayed
     // pair, an oversized group), but the killing blow landed.
     emitKillFeed(ctx, killerPlayer, victim, 0, 0);
     return;
   }
+  // The killing blow is considered first, so it names the collector when it was
+  // paid; otherwise the first paid assist collected it.
+  if (victimHadBounty) announceWorldPvpBountyCollected(ctx, contributors[0].e.name, victim.name);
   const gold = worldPvpSplit(victim.pvpFlag ? worldPvpStake(victimMeta.copper) : 0, n);
-  const honor = worldPvpSplit(WORLD_PVP_KILL_HONOR, n);
+  const honor = worldPvpSplit(worldPvpKillHonorPool(victimHadBounty), n);
   let taken = 0;
   for (const c of contributors) {
     const isKiller = c.e.id === killerPlayer.id;
     const goldShare = c.e.pvpFlag
       ? Math.floor((gold.share + (isKiller ? gold.killerBonus : 0)) * c.mult)
       : 0;
-    const honorShare = Math.floor((honor.share + (isKiller ? honor.killerBonus : 0)) * c.mult);
+    const honorShare = Math.floor((honor.share + (isKiller ? honor.killerBonus : 0)) * c.honorMult);
     notePairKill(ctx, c.meta, victimMeta);
-    ensureState(c.meta).kills++;
+    const state = ensureState(c.meta);
+    state.kills++;
     taken += goldShare;
     if (isKiller && victim.pvpFlag && c.e.pvpFlag) {
       // Both flagged: the killing blow's share DROPS on the body beside the
@@ -762,6 +802,9 @@ export function worldPvpOnPlayerDeath(
       notice(ctx, c.e.id, worldPvpKillLine(victim.name, goldShare, n));
     }
     grantHonor(ctx, c.meta, honorShare, isKiller ? 'world_kill' : 'world_assist');
+    // Only a kill that actually paid builds a streak: a zero share (a large
+    // group's floored split, a decayed repeat) counts for nothing.
+    if (honorShare > 0 || goldShare > 0) noteWorldPvpStreakKill(ctx, c.e, state);
   }
   victimMeta.copper = Math.max(0, victimMeta.copper - taken);
   notice(ctx, victim.id, worldPvpDefeatLine(killerPlayer.name, taken, n), DEFEATED_COLOR);

@@ -583,7 +583,7 @@ export const sv_SE: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const sv_SE: EnTranslations = {
         "battlegroundAssist": "assisterat dödande slag",
         "worldKill": "världsdödande",
         "worldAssist": "världsdodade assisterad",
-        "hillHold": "håller berget"
+        "hillHold": "håller berget",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Dråp",
@@ -2951,7 +2952,7 @@ export const sv_SE: EnTranslations = {
       "delveMark": "Delve-märke",
       "wocToken": "WoC-token",
       "heroicMarkNote": "Heroiska dungeons . spenderas på heroisk kvartermästare",
-      "honorNote": "Slagfält och arena",
+      "honorNote": "Slagfält, arena och världsuppdrag",
       "delveMarkNote": "Genomförda grottvandringar",
       "wocTokenNote": "Kopplat plånbokssaldo",
       "walletNotLinked": "Ingen ansluten plånbok",
@@ -4246,6 +4247,7 @@ export const sv_SE: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "BV",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Fuskare >",
       "pledgeTag": "Trogen {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const sv_SE: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Åskreservoar",
-        "description": "Passiv: Bågblixten och Gaffelblixten ger Åska, upp till 5. Vid 5 Åska gör Jordstöten 125% mer skada eller Jordbävningen 100% mer, och sedan förbrukas all Åska. (Åskkallelse)"
+        "description": "Passiv: Bågblixten, Gaffelblixten och Magma Burst ger Åska, upp till 5. Vid 5 Åska gör Jordstöten 125% mer skada eller Jordbävningen 100% mer, och sedan förbrukas all Åska. (Åskkallelse)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13861,7 +13863,7 @@ export const sv_SE: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Orsakar {damage} eldskada. Träffar alltid kritiskt ett mål som brinner av din Glödstöt. Magma Surge: varje Glödstöt-tick har 20% chans att återställa denna nedräkning och göra din nästa Magma Burst inom 10 sec omedelbar. Skada ökar med Spellkraft. (Thundercall)"
+        "description": "Orsakar {damage} eldskada. En träff ger 1 Åska. Träffar alltid kritiskt ett mål som brinner av din Glödstöt. En kritisk träff gör ytterligare 24% av den normala skadan. Magma Surge: varje Glödstöt-tick har 20% chans att återställa denna nedräkning och göra din nästa Magma Burst inom 10 sec omedelbar. Skada ökar med Spellkraft. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13885,7 +13887,7 @@ export const sv_SE: EnTranslations = {
       },
       "flame_shock": {
         "name": "Glödstöt",
-        "description": "Vållar {damage} Eldskada, sedan {overTime} Eldskada under 12 sek. Den första träffen ökar med Besvärjelsekraft."
+        "description": "Vållar {damage} Eldskada, sedan {overTime} Eldskada under {duration} sek. Den första träffen ökar med Besvärjelsekraft."
       },
       "flametongue_weapon": {
         "name": "Pyrobrandsvapen",

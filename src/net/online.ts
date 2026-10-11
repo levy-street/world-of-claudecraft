@@ -213,6 +213,7 @@ import { pruneMissingEntities } from './despawn_grace';
 import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
 import { decodeEntityFlairWire } from './entity_flair_wire';
 import { reanchorDecision } from './entity_reanchor';
+import { applyEntityStatusWire } from './entity_status_wire';
 import { applyGroundTelegraphSnapshot } from './ground_telegraph_wire';
 import { GuildBankLogMirror } from './guild_bank_log_mirror';
 import { decodeGuildBoardPage, emptyGuildBoardPage, guildBoardPath } from './guild_board_wire';
@@ -2888,8 +2889,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.leaping = !!w.lp;
       applyFerryWire(e, w.fry, snap ? -1 : entAlpha); // a passenger's deck spot
-      e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
-      e.pvpFlag = !!w.pvp; // /pvp flag bit: nameplate + target-frame hostility colour
+      applyEntityStatusWire(e, w); // the /afk, /pvp and bounty display bits
       e.weaponStowed = !!w.ws;
       e.helmHidden = !!w.hh;
       e.aggroTargetId = w.aggro ?? null;

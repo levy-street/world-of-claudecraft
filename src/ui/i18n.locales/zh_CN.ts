@@ -726,6 +726,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': '窗口缩放',
   'hudChrome.meters.windowScaleDesc': '增大或减小统计窗口的整体缩放。',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': '悬赏',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': '遮挡渐隐',
@@ -753,6 +754,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.hillHold': '占据山丘',
   'hudChrome.warfare.reasons.worldAssist': '世界击杀助攻',
   'hudChrome.warfare.reasons.worldKill': '世界击杀',
+  'hudChrome.warfare.reasons.worldQuest': '世界任务',
   'hudChrome.warfareShop.groupEntry': '战争赛季 1',
   'hudChrome.warfareShop.groupSeason2': '战争赛季 2：先锋',
   'hudChrome.worldPvp.aidLine':
@@ -882,7 +884,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.hillwarn.description': '立即宣布山丘出现；倒计时结束后山丘升起。',
   'devCommand.actions.hillwarn.label': '山丘倒计时',
   'entities.abilities.lava_burst.description':
-    '造成{damage}点火焰伤害。对被你的余烬震击点燃的目标必定造成暴击。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）',
+    '造成{damage}点火焰伤害。命中可给予 1 点雷霆。对被你的余烬震击点燃的目标必定造成暴击。暴击时额外造成相当于普通伤害24%的伤害。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）',
   'entities.abilities.lava_burst.name': '岩浆爆发',
   'entities.abilities.lightning_overload.description':
     '被动：电弧箭和叉状闪电有20%几率触发超载，对其首个目标再次造成50%的已造成伤害，并获得1点雷霆。（唤雷）',
@@ -4983,7 +4985,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以闪电环绕你 10 分钟。接下来针对你的 3 次近战攻击会对攻击者造成 {buff} 点自然伤害，最多每 5 秒一次。',
   'entities.abilities.flame_shock.name': '余烬震击',
   'entities.abilities.flame_shock.description':
-    '造成 {damage} 点火焰伤害，随后在 12 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。',
+    '造成 {damage} 点火焰伤害，随后在 {duration} 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。',
   'entities.abilities.flametongue_weapon.name': '焰烙武器',
   'entities.abilities.flametongue_weapon.description':
     '为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点火焰伤害。',
@@ -12746,7 +12748,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_block.description':
     '将你封入坚冰8秒，使你免疫所有伤害。移除已存在的普通有害效果，并阻止新的普通控制效果施加于你。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）',
   'entities.abilities.inner_focus.description':
-    '使你的下一个牧师法术免费且无法被打断。持续 60 秒。',
+    '你的下一个牧师法术不消耗法力值，且无法被打断。持续60秒。',
   'entities.abilities.innervate.description':
     '生命树液在你体内涌动10秒，分波恢复20点当前资源，可恢复法力、怒气或能量。变形不会中断效果。睡眠、昏迷或停滞会使树液停止涌动。（德鲁伊天赋）',
   'entities.abilities.mend_pet.name': '修补',
@@ -15312,7 +15314,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一声呼哨激励你的队伍，使攻击、施法和引导速度提高10%，持续10秒。近期受过群体加速激励的盟友过于疲惫，无法受益。（潜行者天赋）',
   'entities.abilities.thieves_chorus.name': '盗贼合唱',
   'entities.abilities.thunder_reservoir.description':
-    '被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
+    '被动：奥术闪电、天穹连锁和岩浆爆发会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
   'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
   'entities.abilities.tidecall.description':
     '为一个友方目标恢复{damage}点生命值。治疗量随法术强度提高。将过量治疗前的完整治疗量加入愈合水流，最多为目标最大生命值的30%。',
@@ -17740,7 +17742,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': '探险印记',
   'hudChrome.currencies.wocToken': 'WoC 代币',
   'hudChrome.currencies.heroicMarkNote': '英雄地下城 . 在英雄军需官处兑换',
-  'hudChrome.currencies.honorNote': '战场与竞技场',
+  'hudChrome.currencies.honorNote': '战场、竞技场与世界任务',
   'hudChrome.currencies.delveMarkNote': '已完成的探险',
   'hudChrome.currencies.wocTokenNote': '已关联钱包的余额',
   'hudChrome.currencies.walletNotLinked': '未关联钱包',
@@ -18745,7 +18747,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在15秒内造成{damage}点暗影伤害，每3秒一次。伤害随法术强度提升，每次伤害均可暴击。每次伤害将敌人实际损失生命值的20%转化为治疗，平均分配给你和30码内受伤的小队成员；在团队中，仅治疗你所在的小队。若你拥有至少2层幽暗什一，施加此效果会消耗2层，使其全部伤害提高30%。',
   'entities.abilities.spirit_bomb.name': '献纳灵魂炸弹',
   'entities.abilities.spirit_bomb.description':
-    '在敌人身上引爆灵魂炸弹，对目标周围8码内的敌人造成{damage}暗影伤害。伤害随法术强度提高，可以暴击，目标超过5个时伤害降低。累计生成20层幽暗什一，可准备一枚炸弹。即使已持有上限5层，生成仍会增加进度。无需消耗层数，消耗也不会增加进度。进度在战斗之间及死亡后保留，最多储存一枚准备好的炸弹。完成施法会消耗炸弹，即使被抵抗也是如此。取消或打断施法会保留炸弹。开始与团队副本首领战斗时，进度和准备好的炸弹都会清零。此法术无法用于开启团队副本首领战斗。',
+    '在敌人身上引爆灵魂炸弹，对目标周围8码内的敌人造成{damage}暗影伤害。伤害随法术强度提高，可以暴击，目标超过5个时伤害降低。累计生成20层幽暗什一，可准备一枚炸弹。即使已持有上限5层，生成仍会增加进度。无需消耗层数，消耗也不会增加进度。进度在战斗之间保留，最多储存一枚准备好的炸弹。死亡会清除进度和准备好的炸弹。完成施法会消耗炸弹，即使被抵抗也是如此。取消或打断施法会保留炸弹。开始与团队副本首领战斗时，进度和准备好的炸弹都会清零。此法术无法用于开启团队副本首领战斗。',
   'hudChrome.priest.gloomtitheLabel': '幽暗什一',
   'hudChrome.priest.bombLabel': '献纳灵魂炸弹',
   'hudChrome.priest.gloomtitheStatus': '幽暗什一：{value} / {max}',
@@ -18753,9 +18755,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.priest.bombReady': '就绪',
   'hudChrome.priest.chargeCount': '{value} / {max}',
   'hudChrome.priest.gloomtitheTooltip':
-    '幽暗什一：最多保有5层可消耗的层数。吸血之触消耗2层，使伤害提高30%；召唤什一魔消耗全部层数。生成层数也会增加献纳灵魂炸弹的进度，即使已保有5层也会增加。',
+    '幽暗什一：最多保有5层可消耗的层数。虚空破裂消耗3层；吸血之触消耗2层，使伤害提高30%；召唤什一魔消耗全部层数。生成层数也会增加献纳灵魂炸弹的进度，即使已保有5层也会增加。',
   'hudChrome.priest.bombTooltip':
-    '献纳灵魂炸弹：生成20层幽暗什一即可准备一枚炸弹。消耗幽暗什一不会增加进度。进度在战斗之间及死亡后保留。开始与团队副本首领战斗时会清零。完成施法会消耗炸弹，取消施法则会保留。',
+    '献纳灵魂炸弹：生成20层幽暗什一即可准备一枚炸弹。消耗幽暗什一不会增加进度。进度在战斗之间保留。死亡或开始与团队副本首领战斗时会清零。完成施法会消耗炸弹，取消施法则会保留。',
   'entities.abilities.choir_of_deliverance.specNote_shadow':
     '在15秒内，将敌人因你的暗影伤害实际损失生命值的20%转化为治疗，分配给30码内受伤的小队成员，包括你自己。在团队中，仅治疗你所在的小队。瞬间施放，且你可在暮色帷幕下继续攻击。被吸收的伤害及超出敌人剩余生命值的伤害不会产生治疗。',
+  'entities.abilities.void_rupture.name': '虚空破裂',
+  'entities.abilities.void_rupture.description':
+    '消耗3层幽暗什一，撕裂一名敌人并造成{damage}暗影伤害。伤害随法术强度提高，且可以暴击。需要3层，即使被抵抗也会消耗。',
+  'entities.abilities.inner_focus.specNote_shadow':
+    '此外，在60秒内，你的下一次碎心术或虚空破裂命中时必定暴击。其他法术不会消耗此加成。虚空破裂仍会消耗3层幽暗什一。施法被抵抗也会消耗此暴击加成。',
+  'hudChrome.auraEffect.stilledMindCrit':
+    '你的下一次碎心术或虚空破裂命中时必定暴击。其他法术不会消耗此加成。虚空破裂仍会消耗3层幽暗什一。施法被抵抗也会消耗此加成。',
 };

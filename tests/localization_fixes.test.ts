@@ -22,6 +22,12 @@ import {
   worldPvpDefeatLine,
   worldPvpKillLine,
 } from '../src/sim/pvp/world_pvp';
+import {
+  WORLD_PVP_BOUNTY_EARNED_LINE,
+  WORLD_PVP_BOUNTY_LAPSED_LINE,
+  worldPvpBountyCollectedLine,
+  worldPvpBountyPlacedLine,
+} from '../src/sim/pvp/world_pvp_bounty';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
@@ -660,6 +666,12 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       HILL_TAKEN_LINE,
       HILL_LOST_LINE,
       HILL_READOUT_NONE_LINE,
+      // World PvP bounties (src/sim/pvp/world_pvp_bounty.ts): the holder's
+      // notices and the two realm announcements, same constant-and-builder shape.
+      WORLD_PVP_BOUNTY_EARNED_LINE,
+      WORLD_PVP_BOUNTY_LAPSED_LINE,
+      worldPvpBountyPlacedLine('Aki'),
+      worldPvpBountyCollectedLine('Bet', 'Aki'),
     ];
     for (const lang of supportedLanguages) {
       setLanguage(lang);

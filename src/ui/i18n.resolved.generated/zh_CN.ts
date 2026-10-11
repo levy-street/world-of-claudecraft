@@ -583,8 +583,8 @@ export const zh_CN: EnTranslations = {
       "bombStatus": "献纳灵魂炸弹充能：{value} / {max}",
       "bombReady": "就绪",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "幽暗什一：最多保有5层可消耗的层数。吸血之触消耗2层，使伤害提高30%；召唤什一魔消耗全部层数。生成层数也会增加献纳灵魂炸弹的进度，即使已保有5层也会增加。",
-      "bombTooltip": "献纳灵魂炸弹：生成20层幽暗什一即可准备一枚炸弹。消耗幽暗什一不会增加进度。进度在战斗之间及死亡后保留。开始与团队副本首领战斗时会清零。完成施法会消耗炸弹，取消施法则会保留。"
+      "gloomtitheTooltip": "幽暗什一：最多保有5层可消耗的层数。虚空破裂消耗3层；吸血之触消耗2层，使伤害提高30%；召唤什一魔消耗全部层数。生成层数也会增加献纳灵魂炸弹的进度，即使已保有5层也会增加。",
+      "bombTooltip": "献纳灵魂炸弹：生成20层幽暗什一即可准备一枚炸弹。消耗幽暗什一不会增加进度。进度在战斗之间保留。死亡或开始与团队副本首领战斗时会清零。完成施法会消耗炸弹，取消施法则会保留。"
     },
     "procOverlay": {
       "soulFragmentsMeter": "灵魂碎片",
@@ -2820,7 +2820,8 @@ export const zh_CN: EnTranslations = {
         "battlegroundAssist": "助攻击杀",
         "worldKill": "世界击杀",
         "worldAssist": "世界击杀助攻",
-        "hillHold": "占据山丘"
+        "hillHold": "占据山丘",
+        "worldQuest": "世界任务"
       },
       "floatReasons": {
         "kill": "击杀",
@@ -2951,7 +2952,7 @@ export const zh_CN: EnTranslations = {
       "delveMark": "探险印记",
       "wocToken": "WoC 代币",
       "heroicMarkNote": "英雄地下城 . 在英雄军需官处兑换",
-      "honorNote": "战场与竞技场",
+      "honorNote": "战场、竞技场与世界任务",
       "delveMarkNote": "已完成的探险",
       "wocTokenNote": "已关联钱包的余额",
       "walletNotLinked": "未关联钱包",
@@ -3962,7 +3963,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "stilledMindCrit": "你的下一次碎心术或虚空破裂命中时必定暴击。其他法术不会消耗此加成。虚空破裂仍会消耗3层幽暗什一。施法被抵抗也会消耗此加成。",
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -4246,6 +4247,7 @@ export const zh_CN: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "暂离",
       "pvpTag": "PvP",
+      "bountyTag": "悬赏",
       "cheaterTag": "< 作弊者 >",
       "pledgeTag": "{guild}的宣誓者",
       "npcRoleTag": "<{role}>",
@@ -13836,12 +13838,12 @@ export const zh_CN: EnTranslations = {
         "description": "在15秒内造成{damage}点暗影伤害，每3秒一次。伤害随法术强度提升，每次伤害均可暴击。每次伤害将敌人实际损失生命值的20%转化为治疗，平均分配给你和30码内受伤的小队成员；在团队中，仅治疗你所在的小队。若你拥有至少2层幽暗什一，施加此效果会消耗2层，使其全部伤害提高30%。"
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "虚空破裂",
+        "description": "消耗3层幽暗什一，撕裂一名敌人并造成{damage}暗影伤害。伤害随法术强度提高，且可以暴击。需要3层，即使被抵抗也会消耗。"
       },
       "spirit_bomb": {
         "name": "献纳灵魂炸弹",
-        "description": "在敌人身上引爆灵魂炸弹，对目标周围8码内的敌人造成{damage}暗影伤害。伤害随法术强度提高，可以暴击，目标超过5个时伤害降低。累计生成20层幽暗什一，可准备一枚炸弹。即使已持有上限5层，生成仍会增加进度。无需消耗层数，消耗也不会增加进度。进度在战斗之间及死亡后保留，最多储存一枚准备好的炸弹。完成施法会消耗炸弹，即使被抵抗也是如此。取消或打断施法会保留炸弹。开始与团队副本首领战斗时，进度和准备好的炸弹都会清零。此法术无法用于开启团队副本首领战斗。"
+        "description": "在敌人身上引爆灵魂炸弹，对目标周围8码内的敌人造成{damage}暗影伤害。伤害随法术强度提高，可以暴击，目标超过5个时伤害降低。累计生成20层幽暗什一，可准备一枚炸弹。即使已持有上限5层，生成仍会增加进度。无需消耗层数，消耗也不会增加进度。进度在战斗之间保留，最多储存一枚准备好的炸弹。死亡会清除进度和准备好的炸弹。完成施法会消耗炸弹，即使被抵抗也是如此。取消或打断施法会保留炸弹。开始与团队副本首领战斗时，进度和准备好的炸弹都会清零。此法术无法用于开启团队副本首领战斗。"
       },
       "flash_heal": {
         "name": "紧急祈祷",
@@ -13853,7 +13855,7 @@ export const zh_CN: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "雷霆蓄能",
-        "description": "被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）"
+        "description": "被动：奥术闪电、天穹连锁和岩浆爆发会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）"
       },
       "lightning_overload": {
         "name": "电弧超载",
@@ -13861,7 +13863,7 @@ export const zh_CN: EnTranslations = {
       },
       "lava_burst": {
         "name": "岩浆爆发",
-        "description": "造成{damage}点火焰伤害。对被你的余烬震击点燃的目标必定造成暴击。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）"
+        "description": "造成{damage}点火焰伤害。命中可给予 1 点雷霆。对被你的余烬震击点燃的目标必定造成暴击。暴击时额外造成相当于普通伤害24%的伤害。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）"
       },
       "thunderstorm": {
         "name": "碎风暴",
@@ -13885,7 +13887,7 @@ export const zh_CN: EnTranslations = {
       },
       "flame_shock": {
         "name": "余烬震击",
-        "description": "造成 {damage} 点火焰伤害，随后在 12 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。"
+        "description": "造成 {damage} 点火焰伤害，随后在 {duration} 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。"
       },
       "flametongue_weapon": {
         "name": "焰烙武器",
@@ -14663,8 +14665,8 @@ export const zh_CN: EnTranslations = {
       },
       "inner_focus": {
         "name": "静心",
-        "description": "使你的下一个牧师法术免费且无法被打断。持续 60 秒。",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "description": "你的下一个牧师法术不消耗法力值，且无法被打断。持续60秒。",
+        "specNote_shadow": "此外，在60秒内，你的下一次碎心术或虚空破裂命中时必定暴击。其他法术不会消耗此加成。虚空破裂仍会消耗3层幽暗什一。施法被抵抗也会消耗此暴击加成。"
       },
       "innervate": {
         "name": "生命树液",

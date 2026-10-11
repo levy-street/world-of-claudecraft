@@ -522,7 +522,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Facções',
   'hudChrome.currencies.heroicMarkNote': 'Masmorras heroicas. Use com o intendente heroico',
   'hudChrome.currencies.honor': 'Honra',
-  'hudChrome.currencies.honorNote': 'Campos de batalha e arena',
+  'hudChrome.currencies.honorNote': 'Campos de batalha, arena e missões de mundo',
   'hudChrome.currencies.intro':
     'Nenhuma delas ocupa espaço na mochila. As moedas continuam na sua mochila como sempre.',
   'hudChrome.currencies.lifetime': 'Acumulado: {amount}',
@@ -2255,7 +2255,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Anuncia uma colina agora; ela surge após o aviso completo.',
   'devCommand.actions.hillwarn.label': 'Contagem regressiva da colina',
   'entities.abilities.lava_burst.description':
-    'Causa {damage} de dano de Fogo. Sempre acerta criticamente um alvo que estiver queimando com seu Abalo de Brasa. Surto de Magma: cada tique de Abalo de Brasa tem 20% de chance de reiniciar este tempo de recarga e tornar seu próximo Magma Burst instantâneo em até 10 s. O dano aumenta com o Poder Mágico. (Distintivo de Chamado do Trovão)',
+    'Causa {damage} de dano de Fogo. Um acerto concede 1 de Trovão. Sempre acerta criticamente um alvo que estiver queimando com seu Abalo de Brasa. Um acerto crítico causa 24% adicionais do dano normal. Surto de Magma: cada tique de Abalo de Brasa tem 20% de chance de reiniciar este tempo de recarga e tornar seu próximo Magma Burst instantâneo em até 10 s. O dano aumenta com o Poder Mágico. (Distintivo de Chamado do Trovão)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     'Passiva: Raio em Arco e Relâmpago Bifurcado têm 20% de chance de sofrer Sobrecarga, atingindo o primeiro alvo novamente por 50% do dano causado e concedendo 1 de Trovão. (Distintivo de Chamado do Trovão)',
@@ -9417,7 +9417,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Envolve-vos em relâmpagos por 10 min. Os 3 próximos ataques corpo a corpo contra vós causam {buff} de dano de Natureza ao atacante, no máximo uma vez a cada 5 s.',
   'entities.abilities.flame_shock.name': 'Abalo de Brasa',
   'entities.abilities.flame_shock.description':
-    'Causa {damage} de dano de Fogo, e depois {overTime} de dano de Fogo ao longo de 12 s. O acerto inicial aumenta com o Poder Mágico.',
+    'Causa {damage} de dano de Fogo, e depois {overTime} de dano de Fogo ao longo de {duration} s. O acerto inicial aumenta com o Poder Mágico.',
   'entities.abilities.flametongue_weapon.name': 'Arma Flamígera',
   'entities.abilities.flametongue_weapon.description':
     'Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano de Fogo adicional.',
@@ -16282,7 +16282,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passiva: enquanto o Golpe Ancestral está em recarga, consumir um Presságio de Tempestade tem 25% de chance de reiniciá-lo. Se as 3 primeiras chances falharem, a 4.ª sempre o reinicia. (Espírito Guerreiro)',
   'entities.abilities.thunder_reservoir.description':
-    'Passiva: o Raio em Arco e o Relâmpago Bifurcado concedem Trovão, até 5. Com 5 de Trovão, o Abalo Terreno causa 125% mais dano ou o Terremoto causa 100% mais, e então consome todo o Trovão. (Chamado do Trovão)',
+    'Passiva: o Raio em Arco, o Relâmpago Bifurcado e o Magma Burst concedem Trovão, até 5. Com 5 de Trovão, o Abalo Terreno causa 125% mais dano ou o Terremoto causa 100% mais, e então consome todo o Trovão. (Chamado do Trovão)',
   'entities.abilities.tidecall.description':
     'Cura um alvo aliado em {damage}. A cura aumenta com o poder mágico. Adiciona a cura completa antes do excesso à Corrente Restauradora, até 30% da vida máxima do alvo.',
   'entities.abilities.unleash_weapon.description':

@@ -1,5 +1,5 @@
 // Server-side moderation moves (jail, the release, the moderator jail visit, the
-// cage gate, spectate limbo) and the rift floor they may leave or land on.
+// cage gate) and the rift floor they may leave or land on.
 //
 // These moves bypass the sim's own teleports, and ClientWorld mirrors its rift
 // floor from riftState events alone (src/net/online.ts applyRiftStateEvent), while

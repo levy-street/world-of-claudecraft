@@ -583,7 +583,7 @@ export const da_DK: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const da_DK: EnTranslations = {
         "battlegroundAssist": "medvirket til dræbende slag",
         "worldKill": "verden drab",
         "worldAssist": "verden drab assisteret",
-        "hillHold": "holder højen"
+        "hillHold": "holder højen",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Drab",
@@ -2951,7 +2952,7 @@ export const da_DK: EnTranslations = {
       "delveMark": "Dykkermærke",
       "wocToken": "WoC-mønt",
       "heroicMarkNote": "Heroiske fangehuse, brug hos den heroiske kvartermester",
-      "honorNote": "Slagmarker og arenaen",
+      "honorNote": "Slagmarker, arenaen og verdensopgaver",
       "delveMarkNote": "Dykninger afsluttet",
       "wocTokenNote": "Knyttet pungs saldo",
       "walletNotLinked": "Ingen pung knyttet",
@@ -4246,6 +4247,7 @@ export const da_DK: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Snyder >",
       "pledgeTag": "Løfte til {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const da_DK: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Tordenreservoir",
-        "description": "Passiv: Lysbuelynet og Gaffellynet giver Torden, op til 5. Ved 5 Torden gør Jordstødet 125% mere skade eller Jordskælvet 100% mere, og derefter forbruges al Torden. (Tordenkald)"
+        "description": "Passiv: Lysbuelynet, Gaffellynet og Magma Burst giver Torden, op til 5. Ved 5 Torden gør Jordstødet 125% mere skade eller Jordskælvet 100% mere, og derefter forbruges al Torden. (Tordenkald)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13861,7 +13863,7 @@ export const da_DK: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Påfør {damage} Ildskade. Slår altid kritisk en mål som brænder med din Glødstød. Magma Bølge: hver Glødstød slag har 20% chance at nulstille denne nedtælling og gøre din næste Magma Burst inden 10 sek øjeblikkelig. Skade stiger med Stavekraft. (Tordenråb)"
+        "description": "Påfør {damage} Ildskade. Et træf giver 1 Torden. Slår altid kritisk en mål som brænder med din Glødstød. Et kritisk slag gør yderligere 24% af den normale skade. Magma Bølge: hver Glødstød slag har 20% chance at nulstille denne nedtælling og gøre din næste Magma Burst inden 10 sek øjeblikkelig. Skade stiger med Stavekraft. (Tordenråb)"
       },
       "thunderstorm": {
         "name": "Stormbryder",
@@ -13885,7 +13887,7 @@ export const da_DK: EnTranslations = {
       },
       "flame_shock": {
         "name": "Glødstød",
-        "description": "Volder {damage} Ildskade, derefter {overTime} Ildskade over 12 sek. Det første træf stiger med Besværgelseskraft."
+        "description": "Volder {damage} Ildskade, derefter {overTime} Ildskade over {duration} sek. Det første træf stiger med Besværgelseskraft."
       },
       "flametongue_weapon": {
         "name": "Bålbrand-Våben",

@@ -583,7 +583,7 @@ export const nl_NL: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const nl_NL: EnTranslations = {
         "battlegroundAssist": "hulp bij een fatale klap",
         "worldKill": "wereldkill",
         "worldAssist": "wereldkill geassisteerd",
-        "hillHold": "heuvelbeheersing"
+        "hillHold": "heuvelbeheersing",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Kill",
@@ -2951,7 +2952,7 @@ export const nl_NL: EnTranslations = {
       "delveMark": "Delve-embleem",
       "wocToken": "WoC-token",
       "heroicMarkNote": "Heroïsche kerkers . besteed bij de heroïsche kwartiermeester",
-      "honorNote": "Slagvelden en de arena",
+      "honorNote": "Slagvelden, de arena en wereldquests",
       "delveMarkNote": "Delves voltooid",
       "wocTokenNote": "Gekoppeld portefeuillesaldo",
       "walletNotLinked": "Geen portefeuille gekoppeld",
@@ -4246,6 +4247,7 @@ export const nl_NL: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Valsspeler >",
       "pledgeTag": "Gelofte aan {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const nl_NL: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Donderreservoir",
-        "description": "Passief: de Boogbliksem en de Gevorkte bliksem verlenen Donder, tot 5. Bij 5 Donder richt de Aardse Schok 125% meer schade aan of de Aardbeving 100% meer, en dan wordt alle Donder verbruikt. (Donderroep)"
+        "description": "Passief: de Boogbliksem, de Gevorkte bliksem en Magma Burst verlenen Donder, tot 5. Bij 5 Donder richt de Aardse Schok 125% meer schade aan of de Aardbeving 100% meer, en dan wordt alle Donder verbruikt. (Donderroep)"
       },
       "lightning_overload": {
         "name": "Overbelasting",
@@ -13861,7 +13863,7 @@ export const nl_NL: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Veroorzaak {damage} Vuurschade. Slaat altijd kritiek toe op doelen die branden van jouw Sintelschok. Magmastroom: elke Sintelschok-slag heeft 20% kans dit afkoelingseffect opnieuw in te stellen en je volgende Magma Burst binnen 10 sec onmiddellijk uit te voeren. Schade neemt toe met Spreukenkracht. (Donderoproep)"
+        "description": "Veroorzaak {damage} Vuurschade. Een treffer verleent 1 Donder. Slaat altijd kritiek toe op doelen die branden van jouw Sintelschok. Een kritieke treffer doet 24% van de normale schade extra. Magmastroom: elke Sintelschok-slag heeft 20% kans dit afkoelingseffect opnieuw in te stellen en je volgende Magma Burst binnen 10 sec onmiddellijk uit te voeren. Schade neemt toe met Spreukenkracht. (Donderoproep)"
       },
       "thunderstorm": {
         "name": "Stormbreuk",
@@ -13885,7 +13887,7 @@ export const nl_NL: EnTranslations = {
       },
       "flame_shock": {
         "name": "Sintelschok",
-        "description": "Brengt {damage} Vuurschade toe, daarna in 12 sec {overTime} Vuurschade. De eerste treffer stijgt met de Spreukkracht."
+        "description": "Brengt {damage} Vuurschade toe, daarna in {duration} sec {overTime} Vuurschade. De eerste treffer stijgt met de Spreukkracht."
       },
       "flametongue_weapon": {
         "name": "Vuurbrand-Wapen",

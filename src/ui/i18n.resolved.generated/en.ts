@@ -583,7 +583,7 @@ export const en: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const en: EnTranslations = {
         "battlegroundAssist": "killing blow assisted",
         "worldKill": "world kill",
         "worldAssist": "world kill assisted",
-        "hillHold": "holding the hill"
+        "hillHold": "holding the hill",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Kill",
@@ -2951,7 +2952,7 @@ export const en: EnTranslations = {
       "delveMark": "Delve Mark",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Heroic dungeons . spend at the heroic quartermaster",
-      "honorNote": "Battlegrounds and the arena",
+      "honorNote": "Battlegrounds, the arena, and world quests",
       "delveMarkNote": "Delves completed",
       "wocTokenNote": "Linked wallet balance",
       "walletNotLinked": "No wallet linked",
@@ -4246,6 +4247,7 @@ export const en: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Cheater >",
       "pledgeTag": "Pledge of {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const en: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)"
+        "description": "Passive: Arc Bolt, Skybranch, and Magma Burst grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13861,7 +13863,7 @@ export const en: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+        "description": "Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13885,7 +13887,7 @@ export const en: EnTranslations = {
       },
       "flame_shock": {
         "name": "Cinder Jolt",
-        "description": "Deal {damage} Fire damage, then {overTime} Fire damage over 12 sec. The initial hit increases with Spell Power."
+        "description": "Deal {damage} Fire damage, then {overTime} Fire damage over {duration} sec. The initial hit increases with Spell Power."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand Weapon",

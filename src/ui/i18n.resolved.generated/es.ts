@@ -2820,7 +2820,8 @@ export const es: EnTranslations = {
         "battlegroundAssist": "golpe de gracia asistido",
         "worldKill": "muerte en el mundo abierto",
         "worldAssist": "muerte en el mundo abierto asistida",
-        "hillHold": "manteniendo la colina"
+        "hillHold": "manteniendo la colina",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Baja",
@@ -2951,7 +2952,7 @@ export const es: EnTranslations = {
       "delveMark": "Marca de expedición",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Mazmorras heroicas . gástala con el intendente heroico",
-      "honorNote": "Campos de batalla y la arena",
+      "honorNote": "Campos de batalla, la arena y misiones de mundo",
       "delveMarkNote": "Expediciones completadas",
       "wocTokenNote": "Saldo de la cartera vinculada",
       "walletNotLinked": "Ninguna cartera vinculada",
@@ -4246,6 +4247,7 @@ export const es: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "JcJ",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Tramposo >",
       "pledgeTag": "Juramento a {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const es: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Reserva de Truenos",
-        "description": "Pasiva: el Arco Eléctrico y el Relámpago Bifurcado otorgan Trueno, hasta 5. Con 5 de Trueno, la Sacudida Terrestre inflige un 125% más de daño o el Terremoto un 100% más, y luego consume todo el Trueno. (Llamatruenos)"
+        "description": "Pasiva: el Arco Eléctrico, el Relámpago Bifurcado y Magma Burst otorgan Trueno, hasta 5. Con 5 de Trueno, la Sacudida Terrestre inflige un 125% más de daño o el Terremoto un 100% más, y luego consume todo el Trueno. (Llamatruenos)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13861,7 +13863,7 @@ export const es: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Inflige {damage} de daño de Fuego. Siempre asesta golpe crítico a un objetivo que arda con tu Sacudida de Ascuas. Oleada de Magma: cada tic de Sacudida de Ascuas tiene un 20% de probabilidad de reiniciar este tiempo de reutilización y hacer que tu próximo Magma Burst en los 10 s siguientes sea instantáneo. El daño aumenta con el poder con hechizos. (Thundercall)"
+        "description": "Inflige {damage} de daño de Fuego. Un impacto otorga 1 de Trueno. Siempre asesta golpe crítico a un objetivo que arda con tu Sacudida de Ascuas. Un golpe crítico inflige un 24% adicional del daño normal. Oleada de Magma: cada tic de Sacudida de Ascuas tiene un 20% de probabilidad de reiniciar este tiempo de reutilización y hacer que tu próximo Magma Burst en los 10 s siguientes sea instantáneo. El daño aumenta con el poder con hechizos. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13885,7 +13887,7 @@ export const es: EnTranslations = {
       },
       "flame_shock": {
         "name": "Sacudida de Ascuas",
-        "description": "Inflige {damage} de daño de Fuego, y después {overTime} de daño de Fuego durante 12 s. El impacto inicial aumenta con el poder con hechizos."
+        "description": "Inflige {damage} de daño de Fuego, y después {overTime} de daño de Fuego durante {duration} s. El impacto inicial aumenta con el poder con hechizos."
       },
       "flametongue_weapon": {
         "name": "Arma Tizón Ígneo",

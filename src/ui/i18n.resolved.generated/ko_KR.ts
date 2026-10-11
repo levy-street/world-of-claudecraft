@@ -583,8 +583,8 @@ export const ko_KR: EnTranslations = {
       "bombStatus": "헌납 폭탄 충전 {value} / {max}",
       "bombReady": "준비 완료",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "암흑 십일조: 소모할 수 있는 충전을 최대 5개까지 보유합니다. 흡혈의 손길은 2개를 소모해 피해가 30% 증가하고, 십일조 악마 소환은 모든 충전을 소모합니다. 충전을 생성하면 헌납 폭탄 진행도도 증가하며, 이미 5개를 보유한 상태에서도 증가합니다.",
-      "bombTooltip": "헌납 폭탄: 암흑 십일조를 20개 생성하면 폭탄 하나가 준비됩니다. 암흑 십일조를 소모해도 진행도는 증가하지 않습니다. 진행도는 전투 사이와 사망 후에도 유지됩니다. 공격대 우두머리 전투가 시작되면 초기화됩니다. 시전을 완료하면 폭탄을 소모하며, 취소하면 보존됩니다."
+      "gloomtitheTooltip": "암흑 십일조: 소모할 수 있는 충전을 최대 5개까지 보유합니다. 공허 균열은 3개를 소모합니다. 흡혈의 손길은 2개를 소모해 피해가 30% 증가하고, 십일조 악마 소환은 모든 충전을 소모합니다. 충전을 생성하면 헌납 폭탄 진행도도 증가하며, 이미 5개를 보유한 상태에서도 증가합니다.",
+      "bombTooltip": "헌납 폭탄: 암흑 십일조를 20개 생성하면 폭탄 하나가 준비됩니다. 암흑 십일조를 소모해도 진행도는 증가하지 않습니다. 진행도는 전투 사이에도 유지됩니다. 사망하거나 공격대 우두머리 전투가 시작되면 초기화됩니다. 시전을 완료하면 폭탄을 소모하며, 취소하면 보존됩니다."
     },
     "procOverlay": {
       "soulFragmentsMeter": "영혼 조각",
@@ -2820,7 +2820,8 @@ export const ko_KR: EnTranslations = {
         "battlegroundAssist": "처치 도움",
         "worldKill": "월드 처치",
         "worldAssist": "월드 처치 도움",
-        "hillHold": "언덕 점거"
+        "hillHold": "언덕 점거",
+        "worldQuest": "전역 퀘스트"
       },
       "floatReasons": {
         "kill": "처치",
@@ -2951,7 +2952,7 @@ export const ko_KR: EnTranslations = {
       "delveMark": "델브 징표",
       "wocToken": "WoC 토큰",
       "heroicMarkNote": "영웅 던전 . 영웅 보급관에게서 사용",
-      "honorNote": "전장과 투기장",
+      "honorNote": "전장, 투기장, 전역 퀘스트",
       "delveMarkNote": "완료한 델브",
       "wocTokenNote": "연동된 지갑 잔액",
       "walletNotLinked": "연동된 지갑 없음",
@@ -3962,7 +3963,7 @@ export const ko_KR: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "stilledMindCrit": "다음 정신 파열 또는 공허 균열이 적중하면 반드시 극대화됩니다. 다른 주문은 이 효과를 소모하지 않습니다. 공허 균열은 여전히 암흑 십일조 3중첩을 소모합니다. 저항당해도 이 효과는 소모됩니다.",
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
@@ -4246,6 +4247,7 @@ export const ko_KR: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "자리비움",
       "pvpTag": "PvP",
+      "bountyTag": "현상금",
       "cheaterTag": "< 부정행위자 >",
       "pledgeTag": "{guild} 서약자",
       "npcRoleTag": "<{role}>",
@@ -13836,12 +13838,12 @@ export const ko_KR: EnTranslations = {
         "description": "15초 동안 3초마다 총 {damage}의 암흑 피해를 입힙니다. 피해는 주문력에 따라 증가하며 각 피해는 치명타가 될 수 있습니다. 매번 적이 실제로 잃은 생명력의 20%를 치유량으로 전환하여 자신과 30미터 내의 부상당한 파티원에게 균등하게 나눕니다. 공격대에서는 자신의 하위 파티만 치유합니다. 암흑 십일조가 2회 이상 충전되어 있으면 효과를 적용할 때 2회를 소모하여 전체 피해를 30% 증가시킵니다."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "공허 균열",
+        "description": "암흑 십일조 3중첩을 소모하여 적을 찢고 {damage}의 암흑 피해를 줍니다. 피해는 주문력에 따라 증가하며 극대화될 수 있습니다. 3중첩이 필요하며 저항당해도 소모됩니다."
       },
       "spirit_bomb": {
         "name": "헌납 폭탄",
-        "description": "적에게 영혼 폭탄을 터뜨려 대상 주위 8미터 내의 적에게 {damage}의 암흑 피해를 줍니다. 피해는 주문력에 따라 증가하며 극대화될 수 있고 대상이 5명을 초과하면 감소합니다. 암흑 십일조 중첩을 총 20개 생성하면 폭탄 하나가 준비됩니다. 최대 5중첩을 보유한 상태에서 생성해도 진행도가 증가합니다. 중첩을 소모할 필요는 없으며 소모해도 진행도는 증가하지 않습니다. 진행도는 전투 사이와 사망 후에도 유지되며 준비된 폭탄은 하나까지만 저장됩니다. 시전을 완료하면 저항당해도 폭탄을 소모합니다. 취소하거나 차단당하면 보존됩니다. 공격대 우두머리 전투가 시작되면 진행도와 준비된 폭탄이 초기화됩니다. 이 주문으로 공격대 우두머리 전투를 시작할 수 없습니다."
+        "description": "적에게 영혼 폭탄을 터뜨려 대상 주위 8미터 내의 적에게 {damage}의 암흑 피해를 줍니다. 피해는 주문력에 따라 증가하며 극대화될 수 있고 대상이 5명을 초과하면 감소합니다. 암흑 십일조 중첩을 총 20개 생성하면 폭탄 하나가 준비됩니다. 최대 5중첩을 보유한 상태에서 생성해도 진행도가 증가합니다. 중첩을 소모할 필요는 없으며 소모해도 진행도는 증가하지 않습니다. 진행도는 전투 사이에도 유지되며 준비된 폭탄은 하나까지만 저장됩니다. 사망하면 진행도와 준비된 폭탄이 초기화됩니다. 시전을 완료하면 저항당해도 폭탄을 소모합니다. 취소하거나 차단당하면 보존됩니다. 공격대 우두머리 전투가 시작되면 진행도와 준비된 폭탄이 초기화됩니다. 이 주문으로 공격대 우두머리 전투를 시작할 수 없습니다."
       },
       "flash_heal": {
         "name": "다급한 기도",
@@ -13853,7 +13855,7 @@ export const ko_KR: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "천둥 비축",
-        "description": "지속 효과: 비전 화살과 하늘가지가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)"
+        "description": "지속 효과: 비전 화살, 하늘가지, Magma Burst가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13861,7 +13863,7 @@ export const ko_KR: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "{damage}의 화염 피해를 입힙니다. 대상이 잉걸 충격으로 불타고 있으면 항상 치명타로 적중합니다. 마그마 급증: 잉걸 충격이 피해를 줄 때마다 20% 확률로 이 재사용 대기시간을 초기화하고, 10초 안에 시전하는 다음 마그마 폭발을 즉시 시전 가능하게 합니다. 피해량은 주문력에 따라 증가합니다. (천둥소환)"
+        "description": "{damage}의 화염 피해를 입힙니다. 명중하면 천둥을 1 얻습니다. 대상이 잉걸 충격으로 불타고 있으면 항상 치명타로 적중합니다. 치명타는 일반 피해의 24%를 추가로 입힙니다. 마그마 급증: 잉걸 충격이 피해를 줄 때마다 20% 확률로 이 재사용 대기시간을 초기화하고, 10초 안에 시전하는 다음 마그마 폭발을 즉시 시전 가능하게 합니다. 피해량은 주문력에 따라 증가합니다. (천둥소환)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13885,7 +13887,7 @@ export const ko_KR: EnTranslations = {
       },
       "flame_shock": {
         "name": "잉걸 충격",
-        "description": "{damage}의 화염 피해를 입히고, 이어 12초에 걸쳐 {overTime}의 화염 피해를 입힙니다. 첫 명중은 주문력에 따라 증가합니다."
+        "description": "{damage}의 화염 피해를 입히고, 이어 {duration}초에 걸쳐 {overTime}의 화염 피해를 입힙니다. 첫 명중은 주문력에 따라 증가합니다."
       },
       "flametongue_weapon": {
         "name": "화염낙인 무기",
@@ -14663,8 +14665,8 @@ export const ko_KR: EnTranslations = {
       },
       "inner_focus": {
         "name": "고요한 마음",
-        "description": "다음 사제 주문을 소모 없이, 그리고 방해받지 않게 만듭니다. 60초 지속됩니다.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "description": "다음 사제 주문은 마나를 소모하지 않으며 차단되지 않습니다. 60초 동안 지속됩니다.",
+        "specNote_shadow": "추가로 60초 안에 사용하는 다음 정신 파열 또는 공허 균열이 적중하면 반드시 극대화됩니다. 다른 주문은 이 효과를 소모하지 않습니다. 공허 균열은 여전히 암흑 십일조 3중첩을 소모합니다. 저항당해도 극대화 효과는 소모됩니다."
       },
       "innervate": {
         "name": "생명 수액",

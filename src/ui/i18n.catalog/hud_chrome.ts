@@ -142,7 +142,7 @@ export const hudChromeStrings = {
     bombReady: 'Ready',
     chargeCount: '{value} / {max}',
     gloomtitheTooltip:
-      'Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.',
+      'Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.',
     bombTooltip:
       'Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it.',
   },
@@ -3411,6 +3411,8 @@ export const hudChromeStrings = {
       worldKill: 'world kill',
       worldAssist: 'world kill assisted',
       hillHold: 'holding the hill',
+      // The day's Honor world quests (src/sim/world_quest_honor_slots.ts).
+      worldQuest: 'world quest',
     },
     // Short labels for the floating text over your own character. Kept apart from
     // `reasons` above, which are mid-sentence fragments for the chat line.
@@ -3608,7 +3610,9 @@ export const hudChromeStrings = {
     delveMark: 'Delve Mark',
     wocToken: 'WoC Token',
     heroicMarkNote: 'Heroic dungeons . spend at the heroic quartermaster',
-    honorNote: 'Battlegrounds and the arena',
+    // Every Honor source a player can reach, the day's Honor world quests
+    // included (src/sim/world_quest_honor_slots.ts).
+    honorNote: 'Battlegrounds, the arena, and world quests',
     delveMarkNote: 'Delves completed',
     wocTokenNote: 'Linked wallet balance',
     walletNotLinked: 'No wallet linked',
@@ -5627,6 +5631,10 @@ export const hudChromeStrings = {
     afkTag: 'AFK',
     // The World PvP flag tag, same bracket convention as afkTag.
     pvpTag: 'PvP',
+    // The World PvP bounty tag (src/sim/pvp/world_pvp_bounty.ts), same bracket
+    // convention: the non-colour read of the blood-red bounty name tag. Wordy
+    // (M16), so the five non-Latin fills ship in this same change.
+    bountyTag: 'Bounty',
     // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
     // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
     // afkTag the brackets are part of the VALUE, so a locale that punctuates a

@@ -727,6 +727,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': '視窗縮放',
   'hudChrome.meters.windowScaleDesc': '增加或減少統計面板的整體縮放比例。',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': '懸賞',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': '鏡頭穿透淡出',
@@ -754,6 +755,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.hillHold': '佔據山丘',
   'hudChrome.warfare.reasons.worldAssist': '世界擊殺助攻',
   'hudChrome.warfare.reasons.worldKill': '世界擊殺',
+  'hudChrome.warfare.reasons.worldQuest': '世界任務',
   'hudChrome.warfareShop.groupEntry': '戰爭賽季 1',
   'hudChrome.warfareShop.groupSeason2': '戰爭賽季 2：先鋒',
   'hudChrome.worldPvp.aidLine':
@@ -877,7 +879,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.hillwarn.description': '立即發出山丘通告；山丘會在完整的警示時間過後升起。',
   'devCommand.actions.hillwarn.label': '山丘倒數',
   'entities.abilities.lava_burst.description':
-    '造成 {damage} 點火焰傷害。對受你燼焰震擊灼燒的目標必定造成致命一擊。熔岩湧動：燼焰震擊每次造成傷害都有 20% 機率重置此技能的冷卻，並使你在 10 秒內的下一個 Magma Burst 變為瞬發。傷害隨法術強度提升。（雷霆召喚）',
+    '造成 {damage} 點火焰傷害。命中可給予 1 點雷霆。對受你燼焰震擊灼燒的目標必定造成致命一擊。致命一擊時額外造成相當於一般傷害 24% 的傷害。熔岩湧動：燼焰震擊每次造成傷害都有 20% 機率重置此技能的冷卻，並使你在 10 秒內的下一個 Magma Burst 變為瞬發。傷害隨法術強度提升。（雷霆召喚）',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     '被動：電弧箭與叉狀閃電有 20% 機率觸發 Arc Overload，再次擊中其首個目標，造成 50% 的傷害，並獲得 1 點雷霆。（雷霆召喚）',
@@ -4985,7 +4987,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以閃電環繞你 10 分鐘。接下來針對你的 3 次近戰攻擊會對攻擊者造成 {buff} 點自然傷害，最多每 5 秒一次。',
   'entities.abilities.flame_shock.name': '燼焰震擊',
   'entities.abilities.flame_shock.description':
-    '造成 {damage} 點火焰傷害，隨後在 12 秒內造成 {overTime} 點火焰傷害。首次命中隨法術強度提升。',
+    '造成 {damage} 點火焰傷害，隨後在 {duration} 秒內造成 {overTime} 點火焰傷害。首次命中隨法術強度提升。',
   'entities.abilities.flametongue_weapon.name': '焰烙武器',
   'entities.abilities.flametongue_weapon.description':
     '為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點火焰傷害。',
@@ -12746,7 +12748,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_block.description':
     '將你封入堅冰8秒，使你免疫所有傷害。移除已存在的一般有害效果，並阻止新的一般控制效果施加於你。可在昏迷或變形狀態下使用。被封凍期間無法行動。再次施放可取消。（法師）',
   'entities.abilities.inner_focus.description':
-    '使你的下一個牧師法術免費且無法被打斷。持續 60 秒。',
+    '你的下一個牧師法術不消耗法力，且無法被打斷。持續60秒。',
   'entities.abilities.innervate.description':
     '生命樹液在你體內湧動10秒，分波恢復20點當前資源，可恢復法力、怒氣或能量。變形不會中斷效果。睡眠、昏迷或停滯會使樹液停止湧動。（德魯伊天賦）',
   'entities.abilities.mend_pet.name': '修補',
@@ -15316,7 +15318,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一聲呼哨激勵你的隊伍，使攻擊、施法和引導速度提高10%，持續10秒。近期受過群體加速激勵的盟友過於疲憊，無法受益。（潛行者天賦）',
   'entities.abilities.thieves_chorus.name': '盜賊合唱',
   'entities.abilities.thunder_reservoir.description':
-    '被動：奧術閃電與天穹連鎖會獲得雷霆，最多5層。達到5層時，大地震擊造成的傷害提高125%，或裂地震波造成的傷害提高100%，隨後消耗全部雷霆。（雷霆召喚）',
+    '被動：奧術閃電、天穹連鎖與 Magma Burst 會獲得雷霆，最多5層。達到5層時，大地震擊造成的傷害提高125%，或裂地震波造成的傷害提高100%，隨後消耗全部雷霆。（雷霆召喚）',
   'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
   'entities.abilities.tidecall.description':
     '為一個友方目標恢復{damage}點生命值。治療量隨法術強度提高。將過量治療前的完整治療量加入癒合水流，最多為目標最大生命值的30%。',
@@ -17748,7 +17750,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': '探險印記',
   'hudChrome.currencies.wocToken': 'WoC 代幣',
   'hudChrome.currencies.heroicMarkNote': '英雄地下城 . 在英雄軍需官處兌換',
-  'hudChrome.currencies.honorNote': '戰場與競技場',
+  'hudChrome.currencies.honorNote': '戰場、競技場與世界任務',
   'hudChrome.currencies.delveMarkNote': '已完成的探險',
   'hudChrome.currencies.wocTokenNote': '已連結錢包的餘額',
   'hudChrome.currencies.walletNotLinked': '未連結錢包',
@@ -18762,7 +18764,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在15秒內造成{damage}點暗影傷害，每3秒一次。傷害隨法術強度提升，每次傷害均可致命一擊。每次傷害將敵人實際損失生命值的20%轉化為治療，平均分配給你和30碼內受傷的小隊成員；在團隊中，僅治療你所在的小隊。若你擁有至少2層幽暗什一，施加此效果會消耗2層，使其全部傷害提高30%。',
   'entities.abilities.spirit_bomb.name': '獻納靈魂炸彈',
   'entities.abilities.spirit_bomb.description':
-    '在敵人身上引爆靈魂炸彈，對目標周圍8碼內的敵人造成{damage}暗影傷害。傷害隨法術能量提高，可以致命一擊，目標超過5個時傷害降低。累計生成20層幽暗什一，可準備一枚炸彈。即使已持有上限5層，生成仍會增加進度。無需消耗層數，消耗也不會增加進度。進度在戰鬥之間及死亡後保留，最多儲存一枚準備好的炸彈。完成施法會消耗炸彈，即使被抵抗也是如此。取消或中斷施法會保留炸彈。開始與團隊副本首領戰鬥時，進度和準備好的炸彈都會歸零。此法術無法用於開啟團隊副本首領戰鬥。',
+    '在敵人身上引爆靈魂炸彈，對目標周圍8碼內的敵人造成{damage}暗影傷害。傷害隨法術能量提高，可以致命一擊，目標超過5個時傷害降低。累計生成20層幽暗什一，可準備一枚炸彈。即使已持有上限5層，生成仍會增加進度。無需消耗層數，消耗也不會增加進度。進度在戰鬥之間保留，最多儲存一枚準備好的炸彈。死亡會清除進度和準備好的炸彈。完成施法會消耗炸彈，即使被抵抗也是如此。取消或中斷施法會保留炸彈。開始與團隊副本首領戰鬥時，進度和準備好的炸彈都會歸零。此法術無法用於開啟團隊副本首領戰鬥。',
   'hudChrome.priest.gloomtitheLabel': '幽暗什一',
   'hudChrome.priest.bombLabel': '獻納靈魂炸彈',
   'hudChrome.priest.gloomtitheStatus': '幽暗什一：{value} / {max}',
@@ -18770,9 +18772,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.priest.bombReady': '就緒',
   'hudChrome.priest.chargeCount': '{value} / {max}',
   'hudChrome.priest.gloomtitheTooltip':
-    '幽暗什一：最多保有5層可消耗的層數。吸血之觸消耗2層，使傷害提高30%；召喚什一魔消耗全部層數。生成層數也會增加獻納靈魂炸彈的進度，即使已保有5層也會增加。',
+    '幽暗什一：最多保有5層可消耗的層數。虛空破裂消耗3層；吸血之觸消耗2層，使傷害提高30%；召喚什一魔消耗全部層數。生成層數也會增加獻納靈魂炸彈的進度，即使已保有5層也會增加。',
   'hudChrome.priest.bombTooltip':
-    '獻納靈魂炸彈：生成20層幽暗什一即可準備一枚炸彈。消耗幽暗什一不會增加進度。進度在戰鬥之間及死亡後保留。開始與團隊副本首領戰鬥時會歸零。完成施法會消耗炸彈，取消施法則會保留。',
+    '獻納靈魂炸彈：生成20層幽暗什一即可準備一枚炸彈。消耗幽暗什一不會增加進度。進度在戰鬥之間保留。死亡或開始與團隊副本首領戰鬥時會歸零。完成施法會消耗炸彈，取消施法則會保留。',
   'entities.abilities.choir_of_deliverance.specNote_shadow':
     '在15秒內，將敵人因你的暗影傷害實際損失生命值的20%轉化為治療，分配給30碼內受傷的小隊成員，包括你自己。在團隊中，僅治療你所在的小隊。立即施放，且你可在暮色帷幕下繼續攻擊。被吸收的傷害及超出敵人剩餘生命值的傷害不會產生治療。',
+  'entities.abilities.void_rupture.name': '虛空破裂',
+  'entities.abilities.void_rupture.description':
+    '消耗3層幽暗什一，撕裂一名敵人並造成{damage}暗影傷害。傷害隨法術能量提高，且可造成致命一擊。需要3層，即使被抵抗也會消耗。',
+  'entities.abilities.inner_focus.specNote_shadow':
+    '此外，在60秒內，你的下一次裂心術或虛空破裂命中時必定造成致命一擊。其他法術不會消耗此加成。虛空破裂仍會消耗3層幽暗什一。施法被抵抗也會消耗此致命一擊加成。',
+  'hudChrome.auraEffect.stilledMindCrit':
+    '你的下一次裂心術或虛空破裂命中時必定造成致命一擊。其他法術不會消耗此加成。虛空破裂仍會消耗3層幽暗什一。施法被抵抗也會消耗此加成。',
 };

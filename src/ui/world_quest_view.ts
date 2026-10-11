@@ -9,6 +9,7 @@ import {
 import { itemLevel } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { PlayerClass, WorldQuestDef } from '../sim/types';
+import { worldQuestHonorRewardForQuest } from '../sim/world_quest_honor_slots';
 import { worldQuestItemRewardForQuest } from '../sim/world_quest_item_slots';
 import { worldQuestCopperReward, worldQuestXpReward } from '../sim/world_quests';
 import { mobDisplayName, vehicleStationDisplayName } from './entity_display_core';
@@ -168,12 +169,26 @@ export function worldQuestFactionCurrencyRewardText(quest: WorldQuestDef, level:
   });
 }
 
+/** The day's Honor bonus ("+150 Honor"), or null when this quest carries none
+ *  this cycle. Realm-wide, so it reads only the cycle, never the viewer's class. */
+export function worldQuestHonorRewardText(quest: WorldQuestDef, cycle: string): string | null {
+  const honor = worldQuestHonorRewardForQuest(cycle, quest);
+  if (honor <= 0) return null;
+  return t('hudChrome.worldQuestTooltip.currencyReward', {
+    amount: whole(honor),
+    currency: t('hudChrome.currencies.honor'),
+  });
+}
+
 /** One line for the map hover and the screen-reader summary: the bundle, the
- *  standing, and the day's item when the viewer has one coming from this quest. */
+ *  day's item when the viewer has one coming from this quest, the day's Honor
+ *  bonus, and the standing. */
 export function worldQuestRewardLine(quest: WorldQuestDef, viewer: WorldQuestRewardViewer): string {
   const parts = [worldQuestRewardText(quest, viewer.level)];
   const item = worldQuestItemRewardText(quest, viewer);
   if (item) parts.push(item);
+  const honor = worldQuestHonorRewardText(quest, viewer.cycle);
+  if (honor) parts.push(honor);
   parts.push(worldQuestStandingRewardText(quest, viewer.level));
   const currency = worldQuestFactionCurrencyRewardText(quest, viewer.level);
   if (currency) parts.push(currency);

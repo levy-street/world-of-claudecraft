@@ -583,7 +583,7 @@ export const id_ID: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const id_ID: EnTranslations = {
         "battlegroundAssist": "Bantuan pukulan pamungkas",
         "worldKill": "pembunuhan dunia",
         "worldAssist": "membantu pembunuhan dunia",
-        "hillHold": "memegang bukit"
+        "hillHold": "memegang bukit",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Bunuh",
@@ -2951,7 +2952,7 @@ export const id_ID: EnTranslations = {
       "delveMark": "Merek Galian",
       "wocToken": "Token WoC",
       "heroicMarkNote": "Dungeon Heroik: belanjakan di kepala perlengkapan heroik",
-      "honorNote": "Medan Pertempuran dan arena",
+      "honorNote": "Medan Pertempuran, arena, dan Misi Dunia",
       "delveMarkNote": "Galian diselesaikan",
       "wocTokenNote": "Saldo dompet tertaut",
       "walletNotLinked": "Tidak ada dompet yang ditautkan",
@@ -4246,6 +4247,7 @@ export const id_ID: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Pemain Curang >",
       "pledgeTag": "Ikrar {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const id_ID: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Wadah Guruh",
-        "description": "Pasif: Sambaran Busur dan Petir Bercabang memberi Guruh, hingga 5. Pada 5 Guruh, Sentakan Bumi memberi 125% lebih banyak kerusakan atau Gempa Bumi 100% lebih banyak, lalu menghabiskan seluruh Guruh. (Panggilan Guruh)"
+        "description": "Pasif: Sambaran Busur, Petir Bercabang, dan Ledakan Magma memberi Guruh, hingga 5. Pada 5 Guruh, Sentakan Bumi memberi 125% lebih banyak kerusakan atau Gempa Bumi 100% lebih banyak, lalu menghabiskan seluruh Guruh. (Panggilan Guruh)"
       },
       "lightning_overload": {
         "name": "Beban Busur",
@@ -13861,7 +13863,7 @@ export const id_ID: EnTranslations = {
       },
       "lava_burst": {
         "name": "Ledakan Magma",
-        "description": "Berikan {damage} kerusakan Api. Selalu membuat serangan kritis pada target yang terbakar dengan Sentakan Bara-mu. Gelombang Magma: setiap tik Sentakan Bara-mu memiliki 20% kemungkinan untuk mengatur ulang jeda ini dan membuat Ledakan Magma berikutnya dalam 10 detik instan. Kerusakan meningkat dengan Kekuatan Mantra."
+        "description": "Berikan {damage} kerusakan Api. Pukulan telak memberi 1 Guntur. Selalu membuat serangan kritis pada target yang terbakar dengan Sentakan Bara-mu. Serangan kritis memberi tambahan 24% dari kerusakan normal. Gelombang Magma: setiap tik Sentakan Bara-mu memiliki 20% kemungkinan untuk mengatur ulang jeda ini dan membuat Ledakan Magma berikutnya dalam 10 detik instan. Kerusakan meningkat dengan Kekuatan Mantra."
       },
       "thunderstorm": {
         "name": "Putus Badai",
@@ -13885,7 +13887,7 @@ export const id_ID: EnTranslations = {
       },
       "flame_shock": {
         "name": "Sentakan Bara",
-        "description": "Memberi {damage} kerusakan Api, lalu {overTime} kerusakan Api selama 12 dtk. Pukulan awalnya meningkat dengan Kekuatan Mantra."
+        "description": "Memberi {damage} kerusakan Api, lalu {overTime} kerusakan Api selama {duration} dtk. Pukulan awalnya meningkat dengan Kekuatan Mantra."
       },
       "flametongue_weapon": {
         "name": "Senjata Pyrebrand",

@@ -583,7 +583,7 @@ export const fr_FR: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const fr_FR: EnTranslations = {
         "battlegroundAssist": "coup fatal assisté",
         "worldKill": "élimination en monde ouvert",
         "worldAssist": "élimination en monde ouvert assistée",
-        "hillHold": "colline tenue"
+        "hillHold": "colline tenue",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Élimination",
@@ -2951,7 +2952,7 @@ export const fr_FR: EnTranslations = {
       "delveMark": "Marque de plongée",
       "wocToken": "Jeton WoC",
       "heroicMarkNote": "Donjons héroïques . à dépenser auprès de l'intendant héroïque",
-      "honorNote": "Champs de bataille et arène",
+      "honorNote": "Champs de bataille, arène et quêtes mondiales",
       "delveMarkNote": "Plongées terminées",
       "wocTokenNote": "Solde du portefeuille lié",
       "walletNotLinked": "Aucun portefeuille lié",
@@ -4246,6 +4247,7 @@ export const fr_FR: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "JcJ",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Tricheur >",
       "pledgeTag": "Serment de {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const fr_FR: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Réservoir de tonnerre",
-        "description": "Passif : le Éclair d'arc et l'Éclair fourchu octroient du Tonnerre, jusqu'à 5. À 5 Tonnerre, la Secousse tellurique inflige 125% de dégâts en plus ou le Tremblement de terre 100% de plus, puis consomme tout le Tonnerre. (Appel du tonnerre)"
+        "description": "Passif : le Éclair d'arc, l'Éclair fourchu et Magma Burst octroient du Tonnerre, jusqu'à 5. À 5 Tonnerre, la Secousse tellurique inflige 125% de dégâts en plus ou le Tremblement de terre 100% de plus, puis consomme tout le Tonnerre. (Appel du tonnerre)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13861,7 +13863,7 @@ export const fr_FR: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Inflige {damage} points de dégâts de Feu. Assène toujours un coup critique sur une cible brûlant sous l'effet de votre Secousse de braises. Magma Surge : chaque tic de Secousse de braises a 20 % de chances de réinitialiser ce temps de recharge et de rendre votre prochain Magma Burst instantané dans les 10 s qui suivent. Les dégâts augmentent avec la puissance des sorts. (Thundercall)"
+        "description": "Inflige {damage} points de dégâts de Feu. Un coup au but accorde 1 Tonnerre. Assène toujours un coup critique sur une cible brûlant sous l'effet de votre Secousse de braises. Un coup critique inflige 24 % supplémentaires des dégâts normaux. Magma Surge : chaque tic de Secousse de braises a 20 % de chances de réinitialiser ce temps de recharge et de rendre votre prochain Magma Burst instantané dans les 10 s qui suivent. Les dégâts augmentent avec la puissance des sorts. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13885,7 +13887,7 @@ export const fr_FR: EnTranslations = {
       },
       "flame_shock": {
         "name": "Secousse de braises",
-        "description": "Inflige {damage} points de dégâts de Feu, puis {overTime} points de dégâts de Feu en 12 s. Le coup initial augmente avec la puissance des sorts."
+        "description": "Inflige {damage} points de dégâts de Feu, puis {overTime} points de dégâts de Feu en {duration} s. Le coup initial augmente avec la puissance des sorts."
       },
       "flametongue_weapon": {
         "name": "Arme Pyrebrand",

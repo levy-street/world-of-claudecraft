@@ -687,6 +687,14 @@ const baseEnTable = {
   'worldPvp.defeatedGroupPlain': '{killer} and {others} others defeat you.',
   'worldPvp.defeatedGroupTake':
     '{killer} and {others} others defeat you and take {money} from your purse.',
+  // World PvP bounties (src/sim/pvp/world_pvp_bounty.ts): the holder's two
+  // placeholder-free notices register in the EXACT matcher; the realm lines
+  // carry player names and need the RULES entries at the end of this file.
+  'worldPvp.bountyEarned':
+    'A bounty is on your head: your kills pay more Honor, and whoever slays you earns double.',
+  'worldPvp.bountyLapsed': 'Your bounty has lapsed.',
+  'worldPvp.bountyPlaced': 'A bounty has been placed on {name}! Slay them for double Honor.',
+  'worldPvp.bountyCollected': '{killer} has collected the bounty on {victim}.',
   'log.channelJoined': 'Joined the {channel} channel. Type /{channel} <message> to talk.',
   'log.channelLeft': 'Left the {channel} channel.',
   'log.dungeonDifficultyHeroic': 'Dungeon difficulty set to Heroic.',
@@ -21634,6 +21642,16 @@ const RULES: Rule[] = [
         name: m[2],
         minutes: hillMinutes(m[3]),
       }),
+  },
+  // World PvP bounties (src/sim/pvp/world_pvp_bounty.ts): the two realm
+  // announcements. Player names splice through verbatim.
+  {
+    re: /^A bounty has been placed on (.+)! Slay them for double Honor\.$/,
+    build: (m) => tSim('worldPvp.bountyPlaced', { name: m[1] }),
+  },
+  {
+    re: /^(.+) has collected the bounty on (.+)\.$/,
+    build: (m) => tSim('worldPvp.bountyCollected', { killer: m[1], victim: m[2] }),
   },
 ];
 

@@ -60,6 +60,7 @@ import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
 } from './nameplate_projection';
+import { nameplateHasBounty } from './nameplate_tag_fill_core';
 import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
@@ -344,11 +345,14 @@ export class NameplatePainter {
         state = createNameplateCanvasState();
         this.states.set(id, state);
       }
+      // The bounty bit is read against the row BEFORE updateDynamicState writes
+      // it, so a flip re-resolves the `<Bounty>` tag this frame like the flag.
+      const bountyFlipped = state.bounty !== nameplateHasBounty(entity);
       this.updateDynamicState(state, entity, player, plan, languageChanged);
       // The /pvp flag is the one content input read every pass: a flip
       // re-resolves the row THIS frame (state.pvpFlag), never on the tier cadence.
-      const pvpFlipped = state.pvpFlag !== (entity.pvpFlag === true);
-      if (!state.initialized || fullPass || plan.urgent || languageChanged || pvpFlipped) {
+      const tagFlipped = state.pvpFlag !== (entity.pvpFlag === true) || bountyFlipped;
+      if (!state.initialized || fullPass || plan.urgent || languageChanged || tagFlipped) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
       }
 
@@ -537,6 +541,8 @@ export class NameplatePainter {
     state.hostile = entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity));
     state.deadEnemy =
       entity.dead && (entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity)));
+    // World PvP bounty: the whole tag paints blood red, read live like hostile.
+    state.bounty = nameplateHasBounty(entity);
     state.myPet = entity.ownerId === player.id;
     state.threat = plan.threat;
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
@@ -633,7 +639,9 @@ export class NameplatePainter {
       state.pvpFlag = entity.pvpFlag === true;
       const pvpTag = state.pvpFlag ? `<${t('hudChrome.nameplate.pvpTag')}> ` : '';
       const afkTag = entity.afk ? `<${t('hudChrome.nameplate.afkTag')}> ` : '';
-      state.name = `${pvpTag}${afkTag}${baseName}`;
+      // The bounty's non-colour cue (forced colours flatten the blood red).
+      const bountyTag = state.bounty ? `<${t('hudChrome.nameplate.bountyTag')}> ` : '';
+      state.name = `${bountyTag}${pvpTag}${afkTag}${baseName}`;
       state.nameColor = roleColor ?? '#7fb8ff';
       // A member's line is their guild; a PLEDGE (docs/prd/guild-pledge-board.md)
       // borrows the same line with the localized pledge wording, so an

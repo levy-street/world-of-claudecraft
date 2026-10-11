@@ -583,7 +583,7 @@ export const pl_PL: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const pl_PL: EnTranslations = {
         "battlegroundAssist": "Asysta przy ciosie kończącym",
         "worldKill": "zabój światowy",
         "worldAssist": "asystowanie przy zabiciu światowym",
-        "hillHold": "utrzymywanie wzgórza"
+        "hillHold": "utrzymywanie wzgórza",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Zabójstwo",
@@ -2951,7 +2952,7 @@ export const pl_PL: EnTranslations = {
       "delveMark": "Znak Wyprawy",
       "wocToken": "Token WoC",
       "heroicMarkNote": "Lochowiska heroiczne. Wydaj w kwatermistrzu heroicznym",
-      "honorNote": "Pola Bitwy i Arena",
+      "honorNote": "Pola Bitwy, Arena i zadania światowe",
       "delveMarkNote": "Ukończone wyprawy",
       "wocTokenNote": "Saldo połączonego portfela",
       "walletNotLinked": "Brak połączonego portfela",
@@ -4246,6 +4247,7 @@ export const pl_PL: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Oszust >",
       "pledgeTag": "Ślubowanie: {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const pl_PL: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Zbiornik Gromu",
-        "description": "Pasywna: Łukowy pocisk i Rozgałęziona Błyskawica przyznają Grom, do 5. Przy 5 Gromach Ziemny wstrząs zadaje o 125% więcej obrażeń albo Trzęsienie ziemi o 100% więcej, a następnie zużywa cały Grom. (Wezwanie Gromu)"
+        "description": "Pasywna: Łukowy pocisk, Rozgałęziona Błyskawica i Fala Magmy przyznają Grom, do 5. Przy 5 Gromach Ziemny wstrząs zadaje o 125% więcej obrażeń albo Trzęsienie ziemi o 100% więcej, a następnie zużywa cały Grom. (Wezwanie Gromu)"
       },
       "lightning_overload": {
         "name": "Przeładowanie Łuku",
@@ -13861,7 +13863,7 @@ export const pl_PL: EnTranslations = {
       },
       "lava_burst": {
         "name": "Fala Magmy",
-        "description": "Zadaj {damage} obrażeń ogniowych. Zawsze krytycznie trafia cel palący się z Twojego Żarowego Wstrząsu. Przypływ Magmy: każdy Żarowy Wstrząs ma 20% szansy na zresetowanie tej regeneracji i sprawienie, że Twoja następna Fala Magmy w ciągu 10 sek będzie natychmiastowa. Obrażenia rosną wraz z Mocą Zaklęć."
+        "description": "Zadaj {damage} obrażeń ogniowych. Trafienie daje 1 Grom. Zawsze krytycznie trafia cel palący się z Twojego Żarowego Wstrząsu. Trafienie krytyczne zadaje dodatkowo 24% zwykłych obrażeń. Przypływ Magmy: każdy Żarowy Wstrząs ma 20% szansy na zresetowanie tej regeneracji i sprawienie, że Twoja następna Fala Magmy w ciągu 10 sek będzie natychmiastowa. Obrażenia rosną wraz z Mocą Zaklęć."
       },
       "thunderstorm": {
         "name": "Łamacz Burzy",
@@ -13885,7 +13887,7 @@ export const pl_PL: EnTranslations = {
       },
       "flame_shock": {
         "name": "Żarowy wstrząs",
-        "description": "Zadaje {damage} obrażeń od ognia, a następnie {overTime} obrażeń od ognia przez 12 s. Pierwsze trafienie rośnie z mocą zaklęć."
+        "description": "Zadaje {damage} obrażeń od ognia, a następnie {overTime} obrażeń od ognia przez {duration} s. Pierwsze trafienie rośnie z mocą zaklęć."
       },
       "flametongue_weapon": {
         "name": "Oręż żarowego piętna",

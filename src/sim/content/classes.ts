@@ -4662,7 +4662,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
+      'Passive: Arc Bolt, Skybranch, and Magma Burst grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
   },
   // Thundercall v0.44 rework (docs/prd/shaman-thundercall-elemental-v028.md,
   // "v0.44.0 rework"): the classic Lightning Overload talent at its 5/5 value,
@@ -4709,7 +4709,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
+      'Deal $d Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
   },
   // The Wrath-era Thunderstorm: the spec's panic button. The 8% mana return
   // is applied by combat/shaman_thundercall_kit.ts; the knockback is not
@@ -5075,7 +5075,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Fire damage, then $o Fire damage over 12 sec. The initial hit increases with Spell Power.',
+      'Deal $d Fire damage, then $o Fire damage over $t sec. The initial hit increases with Spell Power.',
   },
   flametongue_weapon: {
     id: 'flametongue_weapon',

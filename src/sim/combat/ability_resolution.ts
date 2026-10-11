@@ -25,6 +25,7 @@ import { resolveColdsightAbilityForSpec } from './hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from './hunter_shared';
 import { radiantResonanceCastTime } from './paladin_radiant_resonance';
 import { resolveVespersAbility } from './priest/vespers';
+import { resolveThundercallAbility } from './shaman_thundercall_kit';
 
 /** The narrow slice of PlayerMeta this chain needs, so a caller with only a
  *  class + talent allocation never fakes a full PlayerMeta. */
@@ -45,6 +46,7 @@ export function resolveAbilityChain(
     found = resolveHunterSharedAbilityForTalents(found, actor, meta.talents);
   }
   found = resolveVespersAbility(found, meta);
+  found = resolveThundercallAbility(found, meta);
   // known already carries its own talent mods, baked in once at abilitiesKnownAt
   // time. A wholesale def swap above never went through that bake, so give it
   // its own pass here, exactly once, keyed by the FINAL id: comparing ids

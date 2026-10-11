@@ -524,7 +524,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.heroicMarkNote':
     'Heroische Dungeons . beim heroischen Quartiermeister ausgeben',
   'hudChrome.currencies.honor': 'Ehre',
-  'hudChrome.currencies.honorNote': 'Schlachtfelder und die Arena',
+  'hudChrome.currencies.honorNote': 'Schlachtfelder, die Arena und Weltquests',
   'hudChrome.currencies.intro':
     'Keine davon belegt Taschenplatz. Münze bleibt wie gewohnt in deiner Tasche.',
   'hudChrome.currencies.lifetime': 'Insgesamt {amount}',
@@ -1916,7 +1916,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Kündigt sofort einen Hügel an; er entsteht nach der vollen Vorwarnzeit.',
   'devCommand.actions.hillwarn.label': 'Hügel-Countdown',
   'entities.abilities.lava_burst.description':
-    'Verursacht {damage} Feuerschaden. Trifft ein Ziel, das von Eurem Cinder-Stoß brennt, immer kritisch. Magma Surge: Bei jedem Cinder-Stoß-Tick besteht eine Chance von 20%, diese Abklingzeit zurückzusetzen und Euren nächsten Magma Burst innerhalb von 10 Sek. sofort wirkbar zu machen. Der Schaden steigt mit der Zaubermacht. (Donnerruf)',
+    'Verursacht {damage} Feuerschaden. Ein Treffer gewährt 1 Donner. Trifft ein Ziel, das von Eurem Cinder-Stoß brennt, immer kritisch. Ein kritischer Treffer verursacht zusätzlich 24% des normalen Schadens. Magma Surge: Bei jedem Cinder-Stoß-Tick besteht eine Chance von 20%, diese Abklingzeit zurückzusetzen und Euren nächsten Magma Burst innerhalb von 10 Sek. sofort wirkbar zu machen. Der Schaden steigt mit der Zaubermacht. (Donnerruf)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     'Passiv: Lichtbogenblitz und Gabelblitz haben eine Chance von 20%, sich zu überladen, ihr erstes Ziel erneut für 50% des verursachten Schadens zu treffen und 1 Donner zu gewähren. (Donnerruf)',
@@ -9527,7 +9527,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Umhüllt euch 10 Min. lang mit Blitzen. Die nächsten 3 Nahkampfangriffe gegen euch fügen dem Angreifer {buff} Naturschaden zu, höchstens einmal alle 5 Sek.',
   'entities.abilities.flame_shock.name': 'Cinder-Stoß',
   'entities.abilities.flame_shock.description':
-    'Verursacht {damage} Feuerschaden, danach über 12 Sek. {overTime} Feuerschaden. Der erste Treffer steigt mit der Zaubermacht.',
+    'Verursacht {damage} Feuerschaden, danach über {duration} Sek. {overTime} Feuerschaden. Der erste Treffer steigt mit der Zaubermacht.',
   'entities.abilities.flametongue_weapon.name': 'Pyrebrand-Waffe',
   'entities.abilities.flametongue_weapon.description':
     'Erfüllt eure Waffe 30 Min. lang. Jeder Schlag verursacht {damage} zusätzlichen Feuerschaden.',
@@ -15090,7 +15090,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passiv: Während der Ahnenschlag abklingt, hat das Verbrauchen eines Sturmzeichens eine Chance von 25%, ihn zurückzusetzen. Schlagen die ersten 3 Chancen fehl, setzt ihn die 4. immer zurück. (Kriegsgeist)',
   'entities.abilities.thunder_reservoir.description':
-    'Passiv: Der Lichtbogenblitz und der Gabelblitz gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)',
+    'Passiv: Der Lichtbogenblitz, der Gabelblitz und Magma Burst gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)',
   'entities.abilities.tidecall.description':
     'Heilt ein verbündetes Ziel um {damage}. Die Heilung steigt mit Zaubermacht. Fügt die volle Heilung vor Überheilung der Flickströmung hinzu, bis zu 30% der maximalen Gesundheit des Ziels.',
   'entities.abilities.unleash_weapon.description':

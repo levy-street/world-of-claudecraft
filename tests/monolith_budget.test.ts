@@ -1266,7 +1266,11 @@ const MONOLITHS: MonolithRow[] = [
     // already on this line composed with the weekly loot focus candidate; no
     // new sim logic lands in this resizable-map merge. Exact merged count, zero
     // slack.
-    ceiling: 11631,
+    // Down to 11629 with buff persistence composed on the release candidate:
+    // the sickness save fields moved into src/sim/aura_persist.ts's
+    // auraSaveFragment beside the new buff list, while the candidate's
+    // rift-safe corpse save path remains in sim.ts. Exact count, zero slack.
+    ceiling: 11629,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1762,7 +1766,12 @@ const MONOLITHS: MonolithRow[] = [
     // Bank and vault commands share admission and save scheduling in
     // bank_storage_command. Combined merge measures 9816 lines, exact count
     // and zero slack.
-    ceiling: 9816,
+    // LOWERED 9816 -> 9769 after composing the spectate-body fix with this
+    // release candidate: /spectate stopped parking the moderator's body in
+    // limbo (the camera moves, the body stays in the world), retiring the
+    // saved position, GM toggle and pet stow while entry idle moved to
+    // server/spectate_body.ts. Exact count, zero slack.
+    ceiling: 9769,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2238,7 +2247,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 827 -> 826 at World PvP (PR 4146 review): the state gained the pvpFlag
     // the name row was built with, paid for by three comment trims. Exact count
     // (wc -l < src/render/nameplate_canvas.ts), zero slack.
-    ceiling: 826,
+    // LOWERED 826 -> 823 at World PvP bounties: the state gained the bounty bit
+    // and the name row its blood-red fills, paid for by moving every tag fill
+    // rule (the guild colour tiers included) to nameplate_tag_fill_core.ts.
+    // Exact count (wc -l < src/render/nameplate_canvas.ts), zero slack.
+    ceiling: 823,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

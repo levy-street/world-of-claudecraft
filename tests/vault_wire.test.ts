@@ -915,9 +915,14 @@ describe('materials vault wire round-trip', () => {
     });
 
     // Spectating anchors the WHOLE proximity section (bank, vault, guildBank)
-    // on the observed player, and it parks the moderator's own body in limbo
-    // far from every banker: read against the moderator's own pid the vault
-    // would be null, so the values below can only have come from the anchor.
+    // on the observed player. The moderator's own body stays where it stands,
+    // so stand it far from every banker first: read against the moderator's
+    // own pid the vault is then null, and the values below can only have come
+    // from the anchor.
+    const modBody = server.sim.entities.get(moderator.pid)!;
+    modBody.pos = server.sim.groundPos(400, 400);
+    modBody.prevPos = { ...modBody.pos };
+    expect(server.sim.vaultInfoFor(moderator.pid)).toBeNull();
     // biome-ignore lint/suspicious/noExplicitAny: enterSpectate is a private server method
     (server as any).enterSpectate(moderator, owner.session);
     modWs.sent.length = 0;
@@ -934,8 +939,8 @@ describe('materials vault wire round-trip', () => {
     // The bank-family posture, pinned: this is the moderator's OWN self block
     // carrying somebody else's private store, so a future change to
     // anchorSession semantics (in either direction) trips here. Read against
-    // the moderator's OWN pid the same call returns null (limbo is nowhere near
-    // a banker), so the frame above cannot have come from the viewer.
+    // the moderator's OWN pid the same call returns null (its body stands far
+    // from any banker), so the frame above cannot have come from the viewer.
     expect(server.sim.vaultInfoFor(moderator.pid)).toBeNull();
 
     // The entity-payload scan, with its scope stated exactly rather than

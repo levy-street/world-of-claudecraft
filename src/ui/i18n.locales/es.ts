@@ -603,7 +603,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Facciones',
   'hudChrome.currencies.heroicMarkNote': 'Mazmorras heroicas . gástala con el intendente heroico',
   'hudChrome.currencies.honor': 'Honor',
-  'hudChrome.currencies.honorNote': 'Campos de batalla y la arena',
+  'hudChrome.currencies.honorNote': 'Campos de batalla, la arena y misiones de mundo',
   'hudChrome.currencies.intro':
     'Ninguna de estas ocupa espacio en las bolsas. Las monedas siguen en tu bolsa como siempre.',
   'hudChrome.currencies.lifetime': 'Total histórico {amount}',
@@ -2105,7 +2105,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Movimiento final que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s). Solo en Forma de lobo.',
   'entities.abilities.hamstring_bite.name': 'Takedown',
   'entities.abilities.lava_burst.description':
-    'Inflige {damage} de daño de Fuego. Siempre asesta golpe crítico a un objetivo que arda con tu Sacudida de Ascuas. Oleada de Magma: cada tic de Sacudida de Ascuas tiene un 20% de probabilidad de reiniciar este tiempo de reutilización y hacer que tu próximo Magma Burst en los 10 s siguientes sea instantáneo. El daño aumenta con el poder con hechizos. (Thundercall)',
+    'Inflige {damage} de daño de Fuego. Un impacto otorga 1 de Trueno. Siempre asesta golpe crítico a un objetivo que arda con tu Sacudida de Ascuas. Un golpe crítico inflige un 24% adicional del daño normal. Oleada de Magma: cada tic de Sacudida de Ascuas tiene un 20% de probabilidad de reiniciar este tiempo de reutilización y hacer que tu próximo Magma Burst en los 10 s siguientes sea instantáneo. El daño aumenta con el poder con hechizos. (Thundercall)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     'Pasiva: Arco Eléctrico y Relámpago Bifurcado tienen un 20% de probabilidad de sufrir una Sobrecarga, golpeando de nuevo a su primer objetivo por el 50% del daño infligido y otorgando 1 de Trueno. (Thundercall)',
@@ -9364,7 +9364,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Te rodea de relámpagos durante 10 min. Los 3 siguientes ataques cuerpo a cuerpo contra ti infligen {buff} de daño de Naturaleza al atacante, como mucho una vez cada 5 s.',
   'entities.abilities.flame_shock.name': 'Sacudida de Ascuas',
   'entities.abilities.flame_shock.description':
-    'Inflige {damage} de daño de Fuego, y después {overTime} de daño de Fuego durante 12 s. El impacto inicial aumenta con el poder con hechizos.',
+    'Inflige {damage} de daño de Fuego, y después {overTime} de daño de Fuego durante {duration} s. El impacto inicial aumenta con el poder con hechizos.',
   'entities.abilities.flametongue_weapon.name': 'Arma Tizón Ígneo',
   'entities.abilities.flametongue_weapon.description':
     'Imbuye tu arma durante 30 min. Cada golpe inflige {damage} de daño de Fuego adicional.',
@@ -16498,7 +16498,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Pasiva: mientras el Golpe Ancestral está en reutilización, consumir Presagio de Tormenta tiene un 25% de probabilidad de reiniciarlo. Si los 3 primeros intentos fallan, el 4.º siempre lo reinicia. (Espíritu Guerrero)',
   'entities.abilities.thunder_reservoir.description':
-    'Pasiva: el Arco Eléctrico y el Relámpago Bifurcado otorgan Trueno, hasta 5. Con 5 de Trueno, la Sacudida Terrestre inflige un 125% más de daño o el Terremoto un 100% más, y luego consume todo el Trueno. (Llamatruenos)',
+    'Pasiva: el Arco Eléctrico, el Relámpago Bifurcado y Magma Burst otorgan Trueno, hasta 5. Con 5 de Trueno, la Sacudida Terrestre inflige un 125% más de daño o el Terremoto un 100% más, y luego consume todo el Trueno. (Llamatruenos)',
   'entities.abilities.tidecall.description':
     'Sana a un objetivo amistoso por {damage}. La sanación aumenta con el poder con hechizos. Añade la sanación completa calculada antes del exceso a la Corriente Sanadora, hasta un 30% de la salud máxima del objetivo.',
   'entities.abilities.unleash_weapon.description':

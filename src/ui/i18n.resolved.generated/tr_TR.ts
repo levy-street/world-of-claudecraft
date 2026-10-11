@@ -583,7 +583,7 @@ export const tr_TR: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const tr_TR: EnTranslations = {
         "battlegroundAssist": "öldürücü darbeye yardım edildi",
         "worldKill": "dünya öldürme",
         "worldAssist": "dünya öldürme desteklemek",
-        "hillHold": "tepenin üstünde durmak"
+        "hillHold": "tepenin üstünde durmak",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Öldürme",
@@ -2951,7 +2952,7 @@ export const tr_TR: EnTranslations = {
       "delveMark": "Delve İşareti",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Kahramanlık zindanları . Kahramanlık idarecisinden harca",
-      "honorNote": "Savaş alanları ve arena",
+      "honorNote": "Savaş alanları, arena ve dünya görevleri",
       "delveMarkNote": "Tamamlanan Delve'ler",
       "wocTokenNote": "Bağlı cüzdan bakiyesi",
       "walletNotLinked": "Bağlı cüzdan yok",
@@ -4246,6 +4247,7 @@ export const tr_TR: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "UZAKTA",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Hileci >",
       "pledgeTag": "{guild} Yeminlisi",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const tr_TR: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Gök Gürültüsü Haznesi",
-        "description": "Pasif: Ark Oku ve Çatallı Yıldırım Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)"
+        "description": "Pasif: Ark Oku, Çatallı Yıldırım ve Magma Patlaması Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13861,7 +13863,7 @@ export const tr_TR: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Patlaması",
-        "description": "{damage} Ateş hasarı ver. Her zaman yanmakta olan bir hedefi kritik olarak vur."
+        "description": "{damage} Ateş hasarı ver. İsabet 1 Gök Gürültüsü verir. Her zaman yanmakta olan bir hedefi kritik olarak vur. Kritik vuruş, normal hasarın %24'ü kadar ek hasar verir."
       },
       "thunderstorm": {
         "name": "Fırtına Kırması",
@@ -13885,7 +13887,7 @@ export const tr_TR: EnTranslations = {
       },
       "flame_shock": {
         "name": "Köz Sarsıntısı",
-        "description": "{damage} Ateş hasarı, ardından 12 sn boyunca {overTime} Ateş hasarı verir. İlk isabet Büyü Gücü ile artar."
+        "description": "{damage} Ateş hasarı, ardından {duration} sn boyunca {overTime} Ateş hasarı verir. İlk isabet Büyü Gücü ile artar."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand Silahı",

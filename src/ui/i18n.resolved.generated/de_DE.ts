@@ -583,7 +583,7 @@ export const de_DE: EnTranslations = {
       "bombStatus": "{value} of {max} Tithe Bomb charges",
       "bombReady": "Ready",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
       "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
     },
     "procOverlay": {
@@ -2820,7 +2820,8 @@ export const de_DE: EnTranslations = {
         "battlegroundAssist": "Unterstützung beim Todesstoß",
         "worldKill": "Welt-Tötung",
         "worldAssist": "Welt-Tötung unterstützt",
-        "hillHold": "den Hügel gehalten"
+        "hillHold": "den Hügel gehalten",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Ausschaltung",
@@ -2951,7 +2952,7 @@ export const de_DE: EnTranslations = {
       "delveMark": "Tiefgang-Marke",
       "wocToken": "WoC-Token",
       "heroicMarkNote": "Heroische Dungeons . beim heroischen Quartiermeister ausgeben",
-      "honorNote": "Schlachtfelder und die Arena",
+      "honorNote": "Schlachtfelder, die Arena und Weltquests",
       "delveMarkNote": "Abgeschlossene Tiefgänge",
       "wocTokenNote": "Guthaben der verknüpften Wallet",
       "walletNotLinked": "Keine Wallet verknüpft",
@@ -4246,6 +4247,7 @@ export const de_DE: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Schummler >",
       "pledgeTag": "Gelöbnis: {guild}",
       "npcRoleTag": "<{role}>",
@@ -13853,7 +13855,7 @@ export const de_DE: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Donnerspeicher",
-        "description": "Passiv: Der Lichtbogenblitz und der Gabelblitz gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)"
+        "description": "Passiv: Der Lichtbogenblitz, der Gabelblitz und Magma Burst gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13861,7 +13863,7 @@ export const de_DE: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Verursacht {damage} Feuerschaden. Trifft ein Ziel, das von Eurem Cinder-Stoß brennt, immer kritisch. Magma Surge: Bei jedem Cinder-Stoß-Tick besteht eine Chance von 20%, diese Abklingzeit zurückzusetzen und Euren nächsten Magma Burst innerhalb von 10 Sek. sofort wirkbar zu machen. Der Schaden steigt mit der Zaubermacht. (Donnerruf)"
+        "description": "Verursacht {damage} Feuerschaden. Ein Treffer gewährt 1 Donner. Trifft ein Ziel, das von Eurem Cinder-Stoß brennt, immer kritisch. Ein kritischer Treffer verursacht zusätzlich 24% des normalen Schadens. Magma Surge: Bei jedem Cinder-Stoß-Tick besteht eine Chance von 20%, diese Abklingzeit zurückzusetzen und Euren nächsten Magma Burst innerhalb von 10 Sek. sofort wirkbar zu machen. Der Schaden steigt mit der Zaubermacht. (Donnerruf)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13885,7 +13887,7 @@ export const de_DE: EnTranslations = {
       },
       "flame_shock": {
         "name": "Cinder-Stoß",
-        "description": "Verursacht {damage} Feuerschaden, danach über 12 Sek. {overTime} Feuerschaden. Der erste Treffer steigt mit der Zaubermacht."
+        "description": "Verursacht {damage} Feuerschaden, danach über {duration} Sek. {overTime} Feuerschaden. Der erste Treffer steigt mit der Zaubermacht."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand-Waffe",

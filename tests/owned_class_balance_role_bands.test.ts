@@ -32,9 +32,11 @@ describe('owned-class level 20 balance harness (sustained role bands)', () => {
       // at ~214; Elemental is a below-band kit item tracked separately);
       // flagged for owner review. Lane-diet re-measure: full actual 0.9612 (5
       // seeds), diet actual 0.9663 (2 seeds); same relative margin keeps the
-      // 0.83 floor and puts the diet ceiling at 1.11.
+      // 0.83 floor. v0.45.0 rotation fix: the 1.1x ceiling against Vespers is
+      // removed by owner decision (2026-10-07), so the Cinder Jolt and Magma
+      // Burst rotation this fixture plays can clearly beat Arc Bolt plus Earthen
+      // Jolt (docs/prd/shaman-thundercall-elemental-v028.md).
       expect(thundercall.dps).toBeGreaterThanOrEqual(vespersSingle.dps * 0.83);
-      expect(thundercall.dps).toBeLessThanOrEqual(vespersSingle.dps * band(1.1, 1.11));
       // Warspirit area/single: re-pinned for the 210 softening round (baseline
       // apPct 0.05 to 0.15, Ancestral Strike 0.5 to 0.6, echo stays 0.25). The
       // AP raise grows the melee and echo-cleave lines while the Stormcast

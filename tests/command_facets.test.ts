@@ -161,8 +161,8 @@ describe('command facet tags (W8)', () => {
   });
 
   it('tags the raid markers to IWorldParty, not IWorldTargeting (the W6 exclusion)', () => {
-    expect(tags['setMarker']).toBe('IWorldParty');
-    expect(tags['clearMarker']).toBe('IWorldParty');
+    expect(tags.setMarker).toBe('IWorldParty');
+    expect(tags.clearMarker).toBe('IWorldParty');
   });
 
   it('does not tag partyInfo/markerFor (snapshot reads, no wire send)', () => {
