@@ -283,6 +283,57 @@ describe("the leaver's record counts the forfeit as one death", () => {
   });
 });
 
+describe('the kill rules hold for a forfeit', () => {
+  it('splits the honor and the held gold across every contributor; the blow takes the remainder', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 1);
+    const c = addFighter(sim, 'Gimel', 3, 4);
+    const b = addFighter(sim, 'Bet', 2, 2);
+    for (const pid of [a, b, c]) flag(sim, pid);
+    sim.meta(b)!.copper = 30_001; // 10% = 3_000, split 1_500 each
+    hit(sim, c, b);
+    hit(sim, a, b); // a is the most recent: the killing blow
+    expect(forfeitWorldPvpFightOnDeparture(sim.ctx, b)).toBe(true);
+    expect(sim.meta(a)!.honor).toBe(5);
+    expect(sim.meta(c)!.honor).toBe(5);
+    expect(sim.meta(a)!.worldPvp!.pending).toEqual([expect.objectContaining({ copper: 1_500 })]);
+    expect(sim.meta(c)!.worldPvp!.pending).toEqual([expect.objectContaining({ copper: 1_500 })]);
+    expect(sim.meta(b)!.copper).toBe(27_001);
+    expect(sim.worldPvpInfoFor(c)).toMatchObject({ kills: 1 });
+  });
+
+  it('a grey leaver pays the opponent nothing, but the death still counts', () => {
+    const { sim, a, b } = fight();
+    sim.setPlayerLevel(14, b); // six below: grey to a level-20 opponent
+    ent(sim, b).hp = ent(sim, b).maxHp;
+    sim.meta(b)!.copper = 20_000;
+    hit(sim, a, b);
+    expect(forfeitWorldPvpFightOnDeparture(sim.ctx, b)).toBe(true);
+    expect(sim.meta(a)!.honor).toBe(0);
+    expect(sim.meta(b)!.copper).toBe(20_000);
+    expect(sim.worldPvpInfoFor(b)!.deaths).toBe(1);
+  });
+
+  it('a revived fighter who has only thrown blows since still forfeits in full (stale paid-death row)', () => {
+    const { sim, a, b } = fight();
+    slay(sim, a, b);
+    revive(sim, b);
+    hit(sim, b, a); // b only hits: nothing clears the paid-death row before the sweep
+    expect(sim.worldPvpBooks.paidDeaths.has(b)).toBe(true);
+    expect(forfeitWorldPvpFightOnDeparture(sim.ctx, b)).toBe(true);
+    expect(sim.worldPvpInfoFor(b)!.deaths).toBe(2);
+    expect(sim.worldPvpInfoFor(a)!.kills).toBe(2);
+  });
+
+  it('an opponent already on the way out is no opponent', () => {
+    const { sim, a, b } = fight();
+    hit(sim, a, b);
+    sim.meta(a)!.leaving = true;
+    expect(worldPvpFightOpponent(sim.ctx, ent(sim, b))).toBeNull();
+    expect(forfeitWorldPvpFightOnDeparture(sim.ctx, b)).toBe(false);
+  });
+});
+
 describe('a departure that is not a forfeit', () => {
   it('no blow traded, or the last one older than the assist window: nothing happens', () => {
     const { sim, a, b } = fight();

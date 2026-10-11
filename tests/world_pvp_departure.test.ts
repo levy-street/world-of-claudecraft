@@ -25,6 +25,7 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
+import { saveCharacterAndMarketState, saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { WORLD_PVP_KILL_HONOR } from '../src/sim/pvp';
 import { WORLD_PVP_TOGGLE_COOLDOWN } from '../src/sim/pvp/world_pvp';
@@ -50,6 +51,16 @@ function expectJoined(result: ClientSession | { error: string }): ClientSession 
   return result;
 }
 
+/** Every character blob the mocked db was asked to write for `characterId`. */
+function savedBlobs(characterId: number): Array<Record<string, any>> {
+  return [
+    ...vi.mocked(saveCharacterState).mock.calls,
+    ...vi.mocked(saveCharacterAndMarketState).mock.calls,
+  ]
+    .filter((call) => call[0] === characterId)
+    .map((call) => call[2] as unknown as Record<string, any>);
+}
+
 /** Two flagged level-20 strangers on contested ground, the leaver just hit. */
 function midFight() {
   const server = new GameServer();
@@ -72,12 +83,15 @@ function midFight() {
   }
   const w = sim.entities.get(winner.pid)!;
   const l = sim.entities.get(leaver.pid)!;
+  sim.meta(leaver.pid)!.copper = 20_000; // a 20s stake
   sim.ctx.dealDamage(w, l, 5, false, 'physical', 'Slam', 'hit');
+  vi.mocked(saveCharacterState).mockClear();
+  vi.mocked(saveCharacterAndMarketState).mockClear();
   return { server, sim, winner, leaver, leaverWs };
 }
 
 describe('a departure mid world fight forfeits it on the server', () => {
-  it('a dropped socket: the linkdead body dies to the opponent before the grace begins', () => {
+  it('a dropped socket: the linkdead body dies to the opponent before the grace begins', async () => {
     const { server, sim, winner, leaver, leaverWs } = midFight();
     leaverWs.readyState = 3;
     expect(server.socketClosed(leaver, leaverWs)).toBe(true);
@@ -86,9 +100,16 @@ describe('a departure mid world fight forfeits it on the server', () => {
     expect(sim.meta(winner.pid)!.honor).toBe(WORLD_PVP_KILL_HONOR);
     expect(sim.worldPvpInfoFor(winner.pid)).toMatchObject({ kills: 1 });
     expect(sim.worldPvpInfoFor(leaver.pid)).toMatchObject({ deaths: 1 });
+    // The linkdead safety flush already carries the death and the debit.
+    await vi.waitFor(() => expect(savedBlobs(102).length).toBeGreaterThan(0));
+    expect(savedBlobs(102)[0]).toMatchObject({
+      dead: true,
+      copper: 18_000,
+      worldPvp: { deaths: 1 },
+    });
   });
 
-  it("a deliberate t:'logout': the forfeit resolves before the leave", () => {
+  it("a deliberate t:'logout': the forfeit resolves before the leave", async () => {
     const { server, sim, winner, leaver } = midFight();
     const leaverMeta = sim.meta(leaver.pid)!;
     server.handleMessage(leaver, JSON.stringify({ t: 'logout' }));
@@ -96,6 +117,29 @@ describe('a departure mid world fight forfeits it on the server', () => {
     expect(leaverMeta.worldPvp).toMatchObject({ deaths: 1 });
     expect(sim.meta(winner.pid)!.honor).toBe(WORLD_PVP_KILL_HONOR);
     expect(sim.worldPvpInfoFor(winner.pid)).toMatchObject({ kills: 1 });
+    // The leave save is taken after the forfeit: it carries the death and the debit.
+    await vi.waitFor(() => expect(savedBlobs(102).length).toBeGreaterThan(0));
+    expect(savedBlobs(102)[0]).toMatchObject({
+      dead: true,
+      copper: 18_000,
+      worldPvp: { deaths: 1 },
+    });
+  });
+
+  it('a kick for flooding messages is no way out: it forfeits like a logout', () => {
+    const { server, sim, winner, leaver } = midFight();
+    void (server as any).kickSession(leaver, 'flood', 'message flood');
+    expect(leaver.left).toBe(true);
+    expect(sim.worldPvpInfoFor(winner.pid)).toMatchObject({ kills: 1 });
+    expect(sim.meta(leaver.pid)!.worldPvp).toMatchObject({ deaths: 1 });
+  });
+
+  it('a session whose writes can never land (escrow-quarantined) is not forfeited', () => {
+    const { server, sim, winner, leaver } = midFight();
+    leaver.escrowQuarantined = true;
+    void (server as any).kickSession(leaver, 'character taken over', 'market escrow fenced');
+    expect(sim.meta(winner.pid)!.honor).toBe(0);
+    expect(sim.worldPvpInfoFor(winner.pid)).toMatchObject({ kills: 0 });
   });
 
   it('a takeover from another login forfeits the fight of the session it displaces', async () => {

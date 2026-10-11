@@ -3775,7 +3775,7 @@ export class GameServer {
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
     // Forfeit a live world fight, then stop held movement (a linkdead body can still die).
-    forfeitWorldPvpFightOnSessionDeparture(this.sim, session.pid);
+    forfeitWorldPvpFightOnSessionDeparture(this.sim, session.pid, !session.escrowQuarantined);
     stopDisconnectedPlayerInput(this.sim, session.pid);
     // Safety flush so a process crash during the grace window loses nothing.
     void this.saveCharacter(session, { withMarket: opts.withMarket ?? true }).catch((err) =>
@@ -3848,6 +3848,7 @@ export class GameServer {
 
   async leave(session: ClientSession, _reason: string): Promise<void> {
     if (session.left || !this.clients.has(session.pid)) return;
+    forfeitWorldPvpFightOnSessionDeparture(this.sim, session.pid, !session.escrowQuarantined);
     this.sim.leaveVehicle(session.pid);
     if (session.spectating) this.exitSpectate(session, false);
     if (session.jailVisit) this.exitJailVisit(session, false);
@@ -5802,9 +5803,8 @@ export class GameServer {
     characterId: number,
   ): Promise<'taken-over' | 'not-online'> {
     const session = this.sessionByCharacterId(characterId);
-    // Ownership re-checked here as at the REST layer; a live world fight is forfeited.
+    // Ownership is re-checked here (as at the REST layer): never kick another account.
     if (!session || session.accountId !== accountId) return 'not-online';
-    forfeitWorldPvpFightOnSessionDeparture(this.sim, session.pid);
     await this.kickSession(session, 'character taken over', 'character taken over');
     return 'taken-over';
   }
@@ -6128,9 +6128,9 @@ export class GameServer {
     const msg = rawMsg as ClientMessage;
     const sim = this.sim;
     const pid = session.pid;
-    // Deliberate logout: a clean leave, no linkdead grace (leave() sets session.left).
+    // Deliberate logout: a clean leave, not a linkdead grace. leave() sets
+    // session.left at once, so the page reload's close is a socketClosed() no-op.
     if (msg.t === 'logout') {
-      forfeitWorldPvpFightOnSessionDeparture(sim, pid);
       void this.leave(session, 'logout');
       return;
     }

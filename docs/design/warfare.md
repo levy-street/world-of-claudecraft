@@ -557,11 +557,16 @@ alone is the owner's stated shape.
   player hit them, or they hit one, inside `WORLD_PVP_ASSIST_WINDOW`, and that
   enemy is still standing and still world-hostile) dies to that opponent on the
   spot, through the one shared death hub, so every rule above applies unchanged.
-  The departures that count are the ones the player controls or that cannot be
-  told apart from one: a deliberate logout, a dropped socket (a closed client or
-  a lost connection, judged BEFORE the linkdead grace begins, so the body is
-  already a corpse while it lingers) and a takeover from another login
-  (`server/world_pvp_departure.ts`). The honor pool and the kill land on the
+  Every departure counts: a dropped socket (a closed client or a lost
+  connection, judged BEFORE the linkdead grace begins, so the body is already a
+  corpse while it lingers) and everything that runs `leave()` (a deliberate
+  logout, every kick including the message-flood one, a takeover from another
+  login, the end of the linkdead grace), via `server/world_pvp_departure.ts`.
+  The one exemption is a session whose writes can never land again (an
+  escrow-quarantined zombie displaced by a lease fence or a ledger failure):
+  its death and debit could not persist while the winner's credit would. An
+  opponent who is themselves already leaving (`PlayerMeta.leaving`) is no
+  opponent. The honor pool and the kill land on the
   opponent at once, the leaver's record takes one death at once, and the stake
   leaves the leaver's purse at once (their departure save carries the death and
   the debit); the stake reaches the winner `WORLD_PVP_FORFEIT_PAYOUT_SECONDS`

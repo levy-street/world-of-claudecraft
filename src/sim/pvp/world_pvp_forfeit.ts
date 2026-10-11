@@ -33,10 +33,14 @@ import type { Entity } from '../types';
 import { isWorldPvpHostile } from './world_pvp';
 import { WORLD_PVP_ASSIST_WINDOW } from './world_pvp_rules';
 
-/** A live, world-hostile enemy for `victim` from one candidate pid. */
+/** A live, world-hostile enemy for `victim` from one candidate pid. An enemy
+ *  who is themselves on the way out (`PlayerMeta.leaving`: their final save is
+ *  already taken) is no opponent: the honor and the held gold would land on a
+ *  record that is never saved again, while the leaver's debit would persist. */
 function liveEnemy(ctx: SimContext, victim: Entity, pid: number): Entity | null {
   const e = ctx.entities.get(pid);
-  if (!e || e.kind !== 'player' || e.dead || !ctx.players.has(pid)) return null;
+  const meta = ctx.players.get(pid);
+  if (!e || e.kind !== 'player' || e.dead || !meta || meta.leaving) return null;
   return isWorldPvpHostile(ctx, e, victim) ? e : null;
 }
 
@@ -91,6 +95,11 @@ export function forfeitWorldPvpFightOnDeparture(ctx: SimContext, pid: number): b
   const opponent = worldPvpFightOpponent(ctx, victim);
   if (!opponent) return false;
   const books = ctx.worldPvpBooks;
+  // The leaver is standing, so any paid-death row for them is from an earlier
+  // death the once-a-minute sweep has not cleared yet (a revived fighter who
+  // has only thrown blows since): without this the death hook would read it as
+  // the same death re-entered and resolve nothing.
+  books.paidDeaths.delete(pid);
   books.forfeitVictim = pid;
   try {
     ctx.handleDeath(victim, opponent);

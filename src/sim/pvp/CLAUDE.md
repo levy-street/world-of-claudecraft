@@ -101,9 +101,10 @@ ratings.
 - `world_pvp_forfeit.ts` owns the departure forfeit: `worldPvpFightOpponent`
   (the most recent live, world-hostile enemy who hit the player inside the
   assist window, else the one they hit) and `forfeitWorldPvpFightOnDeparture`,
-  which the SERVER calls on a dropped socket, a deliberate logout and a takeover
-  (`server/world_pvp_departure.ts`; the offline Sim and the RL env have no
-  departure to judge). It kills the leaver through `ctx.handleDeath` with
+  which the SERVER calls from `socketClosed` and from `leave()` (every logout,
+  kick and takeover; skipped for an escrow-quarantined session that can no
+  longer save), via `server/world_pvp_departure.ts`; the offline Sim and the
+  RL env have no departure to judge. It kills the leaver through `ctx.handleDeath` with
   `WorldPvpBooks.forfeitVictim` set, so `worldPvpOnPlayerDeath` resolves the
   kill by its usual rules but HOLDS each gold share instead of paying it.
   `world_pvp_payouts.ts` owns the held shares (`WorldPvpMetaState.pending` on
