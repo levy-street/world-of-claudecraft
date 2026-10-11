@@ -62,10 +62,11 @@ describe("Varkhul's rig twin entity", () => {
     expect(def.offhandSlot).toBeUndefined();
   });
 
-  it('is never claimed by the modular look provider, which composes no mob', () => {
+  it('is never claimed by the modular look provider, which composes players only', () => {
+    // a look is for an NPC and for the escort characters npc_looks.ts names: any other
+    // mob, one that shares a templateId with an NPC included, keeps its mob visual
     expect(npcLookFor(VARKHUL_BOSS_ID, 'mob')).toBeNull();
-    // The provider main.ts installs routes every non-player through npcLookFor
-    // with the entity's own kind, the arm above.
+    // The provider main.ts installs claims a player and answers null for everything else.
     const main = codeWithoutLineComments(
       readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'),
     );
@@ -73,6 +74,6 @@ describe("Varkhul's rig twin entity", () => {
     expect(at).toBeGreaterThan(-1);
     const provider = main.slice(at, main.indexOf(');', at));
     expect(provider).toContain("e.kind === 'player'");
-    expect(provider).toContain(': npcLookFor(e.templateId, e.kind)');
+    expect(provider.trimEnd().endsWith(': null,')).toBe(true);
   });
 });

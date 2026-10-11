@@ -437,6 +437,7 @@ function harness(options: { devicePixelRatio?: number; renderPixelRatio?: number
     showOwnNameplate: () => false,
     showPlayerNameplates: () => true,
     isHostilePlayer: () => false,
+    showPetNames: () => true,
   });
   const canvas = (painter as unknown as { surface: { canvas: HTMLCanvasElement } }).surface.canvas;
   return {

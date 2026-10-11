@@ -8,6 +8,7 @@
 
 import type { ClientSession, GameServer } from '../../server/game';
 import { ActionBarLayoutUploader } from '../../src/net/action_bar_upload';
+import { emptyBuddySelfMirror } from '../../src/net/buddy_wire';
 import { EMPTY_MST_CRAFTS } from '../../src/net/crafting_wire';
 import { GuildBankLogMirror } from '../../src/net/guild_bank_log_mirror';
 import { ClientWorld } from '../../src/net/online';
@@ -75,6 +76,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
     weaponSkinLoadout: {},
   };
   c.accountAdmin = false;
+  c.selfBuddies = emptyBuddySelfMirror();
   c.petSpecialCommandsSupported = false;
   c.movementWireVersion = 1;
   c.reconAuthoritativeX = null;
@@ -122,12 +124,15 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.hillInfo = null;
   c.cardMinigameInfo = { queued: false, available: true, match: null };
   c.socialInfo = null;
+  c.referralCardsState = null;
   c.whoInfo = null;
   c.marketInfo = null;
   c.marketCollectPending = false;
   c.mailInfo = null;
   c.mailUnread = 0;
   c.bankInfo = null;
+  c.accountBankInfo = null;
+  c.courierInfo = null;
   c.bankPurchasedSlots = null;
   c.vaultInfo = null;
   c.weeklyRewardInfo = null;
@@ -152,6 +157,11 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   // region to register a token for in the first place.
   c.riftCollisionToken = 0;
   c.lockpickState = null;
+  // The Shardpike trial's three self fields (src/sim/lance_trial.ts, lance_guidance.ts). All
+  // null/0 between pikes, which is the state almost every suite wants.
+  c.lanceTrial = null;
+  c.lanceRestRemaining = 0;
+  c.lanceGuidance = null;
   c.delveMarks = 0;
   c.companionUpgrades = {};
   c.craftSkills = emptyCraftSkills();

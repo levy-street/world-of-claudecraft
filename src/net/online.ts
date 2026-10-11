@@ -1,6 +1,17 @@
+import type { CourierDispatchRequest, CourierInfo } from '../sim/courier';
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
+import type { ReferralCardsAction, ReferralCardsSnapshot } from '../sim/referral_contract';
+import type { AccountBankInfo } from '../world_api/bank';
+import {
+  accountBankTransferPayload,
+  decodeAccountBankInfo,
+  selectAccountBankMirror,
+} from './account_bank_wire';
 import { resolveInitialActionBarLayout } from './action_bar_restore';
+import { CharacterRequests } from './character_requests';
+import { applyCharacterRoster, type CharacterMembership } from './character_roster';
+import { applyCourierSelfWire } from './courier_wire';
 import { materialStorageTransferPayload } from './material_storage_command';
 import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
@@ -22,6 +33,7 @@ import { signChallenge } from '../sim/client_challenge';
 import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
 import { applyAbilityCostTail, resolveAbilityChain } from '../sim/combat/ability_resolution';
 import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
+import type { BuddyKey } from '../sim/content/buddies';
 import { FARM_PATCHES } from '../sim/content/farm_patches';
 import { type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
@@ -76,6 +88,7 @@ import type { ResolvedAbility } from '../sim/sim';
 import {
   cloneItemInstancePayload,
   type DeedStats,
+  DUNGEON_GUIDE_STATES,
   type DungeonDifficulty,
   type Entity,
   type EquipSlot,
@@ -138,7 +151,6 @@ import {
   type FarmPatchDef,
   type FarmPlantKnobs,
   type FarmPlotView,
-  type FriendInfo,
   type GuildBankInfo,
   type GuildBankLogKind,
   type GuildBankLogView,
@@ -160,7 +172,6 @@ import {
   type PartyInfo,
   PET_SPECIAL_WIRE_VERSION,
   type PlayerProfessionsView,
-  type PresenceStatus,
   type RaidLockout,
   type RecipeDef,
   type ReliquaryCatalogCompletion,
@@ -202,6 +213,8 @@ import { computeBackoffDelay } from './backoff';
 import { applyBankSelfWire, applyGuildBankSelfWire } from './bank_snapshot_wire';
 import { blankEntity } from './blank_entity';
 import { applyBookOfDeedsWire } from './book_wire';
+import { type BuddySelfMirror, decodeBuddySelf, emptyBuddySelfMirror } from './buddy_wire';
+import { readCharacterProfile } from './character_profile';
 import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
@@ -217,19 +230,19 @@ import { pruneMissingEntities } from './despawn_grace';
 import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
 import { decodeEntityFlairWire } from './entity_flair_wire';
 import { reanchorDecision } from './entity_reanchor';
-import { applyGroundTelegraphSnapshot } from './ground_telegraph_wire';
 import { GuildBankLogMirror } from './guild_bank_log_mirror';
 import { decodeGuildBoardPage, emptyGuildBoardPage, guildBoardPath } from './guild_board_wire';
 import { decodeGuildRoster } from './guild_roster_wire';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
-import { inputSignature } from './input_signature';
+import { inputFacingsMatch, inputSignature } from './input_signature';
 import { copyPos, wrapAngle } from './interp_math';
 import { applyMaterialInventoryWire } from './material_inventory_wire';
 import {
   applyMountRaceEventToMirror,
   decodeMountRaceView,
   type MountRaceMirror,
+  mountRaceViewAt,
 } from './mount_race_wire';
 import {
   encodeAnalogMoveInput,
@@ -251,8 +264,10 @@ import { decodePlayerIdentityWire } from './player_identity_wire';
 import { applyProfessionsSelfMirror } from './professions_self_mirror';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { decodeReferralCardsSnapshot } from './referral_cards_wire';
 import { isInputSendBackpressured } from './send_backpressure';
 import { snapshotAlpha } from './snapshot_alpha';
+import { applySnapshotHeadSyncs } from './snapshot_head_syncs';
 import {
   type SnapshotTimerWireMode,
   type StableCooldownWire,
@@ -260,10 +275,10 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
-import { socialInfoFromFrame } from './social_frame_wire';
+import { applySocialPositions, socialInfoFromFrame } from './social_frame_wire';
 import { applySocialSelfWire } from './social_self_wire';
 import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './target_echo';
-import { applyFerryWire, applyTransportSnapshot, clientFerryView } from './transport_wire';
+import { applyFerryWire, clientFerryView } from './transport_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { whoRosterFromFrame } from './who_frame_wire';
@@ -278,9 +293,6 @@ export { buildWebSocketAuthMessage } from './world_auth_message';
 type LooseJson = any;
 
 type InputSendMode = 'periodic' | 'changed' | 'forced-neutral' | 'forced-facing';
-
-const inputFacingsMatch = (a: number, b: number): boolean =>
-  Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) <= 1e-12;
 
 interface PendingTransientInput {
   jump: boolean;
@@ -342,6 +354,8 @@ export class Api {
   // confirms via getAccount()). Never persisted; it is a per-session hint only.
   emailMissing: boolean | undefined = undefined;
   realm: string | null = null;
+  characterMembership: CharacterMembership = { active: false, expiresAt: null };
+  characterLimit = 10;
   // base origin for realm-scoped calls (characters, search, ws). '' = the page
   // origin; set to another realm's origin when the player picks a realm
   base = NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
@@ -503,8 +517,8 @@ export class Api {
     return { choose: false, linkToken: '', username: this.username ?? '' };
   }
 
-  async appleLoginNew(linkToken: string): Promise<void> {
-    const data = await this.post('/api/auth/apple/login/new', { linkToken });
+  async appleLoginNew(linkToken: string, ref = ''): Promise<void> {
+    const data = await this.post('/api/auth/apple/login/new', { linkToken, ref });
     this.token = data.token;
     this.username = data.username;
     this.emailMissing = data.emailMissing === true;
@@ -725,66 +739,18 @@ export class Api {
   }
 
   async characters(): Promise<CharacterSummary[]> {
-    const data = await this.get('/api/characters');
-    if (typeof data.realm === 'string') this.realm = data.realm;
-    return data.characters;
+    return applyCharacterRoster(this, await this.get('/api/characters'));
   }
 
-  async createCharacter(
-    name: string,
-    cls: PlayerClass,
-    skin = 0,
-    // The authored modular look, fixed to THIS character at create (its own
-    // server column). Optional: absent creates a legacy-rig character. Typed
-    // `object` so the render layer's ModularAppearance interface passes
-    // without a cast (this module stays out of src/render imports).
-    appearance: object | null = null,
-    // The creator's helmet toggle, becoming this character's standing helm
-    // preference. Defaults to hidden so an authored face is what the player
-    // meets in the world.
-    helmHidden = true,
-  ): Promise<void> {
-    await this.post('/api/characters', {
-      name,
-      class: cls,
-      skin,
-      helmHidden,
-      ...(appearance ? { appearance } : {}),
-    });
-  }
-
-  // Spend the character's one-shot appearance redesign (characters with no
-  // authored look; the server is the eligibility authority and burns the token
-  // atomically). `helmHidden` is the editor's helmet toggle, which is the same
-  // standing wardrobe choice creation posts, not a preview. Resolves with the
-  // normalized stored look.
-  async rerollAppearance(
-    characterId: number,
-    appearance: object,
-    helmHidden: boolean,
-  ): Promise<Record<string, unknown>> {
-    const data = await this.post(`/api/characters/${characterId}/appearance-reroll`, {
-      appearance,
-      helmHidden,
-    });
-    return (data.appearance ?? appearance) as Record<string, unknown>;
-  }
-
-  async renameCharacter(characterId: number, name: string): Promise<void> {
-    await this.post(`/api/characters/${characterId}/rename`, { name });
-  }
-
-  async deleteCharacter(characterId: number, name: string): Promise<void> {
-    await this.delete(`/api/characters/${characterId}`, { name });
-  }
-
-  // Force-disconnect this character's live session (a stale tab, a crash, or
-  // another device) so we can enter the world on it. Returns whether a session
-  // was actually displaced (false = it was already offline).
-  async takeoverCharacter(characterId: number): Promise<boolean> {
-    const data = await this.post(`/api/characters/${characterId}/takeover`, {});
-    return data.takenOver === true;
-  }
+  private readonly characterRequests = new CharacterRequests(
+    (path, body) => this.post(path, body),
+    (path, body) => this.delete(path, body),
+  );
+  createCharacter = this.characterRequests.create.bind(this.characterRequests);
+  rerollAppearance = this.characterRequests.rerollAppearance.bind(this.characterRequests);
+  renameCharacter = this.characterRequests.renameCharacter.bind(this.characterRequests);
+  deleteCharacter = this.characterRequests.deleteCharacter.bind(this.characterRequests);
+  takeoverCharacter = this.characterRequests.takeoverCharacter.bind(this.characterRequests);
 
   async reportPlayer(
     reporterCharacterId: number,
@@ -940,8 +906,8 @@ export class Api {
 
   // First-time Discord login chooser: create a brand-new account for the verified
   // Discord identity (parked under `linkToken`) and start a session.
-  async discordLoginNew(linkToken: string): Promise<void> {
-    const data = await this.post('/api/auth/discord/login/new', { linkToken });
+  async discordLoginNew(linkToken: string, ref = ''): Promise<void> {
+    const data = await this.post('/api/auth/discord/login/new', { linkToken, ref });
     this.token = data.token;
     this.username = data.username;
   }
@@ -1289,6 +1255,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
   // server), so it only rides the wire while the player stands at a bursar. ---
   bankInfo: BankInfo | null = null;
+  courierInfo: CourierInfo | null = null;
+  accountBankInfo: AccountBankInfo | null = null;
   // --- IWorldBank: Materials Vault contents view, the per-material store beside
   // the slot bank, mirrored from the snapshot self (`s.vault`, delta-omitted).
   // The payload is OWNER-ONLY and never rides the interest-scoped entity
@@ -2254,6 +2222,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // else falls through unchanged.
     if (this.requests().onMessage(msg)) return;
     if (msg.t === 'hello') {
+      this.referralCardsState = null;
       this.movementWireVersion = msg.movementWire === 2 ? 2 : 1;
       this.movementFrameOutbox?.reset();
       this.onMovementWireNegotiated?.(this.movementWireVersion, performance.now());
@@ -2349,6 +2318,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.mouselookFacing = null;
       return;
     }
+    if (msg.t === 'account_bank') {
+      this.accountBankInfo = decodeAccountBankInfo(msg.info);
+      return;
+    }
     if (msg.t === 'gbanklog') {
       // The one-shot answer to a `guild_bank_log` request. The mirror matches
       // it against the query it is waiting on and merges or drops it.
@@ -2420,6 +2393,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
       }
       return;
     }
+    if (msg.t === 'referralCards') {
+      const snapshot = decodeReferralCardsSnapshot(msg.snapshot);
+      if (snapshot) this.referralCardsState = snapshot;
+      return;
+    }
     if (msg.t === 'social') {
       this.socialInfo = socialInfoFromFrame(msg);
       this.socialDirty = true;
@@ -2434,30 +2412,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (msg.t === 'socialpos') {
       // live position refresh for friends/guildmates (drives the world map);
       // merge into the existing roster in place — snapshots own online/offline.
-      if (this.socialInfo && Array.isArray(msg.list)) {
-        const byId = new Map<
-          number,
-          { x: number; z: number; zone: string; status: PresenceStatus; title?: string | null }
-        >();
-        for (const e of msg.list) byId.set(e.id, e);
-        const apply = (arr: FriendInfo[]) => {
-          for (const m of arr) {
-            const u = byId.get(m.id);
-            if (u) {
-              m.x = u.x;
-              m.z = u.z;
-              m.zone = u.zone;
-              m.status = u.status;
-              m.online = true;
-              // rides only on servers that send it; an older server's frame
-              // must not wipe the DB-sourced roster title
-              if (u.title !== undefined) m.activeTitle = u.title;
-            }
-          }
-        };
-        apply(this.socialInfo.friends);
-        if (this.socialInfo.guild) apply(this.socialInfo.guild.members);
-      }
+      applySocialPositions(this.socialInfo, msg.list);
       return;
     }
     if (msg.t === 'challenge') {
@@ -2641,8 +2596,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (typeof snap.tickHz === 'number' && Number.isFinite(snap.tickHz) && snap.tickHz > 0) {
       this.serverTickHz = snap.tickHz;
     }
-    applyGroundTelegraphSnapshot(this, snap);
-    applyTransportSnapshot(this, snap); // the ferry clock + its berth gates
+    applySnapshotHeadSyncs(this, snap); // telegraphs, ferry gates, dungeon gates
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
@@ -2680,6 +2634,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.level = w.lv;
         e.skin = w.sk ?? 0;
         e.mountKey = w.mnt ?? ''; // active rideable mount ('' dismounted); feeds speed + render
+        e.buddyKey = w.bud ?? ''; // active cosmetic buddy ('' none); HUD/UI identity only, not read by the renderer (the buddy's own owned mob entity carries the body)
+        e.buddyAutoloot = w.budal === true; // buddy autoloot armed; HUD/UI only (the errand itself runs server-side)
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
@@ -2743,6 +2699,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
+        e.guideState = DUNGEON_GUIDE_STATES.find((state) => state === w.gds); // a dungeon guide
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.vaultRarity = ['common', 'rare', 'epic', 'legendary'].includes(w.vr) ? w.vr : undefined;
         e.objectItemId = w.obj ?? null;
@@ -2890,6 +2847,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.leaping = !!w.lp;
       applyFerryWire(e, w.fry, snap ? -1 : entAlpha); // a passenger's deck spot
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
+      this.applyWorldBossEntityWire(e, w); // brace, slumber, warpath (lance_wire_state.ts)
       e.pvpFlag = !!w.pvp; // /pvp flag bit: nameplate + target-frame hostility colour
       e.weaponStowed = !!w.ws;
       e.helmHidden = !!w.hh;
@@ -3192,6 +3150,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (copper !== this.copper) this.invChanged = true;
       this.copper = copper;
       if (applyMaterialInventoryWire(this, s)) this.invChanged = true;
+      if (typeof s.mbr === 'boolean') e.membershipActive = s.mbr;
+      if (s.mbr === false) this.accountBankInfo = null;
       if (s.equip !== undefined) this.equipment = s.equip;
       if (s.einst !== undefined) this.equipmentInstances = s.einst ?? {};
       // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
@@ -3213,6 +3173,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
           .filter((k): k is MountKey => k !== '');
       }
       if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
+      // IWorldBuddies self-decode (src/net/buddy_wire.ts): four delta-guarded
+      // keys, omitted keeps the prior mirror, like mntOwn.
+      this.selfBuddies = decodeBuddySelf(s, this.selfBuddies);
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
       if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
@@ -3225,6 +3188,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this,
         s.tal,
         arena?.match?.fiesta?.augments ?? [],
+        e.membershipActive,
       );
       this.talents = presentation.talents;
       this.loadouts = presentation.loadouts;
@@ -3253,6 +3217,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // module, where the delta contract, the by-reference adoption rationale,
       // and each key's malformed policy (vault clears, the rest retain) live.
       applyBankSelfWire(this, s);
+      applyCourierSelfWire(this, s);
       if (s.weeklyRewards !== undefined)
         this.weeklyRewardInfo = decodeWeeklyRewardInfo(s.weeklyRewards);
       applyGuildBankSelfWire(this, s, () => this.guildBankLogMirror.reset());
@@ -3576,10 +3541,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.pendingQuestCommands.set(questId, 'accept');
     this.cmd({ cmd: 'accept', quest: questId, selection });
   }
-  turnInQuest(questId: string): void {
+  turnInQuest(questId: string, rewardChoice?: string): void {
     if (!this.canSendCommand()) return;
     this.pendingQuestCommands.set(questId, 'turnin');
-    this.cmd({ cmd: 'turnin', quest: questId });
+    this.cmd({ cmd: 'turnin', quest: questId, choice: rewardChoice });
   }
   abandonQuest(questId: string): void {
     if (!this.canSendCommand()) return;
@@ -3955,6 +3920,30 @@ export class ClientWorld extends ReconWireState implements IWorld {
   toggleMounted(): void {
     this.cmd({ cmd: 'mount_toggle' });
   }
+  // --- IWorldBuddies: collection, summon and dismiss. All changes stay
+  // authoritative (server-validated ownership), and the active identity mirror
+  // (bud) lands on the next snapshot. ---
+  ownedBuddies(): readonly BuddyKey[] {
+    return this.selfBuddies.owned;
+  }
+  pendingBuddies(): readonly BuddyKey[] {
+    return this.selfBuddies.pending;
+  }
+  renameBuddy(buddyId: number, name: string): void {
+    this.cmd({ cmd: 'buddy_rename', id: buddyId, name });
+  }
+  summonBuddy(key: BuddyKey): void {
+    this.cmd({ cmd: 'buddy_summon', key });
+  }
+  toggleBuddy(): void {
+    this.cmd({ cmd: 'buddy_toggle' });
+  }
+  // Autoloot is a server-authoritative preference like the toggle above: no
+  // optimistic local flip, the `budal` identity field on the next snapshot is
+  // what the menu renders from.
+  setBuddyAutoloot(enabled: boolean): void {
+    this.cmd({ cmd: 'buddy_autoloot', on: enabled });
+  }
   // --- riding skill purchase: server-authoritative; on success the snapshot
   // delta (mntRtd=true) confirms the skill was granted. ---
   learnRiding(npcId: number): void {
@@ -3980,21 +3969,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     return this.mountLessonActiveMirror;
   }
   mountRaceView(): MountRaceView | null {
-    const s = this.mountRaceMirror;
-    if (!s) return null;
-    const now = performance.now();
-    const goMs = Math.max(0, s.goDeadlineMs - now);
-    const remMs = Math.max(0, s.deadlineMs - now);
-    return {
-      raceId: s.raceId,
-      phase: s.phase,
-      clearedMask: s.clearedMask,
-      cleared: s.cleared,
-      jumpsTotal: s.jumpsTotal,
-      goTicksLeft: s.phase === 'countdown' ? Math.round((goMs / 1000) * TICK_RATE) : 0,
-      ticksLeft: s.phase === 'racing' ? Math.round((remMs / 1000) * TICK_RATE) : s.timeLimitTicks,
-      timeLimitTicks: s.timeLimitTicks,
-    };
+    return mountRaceViewAt(this.mountRaceMirror, performance.now());
   }
   // Mirror the authoritative race lifecycle into mountRaceMirror (the fold
   // itself lives in mount_race_wire.ts); the events still flow to the HUD
@@ -4358,6 +4333,19 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
   // character name) + the REST character typeahead. socialInfo arrives via the
   // social/socialpos frames; searchCharacters is a GET, not a cmd(). ---
+  private referralCardsState: ReferralCardsSnapshot | null = null;
+  referralCardsSnapshot(): ReferralCardsSnapshot | null {
+    return this.referralCardsState;
+  }
+  referralCardsAction(action: ReferralCardsAction): void {
+    this.cmd({ cmd: 'referralCards', action });
+  }
+  socialBlocksPage(cursor: number): void {
+    this.cmd({ cmd: 'social_refresh', afterBlockCursor: cursor });
+  }
+  socialFriendsPage(cursor: number): void {
+    this.cmd({ cmd: 'social_refresh', afterFriendCursor: cursor });
+  }
   friendAdd(name: string): void {
     this.cmd({ cmd: 'friend_add', name });
   }
@@ -4453,32 +4441,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // unauthenticated /c/:name page, so a chat-name lookup exposes nothing that
   // was not already crawlable. The richer in-view inspect card (wallet balance,
   // Discord/GitHub flair, gear) stays on the proximity-gated entity wire.
-  async characterProfile(name: string): Promise<CharacterProfile | null> {
-    const wanted = name.trim();
-    if (!wanted) return null;
-    try {
-      // No Authorization header: this route is a public read (meta.publicRead) and
-      // ignores one, so sending the bearer would leak it for nothing.
-      const res = await fetch(
-        apiUrl(`/api/public/characters/${encodeURIComponent(wanted)}/sheet`, this.base),
-      );
-      if (!res.ok) return null;
-      const sheet = await res.json();
-      if (typeof sheet?.name !== 'string') return null;
-      return {
-        name: sheet.name,
-        cls: sheet.class,
-        classLabel: sheet.classLabel ?? sheet.class,
-        spec: sheet.spec ?? '',
-        level: sheet.level ?? 1,
-        guild: sheet.guild ?? null,
-        zone: sheet.zone ?? '',
-        skin: sheet.skin ?? 0,
-        realm: sheet.realm ?? '',
-      };
-    } catch {
-      return null;
-    }
+  characterProfile(name: string): Promise<CharacterProfile | null> {
+    return readCharacterProfile(name, this.base);
   }
   // Operator-set account flair, by name. A pure LOCAL read (no round-trip): the flair
   // already rode in on the entity identity record or on the sender's chat event, so
@@ -4628,6 +4592,23 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   bankWithdraw(...args: Parameters<typeof materialStorageTransferPayload>): void {
     this.cmd({ cmd: 'bank_withdraw', ...materialStorageTransferPayload(...args) });
+  }
+  claimMembershipArmour(): void {
+    this.cmd({ cmd: 'membership_claim_armour' });
+  }
+  requestAccountBanks(): void {
+    this.accountBankInfo = null;
+    this.cmd({ cmd: 'account_bank_list' });
+  }
+  selectAccountBank(characterId: number): void {
+    this.accountBankInfo = selectAccountBankMirror(this.accountBankInfo, characterId);
+    this.cmd({ cmd: 'account_bank_select', characterId });
+  }
+  accountBankTransfer(...args: Parameters<typeof accountBankTransferPayload>): void {
+    this.cmd({ cmd: 'account_bank_transfer', ...accountBankTransferPayload(...args) });
+  }
+  courierDispatch(request: CourierDispatchRequest): void {
+    this.cmd({ cmd: 'courier_dispatch', ...request });
   }
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });
@@ -4843,6 +4824,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   leaveDungeon(): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'leave_dungeon' });
   }
+  answerDungeonGuide(npcId: number, accept: boolean): void {
+    this.cmd({ cmd: 'dungeon_guide_answer', npcId, accept });
+  }
   dungeonDifficulty(): DungeonDifficulty {
     return this.selectedDungeonDifficulty ?? 'normal';
   }
@@ -4887,6 +4871,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // Riding skill, mirrored from the snapshot `s.mntRtd`. False until the server
   // confirms the player purchased it from Marla.
   private selfRidingTrained = false;
+  // The buddy collection mirror (src/net/buddy_wire.ts). Starts empty.
+  private selfBuddies: BuddySelfMirror = emptyBuddySelfMirror();
   raidLockouts(): RaidLockout[] {
     const now = Date.now();
     const src = this.selfLockouts ?? {};

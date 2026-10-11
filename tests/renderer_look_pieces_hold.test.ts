@@ -195,13 +195,15 @@ describe('composed looks on the live candidate path build without their decals, 
     expect(source).toContain(
       'this.createCandidateViews(\n            nearbyPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor),\n            createdViewTypes,\n            buildDeadline,\n          );',
     );
-    // the deferring build takes the slot like any other build
+    // the deferring build takes the slot like any other build, and only a view that exists
+    // is sampled as created (no build is a quiet wait any more: a null one is a logged miss
+    // on its retry cooldown)
     const loop = source.slice(
       source.indexOf('private createCandidateViews('),
       source.indexOf('private createViewDeferringLook('),
     );
     expect(loop).toContain(
-      'if (deferLooks) this.createViewDeferringLook(e);\n      else this.createView(e);\n      sampleCreatedViewType(createdViewTypes, e);\n      created++;',
+      'if (deferLooks) this.createViewDeferringLook(e);\n      else this.createView(e);\n      if (this.views.has(e.id)) sampleCreatedViewType(createdViewTypes, e);\n      created++;',
     );
     const defer = source.slice(
       source.indexOf('private createViewDeferringLook('),
@@ -216,7 +218,10 @@ describe('composed looks on the live candidate path build without their decals, 
     );
     // the option threads down to the character factory
     expect(source).toContain("this.createCharacterVisualWithRetry(e, 'view', undefined, opts)");
-    expect(source).toContain('const visual = createCharacterVisual(e, formKey, opts);');
+    // ...and so does whose character it is (the local player's own armor draws full detail)
+    expect(source).toContain(
+      'const visual = createCharacterVisual(e, formKey, opts, e.id === this.sim.playerId);',
+    );
     expect(source).toContain('lookPieces: lookPiecesStats(),');
   });
 });

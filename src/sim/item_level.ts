@@ -30,8 +30,13 @@ import {
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { hoardLootSourceLevels } from './content/hoard_loot';
 import { IGNIVAR_LOOT_ITEM_IDS, IGNIVAR_RAID_LOOT_SOURCE_LEVEL } from './content/ignivar_loot';
+import {
+  NYTHRAXIS_RELOCATED_ITEM_IDS,
+  NYTHRAXIS_RELOCATED_TRINKET_IDS,
+} from './content/nythraxis_loot';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL, WARFARE_TRINKET_STOCK } from './content/pvp_honor';
 import { SEASON2_SOURCE_LEVEL, SEASON2_STOCK } from './content/pvp_honor_season2';
+import { REFERRAL_REWARD_SOURCE_BOSSES } from './content/referral_rewards';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_GEAR_ITEM_IDS,
@@ -197,7 +202,17 @@ function buildSourceIndex(): Map<string, ItemSource> {
   for (const mob of Object.values(MOBS)) {
     if (!mob.loot) continue;
     const raid = isRaidMob(mob.id);
-    for (const entry of mob.loot) bump(entry.itemId, mob.maxLevel, raid);
+    for (const entry of mob.loot) {
+      // A world boss's level-gated personal entry (LootEntry.maxPlayerLevel) is content
+      // for the level it can fall to, not for the level of the boss: the locals' share
+      // of a level-20 boss in a level 6 to 13 zone is level-13 gear, budgeted and
+      // level-gated as such, rather than a level-20 epic quietly handed to a level eight.
+      const level =
+        entry.maxPlayerLevel === undefined
+          ? mob.maxLevel
+          : Math.min(mob.maxLevel, entry.maxPlayerLevel);
+      bump(entry.itemId, level, raid);
+    }
   }
   // Quest rewards: gated behind the quest's hardest combat source: direct kill
   // objectives, or collected quest items traced back to the mob that drops them.
@@ -220,7 +235,8 @@ function buildSourceIndex(): Map<string, ItemSource> {
       }
     }
     consider(quest.minLevel, false);
-    for (const itemId of Object.values(quest.itemRewards))
+    // Choose-one rewards come from the same quest, so they price at the same source.
+    for (const itemId of [...Object.values(quest.itemRewards), ...(quest.choiceRewards ?? [])])
       bump(itemId, source?.level, source?.raid ?? false);
   }
   // Heroic Quartermaster stock: the marks-vendor jewelry never drops from a mob,
@@ -233,6 +249,10 @@ function buildSourceIndex(): Map<string, ItemSource> {
   for (const itemId of FURY_STOCK) bump(itemId, WARFARE_SOURCE_LEVEL, false);
   // The two honor trinkets sold beside the kit read the same PvP tier.
   for (const itemId of WARFARE_TRINKET_STOCK) bump(itemId, WARFARE_SOURCE_LEVEL, false);
+  // Referral charms use their milestone boss's ordinary accessory budget: the
+  // level-10 uncommon gives 3 Stamina; the level-13 rare evolution gives 5.
+  for (const [itemId, bossId] of Object.entries(REFERRAL_REWARD_SOURCE_BOSSES))
+    bump(itemId, MOBS[bossId]?.maxLevel, false);
   // Warfare Season 2 reads source 29: epic item level 35, level with the raid tier.
   for (const itemId of SEASON2_STOCK) bump(itemId, SEASON2_SOURCE_LEVEL, false);
   // Heroic boss drops: level-20 content one tier up (the heroic bump), so the
@@ -250,6 +270,15 @@ function buildSourceIndex(): Map<string, ItemSource> {
       if (entry.itemId && !entry.preserveSourceTier) bump(entry.itemId, src, false);
     }
   }
+  // The raid pieces relocated off Nythraxis (content/nythraxis_loot.ts) keep
+  // the raid tier they shipped at wherever they drop now: the Normal pieces
+  // read the raid boss's own source (its level plus the raid flag, item level
+  // 29), the four trinkets the heroic raid source (item level 33). bump() is
+  // highest-level-wins, so the dungeon sources registered above never lower them.
+  const raidBossLevel = MOBS[NYTHRAXIS_RAID_BOSS_ID]?.maxLevel;
+  for (const id of NYTHRAXIS_RELOCATED_ITEM_IDS) bump(id, raidBossLevel, true);
+  for (const id of NYTHRAXIS_RELOCATED_TRINKET_IDS)
+    bump(id, NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL, false);
   // Heroic upgraded drop variants (content/heroic_variants.ts): the "Heroic X"
   // copies of base dungeon drops read one tier up (source 22), so their epics land
   // at item level 28 and rares at 25. Registered here so a variant's tooltip level
@@ -257,9 +286,11 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // heroic RAID: the Nythraxis raid boss's own set pieces and legendaries upgrade
   // to the raid tier (source 27, item level 33/37), anchored on the raid boss's
   // normal loot so the auto-swap in a heroic claim reads the raid tier too.
-  const raidBases = new Set(
-    (MOBS[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
-  );
+  const raidBases = new Set<string>([
+    ...(MOBS[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
+    // The pieces relocated to the dungeons keep their raid-tier Heroic copies.
+    ...NYTHRAXIS_RELOCATED_ITEM_IDS,
+  ]);
   for (const item of Object.values(ITEMS)) {
     if (!item.heroicOf) continue;
     const src = raidBases.has(item.heroicOf)
@@ -334,6 +365,31 @@ function buildSourceIndex(): Map<string, ItemSource> {
   bump('varkhul_emberward', 42, true); // 55 (the new-raid legendary tier)
   bump('voidsong_dirk', 39, false); // 49
   bump('heart_of_the_rift', 39, false); // 49
+  // The dungeon rework (docs/design/dungeon-rework/) re-leveled three bosses
+  // for pacing: Sexton Marrow 9 to 8, Knight-Commander Olen 13 to 12 and
+  // Choirmother Selthe 18 to 16 (and the Quilted Trousers moved from Morthen,
+  // level 10, to Marrow). Players own the shipped pieces those bosses pay, so
+  // each keeps the source tier it shipped at: its item level, its derived
+  // equip gate and its stat line are unchanged. Only the rework's new pieces
+  // price at the new boss levels. bump() is highest-wins, so these pins only
+  // ever restore the shipped tier. The lower dungeons' normal blues (2026-10-08)
+  // moved the Drowned Prayer Leggings from Vael (13) to Olen (12): same rule.
+  for (const [id, level] of [
+    ['quilted_trousers', 10],
+    ['marrowtread_boots', 9],
+    ['sextons_slippers', 9],
+    ['gravewalker_softboots', 9],
+    ['knight_commanders_greaves', 13],
+    ['tideguard_greaves', 13],
+    ['tideguard_sabatons', 13],
+    ['eelscale_leggings', 13],
+    ['drowned_prayer_leggings', 13],
+    ['drownstep_sabatons', 18],
+    ['drownstep_slippers', 18],
+    ['drownstep_treads', 18],
+    ['selthes_seastriders', 18],
+  ] as const)
+    bump(id, level, false);
   return idx;
 }
 
@@ -357,9 +413,14 @@ function buildHeroicRaidIndex(): Set<string> {
   for (const entry of HEROIC_BOSS_LOOT[NYTHRAXIS_RAID_BOSS_ID] ?? []) {
     if (entry.itemId) idx.add(entry.itemId);
   }
-  const raidBases = new Set(
-    (MOBS[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
-  );
+  // The relocated raid trinkets keep their heroic-raid standing, so a copy won
+  // before the move behaves exactly as it did (content/nythraxis_loot.ts).
+  for (const id of NYTHRAXIS_RELOCATED_TRINKET_IDS) idx.add(id);
+  const raidBases = new Set<string>([
+    ...(MOBS[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
+    // The pieces relocated to the dungeons keep their raid-tier Heroic copies.
+    ...NYTHRAXIS_RELOCATED_ITEM_IDS,
+  ]);
   for (const item of Object.values(ITEMS)) {
     if (item.heroicOf && raidBases.has(item.heroicOf)) idx.add(item.id);
   }

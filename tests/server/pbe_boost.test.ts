@@ -589,10 +589,12 @@ describe('bags, gold, and alternate role kits', () => {
   it('equips the largest GENERAL bag in the game in every bag socket', () => {
     const bagId = bestBoostBag();
     const generalBags = Object.values(ITEMS).filter(
-      (i) => i.kind === 'bag' && i.materialsOnly !== true,
+      (i) => i.kind === 'bag' && i.materialsOnly !== true && !i.unique && !i.noDiscard,
     );
     const maxSlots = Math.max(...generalBags.map((b) => b.bagSlots ?? 0));
     expect(ITEMS[bagId].bagSlots).toBe(maxSlots);
+    expect(ITEMS.referral_satchel.noDiscard).toBe(true);
+    expect(bagId).not.toBe('referral_satchel');
     // The qualifier is load-bearing, not cosmetic. This one bag fills EVERY socket, and
     // a materialsOnly bag feeds the materials pool instead of the general one
     // (src/sim/bag_pools.ts), so picking the biggest bag outright would leave a boosted

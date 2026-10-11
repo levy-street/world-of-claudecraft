@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_cantor_ilvane_woc.glb",
+      "out": "models/creatures/woc_crypt_cantor_ilvane.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Attack",
+        "Attack2",
+        "Hit",
+        "Death",
+        "Conduct",
+        "Sing",
+        "PlayOrgan"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

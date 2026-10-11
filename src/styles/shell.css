@@ -2556,6 +2556,21 @@
     transition: background-color var(--transition-speed);
     border-radius: var(--radius-sm);
   }
+  .membership-locked {
+    color: var(--color-text-muted);
+    background: var(--color-bg-input);
+  }
+  .char-row.membership-locked .char-name,
+  .char-row.membership-locked .char-sub {
+    color: var(--color-text-muted);
+  }
+  .membership-slot {
+    min-height: 48px;
+    cursor: default;
+  }
+  .membership-slot .char-sub {
+    white-space: normal;
+  }
   .char-row:hover {
     background: rgba(255, 255, 255, 0.02);
   }
@@ -2879,6 +2894,16 @@
       background: linear-gradient(180deg, #0008 0%, #0002 18%, #0002 78%, #000c 100%);
       box-shadow: none;
       overflow: hidden;
+    }
+    /* The #hero-view subpanel rule near the top of this sheet (two ids,
+       margin-top: 10px) outranks the takeover selector above, so its
+       margin reset lost and the fixed panel began 10px down: a strip of the
+       landing backdrop showed along the top edge with no blur or shade.
+       Restate the reset at a specificity that wins. Pinned by
+       tests/browser/charscreen_takeover_edges.browser.test.ts. */
+    #hero-view #offline-select.cs-wow,
+    body:not(.mobile-touch) #hero-view :is(#charselect-panel, #charcreate-panel).cs-wow {
+      margin: 0;
     }
     /* The online panels' card layout is a grid, and grid-placement on an
        absolutely-positioned child would anchor it to its grid AREA rather
@@ -3653,7 +3678,7 @@
       box-shadow 0.12s,
       color 0.12s;
   }
-  .skin-swatch:hover,
+  .skin-swatch:where(:not(:disabled)):hover,
   .skin-swatch:focus-visible {
     border-color: rgba(255, 255, 255, 0.5);
     color: #fff;
@@ -3662,6 +3687,16 @@
     border-color: var(--class-color, #33c1f1);
     color: #fff;
     box-shadow: 0 0 9px var(--class-color, #33c1f1);
+  }
+  /* A swatch that takes no click right now (the Combat Mech while
+     COMBAT_MECH_WEARABLE in src/ui/hud/cosmetics is off). It stays in the row,
+     greyed, so the owner still sees the chroma. The hover lift above is
+     withheld through :where, which leaves an enabled swatch's specificity as
+     it was. */
+  .skin-swatch:disabled {
+    cursor: var(--cursor-arrow);
+    opacity: 0.4;
+    filter: grayscale(0.7);
   }
   .skin-unequip-btn {
     min-height: 34px;
@@ -7462,14 +7497,17 @@
       padding: 5px 8px;
       font-size: 11.5px;
     }
+    /* The stage takes most of the right column (the face builder's close-up has
+       to read on a phone held sideways; a 100px strip left the face a few dozen
+       pixels tall) and the class blurb scrolls in what is left. */
     body.mobile-touch #offline-select .char-preview-container {
-      height: 100px;
-      min-height: 0;
-      flex-shrink: 0;
+      height: auto;
+      flex: 1.8 1 0;
+      min-height: 150px;
     }
     body.mobile-touch #offline-select .class-details-panel {
-      flex: 1 1 auto;
-      min-height: 0;
+      flex: 1 1 0;
+      min-height: 72px;
       overflow-y: auto;
       margin-top: 6px;
     }
@@ -9736,5 +9774,680 @@
    preset strip they captioned is gone (CREATION_SKIN_PRESETS), so the caption
    is dropped rather than the panel renamed. */
 #charcreate-panel .skin-picker-header {
+  display: none;
+}
+
+/* ---------- woc face builder ---------- */
+/* Character creation and the Redesign editor on a WOC body. Mounted by
+   src/ui/woc_head_builder.ts into the same hosts as the modular customizer
+   above. A AAA creator layout: a category menu on the left, the open
+   category's options in a panel beside it, a Randomize / Reset footer.
+   Tokens only, pinned at zero raw colour literals by
+   tests/css_raw_color_ratchet.test.ts; swatch fills arrive as --whb-sw from
+   the painter. Like the customizer rules, these live outside @layer shell so
+   the dock outranks the layered panel layouts. */
+.whb {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  font-family: var(--font-sans);
+  color: var(--color-text-light);
+}
+
+.whb-shell {
+  display: grid;
+  grid-template-columns: 158px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 8px;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.whb-menu-wrap,
+.whb-panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 10px;
+  box-shadow:
+    0 12px 34px color-mix(in srgb, var(--color-bg-dark) 70%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-text-light) 5%, transparent);
+}
+
+.whb-menu-wrap {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 6px 8px;
+  min-height: 0;
+}
+
+.whb-title {
+  padding: 0 8px 8px;
+  margin-bottom: 4px;
+  font-family: var(--title-font);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  border-bottom: 1px solid var(--color-border-showcase);
+}
+
+.whb-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.whb-cat {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 10px 0 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: left;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: var(--cursor-point);
+  transition:
+    color 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease,
+    padding-left 160ms ease;
+}
+
+.whb-cat::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  width: 3px;
+  height: 0;
+  border-radius: 2px;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--color-primary-glow);
+  transform: translateY(-50%);
+  transition: height 160ms ease;
+}
+
+.whb-cat:hover {
+  color: var(--color-text-light);
+  background: color-mix(in srgb, var(--gold-dim) 10%, transparent);
+}
+
+.whb-cat.sel {
+  padding-left: 18px;
+  color: var(--gold);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--gold-dim) 24%, transparent),
+    color-mix(in srgb, var(--gold-dim) 4%, transparent)
+  );
+  border-color: color-mix(in srgb, var(--gold-dim) 55%, transparent);
+}
+
+.whb-cat.sel::before {
+  height: 18px;
+}
+
+/* a long single-word translation wraps inside the fixed menu column */
+.whb-cat-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.whb-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 10px 10px 8px;
+  animation: whb-panel-in 180ms ease;
+}
+
+@keyframes whb-panel-in {
+  from {
+    opacity: 0.4;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.whb-panel-title {
+  padding: 0 2px 8px;
+  margin-bottom: 8px;
+  font-family: var(--title-font);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+  border-bottom: 1px solid var(--color-border-showcase);
+}
+
+.whb-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* the scroll box clips on every side, so inset the content by the width of
+     a focus outline (2px + 2px offset): an edge control's ring stays whole */
+  padding: 4px;
+}
+
+.whb-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.whb-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.whb-opts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.whb-opt,
+.whb-match,
+.whb-custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 4px 10px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-light);
+  background: var(--color-card-inset);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 6px;
+  cursor: var(--cursor-point);
+  transition:
+    color 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 120ms ease;
+}
+
+.whb-opt:hover,
+.whb-match:hover,
+.whb-custom:hover {
+  border-color: color-mix(in srgb, var(--gold-dim) 70%, transparent);
+  background: color-mix(in srgb, var(--gold-dim) 12%, transparent);
+}
+
+.whb-opt:active,
+.whb-match:active {
+  transform: translateY(0.5px);
+}
+
+.whb-opt.sel,
+.whb-match.sel,
+.whb-custom.sel {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--gold-dim) 26%, transparent),
+    color-mix(in srgb, var(--gold-dim) 8%, transparent)
+  );
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gold) 30%, transparent),
+    0 0 12px var(--color-primary-glow);
+}
+
+.whb-opts-body {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.whb-opts-body .whb-opt {
+  flex-direction: column;
+  min-height: 92px;
+  gap: 6px;
+  font-family: var(--title-font);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+.whb-opt-glyph {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  font-family: var(--title-font);
+  font-size: 20px;
+  color: var(--gold-dim);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 50%;
+  background: var(--color-card-inset);
+}
+
+.whb-opt.sel .whb-opt-glyph {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+}
+
+/* One colour's radio group: the brows' Match Hair chip over the swatch grid. */
+.whb-swatch-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.whb-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+  gap: 7px;
+}
+
+/* The skin run (sixteen tones) packs two even rows of eight rather than a
+   ragged third row. */
+.whb-swatches-skin {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.whb-sw {
+  aspect-ratio: 1;
+  width: 100%;
+  min-width: 24px;
+  padding: 0;
+  background: var(--whb-sw);
+  border: 2px solid var(--color-border-showcase);
+  border-radius: 50%;
+  box-shadow: inset 0 -3px 6px color-mix(in srgb, var(--color-bg-dark) 35%, transparent);
+  cursor: var(--cursor-point);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+/* Hover lights the rim, never scales the chip (the no-scale rule for chips). */
+.whb-sw:hover {
+  border-color: var(--gold-dim);
+  box-shadow:
+    inset 0 -3px 6px color-mix(in srgb, var(--color-bg-dark) 35%, transparent),
+    0 0 0 1px var(--gold-dim);
+}
+
+.whb-sw.sel {
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 2px var(--color-bg-dark),
+    0 0 0 3px var(--gold),
+    0 0 12px var(--color-primary-glow);
+}
+
+.whb-match-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--whb-sw);
+  border: 1px solid var(--color-border-showcase);
+}
+
+.whb-custom {
+  justify-content: flex-start;
+}
+
+.whb-custom-input {
+  width: 28px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 4px;
+  cursor: var(--cursor-point);
+}
+
+.whb-slider-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.whb-slider-value {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-dim);
+}
+
+/* Evenly spaced marks under a slider's track (the body size: -5, 0, +5). */
+.whb-slider-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -2px;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-dim);
+  opacity: 0.75;
+}
+
+.whb-slider {
+  width: 100%;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  accent-color: var(--gold-dim);
+  cursor: var(--cursor-point);
+  appearance: none;
+}
+
+.whb-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--gold-dim) 0 var(--whb-fill, 50%),
+    var(--color-border-showcase) var(--whb-fill, 50%) 100%
+  );
+}
+
+.whb-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-border-showcase);
+}
+
+.whb-slider::-moz-range-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--gold-dim);
+}
+
+.whb-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid var(--color-bg-dark);
+  box-shadow: 0 0 8px var(--color-primary-glow);
+}
+
+.whb-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid var(--color-bg-dark);
+}
+
+.whb-foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.whb-foot-btn {
+  min-height: 36px;
+  padding: 0 12px;
+  font-family: var(--title-font);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  background: var(--panel-bg);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 8px;
+  cursor: var(--cursor-point);
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.whb-foot-btn:hover {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 12px var(--color-primary-glow);
+}
+
+.whb-cat:focus-visible,
+.whb-opt:focus-visible,
+.whb-match:focus-visible,
+.whb-custom-input:focus-visible,
+.whb-sw:focus-visible,
+.whb-slider:focus-visible,
+.whb-foot-btn:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whb-panel {
+    animation: none;
+  }
+  .whb-cat,
+  .whb-cat::before,
+  .whb-opt,
+  .whb-match,
+  .whb-custom,
+  .whb-sw,
+  .whb-foot-btn {
+    transition: none;
+  }
+}
+
+/* Forced colors replace every fill, border and shadow, which would turn each
+   swatch into the same system-colour disc and drop every "selected" cue. The
+   swatch and Match Hair fills ARE the information, so they keep their
+   authored colour; the selected state is redrawn in Highlight. */
+@media (forced-colors: active) {
+  .whb-sw,
+  .whb-match-dot {
+    forced-color-adjust: none;
+  }
+  .whb-sw {
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+  .whb-sw.sel {
+    border-color: Highlight;
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+  .whb-opt.sel,
+  .whb-match.sel,
+  .whb-custom.sel,
+  .whb-cat.sel {
+    border-color: Highlight;
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  /* The roving tabindex lands on the selected control, whose Highlight outline
+     above would otherwise replace the focus ring: keep focus its own ring. */
+  .whb-opt.sel:focus-visible,
+  .whb-match.sel:focus-visible,
+  .whb-cat.sel:focus-visible,
+  .whb-sw.sel:focus-visible {
+    outline: 3px solid CanvasText;
+    outline-offset: 2px;
+  }
+  .whb-cat.sel::before {
+    background: Highlight;
+  }
+  .whb-slider::-webkit-slider-runnable-track {
+    background: CanvasText;
+  }
+  .whb-slider::-webkit-slider-thumb {
+    background: Highlight;
+  }
+}
+
+@media (pointer: coarse) {
+  .whb-cat,
+  .whb-opt,
+  .whb-match,
+  .whb-custom,
+  .whb-foot-btn {
+    min-height: 40px;
+  }
+  /* Touch: every swatch clears the 40px target floor, in even rows (the skin
+     run 4 x 4, the hair and brow runs 4 x 3, the eyes 5 x 2), capped so a
+     wide sheet does not blow them up. */
+  .whb-swatches,
+  .whb-swatches-skin {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    justify-items: center;
+    gap: 8px;
+  }
+  .whb-swatches-eye {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .whb-sw {
+    min-width: 40px;
+    max-width: 52px;
+  }
+  /* the range input and its thumb are touch targets like any other */
+  .whb-slider {
+    height: 40px;
+  }
+  .whb-slider::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+    margin-top: -10px;
+  }
+  .whb-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* Dock: the full-viewport creator stages (>=861px) float the builder over
+   the turntable's left edge, clear of the name entry and the class rail. */
+@media (min-width: 861px) {
+  #offline-select .whb,
+  body:not(.mobile-touch) #charcreate-panel.cs-wow .whb {
+    position: absolute;
+    left: 22px;
+    top: 126px;
+    /* hugs the open category; the cap keeps it clear of the class rail */
+    max-height: calc(100% - 322px);
+    width: 468px;
+    max-width: none;
+    margin-top: 0;
+    z-index: 3;
+  }
+  #offline-select .whb .whb-shell,
+  body:not(.mobile-touch) #charcreate-panel.cs-wow .whb .whb-shell {
+    align-items: start;
+  }
+  #offline-select .whb .whb-panel,
+  body:not(.mobile-touch) #charcreate-panel.cs-wow .whb .whb-panel {
+    max-height: 100%;
+    overflow: hidden;
+  }
+  /* a short window caps the dock below the ten categories: the menu then
+     scrolls inside its own column instead of spilling over the footer */
+  #offline-select .whb .whb-menu-wrap,
+  body:not(.mobile-touch) #charcreate-panel.cs-wow .whb .whb-menu-wrap {
+    max-height: 100%;
+  }
+  #offline-select .whb .whb-menu,
+  body:not(.mobile-touch) #charcreate-panel.cs-wow .whb .whb-menu {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px;
+  }
+}
+
+/* Narrow: the menu becomes a horizontal tab strip over the options sheet,
+   scrolling inside itself so the page never scrolls sideways. */
+@media (max-width: 860px) {
+  .whb {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .whb-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .whb-menu-wrap {
+    padding: 6px;
+  }
+  .whb-title {
+    display: none;
+  }
+  .whb-menu {
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+    /* the strip clips on every side: inset it by a focus ring (2px + 2px) */
+    padding: 4px;
+    scroll-padding-inline: 4px;
+  }
+  .whb-menu::-webkit-scrollbar {
+    display: none;
+  }
+  .whb-cat {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    scroll-snap-align: start;
+    padding: 0 12px;
+  }
+  .whb-cat.sel {
+    padding-left: 12px;
+  }
+  .whb-cat::before {
+    left: 50%;
+    top: auto;
+    bottom: 2px;
+    width: 0;
+    height: 3px;
+    transform: translateX(-50%);
+    transition: width 160ms ease;
+  }
+  .whb-cat.sel::before {
+    width: 22px;
+    height: 3px;
+  }
+  .whb-panel-body {
+    /* dvh (every browser on the .browserslistrc floor has it): the visible
+       viewport, not the large one a mobile toolbar overlaps */
+    max-height: 46dvh;
+  }
+  .whb-opts {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  }
+}
+
+/* The narrow block above re-declares the tab underline's transition after the
+   reduced-motion block, so it is switched off again here, in source order. */
+@media (max-width: 860px) and (prefers-reduced-motion: reduce) {
+  .whb-cat::before {
+    transition: none;
+  }
+}
+
+.whb[hidden] {
   display: none;
 }

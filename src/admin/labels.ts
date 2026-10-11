@@ -75,6 +75,8 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   restore_item: 'moderationHistory.actionRestoreItem',
   restore_slot: 'moderationHistory.actionRestoreSlot',
   clear_item_name: 'moderationHistory.actionClearItemName',
+  // The seasonal buddy grant (server/buddy_wire.ts): value minted, never punitive.
+  grant_buddy: 'moderationHistory.actionGrantBuddy',
   cheater_mark: 'moderationHistory.actionCheaterMark',
   cheater_mark_lift: 'moderationHistory.actionCheaterMarkLift',
   // Realm-scoped rather than account-scoped: written by the guild backoffice into

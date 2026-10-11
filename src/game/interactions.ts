@@ -1,3 +1,4 @@
+import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
 import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
@@ -164,6 +165,11 @@ export function hoverCursorKind(
   // An escortee is a quest NPC that happens to be mob-kind; hovering it must
   // read as interactive, or the only cue that it can be talked to is gone.
   if (isEscorteeEntity(e)) return 'friendly';
+  // The muster's weapon rack is scenery that DOES something (a click lends a pike), and
+  // the gauntlet is the one cue that says so before anyone reads the prompt.
+  if (e.kind === 'object' && e.templateId === MUSTER_RACK_TEMPLATE_ID && e.lootable) {
+    return 'friendly';
+  }
   if (e.kind === 'player' && e.id !== playerId) return 'friendly';
   void partyMemberIds;
   return 'default';

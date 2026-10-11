@@ -419,6 +419,7 @@ export function applyLoadoutBar(
     const v = normalizedBar[i];
     if (typeof v === 'string' && abilityExists(v)) return { type: 'ability' as const, id: v };
     const existing = current[i];
+    // Items and buddies are not part of a talent loadout: a switch keeps them.
     return existing?.type === 'item' ? existing : null;
   });
 }

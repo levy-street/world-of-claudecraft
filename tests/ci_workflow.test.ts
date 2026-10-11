@@ -311,7 +311,8 @@ describe('CI workflow parity', () => {
     // coupling shipped and missed two acceptance manifests on its first CI
     // run, and a curated four-root walk is the same failure shape one level
     // up (a reference from a root nobody curated in stays invisible).
-    // Existence comes from the GIT INDEX, not the working tree: under the
+    // Include non-ignored new task files locally; tracked existence still comes
+    // from Git, so sparse checkouts do not silently drop evidence. Under the
     // very cone this verifies, an excluded directory does not exist on disk.
     const SPARSE_CONE = [
       '          sparse-checkout: |',
@@ -320,6 +321,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/admin-cheater-mark/',
       '            /docs/screenshots/admin-guild-bank-panel/',
       '            /docs/screenshots/aura-tracks/',
+      '            /docs/screenshots/balgath-shardpike/',
       '            /docs/screenshots/bank-storage-charters/',
       '            /docs/screenshots/bank-vault-tab/',
       '            /docs/screenshots/buried-hoard-entrance/',
@@ -353,6 +355,9 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/masterwrought-art-completion-2026-09-02/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
+      '            /docs/screenshots/referral-armour/',
+      '            /docs/screenshots/referral-cards/',
+      '            /docs/screenshots/referral-portrait-render-2026-10-09/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
       '            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/',
       '            /docs/screenshots/target-dots/',
@@ -474,10 +479,14 @@ describe('CI workflow parity', () => {
     const repoRootUrl = new URL('..', import.meta.url);
     const indexDirs = new Set<string>();
     {
-      const ls = spawnSync('git', ['ls-files', 'docs/screenshots'], {
-        cwd: fileURLToPath(repoRootUrl),
-        encoding: 'utf8',
-      });
+      const ls = spawnSync(
+        'git',
+        ['ls-files', '--cached', '--others', '--exclude-standard', 'docs/screenshots'],
+        {
+          cwd: fileURLToPath(repoRootUrl),
+          encoding: 'utf8',
+        },
+      );
       expect(ls.status).toBe(0);
       for (const line of ls.stdout.split('\n')) {
         const match = line.match(/^docs\/screenshots\/([A-Za-z0-9._-]+)\//);
@@ -511,11 +520,15 @@ describe('CI workflow parity', () => {
     ];
     const referenced = new Set<string>();
     {
-      const ls = spawnSync('git', ['ls-files', '-z'], {
-        cwd: fileURLToPath(repoRootUrl),
-        encoding: 'utf8',
-        maxBuffer: 64 * 1024 * 1024,
-      });
+      const ls = spawnSync(
+        'git',
+        ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+        {
+          cwd: fileURLToPath(repoRootUrl),
+          encoding: 'utf8',
+          maxBuffer: 64 * 1024 * 1024,
+        },
+      );
       expect(ls.status).toBe(0);
       const repoRoot = fileURLToPath(repoRootUrl);
       const tracked = ls.stdout.split('\0').filter((file) => file.length > 0);

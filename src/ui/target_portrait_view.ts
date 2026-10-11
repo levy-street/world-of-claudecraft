@@ -1,13 +1,28 @@
-// Pure target-portrait selection. Every catalogued mob template has committed,
-// prerendered portrait art; players use their live class portrait and NPCs keep
-// their crest. Short-lived guardians are not MOBS rows, so they deliberately
-// borrow the portrait of the exact existing creature body used in-world.
+// Pure committed-portrait selection. Every catalogued mob template has committed,
+// prerendered portrait art; players use their live class portrait, and a
+// character with an authored look (every NPC) its live face, which
+// nonplayer_portrait_core.ts ranks above this art and above the crest.
+// Short-lived guardians are not MOBS rows, so they deliberately borrow the
+// portrait of the exact existing creature body used in-world.
+
+import type { BuddyKey } from '../sim/content/buddies';
+
+/** Shared model headshots for Cosmetics cards and every targeted buddy frame. */
+export const BUDDY_PORTRAIT_URLS: Readonly<Record<BuddyKey, string>> = Object.freeze({
+  horse: '/ui/portraits/buddy_horse.webp',
+  crystal_lich: '/ui/portraits/buddy_crystal_lich.webp',
+  forgemaw: '/ui/portraits/buddy_forgemaw.webp',
+  sapling: '/ui/portraits/buddy_sapling.webp',
+});
 
 export const TRANSIENT_MOB_PORTRAIT_SOURCE_IDS: Readonly<Record<string, string>> = Object.freeze({
   guardian_tithefiend: 'rift_dread_stalker',
   guardian_stampede_0: 'old_greyjaw',
   guardian_stampede_1: 'wild_boar',
   guardian_stampede_2: 'gloam_strider',
+  // The Muster Standard's soldiers wear the camp soldiers' faces (combat/balgath_trinkets.ts).
+  guardian_muster_standard_spear: 'muster_footman',
+  guardian_muster_standard_sword: 'muster_sergeant',
 });
 
 // A mob whose visual comes from a procedural world renderer rather than the
@@ -22,6 +37,10 @@ export function targetPortraitSourceId(templateId: string, isMobEntity: boolean)
 }
 
 export function targetPortraitUrl(templateId: string, isMobEntity: boolean): string | null {
+  if (isMobEntity && templateId.startsWith('buddy_')) {
+    const key = templateId.slice('buddy_'.length);
+    if (Object.hasOwn(BUDDY_PORTRAIT_URLS, key)) return BUDDY_PORTRAIT_URLS[key as BuddyKey];
+  }
   if (isMobEntity && STATIC_MOB_PORTRAIT_URLS[templateId]) {
     return STATIC_MOB_PORTRAIT_URLS[templateId];
   }

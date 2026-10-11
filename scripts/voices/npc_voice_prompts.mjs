@@ -108,6 +108,17 @@ export const VOICE_PROMPTS = [
       "Hold at the gate. Past those reeds, the fen does the killing for us — and it's never short of work.",
   },
   {
+    npcId: 'socketwright_skerrit',
+    name: 'Maben Skerrit',
+    voiceDescription:
+      'Thin, reedy old craftsman\u2019s tenor \u2014 forty years of unpaid grievance worn smooth into ' +
+      'flat, matter-of-fact bitterness. Precise about his own work, dismissive of everything else. ' +
+      'Age 70s. Male.',
+    sampleText:
+      'I ground that lens myself. Seated it, wedged it true, and never saw a copper for it \u2014 so aim ' +
+      'for my work, and we are square.',
+  },
+  {
     npcId: 'provisioner_hale',
     name: 'Provisioner Hale',
     voiceDescription:
@@ -1103,6 +1114,9 @@ export const VOICE_ALIAS = {
   calligraphy_apprentice_2: 'trader_wilkes',
   // A working forgemistress.
   forge_instructor: 'forgemistress_darva',
+  // The Mirefen muster's leader (content/mirefen_muster.ts) gives clipped soldier's
+  // orders, so he borrows the Marshal's weathered parade register until he is designed.
+  muster_commander: 'marshal_redbrook',
   // Keep suspects vocally distinct without making any voice signal guilt.
   infiltrator_captain: 'warden_fenwick',
   infiltrator_nella: 'scout_maren',
@@ -1134,6 +1148,10 @@ export const VOICE_ALIAS = {
   // harbour road: the Gilded Strongbox bursar's discreet baritone is the
   // register, until a voice of his own is cast.
   eastbrook_vault_keeper: 'bursar_fernando',
+  // Laverock, the Drowned Temple's lore guide (src/sim/dungeon_guide), is the
+  // old last cantor of the Pale Choir: Brother Halven's hushed, unhurried
+  // monkish register is the closest cast, until a voice of his own is designed.
+  cantor_laverock: 'brother_halven',
   brother_aldric_fen: 'brother_aldric',
   brother_aldric_highwatch: 'brother_aldric',
   brother_aldric_raid: 'brother_aldric',

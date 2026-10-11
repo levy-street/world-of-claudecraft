@@ -48,6 +48,7 @@ const CODE_BUILT: Record<string, string> = {
   'dev-command-window': 'src/ui/dev_command_window.ts',
   'perfecting-window': 'src/ui/hud/professions/perfecting_window.ts',
   'keyboard-map-window': 'src/ui/keyboard_map_window.ts',
+  'referral-cards-window': 'src/ui/hud/referral_cards/referral_cards_hud_controller.ts',
 };
 
 /**

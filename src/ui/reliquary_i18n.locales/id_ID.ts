@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Cekungan Hati Liar',
-    desc: 'Senjata khas dari Zulgar dan Fanglord, Penakluk Binatang.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroik: Cekungan Hati Liar',
-    desc: 'Barang epik khusus mode heroik dari Zulgar, Suara Cekungan.',
   },
   conquerors_nythraxis: {
     name: 'Raid Nythraxis',
@@ -61,6 +59,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, Puncak yang Terjaga',
     desc: 'Rampasan epik pribadi dari bos dunia Puncak yang Terjaga.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, Mandor yang Terkubur',
+    desc: 'Rampasan yang diseret keluar dari gundukan kubur Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Reliquary yang Runtuh',

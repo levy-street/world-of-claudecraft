@@ -122,7 +122,9 @@ describe('hunter quivers', () => {
       moggers_hide_quiver: 'mogger',
       cragmaw_huntquiver: 'old_cragmaw',
       gravewyrm_bone_quiver: 'korzul_the_gravewyrm',
-      direfang_quiver: 'nythraxis_scourge_of_thornpeak',
+      // Relocated off the Nythraxis raid onto the Wildheart Beastmaster on
+      // 2026-10-08 (content/nythraxis_loot.ts); still raid tier, item level 29.
+      direfang_quiver: 'wildheart_beastmaster',
     };
     for (const [itemId, mobId] of Object.entries(sources)) {
       const loot = MOBS[mobId]?.loot ?? [];

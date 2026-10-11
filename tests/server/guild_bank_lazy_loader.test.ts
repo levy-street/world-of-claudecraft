@@ -91,8 +91,17 @@ describe('guild bank lazy loader', () => {
 
     expect(game).toContain('const timer = setTimeout(retry, delayMs).unref();');
     expect(game).toContain('return () => clearTimeout(timer);');
-    expect(game).toMatch(/stop\(\): void \{\s+this\.guildBankLazyLoader\.stop\(\);/);
-    expect(game).toContain('await this.guildBankLazyLoader.ensureLoaded(snap.guild.id);');
+    expect(game).toMatch(
+      /async stop\(\): Promise<void> \{\s+const referralDrain = this\.referral\.stop\(\);\s+this\.guildBankLazyLoader\.stop\(\);/,
+    );
+    expect(game).toMatch(/await referralDrain;\s+\}/);
+    expect(game).toContain('ensureGuildLoaded: (id) => this.guildBankLazyLoader.ensureLoaded(id)');
+    const socialHost = stripComments(
+      readFileSync(new URL('../../server/account_social_host.ts', import.meta.url), 'utf8'),
+    );
+    expect(socialHost).toMatch(
+      /if \(snap\.guild && !deps\.sim\.guildBanks\.has\(snap\.guild\.id\)\)\s+await deps\.ensureGuildLoaded\(snap\.guild\.id\);/,
+    );
     expect(game).toContain(
       "recordBookUnloadedIncident: () => gameMetricsCounters().guildBankIncident('book_unloaded')",
     );

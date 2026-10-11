@@ -185,8 +185,15 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // dispatched beside bg_flag), at the second release/v0.44.0 base merge: 243/257/14.
 // The third release/v0.44.0 base merge adds the market buy orders (three
 // commands) and guild custom ranks (guild_set_ranks): 247/261/14.
-const EXPECTED_SEND_COUNT = 247;
-const EXPECTED_DISPATCH_COUNT = 261;
+// The Mirefen world-boss branch adds the Shardpike trial's three commands (lance_brace,
+// lance_thrust, lance_release), each a send plus a dispatch: 250/264/14 on its own.
+// On the v0.45.0 integration: the membership integration's 252/266 plus those three
+// commands = 255/269.
+// + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 256, 270.
+// Buddy collection integration adds four sends and five dispatches: the retired
+// buddy_cosmetic token is dispatch-only; buddy_rename is sent and dispatched.
+const EXPECTED_SEND_COUNT = 262;
+const EXPECTED_DISPATCH_COUNT = 276;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch
@@ -320,6 +327,18 @@ describe('command schema parity (W0b)', () => {
   it('pins unstuck in both the client send-set and authoritative dispatch-set', () => {
     expect(sendSet.has('unstuck')).toBe(true);
     expect(dispatchSet.has('unstuck')).toBe(true);
+  });
+  it('appends courier dispatch as a complete client/server command pair', () => {
+    // The integration adds the dungeon guide answer, then the buddy rename command.
+    expect(COMMAND_NAMES.slice(-4)).toEqual([
+      'courier_dispatch',
+      'dungeon_guide_answer',
+      'buddy_rename',
+      'referralCards',
+    ]);
+    expect(sendSet.has('courier_dispatch')).toBe(true);
+    expect(dispatchSet.has('courier_dispatch')).toBe(true);
+    expect(allowlistSet.has('courier_dispatch' as CommandName)).toBe(false);
   });
 
   it('every ClientWorld send has a matching server dispatch case (send-set is a subset)', () => {

@@ -1,6 +1,7 @@
 // Pure target eligibility and damage pricing for Varkhul's Shared Pyre.
 // Encounter timing and authoritative aura/damage mutation stay in encounters/varkhul.ts.
 
+import { sharedSoakFraction } from './shared_soak';
 import type { VarkhulAssemblyDifficulty } from './varkhul_assembly';
 
 export const VARKHUL_SHARED_PYRE_AURA_ID = 'varkhul_shared_pyre';
@@ -32,7 +33,7 @@ export function varkhulSharedPyreDamageFraction(
   difficulty: VarkhulAssemblyDifficulty,
   soakers: number,
 ): number {
-  return varkhulSharedPyreTotalDamageFraction(difficulty) / Math.max(1, Math.floor(soakers));
+  return sharedSoakFraction(varkhulSharedPyreTotalDamageFraction(difficulty), soakers);
 }
 
 export function varkhulSharedPyreTotalDamageFraction(

@@ -48,6 +48,7 @@ import {
   splitKitSurfacesByUv,
 } from './kit_uv_surface_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { MUSTER_KIT_PROP_DEFS, MUSTER_LOW_TIER_KIT_KEYS, renderDecorProps } from './muster_camps';
 import {
   advanceOccluderFade,
   applyOccluderFade,
@@ -439,6 +440,10 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexrArcheryrange: { url: '/models/biome/hexr_archeryrange.glb', kit: 'khex' },
   hexrTowerCatapult: { url: '/models/biome/hexr_tower_catapult.glb', kit: 'khex' },
   hexrTowerBase2: { url: '/models/biome/hexr_tower_base.glb', kit: 'khex' },
+  // The Mirefen muster camp kit (Balgath's army pickets; image-to-glb factory at
+  // scripts/assets/muster_camp/), placed by src/render/muster_camps.ts through the decor
+  // walk below rather than through ZonePropsDef.decorProps: render-only, no colliders.
+  ...MUSTER_KIT_PROP_DEFS,
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
@@ -493,6 +498,9 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'courseArch',
   'jumpVertical',
   'jumpOxer',
+  // The muster camps' structure (walls, gate, tower, tents, rack, lantern, and the torch
+  // the command gate burns on every preset); its clutter pieces are not drawn on low.
+  ...MUSTER_LOW_TIER_KIT_KEYS,
 ];
 
 /**
@@ -625,6 +633,9 @@ const MAT_OVERRIDES: Record<
   'minerock:_defaultMat': { color: 0x6f7376 },
   // graveyard colormap is near-white; knock it toward weathered stone
   'grave:colormap': { color: 0xd2d2c8 },
+  // muster camp: lantern glass and torch coals glow, the shardpike crystals shine cyan
+  'muster:MusterGlow': { emissive: 0xff9a3c, emissiveIntensity: 1.6 },
+  'muster:MusterCrystal': { emissive: 0x3fd8e8, emissiveIntensity: 1.3 },
 };
 
 // Kits that take the shared triplanar surface-detail layer route through the
@@ -1620,7 +1631,7 @@ export function buildProps(
   // World-scale, front-on-+z models: place at scale 1, orient with rot alone.
   // r > 0 entries mirror the circle collider in colliders.ts and camera-ghost;
   // r 0 dressing stays always-visible (small silhouettes, nothing to hide).
-  for (const d of getActiveWorldContent().props.decorProps ?? []) {
+  for (const d of renderDecorProps(activeContent, seed, lowProps)) {
     if (isTransportShipKey(d.key)) {
       const ship = buildTransportShipView({
         key: d.key,
@@ -1672,9 +1683,11 @@ export function buildProps(
     const baseY =
       d.float !== undefined
         ? Math.max(ground(d.x, d.z), WATER_LEVEL - d.float)
-        : ground(d.x, d.z) - 0.05;
+        : ground(d.x, d.z) - 0.05 - (d.sink ?? 0);
     g.position.set(d.x, baseY, d.z);
     g.rotation.y = d.rot ?? 0;
+    // a muster piece leans with the hillside under it (src/sim/muster_camp_layout.ts)
+    if (d.pitch || d.roll) g.rotation.set(d.pitch ?? 0, d.rot ?? 0, d.roll ?? 0, 'YXZ');
     group.add(shadowed(g));
     if (d.r) {
       registerHideable(g, circleFootprint(d.x, d.z, d.r, baseY + (d.h ?? 4)));
@@ -3143,7 +3156,7 @@ export function collectBuildingImpostors(seed: number): {
       heightScale: HOUSE_HEIGHT[asset] / a.size.y,
     });
   }
-  for (const d of activeContent.props.decorProps ?? []) {
+  for (const d of renderDecorProps(activeContent, seed, !GFX.standardMaterials)) {
     if (!(d.key in PROP_ASSET_DEFS)) continue;
     const a = propAsset(d.key as PropKey);
     const scale = typeof d.scale === 'number' ? d.scale : 1;
@@ -3154,7 +3167,7 @@ export function collectBuildingImpostors(seed: number): {
     const y =
       d.float !== undefined
         ? Math.max(terrainHeight(d.x, d.z, seed), WATER_LEVEL - d.float)
-        : terrainHeight(d.x, d.z, seed) - 0.05;
+        : terrainHeight(d.x, d.z, seed) - 0.05 - (d.sink ?? 0);
     instances.push({
       asset: d.key,
       x: d.x,

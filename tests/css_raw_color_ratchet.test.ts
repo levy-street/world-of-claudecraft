@@ -162,6 +162,7 @@ const CEILINGS: Record<string, number> = {
   'layout.css': 0,
   'library.css': 0,
   'play.extra.css': 1,
+  'referral_cards.css': 0,
   'shell.css': 719,
   'shell.website.css': 0,
   'shell.website-pages.css': 0,
@@ -174,7 +175,12 @@ const MAX_SLACK = 12;
 // Sections that compose tokens only. Every name must exist in the corpus (a
 // renamed banner fails here, not silently) and must count zero. The integrator
 // appends a section here when its migration lands.
-const ZERO_LITERAL_SECTIONS = ['ui library (shared primitives)', 'window shell'];
+const ZERO_LITERAL_SECTIONS = [
+  'ui library (shared primitives)',
+  'window shell',
+  // tokenized as authored (swatch fills arrive from the painter as --whb-sw)
+  'woc face builder',
+];
 
 // A section counts zero when it is tokenized AND when it is empty, so the zero pin
 // alone would bless a deleted or relocated section. These floors sit well under the

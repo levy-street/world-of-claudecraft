@@ -1,11 +1,12 @@
 // The trinkets' item-tooltip lines (src/ui/trinket_tooltip_view.ts): every one
-// of the eighteen trinkets renders a Use line with its exact resolved numbers
+// of the nineteen trinkets renders a Use line with its exact resolved numbers
 // and cooldown, the ones with a passive render an Equip line first, the
 // power-scaled numbers move with the viewer's power exactly as combat does, and
 // the fortune notice names each Gambler's Die roll. The combat proofs drive a
 // real Sim (the same useItem path the action bar presses) and compare the
 // applied aura against the text the tooltip prints for that same character.
 import { afterEach, describe, expect, it } from 'vitest';
+import { REFERRAL_STAMP_ITEMS } from '../src/sim/content/referral_rewards';
 import {
   GAMBLE_FORTUNES,
   type GambleFortune,
@@ -41,7 +42,16 @@ const n = (v: number) => formatNumber(v, { maximumFractionDigits: 0 });
 
 // The whole English line set per trinket for VIEWER, written out literally so a
 // change to a number, a clause or the cooldown fails here.
-const EXPECTED: Record<string, { equip?: string; use: string }> = {
+const EXPECTED: Record<string, { equip?: string; use?: string }> = {
+  referral_hollow_charm: {
+    equip:
+      'Equip: Taking damage while below 35% health grants a shield that absorbs 500 damage (10% of your maximum health) for 10 sec. Can occur once every 120 sec.',
+  },
+  referral_fog_charm: {
+    equip:
+      'Equip: Taking damage while below 35% health grants a shield that absorbs 500 damage (10% of your maximum health) for 10 sec. Can occur once every 120 sec.',
+    use: 'Use: Increase your Strength, Agility, Stamina, Intellect, and Spirit by 5 for 15 seconds. (2 min cooldown)',
+  },
   bastion_sigil: {
     equip:
       'Equip: Taking damage while below 35% health grants a shield that absorbs 750 damage (15% of your maximum health) for 10 sec. Can occur once every 90 sec.',
@@ -111,6 +121,44 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
       'Equip: Each attack you parry, dodge or block adds a heat stack, up to 10. Heat lasts 30 sec, refreshed whenever you gain a stack.',
     use: 'Use: Spend all heat stacks on a fire nova that deals 8 (+25) Fire damage per stack (330 at 10 stacks) to each enemy within 10 yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack. (1 min cooldown)',
   },
+  // Balgath's five (combat/balgath_trinkets.ts). The Heart is passive-only: no Use line.
+  knucklebone_of_balgath: {
+    use: 'Use: Take the Shape of the Foreman for 15 sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain 50% armor and cannot be knocked back. Dismounts you. (2 min cooldown)',
+  },
+  muster_standard: {
+    use: 'Use: Plant a Muster Standard at your feet. For 15 sec, 2 muster soldiers march at your side and fight your target in melee, each hitting every 2 sec for 15 to 21 (+35) Physical damage. They attack only your target, and only once it is already in combat. Each has 35% of your maximum health. Left more than 40 yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it. (2 min cooldown)',
+  },
+  guttered_eye: {
+    use: 'Use: Channel for 3 sec: a beam 30 yd long bursts from you the way you face and deals 45 (+24) Arcane damage every 0.5 sec to up to 8 enemies in its path (414 to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power. (2 min cooldown)',
+  },
+  barrowstone_heart: {
+    equip: `Equip: When a hit would kill you, you turn to stone for 3 sec instead: you take no damage and cannot move or act, then return with ${n(1000)} health (20% of your maximum health). Can occur once every 3 min. Never in duels or arena matches, which end at the killing blow.`,
+  },
+  muster_grapnel: {
+    use: 'Use: Hook a party or raid member within 30 yd that you can see and haul them through the air to your side, healing them for 120 (+160) when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power. (90 sec cooldown)',
+  },
+  foremans_last_link: {
+    use: 'Use: Chain yourself to a friendly player within 20 yd for 10 sec. 30% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you. (2 min cooldown)',
+  },
+  // 5% of the viewer's 5000 maximum health: 250.
+  phial_of_the_tithe: {
+    use: 'Use: For 15 sec, each hostile creature that dies within 20 yd of you restores 5% of your maximum health (250) and 5% of your maximum mana. (2 min cooldown)',
+  },
+  // 40 plus 20% of 500 Attack Power: 40 (+100).
+  quenchwater_flask: {
+    use: 'Use: Your next 3 melee or ranged weapon hits within 12 sec deal 40 (+100) extra Frost damage. The last of them also quenches the target, slowing its attacks by 15% for 8 sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher. (2 min cooldown)',
+  },
+  // 18 to 24 plus 8% of 500 Attack Power: 58 to 64.
+  fanglords_whistle: {
+    use: 'Use: Call a spirit jaguar to fight beside you for 12 sec. It runs to your target and bites it for 58 to 64 Physical damage every 2 sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within 30 yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within 30 yd. (2 min cooldown)',
+  },
+  // 75 plus 60% of 300 Spell Power: 255, or 383 (x 1.5) on a fallen target.
+  gorgebloom_seedpod: {
+    use: 'Use: Plant a seed on your target within 30 yd. After 6 sec it bursts where the target stands, or where it died, dealing 255 Nature damage to each enemy within 8 yd, or 50% more (383) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts. (2 min cooldown)',
+  },
+  gaolers_iron_key: {
+    use: 'Use: Chain your target within 30 yd in place for 6 sec. A creature immune to control, such as a boss, is slowed by 30% instead, unless it is also immune to slows. (2 min cooldown)',
+  },
 };
 
 function wearing(itemId: string, seed = 11): Sim {
@@ -141,20 +189,33 @@ function shownTotal(text: string, before: string, after: string): number {
 }
 
 describe('trinket tooltip lines', () => {
-  it('covers exactly the eighteen trinkets', () => {
-    expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
-    expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
+  const trinkets = {
+    ...TRINKET_ITEMS,
+    ...Object.fromEntries(
+      Object.entries(REFERRAL_STAMP_ITEMS).filter(([, item]) => item.slot === 'trinket'),
+    ),
+  };
+  // The eighteen, Balgath's five and the dungeon rework's eight (v0.45.0 integration).
+  it('covers exactly the thirty-one trinkets', () => {
+    expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(trinkets).sort());
+    expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(trinkets).sort());
   });
 
-  it.each(Object.keys(TRINKET_ITEMS))('%s renders its exact Equip and Use lines', (id) => {
+  it.each(Object.keys(trinkets))('%s renders its exact Equip and Use lines', (id) => {
     const lines = trinketTooltipLineTexts(id, VIEWER);
     const expected = EXPECTED[id];
     const passive = TRINKET_SPECS[id].passive;
+    // A passive-only trinket (the Barrowstone Heart) prints no Use line.
+    const usable = TRINKET_SPECS[id].use.kind !== 'passiveOnly';
     // An Equip line exactly when the trinket has a passive, always before the Use line.
-    expect(lines.map((l) => l.kind)).toEqual(passive ? ['equip', 'use'] : ['use']);
+    expect(lines.map((l) => l.kind)).toEqual([
+      ...(passive ? ['equip'] : []),
+      ...(usable ? ['use'] : []),
+    ]);
     expect(expected.equip !== undefined).toBe(passive !== undefined);
+    expect(expected.use !== undefined).toBe(usable);
     if (expected.equip) expect(lines[0].text).toBe(expected.equip);
-    expect(lines[lines.length - 1].text).toBe(expected.use);
+    if (expected.use) expect(lines[lines.length - 1].text).toBe(expected.use);
   });
 
   it('renders the lines as green tooltip rows, and nothing for a non-trinket', () => {
@@ -164,6 +225,41 @@ describe('trinket tooltip lines', () => {
     expect(plain).toBeDefined();
     if (plain) expect(trinketTooltipLines(plain, VIEWER)).toBe('');
     expect(trinketTooltipLineTexts('not_an_item', VIEWER)).toEqual([]);
+  });
+
+  it('resolves the Wildheart trinkets against the power combat snapshots', () => {
+    const use = (id: string, v: TrinketTooltipViewer) =>
+      trinketTooltipLineTexts(id, v).at(-1)?.text;
+    // The jaguar's bite reads the higher of melee and ranged Attack Power.
+    const hunter = { ...VIEWER, attackPower: 100, rangedPower: 400 };
+    expect(use('fanglords_whistle', hunter)).toContain('bites it for 50 to 56 Physical damage');
+    expect(use('fanglords_whistle', { ...VIEWER, attackPower: 100 })).toContain(
+      'bites it for 26 to 32 Physical damage',
+    );
+    // The seed's burst moves with Spell Power: +60 for +100.
+    expect(use('gorgebloom_seedpod', { ...VIEWER, spellPower: 100 })).toContain(
+      'dealing 135 Nature damage to each enemy within 8 yd, or 50% more (203)',
+    );
+    expect(use('gorgebloom_seedpod', { ...VIEWER, spellPower: 200 })).toContain(
+      'dealing 195 Nature damage to each enemy within 8 yd, or 50% more (293)',
+    );
+    // A real Sim at that power snapshots exactly the printed bite.
+    const sim = wearing('fanglords_whistle');
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 20, {
+      x: sim.player.pos.x,
+      y: sim.player.pos.y,
+      z: sim.player.pos.z + 3,
+    });
+    mob.hostile = true;
+    sim.addEntity(mob);
+    sim.targetEntity(mob.id, sim.player.id);
+    sim.player.attackPower = 100;
+    sim.player.rangedPower = 0;
+    sim.useItem('fanglords_whistle');
+    const jaguar = [...sim.entities.values()].find(
+      (e) => e.ownerId === sim.player.id && e.guardianState,
+    );
+    expect([jaguar?.guardianState?.minDamage, jaguar?.guardianState?.maxDamage]).toEqual([26, 32]);
   });
 
   it('moves every power-scaled number with the viewer power, as combat resolves it', () => {
@@ -239,6 +335,21 @@ describe('trinket tooltip lines', () => {
 });
 
 describe('trinket tooltip numbers match combat', () => {
+  it('Friendship grants the five flat stat bonuses and duration its tooltip describes', () => {
+    for (const power of [0, 500]) {
+      const sim = wearing('referral_fog_charm');
+      sim.player.spellPower = power;
+      const text = trinketTooltipLineTexts('referral_fog_charm', sim.player).at(-1)?.text;
+      sim.useItem('referral_fog_charm');
+      for (const stat of ['str', 'agi', 'sta', 'int', 'spi']) {
+        const applied = aura(sim.player, `referral_friendship_${stat}`);
+        expect(applied?.value).toBe(5);
+        expect(applied?.duration).toBe(15);
+        expect(text).toContain(`by ${applied?.value} for ${applied?.duration} seconds`);
+      }
+      expect(sim.player.cooldowns.get(trinketCooldownKey('referral_fog_charm'))).toBe(120);
+    }
+  });
   it('Wellspring Seed heals each tick for the number its tooltip prints', () => {
     for (const healPower of [0, 250]) {
       const sim = wearing('wellspring_seed');

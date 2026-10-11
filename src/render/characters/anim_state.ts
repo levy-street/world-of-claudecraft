@@ -1,3 +1,7 @@
+import type { LocoState, LocoStrafe } from '../locomotion';
+import type { AuraIdFact } from './aura_idle_core';
+import type { StunAuraFact } from './stun_idle_core';
+
 /** Renderer-derived animation inputs (same facts the old pose machine used). */
 export interface AnimState {
   /** horizontal speed, world units/sec */
@@ -19,6 +23,10 @@ export interface AnimState {
   backwards: boolean;
   /** use reversed forward locomotion instead of an authored walkBack clip */
   reverseBackpedal?: boolean;
+  /** Moving sideways across facing (a Q/E strafe): which way, or null. Only a
+   *  rig that ships both strafe clips plays it (desiredBaseState); optional so
+   *  the fixed scratches that never strafe (previews, portraits) stay valid. */
+  strafe?: LocoStrafe;
   dead: boolean;
   casting: boolean;
   /** The ability id driving `casting`, or null. Presentation that must tell a
@@ -50,9 +58,67 @@ export interface AnimState {
    *  from a mob's live aggro target or a player's targeted auto-attack, so peers brace
    *  identically with no new wire traffic. Display-only; never gates gameplay. */
   combat?: boolean;
+  /** A mob that keeps hours is in bed (Entity.asleep, mob/slumber.ts): the sleep
+   *  loop outranks every locomotion and posture state below it. */
+  asleep?: boolean;
+  /** The body's live aura list, by reference (never copied): a rig whose ClipMap
+   *  names `idleByAura` (aura_idle_core.ts) or `stunned` (stun_idle_core.ts) holds
+   *  that loop in place of its idle while one rides. */
+  auras?: readonly (AuraIdFact & StunAuraFact)[];
+  /** Seconds the body's cast bar has run (castTotal - castRemaining), or
+   *  undefined with no bar: a rig with VisualDef.castClipSync locks its
+   *  per-ability cast clip to it (castClipSyncTime). */
+  castElapsed?: number;
+}
+
+/** A cast clip may drift this far (clip seconds) from the bar before it is
+ *  pulled back onto it. */
+export const CAST_CLIP_SYNC_SLACK = 0.12;
+
+/**
+ * Where a bar-locked cast clip should be (VisualDef.castClipSync): the bar's
+ * elapsed time at the clip's rate, when the clip has drifted more than the
+ * slack from it (it entered late behind a swing or a flinch), else null (leave
+ * it). Clamped inside the clip so it never wraps.
+ */
+/**
+ * Whether the cast clip for `ability` is bar-locked (VisualDef.castClipSync):
+ * `true` locks every per-ability cast clip of the rig; a list locks only those
+ * abilities, so a rig can lock a one-off rise to its bar while its channel
+ * loops (Vael's Emerge off the floor beside his looping Hymn).
+ */
+export function castClipSyncs(
+  sync: boolean | readonly string[] | undefined,
+  ability: string | null | undefined,
+): boolean {
+  if (sync === true) return true;
+  if (!sync || !ability) return false;
+  return sync.includes(ability);
+}
+
+/**
+ * Whether a clip takes the rig at full weight at once instead of crossfading
+ * out of the pose before it (ClipMap.castSnapIn): a body whose clip starts out
+ * of sight (under the floor) must never blend its standing pose into the first
+ * frames, or it reads as popping in standing and then dropping.
+ */
+export function clipSnapsIn(snapIn: readonly string[] | undefined, clip: string): boolean {
+  return snapIn?.includes(clip) === true;
+}
+
+export function castClipSyncTime(
+  clipTime: number,
+  castElapsed: number | undefined,
+  rate: number,
+  duration: number,
+): number | null {
+  if (castElapsed === undefined || !Number.isFinite(castElapsed) || duration <= 0) return null;
+  const want = Math.min(duration - 1e-3, Math.max(0, castElapsed * rate));
+  return Math.abs(clipTime - want) > CAST_CLIP_SYNC_SLACK ? want : null;
 }
 
 export type BaseState =
+  | 'sleep'
   | 'idle'
   /** Standing, but engaged: the braced guard loop, not the relaxed idle. */
   | 'combatIdle'
@@ -61,6 +127,10 @@ export type BaseState =
   | 'walk'
   | 'walkBack'
   | 'run'
+  /** Running sideways across facing (a Q/E strafe): the rig's authored side
+   *  runs instead of the forward Run sliding across the ground. */
+  | 'strafeLeft'
+  | 'strafeRight'
   | 'cast'
   | 'spin'
   | 'swim'
@@ -151,10 +221,16 @@ export function isSwimmingAtDepth(
   dead: boolean,
   feetDepth: number,
   floorDepth: number,
+  wadeDepth?: number,
 ): boolean {
   if (dead || !Number.isFinite(feetDepth) || !Number.isFinite(floorDepth)) return false;
   const minFeetDepth = previous ? SWIM_EXIT_FEET_DEPTH : SWIM_ENTER_FEET_DEPTH;
-  const minFloorDepth = previous ? SWIM_EXIT_FLOOR_DEPTH : SWIM_ENTER_FLOOR_DEPTH;
+  // A body that WADES (MobTemplate.wadeDepth, the sim keeps its feet on the bed through
+  // this much water) swims only past that depth, whatever a human-sized swimmer would do.
+  // Without it a thirteen-yard giant in two yards of fen would latch the swim pose the
+  // moment his boots went under and be pitched prone across the surface of a puddle.
+  const minFloorDepth =
+    wadeDepth !== undefined ? wadeDepth : previous ? SWIM_EXIT_FLOOR_DEPTH : SWIM_ENTER_FLOOR_DEPTH;
   return feetDepth >= minFeetDepth && floorDepth >= minFloorDepth;
 }
 
@@ -264,6 +340,24 @@ export function waterContactFrameMode(
 ): WaterContactFrameMode {
   if (editorCamera || !visible) return 'forget';
   return contactSeen ? 'track' : 'seed';
+}
+
+// ---------------------------------------------------------------------------
+// Held guard
+//
+// A rig whose battle stance is a RAISE that ends on the held guard (ClipMap
+// combatIdleHold: the KayKit `Block`) must not loop it, or the shield drops and
+// comes back up once a second for as long as the body is braced. The base
+// action plays once and clamps on its last frame instead, the same held-base
+// treatment a sit-down or a held jump gets.
+
+/** True when this base state's clip should play ONCE and clamp (the held guard)
+ *  rather than loop. Pure: visual.ts isOnce() asks it for the combatIdle action. */
+export function combatIdleClamps(
+  baseState: BaseState,
+  combatIdleHold: boolean | undefined,
+): boolean {
+  return baseState === 'combatIdle' && combatIdleHold === true;
 }
 
 // ---------------------------------------------------------------------------
@@ -427,7 +521,19 @@ export function desiredBaseState(
   hasCombatIdleClip = false,
   hasProwlIdleClip = false,
   hasProwlWalkClip = false,
+  /** The rig fought moments ago (combat_brace_core.ts): brace as if engaged. */
+  braced = false,
+  /** The LOADED rig plays BOTH strafe clips: the walkBack rule, the machine
+   *  never enters a state nothing is playing. */
+  hasStrafeClips = false,
+  /** Defaults TRUE (the wade rule's shape): a rig with no sleep clip passes false. Last,
+   *  so the brace and strafe callers keep their positions. */
+  hasSleepClip = true,
 ): BaseState {
+  // In bed. Same rule as wade: a rig with no sleep clip must not enter the state at
+  // all, or it would hold its idle at a tempo nothing authored (baseAction falls back
+  // to idle, but the machine would still believe it was asleep).
+  if (s.asleep && hasSleepClip) return 'sleep';
   if (s.swimming) {
     // A swimmer who stops treads water rather than stroking on the spot; a
     // swimmer who moves picks the stroke for their depth: surface crawl above
@@ -446,6 +552,13 @@ export function desiredBaseState(
     if (s.wading && hasWadeClip) return 'wade';
     if (s.stealthed && hasProwlWalkClip) return 'prowlWalk';
     if (s.backwards && hasWalkBackClip && !s.reverseBackpedal) return 'walkBack';
+    // Sideways at the run gait plays the side run instead of sliding the
+    // forward cycle across the ground. A slow sideways walk keeps the walk, and
+    // a backpedal never strafes (a rig that covers it with its forward cycle,
+    // no walkBack clip or a reversed one, keeps doing so).
+    if (s.strafe && s.running && !s.backwards && hasStrafeClips) {
+      return s.strafe === 'left' ? 'strafeLeft' : 'strafeRight';
+    }
     return s.running ? 'run' : 'walk';
   }
   // Standing still. A body that is currently fighting someone holds its braced
@@ -455,7 +568,7 @@ export function desiredBaseState(
   // wade follow: baseAction() falls back to idle for a rig without one, and the
   // machine must not sit in a state nothing is playing.
   if (s.stealthed && hasProwlIdleClip) return 'prowlIdle';
-  if (s.combat && hasCombatIdleClip) return 'combatIdle';
+  if ((s.combat || braced) && hasCombatIdleClip) return 'combatIdle';
   return 'idle';
 }
 
@@ -497,6 +610,11 @@ export function gaitWindDownTimeScale(from: number, elapsed: number, fade: numbe
   return from * (1 - clamp(elapsed / brake, 0, 1));
 }
 
+/** A side run (the strafe states): they blend in and out on a short crossfade (visual.ts). */
+export function isStrafeState(state: BaseState): boolean {
+  return state === 'strafeLeft' || state === 'strafeRight';
+}
+
 export function locomotionTimeScale(
   baseState: BaseState,
   s: Pick<AnimState, 'speed' | 'backwards' | 'reverseBackpedal'>,
@@ -507,6 +625,8 @@ export function locomotionTimeScale(
   runTimeScaleMin = 0.6,
   walkMax = DEFAULT_WALK_TIME_SCALE_MAX,
   runMax = DEFAULT_RUN_TIME_SCALE_MAX,
+  /** the speed the side runs were authored at (VisualDef.strafeRef) */
+  strafeRef = runRef,
 ): number | null {
   if (baseState === 'swim' || baseState === 'swimSurface') {
     // Stroke rate follows swim speed: the slow opening strokes of a dive read as
@@ -522,6 +642,11 @@ export function locomotionTimeScale(
     const stalkScale = clamp(s.speed / prowlRef, 0.6, 1.8);
     return s.backwards ? -stalkScale : stalkScale;
   }
+  // A side run is a run turned sideways: matched and clamped like the run, and
+  // never reversed (each side has its own clip, and a backpedal never strafes).
+  if (baseState === 'strafeLeft' || baseState === 'strafeRight') {
+    return clamp(s.speed / strafeRef, runTimeScaleMin, runMax);
+  }
   if (baseState === 'walk' || baseState === 'walkBack') {
     timeScale = clamp(s.speed / (baseState === 'walkBack' ? walkBackRef : walkRef), 0.6, walkMax);
   } else if (baseState === 'wade') {
@@ -536,6 +661,22 @@ export function locomotionTimeScale(
     return null;
   }
   return s.reverseBackpedal && s.backwards && baseState !== 'walkBack' ? -timeScale : timeScale;
+}
+
+/**
+ * Feed one displayed frame's travel direction into the pose inputs: the
+ * backpedal, how this rig plays it (`reverseBackpedal`: its forward cycle run
+ * in reverse, the ghost wolf), and the strafe. One call so the renderer's sync
+ * loop sets every direction fact the machine reads in one place.
+ */
+export function applyLocoDirection(
+  s: AnimState,
+  loco: Pick<LocoState, 'backwards' | 'strafe'>,
+  reverseBackpedal: boolean,
+): void {
+  s.backwards = loco.backwards;
+  s.reverseBackpedal = reverseBackpedal;
+  s.strafe = loco.strafe;
 }
 
 function clamp(v: number, lo: number, hi: number): number {

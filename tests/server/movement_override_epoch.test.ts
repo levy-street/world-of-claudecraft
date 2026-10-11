@@ -60,6 +60,7 @@ describe('computeOverrideSignature', () => {
       () => (entity.valkyrsCalling = {} as NonNullable<typeof entity.valkyrsCalling>),
       () => (meta.mountRace = { phase: 'countdown' } as NonNullable<typeof meta.mountRace>),
       () => (entity.climb = {} as NonNullable<typeof entity.climb>),
+      () => (entity.bracing = true),
     ];
     for (const arm of forcedModes) {
       arm();
@@ -70,6 +71,7 @@ describe('computeOverrideSignature', () => {
       entity.valkyrsCalling = null;
       meta.mountRace = null;
       entity.climb = null;
+      entity.bracing = false;
     }
   });
 
@@ -107,6 +109,7 @@ describe('updateMovementOverrideEpochs', () => {
       () => (entity.valkyrsCalling = {} as NonNullable<typeof entity.valkyrsCalling>),
       () => (meta.mountRace = { phase: 'countdown' } as NonNullable<typeof meta.mountRace>),
       () => (entity.climb = {} as NonNullable<typeof entity.climb>),
+      () => (entity.bracing = true),
     ];
     for (const arm of forcedModes) {
       arm();
@@ -118,6 +121,7 @@ describe('updateMovementOverrideEpochs', () => {
       entity.valkyrsCalling = null;
       meta.mountRace = null;
       entity.climb = null;
+      entity.bracing = false;
       updateMovementOverrideEpochs(sim, [session]);
     }
   });

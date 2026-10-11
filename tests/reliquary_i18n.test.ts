@@ -79,16 +79,21 @@ describe('reliquary_i18n English resolution', () => {
     // render English to a CJK or Cyrillic reader. The 39 original pages plus
     // the Roots' Bramblehide set page keep all-locale coverage (40); the
     // Crucible collection and Forgebreaker personal-hammer pages add two more.
-    // The Buried Hoards page joins them: 44.
-    expect(pageCount).toBe(44);
-    expect(descCount).toBe(44);
+    // The Buried Hoards page joins them: 44. The Mirefen world boss page: 45.
+    expect(pageCount).toBe(45);
+    expect(descCount).toBe(45);
     expect(manifest.length).toBe(pageCount + descCount);
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(44);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(44);
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(45);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(45);
     expect(manifest).toContainEqual({
       id: 'professions_forgebreaker',
       field: 'name',
       source: 'Forgebreaker',
+    });
+    expect(manifest).toContainEqual({
+      id: 'conquerors_balgath',
+      field: 'name',
+      source: 'Balgath, the Buried Foreman',
     });
     expect(manifest).toContainEqual({
       id: 'conquerors_thunzharr',
@@ -177,13 +182,15 @@ describe('reliquary locale chunks (all shipped locales)', () => {
 
   it('carries only real catalog page ids, and no empty values', () => {
     for (const lang of tableLocales()) {
-      // Preserve the 40 original pages plus the Warfare Season 2 and Buried Hoards
-      // pages, and both profession pages, in every locale. Release fill includes all names and
+      // Vacuity floor: an emptied chunk would satisfy every for-loop in this
+      // suite silently. Preserve the 40 original pages plus the Warfare Season 2,
+      // Buried Hoards and Mirefen world boss pages, and both profession pages, in every
+      // locale. Release fill includes all names and
       // narrative descriptions.
       expect(
         Object.keys(tables[lang]).filter((id) => !NEW_PROFESSION_PAGES.has(id)).length,
         `${lang} original row count`,
-      ).toBe(42);
+      ).toBe(43);
       for (const id of NEW_PROFESSION_PAGES) {
         expect(Object.hasOwn(tables[lang], id), `${lang}.${id}`).toBe(true);
         const description = tables[lang][id]?.desc;
@@ -500,15 +507,13 @@ describe('the window paints the RESOLVED page name, never the model English', ()
 
   it('renders the ja_JP fill for the Overview nearly-complete row', async () => {
     // Nearly-complete needs at least one owned relic and an incomplete page: own
-    // four of the five Hollow Crypt items.
+    // every Hollow Crypt item but one.
+    const cryptItems = RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt.relics.flatMap((relic) =>
+      relic.kind === 'item' ? [relic.itemId] : [],
+    );
     const html = await renderSentinel({
       nav: 'overview',
-      itemsDiscovered: new Set([
-        'cryptbone_greaves',
-        'cryptbone_helm',
-        'cryptbone_pauldrons',
-        'greyjaw_hide_boots',
-      ]),
+      itemsDiscovered: new Set(cryptItems.slice(0, -1)),
     });
     expect(html).toContain('reliquary-nearly-row');
     expect(html).toContain(JA_FILL);

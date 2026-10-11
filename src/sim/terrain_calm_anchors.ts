@@ -167,6 +167,10 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   for (const id in NPCS) {
     if (Object.hasOwn(WORLD_QUEST_CALLIGRAPHY_NPCS, id)) continue;
     const npc = NPCS[id];
+    // A fixed-post NPC (the Muster Commander) is raised by its owning system on ground
+    // that system measured as it stands; calming it would re-grade a camp already fitted
+    // to the hillside (src/sim/muster_camp_layout.ts), so it adds no pad.
+    if (npc.fixedPost) continue;
     pad('npc', npc.pos.x, npc.pos.z, 6, 14, false);
   }
   // Precision-graded landforms outside the content tables: the Glacier Tarn
@@ -224,8 +228,12 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
     pad('tunnelMouth', mouthA.x, mouthA.z, mouthA.radius + 2, mouthA.radius + 9);
     pad('tunnelMouth', mouthB.x, mouthB.z, mouthB.radius + 2, mouthB.radius + 9);
   }
-  // World-boss stands: the fight needs a workable raid floor.
-  for (const boss of WORLD_BOSSES) pad('worldBoss', boss.pos.x, boss.pos.z, 10, 18);
+  // World-boss stands: the fight needs a workable raid floor, unless the boss sleeps in
+  // an authored landform that already is one (WorldBossDef.raidFloorPad).
+  for (const boss of WORLD_BOSSES) {
+    if (boss.raidFloorPad === false) continue;
+    pad('worldBoss', boss.pos.x, boss.pos.z, 10, 18);
+  }
   // Escort runs: the escortee walks the authored polyline, so the whole
   // lane keeps workable ground (pads at every authored point plus samples
   // every 8yd along each leg).

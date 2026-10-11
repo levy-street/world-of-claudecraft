@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "referral-items-2026-10-07",
+    "acceptedDate": "2026-10-07",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "referral_helmet",
+      "runtimeUrl": "/ui/items/referral_helmet.webp",
+      "acceptedSha256": "bd7984890ec205c014ab104decf4c739958277848dbec85eb7fe95d43af37662",
+      "acceptedBytes": 3756,
+      "original": {
+        "path": "tmp/referral-art/originals/referral_helmet.png",
+        "sha256": "7474dc0101a8671916711ecfbacdad16434aa959e57000329c9322336169d535",
+        "bytes": 2514912,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/referral-art/masters/referral_helmet.png",
+        "sha256": "e7c72cf50cac9634ea32f6dacf9bcf73796c9cc710bcf92ab887d42aa9e0cd0c",
+        "bytes": 556429,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "Friendship Helm: silver steel, gold trim, midnight-blue underlayers, deliberate interlocking-ring ornament.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Create ONE square opaque inventory icon for Friendship Helm in a matching seven-piece fantasy armour set for World of ClaudeCraft, woc-item-icon-v1. Single centered helmet, no head. Silver steel with warm gold edge trim, midnight-blue cloth/leather underlayers, and a small deliberate motif of two interlocking plain gold rings incorporated in the metalwork symbolizing friendship, not text or runes. Premium hand-painted classic dark-fantasy MMO inventory art; tactile metal and cloth, crisp focal edges and softer peripheral brushwork, warm top-left key light, cool deep lower-right shadows. Centered complete subject filling about 70 percent of square, generous safe padding all edges, readable at22px and in circular crop. Opaque full-square charcoal-umber painted vignette with subtle contact shadows. One icon only, no letters, text, numbers, pseudo-writing, border, rarity frame, watermark, transparency, collage, mannequin, hands holding item, or crop.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master normalized with Sharp; repository assets:items converter quality 82, smartSubsample and effort 6 emits 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Parent Codex visual inspection approved",
+        "evidence": "docs/achievements/referral-items-2026-10-07/small-size-review.png",
+        "masterEvidence": "docs/achievements/referral-items-2026-10-07/contact-sheet.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "referral_shoulder",
+      "runtimeUrl": "/ui/items/referral_shoulder.webp",
+      "acceptedSha256": "e9bb2c1638f52a8e7231c5cc1a0e66889a848f4c405d398c3fb9d1ce9e0c8f6b",
+      "acceptedBytes": 3582,
+      "original": {
+        "path": "tmp/referral-art/originals/referral_shoulder.png",
+        "sha256": "ce55c7990bc43797d816a9a19b58759704d78540907e09b15db5800b24638aa3",
+        "bytes": 2318191,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/referral-art/masters/referral_shoulder.png",
+        "sha256": "a5ae3582bb56daa4a3b6f13aeaaf08bb0b41cb77452aa81134ce49a156c9bdf0",
+        "bytes": 522490,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "Friendship Pauldrons: silver steel, gold trim, midnight-blue underlayers, deliberate interlocking-ring ornament.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Create ONE square opaque inventory icon for Friendship Pauldrons in a matching seven-piece fantasy armour set for World of ClaudeCraft, woc-item-icon-v1. A compact pair of shoulder armour pieces. Silver steel with warm gold edge trim, midnight-blue cloth/leather underlayers, and a small deliberate motif of two interlocking plain gold rings incorporated in the metalwork symbolizing friendship, not text or runes. Premium hand-painted classic dark-fantasy MMO inventory art; tactile metal and cloth, crisp focal edges and softer peripheral brushwork, warm top-left key light, cool deep lower-right shadows. Centered complete subject filling about 70 percent of square, generous safe padding all edges, readable at22px and in circular crop. Opaque full-square charcoal-umber painted vignette with subtle contact shadows. One icon only, no letters, text, numbers, pseudo-writing, border, rarity frame, watermark, transparency, collage, mannequin, hands holding item, or crop.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master normalized with Sharp; repository assets:items converter quality 82, smartSubsample and effort 6 emits 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Parent Codex visual inspection approved",
+        "evidence": "docs/achievements/referral-items-2026-10-07/small-size-review.png",
+        "masterEvidence": "docs/achievements/referral-items-2026-10-07/contact-sheet.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "referral_chest",
+      "runtimeUrl": "/ui/items/referral_chest.webp",
+      "acceptedSha256": "8094aebe70e4c6630f724f6f5eae8835aa23e55c793385132f72cbf2423f1c1d",
+      "acceptedBytes": 4114,
+      "original": {
+        "path": "tmp/referral-art/originals/referral_chest.png",
+        "sha256": "22f7e69b215281023cb5d828e04c55714ab89ce1b9aefdef5a600e75e293ef28",
+        "bytes": 2626080,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/referral-art/masters/referral_chest.png",
+        "sha256": "d25633c566aeaec116e358f7f4992c35602486c42d57067aefe1db3e78324eae",
+        "bytes": 582175,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "Friendship Cuirass: silver steel, gold trim, midnight-blue underlayers, deliberate interlocking-ring ornament.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Create ONE square opaque inventory icon for Friendship Cuirass in a matching seven-piece fantasy armour set for World of ClaudeCraft, woc-item-icon-v1. Front-facing torso breastplate, no body or arms. Silver steel with warm gold edge trim, midnight-blue cloth/leather underlayers, and a small deliberate motif of two interlocking plain gold rings incorporated in the metalwork symbolizing friendship, not text or runes. Premium hand-painted classic dark-fantasy MMO inventory art; tactile metal and cloth, crisp focal edges and softer peripheral brushwork, warm top-left key light, cool deep lower-right shadows. Centered complete subject filling about 70 percent of square, generous safe padding all edges, readable at22px and in circular crop. Opaque full-square charcoal-umber painted vignette with subtle contact shadows. One icon only, no letters, text, numbers, pseudo-writing, border, rarity frame, watermark, transparency, collage, mannequin, hands holding item, or crop.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master normalized with Sharp; repository assets:items converter quality 82, smartSubsample and effort 6 emits 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Parent Codex visual inspection approved",
+        "evidence": "docs/achievements/referral-items-2026-10-07/small-size-review.png",
+        "masterEvidence": "docs/achievements/referral-items-2026-10-07/contact-sheet.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "referral_waist",
+      "runtimeUrl": "/ui/items/referral_waist.webp",
+      "acceptedSha256": "05f624b0a989ee4db6afcd8254fd7dfdcc00cde6cf3c515e315f35f1711608d7",
+      "acceptedBytes": 3690,
+      "original": {
+        "path": "tmp/referral-art/originals/referral_waist.png",
+        "sha256": "9769dae8905356643223ef02bf51ec17c7e464fd33d2506188d020974dc1c0df",
+        "bytes": 2518421,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/referral-art/masters/referral_waist.png",
+        "sha256": "603a6babbfb54940b7e82de2d07eb75f9948746ea00e25d2530d9515266e5957",
+        "bytes": 522296,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "Friendship Girdle: silver steel, gold trim, midnight-blue underlayers, deliberate interlocking-ring ornament.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Create ONE square opaque inventory icon for Friendship Girdle in a matching seven-piece fantasy armour set for World of ClaudeCraft, woc-item-icon-v1. A substantial armour belt, front view. Silver steel with warm gold edge trim, midnight-blue cloth/leather underlayers, and a small deliberate motif of two interlocking plain gold rings incorporated in the metalwork symbolizing friendship, not text or runes. Premium hand-painted classic dark-fantasy MMO inventory art; tactile metal and cloth, crisp focal edges and softer peripheral brushwork, warm top-left key light, cool deep lower-right shadows. Centered complete subject filling about 70 percent of square, generous safe padding all edges, readable at22px and in circular crop. Opaque full-square charcoal-umber painted vignette with subtle contact shadows. One icon only, no letters, text, numbers, pseudo-writing, border, rarity frame, watermark, transparency, collage, mannequin, hands holding item, or crop.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master normalized with Sharp; repository assets:items converter quality 82, smartSubsample and effort 6 emits 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Parent Codex visual inspection approved",
+        "evidence": "docs/achievements/referral-items-2026-10-07/small-size-review.png",
+        "masterEvidence": "docs/achievements/referral-items-2026-10-07/contact-sheet.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "referral_legs",
+      "runtimeUrl": "/ui/items/referral_legs.webp",
+      "acceptedSha256": "869247aae61d065cdd6d16e2b99432bc3a9066851bd8485384714270484a3102",
+      "acceptedBytes": 3208,
+      "original": {
+        "path": "tmp/referral-art/originals/referral_legs.png",
+        "sha256": "13ce8d82f7bbc0e4ebcacb69a786222b44e8d24ccf5fd15b57ba6138f551188c",
+        "bytes": 2307567,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/referral-art/masters/referral_legs.png",
+        "sha256": "0519ce912614a4dc4f50063ccf51975a663f3dd3e603c719a286e5552214ac80",
+        "bytes": 498950,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "Friendship Legguards: silver steel, gold trim, midnight-blue underlayers, deliberate interlocking-ring ornament.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Create ONE square opaque inventory icon for Friendship Legguards in a matching seven-piece fantasy armour set for World of ClaudeCraft, woc-item-icon-v1. Pair of armoured leggings, no body. Silver steel with warm gold edge trim, midnight-blue cloth/leather underlayers, and a small deliberate motif of two interlocking plain gold rings incorporated in the metalwork symbolizing friendship, not text or runes. Premium hand-painted classic dark-fantasy MMO inventory art; tactile metal and cloth, crisp focal edges and softer peripheral brushwork, warm top-left key light, cool deep lower-right shadows. Centered complete subject filling about 70 percent of square, generous safe padding all edges, readable at22px and in circular crop. Opaque full-square charcoal-umber painted vignette with subtle contact shadows. One icon only, no letters, text, numbers, pseudo-writing, border, rarity frame, watermark, transparency, collage, mannequin, hands holding item, or crop.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master normalized with Sharp; repository assets:items converter quality 82, smartSubsample and effort 6 emits 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Parent Codex visual inspection approved",
+        "evidence": "docs/achievements/referral-items-2026-10-07/small-size-review.png",
+        "masterEvidence": "docs/achievements/referral-items-2026-10-07/contact-sheet.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "referral_gloves",
+      "runtimeUrl": "/ui/items/referral_gloves.webp",
+      "acceptedSha256": "71523dec2699e5bd1a5a5dd90d12f618e09eaea77819d99cd77e6d75ebb2b8a5",
+      "acceptedBytes": 3704,
+      "original": {
+        "path": "tmp/referral-art/originals/referral_gloves.png",
+        "sha256": "605e3703e287dff6408b25e8e7de8f089e8666ba3973478155e661127191d0aa",
+        "bytes": 2442937,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/referral-art/masters/referral_gloves.png",
+        "sha256": "e571a603044e3be3a0129e746357d7afede3018e13c40efdcc4356d88a267097",
+        "bytes": 539486,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "Friendship Gauntlets: silver steel, gold trim, midnight-blue underlayers, deliberate interlocking-ring ornament.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Create ONE square opaque inventory icon for Friendship Gauntlets in a matching seven-piece fantasy armour set for World of ClaudeCraft, woc-item-icon-v1. A compact natural pair of gauntlets, no body. Silver steel with warm gold edge trim, midnight-blue cloth/leather underlayers, and a small deliberate motif of two interlocking plain gold rings incorporated in the metalwork symbolizing friendship, not text or runes. Premium hand-painted classic dark-fantasy MMO inventory art; tactile metal and cloth, crisp focal edges and softer peripheral brushwork, warm top-left key light, cool deep lower-right shadows. Centered complete subject filling about 70 percent of square, generous safe padding all edges, readable at22px and in circular crop. Opaque full-square charcoal-umber painted vignette with subtle contact shadows. One icon only, no letters, text, numbers, pseudo-writing, border, rarity frame, watermark, transparency, collage, mannequin, hands holding item, or crop.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master normalized with Sharp; repository assets:items converter quality 82, smartSubsample and effort 6 emits 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Parent Codex visual inspection approved",
+        "evidence": "docs/achievements/referral-items-2026-10-07/small-size-review.png",
+        "masterEvidence": "docs/achievements/referral-items-2026-10-07/contact-sheet.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "referral_feet",
+      "runtimeUrl": "/ui/items/referral_feet.webp",
+      "acceptedSha256": "140fdb5e0671dc21ef54fe75da5d5a0853b20bbdd59941536764997902205980",
+      "acceptedBytes": 3572,
+      "original": {
+        "path": "tmp/referral-art/originals/referral_feet.png",
+        "sha256": "a450a964c2c540b3e120b14656d4208c65eb51d73a5e1d425a1bb286915623f9",
+        "bytes": 2386161,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/referral-art/masters/referral_feet.png",
+        "sha256": "aa485969303cde503906f2dd704dc184548ac628f9c6c915831c802e54e08a99",
+        "bytes": 544412,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "Friendship Boots: silver steel, gold trim, midnight-blue underlayers, deliberate interlocking-ring ornament.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Create ONE square opaque inventory icon for Friendship Boots in a matching seven-piece fantasy armour set for World of ClaudeCraft, woc-item-icon-v1. A compact natural pair of boots, no body. Silver steel with warm gold edge trim, midnight-blue cloth/leather underlayers, and a small deliberate motif of two interlocking plain gold rings incorporated in the metalwork symbolizing friendship, not text or runes. Premium hand-painted classic dark-fantasy MMO inventory art; tactile metal and cloth, crisp focal edges and softer peripheral brushwork, warm top-left key light, cool deep lower-right shadows. Centered complete subject filling about 70 percent of square, generous safe padding all edges, readable at22px and in circular crop. Opaque full-square charcoal-umber painted vignette with subtle contact shadows. One icon only, no letters, text, numbers, pseudo-writing, border, rarity frame, watermark, transparency, collage, mannequin, hands holding item, or crop.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master normalized with Sharp; repository assets:items converter quality 82, smartSubsample and effort 6 emits 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Parent Codex visual inspection approved",
+        "evidence": "docs/achievements/referral-items-2026-10-07/small-size-review.png",
+        "masterEvidence": "docs/achievements/referral-items-2026-10-07/contact-sheet.png"
+      }
+    }
+  ]
+}

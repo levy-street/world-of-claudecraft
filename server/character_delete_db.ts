@@ -25,6 +25,19 @@ export const DELETE_RESTORE_STATEMENT_TIMEOUT_MS = 15_000;
 
 export type OpenStoragePurchaseStatus = 'pending' | 'unresolved';
 
+/** A movable card or an in-flight bond still requires this character's custody. */
+export class CharacterReferralRewardPending extends Error {
+  readonly code = 'CHARACTER_REFERRAL_REWARD_PENDING' as const;
+
+  constructor(
+    readonly characterId: number,
+    readonly reason: 'transferable' | 'bond',
+  ) {
+    super(`character ${characterId} has a ${reason} referral reward guard`);
+    this.name = 'CharacterReferralRewardPending';
+  }
+}
+
 /** Stable domain refusal for a character whose paid storage rail is still open. */
 export class CharacterStoragePurchaseOpen extends Error {
   readonly code = 'CHARACTER_STORAGE_PURCHASE_OPEN' as const;
@@ -254,6 +267,22 @@ export async function deleteOwnedCharacterRow(
     if ((character.rowCount ?? 0) === 0) {
       await transaction.rollback();
       return false;
+    }
+
+    // Both referral writers serialize on the same account-parent lock before
+    // assigning custody. This fresh statement therefore observes a committed
+    // guard or excludes its insertion until deletion finishes. Each EXISTS
+    // stops at the first row through its character_id index; no card JSON scan.
+    const referral = await transaction.query(
+      `SELECT EXISTS(SELECT 1 FROM referral_transfer_characters WHERE character_id = $1) AS transferable,
+              EXISTS(SELECT 1 FROM referral_bond_delivery_characters WHERE character_id = $1) AS bond`,
+      [characterId],
+    );
+    if (referral.rows[0]?.transferable) {
+      throw new CharacterReferralRewardPending(characterId, 'transferable');
+    }
+    if (referral.rows[0]?.bond) {
+      throw new CharacterReferralRewardPending(characterId, 'bond');
     }
 
     // READ COMMITTED takes a fresh snapshot after the character lock wait. A

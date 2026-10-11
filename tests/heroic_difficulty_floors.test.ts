@@ -1,8 +1,12 @@
 // Heroic retune (economy pass, 2026-07): every heroic mob's health DOUBLES
 // versus the previous heroic calibration, and the minimum non-crit swing of
-// every SPAWN-LIST mob lands at least 500 post-mitigation on the
-// maximum-mitigation reference warrior (see below); boss-summoned adds floor
-// at 150 since the v0.30 40% add nerf. The Nythraxis raid rides the model on
+// every SPAWN-LIST mob landed at least 500 post-mitigation on the
+// maximum-mitigation reference warrior (see below). The heroic pack budget
+// (2026-10-08) keeps that 500 line for the ENCOUNTER bodies only (bosses and
+// solo minibosses) and prices TRASH per pull instead, because the five-mans'
+// trash now comes in packs of three to six (the pack budget block below).
+// Boss-summoned adds floor at 150 since the v0.30 40% add nerf and stay under
+// the 500 line. The Nythraxis raid rides the model on
 // its own numbers: heroic boss floor 1000 (2026-07-24 nerf), encounter-script
 // add waves at the raid 250 line, and NORMAL Nythraxis gets the
 // normal-Gravewyrm treatment (2x health, boss >= 600, adds >= 300).
@@ -31,6 +35,7 @@ import type { PlayerEquipment } from '../src/sim/entity';
 import { characterDerivedStats, createMob } from '../src/sim/entity';
 import { canEquipItemInSlot } from '../src/sim/equipment_rules';
 import {
+  applyDungeonMobTuning,
   type HeroicSpawnRole,
   mobTemplateForDungeonDifficulty,
 } from '../src/sim/instances/difficulty';
@@ -40,6 +45,8 @@ import { ALL_EQUIP_SLOTS, armorReduction } from '../src/sim/types';
 
 const REF_ARMOR = 2861;
 const DEFENSIVE_STANCE_TAKEN = 0.9;
+// The economy pass's per-mob line. Since the pack budget only the encounter
+// bodies (bosses and solo minibosses) are held to it; every add stays under it.
 const HEROIC_MOB_FLOOR = 500;
 // v0.30: five-man boss-summoned adds hit 40% softer again (the 2026-07
 // half-the-mob-line 250 floor was still overwhelming healers when a tanked
@@ -116,16 +123,171 @@ function spawnListMobIds(dungeonId: string): Set<string> {
   return ids;
 }
 
+// ---- the heroic pack budget (2026-10-08) ------------------------------------
+// Heroic trash is priced per PULL. Every placement sharing a
+// DungeonSpawn.packId enters combat together (aggroDungeonPackmates), and a
+// placement with no packId is its own pull. Under the old per-mob 500 floor a
+// pull of three to six stacked as high as 2,060 formula DTPS, and on the bench
+// below the trash pulls ran three to seven times one healer's sustained
+// output. The maintainer's budget is a REAL-SIM number: on the level-20
+// best-in-slot prot warrior (4,081 armor, 3,312 health buffed, Defensive
+// Stance), every pull threat-pinned around it in melee with trash kits inert
+// (the intake bench of scripts/healing_montecarlo.ts), a dungeon's AVERAGE
+// trash pull lands about 250 DTPS and its HEAVIEST about 450 or less (that one
+// wants a crowd control or a cooldown). One healer sustains about 150 to 205
+// HPS on the same bench.
+//
+// This suite cannot run that bench, so it pins the budget's FORMULA image on
+// the reference warrior: each melee member's mean weapon roll through the
+// armor pass at its level and the stance cut, over its swing timer, summed
+// over the pull. A petSpell caster stands at range and casts instead of
+// swinging (mob/combat_profile.ts updateCasterCombat), so it counts 0 here
+// (its unscaled heroic nuke adds about 10 to 20 real DTPS a caster).
+//
+// Calibration (MEASURED 2026-10-08 on the PR 4352 spawn lists with that bench,
+// every trash pull of the five, 4 runs of 90 s each, the p50 per pull):
+//   dungeon   real mean pull (formula)   heaviest real pull   formula heaviest
+//   crypt     262 (366)                  421 (w2, 5 crows)    654 (w2)
+//   bastion   252 (366)                  356 (k3)             541 (b2)
+//   temple    257 (353)                  344 (g11)            539 (g11)
+//   basin     245 (361)                  417 (g1 and g11)     600 (g4)
+//   sanctum   248 (375)                  451 (g11)            620 (g11)
+// (On the old per-mob floor the bench read 561 / 637 / 616 / 589 / 775 mean and
+// 1,055 / 906 / 904 / 1,104 / 1,411 heaviest.) A dungeon's damage factor moves
+// all its pulls together, so each band is that dungeon's own measured
+// conversion carried to the budget's edges: meanMin and meanMax are the formula
+// means that land a real mean of 225 and 275, heaviestMax the formula heaviest
+// at which its heaviest real pull reaches 475. Rounded inward.
+const PACK_BUDGET: Record<
+  string,
+  { pulls: number; meanMin: number; meanMax: number; heaviestMax: number }
+> = {
+  hollow_crypt: { pulls: 17, meanMin: 315, meanMax: 384, heaviestMax: 737 },
+  sunken_bastion: { pulls: 19, meanMin: 327, meanMax: 399, heaviestMax: 721 },
+  drowned_temple: { pulls: 16, meanMin: 309, meanMax: 377, heaviestMax: 744 },
+  wildheart_basin: { pulls: 16, meanMin: 332, meanMax: 405, heaviestMax: 683 },
+  gravewyrm_sanctum: { pulls: 15, meanMin: 341, meanMax: 415, heaviestMax: 652 },
+};
+
+/** Every pull of a dungeon's spawn list, as mob ids (egg sacs never fight). */
+function pullsOf(dungeonId: string): string[][] {
+  const pulls = new Map<string, string[]>();
+  DUNGEONS[dungeonId].spawns.forEach((spawn, i) => {
+    if (MOBS[spawn.mobId]?.broodEgg) return;
+    const key = spawn.packId ?? `solo:${i}`;
+    const pull = pulls.get(key) ?? [];
+    pull.push(spawn.mobId);
+    pulls.set(key, pull);
+  });
+  return [...pulls.values()];
+}
+
+/** An encounter body: every boss and solo miniboss is ccImmune (or the final
+ *  boss flag); trash never is. A pull holding one is an encounter, not trash. */
+function isEncounterBody(mobId: string): boolean {
+  return MOBS[mobId]?.boss === true || MOBS[mobId]?.ccImmune === true;
+}
+
+/** Mean melee DTPS of one heroic spawn on the reference warrior (0 for a
+ *  petSpell caster, which casts from range instead of swinging). */
+function meleeDtps(mobId: string, dungeonId: string): number {
+  if (MOBS[mobId]?.petSpell) return 0;
+  const template = mobTemplateForDungeonDifficulty(MOBS[mobId], dungeonId, 'heroic');
+  const level = template.maxLevel;
+  const mob = createMob(1, template, level, { x: 0, y: 0, z: 0 });
+  const taken = (1 - armorReduction(REF_ARMOR, level)) * DEFENSIVE_STANCE_TAKEN;
+  return (((mob.weapon.min + mob.weapon.max) / 2) * taken) / mob.weapon.speed;
+}
+
 describe('heroic five-man floors', () => {
-  it('every spawn-list mob swings for at least 500 on the reference warrior', () => {
+  it('prices every heroic trash pull inside the pack budget', () => {
+    expect(Object.keys(PACK_BUDGET).sort()).toEqual([...FIVE_MANS].sort());
     for (const dungeonId of FIVE_MANS) {
-      for (const mobId of spawnListMobIds(dungeonId)) {
-        expect(
-          minSwing(mobId, dungeonId, 'heroic'),
-          `${dungeonId}/${mobId}`,
-        ).toBeGreaterThanOrEqual(HEROIC_MOB_FLOOR);
+      const budget = PACK_BUDGET[dungeonId];
+      const trash = pullsOf(dungeonId).filter((pull) => !pull.some(isEncounterBody));
+      // Non-vacuity: the authored pull count, so a lost packId (every member
+      // turning into its own one-mob pull) cannot slip the mean down.
+      expect(trash.length, `${dungeonId} trash pulls`).toBe(budget.pulls);
+      const dtps = trash.map((pull) => pull.reduce((sum, id) => sum + meleeDtps(id, dungeonId), 0));
+      const mean = dtps.reduce((a, b) => a + b, 0) / dtps.length;
+      expect(mean, `${dungeonId} mean pull`).toBeGreaterThanOrEqual(budget.meanMin);
+      expect(mean, `${dungeonId} mean pull`).toBeLessThanOrEqual(budget.meanMax);
+      expect(Math.max(...dtps), `${dungeonId} heaviest pull`).toBeLessThanOrEqual(
+        budget.heaviestMax,
+      );
+    }
+  });
+
+  it('holds every encounter body on the 500 line and every trash mob under it', () => {
+    let bodies = 0;
+    for (const dungeonId of FIVE_MANS) {
+      for (const pull of pullsOf(dungeonId)) {
+        const encounter = pull.some(isEncounterBody);
+        for (const mobId of pull) {
+          const swing = minSwing(mobId, dungeonId, 'heroic');
+          // Ilvane's two Choristers are her trash-like adds: since the pack
+          // budget they ride the crypt's trash value, not a boss entry.
+          if (encounter && mobId !== 'hollow_chorister') {
+            bodies++;
+            expect(swing, `${dungeonId}/${mobId}`).toBeGreaterThanOrEqual(HEROIC_MOB_FLOOR);
+          } else {
+            expect(swing, `${dungeonId}/${mobId} hits like a boss`).toBeLessThan(HEROIC_MOB_FLOOR);
+          }
+        }
       }
     }
+    // The Knellwyrm (Morthen's rite raises it with no add role) is a boss too.
+    expect(minSwing('crypt_knellwyrm', 'hollow_crypt', 'heroic')).toBeGreaterThanOrEqual(
+      HEROIC_MOB_FLOOR,
+    );
+    // Non-vacuity: 20 boss bodies (the Hydra's three heads, the Beastmaster
+    // and his jaguar among them) plus the four solo minibosses.
+    expect(bodies).toBe(24);
+  });
+
+  it('the pack budget left every trash kit on its pre-budget mechanic factor', () => {
+    // A heroic mob with no mechanic entry stamps its MELEE factor as
+    // mechanicDamageMult (instances/difficulty.ts), so the budget's melee cut
+    // would have moved every trash kit with it. Each kit-carrying trash mob
+    // whose melee moved carries its old factor as a mechanic entry instead.
+    const PRE_BUDGET: Record<string, Record<string, number>> = {
+      hollow_crypt: {
+        crypt_ossuary_warrior: 20,
+        crypt_gravecaller_adept: 24,
+        crypt_chapel_gargoyle: 20,
+        crypt_ossuary_cutthroat: 23,
+        crypt_ossuary_drake: 20,
+        bonechill_widow: 20,
+        crypt_crow_caller: 24,
+        crypt_carrion_crow: 66,
+      },
+      sunken_bastion: { bastion_revenant: 18, mistweaver: 21.6 },
+      drowned_temple: { pale_choir_acolyte: 16.5, moonlit_siren: 17.5 },
+      wildheart_basin: {
+        wildheart_stalker: 17.25,
+        wildheart_ravager: 17.25,
+        wildheart_hexcaller: 17.25,
+      },
+    };
+    const stamped = (mobId: string, dungeonId: string): number => {
+      const template = mobTemplateForDungeonDifficulty(MOBS[mobId], dungeonId, 'heroic');
+      const mob = createMob(1, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+      applyDungeonMobTuning(mob, dungeonId, 'heroic');
+      return mob.mechanicDamageMult ?? 1;
+    };
+    for (const [dungeonId, factors] of Object.entries(PRE_BUDGET)) {
+      const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
+      for (const [mobId, factor] of Object.entries(factors)) {
+        expect(stamped(mobId, dungeonId), `${dungeonId}/${mobId}`).toBe(factor);
+        // Load-bearing: the melee factor really moved off the kit's factor.
+        const melee = tuning.damageMultiplierByMob?.[mobId] ?? tuning.damageMultiplier;
+        expect(melee, `${dungeonId}/${mobId} melee`).toBeLessThan(factor);
+      }
+    }
+    // The one deliberate move: the Moonmantle Ray's Pearl Slam rode its x16.5
+    // melee lift while every sibling temple kit sits on x5.5; it joins them.
+    expect(stamped('pearlguard_sentinel', 'drowned_temple')).toBe(5.5);
+    expect(stamped('drowned_templeguard', 'drowned_temple')).toBe(5.5);
   });
 
   it('every boss-summoned add swings for at least the 150 add floor on the reference warrior', () => {
@@ -138,6 +300,16 @@ describe('heroic five-man floors', () => {
         // And UNDER the full mob line: an add must never hit like a boss again.
         expect(swing, `${dungeonId}/${summoned} above the mob line`).toBeLessThan(HEROIC_MOB_FLOOR);
       }
+    }
+  });
+
+  it('the adds an encounter module raises swing in the add band too', () => {
+    // Sexton Marrow's Restless Bones (encounters/hollow_crypt/marrow.ts) rise
+    // from his graves through spawnKitAdd as summoned adds, not a summonAdds row.
+    for (const [dungeonId, add] of [['hollow_crypt', 'marrow_restless_bones']] as const) {
+      const swing = minSwing(add, dungeonId, 'heroic', { summonedAdd: true });
+      expect(swing, `${dungeonId}/${add}`).toBeGreaterThanOrEqual(SUMMONED_ADD_FLOOR);
+      expect(swing, `${dungeonId}/${add} above the mob line`).toBeLessThan(HEROIC_MOB_FLOOR);
     }
   });
 
@@ -158,13 +330,20 @@ describe('heroic five-man doubled health', () => {
   it('pins representative heroic health to exactly double the pre-retune values', () => {
     // pre-retune heroic values in comments (health multipliers 1.9/2.0/2.6/2.0).
     expect(maxHpAt('crypt_shambler', 'hollow_crypt', 'heroic')).toBe(4108); // was 2054
-    expect(maxHpAt('morthen', 'hollow_crypt', 'heroic')).toBe(7883); // was 3942
+    // The crypt rework prices Morthen from fight length x heroic DPS (about
+    // 125 s of damage beside his immune Rite, dungeon_difficulty.ts).
+    expect(maxHpAt('morthen', 'hollow_crypt', 'heroic')).toBe(28837);
     expect(maxHpAt('bastion_revenant', 'sunken_bastion', 'heroic')).toBe(4554); // was 2277
-    expect(maxHpAt('vael_the_mistcaller', 'sunken_bastion', 'heroic')).toBe(8777); // was 4388
+    // The Sunken Bastion rework prices Vael's pool per boss (150 s at heroic
+    // party DPS, dungeon_difficulty.ts healthMultiplierByMob), off the doubling.
+    expect(maxHpAt('vael_the_mistcaller', 'sunken_bastion', 'heroic')).toBe(34449);
     expect(maxHpAt('drowned_templeguard', 'drowned_temple', 'heroic')).toBe(6219); // was 3110
-    expect(maxHpAt('ysolei', 'drowned_temple', 'heroic')).toBe(13132); // was 6566
+    // The Temple rework prices Ysolei from fight length x heroic DPS (150 s).
+    expect(maxHpAt('ysolei', 'drowned_temple', 'heroic')).toBe(34497);
     expect(maxHpAt('moonspawn', 'drowned_temple', 'heroic', { summonedAdd: true })).toBe(1867); // was 933
-    expect(maxHpAt('korzul_the_gravewyrm', 'gravewyrm_sanctum', 'heroic')).toBe(13138); // was 6569
+    // The Ice Tomb rework prices Korzul from fight length x heroic DPS (160 s
+    // on the ground; phase B adds his flights).
+    expect(maxHpAt('korzul_the_gravewyrm', 'gravewyrm_sanctum', 'heroic')).toBe(36785);
   });
 });
 
@@ -213,7 +392,7 @@ describe('Nythraxis raid floors', () => {
 });
 
 describe('heroic tuning data contract', () => {
-  it('pins the retuned heroic ladder (health doubled, 500-floor damage)', () => {
+  it('pins the retuned heroic ladder (health doubled, pack-budget trash damage)', () => {
     expect(
       Object.fromEntries(
         Object.values(HEROIC_DUNGEON_TUNING).map((t) => [
@@ -222,11 +401,15 @@ describe('heroic tuning data contract', () => {
         ]),
       ),
     ).toEqual({
-      hollow_crypt: [3.8, 20, 6],
-      sunken_bastion: [4.0, 18, 9.75],
-      drowned_temple: [5.2, 16.5, 9.15],
-      gravewyrm_sanctum: [4.0, 15.5, 8.55],
-      wildheart_basin: [4.0, 17.25, 8.625],
+      // The five-mans' damage is the trash pack budget (was the 500 floor:
+      // 20, 18, 16.5, 15.5, 17.25; the bosses keep those through their
+      // per-mob entries). 6 -> 9.5: the rework's wing bosses summon adds (the
+      // 150 add floor).
+      hollow_crypt: [3.8, 9, 9.5],
+      sunken_bastion: [4.0, 6.9, 9.75],
+      drowned_temple: [5.2, 6.4, 9.15],
+      gravewyrm_sanctum: [4.0, 5.1, 8.55],
+      wildheart_basin: [4.0, 7.5, 8.625],
       nythraxis_boss_arena: [3.2, 7.25, 7.25],
       ignivar_raid_arena: [1.75, 2, 2],
       ignivar_inner_crucible: [5 / 3, 1.2459633027522936, 1],
@@ -234,10 +417,58 @@ describe('heroic tuning data contract', () => {
   });
 
   it('pins the per-mob heroic overrides and checks every key is a real mob', () => {
+    // Every boss and solo miniboss keeps its pre-budget melee factor (the
+    // Sanctum bosses their 19, everyone else the old dungeon-wide value); the
+    // trash overrides kept their old floor lifts in proportion, the crows,
+    // raptors and whelps that dominated a heavy pull less a little more.
     expect(HEROIC_DUNGEON_TUNING.gravewyrm_sanctum.damageMultiplierByMob).toEqual({
       korgath_the_bound: 19,
       grand_necromancer_velkhar: 19,
       korzul_the_gravewyrm: 19,
+      sledge_tusker: 15.5,
+      broodsworn_thawcaller: 5.5,
+      broodsworn_pyre_tender: 5.5,
+      rime_whelp: 8.8,
+    });
+    expect(HEROIC_DUNGEON_TUNING.hollow_crypt.damageMultiplierByMob).toEqual({
+      sexton_marrow: 20,
+      rimeweb: 20,
+      cantor_ilvane: 20,
+      morthen: 20,
+      crypt_knellwyrm: 20,
+      crypt_gravecaller_adept: 10.8,
+      crypt_gravecaller_necromancer: 10.8,
+      crypt_crow_caller: 10.8,
+      crypt_ossuary_cutthroat: 10.35,
+      crypt_carrion_crow: 26.7,
+    });
+    expect(HEROIC_DUNGEON_TUNING.sunken_bastion.damageMultiplierByMob).toEqual({
+      knight_commander_olen: 18,
+      gaoler_ossick: 18,
+      vael_the_mistcaller: 18,
+      turretback_hermit: 18,
+      gaol_turnkey: 18,
+      bastion_warhound: 7.5,
+      fogbound_arbalest: 8.3,
+      mistweaver: 8.3,
+    });
+    expect(HEROIC_DUNGEON_TUNING.drowned_temple.damageMultiplierByMob).toEqual({
+      choirmother_selthe: 16.5,
+      mere_hydra_head_left: 16.5,
+      mere_hydra_head_center: 16.5,
+      mere_hydra_head_right: 16.5,
+      tideglass_colossus: 16.5,
+      ysolei: 16.5,
+      drowned_pilgrim: 10.5,
+      moonlit_siren: 6.8,
+    });
+    expect(HEROIC_DUNGEON_TUNING.wildheart_basin.damageMultiplierByMob).toEqual({
+      wildheart_beastmaster: 17.25,
+      fanglord_jaguar: 17.25,
+      the_gorgebloom: 17.25,
+      wildheart_high_priest: 17.25,
+      great_saurian: 17.25,
+      basin_raptor: 11.4,
     });
     expect(HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplierByMob).toEqual({
       nythraxis_scourge_of_thornpeak: 1.488,
@@ -386,7 +617,10 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
     // the id-ordered tie lands on the first trinket the warrior can wear and
     // its stamina line (+13, 130 HP) joins the pool. The armor pin above did
     // not move; the floors are not retuned here, the same maintainer decision.
-    expect(a.maxHp, 'and its pool').toBe(2052);
+    // Re-pinned 2052 -> 2032 with Balgath's trinkets: the id-ordered tie now lands on
+    // barrowstone_heart, which sorts first and carries +11 Stamina (110 HP) instead of
+    // +13. Same tie-break, same armor pin, floors not retuned.
+    expect(a.maxHp, 'and its pool').toBe(2032);
   });
 
   it('REF_ARMOR provenance: the readings the comments quote are derived, not hand-carried', () => {

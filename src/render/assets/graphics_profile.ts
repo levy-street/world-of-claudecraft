@@ -39,7 +39,6 @@ import { prepareTransportShipAssets, resetTransportShipCaches } from '../transpo
 import { prepareWaterProfileAssets } from '../water';
 import { prepareWickharborHarborAssets, resetWickharborHarborCaches } from '../wickharbor_harbor';
 import { prepareWickharborWharfAssets, resetWickharborWharfCaches } from '../wickharbor_wharf';
-import { resetWildheartTerrainProfileCaches } from '../wildheart_terrain';
 import { prepareSurfaceDetailProfileAssets, resetSurfaceDetailProfileCaches } from '../worn_stone';
 import { prepareWyrmwatchHarborAssets, resetWyrmwatchHarborCaches } from '../wyrmwatch_harbor';
 
@@ -94,7 +93,6 @@ const RESETTERS = [
   ['jail_scene', resetJailSceneProfileCaches],
   ['cliff_scree', resetCliffScreeProfileCaches],
   ['door_portal', resetDoorPortalProfileCaches],
-  ['wildheart_terrain', resetWildheartTerrainProfileCaches],
   ['fireball_travel_visual', resetFireballTravelProfileCaches],
   ['frost_nova_root_visual', resetFrostNovaRootProfileCaches],
   ['ice_block_visual', resetIceBlockProfileCaches],

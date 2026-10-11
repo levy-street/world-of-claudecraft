@@ -11,6 +11,119 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const ko_KR: EnTranslations = {
+  "referralCards": {
+    "title": "친구 초대",
+    "subtitle": "함께 모험하며 도장을 모으세요.",
+    "close": "친구 초대 닫기",
+    "launcher": "도장 카드",
+    "pages": "도장 카드 페이지",
+    "firstPage": "첫 페이지",
+    "nextPage": "더 많은 카드",
+    "trailmateTitle": "여행 동반자",
+    "friendshipAura": "우정",
+    "protectiveCharm": "수호 부적",
+    "bankBonus": "완료한 도장 카드",
+    "bankBonusHelp": "연결된 친구 2명이 도장 카드를 완료하도록 도우면 은행 슬롯 20칸이 영구 해제됩니다.",
+    "friendshipUse": "힘, 민첩, 체력, 지능, 정신력이 {duration}초 동안 {stats}만큼 증가합니다.",
+    "readyCount": "도장 카드: 보상 {count}개 수령 가능",
+    "loading": "친구 초대 카드에 연결 중...",
+    "empty": "새 플레이어를 초대해 함께 첫 도장 카드를 시작하세요.",
+    "inviteTitle": "친구 초대하기",
+    "inviteHelp": "친구가 계정을 만들기 전에 이 링크를 공유하세요. 내 링크로 새로 만든 계정만 연결된 친구가 됩니다.",
+    "inviteLabel": "내 초대 링크",
+    "inviteUnavailable": "아직 초대 링크를 사용할 수 없습니다.",
+    "membership": "연결된 친구가 처음 멤버십을 구매하면 멤버십 증서를 받습니다.",
+    "cardBetween": "{you} 및 {friend}",
+    "yourCard": "{name}의 도장 카드",
+    "unassigned": "캐릭터 미선택",
+    "start": "카드 시작",
+    "startPrompt": "{friend} 님과 도장 카드를 시작할까요? 두 사람 모두 수락해야 합니다. 각 캐릭터는 5레벨 미만이어야 하며 튜토리얼 섬의 마지막 퀘스트를 완료하지 않았어야 합니다.",
+    "accept": "수락",
+    "decline": "거절",
+    "declinePrompt": "정말 거절할까요? 두 캐릭터가 조건을 충족하는 동안 도장 카드 메뉴에서 나중에 시작할 수 있습니다.",
+    "declineConfirmed": "카드를 시작하지 않았습니다. 두 캐릭터가 조건을 충족하는 동안 도장 카드 메뉴에서 시작할 수 있습니다.",
+    "waiting": "연결된 친구가 수락하기를 기다리는 중입니다.",
+    "cancel": "취소",
+    "okay": "확인",
+    "understand": "예, 이해했습니다",
+    "confirmLock": "예, 이 카드를 고정합니다",
+    "lockFirst": "안개엮는자 도장 보상을 받으면 이 카드가 {name} 캐릭터에 영구 고정됩니다. 이후 카드나 보상을 다른 캐릭터로 옮길 수 없습니다. 이해하셨나요?",
+    "lockSecond": "정말 진행할까요? 안개엮는자 보상을 받고 이 카드를 {name} 캐릭터에 영구 고정합니다.",
+    "locked": "이 카드는 {name} 캐릭터에 고정되어 더 이상 옮길 수 없습니다.",
+    "unlocked": "안개엮는자 도장 보상을 받기 전까지는 조건을 충족하는 다른 캐릭터로 카드를 옮길 수 있습니다. 해당 보상을 받으면 현재 캐릭터에 영구 고정됩니다.",
+    "move": "이 캐릭터로 카드 옮기기",
+    "movePrompt": "카드를 {oldName}에서 {newName}(으)로 옮길까요? 진행 상황과 이 카드로 얻은 모든 보상이 함께 옮겨집니다. 해당 보상은 {oldName}에서 제거됩니다.",
+    "confirmMove": "예, 카드를 옮깁니다",
+    "summon": "연결된 친구 소환",
+    "summonPrompt": "{friend} 님이 자신의 위치로 소환하려고 합니다. 소환을 수락할까요?",
+    "summonHelp": "연결된 친구를 내 위치로 불러옵니다. 30분마다 한 번 소환할 수 있습니다.",
+    "summonCooldown": "소환 대기: {minutes}분 {seconds}초",
+    "reward": "보상: {reward}",
+    "earned": "획득함",
+    "redeemed": "수령함",
+    "emptyStamp": "아직 획득하지 않음",
+    "stamping": "카드에 도장을 찍는 중...",
+    "redeem": "보상 받기",
+    "previous": "이전 도장 보상부터 받으세요.",
+    "playTogether": "이 카드의 캐릭터들과 파티를 이루어 목표를 완료하세요.",
+    "fallback": "목표 퀘스트를 이미 혼자 완료했나요? 친구와 다시 파티를 맺으면 튜토리얼 섬 도장을 받을 수 있습니다. 이후 퀘스트 도장은 해당 던전을 함께 완료하면 받을 수 있습니다.",
+    "questGroup": "도장 카드 퀘스트",
+    "questWithFriend": "{friend} 님과 {quest}",
+    "browseCards": "모든 도장 카드 페이지 보기",
+    "nextQuest": "도장 카드: {quest}",
+    "questIndicator": "이 퀘스트를 완료하면 다음 도장 카드 보상에 가까워집니다.",
+    "completion": "축하합니다! {friend} 님이 여러분의 도움으로 도장 카드를 완료했습니다.",
+    "openInvites": "친구 초대 열기",
+    "referrerTitle": "도움을 준 친구",
+    "referrerCount": "완료한 친구: {count}명",
+    "friendTier": "도움을 준 친구: {count}명",
+    "awarded": "지급됨",
+    "pending": "아직 지급되지 않음",
+    "milestones": {
+      "tutorial": "튜토리얼 섬 마지막 퀘스트",
+      "hollow": "공허 속으로",
+      "fogbinder": "안개엮는자",
+      "gravewyrm": "무덤고룡 코르줄",
+      "raid": "첫 공격대 우두머리 처치"
+    },
+    "rewards": {
+      "tutorial": "고유 칭호와 캐릭터에 귀속되는 최대 용량 가방.",
+      "hollow": "체력을 높이고 생명력이 낮을 때 자동으로 보호막을 생성하는 장신구.",
+      "fogbinder": "장신구가 진화하여 체력이 더 증가하고 사용 효과를 얻습니다. 15초 동안 모든 능력치가 5 증가하며 재사용 대기시간은 2분입니다.",
+      "gravewyrm": "무료 탈것 훈련.",
+      "raid": "전용 우정 전차 탈것."
+    },
+    "referrerRewards": {
+      "1": "전용 우정 랩터 탈것.",
+      "2": "은행 슬롯 20칸과 캐릭터 슬롯 5칸.",
+      "3": "Claudium 1,000개.",
+      "4": "Claudium 1,000개.",
+      "5": "어린 나무 동료."
+    },
+    "reasons": {
+      "notParticipant": "이 계정은 해당 친구 연결에 속하지 않습니다.",
+      "staleRevision": "카드가 변경되었습니다. 최신 진행 상황을 확인하고 다시 시도하세요.",
+      "invalidCharacters": "파티의 캐릭터들이 해당 친구 연결에 속하지 않습니다.",
+      "notTogether": "두 연결된 친구가 같은 파티에 있어야 합니다.",
+      "levelTooHigh": "새 카드를 시작하는 캐릭터는 5레벨 미만이어야 합니다.",
+      "tutorialCompleted": "캐릭터 중 하나가 이미 튜토리얼 섬의 마지막 퀘스트를 완료했습니다.",
+      "alreadyStarted": "이 친구 연결에는 이미 카드가 있습니다. 연결된 친구 한 쌍당 활성 카드는 하나만 가질 수 있습니다.",
+      "notPending": "응답을 기다리는 카드 초대가 없습니다.",
+      "declinePending": "연결된 친구가 카드 거절 여부를 결정하고 있습니다.",
+      "declineNotConfirmed": "초대를 끝내려면 거절을 확정하세요.",
+      "notActive": "보상을 받기 전에 함께 카드를 시작하세요.",
+      "wrongCharacter": "카드에 표시된 캐릭터를 사용하거나 고정되지 않은 카드를 조건에 맞는 캐릭터로 옮기세요.",
+      "locked": "이 카드는 캐릭터에 고정되어 옮길 수 없습니다.",
+      "sameCharacter": "이 카드는 이미 이 캐릭터에게 있습니다.",
+      "invalidMilestone": "해당 도장은 이 카드에 속하지 않습니다.",
+      "notEarned": "이 목표를 함께 완료한 후 보상을 받으세요.",
+      "alreadyRedeemed": "이미 받은 보상입니다.",
+      "previousRewardRequired": "이전 도장 보상부터 받으세요.",
+      "confirmationRequired": "안개엮는자 보상을 받기 전에 카드 고정 경고를 확인하세요.",
+      "newAccountsOnly": "초대 링크로 새 계정을 만들 때만 연결된 친구가 될 수 있습니다. 기존 계정은 연결할 수 없습니다.",
+      "unavailable": "지금은 이 작업을 사용할 수 없습니다. 나중에 다시 시도하세요."
+    }
+  },
   "meta": {
     "builtOn": "{date} 빌드"
   },
@@ -347,6 +460,26 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "배달부",
+      "close": "배달부 닫기",
+      "ready": "배달 준비 완료",
+      "outbound": "은행으로 비행 중",
+      "returning": "아이템을 가지고 돌아오는 중",
+      "waiting": "아이템 반환을 위해 대기 중",
+      "bags": "은행에 보낼 아이템",
+      "bank": "은행에서 가져올 아이템",
+      "cargo": "배달부 소지품",
+      "empty": "아이템 없음",
+      "send": "배달부 보내기",
+      "selected": "{count} / {limit} 묶음 선택됨",
+      "select": "{item}, {count} 선택",
+      "selectedItem": "{item}, {count} 선택 해제",
+      "instructions": "묶음 전체를 선택하세요. 배달부가 먼저 맡긴 뒤 요청한 아이템을 찾습니다. 퀘스트 아이템은 보낼 수 없습니다.",
+      "membership": "새 배달을 시작하려면 멤버십을 갱신하세요.",
+      "cargoSafe": "가방에 공간이 생길 때까지 배달부가 아이템을 보관합니다.",
+      "unavailable": "배달부를 소환하여 배달을 계획하세요."
+    },
     "framePresets": {
       "apply": "적용",
       "pickerLabel": "프레임 프리셋: {name}",
@@ -513,6 +646,48 @@ export const ko_KR: EnTranslations = {
       "sailing": "{dest}(으)로 항해 중"
     },
     "materialStackSelectionUnavailable": "해당 재료 선택을 더 이상 사용할 수 없습니다.",
+    "shardpike": {
+      "braceLabel": "조각창 자세 잡기",
+      "braceTooltip": "창 밑동을 땅에 박고 창끝을 세운다. 좌우 이동 키가 균형 막대다: 빔은 저절로 흐르고, 그가 땅을 내리칠 때마다 튕긴다. 양쪽 끝에 닿지 않게 {set}초간 버티면 창이 고정된다. 단단한 땅이 필요하고, 탈것에 탄 채로는 불가능하다.",
+      "thrustLabel": "배로글라스 찌르기",
+      "thrustTooltip": "고정된 창을 눈에 찔러 넣어 {damage}의 피해를 입힌다. 레벨도, 공격력도, 창 자체도 이 값을 키우지 못한다. 감독관을 실명시키고 무덤가죽을 벗겨내므로, 늪의 다른 모든 무기가 마침내 먹히기 시작한다. 고정된 창만이 이 일격을 낼 수 있고, 사거리는 {reach}야드, 기회는 {seconds}초 동안 열린다.",
+      "braceTooltipLean": "창끝을 땅에 박고 창날을 치켜든다. 좌우 이동 키나 회전 키로, 또는 막대 위의 두 키를 누르고 있어 기울여라. 막대는 저절로 흔들리고, 그가 내려치는 일격마다 튕겨 나간다. {set}초 동안 양 끝에 닿지 않게 버티면 창이 자리 잡는다. 단단한 땅이 필요하며, 탈것 위에서는 불가능하다.",
+      "releaseLabel": "조각창 내리기",
+      "releaseTooltip": "창을 거둔다. 물러나도 벌칙은 없다: 잃는 것은 자세뿐이고 기회 자체는 아니며, {rest}초 후 다시 자세를 잡을 수 있다.",
+      "whyResting": "방금 창을 내렸다. 아이콘의 시간이 끝날 때까지 기다려라.",
+      "whyAlreadyCouched": "창은 이미 자세를 잡았다. 다시 잡기 전에 내려라.",
+      "whyNotSet": "창이 고정되지 않았다. 먼저 자세를 잡고 버텨라.",
+      "whyNothingCouched": "내릴 것이 없다: 창의 자세를 잡지 않았다.",
+      "beamLabel": "조각창 균형",
+      "beamStatus": "창 균형 {balance}, 고정 {set}퍼센트.",
+      "beamDanger": "창 균형 {balance}, 놓치기 직전.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "좌우 이동 키로 창을 버텨라",
+      "promptCatchIt": "붙잡아라, 창이 넘어간다",
+      "promptEyeOut": "눈이 터졌다, {seconds}초 남았다: 전력으로 때려라",
+      "promptSealed": "그의 눈이 닫혔다. {seconds}초 후 다시 열린다",
+      "promptResetting": "창을 다시 잡는 중, {seconds}초",
+      "promptCloser": "감독관에게 접근하라, {yards}야드 남았다",
+      "promptBrace": "조각창 자세를 잡고, 그대로 버텨라",
+      "promptFindBoss": "스케릿의 조각창: 이것으로 감독관의 눈을 찔러라",
+      "promptFindBossMuster": "소집대의 조각창: 이것으로 감독관의 눈을 찔러라",
+      "promptTakePike": "{key} 키를 누르거나 무기 거치대를 클릭해 조각창을 집어라",
+      "promptTakePikeClick": "무기 거치대를 클릭해 조각창을 집어라",
+      "promptTakePikeTap": "무기 거치대를 탭해 조각창을 집어라",
+      "promptPikeLevelCap": "소집군은 레벨 {level} 이하의 신병에게만 창을 빌려줍니다",
+      "promptHoldSteadyLean": "창을 버텨라: {left}와 {right}로 기울여라",
+      "leanLeft": "왼쪽으로 기울이기",
+      "leanRight": "오른쪽으로 기울이기",
+      "leanLeftKey": "왼쪽으로 기울이기 ({key})",
+      "leanRightKey": "오른쪽으로 기울이기 ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "조각창 지시",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "실명시켰다! 이제 공격대 전원이 세게 친다",
+      "promptStrikeLantern": "지금 등불을 찔러라, {seconds}초",
+      "promptLanternOut": "등불이 꺼졌다, {seconds}초 남았다: 자신의 무기로 쳐라",
+      "promptCloserEffigy": "짚 감독관에게 접근하라, {yards}야드 남았다"
+    },
     "vehicle": {
       "title": "북부 감시초소 대포",
       "objective": "북부 감시초소 방어",
@@ -826,6 +1001,50 @@ export const ko_KR: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "게임 정기 구독",
+        "monthlyTitle": "월간 멤버십",
+        "annualTitle": "12개월 멤버십 묶음",
+        "annualPrice": "12개월 이용료 {price} 선불",
+        "annualTerms": "같은 가격으로 매년 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.",
+        "annualMount": "결제 후 구매한 캐릭터로 우편에서 영혼 귀속 전차 탈것 열쇠를 받으세요. 전차는 묶음 탈것의 임시 모델입니다.",
+        "trialTerms": "계정당 한 번 {days}일간 무료로 체험하세요. 결제 수단 등록이 필요합니다. 취소하지 않으면 체험 종료 시 {price}가 청구됩니다.",
+        "startTrial": "7일 무료 체험 시작",
+        "resumeCheckout": "결제 계속하기",
+        "checkoutClosed": "이 결제는 종료되었으며 미수령 보상이 없습니다. 멤버십 요금제를 다시 선택하여 새 결제를 시작하세요.",
+        "annualClaim": "묶음 탈것 받기",
+        "annualPending": "결제 후 구매한 캐릭터로 돌아와 탈것을 받으세요. 결제 처리 중이거나 체험 중이면 유료 결제가 완료된 뒤 다시 시도하세요.",
+        "annualDelivered": "묶음 탈것 열쇠가 우편으로 배송되었습니다.",
+        "tokenTitle": "거래 가능한 멤버십 토큰",
+        "benefitsTitle": "활성 멤버십 혜택",
+        "benefitBank": "어느 은행원에게서든 다른 캐릭터의 은행을 이용할 수 있습니다.",
+        "benefitSlots": "캐릭터 슬롯 10개를 추가로 잠금 해제합니다.",
+        "benefitArmour": "직업과 전문화에 맞는 능력치를 지닌 귀속 방어구를 받으세요. 캐릭터 레벨에 따라 성장하며 20레벨에 아이템 레벨 25가 됩니다. 전체 세트를 착용하면 경험치 획득량이 20% 증가합니다.",
+        "benefitTax": "경매장 수수료가 일반 수수료의 절반으로 줄어듭니다.",
+        "benefitExpiry": "멤버십이 만료되면 추가 슬롯의 캐릭터와 방어구 보너스가 갱신할 때까지 잠깁니다. 기본 슬롯의 캐릭터는 계속 플레이할 수 있습니다.",
+        "tokenTerms": "{price}를 한 번 결제하면 30일 이용권을 받습니다. 이 캐릭터에게 우편으로 전달됩니다. 사용하여 멤버십 기간을 추가하거나 경매장에서 판매하세요.",
+        "tokenBuy": "멤버십 토큰 구매",
+        "tokenClaim": "구매한 토큰 받기",
+        "tokenPending": "결제 후 이 캐릭터로 돌아와 토큰을 받으세요. 결제가 아직 처리 중이면 잠시 후 다시 시도하세요.",
+        "tokenDelivered": "토큰이 우편으로 전달되었습니다.",
+        "price": "월 {price}",
+        "terms": "매월 자동 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.",
+        "subscribe": "구독하기",
+        "manage": "구독 관리",
+        "ending": "현재 결제 기간이 끝나면 취소됩니다",
+        "error": "결제 페이지를 열 수 없습니다. 팝업을 허용한 후 다시 시도하세요.",
+        "status": {
+          "none": "구독 안 함",
+          "incomplete": "결제 미완료",
+          "incomplete_expired": "결제 유효 기간 만료",
+          "trialing": "체험 중",
+          "active": "활성",
+          "past_due": "결제 기한 초과",
+          "canceled": "취소됨",
+          "unpaid": "미납",
+          "paused": "일시 중지됨"
+        }
+      },
       "title": "WOC 상점",
       "close": "WOC 상점 닫기",
       "tabsLabel": "WOC 상점 구역",
@@ -1987,6 +2206,8 @@ export const ko_KR: EnTranslations = {
       "name_goblin_rocket_sled": "고블린 로켓 썰매",
       "name_rallycart_rxt": "랠리카트 RXT",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 드레드스파크",
+      "name_referral_tank": "우정 전차",
+      "name_referral_raptor": "우정 랩터",
       "name_drakemaw_raptor": "화산구 랩터",
       "name_avian_strider": "비리디안 베일스트라이더",
       "name_mech_bird": "태엽 기계새",
@@ -2004,6 +2225,8 @@ export const ko_KR: EnTranslations = {
       "desc_rallycart_rxt": "작지만 본격적인 랠리 머신. 이동 속도를 높여준다.",
       "desc_rallycart_skin": "작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
+      "desc_referral_tank": "친구 초대 도장 카드를 완성하면 획득합니다.",
+      "desc_referral_raptor": "첫 번째 연결된 친구가 도장 카드를 완성하도록 도우면 획득합니다.",
       "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
       "desc_avian_strider": "우뚝 솟은 탈것 조류로, 육중한 발톱과 접은 날개가 모든 여정을 천둥 같은 질주로 바꾼다.",
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
@@ -2208,6 +2431,7 @@ export const ko_KR: EnTranslations = {
       "showDevBadges": "개발자 배지 표시",
       "showOwnNameplate": "내 이름표 표시",
       "showPlayerNameplates": "플레이어 이름표 표시",
+      "showPetNames": "펫 이름 표시",
       "uiScale": "UI 배율",
       "playerFrameScale": "플레이어 프레임 크기",
       "targetFrameScale": "대상 프레임 크기",
@@ -2845,6 +3069,9 @@ export const ko_KR: EnTranslations = {
       "weapons": "무기",
       "groupSeason2": "워페어 시즌 2: 선봉대",
       "groupEntry": "워페어 시즌 1",
+      "companions": "동료",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "owned": "보유 중",
       "buyAria": "{honor}에 {item} 구매",
       "buyOwnedAria": "{honor}에 {item} 구매, 이미 보유 중",
@@ -3112,8 +3339,10 @@ export const ko_KR: EnTranslations = {
         "storm": "주문을 시전할 때마다 충전을 하나 얻으며, 최대 {max}개까지 쌓입니다. 충전은 {duration}초 동안 지속되며, 새로 얻을 때마다 갱신됩니다.",
         "heat": "근접 및 원거리 무기가 적중할 때마다 열기를 1중첩 얻으며, 최대 {max}중첩까지 쌓입니다. 열기는 {duration}초 동안 지속되며, 중첩을 얻을 때마다 갱신됩니다.",
         "ignite": "근접 및 원거리 무기의 치명타가 대상에 불을 붙여 {every}초마다 {tick}의 화염 피해를 {duration}초 동안 입힙니다. 새로운 치명타가 효과를 갱신합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
-        "guardHeat": "공격을 무기 막기, 회피 또는 방패 막기할 때마다 열기를 1중첩 얻으며, 최대 {max}중첩까지 쌓입니다. 열기는 {duration}초 동안 지속되며, 중첩을 얻을 때마다 갱신됩니다."
+        "guardHeat": "공격을 무기 막기, 회피 또는 방패 막기할 때마다 열기를 1중첩 얻으며, 최대 {max}중첩까지 쌓입니다. 열기는 {duration}초 동안 지속되며, 중첩을 얻을 때마다 갱신됩니다.",
+        "stoneHeart": "공격에 죽게 되면 대신 {statue}초 동안 돌로 변합니다. 피해를 받지 않고 이동하거나 행동할 수 없으며, 이후 생명력 {restore}(최대 생명력의 {restorePct}%)으로 돌아옵니다. {icd}마다 한 번만 발생합니다. 결투와 투기장 경기에서는 발동하지 않으며, 결정타에서 끝납니다."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "{duration}초 동안 당신을 직접 공격한 적은 그 공격으로 잃은 생명력의 {pct}%에 해당하는 물리 피해를 받습니다. 지속 피해로는 발동하지 않습니다.",
         "anchor": "{duration}초 동안 받는 피해가 {reduction}% 감소하지만 이동 속도가 {speed}%가 됩니다. 자신에게 걸린 기절, 이동 불가, 감속, 공포, 변이, 침묵, 실명, 주술, 무장 해제, 행동 불가 효과를 제거하고, 지속되는 동안 새로운 효과와 밀쳐내기를 무시합니다.",
@@ -3132,7 +3361,17 @@ export const ko_KR: EnTranslations = {
         "kindlingOrb": "{duration}초 동안 곁에 잉걸불 구슬을 소환합니다. 적에게 주문을 시전할 때마다 구슬이 그 적에게 화염구를 발사하여 {damage}의 화염 피해를 입힙니다. 피해량은 주문력으로 증가합니다.",
         "pierce": "{duration}초 동안 자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.",
         "lantern": "{duration}초 동안 발밑에 등불을 놓습니다. 누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {share}%만큼 치유됩니다.",
-        "heartNova": "열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다."
+        "shackle": "{range}미터 이내의 대상을 {duration}초 동안 사슬로 묶어 제자리에 고정합니다. 우두머리처럼 제어 효과에 면역인 생물은 대신 이동 속도가 {slow}% 감소하며, 감속에도 면역이면 효과가 없습니다.",
+        "spiritPack": "{duration}초 동안 영혼 재규어를 불러 곁에서 싸우게 합니다. 재규어는 대상에게 달려가 {every}초마다 물어뜯어 {min}~{max}의 물리 피해를 주며, 다른 적을 대상으로 지정하면 그 적에게로 옮겨 갑니다. 지정한 적이 없으면 {range}미터 내에서 당신과 가장 가까운 적을 공격합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 비례해 증가하며, 불러낼 때 결정됩니다. {range}미터 내의 적대적 대상이 필요합니다.",
+        "seedburst": "{range}미터 내의 대상에게 씨앗을 심습니다. {delay}초 후 씨앗이 대상이 있는 곳(또는 죽은 곳)에서 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 대상이 먼저 죽었다면 피해가 {bonus}% 증가합니다({empowered}). 피해량은 주문력에 비례해 증가하며, 심을 때 결정됩니다. 씨앗이 터지기 전에 당신이 죽으면 씨앗은 시듭니다.",
+        "tether": "{range}미터 내의 아군 플레이어와 {duration}초 동안 사슬로 연결됩니다. 그 아군의 생명력에 닿을 피해의 {share}%를 대신 당신이 받습니다. 당신이 죽으면 일찍 끝납니다. 자신이 아닌 아군 플레이어를 대상으로 지정해야 합니다.",
+        "harvest": "{duration}초 동안 당신으로부터 {radius}미터 내에서 적대적인 생물이 죽을 때마다 최대 생명력의 {pct}%({health})와 최대 마나의 {pct}%를 회복합니다.",
+        "quench": "{duration}초 내에 다음 {hits}번의 근접 또는 원거리 무기 적중이 {damage}의 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상을 담금질하여 {slowDuration}초 동안 공격 속도를 {slow}% 늦춥니다. 효과가 끝나면 남은 적중은 사라집니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 비례해 증가합니다.",
+        "heartNova": "열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다.",
+        "foremanShape": "{duration}초 동안 감독관의 모습을 취합니다. 외눈 거인이 되어 주먹으로 싸우며, 모든 능력과 그 피해량을 유지합니다. 방어도가 {armorPct}% 증가하고 밀려나지 않습니다. 탈것에서 내립니다.",
+        "musterStandard": "발밑에 소집대 군기를 세웁니다. {duration}초 동안 소집병 {soldiers}명이 당신 곁에서 행군하며 대상과 근접전을 벌이고, 각각 {every}초마다 {damage}의 물리 피해를 줍니다. 병사들은 당신의 대상만, 그것도 이미 전투 중일 때만 공격합니다. 각각 당신 최대 생명력의 {hpPct}%를 가집니다. {leash}미터 넘게 뒤처지면 즉시 당신 곁으로 돌아옵니다. 군기가 쓰러지거나 당신이 죽으면 떠납니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 따라 증가하며, 세울 때 정해집니다.",
+        "gutteredGlare": "{duration}초 동안 정신을 집중합니다. 길이 {length}미터의 광선이 바라보는 방향으로 뻗어 나가 경로에 있는 적 최대 {max}명에게 {every}초마다 {tick}의 비전 피해를 줍니다(전체 집중 동안 각 적에게 {total}). 몸을 돌리면 광선이 휩쓸고, 이동하거나 시전하면 끝납니다. 피해량은 주문력에 따라 증가합니다.",
+        "grapnel": "{range}미터 이내에 보이는 파티원 또는 공격대원에게 갈고리를 걸어 공중으로 끌어당겨 곁으로 데려오며, 착지할 때 생명력을 {heal} 회복시킵니다. 적이나, 탈것이나 배에 탄 아군, 돌로 변한 아군, 해제할 수 없는 효과에 붙잡힌 아군은 끌어당길 수 없습니다. 치유량은 치유력에 따라 증가합니다."
       }
     },
     "questShare": {
@@ -3581,6 +3820,14 @@ export const ko_KR: EnTranslations = {
       "watchYouTube": "YouTube에서 시청",
       "streamerBadgeTitle": "인증된 스트리머"
     },
+    "buddyMenu": {
+      "rename": "Rename Buddy",
+      "nameLabel": "Buddy name",
+      "autolootEnable": "자동 전리품 켜기",
+      "autolootDisable": "자동 전리품 끄기",
+      "autolootHint": "버디가 30야드 이내에 있는 당신 소유의 시체에서 전리품을 가져옵니다.",
+      "cancel": "취소"
+    },
     "lootSettings": {
       "title": "전리품 설정",
       "close": "전리품 설정 닫기",
@@ -3906,6 +4153,64 @@ export const ko_KR: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "짝이 가까이 있는 동안 받는 피해가 {pct}% 감소합니다. 야수조련사와 재규어를 떼어 놓으면 유대가 끊어집니다.",
+        "packBondFury": "짝이 가까이 있는 동안 주는 피해가 {pct}% 증가합니다.",
+        "stalked": "거대 재규어가 당신을 사냥하며 도발을 무시합니다. 물 때마다 {min}~{max}의 물리 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고 출혈을 일으킵니다. 주인에게서 멀리 끌고 가세요.",
+        "waryStuns": "이미 기절을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 기절은 통하지 않습니다.",
+        "waryRoots": "이미 속박을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 속박은 통하지 않습니다.",
+        "warySlows": "이미 감속을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 감속은 통하지 않습니다.",
+        "pollinated": "씨앗 꼬투리를 건드리면 즉시 가시 새싹이 자라납니다. 씨앗을 피하고 깨끗한 플레이어가 밟게 하세요. 아무도 건드리지 않은 꼬투리는 {seconds}초 뒤 싹이 틉니다(영웅 난이도에서는 {heroic}초 뒤 땅속으로 파고들어 가장 가까운 플레이어 곁에서 솟아납니다).",
+        "prey": "줄가르가 당신을 사냥합니다. 빛나는 태양 문양을 밟게 하면 {slow}% 느려집니다. 붙잡히면 물어뜯겨 {damage}의 피해(영웅 난이도 {heroic})를 입고 {stun}초 동안 쓰러집니다.",
+        "avatar": "이동 속도가 {pct}% 증가하고 사냥감을 쫓습니다. 감속과 속박은 통하며 기절 지속 시간은 절반이 됩니다.",
+        "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다."
+      },
+      "bastion": {
+        "brineColumn": "바닷물 기둥에 갇혔습니다: {tick}초마다 {min}~{max}의 자연 피해를 최대 {seconds}초 동안 받습니다. 조수결속 수행사제를 차단하거나 기절시키면 풀려납니다.",
+        "halberdWall": "다른 익사한 파수꾼이 {radius}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 둘을 떼어 놓으세요.",
+        "fogShroud": "안개 장막 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 안개 밖으로 끌어내세요.",
+        "carrionGlut": "죽은 자를 흡수했습니다({stacks}/{max}중첩). 중첩마다 영혼 방출의 범위가 {radius}야드 넓어지고 피해가 {pct}% 증가합니다.",
+        "snappedFetters": "사슬이 끊어졌습니다. 더 이상 싸우지 않고, 피해를 입지 않으며, 곧 떠납니다.",
+        "anchored": "익사의 닻에 묶임: 움직일 수는 있지만 권양기에서 더 멀어질 수는 없으며, 익사의 구덩이로 감겨 갑니다. 걸린 곳에서 {run}야드 이상 떨어진 불 켜진 계류 기둥 {reach}야드 이내로 가면 사슬을 묶을 수 있습니다(그 기둥은 {dark}초 동안 꺼집니다). 아니면 파티가 {links}번 공격해 사슬을 끊어야 합니다(영웅은 {linksHeroic}번). 구덩이에 빠지면 최대 생명력의 {pit}%를 잃습니다(영웅은 {pitHeroic}%)."
+      },
+      "crypt": {
+        "carrionEye": "전투 중인 모든 까마귀가 {seconds}초 동안 당신을 노립니다. 탱커에게 달려가 무리를 한꺼번에 처치하세요.",
+        "graniteSkin": "받는 피해가 {pct}% 감소하며, 돌이 {every}초마다 두꺼워집니다(최대 {max}겹). 기절시키면 부서져 {seconds}초 동안 받는 피해가 {cracked}% 증가합니다.",
+        "measured": "이 효과가 끝나면 서 있는 자리에 열린 무덤이 무너져 {radius}미터 안의 모두에게 {min}~{max} 피해를 줍니다(영웅 난이도 {heroicMin}~{heroicMax}). 무덤은 전투 내내 남으므로 표식을 파티에서 떨어진 묘지 가장자리로 옮기세요.",
+        "graveDirt": "열린 무덤 안에 서 있음: 이동 속도 {slow}% 감소, 매초 {damage} 암흑 피해(영웅 난이도 {heroic}). 영웅 난이도에서는 무덤 안에 {linger}초 머물면 불안한 뼈무더기가 일어납니다. 무덤에서 나오세요.",
+        "dirtInEyes": "이동 속도가 {pct}% 감소합니다. 한 삽의 무덤흙은 성구지기 매로우 앞의 모두를 맞힙니다: 그의 뒤에 서세요.",
+        "blow": "받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 현재 {stacks}/{max}중첩. 무덤꾼의 일격마다 중첩이 쌓이고 지속 시간이 {seconds}초로 초기화됩니다.",
+        "graveVigor": "열린 무덤 안에 서 있는 동안 공격 속도가 {pct}% 증가합니다. 그를 무덤 밖에 두세요.",
+        "tolling": "종 밧줄로 걸어가 장례의 종을 울리는 동안 피해 면역입니다. 종소리가 끝나면 모두에게 {min}~{max} 암흑 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고, 열린 무덤마다 불안한 뼈무더기가 일어납니다.",
+        "embraced": "귀부인의 품에 안겨 공중에 떠 있음: 행동할 수 없고 매초 {tick} 냉기 피해(영웅 난이도 {tickHeroic})를 받습니다. 파티가 그녀의 최대 생명력 {share}%를 깎으면 부드럽게 내려놓지만, 높은 곳에서 {hold}초 동안 붙잡고 있으면 얼음 위로 떨어뜨려 {min}~{max} 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.",
+        "lament": "신부의 애가가 끝나면 켜진 무덤 등불에서 {radius}미터 안에 없는 모두에게 {min}~{max} 냉기 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 등불은 가장 가까운 {cap}명만 보호한 뒤 꺼져 다음 애가를 놓칩니다.",
+        "lingering": "다음 신부의 애가로 받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 최대 {max}중첩. 다음 애가는 등불 빛 안에서 받으세요.",
+        "slippery": "미끄러운 얼음 위: 속도가 매초 최대 {grip}미터/초씩만 바뀌므로 출발이 느리고, 멈추면 계속 미끄러지며, 방향을 틀면 크게 돌아갑니다. 얼음에서 벗어나면 다시 중심을 잡을 수 있습니다.",
+        "harmony": "받는 피해가 {pct}% 감소합니다: 살아 있는 성가대원 한 명마다 {per}%. 성가대원을 먼저 처치하세요.",
+        "crescendo": "더 빠르게 노래합니다: 공허의 만가가 {castNormal}초 대신 {cast}초 걸리고 {everyNormal}초 대신 {every}초마다 오며, 뼈 오르간이 {wavesNormal}파도 대신 {waves}파도의 음표를 연주합니다.",
+        "gorged": "주는 피해 {pct}% 증가: 그에게 도달한 속박된 영혼 하나마다 {per}%, 현재 {stacks}/{max}중첩이며 전투가 끝날 때까지 지속됩니다. 영혼이 도달할 때마다 최대 생명력의 {heal}%도 회복합니다. 영혼의 경로에 들어서면 대신 받아낼 수 있습니다.",
+        "unquietWard": "제단에서 불안한 자들의 의식을 시전하는 동안 피해 면역: 추모의 양초 {total}개 중 {lit}개를 다시 밝혔습니다. 하나를 다시 밝히려면 {channel}초 동안 정신 집중해야 하며, 그동안 밝히는 사람의 최대 생명력 {drain}%(영웅 난이도 {drainHeroic}%)를 매초 빨아들입니다. 공격을 받아도 끊기지 않지만 움직이거나 기절하면 끊깁니다. 마지막 양초가 결계를 부숩니다. 영웅 난이도에서는 명부가 부르는 순서대로 밝히세요: 다른 양초를 밝히면 마지막으로 밝힌 양초가 꺼지고 밝힌 사람에게 {wrongMin}~{wrongMax} 암흑 피해를 줍니다.",
+        "riteBroken": "기절: 부서진 결계 때문에 {seconds}초 동안 행동할 수 없습니다.",
+        "shatteredWard": "{seconds}초 동안 받는 피해 {pct}% 증가: 다시 밝힌 양초들이 그의 결계를 부쉈습니다. 지금 가장 강한 공격을 퍼부으세요.",
+        "graveChill": "불안한 자들의 의식이 이어지는 동안 매초 {bite} 암흑 피해(영웅 난이도 {biteHeroic})를 받으며, {every}초마다 {step}(영웅 난이도 {stepHeroic})씩 늘어납니다. 추모의 양초를 다시 밝혀 끝내세요.",
+        "graspMark": "{fuse}초 후 발밑의 고리에서 손이 솟아오릅니다: 고리가 놓인 곳에서 {radius}야드 안의 모두가 {root}초 동안 묶이고 {min}~{max} 암흑 피해를 받습니다. 고리에서 나오세요.",
+        "graspRoot": "무덤의 손에 붙잡힘: {seconds}초 동안 움직일 수 없습니다.",
+        "knellAirborne": "의식의 고리 위를 날고 있어 공격이 닿지 않습니다. 고리의 절반에 {mark}초 동안 표식을 남긴 뒤 그 절반에 유령불을 쏟아붓습니다: 그 안의 모두에게 {min}~{max} 화염 피해. 한 번 날 때마다 절반을 {breaths}번 태운 뒤 내려앉습니다."
+      },
+      "sanctum": {
+        "lockbound": "받는 피해가 {pct}% 감소합니다: 아직 버티는 사슬 하나당 {per}%. 봉인 족쇄를 부수면 그 사슬이 떨어집니다.",
+        "enrage": "주는 피해가 {pct}% 증가합니다.",
+        "grasp": "녹은 물에 서 있어 주는 피해가 {pct}% 증가합니다. 녹은 물에서 죽으면 가라앉았다가 {seconds}초 후 다시 일어납니다. 차가운 얼음 위에서 죽여야 다시 일어나지 않습니다.",
+        "twiceWoken": "녹은 물에서 다시 일어나 주는 피해가 {pct}% 증가합니다.",
+        "doused": "발밑 얼음판이 깨져 담금질 물이 무덤의 지옥불을 꺼뜨렸습니다.",
+        "airborne": "공중에 있어 공격할 수 없습니다. 가장 많은 플레이어가 선 얼음판에 추락 강하로 내려앉아 {radius}야드 안의 모두에게 {min}~{max}의 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.",
+        "wyrmsEye": "이 효과가 끝나면 코르줄이 당신이 선 얼음판 전체에 내리꽂는 불길을 쏟아붓습니다: 그 위의 모두에게 {min}~{max}의 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고, 얼음판에 금이 가거나 이미 금이 가 있었다면 부서집니다. 멀쩡한 얼음 위에서 파티와 떨어져 서십시오.",
+        "quenchWater": "열린 담금질 물속: 이동 속도가 {slow}% 감소하고 매초 {damage}의 피해(영웅 난이도 {heroic})로 불탑니다. 아무 얼음판이나 물가로 헤엄치십시오.",
+        "shardFlare": "심장 파편이 타오릅니다: 무덤 숨결이 {breath}초마다, 날개 돌풍이 {gale}초마다 옵니다.",
+        "branded": "{seconds}초 동안 {interval}초마다 {value}의 {school} 피해를 입힙니다. 녹은 물웅덩이에 들어가면 즉시 꺼집니다.",
+        "creepingRime": "이동 속도가 {pct}% 감소합니다(중첩당 {per}%). 서리 숨결을 맞을 때마다 1회 중첩되고 지속 시간이 {seconds}초로 초기화됩니다. {max}회 중첩되면 {freeze}초 동안 얼어붙고(빙결) 중첩이 사라집니다.",
+        "icedOver": "스며드는 서리에 얼어붙었습니다: 이동하거나 행동할 수 없습니다."
+      },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
@@ -3950,6 +4255,8 @@ export const ko_KR: EnTranslations = {
       "cooldownCap": "이 구간에서 재사용 대기시간 감소 {used}/{cap}초를 사용했습니다",
       "bruinRushWindow": "늑대 변신이 마나를 소모하지 않으며 큰곰 돌진 대상을 고정하여 {sec}초 동안 이동 속도를 {pct}% 감소시킵니다",
       "funeralHarvestLock": "장례 수확이 아직 다음 영혼 조각을 생성할 수 없습니다",
+      "effigyPlankHide": "모든 타격의 {pct}%를 막아낸다. 조각창 찌르기로 눈의 등불을 끌 때까지 유지된다",
+      "effigyLanternOut": "당신에게는 짚 감독관의 등불이 꺼져 있다: 당신과 소환수의 공격이 판자 가죽을 무시하고 온전히 들어간다",
       "leadenHexLock": "납빛 주술이 아직 이 대상을 다시 이동 불가로 만들 수 없습니다",
       "forbiddenReflectionReady": "다음 적용 가능한 흑마법사 재사용 기술을 다시 사용할 수 있습니다",
       "forbiddenReflectionLock": "금지된 반영을 아직 다시 준비할 수 없습니다",
@@ -4006,8 +4313,8 @@ export const ko_KR: EnTranslations = {
       "nextAttackCrit": "다음 공격이 반드시 치명타로 적중합니다",
       "healEcho": "생명력이 {threshold}% 미만이 되면 생명력을 {value} 회복합니다",
       "trinket": {
-        "lastStandCooldown": "보루의 인장의 최후의 보루 보호막을 이미 사용했습니다. 이 효과가 끝날 때까지 생명력이 {threshold}% 미만으로 떨어져도 다시 발동하지 않습니다.",
-        "lastBastion": "{value}의 피해를 흡수합니다. 생명력이 {threshold}% 미만일 때 피해를 받아 보루의 인장이 만들어 낸 보호막입니다.",
+        "lastStandCooldown": "보호막이 이미 발동했습니다. 이 효과가 끝날 때까지 생명력이 {threshold}% 미만인 상태에서 피해를 받아도 보호막이 다시 생성되지 않습니다.",
+        "lastBastion": "피해를 {value} 흡수합니다. 생명력이 {threshold}% 미만일 때 피해를 받아 장신구가 생성한 보호막입니다.",
         "retaliate": "당신을 직접 공격한 적은 그 공격으로 잃은 생명력의 {pct}%에 해당하는 물리 피해를 받습니다. 지속 피해로는 발동하지 않습니다.",
         "moored": "받는 피해가 {reduction}% 감소하지만 이동 속도가 {speed}%가 됩니다. 기절, 이동 불가, 감속, 공포, 변이, 침묵, 실명, 주술, 무장 해제, 행동 불가 효과와 밀쳐내기를 무시합니다.",
         "hourglassStored": "초과 치유로 저장한 치유량 {stored}을 담고 있습니다. 치유사의 모래시계를 사용하면 {range}미터 이내에서 생명력 비율이 가장 낮은 파티원(자신 포함)에게 보호막으로 바꿔 줍니다.",
@@ -4028,6 +4335,16 @@ export const ko_KR: EnTranslations = {
         "riftGuard": "받는 피해가 {pct}% 감소합니다.",
         "sprint": "이동 속도가 {pct}% 증가합니다. 다른 이동 속도 증가 효과와 중첩되지 않습니다.",
         "brand": "받는 치유량이 {pct}% 감소합니다.",
+        "shackle": "사슬에 묶임: 이동할 수 없습니다.",
+        "shackleSlow": "사슬에 묶임: 이동 속도가 {pct}% 감소합니다.",
+        "spiritPack": "영혼 재규어가 곁에서 싸우며 {every}초마다 대상을 물어뜯어 {min}~{max}의 물리 피해를 줍니다.",
+        "seedburst": "탐식화의 씨앗입니다. 이 효과가 끝나면 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 그 전에 이 적이 죽으면 피해가 {bonus}% 증가합니다({empowered}).",
+        "tether": "십장의 마지막 고리에 묶임: 당신의 생명력에 닿을 피해의 {pct}%를 당신을 묶은 자가 대신 받습니다.",
+        "tetherLink": "묶인 아군이 받을 피해의 {pct}%를 당신이 받습니다.",
+        "harvest": "당신으로부터 {radius}미터 내에서 적대적인 생물이 죽을 때마다 최대 생명력과 마나의 {pct}%를 회복합니다.",
+        "quench": "다음 {stacks}번의 무기 적중이 {damage}의 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상의 공격 속도를 {slow}% 늦춥니다.",
+        "quenchOther": "다음 {stacks}번의 무기 적중이 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상의 공격 속도를 {slow}% 늦춥니다.",
+        "quenched": "공격 속도가 {pct}% 감소합니다.",
         "forgeHeat": "열기: {stacks}/{max}. 대장장이 아버지의 담금질을 사용하면 열기를 모두 소모하며, 그 무기 화염 피해가 {pct}% 증가합니다.",
         "tempered": "근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입힙니다(소모한 열기로 {pct}% 증가). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다.",
         "temperedOther": "근접 및 원거리 무기가 적중하면 화염 피해를 추가로 입히며, 소모한 열기로 {pct}% 증가합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
@@ -4036,6 +4353,10 @@ export const ko_KR: EnTranslations = {
         "moltenIgnite": "{every}초마다 {damage}의 화염 피해를 입힙니다. 새 무기 치명타가 적중하면 초기화됩니다.",
         "pierce": "자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {pct}%를 입힙니다.",
         "lantern": "누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {pct}%만큼 치유됩니다.",
+        "foremanShape": "당신은 감독관입니다. 방어도가 {armorPct}% 증가하고 밀려나지 않습니다.",
+        "musterStandard": "소집대 군기가 세워졌습니다. 병사들이 당신을 따르며 당신의 대상과 싸웁니다.",
+        "gutteredGlare": "광선이 경로에 있는 적에게 {every}초마다 {tick}의 비전 피해를 줍니다. 이동하거나 시전하면 끝납니다.",
+        "stoneStatue": "돌로 변했습니다. 피해를 받지 않고 행동할 수 없습니다. 최대 생명력의 {pct}%로 돌아옵니다.",
         "crucibleHeat": "열기: {stacks}/{max}. 도가니의 심장을 사용하면 열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 {damage}의 화염 피해를 입히고, 적중한 모든 생물을 도발합니다.",
         "crucibleHeatOther": "열기: {stacks}/{max}. 도가니의 심장은 열기를 모두 소모하여 {radius}미터 이내에 화염 폭발을 일으키며, 중첩마다 화염 피해가 늘고 적중한 모든 생물을 도발합니다."
       },
@@ -4071,6 +4392,7 @@ export const ko_KR: EnTranslations = {
       "dodge": "회피 확률을 {pct}% 증가시킵니다",
       "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
       "damageReduction": "받는 모든 피해가 {pct}% 감소합니다",
+      "slumber": "새벽까지 잠들어 있습니다. 공격할 수 없으며 누가 와도 깨어나지 않습니다.",
       "guardianWard": "다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다",
       "armorFlat": "방어도를 {value} 감소시킵니다",
       "armorFlatStacks": "방어도를 {value} 감소시킵니다 ({stacks}중첩)",
@@ -4147,7 +4469,9 @@ export const ko_KR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}이(가) 쏜피크 고지에 솟아올랐습니다!"
+      "spawn": "{name}이(가) {zone} 위로 일어섰습니다!",
+      "wake": "{name}이(가) {zone}에서 깨어났습니다!",
+      "sleep": "{name}이(가) 새벽까지 잠들었습니다."
     },
     "auth": {
       "appleLoginCta": "Apple로 계속하기",
@@ -4291,6 +4615,7 @@ export const ko_KR: EnTranslations = {
         "menu": "메뉴",
         "minimap": "미니맵",
         "stanceBar": "태세 바",
+        "shardpikeBar": "조각창 바",
         "xpBar": "경험치 바",
         "chat": "채팅",
         "actionBarGroup": "액션 바",
@@ -4880,6 +5205,19 @@ export const ko_KR: EnTranslations = {
       "vaultCannotDeposit": "보관소에 넣을 수 없습니다",
       "tabsAria": "은행 탭",
       "personalTab": "개인",
+      "accountTab": "다른 캐릭터",
+      "accountArmour": "멤버십 방어구 받기",
+      "referralArmour": "우정 방어구 받기",
+      "accountMembership": "멤버십이 활성화되어 있으면 여기서 다른 캐릭터의 은행을 이용할 수 있습니다.",
+      "accountCharacters": "캐릭터 은행",
+      "accountEmpty": "다른 캐릭터를 만들면 여기서 해당 캐릭터의 은행을 이용할 수 있습니다.",
+      "accountSelect": "은행을 불러올 캐릭터를 선택하세요.",
+      "accountUnavailable": "이 은행을 이용할 수 없습니다. 캐릭터를 다시 선택하여 새로고침하세요.",
+      "accountDeposit": "내 가방: 이 은행에 보관",
+      "accountWithdraw": "선택한 은행: 내 가방으로 인출",
+      "accountDepositHint": "클릭하면 이 묶음을 선택한 캐릭터의 은행에 보관합니다.",
+      "accountWithdrawHint": "클릭하면 이 묶음을 내 가방으로 인출합니다.",
+      "accountBound": "귀속 아이템, 잠긴 아이템, 퀘스트 아이템은 캐릭터 간에 이동할 수 없습니다.",
       "guildTab": "길드",
       "guildCapacityAria": "사용 중인 길드 은행 칸: {total}칸 중 {used}칸",
       "guildEmpty": "길드 은행이 비어 있습니다.",
@@ -4949,6 +5287,190 @@ export const ko_KR: EnTranslations = {
       "logOpenBank": "{actor}님이 {amount}을(를) 들여 길드 은행을 열었습니다",
       "logCharterFee": "{actor}님이 길드 창설 비용 {amount}을(를) 지불했습니다",
       "logAdminPurge": "관리자가 {item} {count}개를 삭제했습니다"
+    },
+    "collections": {
+      "title": "사냥",
+      "close": "사냥 닫기",
+      "keybindLabel": "사냥",
+      "launcherTitle": "사냥: 버디, 탈것, 아이템 세트",
+      "tabs": {
+        "buddies": "버디",
+        "mounts": "탈것",
+        "sets": "Item Sets"
+      },
+      "state": {
+        "owned": "수집함",
+        "notOwned": "수집 안 함",
+        "unavailable": "아직 획득 불가",
+        "pending": "무언가가 당신을 따라옵니다"
+      },
+      "presenceDefault": "무언가가 당신을 지켜보는 기척이 느껴집니다.",
+      "revealed": "{name}이(가) 당신을 따르기로 했습니다.",
+      "cosmeticUnlocked": "{name}의 새로운 모습: {look}.",
+      "presence": {
+        "ember_fox": "작고 따뜻한 무언가가 당신 뒤를 살금살금 따라오고 있습니다.",
+        "moss_hare": "이탄 속의 바스락 소리가 당신의 발걸음에 맞춰 따라옵니다.",
+        "frog": "당신이 한 걸음 내디딜 때마다 축축한 개구리 울음이 답합니다.",
+        "crimson_claw_crab": "시야 바로 밖에서 무언가가 딸깍거리며 종종걸음칩니다.",
+        "golden_sentinel": "풀숲에서 희미한 금빛 반짝임이 당신을 지켜봅니다.",
+        "nightfang": "보이지 않는 곳에서 소리 없는 발이 따라옵니다.",
+        "tuskhorn_boar": "콧김과 발구름 소리. 고집 센 무언가가 당신을 따라옵니다.",
+        "emerald_wolf": "덤불 속에서 초록 눈이 깜빡이더니 따라옵니다.",
+        "tiger": "시야 가장자리에서 줄무늬가 움직입니다.",
+        "cate_coin": "당신 것이 아닌 동전이 희미하게 울리는 소리가 들립니다.",
+        "alon": "누군가 지켜보며 조용히 인정해 주는 느낌이 듭니다.",
+        "trollface": "당신 뒤 어딘가에서 무언가가 씩 웃고 있습니다.",
+        "ansem": "문과 어둠의 속삭임이 당신을 따라옵니다.",
+        "triple_t": "발소리 하나가 있어야 할 곳에 셋이 울립니다.",
+        "kekius": "억눌린 웃음소리가 길을 따라 당신을 쫓아옵니다.",
+        "solbot": "부드러운 째깍 소리가 당신의 보폭에 맞춰 울립니다.",
+        "frostfire": "증기와 서리가 당신의 뒤에서 소용돌이칩니다.",
+        "rocky": "바람도 없는데 뒤에서 자갈이 움직입니다.",
+        "proud_grunt": "당신 뒤 어딘가에서 군화가 차렷 자세로 발을 구릅니다.",
+        "loot_goblin": "무언가가 당신의 동전을 소곤소곤 세고 있습니다.",
+        "penny_goldspark": "당신 것이 아닌 주머니에서 작은 도구들이 짤랑거립니다.",
+        "stag": "뿔 달린 그림자가 당신의 길 위에 드리웁니다.",
+        "alpaca": "털북숭이에 느긋한 무언가가 함께 가기로 했습니다.",
+        "horse": "어딘가 뒤에서 발굽이 느긋하고 끈기 있는 박자를 맞춥니다.",
+        "sapling": "작은 뿌리들이 뒤에서 종종걸음을 치며 낙엽을 흩뜨립니다.",
+        "bull": "낮은 콧김이 당신 뒤의 먼지를 일으킵니다.",
+        "spider": "거미줄 한 가닥이 당신의 어깨를 스칩니다.",
+        "raptor": "재빠른 발톱이 당신 뒤꿈치의 돌 위를 톡톡 두드립니다.",
+        "skeleton": "마른 뼈가 당신의 걸음에 맞춰 덜그럭거립니다.",
+        "crystal_lich": "잔해에서 차가운 웅웅거림이 피어오르고, 그것이 당신을 지켜봅니다.",
+        "forgemaw": "용광로의 열기가 아직 당신을 떠나지 않았습니다. 무언가가 그것과 함께 걸어 나왔습니다.",
+        "crystal_tide": "바닷물 한 방울이 당신의 낚싯줄에서 떨어지기를 거부합니다.",
+        "phantom": "당신 뒤의 공기가 조금 지나치게 고요합니다.",
+        "emberfall_phoenix": "재에 묻은 불처럼 은근한 온기가 당신의 등 뒤에 내려앉습니다."
+      },
+      "cosmetic": {
+        "crystal_lich_frostbound": "서리결속",
+        "crystal_lich_voltaic": "전광",
+        "forgemaw_ashen": "잿빛",
+        "forgemaw_whitehot": "백열",
+        "stag_acorn": "도토리 왕관",
+        "stag_gilded": "금박",
+        "moss_hare_verdant": "신록",
+        "proud_grunt_warlord": "전쟁군주",
+        "frog_sapphire": "사파이어 개구리"
+      },
+      "actions": {
+        "summon": "소환",
+        "dismiss": "해제",
+        "wear": "착용",
+        "remove": "벗기기"
+      },
+      "looks": {
+        "title": "모습",
+        "unlocked": "해금됨",
+        "locked": "잠김",
+        "worn": "착용 중",
+        "none": "이 동료에게는 아직 준비된 모습이 없습니다"
+      },
+      "source": {
+        "bossLabel": "보스 펫",
+        "bossDrop": "{mob} ({location}), 처치 시 플레이어마다 {chance}%",
+        "bossDropWithHeroic": "{mob} ({location}), 플레이어마다 {chance}%, 영웅 난이도 {heroicChance}%",
+        "bossDropHeroicOnly": "{mob} ({location}), 영웅 난이도 전용, 플레이어마다 {chance}%",
+        "rollNote": "모든 플레이어가 각자 굴립니다. 파티원 때문에 기회를 잃는 일은 없습니다.",
+        "deedLabel": "획득 조건",
+        "deed": "업적: {deed}",
+        "challengeLabel": "도전",
+        "challengeSpeed": "전투 시작 후 {seconds}초 안에 {mob} 처치",
+        "challengeDps": "전투 내내 {mob}에게 초당 {dps}의 피해를 입히기",
+        "craftLabel": "제작",
+        "craft": "{item} ({profession} 제작법)",
+        "grantLabel": "수여",
+        "grantOnly": "시즌 보상: 월간 순위표 및 최고 기록 보상",
+        "tokenLabel": "토큰",
+        "token": "{item}, 한 번 사용하면 동료가 따라옵니다"
+      },
+      "buddyLore": {
+        "ember_fox": "이스트브룩 골짜기의 산울타리에서 온 암여우로, 겨울 덤불 사이로 비치는 숯빛 붉은 털에서 이름을 얻었다. 그곳 사냥꾼들은 몇 세대 전에 새끼 잡기를 포기하고, 대신 먹이를 내놓기 시작했다.",
+        "moss_hare": "버들늪의 산토끼로, 젖은 이탄에 평생 몸을 눕히며 털이 초록으로 물들었다. 늪지 약초사들은 이들을 길조로 여기며, 문간에 온 녀석을 내쫓게 두지 않는다.",
+        "frog": "마이어펜 습지는 이들을 살지고 태평하게 길러낸다. 갈대밭에서 밤새도록 노래한다. 늪 안내인들은 이 녀석을 태운 배는 절대 좌초하지 않는다고 장담한다.",
+        "crimson_claw_crab": "먼바다 해안의 조간대 게로, 물 밖에 나온 지 한참이 지나도 집게가 붉게 남는다. 부두 인부들은 예전에 판자 위에서 이들을 경주시키며 돈을 걸었다.",
+        "golden_sentinel": "호박빛 가을터의 파수 딱정벌레로, 자라난 수지에 도금되어 금빛을 띤다. 이름이 수지보다 오래되었다. 누군가 수액을 병에 담을 생각을 하기 훨씬 전부터, 그런 부류의 파수꾼들이 그 숲을 지켜왔다.",
+        "nightfang": "밤꽃 평원의 어린 사냥꾼으로, 제 동족의 기준으로 봐도 유난히 조용하다. 곁을 따르는 것은 그저 함께 있고 싶어서이고, 나방보다 큰 것은 사냥하지 않는다.",
+        "tuskhorn_boar": "쏜피크 고지의 혈통으로, 울타리를 무너뜨리지 못하는 멧돼지를 원한 목동들이 다리를 짧게 개량한 것이다. 성질은 그대로 남았다.",
+        "emerald_wolf": "망령숲의 새끼 늑대로, 숲 바닥까지 거의 닿지 않는 잎새 사이 빛 아래에서는 털이 초록빛을 띤다. 숲이 남긴 고아는 어떤 것이든 관리인들이 거두어 기른다.",
+        "tiger": "야자 해안의 줄무늬를 지녔으나 야자 해안을 본 적 없는 짐승으로, 옛 동물원이 문을 닫은 뒤로 이 혈통은 줄곧 사육되어 왔다. 오직 호루라기에만 응하고 그 밖의 어떤 것에도 응하지 않는다.",
+        "cate_coin": "깔고 앉은 동전에서 절대 떨어지지 않으며, 무언가 먹는 모습을 본 사람이 아무도 없는 고양이. 이스트브룩 상인들은 아직도 둘 중 어느 쪽이 애완동물인지를 두고 다툰다.",
+        "alon": "어떤 지도에도 없는 길에서 온 여행자의 마스코트로, 일이 틀어지는 곳이면 어디든 나타난다. 지켜보고, 고개를 끄덕이고, 도움은 전혀 주지 않는다.",
+        "trollface": "망령숲이 내놓고는 도로 거두어들이려 하지 않은, 히죽 웃는 것. 이를 설명하려는 시도는 매번 설명하던 사람이 웃음을 터뜨리고 포기하는 것으로 끝난다.",
+        "ansem": "문과 어둠에 대해 말하지만 그 이상은 결코 말하지 않는다. 밤꽃 평원의 신도들은 자기네 것이라 주장하지만, 의식을 치를 때마다 어디론가 사라진다.",
+        "triple_t": "무언가가 셋인지, 한 가지가 세 번 겹친 것인지. 증언마다 말이 다르고, 정작 이 생물은 셀 수 있을 만큼 가만히 있어 주지 않는다.",
+        "kekius": "출처가 분명치 않은 웃는 동행으로, 게일크레스트 경주장이 부적 삼아 거두었다. 이 녀석을 믿고 맹세하던 마구간 네 곳보다 오래 살아남았다.",
+        "solbot": "햇빛을 먹고 도는 작은 자동기계로, 드레이크랜드의 잿더미에 반쯤 묻힌 채 파냈을 때도 여전히 움직이고 있었다. 이를 만든 공방은 외피 어디에도 표시를 남기지 않았다.",
+        "frostfire": "서리장막 봉우리에서 온천이 빙원을 뚫고 솟는 자리에 태어났으며, 자신이 어느 쪽에 속하는지 아직도 정하지 못했다. 찬 공기에서는 김을 내고, 따뜻한 곳에서는 몸을 떤다.",
+        "rocky": "쏜피크 고지의 너덜지대에 사는 돌껍질 기어다니는 것으로, 느리고 무엇에도 아랑곳하지 않는다. 광부들은 붕락 직전 한순간 딱 멈춰 서는 그 습성 때문에 이들을 기른다.",
+        "proud_grunt": "전쟁 보급창의 노병으로, 경례는 지켰으나 계급은 잃었다. 전쟁원수 드레이븐 콜은 그 대가를 알 만큼의 명예를 지닌 병사에게라면 누구에게든 한 명을 내어준다.",
+        "loot_goblin": "영웅의 징표를 지닌 사람이라면 누구든 따라다니지만, 훔치다 걸린 적은 단 한 번도 없다. 병참장교 벡스는 그것이 아무것도 증명하지 못한다고 주장한다.",
+        "penny_goldspark": "노움 기술자의 견습으로, 시간당 삯을 받지만 구리 한 닢까지 값을 한다. 방어구 제작자 호드는 빚을 갚느라 그녀를 거두었고, 이제는 금화 천 냥을 쥔 사람이면 누구에게든 이 계약을 판다.",
+        "stag": "상록 정원의 혈통으로, 관리인들이 예전에 타던 큰 사슴에서 대를 이어 작게 길러낸 것이다. 손을 들면 여전히 고개를 숙이는데, 이 짐승 자신보다 오래된 버릇이다.",
+        "alpaca": "게일크레스트의 무리는 털과 성정 때문에 이들을 기른다. 폭풍 속에서 이보다 침착한 짐승은 없다. 이 녀석은 여정마다 정확히 한 사람에게 침을 뱉는다.",
+        "horse": "이스트브룩 골짜기 조랑말 혈통으로, 과수원 길에 맞게 작게 길러졌고 자기가 군마가 아니라는 말은 한 번도 들어 본 적이 없다. 당신의 어깨 옆에서 보조를 맞추며, 한 번이라도 사과를 준 사람이라면 누구든 따라간다.",
+        "sapling": "나무껍질에 미소를 띠고 호기심 가득한 보랏빛 눈을 가진 어린 나무입니다. 뿌리로 즐겁게 뒤뚱거리며 어디든 당신을 따라갑니다.",
+        "bull": "개만 한 크기의 이스트브룩 골짜기 황소로, 사람들이 실내에서 기르기로 한 이유는 오직 그 크기뿐이다. 성질머리는 함께 줄어들지 않았다.",
+        "spider": "망령숲의 직조자로, 손바닥만 한 크기에, 자기가 담긴 배낭이라면 어디든 새로 꾸며 놓는다. 그 거미줄은 대신 들어간 실보다 질기다.",
+        "raptor": "드레이크랜드의 부화 개체로, 제가 얼마나 빨리 달릴 수 있는지 깨닫기 전에 팔려 나간다. 새 주인은 하나같이 굶기지 말라는 말을 듣고, 두 번 들을 필요가 있는 사람은 없다.",
+        "skeleton": "망령숲의 고분에서 기어 나와 제 몸의 먼지를 털고는, 그 뒤로 줄곧 사람들을 따라다닌다. 이 뼈가 누구의 것이었는지는 아직 아무도 밝혀내지 못했다.",
+        "crystal_lich": "나이트락시스 자신의 파편으로, 그를 빚어낸 냉기를 아직도 웅웅 울리며 품고 있다. 공격대의 잔해에서 자신을 끄집어낸 자를 따르지만, 그 일을 아직 용서하지는 않았다.",
+        "forgemaw": "마지막 샘의 도가니에서 벼려졌으나 끝내 완성되지 못한 것으로, 망치질이 아직 이어지는 동안 이그니바르의 주조장을 제 발로 걸어 나왔다. 오직 영웅 난이도의 공략만이 그를 찾아낸다. 이 용융체는 자신을 만든 화로로 자꾸 돌아가고, 불길을 두 번 살아남은 자를 따라 집까지 온다.",
+        "crystal_tide": "자기 몫의 바다유리 방울을 타고 다니는 조수 정령으로, 이스트브룩 골짜기부터 먼바다 해안까지 저녁거리를 낚던 낚시꾼들이 잔잔한 물에서 건져 올렸다. 자신이 딸려 올라온 물을 그대로 지니고 다니며, 돌아가라는 말은 듣지 않는다.",
+        "phantom": "망령숲의 고분에서 나온 손바닥만 한 유령으로, 온통 천뿐이고 뼈는 없다. 분명히 닫아둔 배낭 안에 나타나서는 함께 있고 싶다는 이유로 눌러앉는다. 무엇을 원하는지 아무도 알아내지 못했고, 누군가를 겁주려 한 적은 한 번도 없다.",
+        "emberfall_phoenix": "가을마다 타들어가 한 점 잉걸불이 되었다가, 봄이면 제 재에서 다시 솟아오른다. 누구에게 물어도 할 수 있는 말은 그것이 전부다. 둥지를 찾아낸 사람도 없고, 같은 개체를 두 번 붙잡은 사람도 없다."
+      },
+      "petKind": {
+        "beast": "야수",
+        "elemental": "정령",
+        "humanoid": "인간형",
+        "undead": "언데드",
+        "celebrity": "유명 인사"
+      },
+      "armor": {
+        "cloth": "천",
+        "mail": "Mail",
+        "leather": "가죽"
+      },
+      "stat": {
+        "intellect": "지능",
+        "agility": "민첩성",
+        "strength": "힘",
+        "mixed": "혼합"
+      },
+      "set": {
+        "owned": "{total}개 중 {owned}개",
+        "itemLevel": "아이템 레벨 {level}",
+        "bonusLabel": "{pieces}개 세트"
+      },
+      "detail": {
+        "dropLabel": "드롭 출처",
+        "vendorLabel": "Sold by",
+        "bindLabel": "귀속",
+        "sellLabel": "상인 지불액",
+        "marketLabel": "월드 마켓",
+        "exchangeLabel": "$WOC 거래소",
+        "setLabel": "수집함",
+        "drop": "{mob}({location}), 처치당 {chance}%",
+        "heroicDrop": "{mob}({location}), 영웅 난이도 전용, 처치당 {chance}%",
+        "dropWithHeroic": "{mob}({location}), 처치당 {chance}%, 영웅 난이도에서 {heroicChance}%",
+        "globalDrop": "아무 적, 처치당 {chance}%, 같은 등급 {count}종 중 하나",
+        "fishingDrop": "아무 곳에서나 낚시, 낚을 때마다 {chance}%",
+        "vendor": "{npc} ({location}) for {price}",
+        "honorPrice": "명예 {amount}",
+        "marksPrice": "영웅의 징표 {amount}",
+        "noSource": "아직 게임 내 획득처가 없습니다",
+        "noItem": "아직 이를 주는 아이템이 없습니다",
+        "tradeable": "거래 가능",
+        "soulbound": "귀속",
+        "noSell": "판매 불가",
+        "marketAtMerchant": "상인에게서 확인",
+        "marketChecking": "확인 중…",
+        "marketNone": "등록된 물품 없음",
+        "exchangeNone": "등록된 물품 없음",
+        "exchangeUnavailable": "이 클라이언트에서는 사용할 수 없습니다"
+      }
     },
     "calendar": {
       "title": "이벤트 달력",
@@ -5949,10 +6471,38 @@ export const ko_KR: EnTranslations = {
       "tagFastRun": "빠른 공략",
       "mech": {
         "shadow_pulse": "어둠의 파동(주기적 광역 피해)",
+        "crypt_shovelful": "한 삽의 무덤흙(11초마다 앞쪽 8미터 부채꼴에 무덤흙을 뿌림: 평타의 1.5배 피해와 6초 동안 이동 속도 50% 감소. 그의 뒤에 서세요)",
+        "crypt_measured_for_the_grave": "무덤 치수 재기(15초마다 탱커가 아닌 플레이어를 표시. 4초 후 그 발밑에 열린 무덤이 무너져 일반 난이도 기준 3미터 안에 42~52 피해. 구덩이는 전투 내내 남아 안에 있으면 초당 9 피해와 이동 속도 40% 감소. 무덤은 묘지 가장자리에 만드세요)",
+        "crypt_burial_toll": "장례의 종소리(생명력 66%와 33%에서 종 밧줄로 성큼 걸어가 피해 면역 상태로 3초 동안 종을 울림: 일반 난이도 기준 모두에게 30~38 암흑 피해, 열린 무덤마다 불안한 뼈무더기가 일어남)",
+        "crypt_marrow_heroic": "영웅: 무덤꾼의 일격이 9초마다 탱커를 타격(중첩당 받는 피해 6% 증가, 20초, 최대 6중첩), 무덤의 활력(무덤 안에 서 있으면 공격 속도 30% 증가), 불안한 대지(무덤 안에 2초 머물면 그 자리에서 불안한 뼈무더기가 일어남)",
+        "crypt_brides_lament": "신부의 애가(22초마다 3초 동안 통곡: 일반 난이도 기준 켜진 무덤 등불의 빛 밖에 있는 모두에게 60~75 냉기 피해, 이미 받은 남은 애가 중첩마다 절반씩 증가. 등불 하나는 최대 2명만 보호하며 누군가를 보호하면 28초 동안 꺼집니다. 흩어져서 교대로 쓰세요)",
+        "crypt_frozen_embrace": "얼어붙은 포옹(30초마다 탱커가 아닌 플레이어를 붙잡아 함께 5미터 높이로 떠오름, 초당 6 냉기 피해: 8초 안에 그녀의 생명력 6%를 깎으면 내려놓지만, 아니면 떨어뜨려 일반 난이도 기준 150~180 피해)",
+        "crypt_rime_path": "서리길(그녀가 지나간 자리에 25초 동안 미끄러운 서리가 남음: 그 위에서는 천천히 가속하고 멈추거나 방향을 틀 때 계속 미끄러집니다)",
+        "crypt_bridal_freeze": "신부의 결빙(생명력이 절반이 되면 협곡 바닥 전체가 얼어붙어 남은 전투 내내 미끄러운 얼음이 됩니다)",
+        "crypt_lady_heroic": "영웅: 켜진 등불은 30초가 지나면 저절로 꺼져 10초 동안 어두워지고, 얼어붙은 포옹은 두 명을 붙잡습니다",
+        "crypt_dirge_of_the_hollow": "공허의 만가(16초마다 차단 가능한 2.5초 노래: 끝까지 부르면 일반 난이도 기준 45미터 안에서 그녀가 보이는 모두에게 105~125 암흑 피해와 4초 침묵. 차단하거나 성가대 기둥 뒤에 숨으세요)",
+        "crypt_harmony": "화음(살아 있는 성가대원 한 명마다 그녀가 받는 피해가 30% 감소: 성가대원을 먼저 처치하세요)",
+        "crypt_bone_organ": "뼈 오르간(26초마다 뼈 오르간을 연주: 암흑 음표 두 파도가 성가대석 바닥의 줄을 따라 터지며 일반 난이도 기준 줄 안에서 100~115 피해, 두 번째 파도는 첫 번째의 빈틈을 메웁니다)",
+        "crypt_crescendo": "크레셴도(생명력 30% 미만에서 만가가 1.8초로 짧아지고 11초마다 오며, 오르간이 세 번째 파도를 연주합니다)",
+        "crypt_ilvane_heroic": "영웅: 앙코르(다른 한 명이 서 있는 동안 10초 쓰러져 있던 성가대원은 다시 일어남: 둘을 함께 처치하세요)와 끊기지 않는 구절(세 번째 만가마다 차단할 수 없음: 숨으세요)",
+        "crypt_morthen_shadow_pulse": "어둠의 파동(12초마다 2초 시전 후, 일반 난이도 기준 그에게서 12야드 안의 모두에게 24~30 암흑 피해: 떨어지세요. 최후의 의식 중에는 9초마다)",
+        "crypt_gravecall": "무덤부름(15초마다 속박된 영혼이 다음 석관 벽감에서 그에게로 떠갑니다. 도달하면 망자 포식 상태가 되어 영혼 하나마다 주는 피해가 10% 증가하고(최대 10중첩) 생명력의 3%를 회복합니다. 경로에 선 플레이어가 대신 받아냅니다: 일반 난이도 기준 12~16 암흑 피해)",
+        "crypt_rite_of_the_unquiet": "불안한 자들의 의식(생명력 65%에서 제단으로 돌아가 불안한 자들의 결계 안에서 피해 면역이 됩니다. 그동안 무덤의 냉기가 모두에게 매초 3 암흑 피해를 주고 5초마다 1씩 늘어나며, 벽감에서 불안한 뼈무더기 2개가 기어 나옵니다. 추모의 양초 4개를 다시 밝히세요: 하나마다 4초 정신 집중이며 밝히는 사람의 최대 생명력 6%를 매초 빨아들입니다. 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다. 마지막 양초가 의식을 깨뜨립니다: 8초 동안 기절하고 받는 피해가 25% 증가합니다)",
+        "crypt_reap_the_unquiet": "불안한 자들의 수확(생명력 35% 미만에서 영혼이 멈추고, 14초마다 2초 시전 후 낫을 휘두릅니다: 일반 난이도 기준 앞쪽 14야드, 120도 부채꼴 안의 모두에게 55~65 암흑 피해. 이후 어둠의 파동은 9초마다 옵니다)",
+        "crypt_morthen_heroic": "영웅 난이도: 망자의 이름(명부가 양초의 순서를 부릅니다. 다른 양초를 밝히면 마지막으로 밝힌 양초가 꺼지고 밝힌 사람에게 252~288 암흑 피해를 주며, 다시 밝히기는 매초 8%를 빨아들입니다), 무덤의 손아귀(16초마다 플레이어 2명 발밑에 4야드 고리가 생기고 1.5초 후 손이 솟아오릅니다: 3초 이동 불가와 162~198 암흑 피해), 조종룡의 불타는 조종(날아올라 고리의 절반에 4.5초 동안 표식을 남긴 뒤 그 절반에 유령불을 쏟아 1,000~1,120 화염 피해, 한 번 날 때마다 3번)",
         "reaping_arc": "수확의 호(전방 휩쓸기)",
+        "hallowed_brine": "성스러운 바닷물 (반경 9야드의 어두운 성수 웅덩이, 영웅은 10야드: 안에 있으면 매초 18 피해, 영웅은 26, 그가 안에 서 있는 동안 받는 피해 40퍼센트 감소, 밖으로 끌어내세요)",
+        "rebounding_bulwark": "튕겨 나오는 방패 (마지막으로 맞은 대상으로부터 10미터 이내의 가장 가까운 플레이어에게 튕김, 최대 3명, 영웅 4명: 흩어지세요)",
+        "tide_sentence": "조수의 선고 (표식 5초 뒤 빛의 기둥이 표식 대상 6미터 이내의 모두를 강타, 영웅 8미터: 무리에서 떨어져 맞으세요)",
+        "unbroken_oath": "깨지지 않는 맹세 (한 번, 생명력 절반에서 최대 60초 동안 거품 속에 무적으로 무릎 꿇음: 병사들을 처치해 깨뜨리면 4초 기절, 10초간 받는 피해 20퍼센트 증가)",
+        "fog_veil": "안개 장막 (네 형상 중 하나만 진짜: 등대의 빛줄기에 진짜 바엘의 등불이 타오릅니다)",
         "mist_surge": "안개 쇄도(주기적 광역 피해)",
         "summons_adds": "증원 소환",
         "lunar_tide": "달의 파도(주기적 광역 피해)",
+        "chorus_and_solo": "합창과 독창 (한 표식에는 모이고 다른 표식에서는 흩어지기)",
+        "tideglass_reflections": "조수유리 투영체 (서로의 거울상을 처치)",
+        "rising_tide": "밀물 (섬의 절반이 잠김, 마른 쪽으로 이동)",
+        "undertow": "역류 (모두를 끌어당김, 충돌 전에 벗어나기)",
         "enrage": "체력이 낮으면 격노",
         "shuddering_stomp": "전율의 발구르기(광역 기절)",
         "grave_inferno": "무덤의 지옥불(시전 화염 광역, 분산 유지)",
@@ -5978,6 +6528,9 @@ export const ko_KR: EnTranslations = {
         "deathless_court": "불사의 궁정(영웅 전용, 불사의 격노 이후 왕실 궁정이 일어남)",
         "bloodmane_rend": "블러드메인 렌드(출혈, 대상 교체 주의)",
         "tusk_sweep": "터스크 스윕(전방 휩쓸기)",
+        "grave_breath": "무덤 숨결 (전방 화염 원뿔, 덮은 얼음에 금이 감)",
+        "plate_floor": "깨지는 얼음 (불길이 호수 얼음판을 깨뜨려 가라앉힘, 드러난 물에 들어가지 말 것)",
+        "wyrm_flights": "비행 단계 (70%와 40%: 고룡의 눈은 멀쩡한 얼음 위로, 착지시킬 곳에 모일 것)",
         "ancestral_sap": "조상의 수액(아군 치유)",
         "call_of_the_hunt": "사냥의 부름(주변 아군 가속)",
         "thickhide_ward": "두꺼운 가죽 결계(주변 아군 보호막)",
@@ -6001,8 +6554,172 @@ export const ko_KR: EnTranslations = {
         "forgestorm": "대장간 폭풍(떨어지는 운석 원, 밖으로 이동)",
         "shared_pyre": "공유 화장단(집결 원, 피해 분담)",
         "anvils_decree": "모루의 칙령(공격대 전체 망치 강타 세 번, 치유로 버티기)",
-        "masters_assembly": "장인의 조립(대장간 광선 막기, 막는 사람 교대)"
+        "masters_assembly": "장인의 조립(대장간 광선 막기, 막는 사람 교대)",
+        "iron_cage": "강철 우리 (상호작용 키를 연타해 탈출, 아군은 창살을 부술 수 있음)",
+        "drowned_anchor": "익사의 닻 (희생자가 구덩이로 감겨 갑니다: 불 켜진 계류 기둥 3야드 이내로 달려가 사슬을 묶으면 그 기둥은 30초 동안 꺼집니다, 아니면 12번 공격해 사슬을 끊으세요, 영웅은 16번)",
+        "shackle_pair": "쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)",
+        "reaper_behind": "그림자 건너기 (세 번 연속 플레이어 뒤에서 솟아오름, 인원이 충분하면 매번 다른 대상: 낫의 궤적에서 벗어나세요)",
+        "pack_bond": "무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)",
+        "stalk": "추적 (재규어가 표식 대상을 사냥하며 탱커는 노리지 않고, 혼자일 때는 당신을 노림: 끌고 다니며 감속, 속박, 기절시키세요)",
+        "shared_health": "생명력 공유 (하나의 생명력: 가장 안전한 쪽을 공격하세요)",
+        "heel_frenzied_bond": "돌아와! 및 광포한 유대 (재규어가 주인에게 도약, 유대 범위 20야드)",
+        "seed_rain": "씨앗 비 (깨끗한 플레이어가 싹트기 전에 씨앗을 밟으세요)",
+        "pollinate": "수분 (황금빛 플레이어는 씨앗을 피하세요, 즉시 싹이 틉니다)",
+        "vine_lash": "덩굴 채찍 (가시 통로에서 벗어나지 않으면 속박됩니다)",
+        "gorge": "포식 (방어 담당에게 강력한 물기와 독)",
+        "burrowing_seeds": "파고드는 씨앗과 꽃가루 구름 (6초 뒤 플레이어 곁에서 솟아나고, 황금빛이 퍼집니다)",
+        "spirit_of_the_hunt": "사냥의 영혼 (사냥감이 화신을 빛나는 태양 문양으로 끌고 가세요. 물어뜯긴 플레이어는 도망칠 시간을 얻습니다)",
+        "twin_prey_ambush": "두 사냥감과 매복 (사냥감 둘, 이후 가장 먼 플레이어를 덮칩니다)",
+        "seal_shackles": "봉인 족쇄(사슬을 하나 끊을 때마다 그가 받는 피해가 20% 늘고 공격 하나가 풀려남)",
+        "chain_strain": "사슬 당기기(사슬이 아직 남은 모든 기둥에서 물러서기)",
+        "korgath_stomp": "전율의 발구르기(그의 주변 고리 밖으로 나가기)",
+        "rerivet_last_link": "재리벳과 마지막 고리(사슬을 다시 박는 몰이막대장이를 차단, 사슬이 하나 남으면 10초마다 사슬 당기기)",
+        "waking_thaw": "깨어나는 해빙 (망자들이 해빙 웅덩이에서 기어 나옵니다)",
+        "unquenched_held": "봉인 또는 꺼지지 않음 (망자는 차가운 얼음 위에서 처치하고, 녹은 물에서는 절대 처치하지 마세요)",
+        "soulfire_trench": "영혼불 도랑 (영혼불 줄기, 이후 녹은 물 띠가 남습니다)",
+        "shadow_volley": "암흑 화살 세례 (모두에게 암흑 피해)",
+        "warm_hands_twice_woken": "따뜻한 손과 두 번 깨어남 (영웅 전용, 망자를 계속 움직이게 하세요. 다시 일어난 자는 더 강해집니다)"
       }
+    },
+    "bastionCage": {
+      "title": "강철 우리에 갇혔습니다!",
+      "promptKey": "{key} 키를 연타해 탈출하세요",
+      "promptNoKey": "상호작용 키를 연타해 탈출하세요",
+      "promptClick": "여기를 연속 클릭해 탈출하세요",
+      "promptTap": "여기를 연타해 탈출하세요",
+      "buttonAria": "강철 우리에서 탈출하기",
+      "progressAria": "탈출 진행도: {pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "익사의 닻에 묶였다!",
+      "anchoredLine": "불 켜진 계류 기둥으로 달려가 사슬을 묶거나, 권양기가 구덩이로 끌고 가기 전에 파티가 사슬을 끊어야 합니다",
+      "allyTitle": "사슬을 끊어라!",
+      "allyLine": "{name} 님이 구덩이로 끌려가고 있습니다: 익사의 닻을 공격하거나 불 켜진 기둥으로 이끄세요",
+      "shackledTitle": "{name} 님과 족쇄로 묶임",
+      "shackledLine": "서로 {range}야드 이내에 머무르세요 (현재 {dist}야드)",
+      "strainedLine": "너무 멀어졌습니다! 사슬이 두 사람을 조입니다: {range}야드 이내로 모이세요",
+      "brokenAria": "사슬 파괴: {pct}",
+      "reachAria": "사슬 당김: {pct}",
+      "linksLeft": "남은 사슬 고리: {count}/{total}",
+      "linkRule": "닻을 칠 때마다 위력과 상관없이 고리가 하나씩 끊어진다",
+      "linksTarget": "사슬 고리 {count}/{total}",
+      "linkBroken": "고리 파괴!"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "선고가 당신에게 떨어진다!",
+      "sentencedLine": "빛의 기둥이 당신 근처의 모두를 강타한다: 무리에서 떨어져라",
+      "brineTitle": "성스러운 바닷물 속에 있다!",
+      "brineLine": "매초 당신을 태운다: 웅덩이에서 벗어나라",
+      "reapedTitle": "죽음이 등 뒤에서 솟아오른다!",
+      "reapedLine": "낫의 궤적에서 벗어나라: 앞으로, 혹은 옆으로",
+      "veilTitle": "안개 장막",
+      "veilLine": "등대의 빛줄기를 보라: 등불이 타오르는 자가 진짜 바엘이다",
+      "realTitle": "빛이 그를 찾아냈다!",
+      "realLine": "이것이 진짜 바엘이다: 공격해 장막을 깨뜨려라",
+      "shadeTitle": "텅 빈 그림자",
+      "shadeLine": "빛이 그대로 통과한다: 내버려 두고 빛이 비추는 자를 찾아라",
+      "timeAria": "{seconds}초 남음"
+    },
+    "wildheartAlert": {
+      "preyTitle": "당신이 사냥감입니다!",
+      "preyLine": "줄가르가 당신을 쫓습니다: 빛나는 태양 문양으로 끌고 가세요",
+      "preyWaitLine": "지금은 다른 사냥감을 쫓습니다: 대비하세요, 대상이 바뀝니다",
+      "stalkedTitle": "추적당함!",
+      "stalkedLine": "재규어가 당신을 사냥합니다: 주인에게서 멀리 끌고 가세요",
+      "pollinatedTitle": "수분됨!",
+      "pollinatedLine": "씨앗에서 떨어지세요: 닿으면 싹이 틉니다",
+      "bondTitle": "무리의 유대",
+      "bondLine": "함께 있으면 받는 피해가 절반입니다: 떼어 놓으세요",
+      "timeAria": "{seconds}초 남음"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "담금질 물속이다!",
+      "quenchLine": "불타고 느려진다: 가장 가까운 얼음이나 물가로 헤엄쳐라",
+      "plungeTitle": "내리꽂는 불길!",
+      "plungeLine": "발밑 얼음판 전체가 곧 불탄다: 당장 벗어나라",
+      "descentTitle": "추락 강하!",
+      "descentLine": "바로 여기에 내려앉는다: 그림자에서 벗어나라",
+      "eyeTitle": "고룡의 눈이 당신을 노린다!",
+      "eyeLine": "표식이 끝나면 서 있는 얼음판이 불탄다: 멀쩡한 얼음 위에서 파티와 떨어져라",
+      "eyeCrackedLine": "금 간 얼음 위에 서 있다: 표식이 끝나기 전에 멀쩡한 얼음판으로 가라",
+      "flailTitle": "사슬 도리깨!",
+      "flailLine": "사슬이 그려진 선을 따라 내리친다: 선에서 벗어나라",
+      "chargeTitle": "문턱 돌진!",
+      "chargeLine": "선을 따라 돌진한다: 선에서 벗어나고 가장자리에서 멀어져라",
+      "trenchTitle": "영혼불 도랑!",
+      "trenchLine": "영혼불이 선을 가르고 녹은 물을 남긴다: 벗어나라",
+      "strainTitle": "사슬 당기기!",
+      "strainLine": "온전한 기둥이 곧 터진다: 기둥에서 멀어져라",
+      "infernoTitle": "무덤의 지옥불!",
+      "infernoLine": "파동마다 더 거세진다: 그의 사거리 밖으로 나가라",
+      "stompTitle": "전율의 발구르기!",
+      "stompLine": "발이 내려오기 전에 그에게서 멀어져라",
+      "breathTitle": "무덤 숨결!",
+      "breathLine": "숨결 부채꼴 안에 있다: 옆으로 빠져라",
+      "maulTitle": "망치 휘두르기!",
+      "maulLine": "앞에 있는 모든 것을 휩쓴다: 뒤로 돌아가라",
+      "tailTitle": "꼬리 휩쓸기!",
+      "tailLine": "그의 뒤에 서 있다: 꼬리가 오기 전에 벗어나라",
+      "meltwaterTitle": "녹은 물속",
+      "meltwaterLine": "당신의 뼈걸음이가 녹은 물에 서 있다: 차가운 얼음 위로 끌어내라",
+      "meltwaterTargetLine": "대상이 녹은 물에서 죽으면 다시 일어난다: 차가운 얼음 위까지 기다려라",
+      "crackedTitle": "금 간 얼음",
+      "crackedLine": "여기에 불이 닿으면 이 얼음판이 부서진다: 그의 불길을 여기서 돌려라",
+      "flightTitle": "코르줄이 날아오른다",
+      "flightLine": "멀쩡한 얼음 위에 모여 착지 지점을 고른 뒤 흩어져라",
+      "lockboundTitle": "자물쇠 속박",
+      "lockboundLine": "사슬 {chains}개가 버틴다: 받는 피해 {pct}% 감소. 봉인 족쇄를 부숴 벗겨내라.",
+      "timeAria": "{seconds}초 남음",
+      "brandedTitle": "낙인!",
+      "brandedLine": "낙인은 끝날 때까지 타오릅니다: 녹은 물웅덩이에서 끄세요",
+      "rimeTitle": "스며드는 서리!",
+      "rimeLine": "스며드는 서리 {stacks}/{max}: 새끼용의 숨결에서 벗어나세요",
+      "slabTitle": "얼음 덩어리",
+      "slabLine": "단단한 얼음: 시야를 가립니다. 뒤에 숨어 시전자의 주문을 피하세요"
+    },
+    "cryptAlert": {
+      "measuredTitle": "무덤 치수 재기!",
+      "measuredLine": "바가 다 떨어지면 발밑에 무덤이 무너집니다: 묘지 가장자리로 옮기세요",
+      "embracedTitle": "얼어붙은 포옹!",
+      "embracedLine": "그녀가 당신을 공중에 들어 올렸습니다: 파티가 그녀에게 피해를 줘야 내려놓습니다",
+      "lamentTitle": "신부의 애가!",
+      "lamentShelteredLine": "켜진 등불의 빛 안에 당신의 자리가 있습니다: 가만히 있으세요",
+      "lamentOpenLine": "통곡이 닥치기 전에 켜진 등불의 빛 안으로 들어가세요: 등불 하나에 두 명",
+      "graveTitle": "열린 무덤 안에 있습니다!",
+      "graveLine": "무덤흙이 당신을 태우고 느리게 합니다: 무덤에서 나오세요",
+      "tollTitle": "장례의 종소리!",
+      "tollLine": "종을 울리는 동안 그는 피해를 받지 않습니다: 종소리와 그것이 일으키는 망자에 대비하세요",
+      "harmonyTitle": "화음",
+      "harmonyLine": "성가대원들이 그녀가 받는 피해를 {pct}% 줄이고 있습니다: 성가대원을 먼저 처치하세요",
+      "knellTitle": "불타는 조종!",
+      "knellLine": "바가 다 줄어들면 고리의 이쪽 절반에 유령불이 쏟아집니다: 반대쪽 절반으로 가세요",
+      "graspTitle": "무덤의 손아귀!",
+      "graspLine": "이 고리에서 손이 솟아올라 안에 선 사람을 붙잡습니다: 나오세요",
+      "reapTitle": "불안한 자들의 수확!",
+      "reapLine": "그의 낫이 앞쪽 땅을 휩씁니다: 그의 뒤로 가세요",
+      "riteTitle": "불안한 자들의 의식",
+      "riteLine": "추모의 양초를 다시 밝혀 결계를 부수세요: {total}개 중 {lit}개 점화",
+      "riteNamedLine": "명부가 다음에 부르는 양초만 다시 밝히세요: {total}개 중 {lit}개 점화",
+      "soulTitle": "속박된 영혼",
+      "soulLine": "영혼이 모르덴에게 떠가고 있습니다: 경로에 들어서서 그가 배를 채우기 전에 받아내세요",
+      "timeAria": "{seconds}초 남음"
+    },
+    "kitUse": {
+      "toppleLine": "무리 위로 걷어차 넘어뜨리세요: 쏟아진 불길이 그들을 태웁니다",
+      "toppleKey": "{name}을(를) 그들 위로 넘어뜨리기",
+      "toppleTap": "여기를 탭해 {name}을(를) 그들 위로 넘어뜨리세요",
+      "toppleClick": "여기를 클릭해 {name}을(를) 그들 위로 넘어뜨리세요",
+      "toppleFar": "{range}야드 안으로 다가가 걷어차세요",
+      "toppleAria": "{name} 넘어뜨리기",
+      "usingLine": "가만히 있으세요: 공격을 받거나 움직이거나 기절하면 끊깁니다",
+      "relightLine": "정신 집중하는 동안 매초 생명력을 빨아들입니다: 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다",
+      "relightKey": "{name} 다시 밝히기",
+      "relightTap": "여기를 탭해 {name}을(를) 다시 밝히세요",
+      "relightClick": "여기를 클릭해 {name}을(를) 다시 밝히세요",
+      "relightFar": "{range}야드 안으로 다가가 다시 밝히세요",
+      "relightAria": "{name} 다시 밝히기",
+      "relightUsingLine": "빨아들이는 동안 가만히 있으세요: 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다",
+      "timeAria": "{seconds}초 남음"
     },
     "cosmetics": {
       "title": "외형",
@@ -6011,6 +6728,8 @@ export const ko_KR: EnTranslations = {
       "tabMounts": "탈것",
       "tabSkins": "스킨",
       "tabMech": "메카",
+      "buddyActive": "Summoned",
+      "buddyDrag": "Drag to action bar",
       "legend": "계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.",
       "scopeAccount": "계정",
       "scopeCharacter": "캐릭터",
@@ -6223,7 +6942,7 @@ export const ko_KR: EnTranslations = {
       "watchFull": "추적 목록이 가득 찼습니다 (최대 {cap}개)",
       "watchAria": "HUD 추적기에서 {name} 추적",
       "unwatchAria": "{name} 추적 중지",
-      "cosmeticsSection": "칭호와 테두리",
+      "cosmeticsSection": "칭호, 테두리, 동료",
       "titlesSection": "칭호",
       "titlesAria": "표시할 칭호 선택",
       "titlesNone": "칭호 없음",
@@ -6231,6 +6950,14 @@ export const ko_KR: EnTranslations = {
       "bordersSection": "테두리",
       "bordersNone": "테두리 없음",
       "bordersEmpty": "테두리가 걸린 업적을 획득하면 이 선반이 열립니다.",
+      "buddiesSection": "동료",
+      "buddiesNone": "동료 없음",
+      "buddiesEmpty": "동료를 모으면 여기서 소환할 수 있습니다.",
+      "buddyDragHint": "행동 단축바로 끌어다 놓기",
+      "looksSection": "동료 외형",
+      "looksNone": "기본 외형",
+      "looksNoBuddy": "동료를 소환하면 여기서 외형을 고를 수 있습니다.",
+      "looksEmpty": "이 동료는 아직 해금된 외형이 없습니다.",
       "unlockedBanner": "업적 달성: {name}",
       "unlockedTitleHint": "새 칭호 획득: {title}. 업적의 서에서 선택할 수 있습니다.",
       "unlockedBorderHint": "새 테두리 획득: {name}. 업적의 서에서 착용할 수 있습니다.",
@@ -6711,6 +7438,8 @@ export const ko_KR: EnTranslations = {
       "delete_confirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
       "storage_purchase_open": "이 캐릭터를 삭제하려면 보관함 구매를 완료하거나 해결해야 합니다.",
       "delete_busy": "서버가 혼잡합니다. 잠시 후 이 캐릭터 삭제를 다시 시도해 주세요.",
+      "referral_transfer_pending": "이 캐릭터를 삭제하기 전에 고정되지 않은 도장 카드를 모두 다른 캐릭터로 옮기세요.",
+      "referral_bond_pending": "친구 초대 보상인 멤버십 증서를 이 캐릭터에게 지급 중입니다. 지급이 완료된 후 캐릭터 삭제를 다시 시도하세요.",
       "already_in_world": "캐릭터가 이미 세계에 있습니다.",
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
@@ -6947,6 +7676,95 @@ export const ko_KR: EnTranslations = {
         "0": "제대로 된 퇴비네요, 화단이 살겠어요. 옛 방앗간 주인이 떠나기 전에 뭔가를 묻어 두었어요. 정원 가장 먼 구석에서 그 풍차는 아직 돌고 있죠. 그 옆에 서 보세요.",
         "2": "방앗간이 당신을 해안 길로 보냈군. 등대에는 마지막 비밀이 하나 있지. 북서쪽, 오솔길 바로 옆에 잔디를 잘라 냈다가 다시 덮은 자리가 있어. 거기를 파게."
       }
+    }
+  },
+  "dungeonGuide": {
+    "drownedTemple": {
+      "greet": {
+        "1": "나는 창백한 성가대에서 가장 어린 목소리였소. 의식의 밤, 나는 마시지 않고 도망쳤지. 그 뒤로 보름달이 뜰 때마다 물 아래에서 그들이 노래하는 소리가 들리오. 죽기 전에 그분을 직접 봐야 하오. 뒤에서 걷게 해 주시오. 싸우지도 않고, 짐이 되지도 않겠소.",
+        "2": "보름달마다 이 문까지 오지만, 보름달마다 용기가 꺾였소. 오늘 밤은 아니오. 성가대가 노래하고 있고, 도망친 자는 바로 나요. 그분께 데려가 주시오. 방해하지 않겠소."
+      },
+      "row": {
+        "join": "함께 갑시다.",
+        "decline": "우리끼리 가겠소."
+      },
+      "joined": "앞장서시오. 바로 뒤에 있겠소.",
+      "singing": "노래하게 해 주시오. 가시오, 평안히 가시오.",
+      "accept": {
+        "1": "고맙소. 뒤에서 걸으며 방해하지 않겠소.",
+        "2": "그렇다면 마침내 내려가는구려. 앞서 가시오. 따라가겠소."
+      },
+      "decline": "이해하오. 늘 그랬듯 여기 위에서 듣겠소.",
+      "heroicWater": "오늘 밤은 물이 높소. 내 평생 본 적 없을 만큼. 그분이 깨어나려 하오.",
+      "memory": {
+        "votaries": "물가의 익사자들은 문이 닫힌 뒤에 걸어 들어간 이들이오. 달은 그들을 데려가지 않았소. 물만이 데려갔지.",
+        "rubbing": "조수지기가 물가 바위에 새긴 내 글을 읽었소. \"그저 잠들어 있을 뿐.\" 다음 날 아침 내가 새긴 것이오."
+      },
+      "area": {
+        "steps": "순례자의 계단이오. 그날 밤 나는 세 칸씩 뛰어 올라가며 한 번도 뒤돌아보지 않았소.",
+        "causeway": {
+          "1": "의식의 밤이면 달이 이 둑길 위에 두 번째 길처럼 누워 있었소.",
+          "2": "물을 보시오. 아직도 달을 품는 법을 기억하고 있소."
+        },
+        "colonnade": "조수의 열주랑이오. 우리는 둘씩 짝지어 오름의 소절을 부르며 걸었소.",
+        "veil": "저 장막 너머가 성가대의 뜰이오. 어린아이였던 뒤로 한 번도 서 보지 못했소.",
+        "terraces": "조수 웅덩이요. 수습생들이 깨끗이 치우고, 그 안에 사는 작고 빛나는 것들에게 먹이를 주었소.",
+        "falls": "폭포 뒤에서는 물이 모든 목소리를 삼키오. 연습을 빼먹을 때 나는 여기 숨었지.",
+        "pool": "달의 연못이오. 그들은 그 둘레에 무릎 꿇고 껍데기로 마셨소. 나는 내 것을 들어 올리지 못했지.",
+        "prismStair": "프리즘 계단이오. 달이 뜰 때 올라 거대한 유리를 깨웠소.",
+        "moonbridge": {
+          "1": "달빛의 다리요. 장로들은 신실한 자만이 건널 수 있다고 했소.",
+          "2": "나는 결코 신실하지 않았소. 뭐, 나를 버텨 줄지 두고 봅시다."
+        },
+        "altarLanding": "내가 서 있던 곳이 여기요. 바로 여기. 여기서 등을 돌려 도망쳤소."
+      },
+      "sight": {
+        "pilgrim": "물가 마을의 순례자들이오. 봄마다 사당을 등에 지고 다녔지. 이제는 영원히 지고 있소.",
+        "acolyte": "수습생들이오. 나는 그들 곁에서 글을 배웠소. 이제 그들은 잠든 채 노래하고, 결코 깨어나지 않소.",
+        "templeguard": "계단의 수비대요. 달이 질 때까지 신전을 지키겠다고 맹세했지. 달은 끝내 지지 않았소.",
+        "snapper": "우리는 저런 껍데기로 달의 물을 마셨소. 내 것은 계단에 떨어뜨렸지.",
+        "siren": "저 목소리. 성가대에서 내 옆에서 노래하던 이요. 지금도 반 박자 일찍 들어오는구려.",
+        "lurker": "아이들이 얕은 물에서 그물로 잡던 것들이오. 엄지만 했고, 빛이 났지.",
+        "tidewisp": "저것이 바로 달의 물, 우리가 마셔야 했던 그 한 모금이오. 몸에 닿지 않게 하시오.",
+        "sentinel": "문 앞 연못의 달가오리들이다. 수련생 시절, 달이 뜰 때 진주를 먹여 주곤 했지. 이제는 그들이 문을 지키며, 우리의 진주를 심장으로 삼고 있구나.",
+        "eel": "석호의 뱀장어들이오. 수습생들이 해 질 녘에 빵을 주었지. 우리 찬송가를 먹고 살이 쪘소.",
+        "reflection": "물이 당신을 무엇으로 바꿀지 보여 주는 것이오. 부수시오!",
+        "moonspawn": "저것들은 결코 내 사람들이 아니었소. 그분의 것이오. 오직 달빛으로만 만들어졌지."
+      },
+      "selthe": {
+        "pre": {
+          "1": "셀세 어머니시오. 배로 숨 쉬는 법을 가르쳐 주셨지. 죽지 않고 물에 잠기는 법을 우리 모두에게 가르치셨소.",
+          "2": "성가대모 셀세. 내가 아는 모든 음은 그분이 넣어 주셨소. 용서하소서, 어머니."
+        },
+        "post": {
+          "1": "조용하시구려. 성가대에 있던 내내, 그분이 조용하신 적은 한 번도 없었소.",
+          "2": "이제 쉬소서, 어머니. 저에 대해 옳으셨습니다. 저는 긴 음을 끝내 지키지 못했지요."
+        }
+      },
+      "hydra": {
+        "pre": "연못의 뱀이오. 내가 어렸을 땐 머리가 하나였고, 우리 손에서 받아먹었소.",
+        "post": "들어 보시오. 폭포 아래에서 그들이 아직 노래하고 있소. 이제 더 가까이."
+      },
+      "colossus": {
+        "pre": "거대한 프리즘이오. 달을 붙잡으려 그 안으로 노래했지. 그것이 일어설 수 있는 줄은 몰랐소.",
+        "post": "유리가 깨졌소. 이제 달을 붙잡을 것은 아무것도 남지 않았소. 그분을 빼고는."
+      },
+      "ysolei": {
+        "pre": "저기 계시오. 평생 나는 그분이 여신인지 괴물인지 물어 왔소. 보여 주시오.",
+        "preHeroic": "이런 밤이면 성가대 전체가 그분과 함께 노래하오. 모두 버티시오."
+      },
+      "farewell": {
+        "answer": "그분은 어느 쪽도 아니었소. 물에 비친 달이었고, 무릎 꿇은 것은 우리였소.",
+        "verse": "의식에는 마지막 소절이 있었소. 노래하는 이들을 잠들게 하는 소절이지. 나는 그것을 부르지 않았소.",
+        "stay": "그들은 충분히 기다렸소. 나는 남아서 이제 그들을 위해 부르겠소.",
+        "goodbye": {
+          "1": "밤하늘로 올라가시오. 보름달에 노랫소리가 들리거든, 그건 나일 뿐이오.",
+          "2": "늙은 겁쟁이를 그의 노래 끝까지 데려와 주어 고맙소. 이제 가시오."
+        },
+        "emote": "{name}이(가) 제단 위로 목소리를 높이자, 석호가 고요해집니다."
+      },
+      "wipe": "일어나시오. 제발. 나를 다시 이 아래에 홀로 남겨 두지 마시오.",
+      "catchUp": "다리는 늙었어도, 이 계단은 한 칸도 빠짐없이 아오. 여기 있소."
     }
   },
   "guide": {
@@ -7428,6 +8246,7 @@ export const ko_KR: EnTranslations = {
       "framesGovernedAuraTracks": "\"프레임 편집\"은 같은 인터페이스 옵션의 전투 탭에서 켠 선택형 오라 트랙 여섯 개, 곧 \"내 버프\" 트랙, \"방어 재사용 대기시간\" 트랙, \"내 보호막\" 트랙, \"공격 재사용 대기시간\" 트랙, \"이동 및 은신\" 트랙, \"아군에게 건 내 버프\" 트랙도 함께 풀어 줍니다. 모든 트랙은 기본적으로 꺼져 있으며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
       "frameGroups": "{trackers}는 퀘스트, 업적, 균열, 탐험, 채집 목표, 성유물 추적을 합칠 수 있습니다. {auras}는 대상 지속 피해와 여섯 오라 추적을 합칠 수 있습니다. 프레임 설정에서 각각 활성화하거나 꺼서 개별 이동하세요. {tot}에는 자원 막대가 있습니다. {focus}의 세 대상은 개별 이동하며 Shift+F1~F3으로 지정하고 Ctrl+F1~F3으로 선택합니다. 피해 및 위협 미터는 잠긴 상태에서도 버튼 이외의 영역을 끌어 이동하고 가장자리를 끌어 크기를 조절할 수 있습니다. 잠금 해제 시 프레임 표시 메뉴에서 그룹별로 표시를 바꾸고, 프레임을 우클릭해 크기를 초기화하거나 관련 설정을 열 수 있습니다. 인터페이스의 프레임 탭에는 공통 설정과 접을 수 있는 파티 설정도 있습니다. 대상의 대상을 대상에 고정하는 옵션을 끄면 따로 이동할 수 있고, 다시 켜도 개별 위치는 보관됩니다. 주시 대상을 지정하면 설정 버튼과 안내가 숨겨집니다. 우클릭하여 주시 해제를 선택하면 기본 상태로 돌아갑니다. 마우스오버 시전은 주시 프레임에서도 작동합니다.",
       "framesGovernedTalkingHead": "프레임 편집은 대화 패널도 해제합니다. 대화 패널은 말하는 NPC가 시야 밖에 있을 때 그 NPC의 대사를 담으며, 해제된 동안에는 자신의 이름 칩을 표시합니다.",
+      "framesGovernedShardpike": "프레임 편집은 조각창 바도 해제합니다. 조각창 바는 조각창을 들고 있는 동안에만 행동 단축바 옆에 나타나는 퀵스트 도구 행동의 짧은 줄이며, 해제된 동안에는 자신의 이름 칩을 표시합니다. 덕분에 전투 중이 아니라 전투 전에 자리를 잡아 둘 수 있습니다.",
       "framesGovernedUnitTooltip": "\"프레임 편집\"은 툴팁 프레임도 풀어 줍니다. 마우스를 올린 대상의 카드가 나타나는 자리로, 생물이면 레벨과 종류, 다른 플레이어면 칭호, 길드, 레벨과 직업, 그리고 전문화와 그 역할이 표시됩니다. 원하는 곳으로 끌어 놓으면 카드는 그 자리에서 가장 가까운 화면 가장자리를 피하는 방향으로 펼쳐집니다. \"프레임 설정\"의 \"프레임 표시 및 숨기기\"에서 툴팁 체크를 해제하면 이 카드를 완전히 숨길 수 있습니다.",
       "barsTitle": "바와 시간 표시, 전투 문자",
       "barsBody": "주문을 시전하거나 정신을 집중할 때마다 화면 한가운데, 행동 단축바 바로 위에 시전 바가 나타나 주문 이름과 남은 시간을 알려 줍니다. 대상도 자기 프레임에 시전 바를 가지므로, 무엇이 날아오는지 보고 답할 수 있습니다.\n\n시전 바 아래에는 가느다란 공격 속도 바가 있어 무기를 휘두르는 사이를 채웁니다. 근접이나 원거리 공격자는 다음 자동 공격이 언제 들어가는지 볼 수 있습니다.\n\n경험치 바는 행동 단축바 아래를 가로질러 화면 전체 폭으로 이어지며 눈금으로 나뉘어 있고, 밝게 표시된 구간이 쌓아 둔 휴식 경험치를 보여 줍니다.\n\n물속으로 헤엄쳐 들어가면 화면 위쪽에 파란 호흡 바가 나타납니다. 머리가 잠겨 있는 동안 줄어들고, 다 떨어져 익사가 시작되면 붉게 깜빡이며, 물 위로 올라오는 순간 빠르게 다시 찹니다. 스페이스로 위로 헤엄치고, 기본값이 Ctrl인 아래로 헤엄치기 키로 더 깊이 내려갑니다.\n\n피해와 치유는 맞은 대상 위로 작은 숫자가 되어 떠오르므로, 글을 읽지 않고도 전투를 읽어 낼 수 있습니다. 채팅창의 전투 탭에는 온전한 기록이 글로 남습니다.",
@@ -8184,8 +9003,8 @@ export const ko_KR: EnTranslations = {
       "hollowBody": "도굴당한 예배당 묘소로, 갓 죽은 자들이 안식하기를 거부하는 곳. 새 파티의 첫 진정한 시험대입니다.",
       "bastionBody": "습지에 삼켜진 침수된 요새로, 물에 빠진 수호자들과 차오르는 밀물 그 자체가 지키고 있습니다.",
       "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
-      "sanctumBody": "가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.",
-      "wildheartBody": "따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드에 올라 정상에서 누가 기다리는지 확인하라.",
+      "sanctumBody": "가시봉우리 높은 곳에 숨겨진 빙하. 한 마리 용이 얼음 속에 갇혀 있고, 교단은 훔친 영혼을 불태워 그 얼음을 녹이고 있다. 높은 고개에서 얼음 탑과 대장장이의 끊어진 사슬, 교단의 불길을 지나 빙하 발치의 얼어붙은 호수까지 내려간다.",
+      "wildheartBody": "가라앉은 우상 뒤에 숨겨진 정글 칼데라. 절벽에 둘러싸여 폭포 소리가 울려 퍼진다. 강 여울을 건너고, 사냥 단구와 폭포를 지나, 폐허가 된 식민지를 가로질러 거대한 석조 재규어 머리 아래의 계단식 성소로 올라가라.",
       "raidName": "최종 단계 공격대",
       "raidBody": "봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.",
       "heroicTitle": "영웅 난이도",
@@ -9751,6 +10570,168 @@ export const ko_KR: EnTranslations = {
     "body": "체형",
     "genderMale": "남성",
     "genderFemale": "여성",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "넘긴 머리",
+        "long": "Long",
+        "mohawk": "모히칸",
+        "quiff": "짧은 리젠트",
+        "undercut": "투블럭 컷",
+        "topknot": "상투 머리",
+        "shoulder": "어깨 길이 머리",
+        "bald": "Bald",
+        "waves": "웨이브",
+        "ponytail": "하이 포니테일",
+        "braid": "땋은 머리",
+        "bob": "Bob",
+        "crown": "왕관 땋기",
+        "twins": "양갈래 땋은 머리",
+        "curls": "곱슬 올림머리"
+      },
+      "beard": {
+        "none": "수염 없음",
+        "moustache": "콧수염",
+        "handlebar": "카이저 수염",
+        "goatee": "염소수염",
+        "chin": "턱수염",
+        "boxed": "짧게 다듬은 수염",
+        "long": "긴 수염",
+        "chops": "구레나룻 수염",
+        "chinstrap": "턱선 수염"
+      },
+      "nose": {
+        "default": "클래식",
+        "broad": "넓은 코",
+        "aquiline": "매부리코",
+        "button": "작고 둥근 코",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "클래식",
+        "full": "Full",
+        "smirk": "한쪽 미소",
+        "relaxed": "편안한 입술",
+        "cupids_bow": "큐피드 입술",
+        "narrow": "좁은 입술",
+        "thin": "Thin",
+        "rounded": "둥근 입술"
+      },
+      "brows": {
+        "default": "클래식",
+        "slim": "Slim",
+        "arched": "아치형 눈썹",
+        "soft": "Soft",
+        "straight": "일자 눈썹",
+        "relaxed": "편안한 눈썹",
+        "soft_arch": "Soft Arch",
+        "rounded": "둥근 눈썹"
+      },
+      "ears": {
+        "default": "클래식",
+        "large": "큰귀",
+        "pointed": "뾰족귀",
+        "round": "둥근귀"
+      },
+      "eyes": {
+        "default": "클래식",
+        "almond": "아몬드형",
+        "hooded": "속쌍꺼풀"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "눈과 눈썹",
+        "eyeColor": "눈 색깔",
+        "hairstyle": "헤어스타일",
+        "facialHair": "수염",
+        "hairColor": "머리 색",
+        "browColor": "눈썹 색",
+        "piercings": "피어싱"
+      },
+      "section": {
+        "hair": "헤어스타일",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "눈썹 모양",
+        "ears": "Ears",
+        "eyes": "눈 모양"
+      },
+      "slider": {
+        "eyeSpacing": "눈 간격",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "눈썹 높이",
+        "chinWidth": "턱 너비",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "귓불",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "콧볼",
+        "septum": "셉텀",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "포슬린",
+        "ivory": "아이보리",
+        "rose": "Rose",
+        "peach": "피치",
+        "fair": "Fair",
+        "beige": "베이지",
+        "sand": "Sand",
+        "honey": "허니",
+        "olive": "올리브",
+        "caramel": "캐러멜",
+        "tan": "Tan",
+        "bronze": "브론즈",
+        "chestnut": "체스트넛",
+        "umber": "엄버",
+        "mahogany": "마호가니",
+        "ebony": "에보니"
+      },
+      "eye": {
+        "brown": "갈색",
+        "darkBrown": "짙은 갈색",
+        "hazel": "헤이즐",
+        "amber": "호박색",
+        "green": "초록색",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "보라색"
+      },
+      "hairColor": {
+        "platinum": "플래티넘",
+        "blonde": "금발",
+        "golden": "골드",
+        "copper": "구릿빛",
+        "red": "Red",
+        "auburn": "적갈색",
+        "lightBrown": "밝은 갈색",
+        "brown": "갈색",
+        "darkBrown": "짙은 갈색",
+        "black": "검은색",
+        "silver": "은색",
+        "white": "흰색"
+      },
+      "matchHair": "머리 색에 맞추기",
+      "resetDefault": "기본값으로 초기화",
+      "customColorAria": "사용자 지정 색상 선택",
+      "customSkinAria": "사용자 지정 피부색 선택"
+    },
     "hair": "헤어",
     "brows": "눈썹",
     "skinTone": "피부색",
@@ -11218,6 +12199,9 @@ export const ko_KR: EnTranslations = {
   "character": {
     "loading": "불러오는 중...",
     "noneYet": "아직 캐릭터가 없습니다. 아래에서 하나를 만드세요.",
+    "membershipRequired": "이 캐릭터로 플레이하려면 멤버십을 갱신하세요.",
+    "membershipSlots": "멤버십으로 캐릭터 슬롯 잠금 해제",
+    "emptySlot": "사용 가능한 캐릭터 슬롯",
     "levelClass": "{level}레벨 {className}",
     "inWorld": "세계에 있음",
     "takeOver": "넘겨받기",
@@ -11227,6 +12211,7 @@ export const ko_KR: EnTranslations = {
     "lockoutRaids": "공격대",
     "lockoutDungeons": "던전",
     "lockoutWorldBosses": "월드 보스",
+    "lockoutWeeklyQuests": "주간 퀘스트",
     "takeOverConfirm": "이 캐릭터를 다른 세션에서 연결 해제하고 여기로 가져옵니다. 계속하시겠습니까?",
     "renameRequired": "이름 변경 필요",
     "delete": "삭제",
@@ -11811,6 +12796,7 @@ export const ko_KR: EnTranslations = {
       "deathRecapCauterized": "사망했습니다. 소작의 화염이 당신을 집어삼켰습니다.",
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
       "respawnKeeperToll": "영혼 치유사가 당신을 부활시켰지만 그 대가로 약해졌습니다. 부활 후유증이 사라질 때까지 모든 능력치가 감소합니다.",
+      "moonbridgeBanner": "달의 다리가 놓인다",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
       "playerNotNearby": "그 플레이어는 근처에 없습니다.",
@@ -12014,6 +13000,10 @@ export const ko_KR: EnTranslations = {
     "social": {
       "title": "소셜",
       "friendsTab": "친구",
+      "friendFirstPage": "첫 페이지",
+      "friendNextPage": "다음 페이지",
+      "boundFriend": "연결된 친구",
+      "boundFriendLink": "연결된 친구는 초대 링크를 통해 연결됩니다.",
       "guildTab": "길드",
       "ignoreTab": "차단",
       "leaveParty": "파티 떠나기",
@@ -12241,7 +13231,161 @@ export const ko_KR: EnTranslations = {
       "hoard_cast_screech": "귀를 찢는 비명",
       "hoard_cast_mimic_bite": "탐욕스러운 물기",
       "hoard_cast_mimic_leap": "짓누르는 도약",
-      "hoard_cast_coin_spit": "저주받은 금화"
+      "hoard_cast_coin_spit": "저주받은 금화",
+      "crypt_grave_bolt": "무덤 화살",
+      "crypt_raise_bones": "뼈 일으키기",
+      "crypt_murder_call": "까마귀떼 부름",
+      "crypt_stone_shriek": "돌의 비명",
+      "crypt_grave_cleave": "무덤 가르기",
+      "crypt_barrowflame_breath": "무덤불꽃 숨결",
+      "crypt_tail_lash": "꼬리 채찍",
+      "crypt_wing_gust": "날개 돌풍",
+      "crypt_grave_rupture": "무덤 파열",
+      "crypt_carrion_eye": "썩은 고기의 눈",
+      "crypt_marrow_crush": "골수 분쇄",
+      "crypt_rimesilk_spit": "서리실 뱉기",
+      "crypt_gravespark_volley": "무덤 불꽃 일제 사격",
+      "crypt_morthen_rite_wakes": "의식의 각성",
+      "crypt_morthen_rise": "무덤부름의 승천",
+      "crypt_morthen_proclaim": "무덤의 선포",
+      "crypt_morthen_descend": "강림",
+      "crypt_knellwyrm_arrive": "하늘에서 강하",
+      "crypt_knellwyrm_pyre_strafe": "화장의 강습",
+      "crypt_knellwyrm_strafe_run": "강습 비행",
+      "crypt_knellwyrm_dread_bellow": "공포의 포효",
+      "crypt_marrow_shovelful": "한 삽의 무덤흙",
+      "crypt_marrow_measure": "무덤 치수 재기",
+      "crypt_marrow_burial_toll": "장례의 종소리",
+      "crypt_marrow_gravediggers_blow": "무덤꾼의 일격",
+      "crypt_lady_brides_lament": "신부의 애가",
+      "crypt_lady_frozen_embrace": "얼어붙은 포옹",
+      "crypt_lady_embrace_hold": "얼어붙은 포옹",
+      "crypt_lady_bridal_freeze": "신부의 결빙",
+      "crypt_ilvane_dirge": "공허의 만가",
+      "crypt_ilvane_unbroken_dirge": "끊기지 않는 구절",
+      "crypt_ilvane_bone_organ": "뼈 오르간",
+      "crypt_morthen_shadow_pulse": "어둠의 파동",
+      "crypt_morthen_rite_of_the_unquiet": "불안한 자들의 의식",
+      "crypt_morthen_reap_the_unquiet": "불안한 자들의 수확",
+      "kituse_crypt_relight_candle": "촛불 다시 밝히기",
+      "crypt_knellwyrm_knell_rise": "불타는 조종",
+      "crypt_knellwyrm_knell_mark": "불타는 조종",
+      "crypt_knellwyrm_knell_breath": "불타는 조종",
+      "crypt_knellwyrm_knell_land": "불타는 조종",
+      "bastion_brine_mend": "소금물 치유",
+      "bastion_fog_ward": "안개 보호막",
+      "bastion_halberd_sweep": "미늘창 휩쓸기",
+      "bastion_piercing_bolt": "관통 화살",
+      "bastion_claw_sweep": "집게 휩쓸기",
+      "bastion_shell_slam": "껍질 내려찍기",
+      "ghost_captain_broadside": "유령선 일제 포격",
+      "ghost_captain_anchor": "저주받은 닻",
+      "ghost_captain_boarding": "환영의 승선",
+      "bastion_boathook": "갈고리 끌기",
+      "bastion_fog_bank": "안개 장막",
+      "bastion_brine_column": "소금물 기둥",
+      "bastion_loose_on_my_mark": "내 신호에 쏴라",
+      "bastion_oathbound_charge": "맹세의 돌진",
+      "bastion_gaolers_cudgel": "간수의 곤봉",
+      "bastion_mist_surge": "안개 해일",
+      "bastion_drowning_hymn": "익사의 성가",
+      "bastion_iron_cage": "강철 우리",
+      "bastion_drowned_anchor_cast": "익사의 닻",
+      "bastion_shackle_pair": "쌍둥이 족쇄",
+      "bastion_shadowstep": "그림자 건너기",
+      "bastion_reaping_scythe": "수확의 낫",
+      "bastion_veil_rise": "안개 장막",
+      "bastion_veil_gather": "모여드는 안개",
+      "bastion_vael_rise": "죽음이 떠오른다",
+      "bastion_vael_sink": "안개 속으로",
+      "bastion_hallowed_brine": "성스러운 바닷물",
+      "bastion_rebounding_bulwark": "튕겨 나오는 방패",
+      "bastion_tide_sentence": "조수의 선고",
+      "bastion_oath_kneel": "깨지지 않는 맹세",
+      "bastion_oath_vigil": "깨지지 않는 맹세",
+      "temple_lullaby": "자장가",
+      "cantor_last_verse": "마지막 소절",
+      "temple_call_the_tide": "조수의 부름",
+      "temple_static_coil": "정전기 똬리",
+      "temple_snapper_snap": "물어뜯기",
+      "temple_trident_sweep": "삼지창 휩쓸기",
+      "temple_sea_song": "바다의 노래",
+      "temple_tidal_slap": "조수 후려치기",
+      "temple_tide_breath": "얼어붙는 숨결",
+      "temple_moonlight_lance": "달빛 창",
+      "temple_prism_flare": "프리즘 섬광",
+      "temple_resonant_slam": "공명의 강타",
+      "temple_moonwater_bolt": "월수 화살",
+      "temple_drowning_aria": "익사의 아리아",
+      "temple_mere_surge": "호수의 해일",
+      "temple_tideglass_fracture": "조수유리 균열",
+      "temple_undertow": "역류",
+      "temple_lunar_tide": "달의 조수",
+      "temple_skewering_trident": "꿰뚫는 삼지창",
+      "temple_pale_mending": "창백한 치유",
+      "temple_glimmer_venom": "반짝이는 독",
+      "temple_pearl_slam": "해일의 날갯짓",
+      "temple_lightning_spit": "번개 침",
+      "temple_crushing_torrent": "짓누르는 급류",
+      "temple_hydra_tsunami": "해일",
+      "temple_ysolei_call": "달의 자손 부르기",
+      "temple_ysolei_wrath": "익사한 분노",
+      "temple_frostlocked_torrent": "얼어붙은 급류",
+      "temple_venom_current": "독의 해류",
+      "temple_toxic_rime": "맹독 서리",
+      "temple_beckoning_moon": "달의 부름",
+      "temple_falling_moon": "떨어지는 달",
+      "temple_prism_glare": "프리즘 응시",
+      "temple_arcing_spark": "호를 그리는 불꽃",
+      "temple_call_of_the_shallows": "여울의 부름",
+      "wildheart_ancestral_sap": "선조의 수액",
+      "wildheart_plant_totem": "토템 심기",
+      "wildheart_entangling_lash": "휘감는 채찍",
+      "wildheart_saurian_tail_swipe": "꼬리 휩쓸기",
+      "wildheart_saurian_stomp": "대지를 뒤흔드는 발구르기",
+      "wildheart_quarry_mark": "사냥감 표식",
+      "wildheart_war_roar": "전쟁의 포효",
+      "wildheart_toad_hex": "두꺼비 사술",
+      "wildheart_rattling_dread": "덜그럭거리는 공포",
+      "wildheart_snaring_tongue": "옭아매는 혀",
+      "wildheart_beast_pit_quake": "야수 구덩이 진동",
+      "wildheart_jaguar_heel": "돌아와!",
+      "wildheart_gorgebloom_seed_rain": "씨앗 비",
+      "wildheart_gorgebloom_vine_lash": "덩굴 채찍",
+      "wildheart_gorgebloom_gorge": "포식",
+      "wildheart_zulgar_pulse": "야생심장 파동",
+      "wildheart_zulgar_spirit_hunt": "사냥의 영혼",
+      "sanctum_cinder_breath": "잿불 숨결",
+      "sanctum_warming_rite": "온기의 의식",
+      "sanctum_goad": "몰아세우기",
+      "sanctum_plant_brazier": "영혼 화로 설치",
+      "sanctum_ice_block_toss": "얼음덩이 던지기",
+      "sanctum_tusker_tusk_sweep": "엄니 휩쓸기",
+      "sanctum_tusker_trample": "짓밟기",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "평형추 꼬리채찍",
+      "sanctum_branding_iron": "낙인 인두",
+      "sanctum_rime_breath": "서리 숨결",
+      "kituse_sanctum_topple_brazier": "화로 넘어뜨리기",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
+      "sanctum_korgath_maul_arc": "대망치 호격",
+      "sanctum_korgath_chain_flail": "사슬 채찍",
+      "sanctum_korgath_threshold_charge": "문턱 돌진",
+      "sanctum_korgath_foremans_bellow": "감독관의 포효",
+      "sanctum_korgath_strain": "사슬 당기기",
+      "sanctum_korgath_stomp": "전율의 발구르기",
+      "sanctum_goadsmith_rerivet": "재리벳",
+      "sanctum_velkhar_soulfire_trench": "영혼불 도랑",
+      "sanctum_velkhar_shadow_volley": "암흑 화살 세례",
+      "sanctum_korzul_break_free": "얼음 깨기",
+      "sanctum_korzul_grave_breath": "무덤 숨결",
+      "sanctum_korzul_tail_sweep": "꼬리 휩쓸기",
+      "sanctum_korzul_grave_inferno": "무덤 지옥불",
+      "sanctum_korzul_wing_gale": "날개 돌풍",
+      "sanctum_korzul_plunging_fire": "쏟아지는 불길",
+      "sanctum_korzul_crashing_descent": "추락 강하"
     }
   },
   "questUi": {
@@ -12309,6 +13453,8 @@ export const ko_KR: EnTranslations = {
       "rewards": "보상",
       "xpReward": "경험치 {xp}",
       "itemReward": "아이템 보상:",
+      "chooseReward": "보상을 선택하세요:",
+      "rewardChoices": "다음 보상 중 하나를 선택할 수 있습니다:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "{level}레벨 필요"
     },
@@ -12686,6 +13832,7 @@ export const ko_KR: EnTranslations = {
       "incomplete": "그 퀘스트는 완료되지 않았습니다.",
       "giverMissing": "그 퀘스트를 주는 대상이 근처에 없습니다.",
       "turnInMissing": "그 퀘스트를 보고할 대상이 근처에 없습니다.",
+      "rewardNotOffered": "해당 보상은 제공되지 않습니다.",
       "tooFar": "너무 멉니다.",
       "escortAway": "호송할 대상이 지금 자리에 없습니다. 잠시 후 그곳으로 돌아옵니다."
     }
@@ -12737,7 +13884,9 @@ export const ko_KR: EnTranslations = {
       "flask": "플라스크",
       "scroll": "두루마리",
       "bag": "가방",
-      "mount": "탈것"
+      "mount": "탈것",
+      "buddy": "버디",
+      "buddyCosmetic": "동료 외형"
     },
     "stats": {
       "armor": "방어도",
@@ -12753,6 +13902,17 @@ export const ko_KR: EnTranslations = {
       "parry": "무기 막기"
     },
     "tooltip": {
+      "referralFullSet": "우정 방어구 {pieces}개를 모두 착용하고 {member} 님과 파티를 맺으면 경험치를 {percent}% 더 얻습니다. 초대자의 멤버십이 활성 상태여야 합니다.",
+      "referralInviter": "나를 초대한 회원",
+      "referralRetained": "초대자와 파티를 맺지 않아도 방어구 능력치는 레벨에 따라 성장합니다.",
+      "referralDormant": "비활성: 이 계정은 회원 초대를 통해 우정 방어구를 받지 않았습니다.",
+      "membershipToken": "사용: 이 토큰을 소모하여 계정의 멤버십 기간에 {days}일을 추가합니다. 남은 멤버십 기간은 유지됩니다. 사용 전에는 거래하거나 경매장에서 판매할 수 있습니다.",
+      "membershipAdaptive": "능력치와 방어구가 직업 및 전문화에 맞게 바뀝니다.",
+      "membershipScaling": "아이템 레벨이 캐릭터 레벨에 맞춰 증가합니다. 20레벨에 도달하면 방어구가 완성되어 아이템 레벨이 25가 됩니다.",
+      "membershipPerfected": "완성됨: 아이템 레벨 {level}.",
+      "membershipFullSet": "멤버십 방어구 {pieces}부위를 모두 착용하면 경험치 획득량이 {percent}% 증가합니다. 활성 멤버십이 필요합니다.",
+      "membershipRequired": "멤버십이 만료되면 방어구 능력치와 세트 효과가 비활성화되며, 갱신하면 다시 활성화됩니다.",
+      "membershipDormant": "비활성: 멤버십을 갱신하면 방어구 능력치와 세트 효과가 복구됩니다.",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "현재 착용 중",
       "ifYouEquip": "이것을 착용하면",
@@ -13052,6 +14212,10 @@ export const ko_KR: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "배달부",
+        "description": "날아다니는 당나귀를 소환하여 가방과 가장 가까운 은행 사이에서 아이템을 운반합니다. 일반 달리기 속도의 250%로 비행합니다. 한 번에 최대 24묶음을 선택할 수 있습니다. 새 배달을 시작하려면 멤버십이 필요합니다."
+      },
       "sport_kick": {
         "name": "킥",
         "description": "조준 지점을 향해 공을 땅볼로 차 보냅니다."
@@ -15829,6 +16993,30 @@ export const ko_KR: EnTranslations = {
       "fenshadow_maul": {
         "name": "늪그림자 철퇴"
       },
+      "foremans_barrowmaul": {
+        "name": "감독관의 봉분망치"
+      },
+      "skerrits_shardpike": {
+        "name": "스케릿의 조각창"
+      },
+      "loomshard_eye": {
+        "name": "배로글라스의 눈"
+      },
+      "barrowhide_pauldrons": {
+        "name": "봉분 어깨보호구"
+      },
+      "mirestone_stride": {
+        "name": "진흙돌 발걸음"
+      },
+      "foremans_wage_band": {
+        "name": "감독관의 임금 반지"
+      },
+      "mirelight_locket": {
+        "name": "늪빛 로켓"
+      },
+      "fenwright_grips": {
+        "name": "늪지 장인의 장갑"
+      },
       "wildgrove_cinch": {
         "name": "야생숲 허리띠"
       },
@@ -16878,6 +18066,114 @@ export const ko_KR: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "안식의 돌"
+      },
+      "whistle_ember_fox": {
+        "name": "잉걸불 여우의 호루라기"
+      },
+      "whistle_moss_hare": {
+        "name": "이끼 산토끼의 호루라기"
+      },
+      "whistle_frog": {
+        "name": "개구리의 호루라기"
+      },
+      "whistle_crimson_claw_crab": {
+        "name": "진홍 집게 게의 호루라기"
+      },
+      "whistle_golden_sentinel": {
+        "name": "황금 파수병의 호루라기"
+      },
+      "whistle_nightfang": {
+        "name": "밤엄니의 호루라기"
+      },
+      "whistle_tuskhorn_boar": {
+        "name": "엄니뿔 멧돼지의 호루라기"
+      },
+      "whistle_emerald_wolf": {
+        "name": "에메랄드 늑대의 호루라기"
+      },
+      "whistle_tiger": {
+        "name": "호랑이의 호루라기"
+      },
+      "whistle_cate_coin": {
+        "name": "케이트 코인의 호루라기"
+      },
+      "whistle_alon": {
+        "name": "알론의 호루라기"
+      },
+      "whistle_trollface": {
+        "name": "트롤페이스의 호루라기"
+      },
+      "whistle_ansem": {
+        "name": "안셈의 호루라기"
+      },
+      "whistle_triple_t": {
+        "name": "트리플 T의 호루라기"
+      },
+      "whistle_kekius": {
+        "name": "케키우스의 호루라기"
+      },
+      "whistle_solbot": {
+        "name": "솔봇의 호루라기"
+      },
+      "whistle_frostfire": {
+        "name": "서리불꽃의 호루라기"
+      },
+      "whistle_rocky": {
+        "name": "로키의 호루라기"
+      },
+      "whistle_proud_grunt": {
+        "name": "자랑스러운 병졸의 호루라기"
+      },
+      "whistle_loot_goblin": {
+        "name": "전리품 고블린의 호루라기"
+      },
+      "whistle_penny_goldspark": {
+        "name": "페니 골드스파크의 호루라기"
+      },
+      "whistle_stag": {
+        "name": "수사슴의 호루라기"
+      },
+      "whistle_alpaca": {
+        "name": "알파카의 호루라기"
+      },
+      "whistle_horse": {
+        "name": "말의 호루라기"
+      },
+      "whistle_sapling": {
+        "name": "어린 나무의 호루라기"
+      },
+      "whistle_bull": {
+        "name": "황소의 호루라기"
+      },
+      "whistle_spider": {
+        "name": "거미의 호루라기"
+      },
+      "whistle_raptor": {
+        "name": "랩터의 호루라기"
+      },
+      "whistle_skeleton": {
+        "name": "해골의 호루라기"
+      },
+      "whistle_crystal_lich": {
+        "name": "수정 리치의 호루라기"
+      },
+      "whistle_forgemaw": {
+        "name": "용융의 화로아귀의 호루라기"
+      },
+      "whistle_crystal_tide": {
+        "name": "수정 물결의 호루라기"
+      },
+      "whistle_phantom": {
+        "name": "팬텀의 호루라기"
+      },
+      "whistle_emberfall_phoenix": {
+        "name": "잿불낙하 불사조의 호루라기"
+      },
+      "charm_stag_acorn": {
+        "name": "도토리 왕관 부적"
+      },
+      "charm_stag_gilded": {
+        "name": "금박 부적"
       },
       "lastflame_core": {
         "name": "마지막 불꽃의 핵"
@@ -18451,6 +19747,1521 @@ export const ko_KR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
       },
+      "brookwatch_robe": {
+        "name": "개울감시 로브"
+      },
+      "brookwatch_leggings": {
+        "name": "개울감시 각반"
+      },
+      "brookwatch_slippers": {
+        "name": "개울감시 슬리퍼"
+      },
+      "brookwatch_hood": {
+        "name": "개울감시 두건"
+      },
+      "brookwatch_gloves": {
+        "name": "개울감시 장갑"
+      },
+      "brookwatch_mantle": {
+        "name": "개울감시 어깨걸이"
+      },
+      "brookwatch_sash": {
+        "name": "개울감시 장식띠"
+      },
+      "brookwatch_jerkin": {
+        "name": "개울감시 웃옷"
+      },
+      "brookwatch_breeches": {
+        "name": "개울감시 가죽바지"
+      },
+      "brookwatch_boots": {
+        "name": "개울감시 장화"
+      },
+      "brookwatch_cap": {
+        "name": "개울감시 모자"
+      },
+      "brookwatch_grips": {
+        "name": "개울감시 손아귀"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "개울감시 어깨덧대"
+      },
+      "brookwatch_belt": {
+        "name": "개울감시 허리띠"
+      },
+      "brookwatch_hauberk": {
+        "name": "개울감시 사슬갑옷"
+      },
+      "brookwatch_legguards": {
+        "name": "개울감시 다리갑옷"
+      },
+      "brookwatch_sabatons": {
+        "name": "개울감시 쇠장화"
+      },
+      "brookwatch_helm": {
+        "name": "개울감시 투구"
+      },
+      "brookwatch_gauntlets": {
+        "name": "개울감시 건틀릿"
+      },
+      "brookwatch_pauldrons": {
+        "name": "개울감시 어깨갑옷"
+      },
+      "brookwatch_girdle": {
+        "name": "개울감시 허리갑"
+      },
+      "brookwatch_chainmail": {
+        "name": "개울감시 사슬옷"
+      },
+      "brookwatch_chausses": {
+        "name": "개울감시 사슬각반"
+      },
+      "brookwatch_greaves": {
+        "name": "개울감시 경갑"
+      },
+      "brookwatch_coif": {
+        "name": "개울감시 사슬두건"
+      },
+      "brookwatch_handguards": {
+        "name": "개울감시 손보호구"
+      },
+      "brookwatch_spaulders": {
+        "name": "개울감시 어깨보호구"
+      },
+      "brookwatch_cord": {
+        "name": "개울감시 허리끈"
+      },
+      "hedgerow_robe": {
+        "name": "산울타리 로브"
+      },
+      "hedgerow_leggings": {
+        "name": "산울타리 각반"
+      },
+      "hedgerow_slippers": {
+        "name": "산울타리 슬리퍼"
+      },
+      "hedgerow_hood": {
+        "name": "산울타리 두건"
+      },
+      "hedgerow_gloves": {
+        "name": "산울타리 장갑"
+      },
+      "hedgerow_mantle": {
+        "name": "산울타리 어깨걸이"
+      },
+      "hedgerow_sash": {
+        "name": "산울타리 장식띠"
+      },
+      "hedgerow_jerkin": {
+        "name": "산울타리 웃옷"
+      },
+      "hedgerow_breeches": {
+        "name": "산울타리 가죽바지"
+      },
+      "hedgerow_boots": {
+        "name": "산울타리 장화"
+      },
+      "hedgerow_cap": {
+        "name": "산울타리 모자"
+      },
+      "hedgerow_grips": {
+        "name": "산울타리 손아귀"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "산울타리 어깨덧대"
+      },
+      "hedgerow_belt": {
+        "name": "산울타리 허리띠"
+      },
+      "hedgerow_hauberk": {
+        "name": "산울타리 사슬갑옷"
+      },
+      "hedgerow_legguards": {
+        "name": "산울타리 다리갑옷"
+      },
+      "hedgerow_sabatons": {
+        "name": "산울타리 쇠장화"
+      },
+      "hedgerow_helm": {
+        "name": "산울타리 투구"
+      },
+      "hedgerow_gauntlets": {
+        "name": "산울타리 건틀릿"
+      },
+      "hedgerow_pauldrons": {
+        "name": "산울타리 어깨갑옷"
+      },
+      "hedgerow_girdle": {
+        "name": "산울타리 허리갑"
+      },
+      "hedgerow_chainmail": {
+        "name": "산울타리 사슬옷"
+      },
+      "hedgerow_chausses": {
+        "name": "산울타리 사슬각반"
+      },
+      "hedgerow_greaves": {
+        "name": "산울타리 경갑"
+      },
+      "hedgerow_coif": {
+        "name": "산울타리 사슬두건"
+      },
+      "hedgerow_handguards": {
+        "name": "산울타리 손보호구"
+      },
+      "hedgerow_spaulders": {
+        "name": "산울타리 어깨보호구"
+      },
+      "hedgerow_cord": {
+        "name": "산울타리 허리끈"
+      },
+      "bogwalker_robe": {
+        "name": "늪방랑자 로브"
+      },
+      "bogwalker_leggings": {
+        "name": "늪방랑자 각반"
+      },
+      "bogwalker_slippers": {
+        "name": "늪방랑자 슬리퍼"
+      },
+      "bogwalker_hood": {
+        "name": "늪방랑자 두건"
+      },
+      "bogwalker_gloves": {
+        "name": "늪방랑자 장갑"
+      },
+      "bogwalker_mantle": {
+        "name": "늪방랑자 어깨걸이"
+      },
+      "bogwalker_sash": {
+        "name": "늪방랑자 장식띠"
+      },
+      "bogwalker_jerkin": {
+        "name": "늪방랑자 웃옷"
+      },
+      "bogwalker_breeches": {
+        "name": "늪방랑자 가죽바지"
+      },
+      "bogwalker_boots": {
+        "name": "늪방랑자 장화"
+      },
+      "bogwalker_cap": {
+        "name": "늪방랑자 모자"
+      },
+      "bogwalker_grips": {
+        "name": "늪방랑자 손아귀"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "늪방랑자 어깨덧대"
+      },
+      "bogwalker_belt": {
+        "name": "늪방랑자 허리띠"
+      },
+      "bogwalker_hauberk": {
+        "name": "늪방랑자 사슬갑옷"
+      },
+      "bogwalker_legguards": {
+        "name": "늪방랑자 다리갑옷"
+      },
+      "bogwalker_sabatons": {
+        "name": "늪방랑자 쇠장화"
+      },
+      "bogwalker_helm": {
+        "name": "늪방랑자 투구"
+      },
+      "bogwalker_gauntlets": {
+        "name": "늪방랑자 건틀릿"
+      },
+      "bogwalker_pauldrons": {
+        "name": "늪방랑자 어깨갑옷"
+      },
+      "bogwalker_girdle": {
+        "name": "늪방랑자 허리갑"
+      },
+      "bogwalker_chainmail": {
+        "name": "늪방랑자 사슬옷"
+      },
+      "bogwalker_chausses": {
+        "name": "늪방랑자 사슬각반"
+      },
+      "bogwalker_greaves": {
+        "name": "늪방랑자 경갑"
+      },
+      "bogwalker_coif": {
+        "name": "늪방랑자 사슬두건"
+      },
+      "bogwalker_handguards": {
+        "name": "늪방랑자 손보호구"
+      },
+      "bogwalker_spaulders": {
+        "name": "늪방랑자 어깨보호구"
+      },
+      "bogwalker_cord": {
+        "name": "늪방랑자 허리끈"
+      },
+      "thornspire_robe": {
+        "name": "가시첨탑 로브"
+      },
+      "thornspire_leggings": {
+        "name": "가시첨탑 각반"
+      },
+      "thornspire_slippers": {
+        "name": "가시첨탑 슬리퍼"
+      },
+      "thornspire_hood": {
+        "name": "가시첨탑 두건"
+      },
+      "thornspire_gloves": {
+        "name": "가시첨탑 장갑"
+      },
+      "thornspire_mantle": {
+        "name": "가시첨탑 어깨걸이"
+      },
+      "thornspire_sash": {
+        "name": "가시첨탑 장식띠"
+      },
+      "thornspire_jerkin": {
+        "name": "가시첨탑 웃옷"
+      },
+      "thornspire_breeches": {
+        "name": "가시첨탑 가죽바지"
+      },
+      "thornspire_boots": {
+        "name": "가시첨탑 장화"
+      },
+      "thornspire_cap": {
+        "name": "가시첨탑 모자"
+      },
+      "thornspire_grips": {
+        "name": "가시첨탑 손아귀"
+      },
+      "thornspire_shoulderpads": {
+        "name": "가시첨탑 어깨덧대"
+      },
+      "thornspire_belt": {
+        "name": "가시첨탑 허리띠"
+      },
+      "thornspire_hauberk": {
+        "name": "가시첨탑 사슬갑옷"
+      },
+      "thornspire_legguards": {
+        "name": "가시첨탑 다리갑옷"
+      },
+      "thornspire_sabatons": {
+        "name": "가시첨탑 쇠장화"
+      },
+      "thornspire_helm": {
+        "name": "가시첨탑 투구"
+      },
+      "thornspire_gauntlets": {
+        "name": "가시첨탑 건틀릿"
+      },
+      "thornspire_pauldrons": {
+        "name": "가시첨탑 어깨갑옷"
+      },
+      "thornspire_girdle": {
+        "name": "가시첨탑 허리갑"
+      },
+      "thornspire_chainmail": {
+        "name": "가시첨탑 사슬옷"
+      },
+      "thornspire_chausses": {
+        "name": "가시첨탑 사슬각반"
+      },
+      "thornspire_greaves": {
+        "name": "가시첨탑 경갑"
+      },
+      "thornspire_coif": {
+        "name": "가시첨탑 사슬두건"
+      },
+      "thornspire_handguards": {
+        "name": "가시첨탑 손보호구"
+      },
+      "thornspire_spaulders": {
+        "name": "가시첨탑 어깨보호구"
+      },
+      "thornspire_cord": {
+        "name": "가시첨탑 허리끈"
+      },
+      "hollowveil_robe": {
+        "name": "그늘장막 로브"
+      },
+      "hollowveil_leggings": {
+        "name": "그늘장막 각반"
+      },
+      "hollowveil_slippers": {
+        "name": "그늘장막 슬리퍼"
+      },
+      "hollowveil_hood": {
+        "name": "그늘장막 두건"
+      },
+      "hollowveil_gloves": {
+        "name": "그늘장막 장갑"
+      },
+      "hollowveil_mantle": {
+        "name": "그늘장막 어깨걸이"
+      },
+      "hollowveil_sash": {
+        "name": "그늘장막 장식띠"
+      },
+      "hollowveil_jerkin": {
+        "name": "그늘장막 웃옷"
+      },
+      "hollowveil_breeches": {
+        "name": "그늘장막 가죽바지"
+      },
+      "hollowveil_boots": {
+        "name": "그늘장막 장화"
+      },
+      "hollowveil_cap": {
+        "name": "그늘장막 모자"
+      },
+      "hollowveil_grips": {
+        "name": "그늘장막 손아귀"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "그늘장막 어깨덧대"
+      },
+      "hollowveil_belt": {
+        "name": "그늘장막 허리띠"
+      },
+      "hollowveil_hauberk": {
+        "name": "그늘장막 사슬갑옷"
+      },
+      "hollowveil_legguards": {
+        "name": "그늘장막 다리갑옷"
+      },
+      "hollowveil_sabatons": {
+        "name": "그늘장막 쇠장화"
+      },
+      "hollowveil_helm": {
+        "name": "그늘장막 투구"
+      },
+      "hollowveil_gauntlets": {
+        "name": "그늘장막 건틀릿"
+      },
+      "hollowveil_pauldrons": {
+        "name": "그늘장막 어깨갑옷"
+      },
+      "hollowveil_girdle": {
+        "name": "그늘장막 허리갑"
+      },
+      "hollowveil_chainmail": {
+        "name": "그늘장막 사슬옷"
+      },
+      "hollowveil_chausses": {
+        "name": "그늘장막 사슬각반"
+      },
+      "hollowveil_greaves": {
+        "name": "그늘장막 경갑"
+      },
+      "hollowveil_coif": {
+        "name": "그늘장막 사슬두건"
+      },
+      "hollowveil_handguards": {
+        "name": "그늘장막 손보호구"
+      },
+      "hollowveil_spaulders": {
+        "name": "그늘장막 어깨보호구"
+      },
+      "hollowveil_cord": {
+        "name": "그늘장막 허리끈"
+      },
+      "trailwarden_robe": {
+        "name": "길지킴이 로브"
+      },
+      "trailwarden_leggings": {
+        "name": "길지킴이 각반"
+      },
+      "trailwarden_slippers": {
+        "name": "길지킴이 슬리퍼"
+      },
+      "trailwarden_hood": {
+        "name": "길지킴이 두건"
+      },
+      "trailwarden_gloves": {
+        "name": "길지킴이 장갑"
+      },
+      "trailwarden_mantle": {
+        "name": "길지킴이 어깨걸이"
+      },
+      "trailwarden_sash": {
+        "name": "길지킴이 장식띠"
+      },
+      "trailwarden_jerkin": {
+        "name": "길지킴이 웃옷"
+      },
+      "trailwarden_breeches": {
+        "name": "길지킴이 가죽바지"
+      },
+      "trailwarden_boots": {
+        "name": "길지킴이 장화"
+      },
+      "trailwarden_cap": {
+        "name": "길지킴이 모자"
+      },
+      "trailwarden_grips": {
+        "name": "길지킴이 손아귀"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "길지킴이 어깨덧대"
+      },
+      "trailwarden_belt": {
+        "name": "길지킴이 허리띠"
+      },
+      "trailwarden_hauberk": {
+        "name": "길지킴이 사슬갑옷"
+      },
+      "trailwarden_legguards": {
+        "name": "길지킴이 다리갑옷"
+      },
+      "trailwarden_sabatons": {
+        "name": "길지킴이 쇠장화"
+      },
+      "trailwarden_helm": {
+        "name": "길지킴이 투구"
+      },
+      "trailwarden_gauntlets": {
+        "name": "길지킴이 건틀릿"
+      },
+      "trailwarden_pauldrons": {
+        "name": "길지킴이 어깨갑옷"
+      },
+      "trailwarden_girdle": {
+        "name": "길지킴이 허리갑"
+      },
+      "trailwarden_chainmail": {
+        "name": "길지킴이 사슬옷"
+      },
+      "trailwarden_chausses": {
+        "name": "길지킴이 사슬각반"
+      },
+      "trailwarden_greaves": {
+        "name": "길지킴이 경갑"
+      },
+      "trailwarden_coif": {
+        "name": "길지킴이 사슬두건"
+      },
+      "trailwarden_handguards": {
+        "name": "길지킴이 손보호구"
+      },
+      "trailwarden_spaulders": {
+        "name": "길지킴이 어깨보호구"
+      },
+      "trailwarden_cord": {
+        "name": "길지킴이 허리끈"
+      },
+      "highgale_robe": {
+        "name": "높바람 로브"
+      },
+      "highgale_leggings": {
+        "name": "높바람 각반"
+      },
+      "highgale_slippers": {
+        "name": "높바람 슬리퍼"
+      },
+      "highgale_hood": {
+        "name": "높바람 두건"
+      },
+      "highgale_gloves": {
+        "name": "높바람 장갑"
+      },
+      "highgale_mantle": {
+        "name": "높바람 어깨걸이"
+      },
+      "highgale_sash": {
+        "name": "높바람 장식띠"
+      },
+      "highgale_jerkin": {
+        "name": "높바람 웃옷"
+      },
+      "highgale_breeches": {
+        "name": "높바람 가죽바지"
+      },
+      "highgale_boots": {
+        "name": "높바람 장화"
+      },
+      "highgale_cap": {
+        "name": "높바람 모자"
+      },
+      "highgale_grips": {
+        "name": "높바람 손아귀"
+      },
+      "highgale_shoulderpads": {
+        "name": "높바람 어깨덧대"
+      },
+      "highgale_belt": {
+        "name": "높바람 허리띠"
+      },
+      "highgale_hauberk": {
+        "name": "높바람 사슬갑옷"
+      },
+      "highgale_legguards": {
+        "name": "높바람 다리갑옷"
+      },
+      "highgale_sabatons": {
+        "name": "높바람 쇠장화"
+      },
+      "highgale_helm": {
+        "name": "높바람 투구"
+      },
+      "highgale_gauntlets": {
+        "name": "높바람 건틀릿"
+      },
+      "highgale_pauldrons": {
+        "name": "높바람 어깨갑옷"
+      },
+      "highgale_girdle": {
+        "name": "높바람 허리갑"
+      },
+      "highgale_chainmail": {
+        "name": "높바람 사슬옷"
+      },
+      "highgale_chausses": {
+        "name": "높바람 사슬각반"
+      },
+      "highgale_greaves": {
+        "name": "높바람 경갑"
+      },
+      "brookwatch_tunic": {
+        "name": "개울감시 튜닉"
+      },
+      "brookwatch_legwraps": {
+        "name": "개울감시 다리싸개"
+      },
+      "brookwatch_treads": {
+        "name": "개울감시 덧신"
+      },
+      "brookwatch_headguard": {
+        "name": "개울감시 머리보호대"
+      },
+      "brookwatch_handwraps": {
+        "name": "개울감시 손싸개"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "개울감시 어깨받이"
+      },
+      "brookwatch_waistguard": {
+        "name": "개울감시 허리보호대"
+      },
+      "hedgerow_tunic": {
+        "name": "산울타리 튜닉"
+      },
+      "hedgerow_legwraps": {
+        "name": "산울타리 다리싸개"
+      },
+      "hedgerow_treads": {
+        "name": "산울타리 덧신"
+      },
+      "hedgerow_headguard": {
+        "name": "산울타리 머리보호대"
+      },
+      "hedgerow_handwraps": {
+        "name": "산울타리 손싸개"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "산울타리 어깨받이"
+      },
+      "hedgerow_waistguard": {
+        "name": "산울타리 허리보호대"
+      },
+      "bogwalker_tunic": {
+        "name": "늪방랑자 튜닉"
+      },
+      "bogwalker_legwraps": {
+        "name": "늪방랑자 다리싸개"
+      },
+      "bogwalker_treads": {
+        "name": "늪방랑자 덧신"
+      },
+      "bogwalker_headguard": {
+        "name": "늪방랑자 머리보호대"
+      },
+      "bogwalker_handwraps": {
+        "name": "늪방랑자 손싸개"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "늪방랑자 어깨받이"
+      },
+      "bogwalker_waistguard": {
+        "name": "늪방랑자 허리보호대"
+      },
+      "thornspire_tunic": {
+        "name": "가시첨탑 튜닉"
+      },
+      "thornspire_legwraps": {
+        "name": "가시첨탑 다리싸개"
+      },
+      "thornspire_treads": {
+        "name": "가시첨탑 덧신"
+      },
+      "thornspire_headguard": {
+        "name": "가시첨탑 머리보호대"
+      },
+      "thornspire_handwraps": {
+        "name": "가시첨탑 손싸개"
+      },
+      "thornspire_shoulderguards": {
+        "name": "가시첨탑 어깨받이"
+      },
+      "thornspire_waistguard": {
+        "name": "가시첨탑 허리보호대"
+      },
+      "hollowveil_tunic": {
+        "name": "그늘장막 튜닉"
+      },
+      "hollowveil_legwraps": {
+        "name": "그늘장막 다리싸개"
+      },
+      "hollowveil_treads": {
+        "name": "그늘장막 덧신"
+      },
+      "hollowveil_headguard": {
+        "name": "그늘장막 머리보호대"
+      },
+      "hollowveil_handwraps": {
+        "name": "그늘장막 손싸개"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "그늘장막 어깨받이"
+      },
+      "hollowveil_waistguard": {
+        "name": "그늘장막 허리보호대"
+      },
+      "trailwarden_tunic": {
+        "name": "길지킴이 튜닉"
+      },
+      "trailwarden_legwraps": {
+        "name": "길지킴이 다리싸개"
+      },
+      "trailwarden_treads": {
+        "name": "길지킴이 덧신"
+      },
+      "trailwarden_headguard": {
+        "name": "길지킴이 머리보호대"
+      },
+      "trailwarden_handwraps": {
+        "name": "길지킴이 손싸개"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "길지킴이 어깨받이"
+      },
+      "trailwarden_waistguard": {
+        "name": "길지킴이 허리보호대"
+      },
+      "highgale_tunic": {
+        "name": "높바람 튜닉"
+      },
+      "highgale_legwraps": {
+        "name": "높바람 다리싸개"
+      },
+      "highgale_treads": {
+        "name": "높바람 덧신"
+      },
+      "highgale_headguard": {
+        "name": "높바람 머리보호대"
+      },
+      "highgale_handwraps": {
+        "name": "높바람 손싸개"
+      },
+      "highgale_shoulderguards": {
+        "name": "높바람 어깨받이"
+      },
+      "highgale_waistguard": {
+        "name": "높바람 허리보호대"
+      },
+      "highgale_coif": {
+        "name": "높바람 사슬두건"
+      },
+      "highgale_handguards": {
+        "name": "높바람 손보호구"
+      },
+      "highgale_spaulders": {
+        "name": "높바람 어깨보호구"
+      },
+      "highgale_cord": {
+        "name": "높바람 허리끈"
+      },
+      "breakwater_mantle": {
+        "name": "방파제 어깨걸이"
+      },
+      "breakwater_shoulderpads": {
+        "name": "방파제 어깨덧대"
+      },
+      "breakwater_spaulders": {
+        "name": "방파제 어깨보호구"
+      },
+      "gravebell_treads": {
+        "name": "무덤종 덧신"
+      },
+      "gravebell_greaves": {
+        "name": "무덤종 경갑"
+      },
+      "cryptbound_tunic": {
+        "name": "묘실속박 튜닉"
+      },
+      "cryptbound_chainmail": {
+        "name": "묘실속박 사슬옷"
+      },
+      "oathbroken_leggings": {
+        "name": "맹세파기 각반"
+      },
+      "oathbroken_breeches": {
+        "name": "맹세파기 가죽바지"
+      },
+      "oathbroken_legwraps": {
+        "name": "맹세파기 다리싸개"
+      },
+      "oathbroken_legguards": {
+        "name": "맹세파기 다리갑옷"
+      },
+      "oathbroken_chausses": {
+        "name": "맹세파기 사슬각반"
+      },
+      "seamist_legwraps": {
+        "name": "바다안개 다리싸개"
+      },
+      "seamist_chausses": {
+        "name": "바다안개 사슬각반"
+      },
+      "warmonger_treads": {
+        "name": "전쟁광 덧신"
+      },
+      "warmonger_greaves": {
+        "name": "전쟁광 경갑"
+      },
+      "sparkglass_leggings": {
+        "name": "불꽃수정 각반"
+      },
+      "sparkglass_breeches": {
+        "name": "불꽃수정 가죽바지"
+      },
+      "sparkglass_legwraps": {
+        "name": "불꽃수정 다리싸개"
+      },
+      "sparkglass_legguards": {
+        "name": "불꽃수정 다리갑옷"
+      },
+      "sparkglass_chausses": {
+        "name": "불꽃수정 사슬각반"
+      },
+      "stillhymn_treads": {
+        "name": "고요찬가 덧신"
+      },
+      "stillhymn_greaves": {
+        "name": "고요찬가 경갑"
+      },
+      "pearlglow_headguard": {
+        "name": "진주빛 머리보호대"
+      },
+      "pearlglow_coif": {
+        "name": "진주빛 사슬두건"
+      },
+      "sealkeeper_gloves": {
+        "name": "봉인지기 장갑"
+      },
+      "sealkeeper_grips": {
+        "name": "봉인지기 손아귀"
+      },
+      "sealkeeper_handwraps": {
+        "name": "봉인지기 손싸개"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "봉인지기 건틀릿"
+      },
+      "sealkeeper_handguards": {
+        "name": "봉인지기 손보호구"
+      },
+      "fetterbound_leggings": {
+        "name": "족쇄속박 각반"
+      },
+      "fetterbound_breeches": {
+        "name": "족쇄속박 가죽바지"
+      },
+      "fetterbound_legwraps": {
+        "name": "족쇄속박 다리싸개"
+      },
+      "fetterbound_legguards": {
+        "name": "족쇄속박 다리갑옷"
+      },
+      "fetterbound_chausses": {
+        "name": "족쇄속박 사슬각반"
+      },
+      "shroudcaller_tunic": {
+        "name": "수의소환자 튜닉"
+      },
+      "shroudcaller_chainmail": {
+        "name": "수의소환자 사슬옷"
+      },
+      "wyrmshadow_tunic": {
+        "name": "용그림자 튜닉"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "용그림자 사슬옷"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "잿불무리 어깨덧대"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "잿불무리 어깨받이"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "잿불무리 어깨갑옷"
+      },
+      "hoarfrost_mantle": {
+        "name": "서리꽃 어깨걸이"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "서리꽃 어깨덧대"
+      },
+      "hoarfrost_spaulders": {
+        "name": "서리꽃 어깨보호구"
+      },
+      "blackmere_mantle": {
+        "name": "검은호수 어깨걸이"
+      },
+      "blackmere_shoulderpads": {
+        "name": "검은호수 어깨덧대"
+      },
+      "blackmere_shoulderguards": {
+        "name": "검은호수 어깨받이"
+      },
+      "blackmere_pauldrons": {
+        "name": "검은호수 어깨갑옷"
+      },
+      "blackmere_spaulders": {
+        "name": "검은호수 어깨보호구"
+      },
+      "reedhush_mantle": {
+        "name": "갈대고요 어깨걸이"
+      },
+      "reedhush_shoulderpads": {
+        "name": "갈대고요 어깨덧대"
+      },
+      "reedhush_shoulderguards": {
+        "name": "갈대고요 어깨받이"
+      },
+      "reedhush_pauldrons": {
+        "name": "갈대고요 어깨갑옷"
+      },
+      "reedhush_spaulders": {
+        "name": "갈대고요 어깨보호구"
+      },
+      "cairnking_mantle": {
+        "name": "돌무덤왕 어깨걸이"
+      },
+      "cairnking_shoulderpads": {
+        "name": "돌무덤왕 어깨덧대"
+      },
+      "cairnking_shoulderguards": {
+        "name": "돌무덤왕 어깨받이"
+      },
+      "cairnking_pauldrons": {
+        "name": "돌무덤왕 어깨갑옷"
+      },
+      "cairnking_spaulders": {
+        "name": "돌무덤왕 어깨보호구"
+      },
+      "palehunt_mantle": {
+        "name": "창백한사냥 어깨걸이"
+      },
+      "palehunt_shoulderpads": {
+        "name": "창백한사냥 어깨덧대"
+      },
+      "palehunt_shoulderguards": {
+        "name": "창백한사냥 어깨받이"
+      },
+      "palehunt_pauldrons": {
+        "name": "창백한사냥 어깨갑옷"
+      },
+      "palehunt_spaulders": {
+        "name": "창백한사냥 어깨보호구"
+      },
+      "jadeshrine_mantle": {
+        "name": "비취사당 어깨걸이"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "비취사당 어깨덧대"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "비취사당 어깨받이"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "비취사당 어깨갑옷"
+      },
+      "jadeshrine_spaulders": {
+        "name": "비취사당 어깨보호구"
+      },
+      "gildhedge_mantle": {
+        "name": "금빛울타리 어깨걸이"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "금빛울타리 어깨덧대"
+      },
+      "gildhedge_spaulders": {
+        "name": "금빛울타리 어깨보호구"
+      },
+      "saltwrack_mantle": {
+        "name": "소금난파 어깨걸이"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "소금난파 어깨덧대"
+      },
+      "saltwrack_spaulders": {
+        "name": "소금난파 어깨보호구"
+      },
+      "brookwatch_vest": {
+        "name": "개울감시 조끼"
+      },
+      "brookwatch_trousers": {
+        "name": "개울감시 바지"
+      },
+      "brookwatch_moccasins": {
+        "name": "개울감시 모카신"
+      },
+      "brookwatch_cowl": {
+        "name": "개울감시 카울"
+      },
+      "brookwatch_mitts": {
+        "name": "개울감시 벙어리장갑"
+      },
+      "brookwatch_epaulets": {
+        "name": "개울감시 견장"
+      },
+      "brookwatch_cinch": {
+        "name": "개울감시 조임띠"
+      },
+      "hedgerow_vest": {
+        "name": "산울타리 조끼"
+      },
+      "hedgerow_trousers": {
+        "name": "산울타리 바지"
+      },
+      "hedgerow_moccasins": {
+        "name": "산울타리 모카신"
+      },
+      "hedgerow_cowl": {
+        "name": "산울타리 카울"
+      },
+      "hedgerow_mitts": {
+        "name": "산울타리 벙어리장갑"
+      },
+      "hedgerow_epaulets": {
+        "name": "산울타리 견장"
+      },
+      "hedgerow_cinch": {
+        "name": "산울타리 조임띠"
+      },
+      "bogwalker_vest": {
+        "name": "늪방랑자 조끼"
+      },
+      "bogwalker_trousers": {
+        "name": "늪방랑자 바지"
+      },
+      "bogwalker_moccasins": {
+        "name": "늪방랑자 모카신"
+      },
+      "bogwalker_cowl": {
+        "name": "늪방랑자 카울"
+      },
+      "bogwalker_mitts": {
+        "name": "늪방랑자 벙어리장갑"
+      },
+      "bogwalker_epaulets": {
+        "name": "늪방랑자 견장"
+      },
+      "bogwalker_cinch": {
+        "name": "늪방랑자 조임띠"
+      },
+      "thornspire_vest": {
+        "name": "가시첨탑 조끼"
+      },
+      "thornspire_trousers": {
+        "name": "가시첨탑 바지"
+      },
+      "thornspire_moccasins": {
+        "name": "가시첨탑 모카신"
+      },
+      "thornspire_cowl": {
+        "name": "가시첨탑 카울"
+      },
+      "thornspire_mitts": {
+        "name": "가시첨탑 벙어리장갑"
+      },
+      "thornspire_epaulets": {
+        "name": "가시첨탑 견장"
+      },
+      "thornspire_cinch": {
+        "name": "가시첨탑 조임띠"
+      },
+      "hollowveil_vest": {
+        "name": "그늘장막 조끼"
+      },
+      "hollowveil_trousers": {
+        "name": "그늘장막 바지"
+      },
+      "hollowveil_moccasins": {
+        "name": "그늘장막 모카신"
+      },
+      "hollowveil_cowl": {
+        "name": "그늘장막 카울"
+      },
+      "hollowveil_mitts": {
+        "name": "그늘장막 벙어리장갑"
+      },
+      "hollowveil_epaulets": {
+        "name": "그늘장막 견장"
+      },
+      "hollowveil_cinch": {
+        "name": "그늘장막 조임띠"
+      },
+      "trailwarden_vest": {
+        "name": "길지킴이 조끼"
+      },
+      "trailwarden_trousers": {
+        "name": "길지킴이 바지"
+      },
+      "trailwarden_moccasins": {
+        "name": "길지킴이 모카신"
+      },
+      "trailwarden_cowl": {
+        "name": "길지킴이 카울"
+      },
+      "trailwarden_mitts": {
+        "name": "길지킴이 벙어리장갑"
+      },
+      "trailwarden_epaulets": {
+        "name": "길지킴이 견장"
+      },
+      "trailwarden_cinch": {
+        "name": "길지킴이 조임띠"
+      },
+      "highgale_vest": {
+        "name": "높바람 조끼"
+      },
+      "highgale_trousers": {
+        "name": "높바람 바지"
+      },
+      "highgale_moccasins": {
+        "name": "높바람 모카신"
+      },
+      "highgale_cowl": {
+        "name": "높바람 카울"
+      },
+      "highgale_mitts": {
+        "name": "높바람 벙어리장갑"
+      },
+      "highgale_epaulets": {
+        "name": "높바람 견장"
+      },
+      "highgale_cinch": {
+        "name": "높바람 조임띠"
+      },
+      "breakwater_shoulderguards": {
+        "name": "방파제 어깨받이"
+      },
+      "breakwater_pauldrons": {
+        "name": "방파제 어깨갑옷"
+      },
+      "breakwater_epaulets": {
+        "name": "방파제 견장"
+      },
+      "gravebell_moccasins": {
+        "name": "무덤종 모카신"
+      },
+      "oathbroken_trousers": {
+        "name": "맹세파기 바지"
+      },
+      "sparkglass_trousers": {
+        "name": "불꽃수정 바지"
+      },
+      "stillhymn_moccasins": {
+        "name": "고요찬가 모카신"
+      },
+      "sealkeeper_mitts": {
+        "name": "봉인지기 벙어리장갑"
+      },
+      "fetterbound_trousers": {
+        "name": "족쇄속박 바지"
+      },
+      "wyrmshadow_vest": {
+        "name": "용그림자 조끼"
+      },
+      "cinderbrood_spaulders": {
+        "name": "잿불무리 어깨보호구"
+      },
+      "cinderbrood_epaulets": {
+        "name": "잿불무리 견장"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "서리꽃 어깨받이"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "서리꽃 어깨갑옷"
+      },
+      "hoarfrost_epaulets": {
+        "name": "서리꽃 견장"
+      },
+      "blackmere_epaulets": {
+        "name": "검은호수 견장"
+      },
+      "reedhush_epaulets": {
+        "name": "갈대고요 견장"
+      },
+      "cairnking_epaulets": {
+        "name": "돌무덤왕 견장"
+      },
+      "palehunt_epaulets": {
+        "name": "창백한사냥 견장"
+      },
+      "jadeshrine_epaulets": {
+        "name": "비취사당 견장"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "금빛울타리 어깨받이"
+      },
+      "gildhedge_pauldrons": {
+        "name": "금빛울타리 어깨갑옷"
+      },
+      "gildhedge_epaulets": {
+        "name": "금빛울타리 견장"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "소금난파 어깨받이"
+      },
+      "saltwrack_pauldrons": {
+        "name": "소금난파 어깨갑옷"
+      },
+      "saltwrack_epaulets": {
+        "name": "소금난파 견장"
+      },
+      "muster_shardpike": {
+        "name": "소집대 조각창"
+      },
+      "knucklebone_of_balgath": {
+        "name": "발가스의 손마디뼈"
+      },
+      "muster_standard": {
+        "name": "소집대 군기"
+      },
+      "guttered_eye": {
+        "name": "꺼져가는 눈"
+      },
+      "barrowstone_heart": {
+        "name": "봉분석 심장"
+      },
+      "muster_grapnel": {
+        "name": "소집대 갈고리"
+      },
+      "craterglass_stave": {
+        "name": "운석유리 지팡이"
+      },
+      "gravedirt_treads": {
+        "name": "무덤흙 장화"
+      },
+      "bellrope_girdle": {
+        "name": "종줄 허리띠"
+      },
+      "sextons_spadehaft": {
+        "name": "성구지기의 삽자루"
+      },
+      "rimesilk_mantle": {
+        "name": "서리비단 어깨망토"
+      },
+      "bonechill_carapace_vest": {
+        "name": "뼈서리 사슬갑옷"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "서리끈 다리보호구"
+      },
+      "rimeweb_fang": {
+        "name": "신부의 고드름"
+      },
+      "cantors_cassock": {
+        "name": "성가대장의 사제복"
+      },
+      "choirward_leggings": {
+        "name": "성가수호 다리보호구"
+      },
+      "choristers_gloves": {
+        "name": "성가대원의 장갑"
+      },
+      "cantors_hymnal": {
+        "name": "성가대장의 찬송가집"
+      },
+      "gravecallers_vestments": {
+        "name": "무덤부름의 제의"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "불안한 추적자의 두건"
+      },
+      "sextons_burial_spade": {
+        "name": "성구지기의 매장삽"
+      },
+      "rimesilk_hood": {
+        "name": "서리비단 두건"
+      },
+      "knight_commanders_longsword": {
+        "name": "기사단장의 장검"
+      },
+      "gaolers_chain_girdle": {
+        "name": "간수의 사슬 허리띠"
+      },
+      "rusted_shackle_grips": {
+        "name": "녹슨 족쇄 장갑"
+      },
+      "drowned_wardens_mantle": {
+        "name": "익사한 감시자의 망토"
+      },
+      "gaolyard_cudgel": {
+        "name": "감옥 뜰의 곤봉"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "익사한 지휘관의 흉갑"
+      },
+      "gaolyard_striders": {
+        "name": "감옥 뜰의 장화"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "간수의 강철 건틀릿"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "옥지기의 열쇠고리 허리띠"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "옥지기의 등불 두건"
+      },
+      "conchplate_girdle": {
+        "name": "소라판 허리띠"
+      },
+      "pale_chorus_leggings": {
+        "name": "창백한 합창 다리보호구"
+      },
+      "refrain_silk_gloves": {
+        "name": "후렴 비단 장갑"
+      },
+      "chorus_conch": {
+        "name": "합창의 소라고둥"
+      },
+      "tideglass_pauldrons": {
+        "name": "조수유리 어깨보호구"
+      },
+      "moonburn_treads": {
+        "name": "달그을림 신발"
+      },
+      "prism_etched_cowl": {
+        "name": "프리즘 새김 두건"
+      },
+      "tideglass_shiv": {
+        "name": "조수유리 단도"
+      },
+      "pale_chorus_vestment": {
+        "name": "창백한 합창 제의"
+      },
+      "tideglass_warmaul": {
+        "name": "조수유리 전투망치"
+      },
+      "beastpit_warbelt": {
+        "name": "야수 구덩이 전투 허리띠"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "재규어 가죽 조끼"
+      },
+      "hexbone_handwraps": {
+        "name": "저주뼈 손싸개"
+      },
+      "rootbound_sabatons": {
+        "name": "뿌리 얽힌 철장화"
+      },
+      "pollen_dusted_leggings": {
+        "name": "꽃가루 묻은 다리보호구"
+      },
+      "bloomsilk_cowl": {
+        "name": "꽃비단 두건"
+      },
+      "falls_blessed_staff": {
+        "name": "폭포의 축복을 받은 지팡이"
+      },
+      "fanglords_hide_mantle": {
+        "name": "송곳니 군주의 가죽 어깨걸이"
+      },
+      "thornroot_greathelm": {
+        "name": "가시관 대투구"
+      },
+      "foremans_grips": {
+        "name": "십장의 장갑"
+      },
+      "serac_stride_boots": {
+        "name": "빙탑 걸음 장화"
+      },
+      "seal_rune_mantle": {
+        "name": "봉인 룬 어깨망토"
+      },
+      "thawbound_legguards": {
+        "name": "해빙 족쇄 다리보호구"
+      },
+      "pyre_tenders_hood": {
+        "name": "화장터지기의 두건"
+      },
+      "meltwater_cord": {
+        "name": "녹은 물 허리끈"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "열린 자물쇠의 망치"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "깨움 의식의 예복"
+      },
+      "spadeworn_gauntlets": {
+        "name": "삽에 닳은 건틀릿"
+      },
+      "gravedirt_grips": {
+        "name": "무덤흙 장갑"
+      },
+      "bellrope_mitts": {
+        "name": "종줄 벙어리장갑"
+      },
+      "rimewreath_coif": {
+        "name": "서리화관 사슬두건"
+      },
+      "rime_laced_hood": {
+        "name": "서리끈 두건"
+      },
+      "lamenting_veil": {
+        "name": "애도의 면사포"
+      },
+      "choirward_pauldrons": {
+        "name": "성가수호 어깨갑옷"
+      },
+      "choristers_spaulders": {
+        "name": "성가대원의 어깨보호구"
+      },
+      "cantors_stole": {
+        "name": "성가대장의 영대"
+      },
+      "knellbound_hauberk": {
+        "name": "조종에 묶인 사슬갑옷"
+      },
+      "candlewatch_jerkin": {
+        "name": "촛불지기 가죽조끼"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "불안한 의식의 로브"
+      },
+      "gravecallers_rod": {
+        "name": "무덤부름의 홀"
+      },
+      "portcullis_girdle": {
+        "name": "쇠창살문 허리띠"
+      },
+      "cellwatch_belt": {
+        "name": "감방 감시 허리띠"
+      },
+      "lanternwick_sash": {
+        "name": "등불심지 장식띠"
+      },
+      "turnkeys_shank": {
+        "name": "옥지기의 수제 칼"
+      },
+      "gaolyard_jerkin": {
+        "name": "감옥 뜰의 가죽조끼"
+      },
+      "brinewarden_robe": {
+        "name": "짠물 감시자의 로브"
+      },
+      "fogbinders_rod": {
+        "name": "안개엮는자의 홀"
+      },
+      "conchplate_sabatons": {
+        "name": "소라판 쇠장화"
+      },
+      "pale_chorus_slippers": {
+        "name": "창백한 합창 덧신"
+      },
+      "tideglass_gauntlets": {
+        "name": "조수유리 건틀릿"
+      },
+      "moonburn_grips": {
+        "name": "달그을림 장갑"
+      },
+      "prism_etched_handwraps": {
+        "name": "프리즘 새김 손싸개"
+      },
+      "mere_crested_helm": {
+        "name": "호수볏 투구"
+      },
+      "mereskin_hood": {
+        "name": "호수뱀가죽 두건"
+      },
+      "merewater_cowl": {
+        "name": "호숫물 두건"
+      },
+      "merecleaver": {
+        "name": "호수가르개 대도끼"
+      },
+      "moonwrack_stave": {
+        "name": "달파멸 지팡이"
+      },
+      "membership_token": {
+        "name": "멤버십 토큰 (30일)"
+      },
+      "referral_satchel": {
+        "name": "우정 가방"
+      },
+      "referral_hollow_charm": {
+        "name": "공허의 우정 부적"
+      },
+      "referral_fog_charm": {
+        "name": "안개에 싸인 우정 부적"
+      },
+      "reins_referral_tank": {
+        "name": "우정 전차 고삐"
+      },
+      "reins_referral_raptor": {
+        "name": "우정 랩터 고삐"
+      },
+      "referral_helmet": {
+        "name": "우정의 투구"
+      },
+      "referral_shoulder": {
+        "name": "우정의 어깨갑옷"
+      },
+      "referral_chest": {
+        "name": "우정의 흉갑"
+      },
+      "referral_waist": {
+        "name": "우정의 허리띠"
+      },
+      "referral_legs": {
+        "name": "우정의 다리갑옷"
+      },
+      "referral_gloves": {
+        "name": "우정의 건틀릿"
+      },
+      "referral_feet": {
+        "name": "우정의 장화"
+      },
+      "membership_helmet": {
+        "name": "멤버십 투구"
+      },
+      "membership_shoulder": {
+        "name": "멤버십 견갑"
+      },
+      "membership_chest": {
+        "name": "멤버십 흉갑"
+      },
+      "membership_waist": {
+        "name": "멤버십 허리띠"
+      },
+      "membership_legs": {
+        "name": "멤버십 다리보호구"
+      },
+      "membership_gloves": {
+        "name": "멤버십 건틀릿"
+      },
+      "membership_feet": {
+        "name": "멤버십 장화"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -19306,6 +22117,24 @@ export const ko_KR: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "도가니의 심장"
       },
+      "gaolers_iron_key": {
+        "name": "간수의 쇠열쇠"
+      },
+      "fanglords_whistle": {
+        "name": "송곳니 군주의 호루라기"
+      },
+      "gorgebloom_seedpod": {
+        "name": "탐식화 씨앗꼬투리"
+      },
+      "foremans_last_link": {
+        "name": "십장의 마지막 고리"
+      },
+      "phial_of_the_tithe": {
+        "name": "십일조의 약병"
+      },
+      "quenchwater_flask": {
+        "name": "담금질 물 플라스크"
+      },
       "rift_watchers_band": {
         "name": "균열 감시자의 반지"
       },
@@ -19440,6 +22269,9 @@ export const ko_KR: EnTranslations = {
       "restless_bones": {
         "name": "불안한 뼈무더기"
       },
+      "marrow_restless_bones": {
+        "name": "불안한 뼈무더기"
+      },
       "gorrak": {
         "name": "무자비한 고라크"
       },
@@ -19557,6 +22389,75 @@ export const ko_KR: EnTranslations = {
       "morthen": {
         "name": "무덤부름 모르덴"
       },
+      "ossuary_sentinel": {
+        "name": "납골당 파수병"
+      },
+      "hollow_gravedigger": {
+        "name": "공허의 무덤파기꾼"
+      },
+      "rime_egg_sac": {
+        "name": "서리 알주머니"
+      },
+      "rimeweb_hatchling": {
+        "name": "서리거미줄 새끼거미"
+      },
+      "rimeweb_spinner": {
+        "name": "서리거미줄 실잣는거미"
+      },
+      "candlewright_acolyte": {
+        "name": "초장이 수행사제"
+      },
+      "hollow_chorister": {
+        "name": "공허의 성가대원"
+      },
+      "bound_soul": {
+        "name": "속박된 영혼"
+      },
+      "rimeweb": {
+        "name": "뼈서리의 귀부인"
+      },
+      "cantor_ilvane": {
+        "name": "성가대장 일베인"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "납골당 전사"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "무덤부름 수련생"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "납골당 멱따개"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "무덤부름 강령술사"
+      },
+      "crypt_bone_minion": {
+        "name": "뼈 하수인"
+      },
+      "crypt_bone_brute": {
+        "name": "뼈 야수병"
+      },
+      "crypt_bone_pile": {
+        "name": "꿈틀거리는 뼈"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "예배당 가고일"
+      },
+      "crypt_crow_caller": {
+        "name": "까마귀 부르미"
+      },
+      "crypt_carrion_crow": {
+        "name": "썩은고기 까마귀"
+      },
+      "crypt_ossuary_drake": {
+        "name": "납골당 뼈드레이크"
+      },
+      "crypt_knellwyrm": {
+        "name": "조종룡"
+      },
+      "crypt_remembrance_candle": {
+        "name": "추모의 양초"
+      },
       "bastion_revenant": {
         "name": "요새 망령"
       },
@@ -19571,6 +22472,102 @@ export const ko_KR: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "안개엮는자 바엘"
+      },
+      "drowned_watchman": {
+        "name": "익사한 파수꾼"
+      },
+      "fogbound_arbalest": {
+        "name": "안개에 묶인 쇠뇌병"
+      },
+      "barnacle_crawler": {
+        "name": "난파선에 묶인 선원"
+      },
+      "bastion_warhound": {
+        "name": "요새 전투견"
+      },
+      "mistweaver": {
+        "name": "안개 영창자"
+      },
+      "drowned_sergeant": {
+        "name": "익사한 부사관"
+      },
+      "shackled_prisoner": {
+        "name": "족쇄 찬 죄수"
+      },
+      "gaol_turnkey": {
+        "name": "감옥 열쇠지기"
+      },
+      "turretback_hermit": {
+        "name": "난파선 선장"
+      },
+      "vael_fog_shade": {
+        "name": "안개엮는자 바엘"
+      },
+      "gaoler_ossick": {
+        "name": "간수 오시크"
+      },
+      "bastion_gaol_cage": {
+        "name": "강철 우리"
+      },
+      "bastion_drowned_anchor": {
+        "name": "익사의 닻"
+      },
+      "lagoon_snapper": {
+        "name": "석호 늑대거북"
+      },
+      "ice_wraith": {
+        "name": "얼음 망령"
+      },
+      "moonlit_siren": {
+        "name": "달빛 세이렌"
+      },
+      "tidewisp": {
+        "name": "조수 정령"
+      },
+      "drowned_pilgrim": {
+        "name": "익사한 순례자"
+      },
+      "mere_hydra_head_left": {
+        "name": "호수 히드라"
+      },
+      "mere_hydra_head_center": {
+        "name": "호수 히드라"
+      },
+      "mere_hydra_head_right": {
+        "name": "호수 히드라"
+      },
+      "tideglass_colossus": {
+        "name": "조수유리 거상"
+      },
+      "tideglass_reflection": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_priest": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_mage": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_druid": {
+        "name": "조수유리 투영체"
       },
       "sanctum_boneguard": {
         "name": "성소 뼈수호자"
@@ -19725,8 +22722,26 @@ export const ko_KR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "천자르, 깨어나는 봉우리"
       },
+      "balgath_cyclops": {
+        "name": "발가스, 외눈의 감독관"
+      },
       "thunzharr_stormling": {
         "name": "깨어난 폭풍 정령"
+      },
+      "muster_footman": {
+        "name": "소집대 보병"
+      },
+      "muster_chaplain": {
+        "name": "소집대 군목"
+      },
+      "muster_sergeant": {
+        "name": "소집대 부사관"
+      },
+      "muster_drillmaster": {
+        "name": "소집대 교관"
+      },
+      "muster_effigy": {
+        "name": "짚 감독관"
       },
       "stable_horse": {
         "name": "마구간 말"
@@ -20100,8 +23115,179 @@ export const ko_KR: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "송곳니 군주 야수조련사"
       },
+      "sunbone_totem_binder": {
+        "name": "태양뼈 토템 결속자"
+      },
+      "sunbone_totem": {
+        "name": "태양뼈 토템"
+      },
+      "sunbone_dread_totem": {
+        "name": "태양뼈 공포 토템"
+      },
+      "basin_raptor": {
+        "name": "분지 랩터"
+      },
+      "spore_toad": {
+        "name": "포자 두꺼비"
+      },
+      "vine_lasher": {
+        "name": "엉킨덩굴 채찍꾼"
+      },
+      "great_saurian": {
+        "name": "거대 용각수"
+      },
+      "howdah_hexcaller": {
+        "name": "가마 사술사"
+      },
+      "fanglord_jaguar": {
+        "name": "송곳니 군주의 거대 재규어"
+      },
+      "the_gorgebloom": {
+        "name": "탐식화"
+      },
       "wildheart_high_priest": {
         "name": "분지의 목소리 줄가르"
+      },
+      "broodsworn_thawcaller": {
+        "name": "용서약단 해빙술사"
+      },
+      "broodsworn_goadsmith": {
+        "name": "용서약단 몰이막대장이"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "용서약단 장작불지기"
+      },
+      "soul_brazier": {
+        "name": "영혼 화로"
+      },
+      "rime_whelp": {
+        "name": "서리 새끼용"
+      },
+      "ogre_sledge_hauler": {
+        "name": "썰매 끄는 오우거"
+      },
+      "glacier_splinter": {
+        "name": "빙하 파편"
+      },
+      "sledge_tusker": {
+        "name": "썰매 끄는 거대엄니"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "망치 족쇄"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "집게 족쇄"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "모루 족쇄"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "풀무 족쇄"
+      },
+      "thorn_sprout": {
+        "name": "가시 새싹"
+      },
+      "buddy_ember_fox": {
+        "name": "잉걸불 여우"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "잿불낙하 불사조"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "진홍 집게 게"
+      },
+      "buddy_golden_sentinel": {
+        "name": "황금 파수병"
+      },
+      "buddy_nightfang": {
+        "name": "밤엄니"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "엄니뿔 멧돼지"
+      },
+      "buddy_emerald_wolf": {
+        "name": "에메랄드 늑대"
+      },
+      "buddy_tiger": {
+        "name": "호랑이"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "트롤페이스"
+      },
+      "buddy_ansem": {
+        "name": "안셈"
+      },
+      "buddy_triple_t": {
+        "name": "트리플 T"
+      },
+      "buddy_kekius": {
+        "name": "케키우스"
+      },
+      "buddy_solbot": {
+        "name": "솔봇"
+      },
+      "buddy_frostfire": {
+        "name": "서리불꽃"
+      },
+      "buddy_rocky": {
+        "name": "로키"
+      },
+      "buddy_proud_grunt": {
+        "name": "자랑스러운 병졸"
+      },
+      "buddy_loot_goblin": {
+        "name": "전리품 고블린"
+      },
+      "buddy_penny_goldspark": {
+        "name": "페니 골드스파크"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "알파카"
+      },
+      "buddy_horse": {
+        "name": "말"
+      },
+      "buddy_sapling": {
+        "name": "어린 나무"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "거미"
+      },
+      "buddy_raptor": {
+        "name": "랩터"
+      },
+      "buddy_skeleton": {
+        "name": "해골"
+      },
+      "buddy_crystal_lich": {
+        "name": "수정 리치"
+      },
+      "buddy_forgemaw": {
+        "name": "용융의 화로아귀"
+      },
+      "buddy_crystal_tide": {
+        "name": "수정 물결"
+      },
+      "buddy_phantom": {
+        "name": "팬텀"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"
@@ -20185,7 +23371,7 @@ export const ko_KR: EnTranslations = {
         "name": "창백한 성가대 수습 사제"
       },
       "pearlguard_sentinel": {
-        "name": "진주수호 파수병"
+        "name": "달망토 가오리"
       },
       "sethrael_palecoil": {
         "name": "페일코일의 세스라엘"
@@ -20375,6 +23561,16 @@ export const ko_KR: EnTranslations = {
         "name": "감시관 펜윅",
         "title": "펜브리지 감시관",
         "greeting": "문 앞에서 멈추십시오, {className}. 갈대 너머의 수렁은 우리 대신 사람을 죽입니다."
+      },
+      "socketwright_skerrit": {
+        "name": "마벤 스케릿",
+        "title": "박음 장인",
+        "greeting": "그 눈을 갈아 그의 눈구멍에 박아 넣은 지 사십 년, 하루치 값도 못 받았다. 감독관에게 아픔을 주고 싶나, {className}? 그렇다면 내 작품을 노려라."
+      },
+      "muster_commander": {
+        "name": "소집대 지휘관",
+        "title": "펜브리지 소집대",
+        "greeting": "먼저 창, 그다음이 모두다, {className}. 그게 전부고, 그게 이 진영을 살려 왔다."
       },
       "brother_aldric_fen": {
         "name": "알드릭 수사",
@@ -20891,6 +24087,11 @@ export const ko_KR: EnTranslations = {
         "title": "부두 대련 사범",
         "greeting": "내 뒤에 있는 허수아비는 되받아치지도, 쓰러지지도 않는다, {className}. 중요한 건 장부다. 네가 저기에 꽂은 일격은 하나도 빠짐없이 피해량 미터가 세어 준다. 저것을 대상으로 삼고 미터를 열어라, 나머지는 내가 알려주마."
       },
+      "cantor_laverock": {
+        "name": "라베록",
+        "title": "창백한 성가대의 마지막 선창자",
+        "greeting": "나는 창백한 성가대에서 가장 어린 목소리였소. 의식의 밤, 나는 마시지 않고 도망쳤지. 그 뒤로 보름달이 뜰 때마다 물 아래에서 그들이 노래하는 소리가 들리오. 죽기 전에 그분을 직접 봐야 하오. 뒤에서 걷게 해 주시오. 싸우지도 않고, 짐이 되지도 않겠소."
+      },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
         "title": "조수지기",
@@ -21114,6 +24315,52 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "펜브리지 소집 명령서"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "소집대의 부름",
+        "text": "내줄 수 있는 창은 모두 낙성 분화구 주위에 진을 쳤다, {playerName}. 거기서 걸어 나오는 놈을 둘러싸기 위해서다. 소집대 지휘관은 분화구를 내려다보는 남쪽 둔덕의 진영을 지키고 있다. 여기서 남동쪽이다. 지휘관에게 보고해라. 놈과 싸우는 법을 듣게 될 거다. 잘 들어라. 듣지 않은 자들은 갈대밭에 누워 있다.",
+        "completion": "펜윅의 전령인가? 좋다. 한 번만 말하겠다, 놈은 아예 말해 주지 않으니까. 발가스는 우리 초소들을 돈다: 분화구 가장자리, 서쪽 평지, 남쪽 둔덕, 남서쪽 가장자리의 틈, 그리고 다시 한 바퀴. 멈춰 선 초소는 모두 짓밟힌다. 강철은 놈에게 먹히지 않는다. 가죽이 튕겨 내고, 놈을 베기만 하는 공격대는 지쳐서 죽는다. 유일한 약점은 눈이다. 버틴 창을 배로글라스에 꿰뚫으면 놈은 눈이 멀고, 눈이 먼 동안 가죽이 벗겨진다. 그때가 공격대 전원이 세게 칠 때다. 그러고 나면 가죽이 다시 닫히고 우리는 다음 기회를 기다린다. 먼저 창, 그다음이 모두다, {playerName}. 거치대는 레벨 19 이하의 신병에게만 창을 빌려준다. 젊은 놈들이 눈을 찌르고, 노병들이 그 틈을 살린다.",
+        "objectives": {
+          "0": {
+            "label": "소집대 지휘관에게 보고"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "먼저 창",
+        "text": "말은 싸지만 창은 싸지 않다. 내 옆 거치대에서 조각창을 가져가라. 그다음 진영 서쪽 끝의 짚 감독관에게 가라. 녀석들이 판자와 짚으로 진짜의 절반 크기로 만든 것인데, 눈 자리에 등불이 들어 있다. 창을 세우고, 교관이 땅을 내리치는 동안에도 창끝을 곧게 유지해라. 진짜는 더 세게 흔들어 대니까. 팔이 확실해지면 창끝을 등불에 꽂아라. 판자가 떨어져 나간다: 그러면 자신의 무기로 쳐 봐라, {playerName}. 차이를 느낄 거다. 거치대는 레벨 19 이하의 신병에게만 창을 빌려준다.",
+        "completion": "먹히는 게 느껴졌지? 진짜라면 공격대 전원이 휘두르는 열네 번의 숨이다. 그리고 가죽이 다시 닫힌다. 이 교훈을 잊지 마라. 감독관이 시험할 거다.",
+        "objectives": {
+          "0": {
+            "label": "소집대 거치대에서 조각창을 가져감"
+          },
+          "1": {
+            "label": "짚 감독관의 등불을 끔"
+          },
+          "2": {
+            "label": "판자가 떨어진 동안 적중한 타격"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "감독관의 부스러기",
+        "text": "놈은 매주 다시 일어서고, 우리는 매주 다시 쓰러뜨린다. 그러려면 공격대가 필요한데, 소집대만으로는 꾸릴 수 없다. 발가스를 치러 가는 다음 공격대를 찾아 놈을 쓰러뜨리는 걸 도와라, {playerName}. 놈을 베든, 베는 자들을 지키든, 치료하든 좋다. 놈과 싸운 손은 모두 인정된다. 놈이 쓰러지면 돌아와서 내게 보고해라. 소집대는 처치할 때마다 값을 치른다.",
+        "completion": "또 쓰러뜨렸군. 그리고 너도 그 싸움에 있었지. 오늘 밤 안에 펜브리지로 보고를 보내겠다. 이렇게 멀리 나와 있으니 주머니가 얇지만, 이건 네 몫이다. 놈이 다시 일어서면 돌아와라.",
+        "objectives": {
+          "0": {
+            "label": "발가스 처치"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "박음 장인의 미수금",
+        "text": "그 눈구멍에 배로글라스를 박은 건 나였다. 렌즈를 갈고, 앉히고, 쐐기로 곧게 고정했지. 봉분의 주인들은 동화 한 푼 주지 않았고, 이제 내 작품이 늪을 짓밟으며 돌아다닌다. 내 조각창을 가져가라. 밑동을 박고, 창끝을 세워 얼마가 걸리든 버텨라. 팔이 확실해지면 그것을 눈에 꽂아라. 그가 걸친 가죽은 그 조각에 묶여 있다, {playerName}. 그를 실명시켜라. 그러면 늪의 모든 칼날이 마침내 먹힌다.",
+        "completion": "뚫리는 느낌이 들었지? 사십 년치 이자를 눈구멍으로 받아냈다. 창은 네 것이다, 친구. 그는 낫는다, 늘 그러니까. 그러니 마음이 동할 때 또 받으러 가면 된다.",
+        "objectives": {
+          "0": {
+            "label": "감독관의 눈을 찌르기"
           }
         }
       },
@@ -23298,6 +26545,12 @@ export const ko_KR: EnTranslations = {
           },
           "7": {
             "label": "가라앉은 요새"
+          },
+          "8": {
+            "label": "봉분의 영역"
+          },
+          "9": {
+            "label": "별똥 분화구"
           }
         }
       },
@@ -23710,7 +26963,7 @@ export const ko_KR: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "야생심장 분지",
-        "enterText": "따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.",
+        "enterText": "우상의 아가리를 지나자 분지 높이 걸린 바위 턱이 나타난다. 폭포가 절벽 가장자리에서 쏟아져 내리고, 저 아래에서는 무언가 거대한 것이 여울을 건너고 있다.",
         "leaveText": "돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다."
       },
       "the_last_keep": {
@@ -23931,6 +27184,16 @@ export const ko_KR: EnTranslations = {
         "sender": "거래소 중개인",
         "subject": "거래소 구매 물품",
         "body": "거래가 정산되어 물품은 이제 당신의 것입니다. 동봉된 소포에는 당신이 값을 치른 바로 그 물건이 들어 있습니다. 등록된 순간부터 대금이 정산될 때까지 거래소가 보관해 왔습니다.\n\n이 거래의 기록은 거래소 장부에 남습니다.\n\n- 거래소 중개인"
+      },
+      "membership_token_delivery": {
+        "sender": "레이븐포스트",
+        "subject": "멤버십 토큰 배송",
+        "body": "구매하신 토큰을 동봉했습니다. 사용하면 계정의 멤버십 기간에 30일이 추가되며, 다른 모험가와 거래할 수도 있습니다."
+      },
+      "membership_annual_reward": {
+        "sender": "까마귀 우편",
+        "subject": "연간 멤버십 탈것",
+        "body": "연간 멤버십 결제가 완료되었습니다. 전차 탈것 열쇠가 동봉되어 있습니다. 탈것을 소유하려면 열쇠를 가방이나 은행에 보관하세요. 멤버십이 만료되어도 소유권은 유지됩니다. 타기 기술이 필요합니다."
       },
       "woc_market_return": {
         "sender": "거래소 중개인",
@@ -24381,6 +27644,7 @@ export const ko_KR: EnTranslations = {
     "mailboxName": "우편함",
     "noticeboardName": "게시판",
     "farmPatchName": "텃밭",
-    "realmBuilderMonumentName": "왕국 건설자 기념비"
+    "realmBuilderMonumentName": "왕국 건설자 기념비",
+    "musterRackName": "소집대 무기 거치대"
   }
 };

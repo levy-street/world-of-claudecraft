@@ -5,7 +5,7 @@ import {
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { PlayerClass, WeaponSkinType } from '../../sim/types';
 import type { WeaponLayoutOverride } from './manifest';
-import { mechHeldWeaponOverride } from './manifest';
+import { type BodyPick, mechHeldWeaponOverride, playerVisualKey } from './manifest';
 
 /** A character's real, in-world appearance for the char-select / char-sheet
  *  turntable: body class, appearance skin, whether it is the class rig or the
@@ -20,6 +20,26 @@ export interface PreviewAppearance {
   weaponSkinId?: string | null;
   /** Optional for older character-summary callers; absent renders no offhand. */
   offhandItemId?: string | null;
+  /** The creation pick, which selects a WOC class's body file (the female warrior). */
+  appearance?: BodyPick;
+  /** Hide the default kit's helmet on a roster preview without equipment data. */
+  helmHidden?: boolean;
+}
+
+/** The roster summary's preview fields, without transport or asset-loading state. */
+export function charselectPreviewAppearance(
+  c: Partial<Omit<PreviewAppearance, 'cls'>> & { class: PlayerClass },
+): PreviewAppearance {
+  return {
+    cls: c.class,
+    skin: c.skin ?? 0,
+    skinCatalog: c.skinCatalog ?? 'class',
+    mainhandItemId: c.mainhandItemId ?? null,
+    offhandItemId: c.offhandItemId ?? null,
+    weaponSkinId: c.weaponSkinId ?? null,
+    appearance: c.appearance,
+    helmHidden: c.helmHidden ?? false,
+  };
 }
 
 /** The model key + held-weapon layout the appearance resolves to. */
@@ -37,7 +57,7 @@ export interface PreviewVisual {
 export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
   const mech = a.skinCatalog === 'mech';
   return {
-    visualKey: mech ? 'player_mech' : `player_${a.cls}`,
+    visualKey: mech ? 'player_mech' : playerVisualKey(a.cls, a.appearance),
     weaponItemId: a.mainhandItemId ?? null,
     offhandItemId: a.offhandItemId ?? null,
     weaponOverride: mech ? mechHeldWeaponOverride(a.cls) : null,
@@ -111,5 +131,5 @@ export function appearanceSignature(a: PreviewAppearance): string {
   // weaponSkinId is part of the identity: without it, applying or removing an
   // Armory skin while a preview is mounted elides as "same appearance" and the
   // stale weapon model survives the repaint.
-  return `${a.cls}|${a.skin}|${a.skinCatalog}|${a.mainhandItemId ?? ''}|${a.offhandItemId ?? ''}|${a.weaponSkinId ?? ''}`;
+  return `${playerVisualKey(a.cls, a.appearance)}|${a.skin}|${a.skinCatalog}|${a.mainhandItemId ?? ''}|${a.offhandItemId ?? ''}|${a.weaponSkinId ?? ''}|${a.helmHidden ?? false}`;
 }

@@ -8,13 +8,20 @@ import { describe, expect, it } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import {
   type ClipMap,
+  KAYKIT_PRIEST,
+  KAYKIT_ROGUE,
+  KAYKIT_SHAMAN,
+  KAYKIT_WARLOCK,
   manifestUrls,
   manifestUrlsForGraphics,
+  NPC_PROP_ATTACH,
+  playerVisualKey,
   SKINS,
   VISUALS,
   visibleAttachmentsForGraphics,
   visualKeyFor,
 } from '../src/render/characters/manifest';
+import { npcLookFor } from '../src/render/characters/npc_looks';
 import { MOBS, NPCS } from '../src/sim/data';
 
 function expectedClipNames(clips: ClipMap): string[] {
@@ -130,34 +137,58 @@ async function glbRenderableContract(path: string): Promise<{
 }
 
 describe('character visual manifest', () => {
-  it('keeps Bursar Fernando in his likeness atlas (the Eastbrook banker easter egg)', () => {
+  it('keeps Bursar Fernando in his likeness (the Eastbrook banker easter egg)', () => {
     // The maintainer-approved easter egg: black shoulder-length hair and light
-    // brown skin ride a repainted rogue palette resolved at skin index 0 (NPCs
-    // always resolve skin 0; the mech precedent for a real index-0 texture).
-    // The def must stay TINT-FREE: an entity tint would wash the repaint back
-    // toward the gold villager look. Do not "clean up" any of the three.
+    // brown skin. He wears it as an authored look on the rogue's body now
+    // (npc_looks.ts), a face the creator can make: the hair long and black, the
+    // skin a light brown, clean shaven.
     const key = visualKeyFor({
       kind: 'npc',
       templateId: 'bursar_fernando',
     } as never);
-    expect(key).toBe('npc_fernando');
+    expect(key).toBe('player_rogue');
+    const look = npcLookFor('bursar_fernando');
+    expect(look?.app.gender).toBe('male');
+    expect(look?.app.headHair).toBe('long');
+    expect(look?.app.headBeard).toBe('none');
+    expect(look?.app.hairLight).toBeLessThanOrEqual(0.1);
+    expect(look?.app.skinHue).toBeGreaterThanOrEqual(15);
+    expect(look?.app.skinHue).toBeLessThanOrEqual(40);
+    expect(look?.app.skinLight).toBeGreaterThanOrEqual(0.35);
+    expect(look?.app.skinLight).toBeLessThanOrEqual(0.6);
+    // His stock rig (the fallback for an NPC with no authored look) keeps the
+    // repainted rogue palette at skin index 0, and stays TINT-FREE: an entity
+    // tint would wash the repaint back toward the gold villager look. Do not
+    // "clean up" either.
     expect(VISUALS.npc_fernando.tint).toBeUndefined();
     const atlas = SKINS.npc_fernando?.[0];
     expect(atlas).toBe('textures/skins/rogue/fernando.png');
     expect(existsSync(fileURLToPath(new URL(`../public/${atlas}`, import.meta.url)))).toBe(true);
   });
 
-  it('resolves all three Chroniclers to the shared scholarly-mage visual', () => {
-    // One def, three tints: the per-NPC NpcDef color carries each identity,
-    // so the def must keep tint 'entity', and the three colors must stay
-    // pairwise distinct and off the bursar gold and auctioneer amethyst.
+  it('resolves all three Chroniclers to the mage body, staff and open tome in hand', () => {
+    // Three scholars, one class: each wears an authored look on the mage's body
+    // (npc_looks.ts) and holds the staff and the open spellbook.
     for (const templateId of [
       'chronicler_saul',
       'chronicler_osric_fenn',
       'chronicler_edda_hartwell',
     ]) {
-      expect(visualKeyFor({ kind: 'npc', templateId } as never)).toBe('npc_chronicler');
+      const look = npcLookFor(templateId);
+      expect(look?.cls, templateId).toBe('mage');
+      expect(look?.props, templateId).toBe('tome');
+      expect(visualKeyFor({ kind: 'npc', templateId } as never), templateId).toBe(
+        playerVisualKey('mage', look?.app),
+      );
     }
+    expect(NPC_PROP_ATTACH.tome.map((a) => a.url)).toEqual([
+      'models/weapons/staff_rare_b_violet.glb',
+      'models/weapons/spellbook_starter.glb',
+    ]);
+    // Their stock rig (the fallback for an NPC with no authored look): one def,
+    // three tints. The per-NPC NpcDef color carries each identity, so the def
+    // must keep tint 'entity', and the three colors must stay pairwise distinct
+    // and off the bursar gold and auctioneer amethyst.
     const visual = VISUALS.npc_chronicler;
     expect(visual.url).toBe('models/chars/players/mage.glb');
     expect(visual.show).toEqual(['Mage_Hat']);
@@ -403,7 +434,9 @@ describe('character visual manifest', () => {
   });
 
   it('points the rogue bespoke abilities at their synthesized clips in the rogue GLB', async () => {
-    const visual = VISUALS.player_rogue;
+    // The KayKit rogue (the `_modular` baseline since the WOC body took the
+    // class on 2026-09-18) still owns the bespoke one-shots.
+    const visual = KAYKIT_ROGUE;
     // The strangle one-shot (scripts/_add_garrote_choke_anim.mjs): a wire
     // pull to the chest, never the dagger swing the default rotation plays.
     expect(visual.clips.attackByAbility?.garrote).toBe('Garrote_Choke');
@@ -524,7 +557,7 @@ describe('character visual manifest', () => {
     ]);
   });
 
-  it('keeps the five Wildheart GLBs on short, non-loop-closed re-cut takes', async () => {
+  it('keeps the three Wildheart Tripo GLBs on short, non-loop-closed re-cut takes', async () => {
     // The original defect: the retarget batch baked an 8.46s 'Death' whose
     // final keyframe equalled its first (deviation 0.0000 on every channel).
     // visual.ts clamps death on its LAST frame and snap-seeds corpses to it,
@@ -540,8 +573,6 @@ describe('character visual manifest', () => {
       'mob_wildheart_stalker',
       'mob_wildheart_ravager',
       'mob_wildheart_hexcaller',
-      'mob_wildheart_beastmaster',
-      'mob_wildheart_high_priest',
     ] as const) {
       const visual = VISUALS[key];
       const doc = await io.read(`public/${visual.url}`);
@@ -638,22 +669,33 @@ describe('character visual manifest', () => {
     // (the same "faint wash" strength used elsewhere for model-sharing
     // differentiation, see mob_troll's 0.12 above), not just an upper bound,
     // so a future bump toward the wash can't silently pass this test.
-    for (const key of ['player_priest', 'player_shaman', 'player_warlock'] as const) {
-      const visual = VISUALS[key];
+    // Since the 2026-09-18 class sets every player class rides its own WOC
+    // body file, so the sharing tints live on the retired KayKit baselines
+    // (the `_modular` fallbacks still derive from them, tint dropped there).
+    for (const [key, visual] of [
+      ['KAYKIT_PRIEST', KAYKIT_PRIEST],
+      ['KAYKIT_SHAMAN', KAYKIT_SHAMAN],
+      ['KAYKIT_WARLOCK', KAYKIT_WARLOCK],
+    ] as const) {
       expect(typeof visual.tint, key).toBe('number');
       expect(visual.tintStrength, key).toBe(0.12);
     }
-    // The classes that own their model outright (no sharing) stay tint-free:
-    // a wash there would be pure regression, never intentional.
+    // Every class owns its model outright now (a WOC body per class and fit)
+    // and stays tint-free: a wash there would be pure regression, never
+    // intentional.
     for (const key of [
       'player_warrior',
       'player_paladin',
       'player_hunter',
       'player_rogue',
       'player_mage',
+      'player_priest',
+      'player_warlock',
       'player_druid',
+      'player_shaman',
     ] as const) {
       expect(VISUALS[key].tint, key).toBeUndefined();
+      expect(VISUALS[`${key}_female`].tint, key).toBeUndefined();
     }
   });
 

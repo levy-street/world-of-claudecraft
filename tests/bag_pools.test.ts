@@ -16,8 +16,10 @@ import {
   poolOccupancyOf,
   totalPoolCapacity,
 } from '../src/sim/bag_pools';
+import type { CharacterState } from '../src/sim/character_state';
 import { ALL_RECIPES, ITEMS, MOBS, NPCS } from '../src/sim/data';
 import { MARKET_HOUSE_STOCK } from '../src/sim/market';
+import { grantReferralReward } from '../src/sim/referral_rewards';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 
 /** The injected classifier under test. Prefix-keyed so a reader can count the
@@ -479,10 +481,10 @@ describe('poolCapacityOf: the shipped materialsOnly satchels feed the MATERIALS 
 // the MERGED aggregation points (MOBS already folds in the dungeon, delve, and
 // per-zone mob tables), so a row that simply moves between content files still
 // counts as reachable.
-type BagChannel = 'loot' | 'market' | 'recipe' | 'vendor';
+type BagChannel = 'loot' | 'market' | 'recipe' | 'referral' | 'vendor';
 // Alphabetical, and the order every expected channel list below is written in:
 // `found` is built by filtering this tuple, so the order is what toEqual sees.
-const CHANNELS = ['loot', 'market', 'recipe', 'vendor'] as const;
+const CHANNELS = ['loot', 'market', 'recipe', 'referral', 'vendor'] as const;
 
 /** Every item id obtainable through each channel, over the live content. */
 function acquisitionIndex(): Record<BagChannel, Set<string>> {
@@ -500,7 +502,14 @@ function acquisitionIndex(): Record<BagChannel, Set<string>> {
   // here is a standing route to the item in its own right.
   const market = new Set<string>();
   for (const row of MARKET_HOUSE_STOCK) market.add(row.itemId);
-  return { loot, market, recipe, vendor };
+  // Exercise the actual stamp redemption, rather than merely listing its content ids.
+  const reward = grantReferralReward(
+    { inventory: [], equipment: {} } as unknown as CharacterState,
+    1,
+    'tutorial',
+  );
+  const referral = new Set(reward.inventory.map((slot) => slot.itemId));
+  return { loot, market, recipe, referral, vendor };
 }
 
 /** The settled route to each phase 05 bag, as an EXACT channel set: one entry
@@ -528,6 +537,7 @@ describe('acquisition census: every phase 05 bag stays reachable in play', () =>
     expect(index.market.size).toBeGreaterThan(0);
     expect(index.recipe.size).toBeGreaterThan(0);
     expect(index.vendor.size).toBeGreaterThan(0);
+    expect([...index.referral]).toEqual(['referral_satchel']);
     // The roster is itself a pin: a row quietly dropped from the map above
     // would take its bag out of the census without failing anything.
     expect(Object.keys(PHASE05_BAG_CHANNELS)).toHaveLength(7);
@@ -551,7 +561,7 @@ describe('acquisition census: every phase 05 bag stays reachable in play', () =>
       const found = CHANNELS.filter((c) => index[c].has(def.id));
       expect(
         found.length > 0 || def.id in PHASE05_BAG_CHANNELS,
-        `${def.id}: no loot, market, recipe, or vendor row anywhere in the content`,
+        `${def.id}: no loot, market, recipe, referral reward, or vendor row anywhere in the content`,
       ).toBe(true);
     }
   });

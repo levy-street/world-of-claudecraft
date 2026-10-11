@@ -1,3 +1,5 @@
+import { COURIER_ABILITY } from '../../sim/content/courier';
+
 // i18n source catalog - Abilities + class ability names (English values).
 // Part of src/ui/i18n.catalog/; assembled into `en` by ./index.ts.
 // Translations live in src/ui/i18n.locales/<lang>.ts, never here.
@@ -132,6 +134,7 @@ function abilityTranslations(
 const classAbilityNamesEn = {
   entities: {
     abilities: abilityTranslations([
+      [COURIER_ABILITY.id, COURIER_ABILITY.name, COURIER_ABILITY.description],
       // The Vale Cup sport kit (docs/prd/vale-cup.md).
       ['sport_kick', 'Kick', 'Knock the ball along the ground toward the aim point.'],
       [

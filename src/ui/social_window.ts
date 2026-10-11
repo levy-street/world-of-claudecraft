@@ -69,6 +69,7 @@ import {
   pledgePanelView,
   raidView,
   type SocialTab,
+  socialPageControls,
   socialStructSig,
   tenureTier,
 } from './social_view';
@@ -92,6 +93,14 @@ import {
 // mousedown on a suggestion can still fire first.
 const SUGGEST_DEBOUNCE_MS = 160;
 const SUGGEST_BLUR_CLEAR_MS = 150;
+
+export function socialPagerHtml(
+  kind: 'friend' | 'block',
+  controls: ReturnType<typeof socialPageControls>,
+): string {
+  if (!controls.first && controls.next === null) return '';
+  return `<div class="soc-actions">${controls.first ? `<button type="button" class="ui-btn" data-act="${kind}-page" data-cursor="0">${esc(t('hud.social.friendFirstPage'))}</button>` : ''}${controls.next !== null ? `<button type="button" class="ui-btn" data-act="${kind}-page" data-cursor="${controls.next}">${esc(t('hud.social.friendNextPage'))}</button>` : ''}</div>`;
+}
 
 // Founding a guild rides the metered name_screen WS lane (refill 2/s, burst 5,
 // shared with pet_rename and the named perfect_item promotion): a lane DROP
@@ -899,7 +908,9 @@ export class SocialWindow {
     const w = this.deps.world();
     const act = node.dataset.act;
     const name = node.dataset.name ?? '';
-    if (act === 'unfriend') w.friendRemove(name);
+    if (act === 'friend-page') w.socialFriendsPage(Number(node.dataset.cursor ?? 0));
+    else if (act === 'block-page') w.socialBlocksPage(Number(node.dataset.cursor ?? 0));
+    else if (act === 'unfriend') w.friendRemove(name);
     else if (act === 'unblock') w.blockRemove(name);
     else if (act === 'unignore') w.ignoreRemove(name);
     else if (act === 'gkick') w.guildKick(name);
@@ -1053,37 +1064,46 @@ export class SocialWindow {
   }
 
   private friendsHtml(): string {
-    const rows = friendRows(this.deps.world().socialInfo);
+    const social = this.deps.world().socialInfo;
+    const rows = friendRows(social);
+    const pager = socialPagerHtml('friend', socialPageControls(social, 'friend'));
     if (rows.length === 0)
-      return `<div class="soc-empty">${esc(t('hud.social.friendsEmpty'))}</div>`;
-    return rows
-      .map((f) => {
-        const meta = f.online
-          ? `<span class="zone">${esc(f.zone ? localizeZone(f.zone) : '')}</span><br>${esc(statusLabel(f.status))}`
-          : esc(t('hud.social.status.offline'));
-        // The friend's Book of Deeds title (a deed id, localized here; '' for
-        // untitled/stale hides the span entirely). It rides INSIDE the
-        // ellipsized .soc-name cell, so a long combo trims the title tail and
-        // never pushes the meta column or action buttons.
-        const titleText = f.activeTitle ? deedTitleText(f.activeTitle) : '';
-        const titleSpan = titleText ? `<span class="soc-title">${esc(titleText)}</span>` : '';
-        const name = f.online
-          ? `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(f.cls)}" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}${titleSpan}</button>`
-          : `<span class="soc-name" style="--class-color:${classColorCss(f.cls)}">${esc(f.name)}${titleSpan}</span>`;
-        const whisper = f.online
-          ? `<button type="button" class="soc-x ui-disc" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${svgIcon('whisper')}</button>`
-          : '';
-        const tip = esc(dotTitle(f.online, f.status, f.zone));
-        return (
-          `<div class="soc-row${f.online ? '' : ' is-offline'}">` +
-          `<span class="soc-dot ${f.dot === 'off' ? '' : f.dot}" title="${tip}"></span>` +
-          `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(f.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(f.cls) }))}</span></span>` +
-          `<span class="soc-meta" title="${tip}">${meta}</span>` +
-          `<span class="soc-actions">${whisper}<button type="button" class="soc-x ui-disc" data-act="unfriend" data-name="${esc(f.name)}" title="${esc(t('hud.social.removeFriendTitle', { name: f.name }))}">${svgIcon('close')}</button></span>` +
-          `</div>`
-        );
-      })
-      .join('');
+      return pager + `<div class="soc-empty">${esc(t('hud.social.friendsEmpty'))}</div>`;
+    return (
+      pager +
+      rows
+        .map((f) => {
+          const meta = f.online
+            ? `<span class="zone">${esc(f.zone ? localizeZone(f.zone) : '')}</span><br>${esc(statusLabel(f.status))}`
+            : esc(t('hud.social.status.offline'));
+          // The friend's Book of Deeds title (a deed id, localized here; '' for
+          // untitled/stale hides the span entirely). It rides INSIDE the
+          // ellipsized .soc-name cell, so a long combo trims the title tail and
+          // never pushes the meta column or action buttons.
+          const titleText = f.activeTitle ? deedTitleText(f.activeTitle) : '';
+          const titleSpan = titleText ? `<span class="soc-title">${esc(titleText)}</span>` : '';
+          const boundSpan =
+            f.tier === 'bound'
+              ? `<span class="soc-title">${esc(t('hud.social.boundFriend'))}</span>`
+              : '';
+          const name = f.online
+            ? `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(f.cls)}" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}${titleSpan}${boundSpan}</button>`
+            : `<span class="soc-name" style="--class-color:${classColorCss(f.cls)}">${esc(f.name)}${titleSpan}${boundSpan}</span>`;
+          const whisper = f.online
+            ? `<button type="button" class="soc-x ui-disc" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${svgIcon('whisper')}</button>`
+            : '';
+          const tip = esc(dotTitle(f.online, f.status, f.zone));
+          return (
+            `<div class="soc-row${f.online ? '' : ' is-offline'}">` +
+            `<span class="soc-dot ${f.dot === 'off' ? '' : f.dot}" title="${tip}"></span>` +
+            `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(f.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(f.cls) }))}</span></span>` +
+            `<span class="soc-meta" title="${tip}">${meta}</span>` +
+            `<span class="soc-actions">${whisper}${f.tier === 'bound' ? '' : `<button type="button" class="soc-x ui-disc" data-act="unfriend" data-name="${esc(f.name)}" title="${esc(t('hud.social.removeFriendTitle', { name: f.name }))}">${svgIcon('close')}</button>`}</span>` +
+            `</div>`
+          );
+        })
+        .join('')
+    );
   }
 
   // The two PLAYER tiers get a tab each, so a row can never be mistaken for the
@@ -1117,11 +1137,16 @@ export class SocialWindow {
   }
 
   private blockHtml(): string {
-    return this.listHtml(
-      blockRows(this.deps.world().socialInfo),
-      'hudChrome.social.blockedEmpty',
-      'unblock',
-      (name) => t('hudChrome.social.stopBlockingTitle', { name }),
+    const social = this.deps.world().socialInfo;
+    const unavailable = social?.blocksUnavailable
+      ? `<div class="soc-empty" role="status">${esc(t('abilityUi.tooltip.unavailable'))}</div>`
+      : '';
+    return (
+      unavailable +
+      socialPagerHtml('block', socialPageControls(social, 'block')) +
+      this.listHtml(blockRows(social), 'hudChrome.social.blockedEmpty', 'unblock', (name) =>
+        t('hudChrome.social.stopBlockingTitle', { name }),
+      )
     );
   }
 

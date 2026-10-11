@@ -50,11 +50,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'ワイルドハート盆地',
-    desc: 'ズルガーと牙王の獣使いから得られる象徴的な武器。',
   },
   conquerors_wildheart_basin_heroic: {
     name: '英雄: ワイルドハート盆地',
-    desc: '盆地の声ズルガーからヒロイックでのみ得られるエピック。',
   },
   // The arena entity reads ナイスラクシスのレイドアリーナ; the page collects the
   // raid's spoils rather than naming the room, so the arena noun is dropped and
@@ -70,6 +68,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'サンザール、目覚めし峰',
     desc: '目覚めし峰のワールドボスから得られる個人用エピック戦利品。',
+  },
+  conquerors_balgath: {
+    name: 'バルガス、埋もれし監督',
+    desc: 'マイアフェンの塚から引きずり出された戦利品。',
   },
   conquerors_collapsed_reliquary: {
     name: '崩れた聖遺物庫',

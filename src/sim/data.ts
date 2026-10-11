@@ -1,3 +1,5 @@
+import { MEMBERSHIP_ITEMS } from './content/membership';
+import { REFERRAL_ITEMS } from './content/referral';
 import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
 import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
 // Content merge layer. Actual game content lives in sim/content/* — one
@@ -52,6 +54,7 @@ import {
   AMBERFALL_ROADS,
   AMBERFALL_ZONE,
 } from './content/amberfall';
+import { BUDDY_MOBS } from './content/buddy_mobs';
 import {
   BROTHER_HALVEN,
   BROTHER_HALVEN_MARSH,
@@ -75,6 +78,9 @@ import {
   DRAKELANDS_ROADS,
   DRAKELANDS_ZONE,
 } from './content/drakelands';
+import { DROWNED_TEMPLE_MOBS } from './content/drowned_temple';
+import { CANTOR_NPCS } from './content/drowned_temple_cantor';
+import { DROWNED_TEMPLE_ITEMS } from './content/drowned_temple_items';
 import { DUNGEON_DEFS, DUNGEON_KEEPSAKE_ITEMS, DUNGEON_MOBS } from './content/dungeons';
 import { FORGEFATHER_ISLE_TERRAIN_EDITS } from './content/ember_coast';
 import {
@@ -136,6 +142,8 @@ import {
   GALECREST_ZONE,
 } from './content/galecrest';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
+import { GRAVEWYRM_SANCTUM_MOBS } from './content/gravewyrm_sanctum';
+import { GRAVEWYRM_SANCTUM_ITEMS } from './content/gravewyrm_sanctum_items';
 import {
   type GraveyardDef,
   LAST_KEEP_GRAVEYARD_ID,
@@ -147,6 +155,9 @@ import {
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { HEALING_TRAINING_MOBS } from './content/healing_training';
 import { HOARD_ITEMS } from './content/hoard_loot';
+import { HOLLOW_CRYPT_MOBS } from './content/hollow_crypt';
+import { HOLLOW_CRYPT_ITEMS } from './content/hollow_crypt_items';
+import { HOLLOW_CRYPT_TRASH_MOBS } from './content/hollow_crypt_trash';
 import {
   IGNIVAR_RAID_LORE_NPCS,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
@@ -154,6 +165,7 @@ import {
 } from './content/ignivar_raid_lore';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import { MAILBOXES } from './content/mailboxes';
+import { MUSTER_COMMANDER_NPC, MUSTER_MOBS } from './content/mirefen_muster';
 import { NECROMANCY_MOBS } from './content/necromancy';
 import {
   NIGHTBLOOM_CAMPS,
@@ -205,6 +217,8 @@ import {
   PROVING_SHORE_ROADS,
   PROVING_SHORE_ZONE,
 } from './content/proving_shore';
+import { QUEST_CHOICE_REWARDS } from './content/quest_choice_rewards';
+import { QUEST_LEVELING_GEAR_ITEMS } from './content/quest_leveling_gear';
 import {
   REALM_CAMPS,
   REALM_ITEMS,
@@ -225,6 +239,8 @@ import {
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
 import { HOARD_MOBS, RIFT_MOBS } from './content/rift/mobs';
+import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
+import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -240,6 +256,7 @@ import {
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import { WEEKLY_EMISSARY_NPC_DEF } from './content/weekly_quests';
 import { WILDHEART_DUNGEON_DEFS, WILDHEART_ITEMS, WILDHEART_MOBS } from './content/wildheart';
+import { WILDHEART_BASIN_ITEMS } from './content/wildheart_items';
 import {
   WILLOWFEN_CAMPS,
   WILLOWFEN_ITEMS,
@@ -353,6 +370,7 @@ import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot'
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { SEASON2_ITEMS } from './content/pvp_honor_season2';
+import { REFERRAL_STAMP_ITEMS } from './content/referral_rewards';
 import { TRINKET_ITEMS } from './content/trinkets';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
@@ -392,6 +410,8 @@ export { STATIONS };
 
 export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
+  MEMBERSHIP_ITEMS,
+  REFERRAL_ITEMS,
   PROFESSION_ITEMS,
   APEX_PATTERN_ITEMS,
   FARM_PATTERN_ITEMS,
@@ -401,6 +421,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DELVE_ITEMS,
   HEROIC_VENDOR_ITEMS,
   TRINKET_ITEMS,
+  REFERRAL_STAMP_ITEMS,
   HEROIC_ITEMS,
   RETIRED_HEROIC_ITEMS,
   IGNIVAR_LOOT_ITEMS,
@@ -419,6 +440,11 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
+  HOLLOW_CRYPT_ITEMS,
+  SUNKEN_BASTION_ITEMS,
+  DROWNED_TEMPLE_ITEMS,
+  WILDHEART_BASIN_ITEMS,
+  GRAVEWYRM_SANCTUM_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,
@@ -426,14 +452,17 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WORLD_QUEST_ITEMS,
   FACTION_VENDOR_ITEMS,
   HOARD_ITEMS,
+  QUEST_LEVELING_GEAR_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
 export { aggregateSetBonuses, ITEM_SETS } from './content/item_sets';
 
 export const MOBS: Record<string, MobTemplate> = {
+  ...BUDDY_MOBS,
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
+  ...MUSTER_MOBS,
   [INVESTIGATION_MOB.id]: INVESTIGATION_MOB,
   ...ZONE3_MOBS,
   ...PRACTICE_DUMMY_MOBS,
@@ -451,6 +480,11 @@ export const MOBS: Record<string, MobTemplate> = {
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
   ...WILDHEART_MOBS,
+  ...HOLLOW_CRYPT_MOBS,
+  ...HOLLOW_CRYPT_TRASH_MOBS,
+  ...SUNKEN_BASTION_MOBS,
+  ...DROWNED_TEMPLE_MOBS,
+  ...GRAVEWYRM_SANCTUM_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,
@@ -474,6 +508,7 @@ Object.assign(ITEMS, buildHeroicVariants(ITEMS, MOBS));
 export const NPCS: Record<string, NpcDef> = {
   ...ZONE1_NPCS,
   ...ZONE2_NPCS,
+  [MUSTER_COMMANDER_NPC.id]: MUSTER_COMMANDER_NPC,
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
   [FURY_NPC.id]: FURY_NPC,
@@ -519,6 +554,9 @@ export const NPCS: Record<string, NpcDef> = {
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
   ...WYRMWATCH_HARBOR_NPCS,
+  // The Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
+  // dynamic, spawned per Temple claim, appended last so no placed NPC moves.
+  ...CANTOR_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -552,6 +590,13 @@ export const QUESTS: Record<string, QuestDef> = {
   ...IGNIVAR_RAID_LORE_QUESTS,
   ...HUB_PRACTICE_QUESTS,
 };
+
+// The choose-one leveling gear rides on the quest records (QuestDef.choiceRewards),
+// so the resolver, the turn-in, item levels and the dialogs all read one field.
+for (const [questId, itemIds] of Object.entries(QUEST_CHOICE_REWARDS)) {
+  const quest = QUESTS[questId];
+  if (quest && !quest.choiceRewards) quest.choiceRewards = [...itemIds];
+}
 
 export const QUEST_ORDER: string[] = [
   ...ZONE1_QUEST_ORDER,

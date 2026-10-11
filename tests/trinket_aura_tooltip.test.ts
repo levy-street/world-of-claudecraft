@@ -8,7 +8,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { onTrinketAvoidance, runTrinketTrigger } from '../src/sim/combat/trinkets';
+import { onTrinketAvoidance, onTrinketDamage, runTrinketTrigger } from '../src/sim/combat/trinkets';
 import {
   TRINKET_ANCHOR_SLOW_AURA,
   TRINKET_AURA,
@@ -101,12 +101,26 @@ describe('trinket aura icons', () => {
       trinket_pierce: 'molten_fletching',
       trinket_lantern: 'last_flame_lantern',
       trinket_crucible_heat: 'heart_of_the_crucible',
+      // Balgath's (combat/balgath_trinkets.ts); the Grapnel applies no aura of its own.
+      trinket_foreman_shape: 'knucklebone_of_balgath',
+      trinket_muster_standard: 'muster_standard',
+      trinket_guttered_glare: 'guttered_eye',
+      trinket_barrowstone_statue: 'barrowstone_heart',
+      trinket_shackle: 'gaolers_iron_key',
+      trinket_spirit_pack: 'fanglords_whistle',
+      trinket_seedburst: 'gorgebloom_seedpod',
+      trinket_tether: 'foremans_last_link',
+      trinket_tether_link: 'foremans_last_link',
+      trinket_harvest: 'phial_of_the_tithe',
+      trinket_quench: 'quenchwater_flask',
+      trinket_quenched: 'quenchwater_flask',
     });
     // Every trinket with a use or passive aura owns at least one of them; the
     // Medallion of Defiance applies none (it only breaks control).
     const owners = new Set(Object.values(TRINKET_AURA_ITEM));
     expect(Object.keys(TRINKET_ITEMS).filter((id) => !owners.has(id))).toEqual([
       'medallion_of_defiance',
+      'muster_grapnel',
     ]);
   });
 
@@ -151,12 +165,12 @@ describe('trinket aura tooltips (English)', () => {
     [
       'Bastion Sigil cooldown marker',
       own({ id: TRINKET_AURA.lastStandIcd, kind: 'internal_cd', value: 0 }),
-      "Bastion Sigil's Last Bastion shield was used. Falling below 35% health cannot raise it again until this expires.",
+      'Your protective shield was used. Taking damage below 35% health cannot raise it again until this expires.',
     ],
     [
       'Last Bastion',
       own({ id: TRINKET_AURA.lastStand, kind: 'absorb', value: 750 }),
-      'Absorbs 750 damage. Bastion Sigil raised it when you took damage below 35% health.',
+      'Absorbs 750 damage. Your trinket raised it when you took damage below 35% health.',
     ],
     [
       'Retaliation Ward',
@@ -236,6 +250,42 @@ describe('trinket aura tooltips (English)', () => {
       'Your next 2 direct heals or direct non-Physical damage hits repeat for 30% of their amount.',
     ],
     [
+      "Fanglord's Whistle",
+      own({ id: TRINKET_AURA.spiritPack, kind: 'internal_cd', value: 26, value2: 32 }),
+      'A spirit jaguar fights beside you, biting your target for 26 to 32 Physical damage every 2 sec.',
+    ],
+    [
+      'Gorgebloom Seedpod',
+      own({ id: TRINKET_AURA.seedburst, kind: 'internal_cd', value: 135 }),
+      'A Gorgebloom seed. When this expires it bursts for 135 Nature damage to each enemy within 8 yd, or 50% more (203) if this enemy dies before then.',
+    ],
+    [
+      "Foreman's Last Link (the chained ally)",
+      foreign({ id: TRINKET_AURA.tether, kind: 'internal_cd', value: 0.3 }),
+      "Chained by Foreman's Last Link: 30% of the damage that would reach your health is dealt to the one who chained you instead.",
+    ],
+    [
+      "Foreman's Last Link (the wearer)",
+      own({ id: TRINKET_AURA.tetherLink, kind: 'internal_cd', value: 12 }),
+      'You take 30% of the damage your chained ally would take.',
+    ],
+    [
+      'Phial of the Tithe',
+      own({ id: TRINKET_AURA.harvest, kind: 'internal_cd', value: 0.05, value2: 20 }),
+      'Each hostile creature that dies within 20 yd of you restores 5% of your maximum health and mana.',
+    ],
+    [
+      // 40 plus 20% of 500 Attack Power: 140.
+      'Quenchwater Flask',
+      own({ id: TRINKET_AURA.quench, kind: 'internal_cd', value: 2, stacks: 2 }),
+      "Your next 2 weapon hits deal 140 extra Frost damage. The last one slows the target's attacks by 15%.",
+    ],
+    [
+      'Quenched',
+      foreign({ id: TRINKET_AURA.quenched, kind: 'attackspeed', value: 1 / 0.85 }),
+      'Attack speed slowed by 15%.',
+    ],
+    [
       'Keen Edge',
       own({ id: TRINKET_AURA.fortune, kind: 'buff_dmg_done', value: 0.15 }),
       "Gambler's Die fortune: you deal 15% more damage.",
@@ -259,6 +309,16 @@ describe('trinket aura tooltips (English)', () => {
       "Wayfarer's Stride",
       own({ id: TRINKET_AURA.sprint, kind: 'buff_speed', value: 1.6 }),
       'Movement speed increased by 60%. Does not stack with other speed increases.',
+    ],
+    [
+      "Gaoler's Iron Key (rooted)",
+      foreign({ id: TRINKET_AURA.shackle, kind: 'root', value: 0 }),
+      'Chained in place: cannot move.',
+    ],
+    [
+      "Gaoler's Iron Key (slowed)",
+      foreign({ id: TRINKET_AURA.shackle, kind: 'slow', value: 0.7 }),
+      'Chained: movement speed reduced by 30%.',
     ],
     [
       "Duelist's Brand",
@@ -314,6 +374,26 @@ describe('trinket aura tooltips (English)', () => {
       'Crucible Heat (another player)',
       foreign({ id: TRINKET_AURA.guardHeat, kind: 'internal_cd', value: 4, stacks: 4 }),
       'Heat: 4/10. Heart of the Crucible spends it all on a fire nova within 10 yd that deals more Fire damage for each stack and taunts every creature it hits.',
+    ],
+    [
+      'Shape of the Foreman',
+      own({ id: TRINKET_AURA.foremanShape, kind: 'form_foreman', value: 50 }),
+      'You are the Foreman: 50% more armor and immune to knockbacks.',
+    ],
+    [
+      'Muster Standard',
+      own({ id: TRINKET_AURA.musterStandard, kind: 'internal_cd', value: 2 }),
+      'Your Muster Standard is planted. Its soldiers march with you and fight your target.',
+    ],
+    [
+      'Guttered Glare',
+      own({ id: TRINKET_AURA.gutteredGlare, kind: 'internal_cd', value: 42, tickInterval: 0.5 }),
+      'The beam deals 42 Arcane damage every 0.5 sec to enemies in its path. Moving or casting ends it.',
+    ],
+    [
+      'Stone Statue',
+      own({ id: TRINKET_AURA.stoneStatue, kind: 'stasis', value: 0.2 }),
+      'Turned to stone: immune to damage and unable to act. You return with 20% of your maximum health.',
     ],
   ];
 
@@ -404,6 +484,32 @@ function shown(text: string, before: string): number {
 }
 
 describe('trinket aura tooltip numbers match combat', () => {
+  it.each(['bastion_sigil', 'referral_hollow_charm', 'referral_fog_charm'])(
+    '%s describes its actual protective shield and trigger',
+    (itemId) => {
+      const sim = wearing(itemId);
+      const p = sim.player;
+      p.hp = Math.ceil(p.maxHp * 0.35);
+      onTrinketDamage(sim.ctx, null, p, 1, 'physical', true, null);
+      expect(findAura(p, TRINKET_AURA.lastStand)).toBeUndefined();
+      p.hp = Math.floor(p.maxHp * 0.35) - 1;
+      onTrinketDamage(sim.ctx, null, p, 1, 'physical', true, null);
+      const shield = findAura(p, TRINKET_AURA.lastStand);
+      const cooldown = findAura(p, TRINKET_AURA.lastStandIcd);
+      expect(shield).toBeDefined();
+      expect(cooldown).toBeDefined();
+      if (!shield || !cooldown) throw new Error('protective trinket did not trigger');
+      expect(shield.value).toBe(Math.round(p.maxHp * (itemId === 'bastion_sigil' ? 0.15 : 0.1)));
+      expect(shield.value2).toBe(0.35);
+      expect(cooldown.duration).toBe(itemId === 'bastion_sigil' ? 90 : 120);
+      expect(render(shield, p)).toBe(
+        `Absorbs ${shield.value} damage. Your trinket raised it when you took damage below 35% health.`,
+      );
+      expect(render(cooldown, p)).toBe(
+        'Your protective shield was used. Taking damage below 35% health cannot raise it again until this expires.',
+      );
+    },
+  );
   it('Tempered prints the Fire damage its next weapon hit deals', () => {
     for (const attackPower of [0, 600]) {
       const sim = wearing('forgefathers_temper');

@@ -9,21 +9,27 @@
 // from there); the pool comes back from db.ts the way every other *_db.ts
 // module takes it.
 
+import { BASE_CHARACTER_SLOTS, MEMBERSHIP_CHARACTER_SLOTS } from '../src/membership_contract';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { type CharacterRow, pool } from './db';
 import { enqueueLinkChange } from './discord_link_changes';
+import { membershipExpiresAtOnClient } from './membership_db';
+import { getMembership, trustedRecurringMembershipExpiry } from './membership_service';
 import { recordCharacterCreation } from './player_metrics_db';
 import { REALM } from './realm';
+import { REFERRAL_CHARACTER_BONUS } from './referral_account_entitlements_db';
 
 /** The RETURNING list every create answers with, one text so the two INSERT
  *  shapes below cannot drift apart in what they hand back. */
 const CREATE_RETURNING =
-  'RETURNING id, account_id, name, class, level, state, is_gm, force_rename, appearance';
+  'RETURNING id, account_id, name, class, level, state, is_gm, force_rename, appearance, membership_slot';
 
 /**
- * Insert one character for `accountId`, refusing past `limit` characters on
- * this realm. The account row is locked FOR UPDATE and the realm-scoped count
+ * Insert one character for `accountId`, with `limit` ordinary base slots (at most ten),
+ * five earned referral base slots, and ten additional member slots on this realm.
+ * Slot identity is durable.
+ * The account row is locked FOR UPDATE and the realm-scoped count
  * taken inside the same transaction, so two racing creates cannot both see
  * room; a refusal rolls back having written nothing and answers null.
  */
@@ -44,9 +50,13 @@ export async function createCharacterCapped(
   // full-blob rewrites per boosted registration.
   level: number | null = null,
 ): Promise<CharacterRow | null> {
+  const membership = await getMembership(accountId);
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    await client.query(
+      "SET LOCAL lock_timeout = '2s'; SET LOCAL statement_timeout = '5s'; SET LOCAL idle_in_transaction_session_timeout = '10s'",
+    );
     const account = await client.query('SELECT id FROM accounts WHERE id = $1 FOR UPDATE', [
       accountId,
     ]);
@@ -55,10 +65,24 @@ export async function createCharacterCapped(
       return null;
     }
     const count = await client.query(
-      'SELECT count(*)::int AS n FROM characters WHERE account_id = $1 AND realm = $2',
+      'SELECT count(*)::int AS n, count(*) FILTER (WHERE NOT membership_slot)::int AS base, EXISTS (SELECT 1 FROM referral_progress WHERE account_id = $1 AND (rewarded_mask & 2) <> 0) AS referral_capacity_earned FROM characters WHERE account_id = $1 AND realm = $2',
       [accountId, REALM],
     );
-    if (Number(count.rows[0]?.n ?? 0) >= limit) {
+    const referralBonus =
+      count.rows[0]?.referral_capacity_earned === true ? REFERRAL_CHARACTER_BONUS : 0;
+    const baseLimit = Math.min(BASE_CHARACTER_SLOTS, limit) + referralBonus;
+    const membershipSlot = Number(count.rows[0]?.base ?? 0) >= baseLimit;
+    const expiresAt = membershipSlot
+      ? await membershipExpiresAtOnClient(
+          client,
+          accountId,
+          trustedRecurringMembershipExpiry(membership, Date.now()),
+        )
+      : null;
+    if (
+      Number(count.rows[0]?.n ?? 0) >= baseLimit + MEMBERSHIP_CHARACTER_SLOTS ||
+      (membershipSlot && (expiresAt === null || expiresAt <= Date.now()))
+    ) {
       await client.query('ROLLBACK');
       return null;
     }
@@ -73,12 +97,13 @@ export async function createCharacterCapped(
       REALM,
       state ? JSON.stringify(state) : null,
       appearance ? JSON.stringify(appearance) : null,
+      membershipSlot,
     ];
     if (level !== null) values.push(level);
     const res = await client.query(
       level === null
-        ? `INSERT INTO characters (account_id, name, class, realm, state, appearance) VALUES ($1, $2, $3, $4, $5, $6) ${CREATE_RETURNING}`
-        : `INSERT INTO characters (account_id, name, class, realm, state, appearance, level) VALUES ($1, $2, $3, $4, $5, $6, $7) ${CREATE_RETURNING}`,
+        ? `INSERT INTO characters (account_id, name, class, realm, state, appearance, membership_slot) VALUES ($1, $2, $3, $4, $5, $6, $7) ${CREATE_RETURNING}`
+        : `INSERT INTO characters (account_id, name, class, realm, state, appearance, membership_slot, level) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ${CREATE_RETURNING}`,
       values,
     );
     await recordCharacterCreation(client, accountId, REALM);

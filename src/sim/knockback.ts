@@ -9,7 +9,7 @@
 
 import { seatGroundedAt } from './colliders';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
-import { isMoored } from './combat/trinkets';
+import { trinketRefusesKnockback } from './combat/trinkets';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { SKIN_WIDTH } from './physics';
 import { rideSteepnessAt, stepWaterLevel } from './ride_height';
@@ -29,8 +29,9 @@ export function applyKnockback(
 ): number {
   if (source.id !== target.id && ctx.isIceBlocked(target)) return 0;
   if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
-  // The Mooring Stone holds its wearer where they stand (combat/trinkets.ts).
-  if (source.id !== target.id && isMoored(target)) return 0;
+  // The Mooring Stone and the Shape of the Foreman hold their wearer where they stand
+  // (combat/trinkets.ts trinketRefusesKnockback).
+  if (source.id !== target.id && trinketRefusesKnockback(target)) return 0;
   if (ctx.cfg.devCommands && ctx.players.get(target.id)?.devAnchored) return 0;
   // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
   // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
@@ -46,8 +47,24 @@ export function applyKnockback(
     dz = Math.cos(source.facing);
     len = 1;
   }
-  const ux = dx / len,
-    uz = dz / len;
+  return displaceAlong(ctx, target, dx / len, dz / len, distance);
+}
+
+/**
+ * Move `target` up to `distance` yards along the unit direction (ux, uz), with
+ * the knockback's terrain clamp and collider sweep (the shared walker of every
+ * forced displacement: a shove away, or a drag toward a point such as an
+ * undertow). The caller has already applied its own immunity rules. Returns
+ * the yards actually moved.
+ */
+export function displaceAlong(
+  ctx: SimContext,
+  target: Entity,
+  ux: number,
+  uz: number,
+  distance: number,
+): number {
+  if (distance <= 0) return 0;
   const STEP = 0.5;
   let moved = 0;
   let cx = target.pos.x,

@@ -139,6 +139,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
   'this.questTracker.relocalize|',
+  'this.referralCards.relocalize|',
   'this.delveTracker.relocalize|',
   'this.riftTracker.relocalize|',
   // The gathering goal tracker (Intentional Gathering PR4): its repaint
@@ -194,6 +195,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.renderTownFocus|this.townFocusOpen',
   'this.marketWindow.render|this.marketWindow.isOpen',
   'this.bankWindow.render|this.bankWindow.isOpen',
+  'this.courierWindow.render|this.courierWindow.isOpen()',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
   // The journal's relocalize gates itself (isOpen inside) and additionally
@@ -343,6 +345,12 @@ interface AnsweredSurface extends GatedModule {
 
 const ANSWERED: readonly AnsweredSurface[] = [
   {
+    file: 'hud/courier/courier_window.ts',
+    memos: ['cheapSignature', 'lastSignature'],
+    answer: 'this.courierWindow.render',
+    why: 'phase, membership, custody, bank contents and selection are locale-independent; the open-window arm forces one render while retaining the selected stacks',
+  },
+  {
     file: 'hud/loot/loot_window_controller.ts',
     memos: ['corpseSig', 'harvestStatusSig'],
     answer: 'this.lootWindow.relocalize',
@@ -475,9 +483,15 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'hud/quest/quest_dialog_controller.ts',
-    memos: ['investigationSig', 'lastClueRowSig', 'lastGossipRowSig', 'lastIntroHintVisible'],
+    memos: [
+      'investigationSig',
+      'lastClueRowSig',
+      'lastGossipRowSig',
+      'lastGuideState',
+      'lastIntroHintVisible',
+    ],
     answer: 'this.questDialog.relocalize',
-    why: 'the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it)',
+    why: "the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it), and a dungeon guide's offer state (an enum, never text)",
   },
   {
     file: 'hud/rift/rift_floor_tracker_controller.ts',
@@ -683,6 +697,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     memos: ['lastClock'],
     reason:
       'lastClock is the authoritative world-quest clock in seconds, compared so the bar can re-anchor its wall-clock extrapolation of the forge timer between snapshots. It is a number that never holds text, and the bar repaints its localized labels on every update through the shared action bar painter, so a locale switch lands on the next frame.',
+  },
+  {
+    file: 'collections/collections_window.ts',
+    memos: ['lastSig', 'paintedTab'],
+    reason:
+      'Retained dormant painter: Hunting has no live HUD instance, shell root or keybind. The lastSig and paintedTab memos cannot gate any player-visible surface. tests/collections_window.test.ts pins that retirement; restoring the menu requires restoring its relocalize fanout arm.',
   },
   {
     file: 'movable_frame.ts',
@@ -1676,7 +1696,8 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // 37 on the merged tree: both pairs above are present.
       // 38 at the release/v0.43.0 merge into feature/world-quests: the forge
       // action bar's numeric world-quest clock memo.
-    ).toBe(38);
+      // The retired Hunting painter adds its dormant memo classification.
+    ).toBe(39);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {
@@ -1743,8 +1764,10 @@ function builderOwnedClasses(armCall: string): Set<string> {
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
   const hud = strippedHudSource;
   const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
-  if (!assigned) return owned;
-  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  // Both composition forms retain a real source-owned builder: direct factory
+  // assignment and a member returned from a previously built component family.
+  const direct = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  const built = assigned ? new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud) : direct;
   if (!built) return owned;
   for (const { source } of uiSources) {
     if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;

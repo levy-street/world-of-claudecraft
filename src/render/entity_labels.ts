@@ -6,6 +6,7 @@
 
 import type { HarborRouteMarkerDestination } from '../sim/content/harbor_route_markers';
 import { IGNIVAR_LORE_OBJECTS } from '../sim/content/ignivar_raid_lore';
+import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
 import { type Entity, REALM_BUILDER_MONUMENT_TEMPLATE_ID } from '../sim/types';
 import { investigationObjectLabel } from '../ui/entity_display_core';
 import { dungeonDisplayName, poiMarkLabel, tEntity, zoneDisplayName } from '../ui/entity_i18n';
@@ -44,6 +45,11 @@ export function objectDisplayName(entity: Entity): string {
   }
   if (entity.templateId === REALM_BUILDER_MONUMENT_TEMPLATE_ID) {
     return t('worldContent.realmBuilderMonumentName');
+  }
+  // The muster's weapon rack lends a pike, but it is the RACK a player clicks: name it,
+  // never the item it hands out.
+  if (entity.templateId === MUSTER_RACK_TEMPLATE_ID) {
+    return t('worldContent.musterRackName');
   }
   if (entity.templateId === 'soulwell') {
     return tEntity({ kind: 'ability', id: 'soulwell', field: 'name' });

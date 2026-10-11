@@ -884,6 +884,8 @@ export const HONOR_QUARTERMASTER_STOCK: readonly string[] = [
   ...WARFARE_TRINKET_STOCK,
   ...SEASON2_STOCK,
 ];
+/** Shared honor vendor stock; FURY_STOCK remains the gear-only list. */
+export const HONOR_VENDOR_STOCK: readonly string[] = [...HONOR_QUARTERMASTER_STOCK, 'whistle_horse'];
 
 export const FURY_NPC: NpcDef = {
   id: FURY_NPC_ID,
@@ -893,7 +895,7 @@ export const FURY_NPC: NpcDef = {
   facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.fury.facing,
   color: 0xb52a2a,
   questIds: [],
-  vendorItems: [...HONOR_QUARTERMASTER_STOCK],
+  vendorItems: [...HONOR_VENDOR_STOCK],
   dynamic: true,
   // The Eastbrook mirror sells the identical stock, so it presents the identical
   // set-divided shop window. One canonical stock, two placements.

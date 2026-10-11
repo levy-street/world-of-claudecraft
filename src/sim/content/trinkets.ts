@@ -14,6 +14,7 @@ import type { ItemDef } from '../types';
 
 /** What a trinket does when used from the action bar. */
 export type TrinketUse =
+  | { kind: 'friendship'; duration: number; stats: number }
   /** Bastion Sigil: for `duration`, strike back at whoever hits you for
    *  `reflect` of the damage they dealt. */
   | { kind: 'retaliate'; duration: number; reflect: number }
@@ -92,7 +93,102 @@ export type TrinketUse =
   /** Heart of the Crucible: spend every heat stack on a fire nova within
    *  `radius`, `flat` (+ `coef` of Attack Power) fire damage per stack, that
    *  taunts every creature it hits. */
-  | { kind: 'heartNova'; radius: number; flat: number; coef: number };
+  | { kind: 'heartNova'; radius: number; flat: number; coef: number }
+  /** Gaoler's Iron Key: chain an enemy within `range` in place for `duration`;
+   *  one immune to control is slowed to `slow` of its speed instead (a target
+   *  immune to slows as well shrugs it off). */
+  | { kind: 'shackle'; range: number; duration: number; slow: number }
+  /** Fanglord's Whistle: a spirit jaguar fights beside you for `duration`,
+   *  running to your target within `range` and biting it every
+   *  `attackInterval` seconds for `min` to `max` (+ `coef` of your Attack
+   *  Power, snapshotted when it is summoned) physical damage. It runs at
+   *  `moveSpeed` yards per second. */
+  | {
+      kind: 'spiritPack';
+      range: number;
+      duration: number;
+      attackInterval: number;
+      min: number;
+      max: number;
+      coef: number;
+      moveSpeed: number;
+    }
+  /** Gorgebloom Seedpod: plant a seed on your target within `range`; after
+   *  `delay` seconds it bursts where the target stands (or where it died) for
+   *  `flat` (+ `coef` of your Spell Power, snapshotted when it is planted)
+   *  nature damage to every enemy within `radius`, `deathBonus` more if the
+   *  target died first. */
+  | {
+      kind: 'seedburst';
+      range: number;
+      delay: number;
+      radius: number;
+      flat: number;
+      coef: number;
+      deathBonus: number;
+    }
+  /** Foreman's Last Link: chain yourself to an ally (not yourself) within
+   *  `range` for `duration`; `share` of the damage that reaches their health is
+   *  taken by you instead. */
+  | { kind: 'tether'; range: number; duration: number; share: number }
+  /** Phial of the Tithe: for `duration`, each enemy that dies within `radius`
+   *  of you restores `restore` of your maximum health and mana. */
+  | { kind: 'harvest'; duration: number; radius: number; restore: number }
+  /** Quenchwater Flask: your next `hits` weapon hits within `duration` deal
+   *  `flat` (+ `coef` of your Attack Power) bonus frost damage; the last one
+   *  quenches the target, slowing its attacks by `slow` for `slowDuration`. */
+  | {
+      kind: 'quench';
+      duration: number;
+      hits: number;
+      flat: number;
+      coef: number;
+      slow: number;
+      slowDuration: number;
+    }
+  // ---- Balgath, the One-Eyed Foreman (combat/balgath_trinkets.ts) ----
+  /** Knucklebone of Balgath: take the Shape of the Foreman for `duration`: the
+   *  cyclops's body (its own abilities, same buttons, same damage), `armorPct`%
+   *  more armor and immunity to knockbacks. */
+  | { kind: 'foremanShape'; duration: number; armorPct: number }
+  /** Muster Standard: plant a standard; `soldiers` muster soldiers rally from it
+   *  for `duration`, march at your side and fight your target in melee, swinging
+   *  every `attackInterval` sec for `min` to `max` (+ `coef` of Attack Power, the
+   *  higher of melee and ranged, snapshotted when planted) Physical damage. Each
+   *  has `hpShare` of your maximum health. Left more than `leash` yd behind they
+   *  rejoin you; they leave with the standard or on your death. */
+  | {
+      kind: 'musterStandard';
+      duration: number;
+      soldiers: number;
+      attackInterval: number;
+      min: number;
+      max: number;
+      coef: number;
+      hpShare: number;
+      leash: number;
+      moveSpeed: number;
+    }
+  /** The Guttered Eye: channel a beam `length` yd straight ahead for `duration`;
+   *  every `every` sec it deals `flat` (+ `coef` of Spell Power) Arcane damage to
+   *  up to `maxTargets` enemies in the line (`halfWidth` yd either side). You may
+   *  turn to sweep it; moving ends it. */
+  | {
+      kind: 'gutteredGlare';
+      duration: number;
+      every: number;
+      length: number;
+      halfWidth: number;
+      flat: number;
+      coef: number;
+      maxTargets: number;
+    }
+  /** Muster Grapnel: hook a party or raid member within `range` yd (in line of
+   *  sight) and haul them through the air to your side in `flight` sec. */
+  | { kind: 'grapnel'; range: number; flight: number; apex: number; heal: number; coef: number }
+  /** A passive-only trinket (the Barrowstone Heart): nothing to use; the action
+   *  bar refuses the press and the tooltip prints no Use line. */
+  | { kind: 'passiveOnly' };
 
 /** What a trinket does on its own while worn. */
 export type TrinketPassive =
@@ -119,10 +215,15 @@ export type TrinketPassive =
   | { kind: 'ignite'; ticks: number; flat: number; coef: number }
   /** Heart of the Crucible: each parry, dodge or block you make adds a heat
    *  stack, up to `max`, kept for `duration`. */
-  | { kind: 'guardHeat'; max: number; duration: number };
+  | { kind: 'guardHeat'; max: number; duration: number }
+  /** Barrowstone Heart: a hit that would kill you turns you into a stone statue
+   *  for `statue` sec instead (immune to damage, unable to move or act), after
+   *  which you return at `restore` of your maximum health. Its internal cooldown
+   *  is the spec's `cooldown`. */
+  | { kind: 'stoneHeart'; statue: number; restore: number };
 
 export interface TrinketSpec {
-  /** Seconds between uses. */
+  /** Seconds between uses (for a passive-only trinket: its internal cooldown). */
   cooldown: number;
   use: TrinketUse;
   passive?: TrinketPassive;
@@ -155,6 +256,18 @@ export const TRINKET_AURA = Object.freeze({
   pierce: 'trinket_pierce',
   lantern: 'trinket_lantern',
   guardHeat: 'trinket_crucible_heat',
+  shackle: 'trinket_shackle',
+  spiritPack: 'trinket_spirit_pack',
+  seedburst: 'trinket_seedburst',
+  tether: 'trinket_tether',
+  tetherLink: 'trinket_tether_link',
+  harvest: 'trinket_harvest',
+  quench: 'trinket_quench',
+  quenched: 'trinket_quenched',
+  foremanShape: 'trinket_foreman_shape',
+  musterStandard: 'trinket_muster_standard',
+  gutteredGlare: 'trinket_guttered_glare',
+  stoneStatue: 'trinket_barrowstone_statue',
 });
 
 /** The Mooring Stone's self-slow rides its own aura id beside the anchor
@@ -192,6 +305,18 @@ export const TRINKET_AURA_ITEM: Readonly<Record<string, string>> = Object.freeze
   [TRINKET_AURA.pierce]: 'molten_fletching',
   [TRINKET_AURA.lantern]: 'last_flame_lantern',
   [TRINKET_AURA.guardHeat]: 'heart_of_the_crucible',
+  [TRINKET_AURA.shackle]: 'gaolers_iron_key',
+  [TRINKET_AURA.spiritPack]: 'fanglords_whistle',
+  [TRINKET_AURA.seedburst]: 'gorgebloom_seedpod',
+  [TRINKET_AURA.tether]: 'foremans_last_link',
+  [TRINKET_AURA.tetherLink]: 'foremans_last_link',
+  [TRINKET_AURA.harvest]: 'phial_of_the_tithe',
+  [TRINKET_AURA.quench]: 'quenchwater_flask',
+  [TRINKET_AURA.quenched]: 'quenchwater_flask',
+  [TRINKET_AURA.foremanShape]: 'knucklebone_of_balgath',
+  [TRINKET_AURA.musterStandard]: 'muster_standard',
+  [TRINKET_AURA.gutteredGlare]: 'guttered_eye',
+  [TRINKET_AURA.stoneStatue]: 'barrowstone_heart',
 });
 
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
@@ -263,7 +388,39 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   molten_fletching: trinket('molten_fletching', 'Molten Fletching', { agi: 15 }),
   last_flame_lantern: trinket('last_flame_lantern', 'Last Flame Lantern', { spi: 15 }),
   heart_of_the_crucible: trinket('heart_of_the_crucible', 'Heart of the Crucible', { sta: 15 }),
+  // The Sunken Bastion's heroic Gaoler Ossick (the five-man heroic trinket
+  // line of the Bastion Sigil).
+  gaolers_iron_key: trinket('gaolers_iron_key', "Gaoler's Iron Key", { sta: 13 }),
+  // The Wildheart Basin's heroic Fanglord Beastmaster and Gorgebloom (the
+  // five-man heroic trinket line, docs/design/dungeon-rework/wildheart_basin.md
+  // 8.2): item level 31, line budget round(31 x 0.6 x 0.7) = 13.
+  fanglords_whistle: trinket('fanglords_whistle', "Fanglord's Whistle", { agi: 13 }),
+  gorgebloom_seedpod: trinket('gorgebloom_seedpod', 'Gorgebloom Seedpod', { int: 13 }),
+  // The Gravewyrm Sanctum's heroic bosses (the five-man heroic trinket line,
+  // docs/design/dungeon-rework/gravewyrm_sanctum.md 9.2): item level 31, 13.
+  foremans_last_link: trinket('foremans_last_link', "Foreman's Last Link", { sta: 13 }),
+  phial_of_the_tithe: trinket('phial_of_the_tithe', 'Phial of the Tithe', { int: 13 }),
+  quenchwater_flask: trinket('quenchwater_flask', 'Quenchwater Flask', { str: 13 }),
+  // Balgath, the One-Eyed Foreman (the Mirefen world boss, content/zone2.ts): five
+  // personal-loot trinkets at his item level 26 (a level-20 world boss epic), whose
+  // trinket line is 11 points on one attribute (tests/item_level.test.ts).
+  knucklebone_of_balgath: trinket('knucklebone_of_balgath', 'Knucklebone of Balgath', {
+    str: 11,
+  }),
+  muster_standard: trinket('muster_standard', 'Muster Standard', { sta: 11 }),
+  guttered_eye: trinket('guttered_eye', 'The Guttered Eye', { int: 11 }),
+  barrowstone_heart: trinket('barrowstone_heart', 'Barrowstone Heart', { sta: 11 }),
+  muster_grapnel: trinket('muster_grapnel', 'Muster Grapnel', { int: 11 }),
 };
+
+/** Balgath's five trinkets, in the order they sit in his loot table. */
+export const BALGATH_TRINKET_ITEM_IDS: readonly string[] = [
+  'knucklebone_of_balgath',
+  'muster_standard',
+  'guttered_eye',
+  'barrowstone_heart',
+  'muster_grapnel',
+];
 
 // The Crucible of the Last Spring raid trinkets, in the order they sit in their
 // bosses' loot. They drop on BOTH difficulties: in each boss's Normal-only
@@ -280,6 +437,16 @@ export const CRUCIBLE_TRINKET_ITEM_IDS: readonly string[] = [
 ];
 
 export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freeze({
+  referral_hollow_charm: {
+    cooldown: 120,
+    use: { kind: 'passiveOnly' },
+    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 0.1, icd: 120, duration: 10 },
+  },
+  referral_fog_charm: {
+    cooldown: 120,
+    use: { kind: 'friendship', duration: 15, stats: 5 },
+    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 0.1, icd: 120, duration: 10 },
+  },
   bastion_sigil: {
     cooldown: 120,
     use: { kind: 'retaliate', duration: 8, reflect: 0.3 },
@@ -367,6 +534,137 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
     cooldown: 60,
     use: { kind: 'heartNova', radius: 10, flat: 8, coef: 0.05 },
     passive: { kind: 'guardHeat', max: 10, duration: 30 },
+  },
+  gaolers_iron_key: {
+    cooldown: 120,
+    use: { kind: 'shackle', range: 30, duration: 6, slow: 0.7 },
+  },
+  // Fanglord's Whistle: one of the Packlord Stampede's three beasts (content/
+  // classes.ts stampede: 18 to 24 physical plus 8 percent of the hunter's
+  // power, every 2 sec, for 12 sec), so the trinket pays a third of a level-17
+  // class cooldown on the five-man heroic trinkets' 2 min timer. Six bites at
+  // a heroic level-20 agile's 200 to 300 Attack Power land about 220 to 270,
+  // in line with a five-man heroic trinket's budget: 10 percent of a 230 DPS
+  // heroic (README section 7) for 12 sec (about 276). It runs at the Fanglord's
+  // Great Jaguar's speed (8 yd/s, wildheart.ts).
+  fanglords_whistle: {
+    cooldown: 120,
+    use: {
+      kind: 'spiritPack',
+      range: 30,
+      duration: 12,
+      attackInterval: 2,
+      min: 18,
+      max: 24,
+      coef: 0.08,
+      moveSpeed: 8,
+    },
+  },
+  // Gorgebloom Seedpod: the Stormjar's full jar on each target it strikes (ten
+  // charges of 8 plus 7 percent of Spell Power: 80 plus 70 percent) re-timed
+  // from its 90 sec cooldown to this 2 min one (x 4/3: about 107 plus 93
+  // percent) is the burst on a target that died first (75 x 1.5 = 112.5 plus
+  // 0.6 x 1.5 = 90 percent); the plain burst is two thirds of it. Like the
+  // Heart of the Crucible's nova it has no target cap; the 6 sec wait and the
+  // 8 yd radius are its price.
+  gorgebloom_seedpod: {
+    cooldown: 120,
+    use: {
+      kind: 'seedburst',
+      range: 30,
+      delay: 6,
+      radius: 8,
+      flat: 75,
+      coef: 0.6,
+      deathBonus: 0.5,
+    },
+  },
+  // Foreman's Last Link: the classic Blessing of Sacrifice share (30 percent
+  // of the damage an ally takes moves to the caster) on the five-man heroic
+  // trinkets' 2 min timer, for 10 sec. It moves damage, never removes it: the
+  // tank's Stamina line is its price.
+  foremans_last_link: {
+    cooldown: 120,
+    use: { kind: 'tether', range: 20, duration: 10, share: 0.3 },
+  },
+  // Phial of the Tithe: 5 percent of health and mana per enemy that dies near
+  // you inside 15 sec. A five-man trash pack (four to six) pays 20 to 30
+  // percent, about one mana potion's worth at level 20; a lone boss pays 5.
+  phial_of_the_tithe: {
+    cooldown: 120,
+    use: { kind: 'harvest', duration: 15, radius: 20, restore: 0.05 },
+  },
+  // Quenchwater Flask: three swings of 40 frost plus 20 percent of Attack
+  // Power. At a heroic level-20 strength wearer's 250 Attack Power that is
+  // three hits of 90 (270), in line with a five-man heroic trinket's budget:
+  // 10 percent of a 230 DPS heroic for 12 sec (about 276). The third one quenches:
+  // 15 percent slower attacks (the swing interval x 1 / 0.85) for 8 sec.
+  quenchwater_flask: {
+    cooldown: 120,
+    use: {
+      kind: 'quench',
+      duration: 12,
+      hits: 3,
+      flat: 40,
+      coef: 0.2,
+      slow: 0.15,
+      slowDuration: 8,
+    },
+  },
+  // Balgath's five (combat/balgath_trinkets.ts). The numbers sit beside the
+  // shipped trinkets and class kit they compete with: the soldiers' swing is the
+  // hunter Stampede's shape (a flat range plus a small power share, snapshotted)
+  // on a longer cooldown and fewer bodies.
+  knucklebone_of_balgath: {
+    cooldown: 120,
+    use: { kind: 'foremanShape', duration: 15, armorPct: 50 },
+  },
+  muster_standard: {
+    cooldown: 120,
+    use: {
+      kind: 'musterStandard',
+      duration: 15,
+      soldiers: 2,
+      attackInterval: 2,
+      min: 15,
+      max: 21,
+      coef: 0.07,
+      hpShare: 0.35,
+      leash: 40,
+      moveSpeed: 7.5,
+    },
+  },
+  // The glare is budgeted against its sister, the Muster Standard: same boss, same item
+  // level, same 2 min cooldown, so the same base damage. Two soldiers swing 7.5 times each
+  // in their 15 sec for 18 on average: 270 to one target. The glare's six ticks of 45 are
+  // that 270, front-loaded into 3 sec and laid on everything in the line. It shipped at
+  // 18 a tick (108 in all), well under the 3 sec of ordinary casting the channel costs a
+  // level 20 caster, which is why it read as a trinket that did nothing (owner playtest).
+  // The Spell Power share stays the classic one for an area channel: 3 sec / 3.5 halved
+  // for hitting many, spread over six ticks (about 0.07, rounded up to 0.08).
+  guttered_eye: {
+    cooldown: 120,
+    use: {
+      kind: 'gutteredGlare',
+      duration: 3,
+      every: 0.5,
+      length: 30,
+      halfWidth: 1.25,
+      flat: 45,
+      coef: 0.08,
+      maxTargets: 8,
+    },
+  },
+  barrowstone_heart: {
+    cooldown: 180,
+    use: { kind: 'passiveOnly' },
+    passive: { kind: 'stoneHeart', statue: 3, restore: 0.2 },
+  },
+  muster_grapnel: {
+    cooldown: 90,
+    // The haul lands with a heal: 120 plus 40% of Healing Power (about a classic rank-4
+    // Flash Heal's weight, the 1.5 / 3.5 direct-heal coefficient), on a 90 sec cooldown.
+    use: { kind: 'grapnel', range: 30, flight: 0.6, apex: 2.4, heal: 120, coef: 0.4 },
   },
 });
 

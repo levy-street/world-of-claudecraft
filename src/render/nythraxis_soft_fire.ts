@@ -13,6 +13,7 @@
 // clock, so the cloud stands still but the footprint below it stays legible.
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from './camera_relative_glsl';
 import { FLAME_ATLAS_FRAMES, FLAME_ATLAS_GLSL, getFlameTex } from './ignivar_fire_vfx';
 import { type HazardPaletteMode, nythraxisSoftFireRamp } from './nythraxis_hazard_palette_core';
 import {
@@ -23,7 +24,7 @@ import {
 
 const LAST_FRAME = (FLAME_ATLAS_FRAMES - 1).toFixed(1);
 
-const SOFT_FIRE_VERT = `
+const SOFT_FIRE_VERT = `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 uniform float uTail;
 uniform float uHead;
@@ -65,7 +66,7 @@ void main() {
   vec3 camRight = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
   vec3 camUp    = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
   world.xyz += (camRight * rc.x + camUp * rc.y) * size;
-  gl_Position = projectionMatrix * viewMatrix * world;
+  gl_Position = projectionMatrix * wocCamRelView(world.xyz);
   float ff = min(life * ${FLAME_ATLAS_FRAMES.toFixed(1)}, ${LAST_FRAME});
   float fA = floor(ff);
   vBlend = ff - fA;

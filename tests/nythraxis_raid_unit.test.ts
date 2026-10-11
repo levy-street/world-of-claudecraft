@@ -4,6 +4,7 @@ import { visualKeyFor } from '../src/render/characters/manifest';
 import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
 import { isBlocked } from '../src/sim/colliders';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
+import { NYTHRAXIS_RELOCATED_ITEM_IDS } from '../src/sim/content/nythraxis_loot';
 import { FARM_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
@@ -367,29 +368,16 @@ describe('Nythraxis raid encounter', () => {
       }
     }
     const sharedIds = groups.get('nythraxis_drop_1')!.map((entry) => entry.itemId);
-    for (const id of [
-      'maul_of_the_scourged_wilds',
-      'bramblehide_crown',
-      'bramblehide_mantle',
-      'bramblehide_harness',
-      'bramblehide_cinch',
-      'bramblehide_legguards',
-      'bramblehide_grips',
-      'bramblehide_treads',
-      'courtiers_bonefang',
-      'thornpeak_wardblade',
-      'gravecourt_hewer',
-      'votive_ward_of_the_deathless_court',
-      'thornpeak_moonhide_cowl',
-      'stormhymn_chain_grips',
-      'stormhymn_chain_treads',
-    ])
-      expect(sharedIds).toContain(id);
-    expect(sharedIds).toHaveLength(30);
-    expect(groups.get('nythraxis_drop_2')).toHaveLength(28);
-    for (const id of sharedIds.filter((id) => id!.startsWith('bramblehide_'))) {
-      expect(ITEMS[id!].requiredClass).toEqual(['druid']);
-      expect(ITEMS[id!].set).toBe('bramblehide');
+    expect(sharedIds).toContain('maul_of_the_scourged_wilds');
+    // The low-weight pieces moved to the dungeons on 2026-10-08
+    // (content/nythraxis_loot.ts, tests/nythraxis_relocation.test.ts): the shared
+    // slot keeps the two legendaries and nine pieces, the Normal slot the nine.
+    for (const id of NYTHRAXIS_RELOCATED_ITEM_IDS) expect(sharedIds).not.toContain(id);
+    expect(sharedIds).toHaveLength(11);
+    expect(groups.get('nythraxis_drop_2')).toHaveLength(9);
+    for (const id of NYTHRAXIS_RELOCATED_ITEM_IDS.filter((id) => id.startsWith('bramblehide_'))) {
+      expect(ITEMS[id].requiredClass).toEqual(['druid']);
+      expect(ITEMS[id].set).toBe('bramblehide');
     }
     expect(ITEMS.maul_of_the_scourged_wilds.requiredClass).toEqual(['druid']);
 
@@ -528,8 +516,11 @@ describe('Nythraxis raid encounter', () => {
     expect(entries.reduce((sum, entry) => sum + entry.chance, 0)).toBeLessThanOrEqual(1);
   });
 
-  it('drops the offhand-slot and two-hander epics at item level 29 (raid source)', () => {
-    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot;
+  it('keeps the offhand-slot and two-hander epics at item level 29 (raid source)', () => {
+    // They moved off the raid table onto Gravewyrm Sanctum and Wildheart Basin
+    // bosses on 2026-10-08 (content/nythraxis_loot.ts) and keep the raid tier.
+    const dropsSomewhere = (id: string) =>
+      Object.values(MOBS).some((mob) => (mob.loot ?? []).some((entry) => entry.itemId === id));
     for (const id of [
       'bonewrought_greatsword',
       'direfang_greatblade',
@@ -544,10 +535,7 @@ describe('Nythraxis raid encounter', () => {
       // weapons carry the doubled TWOHAND_STAT_MULT mainhand budget).
       expect(itemLevel(item), id).toBe(29);
       expect(primaryStatSum(item), id).toBe(expectedStatBudget(item));
-      expect(
-        loot.some((entry) => entry.itemId === id),
-        id,
-      ).toBe(true);
+      expect(dropsSomewhere(id), id).toBe(true);
     }
     // The two-handers occupy both hands; the offhand pieces fill the slot the
     // set never covered. The bulwark uses the v0.26 shield idiom (kind 'armor'
@@ -1958,7 +1946,8 @@ describe('Nythraxis raid encounter', () => {
     expect(boss.nythraxis?.deathlessTimer).toBeGreaterThan(19);
     expect(boss.nythraxis?.deathlessTimer).toBeLessThanOrEqual(20);
     expect(tank.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(false);
-    expect(visualKeyFor(aldric!)).toBe('npc_aldric');
+    // he wears his authored look on the priest's WOC body (characters/npc_looks.ts)
+    expect(visualKeyFor(aldric!)).toBe('player_priest');
   });
 
   it('stuns active Nythraxis adds for the full Aldric transition', () => {

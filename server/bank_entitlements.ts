@@ -30,6 +30,7 @@ export interface BankBonusFacts {
   discordLinked: boolean;
   walletLinked: boolean;
   qualifiedReferrals: number;
+  referralCapacityEarned?: boolean;
 }
 
 /** One entitlement source as data: how many slots a unit is worth, how many units
@@ -52,6 +53,12 @@ export const BANK_BONUS_SOURCES: readonly BankBonusSourceDef[] = [
   { id: 'discord', slotsPerUnit: 2, capUnits: 1, units: (f) => (f.discordLinked ? 1 : 0) },
   { id: 'wallet', slotsPerUnit: 2, capUnits: 1, units: (f) => (f.walletLinked ? 1 : 0) },
   { id: 'referral', slotsPerUnit: 2, capUnits: 5, units: (f) => f.qualifiedReferrals },
+  {
+    id: 'referral_cards',
+    slotsPerUnit: 20,
+    capUnits: 1,
+    units: (f) => (f.referralCapacityEarned ? 1 : 0),
+  },
 ];
 
 /** Turn the facts into the bonus-slot total and the per-source breakdown. Each row is

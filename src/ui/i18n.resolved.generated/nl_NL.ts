@@ -11,6 +11,119 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const nl_NL: EnTranslations = {
+  "referralCards": {
+    "title": "Refer a Friend",
+    "subtitle": "Adventure together. Earn your stamps.",
+    "close": "Close Refer a Friend",
+    "launcher": "Stamp cards",
+    "pages": "Stamp card pages",
+    "firstPage": "First page",
+    "nextPage": "More cards",
+    "trailmateTitle": "Trailmate",
+    "friendshipAura": "Friendship",
+    "protectiveCharm": "Protective Charm",
+    "bankBonus": "Completed stamp cards",
+    "bankBonusHelp": "Help two bound friends complete their stamp cards to unlock 20 permanent bank slots.",
+    "friendshipUse": "Increase your Strength, Agility, Stamina, Intellect, and Spirit by {stats} for {duration} seconds.",
+    "readyCount": "Stamp cards: {count} rewards ready to collect",
+    "loading": "Connecting to your referral cards...",
+    "empty": "Invite a new player to begin your first stamp card together.",
+    "inviteTitle": "Invite a friend",
+    "inviteHelp": "Share this link with a friend before they create their account. Only new accounts created through your link become bound friends.",
+    "inviteLabel": "Your invitation link",
+    "inviteUnavailable": "Your invitation link is not available yet.",
+    "membership": "When your bound friend buys their first membership, you receive a membership bond.",
+    "cardBetween": "{you} and {friend}",
+    "yourCard": "{name}'s stamp card",
+    "unassigned": "Character not selected",
+    "start": "Start a card",
+    "startPrompt": "Start stamp cards with {friend}? Both of you must accept. Each character must be below level 5 and must not have completed the final Tutorial Island quest.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "declinePrompt": "Are you sure you want to decline? You can start later from the stamp card menu while both characters still meet the requirements.",
+    "declineConfirmed": "The card was not started. You can start from the stamp card menu while both characters still meet the requirements.",
+    "waiting": "Waiting for your bound friend to accept.",
+    "cancel": "Cancel",
+    "okay": "OK",
+    "understand": "Yes, I understand",
+    "confirmLock": "Yes, lock this card",
+    "lockFirst": "Redeeming The Fogbinder stamp reward permanently locks this card to {name}. You will no longer be able to move this card or its rewards to another character. Do you understand?",
+    "lockSecond": "Are you sure? Redeem The Fogbinder reward and permanently lock this card to {name}.",
+    "locked": "This card is locked to {name}. It can no longer be moved.",
+    "unlocked": "This card can move to another eligible character until you redeem The Fogbinder stamp reward. Redeeming that reward permanently locks it to this character.",
+    "move": "Move card to this character",
+    "movePrompt": "Move your card from {oldName} to {newName}? Your progress and all rewards earned from this card will move. Those rewards will be removed from {oldName}.",
+    "confirmMove": "Yes, move my card",
+    "summon": "Summon bound friend",
+    "summonPrompt": "{friend} wants to summon you to their location. Accept the summon?",
+    "summonHelp": "Bring your bound friend to your location. You can summon once every 30 minutes.",
+    "summonCooldown": "Summon ready in {minutes} min {seconds} sec",
+    "reward": "Reward: {reward}",
+    "earned": "Earned",
+    "redeemed": "Redeemed",
+    "emptyStamp": "Not yet earned",
+    "stamping": "Stamping your card...",
+    "redeem": "Redeem reward",
+    "previous": "Redeem earlier stamps first.",
+    "playTogether": "Complete milestones in a party with the characters on this card.",
+    "fallback": "Already completed a milestone quest alone? Rejoin your friend in a party for the Tutorial Island stamp. For later quest stamps, clear the matching dungeon together.",
+    "questGroup": "Stamp card quests",
+    "questWithFriend": "{quest} with {friend}",
+    "browseCards": "Browse all stamp card pages",
+    "nextQuest": "Stamp card: {quest}",
+    "questIndicator": "This quest advances your next stamp card reward.",
+    "completion": "Congratulations! {friend} completed their stamp card with your help.",
+    "openInvites": "Open Refer a Friend",
+    "referrerTitle": "Friends you helped",
+    "referrerCount": "{count} friends completed",
+    "friendTier": "Friends helped: {count}",
+    "awarded": "Awarded",
+    "pending": "Not yet awarded",
+    "milestones": {
+      "tutorial": "Tutorial Island final quest",
+      "hollow": "Into the Hollow",
+      "fogbinder": "The Fogbinder",
+      "gravewyrm": "Korzul the Gravewyrm",
+      "raid": "Defeat your first raid boss"
+    },
+    "rewards": {
+      "tutorial": "A unique title and a maximum-tier bag, bound to your character.",
+      "hollow": "A trinket that grants Stamina and a passive shield when your health is low.",
+      "fogbinder": "Your trinket evolves, gaining more Stamina and an active effect: +5 to all stats for 15 seconds, with a 2 minute cooldown.",
+      "gravewyrm": "Free mount training.",
+      "raid": "The exclusive Friendship Tank mount."
+    },
+    "referrerRewards": {
+      "1": "The exclusive Friendship Raptor mount.",
+      "2": "20 bank slots and 5 character slots.",
+      "3": "1,000 Claudium.",
+      "4": "1,000 Claudium.",
+      "5": "A Sapling buddy companion."
+    },
+    "reasons": {
+      "notParticipant": "This account is not part of this bound-friend link.",
+      "staleRevision": "Your card changed. Check its latest progress and try again.",
+      "invalidCharacters": "The party characters do not belong to this bound-friend link.",
+      "notTogether": "Both bound friends must be in the same party.",
+      "levelTooHigh": "New card characters must be below level 5.",
+      "tutorialCompleted": "A character has already completed the final Tutorial Island quest.",
+      "alreadyStarted": "This link already has a card. Each bound-friend link can have only one active card.",
+      "notPending": "There is no card invitation waiting for a response.",
+      "declinePending": "Your bound friend is deciding whether to decline the card.",
+      "declineNotConfirmed": "Confirm the decline before ending this invitation.",
+      "notActive": "Start a card together before collecting rewards.",
+      "wrongCharacter": "Use the characters named on the card, or move an unlocked card to an eligible character.",
+      "locked": "This card is locked to its character and cannot be moved.",
+      "sameCharacter": "This card is already on this character.",
+      "invalidMilestone": "That stamp does not belong to this card.",
+      "notEarned": "Complete this milestone together before redeeming it.",
+      "alreadyRedeemed": "This reward has already been redeemed.",
+      "previousRewardRequired": "Redeem the earlier stamp rewards first.",
+      "confirmationRequired": "Review the card lock warning before redeeming The Fogbinder reward.",
+      "newAccountsOnly": "Accounts can become bound friends only when a new account is created through a referral link. Existing accounts cannot be bound.",
+      "unavailable": "This action is not available right now. Please try again later."
+    }
+  },
   "meta": {
     "builtOn": "Gebouwd op {date}"
   },
@@ -347,6 +460,26 @@ export const nl_NL: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "Courier",
+      "close": "Close courier",
+      "ready": "Ready for a delivery",
+      "outbound": "Flying to the bank",
+      "returning": "Bringing your items back",
+      "waiting": "Waiting to return your items",
+      "bags": "Send to bank",
+      "bank": "Bring from bank",
+      "cargo": "Courier inventory",
+      "empty": "No items",
+      "send": "Send courier",
+      "selected": "{count} / {limit} stacks selected",
+      "select": "Select {item}, {count}",
+      "selectedItem": "Deselect {item}, {count}",
+      "instructions": "Select whole stacks. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.",
+      "membership": "Renew your membership to start another trip.",
+      "cargoSafe": "Carried items stay with the courier until there is room in your bags.",
+      "unavailable": "Summon your courier to plan a delivery."
+    },
     "framePresets": {
       "apply": "Toepassen",
       "pickerLabel": "Framevoorinstellingen: {name}",
@@ -513,6 +646,48 @@ export const nl_NL: EnTranslations = {
       "sailing": "Vaart naar {dest}"
     },
     "materialStackSelectionUnavailable": "Die materiaalkeuze is niet langer beschikbaar.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "Geschut van de Noordwacht",
       "objective": "Verdedig de noordnacht-wacht",
@@ -826,6 +1001,50 @@ export const nl_NL: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "Game subscription",
+        "monthlyTitle": "Monthly membership",
+        "annualTitle": "12-month membership bundle",
+        "annualPrice": "{price} for 12 months, paid upfront",
+        "annualTerms": "Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.",
+        "annualMount": "After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.",
+        "trialTerms": "Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.",
+        "startTrial": "Start 7-day free trial",
+        "resumeCheckout": "Resume checkout",
+        "checkoutClosed": "This checkout has closed without an outstanding reward. Choose a membership plan again to start a new checkout.",
+        "annualClaim": "Collect bundle mount",
+        "annualPending": "Return to the purchasing character after payment to collect the bundle mount. If payment is processing or the trial is active, try again after the paid charge.",
+        "annualDelivered": "Your bundle mount key has been delivered by mail.",
+        "tokenTitle": "Tradable membership token",
+        "benefitsTitle": "Active membership benefits",
+        "benefitBank": "Access your other characters' banks at any banker.",
+        "benefitSlots": "Unlock 10 additional character slots.",
+        "benefitArmour": "Claim soulbound armour with stats for your class and specialisation. It scales with your level and reaches item level 25 at level 20. Wear the full set for 20% more XP.",
+        "benefitTax": "Pay half the normal auction house tax.",
+        "benefitExpiry": "When membership ends, characters in the additional slots and armour bonuses are locked until renewal. Your base character slots remain playable.",
+        "tokenTerms": "{price} once for 30 days. Delivered by mail to this character. Redeem it to add membership time, or sell it at the auction house.",
+        "tokenBuy": "Buy membership token",
+        "tokenClaim": "Collect purchased token",
+        "tokenPending": "After payment, return to this character and collect your token. If payment is still processing, try again shortly.",
+        "tokenDelivered": "Your token has been delivered by mail.",
+        "price": "{price} per month",
+        "terms": "Renews monthly. Pay with fiat through Stripe. Cancel in billing settings.",
+        "subscribe": "Subscribe",
+        "manage": "Manage subscription",
+        "ending": "Cancels at the end of the billing period",
+        "error": "Could not open billing. Allow popups and try again.",
+        "status": {
+          "none": "Not subscribed",
+          "incomplete": "Payment incomplete",
+          "incomplete_expired": "Checkout expired",
+          "trialing": "Trial",
+          "active": "Active",
+          "past_due": "Payment overdue",
+          "canceled": "Canceled",
+          "unpaid": "Unpaid",
+          "paused": "Paused"
+        }
+      },
       "title": "WOC-winkel",
       "close": "WOC-winkel sluiten",
       "tabsLabel": "Onderdelen van de WOC-winkel",
@@ -1987,6 +2206,8 @@ export const nl_NL: EnTranslations = {
       "name_goblin_rocket_sled": "Goblin-raketslee",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Vreesvonk Grondschudder",
+      "name_referral_tank": "Friendship Tank",
+      "name_referral_raptor": "Friendship Raptor",
       "name_drakemaw_raptor": "Drakenmuil-Raptor",
       "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Mechvogel",
@@ -2004,6 +2225,8 @@ export const nl_NL: EnTranslations = {
       "desc_rallycart_rxt": "Een compacte rallymachine die de reissnelheid verhoogt.",
       "desc_rallycart_skin": "Een kleine rallyauto met een machtige brul.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
+      "desc_referral_tank": "Earned by completing a referral stamp card.",
+      "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
       "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend.",
       "desc_avian_strider": "Een imposant zadelvogel wiens zware klauwen en gevouwen vleugels elke reis in een donderend sprinten veranderen.",
       "desc_mech_bird": "Een met de hand gebouwde oorlogskip die sprint op klikkende servo's terwijl de opwindsleutel nog draait.",
@@ -2208,6 +2431,7 @@ export const nl_NL: EnTranslations = {
       "showDevBadges": "Ontwikkelaarsinsignes tonen",
       "showOwnNameplate": "Mijn naambordje tonen",
       "showPlayerNameplates": "Spelersnamen Tonen",
+      "showPetNames": "Show Pet Names",
       "uiScale": "UI-schaal",
       "playerFrameScale": "Schaal spelerframe",
       "targetFrameScale": "Schaal doelwitframe",
@@ -2845,6 +3069,9 @@ export const nl_NL: EnTranslations = {
       "weapons": "Wapens",
       "groupSeason2": "Oorlogvoering Seizoen 2: Voorhoede",
       "groupEntry": "Oorlogvoering Seizoen 1",
+      "companions": "Companions",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "owned": "In bezit",
       "buyAria": "Koop {item} voor {honor}",
       "buyOwnedAria": "Koop {item} voor {honor}, al in bezit",
@@ -3112,8 +3339,10 @@ export const nl_NL: EnTranslations = {
         "storm": "Elke spreuk die je cast voegt een lading toe, tot {max}. Ladingen duren {duration} sec, vernieuwd wanneer je er een krijgt.",
         "heat": "Je melee en ranged wapen hits voegen elk een hittestapel toe, tot {max}. Hitte duurt {duration} sec, vernieuwd wanneer je een stapel krijgt.",
         "ignite": "Je melee en ranged wapen kritieke treffen steken het doelwit in lichtelaaie, voor {tick} Vuur schade elke {every} sec voor {duration} sec. Een nieuwe kritieke treffer vernieuwt het. Schade neemt toe met Attack Power of Ranged Attack Power, wat het hoogste is.",
-        "guardHeat": "Elke aanval die je pareerd, ontwijkt of blokkeert, voegt een hittestapel toe, tot {max}. Hitte duurt {duration} sec, vernieuwd wanneer je een stapel krijgt."
+        "guardHeat": "Elke aanval die je pareerd, ontwijkt of blokkeert, voegt een hittestapel toe, tot {max}. Hitte duurt {duration} sec, vernieuwd wanneer je een stapel krijgt.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "Voor {duration} sec, een vijand die je rechtstreeks raakt, neemt Physical schade gelijk aan {pct}% van de gezondheid die die klap van je afnam. Periodieke schade triggert het niet.",
         "anchor": "Voor {duration} sec, neem {reduction}% minder schade maar beweeg op {speed}% snelheid. Verwijdert stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms en incapacitating effects op jou, en je negeert nieuwe en knockbacks terwijl het duurt.",
@@ -3132,7 +3361,17 @@ export const nl_NL: EnTranslations = {
         "kindlingOrb": "Roep een asmborb naast je op voor {duration} sec. Elke spreuk die je op een vijand cast laat hem een pijl op die vijand afvuren voor {damage} Vuur schade. Schade neemt toe met Spell Power.",
         "pierce": "Voor {duration} sec, je auto-attacks, shots en fysieke vaardigheden (geen bloeds) slaan ook de vijand dichtst bij je doelwit binnen {reach} yd voor {share}% van de toegebrachte schade.",
         "lantern": "Zet een lantaarn aan je voeten voor {duration} sec. Een directe genezing van iemand op je of een partylidmaatje binnen {radius} yd ervan geneest ook het meest gewonde andere partylidmaatje in het licht voor {share}% van de genezing.",
-        "heartNova": "Breng alle hittestapels uit op een vuurvuur die {perHeat} Vuur schade per stapel ({max} op {maxHeat} stapels) aan elke vijand binnen {radius} yd doet en elke vijand die het raakt daagt uit. Schade neemt toe met Attack Power. Vereist een hittestapel."
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "spiritPack": "Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.",
+        "seedburst": "Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.",
+        "tether": "Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.",
+        "harvest": "For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.",
+        "quench": "Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
+        "heartNova": "Breng alle hittestapels uit op een vuurvuur die {perHeat} Vuur schade per stapel ({max} op {maxHeat} stapels) aan elke vijand binnen {radius} yd doet en elke vijand die het raakt daagt uit. Schade neemt toe met Attack Power. Vereist een hittestapel.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -3581,6 +3820,14 @@ export const nl_NL: EnTranslations = {
       "watchYouTube": "Bekijken op YouTube",
       "streamerBadgeTitle": "Geverifieerde streamer"
     },
+    "buddyMenu": {
+      "rename": "Rename Buddy",
+      "nameLabel": "Buddy name",
+      "autolootEnable": "Enable Autoloot",
+      "autolootDisable": "Disable Autoloot",
+      "autolootHint": "Your buddy fetches loot from your own corpses within 30 yards.",
+      "cancel": "Cancel"
+    },
     "lootSettings": {
       "title": "Buitinstellingen",
       "close": "Buitinstellingen sluiten",
@@ -3906,6 +4153,64 @@ export const nl_NL: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.",
+        "packBondFury": "Deals {pct}% more damage while its partner stands close.",
+        "stalked": "The Great Jaguar hunts you and ignores taunts. Each bite deals {min} to {max} physical damage ({heroicMin} to {heroicMax} on Heroic) and opens a bleed. Kite it away from its master.",
+        "waryStuns": "A stun has landed on it. Further stuns slide off until this ends.",
+        "waryRoots": "A root has landed on it. Further roots slide off until this ends.",
+        "warySlows": "A slow has landed on it. Further slows slide off until this ends.",
+        "pollinated": "Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).",
+        "prey": "Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.",
+        "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
+        "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
+      },
+      "bastion": {
+        "brineColumn": "Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.",
+        "halberdWall": "Takes {pct}% less damage while another Drowned Watchman stands within {radius} yd. Pull them apart.",
+        "fogShroud": "Takes {pct}% less damage while it stands in the Fog Bank. Drag it out of the fog.",
+        "carrionGlut": "Fed on the dead ({stacks} of {max}): each stack makes its Soul Release {radius} yd wider and {pct}% stronger.",
+        "snappedFetters": "Its chains are broken. It no longer fights, cannot be harmed, and soon leaves.",
+        "anchored": "Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic)."
+      },
+      "crypt": {
+        "carrionEye": "Every crow in the fight hunts you for {seconds} sec. Run to your tank so the flock can be cut down together.",
+        "graniteSkin": "Takes {pct}% less damage, and the stone thickens every {every} sec, up to {max} layers. A stun shatters it and leaves it taking {cracked}% more damage for {seconds} sec.",
+        "measured": "When this ends, an Open Grave caves in where you stand: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. The grave stays for the rest of the fight, so carry the mark to the edge of the yard, away from the group.",
+        "graveDirt": "Standing in an Open Grave: movement speed reduced by {slow}% and {damage} Shadow damage every second ({heroic} on Heroic). On Heroic, lingering {linger} sec in a grave raises a Restless Bones. Step out of the grave.",
+        "dirtInEyes": "Reduces movement speed by {pct}%. Shovelful hits everyone in front of Sexton Marrow: stand behind him.",
+        "blow": "Increases damage taken by {pct}%: {per}% for each stack, {stacks} of {max} now. Each Gravedigger's Blow adds a stack and resets the duration to {seconds} sec.",
+        "graveVigor": "Attacks {pct}% faster while he stands in an Open Grave. Keep him out of the graves.",
+        "tolling": "Immune to damage while he strides to the bell rope and rings the Burial Bell. When the ringing ends, the Toll deals {min} to {max} Shadow damage ({heroicMin} to {heroicMax} on Heroic) to everyone, and every Open Grave gives up a Restless Bones.",
+        "embraced": "Held aloft in the Lady's arms: unable to act, taking {tick} Frost damage every second ({tickHeroic} on Heroic). If your group deals {share}% of her maximum health she sets you down gently; if she holds you {hold} sec at the top she drops you onto the ice for {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic).",
+        "lament": "When Bride's Lament ends, it deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone not within {radius} yd of a lit grave lantern. A lantern shelters the {cap} players nearest it, then goes dark and misses the next Lament.",
+        "lingering": "Your next Bride's Lament deals {pct}% more damage: {per}% for each stack, up to {max} stacks. Take the next one in a lantern's light.",
+        "slippery": "On slick ice: your speed changes by at most {grip} yd/sec each second, so you are slow to get going, slide on when you stop, and swing wide when you turn. Step off the ice to get your footing back.",
+        "harmony": "Takes {pct}% less damage: {per}% for each of her living Choristers. Kill the Choristers first.",
+        "crescendo": "Sings faster: the Dirge of the Hollow takes {cast} sec instead of {castNormal} sec and comes every {every} sec instead of {everyNormal} sec, and the Bone Organ plays {waves} waves of notes instead of {wavesNormal}.",
+        "gorged": "Deals {pct}% more damage: {per}% for each Bound Soul that reached him, {stacks} of {max} now, for the rest of the fight. Each soul that reaches him also heals him for {heal}% of his maximum health. Step into a soul's path to take it instead.",
+        "unquietWard": "Immune to damage while he channels the Rite of the Unquiet at the altar: {lit} of {total} Remembrance Candles relit. Relighting one is a {channel} sec channel that drains {drain}% of the lighter's maximum health every second ({drainHeroic}% on Heroic); hits do not break it, a step or a stun does. The last candle shatters the ward. On Heroic, light them in the order the Ledger names: a wrong candle snuffs the last one lit and deals {wrongMin} to {wrongMax} Shadow damage to the lighter.",
+        "riteBroken": "Stunned: the shattered ward leaves him unable to act for {seconds} sec.",
+        "shatteredWard": "Takes {pct}% more damage for {seconds} sec: the relit candles broke his ward. Spend your strongest attacks now.",
+        "graveChill": "Takes {bite} Shadow damage every second ({biteHeroic} on Heroic) while the Rite of the Unquiet holds, rising by {step} ({stepHeroic} on Heroic) every {every} sec. Relight the Remembrance Candles to end it.",
+        "graspMark": "Hands erupt from the ring under you in {fuse} sec: everyone within {radius} yd of where it was laid is rooted for {root} sec and takes {min} to {max} Shadow damage. Step out of the ring.",
+        "graspRoot": "Held by the grave's hands: unable to move for {seconds} sec.",
+        "knellAirborne": "On the wing over the Rite Ring, out of reach. It marks half of the ring for {mark} sec, then pours ghost fire over that half: {min} to {max} Fire damage to everyone in it. It burns {breaths} halves each flight, then lands."
+      },
+      "sanctum": {
+        "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
+        "enrage": "Deals {pct}% more damage.",
+        "grasp": "Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.",
+        "twiceWoken": "Rose again from the meltwater and deals {pct}% more damage.",
+        "doused": "His plate broke under him and the quench-water put out his Grave Inferno.",
+        "airborne": "In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.",
+        "wyrmsEye": "When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.",
+        "quenchWater": "In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.",
+        "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.",
+        "branded": "Deals {value} {school} damage every {interval} sec for {seconds} sec. Step into a meltwater pool to put it out at once.",
+        "creepingRime": "Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.",
+        "icedOver": "Frozen solid by Creeping Rime: unable to move or act."
+      },
       "sharedPyre": "Doet {total}% van de maximale gezondheid van elke speler, verdeeld over het aantal spelers in de cirkel ({perPlayer}% elk bij {players} spelers).",
       "varkhulSharedPyre": "Doet {total}% van de maximale gezondheid van elke speler, verdeeld over de spelers in de cirkel ({perPlayer}% elk bij {players} spelers). Elke ontbrekende speler doet bovendien {missingPenalty}% van de maximale gezondheid aan de hele raid, inclusief spelers in de cirkel.",
       "makersBrand": "Gedurende {duration} sec verhoogt elke stapeling de schade die je van Varkhul oploopt met {pct}%. Stapelt tot {max} keer. Tanks moeten wisselen bij {swap} stapelingen.",
@@ -3950,6 +4255,8 @@ export const nl_NL: EnTranslations = {
       "cooldownCap": "{used} van {cap} sec afkoeltijdvermindering gebruikt in dit venster",
       "bruinRushWindow": "Wolfsgedaante kost geen mana en pint het doelwit van uw Bruin-stormloop vast, wat het {sec} sec lang {pct}% vertraagt",
       "funeralHarvestLock": "Funeral Harvest kan nog geen ander Zielfragment creëren",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Loden vloek kan dit doelwit nog niet opnieuw vastwortelen",
       "forbiddenReflectionReady": "Je volgende in aanmerking komende Heksenmeester-afkoeltijd kan opnieuw worden ingezet",
       "forbiddenReflectionLock": "Verboden Weerspiegeling kan nog niet opnieuw worden voorbereid",
@@ -4028,6 +4335,16 @@ export const nl_NL: EnTranslations = {
         "riftGuard": "Je neemt {pct}% minder schade.",
         "sprint": "Bewegingssnelheid verhoogd met {pct}%. Stapelt niet met andere snelheidsverbeteringen.",
         "brand": "Ontvangen genezing is verminderd met {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "spiritPack": "A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.",
+        "seedburst": "A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.",
+        "tether": "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
+        "tetherLink": "You take {pct}% of the damage your chained ally would take.",
+        "harvest": "Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.",
+        "quench": "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenchOther": "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenched": "Attack speed slowed by {pct}%.",
         "forgeHeat": "Hitte: {stacks}/{max}. Het gebruik van Tempering van de Smederij besteedt alles, en zijn wapenvuur toebrengt {pct}% meer schade.",
         "tempered": "Je melee- en afstandswapen treffen toebrengen {damage} extra Vuurschade ({pct}% meer van de bestede hitte). Elke trefferslag voegt {killExtend} sec toe, tot {maxDuration} sec totaal.",
         "temperedOther": "Melee- en afstandswapen treffen toebrengen extra Vuurschade, {pct}% meer van de bestede hitte. Schade groeit met Aanvalssterkte of Afstandsaanvalssterkte, welke het hoogst is.",
@@ -4036,6 +4353,10 @@ export const nl_NL: EnTranslations = {
         "moltenIgnite": "Toebrengen {damage} Vuurschade elke {every} sec. Een ander wapenkritiek raakt het.",
         "pierce": "Je automatische slagen, schoten en fysieke vaardigheden (geen bloedingen) slaan ook de vijand het dichtst bij je doelwit in {reach} yard voor {pct}% van de toegebrachte schade.",
         "lantern": "Een directe genezing van iedereen op jou of een partijlid in {radius} yard van de lantaarn genest ook het meest verwonde andere partijlid in het licht voor {pct}% van de genezing.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Hitte: {stacks}/{max}. Gebruik Hart van de Smeltkroes om alles te besteden aan een vuurnovaan die {damage} Vuurschade toebrengt aan elke vijand in {radius} yard en intimideer alle wezens die het raakt.",
         "crucibleHeatOther": "Hitte: {stacks}/{max}. Hart van de Smeltkroes besteedt alles aan een vuurnovaan in {radius} yard die meer Vuurschade toebrengt per stapel en intimideer alle wezens die het raakt."
       },
@@ -4071,6 +4392,7 @@ export const nl_NL: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Vermindert alle schade die je oploopt met {pct}%",
+      "slumber": "Slaapt tot de dageraad. Kan niet worden aangevallen en wordt voor niemand wakker.",
       "guardianWard": "De volgende dodelijke vijandelijke treffer herstelt je in plaats daarvan naar {pct}% gezondheid",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -4147,7 +4469,9 @@ export const nl_NL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} verrijst boven Doorntop-Hoogten!"
+      "spawn": "{name} verrijst boven {zone}!",
+      "wake": "{name} ontwaakt boven {zone}!",
+      "sleep": "{name} slaapt tot de dageraad."
     },
     "auth": {
       "appleLoginCta": "Ga verder met Apple",
@@ -4291,6 +4615,7 @@ export const nl_NL: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimap",
         "stanceBar": "Houdingsbalk",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "XP-balk",
         "chat": "Chat",
         "actionBarGroup": "Actiebalken",
@@ -4880,6 +5205,19 @@ export const nl_NL: EnTranslations = {
       "vaultCannotDeposit": "Kan niet in de Materialenkluis",
       "tabsAria": "Banktabbladen",
       "personalTab": "Persoonlijk",
+      "accountTab": "Other characters",
+      "accountArmour": "Claim membership armour",
+      "referralArmour": "Claim friendship armour",
+      "accountMembership": "An active membership lets you access your other characters' banks here.",
+      "accountCharacters": "Character banks",
+      "accountEmpty": "Create another character to use their bank here.",
+      "accountSelect": "Select a character to load their bank.",
+      "accountUnavailable": "This bank is unavailable. Select the character again to refresh.",
+      "accountDeposit": "Your bags: deposit into this bank",
+      "accountWithdraw": "Selected bank: withdraw into your bags",
+      "accountDepositHint": "Click to deposit this stack into the selected character bank.",
+      "accountWithdrawHint": "Click to withdraw this stack into your bags.",
+      "accountBound": "Soulbound, locked and quest items cannot move between characters.",
       "guildTab": "Gilde",
       "guildCapacityAria": "Gildebankvakken gebruikt: {used} van {total}",
       "guildEmpty": "De gildebank is leeg.",
@@ -4949,6 +5287,190 @@ export const nl_NL: EnTranslations = {
       "logOpenBank": "{actor} opende de gildebank voor {amount}",
       "logCharterFee": "{actor} betaalde de gildeoprichtingskosten van {amount}",
       "logAdminPurge": "Een beheerder verwijderde {count} {item}"
+    },
+    "collections": {
+      "title": "Hunting",
+      "close": "Close hunting",
+      "keybindLabel": "Hunting",
+      "launcherTitle": "Hunting: buddies, mounts and item sets",
+      "tabs": {
+        "buddies": "Buddies",
+        "mounts": "Mounts",
+        "sets": "Item Sets"
+      },
+      "state": {
+        "owned": "Collected",
+        "notOwned": "Not collected",
+        "unavailable": "Not obtainable yet",
+        "pending": "A presence follows you"
+      },
+      "presenceDefault": "You feel a presence watching you.",
+      "revealed": "{name} has decided to follow you.",
+      "cosmeticUnlocked": "New look for {name}: {look}.",
+      "presence": {
+        "ember_fox": "Something small and warm is padding along behind you.",
+        "moss_hare": "A rustle in the peat keeps pace with your steps.",
+        "frog": "A wet croak answers every step you take.",
+        "crimson_claw_crab": "Something clicks and scuttles just out of sight.",
+        "golden_sentinel": "A faint gilded glint watches from the grass.",
+        "nightfang": "Silent paws follow where you cannot see.",
+        "tuskhorn_boar": "A snort and a stamp: something stubborn is trailing you.",
+        "emerald_wolf": "Green eyes blink in the undergrowth, then follow.",
+        "tiger": "Stripes shift at the edge of your vision.",
+        "cate_coin": "You hear the faint ring of a coin that is not yours.",
+        "alon": "You feel watched, and quietly approved of.",
+        "trollface": "Somewhere behind you, something is grinning.",
+        "ansem": "A whisper of doors and darkness follows you.",
+        "triple_t": "Three footsteps fall where there should be one.",
+        "kekius": "A stifled laugh trails you down the road.",
+        "solbot": "A soft ticking keeps time with your stride.",
+        "frostfire": "Steam and frost swirl in your wake.",
+        "rocky": "Pebbles shift behind you with no wind to move them.",
+        "proud_grunt": "A boot stamps to attention somewhere behind you.",
+        "loot_goblin": "Something is counting your coins under its breath.",
+        "penny_goldspark": "Tiny tools clink in a pocket that is not yours.",
+        "stag": "A shadow with antlers falls across your path.",
+        "alpaca": "Something woolly and unhurried has decided to come along.",
+        "horse": "Hooves keep an easy, patient beat somewhere behind you.",
+        "sapling": "Little roots patter behind you, stirring the fallen leaves.",
+        "bull": "A low huff of breath stirs the dust behind you.",
+        "spider": "A thread of silk brushes your shoulder.",
+        "raptor": "Quick claws tick over stone at your heels.",
+        "skeleton": "Dry bones rattle in step with yours.",
+        "crystal_lich": "A cold hum rises from the wreckage, and it is watching you.",
+        "forgemaw": "The heat of the forge has not left you. Something walked out with it.",
+        "crystal_tide": "A drop of the sea refuses to fall from your line.",
+        "phantom": "The air behind you is a shade too still.",
+        "emberfall_phoenix": "A warmth like a banked fire settles at your back."
+      },
+      "cosmetic": {
+        "crystal_lich_frostbound": "Frostbound",
+        "crystal_lich_voltaic": "Voltaic",
+        "forgemaw_ashen": "Ashen",
+        "forgemaw_whitehot": "White-Hot",
+        "stag_acorn": "Acorn Crown",
+        "stag_gilded": "Gilded",
+        "moss_hare_verdant": "Verdant",
+        "proud_grunt_warlord": "Warlord",
+        "frog_sapphire": "Sapphire Frog"
+      },
+      "actions": {
+        "summon": "Summon",
+        "dismiss": "Dismiss",
+        "wear": "Wear",
+        "remove": "Remove"
+      },
+      "looks": {
+        "title": "Looks",
+        "unlocked": "Unlocked",
+        "locked": "Locked",
+        "worn": "Worn",
+        "none": "No looks authored for this companion yet"
+      },
+      "source": {
+        "bossLabel": "Boss pet",
+        "bossDrop": "{mob} ({location}), {chance}% per player per kill",
+        "bossDropWithHeroic": "{mob} ({location}), {chance}% per player, {heroicChance}% on Heroic",
+        "bossDropHeroicOnly": "{mob} ({location}), Heroic only, {chance}% per player",
+        "rollNote": "Every player rolls separately; nobody loses a roll to a party member.",
+        "deedLabel": "Earned by",
+        "deed": "The deed {deed}",
+        "challengeLabel": "Challenge",
+        "challengeSpeed": "Defeat {mob} within {seconds} seconds of the pull",
+        "challengeDps": "Deal {dps} damage per second to {mob} across the fight",
+        "craftLabel": "Crafted",
+        "craft": "{item} ({profession} recipe)",
+        "grantLabel": "Awarded",
+        "grantOnly": "Seasonal award: the monthly ladder and top-parse rewards",
+        "tokenLabel": "Token",
+        "token": "{item}, used once to attach the companion"
+      },
+      "buddyLore": {
+        "ember_fox": "A vixen out of the Eastbrook Vale hedgerows, named for the coal-red coat that shows through winter scrub. The trappers there gave up on the kits generations ago and started leaving food out instead.",
+        "moss_hare": "The Willowfen hare, green-furred from a lifetime bedded down in wet peat. Fen herbalists count them lucky and will not have one chased off a doorstep.",
+        "frog": "Mirefen Marsh raises them fat and unbothered, singing all night from the reed beds. The marsh guides swear a boat carrying one never runs aground.",
+        "crimson_claw_crab": "A Farshore tidal crab whose claw stays red long after it leaves the water. Dock crews used to race them along the boards for coin.",
+        "golden_sentinel": "A watch-beetle of the Amberfall, gilded by the resin it grew up in. The name is older than the resin: sentinels of a kind kept those groves long before anyone thought to bottle the sap.",
+        "nightfang": "A young Nightbloom hunter, silent even by the standards of its kind. It follows for the company and hunts nothing larger than a moth.",
+        "tuskhorn_boar": "Thornpeak stock, bred short-legged by shepherds who wanted a boar that could not put a fence down. It kept the temper regardless.",
+        "emerald_wolf": "A Wraithwood pup, its coat green in the canopy light that never quite reaches the forest floor. The wardens raise whichever orphans the wood leaves behind.",
+        "tiger": "Palmreach stripes on an animal that has never seen the Palmreach: the line has been kept in captivity since the old menageries closed. It answers to a whistle and to nothing else.",
+        "cate_coin": "A cat that will not be parted from the coin it sits on, and that nobody has ever seen eat. Eastbrook merchants still argue over which of the two is the pet.",
+        "alon": "A traveller's mascot from a road no map will admit to, turning up wherever a plan is going badly. It watches, it approves, and it offers no help whatsoever.",
+        "trollface": "A grinning thing the Wraithwood put out and would not take back. Every attempt to describe it ends with the describer laughing and giving up.",
+        "ansem": "It speaks of doors and of darkness and will not be drawn further on either. The Nightbloom cultists claim it as theirs; it wanders off whenever they hold a rite.",
+        "triple_t": "Three of something, or one thing three times over. The accounts disagree, and the creature will not hold still long enough to be counted.",
+        "kekius": "A laughing companion of unclear origin, adopted by the Galecrest race yards as a charm. It has outlived four stables that swore by it.",
+        "solbot": "A small sun-fed automaton, dug half-buried out of the Drakelands ash and still ticking. Whatever workshop built it left no mark anywhere on the casing.",
+        "frostfire": "Born in the Frostveil Reach where a hot spring surfaces through the ice field, and it has never settled on which half it belongs to. It steams in cold air and shivers in warm.",
+        "rocky": "A stone-shelled crawler off the Thornpeak scree, slow and thoroughly unbothered. Miners keep them for the way they go still a moment before a collapse.",
+        "proud_grunt": "A veteran of the Warfare stores who kept the salute and lost the rank. Warmarshal Draven Kole hands one to any soldier with honor enough to know what that costs.",
+        "loot_goblin": "It follows anyone carrying Heroic Marks and has never once been caught stealing. Quartermaster Vex maintains that this proves nothing at all.",
+        "penny_goldspark": "A gnome tinker's apprentice who charges by the hour and is worth every copper of it. Armorer Hode took her on to settle a debt and now sells the arrangement to anyone holding a thousand gold.",
+        "stag": "Evergarden bloodline, bred down from the great stags the wardens once rode. It still lowers its head at a raised hand, from a habit older than the animal.",
+        "alpaca": "The Galecrest herds keep them for wool and for temper: nothing stays calmer in a storm. This one will spit at exactly one person per journey.",
+        "horse": "Vale pony stock, bred small for the orchard lanes and never told it is not a warhorse. It keeps pace at your shoulder and will follow anyone who once fed it an apple.",
+        "sapling": "A young tree with a smile in its bark and a curious purple gaze. Its roots carry it in a cheerful waddle wherever you wander.",
+        "bull": "A Vale bull the size of a dog, which is the only reason anyone agreed to keep one indoors. The temperament did not scale down with the rest.",
+        "spider": "A Wraithwood weaver, palm-sized, that redecorates any pack it is carried in. The webbing is stronger than the thread it replaces.",
+        "raptor": "Drakelands hatchling stock, sold on before it learns how fast it can run. Every new owner is told to keep it fed, and none of them need telling twice.",
+        "skeleton": "It came up out of the Wraithwood barrows, dusted itself off, and has followed people about ever since. Nobody has established whose bones these were.",
+        "crystal_lich": "A splinter of Nythraxis itself, still humming with the cold that shaped it. It answers to whoever pulled it from the wreck of the raid, and it has not forgiven them for it.",
+        "forgemaw": "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
+        "crystal_tide": "A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.",
+        "phantom": "A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.",
+        "emberfall_phoenix": "It burns down to an ember every autumn and comes back up out of its own ash by spring, which is the whole of what anyone can tell you about it. Nobody has ever found a nest, and nobody has ever caught one twice."
+      },
+      "petKind": {
+        "beast": "Beasts",
+        "elemental": "Elementals",
+        "humanoid": "Humanoids",
+        "undead": "Undead",
+        "celebrity": "Celebrities"
+      },
+      "armor": {
+        "cloth": "Cloth",
+        "mail": "Mail",
+        "leather": "Leather"
+      },
+      "stat": {
+        "intellect": "Intellect",
+        "agility": "Agility",
+        "strength": "Strength",
+        "mixed": "Hybrid"
+      },
+      "set": {
+        "owned": "{owned} of {total} pieces",
+        "itemLevel": "ilvl {level}",
+        "bonusLabel": "{pieces} pieces"
+      },
+      "detail": {
+        "dropLabel": "Drops from",
+        "vendorLabel": "Sold by",
+        "bindLabel": "Binding",
+        "sellLabel": "Vendor pays",
+        "marketLabel": "World Market",
+        "exchangeLabel": "$WOC Exchange",
+        "setLabel": "Collected",
+        "drop": "{mob} ({location}), {chance}% per kill",
+        "heroicDrop": "{mob} ({location}), Heroic only, {chance}% per kill",
+        "dropWithHeroic": "{mob} ({location}), {chance}% per kill, {heroicChance}% on Heroic",
+        "globalDrop": "Any enemy, {chance}% per kill, one of {count} at this rarity",
+        "fishingDrop": "Fishing anywhere, {chance}% per catch",
+        "vendor": "{npc} ({location}) for {price}",
+        "honorPrice": "{amount} Honor",
+        "marksPrice": "{amount} Heroic Marks",
+        "noSource": "No source in the game yet",
+        "noItem": "No item grants this yet",
+        "tradeable": "Tradeable",
+        "soulbound": "Soulbound",
+        "noSell": "Cannot be sold",
+        "marketAtMerchant": "Shown at the Merchant",
+        "marketChecking": "Checking...",
+        "marketNone": "No listings",
+        "exchangeNone": "No listings",
+        "exchangeUnavailable": "Not available on this client"
+      }
     },
     "calendar": {
       "title": "Evenementenkalender",
@@ -5949,10 +6471,38 @@ export const nl_NL: EnTranslations = {
       "tagFastRun": "Snelle run",
       "mech": {
         "shadow_pulse": "Schaduwpuls (pulserende gebiedsschade)",
+        "crypt_shovelful": "Shovelful (every 11 seconds he flings grave dirt over an 8 yard cone in front of him: one and a half times his swing and 50 percent slower movement for 6 seconds, so stand behind him)",
+        "crypt_measured_for_the_grave": "Measured for the Grave (every 15 seconds he marks a player other than the tank; 4 seconds later an Open Grave caves in under them, 42 to 52 damage within 3 yards on normal, and the pit stays for the fight: 9 damage a second and 40 percent slower movement inside, so lay the graves at the edge of the yard)",
+        "crypt_burial_toll": "Burial Toll (at 66 and 33 percent health he strides to the bell rope, immune to damage, and rings for 3 seconds: 30 to 38 shadow damage to everyone on normal, and every Open Grave raises a Restless Bones)",
+        "crypt_marrow_heroic": "Heroic: Gravedigger's Blow every 9 seconds on the tank (each stack makes them take 6 percent more damage for 20 seconds, up to 6 stacks), Grave Vigor (he swings 30 percent faster while he stands in a grave) and Unquiet Earth (anyone who stays 2 seconds in a grave raises a Restless Bones there)",
+        "crypt_brides_lament": "Bride's Lament (every 22 seconds a 3 second wail: 60 to 75 frost damage on normal to everyone outside the light of a lit grave lantern, half again for every Lingering Lament stack from the Laments you already took. A lantern shelters two players at most and goes dark for 28 seconds after it shelters anyone, so split up and take turns)",
+        "crypt_frozen_embrace": "Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 6 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)",
+        "crypt_rime_path": "Rime Path (she leaves slippery rime where she drifts for 25 seconds: on it you gather speed slowly and slide on when you stop or turn)",
+        "crypt_bridal_freeze": "Bridal Freeze (at half health the whole ravine floor freezes over: slippery ice for the rest of the fight)",
+        "crypt_lady_heroic": "Heroic: every lit lantern also burns out on its own after 30 seconds and stays dark for 10, and the Frozen Embrace takes two players",
+        "crypt_dirge_of_the_hollow": "Dirge of the Hollow (every 16 seconds a 2.5 second song you can interrupt: if she finishes it, 105 to 125 shadow damage on normal and a 4 second silence to everyone within 45 yards who can see her, so interrupt it or hide behind a choir pillar)",
+        "crypt_harmony": "Harmony (each living Chorister makes her take 30 percent less damage: kill the Choristers first)",
+        "crypt_bone_organ": "Bone Organ (every 26 seconds she plays the Bone Organ: two waves of shadow notes burst down lanes of the loft, 100 to 115 damage on normal in a lane, the second wave filling the first one's gaps)",
+        "crypt_crescendo": "Crescendo (below 30 percent health her Dirge takes 1.8 seconds and comes every 11 seconds, and the organ plays a third wave)",
+        "crypt_ilvane_heroic": "Heroic: Encore (a Chorister that lies dead for 10 seconds while the other still stands rises again, so kill them together) and Unbroken Verse (every third Dirge cannot be interrupted: hide from it)",
+        "crypt_morthen_shadow_pulse": "Shadow Pulse (every 12 seconds a 2 second cast, then 24 to 30 shadow damage on normal to everyone within 12 yards of him, so step away; every 9 seconds in his Last Rites)",
+        "crypt_gravecall": "Gravecall (every 15 seconds a Bound Soul drifts from the next sarcophagus alcove toward him; when it reaches him he is Gorged on the Dead, 10 percent more damage for each soul up to 10 stacks, and heals 3 percent of his health. A player in its path takes it instead: 12 to 16 shadow damage on normal)",
+        "crypt_rite_of_the_unquiet": "Rite of the Unquiet (at 65 percent health he returns to the altar, immune inside the Unquiet Ward, while Grave Chill deals 3 shadow damage a second to everyone, rising by 1 every 5 seconds, and 2 Restless Bones climb out of the alcoves. Relight the 4 Remembrance Candles: each is a 4 second channel that drains 6 percent of the lighter's maximum health every second, which hits do not break but a step or a stun does. The last candle breaks the Rite: he is stunned for 8 seconds and takes 25 percent more damage)",
+        "crypt_reap_the_unquiet": "Reap the Unquiet (below 35 percent health the souls stop; every 14 seconds he sweeps his scythe after a 2 second cast: 55 to 65 shadow damage on normal to everyone in a 120 degree arc 14 yards in front of him. Shadow Pulse then comes every 9 seconds)",
+        "crypt_morthen_heroic": "Heroic: Name the Dead (the Ledger names the order of the candles: a wrong candle snuffs the last one lit and deals 252 to 288 shadow damage to the lighter, and each relight drains 8 percent a second), Grasp of the Grave (every 16 seconds 2 players get a 4 yard ring; 1.5 seconds later hands erupt in it: a 3 second root and 162 to 198 shadow damage) and the Knellwyrm's Burning Knell (it takes flight and marks half of the ring for 4.5 seconds, then pours ghost fire over that half for 1,000 to 1,120 fire damage, 3 halves each flight)",
         "reaping_arc": "Maaiboog (frontale maaislaan)",
+        "hallowed_brine": "Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)",
+        "rebounding_bulwark": "Rebounding Bulwark (his shield rebounds to the nearest player within 10 yards of the last one hit, up to 3 players, 4 on heroic: spread out)",
+        "tide_sentence": "Sentence of the Tide (5 seconds after the mark, a column of light strikes everyone within 6 yards of the marked player, 8 on heroic: take it away from the group)",
+        "unbroken_oath": "Unbroken Oath (once, at half health, he kneels immune in a bubble for up to 60 seconds: kill his soldiers to break it, then he is stunned 4 seconds and takes 20 percent more damage for 10)",
+        "fog_veil": "Fog Veil (four figures, one real: the beacon's beam makes the real Vael's lantern flare)",
         "mist_surge": "Mistgolf (pulserende gebiedsschade)",
         "summons_adds": "Roept versterkingen op",
         "lunar_tide": "Maantij (pulserende gebiedsschade)",
+        "chorus_and_solo": "Chorus and Solo (stack on one mark, spread from the other)",
+        "tideglass_reflections": "Tideglass Reflections (kill each other's mirror images)",
+        "rising_tide": "Rising Tide (half the island floods, move to the dry half)",
+        "undertow": "Undertow (pulls everyone in, run out before the crash)",
         "enrage": "Razend bij weinig gezondheid",
         "shuddering_stomp": "Huiverende Stamp (gebiedsverdoving)",
         "grave_inferno": "Grafsinferno (gekanaliseerde vuur-AoE, houd afstand)",
@@ -5978,6 +6528,9 @@ export const nl_NL: EnTranslations = {
         "deathless_court": "Het Doodloze Hof (alleen heroic, het koninklijk hof verrijst na Doodloze Razernij)",
         "bloodmane_rend": "Bloodmane Rend (bloeden, let op doelwissels)",
         "tusk_sweep": "Tusk Sweep (frontaal splijten)",
+        "grave_breath": "Grave Breath (frontal fire cone, it cracks the ice it covers)",
+        "plate_floor": "Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)",
+        "wyrm_flights": "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
         "ancestral_sap": "Ancestral Sap (geneest zijn bondgenoten)",
         "call_of_the_hunt": "Call of the Hunt (versnelt nabije bondgenoten)",
         "thickhide_ward": "Thickhide Ward (schermt nabijgelegen bondgenoten)",
@@ -6001,8 +6554,172 @@ export const nl_NL: EnTranslations = {
         "forgestorm": "Forgestorm (vallende meteoorcirkels, ga weg)",
         "shared_pyre": "Gedeelde brandstapel (verzamelcirkel, de schade verdelen)",
         "anvils_decree": "Anvil's Decreet (drie hamerslagen over de hele raid, genezen door)",
-        "masters_assembly": "De Meestervergadering (blokkeer de smederijbalken, draai blokkers)"
+        "masters_assembly": "De Meestervergadering (blokkeer de smederijbalken, draai blokkers)",
+        "iron_cage": "Iron Cage (mash your interact key to break out, allies can smash the bars)",
+        "drowned_anchor": "Drowned Anchor (its victim is reeled toward the pit: run within 3 yards of a lit mooring post to moor the chain, the post then goes dark for 30 seconds, or break the chain with 12 hits, 16 on heroic)",
+        "shackle_pair": "Shackle Pair (two chained players must stay close together)",
+        "reaper_behind": "Shadow Crossing (three times in a row he rises behind a player, a different one each time while enough stand: step out of the scythe's arc)",
+        "pack_bond": "Pack Bond (together they take half damage: drag them 15 yards apart)",
+        "stalk": "Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)",
+        "shared_health": "Shared Health (one pool: hit whichever is safest)",
+        "heel_frenzied_bond": "Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)",
+        "seed_rain": "Seed Rain (clean players stomp the seeds before they sprout)",
+        "pollinate": "Pollinate (golden players stay off the seeds, or they sprout at once)",
+        "vine_lash": "Vine Lash (step out of the thorny lane or be rooted)",
+        "gorge": "Gorge (a heavy bite and a poison on the tank)",
+        "burrowing_seeds": "Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)",
+        "spirit_of_the_hunt": "Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)",
+        "twin_prey_ambush": "Twin Prey and Ambush (two Prey, then a pounce on the farthest player)",
+        "seal_shackles": "Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)",
+        "chain_strain": "Strain (step away from every pillar whose chain still holds)",
+        "korgath_stomp": "Shuddering Stomp (step out of the ring round him)",
+        "rerivet_last_link": "Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)",
+        "waking_thaw": "Waking Thaw (the dead climb out of the thaw pools)",
+        "unquenched_held": "Held or Unquenched (kill the dead on cold ice, never in meltwater)",
+        "soulfire_trench": "Soulfire Trench (a line of soulfire, then a strip of meltwater)",
+        "shadow_volley": "Shadow Volley (shadow damage to everyone)",
+        "warm_hands_twice_woken": "Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)"
       }
+    },
+    "bastionCage": {
+      "title": "Locked in the Iron Cage!",
+      "promptKey": "Press {key} again and again to break free",
+      "promptNoKey": "Press your interact key again and again to break free",
+      "promptClick": "Click here again and again to break free",
+      "promptTap": "Tap here again and again to break free",
+      "buttonAria": "Break free from the Iron Cage",
+      "progressAria": "Escape progress: {pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "Chained to the Drowned Anchor!",
+      "anchoredLine": "Run to a lit mooring post to moor the chain, or have your group break it before the winch drags you into the pit",
+      "allyTitle": "Break the chain!",
+      "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor, or help them reach a lit post",
+      "shackledTitle": "Shackled to {name}",
+      "shackledLine": "Stay within {range} yards of each other ({dist} yards apart)",
+      "strainedLine": "Too far apart! The chain bites both of you: close to {range} yards",
+      "brokenAria": "Chain broken: {pct}",
+      "reachAria": "Chain reach used: {pct}",
+      "linksLeft": "Chain links left: {count} of {total}",
+      "linkRule": "Every hit on the anchor breaks one link, however hard it lands",
+      "linksTarget": "{count} of {total} links",
+      "linkBroken": "Link broken!"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "The Sentence falls on you!",
+      "sentencedLine": "A column of light strikes everyone near you: move away from the group",
+      "brineTitle": "In the Hallowed Brine!",
+      "brineLine": "It burns you every second: step out of the pool",
+      "reapedTitle": "Death rises behind you!",
+      "reapedLine": "Step out of the scythe's arc: forward, or to either side",
+      "veilTitle": "The Fog Veil",
+      "veilLine": "Watch the beacon's beam: the figure whose lantern flares is the real Vael",
+      "realTitle": "The beam found him!",
+      "realLine": "This is the real Vael: strike him to break the veil",
+      "shadeTitle": "A hollow shade",
+      "shadeLine": "The light pours through it: leave it, find the one the beam lights",
+      "timeAria": "{seconds} seconds left"
+    },
+    "wildheartAlert": {
+      "preyTitle": "You are the Prey!",
+      "preyLine": "Zulgar hunts you: run him through the lit sun glyphs",
+      "preyWaitLine": "He chases the other Prey now: be ready, he switches",
+      "stalkedTitle": "Stalked!",
+      "stalkedLine": "The jaguar hunts you: kite it away from its master",
+      "pollinatedTitle": "Pollinated!",
+      "pollinatedLine": "Stay off the seeds: your touch makes them sprout",
+      "bondTitle": "Pack Bond",
+      "bondLine": "Together they take half damage: pull them apart",
+      "timeAria": "{seconds} seconds left"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "In the quench-water!",
+      "quenchLine": "It burns and slows you: swim to the nearest ice or the shore",
+      "plungeTitle": "Plunging Fire!",
+      "plungeLine": "Your whole plate is about to burn: get off it now",
+      "descentTitle": "Crashing Descent!",
+      "descentLine": "He lands right here: step out of his shadow",
+      "eyeTitle": "Wyrm's Eye on you!",
+      "eyeLine": "Your plate burns when the mark ends: stay on sound ice, away from the group",
+      "eyeCrackedLine": "You stand on cracked ice: walk to a sound plate before the mark ends",
+      "flailTitle": "Chain Flail!",
+      "flailLine": "The chain whips down the painted lane: step out of it",
+      "chargeTitle": "Threshold Charge!",
+      "chargeLine": "He charges down the lane: get out of it, away from the edge",
+      "trenchTitle": "Soulfire Trench!",
+      "trenchLine": "Soulfire cuts the lane and leaves meltwater: get out of it",
+      "strainTitle": "Strain!",
+      "strainLine": "The intact pillars are about to lash out: get away from them",
+      "infernoTitle": "Grave Inferno!",
+      "infernoLine": "Each pulse burns harder: get out of his reach",
+      "stompTitle": "Shuddering Stomp!",
+      "stompLine": "Get away from him before his foot comes down",
+      "breathTitle": "Grave Breath!",
+      "breathLine": "You stand in the breath cone: get out to the side",
+      "maulTitle": "Maul Arc!",
+      "maulLine": "He swings through everything in front of him: get behind him",
+      "tailTitle": "Tail Sweep!",
+      "tailLine": "You stand behind him: get out before the tail hits",
+      "meltwaterTitle": "In the meltwater",
+      "meltwaterLine": "Your Bonewalker stands in meltwater: drag it onto the cold ice",
+      "meltwaterTargetLine": "If your target dies in meltwater it rises again: wait for cold ice",
+      "crackedTitle": "Cracked ice",
+      "crackedLine": "Fire here breaks this plate: keep his fire off it",
+      "flightTitle": "Korzul takes flight",
+      "flightLine": "Stack on sound ice to choose where he lands, then step off",
+      "lockboundTitle": "Lockbound",
+      "lockboundLine": "{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.",
+      "timeAria": "{seconds} seconds left",
+      "brandedTitle": "Branded!",
+      "brandedLine": "The brand burns until it ends: douse it in a meltwater pool",
+      "rimeTitle": "Creeping Rime!",
+      "rimeLine": "Creeping Rime {stacks}/{max}: step out of the whelps' breath",
+      "slabTitle": "Ice Slab",
+      "slabLine": "Solid ice: it blocks line of sight. Hide behind it from the casters' spells"
+    },
+    "cryptAlert": {
+      "measuredTitle": "Measured for the Grave!",
+      "measuredLine": "A grave caves in under you when the bar runs out: carry it to the edge of the yard",
+      "embracedTitle": "Frozen Embrace!",
+      "embracedLine": "She holds you aloft: your group must hurt her to make her set you down",
+      "lamentTitle": "Bride's Lament!",
+      "lamentShelteredLine": "You stand in a lit lantern's light with room for you: hold still",
+      "lamentOpenLine": "Get into a lit lantern's light before the wail lands: two to a lantern",
+      "graveTitle": "In an Open Grave!",
+      "graveLine": "The grave dirt burns and slows you: step out of it",
+      "tollTitle": "Burial Toll!",
+      "tollLine": "He cannot be hurt while he rings the bell: brace for the Toll and the dead it raises",
+      "harmonyTitle": "Harmony",
+      "harmonyLine": "Her Choristers take {pct}% off the damage she takes: kill them first",
+      "knellTitle": "Burning Knell!",
+      "knellLine": "Ghost fire pours over this half of the ring when the bar runs out: get to the other half",
+      "graspTitle": "Grasp of the Grave!",
+      "graspLine": "Hands erupt from this ring and hold whoever stands in it: step out",
+      "reapTitle": "Reap the Unquiet!",
+      "reapLine": "His scythe sweeps the ground in front of him: get behind him",
+      "riteTitle": "Rite of the Unquiet",
+      "riteLine": "Relight the Remembrance Candles to shatter his ward: {lit} of {total} lit",
+      "riteNamedLine": "Relight only the candle the Ledger names next: {lit} of {total} lit",
+      "soulTitle": "Bound Soul",
+      "soulLine": "A soul drifts toward Morthen: step into its path to take it before it feeds him",
+      "timeAria": "{seconds} seconds left"
+    },
+    "kitUse": {
+      "toppleLine": "Kick it over onto the pack: the spill burns them",
+      "toppleKey": "Topple the {name} onto them",
+      "toppleTap": "Tap here to topple the {name} onto them",
+      "toppleClick": "Click here to topple the {name} onto them",
+      "toppleFar": "Get within {range} yd to kick it over",
+      "toppleAria": "Topple the {name}",
+      "usingLine": "Hold still: a hit, a step or a stun breaks it",
+      "relightLine": "It drains your health every second you channel: hits do not break it, a step or a stun does",
+      "relightKey": "Relight the {name}",
+      "relightTap": "Tap here to relight the {name}",
+      "relightClick": "Click here to relight the {name}",
+      "relightFar": "Get within {range} yd to relight it",
+      "relightAria": "Relight the {name}",
+      "relightUsingLine": "Hold still while it drains you: hits do not break it, a step or a stun does",
+      "timeAria": "{seconds} seconds left"
     },
     "cosmetics": {
       "title": "Uiterlijk",
@@ -6011,6 +6728,8 @@ export const nl_NL: EnTranslations = {
       "tabMounts": "Rijdieren",
       "tabSkins": "Skins",
       "tabMech": "Mech",
+      "buddyActive": "Summoned",
+      "buddyDrag": "Drag to action bar",
       "legend": "Account: gedeeld door elk personage. Personage: alleen dit personage.",
       "scopeAccount": "Account",
       "scopeCharacter": "Personage",
@@ -6231,6 +6950,14 @@ export const nl_NL: EnTranslations = {
       "bordersSection": "Randen",
       "bordersNone": "Geen rand",
       "bordersEmpty": "Verricht een daad die een rand schenkt om deze plank te ontgrendelen.",
+      "buddiesSection": "Buddies",
+      "buddiesNone": "No Buddy",
+      "buddiesEmpty": "Collect a companion to summon it from this shelf.",
+      "buddyDragHint": "Drag onto your action bar",
+      "looksSection": "Buddy Looks",
+      "looksNone": "Own Look",
+      "looksNoBuddy": "Summon a companion to choose its look here.",
+      "looksEmpty": "This companion has no looks unlocked yet.",
       "unlockedBanner": "Daad volbracht: {name}",
       "unlockedTitleHint": "Nieuwe titel behaald: {title}. Kies hem in het Boek der Daden.",
       "unlockedBorderHint": "Nieuwe rand verdiend: {name}. Draag hem via het Boek der Daden.",
@@ -6711,6 +7438,8 @@ export const nl_NL: EnTranslations = {
       "delete_confirm": "Typ de personagenaam om de verwijdering te bevestigen.",
       "storage_purchase_open": "Een opslag-aankoop moet voltooid of opgelost zijn voordat dit personage kan worden verwijderd.",
       "delete_busy": "De wereld is bezet. Probeer dit personage zo meteen opnieuw te verwijderen.",
+      "referral_transfer_pending": "Move all unlocked stamp cards to another character before deleting this character.",
+      "referral_bond_pending": "A referral membership bond is being delivered to this character. Try deleting the character again after delivery finishes.",
       "already_in_world": "Personage is al in de wereld.",
       "taken_over": "Je personage is overgenomen door een andere sessie.",
       "rename_required": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",
@@ -6947,6 +7676,95 @@ export const nl_NL: EnTranslations = {
         "0": "Goede compost, de bedden zullen leven. De oude molenaar begroef iets voordat hij vertrok. Zijn molen draait nog steeds in de verre hoek van de tuinen. Ga daar staan.",
         "2": "Dus de molen stuurde je de kustweg af. Het baken houdt een laatste geheim: noordwestelijk ervan, net buiten het pad, was het gras gesneden en terugelegd. Graaf daar."
       }
+    }
+  },
+  "dungeonGuide": {
+    "drownedTemple": {
+      "greet": {
+        "1": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you.",
+        "2": "Every full moon I come to this gate, and every full moon my nerve fails me. Not tonight. The Choir is singing, and I am the one who ran. Take me down to her, and I will keep out of your way."
+      },
+      "row": {
+        "join": "Come with us.",
+        "decline": "We go alone."
+      },
+      "joined": "Lead on. I am right behind you.",
+      "singing": "Let me sing. Go, and go gently.",
+      "accept": {
+        "1": "Thank you. I will walk behind you, and keep out of your way.",
+        "2": "Then I go down at last. Walk on. I will keep up."
+      },
+      "decline": "I understand. I will listen from up here, as I always have.",
+      "heroicWater": "The water stands high tonight, higher than I have ever seen it. She is close to waking.",
+      "memory": {
+        "votaries": "The drowned ones on the shore walked in after the gate closed. The moon never took them, only the water.",
+        "rubbing": "The Tidewatcher read my words on the shore-rock. 'It only sleeps.' I carved them the morning after."
+      },
+      "area": {
+        "steps": "The Pilgrim Steps. I ran up these that night, three at a time, and never looked back.",
+        "causeway": {
+          "1": "On rite nights the moon lay on this causeway like a second road.",
+          "2": "Look at the water. It still remembers how to hold the moon."
+        },
+        "colonnade": "The Colonnade of Tides. We walked it two by two, singing the rising verse.",
+        "veil": "Past that veil is the Choir Court. I have not stood there since I was a boy.",
+        "terraces": "The tidepools. The novices kept them clean and fed the small bright things living in them.",
+        "falls": "Behind the falls the water drowns every voice. I hid here when I skipped practice.",
+        "pool": "The moon pool. They knelt round it and drank from their shells. I could not lift mine.",
+        "prismStair": "The Prism Stair. We climbed it at moonrise to wake the great glass.",
+        "moonbridge": {
+          "1": "A bridge of moonlight. The elders said only the faithful could cross it.",
+          "2": "I was never faithful. Well. We shall see if it holds me."
+        },
+        "altarLanding": "This is where I stood. Right here. This is where I turned and ran."
+      },
+      "sight": {
+        "pilgrim": "The pilgrims of the shore villages. They carried their shrine on their backs every spring. Now they carry it forever.",
+        "acolyte": "The novices. I learned my letters beside them. They sing in their sleep now, and never wake.",
+        "templeguard": "The stair guard. They swore to hold the temple until the moon set. It never set.",
+        "snapper": "We drank the moon-water from shells like those. Mine I dropped on the stair.",
+        "siren": "That voice. She sang beside me in the choir. She still comes in half a beat early.",
+        "lurker": "The children netted those in the shallows. They were small as a thumb, and they glowed.",
+        "tidewisp": "That is the moon-water itself, the draught we were meant to drink. Do not let it touch you.",
+        "sentinel": "The moon rays of the gate pools. As novices we fed them pearls at moonrise. Now they keep the doors, and wear our pearls as hearts.",
+        "eel": "The lagoon eels. The novices fed them bread at dusk. They grew fat on our hymns.",
+        "reflection": "It shows you what the water would make of you. Break it!",
+        "moonspawn": "Those were never my people. They are hers, made of nothing but moonlight."
+      },
+      "selthe": {
+        "pre": {
+          "1": "Mother Selthe. She taught me to breathe from the belly. She taught us all to drown without dying.",
+          "2": "Choirmother Selthe. Every note I know, she put in me. Forgive me, Mother."
+        },
+        "post": {
+          "1": "She is quiet. In all my years in the Choir, she was never once quiet.",
+          "2": "Rest now, Mother. You were right about me. I never could hold the long notes."
+        }
+      },
+      "hydra": {
+        "pre": "The pool serpent. When I was a boy it had one head, and it ate from our hands.",
+        "post": "Listen. Under the falls they are still singing. Closer now."
+      },
+      "colossus": {
+        "pre": "The great prism. We sang into it to catch the moon. I never knew it could stand.",
+        "post": "The glass is broken. Nothing is left to catch the moon now, but her."
+      },
+      "ysolei": {
+        "pre": "There she is. All my life I have asked if she was a goddess or a monster. Show me.",
+        "preHeroic": "On a night like this the whole Choir sings with her. Hold fast, all of you."
+      },
+      "farewell": {
+        "answer": "She was neither. She was the moon in the water, and we were the ones who knelt.",
+        "verse": "The rite had a last verse, the one that lets the singers sleep. I never sang it.",
+        "stay": "They have waited long enough. I will stay, and sing it for them now.",
+        "goodbye": {
+          "1": "Go up into the night. If you hear singing at the full moon, it is only me.",
+          "2": "Thank you for bringing an old coward to the end of his song. Go now."
+        },
+        "emote": "{name} lifts his voice over the altar, and the lagoon falls still."
+      },
+      "wipe": "Get up. Please. Do not leave me down here alone again.",
+      "catchUp": "My legs are old, but I know every one of these stairs. I am here."
     }
   },
   "guide": {
@@ -7428,6 +8246,7 @@ export const nl_NL: EnTranslations = {
       "framesGovernedAuraTracks": "Frames bewerken maakt ook de zes optionele aurastromen los zodra je ze hebt ingeschakeld op het tabblad Gevecht van dezelfde Interface-opties: de stroom Mijn buffs, de stroom Verdedigingsafkoelingen, de stroom Mijn schilden, de stroom Aanvalsafkoelingen, de stroom Beweging en sluipen, en de stroom Mijn buffs op bondgenoten. Elke stroom staat standaard uit en draagt zijn eigen naamlabel zolang hij losstaat.",
       "frameGroups": "{trackers} kunnen quests, daden, riften, delves, verzameldoelen en Reliquarium-tracking combineren. {auras} kunnen Target dots en de zes aura-paden combineren. Schakel beide groepen in via Frame-instellingen, of laat het uit om elk frame afzonderlijk te verplaatsen. {tot} bevat een bronnenbalk. {focus} heeft drie onafhankelijk verplaatsbare doelen: Shift+F1 tot Shift+F3 wijzen ze toe; Ctrl+F1 tot Ctrl+F3 selecteert ze. Sleep de schade- of bedreiging meter overal buiten de knoppen om het te verplaatsen, en sleep de randen om het grootte aan te passen, zelfs terwijl frames zijn vergrendeld. Terwijl frames ontgrendeld zijn, Show or Hide Frames heeft zijn eigen gegroepeerde menu. Rechtsklik op een ontgrendeld frame voor Grootte resetten of Frame-opties. Interface > Frames bevat ook Frame-instellingen en opvouwbare Partijframe-opties. Target van Target aan Target vergrendelen houdt die frames samen. Zet het uit om Target van Target afzonderlijk te verplaatsen; teruginschakelen bewaart de afzonderlijke positie voor later. Toegewezen focus frames verbergen hun instellingscontroles; rechtsklik en kies Instellen van Focus ontdoen om ze terug te krijgen. Mouseover-casting werkt ook op focus frames.",
       "framesGovernedTalkingHead": "Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Balken, timers en gevechtstekst",
       "barsBody": "Je spreukbalk verschijnt in het midden van het scherm, net boven je actiebalken, telkens wanneer je een spreuk uitspreekt of kanaliseert, en toont de naam van de spreuk en de resterende tijd. Je doelwit krijgt een eigen spreukbalk op zijn frame, zodat je kunt zien wat eraan komt en erop kunt reageren.\n\nEen dunne wapenslagbalk zit onder je spreukbalk en vult zich tussen je wapenslagen, zodat een nabij- of afstandsaanvaller kan zien wanneer de volgende automatische treffer landt.\n\nJe ervaringsbalk loopt over de volle breedte onder je actiebalken, verdeeld in segmenten, met een lichter stuk dat de uitgeruste ervaring toont die je hebt opgespaard.\n\nZwem onder water en een blauwe adembalk verschijnt bovenaan het scherm. Hij loopt leeg terwijl je hoofd onder water is, knippert rood zodra hij leeg is en je begint te verdrinken, en vult zich snel weer zodra je boven water komt. Spatie zwemt je omhoog, en de toets Omlaag Zwemmen, standaard Ctrl, brengt je dieper.\n\nSchade en genezing zweven als kleine getallen omhoog boven wat ze raken, zodat je een gevecht kunt lezen zonder tekst te lezen. Het tabblad Gevecht in je chatbox houdt het volledige geschreven verslag bij.",
@@ -9751,6 +10570,168 @@ export const nl_NL: EnTranslations = {
     "body": "Lichaam",
     "genderMale": "Man",
     "genderFemale": "Vrouw",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "Swept",
+        "long": "Long",
+        "mohawk": "Mohawk",
+        "quiff": "Cropped Quiff",
+        "undercut": "Undercut",
+        "topknot": "Topknot",
+        "shoulder": "Shoulder Length",
+        "bald": "Bald",
+        "waves": "Waves",
+        "ponytail": "High Ponytail",
+        "braid": "Braid",
+        "bob": "Bob",
+        "crown": "Braided Crown",
+        "twins": "Twin Braids",
+        "curls": "Curly Updo"
+      },
+      "beard": {
+        "none": "Clean Shaven",
+        "moustache": "Moustache",
+        "handlebar": "Handlebar",
+        "goatee": "Goatee",
+        "chin": "Chin Beard",
+        "boxed": "Boxed Beard",
+        "long": "Long Beard",
+        "chops": "Mutton Chops",
+        "chinstrap": "Chinstrap"
+      },
+      "nose": {
+        "default": "Classic",
+        "broad": "Broad",
+        "aquiline": "Aquiline",
+        "button": "Button",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "Classic",
+        "full": "Full",
+        "smirk": "Smirk",
+        "relaxed": "Relaxed",
+        "cupids_bow": "Cupid's Bow",
+        "narrow": "Narrow",
+        "thin": "Thin",
+        "rounded": "Rounded"
+      },
+      "brows": {
+        "default": "Classic",
+        "slim": "Slim",
+        "arched": "Arched",
+        "soft": "Soft",
+        "straight": "Straight",
+        "relaxed": "Relaxed",
+        "soft_arch": "Soft Arch",
+        "rounded": "Rounded"
+      },
+      "ears": {
+        "default": "Classic",
+        "large": "Large",
+        "pointed": "Pointed",
+        "round": "Round"
+      },
+      "eyes": {
+        "default": "Classic",
+        "almond": "Almond",
+        "hooded": "Hooded"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "Eyes and Brows",
+        "eyeColor": "Eye Color",
+        "hairstyle": "Hairstyle",
+        "facialHair": "Facial Hair",
+        "hairColor": "Hair Color",
+        "browColor": "Eyebrow Color",
+        "piercings": "Piercings"
+      },
+      "section": {
+        "hair": "Hairstyle",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "Brow Shape",
+        "ears": "Ears",
+        "eyes": "Eye Shape"
+      },
+      "slider": {
+        "eyeSpacing": "Eye Spacing",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "Brow Height",
+        "chinWidth": "Chin Width",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "Lobes",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "Nostril",
+        "septum": "Septum",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "Porcelain",
+        "ivory": "Ivory",
+        "rose": "Rose",
+        "peach": "Peach",
+        "fair": "Fair",
+        "beige": "Beige",
+        "sand": "Sand",
+        "honey": "Honey",
+        "olive": "Olive",
+        "caramel": "Caramel",
+        "tan": "Tan",
+        "bronze": "Bronze",
+        "chestnut": "Chestnut",
+        "umber": "Umber",
+        "mahogany": "Mahogany",
+        "ebony": "Ebony"
+      },
+      "eye": {
+        "brown": "Brown",
+        "darkBrown": "Dark Brown",
+        "hazel": "Hazel",
+        "amber": "Amber",
+        "green": "Green",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "Violet"
+      },
+      "hairColor": {
+        "platinum": "Platinum",
+        "blonde": "Blonde",
+        "golden": "Golden",
+        "copper": "Copper",
+        "red": "Red",
+        "auburn": "Auburn",
+        "lightBrown": "Light Brown",
+        "brown": "Brown",
+        "darkBrown": "Dark Brown",
+        "black": "Black",
+        "silver": "Silver",
+        "white": "White"
+      },
+      "matchHair": "Match Hair",
+      "resetDefault": "Reset to Default",
+      "customColorAria": "Pick a custom color",
+      "customSkinAria": "Pick a custom skin tone"
+    },
     "hair": "Haar",
     "brows": "Wenkbrauwen",
     "skinTone": "Huidskleur",
@@ -11218,6 +12199,9 @@ export const nl_NL: EnTranslations = {
   "character": {
     "loading": "Laden...",
     "noneYet": "Nog geen personages. Maak er hieronder een aan.",
+    "membershipRequired": "Renew your membership to play this character.",
+    "membershipSlots": "Unlock slots with a membership",
+    "emptySlot": "Available character slot",
     "levelClass": "Niveau {level} {className}",
     "inWorld": "in wereld",
     "takeOver": "Overnemen",
@@ -11227,6 +12211,7 @@ export const nl_NL: EnTranslations = {
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "Wereldbazen",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "Hiermee wordt dit personage losgekoppeld van een andere sessie en hierheen gehaald. Doorgaan?",
     "renameRequired": "hernoemen vereist",
     "delete": "Verwijderen",
@@ -11811,6 +12796,7 @@ export const nl_NL: EnTranslations = {
       "deathRecapCauterized": "Je bent gestorven. De verbranding van Cauteriseren overweldigde je.",
       "respawn": "Je voelt je uitgerust en weer heel.",
       "respawnKeeperToll": "De Bleke Bewaarder heeft je doen herleven, maar je bent er zwakker door geworden: de Tol van de Bewaarder put je eigenschappen uit totdat het vervalt.",
+      "moonbridgeBanner": "The Moonbridge Rises",
       "ignoringChat": "Chat van {name} wordt genegeerd.",
       "noLongerIgnoring": "{name} wordt niet langer genegeerd.",
       "playerNotNearby": "Die speler is niet in de buurt.",
@@ -12014,6 +13000,10 @@ export const nl_NL: EnTranslations = {
     "social": {
       "title": "Sociaal",
       "friendsTab": "Vrienden",
+      "friendFirstPage": "First page",
+      "friendNextPage": "Next page",
+      "boundFriend": "Bound friend",
+      "boundFriendLink": "Bound friends are linked by their referral invitation.",
       "guildTab": "Gilde",
       "ignoreTab": "Negeren",
       "leaveParty": "Groep verlaten",
@@ -12241,7 +13231,161 @@ export const nl_NL: EnTranslations = {
       "hoard_cast_screech": "Verdovend Krijsen",
       "hoard_cast_mimic_bite": "Gulzige Beet",
       "hoard_cast_mimic_leap": "Verpletterde Sprong",
-      "hoard_cast_coin_spit": "Vervloekte munten"
+      "hoard_cast_coin_spit": "Vervloekte munten",
+      "crypt_grave_bolt": "Grave Bolt",
+      "crypt_raise_bones": "Raise Bones",
+      "crypt_murder_call": "Murder Call",
+      "crypt_stone_shriek": "Stone Shriek",
+      "crypt_grave_cleave": "Grave Cleave",
+      "crypt_barrowflame_breath": "Barrowflame Breath",
+      "crypt_tail_lash": "Tail Lash",
+      "crypt_wing_gust": "Wing Gust",
+      "crypt_grave_rupture": "Grave Rupture",
+      "crypt_carrion_eye": "Carrion Eye",
+      "crypt_marrow_crush": "Marrow Crush",
+      "crypt_rimesilk_spit": "Rimesilk Spit",
+      "crypt_gravespark_volley": "Gravespark Volley",
+      "crypt_morthen_rite_wakes": "The Rite Wakes",
+      "crypt_morthen_rise": "Rise of the Gravecaller",
+      "crypt_morthen_proclaim": "Grave Proclamation",
+      "crypt_morthen_descend": "Descent",
+      "crypt_knellwyrm_arrive": "Descending from the Sky",
+      "crypt_knellwyrm_pyre_strafe": "Pyre Strafe",
+      "crypt_knellwyrm_strafe_run": "Strafing Run",
+      "crypt_knellwyrm_dread_bellow": "Dread Bellow",
+      "crypt_marrow_shovelful": "Shovelful",
+      "crypt_marrow_measure": "Measured for the Grave",
+      "crypt_marrow_burial_toll": "Burial Toll",
+      "crypt_marrow_gravediggers_blow": "Gravedigger's Blow",
+      "crypt_lady_brides_lament": "Bride's Lament",
+      "crypt_lady_frozen_embrace": "Frozen Embrace",
+      "crypt_lady_embrace_hold": "Frozen Embrace",
+      "crypt_lady_bridal_freeze": "Bridal Freeze",
+      "crypt_ilvane_dirge": "Dirge of the Hollow",
+      "crypt_ilvane_unbroken_dirge": "Unbroken Verse",
+      "crypt_ilvane_bone_organ": "Bone Organ",
+      "crypt_morthen_shadow_pulse": "Shadow Pulse",
+      "crypt_morthen_rite_of_the_unquiet": "Rite of the Unquiet",
+      "crypt_morthen_reap_the_unquiet": "Reap the Unquiet",
+      "kituse_crypt_relight_candle": "Relight the Candle",
+      "crypt_knellwyrm_knell_rise": "Burning Knell",
+      "crypt_knellwyrm_knell_mark": "Burning Knell",
+      "crypt_knellwyrm_knell_breath": "Burning Knell",
+      "crypt_knellwyrm_knell_land": "Burning Knell",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "ghost_captain_broadside": "Spectral Broadside",
+      "ghost_captain_anchor": "Cursed Anchor",
+      "ghost_captain_boarding": "Phantom Boarding",
+      "bastion_boathook": "Boathook Drag",
+      "bastion_fog_bank": "Fog Bank",
+      "bastion_brine_column": "Brine Column",
+      "bastion_loose_on_my_mark": "Loose on My Mark",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn",
+      "bastion_iron_cage": "Iron Cage",
+      "bastion_drowned_anchor_cast": "Drowned Anchor",
+      "bastion_shackle_pair": "Shackle Pair",
+      "bastion_shadowstep": "Shadow Crossing",
+      "bastion_reaping_scythe": "Reaping Scythe",
+      "bastion_veil_rise": "Fog Veil",
+      "bastion_veil_gather": "Gathering Fog",
+      "bastion_vael_rise": "Death Rises",
+      "bastion_vael_sink": "Into the Fog",
+      "bastion_hallowed_brine": "Hallowed Brine",
+      "bastion_rebounding_bulwark": "Rebounding Bulwark",
+      "bastion_tide_sentence": "Sentence of the Tide",
+      "bastion_oath_kneel": "Unbroken Oath",
+      "bastion_oath_vigil": "Unbroken Oath",
+      "temple_lullaby": "Lullaby",
+      "cantor_last_verse": "The Last Verse",
+      "temple_call_the_tide": "Call the Tide",
+      "temple_static_coil": "Static Coil",
+      "temple_snapper_snap": "Snap",
+      "temple_trident_sweep": "Trident Sweep",
+      "temple_sea_song": "Sea-Song",
+      "temple_tidal_slap": "Tidal Slap",
+      "temple_tide_breath": "Freezing Breath",
+      "temple_moonlight_lance": "Moonlight Lance",
+      "temple_prism_flare": "Prism Flare",
+      "temple_resonant_slam": "Resonant Slam",
+      "temple_moonwater_bolt": "Moonwater Bolt",
+      "temple_drowning_aria": "Drowning Aria",
+      "temple_mere_surge": "Mere Surge",
+      "temple_tideglass_fracture": "Tideglass Fracture",
+      "temple_undertow": "Undertow",
+      "temple_lunar_tide": "Lunar Tide",
+      "temple_skewering_trident": "Skewering Trident",
+      "temple_pale_mending": "Pale Mending",
+      "temple_glimmer_venom": "Glimmer Venom",
+      "temple_pearl_slam": "Tidal Wingbeat",
+      "temple_lightning_spit": "Lightning Spit",
+      "temple_crushing_torrent": "Crushing Torrent",
+      "temple_hydra_tsunami": "Tsunami",
+      "temple_ysolei_call": "Moonspawn Call",
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "temple_frostlocked_torrent": "Frostlocked Torrent",
+      "temple_venom_current": "Venom Current",
+      "temple_toxic_rime": "Toxic Rime",
+      "temple_beckoning_moon": "Beckoning Moon",
+      "temple_falling_moon": "Falling Moon",
+      "temple_prism_glare": "Prism Glare",
+      "temple_arcing_spark": "Arcing Spark",
+      "temple_call_of_the_shallows": "Call of the Shallows",
+      "wildheart_ancestral_sap": "Ancestral Sap",
+      "wildheart_plant_totem": "Plant Totem",
+      "wildheart_entangling_lash": "Entangling Lash",
+      "wildheart_saurian_tail_swipe": "Tail Swipe",
+      "wildheart_saurian_stomp": "Earthshaking Stomp",
+      "wildheart_quarry_mark": "Quarry Mark",
+      "wildheart_war_roar": "War Roar",
+      "wildheart_toad_hex": "Toad Hex",
+      "wildheart_rattling_dread": "Rattling Dread",
+      "wildheart_snaring_tongue": "Snaring Tongue",
+      "wildheart_beast_pit_quake": "Beast Pit Quake",
+      "wildheart_jaguar_heel": "Heel!",
+      "wildheart_gorgebloom_seed_rain": "Seed Rain",
+      "wildheart_gorgebloom_vine_lash": "Vine Lash",
+      "wildheart_gorgebloom_gorge": "Gorge",
+      "wildheart_zulgar_pulse": "Wildheart Pulse",
+      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt",
+      "sanctum_cinder_breath": "Cinder Breath",
+      "sanctum_warming_rite": "Warming Rite",
+      "sanctum_goad": "Goad",
+      "sanctum_plant_brazier": "Plant Soul Brazier",
+      "sanctum_ice_block_toss": "Ice Block Toss",
+      "sanctum_tusker_tusk_sweep": "Tusk Sweep",
+      "sanctum_tusker_trample": "Trample",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "Counterweight Lash",
+      "sanctum_branding_iron": "Branding Iron",
+      "sanctum_rime_breath": "Rime Breath",
+      "kituse_sanctum_topple_brazier": "Topple Brazier",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
+      "sanctum_korgath_maul_arc": "Maul Arc",
+      "sanctum_korgath_chain_flail": "Chain Flail",
+      "sanctum_korgath_threshold_charge": "Threshold Charge",
+      "sanctum_korgath_foremans_bellow": "Foreman's Bellow",
+      "sanctum_korgath_strain": "Strain",
+      "sanctum_korgath_stomp": "Shuddering Stomp",
+      "sanctum_goadsmith_rerivet": "Re-rivet",
+      "sanctum_velkhar_soulfire_trench": "Soulfire Trench",
+      "sanctum_velkhar_shadow_volley": "Shadow Volley",
+      "sanctum_korzul_break_free": "Break Free",
+      "sanctum_korzul_grave_breath": "Grave Breath",
+      "sanctum_korzul_tail_sweep": "Tail Sweep",
+      "sanctum_korzul_grave_inferno": "Grave Inferno",
+      "sanctum_korzul_wing_gale": "Wing Gale",
+      "sanctum_korzul_plunging_fire": "Plunging Fire",
+      "sanctum_korzul_crashing_descent": "Crashing Descent"
     }
   },
   "questUi": {
@@ -12309,6 +13453,8 @@ export const nl_NL: EnTranslations = {
       "rewards": "Beloningen",
       "xpReward": "{xp} ervaring",
       "itemReward": "Voorwerpbeloning:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Vereist niveau {level}"
     },
@@ -12686,6 +13832,7 @@ export const nl_NL: EnTranslations = {
       "incomplete": "Die quest is niet voltooid.",
       "giverMissing": "Die questgever is niet in de buurt.",
       "turnInMissing": "Die questinlevering is niet in de buurt.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Te ver weg.",
       "escortAway": "Degene die je moet begeleiden is er nu niet. Die komt binnenkort terug."
     }
@@ -12737,7 +13884,9 @@ export const nl_NL: EnTranslations = {
       "flask": "Flacon",
       "scroll": "Perkament",
       "bag": "Tas",
-      "mount": "Rijdier"
+      "mount": "Rijdier",
+      "buddy": "Buddy",
+      "buddyCosmetic": "Buddy cosmetic"
     },
     "stats": {
       "armor": "Pantser",
@@ -12753,6 +13902,17 @@ export const nl_NL: EnTranslations = {
       "parry": "Pareren"
     },
     "tooltip": {
+      "referralFullSet": "Equip all {pieces} friendship armor pieces to gain {percent}% more experience while in a party with {member}. Their membership must be active.",
+      "referralInviter": "the member who invited you",
+      "referralRetained": "Armor stats keep scaling even when you are not in a party with your inviter.",
+      "referralDormant": "Inactive: this account has not received friendship armor through a member referral.",
+      "membershipToken": "Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.",
+      "membershipAdaptive": "Stats and armor adapt to your class and specialization.",
+      "membershipScaling": "Item level matches your level. At level 20, this armor perfects at item level 25.",
+      "membershipPerfected": "Perfected: item level {level}.",
+      "membershipFullSet": "Equip all {pieces} membership armor pieces to gain {percent}% more experience. Requires an active membership.",
+      "membershipRequired": "Armor stats and set benefits stop when membership expires and return when you renew.",
+      "membershipDormant": "Inactive: renew your membership to restore armor stats and set benefits.",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Momenteel uitgerust",
       "ifYouEquip": "Als je dit uitrust",
@@ -13052,6 +14212,10 @@ export const nl_NL: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "Courier",
+        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. It flies at 250% of normal running speed. Choose up to 24 stacks per trip. Membership is required to start a new trip."
+      },
       "sport_kick": {
         "name": "Trap",
         "description": "Trap de bal over de grond richting het richtpunt."
@@ -15829,6 +16993,30 @@ export const nl_NL: EnTranslations = {
       "fenshadow_maul": {
         "name": "Moeraschaduw-Knuppel"
       },
+      "foremans_barrowmaul": {
+        "name": "Grafheuvelhamer van de Opzichter"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrits Splinterpiek"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Grafheuvelschouderstukken"
+      },
+      "mirestone_stride": {
+        "name": "Moersteentred"
+      },
+      "foremans_wage_band": {
+        "name": "Loonring van de Voorman"
+      },
+      "mirelight_locket": {
+        "name": "Moeraslicht-medaillon"
+      },
+      "fenwright_grips": {
+        "name": "Grepen van de Moerasbouwer"
+      },
       "wildgrove_cinch": {
         "name": "Wildwoud-Gordel"
       },
@@ -16878,6 +18066,114 @@ export const nl_NL: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Doorgangssteen"
+      },
+      "whistle_ember_fox": {
+        "name": "Ember Fox Whistle"
+      },
+      "whistle_moss_hare": {
+        "name": "Moss Hare Whistle"
+      },
+      "whistle_frog": {
+        "name": "Frog Whistle"
+      },
+      "whistle_crimson_claw_crab": {
+        "name": "Crimson Claw Crab Whistle"
+      },
+      "whistle_golden_sentinel": {
+        "name": "Golden Sentinel Whistle"
+      },
+      "whistle_nightfang": {
+        "name": "Nightfang Whistle"
+      },
+      "whistle_tuskhorn_boar": {
+        "name": "Tuskhorn Boar Whistle"
+      },
+      "whistle_emerald_wolf": {
+        "name": "Emerald Wolf Whistle"
+      },
+      "whistle_tiger": {
+        "name": "Tiger Whistle"
+      },
+      "whistle_cate_coin": {
+        "name": "Cate Coin Whistle"
+      },
+      "whistle_alon": {
+        "name": "Alon Whistle"
+      },
+      "whistle_trollface": {
+        "name": "Trollface Whistle"
+      },
+      "whistle_ansem": {
+        "name": "Ansem Whistle"
+      },
+      "whistle_triple_t": {
+        "name": "Triple T Whistle"
+      },
+      "whistle_kekius": {
+        "name": "Kekius Whistle"
+      },
+      "whistle_solbot": {
+        "name": "Solbot Whistle"
+      },
+      "whistle_frostfire": {
+        "name": "Frostfire Whistle"
+      },
+      "whistle_rocky": {
+        "name": "Rocky Whistle"
+      },
+      "whistle_proud_grunt": {
+        "name": "Proud Grunt Whistle"
+      },
+      "whistle_loot_goblin": {
+        "name": "Loot Goblin Whistle"
+      },
+      "whistle_penny_goldspark": {
+        "name": "Penny Goldspark Whistle"
+      },
+      "whistle_stag": {
+        "name": "Stag Whistle"
+      },
+      "whistle_alpaca": {
+        "name": "Alpaca Whistle"
+      },
+      "whistle_horse": {
+        "name": "Horse Whistle"
+      },
+      "whistle_sapling": {
+        "name": "Sapling Whistle"
+      },
+      "whistle_bull": {
+        "name": "Bull Whistle"
+      },
+      "whistle_spider": {
+        "name": "Spider Whistle"
+      },
+      "whistle_raptor": {
+        "name": "Raptor Whistle"
+      },
+      "whistle_skeleton": {
+        "name": "Skeleton Whistle"
+      },
+      "whistle_crystal_lich": {
+        "name": "Crystal Lich Whistle"
+      },
+      "whistle_forgemaw": {
+        "name": "Forgemaw The Molten Whistle"
+      },
+      "whistle_crystal_tide": {
+        "name": "Crystal Tide Whistle"
+      },
+      "whistle_phantom": {
+        "name": "Phantom Whistle"
+      },
+      "whistle_emberfall_phoenix": {
+        "name": "Emberfall Phoenix Whistle"
+      },
+      "charm_stag_acorn": {
+        "name": "Acorn Crown Charm"
+      },
+      "charm_stag_gilded": {
+        "name": "Gilded Charm"
       },
       "lastflame_core": {
         "name": "Kern van de Laatste Vlam"
@@ -18451,6 +19747,1521 @@ export const nl_NL: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Voortocht Krijgsstaf"
       },
+      "brookwatch_robe": {
+        "name": "Brookwatch Robe"
+      },
+      "brookwatch_leggings": {
+        "name": "Brookwatch Leggings"
+      },
+      "brookwatch_slippers": {
+        "name": "Brookwatch Slippers"
+      },
+      "brookwatch_hood": {
+        "name": "Brookwatch Hood"
+      },
+      "brookwatch_gloves": {
+        "name": "Brookwatch Gloves"
+      },
+      "brookwatch_mantle": {
+        "name": "Brookwatch Mantle"
+      },
+      "brookwatch_sash": {
+        "name": "Brookwatch Sash"
+      },
+      "brookwatch_jerkin": {
+        "name": "Brookwatch Jerkin"
+      },
+      "brookwatch_breeches": {
+        "name": "Brookwatch Breeches"
+      },
+      "brookwatch_boots": {
+        "name": "Brookwatch Boots"
+      },
+      "brookwatch_cap": {
+        "name": "Brookwatch Cap"
+      },
+      "brookwatch_grips": {
+        "name": "Brookwatch Grips"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "Brookwatch Shoulderpads"
+      },
+      "brookwatch_belt": {
+        "name": "Brookwatch Belt"
+      },
+      "brookwatch_hauberk": {
+        "name": "Brookwatch Hauberk"
+      },
+      "brookwatch_legguards": {
+        "name": "Brookwatch Legguards"
+      },
+      "brookwatch_sabatons": {
+        "name": "Brookwatch Sabatons"
+      },
+      "brookwatch_helm": {
+        "name": "Brookwatch Helm"
+      },
+      "brookwatch_gauntlets": {
+        "name": "Brookwatch Gauntlets"
+      },
+      "brookwatch_pauldrons": {
+        "name": "Brookwatch Pauldrons"
+      },
+      "brookwatch_girdle": {
+        "name": "Brookwatch Girdle"
+      },
+      "brookwatch_chainmail": {
+        "name": "Brookwatch Chainmail"
+      },
+      "brookwatch_chausses": {
+        "name": "Brookwatch Chausses"
+      },
+      "brookwatch_greaves": {
+        "name": "Brookwatch Greaves"
+      },
+      "brookwatch_coif": {
+        "name": "Brookwatch Coif"
+      },
+      "brookwatch_handguards": {
+        "name": "Brookwatch Handguards"
+      },
+      "brookwatch_spaulders": {
+        "name": "Brookwatch Spaulders"
+      },
+      "brookwatch_cord": {
+        "name": "Brookwatch Cord"
+      },
+      "hedgerow_robe": {
+        "name": "Hedgerow Robe"
+      },
+      "hedgerow_leggings": {
+        "name": "Hedgerow Leggings"
+      },
+      "hedgerow_slippers": {
+        "name": "Hedgerow Slippers"
+      },
+      "hedgerow_hood": {
+        "name": "Hedgerow Hood"
+      },
+      "hedgerow_gloves": {
+        "name": "Hedgerow Gloves"
+      },
+      "hedgerow_mantle": {
+        "name": "Hedgerow Mantle"
+      },
+      "hedgerow_sash": {
+        "name": "Hedgerow Sash"
+      },
+      "hedgerow_jerkin": {
+        "name": "Hedgerow Jerkin"
+      },
+      "hedgerow_breeches": {
+        "name": "Hedgerow Breeches"
+      },
+      "hedgerow_boots": {
+        "name": "Hedgerow Boots"
+      },
+      "hedgerow_cap": {
+        "name": "Hedgerow Cap"
+      },
+      "hedgerow_grips": {
+        "name": "Hedgerow Grips"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "Hedgerow Shoulderpads"
+      },
+      "hedgerow_belt": {
+        "name": "Hedgerow Belt"
+      },
+      "hedgerow_hauberk": {
+        "name": "Hedgerow Hauberk"
+      },
+      "hedgerow_legguards": {
+        "name": "Hedgerow Legguards"
+      },
+      "hedgerow_sabatons": {
+        "name": "Hedgerow Sabatons"
+      },
+      "hedgerow_helm": {
+        "name": "Hedgerow Helm"
+      },
+      "hedgerow_gauntlets": {
+        "name": "Hedgerow Gauntlets"
+      },
+      "hedgerow_pauldrons": {
+        "name": "Hedgerow Pauldrons"
+      },
+      "hedgerow_girdle": {
+        "name": "Hedgerow Girdle"
+      },
+      "hedgerow_chainmail": {
+        "name": "Hedgerow Chainmail"
+      },
+      "hedgerow_chausses": {
+        "name": "Hedgerow Chausses"
+      },
+      "hedgerow_greaves": {
+        "name": "Hedgerow Greaves"
+      },
+      "hedgerow_coif": {
+        "name": "Hedgerow Coif"
+      },
+      "hedgerow_handguards": {
+        "name": "Hedgerow Handguards"
+      },
+      "hedgerow_spaulders": {
+        "name": "Hedgerow Spaulders"
+      },
+      "hedgerow_cord": {
+        "name": "Hedgerow Cord"
+      },
+      "bogwalker_robe": {
+        "name": "Bogwalker Robe"
+      },
+      "bogwalker_leggings": {
+        "name": "Bogwalker Leggings"
+      },
+      "bogwalker_slippers": {
+        "name": "Bogwalker Slippers"
+      },
+      "bogwalker_hood": {
+        "name": "Bogwalker Hood"
+      },
+      "bogwalker_gloves": {
+        "name": "Bogwalker Gloves"
+      },
+      "bogwalker_mantle": {
+        "name": "Bogwalker Mantle"
+      },
+      "bogwalker_sash": {
+        "name": "Bogwalker Sash"
+      },
+      "bogwalker_jerkin": {
+        "name": "Bogwalker Jerkin"
+      },
+      "bogwalker_breeches": {
+        "name": "Bogwalker Breeches"
+      },
+      "bogwalker_boots": {
+        "name": "Bogwalker Boots"
+      },
+      "bogwalker_cap": {
+        "name": "Bogwalker Cap"
+      },
+      "bogwalker_grips": {
+        "name": "Bogwalker Grips"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "Bogwalker Shoulderpads"
+      },
+      "bogwalker_belt": {
+        "name": "Bogwalker Belt"
+      },
+      "bogwalker_hauberk": {
+        "name": "Bogwalker Hauberk"
+      },
+      "bogwalker_legguards": {
+        "name": "Bogwalker Legguards"
+      },
+      "bogwalker_sabatons": {
+        "name": "Bogwalker Sabatons"
+      },
+      "bogwalker_helm": {
+        "name": "Bogwalker Helm"
+      },
+      "bogwalker_gauntlets": {
+        "name": "Bogwalker Gauntlets"
+      },
+      "bogwalker_pauldrons": {
+        "name": "Bogwalker Pauldrons"
+      },
+      "bogwalker_girdle": {
+        "name": "Bogwalker Girdle"
+      },
+      "bogwalker_chainmail": {
+        "name": "Bogwalker Chainmail"
+      },
+      "bogwalker_chausses": {
+        "name": "Bogwalker Chausses"
+      },
+      "bogwalker_greaves": {
+        "name": "Bogwalker Greaves"
+      },
+      "bogwalker_coif": {
+        "name": "Bogwalker Coif"
+      },
+      "bogwalker_handguards": {
+        "name": "Bogwalker Handguards"
+      },
+      "bogwalker_spaulders": {
+        "name": "Bogwalker Spaulders"
+      },
+      "bogwalker_cord": {
+        "name": "Bogwalker Cord"
+      },
+      "thornspire_robe": {
+        "name": "Thornspire Robe"
+      },
+      "thornspire_leggings": {
+        "name": "Thornspire Leggings"
+      },
+      "thornspire_slippers": {
+        "name": "Thornspire Slippers"
+      },
+      "thornspire_hood": {
+        "name": "Thornspire Hood"
+      },
+      "thornspire_gloves": {
+        "name": "Thornspire Gloves"
+      },
+      "thornspire_mantle": {
+        "name": "Thornspire Mantle"
+      },
+      "thornspire_sash": {
+        "name": "Thornspire Sash"
+      },
+      "thornspire_jerkin": {
+        "name": "Thornspire Jerkin"
+      },
+      "thornspire_breeches": {
+        "name": "Thornspire Breeches"
+      },
+      "thornspire_boots": {
+        "name": "Thornspire Boots"
+      },
+      "thornspire_cap": {
+        "name": "Thornspire Cap"
+      },
+      "thornspire_grips": {
+        "name": "Thornspire Grips"
+      },
+      "thornspire_shoulderpads": {
+        "name": "Thornspire Shoulderpads"
+      },
+      "thornspire_belt": {
+        "name": "Thornspire Belt"
+      },
+      "thornspire_hauberk": {
+        "name": "Thornspire Hauberk"
+      },
+      "thornspire_legguards": {
+        "name": "Thornspire Legguards"
+      },
+      "thornspire_sabatons": {
+        "name": "Thornspire Sabatons"
+      },
+      "thornspire_helm": {
+        "name": "Thornspire Helm"
+      },
+      "thornspire_gauntlets": {
+        "name": "Thornspire Gauntlets"
+      },
+      "thornspire_pauldrons": {
+        "name": "Thornspire Pauldrons"
+      },
+      "thornspire_girdle": {
+        "name": "Thornspire Girdle"
+      },
+      "thornspire_chainmail": {
+        "name": "Thornspire Chainmail"
+      },
+      "thornspire_chausses": {
+        "name": "Thornspire Chausses"
+      },
+      "thornspire_greaves": {
+        "name": "Thornspire Greaves"
+      },
+      "thornspire_coif": {
+        "name": "Thornspire Coif"
+      },
+      "thornspire_handguards": {
+        "name": "Thornspire Handguards"
+      },
+      "thornspire_spaulders": {
+        "name": "Thornspire Spaulders"
+      },
+      "thornspire_cord": {
+        "name": "Thornspire Cord"
+      },
+      "hollowveil_robe": {
+        "name": "Hollowveil Robe"
+      },
+      "hollowveil_leggings": {
+        "name": "Hollowveil Leggings"
+      },
+      "hollowveil_slippers": {
+        "name": "Hollowveil Slippers"
+      },
+      "hollowveil_hood": {
+        "name": "Hollowveil Hood"
+      },
+      "hollowveil_gloves": {
+        "name": "Hollowveil Gloves"
+      },
+      "hollowveil_mantle": {
+        "name": "Hollowveil Mantle"
+      },
+      "hollowveil_sash": {
+        "name": "Hollowveil Sash"
+      },
+      "hollowveil_jerkin": {
+        "name": "Hollowveil Jerkin"
+      },
+      "hollowveil_breeches": {
+        "name": "Hollowveil Breeches"
+      },
+      "hollowveil_boots": {
+        "name": "Hollowveil Boots"
+      },
+      "hollowveil_cap": {
+        "name": "Hollowveil Cap"
+      },
+      "hollowveil_grips": {
+        "name": "Hollowveil Grips"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "Hollowveil Shoulderpads"
+      },
+      "hollowveil_belt": {
+        "name": "Hollowveil Belt"
+      },
+      "hollowveil_hauberk": {
+        "name": "Hollowveil Hauberk"
+      },
+      "hollowveil_legguards": {
+        "name": "Hollowveil Legguards"
+      },
+      "hollowveil_sabatons": {
+        "name": "Hollowveil Sabatons"
+      },
+      "hollowveil_helm": {
+        "name": "Hollowveil Helm"
+      },
+      "hollowveil_gauntlets": {
+        "name": "Hollowveil Gauntlets"
+      },
+      "hollowveil_pauldrons": {
+        "name": "Hollowveil Pauldrons"
+      },
+      "hollowveil_girdle": {
+        "name": "Hollowveil Girdle"
+      },
+      "hollowveil_chainmail": {
+        "name": "Hollowveil Chainmail"
+      },
+      "hollowveil_chausses": {
+        "name": "Hollowveil Chausses"
+      },
+      "hollowveil_greaves": {
+        "name": "Hollowveil Greaves"
+      },
+      "hollowveil_coif": {
+        "name": "Hollowveil Coif"
+      },
+      "hollowveil_handguards": {
+        "name": "Hollowveil Handguards"
+      },
+      "hollowveil_spaulders": {
+        "name": "Hollowveil Spaulders"
+      },
+      "hollowveil_cord": {
+        "name": "Hollowveil Cord"
+      },
+      "trailwarden_robe": {
+        "name": "Trailwarden Robe"
+      },
+      "trailwarden_leggings": {
+        "name": "Trailwarden Leggings"
+      },
+      "trailwarden_slippers": {
+        "name": "Trailwarden Slippers"
+      },
+      "trailwarden_hood": {
+        "name": "Trailwarden Hood"
+      },
+      "trailwarden_gloves": {
+        "name": "Trailwarden Gloves"
+      },
+      "trailwarden_mantle": {
+        "name": "Trailwarden Mantle"
+      },
+      "trailwarden_sash": {
+        "name": "Trailwarden Sash"
+      },
+      "trailwarden_jerkin": {
+        "name": "Trailwarden Jerkin"
+      },
+      "trailwarden_breeches": {
+        "name": "Trailwarden Breeches"
+      },
+      "trailwarden_boots": {
+        "name": "Trailwarden Boots"
+      },
+      "trailwarden_cap": {
+        "name": "Trailwarden Cap"
+      },
+      "trailwarden_grips": {
+        "name": "Trailwarden Grips"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "Trailwarden Shoulderpads"
+      },
+      "trailwarden_belt": {
+        "name": "Trailwarden Belt"
+      },
+      "trailwarden_hauberk": {
+        "name": "Trailwarden Hauberk"
+      },
+      "trailwarden_legguards": {
+        "name": "Trailwarden Legguards"
+      },
+      "trailwarden_sabatons": {
+        "name": "Trailwarden Sabatons"
+      },
+      "trailwarden_helm": {
+        "name": "Trailwarden Helm"
+      },
+      "trailwarden_gauntlets": {
+        "name": "Trailwarden Gauntlets"
+      },
+      "trailwarden_pauldrons": {
+        "name": "Trailwarden Pauldrons"
+      },
+      "trailwarden_girdle": {
+        "name": "Trailwarden Girdle"
+      },
+      "trailwarden_chainmail": {
+        "name": "Trailwarden Chainmail"
+      },
+      "trailwarden_chausses": {
+        "name": "Trailwarden Chausses"
+      },
+      "trailwarden_greaves": {
+        "name": "Trailwarden Greaves"
+      },
+      "trailwarden_coif": {
+        "name": "Trailwarden Coif"
+      },
+      "trailwarden_handguards": {
+        "name": "Trailwarden Handguards"
+      },
+      "trailwarden_spaulders": {
+        "name": "Trailwarden Spaulders"
+      },
+      "trailwarden_cord": {
+        "name": "Trailwarden Cord"
+      },
+      "highgale_robe": {
+        "name": "Highgale Robe"
+      },
+      "highgale_leggings": {
+        "name": "Highgale Leggings"
+      },
+      "highgale_slippers": {
+        "name": "Highgale Slippers"
+      },
+      "highgale_hood": {
+        "name": "Highgale Hood"
+      },
+      "highgale_gloves": {
+        "name": "Highgale Gloves"
+      },
+      "highgale_mantle": {
+        "name": "Highgale Mantle"
+      },
+      "highgale_sash": {
+        "name": "Highgale Sash"
+      },
+      "highgale_jerkin": {
+        "name": "Highgale Jerkin"
+      },
+      "highgale_breeches": {
+        "name": "Highgale Breeches"
+      },
+      "highgale_boots": {
+        "name": "Highgale Boots"
+      },
+      "highgale_cap": {
+        "name": "Highgale Cap"
+      },
+      "highgale_grips": {
+        "name": "Highgale Grips"
+      },
+      "highgale_shoulderpads": {
+        "name": "Highgale Shoulderpads"
+      },
+      "highgale_belt": {
+        "name": "Highgale Belt"
+      },
+      "highgale_hauberk": {
+        "name": "Highgale Hauberk"
+      },
+      "highgale_legguards": {
+        "name": "Highgale Legguards"
+      },
+      "highgale_sabatons": {
+        "name": "Highgale Sabatons"
+      },
+      "highgale_helm": {
+        "name": "Highgale Helm"
+      },
+      "highgale_gauntlets": {
+        "name": "Highgale Gauntlets"
+      },
+      "highgale_pauldrons": {
+        "name": "Highgale Pauldrons"
+      },
+      "highgale_girdle": {
+        "name": "Highgale Girdle"
+      },
+      "highgale_chainmail": {
+        "name": "Highgale Chainmail"
+      },
+      "highgale_chausses": {
+        "name": "Highgale Chausses"
+      },
+      "highgale_greaves": {
+        "name": "Highgale Greaves"
+      },
+      "brookwatch_tunic": {
+        "name": "Brookwatch Tunic"
+      },
+      "brookwatch_legwraps": {
+        "name": "Brookwatch Legwraps"
+      },
+      "brookwatch_treads": {
+        "name": "Brookwatch Treads"
+      },
+      "brookwatch_headguard": {
+        "name": "Brookwatch Headguard"
+      },
+      "brookwatch_handwraps": {
+        "name": "Brookwatch Handwraps"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "Brookwatch Shoulderguards"
+      },
+      "brookwatch_waistguard": {
+        "name": "Brookwatch Waistguard"
+      },
+      "hedgerow_tunic": {
+        "name": "Hedgerow Tunic"
+      },
+      "hedgerow_legwraps": {
+        "name": "Hedgerow Legwraps"
+      },
+      "hedgerow_treads": {
+        "name": "Hedgerow Treads"
+      },
+      "hedgerow_headguard": {
+        "name": "Hedgerow Headguard"
+      },
+      "hedgerow_handwraps": {
+        "name": "Hedgerow Handwraps"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "Hedgerow Shoulderguards"
+      },
+      "hedgerow_waistguard": {
+        "name": "Hedgerow Waistguard"
+      },
+      "bogwalker_tunic": {
+        "name": "Bogwalker Tunic"
+      },
+      "bogwalker_legwraps": {
+        "name": "Bogwalker Legwraps"
+      },
+      "bogwalker_treads": {
+        "name": "Bogwalker Treads"
+      },
+      "bogwalker_headguard": {
+        "name": "Bogwalker Headguard"
+      },
+      "bogwalker_handwraps": {
+        "name": "Bogwalker Handwraps"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "Bogwalker Shoulderguards"
+      },
+      "bogwalker_waistguard": {
+        "name": "Bogwalker Waistguard"
+      },
+      "thornspire_tunic": {
+        "name": "Thornspire Tunic"
+      },
+      "thornspire_legwraps": {
+        "name": "Thornspire Legwraps"
+      },
+      "thornspire_treads": {
+        "name": "Thornspire Treads"
+      },
+      "thornspire_headguard": {
+        "name": "Thornspire Headguard"
+      },
+      "thornspire_handwraps": {
+        "name": "Thornspire Handwraps"
+      },
+      "thornspire_shoulderguards": {
+        "name": "Thornspire Shoulderguards"
+      },
+      "thornspire_waistguard": {
+        "name": "Thornspire Waistguard"
+      },
+      "hollowveil_tunic": {
+        "name": "Hollowveil Tunic"
+      },
+      "hollowveil_legwraps": {
+        "name": "Hollowveil Legwraps"
+      },
+      "hollowveil_treads": {
+        "name": "Hollowveil Treads"
+      },
+      "hollowveil_headguard": {
+        "name": "Hollowveil Headguard"
+      },
+      "hollowveil_handwraps": {
+        "name": "Hollowveil Handwraps"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "Hollowveil Shoulderguards"
+      },
+      "hollowveil_waistguard": {
+        "name": "Hollowveil Waistguard"
+      },
+      "trailwarden_tunic": {
+        "name": "Trailwarden Tunic"
+      },
+      "trailwarden_legwraps": {
+        "name": "Trailwarden Legwraps"
+      },
+      "trailwarden_treads": {
+        "name": "Trailwarden Treads"
+      },
+      "trailwarden_headguard": {
+        "name": "Trailwarden Headguard"
+      },
+      "trailwarden_handwraps": {
+        "name": "Trailwarden Handwraps"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "Trailwarden Shoulderguards"
+      },
+      "trailwarden_waistguard": {
+        "name": "Trailwarden Waistguard"
+      },
+      "highgale_tunic": {
+        "name": "Highgale Tunic"
+      },
+      "highgale_legwraps": {
+        "name": "Highgale Legwraps"
+      },
+      "highgale_treads": {
+        "name": "Highgale Treads"
+      },
+      "highgale_headguard": {
+        "name": "Highgale Headguard"
+      },
+      "highgale_handwraps": {
+        "name": "Highgale Handwraps"
+      },
+      "highgale_shoulderguards": {
+        "name": "Highgale Shoulderguards"
+      },
+      "highgale_waistguard": {
+        "name": "Highgale Waistguard"
+      },
+      "highgale_coif": {
+        "name": "Highgale Coif"
+      },
+      "highgale_handguards": {
+        "name": "Highgale Handguards"
+      },
+      "highgale_spaulders": {
+        "name": "Highgale Spaulders"
+      },
+      "highgale_cord": {
+        "name": "Highgale Cord"
+      },
+      "breakwater_mantle": {
+        "name": "Breakwater Mantle"
+      },
+      "breakwater_shoulderpads": {
+        "name": "Breakwater Shoulderpads"
+      },
+      "breakwater_spaulders": {
+        "name": "Breakwater Spaulders"
+      },
+      "gravebell_treads": {
+        "name": "Gravebell Treads"
+      },
+      "gravebell_greaves": {
+        "name": "Gravebell Greaves"
+      },
+      "cryptbound_tunic": {
+        "name": "Cryptbound Tunic"
+      },
+      "cryptbound_chainmail": {
+        "name": "Cryptbound Chainmail"
+      },
+      "oathbroken_leggings": {
+        "name": "Oathbroken Leggings"
+      },
+      "oathbroken_breeches": {
+        "name": "Oathbroken Breeches"
+      },
+      "oathbroken_legwraps": {
+        "name": "Oathbroken Legwraps"
+      },
+      "oathbroken_legguards": {
+        "name": "Oathbroken Legguards"
+      },
+      "oathbroken_chausses": {
+        "name": "Oathbroken Chausses"
+      },
+      "seamist_legwraps": {
+        "name": "Seamist Legwraps"
+      },
+      "seamist_chausses": {
+        "name": "Seamist Chausses"
+      },
+      "warmonger_treads": {
+        "name": "Warmonger Treads"
+      },
+      "warmonger_greaves": {
+        "name": "Warmonger Greaves"
+      },
+      "sparkglass_leggings": {
+        "name": "Sparkglass Leggings"
+      },
+      "sparkglass_breeches": {
+        "name": "Sparkglass Breeches"
+      },
+      "sparkglass_legwraps": {
+        "name": "Sparkglass Legwraps"
+      },
+      "sparkglass_legguards": {
+        "name": "Sparkglass Legguards"
+      },
+      "sparkglass_chausses": {
+        "name": "Sparkglass Chausses"
+      },
+      "stillhymn_treads": {
+        "name": "Stillhymn Treads"
+      },
+      "stillhymn_greaves": {
+        "name": "Stillhymn Greaves"
+      },
+      "pearlglow_headguard": {
+        "name": "Pearlglow Headguard"
+      },
+      "pearlglow_coif": {
+        "name": "Pearlglow Coif"
+      },
+      "sealkeeper_gloves": {
+        "name": "Sealkeeper Gloves"
+      },
+      "sealkeeper_grips": {
+        "name": "Sealkeeper Grips"
+      },
+      "sealkeeper_handwraps": {
+        "name": "Sealkeeper Handwraps"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "Sealkeeper Gauntlets"
+      },
+      "sealkeeper_handguards": {
+        "name": "Sealkeeper Handguards"
+      },
+      "fetterbound_leggings": {
+        "name": "Fetterbound Leggings"
+      },
+      "fetterbound_breeches": {
+        "name": "Fetterbound Breeches"
+      },
+      "fetterbound_legwraps": {
+        "name": "Fetterbound Legwraps"
+      },
+      "fetterbound_legguards": {
+        "name": "Fetterbound Legguards"
+      },
+      "fetterbound_chausses": {
+        "name": "Fetterbound Chausses"
+      },
+      "shroudcaller_tunic": {
+        "name": "Shroudcaller Tunic"
+      },
+      "shroudcaller_chainmail": {
+        "name": "Shroudcaller Chainmail"
+      },
+      "wyrmshadow_tunic": {
+        "name": "Wyrmshadow Tunic"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "Wyrmshadow Chainmail"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "Cinderbrood Shoulderpads"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "Cinderbrood Shoulderguards"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "Cinderbrood Pauldrons"
+      },
+      "hoarfrost_mantle": {
+        "name": "Hoarfrost Mantle"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "Hoarfrost Shoulderpads"
+      },
+      "hoarfrost_spaulders": {
+        "name": "Hoarfrost Spaulders"
+      },
+      "blackmere_mantle": {
+        "name": "Blackmere Mantle"
+      },
+      "blackmere_shoulderpads": {
+        "name": "Blackmere Shoulderpads"
+      },
+      "blackmere_shoulderguards": {
+        "name": "Blackmere Shoulderguards"
+      },
+      "blackmere_pauldrons": {
+        "name": "Blackmere Pauldrons"
+      },
+      "blackmere_spaulders": {
+        "name": "Blackmere Spaulders"
+      },
+      "reedhush_mantle": {
+        "name": "Reedhush Mantle"
+      },
+      "reedhush_shoulderpads": {
+        "name": "Reedhush Shoulderpads"
+      },
+      "reedhush_shoulderguards": {
+        "name": "Reedhush Shoulderguards"
+      },
+      "reedhush_pauldrons": {
+        "name": "Reedhush Pauldrons"
+      },
+      "reedhush_spaulders": {
+        "name": "Reedhush Spaulders"
+      },
+      "cairnking_mantle": {
+        "name": "Cairnking Mantle"
+      },
+      "cairnking_shoulderpads": {
+        "name": "Cairnking Shoulderpads"
+      },
+      "cairnking_shoulderguards": {
+        "name": "Cairnking Shoulderguards"
+      },
+      "cairnking_pauldrons": {
+        "name": "Cairnking Pauldrons"
+      },
+      "cairnking_spaulders": {
+        "name": "Cairnking Spaulders"
+      },
+      "palehunt_mantle": {
+        "name": "Palehunt Mantle"
+      },
+      "palehunt_shoulderpads": {
+        "name": "Palehunt Shoulderpads"
+      },
+      "palehunt_shoulderguards": {
+        "name": "Palehunt Shoulderguards"
+      },
+      "palehunt_pauldrons": {
+        "name": "Palehunt Pauldrons"
+      },
+      "palehunt_spaulders": {
+        "name": "Palehunt Spaulders"
+      },
+      "jadeshrine_mantle": {
+        "name": "Jadeshrine Mantle"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "Jadeshrine Shoulderpads"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "Jadeshrine Shoulderguards"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "Jadeshrine Pauldrons"
+      },
+      "jadeshrine_spaulders": {
+        "name": "Jadeshrine Spaulders"
+      },
+      "gildhedge_mantle": {
+        "name": "Gildhedge Mantle"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "Gildhedge Shoulderpads"
+      },
+      "gildhedge_spaulders": {
+        "name": "Gildhedge Spaulders"
+      },
+      "saltwrack_mantle": {
+        "name": "Saltwrack Mantle"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "Saltwrack Shoulderpads"
+      },
+      "saltwrack_spaulders": {
+        "name": "Saltwrack Spaulders"
+      },
+      "brookwatch_vest": {
+        "name": "Brookwatch Vest"
+      },
+      "brookwatch_trousers": {
+        "name": "Brookwatch Trousers"
+      },
+      "brookwatch_moccasins": {
+        "name": "Brookwatch Moccasins"
+      },
+      "brookwatch_cowl": {
+        "name": "Brookwatch Cowl"
+      },
+      "brookwatch_mitts": {
+        "name": "Brookwatch Mitts"
+      },
+      "brookwatch_epaulets": {
+        "name": "Brookwatch Epaulets"
+      },
+      "brookwatch_cinch": {
+        "name": "Brookwatch Cinch"
+      },
+      "hedgerow_vest": {
+        "name": "Hedgerow Vest"
+      },
+      "hedgerow_trousers": {
+        "name": "Hedgerow Trousers"
+      },
+      "hedgerow_moccasins": {
+        "name": "Hedgerow Moccasins"
+      },
+      "hedgerow_cowl": {
+        "name": "Hedgerow Cowl"
+      },
+      "hedgerow_mitts": {
+        "name": "Hedgerow Mitts"
+      },
+      "hedgerow_epaulets": {
+        "name": "Hedgerow Epaulets"
+      },
+      "hedgerow_cinch": {
+        "name": "Hedgerow Cinch"
+      },
+      "bogwalker_vest": {
+        "name": "Bogwalker Vest"
+      },
+      "bogwalker_trousers": {
+        "name": "Bogwalker Trousers"
+      },
+      "bogwalker_moccasins": {
+        "name": "Bogwalker Moccasins"
+      },
+      "bogwalker_cowl": {
+        "name": "Bogwalker Cowl"
+      },
+      "bogwalker_mitts": {
+        "name": "Bogwalker Mitts"
+      },
+      "bogwalker_epaulets": {
+        "name": "Bogwalker Epaulets"
+      },
+      "bogwalker_cinch": {
+        "name": "Bogwalker Cinch"
+      },
+      "thornspire_vest": {
+        "name": "Thornspire Vest"
+      },
+      "thornspire_trousers": {
+        "name": "Thornspire Trousers"
+      },
+      "thornspire_moccasins": {
+        "name": "Thornspire Moccasins"
+      },
+      "thornspire_cowl": {
+        "name": "Thornspire Cowl"
+      },
+      "thornspire_mitts": {
+        "name": "Thornspire Mitts"
+      },
+      "thornspire_epaulets": {
+        "name": "Thornspire Epaulets"
+      },
+      "thornspire_cinch": {
+        "name": "Thornspire Cinch"
+      },
+      "hollowveil_vest": {
+        "name": "Hollowveil Vest"
+      },
+      "hollowveil_trousers": {
+        "name": "Hollowveil Trousers"
+      },
+      "hollowveil_moccasins": {
+        "name": "Hollowveil Moccasins"
+      },
+      "hollowveil_cowl": {
+        "name": "Hollowveil Cowl"
+      },
+      "hollowveil_mitts": {
+        "name": "Hollowveil Mitts"
+      },
+      "hollowveil_epaulets": {
+        "name": "Hollowveil Epaulets"
+      },
+      "hollowveil_cinch": {
+        "name": "Hollowveil Cinch"
+      },
+      "trailwarden_vest": {
+        "name": "Trailwarden Vest"
+      },
+      "trailwarden_trousers": {
+        "name": "Trailwarden Trousers"
+      },
+      "trailwarden_moccasins": {
+        "name": "Trailwarden Moccasins"
+      },
+      "trailwarden_cowl": {
+        "name": "Trailwarden Cowl"
+      },
+      "trailwarden_mitts": {
+        "name": "Trailwarden Mitts"
+      },
+      "trailwarden_epaulets": {
+        "name": "Trailwarden Epaulets"
+      },
+      "trailwarden_cinch": {
+        "name": "Trailwarden Cinch"
+      },
+      "highgale_vest": {
+        "name": "Highgale Vest"
+      },
+      "highgale_trousers": {
+        "name": "Highgale Trousers"
+      },
+      "highgale_moccasins": {
+        "name": "Highgale Moccasins"
+      },
+      "highgale_cowl": {
+        "name": "Highgale Cowl"
+      },
+      "highgale_mitts": {
+        "name": "Highgale Mitts"
+      },
+      "highgale_epaulets": {
+        "name": "Highgale Epaulets"
+      },
+      "highgale_cinch": {
+        "name": "Highgale Cinch"
+      },
+      "breakwater_shoulderguards": {
+        "name": "Breakwater Shoulderguards"
+      },
+      "breakwater_pauldrons": {
+        "name": "Breakwater Pauldrons"
+      },
+      "breakwater_epaulets": {
+        "name": "Breakwater Epaulets"
+      },
+      "gravebell_moccasins": {
+        "name": "Gravebell Moccasins"
+      },
+      "oathbroken_trousers": {
+        "name": "Oathbroken Trousers"
+      },
+      "sparkglass_trousers": {
+        "name": "Sparkglass Trousers"
+      },
+      "stillhymn_moccasins": {
+        "name": "Stillhymn Moccasins"
+      },
+      "sealkeeper_mitts": {
+        "name": "Sealkeeper Mitts"
+      },
+      "fetterbound_trousers": {
+        "name": "Fetterbound Trousers"
+      },
+      "wyrmshadow_vest": {
+        "name": "Wyrmshadow Vest"
+      },
+      "cinderbrood_spaulders": {
+        "name": "Cinderbrood Spaulders"
+      },
+      "cinderbrood_epaulets": {
+        "name": "Cinderbrood Epaulets"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "Hoarfrost Shoulderguards"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "Hoarfrost Pauldrons"
+      },
+      "hoarfrost_epaulets": {
+        "name": "Hoarfrost Epaulets"
+      },
+      "blackmere_epaulets": {
+        "name": "Blackmere Epaulets"
+      },
+      "reedhush_epaulets": {
+        "name": "Reedhush Epaulets"
+      },
+      "cairnking_epaulets": {
+        "name": "Cairnking Epaulets"
+      },
+      "palehunt_epaulets": {
+        "name": "Palehunt Epaulets"
+      },
+      "jadeshrine_epaulets": {
+        "name": "Jadeshrine Epaulets"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "Gildhedge Shoulderguards"
+      },
+      "gildhedge_pauldrons": {
+        "name": "Gildhedge Pauldrons"
+      },
+      "gildhedge_epaulets": {
+        "name": "Gildhedge Epaulets"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "Saltwrack Shoulderguards"
+      },
+      "saltwrack_pauldrons": {
+        "name": "Saltwrack Pauldrons"
+      },
+      "saltwrack_epaulets": {
+        "name": "Saltwrack Epaulets"
+      },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
+      "gravedirt_treads": {
+        "name": "Gravedirt Treads"
+      },
+      "bellrope_girdle": {
+        "name": "Bellrope Girdle"
+      },
+      "sextons_spadehaft": {
+        "name": "Sexton's Spadehaft"
+      },
+      "rimesilk_mantle": {
+        "name": "Rimesilk Mantle"
+      },
+      "bonechill_carapace_vest": {
+        "name": "Bonechill Hauberk"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "Rime-Laced Leggings"
+      },
+      "rimeweb_fang": {
+        "name": "Bride's Icicle"
+      },
+      "cantors_cassock": {
+        "name": "Cantor's Cassock"
+      },
+      "choirward_leggings": {
+        "name": "Choirward Leggings"
+      },
+      "choristers_gloves": {
+        "name": "Chorister's Gloves"
+      },
+      "cantors_hymnal": {
+        "name": "Cantor's Hymnal"
+      },
+      "gravecallers_vestments": {
+        "name": "Gravecaller's Vestments"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "Unquiet Stalker's Hood"
+      },
+      "sextons_burial_spade": {
+        "name": "Sexton's Burial Spade"
+      },
+      "rimesilk_hood": {
+        "name": "Rimesilk Hood"
+      },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "Jailer's Iron Gauntlets"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "Turnkey's Keyring Belt"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "Turnkey's Lantern Cowl"
+      },
+      "conchplate_girdle": {
+        "name": "Conchplate Girdle"
+      },
+      "pale_chorus_leggings": {
+        "name": "Pale Chorus Leggings"
+      },
+      "refrain_silk_gloves": {
+        "name": "Refrain Silk Gloves"
+      },
+      "chorus_conch": {
+        "name": "Chorus Conch"
+      },
+      "tideglass_pauldrons": {
+        "name": "Tideglass Pauldrons"
+      },
+      "moonburn_treads": {
+        "name": "Moonburn Treads"
+      },
+      "prism_etched_cowl": {
+        "name": "Prism-Etched Cowl"
+      },
+      "tideglass_shiv": {
+        "name": "Tideglass Shiv"
+      },
+      "pale_chorus_vestment": {
+        "name": "Pale Chorus Vestment"
+      },
+      "tideglass_warmaul": {
+        "name": "Tideglass Warmaul"
+      },
+      "beastpit_warbelt": {
+        "name": "Beastpit Warbelt"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "Jaguar-Hide Jerkin"
+      },
+      "hexbone_handwraps": {
+        "name": "Hexbone Handwraps"
+      },
+      "rootbound_sabatons": {
+        "name": "Rootbound Sabatons"
+      },
+      "pollen_dusted_leggings": {
+        "name": "Pollen-Dusted Leggings"
+      },
+      "bloomsilk_cowl": {
+        "name": "Bloomsilk Cowl"
+      },
+      "falls_blessed_staff": {
+        "name": "Falls-Blessed Staff"
+      },
+      "fanglords_hide_mantle": {
+        "name": "Fanglord's Hide Mantle"
+      },
+      "thornroot_greathelm": {
+        "name": "Thorncrowned Greathelm"
+      },
+      "foremans_grips": {
+        "name": "Foreman's Grips"
+      },
+      "serac_stride_boots": {
+        "name": "Serac-Stride Boots"
+      },
+      "seal_rune_mantle": {
+        "name": "Seal-Rune Mantle"
+      },
+      "thawbound_legguards": {
+        "name": "Thawbound Legguards"
+      },
+      "pyre_tenders_hood": {
+        "name": "Pyre-Tender's Hood"
+      },
+      "meltwater_cord": {
+        "name": "Meltwater Cord"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "Hammer of the Open Lock"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "Vestments of the Waking Rite"
+      },
+      "spadeworn_gauntlets": {
+        "name": "Spadeworn Gauntlets"
+      },
+      "gravedirt_grips": {
+        "name": "Gravedirt Grips"
+      },
+      "bellrope_mitts": {
+        "name": "Bellrope Mitts"
+      },
+      "rimewreath_coif": {
+        "name": "Rimewreath Coif"
+      },
+      "rime_laced_hood": {
+        "name": "Rime-Laced Hood"
+      },
+      "lamenting_veil": {
+        "name": "Lamenting Veil"
+      },
+      "choirward_pauldrons": {
+        "name": "Choirward Pauldrons"
+      },
+      "choristers_spaulders": {
+        "name": "Chorister's Spaulders"
+      },
+      "cantors_stole": {
+        "name": "Cantor's Stole"
+      },
+      "knellbound_hauberk": {
+        "name": "Knellbound Hauberk"
+      },
+      "candlewatch_jerkin": {
+        "name": "Candlewatch Jerkin"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "Robe of the Unquiet Rite"
+      },
+      "gravecallers_rod": {
+        "name": "Gravecaller's Rod"
+      },
+      "portcullis_girdle": {
+        "name": "Portcullis Girdle"
+      },
+      "cellwatch_belt": {
+        "name": "Cellwatch Belt"
+      },
+      "lanternwick_sash": {
+        "name": "Lanternwick Sash"
+      },
+      "turnkeys_shank": {
+        "name": "Turnkey's Shank"
+      },
+      "gaolyard_jerkin": {
+        "name": "Gaolyard Jerkin"
+      },
+      "brinewarden_robe": {
+        "name": "Brinewarden Robe"
+      },
+      "fogbinders_rod": {
+        "name": "Fogbinder's Rod"
+      },
+      "conchplate_sabatons": {
+        "name": "Conchplate Sabatons"
+      },
+      "pale_chorus_slippers": {
+        "name": "Pale Chorus Slippers"
+      },
+      "tideglass_gauntlets": {
+        "name": "Tideglass Gauntlets"
+      },
+      "moonburn_grips": {
+        "name": "Moonburn Grips"
+      },
+      "prism_etched_handwraps": {
+        "name": "Prism-Etched Handwraps"
+      },
+      "mere_crested_helm": {
+        "name": "Mere-Crested Helm"
+      },
+      "mereskin_hood": {
+        "name": "Mereskin Hood"
+      },
+      "merewater_cowl": {
+        "name": "Merewater Cowl"
+      },
+      "merecleaver": {
+        "name": "Merecleaver"
+      },
+      "moonwrack_stave": {
+        "name": "Moonwrack Stave"
+      },
+      "membership_token": {
+        "name": "Membership Token (30 Days)"
+      },
+      "referral_satchel": {
+        "name": "Friendship Satchel"
+      },
+      "referral_hollow_charm": {
+        "name": "Hollow Friendship Charm"
+      },
+      "referral_fog_charm": {
+        "name": "Fogbound Friendship Charm"
+      },
+      "reins_referral_tank": {
+        "name": "Friendship Tank Reins"
+      },
+      "reins_referral_raptor": {
+        "name": "Friendship Raptor Reins"
+      },
+      "referral_helmet": {
+        "name": "Friendship Helm"
+      },
+      "referral_shoulder": {
+        "name": "Friendship Pauldrons"
+      },
+      "referral_chest": {
+        "name": "Friendship Cuirass"
+      },
+      "referral_waist": {
+        "name": "Friendship Girdle"
+      },
+      "referral_legs": {
+        "name": "Friendship Legguards"
+      },
+      "referral_gloves": {
+        "name": "Friendship Gauntlets"
+      },
+      "referral_feet": {
+        "name": "Friendship Boots"
+      },
+      "membership_helmet": {
+        "name": "Membership Helm"
+      },
+      "membership_shoulder": {
+        "name": "Membership Pauldrons"
+      },
+      "membership_chest": {
+        "name": "Membership Cuirass"
+      },
+      "membership_waist": {
+        "name": "Membership Girdle"
+      },
+      "membership_legs": {
+        "name": "Membership Legguards"
+      },
+      "membership_gloves": {
+        "name": "Membership Gauntlets"
+      },
+      "membership_feet": {
+        "name": "Membership Boots"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -19306,6 +22117,24 @@ export const nl_NL: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Hart van de Smeltkroes"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
+      "fanglords_whistle": {
+        "name": "Fanglord's Whistle"
+      },
+      "gorgebloom_seedpod": {
+        "name": "Gorgebloom Seedpod"
+      },
+      "foremans_last_link": {
+        "name": "Foreman's Last Link"
+      },
+      "phial_of_the_tithe": {
+        "name": "Phial of the Tithe"
+      },
+      "quenchwater_flask": {
+        "name": "Quenchwater Flask"
+      },
       "rift_watchers_band": {
         "name": "Breukwachter's Armband"
       },
@@ -19440,6 +22269,9 @@ export const nl_NL: EnTranslations = {
       "restless_bones": {
         "name": "Rusteloze Beenderen"
       },
+      "marrow_restless_bones": {
+        "name": "Restless Bones"
+      },
       "gorrak": {
         "name": "Gorrak de Meedogenloze"
       },
@@ -19557,6 +22389,75 @@ export const nl_NL: EnTranslations = {
       "morthen": {
         "name": "Morthen de Grafroeper"
       },
+      "ossuary_sentinel": {
+        "name": "Ossuary Sentinel"
+      },
+      "hollow_gravedigger": {
+        "name": "Hollow Gravedigger"
+      },
+      "rime_egg_sac": {
+        "name": "Rime Egg Sac"
+      },
+      "rimeweb_hatchling": {
+        "name": "Rimeweb Hatchling"
+      },
+      "rimeweb_spinner": {
+        "name": "Rimeweb Spinner"
+      },
+      "candlewright_acolyte": {
+        "name": "Candlewright Acolyte"
+      },
+      "hollow_chorister": {
+        "name": "Hollow Chorister"
+      },
+      "bound_soul": {
+        "name": "Bound Soul"
+      },
+      "rimeweb": {
+        "name": "Lady of the Bonechill"
+      },
+      "cantor_ilvane": {
+        "name": "Cantor Ilvane"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "Ossuary Warrior"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "Gravecaller Adept"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "Ossuary Cutthroat"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "Gravecaller Necromancer"
+      },
+      "crypt_bone_minion": {
+        "name": "Bone Minion"
+      },
+      "crypt_bone_brute": {
+        "name": "Bone Brute"
+      },
+      "crypt_bone_pile": {
+        "name": "Stirring Bones"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "Chapel Gargoyle"
+      },
+      "crypt_crow_caller": {
+        "name": "Crow Caller"
+      },
+      "crypt_carrion_crow": {
+        "name": "Carrion Crow"
+      },
+      "crypt_ossuary_drake": {
+        "name": "Ossuary Drake"
+      },
+      "crypt_knellwyrm": {
+        "name": "Knellwyrm"
+      },
+      "crypt_remembrance_candle": {
+        "name": "Remembrance Candle"
+      },
       "bastion_revenant": {
         "name": "Bastion-Geestwraak"
       },
@@ -19571,6 +22472,102 @@ export const nl_NL: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael de Fogbinder"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Wreckbound Sailor"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "Shipwreck Captain"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
+      },
+      "bastion_gaol_cage": {
+        "name": "Iron Cage"
+      },
+      "bastion_drowned_anchor": {
+        "name": "Drowned Anchor"
+      },
+      "lagoon_snapper": {
+        "name": "Lagoon Snapper"
+      },
+      "ice_wraith": {
+        "name": "Ice Wraith"
+      },
+      "moonlit_siren": {
+        "name": "Moonlit Siren"
+      },
+      "tidewisp": {
+        "name": "Tidewisp"
+      },
+      "drowned_pilgrim": {
+        "name": "Drowned Pilgrim"
+      },
+      "mere_hydra_head_left": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_center": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_right": {
+        "name": "Mere Hydra"
+      },
+      "tideglass_colossus": {
+        "name": "Tideglass Colossus"
+      },
+      "tideglass_reflection": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_priest": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_mage": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_druid": {
+        "name": "Tideglass Reflection"
       },
       "sanctum_boneguard": {
         "name": "Heiligdom-Botwacht"
@@ -19725,8 +22722,26 @@ export const nl_NL: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, de Ontwakende Piek"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Gewekte Stormling"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Stalpaard"
@@ -20100,8 +23115,179 @@ export const nl_NL: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "Slagtandheer Beestenmeester"
       },
+      "sunbone_totem_binder": {
+        "name": "Sunbone Totem-Binder"
+      },
+      "sunbone_totem": {
+        "name": "Sunbone Totem"
+      },
+      "sunbone_dread_totem": {
+        "name": "Sunbone Dread Totem"
+      },
+      "basin_raptor": {
+        "name": "Basin Raptor"
+      },
+      "spore_toad": {
+        "name": "Spore Toad"
+      },
+      "vine_lasher": {
+        "name": "Snarlvine Lasher"
+      },
+      "great_saurian": {
+        "name": "Great Saurian"
+      },
+      "howdah_hexcaller": {
+        "name": "Howdah Hexcaller"
+      },
+      "fanglord_jaguar": {
+        "name": "Fanglord's Great Jaguar"
+      },
+      "the_gorgebloom": {
+        "name": "The Gorgebloom"
+      },
       "wildheart_high_priest": {
         "name": "Zulgar, Stem van het Bekken"
+      },
+      "broodsworn_thawcaller": {
+        "name": "Broodsworn Thawcaller"
+      },
+      "broodsworn_goadsmith": {
+        "name": "Broodsworn Goadsmith"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "Broodsworn Pyre-Tender"
+      },
+      "soul_brazier": {
+        "name": "Soul Brazier"
+      },
+      "rime_whelp": {
+        "name": "Rime Whelp"
+      },
+      "ogre_sledge_hauler": {
+        "name": "Ogre Sledge-Hauler"
+      },
+      "glacier_splinter": {
+        "name": "Glacier Splinter"
+      },
+      "sledge_tusker": {
+        "name": "Sledge Tusker"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "Hammer Shackle"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "Tongs Shackle"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "Anvil Shackle"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "Bellows Shackle"
+      },
+      "thorn_sprout": {
+        "name": "Thorn Sprout"
+      },
+      "buddy_ember_fox": {
+        "name": "Ember Fox"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "Emberfall Phoenix"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "Crimson Claw Crab"
+      },
+      "buddy_golden_sentinel": {
+        "name": "Golden Sentinel"
+      },
+      "buddy_nightfang": {
+        "name": "Nightfang"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "Tuskhorn Boar"
+      },
+      "buddy_emerald_wolf": {
+        "name": "Emerald Wolf"
+      },
+      "buddy_tiger": {
+        "name": "Tiger"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "Trollface"
+      },
+      "buddy_ansem": {
+        "name": "Ansem"
+      },
+      "buddy_triple_t": {
+        "name": "Triple T"
+      },
+      "buddy_kekius": {
+        "name": "Kekius"
+      },
+      "buddy_solbot": {
+        "name": "Solbot"
+      },
+      "buddy_frostfire": {
+        "name": "Frostfire"
+      },
+      "buddy_rocky": {
+        "name": "Rocky"
+      },
+      "buddy_proud_grunt": {
+        "name": "Proud Grunt"
+      },
+      "buddy_loot_goblin": {
+        "name": "Loot Goblin"
+      },
+      "buddy_penny_goldspark": {
+        "name": "Penny Goldspark"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "Alpaca"
+      },
+      "buddy_horse": {
+        "name": "Tug, the Warhorse"
+      },
+      "buddy_sapling": {
+        "name": "Sapling"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "Spider"
+      },
+      "buddy_raptor": {
+        "name": "Raptor"
+      },
+      "buddy_skeleton": {
+        "name": "Skeleton"
+      },
+      "buddy_crystal_lich": {
+        "name": "Crystal Lich"
+      },
+      "buddy_forgemaw": {
+        "name": "Forgemaw The Molten"
+      },
+      "buddy_crystal_tide": {
+        "name": "Crystal Tide"
+      },
+      "buddy_phantom": {
+        "name": "Phantom"
       },
       "ironvein_foreman": {
         "name": "IJzerader-Voorman"
@@ -20375,6 +23561,16 @@ export const nl_NL: EnTranslations = {
         "name": "Wachter Fenwick",
         "title": "Wachter van Fenbridge",
         "greeting": "Houd halt bij de poort, {className}. Voorbij dat riet doet het veen het doden voor ons."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
       },
       "brother_aldric_fen": {
         "name": "Broeder Aldric",
@@ -20891,6 +24087,11 @@ export const nl_NL: EnTranslations = {
         "title": "Meester van het Muurduel",
         "greeting": "Die pop achter me slaat nooit terug en gaat nooit neer, {className}. Wat telt is de telling: je schademeters tellen elke klap die je erop uitdeelt. Richt hem aan en open de meters, dan leg ik de rest uit."
       },
+      "cantor_laverock": {
+        "name": "Laverock",
+        "title": "Last Cantor of the Pale Choir",
+        "greeting": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tijwachter",
@@ -21114,6 +24315,52 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridge-Oproepbevel"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -23298,6 +26545,12 @@ export const nl_NL: EnTranslations = {
           },
           "7": {
             "label": "Het Verzonken Bastion"
+          },
+          "8": {
+            "label": "Grafheuvelgebied"
+          },
+          "9": {
+            "label": "Sterrenvalkrater"
           }
         }
       },
@@ -23932,6 +27185,16 @@ export const nl_NL: EnTranslations = {
         "subject": "Je aankoop op de Beurs",
         "body": "De verkoop is afgerond en de waar is van jou. Het bijgevoegde pakket bevat precies het voorwerp waarvoor je hebt betaald, veilig in bewaring gehouden vanaf het moment dat het werd aangeboden tot je betaling werd verwerkt.\n\nEen verslag van de verkoop staat vermeld in het beursregister.\n\n- De Beursmakelaar"
       },
+      "membership_token_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Your membership token",
+        "body": "Your purchased token is enclosed. Redeem it to add 30 days of membership to your account, or trade it with another adventurer."
+      },
+      "membership_annual_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your annual membership mount",
+        "body": "Your annual membership payment is complete. Your tank mount key is enclosed. Keep the key in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required."
+      },
       "woc_market_return": {
         "sender": "De Beursmakelaar",
         "subject": "Je aanbieding op de Beurs is beëindigd",
@@ -24381,6 +27644,7 @@ export const nl_NL: EnTranslations = {
     "mailboxName": "Brievenbus",
     "noticeboardName": "Mededelingenbord",
     "farmPatchName": "Tuinbedden",
-    "realmBuilderMonumentName": "Rijksbouwer Monument"
+    "realmBuilderMonumentName": "Rijksbouwer Monument",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

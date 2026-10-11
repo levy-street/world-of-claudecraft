@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4817,
-    "harvestedFiles": 3948,
+    "files": 4840,
+    "harvestedFiles": 3947,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
         "ms": 1954,
@@ -2324,6 +2324,226 @@
           7
         ]
       },
+      "tests/gravewyrm_korgath.test.ts": {
+        "ms": 15889,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          15951,
+          15760,
+          15889
+        ]
+      },
+      "tests/gravewyrm_korzul.test.ts": {
+        "ms": 24699,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          24891,
+          24699,
+          24684
+        ]
+      },
+      "tests/gravewyrm_sanctum_alert.test.ts": {
+        "ms": 37,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          30,
+          40,
+          37
+        ]
+      },
+      "tests/gravewyrm_sanctum_boss_fx.test.ts": {
+        "ms": 68,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          66,
+          73,
+          68
+        ]
+      },
+      "tests/gravewyrm_sanctum_boss_fx_core.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          15,
+          12,
+          12
+        ]
+      },
+      "tests/gravewyrm_sanctum_boss_models.test.ts": {
+        "ms": 104,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          104,
+          62,
+          105
+        ]
+      },
+      "tests/gravewyrm_sanctum_creatures.test.ts": {
+        "ms": 30,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          30,
+          29,
+          32
+        ]
+      },
+      "tests/gravewyrm_sanctum_gates_render.test.ts": {
+        "ms": 52,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          52,
+          52,
+          59
+        ]
+      },
+      "tests/gravewyrm_sanctum_kit.test.ts": {
+        "ms": 45,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          152,
+          39,
+          45
+        ]
+      },
+      "tests/gravewyrm_sanctum_lake.test.ts": {
+        "ms": 244,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          271,
+          244,
+          234
+        ]
+      },
+      "tests/gravewyrm_sanctum_lights.test.ts": {
+        "ms": 34,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          34,
+          31,
+          35
+        ]
+      },
+      "tests/gravewyrm_sanctum_loot.test.ts": {
+        "ms": 20,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          65,
+          15,
+          20
+        ]
+      },
+      "tests/gravewyrm_sanctum_mountains.test.ts": {
+        "ms": 97,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          400,
+          97,
+          70
+        ]
+      },
+      "tests/gravewyrm_sanctum_render_core.test.ts": {
+        "ms": 51,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          56,
+          51,
+          43
+        ]
+      },
+      "tests/gravewyrm_sanctum_route.test.ts": {
+        "ms": 718,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          718,
+          683,
+          722
+        ]
+      },
+      "tests/gravewyrm_sanctum_rune_wall.test.ts": {
+        "ms": 4220,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum playtest fixes (walls audit, rune wall lore): new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          4220,
+          4448,
+          3386
+        ]
+      },
+      "tests/gravewyrm_sanctum_terrain.test.ts": {
+        "ms": 929,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          1101,
+          929,
+          853
+        ]
+      },
+      "tests/gravewyrm_sanctum_trash.test.ts": {
+        "ms": 7088,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          6583,
+          7326,
+          7088
+        ]
+      },
+      "tests/gravewyrm_sanctum_walls.test.ts": {
+        "ms": 14040,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum playtest fixes (walls audit, rune wall lore): new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          14040,
+          16652,
+          13185
+        ]
+      },
+      "tests/gravewyrm_velkhar.test.ts": {
+        "ms": 7176,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          6936,
+          7176,
+          7348
+        ]
+      },
       "tests/ground_object_spawns.test.ts": {
         "ms": 5,
         "method": "local-median",
@@ -2466,15 +2686,6 @@
         "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
         "runs": [
           1517
-        ]
-      },
-      "tests/harbormaster_gear_asset.test.ts": {
-        "ms": 63,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
-        "runs": [
-          63
         ]
       },
       "tests/harvest_choreography.test.ts": {
@@ -2853,6 +3064,17 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           5
+        ]
+      },
+      "tests/interior_collider_cells.test.ts": {
+        "ms": 9295,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          10055,
+          9295,
+          8960
         ]
       },
       "tests/interior_encounter_prewarm_rig_key.test.ts": {
@@ -4492,6 +4714,39 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           2828
+        ]
+      },
+      "tests/sanctum_seal_gate.test.ts": {
+        "ms": 10104,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          9687,
+          10133,
+          10104
+        ]
+      },
+      "tests/sanctum_seal_gate_asset.test.ts": {
+        "ms": 39,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          43,
+          39,
+          34
+        ]
+      },
+      "tests/sanctum_seal_gate_render.test.ts": {
+        "ms": 214,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum rework (phase A and B) and the interior collider cell index: new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          224,
+          200,
+          214
         ]
       },
       "tests/sanguine_weapon_hands.test.ts": {
@@ -9535,10 +9790,29 @@
   "tests/grass_build_slicing.test.ts": 2958,
   "tests/grass_cap_collapse_core.test.ts": 7,
   "tests/grass_tuft_cards_core.test.ts": 7,
-  "tests/grave_inferno.test.ts": 3875,
   "tests/gravewyrm_boss_gold.test.ts": 15239,
   "tests/gravewyrm_farm_exploit.test.ts": 1819,
+  "tests/gravewyrm_korgath.test.ts": 15889,
+  "tests/gravewyrm_korzul.test.ts": 24699,
   "tests/gravewyrm_normal_tuning.test.ts": 15,
+  "tests/gravewyrm_sanctum_alert.test.ts": 37,
+  "tests/gravewyrm_sanctum_boss_fx.test.ts": 68,
+  "tests/gravewyrm_sanctum_boss_fx_core.test.ts": 12,
+  "tests/gravewyrm_sanctum_boss_models.test.ts": 104,
+  "tests/gravewyrm_sanctum_creatures.test.ts": 30,
+  "tests/gravewyrm_sanctum_gates_render.test.ts": 52,
+  "tests/gravewyrm_sanctum_kit.test.ts": 45,
+  "tests/gravewyrm_sanctum_lake.test.ts": 244,
+  "tests/gravewyrm_sanctum_lights.test.ts": 34,
+  "tests/gravewyrm_sanctum_loot.test.ts": 20,
+  "tests/gravewyrm_sanctum_mountains.test.ts": 97,
+  "tests/gravewyrm_sanctum_render_core.test.ts": 51,
+  "tests/gravewyrm_sanctum_route.test.ts": 718,
+  "tests/gravewyrm_sanctum_rune_wall.test.ts": 4220,
+  "tests/gravewyrm_sanctum_terrain.test.ts": 929,
+  "tests/gravewyrm_sanctum_trash.test.ts": 7088,
+  "tests/gravewyrm_sanctum_walls.test.ts": 14040,
+  "tests/gravewyrm_velkhar.test.ts": 7176,
   "tests/graveyard_command.test.ts": 2024,
   "tests/grix_tunnelking_presence.test.ts": 10,
   "tests/ground_aim.test.ts": 14,
@@ -9619,7 +9893,6 @@
   "tests/harbor_route_marker_core.test.ts": 8,
   "tests/harbor_route_marker_render.test.ts": 106,
   "tests/harbor_route_markers.test.ts": 1517,
-  "tests/harbormaster_gear_asset.test.ts": 63,
   "tests/harvest_admission.test.ts": 14,
   "tests/harvest_body_pick.test.ts": 11,
   "tests/harvest_choreography.test.ts": 9,
@@ -9877,6 +10150,7 @@
   "tests/interface_unlock_menu_core.test.ts": 41,
   "tests/interface_unlock_preview.test.ts": 28,
   "tests/interface_visibility_core.test.ts": 5,
+  "tests/interior_collider_cells.test.ts": 9295,
   "tests/interior_encounter_prewarm.test.ts": 29,
   "tests/interior_encounter_prewarm_pass.test.ts": 7370,
   "tests/interior_encounter_prewarm_rig_key.test.ts": 805,
@@ -11357,6 +11631,9 @@
   "tests/salvage_copy_selection.test.ts": 2691,
   "tests/sample_ring.test.ts": 8,
   "tests/sanctum_approach.test.ts": 6,
+  "tests/sanctum_seal_gate.test.ts": 10104,
+  "tests/sanctum_seal_gate_asset.test.ts": 39,
+  "tests/sanctum_seal_gate_render.test.ts": 214,
   "tests/sanguine_weapon_hands.test.ts": 13,
   "tests/sanguine_weapon_sheath.test.ts": 12,
   "tests/save_character_and_market.test.ts": 10,

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { VISUALS } from '../src/render/characters/manifest';
+import { KAYKIT_PALADIN, VISUALS } from '../src/render/characters/manifest';
 import {
   PALADIN_BASTION_SWEEP_DURATION,
   PALADIN_BASTION_SWEEP_IMPACT_TIME,
@@ -172,7 +172,10 @@ describe('Paladin spell VFX timelines', () => {
   });
 
   it('uses a short raised spellcast instead of a thrown-shield attack clip', () => {
-    expect(VISUALS.player_paladin.clips.attackByAbility?.sunward_disc).toBe('Spellcast_Raise');
+    // The KayKit paladin (KAYKIT_PALADIN, the `_modular` baseline) keeps the
+    // raise; the WOC paladin plays nothing for the instant by owner rule.
+    expect(KAYKIT_PALADIN.clips.attackByAbility?.sunward_disc).toBe('Spellcast_Raise');
+    expect(VISUALS.player_paladin.clips.attackByAbility?.sunward_disc).toBeUndefined();
   });
 
   it('builds Bastion Sweep at the exact impact frame and only across its frontal arc', () => {

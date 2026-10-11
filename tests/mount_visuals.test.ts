@@ -37,7 +37,12 @@ describe('mount visual specs cover the sim catalog', () => {
       expect(def.lazyPreload, `${spec.visualKey} must be lazyPreload (never boot-swept)`).toBe(
         true,
       );
-      expect(def.url).toBe(`models/mounts/${key}.glb`);
+      const placeholder = {
+        referral_raptor: 'drakemaw_raptor',
+        referral_tank: 'terrorspark_groundshaker',
+      };
+      const model = placeholder[key as keyof typeof placeholder] ?? key;
+      expect(def.url).toBe(`models/mounts/${model}.glb`);
       // The mount never swings: the rider's one-shots carry mounted combat.
       expect(def.clips.attack).toEqual([]);
     }

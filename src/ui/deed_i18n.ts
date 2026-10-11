@@ -198,6 +198,7 @@ export function deedDesc(id: string): string {
  *  hide the surface entirely). Every title surface (nameplate, target frame,
  *  inspect, chat, social, boards, player card, picker) resolves through here. */
 export function deedTitleText(id: string): string {
+  if (id === 'referral_trailmate') return t('referralCards.trailmateTitle');
   const rung = devBadgeTitleTier(id);
   if (rung) {
     const tier = devTierByIndex(rung.index);

@@ -96,7 +96,36 @@ export function mechanicSlotHeld(mob: Entity, key: GovernedMechanicKey): boolean
     if (riftMechanicSuppressed(mob, other)) continue;
     if (-mob[GOVERNED_TIMER_FIELD[other]] > myOverdue) return true;
   }
-  return false;
+  // A template's ranged-punish kit (mob/boss_ranged_mechanics.ts) drains through the same
+  // oldest-due comparison, so a circle smash that is always due cannot starve it.
+  return rangedKitOverdue(mob) > myOverdue;
+}
+
+/**
+ * How overdue the ranged-punish kit's oldest AIMABLE due mechanic is, as its own tick
+ * published it (mob/boss_ranged_mechanics.ts): negative infinity when none is ready, and
+ * always for a mob without the kit, so the comparison above is inert for every shipped
+ * boss and no drain order moves.
+ */
+export function rangedKitOverdue(mob: Entity): number {
+  return mob.rangedReadyOverdue ?? Number.NEGATIVE_INFINITY;
+}
+
+/**
+ * How overdue the most overdue governed driver of this mob's template is. The ranged kit
+ * reads it so the drain runs both ways: a ranged mechanic yields to a circle smash that
+ * has waited longer, exactly as the smash now yields to it.
+ */
+export function governedOverdue(mob: Entity): number {
+  const template = MOBS[mob.templateId];
+  if (!template) return Number.NEGATIVE_INFINITY;
+  let worst = Number.NEGATIVE_INFINITY;
+  for (const key of Object.keys(GOVERNED_TIMER_FIELD) as GovernedMechanicKey[]) {
+    if (!template[key] || riftMechanicSuppressed(mob, key)) continue;
+    const overdue = -mob[GOVERNED_TIMER_FIELD[key]];
+    if (overdue > worst) worst = overdue;
+  }
+  return worst;
 }
 
 /** Arm the shared lock for one spacing window. A hardcast passes its cast time

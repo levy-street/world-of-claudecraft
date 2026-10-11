@@ -5925,7 +5925,10 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     for (const id of honorRows) {
       // The Warfare tier: the entry tier, the two honor trinkets and Warfare Season 2.
       expect(
-        id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id) || SEASON2_STOCK.includes(id),
+        id in WARFARE_ITEMS ||
+          WARFARE_TRINKET_STOCK.includes(id) ||
+          SEASON2_STOCK.includes(id) ||
+          id === 'whistle_horse',
         id,
       ).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);
@@ -6577,6 +6580,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       auraTrack_utility: `the ${t('hudChrome.auraTracks.utility')} track`,
       auraTrack_friendly: `the ${t('hudChrome.auraTracks.friendly')} track`,
       talkingHead: 'the Dialogue panel',
+      shardpikeBar: 'the Shardpike bar',
       // guide.interfacePage.framesGovernedUnitTooltip, named by its live chip.
       unitTooltip: `the ${t('hudChrome.interfaceUnlock.frameNames.unitTooltip')} frame`,
     };

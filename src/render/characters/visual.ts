@@ -11,8 +11,11 @@ import {
   offhandMirrorsWeaponSkin,
 } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
+import type { EquipSlot } from '../../sim/types';
 import type { OverheadEmoteId } from '../../world_api';
+import { GPU_WORK_PRIORITY } from '../background_gpu_queue';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
+import type { EyeWardMarkerPlan } from '../eye_ward_marker_core';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MeleeImpactProfile } from '../melee_impact_core';
@@ -37,10 +40,15 @@ import {
   advanceSwimBlend,
   advanceTreadBlend,
   type BaseState,
+  castClipSyncs,
+  castClipSyncTime,
   castHoldStep,
+  clipSnapsIn,
+  combatIdleClamps,
   desiredBaseState,
   drivesPose,
   gaitWindDownTimeScale,
+  isStrafeState,
   locomotionTimeScale,
   pickProxyHeight,
   SUBMERGED_HEAD_FRACTION,
@@ -54,9 +62,11 @@ import {
   applyMaterials,
   applyModularSliderMorphs,
   assembleModel,
+  atlasTextureByUrl,
   attachDeferredFaceDecals,
   ensureSkinTexture,
   farSourceMaterials,
+  heldPropHolders,
   modularFarBake,
   peekModularFarBake,
   prepareVisual,
@@ -70,8 +80,21 @@ import {
   type TintedMaterialClaims,
   takeFarBakeBudget,
   tintedFarMaterials,
+  wocBuildLod,
 } from './assets';
-import { deathGroundingOffset } from './death_grounding_core';
+import {
+  contactDelaySec,
+  dualWieldHalfNames,
+  newDualSwingState,
+  pickDualSwing,
+} from './attack_swing_core';
+import { auraIdleClip } from './aura_idle_core';
+import { BoneDials } from './bone_dials';
+import { ChargeGlow } from './charge_glow';
+import { sharedClipSplit } from './clip_split';
+import { twinClipOf } from './clip_twin';
+import { extendBrace, isBraced } from './combat_brace_core';
+import { deathGroundingOffset, deathLiftOffset } from './death_grounding_core';
 import {
   createGhostEffectMaterial,
   createMoonkinEffectMaterial,
@@ -79,29 +102,36 @@ import {
   type GhostStyle,
   ghostEffectOpacity,
 } from './effect_materials';
-import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
+import { EffigyRig } from './effigy_rig';
+import { EyeGlow, selfLitMeshes } from './eye_glow';
+import { EyeWardMarker } from './eye_ward_marker';
+import {
+  bodyDrawn,
+  farMeshShown,
+  shadowProxyShown,
+  shadowStandInShown,
+} from './far_lod_reveal_core';
 import { FormAdornments } from './form_adornments';
+import { GestureMeshToggles } from './gesture_mesh_toggles';
+import { GlowPulse } from './glow_pulse';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import { HarvestRecoil } from './harvest_recoil';
 import { disposeHeldPropIdles, updateHeldPropIdles } from './held_prop_idle';
 import { noteLookAttached } from './look_pieces';
-import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import type { ClipMap, EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
-import type { ModularAppearance, ModularLook } from './modular';
+import { clampWocBodyScale, type ModularAppearance, type ModularLook } from './modular';
 import {
   PALADIN_BASTION_SWEEP_CLIP,
   PALADIN_BASTION_SWEEP_DURATION,
 } from './paladin_bastion_sweep_clip';
 import { PaladinBastionSweepFx } from './paladin_bastion_sweep_fx';
-import {
-  PALADIN_TEMPLARS_VERDICT_CLIP,
-  PALADIN_TEMPLARS_VERDICT_DURATION,
-} from './paladin_templars_verdict_clip';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
 import { SanguineWeaponSheath } from './sanguine_weapon_sheath';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
+import { shardpikeProp } from './shardpike_prop';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -117,23 +147,74 @@ import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { stoneboundShellStyle } from './stonebound_shell_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
+import { auraHeldClip, stunIdleClip } from './stun_idle_core';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
+import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
 import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
 import { WarriorBodyEffects } from './warrior_body_effects';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
+import { fixedHandPropsShown, swappedClip, weaponLoadout } from './weapon_loadout_core';
 import {
   disposeOwnedWeaponSkinMaterials,
   markOwnedWeaponSkinMaterials,
 } from './weapon_skin_materials';
+import {
+  WocArmorDressing,
+  type WocArmorDressingHost,
+  type WocArmorFile,
+} from './woc_armor_dressing';
+import { releaseWocArmorOf, setWocArmorWorkQueue } from './woc_armor_packs';
+import { WocAtlasSwap } from './woc_atlas_swap';
+import type { WocCharacterManifest } from './woc_character_manifest';
+import {
+  peekWocFarBake,
+  queueWocFarBake,
+  retainWocFarBake,
+  WOC_FAR_MOUNT_LABEL,
+  WOC_FAR_MOUNT_SPAN,
+  type WocFarBake,
+  type WocFarBakeLease,
+  type WocFarBakeRequest,
+  warnWocFarStopped,
+  wocFarPartsKey,
+} from './woc_far_bake';
+import { wocDrawnHeadMorphs } from './woc_far_head';
+import { type WocFarHeadPose, wocFarHeadPose } from './woc_far_head_core';
+import { WocFarTint } from './woc_far_tint';
+import { wocHeadTypeForGender } from './woc_head_catalog';
+import { WocHeadDressing, type WocHeadHold } from './woc_head_dressing';
+import { type WocHeadAppearanceInput, wocWornHidesHair } from './woc_head_look_core';
+import { applyWocPartVisibility, resolveWocPartNodes, type WocPartNodes } from './woc_parts';
+import {
+  WOC_DRESSABLE_EQUIP_SLOTS,
+  type WocWorn,
+  wocDefaultAppearance,
+  wocDefaultWorn,
+  wocManifestSets,
+  wocUnderArmorAtlas,
+  wocVisibleParts,
+  wocWornFromEquipment,
+  wocWornSets,
+} from './woc_parts_core';
+import { type WocBodyAtlas, wocBodyAtlasOf } from './woc_skin_tint_core';
 
 export type { AnimState, BaseState } from './anim_state';
 
 /** The renderer's live compile gate for a far LOD minted (or re-skinned) after
  *  the view's own creation gate ran: compile `target` hidden, off-thread, and
- *  call `settle` (a lazy `ready` proof) once its programs are linked, or
- *  immediately when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
+ *  call `settle` (a lazy `ready` proof) once the gate settles, or immediately
+ *  and with no proof when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
 export type FarBakeGate = (target: THREE.Object3D, settle: (ready?: () => boolean) => void) => void;
+
+/** The work queue each renderer gate was first installed with (setFarBakeGate). */
+const queueOfGate = new WeakMap<FarBakeGate, CharacterWorkQueue>();
+
+/** The slice of the renderer's background work queue a character rides
+ *  (background_gpu_queue.ts: synchronous main-thread work is a valid unit there). */
+export interface CharacterWorkQueue {
+  run<T>(work: () => T | Promise<T>, priority?: number, label?: string): Promise<T>;
+}
 
 // Current canvas height in device pixels, pushed by the renderer on resolution
 // changes so newly created weapon-skin VFX rigs size their point sprites right.
@@ -183,6 +264,10 @@ const ONESHOT_FADE = 0.1;
  *  needs a frame to hand the pose over cleanly, but short enough to read as a
  *  hard stop. */
 const CUT_FADE = 0.02;
+/** Run <-> side run (the strafe states): a short crossfade, quicker than a base change's FADE so
+ *  a Q/E press reads at once, but never the one-frame snap (owner, 2026-09-29: the instant cut
+ *  looked weird, "maybe do 0.1 cross fade"). */
+const STRAFE_FADE = 0.1;
 /** Idle-breaker cadence (seconds): a floor plus a per-fire jitter, so several
  *  copies of the same rig standing together never fidget in lockstep.
  *
@@ -459,10 +544,63 @@ function tipFadedWeaponGeometry(
 export class CharacterVisual {
   /** add to the entity group; pivot at feet, faces +Z; renderer applies e.scale */
   readonly root = new THREE.Group();
-  /** unscaled world-unit height, nameplate anchor = height * e.scale + 0.5 */
-  readonly height: number;
+  /** The def's world-unit height (VisualDef.height): the pick capsule's, and
+   *  the frame every poseWrap child is placed in (the wrap carries the scale). */
+  private readonly baseHeight: number;
+  /** A WOC player's chosen body size (setBodyScale), 1 on every other rig. */
+  private bodyScale = 1;
+  /** The DRAWN body's world-unit height before e.scale (the renderer applies
+   *  that on the group): the def height times the body size, so the nameplate
+   *  (height * e.scale + 0.5), the VFX anchors, the cull sphere and the blob
+   *  shadow all read the body actually drawn. The renderer re-reads it every
+   *  frame, so a live size change needs no view rebuild. */
+  get height(): number {
+    return this.baseHeight * this.bodyScale;
+  }
   /** invisible capsule for picking (userData.entityId set by the renderer) */
   readonly clickProxy: THREE.Mesh;
+  // A WOC modular body's part nodes, resolved once on the first dressing, and
+  // the last-applied worn set (one id per dressable equip slot plus the helm
+  // bit) so the per-frame diff is a slot compare and never an allocation.
+  private wocParts: WocPartNodes | null = null;
+  private readonly wocWornItems: (string | null)[] = [];
+  private wocHelmHidden = false;
+  private wocDressed = false;
+  private wocDefaultDressed = false;
+  private wocFarParts: ReadonlySet<string> | null = null;
+  /** The armor files the far parts are drawn from (their tier is the bake's material). */
+  private wocFarFiles: readonly WocArmorFile[] = [];
+  private wocFarLease: WocFarBakeLease | null = null;
+  /** The head's face the far parts freeze (woc_far_head_core.ts); null while the
+   *  modular head is not drawn. */
+  private wocFarHead: WocFarHeadPose | null = null;
+  /** The far key of the three inputs above (woc_far_bake.ts wocFarPartsKey), built once
+   *  per dressing: every later ask (a pending bake's peek, the bake itself) reuses it. */
+  private wocFarKey: string | null = null;
+  /** This body's ask for a queued far bake (woc_far_bake.ts queueWocFarBake), from its
+   *  far crossing until its mount unit has run. A re-dress, a new gate and a dispose all
+   *  drop it, and a dropped ask mounts nothing. The ask holds the finished bake in the
+   *  cache until this body has mounted it, so every way out of it releases it. */
+  private wocFarJob: WocFarBakeRequest | null = null;
+  /** This body's head tints on its far set (woc_far_tint.ts); null on any other rig. */
+  private wocFarTint: WocFarTint | null = null;
+  /** The streamed armor files this WOC body draws (woc_armor_dressing.ts); null on any
+   *  other rig. The last worn set is kept so a file landing late re-dresses the body. */
+  private wocArmor: WocArmorDressing | null = null;
+  private wocWorn: WocWorn | null = null;
+  private wocBirthDressed = false;
+  /** The modular head a WOC body wears (woc_head_dressing.ts); null on any other rig.
+   *  The last appearance reference handed in short-circuits the per-frame diff. */
+  private wocHead: WocHeadDressing | null = null;
+  private wocHeadApp: WocHeadAppearanceInput = undefined;
+  private wocHeadRedress = false;
+  /** A WOC body built directly (a preview, a portrait) draws nothing until its head is
+   *  live: the base file ends at the neck, so the body alone would be a headless figure
+   *  (woc_head_dressing.ts `awaited`). Set at birth, cleared ONCE (syncWocHeadWait): a
+   *  body that has drawn never hides for its head again (a later look change holds the
+   *  previous head instead). A body in the world never waits at all: its opt-in
+   *  (setWocBareHeadStandIn) clears this before its first frame. */
+  private wocHeadAwaited = false;
   /** click-capsule radius (measured body extent); the pick proxy's standing scale.y
    *  is `height`, collapsed to a flat profile while dead (see enterDeath/revive). */
   private readonly clickRadius: number;
@@ -473,14 +611,368 @@ export class CharacterVisual {
   private skinIndex: number;
   private weaponItemId: string | null;
   private offhandItemId: string | null;
+  /** The weapon slot follows real equipment (AssembleOptions.bareWhenUnarmed): with no
+   *  weapon equipped the hand is empty, at birth and on every re-attach after it. */
+  private readonly bareWhenUnarmed: boolean;
   /** Composition inputs for a `modular` def (null for a fixed class rig).
    *  Changing a look means changing GEOMETRY, so callers rebuild the visual
    *  rather than mutating it; this is kept so they can tell whether they must. */
   private look: ModularLook | null = null;
 
   /** The composition this visual was built from (null for a fixed class rig). */
+  /** Dress a WOC modular body from an entity's worn equipment (the helmet,
+   *  shoulder, gloves, chest, waist and feet slots) and its helm-visibility
+   *  bit: a visibility flip per named part, nothing rebuilt (woc_parts_core.ts
+   *  owns the rule, including the per-slot fallback for an unmapped item). A
+   *  no-op on any other rig and on a repeat of the last-applied set, so the
+   *  renderer calls it every frame. Returns whether anything changed. */
+  setWocEquipment(
+    equipped: Readonly<Partial<Record<EquipSlot, string>>> | null | undefined,
+    helmHidden: boolean,
+  ): boolean {
+    const manifest = this.def.wocCharacter;
+    if (!manifest || this.disposed) return false;
+    let changed = !this.wocDressed || this.wocDefaultDressed || helmHidden !== this.wocHelmHidden;
+    for (let i = 0; i < WOC_DRESSABLE_EQUIP_SLOTS.length; i++) {
+      const id = equipped?.[WOC_DRESSABLE_EQUIP_SLOTS[i]] ?? null;
+      if (this.wocWornItems[i] !== id) {
+        changed = true;
+        this.wocWornItems[i] = id;
+      }
+    }
+    if (!changed) {
+      this.wocAtlas.retryFailed();
+      return false;
+    }
+    this.wocHelmHidden = helmHidden;
+    this.wocDressed = true;
+    this.wocDefaultDressed = false;
+    this.applyWocWorn(wocWornFromEquipment(manifest, equipped, helmHidden));
+    return true;
+  }
+
+  /** Roster previews have no equipped-item snapshot; keep the manifest kit. A world
+   *  NPC is dressed the same way at birth, its head slot empty (characters/index.ts). */
+  setWocDefaultEquipment(helmHidden: boolean): boolean {
+    const manifest = this.def.wocCharacter;
+    if (!manifest || this.disposed) return false;
+    if (this.wocDefaultDressed && this.wocHelmHidden === helmHidden) {
+      this.wocAtlas.retryFailed();
+      return false;
+    }
+    this.wocHelmHidden = helmHidden;
+    this.wocDefaultDressed = true;
+    const worn = { ...wocDefaultWorn(manifest) };
+    if (helmHidden) worn.head = null;
+    this.applyWocWorn(worn);
+    return true;
+  }
+
+  /** Change how much armor texture detail a WOC body draws, on the LIVE body: a preview
+   *  whose character was just chosen, or whose stage changed hands
+   *  (preview_armor_detail_core.ts). Never a rebuild and never a blink: with the body's
+   *  next dressing (setWocEquipment, setWocDefaultEquipment), else its next update, the
+   *  dressing asks for the files of the new detail and keeps drawing the ones it has until
+   *  each replacement's reveal settles (woc_armor_dressing.ts setDetail). The geometry
+   *  level is no part of it (fixed at build). A no-op on any other rig and on a repeat. */
+  setWocArmorDetail(detail: import('./woc_armor_core').WocArmorDetail): void {
+    this.wocArmor?.setDetail(detail);
+  }
+
+  /** Draw a WOC head look (the stored appearance: its head picks, face controls and
+   *  colours) IN PLACE: visibility flags, morph influences and tint uniforms on the
+   *  live model, never a rebuild (a body-type change is another body, which the
+   *  caller's key diff rebuilds). A no-op on any other rig and on a repeat of the
+   *  last reference, so the renderer calls it every frame. `hold` is how a look
+   *  whose head files still stream is drawn meanwhile (WocHeadHold: 'look' when the
+   *  body is handed a different character). Returns whether the drawn head changed. */
+  setWocHeadLook(app: WocHeadAppearanceInput, hold: WocHeadHold = 'slot'): boolean {
+    if (!this.wocHead || this.disposed || app === this.wocHeadApp) return false;
+    this.wocHeadApp = app;
+    const changed = this.wocHead.setAppearance(app, hold);
+    // a head born with every file of this look resident is live now: draw the body
+    this.syncWocHeadWait();
+    if (!changed) return false;
+    // the far set's head colours follow as uniform writes (woc_far_tint.ts)
+    this.wocFarTint?.setColors(this.wocHead.look.colors);
+    const manifest = this.def.wocCharacter;
+    if (manifest && this.wocParts) {
+      this.dressWoc(manifest, this.wocWorn ?? wocDefaultWorn(manifest));
+    }
+    return true;
+  }
+
+  /** Re-read the wait for the head (syncFarVisibility ends it once the head is live, or
+   *  one of its files failed to load): the body draws from then on. */
+  private syncWocHeadWait(): void {
+    if (this.wocHeadAwaited) this.syncFarVisibility();
+  }
+
+  /** The WOC head's live look (tests, dev overlays); null on any other rig and until the
+   *  head is live (a body built directly is not drawn yet; one in the world draws without
+   *  a head only while its core is missing). What it DRAWS of that look, a hairstyle or a
+   *  beard still on the wire left off, is wocHeadDrawnLook. */
+  get wocHeadLook(): WocHeadDressing['look'] | null {
+    return this.wocHead?.isLive ? this.wocHead.look : null;
+  }
+
+  /** The head pieces' look drawn right now (the portrait's uncover), which a streaming
+   *  pick can still differ from; null on any other rig and until the head is live. */
+  get wocHeadDrawnLook(): WocHeadDressing['drawnLook'] {
+    return this.wocHead?.drawnLook ?? null;
+  }
+
+  private applyWocWorn(worn: WocWorn): void {
+    const manifest = this.def.wocCharacter;
+    if (!manifest) return;
+    this.wocWorn = worn;
+    // The files this worn set draws from: the class's own set (always: it is the
+    // kit a bare slot falls back to) plus any set a display row points one of
+    // the worn items at (woc_item_display.ts). Resident files attach (at once on
+    // a body with no work queue behind it, else as a unit of it), the rest
+    // stream and attach once they land.
+    const sets = wocManifestSets(manifest);
+    for (const set of wocWornSets(manifest, worn)) if (!sets.includes(set)) sets.push(set);
+    if (this.wocArmor?.want(sets)) this.wocParts = null;
+    this.dressWoc(manifest, worn);
+  }
+
+  /** Show the worn parts that can draw now: a part whose set is still streaming
+   *  resolves to no node yet, and the body's own suit shows in its place. */
+  private dressWoc(manifest: WocCharacterManifest, worn: WocWorn): void {
+    if (!this.wocParts) this.wocParts = resolveWocPartNodes(this.model, manifest);
+    const wanted = wocVisibleParts(manifest, wocDefaultAppearance(manifest), worn);
+    applyWocPartVisibility(this.wocParts, manifest, wanted);
+    // The modular head after the part pass: the worn helm hides its hair.
+    if (this.wocHead && !this.wocHead.setHelm(wocWornHidesHair(manifest, worn))) {
+      this.wocHead.apply();
+    }
+    // The far LOD bakes what is drawn: never a part still streaming, and the
+    // file (tier) each set is drawn from, whose materials the bake shares.
+    const parts = new Set<string>();
+    for (const name of wanted) if (this.wocParts.has(name)) parts.add(name);
+    for (const name of this.wocHead?.drawnNames ?? []) parts.add(name);
+    const files = this.wocArmor?.attachedFiles ?? [];
+    // ...and the face the drawn head shows, frozen on the far grid (woc_far_head.ts)
+    const head = this.wocHead?.isLive
+      ? wocFarHeadPose(wocDrawnHeadMorphs(this.model, this.wocHead.look.morphs))
+      : null;
+    // the key is built here, once per dressing, and kept: nothing asks for it per frame
+    const farKey = wocFarPartsKey(parts, files, head);
+    if (farKey !== this.wocFarKey) {
+      this.wocFarParts = parts;
+      this.wocFarFiles = files;
+      this.wocFarHead = head;
+      this.wocFarKey = farKey;
+      this.invalidateWocFar();
+    }
+    this.setWocBodyAtlas(wocUnderArmorAtlas(manifest, worn));
+    // the merged armor follows the parts this pass just showed and hid
+    this.wocArmor?.redressed();
+  }
+
+  /** Re-dress after the attached files changed under the last worn set (or the
+   *  default kit when the body was never dressed). */
+  private redressWoc(): void {
+    const manifest = this.def.wocCharacter;
+    if (!manifest) return;
+    this.wocParts = null;
+    this.dressWoc(manifest, this.wocWorn ?? wocDefaultWorn(manifest));
+  }
+
+  /** The dressing's view of this visual (woc_armor_dressing.ts). */
+  private wocArmorHost(): WocArmorDressingHost {
+    // No queue behind this body (the constructor's own dressing, a preview, a portrait)
+    // is no `schedule` at all: the dressing then attaches a file on the spot, where with
+    // one it waits for the file's prepare unit and attaches as a unit of its own (the
+    // same scheduleWocWork, and so the same priority, as the merged stand-ins' mounts).
+    const queued = (): WocArmorDressingHost['schedule'] =>
+      this.queuedWorkQueue() ? this.scheduleWocWork : undefined;
+    return {
+      model: this.model,
+      adopt: (container) => this.adoptWocArmor(container),
+      forget: (container) => this.forgetWocArmor(container),
+      reveal: (container, live) => this.revealOnCompile(container, 'armor set', live),
+      rigDrawn: this.wocRigDrawn,
+      get schedule() {
+        return queued();
+      },
+    };
+  }
+
+  /** Whether the articulated rig is what draws right now, to stay, behind a gate: a merged
+   *  stand-in (the head, the armor) is not built for a body never handed a gate, one shown
+   *  by its far mesh, one not shown at all, or one drawn by its rig only until its far mesh
+   *  arrives (farLodArriving). */
+  private readonly wocRigDrawn = (): boolean =>
+    this.farBakeGate !== null &&
+    this.root.visible &&
+    this.modelWrap.visible &&
+    !this.farLodArriving;
+
+  /** A far body whose far mesh is on its way: asked for (in line behind other looks, or
+   *  baking), mounting or linking. Its rig is a stopgap until then, and a crowd arriving in
+   *  the far band would pay a fold per body for a stand-in its far mesh replaces. A body
+   *  whose far bake came to nothing is not arriving: it stays on its rig, and is merged
+   *  like any. */
+  private get farLodArriving(): boolean {
+    return (
+      this.far &&
+      (this.wocFarJob !== null ||
+        (this.farBakePending && !this.farBakeTried) ||
+        (this.farMesh !== null && this.farCompilePending))
+    );
+  }
+
+  /**
+   * Run a merged stand-in's mount as one unit of the renderer's work queue. The queue
+   * is read when the work is ASKED for, never when the host object is built: it rides in
+   * with the compile gate (setFarBakeGate), after the constructor. A stand-in is an
+   * optimization of a body already drawn whole, so it sits below the live views, in the
+   * class that still gets a slot a frame under load (when fewer draws are worth the
+   * most). With no renderer behind this body the work runs on the spot. A unit the
+   * queue refuses (shut down by a graphics rebuild) is dropped: the views go with it.
+   */
+  private readonly scheduleWocWork = (work: () => void, label: string): void => {
+    const queue = this.queuedWorkQueue();
+    if (!queue) {
+      work();
+      return;
+    }
+    void queue.run(work, GPU_WORK_PRIORITY.VISIBLE_PREWARM, label).catch(() => undefined);
+  };
+
+  /** The queue this body's own units ride: the one it was handed, else the one its gate
+   *  came with (rendererWorkQueue). A pooled body is handed its gate alone, and one taken
+   *  before the renderer had paired that gate with its queue would otherwise fold its
+   *  merged head and attach its armor on the spot, inside a live frame. Pooled WOC bodies
+   *  are the norm since every world NPC rides one (npc_looks.ts). */
+  private queuedWorkQueue(): CharacterWorkQueue | null {
+    return this.workQueue ?? this.rendererWorkQueue();
+  }
+
+  /** The head dressing's view of this visual (woc_head_dressing.ts). */
+  private wocHeadHost(): import('./woc_head_dressing').WocHeadDressingHost {
+    return {
+      model: this.model,
+      adopt: (node, retint) => this.adoptWocArmor(node, retint),
+      reveal: (node, live) => this.revealOnCompile(node, 'head part', live),
+      relive: () => {
+        this.wocHeadRedress = true;
+      },
+      forget: (node) => this.forgetWocArmor(node),
+      baseMaterial: (mesh) => this.originalMaterials.get(mesh) ?? mesh.material,
+      rigDrawn: this.wocRigDrawn,
+      schedule: this.scheduleWocWork,
+    };
+  }
+
+  /** Fold this WOC body's many pieces into few draws while they stand still (the head as
+   *  one mesh: woc_head_merge.ts; the worn armor as one mesh per material:
+   *  woc_armor_merge.ts). The world view's opt-in (createCharacterVisual), where a
+   *  crowd's draw calls are the cost; a preview or a portrait draws piece by piece. A
+   *  no-op on any other rig. */
+  setWocDrawMerge(on: boolean): void {
+    this.wocHead?.setMerged(on);
+    this.wocArmor?.setMerged(on);
+  }
+
+  /** Let this WOC body draw with the bare head standing in for a hairstyle or a beard
+   *  whose file is still on the wire, or failed (woc_head_dressing.ts setBareStandIn):
+   *  the body never waits on a head file, and the missing piece joins hidden until
+   *  linked, like a later pick. The world view's opt-in (createCharacterVisual), where a
+   *  player with no body at all is the cost; a preview, a portrait and the face builder
+   *  keep drawing a head only whole. A no-op on any other rig. */
+  setWocBareHeadStandIn(on: boolean): void {
+    this.wocHead?.setBareStandIn(on);
+    this.syncWocHeadWait();
+  }
+
+  /** Give a streamed armor set attached after construction everything the
+   *  constructor's sweeps give a mesh, exactly as attachDeferredDecals does for
+   *  a late face decal: the tier tint and its lease, the effect-swap snapshot
+   *  and the effect the body wears now, the depth materials, the caster flags. */
+  private adoptWocArmor(container: THREE.Object3D, afterMaterials?: () => void): void {
+    container.traverse((o) => {
+      if (!(o as THREE.Mesh).isMesh) return;
+      o.userData.bodyMesh = true;
+      o.userData.skinAtlasTarget = false;
+    });
+    applyMaterials(
+      container,
+      this.def,
+      this.entityColor,
+      this.bodyAtlasTexture(),
+      skinEmissiveTexture(this.key, this.skinIndex),
+      this.tintedRigClaims,
+    );
+    // the head's tint wrap rides between the material pass and the snapshot
+    afterMaterials?.();
+    container.traverse((o) => {
+      const mesh = o as THREE.SkinnedMesh;
+      if (!mesh.isMesh) return;
+      this.originalMaterials.set(mesh, mesh.material);
+      mesh.material = this.effectMaterial(mesh.material);
+      attachSharedDepthMaterials(mesh, mesh.material);
+      const castsShadow = characterMeshCastsShadow(mesh);
+      mesh.castShadow = castsShadow && this.shadowOn;
+      mesh.receiveShadow = false;
+      if (!castsShadow) return;
+      if (mesh.isSkinnedMesh) applySkinnedCullBounds(mesh, this.root, this.height);
+      this.casters.push(mesh);
+    });
+  }
+
+  /** Take a detached armor set's meshes out of the per-mesh bookkeeping (their
+   *  material claims overstay until the next full sweep: an overstay only pins). */
+  private forgetWocArmor(container: THREE.Object3D): void {
+    container.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      this.originalMaterials.delete(mesh);
+      const at = this.casters.indexOf(mesh);
+      if (at >= 0) this.casters.splice(at, 1);
+    });
+  }
+
+  /** The under-armor body atlas the worn set selects (null = the GLB's own
+   *  suit): re-derives the body materials through the same atlas-keyed cache
+   *  a skin swap uses, once the KTX2 is resident, so two paladins with
+   *  different chests never share a material. */
+  private setWocBodyAtlas(url: string | null): void {
+    this.wocAtlas.request(url, () => ({
+      model: this.model,
+      parent: this.poseWrap,
+      def: this.def,
+      color: this.entityColor,
+      fallback: skinTexture(this.key, this.skinIndex),
+      emissive: skinEmissiveTexture(this.key, this.skinIndex),
+      gate: this.farBakeGate,
+      wrap: (scratch) => this.wocHead?.wrapTwins(scratch),
+      commit: () => this.applySkinMaterials(this.skinIndex),
+    }));
+  }
+
+  private bodyAtlasTexture(): THREE.Texture | null {
+    return this.wocAtlas.currentUrl
+      ? atlasTextureByUrl(this.wocAtlas.currentUrl)
+      : skinTexture(this.key, this.skinIndex);
+  }
+
+  /** What the body mesh draws right now (woc_skin_tint_core.ts): a class under-armor
+   *  atlas once it is swapped in and resident, else the base file's own suit. */
+  private wocBodyAtlas(): WocBodyAtlas {
+    const url = this.wocAtlas.currentUrl;
+    return wocBodyAtlasOf(url && atlasTextureByUrl(url) ? url : null);
+  }
+
   get modularLook(): ModularLook | null {
     return this.look;
+  }
+
+  /** The VISUALS key this rig was built from (a shared form slot's look). */
+  get assetKey(): string {
+    return this.key;
   }
 
   /** Move the face/body sliders on the LIVE body: morph influences are
@@ -532,22 +1024,42 @@ export class CharacterVisual {
   }
 
   private revealDecalOnCompile(decal: THREE.Mesh): void {
+    this.revealOnCompile(decal, 'face decal');
+  }
+
+  /** Hide a node attached after construction until its programs link through
+   *  the host's compile gate (immediately without one: previews, tests).
+   *  `revealed` hears whether the gate could prepare it (its `ready` proof): a
+   *  node with a stand-in still drawing can stay behind it instead of linking
+   *  on a live frame. It is handed the proof itself too, when the gate has one:
+   *  asked again later it answers for the gate's context as it is then
+   *  (woc_head_merge_proof_core.ts). */
+  private revealOnCompile(
+    node: THREE.Object3D,
+    what: string,
+    revealed?: (prepared: boolean, proof?: () => boolean) => void,
+  ): void {
     const gate = this.farBakeGate;
-    if (!gate) return;
-    decal.visible = false;
+    if (!gate) {
+      revealed?.(true);
+      return;
+    }
+    node.visible = false;
     try {
-      gate(decal, () => {
-        // A visual disposed, or its decal detached, while the link was in
-        // flight: the settle belongs to a mesh this visual no longer draws.
-        if (this.disposed || decal.parent === null) return;
-        decal.visible = true;
+      gate(node, (ready) => {
+        // A visual disposed, or the node detached, while the link was in
+        // flight: the settle belongs to a node this visual no longer draws.
+        if (this.disposed || node.parent === null) return;
+        node.visible = true;
+        revealed?.(ready?.() !== false, ready);
       });
     } catch (err) {
       // A gate that rejects outright (a lane shut down under a graphics
-      // rebuild) reveals now: a decal linking on its first draw beats one that
+      // rebuild) reveals now: a node linking on its first draw beats one that
       // never shows, and the swap must not throw out of the attach.
-      decal.visible = true;
-      console.warn('[decals] compile gate refused a face decal, revealed ungated:', err);
+      node.visible = true;
+      revealed?.(false);
+      console.warn(`[character] compile gate refused a ${what}, revealed ungated:`, err);
     }
   }
 
@@ -573,6 +1085,13 @@ export class CharacterVisual {
   }[] = [];
   private weaponVfxSpriteScale = WORLD_FOV_SPRITE_SCALE;
   private stow = createStowTransition();
+  // The clip set for what the hands hold (ClipMap.loadoutSwaps, weapon_loadout_core.ts): every
+  // clip name the rig plays resolves through this map in action().
+  private loadoutSwap: Readonly<Record<string, string>> | null = null;
+  // Battle-stance hold for a rig whose engagement is not on the wire (players): every attack
+  // one-shot and hit reaction extends it (combat_brace_core.ts), on this visual's own clock.
+  private braceUntil = Number.NEGATIVE_INFINITY;
+  private clock = 0;
   // Set whenever the held-prop graph is rebuilt OUTSIDE a renderer-driven call
   // (the deferred stow swap); the renderer consumes it to re-rank view lights.
   private weaponGraphDirty = false;
@@ -596,11 +1115,18 @@ export class CharacterVisual {
    *  at construction: most of a crowd stands close and never needs one. This
    *  latches so a bake that yields nothing is not retried every crossing. */
   private farBakeTried = false;
-  /** Waiting on the per-frame bake budget (takeFarBakeBudget): the band
-   *  crossed but this part set's slot was taken, so update() retries. The
-   *  visual stays articulated meanwhile (correct, just not yet cheap). */
+  /** A far body whose bake could not be asked for yet, so update() asks again: it
+   *  waits on the per-frame bake budget (takeFarBakeBudget: the band crossed but
+   *  this part set's slot was taken), or it is a WOC body still waiting for its
+   *  head (attemptWocFar). The visual stays articulated meanwhile (correct, just
+   *  not yet cheap). */
   private farBakePending = false;
   private shadowProxy: THREE.Mesh | null = null;
+  /** A WOC body's shadow in the proxy band while its own far bake cannot cast it: the
+   *  key's stand-in silhouette (woc_shadow_stand_in.ts), mounted at construction so the
+   *  body's own creation gate links it. Null on every other rig, and on a tier that
+   *  casts no dynamic shadow. */
+  private shadowStandIn: THREE.Mesh | null = null;
   /** The far mesh and its shadow proxy under one node, so the compile gate
    *  walks both (colour + depth arms) in one pass. */
   private farWrap: THREE.Group | null = null;
@@ -614,6 +1140,9 @@ export class CharacterVisual {
    *  (stageEffectSwap). Null (previews, tests, hosts without one) keeps the
    *  immediate behaviour both paths had before the gate. */
   private farBakeGate: FarBakeGate | null = null;
+  /** The renderer's background work queue (setFarBakeGate): main-thread pieces this
+   *  body can put off ride it as budgeted units. Null with no renderer behind it. */
+  private workQueue: CharacterWorkQueue | null = null;
   /** Effect clones (ghost / stealth / shadowform / moonkin) whose programs are
    *  known linked: either a gate settle landed on them, or they were mounted
    *  with no gate at all. A later toggle of an effect on the same source
@@ -694,6 +1223,23 @@ export class CharacterVisual {
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
+  /** Fist glow for telegraphed abilities. Built on first use; null on rigs with no hands. */
+  private chargeGlow: ChargeGlow | null = null;
+  /** A permanently lit eye, for a VisualDef that declares one. */
+  private eyeGlow: EyeGlow | null = null;
+  /**
+   * The Shardpike aim reticle around that same eye. Built alongside the glow because it
+   * shares its measured offset: the ring and the thing it rings must never drift apart.
+   */
+  private eyeWardMarker: EyeWardMarker | null = null;
+  /** The drill yard effigy's plank hide and lantern (VisualDef.effigy), or null. */
+  private effigyRig: EffigyRig | null = null;
+  /**
+   * This frame's reticle plan, or null to hide it. Pushed in by the renderer rather than
+   * derived here: the plan needs the LOCAL player's held item and distance, which is
+   * viewer state a per-entity visual has no business knowing about.
+   */
+  private eyeWardPlan: EyeWardMarkerPlan | null = null;
   private currentIsOneShot = false;
   /** Seconds until the next idle-breaker; -1 means "rearm on the next idle". */
   private idleVariantIn = -1;
@@ -723,6 +1269,10 @@ export class CharacterVisual {
   /** which ability's cast clip the current cast-state base action was chosen
    *  for; lets chained casts refresh their per-ability override */
   private castClipAbility: string | null = null;
+  /** The aura-held idle loop in force (ClipMap.idleByAura), or null for the rig's own. */
+  private auraIdle: string | null = null;
+  /** The dazed loop in force (ClipMap.stunned), or null for the rig's own idle. */
+  private stunIdle: string | null = null;
   private deadLock = false;
   /** consecutive frames with no action driving the pose (the T-pose watchdog) */
   private starvedFrames = 0;
@@ -770,8 +1320,38 @@ export class CharacterVisual {
   private climbShinBones: (THREE.Object3D | null)[] | undefined;
   private climbTorsoBone: THREE.Object3D | null | undefined;
   private climbHeadBone: THREE.Object3D | null | undefined;
+  /** Dual-wield swing picking (attack_swing_core.ts): lone swings alternate the
+   *  halves of the two-strike clip; a second swing in the same frame (matched
+   *  weapons keep both hand timers on one sim tick) is both hands at once and
+   *  plays the next ClipMap.dualWieldPair clip. */
+  private readonly dualSwing = newDualSwingState();
+  /** What the current one-shot was blending FROM and the mixer time it began:
+   *  a one-shot replaced in the same frame (the second swing of a same-tick
+   *  pair) blends from that pose, not from the zero-weight action it replaces
+   *  (which used to hard-cut the rig into the new clip). */
+  private oneShotFrom: THREE.AnimationAction | null = null;
+  private oneShotAt = -1;
+  /** A second action per re-triggered one-shot clip, so the same swing started
+   *  again mid-play crossfades from where it is instead of snapping to frame 0. */
+  private readonly twinActions = new Map<THREE.AnimationAction, THREE.AnimationAction>();
+  /** The under-armor body atlas the worn set selects (WOC manifests): null is
+   *  the GLB's own suit. Re-derived through applySkinMaterials on change. */
+  private readonly wocAtlas = new WocAtlasSwap();
+  /** Every held/sheathed prop holder mounted on the rig, for the swim hide. */
+  private weaponProps: THREE.Object3D[] = [];
   /** True while the climb's baked clips own the mixer (restore on release). */
   private climbClipsActive = false;
+  /** The base action a climb overlay has pushed down. An action's STORED
+   *  weight is what every later fadeIn multiplies by (see beginAction), so
+   *  it is restored on the action that yielded, never on whatever `current`
+   *  happens to be at release: a Jump zeroed under a climb and released while
+   *  the body already stood in idle stayed at zero, and the next jump off the
+   *  ledge faded in an action that contributed nothing (the bind pose). */
+  private climbYielded: THREE.AnimationAction | null = null;
+  /** The authored climb one-shot while it runs: unlike the scrubbed KayKit
+   *  overlays it is NOT paused, so beginAction's stale-action sweep must be
+   *  told to leave it alone when the base state flips at the top-out. */
+  private climbOverlay: THREE.AnimationAction | null = null;
   // Straddle pose, for mounts whose spec asks for one (mount_visuals.ts
   // MountRideSpec). `spec` is the target the renderer sets each frame and
   // `blend` chases 0/1 off it, so dismounting unwinds the legs instead of
@@ -795,6 +1375,17 @@ export class CharacterVisual {
   private presentationScale = 1;
   private ascended = false;
   private metamorphLeftWing: THREE.Object3D | null = null;
+  /** VisualDef.dials: bones turned on top of the clips by gestures (bone_dials.ts). */
+  private dials: BoneDials | null = null;
+  /** VisualDef.meshToggles: mesh nodes hidden or shown by gestures (gesture_mesh_toggles.ts). */
+  private meshToggles: GestureMeshToggles | null = null;
+  /** VisualDef.glowPulses: the emissive map flared by gestures (glow_pulse.ts). */
+  private glowPulse: GlowPulse | null = null;
+  /** VisualDef.turnRate / ClipMap.turn: the rooted body's drawn heading
+   *  (turn_in_place_core.ts). */
+  private readonly turnState = createTurnInPlaceState();
+  /** The entity whose entrance (ClipMap.entrance) this rig already played. */
+  private entranceFor: unknown = undefined;
   private metamorphRightWing: THREE.Object3D | null = null;
   private metamorphLeftWingRest = new THREE.Euler();
   private metamorphRightWingRest = new THREE.Euler();
@@ -805,6 +1396,11 @@ export class CharacterVisual {
   private metamorphPulse = 0;
   private metamorphWasVisible = false;
   private runeTint: number | null = null;
+  // The Barrowstone Heart's statue (setPetrified): the rig turns to grey stone and holds
+  // its pose; one program-preserving clone per source material.
+  private abilityAttackIdx = 0;
+  private petrified = false;
+  private petrifiedMaterials = new Map<THREE.Material, THREE.Material>();
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -836,7 +1432,8 @@ export class CharacterVisual {
     this.skinIndex = skinIndex;
     this.weaponItemId = weaponItemId;
     this.offhandItemId = offhandItemId;
-    this.height = prep.def.height;
+    this.bareWhenUnarmed = opts?.bareWhenUnarmed ?? false;
+    this.baseHeight = prep.def.height;
 
     // model: yaw/scale/feet normalization wrapper around the skinned clone. The
     // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
@@ -848,8 +1445,13 @@ export class CharacterVisual {
     // for a non-modular def, this makes the visual agree, so nothing
     // downstream can read a look the geometry never used.
     this.look = prep.def.modular ? look : null;
+    // A WOC body's geometry level, fixed for its life: the model and both dressings draw it
+    // (woc_lod_core.ts; a graphics change rebuilds every visual).
+    const wocLod = wocBuildLod(opts);
+    // ...and the head it is born with: the look its host named, else the type's default
+    const wocHead = opts?.wocHead ?? null;
     this.model = timeBuildSpan('view-part:assemble', () =>
-      assembleModel(this.def, weaponItemId, offhandItemId, look, opts),
+      assembleModel(this.def, weaponItemId, offhandItemId, look, { ...opts, wocLod, wocHead }),
     );
     // Release-on-throw for everything below: the retry gate re-runs this whole
     // constructor when a streamed asset lands late (a designed path, not an
@@ -871,6 +1473,26 @@ export class CharacterVisual {
           this.tintedRigClaims,
         ),
       );
+      // A WOC body's modular head (the pieces of its look resident at build hung by
+      // assembleModel, the rest hung the frame they land): its tint wrap goes on before
+      // the material snapshot below, so the body's first draw links the tinted program.
+      if (prep.def.wocCharacter) {
+        this.wocHead = new WocHeadDressing(
+          this.wocHeadHost(),
+          wocHeadTypeForGender(prep.def.wocCharacter.fit),
+          wocLod,
+          wocHead,
+        );
+        this.wocHead.retint();
+        this.wocFarTint = new WocFarTint();
+        // nothing of this body draws until its head is live (syncWocHeadWait): applied
+        // by syncFarVisibility once the far mesh below exists
+        this.wocHeadAwaited = true;
+      }
+      if (this.def.dials?.length) this.dials = new BoneDials(this.model, this.def.dials);
+      if (this.def.meshToggles?.length)
+        this.meshToggles = new GestureMeshToggles(this.model, this.def.meshToggles);
+      if (this.def.glowPulses?.pulses.length) this.glowPulse = new GlowPulse(this.def.glowPulses);
       if (key === 'form_metamorph') {
         this.metamorphLeftWing = this.model.getObjectByName('metamorph_wing_left_hinge') ?? null;
         this.metamorphRightWing = this.model.getObjectByName('metamorph_wing_right_hinge') ?? null;
@@ -891,6 +1513,22 @@ export class CharacterVisual {
           this.model.getObjectByName('R_Hand') ??
           null;
       }
+      // A permanently lit eye, parented to its own bone. Built here beside the halo for
+      // the same reason: both are additive meshes hung on a bone, and both must be added
+      // AFTER applyMaterials so their material is not re-mapped, and BEFORE the
+      // originalMaterials snapshot so ghost and stealth swaps restore them like any mesh.
+      if (this.def.eyeGlow) {
+        const spec = this.def.eyeGlow;
+        const bone =
+          this.model?.getObjectByName(spec.bone) ??
+          this.model?.getObjectByName(spec.bone.toLowerCase()) ??
+          null;
+        this.eyeGlow = new EyeGlow(spec, bone, selfLitMeshes(this.model, spec.selfLitMaterial));
+        this.eyeWardMarker = new EyeWardMarker(spec, bone);
+      }
+      // The training effigy's planks and lantern: same reasons, same spot (it re-grades a
+      // clone of the lantern glass, so it must run before the originalMaterials snapshot).
+      if (this.def.effigy) this.effigyRig = new EffigyRig(this.model);
       // Class halo (the priest's Light): a glowing ring behind the head bone.
       // Added AFTER applyMaterials (its additive material must not be re-mapped)
       // and BEFORE the originalMaterials snapshot, so ghost/stealth material
@@ -944,8 +1582,13 @@ export class CharacterVisual {
       // hair and outfit. Theirs is baked from their own part set instead, and
       // lazily (buildComposedFar), because most of a crowd stands close enough
       // that the mesh would never be drawn.
+      //
+      // A WOC body's far LOD is baked from what it wears too (woc_far_bake.ts), and
+      // its key bakes no far mesh at all (prepareVisual): nothing is built here that
+      // its first dressing would only throw away. What it mounts is the key's shadow
+      // stand-in, the one thing it casts in the proxy band before that bake exists.
       const idleGeo = prep.idleGeo;
-      if (idleGeo && !this.look) {
+      if (idleGeo && !this.look && !prep.def.bodyless) {
         timeBuildSpan('view-part:far-bake', () =>
           this.buildFarMeshes(
             idleGeo,
@@ -961,39 +1604,86 @@ export class CharacterVisual {
             prep.shadowGeo,
           ),
         );
+      } else if (prep.def.wocCharacter && prep.shadowGeo) {
+        this.mountShadowStandIn(prep.shadowGeo);
       }
+
+      if (this.wocHeadAwaited) this.syncFarVisibility();
 
       // capsule from measured body extents, long/wide creatures (wolves,
       // dragons) were nearly unclickable with a height-derived sliver
       const r = prep.clickRadius;
       this.clickRadius = r;
       this.clickProxy = new THREE.Mesh(clickGeo(), clickMat());
-      this.clickProxy.scale.set(r * 2, this.height, r * 2);
+      this.clickProxy.scale.set(r * 2, this.baseHeight, r * 2);
       this.clickProxy.visible = false;
       this.root.add(this.clickProxy);
+      // A bodyless part (the Mere Hydra's heads): the dungeon's own visuals
+      // draw the creature; this view keeps only its capsule, bars and plate.
+      if (prep.def.bodyless) this.model.visible = false;
 
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
       this.skeletonUpdates = new SkeletonUpdateCache(this.model);
-      const isWarriorRig = key === 'player_warrior' || key === 'player_warrior_modular';
-      const signatureClips = isWarriorRig
+      const signatureClips = key.startsWith('player_')
         ? Array.from(prep.clips.keys()).filter((n) => n.startsWith('Signature_'))
         : [];
       for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES, ...signatureClips]) {
         const clip = prep.clips.get(name);
         if (clip) this.actions.set(name, this.mixer.clipAction(clip));
       }
+      // A two-strike dual-wield clip is minted as two one-shots, one per hand
+      // (ClipMap.dualWieldSplit), so a swing plays its own strike only. The halves are
+      // cut once per source clip and shared by every rig (clip_split.ts sharedClipSplit).
+      const dual = prep.def.clips.attackByHand?.dualwield;
+      const dualClip = dual ? prep.clips.get(dual) : undefined;
+      const split = prep.def.clips.dualWieldSplit;
+      if (dual && dualClip && split !== undefined && split > 0 && split < dualClip.duration) {
+        const names = dualWieldHalfNames(dual);
+        const [main, off] = sharedClipSplit(dualClip, split, names);
+        this.actions.set(names[0], this.mixer.clipAction(main));
+        this.actions.set(names[1], this.mixer.clipAction(off));
+      }
+      // Hold-and-release clips (ClipMap.clipSplits): the same cut, under the
+      // rig's own names, for a cast that holds one half and plays the other.
+      for (const cut of prep.def.clips.clipSplits ?? []) {
+        const source = prep.clips.get(cut.clip);
+        if (!source || !(cut.at > 0) || cut.at >= source.duration) continue;
+        const [head, tail] = sharedClipSplit(source, cut.at, cut.names);
+        this.actions.set(cut.names[0], this.mixer.clipAction(head));
+        this.actions.set(cut.names[1], this.mixer.clipAction(tail));
+      }
       this.mixer.addEventListener('finished', (ev) => this.onFinished(ev.action));
       recordBuildSpan('view-part:mixer', performance.now() - mixerStarted, mixerStarted);
-      if (key === 'player_paladin') {
+      if (key === 'player_paladin' && !prep.def.wocCharacter) {
         this.bastionSweepFx = new PaladinBastionSweepFx(this.model);
-        this.templarsVerdictFx = new PaladinTemplarsVerdictFx(this.model);
       }
+      this.rebuildTemplarsVerdictFx();
 
+      this.refreshLoadout();
       const idle = this.action(this.def.clips.idle);
       if (idle) {
         idle.play();
         this.current = idle;
+      }
+
+      // A WOC body's armor streams per set: the dressing adopts the files
+      // assembleModel attached and wants the default kit until the first
+      // dressing names the worn one, so a body that is never dressed (a mob on
+      // a WOC body, a portrait) still wears its kit: a portrait's explicit kit
+      // is dressed here, any other body on its first frame (update), and again
+      // the frame a streamed file lands.
+      const woc = prep.def.wocCharacter;
+      if (woc) {
+        this.wocArmor = new WocArmorDressing(
+          this.wocArmorHost(),
+          woc,
+          opts?.wocArmorDetail,
+          wocLod,
+        );
+        // a speculative build (fetchStreamed: false) keeps what it was born with
+        if (opts?.fetchStreamed !== false) this.wocArmor.want(wocManifestSets(woc));
+        if ((opts?.wocArmor?.length ?? 0) > 0) this.redressWoc();
       }
 
       // The atlas for a non-default skin may not be resident at construction: every
@@ -1012,6 +1702,10 @@ export class CharacterVisual {
       }
     } catch (err) {
       releaseModularVariant(this.model);
+      this.wocHead?.dispose();
+      // ...and the streamed armor files assembleModel (or the dressing) attached.
+      this.wocArmor?.dispose();
+      releaseWocArmorOf(this.model);
       // ...and the tinted-material leases applyMaterials and the far build
       // already took above, for the same reason and with the same shape as
       // dispose(). A constructor that throws never reaches dispose, so on the
@@ -1032,17 +1726,64 @@ export class CharacterVisual {
   /** `animate=false` skips mixer integration (distance throttling); state
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
+    this.clock += dt;
+    if (this.currentIsOneShot && this.currentOneShotIsAttack && this.def.clips.combatIdle) {
+      this.braceUntil = extendBrace(this.braceUntil, this.clock);
+    }
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
+    // A streamed armor file that landed (or a better tier of one): the dressing
+    // attaches it (at once with no work queue behind this body, else as a unit
+    // of it), and the re-dress that follows is here, on the per-frame path.
+    if (this.wocArmor?.poll()) this.redressWoc();
+    // A head piece the look wants can hang (its file landed: hang it, gated) or a reveal
+    // changed the drawn head (re-dress, so the far bake keys on it): both on the per-frame
+    // path.
+    else if (this.wocHead?.poll() || this.wocHeadRedress) {
+      this.wocHeadRedress = false;
+      this.redressWoc();
+    }
+    // Nobody dressed this body by its first frame (a mob on a WOC body: players are dressed by
+    // the renderer's worn-set diff before their update): its kit attached hidden, so show it.
+    else if (this.wocArmor && this.wocWorn === null && !this.wocBirthDressed) {
+      this.wocBirthDressed = true;
+      this.redressWoc();
+    }
+    // A body in its default kit is dressed once and never diffed again (an NPC: the
+    // renderer's worn-set diff, which heals a failed under-armor atlas for a player every
+    // frame, is the players'): its failed atlas is asked for again from here, on the same
+    // cooldown, so the wrong cloth never stays for as long as the body is in view.
+    if (this.wocDefaultDressed) this.wocAtlas.retryFailed();
+    // The head went live (or a file of it failed): the body draws from this frame on.
+    if (this.wocHeadAwaited) this.syncWocHeadWait();
+    // A glow edge re-mounts only when nothing outranks it (a surface response
+    // owns the materials until it ends, and re-applies them itself then).
+    if (this.glowPulse?.step(dt, s.dead) && !this.surfaceResponse.active)
+      this.applyVisualMaterials();
     // A transparent effect whose clones finished linking: swap them in HERE,
     // on the per-frame path, never in the gate callback (see effectSwapSettled).
     if (this.effectSwapSettled) this.commitPendingEffectSwap();
     // A far crossing that lost the bake-budget race retries here until its
-    // part set gets a slot (or someone else bakes it, making the peek free).
+    // part set gets a slot (or someone else bakes it, making the peek free), and
+    // so does one whose body still waited for its head. Only a FAR body asks: the
+    // shadow plan never bakes (a WOC body casts its key's stand-in meanwhile).
     if (this.farBakePending && this.far && !this.farBakeTried) {
       this.attemptComposedFar();
       this.syncFarVisibility();
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    this.chargeGlow?.update(dt);
+    this.effigyRig?.update(this.eyeWardPlan?.state === 'blinded', dt, reducedMotion);
+    // A snuffed effigy lantern gutters out on the same curve as a dying eye.
+    this.eyeGlow?.update(
+      dt,
+      reducedMotion,
+      s.asleep === true,
+      s.dead || this.effigyRig?.lanternOut() === true,
+    );
+    this.eyeWardMarker?.update(this.eyeWardPlan, dt, reducedMotion);
+    // A body atlas the gate answered for is swapped in here, on the per-frame path and
+    // never in the gate callback (woc_atlas_swap.ts), as an effect swap is above.
+    if (this.wocAtlas.settled) this.wocAtlas.commit();
     this.updateMetamorphWings(dt, s, reducedMotion);
     this.formAdornments?.update(
       dt,
@@ -1086,6 +1827,25 @@ export class CharacterVisual {
 
     this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
     const rushChanged = this.warriorBody.updateRush(dt, s);
+    // An aura swapping the idle loop (Balgath blinded) is a base change for a standing
+    // body, so it rides the same fade arm below; a moving one picks it up when it stops.
+    const auraIdle = auraIdleClip(this.def.clips.idleByAura, s.auras);
+    const auraIdleChanged =
+      auraIdle !== this.auraIdle && (this.baseState === 'idle' || this.baseState === 'combatIdle');
+    this.auraIdle = auraIdle;
+    // A stun swapping the idle loop (the Great Jaguar dazed) is a base change for a
+    // standing body, so it rides the same fade arm below.
+    // A rooted body turning in place to face its target (the Gorgebloom) holds
+    // its turn loop the same way.
+    const turnIdle = this.turnIdle(dt, s);
+    // An aura-held pose (the freed prisoner's kneel, ClipMap.heldByAura) rides it too.
+    const stunIdle =
+      auraHeldClip(this.def.clips.heldByAura, s.auras) ??
+      stunIdleClip(this.def.clips.stunned, s.auras) ??
+      turnIdle;
+    const stunIdleChanged =
+      stunIdle !== this.stunIdle && (this.baseState === 'idle' || this.baseState === 'combatIdle');
+    this.stunIdle = stunIdle;
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
@@ -1105,6 +1865,14 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsEmote = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
+      } else if (baseChanged && previousBase === 'sleep' && this.wakeAction()) {
+        // The dawn rise. Leaving the sleep loop plays the authored wake ONCE (it begins
+        // in the sleep pose, so the hand-off is a continuation rather than a cut) and
+        // onFinished fades it into whatever base the machine now wants; an interrupting
+        // one-shot (a hit, an attack) simply replaces it, as with any other one-shot.
+        // Ahead of the idle-breaker arm below: leaving 'sleep' is a BASE change, so the
+        // rig is never mid-fidget here, and the ordering keeps the rise unmissable.
+        this.playOneShot(this.def.clips.wake as string, 1);
       } else if (this.currentIsOneShot && this.currentOneShotIsIdleVariant && desired !== 'idle') {
         // An idle-breaker must die the instant the rig stops standing still.
         // It is a one-shot, so without this it suppresses BOTH the fade to
@@ -1135,12 +1903,27 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsCastExit = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
-      } else if ((baseChanged || rushChanged) && !this.currentIsOneShot) {
+      } else if (
+        baseChanged &&
+        desired === 'cast' &&
+        this.currentIsOneShot &&
+        castClipSyncs(this.def.castClipSync, this.castingAbility) &&
+        !this.oneShotHoldsAttacks()
+      ) {
+        // A bar-locked strike (VisualDef.castClipSync) takes the body from a
+        // plain swing or flinch at once: its contact frame is on the bar's end.
+        this.currentIsOneShot = false;
+        this.currentOneShotIsEmote = false;
+        this.fadeTo(this.baseAction(), 0.12, false);
+      } else if (
+        (baseChanged || rushChanged || auraIdleChanged || stunIdleChanged) &&
+        !this.currentIsOneShot
+      ) {
         // a cast clip frozen at its hold point must never stay paused through
         // the exit, whichever exit path runs below
         if (previousBase === 'cast' && this.current?.paused) this.current.paused = false;
         if (previousBase !== 'cast' || !this.beginCastExitPlayOut()) {
-          this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
+          this.fadeTo(this.baseAction(), this.baseTransitionFade(desired, previousBase), false);
           this.fadeTo(this.baseAction(), waterFade(previousBase, desired), false);
         }
       } else if (
@@ -1167,6 +1950,7 @@ export class CharacterVisual {
           this.def.runTimeScaleMin,
           this.def.walkTimeScaleMax,
           this.def.runTimeScaleMax,
+          this.def.strafeRef ?? this.def.runRef,
         );
         if (timeScale !== null) {
           if (timeScale < 0 && this.current.time <= 1e-3)
@@ -1186,6 +1970,20 @@ export class CharacterVisual {
               ? this.def.clips.castTimeScaleByAbility?.[this.castingAbility]
               : undefined) ?? 1;
           this.current.timeScale = castScale;
+          // A bar-locked strike follows the bar (it may have entered late).
+          if (
+            castClipSyncs(this.def.castClipSync, this.castingAbility) &&
+            this.castingAbility &&
+            this.current === this.action(this.def.clips.castByAbility?.[this.castingAbility])
+          ) {
+            const t = castClipSyncTime(
+              this.current.time,
+              s.castElapsed,
+              castScale,
+              this.current.getClip().duration,
+            );
+            if (t !== null) this.current.time = t;
+          }
           const holdPoint = this.def.clips.castHoldPointSeconds;
           const genericCast = this.action(this.def.clips.cast);
           // The freeze covers ONLY the generic cast clip: a per-ability
@@ -1247,7 +2045,7 @@ export class CharacterVisual {
     } else {
       this.spinAngle = 0;
     }
-    this.poseWrap.rotation.y = this.spinAngle;
+    this.poseWrap.rotation.y = this.spinAngle + this.turnState.lag;
 
     // swim pose: the clip's own posture + whatever pitch and lift it still needs
     const authoredSwim = !!this.action(this.def.clips.swimSurface);
@@ -1269,6 +2067,10 @@ export class CharacterVisual {
     const treadRise = this.def.swimRise?.tread ?? SWIM_RISE_TREAD;
     const swimRise = strokeRise + (treadRise - strokeRise) * this.treadBlend;
     this.swimBlend = advanceSwimBlend(this.swimBlend, s.swimming && !s.dead, dt);
+    if (this.def.hideWeaponsWhileSwimming) {
+      const shown = !(s.swimming && !s.dead);
+      for (const prop of this.weaponProps) if (prop.visible !== shown) prop.visible = shown;
+    }
     this.swimBobTime += dt;
     // windup lean/recoil spring: while fed (setWindupLean each ceremony frame)
     // the body eases back toward the target; when feeding stops (the release)
@@ -1290,7 +2092,9 @@ export class CharacterVisual {
     // these three lines are rewritten every frame, so a climb pose written
     // anywhere else would be stomped. Blend and phase are advanced here too.
     this.advanceClimbPose(dt, s.dead);
-    const climb = this.climbBlend;
+    // The pitch-into-the-wall and the duck are procedural too: an authored
+    // climb clip keeps its stationary upright root, so they yield as well.
+    const climb = this.def.clips.climb ? 0 : this.climbBlend;
     // Pitch into the wall through the pull, level out as the body tops the
     // lip so the plant lands upright.
     const climbLevel = 1 - env01(this.climbPhase, 0.62, 0.98);
@@ -1315,11 +2119,13 @@ export class CharacterVisual {
     this.harvestRecoil.apply(this.poseWrap, dt, reducedMotion || s.dead);
     this.warriorBody.applyContactRecoil(this.poseWrap, dt, reducedMotion || s.dead);
 
-    // distant corpses show the static idle far mesh, tip it over
+    // distant corpses show the static idle far mesh, tip it over (laid on its
+    // side from the pivot, so a body sunk in life by a negative hover needs no
+    // deathLift here: the rig's lift above is what rests the near corpse)
     if (this.farMesh?.visible) {
       if (s.dead) {
         this.farMesh.rotation.z = Math.PI / 2;
-        this.farMesh.position.y = this.height * 0.16;
+        this.farMesh.position.y = this.baseHeight * 0.16;
       } else {
         this.farMesh.rotation.z = 0;
         this.farMesh.position.y = 0;
@@ -1361,14 +2167,18 @@ export class CharacterVisual {
         this.templarsVerdictAction &&
         this.current === this.templarsVerdictAction &&
         this.currentIsOneShot
-          ? Math.min(PALADIN_TEMPLARS_VERDICT_DURATION, this.templarsVerdictAction.time)
+          ? this.templarsVerdictAction.time
           : null;
       const bastionTime =
         this.bastionSweepAction && this.current === this.bastionSweepAction && this.currentIsOneShot
           ? Math.min(PALADIN_BASTION_SWEEP_DURATION, this.bastionSweepAction.time)
           : null;
       this.bastionSweepFx?.update(bastionTime, animationDt);
-      this.templarsVerdictFx?.update(verdictTime, animationDt);
+      this.templarsVerdictFx?.update(
+        verdictTime,
+        animationDt,
+        this.templarsVerdictAction?.getClip().duration,
+      );
       // Morph influences, not bone writes, so mixer order is irrelevant, but
       // it rides the animated branch: a throttled far rig has no business
       // integrating a hair spring.
@@ -1379,11 +2189,15 @@ export class CharacterVisual {
 
   private syncDeathGrounding(dead: boolean): void {
     const finalOffset = this.def.deathGroundOffset ?? 0;
-    if (finalOffset <= 0) return;
+    const lift = this.def.deathLift;
+    if (finalOffset <= 0 && !lift) return;
     const death = this.action(this.def.clips.death);
+    const time = death?.time ?? 0;
+    const duration = death?.getClip().duration ?? 0;
     this.modelWrap.position.y =
       this.modelWrapGroundY -
-      deathGroundingOffset(dead, death?.time ?? 0, death?.getClip().duration ?? 0, finalOffset);
+      deathGroundingOffset(dead, time, duration, finalOffset) +
+      (lift ? deathLiftOffset(dead, time, duration, lift.yards, lift.from, lift.to) : 0);
   }
 
   private updateMetamorphWings(dt: number, s: AnimState, reducedMotion: boolean): void {
@@ -1443,6 +2257,24 @@ export class CharacterVisual {
       this.holdT -= dt;
       if (this.holdT <= 0) this.holdCooldown = HOLD_REFRACTORY_S;
     }
+    // A body atlas the gate answered for is taken on this per-frame path too: left for the
+    // next visible update, a crowd dressed behind the camera would all swap on the one
+    // frame it turns into view.
+    if (this.wocAtlas.settled) this.wocAtlas.commit();
+  }
+
+  /** Push the live base action down to `1 - k` under a climb overlay, restoring
+   *  whichever action yielded before it if the base state moved meanwhile. */
+  private yieldBaseToClimb(k: number, overlay: THREE.AnimationAction | null): void {
+    const base = this.current && this.current !== overlay ? this.current : null;
+    if (this.climbYielded && this.climbYielded !== base) this.climbYielded.setEffectiveWeight(1);
+    this.climbYielded = base;
+    base?.setEffectiveWeight(1 - k);
+  }
+
+  private restoreBaseFromClimb(): void {
+    this.climbYielded?.setEffectiveWeight(1);
+    this.climbYielded = null;
   }
 
   /**
@@ -1457,6 +2289,11 @@ export class CharacterVisual {
    */
   private driveClimbClips(): void {
     const active = this.climbBlend > 1e-3;
+    const authored = this.def.clips.climb ? this.action(this.def.clips.climb) : null;
+    if (authored) {
+      this.driveAuthoredClimb(authored, active);
+      return;
+    }
     const reach = this.action(CLIMB_REACH_CLIP);
     const mantle = this.action(CLIMB_MANTLE_CLIP);
     if (!reach || !mantle) return;
@@ -1465,7 +2302,7 @@ export class CharacterVisual {
         this.climbClipsActive = false;
         reach.stop();
         mantle.stop();
-        this.current?.setEffectiveWeight(1);
+        this.restoreBaseFromClimb();
       }
       return;
     }
@@ -1497,9 +2334,43 @@ export class CharacterVisual {
     const hand = env01(t, CLIMB_HANDOFF_START, CLIMB_HANDOFF_END);
     reach.setEffectiveWeight(k * (1 - hand));
     mantle.setEffectiveWeight(k * hand);
-    if (this.current && this.current !== reach && this.current !== mantle) {
-      this.current.setEffectiveWeight(1 - k);
+    this.yieldBaseToClimb(k, null);
+  }
+
+  /**
+   * A rig with its OWN climb clip (the WOC warrior's 0.3 s Climb, an upright
+   * stationary-root vault the artist authored for exactly this move): played
+   * once at 1x from the grab and clamped on its ending stance when the sim's
+   * height-scaled pull outlasts it (the sim owns the body's travel, so the
+   * clip never needs to), then released with the climb blend back into
+   * locomotion. Two frames of ramp-in: a 0.3 s clip has no room for the
+   * procedural pose's 14/s fade, and the grab itself is already a cut. Every
+   * procedural climb channel (the pitch, the duck, the limb work and the head
+   * tilt) yields to it, so nothing stacks on top of the authored motion.
+   */
+  private driveAuthoredClimb(action: THREE.AnimationAction, active: boolean): void {
+    if (!active) {
+      if (this.climbClipsActive) {
+        this.climbClipsActive = false;
+        this.climbOverlay = null;
+        action.stop();
+        this.restoreBaseFromClimb();
+      }
+      return;
     }
+    if (!this.climbClipsActive) {
+      this.climbClipsActive = true;
+      this.climbOverlay = action;
+      action.reset();
+      action.setLoop(THREE.LoopOnce, 1);
+      action.clampWhenFinished = true;
+      action.timeScale = 1;
+      action.paused = false;
+      action.play();
+    }
+    const k = this.climbOn ? Math.min(1, this.climbBlend * 4) : this.climbBlend;
+    action.setEffectiveWeight(k);
+    this.yieldBaseToClimb(k, action);
   }
 
   /**
@@ -1536,6 +2407,8 @@ export class CharacterVisual {
    */
   private applyClimbPose(): void {
     if (this.climbBlend <= 1e-3) return;
+    // An authored climb clip owns every limb and the head; no additive work.
+    if (this.def.clips.climb) return;
     if (this.climbClipsActive) {
       // The baked clips own the limbs; only the eyes-lead head tilt rides on
       // top (neither clip looks up at the lip).
@@ -1771,24 +2644,62 @@ export class CharacterVisual {
     return override !== undefined && this.action(override) !== null;
   }
 
-  playAttack(abilityId?: string): void {
-    if (this.deadLock) return;
+  /** Start the attack one-shot for a swing and return the seconds until its blade lands
+   *  (ClipMap.contacts; 0 = no listed contact, the swing's effects play at once). */
+  playAttack(abilityId?: string, gestureOnly = false, kind?: 'melee' | 'wand'): number {
+    if (abilityId && this.meshToggles?.handle(abilityId)) {
+      this.syncFarVisibility();
+      return 0;
+    }
+    if (abilityId && this.dials?.handle(abilityId)) return 0;
+    // A glow-only gesture (no clip of its own) flares the emissive map and stops
+    // here; a gesture that also names a clip (Pollinate) plays it below too.
+    if (
+      abilityId &&
+      this.glowPulse?.handle(abilityId) &&
+      !this.def.clips.attackByAbility?.[abilityId]
+    )
+      return 0;
+    if (this.deadLock) return 0;
+    if (abilityId && abilityId === this.def.entranceGesture) {
+      this.playEntrance();
+      return 0;
+    }
+    if (!abilityId && this.oneShotHoldsAttacks()) return 0;
+    const phase = abilityId ? this.def.phaseClips?.[abilityId] : undefined;
+    if (phase) {
+      this.enterClipPhase(phase);
+      return 0;
+    }
+    if (!abilityId && this.def.castPlayOutHoldsAttacks && this.castPlayOutRunning()) return 0;
     if ((abilityId === 'charge' || abilityId === 'intervene') && this.action(this.def.clips.rush)) {
       this.warriorBody.beginRush(abilityId);
-      return;
+      return 0;
     }
-    if (!abilityId && this.warriorBody.rushOwnsBody) return;
+    if (!abilityId && this.warriorBody.rushOwnsBody) return 0;
     if (abilityId) this.warriorBody.cancelRush();
     const signature = abilityId ? `Signature_${abilityId}` : null;
     if (signature && this.action(signature)) {
       this.playOneShot(signature, 1);
       this.currentOneShotIsAttack = true;
-      return;
+      return 0;
+    }
+    // A cast ceremony (castFx flourish/weaponAura) draws a body gesture ONLY
+    // through an authored per-ability entry, the rule the ability painter
+    // already applies: with none, nothing plays. Never the default weapon
+    // swing, which is what a buff with no entry used to fall back to.
+    if (gestureOnly && !this.def.clips.attackByAbility?.[abilityId ?? '']) return 0;
+    if (kind === 'wand' && this.action(this.def.clips.wandAttack)) {
+      this.playOneShot(this.def.clips.wandAttack!, this.def.attackTimeScale ?? 1.3);
+      this.currentOneShotIsAttack = true;
+      return 0;
     }
     // Resolved against THIS rig's bound clips: a rig without the substitute
     // (every body but the hunter) keeps its own authored attack instead of
     // swinging with no animation at all.
-    const skinAttack = pickSkinAttackClips(this.weaponSkinId, (c) => this.action(c) !== null);
+    const skinAttack = kind
+      ? null
+      : pickSkinAttackClips(this.weaponSkinId, (c) => this.action(c) !== null);
     // A displayed bow skin substitutes Bow_Draw_Shot for the hunter's RANGED
     // attacks, including the ranged per-ability overrides: the crossbow-
     // shoulder ability poses (Hunter_Shot_Snap etc.) are authored for the
@@ -1800,39 +2711,159 @@ export class CharacterVisual {
     // toggles / Fevered Draw (rapid_fire) play the class's own baked
     // Spellcast_Raise raise/buff ceremony through this same playAttack path
     // (the ability-VFX painter triggers non-contact authored gestures here
-    // too), never a draw-shot. Both are identified by their clip-name
-    // convention rather than a hardcoded ability list, so any future
-    // non-ranged override keeps its authored clip automatically
+    // too), never a draw-shot. A RANGED override is identified by its
+    // clip-name convention (the KayKit Hunter_Shot_* poses, the WOC rig's
+    // Ranged_Shoot and its minted halves) rather than a hardcoded ability
+    // list, so any non-ranged override (Hunter_Melee_*, the WOC 1H blades,
+    // Spellcast_Raise) keeps its authored clip automatically
     // (tests/weapon_skins.test.ts).
     const rawOverride = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
-    const overrideIsNonRanged =
-      rawOverride?.startsWith('Hunter_Melee_') || rawOverride === 'Spellcast_Raise';
-    const override = !skinAttack || overrideIsNonRanged ? rawOverride : undefined;
+    const overrideIsRanged = rawOverride !== undefined && /Shot|Shoot/.test(rawOverride);
+    // Light the fist BEFORE the clip choice, so an ability that declares a glow gets one
+    // even on a rig whose authored clip is missing: the telegraph is the load-bearing half
+    // of a slam, and it must not depend on the animation having been baked.
+    const glow = abilityId ? this.def.clips.chargeGlowByAbility?.[abilityId] : undefined;
+    if (glow) this.ensureChargeGlow()?.ignite(glow);
+    const override = !skinAttack || !overrideIsRanged ? rawOverride : undefined;
     if (override && this.action(override)) {
       const authoredTimeScale = abilityId
         ? this.def.clips.attackTimeScaleByAbility?.[abilityId]
         : undefined;
-      this.playOneShot(override, authoredTimeScale ?? this.def.attackTimeScale ?? 1.3);
+      const overrideScale = authoredTimeScale ?? this.def.attackTimeScale ?? 1.3;
+      this.playOneShot(override, overrideScale);
       this.currentOneShotIsAttack = true;
-      if (override === PALADIN_TEMPLARS_VERDICT_CLIP) {
+      if (abilityId === 'final_edict') {
         this.templarsVerdictAction = this.action(override);
       } else if (override === PALADIN_BASTION_SWEEP_CLIP) {
         this.bastionSweepAction = this.action(override);
       }
-      return;
+      return this.swingContact(override, 0, overrideScale);
+    }
+    // A shot launched out of a HELD aim (ClipMap.clipSplits: the generic cast
+    // clip is the head half, frozen at the hold point) releases the tail half
+    // instead of restarting the whole clip: the crossbow is already up. The
+    // launch cue carries no ability id (the sim tags every player shot
+    // 'ranged-shot' and the renderer starts whichever clip the rig selects),
+    // so the per-ability override above never sees a timed shot; this is
+    // the arm that does. A bound bow-skin draw still wins, as for any shot.
+    const tail = skinAttack || kind ? null : this.heldSplitTail();
+    if (tail) {
+      this.playOneShot(tail, this.def.attackTimeScale ?? 1.3);
+      this.currentOneShotIsAttack = true;
+      return 0;
     }
     const style = weaponAttackStyle(this.weaponItemId, this.offhandItemId);
-    const handClip = style ? this.def.clips.attackByHand?.[style] : undefined;
+    // A two-hander carried on the single set (loadoutSwaps.twohand: held in one fist, the
+    // sword-and-board stance without the shield) swings like the one-hand sword too, the
+    // default chop/slash alternation; a two-hand staff keeps its heavy hand clip.
+    const singleSetTwoHander =
+      style === 'twohand' &&
+      this.loadoutSwap !== null &&
+      this.loadoutSwap === this.def.clips.loadoutSwaps?.twohand;
+    const handClip =
+      style && !singleSetTwoHander ? this.def.clips.attackByHand?.[style] : undefined;
     if (!skinAttack && handClip && this.action(handClip)) {
-      this.playOneShot(handClip, this.def.attackTimeScale ?? 1.3);
+      const scale = this.def.attackTimeScale ?? 1.3;
+      if (style !== 'dualwield') {
+        this.playOneShot(handClip, scale);
+        this.currentOneShotIsAttack = true;
+        return this.swingContact(handClip, 0, scale);
+      }
+      // One strike per swing on a split clip, the halves alternating; two swings
+      // in one frame are both hands at once (attack_swing_core.ts).
+      const pick = pickDualSwing(
+        handClip,
+        this.def.clips.dualWieldPair,
+        (n) => this.action(n) !== null,
+        this.mixer.time,
+        this.dualSwing,
+      );
+      if (pick.clip === null) {
+        // a third swing this frame: the pair clip already playing carries it
+        const playing = this.currentIsOneShot ? this.current?.getClip().name : undefined;
+        return contactDelaySec(this.def.clips.contacts, playing, pick.contact, scale);
+      }
+      this.playOneShot(pick.clip, scale);
       this.currentOneShotIsAttack = true;
-      return;
+      return this.swingContact(pick.clip, pick.contact, scale);
     }
-    const clips = skinAttack?.clips ?? this.def.clips.attack;
-    if (clips.length === 0) return;
+    // An ability with no override of its own takes the rig's heavier ability blow, when it
+    // authors one (the Shape of the Foreman's hammer and stomp against its swipes).
+    const abilityClips = abilityId && !skinAttack ? this.def.clips.abilityAttack : undefined;
+    if (abilityClips && abilityClips.length > 0) {
+      const name = abilityClips[this.abilityAttackIdx++ % abilityClips.length];
+      if (this.action(name)) {
+        const abilityScale = this.def.attackTimeScale ?? 1.3;
+        this.playOneShot(name, abilityScale);
+        this.currentOneShotIsAttack = true;
+        return this.swingContact(name, 0, abilityScale);
+      }
+    }
+    const clips =
+      skinAttack?.clips ??
+      (kind === 'melee' ? this.def.clips.meleeAttack : undefined) ??
+      this.def.clips.attack;
+    if (clips.length === 0) return 0;
     const name = clips[this.attackIdx++ % clips.length];
-    this.playOneShot(name, skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3);
+    const listScale = skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3;
+    this.playOneShot(name, listScale);
     this.currentOneShotIsAttack = true;
+    return this.swingContact(name, 0, listScale);
+  }
+
+  /** Seconds until the blade of the swing just started lands: the listed contact of the
+   *  clip the name resolves to under the current loadout (1H_Slash -> Dual_Cross ...). */
+  private swingContact(name: string, contact: number, timeScale: number): number {
+    const clip = this.action(name)?.getClip().name ?? name;
+    return contactDelaySec(this.def.clips.contacts, clip, contact, timeScale);
+  }
+
+  /** The tail half of a split clip whose head half is the cast action the
+   *  rig is holding right now (paused at its hold point), or null. */
+  private heldSplitTail(): string | null {
+    const current = this.current;
+    if (!current?.paused || this.baseState !== 'cast') return null;
+    const head = current.getClip().name;
+    const cut = this.def.clips.clipSplits?.find((c) => c.names[0] === head);
+    return cut && this.action(cut.names[1]) ? cut.names[1] : null;
+  }
+
+  /**
+   * The fist-glow rig, built on first use.
+   *
+   * Resolved through the same bone-name variants the weapon-attach path tries, because
+   * GLTFLoader sanitizes `handslot.r` to `handslotr` and the creature rigs name their
+   * hands `R_Hand` outright. A rig with neither returns a glow that simply never draws,
+   * rather than throwing on a boss mid-fight.
+   */
+  private ensureChargeGlow(): ChargeGlow | null {
+    if (this.chargeGlow) return this.chargeGlow;
+    const find = (...names: string[]): THREE.Object3D | null => {
+      for (const n of names) {
+        const found = this.model?.getObjectByName(n);
+        if (found) return found;
+      }
+      return null;
+    };
+    this.chargeGlow = new ChargeGlow(
+      find('handslotl', 'handslot.l', 'L_Hand'),
+      find('handslotr', 'handslot.r', 'R_Hand'),
+    );
+    return this.chargeGlow;
+  }
+
+  /** A boss stance gesture (VisualDef.phaseClips): the rig's whole ClipMap
+   *  swaps in place, and the stance's `enter` one-shot plays when it names
+   *  one; every later base fade reads the new vocabulary. Idempotent. */
+  private enterClipPhase(phase: { clips: ClipMap; enter?: string }): void {
+    if (this.def.clips === phase.clips) return;
+    this.def = { ...this.def, clips: phase.clips };
+    if (phase.enter && this.action(phase.enter)) {
+      this.playOneShot(phase.enter, 1);
+      this.currentOneShotIsAttack = true;
+    } else if (!this.currentIsOneShot) {
+      this.fadeTo(this.baseAction(), FADE, false);
+    }
   }
 
   /** Bladed Gyre is instant, so it uses one short body spin instead of the
@@ -1874,6 +2905,7 @@ export class CharacterVisual {
     if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
     this.playOneShot(clips[Math.floor(Math.random() * clips.length)], 1.2);
+    if (this.def.clips.combatIdle) this.braceUntil = extendBrace(this.braceUntil, this.clock);
   }
 
   /** Contact-frame hitstop: hold THIS rig's animation at `scale` speed for
@@ -1910,6 +2942,14 @@ export class CharacterVisual {
     const clip = firstLoadedEmoteClip(spec, (name) => this.action(name));
     if (!clip) return;
     this.playOneShot(clip, spec?.timeScale ?? 1, repeatsOverride ?? spec?.repeats ?? 1, id);
+  }
+
+  /** The roar one-shot of a shout cast: the rig's own `shoutEmote` (the WOC
+   *  warrior flexes), cheer for every rig that names none. */
+  playShout(repeats = 1): void {
+    const emote = this.def.clips.shoutEmote;
+    if (emote === null) return;
+    this.playEmote(emote ?? 'cheer', repeats);
   }
 
   /** The summon gesture: the rider throws an arm up as a mount is called. A thin
@@ -2009,6 +3049,9 @@ export class CharacterVisual {
     for (const m of this.casters) m.castShadow = on;
   }
 
+  /** The shadow plan's answer for the proxy band. A flag and a visibility write, never a
+   *  bake: a body with no far bake of its own casts nothing here (a composed body, until
+   *  its first far crossing) or its key's stand-in (a WOC body). */
   setProxyShadow(on: boolean): void {
     this.proxyShadowWanted = on;
     this.syncShadowProxyVisibility();
@@ -2037,10 +3080,11 @@ export class CharacterVisual {
       // but a camera leaving a capital crosses every peer in one frame, so only
       // one genuinely new part set bakes per window and the rest go pending and
       // retry from update(). A part set someone already baked is free (the peek)
-      // and never competes for the slot.
-      if (far && !this.farMesh && this.look && !this.farBakeTried) this.attemptComposedFar();
+      // and never competes for the slot. (A WOC body's bake is units of the
+      // renderer's work queue instead, whose budget does that spreading.)
       if (!far) this.farBakePending = false;
     }
+    if (far && !this.farMesh && !this.farBakeTried) this.attemptComposedFar();
     // Every frame, not only on the edge: the compile gate's settle only clears
     // its flag (below), and the reveal it unlocks must land HERE, inside the
     // renderer's per-frame pass, never in the settle callback. A rig hidden
@@ -2052,25 +3096,50 @@ export class CharacterVisual {
   }
 
   /** The one place the rig/far-mesh handoff is written (far_lod_reveal_core):
-   *  the LOD edge, the budget retry and the per-frame setFar all land here, so
+   *  the LOD edge, update()'s retry and the per-frame setFar all land here, so
    *  a far mesh whose materials are still linking never draws early and the
    *  articulated rig never hides without a ready stand-in. */
   private syncFarVisibility(): void {
-    const showFar = farMeshShown(this.far, this.farMesh !== null, this.farCompilePending);
-    const showRig = !showFar;
+    // A gesture hiding part of the model (the Saurian's broken howdah) keeps the
+    // articulated rig: the far bake still carries the part. A whole-model hide
+    // (Zulgar vanished) takes the far mesh with it.
+    const hidden = this.meshToggles?.hidden() ?? 'none';
+    // The wait for a WOC body's head ends here, once, on whichever per-frame path reveals
+    // first (the LOD pass, the shadow plan, update): the body draws the frame its head is
+    // live. Free afterwards: the latch never re-arms.
+    if (this.wocHeadAwaited && !this.wocHead?.awaited) this.wocHeadAwaited = false;
+    const farStandsIn =
+      hidden === 'none' && farMeshShown(this.far, this.farMesh !== null, this.farCompilePending);
+    const showRig = bodyDrawn(!farStandsIn, this.wocHeadAwaited);
+    const showFar = bodyDrawn(farStandsIn, this.wocHeadAwaited);
     if (this.modelWrap.visible !== showRig) this.modelWrap.visible = showRig;
     if (this.farMesh && this.farMesh.visible !== showFar) this.farMesh.visible = showFar;
     this.syncShadowProxyVisibility();
   }
 
   private syncShadowProxyVisibility(): void {
-    if (!this.shadowProxy) return;
-    const show = shadowProxyShown(
-      this.proxyShadowWanted,
-      this.farMesh !== null,
-      this.farCompilePending,
-    );
-    if (this.shadowProxy.visible !== show) this.shadowProxy.visible = show;
+    const hasFar = this.farMesh !== null;
+    if (this.shadowProxy) {
+      // The proxy is the whole idle pose too: never while the toggles hide any of it.
+      const show = bodyDrawn(
+        (this.meshToggles?.hidden() ?? 'none') === 'none' &&
+          shadowProxyShown(this.proxyShadowWanted, hasFar, this.farCompilePending),
+        this.wocHeadAwaited,
+      );
+      if (this.shadowProxy.visible !== show) this.shadowProxy.visible = show;
+    }
+    // a WOC body's stand-in casts for as long as its own baked silhouette cannot
+    if (this.shadowStandIn) {
+      const show = bodyDrawn(
+        shadowStandInShown(
+          this.proxyShadowWanted,
+          this.shadowProxy !== null,
+          this.farCompilePending,
+        ),
+        this.wocHeadAwaited,
+      );
+      if (this.shadowStandIn.visible !== show) this.shadowStandIn.visible = show;
+    }
   }
 
   /** Install (or clear) the renderer's compile gate for far bakes minted after
@@ -2078,15 +3147,38 @@ export class CharacterVisual {
    *  still pending from a previous life (pool re-acquire): a settle the old
    *  renderer generation dropped must not strand this visual articulated or
    *  keep a superseded far set's tinted lease. */
-  setFarBakeGate(gate: FarBakeGate | null): void {
+  setFarBakeGate(gate: FarBakeGate | null, work?: CharacterWorkQueue): void {
     this.farBakeGate = gate;
+    // The renderer's work queue rides in with its gate. A pool re-acquire passes the
+    // gate alone, and a body the prewarm built never met the queue at all, so the queue
+    // is found again by the gate it first came with (one renderer owns both).
+    if (gate && work) queueOfGate.set(gate, work);
+    const queue = work ?? (gate ? queueOfGate.get(gate) : undefined);
+    if (queue) this.workQueue = queue;
+    // ...and the armor store rides the same queue: a set that lands is prepared as a
+    // unit of it, ahead of any wearer's attach (woc_armor_packs.ts)
+    if (queue) setWocArmorWorkQueue(queue);
+    this.wocHead?.gateChanged();
+    this.wocArmor?.gateChanged();
+    this.wocAtlas.restart();
     this.sanguineSheath.setGate(gate);
     if (this.weaponAuraSanguine) this.rebuildWeaponAura();
     this.dropPendingFarMaterials();
     this.farCompilePending = false;
+    // ...and a far bake asked of the previous queue may never be run: a body still far
+    // asks the new one on its next frame, also when the previous queue had already
+    // answered that it would never bake (it shut down under the ask).
+    this.dropWocFarJob();
+    if (this.wocFarParts && !this.farMesh && !this.wocFarLease) this.farBakeTried = false;
     // Same reason as the far arm: a settle the old renderer generation dropped
     // must not leave this visual waiting forever on an effect it already wears.
+    // A swap that was still in flight is planned again behind THIS gate: dropped and
+    // forgotten, the rig kept the materials of an effect state it had already left
+    // (opaque while stealthed, a ghost after the ghost run) until some later edge
+    // happened to sweep it.
+    const replan = this.effectSwapScratch !== null;
     this.dropPendingEffectSwap();
+    if (replan && !this.disposed) this.applyVisualMaterials();
   }
 
   /** Route a freshly minted far bake (mesh + shadow proxy) through the compile
@@ -2106,17 +3198,179 @@ export class CharacterVisual {
     });
   }
 
-  /** One budgeted attempt at the composed far LOD. Free when the part set is
-   *  already baked; otherwise takes the frame slot or goes pending. */
+  /** One attempt at the composed far LOD, budgeted: free when the part set is already
+   *  baked; otherwise it takes the frame slot or goes pending. A WOC body behind a
+   *  renderer never bakes here: its bake is units of the work queue (attemptWocFar). */
   private attemptComposedFar(): void {
-    if (!this.look) return;
-    const cached = peekModularFarBake(this.key, this.look);
+    if (!this.look && !this.wocFarParts) return;
+    if (this.wocFarParts && this.attemptWocFar()) return;
+    const cached = this.wocFarParts
+      ? peekWocFarBake(
+          this.key,
+          this.wocFarParts,
+          this.wocFarFiles,
+          this.wocFarHead,
+          this.wocFarKey ?? undefined,
+        )
+      : this.look && peekModularFarBake(this.key, this.look);
     if (!cached && !takeFarBakeBudget()) {
       this.farBakePending = true;
       return;
     }
     this.farBakePending = false;
     this.buildComposedFar();
+  }
+
+  /**
+   * A WOC body's far bake, off the frame. Nothing is baked for a body that draws nothing
+   * yet (it still waits for its head), nor for one whose head just changed under a
+   * dressing update() has not run yet: either bake would freeze a head the body is about
+   * to stop drawing (none at all, for the first) and be thrown away the frame the far key
+   * catches up, so it stays pending and update() asks again. A body behind a renderer
+   * (a compile gate, and the work queue that rode in with it) hands the bake to that queue
+   * and keeps its rig until its mount unit has run. True when this call dealt with the
+   * attempt; false for a body with none (a direct build, a preview, a test), which bakes
+   * on the spot under the bake budget, as a composed body does.
+   */
+  private attemptWocFar(): boolean {
+    // A head piece still on its way (a hairstyle joining a head that stands in bare) re-keys
+    // the bake the moment it joins (dressWoc): the rig stands in until then, so a file
+    // landing late never costs this body a second bake. A file that failed is not on its
+    // way: the head is at rest in what it holds, and bakes as it is.
+    if (this.wocHeadAwaited || this.wocHeadRedress || this.wocHead?.joining) {
+      this.farBakePending = true;
+      return true;
+    }
+    const queue = this.rendererWorkQueue();
+    if (!queue) return false;
+    this.farBakePending = false;
+    if (!this.wocFarJob) this.queueWocFar(queue);
+    return true;
+  }
+
+  /** The work queue of the renderer behind this body, or null for a body with no gate (a
+   *  queue outlives the gate it came with only on a body whose gate was taken away). A
+   *  pooled body is handed its gate alone, and one taken before the renderer had paired
+   *  that gate with its queue met no queue then: it finds it here, by the gate, the first
+   *  time it needs one. */
+  private rendererWorkQueue(): CharacterWorkQueue | null {
+    const gate = this.farBakeGate;
+    if (!gate) return null;
+    this.workQueue ??= queueOfGate.get(gate) ?? null;
+    return this.workQueue;
+  }
+
+  /**
+   * Ask the work queue for this body's far LOD: the bake's units (shared with every body
+   * in the same look, and none at all for a look already baked: woc_far_bake.ts
+   * queueWocFarBake), then this body's own mount as one more unit, so a crowd crossing
+   * the band together mounts a few bodies a frame. The far mesh is an optimization of a
+   * body its rig already draws whole, so its units sit with the merged stand-ins: below
+   * the live views, in the class that still gets a slot a frame under load.
+   */
+  private queueWocFar(queue: CharacterWorkQueue): void {
+    const parts = this.wocFarParts;
+    const fit = this.def.wocCharacter?.fit;
+    if (!parts || !fit) return;
+    const priority = GPU_WORK_PRIORITY.VISIBLE_PREWARM;
+    const job = queueWocFarBake(
+      this.key,
+      parts,
+      this.wocFarFiles,
+      this.wocFarHead,
+      queue,
+      priority,
+      this.wocFarKey ?? undefined,
+    );
+    this.wocFarJob = job;
+    void job.ready
+      .then((baked) => {
+        // an ask dropped meanwhile mounts nothing, so it asks the queue for nothing
+        if (this.wocFarJob !== job) return undefined;
+        // nothing to mount: the look bakes to nothing, or the bake stopped and said so
+        if (!baked) return this.endWocFarJob(job);
+        return queue.run(() => this.mountWocFar(job), priority, `${WOC_FAR_MOUNT_LABEL}:${fit}`);
+      })
+      .catch((err) => {
+        // the mount unit was refused (a queue shut down with its renderer) or threw
+        warnWocFarStopped(`mount:${this.key}`, err);
+        this.endWocFarJob(job);
+      });
+  }
+
+  /** The mount unit of a queued far bake: build this body's far mesh from the bake its
+   *  units just finished, hidden behind the compile gate. The ask holds that bake in the
+   *  cache until here, so this retains it and never bakes. An ask dropped since (a
+   *  re-dress, a new gate, a dispose) mounts nothing. The reveal is the next per-frame
+   *  setFar's, never this unit's (see setFar). */
+  private mountWocFar(job: WocFarBakeRequest): void {
+    if (this.wocFarJob !== job) return;
+    this.wocFarJob = null;
+    try {
+      if (this.disposed || this.farMesh || this.farBakeTried) return;
+      // the head changed under a dressing update() has not run yet, or a piece of it is
+      // joining: the look this bake froze is about to be re-keyed, so the body asks again
+      // once it is dressed
+      if (this.wocHeadRedress || this.wocHead?.joining) {
+        this.farBakePending = this.far;
+        return;
+      }
+      this.buildComposedFar();
+    } finally {
+      // after the body's own lease is taken: the bake never goes idle in between
+      job.release();
+    }
+  }
+
+  /** A far ask that came to nothing: the body keeps its rig, and asks again only once it
+   *  is dressed again. Never a bake on the spot in its place. */
+  private endWocFarJob(job: WocFarBakeRequest): undefined {
+    job.release();
+    if (this.wocFarJob !== job) return undefined;
+    this.wocFarJob = null;
+    this.farBakeTried = true;
+    this.farBakePending = false;
+    return undefined;
+  }
+
+  /** The body is parked (its entity streamed out and the pool kept it): nobody sees it,
+   *  so it stops waiting for a far mesh. Its look leaves the line unless another body
+   *  waits for it too. */
+  parked(): void {
+    this.dropWocFarJob();
+    this.farBakePending = false;
+  }
+
+  /** Let go of a queued far bake this body no longer wants. */
+  private dropWocFarJob(): void {
+    this.wocFarJob?.release();
+    this.wocFarJob = null;
+  }
+
+  /** An equipment edge drops the obsolete silhouette, restoring the rig until its
+   *  replacement is baked (units of the work queue, or the bake budget for a body with no
+   *  queue) and linked behind the compile gate. A body with none mounted only forgets
+   *  what it asked for: there is nothing to take down, so nothing is swept. */
+  private invalidateWocFar(): void {
+    this.dropWocFarJob();
+    this.farBakeTried = false;
+    this.farBakePending = this.far;
+    // (a lease with no mesh is a mint that threw part way: it is given back like any other)
+    if (!this.farWrap && !this.wocFarLease) return;
+    this.dropPendingFarMaterials();
+    this.dropPendingEffectSwap();
+    this.farWrap?.removeFromParent();
+    this.farWrap = null;
+    this.farMesh = null;
+    this.farMaterials = null;
+    this.shadowProxy = null;
+    this.farCompilePending = false;
+    releaseTintedMaterials(this.tintedFarClaims);
+    this.tintedFarClaims.clear();
+    this.wocFarLease?.release();
+    this.wocFarLease = null;
+    this.syncFarVisibility();
+    this.applyVisualMaterials();
   }
 
   /** Hang a baked far mesh (and, off the low tier, its shadow proxy) on the
@@ -2145,31 +3399,67 @@ export class CharacterVisual {
     this.poseWrap.add(wrap);
   }
 
+  /** Hang a WOC key's shadow stand-in on the pose wrapper, hidden until the shadow plan
+   *  wants a proxy this body's own far bake cannot cast (syncShadowProxyVisibility). A
+   *  mesh over the key's shared geometry and the shared shadow-only material: nothing to
+   *  derive, nothing to free. */
+  private mountShadowStandIn(geo: THREE.BufferGeometry): void {
+    const standIn = new THREE.Mesh(geo, shadowOnlyMat());
+    standIn.name = 'character_shadow_stand_in';
+    standIn.castShadow = true;
+    standIn.visible = false;
+    this.shadowStandIn = standIn;
+    this.poseWrap.add(standIn);
+  }
+
   /** Bake (or reuse) this composed body's far LOD. Leaves farMesh null if the
    *  look bakes to nothing, in which case the character simply keeps its
-   *  articulated model at distance (correct, just not as cheap). */
+   *  articulated model at distance (correct, just not as cheap). Under its own
+   *  view-lane kind in the CPU build ledger: it runs from a far crossing or a unit of
+   *  the work queue, never inside a view build. */
   private buildComposedFar(): void {
+    const started = performance.now();
+    try {
+      this.mintComposedFar();
+    } finally {
+      recordBuildSpan(
+        this.wocFarParts ? WOC_FAR_MOUNT_SPAN : 'view:composed-far-bake',
+        performance.now() - started,
+        started,
+      );
+    }
+  }
+
+  private mintComposedFar(): void {
     this.farBakeTried = true;
-    if (!this.look) return;
-    const bake = modularFarBake(this.key, this.look);
+    if (this.wocFarParts) {
+      this.wocFarLease = retainWocFarBake(
+        this.key,
+        this.wocFarParts,
+        this.wocFarFiles,
+        this.wocFarHead,
+        this.wocFarKey ?? undefined,
+      );
+    }
+    const woc = this.wocFarLease?.bake;
+    const composed = this.look ? modularFarBake(this.key, this.look) : null;
+    const bake = woc ?? composed;
     if (!bake) return;
     const prep = prepareVisual(this.key);
-    this.buildFarMeshes(
-      bake.geo,
-      tintedFarMaterials(
-        prep.def,
-        this.entityColor,
-        farSourceMaterials(this.model, bake.slots),
-        bake.isBody,
-        skinTexture(this.key, this.skinIndex),
-        skinEmissiveTexture(this.key, this.skinIndex),
-        // Claimed like the fixed-rig far materials, so the tinted cache
-        // refcounts a composed body's far tints too. Nothing to release first:
-        // the constructor builds no far mesh for a composed body (this is the
-        // lazy path), so the claim set is empty until here.
-        this.tintedFarClaims,
-      ),
+    const mats = tintedFarMaterials(
+      prep.def,
+      this.entityColor,
+      woc ? woc.mats : composed ? farSourceMaterials(this.model, composed.slots) : [],
+      bake.isBody,
+      this.bodyAtlasTexture(),
+      skinEmissiveTexture(this.key, this.skinIndex),
+      // Claimed like the fixed-rig far materials, so the tinted cache
+      // refcounts a composed body's far tints too. Nothing to release first:
+      // the constructor builds no far mesh for a composed body (this is the
+      // lazy path), so the claim set is empty until here.
+      this.tintedFarClaims,
     );
+    this.buildFarMeshes(bake.geo, this.wocFarTinted(mats, woc), woc ? woc.shadowGeo : bake.geo);
     // This mesh is minted lazily, on the first crossing into the far band, so
     // any effect state (ghost, soul rend, shadowform, moonkin, metamorph, rune
     // tint) that edged on before that crossing never touched it: every setter
@@ -2191,6 +3481,18 @@ export class CharacterVisual {
     // proxy also answers to the renderer's per-frame plan (setProxyShadow),
     // which already ran this frame against a null proxy.
     this.gateFarMint();
+  }
+
+  /** A WOC far set wearing this body's head tints (woc_far_tint.ts): the bake's
+   *  tinted groups on this character's wrapped clones, at its current colours and
+   *  the strength its body atlas gives the body's skin layer. */
+  private wocFarTinted(mats: THREE.Material[], bake: WocFarBake | undefined): THREE.Material[] {
+    if (!bake) return mats;
+    // a WOC bake's materials are its groups, then one per head slot (read for its
+    // surface, never drawn): only the groups ever reach the mesh
+    return this.wocFarTint && this.wocHead
+      ? this.wocFarTint.wrap(mats, bake.tints, this.wocHead.look.colors, this.wocBodyAtlas())
+      : mats.slice(0, bake.tints.length);
   }
 
   /** Actual shown body, after the far-mesh compile/reveal gate has settled. */
@@ -2228,6 +3530,14 @@ export class CharacterVisual {
     if (this.disposed || this.deadLock) return;
     if (this.surfaceResponse.trigger(school, strength, contact)) this.applyVisualMaterials();
   }
+  /** The pool hands this rig to a new entity (pooled_visual_lifecycle.ts):
+   *  no glow pulse, turn or entrance carries over from the last one. */
+  resetForReuse(): void {
+    this.turnState.seeded = false;
+    this.entranceFor = undefined;
+    if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
+  }
+
   clearElementResponse(): void {
     this.harvestRecoil.clear();
     this.warriorBody.clearContactRecoil();
@@ -2286,17 +3596,22 @@ export class CharacterVisual {
     source: THREE.Mesh;
     overlay: THREE.Material | THREE.Material[];
   }> {
-    return soulRendPrewarmTargets<THREE.Mesh, THREE.Material>({
-      originalMaterials: this.originalMaterials,
-      farMesh: this.farMesh,
-      farMaterials: this.farMaterials,
-      disposed: this.disposed,
-    }).map(({ source, original }) => ({
-      source,
-      overlay: Array.isArray(original)
-        ? original.map((material) => this.soulRendMaterial(material))
-        : this.soulRendMaterial(original),
-    }));
+    return (
+      soulRendPrewarmTargets<THREE.Mesh, THREE.Material>({
+        originalMaterials: this.originalMaterials,
+        farMesh: this.farMesh,
+        farMaterials: this.farMaterials,
+        disposed: this.disposed,
+      })
+        // the mark is translucent, and a merged head or kit goes back to its pieces under one
+        .filter(({ source }) => !source.userData.wocHeadMerged && !source.userData.wocArmorMerged)
+        .map(({ source, original }) => ({
+          source,
+          overlay: Array.isArray(original)
+            ? original.map((material) => this.soulRendMaterial(material))
+            : this.soulRendMaterial(original),
+        }))
+    );
   }
 
   /** Scale only the drawn pose. The click proxy remains at its authoritative size. */
@@ -2304,7 +3619,31 @@ export class CharacterVisual {
     const next = Number.isFinite(scale) ? Math.min(1.2, Math.max(1, scale)) : 1;
     if (next === this.presentationScale) return;
     this.presentationScale = next;
-    this.poseWrap.scale.setScalar(next);
+    this.poseWrap.scale.setScalar(next * this.bodyScale);
+  }
+
+  /** A WOC player's chosen body size (ModularAppearance.bodyScale, clamped to
+   *  WOC_BODY_SCALE_RANGE): the drawn body scales uniformly about its feet on
+   *  the pose wrap, so the far mesh and shadow proxy (wrap children) follow,
+   *  and `height` follows, so the nameplate and every overhead anchor sit on
+   *  the drawn head, shorter or taller. Presentation only: the pick capsule (a
+   *  root child) and the sim keep the authored size either way, so targeting is
+   *  the same for every body size, and a mount (its own visual) never scales, only
+   *  its rider. A no-op on every other rig (a Combat Mech, a form, a mob) and
+   *  on a repeat, so the renderer calls it every frame. True when it changed. */
+  setBodyScale(scale: number): boolean {
+    if (!this.def.wocCharacter || this.disposed) return false;
+    const next = clampWocBodyScale(scale);
+    if (next === this.bodyScale) return false;
+    this.bodyScale = next;
+    this.poseWrap.scale.setScalar(this.presentationScale * next);
+    // each cull sphere lives in its mesh's own space: re-derive it for the body
+    // now drawn, so its padding stays the cull core's rather than scaling too
+    for (const mesh of this.casters) {
+      const skinned = mesh as THREE.SkinnedMesh;
+      if (skinned.isSkinnedMesh) applySkinnedCullBounds(skinned, this.root, this.height);
+    }
+    return true;
   }
 
   setFerocityStage(stage: number): void {
@@ -2362,6 +3701,50 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  /**
+   * Turn the rig to stone (the Barrowstone Heart's statue): every material leans hard to
+   * weathered grey granite and the pose freezes where it stood. Cosmetic only; the sim's
+   * stasis aura is what holds the body. Clones keep their source's program (no link).
+   */
+  setPetrified(on: boolean): void {
+    if (on === this.petrified) return;
+    this.petrified = on;
+    this.applyVisualMaterials();
+  }
+
+  get isPetrified(): boolean {
+    return this.petrified;
+  }
+
+  private petrifiedMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.petrifiedMaterials.get(material);
+    if (cached) return cached;
+    const stone = cloneMaterialWithHooks(material);
+    const m = stone as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+      roughness?: number;
+      metalness?: number;
+    };
+    // Take the hue away without a new shader program: the lit term is dimmed to a grey
+    // multiplier (a painted texture keeps only its value pattern, so the statue still
+    // reads as THIS body) and a flat granite grey rides the emissive term on top, which
+    // washes out whatever hue the texture still carries. A touch of green lichen.
+    if (m.color) {
+      const lum = m.color.r * 0.3 + m.color.g * 0.55 + m.color.b * 0.15;
+      m.color.setRGB(0.32 + lum * 0.1, 0.33 + lum * 0.1, 0.31 + lum * 0.08);
+    }
+    if (m.emissive) {
+      m.emissive.setRGB(0.1, 0.105, 0.095);
+      m.emissiveIntensity = 1;
+    }
+    if (m.roughness !== undefined) m.roughness = 1;
+    if (m.metalness !== undefined) m.metalness = 0;
+    this.petrifiedMaterials.set(material, stone);
+    return stone;
+  }
+
   /** Slight whole-body color lean while a Thornhollow Fields rune buff rides (null = off). */
   setRuneTint(color: number | null): void {
     if (color === this.runeTint) return;
@@ -2389,6 +3772,10 @@ export class CharacterVisual {
     if (this.farMesh && this.farMaterials) {
       this.farMesh.material = this.effectMaterial(this.farMaterials);
     }
+    // a head or a kit merged into few draws goes back to its pieces under a translucent
+    // effect
+    this.wocHead?.effectsChanged();
+    this.wocArmor?.effectsChanged();
   }
 
   /**
@@ -2439,6 +3826,11 @@ export class CharacterVisual {
     const consider = (mesh: THREE.Mesh | null, source: THREE.Material): void => {
       if (!mesh?.geometry) return;
       const next = this.effectSingleMaterial(source);
+      // a merged head or kit goes back to its pieces under a translucent effect
+      // (effectsChanged): its clone would link and never draw
+      if (next.transparent && (mesh.userData.wocHeadMerged || mesh.userData.wocArmorMerged)) {
+        return;
+      }
       if (
         next === source ||
         (next.transparent === source.transparent && !next.userData[SURFACE_RESPONSE_PROGRAM])
@@ -2599,10 +3991,13 @@ export class CharacterVisual {
       this.model,
       this.def,
       this.entityColor,
-      skinTexture(this.key, skinIndex),
+      this.bodyAtlasTexture(),
       skinEmissiveTexture(this.key, skinIndex),
       this.tintedRigClaims,
     );
+    // the WOC head's tint wrap over the re-derived sources, before the snapshot: the
+    // body's skin layer is off under a class under-armor atlas (no skin on it)
+    this.wocHead?.retint(this.wocBodyAtlas(), true);
     releaseTintedMaterials(prevRigClaims);
     // The per-effect clone maps (ghost/soul-rend/shadowform/moonkin/
     // metamorph/rune-tint/aura-glow) key by SOURCE material, and this sweep
@@ -2635,17 +4030,22 @@ export class CharacterVisual {
     if (this.farMesh) {
       const prep = prepareVisual(this.key);
       const composed = this.look ? modularFarBake(this.key, this.look) : null;
+      const woc = this.wocFarLease?.bake;
       const claims: TintedMaterialClaims = new Set();
       const mats = tintedFarMaterials(
         this.def,
         this.entityColor,
-        composed ? farSourceMaterials(this.model, composed.slots) : prep.idleSrcMats,
-        composed ? composed.isBody : prep.idleSrcIsBody,
-        skinTexture(this.key, skinIndex),
+        woc
+          ? woc.mats
+          : composed
+            ? farSourceMaterials(this.model, composed.slots)
+            : prep.idleSrcMats,
+        woc ? woc.isBody : composed ? composed.isBody : prep.idleSrcIsBody,
+        this.bodyAtlasTexture(),
         skinEmissiveTexture(this.key, skinIndex),
         claims,
       );
-      this.stageFarMaterials(mats, claims);
+      this.stageFarMaterials(this.wocFarTinted(mats, woc), claims);
     }
     this.applyVisualMaterials();
   }
@@ -2718,7 +4118,14 @@ export class CharacterVisual {
    *  payload(s) (for the caller's compile gate), or null on a no-op. */
   setWeapon(weaponItemId: string | null): THREE.Object3D[] | null {
     if (weaponItemId === this.weaponItemId) return null;
+    const ownPropsShown = fixedHandPropsShown(this.bareWhenUnarmed, this.weaponItemId);
     this.weaponItemId = weaponItemId;
+    this.refreshLoadout();
+    // Arming or disarming a body that follows real equipment shows or hides its own hand
+    // props too (the hunter's crossbow, the warlock's book), which no slot swap reaches.
+    if (ownPropsShown !== fixedHandPropsShown(this.bareWhenUnarmed, weaponItemId)) {
+      return this.reattachAllHeld();
+    }
     if (!this.def.weaponSlots?.length) return null;
     return this.reattachHeldWeapon();
   }
@@ -2734,10 +4141,12 @@ export class CharacterVisual {
     if (offhandItemId === this.offhandItemId) return null;
     if (this.def.offhandSlot === undefined) {
       this.offhandItemId = offhandItemId;
+      this.refreshLoadout();
       return null;
     }
     const wasMirrored = offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId);
     this.offhandItemId = offhandItemId;
+    this.refreshLoadout();
     const nowMirrored = offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId);
     if (wasMirrored || nowMirrored) {
       return this.reattachHeldWeapon();
@@ -2749,6 +4158,8 @@ export class CharacterVisual {
       this.weaponSkinId,
       this.stow.attached,
     );
+    this.actionProps?.refresh();
+    this.weaponProps = heldPropHolders(this.model);
     for (const payload of payloads) {
       configureTightBoneTextures(payload);
       // Payload-subtree sweep: claim ADDITIVELY into the live rig lease (the
@@ -2815,6 +4226,7 @@ export class CharacterVisual {
       this.weaponItemId,
       this.weaponSkinId,
       this.stow.attached,
+      this.bareWhenUnarmed,
     );
     const offPayloads = setHeldOffhand(
       this.model,
@@ -2850,6 +4262,9 @@ export class CharacterVisual {
    *  and rebuild the skin VFX on the payloads that now exist. */
   private finishWeaponAttach(payloads: THREE.Object3D[]): void {
     this.actionProps?.refresh();
+    // Every mounted holder, not this call's payloads: the mainhand and the
+    // offhand attach through separate calls, and the swim hide must cover both.
+    this.weaponProps = heldPropHolders(this.model);
     for (const payload of payloads) configureTightBoneTextures(payload);
     // Ranged skins take a root-relative orientation pin (position always rides
     // the hand): a bow aims upright WHILE the shot one-shot plays (the string
@@ -2878,7 +4293,7 @@ export class CharacterVisual {
       this.model,
       this.def,
       this.entityColor,
-      skinTexture(this.key, this.skinIndex),
+      this.bodyAtlasTexture(),
       skinEmissiveTexture(this.key, this.skinIndex),
       this.tintedRigClaims,
     );
@@ -2894,7 +4309,8 @@ export class CharacterVisual {
           const mesh = o as THREE.Mesh;
           if (!mesh.isMesh) return;
           // cloneMaterialWithHooks, never a bare clone: a rig material carries
-          // the silhouette rim glow (assets.ts buildTintedClone), and
+          // the silhouette rim glow (assets.ts buildTintedClone; a flat held
+          // plate alone does not, and its clone must not gain one), and
           // Material.clone() drops onBeforeCompile. The bare clone therefore
           // rendered the isolated weapon WITHOUT its rim AND, since three's
           // default program cache key IS the hook source, linked a program the
@@ -2919,8 +4335,9 @@ export class CharacterVisual {
 
   private rebuildTemplarsVerdictFx(): void {
     this.templarsVerdictFx?.dispose();
-    this.templarsVerdictFx =
-      this.key === 'player_paladin' ? new PaladinTemplarsVerdictFx(this.model) : null;
+    this.templarsVerdictFx = this.def.clips.attackByAbility?.final_edict
+      ? new PaladinTemplarsVerdictFx(this.model)
+      : null;
     this.templarsVerdictAction = null;
   }
 
@@ -3034,9 +4451,9 @@ export class CharacterVisual {
 
   private buildStoneboundArmorShards(wireframe: boolean, opacity: number): void {
     const placements = [
-      { x: -0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: -0.35 },
-      { x: 0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: 0.35 },
-      { x: 0, y: this.height * 0.53, z: 0.2, sx: 0.24, sy: 0.18, rz: 0 },
+      { x: -0.42, y: this.baseHeight * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: -0.35 },
+      { x: 0.42, y: this.baseHeight * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: 0.35 },
+      { x: 0, y: this.baseHeight * 0.53, z: 0.2, sx: 0.24, sy: 0.18, rz: 0 },
     ];
     for (const placement of placements) {
       const shard = new THREE.Mesh(
@@ -3244,8 +4661,10 @@ export class CharacterVisual {
       this.shadowformMaterials,
       this.moonkinMaterials,
       this.runeTintMaterials,
+      this.petrifiedMaterials,
       this.auraGlowMaterials,
       this.surfaceResponse.materials,
+      ...(this.glowPulse ? [this.glowPulse.materials] : []),
     ]);
   }
 
@@ -3261,8 +4680,10 @@ export class CharacterVisual {
       ...this.ferocityMaterials.flatMap((cache) => [...cache.values()]),
       ...this.ascensionMaterials.values(),
       ...this.runeTintMaterials.values(),
+      ...this.petrifiedMaterials.values(),
       ...this.auraGlowMaterials.values(),
       ...this.surfaceResponse.materials.values(),
+      ...(this.glowPulse?.materials.values() ?? []),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
@@ -3272,8 +4693,10 @@ export class CharacterVisual {
     for (const cache of this.ferocityMaterials) cache.clear();
     this.ascensionMaterials.clear();
     this.runeTintMaterials.clear();
+    this.petrifiedMaterials.clear();
     this.auraGlowMaterials.clear();
     this.surfaceResponse.materials.clear();
+    this.glowPulse?.forget();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the
@@ -3292,18 +4715,26 @@ export class CharacterVisual {
       if (forceStow(this.stow, stowed)) this.applyStowSwap();
       return;
     }
-    const swapDelay = (gesture.getClip().duration / STOW_GESTURE_TIMESCALE) * STOW_SWAP_FRACTION;
+    const whole = this.def.clips.stowPlaysWhole === true;
+    const timeScale = whole ? 1 : STOW_GESTURE_TIMESCALE;
+    const swapFraction = this.def.clips.stowSwapFraction ?? STOW_SWAP_FRACTION;
+    const swapDelay = (gesture.getClip().duration / timeScale) * swapFraction;
     if (requestStow(this.stow, stowed, swapDelay)) {
-      this.playOneShot(clip as string, STOW_GESTURE_TIMESCALE);
+      this.playOneShot(clip as string, timeScale);
       // Arm-raise window: peaks exactly at the swap, eases back out after it.
-      this.stowLift.t = 0;
-      this.stowLift.dur = swapDelay * 2;
+      // An authored sheathe already reaches the shoulder on its own.
+      if (!whole) {
+        this.stowLift.t = 0;
+        this.stowLift.dur = swapDelay * 2;
+      }
     }
   }
 
   /** Cut the stow gesture at its windup peak: hand back to base so the chop
    *  clip's downswing never plays (mirrors onFinished's one-shot hand-off). */
   private endStowGesture(): void {
+    // An authored sheathe recovers on its own; onFinished hands back to base.
+    if (this.def.clips.stowPlaysWhole) return;
     const clip = this.def.clips.stow;
     const gesture = clip ? this.action(clip) : null;
     if (!gesture || this.current !== gesture || this.deadLock) return;
@@ -3317,11 +4748,19 @@ export class CharacterVisual {
    *  shared re-attach tail (materials, caster snapshot, skin VFX rebuilt on the
    *  new payloads). Mixer state is untouched. */
   private applyStowSwap(): void {
+    this.refreshLoadout();
     // The swap lands mid-gesture, long after the renderer's stow diff returned,
     // so the rig it rebuilds (and the skin VFX point light hanging off it) can
     // only be reconciled into the light budget on a later frame: raise an edge
     // the renderer consumes (consumeWeaponGraphDirty).
     this.weaponGraphDirty = true;
+    this.reattachAllHeld();
+  }
+
+  /** Strip and re-attach EVERY held prop (both slots and the body's own hand props) for
+   *  what the hands hold now and where they are carried, then run the shared re-attach
+   *  tail. Returns every prop mounted afterwards, for the caller's compile gate. */
+  private reattachAllHeld(): THREE.Object3D[] {
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();
     const payloads = setWeaponsStowed(
@@ -3331,12 +4770,14 @@ export class CharacterVisual {
       this.weaponSkinId,
       this.stow.attached,
       this.offhandItemId,
+      this.bareWhenUnarmed,
     );
     // The returned set is the hands that SHOW the skin (attachAllProps); a
     // hand outside it still needs its bone-texture pass, and the whole-rig
     // sweep is idempotent (skeletons already cropped are skipped).
     configureTightBoneTextures(this.model);
     this.finishWeaponAttach(payloads);
+    return heldPropHolders(this.model);
   }
 
   /** Rebuild the shadow-caster list and original-material snapshot after the model
@@ -3375,10 +4816,53 @@ export class CharacterVisual {
     });
   }
 
+  /** Set (or clear, with null) the Shardpike aim reticle on this creature's eye. */
+  setEyeWardMarker(plan: EyeWardMarkerPlan | null): void {
+    this.eyeWardPlan = plan;
+  }
+
+  /** Fire the landed-thrust burst on the reticle. No-op on a rig that has no eye. */
+  strikeEyeWardMarker(): void {
+    this.eyeWardMarker?.strike();
+  }
+
+  releaseShardpikeProp() {
+    return shardpikeProp(this.model);
+  }
+
+  sampleEyeAnchor(out: THREE.Vector3): boolean {
+    const spec = this.def.eyeGlow;
+    const bone = spec && this.model.getObjectByName(spec.bone);
+    if (!spec || !bone) return false;
+    bone.updateWorldMatrix(true, false);
+    out.fromArray(spec.offset).applyMatrix4(bone.matrixWorld);
+    return true;
+  }
+
   dispose(): void {
     this.actionProps?.restore();
     this.disposed = true;
+    // first: whatever below throws, no bake goes on for a body that is gone
+    this.dropWocFarJob();
+    this.wocAtlas.dispose();
+    // Give the streamed armor files back: a set nobody wears is freed after the
+    // idle window (woc_armor_packs.ts).
+    this.wocArmor?.dispose();
+    this.wocArmor = null;
+    this.wocHead?.dispose();
+    this.wocHead = null;
+    this.wocFarTint?.dispose();
+    this.wocFarTint = null;
+    releaseWocArmorOf(this.model);
     disposeHeldPropIdles(this.model);
+    this.chargeGlow?.dispose();
+    this.chargeGlow = null;
+    this.eyeGlow?.dispose();
+    this.eyeGlow = null;
+    this.eyeWardMarker?.dispose();
+    this.eyeWardMarker = null;
+    this.effigyRig?.dispose();
+    this.effigyRig = null;
     this.bastionSweepFx?.dispose();
     this.bastionSweepFx = null;
     this.bastionSweepAction = null;
@@ -3404,6 +4888,8 @@ export class CharacterVisual {
     this.mixer.uncacheRoot(this.model);
     this.skeletonUpdates.dispose();
     this.root.removeFromParent();
+    this.wocFarLease?.release();
+    this.wocFarLease = null;
     // SkeletonUtils.clone gives each instance exclusive Skeletons whose GPU
     // bone textures the renderer allocates lazily, release them here or
     // online interest churn strands one per despawned entity. Geometries
@@ -3427,6 +4913,28 @@ export class CharacterVisual {
   // State machine internals
   // -------------------------------------------------------------------------
 
+  /** ClipMap.entrance, once per entity this rig draws (a pooled rig reused
+   *  for a new entity plays it again). */
+  private playEntrance(): void {
+    const id = this.clickProxy.userData.entityId;
+    const clip = this.def.clips.entrance;
+    if (!clip || this.entranceFor === id || !this.action(clip)) return;
+    this.entranceFor = id;
+    this.playOneShot(clip, 1);
+    this.currentOneShotIsAttack = true;
+  }
+
+  /** The turn loop while a rooted body swings to a new heading (ClipMap.turn,
+   *  VisualDef.turnRate), else null. Steps the drawn heading every frame (the
+   *  lag lands on poseWrap's yaw); a body on the move never plays it. */
+  private turnIdle(dt: number, s: AnimState): string | null {
+    const { turnRate, clips } = this.def;
+    if (turnRate === undefined && !clips.turn) return null;
+    const now = performance.now() / 1000;
+    stepTurnInPlace(this.turnState, this.root.parent?.rotation.y ?? 0, dt, turnRate ?? 0, now);
+    return this.turnState.turning && !s.moving && !s.dead ? (clips.turn ?? null) : null;
+  }
+
   private desiredBase(s: AnimState): BaseState {
     // Whether the LOADED rig has the clip, not whether the ClipMap names one:
     // every player ClipMap names walkBack, but baseAction() silently falls back
@@ -3442,7 +4950,9 @@ export class CharacterVisual {
     // rig with no wade clip standing in a ford.
     //
     // The battle stance is gated the same way and for the walkBack reason: only
-    // a rig that ships the loop may enter the state.
+    // a rig that ships the loop may enter the state. So is the strafe, which
+    // needs BOTH side runs; they are looked up only while strafing, the one
+    // case the flag is read.
     return desiredBaseState(
       s,
       !!this.action(this.def.clips.walkBack),
@@ -3450,12 +4960,17 @@ export class CharacterVisual {
       !!this.action(this.def.clips.combatIdle),
       !!this.action(this.def.clips.prowlIdle),
       !!this.action(this.def.clips.prowlWalk),
+      isBraced(this.braceUntil, this.clock),
+      !!s.strafe &&
+        !!this.action(this.def.clips.strafeLeft) &&
+        !!this.action(this.def.clips.strafeRight),
+      !!this.action(this.def.clips.sleep),
     );
   }
 
   /** The posed head height used by the renderer's surface/submerged latch. */
   get swimHeadHeight(): number {
-    return this.def.swimHeadHeight ?? this.height * SUBMERGED_HEAD_FRACTION;
+    return (this.def.swimHeadHeight ?? this.baseHeight * SUBMERGED_HEAD_FRACTION) * this.bodyScale;
   }
 
   get gait(): VisualDef['gait'] {
@@ -3481,7 +4996,11 @@ export class CharacterVisual {
   }
 
   private updateMixer(dt: number): void {
-    this.mixer.update(dt);
+    // A statue holds the pose it was struck in.
+    this.mixer.update(this.petrified ? 0 : dt);
+    this.dials?.apply(dt);
+    if (this.meshToggles?.update(dt, this.current?.getClip().name ?? null))
+      this.syncFarVisibility();
     this.skeletonUpdates.markPoseChanged();
   }
 
@@ -3513,7 +5032,9 @@ export class CharacterVisual {
     return (t < 0 ? t + clip.duration : t) / clip.duration;
   }
 
-  private baseTransitionFade(next: BaseState): number {
+  private baseTransitionFade(next: BaseState, from?: BaseState): number {
+    // The side runs blend in and out quickly (STRAFE_FADE), whichever state they meet.
+    if (isStrafeState(next) || (from !== undefined && isStrafeState(from))) return STRAFE_FADE;
     // A winged form without an authored Jump clip must leave its locomotion
     // stride almost immediately. The normal crossfade preserves too much of a
     // forward-leaning Run pose after takeoff and reads as a frozen leap.
@@ -3541,12 +5062,16 @@ export class CharacterVisual {
     // Death treatments (soul rend, ghost run) win over the shapeshift tints.
     if (this.soulRend) return this.soulRendMaterial(material);
     if (this.ghosted) return this.ghostMaterial(material);
+    // A statue is stone whatever else it was wearing.
+    if (this.petrified) return this.petrifiedMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
     if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);
     if (this.ascended) return this.ascensionMaterial(material);
     if (this.runeTint !== null) return this.runeTintMaterial(material, this.runeTint);
     if (this.surfaceResponse.active) return this.surfaceResponse.material(material);
+    // the body's own glow map flared by a gesture (VisualDef.glowPulses)
+    if (this.glowPulse?.active) return this.glowPulse.material(material);
     // lowest priority: the ability VFX buff/cast body glow
     if (this.auraGlowIntensity > 0.01) return this.auraGlowMaterial(material);
     return material;
@@ -3662,8 +5187,40 @@ export class CharacterVisual {
     return marked;
   }
 
+  /** Whether the rig carries a clip. Built once: action() asks about ten times a frame. */
+  private readonly hasClip = (name: string): boolean => this.actions.has(name);
+
   private action(name: string | undefined): THREE.AnimationAction | null {
-    return name ? (this.actions.get(name) ?? null) : null;
+    if (!name) return null;
+    const clip = this.loadoutSwap ? swappedClip(this.loadoutSwap, name, this.hasClip) : name;
+    return clip ? (this.actions.get(clip) ?? null) : null;
+  }
+
+  /** Re-pick the loadout clip set (weapon_loadout_core.ts) after the hands' contents change:
+   *  a mainhand or offhand swap, or the sheathe landing. A rig standing in a base state
+   *  crossfades onto its new variant (the base machine only re-resolves on a state change). */
+  private refreshLoadout(): void {
+    const swaps = this.def.clips.loadoutSwaps;
+    if (!swaps) return;
+    const attach = this.def.attach ?? [];
+    const loadout = weaponLoadout({
+      mainhandItemId: this.weaponItemId,
+      offhandItemId: this.offhandItemId,
+      stowed: this.stow.attached,
+      showsMainhand: (this.def.weaponSlots?.length ?? 0) > 0,
+      showsOffhand: this.def.offhandSlot !== undefined,
+      // ...unless the body leaves its own hand props off while unarmed
+      fixedOffhand:
+        fixedHandPropsShown(this.bareWhenUnarmed, this.weaponItemId) &&
+        attach.some((a, i) => a.bone === 'handslot.l' && i !== this.def.offhandSlot && !a.swapOnly),
+    });
+    const next = loadout ? (swaps[loadout] ?? null) : null;
+    if (next === this.loadoutSwap) return;
+    this.loadoutSwap = next;
+    if (this.initialized && !this.deadLock && !this.currentIsOneShot) {
+      const base = this.baseAction();
+      if (base && base !== this.current) this.fadeTo(base, 0.2, false);
+    }
   }
 
   private baseAction(): THREE.AnimationAction | null {
@@ -3677,7 +5234,12 @@ export class CharacterVisual {
         // desiredBaseState only picks this for a rig that HAS the loop, so the
         // fallback is unreachable belt-and-braces (a def whose clip name misses
         // in the GLB resolves to null in both places and lands on idle).
-        return this.action(c.combatIdle) ?? this.action(c.idle);
+        return (
+          this.action(this.auraIdle ?? undefined) ??
+          this.action(this.stunIdle ?? undefined) ??
+          this.action(c.combatIdle) ??
+          this.action(c.idle)
+        );
       case 'walk':
         return this.action(c.walk) ?? this.action(c.idle);
       case 'walkBack':
@@ -3688,6 +5250,12 @@ export class CharacterVisual {
           this.action(c.run) ??
           this.action(c.walk)
         );
+      // desiredBaseState only picks a strafe for a rig that loads BOTH side runs,
+      // so the run-then-walk fallback is belt-and-braces, as combatIdle's is.
+      case 'strafeLeft':
+        return this.action(c.strafeLeft) ?? this.action(c.run) ?? this.action(c.walk);
+      case 'strafeRight':
+        return this.action(c.strafeRight) ?? this.action(c.run) ?? this.action(c.walk);
       case 'cast':
         // A displayed bow holds its draw here instead of the shared caster
         // gesture; a per-ability authored cast clip beats the generic channel;
@@ -3723,6 +5291,10 @@ export class CharacterVisual {
         return this.action(c.wade) ?? this.action(c.walk) ?? this.action(c.idle);
       case 'sit':
         return this.action(c.sitDown) ?? this.action(c.sitIdle) ?? this.action(c.idle);
+      case 'sleep':
+        // Only ever entered when the rig HAS the clip (desiredBase gates on it), so the
+        // idle fallback is belt-and-braces rather than a state anything runs in.
+        return this.action(c.sleep) ?? this.action(c.idle);
       case 'jump': {
         const moving = this.jumpWhileMoving ? this.action(c.jumpMoving) : null;
         return moving ?? this.action(c.jump) ?? this.action(c.idle);
@@ -3732,7 +5304,13 @@ export class CharacterVisual {
         // pose for the whole fall, which is what every rig did before it.
         return this.action(c.fall) ?? this.action(c.jump) ?? this.action(c.idle);
       default:
-        return this.action(c.idle);
+        // 'idle' lands here: an aura-held loop (ClipMap.idleByAura) or a dazed one
+        // (ClipMap.stunned) replaces it while it rides.
+        return (
+          this.action(this.auraIdle ?? undefined) ??
+          this.action(this.stunIdle ?? undefined) ??
+          this.action(c.idle)
+        );
     }
   }
 
@@ -3800,7 +5378,9 @@ export class CharacterVisual {
     next.setLoop(oneShot || this.isOnce(next) ? THREE.LoopOnce : THREE.LoopRepeat, Infinity);
     next.clampWhenFinished = true;
     next.timeScale = 1;
-    this.beginAction(next, prev, fade);
+    // A clip that starts out of sight (ClipMap.castSnapIn) takes the rig at once.
+    const snap = clipSnapsIn(this.def.clips.castSnapIn, next.getClip().name);
+    this.beginAction(next, prev, snap ? 0 : fade);
     this.current = next;
     this.currentIsOneShot = oneShot;
     this.currentOneShotIsEmote = false;
@@ -3842,10 +5422,17 @@ export class CharacterVisual {
     // stopFading()s) without touching weight, and the pairwise fade below keeps
     // the scheduled total at 1, so the rig never dips toward BIND pose.
     for (const a of this.actions.values()) {
+      if (a === next || a === prev || a === this.climbOverlay || a.paused || !a.isRunning()) {
+        continue;
+      }
+      a.stop();
+    }
+    // the re-trigger twins (twinOf) are not in the action map: sweep them too
+    for (const a of this.twinActions.keys()) {
       if (a === next || a === prev || a.paused || !a.isRunning()) continue;
       a.stop();
     }
-    if (prev && prev !== next && drivesPose(readActionWeight(prev))) {
+    if (fade > 0 && prev && prev !== next && drivesPose(readActionWeight(prev))) {
       prev.fadeOut(fade);
       // Arm the cadence wind-down on the SAME action the mixer is fading, and
       // only for a gait that was actually running forward: a reversed
@@ -3869,18 +5456,46 @@ export class CharacterVisual {
     // exists to SNAP, and fading a near-dead prev out from weight 1 would blend
     // it ~50/50 against the snapped `next` for the whole fade, the opposite of
     // what the docblock above promises.
-    if (prev && prev !== next && !prev.paused && prev.isRunning()) prev.stop();
+    // A snap-in (fade 0, ClipMap.castSnapIn) stops even a paused prev (a clamped
+    // clip still holds its pose): nothing standing may blend into the rise.
+    if (prev && prev !== next && (fade <= 0 || (!prev.paused && prev.isRunning()))) prev.stop();
     next.setEffectiveWeight(1);
     next.play();
+  }
+
+  /** Is a `castPlayOut` clip on the rig right now (its cast loop or its play-out)? */
+  /** VisualDef.oneShotsHoldAttacks: a plain swing never cuts these one-shots. */
+  private oneShotHoldsAttacks(): boolean {
+    const held = this.def.oneShotsHoldAttacks;
+    if (!held || !this.currentIsOneShot) return false;
+    const name = this.current?.getClip().name;
+    return name !== undefined && held.includes(name);
+  }
+
+  private castPlayOutRunning(): boolean {
+    const name = this.current?.getClip().name;
+    if (!name || !this.def.clips.castPlayOut?.includes(name)) return false;
+    return this.currentOneShotIsCastExit || this.baseState === 'cast';
+  }
+
+  /** A flying or perching creature (VisualDef.flight): the renderer reads its
+   *  airborne state from its drawn height, as it does a player's. */
+  get flies(): boolean {
+    return this.def.flight === true;
   }
 
   /** Base clips that play once and CLAMP instead of looping: a sit-down
    *  transition (which then hands off to the sit-idle loop), and the jump clip
    *  of a rig that ships a landing one-shot, which holds its airborne pose for
    *  as long as the body is off the ground. Rigs without a `land` clip keep
-   *  looping `jump` unchanged. */
+   *  looping `jump` unchanged, and a flier (VisualDef.flight) never clamps. */
   private isOnce(a: THREE.AnimationAction): boolean {
+    // A rise into sight (ClipMap.castSnapIn) plays once and holds its last
+    // pose: a loop would drop the body back out of sight for a frame.
+    if (clipSnapsIn(this.def.clips.castSnapIn, a.getClip().name)) return true;
     if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
+    // A flier's `jump` is its flight loop (or its perch): it never clamps.
+    if (this.def.flight) return false;
     // 'fall' counts as well as 'jump'. A rig with no authored flail resolves
     // `fall` back to its jump clip (baseAction), so keying this on 'jump' alone
     // meant a long fall silently LOOPED the pose a short hop clamps. The check
@@ -3888,6 +5503,10 @@ export class CharacterVisual {
     // its fall action is not the jump action, and the flail loops as intended.
     if ((this.baseState === 'jump' || this.baseState === 'fall') && this.def.clips.land)
       return a === this.action(this.def.clips.jump);
+    // The held guard: a raise-into-guard stance clip (the muster's `Block`) comes up once
+    // and holds its raised last frame for as long as the body stays braced.
+    if (combatIdleClamps(this.baseState, this.def.clips.combatIdleHold))
+      return a === this.action(this.def.clips.combatIdle);
     return false;
   }
 
@@ -3915,7 +5534,7 @@ export class CharacterVisual {
       return;
     }
     if (this.idleVariantIn < 0) {
-      this.idleVariantIn = IDLE_VARIANT_MIN + Math.random() * IDLE_VARIANT_JITTER;
+      this.idleVariantIn = this.nextIdleVariantIn();
       return;
     }
     this.idleVariantIn -= dt;
@@ -3924,11 +5543,18 @@ export class CharacterVisual {
     // one-shot too). Hold the draw rather than rearming: rearming here let the
     // beat reset this clock on every fire and the pool would never come up.
     if (this.currentIsOneShot) return;
-    this.idleVariantIn = IDLE_VARIANT_MIN + Math.random() * IDLE_VARIANT_JITTER;
+    this.idleVariantIn = this.nextIdleVariantIn();
     const pick = variants[Math.floor(Math.random() * variants.length)];
     if (!this.action(pick)) return;
     this.playOneShot(pick, 1);
     this.currentOneShotIsIdleVariant = true;
+  }
+
+  /** Seconds until the next fidget: the rig's own cadence, else the shared beat. */
+  private nextIdleVariantIn(): number {
+    const cadence = this.def.clips.idleVariantCadence;
+    if (!cadence) return IDLE_VARIANT_MIN + Math.random() * IDLE_VARIANT_JITTER;
+    return cadence.everySec + Math.random() * (cadence.jitterSec ?? 0);
   }
 
   /**
@@ -3971,11 +5597,29 @@ export class CharacterVisual {
     emoteId: OverheadEmoteId | null = null,
   ): void {
     this.currentOneShotIsAttack = false;
-    const a = this.action(name);
+    let a = this.action(name);
     if (!a) return;
-    if (name !== PALADIN_TEMPLARS_VERDICT_CLIP) this.stopTemplarsVerdictFx();
+    // Final Edict and an ordinary two-hand attack share WOC's authored chop.
+    // Every new one-shot clears ownership; playAttack reclaims it by ability.
+    this.stopTemplarsVerdictFx();
     if (name !== PALADIN_BASTION_SWEEP_CLIP) this.stopBastionSweepFx();
-    const prev = this.current;
+    // A one-shot replaced in the frame it began (the second swing of a same-tick
+    // dual pair) never drove a pose: blend from what IT was blending from.
+    const replacedThisFrame = this.currentIsOneShot && this.oneShotAt === this.mixer.time;
+    const prev = replacedThisFrame ? this.oneShotFrom : this.current;
+    // The same clip started again while it still drives the rig (an ability strike on
+    // the swing just begun): play its twin from the top, crossfading from where the
+    // running one is, instead of resetting it in place (a snap to frame 0).
+    // (WOC bodies only: the KayKit signature poses deliberately re-enter at full weight.)
+    if (
+      this.def.wocCharacter &&
+      a === prev &&
+      !replacedThisFrame &&
+      a.isRunning() &&
+      drivesPose(readActionWeight(a))
+    ) {
+      a = this.twinOf(a);
+    }
     // reset (not stop) restarts the clip in place: stopping the clip that is
     // ALREADY driving the rig, then fading it back in from zero with no
     // outgoing partner, T-poses the rig for the whole fade on every same-clip
@@ -3995,12 +5639,28 @@ export class CharacterVisual {
     );
     this.current = a;
     this.currentIsOneShot = true;
+    this.oneShotFrom = prev;
+    this.oneShotAt = this.mixer.time;
     this.currentOneShotIsEmote = emoteId !== null;
     // Cleared for EVERY one-shot; tickIdleVariant re-sets it straight after
     // its own call, so the latch can never outlive the clip that set it.
     this.currentOneShotIsIdleVariant = false;
     this.currentOneShotIsLanding = false;
     this.currentOneShotIsCastExit = false;
+  }
+
+  /** The second action of a one-shot's clip, minted on first use; the two alternate on
+   *  repeated re-triggers. It rides the clip's twin (a clone under the same name, one per
+   *  source clip and shared by every rig: clip_twin.ts), since this mixer already holds
+   *  the one action it keeps per clip. */
+  private twinOf(a: THREE.AnimationAction): THREE.AnimationAction {
+    let twin = this.twinActions.get(a);
+    if (!twin) {
+      twin = this.mixer.clipAction(twinClipOf(a.getClip()));
+      this.twinActions.set(a, twin);
+      this.twinActions.set(twin, a);
+    }
+    return twin;
   }
 
   private onFinished(a: THREE.AnimationAction): void {
@@ -4033,6 +5693,12 @@ export class CharacterVisual {
     });
   }
 
+  /** The authored wake one-shot, if the ClipMap names one AND the loaded rig has it. */
+  private wakeAction(): THREE.AnimationAction | null {
+    const clip = this.def.clips.wake;
+    return clip ? this.action(clip) : null;
+  }
+
   /** One-shot the flourish clip (skeleton awaken / boss taunt / the dragonkin
    *  brood's Shout and the whelp's hatch pounce), off the 'shout'/'flourish'
    *  spellfx cues. No-op for rigs without a flourish clip. */
@@ -4042,6 +5708,7 @@ export class CharacterVisual {
   }
 
   private enterDeath(): void {
+    this.braceUntil = Number.NEGATIVE_INFINITY;
     this.stopTemplarsVerdictFx();
     this.stopBastionSweepFx();
     this.deadLock = true;
@@ -4055,7 +5722,7 @@ export class CharacterVisual {
     // a lootable corpse remains clickable. Restored in revive(). Set here (not the
     // per-frame update) since it only changes on the death/revive edge, and this
     // runs on every enterDeath path including the created-already-dead snapshot.
-    this.clickProxy.scale.y = pickProxyHeight(this.height, this.clickRadius, true);
+    this.clickProxy.scale.y = pickProxyHeight(this.baseHeight, this.clickRadius, true);
     const death = this.action(this.def.clips.death);
     if (!death) {
       // No death clip: the corpse holds whatever pose was driving it. dead-lock
@@ -4075,7 +5742,9 @@ export class CharacterVisual {
     death.clampWhenFinished = true;
     death.timeScale = this.def.deathTimeScale ?? 1.15;
     if (!this.initialized) {
-      // created already-dead (corpse entering interest): snap to the end pose
+      // created already-dead (corpse entering interest): snap to the end pose, and the
+      // eye is simply out rather than guttering through a death nobody saw
+      this.eyeGlow?.snuff();
       if (prev && prev !== death) prev.stop();
       death.play();
       death.time = Math.max(0, death.getClip().duration - 1e-3);
@@ -4102,13 +5771,14 @@ export class CharacterVisual {
     this.baseState = 'idle';
     this.modelWrap.position.y = this.modelWrapGroundY;
     this.applyCorpseMeshSwap(false);
+    this.meshToggles?.reset();
     // Release the one-shot latch: a `finished` that never arrived (the rig was
     // throttled, or the clip was cut) would otherwise leave every later base
     // change committing its state while silently skipping its fade.
     this.currentIsOneShot = false;
     this.currentOneShotIsEmote = false;
     // Restore the upright pick capsule (the corpse-flatten from enterDeath).
-    this.clickProxy.scale.y = pickProxyHeight(this.height, this.clickRadius, false);
+    this.clickProxy.scale.y = pickProxyHeight(this.baseHeight, this.clickRadius, false);
     // The clamped death pose stays the OUTGOING partner of the fade below (a
     // paused action still fades out). Stopping it first, or clearing `current`,
     // left the incoming clip ramping up from zero with nothing else driving the
@@ -4124,11 +5794,24 @@ export class CharacterVisual {
   }
 }
 
-function clipNamesOf(def: VisualDef): string[] {
-  const c = def.clips;
+export function clipNamesOf(def: VisualDef): string[] {
+  // A stance's vocabulary (phaseClips) must be bound too, or its clips never
+  // get an action and the swap plays nothing.
+  const phases = Object.values(def.phaseClips ?? {}).flatMap((p) => [
+    ...clipMapNames(p.clips),
+    ...(p.enter ? [p.enter] : []),
+  ]);
+  return [...clipMapNames(def.clips), ...phases];
+}
+
+function clipMapNames(c: ClipMap): string[] {
   return [
     c.idle,
     c.combatIdle,
+    c.stunned,
+    ...Object.values(c.heldByAura ?? {}),
+    c.turn,
+    c.entrance,
     c.prowlIdle,
     c.prowlWalk,
     c.walk,
@@ -4136,9 +5819,13 @@ function clipNamesOf(def: VisualDef): string[] {
     c.rushArrival,
     c.death,
     ...(c.attack ?? []),
+    ...(c.meleeAttack ?? []),
+    c.wandAttack,
     ...Object.values(c.attackByAbility ?? {}),
+    ...(c.abilityAttack ?? []),
     ...Object.values(c.castByAbility ?? {}),
     ...Object.values(c.attackByHand ?? {}),
+    ...(c.dualWieldPair ?? []),
     ...(c.hit ?? []),
     c.cast,
     c.sitDown,
@@ -4152,8 +5839,11 @@ function clipNamesOf(def: VisualDef): string[] {
     c.fall,
     c.land,
     c.walkBack,
+    c.strafeLeft,
+    c.strafeRight,
     c.flourish,
     c.stow,
+    c.climb,
     // The idle-breakers and the idle beat were MISSING here, which is the only
     // place actions get built (visual.ts constructor). A clip absent from this
     // list loads fine and passes the clipmap gate, that gate checks the GLB,
@@ -4161,7 +5851,16 @@ function clipNamesOf(def: VisualDef): string[] {
     // tickIdleVariant/tickIdleBeat bail on every fire and the rig simply never
     // fidgets. Silent: no throw, no warning, just a clip that is never seen.
     ...(c.idleVariants ?? []),
+    ...Object.values(c.loadoutSwaps ?? {}).flatMap((m) => Object.values(m ?? {})),
     c.idleBeat?.clip,
+    // The night pair (mob/slumber.ts): a slot named here is the ONLY way a clip becomes an
+    // action, so a new ClipMap field joins this list or it never plays (pinned per rig by
+    // tests/character_clipmaps.test.ts against the gate's own required-clip list).
+    c.sleep,
+    c.wake,
+    // The aura-held idles (Balgath's Blinded loop): same rule, a loop never bound is a
+    // pose never seen.
+    ...Object.values(c.idleByAura ?? {}),
     ...Object.values(c.emote ?? {}).flatMap((spec) => spec.clips),
   ].filter((n): n is string => !!n);
 }

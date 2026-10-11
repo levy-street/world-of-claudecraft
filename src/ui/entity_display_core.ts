@@ -15,13 +15,15 @@
 // this module (the Phase 18 frontend review round), and were deleted with that
 // last import; every consumer names this path.
 import { isNecromancyUndead } from '../sim/combat/necromancy';
-import { DUNGEON_LIST, ITEMS, QUESTS } from '../sim/data';
+import { DUNGEON_LIST, ITEMS, MOBS, QUESTS } from '../sim/data';
+import { isBuddyMob } from '../sim/pet/buddy_ai';
 import type { Entity, PlayerClass } from '../sim/types';
 import { abilityDisplayNameFromSource } from './ability_display_name';
 import { classDisplayName, dungeonDisplayName, itemDisplayName, tEntity } from './entity_i18n';
 import { feastTitleFor } from './hud/professions/feast_title';
 import { mobileStationTitleFor } from './hud/professions/mobile_station_title';
 import { formatNumber, t } from './i18n';
+import { kitObjectDisplayName } from './kit_object_name';
 import { professionTrainerLabel } from './profession_trainer_label_core';
 import { localizeSimAuraName } from './sim_i18n';
 import { forgeObjectLabel } from './world_quest_forge_view';
@@ -40,6 +42,14 @@ export function itemStackDisplayName(item: string, stackSuffix?: string): string
 
 export function mobDisplayName(mobId: string): string {
   return tEntity({ kind: 'mob', id: mobId, field: 'name' });
+}
+
+/** Hover titles retain a buddy's nickname and identify its original companion type. */
+export function mobHoverIdentity(entity: Entity): { name: string; buddyType?: string } {
+  const typeName = mobDisplayName(entity.templateId);
+  if (!isBuddyMob(entity)) return { name: typeName };
+  const name = entityDisplayName(entity);
+  return { name, buddyType: name !== typeName ? typeName : undefined };
 }
 
 export function npcDisplayName(npcId: string): string {
@@ -166,6 +176,10 @@ export function entityDisplayName(entity: Entity): string {
       return vehicleStationDisplayName(entity.templateId);
   }
   if (entity.kind === 'mob') {
+    if (isBuddyMob(entity))
+      return entity.name === MOBS[entity.templateId]?.name
+        ? tEntity({ kind: 'mob', id: entity.templateId, field: 'name' })
+        : entity.name;
     return entity.ownerId !== null && !isNecromancyUndead(entity)
       ? (localizeSimAuraName(entity.name) ?? entity.name)
       : tEntity({ kind: 'mob', id: entity.templateId, field: 'name' });
@@ -180,6 +194,10 @@ export function entityDisplayName(entity: Entity): string {
     // A placed mobile crafting station, the same leaf rule (mobile_station_title.ts).
     const stationTitle = mobileStationTitleFor(entity.templateId, entity.name);
     if (stationTitle !== null) return stationTitle;
+    // A trash engine object (an Ice Slab, a soulfire pool): the sim's English
+    // mechanic name, re-localized (kit_object_name.ts).
+    const kitName = kitObjectDisplayName(entity.templateId, entity.name);
+    if (kitName !== null) return kitName;
   }
   return entity.name;
 }

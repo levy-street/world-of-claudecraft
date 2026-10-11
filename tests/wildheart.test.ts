@@ -1,6 +1,9 @@
-// The Wildheart Basin is Palmreach's open-field jungle dungeon. This suite
-// pins its authored roster, radial route, overflow instance band, shared
-// terrain and collision contract, Heroic tuning, and appended deed pair.
+// The Wildheart Basin is Palmreach's open-field jungle dungeon, rebuilt on the
+// shared authored-field engine (docs/design/dungeon-rework/wildheart_basin.md).
+// This suite pins its shipped troll roles, the overflow instance band, the
+// field's terrain and collision contract, Heroic tuning, the appended deed
+// pair and the loot. The rework's route, gates and new kit live in
+// tests/wildheart_basin_route.test.ts, _trash.test.ts and _dungeon.test.ts.
 
 import { describe, expect, it } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
@@ -10,10 +13,15 @@ import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
 import {
+  WILDHEART_BASIN_SPAWNS,
   WILDHEART_DUNGEON_DEFS,
   WILDHEART_ITEMS,
-  WILDHEART_MOBS,
 } from '../src/sim/content/wildheart';
+import {
+  JAGUAR_MAW,
+  WILDHEART_BASIN_FIELD,
+  WILDHEART_HEIGHTS,
+} from '../src/sim/content/wildheart_basin_layout';
 import {
   BUILTIN_WORLD,
   DUNGEON_OVERFLOW_X_BASE,
@@ -31,6 +39,7 @@ import {
   zoneAt,
 } from '../src/sim/data';
 import { onDungeonFinalBossKilledForDeeds } from '../src/sim/deeds';
+import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { enterDungeon, updateDoorTriggers } from '../src/sim/instances/dungeons';
 import {
   primaryStatBudget,
@@ -50,12 +59,6 @@ import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
 import { RUN_SPEED } from '../src/sim/types';
-import {
-  WILDHEART_FIELD_BOUNDS,
-  WILDHEART_FIELD_COLLIDER_SPECS,
-  WILDHEART_FIELD_PLACEMENTS,
-  wildheartFieldHeight,
-} from '../src/sim/wildheart_field';
 import { groundHeight } from '../src/sim/world';
 
 const WILDHEART_TEST_WORLD: WorldContent = {
@@ -84,35 +87,48 @@ describe('Wildheart Basin dungeon content', () => {
     expect(indices.filter((index) => index === def.index)).toHaveLength(1);
   });
 
-  it('defines five distinct, fully registered savage troll combat roles', () => {
-    expect(Object.keys(WILDHEART_MOBS).sort()).toEqual([
+  it('keeps the five shipped savage troll roles registered, with their own models', () => {
+    const TROLLS = [
       'wildheart_beastmaster',
       'wildheart_hexcaller',
       'wildheart_high_priest',
       'wildheart_ravager',
       'wildheart_stalker',
-    ]);
-    for (const id of Object.keys(WILDHEART_MOBS)) {
+    ];
+    for (const id of TROLLS) {
       expect(MOBS[id], `${id} reaches MOBS`).toBeDefined();
       expect(MOBS[id].family).toBe('troll');
       expect(MOBS[id].elite).toBe(true);
     }
     expect(MOBS.wildheart_stalker.petSpell?.name).toBe('Razorvine Spear');
     expect(MOBS.wildheart_ravager.bleed?.name).toBe('Bloodmane Rend');
-    expect(MOBS.wildheart_hexcaller.mendAlly?.name).toBe('Ancestral Sap');
-    expect(MOBS.wildheart_beastmaster).toMatchObject({ rare: true, ccImmune: true });
-    expect(MOBS.wildheart_beastmaster.warcry?.name).toBe('Call of the Hunt');
-    for (const id of Object.keys(WILDHEART_MOBS)) {
+    // The rework: Ancestral Sap is now an interruptible 2 s heal (the trash
+    // kit's mend), and the Beastmaster is a boss that spawns once, not a rare.
+    expect(MOBS.wildheart_hexcaller.trashKit?.mend?.name).toBe('Ancestral Sap');
+    expect(MOBS.wildheart_beastmaster.rare).toBeUndefined();
+    expect(MOBS.wildheart_beastmaster.ccImmune).toBe(true);
+    // Phase B: his whole kit (Call of the Hunt, Thickhide Ward, the Quake)
+    // rides encounters/wildheart_basin/beastmaster.ts, never a template field.
+    expect(MOBS.wildheart_beastmaster.warcry).toBeUndefined();
+    for (const id of TROLLS) {
       const visual = VISUALS[`mob_${id}`];
-      expect(visual?.yaw, `${id} faces the game +Z movement axis`).toBe(-Math.PI / 2);
+      // The Beastmaster's and Zulgar's art-guide bodies are authored facing
+      // +Z; the three Tripo trolls are turned onto it.
+      const artGuide = id === 'wildheart_beastmaster' || id === 'wildheart_high_priest';
+      const yaw = artGuide ? undefined : -Math.PI / 2;
+      expect(visual?.yaw, `${id} faces the game +Z movement axis`).toBe(yaw);
       expect(visual?.clips.run, `${id} carries its run clip`).toBe('Run');
     }
   });
 
   it('makes Zulgar the sole final boss with arena-scale mechanics and three epics', () => {
     const boss = MOBS.wildheart_high_priest;
-    expect(boss).toMatchObject({ boss: true, elite: true, ccImmune: true });
-    expect(boss.aoePulse?.name).toBe('Wildheart Pulse');
+    // Phase B: his control immunity is the encounter's (immune outside the
+    // hunt, slowable and rootable in it) and his Pulse a telegraphed bar
+    // (encounters/wildheart_basin/zulgar.ts), so neither is a template field.
+    expect(boss).toMatchObject({ boss: true, elite: true });
+    expect(boss.ccImmune).toBeUndefined();
+    expect(boss.aoePulse).toBeUndefined();
     expect(boss.knockback?.name).toBe('Jaguar Roar');
     expect(boss.enrage?.belowHpPct).toBe(0.3);
     // Scoped to Zulgar's own loot table: the Tier-2 loot pass added the rare
@@ -133,34 +149,39 @@ describe('Wildheart Basin dungeon content', () => {
     }
   });
 
-  it('populates both banks, two rare encounters, and one deepest shrine boss', () => {
+  it('places the whole route: Zulgar deepest, both wings, the Beastmaster once', () => {
     const spawns = WILDHEART_DUNGEON_DEFS.wildheart_basin.spawns;
-    expect(spawns).toHaveLength(20);
-    for (const spawn of spawns) expect(spawn.mobId.startsWith('wildheart_')).toBe(true);
-    expect(spawns.filter((spawn) => spawn.mobId === 'wildheart_beastmaster')).toHaveLength(2);
+    expect(spawns).toBe(WILDHEART_BASIN_SPAWNS);
+    expect(spawns.filter((spawn) => spawn.mobId === 'wildheart_beastmaster')).toHaveLength(1);
     const bosses = spawns.filter((spawn) => spawn.mobId === 'wildheart_high_priest');
     expect(bosses).toHaveLength(1);
     expect(bosses[0].z).toBe(Math.max(...spawns.map((spawn) => spawn.z)));
-    expect(spawns.some((spawn) => spawn.x < -20)).toBe(true);
-    expect(spawns.some((spawn) => spawn.x > 20)).toBe(true);
+    expect(spawns.some((spawn) => spawn.x < -60)).toBe(true);
+    expect(spawns.some((spawn) => spawn.x > 60)).toBe(true);
   });
 
-  it('keeps combat spawns inside the field and clear of blocking props', () => {
+  it('keeps combat spawns inside the field, on its floor and clear of blocking props', () => {
+    const { minX, maxX, minZ, maxZ } = WILDHEART_BASIN_FIELD.bounds;
+    const blocking = WILDHEART_BASIN_FIELD.props.filter((p) => (p.r ?? 0) > 0 || (p.hw ?? 0) > 0);
     for (const spawn of WILDHEART_DUNGEON_DEFS.wildheart_basin.spawns) {
-      expect(spawn.x).toBeGreaterThanOrEqual(WILDHEART_FIELD_BOUNDS.minX);
-      expect(spawn.x).toBeLessThanOrEqual(WILDHEART_FIELD_BOUNDS.maxX);
-      expect(spawn.z).toBeGreaterThanOrEqual(WILDHEART_FIELD_BOUNDS.minZ);
-      expect(spawn.z).toBeLessThanOrEqual(WILDHEART_FIELD_BOUNDS.maxZ);
+      expect(spawn.x).toBeGreaterThanOrEqual(minX);
+      expect(spawn.x).toBeLessThanOrEqual(maxX);
+      expect(spawn.z).toBeGreaterThanOrEqual(minZ);
+      expect(spawn.z).toBeLessThanOrEqual(maxZ);
+      expect(
+        authoredFieldHeight(WILDHEART_BASIN_FIELD, spawn.x, spawn.z),
+        `${spawn.mobId} at ${spawn.x},${spawn.z} stands over the gorge`,
+      ).toBeGreaterThan(WILDHEART_BASIN_FIELD.voidHeight);
       const clearance = Math.min(
-        ...WILDHEART_FIELD_COLLIDER_SPECS.map(
-          (spec) => Math.hypot(spawn.x - spec.x, spawn.z - spec.z) - spec.r,
+        ...blocking.map(
+          (p) => Math.hypot(spawn.x - p.x, spawn.z - p.z) - (p.r ?? Math.max(p.hw ?? 0, p.hd ?? 0)),
         ),
       );
-      expect(clearance, `${spawn.mobId} at ${spawn.x},${spawn.z}`).toBeGreaterThan(4);
+      expect(clearance, `${spawn.mobId} at ${spawn.x},${spawn.z}`).toBeGreaterThan(2);
     }
   });
 
-  it('spawns all five roles when a party claims the instance', () => {
+  it('spawns every placed role when a party claims the instance', () => {
     const sim = makeSim();
     const playerId = sim.addPlayer('warrior', 'Alpha');
     expect(enterDungeon(sim.ctx, 'wildheart_basin', playerId)).toBe(true);
@@ -173,7 +194,8 @@ describe('Wildheart Basin dungeon content', () => {
       .map((id) => sim.entities.get(id))
       .filter((entity): entity is Entity => !!entity)
       .map((entity) => entity.templateId);
-    for (const id of Object.keys(WILDHEART_MOBS)) expect(templates).toContain(id);
+    for (const id of new Set(WILDHEART_BASIN_SPAWNS.map((s) => s.mobId)))
+      expect(templates).toContain(id);
   });
 
   it('uses the overflow band without reclassifying any existing instance system', () => {
@@ -191,44 +213,41 @@ describe('Wildheart Basin dungeon content', () => {
     }
   });
 
-  it('routes collision and shared height through the Wildheart interior', () => {
+  it('routes collision and shared height through the Wildheart field record', () => {
     const origin = instanceOrigin(DUNGEONS.wildheart_basin.index, 0);
-    const spec = WILDHEART_FIELD_COLLIDER_SPECS.find(
-      (candidate) => candidate.kind === 'wildheart_mask_totem',
-    );
-    if (!spec) throw new Error('Wildheart mask totem collider is missing');
-    const probe = { x: origin.x + spec.x + 0.2, z: origin.z + spec.z };
+    const totem = WILDHEART_BASIN_FIELD.props.find((p) => p.kind === 'wb_totem');
+    if (!totem?.r) throw new Error('a Sunbone totem collider is missing');
+    const probe = { x: origin.x + totem.x + 0.2, z: origin.z + totem.z };
     const resolved = resolvePosition(1, probe.x, probe.z, 1);
     expect(Math.hypot(resolved.x - probe.x, resolved.z - probe.z)).toBeGreaterThan(0.5);
 
     for (const [x, z] of [
-      [0, -5],
-      [-37, 96],
-      [0, 132],
+      [0, -217],
+      [-18, -109],
+      [0, 16],
       [0, 213],
     ] as const) {
-      expect(groundHeight(origin.x + x, origin.z + z, 1)).toBeCloseTo(
-        wildheartFieldHeight(x, z),
-        10,
+      expect(groundHeight(origin.x + x, origin.z + z, 1)).toBe(
+        authoredFieldHeight(WILDHEART_BASIN_FIELD, x, z),
       );
     }
-    expect(wildheartFieldHeight(0, 213)).toBeGreaterThan(wildheartFieldHeight(0, 104) + 7);
+    // The shrine terrace stands far above the ford it overlooks.
+    expect(authoredFieldHeight(WILDHEART_BASIN_FIELD, 0, 213)).toBe(
+      WILDHEART_HEIGHTS.shrineTerrace,
+    );
+    expect(authoredFieldHeight(WILDHEART_BASIN_FIELD, -18, -109)).toBe(WILDHEART_HEIGHTS.ford);
   });
 
-  it('derives visible prop collisions from the single authored placement table', () => {
-    expect(WILDHEART_FIELD_PLACEMENTS.length).toBeGreaterThanOrEqual(45);
-    const blockingKinds = new Set(WILDHEART_FIELD_COLLIDER_SPECS.map((spec) => spec.kind));
-    expect(blockingKinds).toEqual(
-      new Set([
-        'wildheart_beast_den',
-        'wildheart_canopy_platform',
-        'wildheart_ancestor_ruin',
-        'wildheart_jaguar_gate',
-        'wildheart_jungle_canopy_tree',
-        'wildheart_mask_totem',
-        'wildheart_ritual_pyramid',
-      ]),
+  it('derives visible prop collisions from the single authored field record', () => {
+    const blocking = WILDHEART_BASIN_FIELD.props.filter(
+      (p) => (p.r ?? 0) > 0 || ((p.hw ?? 0) > 0 && (p.hd ?? 0) > 0),
     );
+    expect(blocking.length).toBeGreaterThanOrEqual(45);
+    // Ferns, palms, river stones and the floor glyphs are dressing only.
+    for (const p of WILDHEART_BASIN_FIELD.props) {
+      if (['wb_fern', 'wb_palm', 'wb_river_stones', 'wb_sun_glyph'].includes(p.kind))
+        expect(p.r ?? p.hw, p.kind).toBeUndefined();
+    }
   });
 
   it('ships Heroic tuning and an append-only normal plus Heroic deed pair', () => {
@@ -417,7 +436,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     ).toBeLessThan(0.3);
   });
 
-  it("pins Zulgar's roll groups: guaranteed uncommon sums to 1.0, wildheart_bonus to 0.18", () => {
+  it("pins Zulgar's roll groups: guaranteed uncommon sums to 1.0, wildheart_bonus to 0.30", () => {
     const loot = MOBS.wildheart_high_priest.loot ?? [];
     const groupSum = (group: string) =>
       loot.filter((e) => e.rollGroup === group).reduce((a, e) => a + e.chance, 0);
@@ -427,10 +446,12 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // each across a 13-item group; a 3-item pool matches the per-item rate, not
     // the group's total mass). Pinned per item, not only as the group sum: a
     // non-uniform re-tune (0.10/0.05/0.03) keeps the sum but breaks the rate.
+    // The three relocated Nythraxis pieces join the same roll at 0.04 each
+    // (2026-10-08, content/nythraxis_loot.ts).
     expect(loot.filter((e) => e.rollGroup === 'wildheart_bonus').map((e) => e.chance)).toEqual([
-      0.06, 0.06, 0.06,
+      0.06, 0.06, 0.06, 0.04, 0.04, 0.04,
     ]);
-    expect(groupSum('wildheart_bonus')).toBeCloseTo(0.18, 9);
+    expect(groupSum('wildheart_bonus')).toBeCloseTo(0.3, 9);
     expect(loot.some((e) => e.copper === 15000 && e.chance === 1)).toBe(true);
     expect(loot.some((e) => e.itemId === 'bone_fragments' && e.chance === 0.8)).toBe(true);
   });
@@ -455,8 +476,24 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     const gear = entries.filter(
       (entry) => entry.itemId && ITEMS[entry.itemId]?.slot && ITEMS[entry.itemId]?.kind !== 'bag',
     );
-    // Twelve former acquisitions plus the Paired Talons trinket (content/trinkets.ts).
-    expect(gear).toHaveLength(13);
+    // Twelve former acquisitions plus the Paired Talons trinket (content/trinkets.ts),
+    // less the two epics the rework moved to the Beastmaster (Bloodmane
+    // War-Legguards) and the Gorgebloom (Sunbone Oracle's Crown):
+    // tests/wildheart_loot.test.ts pins them there. The three Heroic copies of
+    // his relocated Nythraxis pieces joined on 2026-10-08, and his uncommon
+    // trio left on 2026-10-09 (Normal only): 11.
+    expect(gear).toHaveLength(11);
+    for (const id of [
+      'bloodmane_warleggings',
+      'vineclaw_stalking_breeches',
+      'sunbone_ritual_sarong',
+    ])
+      expect(
+        gear.some((entry) => entry.itemId === id),
+        id,
+      ).toBe(false);
+    expect(gear.some((entry) => entry.itemId === 'bloodmane_war_legguards')).toBe(false);
+    expect(gear.some((entry) => entry.itemId === 'sunbone_oracles_crown')).toBe(false);
     expect(gear.some((entry) => entry.itemId === 'paired_talons')).toBe(true);
     expect(gear.every((entry) => entry.rollGroup === 'wildheart_heroic')).toBe(true);
     expect(gear.reduce((sum, entry) => sum + entry.chance, 0)).toBe(1);
@@ -593,10 +630,10 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
       expect(inst.bossExitId, difficulty).not.toBeNull();
       const exit = sim.entities.get(inst.bossExitId as number) as Entity;
       expect(exit?.templateId, difficulty).toBe('dungeon_exit');
-      // At the authored terrace spot, clear of the pyramid collider disc.
+      // At the authored spot in the stone jaguar's maw behind the shrine.
       const origin = instanceOrigin(DUNGEONS.wildheart_basin.index, 0);
-      expect(exit.pos.x - origin.x).toBeCloseTo(0, 5);
-      expect(exit.pos.z - origin.z).toBeCloseTo(222, 5);
+      expect(exit.pos.x - origin.x).toBeCloseTo(JAGUAR_MAW.portal.x, 5);
+      expect(exit.pos.z - origin.z).toBeCloseTo(JAGUAR_MAW.portal.z, 5);
       // The claim owns it: freeInstance drops it with objectIds.
       expect(inst.objectIds).toContain(inst.bossExitId);
     }
@@ -652,24 +689,18 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     expect(walker.pos.x, 'the walker left the instance band').toBeLessThan(DUNGEON_X_THRESHOLD);
   });
 
-  it('keeps the jaguar-gate colliders inscribed: the arch and pylon flanks stay walkable', () => {
-    const gate = WILDHEART_FIELD_COLLIDER_SPECS.filter(
-      (spec) => spec.kind === 'wildheart_jaguar_gate',
-    );
-    // Six chained posts (three per pylon): solid along each pylon's depth, but
-    // never wider than the visible pillar. The old two-fat-circles version put
-    // a ~4.7yd invisible ring around each ~2.5yd post and blocked the open
-    // grass beside the gate (live-playtest "invisible wall").
-    expect(gate).toHaveLength(6);
-    for (const post of gate) expect(post.r).toBeLessThanOrEqual(2.7);
+  it('keeps the idol maw pylons inscribed: the landing between them stays walkable', () => {
+    const pylons = WILDHEART_BASIN_FIELD.props.filter((p) => p.kind === 'wb_maw_pylon');
+    // Two stone fangs framing the way out, each never wider than it looks
+    // (the old jaguar gate's fat circles were a live-playtest "invisible wall").
+    expect(pylons).toHaveLength(2);
+    for (const post of pylons) expect(post.r).toBeLessThanOrEqual(2.7);
     const origin = instanceOrigin(DUNGEONS.wildheart_basin.index, 0);
-    // Beside the east pylon (just past the pillar's push zone: post r 2.64 +
-    // body 0.5, the old fat circles blocked a player-sized body out past 19)
-    // and the arch center: a 1.2yd step in every direction must resolve
-    // without a collider push-back.
+    // The exit spot between them and the arrival: a 1.2 yd step in every
+    // direction resolves without a collider push-back.
     for (const [sx, sz] of [
-      [18.5, 17],
-      [0, 16],
+      [0, -228],
+      [0, -217],
     ] as const) {
       for (let a = 0; a < 8; a++) {
         const angle = (a / 8) * Math.PI * 2;

@@ -62,12 +62,13 @@ export const BANK_EXPANSION_PRICES: readonly number[] = [
 export const BANK_PURCHASED_SLOTS_MAX = BANK_EXPANSION_PRICES.length * BANK_EXPANSION_SLOTS;
 
 /** The most bonus slots the server's entitlement registry can grant: +2 email,
- *  +2 Discord, +2 wallet, +2 per qualified referral capped at 5 (+10), so 16.
+ *  +2 Discord, +2 wallet, +2 per qualified referral capped at 5 (+10), and
+ *  +20 for the permanent second completed-card reward, so 36.
  *  This is the load-path clamp for `bonusSlots` (a tampered save must not mint
  *  capacity the registry cannot grant). The server-side registry ceiling is pinned
  *  equal to this constant (tests/bank_entitlements.test.ts), so a future source
  *  (X, Twitch) bumps BOTH in the same change or that tripwire goes red. */
-export const BANK_MAX_BONUS_SLOTS = 16;
+export const BANK_MAX_BONUS_SLOTS = 36;
 
 /** Bank bag sockets: a second, independent way to grow the bank, sitting as a
  *  tier ABOVE the twelve-rung slot ladder (which is grandfathered untouched).
@@ -463,6 +464,12 @@ export function bankDeposit(
     ctx.error(meta.entityId, 'You cannot store quest items in the bank.');
     return;
   }
+  // Lent gear (the muster pike, src/sim/muster_pike.ts) is not the player's to store: the
+  // lender takes it back, and a banked copy would outlive the loan.
+  if (ITEMS[slot.itemId]?.lentGear) {
+    ctx.error(meta.entityId, 'You cannot store borrowed gear in the bank.');
+    return;
+  }
   let selectedSources: MaterialComposition | undefined;
   if (selection !== undefined) {
     if (selection.itemId !== slot.itemId || selection.target.slotIndex !== slotIndex) return;
@@ -705,9 +712,15 @@ export function bankGrantStorageSlots(
  *  the NEXT expansion, null once every expansion has been purchased. */
 export function bankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
   const r = ctx.resolve(pid);
+  if (!r || !nearBanker(ctx, r.e)) return null;
+  return personalBankInfoFor(ctx, pid);
+}
+
+/** Owned-bank projection for admitted courier custody and the ordinary banker gate. */
+export function personalBankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
+  const r = ctx.resolve(pid);
   if (!r) return null;
-  const { meta, e: p } = r;
-  if (!nearBanker(ctx, p)) return null;
+  const { meta } = r;
   const bank = meta.bank;
   const purchases = Math.floor(bank.purchasedSlots / BANK_EXPANSION_SLOTS);
   const nextExpansionCost =

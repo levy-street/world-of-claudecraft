@@ -1,0 +1,94 @@
+{
+  "recordedAt": "2026-10-06T23:56:33.795Z",
+  "node": "v26.7.0",
+  "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+  "notes": [
+    "Local diagnostic, not an end-to-end tick SLA.",
+    "Movement batches use the production updateCourier with narrow live context fixtures.",
+    "Bank read uses 1000 identity-bearing stacks, a tolerated over-capacity stress shape.",
+    "Exchange times include actual movement, three personal-bank projections, both ledger diffs and immutable outbox serialization; setup and durable SQL saves excluded.",
+    "Refusal stress starts 1000 couriers at their banker with 24 withdrawal selections each, over 20 fixed ticks."
+  ],
+  "movementBatches": {
+    "1000": {
+      "samples": 200,
+      "meanMs": 0.04701900000000151,
+      "p95Ms": 0.05850000000000932,
+      "maxMs": 0.8777000000000044
+    },
+    "5000": {
+      "samples": 200,
+      "meanMs": 0.21790950000000223,
+      "p95Ms": 0.2692000000000121,
+      "maxMs": 1.5641999999999996
+    }
+  },
+  "smallCollections": {
+    "poseOnly": {
+      "samples": 1000,
+      "meanMs": 0.0002765000000001692,
+      "p95Ms": 0.0003000000000383807,
+      "maxMs": 0.013899999999978263
+    },
+    "unchanged": {
+      "samples": 1000,
+      "meanMs": 0.0005014999999989982,
+      "p95Ms": 0.0006999999999948159,
+      "maxMs": 0.014600000000029922
+    }
+  },
+  "bank1000": {
+    "cold": {
+      "samples": 200,
+      "meanMs": 0.08627249999999834,
+      "p95Ms": 0.099899999999991,
+      "maxMs": 0.44439999999997326
+    },
+    "heavyPayloadBytes": 70999,
+    "unchanged": {
+      "samples": 1000,
+      "meanMs": 0.0005123000000006073,
+      "p95Ms": 0.0006000000000199179,
+      "maxMs": 0.011800000000050659
+    },
+    "unchangedHeavyReads": 0,
+    "unrelatedInventoryRevision": {
+      "samples": 1000,
+      "meanMs": 0.0003911000000004492,
+      "p95Ms": 0.0004999999999881766,
+      "maxMs": 0.010400000000004184
+    },
+    "unrelatedHeavyReads": 0,
+    "movingPose": {
+      "samples": 1000,
+      "meanMs": 0.0006157000000014818,
+      "p95Ms": 0.0008000000000265572,
+      "maxMs": 0.01290000000000191
+    },
+    "movingHeavyReads": 0,
+    "poseOnly": {
+      "samples": 1000,
+      "meanMs": 0.0001438999999995758,
+      "p95Ms": 0.0002000000000066393,
+      "maxMs": 0.015000000000043201
+    },
+    "unrelatedPlayers": 5000,
+    "unrelatedEntities": 5000
+  },
+  "admittedFull24ExchangeBank1000": {
+    "samples": 50,
+    "meanMs": 1.9358820000000014,
+    "p95Ms": 2.64530000000002,
+    "maxMs": 3.626100000000008,
+    "retainedRows": 24
+  },
+  "refusedArrivals1000Over20Ticks": {
+    "samples": 20,
+    "meanMs": 0.2882999999999868,
+    "p95Ms": 0.9216999999999871,
+    "maxMs": 1.5877000000000407,
+    "admissionCalls": 1000,
+    "expectedCalls": 1000
+  },
+  "sqlCalls": 0
+}

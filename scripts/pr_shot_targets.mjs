@@ -6908,12 +6908,12 @@ export const TARGETS = [
   // The Wildheart Basin's light grade: the caldera used to add its own fill
   // pair to the world scene (a light census change that relinked every
   // material for the rest of the session); the grade now lives in
-  // interior_light_rig.ts's wildheartField state. A lighting comparison, so
+  // interior_light_rig.ts's wildheartBasin state. A lighting comparison, so
   // the shot keeps the app's default preset rather than the standing lowest.
   {
     key: 'wildheart-basin-light-rig',
     label: 'Wildheart Basin: the caldera grade through the one sun/hemi pair',
-    when: ['render/wildheart_props', 'render/interior_light_rig'],
+    when: ['render/wildheart_basin/', 'render/interior_light_rig'],
     variants: [{ key: 'desktop' }],
     async capture(page) {
       const entered = await page.evaluate(() => {
@@ -14347,6 +14347,79 @@ export const TARGETS = [
         Boolean(document.querySelector('#quest-dialog [data-profession-preview]')),
       );
       if (!hasPreview) throw new Error('attunement preview line missing from the quest detail');
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
+    key: 'quest-reward-choice',
+    label: 'Choose-one quest reward cards at turn-in (Wolves at the Gate, Marshal Redbrook)',
+    when: [
+      'ui/hud/quest/quest_reward_choice_view',
+      'ui/hud/quest/quest_dialog_controller',
+      'sim/content/quest_choice_rewards',
+    ],
+    // A warrior (the offline default) wears every armor weight, so the turn-in
+    // shows every card with the spec default checked. The quest is forced ready
+    // in the offline log (its collect items in the bags) and the player parked
+    // beside the quest's turn-in NPC (the marshal by default). The old-wolf
+    // variant shoots The Old Wolf, whose authored Greyjaw's Pelt Leggings sit in
+    // the same list as the band set; the olen variant a dungeon-boss quest, whose
+    // authored blue sits beside the rares generated for the other roles.
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'compact', mobile: true, tier: 'compact', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'old-wolf-desktop',
+        quest: { id: 'q_greyjaw', counts: [1], collect: 'greyjaw_fang' },
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'olen-desktop',
+        quest: { id: 'q_olen', counts: [1], npc: 'scout_maren' },
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      const quest = variant.quest ?? { id: 'q_wolves', counts: [8] };
+      const questId = quest.id;
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      if (variant.mobile) await enterTouchTier(page, variant.tier);
+      const setup = await page.evaluate((quest) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const npcId = quest.npc ?? 'marshal_redbrook';
+        const marshal = [...sim.entities.values()].find(
+          (e) => e.kind === 'npc' && e.templateId === npcId,
+        );
+        if (!marshal) return { ok: false, reason: `no ${npcId} entity` };
+        if (quest.collect) sim.addItem(quest.collect, 1);
+        sim.questLog.set(quest.id, { questId: quest.id, counts: quest.counts, state: 'ready' });
+        const p = sim.player;
+        p.pos = sim.groundPos(marshal.pos.x + 1.5, marshal.pos.z);
+        p.prevPos = { ...p.pos };
+        sim.rebucket?.(p);
+        game.hud.openQuestDialog(marshal.id);
+        return { ok: true };
+      }, quest);
+      if (!setup.ok) throw new Error(`quest-reward-choice setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#quest-dialog'))) throw new Error('quest dialog did not open');
+      await page.evaluate((questId) => {
+        document.querySelector(`#quest-dialog [data-quest="${questId}"]`)?.click();
+      }, questId);
+      await wait(600);
+      await sweepOverlays(page, 4);
+      // The dialog focuses the checked card, whose focus opens its tooltip; drop
+      // focus and park the pointer so the shot shows the whole card grid.
+      await page.mouse.move(2, 2);
+      await page.evaluate(() => {
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      });
+      await wait(400);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
       return { clip: '#quest-dialog' };
     },
   },

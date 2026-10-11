@@ -161,6 +161,7 @@ const INDEX_SECTIONS = [
   'talents',
   'modals and dropdown',
   'vendor',
+  'courier',
   'bags',
   'social',
   'map',
@@ -217,7 +218,12 @@ const INDEX_SECTIONS = [
   // bar (components.css); both load in both entries.
   "World PvP (the merged PvP window's flag tab)",
   'King of the Hill (the in-zone bar over the standing hill)',
+  // The Sunken Bastion's Iron Cage escape prompt (src/ui/hud/dungeon/).
+  "Iron Cage escape (the Gaol Turnkey's button-mash prompt)",
   'ui library (shared primitives)',
+  // The WOC character-creation face builder (shell.css); the barrel loads it
+  // in both entries.
+  'woc face builder',
 ];
 
 // The two index-only sections play.html does not ship, so its count is 58 (plus the
@@ -229,15 +235,19 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 74 index + 72 play sections, no duplicate names', () => {
+  it('pins a non-vacuous manifest: 75 index + 73 play sections, no duplicate names', () => {
     // The World Quests branch's vehicle bar and music override sections (72 / 70)
     // plus World PvP (the flag tab) and King of the Hill (src/ui/hud/hill/), one
-    // components.css section each in both entries: 74 / 72.
-    expect(INDEX_SECTIONS.length).toBe(74);
-    expect(PLAY_SECTIONS.length).toBe(72);
-    expect(MANIFEST.length).toBe(74);
-    expect(new Set(INDEX_SECTIONS).size).toBe(74);
-    expect(new Set(PLAY_SECTIONS).size).toBe(72);
+    // components.css section each in both entries: 74 / 72. The courier
+    // window adds one shared section (75 / 73), and the character branch's WOC
+    // face builder (shell.css, in both entries) another: 76 / 74 on the v0.45.0
+    // integration.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 77, 75.
+    expect(INDEX_SECTIONS.length).toBe(77);
+    expect(PLAY_SECTIONS.length).toBe(75);
+    expect(MANIFEST.length).toBe(77);
+    expect(new Set(INDEX_SECTIONS).size).toBe(77);
+    expect(new Set(PLAY_SECTIONS).size).toBe(75);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

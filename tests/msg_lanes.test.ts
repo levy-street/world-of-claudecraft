@@ -94,10 +94,14 @@ describe('lane constants hold the R5 budget literals', () => {
   });
 });
 
-describe('the name-screen lane takes exactly the three matcher-running commands', () => {
-  it('pet_rename and guild_create always, perfect_item only when a name field rides', () => {
+describe('the name-screen lane takes exactly the matcher-running commands', () => {
+  it('pet and buddy renames and guild_create always, perfect_item only with a name', () => {
     expect(classifyMsgLane({ t: 'cmd', cmd: 'pet_rename', name: 'Rex' })).toBe('name_screen');
     expect(classifyMsgLane({ t: 'cmd', cmd: 'pet_rename' })).toBe('name_screen');
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'buddy_rename', id: 7, name: 'Rex' })).toBe(
+      'name_screen',
+    );
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'buddy_rename' })).toBe('name_screen');
     // The guild-name screen (Phase 18): paidGuildCreation screens the name
     // through isNameOffensive before any row (server/social.ts), the same
     // pre-sim matcher cost as pet_rename, so it rides this lane with or
@@ -119,7 +123,7 @@ describe('the name-screen lane takes exactly the three matcher-running commands'
   });
 
   it('an UNNAMED perfect_item attempt stays on the command lane, as does everything else', () => {
-    // pet_rename and guild_create are the two command names that classify
+    // Pet and buddy renames and guild_create classify
     // here on their own (each always screens); the every-other-command sweep
     // below excludes them by name. The other guild verbs run no screen.
     expect(classifyMsgLane({ t: 'cmd', cmd: 'guild_invite', name: 'Rowan' })).toBe('command');
@@ -160,10 +164,10 @@ describe('classifyMsgLane mirrors the dispatch switch', () => {
   it('classifies every other dispatched command into the command lane', () => {
     for (const name of COMMAND_NAMES) {
       if (name === 'chat' || name === 'telemetry' || name === 'challengeResponse') continue;
-      // pet_rename and guild_create always screen player text, so they own the
+      // Pet and buddy renames and guild_create screen player text, so they own the
       // name-screen lane (pinned by name above); every other command,
       // perfect_item included when it carries no name, is the command lane.
-      if (name === 'pet_rename' || name === 'guild_create') continue;
+      if (name === 'pet_rename' || name === 'buddy_rename' || name === 'guild_create') continue;
       expect(classifyMsgLane({ t: 'cmd', cmd: name })).toBe('command');
     }
   });

@@ -1246,10 +1246,16 @@ describe('client HTML shell', () => {
     // lives in the pure preview_framing.ts constants and is applied on construction;
     // the exact numbers are pinned decisively in tests/preview_framing.test.ts.
     expect(characterPreviewTs).toContain('this.applyFraming(PREVIEW_FRAMING.sheet);');
-    expect(characterPreviewTs).toContain('this.camera.position.set(LIVE_PREVIEW_X, f.y, f.z);');
+    // A fixed framing always rides the centered x: applyFraming hands
+    // LIVE_PREVIEW_X to applyPose, which places the camera on that x and aims it
+    // along the same x, so the model is never slid or turned off the stage
+    // center. Only the face builder's close-up reaches applyPose with another x
+    // (creationFocusPose, pinned in tests/woc_head_builder_model.test.ts).
     expect(characterPreviewTs).toContain(
-      'this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, f.lookY, 0));',
+      'this.applyPose({ x: LIVE_PREVIEW_X, y: f.y, z: f.z, lookY: f.lookY });',
     );
+    expect(characterPreviewTs).toContain('this.camera.position.set(p.x, p.y, p.z);');
+    expect(characterPreviewTs).toContain('this.camera.lookAt(new THREE.Vector3(p.x, p.lookY, 0));');
   });
 
   it('offers the quest log in the mobile controls drawer', () => {

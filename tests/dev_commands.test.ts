@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { BUDDY_KEYS } from '../src/sim/content/buddies';
 import { FARM_CROP_IDS } from '../src/sim/content/farm_crops';
 import { FARM_BED_IDS, farmBedById } from '../src/sim/content/farm_patches';
 import { WORLD_QUEST_MIN_LEVEL } from '../src/sim/content/world_quests';
@@ -522,6 +523,31 @@ describe('/dev bg (Thornhollow Fields force-start)', () => {
     });
     sim.chat('/dev bg');
     expect(sim.bgMatchFor(sim.playerId)).toBeNull();
+  });
+
+  it('/dev buddies collects every catalog companion outright, no items involved', () => {
+    const sim = devSim();
+    const meta = sim.players.get(sim.playerId);
+    if (!meta) throw new Error('missing player meta');
+
+    sim.chat('/dev buddies');
+
+    expect(sim.ownedBuddies().length).toBe(BUDDY_KEYS.length);
+    expect(sim.ownedBuddies()).toEqual(['horse', 'crystal_lich', 'forgemaw', 'sapling']);
+    expect(meta.buddies).not.toHaveProperty('cosmetics');
+    expect(meta.inventory.some((s) => s.itemId.startsWith('whistle_'))).toBe(false);
+  });
+
+  it('/dev buddy <key> stages one companion as a boss-roll win that reveals on the walk away', () => {
+    const sim = devSim();
+    const meta = sim.players.get(sim.playerId);
+    if (!meta) throw new Error('missing player meta');
+    sim.chat('/dev buddy crystal_lich');
+    expect(meta.buddies.pending.map((p) => p.key)).toEqual(['crystal_lich']);
+    expect(sim.ownedBuddies()).toEqual([]);
+    sim.player.pos.x += 100;
+    for (let i = 0; i < 25 && !sim.ownedBuddies().includes('crystal_lich'); i++) sim.tick();
+    expect(sim.ownedBuddies()).toEqual(['crystal_lich']);
   });
 
   it('freezes every mob in place with no aggro, and releases on off', () => {

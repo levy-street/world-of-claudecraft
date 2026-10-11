@@ -34,7 +34,10 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_reroll'; quest: string }
   | { cmd: 'world_quest_weekly_choose'; quest: string }
   | { cmd: 'world_quest_weekly_commend'; faction: string }
-  | { cmd: 'clue_hunt_abandon' };
+  | { cmd: 'clue_hunt_abandon' }
+  | { cmd: 'lance_brace' }
+  | { cmd: 'lance_thrust' }
+  | { cmd: 'lance_release' };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {

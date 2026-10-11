@@ -576,6 +576,216 @@ const mergeStringsEn = {
       hoard_cast_mimic_bite: 'Voracious Bite',
       hoard_cast_mimic_leap: 'Crushing Leap',
       hoard_cast_coin_spit: 'Cursed Coins',
+      // The Hollow Crypt trash kit (src/sim/mob/trash_kit/cast_ids.ts). The bolt,
+      // the raise, the call and the shriek can be kicked; the rest are dodged.
+      crypt_grave_bolt: 'Grave Bolt',
+      crypt_raise_bones: 'Raise Bones',
+      crypt_murder_call: 'Murder Call',
+      crypt_stone_shriek: 'Stone Shriek',
+      crypt_grave_cleave: 'Grave Cleave',
+      crypt_barrowflame_breath: 'Barrowflame Breath',
+      crypt_tail_lash: 'Tail Lash',
+      crypt_wing_gust: 'Wing Gust',
+      // The crypt trash mechanics pass (trash_kit/crypt_kit.ts): the rupture and
+      // the eye can be kicked; the crush and the web are dodged.
+      crypt_grave_rupture: 'Grave Rupture',
+      crypt_carrion_eye: 'Carrion Eye',
+      crypt_marrow_crush: 'Marrow Crush',
+      crypt_rimesilk_spit: 'Rimesilk Spit',
+      // The trash pass's second wave: the adept's volley can be kicked.
+      crypt_gravespark_volley: 'Gravespark Volley',
+      // The Hollow Crypt finale (encounters/hollow_crypt/ids.ts): Morthen's
+      // entrance at the Rite Ring and the Knellwyrm. None can be kicked.
+      crypt_morthen_rite_wakes: 'The Rite Wakes',
+      crypt_morthen_rise: 'Rise of the Gravecaller',
+      crypt_morthen_proclaim: 'Grave Proclamation',
+      crypt_morthen_descend: 'Descent',
+      crypt_knellwyrm_arrive: 'Descending from the Sky',
+      crypt_knellwyrm_pyre_strafe: 'Pyre Strafe',
+      crypt_knellwyrm_strafe_run: 'Strafing Run',
+      crypt_knellwyrm_dread_bellow: 'Dread Bellow',
+      // The Hollow Crypt's wing bosses (encounters/hollow_crypt). The Dirge can
+      // be kicked; the Unbroken Verse (heroic) and the rest cannot.
+      crypt_marrow_shovelful: 'Shovelful',
+      crypt_marrow_measure: 'Measured for the Grave',
+      crypt_marrow_burial_toll: 'Burial Toll',
+      crypt_marrow_gravediggers_blow: "Gravedigger's Blow",
+      crypt_lady_brides_lament: "Bride's Lament",
+      crypt_lady_frozen_embrace: 'Frozen Embrace',
+      crypt_lady_embrace_hold: 'Frozen Embrace',
+      crypt_lady_bridal_freeze: 'Bridal Freeze',
+      crypt_ilvane_dirge: 'Dirge of the Hollow',
+      crypt_ilvane_unbroken_dirge: 'Unbroken Verse',
+      crypt_ilvane_bone_organ: 'Bone Organ',
+      // Morthen the Gravecaller's bars (encounters/hollow_crypt/morthen_ids.ts),
+      // the players' own relight bar on a Remembrance Candle, and the
+      // Knellwyrm's heroic Burning Knell flight (every phase reads as the
+      // mechanic). None can be kicked.
+      crypt_morthen_shadow_pulse: 'Shadow Pulse',
+      crypt_morthen_rite_of_the_unquiet: 'Rite of the Unquiet',
+      crypt_morthen_reap_the_unquiet: 'Reap the Unquiet',
+      kituse_crypt_relight_candle: 'Relight the Candle',
+      crypt_knellwyrm_knell_rise: 'Burning Knell',
+      crypt_knellwyrm_knell_mark: 'Burning Knell',
+      crypt_knellwyrm_knell_breath: 'Burning Knell',
+      crypt_knellwyrm_knell_land: 'Burning Knell',
+      // The Sunken Bastion trash kit and boss casts (trash_kit/bastion_cast_ids.ts,
+      // encounters/sunken_bastion/ids.ts). The Mend and the Ward can be kicked.
+      bastion_brine_mend: 'Brine Mend',
+      bastion_fog_ward: 'Fog Ward',
+      bastion_halberd_sweep: 'Halberd Sweep',
+      bastion_piercing_bolt: 'Piercing Bolt',
+      bastion_claw_sweep: 'Claw Sweep',
+      bastion_shell_slam: 'Shell Slam',
+      ghost_captain_broadside: 'Spectral Broadside',
+      ghost_captain_anchor: 'Cursed Anchor',
+      ghost_captain_boarding: 'Phantom Boarding',
+      // The Bastion trash mechanics pass (trash_kit/bastion_kit.ts): the fog and
+      // the column can be kicked; the hook is dodged.
+      bastion_boathook: 'Boathook Drag',
+      bastion_fog_bank: 'Fog Bank',
+      bastion_brine_column: 'Brine Column',
+      // The trash pass's second wave: the sergeant's shout can be kicked.
+      bastion_loose_on_my_mark: 'Loose on My Mark',
+      bastion_oathbound_charge: 'Oathbound Charge',
+      bastion_gaolers_cudgel: "Gaoler's Cudgel",
+      bastion_mist_surge: 'Mist Surge',
+      bastion_drowning_hymn: 'Drowning Hymn',
+      // The Bastion's fifth pass: the Gaol Turnkey's cage, Ossick's anchor and
+      // shackles, and Vael the reaper's crossing and scythe. None can be kicked.
+      bastion_iron_cage: 'Iron Cage',
+      bastion_drowned_anchor_cast: 'Drowned Anchor',
+      bastion_shackle_pair: 'Shackle Pair',
+      bastion_shadowstep: 'Shadow Crossing',
+      bastion_reaping_scythe: 'Reaping Scythe',
+      // The Fog Veil's figures rising out of the roof (Wordy, M16: fills).
+      bastion_veil_rise: 'Fog Veil',
+      // Vael's entrance and the fog gathering before each veil.
+      bastion_veil_gather: 'Gathering Fog',
+      bastion_vael_rise: 'Death Rises',
+      bastion_vael_sink: 'Into the Fog',
+      // Olen the fallen paladin's casts (encounters/sunken_bastion/olen.ts).
+      bastion_hallowed_brine: 'Hallowed Brine',
+      bastion_rebounding_bulwark: 'Rebounding Bulwark',
+      bastion_tide_sentence: 'Sentence of the Tide',
+      bastion_oath_kneel: 'Unbroken Oath',
+      bastion_oath_vigil: 'Unbroken Oath',
+      // The Drowned Temple trash kit and boss casts (trash_kit/temple_cast_ids.ts,
+      // encounters/drowned_temple/ids.ts). The Lullaby, the Call and the Coil
+      // can be kicked.
+      temple_lullaby: 'Lullaby',
+      // Laverock's song at the Moon Altar (the dungeon guide's finale channel).
+      cantor_last_verse: 'The Last Verse',
+      temple_call_the_tide: 'Call the Tide',
+      temple_static_coil: 'Static Coil',
+      temple_snapper_snap: 'Snap',
+      temple_trident_sweep: 'Trident Sweep',
+      temple_sea_song: 'Sea-Song',
+      temple_tidal_slap: 'Tidal Slap',
+      temple_tide_breath: 'Freezing Breath',
+      temple_moonlight_lance: 'Moonlight Lance',
+      temple_prism_flare: 'Prism Flare',
+      temple_resonant_slam: 'Resonant Slam',
+      // The caster pass: Selthe's bolt and aria can be kicked, her surge and
+      // the Colossus's fracture cannot.
+      temple_moonwater_bolt: 'Moonwater Bolt',
+      temple_drowning_aria: 'Drowning Aria',
+      temple_mere_surge: 'Mere Surge',
+      temple_tideglass_fracture: 'Tideglass Fracture',
+      temple_undertow: 'Undertow',
+      temple_lunar_tide: 'Lunar Tide',
+      // The Temple's sixth pass: the trash's second jobs (the Mending and the
+      // Venom can be kicked) and the Mere Hydra's water and wave.
+      temple_skewering_trident: 'Skewering Trident',
+      temple_pale_mending: 'Pale Mending',
+      temple_glimmer_venom: 'Glimmer Venom',
+      // The Moonmantle Ray's wingbeat (the cast id kept from the Pearl Slam).
+      temple_pearl_slam: 'Tidal Wingbeat',
+      temple_lightning_spit: 'Lightning Spit',
+      temple_crushing_torrent: 'Crushing Torrent',
+      temple_hydra_tsunami: 'Tsunami',
+      temple_ysolei_call: 'Moonspawn Call',
+      temple_ysolei_wrath: 'Drowned Wrath',
+      // The Temple encounter pass: the Mere Hydra's Combined Breath and Ysolei
+      // calling the moon. None of them can be kicked.
+      temple_frostlocked_torrent: 'Frostlocked Torrent',
+      temple_venom_current: 'Venom Current',
+      temple_toxic_rime: 'Toxic Rime',
+      temple_beckoning_moon: 'Beckoning Moon',
+      temple_falling_moon: 'Falling Moon',
+      // The Temple trash mechanics pass (trash_kit/temple_cast_ids.ts). The
+      // Arcing Spark can be kicked; the Prism Glare cannot (turn your back).
+      temple_prism_glare: 'Prism Glare',
+      temple_arcing_spark: 'Arcing Spark',
+      // The trash pass's second wave: the siren's song can be kicked.
+      temple_call_of_the_shallows: 'Call of the Shallows',
+      // The Wildheart Basin rework (trash_kit/wildheart_cast_ids.ts,
+      // encounters/wildheart_basin/ids.ts). Only Ancestral Sap can be kicked.
+      wildheart_ancestral_sap: 'Ancestral Sap',
+      wildheart_plant_totem: 'Plant Totem',
+      wildheart_entangling_lash: 'Entangling Lash',
+      wildheart_saurian_tail_swipe: 'Tail Swipe',
+      wildheart_saurian_stomp: 'Earthshaking Stomp',
+      // The Wildheart trash mechanics pass (trash_kit/wildheart_cast_ids.ts).
+      // The War Roar and the Toad Hex can be kicked; the rest cannot.
+      wildheart_quarry_mark: 'Quarry Mark',
+      wildheart_war_roar: 'War Roar',
+      wildheart_toad_hex: 'Toad Hex',
+      wildheart_rattling_dread: 'Rattling Dread',
+      wildheart_snaring_tongue: 'Snaring Tongue',
+      // The Wildheart Basin's three bosses (encounters/wildheart_basin). None
+      // of these bars can be kicked.
+      wildheart_beast_pit_quake: 'Beast Pit Quake',
+      wildheart_jaguar_heel: 'Heel!',
+      wildheart_gorgebloom_seed_rain: 'Seed Rain',
+      wildheart_gorgebloom_vine_lash: 'Vine Lash',
+      wildheart_gorgebloom_gorge: 'Gorge',
+      wildheart_zulgar_pulse: 'Wildheart Pulse',
+      wildheart_zulgar_spirit_hunt: 'Spirit of the Hunt',
+      // The Gravewyrm Sanctum rework (trash_kit/sanctum_cast_ids.ts,
+      // encounters/gravewyrm_sanctum/ids.ts). Warming Rite and Goad can be kicked.
+      sanctum_cinder_breath: 'Cinder Breath',
+      sanctum_warming_rite: 'Warming Rite',
+      sanctum_goad: 'Goad',
+      sanctum_plant_brazier: 'Plant Soul Brazier',
+      sanctum_ice_block_toss: 'Ice Block Toss',
+      sanctum_tusker_tusk_sweep: 'Tusk Sweep',
+      sanctum_tusker_trample: 'Trample',
+      // The Sanctum trash mechanics pass (trash_kit/sanctum_cast_ids.ts). Thaw
+      // the Held and Branding Iron can be kicked.
+      sanctum_thaw_the_held: 'Thaw the Held',
+      sanctum_counterweight_lash: 'Counterweight Lash',
+      sanctum_branding_iron: 'Branding Iron',
+      sanctum_rime_breath: 'Rime Breath',
+      // The player's own bar while kicking a Soul Brazier over (the trash
+      // engine's G3 use, trash_kit/encounter_use.ts).
+      kituse_sanctum_topple_brazier: 'Topple Brazier',
+      // The trash engine's dev-only demonstration kit (trash_kit/engine_demo.ts):
+      // the nova (kickable), its every-third unstoppable twin, and the orb launch.
+      trash_demo_nova: 'Test Nova',
+      trash_demo_nova_unstoppable: 'Test Nova',
+      trash_demo_walker: 'Test Orb',
+      // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts). Only the
+      // Goadsmith's heroic Re-rivet can be kicked.
+      sanctum_korgath_maul_arc: 'Maul Arc',
+      sanctum_korgath_chain_flail: 'Chain Flail',
+      sanctum_korgath_threshold_charge: 'Threshold Charge',
+      sanctum_korgath_foremans_bellow: "Foreman's Bellow",
+      sanctum_korgath_strain: 'Strain',
+      sanctum_korgath_stomp: 'Shuddering Stomp',
+      sanctum_goadsmith_rerivet: 'Re-rivet',
+      // Grand Necromancer Velkhar (encounters/gravewyrm_sanctum/velkhar.ts).
+      sanctum_velkhar_soulfire_trench: 'Soulfire Trench',
+      sanctum_velkhar_shadow_volley: 'Shadow Volley',
+      // Korzul the Gravewyrm (encounters/gravewyrm_sanctum/korzul.ts). None of
+      // his bars can be kicked.
+      sanctum_korzul_break_free: 'Break Free',
+      sanctum_korzul_grave_breath: 'Grave Breath',
+      sanctum_korzul_tail_sweep: 'Tail Sweep',
+      sanctum_korzul_grave_inferno: 'Grave Inferno',
+      sanctum_korzul_wing_gale: 'Wing Gale',
+      sanctum_korzul_plunging_fire: 'Plunging Fire',
+      sanctum_korzul_crashing_descent: 'Crashing Descent',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
@@ -595,6 +805,8 @@ const mergeStringsEn = {
       scroll: 'Scroll',
       bag: 'Bag',
       mount: 'Mount',
+      buddy: 'Buddy',
+      buddyCosmetic: 'Buddy cosmetic',
     },
     tooltip: {
       ...itemNames.en.itemUi.tooltip,
@@ -669,6 +881,10 @@ const mergeStringsEn = {
     social: {
       title: 'Social',
       friendsTab: 'Friends',
+      friendFirstPage: 'First page',
+      friendNextPage: 'Next page',
+      boundFriend: 'Bound friend',
+      boundFriendLink: 'Bound friends are linked by their referral invitation.',
       guildTab: 'Guild',
       ignoreTab: 'Ignore',
       leaveParty: 'Leave Party',
@@ -1542,6 +1758,10 @@ export const mergeStrings = {
       social: {
         title: '社交',
         friendsTab: '好友',
+        friendFirstPage: '首页',
+        friendNextPage: '下一页',
+        boundFriend: '绑定好友',
+        boundFriendLink: '绑定好友通过邀请链接建立关系。',
         guildTab: '公会',
         ignoreTab: '忽略',
         leaveParty: '离开队伍',
@@ -1720,6 +1940,10 @@ export const mergeStrings = {
       social: {
         title: '社交',
         friendsTab: '好友',
+        friendFirstPage: '首頁',
+        friendNextPage: '下一頁',
+        boundFriend: '綁定好友',
+        boundFriendLink: '綁定好友透過邀請連結建立關係。',
         guildTab: '公會',
         ignoreTab: '忽略',
         leaveParty: '離開隊伍',
@@ -1900,6 +2124,10 @@ export const mergeStrings = {
       social: {
         title: '소셜',
         friendsTab: '친구',
+        friendFirstPage: '첫 페이지',
+        friendNextPage: '다음 페이지',
+        boundFriend: '연결된 친구',
+        boundFriendLink: '연결된 친구는 초대 링크를 통해 연결됩니다.',
         guildTab: '길드',
         ignoreTab: '차단',
         leaveParty: '파티 떠나기',
@@ -2080,6 +2308,10 @@ export const mergeStrings = {
       social: {
         title: 'ソーシャル',
         friendsTab: 'フレンド',
+        friendFirstPage: '最初のページ',
+        friendNextPage: '次のページ',
+        boundFriend: '絆のフレンド',
+        boundFriendLink: '絆のフレンドは招待リンクで結ばれています。',
         guildTab: 'ギルド',
         ignoreTab: '無視',
         leaveParty: 'パーティを抜ける',
@@ -2435,6 +2667,10 @@ export const mergeStrings = {
       social: {
         title: 'Общение',
         friendsTab: 'Друзья',
+        friendFirstPage: 'Первая страница',
+        friendNextPage: 'Следующая страница',
+        boundFriend: 'Связанный друг',
+        boundFriendLink: 'Связанные друзья объединены приглашением по реферальной ссылке.',
         guildTab: 'Гильдия',
         ignoreTab: 'Игнор',
         leaveParty: 'Покинуть группу',
@@ -4038,7 +4274,7 @@ const mergeExtraEn = {
       'Glimmerscale Lurker',
       'Moonspawn',
       'Pale Choir Acolyte',
-      'Pearlguard Sentinel',
+      'Moonmantle Ray',
       'Sethrael the Palecoil',
       'Fire Demon',
       'Void Demon',

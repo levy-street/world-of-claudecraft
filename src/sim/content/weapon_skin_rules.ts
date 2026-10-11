@@ -95,6 +95,8 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   drownedmoon_maul: 'mace',
   nhalias_bell_maul: 'mace',
   fenshadow_maul: 'mace',
+  foremans_barrowmaul: 'mace',
+  craterglass_stave: 'staff',
   gravewyrm_thornmaul: 'mace',
   maul_of_the_scourged_wilds: 'mace',
   wildsoul_maul: 'mace',
@@ -162,6 +164,12 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   staff_of_the_last_spring: 'staff',
   forgefire_spire: 'staff',
   wand_of_quenched_sparks: 'wand',
+  // A pike IS a polearm, and this row is what makes the two authorities agree: the render
+  // side already tags its model `VAR_POLEARM` (characters/assets.ts), and an unclassified
+  // weapon here reads as null, which is the mismatch tests/weapon_skins.test.ts catches. No
+  // skin targets polearms, so this is classification only, never new cosmetic surface.
+  skerrits_shardpike: 'polearm',
+  muster_shardpike: 'polearm',
   // Faction quartermaster epics (content/faction_vendors.ts).
   riftwarden_voidblade: 'sword',
   dawnkeeper_consecrated_mace: 'mace',
@@ -171,6 +179,24 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   vanguard_oath_blade: 'sword',
   vanguard_fang_dagger: 'dagger',
   vanguard_warstaff: 'staff',
+  // The five-dungeon rework's weapons (the *_items.ts module of each dungeon).
+  // A spade reads as a two-hand axe, the Tunnelking's Spade precedent.
+  sextons_spadehaft: 'axe',
+  sextons_burial_spade: 'axe',
+  rimeweb_fang: 'dagger',
+  knight_commanders_longsword: 'sword',
+  gaolyard_cudgel: 'mace',
+  tideglass_shiv: 'dagger',
+  tideglass_warmaul: 'mace',
+  falls_blessed_staff: 'staff',
+  hammer_of_the_open_lock: 'mace',
+  // The lower dungeons' normal blues (the same *_items.ts modules): the two
+  // caster rods read as wands, the shank as a dagger.
+  gravecallers_rod: 'wand',
+  turnkeys_shank: 'dagger',
+  fogbinders_rod: 'wand',
+  merecleaver: 'axe',
+  moonwrack_stave: 'staff',
 };
 
 /**

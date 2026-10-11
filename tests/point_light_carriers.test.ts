@@ -502,10 +502,22 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   'render/night_features.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/point_light_carriers.ts': 'the carriers themselves, the only lights three gathers',
+  'render/hollow_crypt/crypt_lights.ts':
+    'the Hollow Crypt lanterns, braziers and soul light, pushed through the fireLights adopter sink the interiors are handed',
+  'render/drowned_temple/temple_lights.ts':
+    'the Drowned Temple braziers, moon orbs, tidepools, the conch, the prism and the altar, pushed through the fireLights adopter sink the interiors are handed',
+  'render/wildheart_basin/basin_lights.ts':
+    'the Wildheart Basin Sunbone braziers and the jaguar eyes, pushed through the fireLights adopter sink the interiors are handed',
+  'render/gravewyrm_sanctum/sanctum_lights.ts':
+    'the Gravewyrm Sanctum braziers, soul brazier, Thaw Works soul pyres and the vault thaw pyres, pushed through the fireLights adopter sink the interiors are handed',
+  'render/sunken_bastion/bastion_lights.ts':
+    'the Sunken Bastion lanterns, braziers, fog-fire and the Fogbeacon lamp, pushed through the fireLights adopter sink the interiors are handed',
   'render/props.ts':
     'campfire and prop fire lights, the seed of the fireLights registry, mass hidden in the constructor',
   'render/quest_objects.ts':
     'the ground-object glow inside the entity view body, a view light marked on reconcile',
+  'render/sanctum_seal_gate.ts':
+    'the Seal Gate rune light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/realm_flora.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/soulwell.ts':
@@ -515,8 +527,6 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'fall and impact lights handed to registerBudgetPointLight, born hidden, marked on the rank rebuild',
   'render/weapon_vfx.ts':
     'weapon-skin light: in the world a hidden view light marked on reconcile; in a preview canvas the only point lights of that scene, all driven live together',
-  'render/wildheart_props.ts':
-    'the Wildheart fire light, pushed through the fireLights adopter sink the interiors are handed',
   'render/wyrmwatch_harbor_house.ts':
     'the Harbormaster House hearth and lantern lights, pushed into the props fireLights by buildProps and mass hidden with them',
   'render/yumi_maze.ts': 'maze brazier lights pushed through the fireLights adopter sink',
@@ -597,9 +607,19 @@ describe('every point-light producer is a carrier source', () => {
       'render/ability_vfx/ground_auras.ts: slot.mesh',
       'render/ability_vfx/rings.ts: mesh',
       'render/ability_vfx/rings.ts: slot.mesh',
+      // The Drowned Temple's Hydra Pool water: a mesh hook reading the drain
+      // (the Prism Stair gate's openness), never a scene.
+      'render/drowned_temple/temple_landmarks.ts: water',
       'render/gather_nodes.ts: target',
       'render/goblin_rocket_sled_fx.ts: inner',
       'render/goblin_rocket_sled_fx.ts: outer',
+      // The Gravewyrm Sanctum: mesh hooks, never a scene: the gates reading
+      // the gate memory (the ice walls shattering, the chain grates rising,
+      // the Chain Bridge falling taut, the wards failing) and the sky dome,
+      // the interior's frame driver (the Calving Face's story, the chains,
+      // the shard's light on the dome and the peaks).
+      'render/gravewyrm_sanctum/sanctum_gates.ts: m',
+      'render/gravewyrm_sanctum/sanctum_sky.ts: mesh',
       // Mesh hooks, never a scene (the 2026-09-28 release/v0.44.0 merge into
       // feature/buried-hoards): the hoard entrance's rim clock and light cards,
       // and the reward chest's cards, motes and pool clock.
@@ -611,6 +631,13 @@ describe('every point-light producer is a carrier source', () => {
       'render/jail_scene.ts: swirl',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
+      // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
+      // the idle sweep or to Vael's lamp yaw, never a scene.
+      'render/sunken_bastion/bastion_beacon.ts: mesh',
+      // The Wildheart Basin's gates: mesh hooks reading the gate memory (the
+      // vine bridges weaving, the thorn walls sinking, the wards failing),
+      // never a scene.
+      'render/wildheart_basin/basin_gates.ts: m',
     ]);
 
     expect(sourceOf('render/light_pulses.ts')).toContain('markPointLightSource(light);');
@@ -633,6 +660,10 @@ describe('every point-light producer is a carrier source', () => {
       'render/characters/makeup.ts',
       'render/characters/rig_merge.ts',
       'render/characters/stubble.ts',
+      // a merged stand-in takes the pieces it folds out of the render lists (mask 0) and
+      // puts their own masks back: never a layer a camera does not already see
+      'render/characters/woc_armor_merge.ts',
+      'render/characters/woc_head_merge.ts',
       'render/gather_nodes.ts',
       'render/point_light_carriers_core.ts',
     ]);

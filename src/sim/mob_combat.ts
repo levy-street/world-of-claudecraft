@@ -1,3 +1,5 @@
+import { BODY_EDGE_MELEE_REACH } from './combat/player_attack_reach';
+import { MOBS } from './data';
 import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
 import { MELEE_RANGE } from './types';
 
@@ -102,6 +104,15 @@ function buildCombatProfileForMob(templateId: string, scale: number): MobCombatP
       meleeRange: scaledDefaultMobMeleeRange(scale),
       desiredRange: 4.5,
     };
+  // The Drowned Temple's Tidewisp bursts only within its detonate reach
+  // (2.2 yd, trashKit.detonate): on the stock profile it settled at 4 yd and
+  // pawed a standing player forever, never bursting. A seeker closes to touch.
+  if (templateId === 'tidewisp')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: 3,
+      desiredRange: 1.2,
+    };
   if (templateId === 'wildheart_ravager')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,
@@ -137,6 +148,28 @@ function buildCombatProfileForMob(templateId: string, scale: number): MobCombatP
       meleeRange: scaledDefaultMobMeleeRange(2.275),
       desiredRange: 5,
     };
+  // Balgath, the Mirefen world boss at scale 4.2. One departure from the scaled default,
+  // and it is what the fight needs rather than what the body measures: the scaled default
+  // settles him at 11.7 yards and he simply STOPS there, swinging from outside his own
+  // silhouette at a target he never closes on. That is the wildheart/grubjaw lesson one
+  // size up and it is worse here, because at his reach the standoff is wide enough that
+  // the raid never sees him take a step, which reads as a statue with a health bar. 9 is
+  // contact for a body this size, so he walks all the way in.
+  //
+  // He deliberately KEEPS canLeash. He walks a warpath (mob/warpath.ts), a circuit of
+  // landmarks across the zone, and the obvious way to stop the 45-yard tether pulling him
+  // home mid-run is to turn it off. That was tried and it is wrong: an untethered open
+  // world boss can be dragged anywhere by one kiting player and never comes back, since
+  // nothing else in this fight ever returns him. Instead the warpath REFRESHES his leash
+  // anchor while he travels, so the tether follows his circuit and then re-tightens
+  // around whichever landmark he stopped at. Untethered where he is supposed to be
+  // moving, tethered everywhere else.
+  if (templateId === 'balgath_cyclops')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(4.2),
+      desiredRange: 9,
+    };
   if (templateId === 'wildheart_beastmaster')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,
@@ -153,6 +186,18 @@ function buildCombatProfileForMob(templateId: string, scale: number): MobCombatP
       meleeRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE),
       desiredRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE) * 0.8,
     };
+  // A towering boss with an authored body (MobTemplate.bodyRadius): its swing
+  // reaches one yard past where a player's melee reaches it, so nobody hits
+  // it from outside its own reach, and it settles at its body's edge.
+  const body = MOBS[templateId]?.bodyRadius;
+  if (body !== undefined && body > 0) {
+    const reach = Math.max(scaledDefaultMobMeleeRange(scale), body + BODY_EDGE_MELEE_REACH + 1);
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: reach,
+      desiredRange: Math.min(reach - 1, body + 1.5),
+    };
+  }
   return {
     ...DEFAULT_MOB_COMBAT_PROFILE,
     meleeRange: scaledDefaultMobMeleeRange(scale),

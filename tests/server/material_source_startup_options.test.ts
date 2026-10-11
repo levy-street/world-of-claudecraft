@@ -22,6 +22,10 @@ const h = vi.hoisted(() => {
   const clientConfigs: Record<string, unknown>[] = [];
   const query = vi.fn((sql: string) => {
     const text = String(sql);
+    // Empty legacy edge tables still return a completed checkpoint row.
+    if (String(sql).includes('UPDATE account_social_migration_progress SET')) {
+      return Promise.resolve({ rows: [{ complete: true }], rowCount: 1 });
+    }
     // The boot refuses unless every connection announces the capability.
     if (text.includes('woc.material_source_writer')) {
       return Promise.resolve({ rows: [{ capability: '1' }], rowCount: 1 });

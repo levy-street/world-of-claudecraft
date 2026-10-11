@@ -1,0 +1,56 @@
+{
+  "class": "balgath_eye_ward",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "iconSize": 128,
+  "sourcePacks": [
+    "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs"
+  ],
+  "runtimeDir": "public/ui/status",
+  "abilities": [
+    {
+      "abilityId": "eye_ward_sealed",
+      "sourcePack": "woc_openai_balgath_eye_ward_status_icons_2026_08_20",
+      "sourceFile": "tmp/codex/mirefen-boss-icons/raw/eye_ward_sealed.png",
+      "output": "eye_ward_sealed.webp",
+      "source": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Balgath's cyclopean stone eye clamped completely shut by a heavy granite eyelid and cold iron bands, with no light escaping.",
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square fantasy MMORPG world-boss status badge, designed to float above a moving grey stone boss and remain unmistakable at 24px\nPrimary request: paint the sealed refractory state of Balgath's single cyclopean eye, instantly readable as \"closed, do not attack\"\nScene/backdrop: deep charcoal-blue black painted ground with soft dark vignette corners, matching the dark wet barrow-stone atmosphere of the World of ClaudeCraft Shardpike mechanic icons\nSubject: one enormous near-symmetrical cyclopean stone eye motif filling the square; the eye is fully shut beneath one heavy dead-grey granite eyelid, clamped by two thick cold-iron bands, with a blunt horizontal stone seam across the center; absolutely no iris is visible and no light escapes\nStyle/medium: premium hand-painted classic fantasy MMO status icon matching the World of ClaudeCraft Shardpike skill art; bold simplified silhouette, tactile wet granite and cold iron, crisp focal edges, restrained energetic brushwork\nComposition/framing: extreme close crop, centered single motif, dominant heavy horizontal clamp silhouette with a clearly closed seam; simple enough to read while moving at 24px; opaque artwork fills the square\nLighting/mood: coldest and darkest icon in the family, low contrast near-monochrome dead grey granite and blue-black cold iron, oppressive and inert\nConstraints: the eye must read fully closed and mechanically sealed; no teal, cyan, green, glow, luminous cracks, visible eyeball, pupil, open socket, shattered crystal, fragments, text, letters, numbers, pseudo-writing, runes, border, UI frame, chrome, transparency, watermark, signature, split sheet, collage, photorealism, flat vector glyph, or cartoon outline"
+    },
+    {
+      "abilityId": "eye_ward_open",
+      "sourcePack": "woc_openai_balgath_eye_ward_status_icons_2026_08_20",
+      "sourceFile": "tmp/codex/mirefen-boss-icons/raw/eye_ward_open.png",
+      "output": "eye_ward_open.webp",
+      "source": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Balgath's cyclopean stone eye held wide open around one intact bright teal faceted Loomshard crystal iris.",
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square fantasy MMORPG world-boss status badge, designed to float above a moving grey stone boss and remain unmistakable at 24px\nPrimary request: paint the warded but unsealed state of Balgath's single cyclopean eye, instantly readable as \"the target is available to be put out\"\nScene/backdrop: deep charcoal-blue black painted ground with soft dark vignette corners, matching the dark wet barrow-stone atmosphere of the World of ClaudeCraft Shardpike mechanic icons\nSubject: one enormous near-symmetrical cyclopean stone eye motif filling the square; wet grey granite upper and lower lids are drawn wide apart into a clean intact almond silhouette; at the exact center is one whole, unbroken, sharply faceted teal Loomshard crystal iris with a small dark pupil; thin controlled teal light spills from the intact socket\nStyle/medium: premium hand-painted classic fantasy MMO status icon matching the World of ClaudeCraft Shardpike skill art; bold simplified silhouette, tactile wet granite, crisp focal edges, restrained energetic brushwork\nComposition/framing: extreme close crop, centered single motif, unmistakable intact open-eye silhouette with smooth stone lids and one complete crystal iris; simple enough to read while moving at 24px; opaque artwork fills the square\nLighting/mood: inviting and alert rather than dangerous; medium-high contrast teal-cyan #76e0d8 and #5fe8d2 against wet grey granite, contained glow, clearly dimmer than the blinded rupture state\nConstraints: the eye must read wide open, alert, intact, symmetrical, and available; keep the crystal iris whole and teal-cyan; no pale-green light, no near-white blast, no rupture, no shattered iris, no fragments, no radial explosion, no closed seam, no iron clamp, text, letters, numbers, pseudo-writing, runes, border, UI frame, chrome, transparency, watermark, signature, split sheet, collage, photorealism, flat vector glyph, or cartoon outline"
+    },
+    {
+      "abilityId": "eye_ward_blinded",
+      "sourcePack": "woc_openai_balgath_eye_ward_status_icons_2026_08_20",
+      "sourceFile": "tmp/codex/mirefen-boss-icons/raw/eye_ward_blinded.png",
+      "output": "eye_ward_blinded.webp",
+      "source": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Balgath's cyclopean stone eye violently ruptured, its crystal iris shattered as brilliant pale-green light blasts through radial cracks.",
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square fantasy MMORPG world-boss status badge, designed to float above a moving grey stone boss and remain unmistakable at 24px\nPrimary request: paint the blinded vulnerable state of Balgath's single cyclopean eye, instantly readable as \"burn now, full damage\"\nScene/backdrop: deep charcoal-black painted ground with soft dark vignette corners, matching the wet barrow-stone atmosphere and explosive impact energy of the World of ClaudeCraft Shardpike thrust icon\nSubject: one enormous cyclopean stone eye motif filling the square, now cracked wide and violently ruptured; the central crystal iris is unmistakably shattered into several large angular fragments around a blown-out hollow core; brilliant pale-green light blasts outward through thick radial cracks in the surrounding broken granite socket\nStyle/medium: premium hand-painted classic fantasy MMO status icon matching the World of ClaudeCraft Shardpike skill art; bold simplified silhouette, tactile broken wet granite, sharp focal fragments, vigorous painterly energy\nComposition/framing: extreme close crop, centered single motif, jagged asymmetric radial starburst silhouette that is decisively different from the smooth intact open eye; large readable shattered pieces and thick cracks, not fine detail; simple enough to read while moving at 24px; opaque artwork fills the square\nLighting/mood: by far the brightest icon in the family, maximum contrast; hot pale green #7fd06a rising to near-white at the core, blasting through dark stone; distinctly yellow-green rather than teal or cyan\nConstraints: the eye must read ruptured, shattered, and vulnerable now; make the shattered crystal and radial broken-stone silhouette obvious; dominant hue is hot pale green to near-white; no intact teal iris, no cyan-dominant glow, no smooth whole eye, no closed seam, no iron clamp, no blood, gore, text, letters, numbers, pseudo-writing, runes, border, UI frame, chrome, transparency, watermark, signature, split sheet, collage, photorealism, flat vector glyph, or cartoon outline"
+    }
+  ],
+  "generatedBatches": [
+    {
+      "name": "balgath-eye-ward-status-icons-2026-08-20",
+      "generator": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "artDirection": "Three original borderless painted dark-fantasy MMORPG world-boss status badges using one cyclopean stone eye and sharply separated silhouettes, hues, and brightness: sealed is a cold iron clamp, open is an intact cyan-teal eye, and blinded is a brilliant pale-green rupture.",
+      "abilityIds": [
+        "eye_ward_sealed",
+        "eye_ward_open",
+        "eye_ward_blinded"
+      ]
+    }
+  ]
+}

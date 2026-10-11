@@ -18,6 +18,7 @@
 import { supportHeightAt } from '../colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import {
+  DUNGEON_FLOOR_Y,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
@@ -28,8 +29,14 @@ import {
   MOBS,
   NPCS,
 } from '../data';
+import { tickDungeonGuides } from '../dungeon_guide';
+import { tickTempleEncounters } from '../encounters/drowned_temple';
+import { tickSanctumEncounters } from '../encounters/gravewyrm_sanctum';
+import { tickCryptEncounters } from '../encounters/hollow_crypt';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
+import { tickBastionEncounters } from '../encounters/sunken_bastion';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
+import { tickWildheartEncounters } from '../encounters/wildheart_basin';
 import { createGroundObject, createMob, createNpc } from '../entity';
 import { updateIgnivarForgeLift } from '../ignivar_forge_lift';
 import {
@@ -42,6 +49,8 @@ import {
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { updateIgnivarRaidProgression } from '../ignivar_raid_progression';
+import { placeOnPatrolPoint, stampDungeonPatrol } from '../mob/patrol';
+import { tickTrashKits } from '../mob/trash_kit';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from '../raid_rooms';
@@ -60,12 +69,14 @@ import {
   NYTHRAXIS_ROOM_RADIUS,
   type Vec3,
 } from '../types';
+import { setCombatWalls } from './combat_wall_state';
 import {
   applyDungeonMobTuning,
   claimDifficultyForDungeon,
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from './difficulty';
+import { tickDungeonGates } from './dungeon_gates';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
 import {
   IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS,
@@ -174,7 +185,8 @@ export function spawnBossExitPortal(ctx: SimContext, mob: Entity): void {
   const dungeon = DUNGEONS[inst.dungeonId];
   const portal = dungeon?.bossExitPortal;
   if (!portal) return;
-  if (mob.templateId !== HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId) return;
+  if (mob.templateId !== (portal.after ?? HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId))
+    return;
   const origin = instanceOrigin(dungeon.index, inst.slot);
   const exit = createGroundObject(
     ctx.nextId++,
@@ -965,6 +977,9 @@ function claimInstance(
   inst.raidReturnKeys = new Set();
   inst.raidBossWelcomeKeys = new Set();
   const origin = instanceOriginOf(inst);
+  // A fresh claim starts with no combat wall in the process-wide collision
+  // view (another world may have left one in this slot: combat_wall_state.ts).
+  setCombatWalls(origin.x, origin.z, []);
   const mobDifficultyTuningId = dungeon.mobDifficultyTuningId ?? inst.dungeonId;
   for (const spawn of dungeon.spawns) {
     const template = MOBS[spawn.mobId];
@@ -987,6 +1002,23 @@ function claimInstance(
     mob.facing = spawn.facing ?? Math.PI; // most packs face the entrance; authored set-pieces may override
     mob.prevFacing = mob.facing;
     if (spawn.idleStationary) mob.idleStationary = true; // hand-placed pack holds formation
+    if (spawn.patrol) {
+      mob.dungeonPatrol = stampDungeonPatrol(spawn.patrol, origin.x, origin.z);
+      // A ground patroller starts on its patrol point for the claim's clock.
+      placeOnPatrolPoint(ctx, mob);
+    }
+    // A perched placement waits on its perch (mob/trash_kit): on it from the start.
+    if (spawn.perch) {
+      const perchY = DUNGEON_FLOOR_Y + spawn.perch.y;
+      mob.perchY = perchY;
+      mob.pos.y = perchY;
+      mob.prevPos.y = perchY;
+    }
+    // A flying patrol starts on the wing.
+    if (mob.dungeonPatrol?.flightY !== undefined) {
+      mob.pos.y = mob.dungeonPatrol.flightY;
+      mob.prevPos.y = mob.dungeonPatrol.flightY;
+    }
     ctx.addEntity(mob);
     inst.mobIds.push(mob.id);
   }
@@ -1473,6 +1505,24 @@ export function awardHeroicMarks(
 // player's entity outside the claim footprint on purpose. Covered end to end
 // by tests/dungeon_instance_disconnect_reset.test.ts.
 export function updateInstances(ctx: SimContext): void {
+  // In-dungeon gates and seals follow their packs and bosses every tick.
+  tickDungeonGates(ctx);
+  // Dungeon trash kits (bolts, raises, leaps, dives, landings), after the mob AI.
+  tickTrashKits(ctx);
+  // The Sunken Bastion's boss fights (encounters/sunken_bastion), same slot.
+  tickBastionEncounters(ctx);
+  // The Drowned Temple's boss fights (encounters/drowned_temple), same slot.
+  tickTempleEncounters(ctx);
+  // The Wildheart Basin's encounters (encounters/wildheart_basin), same slot.
+  tickWildheartEncounters(ctx);
+  // The Gravewyrm Sanctum's encounters (encounters/gravewyrm_sanctum), same slot.
+  tickSanctumEncounters(ctx);
+  // The Hollow Crypt's finale (encounters/hollow_crypt): Morthen's entrance
+  // and the Knellwyrm, same slot.
+  tickCryptEncounters(ctx);
+  // The optional lore guides (dungeon_guide): after every encounter, so a boss
+  // pulled or killed this tick already reads as such. Draws no shared rng.
+  tickDungeonGuides(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
   updateIgnivarForgeLift(ctx);

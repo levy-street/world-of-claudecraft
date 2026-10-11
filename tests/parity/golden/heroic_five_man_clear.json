@@ -10,13 +10,13 @@
     "awardHeroicMarks on a five-man heroic kill: marksPerParticipant to every participant, plus the gravewyrm_sanctum:heroic daily lockout",
     "class:warrior"
   ],
-  "draws": 63,
-  "drawDigest": "2cb65480",
+  "draws": 69,
+  "drawDigest": "0249f6ce",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1010,
+      "nextId": 1011,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,12 +30,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1037,
-      "state": "51878938",
-      "events": "d25cd5af",
+      "nextId": 1093,
+      "state": "cd6b7468",
+      "events": "b49fc288",
       "rng": {
-        "draws": 21,
-        "digest": "7cbdb21a"
+        "draws": 62,
+        "digest": "86e69dc4"
       },
       "label": "claimed",
       "players": [
@@ -59,6 +59,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -79,7 +82,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -140,88 +143,9 @@
             ]
           },
           "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {
-              "partiesJoined": 1
-            },
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "spring_water"
-            ]
+          "buddies": {
+            "names": {}
           },
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1011,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "factionCurrencies": {},
-          "factions": {},
-          "gatheringProficiency": {},
-          "gliderRecords": {},
-          "harvestPreference": {
-            "kind": "all"
-          },
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            }
-          ],
-          "lifetimeXp": 167200,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "vaultAttemptDurable": true,
-          "worldQuestReplacements": {},
-          "wyrmfallDaily": {}
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -304,6 +228,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -386,6 +313,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -406,6 +336,91 @@
           "delveClears": {},
           "delveDaily": {},
           "entityId": 1014,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
+          "gatheringProficiency": {},
+          "gliderRecords": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
+          "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "partiesJoined": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1015,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -461,7 +476,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -471,11 +486,10 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1062,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -488,8 +502,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1110
+            "z": -1042
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -522,58 +535,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.6,
-          "fiveSecondRule": 99,
-          "healPower": 41,
-          "hp": 665,
-          "id": 1011,
-          "kind": "player",
-          "level": 20,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 665,
-          "maxResource": 1506,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 101497,
-            "y": 0.6,
-            "z": -1116
-          },
-          "potionCooldownUntil": -1,
-          "resource": 1506,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 41,
-          "stats": {
-            "agi": 12,
-            "armor": 133,
-            "int": 82,
-            "spi": 60,
-            "sta": 52,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
@@ -588,9 +549,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 101499,
-            "y": 0.6,
-            "z": -1116
+            "x": 101497,
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -624,7 +584,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
@@ -639,9 +598,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 101501,
-            "y": 0.6,
-            "z": -1116
+            "x": 101499,
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -675,7 +633,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
@@ -690,9 +647,57 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
+            "x": 101501,
+            "z": -1048
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 52,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99,
+          "healPower": 41,
+          "hp": 665,
+          "id": 1015,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 665,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
             "x": 101503,
-            "y": 0.6,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -727,17 +732,16 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 13138,
-          "id": 1033,
-          "infernoTimer": 30,
+          "hp": 36785,
+          "id": 1077,
+          "idleStationary": true,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
-          "maxHp": 13138,
-          "mechanicDamageMult": 19,
+          "maxHp": 36785,
+          "mechanicDamageMult": 2.5,
           "mechanicHealMult": 4,
           "moveSpeed": 8,
           "onGround": true,
@@ -745,15 +749,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "potionCooldownUntil": -1,
           "slowImmune": true,
           "spawnPos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "stats": {
             "armor": 857
@@ -770,12 +772,12 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1037,
-      "state": "87fecd66",
-      "events": "cf99e425",
+      "nextId": 1121,
+      "state": "ca77c832",
+      "events": "1bb04e7b",
       "rng": {
-        "draws": 63,
-        "digest": "2cb65480"
+        "draws": 69,
+        "digest": "0249f6ce"
       },
       "label": "death",
       "players": [
@@ -799,10 +801,13 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 14138,
+            "damageDealt": 37785,
             "kills": 1,
             "xpGained": 98
           },
@@ -810,7 +815,7 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 14138,
+              "damageDealt": 37785,
               "dungeonFinalBossKills": 1,
               "fullPartyDungeonClears": 1,
               "kills": 1,
@@ -896,7 +901,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1006,214 +1011,9 @@
             ]
           },
           "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 1771,
-            "deaths": 1,
-            "xpGained": 98
+          "buddies": {
+            "names": {}
           },
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {
-              "deaths": 1,
-              "dungeonFinalBossKills": 1,
-              "fullPartyDungeonClears": 1,
-              "kills": 1,
-              "partiesJoined": 1
-            },
-            "dungeonClears": {
-              "gravewyrm_sanctum:heroic": 1
-            },
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "heroic_mark",
-              "spring_water",
-              "wyrmfall_core"
-            ],
-            "visited": [
-              "quality:rare"
-            ]
-          },
-          "deedsEarned": [
-            [
-              "cmb_first_blood",
-              ""
-            ],
-            [
-              "cmb_first_fall",
-              ""
-            ],
-            [
-              "col_first_rare",
-              ""
-            ],
-            [
-              "dgn_gravewyrm_sanctum",
-              ""
-            ],
-            [
-              "dgn_gravewyrm_sanctum_heroic",
-              ""
-            ],
-            [
-              "dgn_korzul_flawless",
-              ""
-            ],
-            [
-              "dgn_sanctum_speed",
-              ""
-            ],
-            [
-              "feat_era_cap",
-              ""
-            ],
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_level_cap",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ],
-            [
-              "soc_first_party",
-              ""
-            ],
-            [
-              "soc_full_house",
-              ""
-            ]
-          ],
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1011,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "factionCurrencies": {},
-          "factions": {},
-          "gatheringProficiency": {},
-          "gliderRecords": {},
-          "harvestPreference": {
-            "kind": "all"
-          },
-          "heroicDaily": {
-            "date": "reset:1",
-            "marked": [
-              "gravewyrm_sanctum"
-            ]
-          },
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
-            },
-            {
-              "count": 2,
-              "itemId": "wyrmfall_core",
-              "materialSources": [
-                {
-                  "count": 2,
-                  "source": {}
-                }
-              ]
-            }
-          ],
-          "lifetimeXp": 167298,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "raidLockouts": [
-            [
-              "gravewyrm_sanctum:heroic",
-              86400000
-            ]
-          ],
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "renown": 150,
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "vaultAttemptDurable": true,
-          "weeklyRewards": {
-            "bossUnlocks": {
-              "korzul_the_gravewyrm": 2
-            },
-            "dungeons": [
-              2
-            ],
-            "raidUnlocks": [
-              0,
-              0,
-              0
-            ],
-            "raids": [
-              0,
-              0,
-              0
-            ],
-            "resetAtMs": 604800000
-          },
-          "worldQuestReplacements": {},
-          "wyrmfallDaily": {
-            "sources": [
-              "gravewyrm_sanctum:heroic"
-            ]
-          }
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -1415,6 +1215,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -1616,6 +1419,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -1796,6 +1602,210 @@
               "gravewyrm_sanctum:heroic"
             ]
           }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "fullPartyDungeonClears": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "gravewyrm_sanctum:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_gravewyrm_sanctum",
+              ""
+            ],
+            [
+              "dgn_gravewyrm_sanctum_heroic",
+              ""
+            ],
+            [
+              "dgn_korzul_flawless",
+              ""
+            ],
+            [
+              "dgn_sanctum_speed",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ],
+            [
+              "soc_full_house",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1015,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
+          "gatheringProficiency": {},
+          "gliderRecords": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "gravewyrm_sanctum"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "gravewyrm_sanctum:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 145,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "vaultAttemptDurable": true,
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "gravewyrm_sanctum:heroic"
+            ]
+          }
         }
       ],
       "entities": [
@@ -1810,7 +1820,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -1820,11 +1830,10 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
-          "id": 1010,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1838,8 +1847,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1110
+            "z": -1042
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -1867,55 +1875,6 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "dead": true,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fiveSecondRule": 99.05,
-          "healPower": 41,
-          "id": 1011,
-          "inCombat": true,
-          "kind": "player",
-          "level": 20,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 665,
-          "maxResource": 1506,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 101497,
-            "z": -1116
-          },
-          "potionCooldownUntil": -1,
-          "resource": 1506,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 41,
-          "stats": {
-            "agi": 12,
-            "armor": 133,
-            "int": 82,
-            "spi": 60,
-            "sta": 52,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
           "combatTimer": 99.05,
           "comboUntil": -1,
           "critChance": 0.056,
@@ -1935,8 +1894,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 101499,
-            "z": -1116
+            "x": 101497,
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -1984,8 +1943,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 101501,
-            "z": -1116
+            "x": 101499,
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -2033,8 +1992,57 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
+            "x": 101501,
+            "z": -1048
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 52,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99.05,
+          "healPower": 41,
+          "hp": 665,
+          "id": 1015,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 665,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
             "x": 101503,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -2067,11 +2075,11 @@
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1010",
               "entity:1011",
               "entity:1012",
               "entity:1013",
-              "entity:1014"
+              "entity:1014",
+              "entity:1015"
             ],
             "token": {}
           },
@@ -2081,39 +2089,37 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1033,
+          "id": 1077,
+          "idleStationary": true,
           "inCombat": true,
-          "infernoTimer": 30,
           "kind": "mob",
           "leashAnchor": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "level": 22,
           "loot": {
-            "copper": 89018,
+            "copper": 117290,
             "items": [
               {
                 "count": 1,
-                "itemId": "gravewyrm_cleaver"
+                "itemId": "shroud_of_the_gravewyrm"
               }
             ]
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [
-            1010,
             1011,
             1012,
             1013,
-            1014
+            1014,
+            1015
           ],
           "lootable": true,
-          "maxHp": 13138,
-          "mechanicDamageMult": 19,
+          "maxHp": 36785,
+          "mechanicDamageMult": 2.5,
           "mechanicHealMult": 4,
           "moveSpeed": 8,
           "onGround": true,
@@ -2121,21 +2127,106 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.95,
+          "sanctumFight": {
+            "breathTimer": 6,
+            "galeTimer": 20,
+            "infernoTimer": 20,
+            "kind": "korzul",
+            "phase": "slain",
+            "plates": [
+              {
+                "objectId": 1102,
+                "state": "sound"
+              },
+              {
+                "objectId": 1103,
+                "state": "broken"
+              },
+              {
+                "objectId": 1104,
+                "state": "sound"
+              },
+              {
+                "objectId": 1105,
+                "state": "sound"
+              },
+              {
+                "objectId": 1106,
+                "state": "sound"
+              },
+              {
+                "objectId": 1107,
+                "state": "sound"
+              },
+              {
+                "objectId": 1108,
+                "state": "sound"
+              },
+              {
+                "objectId": 1109,
+                "state": "sound"
+              },
+              {
+                "objectId": 1110,
+                "state": "sound"
+              },
+              {
+                "objectId": 1111,
+                "state": "sound"
+              },
+              {
+                "objectId": 1112,
+                "state": "sound"
+              },
+              {
+                "objectId": 1113,
+                "state": "sound"
+              },
+              {
+                "objectId": 1114,
+                "state": "sound"
+              },
+              {
+                "objectId": 1115,
+                "state": "sound"
+              },
+              {
+                "objectId": 1116,
+                "state": "sound"
+              },
+              {
+                "objectId": 1117,
+                "state": "sound"
+              },
+              {
+                "objectId": 1118,
+                "state": "sound"
+              },
+              {
+                "objectId": 1119,
+                "state": "sound"
+              },
+              {
+                "objectId": 1120,
+                "state": "sound"
+              }
+            ],
+            "quenchTick": 1,
+            "tailTimer": 9
+          },
           "slowImmune": true,
           "spawnPos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "stats": {
             "armor": 857
           },
-          "tappedById": 1010,
+          "tappedById": 1011,
           "templateId": "korzul_the_gravewyrm",
           "weapon": {
             "max": 2779,
@@ -2148,12 +2239,12 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1037,
-      "state": "87fecd66",
+      "nextId": 1121,
+      "state": "ca77c832",
       "events": "741638a5",
       "rng": {
-        "draws": 63,
-        "digest": "2cb65480"
+        "draws": 69,
+        "digest": "0249f6ce"
       },
       "label": "final",
       "players": [
@@ -2177,10 +2268,13 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 14138,
+            "damageDealt": 37785,
             "kills": 1,
             "xpGained": 98
           },
@@ -2188,7 +2282,7 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 14138,
+              "damageDealt": 37785,
               "dungeonFinalBossKills": 1,
               "fullPartyDungeonClears": 1,
               "kills": 1,
@@ -2274,7 +2368,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2384,214 +2478,9 @@
             ]
           },
           "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 1771,
-            "deaths": 1,
-            "xpGained": 98
+          "buddies": {
+            "names": {}
           },
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {
-              "deaths": 1,
-              "dungeonFinalBossKills": 1,
-              "fullPartyDungeonClears": 1,
-              "kills": 1,
-              "partiesJoined": 1
-            },
-            "dungeonClears": {
-              "gravewyrm_sanctum:heroic": 1
-            },
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "heroic_mark",
-              "spring_water",
-              "wyrmfall_core"
-            ],
-            "visited": [
-              "quality:rare"
-            ]
-          },
-          "deedsEarned": [
-            [
-              "cmb_first_blood",
-              ""
-            ],
-            [
-              "cmb_first_fall",
-              ""
-            ],
-            [
-              "col_first_rare",
-              ""
-            ],
-            [
-              "dgn_gravewyrm_sanctum",
-              ""
-            ],
-            [
-              "dgn_gravewyrm_sanctum_heroic",
-              ""
-            ],
-            [
-              "dgn_korzul_flawless",
-              ""
-            ],
-            [
-              "dgn_sanctum_speed",
-              ""
-            ],
-            [
-              "feat_era_cap",
-              ""
-            ],
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_level_cap",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ],
-            [
-              "soc_first_party",
-              ""
-            ],
-            [
-              "soc_full_house",
-              ""
-            ]
-          ],
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1011,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "factionCurrencies": {},
-          "factions": {},
-          "gatheringProficiency": {},
-          "gliderRecords": {},
-          "harvestPreference": {
-            "kind": "all"
-          },
-          "heroicDaily": {
-            "date": "reset:1",
-            "marked": [
-              "gravewyrm_sanctum"
-            ]
-          },
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
-            },
-            {
-              "count": 2,
-              "itemId": "wyrmfall_core",
-              "materialSources": [
-                {
-                  "count": 2,
-                  "source": {}
-                }
-              ]
-            }
-          ],
-          "lifetimeXp": 167298,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "raidLockouts": [
-            [
-              "gravewyrm_sanctum:heroic",
-              86400000
-            ]
-          ],
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "renown": 150,
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "vaultAttemptDurable": true,
-          "weeklyRewards": {
-            "bossUnlocks": {
-              "korzul_the_gravewyrm": 2
-            },
-            "dungeons": [
-              2
-            ],
-            "raidUnlocks": [
-              0,
-              0,
-              0
-            ],
-            "raids": [
-              0,
-              0,
-              0
-            ],
-            "resetAtMs": 604800000
-          },
-          "worldQuestReplacements": {},
-          "wyrmfallDaily": {
-            "sources": [
-              "gravewyrm_sanctum:heroic"
-            ]
-          }
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -2793,6 +2682,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -2994,6 +2886,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -3174,6 +3069,210 @@
               "gravewyrm_sanctum:heroic"
             ]
           }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "fullPartyDungeonClears": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "gravewyrm_sanctum:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_gravewyrm_sanctum",
+              ""
+            ],
+            [
+              "dgn_gravewyrm_sanctum_heroic",
+              ""
+            ],
+            [
+              "dgn_korzul_flawless",
+              ""
+            ],
+            [
+              "dgn_sanctum_speed",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ],
+            [
+              "soc_full_house",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1015,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
+          "gatheringProficiency": {},
+          "gliderRecords": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "gravewyrm_sanctum"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "gravewyrm_sanctum:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 145,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "vaultAttemptDurable": true,
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "gravewyrm_sanctum:heroic"
+            ]
+          }
         }
       ],
       "entities": [
@@ -3188,7 +3287,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -3198,11 +3297,10 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
-          "id": 1010,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -3216,8 +3314,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1110
+            "z": -1042
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -3245,55 +3342,6 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "dead": true,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fiveSecondRule": 99.05,
-          "healPower": 41,
-          "id": 1011,
-          "inCombat": true,
-          "kind": "player",
-          "level": 20,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 665,
-          "maxResource": 1506,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 101497,
-            "z": -1116
-          },
-          "potionCooldownUntil": -1,
-          "resource": 1506,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 41,
-          "stats": {
-            "agi": 12,
-            "armor": 133,
-            "int": 82,
-            "spi": 60,
-            "sta": 52,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
           "combatTimer": 99.05,
           "comboUntil": -1,
           "critChance": 0.056,
@@ -3313,8 +3361,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 101499,
-            "z": -1116
+            "x": 101497,
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -3362,8 +3410,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 101501,
-            "z": -1116
+            "x": 101499,
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -3411,8 +3459,57 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
+            "x": 101501,
+            "z": -1048
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 52,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99.05,
+          "healPower": 41,
+          "hp": 665,
+          "id": 1015,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 665,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
             "x": 101503,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -3445,11 +3542,11 @@
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1010",
               "entity:1011",
               "entity:1012",
               "entity:1013",
-              "entity:1014"
+              "entity:1014",
+              "entity:1015"
             ],
             "token": {}
           },
@@ -3459,39 +3556,37 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1033,
+          "id": 1077,
+          "idleStationary": true,
           "inCombat": true,
-          "infernoTimer": 30,
           "kind": "mob",
           "leashAnchor": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "level": 22,
           "loot": {
-            "copper": 89018,
+            "copper": 117290,
             "items": [
               {
                 "count": 1,
-                "itemId": "gravewyrm_cleaver"
+                "itemId": "shroud_of_the_gravewyrm"
               }
             ]
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [
-            1010,
             1011,
             1012,
             1013,
-            1014
+            1014,
+            1015
           ],
           "lootable": true,
-          "maxHp": 13138,
-          "mechanicDamageMult": 19,
+          "maxHp": 36785,
+          "mechanicDamageMult": 2.5,
           "mechanicHealMult": 4,
           "moveSpeed": 8,
           "onGround": true,
@@ -3499,21 +3594,106 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.95,
+          "sanctumFight": {
+            "breathTimer": 6,
+            "galeTimer": 20,
+            "infernoTimer": 20,
+            "kind": "korzul",
+            "phase": "slain",
+            "plates": [
+              {
+                "objectId": 1102,
+                "state": "sound"
+              },
+              {
+                "objectId": 1103,
+                "state": "broken"
+              },
+              {
+                "objectId": 1104,
+                "state": "sound"
+              },
+              {
+                "objectId": 1105,
+                "state": "sound"
+              },
+              {
+                "objectId": 1106,
+                "state": "sound"
+              },
+              {
+                "objectId": 1107,
+                "state": "sound"
+              },
+              {
+                "objectId": 1108,
+                "state": "sound"
+              },
+              {
+                "objectId": 1109,
+                "state": "sound"
+              },
+              {
+                "objectId": 1110,
+                "state": "sound"
+              },
+              {
+                "objectId": 1111,
+                "state": "sound"
+              },
+              {
+                "objectId": 1112,
+                "state": "sound"
+              },
+              {
+                "objectId": 1113,
+                "state": "sound"
+              },
+              {
+                "objectId": 1114,
+                "state": "sound"
+              },
+              {
+                "objectId": 1115,
+                "state": "sound"
+              },
+              {
+                "objectId": 1116,
+                "state": "sound"
+              },
+              {
+                "objectId": 1117,
+                "state": "sound"
+              },
+              {
+                "objectId": 1118,
+                "state": "sound"
+              },
+              {
+                "objectId": 1119,
+                "state": "sound"
+              },
+              {
+                "objectId": 1120,
+                "state": "sound"
+              }
+            ],
+            "quenchTick": 1,
+            "tailTimer": 9
+          },
           "slowImmune": true,
           "spawnPos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "stats": {
             "armor": 857
           },
-          "tappedById": 1010,
+          "tappedById": 1011,
           "templateId": "korzul_the_gravewyrm",
           "weapon": {
             "max": 2779,

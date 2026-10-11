@@ -44,9 +44,10 @@ export function mistGateFramesFor(placements: readonly IgnivarPropPlacement[]): 
 
 // Tileable mist noise (deterministic LCG; wrapped blob stamps so the
 // drifting samples never show a seam). Grayscale: the shader reads .r.
+// Shared with the Seal Gate's cold mouth mist (sanctum_seal_gate.ts).
 let mistTex: THREE.CanvasTexture | null = null;
 
-function mistNoiseTexture(): THREE.CanvasTexture | null {
+export function mistNoiseTexture(): THREE.CanvasTexture | null {
   if (mistTex) return mistTex;
   if (typeof document === 'undefined') return null;
   const S = 128;
@@ -91,8 +92,9 @@ const COMMON_CHUNK = '#include <common>';
 /** Splice the drifting dual-sample + soft edge + pulse into a basic
  *  material's map stage. pulseDepth is how far the sheet breathes toward
  *  transparent at the trough (the glow sheet breathes deep, the smoky
- *  backdrop barely). */
-function decorateMistMaterial(
+ *  backdrop barely). Every decorated sheet shares ONE program (the cache key
+ *  below): the Seal Gate's cold mist film reuses it in its own colours. */
+export function decorateMistMaterial(
   material: THREE.MeshBasicMaterial,
   pulseDepth: number,
 ): THREE.MeshBasicMaterial {

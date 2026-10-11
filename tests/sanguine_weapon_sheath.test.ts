@@ -4,7 +4,7 @@ import {
   SanguineWeaponSheath,
   sanguineWeaponGeometry,
 } from '../src/render/characters/sanguine_weapon_sheath';
-import { compileTargetPrepared } from '../src/render/compile_target_readiness';
+import { compileProof, compileTargetPrepared } from '../src/render/compile_target_readiness';
 import { markProgramReady } from '../src/render/linked_program_readiness';
 
 const assets = vi.hoisted(() => ({ texture: null as THREE.Texture | null }));
@@ -135,5 +135,24 @@ describe('compile target readiness proof', () => {
     target.geometry.dispose();
     material.dispose();
     texture.dispose();
+  });
+
+  it('hands no proof on a host without parallel compile, a live one otherwise', () => {
+    const material = new THREE.MeshBasicMaterial();
+    const target = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    const records = new Map<object, unknown>();
+    const properties = { get: (object: object) => records.get(object) };
+    // That host's gate settles at once over programs it never linked: a proof
+    // would read false forever and hold back a swap with nothing to wait for.
+    expect(compileProof(false, properties, target)).toBeUndefined();
+    const proof = compileProof(true, properties, target);
+    expect(proof?.()).toBe(false);
+    const program = { getUniforms() {}, getAttributes() {} };
+    records.set(material, { programs: new Map([['only', program]]) });
+    markProgramReady(program);
+    // Lazy: read at settle time, not when the gate was armed.
+    expect(proof?.()).toBe(true);
+    target.geometry.dispose();
+    material.dispose();
   });
 });

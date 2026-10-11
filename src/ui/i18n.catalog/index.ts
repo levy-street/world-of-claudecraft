@@ -8,6 +8,7 @@ import { worldEntityText as worldNames } from '../world_entity_i18n';
 import { abilityStrings, classAbilityNames } from './abilities';
 import { apiErrorStrings } from './api_error';
 import { clueStrings } from './clues';
+import { dungeonGuideStrings } from './dungeon_guides';
 import { editorStrings } from './editor';
 import { gameStrings } from './game';
 import { guideStrings } from './guide';
@@ -16,11 +17,13 @@ import { hudChromeStrings } from './hud_chrome';
 import { itemNames, itemStrings } from './items';
 import { mergeEntities, mergeExtra, mergeStrings } from './merge';
 import { questStrings } from './quests';
+import { referralCardStrings } from './referral_cards';
 import { shellStrings } from './shell';
 
 export { abilityStrings, classAbilityNames } from './abilities';
 export { apiErrorStrings } from './api_error';
 export { clueStrings } from './clues';
+export { dungeonGuideStrings } from './dungeon_guides';
 export { editorStrings } from './editor';
 export {
   gameStrings,
@@ -83,6 +86,7 @@ export type Leaves<T, D extends number = 5> = [D] extends [never]
     : '';
 
 export const en = {
+  referralCards: referralCardStrings,
   meta: { builtOn: 'Built {date}' },
   realmTypes: { normal: 'Normal', pvp: 'PvP', rp: 'RP', rpPvp: 'RP-PvP' },
   devCommand: {
@@ -249,6 +253,8 @@ export const en = {
   apiError: apiErrorStrings,
   // Clue Scroll hunt titles and per-step riddles (src/ui/i18n.catalog/clues.ts).
   clues: clueStrings,
+  // The dungeon lore guides' lines and dialog (src/ui/i18n.catalog/dungeon_guides.ts).
+  dungeonGuide: dungeonGuideStrings,
   guide: guideStrings,
   editor: editorStrings,
   // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.
@@ -401,6 +407,175 @@ export const en = {
     body: 'Body',
     genderMale: 'Male',
     genderFemale: 'Female',
+    // The body pick as players see it: a body type, never a gender label.
+    bodyTypeA: 'Type A',
+    bodyTypeB: 'Type B',
+    // WOC modular-head variants (src/render/characters/woc_head_catalog.ts
+    // builds these keys as auth.wocHead.<slot>.<id>).
+    wocHead: {
+      hair: {
+        swept: 'Swept',
+        long: 'Long',
+        mohawk: 'Mohawk',
+        quiff: 'Cropped Quiff',
+        undercut: 'Undercut',
+        topknot: 'Topknot',
+        shoulder: 'Shoulder Length',
+        bald: 'Bald',
+        waves: 'Waves',
+        ponytail: 'High Ponytail',
+        braid: 'Braid',
+        bob: 'Bob',
+        crown: 'Braided Crown',
+        twins: 'Twin Braids',
+        curls: 'Curly Updo',
+      },
+      beard: {
+        none: 'Clean Shaven',
+        moustache: 'Moustache',
+        handlebar: 'Handlebar',
+        goatee: 'Goatee',
+        chin: 'Chin Beard',
+        boxed: 'Boxed Beard',
+        long: 'Long Beard',
+        chops: 'Mutton Chops',
+        chinstrap: 'Chinstrap',
+      },
+      nose: {
+        default: 'Classic',
+        broad: 'Broad',
+        aquiline: 'Aquiline',
+        button: 'Button',
+        soft: 'Soft',
+      },
+      mouth: {
+        default: 'Classic',
+        full: 'Full',
+        smirk: 'Smirk',
+        relaxed: 'Relaxed',
+        cupids_bow: "Cupid's Bow",
+        narrow: 'Narrow',
+        thin: 'Thin',
+        rounded: 'Rounded',
+      },
+      brows: {
+        default: 'Classic',
+        slim: 'Slim',
+        arched: 'Arched',
+        soft: 'Soft',
+        straight: 'Straight',
+        relaxed: 'Relaxed',
+        soft_arch: 'Soft Arch',
+        rounded: 'Rounded',
+      },
+      ears: {
+        default: 'Classic',
+        large: 'Large',
+        pointed: 'Pointed',
+        round: 'Round',
+      },
+      eyes: {
+        default: 'Classic',
+        almond: 'Almond',
+        hooded: 'Hooded',
+      },
+    },
+    // The WOC face builder (src/ui/woc_head_builder.ts): its category menu,
+    // section and slider labels, piercing presets and swatch names.
+    wocBuilder: {
+      cat: {
+        bodyType: 'Body Type',
+        skinTone: 'Skin Tone',
+        face: 'Face',
+        eyesBrows: 'Eyes and Brows',
+        eyeColor: 'Eye Color',
+        hairstyle: 'Hairstyle',
+        facialHair: 'Facial Hair',
+        hairColor: 'Hair Color',
+        browColor: 'Eyebrow Color',
+        piercings: 'Piercings',
+      },
+      section: {
+        hair: 'Hairstyle',
+        nose: 'Nose',
+        mouth: 'Lips',
+        brows: 'Brow Shape',
+        ears: 'Ears',
+        eyes: 'Eye Shape',
+      },
+      slider: {
+        eyeSpacing: 'Eye Spacing',
+        eyeSize: 'Eye Size',
+        eyeTilt: 'Eye Tilt',
+        browHeight: 'Brow Height',
+        chinWidth: 'Chin Width',
+        bodyScale: 'Body Size',
+      },
+      // The letter on each body-type tile. Decorative (the tile's label names
+      // the type), and kept a Latin letter in every locale, like "Type A".
+      bodyGlyph: {
+        a: 'A',
+        b: 'B',
+      },
+      piercing: {
+        none: 'None',
+        lobes: 'Lobes',
+        ears: 'Full Ears',
+        brow: 'Brow',
+        nose: 'Nostril',
+        septum: 'Septum',
+        lip: 'Lip',
+        full: 'Full Set',
+      },
+      skin: {
+        porcelain: 'Porcelain',
+        ivory: 'Ivory',
+        rose: 'Rose',
+        peach: 'Peach',
+        fair: 'Fair',
+        beige: 'Beige',
+        sand: 'Sand',
+        honey: 'Honey',
+        olive: 'Olive',
+        caramel: 'Caramel',
+        tan: 'Tan',
+        bronze: 'Bronze',
+        chestnut: 'Chestnut',
+        umber: 'Umber',
+        mahogany: 'Mahogany',
+        ebony: 'Ebony',
+      },
+      eye: {
+        brown: 'Brown',
+        darkBrown: 'Dark Brown',
+        hazel: 'Hazel',
+        amber: 'Amber',
+        green: 'Green',
+        teal: 'Teal',
+        blue: 'Blue',
+        paleBlue: 'Pale Blue',
+        grey: 'Grey',
+        violet: 'Violet',
+      },
+      hairColor: {
+        platinum: 'Platinum',
+        blonde: 'Blonde',
+        golden: 'Golden',
+        copper: 'Copper',
+        red: 'Red',
+        auburn: 'Auburn',
+        lightBrown: 'Light Brown',
+        brown: 'Brown',
+        darkBrown: 'Dark Brown',
+        black: 'Black',
+        silver: 'Silver',
+        white: 'White',
+      },
+      matchHair: 'Match Hair',
+      resetDefault: 'Reset to Default',
+      customColorAria: 'Pick a custom color',
+      customSkinAria: 'Pick a custom skin tone',
+    },
     hair: 'Hair',
     brows: 'Eyebrows',
     skinTone: 'Skin Tone',
@@ -1949,6 +2124,15 @@ export const en = {
       molten_fletching: { name: 'Molten Fletching' },
       last_flame_lantern: { name: 'Last Flame Lantern' },
       heart_of_the_crucible: { name: 'Heart of the Crucible' },
+      // The Sunken Bastion's heroic Gaoler Ossick.
+      gaolers_iron_key: { name: "Gaoler's Iron Key" },
+      // The Wildheart Basin's heroic Fanglord Beastmaster and Gorgebloom.
+      fanglords_whistle: { name: "Fanglord's Whistle" },
+      gorgebloom_seedpod: { name: 'Gorgebloom Seedpod' },
+      // The Gravewyrm Sanctum's heroic Korgath, Velkhar and Korzul.
+      foremans_last_link: { name: "Foreman's Last Link" },
+      phial_of_the_tithe: { name: 'Phial of the Tithe' },
+      quenchwater_flask: { name: 'Quenchwater Flask' },
       // Faction Quartermaster vendor items
       rift_watchers_band: { name: "Rift Watcher's Band" },
       rift_surveyors_satchel: { name: "Rift Surveyor's Satchel" },

@@ -78,6 +78,9 @@ describe('no quest duplicates another (same giver + identical objectives)', () =
             case 'farm':
               target = `farm ${o.action} ${o.cropId ?? 'any'}`;
               break;
+            case 'event':
+              target = `event ${o.eventId}`;
+              break;
           }
           return `${target} x${o.count}`;
         })

@@ -1,4 +1,6 @@
 import { applyFrameGeometrySetting } from './game/frame_geometry_settings';
+import { createSubscriptionStoreHooks, storeSnapshotForHud } from './net/subscription_sdk';
+import { captureReferralSlug } from './referral_signup';
 import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
 import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
@@ -27,6 +29,7 @@ import { runBlockingArrivalWarmup, settleWorldEntryCover } from './game/arrival_
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
 import { shouldRouteInteractToBgFlag } from './game/bg_flag_interact';
+import { applyBossTestDrive, parseBossTestDrive } from './game/boss_test_drive';
 import {
   BROWSER_BODY_CLASSES,
   browserBodyClasses,
@@ -42,6 +45,7 @@ import {
   wrapAngle,
 } from './game/camera_follow';
 import { applyCameraViewSetting, applyCameraViewSettings } from './game/camera_view_settings';
+import { tickCameraZoomCeiling } from './game/camera_zoom_wiring';
 import { initCharselectWocMarket } from './game/charselect_woc_market_wiring';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
@@ -342,9 +346,7 @@ import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { battlegroundAssetPrewarm } from './render/battleground';
 import {
   CharacterPreview,
-  npcLookFor,
   type PreviewAppearance,
-  previewAppearanceForRow,
   setModularLookProvider,
 } from './render/characters';
 import {
@@ -375,6 +377,7 @@ import {
   playerPortraitDataUrl,
   resetPortraitRendererForGraphicsRebuild,
 } from './render/characters/portrait';
+import { charselectPreviewAppearance } from './render/characters/preview_appearance';
 import { attachContextRecoveryHandlers } from './render/context_loss_recovery';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
@@ -448,7 +451,7 @@ import {
 } from './ui/account_portal_dom';
 import { technicalErrorMessage, userFacingApiError } from './ui/api_error_i18n';
 import { formatFooterVersion } from './ui/app_version';
-import { type AppearanceCustomizer, mountAppearanceCustomizer } from './ui/appearance_customizer';
+import { type AppearanceCustomizer, mountAppearanceEditor } from './ui/appearance_editor_mount';
 import {
   appearancePanelIsStale,
   forgetAppearancePanel,
@@ -467,9 +470,14 @@ import {
 import { BreathBar } from './ui/breath_bar';
 import { assembleBugReportMeta } from './ui/bug_report';
 import { cameraPromptOpen, dismissCameraPrompt } from './ui/camera_prompt';
-import { deleteCharButtonHtml, normalizeDeleteConfirmation } from './ui/char_delete_button';
+import { normalizeDeleteConfirmation } from './ui/char_delete_button';
+import {
+  canCreateMembershipCharacter,
+  characterRowHtml,
+  membershipSlotsHtml,
+} from './ui/character_membership_view';
 import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
-import { charselectHintsHtml, wireCharselectRow } from './ui/charselect_hints';
+import { wireCharselectRow } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -1482,12 +1490,10 @@ async function startGame(
     // paperdoll eye toggle), so peers see the owner's choice. Per-entity
     // wire JSON is normalized at compose time (visual build, not per frame):
     // hostile or stale payloads clamp to a valid body.
-    // Non-players compose too: NPCs resolve authored looks by templateId
-    // (static data on every host; the why lives in characters/npc_looks.ts).
+    // Only players compose: an NPC wears its authored look on a WOC body, which
+    // the visual factory resolves by templateId (characters/npc_looks.ts).
     setModularLookProvider((e) =>
-      e.kind === 'player'
-        ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId))
-        : npcLookFor(e.templateId, e.kind),
+      e.kind === 'player' ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId)) : null,
     );
     // Helmet visibility belongs to each character's saved state: creator
     // toggle first, then paperdoll eye. Do not re-assert the old device-wide
@@ -1502,6 +1508,7 @@ async function startGame(
     renderer.showDevBadges = settings.get('showDevBadges');
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
+    renderer.showPetNames = settings.get('showPetNames');
     setNameplateDotScale(settings.nameplateDotRenderScale());
     renderer.setWaterRipples(settings.get('waterRipples'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
@@ -2504,6 +2511,10 @@ async function startGame(
       renderer.showPlayerNameplates = settings.set('showPlayerNameplates', !!value);
       return;
     }
+    if (key === 'showPetNames') {
+      renderer.showPetNames = settings.set('showPetNames', !!value);
+      return;
+    }
     if (key === 'showNameplateDots') {
       settings.set('showNameplateDots', !!value);
       setNameplateDotScale(settings.nameplateDotRenderScale());
@@ -2714,6 +2725,7 @@ async function startGame(
     next.showDevBadges = settings.get('showDevBadges');
     next.showOwnNameplate = settings.get('showOwnNameplate');
     next.showPlayerNameplates = settings.get('showPlayerNameplates');
+    next.showPetNames = settings.get('showPetNames');
     setNameplateDotScale(settings.nameplateDotRenderScale());
     next.reduceMotionSetting = settings.get('reduceMotion');
     next.setHazardPaletteMode(hazardPaletteModeOf(settings.get('colorblindMode')));
@@ -3103,14 +3115,8 @@ async function startGame(
     };
     const claudiumHooks: ClaudiumHooks = {
       balance: async () => (await economy.balance()).balance,
-      storeSnapshot: async () => {
-        const snapshot = await economy.storeSnapshot();
-        return {
-          available: snapshot.available,
-          balance: snapshot.balance,
-          storeItems: snapshot.items,
-        };
-      },
+      subscription: createSubscriptionStoreHooks({ token: () => api.token, base: api.base }),
+      storeSnapshot: () => storeSnapshotForHud(economy),
       snapshot: async () => {
         const pack = await economy.packSnapshot();
         if (!pack.available) {
@@ -3848,6 +3854,7 @@ async function startGame(
     riftFloor: null,
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
+    tickCameraZoomCeiling(input, world, frameDt);
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
     // When click-to-move ends, the player's facing snaps from the (camera-lagging)
@@ -4961,9 +4968,9 @@ async function startGame(
       // Kick the deferred creature-body fetches now, before the settle cover and
       // the curtain fade: until a creature GLB arrives its view, nameplate, and
       // click target do not exist, so every ms the stream waits past first paint
-      // widens the pop-in window on the tight-memory profile (desktop's stream
-      // set is empty). The allocation spike the stream was deferred past has
-      // cleared by this frame.
+      // widens the pop-in window on the tight-memory profile (desktop's creature
+      // set is empty: there the same kick starts the WOC crowd prefetch). The
+      // allocation spike the stream was deferred past has cleared by this frame.
       kickCharacterPreloadStream({
         startCharacterPreloads: startStreamedCharacterPreloads,
         onCharacterPreloadsStarted: (count) => {
@@ -5209,6 +5216,7 @@ async function startOffline(
     for (const id of usable) sim.addItem(id, 1, sim.playerId);
     if (usable[0]) sim.equipItem(usable[0], sim.playerId);
   }
+  if (bossTestDrive) applyBossTestDrive(sim, bossTestDrive, playerClass);
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
   void startGame(sim, sim, null, `offline:${playerClass}:${name}`, true);
@@ -5232,11 +5240,7 @@ const seekerEntitlementSync = createSeekerEntitlementSync({
 // Referral capture: a visitor who arrives from a shared player card link
 // (?ref=<slug>) carries the referrer's slug into registration. Read it once at
 // load and sanitise it to the server's slug shape so a junk param is dropped.
-const REFERRAL_SLUG = (() => {
-  const raw = new URLSearchParams(location.search).get('ref') ?? '';
-  const slug = raw.trim().toLowerCase();
-  return /^[a-z0-9][a-z0-9-]{0,63}$/.test(slug) ? slug : '';
-})();
+const REFERRAL_SLUG = captureReferralSlug(location.search);
 
 // First-touch attribution capture (fbclid/utm/landing/referrer), write-once at
 // load like the referral slug above; the register call sends it to the server.
@@ -5468,7 +5472,7 @@ function creationLoadout(cls: PlayerClass): ArmorLoadout {
 function previewClassBody(cls: PlayerClass): void {
   if (!characterPreview) return;
   const look = modularLookForClass(cls);
-  if (look) characterPreview.setModular(look.app, look.worn, cls);
+  if (look) characterPreview.setCreationClass(look.app, look.worn, cls);
   else characterPreview.setClass(cls);
 }
 
@@ -5515,22 +5519,22 @@ function syncAppearanceUi(panelId: string, cls: PlayerClass): void {
   noteAppearancePanelMounted(panelId, () => syncAppearanceUi(panelId, panelClass()));
   appearanceUis.set(
     panelId,
-    mountAppearanceCustomizer(host, {
+    mountAppearanceEditor(host, panelClass(), {
       value: modularAppearance,
+      stage: () => characterPreview,
       onChange: (next) => {
         modularAppearance = next;
         storeAppearance(next);
         const c = panelClass();
-        characterPreview?.setModular(next, creationLoadout(c), c);
+        characterPreview?.setCreationClass(next, creationLoadout(c), c);
       },
       helm: creationHelm,
       onHelm: (on) => {
         creationHelm = on;
         const c = panelClass();
-        characterPreview?.setModular(modularAppearance, creationLoadout(c), c);
+        characterPreview?.setCreationClass(modularAppearance, creationLoadout(c), c);
       },
-      // The chips must preview against the set the composed body actually
-      // wears: the stored override when one exists, not the class default.
+      // Chips preview against the set actually worn (stored override, else class kit).
       armorSet: () => readStoredArmorSet(panelClass()),
     }),
   );
@@ -6459,7 +6463,7 @@ async function refreshCharacters(): Promise<void> {
       pendingResume = null;
       const target =
         resume.realm === api.realm ? chars.find((c) => c.id === resume.characterId) : undefined;
-      if (target) {
+      if (target && charselectPrimaryAction(target).kind !== 'disabled') {
         void enterWorld(target);
         return;
       }
@@ -6479,13 +6483,6 @@ async function refreshCharacters(): Promise<void> {
       row.setAttribute('aria-selected', 'false');
       row.dataset.class = c.class;
       row.dataset.skin = String(c.skin ?? 0);
-      const className = classDisplayName(c.class);
-      const statusText = c.online ? '' : c.forceRename ? ` (${t('character.renameRequired')})` : '';
-      // One-shot redesign token (server-decided: pre-creator character, token
-      // unspent). Rendered on every action arm; gone for good once spent.
-      const rerollBtn = c.appearanceRerollAvailable
-        ? `<button type="button" class="btn reroll-char-btn" title="${esc(t('character.redesignHint'))}" aria-label="${esc(t('character.redesignTitle', { name: c.name }))}">${esc(t('character.redesign'))}</button>`
-        : '';
       // The chip draws the character's REAL body: their authored modular look
       // (or the mech cosmetic), matching the 3D stage and the world.
       const chipHtml = () =>
@@ -6495,25 +6492,15 @@ async function refreshCharacters(): Promise<void> {
           name: c.name,
           variant: 'sm',
           look: charselectLook(c),
+          appearance: c.appearance,
           catalog: c.skinCatalog ?? 'class',
         });
       // A composed chip cannot hydrate from data attributes, so the row
       // repaints its own chip once the assets land and again once the composed
       // capture behind it lands (the crest shows until then).
       if (charselectLook(c)) trackComposedChipRow(row, chipHtml, () => hydratePortraits(row));
-      row.innerHTML = `${chipHtml()}
-        <div class="char-id">
-          <span class="char-name">${esc(c.name)}</span>
-          <span class="char-sub">${esc(t('character.levelClass', { level: c.level, className }))}${esc(statusText)}</span>
-          ${charselectHintsHtml(c, Date.now())}
-        </div>
-        ${
-          c.forceRename
-            ? `<input class="rename-input" placeholder="${esc(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${esc(t('character.rename'))}</button>${rerollBtn}${deleteCharButtonHtml(c.online)}</span>`
-            : c.online
-              ? `<span class="char-actions"><button class="btn take-over-btn" title="${esc(t('character.takeOverConfirm'))}" aria-label="${esc(t('character.takeOverConfirm'))}">${esc(t('character.takeOver'))}</button>${rerollBtn}${deleteCharButtonHtml(true)}</span>`
-              : `<span class="char-actions"><button class="btn enter-world-btn">${esc(t('auth.enterWorld'))}</button>${rerollBtn}${deleteCharButtonHtml(false)}</span>`
-        }`;
+      row.innerHTML = characterRowHtml(c, chipHtml(), Date.now());
+      row.classList.toggle('membership-locked', c.membershipLocked === true);
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -6608,6 +6595,15 @@ async function refreshCharacters(): Promise<void> {
       listEl.appendChild(row);
     }
 
+    listEl.insertAdjacentHTML(
+      'beforeend',
+      membershipSlotsHtml(chars, api.characterMembership.active),
+    );
+    ($('#btn-new-character') as HTMLButtonElement).disabled = !canCreateMembershipCharacter(
+      chars,
+      api.characterMembership.active,
+      api.characterLimit,
+    );
     hydratePortraits(listEl);
 
     // Select first character by default if present, else show a default showcase.
@@ -6662,6 +6658,7 @@ function fatalOverlay(
 // passed so enterWorld owns its loading/disabled state and restores it if entry
 // is aborted before it begins.
 async function takeOverAndEnter(c: CharacterSummary, btn: HTMLButtonElement): Promise<void> {
+  if (charselectPrimaryAction(c).kind !== 'takeover') return;
   if (!window.confirm(t('character.takeOverConfirm'))) return;
   $('#charselect-error').textContent = '';
   btn.disabled = true;
@@ -6710,6 +6707,7 @@ function syncCharselectEnterButton(): void {
 }
 
 async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Promise<void> {
+  if (charselectPrimaryAction(c).kind === 'disabled') return;
   stopShaderWarmup();
   try {
     if (button) {
@@ -6835,23 +6833,19 @@ const activeClassDetailsTimeouts: Record<string, number | null> = {};
  *  with), the mech cosmetic or legacy rig otherwise.
  *
  *  Stays here rather than moving into the redesign module because it needs the
- *  coordinator's own singletons (the shared stage, the legacy appearance
- *  builder). The DECISION it rests on, what a roster row composes, is
- *  charselectLook, which does not, and lives in render/characters/player_look.ts
+ *  coordinator's shared stage and on-demand weapon-skin warmup.
+ *  The DECISION it rests on, what a roster row composes, is
+ *  charselectLook, which lives in render/characters/player_look_core.ts
  *  with a unit test. */
 function showCharselectCharacter(c: CharacterSummary): void {
   if (!characterPreview) return;
+  // Streamed Armory models load on demand for either kind of roster body.
+  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   const look = charselectLook(c);
   if (!look) {
-    // Same on-demand weapon-skin warmup the composed path below performs
-    // (mech lazy-load: iOS WebKit streams Armory skins after world entry).
-    ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
-    characterPreview.setAppearance(previewAppearanceForRow(c));
+    characterPreview.setAppearance(charselectPreviewAppearance(c));
     return;
   }
-  // Same on-demand weapon-skin warmup the plain-appearance arm above
-  // performs: the composed turntable holds the skinned weapon too.
-  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   characterPreview.setModular(
     look.app,
     look.worn,
@@ -6873,9 +6867,8 @@ const redesignEditor = new CharselectRedesignEditor({
     characterPreview.setModular(app, worn, cls, mainhandItemId, offhandItemId);
     characterPreview.setWeaponSkin(weaponSkinId);
   },
-  restoreStage: () => {
-    if (charselectSelected) showCharselectCharacter(charselectSelected);
-  },
+  restoreStage: () => charselectSelected && showCharselectCharacter(charselectSelected),
+  stage: () => characterPreview,
   setPreviewName: setCharselectPreviewName,
   saveAppearance: (characterId, app, helmHidden) =>
     api.rerollAppearance(characterId, app, helmHidden).then(() => undefined),
@@ -10359,8 +10352,8 @@ function wireStartScreens(): void {
       discordChoiceError('');
       const request =
         pendingDiscordChoice.provider === 'apple'
-          ? api.appleLoginNew(pendingDiscordChoice.linkToken)
-          : api.discordLoginNew(pendingDiscordChoice.linkToken);
+          ? api.appleLoginNew(pendingDiscordChoice.linkToken, REFERRAL_SLUG)
+          : api.discordLoginNew(pendingDiscordChoice.linkToken, REFERRAL_SLUG);
       void request
         .then(finishDiscordChoice)
         .catch(onDiscordChoiceError)
@@ -10941,6 +10934,7 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
 // here, boot straight into that offline world and skip the start screen. Any
 // malformed/absent request falls through to the normal home flow.
 const editorPlaytest = takeEditorPlaytestRequest();
+const bossTestDrive = import.meta.env.DEV ? parseBossTestDrive(location.search) : null;
 const startupParams = new URLSearchParams(location.search);
 const diagnosticsAutoOffline =
   import.meta.env.DEV &&
@@ -10958,6 +10952,10 @@ if (editorPlaytest) {
 } else if (diagnosticsAutoOffline) {
   startSitePresence('home');
   void startOffline('warrior', 'Diagnostics', 0);
+} else if (bossTestDrive) {
+  // ?boss=... skips the start screens: the point is to be looking at the boss.
+  startSitePresence('home');
+  void startOffline('warrior', 'Balgath', 0);
 } else {
   startSitePresence('home');
   wireStartScreens();

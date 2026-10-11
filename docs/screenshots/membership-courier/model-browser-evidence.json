@@ -1,0 +1,274 @@
+{
+  "evidence": [
+    {
+      "phase": "ground",
+      "lift": 0,
+      "scale": 0.9127271614919107,
+      "textureCompressed": true,
+      "textureDimensions": [
+        1024,
+        1024
+      ],
+      "joints": 47,
+      "visible": true,
+      "normalizedIdle": {
+        "height": 1.2757500000000002,
+        "ground": -5.898059818321144e-17
+      },
+      "weights": {
+        "Idle": 1,
+        "Run": 0,
+        "Fly": 0
+      },
+      "rootHover": 0,
+      "errors": 0
+    },
+    {
+      "phase": "run",
+      "lift": 0,
+      "scale": 0.9127271614919107,
+      "textureCompressed": true,
+      "textureDimensions": [
+        1024,
+        1024
+      ],
+      "joints": 47,
+      "visible": true,
+      "normalizedIdle": {
+        "height": 1.2757500000000002,
+        "ground": -5.898059818321144e-17
+      },
+      "weights": {
+        "Idle": 0,
+        "Run": 1,
+        "Fly": 0
+      },
+      "rootHover": 0,
+      "errors": 0
+    },
+    {
+      "phase": "takeoff",
+      "lift": 1,
+      "scale": 0.9127271614919107,
+      "textureCompressed": true,
+      "textureDimensions": [
+        1024,
+        1024
+      ],
+      "joints": 47,
+      "visible": true,
+      "normalizedIdle": {
+        "height": 1.2757500000000002,
+        "ground": -5.898059818321144e-17
+      },
+      "weights": {
+        "Idle": 0,
+        "Run": 0.5,
+        "Fly": 0.5
+      },
+      "rootHover": 0,
+      "errors": 0
+    },
+    {
+      "phase": "flight",
+      "lift": 2,
+      "scale": 0.9127271614919107,
+      "textureCompressed": true,
+      "textureDimensions": [
+        1024,
+        1024
+      ],
+      "joints": 47,
+      "visible": true,
+      "normalizedIdle": {
+        "height": 1.2757500000000002,
+        "ground": -5.898059818321144e-17
+      },
+      "weights": {
+        "Idle": 0,
+        "Run": 0,
+        "Fly": 1
+      },
+      "rootHover": 0,
+      "errors": 0
+    },
+    {
+      "phase": "land",
+      "lift": 0,
+      "scale": 0.9127271614919107,
+      "textureCompressed": true,
+      "textureDimensions": [
+        1024,
+        1024
+      ],
+      "joints": 47,
+      "visible": true,
+      "normalizedIdle": {
+        "height": 1.2757500000000002,
+        "ground": -5.898059818321144e-17
+      },
+      "weights": {
+        "Idle": 0,
+        "Run": 1,
+        "Fly": 0
+      },
+      "rootHover": 0,
+      "errors": 0
+    },
+    {
+      "phase": "flight",
+      "lift": 2,
+      "scale": 0.9127271614919107,
+      "textureCompressed": true,
+      "textureDimensions": [
+        1024,
+        1024
+      ],
+      "joints": 47,
+      "visible": true,
+      "normalizedIdle": {
+        "height": 1.2757500000000002,
+        "ground": -5.898059818321144e-17
+      },
+      "weights": {
+        "Idle": 0,
+        "Run": 0,
+        "Fly": 1
+      },
+      "rootHover": 0,
+      "errors": 0
+    }
+  ],
+  "travel": [
+    {
+      "viewport": "desktop",
+      "legs": [
+        {
+          "phase": "outbound",
+          "frames": 222,
+          "startLift": 0,
+          "endLift": 0,
+          "maxLift": 2,
+          "cruise": 117,
+          "maxAltitudeError": 2.220446049250313e-16,
+          "maxLineError": 5.684341886080801e-13,
+          "maxRootHover": 0,
+          "groundRange": [
+            0.021695177227186363,
+            1.787599995354948
+          ],
+          "endpoint": [
+            30,
+            40
+          ]
+        },
+        {
+          "phase": "returning",
+          "frames": 222,
+          "startLift": 0,
+          "endLift": 0,
+          "maxLift": 2,
+          "cruise": 117,
+          "maxAltitudeError": 2.220446049250313e-16,
+          "maxLineError": 4.547473508864641e-13,
+          "maxRootHover": 0,
+          "groundRange": [
+            0,
+            1.7725035193945564
+          ],
+          "endpoint": [
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "viewport": "portrait",
+      "legs": [
+        {
+          "phase": "outbound",
+          "frames": 222,
+          "startLift": 0,
+          "endLift": 0,
+          "maxLift": 2,
+          "cruise": 117,
+          "maxAltitudeError": 2.220446049250313e-16,
+          "maxLineError": 5.684341886080801e-13,
+          "maxRootHover": 0,
+          "groundRange": [
+            0.021695177227186363,
+            1.787599995354948
+          ],
+          "endpoint": [
+            30,
+            40
+          ]
+        },
+        {
+          "phase": "returning",
+          "frames": 222,
+          "startLift": 0,
+          "endLift": 0,
+          "maxLift": 2,
+          "cruise": 117,
+          "maxAltitudeError": 2.220446049250313e-16,
+          "maxLineError": 4.547473508864641e-13,
+          "maxRootHover": 0,
+          "groundRange": [
+            0,
+            1.7725035193945564
+          ],
+          "endpoint": [
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "viewport": "landscape",
+      "legs": [
+        {
+          "phase": "outbound",
+          "frames": 222,
+          "startLift": 0,
+          "endLift": 0,
+          "maxLift": 2,
+          "cruise": 117,
+          "maxAltitudeError": 2.220446049250313e-16,
+          "maxLineError": 5.684341886080801e-13,
+          "maxRootHover": 0,
+          "groundRange": [
+            0.021695177227186363,
+            1.787599995354948
+          ],
+          "endpoint": [
+            30,
+            40
+          ]
+        },
+        {
+          "phase": "returning",
+          "frames": 222,
+          "startLift": 0,
+          "endLift": 0,
+          "maxLift": 2,
+          "cruise": 117,
+          "maxAltitudeError": 2.220446049250313e-16,
+          "maxLineError": 4.547473508864641e-13,
+          "maxRootHover": 0,
+          "groundRange": [
+            0,
+            1.7725035193945564
+          ],
+          "endpoint": [
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

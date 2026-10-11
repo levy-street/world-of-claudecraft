@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Kotlina Divokého srdce',
-    desc: 'Příznačné zbraně od Zulgara a od Tesákopána, krotitele zvěře.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Hrdinská: Kotlina Divokého srdce',
-    desc: 'Epické předměty dostupné jen hrdinsky od Zulgara, hlasu Kotliny.',
   },
   conquerors_nythraxis: {
     name: 'Raid Nythraxis',
@@ -61,6 +59,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, probouzející se štít',
     desc: 'Osobní epická kořist od světového bosse Probouzejícího se štítu.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, Pohřbený Předák',
+    desc: 'Kořist vyrvaná zpět z mohyl Mirefenu.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Zhroucený relikviář',

@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'La Cuenca del Corazón Salvaje',
-    desc: 'Armas emblemáticas de Zulgar y del Domador de Bestias Fanglord.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroico: La Cuenca del Corazón Salvaje',
-    desc: 'Épicos exclusivos del modo heroico de Zulgar, Voz de la Cuenca.',
   },
   conquerors_nythraxis: {
     name: 'Incursión de Nythraxis',
@@ -61,6 +59,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, el Pico Despierto',
     desc: 'Botines épicos personales del jefe de mundo del Pico Despierto.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, el Capataz Enterrado',
+    desc: 'Botín arrastrado de vuelta desde los túmulos de Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'El Relicario Hundido',

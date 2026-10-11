@@ -1,14 +1,18 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { PALADIN_SYNTHESIZED_CLIP_SOURCES } from '../src/render/characters/assets';
+import {
+  PALADIN_SYNTHESIZED_CLIP_SOURCES,
+  synthesizesPaladinClips,
+} from '../src/render/characters/assets';
+import { clipSplitNames } from '../src/render/characters/clip_split';
 import {
   type ClipMap,
-  modularVisualKey,
   VISUALS,
   type VisualDef,
   visualAssetUrlForGraphics,
 } from '../src/render/characters/manifest';
+import { clipNamesOf } from '../src/render/characters/visual';
 
 // A clip name the shipped GLB does not carry fails SILENTLY at every layer:
 // baseAction() falls back, fadeTo()/playOneShot() return early, and the
@@ -132,11 +136,18 @@ function loadedClipNames(def: VisualDef, standardMaterials: boolean, key?: strin
   ];
   const names = new Set<string>();
   for (const url of urls) for (const name of animationNamesOf(url)) names.add(name);
+  // Hold-and-release halves minted at load from a GLB clip (ClipMap.clipSplits,
+  // clip_split.ts): resolvable exactly when their source clip is.
+  for (const cut of def.clips.clipSplits ?? []) {
+    if (names.has(cut.clip)) for (const name of clipSplitNames(def.clips)) names.add(name);
+  }
   // The two paladin attack clips are synthesized at prepare time from a GLB
-  // source clip (assets.ts's PALADIN_SYNTHESIZED_CLIP_SOURCES), for the classic
-  // and modular keys alike: a synthesized name resolves exactly when its source
-  // does, so a trimmed-away source still fails this gate.
-  if (key === 'player_paladin' || key === modularVisualKey('paladin')) {
+  // source clip (assets.ts's PALADIN_SYNTHESIZED_CLIP_SOURCES), for every key
+  // assets.ts synthesizes them on (classic, modular, the temple Reflection): a
+  // synthesized name resolves exactly when its source does, so a trimmed-away
+  // source still fails this gate.
+  // The WOC paladin body ships its own vocabulary: no synthesis there.
+  if (key !== undefined && synthesizesPaladinClips(key) && !def.wocCharacter) {
     for (const [synthesized, source] of Object.entries(PALADIN_SYNTHESIZED_CLIP_SOURCES)) {
       if (names.has(source)) names.add(synthesized);
     }
@@ -149,6 +160,10 @@ function requiredClipNames(clips: ClipMap): string[] {
   return [
     clips.idle,
     clips.combatIdle,
+    clips.stunned,
+    ...Object.values(clips.heldByAura ?? {}),
+    clips.turn,
+    clips.entrance,
     clips.prowlIdle,
     clips.prowlWalk,
     clips.walk,
@@ -167,10 +182,22 @@ function requiredClipNames(clips: ClipMap): string[] {
     clips.fall,
     clips.land,
     clips.walkBack,
+    clips.strafeLeft,
+    clips.strafeRight,
     clips.flourish,
     clips.stow,
+    clips.climb,
+    clips.sleep,
+    clips.wake,
+    ...Object.values(clips.idleByAura ?? {}),
     ...clips.attack,
+    ...(clips.meleeAttack ?? []),
+    clips.wandAttack,
+    // The Shape of the Foreman's ability swings (round-robin in CharacterVisual.playAttack).
+    ...(clips.abilityAttack ?? []),
     ...(clips.idleVariants ?? []),
+    // every loadout variant the rig swaps to must ship ('' = suppressed, not a clip)
+    ...Object.values(clips.loadoutSwaps ?? {}).flatMap((m) => Object.values(m ?? {})),
     clips.idleBeat?.clip,
     ...(clips.hit ?? []),
     ...Object.values(clips.attackByAbility ?? {}),
@@ -179,7 +206,63 @@ function requiredClipNames(clips: ClipMap): string[] {
     // cast-exit play-out entries name clips: a typo would silently disable
     // the recovery and bring the snap-to-idle back
     ...(clips.castPlayOut ?? []),
+    // both-hands dual-wield swings, and every clip a blade contact is timed on (the split
+    // halves ride `<clip>#main`/`#off`, minted from their clip at load, never shipped)
+    ...(clips.dualWieldPair ?? []),
+    ...Object.keys(clips.contacts ?? {}).filter((name) => !name.includes('#')),
+    // snap-in entries name clips too: a typo would bring the crossfaded,
+    // looping rise back (a figure popping in upright, then dropping)
+    ...(clips.castSnapIn ?? []),
   ].filter((name): name is string => !!name);
+}
+
+/** The ClipMap fields that name no clip; every other leaf string IS a clip name.
+ *  The two timescale maps and the cast hold point carry NUMBERS, and a charge-glow
+ *  row carries a spec object, so the generic walk below would otherwise read their
+ *  values as clip names that nothing binds. */
+const NON_CLIP_FIELDS = new Set<keyof ClipMap>([
+  'attackTimeScaleByAbility',
+  'castTimeScaleByAbility',
+  'castHoldPointSeconds',
+  'combatIdleHold',
+  'chargeGlowByAbility',
+  // The character branch's non-clip fields: per-clip contact times (numbers keyed by
+  // clip), the idle-variant cadence (seconds), and the shout's overhead emote id
+  // (null = no gesture).
+  'contacts',
+  'idleVariantCadence',
+  'shoutEmote',
+]);
+
+/** Every clip name a ClipMap carries, walked generically off the data. */
+function clipNamesInMap(clips: ClipMap): string[] {
+  const out: string[] = [];
+  for (const [field, value] of Object.entries(clips)) {
+    if (NON_CLIP_FIELDS.has(field as keyof ClipMap) || value === undefined) continue;
+    if (typeof value === 'string') out.push(value);
+    else if (Array.isArray(value))
+      out.push(...value.filter((v): v is string => typeof v === 'string'));
+    else if (field === 'emote')
+      for (const spec of Object.values(value as ClipMap['emote'] & object)) out.push(...spec.clips);
+    // idleBeat is a record of ONE clip plus its cadence numbers; only the clip is a name.
+    else if (field === 'idleBeat') out.push((value as ClipMap['idleBeat'] & object).clip);
+    // loadoutSwaps nests one clip remap per weapon loadout.
+    else if (field === 'loadoutSwaps')
+      for (const swap of Object.values(value as ClipMap['loadoutSwaps'] & object))
+        out.push(...Object.values(swap ?? {}));
+    else out.push(...Object.values(value as Record<string, string>));
+  }
+  return out;
+}
+
+/** Every clip a rig can name: its own ClipMap plus each boss stance it can
+ *  swap to (VisualDef.phaseClips) and that stance's entry one-shot. */
+function allRequiredClipNames(def: VisualDef): string[] {
+  const phases = Object.values(def.phaseClips ?? {}).flatMap((p) => [
+    ...requiredClipNames(p.clips),
+    ...(p.enter ? [p.enter] : []),
+  ]);
+  return [...requiredClipNames(def.clips), ...phases];
 }
 
 /** Emote specs are a fallback CHAIN (firstLoadedEmoteClip), so one is enough. */
@@ -193,6 +276,10 @@ function emoteChains(clips: ClipMap): [string, readonly string[]][] {
 const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'idle',
   'combatIdle',
+  'stunned',
+  'heldByAura',
+  'turn',
+  'entrance',
   'prowlIdle',
   'prowlWalk',
   'walk',
@@ -212,20 +299,41 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'fall',
   'land',
   'walkBack',
+  'strafeLeft',
+  'strafeRight',
   'flourish',
   'stow',
+  'sleep',
+  'wake',
+  'idleByAura',
   'attack',
+  'meleeAttack',
+  'wandAttack',
+  'abilityAttack',
   'hit',
   'attackByAbility',
   'attackTimeScaleByAbility',
   'castByAbility',
   'castTimeScaleByAbility',
   'castHoldPointSeconds',
+  'combatIdleHold',
   'castPlayOut',
+  'chargeGlowByAbility',
+  'castSnapIn',
   'attackByHand',
   'emote',
+  'shoutEmote',
+  'climb',
+  'stowSwapFraction',
+  'dualWieldSplit',
+  'clipSplits',
   'idleVariants',
+  'idleVariantCadence',
   'idleBeat',
+  'loadoutSwaps',
+  'stowPlaysWhole',
+  'dualWieldPair',
+  'contacts',
 ]);
 
 /**
@@ -248,6 +356,9 @@ const CLIPLESS_RIGS = new Set([
   'mob_duskwisp',
   'mob_spider_egg_sac',
   'mob_healing_tide_totem',
+  // The Gravewyrm Sanctum's Soul Brazier: the shipped infernal brazier as a
+  // stationary prop mob (sanctum_creature_looks.ts), its fire drawn by the fx.
+  'sanctum_soul_brazier',
   // Nyxaris's Bound Pulsar: the nucleus as a static prop; every motion it has is
   // drawn round it procedurally (src/render/hoard_pulsars.ts)
   'mob_bound_pulsar',
@@ -262,6 +373,9 @@ const CLIPLESS_RIGS = new Set([
   // the Mother of Mushrooms' Bloated Cap: a stationary Tripo prop mob, no rig,
   // no clips; it swells through its entity scale (src/sim/rift/hoard_mushroom.ts)
   'mob_hoard_bloat_cap',
+  // the Straw Foreman, the muster's training effigy: a clipless prop whose plank hide and
+  // lantern are driven by the effigy rig (characters/effigy_rig.ts)
+  'mob_muster_effigy',
 ]);
 
 /** mob_yumi_cat is a single-clip objective prop: its ClipMap names the one real
@@ -286,12 +400,58 @@ describe('character ClipMaps match the shipped GLBs', () => {
     }
   });
 
+  it('binds every gate-required clip as a mixer action (visual.ts clipNamesOf)', () => {
+    // visual.ts creates an AnimationAction ONLY for the names clipNamesOf enumerates, so a
+    // ClipMap slot this gate requires the GLB to carry but that list forgets is a clip that
+    // ships, passes the gate, and never plays: the state machine refuses a state it has no
+    // action for (desiredBaseState's hasSleepClip/hasWadeClip gates) and the one-shots
+    // resolve to null. Balgath's sleep loop shipped exactly that way once. The two
+    // enumerations agree by construction here, per rig, name for name.
+    for (const [key, def] of rigs) {
+      const bound = new Set(clipNamesOf(def));
+      // Every clip NAME the map carries, derived from the data rather than from this
+      // file's own hand list (requiredClipNames), so a slot registered only in
+      // COVERED_CLIP_FIELDS (the escape hatch for non-clip fields) cannot slip past.
+      const named = clipNamesInMap(def.clips);
+      // Distinct names on both sides: a clip a map names twice (an attack that is also a
+      // `contacts` key) is still one clip to bind.
+      expect(new Set(named).size, key).toBeGreaterThanOrEqual(
+        new Set(requiredClipNames(def.clips)).size,
+      );
+      const unbound = named.filter((name) => !bound.has(name));
+      expect(unbound, `${key}: clips the map names that visual.ts never binds`).toEqual([]);
+    }
+    // The gate is only as wide as its own list: the slots that motivated it are on it.
+    const balgath = VISUALS.mob_balgath_cyclops.clips;
+    expect(balgath.sleep).toBe('Balgath_Sleep');
+    expect(balgath.wake).toBe('Balgath_Wake');
+    expect(requiredClipNames(balgath)).toEqual(
+      expect.arrayContaining(['Balgath_Sleep', 'Balgath_Wake']),
+    );
+  });
+
   it('checks every ClipMap field (a new field must join the gate)', () => {
     for (const [key, def] of rigs) {
       const unknown = Object.keys(def.clips).filter(
         (field) => !COVERED_CLIP_FIELDS.has(field as keyof ClipMap),
       );
       expect(unknown, `${key} has ClipMap fields the gate does not check`).toEqual([]);
+    }
+  });
+
+  it('keeps every charge-glow spec inside its own mechanic', () => {
+    // `chargeGlowByAbility` names no clip, so it rides the covered-fields list rather than
+    // requiredClipNames; this is the check that replaces the one it skips. A glow that
+    // outlives its windup is still burning when the blow lands, which reads as a mechanic
+    // that never resolved, and a rise longer than the whole life never reaches full at all.
+    for (const [key, def] of rigs) {
+      for (const [ability, spec] of Object.entries(def.clips.chargeGlowByAbility ?? {})) {
+        expect(spec.seconds, `${key}/${ability} glow has no life`).toBeGreaterThan(0);
+        expect(spec.rise, `${key}/${ability} glow never reaches full`).toBeLessThanOrEqual(
+          spec.seconds,
+        );
+        expect(spec.radius, `${key}/${ability} glow has no size`).toBeGreaterThan(0);
+      }
     }
   });
 
@@ -312,7 +472,7 @@ describe('character ClipMaps match the shipped GLBs', () => {
       const missing: string[] = [];
       for (const [key, def] of rigs) {
         const loaded = loadedClipNames(def, standardMaterials, key);
-        for (const name of new Set(requiredClipNames(def.clips))) {
+        for (const name of new Set(allRequiredClipNames(def))) {
           if (name === SENTINEL_CLIP_NAME) continue;
           if (!loaded.has(name)) missing.push(`${key}: ${name}`);
         }
@@ -335,7 +495,7 @@ describe('character ClipMaps match the shipped GLBs', () => {
         const bodyUrl = visualAssetUrlForGraphics(def.url, standardMaterials);
         const rigNodes = nodeNamesOf(bodyUrl);
         const referenced = new Set([
-          ...requiredClipNames(def.clips),
+          ...allRequiredClipNames(def),
           ...emoteChains(def.clips).flatMap(([, chain]) => chain),
         ]);
         const sources = [

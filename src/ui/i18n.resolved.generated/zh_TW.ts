@@ -11,6 +11,119 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const zh_TW: EnTranslations = {
+  "referralCards": {
+    "title": "推薦好友",
+    "subtitle": "攜手冒險，收集印章。",
+    "close": "關閉推薦好友",
+    "launcher": "集章卡",
+    "pages": "集章卡分頁",
+    "firstPage": "首頁",
+    "nextPage": "更多卡片",
+    "trailmateTitle": "旅途夥伴",
+    "friendshipAura": "友誼",
+    "protectiveCharm": "守護護符",
+    "bankBonus": "已完成的集章卡",
+    "bankBonusHelp": "幫助兩名綁定好友完成集章卡，即可永久解鎖20個銀行欄位。",
+    "friendshipUse": "使你的力量、敏捷、耐力、智力和精神提高{stats}，持續{duration}秒。",
+    "readyCount": "集章卡：{count}份獎勵可領取",
+    "loading": "正在連線至你的推薦集章卡...",
+    "empty": "邀請一位新玩家，一起開始你們的第一張集章卡。",
+    "inviteTitle": "邀請好友",
+    "inviteHelp": "在好友建立帳號前，將此連結分享給他們。只有透過你的連結建立的新帳號才能成為綁定好友。",
+    "inviteLabel": "你的邀請連結",
+    "inviteUnavailable": "你的邀請連結暫時無法使用。",
+    "membership": "當綁定好友首次購買會員時，你將獲得一份會員契約。",
+    "cardBetween": "{you}與{friend}",
+    "yourCard": "{name}的集章卡",
+    "unassigned": "尚未選擇角色",
+    "start": "開始集章卡",
+    "startPrompt": "要與{friend}一起開始集章卡嗎？雙方都必須接受。每個角色都必須低於5級，且尚未完成新手島的最終任務。",
+    "accept": "接受",
+    "decline": "拒絕",
+    "declinePrompt": "確定要拒絕嗎？只要兩個角色仍符合要求，之後仍可從集章卡選單開始。",
+    "declineConfirmed": "尚未開始此卡片。只要兩個角色仍符合要求，就能從集章卡選單開始。",
+    "waiting": "正在等待綁定好友接受。",
+    "cancel": "取消",
+    "okay": "確定",
+    "understand": "是，我明白",
+    "confirmLock": "是，鎖定此卡片",
+    "lockFirst": "領取縛霧者印章獎勵後，此卡片將永久鎖定給{name}。你將無法再將此卡片及其獎勵轉移給其他角色。你明白嗎？",
+    "lockSecond": "確定嗎？領取縛霧者獎勵，並將此卡片永久鎖定給{name}。",
+    "locked": "此卡片已鎖定給{name}，無法再轉移。",
+    "unlocked": "在領取縛霧者印章獎勵前，可以將此卡片轉移給其他符合條件的角色。領取該獎勵後，卡片將永久鎖定給此角色。",
+    "move": "將卡片轉移至此角色",
+    "movePrompt": "將你的卡片從{oldName}轉移至{newName}嗎？卡片進度和所有透過此卡片獲得的獎勵都會轉移。這些獎勵將從{oldName}處移除。",
+    "confirmMove": "是，轉移我的卡片",
+    "summon": "召喚綁定好友",
+    "summonPrompt": "{friend}想將你召喚到他們所在的位置。接受召喚嗎？",
+    "summonHelp": "將綁定好友召喚到你所在的位置。每30分鐘可以召喚一次。",
+    "summonCooldown": "召喚還需{minutes}分{seconds}秒",
+    "reward": "獎勵：{reward}",
+    "earned": "已獲得",
+    "redeemed": "已領取",
+    "emptyStamp": "尚未獲得",
+    "stamping": "正在為卡片蓋章...",
+    "redeem": "領取獎勵",
+    "previous": "請先領取之前印章的獎勵。",
+    "playTogether": "與此卡片上的角色組隊完成里程碑。",
+    "fallback": "已經獨自完成了里程碑任務？與你的好友重新組隊即可獲得新手島印章。之後的任務印章需要一起通關對應地城。",
+    "questGroup": "集章卡任務",
+    "questWithFriend": "與{friend}一起完成{quest}",
+    "browseCards": "瀏覽全部集章卡分頁",
+    "nextQuest": "集章卡：{quest}",
+    "questIndicator": "此任務可推進你的下一個集章卡獎勵。",
+    "completion": "恭喜！{friend}在你的幫助下完成了集章卡。",
+    "openInvites": "開啟推薦好友",
+    "referrerTitle": "你幫助的好友",
+    "referrerCount": "{count}位好友已完成",
+    "friendTier": "已幫助好友：{count}",
+    "awarded": "已發放",
+    "pending": "尚未發放",
+    "milestones": {
+      "tutorial": "新手島最終任務",
+      "hollow": "進入空洞",
+      "fogbinder": "縛霧者",
+      "gravewyrm": "墓龍科祖爾",
+      "raid": "擊敗你的首個團隊首領"
+    },
+    "rewards": {
+      "tutorial": "一個獨有頭銜和一個最高容量背包，綁定至你的角色。",
+      "hollow": "一件提高耐力的飾品，並在你生命值較低時被動產生護盾。",
+      "fogbinder": "你的飾品進化，提高更多耐力，並獲得主動效果：所有屬性提高5點，持續15秒，冷卻時間為2分鐘。",
+      "gravewyrm": "免費坐騎訓練。",
+      "raid": "專屬友誼坦克坐騎。"
+    },
+    "referrerRewards": {
+      "1": "專屬友誼迅猛龍坐騎。",
+      "2": "20個銀行欄位和5個角色欄位。",
+      "3": "獲得1,000 Claudium。",
+      "4": "獲得1,000 Claudium。",
+      "5": "小樹苗夥伴。"
+    },
+    "reasons": {
+      "notParticipant": "此帳號不屬於這對綁定好友。",
+      "staleRevision": "你的卡片已發生變更。請查看最新進度後重試。",
+      "invalidCharacters": "隊伍中的角色不屬於這對綁定好友。",
+      "notTogether": "雙方綁定好友必須在同一隊伍中。",
+      "levelTooHigh": "新集章卡的角色必須低於5級。",
+      "tutorialCompleted": "有角色已經完成了新手島的最終任務。",
+      "alreadyStarted": "這對好友已經有卡片了。每對綁定好友只能有一張有效卡片。",
+      "notPending": "沒有等待回應的卡片邀請。",
+      "declinePending": "你的綁定好友正在決定是否拒絕此卡片。",
+      "declineNotConfirmed": "請先確認拒絕，再結束此次邀請。",
+      "notActive": "請先一起開始卡片，再領取獎勵。",
+      "wrongCharacter": "請使用卡片上列出的角色，或將尚未鎖定的卡片轉移至符合條件的角色。",
+      "locked": "此卡片已鎖定給其角色，無法轉移。",
+      "sameCharacter": "此卡片已經屬於此角色。",
+      "invalidMilestone": "該印章不屬於此卡片。",
+      "notEarned": "請先一起完成此里程碑，再領取獎勵。",
+      "alreadyRedeemed": "此獎勵已經領取。",
+      "previousRewardRequired": "請先領取之前印章的獎勵。",
+      "confirmationRequired": "領取縛霧者獎勵前，請先閱讀卡片鎖定警告。",
+      "newAccountsOnly": "只有透過推薦連結建立新帳號時，才能成為綁定好友。已有帳號無法綁定。",
+      "unavailable": "暫時無法執行此操作，請稍後再試。"
+    }
+  },
   "meta": {
     "builtOn": "建置於 {date}"
   },
@@ -347,6 +460,26 @@ export const zh_TW: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "信使",
+      "close": "關閉信使",
+      "ready": "準備配送",
+      "outbound": "正在飛往銀行",
+      "returning": "正帶著物品返回",
+      "waiting": "等待歸還物品",
+      "bags": "存入銀行",
+      "bank": "從銀行取出",
+      "cargo": "信使背包",
+      "empty": "沒有物品",
+      "send": "派出信使",
+      "selected": "已選 {count} / {limit} 組",
+      "select": "選擇{item}，{count}",
+      "selectedItem": "取消選擇{item}，{count}",
+      "instructions": "請選擇整組物品。信使會先存入物品，再取出您指定的物品。任務物品無法寄送。",
+      "membership": "續訂會員後即可開始新的配送。",
+      "cargoSafe": "背包有空位前，信使會保管所攜帶的物品。",
+      "unavailable": "召喚信使以安排配送。"
+    },
     "framePresets": {
       "apply": "套用",
       "pickerLabel": "框架預設：{name}",
@@ -513,6 +646,48 @@ export const zh_TW: EnTranslations = {
       "sailing": "正在駛往{dest}"
     },
     "materialStackSelectionUnavailable": "此素材選擇已失效。",
+    "shardpike": {
+      "braceLabel": "架起碎晶長矛",
+      "braceTooltip": "將矛尾插入地面，矛尖朝上。你的橫移鍵就是平衡桿：光束會自行漂移，他每次砸地都會把它踢偏。讓它離開兩端軌道並保持 {set} 秒即可架穩長矛。需要堅實的地面，且不能在坐騎上。",
+      "thrustLabel": "塚琉璃突刺",
+      "thrustTooltip": "將架穩的長矛刺入眼中，造成 {damage} 點傷害。沒有任何東西能加成它：等級、攻擊強度、長矛本身都不行。它會使工頭失明並剝離石塚之皮，讓泥沼中其他所有武器終於能咬進去。只有架穩的長矛才能送出這一擊，射程 {reach} 碼，窗口持續 {seconds} 秒。",
+      "braceTooltipLean": "將矛尾抵地，矛尖上舉。用橫移鍵或轉向鍵傾斜，或按住橫樑上方的兩個按鍵：橫樑會自行偏移，他每落下一擊都會把它震歪。讓它遠離兩端{set}秒，長矛即告架穩。需要堅實的地面，且不能在坐騎上。",
+      "releaseLabel": "放下碎晶長矛",
+      "releaseTooltip": "把長矛收起。中途放棄沒有懲罰：你失去的是架勢，不是這次機會，{rest} 秒後即可重新架起。",
+      "whyResting": "你剛剛放下了長矛。等圖示上的計時走完。",
+      "whyAlreadyCouched": "長矛已經架起。重新架矛前先把它放下。",
+      "whyNotSet": "長矛尚未架穩。先架起它並穩住。",
+      "whyNothingCouched": "沒有可放下的：長矛並未架起。",
+      "beamLabel": "碎晶長矛平衡",
+      "beamStatus": "長矛平衡 {balance}，架穩 {set}%。",
+      "beamDanger": "長矛平衡 {balance}，即將脫手。",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "用橫移鍵穩住長矛",
+      "promptCatchIt": "接住，長矛快要倒了",
+      "promptEyeOut": "眼睛已經瞎了，還有 {seconds} 秒：全力打他",
+      "promptSealed": "他的眼睛閉上了。{seconds} 秒後重新睜開",
+      "promptResetting": "正在重新架矛，{seconds} 秒",
+      "promptCloser": "靠近工頭，還差 {yards} 碼",
+      "promptBrace": "架起碎晶長矛，然後穩住它",
+      "promptFindBoss": "斯克里特的碎晶長矛：用它戳瞎工頭的眼睛",
+      "promptFindBossMuster": "徵召軍的碎晶長矛：用它戳瞎工頭的眼睛",
+      "promptTakePike": "按 {key} 或點擊武器架，取一把碎晶長矛",
+      "promptTakePikeClick": "點擊武器架，取一把碎晶長矛",
+      "promptTakePikeTap": "輕觸武器架，取一把碎晶長矛",
+      "promptPikeLevelCap": "徵召營只把長矛借給 {level} 級以下的新兵",
+      "promptHoldSteadyLean": "穩住長矛：用{left}和{right}傾斜",
+      "leanLeft": "向左傾斜",
+      "leanRight": "向右傾斜",
+      "leanLeftKey": "向左傾斜（{key}）",
+      "leanRightKey": "向右傾斜（{key}）",
+      "promptTally": "{count} put out",
+      "promptLabel": "碎晶長矛指示",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "已致盲！現在全團一起狠狠地打",
+      "promptStrikeLantern": "現在刺燈籠，{seconds} 秒",
+      "promptLanternOut": "燈籠滅了，還有 {seconds} 秒：用你自己的武器打它",
+      "promptCloserEffigy": "靠近稻草工頭，還差 {yards} 碼"
+    },
     "vehicle": {
       "title": "北方哨站砲台",
       "objective": "守衛北方哨站",
@@ -826,6 +1001,50 @@ export const zh_TW: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "遊戲訂閱",
+        "monthlyTitle": "月度會員",
+        "annualTitle": "12個月會員禮包",
+        "annualPrice": "12個月共{price}，一次付清",
+        "annualTerms": "每年以相同價格續訂。透過Stripe使用法定貨幣付款。可在帳單設定中取消。",
+        "annualMount": "付款後，請使用購買禮包的角色從郵件中領取靈魂綁定的坦克坐騎鑰匙。坦克暫時代替禮包坐騎。",
+        "trialTerms": "每個帳號可免費試用一次，共{days}天。需要提供付款方式。除非取消，否則試用結束時將收取{price}。",
+        "startTrial": "開始7天免費試用",
+        "resumeCheckout": "繼續結帳",
+        "checkoutClosed": "此結帳流程已結束，且沒有待領取獎勵。請重新選擇會員方案，開始新的結帳流程。",
+        "annualClaim": "領取禮包坐騎",
+        "annualPending": "付款後，請返回購買禮包的角色領取坐騎。如果付款正在處理或仍在試用期，請在付費成功後重試。",
+        "annualDelivered": "禮包坐騎鑰匙已透過郵件送達。",
+        "tokenTitle": "可交易會員代幣",
+        "benefitsTitle": "有效會員權益",
+        "benefitBank": "在任意銀行員處存取您其他角色的銀行。",
+        "benefitSlots": "額外解鎖10個角色欄位。",
+        "benefitArmour": "領取屬性適配您職業與專精的靈魂綁定護甲。護甲隨角色等級成長，在20級時達到物品等級25。裝備全套可多獲得20%經驗。",
+        "benefitTax": "拍賣場稅費減半。",
+        "benefitExpiry": "會員到期後，額外欄位中的角色和護甲加成會鎖定，續訂後恢復。基礎欄位中的角色仍可正常遊玩。",
+        "tokenTerms": "一次支付{price}，獲得30天會員代幣。代幣將郵寄給此角色，可兌換為會員時長，也可在拍賣場出售。",
+        "tokenBuy": "購買會員代幣",
+        "tokenClaim": "領取已購買的代幣",
+        "tokenPending": "付款後請返回此角色領取代幣。若付款仍在處理中，請稍後重試。",
+        "tokenDelivered": "您的代幣已透過郵件送達。",
+        "price": "每月 {price}",
+        "terms": "每月自動續訂。透過 Stripe 使用法定貨幣付款。可在帳單設定中取消。",
+        "subscribe": "訂閱",
+        "manage": "管理訂閱",
+        "ending": "將在目前帳單週期結束時取消",
+        "error": "無法開啟帳單頁面。請允許彈出式視窗後重試。",
+        "status": {
+          "none": "未訂閱",
+          "incomplete": "付款未完成",
+          "incomplete_expired": "結帳已過期",
+          "trialing": "試用中",
+          "active": "有效",
+          "past_due": "付款逾期",
+          "canceled": "已取消",
+          "unpaid": "未付款",
+          "paused": "已暫停"
+        }
+      },
       "title": "WOC 商店",
       "close": "關閉 WOC 商店",
       "tabsLabel": "WOC 商店分區",
@@ -1987,6 +2206,8 @@ export const zh_TW: EnTranslations = {
       "name_goblin_rocket_sled": "哥布林火箭雪橇",
       "name_rallycart_rxt": "拉力卡丁車 RXT",
       "name_terrorspark_groundshaker": "駭雷撼地者",
+      "name_referral_tank": "友誼坦克",
+      "name_referral_raptor": "友誼迅猛龍",
       "name_drakemaw_raptor": "龍喉迅猛龍",
       "name_avian_strider": "蒼翠谷行者",
       "name_mech_bird": "發條機械鳥",
@@ -2004,6 +2225,8 @@ export const zh_TW: EnTranslations = {
       "desc_rallycart_rxt": "一輛小巧卻道地的拉力賽車，能提升移動速度。",
       "desc_rallycart_skin": "一輛小巧的拉力賽車，轟鳴聲卻震天響。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
+      "desc_referral_tank": "完成一張推薦集章卡後獲得。",
+      "desc_referral_raptor": "幫助你的首位綁定好友完成一張集章卡後獲得。",
       "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。",
       "desc_avian_strider": "高大的坐騎巨鳥，粗壯的利爪與收攏的雙翼讓每一段旅程都化作雷鳴般的疾馳。",
       "desc_mech_bird": "一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。",
@@ -2208,6 +2431,7 @@ export const zh_TW: EnTranslations = {
       "showDevBadges": "顯示開發者徽章",
       "showOwnNameplate": "顯示我的姓名板",
       "showPlayerNameplates": "顯示玩家姓名板",
+      "showPetNames": "顯示寵物名稱",
       "uiScale": "介面縮放",
       "playerFrameScale": "玩家框縮放",
       "targetFrameScale": "目標框縮放",
@@ -2845,6 +3069,9 @@ export const zh_TW: EnTranslations = {
       "weapons": "武器",
       "groupSeason2": "戰爭賽季 2：先鋒",
       "groupEntry": "戰爭賽季 1",
+      "companions": "夥伴",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "owned": "已擁有",
       "buyAria": "以 {honor} 購買 {item}",
       "buyOwnedAria": "以 {honor} 購買 {item}，已擁有",
@@ -3112,8 +3339,10 @@ export const zh_TW: EnTranslations = {
         "storm": "你每施放一個法術便增加一層充能，最多 {max} 層。充能持續 {duration} 秒，每獲得一層便會刷新。",
         "heat": "你的近戰和遠程武器每次命中增加一層熱量，最多 {max} 層。熱量持續 {duration} 秒，每獲得一層便會刷新。",
         "ignite": "你的近戰和遠程武器致命一擊會點燃目標，每 {every} 秒造成 {tick} 點火焰傷害，持續 {duration} 秒。新的致命一擊會刷新該效果。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
-        "guardHeat": "你每招架、閃躲或格擋一次攻擊，便增加一層熱量，最多 {max} 層。熱量持續 {duration} 秒，每獲得一層便會刷新。"
+        "guardHeat": "你每招架、閃躲或格擋一次攻擊，便增加一層熱量，最多 {max} 層。熱量持續 {duration} 秒，每獲得一層便會刷新。",
+        "stoneHeart": "受到致命一擊時，你改為化作石像{statue}秒：不受傷害，無法移動或行動，隨後以{restore}點生命值（最大生命值的{restorePct}%）恢復。每{icd}只能觸發一次。決鬥和競技場比賽中不會觸發，這些戰鬥在致命一擊時結束。"
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "在 {duration} 秒內，直接擊中你的敵人會受到相當於該次攻擊令你損失生命值 {pct}% 的物理傷害。週期性傷害不會觸發此效果。",
         "anchor": "在 {duration} 秒內，受到的傷害降低 {reduction}%，但移動速度變為 {speed}%。移除你身上的昏迷、定身、緩速、恐懼、變形、沉默、致盲、妖術、繳械和失去行動能力效果，並在持續期間無視新的此類效果和擊退。",
@@ -3132,7 +3361,17 @@ export const zh_TW: EnTranslations = {
         "kindlingOrb": "在你身旁召喚一顆餘燼寶珠，持續 {duration} 秒。你每對敵人施放一個法術，它便向該敵人射出一道火焰彈，造成 {damage} 點火焰傷害。傷害隨法術強度提高。",
         "pierce": "在 {duration} 秒內，你的自動攻擊、射擊和物理技能（流血除外）命中還會打擊距離你的目標最近的、{reach} 碼內的一個敵人，造成所造成傷害的 {share}%。",
         "lantern": "在你腳下放置一盞提燈，持續 {duration} 秒。任何人對提燈 {radius} 碼內的你或隊伍成員施放的直接治療，還會以該治療量的 {share}% 治療燈光中受傷最重的另一名隊伍成員。",
-        "heartNova": "消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人每層熱量造成 {perHeat} 點火焰傷害（{maxHeat} 層時為 {max} 點），並嘲諷其命中的每個生物。傷害隨攻擊強度提高。需要至少一層熱量。"
+        "shackle": "用鎖鏈將 {range} 碼內的目標束縛在原地，持續 {duration} 秒。免疫控制的生物（例如首領）改為移動速度降低 {slow}%，除非它也免疫緩速。",
+        "spiritPack": "召喚一隻靈魂美洲豹在你身邊戰鬥，持續{duration}秒。牠會奔向你的目標，每{every}秒撕咬一次，造成{min}到{max}點物理傷害，並會轉而攻擊你選中的其他敵人。若你沒有選中敵人，牠會攻擊{range}碼內離你最近的敵人。傷害隨攻擊強度或遠程攻擊強度（取較高者）提高，在召喚時確定。需要{range}碼內的敵對目標。",
+        "seedburst": "在{range}碼內的目標身上種下一顆種子。{delay}秒後，種子在目標所在處（或其死亡處）爆裂，對{radius}碼內的每個敵人造成{damage}點自然傷害；若目標先行死亡，傷害提高{bonus}%（{empowered}）。傷害隨法術強度提高，在種下時確定。若你在種子爆裂前死亡，種子會枯萎。",
+        "tether": "用鎖鏈將你與{range}碼內的一名友方玩家相連，持續{duration}秒。本應傷及其生命值的傷害中有{share}%改由你承受。你死亡時提前結束。需要以你之外的友方玩家為目標。",
+        "harvest": "在{duration}秒內，每有一個敵對生物在你{radius}碼內死亡，就為你恢復{pct}%的最大生命值（{health}）和{pct}%的最大法力值。",
+        "quench": "在{duration}秒內，你接下來的{hits}次近戰或遠程武器命中額外造成{damage}點冰霜傷害。最後一次命中還會淬火目標，使其攻擊速度降低{slow}%，持續{slowDuration}秒。效果結束時未用完的命中次數會失效。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
+        "heartNova": "消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人每層熱量造成 {perHeat} 點火焰傷害（{maxHeat} 層時為 {max} 點），並嘲諷其命中的每個生物。傷害隨攻擊強度提高。需要至少一層熱量。",
+        "foremanShape": "化身工頭之形，持續{duration}秒：你變成獨眼巨人，以拳頭作戰，保留所有技能及其傷害。護甲提高{armorPct}%，且無法被擊退。會使你解除坐騎。",
+        "musterStandard": "在腳下插下徵召軍旗。{duration}秒內，{soldiers}名徵召士兵跟隨在你身邊，並與你的目標進行近戰，每人每{every}秒造成{damage}點物理傷害。他們只攻擊你的目標，且只在目標已進入戰鬥時出手。每人擁有你最大生命值的{hpPct}%。落後你超過{leash}碼時，他們會立即回到你身邊。軍旗倒下或你死亡時，他們會離開。傷害隨攻擊強度或遠程攻擊強度中較高者提高，在插旗時決定。",
+        "gutteredGlare": "引導{duration}秒：一道{length}碼長的光束從你面朝的方向射出，每{every}秒對路徑上最多{max}個敵人造成{tick}點秘法傷害（整個引導期間對每個敵人共{total}點）。轉身即可橫掃光束；移動或施法會使其結束。傷害隨法術強度提高。",
+        "grapnel": "用鉤索鉤住{range}碼內你能看見的一名小隊或團隊成員，將其從空中拉到你身邊，並在其落地時為其恢復{heal}點生命值。無法拉動敵人，也無法拉動在載具中、在船上、化作石像或被無法打破的效果控制的盟友。治療量隨治療強度提高。"
       }
     },
     "questShare": {
@@ -3581,6 +3820,14 @@ export const zh_TW: EnTranslations = {
       "watchYouTube": "在 YouTube 觀看",
       "streamerBadgeTitle": "認證主播"
     },
+    "buddyMenu": {
+      "rename": "Rename Buddy",
+      "nameLabel": "Buddy name",
+      "autolootEnable": "開啟自動拾取",
+      "autolootDisable": "關閉自動拾取",
+      "autolootHint": "你的夥伴會去拾取 30 碼內屬於你自己的屍體上的戰利品。",
+      "cancel": "取消"
+    },
     "lootSettings": {
       "title": "拾取設定",
       "close": "關閉拾取設定",
@@ -3906,6 +4153,64 @@ export const zh_TW: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "夥伴靠近時受到的傷害降低{pct}%。將馴獸師和他的美洲豹拉開即可打破羈絆。",
+        "packBondFury": "夥伴靠近時造成的傷害提高{pct}%。",
+        "stalked": "巨型美洲豹在追獵你，且無視嘲諷。每次撕咬造成{min}到{max}點物理傷害（英雄難度{heroicMin}到{heroicMax}點）並造成流血。把牠引離牠的主人。",
+        "waryStuns": "牠已被擊暈過一次。在此效果結束前，後續的擊暈都會失效。",
+        "waryRoots": "牠已被定身過一次。在此效果結束前，後續的定身都會失效。",
+        "warySlows": "牠已被減速過一次。在此效果結束前，後續的減速都會失效。",
+        "pollinated": "觸碰種莢會使其立刻長出荊棘幼芽。遠離種子，讓未授粉的玩家去踩碎它們；無人觸碰的種莢會在{seconds}秒後發芽（英雄難度下它會在{heroic}秒後鑽入地下，在最近的玩家身旁破土而出）。",
+        "prey": "祖爾加在追獵你。引他踏過點亮的太陽符文，使他減速{slow}%。若被他追上，你會被撕咬，受到{damage}點傷害（英雄難度{heroic}點）並被擊倒{stun}秒。",
+        "avatar": "移動速度提高{pct}%，追獵牠的獵物。減速和定身可以生效，擊暈的持續時間減半。",
+        "vanished": "隱匿且免疫傷害。他即將撲向最遠的玩家。"
+      },
+      "bastion": {
+        "brineColumn": "你被困在海水之柱中：每{tick}秒受到{min}到{max}點自然傷害，最多持續{seconds}秒。打斷或擊暈潮縛侍僧即可掙脫。",
+        "halberdWall": "另一名溺亡守望者在{radius}碼內時，受到的傷害降低{pct}%。把它們分開。",
+        "fogShroud": "站在霧堤中時，受到的傷害降低{pct}%。把它拖出霧中。",
+        "carrionGlut": "吞噬死者（{stacks}/{max}層）：每層使靈魂釋放的範圍擴大{radius}碼，傷害提高{pct}%。",
+        "snappedFetters": "它的鎖鏈已斷。它不再戰鬥，無法被傷害，並很快離開。",
+        "anchored": "被鎖在溺亡之錨上：你可以移動，但無法遠離絞盤，它會把你絞向溺亡深坑。走到距被鉤住處至少{run}碼的點亮繫泊柱{reach}碼以內即可繫住鎖鏈（該柱熄滅{dark}秒），或者讓隊友用{links}次攻擊砸斷鎖鏈（英雄難度{linksHeroic}次）。掉進深坑會損失{pit}%的最大生命值（英雄難度{pitHeroic}%）。"
+      },
+      "crypt": {
+        "carrionEye": "戰鬥中的所有烏鴉都會追獵你，持續{seconds}秒。跑向你的坦克，讓隊伍一起消滅鴉群。",
+        "graniteSkin": "受到的傷害降低{pct}%，石層每{every}秒增厚一次，最多{max}層。擊暈會將其擊碎，使其在{seconds}秒內受到的傷害提高{cracked}%。",
+        "measured": "此效果結束時，一座敞開的墳墓會在你所站之處塌陷：對{radius}碼內的所有人造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點）。墳墓會在整場戰鬥中保留，所以把印記帶到墓園邊緣，遠離隊伍。",
+        "graveDirt": "站在敞開的墳墓中：移動速度降低{slow}%，每秒受到{damage}點暗影傷害（英雄難度{heroic}點）。英雄難度下，在墳墓中停留{linger}秒會喚起一具不安之骨。離開墳墓。",
+        "dirtInEyes": "移動速度降低{pct}%。一鏟墳土會擊中司事馬羅身前的所有人：站到他身後。",
+        "blow": "受到的傷害提高{pct}%：每層{per}%，目前{stacks}/{max}層。每次掘墓人重擊都會增加一層，並將持續時間重置為{seconds}秒。",
+        "graveVigor": "站在敞開的墳墓中時攻擊速度提高{pct}%。別讓他待在墳墓裡。",
+        "tolling": "他大步走向鐘繩並敲響葬鐘時免疫傷害。鐘聲結束時，喪鐘對所有人造成{min}到{max}點暗影傷害（英雄難度{heroicMin}到{heroicMax}點），並且每座敞開的墳墓都會爬出一具不安之骨。",
+        "embraced": "被夫人舉在半空：無法行動，每秒受到{tick}點冰霜傷害（英雄難度{tickHeroic}點）。如果你的隊伍打掉她{share}%的最大生命值，她會把你輕輕放下；如果她在高處抓住你{hold}秒，就會把你扔到冰面上，造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點）。",
+        "lament": "新娘的哀歌結束時，對所有不在點亮的墓燈{radius}碼內的人造成{min}到{max}點冰霜傷害（英雄難度{heroicMin}到{heroicMax}點）。每盞燈只庇護離它最近的{cap}名玩家，然後熄滅並錯過下一次哀歌。",
+        "lingering": "你承受的下一次新娘的哀歌傷害提高{pct}%：每層{per}%，最多{max}層。下一次請在墓燈光芒中承受。",
+        "slippery": "在光滑的冰面上：你的速度每秒最多改變{grip}碼/秒，所以起步緩慢，停下時會繼續滑行，轉向時會甩出大弧線。離開冰面就能重新站穩。",
+        "harmony": "受到的傷害降低{pct}%：她每有一名存活的唱詩者就降低{per}%。先殺死唱詩者。",
+        "crescendo": "唱得更快：空洞輓歌只需{cast}秒（原為{castNormal}秒），每{every}秒一次（原為{everyNormal}秒），骨管風琴會奏出{waves}波音符（原為{wavesNormal}波）。",
+        "gorged": "造成的傷害提高{pct}%：每個抵達他身邊的縛魂提高{per}%，目前{stacks}/{max}層，持續到戰鬥結束。每個抵達的靈魂還會為他恢復{heal}%的最大生命值。站到靈魂的路徑上，就能由你代為承受。",
+        "unquietWard": "他在祭壇引導不寧者儀式時免疫傷害：已重燃{lit}/{total}根追思蠟燭。重燃一根需要引導{channel}秒，期間每秒吸取點燃者{drain}%的最大生命值（英雄難度{drainHeroic}%）；受到攻擊不會打斷，移動或昏迷會打斷。最後一根蠟燭會擊碎結界。英雄難度下，須按名冊點出的順序點燃：點錯蠟燭會熄滅最後點燃的那根，並對點燃者造成{wrongMin}到{wrongMax}點暗影傷害。",
+        "riteBroken": "昏迷：破碎的結界讓他{seconds}秒內無法行動。",
+        "shatteredWard": "{seconds}秒內受到的傷害提高{pct}%：重燃的蠟燭擊碎了他的結界。現在就打出最強的攻擊。",
+        "graveChill": "不寧者儀式持續期間，每秒受到{bite}點暗影傷害（英雄難度{biteHeroic}點），每{every}秒提高{step}點（英雄難度{stepHeroic}點）。重燃追思蠟燭來終結它。",
+        "graspMark": "{fuse}秒後，你腳下的法環中會伸出鬼手：法環落下處{radius}碼內的所有人被定身{root}秒，並受到{min}到{max}點暗影傷害。離開法環。",
+        "graspRoot": "被墳墓之手抓住：{seconds}秒內無法移動。",
+        "knellAirborne": "在儀式之環上空飛行，無法觸及。它會標記半個法環{mark}秒，然後向那一半傾瀉幽魂之火：對其中所有人造成{min}到{max}點火焰傷害。每次飛行焚燒{breaths}個半區，然後降落。"
+      },
+      "sanctum": {
+        "lockbound": "受到的傷害降低{pct}%：每條仍然完好的鎖鏈提供{per}%。打破一個封印鐐銬即可讓其鎖鏈脫落。",
+        "enrage": "造成的傷害提高{pct}%。",
+        "grasp": "站在融水中，造成的傷害提高{pct}%。如果它死在融水中，會沉下並在{seconds}秒後再次復生；在寒冰上擊殺它才能讓它不再起來。",
+        "twiceWoken": "從融水中再次復生，造成的傷害提高{pct}%。",
+        "doused": "他腳下的冰板碎裂，淬火之水撲滅了他的墓場煉獄。",
+        "airborne": "身在空中，無法被攻擊。他會以墜擊降落落在站人最多的冰板上，對{radius}碼內的所有人造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點）。",
+        "wyrmsEye": "此效果結束時，科祖爾會向你所在的整塊冰板傾瀉俯衝烈焰：對其上所有人造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點），冰板開裂，若已開裂則碎裂。站在完好的冰面上，遠離隊伍。",
+        "quenchWater": "身處開闊的淬火之水：移動速度降低{slow}%，每秒受到{damage}點灼燒傷害（英雄難度{heroic}點）。游向任意冰板或岸邊。",
+        "shardFlare": "心之碎片閃耀：墓穴吐息每{breath}秒一次，振翼狂風每{gale}秒一次。",
+        "branded": "每{interval}秒造成{value}點{school}傷害，持續{seconds}秒。踏入融水池可立即將其澆熄。",
+        "creepingRime": "移動速度降低{pct}%，每層{per}%。每次霜凇吐息都會疊加一層並將持續時間重置為{seconds}秒。疊到{max}層時你會被凍結（冰封）{freeze}秒，並清除所有層數。",
+        "icedOver": "被蔓延霜凇凍結：無法移動或行動。"
+      },
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。",
       "makersBrand": "持續 {duration} 秒，每層使你受到瓦爾庫爾的傷害提高 {pct}%。最多疊加 {max} 層。坦克應在 {swap} 層時換坦。",
@@ -3950,6 +4255,8 @@ export const zh_TW: EnTranslations = {
       "cooldownCap": "此時間窗已使用 {used}/{cap} 秒冷卻縮減",
       "bruinRushWindow": "狼形態無需法力，並釘制你的巨熊衝鋒目標，使其減速 {pct}%，持續 {sec} 秒",
       "funeralHarvestLock": "葬禮收割暫時無法再次產生靈魂碎片",
+      "effigyPlankHide": "擋掉每次攻擊的 {pct}%，直到碎晶長矛的突刺熄滅它眼中的燈籠",
+      "effigyLanternOut": "對你而言，稻草工頭的燈籠已經熄滅：你和你寵物的攻擊無視其木板之皮，全額命中",
       "leadenHexLock": "鉛沉妖術暫時無法再次定身此目標",
       "forbiddenReflectionReady": "下一個符合條件的術士冷卻技能可再次施放",
       "forbiddenReflectionLock": "禁忌映像暫時無法再次準備",
@@ -4006,8 +4313,8 @@ export const zh_TW: EnTranslations = {
       "nextAttackCrit": "下一次攻擊必定造成致命一擊",
       "healEcho": "生命值低於 {threshold}% 時恢復 {value} 點生命值",
       "trinket": {
-        "lastStandCooldown": "堡壘徽印的最後堡壘護盾已被使用。在此效果結束前，生命值低於 {threshold}% 時無法再次觸發。",
-        "lastBastion": "吸收 {value} 點傷害。你在生命值低於 {threshold}% 時受到傷害，堡壘徽印為你升起了此護盾。",
+        "lastStandCooldown": "你的防護護盾已經觸發。在此效果結束前，生命值低於{threshold}%時受到傷害也無法再次產生護盾。",
+        "lastBastion": "吸收{value}點傷害。你在生命值低於{threshold}%時受到傷害，觸發了飾品的護盾。",
         "retaliate": "直接擊中你的敵人會受到相當於該次攻擊令你損失生命值 {pct}% 的物理傷害。週期性傷害不會觸發此效果。",
         "moored": "你受到的傷害降低 {reduction}%，但移動速度變為 {speed}%。你無視昏迷、定身、減速、恐懼、變形、沉默、致盲、妖術、繳械、失去行動能力效果和擊退。",
         "hourglassStored": "儲存了來自你過量治療的 {stored} 點治療量。使用癒者沙漏可將其轉化為護盾，施加於 {range} 碼內生命值百分比最低的隊伍成員（包括你自己）。",
@@ -4028,6 +4335,16 @@ export const zh_TW: EnTranslations = {
         "riftGuard": "你受到的傷害降低 {pct}%。",
         "sprint": "移動速度提高 {pct}%。不與其他速度提高效果疊加。",
         "brand": "受到的治療效果降低 {pct}%。",
+        "shackle": "被鎖鏈束縛：無法移動。",
+        "shackleSlow": "鎖鏈纏身：移動速度降低 {pct}%。",
+        "spiritPack": "一隻靈魂美洲豹在你身邊戰鬥，每{every}秒撕咬你的目標一次，造成{min}到{max}點物理傷害。",
+        "seedburst": "噬花的種子。此效果結束時爆裂，對{radius}碼內的每個敵人造成{damage}點自然傷害；若此敵人在此之前死亡，傷害提高{bonus}%（{empowered}）。",
+        "tether": "被工頭的最後一環鎖住：本應傷及你生命值的傷害中有{pct}%改由鎖住你的人承受。",
+        "tetherLink": "你承受被鎖住的盟友本應受到的傷害的{pct}%。",
+        "harvest": "每有一個敵對生物在你{radius}碼內死亡，就為你恢復{pct}%的最大生命值和法力值。",
+        "quench": "你接下來的{stacks}次武器命中額外造成{damage}點冰霜傷害。最後一次命中使目標的攻擊速度降低{slow}%。",
+        "quenchOther": "接下來的{stacks}次武器命中造成額外冰霜傷害。最後一次命中使目標的攻擊速度降低{slow}%。",
+        "quenched": "攻擊速度降低 {pct}%。",
         "forgeHeat": "熱量：{stacks}/{max}。使用熔鑄之父的淬火會消耗所有熱量，使其武器火焰傷害提高 {pct}%。",
         "tempered": "你的近戰和遠程武器命中額外造成 {damage} 點火焰傷害（消耗的熱量使其提高 {pct}%）。每次致命一擊延長 {killExtend} 秒，總計最多 {maxDuration} 秒。",
         "temperedOther": "近戰和遠程武器命中額外造成火焰傷害，消耗的熱量使其提高 {pct}%。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
@@ -4036,6 +4353,10 @@ export const zh_TW: EnTranslations = {
         "moltenIgnite": "每 {every} 秒造成 {damage} 點火焰傷害。新的武器致命一擊會刷新該效果。",
         "pierce": "你的自動攻擊、射擊和物理技能（流血除外）命中還會打擊距離你的目標最近的、{reach} 碼內的一個敵人，造成所造成傷害的 {pct}%。",
         "lantern": "任何人對提燈 {radius} 碼內的你或隊伍成員施放的直接治療，還會以該治療量的 {pct}% 治療燈光中受傷最重的另一名隊伍成員。",
+        "foremanShape": "你就是工頭：護甲提高{armorPct}%，免疫擊退。",
+        "musterStandard": "你的徵召軍旗已插下。士兵們跟隨你，並與你的目標作戰。",
+        "gutteredGlare": "光束每{every}秒對路徑上的敵人造成{tick}點秘法傷害。移動或施法會使其結束。",
+        "stoneStatue": "已化作石像：免疫傷害且無法行動。你將以最大生命值的{pct}%恢復。",
         "crucibleHeat": "熱量：{stacks}/{max}。使用熔爐之心可消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人造成 {damage} 點火焰傷害，並嘲諷其命中的每個生物。",
         "crucibleHeatOther": "熱量：{stacks}/{max}。熔爐之心會消耗所有熱量在 {radius} 碼內釋放一道火焰新星，每層熱量都會提高火焰傷害，並嘲諷其命中的每個生物。"
       },
@@ -4071,6 +4392,7 @@ export const zh_TW: EnTranslations = {
       "dodge": "閃躲機率提高 {pct}%",
       "dodgeReduce": "閃避機率降低 {pct}%",
       "damageReduction": "受到的所有傷害降低 {pct}%",
+      "slumber": "沉睡至黎明。無法被攻擊，任何人都無法將其喚醒。",
       "guardianWard": "下一次敵人的致命攻擊會改為將你的生命值恢復至 {pct}%",
       "armorFlat": "護甲降低 {value}",
       "armorFlatStacks": "護甲降低 {value}（{stacks} 層）",
@@ -4147,7 +4469,9 @@ export const zh_TW: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}在荊峰高地崛起！"
+      "spawn": "{name}在{zone}上空崛起！",
+      "wake": "{name}在{zone}上空甦醒！",
+      "sleep": "{name}沉睡至黎明。"
     },
     "auth": {
       "appleLoginCta": "透過 Apple 繼續",
@@ -4291,6 +4615,7 @@ export const zh_TW: EnTranslations = {
         "menu": "選單",
         "minimap": "小地圖",
         "stanceBar": "姿態欄",
+        "shardpikeBar": "碎晶長矛欄",
         "xpBar": "經驗條",
         "chat": "聊天",
         "actionBarGroup": "動作列群組",
@@ -4880,6 +5205,19 @@ export const zh_TW: EnTranslations = {
       "vaultCannotDeposit": "無法存入材料倉庫",
       "tabsAria": "銀行標籤頁",
       "personalTab": "個人",
+      "accountTab": "其他角色",
+      "accountArmour": "領取會員護甲",
+      "referralArmour": "領取友誼護甲",
+      "accountMembership": "會員有效期間，可在此存取您其他角色的銀行。",
+      "accountCharacters": "角色銀行",
+      "accountEmpty": "建立另一個角色後，即可在此使用該角色的銀行。",
+      "accountSelect": "選擇一個角色以載入其銀行。",
+      "accountUnavailable": "此銀行暫不可用。請重新選擇該角色以重新整理。",
+      "accountDeposit": "您的背包：存入此銀行",
+      "accountWithdraw": "所選銀行：取出到您的背包",
+      "accountDepositHint": "點擊將此堆物品存入所選角色的銀行。",
+      "accountWithdrawHint": "點擊將此堆物品取出到您的背包。",
+      "accountBound": "靈魂綁定、已鎖定及任務物品無法在角色間轉移。",
       "guildTab": "公會",
       "guildCapacityAria": "公會銀行格已用：{used}/{total}",
       "guildEmpty": "公會銀行是空的。",
@@ -4949,6 +5287,190 @@ export const zh_TW: EnTranslations = {
       "logOpenBank": "{actor} 花費 {amount} 開啟了公會銀行",
       "logCharterFee": "{actor} 支付了 {amount} 的公會創建費用",
       "logAdminPurge": "管理員移除了 {count} 個 {item}"
+    },
+    "collections": {
+      "title": "狩獵",
+      "close": "關閉狩獵",
+      "keybindLabel": "狩獵",
+      "launcherTitle": "狩獵：夥伴、坐騎與套裝",
+      "tabs": {
+        "buddies": "夥伴",
+        "mounts": "坐騎",
+        "sets": "Item Sets"
+      },
+      "state": {
+        "owned": "已收集",
+        "notOwned": "未收集",
+        "unavailable": "尚無法獲得",
+        "pending": "有什麼在跟著你"
+      },
+      "presenceDefault": "你感覺到有什麼在注視著你。",
+      "revealed": "{name}決定跟隨你。",
+      "cosmeticUnlocked": "{name}的新外觀：{look}。",
+      "presence": {
+        "ember_fox": "有個溫暖的小東西正輕手輕腳地跟在你身後。",
+        "moss_hare": "泥炭裡的一陣窸窣聲與你的腳步保持著同步。",
+        "frog": "你每走一步，就有一聲濕漉漉的蛙鳴回應。",
+        "crimson_claw_crab": "視線之外有什麼東西喀嗒作響地爬來爬去。",
+        "golden_sentinel": "草叢中有一抹微弱的金光在注視著你。",
+        "nightfang": "無聲的腳爪在你看不見的地方尾隨。",
+        "tuskhorn_boar": "一聲哼鼻、一記跺腳：有個倔強的傢伙正跟著你。",
+        "emerald_wolf": "灌木叢中一雙綠眼睛眨了眨，然後跟了上來。",
+        "tiger": "你的視野邊緣有條紋在晃動。",
+        "cate_coin": "你聽到一枚不屬於你的硬幣發出微弱的響聲。",
+        "alon": "你感到被注視著，還被默默地讚許著。",
+        "trollface": "在你身後的某處，有什麼東西正咧嘴笑著。",
+        "ansem": "關於門與黑暗的低語跟隨著你。",
+        "triple_t": "本該只有一個腳步聲的地方，響起了三個。",
+        "kekius": "一聲壓抑的笑聲沿著路尾隨著你。",
+        "solbot": "一陣輕柔的滴答聲與你的步伐合拍。",
+        "frostfire": "蒸汽與寒霜在你身後盤旋。",
+        "rocky": "你身後的碎石在沒有風的情況下移動了。",
+        "proud_grunt": "你身後某處，一隻軍靴跺腳立正。",
+        "loot_goblin": "有什麼東西正小聲數著你的錢幣。",
+        "penny_goldspark": "不屬於你的口袋裡，小工具叮噹作響。",
+        "stag": "一道長著鹿角的影子橫過你的路。",
+        "alpaca": "有個毛茸茸、不慌不忙的傢伙決定跟你走。",
+        "horse": "身後某處，馬蹄正踏著從容而耐心的節拍。",
+        "sapling": "細小的樹根在你身後輕快地踏過，撥動了落葉。",
+        "bull": "一聲低沉的喘息揚起了你身後的塵土。",
+        "spider": "一縷蛛絲拂過你的肩膀。",
+        "raptor": "你腳跟後有敏捷的爪子在石頭上嗒嗒作響。",
+        "skeleton": "乾枯的骨頭隨著你的腳步喀喀作響。",
+        "crystal_lich": "一陣寒冷的嗡鳴從殘骸中升起，它正注視著你。",
+        "forgemaw": "熔爐的熱度還沒有離開你。有什麼東西隨之走了出來。",
+        "crystal_tide": "一滴海水拒絕從你的釣線上落下。",
+        "phantom": "你身後的空氣靜得有些過分。",
+        "emberfall_phoenix": "一股如同封火般的暖意落在你的背後。"
+      },
+      "cosmetic": {
+        "crystal_lich_frostbound": "霜縛",
+        "crystal_lich_voltaic": "雷光",
+        "forgemaw_ashen": "灰燼",
+        "forgemaw_whitehot": "白熱",
+        "stag_acorn": "橡果之冠",
+        "stag_gilded": "鍍金",
+        "moss_hare_verdant": "青翠",
+        "proud_grunt_warlord": "戰爭領主",
+        "frog_sapphire": "藍寶石蛙"
+      },
+      "actions": {
+        "summon": "召喚",
+        "dismiss": "解散",
+        "wear": "穿戴",
+        "remove": "卸下"
+      },
+      "looks": {
+        "title": "外觀",
+        "unlocked": "已解鎖",
+        "locked": "未解鎖",
+        "worn": "穿戴中",
+        "none": "這個夥伴還沒有可用的外觀"
+      },
+      "source": {
+        "bossLabel": "首領寵物",
+        "bossDrop": "{mob}（{location}），每次擊殺每位玩家{chance}%",
+        "bossDropWithHeroic": "{mob}（{location}），每位玩家{chance}%，英雄難度{heroicChance}%",
+        "bossDropHeroicOnly": "{mob}（{location}），僅限英雄難度，每位玩家{chance}%",
+        "rollNote": "每位玩家單獨擲骰；不會有人因隊友而失去機會。",
+        "deedLabel": "獲取途徑",
+        "deed": "功績：{deed}",
+        "challengeLabel": "挑戰",
+        "challengeSpeed": "在開怪後{seconds}秒內擊敗{mob}",
+        "challengeDps": "在整場戰鬥中對{mob}保持每秒{dps}點傷害",
+        "craftLabel": "製作",
+        "craft": "{item}（{profession}配方）",
+        "grantLabel": "頒發",
+        "grantOnly": "賽季獎勵：每月天梯與最高戰鬥記錄獎勵",
+        "tokenLabel": "憑證",
+        "token": "{item}，使用一次即可讓夥伴跟隨"
+      },
+      "buddyLore": {
+        "ember_fox": "出自東溪谷樹籬間的母狐，得名於冬日枯叢中透出的炭紅皮毛。那裡的獵人幾代之前就不再打幼崽的主意，改成替牠們留下食物。",
+        "moss_hare": "柳澤沼地的野兔，一輩子臥在濕泥炭裡，長出了一身綠毛。沼澤的草藥師視牠們為吉兆，絕不肯把落在門前的趕走。",
+        "frog": "泥沼濕地把牠們養得肥壯而無憂無慮，整夜在葦叢裡高歌。沼澤嚮導都賭咒說，船上載著一隻就絕不會擱淺。",
+        "crimson_claw_crab": "遠岸的潮間蟹，離水許久之後鉗子依舊通紅。當年碼頭工人常讓牠們在跳板上賽跑賭錢。",
+        "golden_sentinel": "琥珀秋境的守望甲蟲，被自己長大的那片樹脂鍍成了金色。這名字比樹脂更古老：早在有人想到裝取樹液之前，就已有某種哨兵守著那些林子了。",
+        "nightfang": "夜綻花野的年輕獵手，即便以同類的標準衡量也安靜得出奇。牠跟著人只為作伴，獵物從不比飛蛾更大。",
+        "tuskhorn_boar": "荊峰高地的種，被牧人刻意育成短腿，圖的是一頭拱不倒籬笆的野豬。脾氣倒是原封不動地留下來了。",
+        "emerald_wolf": "一隻怨靈林的幼狼，皮毛在幾乎照不到林底的樹冠餘光裡泛著綠色。守林人會把森林留下的每一隻孤兒養大。",
+        "tiger": "一身棕櫚灣的斑紋，長在一頭從沒見過棕櫚灣的獸身上：自從舊日獸苑關閉，這一支血脈便一直圈養至今。牠只聽哨聲，此外什麼也不應。",
+        "cate_coin": "一隻貓，絕不肯離開自己屁股底下那枚錢幣，也從沒人見牠吃過東西。東溪谷的商人至今還在爭論：這兩者到底哪一個才是寵物。",
+        "alon": "一位旅人的吉祥物，來自任何地圖都不肯承認的道路，總在計畫出岔子的地方現身。牠看著，牠點頭，然後什麼忙也不幫。",
+        "trollface": "怨靈林放出來、又不肯收回去的一張咧嘴笑臉。每一次試圖描述牠的嘗試，都以描述者自己笑場放棄告終。",
+        "ansem": "牠談論門扉與黑暗，再問就不肯多說了。夜綻花野的信徒聲稱牠屬於他們；可每逢他們舉行儀式，牠就溜走了。",
+        "triple_t": "某樣東西的三份，或是同一樣東西重複三遍。各家說法互相矛盾，而這生物又從不肯老實待著讓人數清。",
+        "kekius": "一位來歷不明的歡笑同伴，被疾風崖的賽馬場收作吉祥物。發誓靠牠轉運的馬廄換了四家，牠還在。",
+        "solbot": "一具以陽光為食的小型自動機，從龍裔荒原的火山灰裡半埋著挖出來時仍在走動。造牠的作坊沒在外殼上留下任何印記。",
+        "frostfire": "生於霜幕之境一處溫泉湧出冰原的地方，牠始終沒弄明白自己屬於哪一半。冷天裡冒著熱氣，暖處又直打哆嗦。",
+        "rocky": "荊峰高地碎石坡上的石殼爬行者，行動遲緩，且徹底心無掛礙。礦工養著牠們，是因為牠們總在塌方前一瞬靜止不動。",
+        "proud_grunt": "戰備倉庫的一名老兵，敬禮保住了，軍銜丟了。戰帥德拉文·科爾會把這樣一位交給任何一個榮譽足以懂得那代價的士兵。",
+        "loot_goblin": "牠跟著每一個身上帶著英雄徽記的人，卻一次也沒被抓到偷東西。軍需官維克斯堅稱，這壓根說明不了任何問題。",
+        "penny_goldspark": "一位侏儒工匠的學徒，按小時收費，而且每一枚銅板都物有所值。護甲匠霍德當年為抵一筆債收下了她，如今誰揣著一千金，他就把這份差事賣給誰。",
+        "stag": "常青園的血脈，由守林人昔日騎乘的巨鹿一代代選育而來。有人抬手，牠仍會低下頭——那是比這頭鹿本身更古老的習慣。",
+        "alpaca": "疾風崖的牧群養牠們既為羊毛，也為脾氣：暴風雨裡沒有比牠更鎮定的。這一隻每趟旅程恰好會朝一個人吐口水。",
+        "horse": "東溪谷矮馬血統，為果園小徑特意培育得矮小，也從沒人告訴牠自己不是戰馬。牠在你肩旁保持步調，誰曾餵過牠一個蘋果，牠就會跟誰走。",
+        "sapling": "一株樹皮上帶著笑容、紫色眼睛裡滿是好奇的小樹。無論你走到哪裡，牠都會邁著樹根，歡快地搖搖擺擺跟上。",
+        "bull": "一頭狗一般大的東溪谷公牛，這也是唯一讓人肯把牠養在屋裡的理由。可脾氣並沒跟著一起縮小。",
+        "spider": "怨靈林的織網者，巴掌大小，會把任何裝著牠的背包重新佈置一遍。那些蛛絲比牠替換掉的線還結實。",
+        "raptor": "龍裔荒原的雛龍種，還沒學會自己能跑多快就被轉手賣掉。每一位新主人都被叮囑要餵飽牠，而沒有一個需要被叮囑第二遍。",
+        "skeleton": "牠從怨靈林的古塚裡爬出來，撢了撢自己身上的土，從此就跟著人走。這副骨頭當初是誰的，至今沒人查清。",
+        "crystal_lich": "尼思拉克西斯本體的一枚碎片，至今仍鳴響著塑成牠的那股寒意。誰把牠從團隊副本的殘骸裡拽出來，牠就聽誰的——而且始終沒有原諒那個人。",
+        "forgemaw": "在最後泉源熔爐中鍛造，卻始終沒有真正完工——錘聲未歇，牠便自己走出了伊格尼瓦的鑄場。只有英雄難度的下潛才能找到牠：這熔融之物總會回到造出牠的那座爐子，然後跟著兩度熬過烈火的人回家。",
+        "crystal_tide": "一隻乘著自己那滴海玻璃的潮汐精靈，被從東溪谷到遠岸只想釣頓晚飯的漁人從靜水裡勾了上來。牠把撈起牠的那捧水一直帶在身邊，怎麼勸也不肯回去。",
+        "phantom": "來自怨靈林古塚的巴掌大幽魂，只有一層布、沒有骨頭，會出現在一個明明合好的背包裡，然後為了作伴留下來。沒人弄清牠想要什麼，而牠一次也沒試過嚇唬誰。",
+        "emberfall_phoenix": "每逢秋天牠便燃盡成一粒餘燼，到了春天又從自己的灰裡重新升起——關於牠，誰也說不出更多了。從沒有人找到過牠的巢，也從沒有人捉到過同一隻兩次。"
+      },
+      "petKind": {
+        "beast": "野獸",
+        "elemental": "元素生物",
+        "humanoid": "類人生物",
+        "undead": "不死生物",
+        "celebrity": "名流"
+      },
+      "armor": {
+        "cloth": "布甲",
+        "mail": "Mail",
+        "leather": "皮甲"
+      },
+      "stat": {
+        "intellect": "智力",
+        "agility": "敏捷",
+        "strength": "力量",
+        "mixed": "混合"
+      },
+      "set": {
+        "owned": "{total} 件中已收集 {owned} 件",
+        "itemLevel": "裝等 {level}",
+        "bonusLabel": "{pieces} 件套"
+      },
+      "detail": {
+        "dropLabel": "掉落自",
+        "vendorLabel": "Sold by",
+        "bindLabel": "綁定",
+        "sellLabel": "商人收購價",
+        "marketLabel": "世界市場",
+        "exchangeLabel": "$WOC 交易所",
+        "setLabel": "已收集",
+        "drop": "{mob}（{location}），每次擊殺 {chance}%",
+        "heroicDrop": "{mob}（{location}），僅限英雄難度，每次擊殺 {chance}%",
+        "dropWithHeroic": "{mob}（{location}），每次擊殺 {chance}%，英雄難度 {heroicChance}%",
+        "globalDrop": "任意敵人，每次擊殺 {chance}%，同稀有度 {count} 件中的一件",
+        "fishingDrop": "任意水域釣魚，每次上鉤 {chance}%",
+        "vendor": "{npc} ({location}) for {price}",
+        "honorPrice": "{amount} 榮譽",
+        "marksPrice": "{amount} 英雄徽記",
+        "noSource": "遊戲中尚無獲取途徑",
+        "noItem": "尚無物品可以獲得",
+        "tradeable": "可交易",
+        "soulbound": "靈魂綁定",
+        "noSell": "無法出售",
+        "marketAtMerchant": "在商人處查看",
+        "marketChecking": "查詢中…",
+        "marketNone": "無上架",
+        "exchangeNone": "無上架",
+        "exchangeUnavailable": "此用戶端不支援"
+      }
     },
     "calendar": {
       "title": "活動日曆",
@@ -5949,10 +6471,38 @@ export const zh_TW: EnTranslations = {
       "tagFastRun": "速通",
       "mech": {
         "shadow_pulse": "暗影脈衝（週期性範圍傷害）",
+        "crypt_shovelful": "一鏟墳土（每11秒他向身前8碼錐形區域揚起墳土：造成他普通攻擊1.5倍的傷害，並使移動速度降低50%，持續6秒，所以站到他身後）",
+        "crypt_measured_for_the_grave": "量身定墓（每15秒他標記一名非坦克玩家；4秒後腳下塌出一座敞開的墳墓，普通難度下對3碼內造成42到52點傷害，坑會在整場戰鬥中保留：在其中每秒受到9點傷害且移動速度降低40%，所以把墳墓留在墓園邊緣）",
+        "crypt_burial_toll": "葬禮喪鐘（生命值降到66%和33%時，他大步走向鐘繩，免疫傷害，搖鐘3秒：普通難度下對所有人造成30到38點暗影傷害，並且每座敞開的墳墓都會爬出一具不安之骨）",
+        "crypt_marrow_heroic": "英雄：掘墓人重擊，每9秒打擊坦克（每層使其受到的傷害提高6%，持續20秒，最多6層）；墳墓之力（他站在墳墓裡時攻擊速度提高30%）；不寧之土（任何人在墳墓裡停留2秒，就會在那裡爬出一具不安之骨）",
+        "crypt_brides_lament": "新娘的哀歌（每22秒一次3秒的哀嚎：普通難度下對所有不在點亮的墓燈光芒中的人造成60到75點冰霜傷害，你已承受的每層縈繞哀歌再提高一半。每盞燈最多庇護兩名玩家，庇護過任何人後會熄滅28秒，所以分散開輪流使用）",
+        "crypt_frozen_embrace": "冰封之擁（每30秒她抓住一名非坦克玩家，帶著對方升到空中5碼高，每秒造成6點冰霜傷害：在8秒內打掉她6%的生命值她就會把人放下，否則她會把人扔下，普通難度下造成150到180點傷害）",
+        "crypt_rime_path": "霜徑（她飄過的地方會留下光滑的白霜，持續25秒：在上面你加速緩慢，停下或轉向時會繼續滑行）",
+        "crypt_bridal_freeze": "新娘冰封（生命值降到一半時，整個峽谷地面都會凍結：在戰鬥剩餘時間裡都是光滑的冰面）",
+        "crypt_lady_heroic": "英雄：每盞點亮的墓燈在30秒後也會自行熄滅10秒，冰封之擁會同時抓住兩名玩家",
+        "crypt_dirge_of_the_hollow": "空洞輓歌（每16秒一首可打斷的2.5秒歌曲：如果她唱完，普通難度下對45碼內所有能看見她的人造成105到125點暗影傷害並沉默4秒，所以打斷它或躲到唱詩柱後面）",
+        "crypt_harmony": "和聲（每名存活的唱詩者都使她受到的傷害降低30%：先殺唱詩者）",
+        "crypt_bone_organ": "骨管風琴（每26秒她彈奏骨管風琴：兩波暗影音符沿著唱詩樓的通道爆發，普通難度下通道內造成100到115點傷害，第二波會填滿第一波的空隙）",
+        "crypt_crescendo": "漸強（生命值低於30%時，她的輓歌只需1.8秒且每11秒一次，風琴還會多奏一波）",
+        "crypt_ilvane_heroic": "英雄：安可（一名唱詩者倒下10秒而另一名仍站著時，它會再次站起，所以同時殺掉它們）以及不斷之詩（每第三首輓歌無法被打斷：躲開它）",
+        "crypt_morthen_shadow_pulse": "暗影脈衝（每12秒施法2秒，然後在普通難度下對他周圍12碼內所有人造成24到30點暗影傷害，所以要走開；在他的終末儀式中每9秒一次）",
+        "crypt_gravecall": "喚墓（每15秒，一個縛魂從下一個石棺壁龕飄向他；抵達後他獲得飽食亡者，每個靈魂使他造成的傷害提高10%，最多10層，並恢復3%的生命值。擋在路徑上的玩家會代為承受：普通難度下12到16點暗影傷害）",
+        "crypt_rite_of_the_unquiet": "不寧者儀式（生命值降到65%時，他回到祭壇，在不寧結界中免疫傷害，同時墓穴寒意每秒對所有人造成3點暗影傷害，每5秒提高1點，還有2具不安之骨從壁龕中爬出。重燃4根追思蠟燭：每根需要引導4秒，每秒吸取點燃者6%的最大生命值，受到攻擊不會打斷，移動或昏迷會打斷。最後一根蠟燭會打破儀式：他昏迷8秒，受到的傷害提高25%）",
+        "crypt_reap_the_unquiet": "收割不寧者（生命值低於35%時靈魂停止出現；每14秒施法2秒後揮動鐮刀：普通難度下對他前方14碼、120度扇形內的所有人造成55到65點暗影傷害。此後暗影脈衝每9秒一次）",
+        "crypt_morthen_heroic": "英雄難度：點名亡者（名冊點出蠟燭的順序：點錯蠟燭會熄滅最後點燃的那根，並對點燃者造成252到288點暗影傷害，每次重燃每秒吸取8%），墳墓之握（每16秒2名玩家腳下出現4碼法環；1.5秒後鬼手破土而出：定身3秒並造成162到198點暗影傷害），以及喪鐘巨龍的燃燒喪鐘（它飛上天空，標記半個法環4.5秒，然後向那一半傾瀉幽魂之火，造成1,000到1,120點火焰傷害，每次飛行3個半區）",
         "reaping_arc": "收割之弧（正面順劈）",
+        "hallowed_brine": "聖化鹹水（半徑9碼的暗色聖水池，英雄難度10碼：池中每秒受到18點傷害，英雄難度26點，他站在池中時受到的傷害降低40%，把他拖出去）",
+        "rebounding_bulwark": "回彈壁盾（盾牌彈向上一個被擊中者10碼內最近的玩家，最多3人，英雄4人：散開）",
+        "tide_sentence": "潮汐宣判（標記5秒後，光柱擊中被標記者6碼內的所有人，英雄8碼：遠離隊伍承受）",
+        "unbroken_oath": "不破誓言（僅一次，生命值降到一半時他在泡泡中無敵跪下，最多60秒：擊殺他的士兵打破它，隨後他昏迷4秒並在10秒內受到的傷害提高20%）",
+        "fog_veil": "霧幕（四個身影，只有一個是真的：燈塔光束會讓真正維爾的提燈驟亮）",
         "mist_surge": "迷霧湧動（週期性範圍傷害）",
         "summons_adds": "召喚增援",
         "lunar_tide": "月潮（週期性範圍傷害）",
+        "chorus_and_solo": "合唱與獨唱（一個標記集合分攤，另一個標記分散）",
+        "tideglass_reflections": "潮鏡倒影（擊殺彼此的鏡像）",
+        "rising_tide": "漲潮（半座島被淹沒，移動到乾燥的一側）",
+        "undertow": "暗流（將所有人拉近，在衝擊前跑開）",
         "enrage": "低血量時狂怒",
         "shuddering_stomp": "震顫踐踏（範圍暈眩）",
         "grave_inferno": "墓場煉獄（引導火焰AoE，保持分散）",
@@ -5978,6 +6528,9 @@ export const zh_TW: EnTranslations = {
         "deathless_court": "不死宮廷（僅英雄難度，不死之怒後王庭崛起）",
         "bloodmane_rend": "血鬃撕裂（流血，注意目標切換）",
         "tusk_sweep": "獠牙橫掃（正面順劈）",
+        "grave_breath": "墳墓吐息（正面火焰錐形，會使覆蓋的冰面開裂）",
+        "plate_floor": "碎冰（他的火焰會使湖面冰板開裂並沉沒，遠離開闊水面）",
+        "wyrm_flights": "飛行階段（70%和40%時：帶著巨龍之眼走到完好的冰面上，在他應降落的地方集合）",
         "ancestral_sap": "祖靈汁液（治療其盟友）",
         "call_of_the_hunt": "狩獵召喚（加速附近盟友）",
         "thickhide_ward": "厚皮護盾（護盾附近盟友）",
@@ -6001,8 +6554,172 @@ export const zh_TW: EnTranslations = {
         "forgestorm": "熔爐風暴（墜落的隕石圈，移出）",
         "shared_pyre": "共享柴堆（集合圈，分攤傷害）",
         "anvils_decree": "鐵砧法令（三次全團鎚擊，用治療撐過）",
-        "masters_assembly": "大師裝配（阻擋熔爐光束，輪換阻擋者）"
+        "masters_assembly": "大師裝配（阻擋熔爐光束，輪換阻擋者）",
+        "iron_cage": "鐵籠（連按互動鍵掙脫，隊友可以砸開鐵欄）",
+        "drowned_anchor": "溺亡之錨（受害者會被絞向深坑：跑到點亮的繫泊柱3碼以內即可繫住鎖鏈，該柱隨後熄滅30秒；或者用12次攻擊砸斷鎖鏈，英雄難度16次）",
+        "shackle_pair": "雙人鐐銬（被鎖在一起的兩名玩家必須靠在一起）",
+        "reaper_behind": "穿影（連續三次從玩家身後升起，人數足夠時每次都是不同的人：離開鐮刀的弧線）",
+        "pack_bond": "獸群羈絆（兩者相鄰時傷害減半：將牠們拉開15碼）",
+        "stalk": "潛行追獵（美洲豹追獵被標記的玩家，從不追坦克；單人時牠追你：風箏牠，減速、定身、擊暈牠）",
+        "shared_health": "共享生命（同一血池：攻擊最安全的那個）",
+        "heel_frenzied_bond": "回來！與狂熱羈絆（美洲豹躍回主人身邊，羈絆範圍擴至20碼）",
+        "seed_rain": "種子雨（未授粉的玩家在種子發芽前踩碎它們）",
+        "pollinate": "授粉（金色的玩家遠離種子，否則它們會立刻發芽）",
+        "vine_lash": "藤鞭（離開荊棘通道，否則會被定身）",
+        "gorge": "吞噬（對坦克的重咬和毒素）",
+        "burrowing_seeds": "鑽地種子與花粉雲（種子6秒後在玩家身旁破土，金色會傳染）",
+        "spirit_of_the_hunt": "狩獵之魂（獵物引著化身穿過點亮的太陽符文；被撕咬的玩家獲得逃跑的先機）",
+        "twin_prey_ambush": "雙重獵物與伏擊（兩個獵物，隨後撲向最遠的玩家）",
+        "seal_shackles": "封印鐐銬（每打斷一條鎖鏈，他受到的傷害提高20%，並解放他的一種攻擊）",
+        "chain_strain": "繃鏈（遠離每根鎖鏈仍完好的柱子）",
+        "korgath_stomp": "震顫踐踏（離開他周圍的圓環）",
+        "rerivet_last_link": "重鉚與最後一環（打斷重新鉚上鎖鏈的刺棒匠；只剩一條鎖鏈時，每10秒繃鏈一次）",
+        "waking_thaw": "甦醒融冰（亡者從融冰池中爬出）",
+        "unquenched_held": "封存或未熄（在寒冰上擊殺亡者，切勿在融水中）",
+        "soulfire_trench": "魂火溝壑（一道魂火，隨後留下一條融水帶）",
+        "shadow_volley": "暗影箭雨（對所有人造成暗影傷害）",
+        "warm_hands_twice_woken": "溫熱之手與二度甦醒（僅限英雄難度，讓亡者保持移動；復起者會更強）"
       }
+    },
+    "bastionCage": {
+      "title": "你被關進了鐵籠！",
+      "promptKey": "連按 {key} 掙脫",
+      "promptNoKey": "連按互動鍵掙脫",
+      "promptClick": "連續點選這裡掙脫",
+      "promptTap": "連續點擊這裡掙脫",
+      "buttonAria": "從鐵籠中掙脫",
+      "progressAria": "掙脫進度：{pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "被溺亡之錨鎖住了！",
+      "anchoredLine": "跑到點亮的繫泊柱繫住鎖鏈，或者在絞盤把你拖進深坑之前讓隊友砸斷鎖鏈",
+      "allyTitle": "砸斷鎖鏈！",
+      "allyLine": "{name} 正被拖向深坑：攻擊溺亡之錨，或幫助其跑到點亮的繫泊柱",
+      "shackledTitle": "與 {name} 鎖在一起",
+      "shackledLine": "彼此保持在 {range} 碼以內（目前相距 {dist} 碼）",
+      "strainedLine": "離得太遠！鎖鏈會傷害你們兩人：靠近到 {range} 碼以內",
+      "brokenAria": "鎖鏈破損：{pct}",
+      "reachAria": "鎖鏈繃緊：{pct}",
+      "linksLeft": "剩餘鎖鏈環：{count}/{total}",
+      "linkRule": "每次擊中錨，無論傷害多少，都會斷開一環",
+      "linksTarget": "鎖鏈環 {count}/{total}",
+      "linkBroken": "斷開一環！"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "宣判落在你身上！",
+      "sentencedLine": "光柱會擊中你身邊的所有人：遠離隊伍",
+      "brineTitle": "你站在聖化鹹水中！",
+      "brineLine": "它每秒都在灼燒你：離開水池",
+      "reapedTitle": "死亡在你身後升起！",
+      "reapedLine": "離開鐮刀的弧線：向前，或向兩側",
+      "veilTitle": "霧幕",
+      "veilLine": "注意燈塔的光束：提燈驟亮的那個才是真正的維爾",
+      "realTitle": "光束找到了他！",
+      "realLine": "這是真正的維爾：攻擊他以打破霧幕",
+      "shadeTitle": "空洞的幻影",
+      "shadeLine": "光穿透了它：別管它，去找光束照亮的那個",
+      "timeAria": "剩餘{seconds}秒"
+    },
+    "wildheartAlert": {
+      "preyTitle": "你是獵物！",
+      "preyLine": "祖爾加在追獵你：引他穿過點亮的太陽符文",
+      "preyWaitLine": "他正在追另一個獵物：做好準備，他會切換",
+      "stalkedTitle": "被追獵！",
+      "stalkedLine": "美洲豹在追獵你：把牠引離牠的主人",
+      "pollinatedTitle": "已授粉！",
+      "pollinatedLine": "遠離種子：你的觸碰會讓它們發芽",
+      "bondTitle": "獸群羈絆",
+      "bondLine": "在一起時牠們傷害減半：把牠們拉開",
+      "timeAria": "剩餘{seconds}秒"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "身陷淬火之水！",
+      "quenchLine": "它會灼燒並減速你：游向最近的冰面或岸邊",
+      "plungeTitle": "俯衝烈焰！",
+      "plungeLine": "你腳下的整塊冰板即將燃燒：立刻離開",
+      "descentTitle": "墜擊降落！",
+      "descentLine": "他就落在這裡：離開他的陰影",
+      "eyeTitle": "巨龍之眼盯上了你！",
+      "eyeLine": "印記結束時你所在的冰板會燃燒：待在完好的冰面上，遠離隊伍",
+      "eyeCrackedLine": "你站在開裂的冰面上：在印記結束前走到完好的冰板上",
+      "flailTitle": "鎖鏈連枷！",
+      "flailLine": "鎖鏈會沿著標出的路線抽下：離開那條線",
+      "chargeTitle": "門檻衝鋒！",
+      "chargeLine": "他會沿路線衝鋒：離開路線，遠離邊緣",
+      "trenchTitle": "魂火溝壑！",
+      "trenchLine": "魂火會切開這條路線並留下融水：離開它",
+      "strainTitle": "繃鏈！",
+      "strainLine": "完好的石柱即將爆發：遠離它們",
+      "infernoTitle": "墓場煉獄！",
+      "infernoLine": "每次脈衝都更猛烈：離開他的範圍",
+      "stompTitle": "震顫踐踏！",
+      "stompLine": "在他的腳落下前遠離他",
+      "breathTitle": "墓穴吐息！",
+      "breathLine": "你站在吐息錐形範圍內：向側面躲開",
+      "maulTitle": "重錘橫掃！",
+      "maulLine": "他會橫掃面前的一切：繞到他身後",
+      "tailTitle": "尾擊橫掃！",
+      "tailLine": "你站在他身後：在尾巴掃來前離開",
+      "meltwaterTitle": "身處融水",
+      "meltwaterLine": "你的骸骨行者站在融水中：把它拖到寒冰上",
+      "meltwaterTargetLine": "你的目標若死在融水中會再次復生：等它到寒冰上",
+      "crackedTitle": "開裂的冰面",
+      "crackedLine": "這裡的火焰會擊碎這塊冰板：別讓他的火焰落在這裡",
+      "flightTitle": "科祖爾騰空而起",
+      "flightLine": "聚集在完好的冰面上決定他的落點，然後散開",
+      "lockboundTitle": "鎖縛",
+      "lockboundLine": "{chains}條鎖鏈仍在：他受到的傷害降低{pct}%。打破封印鐐銬來解除它。",
+      "timeAria": "剩餘{seconds}秒",
+      "brandedTitle": "烙印！",
+      "brandedLine": "烙印會一直灼燒到結束：到融水池裡將它澆熄",
+      "rimeTitle": "蔓延霜凇！",
+      "rimeLine": "蔓延霜凇 {stacks}/{max}：離開幼龍的吐息",
+      "slabTitle": "冰塊",
+      "slabLine": "堅冰：它會阻擋視線。躲到它後面，避開施法者的法術"
+    },
+    "cryptAlert": {
+      "measuredTitle": "量身定墓！",
+      "measuredLine": "計時條走完時，墳墓會在你腳下塌陷：把它帶到墓園邊緣",
+      "embracedTitle": "冰封之擁！",
+      "embracedLine": "她把你舉在半空：你的隊伍必須傷害她，她才會把你放下",
+      "lamentTitle": "新娘的哀歌！",
+      "lamentShelteredLine": "你站在點亮的墓燈光芒中，燈下還有你的位置：保持不動",
+      "lamentOpenLine": "在哀嚎落下前進入點亮的墓燈光芒中：每盞燈兩人",
+      "graveTitle": "你在敞開的墳墓裡！",
+      "graveLine": "墳土會灼燒你並讓你減速：離開墳墓",
+      "tollTitle": "葬禮喪鐘！",
+      "tollLine": "他搖鐘時無法受到傷害：準備承受喪鐘和它喚起的亡者",
+      "harmonyTitle": "和聲",
+      "harmonyLine": "她的唱詩者使她受到的傷害降低{pct}%：先殺死它們",
+      "knellTitle": "燃燒喪鐘！",
+      "knellLine": "計時條耗盡時，幽魂之火會傾瀉到法環的這一半：去另一半",
+      "graspTitle": "墳墓之握！",
+      "graspLine": "鬼手會從這個法環中伸出，抓住站在裡面的人：離開",
+      "reapTitle": "收割不寧者！",
+      "reapLine": "他的鐮刀橫掃面前的地面：繞到他身後",
+      "riteTitle": "不寧者儀式",
+      "riteLine": "重燃追思蠟燭以擊碎他的結界：已點燃{lit}/{total}",
+      "riteNamedLine": "只重燃名冊接下來點出的蠟燭：已點燃{lit}/{total}",
+      "soulTitle": "縛魂",
+      "soulLine": "一個靈魂正飄向莫森：站到它的路徑上，在它餵飽他之前接住它",
+      "timeAria": "剩餘{seconds}秒"
+    },
+    "kitUse": {
+      "toppleLine": "把它踢倒在敵群上：灑出的火焰會灼燒它們",
+      "toppleKey": "把{name}推倒在它們身上",
+      "toppleTap": "點擊這裡把{name}推倒在它們身上",
+      "toppleClick": "點選這裡把{name}推倒在它們身上",
+      "toppleFar": "靠近到{range}碼內才能把它踢倒",
+      "toppleAria": "推倒{name}",
+      "usingLine": "保持不動：受到攻擊、移動或昏迷都會打斷它",
+      "relightLine": "引導時每秒吸取你的生命值：受到攻擊不會打斷，移動或昏迷會打斷",
+      "relightKey": "重燃{name}",
+      "relightTap": "點擊這裡重燃{name}",
+      "relightClick": "點選這裡重燃{name}",
+      "relightFar": "靠近到{range}碼內才能重燃它",
+      "relightAria": "重燃{name}",
+      "relightUsingLine": "在它吸取你時保持不動：受到攻擊不會打斷，移動或昏迷會打斷",
+      "timeAria": "剩餘{seconds}秒"
     },
     "cosmetics": {
       "title": "外觀",
@@ -6011,6 +6728,8 @@ export const zh_TW: EnTranslations = {
       "tabMounts": "坐騎",
       "tabSkins": "造型",
       "tabMech": "機甲",
+      "buddyActive": "Summoned",
+      "buddyDrag": "Drag to action bar",
       "legend": "帳號：所有角色共用。角色：僅此角色。",
       "scopeAccount": "帳號",
       "scopeCharacter": "角色",
@@ -6223,7 +6942,7 @@ export const zh_TW: EnTranslations = {
       "watchFull": "追蹤清單已滿（最多 {cap} 項）",
       "watchAria": "在介面追蹤器中追蹤{name}",
       "unwatchAria": "停止追蹤{name}",
-      "cosmeticsSection": "頭銜與邊框",
+      "cosmeticsSection": "頭銜、邊框與夥伴",
       "titlesSection": "頭銜",
       "titlesAria": "選擇要展示的頭銜",
       "titlesNone": "無頭銜",
@@ -6231,6 +6950,14 @@ export const zh_TW: EnTranslations = {
       "bordersSection": "邊框",
       "bordersNone": "無邊框",
       "bordersEmpty": "獲得帶邊框的功績後即可解鎖此欄。",
+      "buddiesSection": "夥伴",
+      "buddiesNone": "無夥伴",
+      "buddiesEmpty": "收集一個夥伴，即可從此處召喚。",
+      "buddyDragHint": "拖到你的動作條上",
+      "looksSection": "夥伴外觀",
+      "looksNone": "原本外觀",
+      "looksNoBuddy": "召喚一個夥伴後在此選擇牠的外觀。",
+      "looksEmpty": "這個夥伴還沒有解鎖任何外觀。",
       "unlockedBanner": "達成功績：{name}",
       "unlockedTitleHint": "獲得新頭銜：{title}。可在功績之書中選用。",
       "unlockedBorderHint": "獲得新邊框：{name}。可在功績之書中佩戴。",
@@ -6711,6 +7438,8 @@ export const zh_TW: EnTranslations = {
       "delete_confirm": "輸入角色名稱以確認刪除。",
       "storage_purchase_open": "此儲物空間購買必須完成或解決後，才能刪除該角色。",
       "delete_busy": "伺服器繁忙，請稍後再嘗試刪除該角色。",
+      "referral_transfer_pending": "刪除此角色前，請先將所有尚未鎖定的集章卡轉移至其他角色。",
+      "referral_bond_pending": "一份推薦獎勵會員契約正在發放給此角色。請在發放完成後再嘗試刪除此角色。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一個工作階段接管。",
       "rename_required": "此角色必須先更名才能進入世界。",
@@ -6947,6 +7676,95 @@ export const zh_TW: EnTranslations = {
         "0": "像樣的堆肥，花床有救了。老磨坊主離開前埋了些東西。他的磨坊還在花園最遠的角落裡轉著。去它旁邊站一站吧。",
         "2": "原來是磨坊把你一路送到了海岸路上。燈塔還藏著最後一個秘密：在它西北方，就在小路旁，草皮被切開又鋪了回去。就在那裡挖。"
       }
+    }
+  },
+  "dungeonGuide": {
+    "drownedTemple": {
+      "greet": {
+        "1": "我曾是蒼白唱詩班裡最年輕的聲音。儀式那夜，我沒有喝，我逃了。從那以後，每逢滿月，我都聽見他們在水下歌唱。我必須在死前親眼見到她。讓我跟在你們身後吧。我不會戰鬥，也不會拖累你們。",
+        "2": "每逢滿月我都來到這扇門前，每逢滿月我的勇氣都會潰散。今夜不會。唱詩班正在歌唱，而逃走的那個人是我。帶我下去見她吧，我不會礙事。"
+      },
+      "row": {
+        "join": "跟我們一起走吧。",
+        "decline": "我們自己去。"
+      },
+      "joined": "你們先走，我就在後面。",
+      "singing": "讓我唱吧。走吧，安心地走。",
+      "accept": {
+        "1": "謝謝你們。我會跟在後面，絕不礙事。",
+        "2": "那麼我終於要下去了。往前走吧，我跟得上。"
+      },
+      "decline": "我明白。我會像從前一樣，在這上面聆聽。",
+      "heroicWater": "今夜水漲得很高，比我見過的任何時候都高。她快要醒了。",
+      "memory": {
+        "votaries": "岸邊那些溺亡者，是在門關上之後走進去的。帶走他們的不是月亮，只是湖水。",
+        "rubbing": "守潮者讀到了我刻在岸邊岩石上的字。「它只是沉睡。」那是我在第二天早上刻下的。"
+      },
+      "area": {
+        "steps": "朝聖者階梯。那一夜我一步三級地往上跑，一次也沒有回頭。",
+        "causeway": {
+          "1": "儀式之夜，月光鋪在這條堤道上，像第二條路。",
+          "2": "看看這水。它仍記得如何托住月亮。"
+        },
+        "colonnade": "潮汐柱廊。我們兩兩並肩走過這裡，唱著升起之節。",
+        "veil": "那道帷幕後面就是唱詩庭院。我從小時候起就再沒踏進去過。",
+        "terraces": "潮池。見習生們把它們打掃乾淨，餵養住在裡面的小小發光生靈。",
+        "falls": "瀑布後面，水聲會淹沒一切人聲。我逃練習的時候就躲在這裡。",
+        "pool": "月之池。他們跪在池邊，用貝殼飲水。我卻舉不起我的那只。",
+        "prismStair": "稜鏡階梯。我們在月出時登上它，去喚醒那塊巨大的玻璃。",
+        "moonbridge": {
+          "1": "一座月光之橋。長老們說，只有虔誠的人才能走過去。",
+          "2": "我從來都不虔誠。好吧，看看它撐不撐得住我。"
+        },
+        "altarLanding": "我當年就站在這裡。就是這裡。我在這裡轉身逃走。"
+      },
+      "sight": {
+        "pilgrim": "岸邊村莊的朝聖者。每年春天他們都把神龕背在背上。如今他們要永遠背著它了。",
+        "acolyte": "那些見習生。我曾在她們身旁學認字。如今她們在睡夢中歌唱，永遠不會醒來。",
+        "templeguard": "階梯的守衛。他們發誓守護神殿，直到月亮落下。月亮從未落下。",
+        "snapper": "我們曾用那樣的貝殼喝月之水。我的那只掉在了階梯上。",
+        "siren": "那個聲音。她曾在唱詩班裡站在我身旁歌唱。她現在還是會早半拍進來。",
+        "lurker": "孩子們常在淺灘用網撈這些東西。那時牠們只有拇指大，會發光。",
+        "tidewisp": "那就是月之水本身，我們本該喝下的那一口。別讓它碰到你們。",
+        "sentinel": "門邊水池裡的月鰩。我們還是見習生時，在月出時餵牠們珍珠。如今牠們守著這些門，把我們的珍珠當作心臟。",
+        "eel": "潟湖裡的鰻魚。見習生們會在黃昏餵牠們麵包。牠們靠我們的聖歌養得肥肥的。",
+        "reflection": "它讓你們看見湖水會把你們變成什麼。打碎它！",
+        "moonspawn": "那些從來不是我的族人。牠們是她的，只由月光造成。"
+      },
+      "selthe": {
+        "pre": {
+          "1": "瑟爾瑟嬤嬤。她教我用腹部呼吸。她教會我們所有人如何溺水而不死。",
+          "2": "唱詩之母瑟爾瑟。我會的每一個音，都是她教給我的。原諒我，嬤嬤。"
+        },
+        "post": {
+          "1": "她安靜了。我在唱詩班的那些年裡，她從來沒有安靜過一次。",
+          "2": "安息吧，嬤嬤。妳說得對，我始終撐不住長音。"
+        }
+      },
+      "hydra": {
+        "pre": "池中的大蛇。我小時候牠只有一個頭，還會從我們手裡吃東西。",
+        "post": "聽。瀑布底下，他們還在歌唱。現在更近了。"
+      },
+      "colossus": {
+        "pre": "那座巨大的稜鏡。我們對著它歌唱，想要捕住月亮。我從不知道它能站起來。",
+        "post": "玻璃碎了。如今再沒有什麼能捕住月亮了，除了她。"
+      },
+      "ysolei": {
+        "pre": "她就在那裡。我這一生都在問，她究竟是女神還是怪物。讓我看看吧。",
+        "preHeroic": "在這樣的夜晚，整個唱詩班都會與她一同歌唱。大家都要撐住。"
+      },
+      "farewell": {
+        "answer": "她兩者都不是。她只是水中的月亮，而跪下的是我們自己。",
+        "verse": "儀式還有最後一節，讓歌者得以安睡的那一節。我從沒唱過。",
+        "stay": "他們已經等得夠久了。我會留下，現在就為他們唱。",
+        "goodbye": {
+          "1": "回到夜色中去吧。如果你們在滿月時聽見歌聲，那只是我。",
+          "2": "謝謝你們把一個老懦夫帶到他歌聲的盡頭。走吧。"
+        },
+        "emote": "{name}在祭壇上方揚聲歌唱，潟湖歸於平靜。"
+      },
+      "wipe": "起來。求你們了。別再把我一個人留在這下面。",
+      "catchUp": "我的腿是老了，可這裡的每一級台階我都認得。我在這兒。"
     }
   },
   "guide": {
@@ -7428,6 +8246,7 @@ export const zh_TW: EnTranslations = {
       "framesGovernedAuraTracks": "「編輯框體」也會鬆開六條可選的光環軌道，前提是你已在同一「介面」選項的「戰鬥」分頁中開啟它們：「我的增益」軌道、「防禦性冷卻」軌道、「我的護盾」軌道、「攻擊性冷卻」軌道、「移動與潛行」軌道，以及「我給隊友的增益」軌道。所有軌道預設關閉，每一條在鬆開期間都掛著一枚名稱標籤。",
       "frameGroups": "{trackers}可合併任務、功績、裂隙、地下探索、採集目標及聖物匣追蹤。{auras}可合併目標持續傷害與六種光環追蹤。在框架設定中分別啟用合併，關閉後可個別移動。{tot}具有資源條。{focus}的三個目標可獨立移動：Shift+F1至F3設定，Ctrl+F1至F3選取。傷害與威脅統計即使在框架鎖定時，也可拖曳按鈕以外的區域移動，拖曳邊緣調整大小。解鎖後，獨立的框架顯示選單依群組控制顯示。右鍵點擊框架可重設大小或開啟相關設定。介面中的框架頁也包含共用設定及可摺疊的隊伍設定。關閉「將目標的目標鎖定至目標」即可獨立移動，重新啟用仍會保留獨立位置。設定焦點後，設定按鈕與說明會隱藏。右鍵選擇「清除焦點」可恢復預設狀態。滑鼠懸停施法同樣適用於焦點框架。",
       "framesGovernedTalkingHead": "「編輯框體」也會解鎖對話面板：當某個 NPC 不在你的視野內時，它承載該 NPC 說出的台詞；處於解鎖狀態時它會顯示自己的名稱標籤。",
+      "framesGovernedShardpike": "「編輯框體」也會解鎖碎晶長矛欄：這一小排任務道具動作只在你攜帶碎晶長矛時才會出現在動作列旁；處於解鎖狀態時它會顯示自己的名稱標籤，因此你可以在戰鬥開始前就把它撺好，而不必臨陣調整。",
       "framesGovernedUnitTooltip": "「編輯框體」也會解鎖提示框框體，也就是滑鼠所停留對象的資訊卡出現的位置：生物的等級與種類，或其他玩家的頭銜、公會、等級與職業，以及專精和對應定位。把它拖到任意位置，資訊卡就會從那裡朝遠離螢幕最近邊緣的方向展開。在「框體設定」的「顯示或隱藏框體」中取消勾選「提示框」，即可完全隱藏這張資訊卡。",
       "barsTitle": "各種條、計時與戰鬥文字",
       "barsBody": "你的施法條會在你施法或引導時出現在畫面中央、動作列的正上方，上頭帶著法術的名稱與剩餘時間。你的目標在自己的框架上也有一條施法條，讓你看清接下來要來的是什麼，並做出回應。\n\n施法條下方還有一條細細的揮擊條，會在兩次武器揮擊之間逐漸填滿，讓近戰或遠程攻擊者看出下一次自動攻擊何時落下。\n\n你的經驗條橫貫動作列下方的整個寬度，切分成一段一段，其中較亮的一段顯示你已經存下的充分休息經驗。\n\n潛到水面下時，畫面上方會出現一條藍色的呼吸條。頭部沒入水中時它會逐漸消耗，耗盡並開始溺水時會閃成紅色，而你一浮出水面便會迅速回滿。空白鍵讓你往上游，下潛鍵（預設是 Ctrl）則帶你潛得更深。\n\n傷害與治療會化作小小的數字，從它們落下之處往上浮起，讓你不必讀文字也能看懂一場戰鬥。聊天框中的「戰鬥」分頁則保留完整的文字紀錄。",
@@ -8184,8 +9003,8 @@ export const zh_TW: EnTranslations = {
       "hollowBody": "一座被盜墓洗劫的禮拜堂地穴，新死的亡者拒絕安息。新隊伍的第一個真正考驗。",
       "bastionBody": "一座沉入沼澤、被遺忘的要塞，由溺亡的守軍與不斷上漲的潮水本身所據守。",
       "templeBody": "沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。",
-      "sanctumBody": "棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。",
-      "wildheartBody": "一座被暖雨浸透的叢林火山口，兩條高起的獵徑環繞著碧色深潭。穿過獸巢與先祖遺跡，在儀式金字塔頂端看看是誰在等待。",
+      "sanctumBody": "隱藏在棘峰高處的一座冰川，一條巨龍被封凍在冰中，邪教正焚燒竊取的靈魂將它解凍。從高山隘口一路下行，穿過冰塔、鐵匠斷裂的鎖鏈與邪教的火堆，直到冰川腳下的冰封湖面。",
+      "wildheartBody": "藏在沉沒神像背後的隱秘叢林火山口，四周懸崖環繞，瀑布轟鳴。涉過河流淺灘，穿越狩獵台地與瀑布，走過殖民地廢墟，攀上巨大石雕美洲豹頭下的階梯神殿。",
       "raidName": "最終團隊副本",
       "raidBody": "在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股整個團隊必須齊心遏止的不死力量。先掙得入內的資格，再帶上九位夥伴。",
       "heroicTitle": "英雄模式",
@@ -9751,6 +10570,168 @@ export const zh_TW: EnTranslations = {
     "body": "體型",
     "genderMale": "男性",
     "genderFemale": "女性",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "側梳",
+        "long": "Long",
+        "mohawk": "莫西干頭",
+        "quiff": "短飛機頭",
+        "undercut": "鏟青",
+        "topknot": "頭頂髮髻",
+        "shoulder": "齊肩髮",
+        "bald": "Bald",
+        "waves": "波浪捲",
+        "ponytail": "高馬尾",
+        "braid": "辮子",
+        "bob": "Bob",
+        "crown": "皇冠辮",
+        "twins": "雙辮",
+        "curls": "捲髮盤頭"
+      },
+      "beard": {
+        "none": "無鬍鬚",
+        "moustache": "上唇鬍",
+        "handlebar": "翹八字鬍",
+        "goatee": "山羊鬍",
+        "chin": "下巴鬍",
+        "boxed": "短絡腮鬍",
+        "long": "長鬍鬚",
+        "chops": "絡腮鬢角",
+        "chinstrap": "下顎線鬍"
+      },
+      "nose": {
+        "default": "經典",
+        "broad": "寬鼻",
+        "aquiline": "鷹鉤鼻",
+        "button": "小翹鼻",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "經典",
+        "full": "Full",
+        "smirk": "壞笑",
+        "relaxed": "放鬆",
+        "cupids_bow": "邱比特唇",
+        "narrow": "窄唇",
+        "thin": "Thin",
+        "rounded": "圓唇"
+      },
+      "brows": {
+        "default": "經典",
+        "slim": "Slim",
+        "arched": "彎眉",
+        "soft": "Soft",
+        "straight": "平眉",
+        "relaxed": "舒展眉",
+        "soft_arch": "Soft Arch",
+        "rounded": "圓眉"
+      },
+      "ears": {
+        "default": "經典",
+        "large": "大耳",
+        "pointed": "尖耳",
+        "round": "圓耳"
+      },
+      "eyes": {
+        "default": "經典",
+        "almond": "杏眼",
+        "hooded": "內雙眼"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "眼睛與眉毛",
+        "eyeColor": "瞳色",
+        "hairstyle": "髮型",
+        "facialHair": "鬍鬚",
+        "hairColor": "髮色",
+        "browColor": "眉色",
+        "piercings": "穿孔飾品"
+      },
+      "section": {
+        "hair": "髮型",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "眉形",
+        "ears": "Ears",
+        "eyes": "眼型"
+      },
+      "slider": {
+        "eyeSpacing": "眼距",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "眉毛高度",
+        "chinWidth": "下巴寬度",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "耳垂",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "鼻翼釘",
+        "septum": "鼻中隔",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "瓷白",
+        "ivory": "象牙白",
+        "rose": "Rose",
+        "peach": "蜜桃",
+        "fair": "Fair",
+        "beige": "米色",
+        "sand": "Sand",
+        "honey": "蜂蜜",
+        "olive": "橄欖",
+        "caramel": "焦糖",
+        "tan": "Tan",
+        "bronze": "古銅",
+        "chestnut": "栗褐",
+        "umber": "棕褐",
+        "mahogany": "紅木",
+        "ebony": "烏木"
+      },
+      "eye": {
+        "brown": "棕色",
+        "darkBrown": "深棕色",
+        "hazel": "榛色",
+        "amber": "琥珀色",
+        "green": "綠色",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "紫羅蘭色"
+      },
+      "hairColor": {
+        "platinum": "鉑金色",
+        "blonde": "淺金色",
+        "golden": "金黃色",
+        "copper": "銅色",
+        "red": "Red",
+        "auburn": "赤褐色",
+        "lightBrown": "淺棕色",
+        "brown": "棕色",
+        "darkBrown": "深棕色",
+        "black": "黑色",
+        "silver": "銀色",
+        "white": "白色"
+      },
+      "matchHair": "匹配髮色",
+      "resetDefault": "恢復預設",
+      "customColorAria": "選擇自訂顏色",
+      "customSkinAria": "選擇自訂膚色"
+    },
     "hair": "髮型",
     "brows": "眉毛",
     "skinTone": "膚色",
@@ -11218,6 +12199,9 @@ export const zh_TW: EnTranslations = {
   "character": {
     "loading": "正在載入...",
     "noneYet": "還沒有角色。請在下方建立一個。",
+    "membershipRequired": "續訂會員後即可使用此角色。",
+    "membershipSlots": "開通會員以解鎖角色欄位",
+    "emptySlot": "可用角色欄位",
     "levelClass": "{level} 級 {className}",
     "inWorld": "在世界中",
     "takeOver": "接管",
@@ -11227,6 +12211,7 @@ export const zh_TW: EnTranslations = {
     "lockoutRaids": "團隊副本",
     "lockoutDungeons": "地城",
     "lockoutWorldBosses": "世界首領",
+    "lockoutWeeklyQuests": "每週任務",
     "takeOverConfirm": "這會使該角色從另一個工作階段中斷並切換到此處。是否繼續？",
     "renameRequired": "需要更名",
     "delete": "刪除",
@@ -11811,6 +12796,7 @@ export const zh_TW: EnTranslations = {
       "deathRecapCauterized": "你已經死亡。灼燒術的烈焰吞噬了你。",
       "respawn": "你再次感到精力恢復、身體完整。",
       "respawnKeeperToll": "靈魂醫者復活了你，但你因此變得虛弱：在復活後遺症消退之前，你的所有屬性都會被削弱。",
+      "moonbridgeBanner": "月之橋已成",
       "ignoringChat": "已封鎖來自 {name} 的聊天。",
       "noLongerIgnoring": "不再封鎖 {name}。",
       "playerNotNearby": "該玩家不在附近。",
@@ -12014,6 +13000,10 @@ export const zh_TW: EnTranslations = {
     "social": {
       "title": "社交",
       "friendsTab": "好友",
+      "friendFirstPage": "首頁",
+      "friendNextPage": "下一頁",
+      "boundFriend": "綁定好友",
+      "boundFriendLink": "綁定好友透過邀請連結建立關係。",
       "guildTab": "公會",
       "ignoreTab": "忽略",
       "leaveParty": "離開隊伍",
@@ -12241,7 +13231,161 @@ export const zh_TW: EnTranslations = {
       "hoard_cast_screech": "震耳尖嘯",
       "hoard_cast_mimic_bite": "貪婪撕咬",
       "hoard_cast_mimic_leap": "碾壓跳躍",
-      "hoard_cast_coin_spit": "詛咒金幣"
+      "hoard_cast_coin_spit": "詛咒金幣",
+      "crypt_grave_bolt": "墓穴之箭",
+      "crypt_raise_bones": "喚起骸骨",
+      "crypt_murder_call": "鴉群召喚",
+      "crypt_stone_shriek": "石之尖嘯",
+      "crypt_grave_cleave": "墓穴橫掃",
+      "crypt_barrowflame_breath": "塚焰吐息",
+      "crypt_tail_lash": "尾鞭",
+      "crypt_wing_gust": "翼風",
+      "crypt_grave_rupture": "墓穴崩裂",
+      "crypt_carrion_eye": "腐鴉之眼",
+      "crypt_marrow_crush": "碎髓重擊",
+      "crypt_rimesilk_spit": "霜絲噴吐",
+      "crypt_gravespark_volley": "墓火齊射",
+      "crypt_morthen_rite_wakes": "儀式甦醒",
+      "crypt_morthen_rise": "喚墓者升起",
+      "crypt_morthen_proclaim": "墓之宣告",
+      "crypt_morthen_descend": "降臨",
+      "crypt_knellwyrm_arrive": "自天而降",
+      "crypt_knellwyrm_pyre_strafe": "火葬掃射",
+      "crypt_knellwyrm_strafe_run": "俯衝掃射",
+      "crypt_knellwyrm_dread_bellow": "恐懼咆哮",
+      "crypt_marrow_shovelful": "一鏟墳土",
+      "crypt_marrow_measure": "量身定墓",
+      "crypt_marrow_burial_toll": "葬禮喪鐘",
+      "crypt_marrow_gravediggers_blow": "掘墓人重擊",
+      "crypt_lady_brides_lament": "新娘的哀歌",
+      "crypt_lady_frozen_embrace": "冰封之擁",
+      "crypt_lady_embrace_hold": "冰封之擁",
+      "crypt_lady_bridal_freeze": "新娘冰封",
+      "crypt_ilvane_dirge": "空洞輓歌",
+      "crypt_ilvane_unbroken_dirge": "不斷之詩",
+      "crypt_ilvane_bone_organ": "骨管風琴",
+      "crypt_morthen_shadow_pulse": "暗影脈衝",
+      "crypt_morthen_rite_of_the_unquiet": "不寧者儀式",
+      "crypt_morthen_reap_the_unquiet": "收割不寧者",
+      "kituse_crypt_relight_candle": "重燃蠟燭",
+      "crypt_knellwyrm_knell_rise": "燃燒喪鐘",
+      "crypt_knellwyrm_knell_mark": "燃燒喪鐘",
+      "crypt_knellwyrm_knell_breath": "燃燒喪鐘",
+      "crypt_knellwyrm_knell_land": "燃燒喪鐘",
+      "bastion_brine_mend": "鹽水癒合",
+      "bastion_fog_ward": "霧之護佑",
+      "bastion_halberd_sweep": "戟之橫掃",
+      "bastion_piercing_bolt": "穿刺弩矢",
+      "bastion_claw_sweep": "巨鉗橫掃",
+      "bastion_shell_slam": "殼塔重擊",
+      "ghost_captain_broadside": "幽靈舷炮齊射",
+      "ghost_captain_anchor": "詛咒之錨",
+      "ghost_captain_boarding": "幻影登船",
+      "bastion_boathook": "船鉤拖拽",
+      "bastion_fog_bank": "霧堤",
+      "bastion_brine_column": "鹽水之柱",
+      "bastion_loose_on_my_mark": "聽我號令放箭",
+      "bastion_oathbound_charge": "誓約衝鋒",
+      "bastion_gaolers_cudgel": "獄卒短棍",
+      "bastion_mist_surge": "迷霧湧流",
+      "bastion_drowning_hymn": "溺亡聖詠",
+      "bastion_iron_cage": "鐵籠",
+      "bastion_drowned_anchor_cast": "溺亡之錨",
+      "bastion_shackle_pair": "雙人鐐銬",
+      "bastion_shadowstep": "穿影",
+      "bastion_reaping_scythe": "收割之鐮",
+      "bastion_veil_rise": "霧幕",
+      "bastion_veil_gather": "霧氣聚攏",
+      "bastion_vael_rise": "死亡升起",
+      "bastion_vael_sink": "沒入霧中",
+      "bastion_hallowed_brine": "聖化鹹水",
+      "bastion_rebounding_bulwark": "回彈壁盾",
+      "bastion_tide_sentence": "潮汐宣判",
+      "bastion_oath_kneel": "不破誓言",
+      "bastion_oath_vigil": "不破誓言",
+      "temple_lullaby": "搖籃曲",
+      "cantor_last_verse": "最後一節",
+      "temple_call_the_tide": "潮汐召喚",
+      "temple_static_coil": "靜電盤繞",
+      "temple_snapper_snap": "猛咬",
+      "temple_trident_sweep": "三叉戟橫掃",
+      "temple_sea_song": "海之歌",
+      "temple_tidal_slap": "潮汐掌擊",
+      "temple_tide_breath": "冰凍吐息",
+      "temple_moonlight_lance": "月光長槍",
+      "temple_prism_flare": "稜鏡閃耀",
+      "temple_resonant_slam": "共鳴猛擊",
+      "temple_moonwater_bolt": "月水箭",
+      "temple_drowning_aria": "溺亡詠嘆調",
+      "temple_mere_surge": "湖湧",
+      "temple_tideglass_fracture": "潮鏡碎裂",
+      "temple_undertow": "暗流",
+      "temple_lunar_tide": "月潮",
+      "temple_skewering_trident": "穿刺三叉戟",
+      "temple_pale_mending": "蒼白癒合",
+      "temple_glimmer_venom": "微光毒液",
+      "temple_pearl_slam": "潮汐振翼",
+      "temple_lightning_spit": "閃電噴吐",
+      "temple_crushing_torrent": "碾壓激流",
+      "temple_hydra_tsunami": "海嘯",
+      "temple_ysolei_call": "月裔召喚",
+      "temple_ysolei_wrath": "溺亡之怒",
+      "temple_frostlocked_torrent": "冰封激流",
+      "temple_venom_current": "毒液洋流",
+      "temple_toxic_rime": "劇毒霜晶",
+      "temple_beckoning_moon": "喚月",
+      "temple_falling_moon": "墜月",
+      "temple_prism_glare": "稜鏡凝視",
+      "temple_arcing_spark": "弧光火花",
+      "temple_call_of_the_shallows": "淺灘的呼喚",
+      "wildheart_ancestral_sap": "先祖樹汁",
+      "wildheart_plant_totem": "安置圖騰",
+      "wildheart_entangling_lash": "纏繞鞭笞",
+      "wildheart_saurian_tail_swipe": "甩尾",
+      "wildheart_saurian_stomp": "撼地踐踏",
+      "wildheart_quarry_mark": "獵物印記",
+      "wildheart_war_roar": "戰爭咆哮",
+      "wildheart_toad_hex": "蟾蜍妖術",
+      "wildheart_rattling_dread": "骨鳴恐懼",
+      "wildheart_snaring_tongue": "套索之舌",
+      "wildheart_beast_pit_quake": "獸坑震盪",
+      "wildheart_jaguar_heel": "回來！",
+      "wildheart_gorgebloom_seed_rain": "種子雨",
+      "wildheart_gorgebloom_vine_lash": "藤鞭",
+      "wildheart_gorgebloom_gorge": "吞噬",
+      "wildheart_zulgar_pulse": "荒野之心脈衝",
+      "wildheart_zulgar_spirit_hunt": "狩獵之魂",
+      "sanctum_cinder_breath": "餘燼吐息",
+      "sanctum_warming_rite": "回暖儀式",
+      "sanctum_goad": "驅策",
+      "sanctum_plant_brazier": "放置靈魂火盆",
+      "sanctum_ice_block_toss": "投擲冰塊",
+      "sanctum_tusker_tusk_sweep": "獠牙橫掃",
+      "sanctum_tusker_trample": "踐踏",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "配重尾鞭",
+      "sanctum_branding_iron": "烙鐵",
+      "sanctum_rime_breath": "霜凇吐息",
+      "kituse_sanctum_topple_brazier": "推倒火盆",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
+      "sanctum_korgath_maul_arc": "重錘弧斬",
+      "sanctum_korgath_chain_flail": "鎖鏈鞭笞",
+      "sanctum_korgath_threshold_charge": "門檻衝鋒",
+      "sanctum_korgath_foremans_bellow": "工頭的咆哮",
+      "sanctum_korgath_strain": "繃鏈",
+      "sanctum_korgath_stomp": "震顫踐踏",
+      "sanctum_goadsmith_rerivet": "重鉚",
+      "sanctum_velkhar_soulfire_trench": "魂火溝壑",
+      "sanctum_velkhar_shadow_volley": "暗影箭雨",
+      "sanctum_korzul_break_free": "破冰而出",
+      "sanctum_korzul_grave_breath": "墳墓吐息",
+      "sanctum_korzul_tail_sweep": "尾掃",
+      "sanctum_korzul_grave_inferno": "墓場煉獄",
+      "sanctum_korzul_wing_gale": "翼風",
+      "sanctum_korzul_plunging_fire": "傾瀉烈焰",
+      "sanctum_korzul_crashing_descent": "墜擊降落"
     }
   },
   "questUi": {
@@ -12309,6 +13453,8 @@ export const zh_TW: EnTranslations = {
       "rewards": "獎勵",
       "xpReward": "{xp} 點經驗",
       "itemReward": "物品獎勵：",
+      "chooseReward": "選擇你的獎勵：",
+      "rewardChoices": "你將能夠選擇以下獎勵之一：",
       "objectiveProgress": "{label}：{current}/{total}",
       "requiresLevel": "需要等級 {level}"
     },
@@ -12686,6 +13832,7 @@ export const zh_TW: EnTranslations = {
       "incomplete": "該任務尚未完成。",
       "giverMissing": "該任務發布者不在附近。",
       "turnInMissing": "該任務交付點不在附近。",
+      "rewardNotOffered": "該獎勵未提供。",
       "tooFar": "距離太遠。",
       "escortAway": "你要護送的人現在不在原處，稍後就會回來。"
     }
@@ -12737,7 +13884,9 @@ export const zh_TW: EnTranslations = {
       "flask": "藥壺",
       "scroll": "卷軸",
       "bag": "背包",
-      "mount": "坐騎"
+      "mount": "坐騎",
+      "buddy": "夥伴",
+      "buddyCosmetic": "夥伴外觀"
     },
     "stats": {
       "armor": "護甲",
@@ -12753,6 +13902,17 @@ export const zh_TW: EnTranslations = {
       "parry": "招架"
     },
     "tooltip": {
+      "referralFullSet": "穿戴全部{pieces}件友誼護甲，與{member}組隊時獲得額外{percent}%經驗。邀請人的會員資格必須有效。",
+      "referralInviter": "邀請你的會員",
+      "referralRetained": "即使未與邀請人組隊，護甲屬性仍會隨等級提升。",
+      "referralDormant": "未啟用：此帳號尚未透過會員邀請獲得友誼護甲。",
+      "membershipToken": "使用：消耗此代幣，為您的帳號增加{days}天會員時長。現有剩餘時長會保留。兌換前可交易此代幣或在拍賣場出售。",
+      "membershipAdaptive": "屬性和護甲會隨您的職業與專精調整。",
+      "membershipScaling": "物品等級與您的角色等級一致。達到20級時，此護甲會完善為物品等級25。",
+      "membershipPerfected": "已完善：物品等級{level}。",
+      "membershipFullSet": "裝備全部{pieces}件會員護甲，經驗獲取量提高{percent}%。需要有效會員資格。",
+      "membershipRequired": "會員到期後，護甲屬性和套裝加成會停用，續訂後恢復。",
+      "membershipDormant": "未啟用：續訂會員以恢復護甲屬性和套裝加成。",
       "qualityKind": "{quality}{kind}",
       "currentlyEquipped": "目前已裝備",
       "ifYouEquip": "裝備後",
@@ -13052,6 +14212,10 @@ export const zh_TW: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "信使",
+        "description": "召喚一頭會飛的驢，在您的背包和最近的銀行之間運送物品。飛行速度為普通跑步速度的250%。每次最多可選擇24組物品。開始新的配送需要會員資格。"
+      },
       "sport_kick": {
         "name": "踢球",
         "description": "沿地面把球踢向瞄準點。"
@@ -15829,6 +16993,30 @@ export const zh_TW: EnTranslations = {
       "fenshadow_maul": {
         "name": "沼影重錘"
       },
+      "foremans_barrowmaul": {
+        "name": "工頭的塚錘"
+      },
+      "skerrits_shardpike": {
+        "name": "斯克里特的碎晶長矛"
+      },
+      "loomshard_eye": {
+        "name": "塚琉璃之眼"
+      },
+      "barrowhide_pauldrons": {
+        "name": "古塚護肩"
+      },
+      "mirestone_stride": {
+        "name": "沼石步履"
+      },
+      "foremans_wage_band": {
+        "name": "工頭的工錢指環"
+      },
+      "mirelight_locket": {
+        "name": "沼光吊墜"
+      },
+      "fenwright_grips": {
+        "name": "沼澤工匠握手"
+      },
       "wildgrove_cinch": {
         "name": "野林束帶"
       },
@@ -16878,6 +18066,114 @@ export const zh_TW: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "往生石"
+      },
+      "whistle_ember_fox": {
+        "name": "餘燼狐的哨子"
+      },
+      "whistle_moss_hare": {
+        "name": "苔蘚野兔的哨子"
+      },
+      "whistle_frog": {
+        "name": "青蛙的哨子"
+      },
+      "whistle_crimson_claw_crab": {
+        "name": "赤鉗蟹的哨子"
+      },
+      "whistle_golden_sentinel": {
+        "name": "黃金哨兵的哨子"
+      },
+      "whistle_nightfang": {
+        "name": "夜牙的哨子"
+      },
+      "whistle_tuskhorn_boar": {
+        "name": "獠角野豬的哨子"
+      },
+      "whistle_emerald_wolf": {
+        "name": "翡翠狼的哨子"
+      },
+      "whistle_tiger": {
+        "name": "猛虎的哨子"
+      },
+      "whistle_cate_coin": {
+        "name": "錢幣貓的哨子"
+      },
+      "whistle_alon": {
+        "name": "阿隆的哨子"
+      },
+      "whistle_trollface": {
+        "name": "巨魔臉的哨子"
+      },
+      "whistle_ansem": {
+        "name": "安塞姆的哨子"
+      },
+      "whistle_triple_t": {
+        "name": "三重T的哨子"
+      },
+      "whistle_kekius": {
+        "name": "凱基烏斯的哨子"
+      },
+      "whistle_solbot": {
+        "name": "索爾機偶的哨子"
+      },
+      "whistle_frostfire": {
+        "name": "霜火的哨子"
+      },
+      "whistle_rocky": {
+        "name": "岩仔的哨子"
+      },
+      "whistle_proud_grunt": {
+        "name": "驕傲步兵的哨子"
+      },
+      "whistle_loot_goblin": {
+        "name": "戰利品哥布林的哨子"
+      },
+      "whistle_penny_goldspark": {
+        "name": "潘妮·金火花的哨子"
+      },
+      "whistle_stag": {
+        "name": "雄鹿的哨子"
+      },
+      "whistle_alpaca": {
+        "name": "羊駝的哨子"
+      },
+      "whistle_horse": {
+        "name": "馬的哨子"
+      },
+      "whistle_sapling": {
+        "name": "小樹苗的哨子"
+      },
+      "whistle_bull": {
+        "name": "公牛的哨子"
+      },
+      "whistle_spider": {
+        "name": "蜘蛛的哨子"
+      },
+      "whistle_raptor": {
+        "name": "迅猛龍的哨子"
+      },
+      "whistle_skeleton": {
+        "name": "骷髏的哨子"
+      },
+      "whistle_crystal_lich": {
+        "name": "水晶巫妖的哨子"
+      },
+      "whistle_forgemaw": {
+        "name": "熔顎·熔融者的哨子"
+      },
+      "whistle_crystal_tide": {
+        "name": "水晶潮汐的哨子"
+      },
+      "whistle_phantom": {
+        "name": "幻魂的哨子"
+      },
+      "whistle_emberfall_phoenix": {
+        "name": "燼落鳳凰的哨子"
+      },
+      "charm_stag_acorn": {
+        "name": "橡果之冠護符"
+      },
+      "charm_stag_gilded": {
+        "name": "鍍金護符"
       },
       "lastflame_core": {
         "name": "末焰之核"
@@ -18451,6 +19747,1521 @@ export const zh_TW: EnTranslations = {
       "vanguard_warstaff": {
         "name": "先鋒之戰杖"
       },
+      "brookwatch_robe": {
+        "name": "溪衛長袍"
+      },
+      "brookwatch_leggings": {
+        "name": "溪衛腿甲衣"
+      },
+      "brookwatch_slippers": {
+        "name": "溪衛軟靴"
+      },
+      "brookwatch_hood": {
+        "name": "溪衛兜帽"
+      },
+      "brookwatch_gloves": {
+        "name": "溪衛手套"
+      },
+      "brookwatch_mantle": {
+        "name": "溪衛披肩"
+      },
+      "brookwatch_sash": {
+        "name": "溪衛束帶"
+      },
+      "brookwatch_jerkin": {
+        "name": "溪衛皮甲"
+      },
+      "brookwatch_breeches": {
+        "name": "溪衛及膝褲"
+      },
+      "brookwatch_boots": {
+        "name": "溪衛靴子"
+      },
+      "brookwatch_cap": {
+        "name": "溪衛便帽"
+      },
+      "brookwatch_grips": {
+        "name": "溪衛掌套"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "溪衛肩墊"
+      },
+      "brookwatch_belt": {
+        "name": "溪衛腰帶"
+      },
+      "brookwatch_hauberk": {
+        "name": "溪衛鎖衣"
+      },
+      "brookwatch_legguards": {
+        "name": "溪衛腿護"
+      },
+      "brookwatch_sabatons": {
+        "name": "溪衛甲靴"
+      },
+      "brookwatch_helm": {
+        "name": "溪衛頭盔"
+      },
+      "brookwatch_gauntlets": {
+        "name": "溪衛甲手"
+      },
+      "brookwatch_pauldrons": {
+        "name": "溪衛肩甲"
+      },
+      "brookwatch_girdle": {
+        "name": "溪衛腰飾"
+      },
+      "brookwatch_chainmail": {
+        "name": "溪衛鎖甲"
+      },
+      "brookwatch_chausses": {
+        "name": "溪衛腿甲"
+      },
+      "brookwatch_greaves": {
+        "name": "溪衛脛甲"
+      },
+      "brookwatch_coif": {
+        "name": "溪衛頭罩"
+      },
+      "brookwatch_handguards": {
+        "name": "溪衛護手"
+      },
+      "brookwatch_spaulders": {
+        "name": "溪衛肩鎧"
+      },
+      "brookwatch_cord": {
+        "name": "溪衛腰繩"
+      },
+      "hedgerow_robe": {
+        "name": "樹籬長袍"
+      },
+      "hedgerow_leggings": {
+        "name": "樹籬腿甲衣"
+      },
+      "hedgerow_slippers": {
+        "name": "樹籬軟靴"
+      },
+      "hedgerow_hood": {
+        "name": "樹籬兜帽"
+      },
+      "hedgerow_gloves": {
+        "name": "樹籬手套"
+      },
+      "hedgerow_mantle": {
+        "name": "樹籬披肩"
+      },
+      "hedgerow_sash": {
+        "name": "樹籬束帶"
+      },
+      "hedgerow_jerkin": {
+        "name": "樹籬皮甲"
+      },
+      "hedgerow_breeches": {
+        "name": "樹籬及膝褲"
+      },
+      "hedgerow_boots": {
+        "name": "樹籬靴子"
+      },
+      "hedgerow_cap": {
+        "name": "樹籬便帽"
+      },
+      "hedgerow_grips": {
+        "name": "樹籬掌套"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "樹籬肩墊"
+      },
+      "hedgerow_belt": {
+        "name": "樹籬腰帶"
+      },
+      "hedgerow_hauberk": {
+        "name": "樹籬鎖衣"
+      },
+      "hedgerow_legguards": {
+        "name": "樹籬腿護"
+      },
+      "hedgerow_sabatons": {
+        "name": "樹籬甲靴"
+      },
+      "hedgerow_helm": {
+        "name": "樹籬頭盔"
+      },
+      "hedgerow_gauntlets": {
+        "name": "樹籬甲手"
+      },
+      "hedgerow_pauldrons": {
+        "name": "樹籬肩甲"
+      },
+      "hedgerow_girdle": {
+        "name": "樹籬腰飾"
+      },
+      "hedgerow_chainmail": {
+        "name": "樹籬鎖甲"
+      },
+      "hedgerow_chausses": {
+        "name": "樹籬腿甲"
+      },
+      "hedgerow_greaves": {
+        "name": "樹籬脛甲"
+      },
+      "hedgerow_coif": {
+        "name": "樹籬頭罩"
+      },
+      "hedgerow_handguards": {
+        "name": "樹籬護手"
+      },
+      "hedgerow_spaulders": {
+        "name": "樹籬肩鎧"
+      },
+      "hedgerow_cord": {
+        "name": "樹籬腰繩"
+      },
+      "bogwalker_robe": {
+        "name": "沼行長袍"
+      },
+      "bogwalker_leggings": {
+        "name": "沼行腿甲衣"
+      },
+      "bogwalker_slippers": {
+        "name": "沼行軟靴"
+      },
+      "bogwalker_hood": {
+        "name": "沼行兜帽"
+      },
+      "bogwalker_gloves": {
+        "name": "沼行手套"
+      },
+      "bogwalker_mantle": {
+        "name": "沼行披肩"
+      },
+      "bogwalker_sash": {
+        "name": "沼行束帶"
+      },
+      "bogwalker_jerkin": {
+        "name": "沼行皮甲"
+      },
+      "bogwalker_breeches": {
+        "name": "沼行及膝褲"
+      },
+      "bogwalker_boots": {
+        "name": "沼行靴子"
+      },
+      "bogwalker_cap": {
+        "name": "沼行便帽"
+      },
+      "bogwalker_grips": {
+        "name": "沼行掌套"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "沼行肩墊"
+      },
+      "bogwalker_belt": {
+        "name": "沼行腰帶"
+      },
+      "bogwalker_hauberk": {
+        "name": "沼行鎖衣"
+      },
+      "bogwalker_legguards": {
+        "name": "沼行腿護"
+      },
+      "bogwalker_sabatons": {
+        "name": "沼行甲靴"
+      },
+      "bogwalker_helm": {
+        "name": "沼行頭盔"
+      },
+      "bogwalker_gauntlets": {
+        "name": "沼行甲手"
+      },
+      "bogwalker_pauldrons": {
+        "name": "沼行肩甲"
+      },
+      "bogwalker_girdle": {
+        "name": "沼行腰飾"
+      },
+      "bogwalker_chainmail": {
+        "name": "沼行鎖甲"
+      },
+      "bogwalker_chausses": {
+        "name": "沼行腿甲"
+      },
+      "bogwalker_greaves": {
+        "name": "沼行脛甲"
+      },
+      "bogwalker_coif": {
+        "name": "沼行頭罩"
+      },
+      "bogwalker_handguards": {
+        "name": "沼行護手"
+      },
+      "bogwalker_spaulders": {
+        "name": "沼行肩鎧"
+      },
+      "bogwalker_cord": {
+        "name": "沼行腰繩"
+      },
+      "thornspire_robe": {
+        "name": "棘尖長袍"
+      },
+      "thornspire_leggings": {
+        "name": "棘尖腿甲衣"
+      },
+      "thornspire_slippers": {
+        "name": "棘尖軟靴"
+      },
+      "thornspire_hood": {
+        "name": "棘尖兜帽"
+      },
+      "thornspire_gloves": {
+        "name": "棘尖手套"
+      },
+      "thornspire_mantle": {
+        "name": "棘尖披肩"
+      },
+      "thornspire_sash": {
+        "name": "棘尖束帶"
+      },
+      "thornspire_jerkin": {
+        "name": "棘尖皮甲"
+      },
+      "thornspire_breeches": {
+        "name": "棘尖及膝褲"
+      },
+      "thornspire_boots": {
+        "name": "棘尖靴子"
+      },
+      "thornspire_cap": {
+        "name": "棘尖便帽"
+      },
+      "thornspire_grips": {
+        "name": "棘尖掌套"
+      },
+      "thornspire_shoulderpads": {
+        "name": "棘尖肩墊"
+      },
+      "thornspire_belt": {
+        "name": "棘尖腰帶"
+      },
+      "thornspire_hauberk": {
+        "name": "棘尖鎖衣"
+      },
+      "thornspire_legguards": {
+        "name": "棘尖腿護"
+      },
+      "thornspire_sabatons": {
+        "name": "棘尖甲靴"
+      },
+      "thornspire_helm": {
+        "name": "棘尖頭盔"
+      },
+      "thornspire_gauntlets": {
+        "name": "棘尖甲手"
+      },
+      "thornspire_pauldrons": {
+        "name": "棘尖肩甲"
+      },
+      "thornspire_girdle": {
+        "name": "棘尖腰飾"
+      },
+      "thornspire_chainmail": {
+        "name": "棘尖鎖甲"
+      },
+      "thornspire_chausses": {
+        "name": "棘尖腿甲"
+      },
+      "thornspire_greaves": {
+        "name": "棘尖脛甲"
+      },
+      "thornspire_coif": {
+        "name": "棘尖頭罩"
+      },
+      "thornspire_handguards": {
+        "name": "棘尖護手"
+      },
+      "thornspire_spaulders": {
+        "name": "棘尖肩鎧"
+      },
+      "thornspire_cord": {
+        "name": "棘尖腰繩"
+      },
+      "hollowveil_robe": {
+        "name": "空幕長袍"
+      },
+      "hollowveil_leggings": {
+        "name": "空幕腿甲衣"
+      },
+      "hollowveil_slippers": {
+        "name": "空幕軟靴"
+      },
+      "hollowveil_hood": {
+        "name": "空幕兜帽"
+      },
+      "hollowveil_gloves": {
+        "name": "空幕手套"
+      },
+      "hollowveil_mantle": {
+        "name": "空幕披肩"
+      },
+      "hollowveil_sash": {
+        "name": "空幕束帶"
+      },
+      "hollowveil_jerkin": {
+        "name": "空幕皮甲"
+      },
+      "hollowveil_breeches": {
+        "name": "空幕及膝褲"
+      },
+      "hollowveil_boots": {
+        "name": "空幕靴子"
+      },
+      "hollowveil_cap": {
+        "name": "空幕便帽"
+      },
+      "hollowveil_grips": {
+        "name": "空幕掌套"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "空幕肩墊"
+      },
+      "hollowveil_belt": {
+        "name": "空幕腰帶"
+      },
+      "hollowveil_hauberk": {
+        "name": "空幕鎖衣"
+      },
+      "hollowveil_legguards": {
+        "name": "空幕腿護"
+      },
+      "hollowveil_sabatons": {
+        "name": "空幕甲靴"
+      },
+      "hollowveil_helm": {
+        "name": "空幕頭盔"
+      },
+      "hollowveil_gauntlets": {
+        "name": "空幕甲手"
+      },
+      "hollowveil_pauldrons": {
+        "name": "空幕肩甲"
+      },
+      "hollowveil_girdle": {
+        "name": "空幕腰飾"
+      },
+      "hollowveil_chainmail": {
+        "name": "空幕鎖甲"
+      },
+      "hollowveil_chausses": {
+        "name": "空幕腿甲"
+      },
+      "hollowveil_greaves": {
+        "name": "空幕脛甲"
+      },
+      "hollowveil_coif": {
+        "name": "空幕頭罩"
+      },
+      "hollowveil_handguards": {
+        "name": "空幕護手"
+      },
+      "hollowveil_spaulders": {
+        "name": "空幕肩鎧"
+      },
+      "hollowveil_cord": {
+        "name": "空幕腰繩"
+      },
+      "trailwarden_robe": {
+        "name": "徑衛長袍"
+      },
+      "trailwarden_leggings": {
+        "name": "徑衛腿甲衣"
+      },
+      "trailwarden_slippers": {
+        "name": "徑衛軟靴"
+      },
+      "trailwarden_hood": {
+        "name": "徑衛兜帽"
+      },
+      "trailwarden_gloves": {
+        "name": "徑衛手套"
+      },
+      "trailwarden_mantle": {
+        "name": "徑衛披肩"
+      },
+      "trailwarden_sash": {
+        "name": "徑衛束帶"
+      },
+      "trailwarden_jerkin": {
+        "name": "徑衛皮甲"
+      },
+      "trailwarden_breeches": {
+        "name": "徑衛及膝褲"
+      },
+      "trailwarden_boots": {
+        "name": "徑衛靴子"
+      },
+      "trailwarden_cap": {
+        "name": "徑衛便帽"
+      },
+      "trailwarden_grips": {
+        "name": "徑衛掌套"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "徑衛肩墊"
+      },
+      "trailwarden_belt": {
+        "name": "徑衛腰帶"
+      },
+      "trailwarden_hauberk": {
+        "name": "徑衛鎖衣"
+      },
+      "trailwarden_legguards": {
+        "name": "徑衛腿護"
+      },
+      "trailwarden_sabatons": {
+        "name": "徑衛甲靴"
+      },
+      "trailwarden_helm": {
+        "name": "徑衛頭盔"
+      },
+      "trailwarden_gauntlets": {
+        "name": "徑衛甲手"
+      },
+      "trailwarden_pauldrons": {
+        "name": "徑衛肩甲"
+      },
+      "trailwarden_girdle": {
+        "name": "徑衛腰飾"
+      },
+      "trailwarden_chainmail": {
+        "name": "徑衛鎖甲"
+      },
+      "trailwarden_chausses": {
+        "name": "徑衛腿甲"
+      },
+      "trailwarden_greaves": {
+        "name": "徑衛脛甲"
+      },
+      "trailwarden_coif": {
+        "name": "徑衛頭罩"
+      },
+      "trailwarden_handguards": {
+        "name": "徑衛護手"
+      },
+      "trailwarden_spaulders": {
+        "name": "徑衛肩鎧"
+      },
+      "trailwarden_cord": {
+        "name": "徑衛腰繩"
+      },
+      "highgale_robe": {
+        "name": "高風長袍"
+      },
+      "highgale_leggings": {
+        "name": "高風腿甲衣"
+      },
+      "highgale_slippers": {
+        "name": "高風軟靴"
+      },
+      "highgale_hood": {
+        "name": "高風兜帽"
+      },
+      "highgale_gloves": {
+        "name": "高風手套"
+      },
+      "highgale_mantle": {
+        "name": "高風披肩"
+      },
+      "highgale_sash": {
+        "name": "高風束帶"
+      },
+      "highgale_jerkin": {
+        "name": "高風皮甲"
+      },
+      "highgale_breeches": {
+        "name": "高風及膝褲"
+      },
+      "highgale_boots": {
+        "name": "高風靴子"
+      },
+      "highgale_cap": {
+        "name": "高風便帽"
+      },
+      "highgale_grips": {
+        "name": "高風掌套"
+      },
+      "highgale_shoulderpads": {
+        "name": "高風肩墊"
+      },
+      "highgale_belt": {
+        "name": "高風腰帶"
+      },
+      "highgale_hauberk": {
+        "name": "高風鎖衣"
+      },
+      "highgale_legguards": {
+        "name": "高風腿護"
+      },
+      "highgale_sabatons": {
+        "name": "高風甲靴"
+      },
+      "highgale_helm": {
+        "name": "高風頭盔"
+      },
+      "highgale_gauntlets": {
+        "name": "高風甲手"
+      },
+      "highgale_pauldrons": {
+        "name": "高風肩甲"
+      },
+      "highgale_girdle": {
+        "name": "高風腰飾"
+      },
+      "highgale_chainmail": {
+        "name": "高風鎖甲"
+      },
+      "highgale_chausses": {
+        "name": "高風腿甲"
+      },
+      "highgale_greaves": {
+        "name": "高風脛甲"
+      },
+      "brookwatch_tunic": {
+        "name": "溪衛短衣"
+      },
+      "brookwatch_legwraps": {
+        "name": "溪衛綁腿"
+      },
+      "brookwatch_treads": {
+        "name": "溪衛踏靴"
+      },
+      "brookwatch_headguard": {
+        "name": "溪衛護頭"
+      },
+      "brookwatch_handwraps": {
+        "name": "溪衛裹手"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "溪衛護肩"
+      },
+      "brookwatch_waistguard": {
+        "name": "溪衛護腰"
+      },
+      "hedgerow_tunic": {
+        "name": "樹籬短衣"
+      },
+      "hedgerow_legwraps": {
+        "name": "樹籬綁腿"
+      },
+      "hedgerow_treads": {
+        "name": "樹籬踏靴"
+      },
+      "hedgerow_headguard": {
+        "name": "樹籬護頭"
+      },
+      "hedgerow_handwraps": {
+        "name": "樹籬裹手"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "樹籬護肩"
+      },
+      "hedgerow_waistguard": {
+        "name": "樹籬護腰"
+      },
+      "bogwalker_tunic": {
+        "name": "沼行短衣"
+      },
+      "bogwalker_legwraps": {
+        "name": "沼行綁腿"
+      },
+      "bogwalker_treads": {
+        "name": "沼行踏靴"
+      },
+      "bogwalker_headguard": {
+        "name": "沼行護頭"
+      },
+      "bogwalker_handwraps": {
+        "name": "沼行裹手"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "沼行護肩"
+      },
+      "bogwalker_waistguard": {
+        "name": "沼行護腰"
+      },
+      "thornspire_tunic": {
+        "name": "棘尖短衣"
+      },
+      "thornspire_legwraps": {
+        "name": "棘尖綁腿"
+      },
+      "thornspire_treads": {
+        "name": "棘尖踏靴"
+      },
+      "thornspire_headguard": {
+        "name": "棘尖護頭"
+      },
+      "thornspire_handwraps": {
+        "name": "棘尖裹手"
+      },
+      "thornspire_shoulderguards": {
+        "name": "棘尖護肩"
+      },
+      "thornspire_waistguard": {
+        "name": "棘尖護腰"
+      },
+      "hollowveil_tunic": {
+        "name": "空幕短衣"
+      },
+      "hollowveil_legwraps": {
+        "name": "空幕綁腿"
+      },
+      "hollowveil_treads": {
+        "name": "空幕踏靴"
+      },
+      "hollowveil_headguard": {
+        "name": "空幕護頭"
+      },
+      "hollowveil_handwraps": {
+        "name": "空幕裹手"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "空幕護肩"
+      },
+      "hollowveil_waistguard": {
+        "name": "空幕護腰"
+      },
+      "trailwarden_tunic": {
+        "name": "徑衛短衣"
+      },
+      "trailwarden_legwraps": {
+        "name": "徑衛綁腿"
+      },
+      "trailwarden_treads": {
+        "name": "徑衛踏靴"
+      },
+      "trailwarden_headguard": {
+        "name": "徑衛護頭"
+      },
+      "trailwarden_handwraps": {
+        "name": "徑衛裹手"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "徑衛護肩"
+      },
+      "trailwarden_waistguard": {
+        "name": "徑衛護腰"
+      },
+      "highgale_tunic": {
+        "name": "高風短衣"
+      },
+      "highgale_legwraps": {
+        "name": "高風綁腿"
+      },
+      "highgale_treads": {
+        "name": "高風踏靴"
+      },
+      "highgale_headguard": {
+        "name": "高風護頭"
+      },
+      "highgale_handwraps": {
+        "name": "高風裹手"
+      },
+      "highgale_shoulderguards": {
+        "name": "高風護肩"
+      },
+      "highgale_waistguard": {
+        "name": "高風護腰"
+      },
+      "highgale_coif": {
+        "name": "高風頭罩"
+      },
+      "highgale_handguards": {
+        "name": "高風護手"
+      },
+      "highgale_spaulders": {
+        "name": "高風肩鎧"
+      },
+      "highgale_cord": {
+        "name": "高風腰繩"
+      },
+      "breakwater_mantle": {
+        "name": "防波披肩"
+      },
+      "breakwater_shoulderpads": {
+        "name": "防波肩墊"
+      },
+      "breakwater_spaulders": {
+        "name": "防波肩鎧"
+      },
+      "gravebell_treads": {
+        "name": "墓鐘踏靴"
+      },
+      "gravebell_greaves": {
+        "name": "墓鐘脛甲"
+      },
+      "cryptbound_tunic": {
+        "name": "墓縛短衣"
+      },
+      "cryptbound_chainmail": {
+        "name": "墓縛鎖甲"
+      },
+      "oathbroken_leggings": {
+        "name": "背誓腿甲衣"
+      },
+      "oathbroken_breeches": {
+        "name": "背誓及膝褲"
+      },
+      "oathbroken_legwraps": {
+        "name": "背誓綁腿"
+      },
+      "oathbroken_legguards": {
+        "name": "背誓腿護"
+      },
+      "oathbroken_chausses": {
+        "name": "背誓腿甲"
+      },
+      "seamist_legwraps": {
+        "name": "海霧綁腿"
+      },
+      "seamist_chausses": {
+        "name": "海霧腿甲"
+      },
+      "warmonger_treads": {
+        "name": "戰狂踏靴"
+      },
+      "warmonger_greaves": {
+        "name": "戰狂脛甲"
+      },
+      "sparkglass_leggings": {
+        "name": "火花晶腿甲衣"
+      },
+      "sparkglass_breeches": {
+        "name": "火花晶及膝褲"
+      },
+      "sparkglass_legwraps": {
+        "name": "火花晶綁腿"
+      },
+      "sparkglass_legguards": {
+        "name": "火花晶腿護"
+      },
+      "sparkglass_chausses": {
+        "name": "火花晶腿甲"
+      },
+      "stillhymn_treads": {
+        "name": "寂詠踏靴"
+      },
+      "stillhymn_greaves": {
+        "name": "寂詠脛甲"
+      },
+      "pearlglow_headguard": {
+        "name": "珠輝護頭"
+      },
+      "pearlglow_coif": {
+        "name": "珠輝頭罩"
+      },
+      "sealkeeper_gloves": {
+        "name": "守印手套"
+      },
+      "sealkeeper_grips": {
+        "name": "守印掌套"
+      },
+      "sealkeeper_handwraps": {
+        "name": "守印裹手"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "守印甲手"
+      },
+      "sealkeeper_handguards": {
+        "name": "守印護手"
+      },
+      "fetterbound_leggings": {
+        "name": "鐐縛腿甲衣"
+      },
+      "fetterbound_breeches": {
+        "name": "鐐縛及膝褲"
+      },
+      "fetterbound_legwraps": {
+        "name": "鐐縛綁腿"
+      },
+      "fetterbound_legguards": {
+        "name": "鐐縛腿護"
+      },
+      "fetterbound_chausses": {
+        "name": "鐐縛腿甲"
+      },
+      "shroudcaller_tunic": {
+        "name": "喚殮短衣"
+      },
+      "shroudcaller_chainmail": {
+        "name": "喚殮鎖甲"
+      },
+      "wyrmshadow_tunic": {
+        "name": "龍影短衣"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "龍影鎖甲"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "燼巢肩墊"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "燼巢護肩"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "燼巢肩甲"
+      },
+      "hoarfrost_mantle": {
+        "name": "白霜披肩"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "白霜肩墊"
+      },
+      "hoarfrost_spaulders": {
+        "name": "白霜肩鎧"
+      },
+      "blackmere_mantle": {
+        "name": "黑沼披肩"
+      },
+      "blackmere_shoulderpads": {
+        "name": "黑沼肩墊"
+      },
+      "blackmere_shoulderguards": {
+        "name": "黑沼護肩"
+      },
+      "blackmere_pauldrons": {
+        "name": "黑沼肩甲"
+      },
+      "blackmere_spaulders": {
+        "name": "黑沼肩鎧"
+      },
+      "reedhush_mantle": {
+        "name": "葦寂披肩"
+      },
+      "reedhush_shoulderpads": {
+        "name": "葦寂肩墊"
+      },
+      "reedhush_shoulderguards": {
+        "name": "葦寂護肩"
+      },
+      "reedhush_pauldrons": {
+        "name": "葦寂肩甲"
+      },
+      "reedhush_spaulders": {
+        "name": "葦寂肩鎧"
+      },
+      "cairnking_mantle": {
+        "name": "塚王披肩"
+      },
+      "cairnking_shoulderpads": {
+        "name": "塚王肩墊"
+      },
+      "cairnking_shoulderguards": {
+        "name": "塚王護肩"
+      },
+      "cairnking_pauldrons": {
+        "name": "塚王肩甲"
+      },
+      "cairnking_spaulders": {
+        "name": "塚王肩鎧"
+      },
+      "palehunt_mantle": {
+        "name": "蒼獵披肩"
+      },
+      "palehunt_shoulderpads": {
+        "name": "蒼獵肩墊"
+      },
+      "palehunt_shoulderguards": {
+        "name": "蒼獵護肩"
+      },
+      "palehunt_pauldrons": {
+        "name": "蒼獵肩甲"
+      },
+      "palehunt_spaulders": {
+        "name": "蒼獵肩鎧"
+      },
+      "jadeshrine_mantle": {
+        "name": "玉祠披肩"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "玉祠肩墊"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "玉祠護肩"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "玉祠肩甲"
+      },
+      "jadeshrine_spaulders": {
+        "name": "玉祠肩鎧"
+      },
+      "gildhedge_mantle": {
+        "name": "金籬披肩"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "金籬肩墊"
+      },
+      "gildhedge_spaulders": {
+        "name": "金籬肩鎧"
+      },
+      "saltwrack_mantle": {
+        "name": "鹽骸披肩"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "鹽骸肩墊"
+      },
+      "saltwrack_spaulders": {
+        "name": "鹽骸肩鎧"
+      },
+      "brookwatch_vest": {
+        "name": "溪衛背心"
+      },
+      "brookwatch_trousers": {
+        "name": "溪衛長褲"
+      },
+      "brookwatch_moccasins": {
+        "name": "溪衛鹿皮鞋"
+      },
+      "brookwatch_cowl": {
+        "name": "溪衛風帽"
+      },
+      "brookwatch_mitts": {
+        "name": "溪衛露指手套"
+      },
+      "brookwatch_epaulets": {
+        "name": "溪衛肩飾"
+      },
+      "brookwatch_cinch": {
+        "name": "溪衛束腰"
+      },
+      "hedgerow_vest": {
+        "name": "樹籬背心"
+      },
+      "hedgerow_trousers": {
+        "name": "樹籬長褲"
+      },
+      "hedgerow_moccasins": {
+        "name": "樹籬鹿皮鞋"
+      },
+      "hedgerow_cowl": {
+        "name": "樹籬風帽"
+      },
+      "hedgerow_mitts": {
+        "name": "樹籬露指手套"
+      },
+      "hedgerow_epaulets": {
+        "name": "樹籬肩飾"
+      },
+      "hedgerow_cinch": {
+        "name": "樹籬束腰"
+      },
+      "bogwalker_vest": {
+        "name": "沼行背心"
+      },
+      "bogwalker_trousers": {
+        "name": "沼行長褲"
+      },
+      "bogwalker_moccasins": {
+        "name": "沼行鹿皮鞋"
+      },
+      "bogwalker_cowl": {
+        "name": "沼行風帽"
+      },
+      "bogwalker_mitts": {
+        "name": "沼行露指手套"
+      },
+      "bogwalker_epaulets": {
+        "name": "沼行肩飾"
+      },
+      "bogwalker_cinch": {
+        "name": "沼行束腰"
+      },
+      "thornspire_vest": {
+        "name": "棘尖背心"
+      },
+      "thornspire_trousers": {
+        "name": "棘尖長褲"
+      },
+      "thornspire_moccasins": {
+        "name": "棘尖鹿皮鞋"
+      },
+      "thornspire_cowl": {
+        "name": "棘尖風帽"
+      },
+      "thornspire_mitts": {
+        "name": "棘尖露指手套"
+      },
+      "thornspire_epaulets": {
+        "name": "棘尖肩飾"
+      },
+      "thornspire_cinch": {
+        "name": "棘尖束腰"
+      },
+      "hollowveil_vest": {
+        "name": "空幕背心"
+      },
+      "hollowveil_trousers": {
+        "name": "空幕長褲"
+      },
+      "hollowveil_moccasins": {
+        "name": "空幕鹿皮鞋"
+      },
+      "hollowveil_cowl": {
+        "name": "空幕風帽"
+      },
+      "hollowveil_mitts": {
+        "name": "空幕露指手套"
+      },
+      "hollowveil_epaulets": {
+        "name": "空幕肩飾"
+      },
+      "hollowveil_cinch": {
+        "name": "空幕束腰"
+      },
+      "trailwarden_vest": {
+        "name": "徑衛背心"
+      },
+      "trailwarden_trousers": {
+        "name": "徑衛長褲"
+      },
+      "trailwarden_moccasins": {
+        "name": "徑衛鹿皮鞋"
+      },
+      "trailwarden_cowl": {
+        "name": "徑衛風帽"
+      },
+      "trailwarden_mitts": {
+        "name": "徑衛露指手套"
+      },
+      "trailwarden_epaulets": {
+        "name": "徑衛肩飾"
+      },
+      "trailwarden_cinch": {
+        "name": "徑衛束腰"
+      },
+      "highgale_vest": {
+        "name": "高風背心"
+      },
+      "highgale_trousers": {
+        "name": "高風長褲"
+      },
+      "highgale_moccasins": {
+        "name": "高風鹿皮鞋"
+      },
+      "highgale_cowl": {
+        "name": "高風風帽"
+      },
+      "highgale_mitts": {
+        "name": "高風露指手套"
+      },
+      "highgale_epaulets": {
+        "name": "高風肩飾"
+      },
+      "highgale_cinch": {
+        "name": "高風束腰"
+      },
+      "breakwater_shoulderguards": {
+        "name": "防波護肩"
+      },
+      "breakwater_pauldrons": {
+        "name": "防波肩甲"
+      },
+      "breakwater_epaulets": {
+        "name": "防波肩飾"
+      },
+      "gravebell_moccasins": {
+        "name": "墓鐘鹿皮鞋"
+      },
+      "oathbroken_trousers": {
+        "name": "背誓長褲"
+      },
+      "sparkglass_trousers": {
+        "name": "火花晶長褲"
+      },
+      "stillhymn_moccasins": {
+        "name": "寂詠鹿皮鞋"
+      },
+      "sealkeeper_mitts": {
+        "name": "守印露指手套"
+      },
+      "fetterbound_trousers": {
+        "name": "鐐縛長褲"
+      },
+      "wyrmshadow_vest": {
+        "name": "龍影背心"
+      },
+      "cinderbrood_spaulders": {
+        "name": "燼巢肩鎧"
+      },
+      "cinderbrood_epaulets": {
+        "name": "燼巢肩飾"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "白霜護肩"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "白霜肩甲"
+      },
+      "hoarfrost_epaulets": {
+        "name": "白霜肩飾"
+      },
+      "blackmere_epaulets": {
+        "name": "黑沼肩飾"
+      },
+      "reedhush_epaulets": {
+        "name": "葦寂肩飾"
+      },
+      "cairnking_epaulets": {
+        "name": "塚王肩飾"
+      },
+      "palehunt_epaulets": {
+        "name": "蒼獵肩飾"
+      },
+      "jadeshrine_epaulets": {
+        "name": "玉祠肩飾"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "金籬護肩"
+      },
+      "gildhedge_pauldrons": {
+        "name": "金籬肩甲"
+      },
+      "gildhedge_epaulets": {
+        "name": "金籬肩飾"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "鹽骸護肩"
+      },
+      "saltwrack_pauldrons": {
+        "name": "鹽骸肩甲"
+      },
+      "saltwrack_epaulets": {
+        "name": "鹽骸肩飾"
+      },
+      "muster_shardpike": {
+        "name": "徵召碎晶長矛"
+      },
+      "knucklebone_of_balgath": {
+        "name": "巴爾加斯的指節骨"
+      },
+      "muster_standard": {
+        "name": "徵召軍旗"
+      },
+      "guttered_eye": {
+        "name": "殘燼之眼"
+      },
+      "barrowstone_heart": {
+        "name": "塚石之心"
+      },
+      "muster_grapnel": {
+        "name": "徵召鉤索"
+      },
+      "craterglass_stave": {
+        "name": "隕坑琉璃法杖"
+      },
+      "gravedirt_treads": {
+        "name": "墓土踏靴"
+      },
+      "bellrope_girdle": {
+        "name": "鐘繩腰帶"
+      },
+      "sextons_spadehaft": {
+        "name": "司事的鍬柄"
+      },
+      "rimesilk_mantle": {
+        "name": "霜絲肩衣"
+      },
+      "bonechill_carapace_vest": {
+        "name": "骨寒鎖甲"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "綴霜護腿"
+      },
+      "rimeweb_fang": {
+        "name": "新娘的冰錐"
+      },
+      "cantors_cassock": {
+        "name": "領唱者的法衣"
+      },
+      "choirward_leggings": {
+        "name": "聖詠守衛護腿"
+      },
+      "choristers_gloves": {
+        "name": "唱詩者的手套"
+      },
+      "cantors_hymnal": {
+        "name": "領唱者的聖詠集"
+      },
+      "gravecallers_vestments": {
+        "name": "喚墓者的祭袍"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "不安潛行者兜帽"
+      },
+      "sextons_burial_spade": {
+        "name": "司事的葬鏟"
+      },
+      "rimesilk_hood": {
+        "name": "霜絲兜帽"
+      },
+      "knight_commanders_longsword": {
+        "name": "騎士指揮官長劍"
+      },
+      "gaolers_chain_girdle": {
+        "name": "獄卒鎖鏈腰帶"
+      },
+      "rusted_shackle_grips": {
+        "name": "鏽蝕鐐銬護手"
+      },
+      "drowned_wardens_mantle": {
+        "name": "溺亡看守披肩"
+      },
+      "gaolyard_cudgel": {
+        "name": "獄庭短棍"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "溺亡指揮官胸甲"
+      },
+      "gaolyard_striders": {
+        "name": "獄庭長靴"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "獄卒的鐵護手"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "牢頭的鑰匙腰帶"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "牢頭的提燈兜帽"
+      },
+      "conchplate_girdle": {
+        "name": "螺甲腰帶"
+      },
+      "pale_chorus_leggings": {
+        "name": "蒼白合唱護腿"
+      },
+      "refrain_silk_gloves": {
+        "name": "疊句絲手套"
+      },
+      "chorus_conch": {
+        "name": "合唱海螺"
+      },
+      "tideglass_pauldrons": {
+        "name": "潮鏡肩鎧"
+      },
+      "moonburn_treads": {
+        "name": "月灼便靴"
+      },
+      "prism_etched_cowl": {
+        "name": "稜鏡蝕刻兜帽"
+      },
+      "tideglass_shiv": {
+        "name": "潮鏡匕首"
+      },
+      "pale_chorus_vestment": {
+        "name": "蒼白合唱法衣"
+      },
+      "tideglass_warmaul": {
+        "name": "潮鏡戰槌"
+      },
+      "beastpit_warbelt": {
+        "name": "獸坑戰腰帶"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "美洲豹皮短上衣"
+      },
+      "hexbone_handwraps": {
+        "name": "咒骨裹手"
+      },
+      "rootbound_sabatons": {
+        "name": "縛根鐵靴"
+      },
+      "pollen_dusted_leggings": {
+        "name": "沾滿花粉的護腿"
+      },
+      "bloomsilk_cowl": {
+        "name": "花綢兜帽"
+      },
+      "falls_blessed_staff": {
+        "name": "瀑布祝福法杖"
+      },
+      "fanglords_hide_mantle": {
+        "name": "獠牙領主的獸皮肩甲"
+      },
+      "thornroot_greathelm": {
+        "name": "荊冠巨盔"
+      },
+      "foremans_grips": {
+        "name": "工頭護手"
+      },
+      "serac_stride_boots": {
+        "name": "冰塔跋涉長靴"
+      },
+      "seal_rune_mantle": {
+        "name": "封印符文披肩"
+      },
+      "thawbound_legguards": {
+        "name": "融縛護腿"
+      },
+      "pyre_tenders_hood": {
+        "name": "守柴人兜帽"
+      },
+      "meltwater_cord": {
+        "name": "融水束帶"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "開鎖之錘"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "甦醒儀式法衣"
+      },
+      "spadeworn_gauntlets": {
+        "name": "鍬磨鐵護手"
+      },
+      "gravedirt_grips": {
+        "name": "墓土護手"
+      },
+      "bellrope_mitts": {
+        "name": "鐘繩手套"
+      },
+      "rimewreath_coif": {
+        "name": "霜冠鎖帽"
+      },
+      "rime_laced_hood": {
+        "name": "綴霜兜帽"
+      },
+      "lamenting_veil": {
+        "name": "哀悼面紗"
+      },
+      "choirward_pauldrons": {
+        "name": "聖詠守衛肩鎧"
+      },
+      "choristers_spaulders": {
+        "name": "唱詩者的肩甲"
+      },
+      "cantors_stole": {
+        "name": "領唱者的聖帶"
+      },
+      "knellbound_hauberk": {
+        "name": "喪鐘縛鎖甲"
+      },
+      "candlewatch_jerkin": {
+        "name": "守燭皮甲"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "不安儀式長袍"
+      },
+      "gravecallers_rod": {
+        "name": "喚墓者的短杖"
+      },
+      "portcullis_girdle": {
+        "name": "閘門腰帶"
+      },
+      "cellwatch_belt": {
+        "name": "守牢腰帶"
+      },
+      "lanternwick_sash": {
+        "name": "燈芯飾帶"
+      },
+      "turnkeys_shank": {
+        "name": "牢頭的私刃"
+      },
+      "gaolyard_jerkin": {
+        "name": "獄庭皮甲"
+      },
+      "brinewarden_robe": {
+        "name": "鹹潮看守長袍"
+      },
+      "fogbinders_rod": {
+        "name": "縛霧者短杖"
+      },
+      "conchplate_sabatons": {
+        "name": "螺甲戰靴"
+      },
+      "pale_chorus_slippers": {
+        "name": "蒼白合唱便鞋"
+      },
+      "tideglass_gauntlets": {
+        "name": "潮鏡鐵護手"
+      },
+      "moonburn_grips": {
+        "name": "月灼護手"
+      },
+      "prism_etched_handwraps": {
+        "name": "稜鏡蝕刻裹手"
+      },
+      "mere_crested_helm": {
+        "name": "湖冠頭盔"
+      },
+      "mereskin_hood": {
+        "name": "湖蛇皮兜帽"
+      },
+      "merewater_cowl": {
+        "name": "湖水兜帽"
+      },
+      "merecleaver": {
+        "name": "斷湖巨斧"
+      },
+      "moonwrack_stave": {
+        "name": "月殤法杖"
+      },
+      "membership_token": {
+        "name": "會員代幣（30天）"
+      },
+      "referral_satchel": {
+        "name": "友誼背袋"
+      },
+      "referral_hollow_charm": {
+        "name": "空洞友誼護符"
+      },
+      "referral_fog_charm": {
+        "name": "縛霧友誼護符"
+      },
+      "reins_referral_tank": {
+        "name": "友誼坦克韁繩"
+      },
+      "reins_referral_raptor": {
+        "name": "友誼迅猛龍韁繩"
+      },
+      "referral_helmet": {
+        "name": "友誼頭盔"
+      },
+      "referral_shoulder": {
+        "name": "友誼肩甲"
+      },
+      "referral_chest": {
+        "name": "友誼胸甲"
+      },
+      "referral_waist": {
+        "name": "友誼腰帶"
+      },
+      "referral_legs": {
+        "name": "友誼腿甲"
+      },
+      "referral_gloves": {
+        "name": "友誼護手"
+      },
+      "referral_feet": {
+        "name": "友誼戰靴"
+      },
+      "membership_helmet": {
+        "name": "會員頭盔"
+      },
+      "membership_shoulder": {
+        "name": "會員肩甲"
+      },
+      "membership_chest": {
+        "name": "會員胸甲"
+      },
+      "membership_waist": {
+        "name": "會員腰帶"
+      },
+      "membership_legs": {
+        "name": "會員腿甲"
+      },
+      "membership_gloves": {
+        "name": "會員護手"
+      },
+      "membership_feet": {
+        "name": "會員戰靴"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19306,6 +22117,24 @@ export const zh_TW: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "熔爐之心"
       },
+      "gaolers_iron_key": {
+        "name": "獄卒鐵鑰匙"
+      },
+      "fanglords_whistle": {
+        "name": "獠牙領主的哨子"
+      },
+      "gorgebloom_seedpod": {
+        "name": "噬花種莢"
+      },
+      "foremans_last_link": {
+        "name": "工頭的最後一環"
+      },
+      "phial_of_the_tithe": {
+        "name": "什一稅之瓶"
+      },
+      "quenchwater_flask": {
+        "name": "淬火水瓶"
+      },
       "rift_watchers_band": {
         "name": "裂隙守望者指環"
       },
@@ -19440,6 +22269,9 @@ export const zh_TW: EnTranslations = {
       "restless_bones": {
         "name": "不寧骸骨"
       },
+      "marrow_restless_bones": {
+        "name": "不寧骸骨"
+      },
       "gorrak": {
         "name": "無情者戈拉克"
       },
@@ -19557,6 +22389,75 @@ export const zh_TW: EnTranslations = {
       "morthen": {
         "name": "喚墓者莫森"
       },
+      "ossuary_sentinel": {
+        "name": "骨堂哨兵"
+      },
+      "hollow_gravedigger": {
+        "name": "空洞掘墓人"
+      },
+      "rime_egg_sac": {
+        "name": "霜卵囊"
+      },
+      "rimeweb_hatchling": {
+        "name": "霜網幼蛛"
+      },
+      "rimeweb_spinner": {
+        "name": "霜網織絲蛛"
+      },
+      "candlewright_acolyte": {
+        "name": "燭匠侍僧"
+      },
+      "hollow_chorister": {
+        "name": "空洞唱詩者"
+      },
+      "bound_soul": {
+        "name": "縛魂"
+      },
+      "rimeweb": {
+        "name": "寒骨夫人"
+      },
+      "cantor_ilvane": {
+        "name": "領唱者伊爾凡"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "骨堂戰士"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "喚墓者學徒"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "骨堂割喉者"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "喚墓者死靈法師"
+      },
+      "crypt_bone_minion": {
+        "name": "骸骨僕從"
+      },
+      "crypt_bone_brute": {
+        "name": "骸骨蠻兵"
+      },
+      "crypt_bone_pile": {
+        "name": "蠢動的骸骨"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "禮拜堂石像鬼"
+      },
+      "crypt_crow_caller": {
+        "name": "喚鴉者"
+      },
+      "crypt_carrion_crow": {
+        "name": "食腐烏鴉"
+      },
+      "crypt_ossuary_drake": {
+        "name": "骨堂骨龍"
+      },
+      "crypt_knellwyrm": {
+        "name": "喪鐘巨龍"
+      },
+      "crypt_remembrance_candle": {
+        "name": "追思蠟燭"
+      },
       "bastion_revenant": {
         "name": "堡壘亡魂"
       },
@@ -19571,6 +22472,102 @@ export const zh_TW: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "縛霧者維爾"
+      },
+      "drowned_watchman": {
+        "name": "溺亡守望者"
+      },
+      "fogbound_arbalest": {
+        "name": "縛霧弩手"
+      },
+      "barnacle_crawler": {
+        "name": "縛骸水手"
+      },
+      "bastion_warhound": {
+        "name": "堡壘戰犬"
+      },
+      "mistweaver": {
+        "name": "霧之吟唱者"
+      },
+      "drowned_sergeant": {
+        "name": "溺亡軍士"
+      },
+      "shackled_prisoner": {
+        "name": "戴鐐囚徒"
+      },
+      "gaol_turnkey": {
+        "name": "牢獄鑰匙官"
+      },
+      "turretback_hermit": {
+        "name": "海難船長"
+      },
+      "vael_fog_shade": {
+        "name": "縛霧者維爾"
+      },
+      "gaoler_ossick": {
+        "name": "獄卒奧西克"
+      },
+      "bastion_gaol_cage": {
+        "name": "鐵籠"
+      },
+      "bastion_drowned_anchor": {
+        "name": "溺亡之錨"
+      },
+      "lagoon_snapper": {
+        "name": "潟湖鱷龜"
+      },
+      "ice_wraith": {
+        "name": "寒冰怨靈"
+      },
+      "moonlit_siren": {
+        "name": "月光賽壬"
+      },
+      "tidewisp": {
+        "name": "潮汐精魂"
+      },
+      "drowned_pilgrim": {
+        "name": "溺亡朝聖者"
+      },
+      "mere_hydra_head_left": {
+        "name": "湖泊九頭蛇"
+      },
+      "mere_hydra_head_center": {
+        "name": "湖泊九頭蛇"
+      },
+      "mere_hydra_head_right": {
+        "name": "湖泊九頭蛇"
+      },
+      "tideglass_colossus": {
+        "name": "潮鏡巨像"
+      },
+      "tideglass_reflection": {
+        "name": "潮鏡倒影"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "潮鏡倒影"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "潮鏡倒影"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "潮鏡倒影"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "潮鏡倒影"
+      },
+      "tideglass_reflection_priest": {
+        "name": "潮鏡倒影"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "潮鏡倒影"
+      },
+      "tideglass_reflection_mage": {
+        "name": "潮鏡倒影"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "潮鏡倒影"
+      },
+      "tideglass_reflection_druid": {
+        "name": "潮鏡倒影"
       },
       "sanctum_boneguard": {
         "name": "聖所骨衛"
@@ -19725,8 +22722,26 @@ export const zh_TW: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "桑扎爾，覺醒之峰"
       },
+      "balgath_cyclops": {
+        "name": "巴爾加斯，獨眼工頭"
+      },
       "thunzharr_stormling": {
         "name": "被驚醒的風暴元素"
+      },
+      "muster_footman": {
+        "name": "徵召步兵"
+      },
+      "muster_chaplain": {
+        "name": "徵召隨軍牧師"
+      },
+      "muster_sergeant": {
+        "name": "徵召軍士"
+      },
+      "muster_drillmaster": {
+        "name": "徵召操練官"
+      },
+      "muster_effigy": {
+        "name": "稻草工頭"
       },
       "stable_horse": {
         "name": "廄馬"
@@ -20100,8 +23115,179 @@ export const zh_TW: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "獠牙領主馴獸師"
       },
+      "sunbone_totem_binder": {
+        "name": "日骨圖騰縛靈者"
+      },
+      "sunbone_totem": {
+        "name": "日骨圖騰"
+      },
+      "sunbone_dread_totem": {
+        "name": "日骨恐懼圖騰"
+      },
+      "basin_raptor": {
+        "name": "盆地迅猛龍"
+      },
+      "spore_toad": {
+        "name": "孢子蟾蜍"
+      },
+      "vine_lasher": {
+        "name": "亂藤鞭者"
+      },
+      "great_saurian": {
+        "name": "巨型蜥腳獸"
+      },
+      "howdah_hexcaller": {
+        "name": "馱轎巫咒師"
+      },
+      "fanglord_jaguar": {
+        "name": "獠牙領主的巨型美洲豹"
+      },
+      "the_gorgebloom": {
+        "name": "噬花"
+      },
       "wildheart_high_priest": {
         "name": "盆地之聲祖爾加"
+      },
+      "broodsworn_thawcaller": {
+        "name": "龍誓融冰召喚者"
+      },
+      "broodsworn_goadsmith": {
+        "name": "龍誓刺棒匠"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "龍誓柴堆看守"
+      },
+      "soul_brazier": {
+        "name": "靈魂火盆"
+      },
+      "rime_whelp": {
+        "name": "霜凇幼龍"
+      },
+      "ogre_sledge_hauler": {
+        "name": "食人魔拉橇工"
+      },
+      "glacier_splinter": {
+        "name": "冰川碎片"
+      },
+      "sledge_tusker": {
+        "name": "拖橇巨牙獸"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "鐵錘鐐銬"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "鐵鉗鐐銬"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "鐵砧鐐銬"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "風箱鐐銬"
+      },
+      "thorn_sprout": {
+        "name": "荊棘幼芽"
+      },
+      "buddy_ember_fox": {
+        "name": "餘燼狐"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "燼落鳳凰"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "赤鉗蟹"
+      },
+      "buddy_golden_sentinel": {
+        "name": "黃金哨兵"
+      },
+      "buddy_nightfang": {
+        "name": "夜牙"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "獠角野豬"
+      },
+      "buddy_emerald_wolf": {
+        "name": "翡翠狼"
+      },
+      "buddy_tiger": {
+        "name": "猛虎"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "巨魔臉"
+      },
+      "buddy_ansem": {
+        "name": "安塞姆"
+      },
+      "buddy_triple_t": {
+        "name": "三重T"
+      },
+      "buddy_kekius": {
+        "name": "凱基烏斯"
+      },
+      "buddy_solbot": {
+        "name": "索爾機偶"
+      },
+      "buddy_frostfire": {
+        "name": "霜火"
+      },
+      "buddy_rocky": {
+        "name": "岩仔"
+      },
+      "buddy_proud_grunt": {
+        "name": "驕傲的步兵"
+      },
+      "buddy_loot_goblin": {
+        "name": "戰利品哥布林"
+      },
+      "buddy_penny_goldspark": {
+        "name": "潘妮·金火花"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "羊駝"
+      },
+      "buddy_horse": {
+        "name": "馬"
+      },
+      "buddy_sapling": {
+        "name": "小樹苗"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "蜘蛛"
+      },
+      "buddy_raptor": {
+        "name": "迅猛龍"
+      },
+      "buddy_skeleton": {
+        "name": "骷髏"
+      },
+      "buddy_crystal_lich": {
+        "name": "水晶巫妖"
+      },
+      "buddy_forgemaw": {
+        "name": "熔顎·熔融者"
+      },
+      "buddy_crystal_tide": {
+        "name": "水晶潮汐"
+      },
+      "buddy_phantom": {
+        "name": "幻魂"
       },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
@@ -20185,7 +23371,7 @@ export const zh_TW: EnTranslations = {
         "name": "蒼白唱詩侍僧"
       },
       "pearlguard_sentinel": {
-        "name": "珍珠衛哨兵"
+        "name": "月幔鰩"
       },
       "sethrael_palecoil": {
         "name": "蒼盤者賽斯瑞爾"
@@ -20375,6 +23561,16 @@ export const zh_TW: EnTranslations = {
         "name": "芬威克守望者",
         "title": "芬橋守望者",
         "greeting": "在門口停下，{className}。蘆葦後面的沼澤會替我們殺人。"
+      },
+      "socketwright_skerrit": {
+        "name": "馬本·斯克里特",
+        "title": "鑲嵌匠",
+        "greeting": "四十年前我磨好那顆眼珠，把它嵌進他的眼窩，一天工錢都沒拿到。你想讓工頭吃點苦頭，{className}？那就衝著我的手藝去。"
+      },
+      "muster_commander": {
+        "name": "徵召指揮官",
+        "title": "芬橋徵召軍",
+        "greeting": "先長矛，{className}，再所有人。這就是全部，也是這座營地活到現在的原因。"
       },
       "brother_aldric_fen": {
         "name": "奧德里克修士",
@@ -20891,6 +24087,11 @@ export const zh_TW: EnTranslations = {
         "title": "碼頭陪練師",
         "greeting": "我身後那具假人從不還手，也永遠打不倒，{className}。真正重要的是帳目：你的傷害統計會記下你落在它身上的每一擊。把它設為目標，打開傷害統計視窗，剩下的交給我來教你。"
       },
+      "cantor_laverock": {
+        "name": "拉弗洛克",
+        "title": "蒼白唱詩班最後的領唱",
+        "greeting": "我曾是蒼白唱詩班裡最年輕的聲音。儀式那夜，我沒有喝，我逃了。從那以後，每逢滿月，我都聽見他們在水下歌唱。我必須在死前親眼見到她。讓我跟在你們身後吧。我不會戰鬥，也不會拖累你們。"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
         "title": "守潮者",
@@ -21114,6 +24315,52 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "芬橋集結令"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "徵召令",
+        "text": "我能抽出的每一桿長矛都在星隕坑周圍紮了營，{playerName}，就為了圍住從坑裡走出來的那東西。徵召指揮官守在俯瞰火山坑的南坡營地，在這裡的東南方。去向指揮官報到。你會聽到我們怎麼對付他，好好聽著，因為沒聽的人都躺在蘆葦裡了。",
+        "completion": "芬威克派來的？很好。聽著，這話我只說一遍，而他一句都不會說。巴爾加斯沿著我們的哨站巡行：坑沿、西邊的平地、南坡、西南坑沿上的缺口，然後再繞一圈，他停下的每一個哨站都會被夷平。鋼鐵傷不了他。他的皮會把刀刃彈開，只會砍他的團隊最後只會累死。他唯一的弱點是眼睛。一桿撐穩的長矛刺穿塚琉璃就能讓他失明，而他失明時皮會剝落：那時全團一起打他，狠狠地打。之後皮會重新合上，我們等下一次機會。先長矛，{playerName}，再所有人。兵器架只把長矛借給19級以下的新兵：年輕人刺瞎他的眼睛，老兵們抓住這個窗口。",
+        "objectives": {
+          "0": {
+            "label": "向徵召指揮官報到"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "長矛先行",
+        "text": "說話不值錢，長矛可值錢。從我旁邊的兵器架上拿一桿碎晶長矛，然後去營地西頭找稻草工頭：小伙子們用木板和稻草紮的，只有真傢伙一半大，眼睛的位置放著一盞燈籠。架起長矛，操練官砸地的時候也要穩住矛尖，因為真傢伙晃得更厲害。等你手臂篤定了，就把矛尖刺進燈籠。他的木板會掉下來：然後用你自己的武器打他，{playerName}，感受一下差別。兵器架只把長矛借給19級以下的新兵。",
+        "completion": "感覺到打進去了吧？在真傢伙身上，那是全團揮砍的十四口氣，然後他的皮又會合上。記住這一課。工頭會來考你的。",
+        "objectives": {
+          "0": {
+            "label": "從徵召兵器架上取下碎晶長矛"
+          },
+          "1": {
+            "label": "熄滅稻草工頭的燈籠"
+          },
+          "2": {
+            "label": "木板脫落時命中的攻擊"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "工頭的碎塊",
+        "text": "他每週都會重新站起來，我們每週都會再把他打倒。這需要一支團隊，而徵召軍單憑自己湊不齊。去找下一支討伐巴爾加斯的團隊，幫忙把他打倒，{playerName}。砍他也好，保護砍他的人也好，治療他們也好：每一雙與他作戰的手都算數。等他倒下，回來向我報告。徵召軍每擊倒他一次都付錢。",
+        "completion": "又倒下了，而且你就在那場戰鬥裡。今晚芬橋就會收到我的報告。離家這麼遠，錢袋很薄，但這是你的。等他再站起來就回來。",
+        "objectives": {
+          "0": {
+            "label": "擊敗巴爾加斯"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "鑲嵌匠的欠帳",
+        "text": "塚琉璃是我親手嵌進那眼窩的：磨好透鏡，安放到位，楔緊對齊。塚主們一個銅板都沒付過我，如今我的手藝卻在泥沼裡四處踏平一切。拿走我的碎晶長矛。矛尾插地，穩住矛尖，需要多久就撐多久，等你手臂篤定了，就把它送進那隻眼睛。他披的那層皮與那塊晶石相連，{playerName}：戳瞎他，泥沼裡的每一把刀刃終於都能咬進去。",
+        "completion": "你感覺到它鬆了，是吧？四十年的利息，從那眼窩裡付清了。長矛歸你了，朋友。他會復原的，他總是會，所以你什麼時候想再來收帳都行。",
+        "objectives": {
+          "0": {
+            "label": "戳瞎工頭的眼睛"
           }
         }
       },
@@ -23298,6 +26545,12 @@ export const zh_TW: EnTranslations = {
           },
           "7": {
             "label": "沉沒堡壘"
+          },
+          "8": {
+            "label": "塚丘領地"
+          },
+          "9": {
+            "label": "星隕坑"
           }
         }
       },
@@ -23710,7 +26963,7 @@ export const zh_TW: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",
-        "enterText": "溫熱的雨水在古老石面上嘶嘶作響。荒野之心盆地在你眼前展開。",
+        "enterText": "你穿過神像巨口，踏上高懸於盆地之上的岩架。瀑布自崖頂轟然而下，而在遠處下方，某個龐然大物正涉過淺灘。",
         "leaveText": "你從石牙之下穿回棕櫚之境的陽光中。"
       },
       "the_last_keep": {
@@ -23931,6 +27184,16 @@ export const zh_TW: EnTranslations = {
         "sender": "交易所經紀人",
         "subject": "你的交易所購得之物",
         "body": "交易已結清，貨物歸你所有。隨信的包裹裝著你所購買的那一件物品：自掛單之時起，它便由交易所託管，直到你的付款結清為止。\n\n這筆交易的紀錄已存入交易所帳冊。\n\n- 交易所經紀人"
+      },
+      "membership_token_delivery": {
+        "sender": "渡鴉郵驛",
+        "subject": "您的會員代幣",
+        "body": "您購買的代幣已隨信附上。兌換可為帳號增加30天會員時長，也可與其他冒險者交易。"
+      },
+      "membership_annual_reward": {
+        "sender": "鴉羽郵局",
+        "subject": "您的年度會員坐騎",
+        "body": "您的年度會員付款已完成。坦克坐騎鑰匙隨信附上。請將鑰匙保留在背包或銀行中以擁有此坐騎。會員到期後它仍歸您所有。需要騎術技能。"
       },
       "woc_market_return": {
         "sender": "交易所經紀人",
@@ -24381,6 +27644,7 @@ export const zh_TW: EnTranslations = {
     "mailboxName": "郵箱",
     "noticeboardName": "告示板",
     "farmPatchName": "菜畦",
-    "realmBuilderMonumentName": "王國建造者紀念碑"
+    "realmBuilderMonumentName": "王國建造者紀念碑",
+    "musterRackName": "徵召兵器架"
   }
 };

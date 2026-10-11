@@ -52,6 +52,8 @@ function makeWindow(state: WorldState): { w: DeedsWindow; el: HTMLElement } {
         activeTitle: state.activeTitle,
         deedsRarity: async () => null,
         deedsRecent: async () => null,
+        entities: new Map(),
+        playerId: 1,
         setActiveTitle: (id: string | null) => {
           state.activeTitle = id;
         },

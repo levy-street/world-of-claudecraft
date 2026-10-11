@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CharacterVisual } from '../src/render/characters';
+import { type CharacterVisual, createRosterLookVisual } from '../src/render/characters';
 import { buildCaravanDriver } from '../src/render/world_quest_caravan_driver';
 import { WORLD_QUEST_MOBS } from '../src/sim/content/world_quests';
 
-vi.mock('../src/render/characters', () => ({ CharacterVisual: vi.fn() }));
+vi.mock('../src/render/characters', () => ({ createRosterLookVisual: vi.fn() }));
 
 describe('Eastbrook caravan driver', () => {
   const update = vi.fn();
@@ -19,17 +19,20 @@ describe('Eastbrook caravan driver', () => {
     hips.name = 'hips';
     hips.position.set(0, 0.5, 0.1);
     root.add(hips);
-    vi.mocked(CharacterVisual).mockImplementation(function (this: CharacterVisual) {
-      Object.assign(this, { root, update, dispose, setRidePose });
-      return this;
-    });
+    vi.mocked(createRosterLookVisual).mockImplementation(
+      () => ({ root, update, dispose, setRidePose }) as unknown as CharacterVisual,
+    );
   });
 
-  it('seats the unarmed villager on the front of the wagon and follows its transform', () => {
+  it('seats the unarmed driver on the front of the wagon and follows its transform', () => {
     const driver = buildCaravanDriver();
     expect(driver).not.toBeNull();
     if (!driver) throw new Error('Expected caravan driver');
-    expect(CharacterVisual).toHaveBeenCalledWith('npc_villager', 0x9b794f, 0, null, null);
+    // Tobin wears his own roster row (npc_looks.ts) on a WOC class body
+    expect(createRosterLookVisual).toHaveBeenCalledWith(
+      'eastbrook_freight_caravan_driver',
+      0x9b794f,
+    );
     // CharacterVisual caps each mixer step at 0.3s. Finish the real rig's
     // 1s sit-down and 0.25s handoff before reduced motion can freeze it.
     expect(update).toHaveBeenCalledTimes(6);
@@ -78,36 +81,24 @@ describe('Eastbrook caravan driver', () => {
   });
 
   it.each([
-    ['willowfen_remedy_caravan', 'npc_villager_robed', 'Mira'],
-    ['frostveil_supply_caravan', 'npc_villager', 'Orin'],
-  ])('builds %s with its own speaker and appearance', (templateId, visualKey, speaker) => {
+    ['willowfen_remedy_caravan', 'willowfen_remedy_caravan_driver', 'Mira'],
+    ['frostveil_supply_caravan', 'frostveil_supply_caravan_driver', 'Orin'],
+  ])('builds %s with its own speaker and appearance', (templateId, lookId, speaker) => {
     const driver = buildCaravanDriver(templateId);
     expect(driver?.root.userData.caravanSpeaker).toBe(speaker);
-    expect(CharacterVisual).toHaveBeenCalledWith(
-      visualKey,
-      WORLD_QUEST_MOBS[templateId].color,
-      0,
-      null,
-      null,
-    );
+    expect(createRosterLookVisual).toHaveBeenCalledWith(lookId, WORLD_QUEST_MOBS[templateId].color);
     expect(driver?.root.name).toBe(`${templateId}-driver`);
     driver?.dispose();
   });
 
   it('does not build a driver for an unrelated mob', () => {
     expect(buildCaravanDriver('vale_bandit')).toBeNull();
-    expect(CharacterVisual).not.toHaveBeenCalled();
+    expect(createRosterLookVisual).not.toHaveBeenCalled();
   });
 
   it('keeps the caravan usable if a character asset is unavailable', () => {
-    vi.mocked(CharacterVisual).mockImplementationOnce(() => {
-      throw new Error('missing rig');
-    });
-    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      expect(buildCaravanDriver()).toBeNull();
-    } finally {
-      error.mockRestore();
-    }
+    // the factory logs the miss and hands back null; the wagon rolls on without a driver
+    vi.mocked(createRosterLookVisual).mockReturnValueOnce(null);
+    expect(buildCaravanDriver()).toBeNull();
   });
 });

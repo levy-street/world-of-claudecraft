@@ -13,7 +13,7 @@ export interface GuideClassSpec { id: string; name: string; role: GuideRole; sig
 // Interactive 3D model data, mirrored from the renderer's VisualDef manifest. The Guide's
 // standalone viewer builds the model from one GLB on demand; entities reference a model by
 // visual key into GUIDE_MODELS and carry their own tint color.
-export interface GuideModelAttach { url: string; bone: string; position?: [number, number, number]; rotationY?: number; gripRef?: string; }
+export interface GuideModelAttach { url: string; bone: string; position?: [number, number, number]; rotationY?: number; gripRef?: string; size?: number; }
 export interface GuideModelWeaponFix { node: string; rotX?: number; rotY?: number; rotZ?: number; }
 export interface GuideModelSpec {
   url: string;
@@ -25,6 +25,10 @@ export interface GuideModelSpec {
   attach?: GuideModelAttach[];
   weaponFix?: GuideModelWeaponFix[];
   tintStrength?: number;
+  /** Clip libraries played on this model (a split WOC body's animation library). */
+  animUrls?: string[];
+  /** Armor files bound to this model's skeleton by bone name (a split WOC body's kit). */
+  armor?: string[];
 }
 
 export interface GuideClassInfo {
@@ -1258,9 +1262,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       }
     ],
     "model": "player_priest",
-    "tint": "#f0e9d6",
-    "tintStrength": 0.12,
-    "still": "/guide-stills/player_priest__f0e9d6__s12.webp"
+    "still": "/guide-stills/player_priest.webp"
   },
   {
     "id": "shaman",
@@ -1415,9 +1417,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       }
     ],
     "model": "player_shaman",
-    "tint": "#6f8fc9",
-    "tintStrength": 0.12,
-    "still": "/guide-stills/player_shaman__6f8fc9__s12.webp"
+    "still": "/guide-stills/player_shaman.webp"
   },
   {
     "id": "mage",
@@ -1902,9 +1902,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       }
     ],
     "model": "player_warlock",
-    "tint": "#8d5fd3",
-    "tintStrength": 0.12,
-    "still": "/guide-stills/player_warlock__8d5fd3__s12.webp"
+    "still": "/guide-stills/player_warlock.webp"
   },
   {
     "id": "druid",
@@ -2176,7 +2174,9 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Drowned Chapel",
       "Troll Mounds",
       "Gravecaller Encampment",
-      "The Sunken Bastion"
+      "The Sunken Bastion",
+      "Barrowmound Reach",
+      "Starfall Crater"
     ],
     "welcome": "Report to Warden Fenwick at the Fenbridge gate.",
     "families": [
@@ -2506,7 +2506,7 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "id": "sunken_bastion",
     "isRaid": false,
     "suggestedPlayers": 5,
-    "min": 12,
+    "min": 11,
     "max": 13,
     "name": "The Sunken Bastion"
   },
@@ -2522,7 +2522,7 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "id": "gravewyrm_sanctum",
     "isRaid": false,
     "suggestedPlayers": 5,
-    "min": 19,
+    "min": 18,
     "max": 20,
     "name": "Gravewyrm Sanctum"
   },
@@ -2530,7 +2530,7 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "id": "wildheart_basin",
     "isRaid": false,
     "suggestedPlayers": 5,
-    "min": 20,
+    "min": 19,
     "max": 20,
     "name": "The Wildheart Basin"
   },
@@ -3077,10 +3077,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 5,
         "rare": false,
         "templateId": "vale_bandit",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "tintStrength": 0.3,
-        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
+        "model": "player_rogue",
+        "still": "/guide-stills/player_rogue.webp"
       },
       {
         "name": "Gravecaller Cultist",
@@ -3088,10 +3086,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 12,
         "rare": false,
         "templateId": "gravecaller_cultist",
-        "model": "mob_dark_caster",
-        "tint": "#6c3483",
-        "tintStrength": 0.5,
-        "still": "/guide-stills/mob_dark_caster__6c3483__s50.webp"
+        "model": "player_warlock",
+        "still": "/guide-stills/player_warlock.webp"
       },
       {
         "name": "Gravecaller Mender",
@@ -3099,10 +3095,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 12,
         "rare": false,
         "templateId": "gravecaller_mender",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "tintStrength": 0.3,
-        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
+        "model": "player_priest",
+        "still": "/guide-stills/player_priest.webp"
       },
       {
         "name": "Gravecaller Summoner",
@@ -3110,10 +3104,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 12,
         "rare": false,
         "templateId": "gravecaller_summoner",
-        "model": "mob_dark_caster",
-        "tint": "#884ea0",
-        "tintStrength": 0.5,
-        "still": "/guide-stills/mob_dark_caster__884ea0__s50.webp"
+        "model": "player_warlock_female",
+        "still": "/guide-stills/player_warlock_female.webp"
       },
       {
         "name": "Broodsworn Zealot",
@@ -3121,10 +3113,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 19,
         "rare": false,
         "templateId": "wyrmcult_zealot",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "tintStrength": 0.3,
-        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
+        "model": "player_rogue",
+        "still": "/guide-stills/player_rogue.webp"
       },
       {
         "name": "Broodsworn Necromancer",
@@ -3132,10 +3122,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 19,
         "rare": false,
         "templateId": "wyrmcult_necromancer",
-        "model": "mob_dark_caster",
-        "tint": "#533566",
-        "tintStrength": 0.5,
-        "still": "/guide-stills/mob_dark_caster__533566__s50.webp"
+        "model": "player_warlock",
+        "still": "/guide-stills/player_warlock.webp"
       },
       {
         "name": "Dawnhold Knight",
@@ -3143,8 +3131,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "hedge_knight",
-        "model": "npc_knight",
-        "still": "/guide-stills/npc_knight.webp"
+        "model": "player_paladin",
+        "still": "/guide-stills/player_paladin.webp"
       }
     ]
   },
@@ -6004,6 +5992,196 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "cmb_balgath",
+    "name": "Foreman No More",
+    "category": "combat",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "cmb_balgath_ten",
+    "name": "The Mound Keeps Nothing",
+    "category": "combat",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "cmb_point_taken",
+    "name": "Point Taken",
+    "category": "combat",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "dgn_olen_buttress",
+    "name": "Hold the Wall",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_ossick_moored",
+    "name": "Safe Harbor",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_vael_beacon",
+    "name": "By the Beacon's Light",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_turretback",
+    "name": "Eviction Notice",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_selthe_pitch",
+    "name": "Every Voice in Tune",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_colossus_mirror",
+    "name": "Break the Glass",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_ysolei_high_and_dry",
+    "name": "High and Dry",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_mere_hydra",
+    "name": "All Heads Down",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_crypt_knellwyrm",
+    "name": "Not a Hair Singed",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_turnkey_cage",
+    "name": "No Cage Can Hold Us",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_beastmaster_apart",
+    "name": "Kept at Bay",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_gorgebloom_clean",
+    "name": "Weed Control",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_zulgar_uncaught",
+    "name": "Never Caught",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_great_saurian",
+    "name": "Toppled Titan",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_korgath_all_chains",
+    "name": "A Kinder End",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_korgath_still_bound",
+    "name": "The Lock Holds",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_velkhar_cold",
+    "name": "Cold Comfort",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_korzul_thin_ice",
+    "name": "Thin Ice",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_sledge_tusker",
+    "name": "Cold Cargo",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_drowned_temple_cantor",
+    "name": "The Last Verse",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Witness of the Choir"
+  },
+  {
+    "id": "dgn_marrow_tidy",
+    "name": "A Tidy Churchyard",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_lady_nobody_hanging",
+    "name": "Nobody Left Hanging",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_ilvane_hush",
+    "name": "Hush Now",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_morthen_candlelight",
+    "name": "Every Candle Lit",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -6032,6 +6210,58 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Gravewoven Bag"
+      },
+      {
+        "kind": "item",
+        "name": "Spadeworn Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Gravedirt Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Bellrope Mitts"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewreath Coif"
+      },
+      {
+        "kind": "item",
+        "name": "Rime-Laced Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Lamenting Veil"
+      },
+      {
+        "kind": "item",
+        "name": "Choirward Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Chorister's Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Cantor's Stole"
+      },
+      {
+        "kind": "item",
+        "name": "Knellbound Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Candlewatch Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Robe of the Unquiet Rite"
+      },
+      {
+        "kind": "item",
+        "name": "Gravecaller's Rod"
       }
     ]
   },
@@ -6110,6 +6340,42 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Fogbinder's Duffel"
+      },
+      {
+        "kind": "item",
+        "name": "Knight-Commander's Longsword"
+      },
+      {
+        "kind": "item",
+        "name": "Gaolyard Cudgel"
+      },
+      {
+        "kind": "item",
+        "name": "Portcullis Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Cellwatch Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Lanternwick Sash"
+      },
+      {
+        "kind": "item",
+        "name": "Turnkey's Shank"
+      },
+      {
+        "kind": "item",
+        "name": "Gaolyard Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Brinewarden Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Fogbinder's Rod"
       }
     ]
   },
@@ -6149,6 +6415,22 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Stormjar"
+      },
+      {
+        "kind": "item",
+        "name": "Drowned Commander's Breastplate"
+      },
+      {
+        "kind": "item",
+        "name": "Gaolyard Striders"
+      },
+      {
+        "kind": "item",
+        "name": "Gaoler's Iron Key"
+      },
+      {
+        "kind": "item",
+        "name": "Mooring Stone"
       }
     ]
   },
@@ -6176,6 +6458,54 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Selthe's Sea-Striders"
+      },
+      {
+        "kind": "item",
+        "name": "Chorus Conch"
+      },
+      {
+        "kind": "item",
+        "name": "Tideglass Shiv"
+      },
+      {
+        "kind": "item",
+        "name": "Conchplate Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Pale Chorus Slippers"
+      },
+      {
+        "kind": "item",
+        "name": "Tideglass Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Moonburn Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Prism-Etched Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Mere-Crested Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Mereskin Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Merewater Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Merecleaver"
+      },
+      {
+        "kind": "item",
+        "name": "Moonwrack Stave"
       }
     ]
   },
@@ -6215,6 +6545,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Mender's Hourglass"
+      },
+      {
+        "kind": "item",
+        "name": "Pale Chorus Vestment"
+      },
+      {
+        "kind": "item",
+        "name": "Tideglass Warmaul"
+      },
+      {
+        "kind": "item",
+        "name": "Echoing Lens"
       }
     ]
   },
@@ -6350,6 +6692,42 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Gravewyrm Bone Quiver"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Greatsword"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Bulwark"
+      },
+      {
+        "kind": "item",
+        "name": "Thornpeak Wardblade"
+      },
+      {
+        "kind": "item",
+        "name": "Votive Ward of the Deathless Court"
+      },
+      {
+        "kind": "item",
+        "name": "Wraithfire Orb"
+      },
+      {
+        "kind": "item",
+        "name": "Courtier's Bonefang"
+      },
+      {
+        "kind": "item",
+        "name": "Gravecourt Hewer"
+      },
+      {
+        "kind": "item",
+        "name": "Stormhymn Chain Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Stormhymn Chain Treads"
       }
     ]
   },
@@ -6385,6 +6763,26 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Wildsoul Maul"
+      },
+      {
+        "kind": "item",
+        "name": "Quenchwater Flask"
+      },
+      {
+        "kind": "item",
+        "name": "Hammer of the Open Lock"
+      },
+      {
+        "kind": "item",
+        "name": "Vestments of the Waking Rite"
+      },
+      {
+        "kind": "item",
+        "name": "Foreman's Last Link"
+      },
+      {
+        "kind": "item",
+        "name": "Phial of the Tithe"
       }
     ]
   },
@@ -6412,6 +6810,50 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Fangknife of Zulgar"
+      },
+      {
+        "kind": "item",
+        "name": "Falls-Blessed Staff"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Greatblade"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Quiver"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Treads"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Cinch"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Harness"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Thornpeak Moonhide Cowl"
       }
     ]
   },
@@ -6447,6 +6889,30 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Paired Talons"
+      },
+      {
+        "kind": "item",
+        "name": "Fanglord's Whistle"
+      },
+      {
+        "kind": "item",
+        "name": "Fanglord's Hide Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Gorgebloom Seedpod"
+      },
+      {
+        "kind": "item",
+        "name": "Thorncrowned Greathelm"
+      },
+      {
+        "kind": "item",
+        "name": "Hunter's Tally"
+      },
+      {
+        "kind": "item",
+        "name": "Wellspring Seed"
       }
     ]
   },
@@ -6462,22 +6928,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Thronebane, Last Oath of Thornpeak"
-      },
-      {
-        "kind": "item",
-        "name": "Bonewrought Greatsword"
-      },
-      {
-        "kind": "item",
-        "name": "Bonewrought Bulwark"
-      },
-      {
-        "kind": "item",
-        "name": "Direfang Greatblade"
-      },
-      {
-        "kind": "item",
-        "name": "Wraithfire Orb"
       },
       {
         "kind": "item",
@@ -6514,66 +6964,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Galecall Spaulders"
-      },
-      {
-        "kind": "item",
-        "name": "Direfang Quiver"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Crown"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Mantle"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Harness"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Cinch"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Legguards"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Grips"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Treads"
-      },
-      {
-        "kind": "item",
-        "name": "Courtier's Bonefang"
-      },
-      {
-        "kind": "item",
-        "name": "Thornpeak Wardblade"
-      },
-      {
-        "kind": "item",
-        "name": "Gravecourt Hewer"
-      },
-      {
-        "kind": "item",
-        "name": "Votive Ward of the Deathless Court"
-      },
-      {
-        "kind": "item",
-        "name": "Thornpeak Moonhide Cowl"
-      },
-      {
-        "kind": "item",
-        "name": "Stormhymn Chain Grips"
-      },
-      {
-        "kind": "item",
-        "name": "Stormhymn Chain Treads"
       }
     ]
   },
@@ -6593,22 +6983,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Stormcaller's Focus"
-      },
-      {
-        "kind": "item",
-        "name": "Mooring Stone"
-      },
-      {
-        "kind": "item",
-        "name": "Wellspring Seed"
-      },
-      {
-        "kind": "item",
-        "name": "Hunter's Tally"
-      },
-      {
-        "kind": "item",
-        "name": "Echoing Lens"
       }
     ]
   },
@@ -6652,6 +7026,65 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Vestments of the Waking Grove"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_balgath",
+    "shelf": "conquerors",
+    "name": "Starfall Crater (World Boss)",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Foreman's Barrowmaul"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowhide Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Mirestone Stride"
+      },
+      {
+        "kind": "item",
+        "name": "The Barrowglass Eye"
+      },
+      {
+        "kind": "item",
+        "name": "Foreman's Wage Band"
+      },
+      {
+        "kind": "item",
+        "name": "Mirelight Locket"
+      },
+      {
+        "kind": "item",
+        "name": "Fenwright Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Craterglass Stave"
+      },
+      {
+        "kind": "item",
+        "name": "Knucklebone of Balgath"
+      },
+      {
+        "kind": "item",
+        "name": "Muster Standard"
+      },
+      {
+        "kind": "item",
+        "name": "The Guttered Eye"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowstone Heart"
+      },
+      {
+        "kind": "item",
+        "name": "Muster Grapnel"
       }
     ]
   },
@@ -7039,6 +7472,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mount",
         "name": "Dreadspark Groundshaker"
+      },
+      {
+        "kind": "mount",
+        "name": "Friendship Raptor"
+      },
+      {
+        "kind": "mount",
+        "name": "Friendship Tank"
       }
     ]
   },
@@ -7365,6 +7806,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Treasure Hunter"
+      },
+      {
+        "kind": "title",
+        "name": "Witness of the Choir"
       }
     ]
   },
@@ -21388,13 +21833,9 @@ export const GUIDE_PROF_PAGES: string[] = [
 
 export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_warrior": {
-    "url": "models/chars/players/knight.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Knight_Helmet",
-      "Knight_Cape"
-    ],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/sword_1handed.glb",
@@ -21404,12 +21845,18 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "url": "models/weapons/shield_round.glb",
         "bone": "handslot.l"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_warrior_medium.glb"
     ]
   },
   "player_paladin": {
-    "url": "models/chars/players/paladin.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/axe_1handed.glb",
@@ -21419,26 +21866,35 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "url": "models/weapons/shield_square.glb",
         "bone": "handslot.l"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_paladin_medium.glb"
     ]
   },
   "player_hunter": {
-    "url": "models/chars/players/ranger.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 2.8600000000000003,
     "attach": [
       {
-        "url": "models/weapons/crossbow_1handed.glb",
+        "url": "models/weapons/crossbow_starter.glb",
         "bone": "handslot.r"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_hunter_medium.glb"
     ]
   },
   "player_rogue": {
-    "url": "models/chars/players/rogue.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Rogue_Cape"
-    ],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/dagger.glb",
@@ -21448,28 +21904,35 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "url": "models/weapons/dagger.glb",
         "bone": "handslot.l"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_rogue_medium.glb"
     ]
   },
   "player_priest": {
-    "url": "models/chars/players/mage.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/staff.glb",
         "bone": "handslot.r"
       }
     ],
-    "tintStrength": 0.12
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_priest_medium.glb"
+    ]
   },
   "player_shaman": {
-    "url": "models/chars/players/barbarian.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Barbarian_BearHat"
-    ],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/axe_1handed.glb",
@@ -21480,49 +21943,67 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.l"
       }
     ],
-    "tintStrength": 0.12
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_shaman_medium.glb"
+    ]
   },
   "player_mage": {
-    "url": "models/chars/players/mage.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Mage_Cape"
-    ],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/staff.glb",
         "bone": "handslot.r"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_mage_medium.glb"
     ]
   },
   "player_warlock": {
-    "url": "models/chars/players/mage.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/wand.glb",
         "bone": "handslot.r"
       },
       {
-        "url": "models/weapons/spellbook_open.glb",
+        "url": "models/weapons/spellbook_starter.glb",
         "bone": "handslot.l",
-        "gripRef": "Spellbook_open"
+        "rotationY": 3.141592653589793
       }
     ],
-    "tintStrength": 0.12
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_warlock_medium.glb"
+    ]
   },
   "player_druid": {
-    "url": "models/chars/players/druid.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/staff.glb",
         "bone": "handslot.r"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_druid_medium.glb"
     ]
   },
   "form_bear": {
@@ -21594,25 +22075,9 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "hover": -0.2,
     "tintStrength": 0.12
   },
-  "mob_bandit": {
-    "url": "models/chars/players/rogue_hooded.glb",
-    "idle": "Idle",
-    "height": 2.6,
-    "attach": [
-      {
-        "url": "models/weapons/dagger.glb",
-        "bone": "handslot.r"
-      },
-      {
-        "url": "models/weapons/dagger.glb",
-        "bone": "handslot.l"
-      }
-    ],
-    "tintStrength": 0.3
-  },
   "skel_minion": {
-    "url": "models/chars/enemies/skeleton_minion.glb",
-    "idle": "Idle_Combat",
+    "url": "models/creatures/woc_skeleton_minion.glb",
+    "idle": "Idle",
     "height": 2.5,
     "tintStrength": 0.25
   },
@@ -21633,20 +22098,27 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.9,
     "tintStrength": 0.04
   },
-  "mob_dark_caster": {
-    "url": "models/chars/players/mage.glb",
+  "player_warlock_female": {
+    "url": "models/chars/players/woc/base_female.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Mage_Hat"
-    ],
+    "height": 2.8600000000000003,
     "attach": [
       {
-        "url": "models/weapons/staff.glb",
+        "url": "models/weapons/wand.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/spellbook_starter.glb",
+        "bone": "handslot.l",
+        "rotationY": 3.141592653589793
       }
     ],
-    "tintStrength": 0.5
+    "animUrls": [
+      "models/chars/players/woc/anims_female.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/female_warlock_medium.glb"
+    ]
   },
   "mob_kobold": {
     "url": "models/creatures/goblin.glb",
@@ -21779,21 +22251,6 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 1.7,
     "tintStrength": 0.35
-  },
-  "npc_knight": {
-    "url": "models/chars/players/knight.glb",
-    "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Knight_Helmet",
-      "Knight_Cape"
-    ],
-    "attach": [
-      {
-        "url": "models/weapons/sword_1handed.glb",
-        "bone": "handslot.r"
-      }
-    ]
   },
   "mob_demonalt": {
     "url": "models/creatures/demonalt.glb",

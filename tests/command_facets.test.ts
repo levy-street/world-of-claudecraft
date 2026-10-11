@@ -222,8 +222,9 @@ describe('command facet tags (W9)', () => {
     expect(tags['arena_augment']).toBe('IWorldDuelArena');
   });
 
-  it('does not tag social_refresh (dispatch-only), searchCharacters (REST) or socialInfo (frame)', () => {
-    expect('social_refresh' in tags).toBe(false);
+  it('tags social page refresh and referral actions; leaves REST and frame reads untagged', () => {
+    expect(tags.social_refresh).toBe('IWorldSocialGraph');
+    expect(tags.referralCards).toBe('IWorldSocialGraph');
     expect('searchCharacters' in tags).toBe(false);
     expect('socialInfo' in tags).toBe(false);
   });
@@ -311,7 +312,11 @@ describe('command facet tags (W10)', () => {
 // future guild bank gets its own guild_bank_* tokens (state.md decision 16), never a
 // reuse of these. Append-only: never edit a tag.
 const BANK_TAGS: Readonly<Record<string, string>> = {
+  courier_dispatch: 'IWorldBank',
   bank_deposit: 'IWorldBank',
+  account_bank_list: 'IWorldBank',
+  account_bank_select: 'IWorldBank',
+  account_bank_transfer: 'IWorldBank',
   bank_withdraw: 'IWorldBank',
   bank_buy_slots: 'IWorldBank',
   // The Materials Vault: the per-material material store beside the slot bank.
@@ -364,6 +369,11 @@ describe('command facet tags (bank)', () => {
 
   it('does not tag bankInfo (proximity-gated snapshot read, no wire command)', () => {
     expect('bankInfo' in tags).toBe(false);
+  });
+  it('keeps courier dispatch separate from its owner-only read', () => {
+    expect(tags.courier_dispatch).toBe('IWorldBank');
+    expect('courierDispatch' in tags).toBe(false);
+    expect('courierInfo' in tags).toBe(false);
   });
 
   it('does not tag vaultInfo (proximity-gated snapshot read, no wire command)', () => {

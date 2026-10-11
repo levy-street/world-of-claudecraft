@@ -8,6 +8,8 @@ import {
   requestedCharacterForm,
   resolvedCharacterForm,
 } from '../src/render/characters/form_visual_selection_core';
+import { WOC_HEAD_TYPES } from '../src/render/characters/woc_head_catalog';
+import { wocHeadLiveLook } from '../src/render/characters/woc_head_stream_core';
 import {
   anyCharacterRigDrawing,
   applyCharacterFormVisibility,
@@ -54,6 +56,11 @@ const GATE_CALL_SITES: readonly {
   file: string;
   marker: string;
 }[] = [
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/courier_visual.ts',
+    marker: 'void attachSceneGroupGated(',
+  },
   {
     gate: 'gateViewOnCompile',
     file: 'src/render/renderer.ts',
@@ -274,7 +281,8 @@ describe('entity gate stand-ins actually stand in', () => {
 
   it('deferred face decals: the body drew from its first frame, the paint alone arrives late', () => {
     // The decals of a body built with them deferred are gated through the far
-    // bake gate (visual.ts revealDecalOnCompile hides ONLY the decal meshes);
+    // bake gate (visual.ts revealDecalOnCompile hands ONLY the decal meshes to
+    // revealOnCompile, the node-level gate streamed armor shares);
     // the body is the stand-in, so no plate is forced and the entity has a
     // click target and silhouette the whole time.
     const row = ENTITY_GATE_STAND_INS.find(
@@ -283,13 +291,70 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(row?.hides).toContain('attachDeferredDecals');
     expect(row?.standIn).toContain('the same body');
     const visual = sourceOf('src/render/characters/visual.ts');
-    const reveal = visual.slice(
-      visual.indexOf('private revealDecalOnCompile('),
-      visual.indexOf('\n  }', visual.indexOf('private revealDecalOnCompile(')),
+    const body = (name: string) =>
+      visual.slice(visual.indexOf(name), visual.indexOf('\n  }', visual.indexOf(name)));
+    expect(body('private revealDecalOnCompile(')).toContain(
+      "this.revealOnCompile(decal, 'face decal');",
     );
-    expect(reveal).toContain('decal.visible = false;');
+    const reveal = body('private revealOnCompile(');
+    expect(reveal).toContain('node.visible = false;');
     expect(reveal).not.toContain('root.visible');
     expect(anyCharacterRigDrawing(slots({ visual: rig(true) }))).toBe(true);
+  });
+
+  it('streamed armor: the suited body draws throughout, the set alone arrives late', () => {
+    // A WOC armor file attached after the build (on the spot, or as one unit of the work
+    // queue: characters/woc_armor_dressing.ts) reveals through the same injected gate, and
+    // the visual hands it ONLY the attached nodes: the body, in its own suit, keeps its
+    // click target and silhouette whether the file is still streaming, waiting for its
+    // queue unit, or linking.
+    const row = ENTITY_GATE_STAND_INS.find(
+      (r) => r.callSite === '(settled) => this.gateSwapFlagOnCompile(target, settled),',
+    );
+    expect(row?.hides).toContain('woc_armor_dressing.ts');
+    expect(row?.standIn).toContain('the same body in its own suit');
+    const visual = sourceOf('src/render/characters/visual.ts');
+    const host = visual.slice(
+      visual.indexOf('private wocArmorHost('),
+      visual.indexOf('\n  }', visual.indexOf('private wocArmorHost(')),
+    );
+    expect(host).toContain("this.revealOnCompile(container, 'armor set', live)");
+    const dressing = sourceOf('src/render/characters/woc_armor_dressing.ts');
+    // the dressing never touches the body's own visibility: it shows and hides its files
+    expect(dressing).not.toContain('host.model.visible');
+    expect(anyCharacterRigDrawing(slots({ visual: rig(true) }))).toBe(true);
+  });
+
+  it('a late WOC head piece: the body and its bare head drew from the first frame, the hair alone arrives late', () => {
+    // A world body never waits on a hairstyle or a beard file: it goes live on its head
+    // core (woc_head_stream_core.ts wocHeadLiveLook, the bare stand-in), and a piece hung
+    // after the build rides the same injected gate through revealOnCompile, which hides
+    // ONLY the wrapper it was handed. The body is the stand-in, so no plate is forced.
+    const row = ENTITY_GATE_STAND_INS.find(
+      (r) => r.callSite === '(settled) => this.gateSwapFlagOnCompile(target, settled),',
+    );
+    expect(row?.hides).toContain('woc_head_dressing.ts');
+    expect(row?.standIn).toContain('the body and its bare head');
+    const visual = sourceOf('src/render/characters/visual.ts');
+    // the head dressing reveals its late hangs through the node-level gate, nothing wider
+    expect(visual).toContain(
+      "reveal: (node, live) => this.revealOnCompile(node, 'head part', live),",
+    );
+    // the world view opts into the stand-in, and no head file is a reason to build nothing
+    // (pinned through the real factory in tests/woc_head_world.test.ts)
+    const factory = sourceOf('src/render/characters/index.ts');
+    expect(factory).toContain('visual.setWocBareHeadStandIn(true);');
+    expect(factory).not.toContain('wocHeadAppearanceAwaited');
+    // the rule itself: with the core ready a head is live, whatever its hairstyle is doing
+    const want = { ...WOC_HEAD_TYPES.a.defaults };
+    const coreOnly = (node: string): boolean => !/_(hair|beard)_/.test(node);
+    expect(wocHeadLiveLook('a', want, coreOnly, true)).toEqual({
+      ...want,
+      hair: 'bald',
+      beard: 'none',
+    });
+    // ...while a body built directly (a preview) still shows a head only whole
+    expect(wocHeadLiveLook('a', want, coreOnly, false)).toBeNull();
   });
 
   it('form adornments: the tinted body draws throughout, the pieces alone arrive late', () => {
@@ -392,6 +457,7 @@ describe('entity gate stand-ins actually stand in', () => {
         false, // mob plates toggled OFF
         false,
         false, // player plates toggled OFF
+        false,
         standIn,
       );
     expect(plan(gated).hidden, 'a gated object must keep a plate').toBe(false);
@@ -524,6 +590,7 @@ describe('entity gate stand-ins actually stand in', () => {
         feast as never,
         viewerAt(dz),
         2,
+        false,
         false,
         false,
         false,

@@ -1,4 +1,5 @@
 import { Client, Pool } from 'pg';
+import { ACCOUNT_BLOCKS_NOTIFY_CHANNEL } from './account_friends_db';
 import { pool } from './db';
 import {
   GENERAL_CHAT_QUOTA_ACQUIRE_TIMEOUT_MS,
@@ -357,6 +358,12 @@ export function createGeneralChatQuotaListener(deps: {
     policies: ReadonlyMap<number, GeneralChatRateLimit>,
   ): void;
   onChange(accountId: number, policy: GeneralChatRateLimit | null): void;
+  accountBlocks?: {
+    invalidate(accountId?: number): void;
+    disconnected(): void;
+    resync(): Promise<void>;
+    refresh(accountId: number): Promise<void>;
+  };
   connect?: () => Promise<GeneralChatQuotaListenerClient>;
   onError?: (error: unknown) => void;
 }): GeneralChatQuotaListener {
@@ -371,6 +378,8 @@ export function createGeneralChatQuotaListener(deps: {
   let draining: Promise<void> | null = null;
   let fullResyncRequested = false;
   const dirtyAccounts = new Set<number>();
+  const dirtyBlocks = new Set<number>();
+  let blockResyncRequested = false;
 
   const report = (error: unknown): void => (deps.onError ?? console.error)(error);
 
@@ -392,6 +401,9 @@ export function createGeneralChatQuotaListener(deps: {
     if (client !== failed) return;
     client = null;
     listening = false;
+    deps.accountBlocks?.disconnected();
+    dirtyBlocks.clear();
+    blockResyncRequested = false;
     dirtyAccounts.clear();
     fullResyncRequested = false;
     void failed.close().catch(report);
@@ -406,6 +418,18 @@ export function createGeneralChatQuotaListener(deps: {
     if (draining || client !== expected || stopped || !listening) return;
     draining = (async () => {
       while (client === expected && !stopped) {
+        if (blockResyncRequested) {
+          blockResyncRequested = false;
+          dirtyBlocks.clear();
+          await deps.accountBlocks?.resync();
+          if (client !== expected || stopped) return;
+        }
+        const blockAccounts = [...dirtyBlocks].slice(0, GENERAL_CHAT_QUOTA_RESYNC_BATCH);
+        for (const accountId of blockAccounts) {
+          dirtyBlocks.delete(accountId);
+          await deps.accountBlocks?.refresh(accountId);
+          if (client !== expected || stopped) return;
+        }
         if (fullResyncRequested) {
           fullResyncRequested = false;
           dirtyAccounts.clear();
@@ -416,7 +440,10 @@ export function createGeneralChatQuotaListener(deps: {
           continue;
         }
         const accountIds = [...dirtyAccounts].slice(0, GENERAL_CHAT_QUOTA_RESYNC_BATCH);
-        if (accountIds.length === 0) return;
+        if (accountIds.length === 0) {
+          if (dirtyBlocks.size || blockResyncRequested) continue;
+          return;
+        }
         for (const accountId of accountIds) dirtyAccounts.delete(accountId);
         const policies = await generalChatRateLimitsForAccounts(accountIds, expected);
         if (client !== expected || stopped) return;
@@ -431,7 +458,14 @@ export function createGeneralChatQuotaListener(deps: {
       })
       .finally(() => {
         draining = null;
-        if (client === expected && !stopped && (fullResyncRequested || dirtyAccounts.size > 0)) {
+        if (
+          client === expected &&
+          !stopped &&
+          (fullResyncRequested ||
+            dirtyAccounts.size > 0 ||
+            blockResyncRequested ||
+            dirtyBlocks.size > 0)
+        ) {
           drainChanges(expected);
         }
       });
@@ -468,7 +502,8 @@ export function createGeneralChatQuotaListener(deps: {
         });
         next.on('end', () => loseClient(next!));
         next.on('notification', (message) => {
-          if (message.channel !== GENERAL_CHAT_QUOTA_NOTIFY_CHANNEL) return;
+          const blocks = message.channel === ACCOUNT_BLOCKS_NOTIFY_CHANNEL && !!deps.accountBlocks;
+          if (!blocks && message.channel !== GENERAL_CHAT_QUOTA_NOTIFY_CHANNEL) return;
           let accountId = 0;
           try {
             accountId = Number(JSON.parse(message.payload ?? '').accountId);
@@ -476,19 +511,43 @@ export function createGeneralChatQuotaListener(deps: {
             return;
           }
           if (!Number.isSafeInteger(accountId) || accountId <= 0) return;
+          if (blocks) {
+            // Invalidate synchronously, before an asynchronous refresh can yield.
+            deps.accountBlocks!.invalidate(accountId);
+            if (!blockResyncRequested) {
+              if (dirtyBlocks.size >= GENERAL_CHAT_QUOTA_LISTENER_DIRTY_MAX) {
+                dirtyBlocks.clear();
+                blockResyncRequested = true;
+                deps.accountBlocks!.invalidate();
+              } else dirtyBlocks.add(accountId);
+            }
+            drainChanges(next!);
+            return;
+          }
           queueRefresh(accountId, next!);
         });
         // LISTEN is committed before the authoritative resync. Notifications that
         // arrive during the read queue on this same connection and apply afterward.
         await next.query(`LISTEN ${GENERAL_CHAT_QUOTA_NOTIFY_CHANNEL}`);
+        if (deps.accountBlocks) {
+          await next.query(`LISTEN ${ACCOUNT_BLOCKS_NOTIFY_CHANNEL}`);
+          await deps.accountBlocks.resync();
+        }
         const accountIds = [...deps.activeAccountIds()];
         const policies = await generalChatRateLimitsForAccounts(accountIds, next);
         if (client !== next || stopped) return;
         deps.onResync(accountIds, policies);
         listening = true;
         retryMs = 250;
-        if (fullResyncRequested || dirtyAccounts.size > 0) drainChanges(next);
+        if (
+          fullResyncRequested ||
+          dirtyAccounts.size > 0 ||
+          blockResyncRequested ||
+          dirtyBlocks.size > 0
+        )
+          drainChanges(next);
       } catch (error) {
+        deps.accountBlocks?.disconnected();
         if (next && client === next) {
           client = null;
           await next.close().catch(report);
@@ -507,10 +566,12 @@ export function createGeneralChatQuotaListener(deps: {
   return {
     async start(): Promise<void> {
       stopped = false;
+      deps.accountBlocks?.disconnected();
       await establish();
     },
     async stop(): Promise<void> {
       stopped = true;
+      deps.accountBlocks?.disconnected();
       if (retryTimer !== null) clearTimeout(retryTimer);
       retryTimer = null;
       await connecting?.catch(() => {});

@@ -18,6 +18,10 @@ import { GeneralChatRateLimitLiveState } from '../../server/general_chat_quota';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
+
+const referralSetter = vi.hoisted(() => vi.fn());
+vi.mock('../../src/sim/referral_armour', () => ({ setReferralArmour: referralSetter }));
+
 import { freshAccountLedger } from '../../src/sim/account_ledger';
 import { DUNGEON_ENTRY_FACING_WIRE_VERSION, ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 
@@ -87,8 +91,9 @@ function setup() {
     // No live session by default, so the handshake takes the fresh-acquire arm.
     hasSessionForCharacter: vi.fn((_characterId: number) => false),
     join: vi.fn(() => session),
+    drainBuddyGrants: vi.fn(async () => {}),
     clients: { size: 1 },
-    sim: { resetDay: '2026-09-24' },
+    sim: { resetDay: '2026-09-24', setMembership: vi.fn() },
     handleMessage: vi.fn(),
     leave: vi.fn(async () => {}),
     socketClosed: vi.fn(() => true),
@@ -205,6 +210,120 @@ function gameSourceCode(): string {
     .readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8')
     .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
+
+describe('referral armour fresh admission', () => {
+  beforeEach(() => referralSetter.mockReset());
+
+  it('loads exactly once before leasing and applies after membership authority', async () => {
+    const { ws, deps, req, game } = setup();
+    const entitlement = { inviterAccountId: 10, inviterName: 'Aldric' };
+    deps.referralArmourForAccount = vi.fn(async () => entitlement);
+    deps.getMembership = async () => ({
+      active: false,
+      expiresAt: null,
+      authorizedUntil: 0,
+      recurringExpiresAt: null,
+    });
+    await createWsAuth(deps).authenticateWebSocket(
+      asWs(ws),
+      authRaw({ inviterAccountId: 99 }),
+      req,
+    );
+    expect(deps.referralArmourForAccount).toHaveBeenCalledExactlyOnceWith(1);
+    expect(vi.mocked(deps.referralArmourForAccount).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(deps.acquireCharacterLease).mock.invocationCallOrder[0],
+    );
+    expect(referralSetter).toHaveBeenCalledWith(undefined, 1, entitlement);
+    expect(game.sim.setMembership.mock.invocationCallOrder[0]).toBeLessThan(
+      referralSetter.mock.invocationCallOrder[0],
+    );
+    expect(deps.getCharacter).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not read or replace the live grant on resume', async () => {
+    const { ws, deps, req, game } = setup();
+    game.hasSessionForCharacter.mockReturnValue(true);
+    deps.referralArmourForAccount = vi.fn(async () => null);
+    await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(deps.referralArmourForAccount).not.toHaveBeenCalled();
+    expect(referralSetter).not.toHaveBeenCalled();
+  });
+
+  it('fails a broken entitlement read before acquiring any lease', async () => {
+    const { ws, deps, req, game } = setup();
+    deps.referralArmourForAccount = async () => {
+      throw new Error('referral database unavailable');
+    };
+    await expect(
+      createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req),
+    ).rejects.toThrow('referral database unavailable');
+    expect(deps.acquireCharacterLease).not.toHaveBeenCalled();
+    expect(game.join).not.toHaveBeenCalled();
+  });
+});
+
+describe('membership character admission', () => {
+  it.each([false, true])(
+    'refuses an expired premium slot on fresh or resumed join (resume=%s)',
+    async (resume) => {
+      const { ws, deps, req, game } = setup();
+      vi.mocked(deps.getCharacter).mockResolvedValue(baseChar({ membership_slot: true }));
+      game.hasSessionForCharacter.mockReturnValue(resume);
+      deps.getMembership = async () => ({
+        active: false,
+        expiresAt: 1,
+        authorizedUntil: 0,
+        recurringExpiresAt: null,
+      });
+      await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+      expectSendThenClose(ws, errorFrame('membership required for this character'));
+      expect(game.join).not.toHaveBeenCalled();
+      expect(deps.acquireCharacterLease).not.toHaveBeenCalled();
+    },
+  );
+
+  it('stamps a renewed premium slot with bounded authorization time', async () => {
+    const { ws, deps, req, game } = setup();
+    const now = Date.now();
+    vi.mocked(deps.getCharacter).mockResolvedValue(baseChar({ membership_slot: true }));
+    deps.getMembership = async () => ({
+      active: true,
+      expiresAt: now + 90_000,
+      authorizedUntil: now + 30_000,
+      recurringExpiresAt: null,
+    });
+    await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(game.join).toHaveBeenCalledOnce();
+    expect(game.sim.setMembership).toHaveBeenCalledWith(1, expect.any(Number));
+    expect(game.sim.setMembership.mock.calls[0][1]).toBeGreaterThan(0);
+    expect(game.sim.setMembership.mock.calls[0][1]).toBeLessThanOrEqual(30);
+  });
+
+  it('releases a fresh lease if membership expires during the handshake', async () => {
+    const { ws, deps, req, game } = setup();
+    let now = 1000;
+    const clock = vi.spyOn(Date, 'now').mockImplementation(() => now);
+    try {
+      vi.mocked(deps.getCharacter).mockResolvedValue(baseChar({ membership_slot: true }));
+      deps.getMembership = async () => ({
+        active: true,
+        expiresAt: 1500,
+        authorizedUntil: 31_000,
+        recurringExpiresAt: null,
+      });
+      vi.mocked(deps.guestPayoutsForCycle).mockImplementation(async () => {
+        now = 2000;
+        return 0;
+      });
+      await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+      expectSendThenClose(ws, errorFrame('membership required for this character'));
+      expect(deps.releaseCharacterLease).toHaveBeenCalledOnce();
+      expect(game.join).not.toHaveBeenCalled();
+    } finally {
+      clock.mockRestore();
+    }
+  });
+});
 
 describe('createWsAuth: authenticateWebSocket reject paths', () => {
   it('1. rejects unparseable JSON with "bad auth message" and logs the parse error', async () => {

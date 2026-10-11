@@ -1,18 +1,24 @@
 import type * as THREE from 'three';
 import { ABILITIES, ITEMS } from '../sim/data';
+import type { Entity, SimEvent } from '../sim/types';
+import { groundHeight } from '../sim/world';
 import type { IWorld } from '../world_api';
 import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
 import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
+import { BalgathLootRelics, composeRelicHooks } from './balgath_loot_relics';
 import { CAST_VFX_ENGINE } from './cast_vfx_family';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import type { CharacterVisual } from './characters/visual';
 import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
+import type { GlacialFrontVisual } from './glacial_front_visual';
+import { paintsOwnBreath } from './hollow_crypt/crypt_creature_fx_core';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
+import { ShardpikeThrowFx } from './shardpike_throw_fx';
 import { TrinketRelics } from './trinket_relics';
 import type { Vfx } from './vfx';
 import type { VfxAnchorResolver } from './vfx_anchor';
@@ -77,6 +83,15 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     },
   );
   fx.setViewportScale(h.height() * h.pixelRatio(), 60, h.height());
+  fx.shardpikeThrow = new ShardpikeThrowFx(
+    h.scene,
+    h.world,
+    visual,
+    fx,
+    // The throw draws engine-family pools (bodyGlow, impact), so it waits on that family.
+    () => h.castGate.ready(CAST_VFX_ENGINE),
+    h.camera,
+  );
   fx.setSpiritBuildScheduler(h.spiritBuild);
   fx.setSpiritCompileGate(h.compile);
   fx.setCastVfxSpawnGate((bit) => h.castGate.spawnAllowed(bit));
@@ -98,19 +113,32 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     // linked that family (the release's per-family cast admission).
     ready: () => h.castGate.ready(CAST_VFX_ENGINE),
   });
+  // Balgath's trinkets in the world (balgath_loot_relics.ts): the same pooled, prewarmed
+  // shape, offered every trinket cue right after the Crucible relics.
+  const balgathLoot = new BalgathLootRelics({
+    scene: h.scene,
+    world: () => h.world(),
+    views: h.views,
+    anchor: h.anchor,
+    ground: (x, z) => h.ground(x, z),
+    vfx: h.vfx,
+    time: () => h.time(),
+    ready: () => h.castGate.ready(CAST_VFX_ENGINE),
+  });
   const painter = new AbilityVfx(
     {
       ...h.painter,
-      trinketRelics,
+      trinketRelics: composeRelicHooks(trinketRelics, balgathLoot),
       castVfxAdmit: (mask) => h.castGate.admit(mask),
       castVfxReady: (mask) => h.castGate.ready(mask),
       vfx: h.vfx,
       fx,
+      shardpikeThrow: fx.shardpikeThrow,
       anchor: h.anchor,
       setAuraGlow: (id, color, intensity) => visual(id)?.setAuraGlow(color, intensity),
       playShoutAnim: (id) => {
         const rig = visual(id);
-        if (rig && !rig.isMidOneShot) rig.playEmote('cheer', 1);
+        if (rig && !rig.isMidOneShot) rig.playShout(1);
       },
       isMob: (id) => h.world().entities.get(id)?.kind === 'mob',
       castingAbilityOf: (id) => h.world().entities.get(id)?.castingAbility ?? null,
@@ -154,4 +182,30 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     );
   };
   return { fx, painter };
+}
+
+/** Shared empowered cone release: retain the ability identity on the rig cue. */
+export function presentEmpoweredCone(
+  ev: Extract<SimEvent, { type: 'spellfx' }>,
+  source: Pick<Entity, 'pos' | 'facing' | 'templateId'> | undefined,
+  seed: number,
+  visual: Pick<GlacialFrontVisual, 'spawn'>,
+  triggerAttack: (id: number, abilityId?: string) => void,
+): boolean {
+  if (ev.fx !== 'frostCone' && ev.fx !== 'fireCone') return false;
+  // A creature that paints its own breath (the crypt drake) skips the generic cone.
+  if (source && !paintsOwnBreath(source.templateId)) {
+    visual.spawn(
+      source.pos.x,
+      groundHeight(source.pos.x, source.pos.z, seed),
+      source.pos.z,
+      source.facing,
+      ev.range ?? (ev.fx === 'fireCone' ? 6 : 7),
+      ev.level ?? 1,
+      ev.angle ?? (ev.fx === 'fireCone' ? 55 : 70),
+      ev.fx,
+    );
+    triggerAttack(ev.sourceId, ev.ability);
+  }
+  return true;
 }

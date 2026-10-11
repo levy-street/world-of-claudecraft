@@ -9,6 +9,8 @@ import {
 } from '../src/sim/content/world_quest_investigation';
 import { DELVES, ITEMS, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
+import { defaultRewardChoice } from '../src/sim/quests/quest_reward_choice';
+import { createReferralCard } from '../src/sim/referral_cards';
 import type { Entity } from '../src/sim/types';
 import { WEEKLY_KEEPER_ENTITY_ID, WEEKLY_KEEPER_ID } from '../src/sim/weekly_rewards';
 import { craftNameText } from '../src/ui/char_window';
@@ -59,6 +61,7 @@ function harness(
   const world = {
     entities,
     cfg: { playerClass: 'warrior' },
+    talents: { spec: null },
     player: { name: 'Ari', pos: { x: 0, y: 0, z: 0 } },
     questLog: new Map(),
     partyInfo: null,
@@ -194,6 +197,38 @@ function harness(
 }
 
 describe('QuestDialogController', () => {
+  it('marks only the next stamp quest on pickup and its detail', () => {
+    const card = createReferralCard(8, 10, 20);
+    card.status = 'active';
+    Object.assign(card.participants[0], { characterId: 100, credited: 1, redeemed: 1 });
+    const offered = npc(30, 'brother_aldric');
+    offered.questIds = ['q_hollow', 'q_bones'];
+    const test = harness(
+      offered,
+      'available',
+      {},
+      {
+        referralCardsSnapshot: () => ({
+          revision: 1,
+          accountId: 10,
+          characterId: 100,
+          links: [{ card, friendName: 'Briar' }],
+        }),
+      },
+    );
+    test.controller.open(30);
+    const row = test.element.querySelector<HTMLButtonElement>('[data-quest="q_hollow"]');
+    expect(row).not.toBeNull();
+    expect(row?.getAttribute('aria-label')).toContain('next stamp card reward');
+    expect(row?.querySelector('.referral-quest-indicator')).not.toBeNull();
+    expect(
+      test.element.querySelector('[data-quest="q_bones"] .referral-quest-indicator'),
+    ).toBeNull();
+    row?.click();
+    expect(test.element.querySelector('.referral-quest-indicator')?.textContent).toContain(
+      'next stamp card reward',
+    );
+  });
   beforeEach(() => {
     document.body.innerHTML = '';
   });
@@ -456,8 +491,61 @@ describe('QuestDialogController', () => {
     expect(ready.element.innerHTML).toContain('completion:q_wolves');
     ready.element.querySelector<HTMLButtonElement>('.btn')?.click();
 
-    expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves');
+    // The turn-in carries the preselected choose-one piece: the spec default.
+    expect(ready.turnInQuest).toHaveBeenCalledWith(
+      'q_wolves',
+      defaultRewardChoice(QUESTS.q_wolves, 'warrior', null),
+    );
     expect(ready.reportTelemetry).toHaveBeenCalledWith('quest_turnin', { timeMs: 0 });
+  });
+
+  it('turns in the reward card the player checked, and only the class can wear', () => {
+    const readyNpc = npc(32, 'marshal_redbrook');
+    readyNpc.questIds = ['q_wolves'];
+    const ready = harness(readyNpc, 'ready');
+    ready.controller.open(readyNpc.id);
+    ready.element.querySelector<HTMLButtonElement>('[data-quest="q_wolves"]')?.click();
+    const cards = [
+      ...ready.element.querySelectorAll<HTMLButtonElement>('button[data-reward-choice]'),
+    ];
+    // A warrior wears all four armor weights, so all four cards are offered.
+    expect(cards.map((c) => c.dataset.rewardChoice)).toEqual(QUESTS.q_wolves.choiceRewards);
+    const defaultId = defaultRewardChoice(QUESTS.q_wolves, 'warrior', null);
+    expect(cards.find((c) => c.getAttribute('aria-checked') === 'true')?.dataset.rewardChoice).toBe(
+      defaultId,
+    );
+    const other = cards.find((c) => c.dataset.rewardChoice !== defaultId);
+    other?.click();
+    expect(other?.getAttribute('aria-checked')).toBe('true');
+    expect(cards.filter((c) => c.getAttribute('aria-checked') === 'true')).toHaveLength(1);
+    ready.element.querySelector<HTMLButtonElement>('.btn')?.click();
+    expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves', other?.dataset.rewardChoice);
+  });
+
+  it('moves the reward check and the one tab stop with the arrow keys and Home/End', () => {
+    const readyNpc = npc(34, 'marshal_redbrook');
+    readyNpc.questIds = ['q_wolves'];
+    const ready = harness(readyNpc, 'ready');
+    ready.controller.open(readyNpc.id);
+    ready.element.querySelector<HTMLButtonElement>('[data-quest="q_wolves"]')?.click();
+    const cards = [
+      ...ready.element.querySelectorAll<HTMLButtonElement>('button[data-reward-choice]'),
+    ];
+    const checkedIndex = () => cards.findIndex((c) => c.getAttribute('aria-checked') === 'true');
+    const press = (key: string) =>
+      cards[checkedIndex()].dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+    press('Home');
+    expect(checkedIndex()).toBe(0);
+    press('ArrowRight');
+    expect(checkedIndex()).toBe(1);
+    expect(document.activeElement).toBe(cards[1]);
+    press('End');
+    expect(checkedIndex()).toBe(cards.length - 1);
+    press('ArrowDown');
+    expect(checkedIndex()).toBe(0);
+    expect(cards.filter((c) => c.tabIndex === 0)).toEqual([cards[0]]);
+    ready.element.querySelector<HTMLButtonElement>('.btn')?.click();
+    expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves', cards[0].dataset.rewardChoice);
   });
 
   it('the preview promises the REMEMBERED hobby when the identity carries one', () => {

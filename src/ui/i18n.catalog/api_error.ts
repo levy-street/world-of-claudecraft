@@ -116,6 +116,10 @@ export const apiErrorStrings = {
       'A storage purchase must finish or be resolved before this character can be deleted.',
     // the background-gate saturation refusal on the delete cascade (retryable)
     delete_busy: 'The realm is busy. Try deleting this character again in a moment.',
+    referral_transfer_pending:
+      'Move all unlocked stamp cards to another character before deleting this character.',
+    referral_bond_pending:
+      'A referral membership bond is being delivered to this character. Try deleting the character again after delivery finishes.',
     // reuses errors.api.alreadyInWorld
     already_in_world: 'Character is already in world.',
     // reuses errors.api.takenOver

@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url';
 import { dedup, prune } from '@gltf-transform/functions';
 import {
   bakeClip,
+  blendValue,
   createGlbIO,
   easeInOutQuad,
   easeOutCubic,
@@ -114,12 +115,81 @@ const { animation } = bakeClip(doc, {
   donorFor,
 });
 
+// ---- Wildheart_High_Priest_Swing: his melee swing (the owner's playtest, 03/10) ----
+// The clip above, played as his auto-attack, heaved his WHOLE body (its Jump
+// donor turns the pelvis 140 degrees and tucks the legs) on every swing. The
+// swing is now its own clip off the rig's own Attack donor: a wind-up with the
+// right claw raised, a fast overhead rake down onto the target and a recovery,
+// carried by the arms, shoulders and spine. The legs and pelvis stay on the
+// idle stance (a tenth of the donor's motion), the waist takes half of the
+// donor's forward bend, so his feet stay planted and the blow reads as a swing,
+// not a lurch. Contact at 0.55 s; 1.30 s in all.
+const attackIdx = indexClip(root, 'Attack');
+const swingKeys = new Set([...idleIdx.keys(), ...attackIdx.keys()]);
+const swingDonorFor = (key) => attackIdx.get(key) ?? idleIdx.get(key);
+const P_reach = samplePose(attackIdx, 0.6); // the left claw out, sizing the target
+const P_wind = samplePose(attackIdx, 0.86); // the right claw high over the head
+const P_strike = samplePose(attackIdx, 1.14); // the rake lands, both arms down
+const P_follow = samplePose(attackIdx, 1.4); // carried through, the spine curled
+const P_swingAll = mergePoses(P_idle, P_reach, P_wind, P_strike, P_follow);
+
+/** How much of the Attack donor each bone takes (the rest is the idle stance). */
+function swingWeight(key) {
+  const node = key.slice(0, key.indexOf('|'));
+  if (/^(Root|Pelvis)$/.test(node)) return 0.12;
+  if (/(Thigh|Calf|Foot|ToeBase)/.test(node)) return 0.1;
+  if (node === 'Waist') return 0.5;
+  if (/^Spine/.test(node)) return 0.75;
+  if (/^(Neck|Head)/.test(node)) return 0.7;
+  return 1; // clavicles, arms, forearms, hands
+}
+
+/** A donor pose laid over the idle stance by swingWeight. */
+function overIdle(pose) {
+  const out = new Map();
+  for (const key of swingKeys) {
+    const base = poseValue(P_idle, key, P_swingAll);
+    const donor = poseValue(pose, key, P_swingAll);
+    out.set(key, blendValue(key, base, donor, swingWeight(key)));
+  }
+  return out;
+}
+
+const S_reach = overIdle(P_reach);
+const S_wind = overIdle(P_wind);
+const S_strike = overIdle(P_strike);
+const S_follow = overIdle(P_follow);
+const swingLine = [[0, (k) => poseValue(P_idle, k, P_swingAll)]];
+const ramp = (fromTime, toTime, steps, ease, fromPose, toPose) =>
+  pushPoseRamp(swingLine, {
+    fromTime,
+    toTime,
+    steps,
+    ease,
+    fromPose,
+    toPose,
+    fallback: P_swingAll,
+  });
+ramp(0, 0.2, 3, easeInOutQuad, P_idle, S_reach);
+ramp(0.2, 0.42, 3, easeInOutQuad, S_reach, S_wind);
+ramp(0.42, 0.55, 3, easeOutCubic, S_wind, S_strike);
+ramp(0.55, 0.78, 3, easeOutCubic, S_strike, S_follow);
+swingLine.push([0.86, (k) => poseValue(S_follow, k, P_swingAll)]);
+ramp(0.86, 1.3, 5, easeInOutQuad, S_follow, P_idle);
+
+const { animation: swing } = bakeClip(doc, {
+  clipName: 'Wildheart_High_Priest_Swing',
+  channelKeys: swingKeys,
+  timeline: swingLine,
+  donorFor: swingDonorFor,
+});
+
 if (PREVIEW) {
   await io.write(PREVIEW_OUT, doc);
   console.log(`wrote preview (mesh + skin + clip): ${PREVIEW_OUT}`);
 }
 
-stripToAnimationsOnly(doc, [animation]);
+stripToAnimationsOnly(doc, [animation, swing]);
 await doc.transform(prune(), dedup());
 await io.write(OUT, doc);
 

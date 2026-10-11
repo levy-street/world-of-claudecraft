@@ -86,6 +86,55 @@ describe('Renderer lifecycle wiring', () => {
     expect(createView).toHaveBeenCalledWith(visibleTarget);
   });
 
+  it('counts a required view only when its build made one', () => {
+    // PR 4360 review, S5: createView returns having built nothing when the entity's assets
+    // are unavailable (the fail-soft path), and the player's own view was then still
+    // counted and sampled as created. The rule is required_views_core.ts; this is the
+    // renderer's own wiring of it, over its real members.
+    const player = {
+      id: 1,
+      kind: 'player',
+      targetId: 3,
+      templateId: 'mage',
+      pos: { x: 0, y: 0, z: 0 },
+    } as Entity;
+    const target = {
+      id: 3,
+      kind: 'mob',
+      targetId: null,
+      templateId: 'training_dummy',
+      pos: { x: 1, y: 0, z: 0 },
+    } as Entity;
+    const views = new Map<number, object>();
+    // the player's body cannot be built this frame; its target's can
+    const createView = vi.fn((candidate: Entity) => {
+      if (candidate.id === target.id) views.set(candidate.id, {});
+    });
+    const renderer = Object.create(Renderer.prototype) as Record<string, unknown> & {
+      createRequiredViews(player: Entity, createdViewTypes: string[]): number;
+    };
+    renderer.sim = {
+      entities: new Map([
+        [player.id, player],
+        [target.id, target],
+      ]),
+      questLog: new Map<string, QuestProgress>(),
+    };
+    renderer.views = views;
+    renderer.questObjectHidden = makeQuestObjectGate({});
+    renderer.viewCreateRetry = { canAttempt: () => true };
+    renderer.createView = createView;
+
+    const types: string[] = [];
+    expect(renderer.createRequiredViews(player, types)).toBe(1);
+    expect(types).toEqual(['mob:training_dummy']);
+    expect(createView.mock.calls.map(([candidate]) => candidate.id)).toEqual([1, 3]);
+    // the player's build is asked for again on the next frame, and counted when it lands
+    createView.mockImplementation((candidate: Entity) => void views.set(candidate.id, {}));
+    expect(renderer.createRequiredViews(player, types)).toBe(1);
+    expect(types).toEqual(['mob:training_dummy', 'player:mage']);
+  });
+
   it('keeps the legacy constructor and accepts an explicit WebGL2 context', () => {
     const constructorSource = slice(
       '  constructor(\n    private sim: IWorld,',
@@ -257,7 +306,8 @@ describe('Renderer lifecycle wiring', () => {
   });
 
   it('forwards the resolved skin look into run, jump, and landing dispatch', () => {
-    expect(source).toContain('const mountLook = mountPresentationKey(e.mountKey, e.mountSkinId);');
+    // the presented ride (the live key, or the one a held death still shows)
+    expect(source).toContain('const mountLook = mountPresentationKey(mountKey, e.mountSkinId);');
     expect(source).toMatch(/updateRiddenMountAudio\(\s*sink,\s*v,\s*mountLook,\s*e.id,/);
     expect(source).toContain("sink.movement('jump', ax, ay, az, isSelf, mountLook || undefined)");
     expect(source).toContain("sink.movement('land', ax, ay, az, isSelf, mountLook || undefined)");

@@ -77,6 +77,11 @@ export interface IWorldDungeons {
   // Whether this fixed-position world boss is spawned and alive right now. Reward
   // eligibility remains a separate per-player raid-lockout read.
   worldBossActive(bossId: string): boolean;
+  // Answer a dungeon guide's offer for the whole group ("Come with us" when
+  // `accept`, "We go alone" otherwise). The sim validates everything (same
+  // claim, in reach, offer still open); the guide's state rides his entity
+  // (`guideState`), so this is a send with no return.
+  answerDungeonGuide(npcId: number, accept: boolean): void;
   // The active procedural Rift floor for the local player (null outside a rift).
   riftFloor: RiftFloorView | null;
   // Key into the per-Sim rift collision registry (sim/colliders.ts). Per world

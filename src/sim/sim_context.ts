@@ -1,3 +1,4 @@
+import type { BuddyKey } from './content/buddies';
 // SimContext: the shared seam every extracted game-system module talks to instead
 // of reaching into the 17.5k-line `Sim` monolith.
 //
@@ -16,12 +17,14 @@ import type { AccountCosmetics } from '../world_api';
 import type { FrozenOrbState } from './combat/frozen_orb';
 import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
+import type { CourierBankExchange } from './courier';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { GuildBankState } from './guild_bank';
 import type { InventoryGrantOptions } from './inventory_grant';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
+import type { MusterArmyState } from './mirefen_muster';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
@@ -105,10 +108,14 @@ export type RuntimeSimConfig = Required<
     | 'respawnSeconds'
     | 'storagePrices'
     | 'vaultConsumptionAdmission'
+    | 'courierBankExchange'
     | 'gathererIdentity'
+    // Deliberately NOT defaulted: undefined is the "no day/night clock" world
+    // (dayNightPhase() answers null), which tests and the RL env rely on.
+    | 'dayNightNowMs'
   >
 > &
-  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'> & {
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'> & {
     vaultOpenNeedsSave?: boolean;
     vaultRewardNeedsSave?: boolean;
   };
@@ -394,6 +401,9 @@ export interface SimContextPrimitives {
   // VALUES in place; the deeds proximity sweep resolves the witness target
   // through this instead of scanning the whole entity map every second.
   readonly worldBossEntityIds: readonly (number | null)[];
+  // The Mirefen muster around Balgath's crater (src/sim/mirefen_muster.ts): its soldiers,
+  // weapon rack and live pike loans. Sim-owned holder mutated in place; nothing persists.
+  readonly musterArmy: MusterArmyState;
   // Book of Deeds session runtime (per-attempt encounter windows, per-match
   // Vale Cup memory, the Saul talk counter). Sim-owned holder mutated in
   // place; nothing in it persists.
@@ -432,6 +442,7 @@ export interface SimContextPrimitives {
 // a faithful move-not-rewrite. Grouped by the slice that will eventually own them.
 export interface SimContextCallbacks {
   // Event sink (core). Routes to `Sim.emit`.
+  onBuddyGranted?: (pid: number, key: BuddyKey) => void;
   emit(ev: SimEvent): void;
   // Personal error toast/event to a player (core). Routes to `Sim.error`, which
   // emits `{ type: 'error', text, pid, reason? }`.
@@ -465,6 +476,11 @@ export interface SimContextCallbacks {
   // raid rooms' normal and heroic lockouts expire on (host-owned like raidResetMs;
   // offline/headless fall back to a flat 7-day week).
   weeklyRaidResetMs(nowMs: number): number;
+  // The world day/night phase in [0,1) (0 midnight, 0.5 noon; src/sim/day_night.ts) off
+  // the host clock SimConfig.dayNightNowMs, or null when the host supplies no such
+  // clock (tests, the RL env): null means "there is no night", and every nocturnal
+  // rule must treat it as permanent day so those worlds stay the pre-cycle world.
+  dayNightPhase(): number | null;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   instanceClaimIdAt(pos: Vec3): number | null;
@@ -1215,6 +1231,7 @@ export interface SimContextCallbacks {
 
 // The seam consumed by extracted modules.
 export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
+  readonly courierBankExchange?: CourierBankExchange;
   // The resolved storage price table (storage_prices.ts): bank expansions,
   // bank bag sockets, vault rungs. Frozen at Sim construction from the
   // cfg.storagePrices override; the ONE price truth every bank/vault charge
@@ -1239,6 +1256,7 @@ export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
 // journal wiring fails to compile there, and a deliberately inert server
 // caller must pass the exported inert constant by name.
 export interface SimContextHost extends SimContextPrimitives, SimContextCallbacks {
+  readonly courierBankExchange?: CourierBankExchange;
   readonly storagePrices: StoragePrices;
 }
 
@@ -1250,6 +1268,9 @@ export interface SimContextHost extends SimContextPrimitives, SimContextCallback
 // determinism.
 export function createSimContext(host: SimContextHost): SimContext {
   return {
+    get courierBankExchange() {
+      return host.courierBankExchange;
+    },
     get rng() {
       return host.rng;
     },
@@ -1565,6 +1586,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get worldBossEntityIds() {
       return host.worldBossEntityIds;
     },
+    get musterArmy() {
+      return host.musterArmy;
+    },
     get deedRuntime() {
       return host.deedRuntime;
     },
@@ -1586,12 +1610,14 @@ export function createSimContext(host: SimContextHost): SimContext {
     set nextCommissionOrderId(v) {
       host.nextCommissionOrderId = v;
     },
+    onBuddyGranted: host.onBuddyGranted,
     emit: host.emit,
     error: host.error,
     reserveVaultConsumption: host.reserveVaultConsumption,
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
     weeklyRaidResetMs: host.weeklyRaidResetMs,
+    dayNightPhase: host.dayNightPhase,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
     instanceClaimIdAt: host.instanceClaimIdAt,

@@ -90,7 +90,9 @@ describe('interior encounter prewarm spec', () => {
       'nythraxisGraveVisuals',
       'soulRendPlayerClasses',
       'soulRendVfxWeaponSkins',
+      'vaelShadeGhost',
       'varkhulVisuals',
+      'wildheartToadForm',
     ]);
     const depths = INTERIOR_ENCOUNTER_PREWARM.ignivar_depths;
     const onlyIgnivar = encounterPrewarmSpecForSets(depths, ['ignivarVisuals']);
@@ -133,6 +135,21 @@ describe('interior encounter prewarm spec', () => {
     );
   });
 
+  it('warms the Toad Hex form at the Wildheart Basin attach, and only there', () => {
+    const spec = INTERIOR_ENCOUNTER_PREWARM.wildheart;
+    expect(spec).toEqual({
+      soulRendPlayerClasses: false,
+      soulRendVfxWeaponSkins: false,
+      soulRendLivePlayerVisuals: false,
+      wildheartToadForm: true,
+    });
+    expect(DUNGEONS.wildheart_basin.interior).toBe('wildheart');
+    expect(encounterPrewarmForInterior('wildheart')).toEqual(spec);
+    for (const [interior, row] of Object.entries(INTERIOR_ENCOUNTER_PREWARM)) {
+      if (interior !== 'wildheart') expect(row.wildheartToadForm, interior).toBeUndefined();
+    }
+  });
+
   it('warms the Ignivar mechanic visuals in the Crucible arena, without the Varkhul set', () => {
     const spec = INTERIOR_ENCOUNTER_PREWARM.ignivar;
     expect(spec).toEqual({
@@ -148,9 +165,10 @@ describe('interior encounter prewarm spec', () => {
   it('warms Soul Rend overlays at arena entry, not boot, and warms no encounter NPC', () => {
     const spec = INTERIOR_ENCOUNTER_PREWARM.nythraxis;
     expect(spec).toBeDefined();
-    // Aldric is deliberately absent: measured cold (parked in a start zone that
-    // never compiled npc_aldric), his 70% spawn linked ZERO programs because
-    // the player bodies on screen already carry them.
+    // Aldric is deliberately absent: measured cold on his old stock rig (parked
+    // in a start zone that never compiled it), his 70% spawn linked ZERO programs
+    // because the player bodies on screen already carried them. He rides the
+    // priest's WOC body now, a player's own def.
     expect(Object.keys(spec).sort()).toEqual([
       'nythraxisGraveVisuals',
       'soulRendLivePlayerVisuals',
@@ -473,16 +491,22 @@ describe('live Soul Rend player-visual prewarm', () => {
     // satisfies the assertions below without reading a thing.
     expect(form).toContain('this.createCharacterVisualWithRetry(e, formKey, formKey)');
     expect(form).toContain('encounterPrewarm.queueLiveSoulRendPrewarm(this, built, null, e.kind)');
-    // Every lazy form goes through it, so none can be forgotten one at a time.
-    for (const call of [
-      "this.buildFormVisual(e, v, 'form_sheep', 'sheepVisual', true)",
-      "this.buildFormVisual(e, v, 'form_bear', 'bearVisual', true)",
-      "this.buildFormVisual(e, v, 'form_cat', 'catVisual', true)",
-      "this.buildFormVisual(e, v, 'form_travel', 'travelVisual', true)",
-      "this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false)",
+    // Every lazy form goes through it, so none can be forgotten one at a time:
+    // the entity loop hands syncFormRig the one bound build, and the form table
+    // there names every slot (characters/form_rig_sync.ts).
+    expect(renderer).toContain('syncFormRig(e, v, requestedForm, this.buildFormRig)');
+    expect(renderer).toContain('this.buildFormVisual(e, v, key, slot, gate)');
+    const formRigs = readSource('../src/render/characters/form_rig_sync.ts');
+    for (const row of [
+      "sheep: { key: 'form_sheep', slot: 'sheepVisual', gate: true }",
+      "bear: { key: 'form_bear', slot: 'bearVisual', gate: true }",
+      "cat: { key: 'form_cat', slot: 'catVisual', gate: true }",
+      "travel: { key: 'form_travel', slot: 'travelVisual', gate: true }",
+      "metamorph: { key: 'form_metamorph', slot: 'metamorphVisual', gate: false }",
     ]) {
-      expect(renderer).toContain(call);
+      expect(formRigs).toContain(row);
     }
+    expect(formRigs).toContain('build(e, v, spec.key, spec.slot, spec.gate)');
 
     // A race/mech swap replaces v.visual outright: the replacement is cold.
     const baseStart = renderer.indexOf('  private updateBaseVisual(');

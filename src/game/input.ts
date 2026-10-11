@@ -8,6 +8,7 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { focusTargetAction } from '../ui/focus_targets_core';
 import { detectBrowserEngine } from './browser_env';
+import { BASE_ZOOM_MAX } from './camera_zoom_ceiling';
 import { clickClaimedModalFocus } from './click_claimed_focus';
 import { cursorForHover, type HoverCursorKind } from './cursors';
 import { clampGliderCameraPitch, gliderPitchFromCamera } from './glider_pitch_input';
@@ -18,6 +19,7 @@ import {
   makeCombo,
   partyTargetActionSlot,
 } from './keybinds';
+import { applyLanceLean, lanceLeanIntent } from './lance_lean_intent';
 import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
 import { toggleFriendlyNameplates } from './nameplate_view_prefs';
 import {
@@ -210,6 +212,9 @@ export class Input {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
+  // The zoom-out ceiling (yards): 22, raised in a PvE boss context by
+  // camera_zoom_wiring.ts so a towering boss fits the frame.
+  zoomMax = BASE_ZOOM_MAX;
   // Fired whenever the player changes the zoom distance (wheel / pinch), so main.ts can
   // persist it to settings (issue 1657). Not fired on a direct camDist assignment (the
   // startup restore / Reset path sets the field itself), so restoring never re-persists.
@@ -486,7 +491,7 @@ export class Input {
   /** Move the camera in/out, clamped to the zoom limits. */
   zoomBy(delta: number): void {
     if (this.cb.isCameraMotionLocked?.()) return;
-    const next = Math.min(22, Math.max(3, this.camDist + delta));
+    const next = Math.min(this.zoomMax, Math.max(3, this.camDist + delta));
     if (next === this.camDist) return;
     this.camDist = next;
     this.onCameraDistChange?.(next);
@@ -1756,7 +1761,9 @@ export class Input {
         surface: false,
       };
     }
-    if (this.controllerMoveInput) return { ...this.controllerMoveInput };
+    if (this.controllerMoveInput) {
+      return applyLanceLean({ ...this.controllerMoveInput }, lanceLeanIntent);
+    }
     const held = (id: string) => this.heldAction(id);
     const bothButtons = this.leftDown && this.rightDown;
     const forward =
@@ -1795,7 +1802,39 @@ export class Input {
           );
 
     if (this.mouseCameraEnabled) {
-      return {
+      return applyLanceLean(
+        {
+          forward,
+          back,
+          jump,
+          dive,
+          surface,
+          swimSteer,
+          gliderPitch,
+          turnLeft: false,
+          turnRight: false,
+          strafeLeft:
+            held('strafeLeft') ||
+            held('turnLeft') ||
+            this.touchMove.strafeLeft ||
+            this.gamepadMove.strafeLeft,
+          strafeRight:
+            held('strafeRight') ||
+            held('turnRight') ||
+            this.touchMove.strafeRight ||
+            this.gamepadMove.strafeRight,
+        },
+        lanceLeanIntent,
+      );
+    }
+
+    const mouselook = this.isMouselookActive();
+    const aHeld = held('turnLeft');
+    const dHeld = held('turnRight');
+    // A couched Shardpike turns the left/right keys (and the on-screen lean keycaps) into
+    // its balance stick (lance_lean_intent.ts); a no-op outside a brace.
+    return applyLanceLean(
+      {
         forward,
         back,
         jump,
@@ -1803,44 +1842,20 @@ export class Input {
         surface,
         swimSteer,
         gliderPitch,
-        turnLeft: false,
-        turnRight: false,
         strafeLeft:
           held('strafeLeft') ||
-          held('turnLeft') ||
+          (mouselook && aHeld) ||
           this.touchMove.strafeLeft ||
           this.gamepadMove.strafeLeft,
         strafeRight:
           held('strafeRight') ||
-          held('turnRight') ||
+          (mouselook && dHeld) ||
           this.touchMove.strafeRight ||
           this.gamepadMove.strafeRight,
-      };
-    }
-
-    const mouselook = this.isMouselookActive();
-    const aHeld = held('turnLeft');
-    const dHeld = held('turnRight');
-    return {
-      forward,
-      back,
-      jump,
-      dive,
-      surface,
-      swimSteer,
-      gliderPitch,
-      strafeLeft:
-        held('strafeLeft') ||
-        (mouselook && aHeld) ||
-        this.touchMove.strafeLeft ||
-        this.gamepadMove.strafeLeft,
-      strafeRight:
-        held('strafeRight') ||
-        (mouselook && dHeld) ||
-        this.touchMove.strafeRight ||
-        this.gamepadMove.strafeRight,
-      turnLeft: !mouselook && aHeld,
-      turnRight: !mouselook && dHeld,
-    };
+        turnLeft: !mouselook && aHeld,
+        turnRight: !mouselook && dHeld,
+      },
+      lanceLeanIntent,
+    );
   }
 }

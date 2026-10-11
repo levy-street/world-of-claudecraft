@@ -169,7 +169,7 @@ function hatchEgg(ctx: SimContext, egg: Entity, def: NonNullable<MobTemplate['br
     type: 'spellfxAt',
     x: egg.pos.x,
     z: egg.pos.z,
-    school: 'fire',
+    school: def.burstSchool ?? 'fire',
     fx: 'burst',
     radius: 2,
   });

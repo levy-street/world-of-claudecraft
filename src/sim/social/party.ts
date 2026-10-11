@@ -18,6 +18,7 @@
 
 import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
+import { emitReferralPartyEvidence } from '../referral_evidence';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
 import { rememberSoulwellPartyEligibility } from '../soulwell';
@@ -25,7 +26,9 @@ import { type Aura, DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
 // from sim.ts with the code that reads them; do NOT inline new numbers.
-const PARTY_MAX = 5;
+// PARTY_MAX is also read by the render side to size the pools of telegraphs a
+// whole party can wear at once (wildheart_basin/basin_trash_fx_core.ts).
+export const PARTY_MAX = 5;
 const RAID_MIN = 5;
 // The largest roster any group can hold, enforced at every join site below
 // (partyInvite, partyAccept, and the Dungeon Finder formation seam). The one cap
@@ -211,6 +214,7 @@ export class PartyMachine {
     this.partyByPid.set(r.meta.entityId, party.id);
     rememberSoulwellPartyEligibility(this.ctx, party);
     this.ctx.inheritDungeonResetLocks(r.meta.entityId);
+    emitReferralPartyEvidence(this.ctx, party.members);
     this.syncPersistentPaladinPartyAuras(party);
     // Forming the party is the inviter's join too; the accepter counts on
     // every successful join.
@@ -528,6 +532,7 @@ export class PartyMachine {
         pid: mPid,
       });
     }
+    emitReferralPartyEvidence(this.ctx, party.members);
     return party;
   }
 
@@ -629,5 +634,6 @@ export class PartyMachine {
       }
     }
     this.announceLooterShift(party, beforeLooter);
+    emitReferralPartyEvidence(this.ctx, [...party.members, pid]);
   }
 }

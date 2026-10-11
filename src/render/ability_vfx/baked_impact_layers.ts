@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import {
   CAST_VFX_KIT,
   type CastVfxSpawnGate,
@@ -86,7 +87,7 @@ export class BakedImpactLayers {
         uMirror: { value: 1 },
         uPivot: { value: new THREE.Vector2(0.5, 0.5) },
       },
-      vertexShader: `uniform vec2 uPivot; varying vec2 vUv; varying float vHeight,vDistance,vViewDepth; void main(){vUv=uv;vec3 p=position;p.xy+=vec2(0.5-uPivot.x,uPivot.y-0.5);vec4 world=modelMatrix*vec4(p,1.);vec4 view=viewMatrix*world;vHeight=world.y;vDistance=length(view.xyz);vViewDepth=-view.z;gl_Position=projectionMatrix*view;}`,
+      vertexShader: `${CAMERA_RELATIVE_GLSL}uniform vec2 uPivot; varying vec2 vUv; varying float vHeight,vDistance,vViewDepth; void main(){vUv=uv;vec3 p=position;p.xy+=vec2(0.5-uPivot.x,uPivot.y-0.5);vec4 world=modelMatrix*vec4(p,1.);vec4 view=wocCamRelView(world.xyz);vHeight=world.y;vDistance=length(view.xyz);vViewDepth=-view.z;gl_Position=projectionMatrix*view;}`,
       fragmentShader: `${SCENE_SAMPLE_GLSL}
       uniform sampler2D uNormal,uFlow,uLighting;uniform float uSurface,uSourceScale;uniform vec3 uSunWorld;
       uniform sampler2D uMap;uniform float uFrame,uOpacity,uHeat,uFloor,uGround,uMotion,uAuthored,uMaterialTint,uGutter,uMirror;uniform vec3 uTint,uHot;varying vec2 vUv;varying float vHeight,vDistance,vViewDepth;

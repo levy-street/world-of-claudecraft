@@ -59,9 +59,13 @@ export { SALVAGE_MATERIAL_BY_QUALITY } from './salvage_materials';
 export function isSalvageable(def: ItemDef | undefined): boolean {
   return (
     !!def &&
+    !def.noSalvage &&
     (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') &&
     !!def.quality &&
-    def.quality !== 'poor'
+    def.quality !== 'poor' &&
+    // Lent gear (the muster pike, src/sim/muster_pike.ts) is not the player's to break
+    // down: the rack re-issues it free, so breaking it down would mint materials forever.
+    !def.lentGear
   );
 }
 

@@ -14,6 +14,7 @@
 //  - the first mount rides the visual's injected compile gate.
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { failWocHeads, landWocBodies } from './helpers/woc_streamed';
 
 type Visual = import('../src/render/characters/visual').CharacterVisual;
 let CharacterVisual: typeof import('../src/render/characters/visual').CharacterVisual;
@@ -40,8 +41,13 @@ beforeAll(async () => {
     loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
     releaseGltf: vi.fn(),
   }));
-  const { charactersReady } = await import('../src/render/characters/assets');
-  await charactersReady();
+  const assets = await import('../src/render/characters/assets');
+  await assets.charactersReady();
+  // The druid is a WOC body: its base and clip library stream on demand, never in the boot
+  // preload, so land them through the stub loader; and the stub rig can hang no head, so end
+  // the head wait a WOC body otherwise holds its draw for.
+  failWocHeads(await import('../src/render/characters/woc_head_packs'));
+  await landWocBodies(assets, ['player_druid']);
   ({ CharacterVisual } = await import('../src/render/characters/visual'));
 });
 

@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/temple_hydra_woc.glb",
+      "out": "models/creatures/woc_temple_hydra.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Emerge", "Snap", "Tide_Breath", "Brine_Spit", "Hit", "Death"],
+      "maxTex": 1024
+    }
+  ]
+}

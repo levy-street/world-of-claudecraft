@@ -89,7 +89,7 @@ if (typeof window !== 'undefined') {
         // it. Unmarked, a retiring interior's terminal owner claims those and
         // disposes them, taking out the geometry the next run clones and the
         // materials anything else on screen is still drawing with. Same rule
-        // and same shape as wildheart_props.ts.
+        // and same shape as the other interior dressing kits.
         gltf.scene.traverse((child) => {
           if (!(child instanceof THREE.Mesh)) return;
           markSharedGeometry(child.geometry);

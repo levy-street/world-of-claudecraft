@@ -5,7 +5,6 @@ import {
   type AccountFlair,
   type ChatSenderFlair,
   EMPTY_ACCOUNT_FLAIR,
-  hasStreamerLink,
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import type { AccountLedger } from '../src/sim/account_ledger';
@@ -14,7 +13,6 @@ import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
-import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import {
@@ -52,7 +50,6 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
-import { cleanPetName } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
@@ -108,13 +105,16 @@ import {
   type StableTimerWireVersion,
 } from '../src/world_api';
 import { sameAppearance } from '../src/world_api/appearance';
+import { AccountBuddiesService } from './account_buddies_service';
 import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
 import { AccountCosmeticsService } from './account_cosmetics_service';
 import { reconcileAccountRelics, recordRelicFinds } from './account_ledger_records';
 import { AccountLedgerService } from './account_ledger_service';
+import { addAccountPlayer } from './account_player_join';
 import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
+import { type AdminLiveLocation, adminLiveLocation } from './admin_live_location';
 import { offensiveName } from './auth';
 import type { BackgroundDbGate } from './background_db_gate';
 import type { GuildBankLedgerOp } from './bank_ledger';
@@ -187,6 +187,7 @@ import {
   persistCheaterMark,
   refreshCheaterMark,
 } from './cheater_mark_runtime';
+import { dispatchPetRename } from './companion_rename';
 import {
   cancelCorpseHarvestCastOnDisconnect,
   harvestCorpseCommandOutcome,
@@ -197,6 +198,7 @@ import {
   consumeCosmeticOpToken,
   createCosmeticOpGuard,
 } from './cosmetic_op_guard';
+import * as courierWire from './courier_wire';
 import { stampCuratorStanding } from './curator_standing';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
@@ -243,12 +245,14 @@ import { observeQueuePops, queuedPidsOf, queuePopDepsFor } from './discord_queue
 import { enqueueRelay } from './discord_relay';
 import { findDungeonDoorNear } from './dungeon_door';
 import * as entryFacing from './dungeon_entry_facing';
+import { dispatchDungeonFinderCommand } from './dungeon_finder_commands';
 import { formatDuration } from './duration';
 import {
   copperFlowSourceForCommand,
   harvestBandForNode,
   harvestTierForNode,
 } from './economy_telemetry';
+import { identityFields } from './entity_identity_wire';
 import { isUpdateDue } from './entity_update_cadence';
 // Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
 // barrels), the same way deeds_records imports onDeedRecorded: the barrels
@@ -256,7 +260,6 @@ import { isUpdateDue } from './entity_update_cadence';
 // every test that partial-mocks the db, the known overlay-mock breakage class.
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
-import { equippedInstanceWire } from './equipped_instance_wire';
 import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
 import { buildEventPidIndex, forEachSelectedEventIndex } from './event_pid_index';
@@ -327,11 +330,14 @@ import {
   INTEREST_RADIUS,
   interestLimitSq,
   isStealthed,
+  LandmarkRoster,
   NPC_DROP_RADIUS,
+  queryCutoffSq,
 } from './interest_policy';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed, shouldReapSession, WS_KEEPALIVE_PING_MS } from './keepalive_sweep';
+import { lanceSelfWire, runLanceVerb } from './lance_wire';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import {
   consumeListReadToken,
@@ -345,6 +351,8 @@ import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_p
 import { dispatchMarketCommand, marketWirePromptCommand } from './market_commands';
 import { dispatchInventoryGroupingCommand } from './material_stack_wire';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
+import { configureMembershipBatchDatabase } from './membership_batch';
+import { MembershipGameServices } from './membership_game_services';
 import {
   applyMobScanTick,
   createMobScanTickStats,
@@ -402,13 +410,27 @@ import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types'
 import { dispatchPerfectItemCommand } from './perfect_item_command';
 import { parsePerfectingSwapCommand } from './perfecting_swap_command';
 import { runPeriodicSaveFlush } from './periodic_save_flush';
-import { writePlayerIdentityWire } from './player_identity_wire';
+import { decodeReferralAction } from './referral_command';
+import { ReferralGameAdapter } from './referral_game_adapter';
 import { VaultGameServices, type VaultMailSaveCapture } from './vault_game_services';
 import { dispatchVehicleCommand } from './vehicle_command_wire';
 import { dispatchWeeklyRewardCommand } from './weekly_reward_open';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
+import {
+  AccountSocialHost,
+  initializeAccountSocial,
+  sendAccountSocialSnapshot,
+} from './account_social_host';
+import {
+  applyBuddyGrantToSim,
+  type BuddyGrant,
+  dispatchBuddyCommand,
+  dispatchBuddyRename,
+  drainPendingBuddyGrants,
+  emitBuddySelfKeys,
+} from './buddy_wire';
 import {
   type EntityWireCache,
   type EntityWireVariantCache,
@@ -444,7 +466,7 @@ import {
   wireAura,
 } from './snapshot_timer_wire';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
-import { guildStampRankOf, SocialService } from './social';
+import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import {
@@ -486,7 +508,7 @@ import {
 } from './who_roster';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
-import { activeWorldBossIdsWireJson } from './world_boss_wire';
+import { activeWorldBossIdsWireJson, writeWorldBossWireFields } from './world_boss_wire';
 import { recordWorldQuestScoreEvent } from './world_quest_leaderboard';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -591,6 +613,7 @@ export const SIM_LAP_PHASES = [
   'p.autoAtk',
   'p.regen',
   'p.auras',
+  'p.courier',
   'mob.update',
   'mob.auras',
   'ent.misc',
@@ -647,6 +670,7 @@ export const SELF_WIRE_PHASES = [
   'market',
   'mail',
   'bank', // bank + bpsl + vault + cvault + guildBank (mixed postures: bisect a spike)
+  'courier', // owner-only pose and revision-gated cargo/bank
   'loot', // lroll, lrollg, mloot
   'delve',
   'prof', // prof, cprof, mst
@@ -879,7 +903,6 @@ const PLAYTIME_GRANT_MS = 5 * 60_000;
 const PLAYTIME_POINTS = 10;
 const DAILY_REWARD_ACTIVITY_MS = 60_000;
 const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
-const ADMIN_LOCATION_POI_RADIUS = 32;
 
 export interface ClientSession
   extends MovementInputSessionState,
@@ -966,6 +989,7 @@ export interface ClientSession
   // character ids this player has ignored; chat from them is dropped before
   // delivery. Loaded from the DB on join, kept in sync by social commands.
   blockedIds: Set<number>;
+  blockedAccountIds: Set<number>;
   blockListLoaded: boolean;
   // character ids this player has IGNORED. An ignore is the chat-only sibling of
   // a block: their PUBLIC chat is dropped before delivery, but their whispers,
@@ -1031,6 +1055,7 @@ export interface ClientSession
   lastMailRev: number | null;
   lastMailRebuildTick: number;
   // Personal bank projection: revision + composed-price gated (bank_wire.ts).
+  lastCourierWireRevision: string | number | null;
   lastBankWirePid: number | null;
   lastBankWireRev: number | null;
   lastBankWirePrice: number | null;
@@ -1112,6 +1137,7 @@ export interface ClientSession
   // value its book half could not, so letting it save is the mint the refusal
   // exists to prevent. It is kicked and reloads from its durable row.
   escrowQuarantined: boolean;
+  membershipSlot?: boolean;
   // How many leading log entries per guild an IN-FLIGHT escrow save captured.
   // The post-commit release consumes exactly that many by index, so the cap's
   // compaction must leave that prefix alone while the write is awaited or the
@@ -1201,17 +1227,7 @@ export interface AdminLiveAura {
   permanent?: boolean;
 }
 
-export interface AdminLiveLocation {
-  kind: 'overworld' | 'dungeon' | 'delve';
-  zoneId: string | null;
-  zone: string;
-  instanceId: string | null;
-  instance: string | null;
-  instanceSlot: number | null;
-  poiIndex: number | null;
-  poi: string | null;
-  poiDistance: number | null;
-}
+export type { AdminLiveLocation } from './admin_live_location';
 
 export interface AdminLivePlayer {
   pid: number;
@@ -1259,104 +1275,6 @@ type RememberedChat =
 // Identity fields rarely change, so they ride only in "full" records: on an
 // entity's first snapshot for a session and again whenever one of them
 // changes. The client treats their absence in a record as "unchanged".
-function identityFields(e: Entity): Record<string, unknown> {
-  const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
-  if (e.skinCatalog === 'mech') out.cat = 'mech';
-  if (e.skin) out.sk = e.skin;
-  // Active rideable mount ('' omitted). This identity field is intentionally
-  // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
-  // made the appended self delta overwrite the live riding state in JSON.
-  if (e.mountKey) out.mnt = e.mountKey;
-  if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
-  if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
-  if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
-  if (e.mountSkinId) out.msk = e.mountSkinId; // worn mount-skin cosmetic (render-only, like wsk)
-  // Full worn set, for the inspect-another-player window. Players only and only
-  // when something is equipped; rides the identity record (first appearance +
-  // on change), never the per-tick dynamic fields. Render-only, like `mh`.
-  if (e.kind === 'player') {
-    // The authored modular look (`app`) is NOT built here. It is ~0.6 KB for a
-    // default look (1489 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
-    // and changes at most once a session, and everything in this record is
-    // JSON.stringify'd once per entity per TICK (wireCacheFor), so composing it
-    // into the object would re-serialize half a kilobyte 20 times a second per
-    // online player to produce the same bytes. It is serialized once per entity
-    // instead (EntityWireCache.appJson) and spliced into the cached identity
-    // JSON; the self record picks it up through the `maybeRaw` delta channel in
-    // bcastSelf, which already exists for heavy, rarely-changing fields.
-    // appearanceWireJson() is the one place that string is minted.
-    const eq = e.equippedItems;
-    for (const _ in eq) {
-      out.eq = eq;
-      break;
-    }
-    // Per-slot ItemInstancePayloads of the worn set (masterwork/enchant rolls),
-    // for the inspect window (Professions 2.0). Same sparse rule as
-    // `eq` above: players only, only when at least one worn piece carries a
-    // payload, riding the identity record (wireCacheFor diffs the identity
-    // JSON, so an equip/unequip of an instanced piece re-emits automatically).
-    // Data minimization: only the inspect fields (signer, enchant, rolled,
-    // name, perfected, and a Riftbound band's rift record: its rank, upgrades,
-    // and gems, which the band tooltip's item level and rank lines read) leave
-    // the server; boundTo, charges, and the bindOnTrade arm are gameplay state
-    // no inspecting client needs and never ride this key. The pub allowlist
-    // below is what enforces this, so a new non-cosmetic ItemInstancePayload
-    // field is excluded by construction; the owner still sees their own
-    // payload in full via the self `inv` mirror. 2026-08-27: `name` (the
-    // player-chosen legendary name, Masterwrought phase 13) is the FIRST
-    // cosmetic JOIN since the rule was written. The visible Perfected marker
-    // also exposes loot quality; binding and custody stay private.
-    const eqi = equippedInstanceWire(e);
-    if (eqi) out.eqi = eqi;
-  }
-  if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
-  if (e.holderBalance) out.hb = Math.round(e.holderBalance); // exact $WOC, for inspect
-  if (e.discordTier) out.dt = e.discordTier; // Discord status-tier flair (cosmetic)
-  if (e.discordAvatar) out.dav = e.discordAvatar; // Discord PFP (linked indicator)
-  if (e.discordName) out.dnm = e.discordName; // Discord handle / nickname (nameplate)
-  if (e.discordJoined) out.dj = e.discordJoined; // Discord join epoch ms (member since)
-  if (e.discordRole) out.dr = e.discordRole; // top staff/special role key (name color + tag)
-  if (e.devTier) out.dvt = e.devTier; // developer-badge tier (cosmetic)
-  if (e.devMergedPrs) out.dvc = e.devMergedPrs; // merged-PR count, for inspect/card
-  if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
-  // Curator standing (cosmetic): rank plus the character-scoped completion pair
-  // behind it, for the inspect card's Reliquary line and the rank-5 sigil.
-  // Sparse like the flair above: refreshCuratorStanding only stamps them for a
-  // ranked character, so an unranked player ships nothing and a full record
-  // with the keys absent resets the mirror. The pair NESTS under the rank so
-  // all-or-nothing is structural at the encoder, not a convention the
-  // refresher must remember.
-  if (e.curatorRank) {
-    out.crk = e.curatorRank; // Curator rank 1-5
-    if (e.relicsOwned) out.cro = e.relicsOwned; // character-scoped relics owned
-    // relicsTotal is the one player-INDEPENDENT number of the three: it is the
-    // character-scoped catalog size, so a client could derive it from its own
-    // content tables and never ask. It rides the wire anyway because a
-    // MIXED-VERSION client must not print a total that disagrees with the
-    // server's catalog: the denominator on the card is whatever the server counted
-    // when it stamped the pair, so an older or newer client shows the server's
-    // completion rather than a locally-derived one that quietly differs.
-    if (e.relicsTotal) out.crt = e.relicsTotal; // character-scoped relic total
-  }
-  if (e.aiAccount) out.ai = 1; // operator-set AI-operated mark (name prefix)
-  // Operator-applied Cheater tag. A bare flag, not the remaining budget: every
-  // nearby client needs to RENDER the tag, but only the wearer needs the
-  // countdown, and the wearer already has it on the mark's own aura.
-  if (e.cheaterMark) out.chm = 1;
-  // Official streamer's platform links (player menu). Already gated by
-  // wireStreamerLinks at the point they were set on the entity, so an account whose
-  // streamer flag is off has none here, whatever is stored against it.
-  if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
-  writePlayerIdentityWire(e, out); // guild, pledge, guild tier, deed title/border, spec
-  if (e.dungeonId) out.dgn = e.dungeonId;
-  if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
-  if (e.vaultRarity) out.vr = e.vaultRarity; // buried-hoard rarity (render-only)
-  if (e.objectItemId) out.obj = e.objectItemId;
-  if (e.scale !== 1) out.sc = e.scale;
-  if (e.color !== 0xffffff) out.c = e.color;
-  return out;
-}
-
 // Dynamic fields are re-sent whole in every full or lite record, so the
 // conditional ones keep their absent-means-unset semantics.
 function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> {
@@ -1373,6 +1291,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
   if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
+  writeWorldBossWireFields(e, out); // brace / slumber / warpath bits (world_boss_wire.ts)
   if (e.pvpFlag) out.pvp = 1; // /pvp flag bit: nameplate + target-frame hostility colour
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
@@ -1502,8 +1421,13 @@ export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
   private readonly vault: VaultGameServices; // Buried Hoard vault wiring (vault_game_services.ts)
+  readonly membership: MembershipGameServices;
+  private readonly referral: ReferralGameAdapter;
   private activityDeps: ActivityDetectDeps<ClientSession> | null = null; // built lazily once
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
+  private readonly accountSocial = new AccountSocialHost<ClientSession>((ms) =>
+    this.tickProfiler.add('social', ms),
+  );
   private readonly storageRecoverySweep = new RecoverySweep(this.sessionsByCharacterId);
   private readonly cosmetics = new AccountCosmeticsService({
     sim: () => this.sim,
@@ -1529,7 +1453,9 @@ export class GameServer {
   // at boot (loadChatFilter) and refreshed whenever an admin edits the lists.
   readonly chatFilter = new ChatFilter();
   private readonly ipBlockList = new IpBlockList();
-  private readonly socialDb = new PgSocialDb(pool);
+  private readonly socialDb = new PgSocialDb(pool, (job) =>
+    this.withBackgroundDbPermit(job, AbortSignal.timeout(5000)),
+  );
   readonly social: SocialService;
   private readonly paidGuildCreation: PaidGuildCreationCoordinator;
   private readonly guildBankLazyLoader: GuildBankLazyLoader;
@@ -1600,6 +1526,15 @@ export class GameServer {
   // One FIFO per character id: every durable LIVE-SESSION character write
   // rides it, so commit order is enqueue order (exceptions: server/CLAUDE.md).
   readonly characterSaveQueues = createKeyedSerialWriter<number>();
+  private readonly accountBuddies = new AccountBuddiesService({
+    sim: () => this.sim,
+    save: (session) => this.saveCharacter(session),
+    serialize: (id) => this.serializeCharacterForPersist(id)?.state ?? null,
+    queue: this.characterSaveQueues,
+    quarantine: (session) =>
+      this.escrowSessionLost(session.pid, session.characterId, 'ambiguous', 'buddy purchase'),
+    observe: (ms) => this.tickProfiler.add('accountBuddies', ms),
+  });
   // The per-guild holder index behind the unsettled gate
   // (server/guild_book_holders.ts owns the maintenance contract).
   private readonly guildBookHolders = new GuildBookHolderIndex<ClientSession>();
@@ -1670,6 +1605,9 @@ export class GameServer {
     'bcastSelf',
     'social',
     'saves',
+    'membership',
+    'referral',
+    'accountBuddies',
     'lateness',
     ...SIM_LAP_PHASES,
     ...SIM_MOB_ZONE_PHASES,
@@ -1713,6 +1651,8 @@ export class GameServer {
   // crowd, vs the comparatively tiny entity-JSON build time (`serializeMs`).
   private bcSerializeNs = 0n;
   private bcVisits = 0;
+  /** Live world-boss landmarks, rescanned on a slow cadence (server/interest_policy.ts). */
+  private landmarks = new LandmarkRoster();
   private bcSerializes = 0;
   private bcBaseSerializes = 0;
   private bcLegacySerializes = 0;
@@ -1767,24 +1707,10 @@ export class GameServer {
           }
           this.simLapMark = t;
         },
-        (pid, takes, vaultUpgrades) => {
-          const session = this.clients.get(pid);
-          const meta = this.sim.meta(pid);
-          if (
-            !session ||
-            session.pid !== pid ||
-            session.left ||
-            session.escrowQuarantined ||
-            meta?.characterId !== session.characterId ||
-            session.bankLedgerJournal.outbox.owner.characterId !== session.characterId ||
-            session.bankLedgerJournal.outbox.owner.accountId !== session.accountId
-          ) {
-            return null;
-          }
-          return session.bankVaultLedgerGuard.reserveVaultConsumption(takes.length, () =>
-            session.bankLedgerJournal.reserveVaultConsumption(takes, vaultUpgrades),
-          );
-        },
+        ...courierWire.storageAdmissionsFor(
+          () => this.sim,
+          (pid) => this.clients.get(pid),
+        ),
       ),
     );
     this.vault = new VaultGameServices({
@@ -1800,6 +1726,39 @@ export class GameServer {
       saveInBackground: (session) => this.saveCharacterWithBackgroundPermit(session),
       save: (session) => this.saveCharacter(session),
       kick: (session, message, reason) => void this.kickSession(session, message, reason),
+    });
+    configureMembershipBatchDatabase((job) => this.withBackgroundDbPermit(job));
+    this.membership = new MembershipGameServices({
+      sim: this.sim,
+      session: (id) => this.sessionByCharacterId(id),
+      enqueue: (id, job, signal) =>
+        this.characterSaveQueues.enqueueCancellable(id, signal, () =>
+          this.withBackgroundDbPermit(job, signal),
+        ),
+      capture: (id) => this.serializeCharacterForPersist(id),
+      conflict: (id) => this.hasCharacterOnlySaveConflict(id),
+      acknowledge: (save) => this.acknowledgeCharacterSaveEffects(save),
+      quarantine: (pid, id, kind, surface) => this.escrowSessionLost(pid, id, kind, surface),
+      send: (s, message) => this.send(s, message),
+      kick: (s, message) => void this.kickSession(s, message, 'membership expired'),
+      observeCost: (ms) => this.tickProfiler.add('membership', ms),
+      database: (job, signal) => this.withBackgroundDbPermit(job, signal),
+      mailWrite: (job, signal) => this.enqueueMarketWriteForSave(signal, job),
+    });
+    this.sim.onBuddyGranted = (pid) => this.accountBuddies.granted(pid);
+    this.referral = new ReferralGameAdapter({
+      sim: this.sim,
+      membership: this.membership,
+      session: (id) => this.sessionByCharacterId(id),
+      enqueue: (id, job, signal) => this.characterSaveQueues.enqueueCancellable(id, signal, job),
+      capture: (id) => this.serializeCharacterForPersist(id),
+      conflict: (id) => this.hasCharacterOnlySaveConflict(id),
+      withPermit: (job, signal) => this.withBackgroundDbPermit(job, signal),
+      acknowledge: (save) => this.acknowledgeCharacterSaveEffects(save),
+      quarantine: (pid, id, kind, surface) => this.escrowSessionLost(pid, id, kind, surface),
+      send: (s, message) => this.send(s, message),
+      teleport: (s, pos) => this.teleportSessionEntity(s, pos),
+      observeCost: (ms) => this.tickProfiler.add('referral', ms),
     });
     this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
     this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
@@ -1960,6 +1919,7 @@ export class GameServer {
     const meta = this.sim.meta(session.pid);
     return {
       characterId: session.characterId,
+      accountId: session.accountId,
       name: session.name,
       activeTitle: meta?.activeTitle ?? null,
       cls: meta?.cls,
@@ -2289,7 +2249,11 @@ export class GameServer {
   }
 
   private socialTransport(): SocialTransport {
-    const actor = (s: ClientSession): SocialActor => ({ characterId: s.characterId, name: s.name });
+    const actor = (s: ClientSession): SocialActor => ({
+      characterId: s.characterId,
+      accountId: s.accountId,
+      name: s.name,
+    });
     return {
       // Roster expansion (server/guild_roster_transport.ts): the coordinator
       // rides this server's public session, save-FIFO, and quarantine ports.
@@ -2311,7 +2275,23 @@ export class GameServer {
         const s = this.sessionByName(name);
         return s ? actor(s) : null;
       },
-      isOnline: (id) => this.sessionByCharacterId(id) !== null,
+      onlineCharacterIds: () => [...this.clients.values()].map((s) => s.characterId),
+      onlineFriendForAccount: (accountId) => this.accountSocial.friend(accountId, this.sim, REALM),
+      pushAccountSnapshots: (id) => {
+        const s = this.sessionByCharacterId(id);
+        if (s)
+          this.accountSocial.pushAccountSnapshots(s, (charId) => {
+            void this.sendSocialSnapshot(charId);
+          });
+      },
+      onAccountBlocksChanged: async (id) => {
+        const s = this.sessionByCharacterId(id);
+        if (s) await this.accountSocial.hydrateBlocks(s, this.socialDb);
+      },
+      isOnline: (id) => {
+        const s = this.sessionByCharacterId(id);
+        return !!s && !s.left;
+      },
       locationOf: (id) => {
         const s = this.sessionByCharacterId(id);
         return s ? this.presenceOf(s) : null;
@@ -2427,9 +2407,17 @@ export class GameServer {
       endGuildBankDelete: (guildId) => {
         this.guildBankDeleteWindows.delete(guildId);
       },
-      isBlocking: (recipientId, senderCharacterId) => {
+      isBlocking: (recipientId, senderCharacterId, senderAccountId) => {
         const s = this.sessionByCharacterId(recipientId);
-        return s ? s.blockedIds.has(senderCharacterId) : false;
+        const sender = this.sessionByCharacterId(senderCharacterId);
+        if (s && !s.blockListLoaded && recipientId !== senderCharacterId) return true;
+        return s
+          ? sender
+            ? this.accountSocial.isBlocking(s, sender)
+            : senderAccountId !== undefined
+              ? s.blockedAccountIds.has(senderAccountId)
+              : s.blockedIds.has(senderCharacterId)
+          : false;
       },
       // Offline characters have nothing loaded and no live presence to leak,
       // so they report loaded (true); an online session reports its own
@@ -2452,54 +2440,20 @@ export class GameServer {
 
   private async sendSocialSnapshot(charId: number, firstJoin = false): Promise<void> {
     const session = this.sessionByCharacterId(charId);
-    if (!session) return;
+    if (!session || session.left) return;
     try {
-      // Capture the stamp fence BEFORE the DB read: if a synchronous
-      // membership stamp (onGuildMembershipChanged) lands while the snapshot
-      // is in flight, this read may be staler than the live stamps and must
-      // not overwrite them below.
-      const seqBefore = session.guildStampSeq;
-      const snap = await this.social.snapshot(charId);
-      // A guild can be created after this process's boot load (including an
-      // ambiguous COMMIT resolved by reconnect). Load its durable book before
-      // exposing membership locally; never synthesize empty state when the row
-      // is absent, oversized, malformed, or temporarily unreadable.
-      if (snap.guild && !this.sim.guildBanks.has(snap.guild.id)) {
-        await this.guildBankLazyLoader.ensureLoaded(snap.guild.id);
-      }
-      this.send(session, { t: 'social', ...snap });
-      // Stamp the guild name onto the player's world entity so it rides the
-      // identity wire and shows under their nameplate for everyone nearby,
-      // PAIRED with the session-only membership stamp the guild bank's
-      // officer-plus gate reads (the two must never diverge). This chokepoint
-      // is hit on join and on every membership change; committed mutations
-      // ALSO stamp synchronously at their SocialService call sites, and the
-      // fence check keeps this async arm from rolling one of those back.
-      // On the FIRST join-time stamp (firstJoin), a pre-existing guild arrives a
-      // beat after addPlayer's retro pass (the name lives in the social DB, not
-      // the blob), so retroDeeds re-credits soc_guild_joined silently instead of
-      // firing the live banner for an existing member; later changes are genuine
-      // live joins and pass firstJoin false.
-      if (session.guildStampSeq === seqBefore) {
-        this.sim.setPlayerGuild(session.pid, snap.guild?.name ?? '', { retroDeeds: firstJoin });
-        this.sim.setPlayerGuildMembership(
-          session.pid,
-          snap.guild ? { guildId: snap.guild.id, rank: guildStampRankOf(snap.guild) } : null,
-        );
-        // The pledge nameplate line + guild colour tier ride the same fenced
-        // stamp: a member tiers by their own guild, a pledge by the pledged
-        // one, everyone else reads 0 (docs/prd/guild-pledge-board.md).
-        this.sim.setPlayerPledge(
-          session.pid,
-          snap.guild ? '' : (snap.myPledge?.guildName ?? ''),
-          snap.guild?.tier ?? snap.myPledge?.tier ?? 0,
-        );
-      }
-      // remember who to track for the live position push (friends + guildmates)
-      session.socialTrackedIds = [
-        ...snap.friends.map((f) => f.id),
-        ...(snap.guild ? snap.guild.members.map((m) => m.id) : []),
-      ];
+      await this.accountSocial.snapshot(session, firstJoin, (initial) =>
+        sendAccountSocialSnapshot(session, initial, {
+          snapshot: (id) =>
+            this.accountSocial.friendSnapshot(session, (cursor, blockCursor) =>
+              this.social.snapshot(id, cursor, blockCursor),
+            ),
+          sim: this.sim,
+          ensureGuildLoaded: (id) => this.guildBankLazyLoader.ensureLoaded(id),
+          current: () => !session.left && this.sessionByCharacterId(charId) === session,
+          send: (snap) => this.send(session, { t: 'social', ...snap }),
+        }),
+      );
     } catch (err) {
       console.error('social snapshot failed:', err);
     }
@@ -2618,6 +2572,7 @@ export class GameServer {
             // recorder must see every tick. Read-only; never mutates events.
             this.parseCapture.observe(events);
             this.vault.observe(events);
+            this.referral.observe(events);
             this.routeEvents(events);
             this.detectActivity(events);
             void observeQueuePops(events, queuedPidsOf(this.sim.ctx), this.queuePopDeps);
@@ -2695,6 +2650,7 @@ export class GameServer {
     if (this.saveTimer < AUTOSAVE_SECONDS) return;
     this.saveTimer = 0;
     const sample = this.tickProfiler.currentSample();
+    void this.accountBuddies.refresh();
     runPeriodicSaveFlush({
       saveCharacters: () => this.saveAll('autosave'),
       saveMarket: () => this.saveMarket(sample),
@@ -2804,13 +2760,15 @@ export class GameServer {
     this.lastKeepaliveSweepAt = now;
   }
 
-  stop(): void {
+  async stop(): Promise<void> {
+    const referralDrain = this.referral.stop();
     this.guildBankLazyLoader.stop();
     if (this.interval) clearInterval(this.interval);
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);
     if (this.dailyRewardActivityInterval) clearInterval(this.dailyRewardActivityInterval);
     if (this.keepaliveInterval) clearInterval(this.keepaliveInterval);
+    await referralDrain;
   }
 
   /**
@@ -2940,6 +2898,25 @@ export class GameServer {
   }
 
   /** Apply a committed cross-process policy notification to live sessions. */
+  accountBlockListenerDisconnected(): void {
+    this.accountSocial.setBlockListenerReady(false);
+  }
+  invalidateAccountBlocks(accountId?: number): void {
+    this.accountSocial.invalidateBlocks(accountId);
+  }
+  refreshAccountBlocks(accountId: number): Promise<void> {
+    return this.accountSocial.refreshAccountBlocks(accountId, this.socialDb);
+  }
+  async resyncAccountBlocks(): Promise<void> {
+    this.accountSocial.setBlockListenerReady(true);
+    try {
+      await this.accountSocial.resyncBlocks(this.socialDb);
+    } catch (error) {
+      this.accountSocial.setBlockListenerReady(false);
+      throw error;
+    }
+  }
+
   applyGeneralChatRateLimitLive(accountId: number, rateLimit: GeneralChatRateLimit | null): void {
     this.generalChatRateLimitLiveState.policyChanged(accountId, rateLimit);
     this.generalChatQuota.policyChanged(accountId);
@@ -3196,10 +3173,6 @@ export class GameServer {
 
   // -------------------------------------------------------------------------
 
-  // Account-wide cosmetics (quest lockouts, mech chromas, weapon + mount skins)
-  // live in AccountCosmeticsService (server/account_cosmetics_service.ts); these
-  // three stay on GameServer as the hook surface server/main.ts injects into the
-  // Discord and Claudium routes.
   grantMechChromaToAccount(accountId: number, chromaId: string): void {
     this.cosmetics.grantMechChroma(accountId, chromaId);
   }
@@ -3223,8 +3196,8 @@ export class GameServer {
     meta: RequestMetadata &
       Partial<AccountChatMuteStatus> & {
         accountCosmetics?: AccountCosmetics;
-        // The account ledger loaded for this account (server/account_ledger_db.ts);
-        // absent on the bare test join, which then fills a fresh ledger alone.
+        accountBuddyOwned?: readonly string[];
+        // Account ledger absent on bare test joins; the sim supplies a fresh one.
         accountLedger?: AccountLedger;
         chatStrikes?: number;
         isAdmin?: boolean;
@@ -3274,14 +3247,7 @@ export class GameServer {
     for (const s of linkdeadOthers) {
       void this.leave(s, 'replaced by a new character login');
     }
-    const pid = this.sim.addPlayer(cls, name, {
-      state: state ?? undefined,
-      characterId,
-      accountLedger: meta.accountLedger,
-      bankBonus: meta.bankBonus,
-      appearance: meta.appearance ?? null,
-      tutorialGreetingSent: state === null,
-    });
+    const pid = addAccountPlayer(this.sim, accountId, characterId, cls, name, state, meta);
     const player = this.sim.entities.get(pid);
     this.vault.applyGuestUsage(pid, meta.vaultGuestUsage);
     if (player) {
@@ -3403,6 +3369,7 @@ export class GameServer {
       chatMuteReason: meta.reason ?? '',
       chatStrikes: meta.chatStrikes ?? 0,
       blockedIds: new Set(),
+      blockedAccountIds: new Set(),
       blockListLoaded: false,
       guildStampSeq: 0,
       dirtyGuildBanks: new Map(),
@@ -3446,6 +3413,7 @@ export class GameServer {
       lastMailWireTick: -MAIL_WIRE_INTERVAL_TICKS,
       lastMailRev: null,
       lastMailRebuildTick: 0,
+      lastCourierWireRevision: null,
       lastBankWirePid: null,
       lastBankWireRev: null,
       lastBankWirePrice: null,
@@ -3483,7 +3451,11 @@ export class GameServer {
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
     this.clients.set(pid, session);
     this.sessionsByCharacterId.set(characterId, session);
+    this.membership.onJoin(session);
+    this.referral.attach(session);
+    this.accountSocial.add(session);
     this.vault.onJoin(pid, characterId);
+    this.accountBuddies.attach(session, meta.accountBuddyOwned ?? []);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
     void this.recordOnlineSnapshot();
     // Stamp this character's last world-entry time for the guild-roster "last
@@ -3674,7 +3646,7 @@ export class GameServer {
       // Compared by VALUE, not identity. meta.appearance is a fresh parse of a
       // fresh row read, so it is never the same object as the one already on
       // the entity and an identity check elided nothing: every reconnect busted
-      // the memo and re-shipped the look. Serializing two ~0.6 KB documents once
+      // the memo and re-shipped the look. Serializing two ~0.9 KB documents once
       // per resume is nothing against re-minting the wire string and forcing a
       // full identity record on every player in view.
       if (e && !sameAppearance(e.modularAppearance, meta.appearance ?? null)) {
@@ -3736,6 +3708,7 @@ export class GameServer {
     if (riftState) this.send(session, { t: 'events', list: [riftState] });
     if (session.jailed) this.teleportJailedSession(session);
     void this.sendSocialSnapshot(session.characterId);
+    this.referral.command(session, { type: 'page' });
     return session;
   }
 
@@ -3806,21 +3779,12 @@ export class GameServer {
   // Load the player's block list, send their friends/ignore/guild panel, and
   // let friends + guildmates know they've come online.
   private async initSocial(session: ClientSession, firstJoin = false): Promise<void> {
-    try {
-      session.blockedIds = new Set(await this.socialDb.blockedIds(session.characterId));
-      session.blockListLoaded = true;
-    } catch (err) {
-      console.error('failed to load block list:', err);
-    }
-    try {
-      session.ignoredIds = new Set(await this.socialDb.ignoredIds(session.characterId));
-    } catch (err) {
-      console.error('failed to load ignore list:', err);
-    }
-    await this.sendSocialSnapshot(session.characterId, firstJoin);
-    await this.social
-      .announcePresence({ characterId: session.characterId, name: session.name }, true)
-      .catch((err) => console.error('presence announce failed:', err));
+    await initializeAccountSocial(session, firstJoin, {
+      blocks: () => this.accountSocial.hydrateBlocks(session, this.socialDb),
+      ignores: () => this.socialDb.ignoredIds(session.characterId),
+      snapshot: () => this.sendSocialSnapshot(session.characterId, firstJoin),
+      announce: () => this.social.announcePresence(this.actorFor(session), true),
+    });
   }
 
   // Tear down a live session as a kick: tell the client why, close the socket,
@@ -3852,10 +3816,14 @@ export class GameServer {
     if (session.jailVisit) this.exitJailVisit(session, false);
     this.cancelAndRecordUnstuck(session);
     session.left = true;
+    this.accountSocial.remove(session);
     // Release only the session binding. The account-keyed token state remains
     // cached until it has naturally refilled, so reconnect cannot reset it.
     session.bankVaultLedgerGuard.release();
     this.clients.delete(session.pid);
+    this.membership.onLeave(session);
+    this.referral.detach(session);
+    this.accountBuddies.detach(session);
     if (![...this.clients.values()].some((live) => live.accountId === session.accountId)) {
       this.generalChatQuota.forgetAccount(session.accountId);
     }
@@ -3866,7 +3834,7 @@ export class GameServer {
     this.social.forget(session.characterId);
     // delete from clients first so friends see them as offline in the notice
     void this.social
-      .announcePresence({ characterId: session.characterId, name: session.name }, false)
+      .announcePresence(this.actorFor(session), false)
       .catch((err) => console.error('presence announce failed:', err));
     if (session.dbSessionId !== null) {
       void closePlaySession(session.dbSessionId, session.metricsMaxLevel).catch((err) =>
@@ -5447,69 +5415,6 @@ export class GameServer {
     );
   }
 
-  private liveLocationFor(e: Entity): AdminLiveLocation {
-    const instance = this.sim.instanceInfoAt(e.pos);
-    const dungeonId = e.dungeonId ?? instance?.dungeonId ?? null;
-    if (dungeonId) {
-      const dungeon = DUNGEONS[dungeonId];
-      const zone = dungeon
-        ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
-        : zoneAt(e.pos.x, e.pos.z);
-      return {
-        kind: 'dungeon',
-        zoneId: zone.id,
-        zone: zone.name,
-        instanceId: dungeonId,
-        instance: dungeon?.name ?? dungeonId,
-        instanceSlot: instance?.slot ?? null,
-        poiIndex: null,
-        poi: null,
-        poiDistance: null,
-      };
-    }
-
-    const delveRun = this.sim.delveRunForPlayer(e.id);
-    if (delveRun) {
-      const delve = DELVES[delveRun.delveId];
-      const zone = delve ? zoneAt(delve.doorPos.x, delve.doorPos.z) : zoneAt(e.pos.x, e.pos.z);
-      return {
-        kind: 'delve',
-        zoneId: zone.id,
-        zone: zone.name,
-        instanceId: delveRun.delveId,
-        instance: delve?.name ?? delveRun.delveId,
-        instanceSlot: delveRun.slot,
-        poiIndex: null,
-        poi: null,
-        poiDistance: null,
-      };
-    }
-
-    const zone = zoneAt(e.pos.x, e.pos.z);
-    let bestIndex: number | null = null;
-    let bestDistance = ADMIN_LOCATION_POI_RADIUS;
-    for (let i = 0; i < zone.pois.length; i++) {
-      const poi = zone.pois[i];
-      const distance = Math.hypot(e.pos.x - poi.x, e.pos.z - poi.z);
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestIndex = i;
-      }
-    }
-    const poi = bestIndex === null ? null : zone.pois[bestIndex];
-    return {
-      kind: 'overworld',
-      zoneId: zone.id,
-      zone: zone.name,
-      instanceId: null,
-      instance: null,
-      instanceSlot: null,
-      poiIndex: bestIndex,
-      poi: poi?.label ?? null,
-      poiDistance: poi ? round2(bestDistance) : null,
-    };
-  }
-
   liveSessions(): AdminLivePlayer[] {
     const now = Date.now();
     const players: AdminLivePlayer[] = [];
@@ -5517,7 +5422,7 @@ export class GameServer {
       const e = this.sim.entities.get(session.pid);
       const meta = this.sim.meta(session.pid);
       if (!e || !meta) continue;
-      const location = this.liveLocationFor(e);
+      const location = adminLiveLocation(this.sim, e);
       const zone = location.instance ?? location.zone;
       const moveSpeedMultiplier = round2(this.sim.moveSpeedMult(e));
       players.push({
@@ -5762,6 +5667,20 @@ export class GameServer {
     return 'ok';
   }
 
+  // Admin grants use the normal sim grant hook and durable account ownership.
+  adminGrantBuddy(characterId: number, grant: BuddyGrant): 'ok' | 'offline' | 'already_owned' {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session) return 'offline';
+    return applyBuddyGrantToSim(this.sim, session.pid, grant) ? 'ok' : 'already_owned';
+  }
+
+  /** Join-time drain of the grants queued while this character was offline. */
+  drainBuddyGrants(session: ClientSession): Promise<void> {
+    return drainPendingBuddyGrants(this.sim, session.pid, session.characterId, session.name, () =>
+      this.saveCharacter(session),
+    );
+  }
+
   // R35 GM restore: re-mint a lost tool-effect slot row on a LIVE character.
   // The sim action owns validation, tool-rarity charge sizing, and the
   // success event the player sees; it is server-admin-only by design (the
@@ -5982,6 +5901,7 @@ export class GameServer {
     const cmd = this.messageCommand(msg);
     // Fence projected vault loot until its character+mail save or recovery.
     if (this.vault.guard.isLocked(session.characterId)) return;
+    if (this.membership.isBusy(session.accountId)) return;
     // Economy telemetry: sample the acting player's copper across this one
     // dispatch, so a command's own credit or debit is attributed to its
     // economic surface with no sim-side signal and no gameplay effect. Two
@@ -6215,6 +6135,8 @@ export class GameServer {
     ) {
       return;
     }
+    if (this.accountBuddies.commandBlocked(pid) || this.referral.cards.isBusy(session.accountId))
+      return;
     // W0b command-schema lockstep: cast the untyped wire token to the shared
     // CommandName union so tsc proves every `case` label below is a member of
     // COMMAND_NAMES (a typo or out-of-table token is a compile error) and that
@@ -6271,6 +6193,15 @@ export class GameServer {
     if (questWire.isWorldQuestWireCommand(command))
       return void questWire.dispatchWorldQuestWire(sim, msg, pid);
     switch (command) {
+      case 'courier_dispatch':
+        courierWire.dispatchCourierCommand(sim, msg, pid);
+        break;
+      case 'account_bank_list':
+      case 'account_bank_select':
+      case 'account_bank_transfer':
+      case 'membership_claim_armour':
+        this.membership.dispatch(session, command, msg);
+        break;
       case 'castSlot':
         if (typeof msg.slot === 'number') sim.castAbilityBySlot(msg.slot | 0, pid);
         break;
@@ -6388,7 +6319,7 @@ export class GameServer {
       case 'turnin':
         if (typeof msg.quest === 'string') {
           const beforeDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
-          sim.turnInQuest(msg.quest, pid);
+          questWire.turnInQuestWire(sim, msg, pid);
           const afterDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
           if (!beforeDone && afterDone) {
             void dailyRewardService
@@ -6440,6 +6371,13 @@ export class GameServer {
         break;
       case 'use':
         if (typeof msg.item === 'string') {
+          if (msg.item === 'membership_token') {
+            void this.membership.redeem(
+              session,
+              Number.isInteger(msg.slot) ? Number(msg.slot) : undefined,
+            );
+            break;
+          }
           // The bag index the client named, re-validated in the sim against ITS
           // OWN inventory: an unrecognized value reads as undefined (the legacy
           // id-only path), never as index 0.
@@ -6477,19 +6415,14 @@ export class GameServer {
         }
         break;
       case 'buy':
-        // The options bag third, pid fourth (the one explicit shape; see
-        // Sim.buyItem). A non-number count is dropped like sell's, a hostile
-        // number reaches the sim's sanitize and denies there.
-        if (typeof msg.npc === 'number' && typeof msg.item === 'string')
-          sim.buyItem(
-            msg.npc,
-            msg.item,
-            {
-              count: typeof msg.count === 'number' ? msg.count : undefined,
-              bulk: msg.bulk === true,
-            },
-            pid,
-          );
+        if (typeof msg.npc === 'number' && typeof msg.item === 'string') {
+          const options = {
+            count: typeof msg.count === 'number' ? msg.count : undefined,
+            bulk: msg.bulk === true,
+          };
+          if (!this.accountBuddies.buy(session, msg.npc, msg.item, options))
+            sim.buyItem(msg.npc, msg.item, options, pid);
+        }
         break;
       case 'sell':
         if (typeof msg.item === 'string') {
@@ -6772,6 +6705,19 @@ export class GameServer {
       // gate, combat gate); the entity mirror + self `mnt` field carry the result.
       case 'mount_toggle':
         sim.toggleMountFor(pid);
+        break;
+      case 'buddy_rename':
+        dispatchBuddyRename(sim, pid, msg, offensiveName, () =>
+          this.sendChatNotice(session, 'Pet name is not allowed.'),
+        );
+        break;
+      // Cosmetic buddies (server/buddy_wire.ts): the Sim re-validates every
+      // key and ownership; the entity mirror and the self keys carry results.
+      case 'buddy_toggle':
+      case 'buddy_summon':
+      case 'buddy_cosmetic':
+      case 'buddy_autoloot':
+        dispatchBuddyCommand(sim, pid, command, msg);
         break;
       // Riding lesson: the Sim re-validates everything (level, range, quest
       // state, fee, session state).
@@ -7074,15 +7020,9 @@ export class GameServer {
         sim.abandonPet(pid);
         break;
       case 'pet_rename':
-        if (typeof msg.name === 'string') {
-          // Shape-first like perfect_item: a name the sim's 16-character shape
-          // (cleanPetName) refuses skips the matcher and rides raw for the sim's
-          // own refusal; a valid one is screened and stored as that one value.
-          const clean = cleanPetName(msg.name);
-          if (clean !== null && offensiveName(clean))
-            this.sendChatNotice(session, 'Pet name is not allowed.');
-          else sim.renamePet(clean ?? msg.name, pid);
-        }
+        dispatchPetRename(sim, pid, msg, offensiveName, () =>
+          this.sendChatNotice(session, 'Pet name is not allowed.'),
+        );
         break;
       case 'pet_revive':
         sim.revivePet(pid);
@@ -7189,7 +7129,17 @@ export class GameServer {
         if (typeof msg.name === 'string')
           void this.social.ignoreRemove(this.actorFor(session), msg.name).catch(logSocialErr);
         break;
+      case 'referralCards': {
+        if (!this.consumeListRead(session, receivedAtMs / 1000)) break;
+        const action = decodeReferralAction(msg.action);
+        if (action) this.referral.command(session, action);
+        break;
+      }
       case 'social_refresh':
+        if (!this.consumeListRead(session, receivedAtMs / 1000)) break;
+        if (msg.afterBlockCursor !== undefined) {
+          if (!this.accountSocial.selectBlockPage(session, msg.afterBlockCursor)) break;
+        } else if (!this.accountSocial.selectFriendPage(session, msg.afterFriendCursor)) break;
         void this.sendSocialSnapshot(session.characterId);
         break;
       case 'guild_create':
@@ -7351,6 +7301,10 @@ export class GameServer {
         if (typeof msg.on === 'boolean') sim.setWorldPvpFlag(msg.on, pid);
         session.lastWpvpWireTick = -WPVP_WIRE_INTERVAL_TICKS;
         break;
+      case 'dungeon_guide_answer': // src/sim/dungeon_guide validates the rest
+        if (typeof msg.npcId === 'number' && typeof msg.accept === 'boolean')
+          sim.answerDungeonGuide(msg.npcId, msg.accept, pid);
+        break;
       case 'dev_bg_start': {
         if (process.env.ALLOW_DEV_COMMANDS === '1') sim.devStartBg();
         break;
@@ -7371,60 +7325,18 @@ export class GameServer {
         sim.forfeitCardDuel(pid);
         break;
 
-      // Dungeon Finder (docs/prd/dungeon-finder.md). Deliberately NOT in
-      // HEAVY_SELF_CMDS: finder state rides its own `df`/`dfb` delta keys, and
-      // group formation bumps the party key through the normal snapshot path.
-      // Every field is validated here; the Sim re-validates eligibility, roles,
-      // capacity, and party state authoritatively.
-      case 'df_roles': {
-        if (Array.isArray(msg.roles) && msg.roles.length <= 3) {
-          const roles = msg.roles.filter(isFinderRole);
-          if (roles.length === msg.roles.length) sim.dungeonFinderSetRoles(roles, pid);
-        }
-        break;
-      }
-      case 'df_queue': {
-        if (Array.isArray(msg.activities) && msg.activities.length <= 16) {
-          const activities = msg.activities.filter(
-            (a): a is string => typeof a === 'string' && a.length <= 64,
-          );
-          if (activities.length === msg.activities.length)
-            sim.dungeonFinderQueueJoin(activities, pid);
-        }
-        break;
-      }
+      // Dungeon Finder (docs/prd/dungeon-finder.md): the bodies and their
+      // frame guards live in server/dungeon_finder_commands.ts.
+      case 'df_roles':
+      case 'df_queue':
       case 'df_queue_leave':
-        sim.dungeonFinderQueueLeave(pid);
-        break;
       case 'df_proposal':
-        sim.dungeonFinderRespond(msg.accept === true, pid);
-        break;
-      case 'df_list_create': {
-        if (
-          typeof msg.activity === 'string' &&
-          msg.activity.length <= 64 &&
-          Array.isArray(msg.tags) &&
-          msg.tags.length <= 8
-        ) {
-          const tags = msg.tags.filter(isFinderListingTag);
-          if (tags.length === msg.tags.length)
-            sim.dungeonFinderListingCreate(msg.activity, tags, pid);
-        }
-        break;
-      }
+      case 'df_list_create':
       case 'df_list_close':
-        sim.dungeonFinderListingClose(pid);
-        break;
       case 'df_apply':
-        if (typeof msg.listing === 'number' && Number.isFinite(msg.listing))
-          sim.dungeonFinderApply(msg.listing, pid);
-        break;
       case 'df_apply_cancel':
-        sim.dungeonFinderApplyCancel(pid);
-        break;
       case 'df_app_respond':
-        if (typeof msg.applicant === 'number' && Number.isFinite(msg.applicant))
-          sim.dungeonFinderApplicationRespond(msg.applicant, msg.accept === true, pid);
+        dispatchDungeonFinderCommand(sim, msg, pid);
         break;
 
       // post-cap cosmetic prestige (Max-Level XP Overflow)
@@ -7560,7 +7472,7 @@ export class GameServer {
         const live = this.sessionByName(to);
         if (live) {
           // Blocked recipients refuse before escrow without identity disclosure.
-          if (live.blockedIds.has(session.characterId)) {
+          if (!live.blockListLoaded || this.accountSocial.isBlocking(live, session)) {
             this.send(session, {
               t: 'events',
               list: [{ type: 'mailResult', code: 'noRecipient', pid }],
@@ -7591,7 +7503,7 @@ export class GameServer {
               return;
             }
             // Offline block check is also before escrow.
-            const blockedBy = await this.socialDb.blockedIds(target.id);
+            const blockedBy = await this.socialDb.blockedIds(target.id, [session.characterId]);
             if (this.clients.get(pid) !== session) return;
             if (this.vault.guard.isLocked(session.characterId)) return;
             if (blockedBy.includes(session.characterId)) {
@@ -7897,6 +7809,12 @@ export class GameServer {
         sim.collectDelveChestLoot(msg.objectId, pid);
         break;
       }
+      // The Shardpike trial's three no-argument verbs (lance_wire.ts).
+      case 'lance_brace':
+      case 'lance_thrust':
+      case 'lance_release':
+        runLanceVerb(sim, command, pid);
+        break;
       // client telemetry should not be considered as unknown command. Used for offline stats computing.
       case 'telemetry':
         break;
@@ -8026,6 +7944,8 @@ export class GameServer {
         radius: BG_MATCH_DROP_RADIUS,
         covers: isBgPos,
       },
+      // A world boss is visible from far outside any radius this query can afford to run.
+      this.landmarks.refresh(this.sim.tickCount, this.sim.entities.values()),
     );
     if (this.perfDetailActive) this.bcastGridNs += process.hrtime.bigint() - sharedStart;
     const queryLimitSq = INTEREST_QUERY_RADIUS * INTEREST_QUERY_RADIUS;
@@ -8055,7 +7975,7 @@ export class GameServer {
           const dx = e.pos.x - anchorEntity.pos.x;
           const dz = e.pos.z - anchorEntity.pos.z;
           const d2 = dx * dx + dz * dz;
-          if (d2 > (isBgPos(anchorEntity.pos.x) ? bgQueryLimitSq : queryLimitSq)) continue;
+          if (d2 > queryCutoffSq(e, anchorEntity.pos.x, bgQueryLimitSq, queryLimitSq)) continue;
           // bcVisits counts the exact per-viewer in-range set (self included):
           // increment only AFTER the exact-d2 cutoff, never on the padded
           // per-cell candidate list. Band viewers use the wider battleground
@@ -8205,8 +8125,8 @@ export class GameServer {
   /**
    * The authored modular look as JSON, minted at most ONCE per entity.
    *
-   * `app` is by far the heaviest identity field (~0.6 KB for a default look,
-   * 1489 bytes at the ceiling the sanitizer's allowlists imply, measured by
+   * `app` is by far the heaviest identity field (~0.9 KB for a default look,
+   * 2154 bytes at the ceiling the sanitizer's allowlists imply, measured by
    * tests/appearance_wire_bounds.test.ts rather than compared at runtime) and the only one
    * that a session normally never changes: it is stamped at join from the
    * character's own column, and the sole thing that moves it is a redesign the
@@ -8445,6 +8365,10 @@ export class GameServer {
     // Delta-guarded: ships on death-release and clears on resurrect. The client
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
     maybe('corpse', p.corpsePos);
+    const lanceWire = lanceSelfWire(this.sim.ctx, anchorSession.pid); // lance_wire.ts
+    maybe('lance', lanceWire.lance);
+    maybe('lrest', lanceWire.lrest);
+    maybe('lguide', lanceWire.lguide);
     if (stableTimerWire) {
       maybeSerialized('auras', this.stableAuraWireFor(p).json);
       maybeSerialized(
@@ -8676,6 +8600,8 @@ export class GameServer {
     emitVaultSelfKeys(maybe, this.sim, session, anchorSession.pid);
     emitGuildAndWeeklySelfKeys(maybe, this.sim, session.pid, anchorSession.pid);
     selfLap?.('self.bank');
+    courierWire.emitCourierSelfKeys(maybe, this.sim, session);
+    selfLap?.('self.courier');
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).
@@ -8799,6 +8725,8 @@ export class GameServer {
       // flag, not the modulo, is what carries correctness here. Wire key
       // `mntOwn`.
       maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
+      // The buddy collection (IWorldBuddies), four keys (server/buddy_wire.ts).
+      emitBuddySelfKeys(this.sim, anchorSession.pid, maybe);
       // The viewer's own farm plots (wire key `fplot`): heavy-gated, built by
       // appendFarmPlotsWire in server/farming_commands.ts since the v0.38.0
       // sync monolith heal; the gating and projection doctrine lives there.
@@ -9187,7 +9115,6 @@ export class GameServer {
           if (
             !session.spectating &&
             ev.type === 'chat' &&
-            session.blockedIds.size > 0 &&
             this.isBlockedSender(session, ev.fromPid)
           )
             return;
@@ -9291,7 +9218,9 @@ export class GameServer {
   private isBlockedSender(recipient: ClientSession, fromPid: number): boolean {
     if (fromPid === recipient.pid) return false;
     const sender = this.clients.get(fromPid);
-    return sender ? recipient.blockedIds.has(sender.characterId) : false;
+    return sender
+      ? !recipient.blockListLoaded || this.accountSocial.isBlocking(recipient, sender)
+      : false;
   }
 
   // Same pid-to-character-id hop as isBlockedSender, against the ignore set.
@@ -9365,7 +9294,7 @@ export class GameServer {
         continue;
       if (ev.pid === undefined) continue;
       const target = this.clients.get(ev.pid);
-      if (!target || target.blockedIds.size === 0) continue;
+      if (!target) continue;
       if (!this.isBlockedSender(target, ev.fromPid)) continue;
       suppressed ??= new Set();
       suppressed.add(ev);
@@ -9605,7 +9534,7 @@ export class GameServer {
           );
         }
         if (marquee) {
-          return this.social.broadcastDeedUnlock({ characterId, name }, deedId);
+          return this.social.broadcastDeedUnlock({ characterId, accountId, name }, deedId);
         }
       })
       .catch((err) => console.error('deed broadcast failed:', err));
@@ -9629,7 +9558,7 @@ export class GameServer {
     void getDeedBroadcasts(accountId)
       .then((enabled) => {
         if (!enabled) return;
-        return this.social.broadcastIllumination({ characterId, name }, pageId);
+        return this.social.broadcastIllumination({ characterId, accountId, name }, pageId);
       })
       .catch((err) => console.error('illumination broadcast failed:', err));
   }

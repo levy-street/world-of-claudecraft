@@ -10,6 +10,7 @@
 // download. Each fight opens on one of the two battle themes at random.
 
 import { resumeWhenAllowed } from './audio_unlock';
+import { BossLoopTrack, DEFAULT_BOSS_TRACK_URL } from './boss_music_loop';
 import { CRUCIBLE_STREAM_URLS, type CrucibleFloor } from './crucible_music';
 import { dungeonMusicZoneForDungeon } from './dungeon_music_zones';
 import { minigameLayerFor } from './minigame_music_layer';
@@ -4291,10 +4292,7 @@ export class MusicDirector {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private bossGain: GainNode | null = null;
-  private bossBuffer: AudioBuffer | null = null;
-  private bossSource: AudioBufferSourceNode | null = null;
-  private bossElement: HTMLAudioElement | null = null;
-  private bossLoading = false;
+  private readonly bossLoop = new BossLoopTrack();
   private zoneStreams: Partial<Record<MusicZone, StreamTrack>> = {};
   private combatStreams: StreamTrack[] = [];
   private crucibleStreams: Partial<Record<CrucibleFloor, StreamTrack>> = {};
@@ -4341,7 +4339,8 @@ export class MusicDirector {
 
   /** Engage/disengage the dedicated boss-fight loop. Idempotent; called every
    *  frame by the HUD. Ducks the procedural score while active. */
-  setBossCombat(on: boolean): void {
+  setBossCombat(on: boolean, url = DEFAULT_BOSS_TRACK_URL): void {
+    this.bossLoop.retarget(url, on && !this.bossActive ? this.allStreams() : null);
     if (on === this.bossActive) {
       if (on) this.applyBossPlayback();
       return;
@@ -4372,15 +4371,8 @@ export class MusicDirector {
         /* browser may reject seeking before metadata */
       }
     }
-    if (this.bossElement) {
-      try {
-        this.bossElement.currentTime = 0;
-      } catch {
-        /* browser may reject seeking before metadata */
-      }
-    }
+    this.bossLoop.rewind();
     minigameLayerFor(this).rewind();
-    this.stopBossSource();
   }
 
   private applyBossPlayback(): void {
@@ -4389,7 +4381,7 @@ export class MusicDirector {
     this.bossGain.gain.setTargetAtTime(target, this.ctx.currentTime, target > 0 ? 0.25 : 0.12);
     if (target > 0) {
       resumeWhenAllowed(this.ctx);
-      const element = this.ensureBossElement();
+      const element = this.bossLoop.element();
       if (element) {
         element.volume = target;
         void element.play().catch(() => {
@@ -4402,58 +4394,21 @@ export class MusicDirector {
         this.startBossSource();
       }
     } else {
-      if (this.bossElement) this.bossElement.pause();
+      this.bossLoop.pause();
       this.stopBossSource();
     }
   }
 
-  private ensureBossElement(): HTMLAudioElement | null {
-    if (this.bossElement) return this.bossElement;
-    if (typeof Audio !== 'function') return null;
-    const el = new Audio('/audio/dungeon-boss-fight.mp3');
-    el.loop = true;
-    el.preload = 'auto';
-    this.bossElement = el;
-    return el;
-  }
-
   private ensureBossBuffer(): void {
-    const ctx = this.ctx;
-    if (!ctx || this.bossBuffer || this.bossLoading || typeof fetch !== 'function') return;
-    this.bossLoading = true;
-    void fetch('/audio/dungeon-boss-fight.mp3')
-      .then((res) => res.arrayBuffer())
-      .then((bytes) => ctx.decodeAudioData(bytes))
-      .then((buffer) => {
-        this.bossBuffer = buffer;
-        this.bossLoading = false;
-        this.applyBossPlayback();
-      })
-      .catch(() => {
-        this.bossLoading = false;
-      });
+    if (this.ctx) this.bossLoop.loadBuffer(this.ctx, () => this.applyBossPlayback());
   }
 
   private startBossSource(): void {
-    const ctx = this.ctx;
-    if (!ctx || !this.bossGain || !this.bossBuffer || this.bossSource) return;
-    const src = ctx.createBufferSource();
-    src.buffer = this.bossBuffer;
-    src.loop = true;
-    src.connect(this.bossGain);
-    src.start();
-    this.bossSource = src;
+    if (this.ctx && this.bossGain) this.bossLoop.startSource(this.ctx, this.bossGain);
   }
 
   private stopBossSource(): void {
-    if (!this.bossSource) return;
-    try {
-      this.bossSource.stop();
-    } catch {
-      /* already stopped */
-    }
-    this.bossSource.disconnect();
-    this.bossSource = null;
+    this.bossLoop.stopSource();
   }
 
   /** Set music volume (0..1). Safe before init(); applied to the master gain. */

@@ -37,14 +37,15 @@ export type MobCombatProfileResult = 'done' | 'runAttackMechanics';
 
 type EngagedTickHook = (mode: 'normal' | 'stationary') => void;
 
-// Drop the pull and walk home: the shared evade entry used by the leash breaks
-// and the unreachable-target stall. The evade arm in locomotion.ts handles the
-// walk, the immunity lives in combat/damage.ts, and resetEvadingMob heals to
+// Drop the pull and walk home: the shared evade entry used by the leash breaks,
+// the unreachable-target stall, and a warpath boss giving up (mob/warpath.ts).
+// The evade arm in locomotion.ts handles the walk, the immunity lives in
+// combat/damage.ts, and resetEvadingMob heals to
 // full on arrival. Any in-flight cast dies with the pull: the bar would
 // otherwise freeze on an immune mob walking home, and a committed ranged
 // windup (rangedWindupReleaseTick is an ABSOLUTE tick) would fire instantly
 // on the next pull's first in-range tick.
-function startEvadeHome(mob: Entity): void {
+export function startEvadeHome(mob: Entity): void {
   mob.aiState = 'evade';
   mob.aggroTargetId = null;
   mob.autoAttack = false; // leashing home: not swinging, whatever it was doing before
@@ -95,7 +96,8 @@ export function tryMobMeleeSwingInRange(ctx: SimContext, mob: Entity, target: En
 // in melee still evades past the leash. Boss attack mechanics stay melee-gated
 // via the return value: 'runAttackMechanics' on any engaged tick that ENDS in
 // melee contact (the caller runs the aoePulse/stomp/bigCast/stoneskin/terrify
-// tail then).
+// tail then). A cast bar already started keeps counting down on the other
+// engaged ticks too (mob/mob_cast_bars.ts); only STARTING one is melee-gated.
 export function updateMobCombatProfile(
   ctx: SimContext,
   mob: Entity,

@@ -49,6 +49,10 @@ export const BANK_BONUS_SOURCE_KEYS: Record<
     label: 'hudChrome.bank.bonusSourceReferral',
     advert: 'hudChrome.bank.bonusReferralExplainer',
   },
+  referral_cards: {
+    label: 'referralCards.bankBonus',
+    advert: 'referralCards.bankBonusHelp',
+  },
 };
 
 /** One compact source row. A source carrying progress numbers (referral, the only

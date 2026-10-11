@@ -248,14 +248,9 @@ describe('the SQL blob paths match the sim serializer layout', () => {
     expect(src).toContain('$.deedStats.itemsDiscovered');
   });
 
-  // Top-level segments: PR4 extracted the two inline sparse fragments this suite used to
-  // pin as literal `sim.ts` return strings (`deedStatsSaveFragment` / `reliquarySaveFragment`,
-  // src/sim/deeds.ts + src/sim/reliquary.ts). Walking Sim.serializeCharacter's real `state`
-  // object literal, resolving the two bare-identifier spreads to their owning modules, and
-  // reading each helper's own declared return key proves the SQL's top-level segments still
-  // name the real save composition rather than a string this file keeps agreeing with itself
-  // about: a rename of either helper, its module, or its returned key reds this before it
-  // reds production.
+  // Resolve the live serializer spreads to their owners. Reliquary names its
+  // return key directly; the book wrapper composes deedStats through another
+  // helper, so execute that real wrapper with a discovered-item fixture too.
   it('the deedStats/reliquary top-level segments come from the real save-fragment owners, spread live into Sim.serializeCharacter', async () => {
     const { readFileSync } = await import('node:fs');
     const simFileName = '../../src/sim/sim.ts';
@@ -267,13 +262,10 @@ describe('the SQL blob paths match the sim serializer layout', () => {
       'serializeCharacter',
     );
     expect(helperCallNames).toEqual(
-      expect.arrayContaining(['deedStatsSaveFragment', 'reliquarySaveFragment']),
+      expect.arrayContaining(['savedBookOfDeeds', 'reliquarySaveFragment']),
     );
 
-    for (const [localName, expectedKey] of [
-      ['deedStatsSaveFragment', 'deedStats'],
-      ['reliquarySaveFragment', 'reliquary'],
-    ] as const) {
+    for (const [localName, expectedKey] of [['reliquarySaveFragment', 'reliquary']] as const) {
       const resolved = resolveNamedImportSpecifier(simSrc, simFileName, localName);
       expect(resolved, `${localName} must be a named import in sim.ts`).toBeDefined();
       const modulePath = `${resolved!.modulePath}.ts`;
@@ -284,5 +276,23 @@ describe('the SQL blob paths match the sim serializer layout', () => {
       const keys = saveFragmentReturnKeys(resolved!.exportedName, moduleSrc, modulePath);
       expect(keys).toEqual([expectedKey]);
     }
+    // The deeds fragment now composes through the extracted book owner. Invoke
+    // that actual owner as well as pinning its import at the live Sim spread.
+    const bookImport = resolveNamedImportSpecifier(simSrc, simFileName, 'savedBookOfDeeds');
+    expect(bookImport).toEqual({ modulePath: './deeds_restore', exportedName: 'savedBookOfDeeds' });
+    const { savedBookOfDeeds } = await import('../../src/sim/deeds_restore');
+    const { freshDeedStats } = await import('../../src/sim/deeds');
+    const stats = freshDeedStats();
+    stats.itemsDiscovered.add('cryptbone_helm');
+    const saved = savedBookOfDeeds({
+      deedStats: stats,
+      deedsEarned: new Map(),
+      activeTitle: null,
+      activeBorder: null,
+      renown: 0,
+    } as Parameters<typeof savedBookOfDeeds>[0]);
+    expect(saved).toEqual({
+      deedStats: expect.objectContaining({ itemsDiscovered: ['cryptbone_helm'] }),
+    });
   });
 });

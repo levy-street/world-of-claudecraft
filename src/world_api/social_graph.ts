@@ -1,7 +1,9 @@
 // Persistent social state, mirrored from the server's SocialService. Mirrors
 // server/social.ts shapes; kept here so the HUD has no server-side imports.
+
 import type { PlayerFlair } from '../sim/account_flair';
 import type { GuildRankDef, GuildRankId } from '../sim/guild_ranks';
+import type { ReferralCardsAction, ReferralCardsSnapshot } from '../sim/referral_contract';
 
 export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead' | 'afk';
 // A rank id on the guild's ladder (GuildInfo.ranks): 'leader' and 'member' at
@@ -11,6 +13,7 @@ export type GuildRank = GuildRankId;
 export type { GuildRankDef };
 
 export interface FriendInfo {
+  tier?: 'friend' | 'bound';
   id: number;
   name: string;
   cls: string;
@@ -113,7 +116,12 @@ export interface GuildInfo {
 
 export interface SocialInfo {
   friends: FriendInfo[];
+  friendsCursor?: number;
+  friendsNextCursor?: number | null;
   blocks: { id: number; name: string }[];
+  blocksCursor?: number;
+  blocksNextCursor?: number | null;
+  blocksUnavailable?: boolean;
   // personal chat ignores: hides their public chat from you and nothing else.
   // A block is the heavy tool (invites, whispers, mail, /who all die with it).
   // Neither is the ADMIN "mute", which is a staff silence applied to a player.
@@ -174,6 +182,10 @@ export interface CharacterProfile {
 export interface IWorldSocialGraph {
   // persistent social: friends, ignore/block, guilds (online play only)
   socialInfo: SocialInfo | null;
+  socialFriendsPage(cursor: number): void;
+  socialBlocksPage(cursor: number): void;
+  referralCardsSnapshot(): ReferralCardsSnapshot | null;
+  referralCardsAction(action: ReferralCardsAction): void;
   friendAdd(name: string): void;
   friendRemove(name: string): void;
   blockAdd(name: string): void;

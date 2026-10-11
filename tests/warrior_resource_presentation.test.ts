@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { AbilityVfx, type AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import { Renderer } from '../src/render/renderer';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { withMeleeContact } from './helpers/renderer_contact';
 
 function fixture() {
   const sequenceInstant = vi.fn();
@@ -26,14 +27,14 @@ function fixture() {
     } as unknown as AbilityVfxDeps,
     () => 0,
   );
-  const renderer = {
+  const renderer = withMeleeContact({
     sim: { entities: new Map([[3, player]]) },
     views: new Map(),
     triggerAttack,
     triggerHit,
     vfx: { meleeSpark, drainLifeTick: vi.fn() },
     abilityVfx: painter,
-  } as unknown as Renderer;
+  }) as unknown as Renderer;
   return { painter, renderer, sequenceInstant, triggerAttack, triggerHit, meleeSpark };
 }
 
@@ -72,7 +73,7 @@ describe('Warrior resource cost presentation', () => {
       ability: 'Attack',
       kind: 'hit',
     });
-    expect(f.triggerAttack).toHaveBeenCalledWith(7, undefined);
+    expect(f.triggerAttack).toHaveBeenCalledWith(7, undefined, false, 'melee');
     expect(f.triggerHit).toHaveBeenCalledWith(3);
     expect(f.meleeSpark).toHaveBeenCalledWith(3, false);
   });

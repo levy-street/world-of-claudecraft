@@ -1913,6 +1913,9 @@ describe('Affliction Warlock', () => {
     });
     boss.maxHp = 100_000;
     boss.hp = boss.maxHp;
+    // Held where it stands, like addTarget's dummies: the splash geometry below
+    // is the subject, not how close the boss's body radius lets it walk in.
+    boss.moveSpeed = 0;
     bossSim.addEntity(boss);
     finishCast(bossSim, 'evil_eye', boss);
     gainDoom(ctx(bossSim), bossSim.player, 100);

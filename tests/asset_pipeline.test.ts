@@ -202,6 +202,68 @@ describe('Tripo task detail requests', () => {
   });
 });
 
+describe('Tripo multiview (Smart Mesh P2.0) generation', () => {
+  it('orders the views front, left, back, right and requires the front', () => {
+    expect(tripo.multiviewInputs({ back: 'b', front: 'f', left: 'l' })).toEqual([
+      { front: 'f' },
+      { left: 'l' },
+      { back: 'b' },
+    ]);
+    expect(() => tripo.multiviewInputs({ left: 'l' })).toThrow(/front view/);
+    expect(() => tripo.multiviewInputs({ front: 'f', top: 't' })).toThrow(
+      /unknown multiview angle/,
+    );
+  });
+
+  it('posts the views to the multiview endpoint on P2, with quad only where P2 takes it', async () => {
+    const previousKey = process.env.TRIPO_API_KEY;
+    process.env.TRIPO_API_KEY = 'test-key';
+    const posted: { url: string; body: Record<string, unknown> }[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init: RequestInit | undefined) => {
+        if (init?.method === 'POST') {
+          posted.push({ url, body: JSON.parse(String(init.body)) });
+          return new Response(JSON.stringify({ code: 0, data: { task_id: 'task-1' } }));
+        }
+        return new Response(
+          JSON.stringify({ code: 0, data: { task_id: 'task-1', status: 'success', output: {} } }),
+        );
+      }),
+    );
+    try {
+      const views = {
+        front: 'https://example.test/front.png',
+        left: 'https://example.test/left.png',
+        back: 'https://example.test/back.png',
+      };
+      await tripo.generateModelFromViews({ views, faceLimit: 5000, quad: true, textureSize: 1024 });
+      await tripo.generateModelFromViews({ views, model: tripo.MODEL_LOWPOLY, quad: true });
+      expect(posted.map((p) => p.url)).toEqual([
+        `${tripo.TRIPO_BASE}/generation/multiview-to-model`,
+        `${tripo.TRIPO_BASE}/generation/multiview-to-model`,
+      ]);
+      expect(posted[0].body).toMatchObject({
+        model: 'P2-20260801',
+        face_limit: 5000,
+        quad: true,
+        // the art guide's 1024 px texture map
+        texture_size: 1024,
+        inputs: [{ front: views.front }, { left: views.left }, { back: views.back }],
+      });
+      // P1 rejects quad, so it is never sent there
+      expect(posted[1].body.model).toBe('P1-20260311');
+      expect(posted[1].body).not.toHaveProperty('quad');
+      // no size asked, none sent: Tripo's own default
+      expect(posted[1].body).not.toHaveProperty('texture_size');
+    } finally {
+      vi.unstubAllGlobals();
+      if (previousKey === undefined) delete process.env.TRIPO_API_KEY;
+      else process.env.TRIPO_API_KEY = previousKey;
+    }
+  });
+});
+
 describe('asset library paths', () => {
   it('parses skin atlas paths on Windows and POSIX', () => {
     expect(library.skinAtlasPathParts('textures\\skins\\mage\\base.png')).toEqual({
@@ -1132,9 +1194,10 @@ describe('asset library registry parsers', () => {
     const library = await libraryImport;
     const src = readFileSync(join(ROOT, 'src/ui/weapon_variants.ts'), 'utf8');
     const map = library.parseItemVariants(src);
-    // Known shipped facts: worn_sword maps to sword_a; dagger_a serves several items.
-    expect(map.get('sword_a')).toContain('worn_sword');
-    expect((map.get('dagger_a') ?? []).length).toBeGreaterThan(1);
+    // Known shipped facts: worn_sword maps to the starter sword; one field look serves
+    // several items.
+    expect(map.get('sword_starter')).toContain('worn_sword');
+    expect((map.get('sword_field_steel') ?? []).length).toBeGreaterThan(1);
     for (const [key, items] of map) {
       expect(key).toMatch(/^[a-z0-9_]+$/);
       expect(items.length).toBeGreaterThan(0);
@@ -1251,7 +1314,8 @@ describe('asset library registry parsers', () => {
     const library = await libraryImport;
     const src = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
     const map = library.parseVisualUrls(src);
-    expect(map.get('models/chars/players/knight.glb')).toContain('player_warrior');
+    expect(map.get('models/chars/players/woc/base_male.glb')).toContain('player_warrior');
+    expect(map.get('models/chars/players/woc/anims_male.glb')).toContain('player_mage');
     expect(map.get('models/creatures/wolf_basic.glb')).toEqual(
       expect.arrayContaining(['form_ghost_wolf', 'mob_wolf']),
     );
@@ -1264,14 +1328,24 @@ describe('asset library registry parsers', () => {
     const library = await libraryImport;
     const src = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
     const map = library.parseSkinsMap(src);
-    const knightA = map.get('textures/skins/knight/alt_a.png') ?? [];
-    expect(knightA).toEqual(expect.arrayContaining([{ key: 'player_warrior', index: 1 }]));
-    // mage.glb atlases serve priest, mage, and warlock.
-    const mageA = map.get('textures/skins/mage/alt_a.png') ?? [];
-    expect(mageA.map((s: { key: string }) => s.key).sort()).toEqual([
-      'player_mage',
-      'player_priest',
-      'player_warlock',
+    // WOC bodies use their authored atlases; legacy KayKit sheets cannot
+    // be painted onto this UV layout. Keep parser coverage on a direct fixture.
+    expect(map.get('textures/skins/knight/alt_a.png') ?? []).not.toContainEqual({
+      key: 'player_warrior',
+      index: 1,
+    });
+    const fixture = library.parseSkinsMap(
+      [
+        'export const SKINS = {',
+        '  player_example: [null, `${SKINS_DIR}/knight/alt_a.png`, null, `${SKINS_DIR}/knight/alt_b.png`],',
+        '};',
+      ].join('\n'),
+    );
+    expect(fixture.get('textures/skins/knight/alt_a.png')).toEqual([
+      { key: 'player_example', index: 1 },
+    ]);
+    expect(fixture.get('textures/skins/knight/alt_b.png')).toEqual([
+      { key: 'player_example', index: 3 },
     ]);
   });
 
@@ -1291,12 +1365,14 @@ describe('asset library registry parsers', () => {
     for (const want of ['weapons', 'creatures', 'chars/players', 'props', 'skins']) {
       expect(cats.has(want), `category ${want}`).toBe(true);
     }
-    const swordA = assets.find((a: { path: string }) => a.path === 'models/weapons/sword_a.glb');
-    expect(swordA.registration.gripFamily).toBe('VAR_SWORD');
-    expect(swordA.registration.itemIds).toContain('worn_sword');
-    expect(swordA.registration.icon).toBe('ui/weapons/sword_a.jpg');
+    const starterSword = assets.find(
+      (a: { path: string }) => a.path === 'models/weapons/sword_starter.glb',
+    );
+    expect(starterSword.registration.gripFamily).toBe('VAR_SWORD');
+    expect(starterSword.registration.itemIds).toContain('worn_sword');
+    expect(starterSword.registration.icon).toBe('ui/weapons/sword_starter.jpg');
     const knight = assets.find(
-      (a: { path: string }) => a.path === 'models/chars/players/knight.glb',
+      (a: { path: string }) => a.path === 'models/chars/players/woc/base_male.glb',
     );
     expect(knight.registration.visualKeys).toContain('player_warrior');
     expect(knight.registration.referenced).toBe(true);

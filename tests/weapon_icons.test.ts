@@ -63,7 +63,10 @@ describe('painted weapon inventory icons', () => {
     // faction-vendor-icons-2026-09-16), landed by the wq-reputation merge.
     // 141 -> 145: the four Warfare Season 2 honor weapons, painted in
     // warfare-season2-weapons-2026-09-25 (second release/v0.44.0 base merge).
-    expect(baseWeapons).toHaveLength(145);
+    // 148 with the Mirefen world-boss branch's foremans_barrowmaul, skerrits_shardpike
+    // and muster_shardpike. 149 with Balgath's caster spoil, craterglass_stave.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 163.
+    expect(baseWeapons).toHaveLength(163);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -78,7 +81,9 @@ describe('painted weapon inventory icons', () => {
     );
     // 16 with heroic_duskwhisper (aliases the duskwhisper base painting); 19
     // with the three Nythraxis gap-fill one-handers' raid-tier variants.
-    expect(heroics).toHaveLength(19);
+    // 25 with the dungeon rework's six generated Heroic weapons, 30 with the
+    // lower dungeons' normal blues' five.
+    expect(heroics).toHaveLength(30);
     for (const heroic of heroics) {
       expect(WEAPON_IMAGE_IDS.has(heroic.id), heroic.id).toBe(false);
       expect(weaponIconUrl(heroic.id), heroic.id).toBe(
@@ -107,7 +112,10 @@ describe('painted weapon inventory icons', () => {
     // Eight with the faction quartermaster epics' batch
     // (faction-vendor-icons-2026-09-16, asserted below as `factionBatch`), nine
     // with the Warfare Season 2 weapons (warfare-season2-weapons-2026-09-25).
-    expect(weaponBatches).toHaveLength(9);
+    // Twelve with the Mirefen world-boss branch's boss, Shardpike and muster-pike batches.
+    // Thirteen with Balgath's loot batch (balgath-loot-icons-2026-09-28, the staff).
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 19.
+    expect(weaponBatches).toHaveLength(19);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -243,6 +251,83 @@ describe('painted weapon inventory icons', () => {
       'vanguard_verdict_greatsword',
       'vanguard_warstaff',
     ]);
+    // The Mirefen world boss's maul ships in its own batch
+    // (balgath-boss-icons-2026-08-18): a batch that lands after the
+    // historical one OWNS its ids, so the historical batch's frozen scope
+    // excludes them.
+    const bossBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'balgath-boss-icons-2026-08-18',
+    );
+    expect(bossBatch).toBeDefined();
+    const bossWeaponIds = (bossBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(bossWeaponIds).toEqual(['foremans_barrowmaul']);
+    // Same shape again for the Shardpike mechanic batch
+    // (shardpike-mechanic-icons-2026-08-20), whose quest-tool pike gained a
+    // held model and therefore its own painted inventory art.
+    const shardpikeBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'shardpike-mechanic-icons-2026-08-20',
+    );
+    expect(shardpikeBatch).toBeDefined();
+    const shardpikeWeaponIds = (shardpikeBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(shardpikeWeaponIds).toEqual(['skerrits_shardpike']);
+    // And once more for the muster's lent copy (muster-shardpike-icon-2026-09-26).
+    const musterBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'muster-shardpike-icon-2026-09-26',
+    );
+    expect(musterBatch).toBeDefined();
+    const musterWeaponIds = (musterBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(musterWeaponIds).toEqual(['muster_shardpike']);
+    // And for Balgath's loot (balgath-loot-icons-2026-09-28), whose one weapon is the staff.
+    const lootBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'balgath-loot-icons-2026-09-28',
+    );
+    expect(lootBatch).toBeDefined();
+    const lootWeaponIds = (lootBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(lootWeaponIds).toEqual(['craterglass_stave']);
+    // The dungeon rework's weapons ship deterministic SVG compositions in one
+    // batch per dungeon (scripts/generate_<dungeon>_item_icons.mjs).
+    const reworkBatchIds = [
+      'sunken-bastion-icons-2026-09-29',
+      'drowned-temple-icons-2026-09-30',
+      'wildheart-basin-icons-2026-10-02',
+      'gravewyrm-sanctum-icons-2026-10-03',
+      'hollow-crypt-icons-2026-10-03',
+      'lower-dungeon-blues-icons-2026-10-08',
+    ];
+    for (const batchId of reworkBatchIds) {
+      expect(
+        weaponBatches.some((batch) => batch.batchId === batchId),
+        batchId,
+      ).toBe(true);
+    }
+    const reworkWeaponIds = weaponBatches
+      .filter(({ batchId }) => batchId !== undefined && reworkBatchIds.includes(batchId))
+      .flatMap(({ itemIds }) => itemIds.filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)))
+      .sort();
+    expect(reworkWeaponIds).toEqual([
+      'falls_blessed_staff',
+      'fogbinders_rod',
+      'gaolyard_cudgel',
+      'gravecallers_rod',
+      'hammer_of_the_open_lock',
+      'knight_commanders_longsword',
+      'merecleaver',
+      'moonwrack_stave',
+      'rimeweb_fang',
+      'sextons_burial_spade',
+      'sextons_spadehaft',
+      'tideglass_shiv',
+      'tideglass_warmaul',
+      'turnkeys_shank',
+    ]);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
         (id) =>
@@ -253,7 +338,12 @@ describe('painted weapon inventory icons', () => {
           !varkhulWeaponIds.includes(id) &&
           !gapWeaponIds.includes(id) &&
           !factionWeaponIds.includes(id) &&
-          !season2WeaponIds.includes(id),
+          !season2WeaponIds.includes(id) &&
+          !bossWeaponIds.includes(id) &&
+          !shardpikeWeaponIds.includes(id) &&
+          !musterWeaponIds.includes(id) &&
+          !lootWeaponIds.includes(id) &&
+          !reworkWeaponIds.includes(id),
       ),
     );
     expect(
@@ -295,8 +385,11 @@ describe('painted weapon inventory icons', () => {
     // The chunk records are the frozen weapon campaign's generation reports:
     // they slice the pre-integration weapon roster, without the four
     // integration daggers, the two Masterwrought phase 09 weapons, the nine
-    // Crucible raid weapons, or the Ignivar legendary, all of which postdate
-    // the campaign.
+    // Crucible raid weapons, the Ignivar legendary, the Nythraxis gap-fill
+    // one-handers, the Mirefen world-boss maul, or Skerrit's Shardpike, all
+    // of which postdate the campaign and own their own art. Any weapon added
+    // from here on has to be excluded here too, or it shifts every slice
+    // boundary and all four chunk assertions fail at once.
     const campaignExpected = expected.filter(
       (id) =>
         !integrationWeaponIds.includes(id) &&
@@ -305,7 +398,12 @@ describe('painted weapon inventory icons', () => {
         !varkhulWeaponIds.includes(id) &&
         !gapWeaponIds.includes(id) &&
         !factionWeaponIds.includes(id) &&
-        !season2WeaponIds.includes(id),
+        !season2WeaponIds.includes(id) &&
+        !bossWeaponIds.includes(id) &&
+        !shardpikeWeaponIds.includes(id) &&
+        !musterWeaponIds.includes(id) &&
+        !lootWeaponIds.includes(id) &&
+        !reworkWeaponIds.includes(id),
     );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));

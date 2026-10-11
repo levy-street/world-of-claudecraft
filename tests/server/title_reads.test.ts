@@ -101,6 +101,7 @@ describe('PgSocialDb roster/friends reads carry the selected title', () => {
     const p = {
       query: (sql: string) => {
         calls.push(sql);
+        if (sql.includes('FROM pg_index')) return Promise.resolve(result([{ ready: 1 }]));
         return Promise.resolve(result(rows));
       },
     };
@@ -109,12 +110,13 @@ describe('PgSocialDb roster/friends reads carry the selected title', () => {
 
   it('listFriends embeds the literal read and normalizes per row', async () => {
     const { db, calls } = fakePool([
-      { id: 1, name: 'Titled', cls: 'mage', level: 5, realm: 'R', active_title: 'prog_veteran' },
-      { id: 2, name: 'Empty', cls: 'mage', level: 5, realm: 'R', active_title: '' },
-      { id: 3, name: 'Absent', cls: 'mage', level: 5, realm: 'R', active_title: null },
+      { id: 1, name: 'Titled', cls: 'mage', level: 5, realm: 'R', activeTitle: 'prog_veteran' },
+      { id: 2, name: 'Empty', cls: 'mage', level: 5, realm: 'R', activeTitle: '' },
+      { id: 3, name: 'Absent', cls: 'mage', level: 5, realm: 'R', activeTitle: null },
     ]);
     const friends = await db.listFriends(9);
-    expect(calls[0]).toContain(TITLE_SQL_LITERAL);
+    expect(calls[0]).toContain('indisvalid AND indisready');
+    expect(calls[1]).toContain('c.state->>\'activeTitle\' AS "activeTitle"');
     expect(friends.map((f) => f.activeTitle)).toEqual(['prog_veteran', null, null]);
     // the raw column name never leaks onto the wire shape
     expect('active_title' in friends[0]).toBe(false);

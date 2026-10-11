@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'A Bacia de Wildheart',
-    desc: 'Armas marcantes de Zulgar e do Mestre de Feras Senhor das Presas.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroico: A Bacia de Wildheart',
-    desc: 'Épicos exclusivos do modo heroico de Zulgar, Voz da Bacia.',
   },
   conquerors_nythraxis: {
     name: 'Raide de Nythraxis',
@@ -61,6 +59,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, o Pico Desperto',
     desc: 'Espólios épicos pessoais do chefe mundial do Pico Desperto.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, o Capataz Enterrado',
+    desc: 'Espólios arrastados de volta dos túmulos de Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'O Relicário Desmoronado',

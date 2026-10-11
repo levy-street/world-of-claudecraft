@@ -264,6 +264,9 @@ export const shellStrings = {
     character: {
       loading: 'Loading...',
       noneYet: 'No characters yet. Create one below.',
+      membershipRequired: 'Renew your membership to play this character.',
+      membershipSlots: 'Unlock slots with a membership',
+      emptySlot: 'Available character slot',
       levelClass: 'Level {level} {className}',
       inWorld: 'in world',
       takeOver: 'Take Over',
@@ -277,6 +280,8 @@ export const shellStrings = {
       lockoutRaids: 'Raids',
       lockoutDungeons: 'Dungeons',
       lockoutWorldBosses: 'World bosses',
+      // Weekly quests locked until the weekly reset (src/sim/quests/weekly_quest_lock.ts).
+      lockoutWeeklyQuests: 'Weekly quests',
       takeOverConfirm:
         'This will disconnect this character from another session and bring it here. Continue?',
       renameRequired: 'rename required',
