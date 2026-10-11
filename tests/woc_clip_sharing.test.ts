@@ -247,7 +247,7 @@ describe('a clip name resolves through the loadout swap with no closure per call
     // the variant is NOT in the library: the named clip plays
     expect(peek(v).action('1H_Chop')?.getClip().name).toBe('1H_Chop');
     // a name the swap does not mention is itself
-    expect(peek(v).action('Idle')?.getClip().name).toBe('Idle');
+    expect(peek(v).action('Cast_Loop')?.getClip().name).toBe('Cast_Loop');
     // no clip, no name: no action
     expect(peek(v).action('Not_A_Clip')).toBeNull();
     expect(peek(v).action(undefined)).toBeNull();

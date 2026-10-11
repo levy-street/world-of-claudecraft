@@ -39,6 +39,10 @@ async function hunterVisual() {
           'Idle',
           'Walk',
           'Run',
+          // the hand-keyed idle and gaits the WOC bodies play over the rig's own
+          'Woc_Idle',
+          'Woc_Walk',
+          'Woc_Run',
         ].map(clip),
       }),
     ),
@@ -324,7 +328,7 @@ describe('live WOC combat event linkage', () => {
       expect(h.peek.current?.paused).toBe(false);
       expect(h.peek.current?.isRunning()).toBe(true);
       h.visual.update(0.05, { ...state, casting: false, castingAbility: null }, true);
-      expect(h.peek.current?.getClip().name).toBe('Idle');
+      expect(h.peek.current?.getClip().name).toBe('Woc_Idle');
     },
     60000,
   );

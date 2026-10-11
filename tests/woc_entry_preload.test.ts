@@ -31,6 +31,7 @@ import {
 import { loadWocEntryFiles } from '../src/render/characters/woc_entry_preload';
 import { wocHeadCoreUrl } from '../src/render/characters/woc_head_catalog';
 import * as headStore from '../src/render/characters/woc_head_packs';
+import { wocKeyedAnimsUrl } from '../src/render/characters/woc_keyed_animations';
 import { ALL_CLASSES } from '../src/sim/types';
 
 // The network, stubbed once for the file: the loader double keeps the real loader's contract
@@ -112,7 +113,9 @@ async function settled(p: Promise<unknown>): Promise<'pending' | 'resolved' | 'r
   return state;
 }
 
-const isWoc = (url: string): boolean => url.startsWith(`${WOC_SPLIT_DIR}/`);
+// The split files, and the hand-keyed library that rides on them beside that directory.
+const KEYED = new Set((['male', 'female'] as const).map(wocKeyedAnimsUrl));
+const isWoc = (url: string): boolean => url.startsWith(`${WOC_SPLIT_DIR}/`) || KEYED.has(url);
 const BODIES = wocEntryBodyUrls();
 const CORES = wocEntryHeadCoreUrls();
 const CRITICAL = [...BODIES, ...CORES];
@@ -155,6 +158,7 @@ describe('the WOC entry file sets (woc_entry_core.ts)', () => {
     const bodies = (['male', 'female'] as const).flatMap((fit) => [
       wocBaseUrl(fit),
       wocAnimsUrl(fit),
+      wocKeyedAnimsUrl(fit),
     ]);
     expect([...wocEntryBodyUrls()].sort()).toEqual([...bodies].sort());
     expect([...wocEntryHeadCoreUrls()].sort()).toEqual(
@@ -174,11 +178,11 @@ describe('the WOC entry file sets (woc_entry_core.ts)', () => {
 
   it('names only files that ship, and never an armor set or a hairstyle', () => {
     const all = [...wocEntryBodyUrls(), ...wocEntryHeadCoreUrls()];
-    expect(all).toHaveLength(6);
+    expect(all).toHaveLength(8);
     expect(NOT_ENTRY.length).toBeGreaterThan(0);
     for (const url of NOT_ENTRY) expect(all, url).not.toContain(url);
     for (const url of all) {
-      expect(url.startsWith(`${WOC_SPLIT_DIR}/`), url).toBe(true);
+      expect(isWoc(url), url).toBe(true);
       expect(parseWocArmorPackUrl(url), `${url} is an armor file`).toBeNull();
       expect(existsSync(publicPath(url)), `${url} is not on disk`).toBe(true);
       expect(MEDIA_ASSETS[url], `${url} is not in the media manifest`).toBeTruthy();
@@ -187,15 +191,21 @@ describe('the WOC entry file sets (woc_entry_core.ts)', () => {
 
   it('keeps world entry lighter than the player bodies the release preloaded at boot', () => {
     // The release preloaded 10.58 MB of player bodies before the launcher drew (PR 4360
-    // review, census). The whole entry-critical set is under half of that, and a player
+    // review, census). The whole entry-critical set is under half of that (each fit's
+    // hand-keyed movement and autoattack library adds about 0.32 MB), and a player
     // arriving from the launcher already holds their own fit: the other fit is what is added.
     const critical = bytes([...wocEntryBodyUrls(), ...wocEntryHeadCoreUrls()]);
-    expect(critical).toBeLessThan(4.5 * 1024 * 1024);
+    expect(critical).toBeLessThan(5 * 1024 * 1024);
     const fitBytes = (fit: 'male' | 'female'): number =>
-      bytes([wocBaseUrl(fit), wocAnimsUrl(fit), wocHeadCoreUrl(fit === 'female' ? 'b' : 'a')]);
+      bytes([
+        wocBaseUrl(fit),
+        wocAnimsUrl(fit),
+        wocKeyedAnimsUrl(fit),
+        wocHeadCoreUrl(fit === 'female' ? 'b' : 'a'),
+      ]);
     expect(fitBytes('male') + fitBytes('female')).toBe(critical);
     expect(fitBytes('female')).toBeLessThan(2.75 * 1024 * 1024);
-    expect(fitBytes('male')).toBeLessThan(2 * 1024 * 1024);
+    expect(fitBytes('male')).toBeLessThan(2.25 * 1024 * 1024);
   });
 });
 

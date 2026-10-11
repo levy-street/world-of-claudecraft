@@ -234,6 +234,7 @@ import {
   WOC_WARRIOR_MANIFEST,
   type WocCharacterManifest,
 } from './woc_character_manifest';
+import { withWocKeyedAnimations, wocKeyedAnimsUrl } from './woc_keyed_animations';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -794,6 +795,10 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
 // holdable airborne pose, so the rig takes the held-jump treatment (Jump clamps
 // in the air, Land fires on touchdown, Fall flails on a long drop). Walk, Run and
 // Walk_Back are authored at their game speeds (2.2, 7 and 4.55 yd/s).
+// A second library keyed on this exact bind pose rides on top (woc_keyed_animations.ts,
+// players/woc_keyed/): it replaces the idle, gaits, swim, jump take-off, death, four emotes
+// and the white swings; every other slot above keeps the rig's own clip, and the rig's
+// idle fidget is not bound (wocRigClips).
 // NEVER layer a KayKit donor GLB onto this rig: the bone NAMES match, so a
 // Rig_Medium clip binds, but its bind pose does not, and it poses the body wrong.
 // ---------------------------------------------------------------------------
@@ -895,16 +900,21 @@ export const WOC_CONTACTS_FEMALE: Readonly<Record<string, readonly number[]>> = 
  *  grey film at noon and a quarter keeps a hint of sky without it. */
 const WOC_ENV_SHEEN = 0.25;
 
+// The body, the rig's own library, and the hand-keyed movement/emote/autoattack
+// library layered over it (woc_keyed_animations.ts); all three share one bind pose.
 function wocBody(fit: WocFit): Pick<VisualDef, 'url' | 'animUrls' | 'lazyPreload'> {
-  return { url: wocBaseUrl(fit), animUrls: [wocAnimsUrl(fit)], lazyPreload: true };
+  return {
+    url: wocBaseUrl(fit),
+    animUrls: [wocAnimsUrl(fit), wocKeyedAnimsUrl(fit)],
+    lazyPreload: true,
+  };
 }
 
-const woc = (attack: string[]): ClipMap => ({
+// The rig's own clip vocabulary; woc() layers the hand-keyed clips over it.
+const wocRigClips = (attack: string[]): ClipMap => ({
   idle: 'Idle',
-  // A look around now and then while standing (never mid-fight: an engaged body holds
-  // Combat_Idle instead).
-  idleVariants: ['Idle_Look'],
-  idleVariantCadence: { everySec: 14, jitterSec: 8 },
+  // No idle-breaker: the library's Idle_Look opens and closes on this Idle, so over the
+  // keyed idle it put the old stance back for seconds at a time (owner report 2026-10-12).
   combatIdle: 'Combat_Idle',
   walk: 'Walk',
   run: 'Run',
@@ -942,6 +952,8 @@ const woc = (attack: string[]): ClipMap => ({
   dualWieldPair: ['Dual_Cross', 'Dual_Chop'],
   contacts: WOC_CONTACTS,
 });
+
+const woc = (attack: string[]): ClipMap => withWocKeyedAnimations(wocRigClips(attack));
 
 const skeletonClips = (attack: string[], flourish = 'Skeletons_Awaken_Standing'): ClipMap => ({
   ...kaykit(attack, 'Idle_Combat'),
@@ -2523,7 +2535,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warrior: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     // A tenth taller than the KayKit-sized roster (the artist's body reads
     // small at the shared height); the held weapons scale with the rig.
@@ -2609,7 +2621,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_paladin: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2660,7 +2672,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_hunter: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2713,7 +2725,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_rogue: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2761,7 +2773,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_priest: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2810,7 +2822,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_shaman: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2854,7 +2866,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_mage: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2910,7 +2922,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warlock: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2970,7 +2982,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_druid: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,

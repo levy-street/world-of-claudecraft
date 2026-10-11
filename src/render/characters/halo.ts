@@ -73,13 +73,16 @@ function haloGeometry(radius: number): THREE.PlaneGeometry {
 }
 
 /** Build the per-visual halo mesh; the caller parents it to the head bone. */
+/** The halo mesh's name, for the hosts that look it up (the portrait capture hides it). */
+export const CLASS_HALO_NAME = 'class_halo';
+
 export function buildHalo(
   color: number,
   upOffset: number = HALO_UP_OFFSET,
   radius: number = HALO_RADIUS,
 ): THREE.Mesh {
   const mesh = new THREE.Mesh(haloGeometry(radius), haloMaterial(color));
-  mesh.name = 'class_halo';
+  mesh.name = CLASS_HALO_NAME;
   mesh.position.set(0, upOffset, 0);
   mesh.rotation.x = -Math.PI / 2;
   mesh.castShadow = false;

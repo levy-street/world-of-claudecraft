@@ -15,6 +15,7 @@ import {
   onCharacterAssetReady,
   visualAssetsResident,
 } from './assets';
+import { CLASS_HALO_NAME } from './halo';
 import { VISUALS } from './manifest';
 import { type ModularLook, modularSignature } from './modular';
 import { createPortraitCaptureLane } from './portrait_capture_lane_core';
@@ -515,6 +516,16 @@ interface PortraitCaptureRequest {
   commit(url: string): void;
 }
 
+/** A head-and-shoulders portrait does not draw the priest's halo. It glows behind the head
+ *  in the world, and a portrait never showed it (the head hid it); the framing measures the
+ *  hair, helm or hood, so a halo tipped by the idle's head angle would only ride into the
+ *  frame's top edge. */
+function withoutClassHalo(visual: CharacterVisual): CharacterVisual {
+  const halo = visual.root.getObjectByName(CLASS_HALO_NAME);
+  if (halo) halo.visible = false;
+  return visual;
+}
+
 async function capturePortrait(request: PortraitCaptureRequest): Promise<void> {
   const { key, visualKey, framing } = request;
   let prewarmRig: PortraitRig | null = null;
@@ -524,7 +535,7 @@ async function capturePortrait(request: PortraitCaptureRequest): Promise<void> {
     atlasPending: () => request.atlasPending(),
     build: () => {
       prewarmRig = ensureRig();
-      return request.buildVisual();
+      return withoutClassHalo(request.buildVisual());
     },
     // This offscreen context is separate from the world renderer, so atlases
     // resident there still upload here on first draw; prepay them in slices.

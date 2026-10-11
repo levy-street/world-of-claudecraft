@@ -49,6 +49,7 @@ import {
   visualAssetsResident,
 } from '../src/render/characters/assets';
 import { wocAnimsUrl, wocBaseUrl } from '../src/render/characters/woc_armor_core';
+import { wocKeyedAnimsUrl } from '../src/render/characters/woc_keyed_animations';
 
 const PLAYERS = 'models/chars/players';
 
@@ -74,15 +75,20 @@ describe('a host waiting on a body whose fetch failed', () => {
   });
 
   it('is asked for again by the store, 8 s after the failure, with no further ask from the host', async () => {
-    const [base, anims] = [wocBaseUrl('female'), wocAnimsUrl('female')];
+    const [base, anims, keyed] = [
+      wocBaseUrl('female'),
+      wocAnimsUrl('female'),
+      wocKeyedAnimsUrl('female'),
+    ];
     const ready: string[] = [];
     const off = onCharacterAssetReady((url) => ready.push(url));
     // one ask, as a host with no frame loop makes it
     expect(visualAssetsResident('player_warrior_female')).toBe(false);
     wire.fail(base);
     wire.land(anims);
+    wire.land(keyed);
     await advance(0);
-    expect(ready).toEqual([anims]);
+    expect(ready).toEqual([anims, keyed]);
 
     await advance(7_999);
     expect(wire.fetches(base)).toBe(1);
@@ -92,7 +98,7 @@ describe('a host waiting on a body whose fetch failed', () => {
     // it lands: the ready signal the waiting host builds on, and the wait is over
     wire.land(base);
     await advance(0);
-    expect(ready).toEqual([anims, base]);
+    expect(ready).toEqual([anims, keyed, base]);
     expect(visualAssetsResident('player_warrior_female')).toBe(true);
     off();
   });

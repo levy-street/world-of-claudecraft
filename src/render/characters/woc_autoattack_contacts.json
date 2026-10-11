@@ -1,0 +1,24 @@
+{
+  "male": {
+    "Woc_Attack_1H_0": [0.408],
+    "Woc_Attack_1H_1": [0.592],
+    "Woc_Attack_2H_0": [0.691],
+    "Woc_Attack_2H_1": [0.575],
+    "Woc_Attack_Dual": [0.408, 0.408],
+    "Woc_Attack_Dual#main": [0.408],
+    "Woc_Attack_Dual#off": [0.408],
+    "Woc_Attack_Unarmed_0": [0.358],
+    "Woc_Attack_Unarmed_1": [0.358]
+  },
+  "female": {
+    "Woc_Attack_1H_0": [0.458],
+    "Woc_Attack_1H_1": [0.525],
+    "Woc_Attack_2H_0": [0.708],
+    "Woc_Attack_2H_1": [0.558],
+    "Woc_Attack_Dual": [0.458, 0.458],
+    "Woc_Attack_Dual#main": [0.458],
+    "Woc_Attack_Dual#off": [0.458],
+    "Woc_Attack_Unarmed_0": [0.442],
+    "Woc_Attack_Unarmed_1": [0.358]
+  }
+}

@@ -1086,6 +1086,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/weapon_loadout_core.ts',
   'src/render/characters/held_item_size_core.ts',
   'src/render/characters/attack_swing_core.ts',
+  'src/render/characters/woc_autoattack_core.ts',
   'src/render/characters/woc_armor_core.ts',
   'src/render/characters/woc_armor_merge_core.ts',
   'src/render/characters/death_grounding_core.ts',

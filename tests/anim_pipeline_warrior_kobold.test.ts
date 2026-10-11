@@ -57,7 +57,9 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
     // shipped and deliberately unwired.
     const block = manifestBlock('player_warrior: {', 'player_paladin: {');
     expect(block).not.toContain('warrior_ability_anims.glb');
-    expect(block).toContain('animUrls: [`${PLAYERS}/woc/anims_male.glb`]');
+    expect(block).toContain(
+      'animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`]',
+    );
     expect(block).toContain('attackByAbility');
     // Every entry from the earlier PRs and from this batch survives the body swap.
     const preExisting = [

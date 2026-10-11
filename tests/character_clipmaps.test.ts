@@ -5,6 +5,7 @@ import {
   PALADIN_SYNTHESIZED_CLIP_SOURCES,
   synthesizesPaladinClips,
 } from '../src/render/characters/assets';
+import { clipNamesOf } from '../src/render/characters/clip_names';
 import { clipSplitNames } from '../src/render/characters/clip_split';
 import {
   type ClipMap,
@@ -12,7 +13,6 @@ import {
   type VisualDef,
   visualAssetUrlForGraphics,
 } from '../src/render/characters/manifest';
-import { clipNamesOf } from '../src/render/characters/visual';
 
 // A clip name the shipped GLB does not carry fails SILENTLY at every layer:
 // baseAction() falls back, fadeTo()/playOneShot() return early, and the

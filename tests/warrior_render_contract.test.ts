@@ -9,6 +9,7 @@ import {
   weaponAttackStyle,
 } from '../src/render/characters/weapon_attack_style_core';
 import { wocAnimsUrl, wocBaseUrl } from '../src/render/characters/woc_armor_core';
+import { wocKeyedAnimsUrl } from '../src/render/characters/woc_keyed_animations';
 import {
   isMobEngageCue,
   WARRIOR_SHOUT_COLORS,
@@ -27,8 +28,8 @@ describe('winning Warrior attack animation routing', () => {
 
   it('pins winning Warrior hand and ability clips on the WOC rig', () => {
     // The warrior rides the WOC modular body (the male base, its animation
-    // library and the warrior armor set) and plays only that rig's own clip
-    // vocabulary: no KayKit donor clip is ever layered on.
+    // library, the hand-keyed library keyed on the same bind pose, and the warrior
+    // armor set): no KayKit donor clip is ever layered on.
     expect(VISUALS.player_warrior.clips.attackByHand).toEqual({
       twohand: '2H_Chop',
       dualwield: 'Dual_Chop',
@@ -70,8 +71,11 @@ describe('winning Warrior attack animation routing', () => {
     }
     const renderer = readFileSync('src/render/renderer.ts', 'utf8');
     expect(renderer).toContain('this.triggerAttack(ev.sourceId, warriorCast.abilityId, true);');
-    // Its only clip source is the rig's own animation library.
-    expect(VISUALS.player_warrior.animUrls).toEqual([wocAnimsUrl('male')]);
+    // Its only clip sources are the rig's own library and the hand-keyed one.
+    expect(VISUALS.player_warrior.animUrls).toEqual([
+      wocAnimsUrl('male'),
+      wocKeyedAnimsUrl('male'),
+    ]);
   });
 
   it('resolves the preserved KayKit Warrior gestures from their compatible shipped donors', () => {
@@ -192,7 +196,7 @@ describe('winning Warrior cast VFX routing', () => {
   it('the paladin rides the same WOC body with its own armor pack and the same owner rules', () => {
     const pal = VISUALS.player_paladin;
     expect(pal.url).toBe(wocBaseUrl('male'));
-    expect(pal.animUrls).toEqual([wocAnimsUrl('male')]);
+    expect(pal.animUrls).toEqual([wocAnimsUrl('male'), wocKeyedAnimsUrl('male')]);
     expect(pal.wocCharacter?.items.paladin_chest?.nodes).toEqual([
       'Armor_Paladin_Chest_Front',
       'Armor_Paladin_Chest_Back',
@@ -208,7 +212,7 @@ describe('winning Warrior cast VFX routing', () => {
     expect(pal.hideWeaponsWhileSwimming).toBe(true);
     expect(pal.clips.shoutEmote).toBeNull();
     expect(pal.clips.climb).toBe('Climb');
-    expect(pal.clips.run).toBe('Run');
+    expect(pal.clips.run).toBe('Woc_Run');
     // Weapon strikes and interrupts swing; the timed holy bolt releases a cast.
     expect(pal.clips.attackByAbility).toEqual({
       crusader_strike: '1H_Chop',
@@ -233,13 +237,13 @@ describe('winning Warrior cast VFX routing', () => {
     // the KayKit paladin survives as the modular baseline only
     expect(VISUALS.player_paladin_modular.animUrls?.[0]).toBe(KAYKIT_PALADIN.url);
     // One authored stroke at any depth, on the authored lane (no procedural pitch), and the
-    // upright tread whenever the swimmer stops.
-    expect(VISUALS.player_warrior.clips.swim).toBe('Swim');
-    expect(VISUALS.player_warrior.clips.swimSurface).toBe('Swim');
-    expect(VISUALS.player_warrior.clips.swimIdle).toBe('Swim_Idle');
+    // upright tread whenever the swimmer stops (the hand-keyed stroke and tread).
+    expect(VISUALS.player_warrior.clips.swim).toBe('Woc_Swim');
+    expect(VISUALS.player_warrior.clips.swimSurface).toBe('Woc_Swim');
+    expect(VISUALS.player_warrior.clips.swimIdle).toBe('Woc_Swim_Idle');
     expect(VISUALS.player_warrior.hideWeaponsWhileSwimming).toBe(true);
     expect(VISUALS.player_warrior.swimRise?.stroke).toBeCloseTo(-0.65, 6);
-    expect(VISUALS.player_warrior.clips.emote?.flex?.clips[0]).toBe('Flex');
+    expect(VISUALS.player_warrior.clips.emote?.flex?.clips[0]).toBe('Woc_Emote_Flex');
     expect(KAYKIT_KNIGHT_WARRIOR.clips.shoutEmote).toBeUndefined();
     const renderer = readFileSync('src/render/renderer.ts', 'utf8');
     const presentation = readFileSync('src/render/renderer_ability_presentation.ts', 'utf8');

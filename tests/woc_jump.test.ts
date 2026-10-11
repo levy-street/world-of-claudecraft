@@ -22,6 +22,14 @@ vi.mock('../src/render/assets/loader', () => ({
       'Jump_Land',
       'Death',
       'Swim',
+      // the hand-keyed clips the WOC bodies play over the rig's own
+      'Woc_Idle',
+      'Woc_Walk',
+      'Woc_Run',
+      'Woc_Jump',
+      'Woc_Death',
+      'Woc_Swim',
+      'Woc_Swim_Idle',
     ].map((name) => new THREE.AnimationClip(name, name === 'Land' ? 0.6 : 1, [])),
   })),
   loadTexture: vi.fn(async () => new THREE.Texture()),
@@ -66,7 +74,8 @@ describe('WOC jumps hold in the air and land on touchdown', () => {
   it('covers every class and both body types with the held jump, the flail and the landing', () => {
     expect(keys).toHaveLength(18);
     for (const key of keys) {
-      expect(VISUALS[key].clips.jump, key).toBe('Jump');
+      // the hand-keyed take-off holds in the air; the rig's own flail and landing follow
+      expect(VISUALS[key].clips.jump, key).toBe('Woc_Jump');
       expect(VISUALS[key].clips.fall, key).toBe('Fall');
       expect(VISUALS[key].clips.land, key).toBe('Land');
       expect(VISUALS[key].wocCharacter?.animationNames, key).toContain('Land');
@@ -78,17 +87,17 @@ describe('WOC jumps hold in the air and land on touchdown', () => {
     const visual = new Visual(key, 0xffffff, 0);
     for (let jump = 0; jump < 3; jump++) {
       tick(visual, { airborne: true }, 90);
-      expect(current(visual).getClip().name).toBe('Jump');
+      expect(current(visual).getClip().name).toBe('Woc_Jump');
       // standing touchdown: the landing one-shot, then back to the idle
       tick(visual, {});
       expect(current(visual).getClip().name).toBe('Land');
       tick(visual, {}, 60);
-      expect(current(visual).getClip().name).toBe('Idle');
+      expect(current(visual).getClip().name).toBe('Woc_Idle');
       expect(current(visual).getEffectiveWeight()).toBeCloseTo(1);
       // moving touchdown: the landing yields to the run at once
       tick(visual, { airborne: true }, 30);
       tick(visual, { moving: true, running: true, speed: 7 }, 2);
-      expect(current(visual).getClip().name).toBe('Run');
+      expect(current(visual).getClip().name).toBe('Woc_Run');
       tick(visual, {}, 30);
     }
     expect((visual as unknown as MixerView).actions.has('Jump_Land')).toBe(false);
@@ -97,8 +106,8 @@ describe('WOC jumps hold in the air and land on touchdown', () => {
 
   it('enters swimming or death directly after an airborne frame', () => {
     for (const [input, clip] of [
-      [{ swimming: true, moving: true }, 'Swim'],
-      [{ dead: true }, 'Death'],
+      [{ swimming: true, moving: true }, 'Woc_Swim'],
+      [{ dead: true }, 'Woc_Death'],
     ] as const) {
       const visual = new Visual('player_warrior', 0xffffff, 0);
       tick(visual, { airborne: true }, 30);
