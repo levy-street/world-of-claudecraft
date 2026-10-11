@@ -23,11 +23,13 @@ import {
 } from '../src/sim/instances/dungeon_gate_state';
 import { dungeonGateState, setDungeonGatesDevOpen } from '../src/sim/instances/dungeon_gates';
 import { freeInstance, updateDoorTriggers } from '../src/sim/instances/dungeons';
-import { MAX_AGGRO_RADIUS } from '../src/sim/mob/aggro_ranges';
+import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS } from '../src/sim/mob/aggro_ranges';
+import { PATROL_REJOIN_DISTANCE } from '../src/sim/mob/patrol';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
+import { RIFT_ENTRY_CLEAR_RADIUS } from '../src/sim/rift/entry_clearance';
 import { type InstanceSlot, Sim } from '../src/sim/sim';
 import { RES_HP_FRACTION, RESURRECTION_SICKNESS_ID } from '../src/sim/spirit';
-import type { Entity } from '../src/sim/types';
+import { type Entity, PLAYER_INTEREST_DROP_RADIUS } from '../src/sim/types';
 
 const CASES = [
   ['hollow_crypt', ['sexton_marrow'], -82, 116],
@@ -63,11 +65,12 @@ const FIELDS = {
   wildheart_basin: WILDHEART_BASIN_FIELD,
 } as const;
 
-function setup(dungeonId = 'hollow_crypt', heroic = false) {
+function setup(dungeonId = 'hollow_crypt', heroic = false, idleMobTickRadius = 0) {
   const sim = new Sim({
     seed: 99,
     playerClass: 'warrior',
     noPlayer: true,
+    idleMobTickRadius,
     world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
   });
   const pid = sim.addPlayer('warrior', 'Runner');
@@ -185,6 +188,11 @@ function crossDoor(sim: Sim, pid: number, dungeonId: string) {
 function reenter(sim: Sim, pid: number, dungeonId: string) {
   release(sim, pid);
   crossDoor(sim, pid, dungeonId);
+}
+
+/** Ground-plane distance between two points. */
+function gap(a: { x: number; z: number }, b: { x: number; z: number }): number {
+  return Math.hypot(a.x - b.x, a.z - b.z);
 }
 
 function localOf(inst: InstanceSlot, x: number, z: number) {
@@ -642,21 +650,206 @@ describe('dungeon death checkpoints: gates', () => {
 });
 
 describe('dungeon death checkpoints: arrival clearance', () => {
-  it('checks unrostered enemies and the actual maximum aggro boundary', () => {
+  it('clears the wander ring round every home and the aggro ceiling round every body', () => {
+    expect(MAX_AGGRO_RADIUS).toBe(20);
+    expect(MAX_WANDER_RADIUS).toBe(9);
+    expect(RIFT_ENTRY_CLEAR_RADIUS).toBe(29);
     const { sim, pid, inst, player } = setup();
     earn(sim, inst, 'sexton_marrow');
     release(sim, pid);
     const at = localOf(inst, -82, 116);
+    const yard = { x: -82, z: 116 };
+    const door = DUNGEONS[inst.dungeonId].entry;
+    // Unrostered on purpose: a hazard nobody added to the claim is still seen.
     const add = createMob(sim.ctx.nextId++, MOBS.crypt_shambler, 8, {
-      x: at.x + MAX_AGGRO_RADIUS - 0.01,
+      x: at.x + 28.99,
       y: 8,
       z: at.z,
     });
     sim.ctx.addEntity(add);
     expect(inst.mobIds).not.toContain(add.id);
-    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(DUNGEONS[inst.dungeonId].entry);
-    add.pos.x = at.x + MAX_AGGRO_RADIUS;
-    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: -82, z: 116 });
+    const place = (home: number, body: number) => {
+      add.spawnPos = { x: at.x + home, y: 8, z: at.z };
+      add.pos = { x: at.x + body, y: 8, z: at.z };
+      add.prevPos = { ...add.pos };
+      sim.ctx.rebucket(add);
+      return dungeonReentryPoint(sim.ctx, inst, player);
+    };
+    // Standing on its home: refused a hair inside the clearance, offered on it.
+    expect(place(28.99, 28.99)).toEqual(door);
+    expect(place(29, 29)).toEqual(yard);
+    // A wanderer is judged by its home, not by where it is right now: at the far
+    // edge of a ring that reaches well inside the ceiling it still refuses...
+    expect(place(20, 29)).toEqual(door);
+    expect(place(28.99, 37.9)).toEqual(door);
+    // ...and at the near edge of a ring that stops on the ceiling it does not.
+    expect(place(29, 20)).toEqual(yard);
+    // A body inside the ceiling right now refuses, however far its home.
+    expect(place(60, 19.99)).toEqual(door);
+    expect(place(60, 20)).toEqual(yard);
+  });
+
+  it('measures a patrol by its loop, with room for the corner it cuts', () => {
+    expect(PATROL_REJOIN_DISTANCE).toBe(4);
+    const reach = MAX_AGGRO_RADIUS + PATROL_REJOIN_DISTANCE;
+    const { sim, pid, inst, player } = setup();
+    earn(sim, inst, 'sexton_marrow');
+    release(sim, pid);
+    const at = localOf(inst, -82, 116);
+    const yard = { x: -82, z: 116 };
+    const door = DUNGEONS[inst.dungeonId].entry;
+    // The patroller itself stands far off: only its loop comes near the yard.
+    const walker = createMob(sim.ctx.nextId++, MOBS.crypt_shambler, 8, {
+      x: at.x + 70,
+      y: 8,
+      z: at.z,
+    });
+    sim.ctx.addEntity(walker);
+    inst.mobIds.push(walker.id);
+    const loopAt = (d: number) => ({
+      points: [
+        { x: at.x + d, z: at.z - 40 },
+        { x: at.x + d, z: at.z + 40 },
+        { x: at.x + 70, z: at.z + 40 },
+        { x: at.x + 70, z: at.z - 40 },
+      ],
+      offset: 0,
+      pace: 0.4,
+    });
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(yard);
+    walker.dungeonPatrol = loopAt(reach - 0.01);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(door);
+    walker.dungeonPatrol = loopAt(reach);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(yard);
+    // A patrol has no wander ring: its spawn point inside the home clearance
+    // does not refuse a point its loop stays clear of.
+    walker.spawnPos = { x: at.x + reach, y: 8, z: at.z };
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(yard);
+    // The same mob without a loop, standing in the ring round that spawn point,
+    // is a wanderer homed too close.
+    walker.dungeonPatrol = undefined;
+    walker.pos = { x: at.x + reach + MAX_WANDER_RADIUS, y: 8, z: at.z };
+    sim.ctx.rebucket(walker);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(door);
+    // A loop that only a dead patroller walked refuses nothing.
+    walker.dungeonPatrol = loopAt(reach - 0.01);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(door);
+    handleDeath(sim.ctx, walker, null);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(yard);
+  });
+
+  it('a wanderer on the edge of the clearance never reaches an arrival', () => {
+    const { sim, pid, inst, player } = setup();
+    earn(sim, inst, 'sexton_marrow');
+    const at = localOf(inst, -82, 116);
+    const home = sim.ctx.groundPos(at.x, at.z - RIFT_ENTRY_CLEAR_RADIUS);
+    const wanderer = createMob(sim.ctx.nextId++, MOBS.crypt_shambler, 8, home);
+    sim.ctx.addEntity(wanderer);
+    inst.mobIds.push(wanderer.id);
+    // The worst arrival: low enough that the wanderer sees it from the full ceiling.
+    sim.setPlayerLevel(1, pid);
+    expect(
+      MOBS.crypt_shambler.aggroRadius + (wanderer.level - player.level) * 1.5,
+    ).toBeGreaterThanOrEqual(MAX_AGGRO_RADIUS);
+    reenter(sim, pid, inst.dungeonId);
+    expectLocal(sim, pid, inst, -82, 116);
+    let nearest = Infinity;
+    let strayed = 0;
+    for (let i = 0; i < 20 * 60; i++) {
+      sim.tick();
+      nearest = Math.min(nearest, gap(wanderer.pos, player.pos));
+      strayed = Math.max(strayed, gap(wanderer.pos, home));
+      expect(player.inCombat).toBe(false);
+      expect(wanderer.inCombat).toBe(false);
+    }
+    // It did wander, inside the ring the clearance allows for, so it never came
+    // inside the ceiling.
+    expect(strayed).toBeGreaterThan(1);
+    expect(strayed).toBeLessThanOrEqual(MAX_WANDER_RADIUS + 0.5);
+    expect(nearest).toBeGreaterThanOrEqual(MAX_AGGRO_RADIUS);
+  });
+
+  // The tightest real case: the aisle patrol q2 turns 18 yd short of the loft.
+  // Run on a host that ticks every idle mob and on one that culls them out of
+  // sight of every player (the server and the offline client), where the patrol
+  // stands frozen at the far end of the nave while the spirit runs back.
+  it.each([0, PLAYER_INTEREST_DROP_RADIUS])(
+    'refuses a point a living patrol walks past, wherever it is now (idle cull %i)',
+    (idleMobTickRadius) => {
+      const { sim, pid, inst, player } = setup('hollow_crypt', false, idleMobTickRadius);
+      earn(sim, inst, ...LOFT_BOSSES);
+      killPacks(sim, inst, 'q1', 'ilvane');
+      const patrol = packMobs(sim, inst, ['q2']);
+      expect(patrol.length).toBeGreaterThan(0);
+      const loft = localOf(inst, 0, 162);
+      const before = patrol.map((mob) => ({ ...mob.pos }));
+      release(sim, pid);
+      for (let i = 0; i < 20 * 40; i++) sim.tick();
+      const walked = patrol.some((mob, i) => gap(mob.pos, before[i]) > 1);
+      expect(walked).toBe(idleMobTickRadius === 0);
+      if (idleMobTickRadius > 0) {
+        // Frozen out of sight: no mob stands anywhere near the loft right now.
+        for (const mob of patrol) {
+          expect(gap(mob.pos, loft)).toBeGreaterThan(RIFT_ENTRY_CLEAR_RADIUS);
+        }
+      }
+      crossDoor(sim, pid, inst.dungeonId);
+      expectLocal(sim, pid, inst, 80, 112);
+      let nearestToLoft = Infinity;
+      for (let i = 0; i < 20 * 40; i++) {
+        sim.tick();
+        expect(player.inCombat).toBe(false);
+        for (const mob of patrol) {
+          expect(mob.inCombat).toBe(false);
+          nearestToLoft = Math.min(nearestToLoft, gap(mob.pos, loft));
+        }
+      }
+      // Meanwhile the patrol came round inside the aggro ceiling of the loft...
+      expect(nearestToLoft).toBeLessThan(MAX_AGGRO_RADIUS);
+      // ...where it does see a low arrival: the refusal is not caution for its own sake.
+      const visitor = sim.addPlayer('warrior', 'Visitor');
+      const body = sim.entities.get(visitor)!;
+      expect(body.level).toBe(1);
+      standAt(sim, body, loft.x, loft.z);
+      let seen = false;
+      for (let i = 0; i < 20 * 60 && !seen; i++) {
+        sim.tick();
+        seen = patrol.some((mob) => mob.aggroTargetId === visitor);
+      }
+      expect(seen).toBe(true);
+      killPacks(sim, inst, 'q2');
+      reenter(sim, pid, inst.dungeonId);
+      expectLocal(sim, pid, inst, 0, 162);
+    },
+  );
+
+  it('lands beside a living patrol whose loop stays outside the aggro ceiling', () => {
+    const { sim, pid, inst, player } = setup('gravewyrm_sanctum');
+    earn(sim, inst, 'korgath_the_bound', 'grand_necromancer_velkhar');
+    // The shore patrol pd lives: its loop passes 28 yd from the Vault's point.
+    const patrol = packMobs(sim, inst, ['pd']);
+    expect(patrol.length).toBeGreaterThan(0);
+    const vault = localOf(inst, 0, 107);
+    // The point is offered at every phase of the lap, the nearest included: the
+    // answer does not turn on where the patrol happens to be.
+    release(sim, pid);
+    let nearest = Infinity;
+    for (let i = 0; i < 20 * 120; i++) {
+      sim.tick();
+      expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: 0, z: 107 });
+      for (const mob of patrol) nearest = Math.min(nearest, gap(mob.pos, vault));
+    }
+    expect(nearest).toBeLessThan(RIFT_ENTRY_CLEAR_RADIUS);
+    expect(nearest).toBeGreaterThanOrEqual(MAX_AGGRO_RADIUS + PATROL_REJOIN_DISTANCE);
+    // And the arrival is left alone for another lap and more.
+    crossDoor(sim, pid, inst.dungeonId);
+    expectLocal(sim, pid, inst, 0, 107);
+    for (let i = 0; i < 20 * 120; i++) {
+      sim.tick();
+      expect(player.inCombat).toBe(false);
+      for (const mob of patrol) expect(mob.inCombat).toBe(false);
+    }
+    expectLocal(sim, pid, inst, 0, 107);
   });
 });
 
