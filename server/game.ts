@@ -487,6 +487,7 @@ import {
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { activeWorldBossIdsWireJson } from './world_boss_wire';
+import { forfeitWorldPvpFightOnSessionDeparture } from './world_pvp_departure';
 import { recordWorldQuestScoreEvent } from './world_quest_leaderboard';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -3773,8 +3774,8 @@ export class GameServer {
     session.linkdead = true;
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
-    // Stop any held movement now; the sim keeps ticking this entity (it can
-    // still be attacked, healed, or die while linkdead, like any player).
+    // Forfeit a live world fight, then stop held movement (a linkdead body can still die).
+    forfeitWorldPvpFightOnSessionDeparture(this.sim, session.pid);
     stopDisconnectedPlayerInput(this.sim, session.pid);
     // Safety flush so a process crash during the grace window loses nothing.
     void this.saveCharacter(session, { withMarket: opts.withMarket ?? true }).catch((err) =>
@@ -5801,9 +5802,9 @@ export class GameServer {
     characterId: number,
   ): Promise<'taken-over' | 'not-online'> {
     const session = this.sessionByCharacterId(characterId);
-    // Ownership is also enforced at the REST layer; re-check here so this method
-    // can never disconnect a session that belongs to another account.
+    // Ownership re-checked here as at the REST layer; a live world fight is forfeited.
     if (!session || session.accountId !== accountId) return 'not-online';
+    forfeitWorldPvpFightOnSessionDeparture(this.sim, session.pid);
     await this.kickSession(session, 'character taken over', 'character taken over');
     return 'taken-over';
   }
@@ -6127,10 +6128,9 @@ export class GameServer {
     const msg = rawMsg as ClientMessage;
     const sim = this.sim;
     const pid = session.pid;
-    // Deliberate logout: the client wants a clean leave, not a linkdead grace.
-    // Calling leave() immediately sets session.left = true, so the subsequent
-    // WebSocket close event (from the page reload) is a no-op in socketClosed().
+    // Deliberate logout: a clean leave, no linkdead grace (leave() sets session.left).
     if (msg.t === 'logout') {
+      forfeitWorldPvpFightOnSessionDeparture(sim, pid);
       void this.leave(session, 'logout');
       return;
     }
