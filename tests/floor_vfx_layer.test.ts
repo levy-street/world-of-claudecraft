@@ -239,6 +239,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/umbral_anchor_marker.ts', layer: 'player', strict: true },
   { file: 'src/render/warlock_meteor_fx.ts', layer: 'player', strict: true },
   { file: 'src/render/sentence_vfx.ts', layer: 'player', strict: true },
+  // Gloamveil's shadow pool, its wake and the entry's shock ring: the one
+  // NORMAL-blended player piece that darkens what it covers, on two rungs no
+  // other module's stack reaches, so it never ties with an additive glow.
+  { file: 'src/render/gloam_pool.ts', layer: 'player', strict: true },
   // The player's own click-to-move marker and AoE landing flash: normal-blended
   // feedback, so it rides the TOP of the player band rather than the reticle
   // band, and never covers a telegraph.
@@ -401,6 +405,9 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/drain_life_vfx.ts',
   'src/render/evil_eye_markers.ts',
   'src/render/fireball_travel_visual.ts',
+  // Gloamveil's dark smoke cloud: rising puffs, depth-tested, on the fixed
+  // order just under the additive particle cloud (vfx.ts) it shares glints with.
+  'src/render/gloam_smoke.ts',
   'src/render/goblin_rocket_sled_fx.ts',
   'src/render/ice_block_visual.ts',
   'src/render/mage_barrier_visual.ts',

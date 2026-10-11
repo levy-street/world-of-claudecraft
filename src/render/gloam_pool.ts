@@ -1,0 +1,440 @@
+// Gloamveil's living shadow pool: a dark stain on the ground under the Shadow
+// priest that ripples and throws out tendrils, leaves a short fading wake of
+// smaller stains where the priest just walked, and on the entry erupts past
+// its rest size while a ring of shadow races out over the floor.
+//
+// World-space, never parented to a rig (a rig turns, scales and bobs; a stain
+// on the floor does not). Each stain is a small grid DRAPED on the real floor
+// through the renderer's own seed-bound ground sampler, the one every other
+// floor effect is handed. The decisions (where it lies, what a vertex does
+// where the floor breaks away, when it may be laid again) are the pure
+// gloam_pool_core.ts; this file is the meshes.
+//
+// Every stain of every pool draws with ONE of two materials (the pool's and
+// the ring's), which the field builds once and links behind its compile gate
+// (gloam_field.ts). What differs per stain (its opacity, its growth, its seed)
+// is written into that material's uniforms in the stain's own onBeforeRender,
+// three's sanctioned path for per-object uniforms on a shared ShaderMaterial,
+// so a pool appearing or a wake stain dropping mints no material.
+
+import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
+import {
+  createGloamFloor,
+  createGloamWake,
+  GLOAM_BREAK_HEIGHT,
+  GLOAM_POOL_FADE,
+  GLOAM_POOL_LIFT,
+  GLOAM_POOL_SIZE,
+  GLOAM_RING_SIZE,
+  GLOAM_WAKE_SECONDS,
+  GLOAM_WAKE_SIZE,
+  type GloamDrapeBudget,
+  gloamDrapeFade,
+  gloamDrapeHeight,
+  gloamEruptGrow,
+  gloamFloorInto,
+  gloamRedrapeDue,
+  gloamRingAt,
+  gloamWakeAlpha,
+  gloamWakeGrow,
+  gloamWakeStep,
+} from './gloam_pool_core';
+import { setRenderCategory } from './renderer_diagnostics';
+
+/** Cells along one side of a wake stain and of the shock ring. */
+const WAKE_CELLS = 6;
+const RING_CELLS = 18;
+/**
+ * The pool and its wake take a rung of the player band no other module's
+ * normal-blended floor piece uses, and the ring the one above: a stain that
+ * DARKENS must not share a rung with an additive glow, or the pair would swap
+ * which one covers the other as the camera orbits. Every encounter telegraph
+ * still paints over both.
+ */
+const POOL_STEP = 7;
+const RING_STEP = 8;
+
+const VERTEX_SHADER = /* glsl */ `
+  attribute float aFade;
+  varying vec2 vUv;
+  varying float vFade;
+  void main() {
+    vUv = uv * 2.0 - 1.0;
+    vFade = aFade;
+    // Camera-relative (modelViewMatrix is composed on the CPU in doubles), then
+    // pulled a hand toward the camera along its own view ray: same pixels,
+    // always in front of the floor it lies on, on any slope and at any world
+    // coordinate (a dungeon instance sits a hundred thousand yards out).
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    float dc = max(length(mv.xyz), 1e-3);
+    mv.xyz -= mv.xyz * (min(0.16, dc * 0.25) / dc);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const POOL_FRAGMENT_SHADER = /* glsl */ `
+  varying vec2 vUv;
+  varying float vFade;
+  uniform float uClock;
+  uniform float uAlpha;
+  uniform float uSeed;
+  uniform float uGrow;
+  void main() {
+    float r = length(vUv) / uGrow;
+    float a = atan(vUv.y, vUv.x + 1e-6); // guarded: atan(0,0) is undefined
+    float t = uClock;
+    // tendrils: the rim reaches out in pointed lobes that stretch and draw back
+    float reach =
+      0.24 * pow(clamp(0.5 + 0.5 * sin(a * 5.0 + uSeed + 0.8 * sin(t * 0.7 + a * 2.0)), 0.0, 1.0), 3.0) *
+        (0.6 + 0.4 * sin(t * 1.1 + a * 3.0 + uSeed)) +
+      0.2 * pow(clamp(0.5 + 0.5 * sin(a * 9.0 - t * 0.9 + uSeed * 2.0), 0.0, 1.0), 4.0) *
+        (0.55 + 0.45 * sin(t * 1.9 - a * 2.0)) +
+      0.05 * sin(t * 1.6 + a * 3.0);
+    float edge = 0.4 + reach;
+    float body = 1.0 - smoothstep(edge - 0.14, edge, r);
+    float alpha = body * 0.88 * uAlpha * vFade;
+    if (alpha < 0.01) discard;
+    // slow rings rolling outward across the surface
+    float ripple = 0.5 + 0.5 * sin(r * 16.0 - t * 2.0 + uSeed);
+    float rim = smoothstep(edge - 0.2, edge - 0.03, r) * body;
+    vec3 col = mix(vec3(0.045, 0.02, 0.09), vec3(0.006, 0.003, 0.012), body);
+    col += vec3(0.2, 0.07, 0.5) * rim * 0.55;
+    col += vec3(0.03, 0.012, 0.07) * ripple * 0.3 * body;
+    gl_FragColor = vec4(col, alpha);
+  }
+`;
+
+// The shock ring: a band of darkness racing outward over the floor, a violet
+// edge leading it and a thinning wash of shadow left inside.
+const RING_FRAGMENT_SHADER = /* glsl */ `
+  varying vec2 vUv;
+  varying float vFade;
+  uniform float uClock;
+  uniform float uAlpha;
+  uniform float uSeed;
+  uniform float uGrow;
+  void main() {
+    float r = length(vUv);
+    float a = atan(vUv.y, vUv.x + 1e-6); // guarded: atan(0,0) is undefined
+    float front = uGrow * (0.94 + 0.06 * sin(a * 11.0 + uSeed));
+    float band = smoothstep(front - 0.2, front - 0.02, r) * (1.0 - smoothstep(front, front + 0.03, r));
+    float wash = (1.0 - smoothstep(0.0, front, r)) * 0.35;
+    float edge = smoothstep(front - 0.05, front, r) * (1.0 - smoothstep(front, front + 0.03, r));
+    float alpha = max(band * 0.9, wash) * uAlpha * vFade;
+    if (alpha < 0.01) discard;
+    vec3 col = vec3(0.008, 0.004, 0.018) + vec3(0.42, 0.16, 1.0) * edge * 0.9;
+    gl_FragColor = vec4(col, alpha);
+  }
+`;
+
+/** The two materials every stain draws with, and the clock they share. */
+export interface GloamFloorMaterials {
+  pool: THREE.ShaderMaterial;
+  ring: THREE.ShaderMaterial;
+  /** Seconds for the tendrils and ripples; held still under reduced motion. */
+  clock: { value: number };
+}
+
+function floorMaterial(fragmentShader: string, clock: { value: number }): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.NormalBlending,
+    uniforms: {
+      uClock: clock,
+      uAlpha: { value: 0 },
+      uSeed: { value: 0 },
+      uGrow: { value: 1 },
+    },
+    vertexShader: VERTEX_SHADER,
+    fragmentShader,
+  });
+}
+
+export function createGloamFloorMaterials(): GloamFloorMaterials {
+  const clock = { value: 0 };
+  const pool = floorMaterial(POOL_FRAGMENT_SHADER, clock);
+  pool.name = 'gloam_pool';
+  const ring = floorMaterial(RING_FRAGMENT_SHADER, clock);
+  ring.name = 'gloam_ring';
+  return { pool, ring, clock };
+}
+
+/** One draped stain. */
+interface Stain {
+  mesh: THREE.Mesh;
+  geometry: THREE.PlaneGeometry;
+  position: Float32Array;
+  fade: Float32Array;
+  alpha: number;
+  grow: number;
+  seed: number;
+  /** Seconds a wake stain has left. */
+  life: number;
+}
+
+function makeStain(
+  material: THREE.ShaderMaterial,
+  size: number,
+  cells: number,
+  seed: number,
+  step: number,
+): Stain {
+  const geometry = new THREE.PlaneGeometry(size, size, cells, cells);
+  geometry.rotateX(-Math.PI / 2);
+  const position = geometry.getAttribute('position') as THREE.BufferAttribute;
+  const fade = new THREE.BufferAttribute(new Float32Array(position.count).fill(1), 1);
+  geometry.setAttribute('aFade', fade);
+  // Draping moves vertices by at most the break height, so one fixed bound
+  // covers every lay and the stain culls without a recompute.
+  geometry.boundingSphere = new THREE.Sphere(
+    new THREE.Vector3(),
+    size * Math.SQRT1_2 + GLOAM_BREAK_HEIGHT + 0.2,
+  );
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.renderOrder = floorVfxRenderOrder('player', step);
+  mesh.visible = false;
+  setRenderCategory(mesh, 'vfx');
+  const stain: Stain = {
+    mesh,
+    geometry,
+    position: position.array as Float32Array,
+    fade: fade.array as Float32Array,
+    alpha: 0,
+    grow: 1,
+    seed,
+    life: 0,
+  };
+  const uniforms = material.uniforms;
+  mesh.onBeforeRender = () => {
+    uniforms.uAlpha.value = stain.alpha;
+    uniforms.uGrow.value = stain.grow;
+    uniforms.uSeed.value = stain.seed;
+    material.uniformsNeedUpdate = true;
+  };
+  return stain;
+}
+
+/** A hidden stain on each floor material, so a compile of the field's root
+ *  links both programs with the mesh shape the live stains draw. */
+export function buildGloamFloorStandIns(materials: GloamFloorMaterials): THREE.Mesh[] {
+  const pool = makeStain(materials.pool, 1, 1, 0, POOL_STEP).mesh;
+  pool.name = 'gloam_pool:stand-in';
+  const ring = makeStain(materials.ring, 1, 1, 0, RING_STEP).mesh;
+  ring.name = 'gloam_ring:stand-in';
+  return [pool, ring];
+}
+
+/** Ground samples one lay of `stain` costs. */
+function drapeCost(stain: Stain): number {
+  return stain.position.length / 3;
+}
+
+/** Lay `stain` on the floor around (x, z), whose own floor is `baseY`. */
+function drape(
+  stain: Stain,
+  x: number,
+  z: number,
+  baseY: number,
+  flat: boolean,
+  groundY: (x: number, z: number) => number,
+): void {
+  const position = stain.position;
+  const fade = stain.fade;
+  stain.mesh.position.set(x, baseY + GLOAM_POOL_LIFT, z);
+  for (let i = 0, v = 0; i < position.length; i += 3, v++) {
+    if (flat) {
+      position[i + 1] = 0;
+      fade[v] = 1;
+      continue;
+    }
+    const rise = groundY(x + position[i], z + position[i + 2]) - baseY;
+    position[i + 1] = gloamDrapeHeight(rise);
+    fade[v] = gloamDrapeFade(rise);
+  }
+  stain.geometry.getAttribute('position').needsUpdate = true;
+  stain.geometry.getAttribute('aFade').needsUpdate = true;
+}
+
+function disposeStain(stain: Stain): void {
+  stain.mesh.removeFromParent();
+  stain.geometry.dispose();
+}
+
+const ringScratch = { grow: 0, alpha: 0 };
+
+/** The pool, wake and entry ring of one wearer. Owns its geometries; the two
+ *  materials belong to the field. */
+export class GloamPool {
+  private readonly pool: Stain;
+  private readonly wake: Stain[] = [];
+  private ring: Stain | null = null;
+  private readonly floor = createGloamFloor();
+  private readonly trail = createGloamWake();
+  /** Seconds into the entry; past it the pool rests. */
+  private eruptAge = Number.POSITIVE_INFINITY;
+  private ringPending = false;
+  /** Where, and how, the pool was last laid. */
+  private laidX = Number.NaN;
+  private laidY = Number.NaN;
+  private laidZ = Number.NaN;
+  private laidFlat = false;
+  private fadeIn = 0;
+  /** A wearer was presented since the last animate. */
+  private present = false;
+
+  constructor(
+    private readonly parent: THREE.Object3D,
+    private readonly materials: GloamFloorMaterials,
+    cells: number,
+  ) {
+    this.pool = makeStain(materials.pool, GLOAM_POOL_SIZE, cells, 1.7, POOL_STEP);
+    this.pool.mesh.name = 'gloam_pool';
+    parent.add(this.pool.mesh);
+  }
+
+  /** The form was seen starting: erupt, and send the ring out if `ring`. */
+  enter(ring: boolean): void {
+    this.eruptAge = 0;
+    this.ringPending = ring;
+  }
+
+  /**
+   * A frame in which the wearer is presented: follow it at (x, z), its feet at
+   * `feetY`. `draped` is false past the range where a draped grid is worth its
+   * samples: the pool then lies flat. `wakeStains` is how many stains the wake
+   * may hold (0: none), and `budget` the frame's shared allowance of ground
+   * samples. Call `animate` after it, every frame.
+   */
+  follow(
+    x: number,
+    feetY: number,
+    z: number,
+    settled: boolean,
+    draped: boolean,
+    wakeStains: number,
+    groundY: (x: number, z: number) => number,
+    budget: GloamDrapeBudget,
+  ): void {
+    const floor = gloamFloorInto(groundY(x, z), feetY, settled, this.floor);
+    const flat = floor.flat || !draped;
+    const base = floor.baseY;
+    const pool = this.pool;
+    this.present = true;
+
+    if (this.ringPending) {
+      // Laid once, where the form began. It is charged to the allowance and
+      // never refused: an entry is one lay, and it must not arrive late.
+      this.ringPending = false;
+      this.ring ??= this.makeRing();
+      budget.take(drapeCost(this.ring));
+      drape(this.ring, x, z, base, flat, groundY);
+    }
+
+    if (flat) {
+      // One flat lay serves every later frame: only the mesh moves.
+      if (this.laidFlat) pool.mesh.position.set(x, base + GLOAM_POOL_LIFT, z);
+      else this.lay(x, z, base, true, groundY);
+    } else if (this.laidFlat || gloamRedrapeDue(x, base, z, this.laidX, this.laidY, this.laidZ)) {
+      if (budget.take(drapeCost(pool))) this.lay(x, z, base, false, groundY);
+      // The allowance is spent: slide on the lay it has. It is laid properly
+      // on a later frame (the field rotates who is served first).
+      else pool.mesh.position.set(x, base + GLOAM_POOL_LIFT, z);
+    }
+
+    const drop = gloamWakeStep(this.trail, x, z, draped ? wakeStains : 0);
+    if (drop < 0) return;
+    while (this.wake.length <= drop) this.wake.push(this.makeWake(this.wake.length));
+    const stain = this.wake[drop];
+    // Dropped only by a wearer on its floor (one in the air leaves no print),
+    // and a stain the allowance cannot lay is simply not dropped.
+    if (floor.presence < 1 || !(flat || budget.take(drapeCost(stain)))) return;
+    const dropX = this.trail.dropX;
+    const dropZ = this.trail.dropZ;
+    drape(stain, dropX, dropZ, flat ? base : groundY(dropX, dropZ), flat, groundY);
+    stain.mesh.visible = true;
+    stain.life = GLOAM_WAKE_SECONDS;
+  }
+
+  /**
+   * Every frame, presented or not: the pool fades in under a wearer and out
+   * once nobody reports one (the form ended, or the wearer left the view),
+   * the entry runs its course and the wake thins.
+   */
+  animate(dt: number): void {
+    const step = this.present ? dt : -dt;
+    this.present = false;
+    this.fadeIn = Math.min(1, Math.max(0, this.fadeIn + step / GLOAM_POOL_FADE));
+    this.eruptAge += dt;
+    const presence = this.floor.presence;
+    const pool = this.pool;
+    pool.alpha = this.fadeIn * presence;
+    pool.grow = gloamEruptGrow(this.eruptAge);
+    pool.mesh.visible = pool.alpha > 0.004;
+    if (this.ring) {
+      const shown = gloamRingAt(this.eruptAge, ringScratch);
+      this.ring.mesh.visible = shown;
+      this.ring.grow = ringScratch.grow;
+      this.ring.alpha = shown ? ringScratch.alpha * presence : 0;
+    }
+    for (const stain of this.wake) {
+      if (stain.life <= 0) continue;
+      stain.life -= dt;
+      if (stain.life <= 0) {
+        stain.mesh.visible = false;
+        continue;
+      }
+      const left = stain.life / GLOAM_WAKE_SECONDS;
+      stain.alpha = gloamWakeAlpha(left);
+      stain.grow = gloamWakeGrow(left);
+    }
+  }
+
+  private lay(
+    x: number,
+    z: number,
+    base: number,
+    flat: boolean,
+    groundY: (x: number, z: number) => number,
+  ): void {
+    drape(this.pool, x, z, base, flat, groundY);
+    this.laidX = x;
+    this.laidY = base;
+    this.laidZ = z;
+    this.laidFlat = flat;
+  }
+
+  private makeRing(): Stain {
+    const ring = makeStain(this.materials.ring, GLOAM_RING_SIZE, RING_CELLS, 3.1, RING_STEP);
+    ring.mesh.name = 'gloam_ring';
+    this.parent.add(ring.mesh);
+    return ring;
+  }
+
+  private makeWake(index: number): Stain {
+    const stain = makeStain(
+      this.materials.pool,
+      GLOAM_WAKE_SIZE,
+      WAKE_CELLS,
+      index * 2.3 + 0.4,
+      POOL_STEP,
+    );
+    stain.mesh.name = 'gloam_wake';
+    this.parent.add(stain.mesh);
+    return stain;
+  }
+
+  /** Meshes this pool has in the scene (the pool, its ring, its wake). */
+  get stainCount(): number {
+    return 1 + (this.ring ? 1 : 0) + this.wake.length;
+  }
+
+  dispose(): void {
+    disposeStain(this.pool);
+    if (this.ring) disposeStain(this.ring);
+    for (const stain of this.wake) disposeStain(stain);
+    this.wake.length = 0;
+    this.ring = null;
+  }
+}

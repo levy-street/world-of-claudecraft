@@ -3009,7 +3009,7 @@ export class Renderer {
     const vfxAnchor = createVfxAnchor(fillVfxPose);
     const offsetVfxAnchor = createOffsetVfxAnchor(fillVfxPose);
     bd('scene-misc');
-    this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor);
+    this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor, this.groundSample, gate);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
     this.farmPatchVisuals = new FarmPatchVisuals(
@@ -11159,7 +11159,7 @@ export class Renderer {
           else if (hasLichAura && !this.reducedMotion()) {
             this.vfx.lichAura(e.id, dt, soulFragments);
           } else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
-          else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
+          else if (hasShadowform) this.vfx.gloam.wearer(e.id, active.gloamCue(), settled, d2, ay);
           // orange worn-gear motes: STATIC-preset-gated sheddable prestige
           if (e.kind === 'player' && gfxTierAtLeast(GFX.effectsTier, 'medium')) {
             if (v.legendaryRegaliaRef !== e.equippedInstances) {

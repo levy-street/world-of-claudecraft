@@ -101,6 +101,31 @@ COSMETIC (may be tiered down on lower presets):
   pooled cloud's own governor quality floor. Suppressed under the viewer's
   prefers-reduced-motion setting, the lich-aura precedent (an accessibility choice by the
   viewer, not a graphics shed).
+- The richness around the Shadow priest's form, Gloamveil (`src/render/gloam_field_core.ts`
+  `gloamPlan`, drawn by `src/render/gloam_field.ts`). WHAT A PLAYER READS is the body: the dark
+  legs with their pointed edge, the violet halo, the dark closing over the body at the shift and
+  climbing while the priest casts. That is a shader layer every rig material carries
+  (`src/render/characters/gloam_climb.ts`), so it draws on every tier, on the Lambert arm too,
+  at the range the body itself draws, and no knob here can remove it: another player in the
+  form reads as in the form everywhere. What the tiers shed is the decoration around it:
+  - **high and above** draw the approved look in full: smoke off the lower body, the violet
+    haze, the bubble that bursts every few seconds with its sparkles, a wake of eight stains,
+    the pool draped on a twelve-cell grid, the full entry (smoke column, skirt, sparkles).
+  - **medium** drops the sparkles, halves the wake, thins the smoke and the entry to seven
+    tenths and drapes the pool on eight cells. The rim glow is the engine's own standard
+    material rule and comes with this tier.
+  - **low** (and every Lambert device) keeps the pool, its living rim, the entry's dark beat,
+    ring and a thinned column, and a thin smoke; the haze, the bubbles and the wake go, and the
+    pool is draped on six cells.
+  The tier is the STATIC effects tier (`GFX.effectsTier`), never the FPS governor. Two further
+  arms, both cosmetic: the smoke RATE thins with viewer distance against the fixed
+  `CHARACTER_LOD_RANGE` anchor (never the live crowd band, so two viewers in one spot agree)
+  and through the pooled cloud's own floored governor quality, the lever every continuous aura
+  in `vfx.ts` answers to; past that range the pool is one flat stain under the feet instead of
+  a draped grid. Under the viewer's reduced-motion setting, on any tier, the still read stays
+  (dark legs on a frozen tongue shape, the pool on one still shape, the steady rim, the violet
+  halo) and everything that moves goes: no entry beat, ring or column, no smoke, haze, bubbles
+  or wake. The cast response stays, because it is the form answering what its wearer does.
 - Ambient plant motion in the world: the foliage wind sway on canopies, bushes and grass
   cards, and the farm crops' idle lean (`src/render/farm_patches.ts`). This is the class
   boundary for the reduced-motion clause directly above, which is about a CHARACTER-borne
@@ -631,6 +656,13 @@ The choice reads the static preset or the player's own dial, never the FPS gover
   cap path for the sap).
 - `tests/auras_view.test.ts`: `isAuraDebuff` classifies a negative-value `buff_*` sap identically
   for the Sim aura and its `ClientWorld` mirror.
+- `tests/gloam_field_core.test.ts` + `tests/gloam_field.test.ts` +
+  `tests/character_gloam_form.test.ts`: Gloamveil. The plan of every tier is literal-pinned and
+  proven to shed only downward, no tier or the reduced-motion plan drops the pool, the core is
+  scanned for a single import (the fixed LOD anchor) and for governor and live-band tokens, the
+  field keeps a pool under the feet on every tier and emits nothing that moves under the still
+  cue, and a built priest shows the form on its materials on the frame of the shift whether
+  or not a compile gate is holding the transparent set.
 - `tests/shadow_extent_core.test.ts` + `tests/shadow_render_wiring.test.ts`: the sun-shadow
   EXTENT shed. The policy core imports nothing (same blindness as the cadence: pressure,
   enabled and dt only), the ladder is proven to walk ONE step per dwell and never to reach

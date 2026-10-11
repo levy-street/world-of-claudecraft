@@ -32,6 +32,24 @@ Everything else is a sibling module in one of these families:
   precipitation and masked spawns keep it over that zone's own cells, so a
   neighbouring realm's snow is visible from outside; decisions in
   `weather_field_core.ts`), `character_effects.ts`.
+- **Gloamveil's floor and smoke layer** (`gloam_field.ts`, owned by `Vfx`): the
+  Shadow priest's form outside the body. One field per renderer holds the dark
+  smoke (`gloam_smoke.ts`, an ALPHA-blended cloud: the additive cloud in
+  `vfx.ts` can only add light, so "dark" there is invisible) and one draped
+  pool per wearer with its wake and entry ring (`gloam_pool.ts`). The entity
+  loop reports each wearer once a frame (`vfx.gloam.wearer`) with the rig's
+  cue, and everything else is decided in three pure cores: what each tier and
+  reduced motion keep and who is tracked (`gloam_field_core.ts`), where a
+  stain lies and when it may be laid (`gloam_pool_core.ts`), the puff pool
+  (`gloam_smoke_core.ts`). Its contracts, each pinned in
+  `tests/gloam_field.test.ts`: ground samples come from the renderer's own
+  seed-bound sampler and are spent from ONE per-frame allowance shared by
+  every pool (a refused pool slides on the lay it has, and the field rotates
+  who is served first); every stain draws with one of two materials built
+  once (per-stain values are written in `onBeforeRender`); the root is
+  attached through `attachSceneGroupGated` over hidden stand-ins, so its three
+  programs link before anything under it draws; the field disposes everything
+  it built. The body half is `characters/gloam_climb.ts`.
 - **Cross-surface shader services** own a shared uniform block plus a GLSL
   snippet that SEVERAL materials splice, never a copy per material.
   `biome_haze_field.ts` (+ its `_core`) is the reference: one small world-space

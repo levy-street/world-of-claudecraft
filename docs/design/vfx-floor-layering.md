@@ -69,6 +69,13 @@ changes nothing a player can see. A new normal-blended floor piece in the
 player band should take a rung no other module's normal-blended floor piece
 uses; check the neighbours before picking one.
 
+The Shadow priest's pool (`src/render/gloam_pool.ts`) is the worked case. It is
+normal-blended and it DARKENS, so on a shared rung it would swap with an additive
+glow which of the two covers the other. Its pool and wake take one rung and its
+entry ring the next, both above every other module's stack and below the top
+rung the click marker and the AoE landing flash use, so the order against any
+other player effect is fixed and every encounter telegraph still paints over it.
+
 ## Rules for a floor module
 
 - Take every `renderOrder` from `floorVfxRenderOrder(layer, step)`; never write a

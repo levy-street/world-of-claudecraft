@@ -1092,8 +1092,13 @@ const RENDER_PURE_CORES = [
   'src/render/characters/stonebound_shell_core.ts',
   'src/render/characters/form_adornment_core.ts',
   // Gloamveil (the Shadow priest's form): the climbing dark on the body (the
-  // tongue tables, the cast surge and entry, the shader text and its CPU twin).
+  // tongue tables, the cast surge and entry, the shader text and its CPU twin),
+  // then the floor and smoke layer around it (what each tier keeps, where a
+  // stain lies and when it is laid, the smoke pool and its eviction).
   'src/render/characters/gloam_climb_core.ts',
+  'src/render/gloam_field_core.ts',
+  'src/render/gloam_pool_core.ts',
+  'src/render/gloam_smoke_core.ts',
   'src/render/entry_detail_horizon_core.ts',
   'src/render/gather_batch_reach_core.ts',
   'src/render/zone_feature_cells_core.ts',

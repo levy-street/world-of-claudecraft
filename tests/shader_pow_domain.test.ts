@@ -131,8 +131,10 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ability_vfx/warrior_rage_material.ts': 1,
   'src/render/characters/surface_response.ts': 5,
   // Gloamveil's climbing tongues (one templated line for the three
-  // families): every base is a clamp(0.5 + 0.5 * sin(x), 0.0, 1.0).
+  // families) and the pool's two tendril lobes: every base is a
+  // clamp(0.5 + 0.5 * sin(x), 0.0, 1.0).
   'src/render/characters/gloam_climb_core.ts': 1,
+  'src/render/gloam_pool.ts': 2,
   'src/render/ability_vfx/rings.ts': 1,
   'src/render/ability_vfx/shells.ts': 1,
   // the armour-dye sRGB<->linear pair (bases clamped with max(c, 0))
