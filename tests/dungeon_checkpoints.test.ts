@@ -3,6 +3,7 @@ import * as colliders from '../src/sim/colliders';
 import { isBlocked } from '../src/sim/colliders';
 import { handleDeath } from '../src/sim/combat/damage';
 import { DUNGEON_CHECKPOINTS } from '../src/sim/content/dungeon_checkpoints';
+import { SUNKEN_BASTION_ANCHORS } from '../src/sim/content/sunken_bastion_layout';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { dungeonReentryPoint } from '../src/sim/instances/dungeon_checkpoints';
@@ -12,12 +13,12 @@ import { type InstanceSlot, Sim } from '../src/sim/sim';
 import { RES_HP_FRACTION, RESURRECTION_SICKNESS_ID } from '../src/sim/spirit';
 
 const CASES = [
-  ['hollow_crypt', ['sexton_marrow'], -82, 112],
+  ['hollow_crypt', ['sexton_marrow'], -82, 116],
   ['hollow_crypt', ['rimeweb'], 80, 112],
   ['hollow_crypt', ['sexton_marrow', 'rimeweb', 'cantor_ilvane'], 0, 162],
   ['drowned_temple', ['choirmother_selthe'], 0, 0],
   ['drowned_temple', ['choirmother_selthe', 'tideglass_colossus'], 86, 208],
-  ['sunken_bastion', ['knight_commander_olen'], 57, 126],
+  ['sunken_bastion', ['knight_commander_olen'], 57, 130],
   ['sunken_bastion', ['knight_commander_olen', 'gaoler_ossick'], -2, 12],
   ['gravewyrm_sanctum', ['korgath_the_bound'], 0, -22],
   ['gravewyrm_sanctum', ['korgath_the_bound', 'grand_necromancer_velkhar'], 0, 107],
@@ -82,7 +83,7 @@ describe('dungeon death checkpoints', () => {
       const { sim, pid, inst, player } = setup('hollow_crypt', heroic);
       kill(sim, inst, 'sexton_marrow');
       reenter(sim, pid, inst.dungeonId);
-      expectLocal(sim, pid, inst, -82, 112);
+      expectLocal(sim, pid, inst, -82, 116);
       expect(player.dead).toBe(false);
       expect(player.ghost).toBe(false);
       expect(player.corpsePos).toBeNull();
@@ -155,7 +156,7 @@ describe('dungeon death checkpoints', () => {
     expectLocal(sim, pid, inst, 0, -130);
     enemy.inCombat = false;
     reenter(sim, pid, inst.dungeonId);
-    expectLocal(sim, pid, inst, -82, 112);
+    expectLocal(sim, pid, inst, -82, 116);
   });
 
   it('falls back to an earlier safe checkpoint if a live enemy occupies the latest one', () => {
@@ -165,7 +166,7 @@ describe('dungeon death checkpoints', () => {
     const origin = instanceOrigin(DUNGEONS[inst.dungeonId].index, inst.slot);
     enemy.pos = { x: origin.x + 80, y: -6, z: origin.z + 112 };
     reenter(sim, pid, inst.dungeonId);
-    expectLocal(sim, pid, inst, -82, 112);
+    expectLocal(sim, pid, inst, -82, 116);
   });
 
   it('cannot borrow progress from another solo claim or a missing boss entity', () => {
@@ -197,7 +198,7 @@ describe('dungeon death checkpoints', () => {
     )!;
     kill(sim, inst, 'sexton_marrow');
     reenter(sim, secondPid, inst.dungeonId);
-    expectLocal(sim, secondPid, inst, -82, 112);
+    expectLocal(sim, secondPid, inst, -82, 116);
   });
 
   it('resetting and reclaiming a slot discards its recovery progress', () => {
@@ -221,7 +222,7 @@ describe('dungeon death checkpoints', () => {
     sim.releaseSpirit(pid);
     sim.tick();
     expect(sim.entities.get(boss.id)?.dead).toBe(true);
-    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: -82, z: 112 });
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: -82, z: 116 });
   });
 
   it('uses the previous safe arena while a lingering ground zone covers the latest checkpoint', () => {
@@ -244,12 +245,12 @@ describe('dungeon death checkpoints', () => {
       ability: 'Test hazard',
       abilityId: 'test_hazard',
     });
-    expect(dungeonReentryPoint(ctx, inst, player)).toEqual({ x: -82, z: 112 });
+    expect(dungeonReentryPoint(ctx, inst, player)).toEqual({ x: -82, z: 116 });
     ctx.groundAoEs[0].remaining = 0;
     expect(dungeonReentryPoint(ctx, inst, player)).toEqual({ x: 80, z: 112 });
     ctx.groundAoEs[0].remaining = 10;
     ctx.groundAoEs[0].pos.z = origin.z + 112 + 5 + PLAYER_BODY_RADIUS;
-    expect(dungeonReentryPoint(ctx, inst, player)).toEqual({ x: -82, z: 112 });
+    expect(dungeonReentryPoint(ctx, inst, player)).toEqual({ x: -82, z: 116 });
     ctx.groundAoEs[0].pos.z += 0.01;
     expect(dungeonReentryPoint(ctx, inst, player)).toEqual({ x: 80, z: 112 });
   });
@@ -303,12 +304,12 @@ describe('dungeon death checkpoints', () => {
     const add = createMob(sim.ctx.nextId++, MOBS.crypt_shambler, 8, {
       x: origin.x - 82 + 19.99,
       y: 8,
-      z: origin.z + 112,
+      z: origin.z + 116,
     });
     sim.ctx.addEntity(add);
     expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(DUNGEONS[inst.dungeonId].entry);
     add.pos.x = origin.x - 82 + 20;
-    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: -82, z: 112 });
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: -82, z: 116 });
   });
 
   it.each([
@@ -346,7 +347,8 @@ describe('dungeon death checkpoints', () => {
       );
       kill(sim, inst, ...defeated);
       reenter(sim, pid, inst.dungeonId);
-      expectLocal(sim, pid, inst, missingBoss === 'rimeweb' ? -82 : 80, 112);
+      if (missingBoss === 'rimeweb') expectLocal(sim, pid, inst, -82, 116);
+      else expectLocal(sim, pid, inst, 80, 112);
     },
   );
 
@@ -391,9 +393,22 @@ describe('dungeon death checkpoints', () => {
         x === origin.x + 80 && z === origin.z + 112 ? true : original(seed, x, z, radius),
       );
     try {
-      expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: -82, z: 112 });
+      expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: -82, z: 116 });
     } finally {
       probe.mockRestore();
     }
+  });
+
+  it('stands the Drowning Yard point clear of the winch that fills the yard centre', () => {
+    const dungeon = DUNGEONS.sunken_bastion;
+    const origin = instanceOrigin(dungeon.index, 4);
+    const yard = SUNKEN_BASTION_ANCHORS.drowningYard;
+    expect(isBlocked(99, origin.x + yard.x, origin.z + yard.z, PLAYER_BODY_RADIUS)).toBe(true);
+    const row = DUNGEON_CHECKPOINTS.sunken_bastion[1];
+    expect(row.pos.x).toBe(yard.x);
+    expect(row.pos.z).toBeLessThan(yard.z);
+    expect(isBlocked(99, origin.x + row.pos.x, origin.z + row.pos.z, PLAYER_BODY_RADIUS)).toBe(
+      false,
+    );
   });
 });

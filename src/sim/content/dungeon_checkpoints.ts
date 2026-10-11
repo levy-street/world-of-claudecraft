@@ -12,9 +12,13 @@ export interface DungeonCheckpoint {
   readonly pos: { readonly x: number; readonly z: number };
 }
 
+// The Drowning Winch and its cage pit fill the centre of the Drowning Yard, so
+// its point is the open floor this far south of it.
+const DROWNING_YARD_SOUTH_OF_WINCH = 12;
+
 export const DUNGEON_CHECKPOINTS: Readonly<Record<string, readonly DungeonCheckpoint[]>> = {
   hollow_crypt: [
-    { bosses: ['sexton_marrow'], pos: { x: HOLLOW_CRYPT_ANCHORS.bellYard.x, z: 112 } },
+    { bosses: ['sexton_marrow'], pos: HOLLOW_CRYPT_ANCHORS.bellYard },
     { bosses: ['rimeweb'], pos: HOLLOW_CRYPT_ANCHORS.greatWeb },
     {
       bosses: ['sexton_marrow', 'rimeweb', 'cantor_ilvane'],
@@ -33,11 +37,14 @@ export const DUNGEON_CHECKPOINTS: Readonly<Record<string, readonly DungeonCheckp
   sunken_bastion: [
     {
       bosses: ['knight_commander_olen'],
-      pos: { x: SUNKEN_BASTION_ANCHORS.bastion.x, z: 126 },
+      pos: SUNKEN_BASTION_ANCHORS.bastion,
     },
     {
       bosses: ['knight_commander_olen', 'gaoler_ossick'],
-      pos: { x: SUNKEN_BASTION_ANCHORS.drowningYard.x, z: 12 },
+      pos: {
+        x: SUNKEN_BASTION_ANCHORS.drowningYard.x,
+        z: SUNKEN_BASTION_ANCHORS.drowningYard.z - DROWNING_YARD_SOUTH_OF_WINCH,
+      },
     },
   ],
   gravewyrm_sanctum: [
