@@ -365,9 +365,9 @@ describe('isHarvestableCorpse', () => {
     // (hub_training_dummy, hub_healing_dummy): struck or healed, never
     // harvested, the same untagged shape as the Bone Spike above: 191. Plus
     // the five Eastbrook healing-training role dummies, which are friendly
-    // practice targets rather than harvestable corpses: 196. Plus the four retained
-    // cosmetic buddy companions (content/buddies.ts): owned followers, never
-    // a corpse anyone butchers, so no componentTags: 199.
+    // practice targets rather than harvestable corpses: 196. Plus the three
+    // retained cosmetic buddy templates (content/buddies.ts): owned followers,
+    // never a corpse anyone butchers, so no componentTags: 199.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
     // Three caravan enemies and the undead Fenbridge infiltrator add no components:
     // 200. Plus the sixteen Buried Hoards templates (content/rift/mobs.ts, the
