@@ -24,6 +24,7 @@ import {
   INSTANCE_CLEARED_EMPTY_TIMEOUT,
   instanceKeyFor,
   leaveDungeon,
+  nythraxisInstanceSealed,
   updateInstances,
 } from '../src/sim/instances/dungeons';
 import { raidFamilyOf, raidReturnClaimFor } from '../src/sim/instances/raid_return';
@@ -463,6 +464,24 @@ describe('raid return route: a cleared Ignivar raider who left the raid', () => 
     expect(newLift.enteredBy.has(ally.entityId)).toBe(false);
   });
 
+  it('can still walk out if their lock lapses at a reset while they are inside', () => {
+    const sim = makeSim();
+    const { ally } = clearIgnivarArena(sim);
+    stepOutside(sim, ally.entityId);
+    sim.partyLeave(ally.entityId);
+    productionDoor(sim);
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally.entityId)).toBe(true);
+    ally.raidLockouts.set(IGNIVAR_RAID_ARENA_ID, sim.ctx.lockoutNowMs());
+    const errors = captureErrors(sim);
+
+    // Forward stays shut without the lock; the way out does not.
+    expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, ally.entityId)).toBe(false);
+    stepOutside(sim, ally.entityId);
+
+    expect(errors).toEqual([GATE_SEALED_ERROR]);
+    expect(entityOf(sim, ally).pos.x).toBeLessThan(DUNGEON_X_THRESHOLD);
+  });
+
   it('a relog on the way back still takes the held award off the corpse', () => {
     const sim = makeSim();
     const raid = ignivarRaid(sim, 4242);
@@ -601,6 +620,37 @@ describe('raid return route: a cleared Nythraxis raider who left the raid', () =
       dungeonId: 'nythraxis_boss_arena',
     });
     expect(liveClaim(sim, 'nythraxis_boss_arena', raidKey)).toBe(arena);
+  });
+
+  it('is never held in the old arena by a Nythraxis fight in their new raid', () => {
+    const sim = new Sim({ seed: 77, playerClass: 'warrior', noPlayer: true });
+    const { raiders, raidKey, arena } = nythraxisRaid(sim);
+    const leaver = raiders[2];
+    expect(sim.leaveDungeon(leaver)).toBe(true);
+    sim.partyLeave(leaver);
+    expect(sim.enterDungeon('nythraxis_crypt', leaver)).toBe(true);
+    expect(sim.instanceInfoAt(sim.entities.get(leaver)!.pos)?.slot).toBe(arena.slot);
+    // Their new raid claims its own arena and engages Nythraxis there.
+    const newKey = formRaid(sim, leaver, []);
+    const recruit = sim.ctx.partyOf(leaver)!.members.find((m) => m !== leaver)!;
+    sim.players.get(recruit)!.questsDone.add(NYTHRAXIS_ATTUNEMENT);
+    expect(sim.enterDungeon('nythraxis_boss_arena', recruit)).toBe(true);
+    const fresh = liveClaim(sim, 'nythraxis_boss_arena', newKey);
+    expect(fresh).not.toBe(arena);
+    // Engage the fresh boss on the recruit (the nythraxis_raid_unit idiom);
+    // one tick starts the encounter, which seals that arena's royal door.
+    const freshBoss = bossIn(sim, fresh, NYTHRAXIS_BOSS_ID);
+    freshBoss.inCombat = true;
+    freshBoss.aiState = 'attack';
+    freshBoss.aggroTargetId = recruit;
+    freshBoss.threat.set(recruit, 1000);
+    sim.tick();
+    expect(nythraxisInstanceSealed(sim.ctx, fresh)).toBe(true);
+    expect(liveClaim(sim, 'nythraxis_boss_arena', raidKey)).toBe(arena);
+
+    expect(sim.leaveDungeon(leaver)).toBe(true);
+
+    expect(sim.entities.get(leaver)!.pos.x).toBeLessThan(DUNGEON_X_THRESHOLD);
   });
 
   it('a returner in a five-player party runs the attunement crypt with that party', () => {

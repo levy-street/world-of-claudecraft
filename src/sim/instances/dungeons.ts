@@ -390,10 +390,13 @@ export function enterDungeon(
   // land straight in the cleared boss room; inside, they may only step into
   // another room they cleared, or back out through the backtrack exits.
   // Every rule below then applies to the routed key as it would to a member.
+  // A dev teleport names its room explicitly, so the route never applies.
   const ownKey = instanceKeyFor(ctx, r.meta.entityId);
-  const returnRoute = raidReturnRoute(ctx, r.meta.entityId, dungeonId, ownKey, (claim) =>
-    instanceClaimContains(claim, r.e.pos),
-  );
+  const returnRoute = bypass
+    ? null
+    : raidReturnRoute(ctx, r.meta.entityId, dungeonId, ownKey, (claim) =>
+        instanceClaimContains(claim, r.e.pos),
+      );
   if (returnRoute !== null && options.ignivarBacktrack !== true) {
     const insideRun = ctx.instances.some(
       (claim) => claim.partyKey === returnRoute.partyKey && instanceClaimContains(claim, r.e.pos),
@@ -402,7 +405,14 @@ export function enterDungeon(
       dungeonId = returnRoute.roomId;
       dungeon = DUNGEONS[dungeonId];
     } else if (!isClearedReturnRoom(ctx, r.meta.entityId, returnRoute.partyKey, dungeonId)) {
-      ctx.error(r.meta.entityId, 'The forge gate is sealed to you.');
+      // Throttled like the Ignivar entry denial: the walk-in trigger fires at 20 Hz.
+      if (
+        ctx.time >=
+        (r.e.ignivarEntryDeniedAt ?? -Infinity) + IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS
+      ) {
+        r.e.ignivarEntryDeniedAt = ctx.time;
+        ctx.error(r.meta.entityId, 'The forge gate is sealed to you.');
+      }
       return false;
     }
   }
@@ -816,8 +826,11 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   const dungeon = dungeonAt(p.pos.x);
   if (!dungeon) return false;
   if (dungeon.id === 'nythraxis_boss_arena') {
+    // The arena the leaver STANDS in, not their own group's: a routed raid
+    // returner (instances/raid_return.ts) stands in another group's arena,
+    // and must not be held by a fight in their new group's arena.
     const inst = ctx.instances.find(
-      (i) => i.dungeonId === dungeon.id && i.partyKey === instanceKeyFor(ctx, p.id),
+      (i) => i.partyKey !== null && i.dungeonId === dungeon.id && instanceClaimContains(i, p.pos),
     );
     if (inst && nythraxisInstanceSealed(ctx, inst)) {
       ctx.error(r.meta.entityId, 'The royal door is sealed — Nythraxis must fall first.');

@@ -78,7 +78,9 @@ export interface RaidReturnRoute {
  * (the door's own claim-footprint test). In order:
  * - one standing INSIDE a run they cleared under another key stays on that
  *   run's key, so its interior doors and backtrack exits keep working even if
- *   their own new group claims a room of the same raid meanwhile;
+ *   their own new group claims a room of the same raid meanwhile, or their
+ *   lock lapses at a reset mid-visit (forward doors then refuse them, since
+ *   isClearedReturnRoom wants the lock, but the way out stays open);
  * - one whose own key holds NO claim in this raid and whom a cleared claim of
  *   it names (raidReturnClaimFor below): they left the raid, were removed, or
  *   it reformed under a new party id. Two exceptions keep their own run: a
@@ -112,6 +114,10 @@ export function raidReturnRoute(
     const runKey = standingIn.partyKey;
     const claim = latestClearedClaim(ctx, entityId, memberKey, family, (key) => key === runKey);
     if (claim !== null) return routeTo(claim);
+    const named = ctx.instances.some(
+      (inst) => inst.partyKey === runKey && inst.raidReturnKeys.has(memberKey),
+    );
+    if (named) return { partyKey: runKey, roomId: standingIn.dungeonId };
   }
   const party = ctx.partyOf(entityId);
   if (ctx.instances.some((i) => i.partyKey === ownKey && family.includes(i.dungeonId))) {
