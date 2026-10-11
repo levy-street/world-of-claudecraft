@@ -76,6 +76,7 @@ import {
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from './difficulty';
+import { dungeonReentryPoint } from './dungeon_checkpoints';
 import { tickDungeonGates } from './dungeon_gates';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
 import {
@@ -683,9 +684,10 @@ export function enterDungeon(
   }
   const origin = instanceOriginOf(inst);
   const p = r.e;
+  const entry = dungeonReentryPoint(ctx, inst, p);
   // A live gather/fishing session never survives the door (R28 family).
   cancelProfessionSessionOnDisplacement(ctx, p);
-  p.pos = ctx.groundPos(origin.x + dungeon.entry.x, origin.z + dungeon.entry.z);
+  p.pos = ctx.groundPos(origin.x + entry.x, origin.z + entry.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   settleTeleportArrival(p);
@@ -706,7 +708,7 @@ export function enterDungeon(
   // a player standing in an instance and teleport them back inside fully restored
   // (issue #1600). No-op if they were not queued; notifies any 2v2 teammate.
   arenaQueueLeave(ctx, r.meta.entityId);
-  // A ghost that ran its spirit back and re-entered resurrects at the entrance,
+  // A ghost that ran its spirit back resurrects at the safe unlocked checkpoint,
   // penalty-free: the re-entry IS the corpse run under the instance death model (no
   // Spirit Healer inside an instance).
   // Nythraxis has a nested entrance: a returning ghost must cross the approach crypt
