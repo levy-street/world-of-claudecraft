@@ -1,15 +1,17 @@
 // Before/after capture for the Shadow priest's form look (Gloamveil): the
 // entry, standing, casting and walking moments on a full preset, what the
-// lowest preset keeps, and the form inside a dungeon instance. Needs a Vite dev
-// client (offline world only, no server):
+// lowest preset keeps, the form inside a dungeon instance, and the form
+// standing in another player's ground effect (a paladin's Holy Ground, which
+// has to stay readable under the priest). Needs a Vite dev client (offline
+// world only, no server):
 //
 //   GAME_URL=http://127.0.0.1:5173 SHOTS_DIR=tmp/gloamveil-look \
 //     node scripts/gloamveil_look_shot.mjs after
 //
 // Run it once on the base tree (`before`) and once on the branch (`after`): it
 // drives only the sim's public surface (level, talents, the real form ability,
-// a real Mind Blast at a spawned wolf) and the renderer's editor camera, so the
-// same file runs on both.
+// a real Mind Blast at a spawned wolf, a second player casting a real Holy
+// Ground) and the renderer's editor camera, so the same file runs on both.
 //
 // This is a GRAPHICS comparison, the one exception to the lowest-preset
 // capture rule (pr-screenshots skill): the form's look is a tier ladder, so the
@@ -52,6 +54,7 @@ const SCENARIOS = [
   },
   { name: 'low', preset: 1, where: 'shore', moments: ['standing'] },
   { name: 'dungeon', preset: 4, where: 'hollow_crypt', moments: ['standing'] },
+  { name: 'overlap', preset: 4, where: 'shore', moments: ['consecration'] },
 ];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -173,6 +176,27 @@ const castAtWolf = (page) =>
     return p.castRemaining > 0;
   });
 
+// A paladin two yards from the priest casts Holy Ground (the `consecration`
+// ability) under both of them: a player-band ground effect another player has
+// to be able to read through whatever the priest lays on the floor.
+const castHolyGround = (page) =>
+  page.evaluate(() => {
+    const g = window.__game;
+    const sim = g.sim;
+    const p = sim.player;
+    const pid = sim.addPlayer('paladin', 'Sunward', { bot: true });
+    sim.setPlayerLevel(20, pid);
+    sim.setSpec('retribution', pid);
+    const e = sim.entities.get(pid);
+    e.pos = sim.groundPos(p.pos.x + 1.6, p.pos.z + 1.2);
+    e.prevPos = { ...e.pos };
+    e.resource = e.maxResource;
+    e.gcdRemaining = 0;
+    sim.castAbility('consecration', pid);
+    window.__shotMark = performance.now();
+    return sim.activeConsecrations.length;
+  });
+
 async function shoot(browser, scenario) {
   const page = await browser.newPage();
   page.on('pageerror', (error) => console.log(`[pageerror] ${error.message}`));
@@ -237,6 +261,12 @@ async function shoot(browser, scenario) {
     if (!(await castAtWolf(page))) throw new Error('mind_blast did not start a cast');
     await grab(page, `${scenario.name}-casting`, 900);
     await sleep(3200);
+  }
+  if (scenario.moments.includes('consecration')) {
+    // The form at rest first, so the still shows the settled pool under the wash.
+    await sleep(5200);
+    if ((await castHolyGround(page)) < 1) throw new Error('consecration did not lay its ground');
+    await grab(page, `${scenario.name}-consecration`, 2500);
   }
   if (scenario.moments.includes('walking')) {
     await page.evaluate(() => {

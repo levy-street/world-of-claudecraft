@@ -21,6 +21,7 @@ the frame that drew it, at an offset measured on the page clock.
 | Walking, 1.5 s into a run (preset 4) | `before-world-walking.png` | `after-world-walking.png` |
 | Standing on the lowest preset (preset 1) | `before-low-standing.png` | `after-low-standing.png` |
 | Standing inside a dungeon instance, the Hollow Crypt (preset 4) | `before-dungeon-standing.png` | `after-dungeon-standing.png` |
+| Standing in a paladin's Holy Ground, 2.5 s after it lands (preset 4) | `before-overlap-consecration.png` | `after-overlap-consecration.png` |
 
 Notes for a reviewer:
 
@@ -32,3 +33,8 @@ Notes for a reviewer:
   the haze, the bubbles and the wake (`docs/design/graphics-settings-fairness.md`).
 - The dungeon instance sits about a hundred thousand yards from the world origin. The pool is
   positioned camera-relative and does not flicker against the floor there.
+- `after-overlap-consecration.png` is the fairness case. The pool is near-black and nearly
+  opaque, so it draws UNDER every ground effect a player casts and every encounter telegraph
+  (`docs/design/vfx-floor-layering.md`): the Holy Ground's wash and lines stay readable right
+  through the priest's feet, where the pool only shows as a faint dark star under the light. On
+  plain ground (every other still here) nothing is over it and it reads at full strength.
