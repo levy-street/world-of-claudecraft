@@ -92,8 +92,8 @@ describe('Paladin Templar Verdict baked asset', () => {
       expect(prepared.def.clips.attackByAbility?.final_edict).toBe('2H_Chop');
       expect(prepared.clips.has(PALADIN_TEMPLARS_VERDICT_CLIP)).toBe(false);
       const visual = new CharacterVisual(key, 0xffffff);
-      // An auto attack now uses the SAME authored chop. Ability ownership,
-      // rather than clip identity alone, must clear the solar effect.
+      // The next auto attack (the hand-keyed white swing) must clear the solar effect:
+      // ability ownership ends it, not a change of clip alone.
       visual.setWeapon('eastbrook_greatsword');
       visual.update(0, IDLE, true);
       // What the hands hold picks the chop's variant (weapon_loadout_core.ts: a two-hander plays
@@ -123,7 +123,7 @@ describe('Paladin Templar Verdict baked asset', () => {
       visual.playAttack();
       visual.update(0.016, IDLE, true);
       expect((visual as unknown as { current: THREE.AnimationAction }).current.getClip().name).toBe(
-        played?.name,
+        'Woc_Attack_1H_0',
       );
       expect(effect?.children.every((child) => !child.visible)).toBe(true);
       visual.dispose();

@@ -52,12 +52,14 @@ describe('combat animation linkage on the shipped WOC rigs', () => {
           expect(current(visual).getEffectiveWeight()).toBeGreaterThan(0);
           expect(current(visual).time).toBeGreaterThan(0);
         }
+        // the white swings and shots are the hand-keyed ones (woc_autoattack_core.ts)
+        const melee = ['Woc_Attack_1H_0', 'Woc_Attack_1H_1'];
         visual.playAttack(undefined, false, 'melee');
-        expect([as('1H_Chop'), as('1H_Slash')]).toContain(current(visual).getClip().name);
+        expect(melee).toContain(current(visual).getClip().name);
         visual.playAttack();
-        expect(current(visual).getClip().name).toBe('Ranged_Shoot');
+        expect(current(visual).getClip().name).toBe('Woc_Attack_Rifle');
         visual.playAttack(undefined, false, 'melee');
-        expect([as('1H_Chop'), as('1H_Slash')]).toContain(current(visual).getClip().name);
+        expect(melee).toContain(current(visual).getClip().name);
       } finally {
         visual.dispose();
       }
