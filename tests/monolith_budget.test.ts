@@ -1229,7 +1229,8 @@ const MONOLITHS: MonolithRow[] = [
     // parent pins (11639 and PR 4352's 11636) stands.
     // Composes the existing buddy PR additions with integration extractions.
     // Exact merged size; no additional coordinator logic introduced by resolution.
-    ceiling: 11709,
+    // Referral save projections extracted into quest_progress_save and deeds_restore.
+    ceiling: 11700,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1914,7 +1915,9 @@ const MONOLITHS: MonolithRow[] = [
     // parent pins (5347 and PR 4352's 5347) stands.
     // Composes the existing buddy PR additions with integration extractions.
     // Exact merged size; no additional coordinator logic introduced by resolution.
-    ceiling: 5369,
+    // Account-social position decoding moved to social_frame_wire.
+    // Public character profile REST moved to character_profile; block paging stays intent-only.
+    ceiling: 5342,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

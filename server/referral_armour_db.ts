@@ -1,4 +1,6 @@
 import { pool } from './db';
+import { getMembership } from './membership_service';
+import { referralInviteOwner } from './referral_invites_db';
 
 // One immutable row per referred account, retained for its lifetime. Legacy
 // referrals stay ineligible: membership at their signup cannot be reconstructed.
@@ -10,6 +12,53 @@ ALTER TABLE referrals ADD COLUMN IF NOT EXISTS inviter_name VARCHAR(32) NOT NULL
 export interface ReferralArmourEntitlement {
   inviterAccountId: number;
   inviterName: string;
+}
+
+export interface ReferralSignup {
+  referrerAccountId: number;
+  slug: string;
+  memberEligible: boolean;
+  inviterName: string;
+}
+
+/** Resolve before account creation. Failed attribution reads must abort signup;
+ * membership service availability only affects the existing armour entitlement. */
+export async function resolveReferralSignup(ref: unknown): Promise<ReferralSignup | null> {
+  const slug = typeof ref === 'string' ? ref.trim().toLowerCase() : '';
+  if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(slug)) return null;
+  const invite = await referralInviteOwner(slug);
+  const inviter = invite
+    ? { inviterAccountId: invite.accountId, inviterName: invite.name }
+    : await referralInviterForSlug(slug);
+  if (!inviter) return null;
+  const membership = await getMembership(inviter.inviterAccountId);
+  const now = Date.now();
+  return {
+    referrerAccountId: inviter.inviterAccountId,
+    slug,
+    memberEligible:
+      membership.active && membership.authorizedUntil > now && (membership.expiresAt ?? 0) > now,
+    inviterName: inviter.inviterName.slice(0, 32),
+  };
+}
+
+export async function recordReferralOnClient(
+  client: { query(text: string, values?: unknown[]): Promise<unknown> },
+  refereeAccountId: number,
+  referral: ReferralSignup,
+): Promise<void> {
+  if (referral.referrerAccountId === refereeAccountId) return;
+  await client.query(
+    `INSERT INTO referrals (referee_account_id, referrer_account_id, slug, member_eligible, inviter_name)
+     VALUES ($1, $2, $3, $4, $5) ON CONFLICT (referee_account_id) DO NOTHING`,
+    [
+      refereeAccountId,
+      referral.referrerAccountId,
+      referral.slug,
+      referral.memberEligible,
+      referral.inviterName.slice(0, 32),
+    ],
+  );
 }
 
 /** Resolve the card's current owner and character name without loading its PNG

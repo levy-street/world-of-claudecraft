@@ -34,6 +34,8 @@ import type { PainterHostPresentation } from '../../painter_host';
 import { questMapLocation } from '../../quest_map_location_core';
 import { QuestTrackingState, sharedQuestTracking } from '../../quest_tracking_core';
 import { svgIcon } from '../../ui_icons';
+import { referralQuestRows } from '../referral_cards/referral_cards_view';
+import { referralText } from '../referral_cards/referral_cards_window';
 import { questRewardChoiceHtml, questRewardChoiceModel } from './quest_reward_choice_view';
 import { buildQuestLogView, type QuestDetailModel } from './questlog_view';
 
@@ -67,6 +69,7 @@ export interface QuestLogWindowDeps extends PainterHostPresentation {
   showOnMap(x: number, z: number): void;
   /** Injectable tracking set; production leaves it out and shares the HUD's one. */
   tracking?: QuestTrackingState;
+  openReferralCards?(): void;
 }
 
 export class QuestLogWindow {
@@ -164,6 +167,35 @@ export class QuestLogWindow {
     if (view.empty) {
       list.innerHTML = `<div class="ql-empty ui-card">${esc(t('questUi.log.emptyTitle'))}</div>`;
       detail.innerHTML = `<div class="ql-detail-body"><div class="qd-text">${esc(t('questUi.log.emptyHint'))}</div></div>`;
+    }
+    const referralSnapshot = world.referralCardsSnapshot?.() ?? null;
+    const stampQuests = referralQuestRows(referralSnapshot);
+    if (referralSnapshot?.links.length) {
+      const section = document.createElement('section');
+      section.className = 'ql-group referral-quest-group';
+      const heading = document.createElement('h3');
+      heading.className = 'ql-group-toggle ql-group-line';
+      heading.textContent = referralText('questGroup');
+      section.append(heading);
+      for (const row of stampQuests) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'ql-item ui-btn';
+        button.dataset.referralQuest = row.id;
+        button.textContent = referralText('questWithFriend', {
+          quest: referralText(`milestones.${row.id}`),
+          friend: row.friendName,
+        });
+        button.addEventListener('click', () => this.deps.openReferralCards?.());
+        section.append(button);
+      }
+      const cards = document.createElement('button');
+      cards.type = 'button';
+      cards.className = 'ql-item ui-btn';
+      cards.textContent = referralText('browseCards');
+      cards.addEventListener('click', () => this.deps.openReferralCards?.());
+      section.append(cards);
+      list.prepend(section);
     }
     for (const group of view.groups) {
       if (view.empty && group.id === 'completed' && group.count === 0) continue;

@@ -71,11 +71,16 @@ describe('the positional item-name catalog stays aligned with its ids', () => {
       'membership_waist',
       'referral_chest',
       'referral_feet',
+      'referral_fog_charm',
       'referral_gloves',
       'referral_helmet',
+      'referral_hollow_charm',
       'referral_legs',
+      'referral_satchel',
       'referral_shoulder',
       'referral_waist',
+      'reins_referral_raptor',
+      'reins_referral_tank',
       'soul_stone',
     ]);
   });

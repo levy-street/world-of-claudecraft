@@ -33,6 +33,7 @@ import {
   mountDef,
   normalizeMountKey,
   normalizeSelectedMount,
+  REFERRAL_REWARD_MOUNTS,
   TRAINING_MOUNT_KEY,
 } from '../src/sim/content/mounts';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
@@ -108,10 +109,10 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly eleven mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(11);
+  it('keeps the horse first and appends the two referral milestone mounts', () => {
+    expect(MOUNT_KEYS).toHaveLength(13);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
-    expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
+    expect(MOUNT_KEYS.slice(-2)).toEqual(['referral_tank', 'referral_raptor']);
     expect(DEFAULT_MOUNT).toBe('valorsteed');
     // Every developer-only mount is a real catalog key, and the tank keeps the
     // tail so a new PLAYER-facing mount always lands above it.
@@ -186,7 +187,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (isDeveloperMount(key) || MEMBERSHIP_REWARD_MOUNTS.includes(key)) {
+      if (
+        isDeveloperMount(key) ||
+        MEMBERSHIP_REWARD_MOUNTS.includes(key) ||
+        REFERRAL_REWARD_MOUNTS.includes(key)
+      ) {
         // Bound reins, for the same leak reason from different doors: a
         // developer-only mount has no player acquisition path, and the store
         // mount's reins is a real-money grant (server/claudium.ts). Either
@@ -284,6 +289,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (key === 'avian_strider') continue; // the Rift Watch Champion purchase, pinned above
       if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
       if (MEMBERSHIP_REWARD_MOUNTS.includes(key)) continue; // paid receipt delivery, pinned below
+      if (REFERRAL_REWARD_MOUNTS.includes(key)) continue; // transactional milestone delivery, referral_rewards.test.ts
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity. The only mob tables a
@@ -391,7 +397,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it.each([...DEVELOPER_MOUNTS, ...MEMBERSHIP_REWARD_MOUNTS])(
+  it.each([...DEVELOPER_MOUNTS, ...MEMBERSHIP_REWARD_MOUNTS, ...REFERRAL_REWARD_MOUNTS])(
     'keeps %s absent from every normal acquisition table',
     (mountKey) => {
       const itemId = mountItemId(mountKey)!;

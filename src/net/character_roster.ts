@@ -24,6 +24,9 @@ export function applyCharacterRoster(
     active: data.membership?.active === true,
     expiresAt: typeof data.membership?.expiresAt === 'string' ? data.membership.expiresAt : null,
   };
-  target.characterLimit = data.characterLimit === 20 ? 20 : 10;
+  target.characterLimit =
+    typeof data.characterLimit === 'number' && [10, 15, 20, 25].includes(data.characterLimit)
+      ? data.characterLimit
+      : 10;
   return data.characters;
 }

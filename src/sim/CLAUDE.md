@@ -72,6 +72,7 @@ plausibly covers means the table needs a new row in the same change.
 
 | Module | Owns |
 |--------|------|
+| `referral_cards.ts` + `referral_rewards.ts`, `referral_reward_state.ts` | authoritative referral card transitions, immutable reward transaction candidates, exact trinket provenance and safe card transfers, fenced live reward projection, optional character receipt persistence |
 | `player_movement_modes.ts` | exclusive locomotion order before ordinary walking: vehicle freeze, rift lift strip, deliberate-input AFK clear, Valkyr, race countdown, leap and ledge climb |
 | `combat/damage.ts` | `dealDamage`, `handleDeath`, `grantXp` (+ lifetime-XP; milestone unlocks absorbed into `deeds.ts`) |
 | `combat/heal.ts` | `applyHeal`, healing threat/taken-mult, hex/crit-vuln mults, heal-absorb |

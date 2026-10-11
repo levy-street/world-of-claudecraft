@@ -11,6 +11,119 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const ko_KR: EnTranslations = {
+  "referralCards": {
+    "title": "친구 초대",
+    "subtitle": "함께 모험하며 도장을 모으세요.",
+    "close": "친구 초대 닫기",
+    "launcher": "도장 카드",
+    "pages": "도장 카드 페이지",
+    "firstPage": "첫 페이지",
+    "nextPage": "더 많은 카드",
+    "trailmateTitle": "여행 동반자",
+    "friendshipAura": "우정",
+    "protectiveCharm": "수호 부적",
+    "bankBonus": "완료한 도장 카드",
+    "bankBonusHelp": "연결된 친구 2명이 도장 카드를 완료하도록 도우면 은행 슬롯 20칸이 영구 해제됩니다.",
+    "friendshipUse": "힘, 민첩, 체력, 지능, 정신력이 {duration}초 동안 {stats}만큼 증가합니다.",
+    "readyCount": "도장 카드: 보상 {count}개 수령 가능",
+    "loading": "친구 초대 카드에 연결 중...",
+    "empty": "새 플레이어를 초대해 함께 첫 도장 카드를 시작하세요.",
+    "inviteTitle": "친구 초대하기",
+    "inviteHelp": "친구가 계정을 만들기 전에 이 링크를 공유하세요. 내 링크로 새로 만든 계정만 연결된 친구가 됩니다.",
+    "inviteLabel": "내 초대 링크",
+    "inviteUnavailable": "아직 초대 링크를 사용할 수 없습니다.",
+    "membership": "연결된 친구가 처음 멤버십을 구매하면 멤버십 증서를 받습니다.",
+    "cardBetween": "{you} 및 {friend}",
+    "yourCard": "{name}의 도장 카드",
+    "unassigned": "캐릭터 미선택",
+    "start": "카드 시작",
+    "startPrompt": "{friend} 님과 도장 카드를 시작할까요? 두 사람 모두 수락해야 합니다. 각 캐릭터는 5레벨 미만이어야 하며 튜토리얼 섬의 마지막 퀘스트를 완료하지 않았어야 합니다.",
+    "accept": "수락",
+    "decline": "거절",
+    "declinePrompt": "정말 거절할까요? 두 캐릭터가 조건을 충족하는 동안 도장 카드 메뉴에서 나중에 시작할 수 있습니다.",
+    "declineConfirmed": "카드를 시작하지 않았습니다. 두 캐릭터가 조건을 충족하는 동안 도장 카드 메뉴에서 시작할 수 있습니다.",
+    "waiting": "연결된 친구가 수락하기를 기다리는 중입니다.",
+    "cancel": "취소",
+    "okay": "확인",
+    "understand": "예, 이해했습니다",
+    "confirmLock": "예, 이 카드를 고정합니다",
+    "lockFirst": "안개엮는자 도장 보상을 받으면 이 카드가 {name} 캐릭터에 영구 고정됩니다. 이후 카드나 보상을 다른 캐릭터로 옮길 수 없습니다. 이해하셨나요?",
+    "lockSecond": "정말 진행할까요? 안개엮는자 보상을 받고 이 카드를 {name} 캐릭터에 영구 고정합니다.",
+    "locked": "이 카드는 {name} 캐릭터에 고정되어 더 이상 옮길 수 없습니다.",
+    "unlocked": "안개엮는자 도장 보상을 받기 전까지는 조건을 충족하는 다른 캐릭터로 카드를 옮길 수 있습니다. 해당 보상을 받으면 현재 캐릭터에 영구 고정됩니다.",
+    "move": "이 캐릭터로 카드 옮기기",
+    "movePrompt": "카드를 {oldName}에서 {newName}(으)로 옮길까요? 진행 상황과 이 카드로 얻은 모든 보상이 함께 옮겨집니다. 해당 보상은 {oldName}에서 제거됩니다.",
+    "confirmMove": "예, 카드를 옮깁니다",
+    "summon": "연결된 친구 소환",
+    "summonPrompt": "{friend} 님이 자신의 위치로 소환하려고 합니다. 소환을 수락할까요?",
+    "summonHelp": "연결된 친구를 내 위치로 불러옵니다. 30분마다 한 번 소환할 수 있습니다.",
+    "summonCooldown": "소환 대기: {minutes}분 {seconds}초",
+    "reward": "보상: {reward}",
+    "earned": "획득함",
+    "redeemed": "수령함",
+    "emptyStamp": "아직 획득하지 않음",
+    "stamping": "카드에 도장을 찍는 중...",
+    "redeem": "보상 받기",
+    "previous": "이전 도장 보상부터 받으세요.",
+    "playTogether": "이 카드의 캐릭터들과 파티를 이루어 목표를 완료하세요.",
+    "fallback": "목표 퀘스트를 이미 혼자 완료했나요? 친구와 다시 파티를 맺으면 튜토리얼 섬 도장을 받을 수 있습니다. 이후 퀘스트 도장은 해당 던전을 함께 완료하면 받을 수 있습니다.",
+    "questGroup": "도장 카드 퀘스트",
+    "questWithFriend": "{friend} 님과 {quest}",
+    "browseCards": "모든 도장 카드 페이지 보기",
+    "nextQuest": "도장 카드: {quest}",
+    "questIndicator": "이 퀘스트를 완료하면 다음 도장 카드 보상에 가까워집니다.",
+    "completion": "축하합니다! {friend} 님이 여러분의 도움으로 도장 카드를 완료했습니다.",
+    "openInvites": "친구 초대 열기",
+    "referrerTitle": "도움을 준 친구",
+    "referrerCount": "완료한 친구: {count}명",
+    "friendTier": "도움을 준 친구: {count}명",
+    "awarded": "지급됨",
+    "pending": "아직 지급되지 않음",
+    "milestones": {
+      "tutorial": "튜토리얼 섬 마지막 퀘스트",
+      "hollow": "공허 속으로",
+      "fogbinder": "안개엮는자",
+      "gravewyrm": "무덤고룡 코르줄",
+      "raid": "첫 공격대 우두머리 처치"
+    },
+    "rewards": {
+      "tutorial": "고유 칭호와 캐릭터에 귀속되는 최대 용량 가방.",
+      "hollow": "체력을 높이고 생명력이 낮을 때 자동으로 보호막을 생성하는 장신구.",
+      "fogbinder": "장신구가 진화하여 체력이 더 증가하고 사용 효과를 얻습니다. 15초 동안 모든 능력치가 5 증가하며 재사용 대기시간은 2분입니다.",
+      "gravewyrm": "무료 탈것 훈련.",
+      "raid": "전용 우정 전차 탈것."
+    },
+    "referrerRewards": {
+      "1": "전용 우정 랩터 탈것.",
+      "2": "은행 슬롯 20칸과 캐릭터 슬롯 5칸.",
+      "3": "Claudium 1,000개.",
+      "4": "Claudium 1,000개.",
+      "5": "어린 나무 동료."
+    },
+    "reasons": {
+      "notParticipant": "이 계정은 해당 친구 연결에 속하지 않습니다.",
+      "staleRevision": "카드가 변경되었습니다. 최신 진행 상황을 확인하고 다시 시도하세요.",
+      "invalidCharacters": "파티의 캐릭터들이 해당 친구 연결에 속하지 않습니다.",
+      "notTogether": "두 연결된 친구가 같은 파티에 있어야 합니다.",
+      "levelTooHigh": "새 카드를 시작하는 캐릭터는 5레벨 미만이어야 합니다.",
+      "tutorialCompleted": "캐릭터 중 하나가 이미 튜토리얼 섬의 마지막 퀘스트를 완료했습니다.",
+      "alreadyStarted": "이 친구 연결에는 이미 카드가 있습니다. 연결된 친구 한 쌍당 활성 카드는 하나만 가질 수 있습니다.",
+      "notPending": "응답을 기다리는 카드 초대가 없습니다.",
+      "declinePending": "연결된 친구가 카드 거절 여부를 결정하고 있습니다.",
+      "declineNotConfirmed": "초대를 끝내려면 거절을 확정하세요.",
+      "notActive": "보상을 받기 전에 함께 카드를 시작하세요.",
+      "wrongCharacter": "카드에 표시된 캐릭터를 사용하거나 고정되지 않은 카드를 조건에 맞는 캐릭터로 옮기세요.",
+      "locked": "이 카드는 캐릭터에 고정되어 옮길 수 없습니다.",
+      "sameCharacter": "이 카드는 이미 이 캐릭터에게 있습니다.",
+      "invalidMilestone": "해당 도장은 이 카드에 속하지 않습니다.",
+      "notEarned": "이 목표를 함께 완료한 후 보상을 받으세요.",
+      "alreadyRedeemed": "이미 받은 보상입니다.",
+      "previousRewardRequired": "이전 도장 보상부터 받으세요.",
+      "confirmationRequired": "안개엮는자 보상을 받기 전에 카드 고정 경고를 확인하세요.",
+      "newAccountsOnly": "초대 링크로 새 계정을 만들 때만 연결된 친구가 될 수 있습니다. 기존 계정은 연결할 수 없습니다.",
+      "unavailable": "지금은 이 작업을 사용할 수 없습니다. 나중에 다시 시도하세요."
+    }
+  },
   "meta": {
     "builtOn": "{date} 빌드"
   },
@@ -2093,6 +2206,8 @@ export const ko_KR: EnTranslations = {
       "name_goblin_rocket_sled": "고블린 로켓 썰매",
       "name_rallycart_rxt": "랠리카트 RXT",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 드레드스파크",
+      "name_referral_tank": "우정 전차",
+      "name_referral_raptor": "우정 랩터",
       "name_drakemaw_raptor": "화산구 랩터",
       "name_avian_strider": "비리디안 베일스트라이더",
       "name_mech_bird": "태엽 기계새",
@@ -2110,6 +2225,8 @@ export const ko_KR: EnTranslations = {
       "desc_rallycart_rxt": "작지만 본격적인 랠리 머신. 이동 속도를 높여준다.",
       "desc_rallycart_skin": "작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
+      "desc_referral_tank": "친구 초대 도장 카드를 완성하면 획득합니다.",
+      "desc_referral_raptor": "첫 번째 연결된 친구가 도장 카드를 완성하도록 도우면 획득합니다.",
       "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
       "desc_avian_strider": "우뚝 솟은 탈것 조류로, 육중한 발톱과 접은 날개가 모든 여정을 천둥 같은 질주로 바꾼다.",
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
@@ -4196,8 +4313,8 @@ export const ko_KR: EnTranslations = {
       "nextAttackCrit": "다음 공격이 반드시 치명타로 적중합니다",
       "healEcho": "생명력이 {threshold}% 미만이 되면 생명력을 {value} 회복합니다",
       "trinket": {
-        "lastStandCooldown": "보루의 인장의 최후의 보루 보호막을 이미 사용했습니다. 이 효과가 끝날 때까지 생명력이 {threshold}% 미만으로 떨어져도 다시 발동하지 않습니다.",
-        "lastBastion": "{value}의 피해를 흡수합니다. 생명력이 {threshold}% 미만일 때 피해를 받아 보루의 인장이 만들어 낸 보호막입니다.",
+        "lastStandCooldown": "보호막이 이미 발동했습니다. 이 효과가 끝날 때까지 생명력이 {threshold}% 미만인 상태에서 피해를 받아도 보호막이 다시 생성되지 않습니다.",
+        "lastBastion": "피해를 {value} 흡수합니다. 생명력이 {threshold}% 미만일 때 피해를 받아 장신구가 생성한 보호막입니다.",
         "retaliate": "당신을 직접 공격한 적은 그 공격으로 잃은 생명력의 {pct}%에 해당하는 물리 피해를 받습니다. 지속 피해로는 발동하지 않습니다.",
         "moored": "받는 피해가 {reduction}% 감소하지만 이동 속도가 {speed}%가 됩니다. 기절, 이동 불가, 감속, 공포, 변이, 침묵, 실명, 주술, 무장 해제, 행동 불가 효과와 밀쳐내기를 무시합니다.",
         "hourglassStored": "초과 치유로 저장한 치유량 {stored}을 담고 있습니다. 치유사의 모래시계를 사용하면 {range}미터 이내에서 생명력 비율이 가장 낮은 파티원(자신 포함)에게 보호막으로 바꿔 줍니다.",
@@ -7321,6 +7438,8 @@ export const ko_KR: EnTranslations = {
       "delete_confirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
       "storage_purchase_open": "이 캐릭터를 삭제하려면 보관함 구매를 완료하거나 해결해야 합니다.",
       "delete_busy": "서버가 혼잡합니다. 잠시 후 이 캐릭터 삭제를 다시 시도해 주세요.",
+      "referral_transfer_pending": "이 캐릭터를 삭제하기 전에 고정되지 않은 도장 카드를 모두 다른 캐릭터로 옮기세요.",
+      "referral_bond_pending": "친구 초대 보상인 멤버십 증서를 이 캐릭터에게 지급 중입니다. 지급이 완료된 후 캐릭터 삭제를 다시 시도하세요.",
       "already_in_world": "캐릭터가 이미 세계에 있습니다.",
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
@@ -12881,6 +13000,10 @@ export const ko_KR: EnTranslations = {
     "social": {
       "title": "소셜",
       "friendsTab": "친구",
+      "friendFirstPage": "첫 페이지",
+      "friendNextPage": "다음 페이지",
+      "boundFriend": "연결된 친구",
+      "boundFriendLink": "연결된 친구는 초대 링크를 통해 연결됩니다.",
       "guildTab": "길드",
       "ignoreTab": "차단",
       "leaveParty": "파티 떠나기",
@@ -21081,6 +21204,21 @@ export const ko_KR: EnTranslations = {
       },
       "membership_token": {
         "name": "멤버십 토큰 (30일)"
+      },
+      "referral_satchel": {
+        "name": "우정 가방"
+      },
+      "referral_hollow_charm": {
+        "name": "공허의 우정 부적"
+      },
+      "referral_fog_charm": {
+        "name": "안개에 싸인 우정 부적"
+      },
+      "reins_referral_tank": {
+        "name": "우정 전차 고삐"
+      },
+      "reins_referral_raptor": {
+        "name": "우정 랩터 고삐"
       },
       "referral_helmet": {
         "name": "우정의 투구"

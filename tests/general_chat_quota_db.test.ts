@@ -305,6 +305,64 @@ function listenerClient(
 }
 
 describe('cross-process policy listener', () => {
+  it('shares LISTEN with account privacy invalidation and fences refreshes behind initial resync', async () => {
+    const client = listenerClient(async () => ({ rows: [] }));
+    let finishResync!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      finishResync = resolve;
+    });
+    const blocks = {
+      invalidate: vi.fn(),
+      disconnected: vi.fn(),
+      resync: vi.fn(() => pending),
+      refresh: vi.fn(async () => {}),
+    };
+    const listener = createGeneralChatQuotaListener({
+      activeAccountIds: () => [],
+      onResync: vi.fn(),
+      onChange: vi.fn(),
+      connect: async () => client,
+      accountBlocks: blocks,
+    });
+    const starting = listener.start();
+    await vi.waitFor(() => expect(blocks.resync).toHaveBeenCalledOnce());
+    expect(client.query.mock.calls.slice(0, 2).map((call) => call[0])).toEqual([
+      'LISTEN general_chat_quota_changed',
+      'LISTEN account_blocks_changed',
+    ]);
+    client.emit('notification', { channel: 'account_blocks_changed', payload: '{"accountId":7}' });
+    expect(blocks.invalidate).toHaveBeenCalledWith(7);
+    expect(blocks.refresh).not.toHaveBeenCalled();
+    finishResync();
+    await starting;
+    await vi.waitFor(() => expect(blocks.refresh).toHaveBeenCalledWith(7));
+    await listener.stop();
+    expect(blocks.disconnected).toHaveBeenCalledTimes(2);
+    expect(client.close).toHaveBeenCalledOnce();
+  });
+
+  it('fails privacy closed immediately when the shared listener disconnects', async () => {
+    const client = listenerClient(async () => ({ rows: [] }));
+    const blocks = {
+      invalidate: vi.fn(),
+      disconnected: vi.fn(),
+      resync: vi.fn(async () => {}),
+      refresh: vi.fn(async () => {}),
+    };
+    const listener = createGeneralChatQuotaListener({
+      activeAccountIds: () => [],
+      onResync: vi.fn(),
+      onChange: vi.fn(),
+      connect: async () => client,
+      accountBlocks: blocks,
+    });
+    await listener.start();
+    client.emit('end');
+    expect(blocks.disconnected).toHaveBeenCalledTimes(2);
+    expect(listener.connected()).toBe(false);
+    await listener.stop();
+  });
+
   it('LISTENs before resync and applies a later account notification', async () => {
     const rows = [
       { rows: [] },

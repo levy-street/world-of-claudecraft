@@ -1301,6 +1301,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the social window; a struct change rebuilds, a content change refreshes the list only',
   },
   {
+    call: 'this.referralCards.update',
+    band: 'slow',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/referral_cards/referral_cards_controller.ts',
+      proof: 'if (this.lastRevision === revision) return;',
+    },
+    why: 'launcher and open card rebuild only after an authoritative revision changes',
+  },
+  {
     call: 'this.updateGuildBillboardEcho',
     band: 'slow',
     gate: '',
@@ -1901,7 +1913,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // The courier window adds one slow-band, open-only window surface.
       // The Mirefen world-boss branch's Shardpike bar paint: chrome 98.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 52, 99.
-    ).toEqual({ window: 52, chrome: 99, none: 18 });
+    ).toEqual({ window: 53, chrome: 99, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1925,7 +1937,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // this one: it gained a corpseSig latch when the popup started
       // refreshing instead of only closing.
       // The courier window owns both revision and content signature guards.
-      module: 29,
+      module: 30,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -1969,6 +1981,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     ).toEqual(
       [
         'arena_window.ts: if (ravenriftSig === this.lastSig) return;',
+        'hud/referral_cards/referral_cards_controller.ts: if (this.lastRevision === revision) return;',
         'bags_window.ts: if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper)) return;',
         'bank_window.ts: if (sig === this.lastSig) return;',
         'calendar_window.ts: if (sig === this.lastSig) return;',

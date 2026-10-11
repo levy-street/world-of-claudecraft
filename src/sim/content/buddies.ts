@@ -18,7 +18,7 @@
 // imports and runs unchanged on the server, offline, and headless.
 // ---------------------------------------------------------------------------
 
-export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw';
+export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sapling';
 
 // Historical whistle identities remain readable in existing bags and bank saves.
 // This type is only for item definitions; active ownership uses BuddyKey.
@@ -75,6 +75,7 @@ export const BUDDIES: Record<BuddyKey, BuddyDef> = {
     key: 'forgemaw',
     name: 'Forgemaw The Molten',
   },
+  sapling: { key: 'sapling', name: 'Sapling' },
 };
 
 // Enumerated art debt (the src/ui/icons.ts ITEM_ART_PENDING ledger): the

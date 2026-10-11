@@ -79,7 +79,7 @@ function installDb(overrides: Parameters<typeof setAuthDbForTests>[0] = {}): voi
     setAccountEmail: async () => {},
     emailAccountCreated: () => {},
     createSuspiciousRegistrationReport: async () => ({ created: false, signals: [] }),
-    captureReferral: async () => {},
+    resolveReferralSignup: async () => null,
     trackAccountCreated: async () => {},
     ...overrides,
   });
@@ -320,7 +320,7 @@ describe('register handler', () => {
     expect(captures).toEqual([{ id: 7, profile: { locale: 'pt_BR', marketingOptIn: true } }]);
   });
 
-  it('waits for referral capture before returning credentials for the first join', async () => {
+  it('resolves referral attribution before creating the new account and returning credentials', async () => {
     let finish!: () => void;
     let started!: () => void;
     const began = new Promise<void>((resolve) => {
@@ -330,9 +330,10 @@ describe('register handler', () => {
       finish = resolve;
     });
     installDb({
-      captureReferral: async () => {
+      resolveReferralSignup: async () => {
         started();
         await pending;
+        return null;
       },
     });
     let completed = false;
@@ -354,18 +355,24 @@ describe('register handler', () => {
     expect((await response).status).toBe(200);
   });
 
-  it('still completes registration when referral capture fails', async () => {
+  it('does not create an unlinked account when referral resolution fails', async () => {
+    let creates = 0;
     installDb({
-      captureReferral: async () => {
+      createAccount: async () => {
+        creates++;
+        return SUCCESS_ACCOUNT;
+      },
+      resolveReferralSignup: async () => {
         throw new Error('unavailable');
       },
     });
-    expect(
-      (await runHandler({ username: 'newhero', password: 'secret123', email: 'a@b.co' })).status,
-    ).toBe(200);
+    await expect(
+      runHandler({ username: 'newhero', password: 'secret123', email: 'a@b.co', ref: 'aldric' }),
+    ).rejects.toThrow('unavailable');
+    expect(creates).toBe(0);
   });
 
-  it('fires the best-effort suspicious-registration report and referral capture', async () => {
+  it('passes resolved attribution into the atomic account create while reports remain best effort', async () => {
     let suspicious = 0;
     let referral = 0;
     installDb({
@@ -373,8 +380,18 @@ describe('register handler', () => {
         suspicious++;
         return { created: false, signals: [] };
       },
-      captureReferral: async () => {
+      resolveReferralSignup: async () => {
         referral++;
+        return {
+          referrerAccountId: 9,
+          slug: 'aldric',
+          memberEligible: false,
+          inviterName: 'Aldric',
+        };
+      },
+      createAccount: async (_name, _hash, _meta, opts) => {
+        expect(opts?.referral).toMatchObject({ referrerAccountId: 9, slug: 'aldric' });
+        return SUCCESS_ACCOUNT;
       },
     });
     const out = await runHandler({ username: 'newhero', password: 'secret123', email: 'a@b.co' });

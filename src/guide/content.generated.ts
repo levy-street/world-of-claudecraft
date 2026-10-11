@@ -7484,6 +7484,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mount",
         "name": "Dreadspark Groundshaker"
+      },
+      {
+        "kind": "mount",
+        "name": "Friendship Raptor"
+      },
+      {
+        "kind": "mount",
+        "name": "Friendship Tank"
       }
     ]
   },

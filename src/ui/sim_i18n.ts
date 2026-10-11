@@ -18624,6 +18624,8 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
 };
 
 export function localizeSimAuraName(name: string): string | null {
+  if (name === 'Friendship') return t('referralCards.friendshipAura');
+  if (name === 'Protective Charm') return t('referralCards.protectiveCharm');
   const key = AURA_NAME_KEY[name];
   if (key) return tSim(key);
   const trinketItemId = TRINKET_NAMED_AURA_ITEM_IDS[name];

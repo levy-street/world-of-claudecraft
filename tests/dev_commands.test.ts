@@ -533,7 +533,7 @@ describe('/dev bg (Thornhollow Fields force-start)', () => {
     sim.chat('/dev buddies');
 
     expect(sim.ownedBuddies().length).toBe(BUDDY_KEYS.length);
-    expect(sim.ownedBuddies()).toEqual(['horse', 'crystal_lich', 'forgemaw']);
+    expect(sim.ownedBuddies()).toEqual(['horse', 'crystal_lich', 'forgemaw', 'sapling']);
     expect(meta.buddies).not.toHaveProperty('cosmetics');
     expect(meta.inventory.some((s) => s.itemId.startsWith('whistle_'))).toBe(false);
   });

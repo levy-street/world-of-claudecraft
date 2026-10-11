@@ -1,5 +1,6 @@
 import { applyFrameGeometrySetting } from './game/frame_geometry_settings';
 import { createSubscriptionStoreHooks, storeSnapshotForHud } from './net/subscription_sdk';
+import { captureReferralSlug } from './referral_signup';
 import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
 import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
@@ -5239,11 +5240,7 @@ const seekerEntitlementSync = createSeekerEntitlementSync({
 // Referral capture: a visitor who arrives from a shared player card link
 // (?ref=<slug>) carries the referrer's slug into registration. Read it once at
 // load and sanitise it to the server's slug shape so a junk param is dropped.
-const REFERRAL_SLUG = (() => {
-  const raw = new URLSearchParams(location.search).get('ref') ?? '';
-  const slug = raw.trim().toLowerCase();
-  return /^[a-z0-9][a-z0-9-]{0,63}$/.test(slug) ? slug : '';
-})();
+const REFERRAL_SLUG = captureReferralSlug(location.search);
 
 // First-touch attribution capture (fbclid/utm/landing/referrer), write-once at
 // load like the referral slug above; the register call sends it to the server.
@@ -10355,8 +10352,8 @@ function wireStartScreens(): void {
       discordChoiceError('');
       const request =
         pendingDiscordChoice.provider === 'apple'
-          ? api.appleLoginNew(pendingDiscordChoice.linkToken)
-          : api.discordLoginNew(pendingDiscordChoice.linkToken);
+          ? api.appleLoginNew(pendingDiscordChoice.linkToken, REFERRAL_SLUG)
+          : api.discordLoginNew(pendingDiscordChoice.linkToken, REFERRAL_SLUG);
       void request
         .then(finishDiscordChoice)
         .catch(onDiscordChoiceError)

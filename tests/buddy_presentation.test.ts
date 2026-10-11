@@ -32,6 +32,7 @@ describe('buddy portraits shared by Cosmetics and target frames', () => {
       horse: '/ui/portraits/buddy_horse.webp',
       crystal_lich: '/ui/portraits/buddy_crystal_lich.webp',
       forgemaw: '/ui/portraits/buddy_forgemaw.webp',
+      sapling: '/ui/portraits/buddy_sapling.webp',
     });
     const html = buddyCosmeticsHtml({ owned: BUDDY_KEYS, pending: [], active: 'horse' });
     for (const key of BUDDY_KEYS) {
@@ -39,7 +40,7 @@ describe('buddy portraits shared by Cosmetics and target frames', () => {
       expect(targetUrl).toBe(BUDDY_PORTRAIT_URLS[key]);
       expect(html).toContain(`src="${targetUrl}" alt="" aria-hidden="true" draggable="false"`);
     }
-    expect(html.match(/class="cos-buddy-icon"/g)).toHaveLength(3);
+    expect(html.match(/class="cos-buddy-icon"/g)).toHaveLength(4);
     expect(html).not.toContain('/ui/items/whistle_');
   });
 

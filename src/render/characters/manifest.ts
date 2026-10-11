@@ -3485,6 +3485,12 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 0.75,
     clips: BUDDY_CLIPS,
   },
+  buddy_sapling: {
+    url: `${BUDDIES_DIR}/sapling.glb`,
+    height: 0.75,
+    clips: { ...BUDDY_CLIPS, run: 'Run' },
+    authoredAtlas: true,
+  },
   buddy_crystal_lich: {
     url: `${BUDDIES_DIR}/crystal_lich.glb`,
     height: 0.9,
@@ -7803,6 +7809,7 @@ const MOB_KEYS: Record<string, string> = {
   guardian_tithefiend: 'mob_demonalt',
   // Active cosmetic buddy followers.
   buddy_horse: 'buddy_horse',
+  buddy_sapling: 'buddy_sapling',
   buddy_crystal_lich: 'buddy_crystal_lich',
   buddy_forgemaw: 'buddy_forgemaw',
   // Packlord Stampede guardians are transient local templates, not MOBS rows.

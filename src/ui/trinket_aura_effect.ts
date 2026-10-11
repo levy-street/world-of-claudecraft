@@ -96,13 +96,16 @@ export function trinketAuraEffectDescriptor(
   switch (a.id) {
     case TRINKET_AURA.lastStandIcd: {
       const p = passiveOf('bastion_sigil', 'lastStand');
-      return { key: `${KEY}.lastStandCooldown`, nums: { threshold: pct(p?.belowHp ?? 0) } };
+      return {
+        key: `${KEY}.lastStandCooldown`,
+        nums: { threshold: pct(a.value2 ?? p?.belowHp ?? 0) },
+      };
     }
     case TRINKET_AURA.lastStand: {
       const p = passiveOf('bastion_sigil', 'lastStand');
       return {
         key: `${KEY}.lastBastion`,
-        nums: { value: round(a.value), threshold: pct(p?.belowHp ?? 0) },
+        nums: { value: round(a.value), threshold: pct(a.value2 ?? p?.belowHp ?? 0) },
       };
     }
     case TRINKET_AURA.retaliate:

@@ -12,6 +12,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NPCS, QUESTS, zoneAt } from '../src/sim/data';
+import { createReferralCard } from '../src/sim/referral_cards';
+import type { ReferralCardsSnapshot } from '../src/sim/referral_contract';
 import { QuestLogWindow } from '../src/ui/hud/quest/questlog_window';
 import { questMapLocation } from '../src/ui/quest_map_location_core';
 import { QuestTrackingState } from '../src/ui/quest_tracking_core';
@@ -45,7 +47,7 @@ function stubDeps<T extends object>(overrides: Partial<NoInfer<T>>): T {
   }) as T;
 }
 
-function renderQuestFixture(): {
+function renderQuestFixture(referral: ReferralCardsSnapshot | null = null): {
   root: HTMLElement;
   win: QuestLogWindow;
   questIds: [string, string];
@@ -56,6 +58,7 @@ function renderQuestFixture(): {
   insertQuestChatLink: ReturnType<typeof vi.fn>;
   confirmDialog: ReturnType<typeof vi.fn>;
   abandonQuest: ReturnType<typeof vi.fn>;
+  openReferralCards: ReturnType<typeof vi.fn>;
 } {
   const found = Object.values(QUESTS)
     .filter((quest) => quest.objectives.length > 0)
@@ -87,6 +90,7 @@ function renderQuestFixture(): {
   ]);
   const insertQuestChatLink = vi.fn();
   const showOnMap = vi.fn();
+  const openReferralCards = vi.fn();
   const tracking = new QuestTrackingState(fakeStorage());
   tracking.useCharacter('warrior', 'Aurelia');
   const confirmDialog = vi.fn();
@@ -102,6 +106,7 @@ function renderQuestFixture(): {
           questLog,
           questsDone: new Set<string>(),
           abandonQuest,
+          referralCardsSnapshot: () => referral,
         }) as never,
       captureFocus: () => null,
       moneyHtml: () => '',
@@ -111,6 +116,7 @@ function renderQuestFixture(): {
       focusFirstInteractive: vi.fn(),
       insertQuestChatLink,
       showOnMap,
+      openReferralCards,
       tracking,
       confirmDialog,
     }),
@@ -122,6 +128,7 @@ function renderQuestFixture(): {
     questIds: [questA.id, questB.id],
     mapOpen,
     showOnMap,
+    openReferralCards,
     tracking,
     questLog,
     insertQuestChatLink,
@@ -131,6 +138,29 @@ function renderQuestFixture(): {
 }
 
 describe('questlog_window: WCAG chrome (dialog + rows + focus-return)', () => {
+  it('places the next stamp quests first and opens the paged card menu', () => {
+    const card = createReferralCard(8, 10, 20);
+    card.status = 'active';
+    Object.assign(card.participants[0], { characterId: 100, credited: 1, redeemed: 1 });
+    const f = renderQuestFixture({
+      revision: 1,
+      accountId: 10,
+      characterId: 100,
+      characterName: 'Aster',
+      inviteUrl: null,
+      links: [{ card, friendName: 'Briar', canMove: false, summonRemainingSeconds: 0 }],
+      completedFriends: 0,
+      rewardedTiers: [],
+      notices: [],
+      nextCursor: 8,
+    });
+    const group = f.root.querySelector('.ql-list')?.firstElementChild;
+    expect(group?.classList.contains('referral-quest-group')).toBe(true);
+    expect(group?.querySelector('[data-referral-quest="hollow"]')?.textContent).toContain('Briar');
+    group?.querySelector<HTMLButtonElement>('[data-referral-quest="hollow"]')?.click();
+    expect(f.openReferralCards).toHaveBeenCalledTimes(1);
+    expect(group?.textContent).toContain('Browse all stamp card pages');
+  });
   it('drives the panel from the pure view core', () => {
     expect(code).toContain('buildQuestLogView(');
   });

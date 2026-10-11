@@ -55,6 +55,7 @@ import {
 } from '../src/sim/content/professions';
 import { recipeById } from '../src/sim/content/recipes';
 import { REFERRAL_ITEMS } from '../src/sim/content/referral';
+import { REFERRAL_STAMP_ITEMS } from '../src/sim/content/referral_rewards';
 import {
   RELIQUARY_ITEM_TO_PAGES,
   RELIQUARY_MARK_IDS,
@@ -165,6 +166,9 @@ const PROFESSIONS_BLOB_FIELDS = [
 // included, since a key absent from the fixture is harmless here while a
 // missing one is not.
 const NON_PROFESSIONS_BLOB_FIELDS = [
+  // Per-link reward receipts and the bounded inviter tier mask, never crafting state.
+  'referralRewards',
+  'referralInviterRewards',
   // The buddy collection (src/sim/buddies.ts): owned, last and custom names.
   'buddies',
   // Written by the SERVER, not by serializeCharacter: server/game.ts stamps
@@ -1672,12 +1676,13 @@ function maximalCharacterSim(): Sim {
 
   // Deeds no longer grant companions. Arm the complete retained collection
   // explicitly so removing those rewards does not shrink this field to absent.
-  meta.buddies.owned = new Set(['horse', 'crystal_lich', 'forgemaw']);
+  meta.buddies.owned = new Set(['horse', 'crystal_lich', 'forgemaw', 'sapling']);
   meta.buddies.last = 'crystal_lich';
   meta.buddies.names = {
     horse: 'ABCDEFGHIJKLMNOP',
     crystal_lich: 'ABCDEFGHIJKLMNOP',
     forgemaw: 'ABCDEFGHIJKLMNOP',
+    sapling: 'ABCDEFGHIJKLMNOP',
   };
 
   // Progression at the cap, every counter wide.
@@ -1950,7 +1955,7 @@ describe('whole-character material source composition matrix', () => {
 
       expect(third).toEqual(second);
       expect(second.inventory).toHaveLength(112);
-      expect(second.bank?.inventory).toHaveLength(208);
+      expect(second.bank?.inventory).toHaveLength(228);
       expect(second.vendorBuyback).toHaveLength(12);
       expect(second.vault?.special).toHaveLength(vaultMaterialIds().size);
       expect(second.vault?.stock).toEqual({});
@@ -1963,7 +1968,7 @@ describe('whole-character material source composition matrix', () => {
           ? 1
           : shape === 'varied'
             ? 5
-            : 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * 200;
+            : 112 * 20 + 228 * 20 + 12 * 20 + vaultMaterialIds().size * 200;
       expect(sourceCount(second)).toBe(expectedSources);
       process.stdout.write(
         `[professions-blob-material-sources] ${JSON.stringify({
@@ -1973,7 +1978,7 @@ describe('whole-character material source composition matrix', () => {
           warningBytes: CHARACTER_BLOB_WARN_BYTES,
           relationToWarning:
             materialSourceBytes(second) < CHARACTER_BLOB_WARN_BYTES ? 'below' : 'at-or-above',
-          physicalUnits: 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * 200,
+          physicalUnits: 112 * 20 + 228 * 20 + 12 * 20 + vaultMaterialIds().size * 200,
         })}\n`,
       );
     }
@@ -1981,6 +1986,39 @@ describe('whole-character material source composition matrix', () => {
 });
 
 describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () => {
+  it('measures the conservative full-gear plus referral-receipt field envelope without truncation', () => {
+    const source = maximalCharacterSim();
+    const settled = makeSim(54, CEILING_EPOCH_MS);
+    const pid = settled.addPlayer('warrior', 'ReceiptEnvelope', {
+      state: source.serializeCharacter(source.playerId)!,
+    });
+    const baseline = settled.serializeCharacter(pid)!;
+    // Independent field maxima, NOT a simultaneously reachable storage state:
+    // 284 actual receipts need 284 protected bags (proved in referral_reward_growth),
+    // so their bags would replace the heavy item payloads in this fixture.
+    const receipts = Object.fromEntries(
+      Array.from({ length: 284 }, (_, index) => [2_147_483_647 - index, { redeemed: 31 }]),
+    );
+    const loaded = makeSim(55, CEILING_EPOCH_MS);
+    const loadedPid = loaded.addPlayer('warrior', 'ReceiptEnvelope', {
+      state: { ...baseline, referralRewards: receipts, referralInviterRewards: 31 },
+    });
+    const state = loaded.serializeCharacter(loadedPid)!;
+    expect(state.referralRewards).toEqual(receipts);
+    expect(state.referralInviterRewards).toBe(31);
+    expect(state.bank).toEqual(baseline.bank);
+    const bytes = Buffer.byteLength(JSON.stringify(state));
+    const baselineBytes = Buffer.byteLength(JSON.stringify(baseline));
+    expect(baselineBytes).toBe(258370);
+    expect(bytes - baselineBytes).toBe(8284);
+    expect(bytes).toBe(266654);
+    // Keep the warning threshold unchanged: saves above it remain whole.
+    expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
+    process.stdout.write(
+      `[referral-conservative-blob-envelope] ${JSON.stringify({ bytes, baselineBytes, receiptBytes: bytes - baselineBytes, warningBytes: CHARACTER_BLOB_WARN_BYTES })}\n`,
+    );
+  });
+
   it('settles to a fixed point with every container at its legal ceiling, inside the band', () => {
     const sim = maximalCharacterSim();
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
@@ -1993,18 +2031,20 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(s3).toEqual(s2);
     expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
     expect(s2.buddies).toEqual({
-      owned: ['horse', 'crystal_lich', 'forgemaw'],
+      owned: ['horse', 'crystal_lich', 'forgemaw', 'sapling'],
       last: 'crystal_lich',
       names: {
         horse: 'ABCDEFGHIJKLMNOP',
         crystal_lich: 'ABCDEFGHIJKLMNOP',
         forgemaw: 'ABCDEFGHIJKLMNOP',
+        sapling: 'ABCDEFGHIJKLMNOP',
       },
     });
-    // The retained collection plus three maximum-length custom names, including
-    // its top-level key. Names add 101 bytes to the pre-naming collection.
-    const buddyCollectionBytes = Buffer.byteLength(JSON.stringify(s2.buddies), 'utf8') + 11;
-    expect(buddyCollectionBytes).toBe(179);
+    // Four retained companions and maximum-length custom names, including the key.
+    const fullBuddyCollectionBytes = Buffer.byteLength(JSON.stringify(s2.buddies), 'utf8') + 11;
+    expect(fullBuddyCollectionBytes).toBe(218);
+    const stampBuddyBytes = 39; // Sapling's owned id (10) plus named row (29).
+    const buddyCollectionBytes = fullBuddyCollectionBytes - stampBuddyBytes;
 
     // The professions block rides inside at its own ceiling: the same band the
     // professions arm pins, so the two measurements can never describe
@@ -2036,9 +2076,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       s2.inventory?.every((row) => row.instance?.signer?.length === MAX_CRAFTED_BY_LENGTH),
     ).toBe(true);
-    expect(s2.bank?.inventory).toHaveLength(24 + 72 + 16 + 4 * 16);
+    expect(s2.bank?.inventory).toHaveLength(24 + 72 + 36 + 4 * 16);
     expect(s2.bank?.purchasedSlots).toBe(72);
-    expect(s2.bank?.bonusSlots).toBe(16);
+    expect(s2.bank?.bonusSlots).toBe(36);
     expect(s2.bank?.unlockedSockets).toBe(4);
     expect(s2.bank?.appliedStorageKeys).toHaveLength(12);
     expect(s2.bank?.appliedStorageKeys?.every((k) => k.length === 200)).toBe(true);
@@ -2178,14 +2218,50 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // pure content-table arithmetic with no shape question in them: `deeds`
     // (10,369), `questsDone` (4,620) and `raidLockouts` (541).
     const bytes = Buffer.byteLength(JSON.stringify(s2), 'utf8');
+    // Attribute the stamp-card feature independently from the historical ledger:
+    // twenty more bank slots, five discoverable item ids and the Sapling buddy. Mount relics reuse
+    // an existing illuminated page and add no character-save key in this fixture.
+    const stampIds = new Set(Object.keys(REFERRAL_STAMP_ITEMS));
+    const beforeStampCards: CharacterState = {
+      ...s2,
+      buddies: {
+        ...s2.buddies!,
+        owned: s2.buddies!.owned!.filter((id) => id !== 'sapling'),
+        names: Object.fromEntries(
+          Object.entries(s2.buddies!.names ?? {}).filter(([id]) => id !== 'sapling'),
+        ),
+      },
+      bank: {
+        ...s2.bank!,
+        bonusSlots: 16,
+        inventory: s2.bank!.inventory.slice(0, -20),
+      },
+      deedStats: {
+        ...s2.deedStats,
+        itemsDiscovered: (s2.deedStats?.itemsDiscovered ?? []).filter((id) => !stampIds.has(id)),
+      },
+    };
+    expect(stampIds.size).toBe(5);
+    const stampCardBytes = bytes - Buffer.byteLength(JSON.stringify(beforeStampCards), 'utf8');
+    const bankRewardBytes =
+      20 * (Buffer.byteLength(JSON.stringify(s2.bank!.inventory[0]), 'utf8') + 1);
+    const stampDiscoveryBytes = [...stampIds].reduce((sum, id) => sum + id.length + 3, 0);
+    expect(stampCardBytes).toBe(bankRewardBytes + stampDiscoveryBytes + stampBuddyBytes);
+    // Check the current payload independently of the historical counterfactual ledger.
+    expect(bytes).toBeLessThan(CHARACTER_BLOB_WARN_BYTES);
+    process.stdout.write(
+      `[referral-blob-growth] ${JSON.stringify({ bytes, stampCardBytes, bankRewardBytes, stampDiscoveryBytes, stampBuddyBytes })}\n`,
+    );
     // Referral armour adds seven discovery ids and no saved entitlement fields.
     // Strip only these entries before replaying the historical growth ledger.
     const referralIds = new Set(Object.keys(REFERRAL_ITEMS));
     const withoutReferral: CharacterState = {
-      ...s2,
+      ...beforeStampCards,
       deedStats: {
-        ...s2.deedStats,
-        itemsDiscovered: (s2.deedStats?.itemsDiscovered ?? []).filter((id) => !referralIds.has(id)),
+        ...beforeStampCards.deedStats,
+        itemsDiscovered: (beforeStampCards.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => !referralIds.has(id),
+        ),
       },
     };
     expect(referralIds.size).toBe(7);
@@ -2195,8 +2271,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 242,954 on the v0.45.0 integration: plus the Mirefen world-boss branch (+1,191).
     // 246,084 with the five-dungeon rework's attributed +3,130 (PR 4352).
     expect(beforeReferralBytes).toBe(246084);
-    expect(bytes - beforeReferralBytes).toBe(122);
-    expect(fieldBytes(s2, 'deedStats') - fieldBytes(withoutReferral, 'deedStats')).toBe(122);
+    expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
+    expect(
+      fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
+    ).toBe(122);
     // Membership adds eight discoverable item ids and no character entitlement
     // fields. Isolate the measured content-only growth from the settled save:
     // 233,360 -> 233,515 bytes, all 155 bytes in itemsDiscovered (241,608 ->
@@ -2916,8 +2994,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 246,206 bytes = 243,076 + 3,089 + 41, attributed above. Floor at measurement
     // minus 380, edge at measurement plus one: 245826..246207.
     // Buddy discovery and collection fields add 885 bytes; keep the 381-byte band.
-    expect(bytes, reMint).toBeGreaterThan(246711);
-    expect(bytes, reMint).toBeLessThan(247092);
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(246711);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(247092);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

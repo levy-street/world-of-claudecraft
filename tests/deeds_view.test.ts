@@ -152,6 +152,15 @@ function makeInput(over: Partial<DeedsViewInput> = {}): DeedsViewInput {
 // ---------------------------------------------------------------------------
 
 describe('deedProgress', () => {
+  it('lists the referral title only for its current character owner without changing deed totals', () => {
+    const base = buildDeedsView(makeInput());
+    const owned = buildDeedsView(
+      makeInput({ referralTitleOwned: true, activeTitle: 'referral_trailmate' }),
+    );
+    expect(base.titles.some((row) => row.id === 'referral_trailmate')).toBe(false);
+    expect(owned.titles).toContainEqual({ id: 'referral_trailmate', active: true });
+    expect(owned.summary).toEqual(base.summary);
+  });
   it('reads stat counters and clamps at the target, never over', () => {
     const s = stats((x) => {
       x.counters.kills = 7;

@@ -162,6 +162,7 @@ const CEILINGS: Record<string, number> = {
   'layout.css': 0,
   'library.css': 0,
   'play.extra.css': 1,
+  'referral_cards.css': 0,
   'shell.css': 719,
   'shell.website.css': 0,
   'shell.website-pages.css': 0,

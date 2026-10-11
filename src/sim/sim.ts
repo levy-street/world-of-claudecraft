@@ -54,7 +54,11 @@ import type { ItemCopyAnchor } from './item_copy_anchor';
 import * as membershipMod from './membership';
 import { refreshKnownAbilities } from './progression/known_abilities';
 import { setPlayerLevel as setPlayerLevelImpl } from './progression/level';
+import { savedQuestProgress } from './quests/quest_progress_save';
 import type { HostArmourAuthority } from './referral_armour';
+import type { ReferralCardsAction, ReferralCardsSnapshot } from './referral_contract';
+import { type ReferralRewardState, referralRewardState } from './referral_reward_state';
+import { applyReferralRewardState as applyReferralRewardStateImpl } from './referral_rewards';
 import * as treasureVaultMod from './treasure_vault';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
@@ -238,13 +242,8 @@ import { dayNightPhaseOf } from './day_night';
 import { refusedWhileDead } from './dead_gate';
 import { deckFloorHeight } from './deck_floor';
 import * as deedsMod from './deeds';
-import {
-  createDeedRuntime,
-  type DeedRuntime,
-  deedStatsSaveFragment,
-  freshDeedStats,
-} from './deeds';
-import { restoreBookOfDeeds, runBookOfDeedsJoinRetro } from './deeds_restore';
+import { createDeedRuntime, type DeedRuntime, freshDeedStats } from './deeds';
+import { restoreBookOfDeeds, runBookOfDeedsJoinRetro, savedBookOfDeeds } from './deeds_restore';
 import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
@@ -1324,7 +1323,8 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
 export interface PlayerMeta
-  extends worldQuestState.WorldQuestPlayerState,
+  extends ReferralRewardState,
+    worldQuestState.WorldQuestPlayerState,
     HostArmourAuthority,
     lanceTrialMod.LancePlayerState {
   courier?: courierMod.CourierState;
@@ -3365,6 +3365,7 @@ export class Sim {
       // The Book of Deeds + Reliquary restore (deeds_restore.ts): earned days,
       // stat block, sparse Reliquary state, milestone unification, the renown
       // recompute, and the validated title/border re-apply.
+      Object.assign(meta, referralRewardState(s));
       restoreBookOfDeeds(meta, player, s);
       // The buddy collection restores beside the Book (buddies.ts): owned
       // companions and pending boss reveals.
@@ -3903,23 +3904,11 @@ export class Sim {
       // Unstuck Sickness persists across logout for the same reason.
       unstuckSickness: e.auras.find((a) => a.id === UNSTUCK_SICKNESS_ID)?.remaining ?? null,
       ...savedCharacterStorage(meta),
+      ...referralRewardState(meta),
       // A lent muster pike is folded back out of every save (muster_pike.ts).
       ...savedGearFor(meta, this.musterArmy.lent.get(pid)),
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
-      questLog: [...meta.questLog.values()].map((q) => ({
-        questId: q.questId,
-        counts: [...q.counts],
-        state: q.state,
-        ...(q.selection === undefined ? {} : { selection: q.selection }),
-        ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
-        ...(q.burnedObjects === undefined
-          ? {}
-          : { burnedObjects: q.burnedObjects.map((b) => ({ key: b.key, at: b.at })) }),
-        // Absent until the first interact credit (parity-stable saves).
-        ...(q.creditedObjects === undefined ? {} : { creditedObjects: [...q.creditedObjects] }),
-        ...(q.rev === undefined ? {} : { rev: q.rev }),
-      })),
-      questsDone: [...meta.questsDone],
+      ...savedQuestProgress(meta),
       ...savedWorldQuestState(meta),
       arenaRating: meta.arenaRating,
       arenaWins: meta.arenaWins,
@@ -4069,14 +4058,7 @@ export class Sim {
         return saved === undefined ? {} : { gatheringGoal: saved };
       })(),
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
-      // Book of Deeds: every field conditional (absent while empty/null/zero)
-      // so pre-deed saves stay byte-equal until the system engages. The
-      // legacy unlockedMilestones above stays dual-written for one release.
-      ...(meta.deedsEarned.size > 0 ? { deeds: Object.fromEntries(meta.deedsEarned) } : {}),
-      ...deedStatsSaveFragment(meta.deedStats),
-      ...(meta.activeTitle !== null ? { activeTitle: meta.activeTitle } : {}),
-      ...(meta.activeBorder !== null ? { activeBorder: meta.activeBorder } : {}),
-      ...(meta.renown > 0 ? { renown: meta.renown } : {}),
+      ...savedBookOfDeeds(meta),
       // Reliquary: absent while empty (zero-default omission), same contract as
       // deedStats so pre-system saves stay byte-equal until a catalogued find.
       ...reliquarySaveFragment(meta.reliquary),
@@ -9497,6 +9479,15 @@ export class Sim {
   readonly spectating: string | null = null;
   readonly actionBarReadOnly = false;
   socialInfo: null = null;
+  applyReferralRewardState(pid: number, before: CharacterState, after: CharacterState): boolean {
+    return applyReferralRewardStateImpl(this.ctx, pid, before, after);
+  }
+  referralCardsSnapshot(): ReferralCardsSnapshot | null {
+    return null;
+  }
+  referralCardsAction(_action: ReferralCardsAction): void {}
+  socialFriendsPage(_afterCharacterId: number): void {}
+  socialBlocksPage(_cursor: number): void {}
   friendAdd(_name: string): void {}
   friendRemove(_name: string): void {}
   blockAdd(_name: string): void {}

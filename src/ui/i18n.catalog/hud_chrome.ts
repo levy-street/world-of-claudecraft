@@ -2350,6 +2350,8 @@ export const hudChromeStrings = {
     name_goblin_rocket_sled: 'Goblin Rocket Sled',
     name_rallycart_rxt: 'Rallycart RXT',
     name_terrorspark_groundshaker: 'Dreadspark Groundshaker',
+    name_referral_tank: 'Friendship Tank',
+    name_referral_raptor: 'Friendship Raptor',
     name_drakemaw_raptor: 'Drakemaw Raptor',
     name_avian_strider: 'Viridian Valestrider',
     name_mech_bird: 'Cluckwork Mech Bird',
@@ -2373,6 +2375,8 @@ export const hudChromeStrings = {
     desc_rallycart_skin: 'A tiny rally car with a mighty roar.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
+    desc_referral_tank: 'Earned by completing a referral stamp card.',
+    desc_referral_raptor: 'Earned by helping your first bound friend complete a stamp card.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
     desc_avian_strider:
@@ -5569,9 +5573,9 @@ export const hudChromeStrings = {
     // change, each using its locale's trinket and aura names.
     trinket: {
       lastStandCooldown:
-        "Bastion Sigil's Last Bastion shield was used. Falling below {threshold}% health cannot raise it again until this expires.",
+        'Your protective shield was used. Taking damage below {threshold}% health cannot raise it again until this expires.',
       lastBastion:
-        'Absorbs {value} damage. Bastion Sigil raised it when you took damage below {threshold}% health.',
+        'Absorbs {value} damage. Your trinket raised it when you took damage below {threshold}% health.',
       retaliate:
         'Enemies that hit you directly take Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.',
       moored:

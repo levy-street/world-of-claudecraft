@@ -11,6 +11,119 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const zh_CN: EnTranslations = {
+  "referralCards": {
+    "title": "推荐好友",
+    "subtitle": "携手冒险，收集印章。",
+    "close": "关闭推荐好友",
+    "launcher": "集章卡",
+    "pages": "集章卡分页",
+    "firstPage": "首页",
+    "nextPage": "更多卡片",
+    "trailmateTitle": "旅途伙伴",
+    "friendshipAura": "友谊",
+    "protectiveCharm": "守护护符",
+    "bankBonus": "已完成的集章卡",
+    "bankBonusHelp": "帮助两名绑定好友完成集章卡，即可永久解锁20个银行栏位。",
+    "friendshipUse": "使你的力量、敏捷、耐力、智力和精神提高{stats}，持续{duration}秒。",
+    "readyCount": "集章卡：{count}份奖励可领取",
+    "loading": "正在连接你的推荐集章卡...",
+    "empty": "邀请一位新玩家，一起开始你们的第一张集章卡。",
+    "inviteTitle": "邀请好友",
+    "inviteHelp": "在好友创建账号前，将此链接分享给他们。只有通过你的链接创建的新账号才能成为绑定好友。",
+    "inviteLabel": "你的邀请链接",
+    "inviteUnavailable": "你的邀请链接暂不可用。",
+    "membership": "当绑定好友首次购买会员时，你将获得一份会员契约。",
+    "cardBetween": "{you}与{friend}",
+    "yourCard": "{name}的集章卡",
+    "unassigned": "尚未选择角色",
+    "start": "开始集章卡",
+    "startPrompt": "要与{friend}一起开始集章卡吗？双方都必须接受。每个角色都必须低于5级，且尚未完成新手岛的最终任务。",
+    "accept": "接受",
+    "decline": "拒绝",
+    "declinePrompt": "确定要拒绝吗？只要两个角色仍符合要求，之后仍可从集章卡菜单开始。",
+    "declineConfirmed": "尚未开始此卡片。只要两个角色仍符合要求，就能从集章卡菜单开始。",
+    "waiting": "正在等待绑定好友接受。",
+    "cancel": "取消",
+    "okay": "确定",
+    "understand": "是，我明白",
+    "confirmLock": "是，锁定此卡片",
+    "lockFirst": "领取缚雾者印章奖励后，此卡片将永久锁定给{name}。你将无法再将此卡片及其奖励转移给其他角色。你明白吗？",
+    "lockSecond": "确定吗？领取缚雾者奖励，并将此卡片永久锁定给{name}。",
+    "locked": "此卡片已锁定给{name}，无法再转移。",
+    "unlocked": "在领取缚雾者印章奖励前，可以将此卡片转移给其他符合条件的角色。领取该奖励后，卡片将永久锁定给此角色。",
+    "move": "将卡片转移至此角色",
+    "movePrompt": "将你的卡片从{oldName}转移至{newName}吗？卡片进度和所有通过此卡片获得的奖励都会转移。这些奖励将从{oldName}处移除。",
+    "confirmMove": "是，转移我的卡片",
+    "summon": "召唤绑定好友",
+    "summonPrompt": "{friend}想将你召唤到他们所在的位置。接受召唤吗？",
+    "summonHelp": "将绑定好友召唤到你所在的位置。每30分钟可以召唤一次。",
+    "summonCooldown": "召唤还需{minutes}分{seconds}秒",
+    "reward": "奖励：{reward}",
+    "earned": "已获得",
+    "redeemed": "已领取",
+    "emptyStamp": "尚未获得",
+    "stamping": "正在为卡片盖章...",
+    "redeem": "领取奖励",
+    "previous": "请先领取之前印章的奖励。",
+    "playTogether": "与此卡片上的角色组队完成里程碑。",
+    "fallback": "已经独自完成了里程碑任务？与你的好友重新组队即可获得新手岛印章。之后的任务印章需要一起通关对应地下城。",
+    "questGroup": "集章卡任务",
+    "questWithFriend": "与{friend}一起完成{quest}",
+    "browseCards": "浏览全部集章卡分页",
+    "nextQuest": "集章卡：{quest}",
+    "questIndicator": "此任务可推进你的下一个集章卡奖励。",
+    "completion": "恭喜！{friend}在你的帮助下完成了集章卡。",
+    "openInvites": "打开推荐好友",
+    "referrerTitle": "你帮助的好友",
+    "referrerCount": "{count}位好友已完成",
+    "friendTier": "已帮助好友：{count}",
+    "awarded": "已发放",
+    "pending": "尚未发放",
+    "milestones": {
+      "tutorial": "新手岛最终任务",
+      "hollow": "进入空洞",
+      "fogbinder": "缚雾者",
+      "gravewyrm": "墓龙科祖尔",
+      "raid": "击败你的首个团队首领"
+    },
+    "rewards": {
+      "tutorial": "一个独有头衔和一个最高容量背包，绑定至你的角色。",
+      "hollow": "一件提高耐力的饰品，并在你生命值较低时被动生成护盾。",
+      "fogbinder": "你的饰品进化，提高更多耐力，并获得主动效果：所有属性提高5点，持续15秒，冷却时间为2分钟。",
+      "gravewyrm": "免费坐骑训练。",
+      "raid": "专属友谊坦克坐骑。"
+    },
+    "referrerRewards": {
+      "1": "专属友谊迅猛龙坐骑。",
+      "2": "20个银行栏位和5个角色栏位。",
+      "3": "获得1,000 Claudium。",
+      "4": "获得1,000 Claudium。",
+      "5": "小树苗伙伴。"
+    },
+    "reasons": {
+      "notParticipant": "此账号不属于这对绑定好友。",
+      "staleRevision": "你的卡片已发生变化。请查看最新进度后重试。",
+      "invalidCharacters": "队伍中的角色不属于这对绑定好友。",
+      "notTogether": "双方绑定好友必须在同一队伍中。",
+      "levelTooHigh": "新集章卡的角色必须低于5级。",
+      "tutorialCompleted": "有角色已经完成了新手岛的最终任务。",
+      "alreadyStarted": "这对好友已经有卡片了。每对绑定好友只能有一张有效卡片。",
+      "notPending": "没有等待回应的卡片邀请。",
+      "declinePending": "你的绑定好友正在决定是否拒绝此卡片。",
+      "declineNotConfirmed": "请先确认拒绝，再结束此次邀请。",
+      "notActive": "请先一起开始卡片，再领取奖励。",
+      "wrongCharacter": "请使用卡片上列出的角色，或将尚未锁定的卡片转移至符合条件的角色。",
+      "locked": "此卡片已锁定给其角色，无法转移。",
+      "sameCharacter": "此卡片已经属于此角色。",
+      "invalidMilestone": "该印章不属于此卡片。",
+      "notEarned": "请先一起完成此里程碑，再领取奖励。",
+      "alreadyRedeemed": "此奖励已经领取。",
+      "previousRewardRequired": "请先领取之前印章的奖励。",
+      "confirmationRequired": "领取缚雾者奖励前，请先阅读卡片锁定警告。",
+      "newAccountsOnly": "只有通过推荐链接创建新账号时，才能成为绑定好友。已有账号无法绑定。",
+      "unavailable": "暂时无法执行此操作，请稍后重试。"
+    }
+  },
   "meta": {
     "builtOn": "构建于 {date}"
   },
@@ -2093,6 +2206,8 @@ export const zh_CN: EnTranslations = {
       "name_goblin_rocket_sled": "哥布林火箭雪橇",
       "name_rallycart_rxt": "拉力卡丁车 RXT",
       "name_terrorspark_groundshaker": "骇雷撼地者",
+      "name_referral_tank": "友谊坦克",
+      "name_referral_raptor": "友谊迅猛龙",
       "name_drakemaw_raptor": "龙喉迅猛龙",
       "name_avian_strider": "苍翠谷行者",
       "name_mech_bird": "发条机械鸟",
@@ -2110,6 +2225,8 @@ export const zh_CN: EnTranslations = {
       "desc_rallycart_rxt": "一辆小巧却地道的拉力赛车，能提升移动速度。",
       "desc_rallycart_skin": "一辆小巧的拉力赛车，轰鸣声却震天响。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
+      "desc_referral_tank": "完成一张推荐集章卡后获得。",
+      "desc_referral_raptor": "帮助你的首位绑定好友完成一张集章卡后获得。",
       "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。",
       "desc_avian_strider": "高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。",
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
@@ -4196,8 +4313,8 @@ export const zh_CN: EnTranslations = {
       "nextAttackCrit": "下一次攻击必定暴击",
       "healEcho": "生命值低于 {threshold}% 时恢复 {value} 点生命值",
       "trinket": {
-        "lastStandCooldown": "堡垒徽印的最后堡垒护盾已被使用。在此效果结束前，生命值低于 {threshold}% 时无法再次触发。",
-        "lastBastion": "吸收 {value} 点伤害。你在生命值低于 {threshold}% 时受到伤害，堡垒徽印为你升起了此护盾。",
+        "lastStandCooldown": "你的防护护盾已经触发。在此效果结束前，生命值低于{threshold}%时受到伤害也无法再次生成护盾。",
+        "lastBastion": "吸收{value}点伤害。你在生命值低于{threshold}%时受到伤害，触发了饰品的护盾。",
         "retaliate": "直接击中你的敌人会受到相当于该次攻击令你损失生命值 {pct}% 的物理伤害。周期性伤害不会触发此效果。",
         "moored": "你受到的伤害降低 {reduction}%，但移动速度变为 {speed}%。你无视昏迷、定身、减速、恐惧、变形、沉默、致盲、妖术、缴械、失去行动能力效果和击退。",
         "hourglassStored": "储存了来自你过量治疗的 {stored} 点治疗量。使用愈者沙漏可将其转化为护盾，施加于 {range} 码内生命值百分比最低的队伍成员（包括你自己）。",
@@ -7321,6 +7438,8 @@ export const zh_CN: EnTranslations = {
       "delete_confirm": "输入角色名称以确认删除。",
       "storage_purchase_open": "此储物空间购买必须完成或解决后，才能删除该角色。",
       "delete_busy": "服务器繁忙，请稍后再尝试删除该角色。",
+      "referral_transfer_pending": "删除此角色前，请先将所有尚未锁定的集章卡转移至其他角色。",
+      "referral_bond_pending": "一份推荐奖励会员契约正在发放给此角色。请在发放完成后再尝试删除此角色。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一个会话接管。",
       "rename_required": "此角色必须先改名才能进入世界。",
@@ -12881,6 +13000,10 @@ export const zh_CN: EnTranslations = {
     "social": {
       "title": "社交",
       "friendsTab": "好友",
+      "friendFirstPage": "首页",
+      "friendNextPage": "下一页",
+      "boundFriend": "绑定好友",
+      "boundFriendLink": "绑定好友通过邀请链接建立关系。",
       "guildTab": "公会",
       "ignoreTab": "忽略",
       "leaveParty": "离开队伍",
@@ -21081,6 +21204,21 @@ export const zh_CN: EnTranslations = {
       },
       "membership_token": {
         "name": "会员代币（30天）"
+      },
+      "referral_satchel": {
+        "name": "友谊挎包"
+      },
+      "referral_hollow_charm": {
+        "name": "空洞友谊护符"
+      },
+      "referral_fog_charm": {
+        "name": "缚雾友谊护符"
+      },
+      "reins_referral_tank": {
+        "name": "友谊坦克缰绳"
+      },
+      "reins_referral_raptor": {
+        "name": "友谊迅猛龙缰绳"
       },
       "referral_helmet": {
         "name": "友谊头盔"

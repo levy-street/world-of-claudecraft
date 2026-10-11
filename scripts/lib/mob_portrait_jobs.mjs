@@ -134,6 +134,7 @@ async function loadPortraitData(repoRoot) {
     export { MOBS } from './src/sim/data.ts';
     export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
     export { wocArmorPackUrl } from './src/render/characters/woc_armor_core.ts';
+    export { targetPortraitUrl } from './src/ui/target_portrait_view.ts';
   `;
   const built = await esbuild.build({
     stdin: {
@@ -190,7 +191,7 @@ function sourceRecord(repoRoot, mob, visualKey, def, assetCache, wocArmorPackUrl
 }
 
 export async function buildMobPortraitJobs(repoRoot) {
-  const { FINDER_ACTIVITIES, MOBS, VISUALS, visualKeyFor, wocArmorPackUrl } =
+  const { FINDER_ACTIVITIES, MOBS, VISUALS, visualKeyFor, wocArmorPackUrl, targetPortraitUrl } =
     await loadPortraitData(repoRoot);
   const assetCache = new Map();
   const jobs = new Map();
@@ -225,7 +226,12 @@ export async function buildMobPortraitJobs(repoRoot) {
   for (const activity of FINDER_ACTIVITIES) {
     for (const encounter of activity.encounters) addJob(encounter.mobId, true);
   }
-  for (const mobId of Object.keys(MOBS)) addJob(mobId, false);
+  // Static buddy headshots are shared by target frames and Cosmetics. Only bake
+  // the mob portraits the live resolver actually consumes, never duplicate them.
+  for (const mobId of Object.keys(MOBS)) {
+    if (targetPortraitUrl(mobId, true) === `/ui/mobs/${encodeURIComponent(mobId)}.webp`)
+      addJob(mobId, false);
+  }
   return [...jobs.values()];
 }
 

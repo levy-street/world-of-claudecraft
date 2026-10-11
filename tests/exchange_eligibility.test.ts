@@ -205,14 +205,21 @@ describe('the exchange rail refuses exactly what the sibling TRANSFER-lock pipes
   });
 });
 
-describe('the REAL catalog clears every mount and every chroma plate', () => {
-  it('has a mount item per catalog mount, and all of them pass the locks', () => {
+describe('the REAL catalog applies collectible transfer policy', () => {
+  it('has a mount item per catalog mount and refuses the exclusive referral rewards', () => {
     const mountItems = Object.values(ITEMS).filter((i) => exchangeItemCategory(i) === 'mount');
     // One tradable handle per catalog mount: a mount with no item behind it
     // would be untradable no matter what the policy said.
     expect(mountItems.length).toBe(Object.keys(MOUNTS).length);
     const blocked = mountItems.filter((i) => exchangeHardLock(i, undefined) !== null);
-    expect(blocked.map((i) => i.id)).toEqual([]);
+    expect(blocked.map((i) => i.id).sort()).toEqual([
+      'reins_referral_raptor',
+      'reins_referral_tank',
+    ]);
+    for (const item of blocked) {
+      expect(item.soulbound).toBe(true);
+      expect(exchangeHardLock(item, undefined)).toBe('no_market_list');
+    }
     // Non-vacuity, weakened deliberately in v0.35.0. It used to assert that EVERY
     // mount item is soulbound, which held when the tolerance was written: back then
     // the flag was what kept mounts out of the gold economy. v0.35.0 un-soulbound

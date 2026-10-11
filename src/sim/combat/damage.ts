@@ -69,6 +69,7 @@ import {
   worldPvpOnPlayerDeath,
 } from '../pvp';
 import { referralArmourXpActive } from '../referral_armour';
+import { emitReferralBossEvidence } from '../referral_evidence';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import { computeCharacterModifiers } from '../set_bonus_mods';
@@ -1933,6 +1934,8 @@ export function handleDeath(
       // Book of Deeds kill credit: lifetime counters, slain marks, dungeon
       // clears, and the encounter skill tasks that resolve at this death.
       deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
+      if (e.templateId !== 'nythraxis_scourge_of_thornpeak')
+        emitReferralBossEvidence(ctx, e, eligible);
     }
     // Settle the heroic reward and its realm-reset lockout together. This runs
     // even without player credit so the owning group cannot dodge the lockout;

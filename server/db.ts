@@ -18,7 +18,6 @@ import { bustAdminGuildListReads } from './admin_guilds_read';
 import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { ACCOUNT_ATTRIBUTION_SCHEMA, accountAttributionForExport } from './attribution_db';
-import { validCharName } from './auth';
 import {
   type AccountModerationRow,
   type AccountModerationStatus,
@@ -69,13 +68,6 @@ import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import { cleanMetadataText } from './clean_metadata_text';
 import { CLIENT_PERF_REPORTS_SCHEMA } from './client_perf_reports_schema';
-import {
-  buildCommunityTestCharacters,
-  communityTestAccountsEnabled,
-  GENERATED_NAME_ATTEMPTS,
-  generatedTestCharacterName,
-  prepareCommunityTestCharacters,
-} from './community_test_accounts';
 import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import { CRAFT_ROLL_EVENTS_SCHEMA } from './craft_roll_events_db';
@@ -127,9 +119,12 @@ import { materialSourceConnection } from './material_source_connection';
 import { applyMaterialSourceSchema, applyMaterialSourceWriterGuard } from './material_source_host';
 import { MEMBERSHIP_SCHEMA } from './membership_db';
 import { REFERRAL_ARMOUR_SCHEMA } from './referral_armour_db';
+import { REFERRAL_INVITES_SCHEMA } from './referral_invites_db';
+import { REFERRAL_CARDS_SCHEMA } from './referral_schema_db';
 
 export { recordReferral } from './referral_armour_db';
 
+import { migrateLegacyAccountSocial } from './account_social_migration';
 import { MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA } from './membership_token_delivery_db';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { runOfflineCharacterSave } from './offline_character_save_db';
@@ -1270,7 +1265,11 @@ export async function ensureSchema(): Promise<void> {
     await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
     await client.query(SCHEMA);
     await client.query(
-      MEMBERSHIP_SCHEMA + MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA + REFERRAL_ARMOUR_SCHEMA,
+      MEMBERSHIP_SCHEMA +
+        MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA +
+        REFERRAL_ARMOUR_SCHEMA +
+        REFERRAL_CARDS_SCHEMA +
+        REFERRAL_INVITES_SCHEMA,
     );
     // The material source audit's anchor + journal pair: after SCHEMA (it
     // FK-references characters), before the growth budget that must count it.
@@ -1465,6 +1464,9 @@ export async function ensureSchema(): Promise<void> {
     // Same discipline for the mail partition gate: no mail:<realm>:r:* write
     // can land before this realm's marker is durable.
     openMailPartitionWriteGate();
+    // Separate bounded transactions on this dedicated boot connection. Traffic
+    // starts only after the restartable account-edge migration has completed.
+    await migrateLegacyAccountSocial(client);
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;
@@ -1616,81 +1618,7 @@ export async function loadAccountFlair(accountId: number): Promise<AccountFlair>
   });
 }
 
-export async function createAccount(
-  username: string,
-  passwordHash: string,
-  meta: RequestMetadata = {},
-  // passwordSet=false marks an account whose password is a placeholder the owner
-  // never chose (a Discord-provisioned account). Defaults TRUE for every normal
-  // (register / portal) signup so nothing changes for them.
-  opts: { passwordSet?: boolean } = {},
-): Promise<AccountRow> {
-  const values = [
-    username,
-    passwordHash,
-    cleanMetadataText(meta.ip, 128),
-    cleanMetadataText(meta.userAgent, 512),
-    opts.passwordSet ?? true,
-  ];
-  const insertAccount = `INSERT INTO accounts (username, password_hash, created_ip, created_user_agent, password_set)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING id, username, password_hash`;
-  if (!communityTestAccountsEnabled()) {
-    const res = await pool.query(insertAccount, values);
-    return res.rows[0];
-  }
-
-  // Sim construction and canonical equipment serialization are CPU work, so
-  // warm the immutable templates before opening a database transaction.
-  prepareCommunityTestCharacters();
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    const res = await client.query(insertAccount, values);
-    const account = res.rows[0] as AccountRow | undefined;
-    if (!account) throw new Error('account insert returned no row');
-
-    for (const character of buildCommunityTestCharacters(account.id)) {
-      let inserted = false;
-      for (let attempt = 0; attempt < GENERATED_NAME_ATTEMPTS; attempt++) {
-        const name = generatedTestCharacterName(account.id, character.cls, attempt);
-        if (!validCharName(name)) continue;
-        const characterResult = await client.query(
-          `INSERT INTO characters (account_id, name, class, realm, level, state)
-           VALUES ($1, $2, $3, $4, $5, $6)
-           ON CONFLICT DO NOTHING
-           RETURNING id`,
-          [
-            account.id,
-            name,
-            character.cls,
-            REALM,
-            character.state.level,
-            JSON.stringify(character.state),
-          ],
-        );
-        if ((characterResult.rowCount ?? 0) > 0) {
-          inserted = true;
-          break;
-        }
-      }
-      if (!inserted) {
-        throw new Error(`failed to reserve a community test name for ${character.cls}`);
-      }
-    }
-    await client.query('COMMIT');
-    // The roster is inserted at its authored level, so the account has a top
-    // character from this moment. After COMMIT only: a rolled-back provisioning
-    // transaction inserted nothing and must not enqueue.
-    enqueueLinkChange({ accountId: account.id, kinds: ['flex'] }, Date.now());
-    return account;
-  } catch (err) {
-    await client.query('ROLLBACK').catch(() => {});
-    throw err;
-  } finally {
-    client.release();
-  }
-}
+export { createAccount } from './account_create_db';
 
 export async function findAccount(username: string): Promise<AccountRow | null> {
   const res = await pool.query(
@@ -2678,6 +2606,7 @@ export async function bankBonusFactsForAccount(accountId: number): Promise<BankB
        (a.email_verified_at IS NOT NULL) AS email_verified,
        EXISTS(SELECT 1 FROM discord_links dl WHERE dl.account_id = $1) AS discord_linked,
        EXISTS(SELECT 1 FROM wallet_links wl WHERE wl.account_id = $1) AS wallet_linked,
+       EXISTS(SELECT 1 FROM referral_progress rp WHERE rp.account_id = $1 AND (rp.rewarded_mask & 2) <> 0) AS referral_capacity_earned,
        (SELECT count(*)::int FROM referrals r
           WHERE r.referrer_account_id = $1
             AND EXISTS(
@@ -2694,6 +2623,7 @@ export async function bankBonusFactsForAccount(accountId: number): Promise<BankB
     discordLinked: !!row?.discord_linked,
     walletLinked: !!row?.wallet_linked,
     qualifiedReferrals: row?.qualified_referrals ?? 0,
+    referralCapacityEarned: !!row?.referral_capacity_earned,
   };
 }
 

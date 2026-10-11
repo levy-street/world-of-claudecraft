@@ -34,6 +34,8 @@ import {
 } from '../../world_quest_investigation_view';
 import { archetypeImageUrl } from '../professions/profession_art';
 import { buildAttunementPreview } from '../professions/profession_identity_view';
+import { referralQuestAdvances } from '../referral_cards/referral_cards_view';
+import { referralText } from '../referral_cards/referral_cards_window';
 import { isStationMasterNpc } from '../vendor/train_view';
 import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
 import { clueStepRowFor, clueStepRowSig } from './clue_step_row_view';
@@ -549,7 +551,11 @@ export class QuestDialogController {
           : kind === 'repeat'
             ? t('questUi.dialog.repeatableQuestAria', { name: title })
             : t('questUi.dialog.availableQuestAria', { name: title });
-      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate${coachClass}" data-quest="${esc(questId)}" aria-label="${esc(aria)}">${icon}${esc(title)}</button>`;
+      const stamp = referralQuestAdvances(world.referralCardsSnapshot?.() ?? null, questId)
+        ? `<span class="ui-chip referral-quest-indicator" title="${esc(referralText('questIndicator'))}">${esc(referralText('questGroup'))}</span>`
+        : '';
+      const stampAria = stamp ? `${aria}. ${referralText('questIndicator')}` : aria;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate${coachClass}" data-quest="${esc(questId)}" aria-label="${esc(stampAria)}">${icon}${esc(title)}${stamp}</button>`;
     }
     for (const questId of discussionQuests) {
       const title = this.deps.text.questTitle(questId);
@@ -721,6 +727,9 @@ export class QuestDialogController {
     let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(this.deps.text.questTitle(questId))}${this.deps.text.suggestedPlayers(quest.suggestedPlayers)}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     if (state === 'available' && quest.minLevel) {
       html += `<div class="qd-req ui-chip">${esc(t('questUi.detail.requiresLevel', { level: this.deps.text.number(quest.minLevel) }))}</div>`;
+    }
+    if (referralQuestAdvances(world.referralCardsSnapshot?.() ?? null, questId)) {
+      html += `<div class="qd-req ui-chip referral-quest-indicator">${esc(referralText('questIndicator'))}</div>`;
     }
     html += `<div class="qd-text">${esc(narrative)}</div>`;
     if (state !== 'ready') {

@@ -120,6 +120,8 @@ export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'masterwork_craft',
   'rift_first_clear',
   'buried_hoard',
+  // src/sim/referral_rewards.ts grants the completed-card and inviter reins.
+  'referral_cards',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -276,6 +278,8 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'avian_strider',
   'lanternback_troll',
   'terrorspark_groundshaker',
+  'referral_raptor',
+  'referral_tank',
 ] as const;
 
 // Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',
@@ -317,6 +321,8 @@ const MOUNT_SOURCES: Readonly<
   valorsteed: fromVendor('stablemaster_marla'),
   avian_strider: fromVendor('npc_rift_watch_quartermaster'),
   terrorspark_groundshaker: fromStore(),
+  referral_raptor: fromActivity('referral_cards'),
+  referral_tank: fromActivity('referral_cards'),
   stormfeather_griffin: [
     fromBoss('morthen'),
     fromBoss('nythraxis_scourge_of_thornpeak'),

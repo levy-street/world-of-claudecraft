@@ -598,6 +598,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { createReferralCardsHud } from './hud/referral_cards/referral_cards_hud_controller';
 import { paintFactionTierCelebrations } from './hud/reputation/faction_tier_celebration_painter';
 import { advanceFactionTierObservation } from './hud/reputation/faction_tier_celebration_view';
 import { RiftMapPainter } from './hud/rift';
@@ -3777,6 +3778,9 @@ export class Hud {
       case 'quest-log-window':
         this.questlogWindow.close();
         break;
+      case 'referral-cards-window':
+        this.referralCards.close();
+        break;
       case 'world-quest-leaderboard-window':
       case 'leaderboard-window':
         this.leaderboardWindow.close();
@@ -6009,10 +6013,16 @@ export class Hud {
       this.commitHotbarActions(swapHotbarSlots(this.hotbarActions, slotA - 1, slotB - 1)),
     clearSlot: (slot) => this.commitHotbarActions(clearHotbarSlot(this.hotbarActions, slot - 1)),
   });
-  // Quest-log window painter (questlog_view.ts core + questlog_window.ts painter).
-  // It composes the presentation bag (icon/money/tooltip) for the reward row and
-  // owns the selected quest id (Hud's quest-share command reads it back); the
-  // abandon / chat-link / confirm seams route through these lazy closures.
+  private readonly referralCards = createReferralCardsHud({
+    world: () => this.sim,
+    focus: this.windowFocus('#referral-cards-window'),
+    focusFirst: (root) => this.focusManager.focusFirst(root),
+    closeOthers: () => this.closeOtherWindows('#referral-cards-window'),
+    visibilityChanged: () => this.syncAnyWindowOpenState(),
+    snapshotChanged: () => {
+      if (this.questlogWindow.isOpen) this.questlogWindow.render();
+    },
+  });
   private readonly questlogWindow = new QuestLogWindow({
     ...this.presentationBag,
     root: () => $('#quest-log-window'),
@@ -6027,6 +6037,7 @@ export class Hud {
       this.confirmDialog(title, body, okText, cancelText, onOk),
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
+    openReferralCards: () => this.referralCards.open(),
   });
   private readonly treasureMapWindow = new TreasureMapWindow({ world: () => this.sim });
   private readonly worldQuestPuzzleWindow = new WorldQuestPuzzleWindow({
@@ -6914,6 +6925,7 @@ export class Hud {
     this.mountRaceControls.relocalize();
     this.refreshKeybindLabels();
     this.questTracker.relocalize(); // the strip key cannot see a locale-only change.
+    this.referralCards.relocalize();
     this.worldQuestPuzzleWindow.relocalize();
     // NOT updateDelveTracker(): the tracker's own signature is ids + numbers, so
     // a plain update() early-returns here and re-emits nothing. relocalize()
@@ -9571,6 +9583,7 @@ export class Hud {
     // Social repaints only on the slow divider, behind the painter's struct/content
     // diff-gate; a content tick swaps the body innerHTML without re-wiring rows.
     if (slowHud) this.socialWindow.refreshIfChanged();
+    if (slowHud) this.referralCards.update();
     if (slowHud) this.updateGuildBillboardEcho();
     if (slowHud && this.marketWindow.isOpen) {
       if (!nearbyServiceNpc(this.sim, 'market')) this.marketWindow.close();

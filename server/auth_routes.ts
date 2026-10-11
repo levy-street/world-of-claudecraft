@@ -66,7 +66,6 @@ import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './
 import { createSuspiciousRegistrationReport } from './moderation_db';
 import { createNativeAttestationChallenge } from './native_attestation';
 import { boostAccountCharacters, pbeBoostEnabled } from './pbe_boost';
-import { captureReferral } from './player_card';
 import {
   authThrottled,
   clearAuthFailures,
@@ -74,6 +73,7 @@ import {
   recordAuthFailure,
   requestIp,
 } from './ratelimit';
+import { resolveReferralSignup } from './referral_armour_db';
 import { captureSignupContext, parseSignupProfile } from './signup_attribution';
 import { isWebClientRequest, webLoginEnforced } from './web_login_guard';
 
@@ -173,7 +173,7 @@ const REAL_AUTH_DB = {
   verifyLoginTwoFactor,
   emailAccountCreated,
   createSuspiciousRegistrationReport,
-  captureReferral,
+  resolveReferralSignup,
   trackAccountCreated,
   captureSignupContext,
 };
@@ -277,7 +277,10 @@ async function registerHandler(ctx: Ctx): Promise<void> {
   const meta = rt.requestMetadata(ctx.req);
   let account: AccountRow;
   try {
-    account = await authDb.createAccount(body.username, await hashPassword(body.password), meta);
+    const referral = await authDb.resolveReferralSignup(body.ref);
+    account = await authDb.createAccount(body.username, await hashPassword(body.password), meta, {
+      referral,
+    });
   } catch (err) {
     // A concurrent registration can win the insert after our findAccount check; the
     // username UNIQUE index is the real guard. Surface it as the same 409, not a 500.
@@ -326,11 +329,7 @@ async function registerHandler(ctx: Ctx): Promise<void> {
       ...meta,
     })
     .catch((err) => logger.error({ err }, 'suspicious registration report failed'));
-  // Capture the referral when this account signed up via a card link (?ref=<slug>).
-  // Await before returning credentials so first join sees the grant; errors stay best-effort.
-  await authDb
-    .captureReferral(account.id, body.ref)
-    .catch((err) => logger.error({ err }, 'referral capture failed'));
+  // Referral attribution committed atomically with account creation above.
   // PBE only (PBE_BOOST_ACCOUNTS=1): pre-populate the fresh account with one
   // level-20 character per class in true best-in-slot gear so testers land
   // straight in endgame testing. Awaited so the character select screen right

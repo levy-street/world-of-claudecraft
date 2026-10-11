@@ -85,6 +85,8 @@ export const API_ERROR_KEYS = {
   'character.delete_confirm': 'apiError.character.delete_confirm',
   'character.storage_purchase_open': 'apiError.character.storage_purchase_open',
   'character.delete_busy': 'apiError.character.delete_busy',
+  'character.referral_transfer_pending': 'apiError.character.referral_transfer_pending',
+  'character.referral_bond_pending': 'apiError.character.referral_bond_pending',
   'character.already_in_world': 'apiError.character.already_in_world',
   'character.taken_over': 'apiError.character.taken_over',
   'character.rename_required': 'apiError.character.rename_required',

@@ -295,6 +295,10 @@ export const IWORLD_MEMBERS = [
   { name: 'whoInfo', kind: 'data' },
   { name: 'whoRequest', kind: 'method' },
   // --- social graph commands + async search ---
+  { name: 'socialFriendsPage', kind: 'method' },
+  { name: 'socialBlocksPage', kind: 'method' },
+  { name: 'referralCardsSnapshot', kind: 'method' },
+  { name: 'referralCardsAction', kind: 'method' },
   { name: 'friendAdd', kind: 'method' },
   { name: 'friendRemove', kind: 'method' },
   { name: 'blockAdd', kind: 'method' },
@@ -971,9 +975,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (the membership integration's 431/128/303 plus those six members).
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 438, 131, 307.
     // Buddy collection contributes six methods and no data members.
-    expect(IWORLD_MEMBERS.length).toBe(444);
+    expect(IWORLD_MEMBERS.length).toBe(448);
     expect(DATA_MEMBERS.length).toBe(131);
-    expect(METHOD_MEMBERS.length).toBe(313);
+    expect(METHOD_MEMBERS.length).toBe(317);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1294,6 +1298,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'realm',
       'rechargeToolEffect',
       'recipeList',
+      'referralCardsAction',
+      'referralCardsSnapshot',
       'releaseEmpoweredAbility',
       'releaseSpirit',
       'reliquaryAccountFinds',
@@ -1356,6 +1362,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
       'slotToolEffect',
+      'socialBlocksPage',
+      'socialFriendsPage',
       'socialInfo',
       'socketRiftGem',
       'sortInventory',
@@ -1784,6 +1792,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'rechargeToolEffect',
+      'referralCardsAction',
+      'referralCardsSnapshot',
       'releaseEmpoweredAbility',
       'releaseSpirit',
       'reliquaryCatalogCompletion',
@@ -1837,6 +1847,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
       'slotToolEffect',
+      'socialBlocksPage',
+      'socialFriendsPage',
       'socketRiftGem',
       'sortInventory',
       'spinDailyReward',
@@ -2274,9 +2286,13 @@ type _ExhaustCardMinigame = AssertNever<
 >;
 
 const FACET_SOCIAL_GRAPH = [
+  'referralCardsSnapshot',
+  'referralCardsAction',
   'socialInfo',
   'whoInfo',
   'whoRequest',
+  'socialFriendsPage',
+  'socialBlocksPage',
   'friendAdd',
   'friendRemove',
   'blockAdd',
@@ -2732,8 +2748,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
     // The integration includes the five-dungeon rework and six buddy methods.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(444);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(444);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(448);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(448);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

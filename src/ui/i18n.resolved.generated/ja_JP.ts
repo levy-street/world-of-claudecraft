@@ -11,6 +11,119 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const ja_JP: EnTranslations = {
+  "referralCards": {
+    "title": "フレンド招待",
+    "subtitle": "一緒に冒険して、スタンプを集めよう。",
+    "close": "フレンド招待を閉じる",
+    "launcher": "スタンプカード",
+    "pages": "スタンプカードのページ",
+    "firstPage": "最初のページ",
+    "nextPage": "ほかのカード",
+    "trailmateTitle": "旅の仲間",
+    "friendshipAura": "友情",
+    "protectiveCharm": "守りのお守り",
+    "bankBonus": "完了したスタンプカード",
+    "bankBonusHelp": "絆のフレンド2人のスタンプカード完成を手伝うと、銀行スロットが永久に20枠増えます。",
+    "friendshipUse": "筋力、敏捷性、スタミナ、知力、精神力が{stats}上昇します。持続時間：{duration}秒。",
+    "readyCount": "スタンプカード：報酬を{count}件受け取れます",
+    "loading": "招待スタンプカードに接続中...",
+    "empty": "新しいプレイヤーを招待して、一緒に最初のスタンプカードを始めましょう。",
+    "inviteTitle": "フレンドを招待",
+    "inviteHelp": "フレンドがアカウントを作る前に、このリンクを共有してください。あなたのリンクから新規作成したアカウントだけが絆のフレンドになります。",
+    "inviteLabel": "あなたの招待リンク",
+    "inviteUnavailable": "招待リンクはまだ利用できません。",
+    "membership": "絆のフレンドが初めてメンバーシップを購入すると、メンバーシップ債券を受け取れます。",
+    "cardBetween": "{you} と {friend}",
+    "yourCard": "{name}のスタンプカード",
+    "unassigned": "キャラクター未選択",
+    "start": "カードを始める",
+    "startPrompt": "{friend}とスタンプカードを始めますか？双方の承諾が必要です。両キャラクターともレベル5未満で、チュートリアル島の最終クエストを未完了である必要があります。",
+    "accept": "承諾",
+    "decline": "辞退",
+    "declinePrompt": "本当に辞退しますか？両キャラクターが条件を満たしていれば、後からスタンプカードメニューで開始できます。",
+    "declineConfirmed": "カードは開始されませんでした。両キャラクターが条件を満たしていれば、スタンプカードメニューで開始できます。",
+    "waiting": "絆のフレンドの承諾を待っています。",
+    "cancel": "キャンセル",
+    "okay": "確認",
+    "understand": "はい、理解しました",
+    "confirmLock": "はい、このカードを固定する",
+    "lockFirst": "フォグバインダーの報酬を受け取ると、このカードは{name}に永久に固定されます。カードも報酬も他のキャラクターに移せなくなります。理解しましたか？",
+    "lockSecond": "本当によろしいですか？フォグバインダーの報酬を受け取り、このカードを{name}に永久に固定します。",
+    "locked": "このカードは{name}に固定されています。もう移せません。",
+    "unlocked": "フォグバインダーの報酬を受け取るまでは、条件を満たす別のキャラクターにカードを移せます。受け取ると現在のキャラクターに永久に固定されます。",
+    "move": "このキャラクターにカードを移す",
+    "movePrompt": "カードを{oldName}から{newName}へ移しますか？進行状況と、このカードで獲得した報酬がすべて移ります。それらの報酬は{oldName}から削除されます。",
+    "confirmMove": "はい、カードを移す",
+    "summon": "絆のフレンドを召喚",
+    "summonPrompt": "{friend}が自分の場所にあなたを召喚しようとしています。召喚を受け入れますか？",
+    "summonHelp": "絆のフレンドを自分の場所に呼び寄せます。30分に1回召喚できます。",
+    "summonCooldown": "召喚可能まで{minutes}分{seconds}秒",
+    "reward": "報酬：{reward}",
+    "earned": "獲得済み",
+    "redeemed": "受取済み",
+    "emptyStamp": "未獲得",
+    "stamping": "カードにスタンプを押しています...",
+    "redeem": "報酬を受け取る",
+    "previous": "先に前のスタンプ報酬を受け取ってください。",
+    "playTogether": "このカードのキャラクター同士でパーティを組み、目標を達成しましょう。",
+    "fallback": "目標のクエストを一人で完了しましたか？フレンドと再びパーティを組むとチュートリアル島のスタンプを獲得できます。その後のクエストのスタンプは、対応するダンジョンを一緒にクリアすると獲得できます。",
+    "questGroup": "スタンプカードのクエスト",
+    "questWithFriend": "{friend}と{quest}",
+    "browseCards": "すべてのスタンプカードのページを見る",
+    "nextQuest": "スタンプカード：{quest}",
+    "questIndicator": "このクエストで次のスタンプカード報酬に近づきます。",
+    "completion": "おめでとう！{friend}があなたの助けでスタンプカードを完成させました。",
+    "openInvites": "フレンド招待を開く",
+    "referrerTitle": "手伝ったフレンド",
+    "referrerCount": "完了したフレンド：{count}人",
+    "friendTier": "手伝ったフレンド：{count}人",
+    "awarded": "付与済み",
+    "pending": "未付与",
+    "milestones": {
+      "tutorial": "チュートリアル島の最終クエスト",
+      "hollow": "虚ろへ",
+      "fogbinder": "フォグバインダー",
+      "gravewyrm": "墓ワームのコルズル",
+      "raid": "初めてのレイドボスを倒す"
+    },
+    "rewards": {
+      "tutorial": "特別な称号と、キャラクターに帰属する最大容量のバッグ。",
+      "hollow": "スタミナを増やし、体力が低いときに自動でシールドを張る装飾品。",
+      "fogbinder": "装飾品が進化してスタミナがさらに増加し、使用効果を得ます。全能力値が15秒間5上昇し、再使用まで2分かかります。",
+      "gravewyrm": "無料の騎乗訓練。",
+      "raid": "限定の友情タンクマウント。"
+    },
+    "referrerRewards": {
+      "1": "限定の友情ラプターマウント。",
+      "2": "銀行スロット20枠とキャラクタースロット5枠。",
+      "3": "Claudiumを1,000。",
+      "4": "Claudiumを1,000。",
+      "5": "若木の仲間。"
+    },
+    "reasons": {
+      "notParticipant": "このアカウントはこの絆のフレンド関係に含まれていません。",
+      "staleRevision": "カードが更新されました。最新の進行状況を確認してから、もう一度お試しください。",
+      "invalidCharacters": "パーティのキャラクターはこの絆のフレンド関係に含まれていません。",
+      "notTogether": "絆のフレンド同士で同じパーティに入る必要があります。",
+      "levelTooHigh": "新しいカードを始めるキャラクターはレベル5未満である必要があります。",
+      "tutorialCompleted": "いずれかのキャラクターがチュートリアル島の最終クエストを完了しています。",
+      "alreadyStarted": "この絆のフレンド関係にはすでにカードがあります。1組につき有効なカードは1枚だけです。",
+      "notPending": "返答待ちのカード招待はありません。",
+      "declinePending": "絆のフレンドがカードを辞退するかどうか確認しています。",
+      "declineNotConfirmed": "招待を終了する前に辞退を確定してください。",
+      "notActive": "報酬を受け取る前に、一緒にカードを始めてください。",
+      "wrongCharacter": "カードに記載されたキャラクターを使うか、未固定のカードを条件に合うキャラクターへ移してください。",
+      "locked": "このカードはキャラクターに固定されているため、移せません。",
+      "sameCharacter": "このカードはすでにこのキャラクターのものです。",
+      "invalidMilestone": "そのスタンプはこのカードのものではありません。",
+      "notEarned": "報酬を受け取る前に、この目標を一緒に達成してください。",
+      "alreadyRedeemed": "この報酬はすでに受取済みです。",
+      "previousRewardRequired": "先に前のスタンプ報酬を受け取ってください。",
+      "confirmationRequired": "フォグバインダーの報酬を受け取る前に、カード固定の警告を確認してください。",
+      "newAccountsOnly": "招待リンクから新規アカウントを作成したときだけ絆のフレンドになれます。既存のアカウント同士は結べません。",
+      "unavailable": "現在この操作は利用できません。後でもう一度お試しください。"
+    }
+  },
   "meta": {
     "builtOn": "ビルド日：{date}"
   },
@@ -2093,6 +2206,8 @@ export const ja_JP: EnTranslations = {
       "name_goblin_rocket_sled": "ゴブリンロケットそり",
       "name_rallycart_rxt": "ラリーカートRXT",
       "name_terrorspark_groundshaker": "地揺らしのドレッドスパーク",
+      "name_referral_tank": "友情タンク",
+      "name_referral_raptor": "友情ラプター",
       "name_drakemaw_raptor": "火口のラプトル",
       "name_avian_strider": "ヴィリジアン・ヴェイルストライダー",
       "name_mech_bird": "ゼンマイ・メカバード",
@@ -2110,6 +2225,8 @@ export const ja_JP: EnTranslations = {
       "desc_rallycart_rxt": "小型ながら本格的なラリーマシン。移動速度を高めてくれる。",
       "desc_rallycart_skin": "小さな車体から豪快なエンジン音を響かせるラリーカー。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
+      "desc_referral_tank": "招待スタンプカードを完成させると獲得できます。",
+      "desc_referral_raptor": "最初の絆のフレンドがスタンプカードを完成させるのを手伝うと獲得できます。",
       "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
       "desc_avian_strider": "巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。",
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
@@ -4196,8 +4313,8 @@ export const ja_JP: EnTranslations = {
       "nextAttackCrit": "次の攻撃が必ずクリティカルになる",
       "healEcho": "体力が{threshold}%未満になると体力を{value}回復する",
       "trinket": {
-        "lastStandCooldown": "砦の印章の「最後の砦」シールドは使用済み。この効果が切れるまで、体力が{threshold}%を下回っても再び発動しない。",
-        "lastBastion": "{value}のダメージを吸収する。体力が{threshold}%未満でダメージを受けたときに砦の印章が張ったシールド。",
+        "lastStandCooldown": "防護シールドは使用済みです。この効果が切れるまで、体力が{threshold}%未満でダメージを受けても再発動しません。",
+        "lastBastion": "{value}ダメージを吸収します。体力が{threshold}%未満でダメージを受けたときに、装飾品が張ったシールドです。",
         "retaliate": "あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。",
         "moored": "受けるダメージが{reduction}%減少するが、移動速度が{speed}%になる。スタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果、ノックバックを無視する。",
         "hourglassStored": "過剰回復から蓄えた回復量{stored}を保持している。癒し手の砂時計を使うと、{range}ヤード以内で体力の割合が最も低いパーティメンバー（自分を含む）へのシールドに変える。",
@@ -7321,6 +7438,8 @@ export const ja_JP: EnTranslations = {
       "delete_confirm": "削除を確認するにはキャラクター名を入力してください。",
       "storage_purchase_open": "このキャラクターを削除するには、保管庫の購入を完了または解決する必要があります。",
       "delete_busy": "サーバーが混み合っています。しばらくしてからこのキャラクターの削除をお試しください。",
+      "referral_transfer_pending": "このキャラクターを削除する前に、未固定のスタンプカードをすべて別のキャラクターへ移してください。",
+      "referral_bond_pending": "招待報酬のメンバーシップ債券をこのキャラクターに配布しています。配布が完了してから、もう一度削除をお試しください。",
       "already_in_world": "キャラクターは既に世界にいます。",
       "taken_over": "あなたのキャラクターは別のセッションに引き継がれました。",
       "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。",
@@ -12881,6 +13000,10 @@ export const ja_JP: EnTranslations = {
     "social": {
       "title": "ソーシャル",
       "friendsTab": "フレンド",
+      "friendFirstPage": "最初のページ",
+      "friendNextPage": "次のページ",
+      "boundFriend": "絆のフレンド",
+      "boundFriendLink": "絆のフレンドは招待リンクで結ばれています。",
       "guildTab": "ギルド",
       "ignoreTab": "無視",
       "leaveParty": "パーティを抜ける",
@@ -21081,6 +21204,21 @@ export const ja_JP: EnTranslations = {
       },
       "membership_token": {
         "name": "メンバーシップトークン（30日）"
+      },
+      "referral_satchel": {
+        "name": "友情のサッチェル"
+      },
+      "referral_hollow_charm": {
+        "name": "虚ろの友情のお守り"
+      },
+      "referral_fog_charm": {
+        "name": "霧に包まれた友情のお守り"
+      },
+      "reins_referral_tank": {
+        "name": "友情タンクの手綱"
+      },
+      "reins_referral_raptor": {
+        "name": "友情ラプターの手綱"
       },
       "referral_helmet": {
         "name": "友情の兜"

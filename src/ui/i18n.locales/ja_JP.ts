@@ -20397,9 +20397,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.heartNova':
     '熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。',
   'hudChrome.auraEffect.trinket.lastStandCooldown':
-    '砦の印章の「最後の砦」シールドは使用済み。この効果が切れるまで、体力が{threshold}%を下回っても再び発動しない。',
+    '防護シールドは使用済みです。この効果が切れるまで、体力が{threshold}%未満でダメージを受けても再発動しません。',
   'hudChrome.auraEffect.trinket.lastBastion':
-    '{value}のダメージを吸収する。体力が{threshold}%未満でダメージを受けたときに砦の印章が張ったシールド。',
+    '{value}ダメージを吸収します。体力が{threshold}%未満でダメージを受けたときに、装飾品が張ったシールドです。',
   'hudChrome.auraEffect.trinket.retaliate':
     'あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。',
   'hudChrome.auraEffect.trinket.moored':
@@ -21447,4 +21447,150 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.merewater_cowl.name': '湖水の頭巾',
   'entities.items.merecleaver.name': '湖断ちの大斧',
   'entities.items.moonwrack_stave.name': 'ムーンラックの杖',
+  'referralCards.title': 'フレンド招待',
+  'referralCards.subtitle': '一緒に冒険して、スタンプを集めよう。',
+  'referralCards.close': 'フレンド招待を閉じる',
+  'referralCards.launcher': 'スタンプカード',
+  'referralCards.pages': 'スタンプカードのページ',
+  'referralCards.firstPage': '最初のページ',
+  'referralCards.nextPage': 'ほかのカード',
+  'referralCards.trailmateTitle': '旅の仲間',
+  'referralCards.friendshipAura': '友情',
+  'referralCards.protectiveCharm': '守りのお守り',
+  'referralCards.bankBonus': '完了したスタンプカード',
+  'referralCards.bankBonusHelp':
+    '絆のフレンド2人のスタンプカード完成を手伝うと、銀行スロットが永久に20枠増えます。',
+  'referralCards.friendshipUse':
+    '筋力、敏捷性、スタミナ、知力、精神力が{stats}上昇します。持続時間：{duration}秒。',
+  'referralCards.readyCount': 'スタンプカード：報酬を{count}件受け取れます',
+  'referralCards.loading': '招待スタンプカードに接続中...',
+  'referralCards.empty': '新しいプレイヤーを招待して、一緒に最初のスタンプカードを始めましょう。',
+  'referralCards.inviteTitle': 'フレンドを招待',
+  'referralCards.inviteHelp':
+    'フレンドがアカウントを作る前に、このリンクを共有してください。あなたのリンクから新規作成したアカウントだけが絆のフレンドになります。',
+  'referralCards.inviteLabel': 'あなたの招待リンク',
+  'referralCards.inviteUnavailable': '招待リンクはまだ利用できません。',
+  'referralCards.membership':
+    '絆のフレンドが初めてメンバーシップを購入すると、メンバーシップ債券を受け取れます。',
+  'referralCards.cardBetween': '{you} と {friend}',
+  'referralCards.yourCard': '{name}のスタンプカード',
+  'referralCards.unassigned': 'キャラクター未選択',
+  'referralCards.start': 'カードを始める',
+  'referralCards.startPrompt':
+    '{friend}とスタンプカードを始めますか？双方の承諾が必要です。両キャラクターともレベル5未満で、チュートリアル島の最終クエストを未完了である必要があります。',
+  'referralCards.accept': '承諾',
+  'referralCards.decline': '辞退',
+  'referralCards.declinePrompt':
+    '本当に辞退しますか？両キャラクターが条件を満たしていれば、後からスタンプカードメニューで開始できます。',
+  'referralCards.declineConfirmed':
+    'カードは開始されませんでした。両キャラクターが条件を満たしていれば、スタンプカードメニューで開始できます。',
+  'referralCards.waiting': '絆のフレンドの承諾を待っています。',
+  'referralCards.cancel': 'キャンセル',
+  'referralCards.okay': '確認',
+  'referralCards.understand': 'はい、理解しました',
+  'referralCards.confirmLock': 'はい、このカードを固定する',
+  'referralCards.lockFirst':
+    'フォグバインダーの報酬を受け取ると、このカードは{name}に永久に固定されます。カードも報酬も他のキャラクターに移せなくなります。理解しましたか？',
+  'referralCards.lockSecond':
+    '本当によろしいですか？フォグバインダーの報酬を受け取り、このカードを{name}に永久に固定します。',
+  'referralCards.locked': 'このカードは{name}に固定されています。もう移せません。',
+  'referralCards.unlocked':
+    'フォグバインダーの報酬を受け取るまでは、条件を満たす別のキャラクターにカードを移せます。受け取ると現在のキャラクターに永久に固定されます。',
+  'referralCards.move': 'このキャラクターにカードを移す',
+  'referralCards.movePrompt':
+    'カードを{oldName}から{newName}へ移しますか？進行状況と、このカードで獲得した報酬がすべて移ります。それらの報酬は{oldName}から削除されます。',
+  'referralCards.confirmMove': 'はい、カードを移す',
+  'referralCards.summon': '絆のフレンドを召喚',
+  'referralCards.summonPrompt':
+    '{friend}が自分の場所にあなたを召喚しようとしています。召喚を受け入れますか？',
+  'referralCards.summonHelp': '絆のフレンドを自分の場所に呼び寄せます。30分に1回召喚できます。',
+  'referralCards.summonCooldown': '召喚可能まで{minutes}分{seconds}秒',
+  'referralCards.reward': '報酬：{reward}',
+  'referralCards.earned': '獲得済み',
+  'referralCards.redeemed': '受取済み',
+  'referralCards.emptyStamp': '未獲得',
+  'referralCards.stamping': 'カードにスタンプを押しています...',
+  'referralCards.redeem': '報酬を受け取る',
+  'referralCards.previous': '先に前のスタンプ報酬を受け取ってください。',
+  'referralCards.playTogether':
+    'このカードのキャラクター同士でパーティを組み、目標を達成しましょう。',
+  'referralCards.fallback':
+    '目標のクエストを一人で完了しましたか？フレンドと再びパーティを組むとチュートリアル島のスタンプを獲得できます。その後のクエストのスタンプは、対応するダンジョンを一緒にクリアすると獲得できます。',
+  'referralCards.questGroup': 'スタンプカードのクエスト',
+  'referralCards.questWithFriend': '{friend}と{quest}',
+  'referralCards.browseCards': 'すべてのスタンプカードのページを見る',
+  'referralCards.nextQuest': 'スタンプカード：{quest}',
+  'referralCards.questIndicator': 'このクエストで次のスタンプカード報酬に近づきます。',
+  'referralCards.completion':
+    'おめでとう！{friend}があなたの助けでスタンプカードを完成させました。',
+  'referralCards.openInvites': 'フレンド招待を開く',
+  'referralCards.referrerTitle': '手伝ったフレンド',
+  'referralCards.referrerCount': '完了したフレンド：{count}人',
+  'referralCards.friendTier': '手伝ったフレンド：{count}人',
+  'referralCards.awarded': '付与済み',
+  'referralCards.pending': '未付与',
+  'referralCards.milestones.tutorial': 'チュートリアル島の最終クエスト',
+  'referralCards.milestones.hollow': '虚ろへ',
+  'referralCards.milestones.fogbinder': 'フォグバインダー',
+  'referralCards.milestones.gravewyrm': '墓ワームのコルズル',
+  'referralCards.milestones.raid': '初めてのレイドボスを倒す',
+  'referralCards.rewards.tutorial': '特別な称号と、キャラクターに帰属する最大容量のバッグ。',
+  'referralCards.rewards.hollow': 'スタミナを増やし、体力が低いときに自動でシールドを張る装飾品。',
+  'referralCards.rewards.fogbinder':
+    '装飾品が進化してスタミナがさらに増加し、使用効果を得ます。全能力値が15秒間5上昇し、再使用まで2分かかります。',
+  'referralCards.rewards.gravewyrm': '無料の騎乗訓練。',
+  'referralCards.rewards.raid': '限定の友情タンクマウント。',
+  'referralCards.referrerRewards.1': '限定の友情ラプターマウント。',
+  'referralCards.referrerRewards.2': '銀行スロット20枠とキャラクタースロット5枠。',
+  'referralCards.referrerRewards.3': 'Claudiumを1,000。',
+  'referralCards.referrerRewards.4': 'Claudiumを1,000。',
+  'referralCards.referrerRewards.5': '若木の仲間。',
+  'referralCards.reasons.notParticipant':
+    'このアカウントはこの絆のフレンド関係に含まれていません。',
+  'referralCards.reasons.staleRevision':
+    'カードが更新されました。最新の進行状況を確認してから、もう一度お試しください。',
+  'referralCards.reasons.invalidCharacters':
+    'パーティのキャラクターはこの絆のフレンド関係に含まれていません。',
+  'referralCards.reasons.notTogether': '絆のフレンド同士で同じパーティに入る必要があります。',
+  'referralCards.reasons.levelTooHigh':
+    '新しいカードを始めるキャラクターはレベル5未満である必要があります。',
+  'referralCards.reasons.tutorialCompleted':
+    'いずれかのキャラクターがチュートリアル島の最終クエストを完了しています。',
+  'referralCards.reasons.alreadyStarted':
+    'この絆のフレンド関係にはすでにカードがあります。1組につき有効なカードは1枚だけです。',
+  'referralCards.reasons.notPending': '返答待ちのカード招待はありません。',
+  'referralCards.reasons.declinePending': '絆のフレンドがカードを辞退するかどうか確認しています。',
+  'referralCards.reasons.declineNotConfirmed': '招待を終了する前に辞退を確定してください。',
+  'referralCards.reasons.notActive': '報酬を受け取る前に、一緒にカードを始めてください。',
+  'referralCards.reasons.wrongCharacter':
+    'カードに記載されたキャラクターを使うか、未固定のカードを条件に合うキャラクターへ移してください。',
+  'referralCards.reasons.locked': 'このカードはキャラクターに固定されているため、移せません。',
+  'referralCards.reasons.sameCharacter': 'このカードはすでにこのキャラクターのものです。',
+  'referralCards.reasons.invalidMilestone': 'そのスタンプはこのカードのものではありません。',
+  'referralCards.reasons.notEarned': '報酬を受け取る前に、この目標を一緒に達成してください。',
+  'referralCards.reasons.alreadyRedeemed': 'この報酬はすでに受取済みです。',
+  'referralCards.reasons.previousRewardRequired': '先に前のスタンプ報酬を受け取ってください。',
+  'referralCards.reasons.confirmationRequired':
+    'フォグバインダーの報酬を受け取る前に、カード固定の警告を確認してください。',
+  'referralCards.reasons.newAccountsOnly':
+    '招待リンクから新規アカウントを作成したときだけ絆のフレンドになれます。既存のアカウント同士は結べません。',
+  'referralCards.reasons.unavailable': '現在この操作は利用できません。後でもう一度お試しください。',
+  'entities.items.referral_satchel.name': '友情のサッチェル',
+  'entities.items.referral_hollow_charm.name': '虚ろの友情のお守り',
+  'entities.items.referral_fog_charm.name': '霧に包まれた友情のお守り',
+  'entities.items.reins_referral_tank.name': '友情タンクの手綱',
+  'entities.items.reins_referral_raptor.name': '友情ラプターの手綱',
+  'hud.social.friendFirstPage': '最初のページ',
+  'hud.social.friendNextPage': '次のページ',
+  'hud.social.boundFriend': '絆のフレンド',
+  'hud.social.boundFriendLink': '絆のフレンドは招待リンクで結ばれています。',
+  'hudChrome.mounts.name_referral_tank': '友情タンク',
+  'hudChrome.mounts.name_referral_raptor': '友情ラプター',
+  'hudChrome.mounts.desc_referral_tank': '招待スタンプカードを完成させると獲得できます。',
+  'hudChrome.mounts.desc_referral_raptor':
+    '最初の絆のフレンドがスタンプカードを完成させるのを手伝うと獲得できます。',
+  'apiError.character.referral_transfer_pending':
+    'このキャラクターを削除する前に、未固定のスタンプカードをすべて別のキャラクターへ移してください。',
+  'apiError.character.referral_bond_pending':
+    '招待報酬のメンバーシップ債券をこのキャラクターに配布しています。配布が完了してから、もう一度削除をお試しください。',
 };

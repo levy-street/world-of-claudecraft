@@ -1,3 +1,4 @@
+import type { ReferralRewardState } from './referral_reward_state';
 // Persisted character and pet save shapes. This is a type-only leaf: hosts may
 // describe JSONB state without evaluating the simulation coordinator or any
 // gameplay module. New fields remain optional unless every historical save can
@@ -37,7 +38,7 @@ import type { WeeklyRewardState } from './weekly_rewards';
 // Persistable character state (stored as JSONB server-side). The arena fields
 // are optional so characters saved before the Ashen Coliseum existed load
 // cleanly (addPlayer falls back to the unranked defaults).
-export interface CharacterState {
+export interface CharacterState extends ReferralRewardState {
   // Production content migration revision. Revision 1 is the v0.26 all-class
   // Talents V2 migration; revision 2 is the v0.29 Hunter redesign repick.
   // Absent means a pre-v0.26 character JSONB save.

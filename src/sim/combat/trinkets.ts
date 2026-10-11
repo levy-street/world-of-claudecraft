@@ -217,6 +217,21 @@ export function useWornTrinket(
     return true;
   }
   switch (use.kind) {
+    case 'friendship': {
+      for (const stat of ['str', 'agi', 'sta', 'int', 'spi'] as const) {
+        ctx.applyAura(p, {
+          id: `referral_friendship_${stat}`,
+          name: 'Friendship',
+          kind: `buff_${stat}`,
+          value: use.stats,
+          remaining: use.duration,
+          duration: use.duration,
+          sourceId: p.id,
+          school: 'arcane',
+        });
+      }
+      break;
+    }
     case 'retaliate': {
       ctx.applyAura(
         p,
@@ -944,10 +959,10 @@ export function onTrinketDamage(
       target.hp / Math.max(1, target.maxHp) < passive.belowHp &&
       !findAura(target, TRINKET_AURA.lastStandIcd)
     ) {
-      ctx.applyAura(
-        target,
-        marker(target, TRINKET_AURA.lastStandIcd, 'Bastion Sigil', passive.icd),
-      );
+      ctx.applyAura(target, {
+        ...marker(target, TRINKET_AURA.lastStandIcd, 'Protective Charm', passive.icd),
+        value2: passive.belowHp,
+      });
       ctx.applyAura(target, {
         id: TRINKET_AURA.lastStand,
         name: 'Last Bastion',
@@ -955,6 +970,7 @@ export function onTrinketDamage(
         remaining: passive.duration,
         duration: passive.duration,
         value: Math.round(target.maxHp * passive.absorb),
+        value2: passive.belowHp,
         sourceId: target.id,
         school: 'holy',
       });

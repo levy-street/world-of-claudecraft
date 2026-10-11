@@ -1,6 +1,7 @@
 import type { CourierDispatchRequest, CourierInfo } from '../sim/courier';
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
+import type { ReferralCardsAction, ReferralCardsSnapshot } from '../sim/referral_contract';
 import type { AccountBankInfo } from '../world_api/bank';
 import {
   accountBankTransferPayload,
@@ -150,7 +151,6 @@ import {
   type FarmPatchDef,
   type FarmPlantKnobs,
   type FarmPlotView,
-  type FriendInfo,
   type GuildBankInfo,
   type GuildBankLogKind,
   type GuildBankLogView,
@@ -172,7 +172,6 @@ import {
   type PartyInfo,
   PET_SPECIAL_WIRE_VERSION,
   type PlayerProfessionsView,
-  type PresenceStatus,
   type RaidLockout,
   type RecipeDef,
   type ReliquaryCatalogCompletion,
@@ -215,6 +214,7 @@ import { applyBankSelfWire, applyGuildBankSelfWire } from './bank_snapshot_wire'
 import { blankEntity } from './blank_entity';
 import { applyBookOfDeedsWire } from './book_wire';
 import { type BuddySelfMirror, decodeBuddySelf, emptyBuddySelfMirror } from './buddy_wire';
+import { readCharacterProfile } from './character_profile';
 import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
@@ -264,6 +264,7 @@ import { decodePlayerIdentityWire } from './player_identity_wire';
 import { applyProfessionsSelfMirror } from './professions_self_mirror';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { decodeReferralCardsSnapshot } from './referral_cards_wire';
 import { isInputSendBackpressured } from './send_backpressure';
 import { snapshotAlpha } from './snapshot_alpha';
 import { applySnapshotHeadSyncs } from './snapshot_head_syncs';
@@ -274,7 +275,7 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
-import { socialInfoFromFrame } from './social_frame_wire';
+import { applySocialPositions, socialInfoFromFrame } from './social_frame_wire';
 import { applySocialSelfWire } from './social_self_wire';
 import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './target_echo';
 import { applyFerryWire, clientFerryView } from './transport_wire';
@@ -516,8 +517,8 @@ export class Api {
     return { choose: false, linkToken: '', username: this.username ?? '' };
   }
 
-  async appleLoginNew(linkToken: string): Promise<void> {
-    const data = await this.post('/api/auth/apple/login/new', { linkToken });
+  async appleLoginNew(linkToken: string, ref = ''): Promise<void> {
+    const data = await this.post('/api/auth/apple/login/new', { linkToken, ref });
     this.token = data.token;
     this.username = data.username;
     this.emailMissing = data.emailMissing === true;
@@ -905,8 +906,8 @@ export class Api {
 
   // First-time Discord login chooser: create a brand-new account for the verified
   // Discord identity (parked under `linkToken`) and start a session.
-  async discordLoginNew(linkToken: string): Promise<void> {
-    const data = await this.post('/api/auth/discord/login/new', { linkToken });
+  async discordLoginNew(linkToken: string, ref = ''): Promise<void> {
+    const data = await this.post('/api/auth/discord/login/new', { linkToken, ref });
     this.token = data.token;
     this.username = data.username;
   }
@@ -2221,6 +2222,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // else falls through unchanged.
     if (this.requests().onMessage(msg)) return;
     if (msg.t === 'hello') {
+      this.referralCardsState = null;
       this.movementWireVersion = msg.movementWire === 2 ? 2 : 1;
       this.movementFrameOutbox?.reset();
       this.onMovementWireNegotiated?.(this.movementWireVersion, performance.now());
@@ -2391,6 +2393,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
       }
       return;
     }
+    if (msg.t === 'referralCards') {
+      const snapshot = decodeReferralCardsSnapshot(msg.snapshot);
+      if (snapshot) this.referralCardsState = snapshot;
+      return;
+    }
     if (msg.t === 'social') {
       this.socialInfo = socialInfoFromFrame(msg);
       this.socialDirty = true;
@@ -2405,30 +2412,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (msg.t === 'socialpos') {
       // live position refresh for friends/guildmates (drives the world map);
       // merge into the existing roster in place — snapshots own online/offline.
-      if (this.socialInfo && Array.isArray(msg.list)) {
-        const byId = new Map<
-          number,
-          { x: number; z: number; zone: string; status: PresenceStatus; title?: string | null }
-        >();
-        for (const e of msg.list) byId.set(e.id, e);
-        const apply = (arr: FriendInfo[]) => {
-          for (const m of arr) {
-            const u = byId.get(m.id);
-            if (u) {
-              m.x = u.x;
-              m.z = u.z;
-              m.zone = u.zone;
-              m.status = u.status;
-              m.online = true;
-              // rides only on servers that send it; an older server's frame
-              // must not wipe the DB-sourced roster title
-              if (u.title !== undefined) m.activeTitle = u.title;
-            }
-          }
-        };
-        apply(this.socialInfo.friends);
-        if (this.socialInfo.guild) apply(this.socialInfo.guild.members);
-      }
+      applySocialPositions(this.socialInfo, msg.list);
       return;
     }
     if (msg.t === 'challenge') {
@@ -4349,6 +4333,19 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
   // character name) + the REST character typeahead. socialInfo arrives via the
   // social/socialpos frames; searchCharacters is a GET, not a cmd(). ---
+  private referralCardsState: ReferralCardsSnapshot | null = null;
+  referralCardsSnapshot(): ReferralCardsSnapshot | null {
+    return this.referralCardsState;
+  }
+  referralCardsAction(action: ReferralCardsAction): void {
+    this.cmd({ cmd: 'referralCards', action });
+  }
+  socialBlocksPage(cursor: number): void {
+    this.cmd({ cmd: 'social_refresh', afterBlockCursor: cursor });
+  }
+  socialFriendsPage(cursor: number): void {
+    this.cmd({ cmd: 'social_refresh', afterFriendCursor: cursor });
+  }
   friendAdd(name: string): void {
     this.cmd({ cmd: 'friend_add', name });
   }
@@ -4444,32 +4441,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // unauthenticated /c/:name page, so a chat-name lookup exposes nothing that
   // was not already crawlable. The richer in-view inspect card (wallet balance,
   // Discord/GitHub flair, gear) stays on the proximity-gated entity wire.
-  async characterProfile(name: string): Promise<CharacterProfile | null> {
-    const wanted = name.trim();
-    if (!wanted) return null;
-    try {
-      // No Authorization header: this route is a public read (meta.publicRead) and
-      // ignores one, so sending the bearer would leak it for nothing.
-      const res = await fetch(
-        apiUrl(`/api/public/characters/${encodeURIComponent(wanted)}/sheet`, this.base),
-      );
-      if (!res.ok) return null;
-      const sheet = await res.json();
-      if (typeof sheet?.name !== 'string') return null;
-      return {
-        name: sheet.name,
-        cls: sheet.class,
-        classLabel: sheet.classLabel ?? sheet.class,
-        spec: sheet.spec ?? '',
-        level: sheet.level ?? 1,
-        guild: sheet.guild ?? null,
-        zone: sheet.zone ?? '',
-        skin: sheet.skin ?? 0,
-        realm: sheet.realm ?? '',
-      };
-    } catch {
-      return null;
-    }
+  characterProfile(name: string): Promise<CharacterProfile | null> {
+    return readCharacterProfile(name, this.base);
   }
   // Operator-set account flair, by name. A pure LOCAL read (no round-trip): the flair
   // already rode in on the entity identity record or on the sender's chat event, so

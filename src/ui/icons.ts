@@ -22,6 +22,7 @@ import { crestIconUrl } from './crest_icon_art';
 import { currencyImageUrl } from './currency_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { professionImageUrl } from './hud/professions/profession_art';
+import { ITEM_ART_PLACEHOLDERS } from './item_art_placeholders';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
 import { TRINKET_AURA_IMAGE_URLS } from './trinket_aura_art';
@@ -5587,10 +5588,13 @@ export const ITEM_ART_PENDING = new Set<string>([
   // (hollow-crypt-icons-2026-10-03) landed; the seam stays for the next park.
   ...HOLLOW_CRYPT_ART_PENDING_ITEM_IDS,
   ...BUDDY_ART_PENDING_ITEM_IDS,
+  ...Object.keys(ITEM_ART_PLACEHOLDERS),
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
+  const placeholder = ITEM_ART_PLACEHOLDERS[id];
+  if (typeof placeholder === 'string') return `${ITEM_ICON_DIR}/${placeholder}.webp`;
   if (ITEM_ART_PENDING.has(id)) return null;
   return ITEM_IMAGE_IDS.has(id) || UI_ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
 }

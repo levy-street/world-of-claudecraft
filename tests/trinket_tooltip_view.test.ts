@@ -6,6 +6,7 @@
 // real Sim (the same useItem path the action bar presses) and compare the
 // applied aura against the text the tooltip prints for that same character.
 import { afterEach, describe, expect, it } from 'vitest';
+import { REFERRAL_STAMP_ITEMS } from '../src/sim/content/referral_rewards';
 import {
   GAMBLE_FORTUNES,
   type GambleFortune,
@@ -42,6 +43,15 @@ const n = (v: number) => formatNumber(v, { maximumFractionDigits: 0 });
 // The whole English line set per trinket for VIEWER, written out literally so a
 // change to a number, a clause or the cooldown fails here.
 const EXPECTED: Record<string, { equip?: string; use?: string }> = {
+  referral_hollow_charm: {
+    equip:
+      'Equip: Taking damage while below 35% health grants a shield that absorbs 500 damage (10% of your maximum health) for 10 sec. Can occur once every 120 sec.',
+  },
+  referral_fog_charm: {
+    equip:
+      'Equip: Taking damage while below 35% health grants a shield that absorbs 500 damage (10% of your maximum health) for 10 sec. Can occur once every 120 sec.',
+    use: 'Use: Increase your Strength, Agility, Stamina, Intellect, and Spirit by 5 for 15 seconds. (2 min cooldown)',
+  },
   bastion_sigil: {
     equip:
       'Equip: Taking damage while below 35% health grants a shield that absorbs 750 damage (15% of your maximum health) for 10 sec. Can occur once every 90 sec.',
@@ -179,13 +189,19 @@ function shownTotal(text: string, before: string, after: string): number {
 }
 
 describe('trinket tooltip lines', () => {
+  const trinkets = {
+    ...TRINKET_ITEMS,
+    ...Object.fromEntries(
+      Object.entries(REFERRAL_STAMP_ITEMS).filter(([, item]) => item.slot === 'trinket'),
+    ),
+  };
   // The eighteen, Balgath's five and the dungeon rework's eight (v0.45.0 integration).
   it('covers exactly the thirty-one trinkets', () => {
-    expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
-    expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
+    expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(trinkets).sort());
+    expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(trinkets).sort());
   });
 
-  it.each(Object.keys(TRINKET_ITEMS))('%s renders its exact Equip and Use lines', (id) => {
+  it.each(Object.keys(trinkets))('%s renders its exact Equip and Use lines', (id) => {
     const lines = trinketTooltipLineTexts(id, VIEWER);
     const expected = EXPECTED[id];
     const passive = TRINKET_SPECS[id].passive;
@@ -319,6 +335,21 @@ describe('trinket tooltip lines', () => {
 });
 
 describe('trinket tooltip numbers match combat', () => {
+  it('Friendship grants the five flat stat bonuses and duration its tooltip describes', () => {
+    for (const power of [0, 500]) {
+      const sim = wearing('referral_fog_charm');
+      sim.player.spellPower = power;
+      const text = trinketTooltipLineTexts('referral_fog_charm', sim.player).at(-1)?.text;
+      sim.useItem('referral_fog_charm');
+      for (const stat of ['str', 'agi', 'sta', 'int', 'spi']) {
+        const applied = aura(sim.player, `referral_friendship_${stat}`);
+        expect(applied?.value).toBe(5);
+        expect(applied?.duration).toBe(15);
+        expect(text).toContain(`by ${applied?.value} for ${applied?.duration} seconds`);
+      }
+      expect(sim.player.cooldowns.get(trinketCooldownKey('referral_fog_charm'))).toBe(120);
+    }
+  });
   it('Wellspring Seed heals each tick for the number its tooltip prints', () => {
     for (const healPower of [0, 250]) {
       const sim = wearing('wellspring_seed');

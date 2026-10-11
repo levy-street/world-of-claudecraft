@@ -59,6 +59,8 @@ const KNOWN_CODES = [
   'body.unsupported_media_type',
   'character.already_in_world',
   'character.delete_busy',
+  'character.referral_transfer_pending',
+  'character.referral_bond_pending',
   'character.delete_confirm',
   'character.storage_purchase_open',
   'character.invalid_appearance',

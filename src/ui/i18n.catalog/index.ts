@@ -17,6 +17,7 @@ import { hudChromeStrings } from './hud_chrome';
 import { itemNames, itemStrings } from './items';
 import { mergeEntities, mergeExtra, mergeStrings } from './merge';
 import { questStrings } from './quests';
+import { referralCardStrings } from './referral_cards';
 import { shellStrings } from './shell';
 
 export { abilityStrings, classAbilityNames } from './abilities';
@@ -85,6 +86,7 @@ export type Leaves<T, D extends number = 5> = [D] extends [never]
     : '';
 
 export const en = {
+  referralCards: referralCardStrings,
   meta: { builtOn: 'Built {date}' },
   realmTypes: { normal: 'Normal', pvp: 'PvP', rp: 'RP', rpPvp: 'RP-PvP' },
   devCommand: {

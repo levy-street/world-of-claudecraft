@@ -163,17 +163,23 @@ describe('computeBankBonus: row shape and total invariants', () => {
     }
   });
 
-  it('all facts earned -> 16 bonus slots, and maxBankBonusSlots() === 16', () => {
+  it('all facts earned -> 36 bonus slots while existing sources still contribute 16', () => {
     const maxed = computeBankBonus(
       facts({
         emailVerified: true,
         discordLinked: true,
         walletLinked: true,
         qualifiedReferrals: 5,
+        referralCapacityEarned: true,
       }),
     );
-    expect(maxed.bonusSlots).toBe(16);
-    expect(maxBankBonusSlots()).toBe(16);
+    expect(maxed.bonusSlots).toBe(36);
+    expect(rowFor(maxed, 'referral_cards')).toEqual({
+      id: 'referral_cards',
+      slots: 20,
+      maxSlots: 20,
+    });
+    expect(maxBankBonusSlots()).toBe(36);
   });
 });
 
@@ -214,8 +220,14 @@ describe('computeBankBonus: a new future source row lands without touching the w
 
     // ...and doing so required NO edit to the shipped registry: it is still the four v1
     // rows in order. A regression that mutated the module-level array would red here.
-    expect(BANK_BONUS_SOURCES).toHaveLength(4);
-    expect(BANK_BONUS_SOURCES.map((d) => d.id)).toEqual(['email', 'discord', 'wallet', 'referral']);
+    expect(BANK_BONUS_SOURCES).toHaveLength(5);
+    expect(BANK_BONUS_SOURCES.map((d) => d.id)).toEqual([
+      'email',
+      'discord',
+      'wallet',
+      'referral',
+      'referral_cards',
+    ]);
   });
 
   it('a malformed future units() (NaN or negative) decays to 0 slots, never propagating', () => {

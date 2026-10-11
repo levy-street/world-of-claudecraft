@@ -1,0 +1,234 @@
+@layer components {
+  /* ---------- referral stamp cards ---------- */
+  #referral-cards-window {
+    width: 760px;
+    max-width: calc(var(--app-vw, 100vw) / var(--window-scale) - var(--spacing-lg));
+    max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - var(--spacing-lg));
+  }
+
+  #referral-cards-window[hidden] {
+    display: none;
+  }
+
+  #referral-cards-window > .ui-win-head > div {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #referral-cards-window .ui-x-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .referral-body,
+  .referral-card,
+  .referral-invite {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-width: 0;
+  }
+
+  .referral-body > section + section {
+    border-top: 1px solid var(--color-border-showcase);
+    padding-top: var(--spacing-md);
+  }
+
+  .referral-card-heading,
+  .referral-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .referral-card-heading h3 {
+    overflow-wrap: anywhere;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .referral-stamps,
+  .referral-tiers {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--spacing-sm);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .referral-stamp,
+  .referral-tier {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    min-width: 0;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .referral-stamp-inspect {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    width: 100%;
+    min-height: 40px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: help;
+  }
+
+  .referral-stamp-mark {
+    display: grid;
+    place-items: center;
+    width: calc(var(--socket-size) + var(--spacing-sm));
+    height: calc(var(--socket-size) + var(--spacing-sm));
+    border: 1px dashed var(--color-control-border);
+    border-radius: var(--radius-pill);
+    color: var(--color-accent);
+    font-family: var(--font-display);
+  }
+
+  .referral-stamp-mark svg {
+    width: 60%;
+    height: 60%;
+    fill: currentColor;
+  }
+
+  .referral-stamp.is-earned .referral-stamp-mark {
+    border-style: solid;
+  }
+
+  .referral-stamp > .ui-btn {
+    white-space: normal;
+    height: auto;
+    min-height: 40px;
+    margin-top: auto;
+  }
+
+  .referral-lock-wrap {
+    position: relative;
+  }
+
+  .referral-lock {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .referral-reward {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    top: 100%;
+    display: none;
+    width: 220px;
+    max-width: 70vw;
+    padding: var(--spacing-sm);
+    text-align: start;
+  }
+
+  .referral-stamp:nth-last-child(-n + 2) .referral-reward,
+  .referral-lock-wrap .referral-reward {
+    left: auto;
+    right: 0;
+  }
+
+  .referral-stamp:focus-within > .referral-reward,
+  .referral-stamp:hover > .referral-reward,
+  .referral-lock-wrap:focus-within > .referral-reward,
+  .referral-lock-wrap:hover > .referral-reward {
+    display: block;
+  }
+
+  .referral-stamp-inspect:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .referral-link {
+    display: block;
+    width: 100%;
+    margin-top: var(--spacing-xs);
+  }
+
+  .referral-reward-ready {
+    position: relative;
+    box-shadow: var(--glow-gold);
+  }
+
+  .referral-reward-ready::after {
+    content: attr(data-referral-ready);
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: var(--spacing-2xs);
+    background: var(--color-ink);
+    color: var(--color-text-on-ink);
+    border: 1px solid var(--color-socket-rim);
+    border-radius: var(--radius-xs);
+    font: inherit;
+  }
+
+  .referral-prompt button {
+    min-height: 40px;
+    margin: var(--spacing-xs);
+  }
+
+  body.mobile-touch #referral-cards-window {
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--window-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--window-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--window-scale, 1));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1));
+    transform: none;
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+  }
+
+  @media (max-width: 600px) {
+    .referral-stamps,
+    .referral-tiers {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .referral-stamp:nth-child(even) .referral-reward {
+      left: auto;
+      right: 0;
+    }
+
+    .referral-stamp:nth-child(odd) .referral-reward {
+      left: 0;
+      right: auto;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .referral-actions .ui-btn {
+      min-height: 40px;
+      min-width: 40px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .referral-stamp-mark {
+      animation: none;
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .referral-stamp-mark,
+    .referral-reward-ready {
+      border: 1px solid ButtonText;
+    }
+  }
+}

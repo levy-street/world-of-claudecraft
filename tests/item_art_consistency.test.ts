@@ -857,7 +857,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 2043.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2169.
     // The restored legacy whistle and charm definitions add 36 item ids.
-    expect(Object.keys(ITEMS)).toHaveLength(2205);
+    // Five referral rewards reuse existing art while their own paintings are pending.
+    expect(Object.keys(ITEMS)).toHaveLength(2210);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1086,7 +1087,8 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(new Set(currentOwnerIds).size).toBe(2039);
     expect(shippingIds).toHaveLength(2039);
     // The restored legacy whistle and charm definitions add 36 item ids.
-    expect(Object.keys(ITEMS)).toHaveLength(2205);
+    // Five referral rewards reuse existing art while their own paintings are pending.
+    expect(Object.keys(ITEMS)).toHaveLength(2210);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);

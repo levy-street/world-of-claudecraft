@@ -208,6 +208,8 @@ function passiveMax(spec: TrinketSpec): number {
 
 function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewer): string {
   switch (u.kind) {
+    case 'friendship':
+      return t('referralCards.friendshipUse', { stats: n(u.stats), duration: n(u.duration) });
     case 'retaliate':
       return t('hudChrome.trinkets.use.retaliate', {
         duration: n(u.duration),

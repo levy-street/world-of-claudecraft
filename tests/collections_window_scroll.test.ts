@@ -47,10 +47,10 @@ describe('Hunting window list scroll', () => {
     document.body.innerHTML = '<div id="collections-window"></div>';
   });
 
-  it('shows the three buddies in one complete list with tabs and no category controls', () => {
+  it('shows the four buddies in one complete list with tabs and no category controls', () => {
     const win = makeWindow();
     win.toggle();
-    expect(rowKeys().sort()).toEqual(['crystal_lich', 'forgemaw', 'horse']);
+    expect(rowKeys().sort()).toEqual(['crystal_lich', 'forgemaw', 'horse', 'sapling']);
     expect(list().querySelector('.col-group-head')).toBeNull();
     expect(root().querySelector('input, select')).toBeNull();
     expect(
@@ -61,7 +61,7 @@ describe('Hunting window list scroll', () => {
     (root().querySelector('[data-tab="mounts"]') as HTMLElement).click();
     (root().querySelector('[data-tab="buddies"]') as HTMLElement).click();
     expect(root().querySelector('.col-row.active')?.getAttribute('data-key')).toBe('horse');
-    expect(rowKeys()).toHaveLength(3);
+    expect(rowKeys()).toHaveLength(4);
   });
 
   it('leaves owned buddy selection as discovery without equipping controls', () => {

@@ -2,6 +2,7 @@ import type * as http from 'node:http';
 import {
   CharacterDeleteClientGone,
   CharacterDeleteQueueSaturated,
+  CharacterReferralRewardPending,
   CharacterStoragePurchaseOpen,
 } from './character_delete_db';
 
@@ -32,9 +33,24 @@ export const CHARACTER_DELETE_BUSY_BODY = {
   code: 'character.delete_busy',
 } as const;
 
+export const CHARACTER_REFERRAL_TRANSFER_BODY = {
+  error: 'Move all unlocked stamp cards to another character before deleting this character.',
+  code: 'character.referral_transfer_pending',
+} as const;
+
+export const CHARACTER_REFERRAL_BOND_BODY = {
+  error:
+    'A referral membership bond is being delivered to this character. Try deleting the character again after delivery finishes.',
+  code: 'character.referral_bond_pending',
+} as const;
+
 export interface CharacterDeleteHttpRefusal {
   status: 409 | 503;
-  body: typeof CHARACTER_STORAGE_PURCHASE_OPEN_BODY | typeof CHARACTER_DELETE_BUSY_BODY;
+  body:
+    | typeof CHARACTER_STORAGE_PURCHASE_OPEN_BODY
+    | typeof CHARACTER_DELETE_BUSY_BODY
+    | typeof CHARACTER_REFERRAL_TRANSFER_BODY
+    | typeof CHARACTER_REFERRAL_BOND_BODY;
 }
 
 /** True when the delete failed only because the requesting client vanished
@@ -47,6 +63,15 @@ export function characterDeleteClientGone(error: unknown): boolean {
 
 /** Translate only the known domain refusals, without exposing character id or status. */
 export function characterDeleteHttpRefusal(error: unknown): CharacterDeleteHttpRefusal | null {
+  if (error instanceof CharacterReferralRewardPending) {
+    return {
+      status: 409,
+      body:
+        error.reason === 'transferable'
+          ? CHARACTER_REFERRAL_TRANSFER_BODY
+          : CHARACTER_REFERRAL_BOND_BODY,
+    };
+  }
   if (error instanceof CharacterStoragePurchaseOpen) {
     return { status: 409, body: CHARACTER_STORAGE_PURCHASE_OPEN_BODY };
   }

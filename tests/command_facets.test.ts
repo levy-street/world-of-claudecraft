@@ -222,8 +222,9 @@ describe('command facet tags (W9)', () => {
     expect(tags['arena_augment']).toBe('IWorldDuelArena');
   });
 
-  it('does not tag social_refresh (dispatch-only), searchCharacters (REST) or socialInfo (frame)', () => {
-    expect('social_refresh' in tags).toBe(false);
+  it('tags social page refresh and referral actions; leaves REST and frame reads untagged', () => {
+    expect(tags.social_refresh).toBe('IWorldSocialGraph');
+    expect(tags.referralCards).toBe('IWorldSocialGraph');
     expect('searchCharacters' in tags).toBe(false);
     expect('socialInfo' in tags).toBe(false);
   });

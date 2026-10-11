@@ -15,6 +15,7 @@ import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
 import { isMeleeAudioId, meleeAudioSample } from './fury_audio_core';
+import { mountAudioKey } from './mount_audio_key';
 import {
   advanceInterruptibleMountEngine,
   advanceMountEngine,
@@ -1134,8 +1135,8 @@ class Sfx {
     // stuttering. Gated on the loop clip EXISTING rather than on a mount-key
     // allowlist, so any mount that later gains a loop drops its strides for
     // free, and every mount without one is untouched.
-    if (`mount_loop_${mountKey}` in SFX_CLIPS) return;
-    const custom = `mount_run_${mountKey}`;
+    if (`mount_loop_${mountAudioKey(mountKey)}` in SFX_CLIPS) return;
+    const custom = `mount_run_${mountAudioKey(mountKey)}`;
     if (custom in SFX_CLIPS) {
       this.playAt(custom, x, y, z, {
         gain: 0.85,
@@ -1174,7 +1175,7 @@ class Sfx {
     self: boolean,
     entityId: number,
   ): void {
-    const key = `mount_summon_${mountKey}`;
+    const key = `mount_summon_${mountAudioKey(mountKey)}`;
     if (!(key in SFX_CLIPS)) return;
     // A TAIL fade, because the take does NOT decay to silence: its last 120ms
     // still peaks at about -15 dBFS, so simply reaching the end of the buffer
@@ -1225,7 +1226,7 @@ class Sfx {
   /** Warm a mount's summon take, called on the summon channel's START edge so
    *  the 1.5s channel covers the fetch and decode. */
   preloadMountSummon(mountKey: string): void {
-    const key = `mount_summon_${mountKey}`;
+    const key = `mount_summon_${mountAudioKey(mountKey)}`;
     if (key in SFX_CLIPS) this.preload(key);
   }
 
@@ -1251,7 +1252,9 @@ class Sfx {
     const cached = this.engineClipKeysCache.get(cacheId);
     if (cached !== undefined) return cached;
     const stem =
-      direction === 'forward' ? `mount_run_${mountKey}` : `mount_run_${mountKey}_reverse`;
+      direction === 'forward'
+        ? `mount_run_${mountAudioKey(mountKey)}`
+        : `mount_run_${mountAudioKey(mountKey)}_reverse`;
     const startKey = `${stem}_start`;
     const resolved =
       startKey in SFX_CLIPS ? { startKey, loopKey: stem, stopKey: `${stem}_stop` } : null;
@@ -1288,7 +1291,7 @@ class Sfx {
    *  while summoned, and reverse becomes this same loop pitched up rather than
    *  a separate take (see mountEngine). */
   private engineIdleKey(mountKey: string): string | null {
-    const key = `mount_run_${mountKey}_idle`;
+    const key = `mount_run_${mountAudioKey(mountKey)}_idle`;
     const cached = this.engineIdleKeysCache.get(mountKey);
     if (cached !== undefined) return cached;
     const resolved = key in SFX_CLIPS ? key : null;
@@ -1463,7 +1466,7 @@ class Sfx {
   private idleClipKey(mountKey: string): string | null {
     const cached = this.idleClipKeyCache.get(mountKey);
     if (cached !== undefined) return cached;
-    const key = `mount_idle_${mountKey}`;
+    const key = `mount_idle_${mountAudioKey(mountKey)}`;
     const resolved = key in SFX_CLIPS ? key : null;
     this.idleClipKeyCache.set(mountKey, resolved);
     return resolved;
@@ -1503,7 +1506,7 @@ class Sfx {
     // The per-stride gait beat, idle hum, and mount-aware jump/land takes ride
     // the same warm-up edge: a mount can ship them without an engine take set
     // (the Mech Bird), so they preload before the engine-set early return.
-    const runKey = `mount_run_${mountKey}`;
+    const runKey = `mount_run_${mountAudioKey(mountKey)}`;
     if (runKey in SFX_CLIPS) this.preload(runKey);
     const idleKey = this.idleClipKey(mountKey);
     if (idleKey) this.preload(idleKey);
@@ -1512,7 +1515,7 @@ class Sfx {
       if (key) this.preload(key);
     }
     for (const kind of ['squawk', 'flap'] as const) {
-      const key = `mount_${kind}_${mountKey}`;
+      const key = `mount_${kind}_${mountAudioKey(mountKey)}`;
       if (key in SFX_CLIPS) this.preload(key);
     }
     const keys = this.engineClipKeys(mountKey);
@@ -1542,7 +1545,7 @@ class Sfx {
    *  and the guard only catches a mount bouncing on a ledge seam. */
   mountApex(x: number, y: number, z: number, mountKey: string): void {
     for (const kind of ['squawk', 'flap'] as const) {
-      const key = `mount_${kind}_${mountKey}`;
+      const key = `mount_${kind}_${mountAudioKey(mountKey)}`;
       if (key in SFX_CLIPS) this.playAt(key, x, y, z, { gain: MOVE_GAIN, cooldown: 0.08 });
     }
   }
@@ -1559,7 +1562,7 @@ class Sfx {
    *  players on carts get two independently positioned voices rather than
    *  fighting over one slot. */
   mountLoop(id: number, x: number, y: number, z: number, mountKey: string, moving: boolean): void {
-    const key = `mount_loop_${mountKey}`;
+    const key = `mount_loop_${mountAudioKey(mountKey)}`;
     if (!(key in SFX_CLIPS)) {
       // The renderer calls this every frame for every mounted entity in view,
       // and most mounts have no mount_loop_* clip at all: skip the three
@@ -1601,7 +1604,7 @@ class Sfx {
     mountKey?: string,
   ): void {
     if (mountKey && (kind === 'jump' || kind === 'land')) {
-      const mkey = `mount_${kind}_${mountKey}`;
+      const mkey = `mount_${kind}_${mountAudioKey(mountKey)}`;
       if (mkey in SFX_CLIPS) {
         const gain = kind === 'land' ? MOVE_GAIN * MOUNT_LAND_BOOST : MOVE_GAIN;
         this.playAt(mkey, x, y, z, { gain, cooldown: 0.08 });
@@ -1640,10 +1643,10 @@ class Sfx {
    *  and every mount without them keeps the sound it has today. */
   private mountMovementKey(kind: 'jump' | 'land', mountKey: string, fallback: string): string {
     if (!mountKey) return fallback;
-    const cacheId = `${kind}:${mountKey}`;
+    const cacheId = `${kind}:${mountAudioKey(mountKey)}`;
     const cached = this.mountMovementKeyCache.get(cacheId);
     if (cached !== undefined) return cached ?? fallback;
-    const candidate = `mount_${kind}_${mountKey}`;
+    const candidate = `mount_${kind}_${mountAudioKey(mountKey)}`;
     const resolved = candidate in SFX_CLIPS ? candidate : null;
     this.mountMovementKeyCache.set(cacheId, resolved);
     return resolved ?? fallback;

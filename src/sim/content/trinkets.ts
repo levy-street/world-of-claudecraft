@@ -14,6 +14,7 @@ import type { ItemDef } from '../types';
 
 /** What a trinket does when used from the action bar. */
 export type TrinketUse =
+  | { kind: 'friendship'; duration: number; stats: number }
   /** Bastion Sigil: for `duration`, strike back at whoever hits you for
    *  `reflect` of the damage they dealt. */
   | { kind: 'retaliate'; duration: number; reflect: number }
@@ -436,6 +437,16 @@ export const CRUCIBLE_TRINKET_ITEM_IDS: readonly string[] = [
 ];
 
 export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freeze({
+  referral_hollow_charm: {
+    cooldown: 120,
+    use: { kind: 'passiveOnly' },
+    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 0.1, icd: 120, duration: 10 },
+  },
+  referral_fog_charm: {
+    cooldown: 120,
+    use: { kind: 'friendship', duration: 15, stats: 5 },
+    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 0.1, icd: 120, duration: 10 },
+  },
   bastion_sigil: {
     cooldown: 120,
     use: { kind: 'retaliate', duration: 8, reflect: 0.3 },

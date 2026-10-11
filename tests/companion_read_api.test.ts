@@ -258,7 +258,7 @@ describe('GET /api/me/characters (read-scoped my-characters list)', () => {
   it('both list routes pass their account membership into the same characterListPayload', () => {
     const calls = (
       MAIN.match(
-        /characterListPayload\(\s*await listCharacters\(accountId\),\s*\(await loadAccountCosmetics\(accountId\)\)\.weaponSkinLoadout,\s*await getMembership\(accountId\),\s*\)/g,
+        /characterListPayload\(\s*await listCharacters\(accountId\),\s*\(await loadAccountCosmetics\(accountId\)\)\.weaponSkinLoadout,\s*await getMembership\(accountId\),\s*await referralCapacityEarned\(accountId\),\s*\)/g,
       ) ?? []
     ).length;
     expect(calls).toBe(2); // /api/me/characters and the full-session GET /api/characters

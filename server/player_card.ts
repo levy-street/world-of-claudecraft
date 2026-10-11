@@ -21,11 +21,10 @@ import {
 } from './db';
 import { logger } from './http/logger';
 import { isUniqueViolation, json, parsePngInfo, readBinaryBody } from './http_util';
-import { getMembership } from './membership_service';
 import { PLAYERCARD_NEW } from './player_card.newlocales';
 import { recordUsageMetric } from './provider_usage';
 import { REALM_PUBLIC_ORIGIN } from './realm';
-import { referralInviterForSlug } from './referral_armour_db';
+import { resolveReferralSignup } from './referral_armour_db';
 
 // A composited card is ~1200×630 @2× PNG - comfortably under this bound, which
 // is generous enough to never reject a legitimate upload yet caps memory.
@@ -822,19 +821,13 @@ function missingCardHtml(origin: string, locale: PublicCardLocale): string {
 // call with any untrusted `ref`: invalid slugs, unknown slugs, and self-referrals
 // are silently ignored.
 export async function captureReferral(refereeAccountId: number, ref: unknown): Promise<void> {
-  const slug = typeof ref === 'string' ? ref.trim().toLowerCase() : '';
-  if (!isValidSlug(slug)) return;
-  const inviter = await referralInviterForSlug(slug);
-  if (!inviter || inviter.inviterAccountId === refereeAccountId) return;
-  const membership = await getMembership(inviter.inviterAccountId);
-  const now = Date.now();
-  const eligible =
-    membership.active && membership.authorizedUntil > now && (membership.expiresAt ?? 0) > now;
+  const referral = await resolveReferralSignup(ref);
+  if (!referral || referral.referrerAccountId === refereeAccountId) return;
   await recordReferral(
     refereeAccountId,
-    inviter.inviterAccountId,
-    slug,
-    eligible,
-    inviter.inviterName,
+    referral.referrerAccountId,
+    referral.slug,
+    referral.memberEligible,
+    referral.inviterName,
   );
 }

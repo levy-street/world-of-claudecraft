@@ -158,15 +158,16 @@ describe('CosmeticsWindow', () => {
     const world = fakeWorld();
     const { w, el } = makeWindow(world);
     w.open('buddies');
-    expect(el.querySelectorAll('.cos-card')).toHaveLength(3);
+    expect(el.querySelectorAll('.cos-card')).toHaveLength(4);
     expect(card(el, 'horse').textContent).toContain('Tug, the Warhorse');
-    expect(el.querySelectorAll('.cos-scope-account')).toHaveLength(3);
+    expect(el.querySelectorAll('.cos-scope-account')).toHaveLength(4);
     expect(card(el, 'horse').querySelector('.cos-scope-account')?.textContent).toBe('Account');
     expect(el.querySelector('.cos-scope-character')).toBeNull();
     expect(el.querySelector('[data-buddy-drag], [draggable="true"]')).toBeNull();
     expect(card(el, 'crystal_lich').textContent).toContain('A presence follows you');
     expect(action(el, 'summon-buddy', 'crystal_lich')).toBeNull();
     expect(action(el, 'summon-buddy', 'forgemaw')).toBeNull();
+    expect(action(el, 'summon-buddy', 'sapling')).toBeNull();
     const summon = action(el, 'summon-buddy', 'horse')!;
     summon.focus();
     summon.click();

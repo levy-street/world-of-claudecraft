@@ -18,6 +18,7 @@ import { membershipExpiresAtOnClient } from './membership_db';
 import { getMembership, trustedRecurringMembershipExpiry } from './membership_service';
 import { recordCharacterCreation } from './player_metrics_db';
 import { REALM } from './realm';
+import { REFERRAL_CHARACTER_BONUS } from './referral_account_entitlements_db';
 
 /** The RETURNING list every create answers with, one text so the two INSERT
  *  shapes below cannot drift apart in what they hand back. */
@@ -25,8 +26,9 @@ const CREATE_RETURNING =
   'RETURNING id, account_id, name, class, level, state, is_gm, force_rename, appearance, membership_slot';
 
 /**
- * Insert one character for `accountId`, with `limit` base slots (at most ten)
- * and ten additional member slots on this realm. Slot identity is durable.
+ * Insert one character for `accountId`, with `limit` ordinary base slots (at most ten),
+ * five earned referral base slots, and ten additional member slots on this realm.
+ * Slot identity is durable.
  * The account row is locked FOR UPDATE and the realm-scoped count
  * taken inside the same transaction, so two racing creates cannot both see
  * room; a refusal rolls back having written nothing and answers null.
@@ -63,10 +65,12 @@ export async function createCharacterCapped(
       return null;
     }
     const count = await client.query(
-      'SELECT count(*)::int AS n, count(*) FILTER (WHERE NOT membership_slot)::int AS base FROM characters WHERE account_id = $1 AND realm = $2',
+      'SELECT count(*)::int AS n, count(*) FILTER (WHERE NOT membership_slot)::int AS base, EXISTS (SELECT 1 FROM referral_progress WHERE account_id = $1 AND (rewarded_mask & 2) <> 0) AS referral_capacity_earned FROM characters WHERE account_id = $1 AND realm = $2',
       [accountId, REALM],
     );
-    const baseLimit = Math.min(BASE_CHARACTER_SLOTS, limit);
+    const referralBonus =
+      count.rows[0]?.referral_capacity_earned === true ? REFERRAL_CHARACTER_BONUS : 0;
+    const baseLimit = Math.min(BASE_CHARACTER_SLOTS, limit) + referralBonus;
     const membershipSlot = Number(count.rows[0]?.base ?? 0) >= baseLimit;
     const expiresAt = membershipSlot
       ? await membershipExpiresAtOnClient(

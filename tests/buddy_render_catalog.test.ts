@@ -3,8 +3,8 @@ import { VISUALS } from '../src/render/characters/manifest';
 import { BUDDY_MOBS } from '../src/sim/content/buddy_mobs';
 
 describe('active buddy render catalog', () => {
-  it('keeps only the three requested follower bodies and templates', () => {
-    const expected = ['buddy_crystal_lich', 'buddy_forgemaw', 'buddy_horse'];
+  it('includes the referral Sapling alongside the existing follower bodies', () => {
+    const expected = ['buddy_crystal_lich', 'buddy_forgemaw', 'buddy_horse', 'buddy_sapling'];
     expect(
       Object.keys(VISUALS)
         .filter((key) => key.startsWith('buddy_'))

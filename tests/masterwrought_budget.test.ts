@@ -1281,7 +1281,13 @@ describe('masterwrought apex budget sweep', () => {
     // release/v0.44.0 merge into feature/buried-hoards: the Vanguard-standing
     // quartermaster bag (content/faction_vendors.ts) is unique and soulbound, so
     // it never competes with the tradable apex bag on the market.
-    const APEX_TIE_BAGS = ['allied_vanguard_duffel', 'resonant_weave_bag', 'wayfarers_backpack'];
+    // The referral card's soulbound satchel matches this general-capacity tier.
+    const APEX_TIE_BAGS = [
+      'allied_vanguard_duffel',
+      'referral_satchel',
+      'resonant_weave_bag',
+      'wayfarers_backpack',
+    ];
     const ties: string[] = [];
     for (const def of Object.values(ITEMS)) {
       if (def.kind !== 'bag' || def.id === APEX_BAG_ID) continue;

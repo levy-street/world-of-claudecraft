@@ -46,6 +46,8 @@ export interface WhoFrame {
 /** The minimal session view the visibility rule needs. */
 export interface WhoVisibilitySession {
   characterId: number;
+  accountId?: number;
+  blockedAccountIds?: ReadonlySet<number>;
   blockListLoaded: boolean;
   blockedIds: ReadonlySet<number>;
 }
@@ -58,7 +60,11 @@ export function canShowInWho(
   viewer: WhoVisibilitySession,
   candidate: WhoVisibilitySession,
 ): boolean {
-  if (!candidate.blockListLoaded) return false;
+  if (!candidate.blockListLoaded || !viewer.blockListLoaded) return false;
+  if (candidate.accountId !== undefined && viewer.blockedAccountIds?.has(candidate.accountId))
+    return false;
+  if (viewer.accountId !== undefined && candidate.blockedAccountIds?.has(viewer.accountId))
+    return false;
   if (viewer.blockedIds.has(candidate.characterId)) return false;
   if (candidate.characterId !== viewer.characterId && candidate.blockedIds.has(viewer.characterId))
     return false;

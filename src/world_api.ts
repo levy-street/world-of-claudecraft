@@ -967,6 +967,7 @@ export const COMMAND_NAMES = [
   'dungeon_guide_answer',
   // Rename a specific summoned buddy; the sim verifies its current owner.
   'buddy_rename',
+  'referralCards',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -976,7 +977,7 @@ export type CommandName = (typeof COMMAND_NAMES)[number];
 // Dispatch-only extras: commands the server routes but ClientWorld never sends.
 // `dev_*` are env-gated cheats (ALLOW_DEV_COMMANDS, never production);
 // `enter_crypt`/`leave_crypt` are legacy aliases that fall through to the
-// dungeon cases; `social_refresh` is a server-push refresh path; `targetNearest`
+// dungeon cases; `targetNearest`
 // is called directly on the Sim by the headless RL action layer, never over the
 // wire. Each must be a member of COMMAND_NAMES (the `satisfies` enforces it).
 export const DISPATCH_ONLY_COMMANDS = [
@@ -989,7 +990,6 @@ export const DISPATCH_ONLY_COMMANDS = [
   'dev_complete_all_quests',
   'enter_crypt',
   'leave_crypt',
-  'social_refresh',
   'targetNearest',
   'dev_bg_start',
   // Riding-lesson leftovers: 'mount_train_answer' (the removed lean-cue arm) and
@@ -1203,6 +1203,8 @@ export const COMMAND_FACETS = {
   // GET (no wire command); accountFlair is a pure local read of the flair the entity
   // wire and the chat event already carry (no command); social_refresh is a
   // dispatch-only server push (untagged).
+  referralCards: 'IWorldSocialGraph',
+  social_refresh: 'IWorldSocialGraph',
   friend_add: 'IWorldSocialGraph',
   friend_remove: 'IWorldSocialGraph',
   block_add: 'IWorldSocialGraph',

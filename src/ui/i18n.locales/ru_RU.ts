@@ -20748,9 +20748,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.heartNova':
     'Тратит все стаки жара на огненную вспышку, которая наносит {perHeat} ед. урона от огня за стак ({max} ед. при {maxHeat} стаках) каждому врагу в пределах {radius} м и провоцирует каждое задетое существо. Урон растет с силой атаки. Требуется стак жара.',
   'hudChrome.auraEffect.trinket.lastStandCooldown':
-    'Щит «Последний бастион» от Печати бастиона уже использован. Пока этот эффект не истечет, падение здоровья ниже {threshold}% не создаст его снова.',
+    'Защитный щит уже сработал. До окончания этого эффекта получение урона при здоровье ниже {threshold}% не создаст новый щит.',
   'hudChrome.auraEffect.trinket.lastBastion':
-    'Поглощает {value} ед. урона. Печать бастиона создала этот щит, когда вы получили урон при здоровье ниже {threshold}%.',
+    'Поглощает {value} урона. Аксессуар создал этот щит, когда вы получили урон при здоровье ниже {threshold}%.',
   'hudChrome.auraEffect.trinket.retaliate':
     'Враги, напрямую поражающие вас, получают физический урон, равный {pct}% здоровья, которое у вас отнял этот удар. Периодический урон эффект не вызывает.',
   'hudChrome.auraEffect.trinket.moored':
@@ -21852,4 +21852,149 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.merewater_cowl.name': 'Капюшон озёрной воды',
   'entities.items.merecleaver.name': 'Озёрный секач',
   'entities.items.moonwrack_stave.name': 'Посох Лунной погибели',
+  'referralCards.title': 'Пригласить друга',
+  'referralCards.subtitle': 'Путешествуйте вместе и собирайте отметки.',
+  'referralCards.close': 'Закрыть приглашение друзей',
+  'referralCards.launcher': 'Карточки отметок',
+  'referralCards.pages': 'Страницы карточек',
+  'referralCards.firstPage': 'Первая страница',
+  'referralCards.nextPage': 'Другие карточки',
+  'referralCards.trailmateTitle': 'Спутник',
+  'referralCards.friendshipAura': 'Дружба',
+  'referralCards.protectiveCharm': 'Защитный оберег',
+  'referralCards.bankBonus': 'Завершённые карточки',
+  'referralCards.bankBonusHelp':
+    'Помогите двум связанным друзьям завершить карточки, чтобы навсегда открыть 20 ячеек банка.',
+  'referralCards.friendshipUse':
+    'Повышает вашу силу, ловкость, выносливость, интеллект и дух на {stats} на {duration} сек.',
+  'referralCards.readyCount': 'Карточки: доступно наград: {count}',
+  'referralCards.loading': 'Подключение к вашим карточкам...',
+  'referralCards.empty': 'Пригласите нового игрока и вместе начните первую карточку.',
+  'referralCards.inviteTitle': 'Пригласить друга',
+  'referralCards.inviteHelp':
+    'Поделитесь ссылкой до того, как друг создаст аккаунт. Связанными друзьями становятся только новые аккаунты, созданные по вашей ссылке.',
+  'referralCards.inviteLabel': 'Ваша ссылка-приглашение',
+  'referralCards.inviteUnavailable': 'Ваша ссылка-приглашение пока недоступна.',
+  'referralCards.membership':
+    'Когда связанный друг впервые купит подписку, вы получите облигацию подписки.',
+  'referralCards.cardBetween': '{you} и {friend}',
+  'referralCards.yourCard': 'Карточка: {name}',
+  'referralCards.unassigned': 'Персонаж не выбран',
+  'referralCards.start': 'Начать карточку',
+  'referralCards.startPrompt':
+    'Начать карточки с {friend}? Вы оба должны согласиться. Оба персонажа должны быть ниже 5-го уровня и ещё не завершить последнее задание учебного острова.',
+  'referralCards.accept': 'Принять',
+  'referralCards.decline': 'Отклонить',
+  'referralCards.declinePrompt':
+    'Вы уверены, что хотите отказаться? Пока оба персонажа соответствуют условиям, карточку можно начать позже через меню.',
+  'referralCards.declineConfirmed':
+    'Карточка не начата. Вы можете начать её через меню, пока оба персонажа соответствуют условиям.',
+  'referralCards.waiting': 'Ожидание согласия связанного друга.',
+  'referralCards.cancel': 'Отмена',
+  'referralCards.okay': 'Хорошо',
+  'referralCards.understand': 'Да, я понимаю',
+  'referralCards.confirmLock': 'Да, закрепить карточку',
+  'referralCards.lockFirst':
+    'Получив награду за Вязателя Тумана, вы навсегда закрепите карточку за персонажем {name}. Карточку и её награды больше нельзя будет перенести на другого персонажа. Вы понимаете?',
+  'referralCards.lockSecond':
+    'Вы уверены? Получить награду за Вязателя Тумана и навсегда закрепить карточку за персонажем {name}.',
+  'referralCards.locked': 'Карточка закреплена за персонажем {name}. Перенести её больше нельзя.',
+  'referralCards.unlocked':
+    'До получения награды за Вязателя Тумана карточку можно перенести на другого подходящего персонажа. Получение награды навсегда закрепит её за текущим персонажем.',
+  'referralCards.move': 'Перенести карточку на этого персонажа',
+  'referralCards.movePrompt':
+    'Перенести карточку с {oldName} на {newName}? Весь прогресс и все награды этой карточки будут перенесены. Эти награды будут удалены у {oldName}.',
+  'referralCards.confirmMove': 'Да, перенести карточку',
+  'referralCards.summon': 'Призвать связанного друга',
+  'referralCards.summonPrompt': '{friend} хочет призвать вас к себе. Принять призыв?',
+  'referralCards.summonHelp': 'Призовите связанного друга к себе. Доступно раз в 30 минут.',
+  'referralCards.summonCooldown': 'Призыв через {minutes} мин {seconds} сек',
+  'referralCards.reward': 'Награда: {reward}',
+  'referralCards.earned': 'Получено',
+  'referralCards.redeemed': 'Награда получена',
+  'referralCards.emptyStamp': 'Ещё не получено',
+  'referralCards.stamping': 'Ставим отметку на карточке...',
+  'referralCards.redeem': 'Получить награду',
+  'referralCards.previous': 'Сначала получите награды за предыдущие отметки.',
+  'referralCards.playTogether': 'Выполняйте этапы в группе с персонажами, указанными на карточке.',
+  'referralCards.fallback':
+    'Уже выполнили этапное задание в одиночку? Снова объединитесь с другом в группу, чтобы получить отметку за учебный остров. Для отметок за последующие задания вместе пройдите соответствующее подземелье.',
+  'referralCards.questGroup': 'Задания карточки',
+  'referralCards.questWithFriend': '{quest} вместе с {friend}',
+  'referralCards.browseCards': 'Просмотреть все страницы карточек',
+  'referralCards.nextQuest': 'Карточка: {quest}',
+  'referralCards.questIndicator': 'Это задание приближает вас к следующей награде карточки.',
+  'referralCards.completion': 'Поздравляем! {friend} завершает карточку с вашей помощью.',
+  'referralCards.openInvites': 'Открыть приглашение друзей',
+  'referralCards.referrerTitle': 'Друзья, которым вы помогли',
+  'referralCards.referrerCount': 'Друзей с завершённой карточкой: {count}',
+  'referralCards.friendTier': 'Помощь друзьям: {count}',
+  'referralCards.awarded': 'Выдано',
+  'referralCards.pending': 'Ещё не выдано',
+  'referralCards.milestones.tutorial': 'Последнее задание учебного острова',
+  'referralCards.milestones.hollow': 'В Пустоту',
+  'referralCards.milestones.fogbinder': 'Вязатель Тумана',
+  'referralCards.milestones.gravewyrm': 'Корзул Могильный Вирм',
+  'referralCards.milestones.raid': 'Победите первого рейдового босса',
+  'referralCards.rewards.tutorial':
+    'Уникальное звание и сумка высшего ранга, привязанная к вашему персонажу.',
+  'referralCards.rewards.hollow':
+    'Аксессуар, повышающий выносливость и автоматически создающий щит при низком здоровье.',
+  'referralCards.rewards.fogbinder':
+    'Аксессуар улучшается: даёт больше выносливости и активный эффект, повышающий все характеристики на 5 на 15 секунд. Перезарядка: 2 минуты.',
+  'referralCards.rewards.gravewyrm': 'Бесплатное обучение верховой езде.',
+  'referralCards.rewards.raid': 'Эксклюзивный ездовой танк дружбы.',
+  'referralCards.referrerRewards.1': 'Эксклюзивный ездовой раптор дружбы.',
+  'referralCards.referrerRewards.2': '20 ячеек банка и 5 слотов персонажей.',
+  'referralCards.referrerRewards.3': 'Награда: 1 000 Claudium.',
+  'referralCards.referrerRewards.4': 'Награда: 1 000 Claudium.',
+  'referralCards.referrerRewards.5': 'Спутник Деревце.',
+  'referralCards.reasons.notParticipant': 'Этот аккаунт не участвует в данной связи друзей.',
+  'referralCards.reasons.staleRevision':
+    'Карточка изменилась. Проверьте текущий прогресс и повторите попытку.',
+  'referralCards.reasons.invalidCharacters':
+    'Персонажи группы не принадлежат этой паре связанных друзей.',
+  'referralCards.reasons.notTogether': 'Оба связанных друга должны быть в одной группе.',
+  'referralCards.reasons.levelTooHigh':
+    'Персонажи для новой карточки должны быть ниже 5-го уровня.',
+  'referralCards.reasons.tutorialCompleted':
+    'Один из персонажей уже завершил последнее задание учебного острова.',
+  'referralCards.reasons.alreadyStarted':
+    'У этой пары уже есть карточка. Каждая пара связанных друзей может иметь только одну активную карточку.',
+  'referralCards.reasons.notPending': 'Нет приглашения начать карточку, ожидающего ответа.',
+  'referralCards.reasons.declinePending': 'Связанный друг решает, отказаться ли от карточки.',
+  'referralCards.reasons.declineNotConfirmed':
+    'Подтвердите отказ, прежде чем завершить приглашение.',
+  'referralCards.reasons.notActive': 'Сначала вместе начните карточку, чтобы получать награды.',
+  'referralCards.reasons.wrongCharacter':
+    'Используйте персонажей, указанных на карточке, или перенесите незакреплённую карточку на подходящего персонажа.',
+  'referralCards.reasons.locked': 'Карточка закреплена за персонажем, и её нельзя перенести.',
+  'referralCards.reasons.sameCharacter': 'Карточка уже принадлежит этому персонажу.',
+  'referralCards.reasons.invalidMilestone': 'Эта отметка не относится к данной карточке.',
+  'referralCards.reasons.notEarned': 'Сначала вместе выполните этот этап, затем получите награду.',
+  'referralCards.reasons.alreadyRedeemed': 'Эта награда уже получена.',
+  'referralCards.reasons.previousRewardRequired': 'Сначала получите награды за предыдущие отметки.',
+  'referralCards.reasons.confirmationRequired':
+    'Перед получением награды за Вязателя Тумана прочитайте предупреждение о закреплении карточки.',
+  'referralCards.reasons.newAccountsOnly':
+    'Связанными друзьями можно стать только при создании нового аккаунта по реферальной ссылке. Уже существующие аккаунты связать нельзя.',
+  'referralCards.reasons.unavailable': 'Сейчас это действие недоступно. Попробуйте позже.',
+  'entities.items.referral_satchel.name': 'Сумка дружбы',
+  'entities.items.referral_hollow_charm.name': 'Оберег дружбы Пустоты',
+  'entities.items.referral_fog_charm.name': 'Окутанный туманом оберег дружбы',
+  'entities.items.reins_referral_tank.name': 'Поводья танка дружбы',
+  'entities.items.reins_referral_raptor.name': 'Поводья раптора дружбы',
+  'hud.social.friendFirstPage': 'Первая страница',
+  'hud.social.friendNextPage': 'Следующая страница',
+  'hud.social.boundFriend': 'Связанный друг',
+  'hud.social.boundFriendLink': 'Связанные друзья объединены приглашением по реферальной ссылке.',
+  'hudChrome.mounts.name_referral_tank': 'Танк дружбы',
+  'hudChrome.mounts.name_referral_raptor': 'Раптор дружбы',
+  'hudChrome.mounts.desc_referral_tank': 'Награда за завершение реферальной карточки с отметками.',
+  'hudChrome.mounts.desc_referral_raptor':
+    'Награда за помощь первому связанному другу в завершении карточки с отметками.',
+  'apiError.character.referral_transfer_pending':
+    'Перед удалением этого персонажа перенесите все незакреплённые карточки с отметками на другого персонажа.',
+  'apiError.character.referral_bond_pending':
+    'Этому персонажу доставляется облигация подписки за приглашение друга. Повторите попытку удаления после завершения доставки.',
 };

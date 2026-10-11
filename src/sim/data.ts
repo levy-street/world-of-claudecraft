@@ -370,6 +370,7 @@ import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot'
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { SEASON2_ITEMS } from './content/pvp_honor_season2';
+import { REFERRAL_STAMP_ITEMS } from './content/referral_rewards';
 import { TRINKET_ITEMS } from './content/trinkets';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
@@ -420,6 +421,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DELVE_ITEMS,
   HEROIC_VENDOR_ITEMS,
   TRINKET_ITEMS,
+  REFERRAL_STAMP_ITEMS,
   HEROIC_ITEMS,
   RETIRED_HEROIC_ITEMS,
   IGNIVAR_LOOT_ITEMS,

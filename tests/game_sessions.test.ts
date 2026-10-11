@@ -1,4 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Session-save retries are isolated from the separately tested referral outbox.
+vi.mock('../server/referral_game_adapter', () => ({
+  ReferralGameAdapter: class {
+    cards = { isBusy: () => false };
+    attach() {}
+    detach() {}
+    observe() {}
+    command() {}
+    async stop() {}
+  },
+}));
+
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MECH_CHROMAS } from '../src/sim/content/skins';

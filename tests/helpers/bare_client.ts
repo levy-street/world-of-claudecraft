@@ -124,6 +124,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.hillInfo = null;
   c.cardMinigameInfo = { queued: false, available: true, match: null };
   c.socialInfo = null;
+  c.referralCardsState = null;
   c.whoInfo = null;
   c.marketInfo = null;
   c.marketCollectPending = false;

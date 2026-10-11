@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { mountAudioKey } from '../src/game/mount_audio_key';
 import { FORGE_MAX_DISTANCE, MAX_DISTANCE, REF_DISTANCE, sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
 import { MOUNT_SKIN_IDS, RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
@@ -41,7 +42,7 @@ const FOOTFALL_MOUNTS = new Set(['lanternback_troll', 'chimeglass_tortoise']);
 // comment in sfx.ts), checking the real SFX_CLIPS catalog for a mount_loop_*
 // entry, so it is excluded from the stride coverage below rather than asserted
 // against a source mountRun never actually plays.
-const CUSTOM_STRIDE_MOUNTS = MOUNT_AUDIO_KEYS.filter(
+const CUSTOM_STRIDE_MOUNTS = [...new Set(MOUNT_AUDIO_KEYS.map(mountAudioKey))].filter(
   (mountKey) => !FOOTFALL_MOUNTS.has(mountKey) && !(`mount_loop_${mountKey}` in SFX_CLIPS),
 );
 // SFX_CLIPS is a generated object LITERAL type, so a mount_run_ key that is
@@ -483,6 +484,24 @@ describe('isBuffered/preload', () => {
 });
 
 describe('mount running audio', () => {
+  it("referral placeholders play their models' gait and engine audio", () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    for (const [key, source] of [
+      ['referral_raptor', 'drakemaw_raptor'],
+      ['referral_tank', 'terrorspark_groundshaker'],
+    ]) {
+      expect(mountAudioKey(key)).toBe(source);
+      nowT += 0.5;
+      sfx.mountRun(0, 0, 0, key, 'grass', true);
+      expect(sources.at(-1)?.buffer).toBe(buffers.get(`mount_run_${source}`));
+    }
+    expect(mountAudioKey('valorsteed')).toBe('valorsteed');
+    expect(mountAudioKey('not_a_mount')).toBe('not_a_mount');
+    expect(sfx.mountEngine(0, 0, 0, 'referral_tank', true, 999)).toBe(true);
+    expect(sfx.mountEngine(0, 0, 0, 'referral_raptor', true, 998)).toBe(false);
+    sfx.mountEngineReset(999);
+    sfx.mountEngineReset(998);
+  });
   it('ships one generated manifest entry for every catalog mount', () => {
     // Engine mounts use mount_run_ as the sustain take of an authored
     // windup/loop/winddown set. Those entries genuinely run through

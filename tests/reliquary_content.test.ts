@@ -484,7 +484,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // The seven Mirefen world boss relics (conquerors_balgath) plus his Craterglass
     // Stave and five trinkets on the same page: 495 + 13 = 508.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 558.
-    expect(full).toEqual({ owned: 558, total: 558 });
+    // Two referral reward mounts join Horizons.
+    expect(full).toEqual({ owned: 560, total: 560 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -519,7 +520,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
     // 466 + 13 with the Mirefen world boss page's relics, staff and trinkets: 479.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529.
-    expect(character).toEqual({ owned: 529, total: 529 });
+    expect(character).toEqual({ owned: 531, total: 531 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -585,7 +586,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
-    ).toBe(745);
+    ).toBe(747); // plus two referral reward mounts
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -2935,6 +2936,7 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // (at the tier the map buys, each tier discovering its piece through
   // ItemDef.relicOf) when an entrant opens a hoard's reward chest.
   buried_hoard: HOARD_BASE_ITEM_IDS,
+  referral_cards: ['reins_referral_raptor', 'reins_referral_tank'],
 };
 
 /**
@@ -3298,7 +3300,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // (the Viridian Valestrider's Champion reins, content/faction_vendors.ts) +
   // the WOC Store's annual membership tank reward; the one pending-ruling
   // absence resolves to nothing.
-  horizons_mounts: 13,
+  horizons_mounts: 14, // plus the referral-card reward activity
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
@@ -3949,6 +3951,7 @@ describe('Reliquary source hints resolve against live content', () => {
       'masterwork_craft',
       'rift_first_clear',
       'buried_hoard',
+      'referral_cards',
     ]);
   });
 
@@ -4051,6 +4054,7 @@ describe('Reliquary source hints resolve against live content', () => {
     // literally (interaction.ts and professions/crafting.ts respectively).
     expect(bySlotKind.get('corpse_harvest:mark')).toEqual(['gather_event:perfect_specimen']);
     expect(bySlotKind.get('masterwork_craft:mark')).toEqual(['masterwork:first']);
+    expect(bySlotKind.get('referral_cards:mount')).toEqual(['referral_raptor', 'referral_tank']);
     // The rift first-clear ITEM slots are EXACTLY the live Riftbound band
     // array, the same bidirectional regime as the corpse-harvest specimens
     // above. The array itself is bound to the independent mint literals by
@@ -4817,6 +4821,7 @@ describe('Reliquary source hint coverage', () => {
         'mark x boss',
         'mark x zone',
         // mount: heroic tables, vendors, the rift ladder and the annual bundle.
+        'mount x activity',
         'mount x boss',
         'mount x vendor',
         'mount x rift',

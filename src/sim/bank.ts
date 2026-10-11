@@ -62,12 +62,13 @@ export const BANK_EXPANSION_PRICES: readonly number[] = [
 export const BANK_PURCHASED_SLOTS_MAX = BANK_EXPANSION_PRICES.length * BANK_EXPANSION_SLOTS;
 
 /** The most bonus slots the server's entitlement registry can grant: +2 email,
- *  +2 Discord, +2 wallet, +2 per qualified referral capped at 5 (+10), so 16.
+ *  +2 Discord, +2 wallet, +2 per qualified referral capped at 5 (+10), and
+ *  +20 for the permanent second completed-card reward, so 36.
  *  This is the load-path clamp for `bonusSlots` (a tampered save must not mint
  *  capacity the registry cannot grant). The server-side registry ceiling is pinned
  *  equal to this constant (tests/bank_entitlements.test.ts), so a future source
  *  (X, Twitch) bumps BOTH in the same change or that tripwire goes red. */
-export const BANK_MAX_BONUS_SLOTS = 16;
+export const BANK_MAX_BONUS_SLOTS = 36;
 
 /** Bank bag sockets: a second, independent way to grow the bank, sitting as a
  *  tier ABOVE the twelve-rung slot ladder (which is grandfathered untouched).

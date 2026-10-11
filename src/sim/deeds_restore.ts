@@ -5,6 +5,7 @@
 // two one-line calls and this module is what a Vitest drives directly.
 
 import {
+  deedStatsSaveFragment,
   evaluateDeedsFor,
   recomputeRenown,
   restoreDeedStats,
@@ -75,4 +76,21 @@ export function runBookOfDeedsJoinRetro(ctx: SimContext, meta: PlayerMeta, playe
   ctx.deedDirtyPids.delete(player.id);
   ctx.deedDirtyKeys.delete(player.id);
   seedAccountLedgerSelf(meta);
+}
+
+/** Omit untouched cosmetic fields so old save shapes remain byte-stable. */
+export function savedBookOfDeeds(meta: PlayerMeta): {
+  deeds?: CharacterState['deeds'];
+  deedStats?: CharacterState['deedStats'];
+  activeTitle?: CharacterState['activeTitle'];
+  activeBorder?: CharacterState['activeBorder'];
+  renown?: CharacterState['renown'];
+} {
+  return {
+    ...(meta.deedsEarned.size > 0 ? { deeds: Object.fromEntries(meta.deedsEarned) } : {}),
+    ...deedStatsSaveFragment(meta.deedStats),
+    ...(meta.activeTitle !== null ? { activeTitle: meta.activeTitle } : {}),
+    ...(meta.activeBorder !== null ? { activeBorder: meta.activeBorder } : {}),
+    ...(meta.renown > 0 ? { renown: meta.renown } : {}),
+  };
 }

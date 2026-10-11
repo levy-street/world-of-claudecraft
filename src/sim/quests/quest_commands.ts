@@ -32,6 +32,7 @@ import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { planGradeRemoval } from '../professions/material_grades';
 import { questFallbackGrants } from '../quest_fallback';
+import { emitReferralQuestEvidence } from '../referral_evidence';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { hubHealingAbilityId } from '../tutorial/hub_healing_lesson';
@@ -545,6 +546,7 @@ export function turnInQuestCore(
   // in refreshKnownAbilities means an ordinary turn-in announces nothing.
   ctx.refreshKnownAbilities(meta, true);
   ctx.emit({ type: 'questDone', questId, pid: meta.entityId });
+  emitReferralQuestEvidence(ctx, meta, questId);
   ctx.emit({
     type: 'log',
     text: `Quest completed: ${quest.name}`,

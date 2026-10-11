@@ -6,8 +6,8 @@ import { buddyOf } from '../src/sim/pet/buddy_ai';
 import { Sim } from '../src/sim/sim';
 import { VENDOR_TEST_WORLD } from './sim_shared';
 
-describe('retired Sapling buddy', () => {
-  it('keeps its saved whistle inert without consuming it or spawning a follower', () => {
+describe('restored Sapling buddy', () => {
+  it('honors saved whistles and summons the restored follower', () => {
     const sim = new Sim({
       seed: 42,
       playerClass: 'warrior',
@@ -18,11 +18,14 @@ describe('retired Sapling buddy', () => {
     const meta = sim.players.get(pid)!;
     sim.addItem('whistle_sapling', 1, pid);
     useItem(sim.ctx, 'whistle_sapling', pid);
-    expect(sim.countItem('whistle_sapling', pid)).toBe(1);
-    expect(buddyOwned(meta, 'sapling')).toBe(false);
-    expect(summonBuddy(sim.ctx, pid, 'sapling')).toBe(false);
+    expect(sim.countItem('whistle_sapling', pid)).toBe(0);
+    expect(buddyOwned(meta, 'sapling')).toBe(true);
+    expect(buddyOf(sim.ctx, pid)?.templateId).toBe('buddy_sapling');
+    expect(summonBuddy(sim.ctx, pid, 'sapling')).toBe(true);
     expect(buddyOf(sim.ctx, pid)).toBeNull();
-    expect(MOBS.buddy_sapling).toBeUndefined();
+    expect(summonBuddy(sim.ctx, pid, 'sapling')).toBe(true);
+    expect(buddyOf(sim.ctx, pid)?.templateId).toBe('buddy_sapling');
+    expect(MOBS.buddy_sapling).toBeDefined();
     expect(ITEMS.whistle_sapling).toMatchObject({
       kind: 'buddy',
       buddy: 'sapling',
@@ -30,7 +33,7 @@ describe('retired Sapling buddy', () => {
     });
   });
 
-  it('discards saved Sapling ownership, pending reveals and last selection on login', () => {
+  it('restores saved Sapling ownership and selection without duplicate pending reveals', () => {
     const sim = new Sim({
       seed: 42,
       playerClass: 'warrior',
@@ -53,9 +56,12 @@ describe('retired Sapling buddy', () => {
       world: VENDOR_TEST_WORLD,
     });
     const restoredId = again.addPlayer('warrior', 'Owner', { state });
-    expect(again.ownedBuddiesFor(restoredId)).toEqual(['horse']);
+    expect(again.ownedBuddiesFor(restoredId)).toEqual(['horse', 'sapling']);
     expect(again.pendingBuddiesFor(restoredId)).toEqual([]);
-    expect(buddyOf(again.ctx, restoredId)).toBeNull();
-    expect(again.serializeCharacter(restoredId)!.buddies).toEqual({ owned: ['horse'] });
+    expect(buddyOf(again.ctx, restoredId)?.templateId).toBe('buddy_sapling');
+    expect(again.serializeCharacter(restoredId)!.buddies).toEqual({
+      owned: ['horse', 'sapling'],
+      last: 'sapling',
+    });
   });
 });

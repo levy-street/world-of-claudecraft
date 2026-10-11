@@ -630,6 +630,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'recipe_elixir_of_mana_regeneration',
     'recipe_potion_of_invisibility',
     // Retired premium reins remain inert saved items, with no use or material role.
+    'referral_satchel',
     'reins_chimeglass_tortoise',
     'reins_goblin_rocket_sled',
     'reins_mech_bird',

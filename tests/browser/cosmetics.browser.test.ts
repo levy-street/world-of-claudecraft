@@ -99,7 +99,7 @@ describe('cosmetics accessibility and interaction', () => {
     }
     expect(root.scrollWidth).toBeLessThanOrEqual(root.clientWidth);
     expect(root.querySelector('[data-buddy-drag], [draggable="true"]')).toBeNull();
-    expect(root.querySelectorAll('.cos-scope-account')).toHaveLength(3);
+    expect(root.querySelectorAll('.cos-scope-account')).toHaveLength(4);
     expect(root.querySelector('.cos-scope-character')).toBeNull();
     expect(root.textContent).not.toContain('Drag to action bar');
     const control = () =>

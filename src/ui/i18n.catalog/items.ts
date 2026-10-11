@@ -5441,6 +5441,11 @@ function itemTranslationsEn(names: readonly string[]) {
   return {
     ...itemTranslations(names),
     membership_token: { name: 'Membership Token (30 Days)' },
+    referral_satchel: { name: 'Friendship Satchel' },
+    referral_hollow_charm: { name: 'Hollow Friendship Charm' },
+    referral_fog_charm: { name: 'Fogbound Friendship Charm' },
+    reins_referral_tank: { name: 'Friendship Tank Reins' },
+    reins_referral_raptor: { name: 'Friendship Raptor Reins' },
     referral_helmet: { name: 'Friendship Helm' },
     referral_shoulder: { name: 'Friendship Pauldrons' },
     referral_chest: { name: 'Friendship Cuirass' },

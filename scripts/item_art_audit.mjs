@@ -165,7 +165,8 @@ const build = await buildItemArtAudit({
     // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
     catalogCount: 2039,
     liveItemCount: 2068,
-    pendingArtCount: 137,
+    // Five referral rewards reuse existing art until their own paintings land.
+    pendingArtCount: 142,
     generatedHeroicDefinitions: 116,
     heroicDefinitionsWithOwnWebp: 86,
     heroicWeaponArtAliases: 30,

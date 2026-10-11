@@ -12,6 +12,8 @@
 // ---------------------------------------------------------------------------
 
 export type MountKey =
+  | 'referral_tank'
+  | 'referral_raptor'
   | 'grag_bear'
   | 'stalkglider_snail'
   | 'valorsteed'
@@ -133,6 +135,18 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  referral_tank: {
+    key: 'referral_tank',
+    name: 'Friendship Tank',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  referral_raptor: {
+    key: 'referral_raptor',
+    name: 'Friendship Raptor',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
   // The Bonebound Rickshaw left this catalog with the v0.42.0 cosmetics
   // change: it is a mount SKIN now (content/mount_skins.ts, id rickshaw_mount),
   // worn over whatever the character actually rides.
@@ -152,6 +166,8 @@ export const DEVELOPER_MOUNTS: readonly MountKey[] = [];
 
 /** Paid annual-bundle mounts retain soulbound reins and outlive membership expiry. */
 export const MEMBERSHIP_REWARD_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker'];
+/** Card and inviter milestones, delivered only by the committed referral reward transaction. */
+export const REFERRAL_REWARD_MOUNTS: readonly MountKey[] = ['referral_tank', 'referral_raptor'];
 
 /** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */
 export function isDeveloperMount(key: string): boolean {

@@ -150,7 +150,7 @@ describe('community test account transaction', () => {
         return { rows: [{ id: 42, username: 'tester', password_hash: 'hash' }], rowCount: 1 };
       }
       if (/INSERT INTO characters/i.test(sql) && ++characterInsert === 4) {
-        throw new Error('character write failed');
+        throw Object.assign(new Error('character write failed'), { code: '23514' });
       }
       return { rows: [{ id: 100 }], rowCount: 1 };
     });
@@ -174,6 +174,8 @@ function deleteClient(
     account?: boolean;
     character?: boolean;
     openStatus?: 'pending' | 'unresolved';
+    referralTransfer?: boolean;
+    referralBond?: boolean;
     deleted?: boolean;
     deleteError?: Error;
   } = {},
@@ -190,6 +192,14 @@ function deleteClient(
         ? { rows: [], rowCount: 0 }
         : { rows: [{ id: 42 }], rowCount: 1 };
     }
+    if (/FROM referral_transfer_characters/i.test(sql)) {
+      return {
+        rows: [
+          { transferable: options.referralTransfer ?? false, bond: options.referralBond ?? false },
+        ],
+        rowCount: 1,
+      };
+    }
     if (/FROM storage_purchases/i.test(sql)) {
       return options.openStatus
         ? { rows: [{ status: options.openStatus }], rowCount: 1 }
@@ -205,6 +215,27 @@ function deleteClient(
 }
 
 describe('deleteCharacter', () => {
+  it.each([
+    ['transferable', { referralTransfer: true }],
+    ['bond', { referralBond: true }],
+  ] as const)(
+    'refuses a character with a %s referral guard without deleting it',
+    async (reason, guard) => {
+      const client = deleteClient(guard);
+      dbMock.connect.mockResolvedValueOnce(client);
+      await expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        code: 'CHARACTER_REFERRAL_REWARD_PENDING',
+        characterId: 42,
+        reason,
+      });
+      expect(client.query.mock.calls.some((call) => /DELETE FROM characters/.test(call[0]))).toBe(
+        false,
+      );
+      expect(client.query.mock.calls.map((call) => call[0])).toContain('ROLLBACK');
+      expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+    },
+  );
+
   it('scopes the delete to the current realm so cross-realm characters are safe', async () => {
     const client = deleteClient();
     dbMock.connect.mockResolvedValueOnce(client);
@@ -243,13 +274,18 @@ describe('deleteCharacter', () => {
     const account = sql.findIndex((statement) => /FROM accounts/.test(statement));
     const character = sql.findIndex((statement) => /FROM characters/.test(statement));
     const purchase = sql.findIndex((statement) => /FROM storage_purchases/.test(statement));
+    const referral = sql.findIndex((statement) =>
+      /FROM referral_transfer_characters/.test(statement),
+    );
     const deletion = sql.findIndex((statement) => /DELETE FROM characters/.test(statement));
-    expect(sql).toHaveLength(9);
+    expect(sql).toHaveLength(10);
     expect(sql[0]).toBe('BEGIN');
     expect(sql[1]).toContain('statement_timeout = 15000');
     expect(sql[1]).toContain("lock_timeout = '2s'");
     expect(sql[1]).toContain("idle_in_transaction_session_timeout = '2s'");
     expect(account).toBeLessThan(character);
+    expect(character).toBeLessThan(referral);
+    expect(referral).toBeLessThan(purchase);
     expect(character).toBeLessThan(purchase);
     expect(purchase).toBeLessThan(deletion);
     // The keep-forever bank_ledger / bank_ledger_batch_receipts cascade rides
@@ -1398,7 +1434,7 @@ describe('bankBonusFactsForAccount', () => {
   // The bank bonus-slot facts read at every fresh join. One round trip, fully
   // parameterized, with the RESOLVED criteria (verified email, level-10 referee), and
   // NEVER a balance/holder/chain read for the wallet fact.
-  it('reads all four facts in one parameterized query carrying the load-bearing predicates', async () => {
+  it('reads all entitlement facts in one parameterized query carrying the load-bearing predicates', async () => {
     dbMock.query.mockResolvedValueOnce({
       rows: [
         {
@@ -1406,6 +1442,7 @@ describe('bankBonusFactsForAccount', () => {
           discord_linked: false,
           wallet_linked: true,
           qualified_referrals: 3,
+          referral_capacity_earned: true,
         },
       ],
     } as any);
@@ -1439,6 +1476,7 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: false,
       walletLinked: true,
       qualifiedReferrals: 3,
+      referralCapacityEarned: true,
     });
   });
 
@@ -1449,6 +1487,7 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: false,
       walletLinked: false,
       qualifiedReferrals: 0,
+      referralCapacityEarned: false,
     });
   });
 
@@ -1468,6 +1507,7 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: true,
       walletLinked: false,
       qualifiedReferrals: 0,
+      referralCapacityEarned: false,
     });
   });
 });
@@ -1531,7 +1571,7 @@ describe('createCharacterCapped', () => {
       'BEGIN',
       "SET LOCAL lock_timeout = '2s'; SET LOCAL statement_timeout = '5s'; SET LOCAL idle_in_transaction_session_timeout = '10s'",
       'SELECT id FROM accounts WHERE id = $1 FOR UPDATE',
-      'SELECT count(*)::int AS n, count(*) FILTER (WHERE NOT membership_slot)::int AS base FROM characters WHERE account_id = $1 AND realm = $2',
+      'SELECT count(*)::int AS n, count(*) FILTER (WHERE NOT membership_slot)::int AS base, EXISTS (SELECT 1 FROM referral_progress WHERE account_id = $1 AND (rewarded_mask & 2) <> 0) AS referral_capacity_earned FROM characters WHERE account_id = $1 AND realm = $2',
       'SELECT prepaid_until FROM account_memberships WHERE account_id = $1',
       'ROLLBACK',
     ]);
@@ -1705,7 +1745,7 @@ describe('character roster feed enqueues', () => {
         return { rows: [{ id: 42, username: 'tester', password_hash: 'hash' }], rowCount: 1 };
       }
       if (/INSERT INTO characters/i.test(sql) && ++characterInsert === 4) {
-        throw new Error('character write failed');
+        throw Object.assign(new Error('character write failed'), { code: '23514' });
       }
       return { rows: [{ id: 100 }], rowCount: 1 };
     });

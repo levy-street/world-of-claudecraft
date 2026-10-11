@@ -5,6 +5,7 @@
 // A successful roll attaches a pending companion that reveals when the player
 // leaves the instance (src/sim/buddy_drops.ts). Horse instead comes from a
 // 100,000-honor direct purchase at both honor vendors (content/pvp_honor.ts).
+// Sapling comes from the inviter's fifth completed referral card (referral_rewards.ts).
 //
 // Active whistle items are soulbound grant tokens, consumed on use. Historical
 // tokens remain readable in old inventories but cannot grant retired companions.

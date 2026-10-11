@@ -385,12 +385,7 @@ import {
   pruneAccountIpAssociationsBatch,
   prunePlaySessionsBatch,
 } from './play_session_retention_db';
-import {
-  captureReferral,
-  cardUploadContentLengthTooLarge,
-  handleCardRoutes,
-  handleCardUpload,
-} from './player_card';
+import { cardUploadContentLengthTooLarge, handleCardRoutes, handleCardUpload } from './player_card';
 import { prunePlayerActivityDailyBatch } from './player_metrics_db';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { progressEventsIdle } from './progress_events';
@@ -416,7 +411,9 @@ import {
 import { createPgRateLimitStore } from './ratelimit_db';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { publishRealmBuilderRoll } from './realm_builder';
-import { referralArmourForAccount } from './referral_armour_db';
+import { referralCapacityEarned } from './referral_account_entitlements_db';
+import { referralArmourForAccount, resolveReferralSignup } from './referral_armour_db';
+import { registerReferralMetrics } from './referral_metrics';
 import { configureReliquaryRuntime } from './reliquary';
 import { reliquaryRarityCounts } from './reliquary_rarity_db';
 import { resolveReportTarget } from './report_target';
@@ -1317,6 +1314,7 @@ function characterListPayload(
   chars: CharacterRow[],
   weaponSkinLoadout: Record<string, string>,
   membership: MembershipSnapshot,
+  referralCapacity = false,
 ): unknown {
   // Delegates to the RouteDef arm's shared builder (review follow-up on the
   // weaponSkinId addition): one implementation means the retained legacy arm
@@ -1330,6 +1328,7 @@ function characterListPayload(
     weaponSkinLoadout,
     Date.now(),
     membership,
+    referralCapacity,
   );
 }
 
@@ -1704,7 +1703,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         return json(res, 409, { error: 'username already taken', code: 'account.username_taken' });
       let account: Awaited<ReturnType<typeof createAccount>>;
       try {
-        account = await createAccount(body.username, await hashPassword(body.password), meta);
+        const referral = await resolveReferralSignup(body.ref);
+        account = await createAccount(body.username, await hashPassword(body.password), meta, {
+          referral,
+        });
       } catch (err: any) {
         // a concurrent registration can win the insert after our findAccount
         // check; the username UNIQUE index is the real guard. Surface it as a
@@ -1747,11 +1749,6 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         username: account.username,
         ...meta,
       }).catch((err) => logger.error({ err }, 'suspicious registration report failed'));
-      // Capture the referral when this account signed up via a card link
-      // (?ref=<slug>). Await before returning credentials; errors stay best-effort.
-      await captureReferral(account.id, body.ref).catch((err) =>
-        logger.error({ err }, 'referral capture failed'),
-      );
       // emailMissing is always false here (email is required above); sent so the
       // client can use one uniform post-auth check across register and login.
       return json(res, 200, {
@@ -1855,6 +1852,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           await listCharacters(accountId),
           (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
           await getMembership(accountId),
+          await referralCapacityEarned(accountId),
         ),
       );
     }
@@ -1869,6 +1867,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
             await listCharacters(accountId),
             (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
             await getMembership(accountId),
+            await referralCapacityEarned(accountId),
           ),
         );
       }
@@ -3657,6 +3656,12 @@ export async function startServer(): Promise<http.Server> {
     onError: (error) => console.error('bank ledger growth monitor failed:', error),
   });
   const generalChatQuotaListener = createGeneralChatQuotaListener({
+    accountBlocks: {
+      invalidate: (accountId) => game.invalidateAccountBlocks(accountId),
+      disconnected: () => game.accountBlockListenerDisconnected(),
+      resync: () => game.resyncAccountBlocks(),
+      refresh: (accountId) => game.refreshAccountBlocks(accountId),
+    },
     activeAccountIds: () => [...game.liveAccountIds()],
     onResync: (accountIds, policies) => {
       game.resyncGeneralChatRateLimits(accountIds, policies);
@@ -3925,6 +3930,7 @@ export async function startServer(): Promise<http.Server> {
   // request and cached process-locally. No collector and no query: the gauges read
   // that cache at scrape time and the counters ride the push itself.
   registerDiscordBotMetrics(httpMetrics.registry);
+  registerReferralMetrics(httpMetrics.registry);
 
   // Business gauges use isolated, staggered, timeout-protected engagement and
   // funnel snapshots every 15 minutes. Scrapes publish only cached data and never
@@ -4277,7 +4283,7 @@ export async function startServer(): Promise<http.Server> {
     // Stop the wealth sweep's timer (an in-flight pass logs its own failure if
     // it races the pool close; the next boot's first pass rebuilds the totals).
     accountWealthSweep.stop();
-    game.stop();
+    await game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();
     await game.saveMail();

@@ -553,6 +553,10 @@ describe('/dev kit against a real Sim', () => {
         .map((item) => item.bagSlots ?? 0),
     );
     expect(best?.bagSlots).toBe(generalMax);
+    // Custody-protected card rewards must come from their receipt-owning grant path.
+    expect(ITEMS.referral_satchel.noDiscard).toBe(true);
+    expect(ITEMS.referral_satchel.bagSlots).toBe(generalMax);
+    expect(best?.noDiscard).not.toBe(true);
     // Non-vacuity: the exclusion only proves something while a materials-only bag that
     // WOULD have won exists. If the catalog ever loses that bag, this arm must be
     // re-derived rather than left quietly passing.

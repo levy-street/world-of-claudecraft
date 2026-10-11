@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   type DriftManifest,
@@ -14,6 +14,7 @@ import {
   changedPortraitIds,
 } from '../scripts/lib/mob_portrait_manifest_guard.mjs';
 import { MOBS } from '../src/sim/data';
+import { targetPortraitUrl } from '../src/ui/target_portrait_view';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const script = join(repoRoot, 'scripts/build_mob_portrait_source_manifest.mjs');
@@ -80,9 +81,11 @@ describe('mob portrait source manifest', () => {
     expect(result.stdout).toMatch(/is fresh/);
   });
 
-  it('covers every live mob and records each render dependency with a content hash', () => {
+  it('covers every live rendered mob portrait and records each dependency with a content hash', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
-    const liveIds = Object.keys(MOBS).sort();
+    const liveIds = Object.keys(MOBS)
+      .filter((id) => targetPortraitUrl(id, true) === `/ui/mobs/${encodeURIComponent(id)}.webp`)
+      .sort();
     // 243: the 233 the v0.39.0 base carried, minus vale_cup_ball (retired with
     // the Vale Cup by the New Eastbrook program), plus the Proving Shore
     // tutorial island's training_effigy, shore_scuttler, and mister_crabs
@@ -106,7 +109,8 @@ describe('mob portrait source manifest', () => {
     // 276: plus the Mirefen world-boss branch's six (balgath_cyclops, muster_footman,
     // muster_chaplain, muster_sergeant, muster_drillmaster, muster_effigy).
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 354.
-    expect(liveIds).toHaveLength(354);
+    // The 2026-10-09 reviewed renderer receipt captures all 355 current rows.
+    expect(liveIds).toHaveLength(355);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
@@ -376,7 +380,7 @@ describe('mob portrait source manifest', () => {
   it('derives the renderer fingerprint independently of the launch directory', () => {
     const probe = `
       import { buildPortraitRendererContract, portraitRendererFingerprint } from ${JSON.stringify(
-        join(repoRoot, 'scripts/lib/mob_portrait_jobs.mjs'),
+        pathToFileURL(join(repoRoot, 'scripts/lib/mob_portrait_jobs.mjs')).href,
       )};
       const contract = await buildPortraitRendererContract(${JSON.stringify(repoRoot)});
       process.stdout.write(portraitRendererFingerprint(contract));

@@ -70,8 +70,10 @@ import {
 } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
+import { MembershipGameServices } from '../server/membership_game_services';
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
+import { ReferralGameAdapter } from '../server/referral_game_adapter';
 import { KeyedSerialWriteAborted } from '../server/serial_writer';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { EMPTY_MST_CRAFTS } from '../src/net/crafting_wire';
@@ -2993,6 +2995,15 @@ describe('legendary celebration events reach the client (phase 13)', () => {
 
 describe('autosaves', () => {
   beforeEach(() => {
+    // Join-time social, referral and membership reads share this gate too.
+    // Their own suites cover admission; isolate them here so these exact
+    // permit counts measure only the real save producers and FIFO ordering.
+    vi.spyOn(
+      GameServer.prototype as unknown as { initSocial(): Promise<void> },
+      'initSocial',
+    ).mockResolvedValue();
+    vi.spyOn(ReferralGameAdapter.prototype, 'attach').mockImplementation(() => {});
+    vi.spyOn(MembershipGameServices.prototype, 'onJoin').mockImplementation(() => {});
     vi.mocked(saveCharacterState).mockReset();
     vi.mocked(saveCharacterState).mockResolvedValue(true);
     vi.mocked(saveCharacterAndGuildBankState).mockReset();
@@ -3006,6 +3017,7 @@ describe('autosaves', () => {
     vi.mocked(saveMailPartitions).mockReset();
     vi.mocked(saveMailPartitions).mockResolvedValue();
   });
+  afterEach(() => vi.restoreAllMocks());
 
   it('skips overlapping saveAll runs while saving each current session once', async () => {
     const server = new GameServer();

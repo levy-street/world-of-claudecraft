@@ -8,7 +8,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { onTrinketAvoidance, runTrinketTrigger } from '../src/sim/combat/trinkets';
+import { onTrinketAvoidance, onTrinketDamage, runTrinketTrigger } from '../src/sim/combat/trinkets';
 import {
   TRINKET_ANCHOR_SLOW_AURA,
   TRINKET_AURA,
@@ -165,12 +165,12 @@ describe('trinket aura tooltips (English)', () => {
     [
       'Bastion Sigil cooldown marker',
       own({ id: TRINKET_AURA.lastStandIcd, kind: 'internal_cd', value: 0 }),
-      "Bastion Sigil's Last Bastion shield was used. Falling below 35% health cannot raise it again until this expires.",
+      'Your protective shield was used. Taking damage below 35% health cannot raise it again until this expires.',
     ],
     [
       'Last Bastion',
       own({ id: TRINKET_AURA.lastStand, kind: 'absorb', value: 750 }),
-      'Absorbs 750 damage. Bastion Sigil raised it when you took damage below 35% health.',
+      'Absorbs 750 damage. Your trinket raised it when you took damage below 35% health.',
     ],
     [
       'Retaliation Ward',
@@ -484,6 +484,32 @@ function shown(text: string, before: string): number {
 }
 
 describe('trinket aura tooltip numbers match combat', () => {
+  it.each(['bastion_sigil', 'referral_hollow_charm', 'referral_fog_charm'])(
+    '%s describes its actual protective shield and trigger',
+    (itemId) => {
+      const sim = wearing(itemId);
+      const p = sim.player;
+      p.hp = Math.ceil(p.maxHp * 0.35);
+      onTrinketDamage(sim.ctx, null, p, 1, 'physical', true, null);
+      expect(findAura(p, TRINKET_AURA.lastStand)).toBeUndefined();
+      p.hp = Math.floor(p.maxHp * 0.35) - 1;
+      onTrinketDamage(sim.ctx, null, p, 1, 'physical', true, null);
+      const shield = findAura(p, TRINKET_AURA.lastStand);
+      const cooldown = findAura(p, TRINKET_AURA.lastStandIcd);
+      expect(shield).toBeDefined();
+      expect(cooldown).toBeDefined();
+      if (!shield || !cooldown) throw new Error('protective trinket did not trigger');
+      expect(shield.value).toBe(Math.round(p.maxHp * (itemId === 'bastion_sigil' ? 0.15 : 0.1)));
+      expect(shield.value2).toBe(0.35);
+      expect(cooldown.duration).toBe(itemId === 'bastion_sigil' ? 90 : 120);
+      expect(render(shield, p)).toBe(
+        `Absorbs ${shield.value} damage. Your trinket raised it when you took damage below 35% health.`,
+      );
+      expect(render(cooldown, p)).toBe(
+        'Your protective shield was used. Taking damage below 35% health cannot raise it again until this expires.',
+      );
+    },
+  );
   it('Tempered prints the Fire damage its next weapon hit deals', () => {
     for (const attackPower of [0, 600]) {
       const sim = wearing('forgefathers_temper');

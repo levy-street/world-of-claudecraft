@@ -1696,6 +1696,8 @@ export type ItemDef =
 // time, see market.ts marketList); #1146 wires real market handling for
 // instanced items later.
 export interface ItemInstancePayload {
+  /** Exact referral-card provenance for a movable trinket; bags remain fungible. */
+  referralLinkId?: number;
   /** Permanent enemy-drop quality, independent of rarity, enchants and upgrades. */
   lootQuality?: LootQualityDescriptor;
   /** Player name that signed/crafted this specific copy, if any. */
@@ -8886,6 +8888,7 @@ export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 're
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
+  | import('./referral_evidence').ReferralEvidence
   | { type: 'courier'; playerId: number }
   | {
       type: 'damage';

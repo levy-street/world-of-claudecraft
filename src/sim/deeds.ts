@@ -32,11 +32,14 @@ import { BUDDY_DEED_REWARDS } from './content/buddy_sources';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { FARM_CROP_IDS } from './content/farm_crops';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
+import { REFERRAL_TITLE } from './content/referral_rewards';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
 import { MUSTER_PIKE_MAX_LEVEL } from './lance_balance_core';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
+import { emitReferralBossEvidence } from './referral_evidence';
+import { ownsReferralTitle } from './referral_rewards';
 import {
   accountReliquaryOwnership,
   isHorizonsTitleDeed,
@@ -860,6 +863,12 @@ export function setActiveTitle(
 ): void {
   if (deedId !== null) {
     if (typeof deedId !== 'string') return;
+    if (deedId === REFERRAL_TITLE) {
+      if (!ownsReferralTitle(meta.referralRewards)) return;
+      meta.activeTitle = deedId;
+      e.title = deedId;
+      return;
+    }
     if (devBadgeTitleTier(deedId) !== undefined) {
       if (!opts?.restore && !canWearDevBadgeTitle(deedId, e.devTier)) return;
       meta.activeTitle = deedId;
@@ -1961,6 +1970,7 @@ export function onNythraxisKillForDeeds(
 ): void {
   onDungeonFinalBossKilledForDeeds(ctx, boss, instanceForMob(ctx, boss), roomMetas);
   onDungeonClearedForWeeklyQuests(ctx, FINAL_BOSS_DUNGEONS[boss.templateId], roomMetas);
+  emitReferralBossEvidence(ctx, boss, roomMetas);
 }
 
 /** World-boss credit: the loot-roster snapshot (never pruned by dying). */

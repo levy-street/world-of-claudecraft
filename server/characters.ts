@@ -103,6 +103,10 @@ import { isUniqueViolation, json, moderationErrorBody } from './http_util';
 import { getMembership } from './membership_service';
 import { countOfflineFenceRefusal } from './offline_fence_refusals';
 import { REALM } from './realm';
+import {
+  REFERRAL_CHARACTER_BONUS,
+  referralCapacityEarned,
+} from './referral_account_entitlements_db';
 
 // ---------------------------------------------------------------------------
 // Ported response bodies (the exact legacy { error } identities). Named constants so
@@ -259,6 +263,7 @@ function useRuntime(): CharactersRuntime {
 const REAL_CHARACTERS_DB = {
   accountAndScopeForToken,
   getMembership,
+  referralCapacityEarned,
   loadAccountCosmetics,
   loadAccountLedgerKeys: accountLedgerKeysFor,
   moderationStatusForAccount,
@@ -387,11 +392,14 @@ export function buildCharacterList(
   weaponSkinLoadout: Record<string, string>,
   nowMs: number = Date.now(),
   membership: MembershipSnapshot = MEMBERSHIP_OFF,
+  referralCapacity = false,
 ): unknown {
   return {
     realm: REALM,
     membership: { active: membershipActive(membership, nowMs), expiresAt: membership.expiresAt },
-    characterLimit: membershipCharacterLimit(membership, nowMs),
+    characterLimit:
+      membershipCharacterLimit(membership, nowMs) +
+      (referralCapacity ? REFERRAL_CHARACTER_BONUS : 0),
     characters: chars.map((c) => ({
       id: c.id,
       membershipSlot: c.membership_slot === true,
@@ -706,6 +714,7 @@ async function meCharactersHandler(ctx: Ctx): Promise<void> {
   const chars = await charactersDb.listCharacters(ctxAccountId(ctx));
   const cosmetics = await charactersDb.loadAccountCosmetics(ctxAccountId(ctx));
   const membership = await charactersDb.getMembership(ctxAccountId(ctx));
+  const referralCapacity = await charactersDb.referralCapacityEarned(ctxAccountId(ctx));
   json(
     ctx.res,
     200,
@@ -715,6 +724,7 @@ async function meCharactersHandler(ctx: Ctx): Promise<void> {
       cosmetics.weaponSkinLoadout,
       Date.now(),
       membership,
+      referralCapacity,
     ),
   );
 }
@@ -725,6 +735,7 @@ async function listCharactersHandler(ctx: Ctx): Promise<void> {
   const chars = await charactersDb.listCharacters(ctxAccountId(ctx));
   const cosmetics = await charactersDb.loadAccountCosmetics(ctxAccountId(ctx));
   const membership = await charactersDb.getMembership(ctxAccountId(ctx));
+  const referralCapacity = await charactersDb.referralCapacityEarned(ctxAccountId(ctx));
   json(
     ctx.res,
     200,
@@ -734,6 +745,7 @@ async function listCharactersHandler(ctx: Ctx): Promise<void> {
       cosmetics.weaponSkinLoadout,
       Date.now(),
       membership,
+      referralCapacity,
     ),
   );
 }

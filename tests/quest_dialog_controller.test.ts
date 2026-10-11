@@ -10,6 +10,7 @@ import {
 import { DELVES, ITEMS, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import { defaultRewardChoice } from '../src/sim/quests/quest_reward_choice';
+import { createReferralCard } from '../src/sim/referral_cards';
 import type { Entity } from '../src/sim/types';
 import { WEEKLY_KEEPER_ENTITY_ID, WEEKLY_KEEPER_ID } from '../src/sim/weekly_rewards';
 import { craftNameText } from '../src/ui/char_window';
@@ -196,6 +197,38 @@ function harness(
 }
 
 describe('QuestDialogController', () => {
+  it('marks only the next stamp quest on pickup and its detail', () => {
+    const card = createReferralCard(8, 10, 20);
+    card.status = 'active';
+    Object.assign(card.participants[0], { characterId: 100, credited: 1, redeemed: 1 });
+    const offered = npc(30, 'brother_aldric');
+    offered.questIds = ['q_hollow', 'q_bones'];
+    const test = harness(
+      offered,
+      'available',
+      {},
+      {
+        referralCardsSnapshot: () => ({
+          revision: 1,
+          accountId: 10,
+          characterId: 100,
+          links: [{ card, friendName: 'Briar' }],
+        }),
+      },
+    );
+    test.controller.open(30);
+    const row = test.element.querySelector<HTMLButtonElement>('[data-quest="q_hollow"]');
+    expect(row).not.toBeNull();
+    expect(row?.getAttribute('aria-label')).toContain('next stamp card reward');
+    expect(row?.querySelector('.referral-quest-indicator')).not.toBeNull();
+    expect(
+      test.element.querySelector('[data-quest="q_bones"] .referral-quest-indicator'),
+    ).toBeNull();
+    row?.click();
+    expect(test.element.querySelector('.referral-quest-indicator')?.textContent).toContain(
+      'next stamp card reward',
+    );
+  });
   beforeEach(() => {
     document.body.innerHTML = '';
   });

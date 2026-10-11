@@ -18,6 +18,7 @@
 
 import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
+import { emitReferralPartyEvidence } from '../referral_evidence';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
 import { rememberSoulwellPartyEligibility } from '../soulwell';
@@ -213,6 +214,7 @@ export class PartyMachine {
     this.partyByPid.set(r.meta.entityId, party.id);
     rememberSoulwellPartyEligibility(this.ctx, party);
     this.ctx.inheritDungeonResetLocks(r.meta.entityId);
+    emitReferralPartyEvidence(this.ctx, party.members);
     this.syncPersistentPaladinPartyAuras(party);
     // Forming the party is the inviter's join too; the accepter counts on
     // every successful join.
@@ -530,6 +532,7 @@ export class PartyMachine {
         pid: mPid,
       });
     }
+    emitReferralPartyEvidence(this.ctx, party.members);
     return party;
   }
 
@@ -631,5 +634,6 @@ export class PartyMachine {
       }
     }
     this.announceLooterShift(party, beforeLooter);
+    emitReferralPartyEvidence(this.ctx, [...party.members, pid]);
   }
 }

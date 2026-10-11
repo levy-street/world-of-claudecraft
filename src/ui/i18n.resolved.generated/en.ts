@@ -11,6 +11,119 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const en: EnTranslations = {
+  "referralCards": {
+    "title": "Refer a Friend",
+    "subtitle": "Adventure together. Earn your stamps.",
+    "close": "Close Refer a Friend",
+    "launcher": "Stamp cards",
+    "pages": "Stamp card pages",
+    "firstPage": "First page",
+    "nextPage": "More cards",
+    "trailmateTitle": "Trailmate",
+    "friendshipAura": "Friendship",
+    "protectiveCharm": "Protective Charm",
+    "bankBonus": "Completed stamp cards",
+    "bankBonusHelp": "Help two bound friends complete their stamp cards to unlock 20 permanent bank slots.",
+    "friendshipUse": "Increase your Strength, Agility, Stamina, Intellect, and Spirit by {stats} for {duration} seconds.",
+    "readyCount": "Stamp cards: {count} rewards ready to collect",
+    "loading": "Connecting to your referral cards...",
+    "empty": "Invite a new player to begin your first stamp card together.",
+    "inviteTitle": "Invite a friend",
+    "inviteHelp": "Share this link with a friend before they create their account. Only new accounts created through your link become bound friends.",
+    "inviteLabel": "Your invitation link",
+    "inviteUnavailable": "Your invitation link is not available yet.",
+    "membership": "When your bound friend buys their first membership, you receive a membership bond.",
+    "cardBetween": "{you} and {friend}",
+    "yourCard": "{name}'s stamp card",
+    "unassigned": "Character not selected",
+    "start": "Start a card",
+    "startPrompt": "Start stamp cards with {friend}? Both of you must accept. Each character must be below level 5 and must not have completed the final Tutorial Island quest.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "declinePrompt": "Are you sure you want to decline? You can start later from the stamp card menu while both characters still meet the requirements.",
+    "declineConfirmed": "The card was not started. You can start from the stamp card menu while both characters still meet the requirements.",
+    "waiting": "Waiting for your bound friend to accept.",
+    "cancel": "Cancel",
+    "okay": "OK",
+    "understand": "Yes, I understand",
+    "confirmLock": "Yes, lock this card",
+    "lockFirst": "Redeeming The Fogbinder stamp reward permanently locks this card to {name}. You will no longer be able to move this card or its rewards to another character. Do you understand?",
+    "lockSecond": "Are you sure? Redeem The Fogbinder reward and permanently lock this card to {name}.",
+    "locked": "This card is locked to {name}. It can no longer be moved.",
+    "unlocked": "This card can move to another eligible character until you redeem The Fogbinder stamp reward. Redeeming that reward permanently locks it to this character.",
+    "move": "Move card to this character",
+    "movePrompt": "Move your card from {oldName} to {newName}? Your progress and all rewards earned from this card will move. Those rewards will be removed from {oldName}.",
+    "confirmMove": "Yes, move my card",
+    "summon": "Summon bound friend",
+    "summonPrompt": "{friend} wants to summon you to their location. Accept the summon?",
+    "summonHelp": "Bring your bound friend to your location. You can summon once every 30 minutes.",
+    "summonCooldown": "Summon ready in {minutes} min {seconds} sec",
+    "reward": "Reward: {reward}",
+    "earned": "Earned",
+    "redeemed": "Redeemed",
+    "emptyStamp": "Not yet earned",
+    "stamping": "Stamping your card...",
+    "redeem": "Redeem reward",
+    "previous": "Redeem earlier stamps first.",
+    "playTogether": "Complete milestones in a party with the characters on this card.",
+    "fallback": "Already completed a milestone quest alone? Rejoin your friend in a party for the Tutorial Island stamp. For later quest stamps, clear the matching dungeon together.",
+    "questGroup": "Stamp card quests",
+    "questWithFriend": "{quest} with {friend}",
+    "browseCards": "Browse all stamp card pages",
+    "nextQuest": "Stamp card: {quest}",
+    "questIndicator": "This quest advances your next stamp card reward.",
+    "completion": "Congratulations! {friend} completed their stamp card with your help.",
+    "openInvites": "Open Refer a Friend",
+    "referrerTitle": "Friends you helped",
+    "referrerCount": "{count} friends completed",
+    "friendTier": "Friends helped: {count}",
+    "awarded": "Awarded",
+    "pending": "Not yet awarded",
+    "milestones": {
+      "tutorial": "Tutorial Island final quest",
+      "hollow": "Into the Hollow",
+      "fogbinder": "The Fogbinder",
+      "gravewyrm": "Korzul the Gravewyrm",
+      "raid": "Defeat your first raid boss"
+    },
+    "rewards": {
+      "tutorial": "A unique title and a maximum-tier bag, bound to your character.",
+      "hollow": "A trinket that grants Stamina and a passive shield when your health is low.",
+      "fogbinder": "Your trinket evolves, gaining more Stamina and an active effect: +5 to all stats for 15 seconds, with a 2 minute cooldown.",
+      "gravewyrm": "Free mount training.",
+      "raid": "The exclusive Friendship Tank mount."
+    },
+    "referrerRewards": {
+      "1": "The exclusive Friendship Raptor mount.",
+      "2": "20 bank slots and 5 character slots.",
+      "3": "1,000 Claudium.",
+      "4": "1,000 Claudium.",
+      "5": "A Sapling buddy companion."
+    },
+    "reasons": {
+      "notParticipant": "This account is not part of this bound-friend link.",
+      "staleRevision": "Your card changed. Check its latest progress and try again.",
+      "invalidCharacters": "The party characters do not belong to this bound-friend link.",
+      "notTogether": "Both bound friends must be in the same party.",
+      "levelTooHigh": "New card characters must be below level 5.",
+      "tutorialCompleted": "A character has already completed the final Tutorial Island quest.",
+      "alreadyStarted": "This link already has a card. Each bound-friend link can have only one active card.",
+      "notPending": "There is no card invitation waiting for a response.",
+      "declinePending": "Your bound friend is deciding whether to decline the card.",
+      "declineNotConfirmed": "Confirm the decline before ending this invitation.",
+      "notActive": "Start a card together before collecting rewards.",
+      "wrongCharacter": "Use the characters named on the card, or move an unlocked card to an eligible character.",
+      "locked": "This card is locked to its character and cannot be moved.",
+      "sameCharacter": "This card is already on this character.",
+      "invalidMilestone": "That stamp does not belong to this card.",
+      "notEarned": "Complete this milestone together before redeeming it.",
+      "alreadyRedeemed": "This reward has already been redeemed.",
+      "previousRewardRequired": "Redeem the earlier stamp rewards first.",
+      "confirmationRequired": "Review the card lock warning before redeeming The Fogbinder reward.",
+      "newAccountsOnly": "Accounts can become bound friends only when a new account is created through a referral link. Existing accounts cannot be bound.",
+      "unavailable": "This action is not available right now. Please try again later."
+    }
+  },
   "meta": {
     "builtOn": "Built {date}"
   },
@@ -2093,6 +2206,8 @@ export const en: EnTranslations = {
       "name_goblin_rocket_sled": "Goblin Rocket Sled",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
+      "name_referral_tank": "Friendship Tank",
+      "name_referral_raptor": "Friendship Raptor",
       "name_drakemaw_raptor": "Drakemaw Raptor",
       "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Mech Bird",
@@ -2110,6 +2225,8 @@ export const en: EnTranslations = {
       "desc_rallycart_rxt": "A pint-sized rally machine that provides enhanced travel speed.",
       "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
       "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.",
+      "desc_referral_tank": "Earned by completing a referral stamp card.",
+      "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
       "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.",
       "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
@@ -4196,8 +4313,8 @@ export const en: EnTranslations = {
       "nextAttackCrit": "Your next attack is guaranteed to critically strike",
       "healEcho": "Falling below {threshold}% health restores {value} health",
       "trinket": {
-        "lastStandCooldown": "Bastion Sigil's Last Bastion shield was used. Falling below {threshold}% health cannot raise it again until this expires.",
-        "lastBastion": "Absorbs {value} damage. Bastion Sigil raised it when you took damage below {threshold}% health.",
+        "lastStandCooldown": "Your protective shield was used. Taking damage below {threshold}% health cannot raise it again until this expires.",
+        "lastBastion": "Absorbs {value} damage. Your trinket raised it when you took damage below {threshold}% health.",
         "retaliate": "Enemies that hit you directly take Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.",
         "moored": "You take {reduction}% less damage but move at {speed}% speed. You ignore stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms, incapacitating effects and knockbacks.",
         "hourglassStored": "Holds {stored} healing stored from your overhealing. Use Mender's Hourglass to turn it into a shield on the party member within {range} yd with the lowest health percentage, you included.",
@@ -7321,6 +7438,8 @@ export const en: EnTranslations = {
       "delete_confirm": "Type the character name to confirm deletion.",
       "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
       "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "referral_transfer_pending": "Move all unlocked stamp cards to another character before deleting this character.",
+      "referral_bond_pending": "A referral membership bond is being delivered to this character. Try deleting the character again after delivery finishes.",
       "already_in_world": "Character is already in world.",
       "taken_over": "Your character was taken over by another session.",
       "rename_required": "This character must be renamed before entering the world.",
@@ -12881,6 +13000,10 @@ export const en: EnTranslations = {
     "social": {
       "title": "Social",
       "friendsTab": "Friends",
+      "friendFirstPage": "First page",
+      "friendNextPage": "Next page",
+      "boundFriend": "Bound friend",
+      "boundFriendLink": "Bound friends are linked by their referral invitation.",
       "guildTab": "Guild",
       "ignoreTab": "Ignore",
       "leaveParty": "Leave Party",
@@ -21081,6 +21204,21 @@ export const en: EnTranslations = {
       },
       "membership_token": {
         "name": "Membership Token (30 Days)"
+      },
+      "referral_satchel": {
+        "name": "Friendship Satchel"
+      },
+      "referral_hollow_charm": {
+        "name": "Hollow Friendship Charm"
+      },
+      "referral_fog_charm": {
+        "name": "Fogbound Friendship Charm"
+      },
+      "reins_referral_tank": {
+        "name": "Friendship Tank Reins"
+      },
+      "reins_referral_raptor": {
+        "name": "Friendship Raptor Reins"
       },
       "referral_helmet": {
         "name": "Friendship Helm"
