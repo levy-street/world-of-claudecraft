@@ -65,6 +65,7 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     countIpSessions: () => 0,
     hasSessionForCharacter: hasSessionSpy,
     join: joinSpy,
+    drainBuddyGrants: vi.fn(async () => {}),
     clients: { size: 1 },
     sim: { resetDay: '2026-09-24' },
     // Consumed by the mid-handshake death re-check on a socket that died

@@ -182,6 +182,7 @@ function harness(body: Entity, partyPids: number[] | null = null) {
     showOwnNameplate: () => false,
     showPlayerNameplates: () => true,
     isHostilePlayer: () => false,
+    showPetNames: () => true,
   });
   return { painter, world, body };
 }

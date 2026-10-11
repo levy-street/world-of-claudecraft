@@ -885,6 +885,13 @@ export const HONOR_QUARTERMASTER_STOCK: readonly string[] = [
   ...SEASON2_STOCK,
 ];
 
+/** What both honor counters list: the gear stock above, then the one cosmetic
+ * companion whistle (kind 'buddy'), which no relic page or gear pin counts. */
+export const HONOR_VENDOR_STOCK: readonly string[] = [
+  ...HONOR_QUARTERMASTER_STOCK,
+  'whistle_horse',
+];
+
 export const FURY_NPC: NpcDef = {
   id: FURY_NPC_ID,
   name: 'FURY',
@@ -893,7 +900,7 @@ export const FURY_NPC: NpcDef = {
   facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.fury.facing,
   color: 0xb52a2a,
   questIds: [],
-  vendorItems: [...HONOR_QUARTERMASTER_STOCK],
+  vendorItems: [...HONOR_VENDOR_STOCK],
   dynamic: true,
   // The Eastbrook mirror sells the identical stock, so it presents the identical
   // set-divided shop window. One canonical stock, two placements.

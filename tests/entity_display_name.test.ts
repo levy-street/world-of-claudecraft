@@ -143,3 +143,8 @@ describe('the apex feast titles', () => {
     expect(feastTitleKeyedTemplateIds(), 'the map claims exactly the family').toEqual(templates);
   });
 });
+
+it('preserves a custom buddy name even when it matches a localizable spell name', () => {
+  const buddy = ent({ kind: 'mob', templateId: 'buddy_horse', ownerId: 9, name: 'Frost Nova' });
+  expect(entityDisplayName(buddy)).toBe('Frost Nova');
+});

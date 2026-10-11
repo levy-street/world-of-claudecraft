@@ -52,6 +52,7 @@ import {
   AMBERFALL_ROADS,
   AMBERFALL_ZONE,
 } from './content/amberfall';
+import { BUDDY_MOBS } from './content/buddy_mobs';
 import {
   BROTHER_HALVEN,
   BROTHER_HALVEN_MARSH,
@@ -432,6 +433,7 @@ export type { AggregatedSetEffect } from './content/item_sets';
 export { aggregateSetBonuses, ITEM_SETS } from './content/item_sets';
 
 export const MOBS: Record<string, MobTemplate> = {
+  ...BUDDY_MOBS,
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
   [INVESTIGATION_MOB.id]: INVESTIGATION_MOB,

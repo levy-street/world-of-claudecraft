@@ -5695,6 +5695,8 @@ const ALL_DELTA_KEYS = [
   'bg',
   'blk',
   'bpsl',
+  'budOwn',
+  'budPend',
   'buyback',
   'bval',
   'cardDuel',
@@ -5838,6 +5840,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   bags: 'bags',
   bank: 'bankInfo',
   blk: 'blockChance',
+  budOwn: 'ownedBuddies',
+  budPend: 'pendingBuddies',
   buyback: 'vendorBuyback',
   bval: 'blockValue',
   cbt: 'inCombat',
@@ -6913,6 +6917,23 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.player.mountKey).toBe('valorsteed');
   });
 
+  it('round-trips the active buddy identity mirror (bud) like mnt', () => {
+    // Entity.buddyKey (wire `bud`, identityFields in server/game.ts) is the
+    // "which buddy is out" mirror every client reads for HUD/UI identity; the
+    // buddy's own body renders through its real owned mob entity, never off
+    // this field, but the field itself must still round-trip like every
+    // other identity mirror (skin, mountKey).
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    server.sim.entities.get(leader.pid)!.buddyKey = 'cate_coin';
+    broadcast(server);
+    const snapshot = lastSnap(fc.sent);
+    expect(snapshot.self.bud).toBe('cate_coin');
+
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snapshot);
+    expect(client.player.buddyKey).toBe('cate_coin');
+  });
+
   it('flips mst to null when the mobile station expires (server-side tick-domain check)', () => {
     // The expiry arm of the mst self-delta: activeMobileStationCraftsFor
     // resolves active-vs-expired against the SERVER sim's own tickCount, so
@@ -7151,7 +7172,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 113 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 115 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
@@ -7209,8 +7230,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and the Spell Crit sheet cell's
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
-    expect(ALL_DELTA_KEYS).toHaveLength(113);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(113);
+    // The buddy collection (server/buddy_wire.ts) adds budOwn and budPend at the
+    // release/v0.45.0 merge into the buddy companions branch, for 115.
+    expect(ALL_DELTA_KEYS).toHaveLength(115);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(115);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7380,7 +7403,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    expect(scraped.size).toBe(113);
+    // The buddy collection's budOwn and budPend make 115.
+    expect(scraped.size).toBe(115);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

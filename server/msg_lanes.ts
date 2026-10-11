@@ -25,8 +25,8 @@
 //   cmd 'telemetry', and cmd 'challengeResponse'. Defense-in-depth token
 //   accounting: beats and challenge replies never compete for command-lane
 //   tokens, and never spend or refill lane state at all.
-// - name_screen: cmd 'pet_rename', cmd 'guild_create', and cmd 'perfect_item'
-//   carrying a `name` field: the three handlers that run the obscenity
+// - name_screen: cmd 'pet_rename', 'buddy_rename', 'guild_create', and 'perfect_item'
+//   carrying a `name` field: the handlers that run the obscenity
 //   matcher on player text before any sim gate (see the lane's constants
 //   below).
 // - command: every OTHER parsed shape. All remaining commands, plus the
@@ -58,7 +58,7 @@ export const MSG_LANE_CHAT_BURST = 8;
 
 // Name-screen lane (the Masterwrought phase 13 QA hot-path review): the
 // commands that run the obscenity matcher on player text BEFORE any sim gate
-// (pet_rename, perfect_item when it carries a legendary name, and since Phase
+// (pet_rename, buddy_rename, perfect_item with a legendary name, and since Phase
 // 18 guild_create, whose paid creation screens the guild name through
 // isNameOffensive before any row, server/social.ts) cost about 25
 // microseconds each on the event loop, and an ALLOWED under-ceiling frame
@@ -102,12 +102,13 @@ export function createMsgLanes(nowSec: number): MsgLaneState {
   };
 }
 
-/** The three commands whose handler screens player text through the obscenity
- *  matcher ahead of every sim gate: pet_rename and guild_create always (each
+/** Commands whose handler screens player text through the obscenity
+ *  matcher ahead of every sim gate: pet_rename, buddy_rename and guild_create always (each
  *  frame names something), perfect_item only when a name field rides (the
  *  promotion), never for a plain attempt. */
 function isNameScreenCommand(record: Record<string, unknown>): boolean {
-  if (record.cmd === 'pet_rename' || record.cmd === 'guild_create') return true;
+  if (record.cmd === 'pet_rename' || record.cmd === 'buddy_rename' || record.cmd === 'guild_create')
+    return true;
   return record.cmd === 'perfect_item' && record.name !== undefined;
 }
 

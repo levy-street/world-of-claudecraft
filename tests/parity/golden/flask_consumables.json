@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "4b385e97",
+      "state": "e8e3d247",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -45,6 +45,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -173,7 +176,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "5d080b6e",
+      "state": "e2b30f56",
       "events": "7891aae2",
       "rng": {
         "draws": 0,
@@ -201,6 +204,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -349,7 +355,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "17be1e9d",
+      "state": "87dcae39",
       "events": "0c57cbf8",
       "rng": {
         "draws": 0,
@@ -377,6 +383,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -535,7 +544,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "57bb1ffd",
+      "state": "505a04c3",
       "events": "00000a14",
       "rng": {
         "draws": 0,
@@ -563,6 +572,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -723,7 +735,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "57bb1ffd",
+      "state": "505a04c3",
       "events": "f13a10f8",
       "rng": {
         "draws": 0,
@@ -751,6 +763,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -911,7 +926,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "f2e4ecff",
+      "state": "ff68256f",
       "events": "37e2d621",
       "rng": {
         "draws": 0,
@@ -939,6 +954,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -1099,7 +1117,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "f2e4ecff",
+      "state": "ff68256f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1127,6 +1145,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},

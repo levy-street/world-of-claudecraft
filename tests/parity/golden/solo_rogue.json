@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "51e80822",
+      "state": "3e336b9c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,6 +44,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -167,7 +170,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1012,
-      "state": "161157fe",
+      "state": "1a84c590",
       "events": "253fd465",
       "rng": {
         "draws": 12,
@@ -178,7 +181,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1012,
-      "state": "44ec60eb",
+      "state": "064189ab",
       "events": "e020dcba",
       "rng": {
         "draws": 19,
@@ -189,7 +192,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1012,
-      "state": "94f6b19e",
+      "state": "8dce4ca0",
       "events": "215c7314",
       "rng": {
         "draws": 162,
@@ -200,7 +203,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 1012,
-      "state": "40edb4d0",
+      "state": "d0b9376e",
       "events": "741638a5",
       "rng": {
         "draws": 249,
@@ -229,6 +232,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {

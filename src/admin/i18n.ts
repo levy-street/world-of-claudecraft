@@ -210,6 +210,8 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'windowminutes must be an integer from 1 to 1440': 'error.generalChatRateLimitWindowMinutes',
   'suspension expiry must be in the future': 'error.moderationExpiryFuture',
   'character not found': 'error.characterNotFound',
+  'character already has that': 'error.characterAlreadyHasThat',
+  'buddy grant failed': 'error.buddyGrantFailed',
   'guild not found': 'error.guildNotFound',
   'guild name is already taken': 'error.guildNameTaken',
   'guild name must change': 'error.guildNameUnchanged',

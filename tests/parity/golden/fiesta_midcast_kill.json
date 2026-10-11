@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1014,
-      "state": "01c2d4a5",
+      "state": "79c251e3",
       "events": "8c92e89b",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1014,
-      "state": "82ac53b4",
+      "state": "dfce7962",
       "events": "3a5da579",
       "rng": {
         "draws": 64,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1014,
-      "state": "87f4ffca",
+      "state": "d6e0d6d0",
       "events": "70150bad",
       "rng": {
         "draws": 280,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1014,
-      "state": "9649525d",
+      "state": "d990aadb",
       "events": "f35a0f3d",
       "rng": {
         "draws": 531,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1014,
-      "state": "cf75a304",
+      "state": "055a5180",
       "events": "6307f48a",
       "rng": {
         "draws": 542,
@@ -103,6 +103,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -197,6 +200,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -290,6 +296,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -381,6 +390,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -682,7 +694,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1014,
-      "state": "f3f8eae4",
+      "state": "36a40a98",
       "events": "7b856255",
       "rng": {
         "draws": 542,
@@ -710,6 +722,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -804,6 +819,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -897,6 +915,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -988,6 +1009,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -1287,7 +1311,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1014,
-      "state": "d38711eb",
+      "state": "bf25fcf5",
       "events": "4ae6f06e",
       "rng": {
         "draws": 542,
@@ -1315,6 +1339,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -1412,6 +1439,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -1505,6 +1535,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -1597,6 +1630,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -1896,7 +1932,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1014,
-      "state": "fe3e7c1d",
+      "state": "88076f47",
       "events": "741638a5",
       "rng": {
         "draws": 800,
@@ -1907,7 +1943,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1014,
-      "state": "5d5500fa",
+      "state": "19a70a34",
       "events": "741638a5",
       "rng": {
         "draws": 979,
@@ -1935,6 +1971,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -2032,6 +2071,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -2125,6 +2167,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -2217,6 +2262,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},

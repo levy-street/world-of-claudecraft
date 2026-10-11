@@ -132,6 +132,7 @@ function harness(targets: Entity[], isHostilePlayer: (e: Entity) => boolean = ()
     getViewport: () => VIEWPORT,
     getDevicePixelRatio: () => 1,
     showNameplates: () => true,
+    showPetNames: () => false,
     showDevBadges: () => true,
     showOwnNameplate: () => false,
     showPlayerNameplates: () => true,

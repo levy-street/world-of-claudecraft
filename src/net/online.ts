@@ -22,6 +22,7 @@ import { signChallenge } from '../sim/client_challenge';
 import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
 import { applyAbilityCostTail, resolveAbilityChain } from '../sim/combat/ability_resolution';
 import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
+import type { BuddyKey } from '../sim/content/buddies';
 import { FARM_PATCHES } from '../sim/content/farm_patches';
 import { type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
@@ -202,6 +203,7 @@ import { computeBackoffDelay } from './backoff';
 import { applyBankSelfWire, applyGuildBankSelfWire } from './bank_snapshot_wire';
 import { blankEntity } from './blank_entity';
 import { applyBookOfDeedsWire } from './book_wire';
+import { type BuddySelfMirror, decodeBuddySelf, emptyBuddySelfMirror } from './buddy_wire';
 import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
@@ -2680,6 +2682,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.level = w.lv;
         e.skin = w.sk ?? 0;
         e.mountKey = w.mnt ?? ''; // active rideable mount ('' dismounted); feeds speed + render
+        e.buddyKey = w.bud ?? ''; // active cosmetic buddy ('' none); HUD/UI identity only, not read by the renderer (the buddy's own owned mob entity carries the body)
+        e.buddyAutoloot = w.budal === true; // buddy autoloot armed; HUD/UI only (the errand itself runs server-side)
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
@@ -3213,6 +3217,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
           .filter((k): k is MountKey => k !== '');
       }
       if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
+      // IWorldBuddies self-decode (src/net/buddy_wire.ts): four delta-guarded
+      // keys, omitted keeps the prior mirror, like mntOwn.
+      this.selfBuddies = decodeBuddySelf(s, this.selfBuddies);
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
       if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
@@ -3954,6 +3961,30 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   toggleMounted(): void {
     this.cmd({ cmd: 'mount_toggle' });
+  }
+  // --- IWorldBuddies: collection, summon and dismiss. All changes stay
+  // authoritative (server-validated ownership), and the active identity mirror
+  // (bud) lands on the next snapshot. ---
+  ownedBuddies(): readonly BuddyKey[] {
+    return this.selfBuddies.owned;
+  }
+  pendingBuddies(): readonly BuddyKey[] {
+    return this.selfBuddies.pending;
+  }
+  renameBuddy(buddyId: number, name: string): void {
+    this.cmd({ cmd: 'buddy_rename', id: buddyId, name });
+  }
+  summonBuddy(key: BuddyKey): void {
+    this.cmd({ cmd: 'buddy_summon', key });
+  }
+  toggleBuddy(): void {
+    this.cmd({ cmd: 'buddy_toggle' });
+  }
+  // Autoloot is a server-authoritative preference like the toggle above: no
+  // optimistic local flip, the `budal` identity field on the next snapshot is
+  // what the menu renders from.
+  setBuddyAutoloot(enabled: boolean): void {
+    this.cmd({ cmd: 'buddy_autoloot', on: enabled });
   }
   // --- riding skill purchase: server-authoritative; on success the snapshot
   // delta (mntRtd=true) confirms the skill was granted. ---
@@ -4887,6 +4918,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // Riding skill, mirrored from the snapshot `s.mntRtd`. False until the server
   // confirms the player purchased it from Marla.
   private selfRidingTrained = false;
+  // The buddy collection mirror (src/net/buddy_wire.ts). Starts empty.
+  private selfBuddies: BuddySelfMirror = emptyBuddySelfMirror();
   raidLockouts(): RaidLockout[] {
     const now = Date.now();
     const src = this.selfLockouts ?? {};

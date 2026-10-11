@@ -85,11 +85,13 @@ describe('heroic vendor stock: item-level and budget pins', () => {
     const nonGear = HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind !== 'armor');
     for (const offer of nonGear) {
       expect(
-        ['junk', 'recipe'],
-        `${offer.itemId} is neither gear, a material, a pattern nor a seed`,
+        ['junk', 'recipe', 'buddy'],
+        `${offer.itemId} is neither gear, a material, a pattern, a seed nor the companion whistle`,
       ).toContain(ITEMS[offer.itemId]?.kind);
     }
-    expect(nonGear.length, 'one core plus twenty patterns plus eight seeds').toBe(29);
+    expect(nonGear.length, 'one core, twenty patterns, eight seeds, one companion whistle').toBe(
+      30,
+    );
     for (const offer of gearOffers) {
       const item = ITEMS[offer.itemId];
       expect(item, offer.itemId).toBeTruthy();
@@ -105,6 +107,19 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       // new, not shipped jewelry, and binds like every trinket does.
       expect(item.soulbound, offer.itemId).toBe(item.slot === 'trinket' ? true : undefined);
     }
+  });
+
+  it('sells the Loot Goblin companion for marks, with no item level and no stats', () => {
+    // The stock's one non-gear row (content/items.ts whistle_loot_goblin). It
+    // carries no slot, so the item-level index skips it: a cosmetic can never
+    // enter the budget arithmetic the jewelry above is pinned against.
+    const offer = HEROIC_VENDOR_STOCK.find((o) => o.itemId === 'whistle_loot_goblin');
+    expect(offer?.marks).toBe(100);
+    const item = ITEMS.whistle_loot_goblin;
+    expect(item.kind).toBe('buddy');
+    expect(item.quality).toBe('rare');
+    expect(item.slot).toBeUndefined();
+    expect(itemLevel(item)).toBeUndefined();
   });
 
   it('sells the Wyrmfall Core catch-up row at the ring price point', () => {
@@ -219,9 +234,12 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       // The mark family has exactly TWO points and this counter uses only
       // those: a third price appearing anywhere here is a maintainer decision
       // over the whole family, not something a content phase takes.
-      expect([...new Set(HEROIC_VENDOR_STOCK.map((o) => o.marks))].sort((a, b) => a - b)).toEqual([
-        12, 16,
-      ]);
+      // Over the PATTERN rows: the Loot Goblin companion whistle rides its
+      // own cosmetic price point (content/heroic_vendor.ts).
+      const patternMarks = HEROIC_VENDOR_STOCK.filter(
+        (o) => ITEMS[o.itemId]?.kind === 'recipe',
+      ).map((o) => o.marks);
+      expect([...new Set(patternMarks)].sort((a, b) => a - b)).toEqual([12, 16]);
     });
 
     it('every angler row is priced by the RUNG its recipe teaches, 12 below 125 and 16 at it', () => {

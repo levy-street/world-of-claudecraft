@@ -537,7 +537,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // RE-PINNED 18093 -> 18110 at the release/v0.45.0 merge into the buddy companions
+    // branch: both parent pins for the record, the release 18093 and the branch
+    // 18366; the two sides' additions compose to 18110 by wc -l on the merged tree
+    // (after biome). Exact count, zero slack.
+    ceiling: 18110,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -995,7 +999,11 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // RE-PINNED 12688 -> 12697 at the release/v0.45.0 merge into the buddy companions
+    // branch: both parent pins for the record, the release 12688 and the branch
+    // 12806; the two sides' additions compose to 12697 by wc -l on the merged tree
+    // (after biome). Exact count, zero slack.
+    ceiling: 12697,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1207,7 +1215,11 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // RE-PINNED 11642 -> 11734 at the release/v0.45.0 merge into the buddy companions
+    // branch: both parent pins for the record, the release 11642 and the branch
+    // 11927; the two sides' additions compose to 11734 by wc -l on the merged tree
+    // (after biome). Exact count, zero slack.
+    ceiling: 11734,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1689,7 +1701,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // RE-PINNED 9840 -> 9889 at the release/v0.45.0 merge into the buddy companions
+    // branch: both parent pins for the record, the release 9840 and the branch
+    // 10045; the two sides' additions compose to 9889 by wc -l on the merged tree
+    // (after biome). Exact count, zero slack.
+    ceiling: 9889,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1868,7 +1884,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // RE-PINNED 5356 -> 5389 at the release/v0.45.0 merge into the buddy companions
+    // branch: both parent pins for the record, the release 5356 and the branch
+    // 5486; the two sides' additions compose to 5389 by wc -l on the merged tree
+    // (after biome). Exact count, zero slack.
+    ceiling: 5389,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2034,7 +2054,11 @@ const MONOLITHS: MonolithRow[] = [
     // server/guild_board_db.ts beside the new officer-roster read. Merged with
     // the DEEDS_SCHEMA / ACCOUNT_LEDGER_SCHEMA move above; exact merged count,
     // zero slack.
-    ceiling: 4641,
+    // RE-PINNED 4497 -> 4514 at the release/v0.45.0 merge into the buddy companions
+    // branch: both parent pins for the record, the release 4641 and the branch
+    // 4497; the two sides' additions compose to 4514 by wc -l on the merged tree
+    // (after biome). Exact count, zero slack.
+    ceiling: 4514,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

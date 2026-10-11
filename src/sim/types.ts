@@ -5,6 +5,7 @@ import type { MaterialComposition } from './material_sources';
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
+import type { BuddyTokenKey } from './content/buddies';
 import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
@@ -1070,7 +1071,9 @@ export type ItemKind =
   | 'scroll'
   | 'bag'
   | 'mount'
-  | 'recipe';
+  | 'recipe'
+  | 'buddy'
+  | 'buddy_cosmetic';
 // The aura kinds a timed FLAT STAT buff may carry. Narrower than AuraKind on
 // purpose: this payload's whole contract is "a flat stat buff for a while", and
 // its consumers act on that. The grant sites apply the kind as a plain stat aura
@@ -1425,7 +1428,16 @@ export interface HeldOffhandItemDef extends BaseItemDef {
 export interface OtherItemDef extends BaseItemDef {
   kind: Exclude<
     ItemKind,
-    'armor' | 'weapon' | 'held_offhand' | 'mount' | 'recipe' | 'scroll' | 'flask' | 'food'
+    | 'armor'
+    | 'weapon'
+    | 'held_offhand'
+    | 'mount'
+    | 'recipe'
+    | 'scroll'
+    | 'flask'
+    | 'food'
+    | 'buddy'
+    | 'buddy_cosmetic'
   >;
   armorType?: never;
   // The shared feast (farming, D16): a placeable item whose use spawns a
@@ -1570,6 +1582,29 @@ export interface MountItemDef extends BaseItemDef {
   weapon?: never;
 }
 
+// A buddy GRANT TOKEN (a whistle). Using it attaches the named companion to
+// the character (src/sim/buddies.ts useBuddyToken) and consumes the token;
+// ownership is the per-character collection flag, never the item. Soulbound
+// and never listed by any loot table: a whistle is the channel a vendor, a
+// letter or an admin grant uses to hand a companion over, nothing more. A
+// token for a companion the player already has is refused unconsumed.
+export interface BuddyItemDef extends BaseItemDef {
+  kind: 'buddy';
+  buddy: BuddyTokenKey;
+  armorType?: never;
+  weapon?: never;
+}
+
+// Historical buddy cosmetic token shape, retained for existing inventories.
+// Tokens no longer unlock looks and are not consumed on use.
+export interface BuddyCosmeticItemDef extends BaseItemDef {
+  kind: 'buddy_cosmetic';
+  /** Historical cosmetic id, retained for old inventory records. */
+  cosmetic: string;
+  armorType?: never;
+  weapon?: never;
+}
+
 // A recipe PATTERN item: the physical drop that teaches one ProfessionRecipeRecord
 // when used from the bags (src/sim/professions/pattern_items.ts). The def names the
 // recipe it teaches and nothing else; `teachesRecipeId` is a recipe id
@@ -1607,7 +1642,9 @@ export type ItemDef =
   | RecipeItemDef
   | ScrollItemDef
   | FlaskItemDef
-  | FoodItemDef;
+  | FoodItemDef
+  | BuddyItemDef
+  | BuddyCosmeticItemDef;
 
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
@@ -1959,6 +1996,14 @@ export interface LootEntry {
   // always rides a truthy `copper` (the roller's money arm gates on copper).
   heroicCopper?: number;
   chance: number; // 0..1
+  // Heroic-claim drop rate for THIS row, substituted for `chance` exactly the
+  // way heroicCopper substitutes for `copper`: a value swap on the same single
+  // draw, never an extra one, so the per-kill draw count (and every parity
+  // golden riding it) is identical on both difficulties. Authored where one
+  // item is meant to drop from the same boss at two rates rather than living
+  // on two tables (the Crystal Lich whistle: 0.5% normal, 1% heroic). Ignored
+  // on a rollGroup row, where the group's partition owns the odds.
+  heroicChance?: number;
   questId?: string; // only drops while this quest is active and not complete
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
   // their chances, so at most one matching entry drops.
@@ -6068,6 +6113,26 @@ export interface Entity extends ClientMirroredEntityFields {
   // reads it. Syncs on the wire (terse `mck`) alongside mountCastRemaining, and
   // handleDeath clears it.
   mountCastKey: string;
+  // Active cosmetic buddy ('' = none; players only). Zero GAMEPLAY effect on
+  // the owner (no stat, no combat), but since 2026-08-27 it names a real
+  // server-simulated owned mob entity: spawning/despawning it is the job of
+  // every write site (src/sim/buddies.ts's summonBuddyItem/toggleBuddy), and
+  // src/sim/pet/buddy_ai.ts's updateBuddyMob heels that entity with the same
+  // A*-pathed locomotion a hunter pet uses and reads this field back each
+  // tick to confirm the entity is still wanted. Still syncs in identity
+  // fields (terse `bud`) like `skin`/`mountKey` for HUD/UI state. No
+  // persisted selection, same as mounts: summoning is an item use, and the
+  // whistle you clicked IS the choice.
+  buddyKey: string;
+  // Buddy autoloot toggled on (players only; false otherwise). Set from the
+  // buddy's own target-frame right-click menu (src/sim/buddies.ts's
+  // setBuddyAutoloot). While on, the live buddy entity breaks off its heel to
+  // walk to the owner's OWN lootable corpses inside BUDDY_LOOT_RANGE and loot
+  // them for the owner (src/sim/pet/buddy_autoloot.ts). Syncs in identity
+  // fields (terse `budal`) like `bud` above so the menu can render the right
+  // Enable/Disable row. Session state, not persisted, exactly like buddyKey:
+  // the buddy itself is re-summoned every login.
+  buddyAutoloot: boolean;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `mh`). The sim never reads it for gameplay.
@@ -8507,6 +8572,14 @@ export type SimEvent = { pid?: number } & (
   // (professions/attunement_events.ts). Personal (pid = the celebrant) and
   // text-free: the client renders its own localized line off `pairId`.
   | { type: 'attuned'; pid: number; pairId: string }
+  // Buddy companions (src/sim/buddies.ts, content/buddy_sources.ts). All
+  // events are personal and text-free: the client renders a localized chat
+  // line off the id. `buddyPresence` fires when a boss roll attaches a
+  // PENDING companion ("you feel a presence watching you"); `buddyRevealed`
+  // when a companion becomes owned (the zone-out reveal, a deed grant, a
+  // token use, an admin grant).
+  | { type: 'buddyPresence'; pid: number; key: string }
+  | { type: 'buddyRevealed'; pid: number; key: string }
   // Attunement celebration, zone broadcast (Professions 2.0): the soft
   // zone-wide copy of an attunement, one per overworld player currently in the
   // celebrant's zone INCLUDING the celebrant, `pid` being the RECIPIENT (the

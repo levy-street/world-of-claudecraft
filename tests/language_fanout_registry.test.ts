@@ -679,6 +679,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly reason: string;
 }> = [
   {
+    file: 'collections/collections_window.ts',
+    memos: ['lastSig', 'paintedTab'],
+    reason:
+      'Retained dormant painter: Hunting has no live HUD instance, shell root or keybind. The lastSig and paintedTab memos cannot gate any player-visible surface. tests/collections_window.test.ts pins that retirement; restoring the menu requires restoring its relocalize fanout arm.',
+  },
+  {
     file: 'hud/vehicle/forge_action_bar_controller.ts',
     memos: ['lastClock'],
     reason:
@@ -1676,7 +1682,9 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // 37 on the merged tree: both pairs above are present.
       // 38 at the release/v0.43.0 merge into feature/world-quests: the forge
       // action bar's numeric world-quest clock memo.
-    ).toBe(38);
+      // 39 at the release/v0.45.0 merge into the buddy companions branch: the
+      // retired Hunting painter is retained without a live surface.
+    ).toBe(39);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

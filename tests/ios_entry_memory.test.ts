@@ -246,7 +246,7 @@ describe('post-entry mob-body streaming', () => {
   // Measured before this: WebContent at 1.54 GB pre-renderer on an iPhone 17 Pro.
   it('keeps desktop mobs critical, bulk-streams only iOS mobs, and leaves skins on demand', () => {
     expect(assetsSource).toContain(
-      "const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];",
+      "const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/', 'models/buddies/'];",
     );
     // Weapon SKINS stream (cosmetic, degradable); the BASE item weapons do not,
     // so the player's own hands are never empty at spawn and the degrade path

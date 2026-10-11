@@ -87,6 +87,7 @@ function setup() {
     // No live session by default, so the handshake takes the fresh-acquire arm.
     hasSessionForCharacter: vi.fn((_characterId: number) => false),
     join: vi.fn(() => session),
+    drainBuddyGrants: vi.fn(async () => {}),
     clients: { size: 1 },
     sim: { resetDay: '2026-09-24' },
     handleMessage: vi.fn(),

@@ -10,8 +10,8 @@
     "awardHeroicMarks on a heroic raid kill (instances/dungeons) plus the raid lockout, neither of which a normal claim grants",
     "class:warrior"
   ],
-  "draws": 14,
-  "drawDigest": "31372acd",
+  "draws": 19,
+  "drawDigest": "b446fa79",
   "frames": [
     {
       "tick": 0,
@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1020,
-      "state": "30ea90aa",
+      "state": "22df876c",
       "events": "bc873d79",
       "rng": {
         "draws": 1,
@@ -59,6 +59,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -143,6 +146,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -225,6 +231,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -307,6 +316,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -389,6 +401,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -760,11 +775,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "445286af",
+      "state": "72983aed",
       "events": "3b126ae3",
       "rng": {
-        "draws": 14,
-        "digest": "31372acd"
+        "draws": 19,
+        "digest": "b446fa79"
       },
       "label": "death",
       "players": [
@@ -788,6 +803,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -994,6 +1012,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -1191,6 +1212,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -1388,6 +1412,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -1585,6 +1612,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -2120,11 +2150,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "445286af",
+      "state": "72983aed",
       "events": "741638a5",
       "rng": {
-        "draws": 14,
-        "digest": "31372acd"
+        "draws": 19,
+        "digest": "b446fa79"
       },
       "label": "final",
       "players": [
@@ -2148,6 +2178,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -2354,6 +2387,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -2551,6 +2587,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -2748,6 +2787,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -2945,6 +2987,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {

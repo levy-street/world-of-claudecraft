@@ -284,11 +284,17 @@ export class CharacterPreview {
     weaponItemId: string | null = null,
     weaponOverride: WeaponLayoutOverride | null = null,
     offhandItemId: string | null = null,
+    /** Entity dye for a rig whose VISUALS entry carries `tint: 'entity'`
+     *  (the shared animal and skeleton rigs a buddy borrows). White leaves a
+     *  baked-texture rig exactly as authored, which is why it is the default:
+     *  every player-body caller wants precisely that. */
+    tint = 0xffffff,
   ): void {
     if (this.destroyed) return;
     const look = VISUALS[visualKey]?.modular ? this.pendingLook : null;
     const nextSig = JSON.stringify([
       visualKey,
+      tint,
       weaponItemId,
       weaponOverride,
       offhandItemId,
@@ -313,7 +319,7 @@ export class CharacterPreview {
     try {
       this.currentVisual = new CharacterVisual(
         visualKey,
-        0xffffff,
+        tint,
         this.currentSkin,
         weaponItemId,
         weaponOverride,

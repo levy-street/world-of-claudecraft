@@ -391,6 +391,8 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Confection Cascade polished gold hardware mounts (`public/ui/minigames/*-v7.webp`) | World of ClaudeCraft | Project art edited with OpenAI built-in image generation using the v6 hardware, optimized to WebP; [provenance and exact prompts](docs/screenshots/confection-cascade-v7/hardware-provenance.md) | Project asset | With the project only |
 | Generated prop model (nythraxis_bone_spike) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (nythraxis_binding_cage) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated buddy model + animations (horse, the low-poly pony companion, `public/models/buddies/horse.glb`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline creature lane (Tripo AI 3D sculpt + quadruped auto-rig), owned under the Tripo paid-plan license; Idle/Walk gait clips authored locally by scripts/bake_buddy_horse_gaits.mjs | Project asset | With the project only |
+| Generated buddy model, animations and whistle icon (sapling, `public/models/buddies/sapling.glb`) | World of ClaudeCraft | User-approved lavender-eye concept, Tripo sculpt and biped rig; locally authored Idle/Walk/Run waddle clips; prepared by scripts/prepare_buddy_sapling.mjs and rendered by scripts/assets/render_buddy_item_icons.mjs. Generation task 210d80e7-3360-4f16-8682-3eac128249e7; rig task b0e39abb-708f-4e53-987e-a0970ffda400. | Project asset | With the project only |
 | Generated prop model (windrider_glider_flight) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 
 Crucible profession collection equipment, manuals, and enchant formula paintings are project-generated art, made with OpenAI's built-in image generation for World of ClaudeCraft. Provenance: `docs/achievements/crucible-professions-2026-09-05/`. Project asset, with the project only.
@@ -399,6 +401,13 @@ The Forgefather's Ember quest item painting is project-generated art, made with 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.
+
+Buddy portraits (`public/ui/portraits/buddy_{horse,crystal_lich,forgemaw}.webp`)
+are local renders of the existing shipped buddy models, using their canonical
+visual definitions and idle poses through `scripts/render_buddy_portraits.mjs`.
+The shared backdrop comes from `scripts/lib/mob_portrait_background.mjs`.
+Underlying model ownership and licenses are unchanged; no external image source
+or generated replacement model was used.
 
 License texts: https://creativecommons.org/publicdomain/zero/1.0/ (CC0 1.0) ,
 https://creativecommons.org/licenses/by/4.0/ (CC BY 4.0) ,

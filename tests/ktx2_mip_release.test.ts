@@ -818,6 +818,7 @@ describe('category policy', () => {
       'world_quests',
     ]);
     expect([...KTX2_MIP_EXEMPT_MODEL_ROOTS]).toEqual([
+      'buddies',
       'chars',
       'creatures',
       'mounts',

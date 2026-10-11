@@ -145,14 +145,18 @@ const build = await buildItemArtAudit({
     // feature/buried-hoards: the release's faction ladder, trinket slot and
     // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
     // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
-    catalogCount: 1464,
-    liveItemCount: 1482,
-    pendingArtCount: 135,
+    // + the buddy companion branch at its release/v0.45.0 merge: 34 rendered
+    // whistle and charm icons (two batches, two groups) and the two enumerated
+    // art debts (whistle_emberfall_phoenix, whistle_horse): 1498 / 1516 with
+    // 137 pending, on 38 sheet pages, measured with the same verifier run.
+    catalogCount: 1498,
+    liveItemCount: 1516,
+    pendingArtCount: 137,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 36,
-    groupCount: 26,
+    sheetPageCount: 38,
+    groupCount: 28,
   },
 });
 assertItemArtAuditPass(build);

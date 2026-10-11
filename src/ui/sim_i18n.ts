@@ -327,6 +327,11 @@ const baseEnTable = {
   'error.talentsInCombat': 'You cannot change talents in combat.',
   'error.talentsArena': 'You cannot change talents during an arena match.',
   'error.noItem': "You don't have that item.",
+  // Buddy companions (src/sim/buddies.ts): the summon refusal and the two
+  // duplicate-token refusals (a token is never consumed when refused).
+  'error.buddyNotCollected': "You haven't collected that companion.",
+  'error.buddyAlreadyOwned': 'You already have that companion.',
+  'error.buddyLookAlreadyOwned': 'You already have that look.',
   'error.clueScrollEmpty': 'This scroll has nothing to reveal.',
   'error.clueAlreadyFollowing': 'You are already following a clue.',
   'error.clueNothingToDig': 'There is nothing to dig here.',
@@ -1400,6 +1405,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'You cannot change talents in combat.',
     'error.talentsArena': 'You cannot change talents during an arena match.',
     'error.noItem': "You don't have that item.",
+    'error.buddyNotCollected': "You haven't collected that companion.",
+    'error.buddyAlreadyOwned': 'You already have that companion.',
+    'error.buddyLookAlreadyOwned': 'You already have that look.',
     'error.cantWhileDead': "You can't do that while dead.",
     'error.cantWhileSwimming': "You can't do that while swimming.",
     'error.shellskinPreventsAttacks': 'Shellskin prevents attacks.',

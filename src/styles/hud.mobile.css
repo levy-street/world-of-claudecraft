@@ -7445,6 +7445,21 @@
   body.mobile-touch #cosmetics-window .cos-grid {
     grid-template-columns: 1fr;
   }
+  body.mobile-touch #collections-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
   body.mobile-touch #cosmetics-window .cos-legend {
     margin-block: var(--spacing-xs) var(--spacing-sm);
     font-size: 12px;

@@ -1,4 +1,6 @@
+import { attachPendingBuddy, grantBuddy } from './buddies';
 import { applyCourserDaze } from './combat/hunter_shared';
+import { BUDDY_KEYS } from './content/buddies';
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_SKIN_IDS } from './content/mount_skins';
 import { MOUNT_KEYS } from './content/mounts';
@@ -587,6 +589,37 @@ export function handleDevChat(
     return null;
   }
 
+  // /dev buddies: collect every companion outright.
+  if (/^\/(?:dev\s+buddi?es?|devbuddi?es?)\s*$/i.test(raw)) {
+    let granted = 0;
+    for (const key of BUDDY_KEYS) if (grantBuddy(ctx, pid, key)) granted += 1;
+    emitDevLog(
+      ctx,
+      pid,
+      `[dev] Collected ${granted} buddies (${BUDDY_KEYS.length} in the catalog). Summon one from the Buddies tab in Cosmetics.`,
+    );
+    return null;
+  }
+  // /dev buddy <key>: stage ONE companion as a boss-roll win at your feet, so
+  // the presence line and the walk-away reveal can be watched end to end.
+  const buddyMatch = /^\/dev\s+buddy\s+([a-z_]+)\s*$/i.exec(raw);
+  if (buddyMatch) {
+    const e = ctx.entities.get(pid);
+    const key = buddyMatch[1].toLowerCase();
+    if (!e || !(BUDDY_KEYS as readonly string[]).includes(key)) {
+      emitDevLog(ctx, pid, `[dev] Unknown buddy key: ${key}`);
+      return null;
+    }
+    const staged = attachPendingBuddy(ctx, pid, key, 'world', { x: e.pos.x, z: e.pos.z });
+    emitDevLog(
+      ctx,
+      pid,
+      staged
+        ? `[dev] ${key} is watching you. Walk 80 yards away and it will reveal itself.`
+        : `[dev] ${key} is already collected or already pending.`,
+    );
+    return null;
+  }
   // Grant every catalog mount skin to the (offline, session-local) account
   // cosmetics so the Cosmetics window can be exercised without the store.
   // Server-side the session cosmetics are the authority, so this only ever
@@ -1384,7 +1417,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }

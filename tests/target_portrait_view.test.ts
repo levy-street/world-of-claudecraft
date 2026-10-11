@@ -200,6 +200,7 @@ describe('targetPortraitUrl', () => {
       .sort();
     expect(assets).toEqual(
       Object.keys(MOBS)
+        .filter((id) => targetPortraitUrl(id, true)?.startsWith('/ui/mobs/'))
         .map((id) => `${id}.webp`)
         .sort(),
     );

@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "51e80822",
+      "state": "3e336b9c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -45,6 +45,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -168,7 +171,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1021,
-      "state": "c07cdaa1",
+      "state": "0b308623",
       "events": "707b6954",
       "rng": {
         "draws": 5,
@@ -179,7 +182,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1021,
-      "state": "9d9ee190",
+      "state": "347ce65c",
       "events": "6cb80331",
       "rng": {
         "draws": 5,
@@ -190,7 +193,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1021,
-      "state": "958adcfb",
+      "state": "14f5de89",
       "events": "67fcaac8",
       "rng": {
         "draws": 8,
@@ -201,7 +204,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 1023,
-      "state": "3580c0f4",
+      "state": "9c67b8c4",
       "events": "641e6918",
       "rng": {
         "draws": 11,
@@ -230,6 +233,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 19,
@@ -543,7 +549,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1023,
-      "state": "934a3bbe",
+      "state": "63bfd1aa",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -554,7 +560,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1023,
-      "state": "934a3bbe",
+      "state": "63bfd1aa",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -583,6 +589,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 19,

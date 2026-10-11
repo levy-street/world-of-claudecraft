@@ -27,6 +27,8 @@
 // in Node, the browser, and the headless RL env.
 
 import { recordAccountDeed, selfEarner } from './account_ledger';
+import { grantBuddy } from './buddies';
+import { BUDDY_DEED_REWARDS } from './content/buddy_sources';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { FARM_CROP_IDS } from './content/farm_crops';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
@@ -799,6 +801,12 @@ export function grantDeed(
     pid: meta.entityId,
     ...(opts?.retro ? { retro: true } : {}),
   });
+  // Achievement pets (content/buddy_sources.ts): a deed that names
+  // a companion grants it on the same call, retro grants
+  // included (a character who earned the deed before the pet existed gets it
+  // at their next login). The grant is idempotent and draws no rng.
+  const buddyReward = BUDDY_DEED_REWARDS[deedId];
+  if (buddyReward) grantBuddy(ctx, meta.entityId, buddyReward);
   // Horizons titles score catalogRankOwned. Live grant of a title relic can
   // cross a Curator threshold; keep display rank and zero-Renown bridges aligned
   // without waiting for join retro. The rank bridges for ranks 2 to 4 are

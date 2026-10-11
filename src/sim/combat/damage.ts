@@ -23,6 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { rollBossBuddyDrops } from '../buddy_drops';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
@@ -44,6 +45,7 @@ import {
   nythraxisBoneSpikeWardHit,
 } from '../nythraxis_bone_spike';
 import { grantAbilityDevotion } from '../paladin_devotion';
+import { isBuddyMob } from '../pet/buddy_ai';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import {
   recordCorpseHarvestDeath,
@@ -1692,6 +1694,18 @@ export function handleDeath(
     e.aggroTargetId = null;
     clearThreat(e);
     if (e.ownerId !== null) {
+      // A cosmetic buddy (src/sim/pet/buddy_ai.ts) has no revive command and
+      // no corpse mechanics of its own. isHostileTo/isEnemyTargetCandidate
+      // (sim.ts, targeting.ts) keep it out of ordinary hostile damage
+      // entirely, so this arm should be unreachable in practice, but a
+      // stray non-hostility-gated damage source (a hits-everyone AoE, a
+      // /dev command) must never leave it as a permanent stray corpse the
+      // way the Infinity corpseTimer below deliberately does for a real,
+      // revivable pet. Despawn outright instead; the owner can re-summon it.
+      if (isBuddyMob(e)) {
+        ctx.dropEntity(e.id);
+        return;
+      }
       const owner = ctx.entities.get(e.ownerId);
       const ownerMeta = owner ? ctx.players.get(owner.id) : null;
       if (owner && ownerMeta?.cls === 'hunter') clearPacklordState(ctx, owner);
@@ -1873,6 +1887,14 @@ export function handleDeath(
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
     recordWeeklyBossKill(ctx, e, heroicRewardRecipients, claimedInst);
+    // Boss pets and their challenge looks (content/buddy_sources.ts): one
+    // independent roll per credited player, never a corpse item, then the
+    // speed/dps looks for the same roster. World bosses roll on the
+    // never-pruned contributor roster below instead. Draws rng ONLY for a
+    // boss that carries a companion row.
+    if (!template?.worldBoss) {
+      rollBossBuddyDrops(ctx, e, heroicRewardRecipients, claimedInst);
+    }
     ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
     // Intentional Gathering PR3: the kill-credit priority snapshot for a
     // future corpse-harvest cast, taken from the exact same eligible list the
@@ -1890,6 +1912,7 @@ export function handleDeath(
     // damaged the boss, so it rolls outside the credited-player block above.
     if (worldBossContribs) {
       ctx.rollWorldBossLoot(e, worldBossContribs);
+      rollBossBuddyDrops(ctx, e, worldBossContribs, null);
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
       onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);

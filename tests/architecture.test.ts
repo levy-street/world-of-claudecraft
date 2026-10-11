@@ -239,6 +239,7 @@ const UI_PURE_CORES = [
   // bar's own pure view, the transform and glow flags, and the cue edges.
   'src/ui/hud/cooldown_manager/cooldown_manager_view.ts',
   'src/ui/collection_actions_core.ts',
+  'src/ui/hud/cosmetics/buddy_cosmetics_view.ts',
   'src/ui/hud/cosmetics/cosmetics_cards_view.ts',
   'src/ui/hud/cosmetics/cosmetics_view.ts',
   'src/ui/hud/faction_reward_tooltip_view.ts',
@@ -624,6 +625,7 @@ const UI_PURE_CORES = [
   'src/ui/quest_tracking_core.ts',
   'src/ui/quest_map_location_core.ts',
   'src/ui/arena_window_view.ts',
+  'src/ui/collections/collections_view.ts',
   'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
   'src/ui/pvp_hostile_core.ts',
@@ -2786,6 +2788,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vendor/crucible_vendor_window.ts',
   'src/ui/hud/vendor/train_window.ts',
   'src/ui/hud/vendor/unbind_window.ts',
+  'src/ui/hud/buddy_menu.ts',
   'src/ui/hud/vendor/vendor_window.ts',
   'src/ui/hud/vendor/warfare_vendor_window.ts',
   'src/ui/hud/woc_trade/woc_trade_controller.ts',

@@ -381,13 +381,16 @@ describe('item webp icons', () => {
     // set: no artless item can hide behind an open wave, and the next commissioned wave
     // re-pins its exact membership here when it stages. Open wave: the 135
     // Warfare Season 2 armor pieces (content/pvp_honor_season2.ts), painted in a
-    // follow-up art pass.
+    // follow-up art pass. Plus the buddy merge's two enumerated debts: the
+    // Emberfall Phoenix and Horse whistles (content/buddies.ts
+    // BUDDY_ART_PENDING_ITEM_IDS), whose GLB render lane needs KTX-Software on
+    // the authoring machine.
     const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(season2Armor).toHaveLength(135);
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
-    ).toEqual([...season2Armor].sort());
+    ).toEqual([...season2Armor, 'whistle_emberfall_phoenix', 'whistle_horse'].sort());
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

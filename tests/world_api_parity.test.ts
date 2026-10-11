@@ -43,6 +43,7 @@ import { OVERHEAD_EMOTE_IDS, type PlayerClass } from '../src/sim/types';
 import type { IWorldActionBar } from '../src/world_api/action_bar';
 import type { IWorldBank } from '../src/world_api/bank';
 import type { IWorldBattleground } from '../src/world_api/battleground';
+import type { IWorldBuddies } from '../src/world_api/buddies';
 import type { IWorldCardMinigame } from '../src/world_api/card_minigame';
 import type { IWorldChat } from '../src/world_api/chat';
 // The overhead-emote runtime surface the chat facet derives locally (see the
@@ -519,6 +520,13 @@ export const IWORLD_MEMBERS = [
   { name: 'mountRaceStart', kind: 'method' },
   { name: 'mountRaceCancel', kind: 'method' },
   { name: 'mountRaceView', kind: 'method' }, // read-returning
+  // --- cosmetic buddies (IWorldBuddies) ---
+  { name: 'ownedBuddies', kind: 'method' }, // read-returning
+  { name: 'pendingBuddies', kind: 'method' }, // read-returning
+  { name: 'renameBuddy', kind: 'method' },
+  { name: 'summonBuddy', kind: 'method' },
+  { name: 'toggleBuddy', kind: 'method' },
+  { name: 'setBuddyAutoloot', kind: 'method' },
   { name: 'vehicleSession', kind: 'data' },
   { name: 'enterVehicle', kind: 'method' },
   { name: 'useVehicleAction', kind: 'method' },
@@ -937,9 +945,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
-    expect(IWORLD_MEMBERS.length).toBe(424);
+    // Plus the IWorldBuddies facet's six methods (ownedBuddies, pendingBuddies,
+    // renameBuddy, summonBuddy, toggleBuddy, setBuddyAutoloot) at the
+    // release/v0.45.0 merge into the buddy companions branch: 430/126/304.
+    expect(IWORLD_MEMBERS.length).toBe(430);
     expect(DATA_MEMBERS.length).toBe(126);
-    expect(METHOD_MEMBERS.length).toBe(298);
+    expect(METHOD_MEMBERS.length).toBe(304);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1208,6 +1219,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'nodeRespawnSeconds',
       'openCommissionOrder',
       'openWeeklyReward',
+      'ownedBuddies',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1217,6 +1229,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'partyTradeMsRemaining',
+      'pendingBuddies',
       'perfectItem',
       'perfectingInfo',
       'perfectingSwapInfo',
@@ -1258,6 +1271,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryPageCompletion',
       'reliquaryRarity',
       'reliquaryRecent',
+      'renameBuddy',
       'renamePet',
       'renown',
       'reportTelemetry',
@@ -1287,6 +1301,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
+      'setBuddyAutoloot',
       'setDungeonDifficulty',
       'setGuildPledgeSettings',
       'setHarvestPreference',
@@ -1314,6 +1329,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'stationPlacements',
       'stopAutoAttack',
       'submitLootRoll',
+      'summonBuddy',
       'swapPerfectingRanks',
       'swapWorldQuestMatch3Tiles',
       'switchLoadout',
@@ -1326,6 +1342,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talents',
       'targetEntity',
       'targetNearestFriendly',
+      'toggleBuddy',
       'toggleMounted',
       'toggleWeaponStow',
       'toolEffectSlots',
@@ -1689,6 +1706,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'nodeRespawnSeconds',
       'openCommissionOrder',
       'openWeeklyReward',
+      'ownedBuddies',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1697,6 +1715,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'partyTradeMsRemaining',
+      'pendingBuddies',
       'perfectItem',
       'perfectingInfo',
       'perfectingSwapInfo',
@@ -1723,6 +1742,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryPageClearCount',
       'reliquaryPageCompletion',
       'reliquaryRarity',
+      'renameBuddy',
       'renamePet',
       'reportTelemetry',
       'rerollWorldQuest',
@@ -1748,6 +1768,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
+      'setBuddyAutoloot',
       'setDungeonDifficulty',
       'setGuildPledgeSettings',
       'setHarvestPreference',
@@ -1772,6 +1793,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'startWorldQuestActivity',
       'stopAutoAttack',
       'submitLootRoll',
+      'summonBuddy',
       'swapPerfectingRanks',
       'swapWorldQuestMatch3Tiles',
       'switchLoadout',
@@ -1781,6 +1803,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talentPoints',
       'targetEntity',
       'targetNearestFriendly',
+      'toggleBuddy',
       'toggleMounted',
       'toggleWeaponStow',
       'trackGatheringCommission',
@@ -2349,6 +2372,17 @@ const FACET_MOUNTS = [
   'mountRaceView',
 ] as const satisfies readonly (keyof IWorldMounts)[];
 type _ExhaustMounts = AssertNever<Exclude<keyof IWorldMounts, (typeof FACET_MOUNTS)[number]>>;
+
+const FACET_BUDDIES = [
+  'ownedBuddies',
+  'pendingBuddies',
+  'renameBuddy',
+  'summonBuddy',
+  'toggleBuddy',
+  'setBuddyAutoloot',
+] as const satisfies readonly (keyof IWorldBuddies)[];
+type _ExhaustBuddies = AssertNever<Exclude<keyof IWorldBuddies, (typeof FACET_BUDDIES)[number]>>;
+
 const FACET_VEHICLES = [
   'vehicleSession',
   'enterVehicle',
@@ -2516,6 +2550,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   telemetry: FACET_TELEMETRY,
   professions: FACET_PROFESSIONS,
   mounts: FACET_MOUNTS,
+  buddies: FACET_BUDDIES,
   vehicles: FACET_VEHICLES,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
@@ -2540,7 +2575,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // vehicles facet.
     // 35 at the second release/v0.44.0 base merge: plus the release's world_pvp.ts.
     // 36 at the fourth release/v0.44.0 base merge: plus the release's transport.ts.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(36);
+    // 37 at the release/v0.45.0 merge into the buddy companions branch: plus
+    // its buddies facet (cosmetic followers).
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(37);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2621,8 +2658,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(424);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(424);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(430);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(430);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
