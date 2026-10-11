@@ -114,7 +114,7 @@ export function nearestOverworldGraveyard(
 
 // The graveyard a released spirit appears at. A dungeon/raid death sends the spirit OUT
 // to the overworld graveyard nearest the instance door (never inside the instance): the
-// ghost runs its spirit back to the door and re-enters to resurrect at the entrance, so
+// ghost runs its spirit back to the door and re-enters to resurrect where it arrives, so
 // no Spirit Healer stands inside an instance. Outdoors it is the nearest overworld
 // graveyard to where the body fell.
 function ghostGraveyard(
@@ -409,8 +409,9 @@ export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean 
 }
 
 // Resurrect a ghost that ran its spirit back and re-entered its instance: penalty-free,
-// at the entry it just crossed. Re-entering IS the corpse run under the instance death
-// model (no Spirit Healer inside an instance), so it carries no Resurrection Sickness.
+// at `pos`, where the door set it down (the entrance, or a cleared boss arena:
+// instances/dungeon_checkpoints.ts). Re-entering IS the corpse run under the instance
+// death model (no Spirit Healer inside an instance), so it carries no Resurrection Sickness.
 // Called from enterDungeon when a ghost walks back through the door.
 export function resurrectOnInstanceReentry(
   ctx: SimContext,
