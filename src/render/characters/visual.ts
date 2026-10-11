@@ -91,6 +91,7 @@ import {
 import { auraIdleClip } from './aura_idle_core';
 import { BoneDials } from './bone_dials';
 import { ChargeGlow } from './charge_glow';
+import { clipNamesOf } from './clip_names';
 import { sharedClipSplit } from './clip_split';
 import { twinClipOf } from './clip_twin';
 import { extendBrace, isBraced } from './combat_brace_core';
@@ -138,6 +139,7 @@ import {
   pickSkinAttackClips,
   rangedSkinAiming,
   SKIN_ATTACK_CLIP_NAMES,
+  weaponSkinAttackClips,
   weaponSkinCastClip,
   weaponSkinOrientPin,
 } from './skin_attack';
@@ -166,6 +168,7 @@ import {
 } from './woc_armor_dressing';
 import { releaseWocArmorOf, setWocArmorWorkQueue } from './woc_armor_packs';
 import { WocAtlasSwap } from './woc_atlas_swap';
+import { pickWocAutoAttack } from './woc_autoattack_core';
 import type { WocCharacterManifest } from './woc_character_manifest';
 import {
   peekWocFarBake,
@@ -2760,6 +2763,26 @@ export class CharacterVisual {
       style === 'twohand' &&
       this.loadoutSwap !== null &&
       this.loadoutSwap === this.def.clips.loadoutSwaps?.twohand;
+    // A WOC body's white swings play its hand-keyed autoattacks (woc_autoattack_core.ts).
+    const auto = pickWocAutoAttack({
+      def: this.def,
+      abilityId,
+      kind,
+      style,
+      singleSetTwoHander,
+      bowSkin: weaponSkinAttackClips(this.weaponSkinId)?.clips.includes('Bow_Draw_Shot') ?? false,
+      unarmed: this.bareWhenUnarmed && !this.weaponItemId,
+      index: this.attackIdx,
+      mixerTime: this.mixer.time,
+      dual: this.dualSwing,
+      has: (name) => this.action(name) !== null,
+    });
+    if (auto) {
+      if (auto.clip) this.playOneShot(auto.clip, this.def.attackTimeScale ?? 1.3);
+      this.attackIdx++;
+      this.currentOneShotIsAttack = true;
+      return auto.delay;
+    }
     const handClip =
       style && !singleSetTwoHander ? this.def.clips.attackByHand?.[style] : undefined;
     if (!skinAttack && handClip && this.action(handClip)) {
@@ -5792,77 +5815,6 @@ export class CharacterVisual {
     }
     this.fadeTo(this.action(this.def.clips.idle), 0.2, false);
   }
-}
-
-export function clipNamesOf(def: VisualDef): string[] {
-  // A stance's vocabulary (phaseClips) must be bound too, or its clips never
-  // get an action and the swap plays nothing.
-  const phases = Object.values(def.phaseClips ?? {}).flatMap((p) => [
-    ...clipMapNames(p.clips),
-    ...(p.enter ? [p.enter] : []),
-  ]);
-  return [...clipMapNames(def.clips), ...phases];
-}
-
-function clipMapNames(c: ClipMap): string[] {
-  return [
-    c.idle,
-    c.combatIdle,
-    c.stunned,
-    ...Object.values(c.heldByAura ?? {}),
-    c.turn,
-    c.entrance,
-    c.prowlIdle,
-    c.prowlWalk,
-    c.walk,
-    c.run,
-    c.rushArrival,
-    c.death,
-    ...(c.attack ?? []),
-    ...(c.meleeAttack ?? []),
-    c.wandAttack,
-    ...Object.values(c.attackByAbility ?? {}),
-    ...(c.abilityAttack ?? []),
-    ...Object.values(c.castByAbility ?? {}),
-    ...Object.values(c.attackByHand ?? {}),
-    ...(c.dualWieldPair ?? []),
-    ...(c.hit ?? []),
-    c.cast,
-    c.sitDown,
-    c.sitIdle,
-    c.swim,
-    c.swimSurface,
-    c.swimIdle,
-    c.wade,
-    c.jump,
-    c.jumpMoving,
-    c.fall,
-    c.land,
-    c.walkBack,
-    c.strafeLeft,
-    c.strafeRight,
-    c.flourish,
-    c.stow,
-    c.climb,
-    // The idle-breakers and the idle beat were MISSING here, which is the only
-    // place actions get built (visual.ts constructor). A clip absent from this
-    // list loads fine and passes the clipmap gate, that gate checks the GLB,
-    // not the action map, but `this.action(name)` returns null forever, so
-    // tickIdleVariant/tickIdleBeat bail on every fire and the rig simply never
-    // fidgets. Silent: no throw, no warning, just a clip that is never seen.
-    ...(c.idleVariants ?? []),
-    ...Object.values(c.loadoutSwaps ?? {}).flatMap((m) => Object.values(m ?? {})),
-    c.idleBeat?.clip,
-    // The night pair (mob/slumber.ts): a slot named here is the ONLY way a clip becomes an
-    // action, so a new ClipMap field joins this list or it never plays (pinned per rig by
-    // tests/character_clipmaps.test.ts against the gate's own required-clip list).
-    c.sleep,
-    c.wake,
-    // The aura-held idles (Balgath's Blinded loop): same rule, a loop never bound is a
-    // pose never seen.
-    ...Object.values(c.idleByAura ?? {}),
-    ...Object.values(c.emote ?? {}).flatMap((spec) => spec.clips),
-  ].filter((n): n is string => !!n);
 }
 
 function firstLoadedEmoteClip(

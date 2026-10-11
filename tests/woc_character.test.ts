@@ -35,6 +35,7 @@ import {
   WOC_WARRIOR_MANIFEST,
   type WocCharacterManifest,
 } from '../src/render/characters/woc_character_manifest';
+import { wocKeyedAnimsUrl } from '../src/render/characters/woc_keyed_animations';
 import {
   classBodyComposes,
   WOC_BODY_CLASSES,
@@ -206,8 +207,12 @@ describe('the shipped WOC split files', () => {
       const def = VISUALS[key];
       expect(manifest.fit, key).toBe(key.endsWith('_female') ? 'female' : 'male');
       expect(def.url, key).toBe(wocBaseUrl(manifest.fit));
-      // the rig's own library is its ONLY clip source: no KayKit donor is ever layered on
-      expect(def.animUrls, key).toEqual([wocAnimsUrl(manifest.fit)]);
+      // the rig's own library and the hand-keyed one, both keyed on this exact bind pose:
+      // no KayKit donor is ever layered on
+      expect(def.animUrls, key).toEqual([
+        wocAnimsUrl(manifest.fit),
+        wocKeyedAnimsUrl(manifest.fit),
+      ]);
       expect(def.lazyPreload, key).toBe(true);
       expect(def.authoredAtlas, key).toBe(true);
       expect(def.modular, key).toBeUndefined();
@@ -927,7 +932,7 @@ describe('the seven class equipment sets (2026-09-18) on the shared bodies', () 
         const key = fit === 'female' ? `player_${cls}_female` : `player_${cls}`;
         const def = VISUALS[key];
         expect(def.url, key).toBe(wocBaseUrl(fit));
-        expect(def.animUrls, key).toEqual([wocAnimsUrl(fit)]);
+        expect(def.animUrls, key).toEqual([wocAnimsUrl(fit), wocKeyedAnimsUrl(fit)]);
         const manifest = def.wocCharacter;
         expect(manifest, key).toBeDefined();
         if (!manifest) return;
@@ -972,7 +977,7 @@ describe('the seven class equipment sets (2026-09-18) on the shared bodies', () 
         expect(def.swimRise, key).toEqual({ stroke: -0.65, tread: -1.0 });
         expect(def.clips.shoutEmote, key).toBeNull();
         expect(def.clips.climb, key).toBe('Climb');
-        expect(def.clips.swim, key).toBe('Swim');
+        expect(def.clips.swim, key).toBe('Woc_Swim');
         expect(def.height, key).toBe(VISUALS.player_warrior.height);
       }
       expect({ ...VISUALS[`player_${cls}_female`].clips, contacts: undefined }).toEqual({

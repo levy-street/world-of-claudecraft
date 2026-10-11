@@ -447,6 +447,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/players/woc/head_type_b_hair_twins.glb": "/media/models/chars/players/woc/head_type_b_hair_twins.c6bd28729d20.glb",
   "models/chars/players/woc/head_type_b_hair_undercut.glb": "/media/models/chars/players/woc/head_type_b_hair_undercut.fca045eff2a4.glb",
   "models/chars/players/woc/head_type_b_hair_waves.glb": "/media/models/chars/players/woc/head_type_b_hair_waves.a260537234a0.glb",
+  "models/chars/players/woc/woc_female.glb": "/media/models/chars/players/woc/woc_female.f183381350b1.glb",
+  "models/chars/players/woc/woc_male.glb": "/media/models/chars/players/woc/woc_male.39853314cbb6.glb",
   "models/city/wall_tower.glb": "/media/models/city/wall_tower.f492b537c35f.glb",
   "models/creatures/alpaca.glb": "/media/models/creatures/alpaca.a0de882ed487.glb",
   "models/creatures/aurelhorn.glb": "/media/models/creatures/aurelhorn.a72e8eeee246.glb",

@@ -11,6 +11,7 @@ import {
   wocArmorPackUrl,
   wocBaseUrl,
 } from '../src/render/characters/woc_armor_core';
+import { wocKeyedAnimsUrl } from '../src/render/characters/woc_keyed_animations';
 import { wocManifestSets } from '../src/render/characters/woc_parts_core';
 
 // The accepted WOC character delivery, split the way the artist delivers it (the 2026-09-25
@@ -42,7 +43,8 @@ describe('the September 2026 WOC character delivery (the 51-clip animation rig, 
       expected.add(wocBaseUrl(manifest.fit));
       expected.add(wocAnimsUrl(manifest.fit));
       expect(def.url).toBe(wocBaseUrl(manifest.fit));
-      expect(def.animUrls).toEqual([wocAnimsUrl(manifest.fit)]);
+      // the hand-keyed library rides on top; it is not part of the artist's delivery
+      expect(def.animUrls).toEqual([wocAnimsUrl(manifest.fit), wocKeyedAnimsUrl(manifest.fit)]);
       for (const set of wocManifestSets(manifest)) {
         for (const tier of WOC_ARMOR_TIERS) expected.add(wocArmorPackUrl(manifest.fit, set, tier));
       }

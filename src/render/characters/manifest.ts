@@ -234,6 +234,7 @@ import {
   WOC_WARRIOR_MANIFEST,
   type WocCharacterManifest,
 } from './woc_character_manifest';
+import { withWocKeyedAnimations, wocKeyedAnimsUrl } from './woc_keyed_animations';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -895,11 +896,18 @@ export const WOC_CONTACTS_FEMALE: Readonly<Record<string, readonly number[]>> = 
  *  grey film at noon and a quarter keeps a hint of sky without it. */
 const WOC_ENV_SHEEN = 0.25;
 
+// The body, the rig's own library, and the hand-keyed movement/emote/autoattack
+// library layered over it (woc_keyed_animations.ts); all three share one bind pose.
 function wocBody(fit: WocFit): Pick<VisualDef, 'url' | 'animUrls' | 'lazyPreload'> {
-  return { url: wocBaseUrl(fit), animUrls: [wocAnimsUrl(fit)], lazyPreload: true };
+  return {
+    url: wocBaseUrl(fit),
+    animUrls: [wocAnimsUrl(fit), wocKeyedAnimsUrl(fit)],
+    lazyPreload: true,
+  };
 }
 
-const woc = (attack: string[]): ClipMap => ({
+// The rig's own clip vocabulary; woc() layers the hand-keyed clips over it.
+const wocRigClips = (attack: string[]): ClipMap => ({
   idle: 'Idle',
   // A look around now and then while standing (never mid-fight: an engaged body holds
   // Combat_Idle instead).
@@ -942,6 +950,8 @@ const woc = (attack: string[]): ClipMap => ({
   dualWieldPair: ['Dual_Cross', 'Dual_Chop'],
   contacts: WOC_CONTACTS,
 });
+
+const woc = (attack: string[]): ClipMap => withWocKeyedAnimations(wocRigClips(attack));
 
 const skeletonClips = (attack: string[], flourish = 'Skeletons_Awaken_Standing'): ClipMap => ({
   ...kaykit(attack, 'Idle_Combat'),
@@ -2522,9 +2532,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // pieces across the six armor slots.
   player_warrior: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
-    url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
-    lazyPreload: true,
+    ...wocBody('male'),
     // A tenth taller than the KayKit-sized roster (the artist's body reads
     // small at the shared height); the held weapons scale with the rig.
     height: HUMANOID_H * 1.1,
@@ -2608,9 +2616,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // as the warrior: instant casts play no gesture, only real strikes swing.
   player_paladin: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
-    url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
-    lazyPreload: true,
+    ...wocBody('male'),
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
     envSheen: WOC_ENV_SHEEN,
@@ -2659,9 +2665,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Melee strikes swing the blade. Aspects, traps and pet commands play nothing.
   player_hunter: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
-    url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
-    lazyPreload: true,
+    ...wocBody('male'),
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
     envSheen: WOC_ENV_SHEEN,
@@ -2712,9 +2716,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // entry; stealth, sprint, poisons and the cooldowns play nothing.
   player_rogue: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
-    url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
-    lazyPreload: true,
+    ...wocBody('male'),
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
     envSheen: WOC_ENV_SHEEN,
@@ -2760,9 +2762,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // hood's tip, sized to this rig (the KayKit 1.45 cleared the mage hat).
   player_priest: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
-    url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
-    lazyPreload: true,
+    ...wocBody('male'),
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
     envSheen: WOC_ENV_SHEEN,
@@ -2809,9 +2809,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // nothing.
   player_shaman: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
-    url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
-    lazyPreload: true,
+    ...wocBody('male'),
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
     envSheen: WOC_ENV_SHEEN,
@@ -2853,9 +2851,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // would fall back to.
   player_mage: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
-    url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
-    lazyPreload: true,
+    ...wocBody('male'),
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
     envSheen: WOC_ENV_SHEEN,
@@ -2909,9 +2905,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // commands and every other instant play nothing.
   player_warlock: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
-    url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
-    lazyPreload: true,
+    ...wocBody('male'),
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
     envSheen: WOC_ENV_SHEEN,
@@ -2969,9 +2963,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Moonfire, Faerie Fire, the buffs and the shapeshifts play nothing.
   player_druid: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
-    url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
-    lazyPreload: true,
+    ...wocBody('male'),
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
     envSheen: WOC_ENV_SHEEN,
