@@ -797,7 +797,8 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
 // Walk_Back are authored at their game speeds (2.2, 7 and 4.55 yd/s).
 // A second library keyed on this exact bind pose rides on top (woc_keyed_animations.ts,
 // players/woc_keyed/): it replaces the idle, gaits, swim, jump take-off, death, four emotes
-// and the white swings; every other slot above keeps the rig's own clip.
+// and the white swings; every other slot above keeps the rig's own clip, and the rig's
+// idle fidget is not bound (wocRigClips).
 // NEVER layer a KayKit donor GLB onto this rig: the bone NAMES match, so a
 // Rig_Medium clip binds, but its bind pose does not, and it poses the body wrong.
 // ---------------------------------------------------------------------------
@@ -912,10 +913,8 @@ function wocBody(fit: WocFit): Pick<VisualDef, 'url' | 'animUrls' | 'lazyPreload
 // The rig's own clip vocabulary; woc() layers the hand-keyed clips over it.
 const wocRigClips = (attack: string[]): ClipMap => ({
   idle: 'Idle',
-  // A look around now and then while standing (never mid-fight: an engaged body holds
-  // Combat_Idle instead).
-  idleVariants: ['Idle_Look'],
-  idleVariantCadence: { everySec: 14, jitterSec: 8 },
+  // No idle-breaker: the library's Idle_Look opens and closes on this Idle, so over the
+  // keyed idle it put the old stance back for seconds at a time (owner report 2026-10-12).
   combatIdle: 'Combat_Idle',
   walk: 'Walk',
   run: 'Run',

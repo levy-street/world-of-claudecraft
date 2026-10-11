@@ -131,6 +131,25 @@ describe('WOC authored movement and held props', () => {
     expect(peek(visual).current.getEffectiveWeight()).toBe(1);
   });
 
+  // The rig's look-around fidget opens and closes on the rig's own Idle, so firing it over the
+  // keyed idle put the old stance back on screen for seconds at a time (owner report 2026-10-12,
+  // on the character-select turntable, which stands the same body the world does).
+  it('stands in the keyed idle alone: no rig fidget breaks in', () => {
+    const wocBodies = Object.entries(VISUALS).filter(([, def]) => def.wocCharacter);
+    expect(wocBodies.length).toBeGreaterThanOrEqual(18);
+    for (const [key, def] of wocBodies) {
+      expect(def.clips.idle, key).toBe('Woc_Idle');
+      expect(def.clips.idleVariants, key).toBeUndefined();
+    }
+    const visual = create('player_shaman');
+    const played = new Set<string>();
+    for (let frame = 0; frame < 60 * 45; frame++) {
+      tick(visual);
+      played.add(peek(visual).current.getClip().name);
+    }
+    expect([...played]).toEqual(['Woc_Idle']);
+  });
+
   it('hides both equipped hands while swimming and restores drawn or stowed props on exit', () => {
     const visual = create();
     expect(visual.setWeapon('worn_sword')).toHaveLength(1);
