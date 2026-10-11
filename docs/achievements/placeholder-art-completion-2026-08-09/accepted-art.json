@@ -366,8 +366,8 @@
   "sourceManifests": [
     {
       "path": "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
-      "acceptedSha256": "c3ba77b82dd7ac744e213730394f964cdeaf9b6ee5fbeb2093679cb15ea19687",
-      "acceptedBytes": 415979
+      "acceptedSha256": "a78cfbf6857751b8d41b123f76b2a297d99091cc9259ced15f1ff43a25575f85",
+      "acceptedBytes": 453282
     }
   ],
   "assets": [
@@ -2227,8 +2227,8 @@
       "kind": "mobPortrait",
       "id": "the_wreck_warden",
       "runtimeUrl": "/ui/mobs/the_wreck_warden.webp",
-      "acceptedSha256": "43aa6f55256d34afc6130b9497c2d9fb96fa20981dce1c433e741b9632e3766e",
-      "acceptedBytes": 2562,
+      "acceptedSha256": "3f83e55ce408fc82ae8de4af2252e349da02977c2876900458909e604bb61634",
+      "acceptedBytes": 2520,
       "origin": "deterministic-rerender"
     },
     {

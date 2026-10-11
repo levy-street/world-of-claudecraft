@@ -34,7 +34,13 @@ import type { IWorld } from '../../world_api';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { cryptSlotOrigin } from './crypt_boss_fx_core';
-import { MORTHEN_MITRE_EYE, MORTHEN_RIBS, morthenAnchor, morthenBodyY } from './morthen_fx_core';
+import {
+  MORTHEN_MITRE_EYE,
+  MORTHEN_RIBS,
+  morthenAnchor,
+  morthenBodyY,
+  morthenDrawScale,
+} from './morthen_fx_core';
 import {
   brokenBind,
   candleIndexAt,
@@ -345,7 +351,7 @@ export class MorthenWardFx implements RitePainter {
   private shatter(m: Entity): void {
     const h = this.h;
     const gy = h.groundY(m.pos.x, m.pos.z);
-    const s = m.scale || 1;
+    const s = morthenDrawScale(m.scale);
     this.flashAt = h.clock();
     this.shatterX = m.pos.x;
     this.shatterY = gy;
@@ -567,7 +573,7 @@ export class MorthenWardFx implements RitePainter {
       const b = this.bands[i];
       b.mesh.visible = bind > 0.001;
       if (!m || !b.mesh.visible) continue;
-      const s = m.scale || 1;
+      const s = morthenDrawScale(m.scale);
       const rigY = 1.9 + i * 1.35;
       const y = morthenBodyY(m.pos.y, rigY, s);
       // Each band snaps tight onto him as the stun lands, turning slowly.
@@ -585,7 +591,7 @@ export class MorthenWardFx implements RitePainter {
     // Dazed gold motes circling his mitre.
     const h = this.h;
     if (h.rand() < 0.6) {
-      const s = m.scale || 1;
+      const s = morthenDrawScale(m.scale);
       const eye = morthenAnchor(m.pos, m.facing, s, MORTHEN_MITRE_EYE);
       const a = now * 3 + h.rand() * 0.4;
       {
@@ -621,7 +627,7 @@ export class MorthenWardFx implements RitePainter {
     this.exposureColumn.mesh.visible = on;
     if (!m || !exposed || !on) return;
     const h = this.h;
-    const s = m.scale || 1;
+    const s = morthenDrawScale(m.scale);
     const k = Math.min(1, exposed.remaining / 0.8) * (0.8 + 0.2 * Math.sin(now * 6));
     const ribsY = morthenBodyY(m.pos.y, MORTHEN_RIBS.y, s);
     this.exposure.mesh.position.set(m.pos.x, ribsY, m.pos.z);

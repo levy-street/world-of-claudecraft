@@ -54,9 +54,10 @@ are not proof of a paid purchase.
 
 ## Integration and deployment dependencies
 
-The feature is based on integration PR #4423 at `7bc9c74af5`. Membership PR
+The feature was initially based on integration PR #4423 at `7bc9c74af5`. Membership PR
 #4281 is included there; buddy PR #4240 was merged into that integration branch
-at the user's request. Referral work remains on `codex/referral-stamp-cards`.
+at the user's request. The October 12 publishing pass merges the referral work
+with the newer integration tip `a4cce65bca`, preserving its creature remodels.
 The companion economy change is on `codex/referral-economy`, based on its
 membership billing integration.
 
@@ -328,3 +329,48 @@ with zero high findings after priors, and both worktrees pass `git diff --check`
 The final CI-workflow fixture run is 26 passed and one inherited failure, solely
 its missing `bastion-ghost-crew` screenshot cone entry. Both new referral screenshot
 subtrees are included. The original `d188/WoC` checkout remains clean.
+
+
+### Integration publishing pass, October 12
+
+The user authorized pushing the game changes to `feature/v045-integration` and
+explicitly requested leaving the companion economy-service changes local. The
+game integration therefore contains the service client and durable pending-reward
+handling, but membership-bond delivery and Claudium credits still depend on the
+companion service update being published and deployed. Earlier uncommitted-status
+statements above describe the October 9 checkpoint.
+
+The merge audit found no semantic conflict in the shared simulation types, WOC
+character manifest, authored-surface coverage, quest IDs or encounter IDs. Both
+the latest creature artwork and the referral Sapling remain in the combined tree.
+
+Current checks:
+
+- `pnpm run check:types`: passed for game, admin and bot.
+- `GATE_SELECT_BASE=origin/feature/v045-integration pnpm run ci:changed`:
+  passed, with existing lint warnings.
+- Focused referral, social, architecture and localization run: 371 tests passed.
+  Its portrait-inventory failure occurred while the art merge was in progress;
+  final portrait checks are recorded separately below.
+- Real PostgreSQL rerun of `account_buddies_pg_integration`,
+  `account_social_pg_integration` and `referral_cards_pg_integration`: all 20
+  tests passed. The initial database run failed to connect because the disposable
+  server had started on its default port; the final run used explicit port 55439.
+- `pnpm run build` and `pnpm run build:server`: passed.
+- `GATE_SELECT_BASE=origin/feature/v045-integration GATE_WORKER_TIER=low
+  node scripts/gate_select.mjs`: generation, i18n and manifest freshness, SFX,
+  security and changed-file lint passed. The planner selected the full test
+  suite; that leg was interrupted to stop file-read contention during the
+  required portrait capture. This is not a complete green gate.
+
+The integration push does not certify production readiness. The previously
+recorded whole-suite failures and live two-account, OAuth and payment acceptance
+work remain outstanding. The economy repository is intentionally unchanged by
+this publishing pass.
+
+The final isolated portrait capture completed all 355 jobs with zero failures or
+page errors. Receipt-backed manifest freshness passed and all five portrait
+regression suites passed (47 tests). The 123 changed portrait/finder pairs were
+visually reviewed against the latest integration art; subjects, poses and framing
+are preserved. Dated merge receipts and comparison sheets remain in the existing
+`referral-portrait-render-2026-10-09` evidence directories.

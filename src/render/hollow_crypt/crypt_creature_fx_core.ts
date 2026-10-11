@@ -6,10 +6,10 @@
 //
 // Every footprint comes from the sim's own templates, so the fire fills the cone
 // the sim tests and the shockwave reaches the ring it hits. Anchors on the
-// creature (the drake's jaws, the gargoyle's head) are measured off the authored
-// Blender clips (scripts/assets/hollow_crypt_creatures/) at the key frame each
-// effect plays on, in yards at the visual's authored size, scaled by the
-// entity's own scale.
+// creature (the drake's and the Knellwyrm's jaws, the gargoyle's head) are
+// measured off the art-guide models' authored clips at the key frame each effect
+// plays on, in yards at the visual's authored size, scaled by the entity's own
+// scale.
 //
 // Three-free, DOM-free, deterministic.
 
@@ -31,13 +31,18 @@ export function paintsOwnBreath(templateId: string): boolean {
   return templateId === 'crypt_ossuary_drake' || templateId === 'crypt_bone_brute';
 }
 
-/** Where the drake's jaws hang while it draws the fire up (the bar) and while
- *  it pours it out (the play-out), at its authored size (Breath clip, frames 44
- *  and 49 of build_bone_drake.py). */
-export const DRAKE_JAWS_INHALE: CreatureAnchor = { forward: 3.5, up: 13.2 };
-export const DRAKE_JAWS_EXHALE: CreatureAnchor = { forward: 6.9, up: 4.2 };
+/** Where the drake's jaws hang while it draws the fire up (the bar: the head
+ *  reared high over its chest) and while it pours it out (the play-out: the jaws
+ *  thrust low over the cone's apex), at its authored size (Breath clip, frames 56
+ *  and 66). */
+export const DRAKE_JAWS_INHALE: CreatureAnchor = { forward: -0.2, up: 14.0 };
+export const DRAKE_JAWS_EXHALE: CreatureAnchor = { forward: 5.9, up: 3.0 };
+/** The Knellwyrm's mouth as it pours fire on the wing, its neck plunged (the
+ *  Strafe clip, frame 20: the Pyre Strafe run and the Knell's pour), over the
+ *  wyrm's own altitude at its authored size. */
+export const KNELLWYRM_JAWS_STRAFE: CreatureAnchor = { forward: 4.4, up: 6.8 };
 /** The gargoyle's head as it rears to shriek (Screech clip). */
-export const GARGOYLE_HEAD_SCREECH: CreatureAnchor = { forward: 1.2, up: 5.4 };
+export const GARGOYLE_HEAD_SCREECH: CreatureAnchor = { forward: 1.44, up: 3.47 };
 
 /** The torrent's timeline after the bar lands, in seconds. */
 export const BREATH_TORRENT = { ramp: 0.12, hold: 1.35, fade: 0.45 } as const;

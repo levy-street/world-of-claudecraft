@@ -1,6 +1,6 @@
 // The Gravewyrm Sanctum's three bosses (docs/design/dungeon-rework/
-// gravewyrm_sanctum.md section 6): Blender bodies authored at their in-game
-// size (E:/woc/entregas/santuario/{korgath,velkhar,korzul}), measured in
+// gravewyrm_sanctum.md section 6): bodies drawn at their in-game size
+// (all three on art-guide bodies), measured in
 // render/gravewyrm_sanctum_bosses/boss_model_core.ts. manifest.ts merges
 // SANCTUM_BOSS_LOOKS into VISUALS and SANCTUM_BOSS_MOB_KEYS into the mob key
 // map (each boss's shipped stand-in body is replaced under its own key).
@@ -47,6 +47,7 @@ import {
   KORGATH_BROKEN_CHAIN_MESH,
   KORGATH_BROKEN_GESTURE,
   KORGATH_CLIP,
+  KORGATH_RUN_REF,
   KORGATH_RUNES_GESTURE,
   KORGATH_WHOLE_GESTURE,
   KORZUL_BODY,
@@ -57,6 +58,7 @@ import {
   KORZUL_HEARTBEAT_FLARE_GESTURE,
   KORZUL_HEARTBEAT_GESTURE,
   KORZUL_HIDE_GESTURE,
+  KORZUL_RUN_REF,
   KORZUL_SHOW_GESTURE,
   KORZUL_TAKEOFF_GESTURE,
   VELKHAR_BODY,
@@ -82,14 +84,16 @@ const KORGATH_CHAIN_TOGGLES: MeshToggleDef[] = (['hammer', 'tongs'] as const).ma
 }));
 
 /** Korzul on his feet: the ground kit, the flights (flight: the hover loops
- *  while he is up), the strikes as play-outs. */
+ *  while he is up), the strikes as play-outs. The bite and the claw land on
+ *  frame 18 of their 1.5 s clips (1x). */
 const KORZUL_CLIPS: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
-  run: 'Walk',
+  run: 'Run',
   jump: 'FlyIdle',
   fall: 'FlyForward',
   attack: ['Bite', 'Claw'],
+  contacts: { Bite: [KORZUL_CLIP.biteHit], Claw: [KORZUL_CLIP.clawHit] },
   attackByAbility: {
     [KORZUL_DOUSED]: 'Hit',
     [KORZUL_ENRAGE]: 'Roar',
@@ -102,8 +106,9 @@ const KORZUL_CLIPS: ClipMap = {
     [KORZUL_DOUSED]: 1,
     [KORZUL_ENRAGE]: 1,
     [KORZUL_SHARD_FLARE]: 1,
-    // The sim climbs to the hover in 1.8 s (korzul.ts KORZUL_TAKEOFF_SECONDS).
-    [KORZUL_TAKEOFF_GESTURE]: 2.79 / 1.8,
+    // The sim climbs to the hover in 1.8 s (korzul.ts KORZUL_TAKEOFF_SECONDS),
+    // the clip's own length.
+    [KORZUL_TAKEOFF_GESTURE]: 1,
     [KORZUL_EMERGE_LAND_GESTURE]: KORZUL_EMERGE_LAND_RATE,
   },
   hit: ['Hit'],
@@ -115,7 +120,8 @@ const KORZUL_CLIPS: ClipMap = {
     [KORZUL_GRAVE_INFERNO]: 'GraveInferno',
     [KORZUL_WING_GALE]: 'WingBuffet',
     [KORZUL_PLUNGING_FIRE]: 'BreathAir',
-    [KORZUL_CRASHING_DESCENT]: 'Land',
+    // The hang over the plate, the dive, the slam on the warning's end.
+    [KORZUL_CRASHING_DESCENT]: 'Descent',
     // His pull: the 3 s emergence bar bursts the ice, the forefeet slam on its end.
     [KORZUL_BREAK_FREE]: 'BreakFree',
   },
@@ -128,11 +134,11 @@ const KORZUL_CLIPS: ClipMap = {
     [KORZUL_WING_GALE]: contactRate(KORZUL_CLIP.galeGust, Z.galeCast),
     // The fire pours across the plate through the warning and ends on its end.
     [KORZUL_PLUNGING_FIRE]: contactRate(KORZUL_CLIP.breathAirEnd, Z.plungeWarn),
-    [KORZUL_CRASHING_DESCENT]: contactRate(KORZUL_CLIP.landImpact, Z.descentWarn),
+    [KORZUL_CRASHING_DESCENT]: contactRate(KORZUL_CLIP.descentImpact, Z.descentWarn),
     [KORZUL_BREAK_FREE]: contactRate(KORZUL_CLIP.breakFreeSlam, KORZUL_EMERGE_BAR),
   },
   // Not the Inferno: Doused cuts it (to Hit) the moment his plate breaks.
-  castPlayOut: ['BreathGround', 'TailSwipe', 'WingBuffet', 'BreathAir', 'Land', 'BreakFree'],
+  castPlayOut: ['BreathGround', 'TailSwipe', 'WingBuffet', 'BreathAir', 'Descent', 'BreakFree'],
   flourish: 'Roar',
 };
 
@@ -156,6 +162,9 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'ThresholdChargeLoop',
       attack: ['HammerSlam', 'HammerSweep'],
+      // Both blows land on frame 18 of their 1.5 s clips (1x): the coil, the
+      // hang at the top, his whole weight thrown after the maul.
+      contacts: { HammerSlam: [KORGATH_CLIP.slam], HammerSweep: [KORGATH_CLIP.sweep] },
       attackByAbility: {
         [KORGATH_CHAIN_BREAK]: 'ChainBreak',
         [KORGATH_RERIVETED]: 'ChainYank',
@@ -199,8 +208,8 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
       deathFade: 2.5,
     },
     walkRef: KORGATH_BODY.walkRef * bossModelScale(KORGATH_BODY, KORGATH_BODY.simScale),
-    runRef: 11 * bossModelScale(KORGATH_BODY, KORGATH_BODY.simScale),
-    attackTimeScale: 1.15,
+    runRef: KORGATH_RUN_REF * bossModelScale(KORGATH_BODY, KORGATH_BODY.simScale),
+    attackTimeScale: 1,
     deathTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.04,
@@ -216,6 +225,8 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Walk',
       attack: ['Attack'],
+      // The staff's blow lands on frame 18 of its 1.5 s clip (1x).
+      contacts: { Attack: [VELKHAR_CLIP.attackLand] },
       attackByAbility: { [VELKHAR_THAW_GESTURE]: 'Thaw' },
       attackTimeScaleByAbility: { [VELKHAR_THAW_GESTURE]: 1 },
       hit: ['Hit'],
@@ -236,7 +247,7 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     oneShotsHoldAttacks: ['Thaw'],
     // The caged soul flame roars as he casts and gutters out as he dies.
     glowPulses: {
-      materials: ['VelkharSoulfire', 'VelkharFrostlight'],
+      materials: ['VelkharSoulfire'],
       pulses: [{ gesture: VELKHAR_FLAME_GESTURE, rise: 0.4, hold: 0.6, fall: 1.2, peak: 2.2 }],
       deathFade: 2,
     },
@@ -244,18 +255,17 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     runRef: VELKHAR_BODY.walkRef * bossModelScale(VELKHAR_BODY, VELKHAR_BODY.simScale),
     walkTimeScaleMax: 3,
     runTimeScaleMax: 3,
+    attackTimeScale: 1,
     deathTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.05,
     clickRadius: 1.6,
   },
-  // Korzul the Gravewyrm: twelve hundred years in the quench, 54 yd nose to
-  // tail; the rose-gold shard beats in his chest.
+  // Korzul the Gravewyrm: twelve hundred years in the quench, 34 yd nose to
+  // tail; the rose-gold shard beats in his chest (its own glow map).
   sanctum_korzul: {
     url: KORZUL_BODY.url,
     height: bossLookHeight(KORZUL_BODY),
-    // The claw tips sink a hair into the ice in every grounded pose.
-    hover: -0.25 / KORZUL_BODY.simScale,
     flight: true,
     clips: KORZUL_CLIPS,
     // Still in the ice the showpiece is the environment's frozen Korzul in the
@@ -271,7 +281,10 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     // airborne clips' own Root climb (+6 yd) is dropped so the height has one
     // owner and he never pops between the takeoff, the hover and the landing.
     clipPositionDrops: Object.fromEntries(
-      ['TakeOff', 'FlyIdle', 'FlyForward', 'BreathAir', 'Land'].map((c) => [c, ['Root']]),
+      ['TakeOff', 'FlyIdle', 'FlyForward', 'BreathAir', 'Land', 'Descent'].map((c) => [
+        c,
+        ['Root'],
+      ]),
     ),
     // The heart-shard beats (lub, dub) and flares in the last phase; dark as
     // the lake takes him.
@@ -302,8 +315,8 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     castPlayOutHoldsAttacks: true,
     oneShotsHoldAttacks: ['BreakFree', 'TakeOff', 'Roar'],
     walkRef: KORZUL_BODY.walkRef * bossModelScale(KORZUL_BODY, KORZUL_BODY.simScale),
-    runRef: KORZUL_BODY.walkRef * bossModelScale(KORZUL_BODY, KORZUL_BODY.simScale),
-    attackTimeScale: 1.1,
+    runRef: KORZUL_RUN_REF * bossModelScale(KORZUL_BODY, KORZUL_BODY.simScale),
+    attackTimeScale: 1,
     deathTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.05,

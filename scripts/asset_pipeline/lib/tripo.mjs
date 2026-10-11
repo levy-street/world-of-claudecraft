@@ -282,6 +282,58 @@ export async function generateModel({
   return { taskId, task };
 }
 
+/** The fixed angles multiview generation reads, in Tripo's own order. */
+export const MULTIVIEW_ANGLES = ['front', 'left', 'back', 'right'];
+
+/** The `inputs` list for multiview-to-model: one view-keyed entry per angle that is
+ *  present, in MULTIVIEW_ANGLES order. Front is required (Tripo rejects a set
+ *  without it); any other angle may be left out. Pure, so the order is testable. */
+export function multiviewInputs(resolved) {
+  if (!resolved?.front) throw new Error('multiview generation needs a front view');
+  const unknown = Object.keys(resolved).filter((angle) => !MULTIVIEW_ANGLES.includes(angle));
+  if (unknown.length) throw new Error(`unknown multiview angle(s): ${unknown.join(', ')}`);
+  return MULTIVIEW_ANGLES.filter((angle) => resolved[angle]).map((angle) => ({
+    [angle]: resolved[angle],
+  }));
+}
+
+/** Generate a 3D model from separate fixed-angle views of one subject (a T-pose concept
+ *  drawn front, left and back), the art team's model step: Smart Mesh P2.0 by default.
+ *  `views` maps an angle to a local image path, URL or Tripo file ref. `quad` asks P2
+ *  for a quad mesh (P1 rejects it). `textureSize` is the texture map's edge in pixels
+ *  (the art guide asks for 1024). Returns {taskId, task} like generateModel. */
+export async function generateModelFromViews({
+  views,
+  model = MODEL_P2,
+  faceLimit,
+  texture = true,
+  pbr = true,
+  quad = false,
+  textureQuality,
+  textureSize,
+  onProgress,
+  onTaskCreated,
+}) {
+  const resolved = {};
+  for (const [angle, image] of Object.entries(views ?? {})) {
+    if (image) resolved[angle] = await resolveImageInput(image);
+  }
+  const body = {
+    inputs: multiviewInputs(resolved),
+    model,
+    texture,
+    pbr,
+    ...(faceLimit ? { face_limit: faceLimit } : {}),
+    ...(quad && model.startsWith('P2') ? { quad: true } : {}),
+    ...(textureQuality ? { texture_quality: textureQuality } : {}),
+    ...(textureSize ? { texture_size: textureSize } : {}),
+  };
+  const taskId = await createTask('/generation/multiview-to-model', body);
+  onTaskCreated?.(taskId);
+  const task = await pollTask(taskId, { onProgress });
+  return { taskId, task };
+}
+
 /** Re-texture an existing model from a text (or image) prompt. Returns
  *  {taskId, task} with task.output.model_url (a re-textured GLB). Used to test
  *  whether Tripo can paint a new skin onto a class model while keeping its UVs. */

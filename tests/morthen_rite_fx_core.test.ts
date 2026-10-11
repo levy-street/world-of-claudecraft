@@ -172,7 +172,7 @@ describe('the Burning Knell', () => {
 
   it('plays its aloft beats as one-shots on clips the Knellwyrm ships', () => {
     const def = VISUALS[visualKeyFor({ kind: 'mob', templateId: 'crypt_knellwyrm' } as Entity)];
-    const glb = readFileSync('public/models/creatures/crypt_knellwyrm.glb');
+    const glb = readFileSync('public/models/creatures/woc_crypt_knellwyrm.glb');
     const json = JSON.parse(glb.subarray(20, 20 + glb.readUInt32LE(12)).toString('utf8'));
     const names = new Set<string>((json.animations ?? []).map((a: { name: string }) => a.name));
     const cast = def.clips.castByAbility ?? {};

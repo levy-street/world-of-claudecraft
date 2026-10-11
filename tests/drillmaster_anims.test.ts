@@ -28,16 +28,4 @@ describe('the drillmaster clips', () => {
     expect(doc.meshes ?? []).toHaveLength(0);
     expect(doc.skins ?? []).toHaveLength(0);
   });
-
-  it('wires the lean as his idle and the pound to the mallet blow at its authored speed', () => {
-    const src = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
-    const start = src.indexOf('  npc_muster_drillmaster: {');
-    expect(start).toBeGreaterThanOrEqual(0);
-    const block = src.slice(start, src.indexOf('\n  },', start));
-    expect(block).toContain('`${PLAYERS}/drillmaster_anims.glb`');
-    expect(block).toContain("kaykit(['2H_Melee_Attack_Chop'], 'Drill_Rest')");
-    expect(block).toContain(`attackByAbility: { ${MUSTER_MALLET_POUND_ABILITY}: 'Drill_Pound' }`);
-    // time scale 1: the head meets the ground on MUSTER_DRILL_POUND_IMPACT, as authored
-    expect(block).toContain(`attackTimeScaleByAbility: { ${MUSTER_MALLET_POUND_ABILITY}: 1 }`);
-  });
 });

@@ -28,7 +28,7 @@ import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { orbFollow, orbHover } from '../trash_engine_fx/trash_engine_fx_core';
 import { cryptSlotOrigin } from './crypt_boss_fx_core';
-import { MORTHEN_RIBS, morthenAnchor } from './morthen_fx_core';
+import { MORTHEN_RIBS, morthenAnchor, morthenDrawScale } from './morthen_fx_core';
 import { BOUND_SOUL_LOOK, soulRise } from './morthen_rite_fx_core';
 import type { RiteFxHost, RiteGlowMesh, RitePainter } from './morthen_rite_host';
 
@@ -193,7 +193,7 @@ export class MorthenSoulFx implements RitePainter {
   private surge(m: Entity, slot: SoulSlot): void {
     const h = this.h;
     const now = h.clock();
-    const s = m.scale || 1;
+    const s = morthenDrawScale(m.scale);
     const ribs = morthenAnchor(m.pos, m.facing, s, MORTHEN_RIBS);
     h.flash(ribs.x, ribs.y, ribs.z, 8 * s, 0.5, 0xb8ff9a);
     const n = Math.round(90 * h.density);

@@ -88,7 +88,7 @@ const CORRECTED_PORTRAITS = {
 // holds a row for every MOBS template. Pin the body, the absence of a tint and the
 // deterministic output: a dispatch that slid back to a tinted stock rig, or a body
 // change that left the old render behind, fails here.
-const ESCORTEE_CLASS_BODY_PORTRAITS = {
+const CLASS_BODY_PORTRAITS = {
   apprentice_wren: [
     'player_mage_female',
     'models/chars/players/woc/base_female.glb',
@@ -109,11 +109,18 @@ const ESCORTEE_CLASS_BODY_PORTRAITS = {
     'models/chars/players/woc/base_male.glb',
     '56ee641a3769222428de3ad5dcab643f909f0880fe546768a189971b034600a3',
   ],
+  // the one enemy whose old portrait was pinned (a tinted barbarian stand-in): now on
+  // the warrior's class body with the rest of the humanoid enemies
+  the_wreck_warden: [
+    'player_warrior',
+    'models/chars/players/woc/base_male.glb',
+    'd4a9a1e72899ee8807da04596f1d77a9a95eb6e5bc564b1f51181eef19ba1033',
+  ],
 } as const;
 
-// These portraits all resolve through entity-tinted visuals: Cindraleth, Grubjaw, and the
-// Wreck Warden had retained older model stand-ins. Pin the tint inputs as well as each
-// visual/model and deterministic output.
+// These portraits all resolve through entity-tinted visuals: Cindraleth and Grubjaw had
+// retained older model stand-ins. Pin the tint inputs as well as each visual/model and
+// deterministic output.
 const CORRECTED_TINTED_PORTRAITS = {
   cindraleth_maw_matriarch: [
     'mob_dragonkin_matriarch',
@@ -128,13 +135,6 @@ const CORRECTED_TINTED_PORTRAITS = {
     0x145a32,
     0.04,
     '0fc867ac1c3e9f0fb012472143c9a5258793348d1060750be159d593539d0455',
-  ],
-  the_wreck_warden: [
-    'mob_bruiser',
-    'models/chars/players/barbarian.glb',
-    0x7a8a86,
-    0.3,
-    '2216319bb00c82dc6f121135776c77656925075511df2b29a3ec08d8d871a8e4',
   ],
 } as const;
 
@@ -237,10 +237,8 @@ describe('targetPortraitUrl', () => {
     }
   });
 
-  it('keeps the escortee portraits synchronized with the class body each one draws', () => {
-    for (const [mobId, [visualKey, model, acceptedHash]] of Object.entries(
-      ESCORTEE_CLASS_BODY_PORTRAITS,
-    )) {
+  it('keeps the class-body portraits synchronized with the body each one draws', () => {
+    for (const [mobId, [visualKey, model, acceptedHash]] of Object.entries(CLASS_BODY_PORTRAITS)) {
       const mob = MOBS[mobId];
       expect(mob, `${mobId} fixture`).toBeDefined();
       const currentVisual = visualKeyFor({

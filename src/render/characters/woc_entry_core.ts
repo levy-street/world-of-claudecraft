@@ -17,9 +17,14 @@ import { VISUALS } from './manifest';
 import type { WocFit } from './woc_armor_core';
 import { wocHeadCoreUrl, wocHeadTypeForGender } from './woc_head_catalog';
 
-/** Every WOC player visual key (both fits of every class), in manifest order. */
+/** Every WOC player visual key (both fits of every class), in manifest order. A mob def
+ *  copied from a class body (the Tideglass Colossus's Reflections, manifest.ts) is no
+ *  player: it shares the class body's files, which are entry's already, and is built when
+ *  its encounter needs it. */
 export function wocVisualKeys(): string[] {
-  return Object.keys(VISUALS).filter((key) => VISUALS[key].wocCharacter !== undefined);
+  return Object.keys(VISUALS).filter(
+    (key) => key.startsWith('player_') && VISUALS[key].wocCharacter !== undefined,
+  );
 }
 
 /** The body fits the manifest ships a WOC body for. */

@@ -52,8 +52,11 @@ import {
 import { moonbridgeSpan } from './temple_rising_stair_core';
 
 const COLLAPSED = 1e-4;
-/** The fallen Colossus's prism, above its corpse (yards). */
-const CHEST_UP = 7;
+/** The fallen Colossus's prism: it topples onto its back, so the prism faces
+ *  the sky this high over the floor and this far behind where it stood
+ *  (yards, its Death's last frame). */
+const CHEST_UP = 4.2;
+const CHEST_BACK = 7;
 /** The beam's end, above the landing's floor. */
 const LANDING_UP = 1.4;
 const SOUNDS = ['impact_holy', 'hoard_entrance_open', 'ui_aura_temple_gong'] as const;
@@ -370,8 +373,8 @@ export class TempleMoonbridgeFx {
     const plinthX = ox + PRISM_PLINTH.x;
     const plinthZ = oz + PRISM_PLINTH.z;
     const body = this.colossusNear(plinthX, plinthZ);
-    const cx = body ? body.pos.x : plinthX;
-    const cz = body ? body.pos.z : plinthZ;
+    const cx = body ? body.pos.x - Math.sin(body.facing) * CHEST_BACK : plinthX;
+    const cz = body ? body.pos.z - Math.cos(body.facing) * CHEST_BACK : plinthZ;
     this.from.set(cx, this.groundY(cx, cz) + CHEST_UP, cz);
     const lx = ox + this.span.toX;
     const lz = oz + MOONBRIDGE.z;

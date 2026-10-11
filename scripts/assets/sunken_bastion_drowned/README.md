@@ -1,5 +1,11 @@
 # Sunken Bastion drowned: sculpted Blender builders
 
+> Superseded for the Sunken Bastion's bosses Knight-Commander Olen, the Gaol Turnkey, Gaoler Ossick
+> and Vael the Fogbinder: each now ships the art guide's model (concept, Tripo P2, a skeleton and every clip
+> built in Blender), as `public/models/creatures/woc_bastion_*.glb` from
+> `scripts/assets/specs/woc_bastion_*.json`. The builders below are kept for the garrison and as
+> reference; their output GLBs for the replaced bosses are no longer in the repo.
+
 The second-generation bodies of the Sunken Bastion's drowned garrison, sculpted
 whole (signed-distance fields meshed through OpenVDB, decimated, weighted from the
 sculpt's own primitives, Cycles-baked to one atlas) instead of the first roster's

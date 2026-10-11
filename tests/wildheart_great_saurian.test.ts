@@ -1,4 +1,4 @@
-// The Great Saurian's Blender body in game (src/render/wildheart_basin/
+// The Great Saurian's art-guide body in game (src/render/wildheart_basin/
 // saurian_model_core.ts, saurian_fx_core.ts, src/render/characters/
 // wildheart_creature_looks.ts and gesture_mesh_toggles.ts): the shipped GLB
 // carries the clips, meshes and compression the look keys on, the model's
@@ -121,14 +121,15 @@ describe('the shipped GLB', () => {
     for (const m of json.meshes)
       for (const p of m.primitives)
         if (p.indices !== undefined) tris += json.accessors[p.indices].count / 3;
-    expect(tris).toBeGreaterThan(60_000);
-    expect(tris).toBeLessThan(80_000);
+    // The art-guide body: Tripo's smart mesh, the beast, its howdah and its rider.
+    expect(tris).toBeGreaterThan(10_000);
+    expect(tris).toBeLessThan(16_000);
     expect(statSync(GLB).size).toBeLessThan(4.5 * 1024 * 1024);
   });
 });
 
 describe('the look and the model agree with the sim', () => {
-  it('maps the template to the Blender body at its drawn size', () => {
+  it('maps the template to the art-guide body at its drawn size', () => {
     expect(visualKeyFor({ kind: 'mob', templateId: 'great_saurian' } as unknown as Entity)).toBe(
       'wildheart_great_saurian',
     );

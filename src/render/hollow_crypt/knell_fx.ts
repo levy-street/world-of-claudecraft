@@ -35,7 +35,7 @@ import {
   drapeFanOnCrag,
   resetCragDrape,
 } from './crag_fan_drape';
-import { anchorWorld, coneSpot, DRAKE_JAWS_EXHALE } from './crypt_creature_fx_core';
+import { anchorWorld, coneSpot, KNELLWYRM_JAWS_STRAFE } from './crypt_creature_fx_core';
 import { GHOST_RAMP } from './crypt_fx_particles';
 import {
   cragRimRadius,
@@ -482,7 +482,7 @@ export class KnellFx implements RitePainter {
     }
     if (!wyrm || wyrm.dead) return;
     const jaws = anchorWorld(
-      DRAKE_JAWS_EXHALE,
+      KNELLWYRM_JAWS_STRAFE,
       wyrm.pos.x,
       wyrm.pos.y,
       wyrm.pos.z,

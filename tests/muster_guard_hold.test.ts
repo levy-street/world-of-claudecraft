@@ -163,31 +163,15 @@ describe('combatIdleClamps', () => {
     expect(combatIdleClamps('walk', true)).toBe(false);
   });
 
-  it('is declared by every muster soldier rig, and on the Block raise', async () => {
+  it('is declared by no rig now the muster soldiers ride WOC bodies', async () => {
+    // The KayKit `Block` raise was the muster's; the soldiers moved onto the character
+    // pack's class bodies (npc_looks.ts MOB_LOOK_IDS), whose battle stance loops.
     vi.resetModules();
     vi.doUnmock('../src/render/assets/loader');
     const { VISUALS } = await import('../src/render/characters/manifest');
-    for (const key of [
-      'npc_muster_footman',
-      'npc_muster_sergeant',
-      'npc_muster_chaplain',
-      'npc_muster_captain',
-      'npc_muster_drillmaster',
-    ]) {
-      expect(VISUALS[key]?.clips.combatIdle, key).toBe('Block');
-      expect(VISUALS[key]?.clips.combatIdleHold, key).toBe(true);
-    }
-    // Nobody else changes: every other battle stance keeps looping.
     const holders = Object.entries(VISUALS)
       .filter(([, def]) => def.clips.combatIdleHold)
-      .map(([key]) => key)
-      .sort();
-    expect(holders).toEqual([
-      'npc_muster_captain',
-      'npc_muster_chaplain',
-      'npc_muster_drillmaster',
-      'npc_muster_footman',
-      'npc_muster_sergeant',
-    ]);
+      .map(([key]) => key);
+    expect(holders).toEqual([]);
   });
 });

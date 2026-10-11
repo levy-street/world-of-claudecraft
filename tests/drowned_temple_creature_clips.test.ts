@@ -1,8 +1,8 @@
-// The Drowned Temple's sixth-pass bodies (src/render/characters/manifest.ts):
-// Ysolei is the Codex-built serpent, every one of her clips riding a real
-// mechanic; the Ice Wraith ships five clips, each mapped; the
-// Colossus walks on its own gait. Each row names its clips so a new body is a
-// manifest swap.
+// The Drowned Temple's bodies (src/render/characters/manifest.ts): Ysolei is
+// the art guide's serpent, every one of her clips riding a real mechanic; the
+// Mere Hydra's one body keeps the bones and clips the pool drives; the Ice
+// Wraith ships five clips, each mapped; the Colossus walks on its own gait.
+// Each row names its clips so a new body is a manifest swap.
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -19,6 +19,7 @@ import {
   templeMoonspawnRises,
   templeSentinelShellGesture,
 } from '../src/render/drowned_temple/temple_fx_core';
+import { HYDRA_BODY } from '../src/sim/content/drowned_temple_layout';
 import { MOBS } from '../src/sim/data';
 import {
   COLOSSUS_MOONLIGHT_LANCE,
@@ -54,6 +55,7 @@ import {
   TEMPLE_TRIDENT_SWEEP,
 } from '../src/sim/mob/trash_kit/temple_cast_ids';
 import { TEMPLE_CARAPACE_AURA } from '../src/sim/mob/trash_kit/temple_kit';
+import { clipLength, posedNodes } from './helpers/posed_glb';
 
 function clipsOf(path: string): string[] {
   const buf = readFileSync(path);
@@ -70,13 +72,34 @@ interface GlbJson {
   skins?: { joints: number[] }[];
   materials?: { name?: string; emissiveTexture?: unknown }[];
   meshes?: { primitives: { indices?: number }[] }[];
-  accessors?: { count: number }[];
+  accessors?: { count: number; max?: number[] }[];
+  nodes?: { name?: string; children?: number[] }[];
+  animations?: {
+    name: string;
+    samplers: { input: number }[];
+    channels: { target: { node?: number; path: string } }[];
+  }[];
 }
 
 function glbJson(path: string): GlbJson {
   const buf = readFileSync(path);
   const len = buf.readUInt32LE(12);
   return JSON.parse(buf.subarray(20, 20 + len).toString('utf8')) as GlbJson;
+}
+
+/** A clip's length in seconds (its samplers' last key time). */
+function clipSeconds(path: string, clip: string): number {
+  const j = glbJson(path);
+  const anim = (j.animations ?? []).find((a) => a.name === clip);
+  expect(anim, clip).toBeDefined();
+  return Math.max(...(anim?.samplers ?? []).map((s) => j.accessors?.[s.input]?.max?.[0] ?? 0));
+}
+
+/** The name of the node that parents `name`. */
+function parentOf(path: string, name: string): string | undefined {
+  const nodes = glbJson(path).nodes ?? [];
+  const i = nodes.findIndex((n) => n.name === name);
+  return nodes.find((n) => (n.children ?? []).includes(i))?.name;
 }
 
 /** Triangles the GLB draws (every indexed primitive of every mesh). */
@@ -93,9 +116,9 @@ function visualOf(templateId: string) {
   return VISUALS[visualKeyFor({ kind: 'mob', templateId } as never)];
 }
 
-describe('Ysolei: the Codex serpent on every mechanic', () => {
-  it('ships its ten original clips', () => {
-    expect(clipsOf('public/models/creatures/temple_ysolei.glb').sort()).toEqual(
+describe("Ysolei: the art guide's serpent on every mechanic", () => {
+  it('ships her ten clips', () => {
+    expect(clipsOf('public/models/creatures/woc_temple_ysolei.glb').sort()).toEqual(
       [
         'Bite',
         'Death',
@@ -127,6 +150,73 @@ describe('Ysolei: the Codex serpent on every mechanic', () => {
     expect(v.tint).toBeUndefined();
     // Drawn at native scale: about 24 world units, seven players to her head.
     expect(v.height * (MOBS.ysolei.scale ?? 1)).toBeCloseTo(23.97, 1);
+  });
+
+  it('swings with weight, her jaws carrying the Lunar Tide light', () => {
+    const path = 'public/models/creatures/woc_temple_ysolei.glb';
+    const v = visualOf('ysolei');
+    // Her bite and her tail sweep: 1.5 s at 1x, the blow on frame 18.
+    expect(v.attackTimeScale).toBe(1);
+    for (const clip of ['Bite', 'Tail_Sweep']) {
+      expect(v.clips.contacts?.[clip], clip).toEqual([0.567]);
+      expect(clipSeconds(path, clip), clip).toBeCloseTo(1.5, 2);
+    }
+    // temple_ysolei_fx.ts gathers the light in her jaws on this bone.
+    expect(parentOf(path, 'Mouth_VFX')).toBe('head');
+    // The Undertow's channel plays out its crash after the 3 s bar.
+    expect(clipSeconds(path, 'Undertow')).toBeGreaterThan(3);
+  });
+});
+
+describe("the Mere Hydra: the art guide's three-necked body at the pool", () => {
+  const path = 'public/models/creatures/woc_temple_hydra.glb';
+
+  it('is the body temple_hydra.ts draws and the heads click on', () => {
+    const src = readFileSync('src/render/drowned_temple/temple_hydra.ts', 'utf8');
+    expect(src).toContain("MERE_HYDRA_URL = '/models/creatures/woc_temple_hydra.glb'");
+    expect(VISUALS.temple_hydra_head.url.endsWith('/woc_temple_hydra.glb')).toBe(true);
+  });
+
+  it('stands its heads as tall over the water as the body it replaced', async () => {
+    // The old body's heads averaged 13.87 model yards over the water through
+    // its Idle at the pool's old 1.15, about 15.95 drawn (Reuben 2026-10-11: a
+    // remade boss keeps its height). Sampled through the new Idle at the pool's scale.
+    const len = await clipLength(path, 'Idle');
+    const heads = ['head_L', 'head_C', 'head_R'];
+    const ys: number[] = [];
+    for (const f of [0, 0.25, 0.5, 0.75]) {
+      const p = await posedNodes(path, 'Idle', len * f, heads);
+      for (const h of heads) ys.push(p[h].pos[1] * HYDRA_BODY.scale);
+    }
+    const mean = ys.reduce((a, b) => a + b, 0) / ys.length;
+    expect(mean).toBeGreaterThan(15.65);
+    expect(mean).toBeLessThan(16.25);
+  });
+
+  it('ships the seven whole-body clips the pool drives', () => {
+    expect(clipsOf(path).sort()).toEqual(
+      ['Brine_Spit', 'Death', 'Emerge', 'Hit', 'Idle', 'Snap', 'Tide_Breath'].sort(),
+    );
+    // Snap answers a head's bite as it lands, so its strike comes early.
+    expect(clipSeconds(path, 'Snap')).toBeLessThan(1.25);
+  });
+
+  it('keeps the neck chains, the heads, jaws and breath sockets the fx key on', () => {
+    const names = new Set((glbJson(path).nodes ?? []).map((n) => n.name));
+    for (const s of ['L', 'C', 'R']) {
+      for (let i = 1; i <= 7; i++)
+        expect(names.has(`neck_${s}_0${i}`), `neck_${s}_0${i}`).toBe(true);
+      expect(parentOf(path, `head_${s}`)).toBe(`neck_${s}_07`);
+      expect(parentOf(path, `jaw_${s}`)).toBe(`head_${s}`);
+      expect(parentOf(path, `Socket_Breath_${s}`)).toBe(`head_${s}`);
+    }
+  });
+
+  it('carries vertex colours for the element tint on its necks', () => {
+    const prims = (glbJson(path).meshes ?? []).flatMap(
+      (m) => m.primitives as { attributes?: Record<string, number> }[],
+    );
+    expect(prims.some((p) => p.attributes?.COLOR_0 !== undefined)).toBe(true);
   });
 });
 
@@ -175,7 +265,7 @@ describe('the Ice Wraith and the Colossus', () => {
 
   it('the walking Colossus keeps its body at the old size under its larger reach', () => {
     const v = visualOf('tideglass_colossus');
-    expect(clipsOf('public/models/creatures/temple_colossus.glb')).toEqual(
+    expect(clipsOf('public/models/creatures/woc_temple_colossus.glb')).toEqual(
       expect.arrayContaining(['Walk', 'Run']),
     );
     expect(v.clips.walk).toBe('Walk');
@@ -184,20 +274,26 @@ describe('the Ice Wraith and the Colossus', () => {
     expect(v.height * (MOBS.tideglass_colossus.scale ?? 1)).toBeCloseTo(16.7, 3);
   });
 
-  it('the recut sea-glass Colossus ships its glowing seams and glossy facets in budget', () => {
-    const path = 'public/models/creatures/temple_colossus.glb';
-    const body = glbJson(path).materials?.find((m) => m.name === 'TideglassColossusBody');
-    // the seams, cracks, slits and prism glow through the baked emissive map
-    expect(body?.emissiveTexture).toBeDefined();
+  it('the art-guide Colossus lands its blows on frame 18 and spans each bar with its clip', () => {
+    const path = 'public/models/creatures/woc_temple_colossus.glb';
+    const v = visualOf('tideglass_colossus');
     // the env boost the Reflections' glass uses runs the light across its facets
-    expect(visualOf('tideglass_colossus').envMapIntensity).toBe(2.2);
-    expect(trianglesOf(path)).toBeGreaterThan(30000);
-    expect(trianglesOf(path)).toBeLessThan(42000);
+    expect(v.envMapIntensity).toBe(2.2);
+    // its fists: 1.5 s at 1x, the blow on frame 18
+    expect(v.attackTimeScale).toBe(1);
+    for (const clip of ['Attack', 'Attack2']) {
+      expect(v.clips.contacts?.[clip], clip).toEqual([0.567]);
+      expect(clipSeconds(path, clip), clip).toBeCloseTo(1.5, 2);
+    }
+    // the bars are clip-synced and each clip is its bar long, the blow on its end
+    expect(clipSeconds(path, 'Flare')).toBeCloseTo(COLOSSUS_TUNING.flareCast, 2);
+    expect(clipSeconds(path, 'Lance')).toBeCloseTo(COLOSSUS_TUNING.lanceCast, 2);
+    expect(clipSeconds(path, 'Slam')).toBeCloseTo(COLOSSUS_TUNING.slamCast, 2);
   });
 
   it('the rebuilt sea-glass Colossus answers each of its bars with its own clip', () => {
     const v = visualOf('tideglass_colossus');
-    expect(clipsOf('public/models/creatures/temple_colossus.glb').sort()).toEqual(
+    expect(clipsOf('public/models/creatures/woc_temple_colossus.glb').sort()).toEqual(
       [
         'Attack',
         'Attack2',
@@ -559,7 +655,7 @@ describe('the Pearlguard Sentinel: the Moonmantle Ray', () => {
 
 describe('Choirmother Selthe: the siren matriarch and her fan', () => {
   it('ships her own body with a clip for every mechanic', () => {
-    expect(clipsOf('public/models/creatures/temple_selthe.glb').sort()).toEqual(
+    expect(clipsOf('public/models/creatures/woc_temple_selthe.glb').sort()).toEqual(
       [
         'Attack',
         'Attack2',
@@ -572,25 +668,39 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
         'Idle',
         'Run',
         'SeaSong',
-        'Slap',
         'Solo',
         'Surge',
         'Walk',
       ].sort(),
     );
     const v = visualOf('choirmother_selthe');
-    expect(v.url).toMatch(/temple_selthe\.glb$/);
+    expect(v.url).toMatch(/woc_temple_selthe\.glb$/);
     expect(v.authoredAtlas).toBe(true);
     // Drawn 9.0 at her 1.15: about 3.5 players.
     expect(v.height * (MOBS.choirmother_selthe.scale ?? 1)).toBeCloseTo(9.0, 1);
   });
 
-  it('wears her round-two body baked, her bars and eyes in the emissive map, in budget', () => {
-    const path = 'public/models/creatures/temple_selthe.glb';
-    const body = glbJson(path).materials?.find((m) => m.name === 'ChoirmotherSeltheBody');
-    expect(body?.emissiveTexture).toBeDefined();
-    expect(trianglesOf(path)).toBeGreaterThan(45000);
-    expect(trianglesOf(path)).toBeLessThan(60000);
+  it('folds and flares her fan on its own bone and lies her tail along the floor', () => {
+    const path = 'public/models/creatures/woc_temple_selthe.glb';
+    const j = glbJson(path);
+    const fan = (j.nodes ?? []).findIndex((n) => n.name === 'fan');
+    expect(parentOf(path, 'fan')).toBe('chest');
+    // Chorus folds the fan in and Solo flings it wide: both scale its bone.
+    for (const clip of ['Chorus', 'Solo']) {
+      const anim = j.animations?.find((a) => a.name === clip);
+      expect(
+        anim?.channels.some((c) => c.target.node === fan && c.target.path === 'scale'),
+        clip,
+      ).toBe(true);
+    }
+    // The serpent tail: a chain of eight from the hips to the fluke.
+    expect(parentOf(path, 'tail.1')).toBe('hips');
+    expect(parentOf(path, 'tail.8')).toBe('tail.7');
+    // The bolt and the surge land on their bars' ends and play their
+    // follow-through out after; the song spans its bar.
+    expect(clipSeconds(path, 'Bolt')).toBeGreaterThan(SELTHE_TUNING.boltCast);
+    expect(clipSeconds(path, 'Surge')).toBeGreaterThan(SELTHE_TUNING.surgeCast);
+    expect(clipSeconds(path, 'SeaSong')).toBeCloseTo(SELTHE_TUNING.songCast, 2);
   });
 
   it('casts water on her bars (no hand swings) and answers each mark with its gesture', () => {
@@ -713,8 +823,9 @@ describe('the pilgrim frenzy cue rides the real enrage', () => {
 describe('the trash pass second wave plays on the casters own clips', () => {
   it('the volley, the shout and the song each have their clip', () => {
     const adept = VISUALS.crypt_skel_adept.clips;
-    expect(adept.castByAbility?.[CRYPT_GRAVESPARK_VOLLEY]).toBe('Spellcast_Raise');
-    expect(adept.castTimeScaleByAbility?.[CRYPT_GRAVESPARK_VOLLEY]).toBe(0.6);
+    // the adept's own art-guide body: Volley is authored at the 3 s bar, played at rate 1
+    expect(adept.castByAbility?.[CRYPT_GRAVESPARK_VOLLEY]).toBe('Volley');
+    expect(adept.castTimeScaleByAbility?.[CRYPT_GRAVESPARK_VOLLEY] ?? 1).toBe(1);
     expect(VISUALS.bastion_skel_sergeant.clips.castByAbility?.[BASTION_LOOSE_ON_MY_MARK]).toBe(
       'Rally',
     );

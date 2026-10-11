@@ -168,6 +168,11 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
     }
     if (att.position) prop.position.set(att.position[0], att.position[1], att.position[2]);
     if (att.rotationY) prop.rotation.y = att.rotationY;
+    // The prop's own size about the hand, as the game draws it (assets.ts attachProp).
+    if (att.size !== undefined && att.size !== 1) {
+      prop.position.multiplyScalar(att.size);
+      prop.scale.multiplyScalar(att.size);
+    }
     bone.add(prop);
   }
 

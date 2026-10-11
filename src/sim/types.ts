@@ -2712,6 +2712,9 @@ export interface MobTemplate {
     chainDelay: number;
     proximityRadius: number;
     hatchMobId: string;
+    /** The school of the burst the shell breaks in (default 'fire', the
+     *  dragonkin egg; the Hollow Crypt's rime egg sac bursts in frost). */
+    burstSchool?: Aura['school'];
   };
   // Dragonkin whelp behavior: on hatch it pounces, a `leapSeconds` burst at
   // `leapSpeedMult` x move speed toward its victim, and its first landed

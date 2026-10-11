@@ -188,9 +188,14 @@ describe('composed player defs nobody can reach stay out of the boot download', 
     // A held prop attaches synchronously at build, and a WOC def is lazy for its base and
     // library only. The warlock's wand is the case that needs the rule: nothing else in the
     // boot set asks for it, so without the rule it would be gone (shown by taking the rule's
-    // input away: the same sweep over warlock defs that are not WOC bodies).
+    // input away: the same sweep over warlock defs that are not WOC bodies). The Tideglass
+    // Colossus's warlock Reflection is a copy of the warlock's WOC body, so it goes too.
     const wand = 'models/weapons/wand.glb';
-    const warlocks = [VISUALS.player_warlock, VISUALS.player_warlock_female];
+    const warlocks = [
+      VISUALS.player_warlock,
+      VISUALS.player_warlock_female,
+      VISUALS.temple_reflection_warlock,
+    ];
     for (const def of warlocks) expect(def.attach?.map((a) => a.url)).toContain(wand);
     expect(boot.has(wand)).toBe(true);
     const manifests = warlocks.map((def) => def.wocCharacter);

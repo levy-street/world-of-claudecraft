@@ -62,17 +62,31 @@ export const MORTHEN_REAP_SWEEP = 'crypt_morthen_reap_sweep';
 // the flags and the smoke still boils out round him. One constant drives the
 // manifest's `hover`, every body anchor below and the corpse's rise.
 
-/** The build's MINZ (build_morthen.py): the rig's lowest point over its
- *  origin half a second into Idle (the smoke funnel's tip). */
-export const MORTHEN_REST_MINZ = 0.122;
-/** How deep (authored yards) his smoke funnel sinks under the floor. */
-export const MORTHEN_SINK = 1.3;
+/** The rig's lowest point over its origin half a second into Idle (the smoke
+ *  funnel's tip), in authored yards: the art guide's body draws 2.28 yd per rig
+ *  unit at its manifest `height`, and the tip sits 0.073 units up. */
+export const MORTHEN_REST_MINZ = 0.166;
+/** How deep (authored yards) his smoke funnel sinks under the floor: most of
+ *  it, so the lowest tatters of his robe still float clear of the flags (rig
+ *  1.23, about 0.4 yd up at his 1.35) over the smoke's last wisps. */
+export const MORTHEN_SINK = 0.92;
 /** The manifest's `hover` for crypt_morthen_lich (the funnel tip this far
  *  under the pivot). */
 export const MORTHEN_HOVER = MORTHEN_REST_MINZ - MORTHEN_SINK;
 /** Where the rig's origin sits over his pivot (authored yards): every body
  *  anchor below is measured in the rig's own frame and lifted by this. */
 export const MORTHEN_RIG_Y = MORTHEN_HOVER - MORTHEN_REST_MINZ;
+
+/** How much larger than his authored rig he is drawn, over his template scale:
+ *  grown so he stands as tall over the flags as the body he replaced (7.85 yd at
+ *  his 1.35; the authored rig alone stood 6.88), his mitre eye 6.8 yd up. */
+export const MORTHEN_GROWTH = 1.14;
+
+/** World yards per authored yard for a Morthen of template `scale`: what every
+ *  body anchor below is multiplied by. */
+export function morthenDrawScale(scale: number): number {
+  return (scale || 1) * MORTHEN_GROWTH;
+}
 
 /** The lowest an emitter on his body may sit over the floor under him (his
  *  smoke base is under the floor now: it boils out at the flags instead). */
@@ -81,15 +95,18 @@ export function morthenEmitY(anchorY: number, floorY: number, scale: number): nu
 }
 
 // ---- the body, measured off the Blender rig (authored yards, x right, y up, z forward) ----
-/** The soul fire caged in his ribs. */
-export const MORTHEN_RIBS = { x: 0, y: 3.45, z: 0.16 } as const;
-/** The slit eye of soul fire on his mitre's front plate (rest pose; the v2
- *  body dropped the shoulder candles, so the sparks rise off the mitre). */
-export const MORTHEN_MITRE_EYE = { x: 0, y: 5.3, z: 0.32 } as const;
+/** The soul fire caged in his ribs (the green glow under the cope's clasp). */
+export const MORTHEN_RIBS = { x: 0, y: 4.15, z: 0.36 } as const;
+/** The green eye on his mitre's front plate (rest pose; the sparks rise off it). */
+export const MORTHEN_MITRE_EYE = { x: 0, y: 5.34, z: 0.46 } as const;
 /** The base of the smoke he trails. */
 export const MORTHEN_SMOKE_BASE = { x: 0, y: 0.6, z: 0 } as const;
-/** The reach of his scythe from his centre (the trail's radius). */
-export const MORTHEN_SCYTHE_REACH = 4.2;
+/** The reach of his scythe from his centre (the trail's radius): the blade's
+ *  tip crosses his front 1.8 to 2.8 yd out. */
+export const MORTHEN_SCYTHE_REACH = 2.5;
+/** The rig-frame height (authored yards) both reaps cross his front at: he
+ *  stoops into the cut, so the blade passes at a player's chest. */
+export const MORTHEN_SCYTHE_Y = 2.5;
 
 /** A body point in the world: authored (rig-frame) offset lifted onto his
  *  pivot (MORTHEN_RIG_Y, the sink), scaled, turned by his facing. */
@@ -113,22 +130,27 @@ export function morthenBodyY(pivotY: number, rigY: number, scale: number): numbe
   return pivotY + (rigY + MORTHEN_RIG_Y) * scale;
 }
 
-// ---- timings (seconds; the clips are keyed at 24 fps) -----------------------------------------
-/** The blade leaves the crest this long into the Transform clip (frames 15 to 25). */
+// ---- timings (seconds; the clips are keyed at 30 fps, frame 1 at 0 s) ---------------------------
+/** The blade leaves the crest this long into the Transform clip (frames 22 to 34). */
 export const TRANSFORM_UNFOLD_SEC = 0.85;
-/** The great reaping arc that ends the unfolding lands across his front (frame 54). */
+/** The great reaping arc that ends the unfolding lands across his front (frame 67). */
 export const TRANSFORM_SLAM_SEC = 2.2;
-/** A melee swing's cut (frames 9 to 16 at the default 1.3 attack rate), after the hit event. */
+/** A melee swing's cut (frames 10 to 21 at the default 1.3 attack rate), after the hit event. */
 export const SWING_CUT_START_SEC = 0.24;
 export const SWING_CUT_SEC = 0.28;
-/** The staff strike's bell meets its victim (frame 14 at 1.3). */
+/** The staff strike's ring head meets its victim (frame 17 at 1.3). */
 export const STAFF_STRIKE_SEC = 0.42;
 /** The dissolve after death: the smoke rises and the souls leave for this long. */
 export const DISSOLVE_SEC = 3.2;
 /** As he falls, the body is lifted back out of the floor by the sink, over
- *  this share of his Death clip (from the jolt at frame 7 to the heap at
- *  frame 32 of 60), so the folded vestments come to rest ON the flags. */
-export const MORTHEN_DEATH_LIFT = { yards: MORTHEN_SINK, from: 0.1, to: 0.55 } as const;
+ *  this share of his Death clip (from the reel at frame 7 to the heap at
+ *  frame 42 of 75), so the folded vestments come to rest ON the flags. In the
+ *  manifest's units (his authored yards grown by MORTHEN_GROWTH). */
+export const MORTHEN_DEATH_LIFT = {
+  yards: MORTHEN_SINK * MORTHEN_GROWTH,
+  from: 0.1,
+  to: 0.55,
+} as const;
 
 /** How far round its arc a swing's trail has cut `t` seconds after the hit
  *  (null before it starts and after it fades). `head` is the leading edge,
@@ -149,7 +171,7 @@ export const MORTHEN_SOUL_COUNT = 6;
 /** The orbit's radius at rest (authored yards); a cast draws it wider. */
 export const MORTHEN_SOUL_RADIUS = 1.6;
 /** The orbit's mean height (authored yards), about his ribs. */
-export const MORTHEN_SOUL_HEIGHT = 3.3;
+export const MORTHEN_SOUL_HEIGHT = 4.0;
 
 /**
  * Where soul `k` flies `t` seconds in, as an authored offset from his centre (x right,

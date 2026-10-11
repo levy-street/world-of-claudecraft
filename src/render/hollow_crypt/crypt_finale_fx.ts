@@ -62,6 +62,7 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
+import { anchorWorld, KNELLWYRM_JAWS_STRAFE } from './crypt_creature_fx_core';
 import {
   isKnellLaneTemplate,
   laneBurn,
@@ -1010,11 +1011,19 @@ export class CryptFinaleFx {
       });
     }
     if (!wyrm || wyrm.castingAbility !== KNELLWYRM_STRAFE_RUN) return;
-    // The run: fire poured from the jaws down onto the lane under and behind it.
-    const s = wyrm.scale || 1;
-    const jx = wyrm.pos.x + Math.sin(wyrm.facing) * 7.5 * s;
-    const jz = wyrm.pos.z + Math.cos(wyrm.facing) * 7.5 * s;
-    const jy = wyrm.pos.y + 5 * s;
+    // The run: fire poured from the jaws down onto the lane under and behind it
+    // (the Strafe clip's plunged jaws).
+    const jaws = anchorWorld(
+      KNELLWYRM_JAWS_STRAFE,
+      wyrm.pos.x,
+      wyrm.pos.y,
+      wyrm.pos.z,
+      wyrm.facing,
+      wyrm.scale || 1,
+    );
+    const jx = jaws.x;
+    const jz = jaws.z;
+    const jy = jaws.y;
     const n = 260 * this.density * dt;
     for (let i = 0; i < Math.floor(n + this.rand()); i++) {
       const tx = jx + (this.rand() - 0.5) * 4;

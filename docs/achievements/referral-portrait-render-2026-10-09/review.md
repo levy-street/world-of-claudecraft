@@ -25,7 +25,7 @@ the earlier environment reproduced them.
 All 355 mob images and 24 finder thumbnails changed bytes; three finder images
 are byte-identical. No image is missing or changes dimensions. `comparison.json`
 records every old/new SHA-256 and the RGBA channel differences for all 382 images.
-The maximum mean absolute channel difference is 1.111268 on the 0–255 scale.
+The maximum mean absolute channel difference is 1.111268 on the 0 to 255 scale.
 
 All 379 changed before/after pairs were visually reviewed in the ten
 [contact sheets](../../screenshots/referral-portrait-render-2026-10-09/).

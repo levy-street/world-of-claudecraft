@@ -91,7 +91,6 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mob_tolling_bell',
   'mob_training_dummy',
   'mob_wildheart_hexcaller',
-  'mob_wildheart_high_priest',
   'mob_wildheart_ravager',
   'mob_wildheart_stalker',
   'mob_yumi_cat',
@@ -228,12 +227,39 @@ const AUTHORED_ATLAS_DEFS = [
   'bastion_drowned_anchor',
   'bastion_turnkey',
   'crypt_morthen_lich',
-  // the Hollow Crypt's Blender Sexton Marrow (the skeletal gravedigger)
+  // the Hollow Crypt's bosses on the art guide's models: Sexton Marrow (the skeletal
+  // gravedigger), the Lady of the Bonechill (the frozen bride's ghost), Cantor Ilvane
+  // (the skeletal choir mistress), and the rime egg sacs the Lady's spiders hatch from
   'crypt_skel_sexton',
-  // the Hollow Crypt's Lady of the Bonechill (the frozen bride's ghost)
   'crypt_lady_bonechill',
-  // the Hollow Crypt's Blender Cantor Ilvane (the skeletal choir mistress)
   'crypt_skel_cantor',
+  'crypt_rime_egg_sac',
+  // the art guide's skeleton minion (Tripo P2, rigged in Blender) on its three keys
+  'skel_minion',
+  'delve_skel_wraith',
+  'crypt_skel_minion',
+  // the Sunken Bastion's Blender crawler and the Stormbrass Foundry's turretback, flagged in
+  // manifest.ts on the v0.45.0 integration and listed here late
+  'bastion_crawler',
+  'mob_turretback',
+  // the Drowned Temple's Reflections: copies of the WOC class bodies (their flag
+  // comes with the body they spread)
+  'temple_reflection_druid',
+  'temple_reflection_hunter',
+  'temple_reflection_mage',
+  'temple_reflection_paladin',
+  'temple_reflection_priest',
+  'temple_reflection_rogue',
+  'temple_reflection_shaman',
+  'temple_reflection_warlock',
+  'temple_reflection_warrior',
+  // the art guide's Hollow Crypt trash bodies (Tripo P2, rigged in Blender)
+  'crypt_skel_warrior',
+  'crypt_skel_adept',
+  'crypt_skel_necromancer',
+  'crypt_skel_cutthroat',
+  'crypt_skel_brute',
+  'crypt_skel_chorister',
   // the Gravewyrm Sanctum's three Blender bosses (characters/sanctum_boss_looks.ts)
   'sanctum_korgath',
   'sanctum_velkhar',
@@ -270,6 +296,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_moonspawn',
   // the Drowned Temple's Ice Wraith (a Tripo sculpt)
   'temple_ice_wraith',
+  // the Mere Hydra's one body, the art guide's model (its heads' look renders the portraits)
+  'temple_hydra_head',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   // the Gravewyrm Sanctum trash's Blender bodies (sanctum_trash_looks.ts)
@@ -294,8 +322,11 @@ const AUTHORED_ATLAS_DEFS = [
   'form_toad',
   // the Blender Sunbone Totem-Binder (scripts/assets/wildheart_totem_binder)
   'wildheart_totem_binder',
-  // the Fanglord Beastmaster's Blender body (scripts/assets/wildheart_beastmaster)
+  // the Fanglord Beastmaster's art-guide body (scripts/assets/specs/woc_basin_beastmaster.json)
   'mob_wildheart_beastmaster',
+  // Zulgar's art-guide body and the Great Jaguar's jade spirit (the Fanglord's Whistle pet)
+  'mob_wildheart_high_priest',
+  'wildheart_spirit_jaguar',
   'wildheart_sunbone_totem',
   // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
   'wildheart_sunbone_dread_totem',

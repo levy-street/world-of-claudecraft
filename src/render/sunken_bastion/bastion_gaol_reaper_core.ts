@@ -90,9 +90,9 @@ export const ANCHOR_SETTLE_SECONDS = OSSICK_TUNING.anchorSettle;
 
 // ---- the Fog Veil's emergence -------------------------------------------------------
 
-/** Vael's Emerge clip (scripts/assets/sunken_bastion_creatures/reaper.py: keys
- *  1 to 15 at 24 fps), shared by the Reaping Scythe's rise and the veil's. */
-export const VAEL_EMERGE_CLIP_SECONDS = 15 / 24;
+/** Vael's Emerge clip (the art guide's body: keys 1 to 20 at 30 fps), shared by
+ *  the Reaping Scythe's rise and the veil's. */
+export const VAEL_EMERGE_CLIP_SECONDS = 19 / 30;
 /** The rate that plays Emerge ONCE over the veil's rise bar (the clip is half
  *  the bar: at rate 1 it looped, the figure rising, dropping back under the
  *  flags and rising again). */

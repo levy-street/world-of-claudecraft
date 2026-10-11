@@ -92,6 +92,7 @@ import {
 } from '../../sim/ignivar_raid_ids';
 import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_miniboss_stomp';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
+import { SUMMON_RISE_CUE } from '../../sim/mob/summon_rise';
 import {
   BASTION_BOATHOOK,
   BASTION_BRINE_MEND,
@@ -172,6 +173,7 @@ import {
 } from '../hoard_boss_gestures_core';
 import {
   MORTHEN_DEATH_LIFT,
+  MORTHEN_GROWTH,
   MORTHEN_HOVER,
   MORTHEN_REAP_SWEEP,
   MORTHEN_SCYTHE_HELD,
@@ -484,7 +486,8 @@ export interface AttachDef {
   swapOnly?: boolean;
   /** The size the prop draws at about its hand, on top of its model's own fit: set by the
    *  swap path from the equipped ITEM (held_item_size_core.ts: a common or uncommon weapon
-   *  draws a fifth smaller). Absent is 1. */
+   *  draws a fifth smaller), or authored on a fixed attach whose rig is not the WOC bodies'
+   *  scale (WOC_CRYPT_PROP_SIZE). Absent is 1. */
   size?: number;
 }
 
@@ -2431,6 +2434,9 @@ const MORTHEN_STAFF_CLIPS: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['StaffStrike', 'StaffStrike2'],
+  // The overhead smash and the backhand bash land on frame 17 of 30 fps clips; the
+  // flinch and the number wait for the crozier.
+  contacts: { StaffStrike: [0.533], StaffStrike2: [0.533] },
   attackByAbility: { [MORTHEN_TOLL]: 'BellToll' },
   attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1 },
   hit: ['Hit'],
@@ -2451,15 +2457,57 @@ const MORTHEN_SCYTHE_CLIPS: ClipMap = {
   walk: 'ScytheWalk',
   run: 'ScytheRun',
   attack: ['ScytheSweep', 'ScytheSweep2'],
+  // Both reaps cross his front on frame 17 of 30 fps clips.
+  contacts: { ScytheSweep: [0.533], ScytheSweep2: [0.533] },
   // Reap the Unquiet: the bar winds the blade up (ScytheSummon, the scythe
   // raised over the souls), the landing brings it round in the flat sweep, fast
-  // (its cut at frame 14 lands about 0.3 s after the hit).
+  // (its cut across his front at frame 17 lands about 0.3 s after the hit).
   attackByAbility: { [MORTHEN_TOLL]: 'ScytheToll', [MORTHEN_REAP_SWEEP]: 'ScytheSweep' },
   attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1, [MORTHEN_REAP_SWEEP]: 1.9 },
   hit: ['ScytheHit'],
   death: 'ScytheDeath',
   cast: 'ScytheSummon',
   castByAbility: { [MORTHEN_REAP]: 'ScytheSummon' },
+};
+
+// The held-prop size on the art guide's crypt bodies. Their rigs stand about 1.9 units
+// tall natively, where a WOC body stands 1.15 with a handslot that draws props at 0.46:
+// 0.46 x 1.9 / 1.15 is 0.76, so a sword sits in their fist at the size a WOC body holds it.
+const WOC_CRYPT_PROP_SIZE = 0.76;
+
+// The skeleton minion remade through the art guide (scripts/assets/specs/
+// woc_skeleton_minion.json): a T-pose concept, Tripo Smart Mesh P2.0, and a 31-bone
+// rig built for this mesh with every clip animated for it in Blender at 30 fps. It
+// fights unarmed, as the KayKit minion did (handslot.l/.r are there for a weapon).
+// Walk and Run are authored at their ground speeds (1.44 and 4.31 raw units/s, scaled
+// by height over the 1.797 posed idle height), so a wander and a full chase stay
+// inside the cadence clamps. Death collapses it into a heap of bones; Awaken (the
+// flourish: a respawn, Reassemble, a summon) pulls the heap back onto its feet and
+// ends on Idle, and a boss's summoned minions rise on it too. Cast is a raised-hands
+// conjuring loop for the cast bars.
+const WOC_SKELETON_MINION: VisualDef = {
+  url: `${CREATURES}/woc_skeleton_minion.glb`,
+  height: 2.5,
+  clips: {
+    idle: 'Idle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Attack'],
+    hit: ['React'],
+    death: 'Death',
+    flourish: 'Awaken',
+    cast: 'Cast',
+    // a summoned minion rises the same way (sim/mob/summon_rise.ts, summon_rise_fx.ts)
+    entrance: 'Awaken',
+  },
+  entranceGesture: SUMMON_RISE_CUE,
+  // its first swing never cuts the rise short
+  oneShotsHoldAttacks: ['Awaken'],
+  walkRef: 2.0,
+  runRef: 6.0,
+  authoredAtlas: true,
+  tint: 'entity',
+  tintStrength: 0.25,
 };
 
 export const VISUALS: Record<string, VisualDef> = {
@@ -4370,15 +4418,8 @@ export const VISUALS: Record<string, VisualDef> = {
   },
 
   // -- delve-specific variants (same rigs, colour-differentiated via mob.color) -
-  delve_skel_wraith: {
-    // Ledger Wraith: pale skeleton, no weapon, stronger wash reads as near-transparent
-    url: `${ENEMIES}/skeleton_minion.glb`,
-    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
-    height: 2.5,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    tint: 'entity',
-    tintStrength: 0.55,
-  },
+  // Ledger Wraith: the minion, pale; a stronger wash reads as near-transparent
+  delve_skel_wraith: { ...WOC_SKELETON_MINION, tintStrength: 0.55 },
   delve_skel_ringer: {
     // Funeral Ringer: skeleton rogue rig, cloth-brown tint at mid strength
     url: `${ENEMIES}/skeleton_rogue.glb`,
@@ -4425,17 +4466,11 @@ export const VISUALS: Record<string, VisualDef> = {
   },
 
   // -- undead (KayKit skeletons, shared 41-joint rig) ------------------------
-  skel_minion: {
-    url: `${ENEMIES}/skeleton_minion.glb`,
-    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
-    height: 2.5,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    tint: 'entity',
-    tintStrength: 0.25,
-  },
+  // The minion is the art guide's own skeleton now (WOC_SKELETON_MINION above).
+  skel_minion: WOC_SKELETON_MINION,
   // The Bonebound Rickshaw's puller ONLY: a separate key on its own rebuilt
   // rig (see RICKSHAW_PULLER_CLIPS above for why it is a separate GLB from
-  // skeleton_minion.glb, which skel_minion above still uses unchanged, no
+  // skeleton_minion.glb, which skel_minion above used, no
   // regression to any of its own consumers).
   //
   // 2.166 is a DELIBERATE ART CHOICE, not a measurement, and it is the one
@@ -4547,20 +4582,44 @@ export const VISUALS: Record<string, VisualDef> = {
   },
 
   // -- the Hollow Crypt trash (sim/content/hollow_crypt_trash.ts) ----------------
-  // The KayKit skeletons with the trash kit's casts on their own gestures: the
-  // Grave Cleave winds up the two-hand chop over its bar, the Raise Bones
-  // channel lifts both arms, the Grave Bolt is the shooting cast.
+  // The crypt's skeletons are the art guide's models (concept, Tripo P2, a skeleton
+  // and every clip built from scratch in Blender), each with the trash kit's casts on
+  // its own gestures. Their painted atlas carries its own colour, so they draw it
+  // untinted; the yellow cast Tripo baked into the bone is pulled to neutral before
+  // compression (scripts/assets/neutralize_warm_albedo.mjs).
+  //
+  // The Ossuary Warrior: an ossuary guard in rusted plate studded with skulls and
+  // bones, an iron sword in its right hand. Attack is the overhead chop, Attack2 the
+  // diagonal slice. Cleave is Grave Cleave: both hands take the hilt, the sword hangs
+  // overhead straining while the 1.6 s bar fills and falls into the ground on the
+  // bar's end (frame 49, bar-locked), then the recovery plays out. Death crumples it
+  // onto its back and the helmed skull rolls clear: that corpse is Reassemble's bone
+  // pile, and Awaken (the flourish on the dead-to-alive edge) rolls the skull back
+  // and hauls the body up to Idle. Walk and Run are authored at 1.37 and 4.2 raw
+  // units/s over the 1.819 posed idle height. The sword's size matches the WOC
+  // bodies' hold (their handslot draws props at 0.46 on a body 1.15 units tall).
   crypt_skel_warrior: {
-    url: `${ENEMIES}/skeleton_warrior.glb`,
-    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
+    url: `${CREATURES}/woc_crypt_ossuary_warrior.glb`,
     height: 3.3,
     clips: {
-      ...skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-      castByAbility: { [CRYPT_GRAVE_CLEAVE]: '2H_Melee_Attack_Chop' },
-      castTimeScaleByAbility: { [CRYPT_GRAVE_CLEAVE]: 0.7 },
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['React'],
+      death: 'Death',
+      flourish: 'Awaken',
+      castByAbility: { [CRYPT_GRAVE_CLEAVE]: 'Cleave' },
+      castPlayOut: ['Cleave'],
     },
-    tint: 'entity',
-    tintStrength: 0.25,
+    castClipSync: [CRYPT_GRAVE_CLEAVE],
+    oneShotsHoldAttacks: ['Awaken'],
+    attach: [
+      { url: `${WEAPONS}/sword_field_iron.glb`, bone: 'handslot.r', size: WOC_CRYPT_PROP_SIZE },
+    ],
+    walkRef: 2.5,
+    runRef: 7.6,
+    authoredAtlas: true,
   },
   // Reassemble's Stirring Bones (crypt_bone_pile): the pile IS the fallen
   // warrior's own corpse, so this draws no body; its click capsule, widened so
@@ -4603,90 +4662,131 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 2.2,
   },
+  // The Gravecaller Adept: a novice of the cult in a violet hooded robe split over its
+  // legs, a violet staff in its right hand. Cast is the conjuring loop (Grave Spark).
+  // Bolt is Grave Bolt: the staff levelled, the off hand drawn back to the shoulder
+  // through the 2.5 s bar and thrust out on its end (frame 76). Volley is Gravespark
+  // Volley: staff and hand climb overhead through the 3 s bar and fling forward on its
+  // end (frame 91). Both are bar-locked and play their recovery out. Walk and Run are
+  // authored at 1.21 and 4.0 raw units/s over the 1.818 posed idle height.
   crypt_skel_adept: {
-    url: `${ENEMIES}/skeleton_mage.glb`,
-    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
+    url: `${CREATURES}/woc_crypt_gravecaller_adept.glb`,
     height: 3.2,
     clips: {
-      ...skeletonClips(['2H_Melee_Attack_Chop']),
-      // Gravespark Volley (the trash pass's second wave): both hands raised
-      // for the whole 3 s bar, the sparks loosed as it lands.
-      castByAbility: {
-        [CRYPT_GRAVE_BOLT]: 'Spellcast_Shoot',
-        [CRYPT_GRAVESPARK_VOLLEY]: 'Spellcast_Raise',
-      },
-      castTimeScaleByAbility: { [CRYPT_GRAVE_BOLT]: 0.6, [CRYPT_GRAVESPARK_VOLLEY]: 0.6 },
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['React'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: { [CRYPT_GRAVE_BOLT]: 'Bolt', [CRYPT_GRAVESPARK_VOLLEY]: 'Volley' },
+      castPlayOut: ['Bolt', 'Volley'],
     },
-    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.35,
+    castClipSync: [CRYPT_GRAVE_BOLT, CRYPT_GRAVESPARK_VOLLEY],
+    attach: [
+      { url: `${WEAPONS}/staff_rare_a_violet.glb`, bone: 'handslot.r', size: WOC_CRYPT_PROP_SIZE },
+    ],
+    walkRef: 2.13,
+    runRef: 7.0,
+    authoredAtlas: true,
   },
+  // The Gravecaller Necromancer: a senior priest in black over violet robes, a mantle of
+  // finger bones and a chained ledger, a violet staff in its right hand. Cast is the
+  // conjuring loop (Grave Spark, Grave Rupture); Raise is the Raise Bones channel, both
+  // arms and the staff lifting the dead with each heave. Walk and Run are authored at
+  // 1.13 and 3.9 raw units/s over the 1.836 posed idle height.
   crypt_skel_necromancer: {
-    url: `${ENEMIES}/necromancer.glb`,
-    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
+    url: `${CREATURES}/woc_crypt_gravecaller_necromancer.glb`,
     height: 3.3,
     clips: {
-      ...skeletonClips(['2H_Melee_Attack_Chop']),
-      castByAbility: { [CRYPT_RAISE_BONES]: 'Spellcast_Raise' },
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['React'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: { [CRYPT_RAISE_BONES]: 'Raise' },
     },
-    tint: 'entity',
-    tintStrength: 0.3,
+    attach: [
+      { url: `${WEAPONS}/staff_rare_b_violet.glb`, bone: 'handslot.r', size: WOC_CRYPT_PROP_SIZE },
+    ],
+    walkRef: 2.03,
+    runRef: 7.0,
+    authoredAtlas: true,
   },
-  // The rest of the Hollow Crypt roster on the same rigs, raised a head or more
-  // over a player (2.6) so nothing in the crypt stands at player size: the
-  // cutthroat, the Bone Minion (it grows into the Brute), the Brute itself, the
-  // Sexton, the Cantor and her choir, Morthen, and Rimeweb over her brood.
+  // The rest of the Hollow Crypt roster, raised a head or more over a player (2.6) so
+  // nothing in the crypt stands at player size: the cutthroat, the Bone Minion (it
+  // grows into the Brute), the Brute itself, the Sexton, the Cantor and her choir,
+  // Morthen, and Rimeweb over her brood.
+  //
+  // The Ossuary Cutthroat: a lean skeleton bound in burial shroud, a bone dagger in each
+  // hand, crouched low. Attack is the right-hand stab, Attack2 the double-dagger lunge
+  // (also what its Rending Leap plays: the leap's windup carries no ability id, so it
+  // swings the plain attack mid-arc). Walk and Run are authored at 1.45 and 4.6 raw
+  // units/s over the 1.734 posed (crouched) idle height.
   crypt_skel_cutthroat: {
-    url: `${ENEMIES}/skeleton_rogue.glb`,
-    animUrls: [`${ENEMIES}/skeleton_rogue_hit_variety_anims.glb`],
+    url: `${CREATURES}/woc_crypt_ossuary_cutthroat.glb`,
     height: 3.2,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    tint: 'entity',
-    tintStrength: 0.25,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['React'],
+      death: 'Death',
+    },
+    attach: [
+      { url: `${WEAPONS}/dagger_rare_a_bone.glb`, bone: 'handslot.r', size: WOC_CRYPT_PROP_SIZE },
+      { url: `${WEAPONS}/dagger_rare_a_bone.glb`, bone: 'handslot.l', size: WOC_CRYPT_PROP_SIZE },
+    ],
+    walkRef: 2.68,
+    runRef: 8.5,
+    authoredAtlas: true,
   },
-  crypt_skel_minion: {
-    url: `${ENEMIES}/skeleton_minion.glb`,
-    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
-    height: 3.5,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    tint: 'entity',
-    tintStrength: 0.25,
-  },
-  // The Bone Brute's Marrow Crush heaves the golem's two-fist slam over its
-  // 2 s bar, locked to it: Golem_Slam's fists strike the floor 1.1 s in, so at
-  // 0.55 the strike lands on the bar's end (castClipSync), and the recovery
-  // plays out after it.
+  // the crypt's own bone minion draws its texture untinted, like the rest of its roster
+  crypt_skel_minion: { ...WOC_SKELETON_MINION, height: 3.5, tint: undefined },
+  // The Bone Brute: a hulk of fused ribcages and bundled bone, unarmed, its skull sunk
+  // between the shoulders. Attack is a right hook, Attack2 a short two-fist hammer. Slam
+  // is Marrow Crush: both fists climb overhead through the 2 s bar and smash the floor on
+  // its end (frame 61, bar-locked), then the recovery plays out. Walk and Run are
+  // authored at 1.17 and 3.6 raw units/s over the 1.819 posed idle height.
   crypt_skel_brute: {
-    url: `${ENEMIES}/skeleton_golem.glb`,
+    url: `${CREATURES}/woc_crypt_bone_brute.glb`,
     height: 4.6,
     clips: {
-      ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
-      attack: ['Golem_Slam'],
-      castByAbility: { [CRYPT_MARROW_CRUSH]: 'Golem_Slam' },
-      castTimeScaleByAbility: { [CRYPT_MARROW_CRUSH]: 0.55 },
-      castPlayOut: ['Golem_Slam'],
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['React'],
+      death: 'Death',
+      castByAbility: { [CRYPT_MARROW_CRUSH]: 'Slam' },
+      castPlayOut: ['Slam'],
     },
     castClipSync: [CRYPT_MARROW_CRUSH],
-    animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
-    weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
-    tint: 'entity',
-    tintStrength: 0.25,
+    walkRef: 2.97,
+    runRef: 9.1,
+    authoredAtlas: true,
   },
-  // Sexton Marrow (scripts/assets/hollow_crypt_creatures/build_marrow.py): the
-  // parish gravedigger raised and still digging, sculpted on the Bastion kit at
-  // full size (template scale 1): a stooped skeleton about twice a player's
-  // height under a peaked cowl of grave cloth, a leather apron, a hooded tin
-  // lantern at his hip and the long spade. At rest he digs (Idle); every bar
-  // clip is locked to its bar and plays its recovery out: Shovelful flings the
-  // earth at 1.0 of its 1.2 s bar, Measure levels the spade at the mark from 0.5,
-  // GravediggersBlow lands at 0.7 of 0.8. BellRing is a 1.0 s loop (the haul
-  // bottoming at 0.9, in step with ropePull) with his fists on his own axis,
-  // the spade stood in the earth beside him.
+  // Sexton Marrow (the art guide's model): the parish gravedigger raised and
+  // still digging, a stooped skeleton about twice a player's height in a hooded
+  // grave coat and a leather apron, a tin lantern at his hip and the long spade
+  // in his fists. At rest he digs (Idle: drive, lever, lift, toss); in a fight he
+  // holds the spade low like a spear (CombatIdle), chops (Attack) and swats
+  // (Attack2), and Walk drags the blade behind him. Every bar clip is authored
+  // at bar time and plays its recovery out: Shovelful flings the earth at 1.0 of
+  // its 1.2 s bar, Measure levels the spade at the mark from 0.5, GravediggersBlow
+  // lands at 0.7 of 0.8. BellRing is a 1.0 s loop (the haul bottoming at 0.9, in
+  // step with ropePull) with his fists on his own axis, the spade stood in the
+  // earth beside him.
   crypt_skel_sexton: {
-    url: `${CREATURES}/crypt_sexton_marrow.glb`,
-    // The build's IDLE_HEIGHT and MINZ, half a second into Idle (as the game measures).
-    height: 5.783,
-    hover: -0.038,
+    url: `${CREATURES}/woc_crypt_sexton_marrow.glb`,
+    // The idle's posed height and lowest point half a second in (the spade's blade
+    // is in the earth), at 3.5 yd a unit.
+    height: 5.975,
+    hover: -0.56,
     clips: {
       idle: 'Idle',
       combatIdle: 'CombatIdle',
@@ -4713,31 +4813,34 @@ export const VISUALS: Record<string, VisualDef> = {
     // The one-shot bars follow the bar; the bell loops for as long as it rings.
     castClipSync: [MARROW_SHOVELFUL, MARROW_MEASURE, MARROW_GRAVEDIGGERS_BLOW],
     castPlayOutHoldsAttacks: true,
-    walkRef: 1.671,
-    runRef: 6.109,
+    walkRef: 3.29,
+    runRef: 9.1,
     authoredAtlas: true,
     selfIllumination: 0.1,
     clickRadius: 2.2,
   },
-  // Cantor Ilvane (scripts/assets/hollow_crypt_creatures/build_cantor.py): a tall
-  // skeletal choir mistress in a faded violet cassock and a torn surplice, a great
-  // pleated ruff, a black lace veil under a crown of silver organ pipes, the hymnal
-  // open in her left hand and a finger-bone baton with a violet light in her right.
-  // Her song glows violet (the eyes, the voice in her open jaw, the baton, the notes).
+  // Cantor Ilvane (the art guide's model): a tall skeletal choir mistress in a
+  // violet cassock under a black cloak, a crown of silver organ pipes caging her
+  // face, the hymnal hung open at her belt and a finger-bone baton in her right
+  // hand. Idle conducts softly in three; CombatIdle points the baton at her foe.
   // Sing is the Dirge: bar-locked, its peak reached by 1.75 s (the Crescendo's 1.8 s
   // bar) and held, climbing, to the 2.5 s bar's end. PlayOrgan loops at the Bone
-  // Organ's keys (the hymnal hangs open over them); Conduct is her flourish.
+  // Organ's keys, leaning in; Conduct is her flourish.
   crypt_skel_cantor: {
-    url: `${CREATURES}/crypt_cantor_ilvane.glb`,
-    // The build's IDLE_HEIGHT (feet to the crown's tallest pipe, half a second into
-    // Idle); her template's 1.1 draws her about 6.5 yd, two and a half players.
+    url: `${CREATURES}/woc_crypt_cantor_ilvane.glb`,
+    // The idle's posed height (hem to the crown's tallest pipe, half a second in);
+    // her template's 1.1 draws her about 6.5 yd, two and a half players.
     height: 5.964,
+    hover: -0.206,
     clips: {
       idle: 'Idle',
       combatIdle: 'CombatIdle',
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      // The baton's chop and the claw's backhand land on frame 18 of a 1.5 s swing played
+      // at 1x (she rises and coils, hangs, then steps in); the flinch and the number wait.
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       cast: 'Conduct',
@@ -4754,29 +4857,51 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     // The Dirge follows its bar (normal or Crescendo); the organ loops while she plays.
     castClipSync: [ILVANE_DIRGE, ILVANE_UNBROKEN_DIRGE],
-    walkRef: 2.2,
-    runRef: 6.34,
+    attackTimeScale: 1,
+    walkRef: 1.97,
+    runRef: 6.82,
     authoredAtlas: true,
     selfIllumination: 0.1,
     clickRadius: 2.2,
   },
+  // The Hollow Chorister (the art guide's model): a skeleton of the ruined choir in a lace
+  // hood and surplice over a violet cassock, its jaw open mid-hymn. It fights unarmed
+  // with two raking claw swipes; Sing is its cast loop. Death drops it in its robes, and
+  // Awaken (the flourish: heroic Encore stands a fallen Chorister back up) reverses the
+  // fall into Idle. Walk and Run are authored at 1.10 and 3.9 raw units/s over the 1.806
+  // posed idle height.
   crypt_skel_chorister: {
-    url: `${ENEMIES}/necromancer.glb`,
-    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
+    url: `${CREATURES}/woc_crypt_hollow_chorister.glb`,
     height: 3.3,
-    clips: skeletonClips(['2H_Melee_Attack_Chop']),
-    tint: 'entity',
-    tintStrength: 0.3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['React'],
+      death: 'Death',
+      flourish: 'Awaken',
+      cast: 'Sing',
+    },
+    oneShotsHoldAttacks: ['Awaken'],
+    walkRef: 2.0,
+    runRef: 7.1,
+    authoredAtlas: true,
   },
-  // Morthen, the Lich Bishop (the clip sets above): about three players tall
-  // at his template's 1.35, floating on his soul smoke, the smoke funnel sunk
-  // into the ring floor (morthen_fx_core.ts MORTHEN_HOVER) so his whole body
-  // and face read from the default camera; his corpse is lifted back onto the
-  // flags as he falls (MORTHEN_DEATH_LIFT).
+  // Morthen, the Lich Bishop (the art guide's model; the clip sets above): a
+  // spiked mitre with a green eye, a cope over an open ribcage of soul fire, belt
+  // charms, and a ring-headed crozier whose crest unfolds into the scythe. About
+  // three players tall at his template's 1.35, floating on his soul
+  // smoke, the smoke funnel sunk into the ring floor (morthen_fx_core.ts
+  // MORTHEN_HOVER) so his whole body and face read from the default camera; his
+  // corpse is lifted back onto the flags as he falls (MORTHEN_DEATH_LIFT).
+  // `height` is the idle's posed height half a second in, smoke tip to mitre
+  // (5.85 authored yards), grown by MORTHEN_GROWTH so he stands as tall as the
+  // body he replaced.
   crypt_morthen_lich: {
-    url: `${CREATURES}/crypt_morthen_lich.glb`,
-    height: 6.994,
-    hover: MORTHEN_HOVER,
+    url: `${CREATURES}/woc_crypt_morthen.glb`,
+    height: 5.85 * MORTHEN_GROWTH,
+    hover: MORTHEN_HOVER * MORTHEN_GROWTH,
     deathLift: MORTHEN_DEATH_LIFT,
     clips: MORTHEN_STAFF_CLIPS,
     phaseClips: {
@@ -4788,17 +4913,17 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.08,
     clickRadius: 2.2,
   },
-  // The Lady of the Bonechill (scripts/assets/hollow_crypt_creatures/build_lady.py),
-  // the ghost of a bride buried in the ravine's ice: authored at size (`height`
-  // and `hover` are the build's IDLE_HEIGHT and MINZ half a second into Idle,
-  // the ice crown on top), floating half a yard over the ice. Her gown, veil and
-  // sleeves are one alpha-blended material whose translucency lives in the baked
-  // atlas (it survives the far-LOD bake); the face and hands stay solid. The
-  // Lament and the Bridal Freeze play the Wail on their bars (the Freeze's 2.5 s
-  // bar at 1.2, so the scream peaks as either lands); the Embrace's reach closes
-  // on its bar's end, and the hold loops while the sim lifts her aloft.
+  // The Lady of the Bonechill (the art guide's model), the ghost of a bride buried
+  // in the ravine's ice: a crown of ice, long hair, a bouquet of frozen roses at her
+  // waist, a gown and veil hung with icicles, floating half a yard over the ice
+  // (`hover`; `height` is the idle's posed height half a second in). Her gown, veil
+  // and sleeves are the alpha-blended CreatureGhostVeil; her face, hands, crown and
+  // bouquet the solid CreatureBody. The Lament and the Bridal Freeze play the Wail
+  // on their bars (the Freeze's 2.5 s bar at 1.2, so the scream peaks as either
+  // lands); the Embrace's reach closes on its bar's end, and the hold loops while
+  // the sim lifts her aloft. Her Death sinks her onto the ice below her hover.
   crypt_lady_bonechill: {
-    url: `${CREATURES}/crypt_lady_bonechill.glb`,
+    url: `${CREATURES}/woc_crypt_lady_bonechill.glb`,
     height: 6.749,
     hover: 0.544,
     clips: {
@@ -4807,6 +4932,9 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      // Both claws strike on frame 18 of a 1.5 s swing played at 1x (the coiled windup
+      // hangs at its apex first); the flinch and the number wait for them.
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       // Letting go (gently or not): the arms open.
       attackByAbility: { [LADY_EMBRACE_RELEASED]: 'Release', [LADY_EMBRACE_DROPPED]: 'Release' },
       hit: ['Hit'],
@@ -4826,9 +4954,30 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     // The scream and the reach follow their bars; the hold just loops.
     castClipSync: [LADY_BRIDES_LAMENT, LADY_BRIDAL_FREEZE, LADY_FROZEN_EMBRACE],
+    attackTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.3,
     clickRadius: 2.2,
+  },
+  // The Rime Egg Sac (the art guide's model): a frost-crusted clutch of spider eggs
+  // in a mound of rime-webbing, nearly a player's height. Idle breathes (the shells
+  // swell in turn, something twitching inside); Hit wobbles it; Death swells the
+  // shells, splits them open and lets them fall away, the mound slumping into a torn
+  // husk, as the hatchling breaks free (the sim's frost burst, broodEgg.burstSchool).
+  // `height` is the idle's posed height half a second in.
+  crypt_rime_egg_sac: {
+    url: `${CREATURES}/woc_crypt_rime_egg_sac.glb`,
+    height: 2.2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Idle'],
+      hit: ['Hit'],
+      death: 'Death',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.12,
   },
   mob_crypt_rimeweb: {
     url: `${CREATURES}/spider.glb`,
@@ -4850,19 +4999,19 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.6,
   },
-  // The Chapel Gargoyle (scripts/assets/hollow_crypt_creatures/build_stone_gargoyle.py):
-  // a great, heavy stone brute with baked cracked-stone surfaces, authored about
-  // 4.5 yd tall crouched and raised to scale 1.5 by its template, so it looms
-  // well over three players high on its arch (a player stands 2.6). It is a statue while it
-  // perches (`Perch`, read as airborne up on the cap), cracks free on the pull
-  // (`Awaken`, keyed on the dive cue), plunges (`Dive`), slams down (`DiveLand`),
-  // fights from a braced crouch (`Ready`), rakes with its talons and rears to
-  // shriek. Its talons curl just under its feet: the negative hover plants them.
+  // The Chapel Gargoyle (the art guide's model): a great, heavy horned stone brute
+  // with bat wings and digitigrade legs, raised to scale 1.5 by its template, so it
+  // looms well over three players high on its arch (a player stands 2.6). It is a
+  // statue while it perches (`Perch`, read as airborne up on the cap), cracks free
+  // on the pull (`Awaken`, keyed on the dive cue), plunges (`Dive`), slams down
+  // (`DiveLand`), fights from a braced crouch (`Ready`), rakes with its talons and
+  // rears to shriek (`Screech`). `height` and `hover` are the perch's posed height
+  // and lowest point, at 3.94 yd a unit.
   mob_crypt_gargoyle: {
-    url: `${CREATURES}/crypt_gargoyle.glb`,
+    url: `${CREATURES}/woc_crypt_gargoyle.glb`,
     authoredAtlas: true,
     height: 5.81,
-    hover: -0.22,
+    hover: 0.043,
     flight: true,
     clips: {
       idle: 'Perch',
@@ -4880,6 +5029,9 @@ export const VISUALS: Record<string, VisualDef> = {
       cast: 'Screech',
       castByAbility: { [CRYPT_STONE_SHRIEK]: 'Screech' },
     },
+    // its stalk and lope, authored at 0.86 and 2.87 units a second, at its drawn size
+    walkRef: 5.1,
+    runRef: 17,
     selfIllumination: 0.18,
   },
   // The Carrion Crow is always on the wing: `hover` lifts it and its Death clip
@@ -4899,20 +5051,22 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.15,
   },
-  // The Ossuary Drake (scripts/assets/hollow_crypt_creatures/build_bone_drake.py):
-  // a colossal skeletal wyvern, its head about 10 yd up and its wings about 34
-  // across, centred on its SHOULDERS so the jaws that pour the Barrowflame hang
-  // over the breath cone's apex. It flies its patrol (`Fly`: two downbeats and a
-  // long glide), cries as it breaks off (`SkyRoar`, the landing cue), glides
-  // down (`Glide`), lands (`Land`), walks and runs on its wing knuckles, bites
-  // (never claws), and plays each strike to its bar: the breath inhales over the
-  // 2 s bar and its exhale plays OUT after it; the tail sweeps and the wings
-  // buffet exactly at their bars' ends. Plain swings never cut those short.
+  // The Ossuary Drake (the art guide's model): a colossal skeletal dragon on four
+  // legs, an S-neck to a horned skull, soul fire caged in its ribs, its bat wings a
+  // separate pair raised over its back, centred on its chest so the jaws that pour
+  // the Barrowflame hang over the breath cone's apex. It flies its patrol (`Fly`:
+  // two downbeats and a long glide), cries as it breaks off (`SkyRoar`, the landing
+  // cue), glides down (`Glide`), lands (`Land`), walks in four beats and runs in a
+  // bounding gallop, bites (never claws), and plays each strike to its bar: the
+  // breath inhales over the 2 s bar with the head reared and its exhale plays OUT
+  // after it, the jaws thrust low (crypt_creature_fx_core.ts DRAKE_JAWS_*); the
+  // tail sweeps and the wings buffet exactly at their bars' ends. Plain swings never
+  // cut those short. `height` is the idle's posed height half a second in.
   mob_crypt_drake: {
-    url: `${CREATURES}/crypt_drake.glb`,
+    url: `${CREATURES}/woc_crypt_ossuary_drake.glb`,
     authoredAtlas: true,
     height: 13.63,
-    hover: -0.19,
+    hover: -0.034,
     flight: true,
     clips: {
       idle: 'Idle',
@@ -4942,21 +5096,25 @@ export const VISUALS: Record<string, VisualDef> = {
       flourish: 'Roar',
     },
     castPlayOutHoldsAttacks: true,
+    walkRef: 3.04,
+    runRef: 13.2,
     selfIllumination: 0.12,
   },
 
-  // The Knellwyrm (scripts/assets/hollow_crypt_creatures/build_knellwyrm.py):
-  // the Ossuary Drake's charred kin, built on its skeleton and rig, with ghost
-  // fire burning through its skull, ribs, spine and tail and a crown of horns.
-  // Authored at the drake's size; its template raises it a quarter again. It
-  // glides in from the sky (the arrival bar), takes wing for its Pyre Strafe,
-  // flies the lane with its neck plunged and jaws wide, and rears up with its
-  // wings flung wide for Dread Bellow; the drake's strikes play to their bars.
+  // The Knellwyrm (the art guide's model): the Ossuary Drake's charred kin, a
+  // horned four-legged bone dragon with violet ghost fire through its ribs and
+  // spine, a funeral bell hung under its chest, its wings a separate pair, and a
+  // long spined tail, posed by the drake's clip set on its own skeleton and centred
+  // on its chest. Its template raises it a quarter again. It glides in from the sky
+  // (the arrival bar), takes wing for its Pyre Strafe, flies the lane with its neck
+  // plunged and jaws wide, and rears off its forefeet with its wings flung wide for
+  // Dread Bellow; the drake's strikes play to their bars (its strafing jaws:
+  // KNELLWYRM_JAWS_STRAFE). `height` is the idle's posed height half a second in.
   mob_crypt_knellwyrm: {
-    url: `${CREATURES}/crypt_knellwyrm.glb`,
+    url: `${CREATURES}/woc_crypt_knellwyrm.glb`,
     authoredAtlas: true,
     height: 15.07,
-    hover: -0.19,
+    hover: 0,
     flight: true,
     clips: {
       idle: 'Idle',
@@ -4992,11 +5150,11 @@ export const VISUALS: Record<string, VisualDef> = {
         [CRYPT_WING_GUST]: 1,
         [KNELLWYRM_PYRE_STRAFE]: 1,
         [KNELLWYRM_DREAD_BELLOW]: 1,
-        // TakeWing is authored on the 2.5 s rise (60 frames at 24 fps).
+        // TakeWing is authored on the 2.5 s rise (76 frames at 30 fps).
         [KNELLWYRM_KNELL_RISE]: 1,
       },
       // The Knell's beats aloft (morthen_rite_fx_core.ts): it roars the fire
-      // down over the marked half, then dives into the pour (Strafe's 33
+      // down over the marked half, then dives into the pour (Strafe's 43
       // frames are the 1.4 s breath at rate 1).
       attackByAbility: { [KNELL_GESTURE_SKY_ROAR]: 'SkyRoar', [KNELL_GESTURE_POUR]: 'Strafe' },
       attackTimeScaleByAbility: { [KNELL_GESTURE_SKY_ROAR]: 1, [KNELL_GESTURE_POUR]: 1 },
@@ -5004,6 +5162,8 @@ export const VISUALS: Record<string, VisualDef> = {
       flourish: 'Roar',
     },
     castPlayOutHoldsAttacks: true,
+    walkRef: 4.2,
+    runRef: 18.2,
     selfIllumination: 0.2,
   },
 
@@ -5202,21 +5362,21 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.16,
   },
 
-  // The Sunken Bastion's bosses (sim/encounters/sunken_bastion), each sculpted
-  // whole on the drowned kit. Knight-Commander Olen (scripts/assets/
-  // sunken_bastion_drowned/olen/): the officer his drowned garrison still serves,
-  // towering over it in fluted plate trimmed with tarnished brass, the Bastion's
-  // tower-over-waves in brass on his breast; a grand morion with a crest of
-  // faded crimson horsehair and a bevor up under the nose, sea light burning in
-  // the shadow of the brim; a commander's cloak torn to the calves, a great
-  // tower shield held by its upright grip (the sigil in brass, barnacles crusting
-  // its foot) and a broad longsword. He chops over the shield's rim, drives the
-  // shield in and reaps with a flat sweep (Attack3, his Reaping Arc); the
-  // Oathbound Charge's bar is OathCharge (stamp, the oath roared with the sword
-  // to the sky, down behind the shield), bar-locked so he launches on the bar's
-  // end into Run, the shield-first charge; Breached he reels in Stunned.
+  // The Sunken Bastion's bosses (sim/encounters/sunken_bastion). Knight-Commander
+  // Olen (the art guide's model, scripts/assets/specs/woc_bastion_olen.json): the
+  // officer his drowned garrison still serves, in fluted plate dark with rust and
+  // verdigris, a brass sunburst on his breast, a morion with a crimson horsehair
+  // crest and sea light in its eye slit, a navy cloak torn to the calves, a tower
+  // shield (the sunburst in brass) and a greatsword. Both props drive his arms and
+  // the shield rides its own Shield bone. His blows play at 1x with their weight
+  // before their speed and land on frame 18 (contacts): the chop over the shield's
+  // rim, the shield driven in, and the flat reaping sweep (Attack3, his Reaping
+  // Arc); Run is the shield-first charge, and Breached he reels in Stunned. Out
+  // of the fight he carries the greatsword shouldered, standing or walking (one
+  // hold, so it never flips); dying he lets the sword and the shield go, goes to
+  // his knees and falls face down, both lying flat beside him.
   bastion_olen: {
-    url: `${CREATURES}/knight_commander_olen.glb`,
+    url: `${CREATURES}/woc_bastion_olen.glb`,
     // Drawn over the sergeant (7.2) and the Turnkey (8.3) at his 1.2: about 8.9.
     height: 7.4,
     clips: {
@@ -5225,6 +5385,8 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2', 'Attack3'],
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567], Attack3: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       stunned: 'Stunned',
@@ -5265,26 +5427,29 @@ export const VISUALS: Record<string, VisualDef> = {
         showNow: OLEN_SHIELD_HOME_GESTURE,
       },
     ],
-    walkRef: 2.5,
-    runRef: 9.93,
+    attackTimeScale: 1,
+    walkRef: 3.26,
+    runRef: 10.05,
     authoredAtlas: true,
     selfIllumination: 0.16,
   },
-  // Gaoler Ossick (scripts/assets/sunken_bastion_drowned/ossick/): the gaol's
-  // master, drowned in his own yard, sculpted whole on the drowned kit: a hulking
-  // hunched brute, the shoulders heaped up past his ears and crusted with
-  // barnacles, arms like mooring posts ending in his own snapped manacles, a
-  // bald drowned head caged in an iron brank with sea light behind the bands, a
-  // leather harness over the bare grey chest, a ship's anchor slung on his back
-  // on a chain over the shoulder, shackle pairs at his hip and an iron-bound
-  // cudgel. Every bar is bar-locked, its release on the bar's end and its
-  // follow-through played out: AnchorHurl takes the anchor off his back and
-  // hurls it one-handed (the slung anchor, its own mesh, stays hidden while his
-  // thrown one lies on a victim: bastion_gaol_fx.ts re-sends the gestures),
-  // ShackleHeave thrusts the cudgel through his belt and heaves the shackles in
-  // both fists, CudgelSlam brings the cudgel straight down.
+  // Gaoler Ossick (the art guide's model, scripts/assets/specs/woc_bastion_ossick.json):
+  // the gaol's master, drowned in his own yard, a hulking hunched brute, the
+  // shoulders heaped up past his ears and crusted with barnacles, arms like
+  // mooring posts ending in his own snapped manacles, a bald drowned head caged in
+  // an iron brank, a leather harness, a ship's anchor across his back, shackles at
+  // his hip and an iron-banded cudgel. His blows play at 1x with their weight
+  // before their speed and land on frame 18 (contacts). Every bar is bar-locked,
+  // its release on the bar's end and its follow-through played out: AnchorHurl
+  // takes the anchor off his back and hurls it overarm (the slung anchor, on its
+  // own OssickAnchorBack bone, stays hidden while his thrown one lies on a victim:
+  // bastion_gaol_fx.ts re-sends the gestures), ShackleHeave snatches the shackles
+  // off his hip and heaves them, CudgelSlam brings the cudgel down on the flags.
+  // The cudgel rides his shoulder standing as on the walk (one hold in every
+  // clip); dying he goes to his knees and falls on his face, the cudgel let go
+  // and lying beside him.
   bastion_ossick: {
-    url: `${CREATURES}/gaoler_ossick.glb`,
+    url: `${CREATURES}/woc_bastion_ossick.glb`,
     // Hunched, yet over the Turnkey (8.3) and Olen (8.9) at his 1.4: about 9.8.
     height: 7.0,
     clips: {
@@ -5292,6 +5457,8 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       cast: 'CudgelSlam',
@@ -5312,32 +5479,37 @@ export const VISUALS: Record<string, VisualDef> = {
         showNow: OSSICK_ANCHOR_HOME_GESTURE,
       },
     ],
-    walkRef: 2.74,
-    runRef: 9.37,
+    attackTimeScale: 1,
+    walkRef: 2.37,
+    runRef: 8.57,
     authoredAtlas: true,
     selfIllumination: 0.06,
   },
   // Vael the Fogbinder, Death itself, and his shadow copies wear ONE look (the
-  // veil hides him among them; only the Fogbeacon's beam tells them apart):
-  // the hooded skeletal reaper built in Blender (scripts/assets/
-  // sunken_bastion_creatures/reaper.py), a great scythe in hand, soul fire in
-  // his sockets, ribs and lantern, hovering a hand over the flags. The scythe
-  // is modelled in his right fist and never turns against it (the arms and
-  // body swing it; tests/vael_reaper.test.ts). Authored at size (`height` and
-  // `hover` are the build's IDLE_HEIGHT and MINZ half a second into Idle, the
-  // upright scythe's blade on top; the hood's peak about 6.5), drawn at the
-  // template's 1.35. The Shadow Crossing's bar sinks him through the floor
-  // (Vanish) and rises him out of the pool (Emerge); the sweep off the pool is
-  // his flourish, fired by the Reaping Scythe's cue.
+  // veil hides him among them; only the Fogbeacon's beam tells them apart): the
+  // art guide's hooded skeletal reaper (scripts/assets/specs/woc_bastion_vael.json),
+  // soul fire in his skull, a tattered grey-black shroud fraying into sea mist, the
+  // great scythe in his right fist and the caged soul lantern in his left. The
+  // scythe drives his arm and never turns against the fist (tests/vael_reaper.test.ts);
+  // both hands close on the snath at every heavy blow, and the blows play at 1x with
+  // their weight before their speed, landing on frame 18 (contacts). `height` is the
+  // idle's posed height half a second in (his hood's peak about 6.5, as before);
+  // `hover` floats his shroud's hem 0.4 over the flags, the scythe's butt resting in
+  // them. The Shadow Crossing's bar sinks him through the floor (Vanish) and rises
+  // him out of the pool (Emerge); the sweep off the pool is his flourish, fired by
+  // the Reaping Scythe's cue. Dying he lets the scythe and the lantern go, sits
+  // back hard and falls flat on his back, the shroud spread on the flags.
   bastion_vael: {
-    url: `${CREATURES}/vael_reaper.glb`,
-    height: 9.21,
-    hover: 0.406,
+    url: `${CREATURES}/woc_bastion_vael.glb`,
+    height: 7.357,
+    hover: -0.677,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       cast: 'Cast',
@@ -5378,6 +5550,7 @@ export const VISUALS: Record<string, VisualDef> = {
       VAEL_INTRO_RISE,
       VAEL_SINK,
     ],
+    attackTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.06,
     clickRadius: 2.2,
@@ -5466,19 +5639,20 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.1,
   },
-  // The Gaol Turnkey: the drowned jailer, sculpted whole on the drowned kit
-  // (scripts/assets/sunken_bastion_drowned/turnkey/): a vast bloated body,
-  // bare swollen arms crusted with barnacles, a studded leather jerkin and a
-  // long apron, an executioner's leather hood with sea light in its eye holes,
-  // an iron collar and its snapped chain, the great ring of keys in his right
-  // fist, a chain wound on his left forearm and the gaol's lantern at his hip.
-  // He flails the ring overhead and down (KeySwing) and lashes the chain off
-  // his forearm (ChainLash); opening the cells he takes the lantern off his
-  // hip and hoists it high, rattling the keys (LanternRaise, played from the
-  // lantern flare in sunken_bastion/bastion_creature_fx.ts at the top of the
-  // raise); the Iron Cage's bar is the ring held up and shaken (Cast).
+  // The Gaol Turnkey (the art guide's model, scripts/assets/specs/woc_bastion_turnkey.json):
+  // the drowned jailer, a vast bloated body in a studded leather jerkin and a
+  // long ragged apron, an executioner's leather hood with sea light in its eye
+  // holes, the gaol's great iron key in his right fist, the gaol's lantern on
+  // its chain in his left and the ring of cell keys at his belt. His blows play
+  // at 1x with their weight before their speed and land on frame 18
+  // (contacts): KeySwing hauls the key up over his shoulder and smashes it down
+  // like a club, ChainLash whirls the lantern back on its chain and lashes it
+  // across his front. Opening the cells he hoists the lantern high
+  // (LanternRaise, played from the lantern flare in
+  // sunken_bastion/bastion_creature_fx.ts at the top of the raise); the Iron
+  // Cage's bar is the key thrust out and turned in an unseen lock (Cast).
   bastion_turnkey: {
-    url: `${CREATURES}/gaol_turnkey.glb`,
+    url: `${CREATURES}/woc_bastion_turnkey.glb`,
     // The gaol's miniboss: drawn at a boss's size (about 8.3 at its 1.3),
     // over three players tall.
     height: 6.4,
@@ -5487,14 +5661,17 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['KeySwing', 'ChainLash'],
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { KeySwing: [0.567], ChainLash: [0.567] },
       attackByAbility: { [BASTION_OPEN_CELLS_GESTURE]: 'LanternRaise' },
       attackTimeScaleByAbility: { [BASTION_OPEN_CELLS_GESTURE]: 1 },
       hit: ['Hit'],
       death: 'Death',
       cast: 'Cast',
     },
-    walkRef: 2.17,
-    runRef: 6.65,
+    attackTimeScale: 1,
+    walkRef: 2.89,
+    runRef: 8.76,
     authoredAtlas: true,
     selfIllumination: 0.14,
   },
@@ -5533,10 +5710,18 @@ export const VISUALS: Record<string, VisualDef> = {
     clickRadius: 1.8,
   },
 
-  // Shipwreck Captain: authored naval apparition, with gestures timed to the
-  // authoritative encounter bars. Stable key preserves existing consumers.
+  // Shipwreck Captain (the art guide's model, scripts/assets/specs/woc_bastion_captain.json):
+  // a drowned naval captain's apparition, a skull under a weed-hung tricorn, a
+  // rotted greatcoat with epaulettes and chains, a cutlass in his right fist
+  // and, below the coat, a tail of translucent soul-stuff (the GhostWisps
+  // material) where his legs were. He hovers; his blows play at 1x with their
+  // weight before their speed and land on frame 18 (contacts): Attack rises
+  // with the cutlass and cleaves down as he surges at the victim, Attack2 draws
+  // it back and lunges through in a thrust. His bars end on their blows,
+  // timed to the authoritative encounter bars (Broadside 2.4 s, Anchor and
+  // Boarding 2 s). Stable key preserves existing consumers.
   mob_turretback: {
-    url: `${CREATURES}/bastion_ghost_captain.glb`,
+    url: `${CREATURES}/woc_bastion_captain.glb`,
     height: 7.5,
     hover: 0.3,
     clips: {
@@ -5544,6 +5729,8 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       cast: 'Cast',
@@ -5558,6 +5745,7 @@ export const VISUALS: Record<string, VisualDef> = {
         [GHOST_CAPTAIN_BOARDING]: 1,
       },
     },
+    attackTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.2,
     deathTimeScale: 1,
@@ -5816,33 +6004,33 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.1,
   },
-  // The bosses. Choirmother Selthe (choirmother_selthe; scripts/assets/
-  // drowned_temple_creatures/selthe_matriarch/): the siren matriarch, built
-  // on the Moonlit Siren's skeleton but broad and heavy in the game's
-  // stylized way (round two: a deep ribcage, strong shoulders and arms, a
-  // thicker coil, a larger head with a heavy scowling brow, glowing slit
-  // eyes, two small fangs and the lionfish's violet bars across her face,
-  // arms and flanks), a vast lionfish fan opening
-  // behind her like the pipes of an organ (silver rays, pearl tips, sheer
-  // turquoise to violet fins), her tail coiled in the pool of moonlit water
-  // she rides, the golden Great Conch on her chest, a jaw that drops too far
-  // when she sings. Sea-Song (1.5 s bar) plays SeaSong: arms wide, head back,
-  // the mouth wide, the fan shivering, the song on the bar's end. She is a
-  // caster and never swings her hands: Moonwater Bolt (2.0 s bar) plays Bolt,
-  // water gathered at her shoulder and flung on the bar's end; Mere Surge
-  // (3.0 s bar) plays Surge, sinking into the pool and hurling the wave on the
-  // bar's end; the Drowning Aria (a 5 s channel) loops Beam, both arms thrust
-  // at her target. The bolt and the surge finish their follow-through. Her old
-  // Slap and claw swings stay in the file, unplayed. The Chorus and Solo marks
-  // arrive as windup cues and play Chorus (the conch raised and blown, the fan
-  // folding in) and Solo (one arm raised,
-  // the fan flung wide). Dying, the fan folds and she sinks into her pool,
-  // leaving the conch glowing on the floor. Drawn 9.0 at her 1.15.
+  // The bosses. Choirmother Selthe (choirmother_selthe; the art guide's model,
+  // scripts/assets/specs/woc_temple_selthe.json): the siren matriarch, a pale
+  // woman's body to the waist under a long dark mane and a pearl circlet,
+  // kelp hanging from her forearms, and below the waist a violet serpent's
+  // tail that falls to the floor and runs back along it to its fluke; a vast
+  // silver lionfish fan opens behind her head. Her tail's bend stays planted
+  // on the floor while she leans and rears over it. Sea-Song (1.5 s bar)
+  // plays SeaSong: arms wide, head back, the fan flaring and shivering, the
+  // song on the bar's end. She is a caster and never swings her hands:
+  // Moonwater Bolt (2.0 s bar) plays Bolt, the water orb held before her
+  // chest through the bar, drawn back and flung on its end; Mere Surge (3.0 s
+  // bar) plays Surge, sinking low to gather the pool and hurling the wave up
+  // and out on the bar's end; the Drowning Aria (a 5 s channel) loops Beam,
+  // both palms thrust at her target. The bolt and the surge finish their
+  // follow-through. Her claws (Attack, Attack2) keep their weight should she
+  // ever swing them. The Chorus and Solo marks arrive as windup cues and play
+  // Chorus (her hands to her mouth, the fan folding in, then flung open) and
+  // Solo (her right arm raised, the fan flung wide). Dying, she rears up, the
+  // fan folds, and she slumps forward over her coils onto the floor. Drawn
+  // 9.0 at her 1.15.
   temple_selthe: {
-    url: `${CREATURES}/temple_selthe.glb`,
+    url: `${CREATURES}/woc_temple_selthe.glb`,
     height: 7.83,
     clips: {
       ...TEMPLE_CLIPS,
+      // Each claw lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       castByAbility: {
         [SELTHE_SEA_SONG]: 'SeaSong',
         [SELTHE_MOONWATER_BOLT]: 'Bolt',
@@ -5866,33 +6054,33 @@ export const VISUALS: Record<string, VisualDef> = {
     castClipSync: [SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, SELTHE_MERE_SURGE],
     castPlayOutHoldsAttacks: true,
     authoredAtlas: true,
-    selfIllumination: 0.06,
+    selfIllumination: 0.16,
   },
-  // The Tideglass Colossus (tideglass_colossus; scripts/assets/
-  // drowned_temple_creatures/colossus_tideglass/, recut in round two): a giant
-  // of hard sea-glass, every block of it a cut gem (the builder's gem.py: flat
-  // facets and sharp edges, each facet its own depth of teal, a bright rim on
-  // every edge), the light inside it breaking out of the seams between the
-  // blocks and along a few long fractures, pointed violet spires bursting from
-  // its shoulders, spine, elbows and knees, a low scowling head with two
-  // slanting slits of light under a crown of crystal horns, silver bands with
-  // moons, and in its chest, in a nacre-lined socket held by a silver crescent
-  // ringed with pearls, the prism: the cut gem of silver and violet that casts
-  // the Reflections. It walks its foe down (Walk, Run). Prism Flare (2.0 s
-  // bar) plays Flare: arms flung wide, the prism blazing on the bar's end.
-  // Moonlight Lance (2.0 s bar) plays Lance: the prism levelled along its
-  // pointing arm. Resonant Slam (1.5 s bar) plays Slam: both fists into the
-  // floor and a ring of broken crystal. Heroic's Reflection swap arrives as a
-  // windup cue: PrismPulse. Dying, it kneels, topples and breaks into crystal
-  // over a pool of water. Its body keeps the old 15-unit scale under the
-  // template's 2.2 (its long reach); the pointed spires now rise past it, so
-  // the drawn bounds are 16.7. The env boost matches its Reflections' glass:
-  // the temple's dim environment runs across its glossy facets.
+  // The Tideglass Colossus (tideglass_colossus; the art guide's model,
+  // scripts/assets/specs/woc_temple_colossus.json): a giant of teal sea-glass
+  // in cracked crystal plate, violet crystal spires bursting from its
+  // shoulders and crown, kelp and silver chains hanging from it, and in its
+  // chest the violet prism that casts the Reflections. It walks its foe down
+  // (Walk, Run). Its blows play at 1x with their weight before their speed and
+  // land on frame 18 (contacts): Attack a right haymaker wound back from
+  // behind its shoulder, Attack2 both fists raised over its crown and
+  // hammered down. Its bars land on their ends (clip-synced): Prism Flare
+  // (2.0 s) plays Flare, the fists gathered at the prism and flung wide as it
+  // blazes; Moonlight Lance (2.0 s) plays Lance, the right arm levelled at its
+  // foe with the left hand on the prism; Resonant Slam (1.5 s) plays Slam,
+  // both fists raised and driven into the floor. Heroic's Reflection swap
+  // arrives as a windup cue: PrismPulse, the chest thrust out. Dying, it
+  // staggers, its knees go and it topples onto its back, the prism to the sky
+  // for the moonbridge's beam. Drawn 16.7 at the template's 2.2 (its long
+  // reach). The env boost matches its Reflections' glass: the temple's dim
+  // environment runs across its glossy facets.
   temple_colossus: {
-    url: `${CREATURES}/temple_colossus.glb`,
+    url: `${CREATURES}/woc_temple_colossus.glb`,
     height: 16.7 / 2.2,
     clips: {
       ...TEMPLE_CLIPS,
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       castByAbility: {
         [COLOSSUS_PRISM_FLARE]: 'Flare',
         [COLOSSUS_MOONLIGHT_LANCE]: 'Lance',
@@ -5907,11 +6095,11 @@ export const VISUALS: Record<string, VisualDef> = {
       attackTimeScaleByAbility: { [COLOSSUS_PRISM_FLARE]: 1 },
     },
     attackTimeScale: 1,
-    walkRef: 1.4,
-    runRef: 3.48,
+    walkRef: 6.33,
+    runRef: 16.68,
     castClipSync: true,
     authoredAtlas: true,
-    selfIllumination: 0.06,
+    selfIllumination: 0.12,
     envMapIntensity: 2.2,
   },
   // The Moonspawn (moonspawn; scripts/assets/drowned_temple_creatures/
@@ -5933,22 +6121,27 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.1,
   },
-  // Ysolei, Avatar of the Drowned Moon: the colossal lunar sea-serpent built
-  // in Blender by Codex (sources on the codex/ysolei branch; original work, no
-  // donor assets), coiled on the Moon Altar. Native scale is kept: her raised
-  // head stands about seven players tall. Her Idle measures 23.97 native units
-  // (the halo's top to the coil's underside, 0.34 under her pivot), so at the
-  // template's 2.5 scale the height is 23.97 / 2.5 and the hover sinks the
-  // coil's underside back under the floor. Authored PBR materials (no atlas,
-  // no tint). Each clip rides a real cast bar: Lunar_Tide (1.5 s charge, then
-  // the wave), Undertow (the 3 s channel, jaws wide; the crash plays out),
-  // Summon (Moonspawn Call), Enrage (Drowned Wrath); Bite and Tail_Sweep are
-  // her swings, Rise her flourish on a reset, and she is stationary.
+  // Ysolei, Avatar of the Drowned Moon (the art guide's model, scripts/assets/
+  // specs/woc_temple_ysolei.json): the colossal lunar sea-serpent, a long
+  // spined body lying along the Moon Altar on two great fore-flippers, a neck
+  // rising to a beaked dragon's head hung with kelp, the moon's silver halo
+  // behind it turning slowly, and a broad fluke. Her raised head stands about
+  // seven players tall: drawn 23.97 at the template's 2.5, her flippers on the
+  // floor. Each clip rides a real cast bar: Lunar_Tide (1.5 s charge, her jaws
+  // to the sky, then the head slammed down as the wave goes), Undertow (the
+  // 3 s channel, jaws wide and low; the crash plays out), Summon (Moonspawn
+  // Call), Enrage (Drowned Wrath). Bite (reared back, then struck down to the
+  // floor) and Tail_Sweep (wound to one side, whipped round the other) are her
+  // swings, played at 1x with their weight before their speed and landing on
+  // frame 18 (contacts); Rise is her flourish on a reset, and she is
+  // stationary. Dying, her flippers give way and she falls on her belly, her
+  // neck, head and tail laid along the floor.
   temple_ysolei: {
-    url: `${CREATURES}/temple_ysolei.glb`,
+    url: `${CREATURES}/woc_temple_ysolei.glb`,
     height: 23.97 / 2.5,
-    hover: -0.339 / 2.5,
     authoredAtlas: true,
+    selfIllumination: 0.12,
+    attackTimeScale: 1,
     // The widest override the click-capsule guard allows (2x CLICK_RADIUS_CAP,
     // tests/nythraxis_bone_spike_model.test.ts): wider swallows the raid's clicks.
     clickRadius: 4.4,
@@ -5957,6 +6150,8 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Idle',
       run: 'Idle',
       attack: ['Bite', 'Tail_Sweep'],
+      // Each swing lands on frame 18 of its 1.5 s clip at 1x (30 fps).
+      contacts: { Bite: [0.567], Tail_Sweep: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       cast: 'Summon',
@@ -5980,8 +6175,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Mere Hydra's three heads: bodyless targets (the click capsule stays),
   // the one Hydra model drawn at the pool by drowned_temple/temple_hydra.ts.
   temple_hydra_head: {
-    url: `${CREATURES}/mere_hydra.glb`,
+    url: `${CREATURES}/woc_temple_hydra.glb`,
     height: 14,
+    authoredAtlas: true,
     clips: {
       idle: 'Idle',
       walk: 'Idle',
@@ -6058,86 +6254,6 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['1H_Melee_Attack_Chop']),
     show: ['Knight_Helmet', 'Knight_Cape'],
     attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
-  },
-  // The Mirefen muster (src/sim/content/mirefen_muster.ts): Fenbridge's soldiers dug in
-  // around Balgath's crater. Shipped KayKit rigs and weapons only, dyed toward the muster's
-  // red by the entity tint. CombatIdle is `Block`, the shield raise both rigs ship, held
-  // on its raised last frame (combatIdleHold) rather than looped: the guard they raise
-  // once and hold while he is on them (the sim points their aggroTargetId at him).
-  npc_muster_footman: {
-    url: `${PLAYERS}/knight.glb`,
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
-    height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
-    show: ['Knight_Helmet'],
-    attach: [
-      // spear_a left with the character pack; the pack's NPC spear (NPC_PROP_ATTACH.spear).
-      { url: `${WEAPONS}/spear_rare_b_ember.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
-    ],
-    tint: 'entity',
-    tintStrength: 0.3,
-  },
-  npc_muster_sergeant: {
-    url: `${PLAYERS}/knight.glb`,
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
-    height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
-    show: ['Knight_Helmet', 'Knight_Cape'],
-    attach: [
-      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
-    ],
-    tint: 'entity',
-    tintStrength: 0.3,
-  },
-  npc_muster_chaplain: {
-    url: `${PLAYERS}/paladin.glb`,
-    animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`],
-    height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
-    show: ['Paladin_Helmet', 'Paladin_Cape'],
-    attach: [
-      // hammer_a left with the character pack; the pack's NPC hammer (NPC_PROP_ATTACH.hammer).
-      { url: `${WEAPONS}/hammer_rare_b_ember.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_badge.glb`, bone: 'handslot.l' },
-    ],
-    tint: 'entity',
-    tintStrength: 0.25,
-  },
-  // The drill yard's mallet man (content/mirefen_muster.ts muster_drillmaster): the footman's
-  // knight with the camp's big stake mallet instead of spear and shield. Between blows he
-  // leans on the planted mallet (Drill_Rest); while someone is braced on the lane his sim
-  // cue, a mob windup (muster_drill.ts), plays Drill_Pound at its authored speed, so the
-  // head meets the ground on the sim's strike frame (scripts/build_drillmaster_anims.mjs).
-  npc_muster_drillmaster: {
-    url: `${PLAYERS}/knight.glb`,
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`, `${PLAYERS}/drillmaster_anims.glb`],
-    height: HUMANOID_H,
-    clips: {
-      ...kaykit(['2H_Melee_Attack_Chop'], 'Drill_Rest'),
-      attackByAbility: { muster_mallet_pound: 'Drill_Pound' },
-      attackTimeScaleByAbility: { muster_mallet_pound: 1 },
-      combatIdle: 'Block',
-      combatIdleHold: true,
-    },
-    show: ['Knight_Helmet'],
-    attach: [{ url: `${WEAPONS}/muster_mallet.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.3,
-  },
-  npc_muster_captain: {
-    url: `${PLAYERS}/knight.glb`,
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
-    height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
-    show: ['Knight_Cape'],
-    attach: [
-      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_badge.glb`, bone: 'handslot.l' },
-    ],
-    tint: 'entity',
-    tintStrength: 0.35,
   },
   npc_mage: {
     url: `${PLAYERS}/mage.glb`,
@@ -7000,16 +7116,14 @@ export const VISUALS: Record<string, VisualDef> = {
 //    colour belongs to the player's skin/hair wheels, and a tint over the
 //    picked skin tone repaints exactly what the player chose.
 // ---------------------------------------------------------------------------
-// The retired fixed KayKit warrior rig (knight.glb), kept for two NON-player
+// The retired fixed KayKit warrior rig (knight.glb), kept for NON-player
 // consumers now that the playable warrior rides the WOC body:
 //  - the modular library's own `player_warrior_modular` def below: a class on
 //    a WOC body (WOC_BODY_CLASSES) never composes, so that def is unreachable
 //    for its own players, but the library's fallback key (MODULAR_WARRIOR_KEY)
 //    and the composed-body test bed still name it, and it must keep deriving
 //    from a Rig_Medium rig (the WOC clips would bind onto the library's bones
-//    by name against the wrong bind pose, and drag the WOC part manifest along);
-//  - the Nythraxis phase-2 court's vision of Captain Aldren (mob_vision_aldren),
-//    which borrowed the warrior's key and keeps the knight look it shipped with.
+//    by name against the wrong bind pose, and drag the WOC part manifest along).
 export const KAYKIT_KNIGHT_WARRIOR: VisualDef = swims({
   url: `${PLAYERS}/knight.glb`,
   // Every clip knight.glb ships is already wired somewhere in this block
@@ -7158,8 +7272,6 @@ export const KAYKIT_PALADIN: VisualDef = swims({
   weaponSlots: [0],
   offhandSlot: 1,
 });
-
-VISUALS.mob_vision_aldren = { ...KAYKIT_KNIGHT_WARRIOR, show: ['Knight_Helmet', 'Knight_Cape'] };
 
 // The KayKit class rigs as they shipped before the WOC bodies took the seven
 // remaining classes (2026-09-18 equipment sets): their donor clip GLBs and
@@ -7641,15 +7753,12 @@ for (const cls of ALL_CLASSES) {
 // glass copy of each class's own body, silvered and lit from within, a head
 // taller than the player it mirrors (the owner's look rides the template id,
 // `tideglass_reflection_<class>`, so no wire field is needed).
-// On the WOC character pack the class def is a WOC body; the Reflection keeps the class's
-// KayKit body it was authored and clip-mapped on (the `_modular` fallback's rule above),
-// fetched on demand like that fallback.
+// The copy is of the class's WOC body, the one its player wears, with that body's own
+// clip map and default kit; a mob hands it no look, so it wears the type's default face.
 for (const cls of ALL_CLASSES) {
-  const classDef = VISUALS[`player_${cls}`];
-  const base = classDef.wocCharacter ? (KAYKIT_BASELINES[cls] ?? KAYKIT_KNIGHT_WARRIOR) : classDef;
+  const base = VISUALS[`player_${cls}`];
   VISUALS[`temple_reflection_${cls}`] = {
     ...base,
-    ...(classDef.wocCharacter ? { lazyPreload: true } : {}),
     height: base.height * 1.15,
     // A tint multiplies, so near-white read as the plain class look: a cold
     // tideglass blue with a strong inner light makes the copy read as glass.
@@ -7709,6 +7818,26 @@ export const NPC_PROP_ATTACH: Readonly<Record<NpcPropSet, readonly AttachDef[]>>
   scythe: [{ url: `${WEAPONS}/spear_rare_a_teal.glb`, bone: 'handslot.r' }],
   knife: [{ url: `${WEAPONS}/whittler_s_knife.glb`, bone: 'handslot.r' }],
   spear: [{ url: `${WEAPONS}/spear_rare_b_ember.glb`, bone: 'handslot.r' }],
+  // The Mirefen muster's arms, on the ember finish of its red: the footman's spear and the
+  // chaplain's hammer each with the ember shield, and the drillmaster's own mallet.
+  spear_shield: [
+    { url: `${WEAPONS}/spear_rare_b_ember.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/shield_rare_b_ember.glb`, bone: 'handslot.l' },
+  ],
+  hammer_shield: [
+    { url: `${WEAPONS}/hammer_rare_b_ember.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/shield_rare_b_ember.glb`, bone: 'handslot.l' },
+  ],
+  mallet: [{ url: `${WEAPONS}/muster_mallet.glb`, bone: 'handslot.r' }],
+  // The humanoid enemies' arms (npc_looks.ts, the enemy rows): the outlaws' paired
+  // starter daggers, the brutes' axe, and the shadow cults' violet staff and wand.
+  daggers: [
+    { url: `${WEAPONS}/dagger_starter.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/dagger_starter.glb`, bone: 'handslot.l' },
+  ],
+  axe: [{ url: `${WEAPONS}/axe_rare_a_ember.glb`, bone: 'handslot.r' }],
+  dark_staff: [{ url: `${WEAPONS}/staff_rare_a_violet.glb`, bone: 'handslot.r' }],
+  wand: [{ url: `${WEAPONS}/wand_rare_b_violet.glb`, bone: 'handslot.r' }],
 };
 
 // One layout object per prop set, minted once: a stable identity for every
@@ -7773,9 +7902,6 @@ const MOB_KEYS: Record<string, string> = {
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',
-  // Dawnhold's garrison: the armored knight body (helmet, cape, sword), not
-  // the humanoid family's hooded outlaw fallback.
-  hedge_knight: 'npc_knight',
   // Protect Yumi objective cat: the dedicated Meshy familiar
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
@@ -7818,10 +7944,6 @@ const MOB_KEYS: Record<string, string> = {
   guardian_stampede_0: 'greyjaw',
   guardian_stampede_1: 'mob_boar',
   guardian_stampede_2: 'mob_raptor',
-  // The Muster Standard's soldiers (combat/balgath_trinkets.ts), dressed exactly like the
-  // camp's: the footman's spear and round shield, the sergeant's sword and square shield.
-  guardian_muster_standard_spear: 'npc_muster_footman',
-  guardian_muster_standard_sword: 'npc_muster_sergeant',
   // The Fanglord's Whistle's spirit jaguar (a transient trinket guardian):
   // the jade spirit cat of wildheart_creature_looks.ts.
   guardian_fanglords_spirit_jaguar: 'wildheart_spirit_jaguar',
@@ -7860,26 +7982,13 @@ const MOB_KEYS: Record<string, string> = {
   // The ogre family's quest boss gets his own body instead of the family's
   // mob_ogre fallback (visualKeyFor checks MOB_KEYS first).
   warlord_drogmar: 'mob_drogmar',
-  drowned_cantor: 'delve_mob_acolyte',
   deepfen_spearjaw: 'mob_spearjaw',
   choir_thrall: 'mob_choir_thrall',
   tolling_bell: 'mob_tolling_bell',
   reedbound_acolyte: 'mob_reedbound_acolyte',
-  edda_reedhand: 'npc_edda_reedhand',
-  // gravecaller cult + necromancers: dark-robed casters
-  gravecaller_cultist: 'mob_dark_caster',
-  gravecaller_summoner: 'mob_dark_caster',
-  // BOTH Nhalias: the zone 2 overworld rare elite keeps her original template
-  // id; the Drowned Litany boss is a separate renamed template.
-  sister_nhalia: 'mob_dark_caster',
-  sister_nhalia_drowned_canticle: 'mob_dark_caster',
-  deacon_voss: 'mob_dark_caster',
-  wyrmcult_necromancer: 'mob_dark_caster',
   vael_the_mistcaller: 'bastion_vael',
   vael_fog_shade: 'bastion_vael',
   grand_necromancer_velkhar: 'mob_dark_caster',
-  gorrak: 'mob_bruiser',
-  mogger: 'mob_bruiser',
   // undead variants by role
   boneclad_revenant: 'skel_warrior',
   marrowlord_varkas: 'skel_warrior',
@@ -7902,6 +8011,7 @@ const MOB_KEYS: Record<string, string> = {
   cantor_ilvane: 'crypt_skel_cantor',
   hollow_chorister: 'crypt_skel_chorister',
   rimeweb: 'crypt_lady_bonechill',
+  rime_egg_sac: 'crypt_rime_egg_sac',
   crypt_shambler: 'skel_rogue',
   // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
   crypt_ossuary_warrior: 'crypt_skel_warrior',
@@ -7913,7 +8023,6 @@ const MOB_KEYS: Record<string, string> = {
   crypt_bone_minion: 'crypt_skel_minion',
   crypt_bone_brute: 'crypt_skel_brute',
   crypt_chapel_gargoyle: 'mob_crypt_gargoyle',
-  crypt_crow_caller: 'mob_crypt_crow_caller',
   crypt_carrion_crow: 'mob_crypt_crow',
   crypt_ossuary_drake: 'mob_crypt_drake',
   crypt_knellwyrm: 'mob_crypt_knellwyrm',
@@ -7957,7 +8066,6 @@ const MOB_KEYS: Record<string, string> = {
   // delve enemies
   reliquary_ledger_wraith: 'delve_skel_wraith',
   reliquary_funeral_ringer: 'delve_skel_ringer',
-  reliquary_gravecall_acolyte: 'delve_mob_acolyte',
   reliquary_saintless_effigy: 'delve_skel_effigy',
   deacon_varric: 'delve_skel_varric',
   fallen_captain_aldren: 'skel_warrior',
@@ -7967,14 +8075,11 @@ const MOB_KEYS: Record<string, string> = {
   // the "Spirit of X" adds reuse each character's crypt visual above. Without these
   // the ids fall through to FAMILY_KEYS.undead (skel_minion) and the whole court
   // renders as identical generic skeletons. See spawnNythraxisHeroicAdds.
-  // The Mirefen muster around Balgath's crater (VISUALS npc_muster_* above).
-  muster_footman: 'npc_muster_footman',
-  muster_sergeant: 'npc_muster_sergeant',
-  muster_chaplain: 'npc_muster_chaplain',
-  muster_drillmaster: 'npc_muster_drillmaster',
+  // The Mirefen muster's Straw Foreman. Its soldiers wear WOC class bodies
+  // (npc_looks.ts MOB_LOOK_IDS), so only the effigy keeps a mob visual here.
   muster_effigy: 'mob_muster_effigy',
-  // The playable warrior moved to the WOC body; the vision keeps its knight look.
-  vision_aldren_warrior: 'mob_vision_aldren',
+  // The court's three visions ride the WOC class bodies of the classes they were.
+  vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
   // the Veiled Hollow: stags use the real stag rig instead of the beast-family
@@ -8027,12 +8132,9 @@ const MOB_KEYS: Record<string, string> = {
   the_topiary_bull: 'mob_bull',
   moor_ram: 'mob_alpaca',
   shoal_scuttler: 'mob_crab',
-  // The Wreck Warden walks as Mogger's hulking bruiser body, not a skeleton.
-  the_wreck_warden: 'mob_bruiser',
-  // The Infernal Citadel: the pact cult reads as robed casters, not the `undead`
-  // family's default skeleton minion. Its demons keep the family fallback
-  // (mob_demonalt), re-tinted deep red by the templates.
-  rift_pact_acolyte: 'mob_dark_caster',
+  // The Infernal Citadel: the pact cult's acolytes wear WOC looks (npc_looks.ts
+  // MOB_LOOK_IDS); its demons keep the family fallback (mob_demonalt), re-tinted
+  // deep red by the templates.
   rift_boss_ritualist: 'rift_ritualist',
   rift_boss_tide: 'mob_hoard_abyssal_maw',
   rift_boss_frost: 'mob_hoard_hoarfrost_warden',
@@ -8057,7 +8159,9 @@ const MOB_KEYS: Record<string, string> = {
 
 const FAMILY_KEYS: Record<string, string> = {
   beast: 'mob_wolf',
-  humanoid: 'mob_bandit',
+  // a humanoid with no look of its own (npc_looks.ts MOB_LOOK_IDS) draws as a
+  // person too: the rogue's WOC body, never the KayKit outlaw
+  humanoid: 'player_rogue',
   mudfin: 'mob_murloc',
   spider: 'mob_spider',
   burrower: 'mob_kobold',
@@ -8088,8 +8192,6 @@ const NPC_KEYS: Record<string, string> = {
   calligraphy_apprentice_1: 'npc_villager',
   calligraphy_apprentice_2: 'npc_villager',
   bursar_fernando: 'npc_fernando',
-  // The Mirefen muster's leader (an NPC since he gives the muster's quests).
-  muster_commander: 'npc_muster_captain',
   card_master: 'npc_villager_robed',
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',

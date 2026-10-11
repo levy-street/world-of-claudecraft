@@ -1,5 +1,10 @@
 # Bastion ghost crew
 
+> Superseded for the captain: the Shipwreck Captain now ships the art guide's model (concept,
+> Tripo P2, a skeleton and every clip built in Blender) as `public/models/creatures/woc_bastion_captain.glb`
+> from `scripts/assets/specs/woc_bastion_captain.json`. The builders below are kept for the sailor, the
+> ship and as reference; the captain's old output GLB is no longer in the repo.
+
 Original drowned sailors and their naval captain. The character builders reuse
 the established `sunken_bastion_drowned/kit` SDF/OpenVDB sculpt, skin weighting,
 Cycles atlas bake and animation export pipeline. The revenant's anatomical head,

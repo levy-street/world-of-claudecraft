@@ -1,7 +1,7 @@
-// Morthen the Gravecaller as the Lich Bishop (scripts/assets/hollow_crypt_creatures/
-// build_morthen.py): his own Blender body and clips, the entrance casts played on
-// his own rise, proclamation and ward, the Shadow Pulse on the bell, and the
-// Last Rites stance (the bell staff unfolding into the scythe) read off his
+// Morthen the Gravecaller as the Lich Bishop (the art guide's model,
+// scripts/assets/specs/woc_crypt_morthen.json): his own body and clips, the entrance
+// casts played on his own rise, proclamation and ward, the Shadow Pulse on the staff,
+// and the Last Rites stance (the crozier unfolding into the scythe) read off his
 // mirrored health alone, so offline and online see the same beat.
 
 import { readFileSync } from 'node:fs';
@@ -17,6 +17,7 @@ import {
   DISSOLVE_SEC,
   dissolveLevels,
   MORTHEN_DEATH_LIFT,
+  MORTHEN_GROWTH,
   MORTHEN_HOVER,
   MORTHEN_MITRE_EYE,
   MORTHEN_REAP_SWEEP,
@@ -34,6 +35,7 @@ import {
   MORTHEN_TOLL,
   morthenAnchor,
   morthenBodyY,
+  morthenDrawScale,
   morthenEmitY,
   morthenStance,
   morthenStanceGesture,
@@ -52,7 +54,7 @@ import { MORTHEN_REAP, MORTHEN_RITE } from '../src/sim/encounters/hollow_crypt/m
 import type { Entity } from '../src/sim/types';
 
 const PLAYER_HEIGHT = 2.6;
-const GLB = 'public/models/creatures/crypt_morthen_lich.glb';
+const GLB = 'public/models/creatures/woc_crypt_morthen.glb';
 
 function glbJson(): {
   animations?: { name: string }[];
@@ -82,40 +84,44 @@ function quatAngleDeg(a: ArrayLike<number>, b: ArrayLike<number>): number {
 }
 
 describe('Morthen, the Lich Bishop: his own body', () => {
-  it('draws the Blender lich, not a KayKit mage', () => {
+  it("draws the art guide's lich, not a KayKit mage", () => {
     expect(visualKeyFor({ kind: 'mob', templateId: 'morthen' } as Entity)).toBe(
       'crypt_morthen_lich',
     );
-    expect(def.url).toBe('models/creatures/crypt_morthen_lich.glb');
+    expect(def.url).toBe('models/creatures/woc_crypt_morthen.glb');
     expect(def.attach).toBeUndefined();
     expect(def.authoredAtlas).toBe(true);
   });
 
-  it('stands about three players tall and floats', () => {
+  it('stands as tall over the flags as the body he replaced, and floats', () => {
     const drawn = def.height * MOBS.morthen.scale;
     expect(drawn / PLAYER_HEIGHT).toBeGreaterThan(2.9);
-    // Even with his smoke funnel sunk, what stands over the floor towers.
-    expect(((def.height + (def.hover ?? 0)) * MOBS.morthen.scale) / PLAYER_HEIGHT).toBeGreaterThan(
-      2.8,
-    );
+    // Even with his smoke funnel sunk, what stands over the floor towers: the
+    // old body's 7.85 yd, three players (Reuben 2026-10-11: a remade boss keeps
+    // its height). The authored rig alone stood 6.88, so he is drawn grown.
+    expect((def.height + (def.hover ?? 0)) * MOBS.morthen.scale).toBeCloseTo(7.85, 1);
+    expect(def.height).toBeCloseTo(5.85 * MORTHEN_GROWTH, 9);
   });
 
   it('sinks his smoke funnel into the ring floor so his whole body reads from the camera', () => {
     // One constant drives the manifest's hover and every body anchor.
-    expect(def.hover).toBe(MORTHEN_HOVER);
+    expect(def.hover).toBeCloseTo(MORTHEN_HOVER * MORTHEN_GROWTH, 9);
     expect(MORTHEN_HOVER).toBeCloseTo(MORTHEN_REST_MINZ - MORTHEN_SINK, 9);
     expect(MORTHEN_RIG_Y).toBeCloseTo(-MORTHEN_SINK, 9);
-    expect(MORTHEN_SINK).toBeGreaterThanOrEqual(1.2);
-    expect(MORTHEN_SINK).toBeLessThanOrEqual(1.6);
-    const s = MOBS.morthen.scale;
-    // The burning eye under the mitre sits low enough for the default camera
-    // (well under the old 7 yd) and still well over a player's head.
+    expect(MORTHEN_SINK).toBeGreaterThan(0.5);
+    // Every body anchor rides his grown size.
+    const s = morthenDrawScale(MOBS.morthen.scale);
+    expect(s).toBeCloseTo(MOBS.morthen.scale * MORTHEN_GROWTH, 9);
+    // The burning eye under the mitre sits under the old 7 yd for the default
+    // camera, and well over a player's head.
     const eye = morthenBodyY(0, MORTHEN_MITRE_EYE.y, s);
-    expect(eye).toBeLessThan(6);
+    expect(eye).toBeLessThan(7);
     expect(eye).toBeGreaterThan(PLAYER_HEIGHT * 1.6);
-    // He still floats: the top of the smoke funnel (build_morthen.py, its
-    // wisps' tops near 1.95) rises over the flags, the ribs well above it.
-    expect(morthenBodyY(0, 1.95, s)).toBeGreaterThan(0.5);
+    // He still floats: the lowest tatter of his robe (rig 1.23 half a second
+    // into Idle) clears the flags, the smoke's last wisps under it (their tops
+    // near 1.26), the ribs well above both.
+    expect(morthenBodyY(0, 1.23, s)).toBeGreaterThan(0.3);
+    expect(morthenBodyY(0, 1.26, s)).toBeGreaterThan(0.3);
     expect(morthenBodyY(0, MORTHEN_RIBS.y, s)).toBeGreaterThan(2.5);
     // The smoke base is under the floor now: its emitters boil out at the flags.
     expect(morthenBodyY(0, MORTHEN_SMOKE_BASE.y, s)).toBeLessThan(0);
@@ -123,16 +129,16 @@ describe('Morthen, the Lich Bishop: his own body', () => {
     expect(morthenEmitY(3, 0, s)).toBe(3);
     // His corpse is lifted by the very sink, so the folded vestments rest on the floor.
     expect(def.deathLift).toEqual(MORTHEN_DEATH_LIFT);
-    expect(MORTHEN_DEATH_LIFT.yards).toBe(MORTHEN_SINK);
+    expect(MORTHEN_DEATH_LIFT.yards).toBeCloseTo(MORTHEN_SINK * MORTHEN_GROWTH, 9);
     expect(MORTHEN_DEATH_LIFT.to).toBeGreaterThan(MORTHEN_DEATH_LIFT.from);
   });
 
   it('sheds his sparks off the mitre eye, not the retired shoulder candles', () => {
-    // The v2 body (Vael's family) has no shoulder candles: the sparks rise off
-    // the slit eye on the mitre's front plate, on his centre line, above the
-    // soul-fire eyes (about 4.4) and the ribs, below the mitre's horns.
+    // The art guide's body has no shoulder candles: the sparks rise off the
+    // green eye on the mitre's front plate, on his centre line, above the
+    // skull's eye sockets (about 4.95) and the ribs, below the mitre's spikes.
     expect(MORTHEN_MITRE_EYE.x).toBe(0);
-    expect(MORTHEN_MITRE_EYE.y).toBeGreaterThan(4.6);
+    expect(MORTHEN_MITRE_EYE.y).toBeGreaterThan(4.95);
     expect(MORTHEN_MITRE_EYE.y).toBeGreaterThan(MORTHEN_RIBS.y);
     expect(MORTHEN_MITRE_EYE.y).toBeLessThan(def.height);
     expect(MORTHEN_MITRE_EYE.z).toBeGreaterThan(0);
@@ -171,7 +177,8 @@ describe('Morthen, the Lich Bishop: his own body', () => {
     let tris = 0;
     for (const m of j.meshes)
       for (const p of m.primitives) tris += j.accessors[p.indices].count / 3;
-    expect(tris).toBeGreaterThan(20_000);
+    // a Tripo Smart Mesh body (about 10k faces) plus the scythe blade and the smoke
+    expect(tris).toBeGreaterThan(8_000);
     expect(tris).toBeLessThan(55_000);
     expect(readFileSync(GLB).length).toBeLessThan(3_500_000);
   });
@@ -179,7 +186,7 @@ describe('Morthen, the Lich Bishop: his own body', () => {
 
 describe('Morthen, the Lich Bishop: the staff stays in his fist', () => {
   // The staff is modelled IN the right fist and parented to it, so every swing is
-  // carried by the arm and the body. A Staff bone turning against Hand.R is the
+  // carried by the arm and the body. A staff bone turning against hand.r is the
   // propeller the owner saw: the weapon spinning round the grip while the arm
   // barely moved. Every key of every clip must hold the rest turn.
   it('never turns the staff against the hand, in any clip', async () => {
@@ -187,9 +194,9 @@ describe('Morthen, the Lich Bishop: the staff stays in his fist', () => {
     const staff = doc
       .getRoot()
       .listNodes()
-      .find((n) => n.getName() === 'Staff');
-    expect(staff, 'Staff node').toBeDefined();
-    expect(staff?.getParentNode()?.getName()).toBe('Hand.R');
+      .find((n) => n.getName() === 'staff');
+    expect(staff, 'staff node').toBeDefined();
+    expect(staff?.getParentNode()?.getName()).toBe('hand.r');
     const rest = staff?.getRotation() ?? [0, 0, 0, 1];
     const clips = doc.getRoot().listAnimations();
     expect(clips.length).toBeGreaterThanOrEqual(21);
@@ -270,10 +277,11 @@ describe('Morthen, the Lich Bishop: the souls circling him', () => {
         const r = Math.hypot(p.x, p.z);
         expect(r).toBeGreaterThan(MORTHEN_SOUL_RADIUS * 0.85);
         expect(r).toBeLessThan(MORTHEN_SOUL_RADIUS * 1.15);
-        expect(p.y).toBeGreaterThan(2.5);
-        expect(p.y).toBeLessThan(4.2);
+        // his ribs are at 4.15
+        expect(p.y).toBeGreaterThan(3.2);
+        expect(p.y).toBeLessThan(4.8);
         // drawn over the ring floor even with his funnel sunk into it
-        expect(morthenBodyY(0, p.y, MOBS.morthen.scale)).toBeGreaterThan(1);
+        expect(morthenBodyY(0, p.y, morthenDrawScale(MOBS.morthen.scale))).toBeGreaterThan(1);
       }
     }
   });

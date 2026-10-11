@@ -557,7 +557,7 @@ describe('character visual manifest', () => {
     ]);
   });
 
-  it('keeps the four Wildheart Tripo GLBs on short, non-loop-closed re-cut takes', async () => {
+  it('keeps the three Wildheart Tripo GLBs on short, non-loop-closed re-cut takes', async () => {
     // The original defect: the retarget batch baked an 8.46s 'Death' whose
     // final keyframe equalled its first (deviation 0.0000 on every channel).
     // visual.ts clamps death on its LAST frame and snap-seeds corpses to it,
@@ -573,7 +573,6 @@ describe('character visual manifest', () => {
       'mob_wildheart_stalker',
       'mob_wildheart_ravager',
       'mob_wildheart_hexcaller',
-      'mob_wildheart_high_priest',
     ] as const) {
       const visual = VISUALS[key];
       const doc = await io.read(`public/${visual.url}`);

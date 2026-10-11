@@ -128,45 +128,49 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     chest: { side: 0.03, up: 2.51, fwd: 0.34 },
     eyes: { side: 0.2, up: 3.74, fwd: 0.79 },
   },
-  // The Gaol Turnkey: water off the hood, the key ring, the chain on his
-  // forearm and the lantern at his hip.
-  // Knight-Commander Olen: water off the morion's brim all round, the tower
-  // shield's top and foot carried at his side.
+  // Knight-Commander Olen (the art guide's body, measured on its posed Idle):
+  // water off the morion's brim all round, the tower shield's top and rim
+  // carried at his side.
   knight_commander_olen: {
-    rawHeight: 5.191,
+    rawHeight: 1.914,
     drips: [
-      { side: 0.14, up: 4.59, fwd: 0.38 },
-      { side: 0.44, up: 4.21, fwd: -0.24 },
-      { side: -0.37, up: 4.23, fwd: -0.11 },
-      { side: 0.76, up: 3.41, fwd: 0.73 },
-      { side: 1.11, up: 1.24, fwd: 0.92 },
+      { side: 0.06, up: 1.64, fwd: 0.14 },
+      { side: -0.08, up: 1.62, fwd: -0.17 },
+      { side: 0.05, up: 1.61, fwd: -0.16 },
+      { side: 0.32, up: 1.62, fwd: 0.12 },
+      { side: 0.47, up: 0.86, fwd: 0.1 },
     ],
-    chest: { side: 0.03, up: 3.08, fwd: 0.49 },
-    eyes: { side: 0.08, up: 4.23, fwd: 0.11 },
+    chest: { side: 0.0, up: 1.27, fwd: 0.13 },
+    eyes: { side: -0.03, up: 1.71, fwd: 0.14 },
   },
-  // Gaoler Ossick: water off the brank, the cudgel's head, the manacle's chain
-  // and the anchor on his back.
+  // Gaoler Ossick (the art guide's body, measured on its posed Idle): water off
+  // the brank, the cudgel's shaft, the manacle on his left wrist and the anchor
+  // across his back.
   gaoler_ossick: {
-    rawHeight: 4.084,
+    rawHeight: 1.96,
     drips: [
-      { side: 0.17, up: 3.48, fwd: 0.79 },
-      { side: -0.88, up: 0.9, fwd: 1.24 },
-      { side: 0.89, up: 1.76, fwd: 0.35 },
-      { side: -0.51, up: 2.2, fwd: -1.17 },
+      { side: -0.04, up: 1.75, fwd: 0.33 },
+      { side: -0.46, up: 0.5, fwd: 0.56 },
+      { side: 0.34, up: 0.79, fwd: 0.2 },
+      { side: 0.09, up: 1.9, fwd: -0.14 },
     ],
-    chest: { side: 0.06, up: 2.49, fwd: 0.54 },
-    eyes: { side: 0.17, up: 3.6, fwd: 0.82 },
+    chest: { side: -0.02, up: 1.43, fwd: 0.44 },
+    eyes: { side: -0.01, up: 1.63, fwd: 0.49 },
   },
+  // The Gaol Turnkey (the art guide's body, measured on its posed Idle): water
+  // off the hood's brow and crown, the ring of keys at his belt, the chain on
+  // his left forearm and the lantern's roof.
   gaol_turnkey: {
-    rawHeight: 4.677,
+    rawHeight: 1.933,
     drips: [
-      { side: 0.19, up: 4.28, fwd: 0.22 },
-      { side: -1.11, up: 1.56, fwd: 0.48 },
-      { side: 0.91, up: 1.77, fwd: 0.22 },
-      { side: 0.67, up: 2.08, fwd: 0.09 },
+      { side: 0.0, up: 1.7, fwd: 0.17 },
+      { side: -0.01, up: 1.9, fwd: 0.02 },
+      { side: 0.25, up: 0.89, fwd: 0.19 },
+      { side: 0.37, up: 1.12, fwd: 0.05 },
+      { side: 0.5, up: 0.72, fwd: 0.07 },
     ],
-    chest: { side: 0.06, up: 3.03, fwd: 0.5 },
-    eyes: { side: 0.17, up: 4.17, fwd: 0.19 },
+    chest: { side: 0.0, up: 1.3, fwd: 0.22 },
+    eyes: { side: 0.0, up: 1.75, fwd: 0.15 },
   },
   // The war mastiff: water off its jaws, the collar's ring and the snapped chain.
   bastion_warhound: {

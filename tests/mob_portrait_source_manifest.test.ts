@@ -164,14 +164,13 @@ describe('mob portrait source manifest', () => {
     expect(portraits.grubjaw.tint.resolved).toBe('#145a32');
     expect(portraits.grubjaw.tint.strength).toBe(0.04);
 
-    expect(portraits.the_wreck_warden.visualKey).toBe('mob_bruiser');
+    // the Wreck Warden left the tinted barbarian stand-in for the warrior's class body,
+    // which takes no entity tint
+    expect(portraits.the_wreck_warden.visualKey).toBe('player_warrior');
     expect(portraits.the_wreck_warden.renderSpec.model.url).toBe(
-      'models/chars/players/barbarian.glb',
+      'models/chars/players/woc/base_male.glb',
     );
-    expect(portraits.the_wreck_warden.renderSpec.attach[0].asset.url).toBe(
-      'models/weapons/axe_2handed.glb',
-    );
-    expect(portraits.the_wreck_warden.tint.resolved).toBe('#7a8a86');
+    expect(portraits.the_wreck_warden.tint.source).toBe('none');
   });
 
   it('uses one job builder and emits acceptance receipts only after a successful render', () => {
