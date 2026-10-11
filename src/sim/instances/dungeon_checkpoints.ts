@@ -1,13 +1,28 @@
 // Death recovery uses the live claim's retained boss corpses as progress,
-// just like dungeon gates. No saved state, tick work, or rng draws.
+// just like dungeon gates, and the gates' own derived state as the proof that
+// the arena can be walked to. No saved state, tick work, or rng draws.
 import { isBlocked } from '../colliders';
-import { DUNGEON_CHECKPOINTS } from '../content/dungeon_checkpoints';
+import { DUNGEON_CHECKPOINTS, type DungeonCheckpoint } from '../content/dungeon_checkpoints';
 import { DUNGEONS, instanceOrigin } from '../data';
 import { MAX_AGGRO_RADIUS } from '../mob/aggro_ranges';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity } from '../types';
+import { type DungeonDef, dist2d, type Entity } from '../types';
+import { dungeonGateState } from './dungeon_gates';
+
+/** Is every gate on the way in to `checkpoint` open in this claim, right now? */
+function routeOpen(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  dungeon: DungeonDef,
+  checkpoint: DungeonCheckpoint,
+): boolean {
+  return checkpoint.gates.every((gateId) => {
+    const gate = dungeon.gates?.find((g) => g.id === gateId);
+    return gate !== undefined && dungeonGateState(ctx, inst, gate) === 'open';
+  });
+}
 
 /** Instance-local arrival. Ordinary entries and unrelated corpses use the door. */
 export function dungeonReentryPoint(
@@ -51,6 +66,9 @@ export function dungeonReentryPoint(
   for (let i = checkpoints.length - 1; i >= 0; i--) {
     const checkpoint = checkpoints[i];
     if (!checkpoint.bosses.every(defeated)) continue;
+    // A dead boss alone proves nothing about the way in: the arena is offered
+    // only while a group could walk to it through its open gates.
+    if (!routeOpen(ctx, inst, dungeon, checkpoint)) continue;
     const pos = ctx.groundPos(origin.x + checkpoint.pos.x, origin.z + checkpoint.pos.z);
     if (isBlocked(ctx.cfg.seed, pos.x, pos.z, PLAYER_BODY_RADIUS)) continue;
     // Live positions include patrols and surviving summons. Check the whole
@@ -74,7 +92,7 @@ export function dungeonReentryPoint(
       )
     )
       continue;
-    return checkpoint.pos;
+    return { x: checkpoint.pos.x, z: checkpoint.pos.z };
   }
   return dungeon.entry;
 }
