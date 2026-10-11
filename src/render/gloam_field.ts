@@ -4,18 +4,22 @@
 // bubble of shadow that bursts every few seconds, and the entry (a column of
 // smoke closing over the body while the pool erupts and a ring races out).
 //
-// One field per renderer, owned by Vfx, which forwards the one call the entity
-// loop makes per wearer per frame and its own update, clear and dispose. The
-// body (the climbing dark, the halo, the rim) is characters/gloam_climb.ts and
-// reaches this layer only through the cue that call carries.
+// One field per renderer, owned by Vfx (which clears and disposes it with its
+// own state). The renderer drives it: one `wearer` call per body in the form
+// that it presents, then one `update` to close the frame, which carries the
+// viewer's reduced-motion setting. The body (the climbing dark, the halo, the
+// rim) is characters/gloam_climb.ts and reaches this layer only through the
+// cue the `wearer` call carries.
 //
 // GPU: three programs (the smoke cloud, the pool, the entry ring), on three
 // materials built once here. The root holds a hidden stand-in of each floor
-// material and is attached through attachSceneGroupGated, so nothing under it
-// draws until all three are linked, and every drawable is tagged 'vfx', so the
-// boot's cast-VFX warm-up links them under the loading cover first
-// (ability_vfx/prewarm.ts walks the tag). A pool appearing later mints
-// geometry only.
+// material and is attached through attachSceneGroupGated, at construction and
+// again after a context restore, so nothing under it draws until all three are
+// linked, and every drawable is tagged 'vfx', so the boot's cast-VFX warm-up
+// links them under the loading cover first (ability_vfx/prewarm.ts walks the
+// tag). A pool appearing later mints geometry only, and a pool whose wearer is
+// gone is kept for the next one (a bounded few), so a camera that turns away
+// from a priest and back mints nothing.
 //
 // What each tier and the reduced-motion setting keep is the pure
 // gloam_field_core.ts; where a stain lies is gloam_pool_core.ts.
@@ -25,12 +29,12 @@ import {
   GLOAM_CUE_ENTER,
   GLOAM_CUE_HIDDEN,
   GLOAM_CUE_REST,
-  GLOAM_CUE_STILL,
   type GloamCue,
 } from './characters/gloam_climb_core';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX, sharedUniforms } from './gfx';
 import {
+  GLOAM_SPARE_POOLS,
   GLOAM_WEARER_LINGER,
   type GloamPlan,
   GloamRoster,
@@ -41,7 +45,7 @@ import {
   gloamPoolDraped,
 } from './gloam_field_core';
 import { buildGloamFloorStandIns, createGloamFloorMaterials, GloamPool } from './gloam_pool';
-import { GloamDrapeBudget } from './gloam_pool_core';
+import { GLOAM_POOL_SIZE, GloamDrapeBudget, GloamGround } from './gloam_pool_core';
 import { GloamSmoke } from './gloam_smoke';
 import type { GloamPuff } from './gloam_smoke_core';
 import type { VfxAnchorResolver } from './vfx_anchor';
@@ -109,6 +113,8 @@ export class GloamField {
   private readonly standIns: THREE.Mesh[];
   private readonly roster = new GloamRoster<Wearer>();
   private readonly budget = new GloamDrapeBudget();
+  /** The floor as the pools have learned it, on the grid of the tier's pool. */
+  private ground = new GloamGround(GLOAM_POOL_SIZE);
   private readonly at = new THREE.Vector3();
   /** One reused description: emitting a puff allocates nothing. */
   private readonly puff: GloamPuff = {
@@ -128,14 +134,17 @@ export class GloamField {
   };
   private clock = 0;
   private turn = 0;
-  /** A wearer reported the still cue this frame: the viewer asked for reduced
-   *  motion (one setting for the whole view, read where the rigs read it). */
-  private still = false;
+  /** Parked pools waiting for a wearer, at most GLOAM_SPARE_POOLS. */
+  private readonly spares: GloamPool[] = [];
   private disposed = false;
   private readonly makeWearer = (): Wearer => new Wearer();
   private readonly releaseWearer = (wearer: Wearer): void => {
-    wearer.pool?.dispose();
+    const pool = wearer.pool;
     wearer.pool = null;
+    if (!pool) return;
+    pool.park();
+    if (this.spares.length < GLOAM_SPARE_POOLS) this.spares.push(pool);
+    else pool.dispose();
   };
 
   /**
@@ -145,7 +154,7 @@ export class GloamField {
    * programs are linked.
    */
   constructor(
-    scene: THREE.Scene,
+    private readonly scene: THREE.Scene,
     private readonly anchor: VfxAnchorResolver,
     private readonly cloud: GloamCloudHost,
     private readonly groundY: (x: number, z: number) => number,
@@ -155,25 +164,52 @@ export class GloamField {
     this.root.add(this.smoke.points);
     this.standIns = buildGloamFloorStandIns(this.materials);
     for (const mesh of this.standIns) this.root.add(mesh);
-    attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed).catch(() => {
-      // Cancelled by dispose while its link was pending: nothing to reveal.
-    });
+    this.attach();
+  }
+
+  /** Into the scene behind the compile gate: hidden until the three programs
+   *  are linked, revealed by the gate, its failure, or the attach watchdog. */
+  private attach(): void {
+    attachSceneGroupGated(this.scene, this.root, this.compileGate, () => this.disposed).catch(
+      () => {
+        // Cancelled by dispose while its link was pending: nothing to reveal.
+      },
+    );
   }
 
   /**
    * The WebGL context came back. Three rebuilds buffers and programs on its
    * own, but the three programs here are gone with the old context, so the
    * layer goes back behind its gate until they are linked again instead of
-   * linking them in the first frame that draws a pool. The field holds no
-   * texture and no render target, so there is nothing else to restore.
+   * linking them in the first frame that draws a pool. It goes through the
+   * same gated attach as at construction, so a gate that never settles is
+   * revealed by the watchdog and leaves an event. The parked pools are let go:
+   * nothing of theirs survived the context. The field holds no texture and no
+   * render target, so there is nothing else to restore.
    */
   onContextRestored(): void {
-    if (this.disposed || !this.compileGate) return;
-    this.root.visible = false;
-    const reveal = (): void => {
-      if (!this.disposed) this.root.visible = true;
-    };
-    this.compileGate(this.root).then(reveal, reveal);
+    if (this.disposed) return;
+    this.dropSpares();
+    if (this.compileGate) this.attach();
+  }
+
+  private dropSpares(): void {
+    for (const pool of this.spares) pool.dispose();
+    this.spares.length = 0;
+  }
+
+  /** A pool for a new wearer on a `cells` grid: a parked one when it fits. */
+  private takePool(cells: number): GloamPool {
+    while (this.spares.length > 0) {
+      const pool = this.spares.pop() as GloamPool;
+      if (pool.cells === cells) {
+        pool.revive();
+        return pool;
+      }
+      // Parked on another tier's grid: the preset changed since.
+      pool.dispose();
+    }
+    return new GloamPool(this.root, this.materials, cells);
   }
 
   /** Same projection scale the additive cloud uses, so puff sizes agree. */
@@ -184,11 +220,10 @@ export class GloamField {
   /**
    * One wearer presented this frame (the entity loop calls this once per body
    * in the form that it draws). `cue` comes from the rig (hidden under a ghost
-   * or stealth body, entering on the frame the shift is seen, still under
-   * reduced motion, resting in water), `settled` is false in the air and in
-   * water, `d2` is the squared distance to the viewer, and `feetY` is where
-   * the body touches what it stands on (the mount's hooves for a rider, never
-   * the saddle).
+   * or stealth body, entering on the frame the shift is seen, resting in
+   * water), `settled` is false in the air and in water, `d2` is the squared
+   * distance to the viewer, and `feetY` is where the body touches what it
+   * stands on (the mount's hooves for a rider, never the saddle).
    */
   wearer(id: number, cue: GloamCue, settled: boolean, d2: number, feetY: number): void {
     if (this.disposed) return;
@@ -202,7 +237,7 @@ export class GloamField {
     if (cue === GLOAM_CUE_REST) return;
     const at = this.anchor(id, ANCHOR_FRACTION, this.at);
     if (!at) return;
-    const wearer = this.roster.touch(id, this.clock, this.makeWearer);
+    const wearer = this.admit(id, d2);
     if (!wearer) return;
     wearer.x = at.x;
     wearer.y = at.y;
@@ -212,17 +247,37 @@ export class GloamField {
     wearer.settled = settled;
     wearer.d2 = d2;
     if (cue === GLOAM_CUE_ENTER) wearer.entering = true;
-    else if (cue === GLOAM_CUE_STILL) this.still = true;
   }
 
-  /** Once a frame, after every wearer was reported. */
-  update(dt: number): void {
+  /** The tracked wearer `id`, admitted if there is room. When the roster is
+   *  full the nearest keep their place: a newcomer closer than the farthest
+   *  tracked wearer takes it (that one's pool is a few pixels across). */
+  private admit(id: number, d2: number): Wearer | undefined {
+    const wearer = this.roster.touch(id, this.clock, this.makeWearer);
+    if (wearer) return wearer;
+    let far = -1;
+    for (let i = 0; i < this.roster.size; i++) {
+      if (far < 0 || this.roster.at(i).d2 > this.roster.at(far).d2) far = i;
+    }
+    if (far < 0 || !(this.roster.at(far).d2 > d2)) return undefined;
+    this.roster.drop(this.roster.idAt(far), this.releaseWearer);
+    return this.roster.touch(id, this.clock, this.makeWearer);
+  }
+
+  /**
+   * Once a frame, after every wearer was reported. `reducedMotion` is the
+   * viewer's setting, passed by the renderer and never inferred from who
+   * reported: a pool fading out after its wearer stopped reporting stays as
+   * still as it was.
+   */
+  update(dt: number, reducedMotion: boolean): void {
     if (this.disposed) return;
-    const still = this.still;
-    this.still = false;
     this.clock += dt;
-    this.materials.clock.value = still ? STILL_CLOCK : sharedUniforms.uTime.value;
-    const plan = gloamPlan(GFX.effectsTier, still);
+    const plan = gloamPlan(GFX.effectsTier, reducedMotion);
+    this.materials.clock.value = plan.living ? sharedUniforms.uTime.value : STILL_CLOCK;
+    // The floor is remembered on the pool's own grid: another tier, another grid.
+    const cell = GLOAM_POOL_SIZE / plan.poolCells;
+    if (this.ground.cell !== cell) this.ground = new GloamGround(cell);
     this.budget.refill();
     // Whoever was served first last frame goes last this one, so a crowd of
     // moving pools shares the ground-sample allowance instead of starving its tail.
@@ -237,7 +292,12 @@ export class GloamField {
   private step(wearer: Wearer, dt: number, plan: GloamPlan): void {
     if (wearer.reported) {
       wearer.reported = false;
-      wearer.pool ??= new GloamPool(this.root, this.materials, plan.poolCells);
+      // A pool laid for another tier's grid (the preset changed): replaced.
+      if (wearer.pool && wearer.pool.cells !== plan.poolCells) {
+        wearer.pool.dispose();
+        wearer.pool = null;
+      }
+      wearer.pool ??= this.takePool(plan.poolCells);
       if (wearer.entering) {
         wearer.entering = false;
         if (plan.entry > 0) {
@@ -252,6 +312,7 @@ export class GloamField {
         wearer.settled,
         gloamPoolDraped(wearer.d2),
         plan.wakeStains,
+        this.ground,
         this.groundY,
         this.budget,
       );
@@ -465,28 +526,44 @@ export class GloamField {
     }
   }
 
-  /** Wearers tracked, pools laid and puffs alive (the `?perf` readout and tests). */
-  stats(): { wearers: number; stains: number; puffs: number; samplesLeft: number } {
+  /** Wearers tracked, stains they hold, pools parked, puffs alive, floor nodes
+   *  remembered and what is left of this frame's ground samples. Read by the
+   *  tests, and from the page by whoever measures the layer; it is not part of
+   *  the `?perf` readout. */
+  stats(): {
+    wearers: number;
+    stains: number;
+    spares: number;
+    puffs: number;
+    groundNodes: number;
+    samplesLeft: number;
+  } {
     let stains = 0;
     for (let i = 0; i < this.roster.size; i++) stains += this.roster.at(i).pool?.stainCount ?? 0;
     return {
       wearers: this.roster.size,
       stains,
+      spares: this.spares.length,
       puffs: this.smoke.count,
+      groundNodes: this.ground.size,
       samplesLeft: this.budget.remaining,
     };
   }
 
-  /** Drop every wearer and every puff (a zone change, a renderer reset). */
+  /** Drop every wearer and every puff (a zone change, a renderer reset). The
+   *  parked pools stay: they are bounded, and the next zone has priests too. */
   clear(): void {
     this.roster.clear(this.releaseWearer);
     this.smoke.clear();
+    this.ground.clear();
   }
 
-  /** Terminal: the field owns its three materials and every geometry under it. */
+  /** Terminal: the field owns its three materials and every geometry it made,
+   *  in the scene or parked. */
   dispose(): void {
     if (this.disposed) return;
     this.clear();
+    this.dropSpares();
     this.disposed = true;
     this.root.removeFromParent();
     for (const mesh of this.standIns) mesh.geometry.dispose();

@@ -390,7 +390,8 @@ export class Vfx {
   private fwFlash = new THREE.Color();
   private rocketExhaustSide = 0;
   private quality = 1;
-  /** Gloamveil's pool and dark smoke, which an additive cloud cannot draw. */
+  /** Gloamveil's pool and dark smoke, which an additive cloud cannot draw. The
+   *  renderer reports its wearers and closes its frame (gloam_field.ts). */
   readonly gloam: GloamField;
   private paladinSpellFx: PaladinSpellVfxController;
   private disposed = false;
@@ -2579,7 +2580,6 @@ export class Vfx {
   update(dt: number, reducedMotion = false): void {
     if (this.disposed) return;
     this.drainLifeVfx.update(dt, reducedMotion);
-    this.gloam.update(dt);
 
     for (let i = this.pendingBursts.length - 1; i >= 0; i--) {
       const pending = this.pendingBursts[i];

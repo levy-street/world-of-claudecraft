@@ -99,7 +99,13 @@ export class GloamSmoke {
     this.points = new THREE.Points(geometry, this.material);
     this.points.name = 'gloam_smoke';
     this.points.frustumCulled = false;
-    // Under the additive cloud (renderOrder 5), so its glints ride over the smoke.
+    // A bare order, off the floor ladder: the puffs rise through the air and
+    // are depth-tested, they are not a floor mark. 4 puts them under the
+    // additive cloud (5), so its glints ride over the smoke, and under every
+    // floor piece a player has to read: the whole player and encounter bands
+    // and the Shadow priest's own pool draw after the smoke, so a puff can
+    // never darken a Consecration or a telegraph it drifts in front of. Only
+    // the world's lowest ground marks (blob shadows, torch pools) draw first.
     this.points.renderOrder = 4;
     setRenderCategory(this.points, 'vfx');
   }

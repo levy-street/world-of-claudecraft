@@ -14,10 +14,18 @@
 //   WHAT A VERTEX DOES (gloamDrapeHeight, gloamDrapeFade). Where the floor
 //     breaks away under the grid (a ledge, a wall foot) the stain fades out
 //     rather than climbing or hanging in the air.
-//   WHEN IT IS LAID (GloamDrapeBudget). Draping samples the ground once per
-//     vertex, so every pool in view draws on one per-frame allowance; a pool
-//     the allowance cannot serve this frame slides with its wearer on the
-//     drape it has and is laid properly on a later frame.
+//   WHAT A LAY COSTS (GloamGround, GloamDrapeBudget). The ground sampler is
+//     the expensive part: about ten microseconds a call, so sampling it once
+//     per vertex per frame cost a running priest two milliseconds a frame.
+//     The floor does not move, so its height is remembered on a world-aligned
+//     grid of the pool's own cell and a vertex reads it between four nodes.
+//     A pool laid a hand farther on needs only the row of nodes it has just
+//     reached, so it can be laid every frame it moves, as exactly as the grid
+//     it is drawn on allows. New samples are spent from one per-frame
+//     allowance shared by every pool in view; where the allowance runs out a
+//     vertex keeps the height it had (a pool rides its wearer on its own
+//     floor, so that is exact on any plane) and the lay is finished on a
+//     later frame.
 //
 // Pure core contract: no three import, no DOM, no clocks, no randomness.
 // Registered in RENDER_PURE_CORES (tests/architecture.test.ts); tested by
@@ -63,8 +71,19 @@ export const GLOAM_RING_SECONDS = 0.95;
 /** Seconds the pool takes to fade in (and out, when its wearer leaves it). */
 export const GLOAM_POOL_FADE = 0.2;
 
-/** Ground samples every pool in view may spend between them in one frame. */
-export const GLOAM_DRAPE_BUDGET = 420;
+/** Ground samples every pool in view may spend between them in one frame:
+ *  about a millisecond of the sampler at its measured cost. A pool that has
+ *  just appeared fills its grid over two or three frames, while it fades in. */
+export const GLOAM_DRAPE_BUDGET = 96;
+/** Grid nodes one generation of the ground memory holds before it turns over. */
+export const GLOAM_GROUND_NODES = 4096;
+/** How far ahead of its racing front the entry ring is laid, in seconds of
+ *  the front's own run: longer than a slow frame, so the darkness never
+ *  reaches ground that is not laid yet, at seven frames a second or sixty. */
+export const GLOAM_RING_LEAD_SECONDS = 0.15;
+/** The ring is laid this much past where the front will be (a share of its
+ *  half side): the band's soft outer edge. */
+export const GLOAM_RING_EDGE = 0.05;
 
 function smoothstep(lo: number, hi: number, x: number): number {
   const t = Math.max(0, Math.min(1, (x - lo) / (hi - lo)));
@@ -156,15 +175,21 @@ export function gloamEruptGrow(age: number): number {
   return 1.55 - 0.55 * (1 - (1 - (erupt - 0.3) / 0.7) ** 3);
 }
 
+/** How far the shock ring's front has run `age` seconds in, 0 to 1 of the
+ *  ring's half side: fast at first, easing out. 1 once it has passed. */
+export function gloamRingFront(age: number): number {
+  const left = 1 - Math.min(1, Math.max(0, age / GLOAM_RING_SECONDS));
+  return 1 - left ** 2.4;
+}
+
 /** The shock ring at `age` seconds, written into `out`: how far its front has
  *  run (0 to 1 of the ring's half side) and how strong it is. False once it
  *  has passed. */
 export function gloamRingAt(age: number, out: { grow: number; alpha: number }): boolean {
   const t = age / GLOAM_RING_SECONDS;
   if (!(t < 1)) return false;
-  const left = 1 - Math.max(0, t);
-  out.grow = 1 - left ** 2.4;
-  out.alpha = left ** 1.3;
+  out.grow = gloamRingFront(age);
+  out.alpha = (1 - Math.max(0, t)) ** 1.3;
   return true;
 }
 
@@ -231,19 +256,165 @@ export class GloamDrapeBudget {
     this.left = this.perFrame;
   }
 
-  /**
-   * Spend `samples`. The first request of a frame is always served, whatever
-   * its size, so one pool can never be starved by a budget smaller than its
-   * own grid; after that a request the allowance cannot cover is refused.
-   */
-  take(samples: number): boolean {
+  /** Spend one sample. False once the frame's allowance is gone. */
+  take(): boolean {
     if (this.left <= 0) return false;
-    if (samples > this.left && this.left < this.perFrame) return false;
-    this.left -= samples;
+    this.left -= 1;
     return true;
   }
 
   get remaining(): number {
     return Math.max(0, this.left);
   }
+}
+
+/** A grid coordinate is offset into a non-negative range and packed in one key. */
+const NODE_OFFSET = 2 ** 20;
+const NODE_SPAN = 2 ** 21;
+
+/**
+ * The floor's height, remembered on a world-aligned grid of one cell size.
+ * The ground under the game does not move, so a node sampled once is right for
+ * good. Two generations bound the memory without a stall: when the recent one
+ * is full it becomes the older one, and a node read from the older one is
+ * carried forward, so what a pool is standing on is never forgotten.
+ */
+export class GloamGround {
+  private recent = new Map<number, number>();
+  private older = new Map<number, number>();
+
+  constructor(
+    readonly cell: number,
+    private readonly capacity = GLOAM_GROUND_NODES,
+  ) {}
+
+  /**
+   * The floor height at grid node (ix, iz): remembered, or sampled now when
+   * `budget` still has a sample to give. NaN when it is unknown and cannot be
+   * sampled this frame.
+   */
+  node(
+    ix: number,
+    iz: number,
+    groundY: (x: number, z: number) => number,
+    budget: GloamDrapeBudget,
+  ): number {
+    const kx = ix + NODE_OFFSET;
+    const kz = iz + NODE_OFFSET;
+    // Off the keyed range (a world coordinate no zone reaches): sampled, never kept.
+    if (!(kx >= 0 && kx < NODE_SPAN && kz >= 0 && kz < NODE_SPAN)) {
+      return budget.take() ? groundY(ix * this.cell, iz * this.cell) : Number.NaN;
+    }
+    const key = kx * NODE_SPAN + kz;
+    let height = this.recent.get(key);
+    if (height !== undefined) return height;
+    height = this.older.get(key);
+    if (height === undefined) {
+      if (!budget.take()) return Number.NaN;
+      height = groundY(ix * this.cell, iz * this.cell);
+    }
+    if (this.recent.size >= this.capacity) {
+      this.older = this.recent;
+      this.recent = new Map();
+    }
+    this.recent.set(key, height);
+    return height;
+  }
+
+  /** Nodes remembered (at most two generations). */
+  get size(): number {
+    return this.recent.size + this.older.size;
+  }
+
+  clear(): void {
+    this.recent.clear();
+    this.older.clear();
+  }
+}
+
+/** The grid nodes under one stain, read out of a GloamGround for one lay. */
+export interface GloamWindow {
+  /** Row by row along z, `nx` nodes to a row. NaN where the floor is unknown. */
+  heights: Float32Array;
+  ix0: number;
+  iz0: number;
+  nx: number;
+  nz: number;
+  cell: number;
+}
+
+/** Yards a window reaches past the stain it is read for. */
+const WINDOW_MARGIN = 1e-3;
+
+export function createGloamWindow(): GloamWindow {
+  return { heights: new Float32Array(0), ix0: 0, iz0: 0, nx: 0, nz: 0, cell: 1 };
+}
+
+/**
+ * Read into `out` every grid node the square of half side `half` around (x, z)
+ * stands on, from the middle outward: when the allowance runs out it is the
+ * rim that is left for a later frame, and a stain is drawn from its middle.
+ * Returns how many nodes are still unknown; the lay is whole when it is zero.
+ */
+export function gloamWindowFill(
+  ground: GloamGround,
+  x: number,
+  z: number,
+  half: number,
+  groundY: (x: number, z: number) => number,
+  budget: GloamDrapeBudget,
+  out: GloamWindow,
+): number {
+  const cell = ground.cell;
+  // A hair wider than the stain: its vertices are 32-bit floats, and one a
+  // rounding error outside the square must still find its four nodes.
+  const reach = half + WINDOW_MARGIN;
+  const ix0 = Math.floor((x - reach) / cell);
+  const iz0 = Math.floor((z - reach) / cell);
+  const nx = Math.floor((x + reach) / cell) + 2 - ix0;
+  const nz = Math.floor((z + reach) / cell) + 2 - iz0;
+  if (out.heights.length < nx * nz) out.heights = new Float32Array(nx * nz);
+  out.ix0 = ix0;
+  out.iz0 = iz0;
+  out.nx = nx;
+  out.nz = nz;
+  out.cell = cell;
+  let unknown = 0;
+  // Square rings round the middle node, nearest first.
+  const ci = nx >> 1;
+  const cj = nz >> 1;
+  const rings = Math.max(ci, nx - 1 - ci, cj, nz - 1 - cj);
+  for (let d = 0; d <= rings; d++) {
+    for (let j = cj - d; j <= cj + d; j++) {
+      if (j < 0 || j >= nz) continue;
+      // The ring's top and bottom rows whole, its two sides in between.
+      const stride = d === 0 || j === cj - d || j === cj + d ? 1 : 2 * d;
+      for (let i = ci - d; i <= ci + d; i += stride) {
+        if (i < 0 || i >= nx) continue;
+        const height = ground.node(ix0 + i, iz0 + j, groundY, budget);
+        if (Number.isNaN(height)) unknown += 1;
+        out.heights[j * nx + i] = height;
+      }
+    }
+  }
+  return unknown;
+}
+
+/**
+ * The floor height at (wx, wz), between the four nodes of `read` around it.
+ * NaN when one of the four is unknown or the point lies off what was read.
+ */
+export function gloamWindowHeight(read: GloamWindow, wx: number, wz: number): number {
+  const fx = wx / read.cell - read.ix0;
+  const fz = wz / read.cell - read.iz0;
+  const i = Math.floor(fx);
+  const j = Math.floor(fz);
+  if (!(i >= 0 && j >= 0 && i < read.nx - 1 && j < read.nz - 1)) return Number.NaN;
+  const tx = fx - i;
+  const tz = fz - j;
+  const row = j * read.nx + i;
+  const h = read.heights;
+  const near = h[row] + (h[row + 1] - h[row]) * tx;
+  const far = h[row + read.nx] + (h[row + read.nx + 1] - h[row + read.nx]) * tx;
+  return near + (far - near) * tz;
 }

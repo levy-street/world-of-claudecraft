@@ -10,6 +10,7 @@ import { CHARACTER_LOD_RANGE, CHARACTER_LOD_RANGE_SQ } from '../src/render/crowd
 import {
   GLOAM_FAR_SMOKE_SCALE,
   GLOAM_MAX_WEARERS,
+  GLOAM_SPARE_POOLS,
   GLOAM_WEARER_LINGER,
   type GloamPlan,
   GloamRoster,
@@ -288,7 +289,12 @@ describe('GloamRoster', () => {
     expect(roster.size).toBe(4);
     expect([10, 12, 14, 15].map((id) => roster.get(id))).toEqual(['w0', 'w2', 'w4', 'w5']);
     const seen = new Set<string>();
-    for (let i = 0; i < roster.size; i++) seen.add(roster.at(i));
+    for (let i = 0; i < roster.size; i++) {
+      seen.add(roster.at(i));
+      // The id at a slot is the one its item was touched under, after the
+      // swap-removals above as before them.
+      expect(roster.get(roster.idAt(i))).toBe(roster.at(i));
+    }
     expect([...seen].sort()).toEqual(['w0', 'w2', 'w4', 'w5']);
   });
 
@@ -310,5 +316,10 @@ describe('GloamRoster', () => {
 
   it('lingers longer than a wake stain lives, so the last prints fade rather than pop', () => {
     expect(GLOAM_WEARER_LINGER).toBeGreaterThan(GLOAM_WAKE_SECONDS);
+    // How many pools wait parked for a wearer, and how many wearers are
+    // tracked: both bound what the layer holds, so both are literals here.
+    expect(GLOAM_SPARE_POOLS).toBe(8);
+    expect(GLOAM_MAX_WEARERS).toBe(24);
+    expect(GLOAM_SPARE_POOLS).toBeLessThan(GLOAM_MAX_WEARERS);
   });
 });

@@ -112,11 +112,18 @@ COSMETIC (may be tiered down on lower presets):
     haze, the bubble that bursts every few seconds with its sparkles, a wake of eight stains,
     the pool draped on a twelve-cell grid, the full entry (smoke column, skirt, sparkles).
   - **medium** drops the sparkles, halves the wake, thins the smoke and the entry to seven
-    tenths and drapes the pool on eight cells. The rim glow is the engine's own standard
-    material rule and comes with this tier.
+    tenths and drapes the pool on eight cells.
   - **low** (and every Lambert device) keeps the pool, its living rim, the entry's dark beat,
     ring and a thinned column, and a thin smoke; the haze, the bubbles and the wake go, and the
     pool is draped on six cells.
+  The violet rim glow on the body is not part of this plan and follows no effects tier: it is
+  the character rim every rig material carries where the device draws standard materials
+  (`GFX.standardMaterials`), recoloured for the form. A device on the Lambert arm has no rim
+  on any body, in or out of the form, whatever its effects tier (an iOS device can sit on the
+  medium plan above and still be one). The dark legs and the halo do not depend on it.
+  The pool never hides ground a player reacts to: it draws under every player and encounter
+  floor effect (`docs/design/vfx-floor-layering.md`, the worked case), and the smoke under
+  both too.
   The tier is the STATIC effects tier (`GFX.effectsTier`), never the FPS governor. Two further
   arms, both cosmetic: the smoke RATE thins with viewer distance against the fixed
   `CHARACTER_LOD_RANGE` anchor (never the live crowd band, so two viewers in one spot agree)
@@ -126,6 +133,8 @@ COSMETIC (may be tiered down on lower presets):
   (dark legs on a frozen tongue shape, the pool on one still shape, the steady rim, the violet
   halo) and everything that moves goes: no entry beat, ring or column, no smoke, haze, bubbles
   or wake. The cast response stays, because it is the form answering what its wearer does.
+  The setting is handed to the layer by the renderer every frame, so a pool fading out after
+  its wearer left stays as still as it was.
 - Ambient plant motion in the world: the foliage wind sway on canopies, bushes and grass
   cards, and the farm crops' idle lean (`src/render/farm_patches.ts`). This is the class
   boundary for the reduced-motion clause directly above, which is about a CHARACTER-borne

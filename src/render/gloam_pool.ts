@@ -6,39 +6,51 @@
 // World-space, never parented to a rig (a rig turns, scales and bobs; a stain
 // on the floor does not). Each stain is a small grid DRAPED on the real floor
 // through the renderer's own seed-bound ground sampler, the one every other
-// floor effect is handed. The decisions (where it lies, what a vertex does
-// where the floor breaks away, when it may be laid again) are the pure
-// gloam_pool_core.ts; this file is the meshes.
+// floor effect is handed. That sampler is costly, so the pool and its wake
+// read the floor through the field's remembered grid of it (GloamGround) and
+// the ring, whose grid is coarse and which lives a second, samples only the
+// vertices its racing front is about to reach. The decisions (where it lies,
+// what a vertex does where the floor breaks away, what a lay costs) are the
+// pure gloam_pool_core.ts; this file is the meshes.
 //
 // Every stain of every pool draws with ONE of two materials (the pool's and
 // the ring's), which the field builds once and links behind its compile gate
 // (gloam_field.ts). What differs per stain (its opacity, its growth, its seed)
 // is written into that material's uniforms in the stain's own onBeforeRender,
 // three's sanctioned path for per-object uniforms on a shared ShaderMaterial,
-// so a pool appearing or a wake stain dropping mints no material.
+// so a pool appearing or a wake stain dropping mints no material. A pool whose
+// wearer is gone is parked and handed to the next wearer (gloam_field.ts keeps
+// a bounded few), so a camera turning away and back mints no buffer either.
 
 import * as THREE from 'three';
 import { floorVfxLayerTopOrder } from './floor_vfx_layer';
 import {
   createGloamFloor,
   createGloamWake,
+  createGloamWindow,
   GLOAM_BREAK_HEIGHT,
   GLOAM_POOL_FADE,
   GLOAM_POOL_LIFT,
   GLOAM_POOL_SIZE,
+  GLOAM_RING_EDGE,
+  GLOAM_RING_LEAD_SECONDS,
   GLOAM_RING_SIZE,
   GLOAM_WAKE_SECONDS,
   GLOAM_WAKE_SIZE,
   type GloamDrapeBudget,
+  type GloamGround,
   gloamDrapeFade,
   gloamDrapeHeight,
   gloamEruptGrow,
   gloamFloorInto,
   gloamRedrapeDue,
   gloamRingAt,
+  gloamRingFront,
   gloamWakeAlpha,
   gloamWakeGrow,
   gloamWakeStep,
+  gloamWindowFill,
+  gloamWindowHeight,
 } from './gloam_pool_core';
 import { setRenderCategory } from './renderer_diagnostics';
 
@@ -171,8 +183,14 @@ interface Stain {
   alpha: number;
   grow: number;
   seed: number;
+  /** Half the side of its grid, yards. */
+  half: number;
   /** Seconds a wake stain has left. */
   life: number;
+  /** Its last lay read every node it stands on (none was still unknown). */
+  whole: boolean;
+  /** The ring: how many vertices, nearest its centre first, are laid. */
+  reached: number;
 }
 
 function makeStain(
@@ -186,6 +204,10 @@ function makeStain(
   const position = geometry.getAttribute('position') as THREE.BufferAttribute;
   const fade = new THREE.BufferAttribute(new Float32Array(position.count).fill(1), 1);
   geometry.setAttribute('aFade', fade);
+  // Both are rewritten on every lay, which a walking wearer asks for several
+  // times a second.
+  position.setUsage(THREE.DynamicDrawUsage);
+  fade.setUsage(THREE.DynamicDrawUsage);
   // Draping moves vertices by at most the break height, so one fixed bound
   // covers every lay and the stain culls without a recompute.
   geometry.boundingSphere = new THREE.Sphere(
@@ -204,7 +226,10 @@ function makeStain(
     alpha: 0,
     grow: 1,
     seed,
+    half: size / 2,
     life: 0,
+    whole: true,
+    reached: 0,
   };
   const uniforms = material.uniforms;
   mesh.onBeforeRender = () => {
@@ -226,35 +251,107 @@ export function buildGloamFloorStandIns(materials: GloamFloorMaterials): THREE.M
   return [pool, ring];
 }
 
-/** Ground samples one lay of `stain` costs. */
-function drapeCost(stain: Stain): number {
-  return stain.position.length / 3;
+/** One reused read of the grid nodes under a stain. */
+const WINDOW = createGloamWindow();
+
+function flatten(stain: Stain): void {
+  const position = stain.position;
+  for (let i = 1; i < position.length; i += 3) position[i] = 0;
+  stain.fade.fill(1);
 }
 
-/** Lay `stain` on the floor around (x, z), whose own floor is `baseY`. */
+function uploaded(stain: Stain): void {
+  stain.geometry.getAttribute('position').needsUpdate = true;
+  stain.geometry.getAttribute('aFade').needsUpdate = true;
+}
+
+/**
+ * Lay `stain` on the floor around (x, z), whose own floor there is `baseY`. A
+ * flat lay touches no ground. A draped one reads the floor between the nodes
+ * of `ground`; a vertex over ground still unknown (the allowance ran out) is
+ * left as it was. Returns whether the lay was whole.
+ */
 function drape(
   stain: Stain,
   x: number,
   z: number,
   baseY: number,
   flat: boolean,
+  ground: GloamGround,
   groundY: (x: number, z: number) => number,
-): void {
+  budget: GloamDrapeBudget,
+): boolean {
+  stain.mesh.position.set(x, baseY + GLOAM_POOL_LIFT, z);
+  if (flat) {
+    flatten(stain);
+    uploaded(stain);
+    return true;
+  }
   const position = stain.position;
   const fade = stain.fade;
-  stain.mesh.position.set(x, baseY + GLOAM_POOL_LIFT, z);
+  const unknown = gloamWindowFill(ground, x, z, stain.half, groundY, budget, WINDOW);
   for (let i = 0, v = 0; i < position.length; i += 3, v++) {
-    if (flat) {
-      position[i + 1] = 0;
-      fade[v] = 1;
-      continue;
-    }
-    const rise = groundY(x + position[i], z + position[i + 2]) - baseY;
+    const height = gloamWindowHeight(WINDOW, x + position[i], z + position[i + 2]);
+    if (Number.isNaN(height)) continue;
+    const rise = height - baseY;
     position[i + 1] = gloamDrapeHeight(rise);
     fade[v] = gloamDrapeFade(rise);
   }
-  stain.geometry.getAttribute('position').needsUpdate = true;
-  stain.geometry.getAttribute('aFade').needsUpdate = true;
+  uploaded(stain);
+  return unknown === 0;
+}
+
+/** The ring's vertices, nearest the centre first, and how far out each lies as
+ *  a share of the half side. One table per grid: every ring shares it. */
+interface RingOrder {
+  vertex: Uint16Array;
+  radius: Float32Array;
+}
+let ringOrder: RingOrder | null = null;
+
+function ringOrderOf(stain: Stain): RingOrder {
+  if (ringOrder) return ringOrder;
+  const position = stain.position;
+  const count = position.length / 3;
+  const radius = new Float32Array(count);
+  for (let v = 0; v < count; v++) {
+    radius[v] = Math.hypot(position[v * 3], position[v * 3 + 2]) / stain.half;
+  }
+  const vertex = new Uint16Array(count);
+  for (let v = 0; v < count; v++) vertex[v] = v;
+  vertex.sort((a, b) => radius[a] - radius[b]);
+  ringOrder = { vertex, radius };
+  return ringOrder;
+}
+
+/**
+ * Lay the entry ring as far out as `front` (0 to 1 of its half side), which
+ * the caller takes a moment ahead of where the darkness is. The ring only
+ * ever draws what lies behind its front, so a vertex is sampled just before
+ * the darkness reaches it: the lay is spread over the second the ring lasts,
+ * and its corners, which the front never reaches, are never sampled at all.
+ */
+function reachRing(
+  ring: Stain,
+  front: number,
+  groundY: (x: number, z: number) => number,
+  budget: GloamDrapeBudget,
+): void {
+  const order = ringOrderOf(ring);
+  const position = ring.position;
+  const at = ring.mesh.position;
+  const baseY = at.y - GLOAM_POOL_LIFT;
+  const limit = front + GLOAM_RING_EDGE;
+  const first = ring.reached;
+  while (ring.reached < order.vertex.length) {
+    const v = order.vertex[ring.reached];
+    if (order.radius[v] > limit || !budget.take()) break;
+    const rise = groundY(at.x + position[v * 3], at.z + position[v * 3 + 2]) - baseY;
+    position[v * 3 + 1] = gloamDrapeHeight(rise);
+    ring.fade[v] = gloamDrapeFade(rise);
+    ring.reached += 1;
+  }
+  if (ring.reached !== first) uploaded(ring);
 }
 
 function disposeStain(stain: Stain): void {
@@ -270,28 +367,70 @@ export class GloamPool {
   private readonly pool: Stain;
   private readonly wake: Stain[] = [];
   private ring: Stain | null = null;
-  private readonly floor = createGloamFloor();
-  private readonly trail = createGloamWake();
+  private floor = createGloamFloor();
+  private trail = createGloamWake();
   /** Seconds into the entry; past it the pool rests. */
   private eruptAge = Number.POSITIVE_INFINITY;
   private ringPending = false;
+  /** The ring lies flat (on a deck, or far away): nothing of it is sampled. */
+  private ringFlat = false;
   /** Where, and how, the pool was last laid. */
   private laidX = Number.NaN;
   private laidY = Number.NaN;
   private laidZ = Number.NaN;
   private laidFlat = false;
+  private laidWhole = false;
   private fadeIn = 0;
   /** A wearer was presented since the last animate. */
   private present = false;
 
+  /**
+   * `cells` is the side of the pool's grid: fixed for the life of the pool, so
+   * the field replaces a pool whose tier changed rather than resizing it.
+   */
   constructor(
     private readonly parent: THREE.Object3D,
     private readonly materials: GloamFloorMaterials,
-    cells: number,
+    readonly cells: number,
   ) {
     this.pool = makeStain(materials.pool, GLOAM_POOL_SIZE, cells, 1.7);
     this.pool.mesh.name = 'gloam_pool';
     parent.add(this.pool.mesh);
+  }
+
+  /**
+   * The wearer is gone: take every stain out of the scene and forget where the
+   * pool lay, keeping the geometries. `revive` hands it to the next wearer.
+   */
+  park(): void {
+    for (const stain of this.stains()) {
+      stain.mesh.visible = false;
+      stain.mesh.removeFromParent();
+      stain.alpha = 0;
+      stain.life = 0;
+      stain.whole = true;
+    }
+    // A pool that was never laid lies flat until its first lay reaches it.
+    flatten(this.pool);
+    uploaded(this.pool);
+    this.floor = createGloamFloor();
+    this.trail = createGloamWake();
+    this.eruptAge = Number.POSITIVE_INFINITY;
+    this.ringPending = false;
+    this.laidX = this.laidY = this.laidZ = Number.NaN;
+    this.laidFlat = false;
+    this.laidWhole = false;
+    this.fadeIn = 0;
+    this.present = false;
+  }
+
+  /** Back into the scene for a new wearer, as a pool that was never laid. */
+  revive(): void {
+    for (const stain of this.stains()) this.parent.add(stain.mesh);
+  }
+
+  private stains(): Stain[] {
+    return this.ring ? [this.pool, this.ring, ...this.wake] : [this.pool, ...this.wake];
   }
 
   /** The form was seen starting: erupt, and send the ring out if `ring`. */
@@ -304,8 +443,9 @@ export class GloamPool {
    * A frame in which the wearer is presented: follow it at (x, z), its feet at
    * `feetY`. `draped` is false past the range where a draped grid is worth its
    * samples: the pool then lies flat. `wakeStains` is how many stains the wake
-   * may hold (0: none), and `budget` the frame's shared allowance of ground
-   * samples. Call `animate` after it, every frame.
+   * may hold (0: none), `ground` the field's memory of the floor, and `budget`
+   * the frame's shared allowance of new ground samples. Call `animate` after
+   * it, every frame.
    */
   follow(
     x: number,
@@ -314,6 +454,7 @@ export class GloamPool {
     settled: boolean,
     draped: boolean,
     wakeStains: number,
+    ground: GloamGround,
     groundY: (x: number, z: number) => number,
     budget: GloamDrapeBudget,
   ): void {
@@ -324,35 +465,74 @@ export class GloamPool {
     this.present = true;
 
     if (this.ringPending) {
-      // Laid once, where the form began. It is charged to the allowance and
-      // never refused: an entry is one lay, and it must not arrive late.
+      // Put down where the form began, on the frame it begins: an entry must
+      // not arrive late. It starts flat and is laid outward ahead of its front.
       this.ringPending = false;
       this.ring ??= this.makeRing();
-      budget.take(drapeCost(this.ring));
-      drape(this.ring, x, z, base, flat, groundY);
+      const ring = this.ring;
+      ring.mesh.position.set(x, base + GLOAM_POOL_LIFT, z);
+      flatten(ring);
+      uploaded(ring);
+      ring.reached = 0;
+      this.ringFlat = flat;
+    }
+    if (this.ring && !this.ringFlat && gloamRingAt(this.eruptAge, ringScratch)) {
+      // As far as the front will have run a slow frame from now.
+      const ahead = gloamRingFront(this.eruptAge + GLOAM_RING_LEAD_SECONDS);
+      reachRing(this.ring, ahead, groundY, budget);
     }
 
+    // The pool rides its wearer every frame, and is laid again once it has
+    // moved a step (or while its last lay still has ground to learn). A lay
+    // reads remembered ground and samples only the nodes it newly stands on.
+    pool.mesh.position.set(x, base + GLOAM_POOL_LIFT, z);
     if (flat) {
-      // One flat lay serves every later frame: only the mesh moves.
-      if (this.laidFlat) pool.mesh.position.set(x, base + GLOAM_POOL_LIFT, z);
-      else this.lay(x, z, base, true, groundY);
-    } else if (this.laidFlat || gloamRedrapeDue(x, base, z, this.laidX, this.laidY, this.laidZ)) {
-      if (budget.take(drapeCost(pool))) this.lay(x, z, base, false, groundY);
-      // The allowance is spent: slide on the lay it has. It is laid properly
-      // on a later frame (the field rotates who is served first).
-      else pool.mesh.position.set(x, base + GLOAM_POOL_LIFT, z);
+      // One flat lay serves every later frame.
+      if (!this.laidFlat) this.lay(x, z, base, true, ground, groundY, budget);
+    } else if (
+      this.laidFlat ||
+      !this.laidWhole ||
+      gloamRedrapeDue(x, base, z, this.laidX, this.laidY, this.laidZ)
+    ) {
+      this.lay(x, z, base, false, ground, groundY, budget);
     }
 
+    // A wake stain whose drop found ground still unknown finishes its lay.
+    for (const stain of this.wake) {
+      if (stain.life <= 0 || stain.whole) continue;
+      const at = stain.mesh.position;
+      stain.whole = drape(
+        stain,
+        at.x,
+        at.z,
+        at.y - GLOAM_POOL_LIFT,
+        false,
+        ground,
+        groundY,
+        budget,
+      );
+    }
     const drop = gloamWakeStep(this.trail, x, z, draped ? wakeStains : 0);
     if (drop < 0) return;
     while (this.wake.length <= drop) this.wake.push(this.makeWake(this.wake.length));
     const stain = this.wake[drop];
-    // Dropped only by a wearer on its floor (one in the air leaves no print),
-    // and a stain the allowance cannot lay is simply not dropped.
-    if (floor.presence < 1 || !(flat || budget.take(drapeCost(stain)))) return;
+    // Dropped only by a wearer on its floor (one in the air leaves no print).
+    if (floor.presence < 1) return;
     const dropX = this.trail.dropX;
     const dropZ = this.trail.dropZ;
-    drape(stain, dropX, dropZ, flat ? base : groundY(dropX, dropZ), flat, groundY);
+    // A reused stain starts flat: ground its lay cannot read yet must not keep
+    // the shape of wherever it lay last.
+    flatten(stain);
+    stain.whole = drape(
+      stain,
+      dropX,
+      dropZ,
+      flat ? base : groundY(dropX, dropZ),
+      flat,
+      ground,
+      groundY,
+      budget,
+    );
     stain.mesh.visible = true;
     stain.life = GLOAM_WAKE_SECONDS;
   }
@@ -396,9 +576,11 @@ export class GloamPool {
     z: number,
     base: number,
     flat: boolean,
+    ground: GloamGround,
     groundY: (x: number, z: number) => number,
+    budget: GloamDrapeBudget,
   ): void {
-    drape(this.pool, x, z, base, flat, groundY);
+    this.laidWhole = drape(this.pool, x, z, base, flat, ground, groundY, budget);
     this.laidX = x;
     this.laidY = base;
     this.laidZ = z;

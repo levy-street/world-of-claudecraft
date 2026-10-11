@@ -167,8 +167,12 @@ export function gloamEmitCount(ratePerSecond: number, dt: number, chance: number
 /** A wearer nobody has reported for this long has left the form or the view.
  *  Longer than a wake stain lives, so its last prints fade rather than pop. */
 export const GLOAM_WEARER_LINGER = 1.6;
-/** Wearers tracked at once. One past this draws its body and nothing else. */
+/** Wearers tracked at once. Past this the nearest keep their pools and a
+ *  farther one draws its body and nothing else. */
 export const GLOAM_MAX_WEARERS = 24;
+/** Pools kept for reuse once their wearers are gone, so a camera turning away
+ *  from a priest and back mints no buffer. Bounded: a pool past it is disposed. */
+export const GLOAM_SPARE_POOLS = 8;
 
 /**
  * Who is wearing the form in view, bounded. `touch` is called once a frame per
@@ -191,6 +195,11 @@ export class GloamRoster<T> {
   /** The item at `index` (0 to size - 1), in no promised order. */
   at(index: number): T {
     return this.items[index];
+  }
+
+  /** The id of the wearer at `index`. */
+  idAt(index: number): number {
+    return this.ids[index];
   }
 
   get(id: number): T | undefined {
