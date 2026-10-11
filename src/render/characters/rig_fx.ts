@@ -1,8 +1,7 @@
 // Two small jobs every bespoke FX piece parented into a character rig shares:
 // keeping the piece out of the body's own material cycle, and the unlit glow
-// material recipe. The shapeshift form adornments (moonwing_adornment.ts,
-// gloamveil_veil.ts) use both; the paladin rig FX and the weapon VFX set the
-// same marker inline.
+// material recipe. The shapeshift form adornment (moonwing_adornment.ts) uses
+// both; the paladin rig FX and the weapon VFX set the same marker inline.
 import * as THREE from 'three';
 import { markSharedMaterial, markSharedTexture } from '../shared_resource';
 

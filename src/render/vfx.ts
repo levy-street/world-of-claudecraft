@@ -8,6 +8,7 @@ import {
   DrainLifeVfx,
 } from './drain_life_vfx';
 import { GFX } from './gfx';
+import { type GloamCompileGate, GloamField } from './gloam_field';
 import {
   type IgnivarJudgmentFireSample,
   ignivarJudgmentFireAllowsSmoke,
@@ -389,6 +390,9 @@ export class Vfx {
   private fwFlash = new THREE.Color();
   private rocketExhaustSide = 0;
   private quality = 1;
+  /** Gloamveil's pool and dark smoke, which an additive cloud cannot draw. The
+   *  renderer reports its wearers and closes its frame (gloam_field.ts). */
+  readonly gloam: GloamField;
   private paladinSpellFx: PaladinSpellVfxController;
   private disposed = false;
   private ignivarJudgmentFireSourceId = -1;
@@ -403,6 +407,9 @@ export class Vfx {
     // beam end). Hosts without one fall back to the plain anchor, reading the
     // local offset as zero: the beam still draws, from the caster's center.
     offsetAnchor?: VfxOffsetAnchorResolver,
+    // The renderer's ground sampler and compile gate, for the Gloamveil field.
+    groundY: (x: number, z: number) => number = () => 0,
+    compileGate?: GloamCompileGate,
   ) {
     this.pos = new Float32Array(CAPACITY * 3);
     this.vel = new Float32Array(CAPACITY * 3);
@@ -577,11 +584,24 @@ export class Vfx {
     const drainAnchor: VfxOffsetAnchorResolver =
       offsetAnchor ?? ((id, frac, _localX, _localZ, out) => anchor(id, frac, out));
     this.drainLifeVfx = new DrainLifeVfx(scene, drainAnchor, drainParticleSink);
+    this.gloam = new GloamField(
+      scene,
+      anchor,
+      {
+        sprites: [SPR.glowSoft, SPR.flash, SPR.sparkle],
+        spawn: (x, y, z, vx, vy, vz, c, s, l, g, sprite) =>
+          this.spawn(x, y, z, vx, vy, vz, c, s, l, g, sprite),
+        quality: () => this.quality,
+      },
+      groundY,
+      compileGate,
+    );
   }
 
   setViewportScale(heightPx: number, fovDeg: number): void {
     const mat = this.points.material as THREE.ShaderMaterial;
     mat.uniforms.uScale.value = heightPx / (2 * Math.tan((fovDeg * Math.PI) / 360));
+    this.gloam.setViewportScale(mat.uniforms.uScale.value);
     this.pointProjectionScale = 1 / Math.tan((fovDeg * Math.PI) / 360);
   }
 
@@ -727,6 +747,7 @@ export class Vfx {
     this.paladinSpellFx.clear();
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.drainLifeVfx.clear();
+    this.gloam.clear();
     this.life.fill(0);
     this.size.fill(0);
     this.alphaAttr.fill(0);
@@ -745,6 +766,7 @@ export class Vfx {
     this.clear();
     this.disposed = true;
     this.drainLifeVfx.dispose();
+    this.gloam.dispose();
     this.points.removeFromParent();
     const material = this.points.material as THREE.ShaderMaterial;
     const atlas = material.uniforms.uAtlas?.value;
@@ -762,6 +784,7 @@ export class Vfx {
     if (this.disposed) return;
     this.cloudWarmed = false;
     this.points.visible = true;
+    this.gloam.onContextRestored();
   }
 
   private scaledCount(count: number): number {
@@ -2018,9 +2041,8 @@ export class Vfx {
 
   // Shapeshift-form aura (continuous, called per frame while the form aura is
   // on). Each form reads distinctly at a glance: metamorph = flame tongues +
-  // stray embers, moonkin = drifting star motes, shadowform = gloom wisps +
-  // smoke curls.
-  formAura(entityId: number, form: 'metamorph' | 'moonkin' | 'shadowform', dt: number): void {
+  // stray embers, moonkin = drifting star motes. Shadowform is gloam_field.ts.
+  formAura(entityId: number, form: 'metamorph' | 'moonkin', dt: number): void {
     if (form === 'metamorph') {
       const n = this.emitCount(48, dt);
       if (!n) return;
@@ -2072,29 +2094,6 @@ export class Vfx {
         );
       }
       return;
-    }
-    // shadowform: dark wisps curling around the silhouette, the odd smoke curl
-    const n = this.emitCount(24, dt);
-    if (!n) return;
-    const at = this.anchor(entityId, 0.45);
-    if (!at) return;
-    for (let k = 0; k < n; k++) {
-      const a = Math.random() * Math.PI * 2;
-      const r = 0.4 + Math.random() * 0.4;
-      const smoke = Math.random() < 0.25;
-      this.spawn(
-        at.x + Math.sin(a) * r,
-        at.y + (Math.random() - 0.2) * 0.7,
-        at.z + Math.cos(a) * r,
-        -Math.cos(a) * 0.6,
-        0.4 + Math.random() * 0.5,
-        Math.sin(a) * 0.6,
-        smoke ? 0x3a2a55 : 0x9a5df0,
-        smoke ? 0.5 : 0.34,
-        0.85 + Math.random() * 0.5,
-        -0.2,
-        smoke ? SPR.smoke : SPR.magicWisp,
-      );
     }
   }
 

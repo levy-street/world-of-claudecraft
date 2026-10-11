@@ -358,7 +358,7 @@ describe('entity gate stand-ins actually stand in', () => {
   });
 
   it('form adornments: the tinted body draws throughout, the pieces alone arrive late', () => {
-    // The first mount of a Moonwing or Gloamveil set rides the same injected
+    // The first mount of a Moonwing set rides the same injected
     // gate; the holder hides ONLY the roots it parented into the rig, never
     // the rig itself, so the body keeps its click target and silhouette.
     const row = ENTITY_GATE_STAND_INS.find(

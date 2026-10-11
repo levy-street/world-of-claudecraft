@@ -3009,7 +3009,7 @@ export class Renderer {
     const vfxAnchor = createVfxAnchor(fillVfxPose);
     const offsetVfxAnchor = createOffsetVfxAnchor(fillVfxPose);
     bd('scene-misc');
-    this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor);
+    this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor, this.groundSample, gate);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
     this.farmPatchVisuals = new FarmPatchVisuals(
@@ -10463,9 +10463,8 @@ export class Renderer {
         stealthGhost && !ghostWolf && !e.ghost ? ('stealth' as const) : ('spirit' as const);
       active.setGhost(ghost || veilboundState === 'march', ghostStyle);
       active.setSoulRend(hasSoulRend);
-      // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
-      // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
-      // Metamorphosis also grows the body via Entity.scale in the sim.
+      // Shadowform (Gloamveil) keeps the priest's rig and colours and climbs the dark up it
+      // (characters/gloam_climb.ts); Moonkin Form tints the base rig a bright violet.
       active.setShadowform(hasShadowform);
       active.setMoonkin(hasMoonkin);
       // Metamorphosis is no longer a tint on the base rig: it has its own lazy
@@ -11151,15 +11150,15 @@ export class Renderer {
             this.recklessSkulls.spawn(v.riderAnchor, active.height * e.scale);
           }
         }
-        // Shapeshift-form particle auras riding the tints above: metamorph fire,
-        // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
+        // Shapeshift-form auras riding the forms above: metamorph fire, moonkin star
+        // motes, Gloamveil's pool and smoke (gloam_field.ts). Suppressed for the dead
         // (the auras themselves drop, but a corpse must not smolder for a frame).
         if (!e.dead) {
           if (hasLegacyMetamorphAura) this.vfx.formAura(e.id, 'metamorph', dt);
           else if (hasLichAura && !this.reducedMotion()) {
             this.vfx.lichAura(e.id, dt, soulFragments);
           } else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
-          else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
+          else if (hasShadowform) this.vfx.gloam.wearer(e.id, active.gloamCue(), settled, d2, ay);
           // orange worn-gear motes: STATIC-preset-gated sheddable prestige
           if (e.kind === 'player' && gfxTierAtLeast(GFX.effectsTier, 'medium')) {
             if (v.legendaryRegaliaRef !== e.equippedInstances) {
@@ -11430,6 +11429,7 @@ export class Renderer {
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'water', worldStart);
     this.bgFx.update(this.time);
     updateBattlegroundViews(this.bgViews, this.bgViewState, this.sim.bgInfo, this.sim.playerId);
+    this.vfx.gloam.update(dt, this.reducedMotion());
     this.vfx.update(dt);
     this.worldGuidance.update(this.sim, this.time, dt, this.reducedMotion(), this.views.get(p.id));
     this.abilityVfx.update(dt, this.reducedMotion());

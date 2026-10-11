@@ -98,6 +98,12 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/decor_torch_fx.ts', layer: 'ground', strict: true },
   { file: 'src/render/impact_site.ts', layer: 'ground', strict: true },
   { file: 'src/render/hill_ring.ts', layer: 'ground', strict: true },
+  // Gloamveil's shadow pool, its wake and the entry's shock ring: the dark
+  // stain a Shadow priest lays under itself. Near-black and NORMAL-blended, so
+  // whatever it painted over would be hidden: it takes the top rung of the
+  // ground band, alone (pinned below), over the world's marks and under every
+  // player and encounter piece.
+  { file: 'src/render/gloam_pool.ts', layer: 'ground', strict: true },
   // Balgath's circle telegraphs (the Barrow Smash's safe gap, his solid stomp, hammer and
   // Barrowfall): mechanics a raid must read, on the encounter band.
   { file: 'src/render/balgath_ring_fx.ts', layer: 'encounter', strict: true },
@@ -395,13 +401,15 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/eye_ward_badge.ts',
   // vertical or body-anchored class VFX
   'src/render/burning_pact_markers.ts',
-  'src/render/characters/gloamveil_veil.ts',
   'src/render/characters/moonwing_adornment.ts',
   'src/render/characters/paladin_templars_verdict_fx.ts',
   'src/render/characters/visual.ts',
   'src/render/drain_life_vfx.ts',
   'src/render/evil_eye_markers.ts',
   'src/render/fireball_travel_visual.ts',
+  // Gloamveil's dark smoke cloud: rising puffs, depth-tested, on the fixed
+  // order just under the additive particle cloud (vfx.ts) it shares glints with.
+  'src/render/gloam_smoke.ts',
   'src/render/goblin_rocket_sled_fx.ts',
   'src/render/ice_block_visual.ts',
   'src/render/mage_barrier_visual.ts',
@@ -600,7 +608,11 @@ describe('floor VFX ladder (core)', () => {
   it('pins the four bands, bottom to top, with the orders they own', () => {
     expect(FLOOR_VFX_LAYERS).toEqual(['ground', 'player', 'encounter', 'reticle']);
     expect(FLOOR_VFX_LAYER_BASE).toEqual({ ground: 1, player: 10, encounter: 20, reticle: 50 });
-    expect(FLOOR_VFX_LAYER_SPAN).toEqual({ ground: 8, player: 10, encounter: 30, reticle: 4 });
+    expect(FLOOR_VFX_LAYER_SPAN).toEqual({ ground: 9, player: 10, encounter: 30, reticle: 4 });
+    // The ground band runs right up to the player band: its top rung is the
+    // one order below every player effect.
+    expect(floorVfxLayerTopOrder('ground')).toBe(9);
+    expect(floorVfxLayerTopOrder('ground') + 1).toBe(floorVfxRenderOrder('player', 0));
   });
 
   it('keeps the bands disjoint and ordered: every rung of a band paints under the next band', () => {
@@ -647,8 +659,57 @@ describe('floor VFX ladder (core)', () => {
     }
     expect(floorVfxLayerOf(0)).toBeNull();
     expect(floorVfxLayerOf(-1)).toBeNull();
-    expect(floorVfxLayerOf(9)).toBeNull();
+    expect(floorVfxLayerOf(54)).toBeNull();
     expect(floorVfxLayerOf(9990)).toBeNull();
+    expect(floorVfxLayerOf(9)).toBe('ground');
+  });
+});
+
+describe("the top ground rung is the Shadow priest's pool alone", () => {
+  // The pool is near-black, normal-blended and nearly opaque. On a rung it
+  // shared, which of the two pieces covered the other would flip with the
+  // camera (three falls back to depth on a tie), and one of the two orders
+  // hides the other piece. So the rung is its own: every other ground module
+  // names a literal step below it, and nobody else asks for the band's top.
+  const GROUND_STEP_RE = /floorVfxRenderOrder\(\s*'ground'\s*(?:,\s*([^)]*))?\)/g;
+  const GROUND_SUBTREE_RE = /applyFloorVfxLayer\([^)]*?,\s*'ground'\s*(?:,\s*([^)]*))?\)/g;
+  const GROUND_TOP_RE = /floorVfxLayerTopOrder\(\s*'ground'\s*\)/;
+  const POOL = 'src/render/gloam_pool.ts';
+
+  it('is asked for by gloam_pool.ts and by no other module', () => {
+    const askers = renderSourceFiles().filter((file) =>
+      GROUND_TOP_RE.test(readFileSync(join(repoRoot, file), 'utf8')),
+    );
+    expect(askers).toEqual([POOL]);
+  });
+
+  it('is reached by no other ground module: each names a literal step under it', () => {
+    const top = FLOOR_VFX_LAYER_SPAN.ground - 1;
+    const steps: number[] = [];
+    const unreadable: string[] = [];
+    for (const file of renderSourceFiles()) {
+      if (file === POOL || file.endsWith('floor_vfx_layer_core.ts')) continue;
+      const source = readFileSync(join(repoRoot, file), 'utf8');
+      for (const re of [GROUND_STEP_RE, GROUND_SUBTREE_RE]) {
+        for (const match of source.matchAll(re)) {
+          const step = (match[1] ?? '0').trim();
+          // A computed step could clamp onto the top rung unseen: it has to be
+          // a literal, so this sweep can read it.
+          if (!/^\d+$/.test(step)) unreadable.push(`${file}: ${match[0]}`);
+          else steps.push(Number(step));
+        }
+      }
+    }
+    expect(unreadable).toEqual([]);
+    expect(steps.length).toBeGreaterThan(20);
+    expect(Math.max(...steps)).toBeLessThan(top);
+  });
+
+  it('takes its order from the seam, with no step of its own to drift', () => {
+    const source = readFileSync(join(repoRoot, POOL), 'utf8');
+    expect(source).toContain("const FLOOR_ORDER = floorVfxLayerTopOrder('ground');");
+    expect(source).toContain('mesh.renderOrder = FLOOR_ORDER;');
+    expect([...source.matchAll(/renderOrder\s*=/g)]).toHaveLength(1);
   });
 });
 

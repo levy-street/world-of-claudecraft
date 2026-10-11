@@ -320,7 +320,8 @@ describe.each([
       // two, the hemisphere's three, the ambient);
       expect(c.rows, what).toBeGreaterThanOrEqual(78 + 4 * carriers + 2 + 3 + 1);
       // and it is what the fragment source declares, less the few a driver finds unread
-      // (the roughness, the metalness and the camera position this layer leaves aside)
+      // (the roughness and the metalness this layer leaves aside; the camera position is
+      // read, by the Gloamveil climb every rig material carries)
       expect(c.declaredRows - c.rows, what).toBeGreaterThanOrEqual(0);
       expect(c.declaredRows - c.rows, what).toBeLessThanOrEqual(6);
       expect(c.declaredRows, what).toBeLessThanOrEqual(

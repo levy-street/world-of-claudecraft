@@ -30,7 +30,6 @@ import * as THREE from 'three';
 import { balgathRangedMaterials, buildBalgathRangedStandIn } from './balgath_ranged_fx';
 import { balgathStarwakeMaterials, buildBalgathStarwakeStandIn } from './balgath_starwake_fx';
 import { buildEffigyRigStandIn, effigyRigMaterials } from './characters/effigy_rig';
-import { buildGloamveilStandIn, gloamveilMaterials } from './characters/gloamveil_veil';
 import { buildMoonwingStandIn, moonwingMaterials } from './characters/moonwing_adornment';
 import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
@@ -220,13 +219,6 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'moonwing_adornment.ts',
     materials: () => moonwingMaterials(),
     build: () => buildMoonwingStandIn(),
-  },
-  {
-    // Gloamveil's veil and burning eyes, the same rig-mounted idiom as Moonwing.
-    id: 'gloamveil-veil',
-    module: 'gloamveil_veil.ts',
-    materials: () => gloamveilMaterials(),
-    build: () => buildGloamveilStandIn(),
   },
 ];
 

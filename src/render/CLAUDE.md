@@ -32,6 +32,36 @@ Everything else is a sibling module in one of these families:
   precipitation and masked spawns keep it over that zone's own cells, so a
   neighbouring realm's snow is visible from outside; decisions in
   `weather_field_core.ts`), `character_effects.ts`.
+- **Gloamveil's floor and smoke layer** (`gloam_field.ts`, owned by `Vfx`): the
+  Shadow priest's form outside the body. One field per renderer holds the dark
+  smoke (`gloam_smoke.ts`, an ALPHA-blended cloud: the additive cloud in
+  `vfx.ts` can only add light, so "dark" there is invisible) and one draped
+  pool per wearer with its wake and entry ring (`gloam_pool.ts`). The renderer
+  drives it: the entity loop reports each presented wearer once a frame
+  (`vfx.gloam.wearer`) with the rig's cue, then closes the frame
+  (`vfx.gloam.update`) with the viewer's reduced-motion setting. Everything
+  else is decided in three pure cores: what each tier and reduced motion keep
+  and who is tracked (`gloam_field_core.ts`), where a stain lies and when it
+  may be laid (`gloam_pool_core.ts`), the puff pool (`gloam_smoke_core.ts`).
+  Its contracts, each pinned in `tests/gloam_field.test.ts`: every stain sits
+  on the top rung of the `ground` band, alone, so the dark never covers a
+  player or encounter floor effect (`docs/design/vfx-floor-layering.md`);
+  ground samples come from the renderer's own seed-bound sampler, which
+  costs about ten microseconds a call, so the floor is REMEMBERED on a
+  world-aligned grid of the pool's own cell (`GloamGround`) and a lay reads it
+  between nodes: a moving pool is laid every frame and samples only the nodes
+  it has just reached, the entry ring samples only the vertices its front is
+  about to reach, and every new sample is spent from ONE per-frame allowance
+  shared by all of them (where it runs out a vertex keeps the height it had
+  and the lay is finished on a later frame, and the field rotates who is
+  served first); every stain draws with one of two materials built once
+  (per-stain values are written in `onBeforeRender`); the root is attached
+  through `attachSceneGroupGated` over hidden stand-ins, at construction and
+  again on a context restore, so its three programs link before anything
+  under it draws and a gate that never settles is caught by the watchdog; a
+  pool whose wearer is gone is parked and reused (a bounded few), so a camera
+  turning away and back mints no buffer; the field disposes everything it
+  built. The body half is `characters/gloam_climb.ts`.
 - **Cross-surface shader services** own a shared uniform block plus a GLSL
   snippet that SEVERAL materials splice, never a copy per material.
   `biome_haze_field.ts` (+ its `_core`) is the reference: one small world-space

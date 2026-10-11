@@ -200,6 +200,9 @@ const URL_GUARDED_SCRIPTS = [
   'scripts/bank_guild_pane_probe.mjs',
   'scripts/crowd_fps_bench.mjs',
   'scripts/form_adornment_shot.mjs',
+  // The Gloamveil before/after capture: /dev cheats (god mode, a spawned wolf)
+  // through the sim of the page it opens, against a local Vite server, no database.
+  'scripts/gloamveil_look_shot.mjs',
   'scripts/gpu_hitch_capture.mjs',
   // The druid cat form acceptance drive: offline commands against a local Vite
   // server, no database of its own.

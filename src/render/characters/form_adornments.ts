@@ -1,11 +1,10 @@
 // The per-rig owner of the shapeshift form adornments. CharacterVisual holds
-// one (lazily, only once a form flag first turns on) and forwards the form and
-// ghost edges it already receives every frame from the renderer
-// (`setMoonkin`, `setShadowform`, `setGhost`), its per-frame tick and its
-// teardown; everything else lives here and in the pieces this composes:
+// one (lazily, only once the form flag first turns on) and forwards the form
+// and ghost edges it already receives every frame from the renderer
+// (`setMoonkin`, `setGhost`), its per-frame tick and its teardown; everything
+// else lives here and in the pieces this composes:
 //   form_adornment_core.ts   what a rig wears, and how it moves (pure)
 //   moonwing_adornment.ts    antlers, crescent and wings (THREE)
-//   gloamveil_veil.ts        the veil and burning eyes (THREE)
 //
 // A set's FIRST mount on this rig rides the visual's injected compile gate
 // (the renderer's gateSwapFlagOnCompile, the same one that stages the tint's
@@ -19,10 +18,8 @@ import {
   type AdornmentBody,
   createMoonwingPose,
   formAdornmentPlan,
-  gloamveilEyeGlow,
   moonwingPoseInto,
 } from './form_adornment_core';
-import { GloamveilVeil } from './gloamveil_veil';
 import { MoonwingAdornment } from './moonwing_adornment';
 import type { FarBakeGate } from './visual';
 
@@ -43,19 +40,16 @@ interface Mounted<T extends AdornmentSet> {
 
 export class FormAdornments {
   private moonwing: Mounted<MoonwingAdornment> | null = null;
-  private veil: Mounted<GloamveilVeil> | null = null;
   private moonwingElapsed = 0;
-  private veilElapsed = 0;
   private readonly pose = createMoonwingPose();
   /** Sets whose programs this rig has seen link: later shifts show at once. */
   private moonwingLinked = false;
-  private veilLinked = false;
   /** Ghost or stealth: the body goes see-through, so the pieces hide rather
    *  than glow on over it (a glowing crescent must never mark a stealther). */
   private suppressed = false;
   private disposed = false;
 
-  /** `model` holds the rig's bones; `body` decides the antlers and veil
+  /** `model` holds the rig's bones; `body` decides the antlers
    *  (form_adornment_core.formAdornmentPlan); `gate` reads the visual's
    *  current compile gate, null in previews and tests (no hold). */
   constructor(
@@ -66,10 +60,10 @@ export class FormAdornments {
 
   /** Mount, unmount, or hide the pieces for the current form and ghost flags.
    *  Idempotent: the caller forwards only edges, but a repeat is a no-op. */
-  sync(moonkin: boolean, shadowform: boolean, ghosted: boolean): void {
+  sync(moonkin: boolean, ghosted: boolean): void {
     if (this.disposed) return;
     this.suppressed = ghosted;
-    const plan = formAdornmentPlan(moonkin, shadowform, this.body);
+    const plan = formAdornmentPlan(moonkin, this.body);
     if (plan.moonwing && !this.moonwing) {
       const piece = new MoonwingAdornment(this.model, plan.antlers);
       this.moonwingElapsed = 0;
@@ -81,15 +75,7 @@ export class FormAdornments {
       this.moonwing.piece.dispose();
       this.moonwing = null;
     }
-    if (plan.gloamveil && !this.veil) {
-      this.veilElapsed = 0;
-      this.veil = this.mount(new GloamveilVeil(this.model), this.veilLinked);
-    } else if (!plan.gloamveil && this.veil) {
-      this.veil.piece.dispose();
-      this.veil = null;
-    }
     if (this.moonwing) this.show(this.moonwing);
-    if (this.veil) this.show(this.veil);
   }
 
   /** Hold a new set hidden behind the gate unless this rig already linked it. */
@@ -136,17 +122,12 @@ export class FormAdornments {
   ): void {
     if (this.disposed) return;
     if (this.release(this.moonwing)) this.moonwingLinked = true;
-    if (this.release(this.veil)) this.veilLinked = true;
     if (!visible) return;
     if (this.moonwing && !this.moonwing.held) {
       this.moonwingElapsed += dt;
       this.moonwing.piece.apply(
         moonwingPoseInto(this.moonwingElapsed, moving, casting, reducedMotion, this.pose),
       );
-    }
-    if (this.veil && !this.veil.held) {
-      this.veilElapsed += dt;
-      this.veil.piece.apply(gloamveilEyeGlow(this.veilElapsed, reducedMotion));
     }
   }
 
@@ -156,7 +137,5 @@ export class FormAdornments {
     this.disposed = true;
     this.moonwing?.piece.dispose();
     this.moonwing = null;
-    this.veil?.piece.dispose();
-    this.veil = null;
   }
 }

@@ -20,6 +20,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
+import { attachGloamClimb } from '../src/render/characters/gloam_climb';
 import {
   createSurfaceResponseMaterial,
   surfaceResponseUniforms,
@@ -133,14 +134,16 @@ const worldDefines = (
 /**
  * The fragment uniforms of a merged head's program as three assembles it: the material a
  * merged head wraps, the layers it wears in the world (the standard tiers' rim, the
- * merged tint, and with `struck` the hit response over it), run over three's own source
+ * dormant Gloamveil climb, the merged tint, and with `struck` the hit response over it), run over three's own source
  * for that shader, includes resolved, the prefix in front.
  */
 function mergedHeadUniforms(lib: Lib, carriers: number, struck: boolean): GlslUniforms {
   const base =
     lib === 'standard' ? new THREE.MeshStandardMaterial() : new THREE.MeshLambertMaterial();
-  // the tier derivation's own layer on a standard material (assets.ts): a no-op on Lambert
+  // the tier derivation's own layers (assets.ts): the rim on a standard material, a no-op
+  // on Lambert, and the dormant Gloamveil climb on both
   addRimGlow(base);
+  attachGloamClimb(base);
   attachWocHeadMergedTint(base, true);
   const worn = struck ? createSurfaceResponseMaterial(base, surfaceResponseUniforms()) : base;
   const shader = {
@@ -173,6 +176,8 @@ const THREE_SIDE: Readonly<Record<Lib, readonly string[]>> = {
     'float roughness',
     'float metalness',
     'float opacity',
+    'vec4 uGloamBody',
+    'vec2 uGloamState',
     'float uRimBoost',
     'vec3 uRimColor',
     'float envMapIntensity',
@@ -205,6 +210,8 @@ const THREE_SIDE: Readonly<Record<Lib, readonly string[]>> = {
     'vec3 diffuse',
     'vec3 emissive',
     'float opacity',
+    'vec4 uGloamBody',
+    'vec2 uGloamState',
     'float envMapIntensity',
     'mat3 envMapRotation',
     'float reflectivity',
@@ -310,8 +317,8 @@ describe('the merged head program under the guaranteed fragment uniform vectors'
       );
       // literal: what three and the tier's own layers declare for this material in the world
       // scene (the lights are 46 of it on either shader: 4 a carrier, 2 the sun, 3 the
-      // hemisphere, 1 the ambient)
-      expect(three).toBe(lib === 'standard' ? 73 : 71);
+      // hemisphere, 1 the ambient; the dormant Gloamveil climb is 2 of it on both)
+      expect(three).toBe(lib === 'standard' ? 75 : 73);
       expect(uniformVectorRows(named(plain.uniforms, /Lights?\b|ambientLightColor/))).toBe(
         4 * carriers + 2 + 3 + 1,
       );
@@ -334,20 +341,21 @@ describe('the merged head program under the guaranteed fragment uniform vectors'
         expect(samplerImageUnits(samplers)).toBeLessThanOrEqual(16 - 4);
       }
       // literal: the largest program a merged head ever links on this shader (the real
-      // browser suite reads three fewer off the linked standard program: a driver drops the
-      // roughness, the metalness and the camera position this layer leaves unread)
-      expect(uniformVectorRows(struck.uniforms)).toBe(lib === 'standard' ? 158 : 156);
+      // browser suite reads a few fewer off the linked standard program: a driver drops what
+      // a layer declares and leaves unread, the roughness and the metalness here; the camera
+      // position is read, by the Gloamveil climb every rig material carries)
+      expect(uniformVectorRows(struck.uniforms)).toBe(lib === 'standard' ? 160 : 158);
     },
   );
 
   it('prices a slot and a carrier at four vectors each: what the room left would take', () => {
     // arithmetic on the count above (the slot count is a constant: no program is rebuilt
-    // at another): four tables a slot, so the 66 vectors left under the limit are sixteen
+    // at another): four tables a slot, so the 64 vectors left under the limit are sixteen
     // more slots and no more, or sixteen more carriers
     const { uniforms } = mergedHeadUniforms('standard', carriers, true);
     const rows = uniformVectorRows(uniforms);
     const left = GUARANTEED_FRAGMENT_UNIFORM_VECTORS - rows;
-    expect(left).toBe(66);
+    expect(left).toBe(64);
     expect(Math.floor(left / 4)).toBe(16);
     // ...and a carrier really costs four of it: the same program under four fewer
     const fewer = mergedHeadUniforms('standard', carriers - 4, true);

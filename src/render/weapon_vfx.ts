@@ -25,6 +25,7 @@
 // legendary kit (orbit motes, aurora, spin) or vice versa; the escalation ramp
 // is the whole point of the collections.
 import * as THREE from 'three';
+import { attachGloamClimb } from './characters/gloam_climb';
 import { addRimGlow, GFX } from './gfx';
 import { isSharedTexture, markSharedTexture } from './shared_resource';
 import { DEFAULT_WEAPON_POINT_MAX_PX, maxPointSizePx } from './vfx_screen_bounds_core';
@@ -3273,7 +3274,8 @@ export const WEAPON_VFX_UNTEXTURED_PARTS: Readonly<Record<string, readonly strin
  * draws on this tier (characters/assets.ts buildTintedClone): a Lambert with
  * its map on the Lambert tier; otherwise the GLB's standard material with its
  * normal and occlusion maps plus the silhouette rim glow, which
- * characters/visual.ts carries into its hook-preserving isolation clone. The
+ * characters/visual.ts carries into its hook-preserving isolation clone, and
+ * on both tiers the dormant Gloamveil climb every lit rig material carries. The
  * metal-rough maps are left out because deriveEmissive nulls them on the live
  * weapon too. Only slot presence reaches the key, so the one-pixel map fills
  * every slot.
@@ -3282,7 +3284,9 @@ function prewarmHostTexturedMaterial(side: THREE.Side): THREE.Material {
   const map = weaponVfxPrewarmHostMap();
   const name = 'weapon-vfx-prewarm-host:textured';
   if (!GFX.standardMaterials) {
-    return new THREE.MeshLambertMaterial({ name, color: 0xffffff, map, side });
+    const lambert = new THREE.MeshLambertMaterial({ name, color: 0xffffff, map, side });
+    attachGloamClimb(lambert);
+    return lambert;
   }
   const material = new THREE.MeshStandardMaterial({
     name,
@@ -3293,6 +3297,7 @@ function prewarmHostTexturedMaterial(side: THREE.Side): THREE.Material {
     side,
   });
   addRimGlow(material);
+  attachGloamClimb(material);
   return material;
 }
 
@@ -3302,9 +3307,14 @@ function prewarmHostTexturedMaterial(side: THREE.Side): THREE.Material {
  *  its own name afterwards and a program label tells it from the live part. */
 function prewarmHostUntexturedMaterial(part: string): THREE.Material {
   const name = `weapon-vfx-prewarm-host:${part}`;
-  if (!GFX.standardMaterials) return new THREE.MeshLambertMaterial({ name, color: 0xffffff });
+  if (!GFX.standardMaterials) {
+    const lambert = new THREE.MeshLambertMaterial({ name, color: 0xffffff });
+    attachGloamClimb(lambert);
+    return lambert;
+  }
   const material = new THREE.MeshStandardMaterial({ color: 0xffffff, name: part });
   addRimGlow(material);
+  attachGloamClimb(material);
   applyRiggedWornDetail(material);
   material.name = name;
   return material;
