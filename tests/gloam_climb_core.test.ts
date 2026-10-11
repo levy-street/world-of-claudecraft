@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
+  cancelGloamEntry,
   createGloamSurge,
   GLOAM_CLIMB_FRAGMENT_COLOR,
   GLOAM_CLIMB_FRAGMENT_EMISSIVE,
@@ -15,7 +16,6 @@ import {
   GLOAM_CUE_HIDDEN,
   GLOAM_CUE_PRESENT,
   GLOAM_CUE_REST,
-  GLOAM_CUE_STILL,
   GLOAM_DARK_TINT,
   GLOAM_EDGE_SOFT,
   GLOAM_ENTRY_HOLD,
@@ -65,7 +65,8 @@ describe('the tongues', () => {
   it('move with the clock and hold one shape on the still clock', () => {
     const angle = 1.1;
     expect(gloamTongue(angle, 2)).not.toBeCloseTo(gloamTongue(angle, 2.4), 3);
-    expect(gloamTongue(angle, GLOAM_STILL_CLOCK)).toBe(gloamTongue(angle, GLOAM_STILL_CLOCK));
+    // The still clock is one fixed moment, the one a reduced-motion viewer sees.
+    expect(GLOAM_STILL_CLOCK).toBe(0);
     // The still shape keeps its points: reduced motion freezes the tongues, it
     // does not flatten them.
     const still = Array.from({ length: 48 }, (_, k) =>
@@ -107,6 +108,41 @@ describe('the edge of the dark', () => {
     expect(gloamDark(edge + GLOAM_EDGE_SOFT, edge)).toBe(0);
     expect(gloamDark(1, edge)).toBe(0);
     expect(gloamDark(edge, edge)).toBeCloseTo(0.5, 12);
+  });
+});
+
+describe('how dark the dark is (literals, not the module own constants)', () => {
+  it('leaves a point low on the leg fully dark on every side, at every moment', () => {
+    for (let clock = 0; clock < 20; clock += 0.31) {
+      for (let k = 0; k < 72; k++) {
+        const angle = (k / 72) * TAU;
+        // A tenth of the body up: the shin. At rest and mid-cast alike.
+        expect(gloamDark(0.1, gloamEdge(angle, clock, 0))).toBe(1);
+        expect(gloamDark(0.1, gloamEdge(angle, clock, 1))).toBe(1);
+        // The chest keeps its own colours at rest.
+        expect(gloamDark(0.62, gloamEdge(angle, clock, 0))).toBe(0);
+      }
+    }
+  });
+
+  it('pins the level, the reach and what the dark leaves of a surface', () => {
+    expect(GLOAM_REST_LEVEL).toBe(0.24);
+    expect(GLOAM_SURGE_LEVEL).toBe(0.58);
+    expect(GLOAM_REST_REACH).toBe(0.3);
+    expect(GLOAM_SURGE_REACH).toBe(0.36);
+    expect(GLOAM_EDGE_SOFT).toBe(0.03);
+    // Near black with a breath of violet: no channel keeps more than six
+    // hundredths of the surface, and none is crushed to nothing.
+    expect(GLOAM_DARK_TINT).toEqual([0.035, 0.03, 0.06]);
+    for (const channel of GLOAM_DARK_TINT) {
+      expect(channel).toBeGreaterThan(0.02);
+      expect(channel).toBeLessThanOrEqual(0.06);
+    }
+    // The shader multiplies by exactly that, and stands at exactly those levels.
+    expect(GLOAM_CLIMB_FRAGMENT_COLOR).toContain('diffuseColor.rgb * vec3(0.035, 0.03, 0.06)');
+    expect(GLOAM_CLIMB_FRAGMENT_PARS).toContain('mix(0.24, 0.58, uGloamState.x)');
+    expect(GLOAM_CLIMB_FRAGMENT_PARS).toContain('mix(0.3, 0.36, uGloamState.x)');
+    expect(GLOAM_CLIMB_FRAGMENT_PARS).toContain('smoothstep(edge - 0.03, edge + 0.03, h)');
   });
 });
 
@@ -188,36 +224,46 @@ describe('the surge', () => {
     stopGloamSurge(state);
     expect(state).toEqual({ cast: 0, entry: 0, age: 0 });
   });
+
+  it('calls an entry off and leaves the cast response running', () => {
+    const state = createGloamSurge();
+    startGloamSurge(state, true);
+    expect(stepGloamSurge(state, 0, false, false)).toBe(GLOAM_ENTRY_SURGE);
+    cancelGloamEntry(state);
+    expect(stepGloamSurge(state, 0, false, false)).toBe(0);
+    // Not replayed by time passing, and a cast still drives it.
+    expect(stepGloamSurge(state, 5, false, false)).toBe(0);
+    let surge = 0;
+    for (let i = 0; i < 30; i++) surge = stepGloamSurge(state, 1 / 60, true, false);
+    expect(surge).toBeGreaterThan(0.9);
+    expect(surge).toBeLessThanOrEqual(1);
+  });
 });
 
 describe('the cue a rig gives the floor and smoke layer', () => {
+  it('names four distinct states', () => {
+    const cues = [GLOAM_CUE_HIDDEN, GLOAM_CUE_PRESENT, GLOAM_CUE_ENTER, GLOAM_CUE_REST];
+    expect(new Set(cues).size).toBe(4);
+  });
+
   it('hides under a ghost or stealth body and outside the form, whatever else holds', () => {
-    for (const still of [false, true]) {
-      for (const swimming of [false, true]) {
-        expect(gloamCue(false, false, false, still, swimming)).toBe(GLOAM_CUE_HIDDEN);
-        expect(gloamCue(false, false, true, still, swimming)).toBe(GLOAM_CUE_HIDDEN);
-        expect(gloamCue(true, true, false, still, swimming)).toBe(GLOAM_CUE_HIDDEN);
-        // A shift under a ghost body is still hidden: nothing may mark a stealther.
-        expect(gloamCue(true, true, true, still, swimming)).toBe(GLOAM_CUE_HIDDEN);
-      }
+    for (const swimming of [false, true]) {
+      expect(gloamCue(false, false, false, swimming)).toBe(GLOAM_CUE_HIDDEN);
+      expect(gloamCue(false, false, true, swimming)).toBe(GLOAM_CUE_HIDDEN);
+      expect(gloamCue(true, true, false, swimming)).toBe(GLOAM_CUE_HIDDEN);
+      // A shift under a ghost body is still hidden: nothing may mark a stealther.
+      expect(gloamCue(true, true, true, swimming)).toBe(GLOAM_CUE_HIDDEN);
     }
   });
 
   it('reports the entry only while one is pending', () => {
-    expect(gloamCue(true, false, true, false, false)).toBe(GLOAM_CUE_ENTER);
-    expect(gloamCue(true, false, false, false, false)).toBe(GLOAM_CUE_PRESENT);
-  });
-
-  it('asks for the still read under reduced motion, entry pending or not', () => {
-    expect(gloamCue(true, false, true, true, false)).toBe(GLOAM_CUE_STILL);
-    expect(gloamCue(true, false, false, true, false)).toBe(GLOAM_CUE_STILL);
+    expect(gloamCue(true, false, true, false)).toBe(GLOAM_CUE_ENTER);
+    expect(gloamCue(true, false, false, false)).toBe(GLOAM_CUE_PRESENT);
   });
 
   it('rests the layer for a swimming body: no floor to stain', () => {
-    for (const still of [false, true]) {
-      expect(gloamCue(true, false, false, still, true)).toBe(GLOAM_CUE_REST);
-      expect(gloamCue(true, false, true, still, true)).toBe(GLOAM_CUE_REST);
-    }
+    expect(gloamCue(true, false, false, true)).toBe(GLOAM_CUE_REST);
+    expect(gloamCue(true, false, true, true)).toBe(GLOAM_CUE_REST);
   });
 });
 

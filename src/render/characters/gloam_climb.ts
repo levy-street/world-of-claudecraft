@@ -18,7 +18,8 @@
 // That is what lets the shift show on the frame it happens: the visual mounts
 // the form on program-free stand-ins at once (effect_materials.ts
 // createShadowformStandInMaterial) and swaps to the transparent set when its
-// gate settles, which is a few frames on a rig whose ghost variants are linked.
+// gate settles. GloamPresence holds that choice (which of the two sets a rig
+// wears) along with the surge, so the visual only asks and remounts.
 //
 // The pure half (the tongue tables, the surge, the shader text) is
 // gloam_climb_core.ts.
@@ -26,6 +27,7 @@
 import * as THREE from 'three';
 import { hasRimGlow, sharedUniforms } from '../gfx';
 import {
+  cancelGloamEntry,
   createGloamSurge,
   GLOAM_CUE_HIDDEN,
   GLOAM_RIM_REST,
@@ -50,7 +52,8 @@ export interface GloamLook {
   body: { value: THREE.Vector4 };
   /** Surge (0 rest, 1 mid-cast, above 1 during the entry) and the tongue clock. */
   state: { value: THREE.Vector2 };
-  /** The colour every unlit piece of the rig (the class halo) wears. */
+  /** The colour every unlit piece of the rig (the class halo) wears, dimmed
+   *  with the entry. */
   unlit: THREE.Color;
 }
 
@@ -122,9 +125,22 @@ export function createGloamLook(): GloamLook {
 }
 
 /**
- * Dress a hook-preserving clone of `source` as one rig's form material: the
- * unlit halo takes the form's colour, and a lit material reads this rig's climb
- * and the form's rim instead of the dormant and scene pairs.
+ * Dress a hook-preserving clone of `source` as one rig's form material: an
+ * unlit piece takes the form's colour, and a lit material reads this rig's
+ * climb and the form's rim instead of the dormant and scene pairs.
+ *
+ * EVERY unlit (MeshBasicMaterial) clone is recoloured, and that is safe only
+ * because the class halo is the one unlit piece a rig that can hold the form
+ * carries. Checked: `form_shadow` is applied by the priest's own ability and
+ * nothing else, so only a player-class rig wears it; a priest's material set
+ * holds one MeshBasicMaterial, the halo, on the standard and the Lambert arm
+ * alike (the factory keeps a material unlit only when its GLB authored it so,
+ * and no character or weapon file does). The other unlit rig pieces belong to
+ * rigs that never take the form: the eye glow and the Eye Ward marker's ring
+ * (three boss defs), the training effigy's flames, a boss gesture's charge
+ * glow. If a rig that can hold the form ever gains a second unlit piece that
+ * means something (a marker, a debuff ring), recolour by identity instead of
+ * by material type here, or the form will repaint it.
  *
  * The rebind runs after the clone's own hook chain and changes no shader text,
  * so the clone must keep its source's program. Its key is therefore PINNED to
@@ -160,33 +176,97 @@ export function dressGloamClone(
 
 const haloTint: [number, number, number] = [1, 1, 1];
 
+/** What a rig's frame state tells the form (the visual's own anim state fits). */
+export interface GloamFrameState {
+  casting: boolean;
+  swimming?: boolean;
+}
+
 /**
  * Everything one rig's Gloamveil needs each frame: where its feet are, how tall
- * it stands, the cast surge and the entry. The pool and the smoke are not
- * here: they are world-space and belong to the renderer's Vfx (gloam_field.ts),
- * which learns what it needs from takeCue.
+ * it stands, the cast surge and the entry, and which of the two clone sets the
+ * rig wears (the stand-ins or the settled transparent set). The pool and the
+ * smoke are not here: they are world-space and belong to the renderer's Vfx
+ * (gloam_field.ts), which learns what it needs from takeCue.
  */
 export class GloamPresence {
   readonly look = createGloamLook();
   /** The program-free clones this rig shows while its transparent form set
-   *  links, one per source material (effect_materials.ts). The visual owns
-   *  their disposal with its other effect clones. */
+   *  links and while it swims, one per source material. The visual owns their
+   *  disposal with its other effect clones. */
   readonly standIns = new Map<THREE.Material, THREE.Material>();
   private readonly surge = createGloamSurge();
   private headBone: THREE.Object3D | null | undefined;
   private active = false;
   private entryPending = false;
+  /** An update has run since the form began: the entry was presented. */
+  private presented = false;
   /** The viewer asked for reduced motion (as of the last update). */
   private still = false;
+  /** The body is in the water (as of the last frame). */
+  private inWater = false;
+  /** The rig wears the stand-ins: the settled set is linking, or it swims. */
+  private standsIn = false;
+  /** The settled set was asked for since the last `release`: the form is the
+   *  effect this rig shows, whatever outranks what in the visual. */
+  private settledAsked = false;
 
-  /** The form began on the rig under `root`. `entering` is false for a rig
-   *  first seen already in it, which shows the form at rest. */
+  /** `mintStandIn` builds the stand-in clone of one source material
+   *  (effect_materials.ts createShadowformStandInMaterial). */
+  constructor(
+    private readonly mintStandIn: (source: THREE.Material, look: GloamLook) => THREE.Material,
+  ) {}
+
+  /** The form began or ended on the rig under `root`. `entering` is false for
+   *  a rig first seen already in it, which shows the form at rest. */
+  shift(on: boolean, root: THREE.Object3D, model: THREE.Object3D, entering: boolean): void {
+    this.inWater = false;
+    this.standsIn = false;
+    if (on) this.start(root, model, entering);
+    else this.stop();
+  }
+
+  /** The form began on the rig under `root`. */
   start(root: THREE.Object3D, model: THREE.Object3D, entering: boolean): void {
     this.active = true;
     this.entryPending = entering;
+    this.presented = false;
     startGloamSurge(this.surge, entering);
     // Placed at once: the form materials mount on this same edge.
-    this.update(0, root, model, false, this.still);
+    this.drive(0, root, model, false, this.still);
+  }
+
+  /**
+   * A frame in which the rig is presented. True when the body entered or left
+   * the water: the visual remounts, since a swimmer wears the stand-ins.
+   */
+  frame(
+    dt: number,
+    root: THREE.Object3D,
+    model: THREE.Object3D,
+    state: GloamFrameState,
+    reducedMotion: boolean,
+  ): boolean {
+    this.update(dt, root, model, state.casting, reducedMotion);
+    const swimming = state.swimming === true;
+    if (!this.active || swimming === this.inWater) return false;
+    this.inWater = swimming;
+    return true;
+  }
+
+  /**
+   * A frame in which the rig is NOT presented (off screen, culled). The form's
+   * time still passes: an entry nobody saw start is called off, and one under
+   * way runs on, so a body never comes back into view to play a shift that
+   * happened while nobody was looking.
+   */
+  idle(dt: number): void {
+    if (!this.active) return;
+    if (this.entryPending) {
+      this.entryPending = false;
+      cancelGloamEntry(this.surge);
+    }
+    this.look.state.value.x = stepGloamSurge(this.surge, dt, false, this.still);
   }
 
   update(
@@ -197,6 +277,21 @@ export class GloamPresence {
     reducedMotion: boolean,
   ): void {
     if (!this.active) return;
+    // The floor layer hears of an entry on the frame the rig first presents
+    // it. A cue nobody asked for by the next one (the body was dead, or under
+    // an effect that outranks the form) is not kept for later.
+    if (this.presented) this.entryPending = false;
+    this.presented = true;
+    this.drive(dt, root, model, casting, reducedMotion);
+  }
+
+  private drive(
+    dt: number,
+    root: THREE.Object3D,
+    model: THREE.Object3D,
+    casting: boolean,
+    reducedMotion: boolean,
+  ): void {
     this.still = reducedMotion;
     if (this.headBone === undefined) this.headBone = model.getObjectByName('head') ?? null;
     const body = this.look.body.value;
@@ -224,14 +319,39 @@ export class GloamPresence {
     formRim.boost.value = gloamRimBoost(seconds, reducedMotion);
   }
 
-  /** The stand-in for `source`, minted once through `mint`. */
-  standIn(
-    source: THREE.Material,
-    mint: (source: THREE.Material, look: GloamLook) => THREE.Material,
-  ): THREE.Material {
+  /**
+   * The visual is about to work out what this rig mounts: start from the
+   * settled set, unless the body swims (a body in the transparent pass would
+   * draw over the water it is in, so a swimmer keeps the stand-ins).
+   */
+  release(): void {
+    this.standsIn = this.inWater;
+    this.settledAsked = false;
+  }
+
+  /**
+   * The set the visual just worked out has clones still to link. When the
+   * form is what this rig shows it wears the stand-ins meanwhile, which cost
+   * no link: true, and the visual mounts them now. `release` ends it.
+   */
+  holdStandIns(): boolean {
+    if (!this.settledAsked) return false;
+    this.standsIn = true;
+    return true;
+  }
+
+  /**
+   * The stand-in for `source` while the rig wears them, minted once; null
+   * when it wears the settled set (the visual then hands out its own clone).
+   */
+  standInFor(source: THREE.Material): THREE.Material | null {
+    if (!this.standsIn) {
+      this.settledAsked = true;
+      return null;
+    }
     let clone = this.standIns.get(source);
     if (!clone) {
-      clone = mint(source, this.look);
+      clone = this.mintStandIn(source, this.look);
       this.standIns.set(source, clone);
     }
     return clone;
@@ -242,9 +362,9 @@ export class GloamPresence {
    * most once, on the first frame asked: a shift nobody could see (the body
    * was ghosted, or in the water) is not replayed when the body shows again.
    */
-  takeCue(ghosted: boolean, swimming: boolean): GloamCue {
+  takeCue(ghosted: boolean): GloamCue {
     if (!this.active) return GLOAM_CUE_HIDDEN;
-    const cue = gloamCue(true, ghosted, this.entryPending, this.still, swimming);
+    const cue = gloamCue(true, ghosted, this.entryPending, this.inWater);
     this.entryPending = false;
     return cue;
   }

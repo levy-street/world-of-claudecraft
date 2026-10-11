@@ -341,8 +341,9 @@ describe('the merged head program under the guaranteed fragment uniform vectors'
         expect(samplerImageUnits(samplers)).toBeLessThanOrEqual(16 - 4);
       }
       // literal: the largest program a merged head ever links on this shader (the real
-      // browser suite reads three fewer off the linked standard program: a driver drops the
-      // roughness, the metalness and the camera position this layer leaves unread)
+      // browser suite reads a few fewer off the linked standard program: a driver drops what
+      // a layer declares and leaves unread, the roughness and the metalness here; the camera
+      // position is read, by the Gloamveil climb every rig material carries)
       expect(uniformVectorRows(struck.uniforms)).toBe(lib === 'standard' ? 160 : 158);
     },
   );

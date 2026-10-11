@@ -23,7 +23,6 @@ import {
   GLOAM_CUE_HIDDEN,
   GLOAM_CUE_PRESENT,
   GLOAM_CUE_REST,
-  GLOAM_CUE_STILL,
   GLOAM_ENTRY_SURGE,
   GLOAM_RIM_REST,
   GLOAM_STILL_CLOCK,
@@ -134,6 +133,11 @@ describe('attachGloamClimb (the dormant layer)', () => {
         expect(compiled(tinted).fragmentShader).toContain(GLOAM_CLIMB_MARKER);
         // The shared source the factory clones from stays untouched.
         expect(hasGloamClimb(source)).toBe(false);
+        // The far LOD's materials come out of the same factory: a far body in
+        // the form darkens like a near one.
+        const far = tintedMaterial(source, null, 0, null, null, 'body', null, 'far', '');
+        expect(hasGloamClimb(far)).toBe(true);
+        expect(compiled(far).fragmentShader).toContain(GLOAM_CLIMB_MARKER);
       } finally {
         restore();
       }
@@ -190,14 +194,35 @@ describe('the Shadowform stand-in (program-free)', () => {
     expect(compiled(second).uniforms.uGloamBody).toBe(b.body);
   });
 
-  it('turns the unlit halo to the look colour without wrapping its hook', () => {
+  it('turns the class halo to the look colour without wrapping its hook', () => {
     const halo = new THREE.MeshBasicMaterial({ color: 0xffd966, transparent: true });
     const look = createGloamLook();
-    const standIn = createShadowformStandInMaterial(halo, look) as THREE.MeshBasicMaterial;
-    // The SAME colour object: the presence dims every halo of a rig in one write.
-    expect(standIn.color).toBe(look.unlit);
-    expect(standIn.customProgramCacheKey()).toBe(halo.customProgramCacheKey());
+    for (const mint of [createShadowformStandInMaterial, createShadowformEffectMaterial]) {
+      const clone = mint(halo, look) as THREE.MeshBasicMaterial;
+      // The SAME colour object: the presence dims every halo of a rig in one write.
+      expect(clone.color).toBe(look.unlit);
+      expect(clone.onBeforeCompile).toBe(halo.onBeforeCompile);
+    }
+    expect(createShadowformStandInMaterial(halo, look).customProgramCacheKey()).toBe(
+      halo.customProgramCacheKey(),
+    );
     expect(halo.color.getHex()).toBe(0xffd966);
+  });
+
+  it('binds the look on the Lambert tier, which has the climb and no rim', () => {
+    const source = new THREE.MeshLambertMaterial({ color: 0x8899aa });
+    attachGloamClimb(source);
+    const look = createGloamLook();
+    for (const mint of [createShadowformStandInMaterial, createShadowformEffectMaterial]) {
+      const clone = mint(source, look);
+      const shader = compiled(clone);
+      expect(shader.fragmentShader).toContain(GLOAM_CLIMB_MARKER);
+      // Without this the whole low tier would draw the form with no dark.
+      expect(shader.uniforms.uGloamBody).toBe(look.body);
+      expect(shader.uniforms.uGloamState).toBe(look.state);
+      expect(shader.uniforms.uRimBoost).toBeUndefined();
+      expect(clone.customProgramCacheKey()).toBe(source.customProgramCacheKey());
+    }
   });
 });
 
@@ -256,7 +281,7 @@ describe('GloamPresence', () => {
 
   it('anchors the climb at the feet and measures the body by its head bone', () => {
     const { root, model } = rig(100000, 12, -40, 2.4);
-    const presence = new GloamPresence();
+    const presence = new GloamPresence(createShadowformStandInMaterial);
     presence.start(root, model, false);
     const body = presence.look.body.value;
     expect([body.x, body.y, body.z]).toEqual([100000, 12, -40]);
@@ -265,7 +290,7 @@ describe('GloamPresence', () => {
 
   it('follows the rig as placed THIS frame, before three recomputes its matrices', () => {
     const { root, model } = rig(0, 0, 0, 2);
-    const presence = new GloamPresence();
+    const presence = new GloamPresence(createShadowformStandInMaterial);
     presence.start(root, model, false);
     root.position.set(3, 1.5, -2);
     presence.update(1 / 60, root, model, false, false);
@@ -275,7 +300,7 @@ describe('GloamPresence', () => {
 
   it('keeps the height it stood at when the body lies down or pitches forward', () => {
     const { root, model, head } = rig(0, 0, 0, 2);
-    const presence = new GloamPresence();
+    const presence = new GloamPresence(createShadowformStandInMaterial);
     presence.start(root, model, false);
     head.position.set(1.8, 0.3, 0);
     root.updateMatrixWorld(true);
@@ -287,55 +312,111 @@ describe('GloamPresence', () => {
     const root = new THREE.Group();
     const model = new THREE.Group();
     root.add(model);
-    const presence = new GloamPresence();
+    const presence = new GloamPresence(createShadowformStandInMaterial);
     presence.start(root, model, false);
     expect(presence.look.body.value.w).toBe(0.5);
   });
 
   it('plays the entry on a shift seen happening, and reports it to the floor layer once', () => {
     const { root, model } = rig(0, 0, 0, 2);
-    const presence = new GloamPresence();
-    expect(presence.takeCue(false, false)).toBe(GLOAM_CUE_HIDDEN);
+    const presence = new GloamPresence(createShadowformStandInMaterial);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_HIDDEN);
     presence.start(root, model, true);
     // Dark over the whole body from the frame of the shift.
     expect(presence.look.state.value.x).toBe(GLOAM_ENTRY_SURGE);
-    expect(presence.takeCue(false, false)).toBe(GLOAM_CUE_ENTER);
-    expect(presence.takeCue(false, false)).toBe(GLOAM_CUE_PRESENT);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_ENTER);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_PRESENT);
     for (let i = 0; i < 240; i++) presence.update(1 / 60, root, model, false, false);
     expect(presence.look.state.value.x).toBeLessThan(0.01);
   });
 
   it('shows the form at rest on a rig first seen already in it', () => {
     const { root, model } = rig(0, 0, 0, 2);
-    const presence = new GloamPresence();
+    const presence = new GloamPresence(createShadowformStandInMaterial);
     presence.start(root, model, false);
     expect(presence.look.state.value.x).toBe(0);
-    expect(presence.takeCue(false, false)).toBe(GLOAM_CUE_PRESENT);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_PRESENT);
   });
 
   it('hides its cue under a ghost body and never replays a shift nobody saw', () => {
     const { root, model } = rig(0, 0, 0, 2);
-    const presence = new GloamPresence();
+    const presence = new GloamPresence(createShadowformStandInMaterial);
     presence.start(root, model, true);
-    expect(presence.takeCue(true, false)).toBe(GLOAM_CUE_HIDDEN);
-    expect(presence.takeCue(false, false)).toBe(GLOAM_CUE_PRESENT);
+    expect(presence.takeCue(true)).toBe(GLOAM_CUE_HIDDEN);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_PRESENT);
     presence.stop();
-    expect(presence.takeCue(false, false)).toBe(GLOAM_CUE_HIDDEN);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_HIDDEN);
     expect(presence.look.state.value.x).toBe(0);
   });
 
   it('rests its cue in water, and a shift made there is not replayed on the shore', () => {
     const { root, model } = rig(0, 0, 0, 2);
-    const presence = new GloamPresence();
-    presence.start(root, model, true);
-    expect(presence.takeCue(false, true)).toBe(GLOAM_CUE_REST);
-    expect(presence.takeCue(false, true)).toBe(GLOAM_CUE_REST);
-    expect(presence.takeCue(false, false)).toBe(GLOAM_CUE_PRESENT);
+    const presence = new GloamPresence(createShadowformStandInMaterial);
+    presence.shift(true, root, model, true);
+    const swim = { casting: false, swimming: true };
+    const walk = { casting: false, swimming: false };
+    // The frame it dives the visual is told to remount; after that, nothing.
+    expect(presence.frame(1 / 60, root, model, swim, false)).toBe(true);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_REST);
+    expect(presence.frame(1 / 60, root, model, swim, false)).toBe(false);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_REST);
+    expect(presence.frame(1 / 60, root, model, walk, false)).toBe(true);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_PRESENT);
+    // Out of the form the water is nobody's business.
+    presence.shift(false, root, model, false);
+    expect(presence.frame(1 / 60, root, model, swim, false)).toBe(false);
+  });
+
+  it('calls off an entry on a rig that was not presented at the shift', () => {
+    const { root, model } = rig(0, 0, 0, 2);
+    const presence = new GloamPresence(createShadowformStandInMaterial);
+    // The shift lands while the rig is off screen: only idle frames follow.
+    presence.shift(true, root, model, true);
+    expect(presence.look.state.value.x).toBe(GLOAM_ENTRY_SURGE);
+    presence.idle(1 / 60);
+    expect(presence.look.state.value.x).toBe(0);
+    for (let i = 0; i < 120; i++) presence.idle(1 / 60);
+    // It comes into view two seconds later: the form at rest, no entry beat on
+    // the body and no one-shot on the floor.
+    presence.frame(1 / 60, root, model, { casting: false }, false);
+    expect(presence.look.state.value.x).toBe(0);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_PRESENT);
+    expect(presence.look.unlit.getHex()).toBe(createGloamLook().unlit.getHex());
+  });
+
+  it('runs an entry on through frames the rig is not presented, never replaying it', () => {
+    const { root, model } = rig(0, 0, 0, 2);
+    const presence = new GloamPresence(createShadowformStandInMaterial);
+    presence.shift(true, root, model, true);
+    presence.frame(1 / 60, root, model, { casting: false }, false);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_ENTER);
+    expect(presence.look.state.value.x).toBe(GLOAM_ENTRY_SURGE);
+    // The camera turns away mid-entry and back four seconds later.
+    for (let i = 0; i < 240; i++) presence.idle(1 / 60);
+    presence.frame(1 / 60, root, model, { casting: false }, false);
+    expect(presence.look.state.value.x).toBeLessThan(0.01);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_PRESENT);
+  });
+
+  it('drops an entry cue nobody asked for by the second presented frame', () => {
+    const { root, model } = rig(0, 0, 0, 2);
+    const presence = new GloamPresence(createShadowformStandInMaterial);
+    presence.shift(true, root, model, true);
+    // Presented, but the floor layer is not asked (the body is dead, or wears
+    // an effect that outranks the form): the cue must not wait for later.
+    presence.frame(1 / 60, root, model, { casting: false }, false);
+    presence.frame(1 / 60, root, model, { casting: false }, false);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_PRESENT);
+    // Asked on the first presented frame, it is the entry.
+    presence.shift(false, root, model, false);
+    presence.shift(true, root, model, true);
+    presence.frame(1 / 60, root, model, { casting: false }, false);
+    expect(presence.takeCue(false)).toBe(GLOAM_CUE_ENTER);
   });
 
   it('surges with a cast and writes the live clock, or the still one under reduced motion', () => {
     const { root, model } = rig(0, 0, 0, 2);
-    const presence = new GloamPresence();
+    const presence = new GloamPresence(createShadowformStandInMaterial);
     presence.start(root, model, false);
     const clock = sharedUniforms.uTime.value;
     sharedUniforms.uTime.value = 41.5;
@@ -343,11 +424,11 @@ describe('GloamPresence', () => {
       for (let i = 0; i < 30; i++) presence.update(1 / 60, root, model, true, false);
       expect(presence.look.state.value.x).toBeGreaterThan(0.9);
       expect(presence.look.state.value.y).toBe(41.5);
-      expect(presence.takeCue(false, false)).toBe(GLOAM_CUE_PRESENT);
+      expect(presence.takeCue(false)).toBe(GLOAM_CUE_PRESENT);
       presence.update(1 / 60, root, model, true, true);
       expect(presence.look.state.value.y).toBe(GLOAM_STILL_CLOCK);
-      // The floor layer hears it from the rig: the still read, on every tier.
-      expect(presence.takeCue(false, false)).toBe(GLOAM_CUE_STILL);
+      // The cue does not carry the setting: the floor layer is handed it.
+      expect(presence.takeCue(false)).toBe(GLOAM_CUE_PRESENT);
       // The form's rim is one pair for every rig: held at rest when still.
       const shader = compiled(createShadowformStandInMaterial(rigMaterial(), presence.look));
       expect(shader.uniforms.uRimBoost.value).toBe(GLOAM_RIM_REST);
@@ -358,7 +439,7 @@ describe('GloamPresence', () => {
 
   it('dims the unlit halo colour with the entry and restores it', () => {
     const { root, model } = rig(0, 0, 0, 2);
-    const presence = new GloamPresence();
+    const presence = new GloamPresence(createShadowformStandInMaterial);
     presence.start(root, model, false);
     const rest = presence.look.unlit.clone();
     presence.stop();
@@ -369,21 +450,56 @@ describe('GloamPresence', () => {
     expect(presence.look.unlit.getHex()).toBe(rest.getHex());
   });
 
-  it('mints one stand-in per source and hands the same one back', () => {
-    const presence = new GloamPresence();
-    const source = rigMaterial();
+  it('hands out the settled set until the visual holds the stand-ins, one per source', () => {
     const mint = vi.fn(createShadowformStandInMaterial);
-    const first = presence.standIn(source, mint);
-    expect(presence.standIn(source, mint)).toBe(first);
+    const presence = new GloamPresence(mint);
+    const source = rigMaterial();
+    // Nothing asked for the form yet: there is nothing to hold.
+    presence.release();
+    expect(presence.holdStandIns()).toBe(false);
+    // The visual works out its set: the form is what shows, on the settled clones.
+    expect(presence.standInFor(source)).toBeNull();
+    expect(mint).not.toHaveBeenCalled();
+    // Those are still linking: the stand-ins show meanwhile.
+    expect(presence.holdStandIns()).toBe(true);
+    const first = presence.standInFor(source);
+    expect(first).not.toBeNull();
+    expect(presence.standInFor(source)).toBe(first);
     expect(mint).toHaveBeenCalledTimes(1);
     expect(mint).toHaveBeenCalledWith(source, presence.look);
     expect([...presence.standIns.values()]).toEqual([first]);
-    expect(compiled(first).uniforms.uGloamBody).toBe(presence.look.body);
+    expect(compiled(first as THREE.Material).uniforms.uGloamBody).toBe(presence.look.body);
+    // The link settled: back to the settled set, and the ask starts over.
+    presence.release();
+    expect(presence.standInFor(source)).toBeNull();
+    presence.release();
+    expect(presence.holdStandIns()).toBe(false);
+  });
+
+  it('keeps a swimming rig on the stand-ins across a release', () => {
+    const { root, model } = rig(0, 0, 0, 2);
+    const presence = new GloamPresence(createShadowformStandInMaterial);
+    const source = rigMaterial();
+    presence.shift(true, root, model, false);
+    presence.frame(1 / 60, root, model, { casting: false, swimming: true }, false);
+    presence.release();
+    expect(presence.standInFor(source)).not.toBeNull();
+    // A swimmer asked for no settled clone, so nothing is staged or held for it.
+    expect(presence.holdStandIns()).toBe(false);
+    presence.frame(1 / 60, root, model, { casting: false, swimming: false }, false);
+    presence.release();
+    expect(presence.standInFor(source)).toBeNull();
+    // A new shift starts out of the water, whatever the last one ended in.
+    presence.frame(1 / 60, root, model, { casting: false, swimming: true }, false);
+    presence.shift(false, root, model, false);
+    presence.shift(true, root, model, false);
+    presence.release();
+    expect(presence.standInFor(source)).toBeNull();
   });
 
   it('does nothing before the form starts', () => {
     const { root, model } = rig(5, 5, 5, 2);
-    const presence = new GloamPresence();
+    const presence = new GloamPresence(createShadowformStandInMaterial);
     presence.update(1 / 60, root, model, true, false);
     expect(presence.look.body.value.toArray()).toEqual([0, 0, 0, 0.5]);
     expect(presence.look.state.value.x).toBe(0);

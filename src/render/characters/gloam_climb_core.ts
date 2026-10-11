@@ -94,12 +94,12 @@ export const GLOAM_EDGE_SOFT = 0.03;
 export const GLOAM_DARK_TINT: readonly [number, number, number] = [0.035, 0.03, 0.06];
 
 /** Seconds-scale rates for the surge: it leaps up with a cast and sinks slowly. */
-export const GLOAM_SURGE_RISE = 9;
-export const GLOAM_SURGE_FALL = 1.3;
+const GLOAM_SURGE_RISE = 9;
+const GLOAM_SURGE_FALL = 1.3;
 /** The entry: the dark swallows the whole body, holds a beat, then recedes. */
 export const GLOAM_ENTRY_SURGE = 3.4;
 export const GLOAM_ENTRY_HOLD = 0.28;
-export const GLOAM_ENTRY_FALL = 2.1;
+const GLOAM_ENTRY_FALL = 2.1;
 /** The tongue clock under reduced motion: one still frame of the same shape. */
 export const GLOAM_STILL_CLOCK = 0;
 
@@ -160,7 +160,7 @@ export function gloamHaloTintInto(surge: number, out: [number, number, number]):
  *  the seconds one breath takes. */
 export const GLOAM_RIM_REST = 1.8;
 export const GLOAM_RIM_SWELL = 1.0;
-export const GLOAM_RIM_PERIOD = 3.2;
+const GLOAM_RIM_PERIOD = 3.2;
 
 /** The edge glow's strength at `seconds` on the render clock: a slow breath,
  *  held at rest under reduced motion. */
@@ -190,6 +190,12 @@ export function startGloamSurge(state: GloamSurge, entering: boolean): void {
   state.cast = 0;
   state.age = 0;
   state.entry = entering ? GLOAM_ENTRY_SURGE : 0;
+}
+
+/** The entry is called off (nobody could see it start): the form is simply
+ *  there, at rest, and the cast response carries on. */
+export function cancelGloamEntry(state: GloamSurge): void {
+  state.entry = 0;
 }
 
 /** The form ended: nothing left to drive. */
@@ -224,35 +230,31 @@ export function stepGloamSurge(
 export const GLOAM_CUE_HIDDEN = 0;
 export const GLOAM_CUE_PRESENT = 1;
 export const GLOAM_CUE_ENTER = 2;
-/** In the form, drawn for a viewer who asked for reduced motion. */
-export const GLOAM_CUE_STILL = 3;
 /** In the form with nothing to draw around it (swimming: no floor to stain). */
-export const GLOAM_CUE_REST = 4;
+export const GLOAM_CUE_REST = 3;
 export type GloamCue =
   | typeof GLOAM_CUE_HIDDEN
   | typeof GLOAM_CUE_PRESENT
   | typeof GLOAM_CUE_ENTER
-  | typeof GLOAM_CUE_STILL
   | typeof GLOAM_CUE_REST;
 
 /**
  * The cue for this frame. A ghosted or stealthed body shows no pool and no
  * smoke, at once (nothing may mark a stealther, the rule the form adornments
  * follow). A swimming body rests the layer: it has no floor to stain, and a
- * stain on the bed would draw over the water. Under reduced motion the layer
- * keeps its still read and no entry plays. Otherwise the entry is reported
- * while one is pending.
+ * stain on the bed would draw over the water. Otherwise the entry is reported
+ * while one is pending. The viewer's reduced-motion setting is not part of
+ * the cue: the layer is handed it directly (gloam_field.ts update) and plays
+ * no entry under it.
  */
 export function gloamCue(
   inForm: boolean,
   ghosted: boolean,
   entryPending: boolean,
-  reducedMotion: boolean,
   swimming: boolean,
 ): GloamCue {
   if (!inForm || ghosted) return GLOAM_CUE_HIDDEN;
   if (swimming) return GLOAM_CUE_REST;
-  if (reducedMotion) return GLOAM_CUE_STILL;
   return entryPending ? GLOAM_CUE_ENTER : GLOAM_CUE_PRESENT;
 }
 

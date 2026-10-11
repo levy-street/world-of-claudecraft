@@ -56,7 +56,9 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   own materials, no bone and no adornment. `gloam_climb_core.ts` is the pure
   half (the tongue tables, the cast surge and entry, the shader text and its
   CPU twin, the cue for the floor layer); `gloam_climb.ts` is the layer and the
-  per-rig `GloamPresence`. Three rules hold it together:
+  per-rig `GloamPresence` (the surge, the entry, and which of the two clone
+  sets the rig wears; `visual.ts` only asks it and remounts). Five rules hold
+  it together:
   - **Every lit rig material carries the climb as a dormant layer**, attached
     in `assets.ts` `buildTintedClone` on both tier arms right after the rim and
     re-attached by `material_clone_hooks.ts`. A body out of the form pays one
@@ -72,11 +74,32 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   - **Two clone sets, one look** (`effect_materials.ts`). The settled form is
     the transparent clone (solid, depth written): in the transparent pass the
     body draws after the sun-shaft overlay and its dark stays deep, which is
-    the approved look, and its program is the ghost variant the boot twin
-    already links. The stand-in is the same look on a clone that flips
-    nothing. `applyVisualMaterials` mounts the stand-in while the transparent
-    set is behind its gate, and for as long as the body swims (a body in the
-    transparent pass would draw over the water it is in).
+    the approved look. Its program is the transparent variant of each rig
+    material, the one the ghost run and stealth use, so the form adds no
+    program of its OWN; whether that variant is already linked depends on the
+    mesh. The boot twin (`character_effect_prewarm.ts`) stages skinned meshes
+    only, so it covers the body; a player's rigid bone-attached pieces (head,
+    hair, shoulders, weapon, halo) get their transparent variant on the first
+    shift, stealth or ghost run of the session, behind the effect-swap gate.
+    The stand-in is the same look on a clone that flips nothing, so it needs
+    no link at all: `applyVisualMaterials` mounts it while the transparent set
+    is behind its gate (that first link shows as the stand-ins for a moment,
+    never as a late form), and for as long as the body swims (a body in the
+    transparent pass would draw over the water it is in). A host with no
+    compile gate (a preview, a test, a renderer that links synchronously)
+    mounts the settled set at once and pays its links on that draw, the same
+    baseline the ghost run and stealth have always had there.
+  - **The form recolours every unlit clone, which today is the halo alone.**
+    `dressGloamClone` repaints by material type, and the class halo is the one
+    unlit piece a rig that can hold `form_shadow` carries (a priest's set, on
+    both tier arms). The other unlit rig pieces (an eye glow, the Eye Ward
+    marker's ring, the effigy's flames, a boss's charge glow) live on rigs
+    that never take the form. A second unlit piece on a priest rig that means
+    something has to be told apart by identity there first.
+  - **The form's time passes off screen** (`GloamPresence.idle`, called from
+    `advanceOffscreen`). The renderer forwards the form edge every frame but
+    updates a rig only while it presents it, so without that tick a shift made
+    out of view would play its entry when the body next came into view.
   The pool, the wake, the smoke and the entry burst are world-space and live
   in `../gloam_field.ts` (see `src/render/CLAUDE.md`); the rig tells that layer
   what to show through `CharacterVisual.gloamCue()`, never the other way.
