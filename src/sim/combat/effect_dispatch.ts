@@ -174,6 +174,7 @@ import {
   runHunterWildheart,
 } from './hunter_shared';
 import { spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
+import { applyLaunchKnockback } from './knockback_launch';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
 import {
   addSoulFragments,
@@ -2321,8 +2322,8 @@ export function runEffects(
       case 'incapacitate': {
         if (!target || target.dead) break;
         // Fear keeps its own ladder; every other incapacitate asks
-        // incapacitateDrCategory, which today diminishes Sap alone (and returns
-        // null, meaning "no ladder", for the rest). Deterministic either way:
+        // incapacitateDrCategory, which today diminishes Sap and Slumber (and
+        // returns null, meaning "no ladder", for the rest). Deterministic either way:
         // the resolver draws no rng.
         const incapDrCategory = ability.fearDr ? 'fear' : incapacitateDrCategory(ability.id);
         const remaining = incapDrCategory
@@ -3422,7 +3423,9 @@ export function runEffects(
         // Materialize before movement so displacement cannot perturb iteration.
         for (const hostile of [...ctx.hostilesInRadius(p, p.pos, eff.radius)]) {
           if (!ctx.hasLineOfSight(p, hostile)) continue;
-          ctx.applyKnockback(p, hostile, eff.distance);
+          // Players are thrown into the air (a fall off a ledge credits the
+          // caster); mobs take the grounded shove (combat/knockback_launch.ts).
+          applyLaunchKnockback(ctx, p, hostile, eff.distance);
           ctx.applyAura(hostile, {
             id: `${ability.id}_daze`,
             name: ability.name,

@@ -18,11 +18,20 @@ import type { CrowdControlDrCategory } from './types';
 // SEPARATE category on purpose: sharing 'root' would let a rogue's Sap eat a
 // druid's root chain and vice versa, the same reason opener and controlled
 // stuns are split in stun_dr.ts.
-const DIMINISHED_INCAPACITATES = new Set(['sap']);
+//
+// Slumber (hibernate) is the druid's 8 sec sleep: on a 1.5 sec cast with no
+// cooldown it could be chained on the same player indefinitely, so it rides
+// the same generic full/half/quarter/immune ladder in its OWN 'sleep'
+// category. Separate from Sap for the same reason Sap is separate from roots:
+// a rogue's Sap must not eat a druid's sleep chain on a shared target.
+const DIMINISHED_INCAPACITATES: ReadonlyMap<string, CrowdControlDrCategory> = new Map([
+  ['sap', 'incapacitate'],
+  ['hibernate', 'sleep'],
+]);
 
 /** The DR category a plain incapacitate rides, or null when it is undiminished.
  *  Fear-family incapacitates never reach here: their def carries `fearDr` and
  *  the dispatch picks the 'fear' category before consulting this. */
 export function incapacitateDrCategory(abilityId: string): CrowdControlDrCategory | null {
-  return DIMINISHED_INCAPACITATES.has(abilityId) ? 'incapacitate' : null;
+  return DIMINISHED_INCAPACITATES.get(abilityId) ?? null;
 }

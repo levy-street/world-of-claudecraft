@@ -6686,7 +6686,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Flense the enemy for weapon damage plus $d and cause bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
+      'Flense the enemy for weapon damage plus $d and cause $o bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
     specNotes: {
       feral: 'Each hit that lands adds 1 Old Blood (max 3).',
     },
@@ -6932,7 +6932,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     effects: [{ type: 'incapacitate', duration: 8 }],
-    description: 'Forces the target into a deep sleep for up to 8 sec. Any damage will awaken it.',
+    description:
+      'Forces the target into a deep sleep for up to 8 sec. Any damage will awaken it. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails.',
   },
   dash: {
     id: 'dash',
@@ -6949,9 +6950,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    requiresForm: 'cat',
+    // Pressable from ANY form (and caster form): it shifts the druid into Cat
+    // Form on the way in (combat/druid_form_entry.ts), instantly and still off
+    // the global cooldown, so it doubles as the panic escape out of Bruin.
+    usableInForm: true,
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.5, duration: 15 }],
-    description: 'Sprint forward, increasing movement speed by 50% for 15 sec. Cat Form only.',
+    description:
+      'Shift into Cat Form if you are not already, then sprint, increasing movement speed by 50% for 15 sec. Usable in any form. Instant, and does not trigger the global cooldown.',
   },
   pounce: {
     id: 'pounce',
@@ -7087,10 +7092,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     spendsCombo: true,
     requiresForm: 'cat',
     effects: [
-      { type: 'dot', total: 156, duration: 24, interval: 2, baseTotal: 36, perComboTotal: 24 },
+      // Doubled (was 156 total: 36 base plus 24 per point) so the finisher
+      // bleed earns its press against Gorebite in the feral cycle.
+      { type: 'dot', total: 312, duration: 24, interval: 2, baseTotal: 72, perComboTotal: 48 },
     ],
     description:
-      'Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: $d total). Cat Form only.',
+      'Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: $d total). Cat Form only.',
     specNotes: {
       feral: 'The landed hit adds 1 Old Blood (max 3).',
     },

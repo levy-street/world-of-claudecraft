@@ -158,17 +158,7 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
           }) + suffix(secondary)
         );
       }
-      if (
-        secondary.perComboTotal === undefined &&
-        secondary.perComboDuration === undefined &&
-        secondary.directPct === undefined &&
-        secondary.interval > 0
-      ) {
-        const ticks = secondary.duration / secondary.interval;
-        const total = Math.max(1, Math.round(secondary.total / ticks)) * ticks;
-        return formatAbilityNumber(total) + suffix(secondary);
-      }
-      return formatAbilityNumber(secondary.total) + suffix(secondary);
+      return formatAbilityNumber(dotDisplayTotal(secondary)) + suffix(secondary);
     case 'hot': {
       // v0.42 (docs/design/class-balance-v042.md): a pure-HoT $d (Wildbloom
       // has no primary hit, so its total renders here, not in the primary
@@ -187,6 +177,23 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
     default:
       return '';
   }
+}
+
+// A plain dot lands a whole number per tick (effect_dispatch.ts rounds
+// total / ticks), so the total it really deals is that tick times the tick
+// count, which is what the tooltip shows (Flense rank 2: 99 authored lands as
+// 6 ticks of 17). Combo-scaled and direct-fraction dots keep the authored total.
+function dotDisplayTotal(eff: Extract<AbilityEffect, { type: 'dot' }>): number {
+  if (
+    eff.perComboTotal !== undefined ||
+    eff.perComboDuration !== undefined ||
+    eff.directPct !== undefined ||
+    !(eff.interval > 0)
+  ) {
+    return eff.total;
+  }
+  const ticks = eff.duration / eff.interval;
+  return Math.max(1, Math.round(eff.total / ticks)) * ticks;
 }
 
 function abilityAmountRange(min: number, max: number): string {
@@ -236,7 +243,7 @@ function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): st
       }) + bonus
     );
   }
-  return formatAbilityNumber(eff.total) + bonus;
+  return formatAbilityNumber(eff.type === 'dot' ? dotDisplayTotal(eff) : eff.total) + bonus;
 }
 
 /** Which description field the RESOLVED ability should read: the stealth-free

@@ -1425,6 +1425,9 @@ export function handleDeath(
   stripPaladinDevotionsFromSource(ctx, e.id);
   e.dead = true;
   e.hp = 0;
+  // A corpse is not mid-throw: no Typhoon fall credit or steering lock
+  // survives into the next life (combat/knockback_launch.ts).
+  if (e.launchedBy) e.launchedBy = undefined;
   ctx.clearNonPlayerStatAuras(e);
   // Death cannot shed persistent death penalties or encounter-owned unbreakable
   // control. The encounter script remains responsible for releasing its markers.

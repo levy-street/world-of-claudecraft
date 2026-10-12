@@ -419,6 +419,9 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         PLATFORM_CARRY_CLEARANCE;
   const steepSlide = steepFlagged ? terrainDownhill(p.pos.x, p.pos.z, deps.seed) : null;
   const steepGround = steepSlide !== null;
+  // A launched body that already stood settled (grounded, not sliding) when
+  // this step began has finished its throw (combat/knockback_launch.ts).
+  const launchSettled = p.onGround && !steepGround;
   // Move-to-cancel: any movement input during a summon channel cancels the cast.
   // Dismount channels (mountCastKey === '') remain fully rooted (handled by mountLocked below).
   if (p.mountCastRemaining > 0 && p.mountCastKey !== '' && hasMoveInput) {
@@ -467,7 +470,9 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Air control: held keys steer the airborne velocity toward the wish vector.
   // Also what lets a jump STARTED in place drift forward, and a fall off a
   // ledge stay steerable, instead of the old frozen-at-takeoff trajectory.
-  const airSteering = moving && !p.onGround && !swimming;
+  // A hostile airborne knockback (combat/knockback_launch.ts) flies its
+  // straight line unsteered: held keys cannot curl the throw back to a ledge.
+  const airSteering = moving && !p.onGround && !swimming && !p.launchedBy;
   const slide = steepSlide;
   if (slide || movingOnGround || airSteering || (!p.onGround && (p.vx !== 0 || p.vz !== 0))) {
     if (slide && p.castingAbility) deps.cancelCast(p);
@@ -555,6 +560,14 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   }
 
   verticalPass(deps, p, inp, wishX, wishZ, wishSpeed, swimming, steepGround, mountLocked, platform);
+  // The throw ends once the body stands settled for a whole step, AFTER the
+  // vertical pass has dealt and credited any fall damage it owed (a touchdown
+  // on a steep lip keeps it: the slide off the edge is still the throw), or
+  // when its step budget runs out, whichever comes first.
+  if (p.launchedBy) {
+    p.launchedBy.ticksLeft -= 1;
+    if (p.launchedBy.ticksLeft <= 0 || (launchSettled && p.onGround)) p.launchedBy = undefined;
+  }
   standoffPass(deps, p, stepStartX, stepStartZ, wishX, wishZ, wishSpeed, movingOnGround, platform);
   // Backstop for the NaN freeze class (finite_pose_guard.ts): whatever the
   // step did, the pose it hands to the rest of the tick is finite.

@@ -165,9 +165,10 @@ describe('Sap diminishing returns match Gripping Roots', () => {
     expect(dr()).toBe(8);
   });
 
-  it('only Sap is diminished; the other plain incapacitates are unchanged', () => {
+  it('only Sap and Slumber are diminished, each in its own category', () => {
     expect(incapacitateDrCategory('sap')).toBe('incapacitate');
-    for (const id of ['gouge', 'blind', 'wyvern_sting', 'hibernate']) {
+    expect(incapacitateDrCategory('hibernate')).toBe('sleep');
+    for (const id of ['gouge', 'blind', 'wyvern_sting']) {
       expect(ABILITIES[id], `${id} should exist`).toBeDefined();
       expect(incapacitateDrCategory(id), id).toBeNull();
     }

@@ -204,9 +204,13 @@ export const TALENT_ABILITIES_V2_B = {
     range: 0,
     requiresTarget: false,
     school: 'nature',
-    effects: [{ type: 'aoeKnockback', radius: 8, distance: 6, dazeMult: 0.5, dazeDuration: 4 }],
+    // 15 yd and airborne: an enemy player is thrown in a straight line along
+    // a low arc (the Trailbreak hop, combat/knockback_launch.ts), so a shove
+    // over a ledge keeps going and the fall that follows is credited to the
+    // druid. Mobs keep the grounded shove.
+    effects: [{ type: 'aoeKnockback', radius: 8, distance: 15, dazeMult: 0.5, dazeDuration: 4 }],
     description:
-      'A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec.',
+      'A blast of wind hurls all enemies within 8 yd 15 yd away from you and dazes them, slowing their movement by 50% for 4 sec. Enemy players are thrown into the air in a straight line: knocked off a ledge, they keep going and take falling damage, and a fatal fall counts as your kill.',
   },
   innervate: {
     id: 'innervate',

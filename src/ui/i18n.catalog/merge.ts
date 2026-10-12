@@ -3979,7 +3979,7 @@ const mergeExtraEn = {
     [
       'rake',
       'Flense',
-      'Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
+      'Flense the enemy for weapon damage plus {damage} and cause {overTime} bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
       { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
     ],
     [

@@ -21,7 +21,12 @@ const BODY_RADIUS = PLAYER_BODY_RADIUS;
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH;
 
-export function applyKnockback(
+/** The yards a shove of `distance` actually gets after every knockback
+ *  immunity (Ice Block, Veilbound March, the Mooring Stone, a dev anchor) and
+ *  the target's knockback resistance; 0 means the target does not move. The
+ *  one gate both the grounded shove below and the airborne launch
+ *  (combat/knockback_launch.ts) pass through, so neither can bypass it. */
+export function knockbackDistanceAfterGuards(
   ctx: SimContext,
   source: Entity,
   target: Entity,
@@ -35,7 +40,16 @@ export function applyKnockback(
   // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
   // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
   // and never displaces the victim, so a caster keeps casting through it.
-  distance *= 1 - (target.knockbackResistance ?? 0);
+  return Math.max(0, distance * (1 - (target.knockbackResistance ?? 0)));
+}
+
+export function applyKnockback(
+  ctx: SimContext,
+  source: Entity,
+  target: Entity,
+  distance: number,
+): number {
+  distance = knockbackDistanceAfterGuards(ctx, source, target, distance);
   if (distance <= 0) return 0;
   let dx = target.pos.x - source.pos.x;
   let dz = target.pos.z - source.pos.z;

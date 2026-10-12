@@ -106,7 +106,11 @@ describe('druid spell pack — definitions', () => {
     expect(ABILITIES.enrage.requiresForm).toBe('bear');
     expect(ABILITIES.bash.requiresForm).toBe('bear');
     expect(ABILITIES.tigers_fury.requiresForm).toBe('cat');
-    expect(ABILITIES.dash.requiresForm).toBe('cat');
+    // Dash shifts into Cat Form itself (combat/druid_form_entry.ts), so it
+    // carries no form gate and is usable from any form.
+    expect(ABILITIES.dash.requiresForm).toBeUndefined();
+    expect(ABILITIES.dash.usableInForm).toBe(true);
+    expect(ABILITIES.dash.offGcd).toBe(true);
     expect(ABILITIES.pounce.requiresStealth).toBe(true);
     expect(ABILITIES.pounce.awardsCombo).toBe(1);
     expect(ABILITIES.rip.spendsCombo).toBe(true);
