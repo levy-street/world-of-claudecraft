@@ -24,6 +24,7 @@ import {
 } from '../src/sim/factions';
 import { meetsLevelRequirement, requiredLevelFor } from '../src/sim/item_level_req';
 import { Sim } from '../src/sim/sim';
+import { vendorCountForced } from '../src/sim/vendor_buy_stack';
 import { buildVendorView } from '../src/ui/hud/vendor/vendor_view';
 
 const LADDER_TIERS = ['recognized', 'trusted', 'proven', 'vanguard', 'champion'] as const;
@@ -535,6 +536,98 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     expect(sim.countItem('reins_avian_strider', pid)).toBe(1);
     expect(meta.factionCurrencies.rift_watch).toBe(50);
     expect(meta.copper).toBe(2_500_000);
+  });
+
+  it('a count or bulk request on a marks row buys exactly one copy for one mark cost', () => {
+    // The marks debit is per purchase, never multiplied, so a marks row must
+    // stay force-1 on the count path the way the vendor window already shows
+    // it (no 5x/10x/custom control). Before the fix a crafted { count: 3 } on
+    // a non-soulbound row (the formulas, the unique toys) granted three copies
+    // for a single charge.
+    const sim = new Sim({ seed: 780, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('fixture player missing');
+    meta.factions.rift_watch = 7_000; // Proven
+    meta.factionCurrencies.rift_watch = 500;
+    const qm = [...sim.entities.values()].find(
+      (e) => e.templateId === 'npc_rift_watch_quartermaster',
+    );
+    if (!qm) throw new Error('quartermaster missing');
+    sim.player.pos.x = qm.pos.x;
+    sim.player.pos.z = qm.pos.z;
+
+    const cases: Array<[string, { count?: number; bulk?: boolean }]> = [
+      ['formula_riftwalkers_grace', { count: 3 }],
+      ['rift_feather_glider', { count: 3 }],
+      ['formula_enchant_feet_shadowstride', { bulk: true }],
+    ];
+    for (const [id, opts] of cases) {
+      expect(ITEMS[id].soulbound, `${id} is transferable`).toBeFalsy();
+      const before = meta.factionCurrencies.rift_watch;
+      sim.buyItem(qm.id, id, opts);
+      expect(sim.countItem(id, pid), id).toBe(1);
+      expect(before - meta.factionCurrencies.rift_watch, id).toBe(
+        FACTION_VENDOR_GATES[id].currencyCost,
+      );
+    }
+
+    // The sim and the vendor window agree on every marks row: the shared
+    // force-1 predicate pins it, and the view offers no multiple.
+    for (const [id, gate] of Object.entries(FACTION_VENDOR_GATES)) {
+      if (gate.currencyCost <= 0) continue;
+      expect(vendorCountForced(ITEMS[id]), id).toBe(true);
+    }
+    const view = buildVendorView(
+      ['formula_riftwalkers_grace', 'rift_feather_glider'],
+      [],
+      ITEMS,
+      {
+        copper: 0,
+        honor: 0,
+        gatheringProficiency: { mining: 0, logging: 0, herbalism: 0 },
+        factions: meta.factions,
+        factionCurrencies: meta.factionCurrencies,
+      },
+      5,
+    );
+    for (const row of view.goods) {
+      expect(row.countBuy, row.itemId).toBeUndefined();
+      expect(row.bulkQuantity, row.itemId).toBeUndefined();
+    }
+  });
+
+  it('the bulk verb never multiplies a marks row, even one that also carries a coin price', () => {
+    // No shipped marks row has a coin price, so bulk cannot reach one today;
+    // this pins the guard for the day one does (coin multiplied per unit,
+    // marks debited once would be the same undercharge on the bulk axis).
+    const def = ITEMS.formula_riftwalkers_grace;
+    const saved = { buyValue: def.buyValue, stackSize: def.stackSize };
+    def.buyValue = 10;
+    def.stackSize = 20;
+    try {
+      const sim = new Sim({ seed: 781, playerClass: 'warrior', autoEquip: false });
+      const pid = sim.playerId;
+      const meta = sim.meta(pid);
+      if (!meta) throw new Error('fixture player missing');
+      meta.copper = 100_000;
+      meta.factions.rift_watch = 7_000;
+      meta.factionCurrencies.rift_watch = 500;
+      const qm = [...sim.entities.values()].find(
+        (e) => e.templateId === 'npc_rift_watch_quartermaster',
+      );
+      if (!qm) throw new Error('quartermaster missing');
+      sim.player.pos.x = qm.pos.x;
+      sim.player.pos.z = qm.pos.z;
+      sim.buyItem(qm.id, def.id, { bulk: true });
+      expect(sim.countItem(def.id, pid)).toBe(1);
+      expect(meta.copper).toBe(100_000 - 10);
+      expect(meta.factionCurrencies.rift_watch).toBe(500 - 50);
+    } finally {
+      def.buyValue = saved.buyValue;
+      if (saved.stackSize === undefined) delete def.stackSize;
+      else def.stackSize = saved.stackSize;
+    }
   });
 
   it('a bought formula teaches its enchant once the buyer holds Enchanting 100', () => {

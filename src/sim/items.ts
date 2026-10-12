@@ -1578,9 +1578,11 @@ export function buyItem(
   // a soulbound row mirrors vendorCountForced's Q23 force-1 rule (a future
   // soulbound stackable, e.g. a bind-on-pickup consumable, must stay
   // one-at-a-time on both the count AND the bulk path, never multiply on one
-  // and force-1 on the other). The result is floored at 1 so an unaffordable
-  // bulk request still hits the normal "Not enough money" check below instead
-  // of silently buying zero.
+  // and force-1 on the other). A faction-marks row is excluded the same way
+  // (its mark cost is debited once per purchase; vendor_view.ts already
+  // withholds the bulk control from it). The result is floored at 1 so an
+  // unaffordable bulk request still hits the normal "Not enough money" check
+  // below instead of silently buying zero.
   //
   // Count purchase (the 1x/5x/10x/custom control row): count N is N ordinary
   // row-unit purchases resolved atomically, refuse-whole on any shortfall
@@ -1595,6 +1597,7 @@ export function buyItem(
     hasCopperPrice &&
     !hasHonorPrice &&
     !tokenPrice &&
+    !hasFactionPrice &&
     def.kind !== 'mount' &&
     !def.soulbound;
   let qty: number;
