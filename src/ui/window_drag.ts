@@ -7,6 +7,7 @@
 // while two large store windows overlapped on high-DPI Chromium displays.
 
 import { draggedWindowPosition, type WindowDragPosition } from './window_drag_core';
+import { isTopLeftResizeGrip } from './window_resize';
 
 export interface WindowDragDeps {
   getScale(): number;
@@ -99,6 +100,8 @@ export function installWindowDrag(deps: WindowDragDeps): WindowDragController {
     if (!el || el.id === 'confirm-dialog') return;
     deps.bringToFront(el);
     if (session || event.button !== 0 || !target || !deps.isDragHandle(target, el)) return;
+    // The bag window's NW resize grip sits on its title bar: that corner resizes.
+    if (isTopLeftResizeGrip(event, deps.getScale())) return;
     event.preventDefault();
     deps.hideTooltip();
 

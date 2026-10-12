@@ -9141,6 +9141,32 @@
     overflow: hidden;
     flex-direction: column;
   }
+  /* Once the player has dragged the bags to a size (.window-sized, stamped by
+     src/ui/window_resize.ts), the inline height is the budget: the 560px
+     content cap above would otherwise stop the window growing taller. The
+     viewport clamp stays, matching the shell's own max-width clamp. */
+  #bags.window-sized {
+    max-height: calc(var(--app-vh, 100vh) / var(--window-scale) - 16px);
+  }
+  /* The NW resize grip (.window-resizable-nw, the bottom-anchored windows in
+     src/ui/window_resize.ts): the same diagonal grip as the SE corner, drawn on
+     the sticky title bar because its opaque background covers the window's own
+     top-left. The second layer restates the .ui-win-head gradient, and the
+     title padding grows so the window art clears the grip. Desktop only: on
+     touch the bags are a full-screen sheet with no NW grip. */
+  body:not(.mobile-touch) .window.window-resizable-nw > .ui-win-head {
+    background-image:
+      repeating-linear-gradient(135deg, transparent 0 3px, var(--gold-dim) 3px 4px),
+      linear-gradient(180deg, var(--color-panel-hi), var(--panel-base));
+    background-size:
+      12px 12px,
+      auto;
+    background-position:
+      left 5px top 5px,
+      0 0;
+    background-repeat: no-repeat;
+    padding-left: calc(var(--window-pad, 12px) + 8px);
+  }
   /* The window body is one flex column: title, bag sockets and the filter/search
      chrome hold their natural height, the grid takes every remaining pixel as the
      single scroller, and the money footer stays pinned to the bottom edge. */

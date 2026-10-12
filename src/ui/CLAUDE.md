@@ -615,7 +615,9 @@ same file), and each module's header carries its own contract.
   `window_resize_core.ts`) + **movable_frame.ts** (pure
   `target_frame_pos.ts`; `frame_pos_reset.ts`): the shared SE-corner resize grip on every
   `.window.panel` and the movable/lockable unit-frame controller, both instance-parameterized.
-  Fixed-size popups opt out via `NON_RESIZABLE_WINDOW_IDS`; titlebar drag is frame-batched
+  Fixed-size popups opt out via `NON_RESIZABLE_WINDOW_IDS`; a bottom-anchored window (the
+  bags) also gets a NW grip via `TOP_LEFT_GRIP_WINDOW_IDS`, which titlebar drag yields to
+  (`isTopLeftResizeGrip`), so it can grow upward; titlebar drag is frame-batched
   and compositor-only until it commits through Hud's shared position clamp. Bump
   `LAYOUT_RESET_EPOCH` only for a forced one-time frame-position reset.
 - **interface_unlock.ts** (pure `interface_unlock_core.ts`): the "Unlock interface" Interface

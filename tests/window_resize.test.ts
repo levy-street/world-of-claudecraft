@@ -1,15 +1,19 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  hasTopLeftResizeGrip,
   installWindowResize,
   isResizableWindow,
   markResizableWindow,
 } from '../src/ui/window_resize';
 import {
   isInResizeCorner,
+  isInTopLeftResizeCorner,
   RESIZE_CORNER_BAND,
   RESIZE_CORNER_BAND_TOUCH,
   RESIZE_ENGAGE_SLOP,
   RESIZE_ENGAGE_SLOP_TOUCH,
+  resizedWindowRect,
   resizedWindowSize,
   WINDOW_MIN_HEIGHT,
   WINDOW_MIN_WIDTH,
@@ -90,6 +94,74 @@ describe('resizedWindowSize', () => {
   });
 });
 
+describe('isInTopLeftResizeCorner', () => {
+  const rect = { left: 300, top: 200 };
+
+  it('hits inside the NW band and misses outside it', () => {
+    expect(isInTopLeftResizeCorner(rect, 305, 205, RESIZE_CORNER_BAND)).toBe(true);
+    expect(
+      isInTopLeftResizeCorner(
+        rect,
+        300 + RESIZE_CORNER_BAND,
+        200 + RESIZE_CORNER_BAND,
+        RESIZE_CORNER_BAND,
+      ),
+    ).toBe(true);
+    // Right of the band, below the band, and outside the window edge all miss.
+    expect(
+      isInTopLeftResizeCorner(rect, 300 + RESIZE_CORNER_BAND + 1, 205, RESIZE_CORNER_BAND),
+    ).toBe(false);
+    expect(
+      isInTopLeftResizeCorner(rect, 305, 200 + RESIZE_CORNER_BAND + 1, RESIZE_CORNER_BAND),
+    ).toBe(false);
+    expect(isInTopLeftResizeCorner(rect, 299, 205, RESIZE_CORNER_BAND)).toBe(false);
+    expect(isInTopLeftResizeCorner(rect, 305, 199, RESIZE_CORNER_BAND)).toBe(false);
+  });
+});
+
+describe('resizedWindowRect', () => {
+  // A bottom-anchored window: bottom-right corner at (1100, 790).
+  const start = { left: 800, top: 400, width: 300, height: 390 };
+
+  it('the SE corner keeps left/top and matches resizedWindowSize', () => {
+    expect(resizedWindowRect(start, 30, -50, 'se', LIMITS)).toEqual({
+      left: 800,
+      top: 400,
+      ...resizedWindowSize(start, 30, -50, LIMITS),
+    });
+  });
+
+  it('the NW corner grows up and left while the bottom-right corner stays put', () => {
+    const r = resizedWindowRect(start, -120, -200, 'nw', LIMITS);
+    expect(r).toEqual({ left: 680, top: 200, width: 420, height: 590 });
+    expect(r.left + r.width).toBe(start.left + start.width);
+    expect(r.top + r.height).toBe(start.top + start.height);
+  });
+
+  it('the NW corner shrinks toward the bottom-right, down to the minimum size', () => {
+    expect(resizedWindowRect(start, 50, 40, 'nw', LIMITS)).toEqual({
+      left: 850,
+      top: 440,
+      width: 250,
+      height: 350,
+    });
+    const r = resizedWindowRect(start, 5000, 5000, 'nw', LIMITS);
+    expect(r.width).toBe(WINDOW_MIN_WIDTH);
+    expect(r.height).toBe(WINDOW_MIN_HEIGHT);
+    expect(r.left + r.width).toBe(1100);
+    expect(r.top + r.height).toBe(790);
+  });
+
+  it('the NW corner clamps the new top-left to the viewport margin', () => {
+    expect(resizedWindowRect(start, -5000, -5000, 'nw', LIMITS)).toEqual({
+      left: WINDOW_RESIZE_MARGIN,
+      top: WINDOW_RESIZE_MARGIN,
+      width: 1100 - WINDOW_RESIZE_MARGIN,
+      height: 790 - WINDOW_RESIZE_MARGIN,
+    });
+  });
+});
+
 describe('isResizableWindow', () => {
   const el = (id: string) => ({ id }) as HTMLElement;
 
@@ -130,6 +202,16 @@ describe('markResizableWindow', () => {
     markResizableWindow(excluded.el);
     expect(excluded.added).toEqual([]);
   });
+
+  it('also stamps the NW grip on the bottom-anchored bag window only', () => {
+    const bags = fake('bags');
+    markResizableWindow(bags.el);
+    expect(bags.added).toEqual(['window-resizable', 'window-resizable-nw']);
+    expect(hasTopLeftResizeGrip({ id: 'bags' } as HTMLElement)).toBe(true);
+    for (const id of ['char-window', 'quest-log-window', 'map-window']) {
+      expect(hasTopLeftResizeGrip({ id } as HTMLElement)).toBe(false);
+    }
+  });
 });
 
 describe('RESIZE_ENGAGE_SLOP', () => {
@@ -153,10 +235,10 @@ describe('installWindowResize tap safety', () => {
   // Window at (100,100), 400x300 author px, scale 1: SE client corner (500,400).
   const CORNER = { x: 495, y: 395 };
 
-  const setup = () => {
+  const setup = (opts: { id?: string; mobile?: boolean } = {}) => {
     const classes = new Set<string>(['window', 'panel']);
     const el: any = {
-      id: 'quest-log-window',
+      id: opts.id ?? 'quest-log-window',
       dataset: {} as Record<string, string>,
       style: {} as Record<string, string>,
       classList: {
@@ -169,7 +251,8 @@ describe('installWindowResize tap safety', () => {
       clientWidth: 400,
       clientHeight: 300,
       getBoundingClientRect: () => ({ left: 100, top: 100, width: 400, height: 300 }),
-      closest: (sel: string) => (sel.includes('.window.panel') ? el : null),
+      closest: (sel: string) =>
+        sel.includes('.window.panel') || (opts.mobile && sel === '.mobile-touch') ? el : null,
       setPointerCapture: () => {},
     };
     const listeners = new Map<string, ((ev: any) => void)[]>();
@@ -296,6 +379,57 @@ describe('installWindowResize tap safety', () => {
     }
   });
 
+  // The bag window sits on the bottom screen edge, so its SE grip has no room
+  // to grow it taller: its NW grip (client top-left (100,100)) grows it up and left.
+  it('the bag window NW grip grows it up and left and re-pins the moved top-left', () => {
+    const NW = { x: 105, y: 105 };
+    const { el, pins, fire, restore } = setup({ id: 'bags' });
+    try {
+      expect(el.classList.contains('window-resizable-nw')).toBe(true);
+      fire('pointerdown', { clientX: NW.x, clientY: NW.y });
+      fire('pointermove', { clientX: NW.x - RESIZE_ENGAGE_SLOP, clientY: NW.y });
+      expect(pins).toHaveLength(1);
+      expect(el.classList.contains('window-sized')).toBe(true);
+      // From the engage-time baseline (100,100 400x300), drag up 20 and left 30.
+      fire('pointermove', { clientX: NW.x - RESIZE_ENGAGE_SLOP - 30, clientY: NW.y - 20 });
+      expect(el.style).toEqual({ left: '70px', top: '80px', width: '430px', height: '320px' });
+      fire('pointerup', {});
+      // The end of a NW drag pins again so the remembered spot is the new one.
+      expect(pins).toHaveLength(2);
+      expect(el.classList.contains('window-resizing')).toBe(false);
+    } finally {
+      restore();
+    }
+  });
+
+  it('a SE drag on the bag window still only writes the size', () => {
+    const { el, pins, fire, restore } = setup({ id: 'bags' });
+    try {
+      fire('pointerdown', { clientX: CORNER.x, clientY: CORNER.y });
+      fire('pointermove', { clientX: CORNER.x + RESIZE_ENGAGE_SLOP, clientY: CORNER.y });
+      fire('pointermove', { clientX: CORNER.x + RESIZE_ENGAGE_SLOP + 30, clientY: CORNER.y });
+      expect(el.style).toEqual({ width: '430px', height: '300px' });
+      fire('pointerup', {});
+      expect(pins).toHaveLength(1);
+    } finally {
+      restore();
+    }
+  });
+
+  it('other windows and mobile-touch bags have no NW grip', () => {
+    for (const opts of [{ id: 'quest-log-window' }, { id: 'bags', mobile: true }]) {
+      const { el, pins, fire, restore } = setup(opts);
+      try {
+        fire('pointerdown', { clientX: 105, clientY: 105 });
+        fire('pointermove', { clientX: 105 - RESIZE_ENGAGE_SLOP - 30, clientY: 85 });
+        expect(pins).toHaveLength(0);
+        expect(el.style).toEqual({});
+      } finally {
+        restore();
+      }
+    }
+  });
+
   it('a pending session bails when no buttons are down (swallowed pointerup)', () => {
     const { el, pins, fire, restore } = setup();
     try {
@@ -309,5 +443,25 @@ describe('installWindowResize tap safety', () => {
     } finally {
       restore();
     }
+  });
+});
+
+// The bag window caps its content height at 560px; once the player sizes it,
+// that cap must give way or the NW grip could not make it any taller.
+describe('bag window sized height cap', () => {
+  const css = readFileSync('src/styles/components.css', 'utf8');
+
+  it('drops the 560px content cap on a sized bag window', () => {
+    expect(css).toMatch(/#bags\s*\{[^}]*max-height:\s*min\(560px/);
+    const sized = css.match(/#bags\.window-sized\s*\{([^}]*)\}/);
+    expect(sized).not.toBeNull();
+    expect(sized?.[1]).toMatch(/max-height:\s*calc\(var\(--app-vh, 100vh\)/);
+    expect(sized?.[1]).not.toContain('560px');
+  });
+
+  it('draws the NW grip on the title bar of desktop windows only', () => {
+    expect(css).toMatch(
+      /body:not\(\.mobile-touch\) \.window\.window-resizable-nw > \.ui-win-head\s*\{[^}]*repeating-linear-gradient/,
+    );
   });
 });
