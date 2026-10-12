@@ -675,7 +675,7 @@ describe('Grovespring 2pc: own blooms first, and Swiftmend heals 25 percent more
     // A FOREIGN HoT first in aura order: the base pick would consume it.
     player.auras.push({
       id: 'rejuvenation',
-      name: 'Wildbloom',
+      name: 'Sporemending',
       kind: 'hot',
       remaining: 12,
       duration: 12,
@@ -756,7 +756,7 @@ describe('Grovespring 4pc: Overbloom harvests 75 percent and banks 1 Verdance', 
     // One owned HoT with 4 ticks of 10 left: 40 remaining healing to harvest.
     player.auras.push({
       id: 'rejuvenation',
-      name: 'Wildbloom',
+      name: 'Sporemending',
       kind: 'hot',
       remaining: 12,
       duration: 12,

@@ -464,7 +464,7 @@ describe('actual runtime -> formatted tooltip, real Sim casts (Groveheart druid)
     for (let i = 0; i < 20 * seconds; i++) sim.tick();
   }
 
-  it('Wildbloom (rejuvenation): the pure-HoT $d matches the actually deposited tick total', () => {
+  it('Sporemending (rejuvenation): the pure-HoT $d matches the actually deposited tick total', () => {
     const sim = freshGroveheartDruid(101);
     const p = sim.player;
     castAbility(sim.ctx, 'rejuvenation', p.id);
@@ -543,7 +543,7 @@ describe('actual runtime -> formatted tooltip, real Sim casts (Groveheart druid)
     castAbility(sim.ctx, 'swiftmend', p.id);
     const actualHealed = healedAmount(waitForCast(sim));
     expect(actualHealed).toBeGreaterThan(0);
-    // The consumed Wildbloom is gone; Swiftmend's own heal is the only thing
+    // The consumed Sporemending is gone; Swiftmend's own heal is the only thing
     // that landed.
     expect(p.auras.some((a) => a.id === 'rejuvenation')).toBe(false);
     const res = sim.resolvedAbility('swiftmend');

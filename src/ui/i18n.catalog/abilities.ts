@@ -1192,7 +1192,7 @@ const classAbilityNamesEn = {
       ],
       [
         'rejuvenation',
-        'Wildbloom',
+        'Sporemending',
         'Heals the target for {damage} over 12 sec.',
         {
           restoration:
@@ -1584,7 +1584,7 @@ const classAbilityNamesEn = {
       [
         'swiftmend',
         'Fleetmend',
-        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
       ],
       [
         'moonlash',
@@ -1617,9 +1617,37 @@ const classAbilityNamesEn = {
         'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Groveheart)',
       ],
       [
+        'sporemender_form',
+        'Sporemender Form',
+        'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
+      ],
+      [
+        'spore_burst',
+        'Spore Burst',
+        'Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.',
+        {
+          balance: 'At 3 Moontide it is 25% stronger and spends your Moontide.',
+          restoration:
+            'Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance.',
+        },
+      ],
+      [
+        'natures_boon',
+        "Nature's Boon",
+        "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
+        {
+          feral:
+            'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.',
+          balance:
+            'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
+          restoration:
+            'Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
+        },
+      ],
+      [
         'overbloom',
         'Overbloom',
-        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending.',
       ],
       [
         'summon_imp',

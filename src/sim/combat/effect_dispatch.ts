@@ -131,6 +131,11 @@ import {
   druidMarrowbreakUsesGuard,
   resolveDruidOverbloom,
 } from './druid_engines';
+import {
+  plantSporeBurst,
+  SPORE_BURST_FULL_BANK_POWER,
+  sporeBurstFullBank,
+} from './druid_spore_burst';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -389,7 +394,7 @@ function consumeMatchingAura(
 ): number {
   if (!target) return -1;
   // Grovespring 2pc: Swiftmend (the only hot-kind consumer) prefers the
-  // caster's OWN Wildbloom or Second Bloom, so a wearer stops eating another
+  // caster's OWN Sporemending or Second Bloom, so a wearer stops eating another
   // healer's HoT while their own is up. With none of their own present the
   // base pick below still applies (the set doc's explicit fallback: a paid
   // cast must never turn into a silent no-heal). Selection only; draws no
@@ -651,6 +656,33 @@ export function runEffects(
       }
       case 'temporalHourglass': {
         applyTemporalHourglass(ctx, p, p.castAim ?? p.pos, eff, ability.name);
+        break;
+      }
+      case 'sporeBurst': {
+        // Spore Burst (combat/druid_spore_burst.ts): plant the mushroom where
+        // the cast was aimed. Both riders take the area coefficient, like
+        // aoeDamage and aoeHeal, and everything is snapshotted here so the
+        // burst five seconds later only rolls.
+        // A full Verdance or Moontide bank adds its 25% on top of any armed
+        // Nature's Boon window; the bank itself is spent at cast completion
+        // (druid_engines.ts druidEngineOnCast), after this snapshot.
+        const bankPower = sporeBurstFullBank(p.auras, p.id) ? SPORE_BURST_FULL_BANK_POWER : 1;
+        const boonPower = (res.naturesBoonPower ?? 1) * bankPower;
+        plantSporeBurst(ctx, p, p.castAim ?? p.pos, eff, ability.name, {
+          spBonus: directHitBonus(
+            abilityScalingPower(p, ability),
+            ability,
+            res.castTime,
+            true,
+            talentDmgMult,
+          ),
+          healBonus: directHealBonus(p.healPower, res.castTime, true, talentHealMult),
+          healMult: castScopedHealMult * bankPower,
+          primaryHealMult,
+          damageMult: boonPower * primaryDamageMult,
+          plantsSporemending: meta.cls === 'druid' && mods.spec === 'restoration',
+          threat: threatOpts,
+        });
         break;
       }
       case 'weaponStrike': {

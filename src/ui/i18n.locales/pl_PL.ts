@@ -8124,7 +8124,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Uderza za 10% obrażeń broni plus {damage}. Trafienie przywraca 15 Skupienia i daje 1 Rozpęd Łowów. Obrażenia rosną z mocą ataku poprzez obrażenia broni.',
   'entities.abilities.raptor_strike.name': 'Patroszące uderzenie',
   'entities.abilities.regrowth.name': 'Drugi rozkwit',
-  'entities.abilities.rejuvenation.name': 'Dziki rozkwit',
   'entities.abilities.renew.description':
     'Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.renew.name': 'Trwająca łaska',
@@ -16234,8 +16233,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do {duration} s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem.',
   'entities.abilities.overbloom.name': 'Nadrozkwit',
-  'entities.abilities.overbloom.description':
-    'Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu.',
   'entities.abilities.redharvest.name': 'Czerwone Żniwa',
   'entities.abilities.redharvest.description':
     'Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca {rage} energii. Działa bez punktów combo.',
@@ -16248,8 +16245,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają',
   'hudChrome.auraEffect.oldBlood':
     'Stara Krew: stopień {stacks} z {max}. Trafione ciosy kota i Bruina dzielą tę rezerwę; przy {max} przemienia się Krwawe ukąszenie lub Kruszenie kości',
-  'hudChrome.auraEffect.verdance':
-    'Zieleń {stacks}/{max}. Każdy NOWO zasadzony Dziki rozkwit lub Drugi rozkwit dodaje 1. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit',
   'hudChrome.continentMap.levels': 'Poziomy od {min} do {max}',
   'hudChrome.continentMap.summary': 'Mapa świata. Wybierz strefę, aby otworzyć jej mapę.',
   'hudChrome.continentMap.title': 'Mapa Świata',
@@ -16603,8 +16598,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ukrywa cię w cieniach: wrogowie ledwo cię zauważają, ale poruszasz się o 50% wolniej. Atakowanie lub otrzymanie obrażeń przerywa Zasłonę zmierzchu. Rzuć ponownie, aby z niej wyjść.',
   'entities.abilities.stealth.specNote_subtlety':
     'Każdy otwierający cios użyty z Zasłony zmierzchu dodaje 1 Mrok (maks. 3).',
-  'entities.abilities.swiftmend.description':
-    'Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. Zasadzenia Dzikiego rozkwitu i Drugiego rozkwitu dodają Zieleń; przy 5 Zieleni ten przycisk zmienia się w Nadrozkwit, który natychmiast leczy każdego sojusznika noszącego twoje efekty leczenia w czasie za 60% tego, co z nich zostało. (Sygnatura Serca Gaju)',
   'entities.abilities.swipe.description':
     'Zamaszyście przeczesz pazurami pobliskich wrogów, zadając {damage} obrażeń. Wzbudza dodatkowe zagrożenie. Tylko w Postaci Bruina.',
   'entities.abilities.swipe.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
@@ -17750,8 +17743,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Zjednoczone trafienia Rozkazu Żniw zadają o 25 procent większe obrażenia.',
   'entities.itemSets.gravebrand.name': 'Regalia Grobowego Znaku',
-  'entities.itemSets.grovespring.bonus2':
-    'Szybkie Uzdrowienie najpierw zużywa twój własny Dzikokwiat lub Drugi Rozkwit i leczy o 25 procent więcej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.grovespring.bonus4':
     'Nadrozkwit zbiera 75 procent twoich pozostałych efektów, a następnie zachowuje 1 punkt Zieloności.',
   'entities.itemSets.grovespring.name': 'Strój Gajowego Źródła',

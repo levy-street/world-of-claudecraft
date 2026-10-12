@@ -10463,7 +10463,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Udeří za 10 % poškození zbraně plus {damage}. Zásah obnoví 15 Soustředění a udělí 1 Lovecký spád. Poškození roste s útočnou silou skrze poškození zbraně.',
   'entities.abilities.raptor_strike.name': 'Párací úder',
   'entities.abilities.regrowth.name': 'Druhý květ',
-  'entities.abilities.rejuvenation.name': 'Divoký květ',
   'entities.abilities.renew.description':
     'Vyléčí cíl o {damage} během 15 s, jednou za 3 s. Léčení roste se silou kouzel.',
   'entities.abilities.renew.name': 'Přetrvávající milost',
@@ -13191,8 +13190,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Uvolní prvotní nápor. V kočičí podobě zvýší obnovu energie o 100 % na 10 s. V medvědí podobě okamžitě vygeneruje 50 vzteku. (klíčová schopnost Divokosti)',
   'entities.abilities.swiftmend.name': 'Rychlé zhojení',
-  'entities.abilities.swiftmend.description':
-    'Spotřebuje na spřáteleném cíli léčivý efekt v čase a vyléčí ho o {damage}. Výsadby Divokého květu a Druhého květu přidávají Zeleň; při 5 Zeleni se z tohoto tlačítka stane Překvět, který okamžitě vyléčí každého spojence nesoucího tvé léčivé efekty v čase o 60 % toho, co těmto efektům zbývalo. (Charakteristika Srdce háje)',
   'entities.abilities.chain_heal.name': 'Kaskádové zhojení',
   'entities.abilities.chain_heal.description':
     'Vyléčí přátelský cíl za {damage} a pak přeskočí až na 2 spojence do 12 metrů. Každý skok léčí za 50% předchozího cíle. Každý zasažený spojenec spotřebuje tvůj zbývající Léčivý proud a okamžitě se vyléčí za 125% spotřebovaného množství. Počáteční léčení roste se silou kouzel. (Signatura Zhojení duchem)',
@@ -16017,8 +16014,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Pouze v Podobě měsíčního křídla. Zasáhne za {damage} tajemného poškození, přidá jeden stupeň Měsíčního přílivu a prodlouží tvou Měsíční bouři o 6 s, až o {duration} s na použití. Při plném Měsíčním přílivu se Měsíční semeno mění v Měsíční vzedmutí.',
   'entities.abilities.overbloom.name': 'Překvět',
-  'entities.abilities.overbloom.description':
-    'Spotřebuje 5 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ.',
   'entities.abilities.redharvest.name': 'Rudá sklizeň',
   'entities.abilities.redharvest.description':
     'Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví {rage} energie. Funguje i bez combo bodů.',
@@ -16031,8 +16026,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá',
   'hudChrome.auraEffect.oldBlood':
     'Stará krev: stupeň {stacks} z {max}. Zasažené kočičí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí',
-  'hudChrome.auraEffect.verdance':
-    'Zeleň {stacks}/{max}. Každý NOVĚ zasazený Divoký květ nebo Druhý květ přidá 1. Při {max} se Rychlé zhojení mění v Překvět',
   'hudChrome.continentMap.levels': 'Úrovně {min} až {max}',
   'hudChrome.continentMap.summary': 'Mapa světa. Vyber oblast a otevři její mapu.',
   'hudChrome.continentMap.title': 'Mapa světa',
@@ -17443,8 +17436,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Sjednocené údery Příkazu sklizně způsobují o 25 procent vyšší poškození.',
   'entities.itemSets.gravebrand.name': 'Klenoty Hroboznaku',
-  'entities.itemSets.grovespring.bonus2':
-    'Rychlé léčení nejprve spotřebuje tvůj vlastní Divoký květ nebo Druhý květ a léčí o 25 procent více. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.grovespring.bonus4':
     'Překvetení sklidí 75 procent tvých zbývajících účinků a poté uloží 1 Verdanci.',
   'entities.itemSets.grovespring.name': 'Roucho Hájového pramene',

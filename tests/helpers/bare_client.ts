@@ -226,6 +226,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.activeVarkhulAssemblies = [];
   c.activeTemporalHourglasses = [];
   c.activeConsecrations = [];
+  c.activeSporeBursts = [];
   c.profanityWords = [];
   c.mouselookFacing = null;
   c.lastInputSentAt = 0;

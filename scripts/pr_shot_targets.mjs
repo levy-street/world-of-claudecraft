@@ -17129,7 +17129,7 @@ export const TARGETS = [
     // because Oakhide is a Bruin payoff and naturesBoonFormAllows refuses it
     // out of Bruin Form. A positive frame alone would not tell a working form
     // gate from a rim painted on everything. The window's other member
-    // (Wildbloom) is not in the curated druid form-bar defaults
+    // (Sporemending) is not in the curated druid form-bar defaults
     // (ui/hud/action_bar/owned_class_spec_defaults.ts DRUID_FORM_DEFAULTS), so
     // it has no slot to light on a stock form bar and is deliberately not what
     // these frames are shot against.

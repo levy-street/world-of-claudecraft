@@ -461,7 +461,7 @@ describe('live Soul Rend player-visual prewarm', () => {
   it('warms every OTHER path that mints or re-snapshots a live rig', () => {
     const renderer = readSource('../src/render/renderer.ts');
 
-    // A form rig (sheep/bear/cat/travel/metamorph) is what a shapeshifted body
+    // A form rig (sheep/bear/cat/travel/metamorph/sporemender) is what a shapeshifted body
     // takes the mark on, and three keys the program on mesh shape and skinning,
     // so it cannot inherit the base rig's warmed variant. Its look is null: a
     // form holds nothing it can swap.
@@ -480,6 +480,7 @@ describe('live Soul Rend player-visual prewarm', () => {
       "this.buildFormVisual(e, v, 'form_cat', 'catVisual', true)",
       "this.buildFormVisual(e, v, 'form_travel', 'travelVisual', true)",
       "this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false)",
+      "this.buildFormVisual(e, v, 'form_sporemender', 'sporemenderVisual', true)",
     ]) {
       expect(renderer).toContain(call);
     }

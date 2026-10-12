@@ -36,6 +36,7 @@ import {
   naturesBoonArmedFor,
   naturesBoonFormAllows,
 } from '../../../sim/combat/druid_natures_boon';
+import { sporeBurstFullBankGlowActive } from '../../../sim/combat/druid_spore_burst';
 import {
   freeCostAuraActive,
   nextCastCheapMultiplierFromAuras,
@@ -944,6 +945,8 @@ export function createActionBarView(
           destructionProcGlowActive(player.auras ?? [], def.id) ||
           packlordActionGlowActive(player.auras ?? [], def.id) ||
           thundercallPayoffGlowActive(player.auras ?? [], def.id) ||
+          // Spore Burst at a full Verdance or Moontide bank (the 25% payoff).
+          sporeBurstFullBankGlowActive(player.auras ?? [], player.id, def.id) ||
           flowStateReady ||
           priestActionGlowActive(player.auras ?? [], def.id) ||
           sunVerdictAbilityGlowActive(target?.auras, player.id, def.id) ||

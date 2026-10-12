@@ -8012,7 +8012,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Silah hasarının %10'u artı {damage} vurur. İsabet 15 Odak yeniler ve 1 Av İvmesi verir. Hasar, silah hasarı üzerinden saldırı gücüyle artar.",
   'entities.abilities.raptor_strike.name': 'Deşen Darbe',
   'entities.abilities.regrowth.name': 'İkinci Çiçeklenme',
-  'entities.abilities.rejuvenation.name': 'Yaban Çiçeği',
   'entities.abilities.renew.description':
     "Hedefi 15 sn boyunca {damage} iyileştirir, her 3 sn'de bir kez. İyileştirme Büyü Gücü ile artar.",
   'entities.abilities.renew.name': 'Kalıcı Lütuf',
@@ -16111,8 +16110,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Yalnızca Aykuşu Formunda. {damage} Gizem hasarı vurur, bir Ay Gelgiti aşaması ekler ve Ay Fırtınanı 6 sn uzatır, uygulama başına en fazla {duration} sn. Ay Gelgiti doluyken Ay Tohumu, Ay Kabarışına dönüşür.',
   'entities.abilities.overbloom.name': 'Taşkın Çiçeklenme',
-  'entities.abilities.overbloom.description':
-    '5 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Yaban Çiçeği eker.',
   'entities.abilities.redharvest.name': 'Kızıl Hasat',
   'entities.abilities.redharvest.description':
     '3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve {rage} enerji geri kazandırır. Sıfır combo puanıyla da çalışır.',
@@ -16125,8 +16122,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar',
   'hudChrome.auraEffect.oldBlood':
     'Kadim Kan: aşama {stacks} / {max}. İsabet eden Kedi ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür',
-  'hudChrome.auraEffect.verdance':
-    'Yeşillik: aşama {stacks} / {max}. Ektiğin her YENİ Yaban Çiçeği veya İkinci Çiçeklenme 1 ekler. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür',
   'hudChrome.continentMap.levels': 'Seviye {min} ile {max} arası',
   'hudChrome.continentMap.summary': 'Dünya haritası. Haritasını açmak için bir bölge seç.',
   'hudChrome.continentMap.title': 'Dünya Haritası',
@@ -16481,8 +16476,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Seni gölgelerde gizler: düşmanlar seni zar zor fark eder, ama %50 daha yavaş hareket edersin. Saldırmak ya da hasar almak Alacakaranlık Perdesini bozar. Çıkmak için tekrar oku.',
   'entities.abilities.stealth.specNote_subtlety':
     'Alacakaranlık Perdesinden kullandığın her açılış 1 Alacakaranlık ekler (en fazla 3).',
-  'entities.abilities.swiftmend.description':
-    "Dost bir hedefteki zamana yayılı bir iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. Yaban Çiçeği ve İkinci Çiçeklenme dikimleri Yeşillik ekler; 5 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılı iyileştirme etkilerini taşıyan her müttefiki, o etkilerin kalanının %60'ı kadar anında iyileştirir. (Groveheart motoru)",
   'entities.abilities.swipe.description':
     'Pençelerini yakındaki düşmanların arasından geçirerek {damage} hasar ver. Ekstra tehdit yaratır. Yalnızca Bruin Formu.',
   'entities.abilities.swipe.specNote_feral':
@@ -17601,8 +17594,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Biçim Emrinin birlik vuruşları %25 daha fazla hasar verir.',
   'entities.itemSets.gravebrand.name': 'Mezar Damgası Asaleti',
-  'entities.itemSets.grovespring.bonus2':
-    'Çabuk İyileştirme önce kendi Yaban Çiçeğini veya İkinci Çiçeklenmeni tüketir ve %25 daha fazla iyileştirir. Alınan hasar artık büyü yapmanı geciktirmez.',
   'entities.itemSets.grovespring.bonus4':
     "Aşırı Çiçeklenme kalan etkilerinin %75'ini hasat eder ve ardından 1 Yeşerme depolar.",
   'entities.itemSets.grovespring.name': 'Koruluk Pınarı Giysisi',

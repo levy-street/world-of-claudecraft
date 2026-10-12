@@ -174,6 +174,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'starfire',
       'moonseed',
       'moonfire',
+      'spore_burst',
       'barkskin',
       'entangling_roots',
       'faerie_fire',
@@ -200,6 +201,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'regrowth',
       'healing_touch',
       'swiftmend',
+      'spore_burst',
       'wildwake',
       'barkskin',
       'entangling_roots',
@@ -209,6 +211,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'thorns',
       'travel_form',
       'grove_awakening',
+      'sporemender_form',
     ],
   },
 };

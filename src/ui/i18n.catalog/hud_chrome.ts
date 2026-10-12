@@ -5260,7 +5260,7 @@ export const hudChromeStrings = {
     oldBlood:
       'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
     verdance:
-      'Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom',
+      'Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom',
     freeExecute: 'Your next eligible execute ability costs nothing',
     resourceSap: 'Restores {value} of your current resource every {interval} sec',
     nextAttackCrit: 'Your next attack is guaranteed to critically strike',
@@ -5400,6 +5400,8 @@ export const hudChromeStrings = {
     formFireball: 'Ember Form: movement speed increased by {pct}%; attacks and spells are disabled',
     formMoonkin:
       'Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%',
+    formSporemender:
+      'Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%',
     formShadow: 'Gloamveil Form: Shadow damage increased by {pct}%',
     resourceCount: '{value} of {max}',
     formLich: 'Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage',

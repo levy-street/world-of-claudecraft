@@ -195,6 +195,7 @@ const EXPECTED = {
     'starfire',
     'moonseed',
     'moonfire',
+    'spore_burst',
     'barkskin',
     'entangling_roots',
     'faerie_fire',
@@ -221,6 +222,7 @@ const EXPECTED = {
     'regrowth',
     'healing_touch',
     'swiftmend',
+    'spore_burst',
     'wildwake',
     'barkskin',
     'entangling_roots',
@@ -230,6 +232,7 @@ const EXPECTED = {
     'thorns',
     'travel_form',
     'grove_awakening',
+    'sporemender_form',
   ],
 } as const;
 

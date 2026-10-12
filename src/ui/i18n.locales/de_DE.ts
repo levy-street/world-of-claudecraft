@@ -9578,7 +9578,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.moonfire.name': 'Mondsturm',
-  'entities.abilities.rejuvenation.name': 'Wildblüte',
   'entities.abilities.thorns.name': 'Dornenwacht',
   'entities.abilities.thorns.description':
     'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden {buff} Naturschaden.',
@@ -15170,8 +15169,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu {duration} Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge.',
   'entities.abilities.overbloom.name': 'Überblüte',
-  'entities.abilities.overbloom.description':
-    'Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel.',
   'entities.abilities.redharvest.name': 'Rote Ernte',
   'entities.abilities.redharvest.description':
     'Verbraucht 3 Altes Blut: ein Schlag für {damage}, der sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, beide Blutungen entfernt und {rage} Energie wiederherstellt. Funktioniert auch ohne Combopunkte.',
@@ -15184,8 +15181,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr',
   'hudChrome.auraEffect.oldBlood':
     'Altes Blut: Stufe {stacks} von {max}. Gelandete Katzen- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer',
-  'hudChrome.auraEffect.verdance':
-    'Grünkraft: Stufe {stacks} von {max}. Jede NEUE Wildblüte oder Zweite Blüte, die du pflanzt, fügt 1 hinzu. Bei {max} wird Flinkheilung zu Überblüte.',
   'abilityUi.cast.rift_arcane_execution': 'Leerenriss',
   'abilityUi.cast.rift_arcane_strike': 'Arkane Auslöschung',
   'abilityUi.cast.rift_brute_execution': 'Erdspalter',
@@ -16954,8 +16949,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verbirgt Euch im Schatten: Gegner bemerken Euch kaum, doch Ihr bewegt Euch 50% langsamer. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um herauszutreten.',
   'entities.abilities.stealth.specNote_subtlety':
     'Jede Eröffnung, die Ihr aus Duskveil einsetzt, fügt 1 Dämmer hinzu (max. 3).',
-  'entities.abilities.swiftmend.description':
-    'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Das Pflanzen von Wildblüte und Zweite Blüte fügt Grünkraft hinzu; bei 5 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Hainherz-Signatur)',
   'entities.abilities.swipe.description':
     'Fegt mit Euren Klauen durch nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin-Gestalt.',
   'entities.abilities.swipe.specNote_feral':
@@ -17936,8 +17929,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Die gemeinsamen Treffer von Erntebefehl verursachen 25 Prozent mehr Schaden.',
   'entities.itemSets.gravebrand.name': 'Insignien des Grabmals',
-  'entities.itemSets.grovespring.bonus2':
-    'Schnellheilung verbraucht zuerst deine Wildblüte oder Zweite Blüte und heilt 25 Prozent mehr. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.grovespring.bonus4':
     'Überblüte erntet 75 Prozent deiner verbleibenden Effekte und speichert danach 1 Üppigkeit.',
   'entities.itemSets.grovespring.name': 'Gewand der Hainquelle',

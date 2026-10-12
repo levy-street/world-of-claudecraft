@@ -107,6 +107,7 @@ import {
   type ActiveNythraxisGraveEruption,
   type ActiveNythraxisGraveFlame,
   type ActiveNythraxisGravefire,
+  type ActiveSporeBurst,
   type ActiveTemporalHourglass,
   type ActiveVarkhulAnvilMeteorWarning,
   type ActiveVarkhulAssembly,
@@ -1674,6 +1675,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   activeVarkhulAssemblies: ActiveVarkhulAssembly[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
   activeConsecrations: ActiveConsecration[] = [];
+  activeSporeBursts: ActiveSporeBurst[] = [];
   private counterfangWindowDeadlineMs = 0;
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render

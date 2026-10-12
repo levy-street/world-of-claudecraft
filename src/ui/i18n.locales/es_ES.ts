@@ -469,8 +469,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe instantáneo de 80 a 100 de daño de Naturaleza más una quemadura de 45 a lo largo de 9 s, que restaura 35 de maná y gasta los 3.',
   'entities.abilities.stealth.description':
     'Te oculta entre las sombras: los enemigos apenas te perciben, pero te mueves un 50% más lento. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarlo para salir de él.',
-  'entities.abilities.swiftmend.description':
-    'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Las plantaciones de Floración Silvestre y Segundo Florecer añaden Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por el 60% de su sanación restante. (habilidad distintiva de Restauración)',
   'entities.abilities.swipe.description':
     'Barre con tus garras a los enemigos cercanos infligiendo {damage} de daño. Causa amenaza adicional. Solo en forma de Bruin.',
   'entities.abilities.swipe.specNote_feral':

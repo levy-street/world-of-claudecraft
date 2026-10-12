@@ -8195,7 +8195,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Slaat toe voor 10% wapenschade plus {damage}. Een treffer herstelt 15 Focus en verleent 1 Jachtvaart. De schade stijgt via de wapenschade met de aanvalskracht.',
   'entities.abilities.raptor_strike.name': 'Ontweiende Slag',
   'entities.abilities.regrowth.name': 'Tweede Bloei',
-  'entities.abilities.rejuvenation.name': 'Wildbloei',
   'entities.abilities.renew.description':
     'Geneest het doelwit in 15 sec voor {damage}, eens per 3 sec. De genezing stijgt met de Spreukkracht.',
   'entities.abilities.renew.name': 'Aanhoudende Genade',
@@ -15998,8 +15997,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Alleen in Maanuilvorm. Slaat toe voor {damage} Arcane-schade, voegt een Maanvloed-stadium toe en verlengt je Maanstorm met 6 sec, tot {duration} sec per toepassing. Bij volle Maanvloed wordt Maanzaad Maangolf.',
   'entities.abilities.overbloom.name': 'Overbloei',
-  'entities.abilities.overbloom.description':
-    'Verbruikt 5 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit.',
   'entities.abilities.redharvest.name': 'Rode Oogst',
   'entities.abilities.redharvest.description':
     'Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en {rage} energie herstelt. Werkt ook zonder combopunten.',
@@ -16012,8 +16009,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit',
   'hudChrome.auraEffect.oldBlood':
     'Oud Bloed: stadium {stacks} van {max}. Gelande Kat- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen',
-  'hudChrome.auraEffect.verdance':
-    'Groenkracht: stadium {stacks} van {max}. Voltooide Wildbloei- en Tweede Bloei-spreuken vullen haar; bij {max} wordt Snelle genezing Overbloei',
   'sim.rift.allUnstable': 'Alle rifts zijn op dit moment onstabiel. Probeer het straks opnieuw.',
   'sim.rift.alreadyCleared': 'Deze rift is al opgeruimd door {names}.',
   'sim.rift.deadEntry': 'Je kunt geen rift betreden terwijl je dood bent.',
@@ -16652,8 +16647,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhult je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 50% trager. Aanvallen of schade oplopen verbreekt de Schemersluier. Spreuk opnieuw om eruit te stappen.',
   'entities.abilities.stealth.specNote_subtlety':
     'Elke opener die je vanuit Schemersluier gebruikt, voegt 1 Schemer toe (max 3).',
-  'entities.abilities.swiftmend.description':
-    'Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het te genezen voor {damage}. Het planten van Wildbloei en Tweede Bloei voegt Groenkracht toe; bij 5 Groenkracht wordt deze knop Overbloei, die onmiddellijk elke bondgenoot met jouw genezing-over-tijd-effecten geneest voor 60% van wat die effecten nog over hadden. (Boshart-kenmerk)',
   'entities.abilities.swipe.description':
     'Veeg met je klauwen door nabije vijanden voor {damage} schade. Veroorzaakt extra dreiging. Alleen in Bruingedaante.',
   'entities.abilities.swipe.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
@@ -17760,8 +17753,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'De unisono-aanvallen van Reaping Command richten 25 procent meer schade aan.',
   'entities.itemSets.gravebrand.name': 'Grafmerk-Regalia',
-  'entities.itemSets.grovespring.bonus2':
-    'Snelle genezing verbruikt eerst je eigen Wildbloom of Second Bloom en geneest 25 procent meer. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',
   'entities.itemSets.grovespring.bonus4':
     'Overbloom oogst 75 procent van je resterende effecten en slaat daarna 1 Verdance op.',
   'entities.itemSets.grovespring.name': 'Bosbron-Kledij',

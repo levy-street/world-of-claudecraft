@@ -328,6 +328,7 @@ export type {
   ActiveNythraxisGraveEruption,
   ActiveNythraxisGraveFlame,
   ActiveNythraxisGravefire,
+  ActiveSporeBurst,
   ActiveTemporalHourglass,
   ActiveVarkhulAnvilMeteorWarning,
   ActiveVarkhulAssembly,

@@ -103,7 +103,8 @@ export function normalizedInstantSpeed(weapon: WeaponInfo): number {
 
 // The druid shapeshifts that fight with claws (or hooves): while one is active
 // the class wand is unavailable, exactly like a weapon it cannot hold. Caster
-// form and Moonwing Form (`form_moonkin`) keep the wand. Deliberately a
+// form, Moonwing Form (`form_moonkin`) and Sporemender Form (`form_sporemender`)
+// keep the wand. Deliberately a
 // blocklist of the druid melee/travel forms, so the priest's `form_shadow` and
 // the warlock's `form_metamorph` keep their existing wand behavior.
 const WANDLESS_FORMS = new Set(['form_bear', 'form_cat', 'form_travel']);

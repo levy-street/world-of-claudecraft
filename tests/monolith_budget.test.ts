@@ -995,7 +995,15 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // LOWERED 12688 -> 12685 at the release/v0.45.0 merge into
+    // feature/sporemender-form: the Sporemender Form rig slot moved the per-slot
+    // shadow, far, proxy-shadow, dispose and active-rig lines into
+    // src/render/characters/form_visual_slots_core.ts. wc -l on the merged tree.
+    // Exact count, zero slack.
+    // RAISED 12685 -> 12704 for Spore Burst: the visual lives in
+    // src/render/spore_burst_visual.ts; renderer.ts only constructs it, syncs it
+    // in both frame loops, and routes the burst cue. wc -l on the tree.
+    ceiling: 12704,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1868,7 +1876,9 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // RAISED 5356 -> 5358 for Spore Burst: the activeSporeBursts IWorld field and
+    // its type import (the decode lives in net/ground_telegraph_wire.ts).
+    ceiling: 5358,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

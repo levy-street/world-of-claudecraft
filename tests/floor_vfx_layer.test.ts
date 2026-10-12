@@ -118,6 +118,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/paladin_ascension_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/ring_of_frost_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/frost_nova_root_visual.ts', layer: 'player', strict: true },
+  // Spore Burst's splash ring and fill; its floating countdown is a named
+  // overlay order, not a floor piece.
+  { file: 'src/render/spore_burst_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/glacial_front_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/abyssal_rift_fx.ts', layer: 'player', strict: true },
   { file: 'src/render/umbral_anchor_marker.ts', layer: 'player', strict: true },

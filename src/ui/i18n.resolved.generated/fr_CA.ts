@@ -4000,7 +4000,7 @@ export const fr_CA: EnTranslations = {
       "duskEconomy": "Les capacités coûtent {pct}% d'énergie en moins",
       "moontide": "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
       "oldBlood": "Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme",
-      "verdance": "Verdoyance : cran {stacks} sur {max}. Les incantations achevées de Floraison sauvage et de Seconde floraison la remplissent ; à {max}, Prompte guérison devient Surfloraison",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Votre prochaine capacité d'exécution éligible ne coûte rien",
       "resourceSap": "Restaure {value} de votre ressource actuelle toutes les {interval} s",
       "nextAttackCrit": "Votre prochaine attaque est un coup critique garanti",
@@ -4102,6 +4102,7 @@ export const fr_CA: EnTranslations = {
       "formTravel": "Forme de Fleet : vitesse de déplacement accrue de {pct}%",
       "formFireball": "Forme de braise : vitesse de déplacement augmentée de {pct} % ; les attaques et sorts sont désactivés",
       "formMoonkin": "Forme de sélénien : dégâts des sorts augmentés de {pct}% et armure augmentée de {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Forme d'Ombre : dégâts d'Ombre augmentés de {pct}%",
       "resourceCount": "{value} sur {max}",
       "formLich": "Lance d'âme touche aussi jusqu'à {targets} ennemis proches pour {pct}% de dégâts",
@@ -7794,13 +7795,15 @@ export const fr_CA: EnTranslations = {
       "formLine": {
         "form_bear": "La forme de tank : une peau épaisse, de la rage à la place du mana, et davantage de menace pour que les ennemis continuent de vous frapper.",
         "form_cat": "La forme de dégâts au corps à corps : de l'énergie et des points de combo, comme un voleur, et beaucoup moins de menace.",
-        "form_travel": "La forme de déplacement : bien plus rapide au sol, mais sans aucune autre capacité tant que vous n'en changez pas."
+        "form_travel": "La forme de déplacement : bien plus rapide au sol, mais sans aucune autre capacité tant que vous n'en changez pas.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Un sort de Givre qui appelle l'élémentaire à vos côtés et le lance sur votre cible.",
       "formName": {
         "form_bear": "Forme de Bruin",
         "form_cat": "Forme de chat",
-        "form_travel": "Forme de Fleet"
+        "form_travel": "Forme de Fleet",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8501,6 +8504,7 @@ export const fr_CA: EnTranslations = {
       "formBear": "Forme de Bruin",
       "formCat": "Forme de chat",
       "formTravel": "Forme de Fleet",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Créatures",
       "groupPets": "Démons du Démoniste",
       "pickerLabel": "Choisissez un modèle à afficher",
@@ -13946,7 +13950,7 @@ export const fr_CA: EnTranslations = {
         "description": "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à {duration} s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire."
       },
       "rejuvenation": {
-        "name": "Floraison sauvage",
+        "name": "Sporemending",
         "description": "Soigne la cible de {damage} sur 12 s.",
         "specNote_restoration": "Planter une NOUVELLE floraison ajoute 1 Verdoyance (maximum 5). À 5 Verdoyance, Prompte guérison devient Surfloraison."
       },
@@ -14267,7 +14271,7 @@ export const fr_CA: EnTranslations = {
       },
       "swiftmend": {
         "name": "Prompte guérison",
-        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Les plantations de Floraison sauvage et de Seconde floraison ajoutent de la Verdoyance ; à 5 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Déferlante lunaire",
@@ -14293,9 +14297,26 @@ export const fr_CA: EnTranslations = {
         "name": "Éveil du bosquet",
         "description": "Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Cœur sylvestre)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
+      "spore_burst": {
+        "name": "Spore Burst",
+        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
+        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
+        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+      },
+      "natures_boon": {
+        "name": "Nature's Boon",
+        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
+        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
+        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
+        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+      },
       "overbloom": {
         "name": "Surfloraison",
-        "description": "Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Invoquer un Emberkin",
@@ -24081,7 +24102,7 @@ export const fr_CA: EnTranslations = {
       },
       "grovespring": {
         "name": "Habillement de la Source sylvestre",
-        "bonus2": "Rétablissement rapide consomme d’abord votre Floraison sauvage ou Seconde floraison et soigne 25 % davantage. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdure."
       },
       "hexthread": {

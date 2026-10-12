@@ -203,6 +203,9 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   (`tests/form_adornments.test.ts`, `tests/character_form_adornments.test.ts`).
 - Pure selection cores: `modular.ts` (composed bodies, below),
   `player_look_core.ts`, `form_visual_selection_core.ts`,
+  `form_visual_slots_core.ts` (the lazy form-rig slot list the renderer's
+  per-frame shadow/far/proxy/dispose passes walk: a new form rig is an entry
+  there plus its view field, never more per-slot lines in `renderer.ts`),
   `far_lod_reveal_core.ts` (the rig/far-mesh/shadow-proxy handoff rule: the
   baked far mesh stands in only once it exists AND its materials linked
   behind the renderer's far-bake compile gate; `visual.ts` is a thin consumer
@@ -218,7 +221,7 @@ humanoid mobs, NPCs, forms). Dispatch precedence in `visualKeyFor`: players to
 `player_<class>` (or `player_mech` for the mech skin catalog); mobs to
 `MOB_KEYS[templateId]`, then `FAMILY_KEYS[MOBS[id].family]` (the family ids
 live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
-(`form_sheep`/`form_bear`/`form_cat`/`form_travel`) are passed explicitly by the renderer;
+(`form_sheep`/`form_bear`/`form_cat`/`form_travel`/`form_metamorph`/`form_sporemender`) are passed explicitly by the renderer;
 `characterFormAssetKey` (`form_visual_selection_core.ts`) then splits the shared cat slot at
 construction, so a shaman's `ghost_wolf` aura resolves to `form_ghost_wolf` (the tinted
 `wolf_basic.glb`) while the druid's `form_cat` loads its own `druid_cat_form.glb`.

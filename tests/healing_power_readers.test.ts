@@ -29,7 +29,7 @@
 //   absorb        combat/effect_dispatch.ts 'absorb' (absorbBonus) - outside the healing-factor scope
 //   AoE heal      combat/effect_dispatch.ts 'aoeHeal' (directHealBonus, aoe) - Sunmender x1.10
 //   channel AoE   combat/casting_lifecycle.ts aoeHeal pulse (channelTickBonus) - unspecced druid, x1 (unaffected)
-//   druid replant combat/druid_engines.ts replantWildbloom (hotTickBonus) - Groveheart x1.20
+//   druid replant combat/druid_engines.ts replantSporemending (hotTickBonus) - Groveheart x1.20
 //   Paladin Aegis combat/paladin_aegis.ts tick + final burst - Sunmender x1.10
 import { describe, expect, it } from 'vitest';
 import { castAbility, updateCasting } from '../src/sim/combat/casting_lifecycle';
@@ -260,7 +260,7 @@ describe('channeled AoE heal pulse reads healPower (casting_lifecycle aoeHeal ar
   });
 });
 
-describe('druid Overbloom replant reads healPower (druid_engines replantWildbloom)', () => {
+describe('druid Overbloom replant reads healPower (druid_engines replantSporemending)', () => {
   // At level 10 (rank 2, authored hot.total 32 -> 56 on rank), restoration's
   // spec_baselines.ts global healPct 0.08 plus rejuvenation's ability dmgPct
   // 0.24 give talentHealMult 1.32 (resolveTalentHitMult, level-independent);

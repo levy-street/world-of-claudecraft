@@ -144,7 +144,7 @@ export function disciplineWandOffenseMultiplier(): number {
 export function primaryHealingMultiplier(cls: PlayerClass, spec: string | null): number {
   if (cls === 'shaman' && spec === 'restoration') return 1.1;
   if (cls === 'paladin' && spec === 'holy') return 1.1;
-  // Together with corrected Wildbloom replants: +19.9% across the paired engine profiles.
+  // Together with corrected Sporemending replants: +19.9% across the paired engine profiles.
   if (cls === 'druid' && spec === 'restoration') return 1.05;
   return 1;
 }

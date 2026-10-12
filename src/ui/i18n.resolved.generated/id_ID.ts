@@ -4000,7 +4000,7 @@ export const id_ID: EnTranslations = {
       "duskEconomy": "Kemampuan menghabiskan {pct}% lebih sedikit energi",
       "moontide": "Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya",
       "oldBlood": "Darah Tua: tahap {stacks} dari {max}. Serangan Kucing dan Bruin yang kena berbagi simpanan ini; pada {max}, Gigitan Berdarah atau Remuk Tulang bertransformasi",
-      "verdance": "Kehijauan: tahap {stacks} dari {max}. Setiap Mekar Liar atau Mekar Kedua BARU yang kamu tanam menambah 1. Pada {max}, Pemulihan Cepat menjadi Mekar Raya",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Kemampuan eksekusi berikutnya yang memenuhi syarat tidak memakan biaya apa pun",
       "resourceSap": "Memulihkan {value} dari sumber dayamu saat ini setiap {interval} dtk",
       "nextAttackCrit": "Seranganmu berikutnya dijamin akan menjadi pukulan kritis",
@@ -4102,6 +4102,7 @@ export const id_ID: EnTranslations = {
       "formTravel": "Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%",
       "formFireball": "Ember Form: kecepatan gerak meningkat {pct}%; serangan dan mantra dinonaktifkan",
       "formMoonkin": "Wujud Burung Bulan: kerusakan sihir meningkat {pct}% dan zirah meningkat {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Wujud Bayangan: kerusakan Bayangan meningkat {pct}%",
       "resourceCount": "{value} dari {max}",
       "formLich": "Soul Lance juga menghantam hingga {targets} musuh terdekat sebesar {pct}% kerusakan",
@@ -7794,13 +7795,15 @@ export const id_ID: EnTranslations = {
       "formLine": {
         "form_bear": "Wujud tank: kulit tebal, Amarah alih-alih mana, dan ancaman ekstra agar musuh terus menyerangmu.",
         "form_cat": "Wujud kerusakan jarak dekat: Energi dan poin combo, seperti penyamun, dan ancaman yang jauh lebih sedikit.",
-        "form_travel": "Wujud jelajah: jauh lebih cepat melintasi daratan, tetapi tak ada kemampuan lain sampai kamu keluar dari wujud ini."
+        "form_travel": "Wujud jelajah: jauh lebih cepat melintasi daratan, tetapi tak ada kemampuan lain sampai kamu keluar dari wujud ini.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Sebuah mantra Beku yang memanggil elemental itu ke sisimu dan mengarahkannya pada targetmu.",
       "formName": {
         "form_bear": "Wujud Bruin",
         "form_cat": "Wujud Kucing",
-        "form_travel": "Wujud Fleet"
+        "form_travel": "Wujud Fleet",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8501,6 +8504,7 @@ export const id_ID: EnTranslations = {
       "formBear": "Wujud Bruin",
       "formCat": "Wujud Kucing",
       "formTravel": "Wujud Fleet",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Makhluk",
       "groupPets": "Iblis Penyihir Iblis",
       "pickerLabel": "Pilih model untuk dilihat",
@@ -13946,7 +13950,7 @@ export const id_ID: EnTranslations = {
         "description": "Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga {duration} dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan."
       },
       "rejuvenation": {
-        "name": "Mekar Liar",
+        "name": "Sporemending",
         "description": "Menyembuhkan target sebesar {damage} selama 12 detik.",
         "specNote_restoration": "Menanam kuntum BARU menambah 1 Verdance (maks 5). Pada 5 Verdance, Fleetmend berubah menjadi Overbloom."
       },
@@ -14267,7 +14271,7 @@ export const id_ID: EnTranslations = {
       },
       "swiftmend": {
         "name": "Pemulihan Cepat",
-        "description": "Mengonsumsi efek penyembuhan seiring waktu pada target kawan untuk menyembuhkannya sebesar {damage}. Penanaman Wildbloom dan Second Bloom menambah Verdance; pada 5 Verdance tombol ini berubah menjadi Overbloom, yang seketika menyembuhkan setiap sekutu yang menyandang efek penyembuhan seiring waktumu sebesar 60% dari sisa efek tersebut. (mesin Groveheart)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Gelombang Rembulan",
@@ -14293,9 +14297,26 @@ export const id_ID: EnTranslations = {
         "name": "Kebangkitan Rimba",
         "description": "Memanggil kembali ke sisimu setiap anggota kelompok atau serbuanmu yang gugur dalam 40 m dan dalam garis pandangmu, dengan 30% nyawa dan mana. Tidak dapat dirapal dalam pertempuran. (Groveheart)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
+      "spore_burst": {
+        "name": "Spore Burst",
+        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
+        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
+        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+      },
+      "natures_boon": {
+        "name": "Nature's Boon",
+        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
+        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
+        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
+        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+      },
       "overbloom": {
         "name": "Mekar Raya",
-        "description": "Menghabiskan 5 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Panggil Emberkin",
@@ -24081,7 +24102,7 @@ export const id_ID: EnTranslations = {
       },
       "grovespring": {
         "name": "Busana Mata Air Rimba",
-        "bonus2": "Sembuh Kilat terlebih dahulu mengonsumsi Mekar Liar atau Mekar Kedua milik Anda dan menyembuhkan 25 persen lebih banyak. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Mekar Berlebih memanen 75 persen efek Anda yang tersisa dan setelahnya menyimpan 1 Verdansi."
       },
       "hexthread": {

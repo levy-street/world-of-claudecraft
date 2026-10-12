@@ -2019,8 +2019,13 @@ export class Vfx {
   // Shapeshift-form aura (continuous, called per frame while the form aura is
   // on). Each form reads distinctly at a glance: metamorph = flame tongues +
   // stray embers, moonkin = drifting star motes, shadowform = gloom wisps +
-  // smoke curls.
-  formAura(entityId: number, form: 'metamorph' | 'moonkin' | 'shadowform', dt: number): void {
+  // smoke curls, sporemender = tiny spores lifting off the ground into the sky,
+  // sporemending = the same spores, sparser, on a Sporemending HoT target.
+  formAura(
+    entityId: number,
+    form: 'metamorph' | 'moonkin' | 'shadowform' | 'sporemender' | 'sporemending',
+    dt: number,
+  ): void {
     if (form === 'metamorph') {
       const n = this.emitCount(48, dt);
       if (!n) return;
@@ -2069,6 +2074,36 @@ export class Vfx {
           1.1 + Math.random() * 0.5,
           -0.15,
           SPR.star,
+        );
+      }
+      return;
+    }
+    if (form === 'sporemender' || form === 'sporemending') {
+      // Small spores shaken loose at the druid's feet, rising slowly and
+      // gathering speed as they climb past the cap toward the sky; most are
+      // pale cream specks, a few glow a soft spring green. A HoT target gets a
+      // sparser, shorter drift: a raid can carry the HoT on every member.
+      const hot = form === 'sporemending';
+      const n = this.emitCount(hot ? 9 : 26, dt);
+      if (!n) return;
+      const at = this.anchor(entityId, 0.03);
+      if (!at) return;
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = 0.2 + Math.random() * 0.9;
+        const glow = Math.random() < 0.3;
+        this.spawn(
+          at.x + Math.sin(a) * r,
+          at.y + Math.random() * 0.2,
+          at.z + Math.cos(a) * r,
+          (Math.random() - 0.5) * 0.14,
+          0.5 + Math.random() * 0.4,
+          (Math.random() - 0.5) * 0.14,
+          glow ? 0xc8f77a : 0xf6efcf,
+          glow ? 0.36 + Math.random() * 0.1 : 0.22 + Math.random() * 0.08,
+          (hot ? 2.2 : 2.8) + Math.random() * (hot ? 0.8 : 1.2),
+          -0.3,
+          SPR.flash,
         );
       }
       return;

@@ -191,7 +191,8 @@ describe('Guide route rendering', () => {
       const posters = [
         ...root.querySelectorAll<HTMLImageElement>('.guide-pet .guide-viewer-poster-still'),
       ];
-      expect(posters.length, `${cls} detail page viewer stills`).toBe(3);
+      // Warlock: three demons. Druid: Bruin, Cat, Fleet and Sporemender Form.
+      expect(posters.length, `${cls} detail page viewer stills`).toBe(cls === 'druid' ? 4 : 3);
       for (const poster of posters) {
         expect(poster.getAttribute('data-poster-fallback')).toBe(`/ui/classes/${cls}.webp`);
       }

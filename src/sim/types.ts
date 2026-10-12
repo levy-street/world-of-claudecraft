@@ -459,6 +459,10 @@ export type AuraKind =
   | 'form_travel'
   | 'form_fireball'
   | 'form_moonkin'
+  // Groveheart's Sporemender Form: a caster form that keeps the full kit and
+  // mana bar (+20% healing done, +40% armor, 20% slower movement;
+  // combat/druid_sporemender.ts).
+  | 'form_sporemender'
   | 'form_shadow'
   // Necromancy secondary resource and signature transformation.
   | 'soul_fragments'
@@ -699,6 +703,7 @@ export const FORM_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'form_travel',
   'form_fireball',
   'form_moonkin',
+  'form_sporemender',
   'form_shadow',
   'form_lich',
 ]);
@@ -3264,6 +3269,20 @@ export type AbilityEffect =
       selfCooldownRate: number;
       allyCooldownRate: number;
     }
+  // Druid Spore Burst (combat/druid_spore_burst.ts): plants a spore burster at
+  // the aimed point. After `fuse` seconds it bursts once, healing every friendly
+  // unit within `radius` for healMin..healMax and dealing min..max Nature damage
+  // to every hostile one (no target cap on either side). Groveheart also plants
+  // Sporemending on each ally it heals.
+  | {
+      type: 'sporeBurst';
+      min: number;
+      max: number;
+      healMin: number;
+      healMax: number;
+      radius: number;
+      fuse: number;
+    }
   // Chronomancy raid cooldown (Rewind / Rebobinar): instant, no target, centered on
   // the caster. Restores `fraction` of the REAL damage each living group/raid member
   // within `radius` took in the last `windowSec` seconds, capped per target at
@@ -3370,7 +3389,7 @@ export type AbilityEffect =
   | { type: 'druidMarrowbreakGuard'; belowFrac: number; absorbPctMaxHp: number; rage: number }
   // Groveheart Overbloom (combat/druid_engines.ts): harvest every HoT the
   // caster owns for harvestPct of its remaining healing, then replant a
-  // Wildbloom on the cast target (or on every harvested ally with the
+  // Sporemending on the cast target (or on every harvested ally with the
   // Seedspread row lean).
   | { type: 'druidOverbloom'; harvestPct: number }
   | { type: 'slow'; mult: number; duration: number }
@@ -7629,6 +7648,8 @@ export type SimEvent = { pid?: number } & (
         // travels to targetId as a cosmetic homing projectile.
         | 'soulTravel'
         | 'meteorImpact'
+        // A Spore Burst mushroom bursting (combat/druid_spore_burst.ts).
+        | 'sporeBurst'
         | 'ambientMeteorFall';
       // The casting ability's id, so the renderer can pick that ground cast's
       // authored visual instead of a generic per-school one.

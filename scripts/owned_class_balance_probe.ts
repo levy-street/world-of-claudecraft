@@ -1047,7 +1047,7 @@ function runHealerRotation(
   const lowest = lowestHealth(allies);
   const injured = allies.filter((ally) => ally.hp / ally.maxHp < 0.82).length;
   if (spec === 'groveheart') {
-    // The documented loop: harvest at full growth, keep Wildbloom on the whole
+    // The documented loop: harvest at full growth, keep Sporemending on the whole
     // party and Second Bloom on the spike target, and fill every remaining
     // GCD with Wildmend while the garden ticks. A sow-only loop saturates its
     // GCDs re-seeding and under-measures the spec (the pooled-payoff lesson).

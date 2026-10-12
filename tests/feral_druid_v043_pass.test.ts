@@ -2,7 +2,7 @@
 //   1. every melee attack a feral druid makes reaches 1 yd further
 //   2. Slinkstrike and Lunge each bank 1 Old Blood (cap 3)
 //   3. Nature's Boon: a landed autoattack has a 1-in-15 chance to arm one free
-//      Wildbloom (any form) OR Oakhide (Bruin only) for 10 sec, 25% stronger
+//      Sporemending (any form) OR Oakhide (Bruin only) for 10 sec, 25% stronger
 //   4. Savage Mending is a Bruin AND Cat button
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -413,7 +413,7 @@ describe("3. Nature's Boon", () => {
     expect(willAutoUnshift(armedBear, ABILITIES.wrath)).toBe(true);
   });
 
-  it('casts Wildbloom from Cat Form for free, keeping the form, and spends the window', () => {
+  it('casts Sporemending from Cat Form for free, keeping the form, and spends the window', () => {
     const { sim, player } = rig('feral');
     player.auras.push(formAura(player, 'form_cat'));
     armBoon(sim);
@@ -444,7 +444,7 @@ describe("3. Nature's Boon", () => {
     expect(player.auras.find((entry) => entry.kind === 'buff_armor_pct')?.value).toBe(20);
   });
 
-  it('leaves the unarmed behavior exactly as it was: Wildbloom drops Cat Form', () => {
+  it('leaves the unarmed behavior exactly as it was: Sporemending drops Cat Form', () => {
     const { sim, player } = rig('feral');
     player.auras.push(formAura(player, 'form_cat'));
     expect(aura(player, NATURES_BOON_ID)).toBeUndefined();
@@ -921,7 +921,7 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
     // The bar's rim reads the same predicate, so Oakhide glows in Bruin alone.
     expect(naturesBoonArmedFor([boon, { kind: 'form_cat' }], 'barkskin')).toBe(false);
     expect(naturesBoonArmedFor([boon, { kind: 'form_bear' }], 'barkskin')).toBe(true);
-    // Wildbloom is form-free either way.
+    // Sporemending is form-free either way.
     expect(naturesBoonArmedFor([boon, { kind: 'form_cat' }], 'rejuvenation')).toBe(true);
   });
 
@@ -939,7 +939,7 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
     expect(player.resource).toBe(rageBefore);
     expect(aura(player, NATURES_BOON_ID)).toBeUndefined();
 
-    // First cast wins: Wildbloom pressed next is an ordinary Wildbloom again.
+    // First cast wins: Sporemending pressed next is an ordinary Sporemending again.
     // With no window it can no longer be cast FROM Bruin Form (the auto-unshift
     // stands back up and drops the form), and its tick is the plain one, not
     // the empowered one.
@@ -969,7 +969,7 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
     // Oakhide still goes off (it is usableInForm), but it pays its own cost...
     expect(player.auras.some((a) => a.kind === 'buff_armor_pct')).toBe(true);
     expect(player.resource).toBeLessThan(energyBefore);
-    // ...and the window survives for the Wildbloom it is meant for.
+    // ...and the window survives for the Sporemending it is meant for.
     expect(aura(player, NATURES_BOON_ID)).toBeDefined();
   });
 });
@@ -1001,7 +1001,7 @@ describe('13. An armed window makes its spell 25% stronger', () => {
     return { sim, player };
   }
 
-  it('scales Wildbloom by a quarter, Spell Power rider included', () => {
+  it('scales Sporemending by a quarter, Spell Power rider included', () => {
     const plain = gearedRig();
     plain.sim.castAbility('rejuvenation');
     plain.sim.tick();

@@ -506,6 +506,13 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
+  it('describes both Sporemender Form bonuses and its slower pace from the sim constants', () => {
+    expect(desc({ kind: 'form_sporemender', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.formSporemender',
+      nums: { pct: 20, armorPct: 40, slowPct: 20 },
+    });
+  });
+
   it('safely omits an effect line for a future wire aura kind', () => {
     expect(desc({ kind: 'future_aura', value: 1 } as unknown as AuraEffectInput)).toBeNull();
   });
@@ -715,6 +722,7 @@ describe('auraEffectDescriptor', () => {
       { kind: 'cauterize_fatigue', value: 0 },
       { kind: 'cast_shield', value: 1 },
       { kind: 'form_moonkin', value: 0 },
+      { kind: 'form_sporemender', value: 0 },
       { kind: 'form_shadow', value: 15 },
       { kind: 'affliction_eye', value: 1, tickInterval: 2.5 },
       { kind: 'affliction_eye_secondary', value: 0.5 },

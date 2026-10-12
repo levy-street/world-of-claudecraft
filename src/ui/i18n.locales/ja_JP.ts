@@ -5207,7 +5207,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.name': '月の嵐',
   'entities.abilities.moonfire.description':
     '月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。',
-  'entities.abilities.rejuvenation.name': '野生の芽吹き',
+  'entities.abilities.rejuvenation.name': 'スポアメンディング',
   'entities.abilities.rejuvenation.description': '12秒間で対象の体力を {damage} 回復します。',
   'entities.abilities.thorns.name': '茨の守り',
   'entities.abilities.thorns.description':
@@ -5396,7 +5396,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '原初の力を解き放ちます。キャットフォームでは、10秒間エネルギーの再生速度が100%上昇します。ブルーインフォームでは、即座に怒りを50生成します。（フェラル特性のシグネチャ）',
   'entities.abilities.swiftmend.name': 'スウィフトメンド',
   'entities.abilities.swiftmend.description':
-    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。野生の芽吹きと二度目の開花の植え付けは青翠を貯め、青翠5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
+    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディングと二度目の開花の植え付けは青翠を貯め、青翠5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
   'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
   'entities.abilities.crusader_strike.description':
     '対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）',
@@ -10269,7 +10269,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '骨髄砕きのダメージが30%増加し、緊急時の護りが攻撃を置き換えなくなります。',
   'entities.itemSets.grovespring.name': 'グローヴスプリングの法衣',
   'entities.itemSets.grovespring.bonus2':
-    'スウィフトメンドが自分の野生の芽吹きまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。',
+    'スウィフトメンドが自分のスポアメンディングまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.grovespring.bonus4': '満開が残りの効果の75%を収穫し、その後翠成を1蓄えます。',
   'entities.items.lastflame_core.name': '最後の炎の核',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
@@ -13207,6 +13207,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': 'ブルーインフォーム',
   'guide.models.formCat': 'キャットフォーム',
   'guide.models.formTravel': 'フリートフォーム',
+  'guide.models.formSporemender': 'スポアメンダーフォーム',
   'guide.models.groupForms': 'ドルイドの変身形態',
   'guide.nav.sidebarLabel': 'ガイドの項目',
   'guide.professions.craftHowTitle': '製作ウィンドウ',
@@ -15869,7 +15870,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に15秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。',
   'entities.abilities.ossuary_mark.name': '納骨の印',
   'entities.abilities.overbloom.description':
-    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。',
+    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。',
   'entities.abilities.overbloom.name': '満開',
   'entities.abilities.pack_command.description':
     '生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。',
@@ -16122,11 +16123,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '近接ダメージの姿です。ローグと同じくエナジーとコンボポイントで戦い、脅威ははるかに低く抑えられます。',
   'guide.classPage.formLine.form_travel':
     '移動のための姿です。地上をはるかに速く駆けられますが、変身を解くまで他のアビリティは使えません。',
+  'guide.classPage.formLine.form_sporemender':
+    '回復特性の癒しの姿です。より頑丈な外皮と強い回復を備えますが歩みは遅くなり、すべての呪文とマナをそのまま使えます。',
   'guide.classPage.formName.form_bear': 'ブルーインフォーム',
   'guide.classPage.formName.form_travel': 'フリートフォーム',
+  'guide.classPage.formName.form_sporemender': 'スポアメンダーフォーム',
   'guide.classPage.formsHeading': '変身',
   'guide.classPage.formsMoonwing':
-    '均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。獣の姿でありながら呪文を保てる唯一の形であり、ワンドもこの姿か、通常の術者の姿でしか使えません。',
+    '均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。回復特性のスポアメンダーフォームと同じく呪文をそのまま使え、ワンドはこの二つの姿か、通常の術者の姿でしか使えません。',
   'guide.classPage.formsWolfEngage':
     '狼はブルーインラッシュで戦いを開き、すぐにウルフフォームへ変身して対象を押さえ込み、ステルスでないときはランジで距離を詰め、テイクダウンで敵を足止めする。',
   'guide.classPage.formsAutoUnshift':
@@ -17014,6 +17018,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '悪魔形態：体格が{pct}%大きくなる。ほかのボーナスは別のバフで表示される',
   'hudChrome.auraEffect.formMoonkin':
     'ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する',
+  'hudChrome.auraEffect.formSporemender':
+    'スポアメンダーフォーム：与える回復量が{pct}%、アーマーが{armorPct}%増加し、移動速度が{slowPct}%低下する',
   'hudChrome.auraEffect.formShadow': 'グロームヴェイル形態：影ダメージが{pct}%増加する',
   'hudChrome.auraEffect.freeExecute': '次の対象となる処刑アビリティはコストを消費しない',
   'hudChrome.auraEffect.funeralHarvestLock':
@@ -17079,7 +17085,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     '毒の儀式:{stacks}/{max}段階。「卑劣な突き」「邪悪な斬撃」「毒針」で1段階ずつ進む。{max}段階で「永の眠り」が「毒裂き」に変化する',
   'hudChrome.auraEffect.verdance':
-    '翠成：{stacks}/{max}段階。新しく植えた野生の芽吹きまたは二度目の開花ごとに1段階進む。{max}段階でスウィフトメンドが満開に変化する',
+    '翠成：{stacks}/{max}段階。新しく植えたスポアメンディングまたは二度目の開花ごとに1段階進む。{max}段階でスウィフトメンドが満開に変化する',
   'hudChrome.auraEffect.warlockAnchor':
     '{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する',
   'hudChrome.auraEffect.wintersChill':
@@ -18863,6 +18869,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（回復）',
   'entities.abilities.grove_awakening.name': '樹林の覚醒',
+  'entities.abilities.sporemender_form.name': 'スポアメンダーフォーム',
+  'entities.abilities.sporemender_form.description':
+    'スポアメンダーになり、与える回復量が20%、アーマーが40%増加しますが、移動速度が20%低下します。通常形態で使える呪文はすべてそのまま使えます。姿を戻すまで持続します。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再び唱えると通常形態に戻ります。（回復の象徴）',
+  'entities.abilities.spore_burst.name': 'スポアバースト',
+  'entities.abilities.spore_burst.description':
+    '対象地点にスポアバースターを召喚します。{duration}秒後に破裂し、8ヤード以内の味方の体力を {healing} 回復し、敵に {damage} の自然ダメージを与えます。',
+  'entities.abilities.spore_burst.specNote_balance':
+    '月潮が3段階のとき、効果が25%上昇し、月潮を消費します。',
+  'entities.abilities.spore_burst.specNote_restoration':
+    '回復した味方それぞれにスポアメンディングも付与します。翠成が最大のとき、効果が25%上昇し、翠成を消費します。',
+  'entities.abilities.natures_boon.name': '自然の恵み',
+  'entities.abilities.natures_boon.description':
+    '呪文が10秒間の自然の恵みを発動させることがあります。指定された呪文は無料になり、効果が25%上昇し、どの姿でも詠唱できます。再発動すると時間が更新されます。',
+  'entities.abilities.natures_boon.specNote_feral':
+    '近接の自動攻撃が命中するたびに1/15の確率で発動し、スポアメンディングが対象になります。ブルーインフォーム中は樫の肌も対象です。',
+  'entities.abilities.natures_boon.specNote_balance':
+    '野生の稲妻または天墜を詠唱するたびに10%の確率で発動し、スポアバーストが対象になります。発動は10秒に1回までです。',
+  'entities.abilities.natures_boon.specNote_restoration':
+    '自分の持続回復効果が回復するたびに10%の確率で発動し、スポアバーストが対象になります。発動は10秒に1回までです。',
   'entities.abilities.prayer_of_returning.description':
     'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（聖なる・ディシプリン）',
   'entities.abilities.prayer_of_returning.name': '帰還の祈り',

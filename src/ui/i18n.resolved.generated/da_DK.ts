@@ -4000,7 +4000,7 @@ export const da_DK: EnTranslations = {
       "duskEconomy": "Evner koster {pct}% mindre energi",
       "moontide": "Måneflod: trin {stacks} af {max}. Vildlyn-, Himmelfald- og Månefrø-besværgelser fylder den i Månekinform; ved {max} bliver Månefrø til Månebølge og Himmelfald til Solspor, og begge tærer på den",
       "oldBlood": "Gammelt Blod: trin {stacks} af {max}. Landede Katte- og Bruin-slag deler dette forråd; ved {max} forvandles Blodbid eller Knogleknus",
-      "verdance": "Grønske {stacks}/{max}. Hver NY Vildblomst eller Anden Blomstring, du planter, giver 1. Ved {max} bliver Hurtig heling til Overblomstring",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Din næste kvalificerede henrettelsesevne koster ingenting",
       "resourceSap": "Genopretter {value} af din nuværende ressource hvert {interval}. sek",
       "nextAttackCrit": "Dit næste angreb rammer garanteret kritisk",
@@ -4102,6 +4102,7 @@ export const da_DK: EnTranslations = {
       "formTravel": "Fleet-form: bevægelseshastighed øget med {pct}%",
       "formFireball": "Ember Form: bevægelseshastighed øget med {pct}%; angreb og trolddomme er deaktiverede",
       "formMoonkin": "Månekinform: besværgelsesskade øget med {pct}% og rustning øget med {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Skyggeform: Skyggeskade øget med {pct}%",
       "resourceCount": "{value} af {max}",
       "formLich": "Soul Lance rammer også op til {targets} nærliggende fjender for {pct}% skade",
@@ -7794,13 +7795,15 @@ export const da_DK: EnTranslations = {
       "formLine": {
         "form_bear": "Tank-formen: en tyk hud, raseri i stedet for mana, og ekstra trussel, så fjenderne bliver ved med at svinge efter dig.",
         "form_cat": "Nærkampsskade-formen: energi og kombopoint, som en slyngel, og langt mindre trussel.",
-        "form_travel": "Rejseformen: langt hurtigere hen over jorden, men ingen andre evner, før du skifter ud af den."
+        "form_travel": "Rejseformen: langt hurtigere hen over jorden, men ingen andre evner, før du skifter ud af den.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "En Frost-besværgelse, der kalder elementaren til din side og sætter den på dit mål.",
       "formName": {
         "form_bear": "Bruin-form",
         "form_cat": "Katteform",
-        "form_travel": "Fleet-form"
+        "form_travel": "Fleet-form",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8501,6 +8504,7 @@ export const da_DK: EnTranslations = {
       "formBear": "Bruin-form",
       "formCat": "Katteform",
       "formTravel": "Fleet-form",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Skabninger",
       "groupPets": "Heksemester-Dæmoner",
       "pickerLabel": "Vælg en model at se",
@@ -13946,7 +13950,7 @@ export const da_DK: EnTranslations = {
         "description": "Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til {duration} sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge."
       },
       "rejuvenation": {
-        "name": "Vildblomst",
+        "name": "Sporemending",
         "description": "Helbreder målet for {damage} over 12 sek.",
         "specNote_restoration": "At plante en NY blomstring tilføjer 1 Grønske (maks. 5). Ved 5 Grønske bliver Hurtig heling til Overblomstring."
       },
@@ -14267,7 +14271,7 @@ export const da_DK: EnTranslations = {
       },
       "swiftmend": {
         "name": "Hurtig heling",
-        "description": "Forbruger en helbredelse-over-tid-effekt på et venligt mål for at helbrede det for {damage}. Plantninger af Vildblomst og Anden Blomstring tilføjer Grønske; ved 5 Grønske bliver denne knap til Overblomstring, som øjeblikkeligt helbreder hver allieret, der bærer dine helbredelse-over-tid-effekter, for 60% af det, de effekter havde tilbage. (Lundhjerte-motoren)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Månebølge",
@@ -14293,9 +14297,26 @@ export const da_DK: EnTranslations = {
         "name": "Lundens Opvågnen",
         "description": "Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Lundhjerte)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
+      "spore_burst": {
+        "name": "Spore Burst",
+        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
+        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
+        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+      },
+      "natures_boon": {
+        "name": "Nature's Boon",
+        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
+        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
+        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
+        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+      },
       "overbloom": {
         "name": "Overblomstring",
-        "description": "Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Tilkald Emberkin",
@@ -24081,7 +24102,7 @@ export const da_DK: EnTranslations = {
       },
       "grovespring": {
         "name": "Grovespring-dragt",
-        "bonus2": "Hurtig heling forbruger først din egen Wildbloom eller Second Bloom og heler 25 procent mere. Modtaget skade forsinker ikke længere dine besværgelser.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Overbloom høster 75 procent af dine resterende effekter og oplagrer derefter 1 Verdance."
       },
       "hexthread": {

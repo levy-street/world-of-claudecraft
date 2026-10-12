@@ -5171,7 +5171,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.name': '달빛 폭풍',
   'entities.abilities.moonfire.description':
     '달빛불로 적을 태워 {damage}의 비전 피해와 지속 피해를 입힙니다.',
-  'entities.abilities.rejuvenation.name': '야생 개화',
+  'entities.abilities.rejuvenation.name': '포자치유',
   'entities.abilities.rejuvenation.description':
     '12초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.thorns.name': '가시 수호',
@@ -5361,7 +5361,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '원시의 힘을 폭발시킵니다. 표범 변신 상태에서는 10초 동안 기력 회복 속도가 100% 증가합니다. 큰곰 변신 상태에서는 즉시 분노를 50 생성합니다. (야성 전문화 상징)',
   'entities.abilities.swiftmend.name': '신속한 치유',
   'entities.abilities.swiftmend.description':
-    '아군 대상에게 걸린 지속 치유 효과 하나를 소모해 {damage}만큼 치유합니다. 야생 개화와 두 번째 개화의 심기는 푸르름을 쌓고, 푸르름 5에서 이 버튼은 만개가 되어, 당신의 지속 치유 효과를 지닌 모든 아군을 그 효과에 남은 양의 60%만큼 즉시 치유합니다. (회복 상징 기술)',
+    '아군 대상에게 걸린 지속 치유 효과 하나를 소모해 {damage}만큼 치유합니다. 포자치유와 두 번째 개화의 심기는 푸르름을 쌓고, 푸르름 5에서 이 버튼은 만개가 되어, 당신의 지속 치유 효과를 지닌 모든 아군을 그 효과에 남은 양의 60%만큼 즉시 치유합니다. (회복 상징 기술)',
   'entities.abilities.crusader_strike.name': '성전사의 일격',
   'entities.abilities.crusader_strike.description':
     '대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)',
@@ -10256,7 +10256,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '골수분쇄의 피해가 30% 증가하며, 비상 보호막이 더 이상 타격을 대체하지 않습니다.',
   'entities.itemSets.grovespring.name': '숲샘 예복',
   'entities.itemSets.grovespring.bonus2':
-    '신속한 치유가 자신의 야생 개화나 두 번째 개화를 먼저 소모하며, 치유량이 25% 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+    '신속한 치유가 자신의 포자치유나 두 번째 개화를 먼저 소모하며, 치유량이 25% 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.grovespring.bonus4':
     '만개가 남은 효과의 75%를 수확하고, 그 후 푸른 생장을 1단계 쌓습니다.',
   'entities.items.lastflame_core.name': '마지막 불꽃의 핵',
@@ -13168,6 +13168,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': '큰곰 변신',
   'guide.models.formCat': '표범 변신',
   'guide.models.formTravel': '쾌속 형태',
+  'guide.models.formSporemender': '포자치유사 변신',
   'guide.models.groupForms': '드루이드 변신',
   'guide.nav.sidebarLabel': '가이드 주제',
   'guide.professions.craftHowTitle': '제작 창',
@@ -15828,7 +15829,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6야드 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
   'entities.abilities.ossuary_mark.name': '납골 표식',
   'entities.abilities.overbloom.description':
-    '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다.',
+    '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 포자치유를 심습니다.',
   'entities.abilities.overbloom.name': '만개',
   'entities.abilities.pack_command.description':
     '살아 있는 소환수에게 공격을 명령합니다. 적중하면 집중 20과 무리 흉포 1단계를 얻습니다.',
@@ -16091,11 +16092,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '근접 피해를 맡는 형태입니다. 도적처럼 기력과 연계 점수를 쓰고, 위협 수준은 훨씬 적게 쌓습니다.',
   'guide.classPage.formLine.form_travel':
     '이동을 위한 형태입니다. 땅 위를 훨씬 빠르게 달리지만, 형태를 풀기 전까지는 다른 능력을 쓸 수 없습니다.',
+  'guide.classPage.formLine.form_sporemender':
+    '회복 드루이드의 치유 형태입니다. 더 단단한 가죽과 더 강한 치유를 지니지만 걸음이 느려지며, 모든 주문과 마나를 그대로 사용합니다.',
   'guide.classPage.formName.form_bear': '큰곰 변신',
   'guide.classPage.formName.form_travel': '쾌속 형태',
+  'guide.classPage.formName.form_sporemender': '포자치유사 변신',
   'guide.classPage.formsHeading': '변신',
   'guide.classPage.formsMoonwing':
-    '조화 전문화 드루이드는 형태를 하나 더 얻습니다. 조화 드루이드가 싸울 때 쓰는 시전자 형태인 달빛야수 변신입니다. 주문을 그대로 쓸 수 있는 유일한 동물 형태이며, 마법봉은 이 형태나 평범한 시전자 모습에서만 쓸 수 있습니다.',
+    '조화 전문화 드루이드는 형태를 하나 더 얻습니다. 조화 드루이드가 싸울 때 쓰는 시전자 형태인 달빛야수 변신입니다. 회복 전문화의 포자치유사 변신처럼 주문을 그대로 쓸 수 있으며, 마법봉은 이 두 형태나 평범한 시전자 모습에서만 쓸 수 있습니다.',
   'guide.classPage.formsWolfEngage':
     '늑대는 큰곰 돌진으로 싸움을 열고, 곧바로 늑대 변신으로 바꿔 대상을 고정하며, 은신하지 않을 때는 도약 습격으로 거리를 좁히고, 쓰러뜨리기로 적을 붙잡아 둡니다.',
   'guide.classPage.formsAutoUnshift':
@@ -16972,6 +16976,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '악마 형상: 몸집이 {pct}% 커지며 다른 보너스는 별도 강화 효과로 표시됩니다',
   'hudChrome.auraEffect.formMoonkin':
     '달날개 변신: 주문 공격력이 {pct}%, 방어도가 {armorPct}% 증가합니다',
+  'hudChrome.auraEffect.formSporemender':
+    '포자치유사 변신: 주는 치유량이 {pct}%, 방어도가 {armorPct}% 증가하고 이동 속도가 {slowPct}% 감소합니다',
   'hudChrome.auraEffect.formShadow': '어스름장막 변신: 암흑 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.freeExecute': '다음 적용 가능한 처형 기술이 자원을 소모하지 않습니다',
   'hudChrome.auraEffect.funeralHarvestLock': '장례 수확이 아직 다음 영혼 조각을 생성할 수 없습니다',
@@ -17041,7 +17047,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     '맹독 의식: {stacks}/{max} 단계. 비겁한 찌르기, 사악한 베기, 맹독 다트가 각각 1단계를 쌓으며, {max} 단계가 되면 영면이 맹독 찢기로 바뀝니다',
   'hudChrome.auraEffect.verdance':
-    '푸른 생장: {stacks}/{max}단계. 새로 심는 야생 개화와 두 번째 개화가 각각 1단계를 쌓으며, {max}단계에서 신속한 치유가 만개로 변합니다',
+    '푸른 생장: {stacks}/{max}단계. 새로 심는 포자치유와 두 번째 개화가 각각 1단계를 쌓으며, {max}단계에서 신속한 치유가 만개로 변합니다',
   'hudChrome.auraEffect.warlockAnchor':
     '{range}미터 안에서 다시 사용하면 이곳으로 돌아오고 닻을 소모합니다',
   'hudChrome.auraEffect.wintersChill':
@@ -18820,6 +18826,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     '파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (회복)',
   'entities.abilities.grove_awakening.name': '숲의 각성',
+  'entities.abilities.sporemender_form.name': '포자치유사 변신',
+  'entities.abilities.sporemender_form.description':
+    "포자치유사로 변신해 주는 치유량이 20%, 방어도가 40% 증가하지만 이동 속도가 20% 감소합니다. 일반 형상에서 쓰던 모든 주문을 그대로 사용할 수 있습니다. 형상을 되돌릴 때까지 지속됩니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다. 다시 시전하면 일반 형상으로 돌아옵니다. (회복 상징 기술)",
+  'entities.abilities.spore_burst.name': '포자 폭발',
+  'entities.abilities.spore_burst.description':
+    '대상 지역에 포자 폭발 버섯을 소환합니다. {duration}초 후 터지며 8야드 내 아군의 생명력을 {healing} 회복시키고 적에게 {damage}의 자연 피해를 입힙니다.',
+  'entities.abilities.spore_burst.specNote_balance':
+    '달물결이 3단계일 때 효과가 25% 증가하며 달물결을 소모합니다.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    '치유한 각 아군에게 포자치유도 겁니다. 푸른 생장이 가득 찼을 때 효과가 25% 증가하며 푸른 생장을 소모합니다.',
+  'entities.abilities.natures_boon.name': '자연의 은총',
+  'entities.abilities.natures_boon.description':
+    '주문이 10초 동안 자연의 은총을 발동시킬 수 있습니다. 지정된 주문은 비용이 들지 않고 효과가 25% 증가하며 어떤 형상에서도 시전할 수 있습니다. 다시 발동하면 지속시간이 갱신됩니다.',
+  'entities.abilities.natures_boon.specNote_feral':
+    '근접 자동 공격이 적중할 때마다 1/15 확률로 발동하며 포자치유에 적용됩니다. 큰곰 변신 중에는 참나무 가죽에도 적용됩니다.',
+  'entities.abilities.natures_boon.specNote_balance':
+    '야생 벼락이나 창공 낙하를 시전할 때마다 10% 확률로 발동하며 포자 폭발에 적용됩니다. 10초에 한 번까지만 발동합니다.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    '지속 치유 효과가 회복할 때마다 10% 확률로 발동하며 포자 폭발에 적용됩니다. 10초에 한 번까지만 발동합니다.',
   'entities.abilities.prayer_of_returning.description':
     '파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (신성 및 수양)',
   'entities.abilities.prayer_of_returning.name': '귀환의 기도',

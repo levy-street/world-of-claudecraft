@@ -83,7 +83,11 @@ const SECOND_PASS_RECORD_SHA256 =
   // by hand again, never a JSON round trip. No capture or asset was retaken.
   // PR #3898 adds the four painted elixirs to the hotbar-eligible set, advancing
   // the sealed hotbarItems census 81 -> 85 without retaking any captures.
-  'd1cbf7c3318b57e56869206c2d4ae1edefa13fa8edc8338d88e5b601c1f123eb';
+  // Groveheart's Sporemender Form (sporemender_form) advances the live ability
+  // census 408 -> 409, two lines substituted by hand, no capture retaken.
+  // Spore Burst (spore_burst) and the Nature's Boon passive (natures_boon)
+  // advance it 409 -> 411 the same way.
+  '94a7469620da52ec3193d2024b09a7edd69dbbe948ffacecc7170a15930d6b41';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -381,7 +385,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // the release arm's two new abilities riding the v0.40.0 sync merge.
         // The hotbar census stays at this branch's 75 (the release's own arm
         // read 72 without the three role foods).
-        abilities: { live: 408, painted: 408 },
+        abilities: { live: 411, painted: 411 },
         // 76 at the first v0.42.0 sync: the release's one new hotbar item, the
         // Bonebound Rickshaw reins (reins_rickshaw_mount, kind 'mount'), joins
         // the census and ships committed painted art, so painted moves with
@@ -488,7 +492,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(408);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(411);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',

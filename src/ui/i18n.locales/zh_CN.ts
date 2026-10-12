@@ -4992,7 +4992,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.name': '月光风暴',
   'entities.abilities.moonfire.description':
     '以月火灼烧敌人，造成 {damage} 点奥术伤害，并附加持续伤害。',
-  'entities.abilities.rejuvenation.name': '野性绽放',
+  'entities.abilities.rejuvenation.name': '孢愈术',
   'entities.abilities.rejuvenation.description': '在 12 秒内为目标恢复 {damage} 点生命值。',
   'entities.abilities.thorns.name': '荆棘守护',
   'entities.abilities.thorns.description': '目标身上长出荆棘：近战攻击者受到 {buff} 点自然伤害。',
@@ -5173,7 +5173,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '释放一股原始涌动。豹形态下，能量恢复速度提高100%，持续10秒。巨熊形态下，立即产生50点怒气。（野性专精招牌）',
   'entities.abilities.swiftmend.name': '迅捷治愈',
   'entities.abilities.swiftmend.description':
-    '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。野性绽放与二度绽放的播撒会累加青翠；在 5 层青翠时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
+    '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。孢愈术与二度绽放的播撒会累加青翠；在 5 层青翠时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
   'entities.abilities.crusader_strike.name': '十字军打击',
   'entities.abilities.crusader_strike.description':
     '打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）',
@@ -9863,7 +9863,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.cinderbark.bonus4': '碎髓造成的伤害提高 30%，且其紧急护盾不再取代这次打击。',
   'entities.itemSets.grovespring.name': '林泉法衣',
   'entities.itemSets.grovespring.bonus2':
-    '迅捷治愈优先消耗你自己的野性绽放或二度绽放，治疗效果提高 25%。受到伤害不再延迟你的施法。',
+    '迅捷治愈优先消耗你自己的孢愈术或二度绽放，治疗效果提高 25%。受到伤害不再延迟你的施法。',
   'entities.itemSets.grovespring.bonus4': '盛放收割你剩余治疗效果的 75%，随后积累 1 层繁茂。',
   'entities.items.lastflame_core.name': '末焰之核',
   'entities.itemSets.slagbreaker.name': '碎渣战甲',
@@ -12566,6 +12566,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': '巨熊形态',
   'guide.models.formCat': '豹形态',
   'guide.models.formTravel': '迅捷形态',
+  'guide.models.formSporemender': '孢愈者形态',
   'guide.models.groupForms': '德鲁伊形态',
   'guide.nav.sidebarLabel': '指南主题',
   'guide.professions.craftHowTitle': '制作窗口',
@@ -15131,7 +15132,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为敌人标记15秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。',
   'entities.abilities.ossuary_mark.name': '骸骨印记',
   'entities.abilities.overbloom.description':
-    '消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。',
+    '消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的孢愈术。',
   'entities.abilities.overbloom.name': '盛放',
   'entities.abilities.pack_command.description':
     '命令你的活体宠物发动攻击。命中后产生 20 点集中值和一层兽群凶性。',
@@ -15373,11 +15374,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_cat': '近战输出形态：像盗贼一样使用能量与连击点，威胁值也低得多。',
   'guide.classPage.formLine.form_travel':
     '赶路形态：在地面上快得多，但在你变回原形之前无法使用其他技能。',
+  'guide.classPage.formLine.form_sporemender':
+    '恢复德鲁伊的治疗形态：外皮更坚韧，治疗更强但步伐更慢，并保留你的所有法术和法力值。',
   'guide.classPage.formName.form_bear': '巨熊形态',
   'guide.classPage.formName.form_travel': '迅捷形态',
+  'guide.classPage.formName.form_sporemender': '孢愈者形态',
   'guide.classPage.formsHeading': '变形',
   'guide.classPage.formsMoonwing':
-    '平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它是唯一保留法术的野兽形态，而你的魔杖也只在这个形态或你普通的施法形态下才能使用。',
+    '平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它和恢复系的孢愈者形态一样保留你的法术，而你的魔杖只在这两种形态或你普通的施法形态下才能使用。',
   'guide.classPage.formsWolfEngage':
     '狼以巨熊冲锋开战，随即变为狼形态钉制目标，未潜行时用扑击拉近距离，再用扑倒把敌人钉在原地。',
   'guide.classPage.formsAutoUnshift':
@@ -16207,6 +16211,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formLich': '灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害',
   'hudChrome.auraEffect.formMetamorph': '恶魔形态：体型增大 {pct}%；其他加成由独立增益提供',
   'hudChrome.auraEffect.formMoonkin': '月翼形态：法术伤害提高 {pct}%，护甲提高 {armorPct}%',
+  'hudChrome.auraEffect.formSporemender':
+    '孢愈者形态：造成的治疗提高 {pct}%，护甲提高 {armorPct}%，移动速度降低 {slowPct}%',
   'hudChrome.auraEffect.formShadow': '幽幕形态：暗影伤害提高 {pct}%',
   'hudChrome.auraEffect.freeExecute': '下一个符合条件的斩杀技能不消耗资源',
   'hudChrome.auraEffect.funeralHarvestLock': '葬礼收割暂时无法再次生成灵魂碎片',
@@ -16267,7 +16273,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     '毒祭：第{stacks}/{max}层。卑劣突刺、邪恶斩击与毒镖各累积1层。达到{max}层时，长眠变为蚀毒撕裂',
   'hudChrome.auraEffect.verdance':
-    '繁茂：第{stacks}/{max}层。每种下一个新的野性绽放或二度绽放累积1层。达到{max}层时，迅捷治愈变为盛放',
+    '繁茂：第{stacks}/{max}层。每种下一个新的孢愈术或二度绽放累积1层。达到{max}层时，迅捷治愈变为盛放',
   'hudChrome.auraEffect.warlockAnchor': '在 {range} 码内再次施放可返回此处并消耗锚点',
   'hudChrome.auraEffect.wintersChill': '剩余 {charges} 层：符合条件的法术视此目标为冻结状态',
   'hudChrome.paladin.ascensionLastAnnouncement': '升华的最后一次充能',
@@ -17943,6 +17949,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     '呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（恢复）',
   'entities.abilities.grove_awakening.name': '林地觉醒',
+  'entities.abilities.sporemender_form.name': '孢愈者形态',
+  'entities.abilities.sporemender_form.description':
+    '变形为孢愈者，使你造成的治疗提高20%，护甲提高40%，但移动速度降低20%。你在普通形态下的所有法术仍可施放。持续到你切换形态为止。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。再次施放可返回普通形态。（恢复标志技能）',
+  'entities.abilities.spore_burst.name': '孢子爆发',
+  'entities.abilities.spore_burst.description':
+    '在目标区域召唤一株孢子爆裂菇。{duration} 秒后它会爆开，为 8 码内的盟友恢复 {healing} 点生命值，并对敌人造成 {damage} 点自然伤害。',
+  'entities.abilities.spore_burst.specNote_balance':
+    '月潮达到 3 层时，效果提高 25%，并消耗你的月潮。',
+  'entities.abilities.spore_burst.specNote_restoration':
+    '同时为每个被治疗的盟友施加孢愈术。繁茂叠满时，效果提高 25%，并消耗你的繁茂。',
+  'entities.abilities.natures_boon.name': '自然恩惠',
+  'entities.abilities.natures_boon.description':
+    '你的法术可以触发持续 10 秒的自然恩惠：其指定的法术无需消耗、效果提高 25%，且可在任意形态下施放。再次触发会刷新持续时间。',
+  'entities.abilities.natures_boon.specNote_feral':
+    '每次命中的近战自动攻击有 1/15 的几率触发它，作用于孢愈术；处于巨熊形态时也作用于橡树皮。',
+  'entities.abilities.natures_boon.specNote_balance':
+    '每次施放野性弹或天陨有 10% 的几率触发它，作用于孢子爆发，每 10 秒最多触发一次。',
+  'entities.abilities.natures_boon.specNote_restoration':
+    '你的持续治疗效果每次跳动有 10% 的几率触发它，作用于孢子爆发，每 10 秒最多触发一次。',
   'entities.abilities.prayer_of_returning.description':
     '呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（神圣与戒律）',
   'entities.abilities.prayer_of_returning.name': '归返祈祷',

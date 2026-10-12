@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4817,
+    "files": 4819,
     "harvestedFiles": 3948,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
@@ -1406,6 +1406,17 @@
           5
         ]
       },
+      "tests/druid_sporemender.test.ts": {
+        "ms": 2123,
+        "method": "local-median",
+        "measured": "2026-10-06",
+        "reason": "Sporemender Form adds these two suites; measured locally while the next green full CI harvest is pending.",
+        "runs": [
+          2146,
+          2086,
+          2123
+        ]
+      },
       "tests/druid_wildfang_kit.test.ts": {
         "ms": 3670,
         "method": "local-median",
@@ -1997,6 +2008,17 @@
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
+          15
+        ]
+      },
+      "tests/form_visual_slots_core.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-10-06",
+        "reason": "Sporemender Form adds these two suites; measured locally while the next green full CI harvest is pending.",
+        "runs": [
+          8,
+          12,
           15
         ]
       },
@@ -9011,6 +9033,7 @@
   "tests/druid_form_speed_stack.test.ts": 899,
   "tests/druid_rush_window.test.ts": 5,
   "tests/druid_spell_pack.test.ts": 6662,
+  "tests/druid_sporemender.test.ts": 2123,
   "tests/druid_wand.test.ts": 3533,
   "tests/druid_wildfang_kit.test.ts": 3670,
   "tests/dual_purpose_target.test.ts": 738,
@@ -9376,6 +9399,7 @@
   "tests/form_draft.test.ts": 64,
   "tests/form_swing.test.ts": 5170,
   "tests/form_visual_selection_core.test.ts": 12,
+  "tests/form_visual_slots_core.test.ts": 12,
   "tests/frame_cadence.test.ts": 180,
   "tests/frame_cadence_auto_core.test.ts": 38,
   "tests/frame_cadence_auto_memory.test.ts": 5,

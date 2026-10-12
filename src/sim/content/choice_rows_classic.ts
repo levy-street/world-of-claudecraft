@@ -1802,7 +1802,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           id: 'dru_r5_improved_wrath',
           name: 'Wildshift',
           description:
-            'Shapeshifting into Cat, Bruin, or Moonwing Form removes breakable roots and slows.',
+            'Shapeshifting into Cat, Bruin, Moonwing, or Sporemender Form removes breakable roots and slows.',
           icon: 'travel_form',
           effect: { intrinsic: { mechanic: 'druid_wildshift', metrics: {} } },
         },
@@ -1970,7 +1970,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           id: 'dru_r14_empowered_touch',
           name: 'Seedspread',
           description:
-            'Overbloom replants a fresh Wildbloom on every ally whose healing it harvested.',
+            'Overbloom replants a fresh Sporemending on every ally whose healing it harvested.',
           icon: 'rejuvenation',
           effect: {
             intrinsic: { mechanic: 'druid_seedspread', metrics: {} },

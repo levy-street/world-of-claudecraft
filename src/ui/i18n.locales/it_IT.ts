@@ -9548,7 +9548,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di {buff} per 30 min.",
   'entities.abilities.moonfire.name': 'Tempesta Lunare',
-  'entities.abilities.rejuvenation.name': 'Fioritura Selvaggia',
   'entities.abilities.thorns.name': 'Guardia di Rovi',
   'entities.abilities.thorns.description':
     'Dal bersaglio spuntano spine: gli assalitori in mischia subiscono {buff} danni da Natura.',
@@ -16456,8 +16455,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge uno stadio di Marea Lunare ed estende la tua Tempesta Lunare di 6 sec, fino a {duration} sec per applicazione. A Marea Lunare piena, Seme Lunare diventa Ondata Lunare.',
   'entities.abilities.overbloom.name': 'Sovrafioritura',
-  'entities.abilities.overbloom.description':
-    'Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio.',
   'entities.abilities.redharvest.name': 'Mietitura Rossa',
   'entities.abilities.redharvest.description':
     "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina {rage} energia. Funziona anche senza punti combo.",
@@ -17074,8 +17071,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ben nutrito: conferisce {aura} per {minutes} min quando finisci di mangiare. Un solo effetto Ben nutrito alla volta: un pasto nuovo lo sostituisce.',
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
     'Il pezzo simbolo della collezione glaciale, quello che ogni collezionista cerca per primo. Zanna di Ghiaccio è stata scolpita, non forgiata, da una zanna del ghiacciaio che corona Thornpeak sopra Highwatch; il suo nucleo ciano brucia freddo come la luce su Glimmermere. Brina l’aria che taglia. Le guardie delle mura giurano che un soldato la portò la notte in cui le nevi alte tennero a bada i Giurati della Stirpe e “comprarono un inverno per le mura”.',
-  'hudChrome.auraEffect.verdance':
-    'Verzura {stacks}/{max}. Ogni nuova Fioritura Selvaggia o Seconda Fioritura che pianti aggiunge 1. A {max}, Rapidità di Guarigione diventa Sovrafioritura',
   'hudChrome.continentMap.levels': 'Livelli da {min} a {max}',
   'hudChrome.continentMap.summary': 'Mappa del mondo. Scegli una zona per aprire la sua mappa.',
   'hudChrome.continentMap.title': 'Mappa del Mondo',
@@ -17394,8 +17389,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Ti nasconde nell'ombra: i nemici a stento ti notano, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
   'entities.abilities.stealth.specNote_subtlety':
     'Ogni apertura furtiva che usi dal Velo Crepuscolare aggiunge 1 Caligine (massimo 3).',
-  'entities.abilities.swiftmend.description':
-    'Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Piantare Fioritura Selvaggia e Seconda Fioritura aggiunge Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)',
   'entities.abilities.swipe.description':
     'Colpisci con gli artigli i nemici vicini per {damage} danni. Causa minaccia aggiuntiva. Solo Forma di Bruin.',
   'entities.abilities.swipe.specNote_feral':
@@ -18507,8 +18500,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'I colpi all’unisono del Comando della Mietitura infliggono il 25 percento di danni in più.',
   'entities.itemSets.gravebrand.name': 'Regalia del Marchio Sepolcrale',
-  'entities.itemSets.grovespring.bonus2':
-    'Cura Rapida consuma prima la tua Fioritura Selvatica o Seconda Fioritura e cura il 25 percento in più. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.grovespring.bonus4':
     'Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Rigoglio.',
   'entities.itemSets.grovespring.name': 'Paramento Grovespring',

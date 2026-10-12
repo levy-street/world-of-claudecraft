@@ -7905,7 +7905,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Slår for 10% våbenskade plus {damage}. Et træf genopretter 15 Fokus og giver 1 Jagtfart. Skaden stiger med angrebsstyrke gennem våbenskaden.',
   'entities.abilities.raptor_strike.name': 'Sprættende Slag',
   'entities.abilities.regrowth.name': 'Anden Blomstring',
-  'entities.abilities.rejuvenation.name': 'Vildblomst',
   'entities.abilities.renew.description':
     'Helbreder målet for {damage} over 15 sek., én gang hvert 3. sek. Helbredelsen stiger med Besværgelseskraft.',
   'entities.abilities.renew.name': 'Dvælende Nåde',
@@ -15779,8 +15778,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til {duration} sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge.',
   'entities.abilities.overbloom.name': 'Overblomstring',
-  'entities.abilities.overbloom.description':
-    'Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet.',
   'entities.abilities.redharvest.name': 'Rød Høst',
   'entities.abilities.redharvest.description':
     'Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner {rage} energi. Virker uden kombopoint.',
@@ -15793,8 +15790,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Måneflod: trin {stacks} af {max}. Vildlyn-, Himmelfald- og Månefrø-besværgelser fylder den i Månekinform; ved {max} bliver Månefrø til Månebølge og Himmelfald til Solspor, og begge tærer på den',
   'hudChrome.auraEffect.oldBlood':
     'Gammelt Blod: trin {stacks} af {max}. Landede Katte- og Bruin-slag deler dette forråd; ved {max} forvandles Blodbid eller Knogleknus',
-  'hudChrome.auraEffect.verdance':
-    'Grønske {stacks}/{max}. Hver NY Vildblomst eller Anden Blomstring, du planter, giver 1. Ved {max} bliver Hurtig heling til Overblomstring',
   'sim.rift.allUnstable': 'Alle rifter er ustabile lige nu. Prøv igen senere.',
   'sim.rift.alreadyCleared': 'Denne rift er allerede ryddet af {names}.',
   'sim.rift.deadEntry': 'Du kan ikke gå ind i en rift, mens du er død.',
@@ -16430,8 +16425,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Skjuler dig i skyggerne: fjender lægger næsten ikke mærke til dig, men du bevæger dig 50% langsommere. At angribe eller tage skade bryder Skumringsslør. Kast igen for at træde frem.',
   'entities.abilities.stealth.specNote_subtlety':
     'Hver åbner, du bruger fra Skumringsslør, tilføjer 1 Tusmørke (maks. 3).',
-  'entities.abilities.swiftmend.description':
-    'Forbruger en helbredelse-over-tid-effekt på et venligt mål for at helbrede det for {damage}. Plantninger af Vildblomst og Anden Blomstring tilføjer Grønske; ved 5 Grønske bliver denne knap til Overblomstring, som øjeblikkeligt helbreder hver allieret, der bærer dine helbredelse-over-tid-effekter, for 60% af det, de effekter havde tilbage. (Lundhjerte-motoren)',
   'entities.abilities.swipe.description':
     'Fej dine kløer gennem nærliggende fjender for {damage} skade. Forårsager ekstra trussel. Kun i Bruin-form.',
   'entities.abilities.swipe.specNote_feral':
@@ -17510,8 +17503,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Reaping Commands unisone angreb giver 25 procent mere skade.',
   'entities.itemSets.gravebrand.name': 'Gravebrand-regalier',
-  'entities.itemSets.grovespring.bonus2':
-    'Hurtig heling forbruger først din egen Wildbloom eller Second Bloom og heler 25 procent mere. Modtaget skade forsinker ikke længere dine besværgelser.',
   'entities.itemSets.grovespring.bonus4':
     'Overbloom høster 75 procent af dine resterende effekter og oplagrer derefter 1 Verdance.',
   'entities.itemSets.grovespring.name': 'Grovespring-dragt',

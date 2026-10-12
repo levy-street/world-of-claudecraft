@@ -8105,7 +8105,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memukul sebesar 10% kerusakan senjata ditambah {damage}. Sebuah pukulan telak memulihkan 15 Fokus dan memberi 1 Momentum Berburu. Kerusakan meningkat dengan daya serang melalui kerusakan senjata.',
   'entities.abilities.raptor_strike.name': 'Serangan Cabik Perut',
   'entities.abilities.regrowth.name': 'Mekar Kedua',
-  'entities.abilities.rejuvenation.name': 'Mekar Liar',
   'entities.abilities.renew.description':
     'Menyembuhkan sasaran sebesar {damage} selama 15 dtk, sekali tiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Mantra.',
   'entities.abilities.renew.name': 'Rahmat Berlanjut',
@@ -16116,8 +16115,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga {duration} dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan.',
   'entities.abilities.overbloom.name': 'Mekar Raya',
-  'entities.abilities.overbloom.description':
-    'Menghabiskan 5 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran.',
   'entities.abilities.redharvest.name': 'Panen Merah',
   'entities.abilities.redharvest.description':
     'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan {rage} energi. Berfungsi tanpa poin combo.',
@@ -16130,8 +16127,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya',
   'hudChrome.auraEffect.oldBlood':
     'Darah Tua: tahap {stacks} dari {max}. Serangan Kucing dan Bruin yang kena berbagi simpanan ini; pada {max}, Gigitan Berdarah atau Remuk Tulang bertransformasi',
-  'hudChrome.auraEffect.verdance':
-    'Kehijauan: tahap {stacks} dari {max}. Setiap Mekar Liar atau Mekar Kedua BARU yang kamu tanam menambah 1. Pada {max}, Pemulihan Cepat menjadi Mekar Raya',
   'hudChrome.continentMap.levels': 'Level {min} hingga {max}',
   'hudChrome.continentMap.summary': 'Peta dunia. Pilih zona untuk membuka petanya.',
   'hudChrome.continentMap.title': 'Peta Dunia',
@@ -16674,8 +16669,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyembunyikanmu dalam bayangan: musuh nyaris tidak menyadarimu, tetapi kamu bergerak 50% lebih lambat. Menyerang atau menerima kerusakan membatalkan Selubung Senja. Rapal lagi untuk keluar.',
   'entities.abilities.stealth.specNote_subtlety':
     'Setiap pembuka yang kamu pakai dari Selubung Senja menambah 1 Gloam (maks 3).',
-  'entities.abilities.swiftmend.description':
-    'Mengonsumsi efek penyembuhan seiring waktu pada target kawan untuk menyembuhkannya sebesar {damage}. Penanaman Wildbloom dan Second Bloom menambah Verdance; pada 5 Verdance tombol ini berubah menjadi Overbloom, yang seketika menyembuhkan setiap sekutu yang menyandang efek penyembuhan seiring waktumu sebesar 60% dari sisa efek tersebut. (mesin Groveheart)',
   'entities.abilities.swipe.description':
     'Sapukan cakarmu melalui musuh terdekat sebesar {damage} kerusakan. Menimbulkan ancaman ekstra. Hanya dalam Wujud Bruin.',
   'entities.abilities.swipe.specNote_feral':
@@ -17816,8 +17809,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Serangan serempak Perintah Penuai menghasilkan kerusakan 25 persen lebih besar.',
   'entities.itemSets.gravebrand.name': 'Regalia Tanda Kubur',
-  'entities.itemSets.grovespring.bonus2':
-    'Sembuh Kilat terlebih dahulu mengonsumsi Mekar Liar atau Mekar Kedua milik Anda dan menyembuhkan 25 persen lebih banyak. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.grovespring.bonus4':
     'Mekar Berlebih memanen 75 persen efek Anda yang tersisa dan setelahnya menyimpan 1 Verdansi.',
   'entities.itemSets.grovespring.name': 'Busana Mata Air Rimba',

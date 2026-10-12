@@ -31,6 +31,7 @@ import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
 import { onCraftedCollectionHeal } from './crafted_collection_effects';
+import { sporemenderHealingDoneMult } from './druid_sporemender';
 import { runWeaponProcs } from './equip_procs';
 import {
   BEACON_OF_LIGHT_NAME,
@@ -135,6 +136,7 @@ export function applyHeal(
           (1 + healDone) *
           (crit ? 1.5 + source.critDmgHealBonus : 1) *
           paladinHealingDoneMultiplier(source) *
+          sporemenderHealingDoneMult(source) *
           hexOutputMult(ctx, source) *
           healingTakenMult(ctx, target),
       );

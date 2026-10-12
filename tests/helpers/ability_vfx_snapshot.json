@@ -852,6 +852,10 @@
       "spec": "0a9fe28fe492823b5c202691a84b611457bee6cc53d8d96299d1ac6b95eaad7a",
       "full": "67988b52637d59b37359f89a1b3d1fd4479b3864d12a0f1e0acf66159205df9c"
     },
+    "natures_boon": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
     "needle_of_fate": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
@@ -1195,6 +1199,14 @@
     "spellsteal": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "spore_burst": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "sporemender_form": {
+      "spec": "be8c3cd866f12bbac08bb2938721bc05b79a609b0fa2dd718012933b4b33720e",
+      "full": "22cd3a9918634886f25480e63494ace8e3ad6b59253b0e268f93965ad7957de2"
     },
     "sprint": {
       "spec": "5ca3a151a42b6b014ce6115b878176ce377b74e1c88029825f6a2d0c7792831d",

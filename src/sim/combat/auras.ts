@@ -55,6 +55,8 @@ import {
 } from './crafted_collection_effects';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { druidEngineOnBleedTick } from './druid_engines';
+import { naturesBoonOnHotTick } from './druid_natures_boon';
+import { sporemenderHealingDoneMult } from './druid_sporemender';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { consumeHealAbsorb } from './heal';
 import { isColdsightInternalMarkerAuraId } from './hunter_coldsight_read';
@@ -451,11 +453,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             }
           }
         } else if (a.kind === 'hot' && !tickMendingCurrent(ctx, e, a)) {
-          const intended = Math.round(a.value * ctx.healingTakenMult(e));
+          const healer = ctx.entities.get(a.sourceId);
+          // Sporemender Form scales its wearer's HoT ticks live (exactly 1 for
+          // every other healer, so their tick arithmetic is unchanged).
+          const intended = Math.round(
+            a.value * sporemenderHealingDoneMult(healer) * ctx.healingTakenMult(e),
+          );
           const landing = consumeHealAbsorb(ctx, e, intended);
           const absorbed = intended - landing;
           const healed = Math.min(landing, e.maxHp - e.hp);
-          const healer = ctx.entities.get(a.sourceId);
           if (healer) onCraftedCollectionHeal(ctx, healer, e, landing - healed);
           if (healed > 0 || absorbed > 0) {
             if (healed > 0) e.hp += healed;
@@ -475,6 +481,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             const src = ctx.entities.get(a.sourceId);
             if (src && healed > 0) ctx.healingThreat(src, e, healed);
           }
+          // Groveheart Nature's Boon (combat/druid_natures_boon.ts): an owned
+          // HoT tick can arm the free Spore Burst window. Restoration-gated
+          // and cooldown-gated inside, before any rng draw.
+          naturesBoonOnHotTick(ctx, healer ?? null, a);
         } else if (a.kind === 'buff_mana_grace' && e.resourceType === 'mana') {
           e.resource = Math.min(e.maxResource, e.resource + Math.round(a.value));
         } else if (a.kind === 'polymorph') {

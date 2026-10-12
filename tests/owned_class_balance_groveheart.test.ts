@@ -8,7 +8,7 @@ describe('owned-class level 20 balance harness (Groveheart)', () => {
   it('counts Groveheart heal-over-time ticks in the effective-healing profile', () => {
     const groveheart = runOwnedHealerProbe('groveheart', 3, 29_913);
 
-    expect(groveheart.healingBySource.Wildbloom).toBeGreaterThan(0);
+    expect(groveheart.healingBySource.Sporemending).toBeGreaterThan(0);
     expect(groveheart.hps).toBeGreaterThan(0);
   });
 

@@ -100,7 +100,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   rip: [5],
   // Druid spec-engine interaction lines: the cited numbers are engine
   // constants in combat/druid_engines.ts (the Moonseed extension seconds on
-  // the Lunar Tempest line, the Verdance stage cap on the Wildbloom line),
+  // the Lunar Tempest line, the Verdance stage cap on the Sporemending line),
   // not per-rank effect fields.
   moonfire: [6],
   rejuvenation: [5],

@@ -1158,7 +1158,7 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
   grovespring: [
     {
       pieces: 2,
-      // Swiftmend prefers the caster's OWN Wildbloom or Second Bloom (the
+      // Swiftmend prefers the caster's OWN Sporemending or Second Bloom (the
       // consumeMatchingAura bend), falling back to the base pick when none
       // is present so a paid cast never turns into a silent no-heal (the set
       // doc's explicit fallback), and heals 25 percent more (the bespoke

@@ -7907,7 +7907,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Slår för 10% vapenskada plus {damage}. En träff återställer 15 Fokus och ger 1 Jaktfart. Skadan ökar med anfallskraft via vapenskadan.',
   'entities.abilities.raptor_strike.name': 'Uppsprättande hugg',
   'entities.abilities.regrowth.name': 'Andra blomningen',
-  'entities.abilities.rejuvenation.name': 'Vildblomning',
   'entities.abilities.renew.description':
     'Läker målet för {damage} under 15 sek, en gång var 3 sek. Läkningen ökar med Besvärjelsekraft.',
   'entities.abilities.renew.name': 'Dröjande nåd',
@@ -16101,8 +16100,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till {duration} sek per användning. Vid full Månflod blir Månfrö Månsvall.',
   'entities.abilities.overbloom.name': 'Överblomning',
-  'entities.abilities.overbloom.description':
-    'Förbrukar 5 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet.',
   'entities.abilities.redharvest.name': 'Röd Skörd',
   'entities.abilities.redharvest.description':
     'Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer {rage} energi. Fungerar utan kombopoäng.',
@@ -16115,8 +16112,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den',
   'hudChrome.auraEffect.oldBlood':
     'Gammalt Blod: steg {stacks} av {max}. Träffande Katt- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross',
-  'hudChrome.auraEffect.verdance':
-    'Grönska {stacks}/{max}. Varje NY Vildblomning eller Andra blomningen du planterar ger 1. Vid {max} blir Snabb läkning Överblomning',
   'hudChrome.continentMap.levels': 'Nivåer {min} till {max}',
   'hudChrome.continentMap.summary': 'Världskarta. Välj en zon för att öppna dess karta.',
   'hudChrome.continentMap.title': 'Världskarta',
@@ -16470,8 +16465,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 50% långsammare. Att attackera eller ta skada bryter Skymningsslöja. Kasta igen för att kliva ut.',
   'entities.abilities.stealth.specNote_subtlety':
     'Varje öppnare du använder från Skymningsslöja lägger till 1 Skymningsförråd (max 3).',
-  'entities.abilities.swiftmend.description':
-    'Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Plantering av Vildblomning och Andra blomningen lägger till Grönska; vid 5 Grönska blir denna knapp Överblomning, som skördar varje läkning över tid du äger på alla allierade och omedelbart läker dem för 60% av dess återstående läkning. (Groveheart-motorn)',
   'entities.abilities.swipe.description':
     'Svep dina klor genom närliggande fiender för {damage} skada. Orsakar extra hot. Endast i Bruinform.',
   'entities.abilities.swipe.specNote_feral':
@@ -17598,8 +17591,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Skördekommandots samstämmiga slag orsakar 25 procent mer skada.',
   'entities.itemSets.gravebrand.name': 'Gravmärkt regalia',
-  'entities.itemSets.grovespring.bonus2':
-    'Snabbläkning förbrukar din egen Vildblomma eller Andra blomning först och helar 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.grovespring.bonus4':
     'Överblomning skördar 75 procent av dina återstående effekter och lagrar därefter 1 Grönska.',
   'entities.itemSets.grovespring.name': 'Lundkällans dräkt',

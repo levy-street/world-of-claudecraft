@@ -8095,7 +8095,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đánh một đòn bằng 10% sát thương vũ khí cộng {damage}. Một cú trúng hồi 15 Tập Trung và ban 1 Đà Săn. Sát thương tăng theo sức tấn công thông qua sát thương vũ khí.',
   'entities.abilities.raptor_strike.name': 'Đòn Moi Ruột',
   'entities.abilities.regrowth.name': 'Nở Hoa Lần Hai',
-  'entities.abilities.rejuvenation.name': 'Hoa Nở Hoang Dã',
   'entities.abilities.renew.description':
     'Hồi {damage} máu cho mục tiêu trong 15 giây, mỗi 3 giây một lần. Lượng hồi tăng theo Sức Mạnh Phép Thuật.',
   'entities.abilities.renew.name': 'Ân Điển Vương Vấn',
@@ -15986,8 +15985,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Chỉ trong Dạng Cú Mặt Trăng. Đánh gây {damage} sát thương Bí Thuật, thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt của bạn 6 giây, tối đa {duration} giây mỗi lần. Khi Triều Nguyệt đầy, Nguyệt Chủng trở thành Nguyệt Trào.',
   'entities.abilities.overbloom.name': 'Mãn Khai',
-  'entities.abilities.overbloom.description':
-    'Tiêu 5 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với {buff}% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Hoa Nở Hoang Dã mới lên mục tiêu.',
   'entities.abilities.redharvest.name': 'Thu Hoạch Đỏ',
   'entities.abilities.redharvest.description':
     'Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn.',
@@ -16000,8 +15997,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó',
   'hudChrome.auraEffect.oldBlood':
     'Huyết Cổ {stacks}/{max}. Đòn trúng từ Vuốt Xé, Lóc Xé, Vết Nứt Máu, Cắn Xé Máu, Vuốt Quét Ngang và Nghiền Xương mỗi lần cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin',
-  'hudChrome.auraEffect.verdance':
-    'Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần gieo Hoa Nở Hoang Dã hoặc Nở Hoa Lần Hai MỚI cộng 1. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai',
   'hudChrome.continentMap.levels': 'Cấp {min} đến {max}',
   'hudChrome.continentMap.summary': 'Bản đồ thế giới. Chọn một vùng để mở bản đồ của vùng đó.',
   'hudChrome.continentMap.title': 'Bản Đồ Thế Giới',
@@ -16541,8 +16536,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Ẩn giấu bạn trong bóng tối: kẻ địch hầu như không nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Màn Chạng Vạng. Thi triển lại để bước ra.',
   'entities.abilities.stealth.specNote_subtlety':
     'Mỗi đòn mở màn bạn dùng từ Màn Chạng Vạng thêm 1 U Ám (tối đa 3).',
-  'entities.abilities.swiftmend.description':
-    'Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage} máu. Gieo Hoa Nở Hoang Dã và Nở Hoa Lần Hai sẽ thêm Sắc Xanh; ở 5 Sắc Xanh, nút này trở thành Mãn Khai, hồi máu tức thời cho mọi đồng minh đang mang hiệu ứng hồi máu theo thời gian của bạn bằng 60% lượng còn lại của các hiệu ứng đó. (động cơ Groveheart)',
   'entities.abilities.swipe.description':
     'Quét vuốt qua kẻ địch gần đó gây {damage} sát thương. Gây thêm thù hận. Chỉ dùng được ở Hình Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
@@ -17710,8 +17703,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Các đòn hợp xướng của Reaping Command gây thêm 25% sát thương.',
   'entities.itemSets.gravebrand.name': 'Lễ Phục Dấu Mộ',
-  'entities.itemSets.grovespring.bonus2':
-    'Hồi Phục Nhanh ưu tiên tiêu thụ Wildbloom hoặc Second Bloom của bạn trước và hồi thêm 25% máu. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.grovespring.bonus4':
     'Overbloom thu hoạch 75% các hiệu ứng còn lại của bạn và tích trữ 1 Verdance sau đó.',
   'entities.itemSets.grovespring.name': 'Phục Trang Suối Rừng',

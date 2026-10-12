@@ -129,11 +129,14 @@ describe('ability icons', () => {
     // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite).
     // 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
     // release/v0.44.0 merge into feature/buried-hoards).
-    expect(ids).toHaveLength(473);
+    // 474: plus Groveheart's Sporemender Form (sporemender_form).
+    // 475: plus the druid's Spore Burst (spore_burst).
+    // 476: plus the druid's Nature's Boon passive (natures_boon).
+    expect(ids).toHaveLength(476);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('6fa8b2c16d3459d5f09768545d08e8f6778c00a2ac3973cd0d9361ee3d08971c');
+    expect(hash).toBe('299bd8d57eaccef0d3ecce1fa63c404a927d6d54250f5dd28fe3ba4194b3a97f');
   });
 });

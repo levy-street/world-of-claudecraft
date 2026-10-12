@@ -9466,7 +9466,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Coloca o Wildward em um alvo aliado, aumentando a armadura em {buff} por 30 min.',
   'entities.abilities.moonfire.name': 'Tempestade Lunar',
-  'entities.abilities.rejuvenation.name': 'Florescer Selvagem',
   'entities.abilities.thorns.name': 'Guarda de Espinhos',
   'entities.abilities.thorns.description':
     'Espinhos brotam do alvo: atacantes corpo a corpo sofrem {buff} de dano de Natureza.',
@@ -16360,8 +16359,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonseed.description':
     'Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até {duration} s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar.',
   'entities.abilities.overbloom.name': 'Superflorescência',
-  'entities.abilities.overbloom.description':
-    'Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo.',
   'entities.abilities.redharvest.name': 'Colheita Vermelha',
   'entities.abilities.redharvest.description':
     'Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura {rage} de energia. Funciona sem pontos de combo.',
@@ -16975,8 +16972,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Bem Alimentado: concede {aura} por {minutes} min ao terminar de comer. Apenas um efeito Bem Alimentado por vez: uma refeição nova o substitui.',
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
     'O destaque da coleção congelada e a primeira peça que todo colecionador procura. Presa de Gelo foi entalhada, não forjada, de uma presa da geleira que coroa Thornpeak acima de Highwatch; seu núcleo ciano arde frio como a luz sobre Glimmermere. Ela congela o próprio ar que corta. Os guardas da muralha juram que um soldado a carregou na noite em que as neves altas seguraram os Juramentados da Ninhada e “compraram um inverno para a muralha”.',
-  'hudChrome.auraEffect.verdance':
-    'Verdance {stacks}/{max}. Cada Florescer Selvagem ou Segundo Florescer NOVO que você plantar adiciona 1. Em {max}, Recuperação Rápida vira Superflorescência',
   'hudChrome.continentMap.levels': 'Níveis {min} a {max}',
   'hudChrome.continentMap.summary': 'Mapa do mundo. Escolha uma zona para abrir seu mapa.',
   'hudChrome.continentMap.title': 'Mapa do Mundo',
@@ -17295,8 +17290,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Oculta você nas sombras: os inimigos mal percebem sua presença, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra o Duskveil. Lance de novo para sair.',
   'entities.abilities.stealth.specNote_subtlety':
     'Cada abertura usada a partir de Duskveil adiciona 1 Gloam (máx. 3).',
-  'entities.abilities.swiftmend.description':
-    'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. Plantios de Florescer Selvagem e Segundo Florescer adicionam Verdance; em 5 Verdance, este botão se torna Superflorescência, que cura instantaneamente cada aliado portando seus efeitos de cura ao longo do tempo em 60% do que restava desses efeitos. (assinatura de Coração do Bosque)',
   'entities.abilities.swipe.description':
     'Varre com suas garras os inimigos próximos causando {damage} de dano. Causa ameaça extra. Apenas Forma de Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
@@ -18390,8 +18383,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Os golpes uníssonos do Comando Ceifador causam 25% a mais de dano.',
   'entities.itemSets.gravebrand.name': 'Regalia da Marca Tumular',
-  'entities.itemSets.grovespring.bonus2':
-    'Cura Rápida consome primeiro sua própria Florescência Selvagem ou Segunda Florescência e cura 25% a mais. Dano sofrido não atrasa mais suas conjurações.',
   'entities.itemSets.grovespring.bonus4':
     'Florescência Excedente colhe 75% dos seus efeitos restantes e armazena 1 Verdância depois.',
   'entities.itemSets.grovespring.name': 'Paramento da Nascente do Bosque',

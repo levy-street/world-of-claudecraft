@@ -2181,6 +2181,34 @@ export const VISUALS: Record<string, VisualDef> = {
     attackTimeScale: 1,
     deathTimeScale: 1,
   },
+  // Druid Sporemender Form (Groveheart): the owner's concept redrawn in T-pose
+  // (Tripo image-to-image) and built, auto-rigged and retargeted by Tripo, so
+  // the skeleton is fitted to this short-torso chibi (the KayKit rig put the
+  // shoulders at face height and folded the arms into the robe). The rig was
+  // then post-processed: arm-chain weight stripped from the robe and satchels,
+  // the cap and face bound rigidly to the head, and both upper arms spread 30
+  // degrees in every clip so the hands clear the satchels. Tripo bipeds face
+  // +X; its slash and defeat presets run long (the Lich form's time scales).
+  // Auto-attack plays the Cast gesture: the form fights with the wand, and the
+  // slash preset buries the face under the cap. Jump is left out the same way
+  // as the Lich (airborne frames hold Idle). Same height as the player bodies.
+  form_sporemender: {
+    url: `${CREATURES}/sporemender_form.glb`,
+    height: HUMANOID_H,
+    yaw: -Math.PI / 2,
+    authoredAtlas: true,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Cast'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+  },
   // Shaman Shadewolf retains the original wolf, tint and ghost-material overlay.
   form_ghost_wolf: {
     url: `${CREATURES}/wolf_basic.glb`,

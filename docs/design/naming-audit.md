@@ -1286,6 +1286,7 @@ frozen).
 | Spellgnaw | CLEAR |  | mobMechanic:grubjaw.purgeOnHit |
 | Spirit of Aldren | CLEAR |  | mob:nythraxis_heroic_warrior_add |
 | Splitshot | KEEP | relabeled at QA: 'Split Shot' is a genre-wide ranged skill (FFXIV Machinist, Heroes of Hammerwatch); the fused token keeps it under bar rule 2 | ability:multi_shot choiceRow:hun_r14_multi_shot |
+| Sporemending | CLEAR | owner display rename of Wildbloom (2026-10-08, id unchanged); quoted exact-phrase and coined-token searches found no game use; nearest is Scars of Honor's druid talent effect 'Mending Spore', generic words in another order and role | ability:rejuvenation |
 | Springwell | CLEAR |  | ability:healing_stream choiceRow:sha_r11_healing_stream |
 | Staff of Velkhar | CLEAR |  | item:staff_of_velkhar item:heroic_staff_of_velkhar |
 | Stormcrag | CLEAR |  | poi:2.5 |
@@ -1344,7 +1345,6 @@ frozen).
 | Watcher of the Tanglemouth | CLEAR |  | npcTitle:strandwatcher_pell |
 | Waterbind | CLEAR |  | ability:conjure_water |
 | Wickharbor | CLEAR |  | poi:12.0 |
-| Wildbloom | CLEAR |  | ability:rejuvenation |
 | Wildbolt | CLEAR |  | ability:wrath |
 | Wildbond | CLEAR |  | ability:tame_beast |
 | Wildfang Rally | CLEAR |  | ability:aspect_of_the_wild choiceRow:hun_r20_aspect_of_the_wild |

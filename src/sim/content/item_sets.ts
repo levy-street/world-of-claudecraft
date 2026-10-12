@@ -966,7 +966,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
         // "Fleetmend" is the ability's shipped display name (the Phase 03 naming
         // audit renamed swiftmend; docs/design/naming-audit.md, pinned by
         // tests/ip_scrub.test.ts): player copy names the ability as players see it.
-        text: 'Fleetmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.',
+        text: 'Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,

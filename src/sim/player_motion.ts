@@ -20,6 +20,7 @@
 import { type Collider, isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
 import { abilityCastSurvivesMovement, movementInputWouldMove } from './combat/cast_move_gate';
 import { isRooted, isStunned } from './combat/cc';
+import { SPOREMENDER_FORM_KIND, SPOREMENDER_MOVE_SPEED_MULT } from './combat/druid_sporemender';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { mountMoveSpeedPct } from './content/mounts';
 import { guardAndReportPose } from './finite_pose_guard';
@@ -245,7 +246,8 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   let slow = 1,
     speed = 1,
     cargo = 1,
-    formPassive = 1;
+    formPassive = 1,
+    formPace = 1;
   const slowImmune =
     isVeilboundMarchActive(e) || e.auras.some((aura) => aura.kind === 'slow_immunity');
   for (const a of e.auras) {
@@ -267,6 +269,10 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     if (a.id === WORLD_QUEST_DELIVERY_AURA_ID && a.kind === 'world_quest_cargo') {
       cargo = Math.min(cargo, WORLD_QUEST_DELIVERY_SPEED_MULT);
     }
+    // Groveheart's Sporemender Form walks 20% slower. A form penalty, not a
+    // snare: slow immunity never lifts it, and it scales the final speed so a
+    // Loping Stride burst or a slow still applies on top of the slower pace.
+    if (a.kind === SPOREMENDER_FORM_KIND) formPace = SPOREMENDER_MOVE_SPEED_MULT;
   }
   speed *= formPassive;
   // Mounted travel: the active ground mount rides the entity mirror (mountKey,
@@ -279,7 +285,7 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
-  return slow * speed * cargo;
+  return slow * speed * cargo * formPace;
 }
 
 // Fiesta "Moon Boots" power-up: a buff_jump aura multiplies jump height.
