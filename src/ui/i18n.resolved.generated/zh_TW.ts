@@ -13142,7 +13142,7 @@ export const zh_TW: EnTranslations = {
       },
       "trailbreak": {
         "name": "斷跡",
-        "description": "向後躍開且不失去專精狀態。野戰技藝還會為下一次重返戰場做好準備。"
+        "description": "向後躍出25碼，並解除定身和移動減速效果。若你擁有狩獵動能，則將其刷新，並使你獲得蓄勢再入，持續12秒。"
       },
       "wildheart": {
         "name": "野性之心",
@@ -13709,7 +13709,7 @@ export const zh_TW: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "駿馬之姿",
-        "description": "化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。生效期間，受到傷害會使你昏亂，移動速度降低 50%，持續 4 秒（每次受擊都會重新觸發昏亂）。"
+        "description": "化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。生效期間，受到傷害會使你昏亂，移動速度降低 50%，持續 2 秒（每次受擊都會重新觸發昏亂）。"
       },
       "aimed_shot": {
         "name": "長弓引射",

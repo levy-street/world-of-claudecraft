@@ -5094,7 +5094,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'テンの姿をまとい、回避率を30分間8%高めます。',
   'entities.abilities.aspect_of_the_cheetah.name': '駿馬の相',
   'entities.abilities.aspect_of_the_cheetah.description':
-    '駿馬の姿をまとい、移動速度を30分間30%高めます。効果中はダメージを受けるとよろめき、移動速度が4秒間半減します（被弾のたびによろめきが更新されます）。',
+    '駿馬の姿をまとい、移動速度を30分間30%高めます。効果中はダメージを受けるとよろめき、移動速度が2秒間半減します（被弾のたびによろめきが更新されます）。',
   'entities.abilities.aimed_shot.name': '引き絞り',
   'entities.abilities.aimed_shot.description':
     '対象を撃ち、{damage}の物理ダメージを与えます。ダメージは遠隔攻撃力とともに上がります。',
@@ -15999,7 +15999,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。',
   'entities.abilities.tidecall.name': '潮呼び',
   'entities.abilities.trailbreak.description':
-    '専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。',
+    '後方へ25ヤード跳び、移動不能効果と移動速度低下効果を解除します。狩猟の勢いがある場合はそれを更新し、再突入準備を12秒間付与します。',
   'entities.abilities.trailbreak.name': '離脱跳躍',
   'entities.abilities.umbral_anchor.description':
     '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。',

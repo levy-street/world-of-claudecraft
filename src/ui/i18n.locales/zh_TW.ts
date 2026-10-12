@@ -4886,7 +4886,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '化身為貂的形態，將你的閃避機率提高 8%，持續 30 分鐘。',
   'entities.abilities.aspect_of_the_cheetah.name': '駿馬之姿',
   'entities.abilities.aspect_of_the_cheetah.description':
-    '化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。生效期間，受到傷害會使你昏亂，移動速度降低 50%，持續 4 秒（每次受擊都會重新觸發昏亂）。',
+    '化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。生效期間，受到傷害會使你昏亂，移動速度降低 50%，持續 2 秒（每次受擊都會重新觸發昏亂）。',
   'entities.abilities.aimed_shot.name': '長弓引射',
   'entities.abilities.aimed_shot.description':
     '射擊目標，造成 {damage} 點物理傷害。傷害隨遠程攻擊強度提升。',
@@ -15262,7 +15262,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '為一個友方目標恢復{damage}點生命值。治療量隨法術強度提高。將過量治療前的完整治療量加入癒合水流，最多為目標最大生命值的30%。',
   'entities.abilities.tidecall.name': '潮汐召喚',
   'entities.abilities.trailbreak.description':
-    '向後躍開且不失去專精狀態。野戰技藝還會為下一次重返戰場做好準備。',
+    '向後躍出25碼，並解除定身和移動減速效果。若你擁有狩獵動能，則將其刷新，並使你獲得蓄勢再入，持續12秒。',
   'entities.abilities.trailbreak.name': '斷跡',
   'entities.abilities.umbral_anchor.description':
     '首次施放：在腳下錨定暗影，持續5分鐘。在40碼內再次施放可返回錨點，消耗錨點並觸發45秒冷卻。',

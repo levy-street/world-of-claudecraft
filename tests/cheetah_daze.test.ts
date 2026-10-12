@@ -9,7 +9,7 @@ import type { Aura } from '../src/sim/types';
 
 // Aspect of the Cheetah / Courser's Guise: +30% move speed, but taking damage
 // while it is active dazes the hunter to half of their CURRENT total speed for
-// 4s, refreshed (never stacked) by each hit. The classic anti-kite counterplay.
+// 2s, refreshed (never stacked) by each hit. The classic anti-kite counterplay.
 const CHEETAH = 'aspect_of_the_cheetah';
 
 function hunterWithCheetah(seed = 7): Sim {
@@ -42,7 +42,7 @@ describe("Courser's Guise daze", () => {
   it('tooltip documents the daze drawback', () => {
     const def = ABILITIES[CHEETAH];
     expect(def.description).toMatch(/daze/i);
-    expect(def.description).toMatch(/4 sec/);
+    expect(def.description).toMatch(/2 sec/);
   });
 
   it('grants +30% move speed with no daze until struck', () => {
@@ -59,7 +59,7 @@ describe("Courser's Guise daze", () => {
     expect(daze).toBeTruthy();
     expect(daze!.kind).toBe('slow');
     expect(daze!.value).toBeCloseTo(0.5, 5);
-    expect(daze!.duration).toBe(4);
+    expect(daze!.duration).toBe(2);
     // 0.5 * the aspect's 1.3 = 0.65: half of the CURRENT total, not base run.
     expect(moveSpeedMult(sim.player)).toBeCloseTo(0.65, 5);
   });
@@ -70,16 +70,25 @@ describe("Courser's Guise daze", () => {
     expect(sim.player.auras.some((a) => a.id === COURSER_DAZE_AURA_ID)).toBe(true);
   });
 
-  it('refreshes the 4s timer on each hit rather than stacking', () => {
+  it('refreshes the 2s timer on each hit rather than stacking', () => {
     const sim = hunterWithCheetah();
     hit(sim);
     for (let i = 0; i < 20; i++) sim.tick(); // one second of decay
     const mid = sim.player.auras.find((a) => a.id === COURSER_DAZE_AURA_ID);
-    expect(mid!.remaining).toBeLessThan(4);
+    expect(mid!.remaining).toBeLessThan(2);
     hit(sim);
     const dazes = sim.player.auras.filter((a) => a.id === COURSER_DAZE_AURA_ID);
     expect(dazes).toHaveLength(1);
-    expect(dazes[0].remaining).toBe(4); // reset exactly, in place
+    expect(dazes[0].remaining).toBe(2); // reset exactly, in place
+  });
+
+  it('wears off after 2 sec without another hit', () => {
+    const sim = hunterWithCheetah();
+    hit(sim);
+    for (let i = 0; i < 20 * 1.5; i++) sim.tick();
+    expect(sim.player.auras.some((a) => a.id === COURSER_DAZE_AURA_ID)).toBe(true);
+    for (let i = 0; i < 20 * 0.6; i++) sim.tick();
+    expect(sim.player.auras.some((a) => a.id === COURSER_DAZE_AURA_ID)).toBe(false);
   });
 
   it('refreshes IN PLACE (same aura record) to stay cheap under DoTs and swim pulses', () => {
@@ -90,7 +99,7 @@ describe("Courser's Guise daze", () => {
     hit(sim);
     const second = sim.player.auras.find((a) => a.id === COURSER_DAZE_AURA_ID)!;
     expect(second).toBe(first); // same object: refreshed, not spliced + re-pushed
-    expect(second.remaining).toBe(4);
+    expect(second.remaining).toBe(2);
   });
 
   it('a dazed hunter reads as snared to enemy offense predicates (classic daze = snare)', () => {

@@ -4352,10 +4352,10 @@ function c5AutoAttack(): Scenario {
       'player auto-attack driver updatePlayerAutoAttack (swingTimer cadence, facing/range gates)',
       'meleeSwing white-hit table: single rng.next() miss/dodge + crit + armor mitigation',
       'queuedOnSwing heroic_strike spend + bonus (warrior, cooldown 0)',
-      'instant raptor_strike weaponStrike mixed into the hunter melee lane',
+      'instant raptor_strike weaponStrike mixed into the point-blank hunter lane',
       'overpowerUntil window set on a melee dodge',
       'spiked-hide reflect tail of meleeSwing (wild_boar Bristled Hide)',
-      'rangedSwing Auto Shot (hunter, physical, armor-mitigated, 8yd dead zone)',
+      'rangedSwing Auto Shot (hunter, physical, armor-mitigated, no dead zone since v0.45)',
       'rangedSwing Wand (mage, arcane, no armor, no dead zone)',
       'stopAutoAttack public entry',
     ],
@@ -4395,7 +4395,8 @@ function c5AutoAttack(): Scenario {
         rec.track(m.id);
         return m;
       };
-      // dz 1.5 = melee; dz 20 = hunter Auto Shot band (> 8yd dead zone, <= 35);
+      // dz 1.5 = melee (Auto Shot for the hunter, which has no dead zone since v0.45);
+      // dz 20 = hunter Auto Shot band (<= 35);
       // dz 15 = wand band (no dead zone). wild_boar carries the spiked-hide thorns.
       const mobWarrior = spawnTarget(eWarrior, 'wild_boar', 1.5, 3);
       const mobRogue = spawnTarget(eRogue, 'forest_wolf', 1.5, 6);
@@ -4416,8 +4417,8 @@ function c5AutoAttack(): Scenario {
       for (const pid of ids) sim.startAutoAttack(pid);
 
       for (let round = 0; round < 12; round++) {
-        // Re-pin each target to its lane distance + re-face so the ranged dead-zone
-        // (Auto Shot) vs no-dead-zone (Wand) branches stay deterministically exercised.
+        // Re-pin each target to its lane distance + re-face so the melee and ranged
+        // (Auto Shot, Wand) branches stay deterministically exercised.
         for (const [, e, m, dz] of pairs) {
           teleport(sim, m, e.pos.x, e.pos.z + dz);
           face(e, m);

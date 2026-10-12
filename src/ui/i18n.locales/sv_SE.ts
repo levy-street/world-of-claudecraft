@@ -7626,7 +7626,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Skjuter målet för {damage} Arkan skada. Skadan ökar med anfallskraft på avstånd.',
   'entities.abilities.arcane_shot.name': 'Ondskeskott',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min. Medan den är aktiv omtöcknar skada er och halverar er förflyttningshastighet i 4 sek. (varje träff förnyar omtöckningen)',
+    'Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min. Medan den är aktiv omtöcknar skada er och halverar er förflyttningshastighet i 2 sek. (varje träff förnyar omtöckningen)',
   'entities.abilities.aspect_of_the_cheetah.name': 'Springarens skepnad',
   'entities.abilities.aspect_of_the_hawk.description':
     'Anta kärrhökens skepnad och öka er anfallskraft med {buff} i 30 min.',
@@ -15993,7 +15993,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     'Frammanar 3 bestar i 12 sek. Var och en attackerar var 2:e sek för {damage} fysisk skada. Den visade skadan inkluderar 8% av din distansattackkraft före husdjursskadebonusar. Bestarna låser Flockvildheten när de frammanas och får 10% skada per stapel. Medan Vilt språng är på nedkylning har lyckade Flockbefallningar 20% chans att återställa det, garanterat efter 5 misslyckade chanser. Det kan inte återställas medan bestarna är aktiva. (Flockherre)',
   'entities.abilities.trailbreak.description':
-    'Hoppa 12 meter bakåt. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek.',
+    'Hoppa 25 meter bakåt och bryt dig fri från rotfästningar och förflyttningssänkningar. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek.',
   'entities.abilities.unleash_beast.description':
     'Förbrukar 3 Flockvildhet efter att ditt husdjur slagit för 83 till 105 fysisk skada och skakat varje fiende inom 6 meter för 26 till 34. Slaget och skakningen använder Flockvildhetens fulla husdjursskadebonus på 30% och ökar med husdjurets attackkraft. I 8 sek därefter gör husdjuret 25% mer skada, attackerar 35% snabbare och får Ondskeskott att träffa upp till 2 närliggande fiender.',
   'entities.abilities.wildheart.description': 'Återställer omedelbart 30% av din maximala hälsa.',

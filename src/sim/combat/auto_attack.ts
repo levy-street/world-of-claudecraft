@@ -7,7 +7,7 @@ import { shadowActionsLocked } from '../shadow_action_lock';
 //   - updatePlayerAutoAttack: the per-tick driver (swing-timer decay, facing/range
 //     gates, the ranged-vs-melee branch, and queuedOnSwing consumption that feeds
 //     on-next-swing abilities like Heroic Strike / Raptor Strike into the swing).
-//   - rangedSwing: Auto Shot (hunters, 8yd dead zone) and Wand (casters, no dead
+//   - rangedSwing: Auto Shot (hunters, no dead zone since v0.45) and Wand (casters, no dead
 //     zone); miss roll, crit, and armor mitigation for physical shots only.
 //   - meleeSwing: the white-hit table (single rng.next() miss -> dodge -> hit, crit,
 //     weapon imbue bonus, armor mitigation, and the thorns / spiked-hide reflect

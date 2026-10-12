@@ -95,7 +95,7 @@ describe('Hunter v0.29 spec action ownership', () => {
     expect(knownFor('survival', 5)).toContain('raptor_strike');
   });
 
-  it('shows Fieldcraft mechanics as passives and uses 15 second movement cooldowns', () => {
+  it('shows Fieldcraft mechanics as passives and keeps its movement cooldowns', () => {
     const sim = new Sim({ seed: 2903, playerClass: 'hunter', autoEquip: false });
     sim.setPlayerLevel(20);
     expect(sim.setSpec('survival')).toBe(true);
@@ -103,7 +103,7 @@ describe('Hunter v0.29 spec action ownership', () => {
     expect(sim.resolvedAbility('hunting_momentum')?.def.passive).toBe(true);
     expect(sim.resolvedAbility('fieldcraft_reentry')?.def.passive).toBe(true);
     expect(sim.resolvedAbility('bloodhook')?.cooldown).toBe(15);
-    expect(sim.resolvedAbility('trailbreak')?.cooldown).toBe(15);
+    expect(sim.resolvedAbility('trailbreak')?.cooldown).toBe(20);
   });
 
   it('re-specializing drops the old exclusive kit and keeps shared actions', () => {

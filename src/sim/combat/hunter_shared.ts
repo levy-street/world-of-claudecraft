@@ -5,6 +5,7 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d } from '../types';
 import { replaceResolvedAbility } from './action_replacement';
+import { isUnbreakableControlAura } from './cc';
 import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import { livingGroupRaidInRadius } from './group_targeting';
 import { coldsightLongDrawCritExtensionSec } from './hunter_coldsight';
@@ -47,7 +48,7 @@ export const PACK_FEROCITY_DAMAGE_PER_STACK = 0.1;
 const COURSER_GUISE_AURA_IDS: readonly string[] = ['aspect_of_the_cheetah', 'pack_rally'];
 export const COURSER_DAZE_AURA_ID = 'hunter_courser_daze';
 const COURSER_DAZE_SLOW = 0.5; // reduce movement speed to 50% of its current total
-const COURSER_DAZE_DURATION = 4; // seconds; each hit refreshes, never stacks
+const COURSER_DAZE_DURATION = 2; // seconds; each hit refreshes, never stacks
 
 function removeAura(ctx: SimContext, entity: Entity, id: string): void {
   const index = entity.auras.findIndex((aura) => aura.id === id);
@@ -488,12 +489,15 @@ export function cancelRecedingShell(
   return true;
 }
 
+// Every Trailbreak breaks the hunter free of roots and movement slows (the
+// Tactical Retreat talent now only adds the second charge). Encounter-owned
+// unbreakable control stays: an unbreakable root already refuses the cast in
+// castAbility, and an unbreakable slow rides through the leap.
 export function onHunterTrailbreak(ctx: SimContext, hunter: Entity): void {
-  const meta = ctx.players.get(hunter.id);
-  if (!meta || !hasHunterTalent(meta, 'hun_r5_tactical_retreat')) return;
   for (let index = hunter.auras.length - 1; index >= 0; index--) {
     const aura = hunter.auras[index];
     if (aura.kind !== 'root' && aura.kind !== 'slow') continue;
+    if (isUnbreakableControlAura(aura)) continue;
     hunter.auras.splice(index, 1);
     ctx.emit({ type: 'aura', targetId: hunter.id, name: aura.name, gained: false });
   }

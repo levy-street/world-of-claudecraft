@@ -208,7 +208,7 @@ Every class runs on classic-era MMO mechanics implemented from first principles,
 
 - **Warrior**: a rage engine that turns damage taken and dealt into ever bigger swings, bleeds, and shouts.
 - **Paladin**: a holy knight who brands foes with an oath, then spends it on verdicts, wards, and mending light.
-- **Hunter**: ranged auto-attacks with a classic-style dead zone, snares and traps of the wild, and a tameable pet at your side.
+- **Hunter**: ranged auto-attacks and shots that work even point blank, snares and traps of the wild, and a tameable pet at your side.
 - **Rogue**: energy and combo points, opened from stealth and cashed in on cold-blooded finishers.
 - **Priest**: psalms and litanies that shield allies, mend wounds, and rot an enemy's mind in equal measure.
 - **Shaman**: elemental jolts, mending waters, and weapon imbues that spark on every swing.

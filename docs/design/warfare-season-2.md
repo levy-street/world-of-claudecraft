@@ -305,7 +305,7 @@ Implementation routes:
 ### Marksmanship (`marksmanship`, signature Cold Focus `cold_focus`)
 - **Set:** Farsight Harness. Farsight Coif, Farsight Spaulders, Farsight Jerkin, Farsight Legguards, Farsight Gauntlets.
 - **2pc:** "Trailbreak's cooldown is reduced by 4 sec."
-  Route: DATA, ability row `{ ability: 'trailbreak', cooldownFlat: -4 }` (15 to 11 sec,
+  Route: DATA, ability row `{ ability: 'trailbreak', cooldownFlat: -4 }` (20 to 16 sec,
   12 yd backward leap).
 - **4pc:** "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more
   than once every 15 sec."

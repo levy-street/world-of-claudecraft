@@ -473,7 +473,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r5_tactical_retreat',
           name: 'Tactical Retreat',
-          description: 'Trailbreak stores 2 uses and removes roots and movement slows when used.',
+          description: 'Trailbreak stores 2 uses.',
           icon: 'trailbreak',
           effect: { ability: [{ ability: 'trailbreak', bonusCharges: 1 }] },
         },

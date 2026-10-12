@@ -13142,7 +13142,7 @@ export const zh_CN: EnTranslations = {
       },
       "trailbreak": {
         "name": "断迹",
-        "description": "向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。"
+        "description": "向后跃出25码，并解除定身和移动减速效果。若你拥有狩猎势能，则将其刷新，并使你获得蓄势返场，持续12秒。"
       },
       "wildheart": {
         "name": "野性之心",
@@ -13709,7 +13709,7 @@ export const zh_CN: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "骏马之姿",
-        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 4 秒（每次命中都会刷新昏乱状态）。"
+        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 2 秒（每次命中都会刷新昏乱状态）。"
       },
       "aimed_shot": {
         "name": "引弓长射",
