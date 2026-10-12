@@ -543,13 +543,14 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     // stay force-1 on the count path the way the vendor window already shows
     // it (no 5x/10x/custom control). Before the fix a crafted { count: 3 } on
     // a non-soulbound row (the formulas, the unique toys) granted three copies
-    // for a single charge.
+    // for a single charge. The allied hearthstone (no faction of its own) is
+    // the same hole, charged in the selling quartermaster's marks.
     const sim = new Sim({ seed: 780, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     const meta = sim.meta(pid);
     if (!meta) throw new Error('fixture player missing');
-    meta.factions.rift_watch = 7_000; // Proven
-    meta.factionCurrencies.rift_watch = 500;
+    meta.factions.rift_watch = 13_000; // Vanguard, so the allied hearthstone opens
+    meta.factionCurrencies.rift_watch = 1_000;
     const qm = [...sim.entities.values()].find(
       (e) => e.templateId === 'npc_rift_watch_quartermaster',
     );
@@ -560,6 +561,9 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     const cases: Array<[string, { count?: number; bulk?: boolean }]> = [
       ['formula_riftwalkers_grace', { count: 3 }],
       ['rift_feather_glider', { count: 3 }],
+      ['allied_hearthstone', { count: 3 }],
+      // A guard, not the regression: no shipped marks row has a coin price,
+      // so bulk already fell to the count path here; it must stay one copy.
       ['formula_enchant_feet_shadowstride', { bulk: true }],
     ];
     for (const [id, opts] of cases) {
@@ -573,27 +577,32 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     }
 
     // The sim and the vendor window agree on every marks row: the shared
-    // force-1 predicate pins it, and the view offers no multiple.
+    // force-1 predicate pins it, and (a standing guard, already true before
+    // the fix) the view offers no fixed multiple and no custom prompt.
     for (const [id, gate] of Object.entries(FACTION_VENDOR_GATES)) {
       if (gate.currencyCost <= 0) continue;
       expect(vendorCountForced(ITEMS[id]), id).toBe(true);
     }
-    const view = buildVendorView(
-      ['formula_riftwalkers_grace', 'rift_feather_glider'],
-      [],
-      ITEMS,
-      {
-        copper: 0,
-        honor: 0,
-        gatheringProficiency: { mining: 0, logging: 0, herbalism: 0 },
-        factions: meta.factions,
-        factionCurrencies: meta.factionCurrencies,
-      },
-      5,
-    );
-    for (const row of view.goods) {
-      expect(row.countBuy, row.itemId).toBeUndefined();
-      expect(row.bulkQuantity, row.itemId).toBeUndefined();
+    for (const multiple of [5, 'custom'] as const) {
+      const view = buildVendorView(
+        ['formula_riftwalkers_grace', 'rift_feather_glider'],
+        [],
+        ITEMS,
+        {
+          copper: 0,
+          honor: 0,
+          gatheringProficiency: { mining: 0, logging: 0, herbalism: 0 },
+          factions: meta.factions,
+          factionCurrencies: meta.factionCurrencies,
+        },
+        multiple,
+      );
+      expect(view.goods).toHaveLength(2);
+      for (const row of view.goods) {
+        expect(row.countBuy, row.itemId).toBeUndefined();
+        expect(row.customBuy, row.itemId).toBeUndefined();
+        expect(row.bulkQuantity, row.itemId).toBeUndefined();
+      }
     }
   });
 

@@ -27,7 +27,9 @@
 // excludes honor-priced rows and mounts, so a future soulbound stackable (no
 // such row exists today; the soulbound rows with a buyValue are the mounts and
 // the Warfare Season 1 gear, all unstackable and force-1 on both paths regardless) can never bulk-multiply while the count
-// path pins it to 1.
+// path pins it to 1. Faction-marks rows (FACTION_VENDOR_GATES with a positive
+// currencyCost) are force-1 on both axes the same way: the mark cost is
+// debited once per purchase, so neither axis may multiply the units.
 //
 // DOM-free and deterministic so tests/vendor_buy_stack.test.ts drives it directly.
 

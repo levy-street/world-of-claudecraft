@@ -97,6 +97,21 @@ describe('vendorCountForced (Q23 force-1 rows)', () => {
     expect(vendorCountForced(item({ priceHonor: Number.NaN }))).toBe(false);
     expect(vendorCountForced(item({ priceHonor: 0 }))).toBe(false);
   });
+
+  it('forces a faction-marks row by its gate cost, mirroring buyItem hasFactionPrice', () => {
+    // buyItem debits the gate's currencyCost once per purchase, so a marks row
+    // must never multiply. The shapes are synthetic on purpose: only the id
+    // ties a def to FACTION_VENDOR_GATES, so a non-soulbound recipe kind
+    // isolates the marks arm from every other force-1 arm.
+    expect(vendorCountForced(item({ id: 'formula_riftwalkers_grace', kind: 'recipe' }))).toBe(true);
+    expect(vendorCountForced(item({ id: 'allied_hearthstone', kind: 'tool' }))).toBe(true);
+    // The reins gate carries no mark cost (currencyCost 0): with a non-mount
+    // kind the predicate must leave it countable, exactly as buyItem would
+    // charge it (coin only).
+    expect(vendorCountForced(item({ id: 'reins_avian_strider', kind: 'tool' }))).toBe(false);
+    // An inherited key never reads as a gate.
+    expect(vendorCountForced(item({ id: 'toString', kind: 'tool' }))).toBe(false);
+  });
 });
 
 describe('buyPurchaseTotals (atomic count totals, overflow-guarded)', () => {
