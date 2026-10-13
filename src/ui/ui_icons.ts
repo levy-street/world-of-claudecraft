@@ -22,6 +22,7 @@
 import { chromeIconUrl } from './chrome_icon_art';
 
 export type UiIconName =
+  | 'bell'
   // game-icons.net
   | 'arena'
   | 'dfinder'
@@ -97,6 +98,7 @@ export type UiIconName =
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
 // glyphs set fill-rule="evenodd" locally.
 const ICONS: Record<UiIconName, string> = {
+  bell: '<path d="M224 48a32 32 0 0 1 64 0v24c70 14 112 72 112 144v88l40 56v24H72v-24l40-56v-88c0-72 42-130 112-144V48Zm-64 168v104l-16 16h224l-16-16V216a96 96 0 0 0-192 0Zm48 192h96a48 48 0 0 1-96 0Z"/>',
   // hand-authored capture-the-flag banner on a pole (Thornhollow Fields battleground)
   battleground: '<path d="M150 56h26v400h-26z"/><path d="M176 78h236l-52 66 52 66H176z"/>',
   // hand-authored rank arrows: broad chevrons plus a baseline, designed for

@@ -1156,8 +1156,10 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       // drop-shadow scaled by the tier, never a blur. Base 97; the release's
       // two extra library composites (+4) and the world-quests branch's vault
       // blooms (+11) compose to 112 at the release/v0.44.0 base merge.
-      'the style graph owns 112 reviewed tier-shadow uses',
-    ).toHaveLength(112);
+      // Groups category selection adds one decorative bloom; its inset
+      // selection underline and text remain visible at every graphics tier.
+      'the style graph owns 113 reviewed tier-shadow uses',
+    ).toHaveLength(113);
 
     for (const [name, body] of [
       [

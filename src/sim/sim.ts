@@ -15,6 +15,7 @@ import type {
   DailyRewardStatus,
   DelveCompanionInfo,
   DelveRunInfo,
+  ExpeditionSettings,
   GuildPledgeSettings,
   LockpickView,
   MountRaceView,
@@ -45,6 +46,8 @@ import { restoreCharacterStorage, savedCharacterStorage } from './character_stor
 import type { TreasureMapProgress } from './content/treasure_maps';
 import type { FactionId } from './factions';
 import type { ItemCopyAnchor } from './item_copy_anchor';
+import { savedQuestLog } from './quests/quest_log_persist';
+import { loadQueueRewards, savedQueueRewards } from './social/queue_rewards';
 import * as treasureVaultMod from './treasure_vault';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
@@ -810,10 +813,11 @@ import * as yumiMod from './social/yumi';
 // public path `import { Sim, eloDelta } from './sim'` (tests/arena.test.ts) holds.
 export { eloDelta } from './social/arena';
 
-import { FINDER_ACTIVITIES, type FinderListingTag } from './content/dungeon_finder';
+import type { FinderListingTag } from './content/dungeon_finder';
 import { setHelmHidden as setHelmHiddenMod } from './helm_visibility';
 import { collectPartyInfo } from './party_frame_info';
 import { DungeonFinderMachine } from './social/dungeon_finder';
+import { seedDungeonFinderDev } from './social/dungeon_finder_dev';
 import * as fiestaMod from './social/fiesta';
 // A3: Fiesta tuning consts moved to social/fiesta.ts; these five are read back here
 // by the fiestaMatchInfo presentation accessor (which STAYS on Sim).
@@ -1240,6 +1244,9 @@ export interface InstanceSlot {
   // Sim-time (seconds) this slot was claimed, cleared with the claim. Session
   // state (instances never persist); the Sanctum speed deed reads it.
   claimedAt?: number;
+  // Successful encounter deaths, retained after their corpses despawn.
+  defeatedEncounterIds?: Set<string>;
+  queueHelpers?: import('./instances/queue_participation').QueueHelperRoster;
   // Players whose heroic daily lockout FIRST landed with THIS claim's final-boss
   // kill (instances/dungeons lockToHeroicClaim). The heroic door's cleared-run
   // exception admits only these: a player locked by an earlier run can never
@@ -1303,6 +1310,7 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
 export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
+  queueRewards?: CharacterState['queueRewards'];
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
@@ -3363,6 +3371,7 @@ export class Sim {
       const dailyGate = sanitizeDailyGateLoad(s);
       if (dailyGate.delveDaily) meta.delveDaily = dailyGate.delveDaily;
       if (dailyGate.heroicDaily) meta.heroicDaily = dailyGate.heroicDaily;
+      if (savedState.queueRewards) meta.queueRewards = loadQueueRewards(savedState.queueRewards);
       if (dailyGate.wyrmfallDaily) meta.wyrmfallDaily = dailyGate.wyrmfallDaily;
       if (dailyGate.craftDaily) meta.craftDaily = dailyGate.craftDaily;
       meta.emberWeekAnchor = dailyGate.emberWeekAnchor;
@@ -3852,6 +3861,7 @@ export class Sim {
       xp: restore ? restore.xp : meta.xp,
       lifetimeXp: meta.lifetimeXp,
       ...savedHonorState(meta),
+      ...savedQueueRewards(meta.queueRewards),
       ...savedWorldPvpFields(meta, this.time),
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
@@ -3902,19 +3912,7 @@ export class Sim {
       ),
       ...savedCharacterStorage(meta),
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
-      questLog: [...meta.questLog.values()].map((q) => ({
-        questId: q.questId,
-        counts: [...q.counts],
-        state: q.state,
-        ...(q.selection === undefined ? {} : { selection: q.selection }),
-        ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
-        ...(q.burnedObjects === undefined
-          ? {}
-          : { burnedObjects: q.burnedObjects.map((b) => ({ key: b.key, at: b.at })) }),
-        // Absent until the first interact credit (parity-stable saves).
-        ...(q.creditedObjects === undefined ? {} : { creditedObjects: [...q.creditedObjects] }),
-        ...(q.rev === undefined ? {} : { rev: q.rev }),
-      })),
+      questLog: savedQuestLog(meta),
       questsDone: [...meta.questsDone],
       ...savedWorldQuestState(meta),
       arenaRating: meta.arenaRating,
@@ -5409,6 +5407,7 @@ export class Sim {
       riftOpenTreasure: sim.riftOpenTreasure.bind(sim),
       resetDungeonInstances: sim.resetDungeonInstances.bind(sim),
       inheritDungeonResetLocks: sim.inheritDungeonResetLocks.bind(sim),
+      onDungeonFinderPartyJoined: (pid) => sim.dungeonFinder.onPartyJoined(pid),
       dungeonDifficulty: sim.dungeonDifficulty.bind(sim),
       setDungeonDifficulty: sim.setDungeonDifficulty.bind(sim),
       awardHeroicMarks: sim.awardHeroicMarks.bind(sim),
@@ -9230,7 +9229,6 @@ export class Sim {
   partyAccept(pid?: number): void {
     this.party.partyAccept(pid);
   }
-
   partyDecline(pid?: number): void {
     this.party.partyDecline(pid);
   }
@@ -9306,106 +9304,27 @@ export class Sim {
     this.dungeonFinder.dungeonFinderApplicationRespond(applicantPid, accept, pid);
   }
 
-  // Dev-only Dungeon Finder scenario seeding ("/dev lfg" in social/chat.ts,
-  // gated by devCommands; never a wire command). Spawns whisperable dev bots
-  // around the caller so the queue/proposal/board flows can be exercised
-  // without other humans:
-  //  - 'queue': fills the five-man composition around the caller's first
-  //    selected role and queues the bots for every eligible five-man;
-  //  - 'raid': same for the ten-player raid composition;
-  //  - 'board': publishes two bot listings and, when the caller leads a
-  //    listing, sends them one applicant.
-  // Deterministic: fixed classes/names (numeric suffixes on collision) and no
-  // rng draws of its own.
+  dungeonFinderExpeditionOpen(pid?: number): void {
+    this.dungeonFinder.dungeonFinderExpeditionOpen(pid);
+  }
+
+  dungeonFinderExpeditionTravel(pid?: number): void {
+    this.dungeonFinder.dungeonFinderExpeditionTravel(pid);
+  }
+
+  dungeonFinderExpeditionApply(listingId: number, role: Role, pid?: number): void {
+    this.dungeonFinder.dungeonFinderExpeditionApply(listingId, role, pid);
+  }
+
+  dungeonFinderExpeditionConfigure(settings: ExpeditionSettings, pid?: number): void {
+    this.dungeonFinder.dungeonFinderExpeditionConfigure(settings, pid);
+  }
+
   seedDungeonFinderDev(
     mode: 'queue' | 'raid' | 'board',
     pid?: number,
   ): { spawned: number; note: 'ok' | 'needRoles' | 'noneEligible' } {
-    const r = this.resolve(pid);
-    if (!r) return { spawned: 0, note: 'noneEligible' };
-    const id = r.meta.entityId;
-    const level = this.entities.get(id)?.level ?? 1;
-    let spawnSeq = 0;
-    const spawnBot = (cls: PlayerClass, role: Role, baseName: string): number => {
-      let name = baseName;
-      for (let n = 2; ; n++) {
-        const taken = [...this.players.values()].some(
-          (m) => m.name.toLowerCase() === name.toLowerCase(),
-        );
-        if (!taken) break;
-        name = `${baseName}${n}`;
-      }
-      const botPid = this.addPlayer(cls, name, { bot: true });
-      const meta = this.players.get(botPid);
-      if (meta) meta.isDevBot = true;
-      spawnSeq++;
-      const e = this.entities.get(botPid);
-      const me = this.entities.get(id);
-      if (e && me) {
-        e.pos = this.groundPos(me.pos.x + 2 + spawnSeq, me.pos.z + 2 + (spawnSeq % 3));
-        e.prevPos = { ...e.pos };
-        this.rebucket(e);
-      }
-      this.setPlayerLevel(level, botPid);
-      if (level >= FIRST_TALENT_LEVEL) {
-        const spec = TALENTS[cls]?.specs.find((s) => s.role === role);
-        if (spec) this.setSpec(spec.id, botPid);
-      }
-      this.dungeonFinderSetRoles([role], botPid);
-      return botPid;
-    };
-    const inBand = (a: (typeof FINDER_ACTIVITIES)[number]) =>
-      level >= a.minLevel && level <= a.maxLevel;
-    const BOT_KITS: Record<Role, { cls: PlayerClass; name: string }> = {
-      tank: { cls: 'warrior', name: 'Tankbot' },
-      healer: { cls: 'priest', name: 'Healbot' },
-      dps: { cls: 'mage', name: 'Dpsbot' },
-    };
-
-    if (mode === 'board') {
-      const listable = FINDER_ACTIVITIES.filter(inBand);
-      if (listable.length === 0) return { spawned: 0, note: 'noneEligible' };
-      let spawned = 0;
-      const lister1 = spawnBot('paladin', 'tank', 'Listerbot');
-      spawned++;
-      this.dungeonFinderListingCreate(listable[0].id, ['learning'], lister1);
-      const lister2 = spawnBot('shaman', 'healer', 'Callerbot');
-      spawned++;
-      this.dungeonFinderListingCreate(
-        (listable[1] ?? listable[0]).id,
-        ['fast_run', 'full_clear'],
-        lister2,
-      );
-      const mine = this.dungeonFinderInfoFor(id)?.myListing;
-      if (mine) {
-        const applicant = spawnBot('rogue', 'dps', 'Seekerbot');
-        spawned++;
-        this.dungeonFinderApply(mine.id, applicant);
-      }
-      return { spawned, note: 'ok' };
-    }
-
-    const size = mode === 'raid' ? 10 : 5;
-    const activityIds = FINDER_ACTIVITIES.filter(
-      (a) => a.autoQueue && a.size === size && inBand(a),
-    ).map((a) => a.id);
-    if (activityIds.length === 0) return { spawned: 0, note: 'noneEligible' };
-    const myRoles = this.dungeonFinderInfoFor(id)?.roles ?? [];
-    if (myRoles.length === 0) return { spawned: 0, note: 'needRoles' };
-    const slots: Role[] =
-      mode === 'raid'
-        ? ['tank', 'tank', 'healer', 'healer', 'dps', 'dps', 'dps', 'dps', 'dps', 'dps']
-        : ['tank', 'healer', 'dps', 'dps', 'dps'];
-    // Leave exactly one slot open that the caller's first selected role fills.
-    slots.splice(slots.indexOf(myRoles[0]), 1);
-    let spawned = 0;
-    for (const role of slots) {
-      const kit = BOT_KITS[role];
-      const botPid = spawnBot(kit.cls, role, kit.name);
-      spawned++;
-      this.dungeonFinderQueueJoin(activityIds, botPid);
-    }
-    return { spawned, note: 'ok' };
+    return seedDungeonFinderDev(this, this.ctx, mode, pid);
   }
 
   dungeonFinderInfoFor(pid: number): import('../world_api').DungeonFinderInfo | null {

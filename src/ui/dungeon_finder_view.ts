@@ -21,11 +21,13 @@ import {
   finderActivity,
 } from '../sim/content/dungeon_finder';
 import { HEROIC_BOSS_LOOT } from '../sim/content/heroic_loot';
-import { FIRST_TALENT_LEVEL, type Role } from '../sim/content/talents';
-import { DUNGEONS, ITEMS, MOBS, zoneAt } from '../sim/data';
+import type { Role } from '../sim/content/talents';
+import { DELVE_LIST, DUNGEONS, ITEMS, MOBS, zoneAt } from '../sim/data';
 import { lootEntryRollsOnClaim } from '../sim/loot/loot_difficulty_gate';
 import { compatibleFinderRoles } from '../sim/social/dungeon_finder';
+import { FINDER_PLAYER_APPLICATION_CAP } from '../sim/social/finder_applications';
 import type { DungeonDifficulty, PlayerClass } from '../sim/types';
+import { delveCatalogueDetail, delveCatalogueRows } from './dungeon_catalogue_view';
 
 // ItemDef.quality is an inline optional union in sim/types.ts; name it here for
 // the loot rows (undefined quality renders as 'common').
@@ -44,13 +46,13 @@ export type FinderTab = 'catalogue' | 'queue' | 'board';
 // Directory of the prerendered boss portrait stills (WebP, fixed 128x128).
 export const FINDER_PORTRAIT_DIR = '/ui/dungeons';
 
-export type FinderBlockReason = 'level' | 'spec' | null;
+export type FinderBlockReason = 'level' | null;
 
 export interface FinderActivityRowView {
   id: string;
   dungeonId: string;
   difficulty: DungeonDifficulty;
-  kind: FinderActivityKind;
+  kind: FinderActivityKind | 'delve';
   minLevel: number;
   maxLevel: number;
   size: number;
@@ -71,6 +73,7 @@ export interface FinderLootItemView {
 }
 
 export interface FinderLootGroupView {
+  previewFiltered?: boolean;
   // True when the group's chances partition a full draw (sum ~1), so exactly
   // one item always drops; false for authored bonus groups whose chances sum
   // below 1 (at most one item drops).
@@ -98,7 +101,7 @@ export interface FinderActivityDetailView {
   id: string;
   dungeonId: string;
   difficulty: DungeonDifficulty;
-  kind: FinderActivityKind;
+  kind: FinderActivityKind | 'delve';
   minLevel: number;
   maxLevel: number;
   size: number;
@@ -142,7 +145,6 @@ export interface FinderProposalPanelView {
 
 export interface FinderQueuePanelView {
   roles: FinderRoleOptionView[];
-  needsSpec: boolean; // at or past the spec unlock with no active spec: the finder is closed
   inParty: boolean;
   isLeader: boolean; // solo counts as leader of self
   queuedActivities: string[]; // live selection while queued ([] otherwise)
@@ -154,6 +156,7 @@ export interface FinderQueuePanelView {
 }
 
 export interface FinderListingRowView extends DungeonFinderListingView {
+  applicationRole: Role | null;
   dungeonId: string;
   difficulty: DungeonDifficulty;
   kind: FinderActivityKind;
@@ -217,22 +220,18 @@ export interface DungeonFinderViewInput {
   tab: FinderTab;
   selectedActivityId: string | null;
   stagedActivityIds: readonly string[]; // pre-join checklist while NOT queued
+  includeDelves?: boolean;
 }
 
-function blockReasonFor(
-  activity: FinderActivity,
-  level: number,
-  specRole: Role | null,
-): FinderBlockReason {
+function blockReasonFor(activity: FinderActivity, level: number): FinderBlockReason {
   if (level < activity.minLevel || level > activity.maxLevel) return 'level';
-  if (level >= FIRST_TALENT_LEVEL && specRole === null) return 'spec';
   return null;
 }
 
 // The longest remaining lock across the activity's rooms: a family that locks
 // per boss room (the Ignivar raid) reads every room it declares, so a player
 // locked to Varkhul alone still sees the lock on the one catalogue row.
-function lockoutMinutesFor(activity: FinderActivity, lockouts: RaidLockout[]): number {
+export function lockoutMinutesFor(activity: FinderActivity, lockouts: RaidLockout[]): number {
   if (activity.lockout === 'none') return 0;
   const ids = [activity.dungeonId, ...(activity.lockoutDungeonIds ?? [])];
   let ms = 0;
@@ -277,7 +276,9 @@ function lootGroups(entries: { itemId?: string; chance: number; rollGroup?: stri
   };
 }
 
-function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
+function buildEncounters(
+  activity: Pick<FinderActivity, 'encounters' | 'difficulty'>,
+): FinderEncounterViewModel[] {
   const out: FinderEncounterViewModel[] = [];
   for (const enc of activity.encounters) {
     const mob = MOBS[enc.mobId];
@@ -342,12 +343,11 @@ export function finderLootItemIds(): string[] {
 function buildDetail(
   activity: FinderActivity,
   level: number,
-  specRole: Role | null,
   lockouts: RaidLockout[],
 ): FinderActivityDetailView {
   const door = DUNGEONS[activity.entranceDungeonId]?.doorPos ?? { x: 0, z: 0 };
   const tuning = HEROIC_DUNGEON_TUNING[activity.dungeonId];
-  const blocked = blockReasonFor(activity, level, specRole);
+  const blocked = blockReasonFor(activity, level);
   return {
     id: activity.id,
     dungeonId: activity.dungeonId,
@@ -376,12 +376,14 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
   const level = input.playerLevel;
   const specRole = input.specRole;
   const selectedId =
-    input.selectedActivityId && finderActivity(input.selectedActivityId)
+    input.selectedActivityId &&
+    (finderActivity(input.selectedActivityId) ||
+      (input.includeDelves && DELVE_LIST.some((d) => `delve:${d.id}` === input.selectedActivityId)))
       ? input.selectedActivityId
       : FINDER_ACTIVITIES[0].id;
 
   const rows: FinderActivityRowView[] = FINDER_ACTIVITIES.map((a) => {
-    const blocked = blockReasonFor(a, level, specRole);
+    const blocked = blockReasonFor(a, level);
     const finalEnc = a.encounters.find((e) => e.final) ?? a.encounters[a.encounters.length - 1];
     return {
       portraitUrl: `${FINDER_PORTRAIT_DIR}/${finalEnc.mobId}.webp`,
@@ -398,8 +400,21 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
       selected: a.id === selectedId,
     };
   });
+  if (input.includeDelves) rows.push(...delveCatalogueRows(level, selectedId));
   const selected = finderActivity(selectedId);
-  const detail = selected ? buildDetail(selected, level, specRole, input.lockouts) : null;
+  const delve = input.includeDelves ? DELVE_LIST.find((d) => `delve:${d.id}` === selectedId) : null;
+  const detail = selected
+    ? buildDetail(selected, level, input.lockouts)
+    : delve
+      ? delveCatalogueDetail(
+          selectedId,
+          level,
+          buildEncounters({
+            difficulty: 'normal',
+            encounters: delve.bosses.map((mobId) => ({ mobId, final: true, mechanics: [] })),
+          }),
+        )
+      : null;
 
   // --- Quick Match panel ---
   const eligibleRoles = compatibleFinderRoles(input.playerClass, level, specRole);
@@ -412,7 +427,7 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
   const isLeader = input.party === null || input.party.leader === input.playerId;
   const onCooldown = info.cooldown > 0;
   const options: FinderQueueOptionView[] = FINDER_ACTIVITIES.filter((a) => a.autoQueue).map((a) => {
-    const blocked = blockReasonFor(a, level, specRole);
+    const blocked = blockReasonFor(a, level);
     return {
       id: a.id,
       dungeonId: a.dungeonId,
@@ -428,7 +443,6 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
   const proposalActivity = info.proposal ? finderActivity(info.proposal.activityId) : null;
   const queuePanel: FinderQueuePanelView = {
     roles: roleOptions,
-    needsSpec: level >= FIRST_TALENT_LEVEL && specRole === null,
     inParty: input.party !== null,
     isLeader,
     queuedActivities: info.queue ? [...info.queue.activities] : [],
@@ -457,11 +471,12 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
 
   // --- Premade board panel ---
   const board = input.board ?? [];
+  const applications = info.myApplications ?? (info.myApplication ? [info.myApplication] : []);
   const listings: FinderListingRowView[] = [];
   for (const listing of board) {
     const activity = finderActivity(listing.activityId);
     if (!activity) continue;
-    const applied = info.myApplication?.listingId === listing.id;
+    const applied = applications.some((application) => application.listingId === listing.id);
     const mine = info.myListing?.id === listing.id;
     const locked = lockoutMinutesFor(activity, input.lockouts) > 0;
     // Hide a listing for the group I am ALREADY part of, whether I lead it
@@ -482,9 +497,17 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     // separate `myListing` panel, which no lockout ever filters. The `!mine`
     // guard stays as belt and braces should the skip above ever narrow.
     if (!applied && !mine && locked) continue;
-    const blocked = blockReasonFor(activity, level, specRole);
-    const roleFit =
-      activity.composition === null || info.roles.some((r) => (listing.needed?.[r] ?? 0) > 0);
+    const blocked = blockReasonFor(activity, level);
+    const applicationRole = listing.expedition
+      ? (info.roles.find((role) => eligibleRoles.includes(role)) ?? eligibleRoles[0] ?? null)
+      : null;
+    const roleFit = listing.expedition
+      ? applicationRole !== null
+      : activity.composition === null || info.roles.some((r) => (listing.needed?.[r] ?? 0) > 0);
+    const pendingAvailable = listing.expedition
+      ? applications.length < FINDER_PLAYER_APPLICATION_CAP &&
+        applications.every((app) => app.remaining !== undefined)
+      : applications.length === 0;
     listings.push({
       ...listing,
       dungeonId: activity.dungeonId,
@@ -492,12 +515,15 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
       kind: activity.kind,
       mine,
       applied,
+      applicationRole,
       blocked,
       canApply:
         !mine &&
         blocked === null &&
         input.party === null &&
-        info.myApplication === null &&
+        !applied &&
+        pendingAvailable &&
+        (!listing.expedition || (!queued && info.proposal === null)) &&
         listing.size < listing.capacity &&
         roleFit,
     });
@@ -505,11 +531,11 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
   const boardPanel: FinderBoardPanelView = {
     listings,
     myListing: info.myListing,
-    myApplicationListingId: info.myApplication?.listingId ?? null,
+    myApplicationListingId: applications[0]?.listingId ?? null,
     canCreate: info.myListing === null && isLeader,
     createGate: info.myListing !== null ? 'exists' : isLeader ? null : 'leader',
     createOptions: FINDER_ACTIVITIES.filter(
-      (a) => blockReasonFor(a, level, specRole) === null && (input.party?.size ?? 1) < a.size,
+      (a) => blockReasonFor(a, level) === null && (input.party?.size ?? 1) < a.size,
     ).map((a) => ({ id: a.id, dungeonId: a.dungeonId, difficulty: a.difficulty })),
     tags: FINDER_LISTING_TAGS,
   };
@@ -531,16 +557,36 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     rows.map((r) => [r.eligible, r.blocked, r.lockedMinutes]),
     info.roles,
     eligibleRoles,
-    queuePanel.needsSpec,
     queuePanel.isLeader,
     queuePanel.queued,
     queuePanel.onCooldown,
     queuePanel.canQueue,
     options.map((o) => [o.id, o.eligible, o.checked]),
     info.proposal ? [info.proposal.id, info.proposal.role, info.proposal.myResponse] : null,
-    listings.map((l) => [l.id, l.size, l.needed, l.tags, l.members, l.applied, l.canApply, l.mine]),
-    info.myListing,
-    info.myApplication,
+    listings.map((l) => [
+      l.id,
+      l.size,
+      l.needed,
+      l.tags,
+      l.members,
+      l.applied,
+      l.canApply,
+      l.mine,
+      l.applicationRole,
+      l.details,
+      l.expedition,
+    ]),
+    info.myListing
+      ? {
+          ...info.myListing,
+          // Applicant expiry is not displayed here. Keep the controls mounted
+          // until the applicant actually changes or leaves the listing.
+          applicants: info.myListing.applicants.map(
+            ({ remaining: _remaining, ...applicant }) => applicant,
+          ),
+        }
+      : null,
+    applications.map((app) => app.listingId),
     boardPanel.canCreate,
     input.stagedActivityIds,
   ]);

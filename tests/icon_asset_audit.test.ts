@@ -13,7 +13,7 @@ import {
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import sharp from 'sharp';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import {
   auditIconAssets,
   groupManifestAssets,
@@ -24,6 +24,16 @@ import {
 
 const REPO_ROOT = path.join(__dirname, '..');
 const CLI = path.join(REPO_ROOT, 'scripts/icon_asset_audit.mjs');
+
+// Fixtures overwrite and delete images during a run. Cached libvips file handles
+// keep those temporary paths locked on Windows; restore caller limits afterwards.
+const cache = sharp.cache();
+beforeAll(() => {
+  sharp.cache(false);
+});
+afterAll(() => {
+  sharp.cache({ memory: cache.memory.max, files: cache.files.max, items: cache.items.max });
+});
 
 type Kind = 'ability' | 'item' | 'deed';
 

@@ -44,13 +44,6 @@ function declaredNames(sources: readonly string[]): Set<string> {
 // declaration today (the DESIGN.md chrome retune retires them onto tokens):
 // exact set, so a NEW undeclared read fails and a fix must delete its row.
 const KNOWN_UNDECLARED = [
-  // DESIGN.md 4.3 names this alias and components.css already consumes it, at
-  // 13 sites that are ALL in the Dungeon Finder section. Declaring it is
-  // therefore not a token cleanup: it switches on 13 borders that have never
-  // painted, and grows those content-sized chips by 2px, in a window the
-  // marketplace pass neither owns nor captured. Owed by the DESIGN.md chrome
-  // retune, WITH a Dungeon Finder before/after (desktop and 900x420).
-  '--panel-border',
   '--color-text', // components.css / hud.css: the generic text alias never minted
   '--color-text-primary', // shell.css: the pre-game shell's alias
   '--cursor-pointer', // components.css: the cursor family spells --cursor-point
@@ -84,8 +77,8 @@ describe('css_token_resolution: every var() read names a declared custom propert
     // read var(--accent), which nothing declared.
     for (const css of sheets) expect(varReadsWithoutFallback(css)).not.toContain('--accent');
     expect(declared.has('--color-accent')).toBe(true);
-    // The latent DESIGN.md token stays UNDECLARED for now, on the ratchet above
-    // with its reason: declaring it repaints another window's borders.
+    // The Adventure Guide migrated its former latent border reads to a scoped
+    // --df-border. Keep the generic alias undeclared for other windows.
     expect(declared.has('--panel-border')).toBe(false);
   });
 

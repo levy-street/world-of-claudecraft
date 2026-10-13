@@ -26,6 +26,7 @@ import type {
   TradeInfo,
   WorldPvpInfo,
 } from '../world_api';
+import { decodeDungeonFinderBoard, decodeDungeonFinderInfo } from './dungeon_finder_wire';
 
 /** The mirrors this cohort writes; the concrete ClientWorld satisfies it
  *  structurally. */
@@ -73,8 +74,8 @@ export function applySocialSelfWire(target: SocialSelfMirrors, s: SocialSelfReco
   if (s.duel !== undefined) target.duelInfo = s.duel as DuelInfo | null;
   if (s.arena !== undefined) target.arenaInfo = s.arena as ArenaInfo | null;
   if (s.bg !== undefined) target.bgInfo = s.bg as BgInfo | null;
-  if (s.df !== undefined) target.dungeonFinderInfo = s.df as DungeonFinderInfo | null;
-  if (s.dfb !== undefined) target.dungeonFinderBoard = s.dfb as DungeonFinderBoard | null;
+  if (s.df !== undefined) target.dungeonFinderInfo = decodeDungeonFinderInfo(s.df);
+  if (s.dfb !== undefined) target.dungeonFinderBoard = decodeDungeonFinderBoard(s.dfb);
   if (s.cardDuel !== undefined) target.cardMinigameInfo = s.cardDuel as CardMinigameInfo;
   if (s.honor !== undefined) target.honor = numberOrZero(s.honor);
   if (s.lhonor !== undefined) target.lifetimeHonor = numberOrZero(s.lhonor);

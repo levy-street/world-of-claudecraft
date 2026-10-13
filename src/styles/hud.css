@@ -15293,3 +15293,884 @@
     display: none !important;
   }
 }
+
+@layer components {
+  /* ---------- open expeditions ---------- */
+  #expedition-hud {
+    --expedition-inset: 12px;
+    --expedition-top: max(
+      var(--expedition-inset),
+      calc(var(--expedition-safe-top, env(safe-area-inset-top)) / var(--ui-scale, 1))
+    );
+    --expedition-left: max(
+      var(--expedition-inset),
+      calc(var(--expedition-safe-left, env(safe-area-inset-left)) / var(--ui-scale, 1))
+    );
+    --expedition-right: max(
+      var(--expedition-inset),
+      calc(var(--expedition-safe-right, env(safe-area-inset-right)) / var(--ui-scale, 1))
+    );
+    position: absolute;
+    top: var(--expedition-top);
+    left: var(--expedition-left);
+    z-index: 35;
+    pointer-events: auto;
+    max-width: calc(
+      var(--app-vw, 100vw) /
+      var(--ui-scale, 1) -
+      var(--expedition-left) -
+      var(--expedition-right)
+    );
+  }
+  .expedition-tools,
+  .expedition-actions,
+  .expedition-head,
+  .expedition-run {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .expedition-tools {
+    flex-wrap: wrap;
+  }
+  #expedition-bell {
+    position: relative;
+    min-width: 40px;
+    min-height: 40px;
+  }
+  #expedition-bell .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+  .expedition-tools > [data-action="finder"] {
+    min-height: 40px;
+    white-space: nowrap;
+  }
+  #expedition-bell.expedition-bell-alert {
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+  #expedition-bell.expedition-pulse-a {
+    animation: expedition-flash-a 0.8s ease-out 2;
+  }
+  #expedition-bell.expedition-pulse-b {
+    animation: expedition-flash-b 0.8s ease-out 2;
+  }
+  @keyframes expedition-flash-a {
+    50% {
+      box-shadow: 0 0 0 4px var(--color-primary);
+    }
+  }
+  @keyframes expedition-flash-b {
+    50% {
+      box-shadow: 0 0 0 4px var(--color-primary);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #expedition-bell.expedition-pulse-a,
+    #expedition-bell.expedition-pulse-b {
+      animation: none;
+    }
+  }
+  #expedition-bell[data-finish="bronze"],
+  .expedition-reward-preview[data-finish="bronze"] {
+    color: var(--color-queue-bell-bronze);
+  }
+  #expedition-bell[data-finish="silver"],
+  .expedition-reward-preview[data-finish="silver"] {
+    color: var(--color-queue-bell-silver);
+  }
+  #expedition-bell[data-finish="gold"],
+  .expedition-reward-preview[data-finish="gold"] {
+    color: var(--color-queue-bell-gold);
+  }
+  .expedition-counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .expedition-helper,
+  .expedition-shop {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  .expedition-details {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .expedition-details label {
+    display: grid;
+    gap: 4px;
+  }
+  .expedition-details .ui-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .expedition-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    cursor: pointer;
+  }
+  .expedition-check input {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .expedition-note {
+    overflow-wrap: anywhere;
+  }
+  .expedition-recruitment {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+  }
+  .expedition-recruit-fields {
+    display: grid;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+  .expedition-recruit-fields label {
+    display: grid;
+    gap: var(--spacing-xs);
+  }
+  .expedition-recruit-fields .ui-input {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  .expedition-recruit-preview {
+    overflow: hidden;
+    align-self: start;
+  }
+  .expedition-recruit-preview .ui-icon {
+    margin-right: var(--spacing-xs);
+  }
+  .expedition-recruit-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+  }
+  .expedition-recruit-footer > p {
+    flex: 1 1 240px;
+    margin: 0;
+  }
+  #expedition-panel [data-recruit-action] {
+    min-height: 40px;
+  }
+  .mobile-touch .expedition-recruit-fields .ui-input {
+    font-size: 16px;
+  }
+  @media (max-width: 700px) {
+    .expedition-recruitment {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .expedition-shop {
+    padding-top: var(--spacing-md);
+  }
+  .expedition-shop-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    align-items: center;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+  }
+  .expedition-shop-intro h3 {
+    font: 600 28px / 1.25 var(--font-display);
+    color: var(--color-ranking-text);
+    margin: var(--spacing-sm) 0;
+  }
+  .expedition-shop-intro p {
+    color: var(--color-ranking-text-soft);
+    margin: var(--spacing-sm) 0;
+  }
+  .expedition-eyebrow {
+    font: 600 12px / 1.4 var(--font-display);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ranking-emphasis);
+  }
+  .expedition-shop-wallet {
+    --color-bg-input: var(--color-ranking-well);
+    display: grid;
+    justify-items: center;
+    padding: var(--spacing-md);
+  }
+  .expedition-shop-wallet strong {
+    font: 600 44px / 1 var(--font-display);
+    color: var(--color-gold-400);
+  }
+  .expedition-shop-wallet > span {
+    font-size: 14px;
+    margin-top: var(--spacing-sm);
+  }
+  .expedition-shop-wallet progress {
+    width: 100%;
+  }
+  .expedition-reward-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-md);
+  }
+  .expedition-reward {
+    --reward-metal: var(--color-ranking-place-third);
+    --color-text-on-ink: var(--color-ranking-text);
+    --color-card-hi: var(--color-ranking-ground-top);
+    --color-card-lo: var(--color-ranking-ground-deep);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+  .expedition-reward[data-finish="silver"] {
+    --reward-metal: var(--color-ranking-place-second);
+  }
+  .expedition-reward[data-finish="gold"] {
+    --reward-metal: var(--color-gold-400);
+  }
+  .expedition-reward-display {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding: var(--spacing-md);
+    background: radial-gradient(
+      ellipse at 50% 55%,
+      color-mix(in srgb, var(--reward-metal) 14%, transparent),
+      transparent 65%
+    );
+    border-bottom: 1px solid color-mix(in srgb, var(--reward-metal) 45%, transparent);
+  }
+  .expedition-collectible {
+    width: 168px;
+    height: 168px;
+    overflow: visible;
+  }
+  .expedition-bell-halo {
+    fill: color-mix(in srgb, var(--reward-metal) 6%, transparent);
+    stroke: color-mix(in srgb, var(--reward-metal) 25%, transparent);
+    stroke-width: 1;
+  }
+  .expedition-bell-ring {
+    fill: none;
+    stroke: color-mix(in srgb, var(--reward-metal) 45%, transparent);
+    stroke-width: 1;
+    stroke-dasharray: 2 8;
+  }
+  .expedition-bell-metal {
+    fill: color-mix(in srgb, var(--reward-metal) 40%, var(--color-ranking-ground-deep));
+    stroke: var(--reward-metal);
+    stroke-width: 2;
+  }
+  .expedition-bell-engraving {
+    fill: none;
+    stroke: var(--reward-metal);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .expedition-bell-gem {
+    fill: var(--color-ranking-emphasis);
+    stroke: var(--color-ranking-text);
+    stroke-width: 1;
+  }
+  .expedition-reward-state {
+    position: absolute;
+    inset: auto var(--spacing-sm) var(--spacing-sm);
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-ranking-text-soft);
+  }
+  .expedition-reward-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: var(--spacing-md);
+    text-align: center;
+  }
+  .expedition-reward-body h4 {
+    font: 600 19px / 1.3 var(--font-display);
+    color: var(--reward-metal);
+    margin: 0;
+  }
+  .expedition-reward-body p {
+    font-size: 13px;
+    color: var(--color-ranking-text-soft);
+  }
+  .expedition-reward-price {
+    font: 600 17px / 1.4 var(--font-display);
+    margin: auto 0 var(--spacing-md);
+    color: var(--color-ranking-text);
+  }
+  .expedition-reward-body button {
+    width: 100%;
+  }
+  .expedition-shop-foot {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+  }
+  .expedition-shop-foot details {
+    flex: 1;
+    min-width: 220px;
+  }
+  .expedition-shop-foot summary {
+    cursor: pointer;
+    color: var(--color-ranking-emphasis);
+    padding-block: var(--spacing-sm);
+  }
+  .expedition-shop-foot details p {
+    font-size: 14px;
+    color: var(--color-ranking-text-soft);
+    max-width: 70ch;
+  }
+  @media (max-width: 700px) {
+    .expedition-shop-intro {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .expedition-reward-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .expedition-shop-intro h3 {
+      font-size: 22px;
+    }
+  }
+  .expedition-zones {
+    display: grid;
+    grid-template-columns: minmax(300px, 350px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+    margin-top: 12px;
+  }
+  .expedition-own,
+  .expedition-other {
+    min-width: 0;
+  }
+  .expedition-own {
+    --color-text-muted: var(--color-text-on-ink-soft);
+    --color-text-secondary: var(--color-text-on-ink-soft);
+    padding: 0;
+    overflow: hidden;
+  }
+  .expedition-other {
+    padding: var(--spacing-md);
+  }
+  .expedition-own-body {
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+  }
+  .expedition-own .expedition-hero {
+    height: 120px;
+  }
+  .expedition-management > button {
+    flex: 1;
+    min-width: 0;
+    padding-inline: var(--spacing-xs);
+    font-size: 11px;
+  }
+  .expedition-request {
+    color: var(--color-text-on-ink);
+    --color-text-secondary: var(--color-text-on-ink-soft);
+    --color-text-muted: var(--color-text-on-ink-soft);
+  }
+  .expedition-own > .expedition-zone-head {
+    margin: 0;
+    padding: var(--spacing-md);
+  }
+  .expedition-zone-art {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+  .expedition-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  .expedition-title .ui-win-art {
+    width: 36px;
+    height: 36px;
+  }
+  .expedition-title p {
+    margin: var(--spacing-2xs) 0 0;
+  }
+  .expedition-title h2 {
+    font-size: 20px;
+  }
+  .expedition-points {
+    gap: var(--spacing-sm);
+  }
+  .expedition-points .ui-icon {
+    width: 18px;
+    height: 18px;
+  }
+  .expedition-hero {
+    position: relative;
+    height: 144px;
+    overflow: hidden;
+    background: var(--color-ink);
+    color: var(--color-text-on-ink);
+  }
+  .expedition-hero-art {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 55%;
+  }
+  .expedition-hero-shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      transparent 10%,
+      color-mix(in srgb, var(--color-ink) 50%, transparent) 45%,
+      var(--color-ink) 100%
+    );
+  }
+  .expedition-hero-copy {
+    position: absolute;
+    inset: auto var(--spacing-md) var(--spacing-md);
+  }
+  .expedition-hero-copy h3 {
+    font: 600 20px / 1.3 var(--font-display);
+    margin: var(--spacing-xs) 0 0;
+    overflow-wrap: anywhere;
+  }
+  .expedition-hero-copy p {
+    font-size: 13px;
+    margin: 0;
+    color: var(--color-text-on-ink-soft);
+  }
+  .expedition-seat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+  .expedition-seats {
+    display: flex;
+    gap: var(--spacing-xs);
+  }
+  .expedition-seat {
+    width: 24px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    color: var(--color-chrome-glyph);
+    border-bottom: 2px solid var(--color-border-showcase);
+    opacity: 0.4;
+  }
+  .expedition-seat.is-filled {
+    opacity: 1;
+    border-color: var(--color-bronze-light);
+  }
+  .expedition-seat .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+  .expedition-card-body {
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .expedition-needed {
+    color: var(--color-text-light);
+    font-weight: 600;
+  }
+  .expedition-card-secondary {
+    border-top: 1px solid var(--color-border-default);
+    margin-top: var(--spacing-sm);
+    color: var(--color-text-secondary);
+  }
+  .expedition-card-body > .expedition-actions {
+    margin-top: auto;
+    padding-top: var(--spacing-sm);
+  }
+  .expedition-card-body > .expedition-actions > button {
+    flex: 1;
+  }
+  .expedition-leader,
+  .expedition-card-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  .expedition-leader .ui-icon,
+  .expedition-card-progress .ui-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-chrome-glyph);
+    flex: none;
+  }
+  .expedition-card-body > .expedition-leader {
+    margin-top: 0;
+  }
+  .expedition-purpose {
+    align-self: flex-start;
+  }
+  .expedition-emblem {
+    --portrait-size: 42px;
+  }
+  .expedition-emblem .ui-portrait {
+    border-width: 2px;
+  }
+  .expedition-request-person {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  .expedition-request-person > div {
+    min-width: 0;
+  }
+  .expedition-request-person p:first-child {
+    font-weight: 700;
+  }
+  .expedition-request-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  .expedition-request-bottom > .ui-meta {
+    font-size: 12px;
+  }
+  .expedition-request-bottom .expedition-actions {
+    gap: var(--spacing-xs);
+  }
+  .expedition-request-bottom button {
+    padding-inline: var(--spacing-sm);
+  }
+  .expedition-member .expedition-emblem {
+    --portrait-size: 32px;
+  }
+
+  .expedition-zone-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  .expedition-zone-head > div {
+    flex: 1;
+    min-width: 0;
+  }
+  .expedition-zone-head h3,
+  .expedition-zone-head p {
+    margin: 0;
+  }
+  .expedition-zone-head h3 {
+    color: var(--color-text-secondary);
+    font-family: var(--font-display);
+    font-size: 15px;
+  }
+  .expedition-zone-icon {
+    color: var(--color-primary);
+  }
+  .expedition-zone-icon .ui-icon {
+    width: 30px;
+    height: 30px;
+  }
+  .expedition-other .expedition-zone-icon,
+  .expedition-other .expedition-zone-head h3 {
+    color: var(--color-text-secondary);
+  }
+  .expedition-own-context {
+    margin: var(--spacing-sm) 0;
+  }
+  .expedition-own-context p {
+    margin: var(--spacing-xs) 0 var(--spacing-sm);
+  }
+  .expedition-own-summary,
+  .expedition-card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .expedition-own-summary h3 {
+    margin: 0 0 8px;
+  }
+  .expedition-dungeon-mark {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 56px;
+    color: var(--color-primary);
+  }
+  .expedition-dungeon-mark .ui-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .expedition-progress {
+    width: 100%;
+    height: 8px;
+    accent-color: var(--color-primary);
+  }
+  .expedition-own .expedition-actions {
+    margin-top: 8px;
+  }
+  .expedition-own-requests {
+    border-top: 1px solid var(--color-border-default);
+    margin-top: 16px;
+    padding-top: 12px;
+  }
+  .expedition-own-requests h4 {
+    margin: 0 0 12px;
+  }
+  .expedition-own .expedition-request {
+    flex-basis: 100%;
+    box-sizing: border-box;
+  }
+  .expedition-roster {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .expedition-member {
+    display: flex;
+    height: auto;
+    gap: 6px;
+  }
+  .expedition-member-name {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .expedition-own-empty {
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .expedition-own-empty > .ui-icon {
+    width: 52px;
+    height: 52px;
+    color: var(--color-text-muted);
+  }
+  .expedition-other-empty {
+    padding: 24px 0;
+  }
+  .expedition-other .expedition-helper {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-md) 0 0;
+  }
+  .expedition-pending {
+    margin-bottom: 12px;
+    padding: 12px;
+  }
+  @media (max-width: 700px) {
+    .expedition-zones {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (forced-colors: active) {
+    #expedition-panel,
+    .expedition-own,
+    .expedition-card {
+      background: Canvas;
+      color: CanvasText;
+    }
+    .expedition-shop-wallet,
+    .expedition-reward {
+      background: Canvas;
+      color: CanvasText;
+    }
+    .expedition-collectible {
+      forced-color-adjust: none;
+    }
+    .expedition-hero-art,
+    .expedition-hero-shade {
+      display: none;
+    }
+    .expedition-hero {
+      background: Canvas;
+      color: CanvasText;
+    }
+    .expedition-hero-copy p {
+      color: CanvasText;
+    }
+    .expedition-seat.is-filled {
+      border-color: Highlight;
+    }
+    .expedition-progress {
+      accent-color: Highlight;
+    }
+  }
+  #expedition-panel footer {
+    margin-top: 12px;
+  }
+  #expedition-panel {
+    margin-top: 8px;
+    padding: 12px;
+    --panel-bg-strong:
+      radial-gradient(
+        ellipse 60% 40% at 50% 0%,
+        color-mix(in srgb, var(--color-ranking-ground-glow) 18%, transparent),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        var(--color-ranking-ground-top),
+        var(--color-ranking-ground) 40%,
+        var(--color-ranking-ground-deep)
+      );
+    --color-card-hi: var(--color-ranking-ground-top);
+    --color-card-lo: var(--color-ranking-ground-deep);
+    --color-text-light: var(--color-ranking-text);
+    --color-text-secondary: var(--color-ranking-text-soft);
+    --color-text-muted: var(--color-ranking-text-muted);
+    --color-accent: var(--color-ranking-text);
+    --color-primary: var(--color-ranking-emphasis);
+    --gold: var(--color-gold-400);
+    --border: var(--color-gold-700);
+    width: 1120px;
+    box-sizing: border-box;
+    max-width: calc(
+      var(--app-vw, 100vw) /
+      var(--ui-scale, 1) -
+      var(--expedition-left) -
+      var(--expedition-right)
+    );
+    max-height: calc(
+      var(--app-vh, 100vh) /
+      var(--ui-scale, 1) -
+      var(--expedition-top) -
+      60px -
+      var(--expedition-safe-bottom, env(safe-area-inset-bottom)) /
+      var(--ui-scale, 1)
+    );
+    overflow-y: auto;
+  }
+  #expedition-panel[hidden],
+  [data-expedition-notice][hidden] {
+    display: none;
+  }
+  .expedition-head {
+    border-bottom: 1px solid var(--color-border-default);
+    padding-bottom: var(--spacing-sm);
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .expedition-head h2 {
+    margin: 0;
+  }
+  .expedition-next {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  .expedition-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border-default);
+    padding-bottom: var(--spacing-sm);
+  }
+  .expedition-tabs [aria-current="page"] {
+    border-color: var(--color-primary);
+    color: var(--color-text-light);
+  }
+  .expedition-alerts {
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+  .expedition-alerts .expedition-request {
+    flex: none;
+    width: min(100%, 460px);
+    box-sizing: border-box;
+  }
+  .expedition-cards {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-snap-type: x proximity;
+  }
+  .expedition-card {
+    --color-text-muted: var(--color-text-on-ink-soft);
+    --color-text-secondary: var(--color-text-on-ink-soft);
+    flex: 0 0 280px;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    scroll-snap-align: start;
+  }
+  .expedition-card h3 {
+    margin: 0;
+  }
+  .expedition-card p,
+  .expedition-request p {
+    margin: 8px 0;
+  }
+  .expedition-actions {
+    flex-wrap: wrap;
+  }
+  .expedition-role {
+    display: grid;
+    gap: 4px;
+    width: 100%;
+  }
+  .expedition-role select {
+    width: 100%;
+  }
+  .expedition-requests {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    margin-bottom: 12px;
+  }
+  .expedition-request {
+    flex: 0 0 260px;
+    padding: 12px;
+  }
+  .expedition-run {
+    height: auto;
+    min-height: 40px;
+    padding: 4px 8px;
+    flex-wrap: nowrap;
+    max-width: 420px;
+  }
+  .expedition-run > span {
+    min-width: 0;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .expedition-run > .ui-btn {
+    flex-shrink: 0;
+  }
+  [data-expedition-notice] {
+    margin-top: 8px;
+    padding: 12px;
+    width: 300px;
+    max-width: calc(100dvw - 48px);
+  }
+  [data-expedition-notice] h3 {
+    margin: 0;
+  }
+  [data-expedition-notice] .expedition-request {
+    padding: 0;
+  }
+  .expedition-actions .ui-btn,
+  .expedition-run .ui-btn {
+    min-height: 40px;
+  }
+}

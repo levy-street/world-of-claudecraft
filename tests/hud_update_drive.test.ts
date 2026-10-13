@@ -1096,6 +1096,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the dungeon finder window; an unchanged sig still ticks its 1 Hz clock text',
   },
   {
+    call: 'this.finderSurfaces.expeditions.render',
+    band: 'medium',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/expeditions/expedition_controller.ts',
+      proof: 'if (sig === this.lastSig) {',
+    },
+    why: 'signature-gated bell, entry choice and open expedition cards; no work on identical polls',
+  },
+  {
     call: 'this.dungeonFinderProposalPopup.render',
     band: 'medium',
     gate: 'this.dungeonFinderProposalPopup.isOpen',
@@ -1872,7 +1884,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // surface (51 / 96 measured on the merged tree). The release's Eastbrook
       // ferry countdown panel (hud ferryHud) is one more chrome surface at the
       // fourth release/v0.44.0 base merge (97 measured on the merged tree).
-    ).toEqual({ window: 51, chrome: 97, none: 18 });
+    ).toEqual({ window: 52, chrome: 97, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1895,7 +1907,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // loot window's corpse arm moved OUT of the `none` bucket below into
       // this one: it gained a corpseSig latch when the popup started
       // refreshing instead of only closing.
-      module: 28,
+      module: 29,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -1958,6 +1970,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'hud.ts: if (sig === this.lastTownFocusSig) return;',
         'hud/woc_trade/woc_trade_controller.ts: if (sig === this.lastTradeSig) return;',
         'hud/delve/lockpick_window.ts: if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();',
+        'hud/expeditions/expedition_controller.ts: if (sig === this.lastSig) {',
         // The corpse popup's own latch. `force` is the relocalize arm, which
         // rebuilds through the same guard past a signature a locale switch
         // cannot move, so the flag is part of the line the pin looks for.

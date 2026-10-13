@@ -123,6 +123,22 @@
     /* Typography, Cinzel (heraldic display/headings), Alegreya Sans (UI + body),
        Alegreya (serif flavour prose). Legacy token names alias the canonical set
        so every existing usage resolves to the new system. */
+    --color-finder-ink: #0b1421;
+    --color-finder-surface: #142638;
+    --color-finder-surface-raised: #213a50;
+    --color-finder-line: #3f596b;
+    --color-finder-text: #f4f0e5;
+    --color-finder-muted: #bdcbd5;
+    --color-finder-gold: #f0cd87;
+    --color-finder-gold-deep: #6c4b24;
+    --color-finder-teal: #79dccb;
+    --color-finder-tank: #8dcaff;
+    --color-finder-healer: #8ae2b2;
+    --color-finder-dps: #ffaa91;
+    --color-finder-violet: #d5b5ff;
+    --color-finder-accept-hi: #245f48;
+    --color-finder-accept-lo: #123e30;
+    --dur-finder-reveal: 440ms;
     --font-display: "Cinzel", "Palatino Linotype", Palatino, Georgia, serif;
     --font-ui: "Alegreya Sans", "Segoe UI", system-ui, "Helvetica Neue", sans-serif;
     --font-serif: "Alegreya", "Palatino Linotype", Palatino, Georgia, serif;
@@ -134,6 +150,9 @@
 
     /* --gold is the single source of truth for the primary accent */
     --color-primary: var(--gold);
+    --color-queue-bell-bronze: #c98c55;
+    --color-queue-bell-silver: #ccd2d6;
+    --color-queue-bell-gold: #e5c15a;
     --color-primary-dim: var(--gold-dim);
     --color-primary-glow: rgba(255, 209, 0, 0.2);
     --color-primary-glow-heavy: rgba(255, 209, 0, 0.4);

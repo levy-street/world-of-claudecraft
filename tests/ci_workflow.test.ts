@@ -300,6 +300,7 @@ function screenshotSparseBlocks(source: string): string[] {
 }
 
 describe('CI workflow parity', () => {
+  // Reads the whole tracked text corpus; disk contention is not a CI policy failure.
   it('sparse-checkout on the test jobs covers every referenced screenshot subtree', () => {
     // The five sparse test-job checkouts (pr-gate, both long-sims lanes,
     // release-gate, release-i18n) exclude docs/screenshots DIRECTORIES
@@ -333,6 +334,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/confection-cascade-v6/',
       '            /docs/screenshots/confection-cascade-v7/',
       '            /docs/screenshots/deed-border-cartouche/',
+      '            /docs/screenshots/dungeon-groups/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',
       '            /docs/screenshots/far-foliage-impostors/',
@@ -576,7 +578,7 @@ describe('CI workflow parity', () => {
     expect([...referenced].filter((dir) => !workflowScopedFollowup.has(dir)).sort()).toEqual(
       [...coneDirs].sort(),
     );
-  });
+  }, 60_000);
 
   it('performs no hand-rolled directory reads (the corpus is the git index)', () => {
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);

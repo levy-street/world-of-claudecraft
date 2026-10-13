@@ -1237,6 +1237,7 @@ const baseEnTable = {
   'dfinder.alreadyListing': 'You already lead a group listing.',
   'dfinder.noListing': 'You do not lead a group listing.',
   'dfinder.alreadyApplied': 'You already have a pending application.',
+  'dfinder.expeditionApplicationCap': 'You may have at most 5 pending expedition applications.',
   'dfinder.applyInParty': 'Leave your party before applying to a listing.',
   'dfinder.noRoom': 'That listing has no room for your roles.',
   'dfinder.noApplication': 'You have no pending application.',
@@ -20578,7 +20579,7 @@ const RULES: Rule[] = [
   { re: /^The royal door is sealed to you\.$/, build: () => tRaidExtra('royalDoorSealed') },
   { re: /^You are locked to Nythraxis Raid Arena\.$/, build: () => tRaidExtra('locked') },
   {
-    re: /^Nythraxis is engaged — the royal door has sealed shut\.$/,
+    re: /^Nythraxis is engaged (?:\u2014|-) the royal door has sealed shut\.$/,
     build: () => tRaidExtra('engagedSealed'),
   },
   {

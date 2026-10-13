@@ -33,9 +33,10 @@ boost groups. Existing manually created groups and physical dungeon entry rules 
 
 ### Roles
 
-- At level 10 and above, selected roles must match the active talent specialization. A character
-  without an active specialization cannot queue or apply.
-- Below level 10, compatible roles come from a fixed class capability table:
+- At every level, players select roles from their class capabilities independently of their
+  active specialization. Selecting a role never changes talents or equipment, and does not
+  require choosing or changing a specialization first.
+- Compatible roles come from a fixed class capability table:
   - Tank: warrior, paladin, druid.
   - Healer: paladin, priest, shaman, druid.
   - DPS: every class.
@@ -62,9 +63,17 @@ boost groups. Existing manually created groups and physical dungeon entry rules 
 
 - A party leader creates one listing for one activity and difficulty.
 - A listing advertises its current roster, assigned or compatible roles, and missing role slots.
-- It uses localized structured tags instead of free-form text: first run, quest run, full clear,
+- The Finder board uses localized structured tags: first run, quest run, full clear,
   learning welcome, and fast run.
-- Eligible solo players apply with one or more compatible roles.
+- The bell opens the single Groups board. Creating a group switches that window to a
+  dedicated form with dungeon or raid category, grouped Normal and Heroic choices, one
+  compatible player role, and structured tags. Open listings do not compete with Publish.
+- Publishing stages the selected role and listing through the existing authoritative commands.
+  Selecting or cancelling a draft does not mutate the player's roles or queue state.
+- The board includes pre-entry listings and running expeditions. Publishing or accepting
+  never teleports players.
+- Eligible solo players choose compatible roles when applying. Acceptance revalidates role
+  compatibility and preserves the assigned role in the resulting roster.
 - The leader accepts or declines each application. Acceptance directly adds the applicant through
   the authoritative party machine after revalidating capacity, level, role fit, online state, and
   party state.
@@ -127,9 +136,19 @@ money, and counts use locale-aware formatters.
 - Add `src/ui/dungeon_finder_view.ts`, a DOM-free pure view builder registered in the UI pure-core
   guard and tested with Sim-shaped and ClientWorld-shaped inputs.
 - Add `src/ui/dungeon_finder_window.ts`, a thin painter composed by `Hud`.
-- The window has Catalogue, Quick Match, and Premade Groups modes. Desktop uses a two-column
-  master-detail layout. Mobile uses one navigable pane with a stable back action and bottom action
-  bar.
+- Groups is the single default window for the bell, browsing, recruitment, and managing
+  the player's group. There is no separate Open Expeditions browser or primary tab strip.
+  Catalogue and Quick Match remain explicit secondary entry points in the window API.
+- The player's group appears before other listings, with applications and current expedition
+  controls. Member and applicant cards show class color and icon, exact localized specialization,
+  level, and a distinct tank, healer, or DPS badge. Mobile member rows are compact.
+- Activity cards use panoramic scenery rather than enlarged boss portraits. The creation form
+  keeps Publish reachable while scrolling and separates dungeon and raid choices.
+- The bell reports listing and application changes and opens Groups. The only exposed alert
+  setting is sound. Legacy helper role/availability controls and helper rewards/shop UI are
+  hidden. Helper rewards are paused in the shared simulation: no participation bookkeeping,
+  new points, purchases, equips, or unequips. Existing saved reward progress and read-only
+  projections remain compatible and are not erased.
 - Add a desktop micro button, a mobile More button, and a rebindable `Shift+I` default action.
   Existing `I` calendar behavior remains unchanged.
 - Opening traps focus and closing restores it. All controls meet mobile target sizes, support
@@ -156,7 +175,7 @@ money, and counts use locale-aware formatters.
 ### Pure and simulation tests
 
 - Activity level boundaries, including every minimum and maximum.
-- Pre-level-10 class role compatibility and level-10 specialization enforcement.
+- Class role compatibility independent of level or active specialization; unsupported roles rejected.
 - Exact 1/1/3 and 2/2/6 role assignment, multi-role selection, and impossible compositions.
 - FIFO deterministic activity intersection and partial-party preservation.
 - Proposal accept, decline, timeout, cooldown, and original-join-time restoration.
@@ -176,7 +195,7 @@ money, and counts use locale-aware formatters.
 ### UI, accessibility, and performance tests
 
 - Catalogue and detail completeness for every activity, encounter, and loot source.
-- Quick Match and Premade Groups state transitions.
+- Groups browse/create/cancel transitions and secondary catalogue/queue entry points.
 - Focus trap, focus return, keyboard reachability, accessible names, and mobile target floors.
 - Render signature skips unchanged DOM work and closed state performs zero work.
 - Desktop, mobile portrait, and mobile landscape browser screenshots.
@@ -194,3 +213,10 @@ money, and counts use locale-aware formatters.
 7. Closed finder cost is effectively zero and unchanged open state causes no repeated DOM rebuild.
 8. Desktop and mobile flows meet the repository accessibility and visual QA contracts.
 9. Focused tests, architecture and localization guards, typecheck, builds, and `npm run gate` pass.
+
+## Visual evidence
+
+`docs/screenshots/dungeon-groups/README.md` identifies the current desktop/mobile captures
+and the earlier intermediate UI references. Reproduce the current isolated UI fixture with
+`scripts/dungeon_expeditions_shot.mjs` against Vite. These screenshots exercise the shipping
+window and CSS with sample data; they are not evidence of multiplayer command delivery.

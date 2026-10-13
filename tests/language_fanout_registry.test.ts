@@ -231,6 +231,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.charWindow.renderIfOpen|',
   'this.arenaWindow.relocalize|',
   'this.dungeonFinderWindow.relocalize|',
+  'this.finderSurfaces.expeditions.relocalize|',
   'this.dungeonFinderProposalPopup.relocalize|',
   'this.bgProposalPopup.relocalize|',
   'this.questDialog.relocalize|',
@@ -342,6 +343,12 @@ interface AnsweredSurface extends GatedModule {
 }
 
 const ANSWERED: readonly AnsweredSurface[] = [
+  {
+    file: 'hud/expeditions/expedition_controller.ts',
+    memos: ['lastSig'],
+    answer: 'this.finderSurfaces.expeditions.relocalize',
+    why: 'open groups, current claim and requests use a language-independent signature; relocalize repaints their text',
+  },
   {
     file: 'hud/loot/loot_window_controller.ts',
     memos: ['corpseSig', 'harvestStatusSig'],
@@ -678,6 +685,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly memos: readonly string[];
   readonly reason: string;
 }> = [
+  {
+    file: 'hud/expeditions/expedition_controller.ts',
+    memos: ['lastWorld'],
+    reason:
+      'lastWorld tracks the bound IWorld identity and resets character-local notification history. lastSig gates bell labels; the relocalize arm above clears it and refreshes the label through the shared writers.',
+  },
   {
     file: 'hud/vehicle/forge_action_bar_controller.ts',
     memos: ['lastClock'],
@@ -1676,7 +1689,8 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // 37 on the merged tree: both pairs above are present.
       // 38 at the release/v0.43.0 merge into feature/world-quests: the forge
       // action bar's numeric world-quest clock memo.
-    ).toBe(38);
+      // The expedition controller adds its world-identity lifecycle latch.
+    ).toBe(39);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {
@@ -1742,13 +1756,23 @@ function builderOwnedClasses(armCall: string): Set<string> {
   const owned = new Set<string>();
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
   const hud = strippedHudSource;
-  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
-  if (!assigned) return owned;
-  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  const path = field.split('.');
+  const assigned = new RegExp(`\\b${field}\\s*=\\s*(?:this\\.)?(\\w+)\\.(\\w+);`).exec(hud);
+  if (!assigned && path.length !== 2) return owned;
+  const owner = assigned?.[1] ?? path[0];
+  const property = assigned?.[2] ?? path[1];
+  const built = new RegExp(`\\b${owner}\\s*=\\s*(\\w+)\\(`).exec(hud);
   if (!built) return owned;
   for (const { source } of uiSources) {
     if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;
-    for (const [, cls] of source.matchAll(/\bnew (\w+)\(/g)) owned.add(cls);
+    // Follow the actual returned property, never credit every class a factory constructs.
+    const constructed = new RegExp(`\\b${property}:\\s*new (\\w+)\\(`).exec(source);
+    if (constructed) owned.add(constructed[1]);
+    // A returned shorthand property can refer to a local constructor binding.
+    // Require both edges instead of crediting unrelated classes in the factory.
+    const returned = new RegExp(`return\\s*\\{[\\s\\S]*?\\b${property}\\s*[,}]`).test(source);
+    const binding = new RegExp(`\\bconst ${property}\\s*=\\s*new (\\w+)\\(`).exec(source);
+    if (returned && binding) owned.add(binding[1]);
     return owned;
   }
   return owned;

@@ -535,6 +535,10 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonFinderApply', kind: 'method' },
   { name: 'dungeonFinderApplyCancel', kind: 'method' },
   { name: 'dungeonFinderApplicationRespond', kind: 'method' },
+  { name: 'dungeonFinderExpeditionOpen', kind: 'method' },
+  { name: 'dungeonFinderExpeditionTravel', kind: 'method' },
+  { name: 'dungeonFinderExpeditionApply', kind: 'method' },
+  { name: 'dungeonFinderExpeditionConfigure', kind: 'method' },
   // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title/border
   // reads + the two cosmetic selection commands ---
   { name: 'deedsEarned', kind: 'data' },
@@ -937,9 +941,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
-    expect(IWORLD_MEMBERS.length).toBe(424);
+    // Open expedition publication, atomic role application and safe travel add three methods.
+    expect(IWORLD_MEMBERS.length).toBe(428);
     expect(DATA_MEMBERS.length).toBe(126);
-    expect(METHOD_MEMBERS.length).toBe(298);
+    expect(METHOD_MEMBERS.length).toBe(302);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1079,6 +1084,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderApply',
       'dungeonFinderApplyCancel',
       'dungeonFinderBoard',
+      'dungeonFinderExpeditionApply',
+      'dungeonFinderExpeditionConfigure',
+      'dungeonFinderExpeditionOpen',
+      'dungeonFinderExpeditionTravel',
       'dungeonFinderInfo',
       'dungeonFinderListingClose',
       'dungeonFinderListingCreate',
@@ -1593,6 +1602,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderApplicationRespond',
       'dungeonFinderApply',
       'dungeonFinderApplyCancel',
+      'dungeonFinderExpeditionApply',
+      'dungeonFinderExpeditionConfigure',
+      'dungeonFinderExpeditionOpen',
+      'dungeonFinderExpeditionTravel',
       'dungeonFinderListingClose',
       'dungeonFinderListingCreate',
       'dungeonFinderQueueJoin',
@@ -2368,6 +2381,10 @@ const FACET_DUNGEON_FINDER = [
   'dungeonFinderApply',
   'dungeonFinderApplyCancel',
   'dungeonFinderApplicationRespond',
+  'dungeonFinderExpeditionOpen',
+  'dungeonFinderExpeditionTravel',
+  'dungeonFinderExpeditionApply',
+  'dungeonFinderExpeditionConfigure',
 ] as const satisfies readonly (keyof IWorldDungeonFinder)[];
 type _ExhaustDungeonFinder = AssertNever<
   Exclude<keyof IWorldDungeonFinder, (typeof FACET_DUNGEON_FINDER)[number]>
@@ -2621,8 +2638,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(424);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(424);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(428);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(428);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

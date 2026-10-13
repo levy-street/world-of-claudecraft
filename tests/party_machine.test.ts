@@ -61,6 +61,7 @@ function makeCtx() {
     },
     bumpDeedStat() {},
     inheritDungeonResetLocks() {},
+    onDungeonFinderPartyJoined() {},
     emit(ev: SimEvent) {
       events.push(ev);
     },

@@ -1,11 +1,31 @@
 // IWorldDungeonFinder: the Dungeon Finder facet (docs/prd/dungeon-finder.md).
-// Snapshot reads + queue/listing commands. The finder forms parties/raids only:
-// it never teleports, enters an instance, or changes dungeon difficulty.
+// Snapshot reads, queue/listing commands and open running expeditions:
+// expedition travel rejoins an existing claim without resetting its progress.
 // Layer-agnostic: type-only sim imports, no t(), no DOM (guarded by
 // tests/architecture.test.ts).
 import type { FinderListingTag } from '../sim/content/dungeon_finder';
+import type { QueueRewardId } from '../sim/content/queue_rewards';
 import type { Role } from '../sim/content/talents';
+import type {
+  ExpeditionAvailability,
+  ExpeditionDetails,
+  ExpeditionFeedback,
+} from '../sim/social/expedition_social';
 import type { PlayerClass } from '../sim/types';
+
+export type ExpeditionSettings =
+  | { kind: 'recruit'; activityId: string; role: Role; details: ExpeditionDetails }
+  | { kind: 'details'; details: ExpeditionDetails }
+  | { kind: 'available'; enabled: boolean; roles: Role[] }
+  | { kind: 'reward'; id: QueueRewardId | null; buy: boolean }
+  | { kind: 'cancel_application'; listingId: number };
+
+export interface DungeonFinderApplicationView {
+  listingId: number;
+  remaining?: number;
+  leaderName?: string;
+  activityId?: string;
+}
 
 // My automatic-queue state. `waited` is whole seconds since the original join
 // (preserved when a failed proposal returns the unit to the queue).
@@ -33,8 +53,10 @@ export interface DungeonFinderApplicantView {
   pid: number;
   name: string;
   cls: PlayerClass;
+  spec?: string | null; // actual chosen specialization, absent on older snapshots
   level: number;
   roles: Role[]; // the applicant's compatible selected roles
+  remaining?: number;
 }
 
 // My own published listing (present only for its leader).
@@ -43,6 +65,20 @@ export interface DungeonFinderMyListingView {
   activityId: string;
   tags: FinderListingTag[];
   applicants: DungeonFinderApplicantView[];
+  details?: ExpeditionDetails;
+}
+
+export interface DungeonFinderExpeditionView {
+  exitId: number;
+  activityId: string;
+  dungeonId: string;
+  leaderPid: number;
+  isLeader: boolean;
+  isInside: boolean;
+  canTravel: boolean;
+  open: boolean;
+  bossesDefeated: number;
+  bossesTotal: number;
 }
 
 // Per-player finder snapshot (the `df` self field online).
@@ -53,15 +89,28 @@ export interface DungeonFinderInfo {
   cooldown: number; // whole seconds until I may queue again (0 = clear)
   proposal: DungeonFinderProposalView | null;
   myListing: DungeonFinderMyListingView | null;
-  myApplication: { listingId: number } | null;
+  myApplication: DungeonFinderApplicationView | null;
+  myApplications?: DungeonFinderApplicationView[];
+  expedition?: DungeonFinderExpeditionView | null;
+  availability?: ExpeditionAvailability;
+  applicationFeedback?: ExpeditionFeedback | null;
+  queueRewards?: {
+    balance: number;
+    earnedToday: number;
+    dailyCap: number;
+    unlocked: QueueRewardId[];
+    equipped: QueueRewardId | null;
+  };
 }
 
 // One row of the public premade board. Viewer-independent (the board is shared
-// realm state; "did I apply" is derived client-side from myApplication).
+// realm state; "did I apply" is derived client-side from myApplications).
 export interface DungeonFinderListingView {
   id: number;
   activityId: string;
   leaderName: string;
+  expedition?: { bossesDefeated: number; bossesTotal: number };
+  details?: ExpeditionDetails;
   tags: FinderListingTag[];
   size: number; // current member count
   capacity: number; // activity size
@@ -89,6 +138,10 @@ export interface IWorldDungeonFinder {
   // Publish / close my premade listing for one activity.
   dungeonFinderListingCreate(activityId: string, tags: FinderListingTag[]): void;
   dungeonFinderListingClose(): void;
+  dungeonFinderExpeditionOpen(): void;
+  dungeonFinderExpeditionTravel(): void;
+  dungeonFinderExpeditionApply(listingId: number, role: Role): void;
+  dungeonFinderExpeditionConfigure(settings: ExpeditionSettings): void;
   // Apply to a listing / withdraw my pending application.
   dungeonFinderApply(listingId: number): void;
   dungeonFinderApplyCancel(): void;

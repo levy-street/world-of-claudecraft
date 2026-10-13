@@ -13,6 +13,221 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.adventureGuide.title': 'Путеводитель по приключениям',
+  'hudChrome.adventureGuide.eyebrow': 'Журнал экспедиций',
+  'hudChrome.adventureGuide.intro': 'Откройте мир. Изучите врага. Выберите следующее приключение.',
+  'hudChrome.adventureGuide.dungeons': 'Подземелья',
+  'hudChrome.adventureGuide.raids': 'Рейды',
+  'hudChrome.adventureGuide.delves': 'Вылазки',
+  'hudChrome.adventureGuide.search': 'Поиск приключений',
+  'hudChrome.adventureGuide.eligible': 'Мой уровень',
+  'hudChrome.adventureGuide.catalogueCount': 'Приключений: {count}',
+  'hudChrome.adventureGuide.empty': 'По этим фильтрам приключений не найдено.',
+  'hudChrome.adventureGuide.reset': 'Сбросить фильтры',
+  'hudChrome.adventureGuide.delve': 'Вылазка',
+  'hudChrome.adventureGuide.delveTravel':
+    'Войдите через вход в вылазку. Выберите ступень на доске у входа; автоматический подбор группы недоступен.',
+  'hudChrome.adventureGuide.dungeonTravel':
+    'Изучите бои ниже, затем выберите группу или отправляйтесь ко входу.',
+  'hudChrome.adventureGuide.raidTravel':
+    'Соберите рейд, изучите бои и проверьте сохранение рейда перед входом.',
+  'hudChrome.adventureGuide.soloTravel':
+    'Одиночное приключение. Чтобы начать, отправляйтесь ко входу.',
+  'hudChrome.adventureGuide.browseOnly': 'Отправиться ко входу',
+  'hudChrome.adventureGuide.findGroup': 'Найти группу',
+  'hudChrome.adventureGuide.inspectLoot': 'Возможная добыча',
+  'hudChrome.adventureGuide.lootClass': 'Класс',
+  'hudChrome.adventureGuide.lootSpec': 'Специализация',
+  'hudChrome.adventureGuide.allSpecs': 'Все специализации',
+  'hudChrome.adventureGuide.lootHint':
+    'Доступное снаряжение с характеристиками, подходящими выбранной специализации. Общие награды остаются видимыми. Вероятности выпадения рассчитаны по полной таблице добычи.',
+  'hudChrome.adventureGuide.lootEmpty': 'Нет снаряжения для этого класса и специализации.',
+  'hudChrome.adventureGuide.fullTableRoll': 'Один предмет из полной таблицы добычи',
+  'hudChrome.adventureGuide.encountersCount': 'Боёв: {count}',
+  'hudChrome.adventureGuide.tiers': 'Доступные ступени: {tiers}',
+  'hudChrome.expeditions.bell': 'Открыть группы: уведомлений {count}',
+  'hudChrome.expeditions.alerts': 'Уведомления',
+  'hudChrome.expeditions.groups': 'Группы',
+  'hudChrome.expeditions.rewards': 'Награды',
+  'hudChrome.expeditions.sections': 'Разделы экспедиций',
+  'hudChrome.expeditions.noAlerts': 'Нет уведомлений об экспедициях, требующих вашего внимания.',
+  'hudChrome.expeditions.findGroup': 'Найти группу',
+  'hudChrome.expeditions.recruitPlayers': 'Набрать игроков',
+  'hudChrome.expeditions.recruitIntro':
+    'Выберите подземелье и цель группы. Проверьте объявление и опубликуйте его.',
+  'hudChrome.expeditions.recruitDungeon': 'Подземелье',
+  'hudChrome.expeditions.recruitDifficulty': 'Сложность',
+  'hudChrome.expeditions.recruitPreview': 'Предпросмотр объявления',
+  'hudChrome.expeditions.recruitPublish': 'Опубликовать группу',
+  'hudChrome.expeditions.recruitPublishing': 'Публикация группы...',
+  'hudChrome.expeditions.recruitBeforeEntry':
+    'Можно набирать игроков до входа в подземелье. Публикация не телепортирует группу.',
+  'hudChrome.expeditions.recruitUnconfirmed':
+    'Объявление не подтверждено. Проверьте соединение или сообщения в чате и повторите попытку.',
+  'hudChrome.expeditions.recruitLoading': 'Загрузка вариантов набора...',
+  'hudChrome.expeditions.recruitAlreadyOpen': 'Набор уже открыт. Перейдите к управлению группой.',
+  'hudChrome.expeditions.recruitExistingRun':
+    'У вас уже есть экспедиция. Управляйте набором в разделе «Ваша группа».',
+  'hudChrome.expeditions.recruitLeaveQueue':
+    'Покиньте очередь подбора перед публикацией своей группы.',
+  'hudChrome.expeditions.recruitFinishProposal':
+    'Ответьте на приглашение подбора группы перед публикацией группы.',
+  'hudChrome.expeditions.recruitCancelRequests':
+    'Отзовите ожидающие ответа заявки перед публикацией своей группы.',
+  'hudChrome.expeditions.recruitNoActivities':
+    'Нет подземелий, подходящих вашей группе по уровню и числу мест.',
+  'hudChrome.expeditions.recruitNoRoles': 'Для вашего персонажа нет доступных подходящих ролей.',
+  'hudChrome.expeditions.recruitInvalidNote':
+    'Заметка должна содержать не более 120 символов без управляющих символов.',
+  'hudChrome.expeditions.manageRecruitment': 'Управление набором',
+  'hudChrome.expeditions.formingGroup': 'Сбор группы',
+  'hudChrome.expeditions.groupGathering':
+    'Ваша группа собирается. Когда будете готовы, соберитесь у входа в подземелье.',
+  'hudChrome.expeditions.groupChooseDungeon':
+    'Выберите подземелье для группы и наберите недостающих игроков.',
+  'hudChrome.expeditions.waitForLeader': 'Лидер группы может выбрать подземелье и открыть набор.',
+  'hudChrome.expeditions.recruitmentNext':
+    'Набор открыт. Когда будете готовы, соберите группу у входа в подземелье.',
+  'hudChrome.expeditions.findGroupNext':
+    'Вы не состоите в группе. Найдите группу, чтобы начать экспедицию.',
+  'hudChrome.expeditions.awaitingReply': 'Ожидание ответа от групп: {count}.',
+  'hudChrome.expeditions.requestSent': 'Заявка отправлена. Ожидание ответа лидера группы.',
+  'hudChrome.expeditions.readyToTravel':
+    'Группа готова. Отправляйтесь в подземелье, когда будете готовы.',
+  'hudChrome.expeditions.groupRecruiting': 'Ваша экспедиция продолжается. Набор открыт.',
+  'hudChrome.expeditions.groupInProgress': 'Ваша экспедиция продолжается.',
+  'hudChrome.expeditions.title': 'Открытые экспедиции',
+  'hudChrome.expeditions.entryTitle': 'Идти одному или открыть группу?',
+  'hudChrome.expeditions.entryBody': 'Начните сейчас. Группу можно открыть позже в любой момент.',
+  'hudChrome.expeditions.open': 'Открыть группу',
+  'hudChrome.expeditions.closeRecruitment': 'Закрыть набор',
+  'hudChrome.expeditions.travel': 'Отправиться к группе',
+  'hudChrome.expeditions.request': '{name} хочет присоединиться в роли: {role}.',
+  'hudChrome.expeditions.level': 'Уровень {level}',
+  'hudChrome.expeditions.accept': 'Принять',
+  'hudChrome.expeditions.decline': 'Отклонить',
+  'hudChrome.expeditions.acceptPlayer': 'Принять игрока',
+  'hudChrome.expeditions.declinePlayer': 'Отклонить игрока',
+  'hudChrome.expeditions.chooseRole': 'Ваша роль',
+  'hudChrome.expeditions.send': 'Отправить заявку',
+  'hudChrome.expeditions.confirmRequest': 'Подтвердить заявку',
+  'hudChrome.expeditions.chooseRoleAction': 'Выбрать роль',
+  'hudChrome.expeditions.cancel': 'Отмена',
+  'hudChrome.expeditions.pending': 'Заявка ожидает ответа',
+  'hudChrome.expeditions.join': 'Подать заявку',
+  'hudChrome.expeditions.members': 'Игроков: {current}/{total}',
+  'hudChrome.expeditions.progress': 'Боссов побеждено: {defeated}/{total}',
+  'hudChrome.expeditions.needed': 'Рекомендуемые роли: {roles}',
+  'hudChrome.expeditions.close': 'Закрыть',
+  'hudChrome.expeditions.empty': 'Сейчас нет открытых экспедиций.',
+  'hudChrome.expeditions.finder': 'Открыть поиск подземелий',
+  'hudChrome.expeditions.groupsCount': 'Открытых групп: {count}',
+  'hudChrome.expeditions.requestsCount': 'Заявок на вступление: {count}',
+  'hudChrome.expeditions.yourGroup': 'Ваша группа',
+  'hudChrome.expeditions.otherGroups': 'Другие группы',
+  'hudChrome.expeditions.manageGroup': 'Ваша экспедиция и заявки на вступление',
+  'hudChrome.expeditions.browseGroups': 'Выберите группу, которой хотите помочь',
+  'hudChrome.expeditions.noCurrentGroup': 'Вы не участвуете в экспедиции.',
+  'hudChrome.expeditions.noCurrentGroupHint': 'Войдите в подземелье или подайте заявку в группу.',
+  'hudChrome.expeditions.recruitmentOpen': 'Набор открыт',
+  'hudChrome.expeditions.recruitmentClosed': 'Набор закрыт',
+  'hudChrome.expeditions.groupRoster': 'Участники группы',
+  'hudChrome.expeditions.noRequests': 'Нет заявок, ожидающих ответа.',
+  'hudChrome.expeditions.requestsCombat': 'Есть ожидающие заявки. Рассмотрите их после боя.',
+  'hudChrome.expeditions.expires': 'Истекает через {time}',
+  'hudChrome.expeditions.waiting': 'Ожидание ответа от {name}.',
+  'hudChrome.expeditions.outcomeAccepted':
+    '{name} принимает вашу заявку. Когда будете готовы, нажмите «Отправиться к группе».',
+  'hudChrome.expeditions.outcomeDeclined': '{name} отклоняет вашу заявку.',
+  'hudChrome.expeditions.outcomeExpired': 'Срок заявки истёк. Можно отправить новую.',
+  'hudChrome.expeditions.outcomeCancelled': 'Вы отменили заявку.',
+  'hudChrome.expeditions.outcomeClosed': 'Эта группа больше не принимает вашу заявку.',
+  'hudChrome.expeditions.editDetails': 'Изменить сведения о группе',
+  'hudChrome.expeditions.purpose': 'Цель группы',
+  'hudChrome.expeditions.purposeFirstTime': 'Первый раз',
+  'hudChrome.expeditions.purposeRelaxed': 'Спокойное прохождение',
+  'hudChrome.expeditions.purposeClear': 'Пройти подземелье',
+  'hudChrome.expeditions.purposeNeedsHelp': 'Нужна помощь',
+  'hudChrome.expeditions.note': 'Краткая заметка (необязательно, до 120 символов)',
+  'hudChrome.expeditions.saveDetails': 'Сохранить сведения',
+  'hudChrome.expeditions.available': 'Готов помочь',
+  'hudChrome.expeditions.stopHelping': 'Отключить уведомления о помощи',
+  'hudChrome.expeditions.helperRoles': 'Предлагаемые вами роли',
+  'hudChrome.expeditions.helperOn':
+    'Уведомления о помощи включены. Вы сами выбираете, к какой группе присоединиться.',
+  'hudChrome.expeditions.helperPaused':
+    'Уведомления о помощи приостановлены, пока вы в группе, в очереди или ожидаете ответа на заявку.',
+  'hudChrome.expeditions.helperFound': 'Подходящих групп, которым нужна помощь: {count}.',
+  'hudChrome.expeditions.viewGroups': 'Посмотреть группы',
+  'hudChrome.expeditions.sound': 'Звуковой сигнал при появлении новых групп и заявок',
+  'hudChrome.expeditions.shop': 'Магазин очков подбора',
+  'hudChrome.expeditions.backToGroups': 'Назад к группам',
+  'hudChrome.expeditions.shopIntro': 'Награда за помощь',
+  'hudChrome.expeditions.shopDescription':
+    'Тратьте очки, полученные за помощь другим игрокам в завершении экспедиций.',
+  'hudChrome.expeditions.shopCollection': 'Коллекция колокольчиков',
+  'hudChrome.expeditions.shopOwned': 'В вашей коллекции',
+  'hudChrome.expeditions.shopLocked': 'Можно открыть',
+  'hudChrome.expeditions.shopRules': 'Как заработать очки',
+  'hudChrome.expeditions.pendingRequests': 'Ваши ожидающие заявки: {count}/5',
+  'hudChrome.expeditions.multiApplyHint':
+    'Можно подать заявки в пять групп. Вступление в одну отзовёт остальные заявки.',
+  'hudChrome.expeditions.multiApplyLimit':
+    'У вас уже пять ожидающих заявок. Отмените одну, чтобы подать заявку в другую группу.',
+  'hudChrome.expeditions.points': 'Очки подбора: {count}',
+  'hudChrome.expeditions.dailyPoints': 'Получено сегодня: {earned}/{cap}',
+  'hudChrome.expeditions.rewardRules':
+    'Помощники получают 5 очков за каждого босса, для которого выполнены условия участия, и 10 за завершение. Очки выдаются после прохождения подземелья. Для зачёта участия нанесите или получите эффективный урон либо восстановите здоровье на величину не менее 1% здоровья каждого босса. Каждый босс и завершение дают очки один раз в день для каждой сложности подземелья, не более 60 очков в день. Вступление в группу или ожидание у входа не дают очков.',
+  'hudChrome.expeditions.rewardScope':
+    'Оформления колокольчика навсегда открываются этому персонажу. Они не влияют на игровой процесс.',
+  'hudChrome.expeditions.bronze': 'Бронзовый колокольчик',
+  'hudChrome.expeditions.silver': 'Серебряный колокольчик',
+  'hudChrome.expeditions.gold': 'Золотой колокольчик',
+  'hudChrome.expeditions.price': 'Очки подбора: {count}',
+  'hudChrome.expeditions.buy': 'Купить и применить',
+  'hudChrome.expeditions.equip': 'Применить',
+  'hudChrome.expeditions.equipped': 'Применено',
+  'hudChrome.expeditions.defaultBell': 'Стандартный колокольчик',
+  'hudChrome.expeditions.dismiss': 'Скрыть',
+  'hudChrome.finder.groups': 'Группы',
+  'hudChrome.finder.dungeonGuide': 'Путеводитель по подземельям',
+  'hudChrome.finder.backToGroups': 'Назад к группам',
+  'hudChrome.finder.createGroup': 'Создать группу',
+  'hudChrome.finder.cancelCreate': 'Отмена',
+  'hudChrome.finder.activeQueue': 'Ваша очередь',
+  'hudChrome.finder.yourRole': 'Ваша роль',
+  'hudChrome.finder.createQueueLocked': 'Покиньте очередь подбора перед публикацией.',
+  'hudChrome.finder.noCreateActivities': 'В этой категории нет доступных вам занятий.',
+  'hudChrome.finder.showGuide': 'Показать руководство',
+  'hudChrome.finder.hideGuide': 'Скрыть руководство',
+  'hudChrome.finder.levelUnavailable': 'Не подходит вашему уровню',
+  'hudChrome.finder.guideUnavailable': 'Подробная тактика для этого боя пока недоступна.',
+  'hudChrome.finder.guide.pulse':
+    'Периодически наносит урон игрокам рядом с боссом. Бойцы дальнего боя и лекари могут уменьшить получаемый урон, держась на расстоянии. Лекарям следует подготовиться к исцелению игроков ближнего боя.',
+  'hudChrome.finder.guide.cleave':
+    'Удары ближнего боя также наносят урон другим игрокам рядом с текущей целью. Держитесь подальше от танка; позиция за спиной босса сама по себе не защищает от этого урона по области.',
+  'hudChrome.finder.guide.adds':
+    'По ходу боя прибывают подкрепления. Танк должен собрать их, прежде чем они доберутся до лекаря. Бойцам следует помочь уничтожить их, чтобы группе не пришлось сражаться сразу с несколькими волнами.',
+  'hudChrome.finder.guide.enrage':
+    'При низком здоровье босс атакует быстрее и наносит больше урона. Сохраните защитные и лечебные способности с долгим восстановлением для этой заключительной части боя и добейте босса, продолжая соблюдать остальные механики.',
+  'hudChrome.finder.guide.stomp':
+    'Периодический удар наносит урон и ненадолго оглушает ближайших игроков. Лекарям и бойцам дальнего боя следует держаться подальше. Поддерживайте здоровье танка перед ударом: оглушённые союзники рядом могут оказаться не в состоянии действовать.',
+  'hudChrome.finder.guide.inferno':
+    'Босс прекращает двигаться и атаковать, поддерживая всё более сильные огненные импульсы. Отойдите от босса сразу после начала поддержания и вернитесь, когда оно закончится. Рассредоточение внутри огня не защищает от урона.',
+  'hudChrome.finder.guide.mending':
+    'Периодически исцеляет раненых ближайших союзников, включая себя. Сосредоточьте урон на лекаре и не приводите дополнительных врагов в область его исцеления. Это мгновенный эффект, его нельзя прервать как произнесение заклинания.',
+  'hudChrome.finder.guide.manaBurn':
+    'Успешные удары ближнего боя могут отнимать ману у цели, использующей ману. Не позволяйте боссу атаковать лекаря и других уязвимых заклинателей. Персонажи с яростью или энергией не теряют ресурсы от этого эффекта.',
+  'hudChrome.finder.guide.mortalWound':
+    'Удары ближнего боя могут уменьшать получаемое целью исцеление. Пока действует рана, используйте защитные способности с долгим восстановлением; лекарю потребуется больше исцеления, чтобы восстановить то же количество здоровья.',
+  'hudChrome.finder.guide.bleed':
+    'Удары ближнего боя могут вызывать кровотечение, продолжающее наносить урон жертве. Следите за раненым игроком, даже если враг сменил цель, и восстанавливайте его здоровье, пока действует кровотечение.',
+  'hudChrome.finder.guide.haste':
+    'Периодически увеличивает скорость атаки ближайших союзников. Не сражайтесь с дополнительными группами врагов рядом с повелителем зверей. Подготовьте защитные способности с долгим восстановлением, когда эффект получают несколько врагов.',
+  'hudChrome.finder.guide.ward':
+    'Периодически накладывает на ближайших союзников щит, поглощающий урон. Вместе атакуйте одну цель, чтобы пробить щит и добить её до следующего щита, вместо распределения урона по всей группе врагов.',
+  'hudChrome.finder.guide.knockback':
+    'Удары ближнего боя могут отбрасывать цель. Оставьте за танком безопасное пространство, не стойте рядом с ещё не вступившими в бой врагами и будьте готовы снова подойти на расстояние ближнего боя после отбрасывания.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',

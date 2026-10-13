@@ -1,13 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import {
-  chmodSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  utimesSync,
-  writeFileSync,
-} from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -262,7 +254,7 @@ describe('Discord bot healthcheck probe, executed', () => {
   // Runs the probe exactly as the container healthcheck does and reports its exit
   // code. Both heartbeat keys are always set explicitly (to '' when the case means
   // "unset") so an ambient value in the test environment cannot leak in.
-  const probeExit = (heartbeatFile: string, staleMs: string) => {
+  const probeExit = (heartbeatFile: string, staleMs: string, preload?: string) => {
     // Loud, not vacuous: `node -e ''` exits 0, so a failed extraction would turn
     // every all-zeros case below (the padded path, the non-positive knobs) into a
     // pass that executed nothing. The structural suite reds too, but each executed
@@ -270,14 +262,18 @@ describe('Discord bot healthcheck probe, executed', () => {
     if (!healthcheckProbe)
       throw new Error('healthcheck probe not extracted from docker-compose.yml');
     try {
-      execFileSync(process.execPath, ['-e', healthcheckProbe], {
-        env: {
-          ...process.env,
-          DISCORD_HEARTBEAT_FILE: heartbeatFile,
-          DISCORD_HEARTBEAT_STALE_MS: staleMs,
+      execFileSync(
+        process.execPath,
+        [...(preload ? ['--require', preload] : []), '-e', healthcheckProbe],
+        {
+          env: {
+            ...process.env,
+            DISCORD_HEARTBEAT_FILE: heartbeatFile,
+            DISCORD_HEARTBEAT_STALE_MS: staleMs,
+          },
+          stdio: 'ignore',
         },
-        stdio: 'ignore',
-      });
+      );
       return 0;
     } catch (err) {
       const status = (err as { status?: number | null }).status;
@@ -317,24 +313,30 @@ describe('Discord bot healthcheck probe, executed', () => {
     expect(isHeartbeatFresh(Date.now() - (win + 5000), Date.now(), win)).toBe(false);
   });
 
-  it('answers unhealthy when the heartbeat path cannot be statted (a denied parent directory)', () => {
-    // "Unreadable" needs precision: stat needs no read permission on the FILE, so
-    // a chmod-000 stamp still reads healthy while fresh, and correctly so (mtime
-    // is the only evidence the probe needs, and a stamp the bot cannot WRITE goes
-    // stale within one window anyway). The arm the catch actually guards beyond
-    // ENOENT is stat DENIAL, which takes a denied parent directory. Root stats
-    // through anything, so the fixture is skipped there rather than left vacuous.
-    if (process.getuid?.() === 0) return;
-    const deniedDir = join(dir, 'denied');
-    mkdirSync(deniedDir);
-    const target = join(deniedDir, 'hb');
-    writeFileSync(target, 'probe fixture');
-    chmodSync(deniedDir, 0o000);
-    try {
-      expect(probeExit(target, '')).toBe(1);
-    } finally {
-      chmodSync(deniedDir, 0o755);
-    }
+  it('answers unhealthy when stat denies access to the heartbeat path', () => {
+    // chmod cannot deny stat on Windows or under root. Inject the same EACCES
+    // at the filesystem boundary in the child; execute the real YAML probe and
+    // prove it reached that boundary instead of accepting any startup failure.
+    const target = stampFile('denied', 1000);
+    expect(probeExit(target, '')).toBe(0);
+    const marker = join(dir, 'denied-observed');
+    const preload = join(dir, 'deny-stat.cjs');
+    writeFileSync(
+      preload,
+      `
+const fs = require('node:fs');
+const originalStat = fs.statSync;
+fs.statSync = function (path, ...args) {
+  if (path === ${JSON.stringify(target)}) {
+    fs.writeFileSync(${JSON.stringify(marker)}, 'EACCES');
+    throw Object.assign(new Error('fixture denied stat'), { code: 'EACCES' });
+  }
+  return originalStat.call(this, path, ...args);
+};
+`,
+    );
+    expect(probeExit(target, '', preload)).toBe(1);
+    expect(readFileSync(marker, 'utf8')).toBe('EACCES');
   });
 
   it('answers unhealthy for a missing file', () => {

@@ -1,6 +1,7 @@
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import { resolveInitialActionBarLayout } from './action_bar_restore';
+import { activeRaidLockouts, activeRiftBossDeathZones, riftMs } from './dungeon_mirror_views';
 import { materialStorageTransferPayload } from './material_storage_command';
 import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
@@ -135,6 +136,7 @@ import {
   type DelveShopOfferView,
   type DevLeaderboardPage,
   type DuelInfo,
+  type ExpeditionSettings,
   type FarmPatchDef,
   type FarmPlantKnobs,
   type FarmPlotView,
@@ -4332,6 +4334,18 @@ export class ClientWorld extends ReconWireState implements IWorld {
   dungeonFinderListingClose(): void {
     this.cmd({ cmd: 'df_list_close' });
   }
+  dungeonFinderExpeditionOpen(): void {
+    this.cmd({ cmd: 'df_expedition_open' });
+  }
+  dungeonFinderExpeditionConfigure(settings: ExpeditionSettings): void {
+    this.cmd({ cmd: 'df_expedition_configure', settings });
+  }
+  dungeonFinderExpeditionTravel(): void {
+    this.cmd({ cmd: 'df_expedition_travel' });
+  }
+  dungeonFinderExpeditionApply(listingId: number, role: Role): void {
+    this.cmd({ cmd: 'df_expedition_apply', listing: listingId, role });
+  }
   dungeonFinderApply(listingId: number): void {
     this.cmd({ cmd: 'df_apply', listing: listingId });
   }
@@ -4860,22 +4874,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // riftDeathZoneSpawn events emitted at zone-placement time; the client counts
   // each zone down locally and drops it when remaining falls to zero.
   riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
-    const now = performance.now();
-    const out: import('../world_api/dungeons').RiftBossDeathZoneView[] = [];
-    for (const z of this.activeBossDeathZones) {
-      const remaining = (z.expiresAtMs - now) / 1000;
-      if (remaining > 0) {
-        out.push({ x: z.x, z: z.z, radius: z.radius, remaining, total: z.totalSecs });
-      }
-    }
-    return out;
+    return activeRiftBossDeathZones(this.activeBossDeathZones, performance.now());
   }
   // Milliseconds remaining before the current rift's backing world event stops
   // admitting new parties (null outside a rift, or for a dev-spawned rift). See the
   // riftEventExpiresAtMs field above for the mirrored deadline this subtracts from.
   riftEventMsRemaining(): number | null {
-    if (this.riftEventExpiresAtMs === null) return null;
-    return Math.max(0, this.riftEventExpiresAtMs - Date.now());
+    return riftMs(this.riftEventExpiresAtMs, Date.now());
   }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
@@ -4888,14 +4893,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // confirms the player purchased it from Marla.
   private selfRidingTrained = false;
   raidLockouts(): RaidLockout[] {
-    const now = Date.now();
-    const src = this.selfLockouts ?? {};
-    const out: RaidLockout[] = [];
-    for (const id of Object.keys(src)) {
-      const msRemaining = src[id] - now;
-      if (msRemaining > 0) out.push({ id, msRemaining });
-    }
-    return out;
+    return activeRaidLockouts(this.selfLockouts, Date.now());
   }
   // --- IWorldDelves: delve enter/leave + interact + companion-upgrade + Marks-vendor
   // buy + lockpick lifecycle + chest collect. delveShopOffers is a pure client read

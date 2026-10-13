@@ -9883,6 +9883,89 @@
      bounds while open. */
   body.mobile-touch #dungeon-finder-window {
     max-height: calc(100% - 20px);
+    height: auto;
+    overflow-y: auto;
+    --window-pad: 10px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-guide-intro {
+    padding-top: 6px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-guide-intro p {
+    font-size: 14px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-categories {
+    gap: 5px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-category {
+    padding: 8px 6px;
+    gap: 5px;
+    min-height: 44px;
+    font-size: 14px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-category .ui-icon {
+    width: 18px;
+    height: 18px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-filters {
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0;
+  }
+  body.mobile-touch #dungeon-finder-window .df-search {
+    flex-basis: 100%;
+  }
+  @media (max-height: 480px) and (min-width: 650px) {
+    body.mobile-touch #dungeon-finder-window .df-guide-intro {
+      display: none;
+    }
+    body.mobile-touch #dungeon-finder-window .df-filters {
+      flex-wrap: nowrap;
+    }
+    body.mobile-touch #dungeon-finder-window .df-search {
+      flex-basis: auto;
+    }
+    body.mobile-touch #dungeon-finder-window .df-eligible {
+      white-space: nowrap;
+    }
+  }
+  body.mobile-touch #dungeon-finder-window .df-eligible {
+    min-height: 40px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-eligible input {
+    width: 24px;
+    height: 24px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-detail {
+    padding: 0;
+  }
+  body.mobile-touch #dungeon-finder-window .df-detail-hero {
+    padding: 18px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-detail-name {
+    font-size: 24px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-back {
+    flex-basis: 100%;
+  }
+  body.mobile-touch #dungeon-finder-window .df-loot-row {
+    min-height: 40px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-encounter {
+    padding: 10px;
+    gap: 10px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-portrait {
+    width: 44px;
+    height: 54px;
+    flex-basis: 44px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-loot-name {
+    white-space: normal;
+  }
+  body.mobile-touch #dungeon-finder-window .df-empty .ui-btn {
+    min-height: 40px;
   }
   body.mobile-touch #dungeon-finder-window .df-body {
     overflow: visible;
@@ -9916,6 +9999,86 @@
     padding: 4px 0;
   }
   /* 40x40 touch floor for every tappable finder control. */
+  body.mobile-touch #dungeon-finder-window .df-board-shell {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    padding-top: 10px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-board-shell .df-listings {
+    grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
+  }
+  body.mobile-touch #dungeon-finder-window .df-board-shell .ui-btn {
+    font-size: 16px;
+    min-height: 44px;
+  }
+  body.mobile-touch #dungeon-finder-window:has(.df-board-shell, .df-body-catalogue) .df-tab {
+    font-size: 13px;
+    white-space: normal;
+    min-height: 44px;
+  }
+  @media (max-width: 650px) {
+    body.mobile-touch #dungeon-finder-window .df-category {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 4px;
+      height: auto;
+      min-height: 64px;
+      text-align: left;
+    }
+    body.mobile-touch #dungeon-finder-window .df-category > .ui-icon {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    body.mobile-touch #dungeon-finder-window .df-category-count {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    body.mobile-touch #dungeon-finder-window .df-category > span:not(.df-category-count) {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      font-size: 13px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    body.mobile-touch #dungeon-finder-window .df-meta {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    body.mobile-touch #dungeon-finder-window .df-encounter:has(.df-encounter-guide[open]) {
+      display: block;
+    }
+    body.mobile-touch
+      #dungeon-finder-window
+      .df-encounter:has(.df-encounter-guide[open])
+      .df-portrait {
+      float: left;
+      margin: 0 12px 12px 0;
+    }
+    body.mobile-touch #dungeon-finder-window .df-encounter-guide {
+      clear: both;
+    }
+    body.mobile-touch #dungeon-finder-window .df-guide-content {
+      padding-left: 10px;
+    }
+    body.mobile-touch #dungeon-finder-window .df-detail-head {
+      gap: 10px;
+    }
+    body.mobile-touch #dungeon-finder-window .df-detail-name {
+      flex-basis: calc(100% - 80px);
+    }
+  }
+  @media (min-width: 720px) {
+    body.mobile-touch #dungeon-finder-window .df-board-shell:not(.df-board-shell--browse) {
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 16px;
+    }
+    body.mobile-touch #dungeon-finder-window .df-board-hero {
+      min-height: 112px;
+      padding-top: 12px;
+    }
+    body.mobile-touch #dungeon-finder-window .df-board-hero h3 {
+      font-size: 20px;
+    }
+  }
   body.mobile-touch #dungeon-finder-window .df-tab,
   body.mobile-touch #dungeon-finder-window .df-row,
   body.mobile-touch #dungeon-finder-window .df-role,
@@ -10243,5 +10406,65 @@
   }
   body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-detail {
     font-size: 16px;
+  }
+}
+@layer hud-mobile {
+  body.mobile-touch #expedition-hud {
+    --expedition-inset: 8px;
+  }
+  body.mobile-touch #expedition-panel {
+    padding: 8px;
+  }
+  body.mobile-touch .expedition-run {
+    max-width: calc(100dvw - 76px);
+  }
+  body.mobile-touch .expedition-run > span {
+    max-width: 120px;
+  }
+  body.mobile-touch .expedition-card {
+    flex-basis: 240px;
+  }
+  body.mobile-touch .expedition-zones {
+    grid-template-columns: minmax(250px, 280px) minmax(0, 1fr);
+    gap: 10px;
+  }
+  body.mobile-touch .expedition-other,
+  body.mobile-touch .expedition-own-body {
+    padding: 10px;
+  }
+  body.mobile-touch .expedition-own > .expedition-zone-head {
+    padding: 10px;
+  }
+  body.mobile-touch .expedition-hero {
+    height: 124px;
+  }
+  body.mobile-touch .expedition-hero-copy h3 {
+    font-size: 18px;
+  }
+  body.mobile-touch .expedition-title h2 {
+    font-size: 16px;
+  }
+  body.mobile-touch .expedition-card-body {
+    padding: 12px;
+  }
+  @media (max-height: 500px) {
+    body.mobile-touch .expedition-hero {
+      height: 80px;
+    }
+    body.mobile-touch .expedition-own .expedition-hero {
+      height: 80px;
+    }
+    body.mobile-touch .expedition-zone-head p,
+    body.mobile-touch .expedition-title p {
+      display: none;
+    }
+  }
+  @media (max-width: 700px) {
+    body.mobile-touch .expedition-zones {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  body.mobile-touch #expedition-hud .ui-btn {
+    min-height: 40px;
   }
 }

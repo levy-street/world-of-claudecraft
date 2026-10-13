@@ -29,12 +29,14 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
+import { recordExpeditionEncounterDeath } from '../instances/dungeon_expeditions';
 import {
   claimedInstanceForMob,
   lockNormalDungeonResetOnBossKill,
   spawnBossExitPortal,
 } from '../instances/dungeons';
 import { isImmuneInPlace } from '../instances/instance_combat_hold';
+import { awardQueueEncounter, recordQueueDamage } from '../instances/queue_participation';
 import { isKillParticipant, killParticipationPos } from '../loot/kill_participation';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
@@ -996,6 +998,7 @@ export function dealDamage(
   target.hp = guardianWardRestore || Math.max(0, target.hp - amount);
   // Snapshot before reactive heals can restore health or nested damage can add loss.
   const craftedHpLoss = Math.max(0, preHp - target.hp);
+  recordQueueDamage(ctx, source, target, craftedHpLoss);
   if (resolution) resolution.landedHpLoss = Math.max(0, preHp - target.hp);
   // Chronomancy Rewind (combat/damage_history.ts): log the REAL HP loss this player
   // just took, tagged by sim tick, so Rewind can restore a fraction of recent damage.
@@ -1727,6 +1730,8 @@ export function handleDeath(
     // Resolve the owning claim once for corpse participation and both reward
     // awarders below; the slot remains stable throughout this death path.
     const claimedInst = claimedInstanceForMob(ctx, e.id);
+    awardQueueEncounter(ctx, claimedInst, e);
+    recordExpeditionEncounterDeath(claimedInst, e);
     let heroicRewardRecipients: PlayerMeta[] = [];
     if (meta && creditEntity && !meta.leaving) {
       const tmpl = MOBS[e.templateId];

@@ -1,6 +1,20 @@
 export const MODERATION_COMMAND_REASON_MAX = 500;
 export const MODERATION_COMMAND_MINUTES_MAX = 10 * 365 * 24 * 60;
 
+/** Commands that can leave custody or start another confined activity. */
+export const JAILED_BLOCKED_COMMANDS: ReadonlySet<string> = new Set([
+  'arena_queue',
+  'bg_queue',
+  'enter_dungeon',
+  'df_expedition_travel',
+  'enter_crypt',
+  'enter_delve',
+  'duel_req',
+  'duel_accept',
+  'unstuck',
+  'card_queue_join',
+]);
+
 const DEFAULT_REASON = 'No reason specified';
 
 export type ModerationChatCommand =

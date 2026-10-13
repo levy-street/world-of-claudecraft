@@ -3,6 +3,7 @@ import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
+import { bashExecutable, bashFixtureEnv, bashPath } from './helpers/bash_fixture';
 
 const watchdog = readFileSync('deploy/game_watchdog.sh', 'utf8');
 const userData = readFileSync('deploy/user-data.sh', 'utf8');
@@ -256,6 +257,8 @@ interface Harness {
 function makeHarness(): Harness {
   const dir = mkdtempSync(join(tmpdir(), 'woc-watchdog-'));
   harnessDirs.push(dir);
+  // Normalize checkout line endings, without changing the production script.
+  writeFileSync(join(dir, 'watchdog.sh'), watchdog.replace(/\r\n/g, '\n'));
   const dockerShim = `#!/usr/bin/env bash
 if [ "$1" = "inspect" ]; then
   if [ "\${SHIM_INSPECT_HANG:-0}" = "1" ]; then exec sleep 5; fi
@@ -280,12 +283,15 @@ exit "\${SHIM_FLOCK_EXIT:-0}"
 `;
   writeFileSync(join(dir, 'flock'), flockShim);
   chmodSync(join(dir, 'flock'), 0o755);
-  const timeoutShim = `#!/usr/bin/env node
-import { spawn } from 'node:child_process';
+  const timeoutShim = `
+const { spawn } = require('node:child_process');
 const args = process.argv.slice(2);
 if (args[0] === '-k') args.splice(0, 2);
 const seconds = Number(args.shift());
-const child = spawn(args.shift(), args, { stdio: 'inherit' });
+// Fail closed: only the fixture docker script is ever executable here, even if
+// the caller's PATH changes. Windows cannot spawn an extensionless shell script.
+if (args.shift() !== 'docker') process.exit(125);
+const child = spawn(${JSON.stringify(bashExecutable())}, [${JSON.stringify(bashPath(join(dir, 'docker')))}, ...args], { stdio: 'inherit' });
 let timedOut = false;
 const timer = setTimeout(() => {
   timedOut = true;
@@ -300,7 +306,11 @@ child.on('exit', (code) => {
   process.exit(timedOut ? 124 : (code ?? 125));
 });
 `;
-  writeFileSync(join(dir, 'timeout'), timeoutShim);
+  writeFileSync(join(dir, 'timeout.cjs'), timeoutShim);
+  writeFileSync(
+    join(dir, 'timeout'),
+    '#!/usr/bin/env bash\nexec "$SHIM_NODE" "$SHIM_TIMEOUT_JS" "$@"\n',
+  );
   chmodSync(join(dir, 'timeout'), 0o755);
   return {
     dir,
@@ -320,19 +330,48 @@ function runWatchdog(
   h: Harness,
   opts: { inspect: string; args?: string[]; env?: Record<string, string> },
 ): RunResult {
-  const res = spawnSync('bash', [WATCHDOG_SCRIPT, ...(opts.args ?? [])], {
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      PATH: `${h.dir}:${process.env.PATH ?? ''}`,
-      WATCHDOG_CONTAINER: CONTAINER,
-      WATCHDOG_STATE_FILE: h.stateFile,
-      WATCHDOG_LOCK_FILE: h.lockFile,
-      SHIM_INSPECT: opts.inspect,
-      SHIM_RESTART_LOG: h.restartLog,
-      ...opts.env,
+  const res = spawnSync(
+    bashExecutable(),
+    [
+      '--noprofile',
+      '--norc',
+      '-c',
+      `
+export PATH="$SHIM_DIR:$PATH"
+for tool in docker flock timeout; do
+  [ "$(command -v "$tool")" = "$SHIM_DIR/$tool" ] || exit 126
+done
+exec bash "$SHIM_DIR/watchdog.sh" "$@"
+`,
+      'watchdog-fixture',
+      ...(opts.args ?? []),
+    ],
+    {
+      encoding: 'utf8',
+      timeout: 15000,
+      env: {
+        ...bashFixtureEnv(),
+        SHIM_DIR: bashPath(h.dir),
+        SHIM_NODE: bashPath(process.execPath),
+        SHIM_TIMEOUT_JS: join(h.dir, 'timeout.cjs').replace(/\\/g, '/'),
+        WATCHDOG_CONTAINER: CONTAINER,
+        WATCHDOG_STATE_FILE: bashPath(h.stateFile),
+        WATCHDOG_LOCK_FILE: bashPath(h.lockFile),
+        WATCHDOG_DRY_RUN: '0',
+        WATCHDOG_COOLDOWN: '300',
+        WATCHDOG_INSPECT_TIMEOUT: '55',
+        WATCHDOG_RESTART_TIMEOUT: '150',
+        SHIM_INSPECT_HANG: '0',
+        SHIM_INSPECT_EXIT: '0',
+        SHIM_RESTART_HANG: '0',
+        SHIM_RESTART_EXIT: '0',
+        SHIM_FLOCK_EXIT: '0',
+        SHIM_INSPECT: opts.inspect,
+        SHIM_RESTART_LOG: bashPath(h.restartLog),
+        ...opts.env,
+      },
     },
-  });
+  );
   const restarted =
     existsSync(h.restartLog) && readFileSync(h.restartLog, 'utf8').includes(CONTAINER);
   return { status: res.status, output: `${res.stdout}${res.stderr}`, restarted };
@@ -348,6 +387,15 @@ afterAll(() => {
 });
 
 describe('game watchdog behavior (executed against a fake docker)', () => {
+  it('refuses execution if the fixture docker shim is missing', () => {
+    const h = makeHarness();
+    rmSync(join(h.dir, 'docker'));
+    const res = runWatchdog(h, { inspect: 'true unhealthy' });
+    expect(res.status).toBe(126);
+    expect(res.restarted).toBe(false);
+    expect(existsSync(h.stateFile)).toBe(false);
+  });
+
   // The harness must be able to observe a REAL restart, or every negative case below
   // passes vacuously. An unhealthy, running container is the one case the watchdog
   // exists for: if this stops restarting, a wedged world never recovers on its own.
@@ -556,7 +604,10 @@ describe('game watchdog behavior (executed against a fake docker)', () => {
   // A syntax error anywhere in the script would ship green through every string-grep
   // pin above; parsing it (and the executed cases) is what actually catches one.
   it('parses without a syntax error', () => {
-    const res = spawnSync('bash', ['-n', WATCHDOG_SCRIPT], { encoding: 'utf8' });
+    const res = spawnSync(bashExecutable(), ['-n', WATCHDOG_SCRIPT], {
+      encoding: 'utf8',
+      env: bashFixtureEnv(),
+    });
     expect(res.status).toBe(0);
   });
 });

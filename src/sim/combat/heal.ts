@@ -25,6 +25,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { recordQueueHealing } from '../instances/queue_participation';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { worldPvpOnPlayerAided } from '../pvp';
 import type { SimContext } from '../sim_context';
@@ -167,6 +168,7 @@ export function applyHeal(
     ...(overheal > 0 ? { overheal } : {}),
   });
   healingThreat(ctx, source, target, healed);
+  recordQueueHealing(ctx, source, target, healed);
   // Thornhollow Fields: real healing on an ally is support, and a kill that
   // ally helps land pays the healer an assist. Only healing that actually
   // landed counts (a fully overhealed or absorbed cast is not support), and the

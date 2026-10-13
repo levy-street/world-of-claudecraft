@@ -14,7 +14,6 @@ import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
-import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import {
@@ -243,6 +242,7 @@ import { observeQueuePops, queuedPidsOf, queuePopDepsFor } from './discord_queue
 import { enqueueRelay } from './discord_relay';
 import { findDungeonDoorNear } from './dungeon_door';
 import * as entryFacing from './dungeon_entry_facing';
+import { DF_WIRE_INTERVAL_TICKS, dispatchDungeonFinderCommand } from './dungeon_finder_commands';
 import { formatDuration } from './duration';
 import {
   copperFlowSourceForCommand,
@@ -350,7 +350,7 @@ import {
   createMobScanTickStats,
   resetMobScanCaptureAccumulators,
 } from './mob_scan_tick_stats';
-import { parseModerationChatCommand } from './moderation_commands';
+import { JAILED_BLOCKED_COMMANDS, parseModerationChatCommand } from './moderation_commands';
 import {
   forceCharacterRename,
   moderateAccount,
@@ -694,12 +694,6 @@ const BG_WIRE_RESET_EVENTS = new Set([
 // whole match instead (bgRespawnRefreshPids), the shape the bgKill events
 // already have because the sim emits one copy per member.
 const BG_RESPAWN_EVENT = 'respawn';
-// Dungeon Finder personal readout cadence: the `df` payload carries
-// whole-second clocks (queue wait, proposal countdown), so 2 Hz keeps the
-// window live without re-serializing it at 20 Hz. The shared `dfb` board rides
-// the same cadence and only re-sends when a listing actually changes.
-const DF_WIRE_HZ = 2;
-const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
 // World PvP `wpvp` self key (and the King of the Hill `hill` key, whose 60 s
 // contest bar and whole-minute clock tolerate half-second steps): 2 Hz; the
 // viewer's own pvp_flag command re-arms the gate so a press answers at once.
@@ -856,17 +850,6 @@ const LANE_DROP_CAUSE = {
   chat: 'lane_chat',
   name_screen: 'lane_name_screen',
 } as const satisfies Record<MsgLane, WsDropCause>;
-const JAILED_BLOCKED_COMMANDS = new Set<string>([
-  'arena_queue',
-  'bg_queue',
-  'enter_dungeon',
-  'enter_crypt',
-  'enter_delve',
-  'duel_req',
-  'duel_accept',
-  'unstuck',
-  'card_queue_join',
-]);
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
 // read is served from the woc_balance.ts cache (CACHE_TTL_MS), which is the real
 // freshness floor; keeping this loop at/under that TTL means a token change shows
@@ -7371,60 +7354,25 @@ export class GameServer {
         sim.forfeitCardDuel(pid);
         break;
 
-      // Dungeon Finder (docs/prd/dungeon-finder.md). Deliberately NOT in
-      // HEAVY_SELF_CMDS: finder state rides its own `df`/`dfb` delta keys, and
-      // group formation bumps the party key through the normal snapshot path.
-      // Every field is validated here; the Sim re-validates eligibility, roles,
-      // capacity, and party state authoritatively.
-      case 'df_roles': {
-        if (Array.isArray(msg.roles) && msg.roles.length <= 3) {
-          const roles = msg.roles.filter(isFinderRole);
-          if (roles.length === msg.roles.length) sim.dungeonFinderSetRoles(roles, pid);
-        }
-        break;
-      }
-      case 'df_queue': {
-        if (Array.isArray(msg.activities) && msg.activities.length <= 16) {
-          const activities = msg.activities.filter(
-            (a): a is string => typeof a === 'string' && a.length <= 64,
-          );
-          if (activities.length === msg.activities.length)
-            sim.dungeonFinderQueueJoin(activities, pid);
-        }
-        break;
-      }
+      case 'df_roles':
+      case 'df_queue':
       case 'df_queue_leave':
-        sim.dungeonFinderQueueLeave(pid);
-        break;
       case 'df_proposal':
-        sim.dungeonFinderRespond(msg.accept === true, pid);
-        break;
-      case 'df_list_create': {
-        if (
-          typeof msg.activity === 'string' &&
-          msg.activity.length <= 64 &&
-          Array.isArray(msg.tags) &&
-          msg.tags.length <= 8
-        ) {
-          const tags = msg.tags.filter(isFinderListingTag);
-          if (tags.length === msg.tags.length)
-            sim.dungeonFinderListingCreate(msg.activity, tags, pid);
-        }
-        break;
-      }
+      case 'df_list_create':
       case 'df_list_close':
-        sim.dungeonFinderListingClose(pid);
-        break;
       case 'df_apply':
-        if (typeof msg.listing === 'number' && Number.isFinite(msg.listing))
-          sim.dungeonFinderApply(msg.listing, pid);
-        break;
       case 'df_apply_cancel':
-        sim.dungeonFinderApplyCancel(pid);
-        break;
       case 'df_app_respond':
-        if (typeof msg.applicant === 'number' && Number.isFinite(msg.applicant))
-          sim.dungeonFinderApplicationRespond(msg.applicant, msg.accept === true, pid);
+      case 'df_expedition_open':
+      case 'df_expedition_travel':
+      case 'df_expedition_apply':
+      case 'df_expedition_configure':
+        dispatchDungeonFinderCommand(
+          sim,
+          pid,
+          msg,
+          (note) => !this.enforceChatPolicy(session, note),
+        );
         break;
 
       // post-cap cosmetic prestige (Max-Level XP Overflow)

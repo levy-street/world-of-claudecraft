@@ -335,6 +335,12 @@ describe('in-game moderation actions', () => {
     expect(eventTexts(moderatorWs)).toContain('Jailed Cellmate for 2 hours.');
     expect(logEventTexts(targetWs)).toContain('A moderator has moved you to jail for 2 hours.');
 
+    const travel = vi.spyOn(server.sim, 'dungeonFinderExpeditionTravel');
+    server.handleMessage(target, JSON.stringify({ t: 'cmd', cmd: 'df_expedition_travel' }));
+    expect(travel).not.toHaveBeenCalled();
+    expect(isInJailCage(entity(server, target.pid).pos)).toBe(true);
+    travel.mockRestore();
+
     server.sim.dealDamage(
       null,
       entity(server, target.pid),

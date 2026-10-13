@@ -255,7 +255,7 @@ it('leaves out only the shockwave sheet, which no cast draws', () => {
       drawers.push(`${file}:${source.slice(0, match.index).split('\n').length}`);
   }
   expect(drawers).toHaveLength(1);
-  expect(drawers[0]).toMatch(/^ability_vfx\/fx\.ts:/);
+  expect(drawers[0]).toMatch(/^ability_vfx[\\/]fx\.ts:/);
   const fx = readFileSync(new URL('ability_vfx/fx.ts', root), 'utf8');
   const spawn = fx.slice(fx.indexOf('  prewarmSpawn('), fx.indexOf('  prewarmSpawn(') + 600);
   expect(spawn).toContain("this.bakedAt('shockwave'");

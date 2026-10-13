@@ -199,6 +199,8 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'vault',
   'vendorBuyback',
   'questLog',
+  // Paused helper cosmetics are retained as bounded character progression.
+  'queueRewards',
   'questsDone',
   'worldQuests',
   // Faction standing rows (src/sim/factions.ts), persisted beside the

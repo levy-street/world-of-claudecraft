@@ -472,6 +472,8 @@ export interface SimContextCallbacks {
   leaveDungeon(pid?: number): boolean;
   resetDungeonInstances(pid?: number): void;
   inheritDungeonResetLocks(pid: number): void;
+  // Party joins eagerly withdraw all pending manual finder applications.
+  onDungeonFinderPartyJoined(pid: number): void;
   // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
   // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
   // these two are on the seam so foreign callers reach them through ctx.
@@ -693,7 +695,10 @@ export interface SimContextCallbacks {
   // invite prompts or accept events. Returns the formed party, or null (and
   // mutates nothing) when a source roster no longer matches live party state.
   // Consumed by social/dungeon_finder.ts.
-  formDungeonFinderGroup(units: FinderFormationUnit[], opts: { raid: boolean }): Party | null;
+  formDungeonFinderGroup(
+    units: FinderFormationUnit[],
+    opts: { raid: boolean; expeditionClaim?: InstanceSlot },
+  ): Party | null;
   onMobKilledForQuests(mob: Entity, meta: PlayerMeta): void;
   onRecipeCraftedForQuests(recipeId: string, meta: PlayerMeta): void;
   onNodeGatheredForQuests(node: GatherNodeDef, itemId: string, meta: PlayerMeta): void;
@@ -1602,6 +1607,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     riftOpenTreasure: host.riftOpenTreasure,
     resetDungeonInstances: host.resetDungeonInstances,
     inheritDungeonResetLocks: host.inheritDungeonResetLocks,
+    onDungeonFinderPartyJoined: host.onDungeonFinderPartyJoined,
     dungeonDifficulty: host.dungeonDifficulty,
     setDungeonDifficulty: host.setDungeonDifficulty,
     awardHeroicMarks: host.awardHeroicMarks,

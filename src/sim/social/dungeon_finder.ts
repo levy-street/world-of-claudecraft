@@ -7,11 +7,10 @@
 //  - the premade board: leader-published listings with structured tags and a
 //    leader-approved application flow.
 //
-// The finder only FORMS groups (through PartyMachine.formDungeonFinderGroup).
-// It never teleports, enters instances, changes dungeon difficulty, or touches
-// loot settings. It draws no rng and reads only the sim clock (ctx.time /
-// ctx.tickCount), so installing it cannot perturb determinism; matching runs
-// from the end-of-tick update, never per command.
+// Queue and manual listings form groups through PartyMachine. Open expeditions
+// additionally bind a running claim; explicit travel reuses the normal door
+// admission and never resets that claim or changes its difficulty. The finder
+// draws no rng and reads only the sim clock. Matching runs at the end of a tick.
 //
 // src/sim-pure: imports only sibling sim types/content plus type-only IWorld
 // view shapes (the sanctioned world_api type edge), so it runs unchanged in
@@ -19,22 +18,50 @@
 
 import type {
   DungeonFinderBoard,
+  DungeonFinderExpeditionView,
   DungeonFinderInfo,
   DungeonFinderListingView,
   DungeonFinderProposalView,
 } from '../../world_api/dungeon_finder';
 import {
   FINDER_ACTIVITIES,
-  FINDER_PRE_SPEC_ROLES,
+  FINDER_CLASS_ROLES,
   FINDER_ROLE_ORDER,
   type FinderActivity,
   type FinderComposition,
   type FinderListingTag,
   finderActivity,
 } from '../content/dungeon_finder';
-import { FIRST_TALENT_LEVEL, type Role } from '../content/talents';
+import type { Role } from '../content/talents';
+import {
+  canTravelToExpedition,
+  currentExpeditionClaim,
+  expeditionActivity,
+  expeditionAdmission,
+  expeditionClaimByExit,
+  expeditionFinished,
+  expeditionProgress,
+  travelToExpedition,
+} from '../instances/dungeon_expeditions';
+import { instanceClaimHolds } from '../instances/dungeons';
+import { admitQueueHelper, queueRewardsView } from '../instances/queue_participation';
+import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { PlayerClass } from '../types';
+import {
+  type ExpeditionDetails,
+  ExpeditionSocialState,
+  validExpeditionDetails,
+} from './expedition_social';
+import { FINDER_PLAYER_APPLICATION_CAP, FinderApplications } from './finder_applications';
+import {
+  finderLevelEligible,
+  planFinderListing,
+  planFinderRecruitment,
+} from './finder_recruitment';
+import { changeQueueReward, loadQueueRewards } from './queue_rewards';
+
+export { finderLevelEligible } from './finder_recruitment';
 
 // Availability window before a proposal expires (whole seconds).
 export const FINDER_PROPOSAL_SECONDS = 30;
@@ -49,29 +76,25 @@ export const FINDER_MATCH_NODE_BUDGET = 4000;
 // Board projection cap: the wire payload stays bounded however many listings
 // a realm accumulates (oldest listings first, stable order).
 export const FINDER_BOARD_LISTING_CAP = 50;
+export const FINDER_EXPEDITION_APPLICATION_CAP = 20;
+export const FINDER_EXPEDITION_APPLICATION_SECONDS = 120;
+export const FINDER_EXPEDITION_APPLICATION_COOLDOWN = 10;
+// Distinct recent requests are separate from the five simultaneously pending rows.
+// Preserve every active retry deadline; a full window rejects further attempts.
+export const FINDER_EXPEDITION_RECENT_APPLICATION_CAP = FINDER_BOARD_LISTING_CAP;
 
 // ---------------------------------------------------------------------------
 // Pure helpers (direct Vitest coverage in tests/dungeon_finder.test.ts).
 // ---------------------------------------------------------------------------
 
-// Roles a character may select: below the first talent level a fixed class
-// capability table applies; from there on, the active spec's role. Wildfang
-// is deliberately dual-role: the player chooses tank for Bruin or damage for
-// Cat rather than the finder hardcoding the whole spec to one form.
+// Role declarations describe class capabilities independently of current talents.
+// Keep level/spec inputs compatible with callers; selecting a role changes neither.
 export function compatibleFinderRoles(
   cls: PlayerClass,
-  level: number,
-  specRole: Role | null,
+  _level: number,
+  _specRole: Role | null,
 ): Role[] {
-  if (level >= FIRST_TALENT_LEVEL) {
-    if (cls === 'druid' && specRole === 'tank') return ['tank', 'dps'];
-    return specRole ? [specRole] : [];
-  }
-  return FINDER_ROLE_ORDER.filter((role) => FINDER_PRE_SPEC_ROLES[role].includes(cls));
-}
-
-export function finderLevelEligible(activity: FinderActivity, level: number): boolean {
-  return level >= activity.minLevel && level <= activity.maxLevel;
+  return FINDER_ROLE_ORDER.filter((role) => FINDER_CLASS_ROLES[role].includes(cls));
 }
 
 // Normalize a client-selected activity list: known ids only, auto-queue only,
@@ -185,13 +208,9 @@ interface FinderListing {
   leaderPid: number;
   tags: FinderListingTag[];
   createdAt: number;
-}
-
-interface FinderApplication {
-  pid: number;
-  listingId: number;
-  roles: Role[]; // compatible selected roles captured at apply time
-  at: number;
+  expeditionExitId?: number;
+  expeditionPartyId?: number | null;
+  details?: ExpeditionDetails;
 }
 
 // ---------------------------------------------------------------------------
@@ -199,6 +218,7 @@ interface FinderApplication {
 // ---------------------------------------------------------------------------
 
 export class DungeonFinderMachine {
+  private readonly social = new ExpeditionSocialState();
   // Sticky per-player role selection (validated on write and on every use).
   private readonly roleSelections = new Map<number, Role[]>();
   // FIFO queue of indivisible units (solo players / whole premade parties).
@@ -206,7 +226,12 @@ export class DungeonFinderMachine {
   private readonly proposals: FinderProposal[] = [];
   private readonly cooldownUntil = new Map<number, number>();
   private listings: FinderListing[] = [];
-  private readonly applications = new Map<number, FinderApplication>();
+  private readonly applications = new FinderApplications();
+  private readonly expeditionApplicationUntil = new Map<number, Map<number, number>>();
+  private readonly expeditionMemberships = new Map<
+    number,
+    { exitId: number; leaderPid: number; partyId: number; role?: Role }
+  >();
   private nextUnitId = 1;
   private nextProposalId = 1;
   private nextListingId = 1;
@@ -247,6 +272,78 @@ export class DungeonFinderMachine {
 
   private listingBy(leaderPid: number): FinderListing | null {
     return this.listings.find((l) => l.leaderPid === leaderPid) ?? null;
+  }
+
+  private applicationsFor(listing: FinderListing) {
+    return this.applications.forListing(listing.id);
+  }
+
+  private dropApplication(pid: number, listingId?: number): boolean {
+    return this.applications.delete(pid, listingId);
+  }
+
+  onPartyJoined(pid: number): void {
+    if (this.dropApplication(pid)) this.bumpBoard();
+  }
+
+  dungeonFinderExpeditionConfigure(
+    settings: import('../../world_api/dungeon_finder').ExpeditionSettings,
+    pid?: number,
+  ): void {
+    const r = this.ctx.resolve(pid);
+    if (!r || r.meta.leaving) return;
+    const id = r.meta.entityId;
+    if (settings.kind === 'recruit') {
+      const details = planFinderRecruitment(this.ctx, id, settings, {
+        hasListing: (memberPid) => !!this.listingBy(memberPid),
+        memberBlocksError: (leaderPid, memberPid) => this.memberBlocksError(leaderPid, memberPid),
+        eligibleRoles: compatibleFinderRoles(r.meta.cls, r.e.level, r.meta.talentMods.role),
+        queued: (memberPid) => !!this.unitFor(memberPid) || !!this.proposalFor(memberPid),
+        pendingApplication: (memberPid) => this.applications.has(memberPid),
+        ongoingExpedition: (memberPid) => !!this.expeditionViewFor(memberPid),
+      });
+      if (!details) return;
+      this.roleSelections.set(id, [settings.role]);
+      this.listings.push({
+        id: this.nextListingId++,
+        activityId: settings.activityId,
+        leaderPid: id,
+        tags: [],
+        createdAt: this.ctx.time,
+        details,
+      });
+      this.matchDirty = true;
+      this.bumpBoard();
+      this.ctx.notice(id, 'Your group listing is published.');
+    } else if (settings.kind === 'cancel_application') {
+      if (Number.isSafeInteger(settings.listingId) && settings.listingId > 0)
+        this.cancelApplication(id, settings.listingId);
+    } else if (settings.kind === 'details') {
+      const listing = this.listingBy(id);
+      if (!listing || !this.listingValid(listing) || !validExpeditionDetails(settings.details))
+        return;
+      listing.details = { purpose: settings.details.purpose, note: settings.details.note.trim() };
+      this.bumpBoard();
+    } else if (settings.kind === 'available') {
+      const eligible = compatibleFinderRoles(r.meta.cls, r.e.level, r.meta.talentMods.role);
+      if (
+        typeof settings.enabled !== 'boolean' ||
+        !Array.isArray(settings.roles) ||
+        settings.roles.length > 3 ||
+        settings.roles.some((role) => !eligible.includes(role)) ||
+        (settings.enabled && !settings.roles.length)
+      )
+        return;
+      this.social.setAvailable(
+        id,
+        settings.enabled,
+        FINDER_ROLE_ORDER.filter((role) => settings.roles.includes(role)),
+      );
+    } else if (settings.kind === 'reward') {
+      const state = r.meta.queueRewards ?? loadQueueRewards();
+      if (typeof settings.buy === 'boolean' && changeQueueReward(state, settings.id, settings.buy))
+        r.meta.queueRewards = state;
+    }
   }
 
   private listingMembers(listing: FinderListing): number[] {
@@ -296,10 +393,6 @@ export class DungeonFinderMachine {
     if (!r) return;
     const id = r.meta.entityId;
     const eligible = compatibleFinderRoles(r.meta.cls, r.e.level, r.meta.talentMods.role);
-    if (r.e.level >= FIRST_TALENT_LEVEL && eligible.length === 0) {
-      this.ctx.error(id, 'Choose a specialization to use the Dungeon Finder.');
-      return;
-    }
     const cleaned = FINDER_ROLE_ORDER.filter((role) => roles.includes(role));
     const invalid = cleaned.some((role) => !eligible.includes(role));
     if (invalid) {
@@ -395,16 +488,7 @@ export class DungeonFinderMachine {
 
   private memberRolesError(leaderPid: number, memberPid: number): void {
     if (memberPid === leaderPid) {
-      const r = this.ctx.resolve(leaderPid);
-      const eligible = r
-        ? compatibleFinderRoles(r.meta.cls, r.e.level, r.meta.talentMods.role)
-        : [];
-      this.ctx.error(
-        leaderPid,
-        eligible.length === 0
-          ? 'Choose a specialization to use the Dungeon Finder.'
-          : 'Select a Dungeon Finder role first.',
-      );
+      this.ctx.error(leaderPid, 'Select a Dungeon Finder role first.');
       return;
     }
     const name = this.ctx.players.get(memberPid)?.name ?? 'A party member';
@@ -534,7 +618,7 @@ export class DungeonFinderMachine {
     this.removeProposal(proposal);
     for (const memberPid of proposal.roles.keys()) {
       // A formed member's finder side-state is stale by definition now.
-      this.applications.delete(memberPid);
+      this.dropApplication(memberPid);
       const listing = this.listingBy(memberPid);
       if (listing) this.closeListing(listing, { notifyLeader: false });
       this.ctx.notice(
@@ -551,31 +635,13 @@ export class DungeonFinderMachine {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const id = r.meta.entityId;
-    const activity = finderActivity(activityId);
-    if (!activity) {
-      this.ctx.error(id, 'That listing is no longer available.');
+    if (
+      !planFinderListing(this.ctx, id, activityId, {
+        hasListing: (memberPid) => !!this.listingBy(memberPid),
+        memberBlocksError: (leaderPid, memberPid) => this.memberBlocksError(leaderPid, memberPid),
+      })
+    )
       return;
-    }
-    if (this.listingBy(id)) {
-      this.ctx.error(id, 'You already lead a group listing.');
-      return;
-    }
-    const party = this.ctx.partyOf(id);
-    if (party && party.leader !== id) {
-      this.ctx.error(id, 'Only the party leader may use the Dungeon Finder.');
-      return;
-    }
-    const members = party ? [...party.members] : [id];
-    if (members.length >= activity.size) {
-      this.ctx.error(id, 'Your group is too large for that activity.');
-      return;
-    }
-    for (const memberPid of members) {
-      if (!finderLevelEligible(activity, this.levelOf(memberPid))) {
-        this.memberBlocksError(id, memberPid);
-        return;
-      }
-    }
     const seen = new Set<FinderListingTag>();
     const cleanedTags = tags.filter((tag) => {
       if (seen.has(tag)) return false;
@@ -593,6 +659,95 @@ export class DungeonFinderMachine {
     this.ctx.notice(id, 'Your group listing is published.');
   }
 
+  dungeonFinderExpeditionOpen(pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const id = r.meta.entityId;
+    const claim = currentExpeditionClaim(this.ctx, id);
+    const activity = claim ? expeditionActivity(claim) : null;
+    const party = this.ctx.partyOf(id);
+    if (party && party.leader !== id) {
+      this.ctx.error(id, 'Only the party leader may use the Dungeon Finder.');
+      return;
+    }
+    if (
+      !claim ||
+      !activity ||
+      claim.exitId === null ||
+      r.meta.leaving ||
+      r.e.dead ||
+      r.e.ghost ||
+      expeditionFinished(this.ctx, claim, activity)
+    ) {
+      this.ctx.error(id, 'That listing is no longer available.');
+      return;
+    }
+    if (this.unitFor(id) || this.proposalFor(id)) {
+      this.ctx.error(id, 'You are already in the Dungeon Finder queue.');
+      return;
+    }
+    const members = party?.members ?? [id];
+    if (members.length >= activity.size) {
+      this.ctx.error(id, 'Your group is too large for that activity.');
+      return;
+    }
+    for (const memberPid of members) {
+      if (
+        !finderLevelEligible(activity, this.levelOf(memberPid)) ||
+        this.ctx.players.get(memberPid)?.leaving
+      ) {
+        this.memberBlocksError(id, memberPid);
+        return;
+      }
+    }
+    const existing = this.listingBy(id);
+    if (existing?.expeditionExitId === claim.exitId) return;
+    if (existing) this.closeListing(existing, { notifyLeader: false });
+    this.listings.push({
+      id: this.nextListingId++,
+      activityId: activity.id,
+      leaderPid: id,
+      tags: [],
+      createdAt: this.ctx.time,
+      expeditionExitId: claim.exitId,
+      expeditionPartyId: party?.id ?? null,
+      details: { purpose: 'clear', note: '' },
+    });
+    if (party) {
+      for (const memberPid of members)
+        this.expeditionMemberships.set(memberPid, {
+          exitId: claim.exitId,
+          leaderPid: id,
+          partyId: party.id,
+          role: this.allowedRoles(memberPid)[0],
+        });
+    }
+    this.bumpBoard();
+  }
+
+  dungeonFinderExpeditionTravel(pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const view = this.expeditionViewFor(r.meta.entityId);
+    const claim = view ? expeditionClaimByExit(this.ctx, view.exitId) : null;
+    if (!claim || !travelToExpedition(this.ctx, claim, r.meta.entityId))
+      this.ctx.error(r.meta.entityId, 'That player is no longer available.');
+  }
+
+  dungeonFinderExpeditionApply(listingId: number, role: Role, pid?: number): void {
+    const listing = this.listings.find((entry) => entry.id === listingId);
+    if (
+      !listing ||
+      (listing.expeditionExitId === undefined &&
+        finderActivity(listing.activityId)?.kind !== 'dungeon')
+    ) {
+      const r = this.ctx.resolve(pid);
+      if (r) this.ctx.error(r.meta.entityId, 'That listing is no longer available.');
+      return;
+    }
+    this.applyToListing(listingId, pid, role);
+  }
+
   dungeonFinderListingClose(pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
@@ -606,10 +761,13 @@ export class DungeonFinderMachine {
   }
 
   private closeListing(listing: FinderListing, opts: { notifyLeader: boolean }): void {
+    for (const app of this.applicationsFor(listing))
+      if (listing.expeditionExitId !== undefined)
+        this.social.outcome(app.pid, 'closed', this.ctx.players.get(listing.leaderPid)?.name ?? '');
     this.listings = this.listings.filter((l) => l.id !== listing.id);
-    for (const [pid, app] of this.applications) {
-      if (app.listingId !== listing.id) continue;
-      this.applications.delete(pid);
+    for (const app of this.applicationsFor(listing)) {
+      const pid = app.pid;
+      this.dropApplication(pid, listing.id);
       if (this.ctx.players.has(pid))
         this.ctx.notice(pid, 'The group listing you applied to has closed.');
     }
@@ -619,16 +777,35 @@ export class DungeonFinderMachine {
   }
 
   dungeonFinderApply(listingId: number, pid?: number): void {
+    this.applyToListing(listingId, pid);
+  }
+
+  private applyToListing(listingId: number, pid?: number, expeditionRole?: Role): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const id = r.meta.entityId;
-    if (this.applications.has(id)) {
+    if (
+      this.applications.get(id, listingId) &&
+      this.listings.some(
+        (listing) => listing.id === listingId && listing.expeditionExitId !== undefined,
+      )
+    )
+      return;
+    const listing = this.listings.find((l) => l.id === listingId) ?? null;
+    if (!listing || listing.leaderPid === id || !this.listingValid(listing)) {
+      this.ctx.error(id, 'That listing is no longer available.');
+      return;
+    }
+    const pending = this.applications.forPlayer(id);
+    if (
+      pending.length &&
+      (listing.expeditionExitId === undefined || pending.some((app) => app.expiresAt === undefined))
+    ) {
       this.ctx.error(id, 'You already have a pending application.');
       return;
     }
-    const listing = this.listings.find((l) => l.id === listingId) ?? null;
-    if (!listing || listing.leaderPid === id) {
-      this.ctx.error(id, 'That listing is no longer available.');
+    if (pending.length >= FINDER_PLAYER_APPLICATION_CAP) {
+      this.ctx.error(id, 'You may have at most 5 pending expedition applications.');
       return;
     }
     if (this.ctx.partyOf(id)) {
@@ -645,8 +822,45 @@ export class DungeonFinderMachine {
       return;
     }
     let roles: Role[] = [];
-    if (activity.composition !== null) {
-      roles = this.allowedRoles(id);
+    if (expeditionRole !== undefined && listing.expeditionExitId === undefined) {
+      const eligible = compatibleFinderRoles(r.meta.cls, r.e.level, r.meta.talentMods.role);
+      if (!eligible.includes(expeditionRole)) {
+        this.ctx.error(id, 'You cannot fill that role.');
+        return;
+      }
+      if (r.meta.leaving || this.unitFor(id) || this.proposalFor(id)) {
+        this.ctx.error(id, 'That player is no longer available.');
+        return;
+      }
+    }
+    if (listing.expeditionExitId !== undefined) {
+      const claim = expeditionClaimByExit(this.ctx, listing.expeditionExitId);
+      const selected = expeditionRole ?? this.allowedRoles(id)[0];
+      const eligible = compatibleFinderRoles(r.meta.cls, r.e.level, r.meta.talentMods.role);
+      if (!selected || !eligible.includes(selected)) {
+        this.memberRolesError(id, id);
+        return;
+      }
+      const cooldowns = this.expeditionApplicationUntil.get(id);
+      if (cooldowns) {
+        for (const [targetId, until] of cooldowns)
+          if (until <= this.ctx.time) cooldowns.delete(targetId);
+        if (cooldowns.has(listingId) || cooldowns.size >= FINDER_EXPEDITION_RECENT_APPLICATION_CAP)
+          return;
+      }
+      if (
+        !claim ||
+        !expeditionAdmission(this.ctx, claim, id, listing.leaderPid) ||
+        this.unitFor(id) ||
+        this.proposalFor(id) ||
+        this.applicationsFor(listing).length >= FINDER_EXPEDITION_APPLICATION_CAP
+      ) {
+        this.ctx.error(id, 'That player is no longer available.');
+        return;
+      }
+      roles = [selected];
+    } else if (activity.composition !== null) {
+      roles = expeditionRole === undefined ? this.allowedRoles(id) : [expeditionRole];
       if (roles.length === 0) {
         this.memberRolesError(id, id);
         return;
@@ -659,13 +873,28 @@ export class DungeonFinderMachine {
       this.ctx.error(id, 'That listing has no room for your roles.');
       return;
     }
-    this.applications.set(id, {
+    this.applications.set({
       pid: id,
       listingId: listing.id,
+      activityId: listing.activityId,
+      leaderPid: listing.leaderPid,
       roles,
+      ...(expeditionRole === undefined || listing.expeditionExitId !== undefined
+        ? {}
+        : { selectedRole: expeditionRole }),
       at: this.nextApplicationSeq++,
+      ...(listing.expeditionExitId !== undefined
+        ? { expiresAt: this.ctx.time + FINDER_EXPEDITION_APPLICATION_SECONDS }
+        : {}),
     });
+    this.social.clearFeedback(id);
     this.bumpBoard();
+    if (listing.expeditionExitId !== undefined) {
+      const cooldowns = this.expeditionApplicationUntil.get(id) ?? new Map<number, number>();
+      cooldowns.set(listingId, this.ctx.time + FINDER_EXPEDITION_APPLICATION_COOLDOWN);
+      this.expeditionApplicationUntil.set(id, cooldowns);
+      return;
+    }
     this.ctx.notice(id, 'You apply to a group listing.');
     if (this.ctx.players.has(listing.leaderPid))
       this.ctx.notice(listing.leaderPid, `${r.meta.name} applies to your group listing.`);
@@ -695,11 +924,19 @@ export class DungeonFinderMachine {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const id = r.meta.entityId;
-    if (!this.applications.has(id)) {
+    this.cancelApplication(id);
+  }
+
+  private cancelApplication(id: number, listingId?: number): void {
+    const app = this.applications.get(id, listingId);
+    if (!app) {
       this.ctx.error(id, 'You have no pending application.');
       return;
     }
-    this.applications.delete(id);
+    const listing = this.listings.find((l) => l.id === app.listingId);
+    if (listing?.expeditionExitId !== undefined)
+      this.social.outcome(id, 'cancelled', this.ctx.players.get(listing.leaderPid)?.name ?? '');
+    this.dropApplication(id, app.listingId);
     this.bumpBoard();
     this.ctx.notice(id, 'You withdraw your application.');
   }
@@ -713,12 +950,18 @@ export class DungeonFinderMachine {
       this.ctx.error(id, 'You do not lead a group listing.');
       return;
     }
-    const app = this.applications.get(applicantPid);
-    if (!app || app.listingId !== listing.id) {
+    const app = this.applications.get(applicantPid, listing.id);
+    if (!app || app.listingId !== listing.id || !this.listingValid(listing)) {
       this.ctx.error(id, 'That player is no longer available.');
       return;
     }
-    this.applications.delete(applicantPid);
+    if (listing.expeditionExitId !== undefined)
+      this.social.outcome(
+        applicantPid,
+        (app.expiresAt ?? 0) <= this.ctx.time ? 'expired' : accept ? 'closed' : 'declined',
+        r.meta.name,
+      );
+    this.dropApplication(applicantPid, listing.id);
     this.bumpBoard();
     if (!accept) {
       if (this.ctx.players.has(applicantPid))
@@ -735,9 +978,26 @@ export class DungeonFinderMachine {
       this.ctx.error(id, 'That player is no longer available.');
       return;
     }
+    const applicantRoles =
+      app.selectedRole === undefined ? this.allowedRoles(applicantPid) : [app.selectedRole];
     if (
+      app.selectedRole !== undefined &&
+      (applicant.meta.leaving ||
+        this.unitFor(applicantPid) ||
+        this.proposalFor(applicantPid) ||
+        !compatibleFinderRoles(
+          applicant.meta.cls,
+          applicant.e.level,
+          applicant.meta.talentMods.role,
+        ).includes(app.selectedRole))
+    ) {
+      this.ctx.error(id, 'That player is no longer available.');
+      return;
+    }
+    if (
+      listing.expeditionExitId === undefined &&
       activity.composition !== null &&
-      !this.applicantFits(listing, activity, applicantPid, this.allowedRoles(applicantPid))
+      !this.applicantFits(listing, activity, applicantPid, applicantRoles)
     ) {
       this.ctx.error(id, 'That listing has no room for your roles.');
       return;
@@ -751,6 +1011,28 @@ export class DungeonFinderMachine {
       this.ctx.error(id, 'Your group is too large for that activity.');
       return;
     }
+    let expeditionClaim: InstanceSlot | undefined;
+    if (listing.expeditionExitId !== undefined) {
+      const claim = expeditionClaimByExit(this.ctx, listing.expeditionExitId);
+      const eligible = compatibleFinderRoles(
+        applicant.meta.cls,
+        applicant.e.level,
+        applicant.meta.talentMods.role,
+      );
+      if (
+        !claim ||
+        (app.expiresAt ?? 0) <= this.ctx.time ||
+        app.roles.length !== 1 ||
+        !eligible.includes(app.roles[0]) ||
+        !expeditionAdmission(this.ctx, claim, applicantPid, id) ||
+        this.unitFor(applicantPid) ||
+        this.proposalFor(applicantPid)
+      ) {
+        this.ctx.error(id, 'That player is no longer available.');
+        return;
+      }
+      expeditionClaim = claim;
+    }
     const leaderUnit = {
       partyId: party?.id ?? null,
       leaderPid: id,
@@ -758,11 +1040,28 @@ export class DungeonFinderMachine {
     };
     const formed = this.ctx.formDungeonFinderGroup(
       [leaderUnit, { partyId: null, leaderPid: applicantPid, members: [applicantPid] }],
-      { raid: activity.kind === 'raid' },
+      { raid: activity.kind === 'raid', expeditionClaim },
     );
     if (!formed) {
       this.ctx.error(id, 'That player is no longer available.');
       return;
+    }
+    if (app.selectedRole !== undefined) this.roleSelections.set(applicantPid, [app.selectedRole]);
+    if (expeditionClaim && expeditionClaim.exitId !== null) {
+      admitQueueHelper(this.ctx, expeditionClaim, applicantPid, formed.id);
+      this.social.outcome(applicantPid, 'accepted', r.meta.name);
+      listing.expeditionPartyId = formed.id;
+      for (const memberPid of formed.members)
+        this.expeditionMemberships.set(memberPid, {
+          exitId: expeditionClaim.exitId,
+          leaderPid: id,
+          partyId: formed.id,
+          role:
+            memberPid === applicantPid
+              ? app.roles[0]
+              : (this.expeditionMemberships.get(memberPid)?.role ??
+                this.allowedRoles(memberPid)[0]),
+        });
     }
     this.ctx.notice(applicantPid, 'Your application was accepted.');
     // The applicant's own queue/application side-state is stale now that they
@@ -782,8 +1081,11 @@ export class DungeonFinderMachine {
   // Called by Sim.removePlayer before the party machine tears the player out
   // of their party, so premade snapshots still resolve for notices.
   onPlayerRemoved(pid: number): void {
+    this.social.remove(pid);
     this.roleSelections.delete(pid);
     this.cooldownUntil.delete(pid);
+    this.expeditionApplicationUntil.delete(pid);
+    this.expeditionMemberships.delete(pid);
     const unit = this.unitFor(pid);
     if (unit) {
       this.dropUnit(unit);
@@ -796,13 +1098,55 @@ export class DungeonFinderMachine {
     if (proposal) this.failProposal(proposal, new Set([pid]), { blame: false });
     const listing = this.listingBy(pid);
     if (listing) this.closeListing(listing, { notifyLeader: false });
-    if (this.applications.delete(pid)) this.bumpBoard();
+    if (this.dropApplication(pid)) this.bumpBoard();
   }
 
   // ---- per-tick update (end-of-tick system block) ------------------------------
 
   update(): void {
-    if (this.ctx.tickCount % 20 === 0) this.sweep();
+    if (this.ctx.tickCount % 20 === 0) {
+      this.sweep();
+      const occupied = new Set(this.queue.flatMap((unit) => unit.members));
+      for (const proposal of this.proposals)
+        for (const pid of proposal.roles.keys()) occupied.add(pid);
+      const leaderListings = new Map(
+        this.listings.map((listing) => [listing.leaderPid, listing.id]),
+      );
+      const viewers = new Map<
+        number,
+        { level: number; roles: Role[]; ownListing?: number } | null
+      >();
+      this.social.update(this.buildBoard(), this.ctx.time, (pid, row, selected) => {
+        if (!viewers.has(pid)) {
+          const meta = this.ctx.players.get(pid);
+          const level = this.levelOf(pid);
+          viewers.set(
+            pid,
+            !meta ||
+              meta.leaving ||
+              this.ctx.partyOf(pid) ||
+              occupied.has(pid) ||
+              this.applications.has(pid)
+              ? null
+              : {
+                  level,
+                  roles: compatibleFinderRoles(meta.cls, level, meta.talentMods.role),
+                  ownListing: leaderListings.get(pid),
+                },
+          );
+        }
+        const viewer = viewers.get(pid);
+        const activity = finderActivity(row.activityId);
+        return (
+          !!viewer &&
+          !!activity &&
+          viewer.ownListing !== row.id &&
+          finderLevelEligible(activity, viewer.level) &&
+          row.size < row.capacity &&
+          selected.some((role) => viewer.roles.includes(role))
+        );
+      });
+    }
     if (this.matchDirty) {
       this.matchDirty = false;
       this.runMatching();
@@ -842,24 +1186,66 @@ export class DungeonFinderMachine {
     for (const listing of [...this.listings]) {
       if (!this.listingValid(listing)) this.closeListing(listing, { notifyLeader: true });
     }
-    for (const [pid, app] of [...this.applications]) {
+    for (const [pid, cooldowns] of this.expeditionApplicationUntil) {
+      for (const [listingId, until] of cooldowns)
+        if (until <= this.ctx.time) cooldowns.delete(listingId);
+      if (!cooldowns.size) this.expeditionApplicationUntil.delete(pid);
+    }
+    for (const [pid, membership] of this.expeditionMemberships) {
+      const party = this.ctx.partyOf(pid);
+      const claim = expeditionClaimByExit(this.ctx, membership.exitId);
+      const activity = claim ? expeditionActivity(claim) : null;
+      if (
+        !party ||
+        party.id !== membership.partyId ||
+        party.leader !== membership.leaderPid ||
+        !claim ||
+        claim.partyKey !== `party:${party.id}` ||
+        !activity ||
+        expeditionFinished(this.ctx, claim, activity)
+      )
+        this.expeditionMemberships.delete(pid);
+    }
+    for (const app of this.applications.values()) {
+      const pid = app.pid;
       const listing = this.listings.find((l) => l.id === app.listingId) ?? null;
       if (!listing) {
         // closeListing already notified; entry only lingers if the player
         // vanished mid-close.
-        this.applications.delete(pid);
+        this.dropApplication(pid, app.listingId);
         continue;
       }
       const activity = finderActivity(listing.activityId);
-      const alive = this.ctx.players.has(pid) && this.ctx.entities.has(pid);
+      const meta = this.ctx.players.get(pid);
+      const alive = !!meta && this.ctx.entities.has(pid);
       const eligible =
         alive &&
         activity !== null &&
         this.ctx.partyOf(pid) === null &&
         finderLevelEligible(activity, this.levelOf(pid)) &&
-        (activity.composition === null || this.allowedRoles(pid).length > 0);
+        !this.ctx.players.get(pid)?.leaving &&
+        (listing.expeditionExitId !== undefined
+          ? (app.expiresAt ?? 0) > this.ctx.time &&
+            app.roles.every((role) => {
+              const meta = this.ctx.players.get(pid);
+              return (
+                meta &&
+                compatibleFinderRoles(meta.cls, this.levelOf(pid), meta.talentMods.role).includes(
+                  role,
+                )
+              );
+            })
+          : app.selectedRole !== undefined
+            ? compatibleFinderRoles(meta.cls, this.levelOf(pid), null).includes(app.selectedRole)
+            : activity.composition === null || this.allowedRoles(pid).length > 0);
       if (!eligible) {
-        this.applications.delete(pid);
+        if (listing.expeditionExitId !== undefined)
+          this.social.outcome(
+            pid,
+            (app.expiresAt ?? 0) <= this.ctx.time ? 'expired' : 'closed',
+            this.ctx.players.get(listing.leaderPid)?.name ?? '',
+          );
+        this.dropApplication(pid, app.listingId);
         this.bumpBoard();
         if (alive) this.ctx.notice(pid, 'You withdraw your application.');
       }
@@ -869,13 +1255,35 @@ export class DungeonFinderMachine {
   private listingValid(listing: FinderListing): boolean {
     const activity = finderActivity(listing.activityId);
     if (!activity) return false;
-    if (!this.ctx.players.has(listing.leaderPid)) return false;
+    if (
+      !this.ctx.players.has(listing.leaderPid) ||
+      this.ctx.players.get(listing.leaderPid)?.leaving
+    )
+      return false;
     const party = this.ctx.partyOf(listing.leaderPid);
     if (party && party.leader !== listing.leaderPid) return false;
     const members = this.listingMembers(listing);
     if (members.length >= activity.size) return false;
+    if (listing.expeditionExitId !== undefined) {
+      const claim = expeditionClaimByExit(this.ctx, listing.expeditionExitId);
+      if (
+        (party?.id ?? null) !== listing.expeditionPartyId ||
+        !claim ||
+        !this.ctx.entities.get(listing.leaderPid) ||
+        !instanceClaimHolds(claim, this.ctx.entities.get(listing.leaderPid)!.pos) ||
+        claim.partyKey !== this.ctx.instanceKeyFor(listing.leaderPid) ||
+        !expeditionActivity(claim) ||
+        expeditionFinished(this.ctx, claim, activity)
+      )
+        return false;
+    }
     for (const memberPid of members) {
-      if (!finderLevelEligible(activity, this.levelOf(memberPid))) return false;
+      if (
+        !this.ctx.players.has(memberPid) ||
+        this.ctx.players.get(memberPid)?.leaving ||
+        !finderLevelEligible(activity, this.levelOf(memberPid))
+      )
+        return false;
     }
     return true;
   }
@@ -1012,7 +1420,19 @@ export class DungeonFinderMachine {
     const queueUnit = unit ?? heldUnit;
     const until = this.cooldownUntil.get(pid) ?? 0;
     const listing = this.listingBy(pid);
-    const app = this.applications.get(pid) ?? null;
+    // Personal projection is bounded by FINDER_PLAYER_APPLICATION_CAP (5).
+    const myApplications = this.applications.forPlayer(pid).map((app) => {
+      return {
+        listingId: app.listingId,
+        activityId: app.activityId,
+        leaderName: this.ctx.players.get(app.leaderPid)?.name ?? '',
+        ...(app.expiresAt === undefined
+          ? {}
+          : {
+              remaining: Math.max(0, Math.ceil(app.expiresAt - this.ctx.time)),
+            }),
+      };
+    });
     return {
       roles,
       eligibleRoles,
@@ -1029,8 +1449,8 @@ export class DungeonFinderMachine {
             id: listing.id,
             activityId: listing.activityId,
             tags: [...listing.tags],
-            applicants: [...this.applications.values()]
-              .filter((a) => a.listingId === listing.id)
+            ...(listing.details ? { details: { ...listing.details } } : {}),
+            applicants: this.applicationsFor(listing)
               .sort((a, b) => a.at - b.at)
               .map((a) => {
                 const applicant = this.ctx.players.get(a.pid);
@@ -1038,13 +1458,55 @@ export class DungeonFinderMachine {
                   pid: a.pid,
                   name: applicant?.name ?? '',
                   cls: applicant?.cls ?? 'warrior',
+                  spec: applicant?.talents.spec ?? null,
                   level: this.levelOf(a.pid),
                   roles: [...a.roles],
+                  ...(a.expiresAt === undefined
+                    ? {}
+                    : { remaining: Math.max(0, Math.ceil(a.expiresAt - this.ctx.time)) }),
                 };
               }),
           }
         : null,
-      myApplication: app ? { listingId: app.listingId } : null,
+      myApplication: myApplications[0] ?? null,
+      myApplications,
+      expedition: this.expeditionViewFor(pid),
+      availability: this.social.readAvailability(pid),
+      applicationFeedback: this.social.readFeedback(pid),
+      queueRewards: queueRewardsView(meta?.queueRewards, this.ctx.resetDay),
+    };
+  }
+
+  private expeditionViewFor(pid: number): DungeonFinderExpeditionView | null {
+    const party = this.ctx.partyOf(pid);
+    const leaderPid = party?.leader ?? pid;
+    let claim = currentExpeditionClaim(this.ctx, pid);
+    if (!claim) {
+      const membership = this.expeditionMemberships.get(pid);
+      if (membership && party?.id === membership.partyId && leaderPid === membership.leaderPid)
+        claim = expeditionClaimByExit(this.ctx, membership.exitId);
+    }
+    const activity = claim ? expeditionActivity(claim) : null;
+    if (
+      !claim ||
+      claim.exitId === null ||
+      !activity ||
+      claim.partyKey !== this.ctx.instanceKeyFor(pid) ||
+      expeditionFinished(this.ctx, claim, activity)
+    )
+      return null;
+    const player = this.ctx.entities.get(pid);
+    const listing = this.listingBy(leaderPid);
+    return {
+      exitId: claim.exitId,
+      activityId: activity.id,
+      dungeonId: claim.dungeonId,
+      leaderPid,
+      isLeader: leaderPid === pid,
+      isInside: !!player && instanceClaimHolds(claim, player.pos),
+      canTravel: canTravelToExpedition(this.ctx, claim, pid),
+      open: listing?.expeditionExitId === claim.exitId && this.listingValid(listing),
+      ...expeditionProgress(this.ctx, claim, activity),
     };
   }
 
@@ -1080,7 +1542,7 @@ export class DungeonFinderMachine {
     for (const listing of this.listings) {
       if (board.length >= FINDER_BOARD_LISTING_CAP) break;
       const activity = finderActivity(listing.activityId);
-      if (!activity) continue;
+      if (!activity || !this.listingValid(listing)) continue;
       const members = this.listingMembers(listing);
       const view = this.listingViewFor(listing, activity, members);
       if (view) board.push(view);
@@ -1100,7 +1562,12 @@ export class DungeonFinderMachine {
     if (!leader) return null;
     let assigned = new Map<number, Role>();
     let needed: { tank: number; healer: number; dps: number } | null = null;
-    if (activity.composition !== null) {
+    if (listing.expeditionExitId !== undefined) {
+      for (const pid of members) {
+        const role = this.expeditionMemberships.get(pid)?.role ?? this.allowedRoles(pid)[0];
+        if (role) assigned.set(pid, role);
+      }
+    } else if (activity.composition !== null) {
       const seatable: FinderRoleMember[] = members
         .map((pid) => ({ pid, roles: this.allowedRoles(pid) }))
         .filter((m) => m.roles.length > 0);
@@ -1116,6 +1583,16 @@ export class DungeonFinderMachine {
       id: listing.id,
       activityId: listing.activityId,
       leaderName: leader.name,
+      ...(listing.details ? { details: { ...listing.details } } : {}),
+      ...(listing.expeditionExitId !== undefined
+        ? {
+            expedition: expeditionProgress(
+              this.ctx,
+              expeditionClaimByExit(this.ctx, listing.expeditionExitId)!,
+              activity,
+            ),
+          }
+        : {}),
       tags: [...listing.tags],
       size: members.length,
       capacity: activity.size,

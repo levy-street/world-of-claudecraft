@@ -36,6 +36,7 @@ import type { WeeklyRewardState } from './weekly_rewards';
 // are optional so characters saved before the Ashen Coliseum existed load
 // cleanly (addPlayer falls back to the unranked defaults).
 export interface CharacterState {
+  queueRewards?: import('./social/queue_rewards').QueueRewardsState;
   // Production content migration revision. Revision 1 is the v0.26 all-class
   // Talents V2 migration; revision 2 is the v0.29 Hunter redesign repick.
   // Absent means a pre-v0.26 character JSONB save.

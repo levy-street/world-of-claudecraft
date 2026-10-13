@@ -628,6 +628,10 @@ const UI_PURE_CORES = [
   'src/ui/pvp_tabs_view.ts',
   'src/ui/pvp_hostile_core.ts',
   'src/ui/dungeon_finder_view.ts',
+  'src/ui/dungeon_catalogue_view.ts',
+  'src/ui/dungeon_loot_preview_view.ts',
+  'src/ui/hud/expeditions/expedition_view.ts',
+  'src/ui/hud/expeditions/recruitment_view.ts',
   'src/ui/yumi_match_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
@@ -2647,6 +2651,10 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/dungeon_group_controls.ts',
+  'src/ui/hud/expeditions/finder_surfaces.ts',
+  'src/ui/hud/expeditions/expedition_controller.ts',
+  'src/ui/hud/expeditions/recruitment_controller.ts',
   'src/ui/error_toast_controller.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',

@@ -14970,12 +14970,337 @@
      sits on screen from boot (same reason #market-window declares it). The painter
      opens with inline `flex`, which is what the flex-column bounds below assume. */
   #dungeon-finder-window {
-    width: 640px;
+    width: 1120px;
     max-width: 96%;
-    --window-pad: 14px;
+    --window-pad: 18px;
+    --panel-bg: linear-gradient(
+      145deg,
+      var(--color-ranking-ground-top),
+      var(--color-ranking-ground-deep)
+    );
+    --panel-bg-soft: var(--color-ranking-well);
+    --panel-bg-strong: var(--color-ranking-ground);
+    --panel-base: var(--color-ranking-ground-deep);
+    --color-panel-hi: var(--color-ranking-ground-top);
+    --color-card-hi: var(--color-ranking-control-hover-deep);
+    --color-card-lo: var(--color-ranking-well);
+    --color-bg-input: var(--color-ranking-ground-deep);
+    --color-text-light: var(--color-ranking-text);
+    --color-text-secondary: var(--color-ranking-text-soft);
+    --color-text-muted: var(--color-ranking-text-muted);
+    --color-text-faint: var(--color-ranking-text-muted);
+    --gold: var(--color-wq-ranking-heading);
+    --gold-dim: var(--color-wq-ranking-edge);
+    --border: var(--color-wq-ranking-edge);
+    --df-border: var(--color-ranking-control-border);
+    --color-border-showcase: var(--color-wq-ranking-edge);
+    --btn-fill-selected: linear-gradient(
+      135deg,
+      var(--color-ranking-control),
+      var(--color-ranking-ground-top)
+    );
     display: none;
     flex-direction: column;
-    max-height: min(700px, 80vh);
+    height: 820px;
+    max-height: 88vh;
+  }
+  #dungeon-finder-window:has(.df-body-catalogue) {
+    --color-text-light: var(--color-finder-text);
+    --color-text-secondary: var(--color-finder-muted);
+    --color-text-muted: var(--color-finder-muted);
+    --color-border-showcase: var(--color-finder-line);
+    --color-card-hi: var(--color-finder-surface);
+    --color-card-lo: var(--color-finder-ink);
+    --color-bg-input: var(--color-finder-ink);
+    --panel-bg-soft: var(--color-finder-ink);
+    --df-border: var(--color-finder-line);
+    --gold: var(--color-finder-gold);
+    --gold-dim: var(--color-finder-gold-deep);
+    --radius-card: 10px;
+    --input-h: 42px;
+    font: 400 16px / 1.45 var(--font-ui);
+    color: var(--color-finder-text);
+  }
+  #dungeon-finder-window:has(.df-body-catalogue) .df-tab {
+    font-size: 15px;
+    min-height: 44px;
+  }
+  #dungeon-finder-window:has(.df-body-catalogue) .ui-win-title {
+    font-size: 22px;
+  }
+  .df-detail-hero-copy {
+    position: relative;
+    z-index: 1;
+  }
+  .df-guide-hero-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+  .df-guide-hero-portrait {
+    inset-inline-start: auto;
+    width: 60%;
+    object-position: center 25%;
+  }
+  .df-detail-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        var(--color-finder-ink),
+        color-mix(in srgb, var(--color-finder-ink) 82%, transparent) 48%,
+        color-mix(in srgb, var(--color-finder-ink) 28%, transparent)
+      ),
+      linear-gradient(0deg, var(--color-finder-ink), transparent);
+  }
+  .df-detail-hero::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0 12% auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-finder-gold), transparent);
+    pointer-events: none;
+  }
+  .df-body-catalogue .ui-btn {
+    min-height: 42px;
+    font: 600 15px / 1.25 var(--font-ui);
+  }
+  .df-body-catalogue .ui-input,
+  .df-search .ui-input {
+    font-size: 16px;
+  }
+  .df-body-catalogue .df-badge {
+    font: 600 12px / 1.6 var(--font-ui);
+    color: var(--color-finder-teal);
+  }
+  .df-body-catalogue .df-badge.heroic {
+    color: var(--color-finder-violet);
+  }
+  .df-body-catalogue .df-chip,
+  .df-body-catalogue .df-flag {
+    font: 600 13px / 1.5 var(--font-ui);
+    white-space: normal;
+  }
+  .df-body-catalogue .df-sub {
+    font: 600 19px / 1.4 var(--font-display);
+    margin: 18px 0 10px;
+  }
+  .df-body-catalogue [data-combat-role="tank"] {
+    color: var(--color-finder-tank);
+  }
+  .df-body-catalogue [data-combat-role="healer"] {
+    color: var(--color-finder-healer);
+  }
+  .df-body-catalogue [data-combat-role="dps"] {
+    color: var(--color-finder-dps);
+  }
+  .df-category[data-category="raids"] {
+    --gold: var(--color-finder-violet);
+  }
+  .df-category[data-category="delves"] {
+    --gold: var(--color-finder-teal);
+  }
+  .df-category .ui-icon {
+    color: var(--gold);
+  }
+  .df-category.is-on {
+    --btn-fill-selected: linear-gradient(
+      135deg,
+      var(--color-finder-surface-raised),
+      var(--color-finder-ink)
+    );
+    --color-control-border: var(--gold);
+    color: var(--color-finder-text);
+    box-shadow:
+      inset 0 -2px var(--gold),
+      0 0 calc(14px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 12%, transparent);
+  }
+  @media (forced-colors: active) {
+    #dungeon-finder-window:has(.df-body-catalogue),
+    .df-board-shell {
+      background: Canvas;
+      color: CanvasText;
+    }
+    .df-category.is-on,
+    .df-row.active {
+      outline: 2px solid Highlight;
+      outline-offset: -4px;
+    }
+    .df-guide-hero-art,
+    .df-detail-hero::after,
+    .df-detail-hero::before {
+      display: none;
+    }
+  }
+  .df-guide-intro {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding: 4px 2px 8px;
+    flex: none;
+  }
+  .df-eyebrow {
+    color: var(--color-finder-gold);
+    font: 600 12px var(--font-display);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    flex: none;
+  }
+  .df-guide-intro p {
+    color: var(--color-finder-muted);
+    margin: 0;
+    font-size: 14px;
+  }
+  .df-categories {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    flex: none;
+  }
+  .df-category {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 58px;
+    padding: 12px 18px;
+    font: 600 17px var(--font-display);
+  }
+  .df-category .ui-icon {
+    width: 24px;
+    height: 24px;
+    flex: none;
+  }
+  .df-category-count {
+    margin-left: auto;
+    font: 700 19px var(--font-ui);
+    font-variant-numeric: tabular-nums;
+    color: var(--gold);
+  }
+  .df-filters {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 12px 0;
+    flex: none;
+  }
+  .df-search {
+    flex: 1;
+    min-width: 0;
+  }
+  .df-search input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .df-search > span {
+    display: block;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .df-eligible {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    font-size: 15px;
+    color: var(--color-finder-muted);
+    cursor: var(--cursor-point);
+  }
+  .df-rail {
+    padding: 10px;
+    scrollbar-gutter: stable;
+  }
+  .df-rail-count {
+    color: var(--color-finder-teal);
+    font: 600 12px var(--font-display);
+    letter-spacing: 1px;
+    padding: 6px 4px 14px;
+  }
+  .df-detail {
+    padding: 0 4px 18px;
+    scrollbar-gutter: stable;
+  }
+  .df-detail-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding: 24px;
+    margin-bottom: 16px;
+    border: 1px solid var(--color-finder-line);
+    border-radius: var(--radius-card);
+    background: var(--color-finder-ink);
+  }
+  .df-guide-description {
+    max-width: 52ch;
+    font-size: 16px;
+    color: var(--color-finder-muted);
+    line-height: 1.5;
+    margin: 16px 0 20px;
+  }
+  .df-group-btn {
+    --btn-fill-gold: linear-gradient(
+      var(--color-finder-gold),
+      color-mix(in srgb, var(--color-finder-gold) 74%, var(--color-finder-gold-deep))
+    );
+    --color-text-on-gold-btn: var(--color-finder-ink);
+    --gold-dim: var(--color-finder-gold-deep);
+    min-height: 44px;
+    padding-inline: 26px;
+  }
+  .df-glyph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+  }
+  .df-glyph .ui-icon {
+    width: 32px;
+    height: 32px;
+  }
+  .df-loot-filter {
+    padding: 0 0 16px;
+    border-bottom: 1px solid var(--df-border);
+    margin: 18px 0;
+  }
+  .df-loot-selects {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .df-loot-selects label {
+    min-width: 0;
+    display: grid;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--color-finder-muted);
+  }
+  .df-loot-selects select {
+    width: 100%;
+    min-width: 0;
+    color: var(--color-ranking-text);
+  }
+  .df-loot-selects option {
+    background: var(--color-ranking-ground);
+  }
+  .df-loot-hint {
+    color: var(--color-finder-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 0;
+  }
+  .df-empty {
+    margin: auto;
+    padding: 30px;
+    text-align: center;
+    color: var(--color-text-secondary);
   }
   .df-tabs {
     display: flex;
@@ -14989,7 +15314,7 @@
     justify-content: center;
     gap: 6px;
     padding: 6px 0;
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--df-border);
     cursor: var(--cursor-point);
   }
   .df-body {
@@ -15001,12 +15326,14 @@
   .df-body-catalogue {
     display: flex;
     overflow: hidden;
+    container: finder-catalogue / inline-size;
   }
   .df-cols {
     display: grid;
-    grid-template-columns: 236px 1fr;
-    gap: 10px;
+    grid-template-columns: minmax(290px, 0.95fr) minmax(0, 1.75fr);
+    gap: 20px;
     flex: 1 1 auto;
+    min-width: 0;
     min-height: 0;
   }
   .df-rail,
@@ -15018,29 +15345,29 @@
   .df-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 14px;
     width: 100%;
     text-align: left;
-    padding: 7px 8px;
-    margin: 0 0 4px;
-    border: 1px solid var(--panel-border);
+    padding: 14px 12px;
+    margin: 0 0 10px;
     cursor: var(--cursor-point);
   }
   .df-row.active {
-    border-color: var(--gold-dim);
-    color: var(--color-text-light);
-    background: var(--btn-fill-selected);
+    --color-border-showcase: var(--color-finder-teal);
+    --color-card-hi: var(--color-finder-surface-raised);
+    color: var(--color-finder-text);
+    box-shadow: inset 3px 0 var(--color-finder-teal);
   }
   .df-row.ineligible {
-    opacity: 0.55;
+    opacity: 1;
   }
   .df-row-icon {
-    width: 30px;
-    height: 30px;
-    flex: 0 0 30px;
+    width: 64px;
+    height: 80px;
+    flex: 0 0 64px;
     object-fit: cover;
-    border: 1px solid var(--panel-border);
-    border-radius: 4px;
+    border: 1px solid var(--df-border);
+    border-radius: 7px;
     background: var(--color-card-lo);
   }
   .df-row-text {
@@ -15050,15 +15377,17 @@
   }
   .df-row-name {
     display: block;
-    font-family: var(--title-font);
-    font-size: 13px;
+    font: 600 17px / 1.4 var(--font-display);
+    color: var(--color-finder-text);
   }
   .df-row-meta,
   .df-lock,
   .df-blocked {
     display: block;
-    font-size: 11px;
-    color: var(--color-text-muted);
+    font-size: 14px;
+    line-height: 1.45;
+    margin-top: 5px;
+    color: var(--color-finder-muted);
   }
   .df-lock {
     color: var(--color-text-error);
@@ -15066,7 +15395,7 @@
   .df-badge {
     padding: 1px 5px;
     margin-left: 4px;
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--df-border);
     vertical-align: 1px;
   }
   .df-badge.heroic {
@@ -15075,46 +15404,58 @@
   }
   .df-kind {
     margin-left: 6px;
-    font-size: 11px;
-    color: var(--color-text-muted);
+    font-size: 14px;
+    color: var(--color-finder-muted);
   }
   .df-detail-head {
     display: flex;
     align-items: center;
     gap: 6px;
     margin-bottom: 6px;
+    flex-wrap: wrap;
   }
   .df-detail-icon {
-    width: 40px;
-    height: 40px;
-    flex: 0 0 40px;
+    width: 56px;
+    height: 68px;
+    flex: 0 0 56px;
     object-fit: cover;
-    border: 1px solid var(--panel-border);
-    border-radius: 4px;
+    border: 1px solid var(--df-border);
+    border-radius: 7px;
     background: var(--color-card-lo);
   }
   .df-detail-name {
-    font-family: var(--title-font);
-    font-size: 16px;
-    color: var(--gold);
+    font: 600 27px / 1.25 var(--font-display);
+    flex: 1;
+    color: var(--color-finder-text);
   }
   .df-back {
     display: none;
   }
   .df-meta {
-    border: 1px solid var(--panel-border);
-    padding: 8px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+    padding: 18px;
     margin-bottom: 8px;
   }
   .df-meta-row {
-    font-size: 12px;
-    margin: 2px 0;
-    color: var(--color-text-muted);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-finder-muted);
+    overflow-wrap: anywhere;
+  }
+  .df-entrance {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-top: 1px solid var(--df-border);
+    padding-top: 12px;
   }
   .df-entrance .df-map-btn {
-    margin-left: 6px;
-    padding: 2px 8px;
-    font-size: 11px;
+    margin-left: auto;
+    padding: 8px 14px;
   }
   .df-sub {
     font-family: var(--title-font);
@@ -15124,21 +15465,18 @@
   }
   .df-encounter {
     display: flex;
-    gap: 8px;
-    border: 1px solid var(--panel-border);
-    padding: 8px;
-    margin-bottom: 6px;
+    gap: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
   }
   .df-portrait {
-    width: 64px;
-    height: 64px;
-    flex: 0 0 64px;
+    width: 72px;
+    height: 88px;
+    flex: 0 0 72px;
     object-fit: cover;
-    border: 1px solid var(--panel-border);
-    border-radius: 4px;
+    border: 1px solid var(--df-border);
+    border-radius: 7px;
     background: var(--color-card-lo);
-    position: sticky;
-    top: 8px;
     align-self: flex-start;
   }
   .df-encounter-body {
@@ -15146,32 +15484,89 @@
     min-width: 0;
   }
   .df-encounter-name {
-    font-family: var(--title-font);
-    font-size: 13px;
-    color: var(--color-text-light);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font: 600 19px / 1.4 var(--font-display);
+    color: var(--color-finder-text);
   }
   .df-flag {
     margin-left: 6px;
     padding: 0 4px;
   }
-  .df-mechanics {
-    margin: 4px 0;
+  .df-encounter-guide {
+    margin: 12px 0 16px;
+  }
+  .df-encounter-guide > summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    max-width: 100%;
+    height: auto;
+    padding: 10px 16px;
+    list-style: none;
+    color: var(--color-finder-teal);
+  }
+  .df-encounter-guide > summary::-webkit-details-marker {
+    display: none;
+  }
+  .df-guide-hide,
+  .df-encounter-guide[open] .df-guide-show {
+    display: none;
+  }
+  .df-encounter-guide[open] .df-guide-hide {
+    display: inline;
+  }
+  .df-guide-content {
+    margin-top: 16px;
+    padding: 0 0 0 16px;
+    border-left: 2px solid var(--color-finder-line);
+    font: 400 16px / 1.55 var(--font-ui);
+    color: var(--color-finder-muted);
+    overflow-wrap: anywhere;
+  }
+  .df-guide-content p {
+    margin: 8px 0 14px;
+  }
+  .df-encounter-guide-phase + .df-encounter-guide-phase {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--color-finder-line);
+  }
+  .df-encounter-guide-phase h4 {
+    margin: 0 0 8px;
+    font: 600 19px / 1.4 var(--font-display);
+    color: var(--color-finder-gold);
+  }
+  .df-encounter-guide-mechanic h5 {
+    margin: 18px 0 6px;
+    font: 700 17px / 1.4 var(--font-ui);
+    color: var(--color-finder-text);
+  }
+  .df-encounter-guide-response strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--color-finder-teal);
   }
   .df-chip {
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--df-border);
     padding: 1px 8px;
     margin: 0 4px 4px 0;
   }
   .df-loot-sub {
-    font-size: 11px;
-    color: var(--color-text-muted);
-    margin: 6px 0 2px;
+    font-size: 14px;
+    color: var(--color-finder-muted);
+    margin: 14px 0 6px;
   }
   .df-loot-row {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 2px 2px;
+    gap: 10px;
+    min-height: 40px;
+    padding: 5px 2px;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-finder-line) 40%, transparent);
     border-radius: 3px;
   }
   .df-loot-row:focus-visible {
@@ -15179,23 +15574,64 @@
     outline-offset: 2px;
   }
   .df-loot-row img {
-    width: 22px;
-    height: 22px;
+    width: 32px;
+    height: 32px;
+    flex: none;
   }
   .df-loot-name {
     flex: 1;
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    min-width: 0;
+    font-size: 15px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .df-quality-poor {
+    color: var(--mkt-name-poor);
+  }
+  .df-quality-common {
+    color: var(--mkt-name-common);
+  }
+  .df-quality-uncommon {
+    color: var(--mkt-name-uncommon);
+  }
+  .df-quality-rare {
+    color: var(--mkt-name-rare);
+  }
+  .df-quality-epic {
+    color: var(--mkt-name-epic);
+  }
+  .df-quality-legendary {
+    color: var(--mkt-name-legendary);
   }
   .df-loot-chance {
-    font-size: 11px;
-    color: var(--color-text-muted);
+    flex: none;
+    font-size: 14px;
+    color: var(--color-finder-muted);
   }
   .df-loot-money {
     margin-top: 4px;
     font-size: 12px;
+  }
+  @container finder-catalogue (max-width: 700px) {
+    .df-cols {
+      display: block;
+    }
+    .df-rail,
+    .df-detail {
+      height: 100%;
+      box-sizing: border-box;
+    }
+    .df-pane-list .df-detail,
+    .df-pane-detail .df-rail {
+      display: none;
+    }
+    .df-back {
+      display: inline-block;
+      flex-basis: 100%;
+    }
+    .df-meta {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
   /* The "group found" popup: fixed top-center, outside the finder window. */
   #dfinder-proposal-popup {
@@ -15238,7 +15674,7 @@
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--border);
     padding: 7px 10px;
   }
   .dfp-slot .ui-icon {
@@ -15400,7 +15836,7 @@
     gap: 5px;
     padding: 6px 10px;
     font-size: 12px;
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--df-border);
     cursor: var(--cursor-point);
   }
   .df-opt.active {
@@ -15432,12 +15868,591 @@
   .df-warn {
     color: var(--color-text-error);
   }
-  .df-create,
-  .df-mine,
-  .df-listing {
-    border: 1px solid var(--panel-border);
+  .df-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 0 20px;
+    color: var(--color-finder-text);
+  }
+  .df-navigation-actions,
+  .df-group-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .df-navigation-actions {
+    margin-left: auto;
+  }
+  .df-navigation .ui-btn,
+  .df-group-toolbar .ui-btn,
+  .df-create-heading .ui-btn {
+    min-height: 44px;
+    height: auto;
+    padding: 10px 12px;
+    font: 600 16px / 1.3 var(--font-ui);
+    white-space: normal;
+  }
+  .df-navigation .ui-btn svg,
+  .df-group-toolbar .ui-btn svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .df-navigation-actions .ui-btn {
+    color: var(--color-finder-muted);
+  }
+  .df-create-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .df-create-heading .df-create-cancel {
+    font-size: 14px;
     padding: 8px;
-    margin-bottom: 6px;
+  }
+  .df-queue-shell {
+    --color-text-light: var(--color-finder-text);
+    --color-text-muted: var(--color-finder-muted);
+    --color-border-showcase: var(--color-finder-line);
+    --color-card-hi: var(--color-finder-surface);
+    --color-card-lo: var(--color-finder-ink);
+    --radius-card: 10px;
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    align-items: start;
+    gap: 22px;
+    padding: 6px 0 16px;
+    font: 400 16px / 1.45 var(--font-ui);
+    color: var(--color-finder-text);
+  }
+  #dungeon-finder-window .df-body:has(.df-queue-shell) {
+    container: finder-queue / inline-size;
+  }
+  #dungeon-finder-window:has(.df-queue-shell) .df-tab {
+    font-size: 15px;
+    min-height: 44px;
+  }
+  #dungeon-finder-window:has(.df-queue-shell) .ui-win-title {
+    font-size: 22px;
+  }
+  .df-queue-sidebar {
+    padding: 20px;
+    min-width: 0;
+  }
+  .df-queue-activities {
+    min-width: 0;
+  }
+  .df-queue-shell .df-sub {
+    font: 600 19px / 1.35 var(--font-display);
+    color: var(--color-finder-gold);
+    margin: 0 0 16px;
+    padding: 0;
+    border: 0;
+  }
+  .df-queue-shell .df-roles {
+    display: grid;
+    gap: 10px;
+  }
+  .df-queue-shell .df-role {
+    display: flex;
+    gap: 12px;
+    min-height: 62px;
+    padding: 12px;
+    font: 600 18px / 1.3 var(--font-ui);
+    color: var(--color-finder-dps);
+  }
+  .df-queue-shell .df-role[data-role="tank"] {
+    color: var(--color-finder-tank);
+  }
+  .df-queue-shell .df-role[data-role="healer"] {
+    color: var(--color-finder-healer);
+  }
+  .df-queue-shell .df-role svg {
+    width: 28px;
+    height: 28px;
+  }
+  .df-queue-shell .df-role::after {
+    content: "";
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    margin-left: auto;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+  }
+  .df-queue-shell .df-role.active {
+    border-color: currentColor;
+  }
+  .df-queue-shell .df-role.active::after {
+    background: currentColor;
+  }
+  .df-queue-shell .df-footer {
+    position: static;
+    margin-top: 20px;
+    background: transparent;
+  }
+  .df-queue-shell .df-footer .ui-btn {
+    min-height: 48px;
+    height: auto;
+    white-space: normal;
+    font-size: 17px;
+  }
+  .df-queue-shell .df-note,
+  .df-queue-shell .df-queue-status {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-finder-muted);
+  }
+  .df-queue-shell .df-warn {
+    color: var(--color-text-error);
+  }
+  .df-options.df-activity-options {
+    display: grid;
+    gap: 12px;
+  }
+  .df-activity-group {
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    min-width: 0;
+    padding: 0;
+  }
+  .df-activity-art {
+    width: 80px;
+    flex: 0 0 80px;
+  }
+  .df-activity-art img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 88px;
+    object-fit: cover;
+  }
+  .df-activity-copy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px;
+    flex: 1;
+    min-width: 0;
+  }
+  .df-activity-name {
+    font: 600 18px / 1.35 var(--font-display);
+    color: var(--color-finder-text);
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+  .df-difficulties {
+    display: flex;
+    flex-shrink: 0;
+    gap: 6px;
+  }
+  .df-activity-group .df-difficulty {
+    --btn-h: 44px;
+    min-height: 44px;
+    height: auto;
+    padding: 8px 12px;
+    font: 600 15px / 1.3 var(--font-ui);
+    color: var(--color-finder-teal);
+    border: 1px solid var(--color-finder-line);
+    border-radius: 6px;
+    white-space: normal;
+    background: var(--color-finder-ink);
+  }
+  .df-activity-group .df-difficulty[data-difficulty="heroic"] {
+    color: var(--color-finder-violet);
+  }
+  .df-activity-group .df-difficulty.active {
+    border-color: currentColor;
+    background: var(--color-finder-surface-raised);
+    box-shadow: inset 0 -3px currentColor;
+  }
+  .df-activity-group .df-difficulty:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+  .df-board-sidebar .df-activity-art {
+    display: none;
+  }
+  .df-board-sidebar .df-activity-copy {
+    gap: 8px;
+    padding: 10px;
+  }
+  .df-board-sidebar .df-activity-name {
+    font-size: 14px;
+  }
+  .df-board-sidebar .df-activity-group .df-difficulty {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  @container finder-queue (max-width: 760px) {
+    .df-queue-shell {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .df-queue-shell .df-roles {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .df-queue-shell .df-role {
+      flex-wrap: wrap;
+    }
+  }
+  @container finder-queue (max-width: 480px) {
+    .df-activity-copy {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px;
+    }
+    .df-activity-name {
+      font-size: 16px;
+    }
+    .df-queue-sidebar {
+      padding: 14px;
+    }
+    .df-queue-shell .df-role {
+      font-size: 15px;
+      position: relative;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 76px;
+      padding: 10px 8px;
+      gap: 6px;
+    }
+    .df-queue-shell .df-role::after {
+      position: absolute;
+      right: 7px;
+      top: 7px;
+      width: 8px;
+      height: 8px;
+    }
+  }
+  @media (forced-colors: active) {
+    .df-difficulty.active,
+    .df-queue-shell .df-role.active {
+      outline: 2px solid Highlight;
+      outline-offset: -3px;
+    }
+  }
+  .df-board-shell {
+    --color-text-light: var(--color-finder-text);
+    --color-text-muted: var(--color-finder-muted);
+    --color-text-secondary: var(--color-finder-muted);
+    --color-border-showcase: var(--color-finder-line);
+    --color-card-hi: var(--color-finder-surface);
+    --color-card-lo: var(--color-finder-ink);
+    --radius-card: 10px;
+    display: grid;
+    grid-template-columns: minmax(270px, 320px) minmax(0, 1fr);
+    align-items: start;
+    gap: 22px;
+    padding: 6px 0 16px;
+    font: 400 16px / 1.45 var(--font-ui);
+    color: var(--color-finder-text);
+    container-type: inline-size;
+  }
+  .df-board-sidebar,
+  .df-board-listings,
+  .df-board-browser {
+    min-width: 0;
+  }
+  .df-board-own {
+    min-width: 0;
+  }
+  .df-browse-roles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px;
+  }
+  .df-browse-roles .df-roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .df-browse-roles .df-role {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 16px;
+    font: 600 16px / 1.3 var(--font-ui);
+    color: var(--color-finder-muted);
+    cursor: pointer;
+  }
+  .df-browse-roles .df-role.active {
+    color: var(--color-finder-gold);
+    border-color: var(--color-finder-gold);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .df-current-group .expedition-member {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .df-current-group {
+    padding: 18px;
+    margin-bottom: 18px;
+    min-width: 0;
+    color: var(--color-finder-text);
+    font: 400 16px / 1.45 var(--font-ui);
+  }
+  .df-current-group h3 {
+    color: var(--color-finder-gold);
+    font: 600 21px / 1.3 var(--font-display);
+    margin: 0 0 10px;
+  }
+  .df-current-group .expedition-actions,
+  .df-group-tools .expedition-actions {
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .df-current-group .ui-btn,
+  .df-group-tools .ui-btn {
+    min-height: 42px;
+    height: auto;
+    white-space: normal;
+  }
+  .df-group-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 18px 0;
+    color: var(--color-finder-text);
+    font: 400 16px / 1.45 var(--font-ui);
+  }
+  .df-group-tools > p {
+    flex-basis: 100%;
+    margin: 0;
+  }
+  .df-group-settings {
+    min-width: 0;
+  }
+  .df-group-settings[open] {
+    flex-basis: 100%;
+  }
+  .df-group-settings > summary {
+    width: fit-content;
+    cursor: pointer;
+  }
+  .df-group-settings > .expedition-helper,
+  .df-group-settings > .expedition-shop {
+    padding: 16px 0;
+  }
+
+  .df-board-shell--browse {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #dungeon-finder-window .df-body:has(.df-board-shell) {
+    container: finder-board / inline-size;
+  }
+  #dungeon-finder-window:has(.df-board-shell) .df-tab {
+    font-size: 15px;
+    min-height: 44px;
+  }
+  #dungeon-finder-window:has(.df-board-shell) .ui-win-title {
+    font-size: 22px;
+  }
+  .df-board-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .df-board-heading h2,
+  .df-board-heading h3,
+  .df-board-shell .df-sub {
+    font: 600 19px / 1.35 var(--font-display);
+    color: var(--color-finder-gold);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    letter-spacing: 0.02em;
+  }
+  .df-board-heading .ui-badge,
+  .df-board-heading .ui-chip,
+  .df-board-count {
+    font: 600 18px / 1 var(--font-ui);
+    min-width: 34px;
+    min-height: 30px;
+    display: inline-grid;
+    place-items: center;
+    color: var(--color-finder-teal);
+  }
+  .df-board-eyebrow {
+    font: 600 12px / 1.4 var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-finder-gold);
+  }
+  .df-board-shell .df-note {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-finder-muted);
+    margin: 12px 0;
+  }
+  .df-board-shell .ui-btn {
+    --btn-h: 42px;
+    min-height: 42px;
+    height: auto;
+    padding: 10px 14px;
+    font: 600 15px / 1.25 var(--font-ui);
+    letter-spacing: 0.02em;
+    white-space: normal;
+  }
+  .df-create,
+  .df-mine {
+    padding: 18px;
+    margin: 0;
+    min-width: 0;
+  }
+  .df-mine {
+    --color-border-showcase: var(--color-finder-gold-deep);
+    overflow: hidden;
+  }
+  .df-board-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 154px;
+    margin: -18px -18px 18px;
+    padding: 22px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+  }
+  .df-board-hero > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+  .df-board-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, var(--color-finder-ink));
+    z-index: -1;
+    pointer-events: none;
+  }
+  .df-board-hero h3 {
+    font: 600 23px / 1.3 var(--font-display);
+    color: var(--color-finder-text);
+    margin: 6px 0;
+    text-shadow: 0 2px 8px var(--color-finder-ink);
+  }
+  .df-board-shell .df-listings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .df-board-shell .df-listing {
+    position: relative;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    isolation: isolate;
+  }
+  .df-listing::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-finder-teal), transparent);
+    opacity: 0.7;
+    transition: opacity 180ms ease;
+  }
+  .df-listing:focus-within::after,
+  .df-listing:hover::after {
+    opacity: 1;
+  }
+  .df-listing-art {
+    position: relative;
+    height: 144px;
+    width: 100%;
+    object-fit: cover;
+    object-position: center 48%;
+    overflow: hidden;
+  }
+  .df-listing-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .df-listing-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in srgb, var(--color-finder-ink) 35%, transparent) 30%,
+      var(--color-finder-ink)
+    );
+    pointer-events: none;
+  }
+  .df-listing-art .df-listing-head {
+    position: absolute;
+    z-index: 1;
+    inset: auto 16px 10px;
+    flex-wrap: wrap;
+  }
+  .df-listing-art .df-listing-name {
+    flex-basis: 100%;
+  }
+  .df-listing-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .df-listing-leader {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .df-listing-leader > .ui-icon {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+  }
+  .df-needed {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .df-needed:empty,
+  .df-listing-tags:empty,
+  .df-mine-tags:empty {
+    display: none;
+  }
+  .df-listing-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 12px;
+    min-width: 0;
+    padding: 16px;
   }
   .df-create-tags {
     margin-bottom: 6px;
@@ -15448,48 +16463,610 @@
   .df-listing-head {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: start;
+    gap: 10px;
   }
   .df-listing-name {
-    font-family: var(--title-font);
-    font-size: 13px;
-    color: var(--color-text-light);
+    font: 600 20px / 1.35 var(--font-display);
+    color: var(--color-finder-text);
+    overflow-wrap: anywhere;
+    margin: 0;
   }
-  .df-listing-size,
+  .df-listing-size {
+    font: 600 20px / 1.2 var(--font-ui);
+    color: var(--color-finder-teal);
+    white-space: nowrap;
+  }
   .df-listing-meta,
   .df-needed {
-    font-size: 11px;
-    color: var(--color-text-muted);
+    font-size: 15px;
+    color: var(--color-finder-muted);
+  }
+  .df-listing-leader {
+    font-size: 16px;
+    color: var(--color-finder-gold);
+  }
+  .df-listing-members {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    padding-block: 6px;
   }
   .df-member {
-    display: inline-block;
-    font-size: 11px;
-    color: var(--color-text-muted);
-    margin-right: 8px;
+    color: var(--color-finder-muted);
+    font-size: 14px;
+  }
+  .df-roster-seat {
+    --df-role-accent: var(--color-finder-gold);
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 48px;
+    border: 1px solid color-mix(in srgb, var(--df-role-accent) 50%, transparent);
+    border-radius: 7px;
+    background: var(--color-finder-ink);
+    overflow: hidden;
+  }
+  .df-roster-seat img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+  }
+  .df-member-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .df-member-portrait {
+    display: grid;
+    place-items: center;
+  }
+  .df-roster-seat .ui-icon {
+    position: absolute;
+    inset: auto 1px 1px auto;
+    color: var(--df-role-accent);
+    background: var(--color-finder-ink);
+    border-radius: 3px;
+  }
+  .df-roster-seat.is-empty {
+    border-style: dashed;
+    opacity: 0.65;
+  }
+  .df-roster-seat.is-empty .ui-icon {
+    position: static;
+    width: 20px;
+    height: 20px;
+  }
+  .df-role-chip,
+  .df-app-role {
+    --df-role-accent: var(--color-finder-gold);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    border-radius: 5px;
+    font: 600 14px / 1.3 var(--font-ui);
+    color: var(--df-role-accent);
+    background: color-mix(in srgb, var(--df-role-accent) 12%, transparent);
+  }
+  [data-combat-role="tank"],
+  [data-seat-role="tank"] {
+    --df-role-accent: var(--color-finder-tank);
+  }
+  [data-combat-role="healer"],
+  [data-seat-role="healer"] {
+    --df-role-accent: var(--color-finder-healer);
+  }
+  [data-combat-role="dps"],
+  [data-seat-role="dps"] {
+    --df-role-accent: var(--color-finder-dps);
+  }
+  .df-board-shell .df-badge {
+    display: inline-flex;
+    width: fit-content;
+    font: 600 12px / 1.2 var(--font-ui);
+    padding: 5px 9px;
+    margin-block: 5px;
+    color: var(--color-finder-teal);
+  }
+  .df-board-shell .df-badge.heroic {
+    color: var(--color-finder-violet);
+  }
+  .df-board-shell .df-chip {
+    font: 500 14px / 1.3 var(--font-ui);
+    padding: 5px 9px;
+    height: auto;
   }
   .df-listing-action {
-    margin-top: 6px;
+    margin-top: auto;
+    padding-top: 4px;
+  }
+  .df-listing-action > button {
+    width: 100%;
+  }
+  .df-group-roster {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .df-group-member {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    min-width: 0;
+    border-left: 3px solid var(--class-color);
+  }
+  .df-group-member .df-app-portrait,
+  .df-group-member .df-app-portrait img {
+    width: 44px;
+    height: 44px;
+  }
+  .df-group-member .df-app-person {
+    gap: 2px;
+  }
+  .df-group-member .df-app-class {
+    font-size: 15px;
+    gap: 6px;
+  }
+  .df-group-member .df-app-meta {
+    font-size: 12px;
+  }
+  .df-group-member .df-app-spec {
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+  .df-group-member .df-app-roles {
+    grid-column: auto;
+    justify-content: flex-end;
+  }
+  .df-group-member .df-app-roles .df-role-chip {
+    min-height: 34px;
+    padding: 6px 8px;
+    gap: 6px;
+    font-size: 14px;
+  }
+  .df-group-member .df-app-roles .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+  .df-group-member .df-app-name {
+    font-size: 17px;
+  }
+  @container finder-board (max-width: 600px) {
+    .df-current-group {
+      padding: 8px 0;
+    }
+    .df-group-roster {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .df-group-member {
+      grid-template-columns: 36px minmax(0, 1fr) auto;
+      padding: 10px 8px;
+      gap: 8px;
+    }
+    .df-group-member .df-app-portrait,
+    .df-group-member .df-app-portrait img {
+      width: 36px;
+      height: 36px;
+    }
+    .df-group-member .df-app-roles {
+      grid-column: auto;
+      flex-direction: column;
+    }
+    .df-group-member .df-role-chip {
+      flex-direction: column;
+    }
   }
   .df-applicant {
-    display: flex;
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
     align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    border-top: 1px solid var(--panel-border);
-    padding: 6px 0;
+    gap: 12px 18px;
+    padding: 18px;
+    margin: 12px 0;
+    border-left: 4px solid var(--class-color);
+  }
+  .df-app-portrait {
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(ellipse, var(--color-finder-surface-raised), transparent 70%);
+  }
+  .df-app-portrait img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+  }
+  .df-app-person,
+  .df-app-copy {
+    min-width: 0;
+    display: flex;
+    align-items: start;
+    flex-direction: column;
+    gap: 5px;
   }
   .df-app-name {
-    font-size: 12px;
-    color: var(--color-text-light);
+    font: 700 22px / 1.2 var(--font-ui);
+    color: var(--color-finder-text);
+    overflow-wrap: anywhere;
   }
   .df-app-meta {
-    flex: 1;
-    font-size: 11px;
-    color: var(--color-text-muted);
+    font-size: 14px;
+    color: var(--color-finder-muted);
+  }
+  .df-app-class {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px;
+    font: 700 18px / 1.3 var(--font-ui);
+    color: color-mix(in srgb, var(--class-color) 75%, var(--color-finder-text));
+  }
+  .df-app-spec {
+    font: 600 17px / 1.3 var(--font-ui);
+    color: var(--color-finder-text);
+  }
+  .df-app-roles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .df-app-roles .df-role-chip {
+    min-height: 46px;
+    padding: 10px 14px;
+    gap: 10px;
+    font: 700 18px / 1.3 var(--font-ui);
+    border: 1px solid currentColor;
+    border-radius: 8px;
+  }
+  .df-app-roles .ui-icon {
+    width: 28px;
+    height: 28px;
+  }
+  @container finder-board (max-width: 600px) {
+    .df-applicant {
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 12px;
+      padding: 14px;
+    }
+    .df-app-roles {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+    }
   }
   .df-app-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .df-app-actions .ui-icon {
+    width: 17px;
+    height: 17px;
+    margin-right: 6px;
+  }
+  .df-board-shell .df-app-accept,
+  .df-board-shell .df-accept {
+    --btn-fill-gold: linear-gradient(
+      180deg,
+      var(--color-finder-accept-hi),
+      var(--color-finder-accept-lo)
+    );
+    --gold-dim: var(--color-finder-healer);
+    --color-text-on-gold-btn: var(--color-finder-text);
+    --glow-gold-soft: 0 0 14px color-mix(in srgb, var(--color-finder-healer) 12%, transparent);
+  }
+  .df-board-shell .df-apply {
+    --gold-dim: var(--color-finder-gold-deep);
+    --btn-fill-gold: linear-gradient(
+      180deg,
+      var(--color-finder-gold),
+      color-mix(in srgb, var(--color-finder-gold) 70%, var(--color-finder-gold-deep))
+    );
+    --color-text-on-gold-btn: var(--color-finder-ink);
+    text-shadow: none;
+    font-weight: 700;
+  }
+  .df-mine [data-act="closelisting"] {
+    width: 100%;
+    margin-top: 20px;
+  }
+  .df-board-shell .df-create .df-sub {
+    margin: 12px 0;
+  }
+  .df-board-shell--create .df-create-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    flex-wrap: wrap;
+    padding: 12px 0;
+    background: var(--color-finder-ink);
+  }
+  .df-create-actions {
     display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .df-create-actions .btn {
+    margin: 0;
+  }
+  .df-board-shell--create .df-create-heading .df-sub {
+    margin: 0;
+  }
+  .df-board-shell--create .df-activity-options {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  }
+  .df-board-shell--create .df-activity-art {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    pointer-events: none;
+  }
+  .df-board-shell--create .df-activity-group {
+    position: relative;
+    isolation: isolate;
+    border-color: var(--color-finder-line);
+  }
+  .df-board-shell--create .df-activity-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-finder-ink) 85%, transparent),
+        color-mix(in srgb, var(--color-finder-ink) 15%, transparent)
+      ),
+      linear-gradient(0deg, var(--color-finder-ink), transparent 80%);
+  }
+  .df-board-shell--create .df-activity-art img {
+    object-fit: cover;
+    object-position: center 45%;
+  }
+  .df-board-shell--create .df-activity-copy {
+    position: relative;
+    z-index: 1;
+    min-height: 140px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 18px;
+  }
+  .df-board-shell--create .df-activity-group:has([aria-checked="true"]) {
+    border-color: var(--color-finder-gold);
+    box-shadow: inset 3px 0 var(--color-finder-gold);
+  }
+  .df-board-shell--create .df-activity-name {
+    font-size: 18px;
+    text-shadow: 0 2px 4px var(--color-finder-ink);
+  }
+  .df-create-filter {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin: 12px 0 20px;
+    color: var(--color-finder-gold);
+    font: 600 17px / 1.4 var(--font-display);
+  }
+  .df-board-shell--create .df-create-filter {
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
     gap: 6px;
+    margin: 0;
+    font-size: 15px;
+  }
+  .df-board-shell--create .df-create-actions {
+    align-self: end;
+  }
+  .df-create-filter .ui-input {
+    min-height: 48px;
+    width: min(100%, 320px);
+    padding: 10px 14px;
+    font: 600 18px / 1.4 var(--font-ui);
+    color: var(--color-finder-text);
+    background-color: var(--color-finder-surface);
+    border-color: var(--color-finder-line);
+    border-radius: 8px;
+    color-scheme: dark;
+  }
+  .df-create-role-section {
+    margin-bottom: 22px;
+  }
+  .df-create-roles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    max-width: 600px;
+  }
+  .df-create-role {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 140px;
+    padding: 18px 10px 14px;
+    font: 600 18px / 1.3 var(--font-ui);
+    color: var(--color-finder-tank);
+    border: 1px solid var(--color-finder-line);
+    background:
+      radial-gradient(
+        ellipse at 50% 0%,
+        color-mix(in srgb, currentColor 18%, transparent),
+        transparent 75%
+      ),
+      linear-gradient(150deg, var(--color-finder-surface), var(--color-finder-ink));
+    overflow: hidden;
+  }
+  .df-create-role::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+    border-radius: 7px;
+    pointer-events: none;
+  }
+  .df-create-role[data-create-role="healer"] {
+    color: var(--color-finder-healer);
+  }
+  .df-create-role[data-create-role="dps"] {
+    color: var(--color-finder-dps);
+  }
+  .df-create-role-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, currentColor 22%, var(--color-finder-ink)),
+      var(--color-finder-ink)
+    );
+    box-shadow:
+      0 0 0 4px var(--color-finder-ink),
+      0 0 0 5px color-mix(in srgb, currentColor 45%, transparent),
+      0 0 22px color-mix(in srgb, currentColor 18%, transparent),
+      inset 0 0 12px var(--color-finder-ink);
+  }
+  .df-create-role-icon .ui-icon {
+    width: 32px;
+    height: 32px;
+    fill: currentColor;
+  }
+  .df-create-role::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 9px;
+    height: 9px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+  }
+  .df-create-role[aria-pressed="true"] {
+    border-color: currentColor;
+    box-shadow:
+      inset 0 -3px currentColor,
+      0 0 16px color-mix(in srgb, currentColor 14%, transparent);
+  }
+  .df-create-role[aria-pressed="true"]::after {
+    background: currentColor;
+  }
+  .df-create-role:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  @container finder-board (max-width: 480px) {
+    .df-board-shell--create .df-activity-copy {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px;
+    }
+    .df-board-shell--create .df-create-actions {
+      gap: 6px;
+    }
+    .df-board-shell--create .df-create-actions .ui-btn {
+      padding: 8px;
+      font-size: 14px;
+    }
+    .df-board-shell--create .df-create-filter .ui-input {
+      padding: 8px;
+      font-size: 16px;
+    }
+  }
+  @media (forced-colors: active) {
+    .df-create-role[aria-pressed="true"] {
+      outline: 2px solid Highlight;
+      outline-offset: -3px;
+    }
+  }
+  .df-board-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 28px 14px;
+    grid-column: 1 / -1;
+  }
+  .df-board-empty > .ui-icon {
+    width: 38px;
+    height: 38px;
+    color: var(--color-finder-teal);
+  }
+  .df-board-shell .df-opt {
+    font-size: 15px;
+    min-height: 40px;
+  }
+  @media (max-width: 1080px) {
+    .df-board-shell:not(.df-board-shell--browse) {
+      grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+      gap: 16px;
+    }
+    .df-board-shell .df-listings {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 650px) {
+    .df-board-shell {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @container finder-board (max-width: 900px) {
+    .df-board-shell .df-listings {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @container finder-board (max-width: 600px) {
+    .df-board-shell:not(.df-board-shell--browse) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (forced-colors: active) {
+    .df-board-hero > img,
+    .df-board-hero::after,
+    .df-listing::after {
+      display: none;
+    }
+    .df-board-shell {
+      color: CanvasText;
+    }
+    .df-board-hero,
+    .df-app-name,
+    .df-listing-name,
+    .df-role-chip,
+    .df-app-role,
+    .df-app-meta,
+    .df-listing-meta,
+    .df-needed,
+    .df-listing-size,
+    .df-listing-leader {
+      color: CanvasText;
+      background: Canvas;
+    }
+    .df-roster-seat {
+      border-color: CanvasText;
+    }
   }
 
   /* ---------- Ashen Coliseum (arena) ---------- */

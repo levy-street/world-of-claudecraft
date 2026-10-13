@@ -35,11 +35,9 @@ export function isFinderRole(value: unknown): value is Role {
   return (FINDER_ROLE_ORDER as readonly unknown[]).includes(value);
 }
 
-// Below FIRST_TALENT_LEVEL there is no specialization, so finder roles come
-// from this fixed class-capability table. From the spec unlock (FIRST_TALENT_LEVEL) on, the selected role
-// must match the active specialization's role instead (see compatibleFinderRoles
-// in ../social/dungeon_finder.ts).
-export const FINDER_PRE_SPEC_ROLES: Record<Role, readonly PlayerClass[]> = {
+// Finder roles express the jobs a class can offer, at every level. Selecting
+// a role never changes or requires an active talent specialization.
+export const FINDER_CLASS_ROLES: Record<Role, readonly PlayerClass[]> = {
   tank: ['warrior', 'paladin', 'druid'],
   healer: ['paladin', 'priest', 'shaman', 'druid'],
   dps: ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'],
