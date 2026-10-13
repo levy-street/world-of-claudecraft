@@ -19712,4 +19712,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'errors.noUpdateFound': '업데이트를 찾지 못했습니다. 잠시 후 다시 시도하세요.',
   'errors.updateUnavailable': '게임 스토어에서 업데이트하거나 최신 클라이언트를 다운로드하세요.',
   'errors.updateSearchFailed': '업데이트를 확인할 수 없습니다. 다시 시도하세요.',
+  'entities.abilities.vampiric_touch.name': '흡혈의 손길',
+  'entities.abilities.vampiric_touch.description':
+    '15초 동안 3초마다 총 {damage}의 암흑 피해를 입힙니다. 피해는 주문력에 따라 증가하며 각 피해는 치명타가 될 수 있습니다. 매번 적이 실제로 잃은 생명력의 20%를 치유량으로 전환하여 자신과 30미터 내의 부상당한 파티원에게 균등하게 나눕니다. 공격대에서는 자신의 하위 파티만 치유합니다. 암흑 십일조가 2회 이상 충전되어 있으면 효과를 적용할 때 2회를 소모하여 전체 피해를 30% 증가시킵니다.',
 };

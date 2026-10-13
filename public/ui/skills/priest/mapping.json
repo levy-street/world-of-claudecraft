@@ -342,6 +342,17 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Prayer of Returning (prayer_of_returning)\nCanonical mechanic: Prayer of Returning is a 7 sec out-of-combat prayer that calls every fallen group or raid member within 40 yd back to life at the caster with 30% health and mana; 5 min cooldown.\nSubject: A great downturned hand of golden light drawing three faint rising spirits upward from their fallen bodies.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "vampiric_touch",
+      "sourcePack": "woc_openai_vampiric_touch_2026_10_07",
+      "sourceFile": "tmp/imagegen/vampiric-touch/source.png",
+      "output": "vampiric_touch.webp",
+      "source": "OpenAI built-in image generation through Codex (new image)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A spectral violet hand drawing crimson life essence into its palm.",
+      "generationPrompt": "Original square painted dark-fantasy MMORPG ability icon for Vampiric Touch. Spectral violet hand with elongated fingers curling around a glowing crimson-violet heart-shaped mote of life essence; pale lavender energy flows inward into the palm. Full-bleed opaque midnight-purple background, saturated violet/crimson and cool highlights, painterly sculpted shading, dominant hand and bright central life mote readable at 32px. No frame, text, logos, watermark, panels, numbers, modern objects or anatomical gore."
     }
   ],
   "deferredStayProcedural": {},

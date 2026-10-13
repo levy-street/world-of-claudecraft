@@ -231,6 +231,7 @@ import {
 import { benisonAfterAbility } from './priest/benison';
 import { doctrineAfterAbility } from './priest/doctrine';
 import { priestAfterAbility, priestOnGroupHeal } from './priest/talents';
+import { applyVampiricTouch } from './priest/vampiric_touch';
 import { gloomtitheStacksForCast, vespersAfterAbility } from './priest/vespers';
 import { isPullEligible } from './pull_eligibility';
 import { offerResurrection } from './resurrection_offer';
@@ -2173,7 +2174,7 @@ export function runEffects(
         const dotId = eff.auraId ?? ability.id;
         const priorDirge =
           ability.id === 'shadow_word_pain' ? captureDirgeReapplication(target, p.id) : null;
-        ctx.applyAura(target, {
+        const dot: Aura = {
           id: dotId,
           name: ABILITIES[dotId]?.name ?? ability.name,
           kind: 'dot',
@@ -2185,7 +2186,9 @@ export function runEffects(
           sourceId: p.id,
           school: eff.school ?? ability.school,
           leechPct: eff.leechPct,
-        });
+        };
+        if (dotId === 'vampiric_touch') applyVampiricTouch(ctx, p, target, dot);
+        else ctx.applyAura(target, dot);
         if (priorDirge)
           refreshDirgeFieldAfterReapplication(ctx, p, meta, target, priorDirge, ability.range);
         if (dotId === 'rupture') {

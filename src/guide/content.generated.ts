@@ -1249,6 +1249,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Gloamveil"
       },
       {
+        "id": "vampiric_touch",
+        "name": "Vampiric Touch"
+      },
+      {
         "id": "summon_tithefiend",
         "name": "Call Tithefiend"
       },

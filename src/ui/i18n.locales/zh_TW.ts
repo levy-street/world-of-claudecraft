@@ -18775,4 +18775,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'errors.noUpdateFound': '未找到更新。請稍後再試。',
   'errors.updateUnavailable': '請透過遊戲商店更新，或下載最新用戶端。',
   'errors.updateSearchFailed': '無法檢查更新。請重試。',
+  'entities.abilities.vampiric_touch.name': '吸血之觸',
+  'entities.abilities.vampiric_touch.description':
+    '在15秒內造成{damage}點暗影傷害，每3秒一次。傷害隨法術強度提升，每次傷害均可致命一擊。每次傷害將敵人實際損失生命值的20%轉化為治療，平均分配給你和30碼內受傷的小隊成員；在團隊中，僅治療你所在的小隊。若你擁有至少2層幽暗什一，施加此效果會消耗2層，使其全部傷害提高30%。',
 };

@@ -212,7 +212,7 @@ function summonTithefiend(ctx: SimContext, priest: Entity, stacks: number): void
     preferredTargetId: effigyTarget(ctx, priest.id)?.id ?? null,
     maxRange: TITHEFIEND_MAX_RANGE,
     requiredTargetAuraId: 'shadow_word_pain',
-    dismissWhenUntargeted: true,
+    dismissWhenUntargeted: false,
   });
 }
 

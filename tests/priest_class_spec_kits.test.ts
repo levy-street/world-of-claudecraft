@@ -34,7 +34,7 @@ const SHARED_BACKBONE = [
 const SPEC_KITS = {
   discipline: ['scouring_mercy'],
   holy: ['prayer_of_healing', 'holy_nova', 'seraphic_vigil'],
-  shadow: ['shadowform', 'summon_tithefiend'],
+  shadow: ['shadowform', 'summon_tithefiend', 'vampiric_touch'],
 } as const;
 
 const ALL_EXCLUSIVES = Object.values(SPEC_KITS).flat();
@@ -44,6 +44,28 @@ describe('Priest v0.28 spec kits', () => {
     expect(ABILITIES.smite.name).toBe('Scouring Hymn');
     expect(en.entities.abilities.smite.name).toBe(ABILITIES.smite.name);
   });
+
+  it('describes Tithefiend waiting for own Dirge targets in both English sources', () => {
+    const description = ABILITIES.summon_tithefiend.description;
+    expect(description).toContain(
+      'It attacks only enemies within 35 yards that have your Dirge of Decay',
+    );
+    expect(description).toContain(
+      'Without a target, it waits until one becomes available or its duration ends.',
+    );
+    expect(en.entities.abilities.summon_tithefiend.description).toBe(description);
+  });
+
+  it.each(['shadow_word_pain', 'mind_flay'])(
+    'describes Vespers periodic spell crits for %s',
+    (id) => {
+      const description = ABILITIES[id].description;
+      expect(description).toContain(
+        'Vespers ticks can critically strike, using your spell critical chance and critical damage bonus.',
+      );
+      expect(en.entities.abilities[id].description).toBe(description.replaceAll('$d', '{damage}'));
+    },
+  );
 
   it('pins the new signature ability for each spec', () => {
     const expected = {
