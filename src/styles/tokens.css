@@ -193,6 +193,22 @@
     --aura-glow-core: 5px;
     --aura-glow-halo: 16px;
 
+    /* Raid death recap uses fixed dark chrome across presets. */
+    --death-recap-ink: #141820;
+    --death-recap-surface: #1c222e;
+    --death-recap-surface-hover: #252e3d;
+    --death-recap-surface-selected: #2a3547;
+    --death-recap-rule: #2d3545;
+    --death-recap-border: #333d4f;
+    --death-recap-border-hover: #4b586e;
+    --death-recap-text: #cbd5e1;
+    --death-recap-text-bright: #f8fafc;
+    --death-recap-text-muted: #94a3b8;
+    --death-recap-gold: #d4af37;
+    --death-recap-gold-bright: #ffd700;
+    --death-recap-danger: #ff6b6b;
+    --death-recap-danger-ground: #3b181b;
+    --death-recap-danger-border: #b53232;
     --color-bg-dark: #08080d;
     --color-bg-input: #0a0a0f;
     --color-border-default: #4e3d1d;

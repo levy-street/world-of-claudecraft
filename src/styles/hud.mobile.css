@@ -10285,6 +10285,21 @@
     width: min(520px, calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 20px));
     max-height: 85vh;
   }
+  body.mobile-touch #death-recap-dialog .death-recap-roster-tab,
+  body.mobile-touch #death-recap-dialog .death-recap-player-chip,
+  body.mobile-touch #death-recap-dialog .overview-inspect-btn,
+  body.mobile-touch #death-recap-dialog .death-recap-footer-back {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 12px;
+  }
+  body.mobile-touch #death-recap-dialog .overview-row {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  body.mobile-touch #death-recap-dialog .overview-row-right {
+    margin-left: auto;
+  }
 }
 
 @layer hud-mobile {

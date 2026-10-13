@@ -248,7 +248,7 @@ import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
 import { DayNightDialPainter } from './day_night_dial_painter';
-import { DeathRecapDialog } from './death_recap_dialog';
+import { DeathRecapDialog, deathRecapSource } from './death_recap_dialog';
 import { deathRecapFeedback } from './death_recap_feedback';
 import {
   createDeathScreenInputHold,
@@ -2303,7 +2303,7 @@ export class Hud {
     });
     this.deathRecapDialog = new DeathRecapDialog({
       root: () => $('#death-recap-dialog'),
-      getLatestRecap: () => this.meters.getLatestDeathRecap(this.sim.playerId),
+      ...deathRecapSource(this.meters, () => this.sim.playerId),
       attachTooltip: (el, html, isSpell) => this.attachTooltip(el, html, isSpell),
       hideTooltip: () => this.hideTooltip(),
       previewResolvedAbility: (id) => this.previewResolvedAbility(id),
