@@ -28,8 +28,8 @@
 // stay verbatim and in place: reordering either guard, the loop, or any draw forks the
 // shared rng stream for every later draw.
 //
-// This slice draws NO rng of its own. Its only rng-bearing callee is ctx.dealDamage
-// (the DoT tick), reached through the seam. updateGroundAoEs / pulseGroundAoE are NOT
+// Shadow priest Dirge and Vampiric Touch roll spell crit before ctx.dealDamage; other DoTs
+// retain their existing RNG order. updateGroundAoEs / pulseGroundAoE are NOT
 // here: pulseGroundAoE STAYS on Sim (a shared entry point), and its per-tick driver was
 // already extracted to entity_roster (tickGroundAoEs) by E1.
 //
@@ -43,7 +43,7 @@ import { manaRegenPer2s } from '../mana_regen';
 import { CHEATER_MARK_AURA_ID } from '../moderation';
 import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
-import type { SimContext } from '../sim_context';
+import type { DamageResolution, SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { applyWellFedOnMealComplete } from '../wellfed';
 import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
@@ -68,7 +68,10 @@ import {
 } from './necromancy';
 import { tickPaladinOathChainPull } from './paladin_control';
 import { periodicHarmStands } from './periodic_harm';
+import { shadowPeriodicHit } from './priest/periodic_crit';
+import { prepareShadowSecondVerse, shadowSecondVerseTick } from './priest/shadow_talents';
 import { priestOnAuraEnded } from './priest/talents';
+import { healVampiricTouch } from './priest/vampiric_touch';
 import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
 import { tickShamanTalentAura } from './shaman_talents';
@@ -323,6 +326,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   // an entry a side effect already removed; it never revisits one. rng draw order
   // is unaffected: this removes a spurious extra dealDamage, it adds none.
   const snapshot = e.auras.slice();
+  prepareShadowSecondVerse(ctx, snapshot);
   for (let i = snapshot.length - 1; i >= 0; i--) {
     const a = snapshot[i];
     if (!e.auras.includes(a)) continue; // removed by an earlier entry's side effect this tick
@@ -380,11 +384,17 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             school: a.school,
             fx: 'tick',
           });
+          const periodicHit =
+            a.school === 'shadow' && !a.finalDamage
+              ? shadowPeriodicHit(ctx, dotSource, a.id, tickDamage)
+              : { amount: tickDamage, crit: false };
+          const resolution: DamageResolution | undefined =
+            a.id === 'vampiric_touch' ? { landedHpLoss: 0 } : undefined;
           const tickLanded = ctx.dealDamage(
             dotSource,
             e,
-            tickDamage,
-            false,
+            periodicHit.amount,
+            periodicHit.crit,
             a.school,
             a.name,
             'hit',
@@ -411,7 +421,12 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // Banks copied from resolved damage (Ignite) skip the source-output
             // multipliers so the payout equals what was banked, once.
             a.finalDamage === true,
+            null,
+            false,
+            resolution,
           );
+          if (resolution) healVampiricTouch(ctx, dotSource, a, resolution.landedHpLoss);
+          shadowSecondVerseTick(ctx, e, a);
           vespersOnDotTick(ctx, e, a);
           thundercallOnDotTick(ctx, dotSource, a, tickLanded);
           druidEngineOnBleedTick(ctx, dotSource, a);

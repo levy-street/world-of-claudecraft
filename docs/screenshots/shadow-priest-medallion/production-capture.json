@@ -1,0 +1,26 @@
+{
+  "context": "Full offline development game; aura fixtures and frozen simulation for HUD capture.",
+  "errors": [],
+  "states": [
+    {
+      "width": 1440,
+      "height": 900,
+      "text": "Tithe Bomb20 / 20Ready",
+      "value": "20",
+      "bombHeight": 104,
+      "gloomHeight": 40,
+      "bottom": 662,
+      "mobile": false
+    },
+    {
+      "width": 960,
+      "height": 540,
+      "text": "Tithe Bomb20 / 20Ready",
+      "value": "20",
+      "bombHeight": 96,
+      "gloomHeight": 40,
+      "bottom": 341.1875,
+      "mobile": true
+    }
+  ]
+}

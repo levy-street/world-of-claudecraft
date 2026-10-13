@@ -5,7 +5,7 @@
 // applies at attach and re-clamps from STORAGE on resize, reset hands the frame
 // back to its stylesheet seat, a drag measures the frame once at the grab, the
 // touch layout strips the desktop mover's inline geometry before placing, and
-// the table-driven attach covers exactly the three engine indicators. The
+// the table-driven attach covers every registered class engine indicator. The
 // attacher writes only the two custom properties and the classes; the mobile
 // stylesheet places the frame from them, which the CSS pins at the end hold.
 // Per the repo testing convention this drives a small hand-rolled fake element
@@ -424,7 +424,7 @@ describe('attachTouchFrameDrags', () => {
     };
   }
 
-  it('attaches the three engine indicators by their registry element ids', () => {
+  it('attaches all four engine indicators by their registry element ids', () => {
     const ids = TOUCH_DRAG_FRAMES.map((row) => row.elementId);
     const { els, doc } = fakeDocument(ids);
     const host = fakeHost(
@@ -433,7 +433,7 @@ describe('attachTouchFrameDrags', () => {
       ),
     );
     const drags = attachTouchFrameDrags(doc, () => true, host);
-    expect(drags.drags).toHaveLength(3);
+    expect(drags.drags).toHaveLength(4);
     for (const id of ids) expect(els.get(id)?.classes.has(TOUCH_PLACED_CLASS), id).toBe(true);
     drags.resetAll();
     for (const id of ids) expect(els.get(id)?.classes.size, id).toBe(0);
@@ -463,6 +463,30 @@ describe('attachTouchFrameDrags', () => {
       fy: 200 / 390,
     });
     expect(host.store.size).toBe(1);
+  });
+
+  it('moves and restores the priest medallion without changing its desktop geometry', () => {
+    const { els, doc } = fakeDocument(['priest-charge-frame']);
+    const host = fakeHost({ woc_hud_frame_priest_charge: 'desktop-position' });
+    const drags = attachTouchFrameDrags(doc, () => true, host);
+    const medallion = els.get('priest-charge-frame') as FakeEl;
+    expect(drags.drags).toHaveLength(1);
+    medallion.fire('pointerdown', pointer(130, 123));
+    medallion.fire('pointermove', pointer(500, 240));
+    medallion.fire('pointerup', pointer(500, 240));
+    const anchor = { fx: 500 / 844, fy: 240 / 390 };
+    expect(drags.drags[0]?.anchor).toEqual(anchor);
+    expect(JSON.parse(host.store.get('priestChargeAnchor') ?? '')).toEqual(anchor);
+    expect(host.store.get('woc_hud_frame_priest_charge')).toBe('desktop-position');
+    const reloaded = attachTouchFrameDrags(
+      fakeDocument(['priest-charge-frame']).doc,
+      () => true,
+      host,
+    );
+    expect(reloaded.drags[0]?.anchor).toEqual(anchor);
+    reloaded.resetAll();
+    expect(host.store.has('priestChargeAnchor')).toBe(false);
+    expect(host.store.get('woc_hud_frame_priest_charge')).toBe('desktop-position');
   });
 
   it('skips a frame missing from the document, like the unlock registry does', () => {

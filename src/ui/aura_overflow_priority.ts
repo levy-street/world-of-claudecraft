@@ -30,6 +30,7 @@ export const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
   'old_blood',
   'verdance',
   'priest_gloomtithe',
+  'spirit_bomb_progress',
   'priest_benison_prayers',
   'priest_benison_whisper',
   'hunter_coldsight_read',

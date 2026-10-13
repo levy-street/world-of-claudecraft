@@ -92,6 +92,8 @@ function liveWindupHarness() {
     shells: noopUpdate,
     groundAuras: noopUpdate,
     spirits: noopUpdate,
+    spiritBombs: noopUpdate,
+    voidRuptures: noopUpdate,
     overlay: { beginFrame: vi.fn(), protectPrefix: vi.fn(), push, commit: vi.fn() },
     sequencer: noopUpdate,
     windups: new Map(),

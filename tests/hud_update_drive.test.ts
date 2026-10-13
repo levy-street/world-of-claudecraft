@@ -326,6 +326,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'write-elided paladin Devotion/Ascension resource widget driven by the paladinDevotionView core',
   },
   {
+    call: 'this.doomMeter.paintShadow',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'write-elided Shadow Gloomtithe and Tithe Bomb meters read replicated aura banks',
+  },
+  {
     call: 'this.syncActiveHotbarForm',
     band: 'frame',
     gate: '',
@@ -1885,7 +1892,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // its Release input hold is one state-only call.
       // chrome 96 -> 97, none 19 -> 20 after the click-move marker gains its
       // own HUD repaint row while the move-state holder stays state-only.
-    ).toEqual({ window: 51, chrome: 96, none: 20 });
+    ).toEqual({ window: 51, chrome: 97, none: 20 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

@@ -1,0 +1,64 @@
+{
+  "icon": {
+    "text": "\n        Vampiric Touch\n        60 Mana · 1.5 sec cast-",
+    "images": [
+      "url(\"/ui/skills/priest/vampiric_touch.webp\")"
+    ]
+  },
+  "loadedIcons": [
+    {
+      "url": "http://127.0.0.1:5184/ui/skills/priest/vampiric_touch.webp",
+      "ok": true
+    }
+  ],
+  "combat": {
+    "damage": [
+      {
+        "type": "damage",
+        "sourceId": 1003,
+        "targetId": 99101,
+        "amount": 36,
+        "crit": false,
+        "school": "shadow",
+        "ability": "Vampiric Touch",
+        "abilityId": null,
+        "kind": "hit"
+      }
+    ],
+    "healing": [
+      {
+        "type": "heal2",
+        "sourceId": 1003,
+        "targetId": 1003,
+        "amount": 7,
+        "crit": false,
+        "ability": "Vampiric Touch"
+      }
+    ],
+    "cues": [
+      {
+        "type": "spellfx",
+        "sourceId": 1003,
+        "targetId": 99101,
+        "school": "shadow",
+        "fx": "selfCast",
+        "ability": "vampiric_touch"
+      },
+      {
+        "type": "spellfx",
+        "sourceId": 1003,
+        "targetId": 99101,
+        "school": "shadow",
+        "fx": "tick",
+        "ability": "vampiric_touch"
+      }
+    ],
+    "stats": {
+      "vampiric_touch": {
+        "claimed": 1,
+        "primitives": 18
+      }
+    }
+  },
+  "errors": []
+}

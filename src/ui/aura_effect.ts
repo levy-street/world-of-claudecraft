@@ -186,6 +186,11 @@ export function auraEffectDescriptor(
   // countdown and localized name are the complete tooltip; the generic
   // vulnerability copy would misleadingly claim that it adds 0% damage taken.
   if (a.id === VARKHUL_CINDER_ORBS_AURA_ID) return null;
+  // Shadow Choir's ability description explains its conversion; it grants no damage bonus.
+  if (a.id === 'choir_of_deliverance' && a.kind === 'buff_dmg_done' && a.value === 0) return null;
+  if (a.id === 'priest_stilled_mind_crit') {
+    return { key: `${KEY}.stilledMindCrit`, nums: {} };
+  }
   if (a.id === VARKHUL_ASSEMBLY_FIXATE_AURA_ID) {
     return { key: `${KEY}.varkhulSentinelsGaze`, nums: {} };
   }

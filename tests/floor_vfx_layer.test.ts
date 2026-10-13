@@ -107,6 +107,7 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/ability_vfx/decals.ts', layer: 'player', strict: true },
   { file: 'src/render/ability_vfx/ground_auras.ts', layer: 'player', strict: true },
   { file: 'src/render/ability_vfx/rings.ts', layer: 'player', strict: true },
+  { file: 'src/render/ability_vfx/spirit_bomb.ts', layer: 'player', strict: true },
   { file: 'src/render/player_aura_rings.ts', layer: 'player', strict: true },
   // The meteor telegraph serves the mage's own Meteor AND the sim's world
   // warnings (Ignivar meteors, Varkhul anvils and forgestorm, Nythraxis grave

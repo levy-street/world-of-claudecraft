@@ -157,6 +157,7 @@ describe('settings_transfer_core', () => {
       'paladinDevotionAnchor',
       'procOverlayAnchor',
       'warlockDoomAnchor',
+      'priestChargeAnchor',
       'woc_perf_overlay',
       'wocc.charSort',
       'woc.tutorial.v1',

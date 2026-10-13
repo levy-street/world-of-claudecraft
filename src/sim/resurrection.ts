@@ -90,7 +90,8 @@ export function unstuckSicknessDuration(level: number): number {
 // (updateAuras early-returns for a dead entity), so a death effectively extends
 // a flask by the time spent dead. None may be shed by dying; the encounter script remains
 // responsible for releasing its own control. Every other aura clears, Well Fed
-// included. Used at every player death/respawn site so the rule cannot drift.
+// included, along with Spirit Bomb progress and readiness. Used at every player
+// death/respawn site so the rule cannot drift.
 // RULED (qr-19-flask-dead-timer-pause, 2026-09-01, under qr-19-best-for-project): the pause
 // above is the ratified v1 behavior, not a defect awaiting a fix. The recorded fidelity
 // nuance is that classic flasks kept ticking. Exempting flask auras from this shared guard by

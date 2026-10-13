@@ -139,9 +139,9 @@ describe('the cast first-reads boot entry', () => {
   });
 
   it('links and proves its roots, and the other cast units then open the gate', async () => {
-    // The engine's 10 programs and the kit's 7 (tests/cast_vfx_engine_family.test.ts).
+    // The engine's 14 programs (including bomb and rupture) and the kit's 7.
     const pendingBefore = h.readiness.snapshot().pending ?? 0;
-    expect(pendingBefore).toBe(17);
+    expect(pendingBefore).toBe(21);
     for (const root of h.roots) expect(isProgramKnownReady(h.programOf(root))).toBe(false);
     await h.entry.run();
     expect(h.compiled).toEqual(h.roots);

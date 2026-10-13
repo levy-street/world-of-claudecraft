@@ -27,6 +27,10 @@
 
 import { isBlocked } from '../colliders';
 import { isUnbreakableControlAura } from '../combat/cc';
+import {
+  beginSpiritBombRaidPull,
+  resetSpiritBombRaidPull,
+} from '../combat/priest/spirit_bomb_raid';
 import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { resurrectionArrivalAnchor } from '../combat/resurrection_offer';
 import { DUNGEONS, ITEMS, MOBS, NPCS, QUESTS } from '../data';
@@ -531,6 +535,7 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
 }
 
 export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
+  resetSpiritBombRaidPull(boss);
   shatterNythraxisBoneSpikes(ctx, boss);
   clearNythraxisGraveHazards(boss);
   clearNythraxisSigil(boss);
@@ -576,6 +581,7 @@ export function wipeNythraxisEncounter(ctx: SimContext, boss: Entity): void {
 }
 
 export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
+  beginSpiritBombRaidPull(ctx, boss);
   const st = initNythraxisEncounter(boss);
   const room = playersInNythraxisRoom(ctx, boss);
   for (const player of room) {

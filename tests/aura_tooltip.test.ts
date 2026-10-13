@@ -16,6 +16,17 @@ const aura = (overrides: Partial<AuraInput> = {}): AuraInput => ({
 });
 
 describe('renderAuraTooltipBodyHtml', () => {
+  it('resolves the bomb progress aura through its localized spell description', () => {
+    const description = 'Generate 20 Gloomtithe to prepare one bomb.';
+    expect(
+      renderAuraTooltipBodyHtml(aura({ id: 'spirit_bomb_progress', kind: 'spirit_bomb_charge' }), {
+        abilityDescription: (id) => (id === 'spirit_bomb' ? description : null),
+        effectHtml: () => '',
+        escapeHtml: (text) => text,
+      }),
+    ).toBe(`<div class="tt-desc">${description}</div>`);
+  });
+
   it('resolves known ability prose with the current character power', () => {
     const ability = abilitiesKnownAt('priest', MAX_LEVEL).find((entry) => entry.def.id === 'renew');
     if (!ability) throw new Error('missing renew fixture');

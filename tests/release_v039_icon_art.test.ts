@@ -492,14 +492,16 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(411);
+    // Vampiric Touch, Tithe Bomb and Void Rupture all ship painted art.
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(414);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',
     ).toEqual([]);
-    expect(aggregate.runtimeClosure.abilities).toEqual({
-      live: liveAbilityIds.length,
-      painted: paintedAbilityIds.size,
+    expect(paintedAbilityIds.size).toBe(414);
+    expect(aggregate.runtimeClosure.abilities, 'sealed v0.39 inventory').toEqual({
+      live: 411,
+      painted: 411,
     });
 
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(

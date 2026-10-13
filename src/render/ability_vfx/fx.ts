@@ -48,6 +48,7 @@ import { SignatureCrests } from './signature_crests';
 import type { CrestKind } from './signature_shapes';
 import { SolidImpactFragments } from './solid_impact_fragments';
 import { SPECTACLE, usesCrescendoScale } from './spectacle';
+import { SpiritBombs } from './spirit_bomb';
 import {
   asSpiritPath,
   SpiritApparitions,
@@ -56,6 +57,7 @@ import {
   type SpiritCompileGate,
 } from './spirits';
 import type { SteelSweepRange } from './steel_sweep';
+import { VoidRuptures } from './void_rupture';
 import { WarriorAttention } from './warrior_attention';
 import { drawWarriorControlMark, evictDecorationForWarriorMark } from './warrior_control_marks';
 import { type WarriorFlashStyle, warriorFlashStyle } from './warrior_flash';
@@ -485,6 +487,8 @@ export class AbilityVfxFx implements SequencerHost {
   private groundAuras: GroundAuras;
   private flipbooks: ImpactFlipbooks;
   private spirits: SpiritApparitions;
+  private spiritBombs: SpiritBombs;
+  private voidRuptures: VoidRuptures;
   private windups = new Map<number, WindupState>();
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
@@ -710,6 +714,13 @@ export class AbilityVfxFx implements SequencerHost {
     this.groundAuras = new GroundAuras(scene, tex);
     this.flipbooks = new ImpactFlipbooks(scene, textureReady);
     this.spirits = new SpiritApparitions(scene, groundY);
+    this.voidRuptures = new VoidRuptures(scene, anchor);
+    this.spiritBombs = new SpiritBombs(scene, anchor, groundY, (x, y, z) => {
+      this.burstAt(x, y, z, 0xbd73ff, 54, 2.2, 'sparks', 0.8);
+      this.worldLightAt(x, y, z, 'shadow', 3.6, 0.55);
+      this.shakeAt(x, y, z, 0.38, true);
+      this.abilityAudio('impact', 'shadow', 2.4, x, y, z, { archetype: 'nova' });
+    });
     for (const pool of [
       this.ribbons,
       this.rings,
@@ -725,6 +736,8 @@ export class AbilityVfxFx implements SequencerHost {
       this.furyStates,
       this.baked,
       this.fragments,
+      this.spiritBombs,
+      this.voidRuptures,
     ])
       pool.spawnGate = this.spawnGate;
   }
@@ -1567,6 +1580,7 @@ export class AbilityVfxFx implements SequencerHost {
   // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
   sleepEntity(entityId: number, keepCcBand = false): void {
     if (this.disposed) return;
+    this.spiritBombs.cancel(entityId);
     this.guards.sleep(entityId);
     this.powerForms.sleep(entityId);
     this.furyStates.sleep(entityId);
@@ -2157,6 +2171,24 @@ export class AbilityVfxFx implements SequencerHost {
 
   // Returns true when this call STARTED the windup (first frame of the cast),
   // so the painter can count and accent the moment.
+  spawnVoidRupture(sourceId: number, targetId: number): boolean {
+    return !this.disposed && this.voidRuptures.spawn(sourceId, targetId);
+  }
+
+  holdSpiritBomb(entityId: number, progress: number, priority = false): boolean {
+    if (this.disposed) return false;
+    return this.spiritBombs.hold(entityId, progress, this.frame, priority);
+  }
+
+  releaseSpiritBomb(sourceId: number, targetId: number): boolean {
+    if (this.disposed) return false;
+    return this.spiritBombs.release(sourceId, targetId);
+  }
+
+  cancelSpiritBomb(entityId: number): void {
+    this.spiritBombs.cancel(entityId);
+  }
+
   windup(
     entityId: number,
     colorHex: number,
@@ -2510,6 +2542,8 @@ export class AbilityVfxFx implements SequencerHost {
       camPosScratch.z,
     );
     this.spirits.update(dt);
+    this.spiritBombs.update(dt, this.frame, reducedMotion, this.qualityLevel);
+    this.voidRuptures.update(dt, this.camera.quaternion, reducedMotion, this.qualityLevel);
     this.spiritHammers.beginFrame();
     this.ribbons.drawHeads(this.time, this.headSink, reducedMotion, this.hammerSink);
     this.spiritHammers.endFrame();
@@ -2556,6 +2590,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.shells.clear();
     this.groundAuras.clear();
     this.spirits.clear();
+    this.spiritBombs.clear();
+    this.voidRuptures.clear();
     this.sequencer.clear();
     for (const [id, g] of this.glows) this.applyGlow?.(id, g.color, 0);
     this.glows.clear();
@@ -2601,6 +2637,8 @@ export class AbilityVfxFx implements SequencerHost {
     release(() => this.shells.dispose());
     release(() => this.groundAuras.dispose());
     release(() => this.spirits.dispose());
+    release(() => this.spiritBombs.dispose());
+    release(() => this.voidRuptures.dispose());
     release(() => this.overlay.dispose());
     this.particleBurst = null;
     this.lightPulseCb = null;

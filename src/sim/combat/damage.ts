@@ -143,6 +143,7 @@ import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { veilboundMarkDamageMultiplier } from './paladin_veilbound_march';
 import { doctrineConvertDamage } from './priest/doctrine';
 import { cleanupPriestState } from './priest/lifecycle';
+import { shadowChoirDamage } from './priest/shadow_talents';
 import {
   priestOnAuraEnded,
   priestOnShieldConsumed,
@@ -808,6 +809,7 @@ export function dealDamage(
       // Book of Deeds: the clamped terminal hit counts (zero rng; the early
       // return skips the shared deed site and the session RewardCounters).
       if (resolution) resolution.landedHpLoss = amount;
+      shadowChoirDamage(ctx, source, target, amount, school, copiedHit);
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.endDuel(duel, sourcePlayer.id);
       return amount;
@@ -857,6 +859,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (resolution) resolution.landedHpLoss = amount;
+      shadowChoirDamage(ctx, source, target, amount, school, copiedHit);
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.fiestaTakedown(match, sourcePlayer.id, target);
       return amount;
@@ -889,6 +892,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (resolution) resolution.landedHpLoss = amount;
+      shadowChoirDamage(ctx, source, target, amount, school, copiedHit);
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.yumiPlayerDown(match, target, sourcePlayer.id);
       return amount;
@@ -925,6 +929,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (resolution) resolution.landedHpLoss = amount;
+      shadowChoirDamage(ctx, source, target, amount, school, copiedHit);
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       recordOssuaryMarkDamage(source, target, amount, abilityId);
       markFuneralHarvestDamage(ctx, source, target, amount);
@@ -990,6 +995,7 @@ export function dealDamage(
         attackAnimationStarted,
       );
       if (resolution) resolution.landedHpLoss = landedHpLoss;
+      shadowChoirDamage(ctx, source, target, landedHpLoss, school, copiedHit);
       return landedHpLoss;
     }
   }
@@ -1029,6 +1035,7 @@ export function dealDamage(
   // above (duel/fiesta/arena) intentionally skip conversion (PRD 13.9 defers PvP
   // tuning to a later phase).
   chronomancyConvertArcaneDamage(ctx, source, preHp - target.hp, school, aoe, abilityId);
+  shadowChoirDamage(ctx, source, target, craftedHpLoss, school, copiedHit);
   doctrineConvertDamage(ctx, source, preHp - target.hp, school, abilityId ?? null);
   vespersEchoDamage(ctx, source, target, preHp - target.hp, abilityId ?? null);
   onAfflictionDamage(ctx, source, target, preHp - target.hp);

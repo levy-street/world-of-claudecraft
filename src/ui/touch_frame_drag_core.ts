@@ -1,10 +1,10 @@
 // Pure core for the touch-layout drag of the class engine indicators: the
 // spell-proc overlay (the mage phoenix, and the warlock Soul Fragment bank and
 // Ruin ritual painted on the same element), the paladin devotion medallion and
-// the warlock doom meter. On desktop every governed frame moves through the
+// the warlock doom meter and the priest charge medallion. On desktop every governed frame moves through the
 // "Unlock interface" editor, which every touch layout refuses (MovableFrame
 // no-ops its gestures there, the options row is not offered and the stylesheet
-// hides the editor chrome), so on a phone or tablet these three keep an
+// hides the editor chrome), so on a phone or tablet these indicators keep an
 // always-on one-finger drag instead: the DOM attacher is touch_frame_drag.ts,
 // this file holds the declarative table and the math (the clamp, the storage
 // round-trip, the drag arithmetic, the inset parse). Registered in
@@ -61,17 +61,18 @@ export interface TouchDragFrameSpec {
 /** The rows, by registry id. The proc overlay and the medallion keep the keys
  *  their pre-registry grab-drag persisted under, so a phone that parked the
  *  phoenix before the frames unlock shipped finds it where it was left; the
- *  doom meter never had a touch drag, so its key is new. All three are FULL
+ *  doom meter and priest medallion use their own touch keys. All are FULL
  *  transfer-code keys (settings_transfer_core.ts) like the two always were. */
 const TOUCH_DRAG_ROWS = [
   { frameId: 'procOverlay', storageKey: 'procOverlayAnchor' },
   { frameId: 'paladinDevotion', storageKey: 'paladinDevotionAnchor' },
   { frameId: 'doomMeter', storageKey: 'warlockDoomAnchor' },
+  { frameId: 'priestCharge', storageKey: 'priestChargeAnchor' },
 ] as const;
 
 /** Every frame the touch layout keeps draggable, in attach order. A row whose
  *  registry id no longer resolves is dropped here and caught by the test pin
- *  (the table must always carry exactly the three engine indicators). */
+ *  (the table must always carry every registered engine indicator). */
 export const TOUCH_DRAG_FRAMES: readonly TouchDragFrameSpec[] = TOUCH_DRAG_ROWS.flatMap((row) => {
   const spec = HUD_FRAME_SPECS.find((s) => s.id === row.frameId);
   return spec

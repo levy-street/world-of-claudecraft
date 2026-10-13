@@ -1,7 +1,8 @@
+import { LIVING_COVENANT_MAX_EXTENSION } from '../../content/priest_shadow_tuning';
 import type { PlayerMeta } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Aura, Entity } from '../../types';
-import { LIVING_COVENANT_MAX_EXTENSION, ownDirge, ownEffigy } from './vespers';
+import { ownDirge, ownEffigy } from './vespers';
 
 // v0.42.0 Vespers: reapplying Dirge to a mob that already carries the caster's
 // own living Dirge refreshes every OTHER living hostile MOB (never a player)

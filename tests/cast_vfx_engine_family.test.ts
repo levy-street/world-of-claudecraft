@@ -61,6 +61,8 @@ const ENGINE: Record<string, number> = {
   shells: 1,
   groundAuras: 1,
   flipbooks: 1,
+  spiritBombs: 3,
+  voidRuptures: 1,
 };
 /** The Vfx particle cloud: one Points program, drawn from the first frame. */
 const CLOUD_PROGRAMS = 1;
@@ -82,11 +84,11 @@ const KIT: Record<string, number> = {
   fragments: 1,
 };
 const KIT_PROGRAMS = 7;
-/** The gate set, pinned: the engine's 10 plus the kit's 7. The tier picks the
+/** The gate set, pinned: the engine's 14 plus the kit's 7. The tier picks the
  *  kit surfaces' material family, never how many programs they share, so it
  *  is the same count on every tier and detail level (the composition cases
  *  below). */
-const GATE_TOTAL = 17;
+const GATE_TOTAL = 21;
 /** Pools that build no drawable of their own at construction (the spirit
  *  holders are material-less; each puppet runs its own compile gate). */
 const NO_DRAWABLE = ['spirits'] as const;

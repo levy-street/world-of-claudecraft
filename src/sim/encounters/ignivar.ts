@@ -4,6 +4,10 @@
 // fields expose the cast bar and conduit template swaps to every client, while
 // the renderer derives the cone, brand circles, and water zone from that state.
 
+import {
+  beginSpiritBombRaidPull,
+  resetSpiritBombRaidPull,
+} from '../combat/priest/spirit_bomb_raid';
 import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { MOBS } from '../data';
 import { createMob } from '../entity';
@@ -1490,6 +1494,7 @@ function releaseFrontal(
 }
 
 export function resetIgnivarEncounter(ctx: SimContext, boss: Entity): void {
+  resetSpiritBombRaidPull(boss);
   const rotatingRaysBossFacing =
     boss.ignivar &&
     (boss.ignivar.rotatingRaysWindupRemaining > 0 || boss.ignivar.rotatingRaysActiveRemaining > 0)
@@ -1634,6 +1639,7 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
   boss.aggroTargetId = target.id;
   boss.inCombat = true;
   boss.aiState = 'attack';
+  beginSpiritBombRaidPull(ctx, boss);
 
   const heroic = encounterInstance(ctx, boss)?.difficulty === 'heroic';
   if (heroic && st.forgeChainsPlayerIds !== null) {

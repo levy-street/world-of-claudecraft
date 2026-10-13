@@ -458,7 +458,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1015,
-      "state": "b547dd7c",
+      "state": "54001055",
       "events": "142d780d",
       "rng": {
         "draws": 1,
@@ -469,7 +469,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 1015,
-      "state": "f9fee308",
+      "state": "deb81d4f",
       "events": "701788f0",
       "rng": {
         "draws": 1,
@@ -480,7 +480,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1015,
-      "state": "c5365fc3",
+      "state": "3b4c22a8",
       "events": "6c83945b",
       "rng": {
         "draws": 1,
@@ -491,7 +491,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1015,
-      "state": "c5365fc3",
+      "state": "3b4c22a8",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -815,6 +815,7 @@
             "x": 117400,
             "z": -1234
           },
+          "spiritBombRaidPullStarted": true,
           "stats": {
             "armor": 1159
           },

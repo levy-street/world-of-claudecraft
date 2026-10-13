@@ -133,11 +133,13 @@ describe('ability icons', () => {
     // 475: plus Groveheart's Sporemender Form (sporemender_form).
     // 476: plus the druid's Spore Burst (spore_burst).
     // 477: plus the druid's Nature's Boon passive (natures_boon).
-    expect(ids).toHaveLength(477);
+    // 479: plus Vampiric Touch and the parked Tithe Bomb mechanic icon.
+    // 480: plus Void Rupture's fractured-eye glyph.
+    expect(ids).toHaveLength(480);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('43872bc489ca8b69121821f2a3ef9aadde51cfa26a48ecae43739a94c73c9969');
+    expect(hash).toBe('a3bb70846bbaeb4664139d45e5fcddf5762459e122839134a367ede4cd98daf3');
   });
 });
