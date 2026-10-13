@@ -38,18 +38,21 @@ import { Sim } from '../src/sim/sim';
 // Strength ring it wore by accident of the old sum; the feral and Bruin
 // fixtures keep Ashveil and swap their two caster jewelry slots for Ignivar's
 // Ember Choker and the Seal of the Forgewall. Both are pinned on their own.
+// Since 2026-10-12 the picker skips Healing Power pieces for non-healer specs,
+// so the balance druid wears Moonscorch and spell-damage jewelry in place of
+// the Grovespring healer set, Heartspring Amulet and Loop of Quiet Springs.
 const BALANCE_LOADOUT = {
   mainhand: 'wand_of_quenched_sparks',
   helmet: 'heroic_thornpeak_moonhide_cowl',
-  neck: 'heartspring_amulet',
-  shoulder: 'grovespring_shoulder',
+  neck: 'locket_of_the_last_flame',
+  shoulder: 'moonscorch_shoulder',
   chest: 'crucible_caster_leather_chest',
   waist: 'crucible_caster_leather_waist',
-  legs: 'grovespring_legs',
-  gloves: 'grovespring_gloves',
+  legs: 'moonscorch_legs',
+  gloves: 'moonscorch_gloves',
   feet: 'heroic_bramblehide_treads',
   ring1: 'circle_of_cinders',
-  ring2: 'loop_of_quiet_springs',
+  ring2: 'champions_dawn_loop',
   // The trinket slot (PR 4173): the reference epic kit fills it with the
   // Varkhul caster trinket; the live-mob bands below held at the same seed.
   trinket: 'heart_of_the_crucible',
@@ -106,8 +109,14 @@ const FERAL_LOADOUT = {
 // Measured identically on the integration tip and on the faction ladder
 // branch (PR 4169). Moongrove (5982/225/5983/7) and Bruin (3060/139/
 // 10541.4575/4) stayed inside their bands and keep their anchors.
+// RE-MEASURED 2026-10-12 for the moongrove arm only: the reference picker
+// (src/sim/dev/bis_gear.ts) stopped handing non-healer specs Healing Power
+// pieces, so the balance druid swaps the Grovespring healer set and healer
+// jewelry for its own Moonscorch set and spell-damage jewelry. Damage 5956 to
+// 6115 and threat 5957 to 6116 stayed in band; incoming 212 to 242 left it
+// (the healer pieces' extra Spirit and Stamina are gone), still 7 payoffs.
 const LIVE_MOB_MEASURED = {
-  moongrove: { damage: 5956, incomingDamage: 212, threat: 5957, payoffs: 7 },
+  moongrove: { damage: 6115, incomingDamage: 242, threat: 6116, payoffs: 7 },
   wildfang: { damage: 5315, incomingDamage: 201, threat: 6228.5225, payoffs: 8 },
   bruin: { damage: 3082, incomingDamage: 131, threat: 10651.925, payoffs: 4 },
 } as const;

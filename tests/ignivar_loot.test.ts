@@ -74,6 +74,14 @@ const PROFESSION_SCROLL_IDS = [
   'formula_lastflame_zeal',
 ];
 
+// The three healer waists whose cut Crit was reallocated into Int/Spi, and by
+// how many points each line sits over its ilvl-35 budget on purpose.
+const HEALER_WAIST_OVER_BUDGET: Record<string, number> = {
+  springbinder_sash: 10,
+  grovetender_belt: 10,
+  tidebinder_links: 10,
+};
+
 const gearItems = (): ItemDef[] =>
   Object.values(IGNIVAR_LOOT_ITEMS).filter((item) => item.kind !== 'tool');
 
@@ -141,7 +149,27 @@ describe('ignivar loot: every gear piece is item level 35 and budget-exact', () 
       expect(want, `${item.id} has a derivable budget`).toBe(
         expectedStatTotal(line, statIdentity(item.stats)),
       );
-      expect(primaryStatSum(item), `${item.id} stat sum == budget`).toBe(want);
+      const over = HEALER_WAIST_OVER_BUDGET[item.id] ?? 0;
+      expect(primaryStatSum(item), `${item.id} stat sum == budget`).toBe((want ?? 0) + over);
+    }
+  });
+
+  it('the healer waists carry their reallocated Crit as Int/Spi, deliberately over the line', () => {
+    // 60 Crit became 30 Crit plus +6 Int / +4 Spi: the cut 30 rating priced at
+    // the dev-kit healer weights (rating 0.3, Int 1, Spi 0.7), so the line
+    // stays 10 over the ilvl-35 waist budget by design. Asserted against the
+    // live budget so a well-meaning re-budget reads as the nerf it would be.
+    for (const id of Object.keys(HEALER_WAIST_OVER_BUDGET)) {
+      const item = ITEMS[id];
+      expect(item.stats?.int, id).toBe(15);
+      expect(item.stats?.spi, id).toBe(12);
+      expect(item.stats?.sta, id).toBe(6);
+      expect(item.critRating, id).toBe(30);
+      expect(item.hasteRating, id).toBe(25);
+      expect(item.hitRating ?? 0, id).toBe(0);
+      expect(primaryStatSum(item), `${id} over the live budget`).toBe(
+        (expectedStatBudget(item) ?? Number.NaN) + 10,
+      );
     }
   });
 });
@@ -377,6 +405,9 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
     // rating), plus the choker's original 25. Set pieces still carry none
     // (the Hit-scarcity policy holds: hit lives on the elective lanes), and
     // the cap-coverage describe below proves the lanes reach the heroic caps.
+    // Healer pieces (Healing Power) are the one exception: heals are not
+    // resisted, so their lane amount is Crit instead of Hit (halved on the
+    // waists, whose other 30 moved into Int/Spi).
     for (const item of Object.values(IGNIVAR_LOOT_ITEMS)) {
       const want =
         item.slot === 'waist'
@@ -386,8 +417,39 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
             : item.kind === 'weapon'
               ? 30
               : 0;
+      if ((item.healPower ?? 0) > 0) {
+        expect(item.hitRating ?? 0, item.id).toBe(0);
+        // The healer waists halved theirs (60 to 30) into Int/Spi.
+        const crit = item.slot === 'waist' ? 30 : want;
+        if (want > 0) expect(item.critRating, `${item.id} lane Crit`).toBe(crit);
+        continue;
+      }
       expect(item.hitRating ?? 0, item.id).toBe(want);
     }
+  });
+
+  it('healer pieces carry Crit in place of Hit, and no healer gear anywhere carries Hit', () => {
+    // Named, so a field-predicate drift cannot silently drop a piece: the six
+    // Crucible healer electives took their old Hit amount as Crit, the waists
+    // then halving theirs into Int/Spi.
+    const healerElectives: Array<[string, number]> = [
+      ['springbinder_sash', 30],
+      ['grovetender_belt', 30],
+      ['tidebinder_links', 30],
+      ['loop_of_quiet_springs', 25],
+      ['staff_of_the_last_spring', 30],
+      ['springtouched_crozier', 30],
+    ];
+    for (const [id, crit] of healerElectives) {
+      expect(ITEMS[id].healPower ?? 0, `${id} is healer gear`).toBeGreaterThan(0);
+      expect(ITEMS[id].hitRating ?? 0, id).toBe(0);
+      expect(ITEMS[id].critRating, id).toBe(crit);
+    }
+    // Catalog-wide: every shipped item with Healing Power carries no Hit.
+    const healerHit = Object.values(ITEMS)
+      .filter((item) => (item.healPower ?? 0) > 0 && (item.hitRating ?? 0) > 0)
+      .map((item) => item.id);
+    expect(healerHit).toEqual([]);
   });
 
   it('healer pieces carry Healing Power, damage pieces Spell Damage, never both', () => {
@@ -977,6 +1039,9 @@ describe('the 2026-09-07 Heroic redistribution (docs/prd/ignivar-raid-loot.md)',
   const heroicIds = (bossId: string) =>
     (HEROIC_BOSS_LOOT[bossId] ?? []).flatMap((e) => (e.itemId ? [e.itemId] : []));
   const crucible = Object.values(IGNIVAR_LOOT_ITEMS);
+  // The hit floor counts only pieces a hit-capped role wears: healer pieces
+  // (Healing Power) carry Crit in that lane, since heals are not resisted.
+  const hitLanes = crucible.filter((i) => (i.healPower ?? 0) === 0);
   const heroic = new Set([...heroicIds(IGNIVAR_BOSS_ID), ...heroicIds(VARKHUL_BOSS_ID)]);
   const normal = new Set([...normalIds(IGNIVAR_BOSS_ID), ...normalIds(VARKHUL_BOSS_ID)]);
   const heroicOnly = (ids: readonly string[]) => {
@@ -1035,10 +1100,14 @@ describe('the 2026-09-07 Heroic redistribution (docs/prd/ignivar-raid-loot.md)',
     // Normal floor without a weapon (min waist + two lowest rings) reaches the
     // spell cap but NOT the melee cap, which is why the wand could move and
     // the Kris and Cleaver could not.
+    // Count controls: Math.min over an empty lane is Infinity, which would pass
+    // every floor check below vacuously.
+    expect(hitLanes.filter((i) => i.slot === 'waist').length).toBeGreaterThan(0);
+    expect(hitLanes.filter((i) => i.kind === 'weapon').length).toBeGreaterThan(0);
     const minWaist = Math.min(
-      ...crucible.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
+      ...hitLanes.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
     );
-    const rings = crucible
+    const rings = hitLanes
       .filter((i) => i.slot === 'ring')
       .map((i) => i.hitRating ?? 0)
       .sort((a, b) => a - b);
@@ -1077,17 +1146,24 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
   const meleeCap = Math.round(HEROIC_LEVEL_GAP_MELEE_MISS * HIT_RATING_PER_PCT * 100);
   const spellCap = Math.round(HEROIC_LEVEL_GAP_SPELL_MISS * HIT_RATING_PER_PCT * 100);
   const crucible = Object.values(IGNIVAR_LOOT_ITEMS);
+  // The hit floor counts only pieces a hit-capped role wears: healer pieces
+  // (Healing Power) carry Crit in that lane, since heals are not resisted.
+  const hitLanes = crucible.filter((i) => (i.healPower ?? 0) === 0);
 
   it('the guaranteed elective floor (any waist + two rings + any weapon) covers both caps', () => {
+    // Count controls: Math.min over an empty lane is Infinity, which would pass
+    // every floor check below vacuously.
+    expect(hitLanes.filter((i) => i.slot === 'waist').length).toBeGreaterThan(0);
+    expect(hitLanes.filter((i) => i.kind === 'weapon').length).toBeGreaterThan(0);
     const minWaist = Math.min(
-      ...crucible.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
+      ...hitLanes.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
     );
-    const rings = crucible
+    const rings = hitLanes
       .filter((i) => i.slot === 'ring')
       .map((i) => i.hitRating ?? 0)
       .sort((a, b) => a - b);
     const minWeapon = Math.min(
-      ...crucible.filter((i) => i.kind === 'weapon').map((i) => i.hitRating ?? 0),
+      ...hitLanes.filter((i) => i.kind === 'weapon').map((i) => i.hitRating ?? 0),
     );
     const floor = minWaist + rings[0] + rings[1] + minWeapon;
     expect(minWaist).toBeGreaterThanOrEqual(60);
@@ -1132,8 +1208,9 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
         .reduce((acc, entry) => acc + entry.chance, 0);
       expect(sum, group).toBe(1);
     }
-    // The Heroic-exclusive hit carriers are the six marquee weapons plus the
-    // redistributed Wand of Quenched Sparks, all at 30, so a Heroic-only kit
+    // The Heroic-exclusive hit carriers are the physical marquee weapons, the
+    // damage staff, and the redistributed Wand of Quenched Sparks, all at 30
+    // (the two healer weapons carry that 30 as Crit), so a Heroic-only kit
     // tops out at 60 (both hands) against both caps: the Normal lock is
     // load-bearing for hit, by design.
     const heroicIds = [
@@ -1146,8 +1223,6 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
       'forgefathers_warhammer',
       'forgefire_spire',
       'heart_of_the_end_greatblade',
-      'springtouched_crozier',
-      'staff_of_the_last_spring',
       'wand_of_quenched_sparks',
     ]);
     for (const id of heroicHitCarriers) expect(ITEMS[id].hitRating, id).toBe(30);
