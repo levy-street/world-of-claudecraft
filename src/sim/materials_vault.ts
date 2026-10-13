@@ -29,9 +29,11 @@
 // because every one was premium, rolled, bound, locked or recipe-marked;
 // plainly gathered material is none of those, so it stays drawable now that its
 // representation moved, and a premium bucket stays undrawable inside a mixed
-// row rather than refusing the row whole. Recording a gatherer grants no
-// benefit and unlocks no unit. The read and the spend take their per-id total
-// from the same helper, so they agree by construction.
+// row rather than refusing the row whole, with ONE exception: units signed with
+// the drawing crafter's own name are theirs to spend, after every plain unit
+// (vault_material_sources.ts autoDrawableSource). Recording a gatherer grants
+// no benefit and unlocks no unit. The read and the spend take their per-id
+// total from the same helper, so they agree by construction.
 //
 // Shape follows bank.ts exactly: free functions `fn(ctx, ...)` behind
 // SimContext, backing state on PlayerMeta.vault (persisted INSIDE the character
@@ -832,8 +834,9 @@ export function drawableCounterFor(
  *  provenance, no identity row was auto-drawable, because every one was
  *  premium, rolled, bound, locked or recipe-marked. Plainly gathered material is
  *  none of those, so it stays spendable now that its representation moved; a
- *  premium bucket stays unspendable, including inside a mixed row, and a row
- *  keeping any per-copy identity contributes nothing. `planVaultDraw` refuses
+ *  premium bucket stays unspendable, including inside a mixed row, unless
+ *  `selfSigner` names its own signer (the crafter spending units they signed),
+ *  and a row keeping any per-copy identity contributes nothing. `planVaultDraw` refuses
  *  anything past the SAME per-id total the projection publishes, which is what
  *  makes read and spend agree by construction rather than by review.
  *
@@ -862,6 +865,7 @@ export function consumeVaultStock(
   vault: MaterialsVaultState,
   itemId: string,
   count: number,
+  selfSigner?: string,
 ): boolean {
   const held = drawableVaultCount(vault.stock, itemId);
   // The WHOLE draw is planned before a single write, across BOTH stores: the
@@ -870,7 +874,14 @@ export function consumeVaultStock(
   // the eligible identity rows, where premium buckets stay untouched. A plan
   // that cannot be paid in full answers null and nothing moves, which is the
   // all-or-nothing contract this function has always had.
-  const plan = planVaultDraw(vault.stock, vault.special, itemId, count, vaultMaterialIds());
+  const plan = planVaultDraw(
+    vault.stock,
+    vault.special,
+    itemId,
+    count,
+    vaultMaterialIds(),
+    selfSigner,
+  );
   if (plan === null) return false;
   // Byte-for-byte `vaultWithdraw`'s write shape (delete at zero, else
   // decrement), and that is a requirement rather than a coincidence: it is the
@@ -894,9 +905,11 @@ export function consumeVaultStock(
 
 /** Apply a planned draw to a LIVE player vault and advance its wire revision
  *  immediately after the decrement. Scratch batch simulation keeps calling
- *  consumeVaultStock directly, so planning remains side-effect free. */
+ *  consumeVaultStock directly, so planning remains side-effect free. The
+ *  player's own name rides along so units they signed themself are spendable,
+ *  exactly as `vaultDrawStock` projected them. */
 export function consumePlayerVaultStock(meta: PlayerMeta, itemId: string, count: number): boolean {
-  if (!consumeVaultStock(meta.vault, itemId, count)) return false;
+  if (!consumeVaultStock(meta.vault, itemId, count, meta.name)) return false;
   bumpVaultWireRev(meta);
   return true;
 }

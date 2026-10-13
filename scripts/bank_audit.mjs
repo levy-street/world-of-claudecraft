@@ -477,6 +477,22 @@ function isExactVaultSpecialIdentity(value) {
   );
 }
 
+// The one identity a craft_consume row may carry: the exact special wrapper
+// around a payload holding nothing but a non-empty signer, with no crafted
+// marker (server/bank_ledger.ts buildVaultCraftConsumeLedgerRows).
+function isSignerOnlyVaultIdentity(value) {
+  if (!isExactVaultSpecialIdentity(value) || value.craftedRecipeId !== null) return false;
+  const payload = value.instance;
+  if (payload === null) return false;
+  const keys = Object.keys(payload);
+  return (
+    keys.length === 1 &&
+    keys[0] === 'signer' &&
+    typeof payload.signer === 'string' &&
+    payload.signer !== ''
+  );
+}
+
 function itemIdFromKey(key) {
   try {
     return JSON.parse(key)[0];
@@ -611,7 +627,9 @@ function checkRowShape(row, findings) {
   };
   // craft_consume (Bank Storage Phase 04) is an item op with exactly the
   // deposit/withdraw row shape: vault stock consumed in place by a completed
-  // craft, one row per material id, positive count, no copper.
+  // craft, one row per planned take (a take that reaches the crafter's own
+  // signed units writes a signer-keyed row beside its pooled one), positive
+  // count, no copper.
   if (
     row.op === 'deposit' ||
     row.op === 'withdraw' ||
@@ -964,15 +982,18 @@ function checkRowShape(row, findings) {
     });
   }
   // Vault item evidence is either pooled null or the exact versioned special
-  // wrapper. Craft consumption can only draw pooled stock, and purchases carry
-  // no item identity, so both of those ops require null specifically.
+  // wrapper. Craft consumption draws pooled stock plus, since crafts may spend
+  // the crafter's OWN signed units, the signer-only identity those units key
+  // under (nothing else: no payload, no crafted marker). Purchases carry no item
+  // identity, so buy_slots requires null specifically.
   const vaultInstanceAllowed =
     row.instance == null ||
-    ((row.op === 'deposit' || row.op === 'withdraw') && isExactVaultSpecialIdentity(row.instance));
+    ((row.op === 'deposit' || row.op === 'withdraw') &&
+      isExactVaultSpecialIdentity(row.instance)) ||
+    (row.op === 'craft_consume' && isSignerOnlyVaultIdentity(row.instance));
   if (
     container === 'vault' &&
-    (!vaultInstanceAllowed ||
-      ((row.op === 'craft_consume' || row.op === 'buy_slots') && row.instance != null))
+    (!vaultInstanceAllowed || (row.op === 'buy_slots' && row.instance != null))
   ) {
     findings.push({
       ...base,

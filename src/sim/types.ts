@@ -8977,11 +8977,15 @@ export interface StoragePricesOverride {
   readonly vaultUpgrades?: readonly number[];
 }
 
-/** One identity-free Materials Vault unit draw offered to the authoritative
- *  host before the sim mutates any character state. */
+/** One Materials Vault unit draw offered to the authoritative host before the
+ *  sim mutates any character state. Identity-free (pooled stock) unless
+ *  `signer` is set: then every unit of the take comes out of the crafter's OWN
+ *  signed buckets, which the custody ledger keys by that signer
+ *  (vault_material_sources.ts splitVaultTakesBySigner). */
 export interface VaultConsumptionTake {
   readonly itemId: string;
   readonly count: number;
+  readonly signer?: string;
 }
 
 /** Opaque host reservation for one planned Materials Vault consumption. */

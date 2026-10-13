@@ -235,9 +235,10 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
   `isVaultSpecialSlot`; a count map has nowhere to put a gatherer, so a stack carrying
   recorded provenance joins the identity collection), the migrate-on-touch fold predicate
   (`absorbsCompactStock`), the automatic-draw ELIGIBILITY rule (`autoDrawableRow` /
-  `autoDrawableUnits`: unchanged from before per-unit provenance, premium buckets and rows
-  keeping per-copy identity excluded, a mixed row exposing its eligible count rather than
-  refusing whole), and the one per-id drawable total BOTH the read
+  `autoDrawableUnits`: premium buckets and rows keeping per-copy identity excluded, except
+  units signed with the drawing crafter's own name, which spend after every plain unit; a
+  mixed row exposes its eligible count rather than refusing whole; `splitVaultTakesBySigner`
+  keys the self-signed share of a craft's ledger rows by that signer), and the one per-id drawable total BOTH the read
   (`drawableVaultProjection`) and the spend (`planVaultDraw`, which refuses anything past
   it) compute the same way, so they agree by construction. The second holds the three
   per-slot BODIES as inert decisions `materials_vault.ts` applies (`planVaultDeposit`,

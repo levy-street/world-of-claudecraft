@@ -292,7 +292,10 @@ export function vaultDrawBlocked(ctx: SimContext, pid: number): boolean {
  */
 export function vaultDrawStock(ctx: SimContext, pid: number): Record<string, number> | null {
   if (vaultDrawBlocked(ctx, pid)) return null;
-  const held = ctx.players.get(pid)?.vault;
+  const meta = ctx.players.get(pid);
+  const held = meta?.vault;
   if (!held) return null;
-  return drawableVaultProjection(held.stock, held.special, materialItemIds());
+  // The crafter's own name, so their OWN signed units count as drawable
+  // (vault_material_sources.ts autoDrawableSource); anyone else's stay premium.
+  return drawableVaultProjection(held.stock, held.special, materialItemIds(), meta?.name);
 }

@@ -54,6 +54,7 @@ import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { CoreStats } from '../src/sim/types';
 import { runCraft } from './helpers/enchant_family_cast';
+import { placeInDungeon } from './helpers/instanced_contexts';
 
 const statSum = (stats: Partial<CoreStats> | null | undefined): number => {
   if (!stats) return 0;
@@ -672,6 +673,87 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     expect(traded.masterwork).toBe(true);
   });
 
+  it('a signed reagent held in the Materials Vault feeds the proc chance like one in the bags', () => {
+    // Same hunted seed-21 window. Every reagent is paid from the bags; the
+    // only signed linen sits in the vault, so the proc fires only when the
+    // holding check reads the vault too (where vault draw is allowed).
+    const SEED = 21;
+    const reagents = (sim: Sim, pid: number, linen: number) => {
+      sim.addItem('linen_scrap', linen, pid);
+      sim.addItem('spider_leg', 1, pid);
+      sim.addItem('homespun_cloth', 3, pid);
+      sim.addItem('spool_of_thread', 5, pid);
+    };
+    const vaultSigned = (sim: Sim, pid: number, signer: string) => {
+      (sim as any).players.get(pid).vault.special.push({
+        itemId: 'linen_scrap',
+        count: 1,
+        instance: { signer },
+      });
+    };
+
+    // In-test control: an empty vault at this seed misses.
+    expect(craftVestments(SEED, (sim, pid) => reagents(sim, pid, 3)).masterwork).toBeUndefined();
+
+    const foreign = craftVestments(SEED, (sim, pid) => {
+      vaultSigned(sim, pid, 'Gatherer Friend');
+      reagents(sim, pid, 3);
+    });
+    expect(foreign.ok).toBe(true);
+    expect(foreign.masterwork).toBe(true);
+
+    // The crafter's own signed copy in the vault feeds the proc too, but the
+    // #1145 quantity discount stays bags-only: all 3 linen are still required,
+    // so with 2 in the bags the vault pays the third with that signed copy.
+    let ownSpecial: unknown[] = [];
+    const own = craftVestments(SEED, (sim, pid) => {
+      vaultSigned(sim, pid, (sim as any).players.get(pid).name);
+      reagents(sim, pid, 2);
+      ownSpecial = (sim as any).players.get(pid).vault.special;
+    });
+    expect(own.ok).toBe(true);
+    expect(own.selfSignedBonusApplied).toBe(false);
+    expect(own.masterwork).toBe(true);
+    expect(ownSpecial).toEqual([]);
+  });
+
+  it('a vault-held signed reagent feeds nothing where the vault is out of reach', () => {
+    // Entering a dungeon claims an instance, which rolls rng for its spawns;
+    // the stream is restored afterwards so the craft sees the SAME seed-21
+    // draw, and a bag-held signed copy at the same spot proves the window
+    // still decides the proc there.
+    const SEED = 21;
+    const inDungeon = (signedIn: 'bags' | 'vault') =>
+      craftVestments(SEED, (sim, pid) => {
+        const rng = (sim as any).ctx.rng;
+        const saved = rng.s;
+        placeInDungeon(sim, pid);
+        rng.s = saved;
+        if (signedIn === 'vault') {
+          (sim as any).players.get(pid).vault.special.push({
+            itemId: 'linen_scrap',
+            count: 1,
+            instance: { signer: 'Gatherer Friend' },
+          });
+          sim.addItem('linen_scrap', 3, pid);
+        } else {
+          sim.addItemInstance('linen_scrap', { signer: 'Gatherer Friend' }, pid);
+          sim.addItem('linen_scrap', 2, pid);
+        }
+        sim.addItem('spider_leg', 1, pid);
+        sim.addItem('homespun_cloth', 3, pid);
+        sim.addItem('spool_of_thread', 5, pid);
+      });
+
+    const bags = inDungeon('bags');
+    expect(bags.ok).toBe(true);
+    expect(bags.masterwork).toBe(true);
+
+    const vault = inDungeon('vault');
+    expect(vault.ok).toBe(true);
+    expect(vault.masterwork).toBeUndefined();
+  });
+
   it('a signed FINE grade feeds the proc chance for a recipe declaring its base', () => {
     // D8: 26 shipped masterwork-capable recipes declare a material that has a
     // fine grade, and resolveHarvest mints the signed instance on the RESOLVED
@@ -734,6 +816,20 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
       });
       expect(plainFine.ok, `seed ${seed}`).toBe(true);
       expect(plainFine.masterwork, `seed ${seed}`).toBeUndefined();
+
+      // The vault read spans grades too: one signed FINE copy banked in the
+      // vault, every unit paid from plain fine copies in the bags.
+      const vaultFine = craftLongsword(seed, (sim, pid) => {
+        reagentsExceptOre(sim, pid);
+        for (let i = 0; i < ORE_COUNT; i++) sim.addItem('fine_iron_ore', 1, pid);
+        (sim as any).players.get(pid).vault.special.push({
+          itemId: 'fine_iron_ore',
+          count: 1,
+          instance: { signer: 'Gatherer Friend' },
+        });
+      });
+      expect(vaultFine.ok, `seed ${seed}`).toBe(true);
+      expect(vaultFine.masterwork, `seed ${seed}`).toBe(true);
     }
   });
 
