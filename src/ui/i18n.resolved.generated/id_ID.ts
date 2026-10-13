@@ -2883,6 +2883,12 @@ export const id_ID: EnTranslations = {
       "hint": "Temukan medan yang ditunjukkan peta ini, berdiri di X, dan gali. Gunakan sekop dari inventaris Anda.",
       "upgradeNote": "Menggambar ulangnya sebagai peta {rarity} memerlukan {inks} Tinta Peta dan {held} tempat di tas Anda.",
       "upgradeMaxed": "Tidak ada ahli peta yang bisa memperbaiki peta ini lebih lanjut.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Umum",
         "rare": "Langka",

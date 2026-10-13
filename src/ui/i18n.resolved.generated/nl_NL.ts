@@ -2883,6 +2883,12 @@ export const nl_NL: EnTranslations = {
       "hint": "Vind de grond die deze kaart toont, sta op de X, en gebruik de kaart opnieuw om te graven. Een begraven schat opent voor jou en je groep.",
       "upgradeNote": "Opnieuw tekenen als een {rarity} kaart kost {inks} Kaartograafsinkt (je hebt {held}). Factiequartermasters verkopen dit.",
       "upgradeMaxed": "Geen kaartograaf kan deze kaart verbeteren.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Algemeen",
         "rare": "Zeldzaam",

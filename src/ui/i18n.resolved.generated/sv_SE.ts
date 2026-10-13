@@ -2883,6 +2883,12 @@ export const sv_SE: EnTranslations = {
       "hint": "Hitta marken som denna karta visar, stå på X och använd kartan igen för att gräva. En begravd skatt öppnas för dig och ditt lag.",
       "upgradeNote": "Att omtecka det som en {rarity} karta tar {inks} kartografbläck (du håller {held}). Fraktionens quartermaster säljer det.",
       "upgradeMaxed": "Ingen kartograf kunde göra denna karta bättre.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Vanlig",
         "rare": "Sällsynt",

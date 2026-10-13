@@ -2883,6 +2883,12 @@ export const cs_CZ: EnTranslations = {
       "hint": "Najdi půdu kterou mapa ukazuje, stůj na X a použij mapu znovu k vykopávání. Pohřbený poklad se otevře pro tebe a tvou skupinu.",
       "upgradeNote": "Překreslení jako {rarity} mapu trvá {inks} kartografského inkoustu (máš {held}). Kvartermasterů frakce to prodávají.",
       "upgradeMaxed": "Žádný kartograf by tuto mapu nezvýšil lépe.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Běžný",
         "rare": "Vzácný",

@@ -8,7 +8,7 @@ import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
-import type { TreasureMapRarity } from './content/treasure_maps';
+import type { InkMapTarget, TreasureMapRarity } from './content/treasure_maps';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
 import type { WispMazeState } from './minigames/wisp_maze';
@@ -1106,6 +1106,14 @@ export type TimedStatBuffAuraKind = Extract<AuraKind, 'buff_sta' | 'buff_ap' | '
 export interface ItemUseResult {
   type: 'mechChroma';
   chromaId: string;
+}
+
+/** What an item use is aimed at, beyond the item: the exact bag copy, a ground
+ *  point (an aimed throwable), or the treasure map a Cartographer's Ink redraws. */
+export interface ItemUseTarget {
+  slotIndex?: number;
+  aim?: { x: number; z: number };
+  inkMap?: InkMapTarget;
 }
 
 // One timed flat stat buff, the payload shape shared by the elixir/scroll/flask

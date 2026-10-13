@@ -2883,6 +2883,12 @@ export const pt_BR: EnTranslations = {
       "hint": "Encontre o terreno que este mapa mostra, fique em pé no X e use o mapa novamente para cavar. Um tesouro enterrado se abre para você e seu grupo.",
       "upgradeNote": "Redesenhá-lo como um mapa {rarity} leva {inks} Tinta do Cartógrafo (você possui {held}). Os quartéis-mestres das facções a vendem.",
       "upgradeMaxed": "Nenhum cartógrafo poderia melhorar este mapa.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Comum",
         "rare": "Raro",

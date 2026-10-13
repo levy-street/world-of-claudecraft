@@ -66,6 +66,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.treasureMap.upgradeNote':
     '{rarity}の地図として描き直すには地図職人のインクが{inks}個必要です（所持: {held}）。各勢力の補給係が販売しています。',
   'hudChrome.treasureMap.upgradeMaxed': 'どんな地図職人もこの地図をこれ以上良くはできません。',
+  'hudChrome.treasureMap.inkPickerTitle': 'どの地図に地図職人のインクを使いますか？',
+  'hudChrome.treasureMap.inkPickerHeld': '地図職人のインクを{held}個所持しています。',
+  'hudChrome.treasureMap.inkPickerRead': '追跡中: Xは{zone}にあります。Xの位置は変わりません。',
+  'hudChrome.treasureMap.inkPickerUnread': '未読（所持: {count}）',
+  'hudChrome.treasureMap.inkPickerCost': 'インク{inks}個で{rarity}の地図に描き直す',
+  'hudChrome.treasureMap.inkPickerCancel': 'キャンセル',
   'hudChrome.treasureMap.rarity.common': 'コモン',
   'hudChrome.treasureMap.rarity.rare': 'レア',
   'hudChrome.treasureMap.rarity.epic': 'エピック',

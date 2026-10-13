@@ -2883,6 +2883,12 @@ export const tr_TR: EnTranslations = {
       "hint": "Haritanın gösterdiği yeri bul, X'in üzerinde dur ve haritayı tekrar kullan kazmak için. Bir gizli hazine sende ve takımında açılır.",
       "upgradeNote": "Bir {rarity} harita olarak yeniden çizmek {inks} Haritacı Mürekkebi gerektirir (sahip olduğun: {held}). Faktiyonun ihtiyaç memurları bunu satarlar.",
       "upgradeMaxed": "Hiçbir haritacı bu haritayı daha iyi çizemez.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Yaygın",
         "rare": "Nadir",

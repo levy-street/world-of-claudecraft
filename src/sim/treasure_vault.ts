@@ -16,6 +16,7 @@
 
 import {
   CARTOGRAPHERS_INK_ITEM_ID,
+  type InkMapTarget,
   isTreasureMapRarity,
   nextTreasureMapRarity,
   TREASURE_DIG_RADIUS,
@@ -416,39 +417,59 @@ export function payTreasureVault(
 }
 
 // ---------------------------------------------------------------------------
-// Cartographer's Ink (the `cartographersInk` item-use arm): redraws the read
+// Cartographer's Ink (the `cartographersInk` item-use arm): redraws a treasure
 // map one rarity finer. The ink is bought from a faction quartermaster.
 
-export function useCartographersInk(ctx: SimContext, meta: PlayerMeta): void {
+export function sanitizeInkMapTarget(raw: unknown): InkMapTarget | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const obj = raw as Record<string, unknown>;
+  if (!isTreasureMapRarity(obj.rarity) || typeof obj.read !== 'boolean') return null;
+  return { rarity: obj.rarity, read: obj.read };
+}
+
+/** `rawTarget` is the chosen map off the wire, re-validated here. Absent (an
+ *  older client, the RL env) it means the read map, the rule before the picker. */
+export function useCartographersInk(ctx: SimContext, meta: PlayerMeta, rawTarget?: unknown): void {
   const pid = meta.entityId;
-  const map = meta.treasureMap;
-  if (!map) {
+  const read = meta.treasureMap;
+  const target = rawTarget === undefined ? undefined : sanitizeInkMapTarget(rawTarget);
+  if (target === null || (target?.read && read?.rarity !== target.rarity)) {
+    ctx.error(pid, 'You no longer hold that treasure map.');
+    return;
+  }
+  const rarity = target ? target.rarity : read?.rarity;
+  if (!rarity) {
     ctx.error(pid, 'Read the treasure map you want to redraw first.');
     return;
   }
-  const next = nextTreasureMapRarity(map.rarity);
+  const next = nextTreasureMapRarity(rarity);
   if (!next) {
     ctx.error(pid, 'This map cannot be improved any further.');
     return;
   }
-  const inks = TREASURE_MAP_UPGRADE_INKS[map.rarity];
+  const inks = TREASURE_MAP_UPGRADE_INKS[rarity];
   if (ctx.countItem(CARTOGRAPHERS_INK_ITEM_ID, pid) < inks) {
     ctx.error(pid, `Redrawing this map takes ${inks} Cartographer's Ink.`);
     return;
   }
-  if (ctx.countItem(TREASURE_MAP_ITEM_IDS[map.rarity], pid) < 1) {
+  // An unread copy of the read map's rarity must be a copy beyond the read one.
+  const redrawsRead = !target || target.read;
+  const spare = !redrawsRead && read?.rarity === rarity ? 1 : 0;
+  if (ctx.countItem(TREASURE_MAP_ITEM_IDS[rarity], pid) < 1 + spare) {
     ctx.error(pid, 'You no longer hold that treasure map.');
     return;
   }
   ctx.removeItem(CARTOGRAPHERS_INK_ITEM_ID, inks, pid);
-  ctx.removeItem(TREASURE_MAP_ITEM_IDS[map.rarity], 1, pid);
+  ctx.removeItem(TREASURE_MAP_ITEM_IDS[rarity], 1, pid);
   ctx.addItem(TREASURE_MAP_ITEM_IDS[next], 1, pid);
-  const site = TREASURE_SITES_BY_ID[map.siteId];
-  meta.treasureMap = {
-    rarity: next,
-    siteId: map.siteId,
-    seed: pickVaultSeed(ctx, next, site.zoneId),
-  };
-  meta.wireRev++;
+  if (redrawsRead && read) {
+    const site = TREASURE_SITES_BY_ID[read.siteId];
+    meta.treasureMap = {
+      rarity: next,
+      siteId: read.siteId,
+      seed: pickVaultSeed(ctx, next, site.zoneId),
+    };
+    meta.wireRev++;
+  }
   ctx.emit({ type: 'treasureMapUpgraded', rarity: next, inks, pid });
 }

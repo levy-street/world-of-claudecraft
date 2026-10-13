@@ -2883,6 +2883,12 @@ export const fr_FR: EnTranslations = {
       "hint": "Trouvez le terrain que cette carte montre, tenez-vous sur le X et utilisez la carte à nouveau pour creuser. Un butin enfoui s'ouvre pour vous et votre groupe.",
       "upgradeNote": "La redessiner en tant que carte {rarity} prend {inks} Encres du Cartographe (vous en tenez {held}). Les intendants des factions les vendent.",
       "upgradeMaxed": "Aucun cartographe ne pourrait mieux affiner cette carte.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Commun",
         "rare": "Rare",

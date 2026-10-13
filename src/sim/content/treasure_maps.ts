@@ -44,9 +44,9 @@ export function nextTreasureMapRarity(rarity: TreasureMapRarity): TreasureMapRar
 }
 
 /** Cartographer's Ink: sold by every faction quartermaster for their own
- *  currency (src/sim/content/faction_vendors.ts); using it redraws the READ map
- *  one rarity finer. A higher-band world quest pays 10 currency, so a full day
- *  is about 140: two inks. */
+ *  currency (src/sim/content/faction_vendors.ts); using it redraws a held map
+ *  the player picks one rarity finer. A higher-band world quest pays 10
+ *  currency, so a full day is about 140: two inks. */
 export const CARTOGRAPHERS_INK_ITEM_ID = 'cartographers_ink';
 export const CARTOGRAPHERS_INK_CURRENCY_COST = 60;
 /** Inks one redraw spends, by the map's CURRENT rarity. Epic to legendary is the
@@ -180,4 +180,13 @@ export interface TreasureMapProgress {
   /** The vault's Rift seed, fixed when the map is read (and re-picked on an
    *  upgrade, since the floor count depends on the rank). */
   seed: number;
+}
+
+/** The map one Cartographer's Ink use redraws, as the client's picker names it:
+ *  the READ map (it keeps its dig site and re-seeds its vault) or an unread copy
+ *  in the bags (a plain item swap). Maps of one rarity stack, so the rarity plus
+ *  the read flag is the whole address. */
+export interface InkMapTarget {
+  rarity: TreasureMapRarity;
+  read: boolean;
 }

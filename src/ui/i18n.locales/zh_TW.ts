@@ -66,6 +66,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.treasureMap.upgradeNote':
     '將其重繪為{rarity}地圖需要 {inks} 瓶製圖師的墨水（你持有 {held} 瓶）。各陣營軍需官均有出售。',
   'hudChrome.treasureMap.upgradeMaxed': '沒有哪位製圖師能讓這張地圖更進一步。',
+  'hudChrome.treasureMap.inkPickerTitle': '要將製圖師的墨水用在哪張地圖上？',
+  'hudChrome.treasureMap.inkPickerHeld': '你持有 {held} 瓶製圖師的墨水。',
+  'hudChrome.treasureMap.inkPickerRead': '正在追尋：X 位於{zone}。X 的位置不會改變。',
+  'hudChrome.treasureMap.inkPickerUnread': '未閱讀（持有 {count} 張）',
+  'hudChrome.treasureMap.inkPickerCost': '用 {inks} 瓶墨水將其重繪為{rarity}地圖',
+  'hudChrome.treasureMap.inkPickerCancel': '取消',
   'hudChrome.treasureMap.rarity.common': '普通',
   'hudChrome.treasureMap.rarity.rare': '稀有',
   'hudChrome.treasureMap.rarity.epic': '史詩',

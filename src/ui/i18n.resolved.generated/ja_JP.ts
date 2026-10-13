@@ -2883,6 +2883,12 @@ export const ja_JP: EnTranslations = {
       "hint": "この地図が示す場所を見つけ、X印の上に立ち、もう一度地図を使って掘りましょう。あなたとパーティーのために埋もれた財宝が開かれます。",
       "upgradeNote": "{rarity}の地図として描き直すには地図職人のインクが{inks}個必要です（所持: {held}）。各勢力の補給係が販売しています。",
       "upgradeMaxed": "どんな地図職人もこの地図をこれ以上良くはできません。",
+      "inkPickerTitle": "どの地図に地図職人のインクを使いますか？",
+      "inkPickerHeld": "地図職人のインクを{held}個所持しています。",
+      "inkPickerRead": "追跡中: Xは{zone}にあります。Xの位置は変わりません。",
+      "inkPickerUnread": "未読（所持: {count}）",
+      "inkPickerCost": "インク{inks}個で{rarity}の地図に描き直す",
+      "inkPickerCancel": "キャンセル",
       "rarity": {
         "common": "コモン",
         "rare": "レア",

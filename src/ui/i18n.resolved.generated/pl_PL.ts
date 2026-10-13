@@ -2883,6 +2883,12 @@ export const pl_PL: EnTranslations = {
       "hint": "Znajdź grunt pokazywany na mapie, stań na X i użyj mapy ponownie, aby kopać. Zakopane skarby otwierają się dla ciebie i twojej drużyny.",
       "upgradeNote": "Przerysowanie go jako mapę {rarity} wymaga {inks} Kartogarfa Atrament (posiadasz {held}). Kwatermistrzowie frakcji to sprzedają.",
       "upgradeMaxed": "Żaden kartograf nie mógł tego ulepszyć.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Zwyczajna",
         "rare": "Rzadka",

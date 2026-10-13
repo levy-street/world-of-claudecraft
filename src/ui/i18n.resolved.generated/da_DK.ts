@@ -2883,6 +2883,12 @@ export const da_DK: EnTranslations = {
       "hint": "Find jorden som kortet viser, stå på X og brug kortet igen for at grave. Et begravet skattkammer åbner for dig og dit hold.",
       "upgradeNote": "At tegne det som et {rarity} kort tager {inks} Kartografs blæk (du holder {held}). Fraktionernes kvartermestre sælger det.",
       "upgradeMaxed": "Ingen kartograf kunne forbedre dette kort.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Almindelig",
         "rare": "Sjælden",

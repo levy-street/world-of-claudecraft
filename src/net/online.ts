@@ -3656,9 +3656,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   unequipBag(socket: number): void {
     this.cmd({ cmd: 'unequip_bag', socket });
   }
-  useItem(itemId: string, target?: { slotIndex: number }): void {
-    if (target === undefined) this.cmd({ cmd: 'use', item: itemId });
-    else this.cmd({ cmd: 'use', item: itemId, slot: target.slotIndex });
+  useItem(itemId: string, target?: Parameters<IWorld['useItem']>[1]): void {
+    this.cmd({ cmd: 'use', item: itemId, slot: target?.slotIndex, inkMap: target?.inkMap });
   }
   discardItem(itemId: string, count?: number, target?: NamedSlotTarget): void {
     if (target === undefined) this.cmd({ cmd: 'discard', item: itemId, count });

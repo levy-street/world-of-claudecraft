@@ -2883,6 +2883,12 @@ export const vi_VN: EnTranslations = {
       "hint": "Gợi Ý",
       "upgradeNote": "Vẽ Lại Thành Bản Đồ {rarity} Cần {inks} Mực Của Nhà Địa Lý (Bạn Có {held}). Những Người Quản Lý Phái Bộ Bán Nó.",
       "upgradeMaxed": "Nâng Cấp Tối Đa",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Phổ Biến",
         "rare": "Hiếm",

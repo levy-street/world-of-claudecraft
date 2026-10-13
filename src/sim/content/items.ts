@@ -1995,8 +1995,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: false,
   },
   // Cartographer's Ink (content/treasure_maps.ts): every faction quartermaster
-  // sells it for their currency; using it redraws the READ treasure map one
-  // rarity finer (1, 3 or 8 inks by the map's current rarity).
+  // sells it for their currency; using it asks which held treasure map to
+  // redraw one rarity finer (TREASURE_MAP_UPGRADE_INKS by its current rarity).
   cartographers_ink: {
     id: 'cartographers_ink',
     name: "Cartographer's Ink",

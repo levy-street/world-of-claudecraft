@@ -6442,9 +6442,9 @@ export class GameServer {
         if (typeof msg.item === 'string') {
           // The bag index the client named, re-validated in the sim against ITS
           // OWN inventory: an unrecognized value reads as undefined (the legacy
-          // id-only path), never as index 0.
+          // id-only path), never as index 0. inkMap rides raw; the sim sanitizes it.
           const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
-          const result = sim.useItem(msg.item, pid, slot);
+          const result = sim.useItem(msg.item, pid, slot, undefined, msg.inkMap);
           if (result?.type === 'mechChroma')
             this.cosmetics.noteMechChroma(session, result.chromaId);
         }

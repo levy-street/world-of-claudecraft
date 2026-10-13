@@ -2883,6 +2883,12 @@ export const zh_CN: EnTranslations = {
       "hint": "找到这张地图所示的地方，站在 X 标记上，再次使用地图进行挖掘。一处埋藏的宝藏将为你和你的队伍开启。",
       "upgradeNote": "将其重绘为{rarity}地图需要 {inks} 瓶制图师的墨水（你持有 {held} 瓶）。各阵营军需官均有出售。",
       "upgradeMaxed": "没有哪位制图师能让这张地图更进一步。",
+      "inkPickerTitle": "要将制图师的墨水用在哪张地图上？",
+      "inkPickerHeld": "你持有 {held} 瓶制图师的墨水。",
+      "inkPickerRead": "正在追寻：X 位于{zone}。X 的位置不会改变。",
+      "inkPickerUnread": "未阅读（持有 {count} 张）",
+      "inkPickerCost": "用 {inks} 瓶墨水将其重绘为{rarity}地图",
+      "inkPickerCancel": "取消",
       "rarity": {
         "common": "普通",
         "rare": "稀有",

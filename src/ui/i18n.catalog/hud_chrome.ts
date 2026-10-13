@@ -3521,6 +3521,12 @@ export const hudChromeStrings = {
     upgradeNote:
       "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
     upgradeMaxed: 'No cartographer could better this map.',
+    inkPickerTitle: "Use Cartographer's Ink on which map?",
+    inkPickerHeld: "You hold {held} Cartographer's Ink.",
+    inkPickerRead: 'Being followed: its X lies in {zone}. The X stays put.',
+    inkPickerUnread: 'Unread ({count} held)',
+    inkPickerCost: 'Redraw to {rarity}: {inks} ink',
+    inkPickerCancel: 'Cancel',
     rarity: {
       common: 'Common',
       rare: 'Rare',

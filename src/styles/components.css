@@ -302,6 +302,71 @@
     text-align: center;
     opacity: 0.8;
   }
+  /* The Cartographer's Ink map picker (ink_map_picker_controller.ts), a
+     #prompt-stack tenant: one row per map the ink could redraw. */
+  #prompt-stack .tmap-ink-prompt {
+    box-sizing: border-box;
+    width: min(420px, calc(100vw - 32px));
+    min-width: 0;
+    padding: 18px;
+    pointer-events: auto;
+  }
+  .tmap-ink-prompt .prompt-text {
+    margin: 0 0 6px;
+  }
+  .tmap-ink-prompt .tmap-ink-held {
+    margin: 0 0 12px;
+    font-size: 12px;
+    opacity: 0.8;
+  }
+  .tmap-ink-prompt .tmap-ink-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .tmap-ink-prompt .tmap-ink-choice {
+    --tmap-rarity: var(--color-quality-uncommon);
+    height: auto;
+    min-height: 44px;
+    padding: 6px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    text-align: left;
+    white-space: normal;
+    cursor: pointer;
+  }
+  .tmap-ink-prompt .tmap-ink-choice[data-rarity="rare"] {
+    --tmap-rarity: var(--color-quality-rare);
+  }
+  .tmap-ink-prompt .tmap-ink-choice[data-rarity="epic"] {
+    --tmap-rarity: var(--color-quality-epic);
+  }
+  .tmap-ink-prompt .tmap-ink-choice[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .tmap-ink-prompt .tmap-ink-name {
+    color: var(--tmap-rarity);
+    font-weight: 600;
+  }
+  .tmap-ink-prompt .tmap-ink-note,
+  .tmap-ink-prompt .tmap-ink-cost {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    letter-spacing: 0;
+    opacity: 0.85;
+  }
+  .tmap-ink-prompt .tmap-ink-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  .tmap-ink-prompt .tmap-ink-cancel {
+    min-height: 40px;
+  }
 
   /* ---------- lockpicking minigame ("Tumbler's Path") ---------- */
   /* #delve-rite-panel (the Drowned Reliquary Rite difficulty popup) reuses the

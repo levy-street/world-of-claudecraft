@@ -9,25 +9,130 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "es_ES": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "fr_FR": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "fr_CA": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "de_DE": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "nl_NL": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "pl_PL": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "id_ID": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "tr_TR": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "sv_SE": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "vi_VN": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ],
+  "da_DK": [
+    "hudChrome.treasureMap.inkPickerCancel",
+    "hudChrome.treasureMap.inkPickerCost",
+    "hudChrome.treasureMap.inkPickerHeld",
+    "hudChrome.treasureMap.inkPickerRead",
+    "hudChrome.treasureMap.inkPickerTitle",
+    "hudChrome.treasureMap.inkPickerUnread"
+  ]
 };

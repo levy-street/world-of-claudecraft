@@ -4798,6 +4798,42 @@ export const TARGETS = [
     },
   },
   {
+    key: 'ink-map-picker',
+    label: "Cartographer's Ink map picker",
+    when: ['ui/hud/treasure/ink_map_picker', 'sim/treasure_vault'],
+    // Read one map, hold two more rarities and a few inks, then click the ink
+    // in the real bag grid: the picker lists the read map, the unread copies,
+    // and greys the row the held ink cannot pay for.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        sim?.addItem('treasure_map_rare', 1);
+        sim?.useItem('treasure_map_rare');
+        sim?.addItem('treasure_map_common', 2);
+        sim?.addItem('treasure_map_epic', 1);
+        sim?.addItem('cartographers_ink', 4);
+      });
+      await wait(700);
+      await page.evaluate(() => {
+        document.querySelector('#treasure-map-window [data-close]')?.click();
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await wait(700);
+      await page.click('#bags [data-coach-item="cartographers_ink"]');
+      await wait(500);
+      // The touch HUD answers a tap with the bag action menu; its first row is
+      // the same default action a desktop click runs.
+      if (!(await page.$('#prompt-stack .tmap-ink-prompt'))) {
+        await page.click('.ctx-item[data-act]');
+        await wait(500);
+      }
+      return { clip: '#prompt-stack .tmap-ink-prompt' };
+    },
+  },
+  {
     key: 'bags-materials-pool',
     label:
       'Bags with a materials-only satchel: the general pool full, the satchel room marked, and the pool-honest refusal',

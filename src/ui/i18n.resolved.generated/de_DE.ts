@@ -2883,6 +2883,12 @@ export const de_DE: EnTranslations = {
       "hint": "Finde den Boden, den diese Karte zeigt, stelle dich auf das X und nutze die Karte erneut um zu graben. Ein vergrabener Schatz öffnet sich für dich und deine Gruppe.",
       "upgradeNote": "Das Neuzeichnen als {rarity}-Karte kostet {inks} Kartograph-Tinte (du hältst {held}). Die Fraktionsquartiermeister verkaufen sie.",
       "upgradeMaxed": "Kein Kartograph könnte diese Karte verbessern.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Verbreitet",
         "rare": "Selten",

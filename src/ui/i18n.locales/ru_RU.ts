@@ -66,6 +66,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.treasureMap.upgradeNote':
     'Чтобы перерисовать её в карту качества «{rarity}», нужно чернил картографа: {inks} (у вас: {held}). Их продают интенданты фракций.',
   'hudChrome.treasureMap.upgradeMaxed': 'Ни один картограф не сделает эту карту лучше.',
+  'hudChrome.treasureMap.inkPickerTitle': 'К какой карте применить чернила картографа?',
+  'hudChrome.treasureMap.inkPickerHeld': 'У вас чернил картографа: {held}.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Вы идёте по этой карте: X отмечен в локации {zone}. Место X не изменится.',
+  'hudChrome.treasureMap.inkPickerUnread': 'Не прочитана (у вас: {count})',
+  'hudChrome.treasureMap.inkPickerCost':
+    'Чернил: {inks}, чтобы перерисовать её в карту качества «{rarity}»',
+  'hudChrome.treasureMap.inkPickerCancel': 'Отмена',
   'hudChrome.treasureMap.rarity.common': 'Обычная',
   'hudChrome.treasureMap.rarity.rare': 'Редкая',
   'hudChrome.treasureMap.rarity.epic': 'Эпическая',

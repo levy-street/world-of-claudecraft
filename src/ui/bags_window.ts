@@ -87,6 +87,7 @@ import {
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
+import { pickInkMap } from './hud/treasure';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
@@ -142,7 +143,7 @@ const SORT_SETTLE_STAGGER_CAP = 20;
 // an orphaned aria-modal dialog floating over the closed window (the show* paths
 // already clear a prior same-type prompt with these classes).
 const BAG_PROMPT_SELECTOR =
-  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt, .trade-offer-prompt';
+  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt, .trade-offer-prompt, .tmap-ink-prompt';
 // Exported for the HUD's mobile cluster-close paths (closeVendor / onBankClosed),
 // which hide #bags without running close(): they must not strand a still-visible
 // prompt in #prompt-stack (promptModalOpen() would keep gating game keys on it).
@@ -1965,6 +1966,12 @@ export class BagsWindow {
         if (!item || !this.deps.useGatherTool(item)) {
           const at = this.copyRefFor(s);
           if (!at) return;
+          // Cartographer's Ink asks which treasure map it is for first.
+          const ink = { slotIndex: at.slotIndex, inertRoot: this.deps.root() };
+          if (pickInkMap(this.deps.world(), s.itemId, ink)) {
+            this.deps.hideTooltip();
+            break;
+          }
           this.deps.world().useItem(s.itemId, at);
         }
         this.render();

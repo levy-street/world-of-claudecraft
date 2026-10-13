@@ -867,6 +867,7 @@ import {
   type InvSlot,
   type ItemInstancePayload,
   type ItemUseResult,
+  type ItemUseTarget,
   isConsuming,
   isDungeonDifficulty,
   isEquipSlot,
@@ -8302,20 +8303,20 @@ export class Sim {
 
   useItem(
     itemId: string,
-    pidOrTarget?: number | { slotIndex?: number; aim?: { x: number; z: number } },
+    pidOrTarget?: number | ItemUseTarget,
     slotIndex?: number,
     aim?: { x: number; z: number },
+    inkMap?: unknown,
   ): ItemUseResult | undefined {
+    const obj = typeof pidOrTarget === 'object' && pidOrTarget !== null ? pidOrTarget : undefined;
     const slotTarget =
-      typeof pidOrTarget === 'object' && pidOrTarget !== null && pidOrTarget.slotIndex !== undefined
-        ? { slotIndex: pidOrTarget.slotIndex }
+      obj?.slotIndex !== undefined
+        ? { slotIndex: obj.slotIndex }
         : typeof pidOrTarget === 'number'
           ? pidOrTarget
           : undefined;
     const { pid, named } = foldNamedSlotTarget(slotTarget, slotIndex);
-    const targetAim =
-      typeof pidOrTarget === 'object' && pidOrTarget !== null ? (pidOrTarget.aim ?? aim) : aim;
-    return items.useItem(this.ctx, itemId, pid, named, targetAim);
+    return items.useItem(this.ctx, itemId, pid, named, obj?.aim ?? aim, obj?.inkMap ?? inkMap);
   }
 
   // ONE explicit shape, no overloads (phase 21): the request rides an options
