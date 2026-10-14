@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Zbrojownia Wojny',
-    desc: 'Biżuteria i bronie Wojny kupione za ciężko wywalczony honor.',
+    desc: 'Biżuteria, bronie i towary Wojny kupione za ciężko wywalczony honor.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galeria Awangardy',

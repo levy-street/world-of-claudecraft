@@ -3395,6 +3395,11 @@ export const hudChromeStrings = {
       'Attacking an unflagged player there raises your own flag; attacking a flagged one never does.',
     aidLine: 'Healing, shielding or buffing a flagged player in a world fight raises your flag.',
     stakeLine: 'The loser pays {cap} or {percent} of their purse, whichever is less.',
+    spoilsLine:
+      "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+    // One looted trophy skull (src/sim/pvp/world_pvp_spoils.ts): {name} is the
+    // defeated player's name, carried on the copy.
+    skullName: "{name}'s Skull",
     noStakeLine: 'An unflagged player killed on free-for-all ground loses no gold.',
     noTakeLine:
       'An unflagged fighter takes no gold either: it only moves between two flagged players.',
@@ -3436,6 +3441,30 @@ export const hudChromeStrings = {
     falls: 'Falls in {minutes}',
     standingRaid: 'Raid members do not count: only parties can hold the hill',
   },
+  // The World PvP Skull Bag (src/sim/pvp/skull_bag.ts): the sub-inventory pane
+  // docked in the bags window (src/ui/hud/skull_bag/), its bag hint and its
+  // item tooltip line.
+  skullBag: {
+    title: 'Skull Bag',
+    // {count} is the number of skulls held.
+    total: 'Skulls: {count}',
+    close: 'Close the Skull Bag',
+    clickOpen: 'Click to open',
+    notCarried: 'Carry the Skull Bag in your bags to store or take skulls.',
+    empty: 'Empty. While you carry the bag, skulls you loot go straight in.',
+    // A row of skulls whose victim was never recorded.
+    unrecorded: 'Trophy Skull',
+    // {count} is the number of plain skulls carried in the bags.
+    store: 'Store carried skulls ({count})',
+    storeNone: 'No skulls to store',
+    takeOne: 'Take 1',
+    takeAll: 'Take all',
+    // {item} is the row's skull name ("Bet's Skull" or "Trophy Skull").
+    takeOneAria: 'Take 1: {item}',
+    takeAllAria: 'Take all: {item}',
+    tooltip:
+      'Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls.',
+  },
   // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
   // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings
   // live here: the honor price, the honor balance, the panel title, the close
@@ -3450,6 +3479,8 @@ export const hudChromeStrings = {
     gossipOptionAria: 'Browse the Warfare set shop offered by {name}',
     jewelry: 'Jewelry',
     weapons: 'Weapons',
+    // Honor goods with nothing to wear (the World PvP Skull Bag).
+    goods: 'Goods',
     // Group headings: Warfare Season 2 (the viewer's class sets and weapons)
     // listed above the Season 1 entry tier (warfare_vendor_window.ts).
     groupSeason2: 'Warfare Season 2: Vanguard',
@@ -6011,6 +6042,8 @@ export const hudChromeStrings = {
     // so it says so plainly and names the signer AS the signer instead of
     // inventing an attribution for units nobody recorded.
     materialSourceGatherer: '{count} × Collected by {name}',
+    // A World PvP trophy skull stack's provenance row: {name} is the victim.
+    trophySkullSource: '{count} × Taken from {name}',
     materialSourceGathererSigned: '{count} × Collected by {name}, signed by {signer}',
     materialSourceUnrecorded: '{count} × No gatherer recorded',
     materialSourceUnrecordedSigned: '{count} × No gatherer recorded, signed by {name}',

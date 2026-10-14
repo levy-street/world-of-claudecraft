@@ -1114,7 +1114,8 @@ export interface SimContextCallbacks {
   // B1 bags (src/sim/bags.ts): the capacity pre-check every blocking command
   // path calls before granting (buy/loot/pickup/fish/conjure/collect/trade/
   // turn-in). Stays on Sim next to the addItem/removeItem/countItem hub.
-  canAddItem(itemId: string, count: number, pid?: number): boolean;
+  // Pass the granted copy's payload to include only compatible stack room.
+  canAddItem(itemId: string, count: number, pid?: number, copy?: ItemInstancePayload): boolean;
 
   // Ravenpost mail (mail/post_office.ts): the quest turn-in core
   // (quests/quest_commands.ts) queues the giver's authored thank-you letter

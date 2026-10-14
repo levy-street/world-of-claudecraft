@@ -9820,6 +9820,75 @@
       radial-gradient(circle at 35% 30%, #e8a87a, #8b4513);
   }
 
+  /* ---------- skull bag pane ---------- */
+  /* The World PvP Skull Bag's sub-inventory (src/ui/hud/skull_bag/), docked inside
+     #bags between the grid and the money footer. It holds its natural height up to
+     a cap and scrolls its own rows, so the bag grid above keeps the window's space. */
+  #bags .skull-bag-pane {
+    /* Shrinks before the money footer is pushed out of a short (landscape
+       phone) window; the rows below are the part that scrolls. */
+    flex: 0 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    border-top: 1px solid var(--color-border-showcase);
+    padding-top: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+  }
+  .skull-bag-head {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  .skull-bag-title {
+    color: var(--color-gold);
+    font-weight: 700;
+  }
+  .skull-bag-total {
+    color: var(--color-text-muted);
+    margin-right: auto;
+  }
+  .skull-bag-note {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+  .skull-bag-rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: min(132px, 22dvh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .skull-bag-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 2px 0;
+  }
+  .skull-bag-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .skull-bag-count {
+    color: var(--color-text-muted);
+  }
+  .skull-bag-store {
+    align-self: flex-start;
+  }
+  @media (pointer: coarse) {
+    .skull-bag-take,
+    .skull-bag-store {
+      min-height: 40px;
+    }
+  }
+
   /* ---------- bank ---------- */
   /* The Gilded Strongbox: a cold pooled deposit box, a desktop companion of the bags
      window (docked side by side under body.bank-open). The slot grid mirrors the bag

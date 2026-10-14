@@ -1,3 +1,4 @@
+import { isLootableBody } from '../sim/corpse_loot_state';
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
@@ -129,9 +130,7 @@ export function resolveNearbyInteractionCandidate(
     // it cannot swallow an eligible interaction standing behind it.
     if (
       !player.dead &&
-      entity.kind === 'mob' &&
-      entity.dead &&
-      entity.lootable &&
+      isLootableBody(entity) &&
       corpseLootAvailability(entity, playerId, harvestStateReliable, partyIds).hasLoot &&
       distance < bestCorpseDistance
     ) {

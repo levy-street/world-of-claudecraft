@@ -19,7 +19,12 @@
 // would double-count completion.
 
 import { HOARD_BASE_ITEM_IDS } from './hoard_loot';
-import { FURY_STOCK, WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from './pvp_honor';
+import {
+  FURY_STOCK,
+  WARFARE_ITEMS,
+  WARFARE_TRINKET_STOCK,
+  WORLD_PVP_GOODS_STOCK,
+} from './pvp_honor';
 import { SEASON2_STOCK } from './pvp_honor_season2';
 import {
   RIFT_EPIC_ITEM_IDS,
@@ -958,11 +963,12 @@ const WARFARE_VENDOR_HINTS = [fromVendor('fury'), fromVendor('warmarshal_draven_
 // the partition and both floors are pinned in tests/reliquary_content.test.ts.
 // The two honor trinkets (WARFARE_TRINKET_STOCK) are set-less honor purchases
 // from the same two counters, so they close the armory after the kit's
-// jewelry and weapons.
+// jewelry and weapons, followed by the World PvP goods (the Skull Bag).
 const WARFARE_GALLERY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
 const WARFARE_ARMORY_ITEM_IDS = [
   ...FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined),
   ...WARFARE_TRINKET_STOCK,
+  ...WORLD_PVP_GOODS_STOCK,
 ];
 // Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts) is sold by the same
 // two quartermasters: its 27 spec sets and four weapons fill one page, in stock
@@ -1722,7 +1728,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_warfare_armory',
     shelf: 'conquerors',
     name: 'Warfare Armory',
-    desc: 'Warfare jewelry and weapons purchased with hard-won honor.',
+    desc: 'Warfare jewelry, weapons and goods purchased with hard-won honor.',
     clearSource: { kind: 'none' },
     relics: items(...WARFARE_ARMORY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },

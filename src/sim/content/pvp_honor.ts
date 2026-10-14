@@ -38,6 +38,7 @@
 // tests/warfare_gear_tier.test.ts. Design doc: docs/design/warfare.md.
 
 import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../eastbrook_layout';
+import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../pvp/world_pvp_trophy';
 import type { ItemDef, NpcDef } from '../types';
 import {
   SET_WARFARE_ASHSTALKER,
@@ -874,14 +875,21 @@ export const FURY_STOCK: readonly string[] = Object.keys(WARFARE_ITEMS);
 // honor purchase.
 export const WARFARE_TRINKET_STOCK: readonly string[] = ['medallion_of_defiance', 'duelists_brand'];
 
+// World PvP goods: the Skull Bag (src/sim/pvp/skull_bag.ts), a 500 honor
+// sub-inventory for trophy skulls. No stats and no set, so it sits outside the
+// gear arithmetic; the shop window gives it its own Goods section.
+export const WORLD_PVP_GOODS_STOCK: readonly string[] = [WORLD_PVP_SKULL_BAG_ITEM_ID];
+
 // What both honor quartermasters sell: the Warfare entry tier above, then Warfare
 // Season 2 (content/pvp_honor_season2.ts), the item-level-35 spec sets and
-// weapons, with the two honor trinkets between them (the release pins the entry
-// tier as the head of the list and Season 2 as its tail). FURY_STOCK keeps
+// weapons, with the two honor trinkets and the World PvP goods between them
+// (the release pins the entry tier as the head of the list and Season 2 as its
+// tail). FURY_STOCK keeps
 // meaning the entry tier everywhere it is read.
 export const HONOR_QUARTERMASTER_STOCK: readonly string[] = [
   ...FURY_STOCK,
   ...WARFARE_TRINKET_STOCK,
+  ...WORLD_PVP_GOODS_STOCK,
   ...SEASON2_STOCK,
 ];
 

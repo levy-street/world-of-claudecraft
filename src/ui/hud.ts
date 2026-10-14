@@ -586,6 +586,7 @@ import { advanceFactionTierObservation } from './hud/reputation/faction_tier_cel
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
+import { skullBagTooltipLines } from './hud/skull_bag';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
@@ -776,6 +777,7 @@ import { playerPortraitSubject, portraitUpdateFrames } from './player_portrait_c
 import { playerHoverTooltipHtml } from './player_tooltip';
 import { playerTooltipKey } from './player_tooltip_view';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { potionTooltipLines } from './potion_tooltip_view';
 import {
   type PreviewPrewarmHandle,
   type PreviewPrewarmUnit,
@@ -2499,7 +2501,7 @@ export class Hud {
       money: (copper) => moneyHtml(copper),
       coinIconUrl: () => iconDataUrl('item', 'coin_gold'),
       itemIcon: (item, quality) => this.itemIcon(item, quality),
-      itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
+      itemTooltip: (item, instance, sources) => this.itemTooltip(item, true, instance, sources),
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       confirm: (title, body, okText, cancelText, onOk) =>
         this.confirmDialog(title, body, okText, cancelText, onOk),
@@ -6612,12 +6614,7 @@ export class Hud {
     if (materialUseText) {
       html += createTooltipLine(materialUseText, 'tt-desc', 'tt-material-use').outerHTML;
     }
-    if (item.potionHp)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
-    if (item.potionHpPctMax)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotionPct', { percent: formatNumber(item.potionHpPctMax * 100) }))}</div>`;
-    if (item.potionMana)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
+    html += potionTooltipLines(item);
     // Battle elixirs: the temporary stat-buff quaffing grants (sim/items.ts
     // useItem), from the pure sibling view so bags, bank, crafting, vendor,
     // and market all state what the elixir does.
@@ -6631,6 +6628,7 @@ export class Hud {
       html += recipePatternTooltipLines(item, this.sim.craftingIdentity);
     }
     html += feastTooltipLines(item);
+    html += skullBagTooltipLines(item);
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);

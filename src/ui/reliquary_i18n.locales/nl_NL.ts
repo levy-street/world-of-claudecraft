@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Oorlogsvoeringwapenkamer',
-    desc: 'Sieraden en wapens van Oorlogsvoering, gekocht met zwaarbevochten eer.',
+    desc: 'Sieraden, wapens en goederen van Oorlogsvoering, gekocht met zwaarbevochten eer.',
   },
   conquerors_vanguard_gallery: {
     name: 'Voorhoedegalerij',

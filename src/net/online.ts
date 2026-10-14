@@ -222,7 +222,13 @@ import { GuildBankLogMirror } from './guild_bank_log_mirror';
 import { decodeGuildBoardPage, emptyGuildBoardPage, guildBoardPath } from './guild_board_wire';
 import { decodeGuildRoster } from './guild_roster_wire';
 import { foldInputAck } from './input_ack';
-import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import {
+  INPUT_SEND_TIMER_INTERVAL_MS,
+  type InputSendMode,
+  inputFacingsMatch,
+  inputFlushGateOpen,
+  type PendingTransientInput,
+} from './input_send_cadence';
 import { inputSignature } from './input_signature';
 import { copyPos, wrapAngle } from './interp_math';
 import { applyMaterialInventoryWire } from './material_inventory_wire';
@@ -276,17 +282,6 @@ export { buildWebSocketAuthMessage } from './world_auth_message';
 // individual fields as they are consumed; this alias keeps the decoder local.
 // biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
 type LooseJson = any;
-
-type InputSendMode = 'periodic' | 'changed' | 'forced-neutral' | 'forced-facing';
-
-const inputFacingsMatch = (a: number, b: number): boolean =>
-  Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) <= 1e-12;
-
-interface PendingTransientInput {
-  jump: boolean;
-  turnLeft: boolean;
-  turnRight: boolean;
-}
 
 // ---------------------------------------------------------------------------
 // REST
@@ -4305,9 +4300,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
   bgFlagAction(): void {
     this.cmd({ cmd: 'bg_flag' });
   }
-  // --- IWorldWorldPvp: raise/lower the /pvp flag (worldPvpInfo is a snapshot read). ---
+  // --- IWorldWorldPvp: the /pvp flag + the Skull Bag (worldPvpInfo is a snapshot read). ---
   setWorldPvpFlag(enabled: boolean): void {
     this.cmd({ cmd: 'pvp_flag', on: enabled });
+  }
+  skullBagAction(action: import('../world_api').SkullBagAction): void {
+    this.cmd({ cmd: 'skull_bag', ...action });
   }
   // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
   // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---

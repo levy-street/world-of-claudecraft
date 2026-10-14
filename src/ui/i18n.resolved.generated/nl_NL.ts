@@ -2802,6 +2802,8 @@ export const nl_NL: EnTranslations = {
       "markLine": "Een ongvlagde speler aanvallen daar verhoogt je eigen vlag; een gevlagde aanvallen doet dat nooit.",
       "aidLine": "Het genezen, beschermen of sterken van een gevlagde speler in een wereldgevecht verhoogt je vlag.",
       "stakeLine": "De verliezer betaalt {cap} of {percent} van hun beurs, welke het minst is.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "Een ongvlagde speler gedood op vrij-voor-iedereen grond verliest geen goud.",
       "noTakeLine": "Een ongvlagde vechter neemt ook geen goud: het beweegt alleen tussen twee gevlagde spelers.",
       "honorLine": "{honor} Eer per kill, verdeeld onder iedereen die hielp.",
@@ -2838,11 +2840,28 @@ export const nl_NL: EnTranslations = {
       "falls": "Valt in {minutes}",
       "standingRaid": "Raidleden tellen niet mee: alleen groepen kunnen de heuvel bezetten"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Bekijk Oorlogvoering-Sets",
       "gossipOptionAria": "Bekijk de Oorlogvoering-setwinkel aangeboden door {name}",
       "jewelry": "Juwelen",
       "weapons": "Wapens",
+      "goods": "Goods",
       "groupSeason2": "Oorlogvoering Seizoen 2: Voorhoede",
       "groupEntry": "Oorlogvoering Seizoen 1",
       "owned": "In bezit",
@@ -4436,6 +4455,7 @@ export const nl_NL: EnTranslations = {
       "perfectedBadge": "Geperfectioneerd",
       "perfectingRank": "Perfecteren: rang {rank} van {ranks}",
       "materialSourceGatherer": "{count} × Verzameld door {name}",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × Verzameld door {name}, gesigneerd door {signer}",
       "materialSourceUnrecorded": "{count} × Geen verzamelaar geregistreerd",
       "materialSourceUnrecordedSigned": "{count} × Geen verzamelaar geregistreerd, gesigneerd door {name}",
@@ -18933,6 +18953,12 @@ export const nl_NL: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Voorraad van de Gezant"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Aanwijzingsrol"

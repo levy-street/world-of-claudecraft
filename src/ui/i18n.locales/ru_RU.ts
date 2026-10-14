@@ -824,8 +824,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': 'Счёт: {kills} убийств, {deaths} смертей',
   'hudChrome.worldPvp.repeatLine':
     'Повторные убийства одного и того же игрока приносят {second}, затем {third}, а потом ничего; счётчик сбрасывается через {reset} после первого убийства.',
+  'hudChrome.worldPvp.skullName': 'Череп игрока {name}',
   'hudChrome.worldPvp.splitLine':
     'Чистый бой один на один приносит всю награду целиком; помощники и их лекари делят её между собой.',
+  'hudChrome.worldPvp.spoilsLine':
+    'Если у обоих поднят флаг, золото нанёсшего смертельный удар падает на тело вместе с черепом проигравшего.',
   'hudChrome.worldPvp.stakeLine':
     'Проигравший платит {cap} или {percent}% от своего кошелька, в зависимости от того, что меньше.',
   'hudChrome.worldPvp.statusDisarming':
@@ -2689,6 +2692,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.gossipOptionAria': 'Просмотреть магазин комплектов Боевой мощи у {name}',
   'hudChrome.warfareShop.jewelry': 'Украшения',
   'hudChrome.warfareShop.weapons': 'Оружие',
+  'hudChrome.warfareShop.goods': 'Товары',
+  // World PvP Skull Bag (M16 fills).
+  'hudChrome.skullBag.title': 'Мешок для черепов',
+  'hudChrome.skullBag.total': 'Черепов: {count}',
+  'hudChrome.skullBag.close': 'Закрыть мешок для черепов',
+  'hudChrome.skullBag.clickOpen': 'Нажмите, чтобы открыть',
+  'hudChrome.skullBag.notCarried':
+    'Чтобы класть и доставать черепа, носите мешок для черепов в сумках.',
+  'hudChrome.skullBag.empty': 'Пусто. Пока мешок при вас, добытые черепа попадают прямо в него.',
+  'hudChrome.skullBag.unrecorded': 'Трофейный череп',
+  'hudChrome.skullBag.store': 'Положить черепа из сумок ({count})',
+  'hudChrome.skullBag.storeNone': 'Нет черепов, чтобы положить',
+  'hudChrome.skullBag.takeOne': 'Взять 1',
+  'hudChrome.skullBag.takeAll': 'Взять все',
+  'hudChrome.skullBag.takeOneAria': 'Взять 1: {item}',
+  'hudChrome.skullBag.takeAllAria': 'Взять все: {item}',
+  'hudChrome.skullBag.tooltip':
+    'Вмещает любое количество трофейных черепов, не занимая места в сумках. Пока мешок в сумках, добытые черепа попадают прямо в него. Нажмите на него в сумках, чтобы положить или достать черепа.',
   'hudChrome.warfareShop.owned': 'Получено',
   'hudChrome.warfareShop.buyOwnedAria': 'Купить {item} за {honor}, уже получено',
   'hudChrome.warfareShop.buyConfirmBody':
@@ -18632,6 +18653,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': 'Этот выбор материалов больше недоступен.',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × Сборщик: {name}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Взят у игрока {name}',
   'hudChrome.itemTooltip.materialSourceGathererSigned':
     '{count} × Сборщик: {name}, подпись: {signer}',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × Сборщик не указан',
@@ -18835,6 +18857,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': 'Кольцо Стража Разлома',
   'entities.items.rift_surveyors_satchel.name': 'Сумка Разведчика Разлома',
   'entities.items.emissary_cache.name': 'Тайник эмиссара',
+  'entities.items.pvp_trophy_skull.name': 'Трофейный череп',
+  'entities.items.pvp_skull_bag.name': 'Мешок для черепов',
   'entities.npcs.weekly_emissary.name': 'Чам Пит',
   'entities.npcs.weekly_emissary.title': 'Эмиссар',
   'entities.npcs.weekly_emissary.greeting':

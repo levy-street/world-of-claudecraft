@@ -34,6 +34,21 @@ describe('resolveDirectPickEntityId', () => {
     expect(resolveDirectPickEntityId([10], map, 10)).toBe(10);
   });
 
+  it('treats a dead player holding World PvP spoils as a lootable corpse', () => {
+    // Stacked with a mob corpse: the pair cycles like two corpses do.
+    const map = entities([
+      { id: 10, kind: 'player', dead: true, lootable: true },
+      { id: 11, kind: 'mob', dead: true, lootable: true },
+    ]);
+    expect(resolveDirectPickEntityId([10, 11], map, 10)).toBe(11);
+    // And a live fighter behind the body still wins the click.
+    const withLive = entities([
+      { id: 10, kind: 'player', dead: true, lootable: true },
+      { id: 12, kind: 'player' },
+    ]);
+    expect(resolveDirectPickEntityId([10, 12], withLive)).toBe(12);
+  });
+
   it('skips an already-unlootable corpse to reach a stacked lootable corpse', () => {
     const map = entities([
       { id: 10, kind: 'mob', dead: true, lootable: false },

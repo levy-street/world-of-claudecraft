@@ -25,6 +25,21 @@ import { isHarvestableCorpse } from './professions/gathering';
 import { corpseHasDecayed } from './respawn_policy';
 import type { CorpseLoot, Entity } from './types';
 
+/** A dead body that holds loot someone may open: a mob corpse, or a player's
+ *  body holding World PvP spoils (src/sim/pvp/world_pvp_spoils.ts). The click
+ *  routes (src/game/interactions.ts) and the pick priority
+ *  (src/render/pick_resolution.ts) share this one answer. */
+export function isLootableBody(e: Pick<Entity, 'kind' | 'dead' | 'lootable'>): boolean {
+  return (e.kind === 'mob' || e.kind === 'player') && e.dead && e.lootable;
+}
+
+/** Does the tapper's PARTY share this body's tap-owned pool (its copper and
+ *  plain slots)? A mob corpse's does; a World PvP body's never does: its gold is
+ *  the killing blow's own share, so only the killer (the tapper) may take it. */
+export function bodyPoolSharedWithParty(e: Pick<Entity, 'kind'>): boolean {
+  return e.kind !== 'player';
+}
+
 /** What the corpse indicator shows this viewer: ordinary loot they may take,
  *  else an open harvest, else nothing. Ordinary loot always wins the glyph. */
 export type CorpseIndicator = 'loot' | 'harvest' | 'none';
@@ -111,7 +126,7 @@ export function corpseIndicatorFor(
   harvestStateReliable = true,
 ): CorpseIndicator {
   if (
-    mob.kind !== 'mob' ||
+    (mob.kind !== 'mob' && mob.kind !== 'player') ||
     !mob.dead ||
     !mob.lootable ||
     mob.ownerId != null ||
@@ -123,7 +138,7 @@ export function corpseIndicatorFor(
   const shared = corpseSharedLootRightsFor(
     viewerId,
     tappedById,
-    tapperPartyFromViewerParty(tappedById, viewerPartyIds),
+    bodyPoolSharedWithParty(mob) ? tapperPartyFromViewerParty(tappedById, viewerPartyIds) : null,
     mob.lootFfaTimer,
     true,
   );

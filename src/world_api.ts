@@ -455,6 +455,8 @@ export type {
   HillPhaseInfo,
   HillSide,
   HillStandingInfo,
+  SkullBagAction,
+  SkullBagInfo,
   WorldPvpInfo,
   WorldPvpZone,
 } from './world_api/world_pvp';
@@ -937,6 +939,8 @@ export const COMMAND_NAMES = [
   // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
   // replaces the guild's rank ladder (titles, order, permissions).
   'guild_set_ranks',
+  // World PvP Skull Bag: store or take trophy skulls (IWorldWorldPvp.skullBagAction).
+  'skull_bag',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1316,4 +1320,5 @@ export const COMMAND_FACETS = {
   // IWorldWorldPvp: the /pvp flag raise/lower. worldPvpInfo (the `wpvp`
   // self-delta mirror) carries no wire command and stays untagged.
   pvp_flag: 'IWorldWorldPvp',
+  skull_bag: 'IWorldWorldPvp',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

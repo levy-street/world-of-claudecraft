@@ -1,3 +1,5 @@
+import type { MaterialComposition } from '../sim/material_sources';
+
 // IWorld facet: World PvP, the /pvp flag (src/sim/pvp/world_pvp.ts) and the
 // King of the Hill (src/sim/pvp/hill.ts). The self-scoped readouts the World
 // PvP tab and the hill bar paint plus the one command that raises or lowers
@@ -33,7 +35,28 @@ export interface WorldPvpInfo {
    *  no flag can be raised and no zone is free-for-all, so the client paints
    *  nobody hostile on the world arm. */
   enabled: boolean;
+  /** The Skull Bag sub-inventory (src/sim/pvp/skull_bag.ts), present only for
+   *  a player who carries one or keeps skulls in it. */
+  skullBag?: SkullBagInfo;
 }
+
+/** What the Skull Bag holds, from its owner's seat. */
+export interface SkullBagInfo {
+  /** A Skull Bag sits in the viewer's bags, so storing and taking are open.
+   *  False when the bag is banked or gone: the skulls wait for it. */
+  owned: boolean;
+  /** Every stored skull. */
+  total: number;
+  /** One bucket per victim, the provenance a carried skull stack keeps
+   *  (src/sim/pvp/world_pvp_trophy.ts); an empty source is an unrecorded skull. */
+  sources: MaterialComposition;
+}
+
+/** A Skull Bag command: store every plain skull carried in the bags, or take
+ *  exactly the selected buckets back out. */
+export type SkullBagAction =
+  | { readonly op: 'store' }
+  | { readonly op: 'take'; readonly sources: MaterialComposition };
 
 /** Who a side of the hill is, from the viewer's seat. */
 export type HillSide = 'none' | 'you' | 'other';
@@ -86,6 +109,9 @@ export interface IWorldWorldPvp {
    *  countdown. The sim refuses and explains under level or when nothing
    *  changes; the bare /pvp chat command toggles through the same path. */
   setWorldPvpFlag(enabled: boolean): void;
+  /** Store skulls in, or take them out of, the carried Skull Bag. The sim
+   *  refuses and explains without the bag, and on full bags. */
+  skullBagAction(action: SkullBagAction): void;
   /** The announced or standing King of the Hill circle, or null while none
    *  is (between hills, or on a realm whose World PvP switch is set). */
   hillInfo: HillInfo | null;

@@ -113,6 +113,17 @@ export {
   pvpFractionsFromRatings,
   pvpVitalityFromRating,
 } from './power';
+export {
+  ownsSkullBag,
+  SKULL_BAG_MISSING_LINE,
+  SKULL_BAG_NOTHING_LINE,
+  SKULL_BAG_STORED_ALL_LINE,
+  SKULL_BAG_STORED_LINE,
+  skullBagAction,
+  skullBagInfoFor,
+  storeLootedSkulls,
+  WORLD_PVP_SKULL_BAG_ITEM_ID,
+} from './skull_bag';
 export { pvpVitalityAppliesTo, updatePvpVitality } from './vitality';
 export {
   isWorldPvpFlagged,
@@ -156,4 +167,14 @@ export {
   worldPvpStake,
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
+export {
+  placeWorldPvpSpoils,
+  settleAllWorldPvpSpoils,
+  settleWorldPvpSpoils,
+  settleWorldPvpSpoilsOnLeave,
+  sweepWorldPvpSpoils,
+  WORLD_PVP_SKULL_ITEM_ID,
+  worldPvpSkullSources,
+  worldPvpSpoilsLine,
+} from './world_pvp_spoils';
 export { worldPvpFfaZones, worldPvpZonePolicyAt, worldPvpZonePolicyOf } from './world_pvp_zones';

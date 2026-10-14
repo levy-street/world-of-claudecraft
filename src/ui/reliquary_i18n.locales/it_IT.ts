@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Armeria di Guerra',
-    desc: 'Gioielli e armi di Guerra acquistati con onore sudato.',
+    desc: 'Gioielli, armi e merci di Guerra acquistati con onore sudato.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galleria dell’Avanguardia',

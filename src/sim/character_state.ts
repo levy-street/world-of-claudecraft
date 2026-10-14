@@ -10,6 +10,7 @@ import type { SavedDeedStats } from './deeds';
 import type { PlayerEquipment } from './entity';
 import type { JailState } from './jail';
 import type { LocalGathererIdentity } from './material_gatherer';
+import type { MaterialComposition } from './material_sources';
 import type { SavedMaterialsVaultState } from './materials_vault';
 import type { ArchetypeState } from './professions/archetype';
 import type { PersistedFarmPlot } from './professions/farm_persist';
@@ -53,6 +54,9 @@ export interface CharacterState {
   // countdown stored as remaining seconds, and the career kill/death tally.
   // Absent for every character who never raised the flag.
   worldPvp?: WorldPvpSavedState;
+  // The Skull Bag's stored trophy skulls (src/sim/pvp/skull_bag.ts): one
+  // material-source bucket per victim. Absent when the bag holds nothing.
+  skullBag?: MaterialComposition;
   prestigeRank?: number;
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).

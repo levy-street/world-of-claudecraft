@@ -806,8 +806,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': '전적: 처치 {kills}, 사망 {deaths}',
   'hudChrome.worldPvp.repeatLine':
     '같은 플레이어를 반복해서 처치하면 두 번째는 {second}, 세 번째는 {third}를 주고 그 뒤로는 없습니다; 이 횟수는 첫 처치로부터 {reset} 후 초기화됩니다.',
+  'hudChrome.worldPvp.skullName': '{name}의 해골',
   'hudChrome.worldPvp.splitLine':
     '순수한 1대1은 전액을 지급하며, 도운 이와 그 치유사가 함께 나눕니다.',
+  'hudChrome.worldPvp.spoilsLine':
+    '둘 다 PvP 상태라면 결정타를 넣은 쪽의 골드가 패자의 해골과 함께 시체에 떨어집니다.',
   'hudChrome.worldPvp.stakeLine': '패자는 {cap}이나 소지금의 {percent} 중 더 적은 쪽을 지불합니다.',
   'hudChrome.worldPvp.statusDisarming': '{time} 후 또는 현재 전투가 끝나면 깃발이 내려갑니다.',
   'hudChrome.worldPvp.statusOff':
@@ -2654,6 +2657,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.gossipOptionAria': '{name}이(가) 운영하는 워페어 세트 상점 둘러보기',
   'hudChrome.warfareShop.jewelry': '장신구',
   'hudChrome.warfareShop.weapons': '무기',
+  'hudChrome.warfareShop.goods': '물품',
+  // World PvP Skull Bag (M16 fills).
+  'hudChrome.skullBag.title': '해골 가방',
+  'hudChrome.skullBag.total': '해골: {count}',
+  'hudChrome.skullBag.close': '해골 가방 닫기',
+  'hudChrome.skullBag.clickOpen': '클릭하여 열기',
+  'hudChrome.skullBag.notCarried':
+    '해골을 보관하거나 꺼내려면 해골 가방을 가방에 넣고 다녀야 합니다.',
+  'hudChrome.skullBag.empty':
+    '비어 있습니다. 가방을 지니고 있는 동안 획득한 해골은 바로 이 가방에 들어갑니다.',
+  'hudChrome.skullBag.unrecorded': '전리품 해골',
+  'hudChrome.skullBag.store': '소지한 해골 보관 ({count})',
+  'hudChrome.skullBag.storeNone': '보관할 해골 없음',
+  'hudChrome.skullBag.takeOne': '1개 꺼내기',
+  'hudChrome.skullBag.takeAll': '모두 꺼내기',
+  'hudChrome.skullBag.takeOneAria': '1개 꺼내기: {item}',
+  'hudChrome.skullBag.takeAllAria': '모두 꺼내기: {item}',
+  'hudChrome.skullBag.tooltip':
+    '가방 공간을 차지하지 않고 전리품 해골을 개수 제한 없이 보관합니다. 가방에 있는 동안 획득한 해골은 바로 이 가방에 들어갑니다. 가방에서 클릭하여 해골을 보관하거나 꺼낼 수 있습니다.',
   'hudChrome.warfareShop.owned': '보유 중',
   'hudChrome.warfareShop.buyOwnedAria': '{honor}에 {item} 구매, 이미 보유 중',
   'hudChrome.warfareShop.buyConfirmBody':
@@ -18278,6 +18300,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': '해당 재료 선택을 더 이상 사용할 수 없습니다.',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × {name} 채집',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × {name}에게서 획득',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × {name} 채집, {signer} 서명',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 채집자 기록 없음',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned': '{count} × 채집자 기록 없음, {name} 서명',
@@ -18476,6 +18499,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': '균열 감시자의 반지',
   'entities.items.rift_surveyors_satchel.name': '균열 측량사의 가방',
   'entities.items.emissary_cache.name': '사절의 보관함',
+  'entities.items.pvp_trophy_skull.name': '전리품 해골',
+  'entities.items.pvp_skull_bag.name': '해골 가방',
   'entities.npcs.weekly_emissary.name': '참 피트',
   'entities.npcs.weekly_emissary.title': '사절',
   'entities.npcs.weekly_emissary.greeting':

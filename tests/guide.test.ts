@@ -80,7 +80,11 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
-import { WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from '../src/sim/content/pvp_honor';
+import {
+  WARFARE_ITEMS,
+  WARFARE_TRINKET_STOCK,
+  WORLD_PVP_GOODS_STOCK,
+} from '../src/sim/content/pvp_honor';
 import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import {
   ALL_RECIPES,
@@ -5923,9 +5927,13 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // outside WARFARE_ITEMS (defs in content/trinkets.ts), with the same
     // soulbound, no-sell-value shape.
     for (const id of honorRows) {
-      // The Warfare tier: the entry tier, the two honor trinkets and Warfare Season 2.
+      // The Warfare tier: the entry tier, the two honor trinkets, the World PvP
+      // goods (the Skull Bag) and Warfare Season 2.
       expect(
-        id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id) || SEASON2_STOCK.includes(id),
+        id in WARFARE_ITEMS ||
+          WARFARE_TRINKET_STOCK.includes(id) ||
+          WORLD_PVP_GOODS_STOCK.includes(id) ||
+          SEASON2_STOCK.includes(id),
         id,
       ).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);

@@ -54,6 +54,44 @@ ratings.
   dungeon, delve, arena or battleground floor. Pure and host-agnostic: the sim's
   hostility arm, the nameplate colour and the target frame read the same verdict
   for the same coordinates.
+- `world_pvp_spoils.ts` owns the World PvP DROP: when the victim and the
+  killing blow are both flagged, the kill resolution in `world_pvp.ts` hands the
+  blow's gold share to `placeWorldPvpSpoils`, which puts it on the victim's body
+  beside a `pvp_trophy_skull`, tapped to the killer so the ordinary corpse
+  loot path takes it. The skull is a PROVENANCE-TRACKED stack
+  (`world_pvp_trophy.ts`, fed to the material registry as
+  `trophyMaterialItemIds`): every skull shares one bag stack, and each unit
+  carries its victim as a material-source bucket (`worldPvpSkullSources`, the
+  victim's gatherer identity plus the name they died under), so the counts ride
+  every bank, mail, trade and market path materials already ride. The client
+  lists the buckets as "2 x Taken from Bet" and names a single-victim stack
+  "<name>'s Skull" (`src/ui/item_copy_name_core.ts`). `settleWorldPvpSpoils`
+  pays anything unlooted to the killer (or refunds the gold to the victim when
+  the killer is gone) the moment the body stops being one: `spirit.ts` calls it
+  on release and on every revive, and the zone pass sweeps any other exit
+  (`sweepWorldPvpSpoils`). The books row is `WorldPvpBooks.spoils` (victim pid
+  -> killer pid), bounded by the flagged players lying dead with spoils. It must
+  not import `bags.ts` (that module loads the material tables at import time,
+  before the content they derive from); the room check is `ctx.canAddItem`.
+  `world_pvp_trophy.ts` is a dependency-free leaf for the same reason: the
+  material registry evaluates it before most of the sim loads.
+- `skull_bag.ts` owns the Skull Bag, the honor-vendor sub-inventory for trophy
+  skulls (`WORLD_PVP_SKULL_BAG_ITEM_ID`, declared in the trophy leaf; the stock
+  row is `WORLD_PVP_GOODS_STOCK` in `content/pvp_honor.ts`). Its contents are
+  `PlayerMeta.skullBag`, ONE material-source composition with no cap, absent
+  when empty. `storeLootedSkulls` is the loot hook (the corpse take in
+  `interaction.ts` and the spoils settlement both call it before their bag-room
+  check), `skullBagAction` the one command entry (IWorld `skullBagAction`, wire
+  `skull_bag`, dispatched by `server/world_pvp_wire.ts`; the action is
+  untrusted here and every selection is read through the canonical
+  composition validator), `skullBagInfoFor` the readout (folded into the
+  IWorld readout by `worldPvpReadoutFor`, but never into the server's 2 Hz
+  `worldPvpInfoFor`: online it rides its own change-gated `skb` key), and
+  `savedSkullBag` / `loadSkullBag` the persisted form `savedWorldPvpFields` /
+  `loadWorldPvpState` carry (`skullBagLoadValid` is the load guard
+  `material_slot_load.ts` runs, refusing a corrupt bag like any skull stack). Like the spoils module it
+  must not import `bags.ts`; the room check is `ctx.canAddItem`. Tests:
+  `tests/skull_bag.test.ts`, the client half in `tests/skull_bag_view.test.ts`.
 - `world_pvp.ts` owns the World PvP SYSTEM behind the `SimContext` seam: the
   flag state (`PlayerMeta.worldPvp`, absent until first raised; `Entity.pvpFlag`
   is its display mirror and the ONLY writer is this module, the away.ts

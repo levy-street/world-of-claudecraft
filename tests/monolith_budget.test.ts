@@ -537,7 +537,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // LOWERED 18093 -> 18091 at the World PvP Skull Bag: the item tooltip's
+    // potion Use lines moved to src/ui/potion_tooltip_view.ts, paying for the
+    // bag's own tooltip line (src/ui/hud/skull_bag/). Exact count, zero slack.
+    ceiling: 18091,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1689,7 +1692,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED 9840 -> 9837 at the World PvP Skull Bag: the pvp_flag dispatch
+    // arm and the wpvp wire cadence moved to server/world_pvp_wire.ts, which
+    // also carries the new skull_bag command and the change-gated skb self key.
+    // Exact count, zero slack.
+    ceiling: 9837,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1868,7 +1875,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // LOWERED 5356 -> 5354 at the World PvP Skull Bag: the input-send helper
+    // types moved to src/net/input_send_cadence.ts, paying for the new
+    // skullBagAction send. Exact count, zero slack.
+    ceiling: 5354,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

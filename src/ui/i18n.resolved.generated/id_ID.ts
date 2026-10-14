@@ -2802,6 +2802,8 @@ export const id_ID: EnTranslations = {
       "markLine": "Menyerang pemain yang tidak naikkan bendera di sana akan menaikkan bendera mu sendiri; menyerang pemain yang sudah naikkan bendera hanya menahan mereka.",
       "aidLine": "Menyembuhkan, melindungi, atau memberi buff pada pemain yang sudah naikkan bendera di pertempuran dunia akan menaikkan bendera mu.",
       "stakeLine": "Yang kalah membayar {cap} atau {percent} dari kantong mereka, mana pun yang lebih kecil.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "Pemain yang tidak naikkan bendera yang terbunuh di tanah bebas untuk semua tidak kehilangan emas.",
       "noTakeLine": "Pejuang yang tidak naikkan bendera juga tidak kehilangan emas: hanya bergerak antara dua pemain yang sudah naikkan bendera.",
       "honorLine": "{honor} Kehormatan per pembunuhan, dibagi antara semua orang yang membantu.",
@@ -2838,11 +2840,28 @@ export const id_ID: EnTranslations = {
       "falls": "Jatuh dalam {minutes}",
       "standingRaid": "Anggota raid tidak dihitung: hanya pihak yang dapat memegang bukit"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Jelajahi Set Perang",
       "gossipOptionAria": "Jelajahi toko set Perang yang ditawarkan oleh {name}",
       "jewelry": "Perhiasan",
       "weapons": "Senjata",
+      "goods": "Goods",
       "groupSeason2": "Musim Peperangan 2: Pasukan Depan",
       "groupEntry": "Musim Peperangan 1",
       "owned": "Dimiliki",
@@ -4436,6 +4455,7 @@ export const id_ID: EnTranslations = {
       "perfectedBadge": "Disempurnakan",
       "perfectingRank": "Penyempurnaan: peringkat {rank} dari {ranks}",
       "materialSourceGatherer": "{count} × Dikumpulkan oleh {name}",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × Dikumpulkan oleh {name}, ditandatangani oleh {signer}",
       "materialSourceUnrecorded": "{count} × Tidak ada pengumpul yang tercatat",
       "materialSourceUnrecordedSigned": "{count} × Tidak ada pengumpul yang tercatat, ditandatangani oleh {name}",
@@ -18933,6 +18953,12 @@ export const id_ID: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Simpanan Utusan"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Gulir Petunjuk"

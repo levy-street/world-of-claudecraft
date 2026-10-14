@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Krigsførelsens våbenkammer',
-    desc: 'Smykker og våben til Krigsførelse, købt for hårdt vundet ære.',
+    desc: 'Smykker, våben og varer til Krigsførelse, købt for hårdt vundet ære.',
   },
   conquerors_vanguard_gallery: {
     name: 'Fortropsgalleri',

@@ -2802,6 +2802,8 @@ export const zh_TW: EnTranslations = {
       "markLine": "在該地攻擊未開啟旗幟的玩家會升起你自己的旗幟；攻擊已開啟旗幟的玩家則永遠不會。",
       "aidLine": "為正在世界戰鬥中的已開啟旗幟玩家治療、護盾或增益，會升起你自己的旗幟。",
       "stakeLine": "敗者需支付 {cap} 或其錢袋的 {percent}，以較低者為準。",
+      "spoilsLine": "雙方都開啟 PvP 時，致命一擊者的金幣會與敗者的頭骨一同掉落在屍體上。",
+      "skullName": "{name}的頭骨",
       "noStakeLine": "未開啟旗幟的玩家在自由混戰地帶陣亡不會損失任何金幣。",
       "noTakeLine": "未開啟旗幟的戰鬥者同樣拿不到金幣：金幣只在兩名已開啟旗幟的玩家之間轉移。",
       "honorLine": "每次擊殺獲得 {honor} 點榮譽，由所有出過力的人平分。",
@@ -2838,11 +2840,28 @@ export const zh_TW: EnTranslations = {
       "falls": "將於 {minutes} 分鐘後消失",
       "standingRaid": "團隊成員不計入人數：只有隊伍才能佔據山丘"
     },
+    "skullBag": {
+      "title": "頭骨袋",
+      "total": "頭骨：{count}",
+      "close": "關閉頭骨袋",
+      "clickOpen": "點擊開啟",
+      "notCarried": "將頭骨袋放在背包中才能存放或取出頭骨。",
+      "empty": "空的。只要你攜帶此袋，拾取的頭骨會直接放入袋中。",
+      "unrecorded": "戰利品頭骨",
+      "store": "存放攜帶的頭骨（{count}）",
+      "storeNone": "沒有可存放的頭骨",
+      "takeOne": "取出 1 個",
+      "takeAll": "全部取出",
+      "takeOneAria": "取出 1 個：{item}",
+      "takeAllAria": "全部取出：{item}",
+      "tooltip": "可容納任意數量的戰利品頭骨，且不佔用背包空間。放在背包中時，你拾取的頭骨會直接放入袋中。在背包中點擊它即可存放或取出頭骨。"
+    },
     "warfareShop": {
       "gossipOption": "瀏覽戰爭套裝",
       "gossipOptionAria": "瀏覽 {name} 提供的戰爭套裝商店",
       "jewelry": "飾品",
       "weapons": "武器",
+      "goods": "物品",
       "groupSeason2": "戰爭賽季 2：先鋒",
       "groupEntry": "戰爭賽季 1",
       "owned": "已擁有",
@@ -4436,6 +4455,7 @@ export const zh_TW: EnTranslations = {
       "perfectedBadge": "臻至完美",
       "perfectingRank": "完美化：第{rank}階，共{ranks}階",
       "materialSourceGatherer": "{count} × 由{name}採集",
+      "trophySkullSource": "{count} × 取自{name}",
       "materialSourceGathererSigned": "{count} × 由{name}採集，由{signer}簽名",
       "materialSourceUnrecorded": "{count} × 未記錄採集者",
       "materialSourceUnrecordedSigned": "{count} × 未記錄採集者，由{name}簽名",
@@ -18933,6 +18953,12 @@ export const zh_TW: EnTranslations = {
       },
       "emissary_cache": {
         "name": "使者的寶箱"
+      },
+      "pvp_trophy_skull": {
+        "name": "戰利品頭骨"
+      },
+      "pvp_skull_bag": {
+        "name": "頭骨袋"
       },
       "clue_scroll": {
         "name": "線索卷軸"

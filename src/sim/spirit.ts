@@ -50,6 +50,7 @@ import { createNpc, recalcPlayerStats } from './entity';
 import { releaseSpiritInDelve } from './entity_roster';
 import { restorePetOnOwnerRevive } from './pet/pet_owner_revive';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
+import { settleWorldPvpSpoils } from './pvp/world_pvp_spoils';
 import {
   aurasSurvivingDeath,
   RES_SICKNESS_STAT_MULT,
@@ -302,6 +303,9 @@ function releaseAtNearestGraveyard(
   graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
   fallback: { x: number; z: number } = PLAYER_START,
 ): void {
+  // A body holding World PvP spoils hands them over before it becomes a ghost:
+  // the killer gets what they had not looted yet (world_pvp_spoils.ts).
+  settleWorldPvpSpoils(ctx, p.id);
   // Resolve the graveyard before moving the entity out of its instance band.
   const gy = ghostGraveyard(ctx, p, graveyards, fallback);
   p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
@@ -456,6 +460,8 @@ function reviveAt(
   hpFrac: number,
   sickness: SicknessKind,
 ): boolean {
+  // Standing up ends the body: settle any World PvP spoils still on it first.
+  settleWorldPvpSpoils(ctx, p.id);
   p.dead = false;
   p.ghost = false;
   p.corpsePos = null;

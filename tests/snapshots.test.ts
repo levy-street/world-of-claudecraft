@@ -5772,6 +5772,7 @@ const ALL_DELTA_KEYS = [
   'salv',
   'scb',
   'sh',
+  'skb',
   'sp',
   'stats',
   'tal',
@@ -6066,6 +6067,10 @@ function dirtyEveryDeltaField(): {
   // World PvP: the wpvp self readout (meta) and the pvp entity bit (entity).
   meta.worldPvp = { flagged: true, disarmAt: null, kills: 2, deaths: 1 };
   sim.entities.get(lp)!.pvpFlag = true;
+  // The World PvP Skull Bag: stored skulls (the bag itself banked, so the
+  // inventory mirror below stays as pinned), so the change-gated skb key rides
+  // the first snapshot and merges into worldPvpInfo.
+  meta.skullBag = [{ source: { gatherer: { kind: 'character', id: 77, name: 'Bet' } }, count: 3 }];
   // King of the Hill: a hill stands (in a free-for-all zone the leader is not
   // in), so the hill self readout rides the snapshot.
   spawnHillNow(sim.ctx);
@@ -6554,6 +6559,12 @@ describe('full self-state snapshot delta fixture', () => {
       deaths: 1,
       zone: 'contested', // the fixture leader stands on contested ground
       enabled: true,
+      // skb -> worldPvpInfo.skullBag (merged by social_self_wire.ts)
+      skullBag: {
+        owned: false,
+        total: 3,
+        sources: [{ source: { gatherer: { kind: 'character', id: 77, name: 'Bet' } }, count: 3 }],
+      },
     });
     expect(client.player.pvpFlag).toBe(true);
     // hill -> hillInfo (social_self_wire.ts): the standing hill from the
@@ -7209,8 +7220,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and the Spell Crit sheet cell's
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
-    expect(ALL_DELTA_KEYS).toHaveLength(113);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(113);
+    // The World PvP Skull Bag's change-gated skb (server/world_pvp_wire.ts), for 114.
+    expect(ALL_DELTA_KEYS).toHaveLength(114);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(114);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7380,7 +7392,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    expect(scraped.size).toBe(113);
+    // The World PvP Skull Bag's change-gated skb (server/world_pvp_wire.ts) makes 114.
+    expect(scraped.size).toBe(114);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

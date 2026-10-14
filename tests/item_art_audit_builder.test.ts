@@ -864,11 +864,14 @@ describe('item-art audit builder', () => {
       // painted weapons, re-measured with `--verify-only` on the merged tree.
       // 1464 / 1482 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
       // (the hoard boss loot and map paintings on 36 sheet pages), re-measured the same way.
-      catalogSha256: 'e3f58abc4acad903941898542c592ca749451e776bdb34935821a6e79e32e7c6',
-      catalogBytes: 801291,
+      // 1465 / 1483 with the World PvP trophy skull (pvp_trophy_skull), re-measured
+      // with `--verify-only` on this tree.
+      // 1466 / 1484 with the World PvP Skull Bag (pvp_skull_bag), re-measured the same way.
+      catalogSha256: 'd88c6f24402c066d9582b6bdd0553acda89575a572b26f388e9ef042889d012a',
+      catalogBytes: 802296,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1464,
-      liveItemCount: 1482,
+      catalogCount: 1466,
+      liveItemCount: 1484,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -886,7 +889,7 @@ describe('item-art audit builder', () => {
         identity: 36,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '53d42dd05b8370ad9bf62c5b1d779efc05f02f28fe129a7fe8b53c1b863557fc',
+      shippingCatalogSha256: 'd3ece8a81af79fbbe5cb6a0c1c95cf9e8c5dea00cc9551f7f88ceeefd9f63862',
       machineChecksPassed: true,
       verdict: null,
     });

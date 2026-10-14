@@ -780,8 +780,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': '戰績：擊殺 {kills}，陣亡 {deaths}',
   'hudChrome.worldPvp.repeatLine':
     '重複擊殺同一名玩家時，第二次獲得 {second}，第三次獲得 {third}，之後不再獲得任何獎勵；計數會在首次擊殺後 {reset} 清除。',
+  'hudChrome.worldPvp.skullName': '{name}的頭骨',
   'hudChrome.worldPvp.splitLine':
     '乾淨的一對一可獨得全部獎勵；有人幫忙時則由助攻者與其治療者平分。',
+  'hudChrome.worldPvp.spoilsLine':
+    '雙方都開啟 PvP 時，致命一擊者的金幣會與敗者的頭骨一同掉落在屍體上。',
   'hudChrome.worldPvp.stakeLine': '敗者需支付 {cap} 或其錢袋的 {percent}，以較低者為準。',
   'hudChrome.worldPvp.statusDisarming': '你的旗幟將於 {time} 後降下，或在目前戰鬥結束時降下。',
   'hudChrome.worldPvp.statusOff': '你的 PvP 旗幟已降下。你無法在開放世界中攻擊或被攻擊。',
@@ -2571,6 +2574,23 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.gossipOptionAria': '瀏覽 {name} 提供的戰爭套裝商店',
   'hudChrome.warfareShop.jewelry': '飾品',
   'hudChrome.warfareShop.weapons': '武器',
+  'hudChrome.warfareShop.goods': '物品',
+  // World PvP Skull Bag (M16 fills).
+  'hudChrome.skullBag.title': '頭骨袋',
+  'hudChrome.skullBag.total': '頭骨：{count}',
+  'hudChrome.skullBag.close': '關閉頭骨袋',
+  'hudChrome.skullBag.clickOpen': '點擊開啟',
+  'hudChrome.skullBag.notCarried': '將頭骨袋放在背包中才能存放或取出頭骨。',
+  'hudChrome.skullBag.empty': '空的。只要你攜帶此袋，拾取的頭骨會直接放入袋中。',
+  'hudChrome.skullBag.unrecorded': '戰利品頭骨',
+  'hudChrome.skullBag.store': '存放攜帶的頭骨（{count}）',
+  'hudChrome.skullBag.storeNone': '沒有可存放的頭骨',
+  'hudChrome.skullBag.takeOne': '取出 1 個',
+  'hudChrome.skullBag.takeAll': '全部取出',
+  'hudChrome.skullBag.takeOneAria': '取出 1 個：{item}',
+  'hudChrome.skullBag.takeAllAria': '全部取出：{item}',
+  'hudChrome.skullBag.tooltip':
+    '可容納任意數量的戰利品頭骨，且不佔用背包空間。放在背包中時，你拾取的頭骨會直接放入袋中。在背包中點擊它即可存放或取出頭骨。',
   'hudChrome.warfareShop.owned': '已擁有',
   'hudChrome.warfareShop.buyOwnedAria': '以 {honor} 購買 {item}，已擁有',
   'hudChrome.warfareShop.buyConfirmBody': '用 {honor} 購買 {item}？榮譽購買後無法退款。',
@@ -17431,6 +17451,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': '此素材選擇已失效。',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × 由{name}採集',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × 取自{name}',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × 由{name}採集，由{signer}簽名',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 未記錄採集者',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned': '{count} × 未記錄採集者，由{name}簽名',
@@ -17618,6 +17639,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': '裂隙守望者指環',
   'entities.items.rift_surveyors_satchel.name': '裂隙勘測員挎包',
   'entities.items.emissary_cache.name': '使者的寶箱',
+  'entities.items.pvp_trophy_skull.name': '戰利品頭骨',
+  'entities.items.pvp_skull_bag.name': '頭骨袋',
   'entities.npcs.weekly_emissary.name': '查姆·皮特',
   'entities.npcs.weekly_emissary.title': '使者',
   'entities.npcs.weekly_emissary.greeting':

@@ -8015,6 +8015,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Duelist's Brand"
+      },
+      {
+        "kind": "item",
+        "name": "Skull Bag"
       }
     ]
   },

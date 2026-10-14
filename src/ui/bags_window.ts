@@ -87,6 +87,7 @@ import {
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
+import { SkullBagPaneController } from './hud/skull_bag';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
@@ -396,6 +397,11 @@ export class BagsWindow {
   // cleared on leave/focusout, programmatic tooltip hide, rebuild, and close so
   // a stale class never sticks after the cell is torn down.
   private readonly trackerHighlight = new BagQuestTrackerHighlight(document);
+  /** The Skull Bag's sub-inventory pane, docked under the grid while open. */
+  private readonly skullBagPane = new SkullBagPaneController({
+    world: () => this.deps.world(),
+    focusAfterClose: () => this.deps.root().querySelector<HTMLElement>('[data-close]')?.focus(),
+  });
 
   // One-shot sort settle animation. Armed by the sort button; the NEXT grid
   // paint whose INVENTORY signature (bagSortSignature: id, count, cell hint)
@@ -434,6 +440,9 @@ export class BagsWindow {
    * live search.
    */
   refreshIfChanged(): void {
+    // The Skull Bag pane keeps its own signature: a skull looted straight into
+    // the bag moves nothing in the bags themselves.
+    this.skullBagPane.refreshIfChanged();
     const el = this.deps.root();
     if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper))
       return;
@@ -502,6 +511,7 @@ export class BagsWindow {
     // an orphaned aria-modal dialog floating over the closed window, then clear the inert
     // it set: a hidden window must never stay inert or the next open shows a dead grid.
     dismissBagPrompts(el);
+    this.skullBagPane.close();
     el.style.display = 'none';
     el.inert = false;
     this.clearTrackerHighlight();
@@ -566,6 +576,7 @@ export class BagsWindow {
     this.fillGrid(grid);
     el.appendChild(grid);
     grid.scrollTop = prevScrollTop;
+    this.skullBagPane.mount(el);
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money ui-money';
     el.appendChild(moneyRow);
@@ -1764,8 +1775,8 @@ export class BagsWindow {
   // use/equip binding), so the two can never drift apart.
   private runBagAction(item: (typeof ITEMS)[string], s: InvSlot, ev: MouseEvent): void {
     const action = bagItemAction(
-      // The vault arm needs the honest-set membership the info shape cannot
-      // carry (it has no id); every other arm ignores the extra field.
+      // The vault arm needs the honest-set membership, which the bare id
+      // cannot answer here; every other arm ignores the extra field.
       { ...item, vaultMaterial: vaultMaterialIds().has(s.itemId) },
       this.bagMode(),
       s.instance,
@@ -1938,6 +1949,10 @@ export class BagsWindow {
         this.render();
         break;
       }
+      case 'openSkullBag':
+        this.skullBagPane.toggle();
+        this.render();
+        break;
       case 'placeFeast': {
         // The shared feast (Farming Phase 12): the click is the PLACE verb,
         // never plain useItem. The server spends the bag item and spawns the

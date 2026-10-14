@@ -31,7 +31,7 @@ import {
   BAG_SOCKETS,
   bagCapacity,
   bagPools,
-  canAddItem,
+  canGrantCopies,
   instancedCountCap,
   migrationBagsFor,
 } from './bags';
@@ -1439,6 +1439,7 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   honorArenaDaily?: HonorArenaDailyState;
   // World PvP flag state (pvp/world_pvp.ts): absent until first raised.
   worldPvp?: worldPvpMod.WorldPvpMetaState;
+  skullBag?: MaterialComposition; // Skull Bag contents (pvp/skull_bag.ts), absent when empty
   prestigeRank: number;
   unlockedMilestones: Set<string>;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
@@ -2952,7 +2953,7 @@ export class Sim {
       // existing characters from day one.
       meta.lifetimeXp = s.lifetimeXp ?? xpToReachLevel(player.level) + Math.max(0, s.xp);
       honorMod.loadHonorState(meta, s);
-      worldPvpMod.loadWorldPvpState(this.ctx, meta, player, s.worldPvp);
+      worldPvpMod.loadWorldPvpState(this.ctx, meta, player, s.worldPvp, s.skullBag);
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
       // `s.professions` is the legacy pre-rename field (#1119); `s.gatheringProficiency`
@@ -3700,6 +3701,7 @@ export class Sim {
     vehicleMod.leaveVehicle(this.ctx, pid);
     const meta = this.players.get(pid);
     if (!meta) return;
+    honorMod.settleWorldPvpSpoilsOnLeave(this.ctx, pid); // no-op after preparePlayerLeave
     // Offline/headless removals have no GameServer lifecycle hook. End an
     // accepted recovery explicitly so every accepted attempt has one terminal
     // event; the online server calls the same delegate earlier so it can attach
@@ -3783,6 +3785,7 @@ export class Sim {
   preparePlayerLeave(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
+    honorMod.settleWorldPvpSpoilsOnLeave(this.ctx, pid); // before `leaving` (world_pvp_spoils.ts)
     if (!meta.leaving) {
       const leavingEntity = this.entities.get(pid);
       if (leavingEntity?.castingAbility === 'rain_of_fire') cancelCastImpl(this.ctx, leavingEntity);
@@ -8205,11 +8208,11 @@ export class Sim {
   // True when `count` copies of the item fit the player's pooled bag budget
   // (existing stacks top up first). The capacity gate every blocking command
   // path (buy, loot, pickup, fish, conjure, collect, trade, turn-in) pre-checks.
-  canAddItem(itemId: string, count: number, pid?: number): boolean {
+  canAddItem(itemId: string, count: number, pid?: number, copy?: InvSlot['instance']): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
     const { meta } = r;
-    return canAddItem(meta.inventory, bagPools(meta.bags), itemId, count);
+    return canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, count, copy);
   }
 
   equipBag(
@@ -10711,11 +10714,14 @@ export class Sim {
     return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.lifetimeHonor ?? 0);
   }
   get worldPvpInfo(): import('../world_api').WorldPvpInfo | null {
-    return this.primaryId === -1 ? null : worldPvpMod.worldPvpInfoFor(this.ctx, this.primaryId);
+    return this.primaryId === -1 ? null : worldPvpMod.worldPvpReadoutFor(this.ctx, this.primaryId);
   }
 
   setWorldPvpFlag(enabled: boolean, pid = this.primaryId): void {
     worldPvpMod.setWorldPvpFlag(this.ctx, pid, enabled);
+  }
+  skullBagAction(action: import('../world_api').SkullBagAction, pid = this.primaryId): void {
+    honorMod.skullBagAction(this.ctx, pid, action);
   }
 
   get hillInfo(): import('../world_api').HillInfo | null {

@@ -2802,6 +2802,8 @@ export const pt_BR: EnTranslations = {
       "markLine": "Atacar um jogador não marcado ali levanta sua própria bandeira; atacar um marcado nunca faz isso.",
       "aidLine": "Curar, proteger ou fortalecer um jogador marcado em um combate no mundo aberto levanta sua bandeira.",
       "stakeLine": "O perdedor paga {cap} ou {percent} da própria bolsa, o que for menor.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "Um jogador não marcado morto em terreno livre para todos não perde ouro.",
       "noTakeLine": "Um lutador não marcado também não leva ouro: ele só passa de mão entre dois jogadores marcados.",
       "honorLine": "{honor} de Honra por abate, dividida entre todos que ajudaram.",
@@ -2838,11 +2840,28 @@ export const pt_BR: EnTranslations = {
       "falls": "Cai em {minutes}",
       "standingRaid": "Membros de raide não contam: apenas grupos podem controlar a colina"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Ver Conjuntos de Guerra",
       "gossipOptionAria": "Ver a loja de conjuntos de Guerra oferecida por {name}",
       "jewelry": "Joalheria",
       "weapons": "Armas",
+      "goods": "Goods",
       "groupSeason2": "Temporada de Guerra 2: Vanguarda",
       "groupEntry": "Temporada de Guerra 1",
       "owned": "Possuído",
@@ -4436,6 +4455,7 @@ export const pt_BR: EnTranslations = {
       "perfectedBadge": "Aperfeiçoado",
       "perfectingRank": "Aperfeiçoamento: ranque {rank} de {ranks}",
       "materialSourceGatherer": "{count} × Coletado por {name}",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × Coletado por {name}, assinado por {signer}",
       "materialSourceUnrecorded": "{count} × Coletor não registrado",
       "materialSourceUnrecordedSigned": "{count} × Coletor não registrado, assinado por {name}",
@@ -18933,6 +18953,12 @@ export const pt_BR: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Cofre do Emissário"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Pergaminho de Pista"

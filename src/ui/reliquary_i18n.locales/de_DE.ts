@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Kriegsführungsarsenal',
-    desc: 'Kriegsführungsschmuck und -waffen, gekauft mit hart erkämpfter Ehre.',
+    desc: 'Kriegsführungsschmuck, -waffen und -waren, gekauft mit hart erkämpfter Ehre.',
   },
   conquerors_vanguard_gallery: {
     name: 'Vorhutgalerie',

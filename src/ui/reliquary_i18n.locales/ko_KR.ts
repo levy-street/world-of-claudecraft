@@ -169,7 +169,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: '워페어 무기고',
-    desc: '힘겹게 모은 명예로 구입하는 전쟁 장신구와 무기.',
+    desc: '힘겹게 모은 명예로 구입하는 전쟁 장신구, 무기, 물품.',
   },
   conquerors_vanguard_gallery: {
     name: '선봉대 갤러리',

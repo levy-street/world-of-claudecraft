@@ -2802,6 +2802,8 @@ export const it_IT: EnTranslations = {
       "markLine": "Attaccare lì un giocatore senza bandiera alza la tua; attaccarne uno contrassegnato non lo fa mai.",
       "aidLine": "Curare, proteggere o potenziare un giocatore contrassegnato in uno scontro nel mondo alza la tua bandiera.",
       "stakeLine": "Il perdente paga {cap} o il {percent} della sua borsa, qualunque sia minore.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "Un giocatore senza bandiera ucciso in terreno a tutti contro tutti non perde oro.",
       "noTakeLine": "Anche un combattente senza bandiera non prende oro: si sposta solo tra due giocatori contrassegnati.",
       "honorLine": "{honor} Onore per uccisione, diviso tra chiunque abbia aiutato.",
@@ -2838,11 +2840,28 @@ export const it_IT: EnTranslations = {
       "falls": "Cade tra {minutes}",
       "standingRaid": "I membri di un'incursione non contano: solo i gruppi possono detenere la collina"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Sfoglia i Set da Guerra",
       "gossipOptionAria": "Sfoglia il negozio di set da Guerra offerto da {name}",
       "jewelry": "Gioielli",
       "weapons": "Armi",
+      "goods": "Goods",
       "groupSeason2": "Stagione di Guerra 2: Avanguardia",
       "groupEntry": "Stagione di Guerra 1",
       "owned": "Posseduto",
@@ -4436,6 +4455,7 @@ export const it_IT: EnTranslations = {
       "perfectedBadge": "Perfezionato",
       "perfectingRank": "Perfezionamento: grado {rank} di {ranks}",
       "materialSourceGatherer": "{count} × Raccolto da {name}",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × Raccolto da {name}, firmato da {signer}",
       "materialSourceUnrecorded": "{count} × Raccoglitore non registrato",
       "materialSourceUnrecordedSigned": "{count} × Raccoglitore non registrato, firmato da {name}",
@@ -18933,6 +18953,12 @@ export const it_IT: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Riserva dell'Emissario"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Pergamena Indizio"

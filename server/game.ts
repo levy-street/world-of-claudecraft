@@ -406,6 +406,7 @@ import { writePlayerIdentityWire } from './player_identity_wire';
 import { VaultGameServices, type VaultMailSaveCapture } from './vault_game_services';
 import { dispatchVehicleCommand } from './vehicle_command_wire';
 import { dispatchWeeklyRewardCommand } from './weekly_reward_open';
+import * as worldPvpWire from './world_pvp_wire';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
@@ -700,11 +701,6 @@ const BG_RESPAWN_EVENT = 'respawn';
 // the same cadence and only re-sends when a listing actually changes.
 const DF_WIRE_HZ = 2;
 const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
-// World PvP `wpvp` self key (and the King of the Hill `hill` key, whose 60 s
-// contest bar and whole-minute clock tolerate half-second steps): 2 Hz; the
-// viewer's own pvp_flag command re-arms the gate so a press answers at once.
-const WPVP_WIRE_HZ = 2;
-const WPVP_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * WPVP_WIRE_HZ)));
 // World Market browse readout cadence: the browse view (a filter + page over the
 // whole listing book) is the most expensive per-viewer read in selfWireJson and
 // carries no sub-second clock, so 4 Hz caps the rebuild rate; the viewer's OWN
@@ -1000,7 +996,7 @@ export interface ClientSession
   lastBgWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
   lastDfWireTick: number;
-  // World PvP readout, same idea at its own cadence (WPVP_WIRE_HZ)
+  // World PvP readout, same idea at its own cadence (worldPvpWire.WPVP_WIRE_INTERVAL_TICKS)
   lastWpvpWireTick: number;
   // World Market browse readout, same idea at its own cadence (MARKET_WIRE_HZ),
   // plus the rebuild-only-on-change state: the sim browse revision and the
@@ -1469,7 +1465,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (includeAuras && e.auras.length > 0) {
     out.auras = e.auras.map(wireAura);
   }
-  if (e.kind === 'mob' && e.lootable && e.loot) {
+  if ((e.kind === 'mob' || e.kind === 'player') && e.lootable && e.loot) {
     out.lootList = { copper: e.loot.copper, items: e.loot.items };
   }
   return out;
@@ -3433,7 +3429,7 @@ export class GameServer {
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastBgWireTick: -BG_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
-      lastWpvpWireTick: -WPVP_WIRE_INTERVAL_TICKS,
+      lastWpvpWireTick: -worldPvpWire.WPVP_WIRE_INTERVAL_TICKS,
       lastMarketWireTick: -MARKET_WIRE_INTERVAL_TICKS,
       lastMarketBrowseRev: null,
       lastMarketQueryRef: null,
@@ -7345,11 +7341,11 @@ export class GameServer {
         sim.bgFlagAction(pid);
         session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
         break;
-      // World PvP: raise or lower the /pvp flag (src/sim/pvp/world_pvp.ts owns
-      // every rule; a non-boolean payload is a malformed frame and is ignored).
+      // World PvP: the /pvp flag and the Skull Bag (server/world_pvp_wire.ts).
       case 'pvp_flag':
-        if (typeof msg.on === 'boolean') sim.setWorldPvpFlag(msg.on, pid);
-        session.lastWpvpWireTick = -WPVP_WIRE_INTERVAL_TICKS;
+      case 'skull_bag':
+        worldPvpWire.dispatchWorldPvpCommand(sim, pid, msg);
+        session.lastWpvpWireTick = -worldPvpWire.WPVP_WIRE_INTERVAL_TICKS;
         break;
       case 'dev_bg_start': {
         if (process.env.ALLOW_DEV_COMMANDS === '1') sim.devStartBg();
@@ -8554,10 +8550,11 @@ export class GameServer {
     // Small PvP-ledger scalars, delta-guarded like delve marks (a fresh session gets both).
     maybe('honor', meta.honor);
     maybe('lhonor', meta.lifetimeHonor);
-    if (this.sim.tickCount - session.lastWpvpWireTick >= WPVP_WIRE_INTERVAL_TICKS) {
+    if (this.sim.tickCount - session.lastWpvpWireTick >= worldPvpWire.WPVP_WIRE_INTERVAL_TICKS) {
       session.lastWpvpWireTick = this.sim.tickCount;
       maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));
       maybe('hill', this.sim.hillInfoFor(anchorSession.pid));
+      worldPvpWire.emitSkullBagSelfKey(maybe, this.sim, session, anchorSession.pid);
     }
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;

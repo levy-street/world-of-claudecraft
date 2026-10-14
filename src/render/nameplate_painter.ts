@@ -634,6 +634,16 @@ export class NameplatePainter {
       else if (entity.pledgeGuild)
         state.guildLabel = t('hudChrome.nameplate.pledgeTag', { guild: entity.pledgeGuild });
       state.hpVisible = !entity.dead;
+      // A World PvP body holding spoils THIS viewer may take (only the killing
+      // blow: src/sim/pvp/world_pvp_spoils.ts) wears the corpse loot satchel,
+      // through the same per-viewer rule as a mob corpse.
+      if (entity.dead) {
+        const spoils = corpseIndicatorFor(entity, player.id, this.viewerPartyIds);
+        if (spoils !== 'none') {
+          state.marker = spoils;
+          state.markerTone = spoils;
+        }
+      }
       state.title = entity.title ? deedTitleText(entity.title) : '';
       state.border = deedBorderSlug(entity.border);
       state.aiLabel = entity.aiAccount === true ? t('hudChrome.playerMenu.aiTag') : '';

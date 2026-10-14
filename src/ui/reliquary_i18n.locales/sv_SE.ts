@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Krigföringens vapenkammare',
-    desc: 'Smycken och vapen för Krigföring, köpta för hårt vunnen ära.',
+    desc: 'Smycken, vapen och varor för Krigföring, köpta för hårt vunnen ära.',
   },
   conquerors_vanguard_gallery: {
     name: 'Förtruppsgalleri',

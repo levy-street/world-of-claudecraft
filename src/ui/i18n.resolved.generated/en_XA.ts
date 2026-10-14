@@ -2802,6 +2802,8 @@ export const en_XA: EnTranslations = {
       "markLine": "[Áţţáçķíñĝ áñ úñƒļáĝĝéð þļáýéŕ ţĥéŕé ŕáíšéš ýóúŕ óŵñ ƒļáĝ; áţţáçķíñĝ á ƒļáĝĝéð óñé ñéʋéŕ ðóéš.]",
       "aidLine": "[Ĥéáļíñĝ, šĥíéļðíñĝ óŕ ƀúƒƒíñĝ á ƒļáĝĝéð þļáýéŕ íñ á ŵóŕļð ƒíĝĥţ ŕáíšéš ýóúŕ ƒļáĝ.]",
       "stakeLine": "[Ţĥé ļóšéŕ þáýš {cap} óŕ {percent} óƒ ţĥéíŕ þúŕšé, ŵĥíçĥéʋéŕ íš ļéšš.]",
+      "spoilsLine": "[Ŵĥéñ ƀóţĥ óƒ ýóú áŕé ƒļáĝĝéð, ţĥé ķíļļíñĝ ƀļóŵ'š ĝóļð ðŕóþš óñ ţĥé ƀóðý ŵíţĥ ţĥé ļóšéŕ'š šķúļļ.]",
+      "skullName": "[{name}'š Šķúļļ]",
       "noStakeLine": "[Áñ úñƒļáĝĝéð þļáýéŕ ķíļļéð óñ ƒŕéé-ƒóŕ-áļļ ĝŕóúñð ļóšéš ñó ĝóļð.]",
       "noTakeLine": "[Áñ úñƒļáĝĝéð ƒíĝĥţéŕ ţáķéš ñó ĝóļð éíţĥéŕ: íţ óñļý ɱóʋéš ƀéţŵééñ ţŵó ƒļáĝĝéð þļáýéŕš.]",
       "honorLine": "[{honor} Ĥóñóŕ þéŕ ķíļļ, šþļíţ ƀéţŵééñ éʋéŕýóñé ŵĥó ĥéļþéð.]",
@@ -2838,11 +2840,28 @@ export const en_XA: EnTranslations = {
       "falls": "[Ƒáļļš íñ {minutes}]",
       "standingRaid": "[Ŕáíð ɱéɱƀéŕš ðó ñóţ çóúñţ: óñļý þáŕţíéš çáñ ĥóļð ţĥé ĥíļļ]"
     },
+    "skullBag": {
+      "title": "[Šķúļļ Ɓáĝ]",
+      "total": "[Šķúļļš: {count}]",
+      "close": "[Çļóšé ţĥé Šķúļļ Ɓáĝ]",
+      "clickOpen": "[Çļíçķ ţó óþéñ]",
+      "notCarried": "[Çáŕŕý ţĥé Šķúļļ Ɓáĝ íñ ýóúŕ ƀáĝš ţó šţóŕé óŕ ţáķé šķúļļš.]",
+      "empty": "[Éɱþţý. Ŵĥíļé ýóú çáŕŕý ţĥé ƀáĝ, šķúļļš ýóú ļóóţ ĝó šţŕáíĝĥţ íñ.]",
+      "unrecorded": "[Ţŕóþĥý Šķúļļ]",
+      "store": "[Šţóŕé çáŕŕíéð šķúļļš ({count})]",
+      "storeNone": "[Ñó šķúļļš ţó šţóŕé]",
+      "takeOne": "[Ţáķé 1]",
+      "takeAll": "[Ţáķé áļļ]",
+      "takeOneAria": "[Ţáķé 1: {item}]",
+      "takeAllAria": "[Ţáķé áļļ: {item}]",
+      "tooltip": "[Ĥóļðš áñý ñúɱƀéŕ óƒ Ţŕóþĥý Šķúļļš ŵíţĥóúţ úšíñĝ ƀáĝ šþáçé. Ŵĥíļé íţ íš íñ ýóúŕ ƀáĝš, šķúļļš ýóú ļóóţ ĝó šţŕáíĝĥţ íñ. Çļíçķ íţ íñ ýóúŕ ƀáĝš ţó šţóŕé óŕ ţáķé šķúļļš.]"
+    },
     "warfareShop": {
       "gossipOption": "[Ɓŕóŵšé Ŵáŕƒáŕé Šéţš]",
       "gossipOptionAria": "[Ɓŕóŵšé ţĥé Ŵáŕƒáŕé šéţ šĥóþ óƒƒéŕéð ƀý {name}]",
       "jewelry": "[Ĵéŵéļŕý]",
       "weapons": "[Ŵéáþóñš]",
+      "goods": "[Ĝóóðš]",
       "groupSeason2": "[Ŵáŕƒáŕé Šéášóñ 2: Ʋáñĝúáŕð]",
       "groupEntry": "[Ŵáŕƒáŕé Šéášóñ 1]",
       "owned": "[Óŵñéð]",
@@ -4436,6 +4455,7 @@ export const en_XA: EnTranslations = {
       "perfectedBadge": "[Þéŕƒéçţéð]",
       "perfectingRank": "[Þéŕƒéçţíñĝ: ŕáñķ {rank} óƒ {ranks}]",
       "materialSourceGatherer": "[{count} × Çóļļéçţéð ƀý {name}]",
+      "trophySkullSource": "[{count} × Ţáķéñ ƒŕóɱ {name}]",
       "materialSourceGathererSigned": "[{count} × Çóļļéçţéð ƀý {name}, šíĝñéð ƀý {signer}]",
       "materialSourceUnrecorded": "[{count} × Ñó ĝáţĥéŕéŕ ŕéçóŕðéð]",
       "materialSourceUnrecordedSigned": "[{count} × Ñó ĝáţĥéŕéŕ ŕéçóŕðéð, šíĝñéð ƀý {name}]",
@@ -18933,6 +18953,12 @@ export const en_XA: EnTranslations = {
       },
       "emissary_cache": {
         "name": "[Éɱíššáŕý'š Çáçĥé]"
+      },
+      "pvp_trophy_skull": {
+        "name": "[Ţŕóþĥý Šķúļļ]"
+      },
+      "pvp_skull_bag": {
+        "name": "[Šķúļļ Ɓáĝ]"
       },
       "clue_scroll": {
         "name": "[Çļúé Šçŕóļļ]"

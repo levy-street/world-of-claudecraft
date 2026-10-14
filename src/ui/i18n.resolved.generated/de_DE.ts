@@ -2802,6 +2802,8 @@ export const de_DE: EnTranslations = {
       "markLine": "Einen unmarkierten Spieler dort anzugreifen hebt Eure eigene Flagge; einen markierten anzugreifen tut das nie.",
       "aidLine": "Einen markierten Spieler in einem Weltkampf zu heilen, zu schützen oder zu stärken hebt Eure eigene Flagge.",
       "stakeLine": "Der Verlierer zahlt {cap} oder {percent} seines Beutels, je nachdem, was weniger ist.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "Ein unmarkierter Spieler, der auf Jeder-gegen-Jeden-Gebiet getötet wird, verliert kein Gold.",
       "noTakeLine": "Ein unmarkierter Kämpfer nimmt ebenfalls kein Gold: Es wechselt nur zwischen zwei markierten Spielern.",
       "honorLine": "{honor} Ehre pro Tötung, aufgeteilt unter allen, die geholfen haben.",
@@ -2838,11 +2840,28 @@ export const de_DE: EnTranslations = {
       "falls": "Sinkt in {minutes}",
       "standingRaid": "Schlachtzugsmitglieder zählen nicht: Nur Gruppen können den Hügel halten"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Kriegsführungs-Sets durchsuchen",
       "gossipOptionAria": "Den von {name} angebotenen Kriegsführungs-Set-Laden durchsuchen",
       "jewelry": "Schmuck",
       "weapons": "Waffen",
+      "goods": "Goods",
       "groupSeason2": "Kriegsführung Saison 2: Vorhut",
       "groupEntry": "Kriegsführung Saison 1",
       "owned": "Im Besitz",
@@ -4436,6 +4455,7 @@ export const de_DE: EnTranslations = {
       "perfectedBadge": "Perfektioniert",
       "perfectingRank": "Perfektionierung: Rang {rank} von {ranks}",
       "materialSourceGatherer": "{count} × Gesammelt von {name}",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × Gesammelt von {name}, signiert von {signer}",
       "materialSourceUnrecorded": "{count} × Kein Sammler verzeichnet",
       "materialSourceUnrecordedSigned": "{count} × Kein Sammler verzeichnet, signiert von {name}",
@@ -18933,6 +18953,12 @@ export const de_DE: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Beutekiste des Emissärs"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Hinweisschriftrolle"

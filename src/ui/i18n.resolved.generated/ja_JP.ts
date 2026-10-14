@@ -2802,6 +2802,8 @@ export const ja_JP: EnTranslations = {
       "markLine": "そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立ちますが、フラグを立てた相手を攻撃しても立ちません。",
       "aidLine": "フラグを立てたプレイヤーを戦闘中に回復、シールド、強化すると、自分のフラグも立ちます。",
       "stakeLine": "敗者は所持金の{percent}か{cap}のうち、少ない方を支払います。",
+      "spoilsLine": "双方がフラグを立てている場合、とどめを刺した者の取り分の金貨が敗者の頭蓋骨と共に遺体に落ちます。",
+      "skullName": "{name}の頭蓋骨",
       "noStakeLine": "無差別戦闘地帯でフラグを立てていないプレイヤーが倒されても、金貨を一切支払いません。",
       "noTakeLine": "フラグを立てていない戦闘者もゴールドは得られません。ゴールドが動くのはフラグを立てた2人のプレイヤーの間だけです。",
       "honorLine": "撃破ごとに名誉{honor}、貢献した全員で分配。",
@@ -2838,11 +2840,28 @@ export const ja_JP: EnTranslations = {
       "falls": "{minutes}後に消滅",
       "standingRaid": "レイドメンバーはカウントされません：丘を保持できるのはパーティのみです"
     },
+    "skullBag": {
+      "title": "頭蓋骨袋",
+      "total": "頭蓋骨：{count}",
+      "close": "頭蓋骨袋を閉じる",
+      "clickOpen": "クリックで開く",
+      "notCarried": "頭蓋骨を収納・取り出しするには、頭蓋骨袋をバッグに入れておく必要があります。",
+      "empty": "空です。袋を持っている間、戦利品の頭蓋骨は直接この袋に入ります。",
+      "unrecorded": "戦利品の頭蓋骨",
+      "store": "持っている頭蓋骨を収納（{count}）",
+      "storeNone": "収納できる頭蓋骨がありません",
+      "takeOne": "1個取り出す",
+      "takeAll": "すべて取り出す",
+      "takeOneAria": "1個取り出す：{item}",
+      "takeAllAria": "すべて取り出す：{item}",
+      "tooltip": "戦利品の頭蓋骨をバッグの空きを使わずにいくつでも収納できます。バッグに入れている間、拾った頭蓋骨は直接この袋に入ります。バッグ内でクリックすると頭蓋骨の収納や取り出しができます。"
+    },
     "warfareShop": {
       "gossipOption": "ウォーフェアセットを見る",
       "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
       "jewelry": "アクセサリー",
       "weapons": "武器",
+      "goods": "雑貨",
       "groupSeason2": "ウォーフェア シーズン2：ヴァンガード",
       "groupEntry": "ウォーフェア シーズン1",
       "owned": "所有済み",
@@ -4436,6 +4455,7 @@ export const ja_JP: EnTranslations = {
       "perfectedBadge": "完全化済み",
       "perfectingRank": "完全化：ランク{rank}／{ranks}",
       "materialSourceGatherer": "{count} × {name}が採集",
+      "trophySkullSource": "{count} × {name}から奪取",
       "materialSourceGathererSigned": "{count} × {name}が採集、{signer}が署名",
       "materialSourceUnrecorded": "{count} × 採集者の記録なし",
       "materialSourceUnrecordedSigned": "{count} × 採集者の記録なし、{name}が署名",
@@ -18933,6 +18953,12 @@ export const ja_JP: EnTranslations = {
       },
       "emissary_cache": {
         "name": "使者の宝箱"
+      },
+      "pvp_trophy_skull": {
+        "name": "戦利品の頭蓋骨"
+      },
+      "pvp_skull_bag": {
+        "name": "頭蓋骨袋"
       },
       "clue_scroll": {
         "name": "手がかりの巻物"

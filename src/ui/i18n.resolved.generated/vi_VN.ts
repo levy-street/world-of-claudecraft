@@ -2802,6 +2802,8 @@ export const vi_VN: EnTranslations = {
       "markLine": "Tấn công một người chơi không có cờ ở đó sẽ nâng cao cờ của bạn; tấn công một người có cờ thì không.",
       "aidLine": "Chữa lành, che chắn hoặc buff một người chơi có cờ PvP trong trận chiến thế giới sẽ nâng cao cờ của bạn.",
       "stakeLine": "Người thua trả {cap} hoặc {percent}% số tiền của họ, cái nào ít hơn.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "Một chiến binh không có cờ bị giết trên đất chiến đấu tự do sẽ mất không vàng.",
       "noTakeLine": "Một chiến binh không có cờ cũng không lấy vàng: nó chỉ chuyển động giữa hai người chơi có cờ.",
       "honorLine": "{honor} Danh Dự trên mỗi lần giết, chia sẻ cho mọi người đã giúp đỡ.",
@@ -2838,11 +2840,28 @@ export const vi_VN: EnTranslations = {
       "falls": "Rơi xuống trong {minutes}",
       "standingRaid": "Thành viên cuộc tấn công không tính, chỉ các nhóm mới có thể giữ đồi"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Duyệt Bộ Chiến Tranh",
       "gossipOptionAria": "Duyệt cửa hàng bộ Chiến Tranh do {name} cung cấp",
       "jewelry": "Trang Sức",
       "weapons": "Vũ Khí",
+      "goods": "Goods",
       "groupSeason2": "Mùa Giải Tranh Hùng 2: Đội Tiền Phong",
       "groupEntry": "Mùa Giải Tranh Hùng 1",
       "owned": "Sở Hữu",
@@ -4436,6 +4455,7 @@ export const vi_VN: EnTranslations = {
       "perfectedBadge": "Đã hoàn thiện",
       "perfectingRank": "Hoàn thiện: bậc {rank} trên {ranks}",
       "materialSourceGatherer": "{count} × Được {name} thu thập",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × Được {name} thu thập, có chữ ký của {signer}",
       "materialSourceUnrecorded": "{count} × Không ghi nhận người thu thập",
       "materialSourceUnrecordedSigned": "{count} × Không ghi nhận người thu thập, có chữ ký của {name}",
@@ -18933,6 +18953,12 @@ export const vi_VN: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Kho Tàng Của Phái Viên"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Cuộn Chỉ Gợi Ý"

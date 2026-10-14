@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Armurerie de Guerre',
-    desc: 'Bijoux et armes de Guerre achetés avec un honneur durement gagné.',
+    desc: 'Bijoux, armes et marchandises de Guerre achetés avec un honneur durement gagné.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galerie de l’Avant-garde',

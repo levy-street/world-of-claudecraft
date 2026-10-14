@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Savaş Cephaneliği',
-    desc: 'Zorlukla kazanılmış şerefle satın alınan Savaş takıları ve silahları.',
+    desc: 'Zorlukla kazanılmış şerefle satın alınan Savaş takıları, silahları ve eşyaları.',
   },
   conquerors_vanguard_gallery: {
     name: 'Öncü Galerisi',

@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Kho Vũ Khí Chiến Tranh',
-    desc: 'Trang sức và vũ khí Chiến Tranh mua bằng danh dự khó nhọc mới có.',
+    desc: 'Trang sức, vũ khí và vật phẩm Chiến Tranh mua bằng danh dự khó nhọc mới có.',
   },
   conquerors_vanguard_gallery: {
     name: 'Phòng Trưng Bày Tiên Phong',

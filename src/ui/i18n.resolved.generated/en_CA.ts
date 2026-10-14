@@ -2802,6 +2802,8 @@ export const en_CA: EnTranslations = {
       "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
       "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
       "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
       "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
       "honorLine": "{honor} Honor per kill, split between everyone who helped.",
@@ -2838,11 +2840,28 @@ export const en_CA: EnTranslations = {
       "falls": "Falls in {minutes}",
       "standingRaid": "Raid members do not count: only parties can hold the hill"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Browse Warfare Sets",
       "gossipOptionAria": "Browse the Warfare set shop offered by {name}",
       "jewelry": "Jewelry",
       "weapons": "Weapons",
+      "goods": "Goods",
       "groupSeason2": "Warfare Season 2: Vanguard",
       "groupEntry": "Warfare Season 1",
       "owned": "Owned",
@@ -4436,6 +4455,7 @@ export const en_CA: EnTranslations = {
       "perfectedBadge": "Perfected",
       "perfectingRank": "Perfecting: rank {rank} of {ranks}",
       "materialSourceGatherer": "{count} × Collected by {name}",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × Collected by {name}, signed by {signer}",
       "materialSourceUnrecorded": "{count} × No gatherer recorded",
       "materialSourceUnrecordedSigned": "{count} × No gatherer recorded, signed by {name}",
@@ -18933,6 +18953,12 @@ export const en_CA: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Emissary's Cache"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Clue Scroll"
