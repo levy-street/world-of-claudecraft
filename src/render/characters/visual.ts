@@ -11,6 +11,7 @@ import {
   offhandMirrorsWeaponSkin,
 } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
+import { isBuiltinWorldActive } from '../../sim/data';
 import type { OverheadEmoteId } from '../../world_api';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { GFX } from '../gfx';
@@ -1307,7 +1308,12 @@ export class CharacterVisual {
     const swimPitch = s.swimPitch * (1 + (TREAD_PITCH_SCALE - 1) * this.treadBlend);
     this.poseWrap.rotation.x =
       (proneAngle + swimPitch) * this.swimBlend + this.lean + CLIMB_BODY_PITCH * climb * climbLevel;
-    this.poseWrap.rotation.z = 0;
+    // Bank into the turn. Already eased and already scaled for the medium by the
+    // renderer (advanceBankRoll), so it lands here as a finished angle, but the
+    // ledge climb owns the whole body while it runs, and a lean mid-haul reads
+    // as the character falling off the wall. Authored maps only: the built-in
+    // world keeps the upright body it shipped with.
+    this.poseWrap.rotation.z = isBuiltinWorldActive() ? 0 : (s.bankRoll ?? 0) * (1 - climb);
     this.poseWrap.position.y =
       this.swimBlend * (swimRise + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.

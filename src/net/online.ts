@@ -9,7 +9,7 @@ import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './wee
 import { App } from '@capacitor/app';
 import type { PluginListenerHandle } from '@capacitor/core';
 import { apiUrl, DESKTOP_API_ORIGIN, NATIVE_API_ORIGIN, NATIVE_APP } from '../client_origin';
-import { normalizeOrigin, runtimeWebSocketUrl } from '../runtime';
+import { normalizeOrigin } from '../runtime';
 import {
   hasStreamerLink,
   normalizeStreamerLinks,
@@ -267,10 +267,10 @@ import { applyFerryWire, applyTransportSnapshot, clientFerryView } from './trans
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { whoRosterFromFrame } from './who_frame_wire';
-import { buildWebSocketAuthMessage } from './world_auth_message';
+import { buildWebSocketAuthMessage, buildWebSocketUrl } from './world_auth_message';
 import { WorldInteractionRequests } from './world_interaction_requests';
 
-export { buildWebSocketAuthMessage } from './world_auth_message';
+export { buildWebSocketAuthMessage, buildWebSocketUrl } from './world_auth_message';
 
 // The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
 // individual fields as they are consumed; this alias keeps the decoder local.
@@ -295,10 +295,6 @@ interface PendingTransientInput {
 export type { CharacterSummary } from './character_summary';
 
 import type { CharacterSummary } from './character_summary';
-
-export function buildWebSocketUrl(protocol: string, host: string): string {
-  return runtimeWebSocketUrl(protocol, host, DESKTOP_API_ORIGIN);
-}
 
 export {
   apiUrl,

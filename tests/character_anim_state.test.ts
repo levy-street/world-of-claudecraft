@@ -3,8 +3,12 @@ import {
   ANIM_REPAIR_FRAMES,
   type AnimActionWeight,
   type AnimState,
+  advanceBankRoll,
   advanceSwimPitch,
   advanceTreadBlend,
+  BANK_FULL_SPEED,
+  BANK_FULL_YAW_RATE,
+  BANK_ROLL_MAX,
   castHoldStep,
   desiredBaseState,
   drivesPose,
@@ -20,7 +24,9 @@ import {
   shouldInterruptLanding,
   shouldPlayLanding,
   shouldPlayOutCastExit,
+  TURN_LEAN_MAX,
   weaponStowedOverlay,
+  yawRateBetween,
 } from '../src/render/characters/anim_state';
 
 // A three.js SkinnedMesh renders BIND POSE (arms out, the T-pose) whenever the
@@ -257,7 +263,80 @@ describe('desiredBaseState', () => {
     expect(desiredBaseState(anim({ ...moving, sitting: true }), true)).toBe('sit');
     expect(desiredBaseState(anim(), true)).toBe('idle');
   });
+});
 
+describe('advanceBankRoll', () => {
+  // The sim's facing grows counter-clockwise (forward is `(sin f, cos f)`), so a
+  // POSITIVE yaw rate is a left-hand turn; the pose wrap's +Z raises the body's
+  // left side. Leaning INTO a left turn drops that side, hence a negative roll.
+  it('leans into the turn, not away from it', () => {
+    let roll = 0;
+    for (let i = 0; i < 200; i++) roll = advanceBankRoll(roll, BANK_FULL_YAW_RATE, 99, 1 / 60);
+    expect(roll).toBeLessThan(0);
+    expect(roll).toBeCloseTo(-BANK_ROLL_MAX, 2);
+
+    let right = 0;
+    for (let i = 0; i < 200; i++) right = advanceBankRoll(right, -BANK_FULL_YAW_RATE, 99, 1 / 60);
+    expect(right).toBeCloseTo(BANK_ROLL_MAX, 2);
+  });
+
+  it('clamps a mouse flick instead of throwing the body on its side', () => {
+    let roll = 0;
+    for (let i = 0; i < 200; i++) roll = advanceBankRoll(roll, 40, 99, 1 / 60);
+    expect(roll).toBeCloseTo(-BANK_ROLL_MAX, 2);
+  });
+
+  it('does not bank a body that is turning on the spot', () => {
+    let roll = 0;
+    for (let i = 0; i < 200; i++) roll = advanceBankRoll(roll, BANK_FULL_YAW_RATE, 0, 1 / 60);
+    expect(roll).toBeCloseTo(0, 5);
+  });
+
+  it('scales with travel up to the full-authority speed', () => {
+    let half = 0;
+    for (let i = 0; i < 200; i++) {
+      half = advanceBankRoll(half, BANK_FULL_YAW_RATE, BANK_FULL_SPEED / 2, 1 / 60);
+    }
+    expect(half).toBeCloseTo(-BANK_ROLL_MAX / 2, 2);
+  });
+
+  it('unwinds to level when the turn stops', () => {
+    let roll = -BANK_ROLL_MAX;
+    for (let i = 0; i < 200; i++) roll = advanceBankRoll(roll, 0, 99, 1 / 60);
+    expect(Math.abs(roll)).toBeLessThan(1e-3);
+  });
+
+  it('takes a land lean far smaller than a swimmer bank', () => {
+    let lean = 0;
+    for (let i = 0; i < 200; i++) {
+      lean = advanceBankRoll(lean, BANK_FULL_YAW_RATE, 99, 1 / 60, TURN_LEAN_MAX);
+    }
+    expect(lean).toBeCloseTo(-TURN_LEAN_MAX, 3);
+    expect(Math.abs(lean)).toBeLessThan(BANK_ROLL_MAX / 3);
+  });
+
+  it('survives a non-finite rate or speed', () => {
+    expect(advanceBankRoll(0, Number.NaN, 9, 1 / 60)).toBeCloseTo(0, 6);
+    expect(advanceBankRoll(0, 1, Number.NaN, 1 / 60)).toBeCloseTo(0, 6);
+  });
+});
+
+describe('yawRateBetween', () => {
+  it('takes the short way around the wrap', () => {
+    // Without wrapping, a heading crossing +/-PI reads as a 360deg/frame flick
+    // and slams the body onto its side for one frame.
+    const rate = yawRateBetween(Math.PI - 0.05, -Math.PI + 0.05, 0.1);
+    expect(rate).toBeCloseTo(1, 5);
+  });
+
+  it('is zero on a stalled frame', () => {
+    expect(yawRateBetween(0, 1, 0)).toBe(0);
+  });
+});
+
+// Upstream's battle stance (v0.42): an IDLE variant every other pose outranks.
+// Fourth argument is the stance clip.
+describe('desiredBaseState (battle stance)', () => {
   it('holds the battle stance instead of the idle while engaged and standing', () => {
     expect(desiredBaseState(anim({ combat: true }), true, true, true)).toBe('combatIdle');
     // Not engaged: the relaxed idle, exactly as before the stance existed.

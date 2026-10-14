@@ -8,9 +8,10 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { focusTargetAction } from '../ui/focus_targets_core';
 import { detectBrowserEngine } from './browser_env';
+import { clampCamPitch } from './camera_pitch_range';
 import { clickClaimedModalFocus } from './click_claimed_focus';
 import { cursorForHover, type HoverCursorKind } from './cursors';
-import { clampGliderCameraPitch, gliderPitchFromCamera } from './glider_pitch_input';
+import { gliderPitchFromCamera } from './glider_pitch_input';
 import {
   comboCode,
   isModifierCode,
@@ -175,9 +176,13 @@ export interface InputDebugState {
   hoverActive: boolean;
 }
 
+// The camera's pitch range and clamp live in camera_pitch_range.ts (the
+// renderer reads CAM_PITCH_UP from here).
+export { CAM_PITCH_DOWN, CAM_PITCH_UP } from './camera_pitch_range';
+
 // Camera-driven swimming. camPitch is POSITIVE looking DOWN (renderer.ts seats
-// the boom at eyeY + sin(pitch) * dist), clamped to [-0.4, 1.35], and RESTS at
-// 0.32 — so the bands cannot be centred on zero: a neutral camera has to mean
+// the boom at eyeY + sin(pitch) * dist), clamped by clampCamPitch
+// (camera_pitch_range.ts), and RESTS at 0.32 - so the bands cannot be centred on zero: a neutral camera has to mean
 // "hold this depth", or every swimmer would sink on sight. Diving needs a
 // deliberate ~17 degrees past rest, surfacing about 15 degrees back the other
 // way, leaving a wide dead band in between.
@@ -756,7 +761,7 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT * this.touchLookSpeed;
     this.camYaw -= dx * dragSens;
-    this.camPitch = clampGliderCameraPitch(
+    this.camPitch = clampCamPitch(
       this.camPitch + this.touchPitchSign * dy * dragSens,
       this.cb.isGliderActive?.() === true,
     );
@@ -804,10 +809,7 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     if (yawDelta === 0 && pitchDelta === 0) return;
     this.camYaw += yawDelta;
-    this.camPitch = clampGliderCameraPitch(
-      this.camPitch + pitchDelta,
-      this.cb.isGliderActive?.() === true,
-    );
+    this.camPitch = clampCamPitch(this.camPitch + pitchDelta, this.cb.isGliderActive?.() === true);
     this.swimAimPitch = this.camPitch;
     this.noteIntent('look');
   }
@@ -824,7 +826,7 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     if (!this.touchLookActive) return;
     this.camYaw -= this.touchLookVector.x * TOUCH_LOOK_YAW_RATE * this.touchLookSpeed * dt;
-    this.camPitch = clampGliderCameraPitch(
+    this.camPitch = clampCamPitch(
       this.camPitch +
         this.touchPitchSign *
           this.touchLookVector.y *
@@ -1645,7 +1647,7 @@ export class Input {
     // player kept holding a drag button.
     this.maybeEngageDragPointerLock();
     this.camYaw -= mx * this.lookSensitivity;
-    this.camPitch = clampGliderCameraPitch(
+    this.camPitch = clampCamPitch(
       this.camPitch + my * this.lookSensitivity * this.lookPitchSign,
       this.cb.isGliderActive?.() === true,
     );
@@ -1779,7 +1781,7 @@ export class Input {
     // while swimming, so aiming the camera around on land is inert. See
     // SWIM_LOOK_* for the bands and swimSteer for the graded rate.
     const flying = this.cb?.isGliderActive?.() === true;
-    this.camPitch = clampGliderCameraPitch(this.camPitch, flying);
+    this.camPitch = clampCamPitch(this.camPitch, flying);
     const { dive, surface, swimSteer } = flying
       ? { dive: this.heldAction('dive') || this.touchDive, surface: false, swimSteer: 0 }
       : this.readSwimSteer(this.anyMoveHeld());

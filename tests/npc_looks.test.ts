@@ -23,13 +23,41 @@ import {
   npcModularKeyFor,
 } from '../src/render/characters/npc_looks';
 import { NPCS } from '../src/sim/data';
+import { STUDIO_CONTENT } from '../src/sim/studio_content';
+
+// FORK: fork-only NPCs that still render on the fixed NPC rigs (no authored
+// look yet). Shrink this list by authoring rows in NPC_LOOKS; never grow it
+// for an upstream NPC.
+const FORK_FIXED_RIG_NPCS = new Set([
+  // the Scorching Wastes ('scout_maren_wastes' composes via the scout_maren
+  // baseId alias now, the same person recurs there)
+  'caravan_master_saffa',
+  'loremaster_caddis_wastes',
+  'old_haruk',
+  'provisioner_ashka',
+  'forgemaster_derin',
+  'wellwatch_hana',
+  'wellwatch_toma',
+  'drover_pell',
+  'dowser_emrys',
+  'auctioneer_zeph',
+]);
 
 describe('npc looks roster', () => {
   it('covers every NpcDef id except Brother Aldric (every other world NPC composes)', () => {
     const missing = Object.keys(NPCS).filter(
-      (id) => !aldricKeepsHisRig(id) && npcLookFor(id) === null,
+      (id) => !aldricKeepsHisRig(id) && !FORK_FIXED_RIG_NPCS.has(id) && npcLookFor(id) === null,
     );
     expect(missing).toEqual([]);
+  });
+
+  it('FORK: the fixed-rig exemption list names only NPCs that exist and lack a look', () => {
+    // Studio NPC rows resolve through the authored-map overlay
+    // (src/sim/studio_content.ts), never the built-in table.
+    for (const id of FORK_FIXED_RIG_NPCS) {
+      expect(NPCS[id] ?? STUDIO_CONTENT.npcs[id], id).toBeDefined();
+      expect(npcLookFor(id), id).toBeNull();
+    }
   });
 
   // Brother Aldric renders the pre-v0.7 npc_aldric model on purpose (the

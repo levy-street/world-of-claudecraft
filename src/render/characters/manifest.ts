@@ -4827,6 +4827,14 @@ const NPC_KEYS: Record<string, string> = {
   huntsman_deral: 'npc_scout',
 };
 
+/** The Studio's authored rig override for an entity (the Entity tool's
+ *  "Character model" picker), validated against the manifest so a stale key
+ *  cannot dead-end the visual build. An explicit model choice beats both the
+ *  NPC_KEYS default and a composed look. Null = none authored. */
+export function authoredRigOverride(e: Entity): string | null {
+  return e.kind === 'npc' && e.visualKey && VISUALS[e.visualKey] ? e.visualKey : null;
+}
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
@@ -4838,6 +4846,8 @@ export function visualKeyFor(e: Entity): string {
     const family = MOBS[e.templateId]?.family;
     return (family && FAMILY_KEYS[family]) || 'mob_bandit';
   }
+  const authoredRig = authoredRigOverride(e);
+  if (authoredRig) return authoredRig;
   // npcs — Brother Aldric recurs in every hub under suffixed ids
   if (e.templateId.startsWith('brother_aldric')) return 'npc_aldric';
   return NPC_KEYS[e.templateId] ?? 'npc_villager';

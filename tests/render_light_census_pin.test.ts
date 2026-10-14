@@ -82,6 +82,11 @@ const ALLOWED: Readonly<Record<string, CensusEntry>> = {
     reason:
       'the impostor atlas bake lights a PRIVATE scene rendered into a render target, so it is never part of the world light census',
   },
+  'placed_imposters.ts': {
+    kinds: ['HemisphereLight'],
+    reason:
+      'the Studio placed-asset impostor atlas bake (the foliage_impostor.ts twin) lights a PRIVATE bake scene rendered into a render target, never part of the world light census',
+  },
   'characters/preview.ts': {
     kinds: ['HemisphereLight', 'DirectionalLight'],
     reason:
@@ -177,6 +182,7 @@ describe('the src/render light census', () => {
       'characters/preview.ts',
       'foliage_impostor.ts',
       'mount_preview.ts',
+      'placed_imposters.ts',
       'renderer.ts',
     ]);
   });

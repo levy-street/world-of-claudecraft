@@ -38,8 +38,21 @@ describe('CustomMap build + projection', () => {
     expect(w.terrainEdits).toHaveLength(1);
   });
 
-  it('removes specialized built-in-only props while fresh-cloning rendered exterior props', () => {
-    const world = customMapToWorldContent(newCustomMap('M', 'id', 0));
+  // Studio keeps the authored towns' (Eastbrook Vale, Fenbridge) buildings,
+  // wells, stalls and fences on a custom map (commit 1c426ac1ba,
+  // custom_world_props.ts clonePropsKeepingAuthoredTowns): with those records
+  // stripped the authored town subtrees had nothing to gate on and the editor
+  // drew the pre-rebuild kit stand-ins instead of the live game's town. Only
+  // those four categories have a matching skip on the generic prop path, so
+  // the benches, walls and town graveyard stay stripped (restoring them would
+  // draw them twice). The full-world STATIC projection (no propsMode, the
+  // shape this test was written for) is pinned below; Studio's default
+  // editable-all mode promotes the remaining props to placements, so it is
+  // pinned separately at the end, for the town records alone.
+  it('keeps the authored-town props, strips the rest, and fresh-clones exterior props', () => {
+    const staticMap = newCustomMap('M', 'id', 0);
+    staticMap.propsMode = undefined;
+    const world = customMapToWorldContent(staticMap);
     const eastbrookIds = {
       buildings: new Set<string>([
         ...EASTBROOK_LAYOUT.preservedBuildings.map((placement) => placement.id),
@@ -68,26 +81,23 @@ describe('CustomMap build + projection', () => {
       FENBRIDGE_LAYOUT.civic.provisionStall.id,
     ]);
 
-    expect(
-      world.props.buildings
-        .map((placement) => placement.id)
-        .filter((id): id is string => id !== undefined && builtInOnlyBuildingIds.has(id)),
-    ).toEqual([]);
-    expect(
-      world.props.wells
-        .map((placement) => placement.id)
-        .filter((id): id is string => id !== undefined && builtInOnlyWellIds.has(id)),
-    ).toEqual([]);
-    expect(
-      world.props.stalls
-        .map((placement) => placement.id)
-        .filter((id): id is string => id !== undefined && builtInOnlyStallIds.has(id)),
-    ).toEqual([]);
-    expect(
-      world.props.fences
-        .map((placement) => placement.id)
-        .filter((id): id is string => id !== undefined && eastbrookIds.fences.has(id)),
-    ).toEqual([]);
+    // The authored towns' records ride along, in full and in order.
+    const ids = (records: readonly { id?: string }[]): string[] =>
+      records.map(({ id }) => id).filter((id): id is string => id !== undefined);
+    expect(ids(world.props.buildings).filter((id) => builtInOnlyBuildingIds.has(id))).toEqual(
+      ids(BUILTIN_WORLD.props.buildings).filter((id) => builtInOnlyBuildingIds.has(id)),
+    );
+    expect(ids(world.props.buildings).some((id) => builtInOnlyBuildingIds.has(id))).toBe(true);
+    expect(ids(world.props.wells).filter((id) => builtInOnlyWellIds.has(id))).toEqual(
+      ids(BUILTIN_WORLD.props.wells).filter((id) => builtInOnlyWellIds.has(id)),
+    );
+    expect(ids(world.props.stalls).filter((id) => builtInOnlyStallIds.has(id))).toEqual(
+      ids(BUILTIN_WORLD.props.stalls).filter((id) => builtInOnlyStallIds.has(id)),
+    );
+    expect(ids(world.props.fences).filter((id) => eastbrookIds.fences.has(id))).toEqual(
+      ids(BUILTIN_WORLD.props.fences).filter((id) => eastbrookIds.fences.has(id)),
+    );
+    // ...while the categories with no generic-path skip stay stripped.
     expect(
       (world.props.benches ?? [])
         .map((placement) => placement.id)
@@ -99,24 +109,10 @@ describe('CustomMap build + projection', () => {
         .filter((id) => builtInOnlyWallIds.has(id)),
     ).toEqual([]);
 
-    expect(world.props.buildings).toEqual(
-      BUILTIN_WORLD.props.buildings.filter(
-        ({ id }) => id === undefined || !builtInOnlyBuildingIds.has(id),
-      ),
-    );
-    expect(world.props.wells).toEqual(
-      BUILTIN_WORLD.props.wells.filter(({ id }) => id === undefined || !builtInOnlyWellIds.has(id)),
-    );
-    expect(world.props.stalls).toEqual(
-      BUILTIN_WORLD.props.stalls.filter(
-        ({ id }) => id === undefined || !builtInOnlyStallIds.has(id),
-      ),
-    );
-    expect(world.props.fences).toEqual(
-      BUILTIN_WORLD.props.fences.filter(
-        ({ id }) => id === undefined || !eastbrookIds.fences.has(id),
-      ),
-    );
+    expect(world.props.buildings).toEqual(BUILTIN_WORLD.props.buildings);
+    expect(world.props.wells).toEqual(BUILTIN_WORLD.props.wells);
+    expect(world.props.stalls).toEqual(BUILTIN_WORLD.props.stalls);
+    expect(world.props.fences).toEqual(BUILTIN_WORLD.props.fences);
     expect(world.props.benches).toEqual(
       (BUILTIN_WORLD.props.benches ?? []).filter(({ id }) => !eastbrookIds.benches.has(id)),
     );
@@ -157,13 +153,14 @@ describe('CustomMap build + projection', () => {
     expect(highwatchForge).toBeDefined();
     expect(templeCampfire).toBeDefined();
     expect(world.props.mines).toContainEqual(exteriorValeMine);
-    expect(world.props.buildings).not.toContainEqual(fenbridgeInn);
-    expect(world.props.wells.some(({ id }) => id === FENBRIDGE_LAYOUT.civic.cistern.id)).toBe(
-      false,
+    expect(world.props.buildings).toContainEqual(fenbridgeInn);
+    expect(world.props.buildings.find(({ id }) => id === 'fenbridge_crooked_reed_inn')).not.toBe(
+      fenbridgeInn,
     );
+    expect(world.props.wells.some(({ id }) => id === FENBRIDGE_LAYOUT.civic.cistern.id)).toBe(true);
     expect(
       world.props.stalls.some(({ id }) => id === FENBRIDGE_LAYOUT.civic.provisionStall.id),
-    ).toBe(false);
+    ).toBe(true);
     expect(world.props.stalls).toContainEqual(highwatchForge);
     expect(world.props.campfires).toContainEqual(templeCampfire);
     expect(world.props.mines.find(({ x, z }) => x === -38 && z === 138)).not.toBe(exteriorValeMine);
@@ -173,6 +170,16 @@ describe('CustomMap build + projection', () => {
     expect(world.props.campfires.find(([x, z]) => x === -63 && z === 788)).not.toBe(templeCampfire);
     expect(world.props.docks[0]).not.toBe(BUILTIN_WORLD.props.docks[0]);
     expect(world.props.docks[0].hutLocal).not.toBe(BUILTIN_WORLD.props.docks[0].hutLocal);
+
+    // Studio's default (editable-all) map keeps the town buildings static too
+    // (everything else became an editable placement).
+    const editable = customMapToWorldContent(newCustomMap('M', 'id', 0));
+    const townBuildings = ids(BUILTIN_WORLD.props.buildings).filter((id) =>
+      builtInOnlyBuildingIds.has(id),
+    );
+    expect(townBuildings.length).toBeGreaterThan(0);
+    expect(ids(editable.props.buildings)).toEqual(expect.arrayContaining(townBuildings));
+    expect(editable.props.buildings.length).toBeLessThan(BUILTIN_WORLD.props.buildings.length);
   });
 
   it('customMapFromContent deep-clones (independent of later edits)', () => {

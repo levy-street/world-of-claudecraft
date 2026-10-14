@@ -6,7 +6,7 @@
 // exists on disk; how each asset is instantiated for play-test is resolved by the
 // editor's asset loader against the engine, not here.
 
-import { readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isFoliageFieldCopyCatalogId } from './assets/foliage_bark_decimation.mjs';
@@ -17,13 +17,50 @@ const outFile = join(root, 'src', 'editor', 'asset_catalog.generated.ts');
 
 function walk(dir) {
   const out = [];
-  for (const name of readdirSync(dir)) {
-    const full = join(dir, name);
+  for (const name of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, name.name);
+    // A SYMLINK is never an asset. tests/sfx_studio_server_security.test.ts
+    // plants `public/models/sfx-studio-security-<pid>.glb` -> package.json as
+    // bait (the SFX Studio server must refuse to serve a symlink out of its
+    // root) and an interrupted run leaks it; glb_texture_compression and the
+    // new-endpoint sweep already filter that name for the same reason. Without
+    // this the leaked bait is catalogued as a placeable model, which then fails
+    // tests/asset_collision_coverage.test.ts.
+    if (name.isSymbolicLink()) continue;
     const st = statSync(full);
     if (st.isDirectory()) out.push(...walk(full));
-    else if (/\.(glb|gltf)$/i.test(name)) out.push(full);
+    // A building's parts twin (<name>.parts.glb) is not placeable whole: its
+    // nodes are catalogued one by one from data/prefab_pieces below. Its LOD
+    // twin (<name>.lod.glb) is drawn in its place past 200 yd, never placed.
+    else if (/\.(glb|gltf)$/i.test(name.name) && !/\.(parts|lod)\.glb$/i.test(name.name))
+      out.push(full);
   }
   return out;
+}
+
+// Flat-named packs (dungeon: 379 assets in one folder) get a subcategory from
+// their leaf naming family instead of a subfolder. Ordered: first match wins.
+const NAME_FAMILIES = [
+  [
+    'structure',
+    /^(wall|floor|stairs|arch|pillar|column|fence|barrier|post|scaffold|path|door|gate|window|roof|beam|platform|bridge)/i,
+  ],
+  [
+    'furniture',
+    /^(table|bed|bookcase|bench|shelf|shelves|bar|bartop|chair|stool|throne|desk|cabinet|counter)/i,
+  ],
+  ['containers', /^(chest|crate|barrel|box|bucket|coffin|pot|sack|basket|cauldron)/i],
+  ['lighting', /^(candle|torch|lantern|lamp|brazier|chandelier|sconce)/i],
+  ['nature', /^(tree|trunk|rock|rocks|bone|bones|pumpkin|mushroom|log|stump|vine|root)/i],
+  [
+    'decor',
+    /^(banner|plate|bottle|book|sign|coin|sword|shield|skull|grave|gravemarker|statue|rug|curtain|candy|lollipop|cake|present)/i,
+  ],
+];
+
+function nameFamily(leaf) {
+  for (const [family, re] of NAME_FAMILIES) if (re.test(leaf)) return family;
+  return 'other';
 }
 
 // "models/props/market_stand_1.glb" -> { category: 'props', id: 'props/market_stand_1' }
@@ -38,16 +75,66 @@ function toEntry(full) {
     .replace(/[_-]+/g, ' ')
     .replace(/\b\w/g, (c) => c.toUpperCase())
     .trim();
-  return { id, category, label, path: `/${rel}` };
+  // Subcategory: the real subfolder when the pack has one
+  // (medieval_village_v2/buildings/...), else a naming family for large flat
+  // packs. Small flat categories stay undivided (no subcategory).
+  const subcategory =
+    parts.length >= 4 ? parts[2] : category === 'dungeon' ? nameFamily(leaf) : undefined;
+  const entry = { id, category, label, path: `/${rel}` };
+  if (subcategory) entry.subcategory = subcategory;
+  return entry;
+}
+
+// Prefab pieces: a Blender-built building's kit pieces + hand-built shell,
+// each addressing ONE node of the building's parts GLB (path#node:<name> /
+// path#group:<prefix>, resolved by src/render/assets/loader.ts). Studio's
+// "Edit pieces" splits a placed building into these; they are also placeable
+// on their own from the browser.
+function prefabPieceEntries() {
+  const dir = join(root, 'data', 'prefab_pieces');
+  if (!existsSync(dir)) return [];
+  const out = [];
+  const pretty = (s) =>
+    s
+      .replace(/[_-]+/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim();
+  for (const file of readdirSync(dir).sort()) {
+    if (!file.endsWith('.json')) continue;
+    const m = JSON.parse(readFileSync(join(dir, file), 'utf8'));
+    const building = m.name;
+    if (m.shell) {
+      out.push({
+        id: `tidehold_parts/${building}/shell`,
+        category: 'tidehold_parts',
+        label: `${pretty(building)} shell`,
+        path: `${m.parts}#group:shell_`,
+        subcategory: building,
+      });
+    }
+    for (const p of m.pieces) {
+      const kitLeaf = String(p.kit).split('/').pop();
+      out.push({
+        id: `tidehold_parts/${building}/${p.node}`,
+        category: 'tidehold_parts',
+        label: `${pretty(kitLeaf)} (${pretty(building)} ${p.node.split('_')[0]})`,
+        path: `${m.parts}#node:${p.node}`,
+        subcategory: building,
+      });
+    }
+  }
+  return out;
 }
 
 // The world foliage field's decimated-bark copies
 // (scripts/assets/decimate_foliage_bark.mjs) are not placeable: an authored
 // map places the full-detail original, at any scale.
-const entries = walk(modelsDir)
-  .map(toEntry)
-  .filter((e) => !isFoliageFieldCopyCatalogId(e.id))
-  .sort((a, b) => a.id.localeCompare(b.id));
+const entries = [
+  ...walk(modelsDir)
+    .map(toEntry)
+    .filter((e) => !isFoliageFieldCopyCatalogId(e.id)),
+  ...prefabPieceEntries(),
+].sort((a, b) => a.id.localeCompare(b.id));
 
 const byCat = {};
 for (const e of entries) {
@@ -67,6 +154,9 @@ export interface AssetEntry {
   label: string;
   /** Public URL of the GLB, e.g. "/models/props/well.glb". */
   path: string;
+  /** Pack subdivision: the real subfolder (medieval_village_v2/buildings/...)
+   *  or a naming family for large flat packs (dungeon). Absent = undivided. */
+  subcategory?: string;
 }
 `;
 

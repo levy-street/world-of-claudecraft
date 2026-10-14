@@ -19,6 +19,7 @@ import {
   planGardenMazePieces,
 } from './garden_maze_core';
 import { GFX } from './gfx';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface GardenFeaturesView {
@@ -148,7 +149,12 @@ function buildFountain(x: number, z: number, y: number): THREE.Group {
   return g;
 }
 
-export function buildGardenFeatures(seed: number): GardenFeaturesView {
+export function buildGardenFeatures(
+  seed: number,
+  // The document may own the giants as placements (jungle_features doctrine):
+  // the renderer copy stands down or the movable tree sits inside a ghost.
+  renderGreatTrees = !activeWorldPromoted('greatTrees'),
+): GardenFeaturesView {
   const group = new THREE.Group();
   group.name = 'garden-features';
 
@@ -272,7 +278,7 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
       }
       return m2;
     };
-    const trees = EVERGARDEN_PROPS.greatTrees ?? [];
+    const trees = renderGreatTrees ? (EVERGARDEN_PROPS.greatTrees ?? []) : [];
     if (greatTreeScene) {
       for (const t of trees) {
         const y = terrainHeight(t.x, t.z, seed);

@@ -28,7 +28,11 @@ import {
   bakeSwellGate,
   buildWaterSurfaceIndex,
   buildWaterSurfaceTileIndex,
+  clampsDryShoreDepth,
+  drawnWaterLevelAt,
+  SHORE_SLOPE_SAMPLE_HALF_WIDTH,
   shoreDepthAt,
+  shoreDepthAttribute,
   shoreSlopeAt,
   WATER_FIELD_EDGE_FEATHER_UV,
   WATER_FOAM_WIDTH_YARDS,
@@ -421,6 +425,15 @@ export interface WaterView {
    * Phong tier has no shore attribute and only repositions its one plane.
    */
   setLevel(): void;
+  /**
+   * Editor-only: the same shore re-bake as setLevel, but only for the sheet
+   * vertices inside one edited rect (a sculpt stroke's bounds), plus the
+   * whole-sheet swell gate and dry-tile cull re-derived from them. This is
+   * what keeps the water in step with the terrain after every stroke: ground
+   * lowered under the waterline gets its surface back instead of showing the
+   * bare seabed (or the dark horizon apron) through a hole in the sea.
+   */
+  refreshRegion(minX: number, minZ: number, maxX: number, maxZ: number): void;
   /**
    * Releases the one water sheet built for `zoneId` (front mesh, its
    * underside twin, and their shared geometry; the surface material is
@@ -877,6 +890,14 @@ ${biomeHazeFragmentGlsl('vWPos.xz')}
   }
 `;
 
+/** True when a geometry's live index already holds exactly `next`. */
+function sameIndexArray(current: THREE.BufferAttribute | null, next: ArrayLike<number>): boolean {
+  if (!current || current.array.length !== next.length) return false;
+  const a = current.array;
+  for (let i = 0; i < next.length; i++) if (a[i] !== next[i]) return false;
+  return true;
+}
+
 function disposeOwned(meshes: THREE.Mesh[]): void {
   const materials = new Set<THREE.Material>();
   for (const mesh of meshes) {
@@ -990,7 +1011,7 @@ async function fillShoreOffThread(
     x[i] = pos.getX(i);
     z[i] = pos.getZ(i);
   }
-  const filled = await pool.fillWater({ x, z, seed }, { urgent });
+  const filled = await pool.fillWater({ x, z, seed, clampDry: clampsDryShoreDepth() }, { urgent });
   if (!filled) return false;
   shoreDepth.set(filled.shoreDepth);
   shoreSlope.set(filled.shoreSlope);
@@ -1042,7 +1063,16 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   // the baked bounding volumes stay valid. `mesh` is null for the apron (it
   // spans the whole map and is never released); every other entry carries the
   // front mesh its closure refits, so unloadZone can find and drop just one.
-  const refits: { mesh: THREE.Mesh | null; refit: () => void }[] = [];
+  // `refitRegion` is the same refit over one edited rect only (a sculpt
+  // stroke): it re-samples just the vertices whose ground can have moved, then
+  // re-derives the cheap whole-sheet passes (swell gate, dry-tile cull) from
+  // the updated attribute, so newly flooded ground gets water and newly
+  // raised ground drops it without the full 32k-vertex bake.
+  const refits: {
+    mesh: THREE.Mesh | null;
+    refit: () => void;
+    refitRegion: (minX: number, minZ: number, maxX: number, maxZ: number) => void;
+  }[] = [];
   // The apron: one huge deep-sea sheet running far past every map edge, so
   // looking off the world's side reads as open ocean to the horizon, never
   // a water plane ending in mid-air. It sits a hair below the zone planes
@@ -1071,52 +1101,56 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     // at a ruler-straight 23 to 30 percent luma step along the outer coasts).
     const half = WORLD_MAX_X;
     const edgeDepthCache = new Map<string, number>();
-    const fillApron = (): void => {
-      edgeDepthCache.clear();
-      for (let i = 0; i < pos.count; i++) {
-        const x = pos.getX(i);
-        const z = pos.getZ(i);
-        // Distance OUTSIDE the world rect: 0 anywhere the zone planes cover.
-        const outside = Math.max(0, Math.abs(x) - half, z - WORLD_MAX_Z, WORLD_MIN_Z - z);
-        // The apron is thousands of yards across and the world is 360, so the
-        // vast majority of vertices are far outside and need no sampling at
-        // all. Skipping them is what keeps this bake cheap enough to run
-        // inline: terrainHeight is deliberately rich and shoreSlopeAt costs
-        // four samples of it.
-        if (outside >= APRON_TERRAIN_FADE_YARDS) {
-          deep[i] = WATER_SEABED_CLAMP_YARDS;
-          apronSlope[i] = APRON_SHORE_SLOPE;
-          continue;
-        }
-        const t = outside / APRON_TERRAIN_FADE_YARDS;
-        const toConstant = t * t * (3 - 2 * t); // smoothstep, flat at both ends
-        // Sample the nearest point INSIDE the world, never past it. Inside, that
-        // is the vertex itself, so the apron reads the exact function the zone
-        // planes read and the seam closes by construction. Outside, it extends
-        // the coast's own depth and fades to open sea. Sampling the real
-        // terrain out there instead looks tempting and is wrong: it is another
-        // landmass (measured -518 yards, i.e. dry ground), so it would paint
-        // land and surf across the open horizon.
-        // Every vertex on a ray heading straight out of one edge clamps to the
-        // SAME boundary point, so the samples collapse heavily. Memoize them.
-        const cx = Math.min(half, Math.max(-half, x));
-        const cz = Math.min(WORLD_MAX_Z, Math.max(WORLD_MIN_Z, z));
-        const key = `${cx},${cz}`;
-        let edgeDepth = edgeDepthCache.get(key);
-        if (edgeDepth === undefined) {
-          edgeDepth = shoreDepthAt(cx, cz, seed);
-          edgeDepthCache.set(key, edgeDepth);
-        }
-        const carried = outside > 0 ? Math.max(edgeDepth, 0) : edgeDepth;
-        deep[i] = carried * (1 - toConstant) + WATER_SEABED_CLAMP_YARDS * toConstant;
+    // Distance OUTSIDE the world rect: 0 anywhere the zone planes cover.
+    const outsideWorld = (x: number, z: number): number =>
+      Math.max(0, Math.abs(x) - half, z - WORLD_MAX_Z, WORLD_MIN_Z - z);
+    const fillApronVertex = (i: number): void => {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      const outside = outsideWorld(x, z);
+      // The apron is thousands of yards across and the world is 360, so the
+      // vast majority of vertices are far outside and need no sampling at
+      // all. Skipping them is what keeps this bake cheap enough to run
+      // inline: terrainHeight is deliberately rich and shoreSlopeAt costs
+      // four samples of it.
+      if (outside >= APRON_TERRAIN_FADE_YARDS) {
+        deep[i] = WATER_SEABED_CLAMP_YARDS;
+        apronSlope[i] = APRON_SHORE_SLOPE;
+        return;
       }
-      // Slope is the GRADIENT of the depth just filled, so take it by finite
-      // difference on the grid instead of calling shoreSlopeAt: that costs four
-      // more terrainHeight samples per vertex and terrainHeight is the
-      // expensive part. It cannot be dropped for a constant either: the shader
-      // reads foam as depth/slope, and a constant slope of 1 against the real
-      // shelf depths out here (~1.5 yards) lands inside the surf band and would
-      // paint foam across open water.
+      const t = outside / APRON_TERRAIN_FADE_YARDS;
+      const toConstant = t * t * (3 - 2 * t); // smoothstep, flat at both ends
+      // Sample the nearest point INSIDE the world, never past it. Inside, that
+      // is the vertex itself, so the apron reads the exact function the zone
+      // planes read and the seam closes by construction. Outside, it extends
+      // the coast's own depth and fades to open sea. Sampling the real
+      // terrain out there instead looks tempting and is wrong: it is another
+      // landmass (measured -518 yards, i.e. dry ground), so it would paint
+      // land and surf across the open horizon.
+      // Every vertex on a ray heading straight out of one edge clamps to the
+      // SAME boundary point, so the samples collapse heavily. Memoize them.
+      const cx = Math.min(half, Math.max(-half, x));
+      const cz = Math.min(WORLD_MAX_Z, Math.max(WORLD_MIN_Z, z));
+      const key = `${cx},${cz}`;
+      let edgeDepth = edgeDepthCache.get(key);
+      if (edgeDepth === undefined) {
+        edgeDepth = shoreDepthAt(cx, cz, seed);
+        edgeDepthCache.set(key, edgeDepth);
+      }
+      const carried =
+        outside > 0
+          ? Math.max(edgeDepth, 0)
+          : shoreDepthAttribute(edgeDepth, clampsDryShoreDepth());
+      deep[i] = carried * (1 - toConstant) + WATER_SEABED_CLAMP_YARDS * toConstant;
+    };
+    // Slope is the GRADIENT of the depth just filled, so take it by finite
+    // difference on the grid instead of calling shoreSlopeAt: that costs four
+    // more terrainHeight samples per vertex and terrainHeight is the
+    // expensive part. It cannot be dropped for a constant either: the shader
+    // reads foam as depth/slope, and a constant slope of 1 against the real
+    // shelf depths out here (~1.5 yards) lands inside the surf band and would
+    // paint foam across open water.
+    const fillApronSlope = (): void => {
       const columns = apronSegments + 1;
       const dx = (2 * width) / apronSegments;
       const dz = (2 * span) / apronSegments;
@@ -1130,6 +1164,29 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
         // Never zero: the shader divides by this.
         apronSlope[i] = Math.max(Math.hypot((east - west) / dx, (south - north) / dz), 1e-4);
       }
+    };
+    const fillApron = (): void => {
+      edgeDepthCache.clear();
+      for (let i = 0; i < pos.count; i++) fillApronVertex(i);
+      fillApronSlope();
+    };
+    // Region re-sample: only vertices whose terrain SAMPLE point (the vertex,
+    // or its clamp onto the world rect) lies in the edited rect can change.
+    const fillApronRegion = (minX: number, minZ: number, maxX: number, maxZ: number): boolean => {
+      edgeDepthCache.clear();
+      let touched = false;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const z = pos.getZ(i);
+        if (outsideWorld(x, z) >= APRON_TERRAIN_FADE_YARDS) continue;
+        const cx = Math.min(half, Math.max(-half, x));
+        const cz = Math.min(WORLD_MAX_Z, Math.max(WORLD_MIN_Z, z));
+        if (cx < minX || cx > maxX || cz < minZ || cz > maxZ) continue;
+        fillApronVertex(i);
+        touched = true;
+      }
+      if (touched) fillApronSlope();
+      return touched;
     };
     fillApron();
     geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(deep, 1));
@@ -1229,8 +1286,10 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       // in the new sea.
       for (const tile of apronTiles) {
         const index = buildWaterSurfaceTileIndex(deep, apronColumns, tile.region);
-        tile.geometry.setIndex(new THREE.BufferAttribute(index, 1));
         tile.mesh.visible = index.length > 0;
+        // Unchanged blocks keep their live buffer (a stroke touches a few).
+        if (sameIndexArray(tile.geometry.getIndex(), index)) continue;
+        tile.geometry.setIndex(new THREE.BufferAttribute(index, 1));
       }
     };
     refits.push({
@@ -1242,6 +1301,13 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
         refitApronGate();
         recullApron();
         for (const tile of apronTiles) tile.mesh.position.y = waterLevel() - 0.02;
+      },
+      refitRegion: (minX, minZ, maxX, maxZ) => {
+        if (!fillApronRegion(minX, minZ, maxX, maxZ)) return;
+        (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
+        (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
+        refitApronGate();
+        recullApron();
       },
     });
     // The source geometry only ever carried the shared attributes; the blocks
@@ -1386,7 +1452,10 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       const start = row * columns;
       const end = Math.min(pos.count, start + columns);
       for (let i = start; i < end; i++) {
-        shoreDepth[i] = shoreDepthAt(pos.getX(i), pos.getZ(i), seed);
+        shoreDepth[i] = shoreDepthAttribute(
+          shoreDepthAt(pos.getX(i), pos.getZ(i), seed),
+          clampsDryShoreDepth(),
+        );
         shoreSlope[i] = shoreSlopeAt(pos.getX(i), pos.getZ(i), seed);
       }
     };
@@ -1437,6 +1506,10 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     const fullIndex = geo.getIndex();
     const cullZone = (): void => {
       const culled = buildWaterSurfaceIndex(shoreDepth, columns, SEGMENTS_PER_ZONE + 1);
+      const next = culled ?? fullIndex?.array;
+      // A stroke far from the waterline leaves the kept set as it was: keep
+      // the live buffer rather than churning a fresh upload per stroke.
+      if (next && sameIndexArray(geo.getIndex(), next)) return;
       geo.setIndex(culled ? new THREE.BufferAttribute(culled, 1) : fullIndex);
     };
     cullZone();
@@ -1463,6 +1536,23 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
         refitPlaneGate();
         cullZone();
         mesh.position.y = waterLevel();
+      },
+      refitRegion: (minX, minZ, maxX, maxZ) => {
+        if (maxX < x0 || minX > x1 || maxZ < rect.zMin || minZ > rect.zMax) return;
+        let touched = false;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const z = pos.getZ(i);
+          if (x < minX || x > maxX || z < minZ || z > maxZ) continue;
+          shoreDepth[i] = shoreDepthAttribute(shoreDepthAt(x, z, seed), clampsDryShoreDepth());
+          shoreSlope[i] = shoreSlopeAt(x, z, seed);
+          touched = true;
+        }
+        if (!touched) return;
+        (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
+        (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
+        refitPlaneGate();
+        cullZone();
       },
     });
     return mesh;
@@ -1549,7 +1639,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       // Above the flat surface it costs nothing anyway (a BackSide sheet is
       // back-face culled from above until displacement lifts it over the eye),
       // and it must exceed the worst-case chop + groundswell + wobble lift.
-      const surfaceY = waterLevelAt(cameraX, cameraZ, seed);
+      const surfaceY = drawnWaterLevelAt(cameraX, cameraY, cameraZ, seed);
       const under = cameraY < surfaceY + 1.1;
       for (const pair of underPairs) {
         pair.under.position.y = pair.front.position.y;
@@ -1614,9 +1704,20 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       // it this frame rather than holding the last wake forever.
       if (!enabled) simulation?.reset();
     },
+    refreshRegion(minX: number, minZ: number, maxX: number, maxZ: number): void {
+      // Widen by the shore-slope probe: a vertex just outside the edit reads
+      // edited ground through its finite difference.
+      const pad = SHORE_SLOPE_SAMPLE_HALF_WIDTH;
+      for (const entry of refits) entry.refitRegion(minX - pad, minZ - pad, maxX + pad, maxZ + pad);
+    },
     setLevel(): void {
       simulation?.reset();
       for (const entry of refits) entry.refit();
+      // The refits re-seat the FRONT sheets only. An underside twin copies its
+      // front's position once, at build, so without this every from-below
+      // ceiling stays at the old waterline: after an editor level change the
+      // surface you swim under sits yards away from the one you see from above.
+      for (const pair of underPairs) pair.under.position.copy(pair.front.position);
     },
     unloadZone(zoneId: string): void {
       // See terrain.ts's unloadZone for why this guard exists: unreachable
@@ -1693,6 +1794,8 @@ function buildPhongWater(): WaterView {
     setWavesEnabled: () => {},
     undersideRoot: () => null,
     setUndersideHeld: () => {},
+    // One flat plane with no shore attribute or cull: nothing reads terrain.
+    refreshRegion: () => {},
     setLevel(): void {
       for (const m of meshes) m.position.y = waterLevel();
     },

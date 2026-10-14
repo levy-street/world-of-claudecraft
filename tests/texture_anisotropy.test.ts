@@ -119,7 +119,9 @@ describe('texture anisotropy budget', () => {
 // literal back reds here, which is the point: the ladder is only worth
 // anything if nothing bypasses it.
 const CONSUMERS: ReadonlyArray<readonly [string, number]> = [
-  ['src/render/terrain.ts', 3],
+  // The fourth terrain site is the packed splat NORMAL array
+  // (buildSplatNormalArray, Studio merge); it routes through the knob too.
+  ['src/render/terrain.ts', 4],
   ['src/render/assets/loader.ts', 1],
   ['src/render/detail_normals.ts', 1],
   ['src/render/canopy_detail.ts', 1],

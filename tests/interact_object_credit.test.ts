@@ -14,6 +14,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { BOOTCAMP_COURSE_CHECKPOINTS } from '../src/sim/content/proving_shore';
+import { SCORCHING_QUESTS } from '../src/sim/content/scorching_wastes';
 import { DUNGEONS, GROUND_OBJECTS, QUESTS } from '../src/sim/data';
 import {
   hasInteractObjectCredit,
@@ -151,8 +152,16 @@ describe('interact objectives credit once per distinct object', () => {
     // the IDENTICAL key string, so nothing about the key keeps them apart: the
     // isolation comes from the ledger living on each quest's own QuestProgress.
     const key = interactObjectCreditKey(0, { x: 256, z: 0 });
-    const questA: QuestProgress = { questId: 'a', counts: [0], state: 'active' };
-    const questB: QuestProgress = { questId: 'b', counts: [0], state: 'active' };
+    const questA: QuestProgress = {
+      questId: 'a',
+      counts: [0],
+      state: 'active',
+    };
+    const questB: QuestProgress = {
+      questId: 'b',
+      counts: [0],
+      state: 'active',
+    };
     recordInteractObjectCredit(questA, key);
     expect(hasInteractObjectCredit(questA, key)).toBe(true);
     expect(hasInteractObjectCredit(questB, key), 'the other quest is untouched').toBe(false);
@@ -169,13 +178,25 @@ describe('every multi-count interact objective has enough distinct objects to fi
     placedByItem.set(def.itemId, (placedByItem.get(def.itemId) ?? 0) + def.positions.length);
   }
 
-  const interactObjectives = Object.values(QUESTS).flatMap((quest) =>
-    quest.objectives.flatMap((o, i) =>
-      o.type === 'interact' && o.targetObjectItemId
-        ? [{ questId: quest.id, itemId: o.targetObjectItemId, count: o.count, index: i }]
-        : [],
-    ),
-  );
+  // FORK: the Scorching Wastes is a CUSTOM-MAP zone; its interact objects are
+  // placed by the authored map document, never by GROUND_OBJECTS, so its quests
+  // sit outside this built-in-world placement ledger.
+  const interactObjectives = Object.values(QUESTS)
+    .filter((quest) => !(quest.id in SCORCHING_QUESTS))
+    .flatMap((quest) =>
+      quest.objectives.flatMap((o, i) =>
+        o.type === 'interact' && o.targetObjectItemId
+          ? [
+              {
+                questId: quest.id,
+                itemId: o.targetObjectItemId,
+                count: o.count,
+                index: i,
+              },
+            ]
+          : [],
+      ),
+    );
 
   it('covers the 24 multi-count objectives the exploit applied to', () => {
     // 20 at the ledger's introduction, plus the quest-dedupe murloc-hut burn
@@ -465,7 +486,11 @@ describe('the ledger survives a save/load round-trip', () => {
       interactObjectCreditKey(0, bells[0].pos),
     ]);
 
-    const reloaded = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true }) as AnySim;
+    const reloaded = new Sim({
+      seed: 11,
+      playerClass: 'warrior',
+      noPlayer: true,
+    }) as AnySim;
     const rePid = reloaded.addPlayer('warrior', 'Reload', { state: saved });
     const reQp = reloaded.meta(rePid)?.questLog.get(BELLS_QUEST) as QuestProgress;
     const reBells = [...reloaded.entities.values()].filter(
@@ -488,7 +513,11 @@ describe('the load path normalizes an untrusted ledger', () => {
     const saved = JSON.parse(JSON.stringify(donor.sim.serializeCharacter(donor.sim.playerId)));
     const row = saved.questLog.find((q: any) => q.questId === BELLS_QUEST);
     row.creditedObjects = creditedObjects;
-    const sim = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'warrior',
+      noPlayer: true,
+    }) as AnySim;
     const pid = sim.addPlayer('warrior', 'Reload', { state: saved });
     return sim.meta(pid)?.questLog.get(BELLS_QUEST);
   }
@@ -552,7 +581,10 @@ describe('the ledger ships to clients (the opened-crate per-viewer hide)', () =>
     ).toBe(true);
     expect(
       isObjectOpenedByViewer(
-        { objectItemId: 'ps_castaway_crate', pos: { x: crate.x + 40, z: crate.z } },
+        {
+          objectItemId: 'ps_castaway_crate',
+          pos: { x: crate.x + 40, z: crate.z },
+        },
         mirrored,
       ),
     ).toBe(false);

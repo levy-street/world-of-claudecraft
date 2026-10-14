@@ -11,6 +11,7 @@ import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface HauntFeaturesView {
@@ -82,7 +83,11 @@ function glowTexture(): THREE.CanvasTexture | null {
   return new THREE.CanvasTexture(canvas);
 }
 
-export function buildHauntFeatures(seed: number): HauntFeaturesView {
+export function buildHauntFeatures(
+  seed: number,
+  // The document may own the giants as placements (jungle_features doctrine).
+  renderGreatTrees = !activeWorldPromoted('greatTrees'),
+): HauntFeaturesView {
   const group = new THREE.Group();
   group.name = 'haunt-features';
   const glowLights: THREE.PointLight[] = [];
@@ -109,7 +114,7 @@ export function buildHauntFeatures(seed: number): HauntFeaturesView {
       }
       return m;
     };
-    if (greatTreeScene) {
+    if (greatTreeScene && renderGreatTrees) {
       for (const t of WRAITHWOOD_PROPS.greatTrees ?? []) {
         const y = terrainHeight(t.x, t.z, seed);
         if (y < WATER_LEVEL) continue;

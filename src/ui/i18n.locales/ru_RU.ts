@@ -1153,6 +1153,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC Рекорды',
   'landing.scout': 'WoC Разведка',
   'landing.parseService': 'WoC Боевые отчёты',
+  'editor.buildMode.materialNames.WardenStone': 'Гладкий камень',
+  'editor.buildMode.diagonal': 'Диагональные стены',
+  'editor.buildMode.diagonalHint':
+    'Перетащите указатель между узлами сетки, чтобы построить стену под любым углом.',
   'guide.professions.endgameBodyRaidCollections':
     'Ковка мастера объединяет вещи с меткой «Уникальный (экипируется): Ковка мастера». Прежняя вершина ремесла по-прежнему использует найденные схемы, промежуточные изделия с суточным ограничением и общие материалы финального этапа. Комплекты Горнила представляют отдельный путь с рейдовыми материалами, а не дополнительные расходы поверх прежней цепочки. Обе группы делят один предел ношения в две вещи, поэтому конкурируют за одни и те же два места в вашей сборке. Готовые вещи свободно продаются, пока доведение до совершенства или заказное изготовление не привяжет конкретный экземпляр.',
   'guide.professions.endgamePatternsBodyCollections':
@@ -18591,6 +18595,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Прекрасно начертано! Ваши шаги заслужили золотую оценку.',
   'questUi.worldQuest.traceReaction.elianComplete':
     'Руна завершена! Старательная практика сделает следующую ещё лучше.',
+  'hudChrome.realmBuilder.title': 'Зодчий месяца',
+  'hudChrome.realmBuilder.currentLabel': 'Отмечен в этом месяце',
   'guide.arenaPage.honorFinalNoteSoldBack':
     'Покупки за честь окончательны. Список выкупа у торговца хранит лишь то, что вы продали: купленное за монеты обычно можно продать обратно по цене продажи и, если вы снова передумаете, выкупить из этого списка, но снаряжение Боевой мощи становится персональным в тот же миг, как вы его купили, так что его нельзя ни обменять, ни отправить почтой, ни продать обратно хоть за что-нибудь, и в этот список оно не попадает никогда. Потому магазин и просит подтверждения: прочтите описание вещи, прежде чем нажать.',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -18665,8 +18671,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': 'Разделить по сборщикам',
   'hudChrome.itemMenu.takeChosenQuantity': 'Взять выбранное количество',
   'hudChrome.itemMenu.combine': 'Объединить стопки материалов',
-  'hudChrome.realmBuilder.title': 'Зодчий месяца',
-  'hudChrome.realmBuilder.currentLabel': 'Отмечен в этом месяце',
   'hudChrome.realmBuilder.placeholderName': 'Ваше имя',
   'hudChrome.realmBuilder.placeholderHint': 'Эта табличка ждёт своего первого имени.',
   'hudChrome.realmBuilder.pastTitle': 'Прежние зодчие',

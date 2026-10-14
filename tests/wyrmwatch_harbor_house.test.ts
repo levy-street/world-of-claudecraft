@@ -44,6 +44,7 @@ const DOOR_Z = H.z + H.hd; // the door wall's outer face
 /** Clearance between a circle and a collider (negative = overlap). */
 function clearance(x: number, z: number, r: number, c: Collider): number {
   if (c.type === 'circle') return Math.hypot(x - c.x, z - c.z) - c.r - r;
+  if (c.type === 'prism') throw new Error('unexpected prism collider');
   const cos = Math.cos(-c.rot);
   const sin = Math.sin(-c.rot);
   const lx = (x - c.x) * cos + (z - c.z) * sin;

@@ -2358,6 +2358,16 @@ export const hudChromeStrings = {
     flagTakenLog: '{name} has taken the {team} flag!',
     flagDroppedLog: 'The {team} flag was dropped.',
     flagReturnedLog: 'The {team} flag was returned.',
+    // The authored-map flag rehearsal (src/sim/social/map_objectives_run.ts) logs
+    // a sim line per flag call, matched in src/ui/sim_i18n.ts. Taken, captured
+    // and the clock's return reuse the three lines above; these two name the
+    // player who dropped or returned the flag.
+    flagDroppedByLog: '{name} dropped the {team} flag.',
+    flagReturnedByLog: '{name} returned the {team} flag.',
+    // The two flag objects' names (entityDisplayName, src/ui/entity_display_core.ts),
+    // for the battleground's flags and the authored-map rehearsal's alike.
+    flagNameCrimson: 'Crimson Flag',
+    flagNameAzure: 'Azure Flag',
     // The touch-host confirm for the voluntary flag drop (a long press is also the
     // tooltip-peek gesture, so this cancel is the one that must not fire by accident).
     dropFlagConfirmTitle: 'Drop the flag?',

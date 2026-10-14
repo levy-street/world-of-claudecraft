@@ -518,12 +518,17 @@ describe('pooled VFX cloud', () => {
     // camera-shake updateMatrixWorld.
     // The call consumes its boolean return into the presented-frames counter
     // (phase 4 QA F4), so the pattern anchors the whole consuming statement.
+    // Since the ClaudeCraft Studio import the call sits inside the authored-map
+    // underworld mask's try/finally, so the result lands in `presented` first
+    // and that flag feeds the counter straight after the unmask.
     const presentSites = [
-      ...source.matchAll(
-        /\n\s*if \(presentFrame\(host, dt, present\)\) this\.presentedFrameCount\+\+;/g,
-      ),
+      ...source.matchAll(/\n\s*presented = presentFrame\(host, dt, present\);/g),
     ];
     expect(presentSites).toHaveLength(1);
+    expect(source.match(/presentFrame\(host, dt, present\)/g)).toHaveLength(1);
+    expect(source).toMatch(
+      /presented = presentFrame\(host, dt, present\);\n\s*\} finally \{\n\s*if \(underworld\) this\.underworld\.unmask\(\);\n\s*\}\n\s*if \(presented\) this\.presentedFrameCount\+\+;/,
+    );
     for (const site of presentSites) {
       const before = source.slice(0, site.index).trimEnd();
       // The camera-shake refresh spells refreshFrozenWorldMatrix since the

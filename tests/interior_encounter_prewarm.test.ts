@@ -167,11 +167,17 @@ describe('interior encounter prewarm spec', () => {
 
     const renderer = readSource('../src/render/renderer.ts');
     const buildStart = renderer.indexOf('private buildInterior(');
-    const buildEnd = renderer.indexOf('\n  // Outdoor fog presets', buildStart);
+    // Bounded by the next method: the biome fog table that used to follow it
+    // moved to src/render/outdoor_biome_presets.ts.
+    const buildEnd = renderer.indexOf('\n  private outdoorFogPreset(', buildStart);
+    expect(buildStart).toBeGreaterThan(-1);
+    expect(buildEnd).toBeGreaterThan(buildStart);
     const build = renderer.slice(buildStart, buildEnd);
     expect(build).toContain('encounterPrewarm.startInteriorEncounterPrewarm(interior, this)');
     const kickAt = build.indexOf('encounterPrewarm.startInteriorEncounterPrewarm(interior, this)');
-    const kitAt = build.indexOf('.buildInterior(interior, ox, oz, opts)');
+    // The kit build's last argument is the opts, or the editor's draft-layout
+    // override merged into them, so the anchor stops at the shared prefix.
+    const kitAt = build.indexOf('.buildInterior(interior, ox, oz, ');
     expect(kickAt).toBeGreaterThan(-1);
     expect(kitAt).toBeGreaterThan(kickAt);
 

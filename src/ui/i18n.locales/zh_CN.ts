@@ -1096,6 +1096,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 记录',
   'landing.scout': 'WoC 侦察',
   'landing.parseService': 'WoC 战斗日志',
+  'editor.buildMode.materialNames.WardenStone': '光滑石材',
+  'editor.buildMode.diagonal': '斜墙',
+  'editor.buildMode.diagonalHint': '在网格点之间拖动，以任意角度绘制墙体。',
   'guide.professions.endgameBodyRaidCollections':
     '大师锻造是带有“唯一装备：大师锻造”标记的共同装备家族。旧有的巅峰制作路线仍需寻找图样、制作每日限次的中间材料，并消耗共同的终局材料。熔炉套装则是由团队副本材料支持的独立路线，并非在旧路线之上再加一套费用。两条路线共用最多穿戴两件的限制，因此会竞争配装中的同两个位置。成品在臻至完美或委托绑定该件物品之前都可自由交易。',
   'guide.professions.endgamePatternsBodyCollections':
@@ -17382,6 +17385,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '最后一道符文。线条可能交叉或再次经过同一点；跟随亮起的标记前往下一个拐角。',
   'questUi.worldQuest.traceReaction.elianGold': '描绘得真漂亮！你的脚步赢得了金色的荣耀。',
   'questUi.worldQuest.traceReaction.elianComplete': '符文完成了！用心练习，下次一定会更好。',
+  'hudChrome.realmBuilder.title': '本月王国建造者',
+  'hudChrome.realmBuilder.currentLabel': '本月荣誉获得者',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '荣誉购买是最终的。回购列表里只会有你卖出去的东西：用钱币买下的东西通常可以按出售价格卖回给商人，若你再次改变主意，还能从那份列表里把它买回来；但战争套装在你买下的那一刻便已灵魂绑定，因此它再也无法交易、邮寄，或以任何形式退回，也永远不会进入那份列表。商店正因如此才要你确认一次：按下之前，请把那件装备看清楚。',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -17454,8 +17459,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '按采集者拆分',
   'hudChrome.itemMenu.takeChosenQuantity': '取出指定数量',
   'hudChrome.itemMenu.combine': '合并素材堆叠',
-  'hudChrome.realmBuilder.title': '本月王国建造者',
-  'hudChrome.realmBuilder.currentLabel': '本月荣誉获得者',
   'hudChrome.realmBuilder.placeholderName': '你的名字',
   'hudChrome.realmBuilder.placeholderHint': '这块铭牌还在等待它的第一个名字。',
   'hudChrome.realmBuilder.pastTitle': '历届荣誉获得者',

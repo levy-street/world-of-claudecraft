@@ -20,6 +20,7 @@
 // returns the already-linked program.
 
 import type * as THREE from 'three';
+import { reapplyTownSmartToClone } from './assets/town_smart_material';
 import { reattachBiomeHazeToClone } from './biome_haze_field';
 import { reapplyArmorDyeToClone } from './characters/armor_dye';
 import { addRimGlow, hasRimGlow } from './gfx';
@@ -59,6 +60,10 @@ export function reattachClonedMaterialHooks(source: THREE.Material, clone: THREE
   // factories decorate their emissive building materials here, and those
   // materials are exactly the ones the occluder fade re-clones.
   reapplyVertexColorEmissiveToClone(clone);
+  // The town kit's weathering layer (reads userData.townSmart, which clone()
+  // did copy); a no-op for every other material. Before the dither, because
+  // the town kit applies it when it mints the material, not on a finished one.
+  reapplyTownSmartToClone(clone);
   // Every batch factory attaches the per-instance ghost dither to a finished
   // material (instanced_dither_fade.ts), so it is the outermost layer.
   reapplyInstancedDitherFadeToClone(clone);

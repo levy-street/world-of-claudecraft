@@ -272,8 +272,9 @@ describe('the renderer wiring (source pin)', () => {
     const between = renderer.slice(at + 'castVfxFirstReadsEntry('.length + 6, primitives);
     expect(between).not.toMatch(/id: '/);
     expect(between.match(factoryCall)).toBeNull();
-    expect(between).toContain(
-      '[this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()],',
+    // The AoE ring pool lives in ground_feedback.ts; the renderer owns it.
+    expect(between).toMatch(
+      /\[\s*this\.abilityVfxFx\.ccBandDrawable\(\),\s*this\.groundFeedback\.aoeRings\[0\]\?\.ring,\s*this\.vfx\.cloudDrawable\(\),?\s*\],/,
     );
     expect(between).toContain('this.compileArms,');
     expect(between).toContain('this.webgl,');
@@ -334,8 +335,8 @@ describe('the renderer wiring (source pin)', () => {
 
   it('builds every ring slot with the shared builder the fixture uses', () => {
     expect(renderer).toContain('const ring = buildAoeRingMesh(aoeRingGeo);');
-    expect(renderer).toContain(
-      'this.aoeRings.push({ ring, mat: ring.material, radius: 1, elapsed: AOE_RING_LIFETIME });',
+    expect(renderer).toMatch(
+      /this\.groundFeedback\.aoeRings\.push\(\{\s*ring,\s*mat: ring\.material,\s*radius: 1,\s*elapsed: AOE_RING_LIFETIME,?\s*\}\);/,
     );
   });
 });

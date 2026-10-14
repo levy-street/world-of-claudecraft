@@ -1079,6 +1079,14 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   // dungeon_finder.ts's assembled line both sat outside the guard that way).
   const nr = new RegExp(`(?:this|ctx)\\.(?:notice|stopFollow)\\([^,()]+,\\s*${lit}`, 'g');
   for (const m of simSrc.matchAll(nr)) cands.push({ type: 'log', tmpl: unq(m[1]) });
+  // Module-local broadcast helpers named `announce` fan ONE line out as a 'log'
+  // emit with the text in a variable, which every emit form above misses: the
+  // rift portals' announce(ctx, '<lit>', color) and the authored-map flag
+  // rehearsal's announce(ctx, run, '<lit>', color). The optional middle arg is
+  // a bare identifier only (never a literal), so the two-arg form cannot read
+  // its COLOR as the text; the call may wrap (biome puts each arg on its line).
+  const an = new RegExp(`\\bannounce\\(\\s*ctx,\\s*(?:[A-Za-z_$][\\w$.]*,\\s*)?${lit}`, 'g');
+  for (const m of simSrc.matchAll(an)) cands.push({ type: 'log', tmpl: unq(m[1]) });
   // Ternary args to error/notice/stopFollow (both branches). The first-arg
   // class spans newlines (a biome-wrapped call puts each arg on its own line)
   // but still excludes parens, so a single-arg call cannot bleed into the NEXT
@@ -1606,6 +1614,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // class below would otherwise read `rank` as 5); the bracketed arm has its
     // own matcher cases in tests/server_i18n.test.ts.
     if (/RANK_LABEL|rankLabel\(/.test(expr)) return 'Officer';
+    // A rift tier is one letter of the C/B/A/S ladder (RiftTier), and the rift
+    // portal announcements' rules match exactly that class, so a NAME probe
+    // would fail them for the wrong reason.
+    if (/\btier\b/.test(expr)) return 'S';
     if (
       // The three ready-check tallies are counts whose names say so in words
       // rather than in any of the stems below, so they read as a NAME and the
@@ -1761,6 +1773,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'dungeon_finder.ts',
       'fiesta.ts',
       'fiesta_bots.ts',
+      'map_objective_bots.ts',
+      'map_objectives_hooks.ts',
+      'map_objectives_run.ts',
       'party.ts',
       'pull_timer.ts',
       'ready_check.ts',
@@ -1877,6 +1892,11 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     // e3 anti-bleed: the newline-tolerant condm must still stop at ';' and ')', so
     // an emit followed by an unrelated wrapped ternary cannot harvest its branches.
     "ctx.emit({ type: 'log', text: 'SYNTH_EMIT_STOP' });\ny =\n  b\n    ? 'EMIT_TERN_BLEED_A'\n    : 'EMIT_TERN_BLEED_B';",
+    // an: the module-local announce helpers. The two-arg form (rift portals) must
+    // read the text, never the trailing color literal; the run-carrying form
+    // (map objectives) arrives biome-wrapped, one arg per line.
+    "announce(ctx, `SYNTH_ANNOUNCE ${tier}`, '#ANNOUNCE_COLOR_BLEED');",
+    "announce(\n  ctx,\n  run,\n  `SYNTH_ANNOUNCE_RUN ${name}`,\n  '#ANNOUNCE_RUN_COLOR_BLEED',\n);",
   ].join('\n');
   const synthServer = [
     "this.send({ type: 'error', text: 'SYNTH_SERVER_INLINE' });", // s1
@@ -1930,6 +1950,8 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
       'log',
       'SYNTH_EMIT_STOP',
     ],
+    ['sim announce helper, two-arg form (an)', 'log', 'SYNTH_ANNOUNCE ${tier}'],
+    ['sim announce helper, run form, wrapped (an)', 'log', 'SYNTH_ANNOUNCE_RUN ${name}'],
     ['server inline text (s1)', 'error', 'SYNTH_SERVER_INLINE'],
     ['server ternary text, branch A (s1t)', 'log', 'SYNTH_SRV_TERN_A'],
     ['server ternary text, branch B (s1t)', 'log', 'SYNTH_SRV_TERN_B'],
@@ -1960,6 +1982,10 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     // Negative: the single-arg stopFollow's scan must NOT bleed past ')' into the
     // following track(...) call's literal (would regress if the nr first-arg class
     // ever stopped excluding ')').
+    // Negative: the announce form's optional middle arg is an identifier, so
+    // neither form can harvest its color literal as the line.
+    const colorBled = cands.filter((c) => c.tmpl.includes('COLOR_BLEED'));
+    expect(colorBled, 'announce form must never read the color arg as text').toEqual([]);
     const bled = cands.some((c) => c.tmpl === 'BLEED_SENTINEL_should_not_capture');
     expect(bled, "nr first-arg class must stop at ')' (no cross-call bleed)").toBe(false);
     const socialBled = cands.some((c) => c.tmpl === 'SOCIAL_BLEED_SENTINEL_should_not_capture');
@@ -2183,7 +2209,11 @@ describe('deploy-window aliases for wire-carried renames', () => {
     // bundle-only read proves the catalog really carries the key (fresh read
     // of the round-1 fix).
     expect(
-      tEntityOptional({ kind: 'dungeon', id: 'drowned_temple', field: 'enterText' }),
+      tEntityOptional({
+        kind: 'dungeon',
+        id: 'drowned_temple',
+        field: 'enterText',
+      }),
       'the English catalog carries the enterText row',
     ).toBe(live);
     try {

@@ -26,9 +26,19 @@ vi.mock('../server/db', () => ({
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
-  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
-  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
-  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  loadAccountFlair: vi.fn(async () => ({
+    ai: false,
+    streamer: false,
+    links: {},
+  })),
+  markAccountQuestComplete: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+  })),
+  grantAccountMechChroma: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+  })),
   setAccountWeaponSkinLoadout: vi.fn(async () => ({
     completedQuestIds: [],
     mechChromaIds: [],
@@ -69,7 +79,11 @@ const PROC_SEED = 2;
 // player parked in instance space, and a player moved to a different overworld
 // zone. Position pokes happen after all rng-relevant setup and draw nothing.
 function runScenario(opts?: { crafterInInstanceSpace?: boolean }) {
-  const sim = new Sim({ seed: PROC_SEED, playerClass: 'warrior', autoEquip: false });
+  const sim = new Sim({
+    seed: PROC_SEED,
+    playerClass: 'warrior',
+    autoEquip: false,
+  });
   const crafter = sim.playerId;
   const nearby = sim.addPlayer('mage', 'Bystander');
   const delver = sim.addPlayer('rogue', 'Delver');
@@ -91,6 +105,12 @@ function runScenario(opts?: { crafterInInstanceSpace?: boolean }) {
   // turn this player into an in-zone recipient).
   const farE = sim.entities.get(farhand)!;
   let z = farE.pos.z;
+  for (let i = 0; i < 400 && zoneAt(0, z).id === zoneId; i++) z += 50;
+  if (zoneAt(0, z).id === zoneId) {
+    z = farE.pos.z;
+    for (let i = 0; i < 400 && zoneAt(0, z).id === zoneId; i++) z -= 50;
+  }
+  expect(zoneAt(0, z).id).not.toBe(zoneId);
   for (let i = 0; i < 400 && zoneAt(farE.pos.x, z).id === zoneId; i++) z += 50;
   if (zoneAt(farE.pos.x, z).id === zoneId) {
     z = farE.pos.z;
@@ -218,8 +238,18 @@ describe('online ClientWorld host', () => {
       },
     ]);
     // A personal masterwork event afterwards assigns the mirror as before.
-    feed(client, { type: 'masterwork', recipeId: RECIPE_ID, itemId: ITEM_ID, crafter: 9, pid: 9 });
-    expect(client.lastMasterwork).toEqual({ recipeId: RECIPE_ID, itemId: ITEM_ID, crafter: 9 });
+    feed(client, {
+      type: 'masterwork',
+      recipeId: RECIPE_ID,
+      itemId: ITEM_ID,
+      crafter: 9,
+      pid: 9,
+    });
+    expect(client.lastMasterwork).toEqual({
+      recipeId: RECIPE_ID,
+      itemId: ITEM_ID,
+      crafter: 9,
+    });
   });
 });
 
@@ -237,7 +267,10 @@ function fakeWs(): { sent: { t: string; list?: SimEvent[] }[]; ws: unknown } {
   const sent: { t: string; list?: SimEvent[] }[] = [];
   return {
     sent,
-    ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) },
+    ws: {
+      readyState: 1,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+    },
   };
 }
 
@@ -272,6 +305,12 @@ describe('masterworkZone over the live GameServer wire (session routing)', () =>
     // silently turn them into an in-zone recipient).
     const farE = entities.get(sf.pid)!;
     let z = farE.pos.z;
+    for (let i = 0; i < 400 && zoneAt(0, z).id === zoneId; i++) z += 50;
+    if (zoneAt(0, z).id === zoneId) {
+      z = farE.pos.z;
+      for (let i = 0; i < 400 && zoneAt(0, z).id === zoneId; i++) z -= 50;
+    }
+    expect(zoneAt(0, z).id).not.toBe(zoneId);
     for (let i = 0; i < 400 && zoneAt(farE.pos.x, z).id === zoneId; i++) z += 50;
     if (zoneAt(farE.pos.x, z).id === zoneId) {
       z = farE.pos.z;
@@ -292,7 +331,11 @@ describe('masterworkZone over the live GameServer wire (session routing)', () =>
     // Fan out on the LIVE server sim (the craft trigger itself is pinned by the
     // emit suite; this suite owns the wire routing), then run the real pump.
     announceMasterworkZone(
-      (server.sim as unknown as { ctx: Parameters<typeof announceMasterworkZone>[0] }).ctx,
+      (
+        server.sim as unknown as {
+          ctx: Parameters<typeof announceMasterworkZone>[0];
+        }
+      ).ctx,
       sc.pid,
       'Crafter',
       { recipeId: RECIPE_ID, itemId: ITEM_ID, crafter: sc.pid },

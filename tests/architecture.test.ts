@@ -848,6 +848,11 @@ const RENDER_PURE_CORES = [
   'src/render/shadow_detection_core.ts',
   'src/render/world_quest_public_trace_core.ts',
   'src/render/world_quest_trace_core.ts',
+  'src/render/assets/load_priority_core.ts',
+  'src/render/voxel_identity_core.ts',
+  'src/render/cut_cavity_tile_core.ts',
+  'src/render/rail_tracks_core.ts',
+  'src/render/terrain_paint_interior_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/outdoor_light_rig_core.ts',
   'src/render/wall_backface_cull_core.ts',
@@ -1062,6 +1067,9 @@ const RENDER_PURE_CORES = [
   'src/render/shore_water_gate_core.ts',
   'src/render/static_merge_shadow_core.ts',
   'src/render/terrain_region_core.ts',
+  // The chunk grid's world box (shipped box, or an authored map's own rect
+  // plus outskirts): pure arithmetic over the active zones and stamps.
+  'src/render/terrain_grid_core.ts',
   'src/render/texture_prep_core.ts',
   'src/render/terrain_splat_presence_core.ts',
   'src/render/vehicle_exhaust_core.ts',
@@ -1109,6 +1117,22 @@ const RENDER_PURE_CORES = [
   'src/render/characters/morph_union_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
+  // FORK (Studio) pure cores.
+  'src/render/foliage_far_placements_core.ts',
+  'src/render/decal_stream_core.ts',
+  // renderer.ts extractions: the authored-map layer.
+  'src/render/authored_map/chase_boom_core.ts',
+  'src/render/authored_map/gameplay_fog_core.ts',
+  'src/render/authored_map/lighting_rig_core.ts',
+  'src/render/authored_map/shadow_cache_core.ts',
+  'src/render/authored_map/underworld_core.ts',
+  'src/render/authored_map/zone_atmosphere_core.ts',
+  'src/render/authored_map/zone_residency_core.ts',
+  'src/render/placed_batch_core.ts',
+  'src/render/city_clutter_core.ts',
+  'src/render/terrain_cut_clip_core.ts',
+  'src/render/terrain_cut_rim_core.ts',
+  'src/render/cut_cavity_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -2657,6 +2681,7 @@ const UI_DOM_MODULES = [
   // Mints the shared unit and bag-stack step buttons around a number input and
   // writes the input on a press; the rules are quantity_step_core.ts.
   'src/ui/quantity_stepper.ts',
+  'src/ui/canvas_dpr.ts', // Reads the display's device pixel ratio.
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/map/minimap_objective_tap.ts',

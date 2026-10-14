@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { DUNGEON_X_THRESHOLD } from '../sim/data';
+import { DUNGEON_X_THRESHOLD, isBuiltinWorldActive } from '../sim/data';
 import { GFX } from './gfx';
 
 // Ambient high-altitude BIRD FLOCK — a render-only flourish, no sim state.
@@ -12,6 +12,14 @@ import { GFX } from './gfx';
 export interface BirdsView {
   group: THREE.Group;
   update(px: number, pz: number, dt: number): void;
+}
+
+/** Editor overrides for the ambient flock; absent fields keep the shipped look. */
+export interface BirdsConfig {
+  /** Birds in the flock (0 = no birds at all). */
+  count?: number;
+  /** true (default) = V-formation; false = a loose scattered flock. */
+  formation?: boolean;
 }
 
 // Local seeded PRNG — render convention is never to touch Math.random so the
@@ -29,8 +37,12 @@ function mulberry32(seed: number): () => number {
 
 const SPAWN_RADIUS = 120; // where a recycled flock re-enters around the player
 const DESPAWN_RADIUS = 165; // once the flock drifts past this it is recycled
-const ALT_MIN = 54;
-const ALT_MAX = 82;
+// Flight band in yards. Authored maps fly the Studio's higher band; the
+// built-in world keeps the band it shipped with.
+const ALT_MIN = 162;
+const ALT_MAX = 246;
+const BUILTIN_ALT_MIN = 54;
+const BUILTIN_ALT_MAX = 82;
 const SPEED_MIN = 5;
 const SPEED_MAX = 9;
 const WING_LEN = 1.7;
@@ -79,7 +91,7 @@ function buildBird(mat: THREE.Material): Bird {
   };
 }
 
-export function buildBirds(seed: number): BirdsView {
+export function buildBirds(seed: number, cfg?: BirdsConfig): BirdsView {
   const rand = mulberry32((seed ^ 0x5f3b21) >>> 0);
   const group = new THREE.Group();
   group.name = 'birds';
@@ -95,16 +107,27 @@ export function buildBirds(seed: number): BirdsView {
     depthWrite: false,
   });
 
-  const count = GFX.standardMaterials ? 14 : 6;
+  const count = Math.max(
+    0,
+    Math.min(40, Math.round(cfg?.count ?? (GFX.standardMaterials ? 14 : 6))),
+  );
+  const formation = cfg?.formation ?? true;
   const birds: Bird[] = [];
   for (let i = 0; i < count; i++) {
     const b = buildBird(mat);
-    // Loose V-formation: pairs fan out behind a leader, left/right alternating.
-    const rank = Math.ceil(i / 2);
-    const side = i % 2 === 0 ? 1 : -1;
-    b.ox = side * rank * (2.4 + rand() * 0.8);
-    b.oz = -rank * (2.6 + rand() * 0.9) - rand() * 1.5;
-    b.oy = (rand() - 0.5) * 3.0;
+    if (formation) {
+      // Loose V-formation: pairs fan out behind a leader, left/right alternating.
+      const rank = Math.ceil(i / 2);
+      const side = i % 2 === 0 ? 1 : -1;
+      b.ox = side * rank * (2.4 + rand() * 0.8);
+      b.oz = -rank * (2.6 + rand() * 0.9) - rand() * 1.5;
+      b.oy = (rand() - 0.5) * 3.0;
+    } else {
+      // Scattered flock: a loose drifting cloud with no leader.
+      b.ox = (rand() - 0.5) * (14 + count);
+      b.oz = (rand() - 0.5) * (14 + count);
+      b.oy = (rand() - 0.5) * 8;
+    }
     b.flapSpeed = 5.5 + rand() * 3.5;
     b.flapPhase = rand() * Math.PI * 2;
     b.bobAmp = 0.4 + rand() * 0.5;
@@ -118,7 +141,10 @@ export function buildBirds(seed: number): BirdsView {
   // once we know where the player actually is.
   let cx = 0;
   let cz = 0;
-  let cy = (ALT_MIN + ALT_MAX) / 2;
+  const builtin = isBuiltinWorldActive();
+  const altMin = builtin ? BUILTIN_ALT_MIN : ALT_MIN;
+  const altMax = builtin ? BUILTIN_ALT_MAX : ALT_MAX;
+  let cy = (altMin + altMax) / 2;
   let heading = 0;
   let speed = SPEED_MIN;
   let phase = 0;
@@ -128,7 +154,7 @@ export function buildBirds(seed: number): BirdsView {
     const bearing = rand() * Math.PI * 2;
     cx = px + Math.sin(bearing) * SPAWN_RADIUS;
     cz = pz + Math.cos(bearing) * SPAWN_RADIUS;
-    cy = ALT_MIN + rand() * (ALT_MAX - ALT_MIN);
+    cy = altMin + rand() * (altMax - altMin);
     // Aim roughly back across the player's neighbourhood, with a lateral skew
     // so the flock crosses the sky rather than flying straight at the camera.
     const toPlayer = Math.atan2(px - cx, pz - cz);

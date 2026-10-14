@@ -1,0 +1,114 @@
+.ed-building-panel,
+.ed-building-section {
+  display: grid;
+  min-width: 0;
+  gap: 10px;
+}
+
+.ed-building-panel h2,
+.ed-building-panel h3,
+.ed-building-panel p {
+  margin: 0;
+}
+
+.ed-building-panel h2 {
+  font-size: 15px;
+}
+
+.ed-building-panel h3 {
+  font-size: 12px;
+  color: var(--ed-muted);
+}
+
+.ed-building-modes,
+.ed-building-source,
+.ed-building-levels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.ed-building-modes > :last-child {
+  grid-column: 1 / -1;
+}
+
+.ed-building-panel button {
+  min-height: 36px;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.ed-building-field,
+.ed-building-panel .ed-field {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  align-items: stretch;
+}
+
+.ed-building-panel :is(input[type="number"], select) {
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+}
+
+.ed-building-panel input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ed-building-settings {
+  border: 1px solid var(--ed-line);
+  border-radius: var(--ed-radius);
+  background: var(--ed-panel-2);
+}
+
+.ed-building-settings > summary {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.ed-building-settings > .ed-building-section {
+  padding: 0 10px 10px;
+}
+
+.ed-building-texture-preview {
+  width: 96px;
+  height: 96px;
+  max-width: 100%;
+  object-fit: cover;
+  border-radius: var(--ed-radius);
+  border: 1px solid var(--ed-line);
+}
+
+.ed-building-hint {
+  color: var(--ed-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.ed-building-status {
+  padding: 8px;
+  border: 1px solid var(--ed-line-strong);
+  border-radius: var(--ed-radius);
+  overflow-wrap: anywhere;
+}
+
+.ed-building-panel :is(button, input, select, summary):focus-visible {
+  outline: 2px solid var(--ed-focus);
+  outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  .ed-building-panel button,
+  .ed-building-panel :is(input[type="number"], select),
+  .ed-building-panel .ed-check,
+  .ed-building-settings > summary {
+    min-height: 44px;
+  }
+
+  .ed-building-panel :is(input[type="number"], select) {
+    font-size: 16px;
+  }
+}

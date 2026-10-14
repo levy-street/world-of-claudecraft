@@ -5,6 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import {
+  ARENA_X_MIN,
   DUNGEON_LIST,
   DUNGEONS,
   INSTANCE_X_BASE,
@@ -53,8 +54,9 @@ describe('The Drowned Temple', () => {
     expect(t.suggestedPlayers).toBe(5);
     // it joins the map-derived dungeon list (the moongate draws itself there)
     expect(DUNGEON_LIST.some((d) => d.id === 'drowned_temple')).toBe(true);
-    // index-3 origin keeps its slot in the relocated instance plane
+    // The index-3 origin keeps its offset in the relocated instance plane.
     expect(instanceOrigin(3, 0).x).toBe(INSTANCE_X_BASE + 2700);
+    expect(instanceOrigin(3, 0).x).toBeLessThan(ARENA_X_MIN);
   });
 
   it('is enterable through the moongate with its full spawn set, and exits home', () => {
@@ -64,7 +66,7 @@ describe('The Drowned Temple', () => {
     teleport(sim, a, door.x, door.z);
     sim.enterDungeon('drowned_temple', a);
     const ea = sim.entities.get(a)!;
-    expect(ea.pos.x).toBeGreaterThan(2600); // index-3 band (~2700)
+    expect(ea.pos.x).toBeGreaterThan(INSTANCE_X_BASE + 2600);
     const slot = sim.instanceSlotAt(ea.pos)!;
     const origin = instanceOrigin(3, slot);
 

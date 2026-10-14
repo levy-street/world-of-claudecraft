@@ -6,7 +6,7 @@ import { cameraAxes } from './camera_axes';
 
 /** Placement scale bounds shared by the inspector sliders and the wheel path. */
 export const PLACEMENT_SCALE_MIN = 0.2;
-export const PLACEMENT_SCALE_MAX = 5;
+export const PLACEMENT_SCALE_MAX = 50;
 
 /** One Shift+wheel tick rotates by 15 degrees. */
 export const ROTATE_STEP_RAD = Math.PI / 12;
@@ -53,6 +53,35 @@ export function nudgeDelta(
     case 'ArrowLeft':
       return { dx: -rx * step, dz: -rz * step };
   }
+}
+
+/**
+ * Where a multi-selection member lands when the group transforms about the
+ * active placement's gesture-start pivot (Blender-style): the member's base
+ * offset from the pivot scales by `ratio`, rotates by `dRot` (three.js +Y
+ * convention: +angle turns +X toward -Z), then the whole group translates by
+ * (dx, dz). Move-only gestures pass dRot=0 / ratio=1 and degenerate to the
+ * rigid group grab; rotate/scale gestures pass dx=dz=0 (the active's anchor
+ * stays put and is itself the pivot).
+ */
+export function groupMemberPoint(
+  baseX: number,
+  baseZ: number,
+  pivotX: number,
+  pivotZ: number,
+  dx: number,
+  dz: number,
+  dRot: number,
+  ratio: number,
+): { x: number; z: number } {
+  const ox = (baseX - pivotX) * ratio;
+  const oz = (baseZ - pivotZ) * ratio;
+  const cos = Math.cos(dRot);
+  const sin = Math.sin(dRot);
+  return {
+    x: pivotX + dx + ox * cos + oz * sin,
+    z: pivotZ + dz - ox * sin + oz * cos,
+  };
 }
 
 /** Wrap an angle into [0, 2*PI). */

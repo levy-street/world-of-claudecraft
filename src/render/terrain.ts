@@ -1,12 +1,19 @@
 import * as THREE from 'three';
 import {
+  activeZoneList,
+  BUILTIN_WORLD,
+  getActiveWorldContent,
+  getContentGeneration,
+  isBuiltinWorldActive,
   STRIP_MAX_X,
   STRIP_MIN_X,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
-  ZONES,
+  zoneXBounds,
 } from '../sim/data';
+import { effectiveTerrainCuts } from '../sim/ground_sheets';
+import { noiseStampSpacingIn } from '../sim/terrain_noise_brush';
 import type { ZoneDef } from '../sim/types';
 import { WATER_LEVEL } from '../sim/world';
 import { ktx2SiblingUrl } from './assets/ktx2_sibling';
@@ -34,6 +41,7 @@ import {
   nightLightUniforms,
 } from './night_light_field';
 import { renderLayerDisabled } from './render_dev_flags';
+import { activeTerrainGridBox } from './terrain_grid_core';
 
 // The terrain relief ladder (GFX.terrainRelief, one source for the tier
 // ladder and the Advanced Terrain Detail dial): 0 none (medium and below),
@@ -61,11 +69,23 @@ import {
 } from './meadow_tuning';
 import {
   beginChunkGeometry,
+  buildChunkCutFine,
+  type ChunkCutSet,
   type ChunkGeometryArrays,
   fillChunkIndexRow,
   fillChunkVertexRow,
 } from './terrain_chunk_build';
 import { meshTerrainHeight } from './terrain_mesh_height';
+import {
+  invalidatePaintLayerRuntime,
+  PAINT_LAYER_UNIFORMS_GLSL,
+  PAINT_NORMAL_GLSL,
+  paintLayerRuntime,
+  paintLayerSampleGlsl,
+  refreshPaintFieldLive,
+} from './terrain_paint_layers';
+import { paintTexturedCellsIn } from './terrain_paint_tint';
+import { TERRAIN_TONES } from './terrain_palette';
 import {
   chunkIntersectsRegion,
   normalTexelBounds,
@@ -173,7 +193,20 @@ export function prepareTerrainProfileAssets(target: Readonly<GfxSettings>): Prom
     prepareTerrainTex('sandC', 'Ground080_Color.jpg', true),
     prepareTerrainTex('sandN', 'Ground080_NormalGL.jpg', false),
     prepareTerrainTex('mudC', 'Ground071_Color.jpg', true),
-    prepareTerrainTex('snowC', 'Snow010A_Color.jpg', true),
+    // Snow010A is a near-BLANK image: mean 235, sd 2.24, range 228-245, under
+    // 1% contrast, so any ground the snow layer owns renders as flat white and
+    // reads as a missing texture (SPACEY, 2026-09-22: "the terrain texures are
+    // missing"). On a frost-biome map with the auto-texture rules off, snow
+    // owns everything unpainted, so the whole map went blank. Snow004 is the
+    // same palette with 6x the contrast (mean 209, sd 13.4); Snow002 (sd 21.8)
+    // is available if more relief is wanted. Authored maps only: the built-in
+    // world keeps the snow it shipped with (the key is resolved once per page,
+    // and a page never swaps between the built-in world and an authored one).
+    prepareTerrainTex(
+      'snowC',
+      isBuiltinWorldActive() ? 'Snow010A_Color.jpg' : 'Snow004_Color.jpg',
+      true,
+    ),
     // The packs' relief channels, packed offline into one RGBA texture by
     // scripts/assets/pack_ground_ao.mjs (R grass AO, G dirt AO, B rock height,
     // A sand AO): one sampler instead of four keeps the splat material under
@@ -211,6 +244,69 @@ export function terrainSplatTexture(key: 'grassC' | 'grassN'): THREE.Texture | u
   return TERRAIN_TEX[key];
 }
 
+/** Editor entry point: the editor renders the splat material on every tier, so
+ *  it needs the layer textures fetched even when a low-tier boot skipped them.
+ *  Idempotent, prepareTerrainTex dedupes by key. */
+export function ensureTerrainSplatAssetFetch(): void {
+  void prepareTerrainProfileAssets({ ...GFX, terrainSplat: true });
+}
+
+// ---- Editor ground-texture authoring ---------------------------------------
+// The map editor's paint palette carries imported/library ground textures on
+// top of the built-in splat layers, rendered through terrain_paint_layers.ts
+// (a paint FIELD texture plus a tile DataArrayTexture the splat fragment
+// samples). Builtin sets resolve from the bundle; imported (sha256) textures
+// resolve from the browser's ground-texture store. The material compiles its
+// paint path only when the map carries texture paint, so adding the FIRST
+// textured swatch (or one that claims a new slot) needs a full terrain
+// rebuild, the editor's swatch-add site runs one; everything after that
+// (strokes, hue/light, tile size) updates the field data in place.
+
+/** Palette capacity for imported/library ground textures (document cap; the
+ *  per-build shader slot budget is terrain_paint_layers.MAX_PAINT_SLOTS). */
+export const MAX_CUSTOM_GROUND_TEXTURES = 64;
+/** World-space tile size (yards) a custom ground texture repeats over. */
+export const DEFAULT_TEXTURE_TILE_YD = 14;
+
+/** The palette changed shape (a swatch added/removed/re-textured): drop the
+ *  cached runtime so the next terrain build re-reads the active paint. The
+ *  caller pairs this with a full terrain rebuild when the change must show
+ *  before the next natural rebuild. */
+export function refreshCustomGroundTextures(): void {
+  invalidatePaintLayerRuntime();
+}
+
+/** Paint DATA changed under an unchanged palette (a stroke, a hue/light
+ *  slider, a tile-size drag): rewrite the live field in place when the
+ *  compiled material can show it, else fall back to dropping the cache for
+ *  the next rebuild. */
+export function rebakePaintFieldSwatches(): void {
+  if (refreshPaintFieldLive() === 'rebuild') invalidatePaintLayerRuntime();
+}
+// (TerrainView.refreshPaint is the live-swap-aware form the renderer uses.)
+
+/**
+ * Kept as the editor's "the cuts changed" signal. There is nothing to push:
+ * a boolean cut is no longer a discard in the terrain shader but a MESH-time
+ * operation (terrain_chunk_build.ts drops the quads inside the solid and
+ * terrain_cut_rim_core.ts skirts the boundary), so a changed cut lands through
+ * the ordinary region rebuild the caller already runs beside this. Leaving the
+ * call in place keeps that pairing obvious at every mutation site.
+ */
+export function refreshTerrainHoles(): void {
+  // Intentionally empty: see above.
+}
+
+/** Drop the document-scoped terrain textures on page teardown, so a reload
+ *  does not keep the decoded splat JPEGs reachable. */
+export function disposeTerrainSessionCaches(): void {
+  for (const key of Object.keys(TERRAIN_TEX)) {
+    TERRAIN_TEX[key]?.dispose();
+    delete TERRAIN_TEX[key];
+  }
+  terrainTexTasks.clear();
+}
+
 // Per-layer constant roughness, eyeballed from the packs' roughness-map means
 // (saves four samplers vs. real roughness maps; terrain is never glossy
 // enough for the difference to read at gameplay camera distance).
@@ -243,6 +339,34 @@ const LOD_BANDS = {
 const WALL_LOD_RIDGE_HALF = 30;
 const WALL_LOD_RIM_MARGIN = 40;
 
+// ---------------------------------------------------------------------------
+// Camera-distance terrain LOD. The band table above is STATIC (hub distance,
+// wall promotion, remesh regions decide a chunk's density once, at build), so
+// a dense hub ring or a promoted wall keeps its full grid however far the
+// camera is - a whole map of near-camera density at all times. These rings
+// coarsen any chunk the camera is not close to and re-fine it on approach:
+// the static spacing is the FLOOR of quality near you, the ring spacing is
+// the CEILING of cost far away. Chunks re-mesh through the zone build pool
+// (never on the main thread), a handful at a time, nearest first; without a
+// worker pool (tests, old WebViews) the whole system stands down and the
+// static bands behave exactly as before.
+// ---------------------------------------------------------------------------
+// Inside this range a chunk keeps its authored/static density.
+const LOD_RING_NEAR = 60;
+// Between near and mid the terrain drops to RING_SPACING[1]; past mid, [2].
+const LOD_RING_MID = 150;
+// Spacing per ring (ring 0 = static). Ring 1/2 reuse the low tier's proven
+// spacings: "super low poly", but a silhouette that has shipped before.
+const LOD_RING_SPACING = [0, 4.4, 6.5] as const;
+// A ring change must clear its boundary by this margin, and the evaluation
+// itself only runs every LOD_EVAL_STEP yards of camera travel - together they
+// stop boundary chunks from re-meshing back and forth as the camera drifts.
+const LOD_RING_HYST = 12;
+const LOD_EVAL_STEP = 12;
+// Concurrent pool re-meshes. Low on purpose: LOD swaps are cosmetic catch-up
+// work and must never starve a zone build streaming real ground in.
+const LOD_BUILD_LANES = 2;
+
 // Macro relief only needs to carry broad slopes: vertex normals and the four
 // tiled material normals own close detail. The atlas spans the whole expanded
 // world but is baked sparsely by zone, so keep it compact enough that entering
@@ -259,22 +383,129 @@ const NORMAL_TEX_STRENGTH = 1.55;
 // multiplies into (splat textures are authored near mid-gray).
 function finishChunkGeometry(state: ChunkGeometryArrays): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(state.positions, 3));
-  geo.setAttribute('normal', new THREE.BufferAttribute(state.normals, 3));
-  geo.setAttribute('color', new THREE.BufferAttribute(state.colors, 3));
-  geo.setAttribute('uv', new THREE.BufferAttribute(state.uvs, 2));
-  if (state.splats) geo.setAttribute('aSplat', new THREE.BufferAttribute(state.splats, 4));
-  if (state.extras) geo.setAttribute('aExtra', new THREE.BufferAttribute(state.extras, 4));
-  if (state.splats) {
-    const presence = terrainSplatPresence(state.splats, state.extras);
-    const packedPresence = new Uint8Array(state.positions.length / 3);
+  const welded = state.rim || state.clip ? weldCutRim(state) : state;
+  geo.setAttribute('position', new THREE.BufferAttribute(welded.positions, 3));
+  geo.setAttribute('normal', new THREE.BufferAttribute(welded.normals, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(welded.colors, 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(welded.uvs, 2));
+  if (welded.splats) geo.setAttribute('aSplat', new THREE.BufferAttribute(welded.splats, 4));
+  if (welded.extras) geo.setAttribute('aExtra', new THREE.BufferAttribute(welded.extras, 4));
+  if (welded.splats) {
+    const base = terrainSplatPresence(welded.splats, welded.extras);
+    // FORK: the paint bit. A chunk whose footprint (widened by the fragment
+    // feather) holds no painted TEXTURE cell skips the paint taps wholesale.
+    const pos = welded.positions;
+    let minX = Infinity;
+    let minZ = Infinity;
+    let maxX = -Infinity;
+    let maxZ = -Infinity;
+    for (let i = 0; i < pos.length; i += 3) {
+      const x = pos[i];
+      const z = pos[i + 2];
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (z < minZ) minZ = z;
+      if (z > maxZ) maxZ = z;
+    }
+    const presence = {
+      ...base,
+      paint: pos.length > 0 && paintTexturedCellsIn(minX, minZ, maxX, maxZ),
+    };
+    const packedPresence = new Uint8Array(welded.positions.length / 3);
     packedPresence.fill(terrainSplatPresenceMask(presence));
     geo.setAttribute('aTerrainPresenceMask', new THREE.BufferAttribute(packedPresence, 1));
   }
-  geo.setIndex(new THREE.BufferAttribute(state.indices, 1));
+  geo.setIndex(new THREE.BufferAttribute(welded.indices, 1));
   geo.computeBoundingBox();
   geo.computeBoundingSphere();
   return geo;
+}
+
+// The rim band of a boolean cut, appended to the chunk's own buffers rather
+// than given a mesh of its own: a sibling mesh would need its own place in the
+// streaming, culling, shadow and disposal lifecycle, and it would gain nothing.
+// The band's vertices simply carry ROCK splat weights, so the terrain material
+// already draws them as rock and blends into the ground at the seam, which is
+// the "own material slot" the rim needs. Indices widen to Uint32: the base
+// chunk is capped at 65535 vertices and the band adds more.
+const RIM_ROCK_COLOR = new THREE.Color(TERRAIN_TONES.rock);
+
+function weldCutRim(state: ChunkGeometryArrays): {
+  positions: Float32Array;
+  normals: Float32Array;
+  colors: Float32Array;
+  uvs: Float32Array;
+  splats: Float32Array | null;
+  extras: Float32Array | null;
+  indices: Uint32Array;
+} {
+  const rim = state.rim;
+  const clip = state.clip;
+  const baseVerts = state.positions.length / 3;
+  const rimVerts = rim ? rim.positions.length / 3 : 0;
+  const clipVerts = clip ? clip.positions.length / 3 : 0;
+  const total = baseVerts + rimVerts + clipVerts;
+  const positions = new Float32Array(total * 3);
+  const normals = new Float32Array(total * 3);
+  const colors = new Float32Array(total * 3);
+  const uvs = new Float32Array(total * 2);
+  positions.set(state.positions);
+  normals.set(state.normals);
+  colors.set(state.colors);
+  uvs.set(state.uvs);
+  const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
+  if (rim) {
+    positions.set(rim.positions, baseVerts * 3);
+    normals.set(rim.normals, baseVerts * 3);
+    for (let i = 0; i < rimVerts; i++) {
+      const vi = baseVerts + i;
+      colors[vi * 3] = RIM_ROCK_COLOR.r;
+      colors[vi * 3 + 1] = RIM_ROCK_COLOR.g;
+      colors[vi * 3 + 2] = RIM_ROCK_COLOR.b;
+      // The rim's own arc-length UVs are dropped here on purpose: the terrain
+      // material's detail maps are world-planar, so a band that maps the same
+      // way reads as the same rock the cliffs around it are made of.
+      uvs[vi * 2] = (rim.positions[i * 3] + WORLD_MAX_X) / (WORLD_MAX_X * 2);
+      uvs[vi * 2 + 1] = (rim.positions[i * 3 + 2] - WORLD_MIN_Z) / worldDepth;
+    }
+  }
+  if (clip) {
+    const at = baseVerts + rimVerts;
+    positions.set(clip.positions, at * 3);
+    normals.set(clip.normals, at * 3);
+    colors.set(clip.colors, at * 3);
+    uvs.set(clip.uvs, at * 2);
+  }
+  let splats: Float32Array | null = null;
+  let extras: Float32Array | null = null;
+  if (state.splats) {
+    splats = new Float32Array(total * 4);
+    splats.set(state.splats);
+    for (let i = 0; i < rimVerts; i++) splats[(baseVerts + i) * 4 + 2] = 1; // rock
+    if (clip?.splats) splats.set(clip.splats, (baseVerts + rimVerts) * 4);
+  }
+  if (state.extras) {
+    extras = new Float32Array(total * 4);
+    extras.set(state.extras);
+    if (clip?.extras) extras.set(clip.extras, (baseVerts + rimVerts) * 4);
+  }
+  const rimIdx = rim ? rim.indices.length : 0;
+  const clipIdx = clip ? clip.indices.length : 0;
+  const indices = new Uint32Array(state.indices.length + rimIdx + clipIdx);
+  indices.set(state.indices);
+  if (rim) {
+    for (let i = 0; i < rimIdx; i++) {
+      indices[state.indices.length + i] = rim.indices[i] + baseVerts;
+    }
+  }
+  if (clip) {
+    const at = state.indices.length + rimIdx;
+    const vertBase = baseVerts + rimVerts;
+    for (let i = 0; i < clipIdx; i++) {
+      indices[at + i] = clip.indices[i] + vertBase;
+    }
+  }
+  return { positions, normals, colors, uvs, splats, extras, indices };
 }
 
 function buildChunkGeometry(
@@ -287,10 +518,32 @@ function buildChunkGeometry(
   skirtSpan: number,
   lowShade: boolean,
 ): THREE.BufferGeometry {
-  const state = beginChunkGeometry(x0, z0, size, spacing, seed, withSplat, skirtSpan, lowShade);
+  const state = beginChunkGeometry(
+    x0,
+    z0,
+    size,
+    spacing,
+    seed,
+    withSplat,
+    skirtSpan,
+    lowShade,
+    activeChunkCutSet(),
+  );
   for (let row = 0; row < state.gh; row++) fillChunkVertexRow(state, row);
   for (let row = 0; row < state.gh - 1; row++) fillChunkIndexRow(state, row);
-  return finishChunkGeometry(state);
+  return finishChunkGeometry({ ...state, ...buildChunkCutFine(state) });
+}
+
+/** The active map's boolean cuts, or null on a map with none (the shipped
+ *  world and every unedited document, which must stay on the old fast path).
+ *  effectiveTerrainCuts folds in every self-carving cave's own mouth, so the
+ *  mesher and sim movement read exactly the same list. */
+export function activeChunkCutSet(): ChunkCutSet | null {
+  const content = getActiveWorldContent();
+  const cuts = effectiveTerrainCuts(content.caves, content.holes);
+  const knockouts = content.terrainKnockouts;
+  if (cuts.length === 0 && (!knockouts || knockouts.length === 0)) return null;
+  return { cuts, patches: content.holePatches, knockouts };
 }
 
 const IDLE_GEOMETRY_SLICE_MS = 6;
@@ -307,7 +560,17 @@ async function buildChunkGeometryIdle(
   yieldSlice: () => Promise<void>,
   cancelled: () => boolean,
 ): Promise<THREE.BufferGeometry | null> {
-  const state = beginChunkGeometry(x0, z0, size, spacing, seed, withSplat, skirtSpan, lowShade);
+  const state = beginChunkGeometry(
+    x0,
+    z0,
+    size,
+    spacing,
+    seed,
+    withSplat,
+    skirtSpan,
+    lowShade,
+    activeChunkCutSet(),
+  );
   const drainRows = async (rows: number, fill: (row: number) => void): Promise<boolean> => {
     let row = 0;
     while (row < rows) {
@@ -321,7 +584,7 @@ async function buildChunkGeometryIdle(
   };
   if (!(await drainRows(state.gh, (row) => fillChunkVertexRow(state, row)))) return null;
   if (!(await drainRows(state.gh - 1, (row) => fillChunkIndexRow(state, row)))) return null;
-  return finishChunkGeometry(state);
+  return finishChunkGeometry({ ...state, ...buildChunkCutFine(state) });
 }
 
 // ---------------------------------------------------------------------------
@@ -493,6 +756,28 @@ const GROUND_RELIEF_GLSL = /* glsl */ `
 // grass 0.007 effective and dirt 0.019, so "height maps on grass" read flat.
 const vec4 WOC_PARALLAX_AMP = vec4(0.129, 0.188, 0.229, 0.107);
 const float WOC_PARALLAX_CLAMP = 0.04;   // UV units, ~0.18 world (radial, see pOff)
+// Height-blend tuning. DEPTH scales each layer's height into the same units as
+// its splat weight; WINDOW is the tie band. 0.08 keeps the interlock tight
+// enough to read as detail without the seam flickering under mip changes.
+const float WOC_HBLEND_DEPTH = 0.55;
+const float WOC_HBLEND_WINDOW = 0.08;
+// The four per-layer surface heights at uv, each centred on its own measured
+// mean so the set is zero-mean and mips fade it out with distance. Split out of
+// wocGroundHeight (which is now its weighted sum) so the SPLAT COMPOSITE can
+// height-blend with the very same samples - no extra texture taps.
+vec4 wocGroundHeights(vec2 uv) {
+  vec4 aoBase = vec4(0.812, 0.0, 0.0, 0.883);
+  float aoDirt = 0.897;
+  float aoRock = 0.623;
+  if ( vTerrainSplatPresence.x > 0.5 || vTerrainSplatPresence.w > 0.5 )
+    aoBase = texture2D(uGroundAO, uv);
+  if ( vTerrainSplatPresence.y > 0.5 )
+    aoDirt = texture2D(uGroundAO, uv * 0.55).g;
+  if ( vTerrainSplatPresence.z > 0.5 )
+    aoRock = texture2D(uGroundAO, uv * 0.6).b;
+  return vec4(aoBase.r - 0.812, aoDirt - 0.897, aoRock - 0.623, aoBase.a - 0.883);
+}
+
 float wocGroundHeight(vec2 uv, vec4 sw) {
   // The presence varyings are constant for the entire chunk draw. Skipping a
   // projection is therefore coherent, and only happens when every source
@@ -667,7 +952,7 @@ function grassBakeAlbedoGlsl(rich: boolean): string {
         vec2 combT = vec2(dot(tuv, combDir) * WOC_COMB_COMPRESS, dot(tuv, combPerp));
         vec3 grassAlb = vec3(0.0);
         if ( wocHasGrass ) {
-          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale} + grassJitter).rgb;
+          grassAlb = texture2D(uGrassBake, wocTPlane * ${uvScale} + grassJitter).rgb;
           float bakeHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
           grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, bakeHueT);${GRASS_PAINT_RING_GLSL}
         }`
@@ -677,7 +962,7 @@ function grassBakeAlbedoGlsl(rich: boolean): string {
         vec2 combPerp = vec2(0.0, 1.0);
         vec3 grassAlb = vec3(0.0);
         if ( wocHasGrass ) {
-          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale}).rgb;${GRASS_PAINT_RING_GLSL}
+          grassAlb = texture2D(uGrassBake, wocTPlane * ${uvScale}).rgb;${GRASS_PAINT_RING_GLSL}
         }`;
   return comb;
 }
@@ -714,6 +999,18 @@ function plainGrassLift(
 // v0.34 invisible-ground regression: useProgram spam, ground missing under
 // the player). Packing the albedos into one array unit brings the shader to
 // 12 with headroom; tests/terrain_sampler_budget.test.ts pins the budget.
+//
+// The four detail NORMALS are packed the same way (buildSplatNormalArray,
+// below), for the same reason. The headroom the albedo pack bought was spent
+// again by the texture-paint set (4 samplers), the grass bake, and three
+// r185's own dfgLUT, which left a painted map's splat shader at EXACTLY 16
+// before the scene environment arrived. The IBL lands a few seconds into
+// play (its prefilter is deferred), every lit material relinks to take it,
+// and the 17th sampler failed the terrain's link on the spot: the ground
+// vanished mid-walk, in game and playtest but never in the Studio, whose
+// editor turns the grass bake off (SPACEY, 2026-09-23; the driver log read
+// "FRAGMENT shader texture image units count exceeds
+// MAX_TEXTURE_IMAGE_UNITS(16)").
 // ---------------------------------------------------------------------------
 
 /** Layer order of the packed albedo array; the shader's WOC_L_* constants
@@ -813,6 +1110,184 @@ function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArr
   return splatAlbedoCache;
 }
 
+/** Layer order of the packed detail-normal array; WOC_N_* mirror it. */
+export const SPLAT_NORMAL_LAYERS = ['grassN', 'dirtN', 'rockN', 'sandN'] as const;
+
+const SPLAT_NORMAL_GLSL = `
+        #define WOC_NRM( uv, layer ) texture( uNrm, vec3( uv, layer ) )
+        const float WOC_N_GRASS = 0.0;
+        const float WOC_N_DIRT = 1.0;
+        const float WOC_N_ROCK = 2.0;
+        const float WOC_N_SAND = 3.0;`;
+
+interface SplatNormalArray {
+  texture: THREE.Texture;
+  /** True when every layer was packed from its loaded map. */
+  complete: boolean;
+}
+
+let splatNormalCache: SplatNormalArray | null = null;
+
+type MipLevel = { data: ArrayBufferView; width: number; height: number };
+
+/** The mip chain of a plain (non-array) compressed texture, or null. */
+function compressedMips(tex: THREE.Texture | undefined): MipLevel[] | null {
+  const c = tex as THREE.CompressedTexture | undefined;
+  if (
+    !c?.isCompressedTexture ||
+    (c as { isCompressedArrayTexture?: boolean }).isCompressedArrayTexture
+  ) {
+    return null;
+  }
+  const mips = c.mipmaps as unknown as MipLevel[] | undefined;
+  if (!Array.isArray(mips) || mips.length === 0) return null;
+  // A released KTX2 chain keeps zero-length stubs (ktx2_mip_release.ts):
+  // nothing to copy from, so treat it as not loaded.
+  for (const m of mips) if (!m?.data || m.data.byteLength === 0) return null;
+  return mips;
+}
+
+/**
+ * Pack the four detail normal maps into ONE array texture. The maps arrive as
+ * KTX2 (one 1024 x 1024, 11-level encoding for all four), so the layers are
+ * concatenated level by level into a CompressedArrayTexture: the same bytes
+ * the four separate textures uploaded, in one unit instead of four, with no
+ * decode and no extra VRAM. A layer missing, released or encoded differently
+ * falls back to a flat-normal array (quietly smooth ground, never a failed
+ * link), and the pack retries on the next material build like the albedos.
+ */
+function buildSplatNormalArray(t: Record<string, THREE.Texture>): SplatNormalArray {
+  if (splatNormalCache?.complete) return splatNormalCache;
+  const sources = SPLAT_NORMAL_LAYERS.map((k) => t[k] as THREE.CompressedTexture | undefined);
+  const chains = sources.map(compressedMips);
+  const first = sources[0];
+  const firstChain = chains[0];
+  const compatible =
+    first !== undefined &&
+    firstChain !== null &&
+    chains.every(
+      (chain, i) =>
+        chain !== null &&
+        chain.length === firstChain.length &&
+        sources[i]?.format === first.format &&
+        sources[i]?.type === first.type &&
+        chain.every(
+          (m, level) =>
+            m.width === firstChain[level].width &&
+            m.height === firstChain[level].height &&
+            m.data.byteLength === firstChain[level].data.byteLength,
+        ),
+    );
+  let texture: THREE.Texture;
+  if (compatible && first && firstChain) {
+    const layers = SPLAT_NORMAL_LAYERS.length;
+    const mipmaps = firstChain.map((level, i) => {
+      const bytes = new Uint8Array(level.data.byteLength * layers);
+      chains.forEach((chain, layer) => {
+        const src = (chain as MipLevel[])[i].data;
+        bytes.set(
+          new Uint8Array(src.buffer, src.byteOffset, src.byteLength),
+          layer * src.byteLength,
+        );
+      });
+      // Keep the source's element type: three hands it straight to
+      // texSubImage3D on the uncompressed (RGBA transcode) path.
+      const Ctor = (
+        level.data as unknown as { constructor: new (b: ArrayBuffer) => ArrayBufferView }
+      ).constructor;
+      return { data: new Ctor(bytes.buffer), width: level.width, height: level.height };
+    });
+    const packed = new THREE.CompressedArrayTexture(
+      mipmaps as unknown as THREE.CompressedTextureMipmap[],
+      firstChain[0].width,
+      firstChain[0].height,
+      layers,
+      first.format,
+      first.type,
+    );
+    packed.colorSpace = first.colorSpace;
+    packed.minFilter = firstChain.length > 1 ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter;
+    texture = packed;
+  } else {
+    // Flat tangent-space normal (0.5, 0.5, 1) in every layer.
+    const flat = new Uint8Array(SPLAT_NORMAL_LAYERS.length * 4);
+    for (let i = 0; i < flat.length; i += 4) flat.set([128, 128, 255, 255], i);
+    const neutral = new THREE.DataArrayTexture(flat, 1, 1, SPLAT_NORMAL_LAYERS.length);
+    neutral.minFilter = THREE.LinearFilter;
+    texture = neutral;
+  }
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
+  applyTextureAnisotropy(texture, 'normal');
+  texture.needsUpdate = true;
+  splatNormalCache?.texture.dispose();
+  splatNormalCache = { texture, complete: compatible };
+  return splatNormalCache;
+}
+
+interface PaintUniforms {
+  uPaintField: { value: THREE.DataTexture | null };
+  uPaintTiles: { value: THREE.DataArrayTexture | null };
+  uPaintNormTiles: { value: THREE.DataArrayTexture | null };
+  uPaintGrid: { value: THREE.Vector4 };
+  uPaintDims: { value: THREE.Vector2 };
+  uPaintTileSizes: { value: Float32Array };
+  uPaintTileVar: { value: Float32Array };
+  uPaintTileDepth: { value: Float32Array };
+  uPaintAoTiles: { value: THREE.DataArrayTexture | null };
+  uPaintEdge: { value: THREE.Vector2 };
+  uPaintAoMean: { value: Float32Array };
+  uPaintAoGain: { value: Float32Array };
+  uPaintOn: { readonly value: number };
+}
+
+/**
+ * FORK: put the ACTIVE paint runtime (field, tile arrays, grid, tile sizes)
+ * onto a live splat material. The shader reserves MAX_PAINT_SLOTS uniform
+ * slots and a sampler2DArray takes any layer count, so a grown paint grid or
+ * a new textured swatch needs no recompile and no chunk re-mesh: the old
+ * path (drop the cache, wait for "the next terrain build") left the material
+ * sampling the OLD field with the OLD grid origin, which read as every
+ * painted texture on the map going blocky and shifted after the first stroke
+ * that grew the grid, until a full rebuild. Returns false when the material
+ * was compiled without the paint path (a map that had no textured swatch at
+ * build time): that case still needs the full rebuild.
+ */
+export function swapPaintLayerRuntime(mat: THREE.Material): boolean {
+  const ud = mat.userData as {
+    paintUniforms?: PaintUniforms;
+    paintState?: { on: { value: number } };
+  };
+  const u = ud.paintUniforms;
+  if (!u || !ud.paintState) return false;
+  const rt = paintLayerRuntime();
+  if (!rt.field || !rt.tiles) return false;
+  const old = [u.uPaintField.value, u.uPaintTiles.value, u.uPaintNormTiles.value];
+  u.uPaintField.value = rt.field;
+  u.uPaintTiles.value = rt.tiles;
+  u.uPaintNormTiles.value = rt.normTiles;
+  u.uPaintGrid.value = rt.grid;
+  u.uPaintDims.value = rt.dims;
+  u.uPaintTileSizes.value = rt.tileSizes;
+  u.uPaintTileVar.value = rt.tileVar;
+  u.uPaintTileDepth.value = rt.tileDepth;
+  u.uPaintAoTiles.value = rt.aoTiles;
+  u.uPaintEdge.value = rt.edge;
+  u.uPaintAoMean.value = rt.aoMean;
+  u.uPaintAoGain.value = rt.aoGain;
+  // The material's uPaintOn getter now reads the NEW runtime's flag, which its
+  // own tile loads flip to 1 once every layer settled. No explicit upload
+  // flag: three re-uploads a MeshStandardMaterial's uniforms on the first
+  // draw after any material switch, which every frame has.
+  ud.paintState.on = rt.on;
+  for (const t of old) {
+    if (t && t !== rt.field && t !== rt.tiles && t !== rt.normTiles) t.dispose();
+  }
+  return true;
+}
+
 function buildSplatMaterial(
   normalTex: THREE.DataTexture,
   brush: BrushUniforms,
@@ -832,37 +1307,112 @@ function buildSplatMaterial(
   const zoneHaze = hasBiomeHazeField();
   // Night lamplight on the ground, same compile-time contract (`?nightlights=off`).
   const nightLights = hasNightLightField();
+  // The Studio's ground-look upgrades (dark double-sided underside, dominant-
+  // plane UVs, height-blended layer seams, the sin-free snow glint) are for
+  // authored maps; the built-in world compiles the shader it shipped with.
+  const authoredLook = !isBuiltinWorldActive();
+  // The height-blend half of the splat composite (see the HEIGHT BLEND note in
+  // the map_fragment patch); the built-in world keeps the plain weighted sum.
+  const heightBlend = authoredLook
+    ? `
+        if ( wocH4 != vec4(0.0) ) {
+          vec4 e = vSplatR + wocH4 * WOC_HBLEND_DEPTH;
+          // Only the layers actually present compete; a zero-weight layer must
+          // stay at zero however tall its height field is.
+          e = mix(vec4(-1.0), e, step(1e-4, vSplatR));
+          float top = max(max(e.x, e.y), max(e.z, e.w));
+          vec4 b = max(e - (top - WOC_HBLEND_WINDOW), 0.0);
+          float sum = b.x + b.y + b.z + b.w;
+          wocHW = sum > 1e-5 ? b / sum : vSplatR;
+        }`
+    : '';
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 1.0,
     metalness: 0,
     normalMap: normalTex,
     normalScale: new THREE.Vector2(1.15, 1.15),
+    // Authored maps: the UNDERSIDE of the ground draws solid black (see the
+    // gl_FrontFacing early-out in the fragment patch): from inside a carve, or
+    // through any seam a cut leaves, the world below the map reads as dark
+    // rock instead of the sky showing through a one-sided sheet (SPACEY,
+    // 2026-09-18: "under the world should be dark black ... seams would just
+    // show up as black"). The sun's shadow pass keeps rendering the same faces
+    // it did when the sheet was one-sided (three would otherwise flip to
+    // DoubleSide there too and double the terrain's shadow-map cost).
+    ...(authoredLook ? { side: THREE.DoubleSide, shadowSide: THREE.BackSide } : {}),
   });
+  // three keys a program on onBeforeCompile.toString() by default, which is
+  // the same text for every compile-time variant this builder emits, so a
+  // built-in and an authored (or painted and unpainted) material would share
+  // whichever program linked first. Name the variant dimensions explicitly.
+  mat.customProgramCacheKey = () =>
+    `${mat.onBeforeCompile.toString()}|woc-splat:${[
+      authoredLook,
+      paintUniforms !== null,
+      grassBake !== null,
+      zoneHaze,
+      nightLights,
+    ]
+      .map(Number)
+      .join('')}${terrainReliefLevel()}`;
   // FAIL-SAFE for the splat photo set: a texture whose image has not
   // resolved yet binds as three's default WHITE, and a white splat layer
   // paints the whole ground flat pale (seen live, intermittent: the bake's
   // synchronous constructor readback can reorder against the deferred
-  // preload lane). A neutral mid-grey placeholder is wrong quietly for a
-  // frame; white is wrong loudly forever, because the bind is by value.
-  // The six COLOUR layers carry the same fail-safe inside the packed array
-  // (buildSplatAlbedoArray fills a missing layer neutral grey).
-  const neutral = new THREE.DataTexture(new Uint8Array([96, 96, 96, 255]), 1, 1);
-  neutral.needsUpdate = true;
-  const resolved = (tex: THREE.Texture | undefined): THREE.Texture =>
-    (tex?.image as { width?: number } | undefined)?.width ? (tex as THREE.Texture) : neutral;
+  // preload lane). Both packed arrays carry the fail-safe inside: a missing
+  // colour layer fills neutral grey (buildSplatAlbedoArray) and a missing
+  // normal set packs flat (buildSplatNormalArray).
   const albedo = buildSplatAlbedoArray(t);
+  const normals = buildSplatNormalArray(t);
+  // The map's painted ground TEXTURES (cobbles, paving, tiles...): resolved
+  // from the active content at material build, compile-time gated like the
+  // grass bake so the shipped overworld (no texture paint) keeps its exact
+  // shader. See terrain_paint_layers.ts.
+  const paintLayers = paintLayerRuntime();
+  const hasPaint = paintLayers.field !== null && paintLayers.tiles !== null;
+  // FORK: the paint uniforms live on the material (userData) so a changed
+  // paint grid or texture set can be swapped onto the LIVE material
+  // (swapPaintLayerRuntime) instead of rebuilding every chunk.
+  // `uPaintOn` reads THROUGH to the live runtime's flag: the runtime's async
+  // tile loads flip their own object to 1 once every layer settled, and a
+  // swapped-in runtime is a new object, so the material must follow it by
+  // reference rather than hold a copy.
+  const paintState = { on: paintLayers.on };
+  const paintUniforms: PaintUniforms | null = hasPaint
+    ? {
+        uPaintField: { value: paintLayers.field },
+        uPaintTiles: { value: paintLayers.tiles },
+        uPaintNormTiles: { value: paintLayers.normTiles },
+        uPaintGrid: { value: paintLayers.grid },
+        uPaintDims: { value: paintLayers.dims },
+        uPaintTileSizes: { value: paintLayers.tileSizes },
+        uPaintTileVar: { value: paintLayers.tileVar },
+        uPaintTileDepth: { value: paintLayers.tileDepth },
+        uPaintAoTiles: { value: paintLayers.aoTiles },
+        uPaintEdge: { value: paintLayers.edge },
+        uPaintAoMean: { value: paintLayers.aoMean },
+        uPaintAoGain: { value: paintLayers.aoGain },
+        uPaintOn: {
+          get value() {
+            return paintState.on.value;
+          },
+        },
+      }
+    : null;
+  if (paintUniforms) {
+    mat.userData.paintUniforms = paintUniforms;
+    mat.userData.paintState = paintState;
+  }
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, brush);
     Object.assign(sh.uniforms, {
       uAlb: { value: albedo.texture },
-      uGrassN: { value: resolved(t.grassN) },
-      uDirtN: { value: resolved(t.dirtN) },
-      uRockN: { value: resolved(t.rockN) },
-      uSandN: { value: resolved(t.sandN) },
+      uNrm: { value: normals.texture },
       uMacro: { value: macro },
       uGroundAO: { value: t.groundAO },
     });
+    if (paintUniforms) Object.assign(sh.uniforms, paintUniforms);
     if (grassBake) {
       sh.uniforms.uGrassBake = { value: grassBake.texture };
       // The paint-free ring (GRASS_PAINT_RING_GLSL): the live ring by shared
@@ -886,6 +1436,7 @@ function buildSplatMaterial(
         varying vec4 vExtra;
         flat varying vec4 vTerrainSplatPresence;
         flat varying vec2 vTerrainExtraPresence;
+        flat varying float vTerrainPaintPresence;
         varying vec3 vWPos;
         varying vec3 vWNorm;`,
       )
@@ -898,10 +1449,25 @@ function buildSplatMaterial(
           floor(vec4(aTerrainPresenceMask) / vec4(1.0, 2.0, 4.0, 8.0)), 2.0);
         vTerrainExtraPresence = mod(
           floor(vec2(aTerrainPresenceMask) / vec2(16.0, 32.0)), 2.0);
+        vTerrainPaintPresence = mod(floor(aTerrainPresenceMask / 64.0), 2.0);
         vWPos = (modelMatrix * vec4(position, 1.0)).xyz;
         vWNorm = objectNormal; // terrain mesh is untransformed: object == world`,
       );
     sh.fragmentShader = sh.fragmentShader
+      // Back faces (the ground seen from below) are solid black before any
+      // of the splat/paint/relief work runs: the underside of the map is
+      // dark, and every fragment that would have cost the full terrain
+      // shader there costs a single branch instead.
+      .replace(
+        'void main() {',
+        authoredLook
+          ? `void main() {
+        if (!gl_FrontFacing) {
+          gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+          return;
+        }`
+          : 'void main() {',
+      )
       .replace(
         '#include <common>',
         `#include <common>
@@ -909,26 +1475,109 @@ function buildSplatMaterial(
         varying vec4 vExtra;
         flat varying vec4 vTerrainSplatPresence;
         flat varying vec2 vTerrainExtraPresence;
+        flat varying float vTerrainPaintPresence;
         varying vec3 vWPos;
         varying vec3 vWNorm;
         precision highp sampler2DArray;
         uniform sampler2DArray uAlb;
-        uniform sampler2D uGrassN, uDirtN, uRockN, uSandN, uMacro, uGroundAO;
+        uniform sampler2DArray uNrm;
+        uniform sampler2D uMacro, uGroundAO;
         ${grassBake ? 'uniform sampler2D uGrassBake;\n        uniform vec3 uCarpetRing;\n        uniform vec3 uPlainLift;' : ''}
+        ${hasPaint ? PAINT_LAYER_UNIFORMS_GLSL : ''}
         ${terrainReliefLevel() >= 2 ? 'uniform float uReliefSteps;' : ''}
         ${SPLAT_ALBEDO_GLSL}
+        ${SPLAT_NORMAL_GLSL}
         ${GROUND_RELIEF_GLSL}
         ${BRUSH_RING_GLSL}`,
       )
       .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
-        totalEmissiveRadiance += wocBrushRing(vWPos.xz);`,
+        totalEmissiveRadiance += wocBrushRing(vWPos.xz);
+        // Painted-texture glow (lava): the emission layers sampled under the
+        // paint weight in map_fragment, which runs before this chunk.
+        totalEmissiveRadiance += wocPaintEmis * 1.5;`,
       )
       .replace(
         '#include <map_fragment>',
         `
-        vec2 tuv = vWPos.xz * 0.22;
+        ${
+          authoredLook
+            ? `// The ground UV, projected on the surface's DOMINANT plane rather
+        // than always top-down. A top-down UV on a slope compresses world XZ
+        // against surface distance by cos(theta), which is the vertical
+        // smearing on every steep face (SPACEY, 2026-09-21: "fix these
+        // stretched cursed areas"). Re-aiming the UV costs ZERO extra taps -
+        // the 2026-09-09 attempt blended a SECOND sample per layer, which is
+        // what cost the frames and was reverted.
+        //
+        // On flat ground an.y dominates and this is byte-identical to the old
+        // vWPos.xz * 0.22, so the overwhelming majority of terrain pixels -
+        // and the whole shipped world's look - are untouched. Everything
+        // downstream (parallax, the height/AO taps, the comb frame) rides it
+        // and therefore works IN the wall plane on a wall, which is what it
+        // should have been doing there all along.
+        // The projection plane is chosen from the GEOMETRIC normal, not the
+        // shading normal. Terrain's vertical curtains - the skirt ring that
+        // hides T-junction cracks, and boolean-cut rim walls - copy the
+        // SURFACE sample's normal straight down the curtain
+        // (terrain_chunk_build.ts copies s.normal onto every skirt vert), so
+        // a sheer 20-yard green wall reports n.y ~ 0.7 and claims to face the
+        // sky. Every normal-based test then treats it as ground: it kept the
+        // top-down UV and streaked vertically. (It is also why a survey of
+        // vertex normals found NO steep grass anywhere - the normals lie.)
+        // The cross of the screen-space world derivatives is the true facing
+        // of the triangle being shaded and costs no texture taps.
+        // Ground UV on the surface's DOMINANT plane, sign-corrected, chosen
+        // from a normal that cannot lie.
+        //
+        // Two separate defects meet here. (1) A top-down UV (vWPos.xz) on a
+        // steep face squeezes by 1/cos, and on an EXACTLY vertical face the
+        // xz coordinate does not change down the face at all, so the texture
+        // smears into pure vertical bands. (2) Terrain's vertical curtains -
+        // the skirt ring and boolean-cut rim walls - copy the SURFACE
+        // sample's normal down the curtain, so they claim to face the sky and
+        // every normal-based test keeps them on the top-down plane. Measured
+        // at SPACEY's coordinates (802, 750): 96 of 1150 triangles are exactly
+        // vertical by geometry (geo.y = 0.000) and 92 of those carry a vertex
+        // normal of 0.996+. That is the smear in his screenshot.
+        //
+        // So the plane is chosen from the geometric normal WHERE THE SHADING
+        // NORMAL IS LYING, and from the shading normal everywhere else. The
+        // test is directional on purpose - |shade.y| - |geo.y|, not the angle
+        // between them. Coarse-LOD chunks have big triangles whose analytic
+        // vertex normal and flat facet normal legitimately differ by 30-45
+        // degrees; an angle-based test fires on those and part-flips ordinary
+        // MOUNTAIN terrain per triangle (the patchy "stuck grass"). Two
+        // mostly-upward normals leave this difference near zero however large
+        // the angle, while a curtain sits at 0.75-1.0.
+        //
+        // Costs no texture taps: it re-aims the tap already being taken.
+        vec3 wocShadeN = normalize(vWNorm);
+        vec3 wocGeoRaw = cross(dFdx(vWPos.xyz), dFdy(vWPos.xyz));
+        vec3 wocGeoN = length(wocGeoRaw) > 1e-12 ? normalize(wocGeoRaw) : wocShadeN;
+        if (dot(wocGeoN, wocShadeN) < 0.0) wocGeoN = -wocGeoN;
+        vec3 wocN = normalize(mix(wocShadeN, wocGeoN,
+          smoothstep(0.35, 0.65, abs(wocShadeN.y) - abs(wocGeoN.y))));
+        vec3 wocTAN = abs(wocN);
+        vec2 wocTPlane = wocTAN.y >= max(wocTAN.x, wocTAN.z)
+          ? vec2(vWPos.x * sign(wocN.y), vWPos.z)
+          : (wocTAN.x >= wocTAN.z
+              ? vec2(vWPos.z * sign(wocN.x), vWPos.y)
+              : vec2(vWPos.x * -sign(wocN.z), vWPos.y));`
+            : // The built-in world keeps the top-down ground UV it shipped with.
+              'vec3 wocTAN = vec3(0.0); vec2 wocTPlane = vWPos.xz;'
+        }
+        vec2 tuv = wocTPlane * 0.22;
+        ${
+          hasPaint
+            ? `// Sampled FIRST so every blend in this chunk (and the normal
+        // chunk after it) can stand down under authored paint: the cliff
+        // wall projection and cavity shade used to apply over painted
+        // ground, which read as "cliff biome under my painted texture".
+        ${paintLayerSampleGlsl(terrainReliefLevel())}`
+            : 'vec3 wocPaintCol = vec3(0.0); vec3 wocPaintEmis = vec3(0.0); float wocPaintW = 0.0;'
+        }
         bool wocHasGrass = vTerrainSplatPresence.x > 0.5;
         bool wocHasDirt = vTerrainSplatPresence.y > 0.5;
         bool wocHasRock = vTerrainSplatPresence.z > 0.5;
@@ -1003,7 +1652,10 @@ function buildSplatMaterial(
             ? `float pDist = wocCamDist;
         // Outside either smoothstep support the fade is exactly zero. Keep
         // incidence and every dependent relief tap out of those fragments.
-        if (upW > 0.55 && pDist < 36.0) {
+        // Parallax's pDir is a world-XZ tangent frame, meaningless once the
+        // UV has flipped to a wall plane, so gate it on the same dominance
+        // predicate rather than a constant.
+        if (upW >= max(wocTAN.x, wocTAN.z) && upW > 0.55 && pDist < 36.0) {
         // Grazing fade: at low N dot V the view-ray offset grows past what a
         // 1-2 tap parallax can refine and the texture smears into a liquid
         // blur, exactly where the depth cue is weakest anyway. Fade the whole
@@ -1042,7 +1694,7 @@ function buildSplatMaterial(
         }
         ${
           // Cavity/turf-lip shading is relief level 1+. The fallback keeps
-          // the names later stages read (cavH seeds the sparkle speckle hash,
+          // the names later stages read (cavH feeds the relief shading,
           // groundShade takes the cliff-cavity multiply), at compile-time
           // constants the GLSL compiler folds so every relief tap disappears
           // from the no-relief tiers.
@@ -1058,7 +1710,8 @@ function buildSplatMaterial(
         // directional grain instead. The ultra micro-shadow taps reuse
         // swShade so their height differences stay DC-free.
         vec4 swShade = vSplatR * vec4(0.35, 0.8, 1.0, 1.0);
-        float cavH = wocGroundHeight(tuv, swShade);
+        vec4 wocH4 = wocGroundHeights(tuv);
+        float cavH = dot(wocH4, swShade);
         // tighter slope fade than before: the AO/relief signal lives in the
         // planar-XZ projection, which stretches on banks. Full-strength
         // cavity there amplified the stretch into vertical streaking
@@ -1113,7 +1766,8 @@ function buildSplatMaterial(
         }`
             : ''
         }`
-            : `float cavH = 0.0;
+            : `vec4 wocH4 = vec4(0.0);
+        float cavH = 0.0;
         float cavW = 0.0;
         float groundShade = 1.0;`
         }
@@ -1378,7 +2032,7 @@ function buildSplatMaterial(
           axisW) - 0.623;
         groundShade *= mix(
           1.0, clamp(1.0 + wallCav * 2.6, 0.58, 1.18),
-          vSplatR.z * wallW * (1.0 - vExtra.y));`
+          vSplatR.z * wallW * (1.0 - vExtra.y) * (1.0 - wocPaintW));`
             : `// Simple-splat tiers: one wall tap per plane (the swapped-axis
         // ZY sample still breaks corner stripe alignment), no plate mix, no
         // cliff cavity resample (wallCav stays declared for the roughness
@@ -1404,14 +2058,48 @@ function buildSplatMaterial(
         // mixes so those keep today's response.
         vec3 vtint = clamp(vColor.rgb * 2.0, 0.0, 2.0);
         vec3 vtint35 = mix(vec3(1.0), vtint, 0.35);
-        vec3 alb = grassAlb * vtint * ${(GRASS_PAINT_GAIN / 2).toFixed(4)} * vSplatR.x
-                 + (dirtAlb * vSplatR.y
-                 + rockAlb * vSplatR.z
-                 + sandAlb * vSplatR.w) * vtint35;`
-            : `vec3 alb = grassAlb * vSplatR.x
-                 + dirtAlb * vSplatR.y
-                 + rockAlb * vSplatR.z
-                 + sandAlb * vSplatR.w;`
+        // HEIGHT BLEND between the splat layers, instead of a plain weighted
+        // sum. A linear lerp fades one texture into the next over the whole
+        // transition band, which is what makes a boundary read as a soft
+        // blobby smudge with no detail in it (SPACEY, 2026-09-21: "increase the
+        // texture edges detail and smooth transition between two textures").
+        //
+        // Instead, each layer's own surface height competes: a texel where
+        // the rock is raised pokes THROUGH the dirt beside it, so the seam
+        // follows the rock's real cracks and grain. That is simultaneously
+        // MORE edge detail and a softer read, because the boundary is broken
+        // up at texel scale rather than being one smooth ramp.
+        //
+        // Costs nothing: wocH4 is the same four samples the relief shading
+        // already took this fragment. WOC_HBLEND_WINDOW is how much height
+        // difference still counts as a tie - small is a hard interlocking
+        // edge, large decays to the old linear blend.
+        vec4 wocHW = vSplatR;${heightBlend}
+        vec3 alb = grassAlb * vtint * ${(GRASS_PAINT_GAIN / 2).toFixed(4)} * wocHW.x
+                 + (dirtAlb * wocHW.y
+                 + rockAlb * wocHW.z
+                 + sandAlb * wocHW.w) * vtint35;`
+            : `// HEIGHT BLEND between the splat layers, instead of a plain weighted
+        // sum. A linear lerp fades one texture into the next over the whole
+        // transition band, which is what makes a boundary read as a soft
+        // blobby smudge with no detail in it (SPACEY, 2026-09-21: "increase the
+        // texture edges detail and smooth transition between two textures").
+        //
+        // Instead, each layer's own surface height competes: a texel where
+        // the rock is raised pokes THROUGH the dirt beside it, so the seam
+        // follows the rock's real cracks and grain. That is simultaneously
+        // MORE edge detail and a softer read, because the boundary is broken
+        // up at texel scale rather than being one smooth ramp.
+        //
+        // Costs nothing: wocH4 is the same four samples the relief shading
+        // already took this fragment. WOC_HBLEND_WINDOW is how much height
+        // difference still counts as a tie - small is a hard interlocking
+        // edge, large decays to the old linear blend.
+        vec4 wocHW = vSplatR;${heightBlend}
+        vec3 alb = grassAlb * wocHW.x
+                 + dirtAlb * wocHW.y
+                 + rockAlb * wocHW.z
+                 + sandAlb * wocHW.w;`
         }
         // snow cover on the peaks/rim, by baked per-vertex weight
         if ( wocHasSnow )
@@ -1445,6 +2133,16 @@ function buildSplatMaterial(
         // sampled up by the rock wall blend, which shares it)
         alb = mix(alb, alb * vec3(1.07, 1.03, 0.86), (macro2 - 0.5) * 0.75 * vSplat.x);
         ${
+          hasPaint
+            ? `// The painted ground's REAL texture replaces the splat mix
+        // where the maker painted (terrain_paint_layers.ts, sampled at the
+        // top of this chunk). After the snow and impact mixes on purpose:
+        // paint is an authored floor, so a painted plaza never grows a snow
+        // cap it was not given.
+        alb = mix(alb, wocPaintCol, wocPaintW);`
+            : ''
+        }
+        ${
           grassBake
             ? `// vertex tint already folded in per layer above (grass full,
         // photo layers at 0.35): only the macro swing and relief shade left.
@@ -1454,6 +2152,7 @@ function buildSplatMaterial(
         // (vColor was authored as a full sRGB ground color, so re-centre it
         // around 1.0 before using it as a multiplier.)
         vec3 vtint = clamp(vColor.rgb * 2.0, 0.0, 2.0);
+        ${hasPaint ? '// painted fragments already carry their swatch tint in the tile mix\n        vtint = mix(vtint, vec3(1.0), wocPaintW);' : ''}
         diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;`
         }`,
       )
@@ -1490,20 +2189,44 @@ function buildSplatMaterial(
         // tighten toward a damp sheen instead of staying bone-dry matte
         roughnessFactor = mix(roughnessFactor, min(roughnessFactor, 0.55), wetW);
         // Snow sparkle: tiny speckle cells pull toward glossy so sun-facing
-        // snow glints. The hash folds in the fine AO height already sampled
-        // (cavH), so speckles sit on the texture grain rather than a bare
-        // grid: no new texture tap. Distance-faded so far snow stays matte
-        // and never shimmers; overall snow keeps its matte ROUGH_SNOW base.
-        float sparkCell = fract(sin(dot(floor(vWPos.xz * 12.0),
-          vec2(127.1, 311.7)) + cavH * 41.0) * 43758.5453);
+        // snow glints. Distance-faded so far snow stays matte and never
+        // shimmers; overall snow keeps its matte ROUGH_SNOW base.
+        // SPACEY, 2026-09-26: "semi white pixel translucent defects in some of
+        // the terrain textures". Two faults made these specks on his map:
+        // (1) PAINTED ground under the frost blanket still sparkled (a gloss
+        // fleck catching the cream sun over cobbles is exactly the pale
+        // translucent pixel), so the paint weight now switches it off; (2) the
+        // old hash was fract(sin(dot(cell, k) + cavH * 41.0) * 43758.5), whose
+        // argument runs to millions of radians at x 400, z 540: fp32 sin is
+        // garbage there, and the per-pixel cavH term then re-hashed WITHIN a
+        // cell, cutting it into slivers. A sin-free hash of the whole cell
+        // (Dave Hoskins' hash12) stays exact anywhere on a map, and the
+        // grain no longer enters it, so a glint is always one whole cell.
+        ${
+          authoredLook
+            ? `vec3 sparkP = fract(vec3(floor(vWPos.xz * 12.0).xyx) * 0.1031);
+        sparkP += dot(sparkP, sparkP.yzx + 33.33);
+        float sparkCell = fract((sparkP.x + sparkP.y) * sparkP.z);`
+            : // The built-in world keeps its shipped glint hash.
+              `float sparkCell = fract(sin(dot(floor(vWPos.xz * 12.0),
+          vec2(127.1, 311.7)) + cavH * 41.0) * 43758.5453);`
+        }
         float snowSpark = step(0.94, sparkCell)
           * smoothstep(0.45, 0.85, vExtra.y)
-          * (1.0 - smoothstep(18.0, 55.0, wocCamDist));
+          * (1.0 - smoothstep(18.0, 55.0, wocCamDist))
+          * (1.0 - wocPaintW);
         roughnessFactor = mix(roughnessFactor, 0.55, snowSpark * 0.8);`,
       )
       .replace(
         '#include <normal_fragment_maps>',
         `#include <normal_fragment_maps>
+        #ifdef USE_NORMALMAP
+        // The macro relief atlas spans the shipped world box. An authored
+        // map's outskirts chunks sit past it (chunk UVs leave 0..1), where the
+        // clamped edge texels would smear into stripes: keep the vertex normal.
+        if (any(lessThan(vNormalMapUv, vec2(0.0))) || any(greaterThan(vNormalMapUv, vec2(1.0))))
+          normal = nonPerturbedNormal;
+        #endif
         // per-layer detail normals (GL-convention), weighted by splat: rock
         // carries the hardest relief, then dirt, grass moderate, sand soft.
         // The blade normal follows the combed fine albedo tap (combT, same
@@ -1523,18 +2246,18 @@ function buildSplatMaterial(
         if (wocDetailN > 0.0) {
         vec2 gNxy = vec2(0.0);
         if ( wocHasGrass && wocNearDetail ) {
-          vec3 gN = texture2D(uGrassN, combT + grassJitter).xyz * 2.0 - 1.0;
+          vec3 gN = WOC_NRM(combT + grassJitter, WOC_N_GRASS).xyz * 2.0 - 1.0;
           gNxy = gN.x * WOC_COMB_COMPRESS * combDir + gN.y * combPerp;
         }
         vec3 dN = vec3(0.0);
         if ( wocHasDirt && wocNearDetail )
-          dN = texture2D(uDirtN, tuv * 0.55).xyz * 2.0 - 1.0;
+          dN = WOC_NRM(tuv * 0.55, WOC_N_DIRT).xyz * 2.0 - 1.0;
         vec3 rN = vec3(0.0);
         if ( wocHasRock && wocNearDetail )
-          rN = texture2D(uRockN, tuv * 0.6).xyz * 2.0 - 1.0;
+          rN = WOC_NRM(tuv * 0.6, WOC_N_ROCK).xyz * 2.0 - 1.0;
         vec3 sN = vec3(0.0);
         if ( wocHasSand && wocNearDetail )
-          sN = texture2D(uSandN, tuv).xyz * 2.0 - 1.0;
+          sN = WOC_NRM(tuv, WOC_N_SAND).xyz * 2.0 - 1.0;
         ${
           richTerrainSplat()
             ? `// A second octave at 4x the base tiling: without it the ground is one
@@ -1544,13 +2267,13 @@ function buildSplatMaterial(
         // the hard layers share the crisp tap, the soft layers the gentle one.
         vec2 fineHard = vec2(0.0);
         if ( (wocHasDirt || wocHasRock) && wocNearDetail )
-          fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;
+          fineHard = WOC_NRM(tuv * 2.4, WOC_N_ROCK).xy * 2.0 - 1.0;
         // The fine-soft grain is combed like the blade normal (the 3x tiling
         // was the single loudest dot-scale voice): elongated micro-grain for
         // grass, and on sand it reads as wind-swept ripple rather than dots.
         vec2 fineSoft = vec2(0.0);
         if ( (wocHasGrass || wocHasSand) && wocNearDetail ) {
-          vec2 fineSoftRaw = texture2D(uGrassN, combT * 3.0).xy * 2.0 - 1.0;
+          vec2 fineSoftRaw = WOC_NRM(combT * 3.0, WOC_N_GRASS).xy * 2.0 - 1.0;
           fineSoft = fineSoftRaw.x * WOC_COMB_COMPRESS * combDir + fineSoftRaw.y * combPerp;
         }
         // gravel grain at the trail albedo's own tap scale, so the grit a
@@ -1558,7 +2281,7 @@ function buildSplatMaterial(
         // with the marsh mud swap)
         vec2 gvN = vec2(0.0);
         if ( wocHasDirt && wocNearDetail )
-          gvN = texture2D(uRockN, tuv * 1.8).xy * 2.0 - 1.0;`
+          gvN = WOC_NRM(tuv * 1.8, WOC_N_ROCK).xy * 2.0 - 1.0;`
             : `// Simple-splat tiers: base-scale detail normals only (the
         // merge-base budget); the fine octaves fold to zero and every term
         // below compiles out.
@@ -1585,8 +2308,19 @@ function buildSplatMaterial(
         // wall projection below own the cliff relief. The distance fade rides
         // the same multiply, so the gate can never open a step at its edge.
         detN *= smoothstep(0.5, 0.82, vWNorm.y) * wocDetailN;
+        ${
+          hasPaint
+            ? `// A painted floor is an authored surface: the splat's own
+        // grass/dirt grain must not shimmer through its cobbles. Fully
+        // painted ground stands the base relief down COMPLETELY - leaf
+        // litter bump reading through solid paint is exactly the "terrain
+        // getting underneath the sprayed texture" bug.
+        detN *= 1.0 - wocPaintW;`
+            : ''
+        }
         }
         normal = normalize(normal + tbn * vec3(detN, 0.0));
+        ${hasPaint ? PAINT_NORMAL_GLSL : ''}
         // cliffs: wall-projected rock normal so steep faces get real relief
         // (approximate world-space tangent frames per projection plane; the
         // handedness flip on back faces is invisible on noisy rock). The
@@ -1595,14 +2329,17 @@ function buildSplatMaterial(
         // in the normal map can never line up across the two wall planes
         // (matching stripe phase on adjacent planes is what read as corduroy).
         if (vSplat.z * wallW > 0.01) {
-          vec3 rNx = texture2D(uRockN, vWPos.yz * 0.132).xyz * 2.0 - 1.0; // +-x faces, rotated
-          vec3 rNz = texture2D(uRockN, vWPos.xy * 0.132).xyz * 2.0 - 1.0; // +-z faces
+          vec3 rNx = WOC_NRM(vWPos.yz * 0.132, WOC_N_ROCK).xyz * 2.0 - 1.0; // +-x faces, rotated
+          vec3 rNz = WOC_NRM(vWPos.xy * 0.132, WOC_N_ROCK).xyz * 2.0 - 1.0; // +-z faces
           // rotated frame: the yz sample's tangent u runs along world y and
           // v along world z, so its xy perturbation lands on (0, n.x, n.y)
           vec3 wallPerturb = mix(vec3(rNz.x, rNz.y, 0.0), vec3(0.0, rNx.x, rNx.y), axisW);
           // 1.1 (was 0.8): the projected relief flattened against the
           // strengthened planar detail normals and cliffs read smooth
-          normal = normalize(normal + mat3(viewMatrix) * wallPerturb * (vSplat.z * wallW * 1.1));
+          // Painted ground is an authored floor: the projected cliff
+          // relief must not emboss rock cracks through it.
+          normal = normalize(normal +
+            mat3(viewMatrix) * wallPerturb * (vSplat.z * wallW * 1.1 * (1.0 - wocPaintW)));
         }`,
       );
     // Night lamplight (night_light_field.ts): every lamp, camp fire, and
@@ -1713,12 +2450,15 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
 // ---------------------------------------------------------------------------
 
 /** One chunk's geometry job: the rectangle it covers and the vertex spacing
- *  its LOD band asks for. A far-band super-chunk is one job over a 2x2 block. */
+ *  its LOD band asks for. A far-band super-chunk is one job over a 2x2 block.
+ *  `ring` is the camera-distance LOD ring the spacing was clamped for at
+ *  claim time (0 = static density; see LOD_RING_* above). */
 interface ChunkJob {
   x0: number;
   z0: number;
   size: number;
   spacing: number;
+  ring?: number;
 }
 
 export interface EnsureZoneOptions {
@@ -1753,6 +2493,15 @@ export interface TerrainView {
    * finish anyway).
    */
   escalateZone(zoneId: string): void;
+  /** Listener fired after a camera-LOD geometry swap: a silhouette changed at
+   *  distance, so the renderer must redraw its cached shadow maps. */
+  setChunkSwapListener(fn: (() => void) | null): void;
+  /** FORK: bring the live paint layer up to date with the active content:
+   *  'updated' (field bytes rewritten in place), 'swapped' (a grown grid or a
+   *  changed texture set put onto the live material, no re-mesh needed),
+   *  'off' (no textured paint), or 'rebuild' (the material has no paint path
+   *  yet: only a full terrain rebuild can show the first textured swatch). */
+  refreshPaint(): 'updated' | 'swapped' | 'off' | 'rebuild';
   /**
    * The chunk lattice this view builds on, plus whether a given cell still owes
    * geometry. The outdoor fog clamp reads ground residency through this narrow
@@ -1823,6 +2572,17 @@ export interface TerrainView {
 }
 
 export function buildTerrain(seed: number, priorityPoint?: { x: number; z: number }): TerrainView {
+  // The ACTIVE world's zones, not the shipped const. Every zone-shaped decision
+  // below, which cells a zone owns, where the ridge walls run, LOD by hub
+  // distance, is keyed by zone IDENTITY, and an authored map's zones are its
+  // own objects with its own ids. Read statically, cellOwnerId answered with a
+  // SHIPPED zone id that no authored zone could ever equal, so zoneCells()
+  // returned empty and an authored map streamed in with ZERO ground chunks:
+  // a blank map rendered as a black void you fell through. Resolved once here
+  // because a content change tears the whole view down and rebuilds it, and
+  // activeZoneList() returns the ZONES reference itself for the shipped world,
+  // so the built-in path is byte-identical.
+  const zones = activeZoneList();
   const lowGfx = !GFX.terrainSplat || !hasTerrainSplatAssets();
   // Resolved here, not inside the generator: gfx.ts reads document/navigator, so
   // a worker running the same generator would resolve a different tier.
@@ -1833,27 +2593,36 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   const bands = lowGfx ? LOD_BANDS.low : LOD_BANDS.high;
   const group = new THREE.Group();
   group.name = 'terrain';
-  const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
-  const chunksX = Math.ceil((WORLD_MAX_X * 2) / CHUNK_SIZE);
-  const chunksZ = Math.ceil(worldDepth / CHUNK_SIZE);
+  // The grid's world box: the shipped world's own, or an authored map's rect
+  // plus its outskirts and every sculpted stamp (terrain_grid_core.ts), so an
+  // authored map's edge meets more ground instead of ending in the sky. The
+  // macro normal atlas and the rim-wall promotion stay on the shipped box.
+  const gridBox = activeTerrainGridBox(CHUNK_SIZE);
+  const GRID_X0 = gridBox.minX;
+  const GRID_Z0 = gridBox.minZ;
+  const chunksX = Math.ceil((gridBox.maxX - gridBox.minX) / CHUNK_SIZE);
+  const chunksZ = Math.ceil((gridBox.maxZ - gridBox.minZ) / CHUNK_SIZE);
   const grid: ChunkGrid = {
     size: CHUNK_SIZE,
     countX: chunksX,
     countZ: chunksZ,
-    originX: -WORLD_MAX_X,
-    originZ: WORLD_MIN_Z,
+    originX: GRID_X0,
+    originZ: GRID_Z0,
   };
   // 1 = this cell is owed terrain geometry and has not attached it yet, which
   // is the only state that may clamp the outdoor fog. Ownership is TOTAL
   // since the gap-cell fill (cellOwnerId assigns every cell its containing
-  // zone, else the nearest rectangle), so ALL 792 cells seed pending and each
-  // one is genuinely buildable by its owner: pending-until-attach is the
-  // correct state everywhere, and the old carve-out for unowned cells (the
-  // rects do not tile; 96 cells used to be permanently unbuildable) is gone.
+  // zone, else the nearest rectangle), so ALL cells (792 on the shipped
+  // world) seed pending and each one is genuinely buildable by its owner:
+  // pending-until-attach is the correct state everywhere, and the old
+  // carve-out for unowned cells (the rects do not tile; 96 cells used to be
+  // permanently unbuildable) is gone.
   const groundPending = new Uint8Array(chunksX * chunksZ);
   // x/z/half feed the per-frame fog cull; x0/z0/size/spacing are the exact
-  // buildChunkGeometry inputs, kept so an editor rebuild re-runs the same build.
-  const chunks: {
+  // buildChunkGeometry inputs, kept so an editor rebuild re-runs the same
+  // build. ring/lodTarget/lodQueued/lodBusy belong to the camera-distance LOD
+  // (see LOD_RING_* above).
+  interface ChunkRec {
     mesh: THREE.Mesh;
     x: number;
     z: number;
@@ -1862,11 +2631,25 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     z0: number;
     size: number;
     spacing: number;
-  }[] = [];
+    /** Camera-distance ring the current geometry was built for. */
+    ring: number;
+    /** Spacing a pending LOD re-mesh should adopt (undefined = content). */
+    lodTarget?: number;
+    lodQueued: boolean;
+    lodBusy: boolean;
+  }
+  const chunks: ChunkRec[] = [];
   let lastVisibilityX = Number.NaN;
   let lastVisibilityZ = Number.NaN;
   let lastVisibilityFar = Number.NaN;
   let lastVisibilityChunkCount = -1;
+  // Camera position the LOD rings were last evaluated (and claimCell clamps
+  // against). Seeded from the entry point so the very first zone builds -
+  // which run before the first frame's update() - already claim far cells
+  // coarse instead of building them dense and immediately re-meshing them.
+  let lastLodX = priorityPoint?.x ?? Number.NaN;
+  let lastLodZ = priorityPoint?.z ?? Number.NaN;
+  let lastLodChunkCount = -1;
 
   // True when the chunk cell overlaps a mountain-wall band: an inter-zone
   // ridge line (ZONES[i].zMax) or the world rim. Those chunks always take the
@@ -1879,8 +2662,8 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     if (z0 < WORLD_MIN_Z + WALL_LOD_RIM_MARGIN || z0 + size > WORLD_MAX_Z - WALL_LOD_RIM_MARGIN) {
       return true;
     }
-    for (let i = 0; i + 1 < ZONES.length; i++) {
-      const ridgeZ = ZONES[i].zMax;
+    for (let i = 0; i + 1 < zones.length; i++) {
+      const ridgeZ = zones[i].zMax;
       if (z0 - WALL_LOD_RIDGE_HALF < ridgeZ && z0 + size + WALL_LOD_RIDGE_HALF > ridgeZ) {
         return true;
       }
@@ -1897,18 +2680,20 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   // the Willowfen border around (-195, 161) sits 1.6yd ABOVE the waterline.
   // Leaving them unowned meant no zone's build ever meshed them, so that
   // ground rendered as a hole you could see (and fall) through.
-  const zoneRects: WorldRect[] = ZONES.map((zone) => ({
-    minX: zone.xMin ?? STRIP_MIN_X,
-    maxX: zone.xMax ?? STRIP_MAX_X,
-    minZ: zone.zMin,
-    maxZ: zone.zMax,
-  }));
+  // zoneXBounds, not a raw xMin/xMax fallback: a zone with no explicit x-range
+  // spans the shipped strip on the built-in world but the MAP RECT (+-worldHalfX)
+  // on an authored one. Identical to `zone.xMin ?? STRIP_MIN_X` for every
+  // shipped zone.
+  const zoneRects: WorldRect[] = zones.map((zone) => {
+    const [minX, maxX] = zoneXBounds(zone);
+    return { minX, maxX, minZ: zone.zMin, maxZ: zone.zMax };
+  });
   const insideAnyZone = (x: number, z: number): boolean =>
     zoneRects.some((r) => x >= r.minX && x < r.maxX && z >= r.minZ && z < r.maxZ);
 
   const bandIndexAt = (cx: number, cz: number): number => {
-    const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
-    const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+    const x0 = GRID_X0 + cx * CHUNK_SIZE;
+    const z0 = GRID_Z0 + cz * CHUNK_SIZE;
     const centerX = x0 + CHUNK_SIZE / 2;
     const centerZ = z0 + CHUNK_SIZE / 2;
     // Cells outside every realm (see zoneRects) are open sea floor and the
@@ -1921,17 +2706,179 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     if (!insideAnyZone(centerX, centerZ)) return bands.length - 1;
     if (wallChunkAt(x0, z0, CHUNK_SIZE)) return 0;
     let hubDist = Infinity;
-    for (const zn of ZONES) {
+    for (const zn of zones) {
       hubDist = Math.min(hubDist, Math.hypot(centerX - zn.hub.x, centerZ - zn.hub.z));
     }
     const idx = bands.findIndex((b) => hubDist <= b.maxHubDist);
     return idx === -1 ? bands.length - 1 : idx;
   };
 
+  // Camera-distance LOD (the re-mesh rings below) is a Studio addition for
+  // authored maps; the built-in world keeps the static hub-distance bands it
+  // shipped with. Resolved once: a content swap rebuilds the terrain view.
+  const cameraLod = !isBuiltinWorldActive();
   // the coarsest spacing any neighbor chunk can have; sizes the slope-aware
   // skirt drop so a fine chunk's skirt always reaches past the coarsest
-  // neighbor's chord (and vice versa)
-  const skirtSpan = bands[bands.length - 1].spacing;
+  // neighbor's chord (and vice versa). The camera-LOD far ring can coarsen a
+  // neighbor to LOD_RING_SPACING's tail, so the skirt must reach that far too.
+  const skirtSpan = cameraLod
+    ? Math.max(bands[bands.length - 1].spacing, LOD_RING_SPACING[LOD_RING_SPACING.length - 1])
+    : bands[bands.length - 1].spacing;
+
+  // Remesh DETAIL regions (the Carve tool's Remesh brush): a chunk whose rect
+  // a region touches meshes at the region's cell size when that is finer than
+  // its band. The Uint16 index budget floors the spacing (CHUNK_SIZE/0.25 =
+  // 240 cells -> 59k vertices, still under the 65535 ceiling).
+  const detailSpacingAt = (x0: number, z0: number, size: number, spacing: number): number => {
+    const content = getActiveWorldContent();
+    // Ground painted with the Noise brush meshes fine enough to draw its
+    // smallest bumps, so they neither facet nor float off the collision
+    // surface (terrain_noise_brush.ts NOISE_MESH_SPACING).
+    const noise = noiseStampSpacingIn(
+      content.terrainEdits,
+      getContentGeneration(),
+      x0,
+      z0,
+      x0 + size,
+      z0 + size,
+    );
+    let out = Math.min(spacing, noise);
+    const regions = content.detailRegions;
+    if (!regions || regions.length === 0) return out;
+    for (const r of regions) {
+      if (
+        r.x + r.radius < x0 ||
+        r.x - r.radius > x0 + size ||
+        r.z + r.radius < z0 ||
+        r.z - r.radius > z0 + size
+      ) {
+        continue;
+      }
+      out = Math.min(out, Math.max(0.25, r.cell));
+    }
+    return out;
+  };
+
+  // ---- camera-distance LOD machinery (constants: LOD_RING_*) ---------------
+  // Everything here stands down when no worker pool exists (tests, WebViews
+  // without module workers): claims keep their static spacing and no re-mesh
+  // is ever queued, which is byte-identical to the pre-LOD behaviour.
+  const lodActive = (): boolean =>
+    cameraLod && zoneBuildPool() !== null && Number.isFinite(lastLodX);
+  const lodRectDist = (x0: number, z0: number, size: number): number => {
+    const half = size / 2;
+    const dx = Math.max(Math.abs(lastLodX - (x0 + half)) - half, 0);
+    const dz = Math.max(Math.abs(lastLodZ - (z0 + half)) - half, 0);
+    return Math.hypot(dx, dz);
+  };
+  /** Plain-threshold ring for a fresh claim (no hysteresis: nothing built). */
+  const lodRingForRect = (x0: number, z0: number, size: number): number => {
+    if (!lodActive()) return 0;
+    const d = lodRectDist(x0, z0, size);
+    return d <= LOD_RING_NEAR ? 0 : d <= LOD_RING_MID ? 1 : 2;
+  };
+  const lodClampSpacing = (spacing: number, ring: number): number =>
+    ring > 0 ? Math.max(spacing, LOD_RING_SPACING[ring]) : spacing;
+  /** Ring for a STANDING chunk: adopts a new ring only when the distance
+   *  clears the boundary by LOD_RING_HYST, so boundary chunks don't re-mesh
+   *  back and forth as the camera drifts along the line. */
+  const lodDesiredRing = (d: number, cur: number): number => {
+    let r = cur;
+    while (r < 2 && d > (r === 0 ? LOD_RING_NEAR : LOD_RING_MID) + LOD_RING_HYST) r++;
+    while (r > 0 && d < (r === 1 ? LOD_RING_NEAR : LOD_RING_MID) - LOD_RING_HYST) r--;
+    return r;
+  };
+  /** The spacing the static rules alone would give this chunk today. */
+  const lodStaticSpacing = (chunk: { x0: number; z0: number; size: number }): number => {
+    if (chunk.size > CHUNK_SIZE) return bands[farBand].spacing;
+    const cx = Math.round((chunk.x0 - GRID_X0) / CHUNK_SIZE);
+    const cz = Math.round((chunk.z0 - GRID_Z0) / CHUNK_SIZE);
+    return detailSpacingAt(chunk.x0, chunk.z0, chunk.size, bands[bandIndexAt(cx, cz)].spacing);
+  };
+  const lodQueue: ChunkRec[] = [];
+  let lodBusyCount = 0;
+  const pumpLod = (): void => {
+    while (lodBusyCount < LOD_BUILD_LANES && lodQueue.length > 0) {
+      const chunk = lodQueue.shift();
+      if (!chunk) break;
+      chunk.lodQueued = false;
+      const target = chunk.lodTarget;
+      if (
+        target === undefined ||
+        chunk.lodBusy ||
+        Math.abs(target - chunk.spacing) < 1e-6 ||
+        !chunks.includes(chunk)
+      ) {
+        continue;
+      }
+      chunk.lodBusy = true;
+      lodBusyCount++;
+      void (async () => {
+        try {
+          const geo = await buildChunkGeoInPool(chunk.x0, chunk.z0, chunk.size, target);
+          if (!geo) return;
+          // The chunk may have been evicted (zone unload) or the whole view
+          // discarded while the worker ran: swapping then would resurrect a
+          // disposed mesh, so drop the result instead.
+          if (cancelled || !chunks.includes(chunk)) {
+            geo.dispose();
+            return;
+          }
+          chunk.mesh.geometry.dispose();
+          chunk.mesh.geometry = geo;
+          chunk.spacing = target;
+          notifyChunkSwap?.();
+        } finally {
+          chunk.lodBusy = false;
+          lodBusyCount--;
+          // The target may have moved again while this build was in flight
+          // (the camera kept flying): chase it.
+          if (
+            chunk.lodTarget !== undefined &&
+            Math.abs(chunk.lodTarget - chunk.spacing) > 1e-6 &&
+            !chunk.lodQueued &&
+            chunks.includes(chunk)
+          ) {
+            chunk.lodQueued = true;
+            lodQueue.push(chunk);
+          }
+          pumpLod();
+        }
+      })();
+    }
+  };
+  const lodEval = (camX: number, camZ: number): void => {
+    for (const chunk of chunks) {
+      const dx = Math.max(Math.abs(camX - chunk.x) - chunk.half, 0);
+      const dz = Math.max(Math.abs(camZ - chunk.z) - chunk.half, 0);
+      const ring = lodDesiredRing(Math.hypot(dx, dz), chunk.ring);
+      chunk.ring = ring;
+      const want = lodClampSpacing(lodStaticSpacing(chunk), ring);
+      if (Math.abs(want - chunk.spacing) < 1e-6) {
+        chunk.lodTarget = undefined;
+        continue;
+      }
+      chunk.lodTarget = want;
+      if (!chunk.lodQueued && !chunk.lodBusy) {
+        chunk.lodQueued = true;
+        lodQueue.push(chunk);
+      }
+    }
+    if (lodQueue.length > 1) {
+      // Nearest first: the ground around the camera fines up before the
+      // horizon coarsens, which is the order the eye checks.
+      const d2 = (c: ChunkRec): number => {
+        const dx = Math.max(Math.abs(camX - c.x) - c.half, 0);
+        const dz = Math.max(Math.abs(camZ - c.z) - c.half, 0);
+        return dx * dx + dz * dz;
+      };
+      lodQueue.sort((a, b) => d2(a) - d2(b));
+    }
+    pumpLod();
+  };
+  /** Assigned by the renderer: cached shadow maps must be redrawn after a
+   *  silhouette-changing geometry swap. */
+  let notifyChunkSwap: (() => void) | null = null;
 
   const attachChunk = (
     geo: THREE.BufferGeometry,
@@ -1939,6 +2886,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     z0: number,
     size: number,
     spacing: number,
+    ring = 0,
   ): void => {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.receiveShadow = true;
@@ -1966,8 +2914,8 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     // so keying the fog off it would open the view over ground that has not
     // arrived. A far-band super-chunk covers a 2x2 block, hence the span.
     const span = Math.max(1, Math.round(size / CHUNK_SIZE));
-    const cx0 = Math.round((x0 + WORLD_MAX_X) / CHUNK_SIZE);
-    const cz0 = Math.round((z0 - WORLD_MIN_Z) / CHUNK_SIZE);
+    const cx0 = Math.round((x0 - GRID_X0) / CHUNK_SIZE);
+    const cz0 = Math.round((z0 - GRID_Z0) / CHUNK_SIZE);
     for (let dz = 0; dz < span; dz++) {
       for (let dx = 0; dx < span; dx++) {
         const cx = cx0 + dx;
@@ -1985,15 +2933,19 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       z0,
       size,
       spacing,
+      ring,
+      lodQueued: false,
+      lodBusy: false,
     });
   };
-  const addChunk = (x0: number, z0: number, size: number, spacing: number): void => {
+  const addChunk = (x0: number, z0: number, size: number, spacing: number, ring = 0): void => {
     attachChunk(
       buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx, skirtSpan, lowShade),
       x0,
       z0,
       size,
       spacing,
+      ring,
     );
   };
   // A chunk built OFF-THREAD, on the client-wide pool (water.ts submits its
@@ -2005,15 +2957,24 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   // the caller builds on the main thread exactly as before. Returns false ONLY
   // when the caller should fall back, never on cancellation, which the caller
   // checks itself.
-  const addChunkInWorker = async (
+  const buildChunkGeoInPool = async (
     x0: number,
     z0: number,
     size: number,
     spacing: number,
     urgent = false,
-  ): Promise<boolean> => {
+  ): Promise<THREE.BufferGeometry | null> => {
     const active = zoneBuildPool();
-    if (!active) return false;
+    if (!active) return null;
+    // The worker meshes through its OWN copy of src/sim, which defaults to the
+    // built-in world: hand it the content this view is drawing or a custom
+    // map's sculpted heights, zones, roads and biome paint all vanish from the
+    // mesh while the sim keeps them. Cheap unless the generation moved, and the
+    // shipped world sends nothing at all (null keeps the worker on the instance
+    // whose IDENTITY data.ts's activeZoneList checks).
+    const world = getActiveWorldContent();
+    active.setContent?.(getContentGeneration(), world === BUILTIN_WORLD ? null : world);
+    const cutSet = activeChunkCutSet();
     const arrays = await active.buildChunk(
       {
         x0,
@@ -2024,12 +2985,28 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         withSplat: !lowGfx,
         skirtSpan,
         lowShade,
+        cuts: cutSet?.cuts,
+        cutPatches: cutSet?.patches,
       },
       { urgent },
     );
-    if (!arrays) return false;
-    if (cancelled) return true; // discarded view: drop the result, do not attach
-    attachChunk(finishChunkGeometry(arrays), x0, z0, size, spacing);
+    return arrays ? finishChunkGeometry(arrays) : null;
+  };
+  const addChunkInWorker = async (
+    x0: number,
+    z0: number,
+    size: number,
+    spacing: number,
+    urgent = false,
+    ring = 0,
+  ): Promise<boolean> => {
+    const geo = await buildChunkGeoInPool(x0, z0, size, spacing, urgent);
+    if (!geo) return false;
+    if (cancelled) {
+      geo.dispose();
+      return true; // discarded view: drop the result, do not attach
+    }
+    attachChunk(geo, x0, z0, size, spacing, ring);
     return true;
   };
   const addChunkIdle = async (
@@ -2038,8 +3015,9 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     size: number,
     spacing: number,
     yieldSlice: () => Promise<void>,
+    ring = 0,
   ): Promise<boolean> => {
-    if (await addChunkInWorker(x0, z0, size, spacing)) return !cancelled;
+    if (await addChunkInWorker(x0, z0, size, spacing, false, ring)) return !cancelled;
     const geo = await buildChunkGeometryIdle(
       x0,
       z0,
@@ -2053,7 +3031,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       () => cancelled,
     );
     if (!geo) return false;
-    attachChunk(geo, x0, z0, size, spacing);
+    attachChunk(geo, x0, z0, size, spacing, ring);
     return true;
   };
 
@@ -2076,9 +3054,9 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   // else (the gap cells described at zoneRects) the nearest zone rectangle.
   // See owningRectIndex for why nearest-rect and not zoneAt's z-band clamp.
   const cellOwnerId = (cx: number, cz: number): string => {
-    const x = -WORLD_MAX_X + (cx + 0.5) * CHUNK_SIZE;
-    const z = WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE;
-    return ZONES[owningRectIndex(x, z, zoneRects)].id;
+    const x = GRID_X0 + (cx + 0.5) * CHUNK_SIZE;
+    const z = GRID_Z0 + (cz + 0.5) * CHUNK_SIZE;
+    return zones[owningRectIndex(x, z, zoneRects)].id;
   };
   groundPending.fill(1);
   let islandScoped = false;
@@ -2122,8 +3100,8 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   const claimCell = (zoneId: string, cx: number, cz: number): ChunkJob | null => {
     const cell = cz * chunksX + cx;
     if (built.has(cell)) return null;
-    const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
-    const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+    const x0 = GRID_X0 + cx * CHUNK_SIZE;
+    const z0 = GRID_Z0 + cz * CHUNK_SIZE;
     const superCells = [
       [cx, cz],
       [cx + 1, cz],
@@ -2135,18 +3113,42 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       cz % 2 === 0 &&
       cx + 1 < chunksX &&
       cz + 1 < chunksZ &&
-      superCells.every(
-        ([sx, sz]) =>
+      superCells.every(([sx, sz]) => {
+        const sx0 = GRID_X0 + sx * CHUNK_SIZE;
+        const sz0 = GRID_Z0 + sz * CHUNK_SIZE;
+        return (
           cellOwnerId(sx, sz) === zoneId &&
           !built.has(sz * chunksX + sx) &&
-          bandIndexAt(sx, sz) === farBand,
-      );
+          bandIndexAt(sx, sz) === farBand &&
+          // A Remesh detail region (or Noise-brush ground) anywhere under the
+          // 2x2 span forces single chunks: a super-chunk at the region's cell
+          // size would blow the Uint16 index budget.
+          detailSpacingAt(sx0, sz0, CHUNK_SIZE, Infinity) === Infinity
+        );
+      });
     if (superOk) {
       for (const [sx, sz] of superCells) built.add(sz * chunksX + sx);
-      return { x0, z0, size: CHUNK_SIZE * 2, spacing: bands[farBand].spacing };
+      const ring = lodRingForRect(x0, z0, CHUNK_SIZE * 2);
+      return {
+        x0,
+        z0,
+        size: CHUNK_SIZE * 2,
+        spacing: lodClampSpacing(bands[farBand].spacing, ring),
+        ring,
+      };
     }
     built.add(cell);
-    return { x0, z0, size: CHUNK_SIZE, spacing: bands[bandIndexAt(cx, cz)].spacing };
+    const ring = lodRingForRect(x0, z0, CHUNK_SIZE);
+    return {
+      x0,
+      z0,
+      size: CHUNK_SIZE,
+      spacing: lodClampSpacing(
+        detailSpacingAt(x0, z0, CHUNK_SIZE, bands[bandIndexAt(cx, cz)].spacing),
+        ring,
+      ),
+      ring,
+    };
   };
   const yieldBuild = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
   // Background ('idle') builds advance one batch per idle slot instead: the
@@ -2180,8 +3182,8 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     const zoneBounds = normalTexelsOver(minX, zone.zMin, maxX, zone.zMax);
     if (zoneBounds) regions.push(zoneBounds);
     for (const [cx, cz] of cells) {
-      const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
-      const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+      const x0 = GRID_X0 + cx * CHUNK_SIZE;
+      const z0 = GRID_Z0 + cz * CHUNK_SIZE;
       const inside =
         x0 >= minX && x0 + CHUNK_SIZE <= maxX && z0 >= zone.zMin && z0 + CHUNK_SIZE <= zone.zMax;
       if (inside) continue; // already covered by zoneBounds
@@ -2259,8 +3261,12 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         for (const [cx, cz] of cells) {
           if (cancelled) return;
           const job = claimCell(zone.id, cx, cz);
-          if (job && !(await addChunkIdle(job.x0, job.z0, job.size, job.spacing, yieldSlice)))
+          if (
+            job &&
+            !(await addChunkIdle(job.x0, job.z0, job.size, job.spacing, yieldSlice, job.ring))
+          ) {
             return;
+          }
           onProgress?.(++done, total);
         }
       } else {
@@ -2282,9 +3288,12 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
           zoneBuildPool()?.size ?? 1,
           async ([cx, cz]) => {
             const job = claimCell(zone.id, cx, cz);
-            if (job && !(await addChunkInWorker(job.x0, job.z0, job.size, job.spacing, true))) {
+            if (
+              job &&
+              !(await addChunkInWorker(job.x0, job.z0, job.size, job.spacing, true, job.ring))
+            ) {
               if (cancelled) return;
-              addChunk(job.x0, job.z0, job.size, job.spacing);
+              addChunk(job.x0, job.z0, job.size, job.spacing, job.ring);
             }
             if (cancelled) return;
             onProgress?.(++done, total);
@@ -2316,6 +3325,15 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       escalatedZones.add(zoneId);
     },
     isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
+    setChunkSwapListener(fn: (() => void) | null): void {
+      notifyChunkSwap = fn;
+    },
+    refreshPaint(): 'updated' | 'swapped' | 'off' | 'rebuild' {
+      const verdict = refreshPaintFieldLive();
+      if (verdict !== 'rebuild') return verdict;
+      invalidatePaintLayerRuntime();
+      return swapPaintLayerRuntime(mat) ? 'swapped' : 'rebuild';
+    },
     groundResidency: (view: { x: number; z: number }) => {
       islandScoped = islandIsolationActive(view.x, view.z);
       return residency;
@@ -2349,8 +3367,8 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         // far-band super-chunk covers a 2x2 block, so its release must clear
         // every cell it attached, not just the one nearest its origin.
         const span = Math.max(1, Math.round(chunk.size / CHUNK_SIZE));
-        const cx0 = Math.round((chunk.x0 + WORLD_MAX_X) / CHUNK_SIZE);
-        const cz0 = Math.round((chunk.z0 - WORLD_MIN_Z) / CHUNK_SIZE);
+        const cx0 = Math.round((chunk.x0 - GRID_X0) / CHUNK_SIZE);
+        const cz0 = Math.round((chunk.z0 - GRID_Z0) / CHUNK_SIZE);
         // The origin cell alone decides ownership: attachChunk's superOk gate
         // only ever forms a super-chunk when all four of its cells already
         // share one owner (see ensureZone above), so a mixed-ownership
@@ -2394,13 +3412,83 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         const dz = Math.max(Math.abs(camZ - chunk.z) - chunk.half, 0);
         chunk.mesh.visible = fogFar > 0 && dx * dx + dz * dz < fogFarSq;
       }
+      // Camera-distance LOD: re-evaluate the rings every LOD_EVAL_STEP yards
+      // of travel (or whenever chunks attached/detached) and queue re-meshes.
+      // Pool-less environments never enter: static bands behave as before.
+      if (cameraLod && zoneBuildPool() !== null) {
+        const moved = Number.isFinite(lastLodX)
+          ? Math.hypot(camX - lastLodX, camZ - lastLodZ)
+          : Number.POSITIVE_INFINITY;
+        if (moved >= LOD_EVAL_STEP || chunks.length !== lastLodChunkCount) {
+          lastLodX = camX;
+          lastLodZ = camZ;
+          lastLodChunkCount = chunks.length;
+          lodEval(camX, camZ);
+        }
+      }
     },
     rebuildRegion(minX: number, minZ: number, maxX: number, maxZ: number): void {
+      // A far-band super-chunk (2x2) can never take a finer spacing (its span
+      // would blow the Uint16 index budget), so once a Remesh region or
+      // Noise-brush ground reaches one, split it into its four single chunks,
+      // each meshed at its own spacing - the same shape a fresh build claims
+      // for that ground. The new chunks are built from the current heights,
+      // so the pass below leaves them alone.
+      let fresh: Set<ChunkRec> | null = null;
+      for (let i = chunks.length - 1; i >= 0; i--) {
+        const chunk = chunks[i];
+        if (
+          chunk.size <= CHUNK_SIZE ||
+          !chunkIntersectsRegion(chunk.x0, chunk.z0, chunk.size, minX, minZ, maxX, maxZ) ||
+          detailSpacingAt(chunk.x0, chunk.z0, chunk.size, Infinity) === Infinity
+        ) {
+          continue;
+        }
+        group.remove(chunk.mesh);
+        chunk.mesh.geometry.dispose();
+        chunks.splice(i, 1);
+        fresh ??= new Set();
+        for (let oz = 0; oz < chunk.size; oz += CHUNK_SIZE) {
+          for (let ox = 0; ox < chunk.size; ox += CHUNK_SIZE) {
+            const x0 = chunk.x0 + ox;
+            const z0 = chunk.z0 + oz;
+            const cx = Math.round((x0 - GRID_X0) / CHUNK_SIZE);
+            const cz = Math.round((z0 - GRID_Z0) / CHUNK_SIZE);
+            const ring = lodRingForRect(x0, z0, CHUNK_SIZE);
+            const band = bands[bandIndexAt(cx, cz)].spacing;
+            addChunk(
+              x0,
+              z0,
+              CHUNK_SIZE,
+              lodClampSpacing(detailSpacingAt(x0, z0, CHUNK_SIZE, band), ring),
+              ring,
+            );
+            fresh.add(chunks[chunks.length - 1]);
+          }
+        }
+      }
       // No allocation beyond the replacement geometries: the chunk list is
       // scanned in place and only intersecting chunks re-mesh.
       for (const chunk of chunks) {
-        if (!chunkIntersectsRegion(chunk.x0, chunk.z0, chunk.size, minX, minZ, maxX, maxZ)) {
+        if (
+          fresh?.has(chunk) ||
+          !chunkIntersectsRegion(chunk.x0, chunk.z0, chunk.size, minX, minZ, maxX, maxZ)
+        ) {
           continue;
+        }
+        // A remesh detail region painted (or deleted) since the chunk was
+        // built changes its target spacing: adopt it here so the Remesh brush
+        // takes effect without a full terrain rebuild. Super-chunks keep
+        // their band spacing (their 2x2 span would blow the index budget).
+        // The camera-LOD ring the chunk currently sits in still clamps: an
+        // edit landing on far coarse ground must not re-fine the horizon.
+        if (chunk.size <= CHUNK_SIZE) {
+          const cx = Math.round((chunk.x0 - GRID_X0) / CHUNK_SIZE);
+          const cz = Math.round((chunk.z0 - GRID_Z0) / CHUNK_SIZE);
+          chunk.spacing = lodClampSpacing(
+            detailSpacingAt(chunk.x0, chunk.z0, chunk.size, bands[bandIndexAt(cx, cz)].spacing),
+            chunk.ring,
+          );
         }
         const geo = buildChunkGeometry(
           chunk.x0,

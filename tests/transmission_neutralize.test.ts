@@ -233,25 +233,57 @@ describe('no material buys a second scene pass (src/render/CLAUDE.md)', () => {
     expect(found).toEqual(TRANSMISSIVE_GLBS);
   });
 
+  /** Lines that have the volume-property SHAPE but set no material: the Studio
+   *  building editor's wall thickness (a yards value on the panel state and the
+   *  workspace, plus the catalog key of its label). Matched by the exact trimmed
+   *  line, so any other volume write in these files is still caught, and every
+   *  entry must still be present (a stale entry fails rather than lingering). */
+  const NON_MATERIAL_VOLUME_LINES: Record<string, readonly string[]> = {
+    'src/ui/i18n.catalog/editor.ts': ["thickness: 'Wall thickness (yards)',"],
+    'src/editor/building_panel.ts': ['thickness: number;'],
+    'src/editor/building_workspace.ts': [
+      'thickness: this.thickness,',
+      'this.thickness = Math.max(0.1, Math.min(3, thickness));',
+    ],
+  };
+
   it('constructs no MeshPhysicalMaterial and sets no transmission in the client source', () => {
     // three's transmission pass is what a MeshPhysicalMaterial with
     // transmission > 0 buys; a physical material with none of it is a
     // MeshStandardMaterial with extra uniforms. Translucency here is alpha
     // blending. The neutralizer is the one writer, and it writes zero.
     const offenders: string[] = [];
+    const exemptSeen = new Set<string>();
     let scanned = 0;
     for (const dir of ['src/render', 'src/ui', 'src/game', 'src/editor', 'src/guide']) {
       for (const { file, full } of tsFilesUnder(join(root, dir))) {
         if (file.endsWith('.test.ts')) continue;
-        const rel = `${dir}/${file}`;
+        const rel = `${dir}/${file}`.replace(/\\/g, '/');
         if (rel === 'src/render/assets/transmission_neutralize.ts') continue;
         scanned++;
         const source = readFileSync(full, 'utf8');
         if (PHYSICAL_MATERIAL_CONSTRUCTION.test(source)) offenders.push(`${rel}: construction`);
         if (setsTransmission(source)) offenders.push(`${rel}: transmission set`);
-        if (VOLUME_PROPERTY_SET.test(source)) offenders.push(`${rel}: volume set`);
+        const exempt = NON_MATERIAL_VOLUME_LINES[rel];
+        const volumeSource = exempt
+          ? source
+              .split('\n')
+              .filter((line) => {
+                const trimmed = line.trim();
+                if (!exempt.includes(trimmed)) return true;
+                exemptSeen.add(`${rel}: ${trimmed}`);
+                return false;
+              })
+              .join('\n')
+          : source;
+        if (VOLUME_PROPERTY_SET.test(volumeSource)) offenders.push(`${rel}: volume set`);
       }
     }
+    expect([...exemptSeen].sort()).toEqual(
+      Object.entries(NON_MATERIAL_VOLUME_LINES)
+        .flatMap(([rel, lines]) => lines.map((line) => `${rel}: ${line}`))
+        .sort(),
+    );
     // The vacuity floor, the GLB sweep's twin: a walk that stops finding the
     // client tree (a moved directory, a broken helper) must fail rather than
     // report a clean sweep of nothing. Deliberately far under today's count

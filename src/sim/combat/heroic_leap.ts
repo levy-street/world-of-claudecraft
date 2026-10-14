@@ -1,7 +1,8 @@
-import { MANTLE_REACH, resolvePosition, seatGroundedAt } from '../colliders';
+import { resolvePosition, seatGroundedAt } from '../colliders';
 import { VANGUARD_FURY_4PC_ENRAGE_DURATION_SEC } from '../content/vanguard_set_bonuses_a';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
+import { traversalBand } from '../traversal_band';
 import { type AbilityDef, DT, ENRAGE_DMG_DONE, type Entity, type Vec3 } from '../types';
 import { groundHeight, terrainSteepnessAt, waterLevelAt } from '../world';
 import { hasUnbreakableMovementLock } from './cc';
@@ -106,7 +107,7 @@ export function computeHeroicLeapLanding(
   from: { x: number; y: number; z: number; onGround: boolean },
   to: { x: number; z: number },
 ): { x: number; z: number } {
-  const lift = from.onGround ? 0 : MANTLE_REACH;
+  const lift = from.onGround ? 0 : traversalBand();
   const landing = sweepLeapLanding(
     seed,
     from.x,

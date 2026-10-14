@@ -140,7 +140,7 @@ describe('Renderer lifecycle wiring', () => {
       '\n  /**\n   * Quiesce this generation',
     );
     expect(disposal).toContain('this.post?.dispose()');
-    expect(disposal).toContain('this.chatBubbles.clear()');
+    expect(disposal).toContain('this.chatBubbles.clear(bestEffort)');
     expect(disposal).toContain('this.removeView(id, true)');
     expect(disposal).toContain(
       'for (const visual of this.visualPool.drain()) bestEffort(() => visual.dispose())',

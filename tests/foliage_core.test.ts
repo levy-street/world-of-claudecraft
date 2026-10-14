@@ -332,7 +332,14 @@ describe('Eastbrook town grass exclusion', () => {
     expect(source).toContain('activeContent === BUILTIN_WORLD');
     expect(source).toContain('activeContent.services?.noticeboards ?? []');
     expect(source).toContain('insideGrassHubExclusion(activeContent.zones, x, z)');
-    expect(source).toContain(
+    // The dressing-spot scatter moved verbatim out of foliage.ts into its own
+    // module (the monolith ratchet); the hub/camp exclusion rides with it.
+    const dressing = readFileSync(
+      new URL('../src/render/foliage_dressing_spots.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toContain("from './foliage_dressing_spots'");
+    expect(dressing).toContain(
       'insideDressingExclusion(activeContent.zones, activeContent.camps, x, z)',
     );
     expect(source).toMatch(

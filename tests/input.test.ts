@@ -397,14 +397,24 @@ describe('Input autorun', () => {
   it('a forward touch-move cancels autorun (classic tap-to-stop)', () => {
     const { input } = makeInput();
     input.toggleAutorun();
-    input.setTouchMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setTouchMove({
+      forward: true,
+      back: false,
+      strafeLeft: false,
+      strafeRight: false,
+    });
     expect(input.autorun).toBe(false);
   });
 
   it('a strafe-only touch-move keeps autorun engaged', () => {
     const { input } = makeInput();
     input.toggleAutorun();
-    input.setTouchMove({ forward: false, back: false, strafeLeft: true, strafeRight: false });
+    input.setTouchMove({
+      forward: false,
+      back: false,
+      strafeLeft: true,
+      strafeRight: false,
+    });
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true);
   });
@@ -430,7 +440,12 @@ describe('Input autorun', () => {
   it('still stops autorun when a held strafe is released before the interaction outcome', async () => {
     const { input } = makeInput();
     input.setAutorun(true);
-    input.setTouchMove({ forward: false, back: false, strafeLeft: true, strafeRight: false });
+    input.setTouchMove({
+      forward: false,
+      back: false,
+      strafeLeft: true,
+      strafeRight: false,
+    });
     let resolveOutcome!: (succeeded: boolean) => void;
     const outcome = new Promise<boolean>((resolve) => {
       resolveOutcome = resolve;
@@ -483,7 +498,11 @@ describe('Input autorun', () => {
     vi.spyOn(performance, 'now').mockImplementation(() => now);
 
     windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
-    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('keydown')!({
+      code: 'Space',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.readMoveInput().jump).toBe(true);
 
@@ -499,7 +518,11 @@ describe('Input autorun', () => {
   it('keeps autorun latched when suspension clears stale held key state', () => {
     const { input, windowListeners } = makeInput();
     input.toggleAutorun();
-    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('keydown')!({
+      code: 'Space',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
 
     input.setSuspendMovement(true);
     input.setSuspendMovement(false);
@@ -512,8 +535,18 @@ describe('Input autorun', () => {
   it('clears every movement source for an in-place client transition', () => {
     const { input, windowListeners, cb } = makeInput();
     input.setAutorun(true);
-    input.setTouchMove({ forward: false, back: true, strafeLeft: false, strafeRight: false });
-    input.setGamepadMove({ forward: false, back: false, strafeLeft: true, strafeRight: false });
+    input.setTouchMove({
+      forward: false,
+      back: true,
+      strafeLeft: false,
+      strafeRight: false,
+    });
+    input.setGamepadMove({
+      forward: false,
+      back: false,
+      strafeLeft: true,
+      strafeRight: false,
+    });
     input.setControllerMoveInput({ forward: true, jump: true });
     input.setClickMoveTarget({ x: 4, z: 8 }, 0.5);
     windowListeners.get('keydown')!({
@@ -556,7 +589,12 @@ describe('Input pet bar chords', () => {
     ];
     for (const [code, action] of cases) {
       const preventDefault = vi.fn();
-      windowListeners.get('keydown')!({ code, ctrlKey: true, repeat: false, preventDefault });
+      windowListeners.get('keydown')!({
+        code,
+        ctrlKey: true,
+        repeat: false,
+        preventDefault,
+      });
       expect(cb.onPet).toHaveBeenCalledWith(action);
       // The chord carries Ctrl, so the browser accelerator default is cancelled.
       expect(preventDefault).toHaveBeenCalled();
@@ -567,7 +605,11 @@ describe('Input pet bar chords', () => {
     const { input, windowListeners, cb } = makeInput();
     void input;
 
-    windowListeners.get('keydown')!({ code: 'Tab', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('keydown')!({
+      code: 'Tab',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
     expect(cb.onTab).toHaveBeenCalledTimes(1);
     expect(cb.onTabPrev).not.toHaveBeenCalled();
 
@@ -640,7 +682,11 @@ describe('Input pet bar chords', () => {
   it('does not fire a pet action for a bare digit (that stays an action-bar slot)', () => {
     const { input, windowListeners, cb } = makeInput();
     void input;
-    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('keydown')!({
+      code: 'Digit1',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
     expect(cb.onPet).not.toHaveBeenCalled();
     expect(cb.onAbilityDown).toHaveBeenCalledWith(0); // Digit1 -> action bar slot 0
   });
@@ -716,12 +762,29 @@ describe('Input pointer lock', () => {
     const { canvas, input, canvasListeners, windowListeners } = makeInput();
     const yaw = input.camYaw;
 
-    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
-    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
-    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      ...CENTER,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mousemove')!({
+      movementX: 10,
+      movementY: 5,
+      ...CENTER,
+    });
+    windowListeners.get('mousemove')!({
+      movementX: 12,
+      movementY: 0,
+      ...CENTER,
+    });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
-    windowListeners.get('mousemove')!({ movementX: 20, movementY: 0, clientX: 980, clientY: 540 });
+    windowListeners.get('mousemove')!({
+      movementX: 20,
+      movementY: 0,
+      clientX: 980,
+      clientY: 540,
+    });
 
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
     expect(input.isCameraDragActive()).toBe(true);
@@ -731,15 +794,32 @@ describe('Input pointer lock', () => {
   it('engages the lock as soon as the drag starts, before the cursor reaches an edge', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
 
-    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
-    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
-    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      ...CENTER,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mousemove')!({
+      movementX: 10,
+      movementY: 5,
+      ...CENTER,
+    });
+    windowListeners.get('mousemove')!({
+      movementX: 12,
+      movementY: 0,
+      ...CENTER,
+    });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
     windowListeners.get('mousemove')!({ movementX: 40, movementY: 0, ...EDGE });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
-    windowListeners.get('mousemove')!({ movementX: 5, movementY: 0, clientX: 2, clientY: 540 });
+    windowListeners.get('mousemove')!({
+      movementX: 5,
+      movementY: 0,
+      clientX: 2,
+      clientY: 540,
+    });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
   });
 
@@ -748,7 +828,11 @@ describe('Input pointer lock', () => {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
     );
 
-    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      ...CENTER,
+      preventDefault: vi.fn(),
+    });
 
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
   });
@@ -756,15 +840,31 @@ describe('Input pointer lock', () => {
   it('re-arms per drag while still locking every active drag', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
 
-    canvasListeners.get('mousedown')!({ button: 2, ...EDGE, preventDefault: vi.fn() });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      ...EDGE,
+      preventDefault: vi.fn(),
+    });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...EDGE });
     windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...EDGE });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
     windowListeners.get('mouseup')!({ button: 2, ...EDGE, target: canvas });
 
-    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
-    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
-    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      ...CENTER,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mousemove')!({
+      movementX: 10,
+      movementY: 5,
+      ...CENTER,
+    });
+    windowListeners.get('mousemove')!({
+      movementX: 12,
+      movementY: 0,
+      ...CENTER,
+    });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(2);
   });
 
@@ -792,7 +892,12 @@ describe('Input pointer lock', () => {
     now += 30;
     windowListeners.get('mousemove')!({ movementX: 3, movementY: 2 });
     now += 30;
-    windowListeners.get('mouseup')!({ button: 2, clientX: 103, clientY: 102, target: canvas });
+    windowListeners.get('mouseup')!({
+      button: 2,
+      clientX: 103,
+      clientY: 102,
+      target: canvas,
+    });
 
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
   });
@@ -1055,7 +1160,12 @@ describe('Input pointer lock', () => {
     expect(input.camPitch).toBe(pitch);
 
     now += 40;
-    windowListeners.get('mouseup')!({ button: 0, clientX: 132, clientY: 163, target: canvas });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 132,
+      clientY: 163,
+      target: canvas,
+    });
     expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
   });
 
@@ -1132,7 +1242,12 @@ describe('Input pointer lock', () => {
     expect(input.camYaw).toBe(yaw);
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
 
-    windowListeners.get('mouseup')!({ button: 0, clientX: 160, clientY: 172, target: canvas });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 160,
+      clientY: 172,
+      target: canvas,
+    });
     expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
   });
 
@@ -1159,7 +1274,12 @@ describe('Input pointer lock', () => {
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
     expect(input.camYaw).toBeCloseTo(yaw - 2 * 0.0045);
 
-    windowListeners.get('mouseup')!({ button: 2, clientX: 103, clientY: 100, target: canvas });
+    windowListeners.get('mouseup')!({
+      button: 2,
+      clientX: 103,
+      clientY: 100,
+      target: canvas,
+    });
     expect(cb.onClickPick).not.toHaveBeenCalled();
   });
 
@@ -1322,7 +1442,11 @@ describe('Input target buffs and debuffs keybind', () => {
   it("dispatches onUiKey('targetAuras') for the default Shift+J chord", () => {
     const { cb, windowListeners } = makeInput();
 
-    windowListeners.get('keydown')!({ code: 'KeyJ', repeat: false, shiftKey: true });
+    windowListeners.get('keydown')!({
+      code: 'KeyJ',
+      repeat: false,
+      shiftKey: true,
+    });
 
     expect(cb.onUiKey).toHaveBeenCalledWith('targetAuras');
     expect(cb.onCycleFriendly).not.toHaveBeenCalled();
@@ -1361,7 +1485,11 @@ describe('Input Book of Deeds keybind', () => {
   it("dispatches onUiKey('deeds') for the default Shift+Z chord", () => {
     const { cb, windowListeners } = makeInput();
 
-    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false, shiftKey: true });
+    windowListeners.get('keydown')!({
+      code: 'KeyZ',
+      repeat: false,
+      shiftKey: true,
+    });
 
     expect(cb.onUiKey).toHaveBeenCalledWith('deeds');
   });
@@ -1378,7 +1506,11 @@ describe('Input Book of Deeds keybind', () => {
     const { cb, windowListeners } = makeInput();
     (cb as any).canUseGameKeys = vi.fn(() => false);
 
-    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false, shiftKey: true });
+    windowListeners.get('keydown')!({
+      code: 'KeyZ',
+      repeat: false,
+      shiftKey: true,
+    });
 
     expect(cb.onUiKey).not.toHaveBeenCalled();
   });
@@ -1392,7 +1524,11 @@ describe('Input Harvest Journal, Perfecting, and Loot Explorer keybinds', () => 
   it("dispatches onUiKey('harvestJournal') for the default Shift+K chord", () => {
     const { cb, windowListeners } = makeInput();
 
-    windowListeners.get('keydown')!({ code: 'KeyK', repeat: false, shiftKey: true });
+    windowListeners.get('keydown')!({
+      code: 'KeyK',
+      repeat: false,
+      shiftKey: true,
+    });
 
     expect(cb.onUiKey).toHaveBeenCalledWith('harvestJournal');
   });
@@ -1400,7 +1536,11 @@ describe('Input Harvest Journal, Perfecting, and Loot Explorer keybinds', () => 
   it("dispatches onUiKey('perfecting') for the default Shift+T chord", () => {
     const { cb, windowListeners } = makeInput();
 
-    windowListeners.get('keydown')!({ code: 'KeyT', repeat: false, shiftKey: true });
+    windowListeners.get('keydown')!({
+      code: 'KeyT',
+      repeat: false,
+      shiftKey: true,
+    });
 
     expect(cb.onUiKey).toHaveBeenCalledWith('perfecting');
   });
@@ -1408,7 +1548,11 @@ describe('Input Harvest Journal, Perfecting, and Loot Explorer keybinds', () => 
   it("dispatches onUiKey('lootExplorer') for the default Shift+O chord", () => {
     const { cb, windowListeners } = makeInput();
 
-    windowListeners.get('keydown')!({ code: 'KeyO', repeat: false, shiftKey: true });
+    windowListeners.get('keydown')!({
+      code: 'KeyO',
+      repeat: false,
+      shiftKey: true,
+    });
 
     expect(cb.onUiKey).toHaveBeenCalledWith('lootExplorer');
   });
@@ -1461,7 +1605,11 @@ describe('Input chat keybind', () => {
   it("dispatches onUiKey('chat') for the default Enter key", () => {
     const { cb, windowListeners } = makeInput();
 
-    windowListeners.get('keydown')!({ code: 'Enter', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('keydown')!({
+      code: 'Enter',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
 
     expect(cb.onUiKey).toHaveBeenCalledWith('chat');
   });
@@ -1475,7 +1623,11 @@ describe('Input chat keybind', () => {
     const { windowListeners } = makeInput();
     const preventDefault = vi.fn();
 
-    windowListeners.get('keydown')!({ code: 'Enter', repeat: false, preventDefault });
+    windowListeners.get('keydown')!({
+      code: 'Enter',
+      repeat: false,
+      preventDefault,
+    });
 
     expect(preventDefault).toHaveBeenCalled();
   });
@@ -1487,7 +1639,11 @@ describe('Input chat keybind', () => {
     (globalThis as any).document.activeElement = { tagName: 'BUTTON' };
     const preventDefault = vi.fn();
 
-    windowListeners.get('keydown')!({ code: 'Enter', repeat: false, preventDefault });
+    windowListeners.get('keydown')!({
+      code: 'Enter',
+      repeat: false,
+      preventDefault,
+    });
 
     expect(cb.onUiKey).toHaveBeenCalledWith('chat');
     expect(preventDefault).not.toHaveBeenCalled();
@@ -1500,7 +1656,11 @@ describe('Input Space handling', () => {
     (globalThis as any).document.activeElement = { tagName: 'BUTTON' };
     const preventDefault = vi.fn();
 
-    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault });
+    windowListeners.get('keydown')!({
+      code: 'Space',
+      repeat: false,
+      preventDefault,
+    });
 
     expect(preventDefault).toHaveBeenCalledTimes(1);
     expect(input.readMoveInput().jump).toBe(true);
@@ -1645,7 +1805,12 @@ describe('Input mouse-click focus guard (issue: clicked HUD buttons hijack Space
     const blur = vi.fn();
     (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
 
-    windowListeners.get('mouseup')!({ button: 2, clientX: 100, clientY: 100, target: null });
+    windowListeners.get('mouseup')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      target: null,
+    });
 
     expect(blur).toHaveBeenCalledTimes(1);
   });
@@ -1655,7 +1820,12 @@ describe('Input mouse-click focus guard (issue: clicked HUD buttons hijack Space
     const blur = vi.fn();
     (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
 
-    windowListeners.get('mouseup')!({ button: 0, clientX: 100, clientY: 100, target: null });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 100,
+      clientY: 100,
+      target: null,
+    });
 
     expect(blur).not.toHaveBeenCalled();
   });
@@ -1673,7 +1843,11 @@ describe('Input attack move', () => {
     expect(input.readMoveInput().turnRight).toBe(true);
 
     const preventDefault = vi.fn();
-    windowListeners.get('keydown')!({ code: 'KeyA', repeat: false, preventDefault });
+    windowListeners.get('keydown')!({
+      code: 'KeyA',
+      repeat: false,
+      preventDefault,
+    });
 
     expect(cb.onAttackMove).toHaveBeenCalledTimes(1);
     expect(input.readMoveInput().turnLeft).toBe(false);
@@ -1729,7 +1903,11 @@ describe('keyboard jump latch', () => {
     const { input, windowListeners } = makeInput();
     const now = vi.spyOn(performance, 'now');
     now.mockReturnValue(1000);
-    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: () => {} });
+    windowListeners.get('keydown')!({
+      code: 'Space',
+      repeat: false,
+      preventDefault: () => {},
+    });
     windowListeners.get('keyup')!({ code: 'Space' }); // released almost immediately
     now.mockReturnValue(1010);
     expect(input.readMoveInput().jump).toBe(true); // still inside the latch window
@@ -1744,7 +1922,11 @@ describe('keyboard jump latch', () => {
     const { input, windowListeners } = makeInput();
     const now = vi.spyOn(performance, 'now');
     now.mockReturnValue(1000);
-    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: () => {} });
+    windowListeners.get('keydown')!({
+      code: 'Space',
+      repeat: false,
+      preventDefault: () => {},
+    });
     now.mockReturnValue(5000); // long past any latch, key still physically held
     expect(input.readMoveInput().jump).toBe(true);
     windowListeners.get('keyup')!({ code: 'Space' });
@@ -1780,7 +1962,11 @@ describe('Input emote wheel hold', () => {
     const { windowListeners, cb } = makeInput();
     const preventDefault = vi.fn();
 
-    windowListeners.get('keydown')!({ code: 'KeyX', repeat: false, preventDefault });
+    windowListeners.get('keydown')!({
+      code: 'KeyX',
+      repeat: false,
+      preventDefault,
+    });
     expect(cb.onEmoteWheel).toHaveBeenLastCalledWith(true);
     expect(preventDefault).toHaveBeenCalled();
 
@@ -1790,7 +1976,11 @@ describe('Input emote wheel hold', () => {
 
   it('closes the wheel on focus loss', () => {
     const { windowListeners, cb } = makeInput();
-    windowListeners.get('keydown')!({ code: 'KeyX', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('keydown')!({
+      code: 'KeyX',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
 
     windowListeners.get('blur')!({});
 
@@ -1805,7 +1995,11 @@ describe('Input emote wheel hold', () => {
     // onKeyUp is not modal-gated and releaseCapture covers focus loss.
     const { cb, input, windowListeners } = makeInput();
 
-    windowListeners.get('keydown')!({ code: 'KeyX', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('keydown')!({
+      code: 'KeyX',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
     expect(cb.onEmoteWheel).toHaveBeenCalledWith(true);
 
     input.setSuspendMovement(true); // mirrors the frame loop reacting to the open wheel
@@ -1821,7 +2015,11 @@ describe('Input emote wheel hold', () => {
     const { input, windowListeners } = makeInput();
 
     windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
-    windowListeners.get('keydown')!({ code: 'KeyX', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('keydown')!({
+      code: 'KeyX',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
     input.setSuspendMovement(true); // the open wheel is the modal that suspends
     expect(input.readMoveInput().forward).toBe(false); // movement frozen while the wheel is up
 
@@ -1839,7 +2037,11 @@ describe('Input modifier combos', () => {
     expect(cb.onAbilityDown).toHaveBeenLastCalledWith(0);
     cb.onAbilityDown.mockClear();
     // Shift+1 is a distinct, unbound chord: it must NOT fire bare slot 0.
-    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, shiftKey: true });
+    windowListeners.get('keydown')!({
+      code: 'Digit1',
+      repeat: false,
+      shiftKey: true,
+    });
     expect(cb.onAbilityDown).not.toHaveBeenCalled();
   });
 
@@ -1848,7 +2050,11 @@ describe('Input modifier combos', () => {
     const kb = new Keybinds();
     expect(kb.bind('slot5', 0, 'Shift+Digit1')).toBe(true);
     const { windowListeners, cb } = makeInput();
-    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, shiftKey: true });
+    windowListeners.get('keydown')!({
+      code: 'Digit1',
+      repeat: false,
+      shiftKey: true,
+    });
     expect(cb.onAbilityDown).toHaveBeenLastCalledWith(5);
     cb.onAbilityDown.mockClear();
     // bare 1 still drives its own slot, unaffected by the modified binding
@@ -1858,7 +2064,11 @@ describe('Input modifier combos', () => {
 
   it('keeps movement working while a modifier is held (Shift+W still walks)', () => {
     const { input, windowListeners } = makeInput();
-    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false, shiftKey: true });
+    windowListeners.get('keydown')!({
+      code: 'KeyW',
+      repeat: false,
+      shiftKey: true,
+    });
     expect(input.readMoveInput().forward).toBe(true);
   });
 
@@ -1903,7 +2113,11 @@ describe('Input modifier combos', () => {
     const kb = new Keybinds();
     expect(kb.bind('slot7', 0, 'Meta+Digit1')).toBe(true);
     const { windowListeners, cb } = makeInput();
-    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, metaKey: true });
+    windowListeners.get('keydown')!({
+      code: 'Digit1',
+      repeat: false,
+      metaKey: true,
+    });
     expect(cb.onAbilityDown).toHaveBeenLastCalledWith(7);
     cb.onAbilityDown.mockClear();
     // bare 1 still drives slot 0, unaffected by the Cmd binding
@@ -2121,7 +2335,11 @@ describe('Input captureNextKey cancellation (issue 1238)', () => {
     // on-bar action-bar key-binding mode.
     input.captureNextKey(null);
 
-    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('keydown')!({
+      code: 'Digit1',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
 
     // The stale capture callback must never fire, and the keypress must fall
     // through to normal ability dispatch (slot0's default key) instead of
@@ -2135,7 +2353,11 @@ describe('Input captureNextKey cancellation (issue 1238)', () => {
     const captured: (string | null)[] = [];
     input.captureNextKey((code) => captured.push(code));
 
-    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('keydown')!({
+      code: 'Digit1',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
 
     expect(captured).toEqual(['Digit1']);
     expect(cb.onAbilityDown).not.toHaveBeenCalled();
@@ -2324,7 +2546,12 @@ describe('Input mouse-button bindings', () => {
     const { canvas, cb, canvasListeners, windowListeners } = makeInput();
 
     canvasListeners.get('mousedown')!(mouseDown(3, { clientX: 120, clientY: 160 }));
-    windowListeners.get('mouseup')!({ button: 3, clientX: 120, clientY: 160, target: canvas });
+    windowListeners.get('mouseup')!({
+      button: 3,
+      clientX: 120,
+      clientY: 160,
+      target: canvas,
+    });
 
     expect(cb.onClickPick).not.toHaveBeenCalled();
   });
@@ -2343,7 +2570,12 @@ describe('Input mouse-button bindings', () => {
     windowListeners.get('mousedown')!(mouseDown(3)); // thumb press mid-click
     windowListeners.get('mouseup')!({ button: 3 });
     now += 20;
-    windowListeners.get('mouseup')!({ button: 0, clientX: 121, clientY: 161, target: canvas });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 121,
+      clientY: 161,
+      target: canvas,
+    });
 
     expect(cb.onAbilityDown).toHaveBeenLastCalledWith(3);
     expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
@@ -2361,9 +2593,21 @@ describe('Input camera lock (interface unlock arrange mode)', () => {
     setCameraLocked(true);
     const yaw = input.camYaw;
 
-    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
-    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
-    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      ...CENTER,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mousemove')!({
+      movementX: 10,
+      movementY: 5,
+      ...CENTER,
+    });
+    windowListeners.get('mousemove')!({
+      movementX: 12,
+      movementY: 0,
+      ...CENTER,
+    });
 
     expect(input.isCameraDragActive()).toBe(false);
     expect(input.camYaw).toBe(yaw);
@@ -2374,7 +2618,11 @@ describe('Input camera lock (interface unlock arrange mode)', () => {
     const { canvas, cb, canvasListeners, windowListeners, setCameraLocked } = makeInput();
     setCameraLocked(true);
 
-    canvasListeners.get('mousedown')!({ button: 0, ...CENTER, preventDefault: vi.fn() });
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      ...CENTER,
+      preventDefault: vi.fn(),
+    });
     windowListeners.get('mouseup')!({ button: 0, ...CENTER, target: canvas });
 
     expect(cb.onClickPick).not.toHaveBeenCalled();
@@ -2383,13 +2631,29 @@ describe('Input camera lock (interface unlock arrange mode)', () => {
   it('restores the normal camera drag the moment the mode is left', () => {
     const { input, canvasListeners, windowListeners, setCameraLocked } = makeInput();
     setCameraLocked(true);
-    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      ...CENTER,
+      preventDefault: vi.fn(),
+    });
     expect(input.isCameraDragActive()).toBe(false);
 
     setCameraLocked(false);
-    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
-    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
-    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      ...CENTER,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mousemove')!({
+      movementX: 10,
+      movementY: 5,
+      ...CENTER,
+    });
+    windowListeners.get('mousemove')!({
+      movementX: 12,
+      movementY: 0,
+      ...CENTER,
+    });
     expect(input.isCameraDragActive()).toBe(true);
   });
 

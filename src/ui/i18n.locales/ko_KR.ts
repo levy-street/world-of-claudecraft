@@ -1134,6 +1134,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 기록',
   'landing.scout': 'WoC 정찰',
   'landing.parseService': 'WoC 전투 기록',
+  'editor.buildMode.materialNames.WardenStone': '매끄러운 돌',
+  'editor.buildMode.diagonal': '대각선 벽',
+  'editor.buildMode.diagonalHint': '격자점 사이를 드래그하여 원하는 각도로 벽을 만드세요.',
   'guide.professions.endgameBodyRaidCollections':
     '명장 제작은 고유 장착: 명장 제작 표식을 공유하는 장비 계열이다. 기존 최상위 제작 경로는 발견하는 도안, 하루 단위로 제한되는 중간 재료 제작, 공통 최종 단계 재료를 그대로 사용한다. 도가니 세트는 공격대 재료를 쓰는 별도 경로이지, 기존 경로에 비용을 또 얹는 것이 아니다. 두 경로는 동일한 최대 2개 착용 제한을 공유하므로 구성에서 같은 두 자리를 두고 경쟁한다. 완성품은 완전하게 만들기나 의뢰 제작으로 해당 개체가 귀속되기 전까지 자유롭게 거래할 수 있다.',
   'guide.professions.endgamePatternsBodyCollections':
@@ -18237,6 +18240,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '멋지게 그렸군! 자네의 발걸음은 금빛 평가에 어울리네.',
   'questUi.worldQuest.traceReaction.elianComplete':
     '룬 완성! 정성을 다해 연습하면 다음에는 더 멋지게 그릴 걸세.',
+  'hudChrome.realmBuilder.title': '이달의 왕국 건설자',
+  'hudChrome.realmBuilder.currentLabel': '이달의 수상자',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '명예로 산 물건은 되돌릴 수 없습니다. 되사기 목록에는 언제나 직접 판 물건만 오릅니다. 동전으로 산 물건은 대개 판매 가격에 되팔 수 있고, 마음이 다시 바뀌면 그 목록에서 되찾을 수 있지만, 워페어 장비는 구매하는 순간 귀속되어 거래도, 우편 발송도, 되팔기도 영영 할 수 없습니다. 그러니 그 목록에 오르는 일도 결코 없습니다. 상점이 굳이 한 번 더 확인을 묻는 이유가 그것이니, 누르기 전에 장비를 찬찬히 읽어 보세요.',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -18309,8 +18314,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '채집자별 분리',
   'hudChrome.itemMenu.takeChosenQuantity': '지정 수량 꺼내기',
   'hudChrome.itemMenu.combine': '재료 묶음 합치기',
-  'hudChrome.realmBuilder.title': '이달의 왕국 건설자',
-  'hudChrome.realmBuilder.currentLabel': '이달의 수상자',
   'hudChrome.realmBuilder.placeholderName': '당신의 이름',
   'hudChrome.realmBuilder.placeholderHint': '이 명판은 첫 번째 이름을 기다리고 있습니다.',
   'hudChrome.realmBuilder.pastTitle': '역대 수상자',

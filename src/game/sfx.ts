@@ -10,6 +10,7 @@
 // pool of persistent looping sources for ambience and sustained spell casts.
 
 import { apiUrl } from '../client_origin';
+import type { PointSoundSource } from '../render/audio_sink';
 import { ABILITIES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
@@ -53,6 +54,9 @@ const ABILITY_VOICES = 8;
 const ABILITY_GAIN = 0.34;
 export const REF_DISTANCE = 5; // world units at which a sound is at full volume
 export const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
+// Hysteresis past a map point sound's authored radius before its loop is
+// released, so walking the edge does not restart the source every step.
+const POINT_SOUND_CULL = 6;
 const POINT_AMBIENCE_GAIN = 0.18;
 const COOLDOWN_ENTRY_TTL = 60;
 const COOLDOWN_PRUNE_INTERVAL = 30;
@@ -205,6 +209,7 @@ interface PendingLoop {
   y?: number;
   z?: number;
   maxDistance?: number;
+  refDistance?: number;
   // Carries the caller's `immediate` request through the cold-buffer wait so
   // a resumed loop() call (once the buffer finishes loading) still snaps
   // straight to target gain instead of silently falling back to a fade-in.
@@ -340,6 +345,17 @@ class Sfx {
     } catch {
       this.ctx = null;
     }
+  }
+
+  /** Release the AudioContext for a page that is going away (the editor's
+   *  pagehide teardown). Nulls the context so a later init() rebuilds it. */
+  close(): void {
+    const ctx = this.ctx;
+    this.ctx = null;
+    this.master = null;
+    this.clips = SFX_CLIPS;
+    this.clipsReady = null;
+    if (ctx) void ctx.close().catch(() => {});
   }
 
   private entry(key: string): SfxEntry | undefined {
@@ -872,8 +888,10 @@ class Sfx {
   // maxDistance defaults to makePanner's own default (the shared MAX_DISTANCE),
   // so every existing caller keeps its current audible range; only a caller
   // that needs its own falloff (pointAmbient's 'forge' branch) passes an
-  // override. refDistance has no caller that overrides it today; add it back
-  // if a future station ambience needs its own near-field radius.
+  // override. refDistance is likewise optional, and is passed by the
+  // map-authored point sounds: a maker's radius IS the whole falloff circle,
+  // so the near field has to scale with it rather than sit at the shared
+  // constant (see pointSounds).
   loop(
     id: string,
     key: string,
@@ -883,6 +901,7 @@ class Sfx {
     z?: number,
     maxDistance?: number,
     immediate = false,
+    refDistance?: number,
   ): void {
     const ctx = this.ctx,
       master = this.master;
@@ -907,7 +926,7 @@ class Sfx {
           this.pendingLoopVariants.delete(id);
           return;
         }
-        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance, immediate });
+        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance, refDistance, immediate });
         this.pendingLoopVariants.set(id, variantIndex);
         if (this.pendingLoopLoads.get(id) !== key) {
           this.pendingLoopLoads.set(id, key);
@@ -933,6 +952,7 @@ class Sfx {
               pending.z,
               pending.maxDistance,
               pending.immediate,
+              pending.refDistance,
             );
           });
         }
@@ -944,7 +964,7 @@ class Sfx {
       src.playbackRate.value = this.authoredPlaybackRate(key);
       const g = ctx.createGain();
       g.gain.value = 0;
-      const panner = positional ? this.makePanner(x, y, z, undefined, maxDistance) : null;
+      const panner = positional ? this.makePanner(x, y, z, refDistance, maxDistance) : null;
       if (panner) src.connect(g).connect(panner).connect(master);
       else src.connect(g).connect(master);
       src.start();
@@ -976,7 +996,8 @@ class Sfx {
       // takes effect on the NEXT frame rather than only for a loop that
       // hasn't started yet.
       const resolvedMax = maxDistance ?? MAX_DISTANCE;
-      if (slot.panner.refDistance !== REF_DISTANCE) slot.panner.refDistance = REF_DISTANCE;
+      const resolvedRef = refDistance ?? REF_DISTANCE;
+      if (slot.panner.refDistance !== resolvedRef) slot.panner.refDistance = resolvedRef;
       if (slot.panner.maxDistance !== resolvedMax) slot.panner.maxDistance = resolvedMax;
     }
     // Only (re)arm the ramp when the target actually changes. loop() is called
@@ -1872,6 +1893,42 @@ class Sfx {
     };
     blast(196, 0, 0.5);
     blast(261.6, 0.42, 0.9);
+  }
+
+  /** Per-frame update of the map-authored point sounds (the editor's Sound
+   *  tool). Each node is one positional loop whose panner falls off over the
+   *  authored radius, so it rides the same pool as world ambience: lazy clip
+   *  loading, the manifest's gain trim, and allocation-free repeat calls all
+   *  come along. Out-of-range nodes release their source rather than sitting
+   *  silent, with a little hysteresis past the radius so a player walking the
+   *  edge does not restart the loop every step. */
+  pointSounds(sources: readonly PointSoundSource[]): void {
+    if (!this.ctx) return;
+    for (let i = 0; i < sources.length; i++) {
+      const s = sources[i];
+      const dx = s.x - this.lx,
+        dz = s.z - this.lz;
+      const cull = s.radius + POINT_SOUND_CULL;
+      if (dx * dx + dz * dz > cull * cull) {
+        if (this.loops.has(s.id) || this.pendingLoops.has(s.id)) this.unloop(s.id, 0.7);
+        continue;
+      }
+      // The authored radius IS the whole falloff circle, so it drives both ends
+      // of the linear distance model: full gain out to a small core, silent at
+      // the edge. Without the matching near field a small emitter would sit at
+      // full volume across most of its own circle.
+      this.loop(
+        s.id,
+        s.key,
+        s.volume,
+        s.x,
+        s.y,
+        s.z,
+        Math.max(1, s.radius),
+        false,
+        Math.max(0.5, s.radius * 0.12),
+      );
+    }
   }
 
   // --- Per-ability procedural combat audio (src/render/ability_vfx) --------

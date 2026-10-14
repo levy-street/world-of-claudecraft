@@ -1,6 +1,7 @@
 import { resetBankerChestProfileCaches } from '../banker_chest';
 import { prepareCanopyDetailProfileAssets } from '../canopy_detail';
 import { prepareCharacterProfileAssets, resetCharacterProfileCaches } from '../characters/assets';
+import { prepareCityClutterProfileAssets, resetCityClutterProfileCaches } from '../city_clutter';
 import { prepareCliffScreeProfileAssets, resetCliffScreeProfileCaches } from '../cliff_scree';
 import { prepareStoneDetailProfileAssets } from '../detail_normals';
 import { resetDoorPortalProfileCaches } from '../door_portal';
@@ -65,6 +66,7 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
   (target) =>
     Promise.all([
       prepareCliffScreeProfileAssets(target),
+      prepareCityClutterProfileAssets(target),
       prepareEastbrookTownProfileAssets(),
       prepareEastbrookGrandArmouryProfileAssets(),
       prepareMailboxProfileAssets(),
@@ -93,6 +95,7 @@ const RESETTERS = [
   ['quest_objects', resetQuestObjectProfileCaches],
   ['jail_scene', resetJailSceneProfileCaches],
   ['cliff_scree', resetCliffScreeProfileCaches],
+  ['city_clutter', resetCityClutterProfileCaches],
   ['door_portal', resetDoorPortalProfileCaches],
   ['wildheart_terrain', resetWildheartTerrainProfileCaches],
   ['fireball_travel_visual', resetFireballTravelProfileCaches],

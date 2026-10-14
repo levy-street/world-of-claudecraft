@@ -2543,6 +2543,7 @@ export function normalizeNpcAppearance(app: Partial<ModularAppearance>): Modular
  *  across zones under new templateIds). */
 function baseId(templateId: string): string {
   if (templateId === 'scout_maren_highwatch') return 'scout_maren';
+  if (templateId === 'scout_maren_wastes') return 'scout_maren';
   if (templateId === 'brother_halven_marsh') return 'brother_halven';
   return templateId;
 }

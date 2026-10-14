@@ -1,5 +1,12 @@
 import * as THREE from 'three';
-import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import {
+  DUNGEON_X_THRESHOLD,
+  getActiveWorldContent,
+  isBuiltinWorldActive,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+} from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { GFX } from './gfx';
@@ -171,6 +178,12 @@ export function buildMotes(seed: number): MotesView {
   return {
     group,
     update(px: number, pz: number, dt: number): void {
+      // The shipped world's ambience only: an authored map opts in
+      // (TerrainStyle.motes), so a maker's city carries no stray gold specks.
+      if (!isBuiltinWorldActive() && getActiveWorldContent().terrainStyle?.motes !== true) {
+        group.visible = false;
+        return;
+      }
       if (px > DUNGEON_X_THRESHOLD) {
         group.visible = false; // dungeons live outside the strip — no motes indoors
         seeded = false;

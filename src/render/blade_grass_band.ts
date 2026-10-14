@@ -22,9 +22,27 @@
 // blade root is, by construction, the same colour as the pixel under it.
 
 import * as THREE from 'three';
-import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
-import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
-import { clusterGeometry, clusterPlacementPad, mulberry32 } from './blade_grass';
+import {
+  getActiveWorldContent,
+  isBuiltinWorldActive,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+} from '../sim/data';
+import { grassClearedAt } from '../sim/grass_clear';
+import {
+  roadDistance,
+  terrainCutAtHeight,
+  terrainHeight,
+  WATER_LEVEL,
+  zoneBiomeAt,
+} from '../sim/world';
+import { bladeSwayGlsl, clusterGeometry, clusterPlacementPad, mulberry32 } from './blade_grass';
+import {
+  activateDenseSlot,
+  type DenseSlotState,
+  deactivateDenseSlot,
+} from './blade_grass_dense_core';
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
 import { GRASS_BIOME_DENSITY } from './foliage';
@@ -98,6 +116,10 @@ export function buildBladeGrassBand(
         )
       : new THREE.Vector3(0.62, 0.62, 0.62),
   };
+  // Resolved once at build, like the near carpet (bladeSwayGlsl).
+  const classicSway = isBuiltinWorldActive();
+  mat.customProgramCacheKey = () =>
+    `${mat.onBeforeCompile.toString()}|blade-sway:${classicSway ? 'classic' : 'wind'}`;
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uPlayerPos;
@@ -137,12 +159,9 @@ export function buildBladeGrassBand(
           float bgFade = 1.0 - smoothstep(uBandFar * ${MEADOW_BAND_FADE_START.toFixed(2)},
             uBandFar, distance(bgOrigin.xz, uPlayerPos));
           transformed *= bgFade;
-          // the carpet's sway, verbatim: one meadow, one wind
-          float bgPhase = bgOrigin.x * 1.7 + bgOrigin.z * 2.3;
-          float bgSway = (sin(uTime * 2.1 + bgPhase) + 0.4 * sin(uTime * 3.7 + bgPhase * 1.31))
-            * 0.085 * position.y * position.y;
-          transformed.x += bgSway;
-          transformed.z += bgSway * 0.7;
+          // the carpet's sway, shared: one meadow, one wind; branched around
+          // once the fade has collapsed the blade
+          ${bladeSwayGlsl(classicSway)}
         #endif`,
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
@@ -189,10 +208,16 @@ export function buildBladeGrassBand(
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
       ok = r1 < (0.44 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
       if (ok) ok = roadDistance(x, z) > 2.4;
+      // The maker's painted no-grass discs, same as the near carpet: a city
+      // floor has to be clear in BOTH bands or the meadow reappears the moment
+      // the player steps back from it.
+      if (ok) ok = !grassClearedAt(getActiveWorldContent().grassClear, x, z);
       if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
       if (ok) {
         const h = terrainHeight(x, z, seed);
         ok = h > WATER_LEVEL + 1.4;
+        // no band tufts floating over a boolean cut (mirrors the near carpet)
+        if (ok) ok = !terrainCutAtHeight(x, z, h);
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
           const lushHere = 0.5 + lush * 0.6;

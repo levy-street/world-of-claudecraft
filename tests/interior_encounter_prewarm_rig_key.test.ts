@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { npcLookFor } from '../src/render/characters';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { npcEntityLookFor } from '../src/render/characters/npc_look_provider';
 import { Renderer } from '../src/render/renderer';
 import { MOBS } from '../src/sim/data';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
@@ -64,15 +65,19 @@ describe("Varkhul's rig twin entity", () => {
 
   it('is never claimed by the modular look provider, which composes no mob', () => {
     expect(npcLookFor(VARKHUL_BOSS_ID, 'mob')).toBeNull();
-    // The provider main.ts installs routes every non-player through npcLookFor
-    // with the entity's own kind, the arm above.
+    // The provider main.ts installs routes every non-player through
+    // npcEntityLookFor (the seam shared with the Studio viewport), whose
+    // fallback is npcLookFor with the entity's own kind, the arm above.
+    expect(
+      npcEntityLookFor({ kind: 'mob', templateId: VARKHUL_BOSS_ID } as unknown as Entity),
+    ).toBeNull();
     const main = codeWithoutLineComments(
       readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'),
     );
     const at = main.indexOf('setModularLookProvider((e) =>');
     expect(at).toBeGreaterThan(-1);
-    const provider = main.slice(at, main.indexOf(');', at));
+    const provider = main.slice(at, main.indexOf('});', at));
     expect(provider).toContain("e.kind === 'player'");
-    expect(provider).toContain(': npcLookFor(e.templateId, e.kind)');
+    expect(provider).toContain('return npcEntityLookFor(e)');
   });
 });

@@ -1138,6 +1138,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 記録',
   'landing.scout': 'WoC スカウト',
   'landing.parseService': 'WoC 戦闘ログ',
+  'editor.buildMode.materialNames.WardenStone': '滑らかな石',
+  'editor.buildMode.diagonal': '斜めの壁',
+  'editor.buildMode.diagonalHint':
+    'グリッド上の点から別の点へドラッグして、任意の角度の壁を作成します。',
   'guide.professions.endgameBodyRaidCollections':
     '名匠鍛造は「装備数制限：名匠鍛造」の印を持つ共通の装備群です。従来の最高位製作ルートでは、発見する型紙、1日ごとに制限される中間素材の製作、共通の終盤素材を引き続き使います。坩堝のセットはレイド素材を使う別ルートであり、従来のルートに追加費用を積み重ねるものではありません。どちらも同じ2部位までの装備上限を共有するため、ビルド内の同じ二つの枠を競います。完成品は完全化や依頼製作によってその個体が帰属するまでは自由に取引できます。',
   'guide.professions.endgamePatternsBodyCollections':
@@ -18279,6 +18283,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.traceReaction.elianGold': '見事な線だ！その足取りは金の評価にふさわしい。',
   'questUi.worldQuest.traceReaction.elianComplete':
     'ルーンが完成した！丁寧に練習すれば次はもっと上手くなる。',
+  'hudChrome.realmBuilder.title': '今月の王国建設者',
+  'hudChrome.realmBuilder.currentLabel': '今月の受賞者',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '名誉での購入は取り消せません。商人の買い戻し一覧に並ぶのは、自分が売った品だけです。コインでの買い物なら、たいていは売却価格で売り戻せますし、また気が変わればその一覧から取り戻せますが、ウォーフェア装備は買った瞬間に魂縛されるため、取引にも郵送にも売り戻しにも二度と回せません。その一覧にウォーフェア装備が並ぶことは、決してありません。商店がわざわざ確認を求めるのはそのためです。押す前に、その一点をよく読みましょう。',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -18352,8 +18358,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '採集者別に分ける',
   'hudChrome.itemMenu.takeChosenQuantity': '指定数を取り出す',
   'hudChrome.itemMenu.combine': '素材スタックを結合',
-  'hudChrome.realmBuilder.title': '今月の王国建設者',
-  'hudChrome.realmBuilder.currentLabel': '今月の受賞者',
   'hudChrome.realmBuilder.placeholderName': 'あなたの名前',
   'hudChrome.realmBuilder.placeholderHint': 'この銘板は最初の名前を待っています。',
   'hudChrome.realmBuilder.pastTitle': 'これまでの受賞者',

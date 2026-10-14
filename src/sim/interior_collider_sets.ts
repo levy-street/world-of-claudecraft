@@ -29,9 +29,10 @@ export function derivedInteriorColliders(
   if (!set) {
     const layout = INTERIOR_LAYOUTS[interior] ?? CRYPT_LAYOUT;
     const dressing = dungeonId ? DUNGEONS[dungeonId]?.tombDressing : undefined;
-    set = layoutColliders(layout, dressing, DUNGEON_FLOOR_Y).concat(
-      ignivarPropColliders(interior, layout),
-    );
+    // The layout set is the narrow LayoutCollider shape (circles + OBBs); the
+    // prop colliders are the full Collider union, so widen before joining.
+    const layoutSet: Collider[] = layoutColliders(layout, dressing, DUNGEON_FLOOR_Y);
+    set = layoutSet.concat(ignivarPropColliders(interior, layout));
     interiorSetByDungeon.set(key, set);
   }
   return set;

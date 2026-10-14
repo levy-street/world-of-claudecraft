@@ -8,6 +8,7 @@ import { type AssembleOptions, modularHeadFor } from './assets';
 import { type CharacterFormKey, characterFormAssetKey } from './form_visual_selection_core';
 import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
 import {
+  authoredRigOverride,
   mechHeldWeaponOverride,
   modularVisualKey,
   VISUALS,
@@ -24,6 +25,7 @@ export {
   applyEntityAnimOverrides,
 } from './anim_state_entity_core';
 export type { AssembleOptions } from './assets';
+export { visualAssetsResident } from './assets';
 export { type LookPiecesStats, lookPiecesStats } from './look_pieces';
 export { npcLookFor } from './npc_looks';
 export { CharacterPreview } from './preview';
@@ -121,7 +123,12 @@ export function createCharacterVisual(
   // Shapeshift forms are their own model and never compose, and neither does a
   // Combat Mech wearer: the mech is a whole replacement body, so the cosmetic
   // must win over the authored look (composing over it hid a purchased skin).
-  const look = formKey || isMechWearer(e) ? null : (modularLookProvider?.(e) ?? null);
+  // A Studio-authored rig pick is an explicit model choice the same way, so
+  // it beats a composed NPC look too.
+  const look =
+    formKey || isMechWearer(e) || authoredRigOverride(e)
+      ? null
+      : (modularLookProvider?.(e) ?? null);
   const key = formKey
     ? characterFormAssetKey(formKey, e.auras)
     : look

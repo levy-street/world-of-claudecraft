@@ -5,11 +5,14 @@ import type { MaterialComposition } from './material_sources';
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
+import type { ClutterStamp } from './city_clutter';
 import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
 import type { TreasureMapRarity } from './content/treasure_maps';
+import type { GrassClearCircle } from './grass_clear';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+import type { MapObjectives } from './map_objectives';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
 import type { WispMazeState } from './minigames/wisp_maze';
 import type { FishingCatchBand } from './professions/fishing_bands';
@@ -20,6 +23,7 @@ import type {
 } from './professions/perfecting_swap';
 import type { RespawnWindow } from './respawn_policy';
 import type { HoardControlCast } from './rift/hoard_control_casts';
+import type { TreeParams } from './tree_params';
 import type {
   VarkhulAssemblyDifficulty,
   VarkhulAssemblyPhase,
@@ -3924,6 +3928,34 @@ export interface AbilityDef {
 // modules in sim/content/ export records of these; sim/data.ts merges them.
 // ---------------------------------------------------------------------------
 
+/** Ambient presentation authored in ClaudeCraft Studio for an NPC or mob camp. */
+export type AuthorVfxPreset = 'arcane' | 'fire' | 'frost' | 'holy' | 'nature' | 'shadow';
+
+export interface AuthorVfx {
+  preset: AuthorVfxPreset;
+  /** Relative particle density. The renderer clamps this again before use. */
+  intensity: number;
+}
+
+/** One stop on an authored NPC patrol route. `wait` is a pause in seconds. */
+export interface NpcRoutePoint {
+  x: number;
+  z: number;
+  wait?: number;
+}
+
+/**
+ * An authored NPC patrol route walked by src/sim/npc_routes.ts. `mode` picks
+ * how the end of the point list is handled: 'loop' wraps back to the first
+ * point, 'pingpong' reverses and walks the list backwards. `speed` is in
+ * yards per second (clamped at use; absent means the default walk pace).
+ */
+export interface NpcRoute {
+  points: NpcRoutePoint[];
+  mode: 'loop' | 'pingpong';
+  speed?: number;
+}
+
 export interface NpcDef {
   id: string;
   name: string;
@@ -3988,6 +4020,16 @@ export interface NpcDef {
   // (src/sim/weekly_quests.ts) instead of the gossip menu.
   weeklyEmissary?: boolean;
   greeting: string;
+  /** Authored patrol route; sanitized in map_doc sanitizeNpc. */
+  route?: NpcRoute;
+  /** Explicit rigged-character manifest key. Absent keeps template dispatch. */
+  visualKey?: string;
+  /** Optional ambient particle treatment shown in editor and playtest. */
+  authorVfx?: AuthorVfx;
+  /** Editor-facing role and AI briefs. They never enter gameplay decisions. */
+  authorRole?: string;
+  aiNotes?: string;
+  questNotes?: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
   // mid-fight). Keeping the def in NPCS lets the online client reconstruct its
@@ -3995,11 +4037,49 @@ export interface NpcDef {
   dynamic?: boolean;
 }
 
+/**
+ * Per-camp stat tuning authored in the editor's Mob tool. Every field is a
+ * MULTIPLIER on the value createMob already derived from the template and
+ * level, so 1 means "template default", >1 a bonus and <1 a penalty. Absent
+ * fields (and an absent statMods entirely) leave the spawn byte-identical to
+ * an untuned camp, this is the parity contract that keeps shipped content
+ * unchanged. Applied by applyCampMobTuning (src/sim/camp_authoring.ts).
+ */
+export interface CampStatMods {
+  health?: number;
+  damage?: number;
+  armor?: number;
+  moveSpeed?: number;
+  attackSpeed?: number;
+  scale?: number;
+}
+
 export interface CampDef {
   mobId: string;
   center: { x: number; z: number };
   radius: number;
   count: number;
+  /** Optional camp-specific level range. Absent uses the mob template range. */
+  levelMin?: number;
+  levelMax?: number;
+  /** Optional ambient particle treatment copied to every spawned camp member. */
+  authorVfx?: AuthorVfx;
+  /** Editor stat multipliers applied to every spawned member. Absent = stock. */
+  statMods?: CampStatMods;
+  /**
+   * Seconds between a member's death and its in-place respawn. Absent = the
+   * realm default (cfg.respawnSeconds x the template's rare/respawn multiplier).
+   */
+  respawnSeconds?: number;
+  /**
+   * Authored patrol route walked by every member of the camp (same waypoint
+   * shape the City Build Routes subtool authors for NPCs). Absent = the stock
+   * random wander around the spawn point.
+   */
+  route?: NpcRoute;
+  /** Editor-only briefs preserved for later AI quest and encounter generation. */
+  aiNotes?: string;
+  questNotes?: string;
   // Scatter this camp off a PRIVATE rng sub-stream instead of the shared
   // world stream (the ambient-horse / training-dummy principle in the Sim camp
   // loop, generalized so a camp can still scatter). The shared stream's
@@ -5314,6 +5394,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // it straight back to the line, so a teleport, a spawn or a knockback into a
   // lake never strands anyone on the bed; a diver holds their depth hands-free.
   swimDiving: boolean;
+  /** On a ladder (ladders.ts): the climb owns this body's motion, with no
+   *  gravity; the render plays the floating tread pose. Absent = not climbing. */
+  climbing?: boolean;
   fatigueTicks: number; // ticks spent past the open-sea fatigue line (sim/fatigue.ts)
   breathUsedTicks: number; // ticks of the lungful spent underwater (sim/breath.ts)
   drownTicks: number; // ticks submerged past an empty lungful (paces the drown pulses)
@@ -5393,6 +5476,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // Hosts read it per interest-scan visit (O(viewers x neighbors)); recomputing
   // it from auras each visit was a measurable cost in crowds.
   stealthed: boolean;
+  // Practice bot for an authored map's objective rehearsal
+  // (sim/social/map_objectives_run.ts + map_objective_bots.ts). Absent on every
+  // other entity, so nothing outside that module changes behaviour for one.
+  objectiveBot?: { team: 0 | 1 };
   ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
   castingAbility: string | null;
   castRemaining: number;
@@ -5779,6 +5866,13 @@ export interface Entity extends ClientMirroredEntityFields {
   hasFled: boolean; // a cowardly mob flees only once per pull; cleared when it resets at spawn
   wanderTarget: Vec3 | null;
   wanderTimer: number;
+  // Patrol runtime (src/sim/npc_routes.ts): the target waypoint index, the
+  // seconds left in a waypoint pause, and the ping-pong walk direction. Lazily
+  // initialized on the first routed tick; absent on entities without a route.
+  // Shared by routed NPCs and routed camp mobs (the idle arm of updateMob).
+  routeIdx?: number;
+  routeWaitLeft?: number;
+  routeDir?: 1 | -1;
   aggroTargetId: number | null;
   /** GM character: invulnerable (dealDamage no-ops). Server-set from the
    *  characters.is_gm column; never user-settable. */
@@ -5853,6 +5947,9 @@ export interface Entity extends ClientMirroredEntityFields {
    *  the run's route accumulated mobs indefinitely. */
   runScoped?: boolean;
   respawnTimer: number;
+  /** Authored per-camp respawn delay (CampDef.respawnSeconds), copied at spawn.
+   *  Absent leaves the realm default / template respawn rules untouched. */
+  campRespawnSeconds?: number;
   corpseTimer: number;
   lootFfaTimer: number; // seconds of owner-lock left before tap loot opens to all (FFA); Infinity until rollLoot starts it
   // Profession harvest: single-use, first-come claim on this corpse's componentTags
@@ -5896,6 +5993,11 @@ export interface Entity extends ClientMirroredEntityFields {
   questIds: string[];
   vendorItems: string[];
   devVendor?: boolean; // dev free-epic vendor (ptr_dev_vendor.ts)
+  // Authored patrol route deep-copied at spawn from NpcDef (createNpc) or from
+  // the owning CampDef (applyCampMobTuning); walked by src/sim/npc_routes.ts,
+  // every tick for an NPC, on idle ticks for a mob. Absent = stationary NPC /
+  // stock wandering mob.
+  route?: NpcRoute;
   // object (ground interactable)
   objectItemId: string | null;
   // Runtime-only Soulwell ownership/eligibility state. The object itself is wired
@@ -6047,6 +6149,9 @@ export interface Entity extends ClientMirroredEntityFields {
   corpseInstanceId: number | null;
   scale: number;
   color: number;
+  /** Authored character rig override and ambient VFX. Render-only. */
+  visualKey?: string;
+  authorVfx?: AuthorVfx;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
   // Active rideable ground mount ('' = dismounted; players only). Unlike the
@@ -8699,6 +8804,8 @@ export interface MoveInput {
 // array order: `add` (default) adds `delta`, weighted by the falloff; `level`
 // pulls the height toward the ABSOLUTE height `delta`, weighted by the falloff
 // (the flatten/plateau brush; full weight means h becomes exactly `delta`).
+export type TerrainBrushAlphaId = 'noise' | 'splatter' | 'streaks' | 'dots' | 'chunks';
+
 export interface HeightStamp {
   x: number;
   z: number;
@@ -8706,6 +8813,32 @@ export interface HeightStamp {
   delta: number; // add: +raise / -lower at the centre; level: target height
   falloff: 'smooth' | 'flat';
   mode?: 'add' | 'level'; // absent = 'add' (v1 documents)
+  /** LEVEL stamps only: the target's slope in world yards per yard, so the
+   *  stamp levels toward a tilted PLANE (`delta` at the centre) instead of one
+   *  flat height. Absent = the flat target every v1..v3 document has.
+   *
+   *  This is what lets Smooth take the jaggies off a hillside without turning
+   *  it into a terrace: on ground that is already planar the target equals the
+   *  ground, so the stamp does nothing at all (SPACEY, 2026-09-09: "the smooth
+   *  tool completely ruins the shape of the land even on low"). */
+  gx?: number;
+  gz?: number;
+  /** LEVEL stamps only: how far toward the target this stamp pulls, on top of
+   *  the falloff (0..1). Absent = 1, the full pull every v1..v3 document has.
+   *  Smooth carries its brush strength here so the TARGET can stay the honest
+   *  local surface: a planar slope then cancels exactly, at any strength. */
+  strength?: number;
+  /** Solid inner-radius ratio. Absent preserves the original fully soft brush. */
+  hardness?: number;
+  /** Optional deterministic built-in mask. Imported paint masks stay editor-local. */
+  alpha?: TerrainBrushAlphaId;
+  /** ADD stamps only, the Noise brush: present = the falloff-weighted delta is
+   *  scaled by a seeded fractal field in world space (terrain_noise_brush.ts),
+   *  so one stroke paints natural undulation across the whole brush. Bump size
+   *  in yards; the stroke's pattern seed; fine-detail share 0..1 (absent 0.5). */
+  noiseSize?: number;
+  noiseSeed?: number;
+  noiseRough?: number;
 }
 
 // A freely placed GLB model the editor drops onto the world. Rendered by the
@@ -8713,14 +8846,159 @@ export interface HeightStamp {
 // the sim additionally derives a static circle collider from this record, so
 // what-you-see-is-what-you-collide-with holds for editor placements too.
 // Carried on WorldContent so both sides read the SAME record.
+/** How a placed fire emitter is seated on its owning model. Offsets remain in
+ *  the model's local axes but are measured in world yards, which makes gizmo
+ *  edits predictable even when the asset has a very unusual source scale. */
+export type AssetFireAnchor = 'base' | 'center' | 'top';
+export type AssetFireStyle = 'torch' | 'bonfire' | 'wildfire' | 'soulfire' | 'embers';
+export type AssetFireBlend = 'additive' | 'alpha';
+
+/** One independently authored procedural fire source on a placed asset. */
+export interface AssetFireEmitter {
+  id: string;
+  enabled: boolean;
+  anchor: AssetFireAnchor;
+  style: AssetFireStyle;
+  blend: AssetFireBlend;
+  /** Model-local yard offsets from `anchor`, editable with the 3-axis gizmo. */
+  x: number;
+  y: number;
+  z: number;
+  /** Overall size plus independent flame width/height shaping. */
+  scale: number;
+  width: number;
+  height: number;
+  /** Number of layered flame tongues (1..8). */
+  flames: number;
+  intensity: number;
+  opacity: number;
+  /** Local point-light brightness and radius. */
+  glow: number;
+  glowRange: number;
+  /** Smoke density, puff scale, and upward travel. */
+  smoke: number;
+  smokeScale: number;
+  smokeRise: number;
+  /** Procedural flame colour and motion controls. */
+  hue: number;
+  saturation: number;
+  speed: number;
+  turbulence: number;
+  flicker: number;
+  /** Normalized ember density (0..1). */
+  embers: number;
+}
+
 export interface PlacedAsset {
+  wallFinishes?: import('./wall_finishes').WallFinishes;
+  building?: import('./building').BuildingMembership;
   path: string; // public GLB url, e.g. "/models/props/well.glb"
   x: number;
   z: number;
   rotY: number; // radians
   scale: number;
+  worldPropKind?: 'fence' | 'inn';
+  worldPropWidth?: number;
+  worldPropDepth?: number;
   // Circle collider radius in yards (already scaled), or absent/0 for walk-through.
   collideRadius?: number;
+  // Footprint shape: absent = circle, 'square' = rotY-following OBB with
+  // half-extents = collideRadius (see sim/colliders.ts).
+  collideShape?: 'square';
+  // The maker hand-authored the radius/shape: keep the legacy footprint even
+  // when a baked per-asset collision entry exists for the model.
+  collideCustom?: boolean;
+  // Resolved hitboxes overriding the baked/generated set: hand-edited boxes
+  // (baked mode) or the fine "true collision" bake (mesh mode). Normalized
+  // model space; `ry` = per-box yaw on top of the placement's rotY.
+  hitboxes?: readonly {
+    x: number;
+    y: number;
+    z: number;
+    hx: number;
+    hy: number;
+    hz: number;
+    ry?: number;
+  }[];
+  // Per-placement WALKABLE ramp decks (normalized model space, the
+  // AuthoredCollisionRamp shape): the walkable floor rises linearly along the
+  // deck's local +X from y0 to y1. When present they replace the asset's
+  // authored/generated deck table (see sim/placement_ramps.ts) - the channel
+  // that lets a Collision Master playtest walk unsaved ramps.
+  ramps?: readonly {
+    x: number;
+    z: number;
+    hx: number;
+    hz: number;
+    ry?: number;
+    y0: number;
+    y1: number;
+  }[];
+  // Optional extra transform axes (the editor gizmo): visual-only tilts and
+  // per-axis scale multipliers on top of the uniform scale. Absent = 0 / 1.
+  rotX?: number;
+  rotZ?: number;
+  scaleX?: number;
+  scaleY?: number;
+  scaleZ?: number;
+  // Vertical offset above the terrain seat (yards). Absent = 0.
+  y?: number;
+  // Editor detach (see MapPlacement.detached): when true the model floats at a
+  // fixed height: `groundY` is the frozen ground it seats above instead of the
+  // live terrainHeight, with `y` still added on top. Absent = terrain-seated.
+  detached?: boolean;
+  groundY?: number;
+  // Grass hue override in degrees [0, 360] for procedural grass patches
+  // (path 'procedural://grass-patch'); absent = the default grass tint.
+  hue?: number;
+  // Grass blade lightness [0, 1] and tufts per patch [1, 60]; absent = defaults.
+  lum?: number;
+  clump?: number;
+  // Generated rock (path 'procedural://rock') shape parameters: deterministic
+  // seed + generator sliders (noise amount, feature detail, sharpness, texture
+  // index). Absent on ordinary placements.
+  rockSeed?: number;
+  rockNoise?: number;
+  rockDetail?: number;
+  rockSharp?: number;
+  rockTex?: number;
+  // v3 rock params: vertical stretch, ground embed, ridged jaggedness, and a
+  // built-in terrain texture set key (render/terrain_texture_sets.ts) with
+  // its tile size in yards per repeat.
+  rockHeight?: number;
+  rockDepth?: number;
+  rockJag?: number;
+  rockTexId?: string;
+  rockTexTile?: number;
+  // Merged rock ridge (path 'procedural://rock-ridge'): the chain's nodes as
+  // anchor-relative offsets (girth radius in yards, height multiplier).
+  rockNodes?: { dx: number; dz: number; dy: number; r: number; h: number }[];
+  // Custom built model (path 'procedural://model'): inline editable mesh
+  // volumes rendered as one textured solid (render/model_gen.ts). `modelTexId`
+  // is a built-in terrain texture set key; `modelTexTile` is yards per repeat.
+  meshes?: readonly { verts: number[]; tris: number[]; ramp?: boolean }[];
+  modelTexId?: string;
+  modelTexTile?: number;
+  // Material adjustments (map_doc MapPlacement.modelHue/Sat/Light).
+  modelHue?: number;
+  modelSat?: number;
+  modelLight?: number;
+  // Generated tree (path 'procedural://tree'): the whole generator recipe,
+  // foundation trunk, branch growth, canopy volumes, leaf scatter, bark, wind
+  // (sim/tree_params.ts). The renderer regrows the tree from it deterministically.
+  tree?: TreeParams;
+  // Material overrides (shader tweaks): albedo tint multiply, transparency,
+  // emissive glow color + strength. Absent = the model's own materials.
+  tint?: number;
+  opacity?: number;
+  glow?: number;
+  glowStrength?: number;
+  // Animated fire effect anchored at the model's top (render-only): a live
+  // flame + a boot-time point light in playtest. Absent = none.
+  fire?: boolean;
+  // Rich multi-emitter successor to `fire`. When present it is authoritative;
+  // the legacy flag still renders its original single flame for old maps.
+  fireEffects?: readonly AssetFireEmitter[];
 }
 
 // An invisible blocker wall (editor-authored, custom maps only): a world-space
@@ -8734,6 +9012,257 @@ export interface BlockerDef {
   z2: number;
 }
 
+// An editor-authored collision volume (custom maps only), resolved from a
+// 'collider/<kind>' placement by sim/collider_volumes.ts. Dimensions are FINAL
+// world-space yards (placement scale already applied). Boxes and spheres become
+// static movement colliders; planes raise the walkable floor (groundHeight)
+// over their footprint. Like blockers, there is NO render mesh in the shipped
+// game; the editor draws a translucent overlay instead.
+export interface ColliderVolume {
+  kind: 'box' | 'sphere' | 'plane' | 'wall';
+  x: number;
+  z: number;
+  rotY: number; // three.js rotation.y convention (matches ObbCollider.rot)
+  // Plane tilt (radians, three.js Euler 'XYZ' with rotY): a tilted plane is a
+  // sloped walkable floor (ramp). Absent/0 for boxes and spheres (yaw-only OBBs).
+  rotX?: number;
+  rotZ?: number;
+  sizeX: number; // box width / sphere diameter / plane width
+  sizeY: number; // box height / plane floor offset above the terrain at center
+  sizeZ: number; // box depth / plane depth
+  // Placement Y-lift (the gizmo's Y arrow) and detached anchor, folded into the
+  // plane's walkable floor so collision sits exactly where the overlay draws it
+  // (ramps/fluids already carry these). Absent = 0 / follow the live terrain.
+  offsetY?: number;
+  detached?: boolean;
+  groundY?: number;
+}
+
+// One control point of a cave/tunnel centerline (editor Caves tool).
+// `y` is the ABSOLUTE floor height of the tunnel at this node; `radius` is the
+// half-width of the bore in yards. Consecutive nodes form a capsule-chain
+// corridor; src/sim/caves.ts owns all geometry math derived from these.
+export interface CaveNode {
+  x: number;
+  y: number;
+  z: number;
+  radius: number;
+}
+
+// A cave/tunnel (editor-authored, custom maps only). Pure data shared by sim
+// (ground sheets, wall confinement, camera clamp) and render (the standalone
+// tube mesh), exactly like HeightStamp: both sides sample the same analytic
+// functions in src/sim/caves.ts so what you walk on is what you see.
+//
+// The tube is TERRAIN-INDEPENDENT: its size and shape come only from the
+// authored nodes (never clamped, carved, or collapsed by the surrounding
+// ground). Openings into the terrain are authored separately as TerrainHole
+// cutouts the maker lines the cave up with.
+export interface CaveDef {
+  id: string;
+  nodes: CaveNode[];
+  // The base bore radius this cave was AUTHORED with (yards). Regenerating
+  // the bore (moving a rig node) reuses it, so a cave never silently changes
+  // girth because the Tunnel brush slider moved since. Absent (v1 docs) =
+  // the editor falls back to the live brush radius.
+  radius?: number;
+  // Bore multipliers (editor Cave panel sliders): width scales every node
+  // radius, height scales the interior clearance. Absent = 1 (v1 documents).
+  width?: number;
+  height?: number;
+  // Organic wobble [0,1] applied when the bore is (re)generated from its rig
+  // points: lateral path noise + radius variation. Absent = 0 (straight bore).
+  variance?: number;
+  // Floor bumps [0,1]: deterministic noise rolled into the WALKABLE floor
+  // (sim sheet + render mesh share sim/caves.ts caveFloorBumpAt), fading to
+  // zero at the walls. Absent = 0 (flat floor).
+  floorVariance?: number;
+  // Cosmetic spike density [0,1] for the interior mesh (render-only; the sim
+  // never collides with them). Absent = 0 (bare bore, v1 documents).
+  stalactites?: number;
+  stalagmites?: number;
+  // Spike size multiplier [0.3, 3] for the formations above. Absent = 1.
+  spikeSize?: number;
+  // Mouth toggles: whether each end of the tube is an OPEN entrance ring
+  // (walk-in mouth at exactly the authored node size) or a sealed rock cap.
+  // Absent = true (open) at both ends.
+  startOpen?: boolean;
+  endOpen?: boolean;
+  // Interior base-texture set key (render/terrain_texture_sets.ts): the detail
+  // map tiled over walls/floor. Absent = the default granite (Rock051). The
+  // Paint tool's vertex tinting layers on top either way, so a re-textured
+  // cave stays fully paintable.
+  tex?: string;
+  // Texture tile size in yards per repeat. Absent = 28 for a picked texture
+  // set, the legacy 5 for the stock granite.
+  texTile?: number;
+  // Carve the mouth from the bore itself: the tube emits a matching `tube`
+  // TerrainCut (sim/caves.ts caveBoreCut), so wherever the bore breaches the
+  // surface it opens its own opening. Absent/false = the v1 contract, where
+  // openings are authored by hand as separate cuts, so an existing document
+  // never gains an opening it did not have.
+  autoMouth?: boolean;
+  // Smooth-union radius (yards) for that self-carved mouth, which melts it
+  // into a hand-placed cut beside it instead of leaving a crease. Absent = 0.
+  mouthBlend?: number;
+}
+
+// One node of a `tube` cut's chain: a world-space centreline point with its
+// own cross-section. `radius` is the lateral half-width, `vy` the vertical
+// semi-axis (absent = circular). A cave bore emits exactly this shape.
+export interface TerrainCutNode {
+  x: number;
+  y: number;
+  z: number;
+  radius: number;
+  vy?: number;
+}
+
+// A boolean cutout through the terrain sheet (editor Cut tool): the ground
+// surface simply does not exist where it passes inside the solid. The mesher
+// drops the quads inside it and skirts the rim (render/terrain_cut_rim_core.ts)
+// and movement treats the missing sheet as either a drop into a cave below or
+// a hard wall (nothing to stand on). `y` anchors the solid at the surface
+// height captured when the cut was made, so re-sculpting nearby ground never
+// smears it.
+//
+// An absent `shape` is the v1 sphere, so every existing document evaluates
+// bit-identically; sim and render both sample the union through
+// src/sim/terrain_cuts.ts, which is what keeps a cut from becoming an
+// invisible wall.
+export interface TerrainCut {
+  x: number;
+  y: number;
+  z: number;
+  radius: number;
+  // Absent = 'sphere' (v1 documents). FORK: 'voxel' is the map's dug rock
+  // volume (the Dig / Fill / Smooth brushes bake into it), a signed-distance
+  // grid sampled trilinearly; there is at most one per document.
+  shape?: 'box' | 'capsule' | 'tube' | 'voxel';
+  // Orientation: yaw about Y then pitch about X, radians. A pitched box is how
+  // a slot follows a cliff face rather than dropping straight down.
+  rotY?: number;
+  rotX?: number;
+  // Smooth-union radius in yards: melts this cut into the ones before it
+  // instead of leaving a crease. Absent/0 = a hard union (the v1 behaviour).
+  blend?: number;
+  // box: half extents. Absent = `radius` on that axis.
+  halfX?: number;
+  halfY?: number;
+  halfZ?: number;
+  // capsule: half length along the local X axis, and the cross-section's
+  // vertical semi-axis as a multiple of `radius` (absent = 1, circular).
+  len?: number;
+  vert?: number;
+  // tube: the world-space chain. `bore` clips the solid to the half ABOVE the
+  // chain line, which is exactly a cave bore's horseshoe, so a tube arcing
+  // over a valley cuts the ground it passes through and not the ground under
+  // it.
+  nodes?: TerrainCutNode[];
+  bore?: boolean;
+  // A CARVE (the Carve tool): the solid's underground interior is a real
+  // cavity, walkable floor, rock walls and ceiling, and an interior mesh
+  // (render/cut_cavity_mesh.ts). Absent = the v1 hole: a pure sheet cutout
+  // whose void drops into whatever runs beneath it, so no existing document
+  // gains a floor it never had.
+  carve?: boolean;
+  // A carve's interior base texture: a terrain texture-set key tiled over the
+  // cavity's walls/floor (absent = the default granite), and its tiling
+  // period in yards. Cluster-resolved: the first carve of a blended cluster
+  // carrying one dresses the whole interior, so a brush-dug extension
+  // inherits the room's rock.
+  tex?: string;
+  texTile?: number;
+  // ---- FORK: organic shaping (the Carve tool's "cave system" dials). All
+  // absent = the exact primitive above, so every existing document evaluates
+  // bit-identically. Evaluated in the ONE field the sim, the physics and the
+  // interior mesher share (sim/terrain_cuts.ts), so the ghost, the cut and
+  // the walkable floor always agree.
+  // Undulation: the surface is displaced in and out by up to `warp` yards of
+  // low-frequency noise with features about `warpScale` yards across.
+  warp?: number;
+  warpScale?: number;
+  // Capsule only. `taper` multiplies the radius at the two ends (1 = uniform,
+  // <1 pinched, >1 flared); `wobble` is a periodic radius variance along the
+  // length (0..0.6 of the radius) with period `wobbleLen` yards; `bend` curves
+  // the axis in the horizontal plane and `arch` in the vertical, both in
+  // radians of total turn over the length.
+  taper?: number;
+  wobble?: number;
+  wobbleLen?: number;
+  bend?: number;
+  arch?: number;
+  // ---- FORK: the 'voxel' shape. A grid of `nx*ny*nz` cells of `cell` yards
+  // whose min corner sits at (vx0, vy0, vz0); `vox` is the run-length coded
+  // Int8 signed distance in units of cell/VOXEL_UNIT (positive = rock).
+  // `x/y/z/radius` are the grid's centre and half-diagonal, kept in step so
+  // every rect test that reads them still works.
+  cell?: number;
+  vx0?: number;
+  vy0?: number;
+  vz0?: number;
+  nx?: number;
+  ny?: number;
+  nz?: number;
+  vox?: string;
+  /** FORK, runtime only (never saved): identity + revision of the decoded
+   *  volume, so the zone build workers receive a dug volume once per edit
+   *  instead of once per tile job (render/zone_build_pool.ts). */
+  vid?: string;
+  vrev?: number;
+}
+
+// The v1 name. A hole IS a cut; v1 documents simply authored spheres only.
+export type TerrainHole = TerrainCut;
+
+// A remesh DETAIL region (the Carve tool's Remesh brush): inside its disc the
+// carve-interior mesher extracts at `cell` yards instead of the default, so a
+// maker spends triangles exactly where a cave needs to read clean. Presentation
+// only, the sim samples the analytic field, which has no resolution.
+export interface DetailRegion {
+  x: number;
+  z: number;
+  radius: number;
+  cell: number;
+}
+
+// LEGACY (retired Patch tool): a disc where the old terrain-carving cave
+// layer was suppressed. Still parsed so old documents round-trip, but the
+// runtime ignores it ? the rebuilt cave system never carves terrain.
+export interface CavePatch {
+  x: number;
+  z: number;
+  radius: number;
+}
+
+// A fluid pool volume (lava/acid/spectral/water), resolved from a
+// 'fluid/<kind>' placement by sim/fluid_volumes.ts. An ellipse footprint
+// (half-axes, rotated by rotY) whose surface sits at terrainHeight(center) +
+// offsetY. Independent of the map-wide water level: the sim only reads it for
+// the submerged damage tick; the renderer draws the surface + effects.
+export type FluidKind = 'lava' | 'acid' | 'spectral' | 'water';
+export type FluidSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+export interface FluidVolume {
+  kind: FluidKind;
+  x: number;
+  z: number;
+  rotY: number;
+  halfX: number;
+  halfZ: number;
+  offsetY: number;
+  hue: number; // degrees
+  lum: number; // 0..1
+  dps: number; // flat damage per second while submerged (0 = harmless)
+  // Additional damage per second as a fraction of the victim's MAX HP (0..1),
+  // stacked on top of `dps`. Lava = 0.10 (10% max HP/s); the others are flat-only.
+  dpsPct: number;
+  school: FluidSchool;
+  fx: number; // FLUID_FX_* bits (fluid_volumes.ts)
+  glow: number; // emissive strength 0..1
+  lightColor: number;
+  lightIntensity: number;
+}
+
 // A coarse 2D biome paint grid (editor). Each cell holds a biome id (0=vale,
 // 1=marsh, 2=peaks) or 255 for unpainted. Where painted, it overrides both the
 // terrain SHAPE (sim, in shapeAt) and the ground COLOR (render). Absent for the
@@ -8745,6 +9274,240 @@ export interface BiomePaint {
   originX: number; // world x of the grid's (col 0) edge
   originZ: number; // world z of the grid's (row 0) edge
   ids: number[]; // length cols*rows; 0/1/2 = biome, 255 = unpainted
+  // Maker-defined color swatches (editor palette additions): cells painted with
+  // a custom id (see CUSTOM_PAINT_ID_MIN in sim/map_doc.ts) tint the ground
+  // that color; terrain SHAPE keeps the zone band (color-only painting).
+  custom?: CustomPaintSwatch[];
+  /**
+   * How the boundary between two painted textures LOOKS, map-wide. Both are
+   * 0..1 and both are absent on a document that has never been asked about
+   * them, which reads as the defaults in render/terrain_paint_layers.ts, NOT
+   * as zero, a plain one-cell bilinear over a 0.25-0.5yd grid is a hard
+   * cut-out at walking distance, which is the look these replace.
+   *
+   * `edgeSoftness` widens the shader's blend kernel (in yards, converted to
+   * cells against `cell`). It is the half of the brush-hardness feature that
+   * was missing: a soft stroke already stores its rim as DITHERED cells, and
+   * a kernel only one cell wide resolves that dither as salt-and-pepper
+   * speckle instead of the coverage ramp it encodes.
+   *
+   * `edgeDetail` warps the paint lookup with world-space noise, so a boundary
+   * breaks into interlocking fingers instead of following the grid. Zero for
+   * both is exactly the pre-2026-09-22 look.
+   */
+  edgeSoftness?: number;
+  edgeDetail?: number;
+}
+
+export interface CustomPaintSwatch {
+  id: number; // CUSTOM_PAINT_ID_MIN..CUSTOM_PAINT_ID_MAX, unique per map
+  color: number; // 0xRRGGBB (also the fallback when the texture is unavailable)
+  label?: string;
+  // Content hash of an imported ground texture (stored browser-side in
+  // IndexedDB); when present, painting with this swatch tiles the image over
+  // the ground. A machine without the texture falls back to the color.
+  textureSha?: string;
+  // Yards per texture repeat (default 8).
+  tileSize?: number;
+  // ANTI-TILING, 0..1 (absent/0 = the plain repeating grid this has always
+  // been). A painted swatch is one tap at worldXZ/tileSize, so it grids up
+  // visibly on open ground - unlike the procedural layers, which already mix
+  // rotated octaves and a hue drift. Above 0 the tile is sampled a SECOND
+  // time through a rotated, offset frame and the two are blended by a smooth
+  // low-frequency field, so the repeat never lines up. The second tap is
+  // taken only where variation > 0, which makes this slider its own cost
+  // control.
+  variation?: number;
+  // SURFACE DEPTH, 0..1 (absent/0 = flat, the historical look). Painted
+  // ground gets a normal map but none of the height-driven shading the
+  // procedural layers enjoy - no parallax, no cavity darkening, no
+  // micro-shadow - which is why paving reads flat next to natural rock.
+  // Above 0 the swatch's AmbientOcclusion map (already shipped beside every
+  // builtin Color/NormalGL) is sampled and its crevices are shaded in, so the
+  // stones sit in their mortar instead of floating on it. One extra texture
+  // read, taken only where a swatch asks for it.
+  depth?: number;
+  // Hue rotation in degrees (-180..180) and lightness shift (-1..1) applied
+  // on top of the swatch's base look; 0/absent paints exactly the base.
+  hueShift?: number;
+  light?: number;
+  // Built-in biome id (index into world.ts BIOME_BY_ID) this swatch is a
+  // hue/light variant of: painting re-bases like that biome instead of the
+  // flat-color path, so the variant keeps the stock biome's ground look.
+  baseBiome?: number;
+  // A user-saved tint copy: the biome sliders' auto-variant reuse skips it,
+  // so tweaking a built-in biome's sliders never mutates a saved swatch.
+  saved?: boolean;
+  // Emissive glow strength for the hot/orange parts of the texture (lava): 0 or
+  // absent = no glow; >0 makes bright warm pixels emit light so the bloom pass
+  // gives them a molten glow. Auto-set to 1 when a builtin Lava texture is
+  // picked; the renderer also defaults any lava swatch to 1 (see terrain.ts).
+  glow?: number;
+}
+
+// Map-authored music (game-client presentation only). Track ids are the
+// game's MusicZone names (game/music.ts); unknown ids are ignored at play
+// time so documents stay forward-compatible.
+export interface MapMusic {
+  // Map-wide soundtrack; absent = derived from the biome as usual.
+  zoneTrack?: string;
+  // Rect areas with their own track; the smallest containing rect wins.
+  areas?: { minX: number; minZ: number; maxX: number; maxZ: number; track: string }[];
+}
+
+// Map-authored positional "point sound": a looping sound-effect emitter placed
+// at a spot, audible within `radius` yards (spherical falloff) at up to `volume`
+// gain. Client-audio presentation only; `sound` is an SFX clip id (game/sfx
+// SFX_CLIPS) and an unknown/undecoded id is ignored at play time so documents
+// stay forward-compatible.
+export interface MapPointSound {
+  x: number;
+  z: number;
+  // Height above the terrain seat (yards) of the emitter.
+  y: number;
+  // SFX clip id to loop (see SFX_CLIPS in src/game/sfx.ts).
+  sound: string;
+  // Peak gain 0..1 at the emitter, before distance falloff.
+  volume: number;
+  // Falloff radius in yards: full at the centre, silent at/beyond this distance.
+  radius: number;
+}
+
+// Map-authored ground DECAL: one stamped image draped over the terrain
+// (pentagram, blast scorch, blood pool, tracks, ...). Render-only presentation
+// decals never collide, block, or affect the sim, so an unknown `tex` is
+// simply not drawn and documents stay forward-compatible.
+//
+// The art is resolved like a paint swatch's texture: `builtin:<key>` names an
+// entry of the shipped decal library (render/decal_library.generated.ts) and a
+// 64-hex sha256 names an image imported into this browser. Only decals near
+// the camera are meshed and only their textures are fetched (render/decals.ts),
+// so a map may carry many more than are ever resident at once.
+export interface MapDecal {
+  x: number;
+  z: number;
+  /** `builtin:<key>` or a sha256 of an imported image. */
+  tex: string;
+  /** Footprint DIAMETER in yards along the decal's local x. */
+  size: number;
+  /** Yaw in radians (0 = the art's own up runs along +z). */
+  rot: number;
+  /** Height/width ratio, 1 = square. */
+  aspect?: number;
+  /** Overall opacity 0..1; absent = 1. */
+  opacity?: number;
+  /** Tint (0xRRGGBB) multiplied into the art; absent = untinted. */
+  color?: number;
+  /** Emissive strength 0..1 (glowing sigils); absent = unlit. */
+  glow?: number;
+  /** Draw-order bias among overlapping decals (higher wins); absent = 0. */
+  sort?: number;
+}
+
+// Per-map authored scene lighting (render-only): the editor's Lighting tab
+// saved into the document, applied over the biome/day-night rig in playtest
+// and the editor alike. Absent = the shipped biome/day-night lighting.
+// Structurally identical to the render layer's EditorLightingProfile (the sim
+// stays render-free, so the shape is declared here too).
+export interface MapLighting {
+  sunIntensity: number;
+  sunColor: number; // 0xRRGGBB
+  hemiIntensity: number;
+  skyColor: number; // 0xRRGGBB
+  envScale: number;
+  sunAzimuthDeg: number;
+  sunElevationDeg: number;
+  // How much of the authored daylight the deepest night keeps, 0..1 (absent =
+  // the shipped night dip). Lifts the whole night grade - key, ambient, sky,
+  // fog - so a map can run its clock without going murky after dark.
+  nightFloor?: number;
+  // Cave brightness 0..1: lifts the carved-cavity vertex tint floor from the
+  // shipped cave dark toward plain rock (absent/0 = shipped).
+  caveLight?: number;
+}
+
+/** Optional presentation overrides applied while the camera/player is inside
+ * one authored zone. Missing fields inherit the map-wide atmosphere. */
+export interface ZoneAtmosphere {
+  lighting?: MapLighting;
+  timeScale?: number;
+  skybox?: string | null;
+  // Per-zone ambient weather. Overrides the map-wide `weather` while the player
+  // stands in this zone, so one realm can run its own storm cycle without
+  // dragging the rest of a whole-world map into the same sky.
+  weather?: MapWeather;
+}
+
+/** A weather look the sky can actually hold ('auto' is the absence of one). */
+export type WeatherPrecipMode = 'clear' | 'rain' | 'snow' | 'sparkle' | 'blizzard';
+
+// Map-authored ambient weather (render-only, presentation-only). Absent = the
+// shipped biome rule (snow in the peaks, rain in the marsh).
+export interface MapWeather {
+  // Fixed weather; 'auto' keeps the biome rule. A non-empty schedule wins.
+  mode?: 'auto' | WeatherPrecipMode;
+  // Precipitation strength 0..1 (default 1).
+  intensity?: number;
+  // Billboard cloud deck: coverage 0..1, puff height in yards above sea level.
+  // Authored low it hugs the terrain and reads as rolling ground fog.
+  clouds?: { coverage: number; height: number };
+  // Dynamic weather: cycle these in order, each holding for `minutes`.
+  schedule?: { mode: WeatherPrecipMode; minutes: number }[];
+  // An aurora over the map, strength 0..1 (absent = none). Curtains hang
+  // high over the camera wherever it goes, brightest at night, faint by day.
+  aurora?: number;
+}
+
+// Automatic terrain texturing rules (render-only). Every rule defaults ON
+// (absent = the shipped look); the map editor exposes them as per-map toggles
+// so makers can paint cliffs and peaks themselves. Painted ground always wins
+// over the enabled rules regardless.
+export interface TerrainStyle {
+  // Rock texture creeping over steep slopes.
+  slopeRock?: boolean;
+  // High ground turning rocky then snow-capped.
+  snowCaps?: boolean;
+  // The world-rim "distant sunlit peaks" haze + rock band.
+  rimMountains?: boolean;
+  // Sand feathering in near the waterline (digging below it goes sandy).
+  shoreSand?: boolean;
+  // The high-tier rock rubble scattered over steep relief (render/cliff_scree).
+  // A carved city's terraces read as cliffs to it; off, the streets stay clean.
+  scree?: boolean;
+  // The drifting airborne specks (render/motes.ts: gold pollen, snow dust).
+  // OPT-IN on an authored map (absent = none): they are the shipped world's
+  // ambience, and over a maker's city they read as stray golden particles
+  // (SPACEY, 2026-09-18, twice: "remove these golden particles").
+  motes?: boolean;
+}
+
+/** One spline railway: floor points in world yards, in running order. */
+export interface RailLine {
+  points: { x: number; y: number; z: number }[];
+  /** Rail spacing in yards (absent = the standard mine gauge). */
+  gauge?: number;
+}
+
+/** One Mesh Fix knockout: terrain quads centred within `r` of (x, z) at a
+ *  height within `ySpan` of `y` do not draw (the height keeps a knockout on a
+ *  cliff's draped skin from also opening the plateau above it). */
+export interface TerrainKnockout {
+  x: number;
+  z: number;
+  y: number;
+  r: number;
+}
+
+/** One Mesh Fix vertex move: every DRAWN terrain vertex within `r` of (x, z)
+ *  is lifted by `dy`. Render-only, exactly like TerrainKnockout, the sim's
+ *  ground is untouched, so this tidies the stretched skin a boolean cut
+ *  leaves over a cave mouth without moving anything a player stands on.
+ *  `r` defaults to half the densest chunk lattice, i.e. one vertex. */
+export interface TerrainVertexEdit {
+  x: number;
+  z: number;
+  dy: number;
+  r?: number;
 }
 
 export type StationType = 'forge' | 'kitchens' | 'apothecary' | 'tannery' | 'loom' | 'toolworks';
@@ -8926,6 +9689,15 @@ export interface WorldServicesDef {
 // registry (both, because terrain reaches the data by module global and the Sim
 // reaches it by config). CAMPS order is a determinism contract: append, never
 // reorder, since the Sim draws the shared Rng in array order.
+export type MapPresentationMode =
+  | 'blank'
+  | 'dungeon'
+  | 'temple'
+  | 'nythraxis'
+  | 'delve'
+  | 'sowfield'
+  | 'yumiMaze';
+
 export interface WorldContent {
   zones: ZoneDef[];
   camps: CampDef[];
@@ -8934,6 +9706,9 @@ export interface WorldContent {
   roads: { x: number; z: number }[][];
   props: ZonePropsDef;
   playerStart: { x: number; z: number };
+  zoneAtmosphere?: Record<string, ZoneAtmosphere>;
+  /** Optional author-authored area used to spread new players across distinct positions. */
+  playerSpawnArea?: { minX: number; minZ: number; maxX: number; maxZ: number };
   // Optional by design: active custom maps that omit services must not inherit
   // built-in stations, mailboxes, noticeboards, muster boards, or graveyards.
   services?: WorldServicesDef;
@@ -8946,11 +9721,181 @@ export interface WorldContent {
   // Invisible blocker walls (editor). Collision-only OBBs in the sim's static
   // colliders; never rendered. Absent for the built-in world.
   blockers?: BlockerDef[];
+  // Editor-authored collision volumes (box/sphere block movement, plane raises
+  // the floor); never rendered in playtest. Absent for the built-in world.
+  colliderVolumes?: ColliderVolume[];
+  // Game-mode anchors an authored map tagged with `regionRole` (each team's
+  // flag, respawn ring, banner and graveyard, plus the rune pads), resolved
+  // into the record the objective driver reads (sim/map_objectives.ts). Absent
+  // for the built-in world and for any map that tagged nothing.
+  objectives?: MapObjectives;
+  // Per-imported-asset baked collision boxes (normalized model space, keyed by
+  // the placement path / 'local|user/<sha>' id). Catalogue assets resolve into
+  // the generated table instead; see sim/asset_collision.ts.
+  // Per-asset wind-sway opt-out (MapDoc.assetSway), keyed by asset id or model
+  // path. Only `false` entries are carried; an absent asset sways as usual.
+  // Render-only: the sim never reads it.
+  assetSway?: Record<string, boolean>;
+  assetCollision?: Record<
+    string,
+    readonly { x: number; y: number; z: number; hx: number; hy: number; hz: number }[]
+  >;
   // 2D biome paint overriding terrain shape (sim) and color (render).
   biomePaint?: BiomePaint;
+  // FORK: the carve interior mesher's document-wide base cell in yards (the
+  // Remesh panel's "Cave mesh detail"); absent = the mesher's default.
+  caveMeshCell?: number;
+  // Caves/tunnels (editor Caves tool): standalone tube volumes, independent
+  // of the heightfield. Absent for the built-in world.
+  caves?: CaveDef[];
+  // Legacy patch discs (the retired Patch tool). Parsed for old documents but
+  // ignored at runtime: terrain is no longer carved, so there is nothing to
+  // patch. Absent = none.
+  cavePatches?: CavePatch[];
+  // Spherical cutouts through the terrain sheet (editor Hole tool). Absent
+  // for the built-in world, so its ground stays byte-identical.
+  holes?: TerrainHole[];
+  // Patch spheres restoring the ground inside hole cutouts (editor Patch hole
+  // mode): a patch beats every hole it overlaps. Absent = none.
+  holePatches?: TerrainHole[];
+  // Mesh Fix knockouts (editor Mesh Fix tool): small discs whose terrain
+  // quads are simply not drawn. RENDER-ONLY: the sim's ground is untouched,
+  // so this is for the stretched leftover polys a cut leaves draped over a
+  // cave mouth, never for making a hole to walk through. Absent = none.
+  terrainKnockouts?: TerrainKnockout[];
+  // Spline railways (render/rail_tracks.ts): each line is a list of FLOOR
+  // points a continuous track is swept through. Render-only dressing.
+  rails?: RailLine[];
+  // Mesh Fix vertex moves (editor Mesh Fix tool, Vertices mode): per-vertex
+  // height nudges applied by render/terrain_vertex_edits.ts inside
+  // meshTerrainHeight. RENDER-ONLY, like terrainKnockouts. Absent = none.
+  terrainVertexEdits?: TerrainVertexEdit[];
+  // Remesh detail regions (Carve tool's Remesh brush): finer carve-interior
+  // tessellation inside each disc. Absent = the default cell everywhere.
+  detailRegions?: DetailRegion[];
+  // Fluid pool volumes (lava/acid/...), projected from 'fluid/<kind>'
+  // placements. Sim reads the damage tick; render draws surfaces + effects.
+  fluids?: FluidVolume[];
+  // Map-wide water tint (hue degrees / lightness 0..1); absent = shipped blues.
+  waterHue?: number;
+  waterLum?: number;
+  // Auto-texturing rule toggles (render-only; absent = all rules on).
+  terrainStyle?: TerrainStyle;
+  // Ambience animation speed (render-only): scales cosmetic world motion
+  // (water, foliage sway, fire, birds, weather). 1 = shipped speed. Never
+  // touches the sim tick or any gameplay timing.
+  timeScale?: number;
+  // Placed-asset view distance (render-only): how far free-placed decor renders
+  // before it culls, capped at the fog. Absent = the default.
+  assetViewDistance?: number;
+  // Ambient weather override (render-only; absent = the biome rule).
+  weather?: MapWeather;
+  // Authored scene lighting (render-only; absent = biome/day-night rig).
+  lighting?: MapLighting;
+  // Authored soundtrack (client presentation; absent = the biome rule).
+  music?: MapMusic;
+  // The map's sky: 'builtin:<id>' (bundled equirect) or 'custom:<sha256>'
+  // (uploaded, IndexedDB). Absent = the procedural HDRI sky. Render-only.
+  skybox?: string;
+  // Named location rects (editor-authored): the HUD shows the containing
+  // rect's name as the player's current location.
+  locations?: { name: string; minX: number; minZ: number; maxX: number; maxZ: number }[];
+  // Authored maps: the world-space point the map's origin samples the shipped
+  // world's natural heightfield from (Generate Terrain). Absent = flat slate.
+  terrainBase?: { x: number; z: number };
+  // A LINKED custom map embedded in the shipped world (customMapToWorldContent
+  // linked projection): the map's rect in LOCAL map coords + the world-space
+  // anchor its origin sits at. Inside the rect the map's own terrain (flat
+  // slate, or its Generate Terrain source) replaces the overworld base with an
+  // edge blend, and the lethal open-sea fatigue is suppressed so a map placed
+  // offshore is safe ground. Derived at projection time, never persisted.
+  linkedMap?: {
+    anchor: { x: number; z: number };
+    minX: number;
+    maxX: number;
+    minZ: number;
+    maxZ: number;
+    terrainBase?: { x: number; z: number };
+  };
+  // Editor-authored point lights (render-only; y is height above terrain).
+  lights?: { x: number; z: number; y: number; color: number; intensity: number; range: number }[];
+  // Editor-authored positional point sounds (client audio only): each loops its
+  // SFX clip, attenuated to silence at `radius` yards. y is height above terrain.
+  pointSounds?: MapPointSound[];
+  // Editor-authored ground decals (render-only): images draped over the terrain
+  // near the camera. See MapDecal and render/decals.ts.
+  decals?: MapDecal[];
   // Water surface height for this map; absent = the built-in WATER_LEVEL (-4.5).
   // Read through waterLevel() in src/sim/world.ts, never directly.
   waterLevel?: number;
+  // Half the world's x extent in yards (world spans [-worldHalfX, worldHalfX]);
+  // absent = the built-in WORLD_MAX_X. Drives the terrain rim walls and the
+  // decoration field bounds; the z extent comes from the zone bands.
+  worldHalfX?: number;
+  // Procedural terrain decorations (trees/rocks) are enabled by default. The
+  // map editor's blank-flat template opts out so makers start from bare ground.
+  decorationsMode?: 'empty';
+  // Stable keys of procedural decorations replaced by editable placements.
+  decorationExclusions?: string[];
+  // Painted no-grass discs: the procedural meadow grass (render/foliage.ts) is
+  // suppressed inside each circle, so a maker can scrub away built-in grass.
+  grassClear?: readonly GrassClearCircle[];
+  // Painted ground-clutter stamps (Studio Paint Clutter brush): the renderer
+  // scatters tier-gated dressing inside each disc (render/city_clutter.ts);
+  // nothing here reaches the simulation.
+  clutter?: readonly ClutterStamp[];
+  // Render/sim presentation defaults are enabled by default. 'blank' keeps only
+  // the neutral terrain base and sky birds for new flat authoring worlds.
+  presentationMode?: MapPresentationMode;
+  // Scenery families this world's DOCUMENT already owns as editable placements,
+  // so the renderer-owned builders that normally draw them must stand down or
+  // the same tree is drawn twice, once movable, once not. Absent for the
+  // built-in world BY CONSTRUCTION, so the shipped path cannot drift.
+  promotedScenery?: PromotedScenery;
+}
+
+/**
+ * Renderer-owned scenery a map document has taken over as placements.
+ *
+ * Only families whose builder reads a STATIC content module need a flag. Every
+ * family props.ts draws out of ZonePropsDef is already gated by the projection
+ * emptying that array (withoutEditableWorldProps), so it must NOT get one.
+ */
+export interface PromotedScenery {
+  /** The Palmreach strand's beach palms (world.ts reachPalmSpots). */
+  reachPalms?: boolean;
+  /** The banyan giants (render/jungle_features.ts reads PALMREACH_PROPS). */
+  greatTrees?: boolean;
+  /** The road network's lamp posts (colliders.ts streetlampPlacements, one
+   *  gate stands down the fixtures, the post colliders and the night-light
+   *  registration together, since all three read the same plan). */
+  streetlamps?: boolean;
+  /** The weeping willows (sim/fen_willows.ts spots: render/fen_features.ts
+   *  draws the fen's, render/water_flora.ts the Veiled Hollow's, and
+   *  colliders.ts blocks both sets' trunks). */
+  willows?: boolean;
+  /** The Farshore isle's strand palms (world.ts farshorePalmSpots, a
+   *  separate list from the Palmreach strand's reachPalms). */
+  farshorePalms?: boolean;
+  /** The Drakelands' den dressing: dragon hoards, egg clutches, ember-lily
+   *  trees and crystal clusters (render/ember_features.ts spots; the lily
+   *  trunk colliders in colliders.ts ride the same flag). */
+  emberDressing?: boolean;
+  /** The Veiled Hollow's valley-floor boulders (render/realm_flora.ts). */
+  realmBoulders?: boolean;
+  /** The Willowfen's pond lilies, shoreline reeds and glow mushrooms
+   *  (render/fen_features.ts). */
+  fenFlora?: boolean;
+  /** Every other declared lake's lily rafts and reeds
+   *  (render/water_flora.ts). */
+  waterFlora?: boolean;
+  /** The fallen-coconut clusters under the strand palms (jungle_features.ts
+   *  reachCoconutSpots + farshore_features.ts's isle clusters). */
+  jungleCoconuts?: boolean;
+  /** The authored towns' (Eastbrook Vale / Fenbridge) rebuild BUILDINGS,
+   *  the town views' building loops and the record colliders stand down;
+   *  wells, stalls, fences, streets and the harbor stay town-drawn. */
+  authoredTowns?: boolean;
 }
 
 /** The resolved storage price tables every sim price read consumes: bank slot

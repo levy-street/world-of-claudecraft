@@ -100,7 +100,7 @@ import {
   type Vec3,
 } from '../types';
 import { VARKHUL_WORK_FACING } from '../varkhul_forge_intermission';
-import { groundHeight, waterLevelAt } from '../world';
+import { groundHeight, mobGroundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
 import {
@@ -523,7 +523,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const step = 1.6 * DT;
       mob.pos.x += Math.sin(mob.facing) * step;
       mob.pos.z += Math.cos(mob.facing) * step;
-      mob.pos.y = groundHeight(mob.pos.x, mob.pos.z, ctx.cfg.seed);
+      mob.pos.y = mobGroundHeight(mob.pos.x, mob.pos.z, ctx.cfg.seed, mob.pos.y);
     }
     return;
   }

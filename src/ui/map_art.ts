@@ -10,45 +10,63 @@
 // ratio. Markers, labels, and the player arrow are drawn on top by the
 // existing painters, so the art wants terrain only, no text.
 
-type ArtState = HTMLImageElement | 'loading' | 'missing';
-const cache = new Map<string, ArtState>();
-const waiters = new Map<string, ((img: HTMLImageElement) => void)[]>();
+import { require2dContext } from './canvas_context';
 
-/** Kick (or join) the load of a zone's plate; onReady fires only if it exists. */
-// Plates are parked while the world's shape settles: the shipped art was
-// painted for the old layout and no longer matches the terrain. Flip to
-// true when fresh plates land in public/map_art/.
-const MAP_ART_ENABLED = false;
+const cache = new Map<string, Promise<HTMLImageElement | null>>();
+// The editor opts into the static atlas directly through loadMapArt. The game
+// HUD still calls onMapArtReady for every zone while building its world strip,
+// so keep that eager path parked until it is converted to one lazy world plate.
+const GAME_MAP_ART_ENABLED = false;
 
-export function onMapArtReady(zoneId: string, onReady: (img: HTMLImageElement) => void): void {
-  if (!MAP_ART_ENABLED) return;
-  const state = cache.get(zoneId);
-  if (state === 'missing') return;
-  if (state instanceof HTMLImageElement) {
-    onReady(state);
-    return;
-  }
-  const queue = waiters.get(zoneId) ?? [];
-  queue.push(onReady);
-  waiters.set(zoneId, queue);
-  if (state === 'loading') return;
-  cache.set(zoneId, 'loading');
-  tryLoad(zoneId, ['webp', 'png'], 0);
+/** Load one bundled plate. Replacing public/map_art/<id>.png is the complete
+ * manual update workflow; markers and labels remain live overlays. */
+export function loadMapArt(zoneId: string): Promise<HTMLImageElement | null> {
+  const cached = cache.get(zoneId);
+  if (cached) return cached;
+  const pending = tryLoad(zoneId, ['webp', 'png'], 0);
+  cache.set(zoneId, pending);
+  return pending;
 }
 
-function tryLoad(zoneId: string, exts: string[], i: number): void {
-  if (i >= exts.length) {
-    cache.set(zoneId, 'missing');
-    waiters.delete(zoneId);
-    return;
+/** Hand-painted plates land in the whole-world minimap strip too, each over its
+ *  own band of `region`. The caller passes the ACTIVE world's zones (shipped
+ *  plate art must not land on an authored map); `strip` is read again when a
+ *  plate lands, since the HUD may have swapped the canvas by then. */
+export function paintMapArtIntoStrip(
+  strip: () => HTMLCanvasElement,
+  region: { minZ: number; maxZ: number },
+  zones: readonly { id: string; zMin: number; zMax: number }[],
+): void {
+  const stripH = strip().height;
+  const spanZ = region.maxZ - region.minZ;
+  for (const zn of zones) {
+    onMapArtReady(zn.id, (img) => {
+      const top = ((region.maxZ - zn.zMax) / spanZ) * stripH;
+      const rows = ((zn.zMax - zn.zMin) / spanZ) * stripH;
+      const canvas = strip();
+      require2dContext(canvas).drawImage(img, 0, top, canvas.width, rows);
+    });
   }
-  const img = new Image();
-  img.onload = () => {
-    cache.set(zoneId, img);
-    const queue = waiters.get(zoneId) ?? [];
-    waiters.delete(zoneId);
-    for (const cb of queue) cb(img);
-  };
-  img.onerror = () => tryLoad(zoneId, exts, i + 1);
-  img.src = `/map_art/${zoneId}.${exts[i]}`;
+}
+
+/** Kick (or join) the load of a plate; onReady fires only if it exists. */
+export function onMapArtReady(zoneId: string, onReady: (img: HTMLImageElement) => void): void {
+  if (!GAME_MAP_ART_ENABLED) return;
+  void loadMapArt(zoneId).then((img) => {
+    if (img) onReady(img);
+  });
+}
+
+function tryLoad(
+  zoneId: string,
+  exts: readonly string[],
+  i: number,
+): Promise<HTMLImageElement | null> {
+  if (i >= exts.length) return Promise.resolve(null);
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => void tryLoad(zoneId, exts, i + 1).then(resolve);
+    img.src = `/map_art/${zoneId}.${exts[i]}`;
+  });
 }

@@ -27,8 +27,10 @@ import {
   triad,
 } from './music_notes';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
+import { closeMusicDirector } from './music_teardown';
 import { composeDungeonGravewyrmSanctum } from './music_theme_gravewyrm_sanctum';
-import { COMBAT_STREAM_URLS, pickCombatTrackIndex, ZONE_STREAM_URLS } from './music_tracks';
+import { COMBAT_STREAM_URLS, pickCombatTrackIndex } from './music_tracks';
+import { applyZoneStreamTargets } from './music_zone_streams';
 import type { MusicZone } from './music_zones';
 
 export type { NoteEvent, Phrase, Theme } from './music_notes';
@@ -39,6 +41,7 @@ import { buildIgnivarRaidThemes } from './raid_music_themes';
 export type { MusicZone } from './music_zones';
 export {
   dungeonMusicZoneForDungeon,
+  MUSIC_ZONES,
   musicZoneForLocation,
   riftMusicZoneForTheme,
   shouldResetMusicForDungeonEntry,
@@ -4316,6 +4319,8 @@ export class MusicDirector {
   // Boss-fight override: a looped file track routed through the same AudioContext
   // that user gestures already unlock for the procedural soundtrack.
   private bossActive = false;
+  /** The stream-keeper interval handle, so close() can clear it. */
+  private timer: number | undefined;
 
   get enabled(): boolean {
     return this._enabled;
@@ -4502,7 +4507,7 @@ export class MusicDirector {
       const stream = this.makeStream(url);
       if (stream) this.combatStreams.push(stream);
     }
-    window.setInterval(() => this.streamKeeper(), STREAM_KEEPER_MS);
+    this.timer = window.setInterval(() => this.streamKeeper(), STREAM_KEEPER_MS);
     this.streamKeeper();
   }
 
@@ -4532,14 +4537,6 @@ export class MusicDirector {
       el.muted = true;
     }
     stream.el = el;
-  }
-
-  private ensureZoneStream(zone: MusicZone): void {
-    if (this.zoneStreams[zone]) return;
-    const url = ZONE_STREAM_URLS[zone];
-    if (!url) return;
-    const stream = this.makeStream(url);
-    if (stream) this.zoneStreams[zone] = stream;
   }
 
   /** Each floor owns its whole soundtrack, including pulls and quiet gaps. */
@@ -4640,6 +4637,11 @@ export class MusicDirector {
     if (on) this.streamKeeper();
   }
 
+  /** Tear the director down for a page that is going away (music_teardown.ts). */
+  close(): void {
+    closeMusicDirector(this);
+  }
+
   /** Fade out while the game menu is open; does not change the music toggle. */
   pauseForMenu(): void {
     if (this._menuPaused) return;
@@ -4673,19 +4675,11 @@ export class MusicDirector {
     if (zone === this.zone && combat === this.combat && crucibleFloor === this.crucibleFloor)
       return;
     const combatStarting = combat && !this.combat;
+    const zoneChanging = zone !== this.zone;
     this.setCrucibleFloor(crucibleFloor);
     this.zone = zone;
     this.combat = combat;
     if (minigameLayerFor(this).active !== null) return;
-    // Combat music replaces the zone theme rather than layering over it: the
-    // zone is silenced for the duration of combat and fades back in when it
-    // ends. Fade out faster than fade in so instance music does not bleed
-    // into the world.
-    if (!combat && crucibleFloor === null) this.ensureZoneStream(zone);
-    for (const [name, stream] of Object.entries(this.zoneStreams) as [MusicZone, StreamTrack][]) {
-      const target = name === zone && !combat && crucibleFloor === null ? 1 : 0;
-      this.setStreamTarget(stream, target, target > 0 ? FADE_SECONDS / 3 : 0.35);
-    }
     // Each fight opens on one of the battle themes, chosen at random per
     // fight and restarted from the top so the opening hit lands; the pick
     // then holds for the whole fight, even across a zone border mid-chase.
@@ -4703,14 +4697,8 @@ export class MusicDirector {
         }
       }
     }
-    this.combatStreams.forEach((stream, idx) => {
-      const target = combat && idx === this.combatIdx ? 1 : 0;
-      this.setStreamTarget(
-        stream,
-        target,
-        target > 0 || crucibleFloor !== null ? 0.35 : FADE_SECONDS / 3,
-      );
-    });
+    // Combat replaces the zone theme (music_zone_streams.ts).
+    applyZoneStreamTargets(this, zoneChanging, FADE_SECONDS / 3);
   }
 }
 

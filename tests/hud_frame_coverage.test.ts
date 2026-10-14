@@ -268,7 +268,10 @@ describe('hud_frame_coverage (standing HUD surfaces are movable frames)', () => 
   // test rather than as a describe-scope collection error.
   let built: Array<{ entry: string; harvest: Harvest }> | null = null;
   const entries = () =>
-    (built ??= HTML_ENTRIES.map((entry) => ({ entry, harvest: harvestEntry(read(entry)) })));
+    (built ??= HTML_ENTRIES.map((entry) => ({
+      entry,
+      harvest: harvestEntry(read(entry)),
+    })));
   const frameIds = new Set(HUD_FRAME_SPECS.map((s) => s.elementId));
 
   it('every element in the harvest carries an id', () => {

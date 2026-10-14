@@ -24,10 +24,16 @@ const editorViewport = readFileSync(
 
 describe('renderer CPU hot path', () => {
   it('reuses picking scratch instead of allocating empty-hit containers', () => {
-    expect(renderer).toContain('private readonly raycastNdc = new THREE.Vector2()');
-    expect(renderer).toContain(
-      'this.raycaster.intersectObjects(this.clickTargets, true, this.raycastHits)',
+    // Picking moved to world_picking.ts (renderer.picking).
+    const picking = readFileSync(
+      new URL('../src/render/world_picking.ts', import.meta.url),
+      'utf8',
     );
+    expect(picking).toContain('private readonly raycastNdc = new THREE.Vector2()');
+    expect(picking).toContain(
+      'this.raycaster.intersectObjects(this.host.clickTargets(), true, this.raycastHits)',
+    );
+    expect(picking).not.toContain('const directHitIds: number[] = []');
     expect(renderer).not.toContain('const directHitIds: number[] = []');
   });
 

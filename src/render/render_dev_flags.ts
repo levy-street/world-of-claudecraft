@@ -113,7 +113,7 @@ export function bladeSectorAxis(): number {
 /** Which GPU-preparation behaviour this session runs. */
 export type GpuPrepMode = 'adaptive' | 'legacy';
 
-const disabled = ((): ReadonlySet<string> => {
+const disabled = ((): Set<string> => {
   const set = new Set<string>();
   if (typeof location === 'undefined') return set;
   const params = new URLSearchParams(location.search);
@@ -122,6 +122,15 @@ const disabled = ((): ReadonlySet<string> => {
   }
   return set;
 })();
+
+/**
+ * Turn a render layer off for this session from code, the same way
+ * `?<name>=off` does. Call it BEFORE the renderer is constructed: the layers
+ * are read when materials build. The Studio uses this for 'grassbake'.
+ */
+export function disableRenderLayer(name: string): void {
+  disabled.add(name);
+}
 
 /** True when the named render layer is disabled via `?<name>=off` (dev only). */
 export function renderLayerDisabled(name: string): boolean {

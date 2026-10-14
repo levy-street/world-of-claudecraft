@@ -258,6 +258,19 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/world_quest_trace_visual.ts',
   'src/render/world_quest_public_trace_visual.ts',
   'src/render/shadow_infiltration_visual.ts',
+  // ClaudeCraft Studio (authored maps only). Static scenery and dressing: the
+  // campfire flame (vertical, body then core), authored ground decals (static
+  // map paint inside the ground band, under every player and encounter rung),
+  // and fluid pool surfaces (the hazard-pool rule).
+  'src/render/campfire_flame.ts',
+  'src/render/decals.ts',
+  'src/render/fluid_surfaces.ts',
+  // Sky: the authored cloud and fog-bank billboards.
+  'src/render/clouds.ts',
+  // Dev and editor wireframes: the dev-cheat collider overlay and the Tree
+  // tool's canopy-volume wire, never in a player's raid.
+  'src/render/collision_debug.ts',
+  'src/render/tree_gen.ts',
 ];
 
 /**

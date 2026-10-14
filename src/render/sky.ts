@@ -2,10 +2,12 @@ import * as THREE from 'three';
 import {
   COLUMN_ZONES,
   columnBlendAt,
+  isBuiltinWorldActive,
   STRIP_MAX_X,
   STRIP_MIN_X,
   STRIP_ZONES,
   ZONES,
+  zoneAt,
 } from '../sim/data';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { loadKtx2Texture, loadTexture, releaseKtx2Texture, releaseTexture } from './assets/loader';
@@ -1061,7 +1063,15 @@ export function ensureSkyAssetsAt(
   z: number,
   target: Readonly<GfxSettings> = GFX,
 ): Promise<void> {
-  return ensureSkyBiomeAssets(skyBiomesAt(x, z), target);
+  // On an authored map the IBL follows the map's OWN zone biome (the
+  // renderer's environment choice, see Renderer.updateEnvBiome), which the
+  // shipped world's sky bands know nothing about. Fetch it here too, so the
+  // entry build can prefilter it behind the loading screen: an IBL that lands
+  // after the reveal relinks every lit material mid-play (a visible hitch and
+  // a lighting shift).
+  const biomes = skyBiomesAt(x, z);
+  const own = isBuiltinWorldActive() ? null : zoneAt(x, z).biome;
+  return ensureSkyBiomeAssets(own && !biomes.includes(own) ? [...biomes, own] : biomes, target);
 }
 
 // u offset that moves a given HDRI's sun azimuth onto SUN_ANCHOR's azimuth

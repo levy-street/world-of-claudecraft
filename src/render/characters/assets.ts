@@ -671,6 +671,23 @@ export function ensureCharacterUrl(url: string | null | undefined): void {
   void prepareCharacterUrl(url).catch(() => undefined);
 }
 
+/** Whether every file a visual key builds from (its body GLB and animation
+ *  libraries) is resident, kicking the fetch of any that is not (`fetch: false`
+ *  only asks). A host that builds a CharacterVisual speculatively (the zone
+ *  prewarm) asks here first, so a lazily loaded body such as the training dummy
+ *  is fetched and warmed by a later pass instead of throwing out of the build. */
+export function visualAssetsResident(key: string, fetch = true): boolean {
+  const def = VISUALS[key];
+  if (!def) return false;
+  let resident = true;
+  for (const url of [def.url, ...(def.animUrls ?? [])]) {
+    if (characterAssetResident(url)) continue;
+    resident = false;
+    if (fetch) ensureCharacterUrl(url);
+  }
+  return resident;
+}
+
 /** A streamed url that has not arrived yet must degrade, never throw: return
  *  null so the caller falls back (base weapon / no ranged override) and kick
  *  the fetch so the cosmetic appears on the next swap or view rebuild. */
@@ -1788,6 +1805,10 @@ function attachAllProps(
         ? offhandAttachDef(base, offhandItemId, weaponSkinId)
         : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
     if (!att) continue;
+    // A held prop whose model streams on demand (an Armory skin model an NPC
+    // carries) degrades while it is cold: left off, its fetch kicked, never a
+    // throw out of the build.
+    if (!residentOrEnsure(att.url)) continue;
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
     const swapKind = isOffhandSwap ? 'offhand' : isWeapon ? 'mainhand' : null;

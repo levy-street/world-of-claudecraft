@@ -18,6 +18,7 @@ import {
   writeNeedleWindupPlan,
 } from './needle_of_fate_vfx_core';
 import { tagVfxSubtree } from './renderer_diagnostics';
+import { VisibleChildrenGroup } from './visible_children_group';
 
 const POOL_SIZE = 8;
 const TRAIL_POINTS = 18;
@@ -181,7 +182,8 @@ function ribbonGeometry(points: number): RibbonGeometry {
  * All primitive families are prebuilt and pooled; gameplay remains authoritative in the sim.
  */
 export class NeedleOfFateVfx {
-  readonly group = new THREE.Group();
+  // Parked slots (hidden) are skipped by the per-frame matrix walk.
+  readonly group = new VisibleChildrenGroup();
   private readonly windups: WindupSlot[] = [];
   private readonly releases: ReleaseSlot[] = [];
   private readonly needles: NeedleSlot[] = [];

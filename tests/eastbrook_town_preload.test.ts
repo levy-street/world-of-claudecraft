@@ -104,7 +104,15 @@ describe('Eastbrook town preload', () => {
       await gate;
 
       const data = await import('../src/sim/data');
-      data.setActiveWorldContent({ ...data.BUILTIN_WORLD, zones: [] });
+      // A custom world WITHOUT the town: the gate is data-driven
+      // (authored_town_gate.ts), so an editor copy that still carries
+      // Eastbrook's buildings correctly gets the real town; this arm pins the
+      // other side, a world whose maker removed them builds an empty root.
+      data.setActiveWorldContent({
+        ...data.BUILTIN_WORLD,
+        zones: [],
+        props: { ...data.BUILTIN_WORLD.props, buildings: [] },
+      });
       const custom = module.buildEastbrookTownView(20061);
       expect(custom.group.name).toBe(module.EASTBROOK_TOWN_ROOT_NAME);
       expect(custom.group.children).toEqual([]);

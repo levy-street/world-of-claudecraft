@@ -19,8 +19,9 @@
 import type { GatheringProfessionId } from '../sim/content/professions';
 import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import {
-  DUNGEON_LIST,
+  activeOverworldDungeons,
   GATHER_NODES,
+  getActiveWorldContent,
   isBgPos,
   isDelvePos,
   STRIP_MAX_X,
@@ -90,6 +91,10 @@ const DETAIL_VIEW_MARGIN = 6;
 // Markers (POIs / portals / NPCs / allies) within this many world units of the
 // visible region still draw, so a label anchored just off the edge is not clipped.
 const MARKER_VIEW_MARGIN = 24;
+// Weight a zone POI point carries into the label declutter: its enter
+// diameter (subzone.ts SUBZONE_RADIUS * 2), so a point ranks alongside the
+// mid-sized authored districts rather than above or below all of them.
+const POI_POINT_WEIGHT = 64;
 // Marker radii in the detail overlay: a px floor plus a per-pixel-per-yard scale,
 // so dots stay visible when zoomed out yet grow with the map (matches the inline
 // site verbatim). ppu = pixels per world unit.
@@ -124,7 +129,10 @@ export interface MapViewRect {
   maxZ: number;
 }
 
-/** A zone POI label: canvas position + the identity the painter localizes. */
+/** A zone POI label: canvas position + the identity the painter localizes.
+ *  An AUTHORED named area (a map's `locations` rect) carries its name inline
+ *  instead: the maker typed it, so there is no catalog key to localize and
+ *  `poiIndex` is -1. */
 export interface MapPoiMarker {
   mx: number;
   /** The authored projection: hit-testing and the screen-reader summary read it. */
@@ -134,6 +142,12 @@ export interface MapPoiMarker {
   labelMy: number;
   zoneId: string;
   poiIndex: number;
+  label?: string;
+  /** Drawing priority for the painter's declutter pass, in yards: the longer
+   *  side of an authored area's rect, so a district outranks the tavern inside
+   *  it when their names would collide. Zone POIs carry the subzone enter
+   *  diameter, which puts them among the mid-sized landmarks. */
+  weight: number;
 }
 
 /** A dungeon entrance portal: canvas position + the dungeon id to localize. */
@@ -1030,8 +1044,26 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
       if (poi.hideOnMap) continue;
       if (!inView(poi.x, poi.z)) continue;
       const { mx, my } = toMap(poi.x, poi.z);
-      pois.push({ mx, my, zoneId: zone.id, poiIndex });
+      pois.push({ mx, my, zoneId: zone.id, poiIndex, weight: POI_POINT_WEIGHT });
     }
+    // Authored named areas (MapDoc `locations`) label their rect's centre.
+    // These are what a city map is actually made of - the zone POI list holds
+    // a handful of shipped points, while a Studio map names every square,
+    // dock and terrace with a dragged rect.
+    for (const area of getActiveWorldContent().locations ?? []) {
+      const cx = (area.minX + area.maxX) / 2;
+      const cz = (area.minZ + area.maxZ) / 2;
+      if (!inZone(cx, cz)) continue;
+      if (!inView(cx, cz)) continue;
+      const { mx, my } = toMap(cx, cz);
+      const weight = Math.max(area.maxX - area.minX, area.maxZ - area.minZ);
+      pois.push({ mx, my, zoneId: zone.id, poiIndex: -1, label: area.name, weight });
+    }
+    // Biggest landmark first: the painter draws greedily and drops a label
+    // whose box collides with one already down, so this ordering decides who
+    // survives a crowded plate. Sort is stable, so equal weights keep content
+    // order (every shipped zone's POIs are equal-weight, so nothing moves).
+    pois.sort((a, b) => b.weight - a.weight);
   }
 
   // Active-quest objective areas (the classic "your targets live here" blobs),
@@ -1110,7 +1142,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // Dungeon portals owned by the current zone (shown at every zoom).
   const portals: MapPortalMarker[] = [];
   for (const portal of filters.dungeons
-    ? overworldDungeonPortals(DUNGEON_LIST, zone.zMin, zone.zMax)
+    ? overworldDungeonPortals(activeOverworldDungeons(), zone.zMin, zone.zMax)
     : []) {
     if (!inZone(portal.x, portal.z) || !inView(portal.x, portal.z)) continue;
     const { mx, my } = toMap(portal.x, portal.z);

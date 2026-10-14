@@ -37,6 +37,9 @@ describe('exact runtime aura paintings', () => {
       execFileSync('git', ['ls-files'], {
         cwd: process.cwd(),
         encoding: 'utf8',
+        // The tracked-path listing outgrew execFileSync's 1 MiB default
+        // (spawnSync ENOBUFS) once the tree passed ~1 MB of path names.
+        maxBuffer: 64 * 1024 * 1024,
       })
         .trim()
         .split('\n'),

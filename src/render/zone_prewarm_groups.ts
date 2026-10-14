@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import { CLASSES, MOBS, NPCS } from '../sim/data';
 import { ALL_CLASSES, type Entity, type ZoneDef } from '../sim/types';
 import { buildAfflictionFamiliarPrewarmStandIn } from './affliction_familiar';
-import { type CharacterVisual, createCharacterVisual } from './characters';
+import { type CharacterVisual, createCharacterVisual, visualAssetsResident } from './characters';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { characterVisualPoolKey } from './characters/visual_pool';
 import type { PooledObjectView } from './ground_object_pool';
@@ -106,6 +106,9 @@ export function buildEntityPrewarmGroup(
     if (!template) return;
     for (let i = 0; i < copies; i++) {
       const entity = h.prewarmEntity('mob', template.id, template.color, template.scale);
+      // A lazily loaded body (the training dummy) is fetched here and warmed by a
+      // later pass instead of throwing out of createCharacterVisual.
+      if (!visualAssetsResident(visualKeyFor(entity))) continue;
       const visual = createCharacterVisual(entity);
       // Assets unavailable: skip the seed so a later zone preparation can retry it.
       if (!visual) continue;
@@ -172,6 +175,8 @@ export function buildNpcPrewarmGroup(
       warmed++;
       continue;
     }
+    // Cold body files: kick their fetch and leave the id for a later pass.
+    if (!visualAssetsResident(modelKey)) continue;
     const visual = createCharacterVisual(entity);
     // assets unavailable: skip the seed, leave the model unmarked and the
     // id uncounted, so a later zone preparation can retry it

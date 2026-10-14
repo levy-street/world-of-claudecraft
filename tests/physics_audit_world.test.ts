@@ -6,6 +6,7 @@ import {
   colliderTopAt,
   DOCK_HUT_ROOF_EAVE,
   DOCK_HUT_ROOF_TOP,
+  insidePrism,
   interiorColliderFrame,
   isBlocked,
   queryOpenWorldColliders,
@@ -57,7 +58,12 @@ const IDLE: MoveInput = {
 };
 
 function makeSim(): Sim {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+  });
   sim.setPlayerLevel(60);
   return sim;
 }
@@ -429,7 +435,10 @@ describe('abilities x collision', () => {
       Math.atan2(-LEGACY_STALL_APPROACH.x, -LEGACY_STALL_APPROACH.z),
     );
     const p = sim.player;
-    sim.castAbility('heroic_leap', p.id, { x: LEGACY_STALL.x, z: LEGACY_STALL.z });
+    sim.castAbility('heroic_leap', p.id, {
+      x: LEGACY_STALL.x,
+      z: LEGACY_STALL.z,
+    });
     for (let i = 0; i < 40 && p.leap; i++) sim.tick();
     expect(p.leap ?? null).toBeNull();
     const g = groundHeight(LEGACY_STALL.x, LEGACY_STALL.z, SEED);
@@ -481,7 +490,10 @@ describe('dungeon deep sweep', () => {
     const sim = makeSim();
     const o = instanceOrigin(DUNGEONS.sunken_bastion.index, 0);
     // Find one r<0.5 slot (crates+barrel) and one r>=0.5 (box+keg).
-    const slots = CRYPT_LAYOUT.tombs.map((t) => ({ t, r: tombSlotRoll(t.x, t.z) }));
+    const slots = CRYPT_LAYOUT.tombs.map((t) => ({
+      t,
+      r: tombSlotRoll(t.x, t.z),
+    }));
     const crateSlot = slots.find((s) => s.r < 0.5);
     const boxSlot = slots.find((s) => s.r >= 0.5);
     expect(crateSlot && boxSlot).toBeTruthy();
@@ -569,7 +581,10 @@ describe('programmatic collider sanity sweeps', () => {
     const cols: Collider[] = [];
     queryOpenWorldColliders(SEED, -240, -240, 240, 900, cols);
     const bad: string[] = [];
+    // Dynamic NPCs are placed by their own spawner at runtime (findSafePos, or
+    // an authored world's reserved-id loop), never at the authored literal.
     for (const npc of Object.values(NPCS)) {
+      if ((npc as { dynamic?: boolean }).dynamic) continue;
       const pos = (npc as { pos?: { x: number; z: number } }).pos;
       if (!pos) continue;
       for (const c of cols) {
@@ -577,13 +592,15 @@ describe('programmatic collider sanity sweeps', () => {
         const hit =
           c.type === 'circle'
             ? Math.hypot(pos.x - c.x, pos.z - c.z) < c.r - 0.05
-            : (() => {
-                const cos = Math.cos(-c.rot);
-                const sin = Math.sin(-c.rot);
-                const lx = (pos.x - c.x) * cos + (pos.z - c.z) * sin;
-                const lz = -(pos.x - c.x) * sin + (pos.z - c.z) * cos;
-                return Math.abs(lx) < c.hw - 0.05 && Math.abs(lz) < c.hd - 0.05;
-              })();
+            : c.type === 'prism'
+              ? insidePrism(c, pos.x, pos.z)
+              : (() => {
+                  const cos = Math.cos(-c.rot);
+                  const sin = Math.sin(-c.rot);
+                  const lx = (pos.x - c.x) * cos + (pos.z - c.z) * sin;
+                  const lz = -(pos.x - c.x) * sin + (pos.z - c.z) * cos;
+                  return Math.abs(lx) < c.hw - 0.05 && Math.abs(lz) < c.hd - 0.05;
+                })();
         if (hit)
           bad.push(
             `${(npc as { id?: string }).id} inside collider at (${c.x.toFixed(1)},${c.z.toFixed(1)})`,

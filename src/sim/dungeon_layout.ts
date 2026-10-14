@@ -4,7 +4,7 @@
 // derives CRYPT_COLLIDERS/SANCTUM_COLLIDERS via layoutColliders). This kills
 // the old hand-mirroring between renderer geometry and collider literals.
 // Sim layer: no three.js imports.
-import type { Collider } from './colliders';
+import type { Collider, LayoutCollider } from './colliders';
 import { IGNIVAR_ARENA_SHELL_POLYGON } from './ignivar_arena';
 import {
   type AuthoredDecor,
@@ -188,6 +188,12 @@ export interface DungeonLayout {
    * and the rendered modules all derive from these three fields (see rift/authored.ts). */
   rooms?: AuthoredRoom[];
   doors?: AuthoredDoor[];
+  /** Interior structural walls (maze walls and pit rims) the editor's dungeon
+   *  mode authors alongside the room graph. */
+  barriers?: Array<WallStub & { style?: 'maze' | 'pit' }>;
+  /** Room-wall cuts used only by rendering, for open drops backed by invisible
+   *  collision. */
+  visualOpenings?: AuthoredDoor[];
   decor?: AuthoredDecor[];
   /** Parkour shelves: standable tops the vault and the ledge climb read. */
   ledges?: AuthoredLedge[];
@@ -1057,8 +1063,10 @@ const SHELL_SEGMENT_MAX = 8;
  * edge is split into equal segments; the OBB's long (hw) axis is rotated along
  * the edge. Used for non-rectangular (`shellPolygon`) rooms so collision matches
  * the rendered walls exactly. */
-export function polygonWallColliders(points: readonly { x: number; z: number }[]): Collider[] {
-  const out: Collider[] = [];
+export function polygonWallColliders(
+  points: readonly { x: number; z: number }[],
+): LayoutCollider[] {
+  const out: LayoutCollider[] = [];
   const n = points.length;
   for (let i = 0; i < n; i++) {
     const a = points[i];
@@ -1179,8 +1187,12 @@ export function layoutColliders(
   layout: DungeonLayout,
   dressing?: TombDressing,
   floorY = 0,
-): Collider[] {
-  const out: Collider[] = [];
+  // LayoutCollider, not Collider: a hand-authored layout only ever emits
+  // circles and boxes. Prisms come exclusively from a placement's Collision
+  // Master volumes, so keeping them out of this return type is what lets every
+  // layout consumer go on reading hw/hd/rot off anything that is not a circle.
+): LayoutCollider[] {
+  const out: LayoutCollider[] = [];
   const wallX = layout.wallX ?? DUNGEON_WALL_X;
   const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
   if (layout.rooms) {

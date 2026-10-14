@@ -31,6 +31,8 @@ const EXPECTED_LOW_OVERRIDES = {
   terrainRelief: 'terrainRelief:0',
   bladeCarpetRadius: 'bladeCarpetRadius:0',
   cliffScree: 'cliffScree:0',
+  cityClutter: 'cityClutter:0',
+  cityClutterRadius: 'cityClutterRadius:30',
   canopyDetail: 'canopyDetail:0',
   canopyDetailTaps: 'canopyDetailTaps:0',
   pixelRatioCap: 'pixelRatioCap:1.48',

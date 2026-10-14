@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => {
     characters: prepare(),
     sky: prepare(),
     cliff: prepare(),
+    cityClutter: prepare(),
     town: prepare(),
     armoury: prepare(),
     mailbox: prepare(),
@@ -67,6 +68,10 @@ vi.mock('../src/render/sky', () => ({
 vi.mock('../src/render/cliff_scree', () => ({
   prepareCliffScreeProfileAssets: mocks.cliff,
   resetCliffScreeProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/city_clutter', () => ({
+  prepareCityClutterProfileAssets: mocks.cityClutter,
+  resetCityClutterProfileCaches: mocks.reset,
 }));
 vi.mock('../src/render/eastbrook_town', () => ({
   prepareEastbrookTownProfileAssets: mocks.town,
@@ -169,6 +174,7 @@ const prepareSpies = [
   mocks.characters,
   mocks.sky,
   mocks.cliff,
+  mocks.cityClutter,
   mocks.town,
   mocks.armoury,
   mocks.mailbox,
@@ -200,6 +206,7 @@ describe('graphics profile asset preparation', () => {
     for (const prepare of prepareSpies.slice(0, 9)) expect(prepare).toHaveBeenCalledWith(target);
     expect(mocks.sky).toHaveBeenCalledWith(position.x, position.z, target);
     expect(mocks.cliff).toHaveBeenCalledWith(target);
+    expect(mocks.cityClutter).toHaveBeenCalledWith(target);
     for (const prepare of [
       mocks.town,
       mocks.armoury,
@@ -253,6 +260,7 @@ describe('graphics profile derived-cache reset', () => {
       'quest_objects',
       'jail_scene',
       'cliff_scree',
+      'city_clutter',
       'door_portal',
       'wildheart_terrain',
       'fireball_travel_visual',

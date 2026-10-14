@@ -13,7 +13,10 @@ template.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1)), lamp);
 vi.mock('../src/render/assets/loader', () => ({
   loadGltf: async () => ({ scene: template }),
 }));
-vi.mock('../src/render/assets/preload', () => ({ registerPreload: () => {} }));
+vi.mock('../src/render/assets/preload', () => ({
+  registerPreload: () => {},
+  registerDeferredPreload: () => {},
+}));
 
 const { PlacedAssetsView } = await import('../src/render/placed_assets');
 
@@ -29,6 +32,12 @@ describe('point lights in placed GLBs', () => {
       register: (light) => registered.push(light),
       release: (light) => released.push(light),
     });
+    // The fire-light pool joins the budget at construction, before any clone.
+    const pool = registered.splice(0);
+    expect(pool).toHaveLength(8);
+    expect(pool.every((light) => light.name.startsWith('placed-fire-light-'))).toBe(true);
+    expect(pool.every((light) => light.userData.budgetDynamic === true)).toBe(true);
+
     view.addPlacement(0, { path: '/models/lamp.glb', x: 0, z: 0, rotY: 0, scale: 1 });
     view.addPlacement(1, { path: '/models/lamp.glb', x: 4, z: 0, rotY: 0, scale: 1 });
     await settle();
@@ -42,6 +51,18 @@ describe('point lights in placed GLBs', () => {
     expect(released).toEqual([registered[0]]);
     view.removePlacement(0);
     expect(released).toEqual([registered[0]]);
+  });
+
+  it('release the fire-light pool from the budget on dispose', () => {
+    const registered: THREE.PointLight[] = [];
+    const released: THREE.PointLight[] = [];
+    const view = new PlacedAssetsView([], 7, {
+      register: (light) => registered.push(light),
+      release: (light) => released.push(light),
+    });
+    expect(registered).toHaveLength(8);
+    view.dispose();
+    expect(released).toEqual(registered);
   });
 
   it('shine at their authored level when ranked, like a static view light', () => {

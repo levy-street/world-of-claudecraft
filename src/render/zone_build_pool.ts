@@ -17,10 +17,14 @@
 // thread still has to upload the results, and starving it helps nobody. Hence
 // a small cap rather than hardwareConcurrency.
 
-import { isBuiltinWorldActive } from '../sim/data';
+import type { WorldContent } from '../sim/types';
+import type { CavityMeshArrays } from './cut_cavity_core';
 import type { ChunkGeometryArrays } from './terrain_chunk_build';
+import { createVoxelIdentityRegistry } from './voxel_identity_core';
 import type {
+  CavityTileRequest,
   TerrainChunkRequest,
+  VoxelVolumeMessage,
   WaterFillArrays,
   WaterFillRequest,
   ZoneBuildRequest,
@@ -46,6 +50,23 @@ export interface ZoneBuildPool {
     job: Omit<WaterFillRequest, 'id' | 'kind'>,
     opts?: { urgent?: boolean },
   ): Promise<WaterFillArrays | null>;
+  /** FORK: the world the workers must mesh. A worker owns its own copy of
+   *  src/sim, which defaults to the built-in world; on an authored map (a
+   *  Studio map or play-test) the mesher's content-dependent terms, the
+   *  height stamps, zones, roads, water level, biome paint, would otherwise
+   *  silently revert. Cheap: the content rides only the FIRST job each worker
+   *  runs against a given generation (postMessage is ordered per worker, so a
+   *  job can never overtake the content it needs). `null` means the built-in
+   *  world, which the worker already has.
+   *  Optional on the interface only so a test stub without it still satisfies
+   *  the type; the real pool always has it. */
+  setContent?(generation: number, content: WorldContent | null): void;
+  /** FORK: march one carve interior tile off the frame. Null when the worker
+   *  failed and the caller should march it on the main thread. */
+  buildCavity?(
+    job: Omit<CavityTileRequest, 'id' | 'kind'>,
+    opts?: { urgent?: boolean },
+  ): Promise<{ arrays: CavityMeshArrays | null } | null>;
   /** How many jobs can be in flight before a submission starts queueing. */
   readonly size: number;
   dispose(): void;
@@ -54,6 +75,8 @@ export interface ZoneBuildPool {
 interface PoolWorker {
   worker: Worker;
   busy: boolean;
+  /** FORK: dug volumes this worker holds, vid -> vrev (see VoxelVolumeMessage). */
+  vox: Map<string, number>;
   /** The one job this worker is running, so a worker-level error (which has no
    *  job id of its own) fails only that job, never the other workers' pending
    *  ones. */
@@ -64,6 +87,8 @@ interface PoolWorker {
    *  handing it another job would leave that job's promise unsettled forever
    *  and hang the gating arrival that awaits it. */
   dead: boolean;
+  /** FORK: the content generation this worker was last told about. */
+  generation: number;
 }
 
 function spawn(): Worker | null {
@@ -85,16 +110,31 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
       : 2;
   // Leave the main thread a core: it still uploads every result.
   const target = Math.max(1, Math.min(MAX_WORKERS, hardware - 1));
-  const workers: PoolWorker[] = [{ worker: first, busy: false, currentId: null, dead: false }];
+  const workers: PoolWorker[] = [
+    { worker: first, busy: false, currentId: null, dead: false, generation: -1, vox: new Map() },
+  ];
   for (let i = 1; i < target; i++) {
     const worker = spawn();
-    if (worker) workers.push({ worker, busy: false, currentId: null, dead: false });
+    if (worker) {
+      workers.push({
+        worker,
+        busy: false,
+        currentId: null,
+        dead: false,
+        generation: -1,
+        vox: new Map(),
+      });
+    }
   }
 
+  const voxelIdentity = createVoxelIdentityRegistry();
   const pending = new Map<number, (response: ZoneBuildResponse) => void>();
   const waiting: (() => void)[] = [];
   let nextId = 1;
   let disposed = false;
+  // FORK: the active world, shipped to each worker ahead of its next job.
+  let contentGeneration = -1;
+  let content: WorldContent | null = null;
 
   const allDead = (): boolean => workers.every((entry) => entry.dead);
 
@@ -165,14 +205,45 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
   };
 
   const submit = async (
-    job: Omit<TerrainChunkRequest, 'id'> | Omit<WaterFillRequest, 'id'>,
+    job:
+      | Omit<TerrainChunkRequest, 'id'>
+      | Omit<WaterFillRequest, 'id'>
+      | Omit<CavityTileRequest, 'id'>,
     transfer?: Transferable[],
     urgent = false,
+    prepare?: (entry: PoolWorker) => void,
   ): Promise<ZoneBuildResponse | null> => {
     const entry = await claim(urgent);
     if (!entry) return null;
     const id = nextId++;
     entry.currentId = id;
+    // FORK: anything the job needs the worker to hold first (dug volumes),
+    // on the same ordered channel, so the job cannot overtake it.
+    if (prepare) {
+      try {
+        prepare(entry);
+      } catch (error) {
+        entry.busy = false;
+        entry.currentId = null;
+        waiting.shift()?.();
+        return { id, ok: false, error: String(error) };
+      }
+    }
+    // FORK: structured-cloning the content is not free, so it rides only the
+    // first job a worker runs against a given generation. postMessage is
+    // ordered per worker, so the job below can never be meshed against the old
+    // one. A throwing post here is treated like a throwing job post below.
+    if (contentGeneration >= 0 && entry.generation !== contentGeneration) {
+      try {
+        entry.worker.postMessage({ kind: 'content', generation: contentGeneration, content });
+        entry.generation = contentGeneration;
+      } catch (error) {
+        entry.busy = false;
+        entry.currentId = null;
+        waiting.shift()?.();
+        return { id, ok: false, error: String(error) };
+      }
+    }
     return await new Promise<ZoneBuildResponse>((resolve) => {
       pending.set(id, resolve);
       try {
@@ -191,6 +262,11 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
 
   return {
     size: workers.length,
+    setContent(generation, next): void {
+      if (generation === contentGeneration && next === content) return;
+      contentGeneration = generation;
+      content = next;
+    },
     async buildChunk(job, opts): Promise<ChunkGeometryArrays | null> {
       const response = await submit({ ...job, kind: 'chunk' }, undefined, opts?.urgent === true);
       if (!response?.ok || response.kind !== 'chunk') return null;
@@ -202,7 +278,41 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
         splats: response.splats,
         extras: response.extras,
         indices: response.indices,
+        // FORK: the Carve system's cut-rim strip and fine-clip patch ride
+        // with the chunk.
+        rim: response.rim,
+        clip: response.clip,
       };
+    },
+    async buildCavity(job, opts): Promise<{ arrays: CavityMeshArrays | null } | null> {
+      // Dug volumes travel once per worker per revision; the job's cloned
+      // records carry only their identity.
+      const volumes: { vid: string; vrev: number; text: string; cells: number }[] = [];
+      const cuts = job.cuts.map((cut) => {
+        if (cut.shape !== 'voxel' || !cut.vox) return cut;
+        const { vid, vrev } = voxelIdentity(cut);
+        volumes.push({
+          vid,
+          vrev,
+          text: cut.vox,
+          cells: (cut.nx ?? 0) * (cut.ny ?? 0) * (cut.nz ?? 0),
+        });
+        return { ...cut, vox: undefined, vid, vrev };
+      });
+      const response = await submit(
+        { ...job, cuts, kind: 'cavity' },
+        undefined,
+        opts?.urgent === true,
+        (entry) => {
+          for (const v of volumes) {
+            if (entry.vox.get(v.vid) === v.vrev) continue;
+            entry.worker.postMessage({ kind: 'voxel', ...v } satisfies VoxelVolumeMessage);
+            entry.vox.set(v.vid, v.vrev);
+          }
+        },
+      );
+      if (!response?.ok || response.kind !== 'cavity') return null;
+      return { arrays: response.arrays };
     },
     async fillWater(job, opts): Promise<WaterFillArrays | null> {
       const response = await submit(
@@ -233,14 +343,10 @@ let shared: ZoneBuildPool | null | undefined;
  *  unavailable, and the null is remembered so a workerless host does not retry
  *  the spawn per chunk. */
 export function zoneBuildPool(): ZoneBuildPool | null {
-  // A custom world (editor play-test) lives in THIS thread's module state; a
-  // worker samples its own copy of the content, which is always the built-in
-  // world, so it would bake the wrong ground and shorelines. Fall back to the
-  // main-thread paths while one is active (the spawned pool is kept for the
-  // return to the built-in world). Acquisition-time only: a swap landing after
-  // a job was posted still bakes the built-in world, so the editor must swap
-  // BEFORE it builds, which its play-test entry does.
-  if (!isBuiltinWorldActive()) return null;
+  // FORK: upstream declines the pool while a custom world is active, because a
+  // worker samples its own (built-in) copy of the content. The fork instead
+  // SHIPS the active content to the workers (setContent, sent ahead of each
+  // worker's next job), so authored maps keep off-thread meshing. Callers must setContent() before each build.
   if (shared === undefined) shared = createZoneBuildPool();
   return shared;
 }

@@ -1,5 +1,13 @@
 import { execSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
@@ -12,9 +20,14 @@ import { BalancedSequencer } from './scripts/ci_balanced_sequencer.mjs';
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
 import {
+  emitCollisionOverridesModule,
+  validateOverride,
+} from './scripts/lib/collision_overrides_emit.mjs';
+import {
   diagnosticsCaptureAllowed,
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
+import { studioDevGuardMiddleware } from './scripts/lib/studio_dev_guard.mjs';
 import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
@@ -140,6 +153,20 @@ function staticPageAliasPlugin() {
     });
   };
   return { name: 'woc-static-page-alias', configureServer: attach, configurePreviewServer: attach };
+}
+
+// Loopback same-origin guard in front of every ClaudeCraft Studio dev route
+// (scripts/lib/studio_dev_guard.mjs). Registered before the Studio save plugins so
+// their middlewares only ever see requests that passed it.
+function studioDevGuardPlugin() {
+  return {
+    name: 'woc-studio-dev-guard',
+    configureServer(server: {
+      middlewares: { use: (fn: (req: unknown, res: unknown, next: () => void) => void) => void };
+    }) {
+      server.middlewares.use(studioDevGuardMiddleware);
+    },
+  };
 }
 
 // Phase 4 (i18n Lazy Locales): after the production build, resolve each lazy locale
@@ -304,6 +331,791 @@ function musicEditorSavePlugin() {
   };
 }
 
+// Dev-only save endpoint for the editor's dungeon mode (/editor, Dungeon
+// button): receives a formatted DungeonLayout literal and splices it over the
+// matching exported const in src/sim/dungeon_layout.ts, so the sim, renderer,
+// colliders, minimap, and tests all pick the edit up via HMR. Same lifecycle
+// as musicEditorSavePlugin: configureServer never runs in a build.
+function dungeonEditorSavePlugin() {
+  // The layout consts the editor may rewrite: one per AUTHORED_DUNGEONS entry
+  // (src/editor/dungeon/authored_dungeons.ts). Empty while none is registered,
+  // so the endpoint refuses every write.
+  const ALLOWED_CONSTS = new Set<string>();
+  // The writer emits only plain data: identifiers, numbers, single-quoted
+  // slugs, and Math.PI fractions. Anything else (comments, semicolons,
+  // backticks, imports) is rejected so the endpoint cannot inject code.
+  const LITERAL_RE = /^\{[\w\s{}[\](),:.'+*/-]*\}$/;
+  return {
+    name: 'woc-dungeon-editor-save',
+    configureServer(server: {
+      middlewares: {
+        use: (
+          route: string,
+          fn: (
+            req: { method?: string; on: (ev: string, cb: (chunk?: unknown) => void) => void },
+            res: { statusCode: number; end: (body?: string) => void },
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use('/__dungeon_editor/save', (req, res) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        let body = '';
+        let aborted = false;
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+          if (aborted) return;
+          body += String(chunk);
+          if (body.length > 4_000_000) {
+            aborted = true;
+            res.statusCode = 413;
+            res.end('too large');
+          }
+        });
+        req.on('end', () => {
+          if (aborted) return;
+          void (async () => {
+            try {
+              const payload = JSON.parse(body) as { constName?: unknown; literal?: unknown };
+              const constName = payload.constName;
+              const literal = payload.literal;
+              // The literal is spliced verbatim into a source file, so validate
+              // structurally, not just by shape: reject property access and call
+              // chains (`a.b()`, `require`) that the character-class regex alone
+              // would let through, then confirm it parses to plain data by
+              // round-tripping it through the writer's own evaluator upstream.
+              if (
+                typeof constName !== 'string' ||
+                !ALLOWED_CONSTS.has(constName) ||
+                typeof literal !== 'string' ||
+                !LITERAL_RE.test(literal) ||
+                /\b(?:require|import|process|global|constructor|eval|Function)\b/.test(literal) ||
+                /[a-zA-Z_$][\w$]*\s*\(/.test(literal.replace(/Math\.(?:PI|abs)/g, '')) ||
+                /\.\s*[a-zA-Z_$]/.test(literal.replace(/Math\.(?:PI|abs)/g, ''))
+              ) {
+                res.statusCode = 400;
+                res.end('invalid payload');
+                return;
+              }
+              const { replaceLayoutConst } = await import(
+                './src/editor/dungeon/dungeon_layout_writer_core'
+              );
+              const file = path.resolve(root, 'src/sim/dungeon_layout.ts');
+              const source = readFileSync(file, 'utf8');
+              writeFileSync(file, replaceLayoutConst(source, constName, literal));
+              res.statusCode = 200;
+              res.end('ok');
+            } catch (err) {
+              res.statusCode = 400;
+              res.end(String(err));
+            }
+          })();
+        });
+      });
+    },
+  };
+}
+
+// Dev-only save endpoint for the editor's Ravenrift mode (/editor, Ravenrift
+// button): receives the placement consts the author changed and splices each
+// over the matching exported const in src/sim/battleground_layout.ts, so the
+// sim, colliders, renderer, minimap and tests all pick the edit up via HMR and
+// the file is ready to commit. Same lifecycle as dungeonEditorSavePlugin:
+// configureServer never runs in a build, so this cannot ship.
+function battlegroundEditorSavePlugin() {
+  // Only the hand-authored placement lists may be rewritten. The derived
+  // geometry (perimeter, keep walls) and every scalar stay code-owned.
+  const ALLOWED_CONSTS = new Set([
+    'BG_COVER_WALLS',
+    'BG_CURTAIN_WALLS',
+    'BG_GATEHOUSE_WALLS',
+    'BG_KEEP_BARRICADES',
+    'BG_GRAVEYARD_FENCES',
+    'BG_COVER_PILLARS',
+    'BG_COVER_CRATES',
+    'BG_RUBBLE_PILES',
+    'BG_SPEED_RUNES',
+    'BG_POWER_RUNES',
+    'BG_GRAVEYARDS',
+    'BG_BASES',
+  ]);
+  // The writer emits only plain data: braces, brackets, the known field names,
+  // numbers, and `true`. Anything else (comments, semicolons, backticks,
+  // identifiers with call/member syntax) is rejected, so a body spliced into a
+  // source file cannot carry code.
+  const BODY_RE = /^[\s{}[\],:0-9.eE+-]*$/;
+  const FIELD_RE = /\b(?!x|z|hw|hd|low|fence|team|flag|spawns|banner|true)[a-zA-Z_$][\w$]*/;
+  return {
+    name: 'woc-battleground-editor-save',
+    configureServer(server: {
+      middlewares: {
+        use: (
+          route: string,
+          fn: (
+            req: { method?: string; on: (ev: string, cb: (chunk?: unknown) => void) => void },
+            res: { statusCode: number; end: (body?: string) => void },
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use('/__bg_editor/save', (req, res) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        let body = '';
+        let aborted = false;
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+          if (aborted) return;
+          body += String(chunk);
+          if (body.length > 4_000_000) {
+            aborted = true;
+            res.statusCode = 413;
+            res.end('too large');
+          }
+        });
+        req.on('end', () => {
+          if (aborted) return;
+          void (async () => {
+            try {
+              const payload = JSON.parse(body) as { changes?: unknown };
+              const changes = payload.changes;
+              if (!Array.isArray(changes) || changes.length === 0) {
+                res.statusCode = 400;
+                res.end('no changes');
+                return;
+              }
+              for (const change of changes) {
+                const c = change as { constName?: unknown; literal?: unknown; body?: unknown };
+                const name = c.constName;
+                const text = c.body;
+                if (
+                  typeof name !== 'string' ||
+                  !ALLOWED_CONSTS.has(name) ||
+                  typeof text !== 'string' ||
+                  // structural check first, then a name check that catches any
+                  // identifier the field whitelist does not name
+                  !BODY_RE.test(
+                    text.replace(/\b(?:x|z|hw|hd|low|fence|team|flag|spawns|banner|true)\b/g, ''),
+                  ) ||
+                  FIELD_RE.test(
+                    text.replace(/\b(?:x|z|hw|hd|low|fence|team|flag|spawns|banner|true)\b/g, ''),
+                  )
+                ) {
+                  res.statusCode = 400;
+                  res.end(`invalid payload for ${String(name)}`);
+                  return;
+                }
+              }
+              const { applyChangedConsts } = await import(
+                './src/editor/battleground/bg_layout_writer_core'
+              );
+              const file = path.resolve(root, 'src/sim/battleground_layout.ts');
+              const source = readFileSync(file, 'utf8');
+              writeFileSync(
+                file,
+                applyChangedConsts(source, changes as { constName: string; body: string }[]),
+              );
+              res.statusCode = 200;
+              res.end('ok');
+            } catch (err) {
+              res.statusCode = 400;
+              res.end(String(err));
+            }
+          })();
+        });
+      });
+    },
+  };
+}
+
+// Dev-only save endpoint for the editor's Collision Master tool: receives one
+// asset's authored collision override (or null to clear it), merges it into
+// data/asset_collision_overrides.json, and regenerates
+// src/sim/asset_collision_overrides.generated.ts so the editor, playtest and
+// tests pick the new default up immediately via HMR. configureServer only
+// runs under the dev server, so this never ships.
+function collisionMasterSavePlugin() {
+  const generatedPath = path.resolve(root, 'src/sim/asset_collision_overrides.generated.ts');
+  return {
+    name: 'woc-collision-master-save',
+    // Lock In writes a generated data module for the next boot. The editor has
+    // already applied the same validated override to its live runtime, so HMR
+    // must not tear down the current renderer and stream the map all over again.
+    handleHotUpdate(ctx: { file: string }) {
+      if (path.resolve(ctx.file) === generatedPath) return [];
+      return undefined;
+    },
+    configureServer(server: {
+      middlewares: {
+        use: (
+          route: string,
+          fn: (
+            req: { method?: string; on: (ev: string, cb: (chunk?: unknown) => void) => void },
+            res: { statusCode: number; end: (body?: string) => void },
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use('/__collision_master/save', (req, res) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        // Cap generously: a maxed-out valid override (24 meshes * 3000 verts +
+        // 6000 tri-indices each) serializes to ~1.1MB, so the old 1MB cap
+        // rejected legitimate detailed collision. 32MB leaves headroom while
+        // still blocking a runaway body.
+        const MAX_BODY = 32 * 1024 * 1024;
+        let body = '';
+        let aborted = false;
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+          if (aborted) return;
+          body += String(chunk);
+          if (body.length > MAX_BODY) {
+            aborted = true; // stop accumulating and never double-end the response
+            res.statusCode = 413;
+            res.end('too large');
+          }
+        });
+        req.on('end', () => {
+          if (aborted) return;
+          try {
+            const payload = JSON.parse(body) as { assetId?: unknown; override?: unknown };
+            const assetId = payload.assetId;
+            if (typeof assetId !== 'string') {
+              res.statusCode = 400;
+              res.end('missing assetId');
+              return;
+            }
+            const jsonPath = path.resolve(root, 'data/asset_collision_overrides.json');
+            const overrides = JSON.parse(readFileSync(jsonPath, 'utf8')) as Record<string, unknown>;
+            if (payload.override === null || payload.override === undefined) {
+              delete overrides[assetId];
+            } else {
+              const err = validateOverride(assetId, payload.override);
+              if (err) {
+                res.statusCode = 400;
+                res.end(err);
+                return;
+              }
+              // Blender-authored ladders are not part of a Collision Master
+              // session: carry them over so a save never drops them.
+              const prev = overrides[assetId] as { ladders?: unknown } | undefined;
+              const next = payload.override as { ladders?: unknown };
+              if (prev?.ladders !== undefined && next.ladders === undefined) {
+                next.ladders = prev.ladders;
+              }
+              overrides[assetId] = next;
+            }
+            const { source, errors } = emitCollisionOverridesModule(overrides);
+            if (errors.length > 0) {
+              res.statusCode = 400;
+              res.end(errors.join('; '));
+              return;
+            }
+            writeFileSync(jsonPath, `${JSON.stringify(overrides, null, 2)}\n`);
+            writeFileSync(generatedPath, source);
+            res.statusCode = 200;
+            res.end('ok');
+          } catch (err) {
+            res.statusCode = 400;
+            res.end(String(err));
+          }
+        });
+      });
+    },
+  };
+}
+
+// Region maps: the editor's "Export to production" writes the generated module
+// for a region it opened (Open -> Shipped -> Ravenrift). The editor owns the
+// split and the emit - both live in the pure core the CLI shares
+// (src/editor/regions/region_export_core.ts) - so this endpoint only has to
+// prove the bytes are a generated region module and put them in the right file.
+function regionMapSavePlugin() {
+  const REGION_IDS = new Set(['ravenrift']);
+  const HEADER = '// GENERATED from the map editor';
+  const regionsDir = path.resolve(root, 'src/sim/regions');
+  return {
+    name: 'woc-region-map-save',
+    // Same reasoning as Collision Master: the editor already holds the map it
+    // just exported, so tearing the page down to hot-reload a data module would
+    // only cost the maker their camera and selection.
+    handleHotUpdate(ctx: { file: string }) {
+      if (path.dirname(path.resolve(ctx.file)) === regionsDir) return [];
+      return undefined;
+    },
+    configureServer(server: {
+      middlewares: {
+        use: (
+          route: string,
+          fn: (
+            req: { method?: string; on: (ev: string, cb: (chunk?: unknown) => void) => void },
+            res: { statusCode: number; end: (body?: string) => void },
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use('/__region_map/save', (req, res) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        // A whole field of placements is a few hundred KB of source; the cap
+        // matches the Collision Master endpoint's headroom.
+        const MAX_BODY = 32 * 1024 * 1024;
+        let body = '';
+        let aborted = false;
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+          if (aborted) return;
+          body += String(chunk);
+          if (body.length > MAX_BODY) {
+            aborted = true;
+            res.statusCode = 413;
+            res.end('too large');
+          }
+        });
+        req.on('end', () => {
+          if (aborted) return;
+          try {
+            const payload = JSON.parse(body) as { regionId?: unknown; source?: unknown };
+            const regionId = payload.regionId;
+            const source = payload.source;
+            if (typeof regionId !== 'string' || !REGION_IDS.has(regionId)) {
+              res.statusCode = 400;
+              res.end(`unknown region: ${String(regionId)}`);
+              return;
+            }
+            if (typeof source !== 'string' || !source.startsWith(HEADER)) {
+              res.statusCode = 400;
+              res.end('not a generated region module');
+              return;
+            }
+            if (!source.includes('AuthoredRegion | null =')) {
+              res.statusCode = 400;
+              res.end('module does not export a region');
+              return;
+            }
+            // The id is allowlisted above, so this can only land in the regions
+            // directory; resolve anyway and refuse anything that escapes it.
+            const target = path.resolve(regionsDir, `${regionId}.authored.generated.ts`);
+            if (path.dirname(target) !== regionsDir) {
+              res.statusCode = 400;
+              res.end('bad path');
+              return;
+            }
+            writeFileSync(target, source);
+            res.statusCode = 200;
+            res.end('ok');
+          } catch (err) {
+            res.statusCode = 400;
+            res.end(String(err));
+          }
+        });
+      });
+    },
+  };
+}
+
+// Studio "Publish to Game": writes a published map's three artifacts into the
+// repo, data/maps/<slug>.map.json, src/sim/maps/<slug>.generated.ts, and the
+// regenerated src/sim/maps/index.generated.ts registry. The editor does all
+// the real work (prepareMapForEngine gate + map_publish_core emit); like the
+// region endpoint above, this only proves the bytes are a generated module and
+// puts them in the right files. Dev-only by construction (configureServer).
+function studioMapPublishPlugin() {
+  const HEADER = '// GENERATED by ClaudeCraft Studio "Publish to Game"';
+  const SLUG_RE = /^[a-z0-9][a-z0-9_]{0,63}$/;
+  const mapsDir = path.resolve(root, 'src/sim/maps');
+  const dataDir = path.resolve(root, 'data/maps');
+  // Registry regeneration mirrors src/editor/map_publish_core.ts
+  // emitPublishedMapRegistry byte-for-byte: entries sorted by slug, metadata
+  // re-read from each module on disk so the registry is always a pure
+  // function of the maps directory.
+  const regenRegistry = (): void => {
+    const entries: { slug: string; name: string; seed: number }[] = [];
+    for (const file of readdirSync(mapsDir).sort()) {
+      const m = /^([a-z0-9][a-z0-9_]*)\.generated\.ts$/.exec(file);
+      if (!m || file === 'index.generated.ts') continue;
+      const source = readFileSync(path.resolve(mapsDir, file), 'utf8');
+      const name = /export const MAP_NAME = (".*?");/.exec(source);
+      const seed = /export const MAP_SEED = (-?\d+);/.exec(source);
+      if (!name || !seed) continue;
+      entries.push({
+        slug: m[1],
+        name: JSON.parse(name[1]) as string,
+        seed: Number(seed[1]),
+      });
+    }
+    const rows = entries
+      .sort((a, b) => a.slug.localeCompare(b.slug))
+      .map(
+        (e) =>
+          `\n  {\n    slug: ${JSON.stringify(e.slug)},\n    name: ${JSON.stringify(e.name)},\n    seed: ${JSON.stringify(e.seed)},\n    load: async () => (await import('./${e.slug}.generated')).loadPublishedMap(),\n  },`,
+      )
+      .join('');
+    writeFileSync(
+      path.resolve(mapsDir, 'index.generated.ts'),
+      `${HEADER} - do not edit by hand.
+// The registry of Studio-published maps. The game client boots one with
+// ?map=<slug> (src/main.ts); dynamic import keeps map bytes out of the main
+// bundle until a map is actually chosen.
+import type { WorldContent } from '../types';
+
+export interface PublishedMapEntry {
+  slug: string;
+  name: string;
+  seed: number;
+  load(): Promise<WorldContent>;
+}
+
+export const PUBLISHED_MAPS: readonly PublishedMapEntry[] = [${rows}
+];
+
+export function publishedMapBySlug(slug: string): PublishedMapEntry | undefined {
+  return PUBLISHED_MAPS.find((m) => m.slug === slug);
+}
+`,
+    );
+  };
+  return {
+    name: 'woc-studio-map-publish',
+    // Publishing must not tear the editor's page down: the maker already holds
+    // the exact map that was just written, so hot-reloading the generated data
+    // modules would only re-stream the world and lose camera + selection.
+    handleHotUpdate(ctx: { file: string }) {
+      const dir = path.dirname(path.resolve(ctx.file));
+      if (dir === mapsDir || dir === dataDir) return [];
+      return undefined;
+    },
+    configureServer(server: {
+      middlewares: {
+        use: (
+          route: string,
+          fn: (
+            req: {
+              method?: string;
+              url?: string;
+              on: (ev: string, cb: (chunk?: unknown) => void) => void;
+            },
+            res: { statusCode: number; end: (body?: string) => void },
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use('/__studio_map/publish', (req, res) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        // A full-overworld publish (compact JSON + the embedded module copy)
+        // runs tens of MB; double headroom over the biggest map seen so far.
+        const MAX_BODY = 96 * 1024 * 1024;
+        let body = '';
+        let aborted = false;
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+          if (aborted) return;
+          body += String(chunk);
+          if (body.length > MAX_BODY) {
+            aborted = true;
+            res.statusCode = 413;
+            res.end('too large');
+          }
+        });
+        req.on('end', () => {
+          if (aborted) return;
+          try {
+            const payload = JSON.parse(body) as {
+              slug?: unknown;
+              mapJson?: unknown;
+              moduleSource?: unknown;
+            };
+            const { slug, mapJson, moduleSource } = payload;
+            if (typeof slug !== 'string' || !SLUG_RE.test(slug)) {
+              res.statusCode = 400;
+              res.end(`bad slug: ${String(slug)}`);
+              return;
+            }
+            if (typeof moduleSource !== 'string' || !moduleSource.startsWith(HEADER)) {
+              res.statusCode = 400;
+              res.end('not a generated map module');
+              return;
+            }
+            if (!moduleSource.includes('export function loadPublishedMap()')) {
+              res.statusCode = 400;
+              res.end('module does not export a map');
+              return;
+            }
+            if (typeof mapJson !== 'string' || JSON.parse(mapJson) === null) {
+              res.statusCode = 400;
+              res.end('map json missing');
+              return;
+            }
+            // The slug is pattern-gated above, so these can only land in the
+            // two publish directories; resolve anyway and refuse an escape.
+            const moduleTarget = path.resolve(mapsDir, `${slug}.generated.ts`);
+            const jsonTarget = path.resolve(dataDir, `${slug}.map.json`);
+            if (path.dirname(moduleTarget) !== mapsDir || path.dirname(jsonTarget) !== dataDir) {
+              res.statusCode = 400;
+              res.end('bad path');
+              return;
+            }
+            mkdirSync(dataDir, { recursive: true });
+            writeFileSync(jsonTarget, mapJson);
+            writeFileSync(moduleTarget, moduleSource);
+            regenRegistry();
+            res.statusCode = 200;
+            res.end('ok');
+          } catch (err) {
+            res.statusCode = 400;
+            res.end(String(err));
+          }
+        });
+      });
+
+      // Uninstall a published map: delete its two artifacts and rebuild the
+      // registry. The built-in world is never touched by publishing in the
+      // first place (it is additive, the game only loads a published map on
+      // an explicit ?map=<slug>), so removing the files IS the restore.
+      server.middlewares.use('/__studio_map/unpublish', (req, res) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        let body = '';
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+          // A slug is a few dozen bytes; anything larger is not this request.
+          if (body.length < 4096) body += String(chunk);
+        });
+        req.on('end', () => {
+          try {
+            const { slug } = JSON.parse(body) as { slug?: unknown };
+            if (typeof slug !== 'string' || !SLUG_RE.test(slug)) {
+              res.statusCode = 400;
+              res.end(`bad slug: ${String(slug)}`);
+              return;
+            }
+            // Same resolve-and-verify guard as the publish route: the pattern
+            // above already excludes traversal, this refuses anything that
+            // still somehow lands outside the two publish directories.
+            const moduleTarget = path.resolve(mapsDir, `${slug}.generated.ts`);
+            const jsonTarget = path.resolve(dataDir, `${slug}.map.json`);
+            if (path.dirname(moduleTarget) !== mapsDir || path.dirname(jsonTarget) !== dataDir) {
+              res.statusCode = 400;
+              res.end('bad path');
+              return;
+            }
+            let removed = 0;
+            for (const target of [moduleTarget, jsonTarget]) {
+              if (existsSync(target)) {
+                rmSync(target);
+                removed++;
+              }
+            }
+            regenRegistry();
+            res.statusCode = 200;
+            res.end(JSON.stringify({ removed }));
+          } catch (err) {
+            res.statusCode = 400;
+            res.end(String(err));
+          }
+        });
+      });
+      // The published maps, for Studio's Open drawer: every data/maps/*.map.json
+      // with the name/seed its meta carries. Publish is otherwise write-only
+      // from the editor's point of view (SPACEY: "pressed Publish and the shipped
+      // maps in the editor didn't update").
+      server.middlewares.use('/__studio_map/published', (req, res) => {
+        if (req.method !== 'GET') {
+          res.statusCode = 405;
+          res.end('GET only');
+          return;
+        }
+        try {
+          const out = [];
+          if (existsSync(dataDir)) {
+            for (const file of readdirSync(dataDir).sort()) {
+              if (!file.endsWith('.map.json')) continue;
+              const slug = file.slice(0, -'.map.json'.length);
+              if (!SLUG_RE.test(slug)) continue;
+              const full = path.resolve(dataDir, file);
+              let name = slug;
+              let seed = 0;
+              try {
+                const doc = JSON.parse(readFileSync(full, 'utf8'));
+                if (doc && typeof doc === 'object' && doc.meta && typeof doc.meta === 'object') {
+                  if (typeof doc.meta.name === 'string') name = doc.meta.name;
+                  if (typeof doc.meta.seed === 'number') seed = doc.meta.seed;
+                }
+              } catch {
+                // an unreadable file is still listed by its slug
+              }
+              const st = statSync(full);
+              out.push({ slug, name, seed, bytes: st.size, updatedAt: st.mtime.toISOString() });
+            }
+          }
+          res.statusCode = 200;
+          res.end(JSON.stringify(out));
+        } catch (err) {
+          res.statusCode = 500;
+          res.end(String(err));
+        }
+      });
+      // One published map's document (the compact MapDoc the publish wrote),
+      // so Studio can open it as an ordinary editable copy.
+      server.middlewares.use('/__studio_map/doc', (req, res) => {
+        if (req.method !== 'GET') {
+          res.statusCode = 405;
+          res.end('GET only');
+          return;
+        }
+        const url = new URL(req.url ?? '', 'http://localhost');
+        const slug = url.searchParams.get('slug') ?? '';
+        if (!SLUG_RE.test(slug)) {
+          res.statusCode = 400;
+          res.end(`bad slug: ${slug}`);
+          return;
+        }
+        const full = path.resolve(dataDir, `${slug}.map.json`);
+        if (!existsSync(full)) {
+          res.statusCode = 404;
+          res.end('not published');
+          return;
+        }
+        res.statusCode = 200;
+        res.end(readFileSync(full, 'utf8'));
+      });
+    },
+  };
+}
+
+// Studio "Keep plant": writes one generated foliage GLB into
+// public/models/generated/<slug>.glb, where gen_asset_catalog.mjs picks it up
+// on its next run and it becomes an ordinary catalogue asset. The editor does
+// the real work (grows the model, serializes it, writes its source parameters
+// into the GLB extras); like the map and region routes above, this only proves
+// the bytes are a GLB and puts them in the right file. Dev-only by
+// construction (configureServer).
+function studioAssetSavePlugin() {
+  const SLUG_RE = /^[a-z0-9][a-z0-9_]{0,63}$/;
+  const MAX_BYTES = 24 * 1024 * 1024;
+  const outDir = path.resolve(root, 'public/models/generated');
+  return {
+    name: 'woc-studio-asset-save',
+    // Writing an asset must not tear the editor's page down: the maker is
+    // still holding the plant they just baked.
+    handleHotUpdate(ctx: { file: string }) {
+      if (path.dirname(path.resolve(ctx.file)) === outDir) return [];
+      return undefined;
+    },
+    configureServer(server: {
+      middlewares: {
+        use: (
+          route: string,
+          fn: (
+            req: { method?: string; on: (ev: string, cb: (chunk?: unknown) => void) => void },
+            res: { statusCode: number; end: (body?: string) => void },
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use('/__studio_asset/save', (req, res) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        // Base64 inflates by 4/3; leave headroom over the binary ceiling.
+        const MAX_BODY = MAX_BYTES * 2;
+        let body = '';
+        let aborted = false;
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+          if (aborted) return;
+          body += String(chunk);
+          if (body.length > MAX_BODY) {
+            aborted = true;
+            res.statusCode = 413;
+            res.end('too large');
+          }
+        });
+        req.on('end', () => {
+          if (aborted) return;
+          try {
+            const payload = JSON.parse(body) as {
+              slug?: unknown;
+              glbBase64?: unknown;
+              extras?: unknown;
+            };
+            const { slug, glbBase64, extras } = payload;
+            if (typeof slug !== 'string' || !SLUG_RE.test(slug)) {
+              res.statusCode = 400;
+              res.end(`bad slug: ${String(slug)}`);
+              return;
+            }
+            if (typeof glbBase64 !== 'string' || glbBase64.length === 0) {
+              res.statusCode = 400;
+              res.end('glb missing');
+              return;
+            }
+            if (
+              !extras ||
+              typeof extras !== 'object' ||
+              typeof (extras as { wocFoliage?: unknown }).wocFoliage !== 'number'
+            ) {
+              res.statusCode = 400;
+              res.end('not a generated-foliage bake');
+              return;
+            }
+            const bytes = Buffer.from(glbBase64, 'base64');
+            if (bytes.length > MAX_BYTES) {
+              res.statusCode = 413;
+              res.end('too large');
+              return;
+            }
+            // "glTF" in ASCII, little-endian: refuse anything that is not one.
+            if (bytes.length < 12 || bytes.readUInt32LE(0) !== 0x46546c67) {
+              res.statusCode = 400;
+              res.end('not a binary GLB');
+              return;
+            }
+            // The slug is pattern-gated above, so this can only land in the
+            // generated directory; resolve anyway and refuse an escape.
+            const target = path.resolve(outDir, `${slug}.glb`);
+            if (path.dirname(target) !== outDir) {
+              res.statusCode = 400;
+              res.end('bad path');
+              return;
+            }
+            mkdirSync(outDir, { recursive: true });
+            writeFileSync(target, bytes);
+            res.statusCode = 200;
+            res.end(JSON.stringify({ path: `models/generated/${slug}.glb`, bytes: bytes.length }));
+          } catch (err) {
+            res.statusCode = 400;
+            res.end(String(err));
+          }
+        });
+      });
+    },
+  };
+}
+
 // Dev-only in-memory collector for an unattended local diagnostics run. Reports never
 // touch disk and the endpoints do not exist in preview or production builds.
 function diagnosticsCapturePlugin() {
@@ -396,6 +1208,7 @@ function diagnosticsCapturePlugin() {
     },
   };
 }
+
 export default defineConfig({
   base: '/',
   // The Svelte plugin only transforms the standalone admin entry. The testing
@@ -406,6 +1219,13 @@ export default defineConfig({
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     musicEditorSavePlugin(),
+    studioDevGuardPlugin(),
+    dungeonEditorSavePlugin(),
+    battlegroundEditorSavePlugin(),
+    collisionMasterSavePlugin(),
+    regionMapSavePlugin(),
+    studioMapPublishPlugin(),
+    studioAssetSavePlugin(),
     ...(process.env.WOC_DIAGNOSTICS_CAPTURE === '1' ? [diagnosticsCapturePlugin()] : []),
   ],
   resolve: { alias: { '#bot-detector': botDetectorImpl } },

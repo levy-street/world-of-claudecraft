@@ -189,7 +189,9 @@ describe('editor viewport wiring', () => {
       'utf8',
     );
     const beginAt = viewportSource.indexOf('beginDeferredPreloads()');
-    const awaitAt = viewportSource.indexOf('await assetsReady()');
+    // `await assetsReady(` with no closing paren: the viewport passes its
+    // curtain-progress callback, and the ordering is what this pins.
+    const awaitAt = viewportSource.indexOf('await assetsReady(');
     const rendererAt = viewportSource.indexOf('new Renderer(');
     expect(beginAt).toBeGreaterThan(-1);
     expect(awaitAt).toBeGreaterThan(beginAt);

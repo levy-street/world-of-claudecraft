@@ -18,16 +18,12 @@
 
 import { forgefatherIsleRockWeight } from '../sim/content/ember_coast';
 import {
+  activeWorldStripRegion,
+  activeZoneList,
   COLUMN_ZONES,
   columnBlendAt,
-  STRIP_MAX_X,
-  STRIP_MIN_X,
   STRIP_ZONES,
-  WORLD_MAX_X,
-  WORLD_MAX_Z,
-  WORLD_MIN_X,
-  WORLD_MIN_Z,
-  ZONES,
+  zoneXBounds,
 } from '../sim/data';
 import { fbm2, hash2 } from '../sim/rng';
 import type { BiomeId, ZoneDef } from '../sim/types';
@@ -76,8 +72,11 @@ export function mapCanvasHeight(W: number, region: MapRegion): number {
  *  on a flat sea, showing open water where the neighbouring zone's land actually
  *  continues. Squaring the plate paints that margin with the real world instead. */
 export function mapZoneRegion(zone: ZoneDef): MapRegion {
-  const minX = zone.xMin ?? STRIP_MIN_X;
-  const maxX = zone.xMax ?? STRIP_MAX_X;
+  // zoneXBounds, not the raw field: an authored zone with no explicit x-range
+  // spans its own map rect (+-worldHalfX), not the shipped strip. Identical to
+  // `zone.xMin ?? STRIP_MIN_X` for every shipped zone, so plate bounds (and
+  // the baked-plate digests keyed on them) are unchanged on the live world.
+  const [minX, maxX] = zoneXBounds(zone);
   const side = Math.max(maxX - minX, zone.zMax - zone.zMin);
   const cx = (minX + maxX) / 2;
   const cz = (zone.zMin + zone.zMax) / 2;
@@ -87,11 +86,15 @@ export function mapZoneRegion(zone: ZoneDef): MapRegion {
   // Wraithwood's square reaches 100 yd past WORLD_MAX_X). Beyond the edge the
   // painter's flat ocean fill is the honest answer, and it is seamless now that
   // the fill matches the sea ramp's deep end.
+  // Clamped to the ACTIVE world's rect. The shipped fold cropped an authored
+  // map to the built-in world's edges, so an authored zone reaching past them
+  // fell off its own plate.
+  const strip = activeWorldStripRegion();
   return {
-    minX: Math.max(WORLD_MIN_X, cx - side / 2),
-    maxX: Math.min(WORLD_MAX_X, cx + side / 2),
-    minZ: Math.max(WORLD_MIN_Z, cz - side / 2),
-    maxZ: Math.min(WORLD_MAX_Z, cz + side / 2),
+    minX: Math.max(strip.minX, cx - side / 2),
+    maxX: Math.min(strip.maxX, cx + side / 2),
+    minZ: Math.max(strip.minZ, cz - side / 2),
+    maxZ: Math.min(strip.maxZ, cz + side / 2),
   };
 }
 
@@ -297,6 +300,10 @@ export function paintTerrainRows(
 ): void {
   const spanX = region.maxX - region.minX;
   const spanZ = region.maxZ - region.minZ;
+  // Settlement blobs come from the ACTIVE world's hubs: stamping the shipped
+  // towns' coordinates onto an authored map paints villages on empty ground.
+  // Hoisted out of the per-pixel loop (this runs ~230k times per plate).
+  const hubZones = activeZoneList();
   const worldX = (ix: number) => region.maxX - (ix / W) * spanX;
   const worldZ = (iy: number) => region.maxZ - (iy / H) * spanZ;
 
@@ -626,7 +633,7 @@ export function paintTerrainRows(
       // -- settlements and roads over everything --
       let nearHub = false;
       let hubRing = false;
-      for (const zn of ZONES) {
+      for (const zn of hubZones) {
         const d = Math.hypot(x - zn.hub.x, z - zn.hub.z);
         if (d < 11) {
           nearHub = true;

@@ -40,7 +40,7 @@ import { cancelCorpseHarvestForCorpse } from '../professions/corpse_harvest_sess
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { dist2d, type Entity, IGNIVAR_BOSS_ID, NYTHRAXIS_BOSS_ID } from '../types';
-import { groundHeight } from '../world';
+import { mobGroundHeight } from '../world';
 import { resetMobCharge } from './charge';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetMechanicSpacing } from './mechanic_spacing';
@@ -68,8 +68,22 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.harvestClaimedBy = null;
   mob.ownerId = null;
   mob.hostile = true;
+  // A patroller (editor Mob tool) walks its spawnPos along the route, so it
+  // would otherwise respawn wherever it happened to die. Send it back to the
+  // head of its path and restart the walk. Inert for every routeless mob.
+  if (mob.route && mob.route.points.length >= 2) {
+    mob.spawnPos.x = mob.route.points[0].x;
+    mob.spawnPos.z = mob.route.points[0].z;
+    // Re-seat the home point too: a later evade walks straight at spawnPos, so
+    // it must not keep the height of wherever the patrol died.
+    mob.spawnPos.y = ctx.groundPos(mob.spawnPos.x, mob.spawnPos.z).y;
+    mob.routeIdx = 0;
+    mob.routeDir = 1;
+    mob.routeWaitLeft = 0;
+  }
   mob.pos = { ...mob.spawnPos };
-  mob.pos.y = groundHeight(mob.pos.x, mob.pos.z, ctx.cfg.seed);
+  // a camp on a mine floor respawns on that floor, not on the summit above it
+  mob.pos.y = mobGroundHeight(mob.pos.x, mob.pos.z, ctx.cfg.seed, mob.spawnPos.y);
   mob.prevPos = { ...mob.pos };
   ctx.rebucket(mob);
   mob.hp = mob.maxHp;

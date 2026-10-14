@@ -1,0 +1,202 @@
+{
+  "defaults": {
+    "type": "static"
+  },
+  "items": [
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_a.glb",
+      "out": "models/tidehold/house_a.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_a.parts.glb",
+      "out": "models/tidehold/house_a.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_a.lod.glb",
+      "out": "models/tidehold/house_a.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_b.glb",
+      "out": "models/tidehold/house_b.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_b.parts.glb",
+      "out": "models/tidehold/house_b.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_b.lod.glb",
+      "out": "models/tidehold/house_b.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_c.glb",
+      "out": "models/tidehold/house_c.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_c.parts.glb",
+      "out": "models/tidehold/house_c.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_c.lod.glb",
+      "out": "models/tidehold/house_c.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_d.glb",
+      "out": "models/tidehold/house_d.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_d.parts.glb",
+      "out": "models/tidehold/house_d.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_d.lod.glb",
+      "out": "models/tidehold/house_d.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_e.glb",
+      "out": "models/tidehold/house_e.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_e.parts.glb",
+      "out": "models/tidehold/house_e.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_house_e.lod.glb",
+      "out": "models/tidehold/house_e.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_tavern.glb",
+      "out": "models/tidehold/tavern.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_tavern.parts.glb",
+      "out": "models/tidehold/tavern.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_tavern.lod.glb",
+      "out": "models/tidehold/tavern.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_tavern_b.glb",
+      "out": "models/tidehold/tavern_b.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_tavern_b.parts.glb",
+      "out": "models/tidehold/tavern_b.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_tavern_b.lod.glb",
+      "out": "models/tidehold/tavern_b.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_smithy.glb",
+      "out": "models/tidehold/smithy.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_smithy.parts.glb",
+      "out": "models/tidehold/smithy.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_smithy.lod.glb",
+      "out": "models/tidehold/smithy.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_market.glb",
+      "out": "models/tidehold/market.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_market.parts.glb",
+      "out": "models/tidehold/market.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_market.lod.glb",
+      "out": "models/tidehold/market.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_hall.glb",
+      "out": "models/tidehold/hall.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_hall.parts.glb",
+      "out": "models/tidehold/hall.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_hall.lod.glb",
+      "out": "models/tidehold/hall.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_shop_a.glb",
+      "out": "models/tidehold/shop_a.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_shop_a.parts.glb",
+      "out": "models/tidehold/shop_a.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_shop_a.lod.glb",
+      "out": "models/tidehold/shop_a.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_shop_b.glb",
+      "out": "models/tidehold/shop_b.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_shop_b.parts.glb",
+      "out": "models/tidehold/shop_b.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_shop_b.lod.glb",
+      "out": "models/tidehold/shop_b.lod.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_bank.glb",
+      "out": "models/tidehold/bank.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_bank.parts.glb",
+      "out": "models/tidehold/bank.parts.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/tidehold_town/tidehold_bank.lod.glb",
+      "out": "models/tidehold/bank.lod.glb",
+      "maxTex": 1024
+    }
+  ]
+}

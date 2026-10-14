@@ -95,9 +95,8 @@ describe('Renderer.createView object branch (source pin)', () => {
   it('routes the generic ground-object branch through takeOrBuildGroundObject and never re-nulls the key', () => {
     const objectBranch = rendererSource.slice(
       rendererSource.indexOf("} else if (e.kind === 'object') {"),
-      rendererSource.indexOf(
-        "} else if (e.kind === 'mob' && e.templateId === VALE_CUP_BALL_TEMPLATE) {",
-      ),
+      // the next arm: the rigged-character build
+      rendererSource.indexOf('const visualKey = visualKeyFor(e);'),
     );
     expect(objectBranch).toContain(
       'const result = takeOrBuildGroundObject(this.objectPool, groundObjectPoolKey(e), () =>',
@@ -121,13 +120,19 @@ describe('buildGroundQuestObject with no item (the placed feast view)', () => {
     expect(group.children).toHaveLength(1);
     const proxy = group.children[0] as unknown as {
       visible: boolean;
-      geometry: { parameters: { width: number; height: number; depth: number } };
+      geometry: {
+        parameters: { width: number; height: number; depth: number };
+      };
       position: { y: number };
       castShadow: boolean;
     };
     expect(proxy.visible).toBe(false);
     expect(proxy.castShadow).toBe(false);
-    expect(proxy.geometry.parameters).toMatchObject({ width: 1.6, height: 0.9, depth: 1.6 });
+    expect(proxy.geometry.parameters).toMatchObject({
+      width: 1.6,
+      height: 0.9,
+      depth: 1.6,
+    });
     expect(proxy.position.y).toBeCloseTo(0.45, 6);
   });
 

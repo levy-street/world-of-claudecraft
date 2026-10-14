@@ -43,6 +43,7 @@ import {
 import { GALE_HARBOR_DECKS } from './gale_harbor';
 import { GLIDER_WHARF_DECKS } from './glider_wharf_layout';
 import { REACH_DECKS } from './reach_decks';
+import { isStudioOverlayRow } from './studio_content';
 import { WORLD_BOSSES } from './world_boss';
 
 // The skirt's own contribution to radial slope is bounded by
@@ -166,6 +167,9 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   for (const node of GATHER_NODES) pad('gatherNode', node.pos.x, node.pos.z, 5, 12, false);
   for (const id in NPCS) {
     if (Object.hasOwn(WORLD_QUEST_CALLIGRAPHY_NPCS, id)) continue;
+    // Studio rows (studio_content.ts) never shape terrain: the calm tables are
+    // cached per seed, not per content, and must stay the release's.
+    if (isStudioOverlayRow('npc', id)) continue;
     const npc = NPCS[id];
     pad('npc', npc.pos.x, npc.pos.z, 6, 14, false);
   }
@@ -189,6 +193,7 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
     // both seeds), so this changes no terrain; it stops them silently
     // activating if the character layers near the origin ever diverge.
     if (DUNGEONS[id].overworldDoor === false) continue;
+    if (isStudioOverlayRow('dungeon', id)) continue;
     const door = DUNGEONS[id].doorPos;
     pad('dungeonDoor', door.x, door.z, 7, 15);
   }

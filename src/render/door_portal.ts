@@ -247,7 +247,7 @@ function cloneWildheartGate(): THREE.Object3D | null {
 // rather than a rotating ball. White so the material colour tints it per rank.
 let riftPortalTex: THREE.CanvasTexture | null = null;
 
-function riftPortalTexture(): THREE.CanvasTexture | null {
+export function riftPortalTexture(): THREE.CanvasTexture | null {
   if (riftPortalTex) return riftPortalTex;
   if (typeof document === 'undefined') return null;
   const S = 256;

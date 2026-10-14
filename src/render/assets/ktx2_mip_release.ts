@@ -176,6 +176,11 @@ export const KTX2_MIP_RELEASABLE_MODEL_ROOTS: readonly string[] = [
   'battleground',
   'biome',
   'city',
+  // Studio merge: authored-map world kits, each drawn only by the world
+  // renderer (painted ground clutter baked into InstancedMeshes, the Tidehold
+  // buildings and wall kit). None is a character attachment or a preview
+  // subject.
+  'clutter',
   'drakelands_kit',
   'dungeon',
   'foliage',
@@ -183,6 +188,8 @@ export const KTX2_MIP_RELEASABLE_MODEL_ROOTS: readonly string[] = [
   'props',
   'quest',
   'resources',
+  'tidehold',
+  'tidehold_kit',
   'world_quests',
 ];
 

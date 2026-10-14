@@ -28,6 +28,8 @@ const settings = {
   terrainRelief: 3,
   bladeCarpetRadius: 34,
   cliffScree: true,
+  cityClutter: true,
+  cityClutterRadius: 45,
   canopyDetail: true,
   canopyDetailTaps: 6,
   pixelRatioCap: 2.5,
@@ -65,6 +67,8 @@ describe('gfx override parsing', () => {
           'terrainRelief:2',
           'bladeCarpetRadius:24',
           'cliffScree:0',
+          'cityClutter:0',
+          'cityClutterRadius:30',
           'canopyDetail:0',
           'canopyDetailTaps:3',
           'pixelRatioCap:1.48',
@@ -98,6 +102,8 @@ describe('gfx override parsing', () => {
       terrainRelief: 2,
       bladeCarpetRadius: 24,
       cliffScree: false,
+      cityClutter: false,
+      cityClutterRadius: 30,
       canopyDetail: false,
       canopyDetailTaps: 3,
       pixelRatioCap: 1.48,
@@ -215,13 +221,25 @@ describe('gfx override application', () => {
     // style (occluder_dither_fade.ts). It moves a VALUE: true on low and medium,
     // false on high, ultra, insane and the Advanced default mix (no dial hint,
     // so it inherits the high base). Named pins: tests/graphics_rebuild_core.test.ts.
+    // The LOW and MEDIUM rows alone moved for the painted-clutter gate
+    // (gfx.ts cityClutter/cityClutterRadius, 2026-09-22). Medium moves by two
+    // VALUES: it now draws the layer (false -> true) in a tight 30yd ring
+    // (45 -> 30) because medium is the auto-default for Apple Silicon Macs and
+    // a High gate hid authored ground dressing from them. Low moves only by
+    // the inert radius falling through the same new branch (45 -> 30); its
+    // cityClutter stays false, so it still builds nothing. high/ultra/insane
+    // and the Advanced mix do NOT move, which is the check that the tighter
+    // ring is confined to the rungs below high.
+    // Regenerated across the board at the Studio merge (studio/main into
+    // release/v0.45.0): the two cityClutter keys are new to every release
+    // profile, so every row moves; measured on the merged gfx.ts.
     expect(hashes).toEqual({
-      low: '0748e49e6ecb9bb2081cfa4ca45601ab831eb95a847c8c5c3034f311e8d20bab',
-      medium: '67edab8d72816c12af258dd60217db55751b57aa358a1a4c5df4fac1fb77d63d',
-      high: '0e135d2bc6a726fc190b0d52a8bb670369a7df5f142266c09150ce4a3d6ce1fd',
-      ultra: '72f80b79fdc37c36bd66133eafeb438f9fe091c3c4b16de256f74da1c1dfa857',
-      insane: '30ff1f03d0134187f92f3e71daeaf24d2fec937cba2a8b3630b228f81595825d',
-      advanced: '00214f627cbe2b5082c28d45e06911b445ef1ef3ca271a95d1998c3281fb0248',
+      low: '8a0d7207a1001131fe1b63b920aad247c5c132a5089939692457c654c14ae6fe',
+      medium: '9f6180995123d8b961ab82f2a25b3dad98c1a644ec2c9a8a0ff52390140f95b8',
+      high: '7a0d308e519b77347f4e74a50dd2d0c780d50f805064df62a05c5d4a8b3979ad',
+      ultra: '841013f9654ba7b09a3ea729d463ecfc6fb9472f1c9be4d77062315b709f004e',
+      insane: '00c3b4f4f603bba100aba5b8ebab12ea50ee7db8390a90a9b2e2a95557de454f',
+      advanced: '21d070667192a5bc52b2288135ef58473f3ca3cb7d3a637314617dd307e7851f',
     });
   });
 

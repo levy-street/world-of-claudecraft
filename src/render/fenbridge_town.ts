@@ -12,6 +12,7 @@ import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { activeWorldHasAuthoredTown } from './authored_town_gate';
 import { indexExactVertexTuples } from './exact_index_geometry';
 import {
   applyFenbridgeTownSurfaceDetail,
@@ -37,6 +38,7 @@ import {
   occluderFadeMat,
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
   newTownPiecewiseReveal,
@@ -1229,7 +1231,10 @@ function buildFromTemplates(
 
   const hideTargets: BuildingHideTarget[] = [];
   const buildingGroups: THREE.Object3D[] = [];
-  for (const building of FENBRIDGE_LAYOUT.buildings) {
+  // The document may own the town's BUILDINGS as placements (the
+  // promoted-scenery contract): only the building loop stands down.
+  const fenBuildingList = activeWorldPromoted('authoredTowns') ? [] : FENBRIDGE_LAYOUT.buildings;
+  for (const building of fenBuildingList) {
     const template = templates.get(building.assetId);
     if (!template) throw new Error(`Fenbridge town template is missing: ${building.assetId}`);
     const built = buildBuilding(building, template, groundAt, textures);
@@ -1436,7 +1441,10 @@ export function buildFenbridgeTownView(seed: number): FenbridgeTownView {
   // Extract once even if a custom world is currently active so loader-owned
   // prop GLTFs can be released and a later same-page switch remains sync.
   if (loadedSources.size > 0) prepareTemplates(loadedSources, preparedTemplates, true);
-  if (getActiveWorldContent() !== BUILTIN_WORLD) {
+  // Data-gated, not identity-gated: an editor copy of the built-in world
+  // still carries this town's buildings and must get its real art, or the
+  // kit buildings it replaces draw in Studio instead (authored_town_gate.ts).
+  if (!activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding)) {
     return buildFromTemplates(preparedTemplates, () => 0, false, {
       atlas: undefined,
       normal: undefined,

@@ -67,7 +67,10 @@ describeDb('woc market realm scoping against real Postgres', () => {
     await db.ensureSchema();
     await db.runConcurrentIndexMigrations();
 
-    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 8 });
+    pool = new Pool({
+      ...materialSourceConnection(verifyUrl(ADMIN_URL as string)),
+      max: 8,
+    });
     marketDb = new marketDbMod.PgWocMarketDb(pool);
   }, 120_000);
 
@@ -316,9 +319,11 @@ describeDb('woc market realm scoping against real Postgres', () => {
     };
   }
 
-  async function offerRow(
-    id: number,
-  ): Promise<{ status: string; listingId: number | null; buyerAccepted: boolean }> {
+  async function offerRow(id: number): Promise<{
+    status: string;
+    listingId: number | null;
+    buyerAccepted: boolean;
+  }> {
     const res = await pool.query(
       `SELECT status, listing_id, buyer_accepted FROM woc_market_directed_offers WHERE id = $1`,
       [id],
@@ -355,7 +360,9 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const a = await seedListing(alpha, seller);
-      const aDirected = await seedListing(alpha, seller, { directedBuyerAccount: buyer });
+      const aDirected = await seedListing(alpha, seller, {
+        directedBuyerAccount: buyer,
+      });
       // Closed rows must leave the public browse too (the liveness status set).
       const aClosed = await seedListing(alpha, seller, {
         status: 'closed',
@@ -369,7 +376,9 @@ describeDb('woc market realm scoping against real Postgres', () => {
       // addressed to this buyer (the liveness member). A second seller keeps
       // the seller-keyed sets above unchanged.
       const seller2 = await seedAccount();
-      await seedListing(alpha, seller2, { directedBuyerAccount: await seedAccount() });
+      await seedListing(alpha, seller2, {
+        directedBuyerAccount: await seedAccount(),
+      });
       await seedListing(alpha, seller2, {
         directedBuyerAccount: buyer,
         status: 'closed',
@@ -495,8 +504,12 @@ describeDb('woc market realm scoping against real Postgres', () => {
     it('claimDueListings moves only the realm due set; the beta due listing stays active', async () => {
       const { alpha, beta } = realmPair('claim-due');
       const seller = await seedAccount();
-      const a = await seedListing(alpha, seller, { endsAtMs: BASE_MS - MINUTE_MS });
-      const b = await seedListing(beta, seller, { endsAtMs: BASE_MS - MINUTE_MS });
+      const a = await seedListing(alpha, seller, {
+        endsAtMs: BASE_MS - MINUTE_MS,
+      });
+      const b = await seedListing(beta, seller, {
+        endsAtMs: BASE_MS - MINUTE_MS,
+      });
       expect(listingIds(await marketDb.claimDueListings(alpha, BASE_MS, 10))).toEqual([a]);
       expect((await listingStatus(a)).status).toBe('ending');
       expect((await listingStatus(b)).status, 'beta due listing untouched').toBe('active');
@@ -519,14 +532,22 @@ describeDb('woc market realm scoping against real Postgres', () => {
         resolution: 'unsettled',
         updatedAtMs: old,
       });
-      const aStranded = await seedListing(alpha, seller, { status: 'ending', updatedAtMs: old });
+      const aStranded = await seedListing(alpha, seller, {
+        status: 'ending',
+        updatedAtMs: old,
+      });
       await seedListing(beta, seller, { status: 'ending', updatedAtMs: old });
       // FRESH ending rows are mid-close, not stranded: the age bound must
       // keep them out of the reclaim batch.
-      await seedListing(alpha, seller, { status: 'ending', updatedAtMs: BASE_MS });
+      await seedListing(alpha, seller, {
+        status: 'ending',
+        updatedAtMs: BASE_MS,
+      });
       const aOpen = await seedListing(alpha, seller);
       const bOpen = await seedListing(beta, seller);
-      const aDelivered = await seedSettlement(alpha, aOpen, buyer, { state: 'delivered' });
+      const aDelivered = await seedSettlement(alpha, aOpen, buyer, {
+        state: 'delivered',
+      });
       await seedSettlement(beta, bOpen, buyer, { state: 'delivered' });
 
       // Each exact set below is the whole pin: it excludes the beta twin row
@@ -548,7 +569,10 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const sale = async (realm: string): Promise<number> =>
         marketDb.insertSale({
           realm,
-          listingId: await seedListing(realm, seller, { status: 'closed', resolution: 'sold' }),
+          listingId: await seedListing(realm, seller, {
+            status: 'closed',
+            resolution: 'sold',
+          }),
           itemId: 'crown_of_embers',
           item: { itemId: 'crown_of_embers', count: 1 },
           priceCents: 1000,
@@ -619,7 +643,9 @@ describeDb('woc market realm scoping against real Postgres', () => {
       // it from the catalog derivation and the same query finds it.
       const { alpha } = realmPair('cat-backfill');
       const seller = await seedAccount();
-      const id = await seedListing(alpha, seller, { itemId: 'heroic_kingsbane_last_oath' });
+      const id = await seedListing(alpha, seller, {
+        itemId: 'heroic_kingsbane_last_oath',
+      });
       const swordQuery = {
         page: 0,
         pageSize: 25,
@@ -672,7 +698,10 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const mk = async (realm: string): Promise<number> => {
-        const id = await seedListing(realm, seller, { status: 'closed', resolution: 'sold' });
+        const id = await seedListing(realm, seller, {
+          status: 'closed',
+          resolution: 'sold',
+        });
         await marketDb.insertSale({
           realm,
           listingId: id,
@@ -747,8 +776,12 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const { alpha, beta } = realmPair('offer-expiry');
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const a = await seedOffer(alpha, seller, buyer, { expiresAtMs: BASE_MS - MINUTE_MS });
-      const b = await seedOffer(beta, seller, buyer, { expiresAtMs: BASE_MS - MINUTE_MS });
+      const a = await seedOffer(alpha, seller, buyer, {
+        expiresAtMs: BASE_MS - MINUTE_MS,
+      });
+      const b = await seedOffer(beta, seller, buyer, {
+        expiresAtMs: BASE_MS - MINUTE_MS,
+      });
       // Two SAME-realm rows the due set must also exclude: a pending offer
       // whose TTL has not run out (the due bound: a strip would expire live
       // deals early) and a due-aged row already resolved (the inner status
@@ -771,7 +804,10 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const { alpha, beta } = realmPair('offer-converge');
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const window = { status: 'accepted', updatedAtMs: BASE_MS - 10 * MINUTE_MS };
+      const window = {
+        status: 'accepted',
+        updatedAtMs: BASE_MS - 10 * MINUTE_MS,
+      };
       const a = await seedOffer(alpha, seller, buyer, window);
       const b = await seedOffer(beta, seller, buyer, window);
       const batch = await marketDb.acceptedUnstampedOffers(
@@ -832,11 +868,15 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const aListing = await seedListing(alpha, seller);
       const bListing = await seedListing(beta, seller);
       const old = BASE_MS - 2 * HOUR_MS;
-      const aSigned = await seedBid(alpha, aListing, bidder, { bondSignature: `sig-a-${seq}` });
+      const aSigned = await seedBid(alpha, aListing, bidder, {
+        bondSignature: `sig-a-${seq}`,
+      });
       // Load-bearing by EXISTENCE: the exact sets below exclude this beta
       // twin and the beta refund twin further down.
       await seedBid(beta, bListing, bidder, { bondSignature: `sig-b-${seq}` });
-      const aStale = await seedBid(alpha, aListing, bidder, { placedAtMs: old });
+      const aStale = await seedBid(alpha, aListing, bidder, {
+        placedAtMs: old,
+      });
       const bStale = await seedBid(beta, bListing, bidder, { placedAtMs: old });
       // Fresh AND unsigned: only the TTL, not the signature, spares it.
       const aFresh = await seedBid(alpha, aListing, bidder, {
@@ -918,14 +958,20 @@ describeDb('woc market realm scoping against real Postgres', () => {
         realm: string,
         over: Parameters<typeof seedSettlement>[3],
       ): Promise<number> => seedSettlement(realm, await seedListing(realm, seller), buyer, over);
-      const aConfirming = await mk(alpha, { state: 'confirming', updatedAtMs: old });
+      const aConfirming = await mk(alpha, {
+        state: 'confirming',
+        updatedAtMs: old,
+      });
       // Load-bearing by EXISTENCE: the exact toEqual sets below exclude them.
       await mk(beta, { state: 'confirming', updatedAtMs: old });
       const aConfirmed = await mk(alpha, { state: 'confirmed' });
       const bConfirmed = await mk(beta, { state: 'confirmed' });
       const aDelivering = await mk(alpha, { state: 'delivering' });
       await mk(beta, { state: 'delivering' });
-      const aOverdue = await mk(alpha, { state: 'offered', deadlineAtMs: BASE_MS - MINUTE_MS });
+      const aOverdue = await mk(alpha, {
+        state: 'offered',
+        deadlineAtMs: BASE_MS - MINUTE_MS,
+      });
       await mk(beta, { state: 'offered', deadlineAtMs: BASE_MS - MINUTE_MS });
       // A STRANGER's same-realm settlement: the account activity read carries
       // wallets, amounts, and signatures, so its exact set must be separable
@@ -1041,7 +1087,11 @@ describeDb('woc market realm scoping against real Postgres', () => {
   // -------------------------------------------------------------------------
 
   describe('escrow entry', () => {
-    const SAVE_STATE = { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState;
+    const SAVE_STATE = {
+      questLog: [],
+      questsDone: [],
+      inventory: [],
+    } as unknown as CharacterState;
 
     function escrowListing(
       realm: string,
@@ -1094,7 +1144,9 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const characterId = await seedCharacter(alpha, seller);
-      const bAccepted = await seedOffer(beta, seller, buyer, { status: 'accepted' });
+      const bAccepted = await seedOffer(beta, seller, buyer, {
+        status: 'accepted',
+      });
       const out = await marketDb.escrowInsertListing(
         { characterId, level: 10, state: SAVE_STATE, leaseNonce: undefined },
         escrowListing(alpha, seller, characterId, bAccepted),

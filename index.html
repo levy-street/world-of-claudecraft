@@ -2001,6 +2001,19 @@
     </div>
   </div>
 
+  <!-- Dev-only offscreen frame pump, opt-in with ?headless=1. An agent-driven
+       browser pane renders the page hidden, and Chrome then throttles rAF and
+       never fires requestIdleCallback, so the shader prewarm never finishes and
+       world entry hangs. This must install BEFORE any game module runs, hence a
+       separate module script above the entry: module scripts execute in
+       document order, and the top-level await here holds main.ts until the
+       pump is in place. No-ops in production (see headless_pump.ts). -->
+  <script type="module">
+    if (new URLSearchParams(location.search).has('headless')) {
+      const m = await import('/src/dev/headless_pump.ts');
+      m.installHeadlessPump();
+    }
+  </script>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

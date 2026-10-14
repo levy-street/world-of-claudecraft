@@ -63,6 +63,11 @@ const EXCLUDED: Record<string, string> = {
     'and colour and are reachable only inside the battleground scene, which builds on entry. ' +
     'src/render/CLAUDE.md: a program only ONE encounter can reach warms at that interior attach, ' +
     'never in the boot manifest.',
+  'city_clutter.ts':
+    'World scenery, not a cast: bakeModels() fills the cache when buildCityClutter first builds ' +
+    'the painted-clutter InstancedMeshes into the group the Renderer constructor adds straight to ' +
+    'the scene (renderer.ts), and it builds nothing at all when GFX.cityClutter is off or on the ' +
+    'built-in world (no stamps). Same ruling as cliff_scree: the boot scene compile unit reaches it.',
   'cliff_scree.ts':
     'World scenery, not a cast: bakeRocks() fills the cache while buildCliffScree assembles the ' +
     'scatter the Renderer constructor adds straight to the scene (renderer.ts), so the boot scene ' +
@@ -253,9 +258,10 @@ describe('the lazy-material sweep', () => {
     // the warlock meteor rocks, plus the two rig-adornment stand-ins), the
     // two excluded scenery bakes, and the rocket-sled plume pair. The
     // battleground caches are the remaining non-bundle hit. Plus the World
-    // Quests branch's calligraphy guidance bundle: 18 / 17.
-    expect(hits.length).toBeGreaterThanOrEqual(18);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(17);
+    // Quests branch's calligraphy guidance bundle, and the Studio merge's
+    // painted city-clutter bake (a third excluded scenery bake): 19 / 18.
+    expect(hits.length).toBeGreaterThanOrEqual(19);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(18);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

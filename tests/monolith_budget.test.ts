@@ -537,7 +537,9 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 18082,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -576,7 +578,9 @@ const MONOLITHS: MonolithRow[] = [
     // sub-view landed: the Auras render method and its placement/teardown lines
     // moved out with them to src/ui/options_overlay_panels.ts. Measured with
     // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
-    ceiling: 2813,
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 2807,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -995,7 +999,11 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 12420,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1207,7 +1215,11 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Lowered 11570 -> 11534 when Deepglass and Tidehold left the Studio
+    // merge (the venue hooks, plot deeds and dev-bot removal). wc -l, exact.
+    ceiling: 11534,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1431,7 +1443,11 @@ const MONOLITHS: MonolithRow[] = [
     // Colorblind Mode's interface body-class extraction also composes with
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
-    ceiling: 11140,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 11002,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1689,7 +1705,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Lowered 9836 -> 9833 when the Tidehold `buyplot` case left the Studio
+    // merge. wc -l, exact count.
+    ceiling: 9833,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1868,7 +1888,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 5352,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1883,7 +1907,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 4850 -> 4720: the world quest minigame layer's three director
     // hooks were paid for by moving the note-event primitives (the Inst union,
     // NoteEvent/Theme, and the push* composition helpers) to music_notes.ts.
-    ceiling: 4720,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 4705,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
@@ -1911,7 +1939,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5194 -> 5188 at the merge of release/v0.44.0 into the
     // Eastbrook ferry branch (PR 4225): the release's own extractions plus the
     // ferry's wiring, measured with wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 5188,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    ceiling: 5129,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -2106,7 +2136,9 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered after extracting the world trees' camera-occluder fade (the
     // hideable records, the trunk hit test, the gated instance/ghost swap)
     // into src/render/tree_hide_fade.ts.
-    ceiling: 3996,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    ceiling: 3863,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -2181,7 +2213,11 @@ const MONOLITHS: MonolithRow[] = [
     // 2486 to 2513 into the row's slack: the berth gate bookkeeping (setColliderGateOpen,
     // gridIndex-ordered reopen, lazy wishes) needs the grid's private state, net of the
     // decoration collider builder moving out to decoration_collider.ts. wc -l. Exact count.
-    ceiling: 2513,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Lowered 2493 -> 2441 when crossesFence moved verbatim to fence_crossing.ts
+    // (with the restored Studio fence-placement arm). wc -l, exact count.
+    ceiling: 2441,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
@@ -2222,7 +2258,9 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again after the dais foundation-block stacking (and its
     // per-position hash) moved to src/render/dais_blocks_core.ts for the
     // Nythraxis flanking platforms (v0.42.2). Exact count, zero slack.
-    ceiling: 2420,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    ceiling: 2414,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

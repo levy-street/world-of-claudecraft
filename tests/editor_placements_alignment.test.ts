@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { ASSET_CATALOG } from '../src/editor/asset_catalog.generated';
 import {
@@ -5,7 +6,14 @@ import {
   placementsToPlayAssets,
   placementsToRenderAssets,
 } from '../src/editor/custom_map';
-import { needsReSeat, reindexAfterRemoval, unionRegion } from '../src/render/placed_assets';
+import {
+  needsReSeat,
+  PlacedAssetsView,
+  reindexAfterRemoval,
+  unionRegion,
+} from '../src/render/placed_assets';
+import { MODEL_PATH } from '../src/sim/map_doc';
+import type { PlacedAsset } from '../src/sim/types';
 
 // The doc-index/view-slot lockstep of the editor's placed-asset pipeline:
 // placementsToRenderAssets stays index-aligned across unresolvable ids (the
@@ -156,5 +164,65 @@ describe('reindexAfterRemoval (doc-index/view-slot lockstep)', () => {
       [1, 'entry-2'],
       [2, 'entry-3'],
     ]);
+  });
+});
+
+describe('placed asset ray picking', () => {
+  function triangle(x: number, z: number, localX = 0, halfWidth = 0.8): PlacedAsset {
+    return {
+      path: MODEL_PATH,
+      x,
+      z,
+      rotY: 0,
+      scale: 1,
+      detached: true,
+      groundY: 0,
+      meshes: [
+        {
+          verts: [localX - halfWidth, 0, 0, localX + halfWidth, 0, 0, localX, 2, 0],
+          tris: [0, 1, 2],
+        },
+      ],
+    };
+  }
+
+  it('selects the actual mesh hit instead of the nearest placement anchor', () => {
+    // Placement 0 is authored off its anchor but crosses the pointer ray.
+    // Placement 1 owns the nearer anchor, while its geometry sits well aside.
+    const view = new PlacedAssetsView([triangle(10, 0, -10), triangle(0, 0, 5)], 1);
+    view.group.updateMatrixWorld(true);
+    const raycaster = new THREE.Raycaster(new THREE.Vector3(0, 1, 10), new THREE.Vector3(0, 0, -1));
+
+    expect(view.pickCandidates(raycaster, 720, 60)[0]).toMatchObject({
+      index: 0,
+      direct: true,
+    });
+    view.dispose();
+  });
+
+  it('orders overlapping mesh hits from camera-near to camera-far', () => {
+    const view = new PlacedAssetsView([triangle(0, 0), triangle(0, -3)], 1);
+    view.group.updateMatrixWorld(true);
+    const raycaster = new THREE.Raycaster(new THREE.Vector3(0, 1, 10), new THREE.Vector3(0, 0, -1));
+
+    expect(
+      view
+        .pickCandidates(raycaster, 720, 60)
+        .filter((candidate) => candidate.direct)
+        .map((candidate) => candidate.index),
+    ).toEqual([0, 1]);
+    view.dispose();
+  });
+
+  it('keeps a true mesh hit first and appends a close small prop for cycling', () => {
+    const view = new PlacedAssetsView([triangle(0, 0), triangle(0.5, -2, 0, 0.1)], 1);
+    view.group.updateMatrixWorld(true);
+    const raycaster = new THREE.Raycaster(new THREE.Vector3(0, 1, 10), new THREE.Vector3(0, 0, -1));
+
+    expect(view.pickCandidates(raycaster, 720, 60).slice(0, 2)).toMatchObject([
+      { index: 0, direct: true },
+      { index: 1, direct: false },
+    ]);
+    view.dispose();
   });
 });

@@ -1,4 +1,5 @@
 import { audio } from '../game/audio';
+import { authoredMapMusicInput } from '../game/authored_map_music';
 import { corpseLootAvailabilityInWorld } from '../game/corpse_loot_availability';
 import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
 import { syncDeathControllerHints } from '../game/death_controller_hint';
@@ -67,6 +68,9 @@ import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
   ALL_RECIPES,
+  activeNamedAreas,
+  activeWorldStripRegion,
+  activeZoneList,
   CLASSES,
   DUNGEON_X_THRESHOLD,
   dungeonAt,
@@ -75,10 +79,6 @@ import {
   MOBS,
   NPCS,
   QUESTS,
-  WORLD_MAX_X,
-  WORLD_MAX_Z,
-  WORLD_MIN_X,
-  WORLD_MIN_Z,
   ZONES,
   zoneAt,
 } from '../sim/data';
@@ -296,9 +296,11 @@ import {
   itemSetBonusField,
   knownLetterId,
   riftFloorLabel,
+  subzoneBannerText,
   tEntity,
   zoneDisplayName,
   zonePoiLabel,
+  zoneSourceById,
 } from './entity_i18n';
 import {
   type ErrorTextLockoutDeps,
@@ -673,7 +675,7 @@ import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
-import { onMapArtReady } from './map_art';
+import { onMapArtReady, paintMapArtIntoStrip } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import { createMapMarkerArt } from './map_marker_icon_loader';
 import { mapMarkerProfileForFlags } from './map_marker_profile_core';
@@ -869,7 +871,7 @@ import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
-import { nearestSubzone } from './subzone';
+import { currentSubzone } from './subzone';
 import { SwingTimerBars } from './swing_timer_bars';
 import { localizeSystemText } from './system_text_i18n';
 import { TalentsWindow } from './talents_window';
@@ -2673,12 +2675,8 @@ export class Hud {
     // (public/map_bg/world_strip.webp) blitted in as soon as it decodes, so
     // boot skips ~50k pixels of synchronous terrain painting; other worlds
     // keep the procedural render.
-    const worldStripRegion = {
-      minX: WORLD_MIN_X,
-      maxX: WORLD_MAX_X,
-      minZ: WORLD_MIN_Z,
-      maxZ: WORLD_MAX_Z,
-    };
+    // The ACTIVE world's rect; the painter samples the same one (data.ts).
+    const worldStripRegion = activeWorldStripRegion();
     if (bakedMapBgEligible(this.sim.cfg.seed, 'world_strip')) {
       const stripCanvas = document.createElement('canvas');
       stripCanvas.width = 140;
@@ -2699,17 +2697,7 @@ export class Hud {
       this.minimapBg = this.renderTerrainCanvas(140, worldStripRegion);
     }
     // hand-painted plates land in the world strip too, each over its own band
-    {
-      const stripH = this.minimapBg.height;
-      const spanZ = WORLD_MAX_Z - WORLD_MIN_Z;
-      for (const zn of ZONES) {
-        onMapArtReady(zn.id, (img) => {
-          const top = ((WORLD_MAX_Z - zn.zMax) / spanZ) * stripH;
-          const rows = ((zn.zMax - zn.zMin) / spanZ) * stripH;
-          require2dContext(this.minimapBg).drawImage(img, 0, top, this.minimapBg.width, rows);
-        });
-      }
-    }
+    paintMapArtIntoStrip(() => this.minimapBg, worldStripRegion, activeZoneList());
     mm.style.cursor = 'var(--cursor-point)';
     mm.title = t('controls.worldMap');
     bindMinimapObjectiveTap(mm, this);
@@ -8759,6 +8747,7 @@ export class Hud {
         inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
         entities: sim.entities.values(),
         riftFloor: sim.riftFloor,
+        ...authoredMapMusicInput(),
       });
     }
 
@@ -9429,15 +9418,14 @@ export class Hud {
 
       // subzone text: a smaller banner when you step into a named landmark
       // (classic "subzone" display). POIs are the same labels the minimap pins.
-      const subzone = inDungeon
+      // Zone POI points AND the map's authored `locations` rects (subzone.ts).
+      const hit = inDungeon
         ? null
-        : nearestSubzone(p.pos.x, p.pos.z, currentZone.pois, this.lastSubzone);
+        : currentSubzone(p.pos.x, p.pos.z, currentZone.pois, activeNamedAreas(), this.lastSubzone);
+      const subzone = hit?.label ?? null;
       if (subzone !== this.lastSubzone) {
         this.lastSubzone = subzone;
-        if (subzone) {
-          const poiIndex = currentZone.pois.findIndex((q) => q.label === subzone);
-          this.showSubzone(poiIndex >= 0 ? zonePoiLabel(currentZone.id, poiIndex) : subzone);
-        }
+        if (hit) this.showSubzone(subzoneBannerText(currentZone.id, hit));
       }
 
       // The music machine ran in the non-paint head this same frame (same
@@ -10096,7 +10084,8 @@ export class Hud {
   private prewarmMapBg(zoneId: string): void {
     if (this.mapBgCache.has(zoneId)) return;
     if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
-    const zone = ZONES.find((z) => z.id === zoneId);
+    // ACTIVE zones too: an authored map's zone is in no static list.
+    const zone = zoneSourceById(zoneId);
     if (!zone) return;
     if (bakedMapBgEligible(this.sim.cfg.seed, zoneId)) {
       loadBakedMapBg(

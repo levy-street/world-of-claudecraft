@@ -19272,6 +19272,16 @@ function bgTeamWord(captured: string): string {
   return captured;
 }
 
+/** The team word the battleground flag-log keys (hudChrome.bg.flag*Log) take,
+ *  for a captured English side name: the same t() words the HUD splices into
+ *  those keys for a live bgFlag event, so the authored-map rehearsal's flag
+ *  lines read exactly like the battleground's. Unknown sides pass through. */
+function flagLogTeamWord(captured: string): string {
+  if (captured === 'Crimson') return t('hudChrome.bg.crimson');
+  if (captured === 'Azure') return t('hudChrome.bg.azure');
+  return captured;
+}
+
 type QuestExtraKey =
   | 'ritualNeedsKey'
   | 'aldrenVision1'
@@ -20704,6 +20714,36 @@ const RULES: Rule[] = [
   { re: /^You seize a Sprint Rune!$/, build: () => tBg('seizeRune') },
   { re: /^You seize a Battle Rune!$/, build: () => tBg('seizeBattleRune') },
   { re: /^You seize a Ward Rune!$/, build: () => tBg('seizeWardRune') },
+  // The authored-map flag rehearsal (src/sim/social/map_objectives_run.ts):
+  // its sim lines are worded as the battleground's own flag-log keys, so three
+  // of the five reuse them outright. Scores stay digits on the wire and are
+  // formatted here.
+  {
+    re: /^(.+) has taken the (\S+) flag!$/,
+    build: (m) => t('hudChrome.bg.flagTakenLog', { name: m[1], team: flagLogTeamWord(m[2]) }),
+  },
+  {
+    re: /^(.+) captured the (\S+) flag\. Score (\d+):(\d+)\.$/,
+    build: (m) =>
+      t('hudChrome.bg.capturedLog', {
+        name: m[1],
+        team: flagLogTeamWord(m[2]),
+        crimson: formatNumber(Number(m[3]), { maximumFractionDigits: 0 }),
+        azure: formatNumber(Number(m[4]), { maximumFractionDigits: 0 }),
+      }),
+  },
+  {
+    re: /^The (\S+) flag was returned\.$/,
+    build: (m) => t('hudChrome.bg.flagReturnedLog', { team: flagLogTeamWord(m[1]) }),
+  },
+  {
+    re: /^(.+) returned the (\S+) flag\.$/,
+    build: (m) => t('hudChrome.bg.flagReturnedByLog', { name: m[1], team: flagLogTeamWord(m[2]) }),
+  },
+  {
+    re: /^(.+) dropped the (\S+) flag\.$/,
+    build: (m) => t('hudChrome.bg.flagDroppedByLog', { name: m[1], team: flagLogTeamWord(m[2]) }),
+  },
   { re: /^You are already in a battleground\.$/, build: () => tBg('errInBattleground') },
   { re: /^You are not in a battleground\.$/, build: () => tBg('errNotInBattleground') },
   {

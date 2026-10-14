@@ -1,5 +1,6 @@
 import { authoredLettersById } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
+import { STUDIO_CONTENT } from '../sim/studio_content';
 
 // English world-entity names + narratives (mobs, NPCs, quests, zones, dungeons).
 //
@@ -672,6 +673,8 @@ const ZONE_IDS = [
   'evergarden',
   'galecrest',
   'farshore_isle',
+  // Appended last, matching the ZONES order in sim/data.ts.
+  'goldcrest_harbor',
   'proving_shore',
 ] as const;
 const DUNGEON_IDS = [
@@ -824,14 +827,26 @@ function orderedValues<T>(ids: readonly string[], source: Record<string, T>): T[
   });
 }
 
+// Studio-authored rows (src/sim/studio_content.ts) join the live registries only
+// while an authored map is active, but their names are translated like every
+// other row, so the English source reads the base tables plus that overlay.
+const MOB_SOURCE = { ...STUDIO_CONTENT.mobs, ...MOBS };
+const NPC_SOURCE = { ...STUDIO_CONTENT.npcs, ...NPCS };
+const QUEST_SOURCE = { ...STUDIO_CONTENT.quests, ...QUESTS };
+const DUNGEON_SOURCE = { ...STUDIO_CONTENT.dungeons, ...DUNGEONS };
+const ZONE_SOURCE = [
+  ...ZONES,
+  ...STUDIO_CONTENT.zones.filter((zone) => !ZONES.some((base) => base.id === zone.id)),
+];
+
 function makeEnglishWorldEntities(): WorldEntityTranslations {
   const mobs = {} as MobTranslations;
-  orderedValues(MOB_IDS, MOBS).forEach((mob) => {
+  orderedValues(MOB_IDS, MOB_SOURCE).forEach((mob) => {
     mobs[mob.id as MobId] = { name: mob.name };
   });
 
   const npcs = {} as NpcTranslations;
-  orderedValues(NPC_IDS, NPCS).forEach((npc) => {
+  orderedValues(NPC_IDS, NPC_SOURCE).forEach((npc) => {
     npcs[npc.id as NpcId] = {
       name: npc.name,
       title: npc.title,
@@ -840,7 +855,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   });
 
   const quests = {} as QuestTranslations;
-  orderedValues(QUEST_IDS, QUESTS).forEach((quest) => {
+  orderedValues(QUEST_IDS, QUEST_SOURCE).forEach((quest) => {
     const objectiveRecord = {} as Record<number, { label: string }>;
     quest.objectives.forEach((objective, objectiveIndex) => {
       objectiveRecord[objectiveIndex] = { label: objective.label };
@@ -854,7 +869,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   });
 
   const zones = {} as ZoneTranslations;
-  ZONES.forEach((zone) => {
+  ZONE_SOURCE.forEach((zone) => {
     const poiRecord = {} as Record<number, { label: string }>;
     zone.pois.forEach((poi, index) => {
       poiRecord[index] = { label: poi.label };
@@ -870,7 +885,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   });
 
   const dungeons = {} as DungeonTranslations;
-  orderedValues(DUNGEON_IDS, DUNGEONS).forEach((dungeon) => {
+  orderedValues(DUNGEON_IDS, DUNGEON_SOURCE).forEach((dungeon) => {
     dungeons[dungeon.id as DungeonId] = {
       name: dungeon.name,
       enterText: normalizeSourceText(dungeon.enterText),

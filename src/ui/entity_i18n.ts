@@ -1,6 +1,7 @@
 import { authoredLettersById, type LetterDef } from '../sim/content/letters';
 import {
   ABILITIES,
+  activeZoneList,
   CLASSES,
   DELVES,
   DUNGEONS,
@@ -11,7 +12,7 @@ import {
   QUESTS,
   ZONES,
 } from '../sim/data';
-import type { ItemDef, PlayerClass } from '../sim/types';
+import type { ItemDef, PlayerClass, ZoneDef } from '../sim/types';
 import {
   en,
   getLanguage,
@@ -25,6 +26,7 @@ import {
 } from './i18n';
 import { ownEntry } from './known_item';
 import { localizeRiftPlaceName } from './rift_text_i18n';
+import type { SubzoneHit } from './subzone';
 
 export type EntityTranslationGroup = 'classAbility' | 'item' | 'itemSet' | 'world';
 export type EntityTranslationKind =
@@ -270,6 +272,24 @@ function classDescriptionSource(id: PlayerClass): string {
   return en.classDetails.lore[id];
 }
 
+/** The zone record a display name / POI label reads, shipped catalog FIRST and
+ *  the ACTIVE world's own zones second.
+ *
+ *  Everything here keys off the static ZONES because that is what the locale
+ *  bundles are generated from, but an authored map (a Studio play-test or a
+ *  published `?map=<slug>` world) declares its own zones, which are in no
+ *  catalog and never will be. Without this second look those surfaces fell
+ *  through to the raw key: the zone banner read the zone's id instead of its
+ *  name, and its landmarks read "<zoneId>.pois.1" instead of the landmark.
+ *  Authored text is shown as the maker typed it; there is nothing to
+ *  translate it to. Exported for the
+ *  HUD's map-plate prewarm, which resolves a zone id the same way. */
+export function zoneSourceById(zoneId: string): ZoneDef | undefined {
+  const shipped = ZONES.find((candidate) => candidate.id === zoneId);
+  if (shipped) return shipped;
+  return activeZoneList().find((candidate) => candidate.id === zoneId);
+}
+
 function canonicalEntityText(request: EntityTranslationRequest): string {
   switch (request.kind) {
     case 'class':
@@ -323,14 +343,14 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
         `${request.questId}.${request.objectiveIndex}`
       );
     case 'zone': {
-      const zone = ZONES.find((candidate) => candidate.id === request.id);
+      const zone = zoneSourceById(request.id);
       if (!zone) return request.id;
       if (request.field === 'welcome') return zone.welcome;
       if (request.field === 'welcomeDone') return zone.welcomeDone ?? request.id;
       return zone.name;
     }
     case 'zonePoi': {
-      const zone = ZONES.find((candidate) => candidate.id === request.zoneId);
+      const zone = zoneSourceById(request.zoneId);
       return zone?.pois[request.poiIndex]?.label ?? `${request.zoneId}.pois.${request.poiIndex}`;
     }
     case 'dungeon': {
@@ -511,6 +531,13 @@ export function zoneDisplayName(zoneId: string): string {
 
 export function zonePoiLabel(zoneId: string, poiIndex: number): string {
   return tEntity({ kind: 'zonePoi', zoneId, poiIndex, field: 'label' });
+}
+
+/** The text the subzone banner shows for a landmark hit. A zone POI resolves
+ *  through its positional locale key; an authored `locations` rect (poiIndex
+ *  -1) shows the name the maker typed, which no catalog knows. */
+export function subzoneBannerText(zoneId: string, hit: SubzoneHit): string {
+  return hit.poiIndex >= 0 ? zonePoiLabel(zoneId, hit.poiIndex) : hit.label;
 }
 
 /** Resolve a deed poi:<zoneId>:<poiId> mark (src/sim/deeds.ts markVisited) to

@@ -942,9 +942,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.showSubzone',
     band: 'medium',
-    gate: 'subzone !== this.lastSubzone && subzone',
+    gate: 'subzone !== this.lastSubzone && hit',
     surface: 'chrome',
-    why: 'the subzone banner on a landmark crossing',
+    why: 'the subzone banner on a landmark crossing (a zone POI point or an authored `locations` rect)',
   },
   {
     call: 'syncMinigameMusic',
