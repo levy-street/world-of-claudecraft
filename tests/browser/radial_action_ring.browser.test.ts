@@ -96,6 +96,7 @@ function emptySlotState(kind: ActionBarSlotState['kind']): ActionBarSlotState {
     kind,
     abilityId: null,
     itemId: null,
+    petCommand: null,
     iconKey: '',
     cooldownRemaining: 0,
     cooldownTotal: 0,

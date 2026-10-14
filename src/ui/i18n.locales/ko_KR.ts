@@ -4200,6 +4200,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.passive': '수동',
   'hud.pet.defensive': '방어',
   'hud.pet.aggressive': '공격적',
+  'hud.pet.assist': '지원',
   'hud.pet.petAttackTitle': '소환수 공격',
   'hud.pet.petAttackDesc': '현재 적대적인 대상에게 소환수가 공격하도록 명령합니다.',
   'hud.pet.petTauntTitle': '소환수 도발',
@@ -4213,6 +4214,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.passiveDesc': '명령할 때만 공격합니다.',
   'hud.pet.defensiveDesc': '당신이나 소환수를 해치는 적을 공격합니다.',
   'hud.pet.aggressiveDesc': '근처의 적대적인 적을 공격합니다.',
+  'hud.pet.assistDesc':
+    '현재 대상에게 기술을 사용한 후에만 그 대상을 공격합니다. 당신을 공격하는 적은 무시합니다.',
   'hud.pet.rename': '소환수 이름 변경',
   'hud.pet.revive': '응급 처치',
   'hud.pet.abandon': '소환수 포기',

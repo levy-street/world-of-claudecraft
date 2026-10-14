@@ -2997,6 +2997,7 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           kind: 'ability',
           abilityId: 'x',
           itemId: null,
+          petCommand: null,
           iconKey: 'ability:x',
           cooldownRemaining: 0,
           cooldownTotal: 0,

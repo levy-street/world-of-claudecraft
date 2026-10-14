@@ -100,7 +100,7 @@ export interface HubLessonMetersPort {
 /** One ability/item bound to an action-bar slot, index 0 = assignable slot 1 (fixed Attack is slot 0)
  *  (mirrors src/ui/hud/action_bar/hotbar.ts HotbarAction; restated to avoid
  *  pulling the whole action-bar module graph into this one). */
-export type HubActionBarSlot = { type: 'ability' | 'item'; id: string } | null;
+export type HubActionBarSlot = { type: 'ability' | 'item' | 'pet'; id: string } | null;
 
 export interface HubLessonControllerDeps {
   /** #hub-lesson-coach: the tracker-stack strip this paints into. */

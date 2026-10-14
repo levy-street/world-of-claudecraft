@@ -4198,7 +4198,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   healPet(): void {
     this.cmd({ cmd: 'pet_heal' });
   }
-  setPetMode(mode: 'passive' | 'defensive' | 'aggressive'): void {
+  setPetMode(mode: Parameters<IWorld['setPetMode']>[0]): void {
     this.cmd({ cmd: 'pet_mode', mode });
   }
   // --- IWorldParty: party/raid commands + raid-target markers (terse wire strings;

@@ -10,6 +10,7 @@ import { bindActionLabel, type Keybinds, keyCapLabel } from '../game/keybinds';
 import { trackMetaPixel } from '../game/meta_pixel';
 import { syncMinigameMusic } from '../game/minigame_music_sync';
 import { music } from '../game/music';
+import { runPetCommand } from '../game/pet_commands';
 import {
   type BoolSettingKey,
   type GameSettings,
@@ -88,6 +89,7 @@ import type { FactionId } from '../sim/factions';
 import { isItemLevelEligible, itemInstanceLevel, itemScore } from '../sim/item_level';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MaterialComposition } from '../sim/material_sources';
+import { PET_MODES } from '../sim/pet/pet_assist';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import {
   computeRespecCost,
@@ -395,10 +397,12 @@ import {
   type FreedAttackSlotAbility,
   freedAttackSlotDisplayAbility,
   type HotbarAction,
+  hotbarPetCommand,
   isAbilityActionBarEligible,
   loadoutKnownAbilityIds,
   placeAbilityOnSlot,
   placeItemOnSlot,
+  placePetOnSlot,
   readHotbarDragData,
   swapHotbarSlots,
   writeHotbarDragData,
@@ -416,6 +420,7 @@ import {
 } from './hud/action_bar/mobile_action_page_view';
 import { buildMobileActionRing } from './hud/action_bar/mobile_action_ring_controller';
 import type { MobileActionRingPainter } from './hud/action_bar/mobile_action_ring_painter';
+import { petSlotText } from './hud/action_bar/pet_slot_core';
 import { playerStealthed } from './hud/action_bar/player_stealthed';
 import { RADIAL_DIRECTIONS, type RadialDirection } from './hud/action_bar/radial_action_core';
 import { AuraTrackFamily } from './hud/aura_tracks';
@@ -478,6 +483,11 @@ import {
 import { MapSidebarCollapse } from './hud/map/map_sidebar_collapse';
 import { resolveMapZone } from './hud/map/map_zone_focus_core';
 import { refreshSideButtonLabels } from './hud/menu/side_buttons';
+import {
+  addPetBarButton,
+  type PetBarButtonArgs,
+  type PetBarButtonDeps,
+} from './hud/pet_bar_button';
 import { livingSecondaryPet } from './hud/pet_bar_core';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
@@ -1133,11 +1143,13 @@ const PET_MODE_LABEL_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passive',
   defensive: 'hud.pet.defensive',
   aggressive: 'hud.pet.aggressive',
+  assist: 'hud.pet.assist',
 };
 const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passiveDesc',
   defensive: 'hud.pet.defensiveDesc',
   aggressive: 'hud.pet.aggressiveDesc',
+  assist: 'hud.pet.assistDesc',
 };
 /** The visual language the shared #banner slot paints in. 'default' is the
  *  bare gold celebration text every milestone has always used (level up, zone
@@ -1272,7 +1284,6 @@ export class Hud {
   // shares one hotbarActions array, so drag/drop, persistence, and keybind
   // dispatch work across them with no per-row bookkeeping.
   private static readonly BAR_ABILITY_SLOTS = ACTION_BAR_ABILITY_SLOTS;
-  private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
   private abilityButtons: {
     btn: HTMLButtonElement;
@@ -7527,6 +7538,10 @@ export class Hud {
       }
       this.useHotbarItem(action.id);
       this.flashActionSlot(barSlot);
+    } else if (action?.type === 'pet') {
+      // The same IWorld routing the Ctrl+1..5 pet binds run.
+      runPetCommand(this.sim, action.id);
+      this.flashActionSlot(barSlot);
     }
   }
 
@@ -7703,6 +7718,11 @@ export class Hud {
             this.itemTooltip(item) + itemInBagsLine(this.inventoryCount(item.id), worn) + clearHint
           );
         }
+        const petAction = this.actionForSlot(slot);
+        if (petAction?.type === 'pet') {
+          const text = petSlotText(petAction.id);
+          return `<div class="tt-title">${esc(t(text.title))}</div><div class="tt-desc">${esc(t(text.desc))}</div>${clearHint}`;
+        }
         return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}<br>${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
       });
       if (slot >= 1) {
@@ -7745,7 +7765,7 @@ export class Hud {
             e.dataTransfer.dropEffect =
               this.dragAction?.sourceIndex === null &&
               !this.dragAction?.sourceAttackSlot &&
-              dragged.type === 'item'
+              dragged.type !== 'ability'
                 ? 'copy'
                 : 'move';
           btn.classList.add('drop-target');
@@ -7774,6 +7794,8 @@ export class Hud {
             this.hotbarActions = placeAbilityOnSlot(this.hotbarActions, action.id, slot - 1);
           } else if (action.type === 'item' && this.isHotbarItemId(action.id)) {
             this.hotbarActions = placeItemOnSlot(this.hotbarActions, action.id, slot - 1);
+          } else if (action.type === 'pet') {
+            this.hotbarActions = placePetOnSlot(this.hotbarActions, action.id, slot - 1);
           }
           if (dragged.sourceAttackSlot) {
             this.attackSlotAction = null;
@@ -7915,6 +7937,7 @@ export class Hud {
                 ? null
                 : (this.abilityForSlot(i) ?? (i === 0 ? this.freedAttackSlotAbility() : null)),
             item: () => this.itemForSlot(i),
+            petCommand: () => hotbarPetCommand(this.actionForSlot(i)),
             keybindLabel: () => keyCapLabel(this.keybinds.primaryLabel(slotKey)),
           };
         }),
@@ -8151,7 +8174,8 @@ export class Hud {
     for (const group of bar.querySelectorAll('.petbar-group')) group.remove();
   }
 
-  private renderPetBar(pet: Entity | null): void {
+  // Returns the pet the bar commands (null for none), which the action bar's pet slots read.
+  private renderPetBar(pet: Entity | null): Entity | null {
     const bar = $('#petbar') as HTMLElement;
     // Keep commandable Necromancy secondaries visible after Graveguard is gone.
     const primaryPetShown = !!pet && !pet.dead;
@@ -8170,7 +8194,7 @@ export class Hud {
         this.clearPetBarGroups(bar);
         this.lastPetBarSig = '';
       }
-      return;
+      return null;
     }
     const mode = pet.petMode ?? 'defensive';
     const petTemplate = MOBS[pet.templateId];
@@ -8199,7 +8223,8 @@ export class Hud {
         : (petFeedButtonState(pet.hp, pet.maxHp, this.hasPetFood()).reasonKey ?? 'ok');
     const sig = `${pet.id}:${primaryPetShown ? 'primary' : 'secondary'}:${ownerClass}:${mode}:${actionCooldownSig}:${specialCooldownSig}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}:${feedSig}`;
     bar.style.display = 'flex';
-    if (sig === this.lastPetBarSig) return;
+    // Hold the buttons still while one is dragged: a rebuild would drop the drag source.
+    if (sig === this.lastPetBarSig || this.dragAction?.action.type === 'pet') return pet;
     this.lastPetBarSig = sig;
     // Focus carry-across through the shared helper (focus_restore.ts, #2528):
     // captureFocusKey owns the activeElement narrowing and the containment
@@ -8215,179 +8240,23 @@ export class Hud {
     const petTooltip = (title: string, desc: string): string =>
       `<div class="tt-title">${esc(title)}</div><div class="tt-desc">${esc(desc)}</div>`;
     const petModeLabel = (m: PetMode): string => t(PET_MODE_LABEL_KEYS[m]);
-    const addButton = (
-      parent: HTMLElement,
-      iconId: string,
-      title: string,
-      tooltip: string,
-      onClick: () => void,
-      opts: {
-        active?: boolean;
-        autocast?: boolean;
-        cooldownText?: string;
-        onContextMenu?: () => void;
-        onTouchHold?: () => void;
-        focusKey?: string;
-        // Kept visible (never hidden) but greyed and inert while set. The
-        // accessible name (`title`, which also feeds aria-label) STAYS the
-        // action name; the WHY is carried by the rich hover tooltip
-        // (`tooltip`), so a screen reader still announces the action, not the
-        // disabled reason.
-        disabled?: boolean;
-      } = {},
-    ) => {
-      const btn = document.createElement('button');
-      btn.className = 'pet-btn ui-socket';
-      btn.dataset.focusKey = opts.focusKey ?? iconId;
-      if (opts.active) btn.classList.add('active', 'is-on');
-      if (opts.autocast) btn.classList.add('autocast');
-      if (opts.cooldownText) btn.classList.add('cooldown');
-      if (opts.disabled) btn.classList.add('disabled');
-      btn.title = title;
-      btn.setAttribute(
-        'aria-label',
-        opts.cooldownText
-          ? `${title}, ${tPlural('hudChrome.plurals.secondsRemaining', Number(opts.cooldownText))}`
-          : title,
-      );
-      if (opts.disabled) btn.setAttribute('aria-disabled', 'true');
-      if (opts.active) btn.setAttribute('aria-pressed', 'true');
-      if (opts.onContextMenu) {
-        // Primary activation casts the skill; it does not toggle autocast. Do
-        // not expose this as aria-pressed (which promises the opposite button
-        // contract). Announce the secondary mode as descriptive state instead.
-        btn.setAttribute(
-          'aria-description',
-          t(opts.autocast ? 'hud.pet.autocastOn' : 'hud.pet.autocastOff'),
-        );
-        btn.setAttribute('aria-keyshortcuts', 'Shift+Enter');
-      }
-      const icon = document.createElement('span');
-      icon.className = 'icon-label ui-socket-art';
-      icon.style.backgroundImage = `url(${iconDataUrl('ability', iconId)})`;
-      btn.appendChild(icon);
-      if (opts.cooldownText) {
-        const cdText = document.createElement('span');
-        cdText.className = 'cdtext ui-socket-cd-text';
-        cdText.textContent = opts.cooldownText;
-        btn.appendChild(cdText);
-      }
-      let suppressNextClick = false;
-      let touchHoldTimer: number | undefined;
-      let touchHoldPointerId: number | null = null;
-      let touchHoldStartX = 0;
-      let touchHoldStartY = 0;
-      let touchHoldTriggered = false;
-      let touchHoldCanceled = false;
-      const clearTouchHoldTimer = () => {
-        if (touchHoldTimer !== undefined) window.clearTimeout(touchHoldTimer);
-        touchHoldTimer = undefined;
-      };
-      const runClickAction = () => {
-        if (opts.cooldownText || opts.disabled) return;
-        audio.click();
-        onClick();
-      };
-      btn.addEventListener('click', () => {
-        if (suppressNextClick) {
-          suppressNextClick = false;
-          this.peekGuard.consume();
-          this.hideTooltip();
-          btn.blur();
-          return;
-        }
-        if (this.peekGuard.consume()) {
-          this.hideTooltip();
-          btn.blur();
-          return;
-        }
-        runClickAction();
-      });
-      if (opts.onContextMenu) {
-        btn.addEventListener('keydown', (event) => {
-          if (event.key !== 'Enter' || !event.shiftKey || event.repeat || opts.disabled) return;
-          event.preventDefault();
-          event.stopPropagation();
-          audio.click();
-          opts.onContextMenu?.();
-        });
-        btn.addEventListener('contextmenu', (event) => {
-          event.preventDefault();
-          if (document.body.classList.contains('mobile-touch')) return;
-          if (opts.disabled) return; // an inert button fires no secondary action
-          audio.click();
-          opts.onContextMenu?.();
-        });
-      }
-      if (opts.onTouchHold) {
-        btn.addEventListener('pointerdown', (event) => {
-          if (!document.body.classList.contains('mobile-touch') || event.pointerType !== 'touch') {
-            return;
-          }
-          if (opts.disabled) return; // an inert button fires no long-press action
-          event.preventDefault();
-          clearTouchHoldTimer();
-          suppressNextClick = false;
-          touchHoldTriggered = false;
-          touchHoldCanceled = false;
-          touchHoldPointerId = event.pointerId;
-          touchHoldStartX = event.clientX;
-          touchHoldStartY = event.clientY;
-          try {
-            btn.setPointerCapture?.(event.pointerId);
-          } catch {
-            /* pointer already released */
-          }
-          touchHoldTimer = window.setTimeout(() => {
-            if (touchHoldPointerId !== event.pointerId || touchHoldCanceled) return;
-            touchHoldTriggered = true;
-            suppressNextClick = true;
-            audio.click();
-            opts.onTouchHold?.();
-            this.hideTooltip();
-            this.peekGuard.consume();
-            btn.blur();
-          }, Hud.PET_AUTOCAST_TOUCH_HOLD_MS);
-        });
-        btn.addEventListener('pointermove', (event) => {
-          if (touchHoldPointerId !== event.pointerId) return;
-          const moved = Math.hypot(
-            event.clientX - touchHoldStartX,
-            event.clientY - touchHoldStartY,
-          );
-          if (moved > 9) {
-            touchHoldCanceled = true;
-            clearTouchHoldTimer();
-          }
-        });
-        const finishTouchHold = (event: PointerEvent, canceled: boolean) => {
-          if (touchHoldPointerId !== event.pointerId) return;
-          event.preventDefault();
-          const triggered = touchHoldTriggered;
-          const movedAway = touchHoldCanceled || canceled;
-          clearTouchHoldTimer();
-          touchHoldPointerId = null;
-          touchHoldTriggered = false;
-          touchHoldCanceled = false;
-          suppressNextClick = true;
-          if (triggered || movedAway) {
-            this.peekGuard.consume();
-            return;
-          }
-          if (this.peekGuard.consume()) {
-            this.hideTooltip();
-            btn.blur();
-            return;
-          }
-          runClickAction();
-          btn.blur();
-        };
-        btn.addEventListener('pointerup', (event) => finishTouchHold(event, false));
-        btn.addEventListener('pointercancel', (event) => finishTouchHold(event, true));
-      }
-      this.attachTooltip(btn, () => tooltip);
-      parent.appendChild(btn);
+    const buttonDeps: PetBarButtonDeps = {
+      click: () => audio.click(),
+      consumePeek: () => this.peekGuard.consume(),
+      hideTooltip: () => this.hideTooltip(),
+      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      beginDrag: (action, dt) => {
+        if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return false;
+        this.dragAction = { action, sourceIndex: null };
+        writeHotbarDragData(dt, action);
+        return true;
+      },
+      endDrag: () => {
+        this.dragAction = null;
+        this.clearActionDropTargets();
+      },
     };
+    const addButton = (...args: PetBarButtonArgs) => addPetBarButton(buttonDeps, ...args);
     const restorePetBarFocus = () => {
       if (!focusedPetActionKey) return;
       // Finding the rebuilt equivalent stays the caller's own ladder (the
@@ -8411,6 +8280,7 @@ export class Hud {
       t('hud.pet.attack'),
       petTooltip(t('hud.pet.petAttackTitle'), t('hud.pet.petAttackDesc')),
       () => this.sim.petAttack(),
+      { dragAction: { type: 'pet', id: 'attack' } },
     );
     if (pet.templateId === 'water_elemental') {
       addButton(
@@ -8465,6 +8335,7 @@ export class Hud {
         () => this.sim.petTaunt(),
         {
           autocast: autoTaunt,
+          dragAction: { type: 'pet', id: 'taunt' },
           cooldownText: cd > 0 ? `${cd}` : undefined,
           onContextMenu: () => {
             this.sim.setPetAutoTaunt(!autoTaunt);
@@ -8525,31 +8396,17 @@ export class Hud {
         },
       );
     }
-    const modes: {
-      mode: PetMode;
-      labelKey: TranslationKey;
-      descKey: TranslationKey;
-    }[] = [
-      {
-        mode: 'passive',
-        labelKey: PET_MODE_LABEL_KEYS.passive,
-        descKey: PET_MODE_DESC_KEYS.passive,
-      },
-      {
-        mode: 'defensive',
-        labelKey: PET_MODE_LABEL_KEYS.defensive,
-        descKey: PET_MODE_DESC_KEYS.defensive,
-      },
-      {
-        mode: 'aggressive',
-        labelKey: PET_MODE_LABEL_KEYS.aggressive,
-        descKey: PET_MODE_DESC_KEYS.aggressive,
-      },
-    ];
+    // One row per stance, in menu order (pet/pet_assist.ts PET_MODES).
+    const modes = PET_MODES.map((m) => ({
+      mode: m,
+      labelKey: PET_MODE_LABEL_KEYS[m],
+      descKey: PET_MODE_DESC_KEYS[m],
+    }));
     const modeIcons: Record<PetMode, string> = {
       passive: PET_ACTION_ICONS.passive,
       defensive: PET_ACTION_ICONS.defensive,
       aggressive: PET_ACTION_ICONS.aggressive,
+      assist: PET_ACTION_ICONS.attack, // Assist wears Pet Attack's art, by design
     };
     addButton(
       stances,
@@ -8564,7 +8421,7 @@ export class Hud {
     );
     if (!this.petModeMenuOpen) {
       restorePetBarFocus();
-      return;
+      return pet;
     }
     for (const entry of modes) {
       addButton(
@@ -8577,10 +8434,15 @@ export class Hud {
           this.petModeMenuOpen = false;
           this.lastPetBarSig = '';
         },
-        { active: mode === entry.mode, focusKey: `stance-${entry.mode}` },
+        {
+          active: mode === entry.mode,
+          focusKey: `stance-${entry.mode}`,
+          dragAction: { type: 'pet', id: entry.mode === 'passive' ? 'stop' : entry.mode },
+        },
       );
     }
     restorePetBarFocus();
+    return pet;
   }
 
   // -------------------------------------------------------------------------
@@ -9302,8 +9164,8 @@ export class Hud {
       };
       this.actionBarWorldInput = actionBarWorld;
     }
+    actionBarWorld.pet = this.renderPetBar(pet);
     this.cooldownManager.paint(actionBarWorld);
-    this.renderPetBar(pet);
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();

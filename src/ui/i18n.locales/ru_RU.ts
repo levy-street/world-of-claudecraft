@@ -4281,6 +4281,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.pet.passive': 'Пассивный',
   'hud.pet.defensive': 'Защитный',
   'hud.pet.aggressive': 'Агрессивный',
+  'hud.pet.assist': 'Помощь',
   'hud.pet.petAttackTitle': 'Атака питомца',
   'hud.pet.petAttackDesc': 'Прикажите питомцу атаковать вашу текущую враждебную цель.',
   'hud.pet.petTauntTitle': 'Провокация питомца',
@@ -4294,6 +4295,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.pet.passiveDesc': 'Атакует только по вашей команде.',
   'hud.pet.defensiveDesc': 'Атакует врагов, которые ранят вас или питомца.',
   'hud.pet.aggressiveDesc': 'Атакует ближайших враждебных врагов.',
+  'hud.pet.assistDesc':
+    'Атакует только вашу текущую цель после того, как вы применили к ней способность. Игнорирует врагов, которые атакуют вас.',
   'hud.pet.rename': 'Переименовать питомца',
   'hud.pet.revive': 'Подлатать',
   'hud.pet.abandon': 'Оставить питомца',

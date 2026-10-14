@@ -87,11 +87,21 @@ import {
   type ResourceType,
   type Vec3,
 } from '../../../sim/types';
+import type { PetCommand } from '../../../world_api/pet';
 import type { InterpolationValues, TranslationKey } from '../../i18n';
+import {
+  type PetSlotPet,
+  petSlotActive,
+  petSlotCooldown,
+  petSlotCooldownTotal,
+  petSlotIconId,
+  petSlotText,
+  petSlotUsable,
+} from './pet_slot_core';
 import { trinketSlotState } from './trinket_slot_core';
 
-// The four slot kinds (a discriminated tag the painter maps to DOM classes).
-export type ActionBarSlotKind = 'attack' | 'empty' | 'item' | 'ability';
+// The five slot kinds (a discriminated tag the painter maps to DOM classes).
+export type ActionBarSlotKind = 'attack' | 'empty' | 'item' | 'ability' | 'pet';
 
 // Icon-key identities. The core emits a stable key per slot so the painter can elide
 // the (expensive) icon resolution + background-image write to slot-rebind frames
@@ -198,6 +208,9 @@ export interface ActionBarSlotDescriptor {
   ability(): ActionBarAbility | null;
   /** The slot's current item binding, or null. Host resolves from the layout. */
   item(): ItemDef | null;
+  /** The slot's pet-command binding, or null. Omitted by bar families that
+   *  cannot hold one. */
+  petCommand?(): PetCommand | null;
   /** The slot's keybind label. Host resolves from the keybind map. */
   keybindLabel(): string;
   /** Whether this rendered slot owns the source slot of an active ground aim.
@@ -330,6 +343,9 @@ export interface ActionBarWorldInput {
   entities: Iterable<OwnedDominionServant>;
   /** Source action-bar slot that owns the active ground aim, or null. */
   activeAimSlot: number | null;
+  /** The pet the pet bar commands (its own anchor), or null/absent for none:
+   *  pet-command slots grey out without one. */
+  pet?: PetSlotPet | null;
 }
 
 /** One slot's derived state. All fields are mutated IN PLACE each tick; the object
@@ -338,6 +354,8 @@ export interface ActionBarSlotState {
   kind: ActionBarSlotKind;
   abilityId: string | null;
   itemId: string | null;
+  /** The bound pet-bar command (kind 'pet' only). */
+  petCommand: PetCommand | null;
   iconKey: string;
   cooldownRemaining: number;
   cooldownTotal: number;
@@ -399,6 +417,7 @@ export function makeSlotState(): ActionBarSlotState {
     kind: 'empty',
     abilityId: null,
     itemId: null,
+    petCommand: null,
     iconKey: EMPTY_ICON_KEY,
     cooldownRemaining: 0,
     cooldownTotal: 0,
@@ -612,6 +631,7 @@ export function createActionBarView(
           slot.kind = 'attack';
           slot.abilityId = null;
           slot.itemId = null;
+          slot.petCommand = null;
           slot.iconKey = ATTACK_ICON_KEY;
           slot.cooldownRemaining = 0;
           slot.cooldownTotal = 0;
@@ -642,6 +662,49 @@ export function createActionBarView(
           continue;
         }
 
+        const petCommand = sd.petCommand?.() ?? null;
+        if (petCommand !== null) {
+          const pet = world.pet ?? null;
+          const cd = petSlotCooldown(petCommand, pet);
+          const cdTotal = petSlotCooldownTotal(petCommand, pet);
+          slot.kind = 'pet';
+          slot.abilityId = null;
+          slot.itemId = null;
+          slot.petCommand = petCommand;
+          slot.iconKey = `${ABILITY_ICON_PREFIX}${petSlotIconId(petCommand)}`;
+          slot.cooldownRemaining = cd;
+          slot.cooldownTotal = cdTotal;
+          slot.cooldownPercent =
+            cd > 0
+              ? Math.min(
+                  MAX_COOLDOWN_PERCENT,
+                  (cd / Math.max(COOLDOWN_DENOM_FLOOR, cdTotal)) * MAX_COOLDOWN_PERCENT,
+                )
+              : 0;
+          slot.cdText = cd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(cd)) : '';
+          slot.count = '';
+          slot.isCharges = false;
+          slot.rechargePercent = 0;
+          slot.usable = petSlotUsable(petCommand, pet);
+          slot.outOfRange = false;
+          // The current stance lights like a running auto-attack does.
+          slot.queued = petSlotActive(petCommand, pet);
+          slot.procGlow = false;
+          slot.empowered = false;
+          slot.naturesBoonGlow = false;
+          slot.ascensionSpender = false;
+          slot.ascensionCostLabel = '';
+          slot.fateConsumeReady = false;
+          slot.fateSentenceReady = false;
+          slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
+            slot: slotLabel,
+            ability: deps.t(petSlotText(petCommand).name),
+          });
+          slot.ariaDescription = '';
+          slot.keybindLabel = sd.keybindLabel();
+          continue;
+        }
+
         const item = sd.item();
         const ability = sd.ability();
 
@@ -649,6 +712,7 @@ export function createActionBarView(
           slot.kind = 'empty';
           slot.abilityId = null;
           slot.itemId = null;
+          slot.petCommand = null;
           slot.iconKey = EMPTY_ICON_KEY;
           slot.cooldownRemaining = 0;
           slot.cooldownTotal = 0;
@@ -694,6 +758,7 @@ export function createActionBarView(
           slot.kind = 'item';
           slot.abilityId = null;
           slot.itemId = item.id;
+          slot.petCommand = null;
           slot.iconKey = `${ITEM_ICON_PREFIX}${item.id}`;
           slot.cooldownRemaining = itemCd;
           slot.cooldownTotal = itemCd > 0 ? itemCdTotal : 0;
@@ -749,6 +814,7 @@ export function createActionBarView(
           slot.kind = 'ability';
           slot.abilityId = ability.def.id;
           slot.itemId = null;
+          slot.petCommand = null;
           slot.iconKey = `${ABILITY_ICON_PREFIX}${ability.def.id}`;
           slot.cooldownRemaining = 0;
           slot.cooldownTotal = 0;
@@ -791,6 +857,7 @@ export function createActionBarView(
         slot.kind = 'ability';
         slot.abilityId = def.id;
         slot.itemId = null;
+        slot.petCommand = null;
         slot.iconKey = `${ABILITY_ICON_PREFIX}${def.id}`;
         slot.cooldownRemaining = cd;
         slot.cooldownTotal = denom;

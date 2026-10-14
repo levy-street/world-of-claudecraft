@@ -8792,6 +8792,8 @@ export type TranslationKeyFlat =
   | 'hud.pet.abyssalChainTitle'
   | 'hud.pet.aggressive'
   | 'hud.pet.aggressiveDesc'
+  | 'hud.pet.assist'
+  | 'hud.pet.assistDesc'
   | 'hud.pet.attack'
   | 'hud.pet.autocastOff'
   | 'hud.pet.autocastOn'

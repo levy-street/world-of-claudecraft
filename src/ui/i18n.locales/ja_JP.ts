@@ -4232,6 +4232,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.pet.passive': '受動',
   'hud.pet.defensive': '防御',
   'hud.pet.aggressive': '攻撃',
+  'hud.pet.assist': 'アシスト',
   'hud.pet.petAttackTitle': 'ペット攻撃',
   'hud.pet.petAttackDesc': '現在の敵対対象を攻撃するようペットに命令します。',
   'hud.pet.petTauntTitle': 'ペット挑発',
@@ -4244,6 +4245,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.pet.passiveDesc': '命令した時だけ攻撃します。',
   'hud.pet.defensiveDesc': 'あなたまたはペットを傷つけた敵を攻撃します。',
   'hud.pet.aggressiveDesc': '近くの敵対的な敵を攻撃します。',
+  'hud.pet.assistDesc':
+    '現在のターゲットにアビリティを使った後、そのターゲットだけを攻撃します。あなたを攻撃する敵は無視します。',
   'hud.pet.rename': 'ペット名変更',
   'hud.pet.revive': '応急処置',
   'hud.pet.abandon': 'ペット放棄',

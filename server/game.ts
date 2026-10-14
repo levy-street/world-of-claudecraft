@@ -7123,8 +7123,8 @@ export class GameServer {
         sim.healPet(pid);
         break;
       case 'pet_mode':
-        if (msg.mode === 'passive' || msg.mode === 'defensive' || msg.mode === 'aggressive')
-          sim.setPetMode(msg.mode, pid);
+        // Unchecked on purpose: the sim rejects an unknown stance (pet/pet_assist.ts isPetMode).
+        sim.setPetMode(msg.mode as Parameters<Sim['setPetMode']>[0], pid);
         break;
       // trade
       case 'trade_req':

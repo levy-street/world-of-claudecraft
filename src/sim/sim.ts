@@ -1541,6 +1541,9 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   // aggressive pet auto-pull (see PET_OWNER_IDLE_TICKS) so an idle owner's pet
   // cannot farm the area alone.
   lastActiveTick: number;
+  // The enemy this player's last committed cast was aimed at (session-only): what
+  // an Assist-stance pet may attack, while it is still the active target.
+  petAssistTargetId?: number | null;
   // Runtime-only local recovery attempt. The owning system lives in unstuck.ts;
   // only its anti-relog cooldown is persisted through Entity.cooldowns.
   pendingUnstuck: unstuckMod.PendingUnstuck | null;

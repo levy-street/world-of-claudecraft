@@ -354,6 +354,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/quest/clue_step_row_view.ts',
   'src/ui/hud/pet_bar_core.ts',
+  'src/ui/hud/action_bar/pet_slot_core.ts',
   'src/ui/hud/warlock/doom_meter_view.ts',
   'src/ui/hud/aura_tracks/aura_track_catalog.ts',
   'src/ui/hud/aura_tracks/aura_track_descriptors.ts',
@@ -2698,6 +2699,9 @@ const UI_DOM_MODULES = [
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',
   'src/ui/hud/action_bar/radial_gesture_controller.ts',
   'src/ui/hud/menu/menu_control_controller.ts',
+  // The pet-bar button builder (Hud.renderPetBar's sockets, their touch hold
+  // and the drag that copies a pet command onto the action bar).
+  'src/ui/hud/pet_bar_button.ts',
   'src/ui/hud/stance/stance_bar_controller.ts',
   'src/ui/hud/stance/stance_control_controller.ts',
   'src/ui/hud/tap_menu.ts',

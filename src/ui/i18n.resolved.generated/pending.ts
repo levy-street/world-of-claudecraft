@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "es_ES": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "fr_FR": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "fr_CA": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "de_DE": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "nl_NL": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "pl_PL": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "id_ID": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "tr_TR": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "sv_SE": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "vi_VN": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ],
+  "da_DK": [
+    "hud.pet.assist",
+    "hud.pet.assistDesc"
+  ]
 };

@@ -65,6 +65,7 @@ import {
 } from '../types';
 import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { applyPetOwnerScaling, petRangedAttack, startWaterJet } from './pet_ai';
+import { isPetMode } from './pet_assist';
 import { isTameableFamily } from './pet_scaling';
 import { isPrimaryOwnedPetEntity } from './pet_selection';
 import { petCanForceTaunt } from './pet_taunt_gate';
@@ -888,6 +889,9 @@ export function healPet(ctx: SimContext, pid?: number): void {
 }
 
 export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
+  // The sim owns the stance list: the server hands the raw `pet_mode` wire value
+  // straight through, so an unknown mode stops here.
+  if (!isPetMode(mode)) return;
   const r = ctx.resolve(pid);
   if (!r) return;
   if (!isPetClass(r.meta.cls)) {

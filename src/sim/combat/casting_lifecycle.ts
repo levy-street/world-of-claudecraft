@@ -39,6 +39,7 @@ import { recalcPlayerStats } from '../entity';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
 import { canActivateDivineAscension, hasDevotion, spendDevotion } from '../paladin_devotion';
+import { notePetAssistCast } from '../pet/pet_assist';
 import { scalePrimaryHealing } from '../primary_healing';
 import {
   completeCorpseHarvestCast,
@@ -1867,6 +1868,10 @@ export function castAbility(
   // BEFORE this cast's own effects resolve, so the stealth lands on a cat and
   // the rush leaves as a bear.
   applyDruidFormEntry(ctx, p, meta, ability.id);
+  // An Assist-stance pet attacks the enemy this cast is aimed at (pet/pet_assist.ts).
+  // Recorded here, where the cast is certain and before every commit branch,
+  // including the on-swing one below.
+  notePetAssistCast(ctx, p, meta, target);
   // Auto-dismount when the player is mounted or mid-summon-channel and casts any ability.
   if (p.mountKey !== '') forceDismount(ctx, p);
   if (p.mountCastKey !== '') {

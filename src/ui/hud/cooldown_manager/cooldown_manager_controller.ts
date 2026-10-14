@@ -97,6 +97,9 @@ export const COOLDOWN_WORLD_FIELDS = [
   // The worn trinket (PR 4173's trinket slot): its action-bar state is per
   // frame like the aim slot, so the manager's own view mirrors it too.
   'wornTrinketId',
+  // The commanded pet (pet-command slots): inert in the manager's own view,
+  // whose descriptors hold no pet slot, but mirrored so no field is frozen.
+  'pet',
 ] as const satisfies readonly Exclude<keyof ActionBarWorldInput, 'entities'>[];
 
 function copyWorldField<K extends keyof ActionBarWorldInput>(

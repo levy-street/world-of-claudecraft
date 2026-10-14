@@ -1989,7 +1989,8 @@ export type MobFamily =
   | 'dragonkin'
   | 'demon'
   | 'reptile';
-export type PetMode = 'passive' | 'defensive' | 'aggressive';
+// 'assist' attacks only the owner's active target once they cast on it (pet/pet_assist.ts).
+export type PetMode = 'passive' | 'defensive' | 'aggressive' | 'assist';
 export type PetRole = 'melee_tank' | 'ranged_dps';
 
 // A mechanic-applied refreshing fire DoT (the dragonkin brood's burns): the

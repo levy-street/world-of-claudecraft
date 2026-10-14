@@ -67,6 +67,7 @@ import {
   RUN_SPEED,
   steadyAngleTo,
 } from '../types';
+import { petAssistKeepsTarget, petAssistTargetId } from './pet_assist';
 import { isTameableFamily, petHeelSpeed, petOwnerScaling } from './pet_scaling';
 import { petCanForceTaunt } from './pet_taunt_gate';
 import { tryUseWarlockPetSkill } from './warlock_pet_skills';
@@ -165,6 +166,8 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   // Both arms are the same rule: stop fighting something the owner has left behind.
   // Out of leash range they walked away from it; mounted they rode away from it.
   if (target && (travelling || dist2d(owner.pos, pet.pos) > PET_LEASH)) target = null;
+  // Assist fights only the owner's active target: switching target stands it down.
+  if (target && pet.petMode === 'assist' && !petAssistKeepsTarget(owner, target)) target = null;
   if (!target && !owner.dead) target = petPickTarget(ctx, pet, owner);
   pet.aggroTargetId = target?.id ?? null;
   pet.inCombat = target !== null;
@@ -646,6 +649,9 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   // acquisition here as well as clearing the target there means a pet cannot pick a
   // new one up mid-ride, in aggressive stance or by assisting.
   if (ownerIsMounted(owner)) return null;
+  // Assist never defends or roams: its one candidate is the owner's active target,
+  // and only once the owner has cast on it (pet/pet_assist.ts).
+  if (pet.petMode === 'assist') return petAssistPick(ctx, pet, owner);
   // Anti-AFK: an aggressive pet only proactively pulls fresh targets while its
   // owner is actually playing. An idle owner's pet still defends (engagingUs /
   // ownerOffense below) but cannot farm the area alone (hunter/warlock).
@@ -691,6 +697,18 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
     }
   });
   return best;
+}
+
+// The same filters the stance scan above applies to every candidate, on the one
+// unit Assist may take, plus the scan's own reach (PET_ASSIST_RANGE).
+function petAssistPick(ctx: SimContext, pet: Entity, owner: Entity): Entity | null {
+  const id = petAssistTargetId(owner, ctx.players.get(owner.id));
+  const m = id !== null ? ctx.entities.get(id) : undefined;
+  if (!m || m.id === pet.id || m.dead || isEvadingWildMob(m) || !ctx.isHostileTo(pet, m)) {
+    return null;
+  }
+  if (petQuestGateBlocksTarget(ctx, pet, m) || !petCanSeeTarget(m)) return null;
+  return dist2d(pet.pos, m.pos) <= PET_ASSIST_RANGE ? m : null;
 }
 
 function petQuestGateBlocksTarget(ctx: SimContext, pet: Entity, target: Entity): boolean {
