@@ -217,7 +217,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1020,
-      "state": "46583ec4",
+      "state": "309a2741",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -228,7 +228,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1020,
-      "state": "3cdaea6b",
+      "state": "40cd8009",
       "events": "15371577",
       "rng": {
         "draws": 8,
@@ -239,7 +239,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1020,
-      "state": "dc1d1389",
+      "state": "b3a3e386",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -250,7 +250,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1020,
-      "state": "11e8c07f",
+      "state": "adffb4dd",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -261,7 +261,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1020,
-      "state": "11e8c07f",
+      "state": "adffb4dd",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -507,7 +507,7 @@
           "stats": {
             "armor": 160
           },
-          "stompTimer": 10.2,
+          "stompTimer": 10.15,
           "swingTimer": 0.25,
           "tappedById": 1003,
           "templateId": "deacon_varric",
@@ -529,7 +529,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 1020,
-      "state": "82244340",
+      "state": "83953ddf",
       "events": "5295e58d",
       "rng": {
         "draws": 16,
@@ -776,7 +776,7 @@
           "stats": {
             "armor": 160
           },
-          "stompTimer": 10.15,
+          "stompTimer": 10.1,
           "swingTimer": 0.2,
           "tappedById": 1003,
           "templateId": "deacon_varric",

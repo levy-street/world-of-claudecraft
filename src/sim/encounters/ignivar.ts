@@ -79,6 +79,7 @@ import {
 } from '../types';
 import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../varkhul_forge_intermission';
 import { attemptLost } from './attempt_wipe';
+import { committedTankIds } from './committed_tanks';
 import { resolveEncounterWipe } from './encounter_wipe';
 import {
   IGNIVAR_DIALOGUE,
@@ -215,14 +216,6 @@ function playersInEncounter(ctx: SimContext, boss: Entity, includeDead = false):
   }
   players.sort((a, b) => a.id - b.id);
   return players;
-}
-
-function tankIds(ctx: SimContext): Set<number> {
-  const result = new Set<number>();
-  for (const meta of ctx.players.values()) {
-    if (meta.talentMods.role === 'tank') result.add(meta.entityId);
-  }
-  return result;
 }
 
 function conduitEntities(ctx: SimContext, boss: Entity): Map<IgnivarConduitId, Entity> {
@@ -656,7 +649,10 @@ function updateForgeJudgment(
 }
 
 function castBrandOfThePyre(ctx: SimContext, boss: Entity, players: readonly Entity[]): void {
-  const tanks = tankIds(ctx);
+  const tanks = committedTankIds(ctx);
+  // The player Ignivar is attacking is never branded, even out of a tank
+  // form or posture (a Feral main tank who drops Bruin Form).
+  if (boss.aggroTargetId !== null) tanks.add(boss.aggroTargetId);
   const livingCount = players.filter((player) => !player.dead).length;
   const candidates = players.filter((player) => !player.dead && !tanks.has(player.id));
   const drawSlots = Math.min(IGNIVAR_BRAND_TARGETS_NORMAL, livingCount);

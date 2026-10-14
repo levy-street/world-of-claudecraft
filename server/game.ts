@@ -51,6 +51,7 @@ import {
   partyFrameAggroTargets,
   partyFrameIncomingHeals,
   partyFrameRole,
+  partyFrameVitals,
 } from '../src/sim/party_frame_info';
 import { cleanPetName } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
@@ -67,7 +68,6 @@ import {
 } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
-import { riftStateEventFor } from '../src/sim/rift/runs';
 import type { CharacterState, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
@@ -135,13 +135,14 @@ import {
   bankLedgerSaveEffects,
   createBankLedgerSessionJournal,
 } from './bank_ledger_session';
+import { dispatchBankStorageCommand } from './bank_storage_command';
 import {
   type BankVaultLedgerGuardCoordinator,
   type BankVaultLedgerGuardRuntime,
   createBankVaultLedgerGuardCoordinator,
   resolveBankVaultLedgerMaxAccountStates,
 } from './bank_vault_ledger_guard';
-import { dispatchBankCommand, emitBankSelfKeys, emitGuildAndWeeklySelfKeys } from './bank_wire';
+import { emitBankSelfKeys, emitGuildAndWeeklySelfKeys } from './bank_wire';
 import { reportBgOutcomes } from './battleground_telemetry';
 import type {
   BotDetector,
@@ -235,7 +236,10 @@ import {
 } from './deeds_records';
 import { appendBookOfDeedsWire } from './deeds_wire';
 import { stampDevBadge } from './dev_badge_stamp';
-import { stopDisconnectedPlayerInput } from './disconnected_player_input';
+import {
+  resumeConnectedPlayerInput,
+  stopDisconnectedPlayerInput,
+} from './disconnected_player_input';
 import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
@@ -249,6 +253,7 @@ import {
   harvestBandForNode,
   harvestTierForNode,
 } from './economy_telemetry';
+import { writeEntityStatusWire } from './entity_status_wire';
 import { isUpdateDue } from './entity_update_cadence';
 // Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
 // barrels), the same way deeds_records imports onDeedRecorded: the barrels
@@ -257,7 +262,7 @@ import { isUpdateDue } from './entity_update_cadence';
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
 import { equippedInstanceWire } from './equipped_instance_wire';
-import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
+import { eventAnchor, shouldDeliverEventToViewer } from './event_delivery';
 import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
 import { buildEventPidIndex, forEachSelectedEventIndex } from './event_pid_index';
 import { appendFarmPlotsWire, dispatchFarmingCommand } from './farming_commands';
@@ -358,6 +363,15 @@ import {
   recordInGameAction,
 } from './moderation_db';
 import {
+  describeRiftFloor,
+  jailReturnPoint,
+  leaveRiftForModeration,
+  moderationReturnSpot,
+  type RiftExitSpot,
+  riftExitSpotAt,
+  teleportForModeration,
+} from './moderation_moves';
+import {
   canAttemptModerationCommands,
   type ModerationHost,
   ModerationService,
@@ -406,6 +420,7 @@ import { writePlayerIdentityWire } from './player_identity_wire';
 import { VaultGameServices, type VaultMailSaveCapture } from './vault_game_services';
 import { dispatchVehicleCommand } from './vehicle_command_wire';
 import { dispatchWeeklyRewardCommand } from './weekly_reward_open';
+import * as worldPvpWire from './world_pvp_wire';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
@@ -423,6 +438,8 @@ import { recordLevelUp } from './progress_events';
 import * as questWire from './quest_command_wire';
 import * as questSnap from './quest_snapshot_wire';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
+import { RealmMotd } from './realm_motd';
+import { realmMotdStore } from './realm_motd_db';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { dispatchRiftCommand } from './rift_forge_dispatch';
@@ -435,6 +452,7 @@ import {
   createKeyedSerialWriter,
   createSerialWriter,
 } from './serial_writer';
+import { findSessionByName } from './session_by_name';
 import { buildRealmSimConfig } from './sim_boot_config';
 import { feedRealmCalendar } from './sim_calendar_feed';
 import {
@@ -446,6 +464,7 @@ import {
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { guildStampRankOf, SocialService } from './social';
 import { PgSocialDb } from './social_db';
+import { idleSpectatorBody } from './spectate_body';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import {
   type StorageAppliedEffectDraft,
@@ -473,7 +492,7 @@ import { ferryDeckWire, transportHeadJson } from './transport_head';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
-import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
+import { emitVaultSelfKeys } from './vault_wire';
 import {
   buildWhoRosterEntries,
   canShowInWho,
@@ -487,6 +506,7 @@ import {
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { activeWorldBossIdsWireJson } from './world_boss_wire';
+import { forfeitWorldPvpFightOnSessionDeparture } from './world_pvp_departure';
 import { recordWorldQuestScoreEvent } from './world_quest_leaderboard';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -505,8 +525,6 @@ const TICK_HZ_HEAD_INTERVAL_S = 0.5;
 // cached wire fragments of despawned entities are swept once a minute
 const WIRE_CACHE_SWEEP_TICKS = 1200;
 const EVENT_RADIUS = 90;
-const SPECTATE_LIMBO_X = -10_000;
-const SPECTATE_LIMBO_Z = -10_000;
 const AUTOSAVE_SECONDS = 30;
 const SAVE_CONCURRENCY = 4;
 const LEAVE_SAVE_MAX_ATTEMPTS = 5;
@@ -700,11 +718,6 @@ const BG_RESPAWN_EVENT = 'respawn';
 // the same cadence and only re-sends when a listing actually changes.
 const DF_WIRE_HZ = 2;
 const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
-// World PvP `wpvp` self key (and the King of the Hill `hill` key, whose 60 s
-// contest bar and whole-minute clock tolerate half-second steps): 2 Hz; the
-// viewer's own pvp_flag command re-arms the gate so a press answers at once.
-const WPVP_WIRE_HZ = 2;
-const WPVP_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * WPVP_WIRE_HZ)));
 // World Market browse readout cadence: the browse view (a filter + page over the
 // whole listing book) is the most expensive per-viewer read in selfWireJson and
 // carries no sub-second clock, so 4 Hz caps the rebuild rate; the viewer's OWN
@@ -1000,7 +1013,7 @@ export interface ClientSession
   lastBgWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
   lastDfWireTick: number;
-  // World PvP readout, same idea at its own cadence (WPVP_WIRE_HZ)
+  // World PvP readout, same idea at its own cadence (worldPvpWire.WPVP_WIRE_INTERVAL_TICKS)
   lastWpvpWireTick: number;
   // World Market browse readout, same idea at its own cadence (MARKET_WIRE_HZ),
   // plus the rebuild-only-on-change state: the sim browse revision and the
@@ -1148,19 +1161,15 @@ export interface ClientSession
   pendingDeedRecords: string[];
   // The Reliquary twin (relicRecorded keys), same durability ordering and drain.
   pendingRelicRecords: string[];
-  spectating: {
-    characterId: number;
-    name: string;
-    savedPos: { x: number; y: number; z: number };
-    priorGm: boolean;
-    stowedPet: PetState | null;
-  } | null;
+  // The camera only: the body stays where it stands (server/spectate_body.ts).
+  spectating: { characterId: number; name: string } | null;
   jailed: JailState | null;
   jailVisit: {
     savedPos: { x: number; y: number; z: number };
     savedFacing: number;
     priorGm: boolean;
     stowedPet: PetState | null;
+    riftExit?: RiftExitSpot | null;
   } | null;
 }
 
@@ -1372,8 +1381,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
-  if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
-  if (e.pvpFlag) out.pvp = 1; // /pvp flag bit: nameplate + target-frame hostility colour
+  writeEntityStatusWire(e, out); // the /afk, /pvp and bounty display bits
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
   // three and the frame hides its bar). The rounded res keeps an idle entity's
@@ -1469,7 +1477,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (includeAuras && e.auras.length > 0) {
     out.auras = e.auras.map(wireAura);
   }
-  if (e.kind === 'mob' && e.lootable && e.loot) {
+  if ((e.kind === 'mob' || e.kind === 'player') && e.lootable && e.loot) {
     out.lootList = { copper: e.loot.copper, items: e.loot.items };
   }
   return out;
@@ -1540,6 +1548,10 @@ export class GameServer {
   // beginGuildBankDelete / endGuildBankDelete); removed on every arm.
   private readonly guildBankDeleteWindows = new Set<number>();
   private readonly moderation: ModerationService<ClientSession>;
+  readonly realmMotd = new RealmMotd<ClientSession>(
+    { sessions: () => this.clients.values(), sendRaw: (s, payload) => this.sendRaw(s, payload) },
+    realmMotdStore(() => pool, REALM),
+  );
   private readonly generalChatQuota: GeneralChatQuotaCoordinator;
   private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
   private readonly chatModerationLiveState = new ChatModerationLiveState();
@@ -1971,18 +1983,7 @@ export class GameServer {
   }
 
   private sessionByName(name: string): ClientSession | null {
-    const wanted = name.trim();
-    let ci: ClientSession | null = null;
-    let ciCount = 0;
-    const lower = wanted.toLowerCase();
-    for (const s of this.clients.values()) {
-      if (s.name === wanted) return s; // exact case wins
-      if (s.name.toLowerCase() === lower) {
-        ci = s;
-        ciCount++;
-      }
-    }
-    return ciCount === 1 ? ci : null;
+    return findSessionByName(this.clients.values(), name);
   }
 
   private moderationHost(): ModerationHost<ClientSession> {
@@ -2007,6 +2008,7 @@ export class GameServer {
       isJailed: (session) => session.jailed !== null,
       jail: (moderator, target, minutes) => this.jailSession(moderator, target, minutes),
       unjail: (moderator, target) => this.unjailSession(moderator, target),
+      realmMotd: (actor, command) => this.realmMotd.handle(actor, command),
     };
   }
 
@@ -2019,25 +2021,8 @@ export class GameServer {
       moderator.spectating.characterId = target.characterId;
       moderator.spectating.name = target.name;
     } else {
-      const savedPos = { ...moderatorEntity.pos };
-      const priorGm = !!moderatorEntity.gm;
-      const stowedPet = this.sim.stowPetForSpectate(moderator.pid);
-      const limbo = this.sim.groundPos(SPECTATE_LIMBO_X, SPECTATE_LIMBO_Z);
-      cancelProfessionSessionOnDisplacement(this.sim.ctx, moderatorEntity);
-      moderatorEntity.pos = limbo;
-      moderatorEntity.prevPos = { ...limbo };
-      this.sim.grid.update(moderatorEntity);
-      this.sim.playerGrid.update(moderatorEntity);
-      this.sim.setGm(moderator.pid);
-      const meta = this.sim.meta(moderator.pid);
-      if (meta) Object.assign(meta.moveInput, emptyMoveInput());
-      moderator.spectating = {
-        characterId: target.characterId,
-        name: target.name,
-        savedPos,
-        priorGm,
-        stowedPet,
-      };
+      idleSpectatorBody(this.sim, moderatorEntity);
+      moderator.spectating = { characterId: target.characterId, name: target.name };
     }
 
     moderator.lastSent = {};
@@ -2062,24 +2047,15 @@ export class GameServer {
     // without this the target's heavy fields can silently fail to resend.
     moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: target.name });
+    // after the frame: it resets the client's mirrored rift floor
+    describeRiftFloor(this.sim, target.pid, (frame) => this.send(moderator, frame));
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
   }
 
   private exitSpectate(moderator: ClientSession, announce = true): void {
-    const state = moderator.spectating;
-    if (!state) {
+    if (!moderator.spectating) {
       if (announce) this.sendChatNotice(moderator, 'You are not spectating anyone.');
       return;
-    }
-    const moderatorEntity = this.sim.entities.get(moderator.pid);
-    if (moderatorEntity) {
-      cancelProfessionSessionOnDisplacement(this.sim.ctx, moderatorEntity);
-      moderatorEntity.pos = { ...state.savedPos };
-      moderatorEntity.prevPos = { ...state.savedPos };
-      this.sim.grid.update(moderatorEntity);
-      this.sim.playerGrid.update(moderatorEntity);
-      this.sim.setGm(moderator.pid, state.priorGm);
-      this.sim.restorePetAfterSpectate(moderator.pid, state.stowedPet);
     }
     moderator.spectating = null;
     moderator.lastSent = {};
@@ -2102,26 +2078,9 @@ export class GameServer {
     // instead of staying stuck on the spectated target's last-sent values.
     moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: null });
+    // after the frame like enterSpectate's, never queued: a snapshot could overtake it
+    describeRiftFloor(this.sim, moderator.pid, (frame) => this.send(moderator, frame));
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
-  }
-
-  private teleportSessionEntity(session: ClientSession, pos: { x: number; z: number }): void {
-    const entity = this.sim.entities.get(session.pid);
-    if (!entity) return;
-    // Server-side teleports bypass the sim's own paths, so the shared
-    // displacement teardown runs here too: a jailed or moderated angler's
-    // live session never travels with them.
-    cancelProfessionSessionOnDisplacement(this.sim.ctx, entity);
-    const ground = this.sim.groundPos(pos.x, pos.z);
-    entity.pos = ground;
-    entity.prevPos = { ...ground };
-    entity.vy = 0;
-    entity.onGround = true;
-    entity.fallStartY = ground.y;
-    this.sim.grid.update(entity);
-    this.sim.playerGrid.update(entity);
-    const meta = this.sim.meta(session.pid);
-    if (meta) Object.assign(meta.moveInput, emptyMoveInput());
   }
 
   private jailSpawnFor(session: ClientSession): { x: number; z: number } {
@@ -2133,8 +2092,7 @@ export class GameServer {
     const targetEntity = this.sim.entities.get(target.pid);
     if (!targetEntity) return;
     target.jailed = {
-      returnPos: { x: targetEntity.pos.x, z: targetEntity.pos.z },
-      returnFacing: targetEntity.facing,
+      ...jailReturnPoint(this.sim, targetEntity),
       until: sentencedAtMs + minutes * 60_000,
     };
     // Drop the target out of any match queues (a match popping later would
@@ -2176,10 +2134,7 @@ export class GameServer {
     if (!state) return false;
     target.jailed = null;
     this.sim.setJailed(false, target.pid);
-    const pos = this.sim.groundPos(state.returnPos.x, state.returnPos.z);
-    const entity = this.sim.entities.get(target.pid);
-    if (entity?.dead || entity?.ghost) this.sim.revivePlayerAt(target.pid, pos, 1);
-    else this.teleportSessionEntity(target, state.returnPos);
+    teleportForModeration(this.sim, target.pid, state.returnPos, true);
     const updated = this.sim.entities.get(target.pid);
     if (updated) {
       updated.facing = state.returnFacing;
@@ -2198,11 +2153,7 @@ export class GameServer {
     // enforcement), so this is where the sim-side prisoner flag (the jail
     // brawl hostility, isHostileTo) is stamped. Idempotent.
     this.sim.setJailed(true, session.pid);
-    const spawn = this.jailSpawnFor(session);
-    const pos = this.sim.groundPos(spawn.x, spawn.z);
-    const entity = this.sim.entities.get(session.pid);
-    if (entity?.dead || entity?.ghost) this.sim.revivePlayerAt(session.pid, pos, 1);
-    else this.teleportSessionEntity(session, spawn);
+    teleportForModeration(this.sim, session.pid, this.jailSpawnFor(session), true);
     const updated = this.sim.entities.get(session.pid);
     if (updated) {
       updated.facing = 0;
@@ -2224,9 +2175,10 @@ export class GameServer {
         savedFacing: entity.facing,
         priorGm: !!entity.gm,
         stowedPet: this.sim.stowPetForSpectate(moderator.pid),
+        riftExit: riftExitSpotAt(this.sim, entity.pos),
       };
     }
-    this.teleportSessionEntity(moderator, JAIL_VISITOR_POS);
+    teleportForModeration(this.sim, moderator.pid, JAIL_VISITOR_POS);
     this.sim.setGm(moderator.pid);
     this.sendSystemNotice(moderator, 'Moved to jail visitor area.');
   }
@@ -2238,9 +2190,8 @@ export class GameServer {
       return;
     }
     moderator.jailVisit = null;
-    const entity = this.sim.entities.get(moderator.pid);
-    if (entity?.dead || entity?.ghost) this.sim.revivePlayerAt(moderator.pid, state.savedPos, 1);
-    else this.teleportSessionEntity(moderator, state.savedPos);
+    const back = moderationReturnSpot(this.sim, moderator.pid, state.savedPos, state.riftExit);
+    teleportForModeration(this.sim, moderator.pid, back, true);
     const updated = this.sim.entities.get(moderator.pid);
     if (updated) {
       updated.facing = state.savedFacing;
@@ -2258,10 +2209,9 @@ export class GameServer {
   // dungeon). Resolved in order: an explicit dungeonId portal field, then a
   // delve position, then any other far-off instance-space x as a dungeon. A
   // failed lookup returns null so callers fall back to the overworld zone
-  // rather than ever surfacing a raw id. `pos` defaults to the entity's live
-  // position but callers pass a spectator's saved position so a spectating
-  // moderator reports where they really are, not the limbo they were parked in.
-  private instanceZoneName(e: Entity, pos: { x: number; z: number } = e.pos): string | null {
+  // rather than ever surfacing a raw id.
+  private instanceZoneName(e: Entity): string | null {
+    const pos = e.pos;
     if (e.dungeonId) return DUNGEONS[e.dungeonId]?.name ?? e.dungeonId;
     if (isDelvePos(pos.x)) return delveAt(pos.x)?.name ?? null;
     if (pos.x > DUNGEON_X_THRESHOLD) return dungeonAt(pos.x)?.name ?? null;
@@ -2275,8 +2225,8 @@ export class GameServer {
   private presenceOf(session: ClientSession): Presence {
     const e = this.sim.entities.get(session.pid);
     if (!e) return { zone: 'Unknown', status: 'online' };
-    const pos = session.spectating?.savedPos ?? e.pos;
-    const instanceZone = this.instanceZoneName(e, pos);
+    const pos = e.pos;
+    const instanceZone = this.instanceZoneName(e);
     let status: PresenceStatus = 'online';
     if (e.dead) status = 'dead';
     else if (instanceZone != null) status = 'dungeon';
@@ -2754,7 +2704,7 @@ export class GameServer {
     const entity = this.sim.entities.get(session.pid);
     if (!entity || entity.dead || entity.ghost) return;
     const target = jailGateTeleport(entity.pos);
-    if (target) this.teleportSessionEntity(session, target);
+    if (target) teleportForModeration(this.sim, session.pid, target);
   }
 
   private isInJailRoom(pos: { x: number; z: number }): boolean {
@@ -3433,7 +3383,7 @@ export class GameServer {
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastBgWireTick: -BG_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
-      lastWpvpWireTick: -WPVP_WIRE_INTERVAL_TICKS,
+      lastWpvpWireTick: -worldPvpWire.WPVP_WIRE_INTERVAL_TICKS,
       lastMarketWireTick: -MARKET_WIRE_INTERVAL_TICKS,
       lastMarketBrowseRev: null,
       lastMarketQueryRef: null,
@@ -3573,6 +3523,7 @@ export class GameServer {
       t: 'events',
       list: [{ type: 'log', text: `${name} has entered World of ClaudeCraft.`, color: '#ffd100' }],
     });
+    this.realmMotd.greet(session);
     // firstJoin: the fresh-join path (a resume takes resumeSession, which stamps
     // the guild with firstJoin false since the entity already carries it), so
     // the first guild stamp retro-credits an existing member's soc_guild_joined
@@ -3705,11 +3656,7 @@ export class GameServer {
       player.petSpecialCommandsSupported =
         session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
     }
-    if (session.petSpecialWireVersion === 0) {
-      for (const entity of this.sim.entities.values()) {
-        if (entity.ownerId === session.pid) entity.petAutoSkill = false;
-      }
-    }
+    resumeConnectedPlayerInput(this.sim, session.pid, session.petSpecialWireVersion !== 0);
     session.timerWireCache = new StableSelfTimerWireCache();
     session.sentEnts = new Map();
     session.selfHeavyDirty = true;
@@ -3730,10 +3677,8 @@ export class GameServer {
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence
     // flap), so the fresh join notice would read as a glitch.
-    // A resumed session's fresh ClientWorld starts with riftFloor null (only
-    // enter/descend/exit emit riftState); re-send it so a resume is not blind.
-    const riftState = riftStateEventFor(this.sim.ctx, session.pid);
-    if (riftState) this.send(session, { t: 'events', list: [riftState] });
+    // Only enter/descend/exit emit riftState: re-send the floor so a resume is not blind.
+    describeRiftFloor(this.sim, session.pid, (frame) => this.send(session, frame));
     if (session.jailed) this.teleportJailedSession(session);
     void this.sendSocialSnapshot(session.characterId);
     return session;
@@ -3773,8 +3718,8 @@ export class GameServer {
     session.linkdead = true;
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
-    // Stop any held movement now; the sim keeps ticking this entity (it can
-    // still be attacked, healed, or die while linkdead, like any player).
+    // Forfeit a live world fight, then stop held movement (a linkdead body can still die).
+    forfeitWorldPvpFightOnSessionDeparture(this.sim, session.pid, !session.escrowQuarantined);
     stopDisconnectedPlayerInput(this.sim, session.pid);
     // Safety flush so a process crash during the grace window loses nothing.
     void this.saveCharacter(session, { withMarket: opts.withMarket ?? true }).catch((err) =>
@@ -3847,6 +3792,7 @@ export class GameServer {
 
   async leave(session: ClientSession, _reason: string): Promise<void> {
     if (session.left || !this.clients.has(session.pid)) return;
+    forfeitWorldPvpFightOnSessionDeparture(this.sim, session.pid, !session.escrowQuarantined);
     this.sim.leaveVehicle(session.pid);
     if (session.spectating) this.exitSpectate(session, false);
     if (session.jailVisit) this.exitJailVisit(session, false);
@@ -5801,8 +5747,7 @@ export class GameServer {
     characterId: number,
   ): Promise<'taken-over' | 'not-online'> {
     const session = this.sessionByCharacterId(characterId);
-    // Ownership is also enforced at the REST layer; re-check here so this method
-    // can never disconnect a session that belongs to another account.
+    // Ownership is re-checked here (as at the REST layer): never kick another account.
     if (!session || session.accountId !== accountId) return 'not-online';
     await this.kickSession(session, 'character taken over', 'character taken over');
     return 'taken-over';
@@ -6127,9 +6072,8 @@ export class GameServer {
     const msg = rawMsg as ClientMessage;
     const sim = this.sim;
     const pid = session.pid;
-    // Deliberate logout: the client wants a clean leave, not a linkdead grace.
-    // Calling leave() immediately sets session.left = true, so the subsequent
-    // WebSocket close event (from the page reload) is a no-op in socketClosed().
+    // Deliberate logout: a clean leave, not a linkdead grace. leave() sets
+    // session.left at once, so the page reload's close is a socketClosed() no-op.
     if (msg.t === 'logout') {
       void this.leave(session, 'logout');
       return;
@@ -6442,9 +6386,9 @@ export class GameServer {
         if (typeof msg.item === 'string') {
           // The bag index the client named, re-validated in the sim against ITS
           // OWN inventory: an unrecognized value reads as undefined (the legacy
-          // id-only path), never as index 0.
+          // id-only path), never as index 0. inkMap rides raw; the sim sanitizes it.
           const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
-          const result = sim.useItem(msg.item, pid, slot);
+          const result = sim.useItem(msg.item, pid, slot, undefined, msg.inkMap);
           if (result?.type === 'mechChroma')
             this.cosmetics.noteMechChroma(session, result.chromaId);
         }
@@ -6863,6 +6807,9 @@ export class GameServer {
         break;
       case 'resurrect_healer':
         this.sendCommandOutcome(session, msg, sim.resurrectAtSpiritHealer(pid));
+        break;
+      case 'pvp_resurrect':
+        sim.pvpResurrect(pid);
         break;
       case 'resurrect_respond':
         if (typeof msg.accept === 'boolean') sim.respondToResurrection(msg.accept, pid);
@@ -7345,11 +7292,11 @@ export class GameServer {
         sim.bgFlagAction(pid);
         session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
         break;
-      // World PvP: raise or lower the /pvp flag (src/sim/pvp/world_pvp.ts owns
-      // every rule; a non-boolean payload is a malformed frame and is ignored).
+      // World PvP: the /pvp flag and the Skull Bag (server/world_pvp_wire.ts).
       case 'pvp_flag':
-        if (typeof msg.on === 'boolean') sim.setWorldPvpFlag(msg.on, pid);
-        session.lastWpvpWireTick = -WPVP_WIRE_INTERVAL_TICKS;
+      case 'skull_bag':
+        worldPvpWire.dispatchWorldPvpCommand(sim, pid, msg);
+        session.lastWpvpWireTick = -worldPvpWire.WPVP_WIRE_INTERVAL_TICKS;
         break;
       case 'dev_bg_start': {
         if (process.env.ALLOW_DEV_COMMANDS === '1') sim.devStartBg();
@@ -7631,37 +7578,18 @@ export class GameServer {
       case 'bank_unlock_socket':
       case 'bank_socket_bag':
       case 'bank_unsocket_bag':
-        dispatchBankCommand(
-          sim,
-          session,
-          command,
-          msg,
-          pid,
-          session.bankVaultLedgerGuard.admission,
-        );
-        if (bankLedgerJournalNeedsSave(session.bankLedgerJournal.outbox)) {
-          this.scheduleBankLedgerHighWaterSave(session);
-        }
-        break;
-      case 'weekly_reward_open':
-      case 'weekly_reward_claim':
-        void dispatchWeeklyRewardCommand(this, session, command, msg);
-        break;
       case 'vault_deposit':
       case 'vault_withdraw':
       case 'vault_deposit_all':
       case 'vault_buy_upgrade':
-        dispatchVaultCommand(
-          sim,
-          session,
-          command,
-          msg,
-          pid,
-          session.bankVaultLedgerGuard.admission,
+        dispatchBankStorageCommand(sim, session, command, msg, () =>
+          this.scheduleBankLedgerHighWaterSave(session),
         );
-        if (bankLedgerJournalNeedsSave(session.bankLedgerJournal.outbox)) {
-          this.scheduleBankLedgerHighWaterSave(session);
-        }
+        break;
+      case 'weekly_reward_open':
+      case 'weekly_reward_claim':
+      case 'weekly_loot_spec':
+        void dispatchWeeklyRewardCommand(this, session, command, msg);
         break;
       // Guild Bank: the five officer-plus book mutations, dispatched by
       // server/guild_bank_wire.ts (shape checks) through runGuildBankOp
@@ -7961,14 +7889,9 @@ export class GameServer {
     // fresh here, off the live Entity.pos, never cached across passes: the shared
     // per-cell query below is a strict superset of every per-viewer query ONLY
     // because Sim.tick's end-of-tick grid.refresh leaves buckets fresh, so an
-    // anchor's CURRENT cell is the right one to query. The one mutation reachable
-    // here is the vanished-spectate exitSpectate fallback, which re-buckets the
-    // moderator back to savedPos; hoisting it ahead of the shared-candidate build
-    // makes every co-located session see the moderator at savedPos this pass, a
-    // tick earlier than the old inline ordering (gameplay-neutral: a moderator
-    // leaving spectate limbo becomes visible to co-located viewers one tick
-    // sooner, never later, and it never changes combat, loot, interest, or what
-    // the spectated players see).
+    // anchor's CURRENT cell is the right one to query. The vanished-spectate
+    // exitSpectate fallback runs here too; it moves no entity (a spectator's
+    // body never leaves where it stands), so it cannot stale a bucket.
     const anchors: SnapshotAnchor[] = [];
     forEachGuarded(
       this.clients.values(),
@@ -8411,7 +8334,13 @@ export class GameServer {
     // stringified every tick. Delta-guarded like the rest of this record; the
     // reconciliation-critical fields above stay unconditional since they change
     // on most combat ticks. The cohort lives in server/self_scalar_wire.ts.
-    emitSelfScalarKeys(maybe, meta, p, this.sim.dungeonDifficulty(anchorSession.pid));
+    emitSelfScalarKeys(
+      maybe,
+      meta,
+      p,
+      this.sim.dungeonDifficulty(anchorSession.pid),
+      this.sim.activeDungeonDifficulty(anchorSession.pid),
+    );
     // The viewer's OWN authored look. It cannot come from the entity list (the
     // broadcast loop skips `e.id === anchorEntity.id`), and it is exactly what
     // `maybeRaw` is for: heavy, already serialized once (appearanceWireJson),
@@ -8441,10 +8370,6 @@ export class GameServer {
       Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > Date.now())),
     );
     maybeRaw('wba', this.worldBossIdsJson);
-    // Where the player's corpse lies while their spirit is a ghost (null otherwise).
-    // Delta-guarded: ships on death-release and clears on resurrect. The client
-    // draws the corpse marker and gates the resurrect-at-corpse button on it.
-    maybe('corpse', p.corpsePos);
     if (stableTimerWire) {
       maybeSerialized('auras', this.stableAuraWireFor(p).json);
       maybeSerialized(
@@ -8554,10 +8479,11 @@ export class GameServer {
     // Small PvP-ledger scalars, delta-guarded like delve marks (a fresh session gets both).
     maybe('honor', meta.honor);
     maybe('lhonor', meta.lifetimeHonor);
-    if (this.sim.tickCount - session.lastWpvpWireTick >= WPVP_WIRE_INTERVAL_TICKS) {
+    if (this.sim.tickCount - session.lastWpvpWireTick >= worldPvpWire.WPVP_WIRE_INTERVAL_TICKS) {
       session.lastWpvpWireTick = this.sim.tickCount;
       maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));
       maybe('hill', this.sim.hillInfoFor(anchorSession.pid));
+      worldPvpWire.emitSkullBagSelfKey(maybe, this.sim, session, anchorSession.pid);
     }
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
@@ -8868,22 +8794,20 @@ export class GameServer {
       (mPid) => {
         const meta = this.sim.meta(mPid);
         const e = this.sim.entities.get(mPid);
-        const pos = this.clients.get(mPid)?.spectating?.savedPos ?? e?.pos;
-        if (!meta || !e || !pos) return null;
+        if (!meta || !e) return null;
+        const pos = e.pos;
         return {
           member: {
             pid: mPid,
             name: meta.name,
             cls: meta.cls,
             level: e.level,
-            hp: e.hp,
+            ...partyFrameVitals(e),
             mhp: e.maxHp,
-            res: Math.round(e.resource),
             mres: e.maxResource,
             rtype: e.resourceType,
             x: round2(pos.x),
             z: round2(pos.z),
-            dead: e.dead ? 1 : 0,
             inCombat: e.inCombat ? 1 : 0,
             group: party.raidGroups.get(mPid) ?? 1,
             absorb: partyFrameAbsorb(e.auras),
@@ -9181,7 +9105,7 @@ export class GameServer {
         forEachSelectedEventIndex(pidIndex, anchorPid, session.pid, (i) => {
           const ev = routableEvents[i];
           if (suppressedInvites?.has(ev)) return;
-          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, ownerOf)) return;
+          if (!shouldDeliverEventToViewer(ev, anchorPid, anchorParty, ownerOf, anchorPos)) return;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (

@@ -3,6 +3,7 @@ import { attuneAlliedHearthstone, DAWN_STANDARD_RADIUS } from '../src/sim/conten
 import { FACTION_HUB_LANDINGS } from '../src/sim/content/faction_vendors';
 import { DUNGEON_X_THRESHOLD, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { tryMobMeleeSwingInRange } from '../src/sim/mob/combat_profile';
 import { Sim } from '../src/sim/sim';
 
 describe('Allied Faction World Quest Rewards & Toys', () => {
@@ -180,6 +181,58 @@ describe('Allied Faction World Quest Rewards & Toys', () => {
       sim.tick();
       expect(sim.player.auras.some((a) => a.id === 'rift_feather_glider')).toBe(false);
     });
+
+    it('exempts gliding players from mob aggro scans and blocks ground mob melee swings in the air (#4244)', () => {
+      const sim = new Sim({ seed: 104, playerClass: 'rogue', autoEquip: false });
+      sim.addItem('rift_feather_glider', 1);
+
+      // Position player in the air directly above a spawn point
+      sim.player.pos = { x: 100, y: 15, z: 100 };
+      sim.player.onGround = false;
+
+      sim.useItem('rift_feather_glider');
+      const gliderAura = sim.player.auras.find((a) => a.id === 'rift_feather_glider');
+      expect(gliderAura).toBeDefined();
+      expect(gliderAura?.breaksOnDamage).toBeFalsy();
+
+      // Spawn a hostile mob directly underneath on the ground
+      const mob = createMob(99999, MOBS.forest_wolf, 20, { x: 100, y: 0, z: 100 });
+      sim.addEntity(mob);
+
+      // Mob idle aggro scan must ignore the airborne glider
+      sim.tick();
+      expect(mob.aggroTargetId).toBeNull();
+      expect(sim.player.inCombat).toBe(false);
+      expect(sim.player.auras.some((a) => a.id === 'rift_feather_glider')).toBe(true);
+
+      // Melee reach check: mob on ground cannot swing at target 15yd in the air
+      expect(tryMobMeleeSwingInRange(sim.ctx, mob, sim.player)).toBe(false);
+
+      // But when target is grounded within normal melee reach, swing is permitted
+      sim.player.pos = { x: 100, y: 1, z: 100 };
+      expect(tryMobMeleeSwingInRange(sim.ctx, mob, sim.player)).toBe(true);
+    });
+
+    it('does not leave a ground mob attacking forever under an airborne target', () => {
+      const sim = new Sim({ seed: 114, playerClass: 'rogue', autoEquip: false });
+      sim.player.pos = { x: 100, y: 15, z: 100 };
+      sim.player.onGround = false;
+
+      const mob = createMob(99998, MOBS.forest_wolf, 20, { x: 100, y: 0, z: 100 });
+      mob.aggroTargetId = sim.player.id;
+      mob.aiState = 'attack';
+      mob.threat.set(sim.player.id, 100);
+      sim.addEntity(mob);
+
+      for (let i = 0; i < 130; i++) {
+        mob.prevPos = { ...mob.pos };
+        (sim as unknown as { updateMob(e: typeof mob): void }).updateMob(mob);
+      }
+
+      expect(mob.aiState).not.toBe('attack');
+      expect(mob.aggroTargetId).toBeNull();
+      expect(mob.autoAttack).toBe(false);
+    });
   });
 
   describe('Clockwork Target Dummy (clockwork_target_dummy)', () => {
@@ -235,11 +288,12 @@ describe('Allied Faction World Quest Rewards & Toys', () => {
         sim.tick();
       }
 
-      // Check Blessing of the Dawn was granted (+5 Stamina, 15 min duration)
+      // Check Blessing of the Dawn was granted (+5% all attributes, 30 min duration)
       const blessing = sim.player.auras.find((a) => a.id === 'blessing_of_the_dawn');
       expect(blessing).toBeDefined();
+      expect(blessing?.kind).toBe('buff_stats_pct');
       expect(blessing?.value).toBe(5);
-      expect(blessing?.duration).toBe(900);
+      expect(blessing?.duration).toBe(1800);
 
       // Moving out of radius resets accumulation
       sim.player.pos = { x: -100 + DAWN_STANDARD_RADIUS + 10, y: 0, z: 200 };

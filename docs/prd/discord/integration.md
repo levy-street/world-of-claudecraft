@@ -147,6 +147,38 @@ also pushes voice-room membership so the widget shows it even without the iframe
   403 and is then refused locally by the governor's forbidden cache (`dm:<user>` subject)
   for its TTL.
 
+## World PvP kill feed (game -> bot -> channel)
+- Every resolved World PvP (`/pvp` flag) kill, and nothing else: duels, battlegrounds and
+  arenas never feed it (duel results already card on the activity feed).
+- The sim fires the server-only `worldPvpKill` event exactly once per death from
+  `worldPvpOnPlayerDeath` (`src/sim/pvp/world_pvp.ts`, behind its paid-death guard):
+  killer, victim, both levels, the victim's zone, the credited assists, and the stake
+  actually taken. `server/event_frame.ts` strips it from every client frame.
+- The activity-detect chain shapes it (`server/discord_pvp_feed.ts` `pvpKillFeedItem`,
+  zone id to its English name) into a bounded queue (`PVP_KILL_FEED_MAX_QUEUE`,
+  oldest dropped first) that the bot drains as the outbox's sixth stream (`pvpKills`).
+- Names only: no account ids, so the stream costs the outbox's identity read nothing and
+  every kill posts whether or not anyone is linked. Nobody is pinged
+  (`allowed_mentions: { parse: [] }`).
+- The bot batches each drain into digest posts (`bot/logic.ts` `chunkPvpKills` +
+  `buildPvpKillFeedMessage`, `PVP_FEED_LINES_PER_POST` lines each), so a brawl costs a
+  handful of messages rather than one per kill.
+- `DISCORD_PVP_FEED_CHANNEL_ID` has no fallback: unset is off (drained kills are dropped
+  after a once-per-channel notice), so kill volume never lands in the relay or activity
+  channel.
+
+## King of the Hill spawn calls (game -> bot -> the PvP channel)
+- The same `DISCORD_PVP_FEED_CHANNEL_ID` channel gets a card when a hill is announced
+  (the zone, a live Discord countdown to the rise, the time it falls) and another when it
+  rises. The fall is not posted.
+- `announcePhase` in `src/sim/pvp/hill.ts` fires the server-only `hillAnnounced` event
+  beside the realm's chat line, with times RELATIVE to the announcement.
+  `server/discord_hill_feed.ts` maps them onto the server's wall clock and queues the item
+  (`HILL_ANNOUNCEMENT_MAX_QUEUE`); the outbox serves it as the `hillAnnouncements` stream.
+- The bot posts calls ahead of the kill digests and skips one whose moment passed while it
+  was queued (`hillAnnouncementIsStale`), so a stalled bot never calls players to a hill
+  that is not there.
+
 ## Out of scope / follow-ups
 - Dungeon Finder proposals (`dfProposal`) as a third queue-pop kind; the observer's
   event arm is the only place that changes.

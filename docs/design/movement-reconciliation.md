@@ -72,17 +72,40 @@ struct. Each server tick consumes EXACTLY ONE frame, the next `ct` in sequence:
 
 - Frames are buffered on arrival, with exactly one consumed per server tick.
   The depth cap is 6 frames with drop-oldest overflow. Starvation extrapolates
-  for up to 2 ticks before resynchronizing; a target-depth jitter window remains
-  a possible future refinement.
+  for up to 2 ticks before resynchronizing. The playout depth adapts to chronic
+  lateness only (below).
 - Starvation (next frame missing): extrapolate with debt. The tick consumes a
   SYNTHESIZED frame equal to the last consumed input, advancing both the cursor
-  and the ack, so total travel stays one tick of movement per client tick; the
-  real frame for an extrapolated tick is discarded on arrival. Without the debt,
+  and the ack, so total travel stays one tick of movement per client tick
+  (outside the bounded playout growth below); the real frame for an
+  extrapolated tick is discarded on arrival. Without the debt,
   a starved tick re-applies the held input while the cursor waits, minting free
   distance from lag. If the late frame differed (a release during the starve),
   the client absorbs the one-tick divergence as a bounded replay correction.
   Extrapolation runs for at most the resync threshold, and the stale-input rule
   stays the runaway bound.
+- Chronic lateness grows the playout depth. A client whose ticks alternate
+  on time and just late (the sampler emits on the first render frame past each
+  deadline, so a 30 fps client sends every other tick about 17 ms after its
+  deadline) never starves three ticks in a row, so the resync never re-phases it and
+  every late tick would be guessed and its real frame lost. A frame that lands
+  right after its tick was extrapolated counts as late, once per guessed tick.
+  When the `PLAYOUT_GROWTH_LATE_FRAMES`-th late frame lands within
+  `PLAYOUT_GROWTH_WINDOW_TICKS` of the oldest one counted, that frame is kept:
+  the cursor steps back to it and the playout runs one tick deeper, up to
+  `MAX_PLAYOUT_GROWTH_TICKS` above the anchor. Growing replays the guessed tick
+  as an extra one (one tick of the guessed input, a single bounded replay on the
+  client), which is why a lone late frame, such as the tail of a link stall,
+  is still discarded. A resync resets the growth allowance, and an overflow
+  drop counts as one grown tick handed back. Lateness is measured at the
+  server, so repeated server tick stalls (a catch-up tick consuming before the
+  frames that arrived during the stall are read) grow the playout the same way,
+  which is the intended cover for server-side jitter too.
+- A grown tick is handed back after `PLAYOUT_SHRINK_SPARE_TICKS` consecutive
+  ticks in which the next frame was already buffered, and only when the body
+  did not move over the previous tick, both the consumed and the skipped frame
+  carry idle input, and the skipped frame brings no new facing: skipping such a
+  tick changes nothing, so the client sees no correction.
 - Empty-buffer anchoring is load-bearing recovery behavior. Once starvation
   reaches the resync threshold with no buffered frames, the next valid frame
   is the anchor whatever its `ct`; the ordinary depth window does not reject

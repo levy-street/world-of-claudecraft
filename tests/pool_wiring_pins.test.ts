@@ -419,19 +419,32 @@ describe('two-pool wiring at the migrated sim command boundaries', () => {
     expect(occurrences(body, 'bagPools(')).toBe(0);
   });
 
-  it('items.ts keeps its ONE flat total, and only for the arrangement command', () => {
-    // The first deliberate exemption. moveInventoryItem hands the flat total to
-    // moveStackToCell to bounds-check a drag between existing cells: it moves a
-    // stack the bags already hold rather than granting a new one, so it asks about
-    // the cell grid's extent and never about pool headroom. Pinned to the exact
-    // count AND to the enclosing function, so a NEW flat read, or this one drifting
-    // onto a grant, still reds. Sliced rather than matched line by line, so
-    // rewrapping the call across lines cannot red a pin about WHERE the read lives.
+  it('items.ts keeps its ONE flat total, and only for cell arrangement', () => {
+    // The first deliberate exemption. The flat total is the bag's CELL GRID
+    // extent, read once inside bagGridSize. Every consumer moves or pins a stack
+    // the bags already hold rather than granting a new one: the drag
+    // (moveStackToCell), the sort restamp, and the player-lock cell pin and
+    // equip swap. So each asks about the grid's extent, never pool headroom.
+    // Pinned to the exact count, to the helper, and to each consumer's
+    // arrangement call, so a NEW flat read, or the helper drifting onto a grant,
+    // still reds. Sliced rather than matched line by line, so rewrapping a call
+    // across lines cannot red a pin about WHERE the read lives.
     const src = sourceOf('src/sim/items.ts');
     expect(occurrences(src, 'bagCapacity(')).toBe(1);
-    const body = fnBody(src, 'moveInventoryItem');
-    expect(body).toContain('bagCapacity(meta.bags)');
-    expect(body).toContain('moveStackToCell(');
+    expect(fnBody(src, 'bagGridSize')).toContain('bagCapacity(meta.bags)');
+    const consumers: [fn: string, arrangement: string][] = [
+      ['moveInventoryItem', 'moveStackToCell('],
+      ['sortInventory', 'sortInventoryStacks('],
+      ['equipItem', 'freezeBagCells('],
+      ['returnEquippedItemToBags', 'pinStackToCurrentCell('],
+    ];
+    // The declaration plus exactly one read per consumer.
+    expect(occurrences(src, 'bagGridSize(')).toBe(1 + consumers.length);
+    for (const [fn, arrangement] of consumers) {
+      const body = fnBody(src, fn);
+      expect(occurrences(body, 'bagGridSize(meta)'), fn).toBe(1);
+      expect(body, fn).toContain(arrangement);
+    }
   });
 
   it('sim.ts keeps its ONE flat total, and only for the IWorld readout', () => {

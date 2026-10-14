@@ -68,6 +68,7 @@ import { applyPetOwnerScaling, petRangedAttack, startWaterJet } from './pet_ai';
 import { isTameableFamily } from './pet_scaling';
 import { isPrimaryOwnedPetEntity } from './pet_selection';
 import { petCanForceTaunt } from './pet_taunt_gate';
+import { retainedTamedPetScale } from './pet_visual_scale';
 import { warlockPetScaleAtLevel } from './warlock_pet_growth';
 import { useWarlockPetSkill } from './warlock_pet_skills';
 
@@ -200,8 +201,13 @@ export function serializePet(ctx: SimContext, ownerPid: number): PetState | null
   // stashed snapshot, otherwise a save taken mid-delve (autosave, disconnect, or
   // shutdown saveAll) would persist pet:null and lose the pet on reload.
   if (!pet) return ctx.delvePetStash.get(ownerPid) ?? null;
+  const template = MOBS[pet.templateId];
+  const scale = template
+    ? retainedTamedPetScale(template, ctx.players.get(ownerPid)?.cls, pet.scale)
+    : undefined;
   return {
     templateId: pet.templateId,
+    ...(template && scale !== undefined && scale !== template.scale ? { scale } : {}),
     name: pet.name,
     level: pet.level,
     hp: pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, pet.hp)),
@@ -262,7 +268,9 @@ export function restorePet(ctx: SimContext, owner: Entity, state: PetState): voi
   const level = owner.level;
   const pos = ctx.groundPos(owner.pos.x + 2, owner.pos.z + 1);
   const pet = createMob(ctx.nextId++, template, level, pos);
-  pet.scale = warlockPetScaleAtLevel(template, level);
+  pet.scale =
+    retainedTamedPetScale(template, ctx.players.get(owner.id)?.cls, state.scale) ??
+    warlockPetScaleAtLevel(template, level);
   pet.name = cleanPetName(state.name) ?? template.name;
   pet.ownerId = owner.id;
   pet.petMode = state.mode ?? 'defensive';
@@ -310,7 +318,9 @@ export function syncPetLevel(ctx: SimContext, owner: Entity): void {
   pet.weapon = scaled.weapon;
   pet.stats.armor = scaled.stats.armor;
   pet.moveSpeed = scaled.moveSpeed;
-  pet.scale = warlockPetScaleAtLevel(template, owner.level);
+  pet.scale =
+    retainedTamedPetScale(template, ctx.players.get(owner.id)?.cls, pet.scale) ??
+    warlockPetScaleAtLevel(template, owner.level);
   pet.color = scaled.color;
   pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, Math.round(pet.maxHp * hpFrac)));
   // maxHp/armor were just rebuilt from the template alone, so the owner's share is
@@ -357,6 +367,7 @@ export function completeTame(ctx: SimContext, p: Entity, target: Entity): void {
     ctx.groundPos(p.pos.x + 2, p.pos.z + 1),
   );
   pet.name = target.name;
+  pet.scale = target.scale;
   pet.ownerId = p.id;
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;

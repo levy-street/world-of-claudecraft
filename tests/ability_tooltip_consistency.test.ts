@@ -33,7 +33,7 @@ import {
 const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Courser's Guise daze lasts COURSER_DAZE_DURATION (combat/hunter_shared.ts),
   // a fixed constant applied by the damage hook, not an ability effect field.
-  aspect_of_the_cheetah: [4],
+  aspect_of_the_cheetah: [2],
   // Grace Devotion's mana cadence is stamped by effect_dispatch from its effect kind.
   grace_devotion: [5],
   // The Soul Stone heal fraction is SOUL_STONE_HEAL_PCT_MAX (src/sim/soulwell.ts),
@@ -100,7 +100,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   rip: [5],
   // Druid spec-engine interaction lines: the cited numbers are engine
   // constants in combat/druid_engines.ts (the Moonseed extension seconds on
-  // the Lunar Tempest line, the Verdance stage cap on the Wildbloom line),
+  // the Lunar Tempest line, the Verdance stage cap on the Sporemending line),
   // not per-rank effect fields.
   moonfire: [6],
   rejuvenation: [5],
@@ -114,12 +114,14 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   ambush: [6],
   venom_dart: [6],
   conjure_food: [2],
-  // Patch Up's dead-pet revive fraction is owned by the pet lifecycle branch;
-  // the living-pet HoT remains fully data-driven by the ability effect.
-  revive_pet: [35],
+  // Patch Up's pet-pool heal share and revive fraction live in
+  // combat/hunter_patch_up.ts (shares of the pet's own health, not effect fields).
+  revive_pet: [10, 8, 50],
   // Fieldcraft's Focus, Momentum, and re-entry rules live in hunter_fieldcraft.ts.
   raptor_strike: [1, 3, 8, 15],
-  trailbreak: [15, 18, 24],
+  // The landing sprint (50% for 3 sec) lives in combat/hunter_tick.ts.
+  // The "arm Re-entry for 12 sec" window is stamped by trailbreak().
+  trailbreak: [12, 15, 18, 24, 50, 3],
   // The Priest spec relationship rules are post-damage hooks rather than ability effects.
   smite: [15, 30],
   // 10 = VESPERS_DOT_DAMAGE_MULT (1.1), applied by resolveVespersAbility at

@@ -13,7 +13,7 @@ describe('the HUD vehicle bar factory host seam', () => {
       'private peekGuard = new TouchPeekGuard();',
       'private readonly playerGroundAim = new GroundAimController({',
       'private readonly empowerHold = new EmpowerHold();',
-      '  attachTooltip(el: HTMLElement, html: () => string): void {',
+      '  attachTooltip(el: HTMLElement, html: () => string, isSpell: () => boolean = () => false): void {',
       'this.vehicleBar ??= createHudVehicleBar(this);',
     ]) {
       expect(hudSource, anchor).toContain(anchor);

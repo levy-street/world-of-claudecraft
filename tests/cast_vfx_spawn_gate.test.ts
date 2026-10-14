@@ -2,7 +2,9 @@
 // setCastVfxSpawnGate): every gated pool asks its own family before it spawns
 // and skips when the family is not ready, so a cast admitted on a requirement
 // that missed a family can never link that family's program on a live frame;
-// it shows as a requirement miss instead. Driven through the REAL engine.
+// it shows as a requirement miss instead. A kit pool also checks its own
+// preparation, on every spawn and on every held frame. Driven through the
+// REAL engine.
 
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -31,6 +33,7 @@ import { ABILITY_VFX_FULL_SPECS } from '../src/render/ability_vfx_full_specs';
 import {
   CAST_VFX_ENGINE,
   CAST_VFX_KIT,
+  inCastVfxKit,
   OPEN_CAST_VFX_SPAWN_GATE,
 } from '../src/render/cast_vfx_family';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
@@ -40,6 +43,7 @@ import {
   drawingFamilies,
   gatedDrawables,
   installCastVfxCanvasStub,
+  objectsHeldBy,
   prepareCastVfxKit,
   wouldDraw,
 } from './helpers/cast_vfx_headless';
@@ -61,7 +65,7 @@ const GATED_POOLS = [
   'fragments',
 ] as const;
 
-function engine(open: number) {
+function engine(open: number, textureReady = true) {
   installCastVfxCanvasStub();
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 200);
@@ -97,7 +101,7 @@ function engine(open: number) {
     undefined,
     weapon,
     undefined,
-    () => true,
+    () => textureReady,
     (id, _piece, out) => {
       out.makeTranslation(id * 2, 1, 0);
       return true;
@@ -338,4 +342,110 @@ describe('the boot warm-up', () => {
     expect(gate.asked).toEqual([]);
     expect(drawables.some((object) => wouldDraw(object))).toBe(true);
   });
+});
+
+/** The pool each kit door draws into. The storm is fed through the engine's
+ *  hold, whose crest is the kit piece. A kit pool the engine builds with no
+ *  row here fails the coverage case, so it cannot ship past the refusal and
+ *  readiness cases below without a door of its own. The coverage case finds
+ *  a pool by the kit drawables it holds once constructed, which every kit
+ *  pool builds up front today; a pool that built its meshes only at its first
+ *  spawn would escape it. */
+const KIT_POOL_DOORS: Record<string, string> = {
+  crests: 'crest',
+  baked: 'baked layer',
+  fragments: 'fragments',
+  guards: 'guard plate',
+  powerForms: 'power form',
+  spiritHammers: 'spirit hammer',
+  furyStates: 'Fury solid',
+};
+const KIT_DOORS_WITH_STORM: Record<string, (fx: AbilityVfxFx) => void> = {
+  ...KIT_DOORS,
+  storm: ENGINE_DOORS.storm,
+};
+/** The held kit pieces and the pool whose drawables a hold keeps drawing. */
+const HELD_KIT_POOLS: Record<string, string> = {
+  'guard plate': 'guards',
+  'power form': 'powerForms',
+  'Fury solid': 'furyStates',
+  storm: 'crests',
+};
+
+function kitDrawablesOf(fx: AbilityVfxFx, pool: string): THREE.Object3D[] {
+  const field = (fx as unknown as Record<string, unknown>)[pool];
+  return [...objectsHeldBy(field)].filter(
+    (object) => inCastVfxKit(object) && (object as THREE.Mesh).material,
+  );
+}
+
+describe('every kit pool checks its own readiness', () => {
+  it('gives every kit pool the engine builds a door here', () => {
+    const { fx } = engine(CAST_VFX_ENGINE | CAST_VFX_KIT);
+    const pools = Object.keys(fx as unknown as Record<string, unknown>).filter(
+      (field) => kitDrawablesOf(fx, field).length > 0,
+    );
+    expect(pools.length).toBeGreaterThanOrEqual(Object.keys(KIT_POOL_DOORS).length);
+    for (const pool of pools) expect(KIT_POOL_DOORS[pool], `${pool} has a kit door`).toBeDefined();
+  });
+
+  for (const [pool, name] of Object.entries(KIT_POOL_DOORS)) {
+    it(`reaches the ${pool} pool through the ${name} door once everything is ready`, async () => {
+      // The positive control of the unprepared and revoked cases below: this
+      // door draws this pool's own drawables, not merely some kit piece.
+      const rig = engine(CAST_VFX_ENGINE | CAST_VFX_KIT);
+      await prepareSpawnGateKit(rig.fx);
+      const door = KIT_DOORS_WITH_STORM[name];
+      let drew = false;
+      door(rig.fx);
+      for (let frame = 0; frame < 4; frame++) {
+        if (HELD_DOORS.has(name)) door(rig.fx);
+        rig.fx.update(1 / 30);
+        drew ||= kitDrawablesOf(rig.fx, pool).some(wouldDraw);
+      }
+      expect(drew, `${name} draws the ${pool} pool`).toBe(true);
+    });
+  }
+
+  for (const [name, door] of Object.entries(KIT_DOORS_WITH_STORM)) {
+    it(`draws nothing of the kit through the ${name} door while its own pieces are unprepared`, () => {
+      // The family is ready (its programs are linked) but no piece is: no
+      // sheet uploaded, no preparation run. A pool that checks only the
+      // family bit draws here.
+      const rig = engine(CAST_VFX_ENGINE | CAST_VFX_KIT, false);
+      door(rig.fx);
+      for (let frame = 0; frame < 4; frame++) {
+        if (HELD_DOORS.has(name)) door(rig.fx);
+        rig.step(1);
+      }
+      expect(rig.drawing() & CAST_VFX_KIT).toBe(0);
+    });
+  }
+
+  for (const [name, pool] of Object.entries(HELD_KIT_POOLS)) {
+    for (const revoke of ['the kit family', 'its own preparation'] as const) {
+      it(`stops drawing the held ${name} the frame ${revoke} is no longer ready`, async () => {
+        const rig = engine(CAST_VFX_ENGINE | CAST_VFX_KIT);
+        await prepareSpawnGateKit(rig.fx);
+        const prepared = { ready: true };
+        // The storm's crest is revoked for its own kind only, so a hold that
+        // asked another kind's preparation would keep drawing.
+        prepareCastVfxKit(rig.fx, (kind?: unknown) =>
+          name === 'storm' && kind !== 'steel_storm' ? true : prepared.ready,
+        );
+        const door = KIT_DOORS_WITH_STORM[name];
+        const drawing = () => kitDrawablesOf(rig.fx, pool).filter(wouldDraw).length;
+        for (let frame = 0; frame < 3; frame++) {
+          door(rig.fx);
+          rig.fx.update(1 / 30);
+        }
+        expect(drawing(), `${name} draws while ready`).toBeGreaterThan(0);
+        if (revoke === 'the kit family') rig.gate.open = CAST_VFX_ENGINE;
+        else prepared.ready = false;
+        door(rig.fx);
+        rig.fx.update(1 / 30);
+        expect(drawing(), `${name} after ${revoke} went cold`).toBe(0);
+      });
+    }
+  }
 });

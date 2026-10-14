@@ -85,6 +85,19 @@ export function buildGearSet(
   return out;
 }
 
+/**
+ * Deep clone a SavedGearSet so callers (serialize, migration) can safely snapshot it.
+ */
+export function cloneGearSet(set: SavedGearSet): SavedGearSet {
+  const out: SavedGearSet = {};
+  for (const [slot, piece] of Object.entries(set) as [EquipSlot, SavedGearPiece | undefined][]) {
+    if (piece && typeof piece.itemId === 'string' && piece.itemId !== '') {
+      out[slot] = { itemId: piece.itemId, pin: typeof piece.pin === 'string' ? piece.pin : '' };
+    }
+  }
+  return out;
+}
+
 /** One equip the caller should perform, with the bag index resolved NOW. */
 export interface PlannedEquip {
   slot: EquipSlot;

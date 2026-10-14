@@ -20,11 +20,15 @@ import type { SimEvent } from '../src/sim/types';
 // of a craft the detector already observes through the craft command itself.
 // Loot awards feed Discord activity cards; craft rolls feed the audit observer;
 // treasureVaultOutcomePending / treasureVaultClaimRequested (Buried Hoard
-// vaults) hand off to the vault outcome journal and the claim persister.
+// vaults) hand off to the vault outcome journal and the claim persister;
+// worldPvpKill and hillAnnounced feed the Discord PvP channel
+// (server/discord_pvp_feed.ts, server/discord_hill_feed.ts).
 // None is a player-rendered event. Keep ordinary ticks allocation-free.
 const SERVER_ONLY_EVENT_TYPES: ReadonlySet<SimEvent['type']> = new Set([
   'vaultCraftConsume',
   'lootRollAwarded',
+  'worldPvpKill',
+  'hillAnnounced',
   'craftRoll',
   'treasureVaultOutcomePending',
   'treasureVaultClaimRequested',

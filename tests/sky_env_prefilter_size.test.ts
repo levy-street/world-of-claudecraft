@@ -122,11 +122,13 @@ describe('the env PMREM source width', () => {
     // fromScene defaults to size 256 (cubeUV height 1024) while a 512-wide
     // equirect prefilters at 128 (height 512): a session that boots on the
     // fallback and later gets a real prefilter would relink every lit material.
-    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    const calls = source.split('this.pmremGenerator.fromScene(').length - 1;
-    expect(calls).toBe(1);
-    expect(source).toContain(
-      'this.pmremGenerator.fromScene(envScene, 0.04, 0.1, 1100, { size: 128 })',
-    );
+    // One recipe, shared by the boot fallback and its context-restore re-bake
+    // (src/render/context_restore.ts prefilterSkyDome).
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).not.toContain('.fromScene(');
+    expect(renderer).toContain('prefilterSkyDome(this.pmremGenerator, this.sky)');
+    const host = readFileSync(new URL('../src/render/context_restore.ts', import.meta.url), 'utf8');
+    expect(host.split('.fromScene(').length - 1).toBe(1);
+    expect(host).toContain('pmrem.fromScene(envScene, 0.04, 0.1, 1100, { size: 128 })');
   });
 });

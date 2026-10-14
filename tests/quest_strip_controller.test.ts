@@ -20,7 +20,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QUESTS, WORLD_QUESTS_BY_ID } from '../src/sim/data';
-import type { QuestProgress } from '../src/sim/types';
+import type { QuestProgress, WeeklyQuestProgress } from '../src/sim/types';
 import { buildQuestStrip } from '../src/ui/hud/quest/quest_strip_controller';
 import { QUEST_STRIP_MAX_OBJECTIVES } from '../src/ui/hud/quest/quest_strip_core';
 import type { TrackedQuest } from '../src/ui/hud/quest/quest_tracker';
@@ -335,7 +335,7 @@ describe('the tracker hands its projection to the strip on touch', () => {
     };
   }
 
-  function mountTracker(entries: QuestProgress[]) {
+  function mountTracker(entries: QuestProgress[], weeklyQuest: WeeklyQuestProgress | null = null) {
     const rig = mountStrip();
     const element = document.createElement('div');
     element.id = 'quest-tracker';
@@ -351,6 +351,7 @@ describe('the tracker hands its projection to the strip on touch', () => {
           player: { name: 'Adventurer' },
           questLog,
           worldQuestLog: new Map(),
+          weeklyQuest,
         }) as unknown as Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog'>,
       settings: {
         available: () => true,
@@ -361,7 +362,14 @@ describe('the tracker hands its projection to the strip on touch', () => {
       objectiveLabel: (questId, index) => `objective:${questId}:${index}`,
       click: () => {},
     });
-    return { ...rig, element, controller };
+    return {
+      ...rig,
+      element,
+      controller,
+      setWeeklyQuest: (next: WeeklyQuestProgress | null) => {
+        weeklyQuest = next;
+      },
+    };
   }
 
   it('renders the strip and NOT the right-anchored markup while touch is live', () => {
@@ -370,6 +378,35 @@ describe('the tracker hands its projection to the strip on touch', () => {
     expect(rig.element.innerHTML).toBe('');
     expect(rig.title.textContent).toBe('title:q_wolves');
     expect(rig.counter.textContent).toBe('1/2');
+  });
+
+  it('renders and cycles the accepted emissary charge through progress, completion and reset', () => {
+    const weekly: WeeklyQuestProgress = {
+      questId: 'wk_dungeons',
+      week: 'wk_1',
+      count: 0,
+      state: 'active',
+    };
+    const rig = mountTracker([progress('q_boars')], weekly);
+    rig.controller.update(0);
+    expect(rig.counter.textContent).toBe('1/2');
+    rig.surface.click();
+    expect(rig.title.textContent).toBe('Weekly quest: Dungeons');
+    expect(rig.root.textContent).toContain('Dungeons completed: 0/3');
+    weekly.count = 2;
+    rig.controller.update(1);
+    expect(rig.root.textContent).toContain('Dungeons completed: 2/3');
+    weekly.state = 'completed';
+    rig.controller.update(2);
+    expect(rig.title.textContent).toBe('title:q_boars');
+    rig.setWeeklyQuest({ ...weekly, state: 'active', count: 0 });
+    rig.controller.update(3);
+    rig.surface.click();
+    expect(rig.title.textContent).toBe('Weekly quest: Dungeons');
+    rig.setWeeklyQuest(null);
+    rig.controller.update(4);
+    expect(rig.title.textContent).toBe('title:q_boars');
+    expect(rig.root.textContent).not.toContain('Dungeons completed');
   });
 
   it('renders the right-anchored markup and leaves the strip alone off touch', () => {

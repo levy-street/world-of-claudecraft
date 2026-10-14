@@ -8,7 +8,11 @@
  *
  * Node-only (RENDER_PURE_CORES): no three.js, no DOM.
  */
-import { CHARACTER_EFFECT_IMPALED, hasCharacterEffect } from '../character_effects_core';
+import {
+  CHARACTER_EFFECT_FEIGN_DEATH,
+  CHARACTER_EFFECT_IMPALED,
+  hasCharacterEffect,
+} from '../character_effects_core';
 import { type LocoState, MOVE_ENTER_SPEED } from '../locomotion';
 import type { AnimState } from './anim_state';
 
@@ -77,7 +81,11 @@ export function applyEntityAnimOverrides(
   // stays false, so nameplate, health bar and targeting keep the live read.
   // Last, so nothing above can undo it, and pinned over the other overrides:
   // a pinned body neither braces nor slides.
-  if (hasCharacterEffect(characterEffects, CHARACTER_EFFECT_IMPALED)) {
+  // Play Dead (hunter feign death) lies down the same way.
+  if (
+    hasCharacterEffect(characterEffects, CHARACTER_EFFECT_IMPALED) ||
+    hasCharacterEffect(characterEffects, CHARACTER_EFFECT_FEIGN_DEATH)
+  ) {
     st.dead = true;
     st.moving = false;
     st.running = false;

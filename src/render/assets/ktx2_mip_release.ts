@@ -204,6 +204,7 @@ export const KTX2_MIP_EXEMPT_MODEL_ROOTS: readonly string[] = [
 
 type RederiveResult = { mipmaps: Ktx2MipLevel[]; format: number };
 type Ktx2RederiveFn = (source: ArrayBuffer) => Promise<RederiveResult>;
+type ResolveTarget = () => Ktx2RestoreTarget | undefined | Promise<Ktx2RestoreTarget | undefined>;
 
 type ReleaseState = 'armed' | 'released' | 'restoring';
 
@@ -286,6 +287,19 @@ const pendingSources = new WeakKeyRegistry<ReleasableCompressedTexture, ArrayBuf
 const entries = new WeakKeyRegistry<ReleasableCompressedTexture, ReleaseEntry>();
 const inflightRestores = new Set<Promise<void>>();
 const EMPTY_MIP_DATA = new Uint8Array(0);
+// Between a game-canvas loss and its restore. An upload in that window never
+// reached the GPU (three's initTexture has no lost-context guard and fires
+// onUpdate anyway), so releasing on it would strand an ARMED texture on stubs
+// after the loss already kicked the restores: black until the next loss.
+let contextLostWindow = false;
+// The loss's target getter, reused by the restore-time retry of failures.
+let lastResolveTarget: ResolveTarget | undefined;
+
+/** How many times a failed re-transcode is tried again before the texture is
+ *  left on stubs until the next restore. The failures this covers are a
+ *  transcode worker that died or a transfer that raced; a deterministic
+ *  failure (corrupt bytes) costs this many extra transcodes and no more. */
+export const KTX2_RESTORE_RETRIES = 2;
 
 /** Game-entry opt-in. Must run before any GLB parse resolves (src/main.ts
  *  calls it at module evaluation, ahead of every asset fetch resolution).
@@ -375,6 +389,7 @@ function releaseAfterUpload(tex: ReleasableCompressedTexture, entry: ReleaseEntr
   // 'restoring' uploads are stub uploads on a fresh context; 'released' cannot
   // re-fire (no needsUpdate is ever set on stubs).
   if (entry.state !== 'armed') return;
+  if (contextLostWindow) return;
   // Re-check the profile at RELEASE time: a texture armed before the profile
   // settled (early deferred loads classify before initGfxTier, and a graphics
   // rebuild can re-resolve it) must keep resident mips on a profile that
@@ -427,9 +442,9 @@ function releaseAfterUpload(tex: ReleasableCompressedTexture, entry: ReleaseEntr
  *  pending while a graphics rebuild has the client paused rather than
  *  resolving to "no target" mid-rebuild. Omit it (or have it resolve to
  *  undefined) to keep the pre-existing immediate-upload behavior. */
-export function ktx2MipsOnContextLost(
-  resolveTarget?: () => Ktx2RestoreTarget | undefined | Promise<Ktx2RestoreTarget | undefined>,
-): void {
+export function ktx2MipsOnContextLost(resolveTarget?: ResolveTarget): void {
+  contextLostWindow = true;
+  lastResolveTarget = resolveTarget;
   if (!rederive) return;
   const released: [ReleasableCompressedTexture, ReleaseEntry][] = [];
   for (const pair of entries.entries()) {
@@ -438,6 +453,20 @@ export function ktx2MipsOnContextLost(
   for (let i = released.length - 1; i >= 0; i--) {
     const [tex, entry] = released[i] as [ReleasableCompressedTexture, ReleaseEntry];
     startRestore(tex, entry, resolveTarget);
+  }
+}
+
+/** The game canvas has its context back (in place or after a rebuild's
+ *  recycle): uploads release again, and a texture still on stubs (its
+ *  re-transcode failed through every retry) gets one more restore on the
+ *  restored context instead of staying black until the next loss. */
+export function ktx2MipsOnContextRestored(): void {
+  contextLostWindow = false;
+  if (!rederive) return;
+  for (const [tex, entry] of entries.entries()) {
+    if (entry.state === 'released' && entry.shape !== null) {
+      startRestore(tex, entry, lastResolveTarget);
+    }
   }
 }
 
@@ -521,17 +550,30 @@ export function ktx2RetainedSourceBytes(): number {
   return total;
 }
 
+/** One re-transcode, tried again on a rejection up to KTX2_RESTORE_RETRIES
+ *  times. Each attempt gets its own copy of the retained source. */
+function rederiveWithRetries(fn: Ktx2RederiveFn, source: ArrayBuffer): Promise<RederiveResult> {
+  let retries = 0;
+  const attempt = (): Promise<RederiveResult> =>
+    // Pass a copy: the transcode transfers its input buffer to the worker
+    // (detaching it in this thread), and the retained source must survive
+    // repeated attempts and repeated context losses.
+    fn(source.slice(0)).catch((error: unknown) => {
+      if (retries >= KTX2_RESTORE_RETRIES) throw error;
+      retries++;
+      return attempt();
+    });
+  return attempt();
+}
+
 function startRestore(
   tex: ReleasableCompressedTexture,
   entry: ReleaseEntry,
-  resolveTarget?: () => Ktx2RestoreTarget | undefined | Promise<Ktx2RestoreTarget | undefined>,
+  resolveTarget?: ResolveTarget,
 ): void {
   if (!rederive) return;
   entry.state = 'restoring';
-  // Pass a copy: the transcode transfers its input buffer to the worker
-  // (detaching it in this thread), and the retained source must survive
-  // repeated context losses.
-  const restore = rederive(entry.source.slice(0)).then(
+  const restore = rederiveWithRetries(rederive, entry.source).then(
     (fresh) => {
       if (entries.get(tex) !== entry || entry.state !== 'restoring') return;
       if (fresh.format !== tex.format || fresh.mipmaps.length !== (entry.shape?.length ?? -1)) {
@@ -612,7 +654,7 @@ function startRestore(
     (err: unknown) => {
       if (entries.get(tex) !== entry) return;
       // Dev-channel English: the texture stays on stubs (black) but the
-      // session survives; the next context loss retries.
+      // session survives; the next context restore retries.
       console.warn('[ktx2] restore transcode failed; texture left released', err);
       entry.state = 'released';
     },
@@ -680,6 +722,8 @@ export const ktx2MipReleaseInternalsForTest = {
     pendingSources.clear();
     entries.clear();
     inflightRestores.clear();
+    contextLostWindow = false;
+    lastResolveTarget = undefined;
   },
   isEnabled: (): boolean => releaseEnabled,
   hasRederive: (): boolean => rederive !== null,

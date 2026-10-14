@@ -1111,4 +1111,8 @@ export const table: DeedLocaleTable = {
     name: '現行犯',
     desc: '埋もれた財宝の中で、小銭袋のすばしっこが金を持って逃げる前に倒す。',
   },
+  exp_wisp_maze_hard: {
+    name: '影よりも明るく',
+    desc: 'ハードで盗まれた財布をすべて取り戻し、エバーガーデンの迷宮から脱出する。',
+  },
 };

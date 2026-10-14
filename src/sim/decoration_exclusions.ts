@@ -1,3 +1,6 @@
+import { inParterrePlot } from './garden_parterre_plots';
+import type { BiomeId } from './types';
+
 /** Authored clearings remove only named scatter, never terrain anchors or heights.
  * Both collision and rendering consume this same deterministic placement gate. */
 const EXCLUSIONS = [
@@ -32,6 +35,21 @@ const EXCLUSIONS = [
 
 export function isExcludedDecoration(x: number, z: number): boolean {
   return EXCLUSIONS.some((point) => Math.hypot(x - point.x, z - point.z) < 1.2);
+}
+
+/** The Evergarden curates its scatter: no wild pines (kind 'tree') anywhere on
+ * its lawns, the realm keeps its oaks, topiary and specimen elders; and nothing
+ * within six yards of a parterre bed. Judged at the decoration's FINAL position.
+ * The renderer used to apply this alone, which left a trunk collider under every
+ * pine nobody could see; the generator applies it now, so no host has them.
+ * `biomeAt` is world.ts's `zoneBiomeAt`, injected to keep this leaf cycle-free. */
+export function isCuratedGardenScatter(
+  kind: 'tree' | 'tree2' | 'rock',
+  x: number,
+  z: number,
+  biomeAt: (x: number, z: number) => BiomeId,
+): boolean {
+  return (kind === 'tree' && biomeAt(x, z) === 'garden') || inParterrePlot(x, z, 6);
 }
 
 /** Road lamps kept off authored clearings, matched to the exact planned site so no

@@ -1814,6 +1814,11 @@ export const en = {
       kings_signet: { name: "King's Signet" },
       event_skin_token: { name: 'Mysterious Cosmetic Cache' },
       emissary_cache: { name: "Emissary's Cache" },
+      // World PvP trophy (src/sim/pvp/world_pvp_spoils.ts); each looted copy
+      // reads as "<name>'s Skull" (hudChrome.worldPvp.skullName).
+      pvp_trophy_skull: { name: 'Trophy Skull' },
+      // The World PvP Skull Bag (src/sim/pvp/skull_bag.ts), sold for honor.
+      pvp_skull_bag: { name: 'Skull Bag' },
       // Clue Scrolls (world quests, Stage 3): the scroll and the casket it buries.
       clue_scroll: { name: 'Clue Scroll' },
       treasure_casket: { name: 'Treasure Casket' },

@@ -7,6 +7,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { SimEvent } from '../src/sim/types';
+import { t } from '../src/ui/i18n';
 import { Meters } from '../src/ui/meters';
 import type { IWorld } from '../src/world_api';
 
@@ -81,6 +82,15 @@ function fakeWorld(): IWorld {
     },
   } as unknown as IWorld;
 }
+
+const heal = (
+  sourceId: number,
+  targetId: number,
+  amount: number,
+  overheal: number,
+  ability: string,
+  crit = false,
+): SimEvent => ({ type: 'heal2', sourceId, targetId, amount, overheal, crit, ability }) as SimEvent;
 
 const dmg = (
   sourceId: number,
@@ -367,5 +377,44 @@ describe('meters panel', () => {
     meters.update();
     meters.render(true);
     expect(visibleRows()[0].tabIndex).toBe(0);
+  });
+
+  // The ability drill-down subtitle: a heal2 amount is already effective, so the
+  // subtitle shows it as-is and the overheal share is of total output.
+  it('drills into a heal ability with effective healing and the overheal share of output', () => {
+    const { meters, visibleRows } = setup();
+    meters.onEvent(heal(2, 1, 600, 200, 'Flash Heal', true));
+    meters.onEvent(heal(2, 1, 600, 0, 'Flash Heal'));
+    meters.update();
+    meters.render(true);
+    (document.querySelector('.mt-tab[data-tab="heal"]') as HTMLElement).click();
+    visibleRows()[0].click(); // the priest's bar opens the per-ability breakdown
+    visibleRows()[0].click(); // the Flash Heal row opens its detail
+    // 1200 effective, 200 of 1400 total output overhealed (14%), 1 crit in 2.
+    expect(document.querySelector('.mt-sub')?.textContent).toBe(
+      t('hudChrome.meters.detailHealSubtitle', {
+        effective: '1200',
+        overheal: '200',
+        overhealPercent: '14%',
+        hits: '2',
+        critPercent: '50%',
+      }),
+    );
+    expect(document.querySelector('.mt-sub')?.textContent).toBe(
+      'Effective: 1200 | Overheal: 200 (14%) | Hits: 2 (50% crit)',
+    );
+  });
+
+  it('drills into a damage ability with hits, crits, average and range', () => {
+    const { meters, visibleRows } = setup();
+    meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
+    meters.onEvent(dmg(1, 51, 100, 'Aimed Shot'));
+    meters.update();
+    meters.render(true);
+    visibleRows()[0].click();
+    visibleRows()[0].click();
+    expect(document.querySelector('.mt-sub')?.textContent).toBe(
+      'Hits: 2 | Crits: 0 (0%) | Average: 200 | Min/Max: 100 / 300',
+    );
   });
 });

@@ -11,7 +11,7 @@
     "useItem food/drink (sit + eating/drinking slot), potion (heal + cooldown), elixir (applyAura)",
     "discardItem: removeItem the discarded count",
     "sellItem: vendorInRange gate + recordVendorBuyback + meta.copper payout",
-    "sellAllJunk: bulk gray sweep, per-stack buyback record, one summary line",
+    "sellAllJunk: bulk gray sweep, plain grays skip buyback, one summary line",
     "buyBackItem: meta.copper spend + addItemSilent + onInventoryChangedForQuests"
   ],
   "draws": 0,
@@ -2157,7 +2157,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "a8eff8b0",
+      "state": "66dad3f7",
       "events": "adc6b855",
       "rng": {
         "draws": 0,
@@ -2282,10 +2282,6 @@
           "vendorBuyback": [
             {
               "count": 1,
-              "itemId": "soggy_moccasin"
-            },
-            {
-              "count": 1,
               "itemId": "wolf_fang",
               "materialSources": [
                 {
@@ -2393,7 +2389,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "fcb42414",
+      "state": "f4a966ce",
       "events": "c18fbbfb",
       "rng": {
         "draws": 0,
@@ -2515,12 +2511,6 @@
             "stock": {}
           },
           "vaultAttemptDurable": true,
-          "vendorBuyback": [
-            {
-              "count": 1,
-              "itemId": "soggy_moccasin"
-            }
-          ],
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2619,7 +2609,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "fcb42414",
+      "state": "f4a966ce",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2741,12 +2731,6 @@
             "stock": {}
           },
           "vaultAttemptDurable": true,
-          "vendorBuyback": [
-            {
-              "count": 1,
-              "itemId": "soggy_moccasin"
-            }
-          ],
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

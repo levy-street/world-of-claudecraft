@@ -9,9 +9,8 @@
 // cache/queue state machine live in asset_thumbs_core.ts.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
-import { loadGltf, releaseGltf } from '../render/assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from '../render/assets/loader';
 import { hideBlackPointLights } from '../render/point_light_carriers';
 import { assetById } from './asset_catalog.generated';
 import { hashHue, ThumbBook, thumbPose } from './asset_thumbs_core';
@@ -163,7 +162,7 @@ async function snapshot(assetId: string): Promise<void> {
     callbacks.delete(assetId);
     return;
   }
-  let gltf: GLTF;
+  let gltf: LoadedGltf;
   try {
     gltf = await loadGltf(path);
   } catch {

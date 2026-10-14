@@ -173,7 +173,8 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
   'src/ui/frame_context_menu.ts': 'transient right-click menu for the frame editor',
   'src/ui/focus_targets_controller.ts':
     'mounts the focusTargets frame registered with the shared editor',
-  'src/main.ts': 'mounts the breath bar (transient survival meter, exempt for now) into #ui',
+  'src/main.ts':
+    'mounts the breath bar (transient survival meter, exempt for now) and the graphics restore note (a pointer-inert status line shown only while a WebGL context restore holds the world draw) into #ui',
   'src/ui/hud.ts': 'the HUD coordinator: mounts the proc overlay, FCT pool, match strips',
   'src/ui/interface_unlock.ts': 'the unlock coordinator: its own edit chrome + the detacher',
   'src/ui/meters_frame.ts': 're-homes framed meter panels onto #ui',

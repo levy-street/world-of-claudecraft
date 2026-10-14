@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Zbrojnice Válčení',
-    desc: 'Šperky a zbraně Válčení koupené za tvrdě vydobytou čest.',
+    desc: 'Šperky, zbraně a zboží Válčení koupené za tvrdě vydobytou čest.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galerie Předvoje',

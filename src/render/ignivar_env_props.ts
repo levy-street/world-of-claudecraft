@@ -8,7 +8,8 @@
 import * as THREE from 'three';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { addRoofDarkness } from './gfx';
+import { drakelandsKitBootThunk } from './drakelands_kit_lane_core';
+import { addRoofDarkness, GFX } from './gfx';
 import type { IgnivarEnvPropKey, IgnivarPropPlacement } from './ignivar_dressing_plan_core';
 import { decorateLiftBeamMaterial, decorateLiftSpoolMaterial } from './ignivar_lift_room';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
@@ -151,6 +152,9 @@ interface IgnivarEnvPropTemplate {
 
 const templates = new Map<IgnivarEnvPropKey, IgnivarEnvPropTemplate>();
 let loadTask: Promise<void> | null = null;
+// True once one preparation has settled: every key was attempted, and a
+// missing file stays skipped (fail-soft) exactly as it does at boot.
+let templatesSettled = false;
 
 /** Bake possibly-quantized attributes to plain float so the canonical
  *  transform below can write real-world coordinates (same trick as the
@@ -283,17 +287,27 @@ export function prepareIgnivarEnvProps(): Promise<void> {
     }),
   ).then(() => {
     loadTask = null;
+    templatesSettled = true;
   });
   return loadTask;
 }
 
+/** Whether a preparation has settled, so a build reads every template it will
+ *  ever get (the Drakelands kit lane and the fortress build consult it). */
+export function ignivarEnvPropsSettled(): boolean {
+  return templatesSettled;
+}
+
+// Boot-loaded everywhere but the iOS memory profile, where the Drakelands kit
+// lane and the raid dressing each await prepareIgnivarEnvProps themselves.
 if (typeof window !== 'undefined') {
-  registerDeferredPreload(prepareIgnivarEnvProps);
+  registerDeferredPreload(drakelandsKitBootThunk(prepareIgnivarEnvProps, () => GFX));
 }
 
 export function resetIgnivarEnvPropCaches(): void {
   templates.clear();
   loadTask = null;
+  templatesSettled = false;
 }
 
 function propMatrix(placement: IgnivarPropPlacement): THREE.Matrix4 {

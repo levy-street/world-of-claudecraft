@@ -3,6 +3,7 @@ import { ITEMS } from './data';
 import { isChargeBearingPayload } from './item_instance_merge';
 import { isMaterialItemId, materialItemIds } from './material_ids';
 import { normalizeMaterialStack } from './material_stack';
+import { skullBagLoadValid } from './pvp/skull_bag';
 import { cloneInvSlot, type InvSlot } from './types';
 
 const LOAD_REFUSED = 'material source state is invalid; refusing character load';
@@ -36,6 +37,8 @@ export function validateCharacterMaterialSourcesOnLoad(raw: unknown): void {
   for (const slots of [raw.inventory, raw.vendorBuyback, bank?.inventory, vault?.special]) {
     if (Array.isArray(slots)) for (const slot of slots) validateMaterialSlotSourcesOnLoad(slot);
   }
+  // The Skull Bag holds trophy skulls by the same per-unit provenance.
+  if (!skullBagLoadValid(raw.skullBag)) throw new Error(LOAD_REFUSED);
 }
 
 /** Material stacks may contain tolerated legacy excess; packing applies caps on grants. */

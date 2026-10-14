@@ -1,6 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { QuestWorldWireState } from '../src/net/quest_world_wire_state';
+import {
+  SHADOW_GUARDS,
+  SHADOW_NPC_DEF,
+  SHADOW_NPC_ID,
+  SHADOW_QUEST_ID,
+} from '../src/sim/content/world_quest_shadow';
+import { BUILTIN_WORLD } from '../src/sim/data';
+import { hasShadowCloak } from '../src/sim/shadow_action_lock';
 import { Sim } from '../src/sim/sim';
+import {
+  hasWorldQuestDeliveryCargo,
+  takeWorldQuestDeliveryCargo,
+} from '../src/sim/world_quest_delivery';
 import {
   canRerollWorldQuest,
   playerActiveWorldQuests,
@@ -9,6 +21,7 @@ import {
 import { activeWorldQuestsForCycle, WORLD_QUESTS_BY_ZONE } from '../src/sim/world_quest_rotation';
 import { restoreWorldQuestState, savedWorldQuestState } from '../src/sim/world_quest_state';
 import { awardWorldQuest } from '../src/sim/world_quests';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 describe('World Quest Reroll Mechanism', () => {
   const cycle = 'wq1_100';
@@ -31,15 +44,22 @@ describe('World Quest Reroll Mechanism', () => {
     expect(check1.replacementId).toBeDefined();
     expect(check1.replacementId).not.toBe(eastbrookQuest.id);
 
-    // In-progress quest cannot be rerolled
+    // An in-progress quest can be replaced, on the sim and the online mirror alike
     meta.worldQuestLog.set(eastbrookQuest.id, {
       questId: eastbrookQuest.id,
       count: 2,
       state: 'active',
     });
     const checkProgress = canRerollWorldQuest(meta, eastbrookQuest.id, cycle, 20);
-    expect(checkProgress.canReroll).toBe(false);
-    expect(checkProgress.reason).toBe('In-progress world quests cannot be rerolled.');
+    expect(checkProgress.canReroll).toBe(true);
+    expect(checkProgress.replacementId).toBe(check1.replacementId);
+    const progressClient = new QuestWorldWireState();
+    progressClient.applyQuestSelfSnapshot({
+      wqday: cycle,
+      wqlog: [...meta.worldQuestLog.values()],
+    });
+    expect(progressClient.worldQuestLog.get(eastbrookQuest.id)?.count).toBe(2);
+    expect(progressClient.canRerollWorldQuest(eastbrookQuest.id)).toEqual({ canReroll: true });
 
     // Completed quest cannot be rerolled
     meta.worldQuestLog.set(eastbrookQuest.id, {
@@ -199,5 +219,71 @@ describe('World Quest Reroll Mechanism', () => {
     awardWorldQuest(sim.ctx, meta, replacementDef);
     // At level 20, Automatons WQ awards +100 standing
     expect(meta.factions.automatons).toBe(100);
+  });
+});
+
+describe('Replacing an in-progress World Quest', () => {
+  it('drops the progress and the freight a delivery run is carrying', () => {
+    const deliveryCycle = 'wq1_105';
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const meta = sim.meta(sim.playerId);
+    if (!meta) throw new Error('Expected player meta');
+    meta.devWorldQuestCycle = deliveryCycle;
+    meta.worldQuestCycle = deliveryCycle;
+    const quest = playerActiveWorldQuests(meta, deliveryCycle).find(
+      (q) => q.id === 'wq_eastbrook_bandits',
+    );
+    if (quest?.objective.type !== 'delivery') throw new Error('Expected the delivery quest');
+    meta.worldQuestLog.set(quest.id, { questId: quest.id, count: 3, state: 'active' });
+    meta.worldQuestAreas.add(quest.id);
+    expect(takeWorldQuestDeliveryCargo(sim.ctx, sim.player)).toBe(true);
+
+    expect(sim.rerollWorldQuest(quest.id)).toBe(true);
+
+    expect(hasWorldQuestDeliveryCargo(sim.player)).toBe(false);
+    expect(meta.worldQuestLog.has(quest.id)).toBe(false);
+    expect(meta.worldQuestAreas.has(quest.id)).toBe(false);
+    const replacementId = meta.worldQuestReplacements[quest.id];
+    expect(replacementId).toBeDefined();
+    expect(meta.worldQuestLog.has(replacementId)).toBe(false);
+    const slate = playerActiveWorldQuests(meta, deliveryCycle).map((q) => q.id);
+    expect(slate).toContain(replacementId);
+    expect(slate).not.toContain(quest.id);
+  });
+
+  it('strips the borrowed cloak from a stealth run mid-heist', () => {
+    const sim = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      devCommands: true,
+      world: {
+        ...BUILTIN_WORLD,
+        camps: [],
+        groundObjects: [],
+        npcs: Object.fromEntries(
+          [SHADOW_NPC_DEF, ...SHADOW_GUARDS.map((row) => row.npc)].map((npc) => [npc.id, npc]),
+        ),
+      },
+    });
+    sim.resetDay = '2026-09-06';
+    sim.chat('/dev shadow');
+    sim.talkToNpc(SHADOW_NPC_ID);
+    const meta = sim.meta(sim.playerId);
+    if (!meta) throw new Error('Expected player meta');
+    const progress = meta.worldQuestLog.get(SHADOW_QUEST_ID);
+    if (!progress) throw new Error('Expected the stealth quest to be running');
+    progress.count = 1;
+    expect(hasShadowCloak(sim.player)).toBe(true);
+    expect(sim.canRerollWorldQuest(SHADOW_QUEST_ID).canReroll).toBe(true);
+
+    expect(sim.rerollWorldQuest(SHADOW_QUEST_ID)).toBe(true);
+
+    // Checked before any tick: the encounter's own tick would also strip a
+    // rowless cloak, so only this read proves the reroll tore it down itself.
+    expect(hasShadowCloak(sim.player)).toBe(false);
+    expect(sim.player.stealthed).toBe(false);
+    expect(meta.worldQuestLog.has(SHADOW_QUEST_ID)).toBe(false);
+    expect(meta.worldQuestReplacements[SHADOW_QUEST_ID]).toBeDefined();
   });
 });

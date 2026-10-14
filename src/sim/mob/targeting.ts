@@ -25,6 +25,7 @@ import type { SimContext } from '../sim_context';
 import {
   addThreat,
   canDetectStealthedTarget,
+  isFeigningDeath,
   MELEE_SWITCH_MULT,
   RANGED_SWITCH_MULT,
 } from '../threat';
@@ -136,6 +137,9 @@ export function updateMobTarget(ctx: SimContext, mob: Entity): void {
   if (!cur || cur.dead || !mobCanSeeTarget(ctx, mob, cur)) {
     const next = highestThreatTarget(ctx, mob);
     if (next) mob.aggroTargetId = next.id;
+    // A hunter playing dead is let go even with no one else to turn to; the
+    // empty hate table then sends the mob home like any lost pull.
+    else if (cur && isFeigningDeath(cur)) mob.aggroTargetId = null;
     return;
   }
   const curThreat = mob.threat.get(cur.id) ?? 0;

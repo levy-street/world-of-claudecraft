@@ -4,20 +4,25 @@ import {
   allTierRoleNames,
   buildActivityMessage,
   buildDailyRewardWinnersMessage,
+  buildHillAnnouncementMessage,
   buildLevelNick,
   buildLinkContent,
+  buildPvpKillFeedMessage,
   buildQueuePopMessage,
   buildRelayMessage,
   buildWelcomeMessage,
   buildWhoamiContent,
   chunk,
+  chunkPvpKills,
   clearDepartedFlair,
   clearedMemberMeta,
   computeRoleSync,
   GATEWAY_INTENTS,
   GATEWAY_OP,
   GUILD_LARGE_THRESHOLD,
+  type HillAnnouncementItem,
   heartbeatIntervalMs,
+  hillAnnouncementIsStale,
   identifyPayload,
   indexSpecialRoleIds,
   interactionFailureFallback,
@@ -27,6 +32,12 @@ import {
   MEMBERS_META_BATCH,
   memberRolesFromPayload,
   NICK_MAX,
+  PVP_FEED_LINES_PER_POST,
+  PVP_FEED_NAME_MAX,
+  PVP_FEED_NUMBER_MAX,
+  type PvpKillItem,
+  pvpFeedName,
+  pvpKillLine,
   type QueuePopItem,
   type RelayItem,
   reconcileMemberRolesFromUpdate,
@@ -1021,5 +1032,177 @@ describe('daily rewards winner cards', () => {
       { name: 'Prize Pool', value: '$150.00', inline: true },
       { name: 'Next task', value: 'Win an arena match', inline: false },
     ]);
+  });
+});
+
+// ── World PvP kill feed (digest posts, names only) ───────────────────────────
+describe('PvP kill feed builders', () => {
+  const kill = (over: Partial<PvpKillItem> = {}): PvpKillItem => ({
+    killerName: 'Kargath',
+    victimName: 'Annthar',
+    killerLevel: 60,
+    victimLevel: 58,
+    zoneName: 'Drakelands',
+    assists: 0,
+    copper: 0,
+    realm: 'Claudemoon',
+    ...over,
+  });
+
+  it('writes the bare line with no assists and no stake', () => {
+    expect(pvpKillLine(kill())).toBe(
+      ':crossed_swords: **Kargath** (60) slew **Annthar** (58) in Drakelands',
+    );
+  });
+
+  it('adds singular and plural assists and the stake taken, through formatMoney', () => {
+    expect(pvpKillLine(kill({ assists: 1, copper: 12_005 }))).toBe(
+      ':crossed_swords: **Kargath** (60) slew **Annthar** (58) in Drakelands, with 1 assist, taking 1g 20s 5c',
+    );
+    expect(pvpKillLine(kill({ assists: 3 }))).toBe(
+      ':crossed_swords: **Kargath** (60) slew **Annthar** (58) in Drakelands, with 3 assists',
+    );
+  });
+
+  it('omits the zone clause off the zone table', () => {
+    expect(pvpKillLine(kill({ zoneName: null }))).toBe(
+      ':crossed_swords: **Kargath** (60) slew **Annthar** (58)',
+    );
+  });
+
+  it('treats malformed wire numbers as zero rather than rendering NaN or negatives', () => {
+    const line = pvpKillLine(
+      kill({ assists: -2, copper: Number.NaN, killerLevel: Number.POSITIVE_INFINITY }),
+    );
+    expect(line).toBe(':crossed_swords: **Kargath** (0) slew **Annthar** (58) in Drakelands');
+  });
+
+  it('escapes Discord markdown in names and bounds their length', () => {
+    expect(pvpFeedName('*bold*_under_~x~`c`|s|')).toBe(
+      String.raw`\*bold\*\_under\_\~x\~` + '\\`c\\`' + String.raw`\|s\|`,
+    );
+    expect(pvpFeedName('A'.repeat(PVP_FEED_NAME_MAX + 10))).toBe('A'.repeat(PVP_FEED_NAME_MAX));
+    expect(pvpFeedName('')).toBe('Someone');
+  });
+
+  it('chunks a drain into PVP_FEED_LINES_PER_POST batches, FIFO, remainder kept', () => {
+    const items = Array.from({ length: PVP_FEED_LINES_PER_POST * 2 + 3 }, (_, i) =>
+      kill({ killerName: `K${i}` }),
+    );
+    const batches = chunkPvpKills(items);
+    expect(batches.map((b) => b.length)).toEqual([
+      PVP_FEED_LINES_PER_POST,
+      PVP_FEED_LINES_PER_POST,
+      3,
+    ]);
+    expect(batches.flat().map((k) => k.killerName)).toEqual(items.map((_, i) => `K${i}`));
+    expect(chunkPvpKills([])).toEqual([]);
+  });
+
+  it('builds ONE embed per batch, one line per kill, and pings nobody', () => {
+    const payload = buildPvpKillFeedMessage([
+      kill(),
+      kill({ killerName: 'Borin', victimName: 'Kargath', assists: 2 }),
+    ]);
+    expect(payload).toEqual({
+      embeds: [
+        {
+          color: 0xb22222,
+          author: { name: 'World PvP' },
+          description:
+            ':crossed_swords: **Kargath** (60) slew **Annthar** (58) in Drakelands\n' +
+            ':crossed_swords: **Borin** (60) slew **Kargath** (58) in Drakelands, with 2 assists',
+          footer: { text: 'World of ClaudeCraft (Claudemoon)' },
+        },
+      ],
+      allowed_mentions: { parse: [] },
+    });
+  });
+
+  it('keeps a full batch of worst-case lines inside the 4096-character description limit', () => {
+    // Every escaped field full of metacharacters (each escapes to double
+    // length) and every number past the clamp, so this is the true worst line.
+    const meta = '*'.repeat(PVP_FEED_NAME_MAX);
+    const worst = kill({
+      killerName: meta,
+      victimName: meta,
+      zoneName: meta,
+      killerLevel: 1e300,
+      victimLevel: 1e300,
+      assists: 1e300,
+      copper: 1e300,
+    });
+    const line = pvpKillLine(worst);
+    expect(line).not.toContain('e+');
+    expect(line).toContain(`(${PVP_FEED_NUMBER_MAX})`);
+    const payload = buildPvpKillFeedMessage(Array(PVP_FEED_LINES_PER_POST).fill(worst));
+    const description = (payload.embeds as { description: string }[])[0].description;
+    expect(description).toBe(Array(PVP_FEED_LINES_PER_POST).fill(line).join('\n'));
+    expect(description.length).toBeLessThanOrEqual(4096);
+  });
+});
+
+// ── King of the Hill spawn calls (the PvP channel) ───────────────────────────
+describe('King of the Hill announcement builder', () => {
+  const RISES = 1_790_000_000_000;
+  const FALLS = RISES + 45 * 60_000;
+  const call = (over: Partial<HillAnnouncementItem> = {}): HillAnnouncementItem => ({
+    phase: 'warning',
+    zoneName: 'Drakelands',
+    risesAtMs: RISES,
+    fallsAtMs: FALLS,
+    realm: 'Claudemoon',
+    ...over,
+  });
+
+  it('writes the warning with a live countdown to the rise and the fall time, pinging nobody', () => {
+    expect(buildHillAnnouncementMessage(call())).toEqual({
+      embeds: [
+        {
+          color: 0xf0c060,
+          author: { name: 'King of the Hill' },
+          title: 'A hill will rise in Drakelands',
+          description:
+            `It rises <t:${RISES / 1000}:R> and stands until <t:${FALLS / 1000}:t>. ` +
+            'The party with the most players standing inside takes it and earns Honor for every minute they hold it.',
+          footer: { text: 'World of ClaudeCraft (Claudemoon)' },
+        },
+      ],
+      allowed_mentions: { parse: [] },
+    });
+  });
+
+  it('writes the rise with the fall time and its countdown', () => {
+    const embed = (
+      buildHillAnnouncementMessage(call({ phase: 'risen' })).embeds as {
+        title: string;
+        description: string;
+      }[]
+    )[0];
+    expect(embed.title).toBe('A hill has risen in Drakelands');
+    expect(
+      embed.description.startsWith(
+        `It stands until <t:${FALLS / 1000}:t> (<t:${FALLS / 1000}:R>). `,
+      ),
+    ).toBe(true);
+  });
+
+  it('escapes markdown in the zone name', () => {
+    const embed = (
+      buildHillAnnouncementMessage(call({ zoneName: '*Z*' })).embeds as {
+        title: string;
+      }[]
+    )[0];
+    expect(embed.title).toBe(String.raw`A hill will rise in \*Z\*`);
+  });
+
+  it('is stale once its moment passed: a warning at the rise, a rise at the fall', () => {
+    expect(hillAnnouncementIsStale(call(), RISES - 1)).toBe(false);
+    expect(hillAnnouncementIsStale(call(), RISES)).toBe(true);
+    expect(hillAnnouncementIsStale(call({ phase: 'risen' }), RISES + 1)).toBe(false);
+    expect(hillAnnouncementIsStale(call({ phase: 'risen' }), FALLS)).toBe(true);
+    // A malformed time is never posted.
+    expect(hillAnnouncementIsStale(call({ risesAtMs: Number.NaN }), 0)).toBe(true);
+    expect(hillAnnouncementIsStale(call({ fallsAtMs: Number.NaN }), 0)).toBe(true);
   });
 });

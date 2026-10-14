@@ -13,8 +13,10 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import {
+  drawNameplateDotRow,
   NAMEPLATE_DOT_SCHOOL_DEFAULT_TINT,
   NAMEPLATE_DOT_SCHOOL_TINTS,
+  type NameplateDotRowHost,
 } from '../src/render/nameplate_dot_row';
 
 import {
@@ -198,6 +200,44 @@ describe('nameplateDotsInto', () => {
     expect(plan.slots[0].timeValue).toBeNaN();
   });
 
+  it('invalidates the painter-resolved stack count when a slot is recycled', () => {
+    // A five-stack Armor Shear dropping off must not leave its "5" printed on
+    // the aura that slides into the slot (stacksText is cached on stacksValue).
+    const plan = newNameplateDotsPlan();
+    nameplateDotsInto(plan, [aura({ id: 'armor_shear', stacks: 5 })], isMine);
+    plan.slots[0].stacksText = '5';
+    plan.slots[0].stacksValue = 5;
+    nameplateDotsInto(plan, [aura({ id: 'rend' })], isMine);
+    expect(plan.slots[0].iconKey).toBe('rend');
+    expect(plan.slots[0].stacks).toBe(0);
+    expect(plan.slots[0].stacksText).toBe('');
+    expect(plan.slots[0].stacksValue).toBeNaN();
+  });
+
+  it('badges a stack count only past one application, like the target strip', () => {
+    const plan = nameplateDotsInto(
+      newNameplateDotsPlan(),
+      [
+        aura({ id: 'a_shear', stacks: 5 }),
+        aura({ id: 'b_single', stacks: 1 }),
+        aura({ id: 'c_plain' }),
+      ],
+      isMine,
+    );
+    expect(plan.count).toBe(3);
+    expect(plan.slots[0].stacks).toBe(5);
+    expect(plan.slots[1].stacks).toBe(0);
+    expect(plan.slots[2].stacks).toBe(0);
+  });
+
+  it('tracks a stack count that grows on the same aura', () => {
+    const plan = newNameplateDotsPlan();
+    nameplateDotsInto(plan, [aura({ id: 'armor_shear', stacks: 2 })], isMine);
+    expect(plan.slots[0].stacks).toBe(2);
+    nameplateDotsInto(plan, [aura({ id: 'armor_shear', stacks: 3 })], isMine);
+    expect(plan.slots[0].stacks).toBe(3);
+  });
+
   it('keeps painter-resolved artwork when the same aura stays in its slot', () => {
     const plan = newNameplateDotsPlan();
     nameplateDotsInto(plan, [aura({ id: 'corruption', remaining: 12 })], isMine);
@@ -336,5 +376,85 @@ describe('nameplate dot row artwork', () => {
     expect(Object.keys(NAMEPLATE_DOT_SCHOOL_TINTS).sort()).toEqual(
       [...cssSchools, 'physical'].sort(),
     );
+  });
+});
+
+describe('drawNameplateDotRow stack badge', () => {
+  // A canvas stand-in: every path/fill call is a no-op, the row only needs the
+  // methods to exist. The host records what text lands where.
+  const ctx = new Proxy(
+    {},
+    { get: (_t, key) => (key === 'canvas' ? undefined : () => undefined), set: () => true },
+  ) as unknown as CanvasRenderingContext2D;
+
+  function host(): NameplateDotRowHost & { texts: { text: string; x: number; y: number }[] } {
+    const texts: { text: string; x: number; y: number }[] = [];
+    return {
+      texts,
+      forcedColors: () => false,
+      roundedRect: () => undefined,
+      drawImage: () => undefined,
+      drawText: (_c, text, x, y) => {
+        texts.push({ text, x, y });
+      },
+    };
+  }
+
+  function planWith(stacksText: string, scale = 1) {
+    const plan = newNameplateDotsPlan();
+    nameplateDotsInto(plan, [aura({ id: 'armor_shear', stacks: 5 })], isMine);
+    plan.scale = scale;
+    plan.slots[0].timeText = '10';
+    plan.slots[0].stacksText = stacksText;
+    return plan;
+  }
+
+  it('draws the stack count inside the icon, beside the countdown under it', () => {
+    const h = host();
+    drawNameplateDotRow(ctx, planWith('5'), 100, 50, h);
+    const stacks = h.texts.find((entry) => entry.text === '5');
+    const time = h.texts.find((entry) => entry.text === '10');
+    expect(stacks).toBeDefined();
+    expect(time).toBeDefined();
+    const left = 100 - NAMEPLATE_DOT_SIZE / 2;
+    // Inside the tile: right half, above its bottom edge, so it never collides
+    // with the countdown line hung below the tile.
+    expect(stacks?.x).toBeGreaterThan(left + NAMEPLATE_DOT_SIZE / 2);
+    expect(stacks?.x).toBeLessThan(left + NAMEPLATE_DOT_SIZE);
+    expect(stacks?.y).toBeGreaterThan(50);
+    expect(stacks?.y).toBeLessThan(50 + NAMEPLATE_DOT_SIZE);
+    expect(time?.y).toBeGreaterThan(50 + NAMEPLATE_DOT_SIZE);
+  });
+
+  it('keeps the badge in the same corner at a grown scale', () => {
+    const h = host();
+    drawNameplateDotRow(ctx, planWith('5', 2), 100, 50, h);
+    const stacks = h.texts.find((entry) => entry.text === '5');
+    const size = NAMEPLATE_DOT_SIZE * 2;
+    const left = 100 - size / 2;
+    expect(stacks?.x).toBeGreaterThan(left + size / 2);
+    expect(stacks?.x).toBeLessThan(left + size);
+    expect(stacks?.y).toBeGreaterThan(50 + size / 2);
+    expect(stacks?.y).toBeLessThan(50 + size);
+  });
+
+  it('steps a two-digit count further in so both digits stay on the tile', () => {
+    const one = host();
+    drawNameplateDotRow(ctx, planWith('5'), 100, 50, one);
+    const two = host();
+    drawNameplateDotRow(ctx, planWith('12'), 100, 50, two);
+    const single = one.texts.find((entry) => entry.text === '5');
+    const double = two.texts.find((entry) => entry.text === '12');
+    expect(double?.x).toBeLessThan(single?.x ?? 0);
+    // Centred text about 4 plate units per digit at 100%: the pair's right
+    // edge stays inside the tile's right border.
+    const right = 100 + NAMEPLATE_DOT_SIZE / 2;
+    expect((double?.x ?? 0) + 4).toBeLessThanOrEqual(right);
+  });
+
+  it('draws no badge for an aura that does not stack', () => {
+    const h = host();
+    drawNameplateDotRow(ctx, planWith(''), 100, 50, h);
+    expect(h.texts.map((entry) => entry.text)).toEqual(['10']);
   });
 });

@@ -189,6 +189,7 @@ export interface HarnessRun {
     extrapolated: number;
     discardedLate: number;
     resyncs: number;
+    playoutGrowths: number;
   } | null;
   movementOutboxDroppedOldest: number;
 }
@@ -749,6 +750,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
               extrapolated: session.movementTimeline.extrapolated,
               discardedLate: session.movementTimeline.discardedLate,
               resyncs: session.movementTimeline.resyncs,
+              playoutGrowths: session.movementTimeline.playoutGrowths,
             }
           : null,
         movementOutboxDroppedOldest:

@@ -2,10 +2,11 @@
 // and the day's item slot, driven through the real credit arm: XP, copper and
 // standing on every completion; the fixed piece for the character's class when
 // the quest's zone is one of the cycle's item slots and the character is in the
-// item bracket; a full bag loses the piece and says so; and the owner's budget,
+// item bracket; a full bag posts the piece to the Ravenpost and says so; and the owner's budget,
 // the whole day's circuit at the cap under ten gold with every purse on top.
 import { describe, expect, it } from 'vitest';
-import { bagPools, bagsFullErrorText, canAddItem } from '../src/sim/bags';
+import { bagPools, canAddItem } from '../src/sim/bags';
+import { WORLD_QUEST_REWARD_LETTER } from '../src/sim/content/letters';
 import { TREASURE_MAP_ITEM_IDS, TREASURE_MAP_RARITIES } from '../src/sim/content/treasure_maps';
 import { WORLD_QUEST_CLASS_LOOT } from '../src/sim/content/world_quest_loot';
 import {
@@ -128,6 +129,15 @@ function complete(sim: Sim, quest: WorldQuestDef): SimEvent[] {
   return sim.drainEvents();
 }
 
+/** The attachments of every world quest reward letter in the book, one array
+ *  per letter. Filtered by letterId: a fresh character also holds the welcome
+ *  letter. */
+function rewardLetterItems(sim: Sim): { itemId: string; count: number }[][] {
+  return sim.postOffice.mail
+    .filter((m) => m.letterId === WORLD_QUEST_REWARD_LETTER.letterId)
+    .map((m) => m.items.map((slot) => ({ itemId: slot.itemId, count: slot.count })));
+}
+
 /** Fills the bags with unstackable filler until `itemId` no longer fits. */
 function fillBagsAgainst(meta: PlayerMeta, itemId: string): void {
   const filler = Object.values(ITEMS).find(
@@ -223,26 +233,33 @@ describe("the day's item", () => {
     expect(metaOf(capped).inventory.length).toBe(cappedBefore);
   });
 
-  it('loses the piece to a full bag and says so, without touching the rest of the bundle', () => {
+  it('mails the piece when the bag is full and says so, without touching the rest of the bundle', () => {
     const { day, cycle, quest } = killQuestOnAnItemSlot();
     const sim = questSim(day, quest, 20);
     const expected = worldQuestItemRewardFor(cycle, quest.zoneId, 'warrior');
     if (!expected) throw new Error('Expected an item on the slot');
     const meta = metaOf(sim);
     fillBagsAgainst(meta, expected);
+    const inventoryBefore = meta.inventory.length;
     const copperBefore = sim.copper;
     const events = complete(sim, quest);
+    // Nothing forced into the full bags, and no bags-full refusal: the piece
+    // waits in the mailbox instead of being lost.
     expect(sim.countItem(expected)).toBe(0);
+    expect(meta.inventory.length).toBe(inventoryBefore);
     expect(sim.copper - copperBefore).toBe(worldQuestCopperReward(quest, 20));
-    const error = events.find((ev) => ev.type === 'error');
-    expect(error?.type === 'error' ? error.text : '').toBe(bagsFullErrorText(meta, expected));
+    expect(events.some((ev) => ev.type === 'error')).toBe(false);
+    expect(rewardLetterItems(sim)).toEqual([[{ itemId: expected, count: 1 }]]);
+    expect(events.filter((ev) => ev.type === 'worldQuestRewardMailed')).toEqual([
+      { type: 'worldQuestRewardMailed', itemIds: [expected], pid: sim.playerId },
+    ]);
   });
 
-  it("with one free bag slot on the slate's last quest, the day's piece lands and the treasure map is lost for the day", () => {
+  it("with one free bag slot on the slate's last quest, the day's piece lands and the treasure map is mailed", () => {
     // The quest's own reward pays first (the order tests/clue_scrolls.test.ts pins),
     // so the slate's treasure map (the Buried Hoards payout that replaced the
-    // Clue Scroll) meets the bag-capacity rule that already governs it: lost
-    // for the day, the cycle marked, never re-rolled on a later turn-in.
+    // Clue Scroll) meets the full bag: posted to the Ravenpost, the cycle
+    // marked, never re-rolled on a later turn-in.
     // 2026-08-31 is cycle wq1_0, whose slots include thornpeak_heights
     // (pinned in tests/world_quest_item_slots.test.ts).
     const quest = WORLD_QUESTS_BY_ID.wq_thornpeak_stormcrag;
@@ -261,8 +278,14 @@ describe("the day's item", () => {
     expect(sim.countItem(expected)).toBe(1);
     for (const rarity of TREASURE_MAP_RARITIES)
       expect(sim.countItem(TREASURE_MAP_ITEM_IDS[rarity])).toBe(0);
-    expect(events.some((ev) => ev.type === 'treasureMapLost')).toBe(true);
-    expect(events.some((ev) => ev.type === 'treasureMapEarned')).toBe(false);
+    const earned = events.find((ev) => ev.type === 'treasureMapEarned');
+    if (earned?.type !== 'treasureMapEarned') throw new Error('Expected treasureMapEarned');
+    const mapId = TREASURE_MAP_ITEM_IDS[earned.rarity];
+    expect(rewardLetterItems(sim)).toEqual([[{ itemId: mapId, count: 1 }]]);
+    expect(events.filter((ev) => ev.type === 'worldQuestRewardMailed')).toEqual([
+      { type: 'worldQuestRewardMailed', itemIds: [mapId], pid: sim.playerId },
+    ]);
+    expect(events.some((ev) => ev.type === 'treasureMapLost')).toBe(false);
     expect(meta.clueScrollCycle).toBe(meta.worldQuestCycle);
   });
 });

@@ -16,6 +16,7 @@ import type { InvSlot, ItemDef, ItemSet } from '../src/sim/types';
 import {
   buildWarfareVendorView,
   isWarfareVendorNpc,
+  WARFARE_SHOP_GOODS_KEY,
   WARFARE_SHOP_JEWELRY_KEY,
   WARFARE_SHOP_SEASON2_WEAPONS_KEY,
   WARFARE_SHOP_SET_ORDER,
@@ -550,7 +551,15 @@ describe('buildWarfareVendorView over the full honor stock (Warfare Season 2 fir
       ...WARFARE_SHOP_SET_ORDER,
       WARFARE_SHOP_JEWELRY_KEY,
       WARFARE_SHOP_WEAPONS_KEY,
+      // The World PvP Skull Bag: nothing to wear, so its own Goods section.
+      WARFARE_SHOP_GOODS_KEY,
     ]);
+    const goods = view.sections.find((s) => s.key === WARFARE_SHOP_GOODS_KEY);
+    expect(goods?.kind).toBe('goods');
+    expect(goods?.offers.map((o) => [o.itemId, o.honor])).toEqual([['pvp_skull_bag', 500]]);
+    // Never filed as jewelry.
+    const jewelry = view.sections.find((s) => s.key === WARFARE_SHOP_JEWELRY_KEY);
+    expect(jewelry?.offers.some((o) => o.itemId === 'pvp_skull_bag')).toBe(false);
   });
 
   it('shows every class exactly its own three Season 2 sets', () => {

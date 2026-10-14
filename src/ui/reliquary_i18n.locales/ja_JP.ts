@@ -169,7 +169,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'ウォーフェア武器庫',
-    desc: '苦労して得た名誉で購入する戦争の装飾品と武器。',
+    desc: '苦労して得た名誉で購入する戦争の装飾品、武器、雑貨。',
   },
   conquerors_vanguard_gallery: {
     name: 'ヴァンガードギャラリー',

@@ -789,6 +789,8 @@
     --color-text-on-medal: #ffd100;
     --color-socket-rim: #4a3d1d;
     --color-socket-hi: #2c2c3a;
+    --color-instance-difficulty-mid: #15131a;
+    --color-instance-difficulty-bg: #121016;
     --color-panel-hi: #1c1c29;
     --color-chrome-ground: #1a1410;
     --color-chrome-glyph: #c9b27a;
@@ -903,6 +905,7 @@
     --edge-glint: inset 0 1px 0 color-mix(in srgb, var(--color-glint) 16%, transparent);
     --edge-hairline: inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 12%, transparent);
     --shadow-lift: 0 2px 4px color-mix(in srgb, var(--color-keyline) 56%, transparent);
+    --shadow-instance-difficulty: 0 2px 6px rgb(0 0 0 / 90%);
     --shadow-socket:
       0 0 0 1px var(--color-keyline),
       inset 0 1px 0 color-mix(in srgb, var(--color-white) 10%, transparent), var(--edge-hairline),
@@ -1159,6 +1162,31 @@
     --color-fct-honor: #ffd100;
     /* Self-note combat text keeps the shipped warm warning hue. */
     --color-fct-self-note: #ff8c66;
+    /* Vivid combat text (the default; Classic Combat Text keeps the rows above).
+       Ability damage moves from the pale parchment highlight to a saturated gold so it
+       separates from the white auto-attacks at a glance. */
+    --color-fct-vivid-ability: #ffc933;
+    /* The hot underglow of a hit well above your usual (the big-hit flag). */
+    --color-fct-big-flare: #ff7a1a;
+    /* A solid two-pixel keyline plus a soft drop, so a number holds its colour over
+       bright snow, grey stone and dark dungeon floor alike (the thin shared outline
+       lets it wash out against a mid-grey scene). */
+    --fct-vivid-outline:
+      -1.5px -1.5px 0 var(--color-keyline), 1.5px -1.5px 0 var(--color-keyline),
+      -1.5px 1.5px 0 var(--color-keyline), 1.5px 1.5px 0 var(--color-keyline),
+      0 -2px 0 var(--color-keyline), 0 2px 0 var(--color-keyline),
+      -2px 0 0 var(--color-keyline), 2px 0 0 var(--color-keyline),
+      0 3px 4px var(--color-keyline);
+    /* A crit flares in its own colour (currentColor), so an ability crit burns gold and
+       an incoming crit glows red. Only these decorative glow blurs ride the effect tier
+       (the --glow-* family); the keyline above is legibility, identical on every tier. */
+    --glow-fct-crit:
+      var(--fct-vivid-outline), 0 0 calc(8px * var(--fx-shadow, 1)) currentColor,
+      0 0 calc(18px * var(--fx-shadow, 1)) color-mix(in srgb, currentColor 55%, transparent);
+    --glow-fct-big:
+      var(--fct-vivid-outline), 0 0 calc(10px * var(--fx-shadow, 1)) var(--color-fct-big-flare);
+    --glow-fct-big-crit:
+      var(--glow-fct-crit), 0 0 calc(24px * var(--fx-shadow, 1)) var(--color-fct-big-flare);
     /* Fire aura overlays keep their shipped orange school identity. */
     --color-aura-overlay-fire: #ff8a33;
     /* Frost aura overlays keep their shipped cyan school identity. */
@@ -1336,7 +1364,8 @@
     /* Distance from the bottom of #ui to the TOP of that stock seat: the 6px
        bottom-bar inset, the XP rail, the action row and its gap, the bar gap,
        then the docked player frame's 64px height, so the stock target frame
-       lands level with the player frame. */
+       lands level with the player frame (one aura strip row higher with
+       targetAurasBelowFrame, hud.css). */
     --unit-frame-seat-offset: calc(
       var(--xp-rail-h) +
       var(--socket-row-gap) +
@@ -1344,6 +1373,11 @@
       var(--unit-frame-bar-gap) +
       70px
     );
+    /* The stock pair's shared BOTTOM edge, measured from the bottom of #ui:
+       the seat offset above minus the docked player frame's 64px height. The
+       target seat anchors here when its aura strip hangs below the frame
+       (targetAurasBelowFrame), so the frame grows upward, not into the bar. */
+    --unit-frame-seat-floor: calc(var(--unit-frame-seat-offset) - 64px);
     /* The weekly emissary window (src/ui/weekly_quests_window.ts): its own
        violet-and-gilt palette, named here so the sheet holds no raw literal. */
     --wk-black: #000;

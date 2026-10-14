@@ -1,14 +1,22 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   angleDelta,
   CLICK_MOVE_FORWARD_CONE,
+  CLICK_MOVE_TURN_RATE,
+  type ClickMoveProgressWatch,
   clickMoveBrokenByTeleport,
   clickMoveShouldWalk,
+  clickMoveStalled,
   clickMoveStep,
+  clickMoveTurn,
   facingToward,
   latencyAdjustedStopDistance,
   manualMovementOverrides,
+  newClickMoveWatch,
   resolveClickMoveAction,
+  restartClickMoveWatch,
   stepAngleToward,
 } from '../src/game/click_move';
 
@@ -136,35 +144,125 @@ describe('click-to-move math (#95)', () => {
     expect(clickMoveShouldWalk(0, -(CLICK_MOVE_FORWARD_CONE + 0.01))).toBe(false);
   });
 
-  it('converges instead of orbiting at close range (regression)', () => {
-    // Reproduces the orbit bug: full-speed walk along a turn-rate-capped facing
-    // orbits the target forever when speed/distance exceeds the turn rate. With
-    // the forward gate the player turns in place and converges. Mirrors the
-    // main.ts loop: smooth facing toward the bearing, walk only when aligned.
-    const DT = 1 / 20;
-    const SPEED = 5.6; // RUN_SPEED yd/s
-    const TURN_RATE = 4.2; // CLICK_MOVE_TURN_RATE rad/s
-    const STOP = 0.5;
-    const target = { x: 0, z: 0 };
-    // Start close and offset so the naive version would orbit.
-    let pos = { x: 1.2, z: 0 };
-    let facing = facingToward(pos, target) + Math.PI / 2; // initially sideways
-    let arrived = false;
-    for (let i = 0; i < 20 * 10 && !arrived; i++) {
-      const step = clickMoveStep(pos, target, STOP);
-      if (step.arrived) {
-        arrived = true;
-        break;
+  it.each([
+    ['the 20 Hz sim step', 1 / 20],
+    ['a 60 Hz frame', 1 / 60],
+    ['a 144 Hz frame', 1 / 144],
+  ])(
+    'converges instead of orbiting at close range when stepped by %s (regression)',
+    (_label, dt) => {
+      // Reproduces the orbit bug: full-speed walk along a turn-rate-capped facing
+      // orbits the target forever when speed/distance exceeds the turn rate. With
+      // the forward gate the player turns in place and converges. Mirrors the
+      // main.ts loop: smooth facing toward the bearing, walk only when aligned.
+      const SPEED = 5.6; // RUN_SPEED yd/s
+      const STOP = 0.5;
+      const target = { x: 0, z: 0 };
+      // Start close and offset so the naive version would orbit.
+      let pos = { x: 1.2, z: 0 };
+      let facing = facingToward(pos, target) + Math.PI / 2; // initially sideways
+      let arrived = false;
+      for (let i = 0; i < Math.ceil(10 / dt) && !arrived; i++) {
+        const step = clickMoveStep(pos, target, STOP);
+        if (step.arrived) {
+          arrived = true;
+          break;
+        }
+        facing = clickMoveTurn(facing, step.facing, dt);
+        if (clickMoveShouldWalk(facing, step.facing)) {
+          pos = {
+            x: pos.x + Math.sin(facing) * SPEED * dt,
+            z: pos.z + Math.cos(facing) * SPEED * dt,
+          };
+        }
       }
-      facing = stepAngleToward(facing, step.facing, TURN_RATE * DT);
-      if (clickMoveShouldWalk(facing, step.facing)) {
-        pos = {
-          x: pos.x + Math.sin(facing) * SPEED * DT,
-          z: pos.z + Math.cos(facing) * SPEED * DT,
-        };
+      expect(arrived).toBe(true);
+    },
+  );
+
+  it('turns 4.2 radians per second', () => {
+    expect(clickMoveTurn(0, Math.PI, 1 / 20)).toBeCloseTo(4.2 / 20);
+    expect(CLICK_MOVE_TURN_RATE).toBe(4.2);
+  });
+
+  it('turns by the same angle per second whatever the frame rate', () => {
+    const elapsed = 0.25;
+    const turnedAt = (hz: number) => {
+      let facing = 0;
+      for (let i = 0; i < hz * elapsed; i++) facing = clickMoveTurn(facing, Math.PI, 1 / hz);
+      return facing;
+    };
+    const atSimRate = turnedAt(20);
+    expect(atSimRate).toBeCloseTo(CLICK_MOVE_TURN_RATE * elapsed);
+    for (const hz of [60, 144, 340]) expect(turnedAt(hz)).toBeCloseTo(atSimRate);
+  });
+
+  describe('progress watch', () => {
+    const start = (): ClickMoveProgressWatch => {
+      const watch = newClickMoveWatch();
+      restartClickMoveWatch(watch, { x: 0, z: 0 }, 0);
+      return watch;
+    };
+    const run = (
+      watch: ClickMoveProgressWatch,
+      fromMs: number,
+      toMs: number,
+      walking: boolean,
+      pos = { x: 0, z: 0 },
+    ) => {
+      let stalled = false;
+      for (let t = fromMs + 50; t <= toMs; t += 50)
+        stalled = clickMoveStalled(watch, pos, t, walking);
+      return stalled;
+    };
+
+    it('stalls once the player walks without leaving the spot for long enough', () => {
+      const watch = start();
+      expect(run(watch, 0, 1100, true)).toBe(false);
+      expect(run(watch, 1100, 1200, true)).toBe(true);
+    });
+
+    it('does not count time spent turning in place toward the next leg', () => {
+      const watch = start();
+      expect(run(watch, 0, 300, true)).toBe(false);
+      expect(run(watch, 300, 1000, false)).toBe(false);
+      expect(run(watch, 1000, 1500, true)).toBe(false);
+    });
+
+    it('still stalls a player who keeps alternating between bumping and turning', () => {
+      const watch = start();
+      let stalled = false;
+      for (let t = 0; t < 4000 && !stalled; t += 400) {
+        stalled = run(watch, t, t + 200, true) || run(watch, t + 200, t + 400, false);
       }
-    }
-    expect(arrived).toBe(true);
+      expect(stalled).toBe(true);
+    });
+
+    it('restarts on real progress', () => {
+      const watch = start();
+      expect(run(watch, 0, 1000, true)).toBe(false);
+      expect(clickMoveStalled(watch, { x: 2, z: 0 }, 1050, true)).toBe(false);
+      expect(run(watch, 1050, 2000, true, { x: 2, z: 0 })).toBe(false);
+    });
+  });
+
+  describe('main.ts wiring', () => {
+    const main = readFileSync(join(process.cwd(), 'src/main.ts'), 'utf8');
+    const section = (from: string, to: string) => {
+      const begin = main.indexOf(from);
+      const end = main.indexOf(to, begin);
+      expect(begin).toBeGreaterThanOrEqual(0);
+      expect(end).toBeGreaterThan(begin);
+      return main.slice(begin, end);
+    };
+
+    it('turns online by the real frame time and offline by the sim step', () => {
+      expect(section('const resolved = resolveMove(', ');')).toContain('frameDt,');
+      expect(section('const { mi, facing } = resolveMove(', ');')).toContain('DT,');
+      expect(section('function resolveMove(', 'function partyMemberIds(')).toContain(
+        'clickMoveTurn(fromFacing, step.facing, stepSeconds)',
+      );
+    });
   });
 
   it('steps facing toward the destination along the shortest arc', () => {

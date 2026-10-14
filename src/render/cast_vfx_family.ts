@@ -5,10 +5,11 @@
 // several of their pieces draw with no readiness check of their own (the
 // baked layers' non-strict kinds and every kind before a preparation exists,
 // the solid fragments, the crests outside their authored kinds), so the gate
-// is their only protection. Every other 'vfx' drawable (the bespoke class
-// pools, the lazy spell stand-ins, the generic basics) keeps its compile unit
-// in the same warm-up, but never holds a cast: none of them is drawn behind
-// the gate.
+// is their only protection. The RELIC family is the Crucible trinket relics'
+// pools (trinket_relics.ts): no cast waits on it, only the relics' own
+// cosmetic holds do. Every other 'vfx' drawable (the bespoke class pools, the
+// lazy spell stand-ins, the generic basics) keeps its compile unit in the same
+// warm-up, but never holds a cast: none of them is drawn behind the gate.
 //
 // Each family is one bit: a cast waits on the families it draws from
 // (ability_vfx/cast_requirements.ts), and the readiness core
@@ -24,15 +25,17 @@
 import type * as THREE from 'three';
 import { setRenderCategory } from './renderer_diagnostics';
 
-export type CastVfxFamilyId = 'engine' | 'kit';
+export type CastVfxFamilyId = 'engine' | 'kit' | 'relic';
 
 export const CAST_VFX_ENGINE = 1;
 export const CAST_VFX_KIT = 2;
+export const CAST_VFX_RELIC = 4;
 
 /** Every family, in the order the warm-up links them and the gate reads them. */
 export const CAST_VFX_FAMILIES: readonly { id: CastVfxFamilyId; bit: number }[] = [
   { id: 'engine', bit: CAST_VFX_ENGINE },
   { id: 'kit', bit: CAST_VFX_KIT },
+  { id: 'relic', bit: CAST_VFX_RELIC },
 ];
 
 /** Tag a pooled drawable as cast VFX AND as a member of `family`. */

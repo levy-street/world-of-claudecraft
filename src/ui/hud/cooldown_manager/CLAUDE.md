@@ -59,6 +59,8 @@ core, thin painter, one controller, one settings panel.
   `watchedGlowAbilityIds` channel; it can never suppress an authored class proc.
   It is offered only where the desktop action bar is live.
 - **The buttons are decoration, not controls:** the layer is `aria-hidden` and
-  `pointer-events: none` except in placement (the Options sub-view is open), where
-  every group shows and can be dragged. The keyboard path to the same placement is
+  `pointer-events: none` on the layer and group gaps. Icons receive pointer events
+  for the shared spell or aura hover tooltip, without casting. Touch readouts
+  pass camera gestures through outside placement. In placement (the Options
+  sub-view is open), every group shows and can be dragged. The keyboard path to the same placement is
   the position sliders on each group card.

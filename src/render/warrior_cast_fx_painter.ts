@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { spellEffectsMuted } from './spell_effects_switch';
 
 const RECKLESS_SKULL_LIFETIME = 1;
 
@@ -48,7 +49,9 @@ function recklessSkullTexture(): THREE.CanvasTexture {
 export class RecklessSkullPainter {
   private readonly live: { sprite: THREE.Sprite; parent: THREE.Group; elapsed: number }[] = [];
 
-  spawn(parent: THREE.Group, height: number): void {
+  /** `ownerId` is the wearer, for the Spell Effects option's caster check. */
+  spawn(parent: THREE.Group, height: number, ownerId?: number): void {
+    if (spellEffectsMuted(ownerId)) return;
     const sprite = new THREE.Sprite(
       new THREE.SpriteMaterial({
         map: recklessSkullTexture(),

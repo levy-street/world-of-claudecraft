@@ -8,19 +8,35 @@
 import * as THREE from 'three';
 import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../sim/forgefather_fortress';
 import { registerDeferredPreload } from './assets/preload';
-import { appendIgnivarEnvProps, prepareIgnivarEnvProps } from './ignivar_env_props';
+import { drakelandsKitBootThunk } from './drakelands_kit_lane_core';
+import { GFX } from './gfx';
+import {
+  appendIgnivarEnvProps,
+  ignivarEnvPropsSettled,
+  prepareIgnivarEnvProps,
+} from './ignivar_env_props';
 import { appendIgnivarMistGates } from './ignivar_mist_gate';
 import { addPropGlowPools } from './ignivar_raid_dressing';
 
 // World content: the prop GLBs load in the deferred lane so reaching the
 // home screen never decodes them (the preload doctrine); buildEmberFeatures
-// runs after assetsReady, so the templates are resident by build time.
-registerDeferredPreload(() => prepareIgnivarEnvProps());
+// runs after assetsReady, so the templates are resident by build time. On the
+// iOS memory profile they load on approach instead (drakelands_kit_lane.ts),
+// and the zone prepare awaits them before it builds.
+registerDeferredPreload(drakelandsKitBootThunk(prepareIgnivarEnvProps, () => GFX));
 
 /** Build the fortress group (world coordinates; the caller parents it into
  *  the ember features view). Full-quality shadows: the zone-feature shadow
- *  policy governs casting at attach, not the interior lowGfx shed. */
+ *  policy governs casting at attach, not the interior lowGfx shed. Refuses
+ *  to run before every template was attempted and settled: the sim builds
+ *  this table's colliders whatever the renderer does, and
+ *  appendIgnivarEnvProps skips a missing template, so an early build would
+ *  leave every piece still loading invisible but solid for the session. A
+ *  template that fails after the loader's retries is skipped, as at boot. */
 export function buildForgefatherFortress(): THREE.Group {
+  if (!ignivarEnvPropsSettled()) {
+    throw new Error('buildForgefatherFortress: the Ignivar templates have not settled');
+  }
   const group = new THREE.Group();
   group.name = 'forgefatherFortress';
   // Street lamps render through src/render/streetlamps.ts (the fixture,

@@ -11,6 +11,15 @@ import { ALLIED_HEARTHSTONE_CAST_ID, dist2d, type Entity, type Vec3 } from '../t
 import { FACTION_HUB_LANDINGS } from './faction_vendors';
 
 export const DAWN_STANDARD_RADIUS = 15;
+/** Standard regen pulse: +10% of natural out-of-combat health regen, plus mana
+ *  equal to 5% of Spirit for mana users, every 2 sec regen tick. */
+export const DAWN_STANDARD_HP_REGEN_PCT = 10;
+export const DAWN_STANDARD_MANA_SPIRIT_PCT = 5;
+/** Seconds a player must stay near a standard, out of combat, to be blessed. */
+export const DAWN_BLESSING_DELAY_SECONDS = 10;
+/** Blessing of the Dawn: +5% to every primary attribute (buff_stats_pct points). */
+export const DAWN_BLESSING_STAT_PCT = 5;
+export const DAWN_BLESSING_DURATION_SECONDS = 30 * 60;
 
 /** Start the 10s cast to return the player to their attuned faction hub landing. */
 export function useAlliedHearthstone(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
@@ -134,7 +143,6 @@ export function useRiftFeatherGlider(ctx: SimContext, p: Entity, meta: PlayerMet
     value: 1,
     sourceId: p.id,
     school: 'physical',
-    breaksOnDamage: true,
   });
 
   meta.riftGliderReadyAt = ctx.time + 120; // 2 min cooldown
@@ -249,17 +257,14 @@ export function updateDawnBattleStandards(ctx: SimContext, p: Entity, meta: Play
     return;
   }
 
-  let inRadius = false;
-  for (const entity of ctx.entities.values()) {
-    if (
-      entity.kind === 'object' &&
-      entity.templateId === 'dawn_battle_standard' &&
-      dist2d(p.pos, entity.pos) <= DAWN_STANDARD_RADIUS
-    ) {
-      inRadius = true;
-      break;
-    }
-  }
+  // Spatial-grid lookup (the standard never moves once planted), not a walk of
+  // the whole entity roster for every player on every regen pulse.
+  const inRadius = ctx.grid.someInRadius(
+    p.pos.x,
+    p.pos.z,
+    DAWN_STANDARD_RADIUS,
+    (entity) => entity.kind === 'object' && entity.templateId === 'dawn_battle_standard',
+  );
 
   if (!inRadius) {
     meta.dawnStandardSeconds = 0;
@@ -267,36 +272,49 @@ export function updateDawnBattleStandards(ctx: SimContext, p: Entity, meta: Play
   }
 
   // Under the standard out of combat: +10% hp & mana regen pulse
-  const bonusHp = Math.max(1, Math.round((p.stats.sta * 0.3 + 2) * 0.1));
+  const bonusHp = Math.max(
+    1,
+    Math.round((p.stats.sta * 0.3 + 2) * (DAWN_STANDARD_HP_REGEN_PCT / 100)),
+  );
   if (p.hp < p.maxHp) {
     p.hp = Math.min(p.maxHp, p.hp + bonusHp);
   }
   if (p.resourceType === 'mana' && p.resource < p.maxResource) {
-    const bonusMana = Math.max(1, Math.round(p.stats.spi * 0.05));
+    const bonusMana = Math.max(1, Math.round(p.stats.spi * (DAWN_STANDARD_MANA_SPIRIT_PCT / 100)));
     p.resource = Math.min(p.maxResource, p.resource + bonusMana);
   }
 
-  meta.dawnStandardSeconds = (meta.dawnStandardSeconds ?? 0) + 2;
-  if (meta.dawnStandardSeconds >= 10) {
+  // Bless ONCE per stay: only the pulse that crosses the delay grants the aura.
+  // The counter parks at the delay while the player stays, and any exit (out of
+  // range, combat, death) resets it to 0, so a fresh stay blesses once more.
+  // Re-applying on every later pulse spammed the log line and aura event.
+  const before = meta.dawnStandardSeconds ?? 0;
+  meta.dawnStandardSeconds = Math.min(before + 2, DAWN_BLESSING_DELAY_SECONDS);
+  if (
+    before < DAWN_BLESSING_DELAY_SECONDS &&
+    meta.dawnStandardSeconds >= DAWN_BLESSING_DELAY_SECONDS
+  ) {
     applyBlessingOfTheDawn(ctx, p);
   }
 }
 
-/** Apply the 15-minute Blessing of the Dawn buff (+5 Stamina). */
+/** Apply the 30-minute Blessing of the Dawn buff (+5% to all primary attributes). */
 export function applyBlessingOfTheDawn(ctx: SimContext, p: Entity): void {
   ctx.applyAura(p, {
     id: 'blessing_of_the_dawn',
     name: 'Blessing of the Dawn',
-    kind: 'buff_sta',
-    duration: 900,
-    remaining: 900,
-    value: 5,
+    kind: 'buff_stats_pct',
+    duration: DAWN_BLESSING_DURATION_SECONDS,
+    remaining: DAWN_BLESSING_DURATION_SECONDS,
+    value: DAWN_BLESSING_STAT_PCT,
     sourceId: p.id,
     school: 'holy',
   });
+  // English literal re-localized client-side by the sim_i18n EXACT map
+  // (log.dawnBlessing); keep the two byte-identical.
   ctx.emit({
     type: 'log',
-    text: 'You are bathed in the sacred light: Blessing of the Dawn (+5 Stamina).',
+    text: 'You are bathed in the sacred light: Blessing of the Dawn (+5% to all attributes).',
     color: '#ecd57a',
     pid: p.id,
   });

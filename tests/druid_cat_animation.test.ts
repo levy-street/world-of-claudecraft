@@ -317,6 +317,7 @@ describe('druid cat production animation runtime', () => {
 
   it.each([
     ['claw', 'Attack_Left'],
+    ['scratch', 'Attack_Left'],
     ['rake', 'Attack_Right'],
     ['ferocious_bite', 'Bite'],
     ['rip', 'Finisher'],

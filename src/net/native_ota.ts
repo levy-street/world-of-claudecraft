@@ -297,16 +297,23 @@ async function runningOtaBundleId(scope: OtaGlobalScope): Promise<string | null>
  * merely reloads the running bundle.
  */
 export async function applyPendingOtaUpdate(
-  opts: { bundleId?: string | null; native?: boolean; scope?: OtaGlobalScope } = {},
+  opts: {
+    bundleId?: string | null;
+    native?: boolean;
+    scope?: OtaGlobalScope;
+    /** Stop before switching if the requesting search ended while bridge queries awaited. */
+    cancelled?: () => boolean;
+  } = {},
 ): Promise<boolean> {
   const native = opts.native ?? NATIVE_APP;
-  if (!native) return false;
+  if (!native || opts.cancelled?.()) return false;
   const scope = opts.scope ?? (window as unknown as OtaGlobalScope);
   const setPlugin = updaterSetPlugin(scope);
   if (!setPlugin) {
     const reloadPlugin = updaterReloadPlugin(scope);
     if (!reloadPlugin) return false;
     try {
+      if (opts.cancelled?.()) return false;
       await reloadPlugin.reload();
       return true;
     } catch (err) {
@@ -315,11 +322,11 @@ export async function applyPendingOtaUpdate(
     }
   }
   const bundleId = opts.bundleId ?? (await pendingOtaBundleId({ native, scope }));
-  if (!bundleId) return false;
+  if (!bundleId || opts.cancelled?.()) return false;
   // Never switch to the bundle already running: the plugin would reload the
   // same code and this gate would meet the same staged id again on boot.
   const running = await runningOtaBundleId(scope);
-  if (running !== null && running === bundleId) return false;
+  if (opts.cancelled?.() || (running !== null && running === bundleId)) return false;
   try {
     await setPlugin.set({ id: bundleId });
     // Some bridges resolve the call in the same tick the reload tears the

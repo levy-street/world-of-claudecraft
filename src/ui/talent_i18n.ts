@@ -7,6 +7,7 @@ import {
   rowTreeFor,
   type SpecDef,
   type StatModEffect,
+  specSignatureIds,
   TALENTS,
   type TalentEffect,
   type TalentRowOption,
@@ -15,6 +16,7 @@ import { ABILITIES, CLASSES } from '../sim/data';
 import type { AbilityEffect, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import {
+  formatList,
   getLanguage,
   type InterpolationValues,
   languageTag,
@@ -1357,7 +1359,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Paso del depredador',
     'Receding Shell': 'Caparazón retráctil',
     'Shared Recovery': 'Recuperación compartida',
-    Beastguard: 'Guardia bestial',
+    'Lonely Soul': 'Alma solitaria',
     'Double Hush': 'Silencio doble',
     'Binding Payload': 'Carga vinculante',
     'Crippling Pursuit': 'Persecución incapacitante',
@@ -1869,7 +1871,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Paso del depredador',
     'Receding Shell': 'Caparazón retráctil',
     'Shared Recovery': 'Recuperación compartida',
-    Beastguard: 'Guardia bestial',
+    'Lonely Soul': 'Alma solitaria',
     'Double Hush': 'Silencio doble',
     'Binding Payload': 'Carga vinculante',
     'Crippling Pursuit': 'Persecución incapacitante',
@@ -2382,7 +2384,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Allure du prédateur',
     'Receding Shell': 'Carapace rétractile',
     'Shared Recovery': 'Récupération partagée',
-    Beastguard: 'Garde bestiale',
+    'Lonely Soul': 'Âme solitaire',
     'Double Hush': 'Double silence',
     'Binding Payload': 'Charge entravante',
     'Crippling Pursuit': 'Poursuite invalidante',
@@ -2895,7 +2897,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Allure du prédateur',
     'Receding Shell': 'Carapace rétractile',
     'Shared Recovery': 'Récupération partagée',
-    Beastguard: 'Garde bestiale',
+    'Lonely Soul': 'Âme solitaire',
     'Double Hush': 'Double silence',
     'Binding Payload': 'Charge entravante',
     'Crippling Pursuit': 'Poursuite invalidante',
@@ -3408,7 +3410,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Passo del predatore',
     'Receding Shell': 'Guscio retrattile',
     'Shared Recovery': 'Recupero condiviso',
-    Beastguard: 'Guardia bestiale',
+    'Lonely Soul': 'Anima solitaria',
     'Double Hush': 'Doppio silenzio',
     'Binding Payload': 'Carica vincolante',
     'Crippling Pursuit': 'Inseguimento debilitante',
@@ -3921,7 +3923,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Tempo des Raubtiers',
     'Receding Shell': 'Rückziehender Panzer',
     'Shared Recovery': 'Geteilte Erholung',
-    Beastguard: 'Bestienwacht',
+    'Lonely Soul': 'Einsame Seele',
     'Double Hush': 'Doppeltes Schweigen',
     'Binding Payload': 'Fesselnde Ladung',
     'Crippling Pursuit': 'Lähmende Verfolgung',
@@ -4433,7 +4435,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": '猎手步伐',
     'Receding Shell': '收缩甲壳',
     'Shared Recovery': '共享恢复',
-    Beastguard: '野兽守卫',
+    'Lonely Soul': '孤独之魂',
     'Double Hush': '双重禁声',
     'Binding Payload': '束缚载荷',
     'Crippling Pursuit': '致残追击',
@@ -4945,7 +4947,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": '獵手步伐',
     'Receding Shell': '收縮甲殼',
     'Shared Recovery': '共享恢復',
-    Beastguard: '野獸守衛',
+    'Lonely Soul': '孤獨之魂',
     'Double Hush': '雙重禁聲',
     'Binding Payload': '束縛載荷',
     'Crippling Pursuit': '致殘追擊',
@@ -5457,7 +5459,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": '포식자의 보폭',
     'Receding Shell': '후퇴하는 껍질',
     'Shared Recovery': '회복 공유',
-    Beastguard: '야수 수호',
+    'Lonely Soul': '고독한 영혼',
     'Double Hush': '이중 침묵',
     'Binding Payload': '속박 탄두',
     'Crippling Pursuit': '무력화 추적',
@@ -5969,7 +5971,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": '捕食者の歩調',
     'Receding Shell': '引き潮の甲殻',
     'Shared Recovery': '共有回復',
-    Beastguard: '獣の守り',
+    'Lonely Soul': '孤独な魂',
     'Double Hush': '二重の静寂',
     'Binding Payload': '拘束弾頭',
     'Crippling Pursuit': '衰弱の追跡',
@@ -6482,7 +6484,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Passo do Predador',
     'Receding Shell': 'Carapaça Retrátil',
     'Shared Recovery': 'Recuperação Compartilhada',
-    Beastguard: 'Guarda Bestial',
+    'Lonely Soul': 'Alma Solitária',
     'Double Hush': 'Silêncio Duplo',
     'Binding Payload': 'Carga Vinculante',
     'Crippling Pursuit': 'Perseguição Debilitante',
@@ -6994,7 +6996,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Поступь хищника',
     'Receding Shell': 'Втягивающийся панцирь',
     'Shared Recovery': 'Общее восстановление',
-    Beastguard: 'Звериный страж',
+    'Lonely Soul': 'Одинокая душа',
     'Double Hush': 'Двойная тишина',
     'Binding Payload': 'Связывающий заряд',
     'Crippling Pursuit': 'Калечащая погоня',
@@ -7404,7 +7406,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Krok predátora',
     'Receding Shell': 'Ustupující krunýř',
     'Shared Recovery': 'Sdílené zotavení',
-    Beastguard: 'Strážce šelem',
+    'Lonely Soul': 'Osamělá duše',
     'Double Hush': 'Dvojité umlčení',
     'Binding Payload': 'Poutající nálož',
     'Crippling Pursuit': 'Mrzačící pronásledování',
@@ -7836,7 +7838,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Pas van het roofdier',
     'Receding Shell': 'Terugtrekkend schild',
     'Shared Recovery': 'Gedeeld herstel',
-    Beastguard: 'Beestenwacht',
+    'Lonely Soul': 'Eenzame ziel',
     'Double Hush': 'Dubbele stilte',
     'Binding Payload': 'Bindende lading',
     'Crippling Pursuit': 'Verlammende achtervolging',
@@ -8268,7 +8270,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Krok drapieżnika',
     'Receding Shell': 'Cofająca się skorupa',
     'Shared Recovery': 'Wspólna odnowa',
-    Beastguard: 'Straż bestii',
+    'Lonely Soul': 'Samotna dusza',
     'Double Hush': 'Podwójne uciszenie',
     'Binding Payload': 'Wiążący ładunek',
     'Crippling Pursuit': 'Okaleczający pościg',
@@ -8700,7 +8702,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Langkah Pemangsa',
     'Receding Shell': 'Cangkang Menyusut',
     'Shared Recovery': 'Pemulihan Bersama',
-    Beastguard: 'Penjaga Buas',
+    'Lonely Soul': 'Jiwa Kesepian',
     'Double Hush': 'Bungkam Ganda',
     'Binding Payload': 'Muatan Pengikat',
     'Crippling Pursuit': 'Pengejaran Pelumpuh',
@@ -9131,7 +9133,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Yırtıcının Adımı',
     'Receding Shell': 'Geri Çekilen Kabuk',
     'Shared Recovery': 'Paylaşılan İyileşme',
-    Beastguard: 'Canavar Muhafızı',
+    'Lonely Soul': 'Yalnız Ruh',
     'Double Hush': 'Çifte Susturma',
     'Binding Payload': 'Bağlayıcı Yük',
     'Crippling Pursuit': 'Sakatlayıcı Takip',
@@ -9563,7 +9565,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Rovdjurets steg',
     'Receding Shell': 'Indraget skal',
     'Shared Recovery': 'Delad återhämtning',
-    Beastguard: 'Odjursvakt',
+    'Lonely Soul': 'Ensam själ',
     'Double Hush': 'Dubbel tystnad',
     'Binding Payload': 'Bindande laddning',
     'Crippling Pursuit': 'Förlamande jakt',
@@ -9994,7 +9996,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Bước Chân Kẻ Săn Mồi',
     'Receding Shell': 'Mai Rút',
     'Shared Recovery': 'Hồi Phục Chia Sẻ',
-    Beastguard: 'Hộ Vệ Dã Thú',
+    'Lonely Soul': 'Linh Hồn Cô Độc',
     'Double Hush': 'Song Câm Lặng',
     'Binding Payload': 'Đạn Trói Buộc',
     'Crippling Pursuit': 'Truy Đuổi Tàn Phế',
@@ -10426,7 +10428,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     "Predator's Pace": 'Rovdyrets tempo',
     'Receding Shell': 'Tilbagetrukket skjold',
     'Shared Recovery': 'Delt genopretning',
-    Beastguard: 'Dyrevagt',
+    'Lonely Soul': 'Ensom sjæl',
     'Double Hush': 'Dobbelt tavshed',
     'Binding Payload': 'Bindende ladning',
     'Crippling Pursuit': 'Lammende forfølgelse',
@@ -10659,6 +10661,12 @@ function translateTitle(source: string, lang: SupportedLanguage): string {
 
 function abilityName(id: string): string {
   return tEntity({ kind: 'ability', id, field: 'name' });
+}
+
+// Every signature a spec grants, as one localized list ("Fleetmend and
+// Sporemender Form"); a single signature is just its name.
+function signatureNames(spec: SpecDef, lang: SupportedLanguage): string {
+  return formatList(specSignatureIds(spec).map(abilityName), lang);
 }
 
 type GrantEffectShape = {
@@ -11271,10 +11279,12 @@ export function tTalent(request: TalentTranslationRequest): string {
     if (request.kind === 'talentSpec') {
       // The description names the signature spell so the spec card tooltip always
       // tells the player which spell picking this spec grants (parity with the
-      // localized specDescription arms, pinned by talent_tooltip_accuracy).
-      return request.field === 'name'
-        ? request.spec.name
-        : `${request.spec.description} Signature: ${abilityName(request.spec.signature)}.`;
+      // localized specDescription arms, pinned by talent_tooltip_accuracy). A spec
+      // with a second signature (Groveheart) lists both, primary first.
+      if (request.field === 'name') return request.spec.name;
+      const signatures = specSignatureIds(request.spec);
+      const label = signatures.length > 1 ? 'Signatures' : 'Signature';
+      return `${request.spec.description} ${label}: ${signatureNames(request.spec, lang)}.`;
     }
     if (request.kind === 'talentChoice') {
       return request.field === 'name'
@@ -11302,7 +11312,7 @@ export function tTalent(request: TalentTranslationRequest): string {
       localeText[lang].specDescription(
         className(request.spec.class),
         localeText[lang].roleLabels[request.spec.role],
-        abilityName(request.spec.signature),
+        signatureNames(request.spec, lang),
       )
     );
   }

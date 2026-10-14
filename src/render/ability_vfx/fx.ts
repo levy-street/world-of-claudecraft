@@ -1390,7 +1390,6 @@ export class AbilityVfxFx implements SequencerHost {
 
     this.crests.update(0.05, false);
     this.bakedAt('smoke', x, y, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
-    this.bakedAt('shockwave', x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
     for (const kind of ['shout_dust', 'warrior_power'] as const)
       this.bakedAt(kind, x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
     this.baked.update(0.1, this.camera.quaternion, false);

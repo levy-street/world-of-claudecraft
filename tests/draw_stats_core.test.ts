@@ -70,8 +70,14 @@ describe('draw_stats_core', () => {
     // session kept from before the loss would accumulate into a dead object,
     // zeroing the governor draw signal and the opaque-sort input for the rest
     // of the session.
+    // The restore host (src/render/context_restore.ts) calls this rebind first
+    // thing on every in-place restore.
     expect(source).toMatch(
-      /onWebGLContextRestored = \(\): void => \{[\s\S]{0,900}?if \(this\.drawStats\) this\.drawStats = createLogicalFrameDrawStats\(this\.webgl\.info\);/,
+      /rebindContextReaders: \(\) => \{[\s\S]{0,300}?if \(this\.drawStats\) this\.drawStats = createLogicalFrameDrawStats\(this\.webgl\.info\);/,
+    );
+    const host = readFileSync(new URL('../src/render/context_restore.ts', import.meta.url), 'utf8');
+    expect(host).toMatch(
+      /private contextRestored\(\): void \{[\s\S]{0,400}?this\.surface\.rebindContextReaders\(\);/,
     );
     expect(source.match(/this\.drawStats\.beginFrame\(\)/g)).toHaveLength(1);
     expect(source.match(/this\.drawStats\.currentFrame\(\)/g)).toHaveLength(2);

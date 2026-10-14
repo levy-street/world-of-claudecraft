@@ -60,13 +60,13 @@ export const VANGUARD_RET_4PC_EDICT_WINDOW_SEC = 6;
 export const VANGUARD_BM_2PC_RATTLING_COOLDOWN_CUT_SEC = 4;
 /** Beast Mastery 4pc: seconds each Rattling Shot takes off Howling Rage's remaining cooldown. */
 export const VANGUARD_BM_4PC_HOWLING_RAGE_REFUND_SEC = 1;
-/** Marksmanship 2pc: Trailbreak cooldown cut in seconds (15 to 11). */
+/** Marksmanship 2pc: Trailbreak cooldown cut in seconds (20 to 16). */
 export const VANGUARD_MM_2PC_TRAILBREAK_COOLDOWN_CUT_SEC = 4;
 /** Marksmanship 4pc: the instant Long Draw window in seconds. */
 export const VANGUARD_MM_4PC_INSTANT_WINDOW_SEC = 6;
 /** Marksmanship 4pc: the internal cooldown between instant Long Draw grants. */
 export const VANGUARD_MM_4PC_ICD_SEC = 15;
-/** Survival 2pc: Bloodhook cooldown cut in seconds (15 to 12). */
+/** Survival 2pc: Bloodhook cooldown cut in seconds (10 to 7). */
 export const VANGUARD_SURVIVAL_2PC_BLOODHOOK_COOLDOWN_CUT_SEC = 3;
 /** Survival 4pc: Hunting Momentum stacks a landed Bloodhook grants (cap 3 untouched). */
 export const VANGUARD_SURVIVAL_4PC_MOMENTUM_STACKS = 1;
@@ -346,7 +346,7 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_hunter_marksmanship: [
     {
       pieces: 2,
-      // Trailbreak 15 -> 11 sec on the resolved entry.
+      // Trailbreak 20 -> 16 sec on the resolved entry.
       effect: {
         ability: [
           { ability: 'trailbreak', cooldownFlat: -VANGUARD_MM_2PC_TRAILBREAK_COOLDOWN_CUT_SEC },
@@ -388,7 +388,7 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_hunter_survival: [
     {
       pieces: 2,
-      // Bloodhook 15 -> 12 sec on the resolved entry.
+      // Bloodhook 10 -> 7 sec on the resolved entry.
       effect: {
         ability: [
           { ability: 'bloodhook', cooldownFlat: -VANGUARD_SURVIVAL_2PC_BLOODHOOK_COOLDOWN_CUT_SEC },

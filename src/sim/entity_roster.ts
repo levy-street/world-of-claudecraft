@@ -20,6 +20,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { burstSporeBurst, type SporeBurstGroundState } from './combat/druid_spore_burst';
 import { tickHunterTrap } from './combat/hunter_trap';
 import { isTemporaryNecromancyUndead } from './combat/necromancy';
 import { cleanupPaladinAegis } from './combat/paladin_aegis';
@@ -129,6 +130,9 @@ export type GroundAoE = {
     sourceOrigin: Vec3;
     sourceZoneId: string;
   };
+  // Spore Burst (combat/druid_spore_burst.ts): a growing mushroom whose fuse is
+  // `remaining`; it bursts once when the fuse runs out, then is removed.
+  sporeBurst?: SporeBurstGroundState;
 };
 
 // A SimEvent or deterministic simulation callback scheduled for a future sim time,
@@ -297,7 +301,8 @@ export function tickGroundAoEs(ctx: SimContext): void {
     );
     if (
       ((effect.frostRing || effect.hunterTrap) && !persistentSource) ||
-      (effect.temporalHourglass && (!persistentSource || persistentSource.dead)) ||
+      ((effect.temporalHourglass || effect.sporeBurst) &&
+        (!persistentSource || persistentSource.dead)) ||
       hourglassChangedRegion
     ) {
       ctx.groundAoEs.splice(i, 1);
@@ -322,6 +327,13 @@ export function tickGroundAoEs(ctx: SimContext): void {
         continue;
       }
       if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);
+      continue;
+    }
+    if (effect.sporeBurst) {
+      if (effect.remaining <= CAST_COMPLETE_EPS) {
+        ctx.groundAoEs.splice(i, 1);
+        burstSporeBurst(ctx, effect);
+      }
       continue;
     }
     effect.tickTimer -= DT;

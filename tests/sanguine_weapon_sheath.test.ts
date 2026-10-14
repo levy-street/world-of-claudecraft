@@ -4,7 +4,7 @@ import {
   SanguineWeaponSheath,
   sanguineWeaponGeometry,
 } from '../src/render/characters/sanguine_weapon_sheath';
-import { compileTargetPrepared } from '../src/render/compile_target_readiness';
+import { compileProof, compileTargetPrepared } from '../src/render/compile_target_readiness';
 import { markProgramReady } from '../src/render/linked_program_readiness';
 
 const assets = vi.hoisted(() => ({ texture: null as THREE.Texture | null }));
@@ -107,7 +107,7 @@ describe('Sanguine weapon ownership', () => {
 
 describe('compile target readiness proof', () => {
   it('requires every face program and the actual uploaded texture in this context', () => {
-    const texture = new THREE.Texture();
+    const texture = new THREE.DataTexture(new Uint8Array(4), 1, 1);
     texture.needsUpdate = true;
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
     const target = new THREE.Mesh(new THREE.BoxGeometry(), material);
@@ -135,5 +135,49 @@ describe('compile target readiness proof', () => {
     target.geometry.dispose();
     material.dispose();
     texture.dispose();
+  });
+
+  it('never waits on a texture the upload lane refuses, but still on one it uploads', () => {
+    const pending = new THREE.Texture();
+    expect(pending.image).toBeNull();
+    const cold = new THREE.DataTexture(new Uint8Array(4), 1, 1);
+    cold.needsUpdate = true;
+    const material = new THREE.MeshStandardMaterial({ map: pending, emissiveMap: cold });
+    const target = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    const records = new Map<object, unknown>();
+    const properties = { get: (object: object) => records.get(object) };
+    const program = { getUniforms() {}, getAttributes() {} };
+    records.set(material, { programs: new Map([['only', program]]) });
+    markProgramReady(program);
+    // An image that has not arrived is never uploaded by the lane, so it
+    // cannot read resident: only the uploadable map holds the proof back.
+    expect(compileTargetPrepared(properties, target)).toBe(false);
+    records.set(cold, { __webglTexture: {}, __version: cold.version });
+    expect(compileTargetPrepared(properties, target)).toBe(true);
+    target.geometry.dispose();
+    material.dispose();
+  });
+
+  it('hands no proof on a host without parallel compile, a live one otherwise', () => {
+    const material = new THREE.MeshBasicMaterial();
+    const target = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    const records = new Map<object, unknown>();
+    const webgl = { properties: { get: (object: object) => records.get(object) } };
+    // That host's gate settles at once over programs it never linked: a proof
+    // would read false forever and hold back a swap with nothing to wait for.
+    expect(compileProof(false, webgl, target)).toBeUndefined();
+    const proof = compileProof(true, webgl, target);
+    expect(proof?.()).toBe(false);
+    const program = { getUniforms() {}, getAttributes() {} };
+    records.set(material, { programs: new Map([['only', program]]) });
+    markProgramReady(program);
+    // Lazy: read at settle time, not when the gate was armed.
+    expect(proof?.()).toBe(true);
+    // A context restore gives the renderer new properties: the proof reads
+    // them, never the dead context's record of a linked program.
+    webgl.properties = { get: () => undefined };
+    expect(proof?.()).toBe(false);
+    target.geometry.dispose();
+    material.dispose();
   });
 });

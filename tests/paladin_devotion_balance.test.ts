@@ -44,10 +44,14 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // release/v0.43.0 merge into feature/world-quests forks it once more, through
 // the branch's hedge_knight camp move in src/sim/content/evergarden.ts
 // (c43178a68c): retribution 59.2 back to 55.75; holy and protection unmoved.
+// Dropping the Evergarden's undrawn scatter (the generator now skips the
+// pines and bed-side decorations the renderer never drew, so their trunk
+// colliders are gone) forks it once more: protection 40.15 to 38.65; holy
+// and retribution unmoved.
 // The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 41.25,
-  protection: 40.15,
+  protection: 38.65,
   retribution: 55.75,
 };
 

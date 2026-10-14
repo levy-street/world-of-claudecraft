@@ -168,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: '战争兵器库',
-    desc: '以来之不易的荣誉购得的战争饰品与武器。',
+    desc: '以来之不易的荣誉购得的战争饰品、武器与物品。',
   },
   conquerors_vanguard_gallery: {
     name: '先锋展厅',

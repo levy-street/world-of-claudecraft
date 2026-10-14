@@ -408,4 +408,65 @@ describe('buildVendorView count multiples (phase 21)', () => {
     expect(affordableView.goods[0].affordable).toBe(true);
     expect(affordableView.factionCurrencyBalance).toBe(50);
   });
+
+  it('lists allied faction vendor goods like cartographers_ink priced in the active vendor faction marks', () => {
+    const view = buildVendorView(['cartographers_ink'], [], ITEMS, {
+      ...RICH,
+      factions: { rift_watch: 1500, church_order: 0, automatons: 0 },
+      factionCurrencies: { rift_watch: 60, church_order: 0, automatons: 0 },
+      vendorFactionId: 'rift_watch',
+    });
+    expect(view.goods).toHaveLength(1);
+    expect(view.goods[0].itemId).toBe('cartographers_ink');
+    expect(view.goods[0].price.copper).toBe(0);
+    expect(view.goods[0].price.honor).toBe(0);
+    expect(view.goods[0].price.factionMarks).toEqual({
+      factionId: 'rift_watch',
+      amount: 60,
+    });
+    expect(view.goods[0].affordable).toBe(true);
+    expect(view.goods[0].requirementUnmet).toBe(false);
+    expect(view.goods[0].factionRequirement).toMatchObject({
+      standingTier: 'recognized',
+      currencyCost: 60,
+    });
+    expect(view.goods[0].factionRequirement?.factionId).toBeUndefined();
+
+    // Church Order quartermaster prices in church_order marks and gates on player balance
+    const churchView = buildVendorView(['cartographers_ink'], [], ITEMS, {
+      ...RICH,
+      factions: { rift_watch: 1500, church_order: 0, automatons: 0 },
+      factionCurrencies: { rift_watch: 100, church_order: 20, automatons: 0 },
+      vendorFactionId: 'church_order',
+    });
+    expect(churchView.goods).toHaveLength(1);
+    expect(churchView.goods[0].price.factionMarks).toEqual({
+      factionId: 'church_order',
+      amount: 60,
+    });
+    expect(churchView.goods[0].affordable).toBe(false);
+    // Best standing across allied factions (rift_watch 1500 >= Recognized 1000) unlocks the row
+    expect(churchView.goods[0].requirementUnmet).toBe(false);
+
+    // All three allied rows are preserved in goods across any quartermaster
+    const allAlliedView = buildVendorView(
+      ['cartographers_ink', 'allied_hearthstone', 'allied_vanguard_duffel'],
+      [],
+      ITEMS,
+      {
+        ...RICH,
+        factions: { rift_watch: 0, church_order: 0, automatons: 15_000 },
+        factionCurrencies: { rift_watch: 0, church_order: 0, automatons: 300 },
+        vendorFactionId: 'automatons',
+      },
+    );
+    expect(allAlliedView.goods.map((g) => g.itemId)).toEqual([
+      'cartographers_ink',
+      'allied_hearthstone',
+      'allied_vanguard_duffel',
+    ]);
+    expect(allAlliedView.goods.every((g) => g.price.factionMarks?.factionId === 'automatons')).toBe(
+      true,
+    );
+  });
 });

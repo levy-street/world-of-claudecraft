@@ -25,8 +25,8 @@ import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_a
 // "a rule was dropped during extraction" regression we want to catch.
 //
 // The extraction is now COMPLETE, so today the union is lopsided: both inline
-// <style> blocks are comment-only (pinned by tests/per_entry_css_wiring.test.ts) and
-// carry no ten-dash banner, so every pinned section below is accounted for by
+// <style> blocks hold only the boot splash (pinned by tests/per_entry_css_wiring.test.ts)
+// and carry no ten-dash banner, so every pinned section below is accounted for by
 // src/styles alone. The union side stays because it is what makes the guard
 // indifferent to WHERE a section lives, which is the property being guarded, but it
 // means the src/styles read below is now the whole corpus rather than a supplement
@@ -162,6 +162,7 @@ const INDEX_SECTIONS = [
   'modals and dropdown',
   'vendor',
   'bags',
+  'skull bag pane',
   'social',
   'map',
   'Dungeon Finder',
@@ -229,15 +230,16 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 74 index + 72 play sections, no duplicate names', () => {
+  it('pins a non-vacuous manifest: 75 index + 73 play sections, no duplicate names', () => {
     // The World Quests branch's vehicle bar and music override sections (72 / 70)
     // plus World PvP (the flag tab) and King of the Hill (src/ui/hud/hill/), one
     // components.css section each in both entries: 74 / 72.
-    expect(INDEX_SECTIONS.length).toBe(74);
-    expect(PLAY_SECTIONS.length).toBe(72);
-    expect(MANIFEST.length).toBe(74);
-    expect(new Set(INDEX_SECTIONS).size).toBe(74);
-    expect(new Set(PLAY_SECTIONS).size).toBe(72);
+    // 75 with the World PvP Skull Bag pane (skull bag pane).
+    expect(INDEX_SECTIONS.length).toBe(75);
+    expect(PLAY_SECTIONS.length).toBe(73);
+    expect(MANIFEST.length).toBe(75);
+    expect(new Set(INDEX_SECTIONS).size).toBe(75);
+    expect(new Set(PLAY_SECTIONS).size).toBe(73);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

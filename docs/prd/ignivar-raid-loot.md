@@ -571,6 +571,32 @@ budget-neutral swap of the piece's minor rating). The guaranteed floor
 class; pinned by the cap-coverage describe in tests/ignivar_loot.test.ts.
 The scarcity POLICY holds: set pieces still carry no Hit.
 
+AMENDED (2026-10-12, healer Crit): the full-coverage widening above had
+also seeded Hit on the healer electives (the three Healing Power waists,
+Loop of Quiet Springs, Staff of the Last Spring, Springtouched Crozier),
+contradicting the ratings-ladder rule that healer-facing pieces never
+carry Hit. Direct heals are not resisted, so for most healers that Hit was
+dead weight. The two damage-converting healers (arcane mage via Temporal
+Echo, discipline priest via Doctrine) do lose live Hit, since their
+healing rides resistible damage; they trade it for Crit by maintainer
+direction, and Crit still applies before the conversion. The ring and
+weapons carry the same amount as Crit instead (25 ring, 30 weapon). The
+three waists carry Crit 30, and the other 30 rating moved into the primary
+line as +6 Int / +4 Spi (Int 15, Spi 12), converted at the dev-kit healer
+weights (rating 0.3, Int 1, Spi 0.7). Measured against what a direct
+healer actually used (the Hit was worth nothing to them), this is a
+deliberate healer buff, not a budget-neutral swap: each waist sits 10 over
+its ilvl-35 line by design, exempted in tests/item_stamina_baseline.test.ts.
+The cap floor is computed over the non-healer lanes only (healers have no
+window). Two kit builders followed: the line-only /dev bis picker
+(src/sim/dev/bis_gear.ts) now excludes Healing Power pieces for non-healer
+specs (dev_kit.ts already scored them at zero there), and the PBE boost
+(server/pbe_boost.ts, kit v7) has casters weigh a two-hander against a
+one-hander plus its offhand, so the healer staff's newly scored Crit cannot
+strip the holy kits' orb and shield. Pinned by the healer-Crit cases in
+tests/ignivar_loot.test.ts, which also hold that no shipped item with
+Healing Power carries Hit.
+
 ### The sets
 
 UNDER REDESIGN (2026-08-28): the maintainer-directed adversarial review

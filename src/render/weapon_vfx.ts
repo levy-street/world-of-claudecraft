@@ -2720,7 +2720,7 @@ function makeShell(root: THREE.Object3D, shellSpec: WeaponVfxShellSpec): VfxPart
   const shells: { host: THREE.Mesh; shell: THREE.Mesh }[] = [];
   root.traverse((o) => {
     const host = o as THREE.Mesh;
-    if (!host.isMesh || !host.geometry || host.userData.__vfx) return;
+    if (!host.isMesh || !host.geometry || isWeaponVfxShell(host)) return;
     const shell = new THREE.Mesh(host.geometry, mat);
     shell.scale.setScalar(1.015);
     shell.frustumCulled = false;
@@ -2902,6 +2902,12 @@ export interface WeaponVfxHandle {
   setPixelScale(devicePxHeight: number): void;
   update(dt: number): void;
   dispose(): void;
+}
+
+/** Whether `object` is a weapon-skin glow shell. A shell hangs off the weapon
+ *  mesh it hugs, outside the group its handle owns. */
+export function isWeaponVfxShell(object: THREE.Object3D): boolean {
+  return object.userData.__vfx === true;
 }
 
 export function createWeaponVfx(

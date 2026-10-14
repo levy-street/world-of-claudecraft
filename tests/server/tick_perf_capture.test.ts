@@ -57,7 +57,9 @@ type MovementTimelineCaptureFields =
   | 'movementDroppedOldestTotal'
   | 'movementRejectedAnchoredWindowTotal'
   | 'movementRejectedSanityBoundTotal'
-  | 'movementResyncsTotal';
+  | 'movementResyncsTotal'
+  | 'movementPlayoutGrowthsTotal'
+  | 'movementPlayoutShrinksTotal';
 type _AdminMirrorCarriesMobScanFields = AssertTrue<
   Pick<ServerPerfCaptureResult, MobScanCaptureFields> extends Pick<
     AdminPerfCaptureResult,
@@ -164,6 +166,8 @@ describe('tick perf capture lifecycle', () => {
       movementRejectedAnchoredWindowTotal: 0,
       movementRejectedSanityBoundTotal: 0,
       movementResyncsTotal: 0,
+      movementPlayoutGrowthsTotal: 0,
+      movementPlayoutShrinksTotal: 0,
     });
     // The frozen profile reflects the window's samples (7 ms every tick -> mean 7).
     expect(status.last!.profile.phases.total.mean).toBe(7);
@@ -638,6 +642,8 @@ describe('tick perf capture lifecycle', () => {
       movementRejectedAnchoredWindowTotal: 0,
       movementRejectedSanityBoundTotal: 0,
       movementResyncsTotal: 0,
+      movementPlayoutGrowthsTotal: 0,
+      movementPlayoutShrinksTotal: 0,
     });
   });
 
@@ -667,6 +673,8 @@ describe('tick perf capture lifecycle', () => {
             lastRejectedAnchoredWindow: number;
             lastRejectedSanityBound: number;
             lastResyncs: number;
+            lastPlayoutGrowths: number;
+            lastPlayoutShrinks: number;
           };
         }
       ).movementTimelineTickStats;
@@ -678,6 +686,8 @@ describe('tick perf capture lifecycle', () => {
       movementStats.lastRejectedAnchoredWindow = 6;
       movementStats.lastRejectedSanityBound = 7;
       movementStats.lastResyncs = 8;
+      movementStats.lastPlayoutGrowths = 9;
+      movementStats.lastPlayoutShrinks = 10;
       // Force the heartbeat branch (tickCount 0 minus -100 clears the 100-tick gap).
       (server as unknown as { lastPerfLogTick: number }).lastPerfLogTick = -100;
       (server as unknown as { maybeLogTickPerf: (ms: number) => void }).maybeLogTickPerf(5);
@@ -693,6 +703,8 @@ describe('tick perf capture lifecycle', () => {
       expect(perfLine).toContain('moveRejectWindow=6');
       expect(perfLine).toContain('moveRejectSanity=7');
       expect(perfLine).toContain('moveResyncs=8');
+      expect(perfLine).toContain('moveGrow=9');
+      expect(perfLine).toContain('moveShrink=10');
     } finally {
       log.mockRestore();
       vi.unstubAllEnvs();

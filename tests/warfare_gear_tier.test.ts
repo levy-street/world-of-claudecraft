@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
+  PVP_CASTER_SET_2PC_PUSHBACK_REDUCTION,
   SET_WARFARE_ASHSTALKER,
   SET_WARFARE_CINDERWEAVE,
   SET_WARFARE_FURYFORGED,
@@ -39,6 +40,11 @@ import { expectedWarfareStamina } from './helpers/warfare_stamina';
 const WARFARE_SET_IDS = Object.keys(ITEM_SETS)
   .filter((setId) => setId.startsWith('warfare_'))
   .sort();
+const WARFARE_CASTER_SET_IDS = new Set([
+  SET_WARFARE_CINDERWEAVE,
+  SET_WARFARE_STORMBOUND,
+  SET_WARFARE_THORNHIDE,
+]);
 
 // The derivation above is only worth having if it is non-vacuous: an empty or
 // short list would pass every `for` loop in this file without asserting a thing.
@@ -341,8 +347,9 @@ describe('the five WARFARE sets', () => {
 
   it('pays only in WARFARE rating and PvP-gated effects, never in flat stats', () => {
     // This is the replacement invariant of the whole program: because a set
-    // bonus can only be a WARFARE rating, the crowd-control cut, or a pvpOnly
-    // proc, "honor gear is never better than raid gear in a raid" is structural.
+    // bonus can only be a WARFARE rating, the crowd-control cut, the caster
+    // pushback exception named in the guide, or a pvpOnly proc, "honor gear is
+    // never better than raid gear in a raid" is structural.
     // A future author adding `ap: 40` here reds this rather than shipping.
     const ALLOWED: readonly (keyof SetBonusEffect)[] = [
       'pvpOffenseRating',
@@ -353,6 +360,13 @@ describe('the five WARFARE sets', () => {
     for (const setId of WARFARE_SET_IDS) {
       for (const tier of ITEM_SETS[setId].bonuses) {
         for (const key of Object.keys(tier.effect)) {
+          if (
+            key === 'castPushbackReduction' &&
+            tier.pieces === 2 &&
+            WARFARE_CASTER_SET_IDS.has(setId)
+          ) {
+            continue;
+          }
           expect(ALLOWED, `${setId} ${tier.pieces}pc grants ${key}`).toContain(key);
         }
         if (tier.effect.proc) expect(tier.effect.proc.pvpOnly, setId).toBe(true);
@@ -393,7 +407,9 @@ describe('the five WARFARE sets', () => {
         haste: 0,
         hasteRating: 0,
         hitRating: 0,
-        castPushbackReduction: 0,
+        castPushbackReduction: WARFARE_CASTER_SET_IDS.has(setId)
+          ? PVP_CASTER_SET_2PC_PUSHBACK_REDUCTION
+          : 0,
         knockbackResistance: 0,
       });
       expect(agg.pvpOffenseRating, setId).toBe(

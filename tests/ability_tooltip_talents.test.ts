@@ -106,7 +106,8 @@ describe('druid Cat Form mobility pass (tooltip data)', () => {
     expect(known(12)).toContain('dash');
     expect(ABILITIES.dash.cooldown).toBe(60);
     expect(ABILITIES.dash.offGcd).toBe(true);
-    expect(ABILITIES.dash.requiresForm).toBe('cat');
+    expect(ABILITIES.dash.requiresForm).toBeUndefined();
+    expect(ABILITIES.dash.usableInForm).toBe(true);
     expect(ABILITIES.dash.effects).toEqual([
       { type: 'selfBuff', kind: 'buff_speed', value: 1.5, duration: 15 },
     ]);

@@ -721,6 +721,19 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Cocoon / Cocooned | Vysska's cast and the wrapped player's stun | KEEP. Single common English words. |
 | Draining Silk | her feeding's damage line | KEEP. No match. |
 
+### The sixth lifetime-XP rung: Titan (web-verified 2026-10-01)
+
+Scope: `prog_titan`, the 10,000,000 lifetime-XP deed and its title reward,
+both displayed as "Titan". Method per the standing bar: quoted exact-phrase
+search for "Titan" as a title or achievement across WoW, RuneScape, GW2, FFXIV
+and ESO. No game ships "Titan" alone as a player title; the nearest hit is
+WoW's "Herald of the Titans", a different full name. Titan is shared Greek
+myth vocabulary used across many unrelated properties, and in this repo it
+only appears inside the Fury talent name "Titan's Grip", a different role.
+Verdict: GENERIC. Earlier candidates: "Immortal" and "Undying" were rejected
+as WoW's Naxxramas titles; "Timeless" (also GENERIC) was replaced by the
+owner's pick before shipping.
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.
@@ -1286,6 +1299,7 @@ frozen).
 | Spellgnaw | CLEAR |  | mobMechanic:grubjaw.purgeOnHit |
 | Spirit of Aldren | CLEAR |  | mob:nythraxis_heroic_warrior_add |
 | Splitshot | KEEP | relabeled at QA: 'Split Shot' is a genre-wide ranged skill (FFXIV Machinist, Heroes of Hammerwatch); the fused token keeps it under bar rule 2 | ability:multi_shot choiceRow:hun_r14_multi_shot |
+| Sporemending | CLEAR | owner display rename of Wildbloom (2026-10-08, id unchanged); quoted exact-phrase and coined-token searches found no game use; nearest is Scars of Honor's druid talent effect 'Mending Spore', generic words in another order and role | ability:rejuvenation |
 | Springwell | CLEAR |  | ability:healing_stream choiceRow:sha_r11_healing_stream |
 | Staff of Velkhar | CLEAR |  | item:staff_of_velkhar item:heroic_staff_of_velkhar |
 | Stormcrag | CLEAR |  | poi:2.5 |
@@ -1344,7 +1358,6 @@ frozen).
 | Watcher of the Tanglemouth | CLEAR |  | npcTitle:strandwatcher_pell |
 | Waterbind | CLEAR |  | ability:conjure_water |
 | Wickharbor | CLEAR |  | poi:12.0 |
-| Wildbloom | CLEAR |  | ability:rejuvenation |
 | Wildbolt | CLEAR |  | ability:wrath |
 | Wildbond | CLEAR |  | ability:tame_beast |
 | Wildfang Rally | CLEAR |  | ability:aspect_of_the_wild choiceRow:hun_r20_aspect_of_the_wild |

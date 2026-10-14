@@ -52,10 +52,11 @@ export const WARFARE_SHOP_SET_ORDER: readonly string[] = [
   'warfare_cinderweave', // cloth, caster
 ];
 
-/** Section keys for the two non-set sections. Set sections key on their set id,
+/** Section keys for the non-set sections. Set sections key on their set id,
  *  so every key in one view is unique and safe to build a focus key from. */
 export const WARFARE_SHOP_JEWELRY_KEY = 'jewelry';
 export const WARFARE_SHOP_WEAPONS_KEY = 'weapons';
+export const WARFARE_SHOP_GOODS_KEY = 'goods';
 export const WARFARE_SHOP_SEASON2_WEAPONS_KEY = 'season2_weapons';
 
 /** The NpcDef shape this window gates on. A FLAG, never a hard-coded npc id:
@@ -127,7 +128,7 @@ export interface WarfareShopSetSection {
 }
 
 export interface WarfareShopPlainSection {
-  kind: 'jewelry' | 'weapons';
+  kind: 'jewelry' | 'weapons' | 'goods';
   group: WarfareShopGroup;
   key: string;
   offers: WarfareShopOffer[];
@@ -238,6 +239,7 @@ export function buildWarfareVendorView(
   const jewelry: WarfareShopOffer[] = [];
   const weapons: WarfareShopOffer[] = [];
   const seasonWeapons: WarfareShopOffer[] = [];
+  const goods: WarfareShopOffer[] = [];
   for (const itemId of stock) {
     const item = items[itemId];
     if (!item) continue;
@@ -253,6 +255,10 @@ export function buildWarfareVendorView(
       else bySet.set(item.set, [offer]);
     } else if (item.kind === 'weapon') {
       weapons.push(offer);
+    } else if (!item.slot) {
+      // Nothing to wear (the World PvP Skull Bag): its own Goods section, so
+      // it never reads as jewelry.
+      goods.push(offer);
     } else {
       // Neck and rings: shared across role profiles, so they carry no set tag
       // and the only coherent grouping left is "jewelry".
@@ -332,6 +338,9 @@ export function buildWarfareVendorView(
       key: WARFARE_SHOP_WEAPONS_KEY,
       offers: weapons,
     });
+  }
+  if (goods.length > 0) {
+    sections.push({ kind: 'goods', group: 'entry', key: WARFARE_SHOP_GOODS_KEY, offers: goods });
   }
   return { sections, balance: Math.max(0, Math.floor(viewer.honor)) };
 }

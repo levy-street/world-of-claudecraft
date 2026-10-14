@@ -692,12 +692,14 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(markerInteraction).toContain('this.stations = EMPTY_MARKERS;');
     expect(markerInteraction).toContain('this.services = EMPTY_MARKERS;');
     expect(markerInteraction).toContain('this.navigation = EMPTY_MARKERS;');
-    expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(5);
+    expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(4);
+    expect(hud).toContain('this.mapMarkerInteraction.setContinentPorts(result.ports)');
+    expect(markerInteraction).toContain('this.clear();');
     // The gather-tip resolve memo resets inside the shared clear and beside the
     // overworld store, bounding its staleness at the same
     // mediumHud repaint that refreshes the painted icon.
     expect(markerInteraction.match(/this\.clearMemo\(\);/g)).toHaveLength(2);
-    expect(hud.match(/this\.mapView = null;/g)).toHaveLength(1);
+    expect(hud.match(/this\.mapView = null;/g)).toHaveLength(2);
     expect(hud).toContain('this.continentRegions.length = 0;');
     // Point markers resolve globally by distance. Exact-distance ties follow
     // visual top order in the pure resolver; quest areas remain the fallback.

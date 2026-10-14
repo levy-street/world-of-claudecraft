@@ -88,7 +88,7 @@ describe('createCharacterVisual happy path (issue 2079)', () => {
 });
 
 describe('CharacterVisual dispose() clears every cosmetic-overlay material cache', () => {
-  it('releases the ghost, soulRend, shadowform, moonkin, metamorph, and auraGlow clones', async () => {
+  it('releases the veil, shadowform and auraGlow clones', async () => {
     vi.resetModules();
     // Same minimally real GLTF stub as the happy-path build above: a
     // MeshStandardMaterial (has both `color` and `emissive`, so every
@@ -132,17 +132,14 @@ describe('CharacterVisual dispose() clears every cosmetic-overlay material cache
     visual.setAuraGlow(0xffffff, 0.5);
     visual.setAuraGlow(0xffffff, 0);
 
-    const cacheNames = [
-      'ghostMaterials',
-      'soulRendMaterials',
-      'shadowformMaterials',
-      'moonkinMaterials',
-      'auraGlowMaterials',
-    ] as const;
+    // The ghost looks, Soul Rend and Moonkin all land in the veil's cache.
+    const cacheNames = ['veilMaterials', 'shadowformMaterials', 'auraGlowMaterials'] as const;
     const caches = visual as unknown as Record<string, Map<unknown, unknown>>;
     for (const name of cacheNames) {
       expect(caches[name].size, `${name} should have cached a clone`).toBeGreaterThan(0);
     }
+    const palettes = [...caches.veilMaterials.keys()].map((key) => String(key).split('|')[0]);
+    expect(new Set(palettes)).toEqual(new Set(['spirit', 'soul-rend', 'moonkin']));
 
     visual.dispose();
 

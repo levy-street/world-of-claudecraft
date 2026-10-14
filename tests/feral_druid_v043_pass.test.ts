@@ -2,7 +2,9 @@
 //   1. every melee attack a feral druid makes reaches 1 yd further
 //   2. Slinkstrike and Lunge each bank 1 Old Blood (cap 3)
 //   3. Nature's Boon: a landed autoattack has a 1-in-15 chance to arm one free
-//      Wildbloom (any form) OR Oakhide (Bruin only) for 10 sec, 25% stronger
+//      Wildbloom (any form, 50% stronger) OR Oakhide (Bruin only, 25%
+//      stronger) for 10 sec
+//      Sporemending (any form) OR Oakhide (Bruin only) for 10 sec, 25% stronger
 //   4. Savage Mending is a Bruin AND Cat button
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -22,6 +24,7 @@ import {
   NATURES_BOON_DURATION,
   NATURES_BOON_ID,
   NATURES_BOON_POWER,
+  NATURES_BOON_WILDBLOOM_POWER,
   naturesBoonArmedFor,
   naturesBoonFormAllows,
   naturesBoonOnAutoAttack,
@@ -174,7 +177,7 @@ describe('1. Wildfang reach: +1 yd on melee attacks', () => {
 
   it('leaves every non-melee range alone, Lunge and Slinkstrike included', () => {
     expect(ABILITIES.lunge.range).toBe(25);
-    expect(ABILITIES.pounce.range).toBe(8);
+    expect(ABILITIES.pounce.range).toBe(25);
     expect(feralMeleeReachBonus(FERAL, ABILITIES.lunge.range)).toBe(0);
     expect(feralMeleeReachBonus(FERAL, ABILITIES.pounce.range)).toBe(0);
     expect(feralMeleeReachBonus(FERAL, MELEE_RANGE + 1)).toBe(0);
@@ -280,6 +283,7 @@ describe("3. Nature's Boon", () => {
     expect(NATURES_BOON_CHANCE).toBeCloseTo(1 / 15, 10);
     expect(NATURES_BOON_DURATION).toBe(10);
     expect(NATURES_BOON_POWER).toBe(1.25);
+    expect(NATURES_BOON_WILDBLOOM_POWER).toBe(1.5);
     expect([...NATURES_BOON_ABILITIES].sort()).toEqual(['barkskin', 'rejuvenation']);
   });
 
@@ -292,7 +296,12 @@ describe("3. Nature's Boon", () => {
     expect(text).toContain(`Reaches ${FERAL_MELEE_REACH_BONUS} yd further`);
     expect(text).toContain(`about every ${Math.round(1 / NATURES_BOON_CHANCE)} sec`);
     expect(text).toContain(`for ${NATURES_BOON_DURATION} sec`);
-    expect(text).toContain(`${Math.round((NATURES_BOON_POWER - 1) * 100)}% stronger`);
+    expect(text).toContain(
+      `Sporemending castable in any form and ${Math.round((NATURES_BOON_WILDBLOOM_POWER - 1) * 100)}% stronger`,
+    );
+    expect(text).toContain(
+      `Oakhide in Bruin Form and ${Math.round((NATURES_BOON_POWER - 1) * 100)}% stronger`,
+    );
   });
 
   it('recognizes an armed window for either spell and nothing else', () => {
@@ -348,6 +357,18 @@ describe("3. Nature's Boon", () => {
     // test (which forces the roll through armBoon) stays green.
     const { sim, player } = rig('feral');
     const ctx = rawCtx(sim);
+    // In Cat Form: the per-swing chance scales with the swing's base interval
+    // (4 procs per minute), and the cat's fixed 1.0 sec swing is the 1-in-15.
+    player.auras.push({
+      id: 'cat_form',
+      name: 'Cat Form',
+      kind: 'form_cat',
+      remaining: 3600,
+      duration: 3600,
+      value: 0,
+      sourceId: player.id,
+      school: 'nature',
+    });
     const swings = 600;
     let armed = 0;
     for (let swing = 0; swing < swings; swing++) {
@@ -413,7 +434,7 @@ describe("3. Nature's Boon", () => {
     expect(willAutoUnshift(armedBear, ABILITIES.wrath)).toBe(true);
   });
 
-  it('casts Wildbloom from Cat Form for free, keeping the form, and spends the window', () => {
+  it('casts Sporemending from Cat Form for free, keeping the form, and spends the window', () => {
     const { sim, player } = rig('feral');
     player.auras.push(formAura(player, 'form_cat'));
     armBoon(sim);
@@ -444,7 +465,7 @@ describe("3. Nature's Boon", () => {
     expect(player.auras.find((entry) => entry.kind === 'buff_armor_pct')?.value).toBe(20);
   });
 
-  it('leaves the unarmed behavior exactly as it was: Wildbloom drops Cat Form', () => {
+  it('leaves the unarmed behavior exactly as it was: Sporemending drops Cat Form', () => {
     const { sim, player } = rig('feral');
     player.auras.push(formAura(player, 'form_cat'));
     expect(aura(player, NATURES_BOON_ID)).toBeUndefined();
@@ -921,7 +942,7 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
     // The bar's rim reads the same predicate, so Oakhide glows in Bruin alone.
     expect(naturesBoonArmedFor([boon, { kind: 'form_cat' }], 'barkskin')).toBe(false);
     expect(naturesBoonArmedFor([boon, { kind: 'form_bear' }], 'barkskin')).toBe(true);
-    // Wildbloom is form-free either way.
+    // Sporemending is form-free either way.
     expect(naturesBoonArmedFor([boon, { kind: 'form_cat' }], 'rejuvenation')).toBe(true);
   });
 
@@ -939,7 +960,7 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
     expect(player.resource).toBe(rageBefore);
     expect(aura(player, NATURES_BOON_ID)).toBeUndefined();
 
-    // First cast wins: Wildbloom pressed next is an ordinary Wildbloom again.
+    // First cast wins: Sporemending pressed next is an ordinary Sporemending again.
     // With no window it can no longer be cast FROM Bruin Form (the auto-unshift
     // stands back up and drops the form), and its tick is the plain one, not
     // the empowered one.
@@ -969,17 +990,17 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
     // Oakhide still goes off (it is usableInForm), but it pays its own cost...
     expect(player.auras.some((a) => a.kind === 'buff_armor_pct')).toBe(true);
     expect(player.resource).toBeLessThan(energyBefore);
-    // ...and the window survives for the Wildbloom it is meant for.
+    // ...and the window survives for the Sporemending it is meant for.
     expect(aura(player, NATURES_BOON_ID)).toBeDefined();
   });
 });
 
-describe('13. An armed window makes its spell 25% stronger', () => {
+describe('13. An armed window makes its spell stronger (Wildbloom 50%, Oakhide 25%)', () => {
   // Both arms run at a GEARED heal power, deliberately: the hot arm adds a
   // Spell Power rider on top of the authored base, and a multiplier that only
-  // reached the base would read as 25% at zero heal power and shrink as gear
-  // grew (a level-20 rig with no heal power cannot tell the two apart). The
-  // printed 25% has to reach the whole tick.
+  // reached the base would read as the full bonus at zero heal power and
+  // shrink as gear grew (a level-20 rig with no heal power cannot tell the two
+  // apart). The printed bonus has to reach the whole tick.
   // Heal power is DERIVED (entity.ts recalcPlayerStats: Intellect times the
   // per-point rate, plus gear) and recalculated on the way through a cast, so a
   // value pushed onto the entity does not survive; a feral druid's own leather
@@ -1001,7 +1022,7 @@ describe('13. An armed window makes its spell 25% stronger', () => {
     return { sim, player };
   }
 
-  it('scales Wildbloom by a quarter, Spell Power rider included', () => {
+  it('scales Sporemending by a quarter, Spell Power rider included', () => {
     const plain = gearedRig();
     plain.sim.castAbility('rejuvenation');
     plain.sim.tick();
@@ -1021,8 +1042,8 @@ describe('13. An armed window makes its spell 25% stronger', () => {
     expect(boonTick).toBeGreaterThan(plainTick);
     // The rider is most of the tick at this heal power, so a base-only scale
     // would land near 1.05 here; the band is one rounding step wide.
-    expect(boonTick / plainTick).toBeCloseTo(NATURES_BOON_POWER, 1);
-    expect(boonTick).toBe(Math.round(plainTick * NATURES_BOON_POWER));
+    expect(boonTick / plainTick).toBeCloseTo(NATURES_BOON_WILDBLOOM_POWER, 1);
+    expect(boonTick).toBe(Math.round(plainTick * NATURES_BOON_WILDBLOOM_POWER));
   });
 
   it('scales Oakhide in Bruin Form, and leaves an unempowered one alone', () => {

@@ -15,6 +15,7 @@
 import { FARM_FINE_PRODUCE_ITEM_IDS } from '../sim/content/farm_crops';
 import { MATERIAL_ITEM_IDS } from '../sim/material_taxonomy';
 import { baseMaterialFor } from '../sim/professions/material_grades';
+import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../sim/pvp/world_pvp_trophy';
 import type { ItemDef } from '../sim/types';
 import { type TranslationKey, t } from './i18n';
 
@@ -57,6 +58,9 @@ export function itemQualityLabel(quality: ItemDef['quality']): string {
 
 export function itemKindLabel(kind: ItemDef['kind'], itemId?: string): string {
   if (kind === 'junk' && itemId !== undefined) {
+    // The World PvP Skull Bag is a sub-inventory carried in a bag cell, never
+    // junk (src/sim/pvp/skull_bag.ts): it reads as the bag it is.
+    if (itemId === WORLD_PVP_SKULL_BAG_ITEM_ID) return t('itemUi.kind.bag');
     // Fine grades first: they are also honest materials, but the line must
     // stay "Fine Material" (not the broader Material label).
     if (baseMaterialFor(itemId) !== undefined) {

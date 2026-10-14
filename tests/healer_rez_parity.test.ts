@@ -1,9 +1,4 @@
-// Healer resurrection parity (owner directive 2026-09-01, recorded in
-// docs/design/resurrection-cooldowns.md): every primary healer class fields a
-// resurrection, and every healer rez shares the five-minute cooldown. Benison/Doctrine priests and Groveheart druids gain their rezzes
-// here (prayer_of_returning, wildwake, grove_awakening); the paladin's Recall
-// the Fallen joins the shared cooldown. Chronomancy's Temporal Reversal keeps
-// its deliberately longer ten-minute combat-rez cooldown.
+// Out-of-combat resurrection has no cooldown; combat resurrection keeps its cooldown.
 
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -58,26 +53,51 @@ function addFallenPartyMember(sim: Sim, name: string): Entity {
 }
 
 describe('healer resurrection cooldown parity', () => {
-  it('gives every healer rez the shared five-minute cooldown', () => {
-    for (const id of [
-      'recall_the_fallen',
+  it('removes every out-of-combat resurrection cooldown and preserves combat cooldowns', () => {
+    const outOfCombat = Object.values(ABILITIES).filter(
+      (def) =>
+        def.requiresOutOfCombat &&
+        def.effects.some(
+          (effect) => effect.type === 'resurrectAlly' || effect.type === 'massResurrectGroup',
+        ),
+    );
+    expect(outOfCombat.map((def) => def.id).sort()).toEqual([
       'ancestor_return',
-      'prayer_of_returning',
-      'wildwake',
+      'collective_reversal',
       'grove_awakening',
-    ]) {
-      expect(ABILITIES[id].cooldown, id).toBe(SHARED_REZ_COOLDOWN);
-    }
-    // The mass rezzes stay pinned to the Chronomancy twin so no group revive
-    // outclasses another; the cooldown limits repeats across encounters,
-    // while requiresOutOfCombat blocks casts during an active combat hold.
-    for (const id of ['prayer_of_returning', 'grove_awakening']) {
-      const def = ABILITIES[id];
-      expect(def.cooldown, id).toBe(ABILITIES.collective_reversal.cooldown);
-      expect(def.cooldown, id).toBeGreaterThan(def.castTime + 5);
-    }
-    // Deliberately unchanged: Chronomancy's combat rez keeps a death costlier.
+      'prayer_of_returning',
+      'recall_the_fallen',
+    ]);
+    for (const def of outOfCombat) expect(def.cooldown, def.id).toBe(0);
+    expect(ABILITIES.wildwake.cooldown).toBe(SHARED_REZ_COOLDOWN);
     expect(ABILITIES.temporal_reversal.cooldown).toBe(600);
+  });
+
+  it.each([
+    ['mage', 'arcane', 'collective_reversal', 20],
+    ['shaman', 'restoration', 'ancestor_return', 20],
+    ['priest', 'holy', 'prayer_of_returning', 20],
+    ['priest', 'discipline', 'prayer_of_returning', 20],
+    ['druid', 'restoration', 'grove_awakening', 20],
+    ['paladin', 'holy', 'recall_the_fallen', 15],
+    ['paladin', 'holy', 'recall_the_fallen', 20],
+    ['paladin', 'protection', 'recall_the_fallen', 20],
+    ['paladin', 'retribution', 'recall_the_fallen', 20],
+  ] as const)('allows successive %s %s casts of %s at level %i', (cls, spec, id, level) => {
+    const sim = healerSim(cls, spec, 4486);
+    sim.players.get(sim.playerId)!.questsDone.add('q_rite_of_redemption');
+    sim.setPlayerLevel(level);
+    sim.player.resource = sim.player.maxResource;
+    const fallen = addFallenPartyMember(sim, 'Fallen Twice');
+    for (let cast = 0; cast < 2; cast++) {
+      sim.castAbility(id);
+      expect(sim.player.castingAbility, id).toBe(id);
+      advance(sim, ABILITIES[id].castTime + 0.05);
+      expect(sim.player.cooldowns.has(id), id).toBe(false);
+      sim.respondToResurrection(true, fallen.id);
+      expect(fallen.dead, id).toBe(false);
+      if (cast === 0) killAt(fallen, sim.player.pos.x + 2, sim.player.pos.z);
+    }
   });
 
   it('renders the single-rez glyph in the ability school, not a hardcoded arcane', () => {
@@ -131,7 +151,7 @@ describe('Prayer of Returning content', () => {
       specs: ['holy', 'discipline'],
       learnLevel: 20,
       castTime: 7,
-      cooldown: SHARED_REZ_COOLDOWN,
+      cooldown: 0,
       requiresTarget: false,
       requiresOutOfCombat: true,
     });
@@ -160,7 +180,7 @@ describe('Prayer of Returning content', () => {
     expect(zh_CN.entities.abilities.prayer_of_returning.description).toContain('30%');
   });
 
-  it('revives every offered dead group member and then runs the cooldown', () => {
+  it('revives every offered dead group member without a cooldown', () => {
     const sim = healerSim('priest', 'holy', 4481);
     const fallen = addFallenPartyMember(sim, 'Fallen Friend');
 
@@ -173,22 +193,7 @@ describe('Prayer of Returning content', () => {
     expect(fallen.hp / fallen.maxHp).toBeGreaterThanOrEqual(0.29);
     expect(fallen.hp / fallen.maxHp).toBeLessThanOrEqual(0.31);
 
-    const remaining = sim.player.cooldowns.get('prayer_of_returning') ?? 0;
-    expect(remaining).toBeGreaterThan(290);
-    expect(remaining).toBeLessThanOrEqual(SHARED_REZ_COOLDOWN);
-
-    // The same member dies again with the priest unambiguously out of combat and
-    // full on mana: only the cooldown may refuse the second cast.
-    killAt(fallen, sim.player.pos.x + 2, sim.player.pos.z);
-    sim.player.inCombat = false;
-    sim.player.combatTimer = 99;
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('prayer_of_returning');
-    expect(sim.player.castingAbility).toBeNull();
-    expect(fallen.dead).toBe(true);
-    sim.player.cooldowns.delete('prayer_of_returning');
-    sim.castAbility('prayer_of_returning');
-    expect(sim.player.castingAbility).toBe('prayer_of_returning');
+    expect(sim.player.cooldowns.has('prayer_of_returning')).toBe(false);
   });
 });
 
@@ -199,7 +204,7 @@ describe('Grove Awakening content', () => {
       specs: ['restoration'],
       learnLevel: 20,
       castTime: 7,
-      cooldown: SHARED_REZ_COOLDOWN,
+      cooldown: 0,
       requiresTarget: false,
       requiresOutOfCombat: true,
     });
@@ -228,8 +233,7 @@ describe('Grove Awakening content', () => {
     expect(fallen.dead).toBe(false);
     expect(fallen.hp / fallen.maxHp).toBeGreaterThanOrEqual(0.29);
     expect(fallen.hp / fallen.maxHp).toBeLessThanOrEqual(0.31);
-    const remaining = sim.player.cooldowns.get('grove_awakening') ?? 0;
-    expect(remaining).toBeGreaterThan(290);
+    expect(sim.player.cooldowns.has('grove_awakening')).toBe(false);
   });
 });
 

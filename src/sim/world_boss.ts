@@ -20,6 +20,7 @@
 // preserving this kill's ordinary selections before advancing the shared stream.
 
 import { MOBS } from './data';
+import { lootItemUsableByClasses, usableRollGroup } from './loot/class_locked_drop';
 import { rollEnemyLootQuality } from './loot/enemy_quality';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -214,11 +215,18 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
     // is unchanged (the parity gate depends on it); we just discard a second gear win.
     // Ungrouped entries (the guaranteed storm trophy) are unaffected and always drop.
     let gearWon = false;
+    // Personal loot: the class-lock gate (loot/class_locked_drop.ts) reads this
+    // contributor's own class. It draws NO rng, so the table draws are unchanged.
+    const classes = new Set([meta.cls]);
+    const usable = (id: string): boolean => lootItemUsableByClasses(id, classes);
     for (const entry of template.loot) {
       if (entry.rollGroup) {
         if (rolledGroups.has(entry.rollGroup)) continue;
         rolledGroups.add(entry.rollGroup);
-        const group = template.loot.filter((l) => l.rollGroup === entry.rollGroup);
+        const group = usableRollGroup(
+          template.loot.filter((l) => l.rollGroup === entry.rollGroup),
+          usable,
+        );
         const roll = ctx.rng.next();
         let cumulative = 0;
         for (const g of group) {
@@ -234,7 +242,7 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
         continue;
       }
       if (!ctx.rng.chance(entry.chance)) continue;
-      if (entry.itemId)
+      if (entry.itemId && usable(entry.itemId))
         items.push({ itemId: entry.itemId, count: 1, personalFor: [meta.entityId] });
     }
   }

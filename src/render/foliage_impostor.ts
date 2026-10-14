@@ -30,6 +30,8 @@
 import * as THREE from 'three';
 import { WORLD_MIN_X, WORLD_MIN_Z } from '../sim/data';
 import { attachBiomeHaze } from './biome_haze_field';
+import { rendererDisposed } from './context_generation';
+import { registerContextRestoreRebake } from './context_restore_registry';
 import {
   createFarShortfallSampler,
   FAR_WORLD_MARGIN,
@@ -215,6 +217,7 @@ function archetypeBounds(parts: BakePart[]): { minY: number; height: number; rad
 function bakeAtlas(
   webgl: THREE.WebGLRenderer,
   archetypes: Archetype[],
+  into: THREE.WebGLRenderTarget | null = null,
 ): { target: THREE.WebGLRenderTarget; rects: ImpostorCellRect[]; size: number } {
   const placement = packImpostorAtlas(
     archetypes.map((a) => a.spec),
@@ -254,12 +257,14 @@ function bakeAtlas(
   // OFF until every cell has landed: three regenerates a target's whole
   // mip chain at the end of every render() into it, so leaving it on would
   // rebuild the 2048 chain a few hundred times during the bake.
-  const finalTarget = new THREE.WebGLRenderTarget(size, size, {
-    depthBuffer: false,
-    generateMipmaps: false,
-    minFilter: THREE.LinearMipmapLinearFilter,
-    magFilter: THREE.LinearFilter,
-  });
+  const finalTarget =
+    into ??
+    new THREE.WebGLRenderTarget(size, size, {
+      depthBuffer: false,
+      generateMipmaps: false,
+      minFilter: THREE.LinearMipmapLinearFilter,
+      magFilter: THREE.LinearFilter,
+    });
   finalTarget.texture.generateMipmaps = false;
   finalTarget.texture.anisotropy = Math.min(4, webgl.capabilities.getMaxAnisotropy());
 
@@ -373,7 +378,7 @@ function bakeAtlas(
     scratch.dispose();
     for (const mat of bakeMaterialCache.values()) mat.dispose();
     bakeMaterialCache.clear();
-    if (!done) finalTarget.dispose();
+    if (!done && !into) finalTarget.dispose();
   }
 
   return { target: finalTarget, rects: placement.origin, size };
@@ -418,9 +423,32 @@ const materialCache = new Map<ImpostorCategory, THREE.MeshStandardMaterial>();
 // WebGLRenderTarget.dispose frees) or each rebuild leaks GPU pages.
 let liveAtlas: THREE.WebGLRenderTarget | null = null;
 
-function adoptAtlas(target: THREE.WebGLRenderTarget): void {
+/** What the live atlas was baked from, so a WebGL context restore (which
+ *  gives the target back empty: every impostor would draw as a blank quad)
+ *  can bake it again into the same target. Keyed by the target, so the
+ *  archetypes live only as long as the atlas they describe. */
+const atlasSources = new WeakMap<
+  THREE.WebGLRenderTarget,
+  { webgl: THREE.WebGLRenderer; archetypes: Archetype[] }
+>();
+
+function adoptAtlas(
+  target: THREE.WebGLRenderTarget,
+  webgl: THREE.WebGLRenderer,
+  archetypes: Archetype[],
+): void {
   if (liveAtlas && liveAtlas !== target) liveAtlas.dispose();
   liveAtlas = target;
+  atlasSources.set(target, { webgl, archetypes });
+  registerContextRestoreRebake('impostor-atlas', target, rebakeLiveAtlas);
+}
+
+function rebakeLiveAtlas(target: THREE.WebGLRenderTarget): void {
+  const source = atlasSources.get(target);
+  // A graphics rebuild that baked no new atlas leaves this one live with the
+  // old renderer: never draw with a renderer that has been torn down.
+  if (!source || target !== liveAtlas || rendererDisposed(source.webgl)) return;
+  bakeAtlas(source.webgl, source.archetypes, target);
 }
 
 function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THREE.Material {
@@ -739,7 +767,7 @@ export function createImpostorSession(): ImpostorSession | null {
     finalize(webgl, parent, seed) {
       if (archetypes.length === 0) return [];
       const { target, rects } = bakeAtlas(webgl, archetypes);
-      adoptAtlas(target);
+      adoptAtlas(target, webgl, archetypes);
       const texture = target.texture;
       const registrations: ImpostorRegistration[] = [];
       // Session-scoped shortfall sampler: seed, spacing and origin fix at

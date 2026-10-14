@@ -298,6 +298,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the minimap raid-lockout badge class, value-diffed',
   },
   {
+    call: 'this.updateInstanceDifficultyBadge',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'the minimap instance difficulty badge and tooltip, value-diffed',
+  },
+  {
     call: 'this.dailyRewardsLauncher.refresh',
     band: 'slow',
     gate: '',
@@ -546,6 +553,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "target && target.kind !== 'object' && target.id !== this.lastAnnouncedTargetId",
     surface: 'chrome',
     why: 'marks the target-name announcement so a same-named re-target still re-reads; its result is written straight to the target live region, deliberately NOT through the elided writer, and the id gate makes that an event write rather than a per-frame one',
+  },
+  {
+    call: 'fillTargetHealthText',
+    band: 'frame',
+    gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetFramePaintAt, now, targetFrameNonSelfIntervalMs(fxTier))",
+    surface: 'none',
+    why: 'fills the target descriptor health text under the Health Text option (dead or playing dead reads Dead); a pure descriptor write the painter call below paints, no DOM touch of its own',
   },
   {
     call: 'this.targetFramePainter.paint',
@@ -844,26 +858,26 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the spirit-mode body class that drains the world to greyscale',
   },
   {
+    call: 'noteReleaseOverlayShown',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: 'records the Release overlay opening so its button ignores presses for a short hold; state only, no DOM write',
+  },
+  {
     call: 'this.setDisplay',
     band: 'frame',
     gate: '',
-    sites: 2,
+    sites: 3,
     surface: 'chrome',
-    why: 'the full-screen death overlay and the standing ghost hint line, through the elided writer',
+    why: 'the death screens through the elided writer: the full-screen death overlay, the standing ghost hint line and the ghost prompt (its one corpse button), each shown or hidden by the pure death view core (src/ui/hud/death; a battleground spirit gets neither ghost surface because the respawn wave is its only way back)',
   },
   {
-    call: 'this.setDisplay',
+    call: 'this.pvpRez.paint',
     band: 'frame',
-    gate: 'ghost && !ghostInBgMatch',
+    gate: '',
     surface: 'chrome',
-    why: 'the ghost prompt (its one corpse button) while the spirit is in reach of its body; a battleground spirit is exempt because the respawn wave is its only way back',
-  },
-  {
-    call: 'this.setDisplay',
-    band: 'frame',
-    gate: '!(ghost && !ghostInBgMatch)',
-    surface: 'chrome',
-    why: 'hides the ghost prompt while not a corpse-running ghost',
+    why: 'the PvP Resurrect button and its note line (src/ui/hud/death/pvp_resurrect_painter.ts): shown with the offer, disabled and counting down while the PVP_RESURRECT_WAIT_SECONDS wait runs, all through the elided writers',
   },
   {
     call: 'syncDeathControllerHints',
@@ -875,28 +889,28 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.showBanner',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone banner on a real zone crossing, committed the moment zoneAt flips (the old z-only dead band never fired on an east-west realm crossing)',
   },
   {
     call: 'this.log',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone-entry chat line',
   },
   {
     call: 'this.logZoneWelcome',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone welcome blurb in chat',
   },
   {
     call: 'this.renderer.vistaPan',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== '' && !p.dead && !p.inCombat && !recentlyInCombat",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p) && !p.dead && !p.inCombat && !recentlyInCombat',
     surface: 'none',
     why: 'the zone-entry camera sweep; a renderer call, not a HUD write',
   },
@@ -938,6 +952,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'vehicle integrity, aiming and cooldowns use the shared eliding writer facet',
+  },
+  {
+    call: 'this.zoneAnnouncements.subzone',
+    band: 'medium',
+    gate: '',
+    surface: 'none',
+    why: 'resolves landmark announcements with ferry and dungeon suppression',
   },
   {
     call: 'this.showSubzone',
@@ -1872,7 +1893,15 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // surface (51 / 96 measured on the merged tree). The release's Eastbrook
       // ferry countdown panel (hud ferryHud) is one more chrome surface at the
       // fourth release/v0.44.0 base merge (97 measured on the merged tree).
-    ).toEqual({ window: 51, chrome: 97, none: 18 });
+      // The instance difficulty indicator adds one more chrome surface (98).
+      // chrome 98 -> 96, none 18 -> 19 after #4411: the death-screen surfaces
+      // fold into one three-site setDisplay row fed by death_screen_view, and
+      // its Release input hold is one state-only call.
+      // chrome 96 -> 97, none 19 -> 20 after the click-move marker gains its
+      // own HUD repaint row while the move-state holder stays state-only.
+      // none 20 -> 21 after Fieldcraft's Play Dead state-only HUD tick.
+      // PvP Resurrect's button/note painter adds one chrome row.
+    ).toEqual({ window: 51, chrome: 97, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

@@ -293,7 +293,14 @@ describe('the lock, threaded through save/load', () => {
     });
     const state = sim.serializeCharacter(pid);
     const saved = state?.inventory.find((s) => s.itemId === 'bone_fragments');
-    expect(saved).toEqual({ itemId: 'bone_fragments', count: 5, instance: { locked: true } });
+    // Locking stamps the cell the stack sat in (it is pinned there,
+    // inventory_order.ts), so the save carries that hint too.
+    expect(saved).toEqual({
+      itemId: 'bone_fragments',
+      count: 5,
+      instance: { locked: true },
+      slot: 0,
+    });
 
     const sim2 = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true });
     const pid2 = sim2.addPlayer('warrior', 'Lockwright', { state: state ?? undefined });
@@ -302,6 +309,7 @@ describe('the lock, threaded through save/load', () => {
       itemId: 'bone_fragments',
       count: 5,
       instance: { locked: true },
+      slot: 0,
       materialSources: [{ source: {}, count: 5 }],
     });
   });

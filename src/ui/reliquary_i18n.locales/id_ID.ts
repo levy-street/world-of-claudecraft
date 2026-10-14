@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Gudang Senjata Peperangan',
-    desc: 'Perhiasan dan senjata Peperangan yang dibeli dengan kehormatan hasil jerih payah.',
+    desc: 'Perhiasan, senjata, dan barang Peperangan yang dibeli dengan kehormatan hasil jerih payah.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galeri Garda Depan',

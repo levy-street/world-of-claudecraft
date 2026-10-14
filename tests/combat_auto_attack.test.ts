@@ -611,6 +611,19 @@ describe('auto_attack startAutoAttack: ranged engage must not pre-aggro (issue #
     expect(mob.aggroTargetId).toBe(null);
   });
 
+  it('a point-blank hunter Auto Shot does NOT pre-aggro before projectile impact', () => {
+    const { sim, p } = makeSim('hunter', 12);
+    const mob = spawnDummy(sim, p, 12, 2); // 2yd: melee range, but Auto Shot fires first
+    const events = capture(sim);
+    startAutoAttack(sim.ctx, p.id);
+    expect(p.autoAttack).toBe(true);
+    expect(mob.aiState).toBe('idle');
+    expect(mob.aggroTargetId).toBe(null);
+
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot', 60);
+    expect(mob.aggroTargetId).toBe(p.id);
+  });
+
   it('melee engage still seeds aggro immediately (unchanged behavior)', () => {
     const { sim, p } = makeSim('warrior', 12);
     const mob = spawnDummy(sim, p, 12, 2); // 2yd: melee range, a swing lands at once

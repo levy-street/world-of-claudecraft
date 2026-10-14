@@ -79,7 +79,7 @@ import { clearRiftBossDeathZones, instancePlayerIds } from '../rift/runs';
 // The helper that CONSTRUCTS one lives in mob/idle_rng.ts.
 import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
-import { clearThreat, hasEscapeStealth, stealthDetectionRadius } from '../threat';
+import { clearThreat, hasEscapeStealth, isFeigningDeath, stealthDetectionRadius } from '../threat';
 import {
   type Aura,
   angleTo,
@@ -558,8 +558,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           counters.aggroScanPlayerVisits++;
           if (
             e.dead ||
+            isFeigningDeath(e) ||
             hasShadowCloak(e) ||
-            gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog)
+            gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog) ||
+            e.auras.some((a) => a.id === 'rift_feather_glider')
           )
             return;
           const radius = Math.max(
@@ -584,8 +586,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         counters.aggroScanPlayerVisits++;
         if (
           e.dead ||
+          isFeigningDeath(e) ||
           hasShadowCloak(e) ||
-          gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog)
+          gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog) ||
+          e.auras.some((a) => a.id === 'rift_feather_glider')
         )
           return;
         if (isTrivialTo(mob, e)) return;

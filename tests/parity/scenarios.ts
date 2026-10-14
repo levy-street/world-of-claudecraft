@@ -4352,10 +4352,10 @@ function c5AutoAttack(): Scenario {
       'player auto-attack driver updatePlayerAutoAttack (swingTimer cadence, facing/range gates)',
       'meleeSwing white-hit table: single rng.next() miss/dodge + crit + armor mitigation',
       'queuedOnSwing heroic_strike spend + bonus (warrior, cooldown 0)',
-      'instant raptor_strike weaponStrike mixed into the hunter melee lane',
+      'instant raptor_strike weaponStrike mixed into the point-blank hunter lane',
       'overpowerUntil window set on a melee dodge',
       'spiked-hide reflect tail of meleeSwing (wild_boar Bristled Hide)',
-      'rangedSwing Auto Shot (hunter, physical, armor-mitigated, 8yd dead zone)',
+      'rangedSwing Auto Shot (hunter, physical, armor-mitigated, no dead zone since v0.45)',
       'rangedSwing Wand (mage, arcane, no armor, no dead zone)',
       'stopAutoAttack public entry',
     ],
@@ -4395,7 +4395,8 @@ function c5AutoAttack(): Scenario {
         rec.track(m.id);
         return m;
       };
-      // dz 1.5 = melee; dz 20 = hunter Auto Shot band (> 8yd dead zone, <= 35);
+      // dz 1.5 = melee (Auto Shot for the hunter, which has no dead zone since v0.45);
+      // dz 20 = hunter Auto Shot band (<= 35);
       // dz 15 = wand band (no dead zone). wild_boar carries the spiked-hide thorns.
       const mobWarrior = spawnTarget(eWarrior, 'wild_boar', 1.5, 3);
       const mobRogue = spawnTarget(eRogue, 'forest_wolf', 1.5, 6);
@@ -4416,8 +4417,8 @@ function c5AutoAttack(): Scenario {
       for (const pid of ids) sim.startAutoAttack(pid);
 
       for (let round = 0; round < 12; round++) {
-        // Re-pin each target to its lane distance + re-face so the ranged dead-zone
-        // (Auto Shot) vs no-dead-zone (Wand) branches stay deterministically exercised.
+        // Re-pin each target to its lane distance + re-face so the melee and ranged
+        // (Auto Shot, Wand) branches stay deterministically exercised.
         for (const [, e, m, dz] of pairs) {
           teleport(sim, m, e.pos.x, e.pos.z + dz);
           face(e, m);
@@ -4559,7 +4560,7 @@ function marketRoundTrip(): Scenario {
 // that returns the old piece to the bags via addItemSilent + recalcPlayerStats),
 // unequipItem (piece back to bags + recalc), useItem (food/drink sit, potion heal +
 // cooldown, elixir aura), discardItem, sellItem (vendorInRange gate + recordVendorBuyback
-// + meta.copper payout), sellAllJunk (bulk gray sweep + per-stack buyback record), and
+// + meta.copper payout), sellAllJunk (bulk gray sweep; plain grays record no buyback), and
 // buyBackItem (meta.copper spend + addItemSilent + onInventoryChangedForQuests). Pins
 // copper / inventory / equipment / vendorBuyback in samplePlayerMeta so the W2 move stays
 // byte-identical. None of these commands draw rng, so the draw-order log must be UNCHANGED
@@ -4575,7 +4576,7 @@ function inventoryVendor(): Scenario {
       'useItem food/drink (sit + eating/drinking slot), potion (heal + cooldown), elixir (applyAura)',
       'discardItem: removeItem the discarded count',
       'sellItem: vendorInRange gate + recordVendorBuyback + meta.copper payout',
-      'sellAllJunk: bulk gray sweep, per-stack buyback record, one summary line',
+      'sellAllJunk: bulk gray sweep, plain grays skip buyback, one summary line',
       'buyBackItem: meta.copper spend + addItemSilent + onInventoryChangedForQuests',
     ],
     build: () => new Sim({ seed: 5150, playerClass: 'warrior', noPlayer: true }),
@@ -4638,7 +4639,7 @@ function inventoryVendor(): Scenario {
       sim.sellItem('wolf_fang', 1, buyer);
       rec.snapshot('sold');
 
-      // 7) bulk-sell the remaining gray (sellAllJunk: one summary line + per-stack buyback).
+      // 7) bulk-sell the remaining gray (sellAllJunk: one summary line; plain grays skip buyback).
       // bandit_bandana was the fodder here until phase 11l promoted it to a
       // common trophy reagent; soggy_moccasin keeps the junk-sold beat live.
       sim.addItem('soggy_moccasin', 1, buyer);
@@ -6759,17 +6760,18 @@ function grixRespawnWindow(): Scenario {
 
 // Cat Form AUTO attacks, the arm druid_engines deliberately does not drive
 // (it scripts specials only): the fixed 1.0s cat cadence swings against a
-// bear-form control on the same staff swinging at the weapon speed. The cat
-// lane lands ~1.8x the swings (and rng draws) of the bear lane over the same
-// window, so a regression in the cat swing timer or the normalized mainhand
-// roll moves this golden's draw digest, not just its state hashes.
+// bear-form control on the same staff swinging at HALF the weapon speed (the
+// Groveheart rework pass 2 Bruin cadence, half damage per swing). The two
+// lanes swing at different fixed cadences, so a regression in either swing
+// timer or in the normalized mainhand roll moves this golden's draw digest,
+// not just its state hashes.
 function catFormAutoSwing(): Scenario {
   return {
     name: 'cat_form_auto_swing',
     coverage: [
       'class:druid (Wildfang cat + Bruin control)',
       'Cat Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll',
-      'bear-form control swinging at the equipped weapon speed on the same loadout',
+      'bear-form control swinging at half the equipped weapon speed on the same loadout',
     ],
     sampleEvery: 5,
     build: () => new Sim({ seed: 2931, playerClass: 'druid', noPlayer: true, autoEquip: true }),

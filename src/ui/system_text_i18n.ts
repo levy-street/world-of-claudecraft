@@ -64,9 +64,26 @@ export function localizeSystemText(text: string): string {
     'Trade window closed.': 'hudChrome.trade.windowClosed',
     'Loot method set to Group Loot.': 'hudChrome.masterLoot.methodGroup',
     'Loot Settings: Group Loot.': 'hudChrome.masterLoot.summaryGroup',
+    'Message of the day updated.': 'hudChrome.realmMotd.updated',
+    'Message of the day cleared.': 'hudChrome.realmMotd.cleared',
+    'No message of the day is set.': 'hudChrome.realmMotd.none',
+    'Usage: /motd "<message>" to set it, /motd clear to remove it.': 'hudChrome.realmMotd.usage',
+    'The message of the day could not be saved and will not survive a restart.':
+      'hudChrome.realmMotd.saveFailed',
   };
   const key = exact[text];
   if (key) return t(key);
+  // The realm message of the day (server/realm_motd.ts). Its body is free
+  // admin text, so this arm runs before every regex that opens on a (.+)
+  // capture: "Message of the day: Bob joins the party." is the MOTD, not a
+  // party line.
+  let match = /^Message of the day: ([\s\S]+)$/.exec(text);
+  if (match) return t('hudChrome.realmMotd.line', { text: match[1] });
+  match = /^The message of the day is limited to (\d+) characters\.$/.exec(text);
+  if (match)
+    return t('hudChrome.realmMotd.tooLong', {
+      max: formatNumber(Number(match[1]), { maximumFractionDigits: 0 }),
+    });
   // The DEPLOY-WINDOW alias for the one wire-carried reword this packet makes
   // (Masterwrought phase 18 QA, the Drowned Temple enterText de-dash). The sim
   // emits enterText as RAW ENGLISH and this loop matches it by exact bytes, so
@@ -96,7 +113,7 @@ export function localizeSystemText(text: string): string {
     if (text === delve.leaveText) return delveText(delve.id, 'leaveText');
   }
 
-  let match = /^Loot method set to Master Loot\. Master Looter: (.+)\.$/.exec(text);
+  match = /^Loot method set to Master Loot\. Master Looter: (.+)\.$/.exec(text);
   if (match) return t('hudChrome.masterLoot.methodMaster', { name: match[1] });
   match = /^Master Looter is now (.+)\.$/.exec(text);
   if (match) return t('hudChrome.masterLoot.looterChanged', { name: match[1] });

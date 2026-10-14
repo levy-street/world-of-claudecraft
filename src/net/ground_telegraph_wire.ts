@@ -1,7 +1,7 @@
 // Strict snapshot decoders for the persistent ground-telegraph rows the
 // server ships each snapshot: frost rings, Ignivar meteor warnings, Varkhul
 // Forgestorm warnings, Nythraxis Grave Eruption warnings and Grave Flames,
-// temporal hourglasses, and consecrations. Every field is re-validated and a
+// temporal hourglasses, consecrations, and spore bursters. Every field is re-validated and a
 // malformed row is DROPPED rather than rendered, so a version-skewed frame
 // never puts undefined into the world view. `applyGroundTelegraphSnapshot`
 // at the bottom is the one call ClientWorld.applySnapshot makes for the whole
@@ -19,6 +19,7 @@ import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
 import type {
   ActiveConsecration,
   ActiveFrostRing,
+  ActiveSporeBurst,
   ActiveTemporalHourglass,
   ActiveVarkhulAnvilMeteorWarning,
   ActiveVarkhulAssembly,
@@ -327,6 +328,36 @@ export function decodeConsecrations(value: unknown): ActiveConsecration[] {
   });
 }
 
+export function decodeSporeBursts(value: unknown): ActiveSporeBurst[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((value: unknown): ActiveSporeBurst[] => {
+    if (!value || typeof value !== 'object') return [];
+    const burst = value as Record<string, unknown>;
+    if (
+      typeof burst.id !== 'string' ||
+      ![burst.x, burst.z, burst.r, burst.dur, burst.rem].every(
+        (entry) => typeof entry === 'number' && Number.isFinite(entry),
+      ) ||
+      !Number.isSafeInteger(burst.src) ||
+      (burst.r as number) <= 0 ||
+      (burst.dur as number) <= 0 ||
+      (burst.rem as number) <= 0
+    )
+      return [];
+    return [
+      {
+        id: burst.id,
+        x: burst.x as number,
+        z: burst.z as number,
+        radius: burst.r as number,
+        duration: burst.dur as number,
+        remaining: Math.min(burst.rem as number, burst.dur as number),
+        sourceId: burst.src as number,
+      },
+    ];
+  });
+}
+
 // The IWorld combat-facet arrays the ground-telegraph snapshot families land
 // on. ClientWorld satisfies it structurally with its own field declarations,
 // so the IWorld member names stay on the world (the parity pin reads them
@@ -345,6 +376,7 @@ export interface GroundTelegraphSnapshotSink {
   activeVarkhulAssemblies: ActiveVarkhulAssembly[];
   activeTemporalHourglasses: ActiveTemporalHourglass[];
   activeConsecrations: ActiveConsecration[];
+  activeSporeBursts: ActiveSporeBurst[];
 }
 
 // Decode every ground-telegraph family of one snapshot frame onto the sink.
@@ -371,4 +403,5 @@ export function applyGroundTelegraphSnapshot(
   sink.activeVarkhulAssemblies = decodeVarkhulAssemblies(snap.varkhulAssemblies);
   sink.activeTemporalHourglasses = decodeTemporalHourglasses(snap.hourglasses);
   sink.activeConsecrations = decodeConsecrations(snap.consecrations);
+  sink.activeSporeBursts = decodeSporeBursts(snap.sporeBursts);
 }

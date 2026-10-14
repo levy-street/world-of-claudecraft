@@ -103,8 +103,7 @@ uses; check the neighbours before picking one.
   and the particle cloud in `src/render/vfx.ts`. They are depth-tested against
   the world and additive, so their order only affects blend arithmetic among
   themselves, not what a player can read. The warrior kit's crest and impact
-  volumes keep their fixed low orders (4 and 5) too; the one flat kind among
-  them (the baked shockwave) sits under every player and encounter rung. A boss
+  volumes keep their fixed low orders (4 and 5) too. A boss
   module whose vertical pieces belong to a floor mechanic (the Varkhul forge
   beams) still rides the ladder so its stack cannot tie with a player band.
 - The selection ring under a target and the static dungeon hazard pools stay on

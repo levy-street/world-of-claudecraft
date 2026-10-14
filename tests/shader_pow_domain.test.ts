@@ -134,6 +134,8 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ability_vfx/shells.ts': 1,
   // the armour-dye sRGB<->linear pair (bases clamped with max(c, 0))
   'src/render/characters/armor_dye.ts': 2,
+  // the spirit veil's fresnel rim (base 1.0 - clamp(x, 0.0, 1.0))
+  'src/render/characters/ghost_veil.ts': 1,
   'src/render/dungeon.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
   'src/render/hoard_entrance.ts': 3,

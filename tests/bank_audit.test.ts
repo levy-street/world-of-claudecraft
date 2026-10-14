@@ -1281,21 +1281,35 @@ describe('auditBank (vault container)', () => {
       ).toContain('unexpected_instance');
     }
 
-    const craft = auditBank({
-      ledgerRows: [
-        V({
-          id: 1,
-          character_id: 1,
-          op: 'craft_consume',
-          item_id: 'copper_ore',
-          count: 1,
-          purchased_slots_after: 1,
-          instance: identity,
-        }),
-      ],
-      characters: [],
-    });
-    expect(craft.map((f) => f.kind)).toContain('unexpected_instance');
+    const craftRow = (instance: unknown) =>
+      auditBank({
+        ledgerRows: [
+          V({
+            id: 1,
+            character_id: 1,
+            op: 'craft_consume',
+            item_id: 'copper_ore',
+            count: 1,
+            purchased_slots_after: 1,
+            instance,
+          }),
+        ],
+        characters: [],
+      }).map((f) => f.kind);
+
+    // A craft may spend the crafter's OWN signed units, keyed signer-only.
+    expect(craftRow(identity)).not.toContain('unexpected_instance');
+    // Anything beyond a bare signer is still identity no craft can consume.
+    for (const instance of [
+      { ...identity, instance: { signer: 'Ada', ilvl: 5 } },
+      { ...identity, instance: { signer: '' } },
+      { ...identity, instance: null },
+      { ...identity, craftedRecipeId: 'recipe_copper_bar' },
+      { ...identity, vaultSpecial: 2 },
+      { signer: 'Ada' },
+    ]) {
+      expect(craftRow(instance), JSON.stringify(instance)).toContain('unexpected_instance');
+    }
   });
 
   it('a guild-only op wearing the vault container is flagged', () => {

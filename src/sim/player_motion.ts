@@ -20,6 +20,8 @@
 import { type Collider, isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
 import { abilityCastSurvivesMovement, movementInputWouldMove } from './combat/cast_move_gate';
 import { isRooted, isStunned } from './combat/cc';
+import { SPOREMENDER_FORM_KIND, SPOREMENDER_MOVE_SPEED_MULT } from './combat/druid_sporemender';
+import { huntingMomentumSpeedMult } from './combat/hunting_momentum_speed';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { mountMoveSpeedPct } from './content/mounts';
 import { guardAndReportPose } from './finite_pose_guard';
@@ -245,7 +247,8 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   let slow = 1,
     speed = 1,
     cargo = 1,
-    formPassive = 1;
+    formPassive = 1,
+    formPace = 1;
   const slowImmune =
     isVeilboundMarchActive(e) || e.auras.some((aura) => aura.kind === 'slow_immunity');
   for (const a of e.auras) {
@@ -267,8 +270,15 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     if (a.id === WORLD_QUEST_DELIVERY_AURA_ID && a.kind === 'world_quest_cargo') {
       cargo = Math.min(cargo, WORLD_QUEST_DELIVERY_SPEED_MULT);
     }
+    // Groveheart's Sporemender Form walks 20% slower. A form penalty, not a
+    // snare: slow immunity never lifts it, and it scales the final speed so a
+    // Loping Stride burst or a slow still applies on top of the slower pace.
+    if (a.kind === SPOREMENDER_FORM_KIND) formPace = SPOREMENDER_MOVE_SPEED_MULT;
   }
   speed *= formPassive;
+  // Hunting Momentum (Fieldcraft): +15% per stack, its own layer like the form
+  // passive, so it multiplies the strongest temporary buff instead of losing to it.
+  speed *= huntingMomentumSpeedMult(e.auras);
   // Mounted travel: the active ground mount rides the entity mirror (mountKey,
   // synced over the wire like skin), so the online self-extrapolator predicts
   // mounted speed in lockstep with the server. Additive on top of the buff
@@ -279,7 +289,7 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
-  return slow * speed * cargo;
+  return slow * speed * cargo * formPace;
 }
 
 // Fiesta "Moon Boots" power-up: a buff_jump aura multiplies jump height.
@@ -419,6 +429,9 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         PLATFORM_CARRY_CLEARANCE;
   const steepSlide = steepFlagged ? terrainDownhill(p.pos.x, p.pos.z, deps.seed) : null;
   const steepGround = steepSlide !== null;
+  // A launched body that already stood settled (grounded, not sliding) when
+  // this step began has finished its throw (combat/knockback_launch.ts).
+  const launchSettled = p.onGround && !steepGround;
   // Move-to-cancel: any movement input during a summon channel cancels the cast.
   // Dismount channels (mountCastKey === '') remain fully rooted (handled by mountLocked below).
   if (p.mountCastRemaining > 0 && p.mountCastKey !== '' && hasMoveInput) {
@@ -467,7 +480,9 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Air control: held keys steer the airborne velocity toward the wish vector.
   // Also what lets a jump STARTED in place drift forward, and a fall off a
   // ledge stay steerable, instead of the old frozen-at-takeoff trajectory.
-  const airSteering = moving && !p.onGround && !swimming;
+  // A hostile airborne knockback (combat/knockback_launch.ts) flies its
+  // straight line unsteered: held keys cannot curl the throw back to a ledge.
+  const airSteering = moving && !p.onGround && !swimming && !p.launchedBy;
   const slide = steepSlide;
   if (slide || movingOnGround || airSteering || (!p.onGround && (p.vx !== 0 || p.vz !== 0))) {
     if (slide && p.castingAbility) deps.cancelCast(p);
@@ -555,6 +570,14 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   }
 
   verticalPass(deps, p, inp, wishX, wishZ, wishSpeed, swimming, steepGround, mountLocked, platform);
+  // The throw ends once the body stands settled for a whole step, AFTER the
+  // vertical pass has dealt and credited any fall damage it owed (a touchdown
+  // on a steep lip keeps it: the slide off the edge is still the throw), or
+  // when its step budget runs out, whichever comes first.
+  if (p.launchedBy) {
+    p.launchedBy.ticksLeft -= 1;
+    if (p.launchedBy.ticksLeft <= 0 || (launchSettled && p.onGround)) p.launchedBy = undefined;
+  }
   standoffPass(deps, p, stepStartX, stepStartZ, wishX, wishZ, wishSpeed, movingOnGround, platform);
   // Backstop for the NaN freeze class (finite_pose_guard.ts): whatever the
   // step did, the pose it hands to the rest of the tick is finite.

@@ -20,7 +20,6 @@
 // shared with the route markers: the same programs). Nothing here runs per frame.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {
   WYRMWATCH_HARBOR_ORIGIN,
   WYRMWATCH_HARBOR_PATH,
@@ -31,7 +30,7 @@ import {
   HARBOR_HOUSE_FLOOR_ABOVE_WATER,
 } from '../sim/content/wyrmwatch_harbor_house';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
-import { loadGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 import {
@@ -57,7 +56,7 @@ import { HOUSE_SHELL_PARTS, type HouseShellPart } from './wyrmwatch_harbor_house
 
 const HARBOR_URL = '/models/props/wyrmwatch_harbor.glb';
 
-let loaded: GLTF | null = null;
+let loaded: LoadedGltf | null = null;
 let loadTask: Promise<void> | null = null;
 
 export function prepareWyrmwatchHarborAssets(): Promise<void> {
@@ -102,7 +101,7 @@ export function resetWyrmwatchHarborCaches(): void {
   clearHarborHouseShell();
 }
 
-function buildTemplate(gltf: GLTF, keep: readonly string[]): HarborTemplate {
+function buildTemplate(gltf: LoadedGltf, keep: readonly string[]): HarborTemplate {
   // loader cache results are immutable: read a clone
   const root = gltf.scene.clone(true);
   root.updateMatrixWorld(true);
@@ -258,7 +257,7 @@ export function wyrmwatchHarborPrewarmParts(): readonly HarborPart[] {
 export const wyrmwatchHarborInternalsForTest = {
   assetUrl: HARBOR_URL,
   /** Hand a parsed GLB to the preload slot (Node tests have no fetch path). */
-  setLoadedGltfForTest(gltf: GLTF | null): void {
+  setLoadedGltfForTest(gltf: LoadedGltf | null): void {
     loaded = gltf;
     resetWyrmwatchHarborCaches();
   },

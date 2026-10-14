@@ -25,6 +25,17 @@ export function displacePlayer(
   // click-entry mid-cast is reachable and the rule is scoped to every
   // teleport, not the likely ones.
   cancelProfessionSessionOnDisplacement(ctx, p);
+  // A teleport that starts on a rift floor (the Allied Hearthstone is the one
+  // reachable caller today) must send the rift exit: the online client mirrors
+  // its rift floor from that event alone and otherwise kept the rift map at the
+  // landing. A no-op everywhere outside the rift band.
+  ctx.emitRiftDeparture(p.id, p.pos);
+  // Nor carry an ice-slide pose off the floor: only the in-band rift trigger
+  // clears it, so it would stay latched (and the online self-motion predictor
+  // off) wherever the player lands.
+  p.riftSliding = false;
+  p.riftSlideDirX = 0;
+  p.riftSlideDirZ = 0;
   p.pos = ctx.groundPos(landing.x, landing.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);

@@ -765,6 +765,14 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 2 },
     reflowAllow: {},
   },
+  // The death screen's PvP Resurrect button and note (hud/death/): every write,
+  // the countdown text, the disabled attribute and the two displays, rides the
+  // elided writers; the press is bound once at construction.
+  {
+    file: 'hud/death/pvp_resurrect_painter.ts',
+    allow: {},
+    reflowAllow: {},
+  },
   // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
   // death or an expiry only (the per-frame update elides on the pure core's
   // reference equality); the setAttribute runs once at mount.
@@ -832,6 +840,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // element at all: it is the mark read the M-map plate and the minimap's cached battleground
 // raster share, so it resolves nothing and reads nothing.
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
+  { file: 'ferry_port_map_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/rift/rift_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
@@ -937,6 +946,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   {
     file: 'bags_window.ts',
     reflowAllow: { '.getBoundingClientRect': 1, '.scrollTop': 4 },
+    driverAllow: {},
+  },
+  // The Social window's row right-click: ONE row rect, read lazily and only when a
+  // contextmenu arrives at 0,0 (a keyboard or synthetic open), to seat the player
+  // menu under the row. A pointer right-click uses its own coords and reads nothing;
+  // no repaint or clock ever reaches it.
+  {
+    file: 'social_window.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },
   // The two touch gesture layers of the mobile action ring, one entry each because they

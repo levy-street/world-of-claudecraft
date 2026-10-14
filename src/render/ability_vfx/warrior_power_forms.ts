@@ -20,6 +20,11 @@ import { warriorBloodTexture, warriorRockTexture } from './production_assets';
 import type { AbilityVfxRibbons, RibbonAnchor } from './ribbons';
 import { warriorAvatarBracerShape } from './warrior_avatar_bracer';
 import { warriorAvatarChestShape } from './warrior_avatar_shape';
+import {
+  type WarriorKitSurface,
+  warriorKitSlotMap,
+  warriorKitSurface,
+} from './warrior_kit_surface';
 import { warriorPowerGeometry } from './warrior_power_geometry';
 import { animateWarriorRage } from './warrior_rage_material';
 
@@ -39,6 +44,12 @@ const WEARERS = 64,
   SOLIDS = 16;
 const PIECE_MESH = [0, 2, 2, 3, 3] as const;
 const CAPACITY = [SOLIDS, SOLIDS * 6, SOLIDS * 2, SOLIDS * 2] as const;
+const POWER_FORM_NAMES = [
+  'warrior-avatar-chest',
+  'warrior-reckless-crown',
+  'warrior-avatar-bracers',
+  'warrior-avatar-shins',
+] as const;
 
 /** Offensive forms own four instanced draws, never attack or guard
  * slots. A cold/full pool retains one full shoulder/crown outline per wearer.
@@ -46,7 +57,7 @@ const CAPACITY = [SOLIDS, SOLIDS * 6, SOLIDS * 2, SOLIDS * 2] as const;
 export class WarriorPowerForms {
   /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
   spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
-  readonly meshes: THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>[] = [];
+  readonly meshes: THREE.InstancedMesh<THREE.BufferGeometry, WarriorKitSurface>[] = [];
   readonly preparation: GuardPrewarm[] = [];
   private readonly wearers = new Map<number, Wearer>();
   private readonly matrix = new THREE.Matrix4();
@@ -79,11 +90,12 @@ export class WarriorPowerForms {
   constructor(scene: THREE.Scene) {
     for (let kind = 0; kind < 4; kind++) {
       const blood = kind === 1;
+      const name = POWER_FORM_NAMES[kind];
       const material = modulateEmissiveByVertexColor(
-        new THREE.MeshStandardMaterial({
+        warriorKitSurface(name, {
           color: 0xffffff,
           vertexColors: true,
-          map: blood ? warriorBloodTexture() : warriorRockTexture(),
+          map: (blood ? warriorBloodTexture() : warriorRockTexture()) ?? warriorKitSlotMap(),
           roughness: blood ? 0.42 : 0.96,
           metalness: blood ? 0.08 : 0.025,
           emissive: 0xffffff,
@@ -98,12 +110,7 @@ export class WarriorPowerForms {
             ? warriorAvatarBracerShape()
             : warriorPowerGeometry(blood);
       const mesh = new THREE.InstancedMesh(geometry, material, CAPACITY[kind]);
-      mesh.name = [
-        'warrior-avatar-chest',
-        'warrior-reckless-crown',
-        'warrior-avatar-bracers',
-        'warrior-avatar-shins',
-      ][kind];
+      mesh.name = name;
       tagCastVfxKit(mesh);
       mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
@@ -134,10 +141,7 @@ export class WarriorPowerForms {
                 const texture = kind === 1 ? warriorBloodTexture() : warriorRockTexture();
                 if (!texture) throw Error('Warrior power texture is not prepared');
                 const material = this.meshes[kind].material;
-                if (material.map !== texture) {
-                  material.map = texture;
-                  material.needsUpdate = true;
-                }
+                material.map = texture;
               },
             },
             ...prep.units(host).map((unit) => ({ ...unit, id: `power-${kind}:${unit.id}` })),

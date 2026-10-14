@@ -15,6 +15,7 @@ import {
   writeSentenceBurstPlan,
   writeSentenceInvocationPlan,
 } from './sentence_vfx_core';
+import { spellEffectsMuted } from './spell_effects_switch';
 
 const POOL_SIZE = 8;
 const BASE_SPARK_COUNT = 42;
@@ -809,6 +810,7 @@ export class SentenceVfx {
   }
 
   trigger(sourceId: number, targetId: number, condemnation: number, threadCount = 0): boolean {
+    if (spellEffectsMuted(sourceId)) return false;
     if (!this.anchor(targetId, 0, this.anchorProbe)) return false;
     const slot = this.slots[this.cursor];
     this.cursor = (this.cursor + 1) % this.slots.length;

@@ -77,6 +77,7 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       case 'aoeRoot':
       case 'chainDamage':
       case 'groundAoE':
+      case 'sporeBurst':
       case 'drainTick':
       case 'valkyrsCalling':
       case 'hunterStampede':
@@ -158,19 +159,9 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
           }) + suffix(secondary)
         );
       }
-      if (
-        secondary.perComboTotal === undefined &&
-        secondary.perComboDuration === undefined &&
-        secondary.directPct === undefined &&
-        secondary.interval > 0
-      ) {
-        const ticks = secondary.duration / secondary.interval;
-        const total = Math.max(1, Math.round(secondary.total / ticks)) * ticks;
-        return formatAbilityNumber(total) + suffix(secondary);
-      }
-      return formatAbilityNumber(secondary.total) + suffix(secondary);
+      return formatAbilityNumber(dotDisplayTotal(secondary)) + suffix(secondary);
     case 'hot': {
-      // v0.42 (docs/design/class-balance-v042.md): a pure-HoT $d (Wildbloom
+      // v0.42 (docs/design/class-balance-v042.md): a pure-HoT $d (Sporemending
       // has no primary hit, so its total renders here, not in the primary
       // switch above) takes the same combined-total treatment as $o.
       const combined = scaling ? abilityPrimaryHealingTotal(res, secondary, scaling) : null;
@@ -187,6 +178,23 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
     default:
       return '';
   }
+}
+
+// A plain dot lands a whole number per tick (effect_dispatch.ts rounds
+// total / ticks), so the total it really deals is that tick times the tick
+// count, which is what the tooltip shows (Flense rank 2: 99 authored lands as
+// 6 ticks of 17). Combo-scaled and direct-fraction dots keep the authored total.
+function dotDisplayTotal(eff: Extract<AbilityEffect, { type: 'dot' }>): number {
+  if (
+    eff.perComboTotal !== undefined ||
+    eff.perComboDuration !== undefined ||
+    eff.directPct !== undefined ||
+    !(eff.interval > 0)
+  ) {
+    return eff.total;
+  }
+  const ticks = eff.duration / eff.interval;
+  return Math.max(1, Math.round(eff.total / ticks)) * ticks;
 }
 
 function abilityAmountRange(min: number, max: number): string {
@@ -236,7 +244,7 @@ function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): st
       }) + bonus
     );
   }
-  return formatAbilityNumber(eff.total) + bonus;
+  return formatAbilityNumber(eff.type === 'dot' ? dotDisplayTotal(eff) : eff.total) + bonus;
 }
 
 /** Which description field the RESOLVED ability should read: the stealth-free
@@ -272,11 +280,33 @@ export function abilityDisplayDescription(
   const duration = abilityDurationValue(res);
   const hourglass = abilityTemporalHourglassValues(res);
   const directHeal = res.effects.find((effect) => effect.type === 'heal');
+  // Spore Burst's {healing} is its heal half, shown through the aoeHeal path
+  // so the AoE Healing Power rider and the Groveheart factor read as combat
+  // resolves them (effect_dispatch.ts 'sporeBurst').
+  const sporeBurst = res.effects.find(
+    (effect): effect is Extract<AbilityEffect, { type: 'sporeBurst' }> =>
+      effect.type === 'sporeBurst',
+  );
   const healingText = hourglass
     ? formatAbilityNumber(hourglass.healing)
     : directHeal
       ? abilityEffectText({ ...res, effects: [directHeal] }, scaling)
-      : '';
+      : sporeBurst
+        ? abilityEffectText(
+            {
+              ...res,
+              effects: [
+                {
+                  type: 'aoeHeal',
+                  min: sporeBurst.healMin,
+                  max: sporeBurst.healMax,
+                  radius: sporeBurst.radius,
+                },
+              ],
+            },
+            scaling,
+          )
+        : '';
   // {rage} splices the RESOLVED gainResource total, so a talent that raises the
   // granted amount (Blood Offering on Blood Toll) shows in the tooltip.
   const rageGained = res.effects.reduce(

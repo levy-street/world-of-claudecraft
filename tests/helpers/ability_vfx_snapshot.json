@@ -852,6 +852,10 @@
       "spec": "0a9fe28fe492823b5c202691a84b611457bee6cc53d8d96299d1ac6b95eaad7a",
       "full": "67988b52637d59b37359f89a1b3d1fd4479b3864d12a0f1e0acf66159205df9c"
     },
+    "natures_boon": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
     "needle_of_fate": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
@@ -887,6 +891,10 @@
     "perfect_moment": {
       "spec": "b0e17955aafe6a950cc7899693d0788bc8825af64225a9f0b22d928a458c120f",
       "full": "a1832578c80b0214cb6222cb9372f8b0a197d75dce7041904cfbc14e7b83d691"
+    },
+    "play_dead": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "polymorph": {
       "spec": "f61739cdd7d641013b12e38044304eeb9389fbb0729e0ef35e13c6f79005a3f0",
@@ -1088,6 +1096,10 @@
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
+    "scratch": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
     "seal_of_righteousness": {
       "spec": "6e155ad9745f9ac4a9d08ff2a3f734540b11f94314b7fd114829cde16900f219",
       "full": "723ad5ff1fdddfb3c71b50acee7d93debc77b78037d4304ff23f2dbe9438585c"
@@ -1196,6 +1208,14 @@
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
+    "spore_burst": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "sporemender_form": {
+      "spec": "be8c3cd866f12bbac08bb2938721bc05b79a609b0fa2dd718012933b4b33720e",
+      "full": "22cd3a9918634886f25480e63494ace8e3ad6b59253b0e268f93965ad7957de2"
+    },
     "sprint": {
       "spec": "5ca3a151a42b6b014ce6115b878176ce377b74e1c88029825f6a2d0c7792831d",
       "full": "c3d1907d4fa347a510864fc3117fd14312db7ffaa9335e0ab4bb28e358876a86"
@@ -1267,6 +1287,10 @@
     "swipe": {
       "spec": "f82610e2d04f0a2599d5fde839f16ee1c8205cdc24f7ae28208d79303bf20a12",
       "full": "89146e5558a58d43a056a6562bc7698cdaf31a439db2ee0787db9e59dcd24f61"
+    },
+    "tactical_camo": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "tame_beast": {
       "spec": "70782e8dbd497dfddc2afd870cbbe4d8883d170c14cce5cb7df592ffe57f104b",

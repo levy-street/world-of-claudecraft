@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildingCameraHeight } from '../sim/building_layout';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
@@ -24,7 +23,7 @@ import {
 import { hash2 } from '../sim/rng';
 import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
-import { loadGltf, releaseGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { attachBiomeHaze } from './biome_haze_field';
 import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
@@ -443,7 +442,7 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
 
-const loadedProps = new Map<string, GLTF>();
+const loadedProps = new Map<string, LoadedGltf>();
 const propLoadTasks = new Map<string, Promise<void>>();
 const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
 

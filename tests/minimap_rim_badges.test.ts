@@ -132,6 +132,7 @@ describe('minimap rim badges', () => {
       const html = read(entry);
       expect(html, entry).toMatch(/id="zone-label" class="ui-cin ui-outline"/);
       expect(html, entry).toMatch(/id="raid-lockout"[^>]*class="ui-disc"/);
+      expect(html, entry).toMatch(/id="instance-difficulty"[^>]*class="ui-disc"/);
       expect(html, entry).toMatch(/id="mail-indicator"[^>]*class="ui-disc"/);
       expect(html, entry).toMatch(/id="market-indicator"[^>]*class="ui-disc"/);
       // The clock is interactive, so the board's medallion must retain native

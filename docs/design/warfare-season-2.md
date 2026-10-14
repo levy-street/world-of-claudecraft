@@ -31,7 +31,9 @@ cheaper entry tier:
 
 Season 2 combines the two. **Every 2-piece bonus is PvP utility, and every 4-piece builds on
 its own 2-piece.** The 2-piece bends a mobility, control or defensive button. The 4-piece
-adds a follow-up that fires off that button.
+adds a follow-up that fires off that button. The caster sets (Intellect pieces:
+`VANGUARD_CASTER_SET_IDS` in `content/vanguard_set_bonuses.ts`) also grant immunity to
+damage cast pushback at two pieces, the rider the Season 1 caster families carry.
 
 ## The PvE promise: never better than the raid tier in raids
 
@@ -305,7 +307,7 @@ Implementation routes:
 ### Marksmanship (`marksmanship`, signature Cold Focus `cold_focus`)
 - **Set:** Farsight Harness. Farsight Coif, Farsight Spaulders, Farsight Jerkin, Farsight Legguards, Farsight Gauntlets.
 - **2pc:** "Trailbreak's cooldown is reduced by 4 sec."
-  Route: DATA, ability row `{ ability: 'trailbreak', cooldownFlat: -4 }` (15 to 11 sec,
+  Route: DATA, ability row `{ ability: 'trailbreak', cooldownFlat: -4 }` (20 to 16 sec,
   12 yd backward leap).
 - **4pc:** "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more
   than once every 15 sec."

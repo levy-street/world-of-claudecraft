@@ -58,6 +58,19 @@ export interface ActiveConsecration {
   remaining: number;
 }
 
+/** A planted Spore Burst mushroom (druid): `remaining` counts its fuse down
+ *  from `duration` to the burst. `sourceId` is the caster, so each viewer can
+ *  colour the timer by its own hostility to them. */
+export interface ActiveSporeBurst {
+  id: string;
+  x: number;
+  z: number;
+  radius: number;
+  duration: number;
+  remaining: number;
+  sourceId: number;
+}
+
 export interface GroundAimPointXZ {
   x: number;
   z: number;
@@ -91,6 +104,8 @@ export interface IWorldCombat {
   activeVarkhulCinderOrbProjectiles: ActiveVarkhulCinderOrbProjectile[];
   activeTemporalHourglasses: ActiveTemporalHourglass[];
   activeConsecrations: ActiveConsecration[];
+  /** Planted Spore Burst mushrooms, reconnect-safe from the snapshot. */
+  activeSporeBursts: ActiveSporeBurst[];
   /** Remaining server-authoritative lifetime of a reactive ability window. */
   reactiveAbilityWindowRemaining(abilityId: string): number;
   /** Best-effort adjusted landing preview for a ground-aimed placement
@@ -125,6 +140,10 @@ export interface IWorldCombat {
   releaseSpirit(): void;
   resurrectAtCorpse(): void;
   resurrectAtSpiritHealer(): WorldInteractionOutcome;
+  // PvP Resurrect: a corpse whose death a hostile player had a hand in (the
+  // player's Entity.pvpResurrect) releases and stands up at the graveyard at
+  // full health and mana with no sickness (src/sim/pvp/pvp_resurrect.ts).
+  pvpResurrect(): void;
   /** Accept or decline the currently pending player-cast resurrection offer. */
   respondToResurrection(accept: boolean): void;
 }

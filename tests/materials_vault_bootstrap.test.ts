@@ -24,7 +24,10 @@ describe('materials_vault as the first-evaluated sim module', () => {
     // Core of the Last Flame (the recipe-pending crucible reagent that the
     // release promoted out of vendor junk) for 117 on the merged catalog.
     // Both parents' own derivations, one union; no rule changed.
-    expect(ids.size).toBe(117);
+    // 117 -> 118 with the World PvP trophy skull (pvp/world_pvp_trophy.ts): a
+    // keepsake no recipe consumes, ruled IN so its stack keeps per-victim
+    // provenance through the material-source machinery.
+    expect(ids.size).toBe(118);
     expect(ids.has('iron_ore')).toBe(true);
     expect(ids.has('arcanite_bar')).toBe(true);
     expect(ids.has('guardian_core')).toBe(false);

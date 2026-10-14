@@ -469,6 +469,9 @@ const questStringsEn = {
       treasureMapEarned: 'Every world quest of the day is done: you found a {map}.',
       treasureMapLost:
         'Every world quest of the day is done, but your bags have no room for the treasure map.',
+      // A world quest reward item the bags could not hold, posted instead
+      // (src/sim/world_quest_reward_mail.ts). {items} is a list of item names.
+      worldQuestRewardMailed: 'Your bags are full. Your reward was sent to your mailbox: {items}.',
       treasureMapRead: 'You study the {map}. The X lies somewhere in {zone}.',
       treasureMapUpgraded: 'The map is redrawn in finer ink: it is now a {map}.',
       treasureVaultOpened: 'The ground gives way. A buried hoard lies open before you.',

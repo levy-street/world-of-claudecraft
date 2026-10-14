@@ -345,4 +345,24 @@ describe('talent production save migrations', () => {
     expect(second.inventory).toEqual(first.inventory);
     expect(second.bank).toEqual(first.bank);
   });
+
+  it('preserves loadout gear sets during content revision migration', () => {
+    const legacy = cloneFixture();
+    legacy.contentRevision = 1;
+    legacy.loadouts = [
+      {
+        name: 'PvP Gear',
+        alloc: { spec: 'fury', rows: {} },
+        bar: ['bloodthirst'],
+        gear: {
+          waist: { itemId: 'molten_clinker_girdle', pin: 'test_pin' },
+        },
+      },
+    ];
+
+    const migrated = migrateCharacterTalentsV2('warrior', legacy);
+    expect(migrated.loadouts?.[0]?.gear).toEqual({
+      waist: { itemId: 'molten_clinker_girdle', pin: 'test_pin' },
+    });
+  });
 });

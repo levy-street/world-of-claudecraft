@@ -25,6 +25,11 @@ const LEGACY_STOCK_FRAME_WIDTHS: Partial<Record<string, number>> = {
 export const SETTING_RANGES = {
   cameraSpeed: { min: 0.25, max: 1.25, def: 0.7 },
   sfxVolume: { min: 0, max: 1, def: 0.8 },
+  // The environment beds (wind, birds, rain, water, dungeon air, campfires,
+  // forges), split off sfxVolume onto their own bus
+  // (src/game/sfx_mix_bus.ts). A profile saved before the split inherits its
+  // stored sfxVolume (INHERITED_NUMERIC_DEFAULTS), so nobody's mix jumps.
+  ambientVolume: { min: 0, max: 1, def: 0.8 },
   musicVolume: { min: 0, max: 1, def: 0.8 },
   // Pre-rendered NPC voice-line clips (public/audio/voice). Slightly louder than
   // SFX by default so dialogue reads over ambient combat noise.
@@ -180,6 +185,11 @@ export const SETTING_RANGES = {
   // Scales the hover tooltip's text so small-screen / low-vision players can
   // read item & ability tooltips without squinting.
   tooltipScale: { min: 0.85, max: 1.5, def: 1 },
+  // The World Map atlas rail's width in author px, set by dragging (or keying)
+  // the divider between the rail and the map so long quest titles and the
+  // world-quest board stop truncating. Mirrors the range in
+  // src/ui/hud/map/map_rail_width_core.ts (pinned equal by its test).
+  mapAtlasRailWidth: { min: 240, max: 560, def: 300 },
   // Scales the combat-log / chat text independently of tooltips. The ceiling
   // is 2.5 (not the 1.4 the other comfort scales stop near) because chat is
   // 11px at stock: on a 4K display at 100% OS scaling, 1.4 still leaves it
@@ -397,8 +407,10 @@ export const BOOL_SETTINGS = {
   auraBarBelowFrame: { def: false },
   // off by default (the target's aura strip sits above the frame, since the
   // stock target seat is directly over the action bar): hangs the strip below
-  // the frame instead, the classic layout, for a frame the player has moved
-  // somewhere with room beneath it. Purely presentational (main.ts toggles
+  // the frame instead, the classic layout. On the desktop stock seat the frame
+  // (and the player's cast bar and swing timers) rises by one strip row
+  // (--target-aura-band-lift) so the strip's first row clears the hotbar; a
+  // moved frame keeps its own position. Purely presentational (main.ts toggles
   // body.target-auras-below-frame via src/ui/aura_bar_side.ts; hud.css keys
   // off it) and a deliberate player choice, never inferred from the frame's
   // move state. See hud.css #target-frame > #tf-debuffs.
@@ -421,6 +433,8 @@ export const BOOL_SETTINGS = {
   // separate detailed target-aura panel. Off by default so the tooltip stays
   // uncluttered until a player opts in.
   showAuraCaster: { def: false },
+  // Mouse hover only; keyboard focus and touch inspection stay available.
+  spellTooltipOnHover: { def: true },
   // on by default: Clique-style mouseover casting. Pressing an action-bar key
   // for a friendly (heal/buff) ability while the cursor is over a party frame
   // casts it on the hovered member without touching the current target (read
@@ -456,6 +470,13 @@ export const BOOL_SETTINGS = {
   // an accessibility choice, never a graphics-tier knob. Read live by the
   // renderer (setHazardPaletteMode) plus a body class hook (interface_body_classes.ts).
   colorblindMode: { def: false },
+  // off by default: Classic Combat Text. The default floating combat text is the
+  // vivid look (outgoing spell damage in its school's colour, a heavier outline,
+  // numbers that fan out sideways, and a louder crit and big-hit emphasis). On
+  // restores the shipped classic look: white auto-attacks and gold abilities
+  // rising straight up. Purely presentational: both show every number; mirrored
+  // onto a body class (interface_body_classes.ts) the FCT painter reads.
+  classicCombatText: { def: false },
   // off by default: an opt-in frosted-glass blur behind HUD panels & windows.
   // Off keeps the classic crisp look (and zero GPU cost); on softens the world
   // showing through translucent frames.
@@ -625,6 +646,14 @@ export const BOOL_SETTINGS = {
   // passes per frame, so the player who wants the quietest water gets it as
   // an opt-in rather than an opt-out.
   waterRipples: { def: false },
+  // on by default: the spell visual effects players and their pets cast in
+  // the 3D world (cast glows, projectiles, impacts, lingers, buff orbits and
+  // shells). Off is a preference for a calmer or cheaper screen that never
+  // hides a read a player acts on: every enemy effect, area telegraph rings,
+  // hard crowd-control bands, windup animations, cast bars and the HUD all
+  // stay. render/spell_effects_switch.ts owns the split; main.ts pushes the
+  // value there (render never reads here).
+  spellEffects: { def: true },
   // off by default: the over-the-shoulder Action Cam (render/action_cam_core.ts).
   // A camera framing preference like the FOV slider; it never changes zoom or
   // hides anything, and the side lives in actionCamShoulder.
@@ -711,6 +740,15 @@ function clampNumeric(key: NumericSettingKey, v: number): number {
   return Math.min(r.max, Math.max(r.min, v));
 }
 
+/**
+ * Load-time only: a numeric key split off an older one starts from the stored
+ * value of the key it was split from when the profile has no value of its own,
+ * so the split never changes what a player already hears or sees.
+ */
+const INHERITED_NUMERIC_DEFAULTS: Partial<Record<NumericSettingKey, NumericSettingKey>> = {
+  ambientVolume: 'sfxVolume',
+};
+
 /** Load-time only: see LEGACY_STOCK_FRAME_WIDTHS. */
 function migrateStoredNumeric(key: NumericSettingKey, v: number): number {
   return LEGACY_STOCK_FRAME_WIDTHS[key] === v ? SETTING_RANGES[key].def : v;
@@ -771,6 +809,12 @@ export class Settings {
         typeof v === 'number'
           ? clampNumeric(key, migrateStoredNumeric(key, v))
           : SETTING_RANGES[key].def;
+    }
+    for (const [key, from] of Object.entries(INHERITED_NUMERIC_DEFAULTS) as [
+      NumericSettingKey,
+      NumericSettingKey,
+    ][]) {
+      if (typeof raw[key] !== 'number' && typeof raw[from] === 'number') out[key] = out[from];
     }
     for (const key of BOOL_KEYS) {
       const v = raw[key];

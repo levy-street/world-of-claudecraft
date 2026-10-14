@@ -26,7 +26,7 @@ const mapGestureSource = sourceSection(
 const zoomMapSource = sourceSection(
   hudSource,
   'private zoomMap(factor: number): void {',
-  '// The map window shows the zone band',
+  'private clearMapHitState(canvas: HTMLCanvasElement): void {',
 );
 
 function pointerHarness() {

@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import { GFX } from './gfx';
 import { markPointLightSource } from './point_light_carriers_core';
+import { spellEffectsMuted } from './spell_effects_switch';
 
 interface Pulse {
   light: THREE.PointLight;
@@ -56,6 +57,10 @@ export class LightPulses {
 
   /** Flash a short-lived point light at a world position. */
   pulse(at: THREE.Vector3, school: string, intensity = 6, duration = 0.45, range = 7): void {
+    // Every caller is a spell or ability moment: a pulse inside a muted
+    // caster's event is skipped (spell_effects_switch.ts). The lights stay
+    // allocated either way, so no program or light count changes.
+    if (spellEffectsMuted()) return;
     const cap = Math.min(this.capacity(), this.pool.length);
     if (cap === 0) return;
     let slot: Pulse | undefined;

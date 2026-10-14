@@ -137,6 +137,7 @@ import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { REALM_BUILDER_SCHEMA } from './realm_builder_db';
+import { REALM_MOTD_SCHEMA } from './realm_motd_db';
 import { chooseArchiveName } from './reclaim_name';
 import { attachSchemaNoticeForwarder } from './schema_notices';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
@@ -1300,6 +1301,9 @@ export async function ensureSchema(): Promise<void> {
     // them" column, so it runs after SCHEMA. Bounded at one row a month and
     // deliberately keep-forever: deleting an old row erases a real award.
     await client.query(REALM_BUILDER_SCHEMA);
+    // The admin-set realm message of the day (server/realm_motd.ts): one row
+    // per realm, FK-references accounts(id) for who set it, so after SCHEMA.
+    await client.query(REALM_MOTD_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);

@@ -5,6 +5,7 @@ export const CHARACTER_FORM_FLAG = {
   travel: 1 << 3,
   fireball: 1 << 4,
   metamorph: 1 << 5,
+  sporemender: 1 << 6,
 } as const;
 
 export const CHARACTER_FORM_READY = {
@@ -13,6 +14,7 @@ export const CHARACTER_FORM_READY = {
   cat: 1 << 2,
   travel: 1 << 3,
   metamorph: 1 << 4,
+  sporemender: 1 << 5,
 } as const;
 
 export type CharacterFormVisual =
@@ -22,7 +24,8 @@ export type CharacterFormVisual =
   | 'cat'
   | 'travel'
   | 'fireball'
-  | 'metamorph';
+  | 'metamorph'
+  | 'sporemender';
 
 export interface CharacterFormVisibility {
   base: boolean;
@@ -31,6 +34,7 @@ export interface CharacterFormVisibility {
   cat: boolean;
   travel: boolean;
   metamorph: boolean;
+  sporemender: boolean;
 }
 
 export interface CharacterFormShadowPlan {
@@ -56,7 +60,8 @@ export type CharacterFormKey =
   | 'form_bear'
   | 'form_cat'
   | 'form_travel'
-  | 'form_metamorph';
+  | 'form_metamorph'
+  | 'form_sporemender';
 
 /** The renderer shares one cat/wolf slot, but the two classes keep distinct
  *  assets. Resolve at construction so both stay behind the existing form gate. */
@@ -76,6 +81,7 @@ export function characterFormMaskForAura(aura: AuraIdentity): number {
     return CHARACTER_FORM_FLAG.cat;
   }
   if (aura.kind === 'form_travel') return CHARACTER_FORM_FLAG.travel;
+  if (aura.kind === 'form_sporemender') return CHARACTER_FORM_FLAG.sporemender;
   if (aura.kind === 'form_fireball') return CHARACTER_FORM_FLAG.fireball;
   // `form_lich` is the current Necromancy marker and `form_metamorph` is the
   // legacy Warlock marker. They intentionally share presentation only; their
@@ -94,6 +100,7 @@ export function requestedCharacterForm(mask: number): CharacterFormVisual {
   if (mask & CHARACTER_FORM_FLAG.travel) return 'travel';
   if (mask & CHARACTER_FORM_FLAG.fireball) return 'fireball';
   if (mask & CHARACTER_FORM_FLAG.metamorph) return 'metamorph';
+  if (mask & CHARACTER_FORM_FLAG.sporemender) return 'sporemender';
   return 'base';
 }
 
@@ -109,6 +116,8 @@ function readyFlagFor(form: CharacterFormVisual): number {
       return CHARACTER_FORM_READY.travel;
     case 'metamorph':
       return CHARACTER_FORM_READY.metamorph;
+    case 'sporemender':
+      return CHARACTER_FORM_READY.sporemender;
     default:
       return 0;
   }
@@ -136,6 +145,7 @@ export function characterFormReadyMask(
   cat: unknown,
   travel: unknown,
   metamorph: unknown,
+  sporemender: unknown,
   compilePending: unknown,
 ): number {
   let mask = 0;
@@ -144,6 +154,7 @@ export function characterFormReadyMask(
   if (formRigReady(cat, compilePending)) mask |= CHARACTER_FORM_READY.cat;
   if (formRigReady(travel, compilePending)) mask |= CHARACTER_FORM_READY.travel;
   if (formRigReady(metamorph, compilePending)) mask |= CHARACTER_FORM_READY.metamorph;
+  if (formRigReady(sporemender, compilePending)) mask |= CHARACTER_FORM_READY.sporemender;
   return mask;
 }
 
@@ -161,6 +172,7 @@ export function activeCharacterFormVisual<T>(
   cat: T | null,
   travel: T | null,
   metamorph: T | null,
+  sporemender: T | null,
 ): T {
   switch (resolved) {
     case 'sheep':
@@ -173,6 +185,8 @@ export function activeCharacterFormVisual<T>(
       return travel ?? base;
     case 'metamorph':
       return metamorph ?? base;
+    case 'sporemender':
+      return sporemender ?? base;
     default:
       return base;
   }
@@ -186,6 +200,7 @@ export function characterFormVisibility(resolved: CharacterFormVisual): Characte
     cat: resolved === 'cat',
     travel: resolved === 'travel',
     metamorph: resolved === 'metamorph',
+    sporemender: resolved === 'sporemender',
   };
 }
 

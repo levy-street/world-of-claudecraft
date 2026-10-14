@@ -4685,6 +4685,27 @@
     font-family: var(--font-heading);
     font-size: 20px;
     text-shadow: 1px 1px 3px #000;
+    padding: 24px;
+    text-align: center;
+    overflow: auto;
+  }
+
+  .fatal-overlay-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .fatal-overlay-actions button {
+    margin: 0;
+    min-height: 40px;
+    max-width: 100%;
+  }
+
+  .fatal-overlay-status {
+    min-height: 1.5em;
+    font-size: 16px;
   }
 
   .char-list-message {

@@ -1236,4 +1236,8 @@ export const table: DeedLocaleTable = {
     name: 'Tertangkap Saat Berbuat Buruk',
     desc: 'Tangkap Penari Mata Uang dalam Harta Karun Terkubur sebelum dia kabur dengan emas.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Lebih Terang dari Bayangan',
+    desc: 'Rebut kembali kantong koin yang dicuri dan keluar dari labirin Evergarden pada tingkat Hard.',
+  },
 };

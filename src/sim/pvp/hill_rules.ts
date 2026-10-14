@@ -3,8 +3,12 @@
 // free-for-all zones; it rises HILL_WARNING_SECONDS later as a HILL_RADIUS
 // circle on dry, open ground and stands for HILL_DURATION_SECONDS. The PARTY
 // with the most members standing inside it contests it, holds it after
-// HILL_CAPTURE_SECONDS of unbroken majority, and every holder standing inside
-// earns a slow trickle of Honor for as long as they hold it. Raid members do
+// HILL_CAPTURE_SECONDS of majority (a rival walking in pauses the clock, it
+// never resets it while the group keeps a living member inside), and every
+// holder standing inside earns a slow trickle of Honor for as long as they hold
+// it. While it stands the realm hears where it is every HILL_NOTICE_SECONDS,
+// with the standings (hill_ranking.ts): the group that held it longest earns a
+// point toward the Weekly Vault's PvP row when it falls. Raid members do
 // not count; every level does. No SimContext, no rng, no clock: every function here is a plain function of its arguments so the
 // sim (hill.ts), the HUD bar and the tests read the same verdicts. The
 // ctx-bound system that owns the schedule, the presence pass, the contest
@@ -19,6 +23,9 @@ export const HILL_WINDOW_SECONDS = 3 * 60 * 60;
 export const HILL_WARNING_SECONDS = 15 * 60;
 /** A risen hill stands this long, then falls (owner spec: 45 minutes). */
 export const HILL_DURATION_SECONDS = 45 * 60;
+/** While a hill stands the realm is reminded where it is, and told the
+ *  standings, this often (owner spec 2026-09-29: every 5 minutes). */
+export const HILL_NOTICE_SECONDS = 5 * 60;
 /** The first window opens this long after boot (the natural rift portal
  *  precedent: never at tick zero). Sim time, so offline the first window
  *  opens two minutes into a session. */
@@ -28,8 +35,10 @@ export const HILL_FIRST_WINDOW_AT_SECONDS = 120;
  *  overlap. The warning's offset is drawn uniformly from [0, this]. */
 export const HILL_LATEST_WARN_OFFSET_SECONDS =
   HILL_WINDOW_SECONDS - HILL_WARNING_SECONDS - HILL_DURATION_SECONDS;
-/** Unbroken majority for this long takes the hill (owner spec). */
-export const HILL_CAPTURE_SECONDS = 60;
+/** Majority for this long takes the hill (owner spec 2026-10-12: 30 seconds,
+ *  down from a minute). The seconds need not be unbroken: hillProgressStep
+ *  pauses a group's clock while it is not the leader. */
+export const HILL_CAPTURE_SECONDS = 30;
 /** Each holder standing inside accrues this many seconds of presence before a
  *  payout, and each payout RAMPS with how long the holding party has held the
  *  hill (hillHonorPerPayout): HILL_RAMP_STEP_HONOR a minute for the first five
@@ -45,6 +54,16 @@ export const HILL_ACCRUAL_SECONDS = 60;
 export const HILL_RAMP_STEP_SECONDS = 300;
 export const HILL_RAMP_STEP_HONOR = 2;
 export const HILL_RAMP_MAX_HONOR = 12;
+/** The Weekly Vault point for the longest hold (hill_ranking.ts) pays only a
+ *  player who stood inside for at least this long while their group held the
+ *  hill, and who is still in that group when it falls: a one-second visit, or
+ *  a player cycled through the party, earns nothing. */
+export const HILL_VAULT_MIN_INSIDE_SECONDS = 60;
+/** The longest hold must last at least this long in total before it pays any
+ *  Weekly Vault point (owner decision 2026-10-05): a lone player who captures
+ *  an empty hill on a quiet realm and stands a minute still tops the
+ *  standings, but five such visits must not fill the PvP row. */
+export const HILL_VAULT_MIN_HOLD_SECONDS = 10 * 60;
 
 /** The Honor one payout is worth after the holding party has held the hill
  *  for `heldSeconds`: HILL_RAMP_STEP_HONOR, then that much more every
@@ -116,17 +135,70 @@ export function hillChallengeStands(challengerCount: number, holderCount: number
   return challengerCount > 0 && challengerCount > holderCount;
 }
 
-/** The contest clock after one pass. A lapsed challenge resets it (a group
- *  that thins out below the holder starts over), a new challenger starts it
- *  over from this pass, the same challenger keeps counting. */
-export function hillContestStep(
-  prev: number,
-  contested: boolean,
-  sameChallenger: boolean,
+/** Every group's contest clock after one pass (owner spec 2026-10-12: a rival
+ *  walking in only PAUSES a challenge). The challenger, the leader that beats
+ *  the holder, banks `dt`; every other group with a member still counted
+ *  inside keeps its seconds, paused (a tie, or a bigger group walked in); a
+ *  group with nobody counted inside loses them, which is how a death resets a
+ *  challenge (the dead are not counted) and how walking away does. The holder
+ *  never carries a clock. Returns a fresh map; the input is not touched. */
+export function hillProgressStep(
+  prev: ReadonlyMap<string, number>,
+  counts: ReadonlyMap<string, number>,
+  challenger: string | null,
+  holder: string | null,
   dt: number,
-): number {
-  if (!contested) return 0;
-  return sameChallenger ? prev + dt : dt;
+): Map<string, number> {
+  const next = new Map<string, number>();
+  for (const [key, seconds] of prev) {
+    if (key === holder || (counts.get(key) ?? 0) <= 0) continue;
+    next.set(key, seconds);
+  }
+  if (challenger !== null && challenger !== holder) {
+    next.set(challenger, (next.get(challenger) ?? 0) + dt);
+  }
+  return next;
+}
+
+/** One member of a group whose key just stopped naming anyone in it: the
+ *  key the member counts under now (null in a raid) and whether they stand
+ *  inside the circle. */
+export interface HillSuccessorMember {
+  key: string | null;
+  inside: boolean;
+}
+
+/** The group a hold or a contest clock follows when its key stops naming any
+ *  of its members: a lone holder formed or joined a party (`solo:` becomes
+ *  `party:`), or the holding party disbanded around its last member. The key
+ *  carrying the most of the old group's members inside the circle wins, then
+ *  the most members anywhere, then the earliest member's in the given order
+ *  (the caller lists the capturers first). Null when no member still counts
+ *  (they all left the realm or joined a raid). */
+export function hillSuccessorKey(members: Iterable<HillSuccessorMember>): string | null {
+  const tally = new Map<string, { inside: number; total: number; order: number }>();
+  let order = 0;
+  for (const m of members) {
+    if (m.key === null) continue;
+    const row = tally.get(m.key) ?? { inside: 0, total: 0, order: order++ };
+    row.total += 1;
+    if (m.inside) row.inside += 1;
+    tally.set(m.key, row);
+  }
+  let best: string | null = null;
+  let bestRow: { inside: number; total: number; order: number } | null = null;
+  for (const [key, row] of tally) {
+    if (
+      bestRow === null ||
+      row.inside > bestRow.inside ||
+      (row.inside === bestRow.inside && row.total > bestRow.total) ||
+      (row.inside === bestRow.inside && row.total === bestRow.total && row.order < bestRow.order)
+    ) {
+      best = key;
+      bestRow = row;
+    }
+  }
+  return best;
 }
 
 /** The world reads a spawn probe needs; the sim binds them to the terrain,

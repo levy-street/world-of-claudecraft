@@ -568,6 +568,7 @@ describe('CI workflow parity', () => {
       'charselect-zone',
       'dash-speed-stack',
       'nythraxis-dread-curse-swap',
+      'realm-motd',
     ]);
     for (const dir of workflowScopedFollowup) {
       expect(referenced.has(dir), `${dir} remains a real referenced screenshot subtree`).toBe(true);

@@ -4,14 +4,19 @@ export {
   HILL_LOST_LINE,
   HILL_READOUT_NONE_LINE,
   HILL_TAKEN_LINE,
+  HILL_VAULT_LINE,
   type HillPhase,
   type HillState,
+  type HillVaultCredit,
   hillFallenLine,
   hillInfoFor,
   hillPlanFor,
+  hillRankLine,
   hillReadoutLine,
   hillRiseLine,
+  hillStillStandsLine,
   hillWarningLine,
+  NO_HILL_VAULT_CREDIT,
   newHillState,
   pickHillSpot,
   riseHillNow,
@@ -21,29 +26,41 @@ export {
   warnNextHillNow,
 } from './hill';
 export {
+  HILL_RANKING_SHOWN,
+  type HillHoldRecord,
+  hillLongestHolds,
+  hillRanking,
+  hillVaultPayees,
+} from './hill_ranking';
+export {
   HILL_ACCRUAL_SECONDS,
   HILL_CAPTURE_SECONDS,
   HILL_DURATION_SECONDS,
   HILL_FIRST_WINDOW_AT_SECONDS,
   HILL_LATEST_WARN_OFFSET_SECONDS,
+  HILL_NOTICE_SECONDS,
   HILL_RADIUS,
   HILL_RAMP_MAX_HONOR,
   HILL_RAMP_STEP_HONOR,
   HILL_RAMP_STEP_SECONDS,
+  HILL_VAULT_MIN_HOLD_SECONDS,
+  HILL_VAULT_MIN_INSIDE_SECONDS,
   HILL_WARNING_SECONDS,
   HILL_WINDOW_SECONDS,
   type HillSpotProbe,
   type HillStanding,
+  type HillSuccessorMember,
   type HillTimes,
   hillChallengeStands,
   hillContains,
-  hillContestStep,
   hillGroupKey,
   hillHonorPerPayout,
   hillLeader,
   hillMinutesUntil,
+  hillProgressStep,
   hillSpotIsOpen,
   hillStanding,
+  hillSuccessorKey,
   hillTimes,
   hillTimesFrom,
   hillWindowAt,
@@ -113,6 +130,27 @@ export {
   pvpFractionsFromRatings,
   pvpVitalityFromRating,
 } from './power';
+export {
+  notePvpResurrectAtDeath,
+  PVP_RESURRECT_WAIT_SECONDS,
+  PVP_RESURRECT_WINDOW_SECONDS,
+  type PvpResurrectDeath,
+  pvpResurrectBarred,
+  pvpResurrectEarned,
+  pvpResurrectReady,
+  pvpResurrectWaitSeconds,
+} from './pvp_resurrect';
+export {
+  ownsSkullBag,
+  SKULL_BAG_MISSING_LINE,
+  SKULL_BAG_NOTHING_LINE,
+  SKULL_BAG_STORED_ALL_LINE,
+  SKULL_BAG_STORED_LINE,
+  skullBagAction,
+  skullBagInfoFor,
+  storeLootedSkulls,
+  WORLD_PVP_SKULL_BAG_ITEM_ID,
+} from './skull_bag';
 export { pvpVitalityAppliesTo, updatePvpVitality } from './vitality';
 export {
   isWorldPvpFlagged,
@@ -130,6 +168,7 @@ export {
   type WorldPvpSavedState,
   worldPvpDefeatLine,
   worldPvpDisarmRemaining,
+  worldPvpForfeitKillLine,
   worldPvpInfoFor,
   worldPvpKillLine,
   worldPvpOnOwnedPetDamaged,
@@ -139,9 +178,36 @@ export {
   worldPvpPairRepeats,
 } from './world_pvp';
 export {
+  hasWorldPvpBounty,
+  WORLD_PVP_BOUNTY_EARNED_LINE,
+  WORLD_PVP_BOUNTY_LAPSED_LINE,
+  worldPvpBountyCollectedLine,
+  worldPvpBountyPlacedLine,
+} from './world_pvp_bounty';
+export {
+  WORLD_PVP_BOUNTY_HOLDER_DR,
+  WORLD_PVP_BOUNTY_KILL_HONOR_MULT,
+  WORLD_PVP_BOUNTY_STREAK,
+  worldPvpBountyHolderMultiplier,
+  worldPvpKillHonorPool,
+  worldPvpStreakEarnsBounty,
+} from './world_pvp_bounty_rules';
+export { forfeitWorldPvpFightOnDeparture, worldPvpFightOpponent } from './world_pvp_forfeit';
+export {
+  loadWorldPvpPayouts,
+  payDueWorldPvpPayouts,
+  queueWorldPvpPayout,
+  savedWorldPvpPayouts,
+  WORLD_PVP_PENDING_PAYOUT_LIMIT,
+  type WorldPvpPendingPayout,
+  type WorldPvpSavedPayout,
+  worldPvpForfeitPayoutLine,
+} from './world_pvp_payouts';
+export {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
   WORLD_PVP_DR_WINDOW_SECONDS,
+  WORLD_PVP_FORFEIT_PAYOUT_SECONDS,
   WORLD_PVP_GREY_LEVEL_GAP,
   WORLD_PVP_KILL_HONOR,
   WORLD_PVP_MIN_LEVEL,
@@ -156,4 +222,14 @@ export {
   worldPvpStake,
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
+export {
+  placeWorldPvpSpoils,
+  settleAllWorldPvpSpoils,
+  settleWorldPvpSpoils,
+  settleWorldPvpSpoilsOnLeave,
+  sweepWorldPvpSpoils,
+  WORLD_PVP_SKULL_ITEM_ID,
+  worldPvpSkullSources,
+  worldPvpSpoilsLine,
+} from './world_pvp_spoils';
 export { worldPvpFfaZones, worldPvpZonePolicyAt, worldPvpZonePolicyOf } from './world_pvp_zones';

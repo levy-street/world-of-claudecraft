@@ -69,6 +69,9 @@ describe('duel module: endDuel resolution', () => {
     expect(end).toBeTruthy();
     expect(end.winnerName).toBe('Aleph');
     expect(end.loserName).toBe('Bet');
+    expect(end.winnerPid).toBe(a);
+    expect(end.loserPid).toBe(b);
+    expect(end.zoneId).toBe('eastbrook_vale');
     // endDuel() marks the entry ended (endedTick) but defers the actual
     // ctx.duels delete to updateDuels()'s tick-tail purge, so a same-tick
     // reciprocal lethal hit can still find and clamp it; duelFor() is the
@@ -76,6 +79,18 @@ describe('duel module: endDuel resolution', () => {
     // outside duel.ts.
     expect(duel.duelFor(sim.ctx, a)).toBeNull();
     expect(duel.duelFor(sim.ctx, b)).toBeNull();
+  });
+
+  it('marks an instanced duel victory as personal to the duelists', () => {
+    const { sim, a, b, d } = seatedDuel();
+    teleport(sim, a, 100_900, 0);
+    teleport(sim, b, 100_904, 0);
+    sim.drainEvents();
+    duel.endDuel(sim.ctx, d, a);
+    const end = sim.drainEvents().find((e: any) => e.type === 'duelEnd') as any;
+    expect(end.zoneId).toBeNull();
+    expect(end.winnerPid).toBe(a);
+    expect(end.loserPid).toBe(b);
   });
 
   it('a draw resolution (null winner) ends the bout with no duelEnd, just a notice', () => {

@@ -6,6 +6,7 @@ const PERSISTENT_ENGINE_AURA_IDS: ReadonlySet<string> = new Set([
   'hunter_efficient_rhythm_progress',
   'hunter_efficient_rhythm_ready',
   'hunter_fang_chorus_counter',
+  'hunting_momentum',
   'hunter_overdraw_counter',
   'stampede_ready',
   'priest_benison_prayers',

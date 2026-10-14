@@ -14,6 +14,7 @@
 import type { PoolCapacity } from '../sim/bag_pools';
 import { BANK_EXPANSION_SLOTS, moveBetweenContainers } from '../sim/bank';
 import { storageRungSkuForLadderIndex } from '../sim/content/storage_charters';
+import { isItemLocked } from '../sim/item_lock_flag';
 import type { MaterialComposition } from '../sim/material_sources';
 import { isMaterialItem } from '../sim/material_taxonomy';
 import { cloneInvSlot, type InvSlot, type ItemInstancePayload } from '../sim/types';
@@ -487,6 +488,7 @@ export function planDepositAllMaterials(
     const item = lookup(slot.itemId);
     if (!item) continue; // unknown id: not a known material, leave it in the bags
     if (item.kind === 'quest') continue; // never bank quest items (the taxonomy also excludes them)
+    if (isItemLocked(slot.instance)) continue; // a locked copy stays pinned in its bag cell
     if (!isMaterialItem(item)) continue;
     const itemId = slot.itemId;
     const count = slot.count;

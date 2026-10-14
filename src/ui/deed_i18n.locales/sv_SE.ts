@@ -1315,4 +1315,8 @@ export const table: DeedLocaleTable = {
     name: 'Fångad rödhänt',
     desc: 'Fånga en Myntpåseskinmare i ett begravt lagom innan det flyr med guldet.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Klarare an skuggorna',
+    desc: 'Ta tillbaka de stulna myntpungarna och fly fran Evergarden-labyrinten pa Hard.',
+  },
 };

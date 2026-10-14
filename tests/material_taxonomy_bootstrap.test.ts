@@ -51,7 +51,10 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // Crucible of the Last Spring core reagent, derives IN through the
     // recipe-pending list (CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS)
     // while its consuming recipes are still staged.
-    expect(MATERIAL_ITEM_IDS.size).toBe(117);
+    // 117 -> 118 with the World PvP trophy skull (pvp/world_pvp_trophy.ts): a
+    // keepsake no recipe consumes, ruled IN so its stack keeps per-victim
+    // provenance through the material-source machinery.
+    expect(MATERIAL_ITEM_IDS.size).toBe(118);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     // The farming source specifically, because it is the newest and the one

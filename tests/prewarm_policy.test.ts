@@ -110,7 +110,7 @@ const MANIFEST_IDS = [
   'objects.quest-archetypes',
   'props.material-variants',
   'props.ghost-fade-variants',
-  'entities.character-effect-variants',
+  'entities.spirit-veil-family',
   'foliage.materials',
   'foliage.great-tree-materials',
   'world.settle-state',
@@ -373,7 +373,6 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'objects',
       'props',
       'ghost-fade-variants',
-      'character-effect-variants',
       'ability-materials',
       'foliage',
       'great-tree',
@@ -446,7 +445,6 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // must be added to one of the two, never land unclassified.
     const COSMETIC_RESUME_IDS = [
       'props.ghost-fade-variants',
-      'entities.character-effect-variants',
       'vfx.atlas',
       'vfx.weapon-skins',
       'vfx.ability-primitives',
@@ -1375,6 +1373,9 @@ describe('the keep-list is the minimal entry set', () => {
         // linking before the live governor can lower the post level.
         'post.initial-frame',
         'render.settle-passes',
+        // A character saved dead enters as a released spirit on the first
+        // frame, and a skipped family would stage every death behind the gate.
+        'entities.spirit-veil-family',
         'textures.scene',
         'views.landmarks',
         'views.nearby',
@@ -1594,8 +1595,10 @@ describe('mandatory interaction-landmark prewarm', () => {
     // program variant its materials carry (program_variant_settle.ts), bound to
     // this renderer's material properties and depth-twin cache.
     expect(compileGate).toContain('linkPieceWork(target, color, shadow, settle)');
-    expect(compileGate).toContain(
-      'const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);',
+    // Read through the renderer at every poll, never captured: a context
+    // restore replaces three's properties object (context_restore.ts).
+    expect(compileGate).toMatch(
+      /const settle = pieceProgramSettle\(\s*liveMaterialProperties\(this\.webgl\),\s*this\.prewarmDepthMaterials,?\s*\);/,
     );
     expect(compileGate).toContain('VIEW_COMPILE_GATE_MAX_MS');
     expect(compileGate).not.toContain('onTimeout');
@@ -1621,27 +1624,6 @@ describe('mandatory interaction-landmark prewarm', () => {
       'return this.sharedQueue.run(work, options.priority, options.label, { releaseTail: true })',
     );
     expect(core).toContain('this.tail.then(work)');
-  });
-});
-
-describe('self-spirit prewarm queue wiring', () => {
-  it('preserves the idle delay and runs the warm and link units through the shared GPU queue', () => {
-    const renderer = readFileSync(
-      new URL('../src/render/renderer.ts', import.meta.url),
-      'utf8',
-    ).replace(/\r\n/g, '\n');
-    const start = renderer.indexOf('private selfSpirit = new SelfSpiritPrewarmer({');
-    const end = renderer.indexOf('\n  // Static terrain/water/features', start);
-    expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const wiring = renderer.slice(start, end);
-    expect(wiring).toContain('idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
-    // The units themselves (priority, labels, released tail, the hold
-    // between them) are pinned on the module, tests/self_spirit_warm.test.ts.
-    expect(wiring).toContain('warmSelfSpiritPrograms({');
-    expect(wiring).toContain('this.backgroundGpuWork.run(work, priority, label, options)');
-    expect(wiring).toContain('linkColorPrograms(this.compileArms, root, false)');
-    expect(wiring).toContain('!this.asyncCompileSupported || this.sim.player.ghost');
   });
 });
 

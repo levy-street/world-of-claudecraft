@@ -266,9 +266,9 @@ describe('renderer sky-residency driver', () => {
     const end = renderer.indexOf('\n  }', start);
     const body = renderer.slice(start, end);
     expect(body).toContain('this.skyResidency.updateSkyResidency(cameraX, cameraZ)');
-    expect(body.indexOf('this.skyResidency.updateSkyResidency')).toBeGreaterThan(
-      body.indexOf('this.visibleZoneCheckFar = horizon'),
-    );
+    const guardAt = body.indexOf('if (!claimZoneStreamRecheck(this.visibleZoneCheck,');
+    expect(guardAt).toBeGreaterThan(0);
+    expect(body.indexOf('this.skyResidency.updateSkyResidency')).toBeGreaterThan(guardAt);
     expect(renderer.match(/\.updateSkyResidency\(/g)?.length).toBe(1);
   });
 

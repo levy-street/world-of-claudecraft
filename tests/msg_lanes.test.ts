@@ -530,9 +530,6 @@ describe('dispatchMessage lane wiring at the R5 placements', () => {
     session.spectating = {
       characterId: 2,
       name: 'Target',
-      savedPos: { x: 0, y: 0, z: 0 },
-      priorGm: false,
-      stowedPet: null,
     } as ClientSession['spectating'];
     const host = server as unknown as {
       moderation: { handleChatCommand: (session: unknown, text: string) => boolean };

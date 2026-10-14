@@ -50,6 +50,8 @@ import { createNpc, recalcPlayerStats } from './entity';
 import { releaseSpiritInDelve } from './entity_roster';
 import { restorePetOnOwnerRevive } from './pet/pet_owner_revive';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
+import { pvpResurrectBarred, pvpResurrectReady } from './pvp/pvp_resurrect';
+import { settleWorldPvpSpoils } from './pvp/world_pvp_spoils';
 import {
   aurasSurvivingDeath,
   RES_SICKNESS_STAT_MULT,
@@ -166,6 +168,24 @@ function ghostGraveyard(
   return nearestOverworldGraveyard(p.pos.x, p.pos.z, graveyards, fallback);
 }
 
+// The graveyard a release or /unstuck is about to move `p` to, resolved while the
+// player still stands in their instance band. A move off a rift floor also emits
+// the rift exit leaveRift would have: the online client mirrors the floor from
+// that event alone, so it otherwise kept the rift map at the graveyard.
+function graveyardForMove(
+  ctx: SimContext,
+  p: Entity,
+  graveyards?: readonly { x: number; z: number }[],
+  fallback?: { x: number; z: number },
+): { x: number; z: number } {
+  const gy = ghostGraveyard(ctx, p, graveyards, fallback);
+  ctx.emitRiftDeparture(p.id, p.pos);
+  p.riftSliding = false;
+  p.riftSlideDirX = 0;
+  p.riftSlideDirZ = 0;
+  return gy;
+}
+
 // --- release / resurrect ----------------------------------------------------
 
 // Release the spirit: leave the body where it fell and rise as a ghost at the
@@ -228,7 +248,7 @@ export function moveToGraveyardForUnstuck(
   // stops riding castingAbility.
   cancelProfessionSessionOnDisplacement(ctx, p);
   // Resolve the graveyard before the move takes the player out of its instance band.
-  const gy = ghostGraveyard(ctx, p);
+  const gy = graveyardForMove(ctx, p);
   p.pos = ctx.groundPos(gy.x, gy.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -282,7 +302,7 @@ export function reviveAtGraveyardForUnstuck(
   if (!r?.e.dead) return false;
   const { meta, e: p } = r;
   // Resolve the graveyard before the revive moves the body out of its instance band.
-  const gy = ghostGraveyard(ctx, p);
+  const gy = graveyardForMove(ctx, p);
   const charged = reviveAt(
     ctx,
     meta,
@@ -302,8 +322,11 @@ function releaseAtNearestGraveyard(
   graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
   fallback: { x: number; z: number } = PLAYER_START,
 ): void {
+  // A body holding World PvP spoils hands them over before it becomes a ghost:
+  // the killer gets what they had not looted yet (world_pvp_spoils.ts).
+  settleWorldPvpSpoils(ctx, p.id);
   // Resolve the graveyard before moving the entity out of its instance band.
-  const gy = ghostGraveyard(ctx, p, graveyards, fallback);
+  const gy = graveyardForMove(ctx, p, graveyards, fallback);
   p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
   p.corpseInstanceId = ctx.instanceClaimIdAt(p.pos);
   p.ghost = true; // p.dead stays true
@@ -420,9 +443,40 @@ export function resurrectOnInstanceReentry(
 ): void {
   // Only a spirit whose body actually lies inside an instance revives on re-entry, so
   // walking a ghost through an unrelated door is not a free resurrection.
-  if (!p.corpsePos || p.corpseInstanceId === null) return;
+  if (
+    !p.corpsePos ||
+    p.corpseInstanceId === null ||
+    ctx.instanceClaimIdAt(pos) !== p.corpseInstanceId
+  )
+    return;
   reviveAt(ctx, meta, p, pos, RES_HP_FRACTION, 'none');
   ctx.emit({ type: 'respawn', pid: meta.entityId });
+}
+
+/**
+ * PvP Resurrect (src/sim/pvp/pvp_resurrect.ts owns the rule): a corpse whose death
+ * offered it releases as normal, so the spirit rises at the graveyard Release
+ * picks, and stands straight up there at full health and mana with no sickness.
+ * Refused until the death's PVP_RESURRECT_WAIT_SECONDS have run (the death screen
+ * keeps the button disabled and counts them down). Never for a ghost: a full-health raise wherever a released spirit has run to
+ * would be a free teleport. `releaseSpirit` is the Sim's own release (it carries
+ * the world's graveyard list). Returns whether the player was raised.
+ */
+export function pvpResurrect(
+  ctx: SimContext,
+  pid: number | undefined,
+  releaseSpirit: (pid: number) => void,
+): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const p = r.e;
+  if (!p.dead || p.ghost || p.pvpResurrect !== true || pvpResurrectBarred(p)) return false;
+  if (!pvpResurrectReady(p)) return false;
+  releaseSpirit(p.id);
+  // Release can refuse (an arena corpse); never raise a body that did not rise.
+  if (!p.ghost) return false;
+  revivePlayerAt(ctx, p.id, p.pos, 1);
+  return true;
 }
 
 export function revivePlayerAt(ctx: SimContext, pid: number, pos: Vec3, hpFrac = 1): void {
@@ -456,10 +510,15 @@ function reviveAt(
   hpFrac: number,
   sickness: SicknessKind,
 ): boolean {
+  // Standing up ends the body: settle any World PvP spoils still on it first.
+  settleWorldPvpSpoils(ctx, p.id);
   p.dead = false;
   p.ghost = false;
   p.corpsePos = null;
   p.corpseInstanceId = null;
+  // The PvP Resurrect offer belonged to that death, whichever way back was taken.
+  p.pvpResurrect = false;
+  p.pvpResurrectWait = 0;
   // revivePlayerAt teleports even a LIVE target (wasDead only gates the
   // respawn event), so a running gather/fishing session must end here too.
   cancelProfessionSessionOnDisplacement(ctx, p);

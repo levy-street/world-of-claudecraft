@@ -40,14 +40,23 @@ describe('hoard valley visual plan', () => {
     expect(midnight[2]).toBeGreaterThan(midnight[0]);
   });
 
-  it('owns a distinct ground, fog and dressing identity for every dig-site zone', () => {
+  it('preserves original valley identities and supports every dig-site biome', () => {
     expect([...HOARD_VALLEY_ZONE_IDS].sort()).toEqual([...VAULT_ZONE_IDS].sort());
-    expect(HOARD_VALLEY_ZONE_IDS).toHaveLength(8);
-    expect(new Set(HOARD_VALLEY_ZONE_IDS.map((id) => hoardValleyProfile(id).biome)).size).toBe(8);
-    expect(new Set(HOARD_VALLEY_ZONE_IDS.map((id) => hoardValleyProfile(id).ground)).size).toBe(8);
-    expect(new Set(HOARD_VALLEY_ZONE_IDS.map((id) => hoardValleyProfile(id).dressing)).size).toBe(
-      8,
-    );
+    expect(HOARD_VALLEY_ZONE_IDS).toHaveLength(14);
+    const originalZones = HOARD_VALLEY_ZONE_IDS.slice(0, 8);
+    expect(new Set(originalZones.map((id) => hoardValleyProfile(id).biome)).size).toBe(8);
+    expect(new Set(originalZones.map((id) => hoardValleyProfile(id).ground)).size).toBe(8);
+    expect(new Set(originalZones.map((id) => hoardValleyProfile(id).dressing)).size).toBe(8);
+    expect(
+      [
+        'eastbrook_vale',
+        'mirefen_marsh',
+        'thornpeak_heights',
+        'veiled_hollow',
+        'evergarden',
+        'farshore_isle',
+      ].map((id) => hoardValleyProfile(id as (typeof HOARD_VALLEY_ZONE_IDS)[number]).biome),
+    ).toEqual(['vale', 'marsh', 'peaks', 'dusk', 'garden', 'vale']);
     for (const id of HOARD_VALLEY_ZONE_IDS) {
       const profile = hoardValleyProfile(id);
       expect(profile.fogNear).toBeGreaterThan(60);

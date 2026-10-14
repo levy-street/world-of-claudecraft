@@ -13,7 +13,14 @@ import { SocialWindow, type SocialWindowDeps } from '../src/ui/social_window';
 import type { IWorld, WhoRosterInfo } from '../src/world_api';
 
 interface TestWorld {
-  socialInfo: { friends: []; ignores: []; blocks: []; guild: null; myPledge: null } | null;
+  socialInfo: {
+    friends: { name: string; cls: string; level: number; online: boolean }[];
+    ignores: [];
+    blocks: [];
+    guild: null;
+    myPledge: null;
+  } | null;
+  entities: Map<number, { id: number; kind: string; name: string }>;
   whoInfo: WhoRosterInfo | null;
   whoRequest: ReturnType<typeof vi.fn>;
   spectating: string | null;
@@ -34,12 +41,22 @@ const ROSTER: WhoRosterInfo = {
 let world: TestWorld;
 let root: HTMLElement;
 let whispers: string[];
+// Which of the three player menus a row opened (self / unit frame / by name).
+type MenuOpen =
+  | { menu: 'self'; x: number; y: number }
+  | { menu: 'unit'; pid: number; name: string; x: number; y: number }
+  | { menu: 'name'; name: string; x: number; y: number };
+let menus: MenuOpen[];
+let mobile: boolean;
 
 beforeEach(() => {
   document.body.innerHTML = '';
   whispers = [];
+  menus = [];
+  mobile = false;
   world = {
     socialInfo: { friends: [], ignores: [], blocks: [], guild: null, myPledge: null },
+    entities: new Map([[7, { id: 7, kind: 'player', name: 'Aleron' }]]),
     whoInfo: null,
     whoRequest: vi.fn(),
     spectating: null,
@@ -62,6 +79,7 @@ function makeWindow(): SocialWindow {
       ({
         playerId: 7,
         player: { id: 7, name: 'Aleron' },
+        entities: world.entities,
         realm: 'Ashenvale',
         socialInfo: world.socialInfo,
         partyInfo: world.partyInfo,
@@ -76,6 +94,10 @@ function makeWindow(): SocialWindow {
     restoreFocus: noop,
     showPrompt: noop,
     startWhisper: (name) => whispers.push(name),
+    openSelfMenu: (x, y) => menus.push({ menu: 'self', x, y }),
+    openUnitMenu: (pid, name, x, y) => menus.push({ menu: 'unit', pid, name, x, y }),
+    openNameMenu: (name, x, y) => menus.push({ menu: 'name', name, x, y }),
+    isMobileLayout: () => mobile,
   };
   return new SocialWindow(deps);
 }
@@ -272,6 +294,177 @@ describe('Who tab: request on select, paint on answer', () => {
     win.refreshIfChanged();
     (root.querySelector('.who-name .soc-link[data-whisper="Bryn"]') as HTMLElement).click();
     expect(whispers).toEqual(['Bryn']);
+  });
+
+  it('opens the player menu from a right-click anywhere on a row, at the cursor', () => {
+    const win = makeWindow();
+    win.toggle();
+    clickTab('who');
+    world.whoInfo = ROSTER;
+    win.refreshIfChanged();
+    const cell = root.querySelector('[data-player="Bryn"] .who-zone') as HTMLElement;
+    const ev = new MouseEvent('contextmenu', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 120,
+      clientY: 80,
+    });
+    cell.dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(true);
+    // Bryn has no entity in view, so there is no frame to mirror: the by-name menu.
+    expect(menus).toEqual([{ menu: 'name', name: 'Bryn', x: 120, y: 80 }]);
+    expect(whispers).toEqual([]);
+  });
+
+  it('keeps the native menu for a right-click outside any player row', () => {
+    const win = makeWindow();
+    win.toggle();
+    clickTab('who');
+    world.whoInfo = ROSTER;
+    win.refreshIfChanged();
+    const ev = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    (root.querySelector('select[data-field="who-cls"]') as HTMLElement).dispatchEvent(ev);
+    (root.querySelector('.soc-who-header') as HTMLElement).dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(false);
+    expect(menus).toEqual([]);
+  });
+
+  it('still opens the player menu after a content refresh swaps the rows', () => {
+    const win = makeWindow();
+    win.toggle();
+    clickTab('who');
+    world.whoInfo = ROSTER;
+    win.refreshIfChanged();
+    world.whoInfo = { ...ROSTER, total: 2, rows: ROSTER.rows.slice(0, 2) };
+    win.refreshIfChanged();
+    (root.querySelector('[data-player="Mira"]') as HTMLElement).dispatchEvent(
+      new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 5, clientY: 6 }),
+    );
+    expect(menus).toEqual([{ menu: 'name', name: 'Mira', x: 5, y: 6 }]);
+  });
+
+  function rightClick(selector: string, x = 30, y = 40): void {
+    (root.querySelector(selector) as HTMLElement).dispatchEvent(
+      new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: x, clientY: y }),
+    );
+  }
+
+  it('opens the unit-frame menu, keyed by pid, for a player in view', () => {
+    world.entities.set(12, { id: 12, kind: 'player', name: 'Bryn' });
+    const win = makeWindow();
+    win.toggle();
+    clickTab('who');
+    world.whoInfo = ROSTER;
+    win.refreshIfChanged();
+    rightClick('[data-player="Bryn"]');
+    expect(menus).toEqual([{ menu: 'unit', pid: 12, name: 'Bryn', x: 30, y: 40 }]);
+  });
+
+  it('opens your own player-frame menu from your own row', () => {
+    const win = makeWindow();
+    win.toggle();
+    clickTab('who');
+    world.whoInfo = ROSTER;
+    win.refreshIfChanged();
+    rightClick('[data-player="Aleron"]');
+    expect(menus).toEqual([{ menu: 'self', x: 30, y: 40 }]);
+  });
+
+  it('routes every row to the by-name menu while spectating', () => {
+    world.entities.set(12, { id: 12, kind: 'player', name: 'Bryn' });
+    world.spectating = 'Aleron';
+    const win = makeWindow();
+    win.toggle();
+    clickTab('raid');
+    world.partyInfo = {
+      raid: true,
+      leader: 7,
+      members: [{ pid: 12, name: 'Bryn', cls: 'mage', level: 41, hp: 1, mhp: 1, group: 1 }],
+    } as unknown as IWorld['partyInfo'];
+    win.refreshIfChanged();
+    rightClick('[data-player="Bryn"]');
+    expect(menus).toEqual([{ menu: 'name', name: 'Bryn', x: 30, y: 40 }]);
+  });
+
+  it('a raid row opens the pid-keyed unit menu even for a member out of view', () => {
+    world.partyInfo = {
+      raid: true,
+      leader: 7,
+      members: [
+        { pid: 7, name: 'Aleron', cls: 'warrior', level: 12, hp: 1, mhp: 1, group: 1 },
+        { pid: 33, name: 'Faraway', cls: 'mage', level: 41, hp: 1, mhp: 1, group: 2 },
+      ],
+    } as unknown as IWorld['partyInfo'];
+    const win = makeWindow();
+    win.toggle();
+    clickTab('raid');
+    rightClick('[data-player="Faraway"] .soc-meta');
+    rightClick('[data-player="Aleron"]');
+    expect(menus).toEqual([
+      { menu: 'unit', pid: 33, name: 'Faraway', x: 30, y: 40 },
+      { menu: 'self', x: 30, y: 40 },
+    ]);
+  });
+
+  it('a friend row (offline, out of view) opens the by-name menu', () => {
+    world.socialInfo = {
+      friends: [{ name: 'Oldpal', cls: 'rogue', level: 20, online: false }],
+      ignores: [],
+      blocks: [],
+      guild: null,
+      myPledge: null,
+    };
+    const win = makeWindow();
+    win.toggle();
+    rightClick('[data-player="Oldpal"]');
+    expect(menus).toEqual([{ menu: 'name', name: 'Oldpal', x: 30, y: 40 }]);
+  });
+
+  it('a touch long-press on a row opens the menu in the mobile layout, and eats the click', () => {
+    vi.useFakeTimers();
+    try {
+      mobile = true;
+      const win = makeWindow();
+      win.toggle();
+      clickTab('who');
+      world.whoInfo = ROSTER;
+      win.refreshIfChanged();
+      const name = root.querySelector('.soc-link[data-whisper="Bryn"]') as HTMLElement;
+      name.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          pointerType: 'touch',
+          pointerId: 1,
+          clientX: 50,
+          clientY: 60,
+        }),
+      );
+      vi.advanceTimersByTime(700);
+      expect(menus).toEqual([{ menu: 'name', name: 'Bryn', x: 50, y: 60 }]);
+      // The lifted finger's click must not also start a whisper.
+      name.click();
+      expect(whispers).toEqual([]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('a touch long-press does nothing outside the mobile layout', () => {
+    vi.useFakeTimers();
+    try {
+      const win = makeWindow();
+      win.toggle();
+      clickTab('who');
+      world.whoInfo = ROSTER;
+      win.refreshIfChanged();
+      (root.querySelector('[data-player="Bryn"]') as HTMLElement).dispatchEvent(
+        new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch', pointerId: 1 }),
+      );
+      vi.advanceTimersByTime(700);
+      expect(menus).toEqual([]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('says when the server capped the answer', () => {

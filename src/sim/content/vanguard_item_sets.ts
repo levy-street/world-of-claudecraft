@@ -48,7 +48,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_paladin_holy',
     name: 'Sunvigil Regalia',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Life Covenant's cooldown is reduced by 30 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Life Covenant's cooldown is reduced by 30 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -152,7 +156,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_priest_discipline',
     name: 'Veilpsalm Raiment',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Terror Canticle's cooldown is reduced by 3 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Terror Canticle's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -164,7 +172,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_priest_holy',
     name: 'Gracewing Raiment',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Veilstep's cooldown is reduced by 6 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Veilstep's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -179,7 +191,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
+        text: "Litany of Woe also slows the target's movement by 30 percent while you channel it. Damage taken no longer delays your spellcasting.",
       },
       {
         pieces: 4,
@@ -192,7 +204,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_shaman_elemental',
     name: 'Tempestwrit Battlemail',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Unleash Weapon's cooldown is reduced by 3 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Unleash Weapon's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -223,7 +239,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: 'Mending Waters casts 0.5 sec faster on an ally below 50 percent health.',
+        text: 'Mending Waters casts 0.5 sec faster on an ally below 50 percent health. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,
@@ -236,7 +252,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_mage_arcane',
     name: "Hourbinder's Vestments",
     bonuses: [
-      { pieces: 2, effect: {}, text: "Temporal Barrier's cooldown is reduced by 2 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Temporal Barrier's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -248,7 +268,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_mage_fire',
     name: 'Emberlash Regalia',
     bonuses: [
-      { pieces: 2, effect: {}, text: 'Cinderfall recharges 3 sec faster.' },
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Cinderfall recharges 3 sec faster. Damage taken no longer delays your spellcasting.',
+      },
       {
         pieces: 4,
         effect: {},
@@ -260,7 +284,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_mage_frost',
     name: 'Rimewarden Garb',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Icebind's cooldown is reduced by 2 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Icebind's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -272,7 +300,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_warlock_affliction',
     name: 'Dreadquill Vestments',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Harrow's cast time is reduced by 0.3 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Harrow's cast time is reduced by 0.3 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -284,7 +316,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_warlock_demonology',
     name: 'Marrowbound Regalia',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Bone Armor's cooldown is reduced by 10 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Bone Armor's cooldown is reduced by 10 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -296,7 +332,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_warlock_destruction',
     name: 'Slagcrown Vestments',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Cinderhide's cooldown is reduced by 30 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Cinderhide's cooldown is reduced by 30 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -308,7 +348,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_druid_balance',
     name: 'Starwarden Raiment',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Gripping Roots' cast time is reduced by 0.5 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Gripping Roots' cast time is reduced by 0.5 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -332,7 +376,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_druid_restoration',
     name: 'Thistlebloom Vestment',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Fleetmend's cooldown is reduced by 1 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Fleetmend's cooldown is reduced by 1 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},

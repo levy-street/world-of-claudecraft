@@ -760,7 +760,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "445286af",
+      "state": "e7602e96",
       "events": "3b126ae3",
       "rng": {
         "draws": 14,
@@ -2068,15 +2068,6 @@
             ]
           },
           "lootFfaTimer": 59.95,
-          "lootPartyTradeEligibility": {
-            "names": [
-              "HeroicTank",
-              "HeroicDps0",
-              "HeroicDps1",
-              "HeroicDps2",
-              "HeroicDps3"
-            ]
-          },
           "lootRecipientIds": [
             1010,
             1011,
@@ -2120,7 +2111,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "445286af",
+      "state": "e7602e96",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -3428,15 +3419,6 @@
             ]
           },
           "lootFfaTimer": 59.95,
-          "lootPartyTradeEligibility": {
-            "names": [
-              "HeroicTank",
-              "HeroicDps0",
-              "HeroicDps1",
-              "HeroicDps2",
-              "HeroicDps3"
-            ]
-          },
           "lootRecipientIds": [
             1010,
             1011,

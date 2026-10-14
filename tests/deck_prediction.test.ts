@@ -8,7 +8,7 @@ import {
   EASTBROOK_NIGHTBLOOM_FERRY,
 } from '../src/sim/content/transport_ships';
 import { Sim } from '../src/sim/sim';
-import { deckToWorld, worldToDeck } from '../src/sim/transport_deck';
+import { aboardDeck, deckToWorld, worldToDeck } from '../src/sim/transport_deck';
 import { transportClock } from '../src/sim/transport_ferry';
 import { syncTransportGates } from '../src/sim/transport_gates';
 import { type TransportPose, transportShipPoseAt } from '../src/sim/transport_schedule';
@@ -34,7 +34,7 @@ function mi(over: Partial<MoveInput>): MoveInput {
 }
 
 describe('the deck-aware prediction step', () => {
-  it('matches the live Sim on a sailing deck, walking, turning and jumping', () => {
+  it('matches the live Sim while walking, turning and jumping off a sailing deck', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     sim.setPlayerLevel(20);
     // the western strait's elbow: the ship turns under the passenger
@@ -95,15 +95,18 @@ describe('the deck-aware prediction step', () => {
       sim.tick();
       state = predictTick(ring, state, { ct, mi: input, facing: null }, step);
       const pose = poseAt(transportClock(sim.ctx));
-      const server = worldToDeck(pose, p.pos.x, p.pos.z, { x: 0, z: 0 });
-      expect(state.deck).toBe(0);
+      const aboard = aboardDeck(EASTBROOK_FERRY_HULL, pose, WATER_LEVEL, p.pos.x, p.pos.y, p.pos.z);
+      expect(state.deck).toBe(aboard ? 0 : null);
+      const server =
+        state.deck === null ? p.pos : worldToDeck(pose, p.pos.x, p.pos.z, { x: 0, z: 0 });
       worst = Math.max(
         worst,
         Math.hypot(server.x - state.pos.x, server.z - state.pos.z),
         Math.abs(p.pos.y - state.pos.y),
       );
     });
-    expect(p.ferryRide).toBeTruthy();
+    expect(p.ferryRide ?? null).toBeNull();
+    expect(state.deck).toBeNull();
     expect(worst).toBeLessThan(1e-6);
   });
 

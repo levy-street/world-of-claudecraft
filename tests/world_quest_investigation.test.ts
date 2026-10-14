@@ -149,6 +149,67 @@ describe('A Borrowed Face', () => {
     expect(sim.worldQuestLog.has(ID)).toBe(false);
   });
 
+  it('puts a rider own mount away and hears the accusation instead of ignoring it', () => {
+    const sim = setup();
+    investigate(sim);
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim);
+    expect(sim.player.mountKey).toBe('');
+    const mob = sim.entities.get(sim.worldQuestLog.get(ID)!.investigation!.mobId!)!;
+    expect(mob.templateId).toBe(INVESTIGATION_MOB_ID);
+  });
+
+  it('keeps a rider mounted when the accusation is refused', () => {
+    const sim = setup();
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim);
+    expect(sim.worldQuestLog.get(ID)?.investigation?.mobId).toBeUndefined();
+    expect(sim.player.mountKey).toBe('valorsteed');
+  });
+
+  it('dismounts a rider who names the wrong guard and clears that guard', () => {
+    const sim = setup();
+    investigate(sim);
+    const correct = culprit(sim);
+    const wrong = INVESTIGATION_NPC_IDS.slice(1).find((id) => id !== correct)!;
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim, wrong);
+    const state = sim.worldQuestLog.get(ID)!.investigation!;
+    expect(sim.player.mountKey).toBe('');
+    expect(state.cleared).toBe(1 << (INVESTIGATION_NPC_IDS.indexOf(wrong) - 1));
+    expect(state.mobId).toBeUndefined();
+  });
+
+  it('keeps a rider mounted when the named guard is already cleared or the infiltrator is up', () => {
+    const sim = setup();
+    investigate(sim);
+    const correct = culprit(sim);
+    const wrong = INVESTIGATION_NPC_IDS.slice(1).find((id) => id !== correct)!;
+    accuse(sim, wrong);
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim, wrong);
+    expect(sim.player.mountKey).toBe('valorsteed');
+    sim.player.mountKey = '';
+    accuse(sim, correct);
+    const mobId = sim.worldQuestLog.get(ID)!.investigation!.mobId;
+    expect(mobId).toBeDefined();
+    sim.player.inCombat = false;
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim, correct);
+    expect(sim.player.mountKey).toBe('valorsteed');
+    expect(sim.worldQuestLog.get(ID)!.investigation!.mobId).toBe(mobId);
+  });
+
+  it('refuses a rider in a mount race without dismounting them', () => {
+    const sim = setup();
+    investigate(sim);
+    sim.player.mountKey = 'valorsteed';
+    sim.meta(sim.playerId)!.mountRace = {} as never;
+    accuse(sim);
+    expect(sim.player.mountKey).toBe('valorsteed');
+    expect(sim.worldQuestLog.get(ID)?.investigation?.mobId).toBeUndefined();
+  });
+
   it('keeps clues after wrong accusations and prevents duplicate summons even after movement', () => {
     const sim = setup();
     investigate(sim);
@@ -292,5 +353,32 @@ describe('A Borrowed Face', () => {
     expect(targetEntity).toHaveBeenCalledWith(guardId);
     expect(interact).toHaveBeenCalledOnce();
     expect(hud.openQuestDialog).not.toHaveBeenCalled();
+  });
+
+  it('runs the investigation when it arrives as a reroll, off the base board', () => {
+    // wq1_101 offers the drowned dead in Mirefen; the infiltrator is the reroll.
+    const cycle = 'wq1_101';
+    expect(activeWorldQuestsForCycle(cycle).some((quest) => quest.id === ID)).toBe(false);
+    const sim = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      devCommands: true,
+      world: {
+        ...BUILTIN_WORLD,
+        camps: [],
+        npcs: Object.fromEntries(INVESTIGATION_NPCS.map((npc) => [npc.id, npc])),
+        groundObjects: [],
+      },
+    });
+    sim.resetDay = '2026-09-06';
+    sim.chat('/dev infiltrator');
+    const meta = sim.meta(sim.playerId)!;
+    meta.devWorldQuestCycle = cycle;
+    sim.tick();
+    meta.worldQuestReplacements = { wq_mirefen_drowned: ID };
+    sim.tick();
+    expect(sim.worldQuestLog.get(ID)?.state).toBe('active');
+    investigate(sim);
+    expect(sim.worldQuestLog.get(ID)?.investigation).toEqual({ heard: 15, clues: 3, cleared: 0 });
   });
 });

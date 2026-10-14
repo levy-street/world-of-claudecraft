@@ -5,6 +5,7 @@
 // is the same pure/IO split the server uses (wallet_link.ts vs wallet.ts).
 import { specialRoleByKey, specialRoleByName } from '../src/sim/discord_roles';
 import { DISCORD_STATUS_DEFS, discordStatusByIndex } from '../src/sim/discord_tier';
+import { formatMoney } from '../src/sim/format_money';
 
 // ── Gateway ──────────────────────────────────────────────────────────────────
 // Intents we need: guild metadata, members (privileged), voice states (who is in
@@ -875,6 +876,161 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
     payload.allowed_mentions = { parse: [] };
   }
   return payload;
+}
+
+// ── World PvP kill feed ───────────────────────────────────────────────────────
+// One kill as the outbox's `pvpKills` stream ships it (server/discord_pvp_feed.ts
+// QueuedPvpKill). Names only, no Discord ids: the feed never pings anyone.
+export interface PvpKillItem {
+  killerName: string;
+  victimName: string;
+  killerLevel: number;
+  victimLevel: number;
+  zoneName: string | null;
+  assists: number;
+  copper: number;
+  realm: string;
+}
+
+/**
+ * Lines per digest post. One drain becomes ceil(n / this) posts, so a burst of
+ * kills costs a handful of createMessage calls rather than one each, and the
+ * server's queue cap (PVP_KILL_FEED_MAX_QUEUE) bounds how many posts a drain
+ * can take. Sized against the WORST line, not a typical one: all three escaped
+ * fields (killer, victim, zone) at PVP_FEED_NAME_MAX of pure markdown
+ * metacharacters escape to double length, and every number sits at
+ * PVP_FEED_NUMBER_MAX. A full batch of that line must stay inside the
+ * 4096-character embed description limit; tests/discord_bot.test.ts pins it.
+ */
+export const PVP_FEED_LINES_PER_POST = 13;
+/** Character names are short in game; this only bounds a malformed wire value. */
+export const PVP_FEED_NAME_MAX = 32;
+
+/**
+ * A character name as plain embed text. The wire is unchecked JSON across two
+ * processes, so Discord markdown metacharacters are escaped (a name can never
+ * bold, strike or spoiler the rest of the line) and the length is bounded.
+ */
+export function pvpFeedName(raw: string): string {
+  const bounded = (raw || '').replace(/\s+/g, ' ').trim().slice(0, PVP_FEED_NAME_MAX);
+  return bounded.replace(/[\\*_~`|>[\]()#-]/g, (ch) => `\\${ch}`) || 'Someone';
+}
+
+/**
+ * Ceiling for every number a kill line renders. Far above any real level,
+ * assist count or stake (the stake is capped in copper well below it), it only
+ * bounds a malformed wire value so a line can never render `1e+300`.
+ */
+export const PVP_FEED_NUMBER_MAX = 999_999_999;
+
+/** Whole integer in [0, PVP_FEED_NUMBER_MAX] from an unchecked wire number, else 0. */
+function wireCount(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
+  return Math.min(PVP_FEED_NUMBER_MAX, Math.max(0, Math.floor(value)));
+}
+
+/** Split one drain into digest-sized batches, FIFO order kept. */
+export function chunkPvpKills(items: readonly PvpKillItem[]): PvpKillItem[][] {
+  const batches: PvpKillItem[][] = [];
+  for (let i = 0; i < items.length; i += PVP_FEED_LINES_PER_POST) {
+    batches.push(items.slice(i, i + PVP_FEED_LINES_PER_POST));
+  }
+  return batches;
+}
+
+/**
+ * One kill line, e.g. "**Annthar** (60) slew **Borin** (58) in Drakelands,
+ * with 2 assists, taking 1g 20s". Assists and the stake are omitted at zero.
+ */
+export function pvpKillLine(item: PvpKillItem): string {
+  const assists = wireCount(item.assists);
+  const copper = wireCount(item.copper);
+  let line =
+    `:crossed_swords: **${pvpFeedName(item.killerName)}** (${wireCount(item.killerLevel)}) slew ` +
+    `**${pvpFeedName(item.victimName)}** (${wireCount(item.victimLevel)})`;
+  if (item.zoneName) line += ` in ${pvpFeedName(item.zoneName)}`;
+  if (assists > 0) line += `, with ${assists} ${assists === 1 ? 'assist' : 'assists'}`;
+  if (copper > 0) line += `, taking ${formatMoney(copper)}`;
+  return line;
+}
+
+/**
+ * One digest post for a batch from chunkPvpKills. `allowed_mentions` is empty
+ * on purpose: nothing in a kill line may ping, even if a name happens to look
+ * like a mention.
+ */
+export function buildPvpKillFeedMessage(items: readonly PvpKillItem[]): Record<string, unknown> {
+  const realm = items[0]?.realm || 'the realm';
+  return {
+    embeds: [
+      {
+        color: 0xb22222,
+        author: { name: 'World PvP' },
+        description: items.map(pvpKillLine).join('\n'),
+        footer: { text: `World of ClaudeCraft (${realm})` },
+      },
+    ],
+    allowed_mentions: { parse: [] },
+  };
+}
+
+// ── King of the Hill spawn announcements (same channel as the kill feed) ─────
+// One announcement as the outbox's `hillAnnouncements` stream ships it
+// (server/discord_hill_feed.ts QueuedHillAnnouncement). Times are wall-clock
+// ms on the SERVER's clock, rendered as Discord timestamps so every reader
+// sees their own local time and a live countdown.
+export interface HillAnnouncementItem {
+  phase: 'warning' | 'risen';
+  zoneName: string;
+  risesAtMs: number;
+  fallsAtMs: number;
+  realm: string;
+}
+
+/**
+ * Whether the moment an announcement calls players to has already passed, so
+ * posting it now would mislead: a warning once the hill has risen, a rise once
+ * it has fallen. The consumer skips these (a stalled bot's backlog), the
+ * queue-pop deadline rule. A malformed time (either one) counts as stale.
+ */
+export function hillAnnouncementIsStale(item: HillAnnouncementItem, nowMs: number): boolean {
+  const finite = (ms: unknown) => typeof ms === 'number' && Number.isFinite(ms);
+  // Both times render on the card, so both must be real; the deadline is the
+  // rise for a warning and the fall for a rise.
+  if (!finite(item.risesAtMs) || !finite(item.fallsAtMs)) return true;
+  const deadline = item.phase === 'warning' ? item.risesAtMs : item.fallsAtMs;
+  return !(deadline > nowMs);
+}
+
+/** `<t:unix:style>`: Discord renders it in each reader's own time zone. */
+function discordTime(ms: number, style: 'R' | 't'): string {
+  return `<t:${Math.floor(ms / 1000)}:${style}>`;
+}
+
+/** One card per announcement. Nobody is pinged. */
+export function buildHillAnnouncementMessage(item: HillAnnouncementItem): Record<string, unknown> {
+  const zone = pvpFeedName(item.zoneName);
+  const warning = item.phase === 'warning';
+  const title = warning ? `A hill will rise in ${zone}` : `A hill has risen in ${zone}`;
+  const description = warning
+    ? `It rises ${discordTime(item.risesAtMs, 'R')} and stands until ` +
+      `${discordTime(item.fallsAtMs, 't')}. The party with the most players ` +
+      'standing inside takes it and earns Honor for every minute they hold it.'
+    : `It stands until ${discordTime(item.fallsAtMs, 't')} ` +
+      `(${discordTime(item.fallsAtMs, 'R')}). The party with the most players ` +
+      'standing inside takes it and earns Honor for every minute they hold it.';
+  return {
+    embeds: [
+      {
+        color: 0xf0c060,
+        author: { name: 'King of the Hill' },
+        title,
+        description,
+        footer: { text: `World of ClaudeCraft (${item.realm || 'the realm'})` },
+      },
+    ],
+    allowed_mentions: { parse: [] },
+  };
 }
 
 // ── Daily rewards winners feed ────────────────────────────────────────────────

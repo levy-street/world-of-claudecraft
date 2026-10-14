@@ -97,6 +97,14 @@ export function directHitBonus(
 // Damage spells are untouched (they keep the 1x rider in directHitBonus).
 export const HEALING_SP_SCALE = 2;
 
+// The cast time a resolved ability's direct coefficient reads: its castTime,
+// unless a speed-up pinned the pre-speed-up value in scalingCastTime (Verdance's
+// faster Wildmend keeps its full Spell Power rider). Combat and the tooltip both
+// read it here so they cannot disagree.
+export function coefficientCastTime(res: { castTime: number; scalingCastTime?: number }): number {
+  return res.scalingCastTime ?? res.castTime;
+}
+
 // Flat bonus added to ONE direct heal. Healing always scales off Spell Power at
 // the full cast-time coefficient with no AP scale-down (heals are never "attack
 // spells"): instants use the 1.5 floor, like a direct nuke. `castTimeSec` is the

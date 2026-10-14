@@ -52,6 +52,7 @@ const EXPECTED = {
     'aspect_of_the_monkey',
     'aspect_of_the_cheetah',
     'revive_pet',
+    'play_dead',
   ],
   'hunter/marksmanship': [
     'measured_shot',
@@ -72,6 +73,7 @@ const EXPECTED = {
     'aspect_of_the_monkey',
     'aspect_of_the_cheetah',
     'revive_pet',
+    'play_dead',
   ],
   'hunter/survival': [
     'bloodhook',
@@ -83,6 +85,7 @@ const EXPECTED = {
     'trailbreak',
     'wildheart',
     'shellskin',
+    'tactical_camo',
     'frostjaw_trap',
     'wing_clip',
     'concussive_shot',
@@ -92,6 +95,7 @@ const EXPECTED = {
     'aspect_of_the_monkey',
     'aspect_of_the_cheetah',
     'revive_pet',
+    'play_dead',
   ],
   'shaman/elemental': [
     'lightning_bolt',
@@ -195,6 +199,7 @@ const EXPECTED = {
     'starfire',
     'moonseed',
     'moonfire',
+    'spore_burst',
     'barkskin',
     'entangling_roots',
     'faerie_fire',
@@ -221,6 +226,7 @@ const EXPECTED = {
     'regrowth',
     'healing_touch',
     'swiftmend',
+    'spore_burst',
     'wildwake',
     'barkskin',
     'entangling_roots',
@@ -230,6 +236,7 @@ const EXPECTED = {
     'thorns',
     'travel_form',
     'grove_awakening',
+    'sporemender_form',
   ],
 } as const;
 

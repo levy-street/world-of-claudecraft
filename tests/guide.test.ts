@@ -80,7 +80,11 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
-import { WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from '../src/sim/content/pvp_honor';
+import {
+  WARFARE_ITEMS,
+  WARFARE_TRINKET_STOCK,
+  WORLD_PVP_GOODS_STOCK,
+} from '../src/sim/content/pvp_honor';
 import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import {
   ALL_RECIPES,
@@ -1787,10 +1791,16 @@ describe('Guide model stills', () => {
     );
   });
 
-  it('publishes exactly the three named druid forms (the gallery label map mirrors this)', () => {
-    // models.ts labels forms through its FORM_NAME literal map; a fourth form added in
+  it('publishes exactly the four named druid forms (the gallery label map mirrors this)', () => {
+    // models.ts labels forms through its FORM_NAME literal map; a fifth form added in
     // the generator would silently render as "Druid Forms" unless this pin reds first.
-    expect(GUIDE_DRUID_FORMS.map((d) => d.id)).toEqual(['form_bear', 'form_cat', 'form_travel']);
+    // Groveheart's Sporemender Form is the fourth (Moonwing has no model, so it is prose).
+    expect(GUIDE_DRUID_FORMS.map((d) => d.id)).toEqual([
+      'form_bear',
+      'form_cat',
+      'form_travel',
+      'form_sporemender',
+    ]);
   });
 });
 
@@ -5923,9 +5933,13 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // outside WARFARE_ITEMS (defs in content/trinkets.ts), with the same
     // soulbound, no-sell-value shape.
     for (const id of honorRows) {
-      // The Warfare tier: the entry tier, the two honor trinkets and Warfare Season 2.
+      // The Warfare tier: the entry tier, the two honor trinkets, the World PvP
+      // goods (the Skull Bag) and Warfare Season 2.
       expect(
-        id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id) || SEASON2_STOCK.includes(id),
+        id in WARFARE_ITEMS ||
+          WARFARE_TRINKET_STOCK.includes(id) ||
+          WORLD_PVP_GOODS_STOCK.includes(id) ||
+          SEASON2_STOCK.includes(id),
         id,
       ).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);
@@ -6165,6 +6179,12 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
         if (proc) expect(proc.pvpOnly, `${setId} ${tier.pieces}pc proc`).toBe(true);
         for (const [key, value] of Object.entries(rest)) {
           if (value === undefined) continue;
+          // The one tier that works everywhere: the caster families' 2-piece
+          // pushback immunity, which the prose names as its exception.
+          if (key === 'castPushbackReduction' && tier.pieces === 2) {
+            expect(body).toContain('two pieces of a caster set also stop damage from delaying');
+            continue;
+          }
           expect(
             ['pvpOffenseRating', 'pvpDefenseRating', 'ccDurationReduction'],
             `${setId} ${tier.pieces}pc ${key}`,

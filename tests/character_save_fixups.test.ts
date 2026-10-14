@@ -2,10 +2,12 @@
 // every DURABLE character blob must carry, whichever serialization instant
 // produced it (the autosave thunk, or the marketplace escrow persist's in-job
 // snapshot). The module exists because a raw sim.serializeCharacter is not a
-// save-shaped blob: it holds the spectator body instead of the real one, drops
-// the pet the spectate stowed, and, for a jailed player, carries neither the
-// jail flag nor a jail position. That last one is a moderation escape, not
-// cosmetics: the sentence would be gone at the next load.
+// save-shaped blob: for a jail-visiting moderator it holds the visitor body
+// instead of the real one and drops the pet the visit stowed, and for a jailed
+// player it carries neither the jail flag nor a jail position. That last one
+// is a moderation escape, not cosmetics: the sentence would be gone at the
+// next load. A spectating moderator needs no fixup at all: /spectate leaves
+// the body where it stands (server/spectate_body.ts), pinned below.
 //
 // Unit-tested directly rather than through GameServer, so each arm is decidable
 // on its own and the jail-spawn thunk's call count is observable.
@@ -15,7 +17,9 @@ import { applyCharacterSaveFixups } from '../server/character_save_fixups';
 import type { ClientSession } from '../server/game';
 import type { CharacterState, PetState } from '../src/sim/sim';
 
-type FixupSession = Pick<ClientSession, 'spectating' | 'jailVisit' | 'jailed'>;
+type FixupSession = Pick<ClientSession, 'jailVisit' | 'jailed'> & {
+  spectating?: ClientSession['spectating'];
+};
 
 const JAIL_SPAWN = { x: -12_000, z: -11_975 };
 
@@ -49,51 +53,26 @@ function session(over: Partial<FixupSession> = {}): FixupSession {
   return { spectating: null, jailVisit: null, jailed: null, ...over };
 }
 
-const spectating = (stowedPet: PetState | null): FixupSession['spectating'] => ({
-  characterId: 21,
-  name: 'Watcher',
-  savedPos: { x: 111, y: 42, z: 222 },
-  priorGm: false,
-  stowedPet,
-});
-
-describe('a spectating session persists the real body, not the spectator one', () => {
-  it('writes the saved position and hands the stowed pet back to the blob', () => {
-    // The live body is off at whatever the moderator is watching, so the blob
-    // must take the position the spectate saved. The pet is the same story
-    // told about a different field: spectating stows it, so a blob written
-    // from the live session would persist "no pet" and lose it for good.
-    const s = blob({ pos: { x: 9999, z: -9999 }, pet: null });
-    const out = applyCharacterSaveFixups(session({ spectating: spectating(PET) }), s, () => {
-      throw new Error('jailSpawn must not be consulted for an unjailed session');
-    });
-    expect(out.pos).toEqual({ x: 111, z: 222 });
-    expect(out.pet).toEqual(PET);
-    // The saved position is 3D and the blob's is not: a y that leaked through
-    // would be a shape change on every spectated save.
-    expect(Object.keys(out.pos).sort()).toEqual(['x', 'z']);
-    // Deliberately asymmetric with the jail visit below: a spectate records no
-    // facing, so the serialized one stands rather than being zeroed.
-    expect(out.facing).toBe(1.5);
-  });
-
-  it('carries a null stowed pet through rather than keeping the live one', () => {
-    // The pet always comes FROM the session record. A spectate that stowed
-    // nothing must not let a stale blob pet survive, or a dismissed pet would
-    // resurrect on the next load.
+describe('a spectating session persists the live body as serialized', () => {
+  it('leaves position, pet and facing alone (the body never left)', () => {
+    const s = blob({ pos: { x: 9999, z: -9999 }, pet: PET });
     const out = applyCharacterSaveFixups(
-      session({ spectating: spectating(null) }),
-      blob({ pet: PET }),
-      () => JAIL_SPAWN,
+      session({ spectating: { characterId: 21, name: 'Watcher' } }),
+      s,
+      () => {
+        throw new Error('jailSpawn must not be consulted for an unjailed session');
+      },
     );
-    expect(out.pet).toBeNull();
+    expect(out.pos).toEqual({ x: 9999, z: -9999 });
+    expect(out.pet).toEqual(PET);
+    expect(out.facing).toBe(1.5);
   });
 });
 
 describe('a jail VISIT persists the visitor position, facing and stowed pet', () => {
   it('restores all three from the visit record', () => {
-    // The moderator's own trip to the cage: the same shape as spectating, plus
-    // the facing, which the visit teleport also overwrote.
+    // The moderator's own trip to the cage: the teleport overwrote position
+    // and facing, and the visit stowed the pet.
     const out = applyCharacterSaveFixups(
       session({
         jailVisit: {
@@ -107,38 +86,10 @@ describe('a jail VISIT persists the visitor position, facing and stowed pet', ()
       () => JAIL_SPAWN,
     );
     expect(out.pos).toEqual({ x: -5, z: 7 });
-    // Same 3D-narrowing pin as the spectating arm: savedPos.y must not leak
-    // into the 2D blob position.
+    // savedPos.y must not leak into the 2D blob position.
     expect(Object.keys(out.pos).sort()).toEqual(['x', 'z']);
     expect(out.facing).toBe(2.25);
     expect(out.pet).toEqual(PET);
-  });
-
-  it('wins the position over a spectate saved on the same session', () => {
-    // The middle rung of the precedence order (jail > jailVisit > spectate):
-    // a moderator who visits the cage while also spectating persists the
-    // VISIT record, facing included.
-    const out = applyCharacterSaveFixups(
-      session({
-        jailVisit: {
-          savedPos: { x: -5, y: 3, z: 7 },
-          savedFacing: 2.25,
-          priorGm: true,
-          stowedPet: PET,
-        },
-        spectating: {
-          characterId: 9,
-          name: 'Watched',
-          savedPos: { x: 111, y: 0, z: 222 },
-          priorGm: false,
-          stowedPet: null,
-        },
-      }),
-      blob({ pos: { x: -12_000, z: -12_000 }, facing: 0, pet: null }),
-      () => JAIL_SPAWN,
-    );
-    expect(out.pos).toEqual({ x: -5, z: 7 });
-    expect(out.facing).toBe(2.25);
   });
 });
 
@@ -180,18 +131,26 @@ describe('a jailed session persists the sentence, wherever the body was', () => 
     expect(out.hp).toBe(250);
   });
 
-  it('wins the position over a spectate or a visit saved on the same session', () => {
+  it('wins the position over a visit saved on the same session', () => {
     // Order inside the module is load-bearing: the jail arm runs last, so a
-    // session that is somehow both jailed and spectating persists INSIDE the
+    // session that is somehow both jailed and visiting persists INSIDE the
     // cage. The reverse order would write the free position and release them.
     const out = applyCharacterSaveFixups(
-      session({ jailed: JAILED, spectating: spectating(PET), jailVisit: null }),
+      session({
+        jailed: JAILED,
+        jailVisit: {
+          savedPos: { x: -5, y: 3, z: 7 },
+          savedFacing: 2.25,
+          priorGm: false,
+          stowedPet: PET,
+        },
+      }),
       blob(),
       () => JAIL_SPAWN,
     );
     expect(out.pos).toEqual(JAIL_SPAWN);
     expect(out.jail).toEqual(JAILED);
-    // The pet still rides: the spectate arm's own work is kept, only its
+    // The pet still rides: the visit arm's own work is kept, only its
     // position is overwritten.
     expect(out.pet).toEqual(PET);
   });

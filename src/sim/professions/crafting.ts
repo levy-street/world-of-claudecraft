@@ -435,10 +435,20 @@ function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
  *  the signed instance on the RESOLVED id (gathering.ts). So a player who
  *  out-tooled the material, holding only signed fine copies, would pay the
  *  reagent line with one and still lose MASTERWORK_SIGNED_CHANCE, which is the
- *  same inversion the sibling exists to prevent. */
-function hasSignedInstance(meta: PlayerMeta, itemId: string): boolean {
+ *  same inversion the sibling exists to prevent.
+ *
+ *  Reads the Materials Vault's identity rows too when `vaultReachable` (the
+ *  vault draw is allowed where the crafter stands, the same gate that lets it
+ *  pay reagents): a signed copy banked there feeds the proc exactly like one in
+ *  the bags. Signed units never sit in the compact count record, so the
+ *  identity rows are the whole vault half. */
+function hasSignedInstance(meta: PlayerMeta, itemId: string, vaultReachable: boolean): boolean {
   const gradeIds = materialGradeIds(itemId);
-  return gradeIds.some((gradeId) => holdsMaterialSignature(meta.inventory, gradeId));
+  return gradeIds.some(
+    (gradeId) =>
+      holdsMaterialSignature(meta.inventory, gradeId) ||
+      (vaultReachable && holdsMaterialSignature(meta.vault.special, gradeId)),
+  );
 }
 
 /** The result of resolving one reagent's required quantity: the final count
@@ -521,8 +531,9 @@ export function requiredReagentCountFor(
  *  The carried half counts only UNLOCKED units (issue 3042, item_lock.ts): a
  *  player-locked reagent copy is not spendable material, exactly like a
  *  held-but-bound copy is not sellable, so it can never satisfy this gate.
- *  The drawable vault view deliberately exposes only ordinary pooled stock.
- *  Identity-bearing special rows can be locked and are excluded from every
+ *  The drawable vault view exposes ordinary pooled stock plus units signed by
+ *  the crafter themself; every other identity-bearing special row (another
+ *  player's signature, a payload, a crafted marker) is excluded from every
  *  automatic craft and Create All plan.
  *
  *  `vaultStock` lets a caller that has ALREADY resolved the place gate hand
@@ -911,8 +922,9 @@ export function resolveCraftForRecipe(
   // The masterwork signed-reagent input: a holding check over the recipe's
   // reagents BEFORE consumption (removeItem consumes end-backward, so the
   // signed copy itself may be what gets consumed), any signer counting.
-  // Deliberately still an INVENTORY-only check: drawable vault stock excludes
-  // identity-bearing special rows, so nothing it can spend carries a signer.
+  // A signed copy in the bags OR in the Materials Vault (where the vault draw
+  // is allowed here) counts, any signer. The #1145 quantity discount stays
+  // bags-only; this flag does not.
   let signedReagentUsed = false;
   // Apply the plans decided above, one per reagent in reagent order. The two
   // flags are read off the SAME reagent this plan belongs to (the planner
@@ -930,7 +942,9 @@ export function resolveCraftForRecipe(
   recipe.reagents.forEach((reagent, i) => {
     const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
     if (required.selfSignedBonusApplied) selfSignedBonusApplied = true;
-    if (meta && hasSignedInstance(meta, reagent.itemId)) signedReagentUsed = true;
+    if (meta && hasSignedInstance(meta, reagent.itemId, vaultStock !== null)) {
+      signedReagentUsed = true;
+    }
     const plan = plans[i];
     // Lock-aware removal (issue 3042): the plan's carried takes were counted
     // over unlocked units only (the planner call above), and
@@ -1408,11 +1422,11 @@ export function maxCraftCountForRecipe(
       (reagent) =>
         requiredReagentCountFor(
           // Inventory-only, and it stays that way: the discount is keyed on
-          // HOLDING a signed instance, and drawable vault stock excludes every
-          // identity-bearing special row, so the discount can never derive
-          // from the vault. Re-derived per
-          // iteration because the hold expires when the last signed copy is
-          // consumed mid-batch.
+          // HOLDING a signed instance in the bags. The vault may pay with the
+          // crafter's OWN signed units, but holding them there never earns
+          // the discount (tests/craft_from_vault.test.ts pins bags-only).
+          // Re-derived per iteration because the hold expires when the last
+          // signed copy is consumed mid-batch.
           materialGradeIds(reagent.itemId).some((gradeId) =>
             holdsSelfSignedInstance(scratch, meta.name, gradeId),
           ),

@@ -864,3 +864,30 @@ describe('planJoin: an escrow-quarantined session is never resumed', () => {
     });
   });
 });
+
+describe('World PvP rewards during disconnect grace', () => {
+  it('pauses without losing progress and resumes only after a new socket joins', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Flagbearer', 'warrior', null));
+    server.sim.setPlayerLevel(20, session.pid);
+    const player = server.sim.entities.get(session.pid)!;
+    player.pos = { x: 60, y: 0, z: 700 };
+    player.prevPos = { ...player.pos };
+    server.sim.setWorldPvpFlag(true, session.pid);
+    const meta = server.sim.meta(session.pid)!;
+    meta.worldPvp!.rewardTicks = 72_000 - 1;
+    dropSocket(server, session, ws);
+    server.sim.tick();
+    expect(meta.worldPvp!.rewardTicks).toBe(71_999);
+    expect(meta.deedsEarned.has('pvp_flag_1h')).toBe(false);
+    const saved = server.sim.serializeCharacter(session.pid)!;
+    expect(saved.worldPvp!.rewardTicks).toBe(71_999);
+    expect(saved.worldPvp).not.toHaveProperty('pvpRewardsPaused');
+    const resumed = expectJoined(server.join(fakeWs(), 11, 101, 'Flagbearer', 'warrior', null));
+    expect(resumed.pid).toBe(session.pid);
+    server.sim.tick();
+    expect(meta.worldPvp!.rewardTicks).toBe(72_000);
+    expect(meta.deedsEarned.has('pvp_flag_1h')).toBe(true);
+  });
+});

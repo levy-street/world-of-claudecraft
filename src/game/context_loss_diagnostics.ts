@@ -5,6 +5,7 @@
 // rather than three closures inline in main.ts's own entry sequence, so this
 // coverage can grow without growing the firewall file (src/main.ts sits at a
 // pinned, zero-headroom line ceiling; see tests/monolith_budget.test.ts).
+import { ktx2MipsOnContextRestored } from '../render/assets/ktx2_mip_release';
 import type { ContextRecoveryCallbacks } from '../render/context_loss_recovery';
 import type { EntryCheckpoint, EntryDiagnostics } from './entry_crash_guard';
 
@@ -14,6 +15,9 @@ export interface ContextRecoveryDiagnosticsDeps {
   };
   renderEntryDiagnostics: () => EntryDiagnostics;
   ktx2MipsOnContextLost: () => void;
+  /** Defaults to the real KTX2 restore hook (uploads release again, and a
+   *  texture whose re-transcode failed gets another one); injected by tests. */
+  ktx2MipsOnContextRestored?: () => void;
   /** Renderer's own lost-context tally BEFORE this loss (0 pre-renderer); the
    *  builder adds the +1 for the loss this callback is reporting. */
   contextLostCount: () => number;
@@ -35,6 +39,7 @@ export function buildContextRecoveryCallbacks(
       console.warn('[entry-diag] WebGL context lost during or after world entry');
     },
     onRestored: () => {
+      (deps.ktx2MipsOnContextRestored ?? ktx2MipsOnContextRestored)();
       deps.entryDiagnostics.checkpoint('webgl-context-restored');
       console.info('[entry-diag] WebGL context restored during or after world entry');
     },

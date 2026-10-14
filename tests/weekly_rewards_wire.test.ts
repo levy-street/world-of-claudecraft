@@ -1,9 +1,47 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { decodeWeeklyRewardInfo, sendWeekly } from '../src/net/weekly_rewards_wire';
 import { emptyWeeklyRewards } from '../src/sim/weekly_rewards';
 import { bareClient } from './helpers/bare_client';
 
 describe('weekly reward wire', () => {
+  it('forwards focus selection without predicting a changed server preference', () => {
+    const state = emptyWeeklyRewards(604800000);
+    state.lootSpec = 'fire';
+    const client = bareClient(1, {
+      weeklyRewardInfo: { state },
+      cmd: vi.fn(),
+    });
+    client.setWeeklyLootSpec('arcane');
+    client.setWeeklyLootSpec(null);
+    expect((client as any).cmd.mock.calls).toEqual([
+      [{ cmd: 'weekly_loot_spec', spec: 'arcane' }],
+      [{ cmd: 'weekly_loot_spec', spec: null }],
+    ]);
+    expect(client.weeklyRewardInfo!.state.lootSpec).toBe('fire');
+  });
+
+  it('decodes the current focus and each revealed reward focus independently', () => {
+    const state = emptyWeeklyRewards(604800000);
+    state.lootSpec = 'frost';
+    state.vaults = [
+      {
+        resetAtMs: 1000,
+        choices: [
+          { pool: 'raid', itemId: 'orb_of_the_last_spring', opened: true, lootSpec: 'arcane' },
+        ],
+      },
+    ];
+    const info = decodeWeeklyRewardInfo({
+      state,
+      nowMs: 2000,
+      playerLevel: 20,
+      canClaim: true,
+      worldQuestsAvailable: false,
+      readyWeeks: 1,
+    })!;
+    expect(info.state.lootSpec).toBe('frost');
+    expect(info.state.vaults[0].choices[0].lootSpec).toBe('arcane');
+  });
   it('sends the chosen table with the current open token, never with a claim', () => {
     const info = {
       state: emptyWeeklyRewards(604800000),

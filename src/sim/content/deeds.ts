@@ -3597,6 +3597,79 @@ export const DEEDS: Record<string, DeedDef> = {
       ],
     },
   },
+  // The sixth lifetime-XP rung, appended at the END per the append-only
+  // contract rather than beside its five siblings. Unlike those five it has
+  // no legacy milestone id: MILESTONE_DEED_TO_LEGACY is a frozen one-release
+  // mirror of the retired milestone system, so this rung is a deed title only
+  // (picked from the Book of Deeds like every post-unification title).
+  prog_titan: {
+    id: 'prog_titan',
+    name: 'Titan',
+    desc: 'Earn 10,000,000 lifetime experience.',
+    category: 'progression',
+    renown: 50,
+    trigger: { kind: 'lifetimeXp', amount: 10_000_000 },
+    reward: { kind: 'title', text: 'Titan' },
+  },
+  pvp_flag_1h: {
+    id: 'pvp_flag_1h',
+    name: 'Bold',
+    desc: 'Keep World PvP on while alive in the open world or a PvP match for 1 hour of played time. Sanctuary, PvE instances, death and logout pause progress; switching off resets it. Earned titles are permanent.',
+    category: 'pvp',
+    renown: 5,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Bold' },
+  },
+  pvp_flag_3h: {
+    id: 'pvp_flag_3h',
+    name: 'Defiant',
+    desc: 'Keep World PvP on while alive in the open world or a PvP match for 3 hours of played time. Sanctuary, PvE instances, death and logout pause progress; switching off resets it. Earned titles are permanent.',
+    category: 'pvp',
+    renown: 10,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Defiant' },
+  },
+  pvp_flag_6h: {
+    id: 'pvp_flag_6h',
+    name: 'Dauntless',
+    desc: 'Keep World PvP on while alive in the open world or a PvP match for 6 hours of played time. Sanctuary, PvE instances, death and logout pause progress; switching off resets it. Earned titles are permanent.',
+    category: 'pvp',
+    renown: 10,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Dauntless' },
+  },
+  pvp_flag_24h: {
+    id: 'pvp_flag_24h',
+    name: 'Unyielding',
+    desc: 'Keep World PvP on while alive in the open world or a PvP match for 24 hours of played time. Sanctuary, PvE instances, death and logout pause progress; switching off resets it. Earned titles are permanent.',
+    category: 'pvp',
+    renown: 25,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Unyielding' },
+  },
+  pvp_flag_168h: {
+    id: 'pvp_flag_168h',
+    name: 'Indomitable',
+    desc: 'Keep World PvP on while alive in the open world or a PvP match for 7 days of played time. Sanctuary, PvE instances, death and logout pause progress; switching off resets it. Earned titles are permanent.',
+    category: 'pvp',
+    renown: 50,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Indomitable' },
+  },
+  // The Evergarden wisp maze on Hard (the fifth shadow, a second chaser): a
+  // manual grant at the maze win in src/sim/world_quests.ts, on any Hard
+  // clear including a replay after the day's credit, the Arcane Calligraphy
+  // Gold precedent.
+  // Standard renown (10) for the harder tier; appended at the END per the
+  // append-only contract after the World PvP played-time title deeds.
+  exp_wisp_maze_hard: {
+    id: 'exp_wisp_maze_hard',
+    name: 'Brighter Than the Shadows',
+    desc: 'Recover the stolen coin purses and escape the Evergarden maze on Hard.',
+    category: 'exploration',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

@@ -3,7 +3,8 @@
 // that shows while the local player stands in the hill's zone. While the hill
 // is announced: the title and the zone, "not yet risen", the distance to the
 // marked circle and when it rises. Once risen: who holds the hill, "you N vs
-// them M", the contest clock as a fill bar, the distance and when it falls.
+// them M", the contest clock as a fill bar (saying so when it is paused by a
+// rival), the distance and when it falls.
 // Either way a note says so when the viewer does not count (a raid member). The skeleton is rebuilt in ONE innerHTML write when
 // the structural sig changes (a new hill, the rise, a holder or challenger
 // change, crossing the circle's edge); every
@@ -63,6 +64,7 @@ export class HillBar {
     w.toggleClass(root, 'is-other', view.holder === 'other');
     w.toggleClass(root, 'is-contested', view.challenger !== 'none');
     w.toggleClass(root, 'is-you-contesting', view.challenger === 'you');
+    w.toggleClass(root, 'is-paused', view.contestPaused);
     this.paintValues(view);
   }
 
@@ -170,8 +172,16 @@ function heldText(view: HillBarLive): string {
 function contestText(view: HillBarLive): string {
   const seconds = durationText(view.contest);
   const total = durationText(view.capture);
-  if (view.challenger === 'you') return t('hudChrome.hill.contestYou', { seconds, total });
-  if (view.challenger === 'other') return t('hudChrome.hill.contestOther', { seconds, total });
+  if (view.challenger === 'you') {
+    return view.contestPaused
+      ? t('hudChrome.hill.contestYouPaused', { seconds, total })
+      : t('hudChrome.hill.contestYou', { seconds, total });
+  }
+  if (view.challenger === 'other') {
+    return view.contestPaused
+      ? t('hudChrome.hill.contestOtherPaused', { seconds, total })
+      : t('hudChrome.hill.contestOther', { seconds, total });
+  }
   return t('hudChrome.hill.contestNone', { total });
 }
 

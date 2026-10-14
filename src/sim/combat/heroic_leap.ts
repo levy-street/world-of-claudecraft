@@ -1,6 +1,7 @@
 import { MANTLE_REACH, resolvePosition, seatGroundedAt } from '../colliders';
 import { VANGUARD_FURY_4PC_ENRAGE_DURATION_SEC } from '../content/vanguard_set_bonuses_a';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { riftPlayerLift } from '../rift/runs';
 import type { SimContext } from '../sim_context';
 import { type AbilityDef, DT, ENRAGE_DMG_DONE, type Entity, type Vec3 } from '../types';
 import { groundHeight, terrainSteepnessAt, waterLevelAt } from '../world';
@@ -160,12 +161,17 @@ function wasExternallyRelocated(entity: Entity): boolean {
   );
 }
 
-export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
+export function sweptLanding(
+  ctx: SimContext,
+  entity: Entity,
+  aim: Vec3,
+  feetY: number = entity.pos.y,
+): Vec3 {
   return sweepLeapLanding(
     ctx.cfg.seed,
     entity.pos.x,
     entity.pos.z,
-    entity.pos.y,
+    feetY,
     aim,
     (x, z) => ctx.resolveMovePoint(x, z, PLAYER_BODY_RADIUS, entity),
     (x, z) =>
@@ -176,7 +182,7 @@ export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
         PLAYER_BODY_RADIUS,
         false,
         undefined,
-        { y: entity.pos.y + FLIGHT_APEX, lift: 0 },
+        { y: feetY + FLIGHT_APEX, lift: 0 },
         ctx.riftCollisionToken,
       ),
   );
@@ -201,11 +207,18 @@ export function armHeroicLeap(
   ability: Pick<AbilityDef, 'id' | 'name' | 'school'>,
 ): void {
   if (hasUnbreakableMovementLock(entity)) return;
-  const landing = sweptLanding(ctx, entity, aim);
+  // A rift's raised deck is a Y lift the movement step strips before it runs and
+  // re-applies after (player_movement_modes.ts, rift/runs.ts riftPlayerLift), so
+  // the flight lives in the lift-free frame that step sees. Armed in the lifted
+  // frame, the strip on the first tick read as an outside relocation and the leap
+  // cancelled itself with its cooldown spent (Warlord Grask player report). The
+  // landing seats on the flat floor and the lift puts it back on the deck.
+  const feetY = entity.pos.y - riftPlayerLift(ctx, entity);
+  const landing = sweptLanding(ctx, entity, aim, feetY);
   entity.chargeTargetId = null;
   entity.chargePath = [];
   entity.leap = {
-    from: { ...entity.pos },
+    from: { ...entity.pos, y: feetY },
     to: landing,
     elapsed: 0,
     duration: FLIGHT_DURATION,
@@ -222,6 +235,9 @@ export function advanceHeroicLeap(ctx: SimContext, entity: Entity): boolean {
   if (!flight) return false;
   if (entity.dead || hasUnbreakableMovementLock(entity) || wasExternallyRelocated(entity)) {
     entity.leap = null;
+    // Stopped before it ever left the ground: the leap never happened, so it
+    // costs no cooldown. One stopped mid-air was a real leap and keeps it.
+    if (flight.elapsed <= 0) entity.cooldowns.delete(flight.abilityId);
     return false;
   }
 

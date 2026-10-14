@@ -42,12 +42,20 @@ export function prepareWeeklyRewardOpen(
     const ids = parseWeeklyTableSelection(tableIds);
     if (!ids) return null;
     const candidateBatch = { ...batch, bossUnlocks: batch.bossUnlocks ?? state.bossUnlocks };
-    const options = weeklyRewardTableOptions(candidateBatch, choice, r.meta.cls, r.e.level);
+    const options = weeklyRewardTableOptions(
+      candidateBatch,
+      choice,
+      r.meta.cls,
+      r.e.level,
+      state.lootSpec,
+    );
     const selected = selectedWeeklyRewardTables(options, ids);
     if (!selected) return null;
     const items = [...new Set(selected.flatMap((table) => table.items))].sort();
     if (!items.length) return null;
     choice.itemId = ctx.rng.pick(items);
+    // Attribution belongs to the fixed roll, never to a later preference change.
+    if (state.lootSpec) choice.lootSpec = state.lootSpec;
     // Persist only the attributed source, not the transient multi-selection.
     choice.tableId = selected.find((table) => table.items.includes(choice.itemId!))!.id;
     batch.bossUnlocks ??= { ...state.bossUnlocks };

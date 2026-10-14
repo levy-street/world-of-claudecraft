@@ -44,6 +44,7 @@ import {
   doubleHonorActive,
   honorTeamIdentity,
 } from '../pvp';
+import { detachFromRift } from '../rift/runs';
 import type { ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
 import { settleTeleportArrival } from '../teleport_arrival';
@@ -723,6 +724,15 @@ function backfillBgMatches(ctx: SimContext): void {
   }
 }
 
+/** Detach a fighter about to be seated from whatever instance they stand in,
+ *  returning the outside spot they go home to, or null in the open world. A
+ *  rift floor exits through its portal side and tells the online client, which
+ *  mirrors its rift floor from that riftState event alone: without it the map
+ *  and minimap stayed on the rift plan for the whole match. */
+function detachForSeat(ctx: SimContext, e: Entity): { x: number; z: number } | null {
+  return detachFromDungeon(ctx, e) ?? detachFromRift(ctx, e);
+}
+
 /** Put one queued solo into an open seat on a match already under way. */
 function seatBackfill(ctx: SimContext, match: BgMatch, team: BgTeam, pid: number): void {
   const e = ctx.entities.get(pid);
@@ -731,12 +741,12 @@ function seatBackfill(ctx: SimContext, match: BgMatch, team: BgTeam, pid: number
   // sends them home and hands their pools back exactly like a start-of-match
   // fighter. Skipping either would strand them on the field at match end.
   //
-  // detachFromDungeon FIRST, for the same reason startBgMatch does it: the queue
+  // Detach (detachForSeat) FIRST, for the same reason startBgMatch does it: the queue
   // hygiene deliberately holds a spot through a dungeon pull, so a candidate can
   // be standing inside an instance. Storing the interior position would send
   // them back to a claim that may be gone by match end, and would leave the
   // instance holding their aggro for the whole match.
-  const door = detachFromDungeon(ctx, e);
+  const door = detachForSeat(ctx, e);
   match.returns.set(pid, { x: door?.x ?? e.pos.x, z: door?.z ?? e.pos.z, facing: e.facing });
   match.preMatchPools.set(pid, snapshotArenaReturnPools(e));
   // The pet parenthesis is part of the same promise: a pet that walks in alive
@@ -1042,8 +1052,9 @@ export function startBgMatch(
     // hate tables are scrubbed exactly as walking out of the door would, and
     // their return point becomes that door rather than the interior coordinates
     // they were standing on, which may belong to no live claim by the time the
-    // match ends. Everyone else returns to the spot they were pulled from.
-    const door = detachFromDungeon(ctx, e);
+    // match ends. A rift floor gets the same treatment (detachForSeat). Everyone
+    // else returns to the spot they were pulled from.
+    const door = detachForSeat(ctx, e);
     returns.set(pid, { x: door?.x ?? e.pos.x, z: door?.z ?? e.pos.z, facing: e.facing });
     preMatchPools.set(pid, snapshotArenaReturnPools(e));
     const pet = snapshotMatchPet(ctx, pid);

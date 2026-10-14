@@ -26,7 +26,11 @@ import { riftFloorCount } from '../src/sim/rift/rift_gen';
 import { leaveRift } from '../src/sim/rift/runs';
 import { vaultSeedOpen, vaultSeedTier, vaultSeedZone } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
-import { confirmVaultAttemptDurable, vaultScaledTuning } from '../src/sim/treasure_vault';
+import {
+  confirmVaultAttemptDurable,
+  finishVaultAttempt,
+  vaultScaledTuning,
+} from '../src/sim/treasure_vault';
 import type { SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
@@ -219,6 +223,70 @@ describe('the vault run', () => {
     );
     return sim.riftInstances.find((i) => i.partyKey !== null)!;
   }
+
+  it('lets the owner read the next map as soon as the vault is cleared', () => {
+    const sim = makeSim();
+    readAndDig(sim, 'common');
+    const inst = enterVault(sim);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.rare, 1);
+    sim.drainEvents();
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
+    expect(ofType(sim.drainEvents(), 'error').map((event) => event.text)).toEqual([
+      'You are already following another treasure map.',
+    ]);
+
+    for (const id of inst.mobIds) {
+      const mob = sim.entities.get(id);
+      if (mob) {
+        mob.hp = 0;
+        mob.dead = true;
+      }
+    }
+    for (let i = 0; i < 45; i++) {
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+    }
+    expect(inst.outcome).toBe('won');
+    expect(metaOf(sim).vaultAttempt).toBeNull();
+    sim.drainEvents();
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
+    expect(ofType(sim.drainEvents(), 'treasureMapRead')).toEqual([
+      expect.objectContaining({ rarity: 'rare', fresh: true }),
+    ]);
+  });
+
+  it('keeps an online owner locked until the cleared outcome is committed', () => {
+    const sim = makeSim();
+    sim.cfg.vaultRewardNeedsSave = true;
+    metaOf(sim).characterId = 8123;
+    readAndDig(sim, 'common');
+    const inst = enterVault(sim);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.rare, 1);
+    for (const id of inst.mobIds) {
+      const mob = sim.entities.get(id);
+      if (mob) {
+        mob.hp = 0;
+        mob.dead = true;
+      }
+    }
+    for (let i = 0; i < 45; i++) {
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+    }
+    expect(inst.outcome).toBe('won');
+    expect(metaOf(sim).vaultAttempt?.id).toBe('8123:1');
+    sim.drainEvents();
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
+    expect(ofType(sim.drainEvents(), 'error').map((event) => event.text)).toEqual([
+      'You are already following another treasure map.',
+    ]);
+
+    expect(finishVaultAttempt(sim.ctx, 8123, '8123:1')).toBe(sim.playerId);
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
+    expect(ofType(sim.drainEvents(), 'treasureMapRead')).toEqual([
+      expect.objectContaining({ rarity: 'rare', fresh: true }),
+    ]);
+  });
 
   it('keeps the owner eligible when a guest defeats the boss after the owner exits', () => {
     const sim = makeSim();
@@ -535,6 +603,101 @@ describe("redrawing a map with Cartographer's Ink", () => {
     expect(sim.countItem(CARTOGRAPHERS_INK_ITEM_ID)).toBe(2);
   });
 
+  it('redraws the UNREAD map the picker names, leaving the read map and its seed alone', () => {
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.rare, 1);
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
+    const readBefore = { ...meta.treasureMap! };
+    sim.addItem(TREASURE_MAP_ITEM_IDS.common, 2);
+    sim.addItem(CARTOGRAPHERS_INK_ITEM_ID, TREASURE_MAP_UPGRADE_INKS.common);
+    sim.drainEvents();
+    // Plain swap: no rng draw, so the shared stream is exactly where it was.
+    const rngBefore = (sim as unknown as { rng: { s: number } }).rng.s;
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID, { inkMap: { rarity: 'common', read: false } });
+    expect((sim as unknown as { rng: { s: number } }).rng.s).toBe(rngBefore);
+    const evs = sim.drainEvents();
+    expect(ofType(evs, 'error')).toEqual([]);
+    expect(meta.treasureMap).toEqual(readBefore);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.common)).toBe(1);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.rare)).toBe(2);
+    expect(sim.countItem(CARTOGRAPHERS_INK_ITEM_ID)).toBe(0);
+    expect(ofType(evs, 'treasureMapUpgraded')[0]).toMatchObject({
+      rarity: 'rare',
+      inks: TREASURE_MAP_UPGRADE_INKS.common,
+    });
+  });
+
+  it('redraws the read map when the picker names it, re-seeding at the same site', () => {
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.common, 1);
+    sim.useItem(TREASURE_MAP_ITEM_IDS.common);
+    const siteId = meta.treasureMap!.siteId;
+    sim.addItem(TREASURE_MAP_ITEM_IDS.epic, 1);
+    sim.addItem(CARTOGRAPHERS_INK_ITEM_ID, TREASURE_MAP_UPGRADE_INKS.common);
+    sim.drainEvents();
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID, { inkMap: { rarity: 'common', read: true } });
+    expect(meta.treasureMap).toMatchObject({ rarity: 'rare', siteId });
+    expect(vaultSeedTier(meta.treasureMap!.seed)).toBe(1);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.common)).toBe(0);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.rare)).toBe(1);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.epic)).toBe(1);
+  });
+
+  it('an unread copy of the read rarity needs a copy beyond the read one', () => {
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    const errors = () => ofType(sim.drainEvents(), 'error').map((ev) => ev.text);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.common, 1);
+    sim.useItem(TREASURE_MAP_ITEM_IDS.common);
+    sim.addItem(CARTOGRAPHERS_INK_ITEM_ID, 2);
+    sim.drainEvents();
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID, { inkMap: { rarity: 'common', read: false } });
+    expect(errors()).toEqual(['You no longer hold that treasure map.']);
+    expect(sim.countItem(CARTOGRAPHERS_INK_ITEM_ID)).toBe(2);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.common, 1);
+    sim.drainEvents();
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID, { inkMap: { rarity: 'common', read: false } });
+    expect(errors()).toEqual([]);
+    expect(meta.treasureMap?.rarity).toBe('common');
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.common)).toBe(1);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.rare)).toBe(1);
+  });
+
+  it('refuses a stale or malformed target without spending anything', () => {
+    const sim = makeSim();
+    const errors = () => ofType(sim.drainEvents(), 'error').map((ev) => ev.text);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.rare, 1);
+    sim.addItem(CARTOGRAPHERS_INK_ITEM_ID, 5);
+    sim.drainEvents();
+    // Named as read, but no map is read.
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID, { inkMap: { rarity: 'rare', read: true } });
+    expect(errors()).toEqual(['You no longer hold that treasure map.']);
+    // Named as the read map, but the map being followed is another rarity.
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.common, 1);
+    sim.drainEvents();
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID, { inkMap: { rarity: 'common', read: true } });
+    expect(errors()).toEqual(['You no longer hold that treasure map.']);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.common)).toBe(1);
+    sim.removeItem(TREASURE_MAP_ITEM_IDS.common, 1);
+    // A rarity the bags do not hold.
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID, { inkMap: { rarity: 'common', read: false } });
+    expect(errors()).toEqual(['You no longer hold that treasure map.']);
+    // Junk off the wire (the server passes msg.inkMap through raw).
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID, sim.playerId, undefined, undefined, {
+      rarity: 'mythic',
+    });
+    expect(errors()).toEqual(['You no longer hold that treasure map.']);
+    // The top rarity is never redrawn.
+    sim.addItem(TREASURE_MAP_ITEM_IDS.legendary, 1);
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID, { inkMap: { rarity: 'legendary', read: false } });
+    expect(errors()).toEqual(['This map cannot be improved any further.']);
+    expect(sim.countItem(CARTOGRAPHERS_INK_ITEM_ID)).toBe(5);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.rare)).toBe(1);
+  });
+
   it('every faction quartermaster stocks the ink for their own currency', () => {
     expect(FACTION_VENDOR_GATES.cartographers_ink).toMatchObject({
       standingTier: 'recognized',
@@ -573,6 +736,25 @@ describe('the character save', () => {
     expect(portal?.riftSeed).toBe(map.seed);
     expect(portal?.vaultOwnerCharacterId).toBe(8001);
     expect(restored.countItem(TREASURE_MAP_ITEM_IDS.rare, pid)).toBe(0);
+  });
+
+  it('a logout inside the hoard resumes at the dig site, not the world start', () => {
+    const sim = makeSim();
+    sim.meta(sim.playerId)!.characterId = 8201;
+    const { site } = readAndDig(sim, 'common');
+    const portal = [...sim.entities.values()].find((e) => e.vaultAttemptId === '8201:1');
+    if (!portal) throw new Error('vault portal missing');
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, sim.playerId, undefined, portal);
+    expect(isRiftPos(sim.player.pos.x)).toBe(true);
+    const state = sim.serializeCharacter(sim.playerId);
+    if (!state) throw new Error('Missing serialized character');
+    expect(Math.hypot(state.pos.x - site.x, state.pos.z - site.z)).toBeLessThan(12);
+
+    const restored = new Sim({ seed: 4242, playerClass: 'warrior', noPlayer: true });
+    const pid = restored.addPlayer('warrior', 'Digger', { state, characterId: 8201 });
+    const player = restored.entities.get(pid)!;
+    expect(isRiftPos(player.pos.x)).toBe(false);
+    expect(Math.hypot(player.pos.x - site.x, player.pos.z - site.z)).toBeLessThan(12);
   });
 
   it('round-trips a read map and drops junk', () => {

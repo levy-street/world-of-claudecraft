@@ -34,6 +34,10 @@ describe('command facet tags (W6)', () => {
   const dispatchOnly = new Set<string>(DISPATCH_ONLY_COMMANDS);
   const tags = COMMAND_FACETS as Readonly<Record<string, string>>;
 
+  it('tags the Weekly Vault preference to the bank facet', () => {
+    expect(tags.weekly_loot_spec).toBe('IWorldBank');
+  });
+
   it('tags only real wire tokens that exist in COMMAND_NAMES', () => {
     const orphans = Object.keys(tags)
       .filter((cmd) => !names.has(cmd))
@@ -157,8 +161,8 @@ describe('command facet tags (W8)', () => {
   });
 
   it('tags the raid markers to IWorldParty, not IWorldTargeting (the W6 exclusion)', () => {
-    expect(tags['setMarker']).toBe('IWorldParty');
-    expect(tags['clearMarker']).toBe('IWorldParty');
+    expect(tags.setMarker).toBe('IWorldParty');
+    expect(tags.clearMarker).toBe('IWorldParty');
   });
 
   it('does not tag partyInfo/markerFor (snapshot reads, no wire send)', () => {
@@ -217,9 +221,9 @@ describe('command facet tags (W9)', () => {
   });
 
   it('keeps duel + arena (incl. the fiesta arena_augment) under the one IWorldDuelArena facet', () => {
-    expect(tags['duel_req']).toBe('IWorldDuelArena');
-    expect(tags['arena_queue']).toBe('IWorldDuelArena');
-    expect(tags['arena_augment']).toBe('IWorldDuelArena');
+    expect(tags.duel_req).toBe('IWorldDuelArena');
+    expect(tags.arena_queue).toBe('IWorldDuelArena');
+    expect(tags.arena_augment).toBe('IWorldDuelArena');
   });
 
   it('does not tag social_refresh (dispatch-only), searchCharacters (REST) or socialInfo (frame)', () => {
@@ -268,7 +272,7 @@ describe('command facet tags (W10)', () => {
   });
 
   it('tags delveBuyShopItem by its WIRE string delve_buy (not the method name)', () => {
-    expect(tags['delve_buy']).toBe('IWorldDelves');
+    expect(tags.delve_buy).toBe('IWorldDelves');
     expect('delve_buy_shop_item' in tags).toBe(false);
     expect('delveBuyShopItem' in tags).toBe(false);
   });

@@ -66,6 +66,7 @@ import {
   BIND_ACTIONS,
   BIND_CATEGORIES,
   bindRefusalReason,
+  type ConvertedLayout,
   type Keybinds,
   keyLabel,
 } from '../game/keybinds';
@@ -104,7 +105,8 @@ import type { TranslationKey } from './i18n.catalog';
 import { BIND_CATEGORY_LABEL_KEYS, bindActionDisplayName } from './keybind_action_names_core';
 import { keybindConflictPrompt } from './keybind_conflict_prompt_core';
 import { keybindDeviceNoteKeys, keybindRefusalNote } from './keybind_device_notes_core';
-import { buildKeybindCode, parseKeybindCode } from './keybind_transfer_core';
+import { buildKeybindLayoutConvertRow } from './keybind_layout_convert_rows';
+import { buildKeybindCode, type KeybindSetup, parseKeybindCode } from './keybind_transfer_core';
 import {
   type KeyboardMapHandle,
   type KeyboardMapPaintDeps,
@@ -1805,12 +1807,11 @@ export class OptionsWindow {
     });
   }
 
-  // The hotkey-setup row on the Key Bindings panel: the same Export/Import
-  // expando, carrying this character's key-code map (Keybinds.snapshot) in the
-  // keybind_transfer_core.ts envelope. Import applies live through
-  // Keybinds.importBindings (load()'s validation: unknown actions ignored,
-  // reserved codes skipped, one code per action) and repaints the panel; no
-  // reload, since every reader of the map goes through the live instance.
+  // The hotkey-setup rows on the Key Bindings panel: the Export/Import expando
+  // (Keybinds.snapshot in the keybind_transfer_core.ts envelope) and the layout
+  // converter (keybind_layout_convert_rows.ts). Both apply live (no reload)
+  // through applyKeybindSetup: Keybinds.importBindings with load()'s
+  // validation (unknown actions, reserved codes, one code per action), then a repaint.
   private keybindTransferRows(body: HTMLElement): void {
     const wrap = document.createElement('div');
     wrap.className = 'kb-transfer';
@@ -1826,16 +1827,21 @@ export class OptionsWindow {
               : 'hudChrome.transfer.invalid',
           );
         }
-        this.deps.keybinds().importBindings(parsed.binds);
-        this.dropKeyCapture();
-        this.keybindNote = t('hudChrome.keybindTransfer.imported');
-        this.deps.refreshKeybindLabels();
-        this.keyboardWindow.repaint();
-        this.renderKeybinds();
+        this.applyKeybindSetup(parsed.binds, t('hudChrome.keybindTransfer.imported'));
         return null;
       },
     });
     body.appendChild(wrap);
+    buildKeybindLayoutConvertRow(body, this.deps, (...a) => this.applyKeybindSetup(...a));
+  }
+
+  private applyKeybindSetup(binds: KeybindSetup, note: string, layout?: ConvertedLayout): void {
+    this.deps.keybinds().importBindings(binds, layout ?? null);
+    this.dropKeyCapture();
+    this.keybindNote = note;
+    this.deps.refreshKeybindLabels();
+    this.keyboardWindow.repaint();
+    this.renderKeybinds();
   }
 
   // The shared Export/Import row + expando. `exportCode` yields the code shown

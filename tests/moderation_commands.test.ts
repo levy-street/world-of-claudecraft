@@ -197,5 +197,23 @@ describe('moderation chat commands', () => {
     expect(parseModerationChatCommand('/unspectate now')).toBeNull();
     expect(parseModerationChatCommand('/jailer "Mira"')).toBeNull();
     expect(parseModerationChatCommand('hello /kick')).toBeNull();
+    expect(parseModerationChatCommand('/motdx Welcome')).toBeNull();
+    expect(parseModerationChatCommand('say /motd Welcome')).toBeNull();
+  });
+
+  it('claims /motd in every form so staff text never leaks into ordinary chat', () => {
+    expect(parseModerationChatCommand('/motd')).toEqual({ kind: 'motd', command: { op: 'show' } });
+    expect(parseModerationChatCommand('/MOTD clear')).toEqual({
+      kind: 'motd',
+      command: { op: 'clear' },
+    });
+    expect(parseModerationChatCommand('/motd "Double XP all weekend!"')).toEqual({
+      kind: 'motd',
+      command: { op: 'set', text: 'Double XP all weekend!' },
+    });
+    expect(parseModerationChatCommand('/motd ""')).toEqual({
+      kind: 'motd',
+      command: { op: 'usage' },
+    });
   });
 });

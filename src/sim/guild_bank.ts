@@ -40,6 +40,7 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isTransferLockedInstance, publicInstanceView } from './item_instance_transfer';
+import { isItemLocked } from './item_lock_flag';
 import { materialItemIds } from './material_ids';
 import type { MaterialPayloadIdentity } from './material_payload_identity';
 import {
@@ -1156,6 +1157,14 @@ export function guildBankDeposit(
   const refusal = guildBankPipeRefusal(slot);
   if (refusal !== null) {
     ctx.error(meta.entityId, refusal);
+    return;
+  }
+  // The owner's own lock pins the copy to its bag cell (inventory_order.ts), the
+  // personal bank's rule. Checked here rather than in guildBankPipeRefusal: that
+  // predicate is direction-independent and also gates withdraw, and a locked copy
+  // can never reach the book to be withdrawn.
+  if (isItemLocked(slot.instance)) {
+    ctx.error(meta.entityId, 'That item is locked and cannot be stored in the guild bank.');
     return;
   }
   let selectedSources: MaterialComposition | undefined;

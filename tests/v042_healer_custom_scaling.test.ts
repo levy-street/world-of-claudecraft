@@ -207,10 +207,10 @@ describe('Aegis reproduces a real non-1 talentHealMult (Fiesta healing augment)'
   });
 });
 
-describe('Groveheart primary-healing factor: Wildbloom replant', () => {
+describe('Groveheart primary-healing factor: Sporemending replant', () => {
   it('pins Groveheart at 1.05 and every other druid spec (and no spec) at 1', () => {
     // Retuned down from the initial 1.20 candidate (spec_output_tuning.ts):
-    // combined with the corrected Wildbloom replant scaling below, the total
+    // combined with the corrected Sporemending replant scaling below, the total
     // engine-profile increase already lands near +20% without stacking a
     // full second buff on top of the bug fix (class-balance-v042.md, "do not
     // silently stack a full buff on a large bug fix").
@@ -311,7 +311,7 @@ describe('Sunmender-only heal on the class-wide Perpetual Sun', () => {
 // "Important copy cases"). These exercise the real dispatch path end to end
 // (a real cast through effect_dispatch.ts's 'heal'/'hot' cases, which I do
 // not own) specifically to prove the coordinator's copy sites stay
-// once-only; the Aegis/Wildbloom/Perpetual Sun describes above already prove
+// once-only; the Aegis/Sporemending/Perpetual Sun describes above already prove
 // MY OWN custom sources apply their own factor exactly once.
 describe('Beacon of Light copies the already-scaled effective heal exactly once', () => {
   it('transfers 50% of the Sunmender-scaled primary heal, not a second 1.10 factor on top', () => {

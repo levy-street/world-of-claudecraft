@@ -117,6 +117,8 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
       chain_lightning: { castPct: -0.333333 },
       earth_shock: { dmgPct: 0.18, costPct: -0.15 },
       flame_shock: { costPct: -0.2 },
+      // v0.45.0 rotation fix: Magma Burst takes Arc Bolt's Mana discount.
+      lava_burst: { costPct: -0.35 },
     },
   },
   'shaman/enhancement': {
@@ -182,6 +184,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     abilities: {
       maul: { dmgPct: 0.35 },
       claw: { dmgPct: 0.15 },
+      scratch: { dmgPct: 0.15 },
       swipe: { dmgPct: 0.2 },
     },
   },

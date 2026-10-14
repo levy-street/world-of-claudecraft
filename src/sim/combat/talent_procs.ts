@@ -18,6 +18,7 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
 import { druidEngineOnCast } from './druid_engines';
+import { naturesBoonOnCast } from './druid_natures_boon';
 import { combustionRestokesCinderfall, PERSONAL_BARRIER_IDS } from './fire_mage';
 import { priestOnCastCompleted } from './priest/talents';
 import { rogueEngineOnCast } from './rogue_engines';
@@ -200,6 +201,10 @@ export function onCastCompleted(
   // from Duskveil openers and the Red Ribbon rhythm. Same funnel, no rng.
   rogueEngineOnCast(ctx, player, abilityId, target);
   druidEngineOnCast(ctx, player, abilityId, target);
+  // Moongrove Nature's Boon (combat/druid_natures_boon.ts): Wildbolt and
+  // Skyfall roll the free Spore Burst window. Balance-gated and
+  // cooldown-gated inside, before any rng draw.
+  naturesBoonOnCast(ctx, player, abilityId);
   applyLeadenHex(ctx, player, abilityId, target);
   if (wasEmpowered) return;
   const meta = ctx.players.get(player.id);

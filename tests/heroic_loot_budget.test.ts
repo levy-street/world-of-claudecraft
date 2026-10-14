@@ -29,6 +29,9 @@ import { Sim } from '../src/sim/sim';
 // (paired_talons). Those four gearIds gained the trinket and their digests were
 // re-minted; the digest over their PRE-trinket ids was verified unchanged, so no
 // existing def moved.
+// Those four digests were refreshed again when non-PvP trinkets became tradable.
+// Restoring only their soulbound flags reproduces every previous digest; item
+// stats, levels, equipment ids and loot chances remain unchanged.
 const BASELINE = {
   sexton_marrow: {
     gearIds: ['oiled_boots', 'quilted_trousers'],
@@ -53,7 +56,7 @@ const BASELINE = {
       'shadowpulse_slippers',
     ],
     normalDigest: '608ad38c9ea77cb6a20f75c9aac2fc5bf6787ccf9ac41a8a50ae9b9cd7ddef13',
-    gearDigest: '15bfce8c44bf22ca36d68b5315fd10e2ae00662c4f9c0e258487fe598a3c8edb',
+    gearDigest: '20298c472b0c1de24b007fc06f72c961a89bb19de069145f053006484c399fe6',
   },
   knight_commander_olen: {
     gearIds: [
@@ -89,7 +92,7 @@ const BASELINE = {
       'trollhide_leggings',
     ],
     normalDigest: '213a53c89b1da7a01abf0c4ea3849f9390368a6163a358f3fdad2f2007f0bcb1',
-    gearDigest: '22c9fd554829d688bd6cbc8bb79d99c89c30b250e40ee297452a98197fbb6942',
+    gearDigest: '20c7e3cd2da0ae1a29d687d68c08cbbc431552872d3a01233ec7290a48b704e8',
   },
   choirmother_selthe: {
     gearIds: ['heroic_selthes_seastriders'],
@@ -112,7 +115,7 @@ const BASELINE = {
       'tidewoven_trousers',
     ],
     normalDigest: 'aa4c9a380d095266e6cd74de3869ac1652f4a896af53c6bdd4cf406fa35ee01c',
-    gearDigest: 'b8d1423096dfc7c658a939b0ee7145b33e35305782d3884c640e27fd57dcfe65',
+    gearDigest: 'ee717b4d4f50314ea458932dd8f051a38e15709b4ea361502051e9830707525d',
   },
   korgath_the_bound: {
     gearIds: [
@@ -200,7 +203,7 @@ const BASELINE = {
       'vineclaw_stalking_breeches',
     ],
     normalDigest: 'dc4c6a27f87b5cd5ab11237b791de5a2707e2b55329f7c1aada4a4fb9cfe34f8',
-    gearDigest: '62b6f9de2378727e1e5e2c42d127d08705f32fcd284410b4326e7ec950931da8',
+    gearDigest: 'f3d23a04a90d1acf54262a541f4b2ea06bd9253e9fe23c515e15eea40c1f1861',
   },
 } as const;
 

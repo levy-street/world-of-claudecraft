@@ -624,6 +624,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_warspice_skewers',
     'pattern_wyrmfall_pendant',
     'plans_dense_sharpening_stone',
+    'pvp_skull_bag',
     'recipe_elixir_of_mana_regeneration',
     'recipe_potion_of_invisibility',
     // Retired premium reins remain inert saved items, with no use or material role.

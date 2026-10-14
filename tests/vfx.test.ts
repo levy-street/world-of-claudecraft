@@ -540,11 +540,25 @@ describe('pooled VFX cloud', () => {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);`);
-    // The restore handler re-captures identity, rebinds the draw-stats
-    // session (three replaces webgl.info on restore; see
-    // tests/draw_stats_core.test.ts), then notifies vfx, in that order.
+    // A restore re-captures identity and rebinds the draw-stats session
+    // (three replaces webgl.info on restore; see tests/draw_stats_core.test.ts)
+    // BEFORE the reset registry notifies the vfx cloud, in that order.
     expect(source).toMatch(
-      /this\.captureGlIdentity\(\);[\s\S]{0,700}?if \(this\.drawStats\) this\.drawStats = createLogicalFrameDrawStats\(this\.webgl\.info\);\s+this\.vfx\?\.onContextRestored\(\);/,
+      /rebindContextReaders: \(\) => \{\s+this\.captureGlIdentity\(\);\s+if \(this\.drawStats\) this\.drawStats = createLogicalFrameDrawStats\(this\.webgl\.info\);/,
+    );
+    const restore = readFileSync(
+      fileURLToPath(new URL('../src/render/context_restore.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(restore).toMatch(
+      /this\.surface\.rebindContextReaders\(\);[\s\S]{0,900}?runContextRestoreResets\(\);/,
+    );
+    const vfxSource = readFileSync(
+      fileURLToPath(new URL('../src/render/vfx.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(vfxSource).toContain(
+      "registerContextRestoreReset('vfx-cloud', this, (owner) => owner.onContextRestored());",
     );
   });
 });

@@ -264,7 +264,7 @@ describe('Eastbrook Ravenpost mailbox pipeline', () => {
 describe('Ravenpost mailbox renderer adapter', () => {
   it('drops the immutable loader source after preparing shared resources', () => {
     const source = readFileSync(path.join(REPO_ROOT, 'src/render/mailbox.ts'), 'utf8');
-    expect(source).toContain("import { loadGltf, releaseGltf } from './assets/loader';");
+    expect(source).toMatch(/import \{[^}]*\breleaseGltf\b[^}]*\} from '\.\/assets\/loader';/);
     expect(source).toContain(
       'preparedMailboxTemplate = buildMailboxFromSource(loadedMailboxGltf.scene, atlas);',
     );

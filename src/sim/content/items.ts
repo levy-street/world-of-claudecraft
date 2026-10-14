@@ -429,10 +429,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // The Rift Watch's Champion mount: sold by Quartermaster Vaelen in
   // Drifthaven behind Champion standing (content/faction_vendors.ts,
-  // docs/design/factions.md). Priced at the classic epic-mount ratio, ten
-  // times the Valorsteed's 10 gold, with the 80 gold riding lesson already
-  // paid. An ordinary player reins: transferable like every other, never
-  // vendor-sold back, and the standing gate sits on the PURCHASE.
+  // docs/design/factions.md). Priced in Rift Watch marks, never coin: buyValue
+  // is 0 and the faction gate carries the Champion mark cost, like every other
+  // quartermaster row. An ordinary player reins: transferable like every
+  // other, never vendor-sold back, and the standing gate sits on the PURCHASE.
   reins_avian_strider: {
     id: 'reins_avian_strider',
     name: 'Reins of the Viridian Valestrider',
@@ -442,7 +442,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
-    buyValue: 1_000_000, // 100 gold in copper
+    buyValue: 0,
   },
   // Legacy cosmetic reins; same inert, discardable treatment as mech_bird.
   reins_rallycart_rxt: {
@@ -1995,8 +1995,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: false,
   },
   // Cartographer's Ink (content/treasure_maps.ts): every faction quartermaster
-  // sells it for their currency; using it redraws the READ treasure map one
-  // rarity finer (1, 3 or 8 inks by the map's current rarity).
+  // sells it for their currency; using it asks which held treasure map to
+  // redraw one rarity finer (TREASURE_MAP_UPGRADE_INKS by its current rarity).
   cartographers_ink: {
     id: 'cartographers_ink',
     name: "Cartographer's Ink",
@@ -3000,6 +3000,38 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'poor',
     sellValue: 8,
+  },
+  // World PvP trophy (src/sim/pvp/world_pvp_spoils.ts): the killing blow of a
+  // flagged-vs-flagged world kill loots the loser's skull from their body. All
+  // skulls share one stack that records whose each one is, the way a gathered
+  // material records its gatherer (src/sim/pvp/world_pvp_trophy.ts). A keepsake
+  // with no vendor price, so camping an alt for skulls can never mint gold.
+  pvp_trophy_skull: {
+    id: 'pvp_trophy_skull',
+    name: 'Trophy Skull',
+    kind: 'junk',
+    // Common, not grey: a provenance-tracked stack is a material, and grey
+    // trash is never one (tests/material_taxonomy.test.ts).
+    quality: 'common',
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  // The Skull Bag (src/sim/pvp/skull_bag.ts): a sub-inventory sold by both
+  // honor quartermasters that holds any number of trophy skulls outside the bag
+  // pools. Clicking it opens its own window; carrying it sends looted skulls
+  // straight in. One cell, never socketed (so not kind 'bag'), soulbound like
+  // every honor purchase, and one per character.
+  pvp_skull_bag: {
+    id: 'pvp_skull_bag',
+    name: 'Skull Bag',
+    kind: 'junk',
+    // Epic like every honor quartermaster row (tests/reliquary_content.test.ts).
+    quality: 'epic',
+    unique: true,
+    soulbound: true,
+    stackSize: 1,
+    priceHonor: 500,
+    sellValue: 0,
   },
   // Vendor food nerf (11n-D-13): was ABOVE crafted pan_seared_perch 90 (a
   // negative margin); 90 / 1.10, bottom tercile, floored; crafted margin

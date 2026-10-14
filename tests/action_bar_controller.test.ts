@@ -1239,13 +1239,10 @@ describe('isHotbarItemId: Field Kit (Intentional Gathering, use.type harvestPref
     expect(controller.isHotbarItemId('field_kit')).toBe(true);
   });
 
-  it('preserves the recipe/consumable-pattern exclusion: a one-shot recipe pattern stays unplaceable', () => {
+  it('admits consumable recipe patterns alongside the field kit', () => {
     const { controller } = makeHarness('warrior', [], []);
-    // Guard the guard: the exclusion below must fail on a widened
-    // isHotbarItemId, never pass because the content id quietly stopped
-    // existing or stopped being kind:'recipe'.
     expect(ITEMS.pattern_spiritweld_girdle?.kind).toBe('recipe');
-    expect(controller.isHotbarItemId('pattern_spiritweld_girdle')).toBe(false);
+    expect(controller.isHotbarItemId('pattern_spiritweld_girdle')).toBe(true);
   });
 
   it('routes a field kit drag through the assignable-action path like a gathering tool', () => {
@@ -1296,6 +1293,29 @@ describe('isHotbarItemId: elixirs are placeable like potions', () => {
     expect(controller.isAssignableAction({ type: 'item', id: 'elixir_of_the_bear' })).toBe(true);
     expect(controller.keepsStoredItemId('elixir_of_the_bear')).toBe(true);
     expect(controller.isAssignableAction({ type: 'item', id: 'copper_ore' })).toBe(false);
+  });
+});
+
+describe('isHotbarItemId: allied faction rewards, toys, and usable tools (#4244)', () => {
+  it('admits faction rewards, banner, and glider to the hotbar', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    const factionToolIds = [
+      'dawn_battle_standard',
+      'rift_feather_glider',
+      'clockwork_target_dummy',
+      'clockwork_shock_bomb',
+      'allied_hearthstone',
+      'dense_sharpening_stone',
+      'reinforced_armor_kit',
+    ];
+    for (const id of factionToolIds) {
+      expect(controller.isHotbarItemId(id), `${id} should be hotbar placeable`).toBe(true);
+      expect(
+        controller.isAssignableAction({ type: 'item', id }),
+        `${id} should be assignable action`,
+      ).toBe(true);
+      expect(controller.keepsStoredItemId(id), `${id} should keep stored item id`).toBe(true);
+    }
   });
 });
 

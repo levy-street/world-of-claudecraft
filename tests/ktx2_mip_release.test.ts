@@ -18,10 +18,12 @@ import {
   KTX2_MIP_EXEMPT_MODEL_ROOTS,
   KTX2_MIP_RELEASABLE_MODEL_ROOTS,
   KTX2_RESTORE_MAX_WAIT_MS,
+  KTX2_RESTORE_RETRIES,
   type Ktx2MipLevel,
   type Ktx2RestoreTarget,
   ktx2MipReleaseInternalsForTest,
   ktx2MipsOnContextLost,
+  ktx2MipsOnContextRestored,
   ktx2MipsRestored,
   ktx2RetainedSourceBytes,
   setKtx2MipRederive,
@@ -226,7 +228,9 @@ describe('context-loss restore story', () => {
     expect(tex.source.dataReady).toBe(true);
     expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('armed');
 
-    // The re-upload's onUpdate releases back to stubs: the steady-state cycle.
+    // The re-upload's onUpdate releases back to stubs once the context is
+    // back: the steady-state cycle.
+    ktx2MipsOnContextRestored();
     simulateUpload(tex);
     expect(mipsOf(tex)).toHaveLength(4);
     expect(mipsOf(tex)[0]?.data.byteLength).toBe(0);
@@ -747,12 +751,15 @@ describe('context-loss restore story', () => {
     ktx2MipsOnContextLost();
     await ktx2MipsRestored();
     expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('released');
+    // Every retry was spent before the texture was left on stubs.
+    expect(KTX2_RESTORE_RETRIES).toBe(2);
+    expect(rederive).toHaveBeenCalledTimes(1 + KTX2_RESTORE_RETRIES);
     expect(warn).toHaveBeenCalledWith(
       '[ktx2] restore transcode failed; texture left released',
       expect.any(Error),
     );
     ktx2MipsOnContextLost();
-    expect(rederive).toHaveBeenCalledTimes(2);
+    expect(rederive).toHaveBeenCalledTimes(2 + KTX2_RESTORE_RETRIES);
   });
 
   it('discards a transcode that resolves after the texture was disposed', async () => {
@@ -1068,5 +1075,61 @@ describe('wiring pins (source scans, anchor style per docs/qa-gate.md)', () => {
     for (const entry of ['src/editor/main.ts', 'src/guide/main.ts']) {
       expect(read(entry), entry).not.toContain('enableKtx2MipRelease');
     }
+  });
+});
+
+describe('the in-place restore closes the lost-window hole and retries', () => {
+  it('an upload DURING the lost window keeps its mips: nothing reached the GPU, and nothing would re-arm it', async () => {
+    setKtx2MipRederive(async () => ({ mipmaps: makeMips(2), format: 0 }));
+    const tex = armedTexture(2);
+    ktx2MipsOnContextLost();
+    // Another lane initTexture()s the armed texture on the lost context.
+    simulateUpload(tex);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('armed');
+    expect(mipsOf(tex)[0]?.data.byteLength).toBeGreaterThan(0);
+    // Once the context is back the real upload releases it as usual.
+    ktx2MipsOnContextRestored();
+    simulateUpload(tex);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('released');
+  });
+
+  it('a transcode that fails and then succeeds restores the texture within the same loss', async () => {
+    const tex = armedTexture(2);
+    simulateUpload(tex);
+    const freshMips = makeMips(2);
+    const rederive = vi
+      .fn<(source: ArrayBuffer) => Promise<{ mipmaps: Ktx2MipLevel[]; format: number }>>()
+      .mockRejectedValueOnce(new Error('worker died'))
+      .mockResolvedValueOnce({ mipmaps: freshMips, format: tex.format as number });
+    setKtx2MipRederive(rederive);
+    ktx2MipsOnContextLost();
+    await ktx2MipsRestored();
+    expect(rederive).toHaveBeenCalledTimes(2);
+    // Each attempt got its own copy of the retained source.
+    expect(new Uint8Array(rederive.mock.calls[1][0])).toEqual(new Uint8Array(SOURCE_BYTES));
+    expect(tex.mipmaps as unknown).toBe(freshMips);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('armed');
+  });
+
+  it('the restore gives a texture whose every retry failed one more transcode, instead of black until the next loss', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const tex = armedTexture(2);
+    simulateUpload(tex);
+    const freshMips = makeMips(2);
+    let failing = true;
+    const rederive = vi.fn(async () => {
+      if (failing) throw new Error('worker died');
+      return { mipmaps: freshMips, format: tex.format as number };
+    });
+    setKtx2MipRederive(rederive);
+    ktx2MipsOnContextLost();
+    await ktx2MipsRestored();
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('released');
+    failing = false;
+    ktx2MipsOnContextRestored();
+    await ktx2MipsRestored();
+    expect(tex.mipmaps as unknown).toBe(freshMips);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('armed');
+    expect(warn).toHaveBeenCalled();
   });
 });

@@ -404,6 +404,13 @@ export interface BackgroundGpuQueue {
   /** Reject queued work, stop accepting more, and await the active unit plus
    *  any released tails still settling. */
   shutdown(reason?: Error): Promise<void>;
+  /** Hold every unit that has not started yet (they stay queued, in order)
+   *  until `setPaused(false)`. The running unit and released tails finish on
+   *  their own. The renderer pauses on a WebGL context loss: a unit started on
+   *  a lost context mints proofs (an upload stamped, a link polled complete)
+   *  that the restored context does not have. */
+  setPaused(paused: boolean): void;
+  isPaused(): boolean;
 }
 
 const DEFAULT_SLOWEST_LIMIT = 20;
@@ -514,6 +521,8 @@ export function createBackgroundGpuQueue(opts?: {
   let accepting = true;
   let nextOrder = 0;
   let tailNotify: (() => void) | null = null;
+  let paused = false;
+  let pauseNotify: (() => void) | null = null;
   let shutdownReason: Error | null = null;
   let shutdownPromise: Promise<void> | null = null;
   let resolveShutdown: (() => void) | null = null;
@@ -756,8 +765,20 @@ export function createBackgroundGpuQueue(opts?: {
     }
   };
 
+  const wakePause = (): void => {
+    const notify = pauseNotify;
+    pauseNotify = null;
+    notify?.();
+  };
+
   const drain = async (): Promise<void> => {
     while (pending.length > 0) {
+      if (paused) {
+        await new Promise<void>((resolve) => {
+          pauseNotify = resolve;
+        });
+        continue;
+      }
       // The released-tail cap gates STARTING units that would add a tail, so
       // the bound covers the running unit's own driver work too: at most
       // tailLimit + 1 units' driver work can be in flight at any instant. A
@@ -1030,6 +1051,14 @@ export function createBackgroundGpuQueue(opts?: {
         recent: recent.stats(now()),
       };
     },
+    setPaused(next: boolean): void {
+      if (paused === next) return;
+      paused = next;
+      if (!paused) wakePause();
+    },
+    isPaused(): boolean {
+      return paused;
+    },
     shutdown(reason = new Error('Background GPU queue is shut down')): Promise<void> {
       if (shutdownPromise) return shutdownPromise;
       accepting = false;
@@ -1038,6 +1067,7 @@ export function createBackgroundGpuQueue(opts?: {
       // A loop parked on the admission has no other way out: nothing will feed
       // it a frame after shutdown, and its pending set just emptied.
       wakeAdmission();
+      wakePause();
       shutdownPromise = new Promise<void>((resolve) => {
         resolveShutdown = resolve;
       });

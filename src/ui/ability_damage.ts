@@ -24,6 +24,7 @@ import {
   abilityScalingPower,
   absorbBonus,
   channelTickBonus,
+  coefficientCastTime,
   directHealBonus,
   directHitBonus,
   dotTickBonus,
@@ -109,8 +110,10 @@ export function abilityDamageBonus(
         ? channelTickBonus(power, def, out.damage)
         : directHitBonus(power, def, res.castTime, true, out.damage);
     case 'groundAoE':
+    case 'sporeBurst':
       // Each ground pulse is an AoE hit: effect_dispatch snapshots
-      // directHitBonus(..., aoe) into the zone's spBonus at cast time.
+      // directHitBonus(..., aoe) into the zone's spBonus at cast time (Spore
+      // Burst's damage half snapshots the same rider).
       return directHitBonus(power, def, res.castTime, true, out.damage);
     case 'valkyrsCalling':
       // The delayed landing owns its authored range in the movement system.
@@ -134,8 +137,9 @@ export function abilityDamageBonus(
       return 0;
     case 'heal':
       // Combat adds the direct-heal rider (full cast-time coefficient off Spell
-      // Power, no AP scale-down) to every direct heal in effect_dispatch.
-      return directHealBonus(scaling.healPower, res.castTime, false, out.healing);
+      // Power, no AP scale-down) to every direct heal in effect_dispatch,
+      // reading the same coefficient cast time (Verdance keeps Wildmend's).
+      return directHealBonus(scaling.healPower, coefficientCastTime(res), false, out.healing);
     case 'absorb':
       return absorbBonus(scaling.healPower, eff.spellPowerCoeff ?? 0, out.absorb);
     case 'hot': {
@@ -265,6 +269,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'weaponDamage' ||
       eff.type === 'weaponStrike' ||
       eff.type === 'aoeDamage' ||
+      eff.type === 'sporeBurst' ||
       eff.type === 'aoeHeal' ||
       eff.type === 'chainHeal' ||
       eff.type === 'aoeRoot' ||
@@ -349,6 +354,8 @@ export function abilityDurationValue(res: ResolvedAbility): number | null {
     // seconds (Moonseed is the only extendDot user): $t prints the RESOLVED
     // maxBonus, so the Moonscorch 2pc's 12 shows live for wearers (base 6).
     if (eff.type === 'extendDot') return eff.maxBonus;
+    // Spore Burst's $t is the mushroom's fuse, placement to burst.
+    if (eff.type === 'sporeBurst') return eff.fuse;
     if ('duration' in eff && typeof eff.duration === 'number') return eff.duration;
   }
   return null;

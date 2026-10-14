@@ -394,6 +394,11 @@ holder's class at the Crucible Quartermaster.
 Waist budget 17, feet 16. The Hit-flavored waists are the deliberate Hit
 electives; healer waists take haste instead.
 
+The healer rows in these tables are the original design and are superseded:
+the live records in src/sim/content/ignivar_loot.ts are authoritative, and
+the healer waists, ring, and weapons follow the 2026-10-12 healer Crit
+amendment in docs/prd/ignivar-raid-loot.md.
+
 | Variant | Piece | Slot | Armor | Stats | Affix | Ratings | Classes |
 |---|---|---|---|---|---|---|---|
 | Cloth spell damage | Cord of the Last Flame | waist | 75 | Int 11, Spi 6 | Spell Damage 4 | hit 60, crit 25 | mage, priest, warlock |

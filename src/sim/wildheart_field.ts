@@ -243,19 +243,19 @@ const WILDHEART_PROP_FOOTPRINTS: Record<WildheartPropKind, WildheartFootprint> =
   wildheart_jaguar_gate: {
     r: 0,
     h: 13,
-    // Three overlapping r2.4 circles per pylon, not two r4.3: the fat pair put
-    // a ~4.7yd invisible ring around each ~2.5yd-wide bone pillar, and a player
-    // walking the visually clear grass beside a pylon hit nothing but air
-    // (live-playtest "invisible wall"). The chain keeps each pylon solid along
-    // its depth while the collider inscribes what the eye sees; the arch
-    // between the pylons stays as open as it looks.
+    // Measured from the shipped GLB at height 13 and asset yaw -PI/2,
+    // BEFORE placement scaling. Its stone feet spread across x, not z.
+    // The old posts at x +/-12.5 sat outside the entire visible gate
+    // (half-width 7.30), blocking empty grass beside the entrance.
+    // Overlapping circles stay inside each foot at player body height;
+    // tests/wildheart_gate_collision.test.ts checks the actual mesh slices.
     posts: [
-      { dx: -12.5, dz: -5, r: 2.4 },
-      { dx: -12.5, dz: -0.5, r: 2.4 },
-      { dx: -12.5, dz: 4, r: 2.4 },
-      { dx: 12.5, dz: -5, r: 2.4 },
-      { dx: 12.5, dz: -0.5, r: 2.4 },
-      { dx: 12.5, dz: 4, r: 2.4 },
+      { dx: -5.6, dz: -1.7, r: 0.85 },
+      { dx: -4.4, dz: -1.7, r: 0.85 },
+      { dx: -3.4, dz: -1.7, r: 0.85 },
+      { dx: 3.4, dz: -1.7, r: 0.85 },
+      { dx: 4.4, dz: -1.7, r: 0.85 },
+      { dx: 5.6, dz: -1.7, r: 0.85 },
     ],
   },
   wildheart_ritual_pyramid: { r: 12, h: 19 },

@@ -153,9 +153,24 @@ const BEFORE_COLLAPSE: readonly (readonly [string, string])[] = [
   ],
 ];
 
+/** The block a pattern tooltip appends after its gate lines (the crafted
+ *  product card and its materials), added after this extraction. */
+const PRODUCT_BLOCK = '<div class="tt-recipe-product">';
+
 /** Renders one captured case by its key, so the pin drives the REAL builders
- *  rather than a second copy of their composition. */
+ *  rather than a second copy of their composition. A pattern case pins only
+ *  the gate lines the extraction moved: the product block that now follows
+ *  them is newer than the capture and pinned in recipe_pattern_tooltip_view. */
 function render(key: string): string {
+  if (key.startsWith('pattern:')) {
+    const html = renderFull(key);
+    const at = html.indexOf(PRODUCT_BLOCK);
+    return at < 0 ? html : html.slice(0, at);
+  }
+  return renderFull(key);
+}
+
+function renderFull(key: string): string {
   const [kind, id] = key.split(':');
   if (kind === 'gather') return gatherToolTooltipLines(ITEMS[id]);
   if (kind === 'effectLines') return toolEffectTooltipLines(ITEMS[id]);
@@ -351,4 +366,13 @@ describe('byte identity across the extraction', () => {
   it.each(BEFORE_COLLAPSE)('%s renders the pre-extraction string exactly', (key, expected) => {
     expect(render(key)).toBe(expected);
   });
+
+  it.each(BEFORE_COLLAPSE.filter(([key]) => key.startsWith('pattern:')))(
+    '%s appends exactly one product block after the pinned gate lines',
+    (key, expected) => {
+      const html = renderFull(key);
+      expect(html.startsWith(`${expected}${PRODUCT_BLOCK}`)).toBe(true);
+      expect(html.split(PRODUCT_BLOCK).length).toBe(2);
+    },
+  );
 });

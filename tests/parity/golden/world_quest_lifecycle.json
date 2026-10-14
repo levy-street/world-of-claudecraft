@@ -890,8 +890,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "67b39121",
-      "events": "b31d0795",
+      "state": "2b088a56",
+      "events": "b98f1009",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -966,6 +966,7 @@
             "kind": "all"
           },
           "heroicDaily": {},
+          "honor": 150,
           "inventory": [
             {
               "count": 5,
@@ -976,6 +977,7 @@
               "itemId": "rift_essence"
             }
           ],
+          "lifetimeHonor": 150,
           "lifetimeXp": 175552,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
@@ -1114,7 +1116,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "4225155a",
+      "state": "66f304ad",
       "events": "bf18640f",
       "rng": {
         "draws": 0,
@@ -1190,6 +1192,7 @@
             "kind": "all"
           },
           "heroicDaily": {},
+          "honor": 150,
           "inventory": [
             {
               "count": 5,
@@ -1200,6 +1203,7 @@
               "itemId": "rift_essence"
             }
           ],
+          "lifetimeHonor": 150,
           "lifetimeXp": 175552,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
@@ -1316,7 +1320,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "4225155a",
+      "state": "66f304ad",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1392,6 +1396,7 @@
             "kind": "all"
           },
           "heroicDaily": {},
+          "honor": 150,
           "inventory": [
             {
               "count": 5,
@@ -1402,6 +1407,7 @@
               "itemId": "rift_essence"
             }
           ],
+          "lifetimeHonor": 150,
           "lifetimeXp": 175552,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},

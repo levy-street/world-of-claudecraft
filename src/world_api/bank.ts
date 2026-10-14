@@ -106,6 +106,7 @@ export interface IWorldBank {
   readonly weeklyRewardInfo: WeeklyRewardInfo | null;
   claimWeeklyReward(choice: string): void;
   openWeeklyReward(choice: string, table?: string | readonly string[]): void;
+  setWeeklyLootSpec(spec: string | null): void;
   // Non-null only while standing at a banker NPC.
   bankInfo: BankInfo | null;
   // Copper- and Claudium-bought ladder slots on the CALLER'S OWN character,

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { registerContextRestoreRebake } from './context_restore_registry';
 
 /** One scene-owned uniform service. The capture below copies the opaque colour
  * and depth out of the framebuffer bound at that moment into its own pair, and
@@ -82,6 +83,11 @@ export class OpaqueSceneCapture {
   private readonly group = new THREE.Group();
   private readonly sentinel: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   private disposed = false;
+
+  reinitialize(): void {
+    if (!this.disposed) this.renderer.initRenderTarget(this.target);
+  }
+
   constructor(
     private readonly renderer: THREE.WebGLRenderer,
     private readonly scene: THREE.Scene,
@@ -101,6 +107,9 @@ export class OpaqueSceneCapture {
     });
     this.target.texture.name = 'vfxOpaqueColour';
     renderer.initRenderTarget(this.target);
+    // A context restore drops the allocation; make it again under the restore
+    // hold rather than in the first frame that samples it.
+    registerContextRestoreRebake('scene-sampling', this, (owner) => owner.reinitialize());
     this.service.uniforms.uOpaqueColor.value = this.target.texture;
     this.service.uniforms.uOpaqueDepth.value = this.depth;
     const geometry = new THREE.BufferGeometry();

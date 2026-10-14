@@ -101,9 +101,9 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       // Deliberately tradeable (maintainer ruling 2026-08-28): the Crucible
       // tier binds its vendor gear, but this jewelry shipped tradeable and
       // the live economy is built around that; the pin keeps a future
-      // vendor-gear-binds sweep from silently rebinding it. The trinket is
-      // new, not shipped jewelry, and binds like every trinket does.
-      expect(item.soulbound, offer.itemId).toBe(item.slot === 'trinket' ? true : undefined);
+      // vendor-gear-binds sweep from silently rebinding it. Wayfarer's
+      // Lodestone is also tradable; only PvP vendor trinkets bind.
+      expect(item.soulbound, offer.itemId).toBeUndefined();
     }
   });
 

@@ -8,11 +8,9 @@ import { markSharedMaterial, markSharedTexture } from '../shared_resource';
 
 /**
  * Keep a rig-parented FX object out of the body's overlay cycle: the tint,
- * ghost and Soul Rend swaps and their prewarm twins, the skin re-snapshot and
- * the shadow-caster sweep all skip `weaponVfxMesh` meshes (visual.ts,
- * assets.ts applyMaterials, character_effect_prewarm.ts,
- * soul_rend_prewarm_core.ts). An FX piece draws its own material and never
- * casts a shadow.
+ * spirit veil and Soul Rend swaps, the skin re-snapshot and the shadow-caster
+ * sweep all skip `weaponVfxMesh` meshes (visual.ts, assets.ts applyMaterials).
+ * An FX piece draws its own material and never casts a shadow.
  */
 export function markRigFx<T extends THREE.Object3D>(object: T): T {
   object.userData.weaponVfxMesh = true;

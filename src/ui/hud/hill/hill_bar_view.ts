@@ -24,8 +24,10 @@ export interface HillBarLive {
    *  the holder's members inside, or the largest rival's while unheld. */
   yours: number;
   theirs: number;
-  /** Whole seconds of unbroken majority banked, of `capture`. */
+  /** Whole seconds of majority banked, of `capture`. */
   contest: number;
+  /** The shown clock is paused (its group is inside but not leading). */
+  contestPaused: boolean;
   capture: number;
   /** 0..1, for the progress fill. */
   contestFraction: number;
@@ -46,15 +48,13 @@ export type HillBarView = HillBarLive | HillBarHidden;
 const HIDDEN: HillBarHidden = { visible: false, sig: 'hidden' };
 
 /** The count the viewer's group is measured against (the bar's right-hand
- *  number): the holder's present members, or the largest other group's while
- *  nobody holds the hill (a rival, or nobody). */
+ *  number): the holder's present members while another group holds it, else
+ *  the largest other group inside (the rival that pauses or threatens). */
 export function hillRivalCount(
-  info: Pick<HillInfo, 'holder' | 'holderCount' | 'challenger' | 'challengerCount'>,
+  info: Pick<HillInfo, 'holder' | 'holderCount' | 'rivalCount'>,
 ): number {
-  if (info.holder === 'other') return info.holderCount;
-  if (info.holder === 'none' && info.challenger === 'other') return info.challengerCount;
-  if (info.holder === 'you' && info.challenger === 'other') return info.challengerCount;
-  return 0;
+  // `?? 0`: a server from before rivalCount (a rolling deploy) omits it.
+  return info.holder === 'other' ? info.holderCount : (info.rivalCount ?? 0);
 }
 
 /** Whole yards from a point to the circle's edge, 0 inside. */
@@ -85,6 +85,7 @@ export function buildHillBarView(
     yours: info.yourCount,
     theirs: hillRivalCount(info),
     contest,
+    contestPaused: info.contestPaused === true,
     capture: HILL_CAPTURE_SECONDS,
     contestFraction: HILL_CAPTURE_SECONDS > 0 ? contest / HILL_CAPTURE_SECONDS : 0,
     inside: info.inside,

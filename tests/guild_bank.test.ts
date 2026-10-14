@@ -1597,27 +1597,39 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     expect(meta(sim).inventory.find((s) => s.craftedRecipeId === 'r_test')?.count).toBe(2);
   });
 
-  it('round-trips a whole LOCKED material stack as ONE book row, never one per unit', () => {
-    // The guild-bank twin of the personal-bank and vault cases: guildBankDepositFor
-    // reuses bags.ts addStacked for the book write, so the fresh-slot-sizing fix
-    // must hold here too, including through the escrow delta log this op replays.
+  it('refuses to deposit a LOCKED stack, mutating neither bags nor book', () => {
+    // The lock pins a copy to its bag cell (inventory_order.ts), the personal
+    // bank's rule; checked beside guildBankPipeRefusal, not inside it, because
+    // that predicate also gates withdraw.
     const sim = makeOfficerSim();
     sim.addItem('wolf_fang', 20);
     const idx = meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang');
     sim.setItemLocked('wolf_fang', true, sim.playerId, idx);
-    expect(meta(sim).inventory[idx].instance).toEqual({ locked: true });
+    const before = fingerprint(sim);
+    sim.drainEvents();
 
     sim.guildBankDepositFor(sim.playerId, idx);
 
-    const banked = book(sim).inventory.filter((s) => s.itemId === 'wolf_fang');
-    expect(banked).toHaveLength(1);
-    expect(banked[0].count).toBe(20);
-    expect(banked[0].instance).toEqual({ locked: true });
+    expect(
+      hasErr(sim.drainEvents(), 'That item is locked and cannot be stored in the guild bank.'),
+    ).toBe(true);
+    expect(fingerprint(sim)).toBe(before);
+  });
 
-    sim.guildBankWithdrawFor(
-      sim.playerId,
-      book(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang'),
-    );
+  it('withdraws a legacy LOCKED book row as ONE carried stack, never one per unit', () => {
+    // A book written before the deposit refusal can still hold a locked row;
+    // the fresh-slot-sizing fix must still land it whole.
+    const sim = makeOfficerSim();
+    meta(sim).inventory.length = 0;
+    book(sim).inventory.push({
+      itemId: 'wolf_fang',
+      count: 20,
+      instance: { locked: true },
+      materialSources: [{ source: {}, count: 20 }],
+    });
+
+    sim.guildBankWithdrawFor(sim.playerId, 0);
+
     const carried = meta(sim).inventory.filter((s) => s.itemId === 'wolf_fang');
     expect(carried).toHaveLength(1);
     expect(carried[0].count).toBe(20);

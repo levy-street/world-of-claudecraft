@@ -12,4 +12,5 @@ export * from './quest_tracker';
 export * from './quest_tracker_controller';
 export * from './questlog_view';
 export * from './questlog_window';
+export * from './weekly_quest_tracker_view';
 export * from './world_quest_banner_view';

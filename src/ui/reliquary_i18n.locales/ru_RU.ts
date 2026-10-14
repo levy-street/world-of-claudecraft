@@ -167,7 +167,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Арсенал Боевой мощи',
-    desc: 'Украшения и оружие Войны, купленные за тяжело добытую честь.',
+    desc: 'Украшения, оружие и товары Войны, купленные за тяжело добытую честь.',
   },
   conquerors_vanguard_gallery: {
     name: 'Галерея Авангарда',

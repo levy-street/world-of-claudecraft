@@ -624,7 +624,13 @@ describe('bank ledger dispatch integration', () => {
 // tests/vault_wire.test.ts; this block owns the pure diff contract.
 // ---------------------------------------------------------------------------
 
-import { diffVaultOp, recordVaultOp, vaultSpecialLedgerIdentity } from '../server/bank_ledger';
+import {
+  buildVaultCraftConsumeLedgerRows,
+  diffVaultOp,
+  recordVaultOp,
+  vaultCountGroups,
+  vaultSpecialLedgerIdentity,
+} from '../server/bank_ledger';
 import {
   noopGameMetricsCounters,
   setGameMetricsCounters,
@@ -648,6 +654,39 @@ function vinfo(
     nextUpgradeCost,
   };
 }
+
+describe("craft_consume rows for the crafter's own signed units", () => {
+  it('key a signed take exactly as the custody ledger keys that vault bucket', () => {
+    // The gatherer is provenance, never part of the custody key, so a bucket
+    // the crafter both gathered and signed keys signer-only.
+    const row: VaultInfo['special'][number] = {
+      itemId: 'copper_ore',
+      count: 2,
+      materialSources: [
+        {
+          source: { gatherer: { kind: 'character', id: 11, name: 'Ana' }, signer: 'Ana' },
+          count: 2,
+        },
+      ],
+    };
+    const rows = buildVaultCraftConsumeLedgerRows([
+      {
+        who: { characterId: 1, accountId: 1 },
+        takes: [
+          { itemId: 'copper_ore', count: 3 },
+          { itemId: 'copper_ore', count: 2, signer: 'Ana' },
+        ],
+        upgrades: 1,
+      },
+    ]);
+
+    expect(rows.map((r) => [r.count, r.instance])).toEqual([
+      [3, null],
+      [2, { vaultSpecial: 1, instance: { signer: 'Ana' }, craftedRecipeId: null }],
+    ]);
+    expect(vaultCountGroups(row)).toEqual([{ identity: rows[1].instance, count: 2 }]);
+  });
+});
 
 describe('diffVaultOp (pure)', () => {
   it('a deposit of a new material yields the deposited count with a null instance', () => {

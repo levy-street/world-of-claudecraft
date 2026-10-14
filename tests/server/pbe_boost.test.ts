@@ -1253,6 +1253,76 @@ describe('fillHands: a worn offhand rides beside a two-hander (Phase 18, sim dis
   });
 });
 
+describe('fillHands: a caster weighs a two-hander against a one-hander plus its offhand', () => {
+  // The healer staff's Crit (the Crucible healer Crit amendment) lifted it
+  // over the best one-hander on its own, and the greedy top-weapon pick then
+  // stripped the holy kits' orb and shield. Casters now compare the two
+  // loadouts; melee roles keep the top weapon (a shield's armor must never
+  // talk a two-hand melee spec into sword and board). Synthetic through the
+  // HandLegalityReads seam, the phase 09 idiom below.
+  const isFlagged = (id: string) => id.startsWith('mw_');
+  const scoreOf = (scores: Record<string, number>) => (id: string) => scores[id] ?? 0;
+  const reads: HandLegalityReads = {
+    canEquipInSlot: () => true,
+    canDualWieldSpecless: () => false,
+    occupiesHand: () => true,
+  };
+  const refill = (melee: boolean): Partial<Record<EquipSlot, string>> => {
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      mainhand: 'mw_greatstaff',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map([['offhand', { id: 'plain_orb', score: 20 }]]),
+      [],
+      scoreOf({ mw_chest: 100, mw_waist: 90, mw_greatstaff: 60 }),
+      isFlagged,
+      {
+        cls: 'priest',
+        role: { id: 'test', weights: {}, melee },
+        weapons: [
+          { id: 'mw_greatstaff', score: 60, twoHand: true },
+          { id: 'plain_staff', score: 50, twoHand: true },
+          { id: 'plain_mace', score: 40, twoHand: false },
+        ],
+        shields: [],
+        held: { id: 'plain_orb', score: 20 },
+        reads,
+      },
+    );
+    return kit;
+  };
+
+  it('a caster takes the one-hander and orb when the pair outscores the two-hander', () => {
+    const kit = refill(false);
+    expect(kit.mainhand).toBe('plain_mace');
+    expect(kit.offhand).toBe('plain_orb');
+  });
+
+  it('a melee role keeps the top two-hander on the same numbers', () => {
+    const kit = refill(true);
+    expect(kit.mainhand).toBe('plain_staff');
+    expect(kit.offhand).toBeUndefined();
+  });
+
+  it('the live holy kits keep their one-hander and offhand beside the healer staff', () => {
+    const priest = bisKitForRole('priest', roleOf('priest', 'holy'));
+    expect(priest.mainhand).toBe('heroic_deathless_heartwood');
+    expect(priest.offhand).toBe('orb_of_the_last_spring');
+    const paladin = bisKitForRole('paladin', roleOf('paladin', 'holy'));
+    expect(paladin.mainhand).toBe('heroic_deathless_heartwood');
+    expect(paladin.offhand).toBe('ember_wardens_barrier');
+    // The staff now outscores the one-hander alone (its Crit is scored), which
+    // is exactly the case the loadout comparison exists for.
+    const role = roleOf('priest', 'holy');
+    expect(roleItemScore(role, ITEMS.staff_of_the_last_spring)).toBeGreaterThan(
+      roleItemScore(role, ITEMS.heroic_deathless_heartwood),
+    );
+  });
+});
+
 describe('Masterwrought cap: hand demotion routes through fillHands (phase 09)', () => {
   // Phase 09 ships flagged hands (Ridgebreaker, Duskforged Warblade and
   // Bulwark, the two held offhands), but none is an argmax pick for any role

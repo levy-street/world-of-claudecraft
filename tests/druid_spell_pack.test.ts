@@ -106,7 +106,11 @@ describe('druid spell pack — definitions', () => {
     expect(ABILITIES.enrage.requiresForm).toBe('bear');
     expect(ABILITIES.bash.requiresForm).toBe('bear');
     expect(ABILITIES.tigers_fury.requiresForm).toBe('cat');
-    expect(ABILITIES.dash.requiresForm).toBe('cat');
+    // Dash shifts into Cat Form itself (combat/druid_form_entry.ts), so it
+    // carries no form gate and is usable from any form.
+    expect(ABILITIES.dash.requiresForm).toBeUndefined();
+    expect(ABILITIES.dash.usableInForm).toBe(true);
+    expect(ABILITIES.dash.offGcd).toBe(true);
     expect(ABILITIES.pounce.requiresStealth).toBe(true);
     expect(ABILITIES.pounce.awardsCombo).toBe(1);
     expect(ABILITIES.rip.spendsCombo).toBe(true);
@@ -419,19 +423,23 @@ describe('druid spell pack — casting applies effects', () => {
     expect((sim as any).moveSpeedMult(e)).toBeCloseTo(1.4);
   });
 
-  it('Dash grants +50% movement speed in cat form', () => {
+  it('Dash grants +50% movement speed in cat form without breaking Prowl', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('druid', 'Dasher');
     const e = sim.entities.get(a)!;
     sim.setPlayerLevel(20, a);
     giveForm(sim, a, 'form_cat', 'Cat Form');
     e.resource = 100;
+    sim.castAbility('prowl', a);
+    expect(e.auras.some((au) => au.id === 'prowl' && au.kind === 'stealth')).toBe(true);
     sim.castAbility('dash', a);
     sim.tick();
     const buff = e.auras.find((au) => au.kind === 'buff_speed');
     expect(buff, 'dash should apply a buff_speed aura').toBeTruthy();
     expect(buff!.value).toBeCloseTo(1.5);
+    expect(e.auras.some((au) => au.id === 'prowl' && au.kind === 'stealth')).toBe(true);
     // Dash multiplies the Cat Form passive (+15%): 1.15 x 1.5, never a flat 1.5.
+    // Stalk itself is full-speed for feral, so preserving it does not add a slow.
     expect((sim as any).moveSpeedMult(e)).toBeCloseTo(1.15 * 1.5);
   });
 });

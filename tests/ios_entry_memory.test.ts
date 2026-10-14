@@ -17,9 +17,11 @@ import {
 const read = (path: string): string => readFileSync(new URL(path, import.meta.url), 'utf8');
 const mainSource = read('../src/main.ts');
 const assetsSource = read('../src/render/characters/assets.ts');
+const streamCoreSource = read('../src/render/characters/rift_body_stream_core.ts');
 const visualSource = read('../src/render/characters/visual.ts');
 const portraitSource = read('../src/render/characters/portrait.ts');
 const portraitChipSource = read('../src/ui/portrait_chip.ts');
+const hudSource = read('../src/ui/hud.ts');
 const vfxSource = read('../src/render/vfx.ts');
 
 describe('entry probe covers the await window', () => {
@@ -99,6 +101,24 @@ describe('tight-memory residency diet', () => {
     const revealAt = mainSource.indexOf('const revealWorld = (): void => {');
     expect(revealAt).toBeGreaterThan(-1);
     expect(startAt).toBeGreaterThan(revealAt);
+  });
+
+  it('never starts the schedule through a graphics rebuild when none was running', () => {
+    // The tight profile never starts the schedule at boot, so the rebuild
+    // restart must be conditional on a live one, or a rebuild would warm the
+    // portrait catalog on tight after all.
+    const resetAt = hudSource.indexOf('resetGraphicsPreviewContexts(): void {');
+    expect(resetAt).toBeGreaterThan(-1);
+    const reset = hudSource.slice(resetAt, hudSource.indexOf('\n  }', resetAt));
+    expect(reset).toContain(
+      'this.restartPreviewPrewarmAfterGraphicsRebuild = this.previewPrewarmHandle !== null;',
+    );
+    const restoreAt = hudSource.indexOf('restoreGraphicsPreviewContexts(): void {');
+    expect(restoreAt).toBeGreaterThan(-1);
+    const restore = hudSource.slice(restoreAt, hudSource.indexOf('\n  }', restoreAt));
+    const gateAt = restore.indexOf('if (this.restartPreviewPrewarmAfterGraphicsRebuild) {');
+    expect(gateAt).toBeGreaterThan(-1);
+    expect(restore.indexOf('this.startPostEntryPreviewPrewarm(false)')).toBeGreaterThan(gateAt);
   });
 
   it('keeps the curtain-side paperdoll shell build inside the tight-memory gate', () => {
@@ -245,8 +265,11 @@ describe('post-entry mob-body streaming', () => {
   // through the fail-soft view-create seam (#2079).
   // Measured before this: WebContent at 1.54 GB pre-renderer on an iPhone 17 Pro.
   it('keeps desktop mobs critical, bulk-streams only iOS mobs, and leaves skins on demand', () => {
-    expect(assetsSource).toContain(
-      "const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];",
+    // The split itself (which bodies, which lane, per profile) is behavior
+    // pinned in tests/ios_rift_body_stream.test.ts; these pins keep assets.ts
+    // consuming it.
+    expect(streamCoreSource).toContain(
+      "export const STREAMED_BODY_URL_PREFIXES: readonly string[] = [\n  'models/creatures/',\n  'models/chars/enemies/',\n];",
     );
     // Weapon SKINS stream (cosmetic, degradable); the BASE item weapons do not,
     // so the player's own hands are never empty at spawn and the degrade path
@@ -258,15 +281,10 @@ describe('post-entry mob-body streaming', () => {
       'const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));',
     );
     expect(assetsSource).toContain(
-      'streamedSkinUrls.has(url) ||\n      (profile.iosMemoryProfile && STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)))',
+      'return characterStreamPlan(allPreloadUrls, streamedSkinUrls, profile.iosMemoryProfile);',
     );
-    expect(assetsSource).toContain('let streamedUrls = streamedCharacterUrlsFor(GFX);');
-    expect(assetsSource).toContain(
-      'let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);',
-    );
-    expect(assetsSource).toContain(
-      'return urls.filter((url) => STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)));',
-    );
+    expect(assetsSource).toContain('let streamedUrls = initialStreamPlan.streamed;');
+    expect(assetsSource).toContain('let postEntryStreamUrls = initialStreamPlan.postEntry;');
     expect(assetsSource).toContain('for (const url of postEntryStreamUrls) {');
     expect(assetsSource).toContain('return postEntryStreamUrls.length;');
     expect(assetsSource).not.toContain('for (const url of streamedUrls) {');

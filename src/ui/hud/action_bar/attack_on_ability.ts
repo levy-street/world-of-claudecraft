@@ -57,6 +57,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   aoeHeal: 'other',
   chainHeal: 'other',
   groundAoE: 'damage',
+  // Spore Burst also damages every enemy in its splash.
+  sporeBurst: 'damage',
   frozenOrb: 'damage',
   aoeRoot: 'damage',
   empoweredCone: 'damage',
@@ -155,6 +157,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   hunterBloodhook: 'damage',
   hunterShrapnel: 'damage',
   hunterTrailbreak: 'other',
+  hunterPlayDead: 'other',
   hunterPackRally: 'other',
   frostjawTrap: 'other',
 };

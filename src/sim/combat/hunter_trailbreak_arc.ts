@@ -236,7 +236,15 @@ export function planTrailbreakArc(
  *  lift the kernel grants mid-flight; the resolve judges every sample at the
  *  launch feet height, which is conservative (a low prop far up a hill may
  *  read as a wall and shorten the leap) and never lets the body clip. */
-export function trailbreakArcFor(ctx: SimContext, hunter: Entity, distance: number): TrailbreakArc {
+export function trailbreakArcFor(
+  ctx: SimContext,
+  hunter: Entity,
+  distance: number,
+  // The heading whose BACK the leap runs along. Trailbreak leaps behind the
+  // hunter's own facing; an airborne knockback (combat/knockback_launch.ts)
+  // throws its victim along a heading of its own without turning them.
+  facing: number = hunter.facing,
+): TrailbreakArc {
   const seed = ctx.cfg.seed;
   return planTrailbreakArc(
     {
@@ -247,7 +255,7 @@ export function trailbreakArcFor(ctx: SimContext, hunter: Entity, distance: numb
         ctx.resolveMove(fromX, fromZ, toX, toZ, PLAYER_BODY_RADIUS, hunter, true),
     },
     hunter.pos,
-    hunter.facing,
+    facing,
     distance,
   );
 }

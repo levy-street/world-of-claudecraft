@@ -55,6 +55,8 @@ export type WorldPvpWindowView =
       kills: number;
       deaths: number;
       honor: number;
+      rewardSeconds: number;
+      rewardPause: NonNullable<WorldPvpInfo['rewardPause']> | null;
       /** The ground under the player right now, for the status card's second
        *  line. Reported whatever the kill switch says, so `realmEnabled` is
        *  what decides whether it means anything. */
@@ -64,7 +66,7 @@ export type WorldPvpWindowView =
        *  ground line is dropped (no zone policy is live to report). */
       realmEnabled: boolean;
       stakes: WorldPvpStakes;
-      /** Render-skip signature: every id and number the markup depends on. */
+      /** Full-panel signature; the reward progress line is patched separately. */
       sig: string;
     };
 
@@ -126,6 +128,13 @@ export function buildWorldPvpWindowView(input: WorldPvpWindowViewInput): WorldPv
     kills: info.kills,
     deaths: info.deaths,
     honor: input.honor,
+    rewardSeconds: info.rewardSeconds ?? 0,
+    rewardPause:
+      info.rewardPause !== undefined
+        ? info.rewardPause
+        : info.flagged && info.disarmRemaining === null && info.zone === 'sanctuary'
+          ? 'sanctuary'
+          : null,
     zone: info.zone,
     realmEnabled: info.enabled !== false,
     stakes: WORLD_PVP_STAKES,

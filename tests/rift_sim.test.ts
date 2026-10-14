@@ -6,7 +6,7 @@ import {
   resolvePosition,
   setRiftRegion,
 } from '../src/sim/colliders';
-import { BUILTIN_WORLD, isRiftPos, riftInstanceOrigin } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEON_LIST, isRiftPos, riftInstanceOrigin } from '../src/sim/data';
 import { layoutColliders } from '../src/sim/dungeon_layout';
 import { generateRiftFloor } from '../src/sim/rift/rift_gen';
 import { Sim } from '../src/sim/sim';
@@ -366,6 +366,89 @@ describe('rift sim: death returns to the entry zone cemetery', () => {
     sim.enterRift(SEED, 20, sim.player.id, { x: 138, z: 838 });
     dieAndRelease(sim);
     expect(sim.player.pos.z).toBeGreaterThan(500);
+  });
+});
+
+describe('rift sim: logging out inside a rift resumes at its portal', () => {
+  // A Thornpeak-Heights return spot, far from the first dungeon's door in
+  // Eastbrook Vale where the instance-door fallback used to land rift saves.
+  const RETURN = { x: 138, z: 838 };
+  const flatDist = (a: { x: number; z: number }, b: { x: number; z: number }) =>
+    Math.hypot(a.x - b.x, a.z - b.z);
+
+  function enterThornpeakRift(sim: Sim) {
+    sim.enterRift(SEED, 20, sim.player.id, RETURN);
+    expect(isRiftPos(sim.player.pos.x)).toBe(true);
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    inst.returnFacing = 1.25; // a known exit facing to round-trip
+    return inst;
+  }
+
+  function relog(state: NonNullable<ReturnType<Sim['serializeCharacter']>>): Entity {
+    const restored = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: RIFT_SIM_TEST_WORLD,
+    });
+    const pid = restored.addPlayer('warrior', 'Relog', { state });
+    return restored.entities.get(pid)!;
+  }
+
+  it('saves the run return spot and facing, and login lands beside the portal', () => {
+    const sim = makeSim();
+    const inst = enterThornpeakRift(sim);
+    const state = sim.serializeCharacter(sim.player.id)!;
+    expect(state.pos).toEqual({ x: inst.returnPos.x, z: inst.returnPos.z });
+    expect(state.facing).toBe(1.25);
+    // Saving never moves the live entity: an autosave mid-run leaves them inside.
+    expect(isRiftPos(sim.player.pos.x)).toBe(true);
+    const p = relog(state);
+    expect(isRiftPos(p.pos.x)).toBe(false);
+    expect(flatDist(p.pos, inst.returnPos)).toBeLessThan(3);
+    expect(p.facing).toBe(1.25);
+    const firstDoor = DUNGEON_LIST[0].doorPos;
+    expect(flatDist(p.pos, firstDoor)).toBeGreaterThan(100);
+  });
+
+  it('a body left dead on the floor auto-releases with its corpse at the portal', () => {
+    const sim = makeSim();
+    const inst = enterThornpeakRift(sim);
+    sim.player.gm = false;
+    sim.dealDamage(null, sim.player, 999999, false, 'physical', 'test', 'hit');
+    expect(sim.player.dead).toBe(true);
+    const state = sim.serializeCharacter(sim.player.id)!;
+    expect(state.dead).toBe(true);
+    expect(state.pos).toEqual({ x: inst.returnPos.x, z: inst.returnPos.z });
+    const p = relog(state);
+    expect(p.ghost).toBe(true);
+    expect(p.corpsePos).not.toBeNull();
+    expect(isRiftPos(p.corpsePos!.x)).toBe(false);
+    expect(flatDist(p.corpsePos!, inst.returnPos)).toBeLessThan(3);
+    // The spirit releases to a graveyard of the portal's zone, not Eastbrook's.
+    expect(p.pos.z).toBeGreaterThan(500);
+  });
+
+  it('a released spirit whose corpse is on the floor resumes with the corpse at the portal', () => {
+    const sim = makeSim();
+    const inst = enterThornpeakRift(sim);
+    sim.player.gm = false;
+    sim.dealDamage(null, sim.player, 999999, false, 'physical', 'test', 'hit');
+    sim.releaseSpirit(sim.player.id);
+    expect(sim.player.ghost).toBe(true);
+    expect(isRiftPos(sim.player.corpsePos!.x)).toBe(true);
+    const state = sim.serializeCharacter(sim.player.id)!;
+    expect(state.corpsePos).toEqual({ x: inst.returnPos.x, z: inst.returnPos.z });
+    const p = relog(state);
+    expect(p.ghost).toBe(true);
+    expect(isRiftPos(p.corpsePos!.x)).toBe(false);
+    expect(flatDist(p.corpsePos!, inst.returnPos)).toBeLessThan(3);
+  });
+
+  it('a save outside any rift keeps the position as it stands', () => {
+    const sim = makeSim();
+    const before = { x: sim.player.pos.x, z: sim.player.pos.z };
+    expect(sim.serializeCharacter(sim.player.id)!.pos).toEqual(before);
   });
 });
 

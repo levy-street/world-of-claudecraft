@@ -7,4 +7,5 @@ export function settleTeleportArrival(p: Entity): void {
   p.jumping = false;
   p.onGround = true;
   p.fallStartY = p.pos.y;
+  p.launchedBy = undefined; // a Typhoon throw does not follow a teleport
 }

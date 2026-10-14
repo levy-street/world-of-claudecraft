@@ -1,6 +1,7 @@
 import { formatDuration } from './duration';
 import { logger } from './http/logger';
 import { parseModerationChatCommand } from './moderation_commands';
+import type { RealmMotdCommand } from './realm_motd';
 
 export interface ModerationSession {
   pid: number;
@@ -8,8 +9,8 @@ export interface ModerationSession {
   characterId: number;
   isAdmin: boolean;
   // Expanded admin permission set, snapshotted at WS join (like isAdmin). The
-  // commands this service handles require 'moderation.act' or
-  // 'moderation.spectate' (see requiredCommandPermission).
+  // commands this service handles require 'moderation.act',
+  // 'moderation.spectate' or 'realm.motd' (see requiredCommandPermission).
   adminPermissions: ReadonlySet<string>;
   name: string;
 }
@@ -29,6 +30,7 @@ export interface ModerationHost<TSession extends ModerationSession> {
   isJailed(session: TSession): boolean;
   jail(moderator: TSession, target: TSession, minutes: number): void;
   unjail(moderator: TSession, target: TSession): void;
+  realmMotd(actor: TSession, command: RealmMotdCommand): void;
 }
 
 export interface ModerationAudit {
@@ -70,6 +72,7 @@ const UNSPECTATE_REASON = 'Stopped spectating via in-game moderator command';
 type ModerationCommandKind = NonNullable<ReturnType<typeof parseModerationChatCommand>>['kind'];
 
 function requiredCommandPermission(kind: ModerationCommandKind): string {
+  if (kind === 'motd') return 'realm.motd';
   return kind === 'spectate' || kind === 'unspectate' ? 'moderation.spectate' : 'moderation.act';
 }
 
@@ -79,7 +82,8 @@ function requiredCommandPermission(kind: ModerationCommandKind): string {
 export function canAttemptModerationCommands(session: ModerationSession): boolean {
   return (
     session.adminPermissions.has('moderation.act') ||
-    session.adminPermissions.has('moderation.spectate')
+    session.adminPermissions.has('moderation.spectate') ||
+    session.adminPermissions.has('realm.motd')
   );
 }
 
@@ -153,6 +157,9 @@ export class ModerationService<TSession extends ModerationSession> {
         break;
       case 'unjail':
         this.unjail(actor, command.name, command.malformed);
+        break;
+      case 'motd':
+        this.host.realmMotd(actor, command.command);
         break;
     }
     return true;

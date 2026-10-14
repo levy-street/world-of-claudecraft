@@ -3,6 +3,28 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// The painter's portrait chip reaches the character model preload; keep it
+// inert (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
+// This suite exercises the character sheet DOM, not WebGL portraits. Importing
+// the real portrait module starts GLB fetches that can outlive happy-dom
+// teardown and throw ProgressEvent errors in Node, so the portrait chip stays a
+// stub.
+vi.mock('../src/ui/portrait_chip', () => ({
+  crestUrl: () => '',
+  hydrateComposedChips: () => undefined,
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
@@ -18,6 +40,16 @@ import {
 import { hasTranslation } from '../src/ui/i18n';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import { svgIcon } from '../src/ui/ui_icons';
+
+// Importing the portrait chip starts character asset loads. Keep those pending
+// in this DOM suite: real Three loaders can outlive happy-dom teardown and
+// reject when its ProgressEvent global is gone. The painter still exercises
+// the real portrait chip's pending-asset fallback.
+vi.mock('../src/render/assets/loader', () => ({
+  loadGltf: vi.fn(() => new Promise(() => undefined)),
+  loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
+  loadTexture: vi.fn(() => new Promise(() => undefined)),
+}));
 
 // The character window painter is a DOM module. Most guards below inspect its
 // source, while the profession-art arm opts into jsdom and drives the real

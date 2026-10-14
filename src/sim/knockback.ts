@@ -12,6 +12,7 @@ import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { isMoored } from './combat/trinkets';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { SKIN_WIDTH } from './physics';
+import { platformSupportAt } from './physics/platform';
 import { rideSteepnessAt, stepWaterLevel } from './ride_height';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
@@ -21,7 +22,12 @@ const BODY_RADIUS = PLAYER_BODY_RADIUS;
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH;
 
-export function applyKnockback(
+/** The yards a shove of `distance` actually gets after every knockback
+ *  immunity (Ice Block, Veilbound March, the Mooring Stone, a dev anchor) and
+ *  the target's knockback resistance; 0 means the target does not move. The
+ *  one gate both the grounded shove below and the airborne launch
+ *  (combat/knockback_launch.ts) pass through, so neither can bypass it. */
+export function knockbackDistanceAfterGuards(
   ctx: SimContext,
   source: Entity,
   target: Entity,
@@ -35,7 +41,16 @@ export function applyKnockback(
   // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
   // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
   // and never displaces the victim, so a caster keeps casting through it.
-  distance *= 1 - (target.knockbackResistance ?? 0);
+  return Math.max(0, distance * (1 - (target.knockbackResistance ?? 0)));
+}
+
+export function applyKnockback(
+  ctx: SimContext,
+  source: Entity,
+  target: Entity,
+  distance: number,
+): number {
+  distance = knockbackDistanceAfterGuards(ctx, source, target, distance);
   if (distance <= 0) return 0;
   let dx = target.pos.x - source.pos.x;
   let dz = target.pos.z - source.pos.z;
@@ -52,22 +67,32 @@ export function applyKnockback(
   let moved = 0;
   let cx = target.pos.x,
     cz = target.pos.z;
+  const platform = ctx.platformFor?.(target) ?? null;
+  const platformMaxY = target.pos.y + 3;
+  const footingAt = (x: number, z: number) => {
+    const terrain = groundHeight(x, z, ctx.cfg.seed);
+    const platformTop = platformSupportAt(platform, x, z, BODY_RADIUS, platformMaxY);
+    return { terrain, platformTop, floor: Math.max(terrain, platformTop) };
+  };
   while (moved < distance) {
     const adv = Math.min(STEP, distance - moved);
     const nx = cx + ux * adv,
       nz = cz + uz * adv;
-    const h1 = groundHeight(nx, nz, ctx.cfg.seed);
-    if (h1 < waterLevelAt(nx, nz, ctx.cfg.seed) - SWIM_DEPTH) break; // would land in deep water
+    const next = footingAt(nx, nz);
+    if (next.floor < waterLevelAt(nx, nz, ctx.cfg.seed) - SWIM_DEPTH) break; // would land in deep water
     // ridden-surface slopes (ride_height.ts): a submerged bed bump does not
     // stop a shove crossing shallow water. No shore step-out here: a forced
     // displacement conservatively stops at a bank face.
     const wls = stepWaterLevel(cx, cz, nx, nz, ctx.cfg.seed);
-    const r0 = Math.max(groundHeight(cx, cz, ctx.cfg.seed), wls);
-    const r1 = Math.max(h1, wls);
+    const current = footingAt(cx, cz);
+    const r0 = Math.max(current.floor, wls);
+    const r1 = Math.max(next.floor, wls);
     if (
       r1 > r0 &&
       ((r1 - r0) / adv > MAX_CLIMB_SLOPE ||
-        (h1 >= wls && rideSteepnessAt(nx, nz, ctx.cfg.seed) > MAX_CLIMB_SLOPE))
+        (next.platformTop === -Infinity &&
+          next.terrain >= wls &&
+          rideSteepnessAt(nx, nz, ctx.cfg.seed) > MAX_CLIMB_SLOPE))
     ) {
       break; // would slam into a cliff
     }
@@ -95,7 +120,11 @@ export function applyKnockback(
   // Support-aware seat: a victim shoved along crate tops stays on them, and
   // one shoved through a passed-over prop footprint is nudged clear instead
   // of being embedded at terrain height inside it.
-  const seat = seatGroundedAt(ctx.cfg.seed, cx, cz, BODY_RADIUS, target.pos.y);
+  const platformTop = platformSupportAt(platform, cx, cz, BODY_RADIUS, platformMaxY);
+  const seat =
+    platformTop > groundHeight(cx, cz, ctx.cfg.seed)
+      ? { x: cx, y: platformTop, z: cz }
+      : seatGroundedAt(ctx.cfg.seed, cx, cz, BODY_RADIUS, target.pos.y);
   target.pos.x = seat.x;
   target.pos.z = seat.z;
   target.pos.y = seat.y;

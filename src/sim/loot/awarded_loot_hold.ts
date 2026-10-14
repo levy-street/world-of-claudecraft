@@ -15,6 +15,12 @@
 // mailbox fallback: a mailbox that catches every overflow is an unlimited
 // bag, and nobody would ever need to manage theirs.
 //
+// The held slot names its winner by entity id (`personalFor`, the shape every
+// loot path reads), and a relog mints a new one. So the hold also records the
+// winner's durable character on the corpse (Entity.heldLootOwners), and
+// rebindHeldAwardsOnJoin re-points the slot when that character comes back:
+// a winner who logs out on the way back to the corpse can still take it.
+//
 // `src/sim`-pure: no DOM/Three, no wall clock, no rng of its own.
 
 import { bagPools, countFit } from '../bags';
@@ -109,6 +115,10 @@ export function grantOrHoldAwardedLoot(
   };
   if (!mob.loot) mob.loot = { copper: 0, items: [] };
   mob.loot.items.push(slot);
+  if (meta.characterId !== undefined) {
+    if (!mob.heldLootOwners) mob.heldLootOwners = new Map();
+    mob.heldLootOwners.set(pid, meta.characterId);
+  }
   mob.lootable = true;
   mob.corpseTimer = Math.max(mob.corpseTimer, HELD_LOOT_CORPSE_SECONDS);
   ctx.emit({
@@ -118,4 +128,29 @@ export function grantOrHoldAwardedLoot(
     text: `Your bags are full; [[i:${itemId}]] is waiting on the corpse for you.`,
     pid,
   });
+}
+
+// A character joining under a new entity id (a relog or a character-select
+// Take Over) takes back every award still held for it on a corpse: each held
+// slot naming the character's previous entity id is re-pointed at the new
+// one. A previous id that is still a live session is left alone. Joins are
+// rare, so the one pass over the entity table is cheap; draws no rng.
+export function rebindHeldAwardsOnJoin(ctx: SimContext, entityId: number): void {
+  const characterId = ctx.players.get(entityId)?.characterId;
+  if (characterId === undefined) return;
+  for (const corpse of ctx.entities.values()) {
+    const owners = corpse.heldLootOwners;
+    if (!owners || !corpse.loot) continue;
+    for (const [previousId, ownerCharacterId] of [...owners]) {
+      if (ownerCharacterId !== characterId || previousId === entityId) continue;
+      if (ctx.players.has(previousId)) continue;
+      for (const slot of corpse.loot.items) {
+        if (slot.personalFor?.includes(previousId)) {
+          slot.personalFor = slot.personalFor.map((id) => (id === previousId ? entityId : id));
+        }
+      }
+      owners.delete(previousId);
+      owners.set(entityId, characterId);
+    }
+  }
 }

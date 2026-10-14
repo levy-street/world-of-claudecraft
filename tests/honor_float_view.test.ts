@@ -25,6 +25,7 @@ const ALL_REASONS: HonorReason[] = [
   'world_kill',
   'world_assist',
   'hill_hold',
+  'world_quest',
 ];
 
 // The two the drip pays plus the once-a-day bonus (which lands in the same

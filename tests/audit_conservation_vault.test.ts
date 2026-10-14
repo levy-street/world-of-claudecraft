@@ -1459,6 +1459,71 @@ describe('the audit arm (mutation check: a dropped or bent row is caught)', () =
     );
     expect(audit(bentRung).map((f) => f.kind)).toContain('purchased_mismatch');
   }, 60_000);
+
+  it("reconciles a craft that spends the crafter's OWN signed vault units", async () => {
+    // Crafts may draw units signed with the crafter's own name. The custody
+    // ledger keys those by signer, so the craft_consume row must name that
+    // identity or the audit reads a pooled shortfall beside a signed surplus.
+    coverage.enabled = false;
+    let w: World;
+    let rows: Record<string, unknown>[];
+    try {
+      store.insertBankLedgerRow.mockClear();
+      store.insertBankLedgerRows.mockClear();
+      w = makeWorld(2);
+      const meta = metaOf(w.sim, w.pid);
+      // Replace the run's starting grant with exactly one craft's reagents: one
+      // plain wolf fang plus three the crafter signed (a rare gather), so the
+      // draw takes the plain unit first, then one signed unit.
+      meta.inventory.length = 0;
+      w.granted.clear();
+      w.sim.addItem('wolf_fang', 1, w.pid);
+      w.sim.addItemInstance('wolf_fang', { signer: meta.name }, w.pid, 3);
+      w.sim.addItem('bone_fragments', 4, w.pid);
+      w.sim.addItem('smithing_flux', 6, w.pid);
+      w.granted.set('wolf_fang', 4);
+      w.granted.set('bone_fragments', 4);
+      w.granted.set('smithing_flux', 6);
+      const scenario: Step[] = [{ k: 'buy' }, { k: 'deposit_all' }, { k: 'craft' }];
+      for (const step of scenario) expect(await applyStep(w, step)).toEqual([]);
+      expect(conservationViolations(w)).toEqual([]);
+      await bankLedgerIdle();
+      rows = [...store.rows];
+    } finally {
+      coverage.enabled = true;
+    }
+
+    const signed = {
+      vaultSpecial: 1,
+      instance: { signer: metaOf(w.sim, w.pid).name },
+      craftedRecipeId: null,
+    };
+    expect(
+      rows
+        .filter((r) => r.op === 'craft_consume' && r.item_id === 'wolf_fang')
+        .map((r) => ({ count: r.count, instance: r.instance })),
+    ).toEqual([
+      { count: 1, instance: null },
+      { count: 1, instance: signed },
+    ]);
+    // The one signed fang the craft left behind is still in the vault.
+    expect(vaultStoredCount(metaOf(w.sim, w.pid).vault, 'wolf_fang')).toBe(2);
+
+    const persisted = w.sim.serializeCharacter(w.pid);
+    const character = { id: CHARACTER_ID, realm: REALM, state: { vault: persisted?.vault } };
+    const audit = (ledgerRows: Record<string, unknown>[]) =>
+      auditBank({
+        ledgerRows: ledgerRows as unknown as BankLedgerAuditRow[],
+        characters: [character],
+        guildBanks: [],
+      });
+    expect(audit(rows)).toEqual([]);
+
+    // The pre-fix row shape (every take written as pooled stock) is exactly the
+    // mismatch this guards against.
+    const pooledOnly = rows.map((r) => (r.op === 'craft_consume' ? { ...r, instance: null } : r));
+    expect(audit(pooledOnly).map((f) => f.kind)).toContain('ledger_state_mismatch');
+  });
 });
 
 // ---------------------------------------------------------------------------

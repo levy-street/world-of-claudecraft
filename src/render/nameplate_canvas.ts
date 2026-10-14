@@ -38,10 +38,12 @@ import {
   roundedRect,
 } from './nameplate_paint_primitives';
 import { NAMEPLATE_BASE_WIDTH, nameplateHealthBarWidth } from './nameplate_pick_core';
+import { bountyFill, nameplateGuildFill, nameplateNameFill } from './nameplate_tag_fill_core';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
 export type { NameplateMarkerTone } from './nameplate_markers';
 export type { NameplateBadge } from './nameplate_paint_primitives';
+export { GUILD_TIER_FILLS } from './nameplate_tag_fill_core'; // with the other tag fills
 
 export interface NameplateCanvasState {
   initialized: boolean;
@@ -89,6 +91,8 @@ export interface NameplateCanvasState {
   /** The /pvp flag the name row was built with: the painter re-resolves the row
    *  the frame the live flag differs, so the `<PvP>` tag never waits on the tier cadence. */
   pvpFlag: boolean;
+  /** World PvP bounty: the whole tag paints blood red. Read every pass, like `hostile`. */
+  bounty: boolean;
   /** The operator-applied Cheater tag, already localized AND already wrapped in
    *  its `< >` form by the painter's resolveContent (its only writer, the
    *  guildLabel precedent), '' for everyone else. An inline chip in the name row
@@ -135,6 +139,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     dots: newNameplateDotsPlan(),
     aiLabel: '',
     pvpFlag: false,
+    bounty: false,
     cheaterLabel: '',
     devOutline: null,
     badges: [],
@@ -209,16 +214,6 @@ const GUILD_STYLE: TextSpriteStyle = {
   stroke: '#000',
   lineWidth: 2,
 };
-/** Guild colour tiers (sim/guild_tier.ts): the guild line's fill by the
- *  guild's collective lifetime XP. Index IS the tier; 0 keeps the classic
- *  fill every fresh guild has always had. Cosmetic only. */
-export const GUILD_TIER_FILLS: readonly string[] = [
-  '#c9dcfb', // 0: the classic guild blue
-  '#9fe8a8', // 1: spring green, a few actives
-  '#5fd3e8', // 2: cyan, an established roster
-  '#e8b45f', // 3: amber, a serious guild
-  '#ffcf40', // 4: gold, the realm's elite
-];
 const TARGET_GUILD_STYLE: TextSpriteStyle = {
   font: `700 13px ${TITLE_FONT}`,
   fill: '#c9dcfb',
@@ -421,7 +416,7 @@ export class NameplateCanvasSurface {
         state.guildLabel,
         screenX,
         y + (state.currentTarget ? 11 : 10),
-        this.configureTextStyle(guildStyle, GUILD_TIER_FILLS[state.guildTier] ?? GUILD_STYLE.fill),
+        this.configureTextStyle(guildStyle, nameplateGuildFill(state.bounty, state.guildTier)),
       );
     }
     if (state.title) y -= NAMEPLATE_HERALDRY_TITLE_STEP;
@@ -551,12 +546,14 @@ export class NameplateCanvasSurface {
   private drawNameRow(state: NameplateCanvasState, screenX: number, bottomY: number): number {
     const rowHeight = this.nameRowHeight(state);
     const nameStyle = state.currentTarget ? this.targetNameStyle : this.nameStyle;
-    const nameColor = state.deadEnemy ? '#bbb' : state.hostile ? '#ff5555' : state.nameColor;
-    this.configureTextStyle(nameStyle, nameColor);
-    this.configureTextStyle(this.levelStyle, state.levelColor);
+    this.configureTextStyle(nameStyle, nameplateNameFill(state));
+    this.configureTextStyle(this.levelStyle, bountyFill(state.bounty, state.levelColor));
     this.configureTextStyle(this.aiStyle, AI_STYLE.fill);
     this.configureTextStyle(this.cheaterStyle, CHEATER_STYLE.fill);
-    const titleStyle = this.configureTextStyle(this.titleStyle, TITLE_STYLE.fill);
+    const titleStyle = this.configureTextStyle(
+      this.titleStyle,
+      bountyFill(state.bounty, TITLE_STYLE.fill),
+    );
     const nameWidth = this.text.measureAdvance(state.name, nameStyle);
     const levelWidth = state.level ? this.text.measureAdvance(state.level, this.levelStyle) + 6 : 0;
     const aiWidth = state.aiLabel ? this.text.measureAdvance(state.aiLabel, this.aiStyle) + 3 : 0;

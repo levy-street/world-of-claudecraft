@@ -34,7 +34,8 @@
 // worst cases (two rows for a socket swap and 112 for vault_deposit_all), so a
 // hostile account is bounded to 172,800 receipts and 345,600 retained rows
 // per day after its one-time burst. Craft-from-vault (Phase 04) adds op
-// 'craft_consume', one row per material id drawn per COMPLETED CAST, and shares
+// 'craft_consume', one row per planned take per COMPLETED CAST (a material id
+// can carry a pooled row and a signer row for the crafter's own units), and shares
 // those same account command/row buckets rather than stacking another source.
 // Account state survives reconnect in-process. A separate process/realm bucket
 // admits 242 rows of burst and 8 rows/s sustained, at most 691,200 of these
@@ -53,7 +54,7 @@
 import { isMaterialItemId, materialItemIds } from '../src/sim/material_ids';
 import type { MaterialSourceDelta } from '../src/sim/material_sources';
 import { normalizeMaterialStack } from '../src/sim/material_stack';
-import type { ItemInstancePayload } from '../src/sim/types';
+import type { ItemInstancePayload, VaultConsumptionTake } from '../src/sim/types';
 import type { BankInfo, GuildBankInfo, VaultInfo } from '../src/world_api';
 import { BankLedgerGrowthLimitExceeded } from './bank_ledger_growth_budget';
 import { type BankLedgerRow, insertBankLedgerRow, insertBankLedgerRows } from './db';
@@ -975,20 +976,24 @@ export function buildVaultLedgerRows(
 // This module keeps only the PURE row builder the journal serializes with.
 //
 // Rows write op 'craft_consume', container 'vault', container_id null,
-// instance null, copper_delta 0; purchased_slots_after carries the rung the
-// reservation sampled at consumption time; one row per material id drawn, in
-// the canonical sorted take order (src/sim/sim_context.ts
-// reservePlannedVaultConsumption). scripts/bank_audit.mjs replays
-// 'craft_consume' as a REMOVAL beside deposit/withdraw/admin_purge; without
+// copper_delta 0, and instance null for pooled stock or the signer-only vault
+// identity for the crafter's OWN signed units (the take's `signer`);
+// purchased_slots_after carries the rung the reservation sampled at
+// consumption time; one row per planned take, in the order
+// src/sim/sim_context.ts reservePlannedVaultConsumption offers them (sorted,
+// then split by signer, so one id may carry a pooled and a signed row).
+// scripts/bank_audit.mjs replays 'craft_consume' as a REMOVAL beside
+// deposit/withdraw/admin_purge; without
 // that row every crafting character would reconcile as a permanent
 // ledger_state_mismatch, which is why the row family exists at all.
 // ---------------------------------------------------------------------------
 
 /** One completed cast's vault consumption: the owning session's identity, the
- *  canonically sorted takes, and the rung it sampled. */
+ *  takes sorted by id and split by signer (pooled before signed within an id),
+ *  and the rung it sampled. */
 export interface VaultCraftConsumption {
   who: { characterId: number; accountId: number };
-  takes: readonly { itemId: string; count: number }[];
+  takes: readonly VaultConsumptionTake[];
   upgrades: number;
 }
 
@@ -1005,7 +1010,13 @@ export function buildVaultCraftConsumeLedgerRows(
       op: 'craft_consume',
       itemId: take.itemId,
       count: take.count,
-      instance: null,
+      // A signer-carrying take drew the crafter's OWN signed units, which the
+      // count ledger keys exactly as vaultCountGroups keys that bucket; every
+      // other take is ordinary pooled stock.
+      instance:
+        take.signer === undefined
+          ? null
+          : vaultCountLedgerIdentity(effectiveCountPayload(undefined, take.signer), null),
       copperDelta: 0,
       purchasedSlotsAfter: c.upgrades,
       container: 'vault',

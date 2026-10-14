@@ -22,6 +22,12 @@ import {
   worldPvpDefeatLine,
   worldPvpKillLine,
 } from '../src/sim/pvp/world_pvp';
+import {
+  WORLD_PVP_BOUNTY_EARNED_LINE,
+  WORLD_PVP_BOUNTY_LAPSED_LINE,
+  worldPvpBountyCollectedLine,
+  worldPvpBountyPlacedLine,
+} from '../src/sim/pvp/world_pvp_bounty';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
@@ -660,6 +666,12 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       HILL_TAKEN_LINE,
       HILL_LOST_LINE,
       HILL_READOUT_NONE_LINE,
+      // World PvP bounties (src/sim/pvp/world_pvp_bounty.ts): the holder's
+      // notices and the two realm announcements, same constant-and-builder shape.
+      WORLD_PVP_BOUNTY_EARNED_LINE,
+      WORLD_PVP_BOUNTY_LAPSED_LINE,
+      worldPvpBountyPlacedLine('Aki'),
+      worldPvpBountyCollectedLine('Bet', 'Aki'),
     ];
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -1556,6 +1568,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     'server/character_blob_size.ts',
     'server/character_save_statement.ts',
     'server/admin_market_metrics.ts',
+    'server/realm_motd.ts',
   ]
     .map((file) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8'))
     .join('\n');
@@ -1758,6 +1771,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'chat.ts',
       'chat_readouts.ts',
       'duel.ts',
+      'duel_zone.ts',
       'dungeon_finder.ts',
       'fiesta.ts',
       'fiesta_bots.ts',

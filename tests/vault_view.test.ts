@@ -358,16 +358,27 @@ describe('predictVaultDepositAll (the click-time replay of the sim sweep)', () =
     const info = vinfo({ copper_ore: 30 }, 1, 40, 50000, [
       slot('copper_ore', 8, { craftedRecipeId: 'smelt_copper' }),
     ]);
-    // Headroom 2. A locked payload moves whole or not at all (the sim's
-    // vaultRowMovesWhole), so the replay leaves it carried and reports the
-    // ceiling, exactly as the sweep does.
-    const locked = [slot('copper_ore', 5, { instance: { locked: true } })];
-    expect(predictVaultDepositAll(locked, info, MATERIALS, lookup)).toEqual({
+    // Headroom 2. A charge-bearing payload moves whole or not at all (the
+    // sim's vaultRowMovesWhole), so the replay leaves it carried and reports
+    // the ceiling, exactly as the sweep does.
+    const charged = [slot('copper_ore', 5, { instance: { charges: { zap: 2 } } })];
+    expect(predictVaultDepositAll(charged, info, MATERIALS, lookup)).toEqual({
       stacks: 0,
       items: 0,
       full: true,
       notableItemId: null,
     });
+    // A player-locked stack is not depositable at all (it stays pinned in its
+    // bag cell), so the shared predicate skips it before headroom is read:
+    // nothing moves and the ceiling is never reached.
+    const locked = [slot('copper_ore', 5, { instance: { locked: true } })];
+    expect(predictVaultDepositAll(locked, info, MATERIALS, lookup)).toEqual({
+      stacks: 0,
+      items: 0,
+      full: false,
+      notableItemId: null,
+    });
+    expect(hasVaultDepositable(locked, MATERIALS)).toBe(false);
     // A signer or bind-on-trade payload partially fills like plain stock, the
     // same two units the sweep and the targeted deposit both move.
     const signed = [slot('copper_ore', 5, { instance: { signer: 'Ada' } })];

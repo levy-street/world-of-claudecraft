@@ -1,4 +1,5 @@
 import { isCannonActionId } from '../sim/minigames/cannon_encounter';
+import { CANNON_MAX_ENEMY_HP, CANNON_MAX_LIVE_ENEMIES } from '../sim/minigames/cannon_endless';
 import type { CannonEncounterState, CannonEnemyKind, VehicleSession } from '../sim/types';
 import { vehicleStationById } from '../sim/vehicle_stations';
 
@@ -84,7 +85,7 @@ export function decodeVehicleSession(value: unknown): VehicleSession | null {
     !integer(source.readyAt.grapeshot) ||
     !integer(source.readyAt.incendiary) ||
     !Array.isArray(source.enemies) ||
-    source.enemies.length > 32 ||
+    source.enemies.length > CANNON_MAX_LIVE_ENEMIES ||
     !Array.isArray(source.shots) ||
     source.shots.length > 4 ||
     !Array.isArray(source.fires) ||
@@ -100,7 +101,7 @@ export function decodeVehicleSession(value: unknown): VehicleSession | null {
       !finite(row.x) ||
       !finite(row.z) ||
       !integer(row.hp) ||
-      row.hp > 800 ||
+      row.hp > CANNON_MAX_ENEMY_HP ||
       !integer(row.slowUntilTick) ||
       (row.armorBroken !== undefined && typeof row.armorBroken !== 'boolean')
     )

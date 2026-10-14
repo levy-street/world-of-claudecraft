@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { loadGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { compactScreeMatrices, SCREE_CELL, screeSinkY, screeSpotAt } from './cliff_scree_core';
 import { GFX, type GfxSettings } from './gfx';
@@ -49,7 +48,7 @@ export interface CliffScreeView {
 // kick off fetches at import (the loader cache shares them with foliage.ts's
 // preload of the same URLs, so this costs no extra network); the normal boot
 // flow awaits the gate, letting build read the resolved models synchronously
-const loadedRocks: GLTF[] = [];
+const loadedRocks: LoadedGltf[] = [];
 // Deferred lane: the thunk CREATES the fetch when the lane opens, never closes
 // over one already in flight. The build retry below shares the same promise.
 let rocksReady: Promise<void> | null = null;
@@ -96,7 +95,7 @@ interface RockSource {
 }
 
 // each kit rock GLB is a single mesh wearing the shared 'Rocks' sheet
-function extractRock(gltf: GLTF): RockSource {
+function extractRock(gltf: LoadedGltf): RockSource {
   gltf.scene.updateMatrixWorld(true);
   const found: THREE.Mesh[] = [];
   gltf.scene.traverse((obj) => {

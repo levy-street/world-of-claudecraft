@@ -37,7 +37,7 @@ interface LifecycleHarness {
   lightRankDirty: boolean;
   weaponSkinApplies: { cancel(id: number): void };
   nameplatePainter: { remove(id: number): void };
-  vfx: { healGlow(id: number): void };
+  vfx: { spellHealGlow(id: number): void };
   handleEvent(ev: HealEvent): void;
   removeView(id: number, terminal?: boolean): void;
 }
@@ -82,7 +82,7 @@ function harness(views: Map<number, LifecycleView>, healGlowAt: Map<number, numb
   renderer.lightRankDirty = false;
   renderer.weaponSkinApplies = { cancel: vi.fn() };
   renderer.nameplatePainter = { remove: vi.fn() };
-  renderer.vfx = { healGlow: vi.fn() };
+  renderer.vfx = { spellHealGlow: vi.fn() };
   return renderer;
 }
 
@@ -105,7 +105,7 @@ describe('healGlowAt eviction', () => {
     renderer.handleEvent(healEvent(7));
 
     expect(healGlowAt.has(7)).toBe(false);
-    expect(renderer.vfx.healGlow).not.toHaveBeenCalled();
+    expect(renderer.vfx.spellHealGlow).not.toHaveBeenCalled();
   });
 
   it('clears a stale throttle entry when removal finds no view', () => {
@@ -128,7 +128,7 @@ describe('healGlowAt eviction', () => {
     renderer.handleEvent(healEvent(7));
     renderer.handleEvent(healEvent(7));
 
-    expect(renderer.vfx.healGlow).toHaveBeenCalledTimes(2);
+    expect(renderer.vfx.spellHealGlow).toHaveBeenCalledTimes(2);
     expect(healGlowAt.get(7)).toBe(1111);
     now.mockRestore();
   });

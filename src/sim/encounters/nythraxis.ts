@@ -29,7 +29,7 @@ import { isBlocked } from '../colliders';
 import { isUnbreakableControlAura } from '../combat/cc';
 import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { resurrectionArrivalAnchor } from '../combat/resurrection_offer';
-import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
+import { DUNGEONS, ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { dungeonInstanceAt } from '../dungeon_floor';
 import { createMob, createNpc } from '../entity';
@@ -38,6 +38,7 @@ import {
   claimedInstanceForMob,
   heroicLockoutId,
   instanceLockoutMetas,
+  recordClearedRaidParticipant,
 } from '../instances/dungeons';
 import {
   NYTHRAXIS_ASCENSION_AURA_ID,
@@ -932,6 +933,11 @@ export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
     for (const meta of instanceLockoutMetas(ctx, inst)) lockoutMetas.set(meta.entityId, meta);
   }
   for (const meta of lockoutMetas.values()) {
+    // Before the stamp: a participant whose lock first lands with this kill
+    // earns the claim's cleared-run record, so they can walk back into this
+    // exact arena for a corpse run or loot (instances/raid_return.ts), and
+    // the cleared claim takes the longer empty-instance grace.
+    if (inst) recordClearedRaidParticipant(ctx, inst, meta, lockId);
     meta.raidLockouts.set(lockId, until);
   }
   // Raid deed credit stays scoped to the boss room roster.
@@ -2568,6 +2574,13 @@ export function updateNythraxisTransition(
   if (st.transitionTimer > 0) return;
   st.phase = 2;
   st.transitionReleased = true;
+  // Step aside by the entrance once the speech ends, leaving the wardstone clear.
+  // The NPC tick owns the walk so an early boss kill cannot strand him here.
+  const frame = dungeonInstanceAt(boss.spawnPos.x, boss.spawnPos.z);
+  if (aldric && frame) {
+    const arena = DUNGEONS.nythraxis_boss_arena;
+    aldric.wanderTarget = ctx.groundPos(frame.ox + arena.entry.x + 8, frame.oz + arena.entry.z + 4);
+  }
   st.gravebreakerTimer = 3;
   st.soulRendTimer = NYTHRAXIS_PHASE_TWO_SETTLE_DELAY;
   st.deathlessTimer = NYTHRAXIS_PHASE_TWO_SETTLE_DELAY + 15;

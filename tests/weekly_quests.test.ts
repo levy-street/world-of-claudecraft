@@ -2,13 +2,15 @@
 // talk that opens the window, the guarded pick, credit from the three hook
 // families, the one-time purse, the weekly roll, and the save shape.
 import { describe, expect, it } from 'vitest';
+import { bagPools, canAddItem } from '../src/sim/bags';
+import { WORLD_QUEST_REWARD_LETTER } from '../src/sim/content/letters';
 import {
   WEEKLY_EMISSARY_NPC_DEF,
   WEEKLY_EMISSARY_NPC_ID,
   WEEKLY_QUEST_REWARD,
   WEEKLY_QUESTS,
 } from '../src/sim/content/weekly_quests';
-import { NPCS } from '../src/sim/data';
+import { ITEMS, NPCS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import {
@@ -128,6 +130,34 @@ describe('the emissary', () => {
     expect(meta.copper).toBe(copper + weeklyQuestRewardCopper(sim.player.level));
     sim.chooseWeeklyQuest('wk_raid');
     expect(meta.weeklyQuest?.questId).toBe('wk_dungeons');
+  });
+
+  it('posts the cache to the Ravenpost when the bags are full', () => {
+    const sim = armed();
+    const meta = sim.meta(sim.playerId)!;
+    sim.chooseWeeklyQuest('wk_dungeons');
+    sim.tick();
+    const cacheId = WEEKLY_QUEST_REWARD.cacheItemId;
+    const filler = Object.values(ITEMS).find(
+      (item) => item.id !== cacheId && item.kind === 'armor' && !!item.slot,
+    );
+    if (!filler) throw new Error('No filler item');
+    while (canAddItem(meta.inventory, bagPools(meta.bags), cacheId, 1))
+      meta.inventory.push({ itemId: filler.id, count: 1 });
+    const caches = sim.countItem(cacheId);
+    const inventoryBefore = meta.inventory.length;
+    for (let i = 0; i < 3; i++) onDungeonClearedForWeeklyQuests(sim.ctx, 'hollow_crypt', [meta]);
+    expect(meta.weeklyQuest?.state).toBe('completed');
+    expect(sim.countItem(cacheId)).toBe(caches);
+    expect(meta.inventory.length).toBe(inventoryBefore);
+    expect(
+      sim.postOffice.mail
+        .filter((m) => m.letterId === WORLD_QUEST_REWARD_LETTER.letterId)
+        .map((m) => m.items.map((slot) => [slot.itemId, slot.count])),
+    ).toEqual([[[cacheId, WEEKLY_QUEST_REWARD.cacheCount]]]);
+    expect(eventsOf(sim, 'worldQuestRewardMailed')).toEqual([
+      { type: 'worldQuestRewardMailed', itemIds: [cacheId], pid: sim.playerId },
+    ]);
   });
 
   it('credits the raid, battleground, and world-boss charges from their own hooks', () => {

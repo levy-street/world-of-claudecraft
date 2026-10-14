@@ -61,6 +61,8 @@ export class QuestWorldWireState {
   protected readonly hoardBossCueMirror = new HoardBossCueMirror(() => performance.now());
   private activeWorldBossIds = new Set<string>();
   private questWorldTransport: ((command: QuestWorldCommand) => void) | null = null;
+  /** A release was already requested for the undecodable session on the wire. */
+  private vehicleReleaseRequested = false;
   private questWorldRestBase = '';
 
   /** The host's command transport and REST origin, bound once at construction. */
@@ -91,7 +93,22 @@ export class QuestWorldWireState {
   ): void {
     applyQuestSelfWire(this, self, simTime);
     if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
-    if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
+    if (self.vehicle !== undefined) this.applyVehicleWire(self.vehicle);
+  }
+
+  /** Mirror the owner's cannon session. A live server session the client cannot
+   *  decode would hide the cannon controls while the server still holds the
+   *  movement lock and runs the waves, leaving the player frozen until the line
+   *  falls; so the mirror asks the server, once per such session, to release it. */
+  private applyVehicleWire(value: unknown): void {
+    this.vehicleSession = decodeVehicleSession(value);
+    if (value === null || this.vehicleSession !== null) {
+      this.vehicleReleaseRequested = false;
+      return;
+    }
+    if (this.vehicleReleaseRequested) return;
+    this.vehicleReleaseRequested = true;
+    this.questWorldTransport?.({ cmd: 'vehicle_leave' });
   }
 
   enterVehicle(stationId: string): void {
@@ -166,9 +183,6 @@ export class QuestWorldWireState {
     ) {
       return { canReroll: false, reason: 'Completed world quests cannot be rerolled.' };
     }
-    if (progress && progress.count > 0) {
-      return { canReroll: false, reason: 'In-progress world quests cannot be rerolled.' };
-    }
     return { canReroll: true };
   }
 
@@ -197,6 +211,7 @@ export class QuestWorldWireState {
 
   resetQuestWorldWireState(): void {
     this.vehicleSession = null;
+    this.vehicleReleaseRequested = false;
     this.worldQuestCycle = '';
     this.worldQuestExpiresAtMs = 0;
     this.worldQuestTime = 0;

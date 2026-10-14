@@ -61,6 +61,7 @@ function fields(overrides: Partial<NameplatePaintFields> = {}): NameplatePaintFi
     currentTarget: false,
     hostile: true,
     deadEnemy: false,
+    bounty: false,
     myPet: false,
     friendlyPet: false,
     threat: false,
@@ -133,6 +134,7 @@ describe('nameplate paint gate core', () => {
     ['guild line', fields({ guild: 'Vale', guildLabel: '<Vale>' })],
     ['deed title', fields({ title: 'the Bold' })],
     ['deed border', fields({ border: 'ember' })],
+    ['bounty', fields({ bounty: true })],
     ['elite frame', fields({ frame: 'elite' })],
     ['combo pips', fields({ comboPips: 3 })],
     [

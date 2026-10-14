@@ -217,6 +217,21 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
       };
     case 'treasureMapLost':
       return { logText: t('questUi.logs.treasureMapLost') };
+    case 'worldQuestRewardMailed': {
+      // A full-bags payout went to the Ravenpost: the banner is the pop-up
+      // the player cannot miss, the log line the durable copy. Queued as a
+      // celebration so the completion banner landing on the same tick waits
+      // its turn instead of replacing it.
+      const text = t('questUi.logs.worldQuestRewardMailed', {
+        items: formatList(
+          event.itemIds.map((itemId) => {
+            const def = ownEntry(ITEMS, itemId);
+            return def ? itemDisplayName(def) : itemId;
+          }),
+        ),
+      });
+      return { bannerText: text, bannerClass: 'deed', logText: text, sound: 'quest_ready' };
+    }
     case 'treasureMapRead':
       // A re-read only re-opens the window; the line is for the first read.
       return event.fresh

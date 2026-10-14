@@ -13,6 +13,7 @@ import {
   type MapAnchor,
 } from './dungeon_map_view';
 import { dungeonDisplayName } from './entity_i18n';
+import { t } from './i18n';
 import type { PainterHostWriters } from './painter_host';
 
 const FULL_CIRCLE = Math.PI * 2;
@@ -291,7 +292,7 @@ export class DungeonMapPainter {
   ): void {
     const model = this.view.minimap(world, size, MINIMAP_BASE_SCALE * zoom);
     if (!model) return;
-    this.writers.setText(zoneLabelEl, dungeonDisplayName(model.dungeonId));
+    this.writers.setText(zoneLabelEl, dungeonTitleWithDifficulty(model.dungeonId, world));
     const colors = this.resolveColors();
 
     ctx.clearRect(0, 0, size, size);
@@ -320,7 +321,7 @@ export class DungeonMapPainter {
     const model = this.view.worldMap(world, size, pad, anchor);
     if (!model) return null;
     const colors = this.resolveColors();
-    const title = dungeonDisplayName(model.dungeonId);
+    const title = dungeonTitleWithDifficulty(model.dungeonId, world);
 
     ctx.clearRect(0, 0, size, size);
     ctx.drawImage(this.staticPlate(model.staticGeometry, colors, WORLD_MAP_MARKER_METRICS), 0, 0);
@@ -342,4 +343,12 @@ export class DungeonMapPainter {
     }
     return this.paintedWorldMap;
   }
+}
+
+export function dungeonTitleWithDifficulty(dungeonId: string, world: IWorld): string {
+  const name = dungeonDisplayName(dungeonId);
+  const difficulty = world.activeDungeonDifficulty?.() ?? world.dungeonDifficulty?.() ?? 'normal';
+  const diffLabel =
+    difficulty === 'heroic' ? t('hudChrome.finder.heroic') : t('hudChrome.finder.normal');
+  return `${name} (${diffLabel})`;
 }

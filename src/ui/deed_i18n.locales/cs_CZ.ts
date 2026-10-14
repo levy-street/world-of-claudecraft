@@ -1199,4 +1199,8 @@ export const table: DeedLocaleTable = {
     name: 'Přistižen při činu',
     desc: 'Chyť Hbitce s měšcem v Pohřbeném pokladu dřív, než uteče se zlatem.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Jasnejsi nez stiny',
+    desc: 'Ziskej zpet ukradene mesce s mincemi a unikni z bludiste Evergarden na obtiznost Hard.',
+  },
 };

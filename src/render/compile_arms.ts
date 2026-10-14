@@ -10,6 +10,7 @@
 // asks for.
 
 import type * as THREE from 'three';
+import { linkAcrossContextLoss } from './context_generation';
 import { prewarmDepthMaterial } from './prewarm_depth_material';
 
 /** The renderer surface both arms drive. `compileAsync` is the link; the
@@ -121,11 +122,15 @@ export async function linkColorPrograms(
   includeOffscreenVariant: boolean,
 ): Promise<void> {
   armObserver?.(root, 'color');
-  for (const target of colorArmTargets(host, includeOffscreenVariant)) {
-    await underRenderTarget(host, target, () =>
-      host.webgl().compileAsync(root, host.camera(), host.scene()),
-    );
-  }
+  // A link that straddled a context loss is linked again on the live context
+  // (context_generation.ts): its first answer proves nothing there.
+  await linkAcrossContextLoss(host.webgl(), async () => {
+    for (const target of colorArmTargets(host, includeOffscreenVariant)) {
+      await underRenderTarget(host, target, () =>
+        host.webgl().compileAsync(root, host.camera(), host.scene()),
+      );
+    }
+  });
 }
 
 /** The colour arm's state, applied to any operation: `op` runs once per
@@ -219,10 +224,12 @@ export async function linkShadowPrograms(
   host: CompileArmHost,
   root: THREE.Object3D,
 ): Promise<void> {
-  // Told inside the arm, so a root with nothing to link announces nothing.
-  const link = runShadowArm(host, root, (target, camera, scene) => {
-    armObserver?.(root, 'shadow');
-    return host.webgl().compileAsync(target, camera, scene);
+  await linkAcrossContextLoss(host.webgl(), async () => {
+    // Told inside the arm, so a root with nothing to link announces nothing.
+    const link = runShadowArm(host, root, (target, camera, scene) => {
+      armObserver?.(root, 'shadow');
+      return host.webgl().compileAsync(target, camera, scene);
+    });
+    if (link) await link;
   });
-  if (link) await link;
 }

@@ -14,6 +14,7 @@ import {
   spawnNythraxisAdds,
 } from '../src/sim/encounters/nythraxis';
 import { isShieldItem } from '../src/sim/equipment_rules';
+import { freeInstance } from '../src/sim/instances/dungeons';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import {
@@ -2818,6 +2819,18 @@ describe('Nythraxis raid encounter', () => {
 
     sim.leaveDungeon(tankPid);
     expect(tank.pos.x).toBeLessThan(3000);
+    // The run the tank just cleared stays open to them for loot and corpse
+    // runs while its claim is live (instances/raid_return.ts)...
+    const cleared = sim.instances.find(
+      (i) => i.dungeonId === 'nythraxis_boss_arena' && i.partyKey !== null,
+    )!;
+    expect(cleared.raidReturnKeys.has(`entity:${tankPid}`)).toBe(true);
+    sim.enterDungeon('nythraxis_boss_arena', tankPid);
+    expect(tank.pos.x).toBeGreaterThan(3000);
+    sim.leaveDungeon(tankPid);
+    // ...but once it is freed (the empty-instance reaper's job), the lockout
+    // bars every fresh claim until the reset.
+    freeInstance(sim.ctx, cleared);
     sim.enterDungeon('nythraxis_boss_arena', tankPid);
     expect(tank.pos.x).toBeLessThan(3000); // still locked before the reset
 

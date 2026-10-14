@@ -152,6 +152,10 @@ export const SPEC_BASELINES: SpecBaselineTable = {
         { ability: 'chain_lightning', castPct: LIGHTNING_MASTERY_CAST_PCT },
         { ability: 'earth_shock', dmgPct: 0.18, costPct: -0.15 },
         { ability: 'flame_shock', costPct: -0.2 },
+        // v0.45 rotation fix: Magma Burst takes Arc Bolt's discount. At full
+        // price the Cinder Jolt and Magma Burst loop ran out of Mana inside a
+        // 3 min fight and lost to Arc Bolt plus Earthen Jolt.
+        { ability: 'lava_burst', costPct: -0.35 },
       ],
     },
     enhancement: {
@@ -259,12 +263,14 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // feeds the autos in both forms; the paired offensive physical ability
       // bonus (+0.15, form attacks and bleeds) lives ONLY in
       // spec_output_tuning.ts, never CAT_FORM_DAMAGE_MULT/Wild Apex/armor/
-      // Marrowbreak's shield.
+      // Marrowbreak's heal.
       stats: { armorPct: 0.23, staPct: 0.25, apPct: 0.1 },
       global: { threatPct: 0.2 },
       ability: [
         { ability: 'maul', dmgPct: 0.35 },
         { ability: 'claw', dmgPct: 0.15 },
+        // Scratch copies Rendclaw's damage profile, baseline row included.
+        { ability: 'scratch', dmgPct: 0.15 },
         { ability: 'swipe', dmgPct: 0.2 },
       ],
     },

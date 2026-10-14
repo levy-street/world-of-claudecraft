@@ -231,6 +231,7 @@ describe('i18n whole-catalog completeness', () => {
         'hudChrome.bank.vaultSearch',
         'hudChrome.mapAtlas.collapseHint',
         'hudChrome.mapAtlas.expandHint',
+        'hudChrome.graphicsRestore.note',
         'guide.nav.worldPvp',
         'guide.settingsPage.ifColorblindMode',
         'guide.settingsPage.ifTargetAurasBelowFrame',

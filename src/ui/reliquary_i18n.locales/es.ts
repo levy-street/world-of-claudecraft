@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Armería de Guerra',
-    desc: 'Joyería y armas de Guerra compradas con honor ganado a pulso.',
+    desc: 'Joyería, armas y bienes de Guerra comprados con honor ganado a pulso.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galería de Vanguardia',

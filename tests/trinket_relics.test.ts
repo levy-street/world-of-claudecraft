@@ -5,6 +5,7 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { describe, expect, it, vi } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { TrinketRelics, trinketRelicsPreloadInternalsForTest } from '../src/render/trinket_relics';
@@ -81,7 +82,8 @@ describe('trinket relic GLB (Blender-authored, texture-free)', () => {
         p.getMaterial()?.getName() ?? '',
         (p.getIndices()?.getCount() ?? 0) / 3,
       ]);
-      for (const p of prims) expect(p.getAttribute('COLOR_0'), node.getName()).toBeTruthy();
+      // RGBA: the glow's program differs from the bolt's RGB one (the bolt's own material).
+      for (const p of prims) expect(p.getAttribute('COLOR_0')?.getElementSize()).toBe(4);
     }
     expect(tris).toEqual({
       KindlingOrb: [
@@ -237,7 +239,7 @@ describe('TrinketRelics painter', () => {
     }
     const w = { current: world(entities) };
     const burst = vi.fn();
-    const gate = { ready };
+    const gate = { ready, consults: 0 };
     const relics = new TrinketRelics({
       scene,
       world: () => w.current,
@@ -250,7 +252,10 @@ describe('TrinketRelics painter', () => {
       ground: (x) => x * 0.01,
       vfx: { burst },
       time: () => 1,
-      ready: () => gate.ready,
+      ready: () => {
+        gate.consults++;
+        return gate.ready;
+      },
     });
     return { scene, views, w, burst, relics, gate };
   }
@@ -289,6 +294,21 @@ describe('TrinketRelics painter', () => {
     expect(after).toBe(count);
   });
 
+  it('draws the bolts with a material no other relic draws', () => {
+    const h = setup([]);
+    const bolts = new Set<THREE.Material>();
+    const others = new Set<THREE.Material>();
+    h.scene.traverse((o) => {
+      const material = (o as THREE.Mesh).material as THREE.Material | undefined;
+      if (material) (o.name === 'kindling-bolt' ? bolts : others).add(material);
+    });
+    expect(bolts.size).toBe(1);
+    for (const material of bolts) expect(others.has(material)).toBe(false);
+    const [bolt] = bolts;
+    const glow = [...others].find((m) => !m.transparent) as THREE.MeshBasicMaterial;
+    expect((bolt as THREE.MeshBasicMaterial).color.getHex()).toBe(glow.color.getHex());
+  });
+
   it('shows the orb while the aura lives and takes it away when it goes', () => {
     const h = setup([entity(1, [aura(TRINKET_AURA.kindlingOrb, 6)])]);
     h.relics.update(0.2);
@@ -296,6 +316,59 @@ describe('TrinketRelics painter', () => {
     h.w.current = world([entity(1, [])]);
     h.relics.update(0.2);
     expect(h.relics.activeCounts().orbs).toBe(0);
+  });
+
+  it('asks its ready bit only while a relic is tracked, so a session with no wearer starts no deadline', () => {
+    const h = setup([entity(1, [])], false);
+    for (let i = 0; i < 10; i++) h.relics.update(0.05);
+    expect(h.gate.consults).toBe(0);
+    h.w.current = world([entity(1, [aura(TRINKET_AURA.kindlingOrb, 6)])]);
+    for (let i = 0; i < 4; i++) h.relics.update(0.05);
+    expect(h.gate.consults).toBeGreaterThan(0);
+    h.relics.handleSpellfx(
+      {
+        sourceId: 1,
+        targetId: 1,
+        school: 'fire',
+        fx: 'selfCast',
+        ability: 'trinket_forgefathers_temper',
+      },
+      true,
+    );
+    h.w.current = world([entity(1, [])]);
+    h.relics.update(0.2);
+    const before = h.gate.consults;
+    // The hammer still swings once the orb is gone: the bit is still asked.
+    h.relics.update(0.05);
+    expect(h.gate.consults).toBe(before + 1);
+    for (let i = 0; i < 40; i++) h.relics.update(0.05);
+    const idle = h.gate.consults;
+    for (let i = 0; i < 10; i++) h.relics.update(0.05);
+    expect(h.gate.consults).toBe(idle);
+  });
+
+  it('asks its ready bit for a lantern alone, and for a wisp alone', () => {
+    const lantern = setup([entity(1, [aura(TRINKET_AURA.lantern, 10, { value2: 4, value3: 0 })])]);
+    lantern.relics.update(0.2);
+    expect(lantern.gate.consults).toBeGreaterThan(0);
+    expect(lantern.relics.activeCounts().lanterns).toBe(1);
+    const wisp = setup([entity(1, [aura(TRINKET_AURA.ignite, 6)])]);
+    wisp.relics.update(0.2);
+    expect(wisp.gate.consults).toBeGreaterThan(0);
+  });
+
+  it('launches no bolt from an orb its closed bit keeps hidden, even on an admitted cue', () => {
+    const h = setup([entity(1, [aura(TRINKET_AURA.kindlingOrb, 6)]), entity(2, [], 10)], false);
+    h.relics.update(0.2);
+    const bolt = {
+      sourceId: 1,
+      targetId: 2,
+      school: 'fire',
+      fx: 'projectile',
+      ability: 'trinket_kindling_orb_bolt',
+    };
+    expect(h.relics.handleSpellfx(bolt, true)).toBe(false);
+    expect(h.relics.activeCounts().bolts).toBe(0);
   });
 
   it('holds the cosmetic orb behind a cold cast gate', () => {
@@ -376,4 +449,88 @@ describe('TrinketRelics painter', () => {
     for (let i = 0; i < 20; i++) h.relics.update(0.05);
     expect(h.relics.activeCounts().hammers).toBe(0);
   });
+});
+
+describe('TrinketRelics over the shipped GLB', () => {
+  // The headless suites above build the procedural stand-ins; this one seeds
+  // the module with the real model, whose RGBA glow and Standard or Lambert
+  // body are the programs the relic family's ready bit must see.
+  async function relicsOverGlb(standardMaterials: boolean) {
+    await MeshoptDecoder.ready;
+    const bytes = readFileSync(ASSET_PATH);
+    const gltf = await new GLTFLoader()
+      .setMeshoptDecoder(MeshoptDecoder as never)
+      .parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
+    const steps: Array<() => Promise<unknown>> = [];
+    vi.resetModules();
+    vi.doMock('../src/render/assets/preload', () => ({
+      registerPreload: vi.fn(),
+      registerDeferredPreload: (step: () => Promise<unknown>) => steps.push(step),
+    }));
+    vi.doMock('../src/render/assets/loader', () => ({
+      loadGltf: async () => gltf,
+      loadTexture: vi.fn(),
+      releaseTexture: vi.fn(),
+      releaseGltf: vi.fn(),
+    }));
+    vi.stubGlobal('window', {});
+    const relicsModule = await import('../src/render/trinket_relics');
+    vi.unstubAllGlobals();
+    const gfx = await import('../src/render/gfx');
+    const prewarm = await import('../src/render/ability_vfx/prewarm');
+    const family = await import('../src/render/cast_vfx_family');
+    const { drawProgramSignature } = await import('../src/render/draw_program_signature_core');
+    vi.doUnmock('../src/render/assets/preload');
+    vi.doUnmock('../src/render/assets/loader');
+    expect(steps).toHaveLength(1);
+    await steps[0]();
+    const restore = gfx.gfxInternalsForTest.overrideSettings({ standardMaterials });
+    const scene = new THREE.Scene();
+    try {
+      new relicsModule.TrinketRelics({
+        scene,
+        world: () => ({ entities: new Map() }) as unknown as IWorld,
+        views: new Map(),
+        anchor: () => null,
+        ground: () => 0,
+        vfx: { burst: vi.fn() },
+        time: () => 0,
+        ready: () => true,
+      });
+    } finally {
+      restore();
+    }
+    const drawables: THREE.Mesh[] = [];
+    scene.traverse((o) => {
+      if ((o as THREE.Mesh).material) drawables.push(o as THREE.Mesh);
+    });
+    return { scene, drawables, prewarm, family, drawProgramSignature };
+  }
+
+  for (const standardMaterials of [true, false]) {
+    it(`gates every relic program on the relic family, one per material (${standardMaterials ? 'Standard' : 'Lambert'} body)`, async () => {
+      const h = await relicsOverGlb(standardMaterials);
+      expect(h.drawables.some((d) => d.name.startsWith('KindlingOrb'))).toBe(true);
+      for (const d of h.drawables)
+        expect(h.family.castVfxFamilyBitOf(d)).toBe(h.family.CAST_VFX_RELIC);
+      const listed = h.prewarm.abilityVfxFamilyMaterials(h.scene).get('relic') ?? [];
+      const bySignature = new Map<string, Set<THREE.Material>>();
+      const byMaterial = new Map<THREE.Material, Set<string>>();
+      for (const d of h.drawables) {
+        const material = d.material as THREE.Material;
+        const signature = h.drawProgramSignature(d, material);
+        bySignature.set(signature, (bySignature.get(signature) ?? new Set()).add(material));
+        byMaterial.set(material, (byMaterial.get(material) ?? new Set()).add(signature));
+      }
+      // RGBA glow, the body, the lantern light, the RGB bolt.
+      expect(bySignature.size).toBe(4);
+      for (const signatures of byMaterial.values()) expect(signatures.size).toBe(1);
+      for (const materials of bySignature.values()) {
+        expect([...materials].some((material) => listed.includes(material))).toBe(true);
+      }
+      const units = h.prewarm.collectAbilityVfxCompileTargets(h.scene);
+      expect(units).toHaveLength(4);
+      for (const unit of units) expect(h.family.castVfxFamilyBitOf(unit.object)).toBe(4);
+    });
+  }
 });

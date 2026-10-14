@@ -145,8 +145,10 @@ const build = await buildItemArtAudit({
     // feature/buried-hoards: the release's faction ladder, trinket slot and
     // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
     // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
-    catalogCount: 1464,
-    liveItemCount: 1482,
+    // + the World PvP trophy skull (pvp_trophy_skull): 1465 / 1483.
+    // + the World PvP Skull Bag (pvp_skull_bag): 1466 / 1484.
+    catalogCount: 1466,
+    liveItemCount: 1484,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

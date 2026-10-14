@@ -14,6 +14,7 @@ import { type QuestTrackingState, sharedQuestTracking } from '../../quest_tracki
 import { forgeInstructionLines } from '../../world_quest_forge_view';
 import { gliderInstructionLines } from '../../world_quest_glider_view';
 import { investigationInstructionLines } from '../../world_quest_investigation_view';
+import { worldQuestReadsCompleted } from '../../world_quest_progress_state';
 import { shadowInstructionLines } from '../../world_quest_shadow_view';
 import { worldQuestTraceProgressInstruction } from '../../world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../../world_quest_view';
@@ -27,6 +28,7 @@ import {
   questTrackerSections,
   type TrackedQuest,
 } from './quest_tracker';
+import { weeklyQuestTrackerRow } from './weekly_quest_tracker_view';
 import { buildWispMazeHud, type WispMazeHudController } from './wisp_maze_hud_controller';
 import { createWorldQuestTrackerVisibility } from './world_quest_tracker_visibility';
 
@@ -48,7 +50,7 @@ export interface QuestTrackerControllerDeps {
   element: HTMLElement;
   document: Document;
   world(): Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog'> &
-    Partial<Pick<IWorld, 'abandonQuest' | 'clueHunt'>>;
+    Partial<Pick<IWorld, 'abandonQuest' | 'clueHunt' | 'weeklyQuest'>>;
   /** Injectable tracking set; production leaves it out and shares the HUD's one. */
   tracking?: QuestTrackingState;
   settings: QuestTrackerSettingsPort;
@@ -178,7 +180,7 @@ export class QuestTrackerController {
         progress.glider?.phase === 'countdown' ||
         progress.glider?.phase === 'flying';
       const complete =
-        progress.state === 'completed' &&
+        worldQuestReadsCompleted(progress) &&
         !(progress.wispMaze && progress.wispMaze.phase !== 'won') &&
         progress.glider?.phase !== 'countdown' &&
         progress.glider?.phase !== 'flying';
@@ -264,6 +266,8 @@ export class QuestTrackerController {
         ],
       });
     }
+    const weeklyQuest = weeklyQuestTrackerRow(world.weeklyQuest);
+    if (weeklyQuest) quests.push(weeklyQuest);
     // A section with no rows paints no header, so a stale collapse there would
     // hide the next row to arrive behind a header the player never saw close:
     // clear it once, per section.
@@ -430,10 +434,15 @@ export class QuestTrackerController {
       // World quests list in their own section; this guard keeps any world
       // quest id that reaches this list plain text (it has no log entry).
       const worldQuest = ownEntry(WORLD_QUESTS_BY_ID, quest.id);
-      const behavior = !worldQuest
-        ? ` role="button" tabindex="0" data-quest="${esc(quest.id)}"`
-        : '';
-      rows += `<div class="qt-title ui-cin"${behavior}><span class="qt-num ui-badge ui-num">${esc(this.number(quest.number))}</span>${esc(quest.title)}${this.completeTag(quest.complete)}</div>`;
+      const behavior =
+        !worldQuest && quest.number > 0
+          ? ` role="button" tabindex="0" data-quest="${esc(quest.id)}"`
+          : '';
+      const badge =
+        quest.number > 0
+          ? `<span class="qt-num ui-badge ui-num">${esc(this.number(quest.number))}</span>`
+          : '';
+      rows += `<div class="qt-title ui-cin"${behavior}>${badge}${esc(quest.title)}${this.completeTag(quest.complete)}</div>`;
       for (const objective of quest.objectives) {
         if (objective.instruction) {
           // A movement lesson instruction is shown in full, with no count.

@@ -235,3 +235,44 @@ export function buildGroupedMeterBreakdown(
   for (const group of groups) group.fill = topGroup > 0 ? group.amount / topGroup : 0;
   return { total, perSecond, groups };
 }
+
+/** The numbers behind one ability's drill-down subtitle; meters.ts localizes them. */
+export interface AbilityDetailStats {
+  hits: number;
+  crits: number;
+  /** crits / hits, 0 to 1 */
+  critShare: number;
+  /** rounded mean per hit */
+  avg: number;
+  minHit: number;
+  maxHit: number;
+  /** heal tab: the entry amount, which is already effective healing */
+  effective: number;
+  overheal: number;
+  /** heal tab: overheal / (effective + overheal), 0 to 1 */
+  overhealShare: number;
+}
+
+// A heal entry's `amount` is ALREADY effective: the sim clamps every heal2
+// event's amount to the target's missing hp and reports the excess as a
+// separate `overheal`, which the meters accumulate into `entry.overheal`. So
+// effective is the amount itself, and the overheal share is of total output.
+// An entry with no hit counter is treated as one hit, as the meters always have.
+export function abilityDetailStats(entry: BreakdownEntry): AbilityDetailStats {
+  const hits = entry.hits ?? 1;
+  const crits = entry.crits ?? 0;
+  const avg = hits > 0 ? Math.round(entry.amount / hits) : entry.amount;
+  const overheal = entry.overheal ?? 0;
+  const output = entry.amount + overheal;
+  return {
+    hits,
+    crits,
+    critShare: hits > 0 ? crits / hits : 0,
+    avg,
+    minHit: entry.minHit ?? avg,
+    maxHit: entry.maxHit ?? avg,
+    effective: entry.amount,
+    overheal,
+    overhealShare: output > 0 ? overheal / output : 0,
+  };
+}

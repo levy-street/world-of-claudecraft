@@ -1186,7 +1186,11 @@ describe('dungeon difficulty slash command', () => {
     const p = sim.addPlayer('warrior', 'Solo');
     sim.enterDungeon('hollow_crypt', p);
     sim.leaveDungeon(p);
-    sim.setDungeonDifficulty('heroic', p);
+    // Seed a divergent preference so this tests explicit slash-command routing,
+    // independently of the automatic switch covered in difficulty_selection.test.ts.
+    sim.players.get(p)!.dungeonDifficulty = 'heroic';
+    const claim = sim.instances.find((inst) => inst.dungeonId === 'hollow_crypt' && inst.partyKey);
+    expect(claim?.difficulty).toBe('normal');
 
     sim.drainEvents();
     sim.chat('/dungeon reset', p);
@@ -1201,6 +1205,7 @@ describe('dungeon difficulty slash command', () => {
             event.text === 'All instances have been reset.',
         ),
     ).toBe(true);
+    expect(claim?.difficulty).toBe('heroic');
   });
 
   it('routes the /dungeons and /instances reset aliases', () => {

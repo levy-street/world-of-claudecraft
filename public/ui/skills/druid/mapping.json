@@ -644,6 +644,37 @@
       "source": "Owner-provided original artwork",
       "owner": "Levy Street account",
       "license": "Owner-provided artwork, used with permission (Levy Street), rights reserved"
+    },
+    {
+      "abilityId": "sporemender_form",
+      "sourcePack": "owner-provided",
+      "sourceFile": "owner-provided Sporemender concept sheet (the Heal panel, cropped to a square with the label row trimmed off), re-encoded to 128px WebP by scripts/convert_skill_icons_webp.mjs",
+      "output": "sporemender_form.webp",
+      "source": "Owner-provided original artwork",
+      "owner": "Levy Street account",
+      "license": "Owner-provided artwork, used with permission (Levy Street), rights reserved"
+    },
+    {
+      "abilityId": "spore_burst",
+      "sourcePack": "woc_tripo_spore_burst_icon_2026_10_12",
+      "sourceFile": "public/ui/skills/druid/spore_burst.png (Tripo text-to-image 2048px, cropped inside its painted frame to the square art and resized to 512px, converted in place by assets:skills, original deleted)",
+      "output": "spore_burst.webp",
+      "source": "Tripo AI text-to-image",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A dark sage-green mushroom with cream spots bursting open in a cloud of glowing cream and lime-green spores.",
+      "generationPrompt": "Square fantasy MMO spell icon, painted digital art, no border, no text. A small round dark sage-green mushroom with large cream spots and a cream rim, bursting open in an explosion of glowing cream and lime-green spores and pollen, radiant light rays, swirling green magical energy, dark forest-green background with vignette, vivid glow, high contrast, centered composition, filling the frame."
+    },
+    {
+      "abilityId": "natures_boon",
+      "sourcePack": "woc_tripo_spore_burst_icon_2026_10_12",
+      "sourceFile": "public/ui/skills/druid/natures_boon.png (Tripo text-to-image 2048px, center-cropped and resized to 512px, converted in place by assets:skills, original deleted)",
+      "output": "natures_boon.webp",
+      "source": "Tripo AI text-to-image",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Glowing leaf-and-vine druid hands cradling a golden-green sprouting seed of light.",
+      "generationPrompt": "Square fantasy MMO passive spell icon, painted digital art, no border, no frame, no text. A cupped pair of glowing green druid hands made of leaves and vines, cradling a bright golden-green seed of light that sprouts a small luminous leaf, swirling motes of lime-green and gold nature magic, dark forest-green background with vignette, soft radiant glow, high contrast, centered composition filling the frame."
     }
   ],
   "deferredStayProcedural": {},
