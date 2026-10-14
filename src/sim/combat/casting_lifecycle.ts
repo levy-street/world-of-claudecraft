@@ -1,4 +1,5 @@
 import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
+import { courierSummon } from '../courier';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
@@ -1163,6 +1164,10 @@ export function castAbility(
       p.queuedCastTargetId = castTargetId;
     }
     return; // an earlier press stays silent, classic spams this
+  }
+  if (abilityId === 'courier') {
+    courierSummon(ctx, p.id);
+    return;
   }
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   // sharedCooldownIds generalizes the release's shaman-shock special case (it

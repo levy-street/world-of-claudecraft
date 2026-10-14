@@ -8,6 +8,7 @@
 // painted item WebP in the same change. Values name both the GLBs and their legacy JPG previews
 // under public/ui/weapons/, which remain useful to Armory and asset-pipeline tooling.
 export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
+  membership_staff: 'staff_a',
   // ---- swords (sword_a..g + the adv set; legendary/epic kept distinct) --------
   worn_sword: 'sword_a',
   eastbrook_arming_sword: 'sword_b',

@@ -3023,7 +3023,10 @@ function judgeSlotRoutes(
   for (const rank of ROUTE_MAPS.riftRanksByItem.get(awardId) ?? []) {
     judge('riftReins', `riftReins:${rank}`, names('rift', rank));
   }
-  if (relicKind === 'weapon_skin' && ROUTE_MAPS.storeSkinIds.has(slotId)) {
+  if (
+    (relicKind === 'weapon_skin' && ROUTE_MAPS.storeSkinIds.has(slotId)) ||
+    (relicKind === 'mount' && slotId === 'terrorspark_groundshaker')
+  ) {
     judge('store', `store:${RELIQUARY_STORE_SOURCE_ID}`, names('store', RELIQUARY_STORE_SOURCE_ID));
   }
   for (const activityId of ROUTE_MAPS.activitiesBySlot.get(slotId) ?? []) {
@@ -3060,13 +3063,11 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
   // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
   // slot stays listed and sourceless until the mount gets a route.
-  // terrorspark_groundshaker and lanternback_troll: DEVELOPER_MOUNTS,
-  // dev-grant only, deliberately absent from
-  // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
-  // def comments in content/mounts.ts).
+  // terrorspark_groundshaker left this list when the annual membership
+  // bundle began granting its soulbound reins through the WOC Store.
   // avian_strider left this list when the Rift Watch quartermaster's Champion
   // row gave it a route (content/faction_vendors.ts; MOUNT_SOURCES hints it).
-  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll', 'terrorspark_groundshaker'],
+  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll'],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -3184,12 +3185,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   professions_specimens: 7,
   professions_crucible: 3,
   professions_forgebreaker: 1,
-  // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
-  // pending-ruling absences resolve to nothing. The storefront door left with
-  // the Mech Bird: a paid mount is a mount SKIN now, never a relic.
-  // 11 with the Rift Watch quartermaster's door: the Viridian Valestrider's
-  // Champion-standing reins (content/faction_vendors.ts).
-  horizons_mounts: 11,
+  // The eleven existing boss, vendor and rift doors plus the WOC Store's
+  // annual membership tank reward. Pending-ruling absences resolve to nothing.
+  horizons_mounts: 12,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
@@ -3868,21 +3866,23 @@ describe('Reliquary source hints resolve against live content', () => {
     expect(Object.values(QUESTS.q_riding_lessons.itemRewards ?? {})).toEqual([]);
   });
 
-  it('every store hint sits on a live Armory skin and names the one storefront', () => {
-    // The storefront is an id space of exactly one, so the truth standard is
-    // the SLOT: only an account weapon skin is granted this way
-    // (grantWeaponSkinsToAccount), and it must be a live WEAPON_SKINS id.
+  it('every store hint names a live Armory skin or the annual membership mount', () => {
+    // Store cosmetics are live WEAPON_SKINS ids. The annual membership's
+    // fixed tank reins are the sole paid mount-item exception.
     const offenders: string[] = [];
     let checked = 0;
     for (const { page, relic, slotId } of RELIC_SLOTS) {
       for (const hint of reliquaryRelicSource(page, relic)) {
         if (hint.sourceKind !== 'store') continue;
         checked += 1;
-        if (relic.kind !== 'weapon_skin') {
-          // The store's other cosmetic family, the mount SKINS
-          // (content/mount_skins.ts), are account cosmetics and never relics:
-          // a mount slot with a store hint would be a mount item sold for
-          // money, which no longer exists.
+        if (relic.kind === 'mount' && slotId === 'terrorspark_groundshaker') {
+          expect(ITEMS.reins_terrorspark_groundshaker).toMatchObject({
+            kind: 'mount',
+            mount: slotId,
+            soulbound: true,
+          });
+        } else if (relic.kind !== 'weapon_skin') {
+          // Other mount skins are account cosmetics, never mount-item relics.
           offenders.push(`${page.id}:${slotId} is a ${relic.kind} slot with a store hint`);
         } else if (!Object.hasOwn(WEAPON_SKINS, slotId)) {
           offenders.push(`${page.id}:${slotId} is not a live Armory skin`);
@@ -4162,11 +4162,7 @@ describe('Reliquary source hint coverage', () => {
     // (masterwork:engineering was a row here too until masterwrought Phase
     // 11o's stats-bearing ocular un-pended it; see the pending-table comment.)
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
-    expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
-      'drakemaw_raptor',
-      'lanternback_troll',
-      'terrorspark_groundshaker',
-    ]);
+    expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual(['drakemaw_raptor', 'lanternback_troll']);
     // All are still live catalog slots, so the exclusion cannot outlive them.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
       expect(RELIQUARY_HORIZON_MOUNTS, mountId).toContain(mountId);
@@ -4706,10 +4702,11 @@ describe('Reliquary source hint coverage', () => {
         'mark x activity',
         'mark x boss',
         'mark x zone',
-        // mount: heroic tables, Marla's counter, the rift reins ladder.
+        // mount: heroic tables, vendors, the rift ladder and the annual bundle.
         'mount x boss',
         'mount x vendor',
         'mount x rift',
+        'mount x store',
         // weapon_skin: the account storefront, page-wide.
         'weapon_skin x store',
         // title: the deed that grants it, always.

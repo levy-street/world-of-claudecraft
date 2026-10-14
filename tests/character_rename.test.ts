@@ -25,6 +25,63 @@ function st(partial: Record<string, unknown>): CharacterState {
 }
 
 describe('rekeyInstanceSigner (force-rename sweep)', () => {
+  it('rekeys courier-held instance and material signatures without rewriting historical gatherers', () => {
+    const cargo = [
+      {
+        itemId: 'wyrmfall_pendant',
+        count: 1,
+        instance: { signer: 'Oldname', boundTo: 7, name: 'Keep' },
+      },
+      { itemId: 'wyrmfall_pendant', count: 1, instance: { signer: 'Other' } },
+      {
+        itemId: 'iron_bar',
+        count: 2,
+        materialSources: [
+          {
+            count: 2,
+            source: {
+              signer: 'Oldname',
+              gatherer: { kind: 'character', id: 7, name: 'Oldname' },
+            },
+          },
+        ],
+      },
+      ...Array.from({ length: 21 }, () => ({
+        itemId: 'linen_scrap',
+        count: 1,
+        instance: { signer: 'Oldname' },
+      })),
+    ];
+    const state = st({
+      courier: {
+        phase: 'outbound',
+        x: 3,
+        z: 4,
+        bankerId: 9,
+        retryRemaining: 0,
+        revision: 3,
+        cargo,
+        withdrawals: [{ index: 0, fingerprint: 'unchanged' }],
+      },
+    });
+    const expected = structuredClone(state);
+    for (const slot of expected.courier!.cargo) {
+      if (slot.instance?.signer === 'Oldname') slot.instance.signer = 'Newname';
+    }
+    expected.courier!.cargo[2].materialSources = [
+      {
+        count: 2,
+        source: {
+          signer: 'Newname',
+          gatherer: { kind: 'character', id: 7, name: 'Oldname' },
+        },
+      },
+    ];
+    expect(rekeyInstanceSigner(state, 'Oldname', 'Newname')).toBe(true);
+    expect(state).toEqual(expected);
+    expect(rekeyInstanceSigner(state, 'Oldname', 'Newname')).toBe(false);
+  });
+
   it('rewrites the old-name signer across bags, bank, and the equipped-instance map, nothing else', () => {
     const state = st({
       inventory: [

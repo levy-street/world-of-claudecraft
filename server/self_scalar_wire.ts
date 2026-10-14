@@ -34,6 +34,7 @@ export const SELF_SCALAR_KEYS = [
   'hirat',
   'ddiff',
   'cbt',
+  'mbr',
 ] as const;
 
 export type SelfScalarKey = (typeof SELF_SCALAR_KEYS)[number];
@@ -74,4 +75,5 @@ export function emitSelfScalarKeys(
   // traded a blow. A 0/1 bit rather than a boolean: it flips at most a few
   // times per fight, so the delta elision keeps it off the wire between flips.
   emit('cbt', p.inCombat ? 1 : 0);
+  emit('mbr', p.membershipActive === true);
 }

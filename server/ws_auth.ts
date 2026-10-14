@@ -15,7 +15,9 @@ import { randomUUID } from 'node:crypto';
 import type { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
+import { MEMBERSHIP_OFF, membershipCharacterLocked } from '../src/membership_contract';
 import { type AccountLedger, freshAccountLedger } from '../src/sim/account_ledger';
+import { setReferralArmour } from '../src/sim/referral_armour';
 import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
 import {
   type BankBonusSource,
@@ -35,7 +37,9 @@ import type {
 } from './db';
 import type { GameServer } from './game';
 import { noteClientFrame } from './keepalive_sweep';
+import type { MembershipAuthorization } from './membership_service';
 import { negotiateMovementWireVersion } from './movement_wire_version';
+import type { ReferralArmourEntitlement } from './referral_armour_db';
 import { kickStoragePurchaseRecovery } from './storage_purchases';
 import type { HandshakeFlushMode } from './ws_buffer';
 
@@ -65,6 +69,7 @@ const WS_AUTH_ERROR = {
   // commit.
   tooManyConnections: 'too many connections from your network',
   forceRename: 'This character must be renamed before entering the world.',
+  membershipRequired: 'membership required for this character',
   authTimedOut: 'authentication timed out',
   incompatibleWorldLayout: ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
 } as const;
@@ -94,6 +99,8 @@ function rejectHandshake(ws: WebSocket, error: string): void {
 
 export interface WsAuthDeps {
   game: GameServer;
+  getMembership?: (accountId: number) => Promise<MembershipAuthorization>;
+  referralArmourForAccount?: (accountId: number) => Promise<ReferralArmourEntitlement | null>;
   accountAndScopeForToken: (
     token: string,
   ) => Promise<{ accountId: number; scope: TokenScope } | null>;
@@ -329,6 +336,19 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         rejectHandshake(ws, WS_AUTH_ERROR.forceRename);
         return;
       }
+      const membership = deps.getMembership
+        ? await deps.getMembership(accountId)
+        : { ...MEMBERSHIP_OFF, authorizedUntil: 0, recurringExpiresAt: null };
+      const membershipLocked = (row: CharacterRow) =>
+        membershipCharacterLocked(
+          row.membership_slot,
+          { ...membership, active: membership.active && membership.authorizedUntil > Date.now() },
+          Date.now(),
+        );
+      if (membershipLocked(character)) {
+        rejectHandshake(ws, WS_AUTH_ERROR.membershipRequired);
+        return;
+      }
       const chatMute = await chatMuteStatusForAccount(accountId);
       // Resolved at each game.join call below, not here: like
       // generalChatRateLimitHydration, resolving early would leave every
@@ -406,6 +426,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       pendingLeaseJoins.add(character.id);
       try {
         let admittedCharacter = character;
+        let referralArmour: ReferralArmourEntitlement | null | undefined;
         let leaseNonce: string | undefined;
         let result: ReturnType<GameServer['join']>;
         if (game.hasSessionForCharacter(character.id)) {
@@ -417,6 +438,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           // resumes and keeps its nonce; a live duplicate is rejected) and never
           // re-stamp the row with a fresh acquire that a doomed handshake could
           // leave mismatched.
+          if (membershipLocked(character)) {
+            rejectHandshake(ws, WS_AUTH_ERROR.membershipRequired);
+            return;
+          }
           const moderation = chatModerationHydration.resolve(freshModeration);
           result = game.join(
             ws,
@@ -478,6 +503,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // Computed BEFORE the lease acquire so the lease-held window stays tight; a bare
             // await means a DB error fails the handshake exactly like a getCharacter failure.
             const bankBonus = await bankBonusForAccount(accountId);
+            // Fixed account-PK read, before the lease; resumes retain live authority.
+            if (deps.referralArmourForAccount)
+              referralArmour = await deps.referralArmourForAccount(accountId);
             leaseNonce = randomUUID();
             const leased = await acquireCharacterLease(character.id, accountId, leaseNonce);
             if (!leased) {
@@ -544,6 +572,14 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               leaseNonce = undefined;
               throw error;
             }
+            if (membershipLocked(admittedCharacter)) {
+              await releaseCharacterLease(character.id, leaseNonce).catch((error) =>
+                console.error('lease release failed:', error),
+              );
+              leaseNonce = undefined;
+              rejectHandshake(ws, WS_AUTH_ERROR.membershipRequired);
+              return;
+            }
             result = game.join(
               ws,
               accountId,
@@ -592,6 +628,21 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           return;
         }
         const session = result;
+        session.membershipSlot = admittedCharacter.membership_slot === true;
+        if (deps.getMembership) {
+          game.sim.setMembership(
+            session.pid,
+            membership.active
+              ? Math.max(
+                  0,
+                  (Math.min(membership.expiresAt ?? 0, membership.authorizedUntil) - Date.now()) /
+                    1000,
+                )
+              : 0,
+          );
+        }
+        if (referralArmour !== undefined)
+          setReferralArmour(game.sim.ctx, session.pid, referralArmour);
         console.log(
           `+ ${admittedCharacter.name} (${admittedCharacter.class}) joined, ${game.clients.size} online`,
         );

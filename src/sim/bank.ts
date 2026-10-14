@@ -705,9 +705,15 @@ export function bankGrantStorageSlots(
  *  the NEXT expansion, null once every expansion has been purchased. */
 export function bankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
   const r = ctx.resolve(pid);
+  if (!r || !nearBanker(ctx, r.e)) return null;
+  return personalBankInfoFor(ctx, pid);
+}
+
+/** Owned-bank projection for admitted courier custody and the ordinary banker gate. */
+export function personalBankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
+  const r = ctx.resolve(pid);
   if (!r) return null;
-  const { meta, e: p } = r;
-  if (!nearBanker(ctx, p)) return null;
+  const { meta } = r;
   const bank = meta.bank;
   const purchases = Math.floor(bank.purchasedSlots / BANK_EXPANSION_SLOTS);
   const nextExpansionCost =

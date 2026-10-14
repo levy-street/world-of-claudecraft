@@ -17,6 +17,7 @@
 import { ENCHANTS } from '../content/enchants';
 import { ITEMS } from '../data';
 import { meetsLevelRequirement } from '../item_level_req';
+import { isMembershipWeapon, membershipWeaponShape } from '../membership_weapon';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import type { Entity, WeaponProc, WeaponProcEffect, WeaponProcTrigger } from '../types';
@@ -49,7 +50,15 @@ export function runWeaponProcs(
   // one). All these guards short-circuit BEFORE any rng draw.
   const id = weaponItemId === undefined ? wielder.mainhandItemId : weaponItemId;
   if (!id) return;
-  const item = ITEMS[id];
+  const meta = ctx.players.get(wielder.id);
+  const equippedId = meta?.equipment?.[meleeHand ?? 'mainhand'];
+  const adaptive = equippedId !== undefined && isMembershipWeapon(equippedId);
+  // Held-model ids are cosmetic donors. Proc identity and base cadence belong
+  // to the owned item, and dormant membership weapons cannot proc enchants.
+  if (adaptive && !wielder.membershipActive) return;
+  const base = ITEMS[adaptive ? equippedId : id];
+  const item =
+    adaptive && base && meta ? membershipWeaponShape(base, meta.cls, meta.talents.spec) : base;
   if (item?.kind !== 'weapon') return;
   if (!meetsLevelRequirement(wielder.level, item)) return;
   // Keep the historical dead-target skip for the weapon's own procs, including
@@ -76,7 +85,7 @@ export function runWeaponProcs(
   // Explicit hand comes only from the melee hit path. The historical ranged
   // weaponHit call keeps legendary behavior but cannot trigger a melee enchant.
   if (trigger !== 'weaponHit' || !meleeHand || wielder.dead || wielder.kind !== 'player') return;
-  const enchantId = ctx.players.get(wielder.id)?.equipmentInstance[meleeHand]?.enchant;
+  const enchantId = meta?.equipmentInstance[meleeHand]?.enchant;
   const enchant = enchantId ? ENCHANTS[enchantId] : undefined;
   const enchantProc = enchant?.weaponProc;
   if (!enchant || !enchantProc) return;

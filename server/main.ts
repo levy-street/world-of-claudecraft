@@ -6,6 +6,7 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { pipeline } from 'node:stream';
 import { WebSocketServer } from 'ws';
+import type { MembershipSnapshot } from '../src/membership_contract';
 import { bankGrantStorageSlots } from '../src/sim/bank';
 import { DEEDS } from '../src/sim/content/deeds';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
@@ -362,6 +363,8 @@ import {
   readMarketSoldVolumeSince,
   recordMarketSoldVolumeRowBounded,
 } from './market_sold_volume_db';
+import { configureMembershipRewardStores } from './membership_annual_store';
+import { getMembership } from './membership_service';
 import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './meta_capi';
 import {
   cleanReportReason,
@@ -412,6 +415,7 @@ import {
 import { createPgRateLimitStore } from './ratelimit_db';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { publishRealmBuilderRoll } from './realm_builder';
+import { referralArmourForAccount } from './referral_armour_db';
 import { configureReliquaryRuntime } from './reliquary';
 import { reliquaryRarityCounts } from './reliquary_rarity_db';
 import { resolveReportTarget } from './report_target';
@@ -1311,6 +1315,7 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
 function characterListPayload(
   chars: CharacterRow[],
   weaponSkinLoadout: Record<string, string>,
+  membership: MembershipSnapshot,
 ): unknown {
   // Delegates to the RouteDef arm's shared builder (review follow-up on the
   // weaponSkinId addition): one implementation means the retained legacy arm
@@ -1322,6 +1327,8 @@ function characterListPayload(
     chars,
     (characterId) => [...liveGame().clients.values()].some((s) => s.characterId === characterId),
     weaponSkinLoadout,
+    Date.now(),
+    membership,
   );
 }
 
@@ -1740,8 +1747,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         ...meta,
       }).catch((err) => logger.error({ err }, 'suspicious registration report failed'));
       // Capture the referral when this account signed up via a card link
-      // (?ref=<slug>). Best-effort: never block or fail registration on it.
-      void captureReferral(account.id, body.ref).catch((err) =>
+      // (?ref=<slug>). Await before returning credentials; errors stay best-effort.
+      await captureReferral(account.id, body.ref).catch((err) =>
         logger.error({ err }, 'referral capture failed'),
       );
       // emailMissing is always false here (email is required above); sent so the
@@ -1846,6 +1853,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         characterListPayload(
           await listCharacters(accountId),
           (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+          await getMembership(accountId),
         ),
       );
     }
@@ -1859,6 +1867,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           characterListPayload(
             await listCharacters(accountId),
             (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+            await getMembership(accountId),
           ),
         );
       }
@@ -3365,6 +3374,7 @@ configureClaudiumRuntime({
   grantMountSkins: (accountId, skinIds) => liveGame().grantMountSkinsToAccount(accountId, skinIds),
   storagePurchase: (input) => executeStoragePurchase(storagePurchaseHost(), input),
 });
+configureMembershipRewardStores(() => liveGame().membership);
 
 // configureAdminRuntime(game) and configureInternalRuntime(game) pass the live
 // GameServer BY VALUE (AdminRuntime / InternalRuntime are Picks of GameServer, so
@@ -3825,6 +3835,8 @@ export async function startServer(): Promise<http.Server> {
   const vaultRewardsDb = createVaultRewardsDb(pool, REALM);
   const wsAuth = createWsAuth({
     game,
+    getMembership,
+    referralArmourForAccount,
     accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,

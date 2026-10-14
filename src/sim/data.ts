@@ -1,3 +1,5 @@
+import { MEMBERSHIP_ITEMS } from './content/membership';
+import { REFERRAL_ITEMS } from './content/referral';
 import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
 import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
 // Content merge layer. Actual game content lives in sim/content/* — one
@@ -392,6 +394,8 @@ export { STATIONS };
 
 export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
+  MEMBERSHIP_ITEMS,
+  REFERRAL_ITEMS,
   PROFESSION_ITEMS,
   APEX_PATTERN_ITEMS,
   FARM_PATTERN_ITEMS,

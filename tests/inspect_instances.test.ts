@@ -259,10 +259,14 @@ describe('inspect_window painter instance threading (source pins)', () => {
     );
   });
 
-  it('the slot row reads the cell payload and forwards it into the tooltip builder', () => {
+  it('the slot row forwards both the worn payload and wearer into the tooltip builder', () => {
     expect(painter).toContain('const { slot, item, instance } = cell;');
-    expect(painter).toContain(
-      'this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance ?? undefined))',
+    expect(painter).toMatch(
+      /this\.deps\.attachTooltip\(row,\s*\(\) =>\s*this\.deps\.itemTooltip\(item, instance \?\? undefined, wearer\)/,
+    );
+    expect(painter).toContain('this.buildSlotRow(cell, e)');
+    expect(hud).toMatch(
+      /itemTooltip: \(item, instance, wearer\) =>\s*this\.itemTooltip\(item, false, instance, undefined, wearer\)/,
     );
   });
 

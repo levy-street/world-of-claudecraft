@@ -10244,4 +10244,18 @@
   body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-detail {
     font-size: 16px;
   }
+  body.mobile-touch #courier-window {
+    left: 8px;
+    right: 8px;
+    top: max(8px, env(safe-area-inset-top));
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    transform: none;
+  }
+  @media (max-width: 500px) {
+    body.mobile-touch #courier-window .courier-columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
 }

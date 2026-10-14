@@ -123,6 +123,12 @@ import {
 import { MARKET_SOLD_VOLUME_SCHEMA } from './market_sold_volume_db';
 import { materialSourceConnection } from './material_source_connection';
 import { applyMaterialSourceSchema, applyMaterialSourceWriterGuard } from './material_source_host';
+import { MEMBERSHIP_SCHEMA } from './membership_db';
+import { REFERRAL_ARMOUR_SCHEMA } from './referral_armour_db';
+
+export { recordReferral } from './referral_armour_db';
+
+import { MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA } from './membership_token_delivery_db';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { runOfflineCharacterSave } from './offline_character_save_db';
 import { PLAY_SESSION_RETENTION_SCHEMA } from './play_session_retention_db';
@@ -1261,6 +1267,9 @@ export async function ensureSchema(): Promise<void> {
     await client.query('SET LOCAL statement_timeout = 0');
     await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
     await client.query(SCHEMA);
+    await client.query(
+      MEMBERSHIP_SCHEMA + MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA + REFERRAL_ARMOUR_SCHEMA,
+    );
     // The material source audit's anchor + journal pair: after SCHEMA (it
     // FK-references characters), before the growth budget that must count it.
     await applyMaterialSourceSchema(client);
@@ -2641,21 +2650,6 @@ export async function accountForSlug(slug: string): Promise<number | null> {
   return res.rows[0]?.account_id ?? null;
 }
 
-// Record that `referee` joined via `referrer`'s `slug`. Idempotent: only the
-// first referral for a given referee is kept (PK on referee_account_id).
-export async function recordReferral(
-  refereeAccountId: number,
-  referrerAccountId: number,
-  slug: string,
-): Promise<void> {
-  await pool.query(
-    `INSERT INTO referrals (referee_account_id, referrer_account_id, slug)
-     VALUES ($1, $2, $3)
-     ON CONFLICT (referee_account_id) DO NOTHING`,
-    [refereeAccountId, referrerAccountId, slug],
-  );
-}
-
 export async function referralCountForAccount(accountId: number): Promise<number> {
   const res = await pool.query(
     'SELECT count(*)::int AS n FROM referrals WHERE referrer_account_id = $1',
@@ -2848,6 +2842,7 @@ export async function chatMuteStatusForAccount(accountId: number): Promise<Accou
 }
 
 export interface CharacterRow {
+  membership_slot?: boolean;
   id: number;
   account_id: number;
   name: string;
@@ -2885,17 +2880,7 @@ export interface CharacterRow {
 // is "top" or the bot renders a different one depending on which it called. The
 // ordering is restated there rather than shared because db.ts imports discord_db
 // (DISCORD_SCHEMA), so that module cannot import back from here.
-export async function highestCharacterForAccount(accountId: number): Promise<CharacterRow | null> {
-  const res = await pool.query(
-    `SELECT id, account_id, name, class, level, state, is_gm, force_rename
-       FROM characters
-      WHERE account_id = $1 AND realm = $2
-      ORDER BY level DESC, ((state->>'lifetimeXp')::bigint) DESC NULLS LAST, id ASC
-      LIMIT 1`,
-    [accountId, REALM],
-  );
-  return res.rows[0] ?? null;
-}
+export { highestCharacterForAccount } from './character_roster_db';
 
 // Character reads/writes are scoped to this process's realm: an account may
 // hold characters on several realms (each served by its own process), but a
@@ -2903,7 +2888,7 @@ export async function highestCharacterForAccount(accountId: number): Promise<Cha
 export async function listCharacters(accountId: number): Promise<CharacterRow[]> {
   const res = await pool.query(
     `SELECT c.id, c.account_id, c.name, c.class, c.level, c.state, c.is_gm, c.force_rename,
-            c.appearance, c.appearance_reroll_used, c.created_at,
+            c.appearance, c.appearance_reroll_used, c.created_at, c.membership_slot,
             GREATEST(ps.last_played, totals.last_played) AS last_played,
             (COALESCE(ps.playtime_seconds, 0) + COALESCE(totals.playtime_seconds, 0))::bigint AS playtime_seconds
        FROM characters c
@@ -2939,7 +2924,7 @@ export async function listCharactersAllRealms(
 ): Promise<(CharacterRow & { realm: string })[]> {
   const res = await pool.query(
     `SELECT id, account_id, name, class, level, state, is_gm, force_rename, realm,
-            appearance
+            appearance, membership_slot
        FROM characters
       WHERE account_id = $1
       ORDER BY realm, id`,
@@ -2953,7 +2938,7 @@ export async function getCharacter(
   characterId: number,
 ): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout, appearance FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout, appearance, membership_slot FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
   return res.rows[0] ?? null;

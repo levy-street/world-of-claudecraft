@@ -35,6 +35,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now.
 
 import { bagPools, canGrantCopies } from './bags';
+import { MEMBERSHIP_TOKEN_ID } from './content/membership';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
 import type { MarketCollection, MarketListing } from './market';
@@ -196,7 +197,7 @@ export interface MarketOrderHost {
   previewPlainBucketCount(meta: PlayerMeta, itemId: string, want: number): number;
   /** Escrow `want` plain units out of `meta`'s bags into provenance buckets. */
   escrowPlainBuckets(meta: PlayerMeta, itemId: string, want: number): InvSlot[];
-  cutPct(): number; // the Merchant's cut, as a fraction (MARKET_CUT)
+  cutPct(meta: PlayerMeta): number; // the Merchant's cut, as a fraction (MARKET_CUT)
   minPrice(): number;
   maxPrice(): number;
 }
@@ -299,7 +300,11 @@ export class MarketOrderBook {
     for (const id of plan.listingIds) {
       const listing = byId.get(id);
       if (!listing) continue;
-      if (!canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, listing.count)) break;
+      if (
+        itemId !== MEMBERSHIP_TOKEN_ID &&
+        !canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, listing.count)
+      )
+        break;
       if (!this.host.settleListing(listing, def, meta)) continue;
       settled.push(listing);
       filled += listing.count;
@@ -401,7 +406,7 @@ export class MarketOrderBook {
       });
     }
     const gross = units * order.unitPrice;
-    const proceeds = Math.max(0, Math.floor(gross * (1 - this.host.cutPct())));
+    const proceeds = Math.max(0, Math.floor(gross * (1 - this.host.cutPct(meta))));
     const col = this.host.collectionFor(this.host.playerKey(meta));
     col.copper += proceeds;
     recordSale(col.sales, {

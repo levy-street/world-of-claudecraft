@@ -1,4 +1,6 @@
+import { MEMBERSHIP_TOKEN_ID } from './content/membership';
 import { gliderActionsLocked } from './glider_action_lock';
+import { membershipWeaponShape } from './membership_weapon';
 import { shadowActionsLocked } from './shadow_action_lock';
 import { useCartographersInk, useTreasureMap } from './treasure_vault';
 // Inventory items + vendor: the player-facing equip/use/discard and buy/sell/buyback
@@ -207,7 +209,8 @@ function canReturnEquippedItemToBags(
  *  routed between hands from the committed spec. Exported so auto_equip.ts
  *  compares a grant against the copy this resolver would actually displace. */
 export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
-  const def = ITEMS[itemId];
+  const base = ITEMS[itemId];
+  const def = base ? membershipWeaponShape(base, meta.cls, meta.talents.spec) : undefined;
   if (!def?.slot) return null;
   if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);
 
@@ -216,7 +219,8 @@ export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | 
   if (hand === 'mainhand') return 'mainhand';
   if (hand === 'twohand') {
     if (!canDualWieldTwoHand(meta.cls, spec)) return 'mainhand';
-    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const baseMainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const mainhand = baseMainhand ? membershipWeaponShape(baseMainhand, meta.cls, spec) : undefined;
     if (
       mainhand?.kind === 'weapon' &&
       weaponHand(mainhand) === 'twohand' &&
@@ -231,7 +235,8 @@ export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | 
   if (!canDualWield(meta.cls, spec)) return 'mainhand';
   if (!canEquipItemInSlot(meta.cls, def, 'offhand', spec)) return 'mainhand';
 
-  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const baseMainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const mainhand = baseMainhand ? membershipWeaponShape(baseMainhand, meta.cls, spec) : undefined;
   if (
     !canDualWieldTwoHand(meta.cls, spec) &&
     mainhand?.kind === 'weapon' &&
@@ -749,7 +754,18 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
   if (!offhandId) return;
   const def = ITEMS[offhandId];
   if (!def) return;
-  if (canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
+  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const conflict =
+    mainhand &&
+    displacedSlotForEquip(
+      mainhand,
+      'mainhand',
+      meta.equipment,
+      (id) => ITEMS[id],
+      meta.cls,
+      meta.talents.spec,
+    );
+  if (!conflict && canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
 
   const instance = meta.equipmentInstance?.offhand;
   delete meta.equipment.offhand;
@@ -845,6 +861,8 @@ export function useItem(
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
+  // Redemption is a durable account operation owned by the online host.
+  if (itemId === MEMBERSHIP_TOKEN_ID) return;
   if (
     meta.vehicle ||
     wispMazeActionsLocked(meta.worldQuestLog) ||

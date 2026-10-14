@@ -264,6 +264,9 @@ export const shellStrings = {
     character: {
       loading: 'Loading...',
       noneYet: 'No characters yet. Create one below.',
+      membershipRequired: 'Renew your membership to play this character.',
+      membershipSlots: 'Unlock slots with a membership',
+      emptySlot: 'Available character slot',
       levelClass: 'Level {level} {className}',
       inWorld: 'in world',
       takeOver: 'Take Over',

@@ -13,6 +13,123 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.courier.inventory': 'Инвентарь',
+  'hudChrome.courier.bankTitle': 'Банк',
+  'hudChrome.courier.capacity': '{used} / {capacity} ячеек',
+  'hudChrome.courier.travelTime': '10 секунд в каждую сторону',
+  'hudChrome.courier.cargoSafe':
+    'Если сумки полны, доставленные предметы сохраняются сверх лимита. После доставки курьер исчезает до следующего вызова.',
+  'entities.abilities.courier.description':
+    'Призывает летающего ослика для перевозки предметов между вашими сумками и ближайшим банком. Дорога до банка занимает 10 секунд, обратная дорога тоже 10 секунд. За рейс можно выбрать до 24 стопок. Возвращённые предметы помещаются даже в полные сумки сверх лимита, после чего курьер исчезает до следующего вызова. Обратный путь приостанавливается, пока вы мертвы или находитесь в инстансе. Для нового рейса нужна активная подписка.',
+  'itemUi.tooltip.membershipWeaponAdaptive':
+    'При экипировке тип, внешний вид и характеристики оружия подстраиваются под ваш класс и специализацию.',
+  'itemUi.tooltip.membershipScaling':
+    'Уровень предмета: {level}. Всегда на 5 выше уровня персонажа.',
+  'itemUi.tooltip.membershipRequired':
+    'После окончания подписки характеристики снаряжения и бонусы комплекта отключаются до её продления.',
+  'itemUi.tooltip.membershipDormant':
+    'Неактивно: продлите подписку, чтобы восстановить характеристики снаряжения и бонусы комплекта.',
+  'entities.items.membership_staff.name': 'Посох перемен',
+  'hudChrome.bags.membershipSlot': 'Ячейка сумки по подписке',
+  'hudChrome.bags.membershipSlotLocked': 'Оформите подписку, чтобы открыть эту ячейку сумки.',
+  'hudChrome.bags.membershipSlotHint':
+    'Активная подписка позволяет надеть ещё одну сумку. После её окончания сумка и предметы сохраняются.',
+  'hudChrome.wocStore.subscription.benefitBag':
+    'Наденьте дополнительную сумку в ячейку по подписке.',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    'Получите редкую персональную броню и Посох перемен. Их характеристики подстраиваются под класс и специализацию, а уровень предметов всегда на 5 выше уровня персонажа. Все 7 частей брони дают на 20% больше опыта.',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    'После окончания подписки дополнительные ячейки персонажей, бонусы снаряжения и ячейка сумки блокируются до продления. Сумка и предметы сохраняются, лишние предметы остаются сверх лимита. Базовые ячейки персонажей остаются доступными.',
+  'hudChrome.bank.accountArmour': 'Получить снаряжение подписки',
+  'hudChrome.courier.title': 'Курьер',
+  'hudChrome.courier.close': 'Закрыть курьера',
+  'hudChrome.courier.ready': 'Готов к доставке',
+  'hudChrome.courier.outbound': 'Летит в банк',
+  'hudChrome.courier.returning': 'Возвращается с предметами',
+  'hudChrome.courier.waiting': 'Ожидает передачи предметов',
+  'hudChrome.courier.bags': 'Отправить в банк',
+  'hudChrome.courier.bank': 'Забрать из банка',
+  'hudChrome.courier.cargo': 'Груз курьера',
+  'hudChrome.courier.empty': 'Нет предметов',
+  'hudChrome.courier.send': 'Отправить курьера',
+  'hudChrome.courier.selected': 'Выбрано стопок: {count} / {limit}',
+  'hudChrome.courier.select': 'Выбрать: {item}, {count}',
+  'hudChrome.courier.selectedItem': 'Снять выбор: {item}, {count}',
+  'hudChrome.courier.instructions':
+    'Выберите целые стопки. Курьер сначала положит их в банк, затем заберёт выбранные предметы. Предметы заданий отправлять нельзя.',
+  'hudChrome.courier.membership': 'Продлите подписку, чтобы начать новую доставку.',
+  'hudChrome.courier.unavailable': 'Призовите курьера, чтобы подготовить доставку.',
+  'entities.abilities.courier.name': 'Курьер',
+  // Membership additions: same-change non-Latin coverage (M16).
+  'hudChrome.wocStore.subscription.benefitsTitle': 'Преимущества действующего членства',
+  'hudChrome.wocStore.subscription.benefitBank':
+    'Пользуйтесь банками других своих персонажей у любого банкира.',
+  'hudChrome.wocStore.subscription.benefitSlots': 'Откройте ещё 10 ячеек персонажей.',
+  'hudChrome.wocStore.subscription.benefitTax': 'Платите половину обычного налога на аукционе.',
+  'character.membershipRequired': 'Продлите членство, чтобы играть этим персонажем.',
+  'character.membershipSlots': 'Откройте ячейки персонажей с членством',
+  'character.emptySlot': 'Свободная ячейка персонажа',
+  'hudChrome.bank.accountTab': 'Другие персонажи',
+  'hudChrome.bank.accountMembership':
+    'При действующем членстве здесь можно пользоваться банками других своих персонажей.',
+  'hudChrome.bank.accountCharacters': 'Банки персонажей',
+  'hudChrome.bank.accountEmpty':
+    'Создайте ещё одного персонажа, чтобы пользоваться его банком здесь.',
+  'hudChrome.bank.accountSelect': 'Выберите персонажа, чтобы загрузить его банк.',
+  'hudChrome.bank.accountUnavailable':
+    'Этот банк недоступен. Выберите персонажа ещё раз, чтобы обновить данные.',
+  'hudChrome.bank.accountDeposit': 'Ваши сумки: положить в этот банк',
+  'hudChrome.bank.accountWithdraw': 'Выбранный банк: забрать в свои сумки',
+  'hudChrome.bank.accountDepositHint':
+    'Нажмите, чтобы положить эту стопку в банк выбранного персонажа.',
+  'hudChrome.bank.accountWithdrawHint': 'Нажмите, чтобы забрать эту стопку в свои сумки.',
+  'hudChrome.bank.accountBound':
+    'Привязанные, заблокированные и квестовые предметы нельзя передавать между персонажами.',
+  'hudChrome.wocStore.subscription.tokenTitle': 'Передаваемый жетон членства',
+  'hudChrome.wocStore.subscription.tokenTerms':
+    'Разовый платёж {price} за 30 дней. Жетон придёт этому персонажу по почте. Используйте его, чтобы продлить членство, или продайте на аукционе.',
+  'hudChrome.wocStore.subscription.tokenBuy': 'Купить жетон членства',
+  'hudChrome.wocStore.subscription.tokenClaim': 'Получить купленный жетон',
+  'hudChrome.wocStore.subscription.tokenPending':
+    'После оплаты вернитесь к этому персонажу и получите жетон. Если платёж ещё обрабатывается, повторите попытку чуть позже.',
+  'hudChrome.wocStore.subscription.tokenDelivered': 'Ваш жетон отправлен по почте.',
+  'itemUi.tooltip.membershipToken':
+    'Использование: расходует жетон и добавляет {days} дней членства к вашей учётной записи. Оставшееся время сохраняется. До использования жетон можно передать или продать на аукционе.',
+  'itemUi.tooltip.membershipAdaptive':
+    'Характеристики и тип брони подстраиваются под ваш класс и специализацию.',
+  'itemUi.tooltip.membershipPerfected': 'Совершенный предмет: уровень {level}.',
+  'itemUi.tooltip.membershipFullSet':
+    'Наденьте все {pieces} предметов доспехов участника, чтобы получать на {percent}% больше опыта. Требуется действующее членство.',
+  'entities.items.membership_token.name': 'Жетон членства (30 дней)',
+  'entities.items.membership_helmet.name': 'Шлем участника',
+  'entities.items.membership_shoulder.name': 'Наплечники участника',
+  'entities.items.membership_chest.name': 'Кираса участника',
+  'entities.items.membership_waist.name': 'Пояс участника',
+  'entities.items.membership_legs.name': 'Поножи участника',
+  'entities.items.membership_gloves.name': 'Рукавицы участника',
+  'entities.items.membership_feet.name': 'Сапоги участника',
+  'entities.letters.membership_token_delivery.sender': 'Вороновая почта',
+  'entities.letters.membership_token_delivery.subject': 'Ваш жетон членства',
+  'entities.letters.membership_token_delivery.body':
+    'К письму приложен купленный вами жетон. Используйте его, чтобы добавить 30 дней членства к своей учётной записи, или обменяйте с другим искателем приключений.',
+  'hudChrome.wocStore.subscription.title': 'Подписка на игру',
+  'hudChrome.wocStore.subscription.price': '{price} в месяц',
+  'hudChrome.wocStore.subscription.terms':
+    'Продлевается ежемесячно. Оплата фиатной валютой через Stripe. Отмена в настройках платежей.',
+  'hudChrome.wocStore.subscription.subscribe': 'Подписаться',
+  'hudChrome.wocStore.subscription.manage': 'Управление подпиской',
+  'hudChrome.wocStore.subscription.ending': 'Будет отменена в конце расчётного периода',
+  'hudChrome.wocStore.subscription.error':
+    'Не удалось открыть страницу оплаты. Разрешите всплывающие окна и повторите попытку.',
+  'hudChrome.wocStore.subscription.status.none': 'Нет подписки',
+  'hudChrome.wocStore.subscription.status.incomplete': 'Оплата не завершена',
+  'hudChrome.wocStore.subscription.status.incomplete_expired': 'Срок оплаты истёк',
+  'hudChrome.wocStore.subscription.status.trialing': 'Пробный период',
+  'hudChrome.wocStore.subscription.status.active': 'Активна',
+  'hudChrome.wocStore.subscription.status.past_due': 'Платёж просрочен',
+  'hudChrome.wocStore.subscription.status.canceled': 'Отменена',
+  'hudChrome.wocStore.subscription.status.unpaid': 'Не оплачена',
+  'hudChrome.wocStore.subscription.status.paused': 'Приостановлена',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -19978,4 +20095,41 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Время применения Хватких корней сокращается на 0,5 сек.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
+  'hudChrome.wocStore.subscription.monthlyTitle': 'Ежемесячное членство',
+  'hudChrome.wocStore.subscription.annualTitle': 'Набор членства на 12 месяцев',
+  'hudChrome.wocStore.subscription.annualPrice': '{price} за 12 месяцев, оплата сразу',
+  'hudChrome.wocStore.subscription.annualTerms':
+    'Ежегодное продление по той же цене. Оплата обычной валютой через Stripe. Отмена в настройках платежей.',
+  'hudChrome.wocStore.subscription.annualMount':
+    'После оплаты получите привязанный к персонажу ключ от танка по почте на персонаже, купившем набор. Танк временно заменяет ездовое животное набора.',
+  'hudChrome.wocStore.subscription.trialTerms':
+    'Бесплатный пробный период на {days} дней доступен один раз на аккаунт. Требуется способ оплаты. Если не отменить подписку, по окончании будет списано {price}.',
+  'hudChrome.wocStore.subscription.startTrial': 'Начать пробные 7 дней',
+  'hudChrome.wocStore.subscription.annualClaim': 'Получить транспорт набора',
+  'hudChrome.wocStore.subscription.annualPending':
+    'После оплаты вернитесь на персонажа, купившего набор, чтобы получить транспорт. Если платеж обрабатывается или действует пробный период, повторите попытку после оплаты.',
+  'hudChrome.wocStore.subscription.annualDelivered':
+    'Ключ от транспорта набора доставлен по почте.',
+  'hudChrome.wocStore.subscription.resumeCheckout': 'Продолжить оформление',
+  'entities.letters.membership_annual_reward.sender': 'Воронья почта',
+  'entities.letters.membership_annual_reward.subject': 'Транспорт годового членства',
+  'entities.letters.membership_annual_reward.body':
+    'Годовое членство оплачено. Ключ от танка приложен к письму. Храните ключ в сумке или банке, чтобы владеть транспортом. Он останется вашим после окончания членства. Требуется навык верховой езды.',
+  'hudChrome.wocStore.subscription.checkoutClosed':
+    'Это оформление завершено, неполученных наград нет. Выберите план членства ещё раз, чтобы начать новое оформление.',
+  'itemUi.tooltip.referralFullSet':
+    'Наденьте все {pieces} предметов доспехов дружбы, чтобы получать на {percent}% больше опыта в группе с {member}. Подписка пригласившего должна быть активна.',
+  'itemUi.tooltip.referralInviter': 'пригласившим вас участником',
+  'itemUi.tooltip.referralRetained':
+    'Характеристики доспехов растут с уровнем, даже когда вы не в группе с пригласившим вас игроком.',
+  'itemUi.tooltip.referralDormant':
+    'Неактивно: этот аккаунт не получил доспехи дружбы по приглашению подписчика.',
+  'entities.items.referral_helmet.name': 'Шлем дружбы',
+  'entities.items.referral_shoulder.name': 'Наплечники дружбы',
+  'entities.items.referral_chest.name': 'Кираса дружбы',
+  'entities.items.referral_waist.name': 'Пояс дружбы',
+  'entities.items.referral_legs.name': 'Поножи дружбы',
+  'entities.items.referral_gloves.name': 'Рукавицы дружбы',
+  'entities.items.referral_feet.name': 'Сапоги дружбы',
+  'hudChrome.bank.referralArmour': 'Получить доспехи дружбы',
 };

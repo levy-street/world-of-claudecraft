@@ -317,7 +317,9 @@ describe('the bake set', () => {
     const [sql, params] = query.mock.calls[0];
     expect(sql).toMatch(/DELETE FROM mail_custody_parcels/);
     expect(sql).toMatch(/created_at < now\(\) - \(\$1 \|\| ' days'\)::interval/);
-    expect(sql).toMatch(/letter <> 'vault_reward'/);
+    expect(sql).toMatch(
+      /letter NOT IN \('vault_reward', 'membership_token', 'membership_annual'\)/,
+    );
     expect(sql).toMatch(/LIMIT \$2/);
     expect(params).toEqual(['30', 500]);
   });
@@ -382,6 +384,26 @@ describe('mergeCustodyParcelOverlay', () => {
       copper: 0,
     }));
   }
+
+  it('replays an annual mount into the real post office and deduplicates after restart', async () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const row = {
+      ...overlayRows(['membership-annual:receipt-1234567890'], 'membership_annual')[0],
+      items: [{ itemId: 'reins_terrorspark_groundshaker', count: 1 }],
+    };
+    mockStaleDelete(0);
+    query.mockResolvedValueOnce({ rows: [row] });
+    expect((await mergeCustodyParcelOverlay(sim)).replayed).toBe(1);
+    expect(sim.postOffice.mail[0]).toMatchObject({
+      letterId: 'membership_annual_reward',
+      items: [{ itemId: 'reins_terrorspark_groundshaker', count: 1 }],
+    });
+    resetCustodyParcelOverlayForTests();
+    mockStaleDelete(0);
+    query.mockResolvedValueOnce({ rows: [row] });
+    expect((await mergeCustodyParcelOverlay(sim)).present).toBe(1);
+    expect(sim.postOffice.mail).toHaveLength(1);
+  });
 
   it('replays a vault reward with its exact coin and items into the real post office', async () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });

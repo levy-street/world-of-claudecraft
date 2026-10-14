@@ -253,7 +253,9 @@ describe('bags_window: load-bearing behaviors preserved', () => {
     // toContain over comment-intact source is satisfied by a comment quoting the
     // call, or by the same expression surviving in some other method after the
     // socket label itself regressed.
-    const socketLoopStart = painter.indexOf('for (const socket of model.sockets) {');
+    const socketLoopStart = painter.indexOf(
+      'for (const socket of model.sockets.slice(0, BAG_SOCKETS)) {',
+    );
     const afterBagBarStart = painter.indexOf('private persistFilter(): void {');
     expect(
       socketLoopStart,
@@ -465,6 +467,15 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     );
   });
 
+  it('the extra member socket preserves the materials-only accessible capacity label', () => {
+    const root = renderBags([null, null, null, null, 'foragers_haversack']);
+    const memberSocket = root.querySelector('.membership-bag-slot');
+    expect(memberSocket?.getAttribute('aria-label')).toBe(
+      "Forager's Haversack: 12 Slot Materials Bag",
+    );
+    expect(memberSocket?.getAttribute('aria-disabled')).toBeNull();
+  });
+
   it('the bags x-btn closes the whole bank cluster on touch (mirrors the vendor close)', () => {
     // On mobile the bank hides its own x-btn under the pairing, so the bags x-btn is
     // the cluster's single close control: it must close the bank companion too, never
@@ -500,8 +511,11 @@ describe('bags_window: touch peek + bank-cluster close', () => {
       /this\.deps\.restoreFocus\(this\.openerFocus\);\s*this\.openerFocus = null;\s*this\.deps\.onClosed\(\);/,
     );
     expect(hud).toContain('onClosed: () => this.onBagsClosed(),');
-    expect(hud).toMatch(
-      /private onBagsClosed\(\): void \{\s*if \(document\.body\.classList\.contains\('mobile-touch'\) && this\.bankWindow\.isOpen\) \{\s*document\.body\.classList\.remove\('bank-open'\);/,
+    // The extracted lifecycle owns the touch-only undock predicate, covered
+    // behaviorally in bank_window_lifecycle.test.ts. Pin this callback's
+    // delegation so moving the predicate cannot disconnect the bags close hook.
+    expect(stripComments(hud)).toMatch(
+      /private onBagsClosed\(\): void \{\s*undockBagCompanions\(this\.bankWindow\.isOpen, this\.marketWindow\.isOpen\);/,
     );
     expect(hud).toMatch(
       /this\.bagsWindow\.noteOpener\(\);[\s\S]{0,400}?if \(this\.bankWindow\.isOpen\) document\.body\.classList\.add\('bank-open'\);/,

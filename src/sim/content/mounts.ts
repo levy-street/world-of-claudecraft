@@ -80,15 +80,12 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'rare',
     moveSpeedPct: 0.75,
   },
-  // There is deliberately no store mount here. Paid looks are MOUNT SKINS
-  // (content/mount_skins.ts): account-wide cosmetics worn over whatever mount
-  // the character rides, so real money never buys a catalog row, a reins item,
-  // or a speed tier, the same line the weapon skins hold.
+  // Paid cosmetic looks are MOUNT SKINS (content/mount_skins.ts), worn over
+  // whatever mount the character rides. The annual reward tank below is
+  // the one paid mount item; it shares the existing epic travel speed.
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears,
-  // the Lanternback Troll from Treasure Caskets. The Terrorspark Groundshaker
-  // is developer-only for now and has no player-facing acquisition. The tank stays LAST in the
-  // catalog (the tests pin it as the tail, so a new player-facing mount lands
-  // above it); see DEVELOPER_MOUNTS below for the shared gate.
+  // the Lanternback Troll from Treasure Caskets. The Dreadspark Groundshaker
+  // is the annual membership bundle reward. It retains its catalog position.
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
     name: 'Aether-Jouster Hover-Cycle',
@@ -151,7 +148,10 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  the single source of truth: the catalog, the item table, and the acquisition
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
-export const DEVELOPER_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker'];
+export const DEVELOPER_MOUNTS: readonly MountKey[] = [];
+
+/** Paid annual-bundle mounts retain soulbound reins and outlive membership expiry. */
+export const MEMBERSHIP_REWARD_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker'];
 
 /** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */
 export function isDeveloperMount(key: string): boolean {

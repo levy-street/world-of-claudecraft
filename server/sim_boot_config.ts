@@ -23,6 +23,7 @@ import { STORAGE_PRICES } from './storage_prices';
 export function buildRealmSimConfig(
   perfLap: SimConfig['perfLap'],
   vaultConsumptionAdmission: VaultConsumptionAdmission,
+  courierBankExchange: NonNullable<SimConfig['courierBankExchange']>,
 ): SimConfig {
   return {
     seed: WORLD_SEED,
@@ -66,6 +67,7 @@ export function buildRealmSimConfig(
     weeklyRaidResetMs: (nowMs) => nextWeeklyRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
     perfLap,
     vaultConsumptionAdmission,
+    courierBankExchange,
     // Boot-time construction input: the optional STORAGE_PRICES env override
     // (server/storage_prices.ts), resolved once by the Sim ctor.
     storagePrices: STORAGE_PRICES,

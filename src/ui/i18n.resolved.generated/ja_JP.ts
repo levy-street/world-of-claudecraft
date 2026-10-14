@@ -347,6 +347,30 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "配達員",
+      "close": "配達員を閉じる",
+      "ready": "配達の準備完了",
+      "outbound": "銀行へ飛行中",
+      "returning": "アイテムを持って帰還中",
+      "waiting": "アイテムを返すため待機中",
+      "bags": "銀行へ送る",
+      "bank": "銀行から取り出す",
+      "inventory": "所持品",
+      "bankTitle": "銀行",
+      "capacity": "{used} / {capacity} スロット",
+      "travelTime": "片道10秒",
+      "cargo": "配達員の荷物",
+      "empty": "アイテムなし",
+      "send": "配達員を送る",
+      "selected": "{count} / {limit} スタック選択中",
+      "select": "{item}、{count}を選択",
+      "selectedItem": "{item}、{count}の選択を解除",
+      "instructions": "スタック全体を選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。",
+      "membership": "次の配達にはメンバーシップの更新が必要です。",
+      "cargoSafe": "バッグが満杯の場合、返却品は超過分として保管されます。配達後、再召喚するまでクーリエは姿を消します。",
+      "unavailable": "配達員を召喚して配達を計画しましょう。"
+    },
     "framePresets": {
       "apply": "適用",
       "pickerLabel": "フレームプリセット：{name}",
@@ -826,6 +850,51 @@ export const ja_JP: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "ゲームの定期購入",
+        "monthlyTitle": "月額メンバーシップ",
+        "annualTitle": "12か月メンバーシップセット",
+        "annualPrice": "12か月分を一括で{price}",
+        "annualTerms": "同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。",
+        "annualMount": "支払い後、購入したキャラクターで郵便から魂に縛られた戦車の鍵を受け取れます。戦車はセット用騎乗動物の仮モデルです。",
+        "trialTerms": "1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。",
+        "startTrial": "7日間の無料体験を開始",
+        "resumeCheckout": "購入手続きを再開",
+        "checkoutClosed": "この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。",
+        "annualClaim": "セットの騎乗動物を受け取る",
+        "annualPending": "支払い後、購入したキャラクターに戻って騎乗動物を受け取ってください。支払い処理中や無料体験中の場合は、課金後に再試行してください。",
+        "annualDelivered": "セットの騎乗動物の鍵が郵便で届きました。",
+        "tokenTitle": "取引可能なメンバーシップトークン",
+        "benefitsTitle": "有効なメンバーシップの特典",
+        "benefitBank": "どの銀行員からでも、ほかのキャラクターの銀行を利用できます。",
+        "benefitSlots": "キャラクター枠を10個追加で解放します。",
+        "benefitArmour": "レア品質のソウルバウンド防具と変化の杖を受け取れます。能力値はクラスと専門分野に適応し、アイテムレベルは常にキャラクターレベルより5高くなります。防具7部位をすべて装備すると経験値が20%増加します。",
+        "benefitBag": "メンバーシップバッグ枠にバッグを1個追加で装備できます。",
+        "benefitTax": "オークションの通常の手数料が半額になります。",
+        "benefitExpiry": "メンバーシップが切れると追加キャラクター枠、装備の効果、追加バッグ枠は更新までロックされます。バッグとアイテムは安全に保管され、容量超過分も保持されます。基本キャラクター枠は引き続き利用できます。",
+        "tokenTerms": "{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。",
+        "tokenBuy": "メンバーシップトークンを購入",
+        "tokenClaim": "購入したトークンを受け取る",
+        "tokenPending": "支払い後、このキャラクターに戻ってトークンを受け取ってください。支払い処理中の場合は、少し待ってから再試行してください。",
+        "tokenDelivered": "トークンが郵便で届きました。",
+        "price": "月額 {price}",
+        "terms": "毎月自動更新されます。Stripe で法定通貨によるお支払いができます。請求設定から解約できます。",
+        "subscribe": "定期購入する",
+        "manage": "定期購入を管理",
+        "ending": "現在の請求期間の終了時に解約されます",
+        "error": "請求ページを開けませんでした。ポップアップを許可して再試行してください。",
+        "status": {
+          "none": "未登録",
+          "incomplete": "支払い未完了",
+          "incomplete_expired": "決済の有効期限切れ",
+          "trialing": "試用中",
+          "active": "有効",
+          "past_due": "支払い期限超過",
+          "canceled": "解約済み",
+          "unpaid": "未払い",
+          "paused": "一時停止中"
+        }
+      },
       "title": "WOCストア",
       "close": "WOCストアを閉じる",
       "tabsLabel": "WOCストアのセクション",
@@ -3610,6 +3679,9 @@ export const ja_JP: EnTranslations = {
       "entryMismatchHeroic": "このインスタンスはヒロイック難易度に設定されています。ノーマルで新しく始めるには「すべてのインスタンスをリセット」を使用してください。"
     },
     "bags": {
+      "membershipSlot": "メンバーシップバッグ枠",
+      "membershipSlotLocked": "メンバーシップでこのバッグ枠を解放。",
+      "membershipSlotHint": "メンバーシップ有効中はバッグを1個追加で装備できます。期限が切れてもバッグとアイテムは安全に保管されます。",
       "cannotDestroy": "このアイテムは破壊できません。",
       "rightClickDestroy": "右クリックで破壊",
       "dragEquipHint": "キャラクターにドラッグして装備",
@@ -4880,6 +4952,19 @@ export const ja_JP: EnTranslations = {
       "vaultCannotDeposit": "保管庫には預けられません",
       "tabsAria": "銀行タブ",
       "personalTab": "個人",
+      "accountTab": "ほかのキャラクター",
+      "accountArmour": "メンバーシップ装備を受け取る",
+      "referralArmour": "友情の防具を受け取る",
+      "accountMembership": "メンバーシップが有効な間、ここからほかのキャラクターの銀行を利用できます。",
+      "accountCharacters": "キャラクターの銀行",
+      "accountEmpty": "別のキャラクターを作成すると、その銀行をここで利用できます。",
+      "accountSelect": "キャラクターを選んで銀行を読み込んでください。",
+      "accountUnavailable": "この銀行は利用できません。キャラクターを選び直して更新してください。",
+      "accountDeposit": "自分のバッグ：この銀行に預ける",
+      "accountWithdraw": "選択中の銀行：自分のバッグに引き出す",
+      "accountDepositHint": "クリックすると、このスタックを選択中のキャラクターの銀行に預けます。",
+      "accountWithdrawHint": "クリックすると、このスタックを自分のバッグに引き出します。",
+      "accountBound": "魂縛、ロック済み、クエスト用のアイテムはキャラクター間で移動できません。",
       "guildTab": "ギルド",
       "guildCapacityAria": "使用中のギルド銀行スロット: {total}個中{used}個",
       "guildEmpty": "ギルド銀行は空です。",
@@ -11218,6 +11303,9 @@ export const ja_JP: EnTranslations = {
   "character": {
     "loading": "読み込み中...",
     "noneYet": "まだキャラクターがいません。下で作成してください。",
+    "membershipRequired": "このキャラクターで遊ぶにはメンバーシップを更新してください。",
+    "membershipSlots": "メンバーシップでキャラクター枠を解放",
+    "emptySlot": "利用可能なキャラクター枠",
     "levelClass": "レベル{level} {className}",
     "inWorld": "世界にいます",
     "takeOver": "引き継ぐ",
@@ -12753,6 +12841,18 @@ export const ja_JP: EnTranslations = {
       "parry": "受け流し"
     },
     "tooltip": {
+      "referralFullSet": "友情の防具を全{pieces}部位装備し、{member}とパーティーを組むと経験値が{percent}%増加します。招待者のメンバーシップが有効である必要があります。",
+      "referralInviter": "あなたを招待したメンバー",
+      "referralRetained": "招待者とパーティーを組んでいなくても、防具の能力値はレベルに応じて成長します。",
+      "referralDormant": "無効：このアカウントはメンバーの招待による友情の防具を獲得していません。",
+      "membershipToken": "使用：このトークンを消費し、アカウントのメンバーシップ期間に{days}日を追加します。残りの期間は失われません。使用前なら取引やオークションでの売却が可能です。",
+      "membershipAdaptive": "能力値と防具の種類がクラスと専門化に合わせて変わります。",
+      "membershipWeaponAdaptive": "装備中はクラスと専門分野に合わせて武器の種類、外見、能力値が変化します。",
+      "membershipScaling": "アイテムレベル{level}。常にキャラクターレベルより5高くなります。",
+      "membershipPerfected": "完成：アイテムレベル{level}。",
+      "membershipFullSet": "メンバーシップ防具を全{pieces}部位装備すると、獲得経験値が{percent}%増加します。有効なメンバーシップが必要です。",
+      "membershipRequired": "メンバーシップが切れると装備の能力値とセット効果が停止し、更新すると復活します。",
+      "membershipDormant": "無効：メンバーシップを更新すると装備の能力値とセット効果が復活します。",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "現在の装備",
       "ifYouEquip": "これを装備すると",
@@ -13052,6 +13152,10 @@ export const ja_JP: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "配達員",
+        "description": "空飛ぶロバを召喚し、バッグと最寄りの銀行の間でアイテムを運びます。銀行まで10秒、帰りも10秒かかります。1回につき最大24スタックを選択できます。返却品は満杯のバッグにも超過分として入り、クーリエは再召喚するまで姿を消します。死亡中やインスタンス内では帰路が一時停止します。新しい配達にはメンバーシップが必要です。"
+      },
       "sport_kick": {
         "name": "キック",
         "description": "狙った地点へボールをグラウンダーで蹴り出す。"
@@ -18450,6 +18554,54 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
+      },
+      "membership_staff": {
+        "name": "変化の杖"
+      },
+      "membership_token": {
+        "name": "メンバーシップトークン（30日）"
+      },
+      "referral_helmet": {
+        "name": "友情の兜"
+      },
+      "referral_shoulder": {
+        "name": "友情の肩当て"
+      },
+      "referral_chest": {
+        "name": "友情の胸当て"
+      },
+      "referral_waist": {
+        "name": "友情の帯"
+      },
+      "referral_legs": {
+        "name": "友情の脚甲"
+      },
+      "referral_gloves": {
+        "name": "友情の手甲"
+      },
+      "referral_feet": {
+        "name": "友情のブーツ"
+      },
+      "membership_helmet": {
+        "name": "メンバーシップの兜"
+      },
+      "membership_shoulder": {
+        "name": "メンバーシップの肩当て"
+      },
+      "membership_chest": {
+        "name": "メンバーシップの胸当て"
+      },
+      "membership_waist": {
+        "name": "メンバーシップの腰帯"
+      },
+      "membership_legs": {
+        "name": "メンバーシップの脚甲"
+      },
+      "membership_gloves": {
+        "name": "メンバーシップの手甲"
+      },
+      "membership_feet": {
+        "name": "メンバーシップの長靴"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -23931,6 +24083,16 @@ export const ja_JP: EnTranslations = {
         "sender": "取引所仲買人",
         "subject": "取引所でのご購入品",
         "body": "取引は決済され、品物はあなたのものです。同封の小包には、あなたが代金を支払ったまさにその品が入っています。出品の瞬間から支払いが確定するまで、取引所が責任を持って預かっていました。\n\nこの取引の記録は取引所の台帳に残ります。\n\n- 取引所仲買人"
+      },
+      "membership_token_delivery": {
+        "sender": "レイヴンポスト",
+        "subject": "メンバーシップトークンのお届け",
+        "body": "購入したトークンを同封しました。使用するとアカウントのメンバーシップ期間に30日が追加されます。ほかの冒険者と取引することもできます。"
+      },
+      "membership_annual_reward": {
+        "sender": "レイヴンポスト",
+        "subject": "年間メンバーシップの騎乗動物",
+        "body": "年間メンバーシップの支払いが完了しました。戦車の鍵を同封しました。所有するには鍵をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。"
       },
       "woc_market_return": {
         "sender": "取引所仲買人",

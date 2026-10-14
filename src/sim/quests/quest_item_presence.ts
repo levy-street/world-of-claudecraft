@@ -50,6 +50,8 @@ export function playerHoldsQuestItem(
   itemId: string,
 ): boolean {
   if (ctx.countItem(itemId, meta.entityId) > 0) return true;
+  // In-flight custody is still recoverable ownership, just like bank storage.
+  if (meta.courier?.cargo.some((s) => s.itemId === itemId && s.count > 0)) return true;
   if (meta.bank.inventory.some((s) => s.itemId === itemId && s.count > 0)) return true;
   // A hostile itemId ('toString') reads an inherited function here; NaN
   // comparisons make that arm false, so no Object.hasOwn dance is needed.

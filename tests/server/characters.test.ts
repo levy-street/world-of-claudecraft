@@ -70,7 +70,16 @@ type DbOverrides = Parameters<typeof setCharactersDbOverrides>[0];
 
 /** Every override stays Postgres-free now that signer rekeys always read fresh state. */
 function setCharactersDbForTests(overrides: DbOverrides): void {
-  setCharactersDbOverrides({ rekeyOfflineCharacterSigner: async () => true, ...overrides });
+  setCharactersDbOverrides({
+    getMembership: async () => ({
+      active: false,
+      expiresAt: null,
+      authorizedUntil: 0,
+      recurringExpiresAt: null,
+    }),
+    rekeyOfflineCharacterSigner: async () => true,
+    ...overrides,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -399,9 +408,13 @@ describe('character list handlers', () => {
 
     const expected = {
       realm: REALM,
+      membership: { active: false, expiresAt: null },
+      characterLimit: 10,
       characters: [
         {
           id: 1,
+          membershipSlot: false,
+          membershipLocked: false,
           name: 'Aaa',
           class: 'warrior',
           level: 10,
@@ -426,6 +439,8 @@ describe('character list handlers', () => {
         },
         {
           id: 2,
+          membershipSlot: false,
+          membershipLocked: false,
           name: 'Bbb',
           class: 'mage',
           level: 5,
@@ -467,6 +482,46 @@ describe('character list handlers', () => {
 });
 
 describe('buildCharacterList weapon skin resolution', () => {
+  it.each([
+    ['warrior', 'arms', 'eastbrook_greatsword', 'sword', 'ice_fang_sword'],
+    ['warrior', 'prot', 'worn_sword', 'sword', 'ice_fang_sword'],
+    ['rogue', 'assassination', 'rusty_dagger', 'dagger', 'frostbite_dagger'],
+    ['paladin', 'holy', 'training_mace', 'mace', 'starfall_mace'],
+    ['mage', 'fire', 'gnarled_staff', 'staff', 'brasscrown_staff'],
+  ] as const)(
+    'projects the adaptive held model and skin for %s %s',
+    (cls, spec, model, type, skin) => {
+      const row = charRow({
+        class: cls,
+        state: st({
+          equipment: { mainhand: 'membership_staff' },
+          talents: { spec },
+        }),
+      });
+      const list = buildCharacterList([row], () => false, { [type]: skin }) as {
+        characters: { mainhandItemId: string | null; weaponSkinId: string | null }[];
+      };
+      expect(list.characters[0].mainhandItemId).toBe(model);
+      expect(list.characters[0].weaponSkinId).toBe(skin);
+      expect(row.state?.equipment.mainhand).toBe('membership_staff');
+    },
+  );
+
+  it('projects an adaptive offhand before resolving its cosmetic skin', () => {
+    const row = charRow({
+      class: 'rogue',
+      state: st({
+        equipment: { mainhand: 'worn_sword', offhand: 'membership_staff' },
+        talents: { spec: 'assassination' },
+      }),
+    });
+    const list = buildCharacterList([row], () => false, { dagger: 'frostbite_dagger' }) as {
+      characters: { offhandItemId: string | null; weaponSkinId: string | null }[];
+    };
+    expect(list.characters[0].offhandItemId).toBe('rusty_dagger');
+    expect(list.characters[0].weaponSkinId).toBe('frostbite_dagger');
+  });
+
   it('resolves an Armory skin whose weapon type is held in the offhand', () => {
     // A rogue with a dagger mainhand and a mace offhand owning the legendary
     // mace skin: the roster turntable shows it, like the world does.

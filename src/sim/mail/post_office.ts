@@ -27,6 +27,7 @@ import {
   WELCOME_LETTER,
   WYRMFALL_CORE_LETTER,
 } from '../content/letters';
+import { MEMBERSHIP_TOKEN_ID } from '../content/membership';
 import { ITEMS } from '../data';
 import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
 import { isMergeableInstancePayload, itemInstancePayloadsEqual } from '../item_instance_merge';
@@ -820,7 +821,8 @@ export class PostOffice {
     }
     // Parcels respect bag capacity (#1354, the market-collect rule): a stack that
     // does not fit stays ATTACHED to the letter for a later take, never destroyed
-    // and never force-added past the bag budget. Capacity is checked per stack
+    // and never force-added past the bag budget, except membership tokens,
+    // which use the existing visible inventory overflow. Capacity is checked per stack
     // against the live inventory, so cumulative capacity is honoured. An
     // instanced parcel (a marketplace custody delivery or return) grants
     // through addItemInstance so the exact payload survives. Every grant
@@ -837,6 +839,7 @@ export class PostOffice {
       // threads its craftedRecipeId marker through so a mailed crafted item
       // keeps its provenance on arrival, the same as the market fix.
       if (
+        s.itemId === MEMBERSHIP_TOKEN_ID ||
         canGrantCopies(
           meta.inventory,
           bagPools(meta.bags),

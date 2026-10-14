@@ -27,6 +27,7 @@ import {
   DEFAULT_MOUNT,
   DEVELOPER_MOUNTS,
   isDeveloperMount,
+  MEMBERSHIP_REWARD_MOUNTS,
   MOUNT_KEYS,
   MOUNTS,
   mountDef,
@@ -179,13 +180,13 @@ describe('mount reins items (the collection: owning the item is owning the mount
   const reinsFor = (key: string) =>
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
-  it('every mount has exactly one reins item; player reins are unbound, dev mounts stay bound', () => {
+  it('each mount has one reins item; developer and annual rewards remain soulbound', () => {
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (isDeveloperMount(key)) {
+      if (isDeveloperMount(key) || MEMBERSHIP_REWARD_MOUNTS.includes(key)) {
         // Bound reins, for the same leak reason from different doors: a
         // developer-only mount has no player acquisition path, and the store
         // mount's reins is a real-money grant (server/claudium.ts). Either
@@ -276,6 +277,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (key === 'valorsteed') continue; // the purchase, not a drop
       if (key === 'avian_strider') continue; // the Rift Watch Champion purchase, pinned above
       if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
+      if (MEMBERSHIP_REWARD_MOUNTS.includes(key)) continue; // paid receipt delivery, pinned below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity.
@@ -356,8 +358,8 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it.each([...DEVELOPER_MOUNTS])(
-    'keeps %s developer-only and absent from every normal acquisition table',
+  it.each([...DEVELOPER_MOUNTS, ...MEMBERSHIP_REWARD_MOUNTS])(
+    'keeps %s absent from every normal acquisition table',
     (mountKey) => {
       const itemId = mountItemId(mountKey)!;
       const item = ITEMS[itemId] as MountItemDef;
@@ -782,10 +784,22 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     }
   });
 
-  it('the developer tank stays refused by the exchange pipes (still soulbound)', () => {
+  it('the annual reward tank stays refused by the exchange pipes (still soulbound)', () => {
     expect(guildBankPipeRefusal({ itemId: 'reins_terrorspark_groundshaker', count: 1 })).not.toBe(
       null,
     );
+  });
+
+  it('the annual tank remains owned and rideable after membership expires', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    sim.addItem('reins_terrorspark_groundshaker', 1, pid);
+    sim.setMembership(pid, 30);
+    sim.setMembership(pid, 0);
+    expect(mountOwned(sim.players.get(pid)!, 'terrorspark_groundshaker')).toBe(true);
+    summonMountItem(sim.ctx, pid, 'terrorspark_groundshaker');
+    finishTransition(sim, pid);
+    expect(sim.entities.get(pid)!.mountKey).toBe('terrorspark_groundshaker');
   });
 
   it('vendor sell still refuses reins (noVendorSell: sellValue 0 protects the collection)', () => {

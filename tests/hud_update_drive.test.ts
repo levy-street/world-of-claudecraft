@@ -1354,6 +1354,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the bank window; it also closes itself when the bank mirror goes null',
   },
   {
+    call: 'this.courierWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.courierWindow.isOpen()',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/courier/courier_window.ts',
+      proof: 'if (!force && signature === this.lastSignature) return;',
+    },
+    why: 'the owner courier window; custody, phase, membership and draft changes rebuild it, while pose-only movement never does',
+  },
+  {
     call: 'this.dailyRewardsWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.dailyRewardsWindow.isOpen',
@@ -1872,7 +1884,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // surface (51 / 96 measured on the merged tree). The release's Eastbrook
       // ferry countdown panel (hud ferryHud) is one more chrome surface at the
       // fourth release/v0.44.0 base merge (97 measured on the merged tree).
-    ).toEqual({ window: 51, chrome: 97, none: 18 });
+      // The courier window adds one slow-band, open-only window surface.
+    ).toEqual({ window: 52, chrome: 97, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1895,7 +1908,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // loot window's corpse arm moved OUT of the `none` bucket below into
       // this one: it gained a corpseSig latch when the popup started
       // refreshing instead of only closing.
-      module: 28,
+      // The courier window owns both revision and content signature guards.
+      module: 29,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -1949,6 +1963,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',
         'hud/battleground/battleground_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'hud/cosmetics/cosmetics_window.ts: const sig = cosmeticsSig(this.snapshot()); if (sig === this.lastSig) return;',
+        'hud/courier/courier_window.ts: if (!force && signature === this.lastSignature) return;',
         'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name, this.sim.craftVaultStock) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',

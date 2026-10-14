@@ -1,6 +1,16 @@
+import type { CourierDispatchRequest, CourierInfo } from '../sim/courier';
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
+import type { AccountBankInfo } from '../world_api/bank';
+import {
+  accountBankTransferPayload,
+  decodeAccountBankInfo,
+  selectAccountBankMirror,
+} from './account_bank_wire';
 import { resolveInitialActionBarLayout } from './action_bar_restore';
+import { CharacterRequests } from './character_requests';
+import { applyCharacterRoster, type CharacterMembership } from './character_roster';
+import { applyCourierSelfWire } from './courier_wire';
 import { materialStorageTransferPayload } from './material_storage_command';
 import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
@@ -342,6 +352,8 @@ export class Api {
   // confirms via getAccount()). Never persisted; it is a per-session hint only.
   emailMissing: boolean | undefined = undefined;
   realm: string | null = null;
+  characterMembership: CharacterMembership = { active: false, expiresAt: null };
+  characterLimit = 10;
   // base origin for realm-scoped calls (characters, search, ws). '' = the page
   // origin; set to another realm's origin when the player picks a realm
   base = NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
@@ -725,66 +737,18 @@ export class Api {
   }
 
   async characters(): Promise<CharacterSummary[]> {
-    const data = await this.get('/api/characters');
-    if (typeof data.realm === 'string') this.realm = data.realm;
-    return data.characters;
+    return applyCharacterRoster(this, await this.get('/api/characters'));
   }
 
-  async createCharacter(
-    name: string,
-    cls: PlayerClass,
-    skin = 0,
-    // The authored modular look, fixed to THIS character at create (its own
-    // server column). Optional: absent creates a legacy-rig character. Typed
-    // `object` so the render layer's ModularAppearance interface passes
-    // without a cast (this module stays out of src/render imports).
-    appearance: object | null = null,
-    // The creator's helmet toggle, becoming this character's standing helm
-    // preference. Defaults to hidden so an authored face is what the player
-    // meets in the world.
-    helmHidden = true,
-  ): Promise<void> {
-    await this.post('/api/characters', {
-      name,
-      class: cls,
-      skin,
-      helmHidden,
-      ...(appearance ? { appearance } : {}),
-    });
-  }
-
-  // Spend the character's one-shot appearance redesign (characters with no
-  // authored look; the server is the eligibility authority and burns the token
-  // atomically). `helmHidden` is the editor's helmet toggle, which is the same
-  // standing wardrobe choice creation posts, not a preview. Resolves with the
-  // normalized stored look.
-  async rerollAppearance(
-    characterId: number,
-    appearance: object,
-    helmHidden: boolean,
-  ): Promise<Record<string, unknown>> {
-    const data = await this.post(`/api/characters/${characterId}/appearance-reroll`, {
-      appearance,
-      helmHidden,
-    });
-    return (data.appearance ?? appearance) as Record<string, unknown>;
-  }
-
-  async renameCharacter(characterId: number, name: string): Promise<void> {
-    await this.post(`/api/characters/${characterId}/rename`, { name });
-  }
-
-  async deleteCharacter(characterId: number, name: string): Promise<void> {
-    await this.delete(`/api/characters/${characterId}`, { name });
-  }
-
-  // Force-disconnect this character's live session (a stale tab, a crash, or
-  // another device) so we can enter the world on it. Returns whether a session
-  // was actually displaced (false = it was already offline).
-  async takeoverCharacter(characterId: number): Promise<boolean> {
-    const data = await this.post(`/api/characters/${characterId}/takeover`, {});
-    return data.takenOver === true;
-  }
+  private readonly characterRequests = new CharacterRequests(
+    (path, body) => this.post(path, body),
+    (path, body) => this.delete(path, body),
+  );
+  createCharacter = this.characterRequests.create.bind(this.characterRequests);
+  rerollAppearance = this.characterRequests.rerollAppearance.bind(this.characterRequests);
+  renameCharacter = this.characterRequests.renameCharacter.bind(this.characterRequests);
+  deleteCharacter = this.characterRequests.deleteCharacter.bind(this.characterRequests);
+  takeoverCharacter = this.characterRequests.takeoverCharacter.bind(this.characterRequests);
 
   async reportPlayer(
     reporterCharacterId: number,
@@ -1289,6 +1253,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
   // server), so it only rides the wire while the player stands at a bursar. ---
   bankInfo: BankInfo | null = null;
+  courierInfo: CourierInfo | null = null;
+  accountBankInfo: AccountBankInfo | null = null;
   // --- IWorldBank: Materials Vault contents view, the per-material store beside
   // the slot bank, mirrored from the snapshot self (`s.vault`, delta-omitted).
   // The payload is OWNER-ONLY and never rides the interest-scoped entity
@@ -2349,6 +2315,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.mouselookFacing = null;
       return;
     }
+    if (msg.t === 'account_bank') {
+      this.accountBankInfo = decodeAccountBankInfo(msg.info);
+      return;
+    }
     if (msg.t === 'gbanklog') {
       // The one-shot answer to a `guild_bank_log` request. The mirror matches
       // it against the query it is waiting on and merges or drops it.
@@ -3192,6 +3162,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (copper !== this.copper) this.invChanged = true;
       this.copper = copper;
       if (applyMaterialInventoryWire(this, s)) this.invChanged = true;
+      if (typeof s.mbr === 'boolean') e.membershipActive = s.mbr;
+      if (s.mbr === false) this.accountBankInfo = null;
       if (s.equip !== undefined) this.equipment = s.equip;
       if (s.einst !== undefined) this.equipmentInstances = s.einst ?? {};
       // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
@@ -3225,6 +3197,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this,
         s.tal,
         arena?.match?.fiesta?.augments ?? [],
+        e.membershipActive,
       );
       this.talents = presentation.talents;
       this.loadouts = presentation.loadouts;
@@ -3253,6 +3226,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // module, where the delta contract, the by-reference adoption rationale,
       // and each key's malformed policy (vault clears, the rest retain) live.
       applyBankSelfWire(this, s);
+      applyCourierSelfWire(this, s);
       if (s.weeklyRewards !== undefined)
         this.weeklyRewardInfo = decodeWeeklyRewardInfo(s.weeklyRewards);
       applyGuildBankSelfWire(this, s, () => this.guildBankLogMirror.reset());
@@ -4628,6 +4602,23 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   bankWithdraw(...args: Parameters<typeof materialStorageTransferPayload>): void {
     this.cmd({ cmd: 'bank_withdraw', ...materialStorageTransferPayload(...args) });
+  }
+  claimMembershipArmour(): void {
+    this.cmd({ cmd: 'membership_claim_armour' });
+  }
+  requestAccountBanks(): void {
+    this.accountBankInfo = null;
+    this.cmd({ cmd: 'account_bank_list' });
+  }
+  selectAccountBank(characterId: number): void {
+    this.accountBankInfo = selectAccountBankMirror(this.accountBankInfo, characterId);
+    this.cmd({ cmd: 'account_bank_select', characterId });
+  }
+  accountBankTransfer(...args: Parameters<typeof accountBankTransferPayload>): void {
+    this.cmd({ cmd: 'account_bank_transfer', ...accountBankTransferPayload(...args) });
+  }
+  courierDispatch(request: CourierDispatchRequest): void {
+    this.cmd({ cmd: 'courier_dispatch', ...request });
   }
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });

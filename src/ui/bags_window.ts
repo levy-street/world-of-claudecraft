@@ -18,7 +18,7 @@
 // (not a literal white hex).
 
 import { audio } from '../game/audio';
-import { BACKPACK_SLOTS, bagSlotsOf, stackSizeOf } from '../sim/bags';
+import { BACKPACK_SLOTS, BAG_SOCKETS, bagSlotsOf, stackSizeOf } from '../sim/bags';
 import { getItemCooldownDuration } from '../sim/content/item_cooldowns';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
@@ -111,6 +111,7 @@ import {
   openMaterialSourcesForRow,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
+import { createMembershipBagSocket } from './membership_bag_socket';
 import type { PainterHostPresentation } from './painter_host';
 import { BAG_ITEM_ROW_ATTR } from './panel_key_guard';
 import {
@@ -669,7 +670,7 @@ export class BagsWindow {
         `<div class="tt-title">${esc(t('hudChrome.bags.backpack'))}</div><div class="tt-sub">${esc(t('itemUi.tooltip.bagSlots', { slots: formatNumber(model.backpackSlots, { maximumFractionDigits: 0 }) }))}</div>`,
     );
     bar.appendChild(backpack);
-    for (const socket of model.sockets) {
+    for (const socket of model.sockets.slice(0, BAG_SOCKETS)) {
       const item = socket.itemId ? ITEMS[socket.itemId] : undefined;
       if (item) {
         const btn = document.createElement('button');
@@ -711,6 +712,15 @@ export class BagsWindow {
         bar.appendChild(emptySocket);
       }
     }
+    const memberSocket = createMembershipBagSocket(world, {
+      itemIcon: this.deps.itemIcon,
+      itemTooltip: this.deps.itemTooltip,
+      attachTooltip: this.deps.attachTooltip,
+      hideTooltip: this.deps.hideTooltip,
+      repaint: () => this.render(),
+    });
+    memberSocket.dataset.focusKey = `bagsocket:${BAG_SOCKETS}`;
+    bar.appendChild(memberSocket);
     const counter = document.createElement('span');
     counter.className = `bag-capacity${model.used > model.capacity ? ' over' : ''}`;
     const split = carriedPools(world.bags, world.inventory);

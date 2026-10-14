@@ -353,6 +353,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/masterwrought-art-completion-2026-09-02/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
+      '            /docs/screenshots/referral-armour/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
       '            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/',
       '            /docs/screenshots/target-dots/',

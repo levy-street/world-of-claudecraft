@@ -10,6 +10,17 @@ import { canDualWield, isShieldItem } from './equipment_rules';
 import { activeItemInstanceStats } from './item_instance_stats';
 import { meetsLevelRequirement } from './item_level_req';
 import { lootQualityWeapon } from './loot_quality';
+import {
+  isMembershipArmour,
+  isReferralArmour,
+  membershipArmourItem,
+  referralArmourItem,
+} from './membership_armour';
+import {
+  isMembershipWeapon,
+  membershipWeaponDisplayId,
+  membershipWeaponItem,
+} from './membership_weapon';
 import { pvpFractionsFromRatings, pvpVitalityFromRating } from './pvp';
 import type {
   Entity,
@@ -342,8 +353,17 @@ export function recalcPlayerStats(
   for (const slot of ALL_EQUIP_SLOTS) {
     const itemId = equipment[slot];
     if (!itemId) continue;
-    const item = ITEMS[itemId];
-    if (!item) continue;
+    const baseItem = ITEMS[itemId];
+    if (!baseItem) continue;
+    if ((isMembershipArmour(itemId) || isMembershipWeapon(itemId)) && !e.membershipActive) continue;
+    if (isReferralArmour(itemId) && !e.referralInviterName) continue;
+    const item = referralArmourItem(
+      membershipArmourItem(baseItem, cls, mods?.spec, lvl, !!e.membershipActive),
+      cls,
+      mods?.spec,
+      lvl,
+      !!e.referralInviterName,
+    );
     // Gear above the wearer's level is inert: it stays equipped (still rendered
     // and occupying the slot, see the render mirrors below) but grants no stats,
     // armor, spell power, or set pieces until the character reaches its required
@@ -578,15 +598,27 @@ export function recalcPlayerStats(
   // damage (and drop the weapon-type flags, e.g. dagger, that gate abilities)
   // until the wearer is high enough level. The mainhand still stays worn (see
   // e.mainhandItemId below) so the weapon model keeps rendering.
-  const mainhand = equipment.mainhand ? ITEMS[equipment.mainhand] : undefined;
+  const baseMainhand = equipment.mainhand ? ITEMS[equipment.mainhand] : undefined;
+  const mainhand = baseMainhand
+    ? membershipWeaponItem(baseMainhand, cls, mods?.spec, lvl, !!e.membershipActive)
+    : undefined;
   const weapon =
     mainhand?.weapon && meetsLevelRequirement(lvl, mainhand)
-      ? lootQualityWeapon(mainhand, equipmentInstance?.mainhand)!
+      ? lootQualityWeapon(
+          mainhand,
+          isMembershipWeapon(mainhand.id) && !e.membershipActive
+            ? undefined
+            : equipmentInstance?.mainhand,
+        )!
       : { min: 1, max: 2, speed: 2 };
   e.weapon = weapon;
-  const offhand = equipment.offhand ? ITEMS[equipment.offhand] : undefined;
+  const baseOffhand = equipment.offhand ? ITEMS[equipment.offhand] : undefined;
+  const offhand = baseOffhand
+    ? membershipWeaponItem(baseOffhand, cls, mods?.spec, lvl, !!e.membershipActive)
+    : undefined;
   const offhandWeapon =
     canDualWield(cls, mods?.spec) &&
+    !(offhand && isMembershipWeapon(offhand.id) && !e.membershipActive) &&
     offhand?.kind === 'weapon' &&
     meetsLevelRequirement(lvl, offhand)
       ? lootQualityWeapon(offhand, equipmentInstance?.offhand)!
@@ -611,7 +643,7 @@ export function recalcPlayerStats(
     meetsLevelRequirement(lvl, offhand);
   e.blockChance = activeShield ? SHIELD_BLOCK_BASE : 0;
   e.blockValue = activeShield ? (offhand.blockValue ?? 0) : 0;
-  // The equipped mainhand item id: drives the held weapon model on the client
+  // The held weapon identity drives the model on the client
   // (mapped via ITEM_WEAPON_VARIANTS) AND legendary weapon procs in combat
   // (combat/equip_procs.ts, which re-applies the level gate above so an inert
   // over-level weapon's procs are inert too). Gated on the item actually being
@@ -626,6 +658,10 @@ export function recalcPlayerStats(
       isShieldItem(ITEMS[equipment.offhand]))
       ? equipment.offhand
       : null;
+  // Membership forms use ordinary no-proc donor identities for the model and
+  // weapon-type consumers. Persistent ownership stays in equippedItems below.
+  e.mainhandItemId = membershipWeaponDisplayId(e.mainhandItemId, cls, mods?.spec);
+  e.offhandItemId = membershipWeaponDisplayId(e.offhandItemId, cls, mods?.spec);
   // Resolve the active weapon-skin cosmetic against the (possibly changed)
   // mainhand: swapping to a different weapon type drops a non-matching skin and
   // re-shows the matching one automatically. Cosmetic only; never feeds stats.

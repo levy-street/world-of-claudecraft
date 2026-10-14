@@ -7120,6 +7120,73 @@
         "tempest_strike_grips",
         "venom_etched_waistcord"
       ]
+    },
+    {
+      "batchId": "membership-items-2026-10-05",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "The canonical woc-item-icon-v1 written contract; no source images were supplied.",
+      "commonPrompt": "Separate opaque painted inventory icons, silver and gold with midnight-blue accents, warm top-left key light, charcoal-umber vignette, complete subject and no text or UI chrome.",
+      "provenanceRecords": [
+        "docs/achievements/membership-items-2026-10-05/accepted-art.json"
+      ],
+      "itemIds": [
+        "membership_helmet",
+        "membership_shoulder",
+        "membership_chest",
+        "membership_waist",
+        "membership_legs",
+        "membership_gloves",
+        "membership_feet",
+        "membership_token"
+      ]
+    },
+    {
+      "batchId": "referral-items-2026-10-07",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "The canonical woc-item-icon-v1 written contract; no source images were supplied.",
+      "commonPrompt": "Seven individually generated Friendship armour paintings: silver steel, gold trim, midnight-blue underlayers, interlocking plain gold rings, top-left light and opaque charcoal-umber ground.",
+      "provenanceRecords": [
+        "docs/achievements/referral-items-2026-10-07/accepted-art.json"
+      ],
+      "itemIds": [
+        "referral_helmet",
+        "referral_shoulder",
+        "referral_chest",
+        "referral_waist",
+        "referral_legs",
+        "referral_gloves",
+        "referral_feet"
+      ]
+    },
+    {
+      "batchId": "membership-weapon-2026-10-14",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "itemIds": [
+        "membership_staff"
+      ],
+      "styleReference": "public/ui/items/kingsbane_last_oath.webp (Style only: diagonal composition and safe padding); public/ui/items/eastbrook_buckler.webp (Style only: metal and wood material rendering); public/ui/items/arcanite_mining_pick.webp (Style only: restrained magical accent)",
+      "commonPrompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory icon. Paint an original Staff of Changing (membership_staff) for World of ClaudeCraft, contract woc-item-icon-v1. This is a NEW authored item, not an edit or duplicate of any reference. Subject: one complete magical staff with a dark midnight-blue wrapped shaft, brushed silver fittings, narrow antique-gold bands, and a distinctive faceted pale-blue crystal enclosed in two asymmetrical silver crescent prongs, suggesting a weapon that changes form. Clear substantial staff silhouette, full tip and pommel visible, diagonal from lower-left to upper-right, approximately 72 percent square fill and safe padding on every side. No additional weapons or objects. Input roles: Image 1 (kingsbane_last_oath) is STYLE ONLY for diagonal long-weapon composition and safe tip padding, do not copy its sword; Image 2 (eastbrook_buckler) is STYLE ONLY for brushed metal and tactile materials, do not copy its shield; Image 3 (arcanite_mining_pick) is STYLE ONLY for restrained magical accent, do not copy its pick or purple palette. Premium hand-painted classic dark-fantasy MMO inventory art with crisp focal edges, softer peripheral brushwork, tactile wood/leather/metal, warm top-left key light, cool deep bottom-right shadow. The background is a fully opaque charcoal, muted umber and midnight-navy painted vignette with restrained atmosphere and grounded contact shadow, no flat black void. Magical blue light remains confined to the crystal so it cannot erase the silhouette. Readable at 22, 28, 40, 128 pixels and in a 64px circular crop. Square 1024x1024 output. No text, letters, numbers, runes, pseudo-writing, signature, watermark, rarity border, frame, UI chrome, checkerboard, transparency, mannequin, person, hand, split sheet, collage, clipped tip or cropped base.",
+      "provenanceRecords": [
+        "docs/achievements/membership-weapon-2026-10-14/accepted-art.json"
+      ]
     }
   ]
 }

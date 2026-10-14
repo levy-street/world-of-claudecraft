@@ -238,6 +238,7 @@ export function consumeEnchantedVictim(
 export function isDisenchantable(def: ItemDef | undefined): boolean {
   return (
     !!def &&
+    !def.noSalvage &&
     (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') &&
     !!def.quality &&
     def.quality !== 'poor'

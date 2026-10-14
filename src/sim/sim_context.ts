@@ -16,6 +16,7 @@ import type { AccountCosmetics } from '../world_api';
 import type { FrozenOrbState } from './combat/frozen_orb';
 import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
+import type { CourierBankExchange } from './courier';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { GuildBankState } from './guild_bank';
@@ -105,6 +106,7 @@ export type RuntimeSimConfig = Required<
     | 'respawnSeconds'
     | 'storagePrices'
     | 'vaultConsumptionAdmission'
+    | 'courierBankExchange'
     | 'gathererIdentity'
   >
 > &
@@ -1215,6 +1217,7 @@ export interface SimContextCallbacks {
 
 // The seam consumed by extracted modules.
 export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
+  readonly courierBankExchange?: CourierBankExchange;
   // The resolved storage price table (storage_prices.ts): bank expansions,
   // bank bag sockets, vault rungs. Frozen at Sim construction from the
   // cfg.storagePrices override; the ONE price truth every bank/vault charge
@@ -1239,6 +1242,7 @@ export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
 // journal wiring fails to compile there, and a deliberately inert server
 // caller must pass the exported inert constant by name.
 export interface SimContextHost extends SimContextPrimitives, SimContextCallbacks {
+  readonly courierBankExchange?: CourierBankExchange;
   readonly storagePrices: StoragePrices;
 }
 
@@ -1250,6 +1254,9 @@ export interface SimContextHost extends SimContextPrimitives, SimContextCallback
 // determinism.
 export function createSimContext(host: SimContextHost): SimContext {
   return {
+    get courierBankExchange() {
+      return host.courierBankExchange;
+    },
     get rng() {
       return host.rng;
     },
