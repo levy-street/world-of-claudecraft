@@ -10,6 +10,8 @@ export const cosmeticsStrings = {
   tabMounts: 'Mounts',
   tabSkins: 'Skins',
   tabMech: 'Mech',
+  buddyActive: 'Summoned',
+  buddyDrag: 'Drag to action bar',
   legend: 'Account: shared by every character. Character: this character only.',
   scopeAccount: 'Account',
   scopeCharacter: 'Character',

@@ -10,25 +10,105 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "es_ES": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "fr_FR": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "fr_CA": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "de_DE": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "zh_CN": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "zh_TW": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "ko_KR": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "ja_JP": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "pt_BR": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "ru_RU": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "cs_CZ": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "nl_NL": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "pl_PL": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "id_ID": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "tr_TR": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "sv_SE": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "vi_VN": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ],
+  "da_DK": [
+    "error.buddyGrantFailed",
+    "error.characterAlreadyHasThat",
+    "moderationHistory.actionGrantBuddy"
+  ]
 };

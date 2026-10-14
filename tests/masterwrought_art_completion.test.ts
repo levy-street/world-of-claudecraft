@@ -824,7 +824,10 @@ describe('Masterwrought art completion evidence', () => {
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
     // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
     // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
-    expect(currentOwnerIds).toHaveLength(1464);
+    // The buddy companions branch adds its 32 whistle icons
+    // (buddy-whistle-icons-2026-08-28) and two stag charm icons
+    // (buddy-charm-icons-2026-09-09): 1,464 to 1,498, likewise outside it.
+    expect(currentOwnerIds).toHaveLength(1498);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -959,11 +962,26 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => hoardBranchIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => hoardBranchIds.has(id))).toHaveLength(119);
 
+    // The buddy companions branch's two batches (32 whistle icons, two stag
+    // charm icons): 34 ids, additive the same way.
+    const buddyBranchBatchIds: readonly (string | undefined)[] = [
+      'buddy-whistle-icons-2026-08-28',
+      'buddy-charm-icons-2026-09-09',
+    ];
+    const buddyBranchIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => buddyBranchBatchIds.includes(batchId))
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(buddyBranchIds.size).toBe(34);
+    expect(datedIds.filter((id) => buddyBranchIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => buddyBranchIds.has(id))).toHaveLength(34);
+
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
-    // faction quartermaster, and Clue Scroll batches, and the Buried Hoards
-    // branch's three batches)
+    // faction quartermaster, and Clue Scroll batches, the Buried Hoards
+    // branch's three batches, and the buddy companions branch's two batches)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -985,7 +1003,8 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
         !season2WeaponIds.has(id) &&
-        !hoardBranchIds.has(id),
+        !hoardBranchIds.has(id) &&
+        !buddyBranchIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

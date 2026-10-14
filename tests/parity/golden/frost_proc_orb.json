@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "438b0c23",
+      "state": "008aa627",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -45,6 +45,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -163,7 +166,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1012,
-      "state": "18a4805c",
+      "state": "aac4dc82",
       "events": "83d03f60",
       "rng": {
         "draws": 1,
@@ -174,7 +177,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1012,
-      "state": "25e236e8",
+      "state": "abaa190e",
       "events": "06d8aa46",
       "rng": {
         "draws": 2,
@@ -185,7 +188,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1012,
-      "state": "cc73992b",
+      "state": "fb4d533b",
       "events": "9364a499",
       "rng": {
         "draws": 150,
@@ -196,7 +199,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1012,
-      "state": "43879580",
+      "state": "76dcae86",
       "events": "a15e8a4a",
       "rng": {
         "draws": 316,
@@ -207,7 +210,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 1012,
-      "state": "84a43b76",
+      "state": "b1a5d144",
       "events": "667f5ae2",
       "rng": {
         "draws": 356,
@@ -236,6 +239,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -486,7 +492,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 1012,
-      "state": "84a43b76",
+      "state": "b1a5d144",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -515,6 +521,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {

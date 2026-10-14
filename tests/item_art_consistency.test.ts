@@ -853,7 +853,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    // 1,653 with the buddy companion branch's 36 item definitions (release/v0.45.0 merge).
+    expect(Object.keys(ITEMS)).toHaveLength(1653);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1017,9 +1018,13 @@ describe('item-art consistency accepted-art provenance', () => {
     // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
-    expect(new Set(currentOwnerIds).size).toBe(1464);
-    expect(shippingIds).toHaveLength(1464);
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    // + the buddy companion branch at its release/v0.45.0 merge: 34 rendered
+    // whistle and charm icons (buddy-whistle-icons-2026-08-28,
+    // buddy-charm-icons-2026-09-09) and 36 item definitions (the 34 plus the
+    // Horse and Emberfall Phoenix whistles, whose art is enumerated debt).
+    expect(new Set(currentOwnerIds).size).toBe(1498);
+    expect(shippingIds).toHaveLength(1498);
+    expect(Object.keys(ITEMS)).toHaveLength(1653);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1038,10 +1043,14 @@ describe('item-art consistency accepted-art provenance', () => {
           [
             'nythraxis-gap-weapon-renders-2026-09-04',
             'roots-bramblehide-icons-2026-09-07',
+            // The buddy companion merge: rendered whistles + the two charm dyes.
+            'buddy-whistle-icons-2026-08-28',
+            'buddy-charm-icons-2026-09-09',
           ].includes(batchId),
       )
       .flatMap(({ itemIds }) => itemIds);
-    expect(releaseBatchIds).toHaveLength(25);
+    // 59 with the buddy companion branch's two batches (34 ids) in the filter above.
+    expect(releaseBatchIds).toHaveLength(59);
     // The world-quest branch's two batches are additive beyond the dated chain
     // as well (release/v0.43.0 merge into feature/world-quests).
     const worldQuestBatchIds = mapping.generatedBatches
@@ -1349,7 +1358,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // its batch (faction-ladder-icons-2026-09-23) = 36. The trinket slot's icon batch
     // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
     // batch (warfare-season2-weapons-2026-09-25) = 38.
-    expect(mapping.generatedBatches).toHaveLength(41);
+    // The buddy companion branch's two batches (whistles, charms) at its
+    // release/v0.45.0 merge = 43.
+    expect(mapping.generatedBatches).toHaveLength(43);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1419,13 +1430,15 @@ describe('item-art consistency accepted-art provenance', () => {
     // Season 2's weapon batch adds 4: 815. The Buried Hoards branch's three
     // batches (18 faction reward paintings, 5 treasure-map family, 96 hoard boss
     // loot) add 119 at the 2026-09-28 release merge: 934.
-    expect(priorGeneratedIds).toHaveLength(934);
+    // The buddy companion branch's 34 whistle and charm renders (release/v0.45.0
+    // merge): 968.
+    expect(priorGeneratedIds).toHaveLength(968);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1464);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1464);
+    expect(allCurrentOwnerIds).toHaveLength(1498);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1498);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1439,7 +1452,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
       // + the 4 Warfare Season 2 weapons = 815.
       // + the Buried Hoards branch's 119 paintings (three batches) = 934.
-      priorGenerated: 934,
+      // + the buddy companion branch's 34 renders (release/v0.45.0 merge) = 968.
+      priorGenerated: 968,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1480,6 +1494,16 @@ describe('item-art consistency accepted-art provenance', () => {
       )
       .flatMap(({ itemIds }) => itemIds);
     expect(releaseBatchIdsForCatalog).toHaveLength(25);
+    // The buddy companion merge's two batches (rendered whistles, charm dyes)
+    // are additive beyond the whole historical chain, the way the Field Kit is.
+    const buddyBatchIdsForCatalog = mapping.generatedBatches
+      .filter(
+        ({ batchId }) =>
+          typeof batchId === 'string' &&
+          ['buddy-whistle-icons-2026-08-28', 'buddy-charm-icons-2026-09-09'].includes(batchId),
+      )
+      .flatMap(({ itemIds }) => itemIds);
+    expect(buddyBatchIdsForCatalog).toHaveLength(34);
     expect(
       sorted([
         ...historicalVerdict.visualVerdict.passIds.filter(
@@ -1520,6 +1544,7 @@ describe('item-art consistency accepted-art provenance', () => {
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
+        ...buddyBatchIdsForCatalog,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
@@ -1667,9 +1692,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464.
-    if (ownerIds.length !== 1464)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1464`);
-    if (fileIds.length !== 1464) violations.push(`shipping WebP count: ${fileIds.length} != 1464`);
+    // Plus the buddy companion branch's 34 rendered whistle and charm icons at
+    // its release/v0.45.0 merge = 1498.
+    if (ownerIds.length !== 1498)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1498`);
+    if (fileIds.length !== 1498) violations.push(`shipping WebP count: ${fileIds.length} != 1498`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

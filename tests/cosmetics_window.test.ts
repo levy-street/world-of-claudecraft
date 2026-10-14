@@ -22,6 +22,7 @@ interface FakeWorld {
     skinCatalog: 'class' | 'mech';
     skin: number;
     mountSkinId: string | null;
+    buddyKey?: string;
   };
   accountCosmetics: {
     completedQuestIds: string[];
@@ -31,6 +32,9 @@ interface FakeWorld {
     mountSkinIds: string[];
   };
   ownedMounts: () => string[];
+  ownedBuddies: () => string[];
+  pendingBuddies: () => string[];
+  summonBuddy: ReturnType<typeof vi.fn>;
   changeMountSkin: ReturnType<typeof vi.fn>;
   changeWeaponSkin: ReturnType<typeof vi.fn>;
   changeSkin: ReturnType<typeof vi.fn>;
@@ -54,6 +58,11 @@ function fakeWorld(): FakeWorld {
       mountSkinIds: ['mech_bird'],
     },
     ownedMounts: () => ['valorsteed'],
+    ownedBuddies: () => ['horse'],
+    pendingBuddies: () => ['crystal_lich'],
+    summonBuddy: vi.fn((key: string) => {
+      world.player.buddyKey = world.player.buddyKey === key ? '' : key;
+    }),
     changeMountSkin: vi.fn((id: string | null) => {
       world.player.mountSkinId = id;
     }),
@@ -102,6 +111,58 @@ beforeEach(() => {
 });
 
 describe('CosmeticsWindow', () => {
+  it('equips and dismisses only collected buddies, while preserving pending and locked states', () => {
+    const world = fakeWorld();
+    const { w, el } = makeWindow(world);
+    w.open('buddies');
+    expect(el.querySelectorAll('.cos-card')).toHaveLength(3);
+    expect(card(el, 'horse').textContent).toContain('Tug, the Warhorse');
+    expect(el.querySelectorAll('.cos-scope-account')).toHaveLength(3);
+    expect(card(el, 'horse').querySelector('.cos-scope-account')?.textContent).toBe('Account');
+    expect(el.querySelector('.cos-scope-character')).toBeNull();
+    expect(el.querySelector('[data-buddy-drag], [draggable="true"]')).toBeNull();
+    expect(card(el, 'crystal_lich').textContent).toContain('A presence follows you');
+    expect(action(el, 'summon-buddy', 'crystal_lich')).toBeNull();
+    expect(action(el, 'summon-buddy', 'forgemaw')).toBeNull();
+    const summon = action(el, 'summon-buddy', 'horse')!;
+    summon.focus();
+    summon.click();
+    expect(world.summonBuddy).toHaveBeenCalledExactlyOnceWith('horse');
+    expect(action(el, 'summon-buddy', 'horse')?.textContent).toBe('Dismiss');
+    expect(document.activeElement).toBe(action(el, 'summon-buddy', 'horse'));
+    action(el, 'summon-buddy', 'horse')?.click();
+    expect(world.summonBuddy).toHaveBeenCalledTimes(2);
+    expect(action(el, 'summon-buddy', 'horse')?.textContent).toBe('Summon');
+  });
+
+  it('offers no buddy drag controls and does not create action-bar drag payloads', () => {
+    const world = fakeWorld();
+    const { w, el } = makeWindow(world);
+    w.open('buddies');
+    expect(el.querySelector('[data-buddy-drag], [draggable="true"]')).toBeNull();
+    expect(el.textContent).not.toContain('Drag to action bar');
+    const drag = new Event('dragstart', { bubbles: true });
+    const transfer = { setData: vi.fn(), effectAllowed: '' };
+    Object.defineProperty(drag, 'dataTransfer', { value: transfer });
+    card(el, 'horse').dispatchEvent(drag);
+    expect(transfer.setData).not.toHaveBeenCalled();
+    expect(world.summonBuddy).not.toHaveBeenCalled();
+  });
+
+  it('refreshes a revealed buddy and skips unchanged companion snapshots', () => {
+    const world = fakeWorld();
+    const { w, el } = makeWindow(world);
+    w.open('buddies');
+    const original = card(el, 'horse');
+    w.refreshIfChanged();
+    expect(card(el, 'horse')).toBe(original);
+    world.ownedBuddies = () => ['horse', 'crystal_lich'];
+    world.pendingBuddies = () => [];
+    world.player.buddyKey = 'crystal_lich';
+    w.refreshIfChanged();
+    expect(action(el, 'summon-buddy', 'crystal_lich')?.textContent).toBe('Dismiss');
+    expect(card(el, 'crystal_lich').textContent).not.toContain('A presence follows you');
+  });
   it('renders shipped decorative art for every catalog mount and owned weapon skin', () => {
     const world = fakeWorld();
     world.accountCosmetics.weaponSkinIds = WEAPON_SKIN_LIST.map((skin) => skin.id);
@@ -149,7 +210,7 @@ describe('CosmeticsWindow', () => {
     const { w, el } = makeWindow(world);
     w.toggle();
     expect(w.isOpen).toBe(true);
-    expect(el.querySelectorAll('.cos-tab')).toHaveLength(3);
+    expect(el.querySelectorAll('.cos-tab')).toHaveLength(4);
     expect(el.querySelector('.cos-tab.on')?.getAttribute('data-tab')).toBe('mounts');
     expect(card(el, 'mech_bird')).toBeTruthy();
     expect(card(el, 'chimeglass_tortoise')).toBeTruthy();

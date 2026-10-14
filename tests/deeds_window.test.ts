@@ -756,6 +756,7 @@ describe('touch long-press peek', () => {
       painter.match(
         /if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}/g,
       )?.length,
+      // Watch, title and border.
     ).toBe(3);
     // Association, not just count: the guard is the FIRST statement of each
     // action handler specifically, never merely present somewhere in the file.

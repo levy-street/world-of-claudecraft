@@ -1041,6 +1041,10 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // cost with one of each too. Interleaving a read BETWEEN the writes is what
   // would make this thrash, and nothing here does.)
   { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 6 }, driverAllow: {} },
+  // The Hunting pane keeps the catalog list's scroll offset across its full
+  // innerHTML repaint (one read before the rebuild, one write after), so a row
+  // click two screens down never snaps the player back to the top.
+  { file: 'collections/collections_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The scroll pair and the rAF both belonged to the mount picker's
   // scroll-the-selected-card-into-view path, which went away when reins became
   // usable items and the picker was deleted. The sheet now reads nothing and

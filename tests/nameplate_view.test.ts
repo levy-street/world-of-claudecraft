@@ -62,6 +62,7 @@ function plan(
   showOwnNameplate = false,
   showPlayerNameplates = true,
   standIn = false,
+  showPetNames = false,
 ) {
   return nameplatePlanInto(
     newNameplatePlan(),
@@ -71,6 +72,7 @@ function plan(
     showNameplates,
     showOwnNameplate,
     showPlayerNameplates,
+    showPetNames,
     standIn,
   );
 }
@@ -351,15 +353,15 @@ describe('nameplate_view - allocation-light + determinism', () => {
   it('writes into the caller-owned plan and returns that same instance (no per-call alloc)', () => {
     const out = newNameplatePlan();
     const e = ent({ pos: { x: 0, y: 0, z: 5 } });
-    const returned = nameplatePlanInto(out, e, viewer(), 2, true, false, true, false);
+    const returned = nameplatePlanInto(out, e, viewer(), 2, true, false, true, false, false);
     expect(returned).toBe(out); // same reference, reused
   });
 
   it('same input gives the same plan (pure)', () => {
     const e = ent({ pos: { x: 0, y: 0, z: 5 }, aggroTargetId: PLAYER_ID });
     const p = viewer({ comboPoints: 2, targetId: e.id });
-    const a = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false, true, false);
-    const b = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false, true, false);
+    const a = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false, true, false, false);
+    const b = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false, true, false, false);
     expect(a).toEqual(b);
   });
 });
@@ -407,6 +409,7 @@ describe('nameplate_view - Sim-vs-ClientWorld parity', () => {
         false,
         true,
         false,
+        false,
       );
       const mirPlan = nameplatePlanInto(
         newNameplatePlan(),
@@ -416,6 +419,7 @@ describe('nameplate_view - Sim-vs-ClientWorld parity', () => {
         true,
         false,
         true,
+        false,
         false,
       );
       expect(simPlan).toEqual(mirPlan);
@@ -447,6 +451,7 @@ describe('nameplate_view - import absence (two-controller + purity, source scan)
     const froms = [...code.matchAll(/\bimport\b[^;]*\bfrom\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
     // unique modules, robust to biome merging/splitting the type vs value sim import
     expect([...new Set(froms)].sort()).toEqual([
+      '../sim/pet/buddy_ai',
       // The feast template-id constant (Phase 12): a sim CONTENT leaf, not
       // three/painter/gfx; imported so the discriminator cannot drift from
       // the sim's own id (the frontend-seam review's ask).

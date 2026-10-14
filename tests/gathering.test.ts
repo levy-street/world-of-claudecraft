@@ -365,7 +365,9 @@ describe('isHarvestableCorpse', () => {
     // (hub_training_dummy, hub_healing_dummy): struck or healed, never
     // harvested, the same untagged shape as the Bone Spike above: 191. Plus
     // the five Eastbrook healing-training role dummies, which are friendly
-    // practice targets rather than harvestable corpses: 196.
+    // practice targets rather than harvestable corpses: 196. Plus the three
+    // retained cosmetic buddy templates (content/buddies.ts): owned followers,
+    // never a corpse anyone butchers, so no componentTags: 199.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
     // Three caravan enemies and the undead Fenbridge infiltrator add no components:
     // 200. Plus the sixteen Buried Hoards templates (content/rift/mobs.ts, the
@@ -373,8 +375,9 @@ describe('isHarvestableCorpse', () => {
     // hoard_* bosses, adds and summons (the Healing Tide Totem, the Bloated Cap,
     // the Coinsack Scurrier and the rest) and the Boneyard's rift_marrow_golem,
     // all rift-instance templates that ship untagged like every rift template
-    // the release already carries: 216.
-    expect(untagged).toHaveLength(216);
+    // the release already carries: 216. Plus the three retained cosmetic buddy
+    // templates (the release/v0.45.0 merge into the buddy companions branch): 219.
+    expect(untagged).toHaveLength(219);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

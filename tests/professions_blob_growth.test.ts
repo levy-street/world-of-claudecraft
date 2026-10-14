@@ -163,6 +163,8 @@ const PROFESSIONS_BLOB_FIELDS = [
 // included, since a key absent from the fixture is harmless here while a
 // missing one is not.
 const NON_PROFESSIONS_BLOB_FIELDS = [
+  // The buddy collection (src/sim/buddies.ts): owned, looks, worn, pending, last.
+  'buddies',
   // Written by the SERVER, not by serializeCharacter: server/game.ts stamps
   // state.jail onto the serialized blob before persisting, so no sim fixture
   // can arm it and the source scrape below cannot see it either. Classified
@@ -1666,6 +1668,16 @@ function maximalCharacterSim(): Sim {
   const longName = 'A'.repeat(MAX_CRAFTED_BY_LENGTH);
   const instanceItemId = STORED_COLLECTION_ITEM_ID;
 
+  // Deeds no longer grant companions. Arm the complete retained collection
+  // explicitly so removing those rewards does not shrink this field to absent.
+  meta.buddies.owned = new Set(['horse', 'crystal_lich', 'forgemaw']);
+  meta.buddies.last = 'crystal_lich';
+  meta.buddies.names = {
+    horse: 'ABCDEFGHIJKLMNOP',
+    crystal_lich: 'ABCDEFGHIJKLMNOP',
+    forgemaw: 'ABCDEFGHIJKLMNOP',
+  };
+
   // Progression at the cap, every counter wide.
   sim.setPlayerLevel(MAX_LEVEL);
   meta.lifetimeXp = 999_999_999;
@@ -1978,6 +1990,19 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const s3 = third.serializeCharacter(pid3) as CharacterState;
     expect(s3).toEqual(s2);
     expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
+    expect(s2.buddies).toEqual({
+      owned: ['horse', 'crystal_lich', 'forgemaw'],
+      last: 'crystal_lich',
+      names: {
+        horse: 'ABCDEFGHIJKLMNOP',
+        crystal_lich: 'ABCDEFGHIJKLMNOP',
+        forgemaw: 'ABCDEFGHIJKLMNOP',
+      },
+    });
+    // The retained collection plus three maximum-length custom names, including
+    // its top-level key. Names add 101 bytes to the pre-naming collection.
+    const buddyCollectionBytes = Buffer.byteLength(JSON.stringify(s2.buddies), 'utf8') + 11;
+    expect(buddyCollectionBytes).toBe(179);
 
     // The professions block rides inside at its own ceiling: the same band the
     // professions arm pins, so the two measurements can never describe
@@ -2442,7 +2467,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and the 32
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
-        4711,
+        4711 +
+        // Plus 706 + 179 at the release/v0.45.0 merge into the buddy companions
+        // branch: the historical token item definitions stay readable, so the 34
+        // whistle and 2 charm ids join deedStats.itemsDiscovered (each
+        // `"<id>",`, id length + 3, summed off the catalog: 706), and the
+        // explicitly armed retained buddy collection contributes the
+        // independently measured buddyCollectionBytes above (179).
+        706 +
+        buddyCollectionBytes,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2488,7 +2521,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       deeds: 743,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
-      deedStats: 9427,
+      // deedStats 9427 -> 10133 at the release/v0.45.0 merge into the buddy
+      // companions branch: the 34 whistle and 2 charm ids in itemsDiscovered
+      // (+706, attributed in the growth equation above).
+      deedStats: 10133,
       reliquary: 11501,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2526,7 +2562,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-    ).toBe(231729);
+      // 231,729 -> 232,614 at the release/v0.45.0 merge into the buddy companions
+      // branch (+885: the 706 historical token ids and the 179-byte armed buddy
+      // collection, attributed above, both kept here).
+    ).toBe(232614);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2554,7 +2593,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-    ).toBe(233348);
+      // 233,348 -> 234,233 at the release/v0.45.0 merge into the buddy companions
+      // branch (+885, kept).
+    ).toBe(234233);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2645,8 +2686,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    expect(bytes, reMint).toBeGreaterThan(232980);
-    expect(bytes, reMint).toBeLessThan(233361);
+    // RE-BASED at the release/v0.45.0 merge into the buddy companions branch:
+    // 234,245 bytes, +885 over the measurement above (the 706 bytes of
+    // historical whistle and charm ids in deedStats.itemsDiscovered and the
+    // 179-byte armed buddy collection, both attributed in the growth equation).
+    // Floor at measurement minus 380, edge at measurement plus one:
+    // 233865..234246.
+    expect(bytes, reMint).toBeGreaterThan(233865);
+    expect(bytes, reMint).toBeLessThan(234246);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

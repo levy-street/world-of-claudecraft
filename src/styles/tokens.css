@@ -1344,6 +1344,18 @@
       var(--unit-frame-bar-gap) +
       70px
     );
+    /* The Collections window (src/ui/collections/collections_window.ts): its
+       tab plates, white-and-bold readability text, selected-row wash, lore
+       line, the owned-piece green and the dim item-level note. The gradient
+       tokens drop the --color- prefix (the --panel-bg precedent). */
+    --collections-tab-bg: linear-gradient(#2a2418, #1d1811);
+    --collections-tab-active-bg: linear-gradient(#4a3c1c, #302713);
+    --color-collections-text: #fff;
+    --color-collections-row-active: #ffffff0f;
+    --color-collections-lore: #ded6c2;
+    --color-collections-owned: #4fdc6a;
+    --color-collections-ilvl: #c9c1a8;
+    --color-collections-noart: #ffffff0a;
     /* The weekly emissary window (src/ui/weekly_quests_window.ts): its own
        violet-and-gilt palette, named here so the sheet holds no raw literal. */
     --wk-black: #000;

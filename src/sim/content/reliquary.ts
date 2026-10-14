@@ -943,7 +943,8 @@ const REALM_RARE_ZONES = [
 // Both quartermasters front the SAME canonical honor stock: FURY at the
 // Eastbrook arena (FURY_NPC in content/pvp_honor.ts) and Warmarshal Draven
 // Kole at the Highwatch hub (content/zone3.ts, spawned under a reserved id by
-// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = HONOR_QUARTERMASTER_STOCK.
+// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = HONOR_VENDOR_STOCK (the
+// HONOR_QUARTERMASTER_STOCK gear plus one cosmetic companion whistle no page counts).
 // Every slot therefore names both counters through one shared tuple. Honor
 // purchases flow through the ordinary buyItem discovery path
 // (markItemDiscovered + noteRelicObtain), so ownership needs no new state.

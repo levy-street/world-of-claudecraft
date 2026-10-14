@@ -878,6 +878,7 @@ const GENERAL_KEYS = [
   'showReliquaryTracker',
   'showOwnNameplate',
   'showPlayerNameplates',
+  'showPetNames',
   'confirmVendorSell',
   'note:hudChrome.options.confirmVendorSellNote',
   'confirmVendorSellMinQuality',

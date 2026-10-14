@@ -55,6 +55,8 @@ function makeWindow(
         activeTitle: state.activeTitle,
         deedsRarity: async () => null,
         deedsRecent: async () => state.recent,
+        entities: new Map(),
+        playerId: 1,
         setActiveTitle: (id: string | null) => {
           state.activeTitle = id;
         },

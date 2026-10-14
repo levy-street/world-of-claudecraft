@@ -20,6 +20,13 @@ export const PREVIEW_FRAMING = {
   sheet: { y: 1.45, z: 5.1, lookY: 1.3 },
   // Inspect another player: pulled back / raised so tall silhouettes stay framed.
   inspect: { y: 1.5, z: 6.6, lookY: 1.3 },
+  // Collections, buddy rows: the follower rigs stand 0.55 to 0.8 units tall, so
+  // both player framings above leave them a speck in the middle of the pane.
+  // Pulled in and dropped to the creature's own eye line instead.
+  collectionBuddy: { y: 0.8, z: 3.4, lookY: 0.45 },
+  // Collections, mount rows: the opposite problem. A rideable body is two to
+  // four times a player's height, so it needs more room than the inspect stage.
+  collectionMount: { y: 2.2, z: 9, lookY: 1.5 },
 } as const satisfies Record<string, PreviewFraming>;
 
 export type PreviewFramingName = keyof typeof PREVIEW_FRAMING;

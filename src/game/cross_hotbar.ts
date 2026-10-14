@@ -154,7 +154,7 @@ export function seedCrossHotbarLayout(
   const flat: CrossHotbarAction[] = [];
   for (const action of barActions) flat.push(action ?? null);
   const already = new Set(
-    flat.filter((a): a is { type: 'ability' | 'item'; id: string } => a !== null).map((a) => a.id),
+    flat.filter((a): a is Exclude<CrossHotbarAction, null> => a !== null).map((a) => a.id),
   );
   for (const id of extras) {
     if (already.has(id)) continue;
