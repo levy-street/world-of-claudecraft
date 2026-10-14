@@ -9510,7 +9510,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': 'Desollar',
   'entities.abilities.revive_pet.name': 'Remendar',
   'entities.abilities.revive_pet.description':
-    'Remienda a tu mascota y restaura {overTime} de salud durante 12 s en pulsos cada 3 s mientras esté viva. Si está muerta, la revive con un 35% de salud.',
+    'Restaura el 10% de la salud máxima de tu compañero vivo cada segundo durante 8 s. Si tu compañero está muerto, lo revive con un 50% de salud.',
   'entities.abilities.holy_shock.description':
     'Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)',
   'entities.abilities.holy_shield.name': 'Escudo Sagrado',

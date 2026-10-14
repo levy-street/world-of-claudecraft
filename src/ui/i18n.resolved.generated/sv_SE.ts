@@ -13152,6 +13152,14 @@ export const sv_SE: EnTranslations = {
         "name": "Skalhud",
         "description": "Minskar skadan du tar med 60% i 8 sek, men hindrar attacker medan den är aktiv."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Frostkäftsfälla",
         "description": "Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek."
@@ -14781,7 +14789,7 @@ export const sv_SE: EnTranslations = {
       },
       "revive_pet": {
         "name": "Lappa ihop",
-        "description": "Lappar ihop ditt husdjur. Om det lever återställer det totalt {overTime} hälsa under 12 sek. med läkning var 3:e sek. Om det är dött återupplivas det med 35 % hälsa."
+        "description": "Återställer 10 % av din levande följeslagares maximala hälsa varje sekund i 8 sek. Om följeslagaren är död återupplivas den i stället med 50 % hälsa."
       }
     },
     "items": {

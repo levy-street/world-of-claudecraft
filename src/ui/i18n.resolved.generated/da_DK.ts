@@ -13152,6 +13152,14 @@ export const da_DK: EnTranslations = {
         "name": "Skalhud",
         "description": "Reducerer den skade, du tager, med 60% i 8 sek., men forhindrer angreb, mens den er aktiv."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Frostkæbefælde",
         "description": "Placer en fælde ved den valgte fjende eller ved dine fødder. Den armeres efter 0,75 sek. og varer 30 sek. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek."
@@ -14781,7 +14789,7 @@ export const da_DK: EnTranslations = {
       },
       "revive_pet": {
         "name": "Lappe sammen",
-        "description": "Lapper dit kæledyr sammen. Hvis det lever, genopretter det i alt {overTime} helbred over 12 sek. med helbredelse hvert 3. sek. Hvis det er dødt, genopliver det med 35 % helbred."
+        "description": "Genopretter 10 % af din levende ledsagers maksimale helbred hvert sekund i 8 sek. Hvis din ledsager er død, genoplives den i stedet med 50 % helbred."
       }
     },
     "items": {

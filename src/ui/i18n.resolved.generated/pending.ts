@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "es_ES": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "fr_FR": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "fr_CA": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "de_DE": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "nl_NL": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "pl_PL": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "id_ID": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "tr_TR": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "sv_SE": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "vi_VN": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ],
+  "da_DK": [
+    "entities.abilities.play_dead.description",
+    "entities.abilities.play_dead.name",
+    "entities.abilities.tactical_camo.description",
+    "entities.abilities.tactical_camo.name"
+  ]
 };

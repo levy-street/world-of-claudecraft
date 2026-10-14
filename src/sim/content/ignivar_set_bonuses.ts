@@ -103,8 +103,8 @@ export const COLDSIGHT_4PC_WINDOW_EXTENSION_CAP_SEC = 6;
  *  Harrier and Efficient Rhythm riders apply after (preResolved false),
  *  exactly as they do for the base grant. */
 export const SLAGSNARE_2PC_GUTTING_STRIKE_FOCUS = 20;
-/** Slagsnare 4pc: the once-per-8-sec momentum-preserve lockout; deliberately
- *  MATCHES the Hunting Momentum window by construction. */
+/** Slagsnare 4pc: the once-per-8-sec momentum-preserve lockout (Momentum
+ *  itself no longer expires since the Fieldcraft rework). */
 export const SLAGSNARE_4PC_MOMENTUM_ICD_SEC = 8;
 
 // Audited constants for the bespoke rogue bends (read by the class-module
@@ -561,8 +561,7 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
     {
       pieces: 4,
       // Bespoke: a Woundrend that consumes 3 Hunting Momentum preserves the
-      // stacks, once per 8 sec (the lockout deliberately MATCHES the Momentum
-      // window). Scoped to the Woundrend consume site ONLY: the Re-entry
+      // stacks, once per 8 sec (Momentum itself is a persistent bank). Scoped to the Woundrend consume site ONLY: the Re-entry
       // consumers still spend the stacks, and payoffs stay at 3-stack value.
       effect: { tuning: { momentumPreserveIcdSec: SLAGSNARE_4PC_MOMENTUM_ICD_SEC } },
     },

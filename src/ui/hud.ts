@@ -878,6 +878,7 @@ import { TargetAurasWindow } from './target_auras_window';
 import { TargetDiscordController } from './target_discord_controller';
 import {
   fillTargetFrameDescriptor,
+  fillTargetHealthText,
   fillTargetOfTargetDescriptor,
   targetPortraitKey,
 } from './target_frame_descriptor';
@@ -9015,10 +9016,7 @@ export class Hud {
           sim.markerFor(target.id),
         );
         const hpMode = healthTextMode(this.optionsHooks?.settings?.get('targetFrameHealthText'), 3);
-        targetFrame.hpText = target.dead
-          ? t('hud.core.dead')
-          : unitFrameHealthText(target.hp, target.maxHp, hpMode);
-        targetFrame.showAbsorbText = !target.dead && hpMode !== 0;
+        fillTargetHealthText(targetFrame, target, hpMode);
         this.targetFramePainter.paint(unitFrameViewInto(this.targetFrameBuffer, targetFrame));
       }
       // Target-only sub-parts the family frame does not express, each routed through

@@ -435,6 +435,9 @@ export function createAurasView(
         // via echoVisibleTo, so re-filtering here would wrongly hide the viewer's OWN
         // marks too.
         if (ownFirst && a.kind === 'temporal_echo' && !deps.isOwn(a)) return;
+        // Play Dead (hunter feign death) must not give itself away: only the
+        // hunter sees the aura on their own target/focus strip.
+        if (ownFirst && a.kind === 'feign_death' && !deps.isOwn(a)) return;
         // Coldsight Read's internal bookkeeping markers (the Fevered Draw progress
         // counter, the two per-ability reserved-cast markers): kind 'internal_cd'
         // with an 86400s reservation-timeout duration purely so nothing but their

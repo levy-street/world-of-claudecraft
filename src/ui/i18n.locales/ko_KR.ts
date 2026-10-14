@@ -5301,7 +5301,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적을 찢어 무기 피해에 {damage}를 더하고 18초 동안 출혈 피해를 입힙니다. 연계 점수를 1 줍니다. 표범 형상 전용.',
   'entities.abilities.revive_pet.name': '응급 처치',
   'entities.abilities.revive_pet.description':
-    '소환수를 응급 처치합니다. 살아 있으면 12초에 걸쳐 3초마다 생명력을 회복해 총 {overTime}의 생명력을 회복합니다. 죽어 있으면 35%의 생명력으로 되살립니다.',
+    '8초 동안 매초 살아 있는 소환수의 최대 생명력의 10%를 회복합니다. 소환수가 죽어 있으면 대신 50%의 생명력으로 되살립니다.',
+  'entities.abilities.tactical_camo.name': '전술 위장',
+  'entities.abilities.tactical_camo.description':
+    '주변 환경에 녹아듭니다. 적이 거의 알아채지 못하며, 이동 속도가 80%가 됩니다. 공격하거나 피해를 받으면 전술 위장이 해제됩니다. 다시 시전하면 해제됩니다. (야전술)',
+  'entities.abilities.play_dead.name': '죽은 척하기',
+  'entities.abilities.play_dead.description':
+    '땅에 쓰러져 죽은 척합니다. 모두에게 생명력과 집중이 비어 있는 것으로 보입니다. 적은 당신을 잊고, 당신을 대상으로 삼은 적 플레이어는 대상을 잃습니다. 이동하거나 공격하거나 다른 능력을 사용하면 끝납니다. 다시 시전하면 일어납니다.',
   'entities.abilities.holy_shock.name': '빛의 충격',
   'entities.abilities.holy_shock.description':
     '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',

@@ -8132,7 +8132,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Otacza ciebie i twoją drużynę świętą energią aż do śmierci lub zastąpienia. Wrogowie, którzy zaatakują wręcz objętego sojusznika, otrzymują {buff} obrażeń od Świętości, a objęci sojusznicy zadają {buff} dodatkowych obrażeń od Świętości atakami automatycznymi.',
   'entities.abilities.retribution_aura.name': 'Aura odpłaty',
   'entities.abilities.revive_pet.description':
-    'Opatruje twojego zwierzaka. Jeśli żyje, przywraca mu łącznie {overTime} pkt. zdrowia przez 12 sek., co 3 sek. Jeśli nie żyje, wskrzesza go z 35% zdrowia.',
+    'Przywraca żywemu towarzyszowi 10% maksymalnego zdrowia co sekundę przez 8 s. Jeśli towarzysz nie żyje, zamiast tego wskrzesza go z 50% zdrowia.',
   'entities.abilities.revive_pet.name': 'Opatrzenie',
   'entities.abilities.righteous_fury.description':
     'Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 30%. Tylko Strażnik wiary.',

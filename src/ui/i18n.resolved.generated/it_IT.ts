@@ -13152,6 +13152,14 @@ export const it_IT: EnTranslations = {
         "name": "Pelle di Corazza",
         "description": "Riduce i danni subiti del 60% per 8 s, ma impedisce di attaccare mentre è attiva."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Trappola Fauci di Gelo",
         "description": "Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s."
@@ -14781,7 +14789,7 @@ export const it_IT: EnTranslations = {
       },
       "revive_pet": {
         "name": "Rattoppare",
-        "description": "Rattoppa il tuo famiglio, ripristinando {overTime} salute in 12 sec con impulsi ogni 3 sec se è vivo. Se è morto, lo rianima con il 35% della salute."
+        "description": "Ripristina il 10% della salute massima del tuo compagno vivo ogni secondo per 8 sec. Se è morto, lo rianima con il 50% della salute."
       }
     },
     "items": {

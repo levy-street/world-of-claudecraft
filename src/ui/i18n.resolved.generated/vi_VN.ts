@@ -13152,6 +13152,14 @@ export const vi_VN: EnTranslations = {
         "name": "Da Mai",
         "description": "Giảm 60% sát thương phải chịu trong 8 giây, nhưng ngăn bạn tấn công khi còn hiệu lực."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Bẫy Hàm Băng",
         "description": "Đặt bẫy tại kẻ địch được chọn hoặc dưới chân bạn. Bẫy kích hoạt sau 0,75 giây và tồn tại 30 giây. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây."
@@ -14781,7 +14789,7 @@ export const vi_VN: EnTranslations = {
       },
       "revive_pet": {
         "name": "Băng Bó",
-        "description": "Băng bó cho thú cưng. Nếu còn sống, thú cưng hồi tổng cộng {overTime} máu trong 12 giây, mỗi 3 giây hồi một lần. Nếu đã chết, thú cưng được hồi sinh với 35% máu."
+        "description": "Hồi 10% máu tối đa cho bạn đồng hành còn sống mỗi giây trong 8 giây. Nếu bạn đồng hành đã chết, hồi sinh nó với 50% máu."
       }
     },
     "items": {

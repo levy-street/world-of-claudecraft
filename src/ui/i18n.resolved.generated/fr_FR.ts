@@ -13152,6 +13152,14 @@ export const fr_FR: EnTranslations = {
         "name": "Peau de carapace",
         "description": "Réduit les dégâts subis de 60% pendant 8 s, mais empêche d'attaquer tant que l'effet est actif."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Piège Mâchegivre",
         "description": "Pose un piège sur l'ennemi sélectionné ou à vos pieds. Il s'arme après 0,75 s et dure 30 s. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s."
@@ -14781,7 +14789,7 @@ export const fr_FR: EnTranslations = {
       },
       "revive_pet": {
         "name": "Rafistoler",
-        "description": "Rafistole votre familier et lui rend {overTime} points de vie en 12 s, par pulsations toutes les 3 s, s'il est vivant. S'il est mort, le ranime avec 35 % de ses points de vie."
+        "description": "Rend 10 % des points de vie maximum de votre compagnon vivant chaque seconde pendant 8 s. S'il est mort, le ranime avec 50 % de ses points de vie."
       }
     },
     "items": {

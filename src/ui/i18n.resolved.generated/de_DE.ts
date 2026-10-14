@@ -13152,6 +13152,14 @@ export const de_DE: EnTranslations = {
         "name": "Panzerhaut",
         "description": "Verringert erlittenen Schaden 8 Sek. lang um 60%, verhindert aber Angriffe, solange sie aktiv ist."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Frostkieferfalle",
         "description": "Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt."
@@ -14781,7 +14789,7 @@ export const de_DE: EnTranslations = {
       },
       "revive_pet": {
         "name": "Zusammenflicken",
-        "description": "Flickt deinen Begleiter zusammen und stellt ihm, solange er lebt, im Verlauf von 12 Sek. alle 3 Sek. insgesamt {overTime} Gesundheit wieder her. Ist er tot, wird er mit 35 % Gesundheit wiederbelebt."
+        "description": "Stellt deinem lebenden Begleiter 8 Sek. lang jede Sekunde 10 % seiner maximalen Gesundheit wieder her. Ist er tot, wird er stattdessen mit 50 % Gesundheit wiederbelebt."
       }
     },
     "items": {

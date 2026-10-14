@@ -313,6 +313,7 @@ const PCT_FIELDS = new Set([
   'focusGenerationPct',
   'damageReductionPct',
   'fallbackDamageReductionPct',
+  'noPetDamagePct',
   'petHealPct',
   'cooldownRefundPct',
   'petHealthFloorPct',
@@ -814,7 +815,7 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     expect(render('warrior', 'war_row_bloodbath')).toContain('25%');
     const survival = render('hunter', 'survival.mastery');
     expect(survival).toContain('Agility');
-    expect(survival).toContain('15%');
+    expect(survival).toContain('20%');
     // Balance pass: Quickblood is the evasive-skirmisher mastery now.
     expect(survival).toContain('dodge chance by 4%');
   });

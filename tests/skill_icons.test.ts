@@ -9,7 +9,7 @@ import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { PALADIN_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
-import { ABILITY_IMAGE_IDS, abilityImageUrl } from '../src/ui/icons';
+import { ABILITY_ART_PENDING, ABILITY_IMAGE_IDS, abilityImageUrl } from '../src/ui/icons';
 import { PALADIN_TALENT_IMAGE_IDS } from '../src/ui/talent_icons';
 
 // Gate for the committed WebP class ability icons. The art under
@@ -445,6 +445,13 @@ describe('class ability webp icons', () => {
     expect(abilityImageUrl('temporal_hourglass')).toBe('/ui/skills/mage/temporal_hourglass.webp');
   });
 
+  it('serves the accepted Fieldcraft paintings instead of pending procedural icons', () => {
+    for (const id of ['play_dead', 'tactical_camo']) {
+      expect(ABILITY_ART_PENDING.has(id), id).toBe(false);
+      expect(abilityImageUrl(id), id).toBe(`/ui/skills/hunter/${id}.webp`);
+    }
+  });
+
   it('image-backs every owned-class icon delivered by PR #2218 with recorded provenance', () => {
     for (const [cls, ids] of Object.entries(PR_2218_OWNED_CLASS_ICON_IDS)) {
       const mapping = JSON.parse(
@@ -472,6 +479,7 @@ describe('class ability webp icons', () => {
       for (const spec of specs) {
         const mods = computeTalentModifiers(cls, { ...emptyAllocation(), spec }, 20);
         for (const { def } of abilitiesKnownAt(cls, 20, mods)) {
+          if (ABILITY_ART_PENDING.has(def.id)) continue; // parked on its glyph
           if (!abilityImageUrl(def.id)) missing.push(`${cls}/${spec}/${def.id}`);
         }
       }

@@ -956,6 +956,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Bloodtrail Assault"
       },
       {
+        "id": "tactical_camo",
+        "name": "Tactical Camo"
+      },
+      {
+        "id": "play_dead",
+        "name": "Play Dead"
+      },
+      {
         "id": "volley",
         "name": "Volley"
       },

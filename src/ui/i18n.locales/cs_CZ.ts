@@ -10471,7 +10471,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Obklopí tebe i tvou skupinu svatou energií až do smrti nebo nahrazení. Nepřátelé, kteří na blízko zasáhnou zasaženého spojence, utrpí {buff} svatého poškození a zasažení spojenci způsobí automatickými útoky {buff} svatého poškození navíc.',
   'entities.abilities.retribution_aura.name': 'Aura odplaty',
   'entities.abilities.revive_pet.description':
-    'Ošetří tvého mazlíčka. Pokud žije, obnoví mu celkem {overTime} zdraví během 12 s v intervalech po 3 s. Pokud je mrtvý, oživí ho s 35 % zdraví.',
+    'Každou sekundu po dobu 8 s obnoví živému společníkovi 10 % jeho maximálního zdraví. Pokud je mrtvý, oživí ho místo toho s 50 % zdraví.',
   'entities.abilities.revive_pet.name': 'Ošetření',
   'entities.abilities.righteous_fury.description':
     'Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 30 %. Pouze Strážce víry.',

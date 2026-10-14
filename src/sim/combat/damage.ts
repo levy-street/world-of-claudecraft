@@ -111,12 +111,12 @@ import {
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
 import { clearFieldcraftState } from './hunter_fieldcraft';
+import { lonelySoulDamageMult, lonelySoulPetFloor } from './hunter_lonely_soul';
 import { clearPacklordState } from './hunter_packlord';
 import {
   breakEnduringCourserBurst,
   clearHunterTalentState,
   courserGuiseDazeOnDamage,
-  hasHunterTalent,
 } from './hunter_shared';
 import {
   clearOssuaryMarks,
@@ -507,6 +507,13 @@ export function dealDamage(
     if (form) amount = Math.round(amount * (1 + form.value / 100));
   }
 
+  // Lonely Soul (hunter choice row): a petless hunter deals 40% more damage.
+  // Source-output, so the alreadyFinal guard keeps a redirect share clean.
+  if (!alreadyFinal && source && source.id !== target.id && amount > 0) {
+    const lonely = lonelySoulDamageMult(ctx, source);
+    if (lonely !== 1) amount = Math.round(amount * lonely);
+  }
+
   // Warded (mage choice row): the wearer takes barrierDrPct less damage while
   // their own personal barrier (an ice_barrier absorb aura) is up. Checked
   // target-side BEFORE absorb shields soak, so the cut stretches the barrier it
@@ -676,12 +683,8 @@ export function dealDamage(
     }
     const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
     const pet = share > 0 ? ctx.petOf(target.id) : null;
-    const beastguard = !!meta && hasHunterTalent(meta, 'hun_r8_beastguard');
-    if (beastguard && (!pet || pet.dead) && target.hp < target.maxHp * 0.5) {
-      amount = Math.round(amount * 0.92);
-    }
     if (pet && !pet.dead) {
-      const petFloor = beastguard ? Math.ceil(pet.maxHp * 0.2) : 0;
+      const petFloor = lonelySoulPetFloor(ctx, target, pet);
       const redirected = Math.min(
         amount,
         Math.round(amount * share),

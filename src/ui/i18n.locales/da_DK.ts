@@ -7913,7 +7913,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Omgiver dig og din gruppe med hellig energi indtil død eller udskiftning. Fjender, der rammer en påvirket allieret i nærkamp, tager {buff} Hellig skade, og påvirkede allierede giver {buff} ekstra Hellig skade med automatiske angreb.',
   'entities.abilities.retribution_aura.name': 'Gengældelsens Aura',
   'entities.abilities.revive_pet.description':
-    'Lapper dit kæledyr sammen. Hvis det lever, genopretter det i alt {overTime} helbred over 12 sek. med helbredelse hvert 3. sek. Hvis det er dødt, genopliver det med 35 % helbred.',
+    'Genopretter 10 % af din levende ledsagers maksimale helbred hvert sekund i 8 sek. Hvis din ledsager er død, genoplives den i stedet med 50 % helbred.',
   'entities.abilities.revive_pet.name': 'Lappe sammen',
   'entities.abilities.righteous_fury.description':
     'Øger passivt den trussel, jeres Hellige skade skaber, med 30%. Kun Trosvogter.',

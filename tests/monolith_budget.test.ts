@@ -537,7 +537,9 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // Lowered at the Fieldcraft rework: the target-frame health-text override
+    // moved into target_frame_descriptor.ts (fillTargetHealthText). wc -l.
+    ceiling: 18091,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1689,7 +1691,9 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // Lowered at the Fieldcraft rework: the party member vitals moved into
+    // party_frame_info.ts (partyFrameVitals, shared with collectPartyInfo). wc -l.
+    ceiling: 9839,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

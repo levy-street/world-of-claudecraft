@@ -58,6 +58,7 @@ import { druidEngineOnBleedTick } from './druid_engines';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { consumeHealAbsorb } from './heal';
 import { isColdsightInternalMarkerAuraId } from './hunter_coldsight_read';
+import { hunterFocusRegenMult } from './hunter_fieldcraft';
 import {
   detonateOssuaryMark,
   OSSUARY_MARK_ABILITY_ID,
@@ -141,8 +142,9 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
     for (const a of p.auras) if (a.kind === 'buff_energyregen') regen *= 1 + a.value;
     p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
   } else if (p.resourceType === 'focus') {
-    // Hunter Focus returns at 5 per second on the classic two-second tick.
-    p.resource = Math.min(p.maxResource, p.resource + 10);
+    // Hunter Focus returns at 5 per second on the classic two-second tick
+    // (doubled by a petless Bloodtrail Assault, combat/hunter_fieldcraft.ts).
+    p.resource = Math.min(p.maxResource, p.resource + 10 * hunterFocusRegenMult(ctx, p));
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }

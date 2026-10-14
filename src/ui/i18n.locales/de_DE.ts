@@ -9681,7 +9681,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': 'Schinden',
   'entities.abilities.revive_pet.name': 'Zusammenflicken',
   'entities.abilities.revive_pet.description':
-    'Flickt deinen Begleiter zusammen und stellt ihm, solange er lebt, im Verlauf von 12 Sek. alle 3 Sek. insgesamt {overTime} Gesundheit wieder her. Ist er tot, wird er mit 35 % Gesundheit wiederbelebt.',
+    'Stellt deinem lebenden Begleiter 8 Sek. lang jede Sekunde 10 % seiner maximalen Gesundheit wieder her. Ist er tot, wird er stattdessen mit 50 % Gesundheit wiederbelebt.',
   'entities.abilities.holy_shock.description':
     'Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)',
   'entities.abilities.holy_shield.name': 'Heiliger Schild',

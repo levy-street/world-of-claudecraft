@@ -13152,6 +13152,14 @@ export const nl_NL: EnTranslations = {
         "name": "Schildhuid",
         "description": "Vermindert de opgelopen schade 8 sec. lang met 60%, maar verhindert aanvallen zolang ze actief is."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Vorstkaakval",
         "description": "Plaatst een val bij de gekozen vijand of aan je voeten. Hij scherpt na 0,75 sec. en duurt 30 sec. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd."
@@ -14781,7 +14789,7 @@ export const nl_NL: EnTranslations = {
       },
       "revive_pet": {
         "name": "Oplappen",
-        "description": "Lapt je huisdier op. Als het leeft, herstelt het in totaal {overTime} gezondheid gedurende 12 sec., met elke 3 sec. een tik. Als het dood is, wordt het met 35% gezondheid tot leven gewekt."
+        "description": "Herstelt gedurende 8 sec. elke seconde 10% van de maximale gezondheid van je levende metgezel. Als je metgezel dood is, wordt hij in plaats daarvan met 50% gezondheid herrezen."
       }
     },
     "items": {

@@ -5116,7 +5116,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '撕裂敵人，造成武器傷害外加 {damage} 點，並造成持續 18 秒的流血傷害。給予 1 點連擊點。僅限貓形態。',
   'entities.abilities.revive_pet.name': '修補',
   'entities.abilities.revive_pet.description':
-    '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。',
+    '在 8 秒內每秒為存活的寵物恢復其最大生命值的 10%。若寵物已死亡，則改為以 50% 生命值將其復活。',
+  'entities.abilities.tactical_camo.name': '戰術偽裝',
+  'entities.abilities.tactical_camo.description':
+    '融入周圍環境：敵人幾乎察覺不到你，你以 80% 的速度移動。攻擊或受到傷害會打破戰術偽裝。再次施放即可解除。（野戰技藝）',
+  'entities.abilities.play_dead.name': '裝死',
+  'entities.abilities.play_dead.description':
+    '倒地裝死：所有人看到你的生命值和集中值都為空。敵人會遺忘你，正以你為目標的敵方玩家會失去目標。移動、攻擊或使用其他技能都會結束裝死。再次施放即可起身。',
   'entities.abilities.holy_shock.name': '聖光震顫',
   'entities.abilities.holy_shock.description':
     '以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）',

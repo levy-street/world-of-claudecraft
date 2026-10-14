@@ -13152,6 +13152,14 @@ export const pt_BR: EnTranslations = {
         "name": "Pele de Casco",
         "description": "Reduz o dano sofrido em 60% por 8 s, mas impede ataques enquanto está ativa."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Armadilha Presa Gélida",
         "description": "Posiciona uma armadilha no inimigo selecionado ou aos seus pés. Ela arma após 0,75 s e dura 30 s. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s."
@@ -14781,7 +14789,7 @@ export const pt_BR: EnTranslations = {
       },
       "revive_pet": {
         "name": "Remendar",
-        "description": "Remenda seu mascote, restaurando {overTime} de vida ao longo de 12 s em pulsos a cada 3 s se ele estiver vivo. Se estiver morto, revive-o com 35% da vida."
+        "description": "Restaura 10% da vida máxima do seu companheiro vivo a cada segundo durante 8 s. Se ele estiver morto, revive-o com 50% da vida."
       }
     },
     "items": {

@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { friendlyNameplatesShown } from '../game/nameplate_view_prefs';
 import { isOwnAura } from '../sim/aura_classify';
+import { isPlayingDead } from '../sim/combat/hunter_play_dead';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
@@ -65,6 +66,11 @@ import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 import { WorldQuestTraceLabels } from './world_quest_trace_labels';
+
+/** Dead for display: really dead, or a hunter playing dead (feign death). */
+function shownDead(entity: Entity): boolean {
+  return entity.dead || isPlayingDead(entity);
+}
 
 const NAMEPLATE_LEVEL_NUMBER_OPTIONS = { maximumFractionDigits: 0 } as const;
 // The dot countdown's two shapes, hoisted for the same reason the level options
@@ -348,7 +354,10 @@ export class NameplatePainter {
       // The /pvp flag is the one content input read every pass: a flip
       // re-resolves the row THIS frame (state.pvpFlag), never on the tier cadence.
       const pvpFlipped = state.pvpFlag !== (entity.pvpFlag === true);
-      if (!state.initialized || fullPass || plan.urgent || languageChanged || pvpFlipped) {
+      // Play Dead (hunter feign death) hides a player's bar the frame it lands.
+      const feignFlipped = entity.kind === 'player' && state.hpVisible === shownDead(entity);
+      const flipped = pvpFlipped || feignFlipped;
+      if (!state.initialized || fullPass || plan.urgent || languageChanged || flipped) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
       }
 
@@ -518,11 +527,12 @@ export class NameplatePainter {
     // dead-enemy arm below already trusts).
     state.hostile = entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity));
     state.deadEnemy =
-      entity.dead && (entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity)));
+      shownDead(entity) &&
+      (entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity)));
     state.myPet = entity.ownerId === player.id;
     state.threat = plan.threat;
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
-    state.hpFill = entity.hp / Math.max(1, entity.maxHp);
+    state.hpFill = isPlayingDead(entity) ? 0 : entity.hp / Math.max(1, entity.maxHp);
     this.resolveDots(state, entity, player);
 
     const cast = castBarState(entity);
@@ -633,7 +643,7 @@ export class NameplatePainter {
       if (entity.guild) state.guildLabel = `<${entity.guild}>`;
       else if (entity.pledgeGuild)
         state.guildLabel = t('hudChrome.nameplate.pledgeTag', { guild: entity.pledgeGuild });
-      state.hpVisible = !entity.dead;
+      state.hpVisible = !shownDead(entity);
       state.title = entity.title ? deedTitleText(entity.title) : '';
       state.border = deedBorderSlug(entity.border);
       state.aiLabel = entity.aiAccount === true ? t('hudChrome.playerMenu.aiTag') : '';

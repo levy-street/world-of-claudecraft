@@ -8103,7 +8103,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Bao bọc bạn và nhóm của bạn trong năng lượng thánh cho đến khi chết hoặc bị thay thế. Kẻ địch đánh cận chiến một đồng minh chịu ảnh hưởng sẽ nhận {buff} sát thương Thánh, và đồng minh chịu ảnh hưởng gây thêm {buff} sát thương Thánh bằng đòn đánh tự động.',
   'entities.abilities.retribution_aura.name': 'Hào Quang Báo Đền',
   'entities.abilities.revive_pet.description':
-    'Băng bó cho thú cưng. Nếu còn sống, thú cưng hồi tổng cộng {overTime} máu trong 12 giây, mỗi 3 giây hồi một lần. Nếu đã chết, thú cưng được hồi sinh với 35% máu.',
+    'Hồi 10% máu tối đa cho bạn đồng hành còn sống mỗi giây trong 8 giây. Nếu bạn đồng hành đã chết, hồi sinh nó với 50% máu.',
   'entities.abilities.revive_pet.name': 'Băng Bó',
   'entities.abilities.righteous_fury.description':
     'Bị động tăng 30% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin.',

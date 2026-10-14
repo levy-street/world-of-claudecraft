@@ -13152,6 +13152,14 @@ export const tr_TR: EnTranslations = {
         "name": "Kabuk Deri",
         "description": "Alınan hasarı 8 sn boyunca 60% azaltır, ancak etkinken saldırmayı engeller."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Buzçene Tuzağı",
         "description": "Seçili düşmana veya ayaklarının dibine bir tuzak yerleştirir. 0,75 sn sonra kurulur ve 30 sn sürer. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar."
@@ -14781,7 +14789,7 @@ export const tr_TR: EnTranslations = {
       },
       "revive_pet": {
         "name": "Yarasını Sar",
-        "description": "Evcilinin yaralarını sarar. Yaşıyorsa 12 saniye boyunca her 3 saniyede bir iyileştirerek toplam {overTime} can yeniler. Ölüyse %35 canla diriltir."
+        "description": "Yaşayan yoldaşının azami canının %10'unu 8 sn boyunca her saniye yeniler. Yoldaşın ölüyse, bunun yerine onu %50 canla diriltir."
       }
     },
     "items": {

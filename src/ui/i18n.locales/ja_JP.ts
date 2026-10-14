@@ -5336,7 +5336,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵を切り裂いて武器ダメージに{damage}を加え、18秒間の出血ダメージを与えます。コンボポイントを1与えます。猫の姿専用。',
   'entities.abilities.revive_pet.name': '応急処置',
   'entities.abilities.revive_pet.description':
-    'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
+    '生存しているペットの最大体力の10%を8秒間、毎秒回復する。ペットが死亡している場合は、代わりに体力50%で蘇生する。',
+  'entities.abilities.tactical_camo.name': '戦術迷彩',
+  'entities.abilities.tactical_camo.description':
+    '周囲に溶け込む。敵にほとんど気づかれず、移動速度は80%になる。攻撃するかダメージを受けると戦術迷彩は解除される。再使用で解除する。（野戦術）',
+  'entities.abilities.play_dead.name': '死んだふり',
+  'entities.abilities.play_dead.description':
+    '地面に倒れて死んだふりをする。体力と集中値は全員に空として表示される。敵はあなたを忘れ、あなたをターゲットしている敵プレイヤーはターゲットを失う。移動、攻撃、または他のアビリティの使用で終了する。再使用で起き上がる。',
   'entities.abilities.holy_shock.name': 'ライトジョルト',
   'entities.abilities.holy_shock.description':
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',

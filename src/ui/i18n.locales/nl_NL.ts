@@ -8203,7 +8203,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Omhult jou en je groep met heilige energie tot de dood of vervanging. Vijanden die een beïnvloede bondgenoot in melee raken, krijgen {buff} Heilige schade, en beïnvloede bondgenoten doen {buff} extra Heilige schade met automatische aanvallen.',
   'entities.abilities.retribution_aura.name': 'Aura van Vergelding',
   'entities.abilities.revive_pet.description':
-    'Lapt je huisdier op. Als het leeft, herstelt het in totaal {overTime} gezondheid gedurende 12 sec., met elke 3 sec. een tik. Als het dood is, wordt het met 35% gezondheid tot leven gewekt.',
+    'Herstelt gedurende 8 sec. elke seconde 10% van de maximale gezondheid van je levende metgezel. Als je metgezel dood is, wordt hij in plaats daarvan met 50% gezondheid herrezen.',
   'entities.abilities.revive_pet.name': 'Oplappen',
   'entities.abilities.righteous_fury.description':
     'Verhoogt passief de dreiging die uw Heilige schade opwekt met 30%. Alleen Geloofswachter.',

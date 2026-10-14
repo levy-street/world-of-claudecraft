@@ -3985,7 +3985,7 @@ const mergeExtraEn = {
     [
       'revive_pet',
       'Patch Up',
-      'Patch up your companion, restoring {overTime} health over 12 sec in 3-sec ticks while it is alive. If it is dead, revive it at 35% health.',
+      "Restore 10% of your living companion's maximum health every sec for 8 sec. If your companion is dead, revive it with 50% health instead.",
     ],
   ]),
   items: {
@@ -4138,7 +4138,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Remendar',
-        'Remienda a tu mascota y restaura {overTime} de salud durante 12 s en pulsos cada 3 s mientras esté viva. Si está muerta, la revive con un 35% de salud.',
+        'Restaura el 10% de la salud máxima de tu compañero vivo cada segundo durante 8 s. Si tu compañero está muerto, lo revive con un 50% de salud.',
       ],
     ]),
     items: {
@@ -4294,7 +4294,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Rafistoler',
-        "Rafistole votre familier et lui rend {overTime} points de vie en 12 s, par pulsations toutes les 3 s, s'il est vivant. S'il est mort, le ranime avec 35 % de ses points de vie.",
+        "Rend 10 % des points de vie maximum de votre compagnon vivant chaque seconde pendant 8 s. S'il est mort, le ranime avec 50 % de ses points de vie.",
       ],
     ]),
     items: {
@@ -4446,7 +4446,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Rattoppare',
-        'Rattoppa il tuo famiglio, ripristinando {overTime} salute in 12 sec con impulsi ogni 3 sec se è vivo. Se è morto, lo rianima con il 35% della salute.',
+        'Ripristina il 10% della salute massima del tuo compagno vivo ogni secondo per 8 sec. Se è morto, lo rianima con il 50% della salute.',
       ],
     ]),
     items: mergeNameTranslations(
@@ -4585,7 +4585,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Zusammenflicken',
-        'Flickt deinen Begleiter zusammen und stellt ihm, solange er lebt, im Verlauf von 12 Sek. alle 3 Sek. insgesamt {overTime} Gesundheit wieder her. Ist er tot, wird er mit 35 % Gesundheit wiederbelebt.',
+        'Stellt deinem lebenden Begleiter 8 Sek. lang jede Sekunde 10 % seiner maximalen Gesundheit wieder her. Ist er tot, wird er stattdessen mit 50 % Gesundheit wiederbelebt.',
       ],
     ]),
     items: mergeNameTranslations(
@@ -4720,7 +4720,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         '修补',
-        '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
+        '在8秒内每秒为存活的宠物恢复其最大生命值的10%。若宠物已死亡，则改为以50%生命值将其复活。',
       ],
     ]),
     items: mergeNameTranslations(
@@ -4852,7 +4852,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         '修補',
-        '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。',
+        '在 8 秒內每秒為存活的寵物恢復其最大生命值的 10%。若寵物已死亡，則改為以 50% 生命值將其復活。',
       ],
     ]),
     items: mergeNameTranslations(
@@ -4984,7 +4984,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         '응급 처치',
-        '소환수를 응급 처치합니다. 살아 있으면 12초에 걸쳐 3초마다 생명력을 회복해 총 {overTime}의 생명력을 회복합니다. 죽어 있으면 35%의 생명력으로 되살립니다.',
+        '8초 동안 매초 살아 있는 소환수의 최대 생명력의 10%를 회복합니다. 소환수가 죽어 있으면 대신 50%의 생명력으로 되살립니다.',
       ],
     ]),
     items: mergeNameTranslations(
@@ -5117,7 +5117,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         '応急処置',
-        'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
+        '生存しているペットの最大体力の10%を8秒間、毎秒回復する。ペットが死亡している場合は、代わりに体力50%で蘇生する。',
       ],
     ]),
     items: mergeNameTranslations(
@@ -5254,7 +5254,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Remendar',
-        'Remenda seu mascote, restaurando {overTime} de vida ao longo de 12 s em pulsos a cada 3 s se ele estiver vivo. Se estiver morto, revive-o com 35% da vida.',
+        'Restaura 10% da vida máxima do seu companheiro vivo a cada segundo durante 8 s. Se ele estiver morto, revive-o com 50% da vida.',
       ],
     ]),
     items: mergeNameTranslations(
@@ -5391,7 +5391,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Подлатать',
-        'Подлечивает питомца: если он жив, восстанавливает ему {overTime} ед. здоровья за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
+        'Каждую секунду в течение 8 сек. восстанавливает живому питомцу 10% максимального запаса здоровья. Если питомец мёртв, вместо этого воскрешает его с 50% здоровья.',
       ],
     ]),
     items: mergeNameTranslations(

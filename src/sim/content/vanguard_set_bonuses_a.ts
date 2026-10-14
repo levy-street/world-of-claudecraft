@@ -66,7 +66,7 @@ export const VANGUARD_MM_2PC_TRAILBREAK_COOLDOWN_CUT_SEC = 4;
 export const VANGUARD_MM_4PC_INSTANT_WINDOW_SEC = 6;
 /** Marksmanship 4pc: the internal cooldown between instant Long Draw grants. */
 export const VANGUARD_MM_4PC_ICD_SEC = 15;
-/** Survival 2pc: Bloodhook cooldown cut in seconds (15 to 12). */
+/** Survival 2pc: Bloodhook cooldown cut in seconds (10 to 7). */
 export const VANGUARD_SURVIVAL_2PC_BLOODHOOK_COOLDOWN_CUT_SEC = 3;
 /** Survival 4pc: Hunting Momentum stacks a landed Bloodhook grants (cap 3 untouched). */
 export const VANGUARD_SURVIVAL_4PC_MOMENTUM_STACKS = 1;
@@ -388,7 +388,7 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_hunter_survival: [
     {
       pieces: 2,
-      // Bloodhook 15 -> 12 sec on the resolved entry.
+      // Bloodhook 10 -> 7 sec on the resolved entry.
       effect: {
         ability: [
           { ability: 'bloodhook', cooldownFlat: -VANGUARD_SURVIVAL_2PC_BLOODHOOK_COOLDOWN_CUT_SEC },

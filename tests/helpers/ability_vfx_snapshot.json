@@ -888,6 +888,10 @@
       "spec": "b0e17955aafe6a950cc7899693d0788bc8825af64225a9f0b22d928a458c120f",
       "full": "a1832578c80b0214cb6222cb9372f8b0a197d75dce7041904cfbc14e7b83d691"
     },
+    "play_dead": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
     "polymorph": {
       "spec": "f61739cdd7d641013b12e38044304eeb9389fbb0729e0ef35e13c6f79005a3f0",
       "full": "02ba8af2c98ece29929f030bd591e32849962a6a5af5a50bea2858d7c68a4133"
@@ -1267,6 +1271,10 @@
     "swipe": {
       "spec": "f82610e2d04f0a2599d5fde839f16ee1c8205cdc24f7ae28208d79303bf20a12",
       "full": "89146e5558a58d43a056a6562bc7698cdaf31a439db2ee0787db9e59dcd24f61"
+    },
+    "tactical_camo": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "tame_beast": {
       "spec": "70782e8dbd497dfddc2afd870cbbe4d8883d170c14cce5cb7df592ffe57f104b",

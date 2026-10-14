@@ -5114,7 +5114,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限豹形态。',
   'entities.abilities.revive_pet.name': '修补',
   'entities.abilities.revive_pet.description':
-    '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
+    '在8秒内每秒为存活的宠物恢复其最大生命值的10%。若宠物已死亡，则改为以50%生命值将其复活。',
+  'entities.abilities.tactical_camo.name': '战术伪装',
+  'entities.abilities.tactical_camo.description':
+    '融入周围环境：敌人几乎察觉不到你，你以80%的速度移动。攻击或受到伤害会打破战术伪装。再次施放即可解除。（野战技艺）',
+  'entities.abilities.play_dead.name': '装死',
+  'entities.abilities.play_dead.description':
+    '倒地装死：所有人看到你的生命值和集中值都为空。敌人会遗忘你，正以你为目标的敌方玩家会失去目标。移动、攻击或使用其他技能都会结束装死。再次施放即可起身。',
   'entities.abilities.holy_shock.name': '圣光震颤',
   'entities.abilities.holy_shock.description':
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',

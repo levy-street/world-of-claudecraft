@@ -13152,6 +13152,14 @@ export const id_ID: EnTranslations = {
         "name": "Kulit Cangkang",
         "description": "Mengurangi kerusakan yang diterima 60% selama 8 dtk, tetapi mencegah serangan selama aktif."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Jerat Rahang Beku",
         "description": "Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk."
@@ -14781,7 +14789,7 @@ export const id_ID: EnTranslations = {
       },
       "revive_pet": {
         "name": "Obati",
-        "description": "Mengobati peliharaanmu. Jika masih hidup, memulihkan total {overTime} kesehatan selama 12 detik dengan pemulihan setiap 3 detik. Jika mati, menghidupkannya kembali dengan 35% kesehatan."
+        "description": "Memulihkan 10% nyawa maksimum pendampingmu yang hidup setiap detik selama 8 dtk. Jika pendampingmu mati, hidupkan kembali dengan 50% nyawa."
       }
     },
     "items": {

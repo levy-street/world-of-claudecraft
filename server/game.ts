@@ -51,6 +51,7 @@ import {
   partyFrameAggroTargets,
   partyFrameIncomingHeals,
   partyFrameRole,
+  partyFrameVitals,
 } from '../src/sim/party_frame_info';
 import { cleanPetName } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
@@ -8876,14 +8877,12 @@ export class GameServer {
             name: meta.name,
             cls: meta.cls,
             level: e.level,
-            hp: e.hp,
+            ...partyFrameVitals(e),
             mhp: e.maxHp,
-            res: Math.round(e.resource),
             mres: e.maxResource,
             rtype: e.resourceType,
             x: round2(pos.x),
             z: round2(pos.z),
-            dead: e.dead ? 1 : 0,
             inCombat: e.inCombat ? 1 : 0,
             group: party.raidGroups.get(mPid) ?? 1,
             absorb: partyFrameAbsorb(e.auras),

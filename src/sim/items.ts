@@ -1,3 +1,4 @@
+import { endPlayDead } from './combat/hunter_play_dead';
 import { gliderActionsLocked } from './glider_action_lock';
 import { shadowActionsLocked } from './shadow_action_lock';
 import { useCartographersInk, useTreasureMap } from './treasure_vault';
@@ -843,6 +844,8 @@ export function useItem(
 ): ItemUseResult | undefined {
   const r = ctx.resolve(pid);
   if (!r) return;
+  // Using an item is acting: a hunter playing dead stands up first.
+  endPlayDead(ctx, r.e);
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
   if (

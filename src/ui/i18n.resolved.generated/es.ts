@@ -13152,6 +13152,14 @@ export const es: EnTranslations = {
         "name": "Piel de Caparazón",
         "description": "Reduce el daño recibido un 60% durante 8 s, pero impide atacar mientras está activa."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Trampa Fauces de Escarcha",
         "description": "Coloca una trampa en el enemigo seleccionado o a tus pies. Se arma tras 0,75 s y dura 30 s. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s."
@@ -14781,7 +14789,7 @@ export const es: EnTranslations = {
       },
       "revive_pet": {
         "name": "Remendar",
-        "description": "Remienda a tu mascota y restaura {overTime} de salud durante 12 s en pulsos cada 3 s mientras esté viva. Si está muerta, la revive con un 35% de salud."
+        "description": "Restaura el 10% de la salud máxima de tu compañero vivo cada segundo durante 8 s. Si tu compañero está muerto, lo revive con un 50% de salud."
       }
     },
     "items": {

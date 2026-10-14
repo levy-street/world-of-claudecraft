@@ -25,6 +25,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'aspect_of_the_monkey',
       'aspect_of_the_cheetah',
       'revive_pet',
+      'play_dead',
     ],
     marksmanship: [
       'measured_shot',
@@ -45,6 +46,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'aspect_of_the_monkey',
       'aspect_of_the_cheetah',
       'revive_pet',
+      'play_dead',
     ],
     survival: [
       'bloodhook',
@@ -56,6 +58,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'trailbreak',
       'wildheart',
       'shellskin',
+      'tactical_camo',
       'frostjaw_trap',
       'wing_clip',
       'concussive_shot',
@@ -65,6 +68,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'aspect_of_the_monkey',
       'aspect_of_the_cheetah',
       'revive_pet',
+      'play_dead',
     ],
   },
   shaman: {

@@ -9653,7 +9653,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': 'Scarnificare',
   'entities.abilities.revive_pet.name': 'Rattoppare',
   'entities.abilities.revive_pet.description':
-    'Rattoppa il tuo famiglio, ripristinando {overTime} salute in 12 sec con impulsi ogni 3 sec se è vivo. Se è morto, lo rianima con il 35% della salute.',
+    'Ripristina il 10% della salute massima del tuo compagno vivo ogni secondo per 8 sec. Se è morto, lo rianima con il 50% della salute.',
   'entities.abilities.holy_shock.description':
     'Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)',
   'entities.abilities.holy_shield.name': 'Scudo Sacro',

@@ -9569,7 +9569,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': 'Esfolar',
   'entities.abilities.revive_pet.name': 'Remendar',
   'entities.abilities.revive_pet.description':
-    'Remenda seu mascote, restaurando {overTime} de vida ao longo de 12 s em pulsos a cada 3 s se ele estiver vivo. Se estiver morto, revive-o com 35% da vida.',
+    'Restaura 10% da vida máxima do seu companheiro vivo a cada segundo durante 8 s. Se ele estiver morto, revive-o com 50% da vida.',
   'entities.abilities.holy_shock.description':
     'Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)',
   'entities.abilities.holy_shield.name': 'Escudo Sagrado',

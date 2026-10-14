@@ -13152,6 +13152,14 @@ export const cs_CZ: EnTranslations = {
         "name": "Krunýřová kůže",
         "description": "Snižuje utrpěné poškození o 60% na 8 s, ale zabraňuje útokům, dokud je aktivní."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Past mrazivé čelisti",
         "description": "Umísti past k vybranému nepříteli nebo ke svým nohám. Aktivuje se po 0,75 s a trvá 30 s. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s."
@@ -14781,7 +14789,7 @@ export const cs_CZ: EnTranslations = {
       },
       "revive_pet": {
         "name": "Ošetření",
-        "description": "Ošetří tvého mazlíčka. Pokud žije, obnoví mu celkem {overTime} zdraví během 12 s v intervalech po 3 s. Pokud je mrtvý, oživí ho s 35 % zdraví."
+        "description": "Každou sekundu po dobu 8 s obnoví živému společníkovi 10 % jeho maximálního zdraví. Pokud je mrtvý, oživí ho místo toho s 50 % zdraví."
       }
     },
     "items": {

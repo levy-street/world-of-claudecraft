@@ -124,6 +124,7 @@ import { advanceHeroicLeap, heroicLeapPlacementPreview } from './combat/heroic_l
 import { clearFieldcraftState } from './combat/hunter_fieldcraft';
 import { clearPacklordState } from './combat/hunter_packlord';
 import { clearHunterTalentState, hunterPetDamageMultiplier } from './combat/hunter_shared';
+import { updateHunterTick } from './combat/hunter_tick';
 import { tickNaturesFury } from './combat/natures_fury';
 import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import { tryGrantSolarReprisal } from './combat/paladin_solar_reprisal';
@@ -831,7 +832,7 @@ import * as readyCheckMod from './social/ready_check';
 import { SpatialGrid } from './spatial';
 import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
 import { Targeting } from './targeting';
-import { addThreat, TAUNT_FORCE_SECONDS, topThreatValue } from './threat';
+import { addThreat, isFeigningDeath, TAUNT_FORCE_SECONDS, topThreatValue } from './threat';
 import {
   type AbilityDef,
   type AbilityEffect,
@@ -6094,6 +6095,7 @@ export class Sim {
         p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
         updatePaladinDevotion(p, DT, this.playerMods(meta).global.paladinSacredReserve > 0);
         druidEngineCombatState(this.ctx, p);
+        updateHunterTick(this.ctx, p);
       }
     }
     lap?.('engaged');
@@ -7526,7 +7528,7 @@ export class Sim {
     // [dev] /dev noaggro: a designer positioning mobs is invisible to autonomous
     // pulls, so the pack stays exactly where it spawned. The single aggro choke
     // point, so this covers proximity, social, and retaliation pulls alike.
-    if (target.kind === 'player' && target.devNoAggro) return false;
+    if (target.kind === 'player' && (target.devNoAggro || isFeigningDeath(target))) return false;
     // [dev] /dev freezemobs: a frozen world acquires no aggro either (the AI
     // update skip alone would still let a proximity sweep seed a hate table).
     if (this.devMobsFrozen) return false;

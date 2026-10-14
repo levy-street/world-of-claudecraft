@@ -113,10 +113,11 @@ const HUNTER_SPECS: SpecDef[] = [
     'A melee-first skirmisher who tears one wound and controls re-entry.',
     'bloodhook',
     // Balance pass: was +15% Agility / +15% physical damage, a straight Iron
-    // Aim rival with no niche. Now the evasive-skirmisher identity.
+    // Aim rival with no niche. Now the evasive-skirmisher identity (Agility
+    // raised 15% to 20% in the Fieldcraft rework).
     'Quickblood',
-    'Increases your Agility by 15% and your dodge chance by 4%.',
-    { stats: { agiPct: 0.15, dodge: 0.04 } },
+    'Increases your Agility by 20% and your dodge chance by 4%.',
+    { stats: { agiPct: 0.2, dodge: 0.04 } },
   ),
 ];
 

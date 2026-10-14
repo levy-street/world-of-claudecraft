@@ -8020,7 +8020,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Seni ve grubunu ölüme ya da değiştirilene kadar kutsal enerjiyle sarar. Etkilenen bir müttefike yakın dövüşte vuran düşmanlar {buff} Kutsal hasar alır ve etkilenen müttefikler otomatik saldırılarıyla {buff} ek Kutsal hasar verir.',
   'entities.abilities.retribution_aura.name': 'Karşılık Aurası',
   'entities.abilities.revive_pet.description':
-    'Evcilinin yaralarını sarar. Yaşıyorsa 12 saniye boyunca her 3 saniyede bir iyileştirerek toplam {overTime} can yeniler. Ölüyse %35 canla diriltir.',
+    "Yaşayan yoldaşının azami canının %10'unu 8 sn boyunca her saniye yeniler. Yoldaşın ölüyse, bunun yerine onu %50 canla diriltir.",
   'entities.abilities.revive_pet.name': 'Yarasını Sar',
   'entities.abilities.righteous_fury.description':
     'Kutsal hasarının ürettiği tehdidi pasif olarak %30 artırır. Yalnızca İnanç muhafızı.',

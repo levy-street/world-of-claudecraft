@@ -13130,19 +13130,19 @@ export const en: EnTranslations = {
       },
       "bloodhook": {
         "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. On arrival, slow the target by 30% for 3 sec. (Fieldcraft signature)"
       },
       "shrapnel_charge": {
         "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "description": "Blast a 10-yard cone in front of you. Your target, or the nearest enemy hit if your target is outside the cone, takes 24 to 30 Physical damage. Every other enemy in the cone takes 7 to 9 and bleeds for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Hitting an enemy grants 1 Hunting Momentum. Direct damage increases with Ranged Attack Power."
       },
       "bloodtrail_assault": {
         "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards of radius, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge reaches 2 yards farther, deals 25% more base damage to its main target, and triggers 50% more wound damage. While you have no living pet, your Focus also regenerates 100% faster."
       },
       "trailbreak": {
         "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "description": "Leap 12 yards backward. Landing grants 50% movement speed for 3 sec. If you have Hunting Momentum, arm Re-entry for 12 sec."
       },
       "wildheart": {
         "name": "Wildheart",
@@ -13151,6 +13151,14 @@ export const en: EnTranslations = {
       "shellskin": {
         "name": "Shellskin",
         "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+      },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
       },
       "frostjaw_trap": {
         "name": "Frostjaw Trap",
@@ -13693,11 +13701,11 @@ export const en: EnTranslations = {
       },
       "hunting_momentum": {
         "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "description": "Passive: Gutting Strike and a Shrapnel Charge that hits an enemy each grant 1 Hunting Momentum, up to 3. Momentum lasts until spent or until you leave combat, and each stack increases your movement speed by 15%. At 3 stacks, Woundrend deals 60% more strike damage and consumes the stacks. (Fieldcraft)"
       },
       "fieldcraft_reentry": {
         "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "description": "Passive: With Hunting Momentum, Trailbreak arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
       },
       "wing_clip": {
         "name": "Fettering Slash",
@@ -14781,7 +14789,7 @@ export const en: EnTranslations = {
       },
       "revive_pet": {
         "name": "Patch Up",
-        "description": "Patch up your companion, restoring {overTime} health over 12 sec in 3-sec ticks while it is alive. If it is dead, revive it at 35% health."
+        "description": "Restore 10% of your living companion's maximum health every sec for 8 sec. If your companion is dead, revive it with 50% health instead."
       }
     },
     "items": {

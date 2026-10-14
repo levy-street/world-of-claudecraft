@@ -129,7 +129,7 @@ describe('spec masteries', () => {
     });
     // Balance pass: Quickblood is the evasive-skirmisher mastery.
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'survival')?.mastery.effect).toEqual({
-      stats: { agiPct: 0.15, dodge: 0.04 },
+      stats: { agiPct: 0.2, dodge: 0.04 },
     });
     // Mage rework: the 'arcane' internal id is now the Chronomancy healer (Chronoweave
     // mastery), so its effect boosts healing/mana, not spell damage.
@@ -495,7 +495,7 @@ describe('spec masteries', () => {
       hunter: {
         beast_mastery: { global: 'petDmgPct', value: 0.25 },
         marksmanship: { global: 'meleeDmgPct', value: 0.12 },
-        survival: { stat: 'agiPct', value: 0.15 },
+        survival: { stat: 'agiPct', value: 0.2 },
       },
       mage: {
         // Mage rework: arcane is the Chronomancy healer (healing axis), fire is Ignition.

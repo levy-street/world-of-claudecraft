@@ -164,6 +164,7 @@ import {
   runStampede,
   runUnleashBeast,
 } from './hunter_packlord';
+import { startPlayDead } from './hunter_play_dead';
 import {
   activateHunterMajorWindow,
   cripplingPursuit,
@@ -315,7 +316,7 @@ function dropsCombatOnStealth(ability: AbilityDef): boolean {
  * return the extra ids the live-target sweep must clear. Ordinary stealth uses
  * only that live-target sweep, so it never becomes a full threat dump.
  */
-function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): readonly number[] {
+export function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): readonly number[] {
   p.combatTimer = 5;
   p.inCombat = false;
   p.autoAttack = false;
@@ -3910,7 +3911,11 @@ export function runEffects(
         break;
       }
       case 'hunterShrapnel': {
-        runShrapnelCharge(ctx, p, target, eff, ability.name);
+        runShrapnelCharge(ctx, p, eff, ability.name, ability.id);
+        break;
+      }
+      case 'hunterPlayDead': {
+        startPlayDead(ctx, p, ability.name, dropSelfFromHostileFocus(ctx, p));
         break;
       }
       case 'hunterTrailbreak': {

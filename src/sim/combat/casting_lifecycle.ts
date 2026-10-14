@@ -182,6 +182,8 @@ import {
 } from './hunter_coldsight_read';
 import { bloodhookStartError } from './hunter_fieldcraft';
 import { packCommandError } from './hunter_packlord';
+import { applyPatchUp } from './hunter_patch_up';
+import { playDeadOnCastAttempt } from './hunter_play_dead';
 import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
 import {
   hasDeadGroupMember,
@@ -1064,6 +1066,7 @@ export function castAbility(
     return;
   }
   if (cancelStasisToggle(ctx, p, ability)) return;
+  if (playDeadOnCastAttempt(ctx, p, ability.id)) return;
   if (shellskinBlocksAbility(p, meta, ability)) {
     ctx.error(p.id, 'Shellskin prevents attacks.');
     return;
@@ -2781,25 +2784,7 @@ function applyAbility(
     }
     spendResource(p, billableCost());
     armAbilityCooldownWithReflection(ctx, p, meta, res);
-    if (pet.dead) {
-      ctx.revivePet(p.id);
-    } else {
-      const hot = res.effects.find((effect) => effect.type === 'hot');
-      if (hot) {
-        ctx.applyAura(pet, {
-          id: ability.id,
-          name: ability.name,
-          kind: 'hot',
-          remaining: hot.duration,
-          duration: hot.duration,
-          value: Math.max(1, Math.round(hot.total / (hot.duration / hot.interval))),
-          tickInterval: hot.interval,
-          tickTimer: hot.interval,
-          sourceId: p.id,
-          school: ability.school,
-        });
-      }
-    }
+    applyPatchUp(ctx, p, pet, ability);
     if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, pet);
     return;
   }

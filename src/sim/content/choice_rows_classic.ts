@@ -529,17 +529,17 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
+          // Renamed from Beastguard in the Fieldcraft rework; the id is frozen.
           id: 'hun_r8_beastguard',
-          name: 'Beastguard',
+          name: 'Lonely Soul',
           description:
-            'Redirect 15% of damage to a living pet without reducing it below 20% health. Without one, take 8% less damage below 50% health.',
+            'Redirect 30% of damage taken to a living pet without reducing it below 20% health. Without a living pet, deal 10% more damage.',
           icon: 'concussive_shot',
           effect: {
-            global: { petDmgSharePct: 0.15 },
+            global: { petDmgSharePct: 0.3 },
             runtime: {
               petHealthFloorPct: 0.2,
-              fallbackDamageReductionPct: 0.08,
-              healthThresholdPct: 0.5,
+              noPetDamagePct: 0.1,
             },
           },
         },
@@ -553,7 +553,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r11_double_hush',
           name: 'Double Hush',
-          description: 'Hushing Shot stores 2 uses, each with a 24 sec recharge.',
+          description: 'Hushing Shot stores 2 uses, each recharging 4 sec slower (19 sec).',
           icon: 'counter_shot',
           effect: {
             ability: [{ ability: 'counter_shot', bonusCharges: 1, cooldownFlat: 4 }],

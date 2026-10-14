@@ -7915,7 +7915,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Omger dig och din grupp med helig energi till döden eller tills den ersätts. Fiender som träffar en påverkad allierad i närstrid tar {buff} helig skada, och påverkade allierade gör {buff} extra helig skada med automatiska attacker.',
   'entities.abilities.retribution_aura.name': 'Vedergällningsaura',
   'entities.abilities.revive_pet.description':
-    'Lappar ihop ditt husdjur. Om det lever återställer det totalt {overTime} hälsa under 12 sek. med läkning var 3:e sek. Om det är dött återupplivas det med 35 % hälsa.',
+    'Återställer 10 % av din levande följeslagares maximala hälsa varje sekund i 8 sek. Om följeslagaren är död återupplivas den i stället med 50 % hälsa.',
   'entities.abilities.revive_pet.name': 'Lappa ihop',
   'entities.abilities.righteous_fury.description':
     'Ökar passivt hotet som er Heliga skada alstrar med 30%. Endast Trosväktare.',

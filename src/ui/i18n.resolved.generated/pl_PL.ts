@@ -13152,6 +13152,14 @@ export const pl_PL: EnTranslations = {
         "name": "Pancerna Skóra",
         "description": "Zmniejsza otrzymywane obrażenia o 60% na 8 s, ale uniemożliwia atakowanie, gdy jest aktywna."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Pułapka Mroźnej Paszczy",
         "description": "Umieszcza pułapkę przy wybranym wrogu lub u twoich stóp. Uzbraja się po 0,75 s i trwa 30 s. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s."
@@ -14781,7 +14789,7 @@ export const pl_PL: EnTranslations = {
       },
       "revive_pet": {
         "name": "Opatrzenie",
-        "description": "Opatruje twojego zwierzaka. Jeśli żyje, przywraca mu łącznie {overTime} pkt. zdrowia przez 12 sek., co 3 sek. Jeśli nie żyje, wskrzesza go z 35% zdrowia."
+        "description": "Przywraca żywemu towarzyszowi 10% maksymalnego zdrowia co sekundę przez 8 s. Jeśli towarzysz nie żyje, zamiast tego wskrzesza go z 50% zdrowia."
       }
     },
     "items": {

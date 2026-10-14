@@ -10228,7 +10228,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': 'Écorcher',
   'entities.abilities.revive_pet.name': 'Rafistoler',
   'entities.abilities.revive_pet.description':
-    "Rafistole votre familier et lui rend {overTime} points de vie en 12 s, par pulsations toutes les 3 s, s'il est vivant. S'il est mort, le ranime avec 35 % de ses points de vie.",
+    "Rend 10 % des points de vie maximum de votre compagnon vivant chaque seconde pendant 8 s. S'il est mort, le ranime avec 50 % de ses points de vie.",
   'entities.abilities.holy_shock.description':
     'Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)',
   'entities.abilities.holy_shield.name': 'Bouclier sacré',
