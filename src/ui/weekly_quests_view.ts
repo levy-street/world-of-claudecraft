@@ -2,7 +2,7 @@
 // one the character holds (or has finished), the reward line, the reset
 // countdown, and the confirm-dialog model. DOM-free; the painter
 // (weekly_quests_window.ts) renders exactly what this shapes.
-import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../sim/content/dungeon_difficulty';
 import {
   WEEKLY_EMISSARY_NPC_DEF,
   WEEKLY_QUEST_REWARD,
@@ -206,7 +206,7 @@ export function buildWeeklyQuestDialog(
   level: number,
   resetText: string,
 ): WeeklyQuestDialogView {
-  const mark = ITEMS[HEROIC_MARK_ITEM_ID];
+  const mark = ITEMS[HEROIC_MARK_CURRENCY_ID];
   const cache = ITEMS[WEEKLY_QUEST_REWARD.cacheItemId];
   const marks = formatNumber(EMISSARY_CACHE_MARKS, { maximumFractionDigits: 0 });
   return {
@@ -226,7 +226,7 @@ export function buildWeeklyQuestDialog(
     rewardItemIcon: `ui/items/${WEEKLY_QUEST_REWARD.cacheItemId}.webp`,
     rewardItemDesc: t('hudChrome.weekly.cacheDesc', {
       count: marks,
-      item: mark ? itemDisplayName(mark) : HEROIC_MARK_ITEM_ID,
+      item: mark ? itemDisplayName(mark) : HEROIC_MARK_CURRENCY_ID,
     }),
     note: t('hudChrome.weekly.dialogNote', { reset: resetText }),
     art: `${WEEKLY_ART_DIR}/${quest.kind}.webp`,

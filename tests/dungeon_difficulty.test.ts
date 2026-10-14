@@ -5,7 +5,10 @@
 // this file pins the pure math and the data contract to exact literals.
 
 import { describe, expect, it } from 'vitest';
-import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import {
+  HEROIC_DUNGEON_TUNING,
+  HEROIC_MARK_CURRENCY_ID,
+} from '../src/sim/content/dungeon_difficulty';
 import { DUNGEON_MOBS } from '../src/sim/content/dungeons';
 import { TEMPLE_DUNGEON_MOBS } from '../src/sim/content/temple';
 import { ITEMS, MOBS } from '../src/sim/data';
@@ -69,7 +72,7 @@ describe('heroic tuning data contract', () => {
       expect(tuning.level).toBe(22);
       expect(MOBS[tuning.finalBossId], `${tuning.id} finalBossId is a real mob`).toBeTruthy();
     }
-    expect(ITEMS[HEROIC_MARK_ITEM_ID]).toBeTruthy();
+    expect(ITEMS[HEROIC_MARK_CURRENCY_ID]).toBeTruthy();
     // The five-mans pay one mark per participant; the raid pays three.
     expect(
       Object.fromEntries(

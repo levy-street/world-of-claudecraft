@@ -5,7 +5,7 @@
 // stack of Heroic Marks. Server-authoritative:
 // the pick draws ctx.rng once, and the item leaves the bag only when the
 // contents have landed.
-import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from './content/dungeon_difficulty';
 import { DUNGEON_MOBS } from './content/dungeons';
 import { NYTHRAXIS_RAID_BOSS_ID } from './content/heroic_loot';
 import { IGNIVAR_LOOT_ITEM_IDS } from './content/ignivar_loot';
@@ -61,6 +61,6 @@ export function openEmissaryCache(
   const piece = ctx.rng.pick([...pool]);
   consumeOneUnit();
   ctx.addItem(piece, 1, meta.entityId);
-  ctx.addItem(HEROIC_MARK_ITEM_ID, EMISSARY_CACHE_MARKS, meta.entityId);
+  ctx.addItem(HEROIC_MARK_CURRENCY_ID, EMISSARY_CACHE_MARKS, meta.entityId);
   return true;
 }

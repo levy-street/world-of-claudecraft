@@ -3200,7 +3200,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.accountCosmetics = normalizeAccountCosmetics(s.cosmetics);
         this.cosmeticsChanged = true;
       }
-      this.applyQuestSelfSnapshot(s, timerWire.time);
+      if (this.applyQuestSelfSnapshot(s, timerWire.time)) this.invChanged = true;
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior
       // mirror). The owned collection is mirrored VERBATIM (no horse prepend): the

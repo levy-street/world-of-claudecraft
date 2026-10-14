@@ -1,12 +1,11 @@
 // The Currencies tab's pure view core: every balance the character can spend
-// that is NOT coin, in two groups. Activities: the Heroic Mark (an inventory
-// item today, counted across the bags), Honor, Delve Marks and the $WOC token
+// that is NOT coin, in two groups. Activities: Heroic Marks (a PlayerMeta
+// counter, src/sim/heroic_marks.ts), Honor, Delve Marks and the $WOC token
 // (the account-linked wallet, injected by the painter because it is host state,
 // not IWorld). Factions: one row per allied faction, PENDING until Stage 2 of
 // the World Quests scope chooses the currency model; standing is shown on the
 // Reputation tab and is deliberately not a currency here.
 import { FACTION_IDS, type FactionId } from '../../../sim/factions';
-import type { InvSlot } from '../../../sim/types';
 
 export type ActivityCurrencyId = 'heroic_mark' | 'honor' | 'delve_mark' | 'woc_token';
 
@@ -33,7 +32,7 @@ export interface CurrenciesView {
 }
 
 export interface CurrenciesViewInput {
-  readonly inventory: readonly Pick<InvSlot, 'itemId' | 'count'>[];
+  readonly heroicMarks: number;
   readonly honor: number;
   readonly lifetimeHonor: number;
   readonly delveMarks: number;
@@ -45,23 +44,12 @@ export interface CurrenciesViewInput {
   };
 }
 
-export const HEROIC_MARK_ITEM_ID = 'heroic_mark';
-
-/** Marks live in the bags as an ordinary stackable item; sum every stack. */
-export function heroicMarkCount(inventory: readonly Pick<InvSlot, 'itemId' | 'count'>[]): number {
-  let total = 0;
-  for (const slot of inventory) {
-    if (slot.itemId === HEROIC_MARK_ITEM_ID) total += Math.max(0, Math.floor(slot.count));
-  }
-  return total;
-}
-
 const whole = (value: number): number =>
   Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
 
 export function buildCurrenciesView(input: CurrenciesViewInput): CurrenciesView {
   const activities: ActivityCurrencyRow[] = [
-    { id: 'heroic_mark', amount: heroicMarkCount(input.inventory), lifetime: null, verified: true },
+    { id: 'heroic_mark', amount: whole(input.heroicMarks), lifetime: null, verified: true },
     {
       id: 'honor',
       amount: whole(input.honor),

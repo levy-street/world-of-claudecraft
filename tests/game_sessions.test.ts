@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
 import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { MOBS } from '../src/sim/data';
@@ -795,8 +795,8 @@ describe('GameServer sessions', () => {
     (server.sim as any).dealDamage(stayerPet, boss, boss.hp + 10, false, 'physical', null, 'hit');
     expect(boss.dead).toBe(true);
     expect({
-      stayerMarks: server.sim.countItem(HEROIC_MARK_ITEM_ID, stayer.pid),
-      leaverMarks: server.sim.countItem(HEROIC_MARK_ITEM_ID, leaver.pid),
+      stayerMarks: server.sim.meta(stayer.pid)!.heroicMarks,
+      leaverMarks: server.sim.meta(leaver.pid)!.heroicMarks,
       stayerLocked: server.sim.meta(stayer.pid)?.raidLockouts.has('hollow_crypt:heroic'),
       leaverLocked: server.sim.meta(leaver.pid)?.raidLockouts.has('hollow_crypt:heroic'),
     }).toEqual({
@@ -862,8 +862,8 @@ describe('GameServer sessions', () => {
     const result = {
       bossDead: boss.dead,
       recipients: boss.lootRecipientIds,
-      stayerMarks: server.sim.countItem(HEROIC_MARK_ITEM_ID, stayer.pid),
-      leaverMarks: server.sim.countItem(HEROIC_MARK_ITEM_ID, leaver.pid),
+      stayerMarks: server.sim.meta(stayer.pid)!.heroicMarks,
+      leaverMarks: server.sim.meta(leaver.pid)!.heroicMarks,
       stayerLocked: server.sim.meta(stayer.pid)?.raidLockouts.has('hollow_crypt:heroic'),
       leaverLocked: server.sim.meta(leaver.pid)?.raidLockouts.has('hollow_crypt:heroic'),
     };

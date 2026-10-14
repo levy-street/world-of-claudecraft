@@ -16,7 +16,7 @@
 // the N1/quest/delve code that reaches them through `ctx`.
 
 import { supportHeightAt } from '../colliders';
-import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
+import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_CURRENCY_ID } from '../content/dungeon_difficulty';
 import {
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
@@ -1434,10 +1434,10 @@ export function awardHeroicMarks(
     if (!alreadyLocked && credited) {
       let paid = false;
       if (presentIds.has(meta.entityId)) {
-        ctx.addItem(HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant, meta.entityId);
+        ctx.addItem(HEROIC_MARK_CURRENCY_ID, tuning.marksPerParticipant, meta.entityId);
         paid = true;
       } else if (inst.enteredBy.has(meta.entityId)) {
-        ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant);
+        ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_CURRENCY_ID, tuning.marksPerParticipant);
         paid = true;
       }
       // The Book of Deeds daily circuit observes successful rewards, but it is

@@ -2,6 +2,7 @@
 // source-aware packing; other items retain their existing per-copy semantics.
 import { addStacked, stackSizeOf } from './bags';
 import { ITEMS } from './data';
+import { creditHeroicMarks, isCurrencyGrantId } from './heroic_marks';
 import { canStackInstancePayloads } from './item_instance_merge';
 import { isMaterialItemId } from './material_ids';
 import type { MaterialComposition } from './material_sources';
@@ -14,6 +15,30 @@ export interface InventoryGrantOptions {
   readonly craftedRecipeId?: string;
   readonly movement?: boolean;
   readonly materialSources?: MaterialComposition;
+}
+
+/** The plain (payload-free) grant mutation behind Sim.addItem: stack the copies
+ *  into the bags, or, for a currency id (Heroic Marks), credit its counter and
+ *  touch no slot. The hub's receipt, discovery and Reliquary bookkeeping run
+ *  the same either way, so a marks grant reads exactly as it did as an item. */
+export function grantPlainStack(
+  meta: { inventory: InvSlot[]; heroicMarks: number },
+  itemId: string,
+  count: number,
+  opts?: InventoryGrantOptions,
+): void {
+  if (isCurrencyGrantId(itemId)) {
+    creditHeroicMarks(meta, count);
+    return;
+  }
+  addStacked(
+    meta.inventory,
+    itemId,
+    count,
+    undefined,
+    opts?.craftedRecipeId,
+    opts?.materialSources,
+  );
 }
 
 export function grantInventoryInstances(

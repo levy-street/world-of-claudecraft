@@ -2,6 +2,7 @@
 
 import { sanitizeBankState, savedBankState } from './bank';
 import type { CharacterState } from './character_state';
+import { absorbLegacyHeroicMarkSlots, sanitizeHeroicMarks } from './heroic_marks';
 import * as vaultMod from './materials_vault';
 import type { PlayerMeta } from './sim';
 import { cloneInvSlot } from './types';
@@ -23,11 +24,15 @@ export function restoreCharacterStorage(
   // whole-record replacement AND its vaultWireRev bump (the rationale sits there).
   vaultMod.restoreVaultStateOnLoad(meta, s.vault, droppedInstanceJunk, playerId);
   meta.weeklyRewards = weeklyMod.sanitizeWeeklyRewards(s.weeklyRewards);
+  // Heroic Marks: the saved balance, plus any pre-currency `heroic_mark` stacks
+  // still sitting in the bags or bank (both hydrated above), folded in once.
+  meta.heroicMarks = sanitizeHeroicMarks(s.heroicMarks);
+  absorbLegacyHeroicMarkSlots(meta);
 }
 
 export function savedCharacterStorage(
   meta: PlayerMeta,
-): Pick<CharacterState, 'inventory' | 'bags' | 'bank' | 'vault' | 'weeklyRewards'> {
+): Pick<CharacterState, 'inventory' | 'bags' | 'bank' | 'vault' | 'weeklyRewards' | 'heroicMarks'> {
   return {
     inventory: meta.inventory.map(cloneInvSlot),
     bags: [...meta.bags],
@@ -38,5 +43,7 @@ export function savedCharacterStorage(
     ...(meta.weeklyRewards
       ? { weeklyRewards: weeklyMod.sanitizeWeeklyRewards(meta.weeklyRewards) }
       : {}),
+    // Absent at zero, so a character that never earned a mark saves unchanged.
+    ...(meta.heroicMarks > 0 ? { heroicMarks: meta.heroicMarks } : {}),
   };
 }

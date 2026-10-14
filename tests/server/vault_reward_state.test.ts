@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { addVaultRewardToCharacterState } from '../../server/vault_reward_state';
 import type { CharacterState } from '../../src/sim/character_state';
-import { HEROIC_MARK_ITEM_ID } from '../../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../../src/sim/content/dungeon_difficulty';
 import { HOARD_BASE_ITEM_IDS, hoardLootVariantId } from '../../src/sim/content/hoard_loot';
 import { TREASURE_MAP_ITEM_IDS } from '../../src/sim/content/treasure_maps';
 import { grantHoardReward } from '../../src/sim/rift/hoard_reward_grant';
@@ -138,7 +138,7 @@ describe('direct vault reward character snapshot', () => {
     ['plain hoard piece', HOARD_BASE_ITEM_IDS[0]],
     ['tarnished hoard piece', hoardLootVariantId(HOARD_BASE_ITEM_IDS[0], 'rare')],
     ['sovereign hoard piece', hoardLootVariantId(HOARD_BASE_ITEM_IDS[0], 'legendary')],
-    ['heroic mark', HEROIC_MARK_ITEM_ID],
+    ['heroic mark', HEROIC_MARK_CURRENCY_ID],
     ['mount reins', 'reins_lanternback_troll'],
     ['next map', TREASURE_MAP_ITEM_IDS.epic],
   ])('matches the live collection ledger for %s', (_label, itemId) => {
@@ -171,5 +171,9 @@ describe('direct vault reward character snapshot', () => {
     const live = sim.serializeCharacter(pid);
     expect(projected.deedStats).toEqual(live?.deedStats);
     expect(projected.reliquary).toEqual(live?.reliquary);
+    // Heroic Marks are a currency on both arms: the offline projection credits
+    // the saved balance exactly as the live hub does, and neither bags a stack.
+    expect(projected.heroicMarks).toEqual(live?.heroicMarks);
+    expect(projected.inventory.some((slot) => slot.itemId === HEROIC_MARK_CURRENCY_ID)).toBe(false);
   });
 });

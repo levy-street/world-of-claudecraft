@@ -4,11 +4,10 @@ import type { IWorld } from '../src/world_api';
 
 function worldStub(overrides: Partial<Record<string, unknown>> = {}): IWorld {
   return {
-    inventory: [
-      { itemId: 'heroic_mark', count: 4 },
-      { itemId: 'copper_ore', count: 9 },
-      { itemId: 'heroic_mark', count: 8 },
-    ],
+    // A legacy bag stack is deliberately present: the tab must read the
+    // currency balance, never count the bags.
+    inventory: [{ itemId: 'heroic_mark', count: 7 }],
+    heroicMarks: 12,
     honor: 340,
     lifetimeHonor: 1_200,
     delveMarks: 5,
@@ -17,7 +16,7 @@ function worldStub(overrides: Partial<Record<string, unknown>> = {}): IWorld {
 }
 
 describe('currencies tab html', () => {
-  it('paints the activity group with the bag-counted Heroic Marks and Honor with its lifetime total', () => {
+  it('paints the activity group with the Heroic Marks balance and Honor with its lifetime total', () => {
     const html = currenciesTabHtml(worldStub());
     expect(html).toContain('class="char-cur-row is-heroic_mark"');
     expect(html).toContain('Heroic Mark');
@@ -48,7 +47,9 @@ describe('currencies tab html', () => {
   });
 
   it('escapes every value and clamps corrupt balances', () => {
-    const html = currenciesTabHtml(worldStub({ honor: -3, delveMarks: Number.NaN, inventory: [] }));
+    const html = currenciesTabHtml(
+      worldStub({ honor: -3, delveMarks: Number.NaN, heroicMarks: -2 }),
+    );
     expect(html).not.toContain('<script');
     expect(html).not.toContain('-3');
     expect(html).not.toContain('NaN');

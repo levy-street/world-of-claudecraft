@@ -37,7 +37,7 @@ import {
   type ClueHuntDef,
   TREASURE_CASKET_ITEM_ID,
 } from '../src/sim/content/clue_hunts';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
 import { TREASURE_MAP_ITEM_IDS, TREASURE_MAP_RARITIES } from '../src/sim/content/treasure_maps';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
 import { ITEMS } from '../src/sim/data';
@@ -821,7 +821,11 @@ describe('the Treasure Casket', () => {
       // Then the extras, each at most once and in gear, marks, mount order.
       const rest = grants.slice(1).map((g) => g.itemId);
       const kinds = rest.map((id) =>
-        id === HEROIC_MARK_ITEM_ID ? 'marks' : id === CASKET_MOUNT_REINS_ITEM_ID ? 'mount' : 'gear',
+        id === HEROIC_MARK_CURRENCY_ID
+          ? 'marks'
+          : id === CASKET_MOUNT_REINS_ITEM_ID
+            ? 'mount'
+            : 'gear',
       );
       expect(
         [...kinds].sort(
@@ -830,7 +834,7 @@ describe('the Treasure Casket', () => {
       ).toEqual(kinds);
       expect(new Set(kinds).size).toBe(kinds.length);
       for (const g of grants.slice(1)) {
-        if (g.itemId === HEROIC_MARK_ITEM_ID) {
+        if (g.itemId === HEROIC_MARK_CURRENCY_ID) {
           expect(g.count).toBe(CASKET_HEROIC_MARKS);
           marks++;
         } else if (g.itemId === CASKET_MOUNT_REINS_ITEM_ID) {

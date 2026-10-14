@@ -5,7 +5,10 @@
 
 import { describe, expect, it } from 'vitest';
 import { resolvePosition } from '../src/sim/colliders';
-import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import {
+  HEROIC_DUNGEON_TUNING,
+  HEROIC_MARK_CURRENCY_ID,
+} from '../src/sim/content/dungeon_difficulty';
 import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
 import { FARM_RECIPES } from '../src/sim/content/recipes';
@@ -96,7 +99,7 @@ function mailedMarksTo(sim: AnySim, pid: number): number {
   return ((sim.postOffice as any).mail as any[])
     .filter((m) => m.recipientName === name)
     .flatMap((m) => m.items as { itemId: string; count: number }[])
-    .filter((s) => s.itemId === HEROIC_MARK_ITEM_ID)
+    .filter((s) => s.itemId === HEROIC_MARK_CURRENCY_ID)
     .reduce((n, s) => n + s.count, 0);
 }
 
@@ -1361,9 +1364,9 @@ describe('dungeons: heroic difficulty', () => {
 
 describe('dungeons: heroic marks', () => {
   it('registers the heroic_mark item the award path references', () => {
-    expect(ITEMS[HEROIC_MARK_ITEM_ID]).toBeTruthy();
-    expect(ITEMS[HEROIC_MARK_ITEM_ID].quality).toBe('rare');
-    expect(ITEMS[HEROIC_MARK_ITEM_ID].sellValue).toBe(0);
+    expect(ITEMS[HEROIC_MARK_CURRENCY_ID]).toBeTruthy();
+    expect(ITEMS[HEROIC_MARK_CURRENCY_ID].quality).toBe('rare');
+    expect(ITEMS[HEROIC_MARK_CURRENCY_ID].sellValue).toBe(0);
     // Every tuned final boss must be a real mob record (ids are string-matched
     // at runtime with no compile check).
     for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
@@ -1395,24 +1398,24 @@ describe('dungeons: heroic marks', () => {
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
 
     expect(morthen.dead).toBe(true);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBe(1);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, member)).toBe(1);
-    // Two direct kill-time grants land together: the marks stack plus the
-    // Masterwrought phase 04 Wyrmfall Core stack (awardWyrmfallCores rides the
-    // same death-hub call). No ember here: the bare test Sim has no resetDay,
-    // so the weekly check stays closed, like every other calendar gate.
-    expect(sim.players.get(leader)!.inventory).toHaveLength(fullCapacity + 2);
+    expect(sim.meta(leader)!.heroicMarks).toBe(1);
+    expect(sim.meta(member)!.heroicMarks).toBe(1);
+    // Two direct kill-time grants land together: the marks credit the currency
+    // balance (no bag slot, even with the bags full) and the Masterwrought
+    // phase 04 Wyrmfall Core stack takes the one new slot (awardWyrmfallCores
+    // rides the same death-hub call). No ember here: the bare test Sim has no
+    // resetDay, so the weekly check stays closed, like every other calendar gate.
+    expect(sim.players.get(leader)!.inventory).toHaveLength(fullCapacity + 1);
+    expect(sim.countItem(HEROIC_MARK_CURRENCY_ID, leader)).toBe(0);
     expect(sim.countItem('wyrmfall_core', leader)).toBeGreaterThanOrEqual(1);
     const markSlots = ((morthen.loot?.items ?? []) as any[]).filter(
-      (s) => s.itemId === HEROIC_MARK_ITEM_ID,
+      (s) => s.itemId === HEROIC_MARK_CURRENCY_ID,
     );
     expect(markSlots).toHaveLength(0);
 
-    // The inventory award and lockout serialize together. No transient corpse
-    // state is required for the marks to survive a logout or process restart.
-    expect(sim.serializeCharacter(leader)?.inventory).toEqual(
-      expect.arrayContaining([expect.objectContaining({ itemId: HEROIC_MARK_ITEM_ID, count: 1 })]),
-    );
+    // The balance and lockout serialize together. No transient corpse state is
+    // required for the marks to survive a logout or process restart.
+    expect(sim.serializeCharacter(leader)?.heroicMarks).toBe(1);
   });
 
   it('drops no marks from a normal final boss or heroic trash', () => {
@@ -1432,7 +1435,7 @@ describe('dungeons: heroic marks', () => {
     );
     expect(nMorthen.dead).toBe(true);
     expect(
-      ((nMorthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID),
+      ((nMorthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_CURRENCY_ID),
     ).toBe(false);
     // A NORMAL final-boss kill also never grants the daily lockout.
     expect(normal.players.get(nPid)!.raidLockouts.size).toBe(0);
@@ -1458,7 +1461,7 @@ describe('dungeons: heroic marks', () => {
     expect((trash as AnyEntity).dead).toBe(true);
     expect(
       (((trash as AnyEntity).loot?.items ?? []) as any[]).some(
-        (s) => s.itemId === HEROIC_MARK_ITEM_ID,
+        (s) => s.itemId === HEROIC_MARK_CURRENCY_ID,
       ),
     ).toBe(false);
     // Heroic TRASH kills never grant the daily lockout either (finalBossId gate).
@@ -1782,14 +1785,14 @@ describe('dungeons: heroic daily lockouts', () => {
     const meta = sim.players.get(pid)!;
     expect(meta.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
     expect(meta.raidLockouts.has('hollow_crypt')).toBe(false); // never the normal key
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+    expect(sim.meta(pid)!.heroicMarks).toBe(1);
 
     // Past the realm reset boundary the claim and reward are available again,
     // even though host UTC midnight has not changed.
     now = (meta.raidLockouts.get('hollow_crypt:heroic') ?? now) + 1;
     heroicClear(sim, pid, 'hollow_crypt', 'morthen');
     expect(sim.utcDay).toBe('2026-07-12');
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(2);
+    expect(sim.meta(pid)!.heroicMarks).toBe(2);
   });
 
   it('the kill locks EVERY current party member, wherever they stand', () => {
@@ -1824,11 +1827,11 @@ describe('dungeons: heroic daily lockouts', () => {
     // ...while marks stay participation-gated: only the nearby leader is paid.
     // The camper never walked through the door this run, so the mail arm skips
     // them too: roster membership alone earns the lockout, never mailed income.
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBe(1);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, camper)).toBe(0);
+    expect(sim.meta(leader)!.heroicMarks).toBe(1);
+    expect(sim.meta(camper)!.heroicMarks).toBe(0);
     expect(mailedMarksTo(sim, camper)).toBe(0);
     expect(
-      ((morthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID),
+      ((morthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_CURRENCY_ID),
     ).toBe(false);
   });
 
@@ -1856,13 +1859,13 @@ describe('dungeons: heroic daily lockouts', () => {
     // Locked and paid by mail: they entered this run, so distance costs them
     // only the delivery route, never the reward.
     expect(sim.players.get(healer)!.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(0);
+    expect(sim.meta(healer)!.heroicMarks).toBe(0);
     expect(mailedMarksTo(sim, healer)).toBe(1);
 
     // A repeat settlement on the same claim (the alreadyLocked guard) must not
     // pay anyone again, bags or mail.
     awardHeroicMarks(sim.ctx, morthen, [sim.players.get(leader)!]);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBe(1);
+    expect(sim.meta(leader)!.heroicMarks).toBe(1);
     expect(mailedMarksTo(sim, healer)).toBe(1);
   });
 
@@ -1892,7 +1895,7 @@ describe('dungeons: heroic daily lockouts', () => {
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
 
     expect(new Set(morthen.lootRecipientIds)).toEqual(new Set([leader, member]));
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, member)).toBe(1);
+    expect(sim.meta(member)!.heroicMarks).toBe(1);
   });
 
   it('a member who left the party mid-run but stayed inside is still locked by the kill', () => {
@@ -1929,7 +1932,7 @@ describe('dungeons: heroic daily lockouts', () => {
     }
     // The quitter ran the dungeon (they entered this run and stood in the boss
     // room) but left the credit party, so their marks ride the Ravenpost.
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, quitter)).toBe(0);
+    expect(sim.meta(quitter)!.heroicMarks).toBe(0);
     expect(mailedMarksTo(sim, quitter)).toBe(1);
   });
 
@@ -1968,7 +1971,7 @@ describe('dungeons: heroic daily lockouts', () => {
     // Locked away from the corpse but a real participant (they entered and died
     // in there), so the marks arrive end to end as the reward letter's exact
     // attachment rather than dropping into distant bags.
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, quitter)).toBe(0);
+    expect(sim.meta(quitter)!.heroicMarks).toBe(0);
     const letter = ((sim.postOffice as any).mail as any[]).find(
       (m) =>
         m.recipientName === sim.players.get(quitter)!.name &&
@@ -1977,7 +1980,7 @@ describe('dungeons: heroic daily lockouts', () => {
     expect(letter).toBeDefined();
     expect(letter.items).toEqual([
       {
-        itemId: HEROIC_MARK_ITEM_ID,
+        itemId: HEROIC_MARK_CURRENCY_ID,
         count: HEROIC_DUNGEON_TUNING.hollow_crypt.marksPerParticipant,
       },
     ]);
@@ -2017,7 +2020,7 @@ describe('dungeons: heroic daily lockouts', () => {
     expect(instanceLockoutMetas(sim.ctx, inst).map((meta) => meta.entityId)).not.toContain(stale);
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
     expect(sim.players.get(stale)!.raidLockouts.has('hollow_crypt:heroic')).toBe(false);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, stale)).toBe(0);
+    expect(sim.meta(stale)!.heroicMarks).toBe(0);
     expect(mailedMarksTo(sim, stale)).toBe(0);
   });
 
@@ -2042,10 +2045,10 @@ describe('dungeons: heroic daily lockouts', () => {
     // No credit means no marks were created: nobody is paid to bags and the
     // Ravenpost carries nothing, for anyone.
     expect(
-      ((morthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID),
+      ((morthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_CURRENCY_ID),
     ).toBe(false);
     for (const pid of [leader, member]) {
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid), `bags pid ${pid}`).toBe(0);
+      expect(sim.meta(pid)!.heroicMarks, `bags pid ${pid}`).toBe(0);
       expect(mailedMarksTo(sim, pid), `mail pid ${pid}`).toBe(0);
     }
     // ...but the kill-site lockout is credit-free and still locks the party.
@@ -2129,9 +2132,9 @@ describe('dungeons: heroic daily lockouts', () => {
     teleport(sim, re, 0, 0);
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
     expect(morthen.dead).toBe(true);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, runner)).toBe(1);
+    expect(sim.meta(runner)!.heroicMarks).toBe(1);
     expect(
-      ((morthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID),
+      ((morthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_CURRENCY_ID),
     ).toBe(false);
 
     // The rewarded runner carries the daily lockout like everyone else: a
@@ -2306,10 +2309,10 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     );
 
     expect(boss.dead).toBe(true);
-    for (const pid of raiders) expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(3);
-    expect(((boss.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID)).toBe(
-      false,
-    );
+    for (const pid of raiders) expect(sim.meta(pid)!.heroicMarks).toBe(3);
+    expect(
+      ((boss.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_CURRENCY_ID),
+    ).toBe(false);
   });
 
   it('pays marks to a raider locked from far back, so lockout never outruns reward', () => {
@@ -2342,12 +2345,12 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     // back-line healer gets the direct heroic-mark pay instead of the fallback
     // Ravenpost arm reserved for lockout recipients outside that snapshot.
     expect(boss.lootRecipientIds).toContain(healer);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(3);
+    expect(sim.meta(healer)!.heroicMarks).toBe(3);
     const healerName = sim.players.get(healer)!.name;
     const mailedMarks = ((sim.postOffice as any).mail as any[])
       .filter((m) => m.recipientName === healerName)
       .flatMap((m) => m.items as { itemId: string; count: number }[])
-      .filter((s) => s.itemId === HEROIC_MARK_ITEM_ID)
+      .filter((s) => s.itemId === HEROIC_MARK_CURRENCY_ID)
       .reduce((n, s) => n + s.count, 0);
     expect(mailedMarks).toBe(0);
   });
@@ -2673,7 +2676,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     (sim as any).dealDamage(tankEntity, boss, boss.hp + 100, false, 'physical', null, 'hit');
 
     expect(sim.players.get(fallen)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, fallen)).toBe(0);
+    expect(sim.meta(fallen)!.heroicMarks).toBe(0);
   });
 
   it('the empty-instance reaper never frees the arena while raiders stand in its far corner', () => {

@@ -1,6 +1,7 @@
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
 import { freshFactionCurrencies, freshFactionReputation } from '../sim/factions';
+import { sanitizeHeroicMarks } from '../sim/heroic_marks';
 import type {
   CannonActionId,
   CannonPoint,
@@ -50,6 +51,8 @@ export class QuestWorldWireState {
   nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[] = [];
   factions: Readonly<Record<FactionId, number>> = freshFactionReputation();
   factionCurrencies: Readonly<Record<FactionId, number>> = freshFactionCurrencies();
+  /** The Heroic Marks balance mirrored from the `hmarks` self key. */
+  heroicMarks = 0;
   worldQuestReplacements: Readonly<Record<string, string>> = Object.freeze({});
   worldQuestRerollCycle = '';
   /** The active clue hunt mirrored from the `cluh` self key (null when none). */
@@ -84,14 +87,26 @@ export class QuestWorldWireState {
     return fetchWorldQuestLeaderboard(this.questWorldRestBase, board, page, pageSize, viewer);
   }
 
-  /** The owner-only quest family plus the world-boss and vehicle mirrors of one self record. */
+  /** The owner-only quest family plus the world-boss, vehicle and Heroic Marks
+   *  mirrors of one self record. Returns true when the Heroic Marks balance
+   *  really moved, so the host can repaint balance-priced windows: a marks
+   *  credit no longer echoes through the inventory the way a bag item did. */
   applyQuestSelfSnapshot(
-    self: Parameters<typeof applyQuestSelfWire>[1] & { wba?: unknown; vehicle?: unknown },
+    self: Parameters<typeof applyQuestSelfWire>[1] & {
+      wba?: unknown;
+      vehicle?: unknown;
+      hmarks?: unknown;
+    },
     simTime?: unknown,
-  ): void {
+  ): boolean {
     applyQuestSelfWire(this, self, simTime);
     if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
     if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
+    if (self.hmarks === undefined) return false;
+    const marks = sanitizeHeroicMarks(self.hmarks);
+    const moved = marks !== this.heroicMarks;
+    this.heroicMarks = marks;
+    return moved;
   }
 
   enterVehicle(stationId: string): void {
@@ -207,6 +222,7 @@ export class QuestWorldWireState {
     this.weeklyQuestResetAtMs = 0;
     this.clueHunt = null;
     this.treasureMap = null;
+    this.heroicMarks = 0;
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

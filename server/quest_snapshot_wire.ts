@@ -38,6 +38,10 @@ export function emitActivitySelfKeys(
   // from sim sites that never mark this session dirty, and neither cosmetic
   // echo must wait on the heavy gate).
   emit('renown', meta.renown);
+  // Heroic Marks balance (src/sim/heroic_marks.ts): a cheap scalar diffed per
+  // tick for the same reason, since a kill, cache or mail take credits it from
+  // sim sites that never mark this session dirty.
+  emit('hmarks', meta.heroicMarks);
   emit('atitle', meta.activeTitle);
   emit('aborder', meta.activeBorder);
   // Lifetime played time (IWorldProgressionXp.playtimeSeconds), quantized to

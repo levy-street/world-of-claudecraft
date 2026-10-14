@@ -5396,6 +5396,30 @@ describe('delve self-state mirrors over the wire', () => {
     expect(client.companionState?.companionId).toBe('companion_tessa');
   });
 
+  it('mirrors the Heroic Marks balance to the client and delta-omits an unchanged one', () => {
+    broadcast(server);
+    fc.sent.length = 0;
+    server.sim.addItem('heroic_mark', 6, session.pid);
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.hmarks).toBe(6);
+    const client = bareClient(session.pid);
+    // A marks move no longer echoes through the bags, so the mirror itself must
+    // raise the inventory-changed repaint (quartermaster and Currencies tab).
+    (client as any).invChanged = false;
+    (client as any).applySnapshot(snap);
+    expect(client.heroicMarks).toBe(6);
+    expect((client as any).invChanged).toBe(true);
+    fc.sent.length = 0;
+    broadcast(server);
+    const quiet = lastSnap(fc.sent);
+    expect(quiet.self.hmarks).toBeUndefined();
+    (client as any).invChanged = false;
+    (client as any).applySnapshot(quiet);
+    expect(client.heroicMarks).toBe(6);
+    expect((client as any).invChanged).toBe(false);
+  });
+
   it('mirrors delveMarks + delveClears + delveDaily to the client when they change', () => {
     enterDelveOnServer();
     broadcast(server);
@@ -5736,6 +5760,7 @@ const ALL_DELTA_KEYS = [
   'hbl',
   'hill',
   'hirat',
+  'hmarks',
   'honor',
   'hpref',
   'hpw',
@@ -5873,6 +5898,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   guildBank: 'guildBankInfo',
   hill: 'hillInfo',
   hirat: 'hitRating',
+  hmarks: 'heroicMarks',
   hpref: 'harvestPreference',
   hrat: 'hasteRating',
   inv: 'inventory',
@@ -6072,6 +6098,7 @@ function dirtyEveryDeltaField(): {
   meta.restedXp = 222;
   meta.prestigeRank = 3;
   meta.delveMarks = 7;
+  meta.heroicMarks = 9;
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0, fishing: 0, farming: 0 };
@@ -6689,6 +6716,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.delveRun).not.toBeNull(); // drun -> delveRun
     expect(client.companionState?.companionId).toBe('companion_tessa'); // dcompanion -> companionState
     expect(client.delveMarks).toBe(7); // dmarks -> delveMarks
+    expect(client.heroicMarks).toBe(9); // hmarks -> heroicMarks
     expect(client.companionUpgrades).toEqual({ companion_tessa: 2 }); // dcomp -> companionUpgrades
     expect(client.gatheringProficiency).toEqual({
       mining: 6,
@@ -7087,6 +7115,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.vaultInfo).toBe(vaultRef);
     expect(client.markerFor(memberPid)).toBe(3);
     expect(client.delveMarks).toBe(7);
+    expect(client.heroicMarks).toBe(9);
     expect(client.honor).toBe(321);
     expect(client.lifetimeHonor).toBe(654);
     expect(client.companionState?.companionId).toBe('companion_tessa');
@@ -7209,8 +7238,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and the Spell Crit sheet cell's
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
-    expect(ALL_DELTA_KEYS).toHaveLength(113);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(113);
+    // The Heroic Marks currency balance hmarks (server/quest_snapshot_wire.ts
+    // emitActivitySelfKeys), for 114.
+    expect(ALL_DELTA_KEYS).toHaveLength(114);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(114);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7380,7 +7411,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    expect(scraped.size).toBe(113);
+    // The Heroic Marks balance hmarks makes 114.
+    expect(scraped.size).toBe(114);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

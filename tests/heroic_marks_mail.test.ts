@@ -16,7 +16,7 @@
 
 import { describe, expect, it } from 'vitest';
 import type { CharacterState } from '../src/sim/character_state';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import {
   awardHeroicMarks,
@@ -173,12 +173,12 @@ describe('claimedInstanceForMob', () => {
     const leaderMeta = metaOf(sim, leader);
 
     awardHeroicMarks(sim.ctx, boss, [leaderMeta], null);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBe(0);
+    expect(sim.meta(leader)!.heroicMarks).toBe(0);
     expect(markLetters(sim, 'Mate')).toHaveLength(0);
     expect(metaOf(sim, away).raidLockouts.has(LOCK_ID)).toBe(false);
 
     awardHeroicMarks(sim.ctx, boss, [leaderMeta]);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBeGreaterThan(0);
+    expect(sim.meta(leader)!.heroicMarks).toBeGreaterThan(0);
     expect(markLetters(sim, 'Mate')).toHaveLength(1);
   });
 });
@@ -193,8 +193,8 @@ describe('the Heroic Marks mail arm pairs durable income with a durable gate', (
     killBoss(sim, leader, boss);
 
     // Present at the corpse: straight to bags. Absent but entered: by raven.
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBeGreaterThan(0);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, away)).toBe(0);
+    expect(sim.meta(leader)!.heroicMarks).toBeGreaterThan(0);
+    expect(sim.meta(away)!.heroicMarks).toBe(0);
     expect(markLetters(sim, 'Mate')).toHaveLength(1);
 
     // The gate that gives that income its price reaches the PERSISTED
@@ -216,11 +216,11 @@ describe('the Heroic Marks mail arm pairs durable income with a durable gate', (
     killBoss(sim, leader, boss);
 
     expect(markLetters(sim, 'Mate')).toHaveLength(0);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, away)).toBe(0);
+    expect(sim.meta(away)!.heroicMarks).toBe(0);
     expect(leaveSnapshot.raidLockouts?.[LOCK_ID]).toBeUndefined();
     // The freeze is scoped to the leaver: everyone still here is paid and
     // locked exactly as before, so this is not a silently dead kill.
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBeGreaterThan(0);
+    expect(sim.meta(leader)!.heroicMarks).toBeGreaterThan(0);
     const anchorSave = sim.serializeCharacter(leader) as CharacterState;
     expect(anchorSave.raidLockouts?.[LOCK_ID]).toBeGreaterThan(0);
   });
@@ -270,7 +270,7 @@ describe('the persisted stamp is the whole gate against a second payout', () => 
     // ...and the award arm refuses them anyway.
     awardHeroicMarks(sim.ctx, boss, [metaOf(sim, leader)]);
     expect(markLetters(sim, 'Mate')).toHaveLength(1);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, returned)).toBe(0);
+    expect(sim.meta(returned)!.heroicMarks).toBe(0);
   });
 
   it('a save that LOST the stamp walks back in and the same source pays again', () => {

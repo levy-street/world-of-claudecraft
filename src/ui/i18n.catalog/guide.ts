@@ -1210,7 +1210,8 @@ export const guideStrings = {
     chronicleDef:
       "A zone's own collection of deeds, gathered into chapters by a local Chronicler. You can work through the chapters in whatever order suits you.",
     // Delve Marks are a per-character counter spent in the delve shop and on
-    // companion upgrades; Heroic Marks are the heroic dungeon item currency.
+    // companion upgrades; Heroic Marks are the heroic dungeon counter, spent at
+    // the heroic quartermaster.
     marksTerm: 'Delve Marks and Heroic Marks',
     marksDef:
       'The two rewards the repeatable endgame pays besides loot. Delves pay Delve Marks, which buy gear from the delve shop and upgrade your companion; heroic dungeons pay Heroic Marks, which buy gear from the heroic quartermaster.',

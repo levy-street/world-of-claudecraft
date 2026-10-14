@@ -771,7 +771,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1037,
-      "state": "87fecd66",
+      "state": "7c9b1e4b",
       "events": "cf99e425",
       "rng": {
         "draws": 63,
@@ -916,14 +916,11 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1121,6 +1118,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -1129,10 +1127,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1322,6 +1316,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -1330,10 +1325,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1523,6 +1514,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -1531,10 +1523,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1724,6 +1712,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -1732,10 +1721,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2149,7 +2134,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1037,
-      "state": "87fecd66",
+      "state": "7c9b1e4b",
       "events": "741638a5",
       "rng": {
         "draws": 63,
@@ -2294,14 +2279,11 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2499,6 +2481,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -2507,10 +2490,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2700,6 +2679,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -2708,10 +2688,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2901,6 +2877,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -2909,10 +2886,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -3102,6 +3075,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -3110,10 +3084,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,

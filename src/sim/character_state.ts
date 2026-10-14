@@ -266,6 +266,10 @@ export interface CharacterState {
   delveLoreUnlocked?: string[];
   delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
   heroicDaily?: { date: string; marked: string[] };
+  // The Heroic Marks currency balance (src/sim/heroic_marks.ts). Optional and
+  // absent at zero; a pre-currency save loads its `heroic_mark` bag and bank
+  // stacks into it instead.
+  heroicMarks?: number;
   // Masterwrought materials (phase 04): both optional so pre-materials saves
   // load with the fields at their fresh defaults, and both omitted from
   // serialization while at those defaults so untouched rows stay byte-equal.

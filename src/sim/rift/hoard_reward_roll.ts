@@ -3,7 +3,7 @@
 // same frozen reward parcel an online entrant would have received at boss death.
 
 import { treasureCasketCopper } from '../clue_casket';
-import { HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../content/dungeon_difficulty';
 import { rollHoardBossDrop } from '../content/hoard_loot';
 import {
   nextTreasureMapRarity,
@@ -54,7 +54,7 @@ export function rollHoardReward(
       count: 1,
     });
   }
-  if (rng.chance(def.markChance)) items.push({ itemId: HEROIC_MARK_ITEM_ID, count: def.marks });
+  if (rng.chance(def.markChance)) items.push({ itemId: HEROIC_MARK_CURRENCY_ID, count: def.marks });
   if (rng.chance(def.mountChance) && !input.mountOwned)
     items.push({ itemId: VAULT_MOUNT_REINS_ITEM_ID, count: 1 });
   const next = nextTreasureMapRarity(input.rarity);

@@ -10,7 +10,7 @@
 // Pure sim tests: construct a Sim, advance fixed ticks, no rng drawn by the post.
 
 import { describe, expect, it } from 'vitest';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
 import {
   HEROIC_MARK_LETTER,
   MASTERY_RESET_LETTER,
@@ -626,7 +626,7 @@ describe('the system and npc exemption', () => {
     expect(welcome.copper).toBeGreaterThan(0);
     expect(welcome.copper).toBeLessThan(MAIL_ESCROW_COPPER_MIN);
     expect(Number.isFinite(welcome.expiresAt)).toBe(true);
-    sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_ITEM_ID, 3);
+    sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_CURRENCY_ID, 3);
     const marks = bookOf(sim).find((m) => m.letterId === HEROIC_MARK_LETTER.letterId);
     expect(Number.isFinite(marks.expiresAt)).toBe(false);
     const meta = sim.meta(pid);
@@ -645,7 +645,7 @@ describe('the system and npc exemption', () => {
   it('the sweep kind filter leaves a non-player parcel alone even past a forced expiry', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Keeper');
-    sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_ITEM_ID, 3);
+    sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_CURRENCY_ID, 3);
     tickFor(sim, 1);
     const marks = bookOf(sim).find((m) => m.letterId === HEROIC_MARK_LETTER.letterId);
     const welcome = bookOf(sim).find((m) => m.letterId === WELCOME_LETTER.letterId);
@@ -654,7 +654,7 @@ describe('the system and npc exemption', () => {
     tickFor(sim, 2);
     // Untouched: not returned, not deleted, attachments intact.
     expect(marks.returned).toBeFalsy();
-    expect(marks.items).toEqual([{ itemId: HEROIC_MARK_ITEM_ID, count: 3 }]);
+    expect(marks.items).toEqual([{ itemId: HEROIC_MARK_CURRENCY_ID, count: 3 }]);
     expect(bookOf(sim)).toContain(marks);
     // The welcome letter's sub-silver coin is no escrow: swept, coin and all.
     expect(bookOf(sim)).not.toContain(welcome);

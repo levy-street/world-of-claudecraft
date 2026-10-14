@@ -27,6 +27,7 @@
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
+import { isCurrencyGrantId } from '../src/sim/heroic_marks';
 import {
   evaluateApplyEnchantAdmission,
   holdsPerfectedTarget,
@@ -103,6 +104,9 @@ describe('holdsPerfectedTarget refuses every PLAIN copy (only the Perfecting wal
     const { sim, pid, meta } = world();
     let swept = 0;
     for (const id of Object.keys(ITEMS)) {
+      // A currency id (Heroic Marks) credits a counter at the hub, never a bag
+      // copy, so it has no held copy to read (src/sim/heroic_marks.ts).
+      if (isCurrencyGrantId(id)) continue;
       sim.addItem(id, 1, pid);
       // The absence-is-not-refusal guard: the copy must really be in the bags
       // when the read happens, or a grant that silently failed would satisfy

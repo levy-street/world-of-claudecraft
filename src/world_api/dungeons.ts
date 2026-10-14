@@ -117,8 +117,11 @@ export interface IWorldDungeons {
   riftEventMsRemaining(): number | null;
   dungeonDifficulty(): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty): void;
+  // The viewer's Heroic Marks balance: a currency counter, never a bag stack
+  // (src/sim/heroic_marks.ts). Online it mirrors the `hmarks` self key.
+  readonly heroicMarks: number;
   // Buy one Heroic Quartermaster offer (src/sim/content/heroic_vendor.ts),
-  // paying its Heroic Marks price from the buyer's bags. Server-validated.
+  // paying its Heroic Marks price from the buyer's balance. Server-validated.
   buyHeroicVendorItem(itemId: string): void;
   // Redeem one Crucible Quartermaster set piece (src/sim/content/ignivar_loot.ts),
   // paying its matching-slot sigil from the buyer's bags. Server-validated,

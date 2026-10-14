@@ -54,7 +54,6 @@ import {
 import { isOwnAura } from '../sim/aura_classify';
 import { bagPools } from '../sim/bags';
 import { DEEDS } from '../sim/content/deeds';
-import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { vendorFactionForNpc } from '../sim/content/faction_vendors';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_STOCK } from '../sim/content/ignivar_loot';
@@ -14741,9 +14740,7 @@ export class Hud {
     if (this.openHeroicVendorNpcId === null) return;
     const npc = this.sim.entities.get(this.openHeroicVendorNpcId);
     if (!npc) return;
-    const balance = this.sim.inventory
-      .filter((slot) => slot.itemId === HEROIC_MARK_ITEM_ID)
-      .reduce((sum, slot) => sum + slot.count, 0);
+    const balance = this.sim.heroicMarks;
     renderHeroicVendorWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
@@ -15931,7 +15928,7 @@ export class Hud {
     // this hook (#2373), so a hidden window would be rebuilt on each one.
     if (bagsWindowShown($('#bags').style.display)) this.renderBags();
     // A trainer fee is a money-only self delta online (no inv echo), and the
-    // heroic shop prices rows off a mark COUNT in the bag: every service
+    // heroic shop prices rows off the marks balance (an hmarks move raises it): every service
     // window's affordability flag can go stale on a purse or inventory move,
     // so re-price the whole open family here, the same edge the vendor path
     // already used (#2373). Offline this hook barely fires (the bank window's
@@ -15965,7 +15962,7 @@ export class Hud {
   /** Repaint every OPEN service window (copper vendor, heroic quartermaster,
    *  WARFARE quartermaster, training ladder, unbind list) behind its own
    *  open-plus-shown guard. All five price their rows against the purse or a
-   *  bag count, so the language switch and the authoritative inventory hook
+   *  balance, so the language switch and the authoritative inventory hook
    *  repaint the family through this one method; the per-site copies of the
    *  guard pack earned the extraction (rule of three). */
   private repaintOpenServiceWindows(): void {

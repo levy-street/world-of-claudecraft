@@ -3,6 +3,23 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// The character window (imported here, directly or through the dialog
+// controller) pulls in the portrait chip, whose real module starts GLB fetches
+// that can outlive happy-dom teardown and fail the CI shard with unhandled
+// "ProgressEvent is not defined" rejections after green assertions. These
+// assertions never read a portrait, so keep that renderer boundary inert, the
+// same stub tests/inspect_window.test.ts uses.
+vi.mock('../src/ui/portrait_chip', () => ({
+  crestUrl: () => '',
+  hydrateComposedChips: () => undefined,
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
 import { itemCopyPin } from '../src/sim/item_copy_ref';

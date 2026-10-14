@@ -1,10 +1,12 @@
 import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_MOLTEN_ASSEMBLY_ID } from '../ignivar_raid_ids';
 import type { DungeonDifficulty } from '../types';
 
-// The participation token awarded directly to every eligible player when a
-// heroic final boss dies (see awardHeroicMarks in ../instances/dungeons.ts).
-// The item record lives in ./items.ts.
-export const HEROIC_MARK_ITEM_ID = 'heroic_mark';
+// The Heroic Marks CURRENCY id, awarded to every eligible player when a heroic
+// final boss dies (see awardHeroicMarks in ../instances/dungeons.ts). Not an
+// item: a reward list naming it credits PlayerMeta.heroicMarks through the
+// inventory hub (../heroic_marks.ts). The string is the legacy item id, so old
+// saves, mail parcels and durable vault claims still resolve to the currency.
+export const HEROIC_MARK_CURRENCY_ID = 'heroic_mark';
 
 // Heroic finale gold: a heroic-claim kill of a dungeon's final boss pays a
 // raised money base through LootEntry.heroicCopper (the roller substitutes

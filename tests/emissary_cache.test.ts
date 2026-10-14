@@ -1,7 +1,7 @@
 // The Emissary's Cache (src/sim/emissary_cache.ts): the Normal raid pool per
 // class, and opening one through the ordinary item-use path.
 import { describe, expect, it } from 'vitest';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
 import { IGNIVAR_LOOT_ITEM_IDS } from '../src/sim/content/ignivar_loot';
 import { ITEMS } from '../src/sim/data';
 import {
@@ -69,13 +69,13 @@ describe('opening a cache', () => {
     expect(sim.countItem(EMISSARY_CACHE_ITEM_ID)).toBe(0);
     sim.chat(`/dev give ${EMISSARY_CACHE_ITEM_ID} 2`);
     expect(sim.countItem(EMISSARY_CACHE_ITEM_ID)).toBe(2);
-    const marks = sim.countItem(HEROIC_MARK_ITEM_ID);
+    const marks = sim.heroicMarks;
     const before = new Map(
       emissaryCachePoolForClass(meta.cls).map((id) => [id, sim.countItem(id)] as const),
     );
     sim.useItem(EMISSARY_CACHE_ITEM_ID);
     expect(sim.countItem(EMISSARY_CACHE_ITEM_ID)).toBe(1);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID)).toBe(marks + EMISSARY_CACHE_MARKS);
+    expect(sim.heroicMarks).toBe(marks + EMISSARY_CACHE_MARKS);
     const gained = [...before].filter(([id, count]) => sim.countItem(id) === count + 1);
     expect(gained).toHaveLength(1);
     expect(ITEMS[gained[0][0]].requiredClass ?? ['mage']).toContain('mage');

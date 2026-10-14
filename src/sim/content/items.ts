@@ -2030,9 +2030,6 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noMarketList: true,
     noDiscard: false,
   },
-  // Heroic-dungeon participation token: the final boss of a heroic instance
-  // directly awards marks to every eligible participant (awardHeroicMarks in
-  // src/sim/instances/dungeons.ts). Not vendorable; a spend sink ships later.
   // The weekly emissary's reward chest (src/sim/weekly_quests.ts): opening it
   // (src/sim/emissary_cache.ts) hands over one Normal raid piece for the
   // owner's class plus a few Heroic Marks. Bound to the earner like a mark.
@@ -2046,13 +2043,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
   },
+  // RETIRED as a bag item: Heroic Marks are now a PlayerMeta currency
+  // (src/sim/heroic_marks.ts). The def stays because the id shipped (saves,
+  // mail parcels and durable vault claims still name it) and because the hub
+  // receipt, the Ravenpost parcel row and the currency art read its name and
+  // icon; no grant can stack it, since the inventory hub credits the counter
+  // and a load folds any legacy stack into it.
   heroic_mark: {
     id: 'heroic_mark',
     name: 'Heroic Mark',
     kind: 'tool',
     quality: 'rare',
-    // Currency-like: marks stack so saving toward a 12-16 mark vendor price
-    // (content/heroic_vendor.ts) does not eat a bag slot per mark.
     stackSize: 20,
     sellValue: 0,
     // Bound to the earner: marks can only be spent at the Heroic Quartermaster,

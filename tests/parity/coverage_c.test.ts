@@ -12,7 +12,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   HEROIC_DUNGEON_TUNING,
-  HEROIC_MARK_ITEM_ID,
+  HEROIC_MARK_CURRENCY_ID,
   NYTHRAXIS_HEROIC_COPPER,
 } from '../../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../../src/sim/content/heroic_loot';
@@ -441,7 +441,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const raid = [...sim.players.values()] as any[];
     expect(raid.length).toBe(5);
     for (const meta of raid) {
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, meta.entityId), `${meta.name} heroic marks`).toBe(
+      expect(sim.meta(meta.entityId)!.heroicMarks, `${meta.name} heroic marks`).toBe(
         tuning.marksPerParticipant,
       );
     }
@@ -1891,15 +1891,13 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const tuning = HEROIC_DUNGEON_TUNING[HEROIC_FIVE_MAN_DUNGEON_ID];
     expect(tuning.marksPerParticipant).toBe(1);
     for (const pid of partyPids) {
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid), `marks pid ${pid}`).toBe(
-        tuning.marksPerParticipant,
-      );
+      expect(sim.meta(pid)!.heroicMarks, `marks pid ${pid}`).toBe(tuning.marksPerParticipant);
       const lockouts = sim.players.get(pid).raidLockouts;
       expect(lockouts.has(`${HEROIC_FIVE_MAN_DUNGEON_ID}:heroic`), `lock pid ${pid}`).toBe(true);
       expect(lockouts.has(HEROIC_FIVE_MAN_DUNGEON_ID), `plain key pid ${pid}`).toBe(false);
     }
     // Marks are paid into the bags, never onto the corpse.
-    expect(droppedIds).not.toContain(HEROIC_MARK_ITEM_ID);
+    expect(droppedIds).not.toContain(HEROIC_MARK_CURRENCY_ID);
   });
 
   it('flask_consumables: one flask ever rides, upward replaces, downward refuses, and the whole path draws nothing', () => {
