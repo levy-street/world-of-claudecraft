@@ -9601,22 +9601,21 @@ export const TARGETS = [
         const loot = document.querySelector('#loot-settings-window');
         if (loot) loot.style.display = 'none';
       });
-      // Mobile party frames default to COLLAPSED (party_collapse.ts: anything but a
-      // stored '0' collapses), so without expanding them the mobile shot has no rows
-      // in it at all and cannot show the sliver. Expand via the real chip control.
-      if (variant?.mobile) {
-        await page.evaluate(() => {
-          const rowsVisible = () => {
-            const w = document.querySelector('.party-rows');
-            return !!w && getComputedStyle(w).display !== 'none' && w.childNodes.length > 0;
-          };
-          if (rowsVisible()) return;
-          document
-            .querySelector('#party-chip')
-            ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-        });
-        await wait(600);
-      }
+      // Party frames default to COLLAPSED (party_collapse.ts: anything but a stored
+      // '0' collapses), so without expanding them the shot has no rows in it at all
+      // and cannot show the sliver. Expand via the real control: the chip on mobile,
+      // the Party N disclosure header on desktop.
+      await page.evaluate((mobile) => {
+        const rowsVisible = () => {
+          const w = document.querySelector('.party-rows');
+          return !!w && getComputedStyle(w).display !== 'none' && w.childNodes.length > 0;
+        };
+        if (rowsVisible()) return;
+        document
+          .querySelector(mobile ? '#party-chip' : '#party-frame-header')
+          ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      }, !!variant?.mobile);
+      await wait(600);
       await wait(800);
       return variant?.mobile ? {} : { clip: '#party-frames' };
     },
