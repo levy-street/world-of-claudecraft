@@ -12285,6 +12285,8 @@ export const fr_FR: EnTranslations = {
       "clueTalkAria": "Demander au sujet de l'indice : {name}",
       "clueDeliver": "Remettez {count} {item}.",
       "clueDeliverAria": "Remettre {count} {item} à {name}",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Voir {name} pour \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Les trois reliques racontent la même histoire : Aldren combattit pour défendre son roi, Malric franchit la frontière de la mort, et Voss tenta d'arrêter ce qui suivit. Le sceau faiblit, et la crypte abandonnée est le chemin vers les profondeurs.",
       "browseGoods": "Laissez-moi voir vos marchandises.",

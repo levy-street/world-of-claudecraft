@@ -12285,6 +12285,8 @@ export const zh_CN: EnTranslations = {
       "clueTalkAria": "询问线索：{name}",
       "clueDeliver": "交出{count}个{item}。",
       "clueDeliverAria": "交出{count}个{item}给{name}",
+      "attuneHearthstone": "在这里校准我的盟约炉石。",
+      "attuneHearthstoneAria": "通过{name}将你的盟约炉石校准至{hub}",
       "profIntroHint": "请找{name}接取《{quest}》。",
       "nythraxisDeathlessKingWarning": "三件遗物讲述着同一个故事：奥德伦为守护国王而战，马尔里克打破了死亡的界限，沃斯试图阻止随后发生的一切。封印正在减弱，废弃墓穴就是通往地下的道路。",
       "browseGoods": "让我看看你的货物。",

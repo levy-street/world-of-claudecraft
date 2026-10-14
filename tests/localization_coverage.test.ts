@@ -373,6 +373,8 @@ describe('i18n Localization Key Coverage', () => {
     requiredLevel: 20,
     // The map hover faction line and standing text (questUi.worldQuest.factionLine, standingReward).
     faction: 'Rift Watch',
+    // The quartermaster's Allied Hearthstone attune row (questUi.dialog.attuneHearthstone).
+    hub: 'Wyrmwatch (The Automatons)',
     answered: 6,
     // The elixir use line's granted-buff name (itemUi.tooltip.useElixirAura).
     aura: 'Might of the Boar',

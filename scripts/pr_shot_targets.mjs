@@ -16939,6 +16939,51 @@ export const TARGETS = [
     },
   },
   {
+    key: 'allied-hearthstone-attune-row',
+    label: 'Church Order quartermaster gossip menu with the Allied Hearthstone attune row',
+    when: ['hud/quest/hearthstone_attune_row_core', 'content/faction_rewards'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      // Reuses the Eastbrook staging (town loaded, hostiles cleared), then
+      // steps up to Templar Althea, the Church Order quartermaster in the same
+      // square, carrying an unbound Allied Hearthstone. On a base build the
+      // row is absent and the shot shows the menu without it.
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const qm = [...sim.entities.values()].find(
+          (e) => e.templateId === 'npc_church_order_quartermaster',
+        );
+        if (!qm) return { ok: false, reason: 'no npc_church_order_quartermaster entity' };
+        const player = sim.player;
+        player.pos.x = qm.pos.x + 2;
+        player.pos.z = qm.pos.z + 2;
+        player.prevPos = { ...player.pos };
+        if (sim.countItem('allied_hearthstone') <= 0) sim.addItem('allied_hearthstone', 1);
+        const el = document.querySelector('#quest-dialog');
+        if (el) el.style.display = 'none';
+        game.hud.openQuestDialog(qm.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`allied-hearthstone-attune-row setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      // The step over to the quartermaster can bring the loading curtain back
+      // while the square streams in; shoot only once it has lifted again.
+      await page.waitForFunction(
+        () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+        { timeout: 90000, polling: 200 },
+      );
+      await wait(800);
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
     key: 'farmer-vendor-grid',
     label: 'Farmer Jessica vendor grid: tier-1 seeds, brook carrot, compost, garden hoe',
     when: ['professions/farmer_npcs', 'content/zone1'],

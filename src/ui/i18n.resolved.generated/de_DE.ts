@@ -12285,6 +12285,8 @@ export const de_DE: EnTranslations = {
       "clueTalkAria": "Nach dem Hinweis fragen: {name}",
       "clueDeliver": "Übergebt {count} {item}.",
       "clueDeliverAria": "{count} {item} an {name} übergeben",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Sprich mit {name} wegen \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Die drei Relikte erzählen dieselbe Geschichte: Aldren kämpfte, um seinen König zu verteidigen, Malric durchbrach die Grenze des Todes, und Voss versuchte aufzuhalten, was danach kam. Das Siegel wird schwächer, und die verlassene Krypta ist der Weg hinab.",
       "browseGoods": "Lasst mich Eure Waren ansehen.",

@@ -10,6 +10,7 @@ import type { FactionId } from './factions';
 import {
   freshFactionCurrencies,
   freshFactionReputation,
+  sanitizeAlliedHearthstoneAttunement,
   sanitizeFactionCurrencies,
   sanitizeFactionReputation,
 } from './factions';
@@ -170,6 +171,9 @@ export function restoreWorldQuestState(
   meta.vaultAttemptDurable = true;
   meta.vaultGuestCycle = sanitizeWorldQuestCycle(saved?.vaultGuestCycle);
   meta.vaultGuestPayouts = sanitizeVaultGuestPayouts(saved?.vaultGuestPayouts);
+  // The faction-reward Allied Hearthstone keeps its bind across sessions (an
+  // unknown hub id restores unbound, so the next use in a hub binds afresh).
+  meta.alliedHearthstoneAttunement = sanitizeAlliedHearthstoneAttunement(saved?.alliedHearthstone);
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
     if (typeof saved.rerollCycle === 'string' && saved.rerollCycle === meta.worldQuestCycle) {
@@ -215,6 +219,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
   const hasVaultAttempt = meta.vaultAttempt !== null && meta.vaultAttempt !== undefined;
   const hasVaultAttemptSeq = meta.vaultAttemptSeq > 0;
   const hasVaultGuest = (meta.vaultGuestPayouts ?? 0) > 0 && !!meta.vaultGuestCycle;
+  const hearth = sanitizeAlliedHearthstoneAttunement(meta.alliedHearthstoneAttunement);
   if (
     !meta.worldQuestCycle &&
     meta.worldQuestLog.size === 0 &&
@@ -228,7 +233,8 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     !hasTreasureMap &&
     !hasVaultAttempt &&
     !hasVaultAttemptSeq &&
-    !hasVaultGuest
+    !hasVaultGuest &&
+    !hearth
   ) {
     return weeklyPart;
   }
@@ -294,6 +300,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
       ...(hasVaultGuest
         ? { vaultGuestCycle: meta.vaultGuestCycle, vaultGuestPayouts: meta.vaultGuestPayouts }
         : {}),
+      ...(hearth ? { alliedHearthstone: hearth } : {}),
     },
     ...(factionsObj ? { factions: factionsObj } : {}),
     ...(currenciesObj ? { factionCurrencies: currenciesObj } : {}),

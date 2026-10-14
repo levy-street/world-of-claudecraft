@@ -12285,6 +12285,8 @@ export const nl_NL: EnTranslations = {
       "clueTalkAria": "Vraag naar de aanwijzing: {name}",
       "clueDeliver": "Geef {count} {item} over.",
       "clueDeliverAria": "Geef {count} {item} over aan {name}",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Zie {name} voor \"{quest}\".",
       "nythraxisDeathlessKingWarning": "De drie relikwieën vertellen hetzelfde verhaal: Aldren vocht om zijn koning te verdedigen, Malric verbrak de grens van de dood, en Voss probeerde te stoppen wat volgde. Het zegel verzwakt, en de verlaten crypte is de weg naar beneden.",
       "browseGoods": "Laat me je waren bekijken.",

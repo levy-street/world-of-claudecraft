@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "es_ES": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "fr_FR": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "fr_CA": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "de_DE": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "nl_NL": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "pl_PL": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "id_ID": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "tr_TR": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "sv_SE": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "vi_VN": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ],
+  "da_DK": [
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria"
+  ]
 };

@@ -150,10 +150,12 @@ export const IWORLD_MEMBERS = [
   { name: 'worldQuestRerollCycle', kind: 'data' },
   { name: 'clueHunt', kind: 'data' },
   { name: 'treasureMap', kind: 'data' },
+  { name: 'alliedHearthstoneAttunement', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'canRerollWorldQuest', kind: 'method' },
   { name: 'rerollWorldQuest', kind: 'method' },
   { name: 'abandonClueHunt', kind: 'method' },
+  { name: 'attuneAlliedHearthstone', kind: 'method' },
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'groundAimPlacementPreview', kind: 'method' },
@@ -937,9 +939,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
-    expect(IWORLD_MEMBERS.length).toBe(424);
-    expect(DATA_MEMBERS.length).toBe(126);
-    expect(METHOD_MEMBERS.length).toBe(298);
+    // Plus the Allied Hearthstone's alliedHearthstoneAttunement (+1 data) and
+    // attuneAlliedHearthstone (+1 method), the quartermaster bind: 426/127/299.
+    expect(IWORLD_MEMBERS.length).toBe(426);
+    expect(DATA_MEMBERS.length).toBe(127);
+    expect(METHOD_MEMBERS.length).toBe(299);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -981,6 +985,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeVarkhulCinderFires',
       'activeVarkhulCinderOrbProjectiles',
       'activeVarkhulForgestormWarnings',
+      'alliedHearthstoneAttunement',
       'applyEnchant',
       'applyTalents',
       'archetypeTitle',
@@ -989,6 +994,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
+      'attuneAlliedHearthstone',
       'autoLoot',
       'bagCapacity',
       'bags',
@@ -1400,6 +1406,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeVarkhulCinderFires',
       'activeVarkhulCinderOrbProjectiles',
       'activeVarkhulForgestormWarnings',
+      'alliedHearthstoneAttunement',
       'archetypeTitle',
       'arenaInfo',
       'bagCapacity',
@@ -1526,6 +1533,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
+      'attuneAlliedHearthstone',
       'autoLoot',
       'bankBuySlots',
       'bankDeposit',
@@ -2055,6 +2063,8 @@ const FACET_QUESTS = [
   'treasureMap',
   'clueHunt',
   'abandonClueHunt',
+  'alliedHearthstoneAttunement',
+  'attuneAlliedHearthstone',
 ] as const satisfies readonly (keyof IWorldQuests)[];
 type _ExhaustQuests = AssertNever<Exclude<keyof IWorldQuests, (typeof FACET_QUESTS)[number]>>;
 
@@ -2621,8 +2631,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(424);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(424);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(426);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(426);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

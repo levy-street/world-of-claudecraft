@@ -537,7 +537,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // LOWERED 18093 -> 18090 by the Allied Hearthstone attunement fix: the
+    // item tooltip now reads IWorld.alliedHearthstoneAttunement instead of a
+    // cast around the seam, which collapsed a four-line call to one. Exact
+    // count after biome, zero slack.
+    ceiling: 18090,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

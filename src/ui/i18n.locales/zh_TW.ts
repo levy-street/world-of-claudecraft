@@ -6529,6 +6529,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.clueTalkAria': '詢問線索：{name}',
   'questUi.dialog.clueDeliver': '交出{count}個{item}。',
   'questUi.dialog.clueDeliverAria': '交出{count}個{item}給{name}',
+  'questUi.dialog.attuneHearthstone': '在這裡校準我的盟約爐石。',
+  'questUi.dialog.attuneHearthstoneAria': '透過{name}將你的盟約爐石校準至{hub}',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '三件遺物講述著同一個故事：阿爾德倫為守護國王而戰，馬爾里克打破了死亡的界限，沃斯試圖阻止隨後發生的一切。封印正在減弱，廢棄墓穴就是通往地下的道路。',
   'entities.items.runed_bone_shard.name': '符文骨片',

@@ -12285,6 +12285,8 @@ export const ja_JP: EnTranslations = {
       "clueTalkAria": "手がかりについて尋ねる：{name}",
       "clueDeliver": "{item}を{count}個渡す。",
       "clueDeliverAria": "{name}に{item}を{count}個渡す",
+      "attuneHearthstone": "ここで同盟のハースストーンを同調させる。",
+      "attuneHearthstoneAria": "{name}のもとで同盟のハースストーンを{hub}に同調させる",
       "profIntroHint": "{name}から「{quest}」を受けましょう。",
       "nythraxisDeathlessKingWarning": "三つの遺物は同じ物語を語っています。オルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、廃棄された墓所こそ地下への道です。",
       "browseGoods": "品物を見せてください。",

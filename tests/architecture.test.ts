@@ -359,6 +359,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/aura_tracks/aura_track_descriptors.ts',
   'src/ui/hud/aura_tracks/aura_track_view.ts',
   'src/ui/hud/quest/master_craft_core.ts',
+  'src/ui/hud/quest/hearthstone_attune_row_core.ts',
   // The world quest entry banner model (the #banner 'worldQuest' plate).
   'src/ui/hud/quest/world_quest_banner_view.ts',
   'src/ui/quest_marker_tags.ts',

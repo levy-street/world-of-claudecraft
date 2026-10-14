@@ -70,6 +70,10 @@ export interface IWorldQuests {
    * null when none.
    */
   readonly treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null;
+  /** The faction hub the Allied Hearthstone is bound to (persisted), or null while unbound. */
+  readonly alliedHearthstoneAttunement: FactionId | null;
+  /** Bind the Allied Hearthstone at a faction quartermaster (server-validated: in range, holding it). */
+  attuneAlliedHearthstone(npcId: number): void;
   canRerollWorldQuest?(questId: string): { canReroll: boolean; reason?: string };
   rerollWorldQuest?(questId: string): boolean;
   questState(questId: string): QuestState;

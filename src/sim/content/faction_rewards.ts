@@ -7,12 +7,26 @@ import { createGroundObject, createMob } from '../entity';
 import type { FactionId } from '../factions';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { ALLIED_HEARTHSTONE_CAST_ID, dist2d, type Entity, type Vec3 } from '../types';
-import { FACTION_HUB_LANDINGS } from './faction_vendors';
+import {
+  ALLIED_HEARTHSTONE_CAST_ID,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type Vec3,
+} from '../types';
+import { FACTION_HUB_LANDINGS, vendorFactionForNpc } from './faction_vendors';
 
 export const DAWN_STANDARD_RADIUS = 15;
+/** How close to a hub landing an unbound Allied Hearthstone binds on use. */
+export const ALLIED_HUB_ATTUNE_RADIUS = 35;
 
-/** Start the 10s cast to return the player to their attuned faction hub landing. */
+/**
+ * Use the Allied Hearthstone. An unbound stone used in an allied hub binds
+ * there and stops: the bind is the whole action, so it neither casts toward
+ * the hub the player already stands in nor spends the 15 min cooldown. A
+ * bound stone starts the 10s cast home; standing in another hub never rebinds
+ * it (that is the quartermaster's job, attuneAlliedHearthstoneAtNpc below).
+ */
 export function useAlliedHearthstone(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (p.dead || p.ghost) {
     ctx.error(meta.entityId, "You can't do that while dead.");
@@ -22,6 +36,24 @@ export function useAlliedHearthstone(ctx: SimContext, p: Entity, meta: PlayerMet
     ctx.error(meta.entityId, "You can't do that while in combat.");
     return;
   }
+
+  if (!meta.alliedHearthstoneAttunement) {
+    for (const [fid, hub] of Object.entries(FACTION_HUB_LANDINGS) as [
+      FactionId,
+      (typeof FACTION_HUB_LANDINGS)[FactionId],
+    ][]) {
+      if (dist2d(p.pos, hub) <= ALLIED_HUB_ATTUNE_RADIUS) {
+        setAlliedHearthstoneAttunement(ctx, meta, fid);
+        return;
+      }
+    }
+    ctx.error(
+      meta.entityId,
+      'Your Allied Hearthstone is not attuned. Speak with an allied quartermaster or use it in an allied hub.',
+    );
+    return;
+  }
+
   const readyAt = meta.alliedHearthstoneReadyAt ?? 0;
   if (ctx.time < readyAt) {
     const remMins = Math.ceil((readyAt - ctx.time) / 60);
@@ -30,35 +62,6 @@ export function useAlliedHearthstone(ctx: SimContext, p: Entity, meta: PlayerMet
   }
   if (p.castingAbility) {
     ctx.error(meta.entityId, 'You are busy.');
-    return;
-  }
-
-  // Check attunement or auto-attune if currently near an allied hub landing
-  let attunement: FactionId | undefined = meta.alliedHearthstoneAttunement;
-  if (!attunement) {
-    for (const [fid, hub] of Object.entries(FACTION_HUB_LANDINGS) as [
-      FactionId,
-      (typeof FACTION_HUB_LANDINGS)[FactionId],
-    ][]) {
-      if (dist2d(p.pos, hub) <= 35) {
-        attunement = fid;
-        meta.alliedHearthstoneAttunement = fid;
-        ctx.emit({
-          type: 'log',
-          text: `Your Allied Hearthstone is now attuned to ${hub.name}.`,
-          color: '#b9f',
-          pid: meta.entityId,
-        });
-        break;
-      }
-    }
-  }
-
-  if (!attunement) {
-    ctx.error(
-      meta.entityId,
-      'Your Allied Hearthstone is not attuned. Speak with an allied quartermaster or use it in an allied hub.',
-    );
     return;
   }
 
@@ -97,16 +100,55 @@ export function attuneAlliedHearthstone(
     ctx.error(meta.entityId, "You don't have that item.");
     return false;
   }
-  const hub = FACTION_HUB_LANDINGS[factionId];
-  if (!hub) return false;
+  if (!FACTION_HUB_LANDINGS[factionId]) return false;
+  // Already bound here: nothing changes, so no line and no self-wire re-send.
+  if (meta.alliedHearthstoneAttunement !== factionId) {
+    setAlliedHearthstoneAttunement(ctx, meta, factionId);
+  }
+  return true;
+}
+
+/**
+ * "Speak with an allied quartermaster": the quest dialog's attune row on a
+ * faction quartermaster binds the stone to that quartermaster's hub. Any other
+ * NPC is a silent no-op (the row is only offered on the three quartermasters).
+ */
+export function attuneAlliedHearthstoneAtNpc(
+  ctx: SimContext,
+  npcId: number,
+  pid?: number,
+): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const { meta, e: p } = r;
+  const npc = ctx.entities.get(npcId);
+  const factionId = npc?.kind === 'npc' ? vendorFactionForNpc(npc.templateId) : undefined;
+  if (!npc || !factionId) return false;
+  if (p.dead || p.ghost) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return false;
+  }
+  if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) {
+    ctx.error(meta.entityId, 'Too far away.');
+    return false;
+  }
+  return attuneAlliedHearthstone(ctx, p, meta, factionId);
+}
+
+/** The one attunement writer: the bind line, plus a self-wire bump for the online mirror. */
+function setAlliedHearthstoneAttunement(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  factionId: FactionId,
+): void {
   meta.alliedHearthstoneAttunement = factionId;
+  meta.wireRev++;
   ctx.emit({
     type: 'log',
-    text: `Your Allied Hearthstone is now attuned to ${hub.name}.`,
+    text: `Your Allied Hearthstone is now attuned to ${FACTION_HUB_LANDINGS[factionId].name}.`,
     color: '#b9f',
     pid: meta.entityId,
   });
-  return true;
 }
 
 /** Deploy the Rift Feather Glider to slow fall gracefully. */

@@ -12285,6 +12285,8 @@ export const tr_TR: EnTranslations = {
       "clueTalkAria": "İpucu sorgusu: {name}",
       "clueDeliver": "{count} {item} teslim et.",
       "clueDeliverAria": "{count} {item}'i {name}'ye teslim et",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "{quest} görevi için {name}'e git.",
       "nythraxisDeathlessKingWarning": "Üç kutsal emanet de aynı hikayeyi anlatıyor: Aldren kralını savunmak için savaştı, Malric ölümün sınırını aştı ve Voss ardından gelene engel olmaya çalıştı. Mühür zayıflıyor ve terk edilmiş mahzen aşağı inen yol.",
       "browseGoods": "Mallarına bir göz atayım.",

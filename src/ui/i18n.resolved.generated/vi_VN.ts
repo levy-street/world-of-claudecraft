@@ -12285,6 +12285,8 @@ export const vi_VN: EnTranslations = {
       "clueTalkAria": "Hỏi về manh mối: {name}",
       "clueDeliver": "Trao {count} {item}.",
       "clueDeliverAria": "Trao {count} {item} cho {name}",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Gặp {name} để nhận \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Ba di vật cùng kể một câu chuyện: Aldren chiến đấu để bảo vệ vua của mình, Malric phá vỡ ranh giới của cái chết, và Voss cố ngăn chặn những gì xảy đến sau đó. Ấn phong đang suy yếu, và hầm mộ bị bỏ hoang là con đường dẫn xuống dưới.",
       "browseGoods": "Để ta xem qua hàng hóa của ngươi.",

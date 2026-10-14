@@ -76,6 +76,11 @@ export function commendWeeklyQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
   sim.commendWeeklyQuest(msg.faction, pid);
 }
 
+export function attuneAlliedHearthstoneWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
+  if (typeof msg.npcId === 'number' && Number.isSafeInteger(msg.npcId) && msg.npcId > 0)
+    sim.attuneAlliedHearthstone(msg.npcId, pid);
+}
+
 /** The world-quest-only command family; game.ts routes every member here. */
 const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_glider_boost',
@@ -90,6 +95,7 @@ const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_weekly_choose',
   'world_quest_weekly_commend',
   'clue_hunt_abandon',
+  'allied_hearthstone_attune',
 ] as const;
 export type WorldQuestWireCommand = (typeof WORLD_QUEST_WIRE_COMMANDS)[number];
 const WORLD_QUEST_WIRE_COMMAND_SET: ReadonlySet<unknown> = new Set(WORLD_QUEST_WIRE_COMMANDS);
@@ -137,5 +143,8 @@ export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
       break;
     case 'clue_hunt_abandon':
       sim.abandonClueHunt(pid);
+      break;
+    case 'allied_hearthstone_attune':
+      attuneAlliedHearthstoneWire(sim, msg, pid);
   }
 }

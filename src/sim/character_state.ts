@@ -131,6 +131,8 @@ export interface CharacterState {
     vaultAttemptSeq?: number;
     vaultGuestCycle?: string;
     vaultGuestPayouts?: number;
+    // The Allied Hearthstone's bound hub (a FactionId), written only when bound.
+    alliedHearthstone?: string;
   };
   // Faction standing (JSONB; optional so pre-reputation saves load cleanly).
   factions?: Partial<Record<string, number>>;

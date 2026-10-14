@@ -6842,6 +6842,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.clueTalkAria': 'Спросить о подсказке: {name}',
   'questUi.dialog.clueDeliver': 'Отдать {item} ({count} шт.).',
   'questUi.dialog.clueDeliverAria': 'Отдать {item} ({count} шт.) персонажу {name}',
+  'questUi.dialog.attuneHearthstone': 'Привязать здесь мой союзный камень возвращения.',
+  'questUi.dialog.attuneHearthstoneAria':
+    'Привязать союзный камень возвращения к месту {hub} у персонажа {name}',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     'Три реликвии рассказывают одну историю: Алдрен сражался, защищая своего короля, Малрик нарушил границу смерти, а Восс пытался остановить то, что последовало. Печать слабеет, и заброшенная крипта ведет вниз.',
   'entities.items.runed_bone_shard.name': 'Рунный костяной осколок',

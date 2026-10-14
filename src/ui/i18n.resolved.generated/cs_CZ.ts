@@ -12285,6 +12285,8 @@ export const cs_CZ: EnTranslations = {
       "clueTalkAria": "Zeptat se na stopu: {name}",
       "clueDeliver": "Odevzdej {count}x {item}.",
       "clueDeliverAria": "Odevzdat {count}x {item} osobě {name}",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Viz {name} pro \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Tři relikvie vyprávějí stejný příběh: Aldren bojoval na obranu svého krále, Malric prolomil hranici smrti a Voss se pokusil zastavit to, co následovalo. Pečeť slábne a opuštěná krypta je cestou dolů.",
       "browseGoods": "Ukaž mi své zboží.",

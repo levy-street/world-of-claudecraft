@@ -937,6 +937,9 @@ export const COMMAND_NAMES = [
   // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
   // replaces the guild's rank ladder (titles, order, permissions).
   'guild_set_ranks',
+  // Allied Hearthstone: a faction quartermaster binds the stone to its hub
+  // (IWorldQuests.attuneAlliedHearthstone, the quest dialog's attune row).
+  'allied_hearthstone_attune',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1052,6 +1055,7 @@ export const COMMAND_FACETS = {
   world_quest_start: 'IWorldQuests',
   world_quest_reroll: 'IWorldQuests',
   clue_hunt_abandon: 'IWorldQuests',
+  allied_hearthstone_attune: 'IWorldQuests',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',

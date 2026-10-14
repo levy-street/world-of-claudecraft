@@ -154,6 +154,7 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { attuneAlliedHearthstoneAtNpc } from './content/faction_rewards';
 import { farmCropTier } from './content/farm_crops';
 import {
   FARM_BED_IDS,
@@ -4639,8 +4640,11 @@ export class Sim {
   get factionCurrencies(): Readonly<Record<FactionId, number>> {
     return this.primary.factionCurrencies;
   }
-  get alliedHearthstoneAttunement(): FactionId | undefined {
-    return this.primary.alliedHearthstoneAttunement;
+  get alliedHearthstoneAttunement(): FactionId | null {
+    return this.primary.alliedHearthstoneAttunement ?? null;
+  }
+  attuneAlliedHearthstone(npcId: number, pid?: number): void {
+    attuneAlliedHearthstoneAtNpc(this.ctx, npcId, pid);
   }
   get worldQuestReplacements(): Readonly<Record<string, string>> {
     return this.primary.worldQuestReplacements;

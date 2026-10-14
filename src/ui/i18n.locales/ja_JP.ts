@@ -6786,6 +6786,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.clueTalkAria': '手がかりについて尋ねる：{name}',
   'questUi.dialog.clueDeliver': '{item}を{count}個渡す。',
   'questUi.dialog.clueDeliverAria': '{name}に{item}を{count}個渡す',
+  'questUi.dialog.attuneHearthstone': 'ここで同盟のハースストーンを同調させる。',
+  'questUi.dialog.attuneHearthstoneAria': '{name}のもとで同盟のハースストーンを{hub}に同調させる',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '三つの遺物は同じ物語を語っています。オルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、廃棄された墓所こそ地下への道です。',
   'entities.items.runed_bone_shard.name': 'ルーン刻みの骨片',

@@ -12285,6 +12285,8 @@ export const ru_RU: EnTranslations = {
       "clueTalkAria": "Спросить о подсказке: {name}",
       "clueDeliver": "Отдать {item} ({count} шт.).",
       "clueDeliverAria": "Отдать {item} ({count} шт.) персонажу {name}",
+      "attuneHearthstone": "Привязать здесь мой союзный камень возвращения.",
+      "attuneHearthstoneAria": "Привязать союзный камень возвращения к месту {hub} у персонажа {name}",
       "profIntroHint": "Обратитесь к {name} за заданием «{quest}».",
       "nythraxisDeathlessKingWarning": "Три реликвии рассказывают одну историю: Алдрен сражался, защищая своего короля, Малрик нарушил границу смерти, а Восс пытался остановить то, что последовало. Печать слабеет, и заброшенная крипта ведет вниз.",
       "browseGoods": "Покажите ваши товары.",

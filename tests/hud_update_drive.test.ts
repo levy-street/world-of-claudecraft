@@ -1470,9 +1470,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       kind: 'module',
       module: 'hud/quest/quest_dialog_controller.ts',
       proof:
-        'if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig) { this.refresh(); }',
+        'if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction) { this.refresh(); }',
     },
-    why: "the gossip dialog's intro hint row plus the offerable-row set (phase 23: a cadence lapse re-offers a work order) plus the Clue Scroll step row (world quests round 2: the hunt step advances on a sim log line), three edges no quest event fires for",
+    why: "the gossip dialog's intro hint row plus the offerable-row set (phase 23: a cadence lapse re-offers a work order) plus the Clue Scroll step row (world quests round 2: the hunt step advances on a sim log line) plus the Allied Hearthstone attune row (the bind or the bags change), four edges no quest event fires for",
   },
   {
     call: 'this.updateDeedTracker',
@@ -1963,7 +1963,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // cannot move, so the flag is part of the line the pin looks for.
         'hud/loot/loot_window_controller.ts: const unchanged = sig === this.corpseSig && harvestSig === this.harvestStatusSig; if (!force && unchanged) return availability;',
         'hud/professions/farming_plant_sheet_window.ts: if (view.status !== this.paintedStatus) this.paint();',
-        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig) { this.refresh(); }',
+        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction) { this.refresh(); }',
         'mailbox_window.ts: if (sig === this.lastSig) return;',
         'market_window.ts: if (sig === this.lastSig) return;',
         'meters.ts: if (!this.isOpen || now - this.lastRender < 250) return;',

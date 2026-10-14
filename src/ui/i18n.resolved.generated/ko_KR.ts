@@ -12285,6 +12285,8 @@ export const ko_KR: EnTranslations = {
       "clueTalkAria": "단서에 대해 묻는다: {name}",
       "clueDeliver": "{item} {count}개를 건넨다.",
       "clueDeliverAria": "{item} {count}개를 건넨다: {name}",
+      "attuneHearthstone": "여기서 동맹의 귀환석을 조율한다.",
+      "attuneHearthstoneAria": "{name}에게서 동맹의 귀환석을 {hub}에 조율한다",
       "profIntroHint": "{name}에게 \"{quest}\"을(를) 받으세요.",
       "nythraxisDeathlessKingWarning": "세 유물은 같은 이야기를 전합니다. 알드렌은 왕을 지키기 위해 싸웠고, 말릭은 죽음의 경계를 깨뜨렸으며, 보스는 그 뒤에 일어난 일을 막으려 했습니다. 봉인은 약해지고 있고, 버려진 묘실이 아래로 향하는 길입니다.",
       "browseGoods": "물건을 보여 주세요.",

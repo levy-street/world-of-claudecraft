@@ -6526,6 +6526,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.clueTalkAria': '询问线索：{name}',
   'questUi.dialog.clueDeliver': '交出{count}个{item}。',
   'questUi.dialog.clueDeliverAria': '交出{count}个{item}给{name}',
+  'questUi.dialog.attuneHearthstone': '在这里校准我的盟约炉石。',
+  'questUi.dialog.attuneHearthstoneAria': '通过{name}将你的盟约炉石校准至{hub}',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '三件遗物讲述着同一个故事：奥德伦为守护国王而战，马尔里克打破了死亡的界限，沃斯试图阻止随后发生的一切。封印正在减弱，废弃墓穴就是通往地下的道路。',
   'entities.items.runed_bone_shard.name': '符文骨片',

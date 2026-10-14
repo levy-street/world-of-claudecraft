@@ -99,6 +99,9 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
     'tmap',
     meta.treasureMap ? { rarity: meta.treasureMap.rarity, siteId: meta.treasureMap.siteId } : null,
   );
+  // The Allied Hearthstone's bound hub (null while unbound); every bind bumps
+  // wireRev (src/sim/content/faction_rewards.ts) so the gate re-diffs it.
+  emit('ahs', meta.alliedHearthstoneAttunement ?? null);
   emit('wqrr', meta.worldQuestRerollCycle);
   emit('wqrep', meta.worldQuestReplacements ?? {});
   emit('wkq', meta.weeklyQuest);

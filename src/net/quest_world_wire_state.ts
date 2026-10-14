@@ -34,7 +34,8 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_reroll'; quest: string }
   | { cmd: 'world_quest_weekly_choose'; quest: string }
   | { cmd: 'world_quest_weekly_commend'; faction: string }
-  | { cmd: 'clue_hunt_abandon' };
+  | { cmd: 'clue_hunt_abandon' }
+  | { cmd: 'allied_hearthstone_attune'; npcId: number };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -56,6 +57,8 @@ export class QuestWorldWireState {
   clueHunt: Readonly<{ huntId: string; step: number }> | null = null;
   /** The read treasure map mirrored from the `tmap` self key (null when none). */
   treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null = null;
+  /** The Allied Hearthstone's bound hub mirrored from the `ahs` self key (null when unbound). */
+  alliedHearthstoneAttunement: FactionId | null = null;
   /** Client clock mirror of the authoritative Buried Hoard boss telegraphs;
    *  the host feeds it every routed event (ClientWorld's event loop). */
   protected readonly hoardBossCueMirror = new HoardBossCueMirror(() => performance.now());
@@ -151,6 +154,10 @@ export class QuestWorldWireState {
     this.sendQuestWorldCommand({ cmd: 'clue_hunt_abandon' });
   }
 
+  attuneAlliedHearthstone(npcId: number): void {
+    this.sendQuestWorldCommand({ cmd: 'allied_hearthstone_attune', npcId });
+  }
+
   canRerollWorldQuest(questId: string): { canReroll: boolean; reason?: string } {
     if (!this.worldQuestCycle) {
       return { canReroll: false, reason: 'No active world quest cycle.' };
@@ -207,6 +214,7 @@ export class QuestWorldWireState {
     this.weeklyQuestResetAtMs = 0;
     this.clueHunt = null;
     this.treasureMap = null;
+    this.alliedHearthstoneAttunement = null;
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

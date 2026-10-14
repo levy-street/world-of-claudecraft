@@ -12285,6 +12285,8 @@ export const id_ID: EnTranslations = {
       "clueTalkAria": "Tanyakan tentang petunjuknya: {name}",
       "clueDeliver": "Serahkan {count} {item}.",
       "clueDeliverAria": "Serahkan {count} {item} ke {name}",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Temui {name} untuk \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Ketiga pusaka itu menceritakan kisah yang sama: Aldren berjuang membela rajanya, Malric menerobos batas kematian, dan Voss berupaya menghentikan apa yang menyusul. Segel itu kian melemah, dan kripta terbengkalai adalah jalan turun ke bawah.",
       "browseGoods": "Biar kulihat-lihat daganganmu.",

@@ -12285,6 +12285,8 @@ export const pt_BR: EnTranslations = {
       "clueTalkAria": "Perguntar sobre a pista: {name}",
       "clueDeliver": "Entregue {count} {item}.",
       "clueDeliverAria": "Entregar {count} {item} para {name}",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Fale com {name} para \"{quest}\".",
       "nythraxisDeathlessKingWarning": "As três relíquias contam a mesma história: Aldren lutou para defender seu rei, Malric rompeu a fronteira da morte e Voss tentou impedir o que veio depois. O selo está enfraquecendo, e a cripta abandonada é o caminho para baixo.",
       "browseGoods": "Deixe-me ver suas mercadorias.",

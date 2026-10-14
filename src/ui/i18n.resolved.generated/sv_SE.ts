@@ -12285,6 +12285,8 @@ export const sv_SE: EnTranslations = {
       "clueTalkAria": "Fråga om ledtråden: {name}",
       "clueDeliver": "Överlämna {count} {item}.",
       "clueDeliverAria": "Överlämna {count} {item} till {name}",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Se {name} angående \"{quest}\".",
       "nythraxisDeathlessKingWarning": "De tre relikerna berättar samma historia: Aldren stred för att försvara sin kung, Malric bröt dödens gräns, och Voss försökte hejda det som följde. Sigillet försvagas, och den övergivna kryptan är vägen nedåt.",
       "browseGoods": "Låt mig se dina varor.",

@@ -12285,6 +12285,8 @@ export const it_IT: EnTranslations = {
       "clueTalkAria": "Chiedi dell'indizio: {name}",
       "clueDeliver": "Consegna {count} {item}.",
       "clueDeliverAria": "Consegna {count} {item} a {name}",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Vai da {name} per \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Le tre reliquie raccontano la stessa storia: Aldren combatté per difendere il suo re, Malric spezzò il confine della morte e Voss tentò di fermare ciò che seguì. Il sigillo si indebolisce, e la cripta abbandonata è la via verso il basso.",
       "browseGoods": "Fammi vedere la tua merce.",

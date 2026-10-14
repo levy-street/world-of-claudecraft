@@ -7623,7 +7623,7 @@ export const hudChromeStrings = {
     hub_none: 'None (Use near a faction hub to attune)',
     hub_rift_watch: 'Drifthaven (The Rift Watch)',
     hub_church_order: 'Eastbrook Vale (The Church Order)',
-    hub_automatons: 'South Reach (The Automaton Foundry)',
+    hub_automatons: 'Wyrmwatch (The Automatons)',
     riftGliderUse:
       'Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)',
     targetDummyUse:
