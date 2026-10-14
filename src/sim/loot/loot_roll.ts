@@ -60,6 +60,7 @@ import type {
 } from '../types';
 import { cloneItemInstancePayload, dist2d, PARTY_XP_RANGE } from '../types';
 import { grantAwardedLootItem, grantOrHoldAwardedLoot } from './awarded_loot_hold';
+import { announceBossDrops } from './boss_drop_announce';
 import { rollEnemyLootQuality } from './enemy_quality';
 import { heroicLootItemId } from './heroic_item';
 import { lootEntryRollsOnClaim } from './loot_difficulty_gate';
@@ -378,6 +379,8 @@ export function rollLoot(
     }
     mob.loot = { copper, items: rollEnemyLootQuality(ctx.rng, mob, items, questSlots) };
     mob.lootable = true;
+    // After the quality roll, so each line links the exact copy on the corpse.
+    announceBossDrops(ctx, mob, meta.entityId);
     // start the owner-lock countdown: after LOOT_FFA_DELAY the tap opens to all.
     mob.lootFfaTimer = LOOT_FFA_DELAY;
   } else if (isHarvestableCorpse(template.componentTags)) {

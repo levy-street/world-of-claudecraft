@@ -604,6 +604,9 @@ const baseEnTable = {
   // The awarded-loot hold (src/sim/loot/awarded_loot_hold.ts): a full-bags
   // winner's award stays on the corpse as a winner-only slot.
   'loot.awardHeldOnCorpse': 'Your bags are full; {item} is waiting on the corpse for you.',
+  // The party boss-drop printout (src/sim/loot/boss_drop_announce.ts): one line
+  // per shared drop to every party member when a boss's loot is rolled.
+  'loot.bossDrop': '{boss} dropped {item}.',
   'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
   'loot.rollGreed': 'Greed Roll - {roll} for {item} by {name}',
   'loot.marketSellerBought':
@@ -20462,6 +20465,10 @@ const RULES: Rule[] = [
   {
     re: /^Your bags are full; (.+) is waiting on the corpse for you\.$/,
     build: (m) => tSim('loot.awardHeldOnCorpse', { item: m[1] }),
+  },
+  {
+    re: /^(.+) dropped (\[\[i:[A-Za-z0-9_]+\]\])\.$/,
+    build: (m) => tSim('loot.bossDrop', { boss: locMob(m[1]), item: m[2] }),
   },
   {
     re: /^(.+) bought your (.+) for (.+) [—-] collect (.+) from the Merchant\.$/,
