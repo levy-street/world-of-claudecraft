@@ -348,11 +348,12 @@ import {
   setModularLookProvider,
 } from './render/characters';
 import {
-  charactersReady,
   ensureCharacterUrl,
+  launcherCharactersReady,
   modularCacheStats,
   preloadMechAssets,
   startStreamedCharacterPreloads,
+  warmWorldCharacterBodies,
 } from './render/characters/assets';
 import { skinCount, weaponSkinModelUrl } from './render/characters/manifest';
 import {
@@ -5678,6 +5679,7 @@ function show(el: string): void {
 
   const isPlayPanel =
     el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select';
+  if (isPlayPanel) warmWorldCharacterBodies();
   const logoImg = $('#title-logo');
   if (logoImg) logoImg.toggleAttribute('hidden', isPlayPanel);
 
@@ -10825,17 +10827,12 @@ function wireStartScreens(): void {
   // plain label for the rest of the page's life.
   decorateClassChips();
 
-  // Initialize 3D character preview once its assets are ready. Gated on the
-  // narrower charactersReady() (with its own retries), not the site-wide
-  // assetsReady(): that single shared promise covers EVERY registered preload
-  // (terrain, dungeon, foliage, ...), so an unrelated failure there must never
-  // permanently blank the character-creation preview. This previously used
-  // assetsReady().then() with no failure handler at all, so on a cold,
-  // first-visit cache a single transient asset failure anywhere on the site
-  // silently stranded the preview forever (issue: new players saw no
-  // character model on their first load; a reload "fixed" it only because the
-  // browser's HTTP cache was warm by then).
-  charactersReady()
+  // Initialize the 3D character preview once its assets are ready, gated on the
+  // narrower launcherCharactersReady() (own retries, no mob bodies), never the
+  // site-wide assetsReady(): one failure anywhere in that shared promise used to
+  // strand the preview for good on a cold first visit (new players saw no model
+  // until a reload, which only "fixed" it because the HTTP cache was warm).
+  launcherCharactersReady()
     .then(() => {
       // Resolve each panel defensively: play.html (online-only) has no #offline-select.
       const activePanelId = ['#charselect-panel', '#offline-select'].find((id) => {
