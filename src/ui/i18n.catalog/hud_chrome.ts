@@ -5840,6 +5840,48 @@ export const hudChromeStrings = {
     imported: 'Hotkey setup imported.',
     wrongKind: 'That code is a settings export, not a hotkey setup.',
   },
+  // The Key Bindings panel's keyboard-layout converter
+  // (keybind_layout_convert_rows.ts over keyboard_layout_convert_core.ts):
+  // moves every hotkey to the key that prints the same character on another
+  // layout. QWERTY, QWERTZ, AZERTY, Dvorak and Colemak are layout names; the
+  // wordy rows (M16) get their five non-Latin fills in this same change.
+  keybindLayout: {
+    title: 'Keyboard Layout',
+    open: 'Convert',
+    from: 'Hotkeys made for',
+    to: 'Convert to',
+    // The six move and turn actions (the WASD and QE keys); every other hotkey converts.
+    keepMovement: 'Keep movement keys in place',
+    // Shown when the last conversion kept movement in place: those keys are
+    // still on their earlier positions, so they stay put again.
+    keepMovementLocked:
+      'Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.',
+    help: 'Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.',
+    // {count} is how many hotkeys land on a different key.
+    moves: 'Hotkeys that will move: {count}',
+    noChange: 'No hotkeys change between these layouts.',
+    apply: 'Convert Hotkeys',
+    // {from} and {to} are layout names from layouts.* below.
+    converted: 'Hotkeys converted from {from} to {to}.',
+    layouts: {
+      qwertyUs: 'QWERTY (US)',
+      qwertyUk: 'QWERTY (UK)',
+      qwertzDe: 'QWERTZ (German)',
+      qwertzCh: 'QWERTZ (Swiss)',
+      azertyFr: 'AZERTY (French)',
+      azertyBe: 'AZERTY (Belgian)',
+      qwertyEs: 'QWERTY (Spanish)',
+      qwertyIt: 'QWERTY (Italian)',
+      qwertyNordic: 'QWERTY (Swedish, Finnish)',
+      qwertyDa: 'QWERTY (Danish)',
+      qwertyNo: 'QWERTY (Norwegian)',
+      qwertyBr: 'QWERTY (Brazilian ABNT2)',
+      qwertyPt: 'QWERTY (Portuguese)',
+      qwertyTr: 'QWERTY (Turkish)',
+      dvorak: 'Dvorak',
+      colemak: 'Colemak',
+    },
+  },
   // The Key Bindings panel's keyboard overview (src/ui/keyboard_map.ts): a live
   // keyboard with every key in use coloured by category and captioned with its
   // action, shown one modifier layer at a time. The layer names (Ctrl, Alt) are

@@ -125,7 +125,14 @@ describe('options_window: hotkey setup row', () => {
       painter.indexOf('private transferControls('),
     );
     expect(rows).toContain('buildKeybindCode(this.deps.keybinds().snapshot())');
-    expect(rows).toContain('importBindings(parsed.binds)');
+    // Import and the layout converter share one live apply.
+    expect(rows).toContain(
+      "this.applyKeybindSetup(parsed.binds, t('hudChrome.keybindTransfer.imported'));",
+    );
+    expect(rows).toContain('this.deps.keybinds().importBindings(binds, layout ?? null);');
+    expect(rows).toContain(
+      'buildKeybindLayoutConvertRow(body, this.deps, (...a) => this.applyKeybindSetup(...a));',
+    );
     expect(rows).toContain("'hudChrome.keybindTransfer.wrongKind'");
     // The hollow-code refusal lives in the core (pinned in
     // tests/keybind_transfer_core.test.ts); the panel hands it the registry ids.

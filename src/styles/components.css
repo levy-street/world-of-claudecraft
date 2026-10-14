@@ -17927,6 +17927,11 @@
   .kb-transfer {
     margin: 0 0 var(--spacing-sm);
   }
+  /* The Key Bindings panel's keyboard-layout converter: the same expando, with
+     its picker rows and the movement switch spanning the pane. */
+  .kb-layout-pane > .set-row {
+    align-self: stretch;
+  }
   /* The Import / Export sub-panel's body around the Full Settings row. */
   .transfer-body {
     margin: var(--spacing-sm) 0;

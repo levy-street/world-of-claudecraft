@@ -4347,6 +4347,37 @@ export const ja_JP: EnTranslations = {
       "imported": "ホットキー設定をインポートしました。",
       "wrongKind": "このコードは設定のエクスポートで、ホットキー設定ではありません。"
     },
+    "keybindLayout": {
+      "title": "キーボード配列",
+      "open": "変換",
+      "from": "ホットキーの元の配列",
+      "to": "変換先",
+      "keepMovement": "移動キーはそのままにする",
+      "keepMovementLocked": "前回の変換で移動キーをそのままにしたため、今回もそのままになります。やり直すには初期設定に戻してください。",
+      "help": "各ホットキーは新しい配列で同じ文字を入力するキーに移動します。数字列はそのままです。この一覧のキー名は QWERTY の位置で、キーボード概要にはお使いの配列が表示されます。",
+      "moves": "移動するホットキー：{count}",
+      "noChange": "これらの配列間で変わるホットキーはありません。",
+      "apply": "ホットキーを変換",
+      "converted": "ホットキーを {from} から {to} に変換しました。",
+      "layouts": {
+        "qwertyUs": "QWERTY (US)",
+        "qwertyUk": "QWERTY (UK)",
+        "qwertzDe": "QWERTZ（ドイツ語）",
+        "qwertzCh": "QWERTZ（スイス）",
+        "azertyFr": "AZERTY（フランス語）",
+        "azertyBe": "AZERTY（ベルギー）",
+        "qwertyEs": "QWERTY（スペイン語）",
+        "qwertyIt": "QWERTY（イタリア語）",
+        "qwertyNordic": "QWERTY（スウェーデン語、フィンランド語）",
+        "qwertyDa": "QWERTY（デンマーク語）",
+        "qwertyNo": "QWERTY（ノルウェー語）",
+        "qwertyBr": "QWERTY（ブラジル ABNT2）",
+        "qwertyPt": "QWERTY（ポルトガル語）",
+        "qwertyTr": "QWERTY（トルコ語）",
+        "dvorak": "Dvorak 配列",
+        "colemak": "Colemak 配列"
+      }
+    },
     "keyboardMap": {
       "title": "キーボード一覧",
       "hint": "使用中のキーはカテゴリ別に色分けされています。キーにカーソルを合わせるかフォーカスすると、そのキーの割り当てがすべて表示されます。",

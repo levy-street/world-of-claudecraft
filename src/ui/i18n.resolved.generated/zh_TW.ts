@@ -4347,6 +4347,37 @@ export const zh_TW: EnTranslations = {
       "imported": "快捷鍵配置已匯入。",
       "wrongKind": "該代碼是設定匯出，不是快捷鍵配置。"
     },
+    "keybindLayout": {
+      "title": "鍵盤配置",
+      "open": "轉換",
+      "from": "快捷鍵原配置",
+      "to": "轉換為",
+      "keepMovement": "移動鍵維持原位",
+      "keepMovementLocked": "上次轉換時移動鍵維持原位，因此這次也會維持原位。如需重新開始，請恢復預設值。",
+      "help": "每個快捷鍵會移到新配置中打出相同字元的按鍵上。數字列維持不變。此清單中的按鍵名稱是 QWERTY 位置；鍵盤總覽會顯示你自己的配置。",
+      "moves": "將移動的快捷鍵：{count}",
+      "noChange": "這兩種配置之間沒有快捷鍵需要變更。",
+      "apply": "轉換快捷鍵",
+      "converted": "快捷鍵已從 {from} 轉換為 {to}。",
+      "layouts": {
+        "qwertyUs": "QWERTY (US)",
+        "qwertyUk": "QWERTY (UK)",
+        "qwertzDe": "QWERTZ（德文）",
+        "qwertzCh": "QWERTZ（瑞士）",
+        "azertyFr": "AZERTY（法文）",
+        "azertyBe": "AZERTY（比利時）",
+        "qwertyEs": "QWERTY（西班牙文）",
+        "qwertyIt": "QWERTY（義大利文）",
+        "qwertyNordic": "QWERTY（瑞典文、芬蘭文）",
+        "qwertyDa": "QWERTY（丹麥文）",
+        "qwertyNo": "QWERTY（挪威文）",
+        "qwertyBr": "QWERTY（巴西 ABNT2）",
+        "qwertyPt": "QWERTY（葡萄牙文）",
+        "qwertyTr": "QWERTY（土耳其文）",
+        "dvorak": "德沃夏克",
+        "colemak": "Colemak 配置"
+      }
+    },
     "keyboardMap": {
       "title": "鍵盤總覽",
       "hint": "正在使用的按鍵依類別著色。將滑鼠懸停或聚焦到某個按鍵即可查看其全部綁定。",

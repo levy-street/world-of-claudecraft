@@ -541,6 +541,26 @@ const SLOTS_PER_ACTION = 2; // primary + secondary
 // means deciding (and documenting here) whether existing marked profiles need to
 // see it too, e.g. by moving this to a version number bumped for that signature.
 const REPAIR_MARKER = '__repaired';
+// The keyboard layout this profile's hotkeys were last converted to by the Key
+// Bindings layout converter (src/ui/keyboard_layout_convert_core.ts ids), and
+// whether the movement keys were kept in place (so they still sit on their
+// pre-conversion positions). It lives in the profile blob so it persists and a
+// fresh character seeded from the legacy blob inherits it with the bindings;
+// reset() and a plain importBindings() clear it. Like REPAIR_MARKER it is never
+// a BIND_ACTIONS id, so the id-keyed loops skip it.
+const LAYOUT_MARKER = '__layout';
+
+/** The layout converter's record on a profile (LAYOUT_MARKER). */
+export interface ConvertedLayout {
+  id: string;
+  keptMovement: boolean;
+}
+
+function readConvertedLayout(raw: unknown): ConvertedLayout | null {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return null;
+  const { id, keptMovement } = raw as { id?: unknown; keptMovement?: unknown };
+  return typeof id === 'string' && typeof keptMovement === 'boolean' ? { id, keptMovement } : null;
+}
 
 export function actionKind(id: string): BindKind | null {
   return ACTION_BY_ID.get(id)?.kind ?? null;
@@ -773,6 +793,8 @@ export function keyCapLabel(label: string): string {
 export class Keybinds {
   // actionId -> [primary, secondary] codes (either may be null)
   private map = new Map<string, (string | null)[]>();
+  // The layout converter's last target for these bindings (LAYOUT_MARKER).
+  private layout: ConvertedLayout | null = null;
   // localStorage key this profile reads/writes. A non-empty scope namespaces it
   // per character; an empty scope keeps the bare legacy/global key.
   private readonly storeKey: string;
@@ -815,6 +837,7 @@ export class Keybinds {
       repairStoredBindings(obj);
     }
     this.applyBlob(obj);
+    this.layout = readConvertedLayout(obj[LAYOUT_MARKER]);
   }
 
   /**
@@ -879,22 +902,35 @@ export class Keybinds {
     return obj;
   }
 
+  /** The keyboard layout these hotkeys were last converted to, or null when
+   *  they are as authored (defaults, a reset, an imported code). */
+  convertedLayout(): ConvertedLayout | null {
+    return this.layout === null ? null : { ...this.layout };
+  }
+
   /**
    * Replace this profile with an imported hotkey setup: defaults first, then the
    * blob applied with load()'s validation (unknown actions ignored, reserved
    * codes skipped, one code per action, missing actions keep their defaults).
    * Persists immediately, so the setup survives a reload like any rebind.
+   * `convertedLayout` records a layout conversion (the converter passes it); a
+   * pasted hotkey code passes none, which clears any earlier record.
    */
-  importBindings(obj: Record<string, unknown>): void {
+  importBindings(
+    obj: Record<string, unknown>,
+    convertedLayout: ConvertedLayout | null = null,
+  ): void {
     this.map = this.defaults();
     this.applyBlob(obj);
+    this.layout = convertedLayout === null ? null : { ...convertedLayout };
     this.save();
   }
 
   private save(): void {
-    const obj: Record<string, (string | null)[] | boolean> = {};
+    const obj: Record<string, (string | null)[] | boolean | ConvertedLayout> = {};
     for (const [id, codes] of this.map) obj[id] = codes;
     obj[REPAIR_MARKER] = true;
+    if (this.layout !== null) obj[LAYOUT_MARKER] = this.layout;
     try {
       localStorage.setItem(this.storeKey, JSON.stringify(obj));
     } catch {
@@ -1024,6 +1060,7 @@ export class Keybinds {
 
   reset(): void {
     this.map = this.defaults();
+    this.layout = null;
     this.save();
   }
 

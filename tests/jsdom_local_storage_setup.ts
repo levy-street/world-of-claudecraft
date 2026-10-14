@@ -52,26 +52,44 @@ function ensureUsable(key: 'localStorage' | 'sessionStorage'): void {
   }
 }
 
-const MemoryProgressEvent =
-  globalThis.ProgressEvent ??
-  class extends Event implements ProgressEvent {
-    readonly lengthComputable: boolean;
-    readonly loaded: number;
-    readonly total: number;
+class FallbackProgressEvent extends Event implements ProgressEvent {
+  readonly lengthComputable: boolean;
+  readonly loaded: number;
+  readonly total: number;
 
-    constructor(type: string, init: ProgressEventInit = {}) {
-      super(type, init);
-      this.lengthComputable = init.lengthComputable ?? false;
-      this.loaded = init.loaded ?? 0;
-      this.total = init.total ?? 0;
-    }
-  };
+  constructor(type: string, init: ProgressEventInit = {}) {
+    super(type, init);
+    this.lengthComputable = init.lengthComputable ?? false;
+    this.loaded = init.loaded ?? 0;
+    this.total = init.total ?? 0;
+  }
+}
+
+const MemoryProgressEvent = globalThis.ProgressEvent ?? FallbackProgressEvent;
 
 if (typeof globalThis.ProgressEvent === 'undefined') {
   Object.defineProperty(globalThis, 'ProgressEvent', {
     value: MemoryProgressEvent,
     configurable: true,
     enumerable: true,
+  });
+}
+
+// A happy-dom file gets ProgressEvent from happy-dom itself, so the shim above
+// is skipped, and the environment's teardown then DELETES that global. A model
+// preload still streaming at that point (Three's FileLoader reads a GLB the
+// virtual server in vite.config.ts serves from public/ and builds a
+// ProgressEvent per chunk) threw `ProgressEvent is not defined` as an unhandled
+// rejection after the file's tests had all passed, failing the CI shard at
+// random. A fallback on the global object's PROTOTYPE survives that delete
+// (an unqualified name resolves through the global's prototype chain) without
+// shadowing the environment's own class while a test runs.
+const globalProto = Object.getPrototypeOf(globalThis) as object | null;
+if (globalProto && !Object.hasOwn(globalProto, 'ProgressEvent')) {
+  Object.defineProperty(globalProto, 'ProgressEvent', {
+    value: FallbackProgressEvent,
+    configurable: true,
+    writable: true,
   });
 }
 

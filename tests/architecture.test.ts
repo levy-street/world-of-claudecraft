@@ -387,6 +387,7 @@ const UI_PURE_CORES = [
   'src/ui/keybind_action_names_core.ts',
   'src/ui/keybind_device_notes_core.ts',
   'src/ui/keyboard_layout_pref_core.ts',
+  'src/ui/keyboard_layout_convert_core.ts',
   'src/ui/settings_transfer_core.ts',
   'src/ui/meters_frame_core.ts',
   'src/ui/meters_menu_view.ts',
@@ -2707,6 +2708,9 @@ const UI_DOM_MODULES = [
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/options_window_shell.ts',
   'src/ui/options_interface_rows.ts',
+  // Key Bindings > Keyboard Layout: mints its own nodes; the conversion lives in
+  // the registered pure core src/ui/keyboard_layout_convert_core.ts.
+  'src/ui/keybind_layout_convert_rows.ts',
   // Options > Performance > System Report: mints its own nodes (createElement)
   // and reads the desktop bridge for its availability gate. Decisions live in
   // the registered pure core src/ui/host_diag_view.ts; this half is nodes, one
