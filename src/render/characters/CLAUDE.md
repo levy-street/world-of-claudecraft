@@ -18,16 +18,22 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `assets.ts`: eager `registerPreload` of `characterPreloadUrls()`, the
   tier-INDEPENDENT union of every graphics tier's URL set (the why lives in
   the Asset loading section of `src/render/CLAUDE.md` and the P0 comment in
-  `manifest.ts`). `prepareVisual(key)` memoizes normalize transform, resolved
-  clips, click-capsule radius, and a baked idle-pose geo (far-LOD/shadow
-  proxy). `charactersReady()` is deliberately NARROWER than the site-wide
-  `assetsReady()`: only this file's boot GLBs (the skin atlases defer on every
-  host and rejoin this gate only if the eagerSkinAtlases kill-switch in
-  `assets.ts` is ever flipped back), with its own
-  delayed, backed-off retry loop, so a transient failure anywhere else on the
-  site can never permanently blank the landing character-creation preview
-  (`src/main.ts` awaits it there instead of `assetsReady()`;
-  `tests/character_preview_boot.test.ts`).
+  `manifest.ts`), except the mob bodies (`models/creatures/`,
+  `models/chars/enemies/`): the launcher draws none, so on desktop and Android
+  they register in the deferred lane, still gating the Renderer, and
+  `warmWorldCharacterBodies()` starts them early when a play screen opens
+  (`tests/defer_mob_bodies.test.ts`). iOS streams them after entry instead.
+  `prepareVisual(key)` memoizes normalize transform, resolved clips,
+  click-capsule radius, and a baked idle-pose geo (far-LOD/shadow proxy).
+  `launcherCharactersReady()` is deliberately NARROWER than the site-wide
+  `assetsReady()`: only this file's launcher GLBs (the skin atlases defer on
+  every host and rejoin this gate only if the eagerSkinAtlases kill-switch in
+  `assets.ts` is ever flipped back), with its own delayed, backed-off retry
+  loop, so a transient failure anywhere else on the site can never permanently
+  blank the landing character-creation preview (`src/main.ts` awaits it there
+  instead of `assetsReady()`; `tests/character_preview_boot.test.ts`).
+  `charactersReady()` is the same loop over every gate GLB, mob bodies
+  included, for in-world callers that build mob bodies directly.
 - `armor_dye.ts`: the outfit-colorway dye shader layer (`attachArmorDye`, plus
   `reapplyArmorDyeToClone` for the clone path). Its own leaf module because
   `../material_clone_hooks.ts` must re-attach it on every program-preserving
