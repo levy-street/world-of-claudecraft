@@ -765,6 +765,14 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 2 },
     reflowAllow: {},
   },
+  // The death screen's PvP Resurrect button and note (hud/death/): every write,
+  // the countdown text, the disabled attribute and the two displays, rides the
+  // elided writers; the press is bound once at construction.
+  {
+    file: 'hud/death/pvp_resurrect_painter.ts',
+    allow: {},
+    reflowAllow: {},
+  },
   // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
   // death or an expiry only (the per-frame update elides on the pure core's
   // reference equality); the setAttribute runs once at mount.

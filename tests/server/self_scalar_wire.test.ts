@@ -6,6 +6,7 @@
 // pins WHAT the emitter hands it.
 import { describe, expect, it } from 'vitest';
 import { emitSelfScalarKeys, SELF_SCALAR_KEYS } from '../../server/self_scalar_wire';
+import { DUNGEON_X_THRESHOLD } from '../../src/sim/data';
 import type { PlayerMeta } from '../../src/sim/sim';
 import type { Entity } from '../../src/sim/types';
 
@@ -61,6 +62,23 @@ describe('emitSelfScalarKeys', () => {
       hirat: 11,
       ddiff: 'heroic',
     });
+  });
+
+  it('corpse is the ghost run body position, null once there is none', () => {
+    expect(collect({ corpsePos: null }, {}).corpse).toBeNull();
+    expect(collect({ corpsePos: { x: 1, y: 2, z: 3 } }, {}).corpse).toEqual({ x: 1, y: 2, z: 3 });
+  });
+
+  it('pvr is lit only for a corpse whose PvP Resurrect would be honored', () => {
+    const open = { dead: true, pvpResurrect: true, pos: { x: 0, y: 0, z: 0 } };
+    expect(collect(open, {}).pvr).toBe(1);
+    expect(collect({ ...open, dead: false }, {}).pvr, 'alive').toBe(0);
+    expect(collect({ ...open, pvpResurrect: false }, {}).pvr, 'no offer').toBe(0);
+    expect(collect({ ...open, jailed: true }, {}).pvr, 'jailed').toBe(0);
+    expect(
+      collect({ ...open, pos: { x: DUNGEON_X_THRESHOLD + 50, y: 0, z: 0 } }, {}).pvr,
+      'on the instance plane',
+    ).toBe(0);
   });
 
   it('cbt is the sim in-combat flag as a 0/1 bit, never a boolean or an omission', () => {

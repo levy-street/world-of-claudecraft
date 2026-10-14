@@ -677,6 +677,7 @@ import * as tradeMod from './social/trade';
 import {
   applyResurrectionSickness,
   applyUnstuckSickness,
+  pvpResurrect,
   RESURRECTION_SICKNESS_ID,
   releasePlayerSpirit,
   resurrectAtCorpse,
@@ -9039,6 +9040,9 @@ export class Sim {
 
   resurrectAtSpiritHealer(pid?: number): boolean {
     return resurrectAtSpiritHealer(this.ctx, pid);
+  }
+  pvpResurrect(pid?: number): void {
+    pvpResurrect(this.ctx, pid, (id) => this.releaseSpirit(id));
   }
 
   respondToResurrection(accept: boolean, pid?: number): void {

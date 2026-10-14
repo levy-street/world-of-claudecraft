@@ -34,16 +34,18 @@ export {
   HILL_WINDOW_SECONDS,
   type HillSpotProbe,
   type HillStanding,
+  type HillSuccessorMember,
   type HillTimes,
   hillChallengeStands,
   hillContains,
-  hillContestStep,
   hillGroupKey,
   hillHonorPerPayout,
   hillLeader,
   hillMinutesUntil,
+  hillProgressStep,
   hillSpotIsOpen,
   hillStanding,
+  hillSuccessorKey,
   hillTimes,
   hillTimesFrom,
   hillWindowAt,
@@ -113,6 +115,16 @@ export {
   pvpFractionsFromRatings,
   pvpVitalityFromRating,
 } from './power';
+export {
+  notePvpResurrectAtDeath,
+  PVP_RESURRECT_WAIT_SECONDS,
+  PVP_RESURRECT_WINDOW_SECONDS,
+  type PvpResurrectDeath,
+  pvpResurrectBarred,
+  pvpResurrectEarned,
+  pvpResurrectReady,
+  pvpResurrectWaitSeconds,
+} from './pvp_resurrect';
 export { pvpVitalityAppliesTo, updatePvpVitality } from './vitality';
 export {
   isWorldPvpFlagged,

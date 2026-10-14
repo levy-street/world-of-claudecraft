@@ -125,6 +125,10 @@ export interface IWorldCombat {
   releaseSpirit(): void;
   resurrectAtCorpse(): void;
   resurrectAtSpiritHealer(): WorldInteractionOutcome;
+  // PvP Resurrect: a corpse whose death a hostile player had a hand in (the
+  // player's Entity.pvpResurrect) releases and stands up at the graveyard at
+  // full health and mana with no sickness (src/sim/pvp/pvp_resurrect.ts).
+  pvpResurrect(): void;
   /** Accept or decline the currently pending player-cast resurrection offer. */
   respondToResurrection(accept: boolean): void;
 }

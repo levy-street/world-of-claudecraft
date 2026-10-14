@@ -600,9 +600,15 @@ parties only). A party is one group and a lone player a group of one
 level counts, since anyone on free-for-all ground is fair game. The
 largest group that beats the holder's present members by a strict majority
 (`hillChallengeStands`; a tie never moves the hill, an absent holder is beaten
-by anyone) is the challenger, and after `HILL_CAPTURE_SECONDS` (60) of
-unbroken majority it takes the hill (`hillContestStep`: a lapsed challenge
-starts over, a new challenger starts its own clock). The dead do not count.
+by anyone) is the challenger, and after `HILL_CAPTURE_SECONDS` (30, owner spec
+2026-10-12) of majority it takes the hill. Each group keeps its own clock
+(`hillProgressStep`): a rival walking in only PAUSES it (a tie, or a bigger
+group now leading), and it resumes where it stopped once the group leads again;
+the clock is lost only when the group has nobody counted inside, so a death
+(the dead do not count) or walking away resets it. The hold and any clock follow
+their members across a group change (`hillSuccessorKey`): a lone holder who
+forms or joins a party keeps the hill, its ramp and every bank, and a holding
+party that disbands leaves it with the member still inside.
 Everyone standing in the zone is already hostile to every stranger there (the
 free-for-all arm, and guildmates outside one party are strangers), so the hill
 needs no flag of its own.

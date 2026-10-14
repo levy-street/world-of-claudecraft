@@ -9,9 +9,11 @@ through `IWorld.hillInfo`), behind the `index.ts` barrel:
   (announced or risen) and whether the viewer counts (`standing`: a raid member
   does not, and the bar says so); the holder
   and the challenger from the viewer's seat; the two headcounts the contest is
-  decided on (`yours` against the holder's members inside, or the largest
-  rival's while the hill is unheld, `hillRivalCount`); the contest clock
-  against `HILL_CAPTURE_SECONDS` and its 0..1 fill fraction; the whole-yard
+  decided on (`yours` against the holder's members inside while another group
+  holds it, else the largest other group inside, `HillInfo.rivalCount`,
+  `hillRivalCount`); the contest clock against `HILL_CAPTURE_SECONDS`, its 0..1
+  fill fraction and whether it is paused (`contestPaused`: the group is inside
+  but a rival matches or outnumbers it; the viewer's own clock is shown first); the whole-yard
   distance to the circle's edge (`hillEdgeDistance`, 0 inside); the minutes
   until the hill rises or falls; and the structural `sig` (zone, geometry,
   phase, standing, holder, challenger, inside) the painter rebuilds its
@@ -24,7 +26,7 @@ through `IWorld.hillInfo`), behind the `index.ts` barrel:
   change; every per-second
   value (the counts, the contest text and fill width, the distance, the
   minutes) rides the `PainterHost` elided writers, so an idle second writes
-  nothing; the tone classes (`is-you`, `is-other`, `is-contested`) are
+  nothing; the tone classes (`is-you`, `is-other`, `is-contested`, `is-paused`) are
   toggled through the elided class writer and chosen from the union, never
   interpolated from the wire. The state is carried by text as well as colour.
   Cold painter: its allowance is pinned in `tests/hud_perf_budget.test.ts`.

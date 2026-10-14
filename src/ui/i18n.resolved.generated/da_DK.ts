@@ -593,6 +593,11 @@ export const da_DK: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
+      "pvpResurrect": "PvP Resurrect",
+      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
+      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
+      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
+      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
       "resurrectAtHealer": "Den Blege Vogter (Vogterens Klokke)",
       "ghostHint": "Løb til stedet for din død eller tale med Blegekyperen for at blive genoplivet",
       "spiritHealerAlive": "Den Blege Vogter våger over de døde. Du er stadig blandt de levende.",
@@ -2831,6 +2836,8 @@ export const da_DK: EnTranslations = {
       "countsHolding": "Inde: du {yours}, rival {theirs}",
       "contestYou": "Tager bakken: {seconds} af {total}",
       "contestOther": "Mister bakken: {seconds} af {total}",
+      "contestYouPaused": "Paused: {seconds} of {total}",
+      "contestOtherPaused": "Rival paused: {seconds} of {total}",
       "contestNone": "Hold et flertal indenfor i {total} for at tage det",
       "inside": "Du er indenfor cirklen",
       "distance": "{yards} yd til cirklen",
@@ -8324,6 +8331,7 @@ export const da_DK: EnTranslations = {
       "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Hver tredje time, på et tidspunkt ingen kan forudsige, hele riget fortalt at en bakke vil stige i en af fri-for-alt-zonerne på femten minutter, og cirklen hvor det vil stå markeres på åbent land. Når det stiger står det i 45 minutter, derefter falder. Partiet med de fleste spillere stående indenfor strides bakken, og efter et minuts ubrudt majoritet bakken er deres; en ensom spiller tæller som et parti på en, men raid-medlemmer tæller slet ikke. Mens en parti holder bakken, hver af dets medlemmer stående indenfor tjener Ære hver minut, og jo længere det samme parti holder det, jo mere hver minut betaler: et fuldt parti holder en omstridt bakke for hele sit stå tjener omkring så meget som tre battleground sejre. Når bakken skifter hænder, start de nye indehavere tællingen fra begyndelsen. En bar over marken viser hvem der holder det, dine numre mod deres, og konkurrenceuret; /hill i chat siger hvor det står.",
+      "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyRaids": "Besejring det samme spiller igen og igen betaler mindre hver gang og snart ingenting, og din tælling mod det spiller kun starter over omkring en time efter først af disse drab, så lejring en offer er aldrig værd ventetid. Et mål langt under dit niveau betaler ingenting overhovedet. Battlegrounds og Arenaer køre deres egne regler mens du er inden i dem, og de betaler mere Ære end åben verden, så verden PvP er den langsommere vej til samme forhandler. Raids tjener ingenting fra verden drab: et raid medlem tager ingen Ære eller guld og gør ikke skrumpe nogen anden aktie, så kæmp som en parti til at blive betalt."
     },
     "thornhollowPage": {

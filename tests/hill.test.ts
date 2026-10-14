@@ -4,7 +4,8 @@
 // wholly inside a free-for-all zone, the same on every host, drawn from a
 // private rng, a retry searching new ground), the contest (a party as one
 // group, raids not counted, any level counted, the strict majority, the
-// tie, the lapse, the dead), the capture notices, the Honor trickle (a minute
+// tie, the lapse, the dead, a rival only pausing a clock, the hold and a clock
+// following a group change), the capture notices, the Honor trickle (a minute
 // of presence pays one, only inside, only holders, a bank kept across a step
 // out), the readout from each viewer's seat, the /hill and /dev hill arms, and
 // the kill switch.
@@ -352,7 +353,7 @@ describe('the spot', () => {
 });
 
 describe('the contest', () => {
-  it('a lone player takes an unheld hill after a minute inside, and is told', () => {
+  it('a lone player takes an unheld hill after HILL_CAPTURE_SECONDS inside, and is told', () => {
     const { sim, pids } = hillWorld(['Aleph']);
     const [a] = pids;
     inside(sim, a);
@@ -420,8 +421,8 @@ describe('the contest', () => {
     const { sim, pids } = hillWorld(['Aleph', 'Bet']);
     const [a, b] = pids;
     inside(sim, a);
-    tickSeconds(sim, 30);
-    expect(sim.hillInfoFor(a)!.contest).toBe(30);
+    tickSeconds(sim, 20);
+    expect(sim.hillInfoFor(a)!.contest).toBe(20);
     outside(sim, a);
     tickSeconds(sim, 2);
     expect(sim.hillInfoFor(a)!.contest).toBe(0);
@@ -495,6 +496,186 @@ describe('the contest', () => {
     tickSeconds(sim, 2);
     expect(sim.hillState.active!.holder).toBe(`solo:${a}`);
     expect(sim.hillInfoFor(a)).toMatchObject({ holder: 'you', challenger: 'none', contest: 0 });
+  });
+
+  it('a rival walking in only pauses the clock, and it resumes when the rival leaves', () => {
+    const { sim, pids } = hillWorld(['Aleph', 'Bet']);
+    const [a, b] = pids;
+    inside(sim, a);
+    tickSeconds(sim, 20);
+    expect(sim.hillInfoFor(a)).toMatchObject({
+      challenger: 'you',
+      contest: 20,
+      contestPaused: false,
+    });
+    // One against one: a tie, so the clock holds still rather than resetting.
+    inside(sim, b, 5, 0);
+    tickSeconds(sim, 10);
+    expect(sim.hillState.active!.holder).toBeNull();
+    expect(sim.hillInfoFor(a)).toMatchObject({
+      challenger: 'you',
+      contest: 20,
+      contestPaused: true,
+      yourCount: 1,
+      rivalCount: 1,
+    });
+    // The rival sees the paused clock as someone else's.
+    expect(sim.hillInfoFor(b)).toMatchObject({
+      challenger: 'other',
+      contest: 20,
+      contestPaused: true,
+    });
+    outside(sim, b);
+    tickSeconds(sim, 5);
+    expect(sim.hillInfoFor(a)).toMatchObject({ contest: 25, contestPaused: false });
+    tickSeconds(sim, 6);
+    expect(sim.hillState.active!.holder).toBe(`solo:${a}`);
+  });
+
+  it('a bigger group pauses a lone challenger, who resumes once it leaves', () => {
+    const { sim, pids } = hillWorld(['Aleph', 'Bet', 'Gimel']);
+    const [a, b, c] = pids;
+    sim.partyInvite(c, b);
+    sim.partyAccept(c);
+    inside(sim, a);
+    tickSeconds(sim, 20);
+    inside(sim, b, 5, 0);
+    inside(sim, c, -5, 0);
+    tickSeconds(sim, 10);
+    // The pair leads and counts; the lone player's 20 seconds wait.
+    expect(sim.hillInfoFor(a)).toMatchObject({
+      challenger: 'you',
+      contest: 20,
+      contestPaused: true,
+      rivalCount: 2,
+    });
+    expect(sim.hillInfoFor(b)).toMatchObject({ challenger: 'you', contestPaused: false });
+    expect(sim.hillInfoFor(b)!.contest).toBeGreaterThanOrEqual(9);
+    outside(sim, b);
+    outside(sim, c);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS - 20 + 1);
+    expect(sim.hillState.active!.holder).toBe(`solo:${a}`);
+  });
+
+  it('dying resets the challenge: the dead are not counted, so their clock is dropped', () => {
+    const { sim, pids } = hillWorld(['Aleph', 'Bet']);
+    const [a, b] = pids;
+    inside(sim, a);
+    tickSeconds(sim, 20);
+    inside(sim, b, 5, 0);
+    tickSeconds(sim, 2);
+    expect(sim.hillInfoFor(a)).toMatchObject({ contest: 20, contestPaused: true });
+    ent(sim, a).dead = true;
+    outside(sim, b);
+    tickSeconds(sim, 2);
+    expect(sim.hillState.active!.progress.has(`solo:${a}`)).toBe(false);
+    ent(sim, a).dead = false;
+    tickSeconds(sim, 2);
+    expect(sim.hillInfoFor(a)!.contest).toBeLessThanOrEqual(2);
+  });
+
+  it('a lone holder who forms a party keeps the hill, the ramp and the bank', () => {
+    const { sim, pids } = hillWorld(['Aleph', 'Bet']);
+    const [a, b] = pids;
+    inside(sim, a);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
+    tickSeconds(sim, 20);
+    const hill = sim.hillState.active!;
+    expect(hill.holder).toBe(`solo:${a}`);
+    const held = hill.heldSeconds;
+    const banked = hill.accrual.get(a)!;
+    expect(banked).toBeGreaterThan(0);
+    sim.events = [];
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    const party = sim.partyOf(a)!;
+    const seen = tickSeconds(sim, 2);
+    expect(hill.holder).toBe(`party:${party.id}`);
+    expect(hill.heldSeconds).toBeGreaterThan(held);
+    expect(hill.accrual.get(a)!).toBeGreaterThan(banked);
+    expect(logLines(seen, a)).not.toContain(HILL_TAKEN_LINE);
+    expect(logLines(seen, a)).not.toContain(HILL_LOST_LINE);
+    expect(sim.hillInfoFor(a)).toMatchObject({ holder: 'you', challenger: 'none' });
+    // The friend walks in and holds with them.
+    inside(sim, b, 4, 0);
+    tickSeconds(sim, 2);
+    expect(sim.hillInfoFor(b)).toMatchObject({ holder: 'you', holderCount: 2 });
+    expect(hill.accrual.has(b)).toBe(true);
+  });
+
+  it('a holding pair that disbands leaves the hill with the member still inside', () => {
+    const { sim, pids } = hillWorld(['Aleph', 'Bet']);
+    const [a, b] = pids;
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    inside(sim, a);
+    inside(sim, b, 4, 0);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
+    expect(sim.hillState.active!.holder).toBe(`party:${sim.partyOf(a)!.id}`);
+    const held = sim.hillState.active!.heldSeconds;
+    outside(sim, b);
+    sim.partyLeave(b);
+    expect(sim.partyOf(a)).toBeNull();
+    tickSeconds(sim, 2);
+    expect(sim.hillState.active!.holder).toBe(`solo:${a}`);
+    expect(sim.hillState.active!.heldSeconds).toBeGreaterThan(held);
+    expect(sim.hillInfoFor(b)).toMatchObject({ holder: 'other' });
+  });
+
+  it('a holder who joins a rival party inside does not hand that party the hill', () => {
+    const { sim, pids } = hillWorld(['Aleph', 'Bet', 'Gimel']);
+    const [a, b, c] = pids;
+    inside(sim, a);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
+    expect(sim.hillState.active!.holder).toBe(`solo:${a}`);
+    // A rival pair stands inside (tied out by nobody: they outnumber the holder).
+    sim.partyInvite(c, b);
+    sim.partyAccept(c);
+    inside(sim, b, 5, 0);
+    inside(sim, c, -5, 0);
+    tickSeconds(sim, 4);
+    const rival = `party:${sim.partyOf(b)!.id}`;
+    expect(sim.hillState.active!.progress.get(rival)).toBeGreaterThan(0);
+    // The holder joins them: the hold stays behind, the pair must still capture.
+    sim.partyInvite(a, b);
+    sim.partyAccept(a);
+    tickSeconds(sim, 2);
+    expect(sim.hillState.active!.holder).toBe(`solo:${a}`);
+    expect(sim.hillInfoFor(b)).toMatchObject({ holder: 'other', challenger: 'you' });
+  });
+
+  it('a challenger who joins a rival party inside brings no clock with them', () => {
+    const { sim, pids } = hillWorld(['Aleph', 'Bet', 'Gimel']);
+    const [a, b, c] = pids;
+    inside(sim, a);
+    tickSeconds(sim, 20);
+    sim.partyInvite(c, b);
+    sim.partyAccept(c);
+    inside(sim, b, 5, 0);
+    inside(sim, c, -5, 0);
+    tickSeconds(sim, 2);
+    const rival = `party:${sim.partyOf(b)!.id}`;
+    const before = sim.hillState.active!.progress.get(rival)!;
+    expect(before).toBeLessThan(5);
+    sim.partyInvite(a, b);
+    sim.partyAccept(a);
+    tickSeconds(sim, 2);
+    expect(sim.hillState.active!.progress.get(rival)!).toBeLessThan(before + 5);
+    expect(sim.hillState.active!.progress.has(`solo:${a}`)).toBe(false);
+  });
+
+  it('a lone challenger who forms a party mid-capture keeps their progress', () => {
+    const { sim, pids } = hillWorld(['Aleph', 'Bet']);
+    const [a, b] = pids;
+    inside(sim, a);
+    tickSeconds(sim, 20);
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    tickSeconds(sim, 2);
+    expect(sim.hillInfoFor(a)).toMatchObject({ challenger: 'you', contestPaused: false });
+    expect(sim.hillInfoFor(a)!.contest).toBeGreaterThanOrEqual(21);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS - 20);
+    expect(sim.hillState.active!.holder).toBe(`party:${sim.partyOf(a)!.id}`);
   });
 });
 
@@ -634,10 +815,10 @@ describe('the readout and the chat arms', () => {
       (ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error',
     );
     expect(errors.find((ev) => ev.pid === a)?.text).toBe(
-      'The hill stands in The Drakelands: your group holds it. It falls in 44 minutes.',
+      'The hill stands in The Drakelands: your group holds it. It falls in 45 minutes.',
     );
     expect(errors.find((ev) => ev.pid === b)?.text).toBe(
-      'The hill stands in The Drakelands: another group holds it. It falls in 44 minutes.',
+      'The hill stands in The Drakelands: another group holds it. It falls in 45 minutes.',
     );
     const quiet = world();
     const q = addPlayer(quiet, 'Quiet');
@@ -787,7 +968,7 @@ describe('determinism', () => {
       return {
         holder: sim.hillState.active!.holder,
         honor: [sim.meta(a)!.honor, sim.meta(b)!.honor],
-        contest: sim.hillState.active!.contest,
+        progress: [...sim.hillState.active!.progress],
         rng: sim.rng.next(),
       };
     };

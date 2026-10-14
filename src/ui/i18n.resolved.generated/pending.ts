@@ -9,25 +9,160 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "es_ES": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "fr_FR": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "fr_CA": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "de_DE": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "nl_NL": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "pl_PL": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "id_ID": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "tr_TR": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "sv_SE": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "vi_VN": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ],
+  "da_DK": [
+    "guide.worldPvpPage.hillBodyPause",
+    "hudChrome.death.pvpResurrect",
+    "hudChrome.death.pvpResurrectReadyNote",
+    "hudChrome.death.pvpResurrectTitle",
+    "hudChrome.death.pvpResurrectWaitButton",
+    "hudChrome.death.pvpResurrectWaitNote",
+    "hudChrome.hill.contestOtherPaused",
+    "hudChrome.hill.contestYouPaused"
+  ]
 };

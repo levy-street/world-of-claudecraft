@@ -10632,9 +10632,21 @@
   }
   #death-overlay .death-actions {
     display: flex;
-    gap: 16px;
+    /* Three buttons (Release, PvP Resurrect, Recap) are wider than the 360px
+       panel, so the row wraps: the two ways back share the first line and
+       Recap drops below, never spilling past the panel edge. */
+    flex-wrap: wrap;
+    gap: 12px 16px;
     align-items: center;
     justify-content: center;
+  }
+  /* The PvP Resurrect wait and where the raise lands (src/ui/hud/death). */
+  #death-overlay .death-note {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
+    color: var(--color-text-muted);
   }
 
   /* ---------- death recap dialog (WoW-style) ---------- */

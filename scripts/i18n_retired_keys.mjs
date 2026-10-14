@@ -64,6 +64,7 @@ export const RETIRED_KEYS = [
   'guide.worldPvpPage.limitsBody', // -> guide.worldPvpPage.limitsBodyHour
   'guide.worldPvpPage.limitsBodyHour', // -> guide.worldPvpPage.limitsBodyRaids (the raid rule)
   'guide.worldPvpPage.hillBody', // -> guide.worldPvpPage.hillBodyRamp (the hold ramp)
+  'guide.worldPvpPage.hillBodyRamp', // -> guide.worldPvpPage.hillBodyPause (30 s capture, a rival pauses it)
   'guide.commandsPage.pvp', // -> guide.commandsPage.pvpZones
 
   // -- Content the game no longer has, so the wiki must not define it.

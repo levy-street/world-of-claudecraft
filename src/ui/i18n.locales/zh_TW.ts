@@ -547,6 +547,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.contestNone': '在圈內維持人數優勢 {total} 即可奪取',
   'hudChrome.hill.contestOther': '正在失守山丘：{seconds} / {total}',
   'hudChrome.hill.contestYou': '正在奪取山丘：{seconds} / {total}',
+  'hudChrome.hill.contestYouPaused': '已暫停：{seconds} / {total}',
+  'hudChrome.hill.contestOtherPaused': '對手的奪取已暫停：{seconds} / {total}',
   'hudChrome.hill.counts': '圈內：你方 {yours}，佔據者 {theirs}',
   'hudChrome.hill.countsHolding': '圈內：你方 {yours}，對手 {theirs}',
   'hudChrome.hill.countsUnheld': '圈內：你方 {yours}，最大對手 {theirs}',
@@ -2724,6 +2726,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。',
   'guide.worldPvpPage.hillBodyRamp':
     '每三小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個自由混戰地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立四十五分鐘，然後消失。圈內站著玩家最多的隊伍爭奪這座山丘，連續保持人數優勢一分鐘後，山丘便歸他們所有；單獨一人算作一支一人隊伍，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得榮譽，同一支隊伍佔據得越久，每分鐘獲得的榮譽就越多。一支滿員隊伍在山丘屹立的全程不受爭奪地佔據它，所獲榮譽約相當於三場戰場勝利。山丘易手時，新的佔據者從頭開始累積。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。',
+  'guide.worldPvpPage.hillBodyPause':
+    '每三小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個自由混戰地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立四十五分鐘，然後消失。圈內站著玩家最多的隊伍爭奪這座山丘，保持人數優勢三十秒後，山丘便歸他們所有。對手隊伍進入只會暫停這一計時，直到你方重新領先；只有當你方隊伍在圈內無人存活時，計時才會從頭開始。單獨一人算作一支一人隊伍，佔據山丘後組成隊伍也不會失去它，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得榮譽，同一支隊伍佔據得越久，每分鐘獲得的榮譽就越多。一支滿員隊伍在山丘屹立的全程不受爭奪地佔據它，所獲榮譽約相當於三場戰場勝利。山丘易手時，新的佔據者從頭開始累積。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。',
   'guide.worldPvpPage.limitsBodyRaids':
     '反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。團隊無法從世界擊殺中獲得任何收益：團隊成員既得不到榮譽也得不到金幣，也不會減少其他人的份額，所以想獲得報酬就以隊伍身分作戰。',
   'guide.worldPvpPage.hillHeading': '山丘之王',
@@ -5568,6 +5572,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlock_voidwalker.name': '虛空惡魔',
   'entities.mobs.ysolei.name': '伊索蕾，溺月化身',
   'hudChrome.death.resurrectAtCorpse': '在屍體旁復活',
+  'hudChrome.death.pvpResurrect': 'PvP 復活',
+  'hudChrome.death.pvpResurrectTitle': '在最近的墓地以滿生命值復活，且不會新增復活後遺症。',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP 復活（{seconds}）',
+  'hudChrome.death.pvpResurrectWaitNote': '{seconds}後可以 PvP 復活：你將在最近的墓地復活。',
+  'hudChrome.death.pvpResurrectReadyNote': 'PvP 復活已就緒：你將在最近的墓地復活。',
   'hudChrome.death.resurrectAtHealer': '靈魂醫者（復活虛弱）',
   'hudChrome.death.healerConfirmTitle': '接受復活虛弱？',
   'hudChrome.death.healerConfirmBody':

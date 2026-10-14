@@ -547,6 +547,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.contestNone': '在圈内保持人数优势 {total} 即可占据它',
   'hudChrome.hill.contestOther': '正在失去山丘：{seconds} / {total}',
   'hudChrome.hill.contestYou': '正在占据山丘：{seconds} / {total}',
+  'hudChrome.hill.contestYouPaused': '已暂停：{seconds} / {total}',
+  'hudChrome.hill.contestOtherPaused': '对手的占领已暂停：{seconds} / {total}',
   'hudChrome.hill.counts': '圈内：你方 {yours}，占据者 {theirs}',
   'hudChrome.hill.countsHolding': '圈内：你方 {yours}，对手 {theirs}',
   'hudChrome.hill.countsUnheld': '圈内：你方 {yours}，最大对手 {theirs}',
@@ -2723,6 +2725,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。',
   'guide.worldPvpPage.hillBodyRamp':
     '每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；单独一人算作一支一人小队，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得荣誉，同一支小队占据得越久，每分钟获得的荣誉就越多。一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉约相当于三场战场胜利。山丘易手时，新的占据者从头开始累积。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。',
+  'guide.worldPvpPage.hillBodyPause':
+    '每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，保持人数优势三十秒后，山丘便归他们所有。对手小队进入只会暂停这一计时，直到你方重新领先；只有当你方小队在圈内无人存活时，计时才会从头开始。单独一人算作一支一人小队，占据山丘后组建小队也不会失去它，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得荣誉，同一支小队占据得越久，每分钟获得的荣誉就越多。一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉约相当于三场战场胜利。山丘易手时，新的占据者从头开始累积。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。',
   'guide.worldPvpPage.limitsBodyRaids':
     '反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。团队无法从世界击杀中获得任何收益：团队成员既得不到荣誉也得不到金币，也不会减少其他人的份额，所以想获得报酬就以小队身份作战。',
   'guide.worldPvpPage.hillHeading': '山丘之王',
@@ -5565,6 +5569,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlock_voidwalker.name': '虚空恶魔',
   'entities.mobs.ysolei.name': '伊索蕾，溺月化身',
   'hudChrome.death.resurrectAtCorpse': '在尸体旁复活',
+  'hudChrome.death.pvpResurrect': 'PvP 复活',
+  'hudChrome.death.pvpResurrectTitle': '在最近的墓地以满生命值复活，且不会新增复活后遗症。',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP 复活（{seconds}）',
+  'hudChrome.death.pvpResurrectWaitNote': '{seconds}后可以 PvP 复活：你将在最近的墓地复活。',
+  'hudChrome.death.pvpResurrectReadyNote': 'PvP 复活已就绪：你将在最近的墓地复活。',
   'hudChrome.death.resurrectAtHealer': '灵魂医者（复活后遗症）',
   'hudChrome.death.healerConfirmTitle': '接受复活后遗症？',
   'hudChrome.death.healerConfirmBody':

@@ -2983,9 +2983,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.savedMana = typeof s.sm === 'number' ? s.sm : 0;
       // delta fields: the server omits them while unchanged, so only the
       // snapshots that carry them rebuild the local structures
-      // corpse position while a ghost (null once resurrected). Delta-guarded: kept
-      // unchanged when the server omits it; drives the corpse marker + resurrect button.
-      if (s.corpse !== undefined) e.corpsePos = s.corpse ?? null;
       if (timerWire.mode === 'stable' && timerWire.time !== null && s.cds !== undefined) {
         if (this.stableCooldownSchedules === undefined) this.stableCooldownSchedules = new Map();
         this.stableCooldownSchedules.clear();
@@ -3447,6 +3444,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   resurrectAtSpiritHealer(): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'resurrect_healer' });
+  }
+  pvpResurrect(): void {
+    this.cmd({ cmd: 'pvp_resurrect' });
   }
   respondToResurrection(accept: boolean): void {
     this.cmd({ cmd: 'resurrect_respond', accept });

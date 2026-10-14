@@ -50,6 +50,7 @@ import { createNpc, recalcPlayerStats } from './entity';
 import { releaseSpiritInDelve } from './entity_roster';
 import { restorePetOnOwnerRevive } from './pet/pet_owner_revive';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
+import { pvpResurrectBarred, pvpResurrectReady } from './pvp/pvp_resurrect';
 import {
   aurasSurvivingDeath,
   RES_SICKNESS_STAT_MULT,
@@ -425,6 +426,32 @@ export function resurrectOnInstanceReentry(
   ctx.emit({ type: 'respawn', pid: meta.entityId });
 }
 
+/**
+ * PvP Resurrect (src/sim/pvp/pvp_resurrect.ts owns the rule): a corpse whose death
+ * offered it releases as normal, so the spirit rises at the graveyard Release
+ * picks, and stands straight up there at full health and mana with no sickness.
+ * Refused until the death's PVP_RESURRECT_WAIT_SECONDS have run (the death screen
+ * keeps the button disabled and counts them down). Never for a ghost: a full-health raise wherever a released spirit has run to
+ * would be a free teleport. `releaseSpirit` is the Sim's own release (it carries
+ * the world's graveyard list). Returns whether the player was raised.
+ */
+export function pvpResurrect(
+  ctx: SimContext,
+  pid: number | undefined,
+  releaseSpirit: (pid: number) => void,
+): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const p = r.e;
+  if (!p.dead || p.ghost || p.pvpResurrect !== true || pvpResurrectBarred(p)) return false;
+  if (!pvpResurrectReady(p)) return false;
+  releaseSpirit(p.id);
+  // Release can refuse (an arena corpse); never raise a body that did not rise.
+  if (!p.ghost) return false;
+  revivePlayerAt(ctx, p.id, p.pos, 1);
+  return true;
+}
+
 export function revivePlayerAt(ctx: SimContext, pid: number, pos: Vec3, hpFrac = 1): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -460,6 +487,9 @@ function reviveAt(
   p.ghost = false;
   p.corpsePos = null;
   p.corpseInstanceId = null;
+  // The PvP Resurrect offer belonged to that death, whichever way back was taken.
+  p.pvpResurrect = false;
+  p.pvpResurrectWait = 0;
   // revivePlayerAt teleports even a LIVE target (wasDead only gates the
   // respawn event), so a running gather/fishing session must end here too.
   cancelProfessionSessionOnDisplacement(ctx, p);

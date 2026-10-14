@@ -6045,6 +6045,16 @@ export interface Entity extends ClientMirroredEntityFields {
   // Null for world corpses and saved ghosts. Instance exits are recreated on
   // every claim, so stale corpse coordinates cannot match a recycled slot.
   corpseInstanceId: number | null;
+  // PvP Resurrect (src/sim/pvp/pvp_resurrect.ts): true while this corpse may stand
+  // up at the nearest graveyard at full health with no Keeper's Toll, because a
+  // hostile player had a hand in the death. Reset when a living player dies
+  // (combat/damage.ts handleDeath), stamped by that death, and cleared by the
+  // shared revive (spirit.ts reviveAt); absent on everyone else.
+  pvpResurrect?: boolean;
+  // Seconds left before that offer may be taken (PVP_RESURRECT_WAIT_SECONDS at the
+  // death, counted down by combat/auras.ts updateTimers, cleared with the offer).
+  // Online it mirrors the self wire's whole-second `pvrw`.
+  pvpResurrectWait?: number;
   scale: number;
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.

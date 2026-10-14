@@ -1414,6 +1414,15 @@ export function handleDeath(
   if (e.kind === 'player') {
     clearSpiritmendCurrents(ctx, e.id);
     clearShamanTalentState(ctx, e);
+    // A new death decides its own PvP Resurrect offer (pvp_resurrect.ts, stamped
+    // in worldPvpOnPlayerDeath below): drop one a revive outside spirit.ts
+    // reviveAt left behind (battleground seating, the delve respawn). Only a
+    // LIVING player's death resets it, so a second pass over the same corpse
+    // keeps the offer this death earned.
+    if (!e.dead) {
+      e.pvpResurrect = false;
+      e.pvpResurrectWait = 0;
+    }
   }
   vespersOnEntityDeath(ctx, e);
   afflictionOnDeath(ctx, e);

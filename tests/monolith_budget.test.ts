@@ -537,7 +537,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // Lowered 18093 -> 18088 on the v0.45.0 port of PvP Resurrect: the death-screen
+    // decisions moved to src/ui/hud/death (death_prompt_view.ts, pvp_resurrect_painter.ts).
+    // Extract, then lower.
+    ceiling: 18088,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1689,7 +1692,9 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // Lowered 9840 -> 9839 on the v0.45.0 port of PvP Resurrect: the corpse emit
+    // moved into server/self_scalar_wire.ts beside pvr. Extract, then lower.
+    ceiling: 9839,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

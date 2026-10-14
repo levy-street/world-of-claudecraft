@@ -456,6 +456,7 @@ import {
   crossHotbarResolvers,
   crossHotbarSeedActions,
 } from './hud/cross_hotbar';
+import { createDeathPromptView, PvpResurrectPrompt, updateDeathPromptView } from './hud/death';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
@@ -1108,12 +1109,6 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
-// Ghost-mode display threshold, mirroring src/sim/spirit.ts CORPSE_REZ_RANGE. The
-// server re-validates the range; this only decides whether the ghost prompt's corpse
-// button is shown, so keep it in sync. (The Pale Keeper's raise is reached by talking
-// to the Keeper, so no healer range is mirrored here any more.)
-const GHOST_CORPSE_REZ_RANGE = 35;
-
 const STAT_VIEW_DEPS: StatTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
@@ -1652,6 +1647,7 @@ export class Hud {
   private guildInvitePromptEl: HTMLElement | null = null;
   private promptSequence = 0;
   private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
+  private deathView = createDeathPromptView();
   // The standing top-of-screen ghost line (both ways back); shown for a ghost only.
   private ghostHintEl = $('#ghost-hint');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
@@ -4512,6 +4508,7 @@ export class Hud {
       this.hotDomSkippedWrites++;
     },
   );
+  private pvpRez = new PvpResurrectPrompt(this.writerFacet, () => this.sim.pvpResurrect());
   // The micro-menu rail's open-window ring and count badges. The view core owns the
   // launcher-to-window table; the painter writes only through the elided facet.
   private readonly microMenuStateView = createMicroMenuStateView((value) =>
@@ -9373,32 +9370,30 @@ export class Hud {
     // returns immediately, so this costs nothing at steady state.
     this.fctPainter.step(now);
 
-    // Death UI. A fresh corpse (dead, spirit not yet released) gets the full-screen
-    // Release overlay (a corpse cannot move, so a modal is fine; suppressed in arena).
-    // A ghost runs FREELY (no blocking overlay) and the world drains to greyscale; a
-    // A small prompt appears only in corpse reach (the server re-checks the range); the
-    // Pale Keeper's raise is reached by talking to the Keeper, and a standing top line
-    // names both ways back for the whole ghost run.
-    const ghost = p.dead && p.ghost;
-    const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
-    // A battleground corpse releases like the open world, so the Release modal shows;
-    // only the corpse-run / Spirit Healer prompts are suppressed in a match
-    // (the wave is the one way back, enforced server-side too).
-    const ghostInBgMatch = !!this.sim.bgInfo?.match;
+    // Death UI: src/ui/hud/death/death_prompt_view.ts decides (the Release overlay
+    // and its PvP Resurrect button for a fresh corpse; the greyscale spirit world,
+    // hint line and corpse-reach prompt for a ghost); this paints.
+    const death = updateDeathPromptView(
+      this.deathView,
+      p.dead,
+      p.ghost,
+      !!this.sim.arenaInfo?.match,
+      !!this.sim.bgInfo?.match,
+      p.pos,
+      p.corpsePos,
+      p.pvpResurrect === true,
+      p.pvpResurrectWait ?? 0,
+    );
     if (p.dead) syncDeathControllerHints(this.optionsHooks?.gamepad ?? null);
     if (!p.dead) {
       this.closeResurrectionPrompt();
       if (this.deathRecapDialog.isOpen()) this.deathRecapDialog.close();
     }
-    document.body.classList.toggle('spirit-mode', ghost);
-    this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
-    this.setDisplay(this.ghostHintEl, ghost && !ghostInBgMatch ? 'block' : 'none');
-    if (ghost && !ghostInBgMatch) {
-      const corpseInRange = !!p.corpsePos && dist2d(p.pos, p.corpsePos) <= GHOST_CORPSE_REZ_RANGE;
-      this.setDisplay(this.ghostPromptEl, corpseInRange ? 'flex' : 'none');
-    } else {
-      this.setDisplay(this.ghostPromptEl, 'none');
-    }
+    document.body.classList.toggle('spirit-mode', death.spiritMode);
+    this.setDisplay(this.deathOverlayEl, death.overlay ? 'flex' : 'none');
+    this.pvpRez.paint(death);
+    this.setDisplay(this.ghostHintEl, death.ghostHint ? 'block' : 'none');
+    this.setDisplay(this.ghostPromptEl, death.ghostPrompt ? 'flex' : 'none');
 
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
     const currentZone = zoneAt(p.pos.x, p.pos.z);

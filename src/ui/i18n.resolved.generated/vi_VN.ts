@@ -593,6 +593,11 @@ export const vi_VN: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
+      "pvpResurrect": "PvP Resurrect",
+      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
+      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
+      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
+      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
       "resurrectAtHealer": "Người Canh Giữ Nhợt Nhạt (Cái Giá của Người Canh Giữ)",
       "ghostHint": "Chạy đến nơi bạn chết hoặc nói chuyện với Người Giữ Xanh Xao để hồi sinh",
       "spiritHealerAlive": "Người Canh Giữ Nhợt Nhạt trông nom kẻ chết. Bạn vẫn còn ở giữa cõi sống.",
@@ -2831,6 +2836,8 @@ export const vi_VN: EnTranslations = {
       "countsHolding": "Bên trong: bạn {yours}, đối thủ {theirs}",
       "contestYou": "Chiếm đồi: {seconds} trong {total}",
       "contestOther": "Mất đồi: {seconds} trong {total}",
+      "contestYouPaused": "Paused: {seconds} of {total}",
+      "contestOtherPaused": "Rival paused: {seconds} of {total}",
       "contestNone": "Giữ đa số bên trong {total} để chiếm lấy nó",
       "inside": "Bạn ở trong vòng tròn",
       "distance": "{yards} thước đến vòng tròn",
@@ -8324,6 +8331,7 @@ export const vi_VN: EnTranslations = {
       "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Một lần mỗi ba giờ, vào một thời điểm không ai có thể dự đoán, toàn bộ vương quốc được thông báo rằng một ngọn đồi sẽ mọc lên ở một trong các khu vực tự do trong năm phút, và vòng tròn nơi nó sẽ đứng được đánh dấu trên mặt đất mở. Khi nó mọc lên nó đứng trong bốn mươi lăm phút, rồi rơi. Bên có nhiều người chơi nhất đứng bên trong tranh giành ngọn đồi, và sau một phút đa số không bị phá vỡ ngọn đồi là của họ; một người chơi cô lập được tính như một bên của một, nhưng các thành viên đột kích không tính ở tất cả. Trong khi một bên giữ ngọn đồi, mỗi thành viên của nó đứng bên trong kiếm Danh dự mỗi phút, và càng lâu bên cùng giữ nó, càng nhiều tiền mỗi phút trả: một bên đầy đủ giữ một ngọn đồi tranh chấp cho toàn bộ đứng kiếm được khoảng như ba chiến thắng sân vận động. Khi ngọn đồi thay đổi tay, những chủ mới bắt đầu số lượng từ đầu. Một thanh trên trường cho thấy ai nắm giữ nó, số của bạn chống lại số của họ, và đồng hồ cuộc thi; /hill trong trò chuyện nói nơi nó đứng.",
+      "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyRaids": "Đánh bại cùng một người chơi lại và lại trả ít hơn mỗi lần và sớm không gì cả, và số lượng của bạn chống lại người chơi đó chỉ bắt đầu lại khoảng một giờ sau những vết sưng đầu tiên của những vết sưng đó, vì vậy cắm trại một nạn nhân không bao giờ đáng chờ đợi. Một mục tiêu xa dưới cấp độ của bạn trả không gì cả. Các sân vận động chiến đấu và Arena chạy các quy tắc riêng của họ trong khi bạn ở bên trong chúng, và họ trả nhiều Danh dự hơn thế giới mở, vì vậy chiến tranh thế giới là con đường chậm hơn đến cùng một người bán hàng. Đột kích không kiếm được gì từ vết sưng thế giới: một thành viên đột kích không lấy Danh dự hoặc vàng và không làm nhỏ lại chia sẻ của bất kỳ ai khác, vì vậy hãy chiến đấu như một bên để được trả tiền."
     },
     "thornhollowPage": {

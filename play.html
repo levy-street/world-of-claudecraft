@@ -635,8 +635,12 @@
         <h2 class="ui-cin" data-i18n="hud.core.deathTitle">You have died.</h2>
         <div class="death-actions">
           <button type="button" class="btn ui-btn ui-btn--red ui-btn--lg" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+          <!-- Shown only while the corpse carries the PvP Resurrect offer (src/ui/hud/death). -->
+          <button type="button" class="btn ui-btn ui-btn--lg" id="pvp-resurrect-btn" style="display: none" data-i18n="hudChrome.death.pvpResurrect" data-i18n-title="hudChrome.death.pvpResurrectTitle" title="Revive at the nearest graveyard at full health, without a new Keeper's Toll.">PvP Resurrect</button>
           <button type="button" class="btn ui-btn ui-btn--lg" id="death-recap-btn" data-i18n="hud.core.deathRecap">Recap</button>
         </div>
+        <!-- The PvP Resurrect wait and where the raise lands (src/ui/hud/death/pvp_resurrect_painter.ts). -->
+        <p id="pvp-resurrect-note" class="death-note" style="display: none"></p>
       </div>
     </div>
     <div id="death-recap-dialog" class="window panel" role="dialog" aria-modal="true" aria-labelledby="death-recap-title" style="display: none"></div>

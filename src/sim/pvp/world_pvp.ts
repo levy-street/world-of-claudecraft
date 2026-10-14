@@ -43,6 +43,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { grantHonor } from './honor';
+import { notePvpResurrectAtDeath } from './pvp_resurrect';
 import { updatePvpVitality } from './vitality';
 import {
   WORLD_PVP_ASSIST_WINDOW,
@@ -642,13 +643,17 @@ export function worldPvpOnPlayerDeath(
 ): void {
   const books = ctx.worldPvpBooks;
   const helpers = books.recentDamage.get(victim.id);
+  const killerPlayer = controllerOf(ctx, killer);
+  const killerHostile = !!killerPlayer && isWorldPvpHostile(ctx, killerPlayer, victim);
+  // Every player death decides its own PvP Resurrect offer (pvp_resurrect.ts),
+  // from the same hostile-hit books the kill credit reads, before they clear.
+  if (victim.kind === 'player') notePvpResurrectAtDeath(ctx, victim, killerHostile, helpers);
   books.recentDamage.delete(victim.id);
   books.recentSupport.delete(victim.id);
   if (books.paidDeaths.has(victim.id)) return;
   const victimMeta = ctx.players.get(victim.id);
   if (!victimMeta) return;
-  const killerPlayer = controllerOf(ctx, killer);
-  if (!killerPlayer || !isWorldPvpHostile(ctx, killerPlayer, victim)) return;
+  if (!killerPlayer || !killerHostile) return;
   books.paidDeaths.add(victim.id);
   ensureState(victimMeta).deaths++;
 

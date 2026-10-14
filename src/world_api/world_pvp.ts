@@ -71,13 +71,22 @@ export interface HillInfo {
   holderCount: number;
   /** The viewer's own group's members standing inside right now. */
   yourCount: number;
-  /** The leading challenger (the largest group inside that beats the
-   *  holder's present count), and its members inside. */
+  /** The group whose contest clock this viewer's bar shows: their own group's
+   *  when it has one (running or paused), else the running challenger's (the
+   *  largest group inside that beats the holder's present count), else the
+   *  largest paused clock; and its members inside. */
   challenger: HillSide;
   challengerCount: number;
-  /** Whole seconds of unbroken majority the challenger has banked, of
-   *  HILL_CAPTURE_SECONDS; 0 when nobody is challenging. */
+  /** The largest other group's members inside (any group but the viewer's,
+   *  the holder included): the number the viewer's group must beat. */
+  rivalCount: number;
+  /** Whole seconds of majority that clock has banked, of
+   *  HILL_CAPTURE_SECONDS; 0 when no clock stands. */
   contest: number;
+  /** The shown clock is paused: its group is inside but not the leader (a
+   *  tie, or a bigger group walked in). It resumes, never restarts, once the
+   *  group leads again. */
+  contestPaused: boolean;
 }
 
 export interface IWorldWorldPvp {

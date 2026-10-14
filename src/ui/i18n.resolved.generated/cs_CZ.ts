@@ -593,6 +593,11 @@ export const cs_CZ: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
+      "pvpResurrect": "PvP Resurrect",
+      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
+      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
+      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
+      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
       "ghostHint": "Doběhni na místo své smrti, nebo promluv s Bledým strážcem a nech se vzkřísit",
       "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými.",
@@ -2831,6 +2836,8 @@ export const cs_CZ: EnTranslations = {
       "countsHolding": "Uvnitř: ty {yours}, soupeř {theirs}",
       "contestYou": "Ovládáš kopec: {seconds} z {total}",
       "contestOther": "Ztrácíš kopec: {seconds} z {total}",
+      "contestYouPaused": "Paused: {seconds} of {total}",
+      "contestOtherPaused": "Rival paused: {seconds} of {total}",
       "contestNone": "Udrž si uvnitř většinu po {total}, abys ji ovládl(a)",
       "inside": "Jsi uvnitř kruhu",
       "distance": "{yards} yardů ke kruhu",
@@ -8324,6 +8331,7 @@ export const cs_CZ: EnTranslations = {
       "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Jednou za tři hodiny, v okamžiku, který nikdo nedokáže předvídat, se celé říši oznámí, že za patnáct minut vyroste kopec v jedné ze zón volno pro všechny, a kruh, kde bude stát, je vyznačen na volné zemi. Když vyroste, stojí čtyřicet pět minut, pak padne. O kopec soupeří skupina s nejvíce hráči uvnitř, a po minutě nepřerušené většiny kopec připadne jí; osamělý hráč se počítá jako skupina o jednom, ale členové výpravy se nepočítají vůbec. Dokud skupina drží kopec, každý její člen uvnitř získává každou minutu Čest, a čím déle stejná skupina kopec drží, tím víc každá minuta vyplácí: plná skupina, která drží nesporný kopec po celou dobu jeho stání, vydělá zhruba tolik jako tři výhry na bojišti. Když kopec změní držitele, noví držitelé začnou počítat od začátku. Lišta nad bojištěm ukazuje, kdo kopec drží, tvá čísla proti jejich a čas souboje; /hill v chatu řekne, kde kopec stojí.",
+      "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyRaids": "Porážení stejného hráče znovu a znovu vyplácí pokaždé méně a brzy nic, a tvůj počet proti tomu hráči se resetuje až zhruba hodinu po prvním z těch zabití, takže čekání na jedné oběti se nikdy nevyplatí. Cíl hluboko pod tvou úrovní nevyplatí vůbec nic. Bojiště a Arény se řídí vlastními pravidly, dokud jsi uvnitř, a vyplácí víc Cti než otevřený svět, takže světové PvP je pomalejší cesta ke stejnému obchodníkovi. Výpravy nezískávají ze světových zabití nic: člen výpravy nedostane žádnou Čest ani zlato a nezmenší podíl nikoho jiného, takže boj jako skupina se vyplatí."
     },
     "thornhollowPage": {

@@ -561,6 +561,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.contestNone': '{total}の間、内部で過半数を維持すると占拠できます',
   'hudChrome.hill.contestOther': '丘を失いつつあります：{seconds} / {total}',
   'hudChrome.hill.contestYou': '丘を占拠中：{seconds} / {total}',
+  'hudChrome.hill.contestYouPaused': '一時停止中：{seconds} / {total}',
+  'hudChrome.hill.contestOtherPaused': 'ライバルの占拠は一時停止中：{seconds} / {total}',
   'hudChrome.hill.counts': '内部：自分 {yours}、保持者 {theirs}',
   'hudChrome.hill.countsHolding': '内部：自分 {yours}、対抗勢力 {theirs}',
   'hudChrome.hill.countsUnheld': '内部：自分 {yours}、最大の対抗勢力 {theirs}',
@@ -2826,6 +2828,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
   'guide.worldPvpPage.hillBodyRamp':
     '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分名誉を得て、同じパーティが占拠し続けるほど1分ごとの名誉は増えていきます。満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利およそ3回分の名誉になります。丘の持ち主が変わると、新しい持ち主の積み上げは最初から始まります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
+  'guide.worldPvpPage.hillBodyPause':
+    '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、30秒間多数を保てば丘はそのパーティのものになります。ライバルのパーティが入ってきてもその時計は一時停止するだけで、再びあなたの側が上回れば続きから進みます。最初からやり直しになるのは、円の中にあなたのパーティの生存者が一人もいなくなったときだけです。単独のプレイヤーは一人のパーティとして数え、丘を占拠したあとにパーティを組んでも丘は失いませんが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分名誉を得て、同じパーティが占拠し続けるほど1分ごとの名誉は増えていきます。満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利およそ3回分の名誉になります。丘の持ち主が変わると、新しい持ち主の積み上げは最初から始まります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
   'guide.worldPvpPage.limitsBodyRaids':
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。レイドはワールドでの撃破から何も得られません。レイドのメンバーは名誉もゴールドも受け取らず、他の人の取り分も減らさないため、報酬を得るにはパーティで戦いましょう。',
   'guide.worldPvpPage.hillHeading': '丘の王',
@@ -5788,6 +5792,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlock_voidwalker.name': '虚無の魔物',
   'entities.mobs.ysolei.name': 'イソレイ、溺月の化身',
   'hudChrome.death.resurrectAtCorpse': '亡骸で復活',
+  'hudChrome.death.pvpResurrect': 'PvP復活',
+  'hudChrome.death.pvpResurrectTitle':
+    '最寄りの墓地でHP全快の状態で復活し、新たな復活の後遺症は付かない。',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP復活（{seconds}）',
+  'hudChrome.death.pvpResurrectWaitNote':
+    '{seconds}後にPvP復活できます：最寄りの墓地で復活します。',
+  'hudChrome.death.pvpResurrectReadyNote': 'PvP復活の準備ができました：最寄りの墓地で復活します。',
   'hudChrome.death.resurrectAtHealer': '霊魂の癒し手（復活の後遺症）',
   'hudChrome.death.healerConfirmTitle': '復活の後遺症を受けますか？',
   'hudChrome.death.healerConfirmBody':

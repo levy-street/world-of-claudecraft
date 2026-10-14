@@ -1,6 +1,7 @@
 // Pins for the King of the Hill pure rules (src/sim/pvp/hill_rules.ts): the
 // standing (parties only, any level), the group key, the strict-maximum
-// leader, the majority verdict, the contest clock, the spot probe, the
+// leader, the majority verdict, the contest clocks (paused, never reset, by a
+// rival), the successor a hold follows across a group change, the spot probe, the
 // three-hour schedule and the circle test.
 import { describe, expect, it } from 'vitest';
 import {
@@ -18,13 +19,14 @@ import {
   type HillSpotProbe,
   hillChallengeStands,
   hillContains,
-  hillContestStep,
   hillGroupKey,
   hillHonorPerPayout,
   hillLeader,
   hillMinutesUntil,
+  hillProgressStep,
   hillSpotIsOpen,
   hillStanding,
+  hillSuccessorKey,
   hillTimes,
   hillTimesFrom,
   hillWindowAt,
@@ -38,7 +40,7 @@ describe('the tuning literals the copy and the docs quote', () => {
     expect(HILL_DURATION_SECONDS).toBe(45 * 60);
     expect(HILL_FIRST_WINDOW_AT_SECONDS).toBe(120);
     expect(HILL_LATEST_WARN_OFFSET_SECONDS).toBe(2 * 3_600);
-    expect(HILL_CAPTURE_SECONDS).toBe(60);
+    expect(HILL_CAPTURE_SECONDS).toBe(30);
     expect(HILL_ACCRUAL_SECONDS).toBe(60);
     expect(HILL_RAMP_STEP_SECONDS).toBe(5 * 60);
     expect(HILL_RAMP_STEP_HONOR).toBe(2);
@@ -115,12 +117,89 @@ describe('hillChallengeStands', () => {
   });
 });
 
-describe('hillContestStep', () => {
-  it('counts on for the same challenger, restarts for a new one, resets when the challenge lapses', () => {
-    expect(hillContestStep(10, true, true, 1)).toBe(11);
-    expect(hillContestStep(10, true, false, 1)).toBe(1);
-    expect(hillContestStep(10, false, true, 1)).toBe(0);
-    expect(hillContestStep(0, true, false, 1)).toBe(1);
+describe('hillProgressStep', () => {
+  const step = (
+    prev: [string, number][],
+    counts: [string, number][],
+    challenger: string | null,
+    holder: string | null = null,
+  ) => [...hillProgressStep(new Map(prev), new Map(counts), challenger, holder, 1)];
+
+  it('banks a pass for the challenger, starting a fresh clock at one pass', () => {
+    expect(step([['a', 10]], [['a', 2]], 'a')).toEqual([['a', 11]]);
+    expect(step([], [['a', 1]], 'a')).toEqual([['a', 1]]);
+  });
+
+  it('pauses, never resets, a group still inside that is not the leader', () => {
+    // A tie: nobody leads, both clocks hold still.
+    expect(
+      step(
+        [['a', 10]],
+        [
+          ['a', 1],
+          ['b', 1],
+        ],
+        null,
+      ),
+    ).toEqual([['a', 10]]);
+    // A bigger group walked in: it counts, the old challenger waits.
+    expect(
+      step(
+        [['a', 10]],
+        [
+          ['a', 1],
+          ['b', 2],
+        ],
+        'b',
+      ),
+    ).toEqual([
+      ['a', 10],
+      ['b', 1],
+    ]);
+  });
+
+  it('drops the clock of a group with nobody counted inside (dead or gone)', () => {
+    expect(step([['a', 25]], [['b', 1]], 'b')).toEqual([['b', 1]]);
+    expect(step([['a', 25]], [['a', 0]], null)).toEqual([]);
+  });
+
+  it('never carries a clock for the holder, and leaves its input untouched', () => {
+    const prev = new Map([['h', 5]]);
+    expect([...hillProgressStep(prev, new Map([['h', 3]]), null, 'h', 1)]).toEqual([]);
+    expect([...prev]).toEqual([['h', 5]]);
+  });
+});
+
+describe('hillSuccessorKey', () => {
+  it('follows a lone holder into the party they formed', () => {
+    expect(hillSuccessorKey([{ key: 'party:7', inside: true }])).toBe('party:7');
+  });
+
+  it('prefers the key with most members inside, then most members, then the earliest', () => {
+    expect(
+      hillSuccessorKey([
+        { key: 'solo:1', inside: false },
+        { key: 'solo:2', inside: true },
+      ]),
+    ).toBe('solo:2');
+    expect(
+      hillSuccessorKey([
+        { key: 'solo:1', inside: false },
+        { key: 'party:3', inside: false },
+        { key: 'party:3', inside: false },
+      ]),
+    ).toBe('party:3');
+    expect(
+      hillSuccessorKey([
+        { key: 'solo:1', inside: true },
+        { key: 'solo:2', inside: true },
+      ]),
+    ).toBe('solo:1');
+  });
+
+  it('is null when no member still counts', () => {
+    expect(hillSuccessorKey([])).toBeNull();
+    expect(hillSuccessorKey([{ key: null, inside: true }])).toBeNull();
   });
 });
 

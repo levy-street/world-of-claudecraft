@@ -559,6 +559,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.contestNone': '{total} 동안 다수를 유지하면 점령할 수 있습니다',
   'hudChrome.hill.contestOther': '언덕을 빼앗기는 중: {total} 중 {seconds}',
   'hudChrome.hill.contestYou': '언덕을 점령하는 중: {total} 중 {seconds}',
+  'hudChrome.hill.contestYouPaused': '일시 정지됨: {total} 중 {seconds}',
+  'hudChrome.hill.contestOtherPaused': '경쟁자의 점령 일시 정지됨: {total} 중 {seconds}',
   'hudChrome.hill.counts': '안쪽 인원: 나 {yours}, 점령자 {theirs}',
   'hudChrome.hill.countsHolding': '안쪽 인원: 나 {yours}, 상대 {theirs}',
   'hudChrome.hill.countsUnheld': '안쪽 인원: 나 {yours}, 최다 상대 {theirs}',
@@ -2809,6 +2811,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다.',
   'guide.worldPvpPage.hillBodyRamp':
     '세 시간에 한 번, 아무도 예측할 수 없는 때에 자유 전투 지역 가운데 한 곳에 15분 뒤 언덕이 솟아오른다는 소식이 서버 전체에 알려지고, 언덕이 설 원이 탁 트인 땅에 표시됩니다. 솟아오른 언덕은 45분 동안 서 있다가 사라집니다. 원 안에 선 플레이어가 가장 많은 파티가 언덕을 두고 다투며, 1분 동안 끊이지 않고 다수를 유지하면 언덕은 그 파티의 것이 됩니다. 혼자인 플레이어는 1인 파티로 세지만, 공격대원은 전혀 세지 않습니다. 한 파티가 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 명예를 얻으며, 같은 파티가 오래 지킬수록 1분마다 얻는 명예가 늘어납니다. 가득 찬 파티가 아무런 다툼 없이 언덕이 서 있는 내내 지키면 전장 승리 약 세 번에 해당하는 명예를 얻습니다. 언덕의 주인이 바뀌면 새 주인의 누적은 처음부터 시작됩니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.',
+  'guide.worldPvpPage.hillBodyPause':
+    '세 시간에 한 번, 아무도 예측할 수 없는 때에 자유 전투 지역 가운데 한 곳에 15분 뒤 언덕이 솟아오른다는 소식이 서버 전체에 알려지고, 언덕이 설 원이 탁 트인 땅에 표시됩니다. 솟아오른 언덕은 45분 동안 서 있다가 사라집니다. 원 안에 선 플레이어가 가장 많은 파티가 언덕을 두고 다투며, 30초 동안 다수를 유지하면 언덕은 그 파티의 것이 됩니다. 경쟁 파티가 들어와도 그 시계는 일시 정지될 뿐이며, 다시 우세해지면 이어서 흐릅니다. 원 안에 당신 파티의 생존자가 한 명도 남지 않을 때만 처음부터 다시 시작됩니다. 혼자인 플레이어는 1인 파티로 세며, 언덕을 점령한 뒤 파티를 맺어도 언덕을 잃지 않지만, 공격대원은 전혀 세지 않습니다. 한 파티가 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 명예를 얻으며, 같은 파티가 오래 지킬수록 1분마다 얻는 명예가 늘어납니다. 가득 찬 파티가 아무런 다툼 없이 언덕이 서 있는 내내 지키면 전장 승리 약 세 번에 해당하는 명예를 얻습니다. 언덕의 주인이 바뀌면 새 주인의 누적은 처음부터 시작됩니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.',
   'guide.worldPvpPage.limitsBodyRaids':
     '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다. 공격대는 월드 처치에서 아무것도 얻지 못합니다. 공격대원은 명예도 골드도 받지 않으며 다른 사람의 몫도 줄이지 않으니, 보상을 받으려면 파티로 싸우세요.',
   'guide.worldPvpPage.hillHeading': '언덕의 왕',
@@ -5753,6 +5757,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlock_voidwalker.name': '공허 악마',
   'entities.mobs.ysolei.name': '이솔레이, 익사한 달의 화신',
   'hudChrome.death.resurrectAtCorpse': '시신에서 부활',
+  'hudChrome.death.pvpResurrect': 'PvP 부활',
+  'hudChrome.death.pvpResurrectTitle':
+    '가장 가까운 묘지에서 생명력이 가득 찬 상태로 부활하며, 새로운 부활 후유증은 걸리지 않습니다.',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP 부활 ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    '{seconds} 후 PvP 부활할 수 있습니다: 가장 가까운 묘지에서 부활합니다.',
+  'hudChrome.death.pvpResurrectReadyNote': 'PvP 부활 준비 완료: 가장 가까운 묘지에서 부활합니다.',
   'hudChrome.death.resurrectAtHealer': '영혼 치유사 (부활의 후유증)',
   'hudChrome.death.healerConfirmTitle': '부활의 후유증을 감수하시겠습니까?',
   'hudChrome.death.healerConfirmBody':

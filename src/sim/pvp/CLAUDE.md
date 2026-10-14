@@ -110,6 +110,24 @@ ratings.
   `nextId` nor the shared rng stream moves
   (`tests/warfare_vendor_npc.test.ts` asserts both). His stock is the one
   canonical `content/pvp_honor.ts` table, shared with FURY.
+- `pvp_resurrect.ts` owns the PvP Resurrect RULE (owner rule 2026-10-02): a
+  player death outside the instance plane, not jailed, whose killing blow came
+  from a hostile player or that took a hostile player's hit within
+  `PVP_RESURRECT_WINDOW_SECONDS` (10), offers a raise at the graveyard Release
+  picks at full health and mana with no Keeper's Toll. `worldPvpOnPlayerDeath`
+  stamps `Entity.pvpResurrect` at every player death from the same hostile-hit
+  books the kill credit reads; the raise is `spirit.ts` `pvpResurrect` (refused
+  to a ghost). A living player's death resets the stamp before deciding it
+  (`combat/damage.ts` `handleDeath`), so a revive that skips `reviveAt`
+  (battleground seating, the delve respawn) can never carry an offer into a
+  later death; `reviveAt` clears it too. The raise waits
+  `PVP_RESURRECT_WAIT_SECONDS` (15) from the death (`Entity.pvpResurrectWait`,
+  counted down in `combat/auras.ts` `updateTimers`, which visits corpses; a
+  second death-hook pass never restarts it), shipped on the self record as whole
+  seconds `pvrw`. The self record carries the offer as `pvr`,
+  lit only when the raise would be honored (`server/self_scalar_wire.ts`); the death screen's button is
+  `src/ui/hud/death`. Imported by path from `world_pvp.ts` and `spirit.ts` (it
+  imports neither, so no cycle). Pinned by `tests/pvp_resurrect.test.ts`.
 - Import the directory's public API through `src/sim/pvp/index.ts`, with ONE
   deliberate exception: `warfare_quartermaster.ts` is NOT re-exported there
   (see the comment in `index.ts`). It needs `createNpc` from `../entity` at
@@ -128,7 +146,9 @@ ratings.
   only, so a raid member does not; any level does), the group key (`hillGroupKey`: a party, or a lone
   player as a group of one; null for a raid), the strict-maximum leader
   (`hillLeader`, null on a tie), the majority verdict (`hillChallengeStands`),
-  the contest clock (`hillContestStep`), the spot probe (`hillSpotIsOpen` over a
+  the per-group contest clocks (`hillProgressStep`: a rival only pauses a clock,
+  nobody counted inside drops it), the key a hold or a clock follows across a
+  group change (`hillSuccessorKey`), the spot probe (`hillSpotIsOpen` over a
   `HillSpotProbe` the sim binds to the terrain, the water bodies, the collider
   grid and the static zones), the three-hour schedule (`hillWindowAt`,
   `hillTimes` from a window and a warning offset, `hillMinutesUntil`) and the
@@ -147,7 +167,9 @@ ratings.
   levers (`spawnHillNow`, `riseHillNow`, `endHillNow`, `warnNextHillNow`; their
   argument grammar is the pure `hill_dev.ts`), the once-a-second `updateHill` pass (the
   phases warning, risen, fallen, each announced to the realm; then, only while
-  risen, presence by party, contest, payouts through `grantHonor` with reason
+  risen, presence by party, the holder following its roster across a group
+  change (`reconcileHolder`) and clocks following theirs (`carryProgress`),
+  contest, payouts through `grantHonor` with reason
   `hill_hold`), the readout (`hillInfoFor`, live fields only for a viewer in the
   hill's zone while it is risen, so the self wire elides it elsewhere), the
   `/hill` readout line, and the notice lines the client matcher re-localizes

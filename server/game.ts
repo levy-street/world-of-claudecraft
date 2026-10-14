@@ -6864,6 +6864,9 @@ export class GameServer {
       case 'resurrect_healer':
         this.sendCommandOutcome(session, msg, sim.resurrectAtSpiritHealer(pid));
         break;
+      case 'pvp_resurrect':
+        sim.pvpResurrect(pid);
+        break;
       case 'resurrect_respond':
         if (typeof msg.accept === 'boolean') sim.respondToResurrection(msg.accept, pid);
         break;
@@ -8441,10 +8444,6 @@ export class GameServer {
       Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > Date.now())),
     );
     maybeRaw('wba', this.worldBossIdsJson);
-    // Where the player's corpse lies while their spirit is a ghost (null otherwise).
-    // Delta-guarded: ships on death-release and clears on resurrect. The client
-    // draws the corpse marker and gates the resurrect-at-corpse button on it.
-    maybe('corpse', p.corpsePos);
     if (stableTimerWire) {
       maybeSerialized('auras', this.stableAuraWireFor(p).json);
       maybeSerialized(

@@ -49,7 +49,9 @@ const info = (over: Partial<HillInfo> = {}): HillInfo => ({
   yourCount: 0,
   challenger: 'none',
   challengerCount: 0,
+  rivalCount: 0,
   contest: 0,
+  contestPaused: false,
   ...over,
 });
 
@@ -61,22 +63,17 @@ describe('buildHillBarView', () => {
     expect(buildHillBarView(info({ inZone: false }), { x: 360, z: 1540 }).visible).toBe(false);
   });
 
-  it('measures you against the holder, or the largest rival while unheld', () => {
-    expect(
-      hillRivalCount(
-        info({ holder: 'other', holderCount: 3, challenger: 'you', challengerCount: 4 }),
-      ),
-    ).toBe(3);
-    expect(hillRivalCount(info({ holder: 'none', challenger: 'other', challengerCount: 2 }))).toBe(
-      2,
-    );
-    expect(
-      hillRivalCount(
-        info({ holder: 'you', holderCount: 2, challenger: 'other', challengerCount: 3 }),
-      ),
-    ).toBe(3);
+  it('measures you against the holder, else the largest other group inside', () => {
+    expect(hillRivalCount(info({ holder: 'other', holderCount: 3, rivalCount: 4 }))).toBe(3);
+    expect(hillRivalCount(info({ holder: 'none', rivalCount: 2 }))).toBe(2);
+    expect(hillRivalCount(info({ holder: 'you', holderCount: 2, rivalCount: 3 }))).toBe(3);
     expect(hillRivalCount(info({ holder: 'you', holderCount: 2 }))).toBe(0);
-    expect(hillRivalCount(info({ holder: 'none', challenger: 'you', challengerCount: 2 }))).toBe(0);
+    // A lone challenger paused by a rival of equal size sees that rival, not 0.
+    expect(
+      hillRivalCount(
+        info({ holder: 'none', challenger: 'you', contestPaused: true, rivalCount: 1 }),
+      ),
+    ).toBe(1);
   });
 
   it('reports the whole-yard distance to the edge, zero inside', () => {
@@ -105,7 +102,7 @@ describe('buildHillBarView', () => {
       theirs: 2,
       contest: 15,
       capture: HILL_CAPTURE_SECONDS,
-      contestFraction: 0.25,
+      contestFraction: 0.5,
       distanceYards: 0,
       minutesLeft: 42,
       phase: 'active',
@@ -175,10 +172,13 @@ describe('HillBar (the painter)', () => {
   it('mounts once with the status attributes and paints the unheld state', () => {
     const { layer, bar, calls } = harness();
     bar.update(
-      buildHillBarView(info({ challenger: 'other', challengerCount: 2, contest: 12 }), {
-        x: 460,
-        z: 1540,
-      }),
+      buildHillBarView(
+        info({ challenger: 'other', challengerCount: 2, rivalCount: 2, contest: 12 }),
+        {
+          x: 460,
+          z: 1540,
+        },
+      ),
     );
     const root = layer.querySelector('#hill-bar') as HTMLElement;
     expect(root).not.toBeNull();
@@ -189,11 +189,11 @@ describe('HillBar (the painter)', () => {
     expect(root.textContent).toContain('The Drakelands');
     expect(root.textContent).toContain('Nobody holds the hill');
     expect(root.textContent).toContain('Inside: you 0, largest rival 2');
-    expect(root.textContent).toContain('Losing the hill: 12 seconds of 1 minute');
+    expect(root.textContent).toContain('Losing the hill: 12 seconds of 30 seconds');
     expect(root.textContent).toContain('50 yd to the circle');
     expect(root.textContent).toContain('Falls in 42 minutes');
     expect(root.querySelector('.hill-note')).toBeNull();
-    expect((root.querySelector('.hill-fill') as HTMLElement).style.width).toBe('20%');
+    expect((root.querySelector('.hill-fill') as HTMLElement).style.width).toBe('40%');
     expect(root.classList.contains('is-contested')).toBe(true);
     expect(root.classList.contains('is-you-contesting')).toBe(false);
     bar.update(
@@ -206,6 +206,42 @@ describe('HillBar (the painter)', () => {
     expect(root.classList.contains('is-you')).toBe(false);
     expect(root.classList.contains('is-other')).toBe(false);
     expect(calls.length).toBeGreaterThan(0);
+  });
+
+  it('says so when the clock is paused by a rival, and resumes the running text after', () => {
+    const { layer, bar } = harness();
+    const paused = info({
+      challenger: 'you',
+      challengerCount: 1,
+      yourCount: 1,
+      rivalCount: 1,
+      contest: 20,
+      contestPaused: true,
+      inside: true,
+    });
+    bar.update(buildHillBarView(paused, { x: 360, z: 1540 }));
+    const root = layer.querySelector('#hill-bar') as HTMLElement;
+    expect(root.textContent).toContain('Paused: 20 seconds of 30 seconds');
+    expect(root.textContent).toContain('Inside: you 1, largest rival 1');
+    expect(root.classList.contains('is-paused')).toBe(true);
+    bar.update(
+      buildHillBarView(
+        info({ challenger: 'other', challengerCount: 1, contest: 20, contestPaused: true }),
+        { x: 360, z: 1540 },
+      ),
+    );
+    expect(root.textContent).toContain('Rival paused: 20 seconds of 30 seconds');
+    bar.update(
+      buildHillBarView(
+        { ...paused, rivalCount: 0, contest: 21, contestPaused: false },
+        {
+          x: 360,
+          z: 1540,
+        },
+      ),
+    );
+    expect(root.textContent).toContain('Taking the hill: 21 seconds of 30 seconds');
+    expect(root.classList.contains('is-paused')).toBe(false);
   });
 
   it('a repeated frame writes nothing; a live change writes only its slot', () => {
@@ -239,7 +275,7 @@ describe('HillBar (the painter)', () => {
     expect(root.classList.contains('is-you')).toBe(true);
     expect(root.textContent).toContain('Your group holds the hill');
     expect(root.textContent).toContain('You are inside the circle');
-    expect(root.textContent).toContain('Hold a majority inside for 1 minute to take it');
+    expect(root.textContent).toContain('Hold a majority inside for 30 seconds to take it');
     bar.update(
       buildHillBarView(
         info({ holder: 'other', holderCount: 2, yourCount: 1, challenger: 'none' }),

@@ -217,6 +217,9 @@ export function updateTimers(p: Entity): void {
   p.gcdRemaining = Math.max(0, p.gcdRemaining - DT);
   p.potionCdRemaining = Math.max(0, p.potionCdRemaining - DT);
   p.firebottleCdRemaining = Math.max(0, p.firebottleCdRemaining - DT);
+  // The PvP Resurrect wait (pvp/pvp_resurrect.ts) runs on a corpse, and this lap
+  // visits the dead too.
+  if (p.pvpResurrectWait) p.pvpResurrectWait = Math.max(0, p.pvpResurrectWait - DT);
   p.fiveSecondRule += DT;
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
