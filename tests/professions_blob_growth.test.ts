@@ -299,6 +299,10 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   // and this is a single small selection record with no content-scaled growth of its own,
   // so it stays out of that measurement rather than moving the ceiling for it.
   'gatheringGoal',
+  // Tidehold housing deeds (sim/plots.ts, the Studio merge): the owned plot
+  // ids. Written only after a deed is bought at a Deepglass plot sign, which
+  // the built-in world never spawns, so it adds no bytes to this fixture.
+  'ownedPlots',
 ] as const;
 
 // The settled ceiling measured 8,469 bytes when this bound was re-minted

@@ -35,6 +35,9 @@ import {
   ZONES,
   zoneAt,
 } from '../sim/data';
+import { DEEPGLASS_BALL_TEMPLATE_ID } from '../sim/deepglass/abilities';
+import { DG_SWIM_SPEED } from '../sim/deepglass/flight';
+import { insideBell } from '../sim/deepglass/layout';
 import type { DelveModuleId } from '../sim/delve_layout';
 import { interiorPresentationMode, isAuthoredMapPresentation } from '../sim/map_presentation';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
@@ -303,6 +306,21 @@ import {
 import { deckCameraTurn, entityRenderPose, updateSelfRenderOnDeck } from './deck_frame';
 import { buildDecorTorchFx, type DecorTorchFxView } from './decor_torch_fx';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
+import {
+  advanceDashFlip,
+  type DashFlipOffset,
+  type DashFlipState,
+  DeepglassBallFx,
+  DeepglassScene,
+  DG_CAM_LEASH_SCALE,
+  DG_CAM_STIFFNESS,
+  DG_FLIP_SECS,
+  DG_PITCH_FULL_SPEED,
+  DG_PITCH_MAX,
+  flightPoseVerticalSpeed,
+  nextCameraFovBase,
+  resetDashFlip,
+} from './deepglass_scene';
 import { DelveInteriorTracker } from './delve_interior_tracker';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
@@ -618,7 +636,7 @@ import {
 } from './paladin_sun_verdict_visual';
 import { projectionScalePixels } from './perceptual_lod_core';
 import { buildPickOnlyObjectBody, isPickOnlyObjectTemplate } from './pick_only_objects';
-import { PlacedAssetsView } from './placed_assets';
+import { PlacedAssetsView, type PlacedCullHalfPlane } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
 import { type RankedPointLight, reconcileViewPointLights } from './point_light_budget';
 import { attachPointLightCarriers, NO_POINT_LIGHTS } from './point_light_carriers';
@@ -909,6 +927,7 @@ import { weaponVfxShedScale } from './weapon_vfx_shed_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { createRendererWebGL, type WebGLPowerPreference } from './webgl_context_fallback';
+import { WizardGate } from './wizard_gate';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
 import { WorldBossLayer } from './world_boss_layer';
 import { WorldGuidance } from './world_guidance';
@@ -1181,7 +1200,10 @@ type RendererWorldPhase =
   | 'sky'
   | 'sunSprites'
   | 'godRays';
-export interface EntityView extends RickshawMountViewState, WorldQuestCarryViewState {
+export interface EntityView
+  extends RickshawMountViewState,
+    WorldQuestCarryViewState,
+    DashFlipState {
   group: THREE.Group;
   /** Last frame's range verdict, kept off group.visible so the cull cannot latch it. */
   inDrawRange: boolean;
@@ -1441,6 +1463,9 @@ export class Renderer {
   private gatherNodes: GatherNodesView;
   camYaw = Math.PI;
   camPitch = 0.32;
+  /** Draw the deepball ball marker (the `ballMarker` bind). Set by the frame
+   *  loop from Input; the HUD never reads Input directly. */
+  showDeepglassBallMark = true;
   camDist = 12;
   // Map-editor 3D mode: when set, the camera uses this free-cam pose instead of
   // chasing the player (updateCamera honors it and returns early). Editor-only;
@@ -1566,6 +1591,8 @@ export class Renderer {
   // brightness without moving anything across BLOOM_THRESHOLD.
   private baseExposure = 1;
   private tmpV = new THREE.Vector3();
+  /** The base FOV, eased between the land figure and the bell's wider one. */
+  private camFovBase = CAMERA_BASE_FOV;
   /** Authored-map chase boom solve (chase_boom_core.ts): scratch in, seat out
    *  (whose solidLimit carries the eased asset-collider limit frame to frame). */
   private readonly chaseBoom = createChaseBoomScratch(CAM_PITCH_UP);
@@ -1603,6 +1630,7 @@ export class Renderer {
     submerged: false,
     swimPitch: 0,
     bankRoll: 0,
+    gliding: false,
     wading: false,
     sitting: false,
   };
@@ -1622,6 +1650,7 @@ export class Renderer {
     submerged: false,
     swimPitch: 0,
     bankRoll: 0,
+    gliding: false,
     wading: false,
     sitting: false,
   };
@@ -1708,7 +1737,8 @@ export class Renderer {
   private cityClutter: CityClutterView;
   private birds: BirdsView;
   // The Mirefen impact site is a landmark of the BUILT-IN world; an authored
-  // map covering its coordinates must not inherit it.
+  // map covering its coordinates must not inherit it (SPACEY: the crater showed
+  // up in the Deepglass city).
   private impactSite: ImpactSiteView | null;
   private realmFlora: RealmFloraView | null = null;
   private emberFeatures: EmberFeaturesView | null = null;
@@ -1807,9 +1837,11 @@ export class Renderer {
   private foliageRevealGate: RevealGateCore | null = null;
   private eastbrookTownView!: EastbrookTownView;
 
-  /** Re-bake the monument's projected name (src/game/realm_builder_boot.ts). */
+  /** Re-bake the monuments' projected name (src/game/realm_builder_boot.ts):
+   *  Eastbrook's, through its town view, and Tidehold's FX in the bell world. */
   setRealmBuilderHonouree(name: string): void {
     this.eastbrookTownView?.setRealmBuilderHonouree(name);
+    this.deepglassScene?.setHonouree(name);
   }
   private fenbridgeTownView!: FenbridgeTownView;
   private hollowGates!: HollowGatesView;
@@ -1987,6 +2019,18 @@ export class Renderer {
   private frozenOrbFx!: FrozenOrbFx;
   private worldBoss!: WorldBossLayer; // Balgath's fx, far sprites, ward badges
   private mageGroundFx!: MageGroundFx;
+  /** Baldemar's travel gate (`renderer.wizardGate`, wizard_gate.ts). */
+  readonly wizardGate = new WizardGate({
+    scene: () => this.scene,
+    lowGfx: () => this.lowGfx,
+    budgetLights: this.budgetLights,
+    groundHeight: (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+    view: (id) => this.views.get(id),
+    activeVisual: (v) => this.activeVisual(v),
+    pulseAt: (id, school, intensity, duration) => this.pulseAt(id, school, intensity, duration),
+    vfx: () => this.vfx,
+    mageGroundFx: () => this.mageGroundFx,
+  });
   private varkhulForgestormVisuals?: VarkhulForgestormVisuals;
   private nythraxisMechanicVisuals?: NythraxisMechanicVisuals;
   private warlockMeteorFx!: WarlockMeteorFx;
@@ -2051,6 +2095,16 @@ export class Renderer {
   // plenty of feedback; the FCT numbers are unaffected.
   private healGlowAt = new Map<number, number>();
 
+  /** The Deepglass arena world's scene layer (deepglass_scene/); null in
+   *  every other world. */
+  private deepglassScene: DeepglassScene | null = null;
+  /** The Tidesow's per-entity views and comet trail; inert until one spawns. */
+  private readonly deepglassBall = new DeepglassBallFx(this.scene);
+  /** Scratch for the Deepglass dash flip's per-frame pose offset. */
+  private readonly dashFlipScratch: DashFlipOffset = { pitch: 0, roll: 0 };
+  /** True only in the standalone Deepglass arena world. */
+  private readonly deepglassWorld: boolean =
+    getActiveWorldContent().presentationMode === 'deepglass';
   // seed-bound ground sampler, built once so per-frame drape updates
   // allocate no closure.
   private groundSample = createRiftAwareGroundSampler(
@@ -2419,8 +2473,8 @@ export class Renderer {
         // rotation match the dome from the first frame instead of after a
         // deferred prefilter. Never seed a biome with no PMREM: that bound NO
         // environment at entry, and the IBL's late arrival relinked every lit
-        // material mid-play (a hitch, a lighting shift, and the terrain's 17th
-        // sampler).
+        // material mid-play (SPACEY's Deepglass: a hitch, a lighting shift, and
+        // the terrain's 17th sampler).
         const seedBiome: SkyKey = this.envRTs.has(initialBiome)
           ? initialBiome
           : (entryBiomes.find((b) => this.envRTs.has(b)) ?? [...this.envRTs.keys()][0]);
@@ -2703,6 +2757,30 @@ export class Renderer {
     // point-light count stays constant as the player travels (constant
     // numPointLights -> materials never recompile for a light-count change).
     if (this.impactSite) this.fireLights.push(this.impactSite.light);
+    // The Deepglass bell. Built only for the deepball arena world: the glass
+    // sphere is 76 yd across and would be a landmark in the middle of anybody
+    // else's map, so it self-gates on the presentation mode from day one (the
+    // sowfieldIsLive lesson, PRD risk 4).
+    if (this.deepglassWorld) {
+      this.deepglassScene = new DeepglassScene({
+        sim: this.sim,
+        scene: this.scene,
+        camera: this.camera,
+        views: this.views,
+        ball: this.deepglassBall,
+        lightBudget: this.budgetLights,
+        activeVisual: (v) => this.activeVisual(v),
+        compileGate: (node) => this.compileGate(node),
+        reducedMotion: () => this.reducedMotion(),
+        addShake: (amount) => this.addShake(amount),
+        punchFov: (degrees) => this.punchFov(degrees),
+        zapBurst: (id) => {
+          this.vfx.procSurge(id, 'nature');
+          this.vfx.wardBloom(id, 'nature');
+        },
+      }, this.fireLights);
+      bd('deepglass');
+    }
     // The boot-built fluid pools' lights join the same budget (rebuildFluids
     // re-adopts them on an editor rebuild).
     if (this.authoredLayers) this.fireLights.push(...this.authoredLayers.fluidSurfaces.lights);
@@ -3306,6 +3384,9 @@ export class Renderer {
     this.lifecycleGeneration++;
     this.onZonePrepared = null;
     this.audioSink = null;
+    // Positional beds outlive the renderer otherwise: nothing else ever calls
+    // the cue sync again to release them.
+    this.deepglassScene?.stopBoostLoops();
     this.visibleZonePrepareQueue = [];
     try {
       this.terrainView?.cancelStreaming();
@@ -3353,6 +3434,7 @@ export class Renderer {
       }
     };
 
+    bestEffort(() => this.wizardGate.closeWizardPortal());
     // The grass ground bake is a MODULE SINGLETON holding a render target
     // texture owned by THIS renderer's GL context. It was set at construction
     // and never cleared, so after a teardown (the Studio rebuilds the renderer
@@ -5024,7 +5106,14 @@ export class Renderer {
     this.tmpV.set(p.pos.x, p.pos.y, p.pos.z);
     this.updateCamera(this.tmpV, dt);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
-    this.underwaterView.frame(this.camera, this.scene, p.pos, this.sim.cfg.seed, dt);
+    this.underwaterView.frame(
+      this.camera,
+      this.scene,
+      p.pos,
+      this.sim.cfg.seed,
+      dt,
+      this.deepglassCityCull() !== null,
+    );
     this.budgetFireLights(p.pos.x, p.pos.z);
     const fogFar = this.subsystemCullFar();
     // The foliage handoff keys off distance planes (foliage_impostor_core.ts /
@@ -5119,6 +5208,7 @@ export class Renderer {
     this.worldBoss.fx.update(dt, this.reducedMotion(), this.sim.entities.values());
     this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
+    this.wizardGate.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
     this.varkhulForgestormVisuals?.update(dt, this.reducedMotion());
     this.nythraxisMechanicVisuals?.syncWorld(this.sim);
@@ -8129,6 +8219,15 @@ export class Renderer {
         sparkle.position.y = 1.35;
         group.add(sparkle);
       }
+    } else if (e.kind === 'mob' && e.templateId === DEEPGLASS_BALL_TEMPLATE_ID) {
+      // The Tidesow: machined metal, wisp lenses at the poles, and an aura that
+      // reads its speed. An inert mob entity would otherwise dress as a generic
+      // bandit rig. Keeps the default body click path below, so clicking it is a
+      // harmless soft target; its nameplate is suppressed in nameplate_view.
+      const tidesow = this.deepglassBall.createBody(e.id);
+      body = tidesow.group;
+      height = tidesow.height;
+      objectMesh = body;
     } else {
       const visualKey = visualKeyFor(e);
       // The in-flight cooldown stops the deferring entity from burning a
@@ -8270,6 +8369,9 @@ export class Renderer {
       swimPitch: 0,
       lastFacing: e.facing,
       bankRoll: 0,
+      dgFlipT: DG_FLIP_SECS,
+      dgFlipKind: 1,
+      dgPrevDashTicks: 0,
       wasWading: false,
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
@@ -9082,8 +9184,8 @@ export class Renderer {
         // An authored night floor (MapLighting.nightFloor) lifts the whole
         // grade's night end toward the map's own daylight: key, ambient, sky
         // and fog together, so a map that runs its clock never goes murky
-        // after dark. The lamps and the aurora still read the true clock
-        // (dnGlobalNight).
+        // after dark (SPACEY's Deepglass: "less dark/dull, more chill"). The
+        // lamps and the aurora still read the true clock (dnGlobalNight).
         const floor = this.authoredLighting.override?.nightFloor ?? 0;
         const lifted = floor + (1 - floor) * effectiveDayness(gday, biome);
         this.dnGrade = warmDuskGrade(dayNightGrade(lifted, biome, moonLit), duskWarmAmount(sd[1]));
@@ -9997,6 +10099,17 @@ export class Renderer {
       const ea = isSelf
         ? Math.min(1, alpha)
         : remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
+      // A body flying the Deepglass bell is exempt from BOTH crowd LOD levers
+      // below, the frozen far mesh and the pose-rate throttle.
+      //
+      // That mesh is a baked IDLE pose, a figure standing upright: on land at
+      // 80 yards it reads as a distant person, but in the bell it read as the
+      // whole opposing side standing to attention in mid-air while they flew,
+      // and the throttle left the few that were animating stuttering. The
+      // roster is at most ten bodies inside one small sphere, so carrying every
+      // rig articulated and at full rate is a rounding error against the crowd
+      // these levers exist for.
+      const dgFlier = (e as { dgFlight?: boolean }).dgFlight === true;
       let wantShadow = true;
       let inProxyBand = false;
       if (isSelf) {
@@ -10032,9 +10145,14 @@ export class Renderer {
           // shadow; an active form's own rig keeps casting instead. A mounted
           // rider also skips the proxy: its baked ground-level idle silhouette
           // would render under the raised body.
+          // A Deepglass flier keeps its articulated shadow through the band
+          // as well: the proxy is the baked upright idle, and an upright
+          // shadow under a body pitching through the water reads as a second
+          // figure (the same reason the far mesh is off for fliers above).
           v.visual?.setProxyShadow(
             !wantShadow &&
               inProxyBand &&
+              !dgFlier &&
               !polyed &&
               !bear &&
               !cat &&
@@ -10046,6 +10164,7 @@ export class Renderer {
           // sheep/forms keep articulated shadows through the whole proxy band:
           // a frozen humanoid proxy silhouette would be wrong under a form
           const wantFormShadow = wantShadow || inProxyBand;
+          if (dgFlier) v.visual?.setShadow(wantFormShadow);
           v.sheepVisual?.setShadow(wantFormShadow);
           v.bearVisual?.setShadow(wantFormShadow);
           v.catVisual?.setShadow(wantFormShadow);
@@ -10058,7 +10177,9 @@ export class Renderer {
           }
         }
         if (v.visual) {
-          v.isFar = latchFarLod(v, e, ea, isSelf, d2, lodBands, actionablePose, this.time);
+          v.isFar = dgFlier
+            ? false
+            : latchFarLod(v, e, ea, isSelf, d2, lodBands, actionablePose, this.time);
         }
       }
       // online, entities beyond nameplate range stream below snapshot rate;
@@ -10213,6 +10334,11 @@ export class Renderer {
         if (vis && e.objectItemId === 'soulwell' && v.objectMesh) {
           syncSoulwellVisual(v.objectMesh, this.time, e.id);
         }
+        continue;
+      }
+      if (e.templateId === DEEPGLASS_BALL_TEMPLATE_ID) {
+        // bespoke ball motion (the comet trail); no rig to animate
+        this.deepglassBall.updateBall(e, v, dt);
         continue;
       }
       if (e.kind === 'npc') {
@@ -10601,7 +10727,14 @@ export class Renderer {
           ? wl - groundHeightAtBody(ax, az, this.sim.cfg.seed, ay)
           : Number.NEGATIVE_INFINITY;
       const wadeDepth = e.kind === 'mob' ? MOBS[e.templateId]?.wadeDepth : undefined;
-      const swimming = isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth, wadeDepth);
+      // Deepball: the bell holds its own water, so the depth latch (which reads
+      // the GLOBAL waterline, parked far below the arena slate) would never
+      // fire. A body in flooded flight is unconditionally swimming and
+      // unconditionally under, that is what puts it on the authored strokes
+      // instead of running on air.
+      const dgFlying = (e as { dgFlight?: boolean }).dgFlight === true;
+      const swimming =
+        dgFlying || isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth, wadeDepth);
       // ...and the band under it, where the feet are wet but the ground is
       // still doing the work. Read off the SAME displayed depth as the swim
       // latch, so a body crossing a shoreline can never be both at once.
@@ -10627,12 +10760,14 @@ export class Renderer {
       // sim owns the DEPTH (players dive with the dive key); this is the
       // presentation read of it, taken off the same displayed coordinates as
       // the swim latch so pose and splash can never disagree.
-      const submerged = isSubmergedAtHeadHeight(
-        v.wasSubmerged,
-        swimming,
-        feetDepth,
-        active.swimHeadHeight * e.scale,
-      );
+      const submerged =
+        dgFlying ||
+        isSubmergedAtHeadHeight(
+          v.wasSubmerged,
+          swimming,
+          feetDepth,
+          active.swimHeadHeight * e.scale,
+        );
       const vx = ax - v.lastX,
         vz = az - v.lastZ;
       // Vertical travel, off the SAME displayed coordinates: how hard the body
@@ -10645,10 +10780,30 @@ export class Renderer {
       v.lastX = ax;
       v.lastZ = az;
       v.lastY = ay;
-      v.swimPitch = advanceSwimPitch(v.swimPitch, vy, swimming && e.kind === 'player', dt);
+      // Flooded flight pitches the body to the DIRECTION it is travelling, not
+      // to a vertical-speed ratio: a body climbing on the trim key alone was
+      // rising at cruise and still drawn nose-forward, because vy over the
+      // reference speed never reached the ceiling once forward motion shared
+      // the cap. The angle of travel does, a pure climb is nose straight up.
+      // Expressed as the vertical speed advanceSwimPitch maps to that angle.
+      const poseVy = dgFlying ? flightPoseVerticalSpeed(vx, vz, vy, dt) : vy;
+      v.swimPitch = advanceSwimPitch(
+        v.swimPitch,
+        poseVy,
+        swimming && (e.kind === 'player' || dgFlying),
+        dt,
+        // Flooded flight climbs and dives an order of magnitude faster than a
+        // swimmer does (DG_BOOST_SPEED is 26 yd/s against the lake's 3.2), so
+        // the swim reference saturates on the first tick of any vertical input
+        // and the nose-over becomes a two-position switch. Its own reference ,
+        // and its own, steeper ceiling, because in the bell you genuinely do
+        // point where you are going.
+        dgFlying ? DG_PITCH_FULL_SPEED : undefined,
+        dgFlying ? DG_PITCH_MAX : undefined,
+      );
       // Bank into the turn, off the DRAWN heading's sweep rate. In the water
-      // that is a full roll; on land it is a runner's inside lean, an order of
-      // magnitude smaller.
+      // (and above all in the bell) that is a full airplane roll; on land it is
+      // a runner's inside lean, an order of magnitude smaller.
       const yawRate = yawRateBetween(v.lastFacing, facing, dt);
       v.lastFacing = facing;
       const loco = updateLocomotionInto(v.locoState, v.loco, vx, vz, facing, dt, active.gait);
@@ -10656,7 +10811,7 @@ export class Renderer {
       v.bankRoll = advanceBankRoll(
         v.bankRoll,
         // A body with no say in where it is going does not lean into anything:
-        // a corpse just drifts.
+        // a corpse, or a fighter frozen by a Tidewarden's beam, just drifts.
         e.dead ? 0 : yawRate,
         loco.speed,
         dt,
@@ -10814,6 +10969,28 @@ export class Renderer {
       st.submerged = submerged;
       st.swimPitch = v.swimPitch;
       st.bankRoll = v.bankRoll;
+      // The deepball dash FLIP: a full 360 about the dash's own axis, layered
+      // onto the pose channels the swim rig already owns (pitch for a
+      // front/back flip, roll for the sides). Edge-detected off dgDashTicks ,
+      // the sim's dash flare, and integrated here at frame rate so the spin
+      // is smooth at any fps.
+      if (dgFlying) {
+        const flip = advanceDashFlip(
+          v,
+          (e as { dgDashTicks?: number }).dgDashTicks ?? 0,
+          (e as { dgDashKind?: number }).dgDashKind ?? 1,
+          dt,
+          this.dashFlipScratch,
+        );
+        st.swimPitch += flip.pitch;
+        st.bankRoll += flip.roll;
+      } else {
+        resetDashFlip(v);
+      }
+      // Burners lit: streamline. Read off the sim's own boost latch rather than
+      // from speed, so the pose answers the throttle on the frame it opens and
+      // a fast COAST (which is most of a good run in the bell) keeps stroking.
+      st.gliding = dgFlying && (e as { dgBoosting?: boolean }).dgBoosting === true;
       st.wading = wading;
       if (isSelf) this.selfSubmerged = submerged && !visuallyDead;
       // A mounted rider holds the seated pose (the sit loop reads as riding);
@@ -11102,7 +11279,7 @@ export class Renderer {
       // player reacts to, so the local player, the current target, and anything
       // mid-cast always animate every frame no matter how dense the crowd.
       let animate = true;
-      if (!actionablePose) {
+      if (!actionablePose && !dgFlier) {
         const cadence = animCadenceFrames(d2, lodBands);
         animate = cadence <= 1 || (this.frameIdx + e.id) % cadence === 0;
       }
@@ -11589,6 +11766,7 @@ export class Renderer {
       dt,
       this.lowGfx,
     );
+    this.deepglassBall.tick(dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'vfx', worldStart);
 
     this.camYaw += deckCameraTurn(sim, this.camBoom, this.lastLocalPos, this.camMirror);
@@ -11765,18 +11943,33 @@ export class Renderer {
         cullFar: this.subsystemCullFar(),
         viewDistance: this.editor.placedAssetViewDistance,
         fogFar: (this.scene.fog as THREE.Fog | null)?.far ?? null,
+        cullBeyond: this.deepglassCityCull(),
       })
     ) {
       this.editor.invalidateShadows();
     }
     this.authoredLayers?.updateLod(this.camera.position.x, this.camera.position.z);
+    this.deepglassScene?.update(p.pos.x, p.pos.z, dt, this.showDeepglassBallMark);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'zoneFeatures', worldStart);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
-    this.underwaterView.frame(this.camera, this.scene, p.pos, this.sim.cfg.seed, dt);
+    // Inside the Deepglass bell (the same reading the city cull uses) the wash
+    // takes the bell's own sealed water and its lighter palette.
+    this.underwaterView.frame(
+      this.camera,
+      this.scene,
+      p.pos,
+      this.sim.cfg.seed,
+      dt,
+      this.deepglassCityCull() !== null,
+    );
     // The camera under an authored map's ground draws a black void
     // (authored_map/underworld.ts); the built-in world never masks.
     if (isBuiltinWorldActive()) this.underworld.active = false;
-    else this.underworld.update(this.camera.position, this.sim.cfg.seed);
+    else {
+      const cam = this.camera.position;
+      const inBell = this.deepglassWorld && insideBell(cam.x, cam.y, cam.z);
+      this.underworld.update(cam, this.sim.cfg.seed, inBell);
+    }
     // The placed waterfalls share one shader clock and nothing else advances it
     // (SPACEY, 2026-09-19: "waterfalls not animated they are frozen").
     advanceWaterfallTime(this.time);
@@ -11872,7 +12065,12 @@ export class Renderer {
     } finally {
       if (underworld) this.underworld.unmask();
     }
-    if (presented) this.presentedFrameCount++;
+    if (presented) {
+      this.presentedFrameCount++;
+      // Last thing onto the canvas, and still inside the shake offset so the
+      // wave rides the same jolted camera the frame under it was drawn with.
+      this.deepglassScene?.drawGoalWave(this.webgl, this.camera);
+    }
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;
@@ -12164,6 +12362,7 @@ export class Renderer {
     this.blobShadows?.dispose();
     this.worldBoss.dispose();
     this.authoredLayers?.dispose();
+    this.deepglassScene?.dispose();
     this.editor.dispose();
   }
 
@@ -12199,11 +12398,22 @@ export class Renderer {
     const p = this.sim.player;
     const seed = this.sim.cfg.seed;
     const reduce = this.reducedMotion();
+    // Flooded flight: a looser, longer-leashed boom (Rocket League's camera
+    // stiffness), a wider base FOV, and a boom held inside the glass. DG_CAM_*.
+    const dgFlying = (p as { dgFlight?: boolean }).dgFlight === true;
 
     // Spring-arm lag: the look pivot trails the avatar on a critically damped
     // spring (vertical softer), so runs, jumps, mantles, and landings carry
     // weight. Reduced motion stiffens it to near-rigid instead of branching.
-    stepCameraBoom(this.camBoom, selfPos.x, selfPos.y, selfPos.z, dt, reduce ? 4 : 1);
+    stepCameraBoom(
+      this.camBoom,
+      selfPos.x,
+      selfPos.y,
+      selfPos.z,
+      dt,
+      reduce ? 4 : dgFlying ? DG_CAM_STIFFNESS : 1,
+      reduce || !dgFlying ? 1 : DG_CAM_LEASH_SCALE,
+    );
 
     // Landing thump, detected from the display trajectory alone (works in
     // both hosts): a short FOV dip plus a touch of trauma, scaled by fall
@@ -12226,7 +12436,12 @@ export class Renderer {
         velZ = 0;
       }
     }
-    stepCameraFeel(this.camFeel, velX, velZ, dt, !reduce);
+    // In the bell the reference is the flooded-flight CRUISE, not the run: a
+    // flier is always faster than a runner, so the land reference pinned the
+    // widening at maximum and it stopped meaning anything. Against cruise it
+    // reads as what it should, the burners are lit.
+    const feelRef = dgFlying ? DG_SWIM_SPEED : undefined;
+    stepCameraFeel(this.camFeel, velX, velZ, dt, !reduce, feelRef);
 
     // Flipping reduce motion on mid-directive blends any running move out.
     if (reduce) cancelCameraDirective(this.camDirector);
@@ -12282,15 +12497,18 @@ export class Renderer {
     // bubbles, the breaststroke you are actually playing) would only ever be
     // visible from a zoomed-in view. The ground clamp below still keeps the
     // camera off the lake bed.
+    // Not in the bell: it holds its own water, and the icy sea's level near
+    // the perimeter would drag the camera down out of the arena.
     const underwaterCeilingY = underwaterCameraCeiling(
-      this.selfSubmerged,
+      this.selfSubmerged && !dgFlying,
       waterLevelAt(selfPos.x, selfPos.z, seed),
     );
     // The camera orbits the lagged/led pivot at the player's requested
     // distance. Scene geometry never changes that distance on the built-in
     // world; registered obstructors fade through their subsystem's
-    // occluder-fade pass. An authored map also lets rock and a placed asset's
-    // collider stop the boom (authored_map/chase_boom_core.ts).
+    // occluder-fade pass. An authored map (and the Deepglass bell) also lets
+    // the bell's glass, rock and a placed asset's collider stop the boom
+    // (authored_map/chase_boom_core.ts).
     const pose = stepRendererVehicleCamera(this, directedPose, dt, reduce);
     // The opt-in Action Cam shoulder shift rides on top of the vehicle-aware
     // pose: the vehicle camera decides the boom, the shoulder offsets it.
@@ -12317,6 +12535,7 @@ export class Renderer {
       boomIn.dist = pose.dist;
       boomIn.ceilingY = underwaterCeilingY;
       boomIn.dt = dt;
+      boomIn.flying = dgFlying;
       const seat = solveChaseBoom(boomIn, this.chaseBoom.out.solidLimit, this.chaseBoom.out);
       cx = seat.x;
       cy = seat.y;
@@ -12334,8 +12553,18 @@ export class Renderer {
     // alone would sit the camera inside their leaves: ride over them the
     // way the old terrain walls lifted it.
     groundY += gardenMazeCameraLift(cx, cz);
-    this.camera.position.set(cx, Math.max(cy, groundY), cz);
-    const fovTarget = Math.min(100, resolveCameraFov(this.baseFov, this.camFeel) + shoulder.fov);
+    this.camera.position.set(cx, dgFlying ? cy : Math.max(cy, groundY), cz);
+    // Base FOV plus the feel kicks; the latter are zero under reduced motion.
+    // In the Deepglass world the base eases between the land figure and the
+    // bell's wider one (nextCameraFovBase); everywhere else it is baseFov.
+    this.camFovBase = nextCameraFovBase(
+      this.camFovBase,
+      this.baseFov,
+      dgFlying,
+      this.deepglassWorld,
+      dt,
+    );
+    const fovTarget = Math.min(100, resolveCameraFov(this.camFovBase, this.camFeel) + shoulder.fov);
     if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
       this.camera.fov = fovTarget;
       this.camera.updateProjectionMatrix();
@@ -12370,8 +12599,24 @@ export class Renderer {
         for (const p of this.riftAmbienceScratch) this.ambientPointsMergedScratch.push(p);
         points = this.ambientPointsMergedScratch;
       }
-      sink.ambience(amb.biome, amb.inDungeon, amb.precip, amb.nearWater, 0, points);
+      // In the bell every open-air bed is wrong: the player is a hundred
+      // yards down. dgFlight is the flag for "in the water at the Deepglass",
+      // and it is the sim's own, so this follows a player in or out with no
+      // geometry test of its own.
+      const submerged = (this.sim.player as { dgFlight?: boolean }).dgFlight === true;
+      // The Deepglass bowl. In the bell you hear the stands THROUGH the glass;
+      // out on the terrace and the causeway you hear them in the air. One
+      // number drives both beds, and it is the same reading the card crowd
+      // animates from, so the bowl you hear and the bowl you see agree.
+      const crowd = this.deepglassScene?.crowdLevel(eye.x, eye.z, submerged) ?? 0;
+      sink.ambience(amb.biome, amb.inDungeon, amb.precip, amb.nearWater, crowd, points, submerged);
     }
+  }
+
+  /** The slab of the Deepglass map hidden while the camera is inside the bell
+   *  (DeepglassScene.cityCull); null in every other world. */
+  private deepglassCityCull(): PlacedCullHalfPlane | null {
+    return this.deepglassScene?.cityCull() ?? null;
   }
 
   // Hang a speech bubble over an entity's head; it follows the entity and

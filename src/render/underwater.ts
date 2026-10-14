@@ -36,6 +36,41 @@ const UNDERWATER_FADE_DEPTH = 0.45;
 /** Peak opacity of the tint quad, at full submersion. */
 const TINT_OPACITY = 0.46;
 
+/**
+ * A palette override for water you are meant to SEE THROUGH.
+ *
+ * The shipped wash is tuned for a murky lake: nearly half-opaque blue with fog
+ * closing at 46 yd. The Deepglass is a 76-yard arena where reading the far ring
+ * is the whole game, so it runs the same effect far lighter and clearer, the
+ * cue comes from bubbles and motion, never from extinction
+ * (docs/prd/deepglass.md section 6).
+ */
+export interface UnderwaterPalette {
+  tint: number;
+  tintOpacity: number;
+  fogColor: number;
+  fogNear: number;
+  fogFar: number;
+  bubbleColor: number;
+}
+
+export const DEEPGLASS_PALETTE: UnderwaterPalette = {
+  tint: 0x3fa8cf,
+  tintOpacity: 0.13,
+  fogColor: 0x2d7ea8,
+  fogNear: 14,
+  fogFar: 210,
+  bubbleColor: 0xeaf9ff,
+};
+
+export const DEFAULT_PALETTE: UnderwaterPalette = {
+  tint: UNDERWATER_TINT,
+  tintOpacity: TINT_OPACITY,
+  fogColor: UNDERWATER_FOG_COLOR,
+  fogNear: UNDERWATER_FOG_NEAR,
+  fogFar: UNDERWATER_FOG_FAR,
+  bubbleColor: 0xdff2ff,
+};
 /** Vertical extent of the bubble column (yards). Points wrap within it. */
 const BUBBLE_BOX_HEIGHT = 9;
 /** Bubbles seat in an ANNULUS around the camera: anything spawned at the lens
@@ -62,11 +97,16 @@ export function underwaterBlendStep(
  *  biome fog easing just wrote: the easing pulls back toward the zone preset
  *  every frame and this pulls toward the water, so surfacing restores the
  *  biome's own fog with no state to unwind. */
-export function applyUnderwaterFog(fog: THREE.Fog, blend: number, scratch: THREE.Color): void {
+export function applyUnderwaterFog(
+  fog: THREE.Fog,
+  blend: number,
+  scratch: THREE.Color,
+  palette: UnderwaterPalette = DEFAULT_PALETTE,
+): void {
   if (blend <= 0.002) return;
-  fog.color.lerp(scratch.setHex(UNDERWATER_FOG_COLOR), blend);
-  fog.near += (UNDERWATER_FOG_NEAR - fog.near) * blend;
-  fog.far += (UNDERWATER_FOG_FAR - fog.far) * blend;
+  fog.color.lerp(scratch.setHex(palette.fogColor), blend);
+  fog.near += (palette.fogNear - fog.near) * blend;
+  fog.far += (palette.fogFar - fog.far) * blend;
 }
 
 /** The renderer's live compile gate (`renderer.compileGate`), the shape
@@ -272,13 +312,18 @@ export class UnderwaterView {
   /** One frame of the camera under a waterline: a blue wash, shortened fog,
    *  and a rising bubble stream. Keyed off the CAMERA, not the player, so a
    *  third-person boom that dips below the surface reads right, and a swimmer
-   *  at the surface with the camera under it still sees water rather than air. */
+   *  at the surface with the camera under it still sees water rather than air.
+   *  `inBell`: the camera is inside the Deepglass bell, which holds its OWN
+   *  sealed water (the arena world parks the global waterline far below the
+   *  slate), so submersion there is "inside the glass", not "under the line",
+   *  and it takes the far lighter DEEPGLASS_PALETTE. */
   frame(
     camera: THREE.PerspectiveCamera,
     scene: THREE.Scene,
     player: { readonly x: number; readonly z: number },
     seed: number,
     dt: number,
+    inBell = false,
   ): void {
     const cam = camera.position;
     const level = drawnWaterLevelAt(cam.x, cam.y, cam.z, seed);
@@ -292,15 +337,19 @@ export class UnderwaterView {
     }
     if (
       this.gateState === 'idle' &&
-      (Number.isFinite(level) || this.approach.near(player.x, player.z, seed))
+      (inBell || Number.isFinite(level) || this.approach.near(player.x, player.z, seed))
     ) {
       this.armCompileGate();
     }
     water?.setUndersideHeld(this.gateState !== 'ready');
-    this.blend = underwaterBlendStep(this.blend, level, cam.y, dt);
-    this.update(camera, this.blend, dt);
+    // Inside the bell the wash is always full: the same eased step toward 1.
+    this.blend = inBell
+      ? this.blend + (1 - this.blend) * (1 - Math.exp(-dt * 7))
+      : underwaterBlendStep(this.blend, level, cam.y, dt);
+    const palette = inBell ? DEEPGLASS_PALETTE : DEFAULT_PALETTE;
+    this.update(camera, this.blend, dt, palette);
     // The fog stays outside the hold: view range under water is gameplay.
-    applyUnderwaterFog(scene.fog as THREE.Fog, this.blend, this.fogScratch);
+    applyUnderwaterFog(scene.fog as THREE.Fog, this.blend, this.fogScratch, palette);
   }
 
   /** Install (or clear) the renderer's live compile gate and the water whose
@@ -340,7 +389,12 @@ export class UnderwaterView {
    * @param blend 0 = fully dry (the group hides and costs nothing), 1 = the
    *              camera is well under the waterline.
    */
-  update(camera: THREE.PerspectiveCamera, blend: number, dt: number): void {
+  update(
+    camera: THREE.PerspectiveCamera,
+    blend: number,
+    dt: number,
+    palette: UnderwaterPalette = DEFAULT_PALETTE,
+  ): void {
     const amount = Math.min(1, Math.max(0, blend));
     this.group.visible = amount > 0.002 && this.gateState === 'ready';
     if (!this.group.visible) return;
@@ -348,7 +402,9 @@ export class UnderwaterView {
     this.time += dt;
     this.bubbleMat.uniforms.uTime.value = this.time;
     this.bubbleMat.uniforms.uOpacity.value = amount;
-    this.tint.material.opacity = TINT_OPACITY * amount;
+    this.bubbleMat.uniforms.uColor.value.setHex(palette.bubbleColor);
+    this.tint.material.color.setHex(palette.tint);
+    this.tint.material.opacity = palette.tintOpacity * amount;
 
     // The box rides the camera, so there is always a stream around the viewer.
     this.group.position.copy(camera.position);

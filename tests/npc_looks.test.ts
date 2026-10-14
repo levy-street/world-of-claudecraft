@@ -27,12 +27,16 @@ import {
 } from '../src/render/characters/modular';
 import { npcEntityLookFor } from '../src/render/characters/npc_look_provider';
 import {
+  isDeepglassCrowdTemplate,
+  isDeepglassMarshalTemplate,
+  isPortalWizardTemplate,
   MOB_LOOK_IDS,
   NPC_LOOKS,
   NPC_OWN_BODY_IDS,
   NPC_PROP_SET_IDS,
   type NpcLookDef,
   npcLookFor,
+  PORTAL_WIZARD_LOOK,
 } from '../src/render/characters/npc_looks';
 import {
   resolveWocHeadLook,
@@ -48,6 +52,7 @@ import { wocWornHidesHair } from '../src/render/characters/woc_head_look_core';
 import { WOC_BODY_CLASSES, wocDefaultWorn } from '../src/render/characters/woc_parts_core';
 import { caravanDriverLookId } from '../src/render/world_quest_caravan_driver';
 import { ESCORTS, MOBS, NPCS } from '../src/sim/data';
+import { isTideholdTemplate } from '../src/sim/deepglass/citadel';
 import { Sim } from '../src/sim/sim';
 import { STUDIO_CONTENT } from '../src/sim/studio_content';
 import type { Entity } from '../src/sim/types';
@@ -100,6 +105,19 @@ const SLOT_FIELD: Record<WocHeadSlot, keyof NpcLookDef['app']> = {
   eyes: 'headEyes',
 };
 
+// FORK: NPCs whose look is composed at RUNTIME rather than authored in
+// NPC_LOOKS; the look provider composes them (npc_look_provider.ts,
+// render/characters/npc_looks.ts FORK DECLARATIONS): Baldemar's selves, the
+// Deepglass crowd and marshal, and every Tidehold resident.
+function forkRuntimeComposed(id: string): boolean {
+  return (
+    isPortalWizardTemplate(id) ||
+    isDeepglassCrowdTemplate(id) ||
+    isDeepglassMarshalTemplate(id) ||
+    isTideholdTemplate(id)
+  );
+}
+
 // FORK: fork-only NPCs that still render on the fixed NPC rigs (no authored
 // look yet). Shrink this list by authoring rows in NPC_LOOKS; never grow it
 // for an upstream NPC.
@@ -116,12 +134,18 @@ const FORK_FIXED_RIG_NPCS = new Set([
   'drover_pell',
   'dowser_emrys',
   'auctioneer_zeph',
+  // the Deepglass fixture desk
+  'deepglass_steward',
 ]);
 
 describe('npc looks roster', () => {
   it('covers every NpcDef id: every world NPC wears an authored look but the own-body ones', () => {
     const missing = Object.keys(NPCS).filter(
-      (id) => !NPC_OWN_BODY_IDS.has(id) && !FORK_FIXED_RIG_NPCS.has(id) && npcLookFor(id) === null,
+      (id) =>
+        !NPC_OWN_BODY_IDS.has(id) &&
+        !forkRuntimeComposed(id) &&
+        !FORK_FIXED_RIG_NPCS.has(id) &&
+        npcLookFor(id) === null,
     );
     expect(missing).toEqual([]);
   });
@@ -646,12 +670,14 @@ describe('the cast', () => {
   });
 });
 
-// The non-player half of the look provider (npc_look_provider.ts): nothing
-// composes on the part library's body. An NPC_LOOKS NPC wears its look on a WOC
-// class body through the visual factory, so the provider must never claim it (a
-// claim would compose it instead).
+// The non-player half of the look provider (npc_look_provider.ts): only the
+// Studio's runtime-composed civilians compose on the part library's body. An
+// NPC_LOOKS NPC wears its look on a WOC class body through the visual factory,
+// so the provider must never claim it (a claim would compose it instead).
 describe('the look provider for non-players', () => {
-  it('claims nothing with an NPC_LOOKS row', () => {
+  it('composes the fork civilians and nothing with an NPC_LOOKS row', () => {
+    expect(npcEntityLookFor(npc('portal_wizard_eastbrook'))).toBe(PORTAL_WIZARD_LOOK);
+    expect(npcEntityLookFor(npc('dg_spectator_pace1'))).not.toBeNull();
     expect(npcLookFor('smith_haldren')).not.toBeNull();
     expect(npcEntityLookFor(npc('smith_haldren'))).toBeNull();
     for (const id of MUSTER_MOB_LOOKS) {

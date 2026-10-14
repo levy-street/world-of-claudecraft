@@ -543,14 +543,14 @@ describe('map semantic accessibility core', () => {
       portals: [],
       pois: [
         // An authored `locations` rect (map_window_view.ts): poiIndex -1, its
-        // name inline. The positional resolver would read "harbor_city/-1".
+        // name inline. The positional resolver would read "tidehold/-1".
         {
           mx: 280,
           my: 200,
           labelMy: 200,
-          zoneId: 'harbor_city',
+          zoneId: 'tidehold',
           poiIndex: -1,
-          label: 'Lantern Square',
+          label: "Baldemar's Square",
           weight: 80,
         },
         // A shipped zone POI still resolves through names.poi.
@@ -558,9 +558,9 @@ describe('map semantic accessibility core', () => {
       ],
     } as unknown as MapPaintResult;
 
-    const prose = core().updateOverworld(model, 'Harbor City', 560);
-    expect(prose).toContain('Lantern Square');
-    expect(prose).not.toContain('harbor_city/-1');
+    const prose = core().updateOverworld(model, 'Tidehold', 560);
+    expect(prose).toContain("Baldemar's Square");
+    expect(prose).not.toContain('tidehold/-1');
     expect(prose).toContain('POI eastbrook_vale/2');
   });
 

@@ -11,10 +11,17 @@
 
 import { apiUrl } from '../client_origin';
 import type { PointSoundSource } from '../render/audio_sink';
-import { ABILITIES } from '../sim/data';
+import { ABILITIES, isBuiltinWorldActive } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
+import {
+  DEEPGLASS_LOOP_SFX_KEYS,
+  DEEPGLASS_SFX_KEYS,
+  type DeepglassLoop,
+  deepglassLoopSamples,
+  deepglassSamples,
+} from './deepglass_audio';
 import { isMeleeAudioId, meleeAudioSample } from './fury_audio_core';
 import { mountAudioKey } from './mount_audio_key';
 import {
@@ -26,6 +33,7 @@ import {
   mountEngineIdleAudible,
   mountEngineLoopActive,
 } from './mount_engine_state';
+
 import {
   SFX_CATALOG_HASH,
   SFX_CLIPS,
@@ -59,6 +67,21 @@ export const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/
 // released, so walking the edge does not restart the source every step.
 const POINT_SOUND_CULL = 6;
 const POINT_AMBIENCE_GAIN = 0.18;
+// Every open-air/dungeon bed ambience() can raise. Listed once so the
+// submerged branch can silence the lot without having to stay in step with the
+// biome ladder below it, a bed added there and forgotten here would keep
+// blowing wind through the Deepglass.
+const SURFACE_BEDS = [
+  'amb_dungeon',
+  'amb_crowd',
+  'amb_wind_vale',
+  'amb_birds',
+  'amb_wind_marsh',
+  'amb_wind_peaks',
+  'amb_rain',
+  'amb_snow',
+  'amb_water',
+] as const;
 const COOLDOWN_ENTRY_TTL = 60;
 const COOLDOWN_PRUNE_INTERVAL = 30;
 // The target loop() multiplies by the clip's own manifest gain (1 for this
@@ -178,6 +201,16 @@ export interface PlayOpts {
   // pile up and comb-filter into a metallic ring. 0 (default) plays the clip flat.
   attack?: number; // fade-in seconds (default 0 = instant)
   release?: number; // fade-out seconds; the clip is stopped once it ends
+  /**
+   * How far this sound carries, in world units. Defaults to MAX_DISTANCE, which
+   * is tuned for zone-scale footsteps and combat.
+   *
+   * Overridable because one venue breaks that assumption: the Deepglass bell is
+   * ~98 yd across, so a strike at the far ring is further away than the shared
+   * cutoff and would be SILENT, in an arena where hearing the ball behind you
+   * is half of knowing where it is.
+   */
+  maxDistance?: number;
   /** Fade the clip's OWN TAIL, keeping its full length. The opposite of
    *  `release` above, which truncates: `release: 0.2` on a 2.3s take stops it
    *  0.2s in, correct for a footstep and wrong for anything meant to play out.
@@ -402,6 +435,26 @@ class Sfx {
     this.lastVariant.set(key, variantIndex);
   }
 
+  /** Bake one Deepglass procedural cue into the buffer cache, or null when
+   *  `key` is not one. Baked rather than generated as clips because the arena
+   *  is an offline event build and every cue it needs is a short percussive
+   *  transient, and because the bell shipped SILENT, which read as a physics
+   *  demo rather than a match. The two sustained beds (the bell's room tone,
+   *  the burners under load) share the bank through a separate render path:
+   *  they are seamless loops, so they carry no fade at either end. */
+  private bakeDeepglassBuffer(ctx: AudioContext, key: string): AudioBuffer | null {
+    const cue = Object.hasOwn(DEEPGLASS_SFX_KEYS, key) ? DEEPGLASS_SFX_KEYS[key] : null;
+    const loop = Object.hasOwn(DEEPGLASS_LOOP_SFX_KEYS, key) ? DEEPGLASS_LOOP_SFX_KEYS[key] : null;
+    if (!cue && !loop) return null;
+    const samples = cue
+      ? deepglassSamples(cue, ctx.sampleRate)
+      : deepglassLoopSamples(loop as DeepglassLoop, ctx.sampleRate);
+    const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+    buffer.getChannelData(0).set(samples);
+    this.buffers.set(key, buffer);
+    return buffer;
+  }
+
   private loadBuffer(key: string, variantIndex = 0): Promise<AudioBuffer | null> {
     const ctx = this.ctx;
     const cacheKey = assetCacheKey(key, variantIndex);
@@ -411,6 +464,14 @@ class Sfx {
     const inFlight = this.loading.get(cacheKey);
     if (inFlight) return inFlight;
     if (!ctx) return Promise.resolve(null);
+    if (variantIndex === 0) {
+      try {
+        const baked = this.bakeDeepglassBuffer(ctx, key);
+        if (baked) return Promise.resolve(baked);
+      } catch {
+        /* minimal AudioContext stubs may not implement buffer synthesis */
+      }
+    }
     const request = (async () => {
       try {
         if (this.clipsReady) await this.clipsReady;
@@ -474,6 +535,18 @@ class Sfx {
         const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
         buffer.getChannelData(0).set(samples);
         this.buffers.set(`mob_water_elemental_${cue}`, buffer);
+      }
+      // Deepball at the Deepglass (game/deepglass_audio.ts): baked up front on
+      // an authored map only. The built-in world never plays a deepball cue, so
+      // it skips the synthesis; loadBuffer bakes a cue on first use if init ran
+      // before an authored world was active.
+      if (!isBuiltinWorldActive()) {
+        for (const key of [
+          ...Object.keys(DEEPGLASS_SFX_KEYS),
+          ...Object.keys(DEEPGLASS_LOOP_SFX_KEYS),
+        ]) {
+          this.bakeDeepglassBuffer(ctx, key);
+        }
       }
     } catch {
       /* minimal AudioContext stubs may not implement buffer synthesis */
@@ -639,7 +712,8 @@ class Sfx {
     const ctx = this.ctx,
       master = this.master;
     if (!ctx || !master) return false;
-    if (this.tooFar(x, z)) return false;
+    const range = opts?.maxDistance ?? MAX_DISTANCE;
+    if (this.tooFar(x, z, range)) return false;
     const variantIndex = this.nextVariantIndex(key);
     const cacheKey = assetCacheKey(key, variantIndex);
     const buf = this.buffers.get(cacheKey);
@@ -1050,6 +1124,31 @@ class Sfx {
 
   hasLoop(id: string): boolean {
     return this.loops.has(id);
+  }
+
+  /** Bend a live loop's playback rate, ramped rather than stepped.
+   *
+   *  Ambience never needs this, a wind bed has no "harder". A THRUST bed does:
+   *  the deepball burners have to climb with the body they are pushing, and a
+   *  boost that sounds identical at cruise and at 26 yd/s tells the player
+   *  nothing. Silently a no-op for a loop that is not playing yet (a bed can be
+   *  a frame or two behind while its buffer resolves), so callers can set it
+   *  every frame beside loop(). */
+  loopRate(id: string, rate: number): void {
+    const slot = this.loops.get(id);
+    const ctx = this.ctx;
+    if (!slot || !ctx) return;
+    const target = Math.max(0.25, Math.min(4, rate)) * this.authoredPlaybackRate(slot.key);
+    const param = slot.src.playbackRate;
+    if (Math.abs(param.value - target) < 0.005) return;
+    // Ramped where the platform offers it (a stepped playback rate on a live
+    // source is an audible zip), stepped where it does not, minimal
+    // AudioContext stubs implement playbackRate as a plain value.
+    if (typeof param.setTargetAtTime === 'function') {
+      param.setTargetAtTime(target, ctx.currentTime, 0.12);
+    } else {
+      param.value = target;
+    }
   }
 
   /** A fixed-duration ground zone loop (Blizzard's storm): starts `key`
@@ -1776,7 +1875,17 @@ class Sfx {
 
   /** Cross-fade the global ambience loops to match the player's surroundings.
    *  These are continuous background beds, kept well under the foreground
-   *  footstep/jump/combat one-shots so movement always reads clearly over them. */
+   *  footstep/jump/combat one-shots so movement always reads clearly over them.
+   *
+   *  `submerged` is the Deepglass: the player is inside the bell, and none of
+   *  the beds above deal with being under a hundred yards of water. It is
+   *  handled here rather than beside the deepball cues so that ONE function
+   *  still owns which bed is playing, two owners is how you get a ridge wind
+   *  blowing through an underwater arena.
+   *
+   *  `crowd` (0..1) is how full and how loud the nearest stadium reads. It
+   *  raises the open-air murmur below and, when submerged, the muffled bowl
+   *  bed instead, one number, and the bell picks which one you hear. */
   ambience(
     biome: BiomeId,
     inDungeon: boolean,
@@ -1784,10 +1893,26 @@ class Sfx {
     nearWater: boolean,
     crowd = 0,
     points: readonly AmbientPointSource[] = [],
+    submerged = false,
   ): void {
+    this.ambient('dg_ambient', submerged ? 0.42 : 0);
+    // The stands, heard through the glass. Same `crowd` reading that raises
+    // amb_crowd out in the air below, so walking off the causeway and diving
+    // into the bell changes which bed carries the bowl, not whether it is
+    // there. Never zero while a crowd is present: an empty-sounding stadium
+    // full of people is the one thing this cannot be.
+    this.ambient('dg_crowd', submerged && crowd > 0 ? 0.14 + 0.2 * Math.min(1, crowd) : 0);
+    if (submerged) {
+      // Everything else is up in the air, and the air is not down here.
+      for (const key of SURFACE_BEDS) this.ambient(key, 0);
+      for (let i = 0; i < points.length; i++) this.unloop(points[i].id, 0.7);
+      return;
+    }
     this.ambient('amb_dungeon', inDungeon ? 0.3 : 0);
-    // Sowfield crowd murmur (procedural bed): quiet chatter on the grounds,
-    // swelling while a match is live (the renderer passes 0 / ~0.4 / 1).
+    // Open-air crowd murmur (procedural bed): quiet chatter on the grounds,
+    // swelling while a match is live. The Deepglass terrace and causeway raise
+    // it from outside the bell; the muffled dg_crowd bed above takes over the
+    // moment the player is in the water.
     this.ambient('amb_crowd', crowd > 0 ? 0.08 + 0.18 * Math.min(1, crowd) : 0);
     this.ambient('amb_wind_vale', !inDungeon && (biome === 'vale' || biome === 'beach') ? 0.12 : 0);
     this.ambient(

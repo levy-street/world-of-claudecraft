@@ -18,7 +18,7 @@ import {
   visualKeyFor,
 } from './manifest';
 import { MODULAR_WARRIOR_KEY, type ModularLook, wocBodyScaleOf } from './modular';
-import { npcLookFor } from './npc_looks';
+import { isUnarmedCivilianTemplate, npcLookFor } from './npc_looks';
 import { CharacterVisual } from './visual';
 import { ensureWocHeadForAppearance } from './woc_head_packs';
 
@@ -51,7 +51,10 @@ export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 // body's modular head reads. The RULE for what an entity wears is app-level
 // (see src/render/characters/player_look_core.ts), while this module only
 // needs the answer. An NPC_LOOKS NPC never composes either: its authored look
-// rides the WOC def of its class (npc_looks.ts, the factory below).
+// rides the WOC def of its class (npc_looks.ts, the factory below). The one
+// exception is the Studio's runtime-composed civilians (npc_looks.ts FORK
+// DECLARATIONS, claimed through npc_look_provider.ts), which only authored maps
+// spawn.
 let modularLookProvider: ((e: Entity) => ModularLook | null) | null = null;
 
 /** Install (or clear, with null) the entity-to-look mapping. */
@@ -69,7 +72,9 @@ export function modularLookFor(e: Entity): ModularLook | null {
 /** The composed-body visual key for an entity the look provider claimed: the
  *  class's own modular def (its clips, ability mapping and hand layout), with
  *  the warrior's as the fallback for a templateId without one. A player
- *  composes; an NPC_LOOKS NPC wears its look on a WOC body. */
+ *  composes, and so does a Studio runtime-composed civilian (npc_looks.ts FORK
+ *  DECLARATIONS), which takes the warrior fallback and is disarmed at build
+ *  (createCharacterVisual); an NPC_LOOKS NPC wears its look on a WOC body. */
 export function modularKeyFor(e: Entity): string {
   const key = modularVisualKey(e.templateId as PlayerClass);
   return VISUALS[key] ? key : MODULAR_WARRIOR_KEY;
@@ -193,6 +198,12 @@ export function createCharacterVisual(
       look,
       localPlayer ? born : { ...born, wocArmorDetail: 'crowd' },
     );
+    // Civilians (the portal wizard, the Deepglass crowd and its keepers) compose
+    // on a class body and would otherwise inherit that class's held-weapon
+    // layout: a stadium of spectators, every one of them holding a sword.
+    if (!formKey && e.kind === 'npc' && isUnarmedCivilianTemplate(e.templateId)) {
+      visual.disarmHeldProps();
+    }
     visual.budgetedWeaponLight = true;
     // ...and the only one that draws crowds: a WOC body folds its head's dozen pieces
     // into one draw here (woc_head_merge.ts). A rig built directly (previews, portraits)

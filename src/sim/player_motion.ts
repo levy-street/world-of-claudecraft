@@ -372,6 +372,14 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     if (inp.turnRight) p.facing = normAngle(p.facing - TURN_SPEED * DT);
   }
 
+  // Flooded flight owns this body outright. The deepball match driver runs
+  // deepglassFlightPass for every participant on its own tick (it holds the
+  // match clock, the currents and who is carrying the Tidesow), so the whole
+  // ground/swim pipeline below, gravity, terrain collision, the standoff, the
+  // ledge snap-down, must not also run. Turning still works above, because
+  // yaw is how you aim the pack.
+  if (p.dgFlight) return;
+
   let mx = 0,
     mz = 0; // local: z forward, x strafe-right
   if (inp.forward) mz += 1;

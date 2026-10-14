@@ -1,0 +1,72 @@
+{
+  "defaults": {
+    "type": "static"
+  },
+  "items": [
+    {
+      "src": "tmp/asset_src/deepglass/arena_stand.glb",
+      "out": "models/deepglass/arena_stand.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_stand_vom.glb",
+      "out": "models/deepglass/arena_stand_vom.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_gatehouse.glb",
+      "out": "models/deepglass/arena_gatehouse.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_canopy.glb",
+      "out": "models/deepglass/arena_canopy.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_floor.glb",
+      "out": "models/deepglass/arena_floor.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_floor_gate.glb",
+      "out": "models/deepglass/arena_floor_gate.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_floor_core.glb",
+      "out": "models/deepglass/arena_floor_core.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/deepglass/bell_frame.glb",
+      "out": "models/deepglass/bell_frame.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_brazier.glb",
+      "out": "models/deepglass/arena_brazier.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_banner.glb",
+      "out": "models/deepglass/arena_banner.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_box.glb",
+      "out": "models/deepglass/arena_box.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_scoreboard.glb",
+      "out": "models/deepglass/arena_scoreboard.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/deepglass/arena_pennant.glb",
+      "out": "models/deepglass/arena_pennant.glb",
+      "maxTex": 512
+    }
+  ]
+}

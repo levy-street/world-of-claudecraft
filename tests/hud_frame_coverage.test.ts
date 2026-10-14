@@ -187,6 +187,7 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
     'mounts nothing: toggles #ui.options-open (the Esc menu scrim state class that replaced a #ui-anchored :has())',
   'src/ui/noticeboard_popup.ts': 'transient noticeboard popup card',
   'src/ui/realm_builder_popup.ts': 'transient Realm Builder honour roll card',
+  'src/ui/plot_sign_popup.ts': 'transient Tidehold housing-plot deed card (fork)',
   'src/ui/dev_command_window.ts': 'dev-only command window (a .window, window_drag governs it)',
   'src/ui/hud/professions/perfecting_window.ts':
     'the Perfecting window (a .window.panel, window_drag governs it), minted at runtime like dev_command_window.ts since no markup entry ships it',

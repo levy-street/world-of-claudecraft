@@ -1,6 +1,6 @@
 // A map can switch the high-tier cliff rubble off (TerrainStyle.scree).
-// A city carved into terraces reads to the scree probes as cliff faces, so on
-// ultra its streets filled with boulders (SPACEY:
+// Deepglass: the ring city is carved into terraces, which the scree probes
+// read as cliff faces, so on ultra the streets filled with boulders (SPACEY:
 // "the ultra graphics shouldn't have random rock clutter rendered around
 // city circle"). Off, the pure placement source yields nothing at all, so
 // the tier-gated dressing cannot cost a draw either.

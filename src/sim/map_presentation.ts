@@ -1,6 +1,9 @@
 import type { MapPresentationMode } from './types';
 
-export type InteriorPresentationMode = Exclude<MapPresentationMode, 'blank' | 'sowfield'>;
+export type InteriorPresentationMode = Exclude<
+  MapPresentationMode,
+  'blank' | 'sowfield' | 'deepglass'
+>;
 
 /** Authored maps use a bounded, flat slate instead of the shipped overworld. */
 export function isAuthoredMapPresentation(mode: MapPresentationMode | undefined): boolean {
@@ -25,9 +28,9 @@ export function usesProceduralOverworldFoliage(mode: MapPresentationMode | undef
  * the building, if the building sits near the origin.
  *
  * minimap_markers.ts already refused to draw those veins on an authored map's
- * minimap; the renderer never got the same memo, so an arena map was drawing
- * 223k triangles of ore and herbs a frame (36% of it) around and inside its
- * stadium. Every reader of this content answers to this one
+ * minimap; the renderer never got the same memo, so the Deepglass arena was
+ * drawing 223k triangles of ore and herbs a frame (36% of it) around and
+ * inside a blitzball stadium. Every reader of this content answers to this one
  * function so the map, the mesh and the interact key cannot disagree again.
  */
 export function usesOverworldSiteDressing(mode: MapPresentationMode | undefined): boolean {
@@ -40,7 +43,7 @@ export function usesOverworldSiteDressing(mode: MapPresentationMode | undefined)
  * pads, the Old Beacon's stair) are written at fixed overworld coordinates and
  * applied AFTER the custom-map sculpt layer, so on an authored map they stamp
  * ground the maker can neither see coming nor sculpt away: SPACEY's "weird flat
- * square ... hard stuck" on an authored map (2026-09-15) was Dawnhold's pad at
+ * square ... hard stuck" on the Deepglass (2026-09-15) was Dawnhold's pad at
  * x 232..300, z 854..944, pinned at y 3.2 under every lowering stroke. Full
  * copies of the shipped world keep them (their castles stand on them).
  */
@@ -52,5 +55,5 @@ export function usesOverworldTerrainPads(mode: MapPresentationMode | undefined):
 export function interiorPresentationMode(
   mode: MapPresentationMode | undefined,
 ): InteriorPresentationMode | null {
-  return mode && mode !== 'blank' && mode !== 'sowfield' ? mode : null;
+  return mode && mode !== 'blank' && mode !== 'sowfield' && mode !== 'deepglass' ? mode : null;
 }

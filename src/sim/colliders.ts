@@ -750,8 +750,8 @@ function staticWorldColliders(seed: number): Collider[] {
   // The Forgefather's Isle fortress: the owner's baked exterior pass
   // (forgefather_fortress.ts owns the ground-standing derivation). Built-in
   // world only: an authored map reuses these coordinates for its own ground
-  // (a market can sit where the fortress does), and an ungated push here put
-  // an invisible wall through its stalls.
+  // (the Deepglass's Tidehold market sits where the fortress does), and an
+  // ungated push here put an invisible wall through its stalls.
   if (!authoredMapActive()) out.push(...forgefatherFortressColliders(seed));
 
   // Delve entrance portals: the whole slab is a solid one-way threshold

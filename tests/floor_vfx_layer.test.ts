@@ -517,16 +517,28 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   // ClaudeCraft Studio (authored maps only). Static scenery and dressing: the
   // campfire flame (vertical, body then core), authored ground decals (static
   // map paint inside the ground band, under every player and encounter rung),
-  // and fluid pool surfaces (the hazard-pool rule).
+  // fluid pool surfaces (the hazard-pool rule), and Baldemar's walk-in portal
+  // gate.
   'src/render/campfire_flame.ts',
   'src/render/decals.ts',
   'src/render/fluid_surfaces.ts',
+  'src/render/wizard_portal.ts',
   // Sky: the authored cloud and fog-bank billboards.
   'src/render/clouds.ts',
   // Dev and editor wireframes: the dev-cheat collider overlay and the Tree
   // tool's canopy-volume wire, never in a player's raid.
   'src/render/collision_debug.ts',
   'src/render/tree_gen.ts',
+  // The Deepglass bell sport: a self-contained arena (bell, stadium, ball) and
+  // body-anchored fighter effects (team auras, thrustpack plumes, ice shells,
+  // the speed rush), all on their own 10 to 18 stack, far from any raid floor.
+  'src/render/deepglass.ts',
+  'src/render/deepglass_aura.ts',
+  'src/render/deepglass_ball.ts',
+  'src/render/deepglass_ice.ts',
+  'src/render/deepglass_pack.ts',
+  'src/render/deepglass_rush.ts',
+  'src/render/deepglass_stadium.ts',
 ];
 
 /**

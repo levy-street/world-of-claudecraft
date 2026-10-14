@@ -23,6 +23,9 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   'discard',
   'lock_item',
   'buy',
+  // Tidehold housing deeds (fork): no item changes hands; buyPlot debits copper
+  // and appends the deed id to PlayerMeta.ownedPlots, both on the self payload.
+  'buyplot',
   'sell',
   'buyback',
   // 'vcup_bet' (a copper debit) sat here until the Vale Cup retired with

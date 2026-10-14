@@ -540,10 +540,7 @@ const MONOLITHS: MonolithRow[] = [
     // the Moonbridge banner) moved into log_event_route.ts logEventCue.
     // v0.45.0 integration: 18025 on the merged tree (wc -l); the lower of the two
     // parent pins (18054 and PR 4352's 18069) stands.
-    // LOWERED to 18043 at the v0.45.0 integration merge of #4479's head that moved
-    // Deepglass and the Tidehold city out of the Studio import: the integration pin
-    // 18054 minus that removal. Exact merged count (wc -l), zero slack.
-    ceiling: 18043,
+    ceiling: 18054,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -582,9 +579,7 @@ const MONOLITHS: MonolithRow[] = [
     // sub-view landed: the Auras render method and its placement/teardown lines
     // moved out with them to src/ui/options_overlay_panels.ts. Measured with
     // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
-    // Lowered when Deepglass and the Tidehold city left the Studio merge for
-    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
-    ceiling: 2807,
+    ceiling: 2813,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1027,7 +1022,11 @@ const MONOLITHS: MonolithRow[] = [
     // Merge of the four dungeon entrances (#4478): both parents' additions combine
     // (ours is the one updateSetPieceOccluders call), exact merged count, within
     // the release/v0.45.0 ceiling the branch was held to.
-    ceiling: 12426,
+    // Merge of the Deepglass / Tidehold city branch (#4490) back onto the
+    // integration: its Deepglass and Tidehold-city renderer hooks return on top
+    // of the integration's set piece occluder call. Exact merged count (wc -l),
+    // within the release/v0.45.0 ceiling (12688).
+    ceiling: 12671,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1258,10 +1257,7 @@ const MONOLITHS: MonolithRow[] = [
     // instances/dungeon_run.ts) is paid for by moving riftEventMsRemaining's
     // body and its comment to rift/rift_floor_view.ts, beside the floor view it
     // reads. Exact count (wc -l after biome), zero slack.
-    // LOWERED to 11598 at the v0.45.0 integration merge of #4479's head that moved
-    // Deepglass and the Tidehold city out of the Studio import: the integration pin
-    // 11634 minus that removal. Exact merged count (wc -l), zero slack.
-    ceiling: 11598,
+    ceiling: 11634,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1508,7 +1504,11 @@ const MONOLITHS: MonolithRow[] = [
     // 11037 minus that removal. Exact merged count (wc -l), zero slack.
     // LOWERED to 11001 when the offline Play click (its audio start and its world
     // choice) moved into src/game/studio_boot.ts bootOfflinePlay.
-    ceiling: 11001,
+    // Merge of the Deepglass / Tidehold city branch (#4490) back onto the
+    // integration: its portal handoff boot and the arena's session tail return
+    // beside the integration's bootOfflinePlay click. Exact merged count (wc -l),
+    // within the release/v0.45.0 ceiling (11140).
+    ceiling: 11035,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1776,10 +1776,7 @@ const MONOLITHS: MonolithRow[] = [
     // the Studio's own delta (9836 - 9840 = -4) gives 9765; re-measure with wc -l.
     // The run readouts of the self record (drun, dgrun, dcompanion, dmarks) moved to
     // dungeon_run_wire.ts with the dungeon objectives tracker. Exact count.
-    // LOWERED to 9758 at the v0.45.0 integration merge of #4479's head that moved
-    // Deepglass and the Tidehold city out of the Studio import: the integration pin
-    // 9764 minus that removal. Exact merged count (wc -l), zero slack.
-    ceiling: 9758,
+    ceiling: 9764,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1972,10 +1969,7 @@ const MONOLITHS: MonolithRow[] = [
     // sibling modules (v0.45.0); exact count.
     // Studio merge into the v0.45.0 integration: the integration pin 5342 plus
     // the Studio's own delta (5355 - 5356 = -1) gives 5341; re-measure with wc -l.
-    // LOWERED to 5338 at the v0.45.0 integration merge of #4479's head that moved
-    // Deepglass and the Tidehold city out of the Studio import: the integration pin
-    // 5341 minus that removal. Exact merged count (wc -l), zero slack.
-    ceiling: 5338,
+    ceiling: 5341,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1998,10 +1992,7 @@ const MONOLITHS: MonolithRow[] = [
     // the Studio's own delta (4716 - 4720 = -4) gives 4668; re-measure with wc -l.
     // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
     // the release/v0.45.0 ceiling both merged PRs were held to.
-    // LOWERED to 4660 at the v0.45.0 integration merge of #4479's head that moved
-    // Deepglass and the Tidehold city out of the Studio import: the integration pin
-    // 4671 minus that removal. Exact merged count (wc -l), zero slack.
-    ceiling: 4660,
+    ceiling: 4671,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {

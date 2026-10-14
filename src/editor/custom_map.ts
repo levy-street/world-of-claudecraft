@@ -507,6 +507,10 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
     zoneAtmosphere: map.zoneAtmosphere ? deepClone(map.zoneAtmosphere) : undefined,
     terrainEdits: deepClone(map.terrainEdits),
     placements: placementsToPlayAssets(map.placements, map.assetCollisionMesh),
+    deepglassKitPlaced: map.placements.some((pl) => pl.assetId.startsWith('deepglass/')),
+    deepglassFloorPlaced: map.placements.some((pl) =>
+      pl.assetId.startsWith('deepglass/arena_floor'),
+    ),
     biomePaint: map.biomePaint ? deepClone(map.biomePaint) : undefined,
     promotedScenery: promotedSceneryFor(map.propsMode, map.placements, map.promotedScenery),
   };

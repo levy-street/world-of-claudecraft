@@ -16730,6 +16730,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': 'По центру',
   'hudChrome.breath.label': 'Дыхание',
   'hudChrome.breath.drowning': 'Вы тонете!',
+  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
+  // non-Latin locales per src/ui/CLAUDE.md).
+  'hudChrome.portalWizard.gossipDeepglass': 'Открой путь к Дипгласу',
+  'hudChrome.portalWizard.gossipDeepglassAria': 'Попросить Бальдемара открыть портал к Дипгласу',
+  'hudChrome.portalWizard.gossipHome': 'Открой путь домой',
+  'hudChrome.portalWizard.gossipHomeAria': 'Попросить Бальдемара открыть портал обратно в город',
+  'hudChrome.portalWizard.portalOpen': 'Портал открыт. Шагните в него.',
   'abilityUi.resources.devotion': 'Преданность',
   'abilityUi.resources.focus': 'концентрации',
   'abilityUi.tooltip.requiresStealthSkulduggery':

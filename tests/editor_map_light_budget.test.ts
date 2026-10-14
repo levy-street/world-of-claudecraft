@@ -4,7 +4,7 @@
 // shining. That is not merely "a few extra lights": numPointLights is compiled
 // into every lit material, so a 24-lamp city made EVERY material in the scene
 // loop 24 lights per fragment and re-upload 24 light structs on each material
-// switch. Measured on one of SPACEY's own lamp-lit city maps (Retina, his own
+// switch. Measured on SPACEY's Deepglass map (harbour spot, Retina, his own
 // save): 63 -> 78 fps with the draw count UNCHANGED - the cost was never
 // geometry. And the look it bought was one no player can ever see, because the
 // shipped game budgets these same lights down to GFX.maxPointLights.
@@ -42,7 +42,7 @@ function authored(x: number, z: number, intensity = 2.2): RankedPointLight {
 
 describe('editor map lights', () => {
   it('lights only the nearest maxPointLights of a city ring, and rests the others', () => {
-    // 24 lamps on a ring, the shape of a walled city's lamp line.
+    // 24 lamps on a ring, the shape of the Deepglass ring city.
     const ranked: RankedPointLight[] = [];
     for (let i = 0; i < 24; i++) {
       const a = (i / 24) * Math.PI * 2;

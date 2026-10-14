@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 // overlay, no fallback, just no terrain drawn at all. Twice now:
 // - v0.34: the ultra tier's three builtins on top of twelve photo samplers
 //   (fixed by packing the six colour layers into one sampler2DArray);
-// - 2026-09-23 (SPACEY, an authored map): a texture-painted map's shader sat
+// - 2026-09-23 (SPACEY, Tidehold/Deepglass): a texture-painted map's shader sat
 //   at exactly 16 WITHOUT the scene environment, and the deferred IBL landing
 //   a few seconds into play relinked it at 17 ("FRAGMENT shader texture image
 //   units count exceeds MAX_TEXTURE_IMAGE_UNITS(16)" on an Apple M5): the

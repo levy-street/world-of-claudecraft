@@ -1,5 +1,5 @@
 // The map-authored cloud deck (render/clouds.ts): a puff is a DISTANT thing.
-// Authored low (coverage 0.16 at 7 yards) the deck reads as rolling
+// Authored low (Deepglass: coverage 0.16 at 7 yards) the deck reads as rolling
 // harbour fog, which is the point - but a 100-yard billboard drifting through
 // the camera is a flat white wall across the deck. SPACEY: "make the fog clouds
 // only render when they are far from the player so it doesn't look weird with

@@ -153,8 +153,8 @@ export class MapDrawer {
       rows.appendChild(row);
     }
     // Published to Game: the maps this Studio has written into the repo. They
-    // are what the game boots for their slug (a publish under a shipped map's
-    // slug replaces that built-in map), so they belong beside the shipped list.
+    // are what the game boots for their slug (a published "deepglass" replaces
+    // the built-in arena), so they belong beside the shipped list.
     void this.deps.listPublished().then((published) => {
       if (this.tab !== 'shipped' || published.length === 0) return;
       for (const map of published) {

@@ -111,7 +111,7 @@ function computeSpot(seed: number, ci: number, cj: number): ScreeSpot | null {
   const h = terrainHeight(x, z, seed);
   if (h < waterLevel() + 0.5) return null; // shorelines keep their own dressing
   // An authored map can switch the rubble off (TerrainStyle.scree === false):
-  // a carved terraced city's terraces read as cliffs to the probes below, and its
+  // a carved ring city's terraces read as cliffs to the probes below, and its
   // streets filled with boulders on the high tiers (SPACEY: "random rock clutter
   // rendered around city circle").
   if (getActiveWorldContent().terrainStyle?.scree === false) return null;

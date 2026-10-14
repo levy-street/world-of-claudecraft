@@ -35,11 +35,13 @@ import type { MapPlacement, RegionRole } from '../sim/map_doc';
 import type { MapPresentationMode } from '../sim/types';
 import { yumiMazeColliders, yumiMazeLayout } from '../sim/yumi_maze_layout';
 import { type CustomMap, newCustomMap, newFlatCustomMap } from './custom_map';
+import { deepglassMap } from './shipped_deepglass';
 import { thornhollowMap } from './shipped_thornhollow';
 
 export type ShippedMapId =
   | 'overworld'
   | 'thornhollow'
+  | 'deepglass'
   | 'hollow_crypt'
   | 'sunken_bastion'
   | 'gravewyrm_sanctum'
@@ -70,6 +72,7 @@ export const SHIPPED_MAPS: readonly ShippedMapEntry[] = [
     group: 'Dungeon',
   },
   { id: 'ashen_coliseum', name: 'Ashen Coliseum', group: 'Arena' },
+  { id: 'deepglass', name: 'Tidehold', group: 'Arena' },
   { id: 'protect_yumi_maze', name: 'Protect Yumi! Maze', group: 'Arena' },
   {
     id: 'reliquary_sunken_ossuary',
@@ -475,6 +478,7 @@ export async function createShippedMap(
   if (!entry) throw new Error(`Unknown shipped map: ${mapId}`);
   if (mapId === 'overworld') return newCustomMap(entry.name, id, now);
   if (mapId === 'thornhollow') return thornhollowMap(entry.name, id, now);
+  if (mapId === 'deepglass') return deepglassMap(entry.name, id, now);
   if (mapId === 'protect_yumi_maze') {
     const layout = yumiMazeLayout();
     return mapFromColliders(

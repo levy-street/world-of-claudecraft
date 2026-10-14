@@ -218,6 +218,8 @@ describe('the classifier map is complete and its keys are real commands', () => 
       bank_unlock_socket: 'bank',
       buy: 'vendor',
       buyback: 'vendor',
+      // A Tidehold housing deed bought at its plot sign (Studio, world_object_commands.ts).
+      buyplot: 'vendor',
       collect_delve_chest_loot: 'delve',
       craft_item: 'craft',
       delve_buy: 'delve',

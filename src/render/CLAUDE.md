@@ -186,7 +186,7 @@ Everything else is a sibling module in one of these families:
   moves). All display-only, all gated by the reduced-motion switch; driven
   from `renderer.ts` `updateCamera` and the hud event hooks
   (`tests/camera_*_core.test.ts`).
-- **Studio (authored maps) and the editor:** two directories, each with its
+- **Studio (authored maps) and the editor:** three directories, each with its
   own `CLAUDE.md` and `index.ts` barrel. `authored_map/` holds what the
   renderer does ONLY on an authored map (chase-boom clamps and look-up dolly,
   the gameplay fog band, authored lighting, cave/carve/rail/fluid/decal layers,
@@ -194,13 +194,16 @@ Everything else is a sibling module in one of these families:
   or the editor camera, so the built-in world draws exactly what the release
   did. `editor_api/` is `renderer.editor`, the map editor's facade (a new
   editor hook lands there, never as a public `Renderer` method).
+  `deepglass_scene/` is the Deepglass arena world's layer, built only in that
+  world.
 - **Renderer facades and per-frame helpers** extracted under the monolith
   ratchet: `renderer.picking` (`world_picking.ts`: entity, gather-node, mover
-  and ground picks), the speech bubbles (`chat_bubble_layer.ts`), click
-  markers / AoE rings / ground-aim reticle (`ground_feedback.ts`), the Tab cone overlay
+  and ground picks), `renderer.wizardGate` (`wizard_gate.ts`), the speech
+  bubbles (`chat_bubble_layer.ts`), click markers / AoE rings / ground-aim
+  reticle (`ground_feedback.ts`), the Tab cone overlay
   (`target_cone_overlay.ts`), god-ray shafts (`god_ray_shafts.ts`), and the
   per-biome fog/light/god-ray tables (`outdoor_biome_presets.ts`). A new
-  public picking method lands on its facade, not on `Renderer`.
+  public picking or gate method lands on its facade, not on `Renderer`.
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD
 selection) is its own Three/DOM/i18n-free `*_core.ts` or `*_view.ts` module,

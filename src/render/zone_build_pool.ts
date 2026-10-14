@@ -51,8 +51,8 @@ export interface ZoneBuildPool {
     opts?: { urgent?: boolean },
   ): Promise<WaterFillArrays | null>;
   /** FORK: the world the workers must mesh. A worker owns its own copy of
-   *  src/sim, which defaults to the built-in world; on an authored map (a
-   *  Studio map or play-test) the mesher's content-dependent terms, the
+   *  src/sim, which defaults to the built-in world; on an authored map (the
+   *  Deepglass, a Studio play-test) the mesher's content-dependent terms, the
    *  height stamps, zones, roads, water level, biome paint, would otherwise
    *  silently revert. Cheap: the content rides only the FIRST job each worker
    *  runs against a given generation (postMessage is ordered per worker, so a
@@ -346,7 +346,8 @@ export function zoneBuildPool(): ZoneBuildPool | null {
   // FORK: upstream declines the pool while a custom world is active, because a
   // worker samples its own (built-in) copy of the content. The fork instead
   // SHIPS the active content to the workers (setContent, sent ahead of each
-  // worker's next job), so authored maps keep off-thread meshing. Callers must setContent() before each build.
+  // worker's next job), so authored maps, the Deepglass, every Studio map ,
+  // keep off-thread meshing. Callers must setContent() before each build.
   if (shared === undefined) shared = createZoneBuildPool();
   return shared;
 }

@@ -1,0 +1,117 @@
+{
+  "defaults": {
+    "type": "static"
+  },
+  "items": [
+    {
+      "src": "tmp/asset_src/deepglass/pylon.glb",
+      "out": "models/deepglass/cradle_pylon.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/deepglass/goal_gate.glb",
+      "out": "models/deepglass/goal_gate.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/powerup_station.glb",
+      "out": "models/deepglass/powerup_station.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/deepglass/boost_vent.glb",
+      "out": "models/deepglass/boost_vent.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/deepglass/brennoch_plume.glb",
+      "out": "models/cosmetics/brennoch_plume.glb",
+      "keepAttributes": true
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wall.glb",
+      "out": "models/deepglass/warden_wall.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wall_pillar.glb",
+      "out": "models/deepglass/warden_wall_pillar.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/tower.glb",
+      "out": "models/deepglass/warden_tower.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/tower_spire.glb",
+      "out": "models/deepglass/warden_tower_spire.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/tower_spire_b.glb",
+      "out": "models/deepglass/warden_tower_spire_b.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/tower_spire_c.glb",
+      "out": "models/deepglass/warden_tower_spire_c.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/tower_spire_d.glb",
+      "out": "models/deepglass/warden_tower_spire_d.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/tower_spire_e.glb",
+      "out": "models/deepglass/warden_tower_spire_e.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/bridge_deck.glb",
+      "out": "models/deepglass/bridge_deck.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/bridge_lamp.glb",
+      "out": "models/deepglass/bridge_lamp.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/bridge_pylon.glb",
+      "out": "models/deepglass/bridge_pylon.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/warden_gate_closed.glb",
+      "out": "models/deepglass/warden_gate_closed.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/warden_gate_open.glb",
+      "out": "models/deepglass/warden_gate_open.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/dock_stairs.glb",
+      "out": "models/props/dock_stairs.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/dock_deck.glb",
+      "out": "models/props/dock_deck.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/dock_deck_rail.glb",
+      "out": "models/props/dock_deck_rail.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/plot_sign.glb",
+      "out": "models/props/plot_sign.glb",
+      "maxTex": 1024
+    }
+  ]
+}

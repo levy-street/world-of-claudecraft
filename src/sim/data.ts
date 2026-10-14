@@ -60,6 +60,7 @@ import {
   AMBERFALL_ZONE,
 } from './content/amberfall';
 import { BUDDY_MOBS } from './content/buddy_mobs';
+import { ABILITIES } from './content/classes';
 import {
   BROTHER_HALVEN,
   BROTHER_HALVEN_MARSH,
@@ -737,8 +738,8 @@ export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
  * PLAYER TOUCH a vein. The table is pinned to overworld coordinates, so on an
  * authored map it puts ore and herbs wherever the built-in world happens to
  * keep them; the minimap had already worked that out on its own while the
- * renderer went on drawing them, spending a third of an arena map's triangles
- * on ore inside its stadium.
+ * renderer went on drawing them, which is how the Deepglass arena ended up
+ * spending 36% of its triangles on ore inside a blitzball stadium.
  */
 export function activeGatherNodes(): GatherNodeDef[] {
   return usesOverworldSiteDressing(getActiveWorldContent().presentationMode) ? GATHER_NODES : [];
@@ -750,9 +751,9 @@ export function activeGatherNodes(): GatherNodeDef[] {
  *  shipped world's doors at fixed overworld coordinates, and the map's portal
  *  pass admits any door whose z falls inside the drawn zone's band. An
  *  authored map declares its own zone bands, and a big one swallows them
- *  whole - a map whose single zone spans the world came up stamped with six
- *  built-in crypt and temple labels over ground that has no door on it at
- *  all.
+ *  whole - Tidehold's single zone spans the world, so its map came up stamped
+ *  with six built-in crypt and temple labels over ground that has no door on
+ *  it at all (the sim never spawns those doors on an authored map either).
  *  The minimap was already right by construction: it reads the live ground
  *  objects, not this table. */
 /** The active map's authored named areas (its `locations` rects), the list the
@@ -799,7 +800,7 @@ function shippedStrip(): MapStripRegion {
  *
  *  WORLD_MIN_X..WORLD_MAX_Z are folded from the SHIPPED zone list at module
  *  load, so on an authored map both the render AND the blit that samples it
- *  were addressing the wrong thousands of yards: an authored minimap came up
+ *  were addressing the wrong thousands of yards: Tidehold's minimap came up
  *  as a grey wash of upscaled fallback pixels because the player's position
  *  was being mapped into a strip covering ground the map does not contain.
  *  Renderer and sampler must agree, so both go through here. */
@@ -1076,6 +1077,7 @@ function refreshAuthoredMapGate(): void {
   authoredMapWorld = activeWorld !== BUILTIN_WORLD && isAuthoredMapContent(activeWorld);
   setStudioOverlay(
     {
+      abilities: ABILITIES,
       items: ITEMS,
       mobs: MOBS,
       npcs: NPCS,
@@ -1100,7 +1102,7 @@ let authoredMapWorld = false;
 
 /** Whether the active content is an AUTHORED map: a Studio map document (it
  *  carries a placements list, even an empty one), an authored presentation
- *  slate (a blank or interior map), or content using the Studio
+ *  slate (the Deepglass, a blank or interior map), or content using the Studio
  *  map runtime (collider volumes, caves, terrain holes). False for the
  *  built-in world AND for a plain variant of it (a `{ ...BUILTIN_WORLD, ... }`
  *  test or playtest fixture), which keep the release's behaviour. The gate for

@@ -169,7 +169,7 @@ export function drawnWaterLevelAt(x: number, y: number, z: number, seed: number)
  *
  * The sheet's alpha and shore film fade in over the first yard of depth,
  * interpolated linearly across each cell. The raw depth of a vertex on top of
- * a sheer cliff is the cliff's whole height (a fjord wall can put -30 to
+ * a sheer cliff is the cliff's whole height (Tidehold's fjord walls put -30 to
  * -85 next to +50 of open sea), so the zero crossing of that interpolation
  * lands a third of the way across the cell, out over the water: a straight
  * band of bare seabed between the sheet's edge and the cliff foot, ~1 yard on

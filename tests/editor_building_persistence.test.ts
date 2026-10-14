@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { planBuildingDrag } from '../src/editor/building_core';
 import {
   type CustomMap,
+  customMapToWorldContent,
   newFlatCustomMap,
   placementsToRenderAssets,
 } from '../src/editor/custom_map';
@@ -12,6 +13,8 @@ import {
 } from '../src/editor/export_contract';
 import { parseMap, serializeMapCompact } from '../src/editor/persist';
 import { cloneAssetPlacement } from '../src/editor/selection_clipboard';
+import { deepglassMap } from '../src/editor/shipped_deepglass';
+import * as deepglassWorld from '../src/sim/deepglass/world';
 import { CUSTOM_PAINT_ID_MIN, MODEL_PATH } from '../src/sim/map_doc';
 
 const SHARED_TEXTURE = 'a'.repeat(64);
@@ -225,5 +228,25 @@ describe('building persistence across editor save, projection, and export', () =
       front: { texture: `custom:${WALL_ONLY_TEXTURE}`, tileSize: 4, color: 0xeeddaa },
       back: { texture: 'Bricks001', tileSize: 8 },
     });
+  });
+
+  it('retains membership and finish records when shipped world placements become an editable map', () => {
+    const source = customMapToWorldContent(saveAndReload(builtCastle()));
+    // Inject the authored world at the existing shipped-map boundary; the real
+    // conversion and serializer remain under test, without modifying live content.
+    const worldBuilder = vi.spyOn(deepglassWorld, 'buildDeepglassWorld').mockReturnValue(source);
+    try {
+      const converted = deepglassMap('Castle snapshot', 'castle-snapshot', 42);
+      const loaded = saveAndReload(converted);
+      expect(loaded.placements[0].building).toEqual({ id: 'castle', level: 1, kind: 'wall' });
+      expect(loaded.placements[0].wallFinishes).toEqual(source.placements?.[0].wallFinishes);
+      expect(converted.placements[0].wallFinishes).not.toBe(source.placements?.[0].wallFinishes);
+      expect(converted.placements[0].wallFinishes?.front).not.toBe(
+        source.placements?.[0].wallFinishes?.front,
+      );
+      expect(converted.placements[0].building).not.toBe(source.placements?.[0].building);
+    } finally {
+      worldBuilder.mockRestore();
+    }
   });
 });

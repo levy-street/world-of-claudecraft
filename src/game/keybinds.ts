@@ -11,6 +11,7 @@
 // Escape is deliberately NOT a bindable action: it always opens/closes the
 // game menu, so it stays out of the registry and is refused by bind().
 
+import { isBuiltinWorldActive } from '../sim/data';
 import { repairStoredBindings } from './keybinds_repair';
 import { parseStoredJson } from './local_storage_json';
 import { isReservedMouseCode, mouseCodeLabel } from './mouse_binds';
@@ -38,6 +39,13 @@ export interface BindAction {
   // setting is on, so they can share a key without either stealing it from the
   // other on save/load.
   allowShared?: boolean;
+  // When true this action belongs to an authored (Studio) map's own mechanics
+  // (the Deepglass arena's deepball binds). On the built-in world it is inert
+  // and unlisted: no key lookup resolves to it (bindActionLive) and the
+  // options window hides its row, so the default game reads exactly as it did
+  // before the arena existed. Such an action is also allowShared, so its
+  // default never evicts a built-in action's key in the uniqueness sweep.
+  authoredOnly?: boolean;
 }
 
 // Slot 0 is Attack. Slots 1..11, 12..22, and 23..33 are the three ability rows.
@@ -165,12 +173,45 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['WheelDown'],
   },
+  // Deepball burners. Held, and deliberately on F: it sits under the movement
+  // hand next to nothing else you press while flying, and the bell has no
+  // interactables for F's edge binding to collide with.
+  {
+    id: 'boost',
+    label: 'Burners (Deepball)',
+    category: 'Movement',
+    kind: 'held',
+    defaults: ['KeyF'],
+    allowShared: true,
+    authoredOnly: true,
+  },
   {
     id: 'autorun',
     label: 'Toggle Autorun',
     category: 'Movement',
     kind: 'edge',
     defaults: ['KeyR'],
+  },
+  // Deepball ball tracker. A 2.4 yd ball inside a 76 yd sphere is gone the moment
+  // it leaves the screen, and hunting for it with the mouse is the least
+  // interesting thing in the bell, so the HUD marks where it is, and points at
+  // it when it is behind you.
+  //
+  // Deliberately a MARKER and not a tracking camera. In the bell the camera is
+  // also the aim (flight.ts DG_AIM_MAX pitches the thrust along it, and a Shot
+  // leaves down the same line), so a camera that swung itself onto the ball would
+  // take the player's aim with it and there would be no way to place a shot at
+  // all. On by default; the bind is for players who want the view clean. Every
+  // bare letter is claimed by another default, so it sits on the shifted layer of
+  // V (Nameplates), both are "what the HUD shows me".
+  {
+    id: 'ballMarker',
+    label: 'Ball Marker (Deepball)',
+    category: 'Movement',
+    kind: 'edge',
+    defaults: ['Shift+KeyV'],
+    allowShared: true,
+    authoredOnly: true,
   },
   // Targeting / interaction
   {
@@ -551,6 +592,22 @@ export function actionAllowsShared(id: string): boolean {
   return ACTION_BY_ID.get(id)?.allowShared === true;
 }
 
+/** Whether an action is live (resolvable and listed) on the current world: every
+ *  action is, except an authoredOnly one on the built-in world (see BindAction).
+ *  `builtinWorld` defaults to the live world and is a parameter for tests. */
+export function bindActionLive(
+  id: string,
+  builtinWorld: boolean = isBuiltinWorldActive(),
+): boolean {
+  return !(builtinWorld && ACTION_BY_ID.get(id)?.authoredOnly === true);
+}
+
+/** BIND_ACTIONS minus the ones not live on this world: the rows a keybind list,
+ *  keyboard map or pad picker offers (see bindActionLive). */
+export function liveBindActions(builtinWorld: boolean = isBuiltinWorldActive()): BindAction[] {
+  return BIND_ACTIONS.filter((a) => bindActionLive(a.id, builtinWorld));
+}
+
 // --- modifier-aware bindings ---------------------------------------------
 // A binding is serialized as a single "combo" string: the bare KeyboardEvent
 // .code, optionally prefixed by held modifiers in a fixed canonical order
@@ -909,7 +966,7 @@ export class Keybinds {
    */
   actionForCode(combo: string): string | null {
     for (const [id, codes] of this.map) {
-      if (codes.includes(combo)) return id;
+      if (codes.includes(combo) && bindActionLive(id)) return id;
     }
     return null;
   }
@@ -920,8 +977,11 @@ export class Keybinds {
    * distinct from "Digit1".
    */
   edgeActionForCombo(combo: string): string | null {
+    const builtin = isBuiltinWorldActive();
     for (const [id, codes] of this.map) {
-      if (actionKind(id) === 'edge' && codes.includes(combo)) return id;
+      if (actionKind(id) === 'edge' && codes.includes(combo) && bindActionLive(id, builtin)) {
+        return id;
+      }
     }
     return null;
   }
@@ -931,8 +991,9 @@ export class Keybinds {
    * so movement survives a held Shift/Ctrl/Alt. Compares the bare code only.
    */
   heldActionForCode(code: string): string | null {
+    const builtin = isBuiltinWorldActive();
     for (const [id, codes] of this.map) {
-      if (actionKind(id) !== 'held') continue;
+      if (actionKind(id) !== 'held' || !bindActionLive(id, builtin)) continue;
       if (codes.some((c) => c !== null && comboCode(c) === code)) return id;
     }
     return null;
@@ -940,6 +1001,7 @@ export class Keybinds {
 
   /** Non-null codes bound to an action (for held-key polling). */
   codesForAction(id: string): string[] {
+    if (!bindActionLive(id)) return [];
     return (this.map.get(id) ?? []).filter((c): c is string => c !== null);
   }
 

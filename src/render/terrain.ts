@@ -2192,7 +2192,7 @@ function buildSplatMaterial(
         // snow glints. Distance-faded so far snow stays matte and never
         // shimmers; overall snow keeps its matte ROUGH_SNOW base.
         // SPACEY, 2026-09-26: "semi white pixel translucent defects in some of
-        // the terrain textures". Two faults made these specks on his map:
+        // the terrain textures". Two faults made these specks on Deepglass:
         // (1) PAINTED ground under the frost blanket still sparkled (a gloss
         // fleck catching the cream sun over cobbles is exactly the pale
         // translucent pixel), so the paint weight now switches it off; (2) the

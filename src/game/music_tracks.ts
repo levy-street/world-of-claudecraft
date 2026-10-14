@@ -37,6 +37,7 @@ export const ZONE_STREAM_URLS: Record<MusicZone, string | null> = {
   ember: '/audio/music/peaks.mp3?v=b41ca1a8edcc',
   frost: '/audio/music/frost.mp3?v=88500e3eb213',
   amber: '/audio/music/amber.mp3?v=338cb1c002c2',
+  tidehold: '/audio/music/tidehold.mp3?v=9708d43dcc77',
   fen: '/audio/music/fen.mp3?v=1ff84a71dd31',
   night: '/audio/music/night.mp3?v=44f582c43720',
   haunt: '/audio/music/marsh.mp3?v=ad5dcf5613b9',

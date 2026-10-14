@@ -21,7 +21,7 @@ const TOP = 8; // the lookout platform, over the pole's base
 const ASSET = 'props/ladder_fixture';
 
 /** A mast with a ladder up its -X face to a 4 x 4 lookout deck; the mast
- *  carries on above the deck (a topmast), as a ship's mast does. */
+ *  carries on above the deck (a topmast), as the galleon's does. */
 const POLE_OVERRIDE = {
   mode: 'baked' as const,
   boxes: [{ x: 0, y: (TOP + 4) / 2, z: 0, hx: 0.45, hy: (TOP + 4) / 2, hz: 0.45 }],

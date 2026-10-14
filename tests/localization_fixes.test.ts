@@ -1286,6 +1286,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // The buy-order board (Wanted tab): place / deliver / withdraw errors and
     // loot lines, matched by error_text_i18n_core + sim_i18n RULES.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market_orders.ts'), 'utf8'),
+    // Tidehold housing deeds: buyPlot's ctx.error refusals (already held, held
+    // by another, cannot afford), matched by error_text_i18n_core.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/plots.ts'), 'utf8'),
     // Card Duel minigame (Card Master NPC): the queue/match log + error emits.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/social/card_duel.ts'), 'utf8'),
     // W2: the inventory/vendor command bodies (equip/use/discard + buy/sell/buyback).

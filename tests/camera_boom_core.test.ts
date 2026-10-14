@@ -98,3 +98,27 @@ describe('camera boom (spring-arm lag)', () => {
     expect(1 - stiff.x).toBeLessThan((1 - soft.x) * 0.5);
   });
 });
+
+describe('the flight camera lag (Deepglass)', () => {
+  it('a stiffness under 1 with a wider leash trails FURTHER than the land boom', () => {
+    // Rocket League's camera stiffness: the pivot is allowed to fall a couple
+    // of yards behind a burning body and catch up, which a rigid boom cannot
+    // sell. The leash has to widen with it or the soft spring is clamped
+    // straight back to the land trail on every frame.
+    const land = createCameraBoom();
+    const flight = createCameraBoom();
+    stepCameraBoom(land, 0, 0, 0, 1 / 60);
+    stepCameraBoom(flight, 0, 0, 0, 1 / 60);
+    let tx = 0;
+    for (let i = 0; i < 120; i++) {
+      tx += 26 / 60; // the bell's boost pace
+      stepCameraBoom(land, tx, 0, 0, 1 / 60);
+      stepCameraBoom(flight, tx, 0, 0, 1 / 60, 0.5, 2.4);
+    }
+    const landTrail = tx - land.x;
+    const flightTrail = tx - flight.x;
+    expect(landTrail).toBeLessThanOrEqual(BOOM_LEASH_XZ + 1e-6);
+    expect(flightTrail).toBeGreaterThan(landTrail * 1.5);
+    expect(flightTrail).toBeLessThanOrEqual(BOOM_LEASH_XZ * 2.4 + 1e-6);
+  });
+});

@@ -12,4 +12,5 @@ export * from './quest_tracker';
 export * from './quest_tracker_controller';
 export * from './questlog_view';
 export * from './questlog_window';
+export * from './studio_gossip_hooks';
 export * from './world_quest_banner_view';

@@ -117,7 +117,8 @@ function kernelSlope(
  *
  * A least-squares fit across a sea cliff reports several yards per yard;
  * extrapolated to the brush rim that plane sits a hundred yards under the water,
- * and a few strokes tore the headland off. The bound is taken along the fitted slope's OWN direction, two
+ * and a few strokes tore the headland off (measured on the Deepglass rim before
+ * this guard). The bound is taken along the fitted slope's OWN direction, two
  * samples, uphill and downhill at the brush radius, so the plane may rise
  * exactly as far as the real ground does and no further.
  *

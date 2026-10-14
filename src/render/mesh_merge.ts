@@ -3,7 +3,7 @@
 // A kit GLB arrives as many small nodes: a house is 26 sub-meshes over 8
 // materials, a castle 150 over a dozen. Every node is a draw call (twice, with
 // the sun's shadow pass), and on a real map the placed assets were ~55% of all
-// draw submissions, measured in a kit-built town on Ultra: 890 draws a
+// draw submissions, measured at the Tidehold city on Ultra: 890 draws a
 // frame, 480 of them placements, at ~2500 visible nodes. Sub-meshes that share
 // a material and a vertex layout can be baked into ONE geometry in their
 // template's root frame with no visible change, so the instance batches
@@ -11,7 +11,7 @@
 // buildings, placed_assets) draw them in one call.
 //
 // What is never merged, and why:
-//   - a node whose material carries a shader patch (tree sway):
+//   - a node whose material carries a shader patch (tree sway, ship motion):
 //     those displace `transformed` in the NODE's frame, and baking the node
 //     transform into the vertices would change the frame under the shader;
 //   - a mesh with its own onBeforeRender (the fire puffs pose themselves);

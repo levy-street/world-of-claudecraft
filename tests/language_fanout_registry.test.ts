@@ -260,6 +260,9 @@ const FANOUT_ARMS: readonly string[] = [
   // Intl-formatted and the placeholder hint is prose, so a locale switch alone
   // moves both without any state changing.
   'this.realmBuilderPopup.relocalize|',
+  // a Tidehold housing-plot deed card (authored maps): its chrome is t() copy
+  // and the price is formatMoney, so an open card repaints on a locale switch.
+  'this.plotSignPopup.relocalize|',
   'this.guildBoardWindow.relocalize|',
   'this.riftForgeWindow.relocalize|',
   'this.mobileActionRingPainter.relocalize|',

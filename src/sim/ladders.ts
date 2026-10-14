@@ -1,5 +1,6 @@
 // Climbable ladders. An asset authors them in its collision override (the
-// Blender build's sidecar `ladders`): each is a flat rung face with
+// Blender build's sidecar `ladders`, installed by
+// scripts/assets/deepglass/install_authored.mjs): each is a flat rung face with
 // an outward normal (the side a climber hangs on), a half width, and the floor
 // it stands on / the floor its top steps off onto.
 //

@@ -276,13 +276,13 @@ function classDescriptionSource(id: PlayerClass): string {
  *  the ACTIVE world's own zones second.
  *
  *  Everything here keys off the static ZONES because that is what the locale
- *  bundles are generated from, but an authored map (a Studio play-test or a
- *  published `?map=<slug>` world) declares its own zones, which are in no
- *  catalog and never will be. Without this second look those surfaces fell
- *  through to the raw key: the zone banner read the zone's id instead of its
- *  name, and its landmarks read "<zoneId>.pois.1" instead of the landmark.
- *  Authored text is shown as the maker typed it; there is nothing to
- *  translate it to. Exported for the
+ *  bundles are generated from, but an authored map (a Studio play-test, a
+ *  published `?map=<slug>` world, the Deepglass/Tidehold content) declares its
+ *  own zones, which are in no catalog and never will be. Without this second
+ *  look those surfaces fell through to the raw key: the zone banner read
+ *  "deepglass" instead of the zone's name, and its landmarks read
+ *  "deepglass.pois.1" instead of "Tidehold". Authored text is shown as the
+ *  maker typed it; there is nothing to translate it to. Exported for the
  *  HUD's map-plate prewarm, which resolves a zone id the same way. */
 export function zoneSourceById(zoneId: string): ZoneDef | undefined {
   const shipped = ZONES.find((candidate) => candidate.id === zoneId);

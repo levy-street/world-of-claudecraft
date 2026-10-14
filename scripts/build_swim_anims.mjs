@@ -407,6 +407,7 @@ const WATER_CLIPS = new Set([
   'Swim_Breaststroke', // submerged stroke
   'Swim_Freestyle', // surface stroke
   'Swim_Tread', // the swim idle: upright, sculling
+  'Swim_Glide', // the deepglass burner pose: hands out front, legs locked
   'Water_Wade', // walking through shallow water
   'Fall_Flail', // long-fall panic flail (tmp/fall/build_fall.py) — rides this
   // shared clip-only GLB so it costs no extra loading lane

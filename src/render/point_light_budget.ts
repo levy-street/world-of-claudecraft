@@ -126,7 +126,7 @@ function isDrawnEligible(light: THREE.PointLight, sceneRoot: THREE.Object3D): bo
  * scene live and leave it shining, which is not merely "a few extra lights".
  * numPointLights is compiled into every lit material, so a 24-lamp city made
  * EVERY material in the scene loop 24 lights per fragment and re-upload 24
- * light structs on each material switch. Measured on one of SPACEY's maps
+ * light structs on each material switch. Measured on SPACEY's Deepglass map
  * (harbour, Retina, 2026-09-17): 63 -> 172 fps with the DRAW COUNT UNCHANGED -
  * the cost was never geometry - and the lighting it bought was a look no
  * player can see, since the shipped game budgets these same lights anyway.

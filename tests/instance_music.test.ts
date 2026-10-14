@@ -9,7 +9,8 @@ import {
   resolveMapMusicZone,
 } from '../src/game/instance_music';
 import { ZONE_STREAM_URLS } from '../src/game/music_tracks';
-import { DELVE_X_MIN, DUNGEONS, instanceOrigin, ZONES } from '../src/sim/data';
+import { DELVE_X_MIN, DUNGEONS, instanceOrigin, MOBS, ZONES } from '../src/sim/data';
+import { DEEPGLASS_CENTER, DG_BOWL_OUTER_R } from '../src/sim/deepglass/layout';
 
 const eastbrookFixture = ZONES.find((zone) => zone.id === 'eastbrook_vale');
 if (!eastbrookFixture) throw new Error('eastbrook_vale fixture is missing');
@@ -27,6 +28,7 @@ function input(overrides: Partial<InstanceMusicInput> = {}): InstanceMusicInput 
     inDungeon: false,
     entities: [],
     riftFloor: null,
+    deepglass: null,
     ...overrides,
   };
 }
@@ -50,6 +52,7 @@ describe('instance music policy', () => {
       resetForDungeonEntry: vi.fn(),
       update: vi.fn(),
       setBossCombat: vi.fn(),
+      setVenueTrack: vi.fn(),
     };
     const controller = new InstanceMusicController(port);
     const delveInput = input({
@@ -175,11 +178,87 @@ describe('instance music policy: the authoritative in-combat flag', () => {
   });
 });
 
+describe('Deepglass venue track', () => {
+  // Standing in the bowl itself, which is where the grounds cue lives.
+  const BOWL = { x: DEEPGLASS_CENTER.x, z: DEEPGLASS_CENTER.z };
+  // Out in Tidehold's streets: same world, well outside the stands.
+  const CITY = { x: DEEPGLASS_CENTER.x + DG_BOWL_OUTER_R + 120, z: DEEPGLASS_CENTER.z };
+  const inBell = (phase: string | null, entities: InstanceMusicEntity[] = [], playerPos = BOWL) =>
+    instanceMusicDecision(input({ deepglass: { inArena: true, phase }, entities, playerPos }))
+      .venueTrack;
+
+  it('holds the grounds cue between bouts and the arena cue from whistle to final horn', () => {
+    expect(instanceMusicDecision(input({ deepglass: null })).venueTrack).toBe(null);
+    // In the bell with no bout on: the grounds cue (SPACEY's exploration track,
+    // restored 2026-09-07 after a pass had swapped it for the map's zone track).
+    expect(inBell(null)).toBe('waiting');
+    // The whistle starts the match cue, and it holds through every phase...
+    expect(inBell('countdown')).toBe('match');
+    expect(inBell('active')).toBe('match');
+    expect(inBell('goal')).toBe('match');
+    expect(inBell('over')).toBe('match');
+    // ...and an undefined phase reads as no bout: grounds again.
+    expect(inBell(undefined as unknown as string)).toBe('waiting');
+  });
+
+  it('leaves the city to the map track between bouts, and scores a bout everywhere', () => {
+    // Out in Tidehold's streets with no bout on, no venue track is armed, so
+    // the map's own zone cue plays ("Tidesong - Outside the Bell").
+    expect(inBell(null, [], CITY)).toBe(null);
+    // A BOUT is a world event: it scores the streets too, not just the bowl.
+    expect(inBell('active', [], CITY)).toBe('match');
+    expect(inBell('countdown', [], CITY)).toBe('match');
+    // And the bowl itself is unaffected by the split.
+    expect(inBell(null, [], BOWL)).toBe('waiting');
+  });
+
+  it('gives a boss fought in the bell its own theme, ahead of both game cues', () => {
+    // Any boss-flagged mob with a target does it: the arena encounter does not
+    // exist yet, and this rule is what makes it score itself when it lands.
+    const boss: InstanceMusicEntity = {
+      kind: 'mob',
+      dead: false,
+      templateId: 'morthen',
+      aggroTargetId: 7,
+    };
+    expect(MOBS.morthen?.boss).toBe(true);
+    expect(inBell(null, [boss])).toBe('boss');
+    expect(inBell('active', [boss])).toBe('boss');
+    // Untargeted or dead, it is not a fight.
+    expect(inBell(null, [{ ...boss, aggroTargetId: null }])).toBe('waiting');
+    // A boss in the bell outranks the split too: it scores the city.
+    expect(inBell(null, [boss], CITY)).toBe('boss');
+    expect(inBell('active', [{ ...boss, dead: true }])).toBe('match');
+    // ...and a boss engaged OUTSIDE the bell never arms a venue track at all.
+    expect(instanceMusicDecision(input({ deepglass: null, entities: [boss] })).venueTrack).toBe(
+      null,
+    );
+  });
+
+  it('leaves the overworld boss loop alone: only Nythraxis engages it', () => {
+    const boss: InstanceMusicEntity = {
+      kind: 'mob',
+      dead: false,
+      templateId: 'morthen',
+      aggroTargetId: 7,
+    };
+    expect(
+      instanceMusicDecision(
+        input({
+          deepglass: { inArena: true, phase: null },
+          entities: [boss],
+          playerPos: { x: DEEPGLASS_CENTER.x, z: DEEPGLASS_CENTER.z },
+        }),
+      ).bossEngaged,
+    ).toBe(false);
+  });
+});
+
 describe('an authored map’s own soundtrack', () => {
   // WorldContent.music is what the Studio's "Map track" writes; before this
   // the game ignored it and an authored world resolved its score through the
-  // OVERWORLD's zone table at its own coordinates, so the cue churned as the
-  // player walked.
+  // OVERWORLD's zone table at its own coordinates (the Deepglass map spans
+  // seven of them), so the cue churned as the player walked.
   it('outranks the location walk when the map names a known track', () => {
     const d = instanceMusicDecision(input({ mapMusic: { zoneTrack: 'amber' } }));
     expect(d.zone).toBe('amber');

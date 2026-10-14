@@ -432,6 +432,7 @@ describe('muster camps: the weapon rack entity', () => {
   it('is a pick volume only, through the one pick-only table the monument shares', () => {
     expect([...PICK_ONLY_OBJECT_TEMPLATE_IDS].sort()).toEqual([
       'muster_weapon_rack',
+      'plot_sign',
       'realm_builder_monument',
     ]);
     expect(isPickOnlyObjectTemplate(MUSTER_RACK_TEMPLATE_ID)).toBe(true);

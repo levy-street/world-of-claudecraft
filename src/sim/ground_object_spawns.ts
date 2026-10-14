@@ -91,7 +91,11 @@ export function spawnStaticWorldObjects(world: WorldContent, deps: StaticObjectS
     deps.mailboxIds.push(mailbox.id);
   }
 
-  for (const dungeon of DUNGEON_LIST) {
+  // DUNGEON_LIST is a static registry with fixed overworld coordinates, so in
+  // the Deepglass arena the doors would leak into a world you cannot walk out
+  // of: that venue gets neither the doors nor their instance slots.
+  const dungeons = world.presentationMode === 'deepglass' ? [] : DUNGEON_LIST;
+  for (const dungeon of dungeons) {
     if (dungeon.overworldDoor !== false) {
       const door = createGroundObject(
         deps.allocateEntityId(),

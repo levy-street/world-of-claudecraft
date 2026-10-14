@@ -165,9 +165,9 @@ export const MAX_WORLD_COORD = 10_000;
 // Zone sub-arrays feed terrainHeight per sampled vertex (lakes) and the
 // decoration generator loop bounds (zMin/zMax), so a stored map must not be
 // able to carry unbounded values a viewer's tab then pays for. 64, not 32:
-// a ring map can declare its straits, a moat AND its harbour basins as lakes
-// (sculpted sea is sim-dry, world.ts isOpenSeaAt), and at 32 the sanitizer
-// silently dropped the tail of that list. Each lake
+// Tidehold's ring map declares its straits, its arena moat AND its two
+// harbour basins as lakes (sculpted sea is sim-dry, world.ts isOpenSeaAt),
+// and at 32 the sanitizer silently dropped the tail of that list. Each lake
 // costs a squared-distance gate per height sample (world.ts), so the cap
 // still bounds a hostile document without charging real maps.
 export const MAX_ZONE_LAKES = 64;
@@ -2150,7 +2150,13 @@ export function sanitizeMapDoc(raw: unknown): MapDoc | null {
     o.presentationMode === 'nythraxis' ||
     o.presentationMode === 'delve' ||
     o.presentationMode === 'sowfield' ||
-    o.presentationMode === 'yumiMaze'
+    o.presentationMode === 'yumiMaze' ||
+    // The Deepglass arena. Omitting it here silently dropped the flag on every
+    // parse, and that one flag gates the whole venue: the bell and stadium
+    // (renderer.ts), the marshal, the bell wizard and the crowd (sim.ts), the
+    // match-day market (props.ts) and the pinned arena hour. A doc that lost it
+    // opened as an empty caldera.
+    o.presentationMode === 'deepglass'
   ) {
     doc.presentationMode = o.presentationMode;
   }

@@ -5,7 +5,7 @@
 
 import type * as THREE from 'three';
 import { sfx } from '../../game/sfx';
-import type { PlacedAssetsView } from '../placed_assets';
+import type { PlacedAssetsView, PlacedCullHalfPlane } from '../placed_assets';
 import { PLACED_MOVER_SFX } from '../placed_movers';
 
 export interface PlacedFrame {
@@ -19,6 +19,8 @@ export interface PlacedFrame {
   viewDistance: number;
   /** The scene fog's far, or null when there is no fog. */
   fogFar: number | null;
+  /** The Deepglass city cut while the camera is in the bell, else null. */
+  cullBeyond: PlacedCullHalfPlane | null;
 }
 
 /** Run the frame's placed-asset work. True when the parked sun-shadow map went
@@ -54,6 +56,19 @@ export function updatePlacedAssetsFrame(view: PlacedAssetsView, f: PlacedFrame):
     // wall on its own.
     f.fogFar ?? f.cullFar,
   );
+  // Tidehold, while the player is down in the bell. The city stands behind
+  // the Tide Gate's curtain wall AND behind a hundred yards of water (the
+  // underwater fog closes at 210yd), so none of it can be seen from the
+  // arena, but 5,317 of this map's 6,127 placements are north of that wall
+  // and every one of them was still being submitted every frame, through a
+  // fog that had already swallowed them. The cut is the wall itself, so the
+  // gate, its towers and the colossi all stay: what goes is only what the
+  // wall was hiding anyway.
+  view.setCullBeyond(f.cullBeyond);
+  // ...and actually UNLOAD what that line hides, a budgeted slice per frame,
+  // rebuilding it once the line clears. Hiding stops the city being drawn;
+  // this hands its memory back for the length of the event.
+  view.reconcileCullRegion();
   // Residency streaming (dormant unless the view was built with
   // streamAround): a no-op call otherwise.
   view.streamResidency(f.player.x, f.player.z);

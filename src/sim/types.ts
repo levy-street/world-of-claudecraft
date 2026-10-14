@@ -4068,6 +4068,15 @@ export type AbilityEffect =
       dazeMult: number;
       dazeDuration: number;
     }
+  // Deepball at the Deepglass (docs/prd/deepglass.md). ONE arm for all four
+  // moves: they differ only in what the match driver does with the caster, and
+  // a union member per move would be four dispatch cases that share a body.
+  // `power` is the strike speed for shot/pass and unused by the rest.
+  | {
+      type: 'deepball';
+      move: 'shot' | 'pass' | 'check' | 'overburn' | 'power';
+      power?: number;
+    }
   | {
       type: 'consumeAura';
       auraIds?: string[];
@@ -4548,6 +4557,21 @@ export interface NpcDef {
   // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
   // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
   cardMaster?: boolean;
+  // The Deepglass steward: talking to this NPC offers passage down to the
+  // deepball bell. A FLAG rather than a hard-keyed id, following the warfare
+  // quartermaster's lesson, so a second berth needs no constant widened.
+  deepglassSteward?: boolean;
+  // The Deepglass match marshal, standing at the head of the causeway inside
+  // the arena itself: talking to her offers 1v1 / 2v2 / 3v3 and starts the bout
+  // on the spot. The steward above sells the JOURNEY (she is a world away and
+  // her row is a page load); this one runs the fixtures once you are here.
+  deepglassMarshal?: boolean;
+  // Baldemar the Bald, the portal wizard (src/sim/portal_wizard.ts): talking to
+  // any of his selves offers a gate to the Deepglass (or home again from the
+  // bell). A FLAG for the same reason as the steward above: he stands in every
+  // town, and fifteen hard-keyed ids would be the warfare quartermaster's
+  // mistake fifteen times over.
+  portalWizard?: boolean;
   // A farmer NPC (the farming go-live): the range anchor of the husk-to-compost
   // trade (src/sim/professions/farming.ts convertHusks refuses out of reach of
   // one) and the gossip row that offers it. A FLAG rather than a hard-keyed id
@@ -7365,6 +7389,60 @@ export interface Entity extends ClientMirroredEntityFields {
   /** On a ladder (ladders.ts): the climb owns this body's motion, with no
    *  gravity; the render plays the floating tread pose. Absent = not climbing. */
   climbing?: boolean;
+  // --- Deepglass deepball (src/sim/deepglass/) -----------------------------
+  // Optional by design: every field is absent outside the bell, so no other
+  // world, test fixture or persisted character carries deepball state.
+  /** Flying inside the bell: the flooded-flight pass owns this body's motion. */
+  dgFlight?: boolean;
+  /** Boost charge, 0..DG_CHARGE_MAX. ~2.5s of burn, ~6s to recharge. */
+  dgCharge?: number;
+  /** Burners lit THIS tick. The render reads it for the animation contract. */
+  dgBoosting?: boolean;
+  /** Ticks left before the recharge resumes after a burn (no clock: the pass
+   *  keeps the module's own "no clocks, no rng" discipline). */
+  dgRegenHold?: number;
+  /** Ticks of Overburn left: the burners run without draining charge. */
+  dgOverburnTicks?: number;
+  /** Ticks left of a Check tumble: the body is along for the ride. */
+  dgTumbleTicks?: number;
+  /** Thrust spool, 0..1: how far the pack has wound up. Scales both the thrust
+   *  and the speed ceiling, and the render scales the burner cones by it. */
+  dgSpool?: number;
+  /** The smoothed thrust vector: the steering lag's state (see flight.ts
+   *  DG_STEER_LAG). Chases the raw key axes rather than snapping to them. */
+  dgWish?: { x: number; y: number; z: number };
+  /** Ticks left frozen by a Tidewarden's beam: no controls, and the body's own
+   *  momentum bleeds out under it. */
+  dgFrozenTicks?: number;
+  /** The powerup this fighter is carrying, if any. One slot, Rocket League
+   *  style: pick another up and it replaces what you had. */
+  dgPowerup?: 'zap' | 'overburn';
+  /** Ticks until this DEMOLISHED body respawns by its own goal (the Zap Shot's
+   *  victim, Rocket League's demo): no flight, no ball, not drawn. 0/absent =
+   *  alive. */
+  dgDeadTicks?: number;
+  /** Who zapped this body (for the credit line). */
+  dgZappedBy?: number;
+  /** The pitch this body is AIMED along, radians, + is up. Resolved by the
+   *  flight pass from the camera (a human) or the target line (a bot), and read
+   *  back by the strike moves so you shoot exactly where you fly. */
+  dgAimPitch?: number;
+  /** Ticks left of a dash's flare. Render-only; the impulse itself is one tick. */
+  dgDashTicks?: number;
+  /** Ticks until the next dash is available. */
+  dgDashCd?: number;
+  /** Which axis the last dash left along (1 fwd, 2 back, 4 left, 8 right).
+   *  Render-only: it picks which way the dash flip turns the body. */
+  dgDashKind?: number;
+  /** A buffered strike: the player pressed Shot/Pass a beat before the ball
+   *  arrived. Held a few ticks and fired the moment the ball is in reach,
+   *  the input-timing half of the hit-reg fix (see match.ts). */
+  dgStrikeBuf?: { move: 'shot' | 'pass'; power: number; ticks: number };
+  /** The single direction bit last tapped, and how many ticks ago, the other
+   *  half of the double-tap detector. */
+  /** Air-braking this tick: the pack is thrown into reverse and the body is
+   *  shedding pace hard. Render reads it for the retro plume. */
+  dgBraking?: boolean;
   fatigueTicks: number; // ticks spent past the open-sea fatigue line (sim/fatigue.ts)
   breathUsedTicks: number; // ticks of the lungful spent underwater (sim/breath.ts)
   drownTicks: number; // ticks submerged past an empty lungful (paces the drown pulses)
@@ -8013,6 +8091,8 @@ export interface Entity extends ClientMirroredEntityFields {
   route?: NpcRoute;
   // object (ground interactable)
   objectItemId: string | null;
+  /** Plot signs only: who holds the deed (sim/plots.ts). */
+  plotOwner?: { characterId: number; name: string };
   // Runtime-only Soulwell ownership/eligibility state. The object itself is wired
   // through objectItemId; this authority data never needs to reach clients.
   soulwell?: {
@@ -9488,6 +9568,7 @@ export type SimEvent = { pid?: number } & (
       past: readonly RealmBuilderHonour[];
     }
   | { type: 'worldQuestInvestigationDialogue'; targetId: number }
+  | { type: 'plotSign'; plot: PlotDeedView }
   // `boardId` is the authored NoticeboardDef id (every board shares one
   // templateId), so the client can tell the Proving Shore's recruits' signpost
   // from a town board and open the guild board on its default view.
@@ -11046,6 +11127,27 @@ export interface MoveInput {
    *  bank once you reach the line — holding a look-up camera at the surface
    *  must not launch you out of the water over and over. Ignored on land. */
   surface: boolean;
+  /** Deepball throttle (the F key). Distinct from `jump`, which in the bell is
+   *  a pure CLIMB: burning and rising are separate intents, and sharing a key
+   *  made three-axis flight genuinely hard to steer. Ignored outside a bout. */
+  boost?: boolean;
+  /** Deepball dash trigger (a bell-side LEFT CLICK, latched briefly by
+   *  input.ts so the 20 Hz tick cannot miss it). One dash per press: the
+   *  flight pass's dash cooldown eats the latch's extra ticks. Ignored
+   *  outside a bout. */
+  dash?: boolean;
+  /**
+   * The pitch the body is AIMED along, radians, POSITIVE UP.
+   *
+   * Deepball only, and the whole reason flying the bell reads as flight rather
+   * than as a lift: `dive`/`surface` are latched BANDS (a three-position switch),
+   * so before this existed a shot could only ever leave at -0.85, 0 or +0.85 and
+   * forward thrust was flat no matter where the camera pointed. This is the
+   * camera's actual pitch, continuous, so W flies where you look and a shot
+   * leaves along the line you aimed it. Absent reads as "fall back to the bands",
+   * which is what every bot and every land path sends.
+   */
+  aimPitch?: number;
   /** How STEEPLY the camera is aimed into the dive or the climb, 0..1, as a
    *  quantised step (see SWIM_STEER_STEPS in input.ts). It scales the vertical
    *  rate, so easing the view down eases you down and burying it plunges: the
@@ -11793,6 +11895,22 @@ export interface MailboxDef {
 // it needs a templateId rather than a def list: interaction.ts recognises the
 // entity by this id and the client sizes its click range from it.
 export const REALM_BUILDER_MONUMENT_TEMPLATE_ID = 'realm_builder_monument' as const;
+/** Tidehold's housing-plot signs (sim/plots.ts): read to see the deed, bought
+ *  through Sim.buyPlot. One static object per plot on a reserved id. */
+export const PLOT_SIGN_TEMPLATE_ID = 'plot_sign' as const;
+/** What a plot sign shows the player who reads it. Copper amounts. */
+export interface PlotDeedView {
+  id: string;
+  name: string;
+  size: 'small' | 'medium' | 'large';
+  /** Along the road and back from it, yards. */
+  w: number;
+  d: number;
+  priceCopper: number;
+  ownerName: string | null;
+  ownedByYou: boolean;
+  yourCopper: number;
+}
 /**
  * How close (yards, from the statue's centre) a player must stand for the
  * monument to be the object an interact press picks. Its collider keeps the
@@ -11956,6 +12074,7 @@ export type MapPresentationMode =
   | 'nythraxis'
   | 'delve'
   | 'sowfield'
+  | 'deepglass'
   | 'yumiMaze';
 
 export interface WorldContent {
@@ -12107,6 +12226,19 @@ export interface WorldContent {
   // Render/sim presentation defaults are enabled by default. 'blank' keeps only
   // the neutral terrain base and sky birds for new flat authoring worlds.
   presentationMode?: MapPresentationMode;
+  // The document owns the Deepglass kit's pylons/goal gates as editable
+  // placements, so render/deepglass_kit.ts must not draw its own copies.
+  // Carried EXPLICITLY (not derived from `placements`) because the editor
+  // viewport strips placements from its active world, the render owns them
+  // there, and a derived check would see an empty list and double-draw.
+  deepglassKitPlaced?: boolean;
+  /** The document places the arena kit, so the procedural bowl stands down. */
+  deepglassArenaPlaced?: boolean;
+  /** The document places the arena FLOOR (arena_floor wedges), so the
+   *  procedural plaza disc, base ring and pylon sockets stand down. Separate
+   *  from deepglassArenaPlaced: a document laid before the floor existed
+   *  places the bowl but still stands on the procedural plaza. */
+  deepglassFloorPlaced?: boolean;
   // Scenery families this world's DOCUMENT already owns as editable placements,
   // so the renderer-owned builders that normally draw them must stand down or
   // the same tree is drawn twice, once movable, once not. Absent for the
@@ -12267,6 +12399,11 @@ export interface SimConfig {
   // so callers that set this MUST also call setActiveWorldContent() with content
   // whose terrain-relevant fields are identical (see the sim.ts ctor invariant).
   world?: WorldContent;
+  // Boot the player at these coordinates instead of the world's playerStart.
+  // Used by Baldemar's return portal (src/game/portal_travel.ts) to land the
+  // homebound player back at the town square the trip left from. Ground-snapped
+  // like playerStart itself; draws no rng, so world-gen determinism holds.
+  playerStartOverride?: { x: number; z: number };
   // Optional per-phase timing hook: tick() calls this after each internal phase and
   // the HOST owns the clock, attributing the elapsed time since its previous mark to
   // `phase` (keeps wall-clock reads out of the sim, per the determinism guard). The
@@ -12328,6 +12465,16 @@ export function emptyMoveInput(): MoveInput {
     jump: false,
     dive: false,
     surface: false,
+    // Both optional fields are initialized HERE on purpose, even though
+    // `swimSteer: undefined` is semantically identical to omitting it.
+    // sanitizeMoveInput assigns every field on an object minted by this
+    // function, and a field the literal never declared forces a V8 hidden-class
+    // transition on each call, on the hottest object in the movement path.
+    // Adding `boost` without this doubled the sim tick cost and timed the Vale
+    // Cup showcase test out; declaring it up front is the whole fix.
+    boost: false,
+    swimSteer: undefined,
+    aimPitch: undefined,
   };
 }
 

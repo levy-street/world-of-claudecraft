@@ -9,8 +9,15 @@ import { groundHeight, onUnderSheet } from '../../sim/world';
 export const UNDERWORLD_DEPTH = 3;
 
 /** One ground sample a frame decides it. Never inside an instance (dungeon
- *  floors are their own world). */
-export function cameraUnderWorld(x: number, y: number, z: number, seed: number): boolean {
-  if (x > DUNGEON_X_THRESHOLD) return false;
+ *  floors are their own world) and never inside the Deepglass bell (`inBell`),
+ *  which is its own sealed water volume far below the slate. */
+export function cameraUnderWorld(
+  x: number,
+  y: number,
+  z: number,
+  seed: number,
+  inBell: boolean,
+): boolean {
+  if (inBell || x > DUNGEON_X_THRESHOLD) return false;
   return y < groundHeight(x, z, seed) - UNDERWORLD_DEPTH && !onUnderSheet(x, z, seed, y);
 }

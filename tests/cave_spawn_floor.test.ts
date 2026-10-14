@@ -1,6 +1,6 @@
 // A camp authored INSIDE a cave spawns on the tube floor, not on the surface
 // above it (sim/cave_ground_core.ts caveSpawnFloor, consulted by
-// Sim.groundPos). Authored mines: kobolds in a gallery two hundred yards
+// Sim.groundPos). Deepglass mines: kobolds in a gallery two hundred yards
 // under the summit used to spawn ON the summit.
 
 import { readFileSync } from 'node:fs';

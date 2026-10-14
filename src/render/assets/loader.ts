@@ -252,8 +252,8 @@ export function loadGltf(
       () => minimumLoadPriority(priorities),
     ).then(
       (gltf) => {
-        // The Tidehold kit's GLBs share one set of tiling maps: keep one copy
-        // of each on the GPU (shared_kit_textures.ts). Before classification, so
+        // The arena kit's GLBs share one set of tiling maps: keep one copy of
+        // each on the GPU (shared_kit_textures.ts). Before classification, so
         // the mip-release registry only ever sees the survivors.
         shareKitTextures(gltf.scene, resolved);
         polishGltfTextures(gltf);
@@ -261,7 +261,7 @@ export function loadGltf(
         applyTownSmartToScene(gltf.scene);
         // Transmissive materials become translucent (transmission_neutralize.ts).
         neutralizeGltfTransmission(gltf);
-        // Kit foliage cards fade out as they turn edge-on (foliage_edge_fade.ts).
+        // Deepglass foliage cards fade out as they turn edge-on (foliage_edge_fade.ts).
         applyFoliageEdgeFade(gltf.scene);
         // Classify every KTX2 texture for post-upload mip release (world-only
         // categories) or source dismissal (everything a preview/portrait/armory

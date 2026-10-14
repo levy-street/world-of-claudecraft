@@ -1,15 +1,5 @@
 # Tidehold buildings, Blender assembly chain
 
-> REBUILD CAVEAT (2026-10-13): the Tidehold CITY and the Deepglass arena moved
-> out of the Studio merge into their own PR; only this building KIT stays, as
-> general Studio editor assets (Edit pieces and Build mode wall runs). Until
-> that PR lands, this chain cannot rebuild the kit from source: it still reads
-> Deepglass sources that are no longer in this tree (`scripts/assets/deepglass/`
-> `dg_lib.py` and `arena_tex/`, the `public/models/deepglass/shrub_*` window-box
-> plants read by `town_flowers.mjs`) and the installer writes the city layout in
-> `src/sim/deepglass/citadel.ts`. The shipped GLBs, their `.parts`/`.lod` twins,
-> `data/prefab_pieces/` and the collision overrides are complete as committed.
-
 > Moved here from `tmp/blender_tidehold/` on 2026-08-21. `tmp/` is gitignored,
 > so the chain that builds the shipped `public/models/tidehold/*.glb` was one
 > `git clean` from being lost. The scripts still expect to be COPIED into a

@@ -18,8 +18,8 @@ export class UnderworldMask {
 
   constructor(private readonly scene: THREE.Scene) {}
 
-  update(cam: THREE.Vector3, seed: number): void {
-    this.active = cameraUnderWorld(cam.x, cam.y, cam.z, seed);
+  update(cam: THREE.Vector3, seed: number, inBell: boolean): void {
+    this.active = cameraUnderWorld(cam.x, cam.y, cam.z, seed, inBell);
   }
 
   /** Hide everything but the lights (hiding one changes the lighting hash and

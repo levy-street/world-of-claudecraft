@@ -87,8 +87,8 @@ export function mapZoneRegion(zone: ZoneDef): MapRegion {
   // painter's flat ocean fill is the honest answer, and it is seamless now that
   // the fill matches the sea ramp's deep end.
   // Clamped to the ACTIVE world's rect. The shipped fold cropped an authored
-  // map to the built-in world's edges, so an authored zone reaching past them
-  // fell off its own plate.
+  // map to the built-in world's edges - Tidehold's north end (the mines, past
+  // z 1120) fell off its own plate.
   const strip = activeWorldStripRegion();
   return {
     minX: Math.max(strip.minX, cx - side / 2),

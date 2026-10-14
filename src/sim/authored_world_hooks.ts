@@ -18,18 +18,23 @@ export interface SpawnSlots {
 }
 
 /**
- * Where a joining player starts: its saved spot, else the authored spawn-area
- * slot (advancing the per-Sim counter), else the world's `playerStart`. Grounded with the Sim's own `groundPos`.
+ * Where a joining player starts: its saved spot, else the host's start override,
+ * else the authored spawn-area slot (advancing the per-Sim counter), else the
+ * world's `playerStart`. Grounded with the Sim's own `groundPos`.
  */
 export function playerStartPos(
-  ctx: Pick<SimContext, 'groundPos'>,
+  ctx: Pick<SimContext, 'cfg' | 'groundPos'>,
   saved: { x: number; z: number } | null | undefined,
   world: Pick<WorldContent, 'playerStart' | 'playerSpawnArea'>,
   slots: SpawnSlots,
 ): Vec3 {
+  const override = ctx.cfg.playerStartOverride;
   const area = world.playerSpawnArea;
   const xz =
-    saved ?? (area ? spawnPointInArea(area, slots.next++) : undefined) ?? world.playerStart;
+    saved ??
+    override ??
+    (area ? spawnPointInArea(area, slots.next++) : undefined) ??
+    world.playerStart;
   return ctx.groundPos(xz.x, xz.z);
 }
 

@@ -33,7 +33,8 @@ import {
 import type { AssetFireEmitter, PlacedAsset } from '../sim/types';
 import { cloneWallFinishes } from '../sim/wall_finishes';
 import { terrainHeight } from '../sim/world';
-import { targetHeightFor } from './asset_scale';
+import { attachArenaWater } from './arena_water';
+import { authoredGroundLine, targetHeightFor } from './asset_scale';
 import { loadGltf } from './assets/loader';
 import { mediaAssetExists } from './assets/media';
 import { registerPreload } from './assets/preload';
@@ -67,9 +68,18 @@ import { type MoverHit, type MoverUpdate, PlacedMovers } from './placed_movers';
 import { placedTextureTierPath } from './placed_texture_tier_core';
 import { adoptDynamicBudgetLight } from './point_light_budget';
 import { buildRockChainModel, buildRockModel, rockSeed } from './rock_gen';
+import { attachShipMotion } from './ship_motion';
 import { refreshFrozenWorldMatrix } from './static_matrix';
 import { type TreeBuild, treeSeed } from './tree_gen';
 import {
+  isKitFoliageMaterial,
+  KIT_WIND_ATTRIBUTE_GLSL,
+  KIT_WIND_FAR,
+  KIT_WIND_NEAR,
+  KIT_WIND_TIME_SCALE,
+  type KitWindMode,
+  kitTreeLean,
+  kitWindGlsl,
   LEAF_KIND_MUL,
   LEAF_SHIMMER_YARDS,
   LEAN_FRACTION,
@@ -118,26 +128,57 @@ export function attachPlacedTreeSway(
   kind: SwayKind,
 ): void {
   const span = Math.max(0.001, maxY - minY);
-  const amp = span * LEAN_FRACTION[kind];
+  // The Deepglass foliage kit carries BAKED wind (tree_sway.ts kitWindGlsl):
+  // its trunks barely lean, its boughs, leaves and grass blades move instead.
+  let kit = false;
+  let grass = false;
+  object.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+      if (!m) continue;
+      if (isKitFoliageMaterial(m.name)) kit = true;
+      if (/^Leaves_dg_grass/.test(m.name)) grass = true;
+    }
+  });
+  const kitMode: KitWindMode | null = !kit
+    ? null
+    : kind === 'tree'
+      ? 'tree'
+      : grass
+        ? 'grass'
+        : 'shrub';
+  const amp =
+    kitMode === 'tree'
+      ? kitTreeLean(span)
+      : kitMode === 'grass'
+        ? 0 // blades bend on their own; the tuft does not rock as a block
+        : kitMode === 'shrub'
+          ? span * LEAN_FRACTION.bush * 0.5
+          : span * LEAN_FRACTION[kind];
   object.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
     const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     for (const mat of mats) {
       if (!mat || mat.userData.wocTreeSway) continue;
-      // Stone never sways, even as part of a plant (the crag pine's boulder):
-      // the whole-plant lean would rock it.
+      // Stone never sways, even as part of a plant (the Deepglass moss rock,
+      // the crag pine's boulder): the whole-plant lean would rock it.
       if (/^rocks?$|^stone/i.test(mat.name)) continue;
       mat.userData.wocTreeSway = true;
       const leaf = leafStrengthForMaterialName(mat.name) * LEAF_KIND_MUL[kind];
       // Bark and stone pay for neither the shimmer sines nor the world-scale
       // sqrt: the whole block is compiled out for them.
       const shimmer =
-        leaf > 0
-          ? `${treeSwayLeafGlsl(leaf * LEAF_SHIMMER_YARDS, 'wocSwayScale')}
+        leaf > 0 && kitMode && isKitFoliageMaterial(mat.name)
+          ? kitWindGlsl(kitMode, span, 'wocSwayScale')
+          : leaf > 0
+            ? `${treeSwayLeafGlsl(leaf * LEAF_SHIMMER_YARDS, 'wocSwayScale')}
             transformed.x += wocLeafWave * wocBendW;
             transformed.z += wocLeafWave * wocBendW * 0.6;`
-          : '';
+            : '';
+      const kitAttr =
+        leaf > 0 && kitMode && isKitFoliageMaterial(mat.name) ? KIT_WIND_ATTRIBUTE_GLSL : '';
       const scaleTerm =
         leaf > 0
           ? `#ifdef USE_INSTANCING
@@ -146,7 +187,7 @@ export function attachPlacedTreeSway(
               float wocSwayScale = length(modelMatrix[1].xyz);
             #endif`
           : '';
-      // Chain the material's base hook (the foliage edge fade,
+      // Chain the material's base hook (the Deepglass foliage edge fade,
       // assets/foliage_edge_fade.ts) instead of replacing it.
       const base = mat.userData.wocBaseCompile as typeof mat.onBeforeCompile | undefined;
       mat.onBeforeCompile = (sh, renderer) => {
@@ -158,7 +199,8 @@ export function attachPlacedTreeSway(
             '#include <common>',
             `#include <common>
             uniform float uTime;
-            uniform vec2 uSwayPlayer;`,
+            uniform vec2 uSwayPlayer;
+            ${kitAttr}`,
           )
           .replace(
             '#include <begin_vertex>',
@@ -170,12 +212,24 @@ export function attachPlacedTreeSway(
             #endif
             vec2 wocSwayBase = wocSwayBase4.xz;
             ${scaleTerm}
-            ${treeSwayWaveGlsl()}
+            ${
+              kitMode
+                ? treeSwayWaveGlsl(
+                    `(uTime * ${KIT_WIND_TIME_SCALE.toFixed(4)})`,
+                    // kit grass sways wherever it draws: the prop cull that
+                    // hides it is its gate (tree_sway.ts GRASS_WIND_TIME_SCALE)
+                    kitMode === 'grass' ? null : KIT_WIND_NEAR,
+                    KIT_WIND_FAR,
+                  )
+                : treeSwayWaveGlsl()
+            }
+            ${kitMode ? 'if (wocSwayGate > 0.0) {' : ''}
             float wocBendW = clamp((transformed.y - ${minY.toFixed(3)}) / ${span.toFixed(3)}, 0.0, 1.0);
             float wocBend = wocSwayWave * ${amp.toFixed(4)} * wocBendW * wocBendW;
             transformed.x += wocBend;
             transformed.z += wocBend * 0.6;
-            ${shimmer}`,
+            ${shimmer}
+            ${kitMode ? '}' : ''}`,
           );
       };
       mat.customProgramCacheKey = () => `${mat.uuid}:woc-tree-sway`;
@@ -247,6 +301,15 @@ const STREAM_MIN_PLACEMENTS = 1500;
 const STREAM_SLICE = 800;
 const STREAM_OPS_BUDGET = 24;
 
+/** Region residency (setCullBeyond's load/unload half): how many placements
+ *  may be released or rebuilt in one frame. Restoring is the expensive
+ *  direction, it clones a template, where releasing hands one back, so it
+ *  gets the smaller budget. At 48 a frame the Deepglass sheds its 5,317
+ *  Tidehold placements in under two seconds of bout, and at 32 it rebuilds
+ *  them over the ~100 yards of causeway between the bell and the city wall. */
+const REGION_EVICT_BUDGET = 48;
+const REGION_RESTORE_BUDGET = 32;
+
 // Editable foliage placements adopt the SHIPPED world's tree/rock handoff:
 // the real model ends at the same lodDists plane procedural foliage swaps at,
 // and the placement's far-sprite mirror (foliage_far_placements_core.ts,
@@ -290,7 +353,7 @@ const LOD_HYSTERESIS = 1.12; // re-show at range, re-hide at range * this
 // Fire VFX carry their OWN, much shorter range. A lantern's flame stack is 8
 // draws and 7 materials, and it was gated only by the model's LOD range, so
 // a torch 700 yd away still submitted all of it for a few pixels of additive
-// blend nobody can resolve. Measured on one of SPACEY's saves (2026-09-20):
+// blend nobody can resolve. Measured on SPACEY's Deepglass save (2026-09-20):
 // 49 authored emitters cost 427 of the 974 draws at the mine mouth, the
 // single largest item in the frame. The flame's own point light already lives
 // on a 55 yd budget (renderer LIGHT_BUDGET_RANGE_SQ), so the visuals were
@@ -321,7 +384,7 @@ const MAX_RENDERED_FIRE_EMITTERS = 64;
 // how bright), so this count never reaches `numPointLights` directly. It used
 // to be a FIRST-COME cap, which in a city with more than eight lit emitters
 // handed every light to whichever building streamed in first and left the rest
-// pitch dark inside. The eight lights are a POOL
+// (the Warden's Keep among them) pitch dark inside. The eight lights are a POOL
 // now: they are re-assigned to the emitters nearest the player each frame
 // (assignFireLights), so the light always lands where somebody is standing.
 const MAX_RENDERED_FIRE_LIGHTS = 8;
@@ -336,6 +399,25 @@ interface FireLightSpec {
 }
 
 /** World-space XZ bounds of a terrain edit (the sculpt stroke region). */
+/**
+ * A half-plane of the map to drop from the frame entirely: a placement is
+ * hidden when `nx * x + nz * z >= d`.
+ *
+ * Distance culling asks whether the player COULD see a placement from here.
+ * This asks a different question, whether it is worth existing for them at
+ * all right now, and it is the answer when a wall, not a range, is what hides
+ * something. The Deepglass is the case it was written for: from inside the
+ * bell, Tidehold stands behind the Tide Gate's curtain wall and behind a
+ * hundred yards of water, and 5,317 of that map's 6,127 placements are up
+ * there. None of them can be seen from the arena and every one of them was
+ * still being submitted.
+ */
+export interface PlacedCullHalfPlane {
+  readonly nx: number;
+  readonly nz: number;
+  readonly d: number;
+}
+
 export interface SeatRegion {
   minX: number;
   minZ: number;
@@ -678,6 +760,14 @@ export class PlacedAssetsView {
   private imposterTier = true;
   private lastLodTime = 0;
   private footprintsOn = false;
+  private cullBeyond: PlacedCullHalfPlane | null = null;
+  /** Every placement this view was built from, kept so the region residency
+   *  pass can rebuild what it released. The array is held by reference. */
+  private allPlacements: readonly (PlacedAsset | null)[] = [];
+  /** Indices released by the region pass, and therefore owed a rebuild when
+   *  the line clears. Never touched by the ordinary LOD or stream paths. */
+  private readonly regionEvicted = new Set<number>();
+  private regionCursor = 0;
   // Imported-model collision bakes (MapDoc.assetCollision), for the footprint
   // view: catalogue assets resolve into the generated table instead.
   private assetCollision: Readonly<Record<string, readonly BakedCollisionBox[]>> | null = null;
@@ -796,6 +886,7 @@ export class PlacedAssetsView {
     }
     this.seed = seed;
     this.lights = lights;
+    this.allPlacements = placements;
     if (this.streamCenter && placements.length > STREAM_MIN_PLACEMENTS) {
       // Game host on a big authored map: materialize only the placements
       // around the spawn now (boot stops paying for the whole map) and let
@@ -845,7 +936,10 @@ export class PlacedAssetsView {
       const resident = this.entries.has(this.streamCursor);
       // preload only for the boot pass (force=true): a mid-travel add is an
       // ordinary async pop-in, never a boot-gate registration.
-      if (!resident && d2 <= keep2) {
+      // A placement the region pass has ruled out must not be streamed back
+      // in behind its back (the two systems are independent, and only their
+      // agreement on this test keeps them from fighting).
+      if (!resident && d2 <= keep2 && !this.beyondCull(p)) {
         this.addPlacement(this.streamCursor, p, force);
         ops++;
       } else if (resident && d2 > drop2) {
@@ -1885,6 +1979,8 @@ export class PlacedAssetsView {
     // An explicit full rebuild is an editor host taking ownership of
     // residency (its zone stream passes null slots itself).
     this.streamSource = null;
+    this.allPlacements = placements;
+    this.regionEvicted.clear();
     for (const index of [...this.entries.keys()]) this.removePlacement(index);
     this.setSelected(null);
     for (let index = 0; index < placements.length; index++) {
@@ -1963,10 +2059,23 @@ export class PlacedAssetsView {
           if (swayKind) {
             attachPlacedTreeSway(object, box.min.y, box.max.y, swayKind);
           }
+          // Canvas moves on the same wind: a ship's sails and pennants (keyed
+          // by the Warden kit's material names, see render/ship_motion.ts), also
+          // gated in-shader on the player's distance so a far harbour rests.
+          attachShipMotion(object);
+          // The arena floor's tide channel: moving light on its water
+          // (render/arena_water.ts, keyed by the kit's material name).
+          attachArenaWater(object);
+          // Seat by the AUTHORED ground line where the kit declares one; the
+          // bounding box otherwise. `minY` is what applyTransform subtracts
+          // from the terrain height, so a model with deliberately buried
+          // geometry is lifted clear of the ground by exactly that depth
+          // unless it opts out here.
+          const groundLine = authoredGroundLine(path);
           return {
             object,
             norm: targetHeightFor(path) / maxDim,
-            minY: box.min.y,
+            minY: groundLine ?? box.min.y,
             maxY: box.max.y,
             radiusSrc: Math.max(size.x, size.z) / 2 || 1,
           };
@@ -2853,6 +2962,81 @@ export class PlacedAssetsView {
    * terrain. Checks are strided so huge maps never spend more than
    * LOD_BUDGET_PER_FRAME tests a frame.
    */
+  /**
+   * Drop every placement on the far side of a line in world XZ; null clears.
+   *
+   * Takes effect over the next few frames, as the strided sweep in updateLod
+   * comes round to each entry. That lag is deliberate in both directions:
+   * flipping five thousand entries in one frame is exactly the stutter the
+   * strided sweep exists to prevent, and whatever this hides was already
+   * behind something.
+   */
+  /** Is this placement on the far side of the region line? One owner for the
+   *  test, read by the LOD sweep, the residency stream and the region pass. */
+  private beyondCull(p: PlacedAsset): boolean {
+    const b = this.cullBeyond;
+    return b !== null && p.x * b.nx + p.z * b.nz >= b.d;
+  }
+
+  /**
+   * The LOAD half of {@link setCullBeyond}: release the placements past the
+   * line outright, and rebuild them once it clears.
+   *
+   * The LOD sweep's region test stops them being DRAWN within a few frames,
+   * which is all the eye needs. This is what gives the memory back, the
+   * clone, its instance slots, and the per-entry geometry a grass patch,
+   * generated rock, built model or generated tree owns. Both directions are
+   * budgeted per frame, because doing five thousand of either at once is
+   * exactly the stutter every strided sweep in this file exists to avoid.
+   *
+   * Release runs on a rolling cursor over the whole placement list; the
+   * rebuild drains the released set, so nothing the region pass did not take
+   * away is ever added by it.
+   */
+  reconcileCullRegion(): void {
+    const src = this.allPlacements;
+    if (src.length === 0) return;
+    if (this.cullBeyond !== null) {
+      let ops = 0;
+      for (let step = 0; step < src.length && ops < REGION_EVICT_BUDGET; step++) {
+        this.regionCursor = (this.regionCursor + 1) % src.length;
+        const p = src[this.regionCursor];
+        if (!p || !this.entries.has(this.regionCursor) || !this.beyondCull(p)) continue;
+        // The selected placement is being edited: never pull it out from
+        // under the maker, the same exemption the LOD sweep makes.
+        if (this.regionCursor === this.selected) continue;
+        this.removePlacement(this.regionCursor);
+        this.regionEvicted.add(this.regionCursor);
+        ops++;
+      }
+      return;
+    }
+    if (this.regionEvicted.size === 0) return;
+    let ops = 0;
+    for (const index of this.regionEvicted) {
+      if (ops >= REGION_RESTORE_BUDGET) break;
+      this.regionEvicted.delete(index);
+      const p = src[index];
+      if (p) this.addPlacement(index, p);
+      ops++;
+    }
+  }
+
+  setCullBeyond(plane: PlacedCullHalfPlane | null): void {
+    const held = this.cullBeyond;
+    if (held === plane) return;
+    if (
+      held !== null &&
+      plane !== null &&
+      held.nx === plane.nx &&
+      held.nz === plane.nz &&
+      held.d === plane.d
+    ) {
+      return;
+    }
+    this.cullBeyond = plane;
+  }
+
   updateLod(
     camX: number,
     camZ: number,
@@ -2939,7 +3123,11 @@ export class PlacedAssetsView {
       const dz = p.z - camZ;
       const d2 = dx * dx + dz * dz;
       const limit = entry.lodHidden ? range : range * LOD_HYSTERESIS;
-      const hide = d2 > limit * limit;
+      // The host's region cull sits alongside the range test rather than
+      // inside it: it carries no hysteresis, because its boundary is a wall
+      // rather than a fog plane and nothing oscillates across it. This hides
+      // within a few frames; reconcileCullRegion releases behind it.
+      const hide = d2 > limit * limit || this.beyondCull(p);
       // Fire VFX ride the same strided sweep on their own, much shorter
       // range. Flipping `visible` on the emitter root is enough: three skips
       // the whole subtree, so all 8 submissions and their material switches

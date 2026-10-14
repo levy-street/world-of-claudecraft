@@ -1405,7 +1405,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
   // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
   // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
-  'f7009c0f275b3dc38a413c1a03f643842567524774d3951a5439ae57a518d916';
+  // Re-minted at the merge of feature/v045-integration into the Deepglass PR
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  'e0eb8934af5db62a54f13419879da05027b4587cd9733ff52306f64e398f2dd6';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1436,7 +1438,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
   // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
   // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
-  'b13e2b326060c11b76ac549d32c58d1e8289e7e13a5751d184860675ef882f95';
+  // Re-minted at the merge of feature/v045-integration into the Deepglass PR
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  'fc80ae593fe1c0491bdcd5da21988cbc9263b4f6963684502acbe9ca2ce6c136';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2825,7 +2829,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // Merging #4466 and #4470 into the v0.45.0 integration: recomputed LAST again
       // over the re-swept evidence. No capture was retaken.
-    ).toBe('2b5bd87d62d49db842de798193ca5d2bdcef0fcbc1f1f419d0ce1288c214a1eb');
+    ).toBe('b98f87aedc510520a3935575155419ca342b2b8ba1d4b3c1b230f991476dacfa');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

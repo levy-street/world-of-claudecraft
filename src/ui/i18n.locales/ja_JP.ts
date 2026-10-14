@@ -16447,6 +16447,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': '中央',
   'hudChrome.breath.label': '息',
   'hudChrome.breath.drowning': '溺れています！',
+  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
+  // non-Latin locales per src/ui/CLAUDE.md).
+  'hudChrome.portalWizard.gossipDeepglass': 'ディープグラスへの道を開いてもらう',
+  'hudChrome.portalWizard.gossipDeepglassAria':
+    'バルデマーにディープグラスへのポータルを開いてもらう',
+  'hudChrome.portalWizard.gossipHome': '帰り道を開いてもらう',
+  'hudChrome.portalWizard.gossipHomeAria': 'バルデマーに町へ戻るポータルを開いてもらう',
+  'hudChrome.portalWizard.portalOpen': 'ポータルが開いた。くぐろう。',
   'abilityUi.resources.devotion': '献身',
   'abilityUi.resources.focus': '集中値',
   'abilityUi.tooltip.requiresStealthSkulduggery':

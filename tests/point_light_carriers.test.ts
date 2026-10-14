@@ -469,10 +469,20 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   // routed into a carrier source list like the release producers below.
   'editor/3d/viewport.ts':
     'the editor map lights, handed to Renderer.setEditorMapLights, which swaps them into viewLights and marks them (swapBudgetedLights)',
+  'render/deepglass.ts':
+    'the Deepglass bell ring, orb and burst lights, pushed into fireLights by the renderer before the constructor mass hide',
+  'render/deepglass_ball.ts':
+    'the Tidesow pole glow, marked at birth inside the deepball entity view body, a view light marked on reconcile',
+  'render/deepglass_pack.ts':
+    'the thrustpack burn light, adoptDynamicBudgetLight into the budget registry the renderer hands DeepglassPacks',
+  'render/deepglass_stadium.ts':
+    'the stadium banner and crown lights, pushed into fireLights by the renderer before the constructor mass hide',
   'render/fluid_surfaces.ts':
     'fluid pool lights, pushed into fireLights at boot and re-adopted through the fireLights adopter on an editor rebuild',
   'render/placed_assets.ts':
     'the placed fire-light pool, adoptDynamicBudgetLight into the PlacedLightRegistry (the renderer budgetLights)',
+  'render/wizard_portal.ts':
+    'the wizard portal glow, adoptDynamicBudgetLight into the budget registry handed to buildWizardPortal',
   'render/battleground.ts':
     'field lights, born hidden, handed to the fireLights registry through the battleground host',
   'render/battleground_props.ts':

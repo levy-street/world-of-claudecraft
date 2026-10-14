@@ -228,7 +228,7 @@ export const PAINT_FIELD_INTERIOR_BIT = 128;
 /** Amplitude ceilings for the two edge sliders at 100%, in world yards.
  *
  *  Sized against a ONE-YARD paint grid, which is what real maps use (the
- *  shipped Studio documents are cell 1) -- the first cut of this was scaled
+ *  shipped Deepglass document is cell 1) -- the first cut of this was scaled
  *  for the 0.25yd floor, which left the softness slider clamped to "no change
  *  at all" for its bottom 40% and made the warp wander less than a single
  *  cell. Every yard of reach here is a yard the interior fast path gives up
@@ -305,7 +305,8 @@ export function measureAo(
   // at every block boundary, a grid of pale squares over the cobbles, while
   // PavingStones046 (sd 0.145, gain 6.9) stayed clean at 0.02%. That is exactly
   // what SPACEY reported, on exactly the two swatches he had at depth 1
-  // (Cobblestone001 and Tiles001, blockiness 2.8 and 2.5).
+  // (Warden Cobbles = Cobblestone001, Warden Tiles = Tiles001, blockiness 2.8
+  // and 2.5).
   //
   // So measure the seam directly, mean |step| ACROSS 8px boundaries minus the
   // same within blocks, and cap the gain so what survives stays under

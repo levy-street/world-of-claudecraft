@@ -1,6 +1,6 @@
 // The map-authored aurora (render/aurora_sky.ts, MapWeather.aurora): curtains
 // hung over the CAMERA wherever it goes, brightest at night, faint by day.
-// SPACEY: "give us an aurora in the sky, still make the weather
+// SPACEY (Deepglass): "give us an aurora in the sky, still make the weather
 // dynamic, just make it look more chill and less dark/dull".
 
 import { readFileSync } from 'node:fs';

@@ -4,8 +4,8 @@
 // The shipped world streams over its own fixed box: x +-WORLD_MAX_X by
 // z WORLD_MIN_Z..WORLD_MAX_Z. An authored map is its own rect (worldHalfX by
 // the zone band) and is sculpted past it freely, so a grid pinned to the
-// shipped box clipped the maker's ground wherever the two disagree: one of
-// SPACEY's maps (2026-09-15, "the outside of the terrain is cut off ... collapse
+// shipped box clipped the maker's ground wherever the two disagree: SPACEY's
+// Deepglass (2026-09-15, "the outside of the terrain is cut off ... collapse
 // into nothing") runs z -250..1120 against a grid that starts at z -180, and
 // its peaks were sculpted out to x -631 against a grid that stops at -540.
 // Past the grid only the water sheet ran on, over nothing.

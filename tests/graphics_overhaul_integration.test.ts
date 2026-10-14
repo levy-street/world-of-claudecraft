@@ -46,18 +46,22 @@ describe('graphics-overhaul integration', () => {
     expect(renderer).toContain(
       'let cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;',
     );
-    expect(renderer).toContain('this.camera.position.set(cx, Math.max(cy, groundY), cz);');
+    // In flooded flight the sphere is the only floor, so the terrain clamp stands
+    // down there (bellBoomLimit); everywhere else it is the ground.
+    expect(renderer).toContain(
+      'this.camera.position.set(cx, dgFlying ? cy : Math.max(cy, groundY), cz);',
+    );
     const chaseStart = renderer.indexOf('const px = pose.x + shoulder.x;');
     const chaseEnd = renderer.indexOf('// Spatial-audio listener');
     expect(chaseStart).toBeGreaterThan(0);
     expect(chaseEnd).toBeGreaterThan(chaseStart);
     const chaseCamera = renderer.slice(chaseStart, chaseEnd);
     expect(chaseCamera).not.toMatch(/pose\.dist\s*[-+*/]?=/);
-    // The boom only shortens on an AUTHORED map, in ONE gated branch: the rock
-    // of a cave tube or carve cavity, and a placed asset's collider (SPACEY,
-    // 2026-09-19: "make the camera work with our assets colliion just like the
-    // terrain"). The solve lives in authored_map/chase_boom_core.ts; the
-    // built-in world never enters it.
+    // The boom only shortens on an AUTHORED map (or in the Deepglass bell), in
+    // ONE gated branch: the bell's glass, the rock of a cave tube or carve
+    // cavity, and a placed asset's collider (SPACEY, 2026-09-19: "make the camera
+    // work with our assets colliion just like the terrain"). The solve lives in
+    // authored_map/chase_boom_core.ts; the built-in world never enters it.
     expect(chaseCamera).toMatch(
       /if \(isBuiltinWorldActive\(\)\) \{\s*groundY = groundHeight\(cx, cz, seed\) \+ 0\.6;\s*\} else \{/,
     );
@@ -67,7 +71,7 @@ describe('graphics-overhaul integration', () => {
     expect(chaseCamera).not.toContain('CAM_PITCH_UP');
     expect(chaseCamera).not.toContain('lookUpDollyDist');
     expect(source('src/render/authored_map/chase_boom_core.ts')).toContain(
-      'const camDist = lookUpDollyDist(i.dist, i.pitch, i.pitchUp);',
+      'if (!i.flying) camDist = lookUpDollyDist(camDist, i.pitch, i.pitchUp);',
     );
     expect(chaseCamera).toContain(
       'groundY = authoredChaseGroundY(seed, cx, cz, px, py, pz, eyeY);',
@@ -76,12 +80,13 @@ describe('graphics-overhaul integration', () => {
     expect(chaseCamera.match(/\bcy\s*=/g)).toHaveLength(2);
     expect(chaseCamera.match(/\bcz\s*=/g)).toHaveLength(2);
     const boom = source('src/render/authored_map/chase_boom_core.ts');
+    expect(boom).toContain('bellBoomLimit(i.px, i.eyeY, i.pz, i.yaw, i.pitch)');
     expect(boom).toContain('const sheetMax = cameraSheetMaxDist(');
     expect(boom).toContain(
       'cameraBoomMaxDist(i.seed, i.px, i.eyeY, i.pz, out.x, out.y, out.z, 0.3)',
     );
     expect(boom).toContain('const boomMax = Math.min(sheetMax, out.solidLimit);');
-    expect(renderer).toContain('resolveCameraFov(this.baseFov, this.camFeel)');
+    expect(renderer).toContain('resolveCameraFov(this.camFovBase, this.camFeel)');
   });
 
   it('hands the occluder fades and ambience the avatar eye, not the Action Cam aim', () => {

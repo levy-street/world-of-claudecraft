@@ -21,8 +21,8 @@
 // objective maps only, never the built-in world.
 //
 // Cost: the bot driver's teardown arm walks the whole roster when no run is
-// live, which every authored map WITHOUT objectives would otherwise pay each
-// tick. Bots only ever spawn under a live run,
+// live, which every authored map WITHOUT objectives (the Deepglass arena among
+// them) would otherwise pay each tick. Bots only ever spawn under a live run,
 // so the driver is skipped for a Sim that has never had one, and runs exactly
 // once more after its run ends, to take the bots down.
 

@@ -661,7 +661,7 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     // ally-name term from 150 to 550 and the derived worst case to 785.
     // 800 -> 1300: the ladder's 1,000-seat hard cap took the ally-name term to
     // 1050 and the derived worst case to 1285.
-    expect(TEXT_SPRITE_LIMIT).toBe(1300);
+    expect(TEXT_SPRITE_LIMIT).toBe(1360); // FORK: Tidehold lifts the worst case to 1319
   });
 
   it('stays above the largest label set one redraw can ask for', () => {

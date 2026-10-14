@@ -23,7 +23,7 @@ describe('shoreDepthAttribute', () => {
   });
 
   it('floors a cliff-top vertex so the sheet runs to the cliff foot', () => {
-    // A fjord: cliff top at +30, water at -2, sea floor at -55.
+    // Tidehold fjord: ward at +30, water at -2, sea floor at -55.
     const rawDry = -2 - 30;
     const wet = 53;
     // Raw: the crossing sits ~38% of the way across the cell, over the water.

@@ -1,5 +1,4 @@
-// Edge-on fade for the kit foliage's cutout cards (the `Leaves_dg_*` planting
-// the Tidehold kit buildings carry).
+// Edge-on fade for the Deepglass foliage kits' cutout cards.
 //
 // A foliage card is a flat alpha-cutout quad. Seen within a few degrees of
 // edge-on it collapses to a thin line of texture: a bright sliver across a
@@ -17,15 +16,15 @@
 // painted texel's darkest values and a sky wrap for leaves facing away from
 // the sky (FOLIAGE_DARK_LIFT_GLSL, FOLIAGE_SKY_WRAP_GLSL below).
 //
-// Scoped by material NAME to the kit's leaf cards (`Leaves_dg_*`), so no
-// other asset's look changes. Installed once per parsed
+// Scoped by material NAME to the kits built by scripts/assets/deepglass
+// (`Leaves_dg_*`), so no other asset's look changes. Installed once per parsed
 // GLB by the loader, as the material's base compile hook: the placed-asset
 // sway (placed_assets.ts) chains it rather than replacing it, and its detach
 // restores it.
 
 import type * as THREE from 'three';
 
-/** Materials that take the fade: the kit foliage's leaf cards. */
+/** Materials that take the fade: the Deepglass foliage kits' leaf cards. */
 export function isEdgeFadeFoliage(name: string): boolean {
   return /^Leaves_dg_/.test(name);
 }
@@ -62,8 +61,8 @@ export const FROM_BELOW_GLSL = `
 `;
 
 /**
- * Snow boughs: the foliage painter tags snow pixels with alpha 0.66
- * (SNOW_TAG_ALPHA; needles are 1.0, both pass the 0.5 cutout). SNOW_TAG_GLSL
+ * Snow boughs: the painter tags snow pixels with alpha 0.66 (paint_foliage.py
+ * SNOW_TAG_ALPHA; needles are 1.0, both pass the 0.5 cutout). SNOW_TAG_GLSL
  * reads the tag before any fade touches alpha and restores full alpha;
  * SNOW_FROM_BELOW_GLSL then swaps tagged pixels for underside green whenever
  * the camera is below them. Snow lies on TOP of a branch; the white and
@@ -178,7 +177,7 @@ export function injectFoliageEdgeFade(
 }
 
 /**
- * Install the fade on every kit foliage material of a parsed GLB as
+ * Install the fade on every Deepglass foliage material of a parsed GLB as
  * its BASE compile hook (`userData.wocBaseCompile`), which the sway attach
  * chains and its detach restores. Returns how many materials took it.
  */

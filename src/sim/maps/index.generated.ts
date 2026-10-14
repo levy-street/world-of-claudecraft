@@ -13,6 +13,12 @@ export interface PublishedMapEntry {
 
 export const PUBLISHED_MAPS: readonly PublishedMapEntry[] = [
   {
+    slug: "deepglass",
+    name: "deepglass",
+    seed: 20261,
+    load: async () => (await import('./deepglass.generated')).loadPublishedMap(),
+  },
+  {
     slug: "eastbrook_rebuild",
     name: "Eastbrook Rebuild",
     seed: 20061,

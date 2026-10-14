@@ -610,7 +610,7 @@ describe('pooled VFX cloud', () => {
     expect(presentSites).toHaveLength(1);
     expect(source.match(/presentFrame\(host, dt, present\)/g)).toHaveLength(1);
     expect(source).toMatch(
-      /presented = presentFrame\(host, dt, present\);\n\s*\} finally \{\n\s*if \(underworld\) this\.underworld\.unmask\(\);\n\s*\}\n\s*if \(presented\) this\.presentedFrameCount\+\+;/,
+      /presented = presentFrame\(host, dt, present\);\n\s*\} finally \{\n\s*if \(underworld\) this\.underworld\.unmask\(\);\n\s*\}\n\s*if \(presented\) \{\n\s*this\.presentedFrameCount\+\+;/,
     );
     for (const site of presentSites) {
       const before = source.slice(0, site.index).trimEnd();

@@ -155,6 +155,20 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/characters/woc_head_tint.ts': 3,
   // the campfire flame's lick ramp (base is a clamped normalized height)
   'src/render/campfire_flame.ts': 1,
+  // the goal celebration's shell: a ripple band and a fresnel rim, both clamped
+  'src/render/deepglass_goal_wave.ts': 2,
+  // the crowd cards' card-edge fade and the goal-excite pulse, both clamped
+  'src/render/deepglass_crowd_cards.ts': 2,
+  // the bell glass, the goal burst and the orb glow: three fresnel rims, clamped;
+  // the bell's climbing rings and the crown beam's height ramp and core, clamped
+  // or abs() (ClaudeCraft Studio import)
+  'src/render/deepglass.ts': 6,
+  // the team aura's fresnel rim, used twice (alpha and the white edge lift)
+  'src/render/deepglass_aura.ts': 2,
+  // the Tidesow speed shell's fresnel rim
+  'src/render/deepglass_ball.ts': 1,
+  // the plume's heat ramp and cross-section falloff, both bases clamped
+  'src/render/jet_fire.ts': 2,
   // the brazier flame's taper ramp
   'src/render/placed_assets.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
@@ -251,7 +265,8 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   // counts: sites neither parent's pin listed (the temple flood's pow moved out of
   // dungeon.ts into temple_water_shader.ts, and the Bastion's ghost discharge and
   // ghost fx replaced the boss fx row on the integration side; the Studio's
-  // cut cavity, model generator, triplanar maps and wall finishes).
+  // arena water, cut cavity, model generator, triplanar maps and wall finishes).
+  'src/render/arena_water.ts': 2,
   'src/render/cut_cavity_mesh.ts': 1,
   'src/render/model_gen.ts': 1,
   'src/render/sunken_bastion/bastion_ghost_discharge.ts': 3,

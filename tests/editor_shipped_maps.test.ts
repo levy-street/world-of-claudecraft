@@ -12,6 +12,7 @@ const EXPECTED_IDS: ShippedMapId[] = [
   'abandoned_crypt',
   'nythraxis_raid_arena',
   'ashen_coliseum',
+  'deepglass',
   'protect_yumi_maze',
   'reliquary_sunken_ossuary',
   'reliquary_bell_niche',

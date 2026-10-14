@@ -3,7 +3,7 @@
 // authored rig from THAT projection (applyZoneAtmosphere: world.lighting ??
 // null), so a field the projection forgets is a field the viewport wipes on
 // its first frame. Lighting was forgotten: every map opened with the shipped
-// rig until a maker nudged a slider, which is how a map read "dark and
+// rig until a maker nudged a slider, which is how Deepglass read "dark and
 // overcast" in the Studio while its document said otherwise.
 
 import { readFileSync } from 'node:fs';

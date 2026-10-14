@@ -214,6 +214,7 @@ export const IWORLD_MEMBERS = [
   { name: 'sellItem', kind: 'method' },
   { name: 'sellAllJunk', kind: 'method' },
   { name: 'buyBackItem', kind: 'method' },
+  { name: 'buyPlot', kind: 'method' }, // Tidehold housing deeds (fork)
   { name: 'upgradeRiftItem', kind: 'method' },
   { name: 'socketRiftGem', kind: 'method' },
   { name: 'partyTradeMsRemaining', kind: 'method' },
@@ -976,11 +977,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (the membership integration's 431/128/303 plus those six members).
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 438, 131, 307.
     // Buddy collection contributes six methods and no data members.
-    // The Studio merge adds no member: 448/131/317. The dungeon objectives
-    // tracker's dungeonRun adds one data member: 449/132/317.
-    expect(IWORLD_MEMBERS.length).toBe(449);
+    // Plus the Studio merge: Tidehold housing deeds' buyPlot (+1 method over the
+    // release base): 449/131/318. The dungeon objectives tracker's dungeonRun adds one
+    // data member: 450/132/318.
+    expect(IWORLD_MEMBERS.length).toBe(450);
     expect(DATA_MEMBERS.length).toBe(132);
-    expect(METHOD_MEMBERS.length).toBe(317);
+    expect(METHOD_MEMBERS.length).toBe(318);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1056,6 +1058,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'buyCrucibleVendorItem',
       'buyHeroicVendorItem',
       'buyItem',
+      'buyPlot', // Tidehold housing deeds (fork)
       'canRerollWorldQuest',
       'cancelAura',
       'cancelCommissionOrder',
@@ -1618,6 +1621,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'buyCrucibleVendorItem',
       'buyHeroicVendorItem',
       'buyItem',
+      'buyPlot', // Tidehold housing deeds (fork)
       'canRerollWorldQuest',
       'cancelAura',
       'cancelCommissionOrder',
@@ -2066,6 +2070,7 @@ const FACET_INTERACTION = [
   'townFocusPending',
   'setTownFocus',
   'autoLoot',
+  'buyPlot', // Tidehold housing deeds (fork)
 ] as const satisfies readonly (keyof IWorldInteraction)[];
 type _ExhaustInteraction = AssertNever<
   Exclude<keyof IWorldInteraction, (typeof FACET_INTERACTION)[number]>
@@ -2754,9 +2759,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
     // The integration includes the five-dungeon rework, six buddy methods and
-    // the dungeon objectives tracker's dungeonRun (one data member).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(449);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(449);
+    // the Studio merge's buyPlot, plus the
+    // dungeon objectives tracker's dungeonRun (one data member).
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(450);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(450);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

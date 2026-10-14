@@ -7,9 +7,9 @@ import { type GossipMenuContent, gossipMenuIsEmpty } from '../src/ui/hud/quest/g
 // can close it, instead of leaving a dead greeting-only window on screen.
 //
 // EMPTY is the all-false base every case spreads from: a new menu dimension
-// added to GossipMenuContent extends this one object instead of a dozen
-// hand-maintained literals (each one a compile break waiting for the next
-// field).
+// added to GossipMenuContent extends this one object instead of thirteen
+// hand-maintained literals (which is exactly how hasDeepglassBouts and
+// hasPortalWizard once broke this file's compile).
 const EMPTY: GossipMenuContent = {
   questCount: 0,
   discussionCount: 0,
@@ -20,6 +20,9 @@ const EMPTY: GossipMenuContent = {
   hasCrucibleVendor: false,
   hasDelveBoard: false,
   hasCardMaster: false,
+  hasDeepglass: false,
+  hasDeepglassBouts: false,
+  hasPortalWizard: false,
   hasTraining: false,
   hasFarmer: false,
   hasWorldQuestBoard: false,
@@ -51,7 +54,8 @@ describe('gossipMenuIsEmpty', () => {
   it('stays non-empty for every single-row service NPC', () => {
     // Each dimension alone must keep the menu open: an NPC whose ENTIRE menu
     // is that one row would otherwise close itself the moment it opened. The
-    // WARFARE shop earned its field exactly that way.
+    // WARFARE shop, the steward's passage row, the marshal's fixture rows and
+    // the portal wizard's gate row all earned their fields exactly that way.
     const dimensions: Partial<GossipMenuContent>[] = [
       { hasVendor: true },
       { hasMarket: true },
@@ -60,6 +64,9 @@ describe('gossipMenuIsEmpty', () => {
       { hasCrucibleVendor: true },
       { hasDelveBoard: true },
       { hasCardMaster: true },
+      { hasDeepglass: true },
+      { hasDeepglassBouts: true },
+      { hasPortalWizard: true },
       { hasTraining: true },
       { hasFarmer: true },
       { hasWorldQuestBoard: true },

@@ -1,6 +1,6 @@
 // The chase camera is not influenced by geometry ABOVE the player (SPACEY,
 // 2026-09-21: "its getting caught on the assets above and then forcing a
-// birds eye view"). Two separate gates were doing it on a two-deck ship:
+// birds eye view"). Two separate gates were doing it on the Tidehold galleon:
 //
 //  1. the renderer's ground clamp read the BLIND groundHeight at the camera's
 //     column, which answers with the highest walkable surface there - the
@@ -84,7 +84,7 @@ describe('the camera ignores what is above the player', () => {
   // asset table), so any test written against one passes with the filter
   // disabled and pins nothing. It is verified instead against SPACEY's real map
   // in tmp/qa/camera_deck.test.ts, A/B on the filter line: boom snap-ins over
-  // the ship's deck fall 364 -> 283 at pitch 0.5, 381 -> 197 at 0.8 and
+  // the galleon deck fall 364 -> 283 at pitch 0.5, 381 -> 197 at 0.8 and
   // 262 -> 127 at 1.1, and are unchanged at shoulder pitch where the boom
   // never reaches the overhead.
 });

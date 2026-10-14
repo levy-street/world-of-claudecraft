@@ -1,6 +1,6 @@
 // Cave brightness (MapLighting.caveLight): a map knob that lifts the carved
-// cavity vertex tint floor so big caverns stay readable. SPACEY (a mine
-// rebuild, 2026-09-18): the 70 yd halls vanished into black.
+// cavity vertex tint floor so big caverns stay readable. SPACEY (Deepglass
+// mine rebuild, 2026-09-18): the 70 yd halls vanished into black.
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';

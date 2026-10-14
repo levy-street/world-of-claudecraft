@@ -54,12 +54,15 @@ export function moveTowardImpl(
   // by SNAPPING pos.y to the ground, and it does that even when the
   // horizontal step is zero, which is what an immobile mob always takes.
   //
-  // An immobile mob whose position something else owns (an inert body held
-  // in the air) was written down onto the floor every chase tick, and since
-  // the renderer interpolates prevPos -> pos the drawn body swept between the
-  // floor and its true height every frame.
-  // Authored maps only: the built-in world keeps release's zero-step snap,
-  // which its pinned replays move by.
+  // The Tidesow found this. It is an inert mob whose position is owned by the
+  // deepball physics, and once a strike put it in combat the chase arm ran
+  // this every tick and wrote the ball down onto the slate, a hundred feet
+  // under where it was flying. The match restored pos immediately after, so
+  // the ball LOOKED right in the sim, but prevPos had already captured the
+  // floor, and the renderer interpolates prevPos -> pos, so the drawn ball
+  // swept between the slate and its true height every single frame.
+  // Authored maps only (the Tidesow lives there): the built-in world keeps
+  // release's zero-step snap, which its pinned replays move by.
   if (speed <= 0 && authoredMapActive()) return false;
   const step = Math.min(speed * DT, d);
   const canSwim = ctx.mobCanSwim(MOBS[e.templateId]);

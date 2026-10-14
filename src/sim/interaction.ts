@@ -56,6 +56,7 @@ import {
   pruneCorpseLoot,
 } from './loot/loot_roll';
 import { isMusterRack, useMusterRack } from './mirefen_muster';
+import { inspectPlotSign } from './plots';
 import { startCorpseHarvest } from './professions/corpse_harvest_session';
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { corpseHasDecayed } from './respawn_policy';
@@ -69,6 +70,7 @@ import {
   type Entity,
   INTERACT_RANGE,
   OBJECT_RESPAWN,
+  PLOT_SIGN_TEMPLATE_ID,
   REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
   REALM_BUILDER_MONUMENT_TEMPLATE_ID,
   type Vec3,
@@ -317,10 +319,11 @@ export function pickUpObject(
   if (vehicleStation) return enterVehicle(ctx, vehicleStation.id, p.id);
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
   const isRealmBuilderMonument = obj.templateId === REALM_BUILDER_MONUMENT_TEMPLATE_ID;
+  const isPlotSign = obj.templateId === PLOT_SIGN_TEMPLATE_ID;
   // Preserve the historical no-op for malformed/non-pickup objects. The board
   // and the monument are the intentional lootable objects without an item
   // payload: both are read, never taken.
-  if (!noticeboardDef && !isRealmBuilderMonument && !obj.objectItemId) return false;
+  if (!noticeboardDef && !isRealmBuilderMonument && !isPlotSign && !obj.objectItemId) return false;
   const interactionRange =
     noticeboardDef?.interactionRadius ??
     (forgeStationForEntity(obj) ? FORGE_INTERACT_RANGE : INTERACT_RANGE);
@@ -332,6 +335,7 @@ export function pickUpObject(
     ctx.error(meta.entityId, 'Too far away.');
     return false;
   }
+  if (isPlotSign) return inspectPlotSign(ctx, obj, pid);
   if (isRealmBuilderMonument) {
     // The whole roll travels with the event so the card reads identically
     // offline and online, and so pointing content/realm_builders.ts at a live

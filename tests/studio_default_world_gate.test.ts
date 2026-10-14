@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { MANTLE_REACH } from '../src/sim/colliders';
 import { OVERWORLD_GRAVEYARDS } from '../src/sim/content/graveyards';
 import {
+  ABILITIES,
   ARENA_X_MAX,
   authoredMapActive,
   BUILTIN_WORLD,
@@ -28,7 +29,10 @@ import {
 } from '../src/sim/data';
 import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
 import { LEDGE_GRAB_MIN } from '../src/sim/physics/ledge';
+import { PORTAL_WIZARD_STOPS } from '../src/sim/portal_wizard';
+import { Sim } from '../src/sim/sim';
 import { traversalBand } from '../src/sim/traversal_band';
+import type { Entity } from '../src/sim/types';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 
 // The release/v0.45.0 dungeon roster, by id and index (index 6 is unused). An
@@ -53,7 +57,6 @@ const RELEASE_DUNGEONS = [
 const STUDIO_ITEM_IDS = ['brimming_waterskin', 'duneblade_token'];
 const STUDIO_QUEST_IDS = ['q_sw_arrival'];
 const STUDIO_MOB_IDS = ['duneblade_marauder', 'objective_practice_champion'];
-const STUDIO_NPC_IDS = ['caravan_master_saffa'];
 
 afterEach(() => setActiveWorldContent(null));
 
@@ -75,7 +78,10 @@ describe('the default world reads exactly like the release', () => {
       expect(QUEST_ORDER).not.toContain(id);
     }
     for (const id of STUDIO_MOB_IDS) expect(MOBS[id], id).toBeUndefined();
-    for (const id of STUDIO_NPC_IDS) expect(NPCS[id], id).toBeUndefined();
+    expect(NPCS.deepglass_steward).toBeUndefined();
+    expect(NPCS.deepglass_marshal ?? NPCS.portal_wizard_eastbrook).toBeUndefined();
+    expect(MOBS.deepglass_ball).toBeUndefined();
+    expect(Object.keys(ABILITIES).some((id) => id.startsWith('dg_'))).toBe(false);
   });
 
   it('schedules only the release world bosses', () => {
@@ -98,6 +104,15 @@ describe('the default world reads exactly like the release', () => {
     expect(isArenaPos(ARENA_X_MAX + 1)).toBe(true);
     expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(true);
     expect(isArenaPos(DELVE_BAND_X_MIN)).toBe(false);
+  });
+
+  it('spawns no Goldcrest steward and no town portal wizards', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const entities = [...(sim as unknown as { entities: Map<number, Entity> }).entities.values()];
+    const templates = new Set(entities.map((e) => e.templateId));
+    expect(templates.has('deepglass_steward')).toBe(false);
+    for (const stop of PORTAL_WIZARD_STOPS)
+      expect(templates.has(stop.npcId), stop.npcId).toBe(false);
   });
 });
 
@@ -132,7 +147,10 @@ describe('an authored map gets the Studio content and band', () => {
       expect(QUEST_ORDER).toContain(id);
     }
     for (const id of STUDIO_MOB_IDS) expect(MOBS[id], id).toBeDefined();
-    for (const id of STUDIO_NPC_IDS) expect(NPCS[id], id).toBeDefined();
+    expect(NPCS.deepglass_steward).toBeDefined();
+    expect(NPCS.portal_wizard_eastbrook).toBeDefined();
+    expect(MOBS.deepglass_ball).toBeDefined();
+    expect(Object.keys(ABILITIES).some((id) => id.startsWith('dg_'))).toBe(true);
     // the release arena band, running on to the delve band
     expect(isArenaPos(ARENA_X_MAX + 1)).toBe(true);
 
@@ -142,7 +160,6 @@ describe('an authored map gets the Studio content and band', () => {
     expect(dungeonByIndex(6)).toBeNull();
     for (const id of STUDIO_ITEM_IDS) expect(ITEMS[id], id).toBeUndefined();
     for (const id of STUDIO_QUEST_IDS) expect(QUEST_ORDER).not.toContain(id);
-    for (const id of STUDIO_NPC_IDS) expect(NPCS[id], id).toBeUndefined();
     expect(NPCS.loremaster_caddis.questIds).toEqual(caddisQuests);
   });
 

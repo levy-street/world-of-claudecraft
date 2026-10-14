@@ -1,6 +1,6 @@
 // An authored night floor (MapLighting.nightFloor): how much of the map's own
-// daylight the deepest night keeps. A map that runs the world clock had nights
-// that read "dark and overcast" (SPACEY); the floor lifts the whole grade's night
+// daylight the deepest night keeps. SPACEY's Deepglass runs the world clock, and
+// its nights read "dark and overcast"; the floor lifts the whole grade's night
 // end (key, ambient, sky, fog) while the lamps and the aurora keep the true
 // clock, so the map stays dynamic - just never murky.
 

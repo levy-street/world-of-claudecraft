@@ -192,9 +192,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 256, 270.
 // Buddy collection integration adds four sends and five dispatches: the retired
 // buddy_cosmetic token is dispatch-only; buddy_rename is sent and dispatched.
-// The Studio merge adds no command, so the v0.45.0 integration stays at 262/276.
-const EXPECTED_SEND_COUNT = 262;
-const EXPECTED_DISPATCH_COUNT = 276;
+// The Studio merge adds the plot-sign purchase (`buyplot`, sent by
+// ClientWorld.buyPlot, dispatched server-side): +1/+1 over the release base, so
+// the v0.45.0 integration's 262/276 becomes 263/277.
+const EXPECTED_SEND_COUNT = 263;
+const EXPECTED_DISPATCH_COUNT = 277;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

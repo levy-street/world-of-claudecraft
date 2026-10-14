@@ -284,6 +284,7 @@ import {
   terrainHeight,
   WATER_LEVEL,
   waterLevel,
+  waterLevelAt,
 } from '../sim/world';
 import { tEntity } from '../ui/entity_i18n';
 import { formatNumber, t } from '../ui/i18n';
@@ -432,6 +433,7 @@ import {
   importMapBundleBytes,
   pickMapOrBundle,
 } from './file_io';
+import { floatingGroundY } from './float_on_water_core';
 import { bakeFoliageToGlb } from './foliage_bake';
 import { foliageSlug } from './foliage_bake_core';
 import {
@@ -2215,6 +2217,13 @@ export class EditorApp {
       playerStart: map.playerStart ? { ...map.playerStart } : { ...PLAYER_START },
       terrainEdits: map.terrainEdits,
       placements: [],
+      // Placements are stripped here (the viewport owns them), so the kit gate
+      // gets its signal explicitly or it double-draws the pylon ring.
+      deepglassKitPlaced: map.placements.some((pl) => pl.assetId.startsWith('deepglass/')),
+      deepglassArenaPlaced: map.placements.some((pl) => pl.assetId.startsWith('deepglass/arena_')),
+      deepglassFloorPlaced: map.placements.some((pl) =>
+        pl.assetId.startsWith('deepglass/arena_floor'),
+      ),
       biomePaint: map.biomePaint,
       // Same tier answer the playtest projection gives, from the same function:
       // the renderer-owned builders that read a STATIC content module (the
@@ -2270,7 +2279,7 @@ export class EditorApp {
     // applyZoneAtmosphere reads world.lighting ?? null) restamped the shipped
     // rig on the first frame after every load, so a map's own sun, sky and
     // night floor only ever showed once a maker touched a Lighting slider -
-    // the Studio opened every map "dark and overcast" (SPACEY).
+    // the Studio opened every map "dark and overcast" (SPACEY, Deepglass).
     if (map.lighting) world.lighting = { ...map.lighting };
     if (map.music) world.music = map.music;
     // Zone isolate cuts the built-in dressing at the source. buildProps() reads
@@ -7938,6 +7947,17 @@ export class EditorApp {
       scale: this.placeScale,
       collide: this.placeCollide,
     };
+    // A ship rides the water: over water it is seated detached at its
+    // waterline (float_on_water_core), not sunk to the seabed.
+    const floatY = floatingGroundY(
+      placement.assetId,
+      placement.scale,
+      waterLevelAt(w.x, w.z, this.map.meta.seed),
+    );
+    if (floatY !== null) {
+      placement.detached = true;
+      placement.groundY = floatY;
+    }
     // A saved hitbox preset for this asset (this device) is the maker's word:
     // every fresh placement copies those boxes.
     const preset = this.hitboxPresets[this.placeAssetId];

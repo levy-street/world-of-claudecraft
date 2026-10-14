@@ -1,5 +1,5 @@
 // Sloped standable tops on baked asset boxes (map_doc.ts MapHitbox.slope):
-// an authored kit's tree roots are one box each whose crest FALLS along the
+// the Deepglass kit's tree roots are one box each whose crest FALLS along the
 // root (colliders.ts TopSlope.fall) and whose flanks fall across it, so a
 // walker's feet follow the bark instead of standing on flat terraces over it.
 

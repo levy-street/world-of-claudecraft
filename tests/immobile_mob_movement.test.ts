@@ -3,17 +3,21 @@
 //
 // Sim.moveToward ends every one of its paths by snapping pos.y to the terrain,
 // and it did that even when the horizontal step was zero, which is the only
-// step an immobile mob ever takes. For the stationary templates that stand on
-// the floor anyway (eggs, dummies, a bell, quest NPCs) the snap was a no-op,
-// which is why it went unseen. An inert mob held in the air by something else
-// was written onto the floor every chase tick instead, and since the renderer
-// interpolates prevPos -> pos, the drawn body strobed between the floor and
-// its true height every single frame.
+// step an immobile mob ever takes. For the seventeen stationary templates that
+// stand on the floor anyway (eggs, dummies, a bell, quest NPCs) the snap was a
+// no-op, which is why it went unseen. The eighteenth is the Deepglass Tidesow:
+// an inert mob whose position is owned by the deepball physics and whose
+// correct y is a hundred feet in the air. Once a strike put it in combat, the
+// chase arm ran this every tick and wrote the ball onto the slate. The match
+// restored pos immediately, so the sim looked right, but prevPos had already
+// captured the floor, and the renderer interpolates prevPos -> pos, so the
+// drawn ball strobed between the slate and the bell every single frame.
 //
 // The idle-wander arm in mob/locomotion.ts already carried this rule; chase,
 // flee and evade did not. The guard now lives in the one place all four meet.
 //
-// Authored maps only (the Studio merge gate): the built-in world keeps the release's zero-step snap that its pinned
+// Authored maps only (the Studio merge gate): the Tidesow only exists there,
+// and the built-in world keeps the release's zero-step snap that its pinned
 // parity replays move by. So these run with an authored copy of the shipped
 // world active, and the last case pins the built-in world's release behaviour.
 
@@ -75,6 +79,14 @@ describe('immobile mobs are never moved by the shared movement step', () => {
     // what is hitting it.
     expect(dummy.facing).not.toBe(0);
     expect(dummy.facing).toBeCloseTo(Math.atan2(DEST.x, DEST.z), 5);
+  });
+
+  it('covers the Tidesow, whose correct height is nowhere near the ground', () => {
+    const sim = makeSim();
+    const ball = spawn(sim, 'deepglass_ball');
+    expect(ball.moveSpeed).toBe(0);
+    sim.moveToward(ball, DEST, ball.moveSpeed);
+    expect(ball.pos.y).toBe(AIR_Y);
   });
 
   it('leaves a mob that CAN move alone: it walks, and it does land on the ground', () => {

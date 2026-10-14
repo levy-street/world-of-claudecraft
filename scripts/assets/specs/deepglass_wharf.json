@@ -1,0 +1,107 @@
+{
+  "defaults": {
+    "type": "static"
+  },
+  "items": [
+    {
+      "src": "tmp/asset_src/deepglass/wharf_deck.glb",
+      "out": "models/deepglass/wharf_deck.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_deck_rail.glb",
+      "out": "models/deepglass/wharf_deck_rail.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_deck_rails.glb",
+      "out": "models/deepglass/wharf_deck_rails.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_quay.glb",
+      "out": "models/deepglass/wharf_quay.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_quay_rail.glb",
+      "out": "models/deepglass/wharf_quay_rail.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_bastion.glb",
+      "out": "models/deepglass/wharf_bastion.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_stairs.glb",
+      "out": "models/deepglass/wharf_stairs.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_crane.glb",
+      "out": "models/deepglass/wharf_crane.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_mast.glb",
+      "out": "models/deepglass/wharf_mast.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_lamp.glb",
+      "out": "models/deepglass/wharf_lamp.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_bollard.glb",
+      "out": "models/deepglass/wharf_bollard.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_rail.glb",
+      "out": "models/deepglass/wharf_rail.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_shed.glb",
+      "out": "models/deepglass/wharf_shed.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_galleon.glb",
+      "out": "models/deepglass/wharf_galleon.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_gangplank.glb",
+      "out": "models/deepglass/wharf_gangplank.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_quay_wide.glb",
+      "out": "models/deepglass/wharf_quay_wide.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_quay_wide_rail.glb",
+      "out": "models/deepglass/wharf_quay_wide_rail.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_berth.glb",
+      "out": "models/deepglass/wharf_berth.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_bastion_open.glb",
+      "out": "models/deepglass/wharf_bastion_open.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/wharf_mine_support.glb",
+      "out": "models/deepglass/wharf_mine_support.glb",
+      "maxTex": 1024
+    }
+  ]
+}

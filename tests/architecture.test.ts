@@ -1376,10 +1376,12 @@ const RENDER_PURE_CORES = [
   'src/render/characters/morph_union_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
-  // FORK (Studio) pure cores.
+  // FORK (Studio + Deepglass) pure cores.
   'src/render/foliage_far_placements_core.ts',
   'src/render/decal_stream_core.ts',
-  // renderer.ts extractions: the authored-map layer.
+  'src/render/deepglass_crowd_fx_core.ts',
+  'src/render/deepglass_goal_wave_core.ts',
+  // renderer.ts extractions: the authored-map layer and the Deepglass scene.
   'src/render/authored_map/chase_boom_core.ts',
   'src/render/authored_map/gameplay_fog_core.ts',
   'src/render/authored_map/lighting_rig_core.ts',
@@ -1387,6 +1389,9 @@ const RENDER_PURE_CORES = [
   'src/render/authored_map/underworld_core.ts',
   'src/render/authored_map/zone_atmosphere_core.ts',
   'src/render/authored_map/zone_residency_core.ts',
+  'src/render/deepglass_scene/deepglass_camera_core.ts',
+  'src/render/deepglass_scene/deepglass_cue_core.ts',
+  'src/render/deepglass_scene/deepglass_pose_core.ts',
   'src/render/placed_batch_core.ts',
   'src/render/placed_texture_tier_core.ts',
   'src/render/city_clutter_core.ts',
@@ -2945,6 +2950,8 @@ const UI_DOM_MODULES = [
   // writes the input on a press; the rules are quantity_step_core.ts.
   'src/ui/quantity_stepper.ts',
   'src/ui/canvas_dpr.ts', // Reads the display's device pixel ratio.
+  'src/ui/deepglass_hud.ts', // Owns the live arena overlay.
+  'src/ui/plot_sign_popup.ts', // Mounts and removes the plot purchase card.
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/map/minimap_objective_tap.ts',

@@ -6,7 +6,7 @@ import type { HeightStamp } from '../src/sim/types';
 // Editor3DViewport.finishTerrainStroke). A zone sheet bakes its shore depth
 // and drops its dry quads ONCE at build, so ground a maker lowered under the
 // waterline afterwards showed bare seabed through a hole in the sea (SPACEY's
-// An authored map, 2026-09-15: "visible gaps in the water ... should update each
+// Deepglass, 2026-09-15: "visible gaps in the water ... should update each
 // time the user edits terrain"). The refresh re-bakes just the edited rect.
 
 function mockWaterShaderAssets(): void {

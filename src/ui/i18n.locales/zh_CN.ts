@@ -15704,6 +15704,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': '居中',
   'hudChrome.breath.label': '呼吸',
   'hudChrome.breath.drowning': '溺水！',
+  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
+  // non-Latin locales per src/ui/CLAUDE.md).
+  'hudChrome.portalWizard.gossipDeepglass': '为我打开通往深琉璃之路',
+  'hudChrome.portalWizard.gossipDeepglassAria': '请巴尔德玛开启前往深琉璃的传送门',
+  'hudChrome.portalWizard.gossipHome': '为我打开回家之路',
+  'hudChrome.portalWizard.gossipHomeAria': '请巴尔德玛开启回到你城镇的传送门',
+  'hudChrome.portalWizard.portalOpen': '传送门已开启。走进去吧。',
   'abilityUi.resources.devotion': '虔诚',
   'abilityUi.resources.focus': '集中值',
   'abilityUi.tooltip.requiresStealthSkulduggery': '需要潜行（幽暝达到3层或暗影缠身期间无需潜行）',

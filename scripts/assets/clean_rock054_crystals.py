@@ -7,7 +7,8 @@
 # never were, `Rock054_Color.jpg` ships ~7,500 violet pixels in little
 # lozenge shapes scattered over the sandstone, and Rock054 is a
 # `paintDefault` swatch ("Sandstone Face", terrain_texture_sets.ts) used by
-# Thornhollow, so it turns up wherever that swatch is painted. The reason it reads as "back" is that the painted-ground
+# Deepglass's Terrace Stone and by Thornhollow, so it turns up wherever that
+# swatch is painted. The reason it reads as "back" is that the painted-ground
 # relief work makes near-field surface detail far more legible.
 #
 # COLOUR ONLY. Measured against the mask, the blobs move the sibling maps by

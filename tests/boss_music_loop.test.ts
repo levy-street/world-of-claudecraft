@@ -52,6 +52,7 @@ function input(overrides: Partial<InstanceMusicInput> = {}): InstanceMusicInput 
     inDungeon: true,
     entities: [],
     riftFloor: null,
+    deepglass: null,
     ...overrides,
   };
 }
@@ -116,6 +117,7 @@ describe('per-boss fight tracks', () => {
       resetForDungeonEntry: vi.fn(),
       update: vi.fn(),
       setBossCombat: vi.fn(),
+      setVenueTrack: vi.fn(),
     };
     const controller = new InstanceMusicController(port);
 
@@ -136,6 +138,7 @@ describe('per-boss fight tracks', () => {
       resetForDungeonEntry: vi.fn(),
       update: vi.fn(),
       setBossCombat: vi.fn(),
+      setVenueTrack: vi.fn(),
     };
     const controller = new InstanceMusicController(port);
     controller.update(input({ entities: [{ ...morthen(7), templateId: 'sexton_marrow' }] }));
@@ -151,6 +154,7 @@ describe('per-boss fight tracks', () => {
       resetForDungeonEntry: vi.fn(),
       update: vi.fn(),
       setBossCombat: vi.fn(),
+      setVenueTrack: vi.fn(),
     };
     const controller = new InstanceMusicController(port);
     controller.update(input({ entities: [{ ...morthen(7), templateId: 'sexton_marrow' }] }));
@@ -165,6 +169,7 @@ describe('per-boss fight tracks', () => {
       resetForDungeonEntry: vi.fn(),
       update: vi.fn(),
       setBossCombat: vi.fn(),
+      setVenueTrack: vi.fn(),
     };
     const controller = new InstanceMusicController(port);
     controller.update(input({ lastBossCombatEventAt: 19000 }));

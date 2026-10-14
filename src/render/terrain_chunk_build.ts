@@ -1071,7 +1071,7 @@ export function fillChunkIndexRow(state: ChunkGeometryBuildState, gj: number): v
         // Its top is the border surface sample and its bottom is sunk by
         // SKIRT_DROP + slope * skirtSpan (fillChunkVertexRow), which on the
         // cliff face at a mine mouth is seventy yards or more. Measured at
-        // one of SPACEY's mine mouths: one curtain spanning y -79.8 to +36.1 over
+        // SPACEY's Deepglass mouth: one curtain spanning y -79.8 to +36.1 over
         // a 0.90 yd footprint, standing on the tunnel centreline. Both
         // obvious single samples miss it, the mean corner height (-38.8) is
         // far BELOW the bore, and the surface height (35.2) is ABOVE it,
@@ -1132,7 +1132,7 @@ const SKIRT_CUT_SAMPLES = 12;
 // The span is grown by this before sampling. A skirt that stops a yard under
 // a cave floor, or starts a yard over its ceiling, is still hanging in the
 // hollow, it just does not technically intersect the capsule. Measured at
-// the same mouth: survivors at y [-21.7, 4.2] against a bore floor of
+// the Deepglass mouth: survivors at y [-21.7, 4.2] against a bore floor of
 // 4.55, and at [23.2, 43.2] against a ceiling of 23.25. Skirts are padding,
 // so dropping a few extra near an opening costs nothing.
 const SKIRT_CUT_MARGIN = 3;

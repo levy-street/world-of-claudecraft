@@ -29,7 +29,7 @@
 // (world.ts northEnd) is derived from that bound, so a zone pushed further north
 // would have dragged the whole centre-east coastline north with it.
 
-import type { ZoneDef } from '../types';
+import type { NpcDef, ZoneDef } from '../types';
 
 export const GOLDCREST_ZONE: ZoneDef = {
   id: 'goldcrest_harbor',
@@ -54,4 +54,33 @@ export const GOLDCREST_ZONE: ZoneDef = {
   ],
   welcome:
     'Goldcrest Harbor, seat of the World Market. Every road, tide and ledger in the realm meets here.',
+};
+
+/** Where the Deepglass steward keeps her berth: the Grand Plaza, beside the
+ *  Exchange, where the harbour's crowds already gather. */
+export const DEEPGLASS_STEWARD_POS = { x: 4, z: 2198 };
+
+/**
+ * The Goldcrest roster.
+ *
+ * `dynamic: true` on every entry, the Scorching Wastes rule: the base world
+ * places nothing in this square (with no city map loaded it is still open sea),
+ * so the generic surface-placement loop must skip them. The steward is instead
+ * spawned at world init under a reserved id, onto the nearest dry ground ,
+ * exactly how Groundskeeper Bram takes his post at the Sowfield gate.
+ */
+export const GOLDCREST_NPCS: Record<string, NpcDef> = {
+  deepglass_steward: {
+    id: 'deepglass_steward',
+    name: 'Steward Aleyn Tidewell',
+    title: 'Warden of the Deepglass',
+    pos: { ...DEEPGLASS_STEWARD_POS },
+    facing: Math.PI,
+    color: 0x4fc3d9,
+    questIds: [],
+    dynamic: true,
+    deepglassSteward: true,
+    greeting:
+      'The bell is full and the truce holds, $C. Say the word and the tide-lift will set you down inside it, brassgill, thrustpack and all.',
+  },
 };

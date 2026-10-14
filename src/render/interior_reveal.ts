@@ -79,9 +79,10 @@ export const INTERIOR_BUILDINGS: Readonly<Record<string, InteriorSpec>> = {
   },
   // NOT registered on purpose: tidehold/castle.glb. Its "roof" (G_H2) is the
   // walkable battlement TERRACE, so hiding it from inside would strip the great
-  // hall's ceiling and open the keep to the sky, a courtyard, not a keep.
+  // hall's ceiling and open the keep to the sky, a courtyard, not a keep. The
+  // hall is lit by its own braziers instead (fireEffects in citadel.ts).
   // Castle B: three storeys in the keep (hall, the middle floor = G_H1 at
-  // 5 kit, the top floor = G_H3 at 10 kit) and a room upstairs in each
+  // 5 kit, the Warden's floor = G_H3 at 10 kit) and a room upstairs in each
   // wing (G_H1). The splits sit at the storey lines (6.75 and 13.5 yd).
   '/models/tidehold/castle_b.glb': {
     volumes: [

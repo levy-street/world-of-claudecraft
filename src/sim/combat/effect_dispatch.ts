@@ -24,6 +24,7 @@ import {
 } from '../content/ignivar_set_bonuses';
 import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { dawnreaverDamageMultiplier } from '../dawnreaver_damage';
+import { deepballMove } from '../deepglass/match';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
@@ -4214,6 +4215,14 @@ export function runEffects(
           p.resource = Math.min(p.maxResource, p.resource + amount);
         }
         ctx.enterCombat(p, target);
+        break;
+      }
+      // Deepball. Routed by direct import rather than a SimContext member: the
+      // arena is an offline event build, and a facet member would mean bumping
+      // the IWORLD_MEMBERS guard pins for a seam nothing online calls yet.
+      // No-ops unless the caster is in a live bout.
+      case 'deepball': {
+        deepballMove(ctx, p, eff.move, target ?? null, eff.power);
         break;
       }
       case 'sunder': {

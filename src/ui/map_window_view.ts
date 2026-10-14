@@ -1049,7 +1049,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     // Authored named areas (MapDoc `locations`) label their rect's centre.
     // These are what a city map is actually made of - the zone POI list holds
     // a handful of shipped points, while a Studio map names every square,
-    // dock and terrace with a dragged rect.
+    // wharf and terrace with a dragged rect.
     for (const area of getActiveWorldContent().locations ?? []) {
       const cx = (area.minX + area.maxX) / 2;
       const cz = (area.minZ + area.maxZ) / 2;

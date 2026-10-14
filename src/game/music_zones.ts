@@ -22,6 +22,10 @@ export type MusicZone =
   | 'gale'
   | 'farshore'
   | 'proving_shore'
+  // Tidehold's own cue: SPACEY's "Tidesong - Outside the Bell", the relaxing
+  // harbour theme he wrote for the city. Authored maps select it by name
+  // through MapMusic.zoneTrack, so no biome mapping routes to it.
+  | 'tidehold'
   | 'dungeon_hollow_crypt'
   | 'dungeon_sunken_bastion'
   | 'dungeon_gravewyrm_sanctum'
@@ -116,6 +120,7 @@ export const MUSIC_ZONES: readonly MusicZone[] = [
   'marsh',
   'peaks',
   'farshore',
+  'tidehold',
   'dungeon_hollow_crypt',
   'dungeon_sunken_bastion',
   'dungeon_gravewyrm_sanctum',
@@ -125,8 +130,10 @@ export const MUSIC_ZONES: readonly MusicZone[] = [
 // biome layers and the world-chosen realm/rift cues. A Record keyed on the
 // union so tsc fails the moment a new MusicZone is added without a row here.
 // Used to validate map-authored track ids at play time (an authored world may
-// legitimately name a biome cue the editor does not offer, such as 'amber').
+// legitimately name a biome cue the editor does not offer: the Deepglass asks
+// for 'amber').
 const ALL_MUSIC_ZONE_FLAGS: Record<MusicZone, true> = {
+  tidehold: true,
   town_eastbrook: true,
   town_fenbridge: true,
   town_highwatch: true,

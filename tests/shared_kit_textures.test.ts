@@ -53,9 +53,13 @@ function bc7(size: number, seed: number): THREE.CompressedTexture {
 afterEach(() => resetSharedKitTextures());
 
 describe('shared kit textures', () => {
-  it('only takes the Tidehold town kit GLBs', () => {
-    expect(isSharedKitTextureUrl('/models/tidehold/bank.glb?x=1')).toBe(true);
-    expect(isSharedKitTextureUrl('/models/tidehold_kit/wall_section.glb')).toBe(false);
+  it('only takes the arena kit, bell frame and bridge GLBs', () => {
+    expect(isSharedKitTextureUrl('/media/models/deepglass/arena_stand.c05881b8cc46.glb')).toBe(
+      true,
+    );
+    expect(isSharedKitTextureUrl('/models/deepglass/bell_frame.glb')).toBe(true);
+    expect(isSharedKitTextureUrl('/models/deepglass/bridge_deck.glb?x=1')).toBe(true);
+    expect(isSharedKitTextureUrl('/models/deepglass/tree_pine_full.glb')).toBe(false);
     expect(isSharedKitTextureUrl('/models/props/barrel.glb')).toBe(false);
     // the Tidehold town kit and its Edit-pieces twins; the older castles are not in it
     expect(isSharedKitTextureUrl('/media/models/tidehold/tavern_b.3fa2c1d0e9ab.glb')).toBe(true);
@@ -100,7 +104,7 @@ describe('shared kit textures', () => {
   it('swaps a later GLB onto the first identical texture and drops the copy', () => {
     const first = ktx([9, 9, 9, 9]);
     const a = sceneWith(first);
-    expect(shareKitTextures(a, '/models/tidehold/house_a.glb')).toBe(0);
+    expect(shareKitTextures(a, '/models/deepglass/arena_stand.glb')).toBe(0);
     const copy = ktx([9, 9, 9, 9]);
     let disposed = false;
     copy.addEventListener('dispose', () => {
@@ -108,7 +112,7 @@ describe('shared kit textures', () => {
     });
     const other = ktx([7, 7, 7, 7]);
     const b = sceneWith(copy, other, copy);
-    expect(shareKitTextures(b, '/models/tidehold/house_b.glb')).toBe(1);
+    expect(shareKitTextures(b, '/models/deepglass/arena_gatehouse.glb')).toBe(1);
     expect(mapOf(b, 0)).toBe(first);
     expect(mapOf(b, 2)).toBe(first);
     expect(mapOf(b, 1)).toBe(other);
@@ -116,7 +120,7 @@ describe('shared kit textures', () => {
   });
 
   it('leaves every other asset alone', () => {
-    shareKitTextures(sceneWith(ktx([5, 5, 5, 5])), '/models/tidehold/tavern.glb');
+    shareKitTextures(sceneWith(ktx([5, 5, 5, 5])), '/models/deepglass/arena_floor.glb');
     const mine = ktx([5, 5, 5, 5]);
     const g = sceneWith(mine);
     expect(shareKitTextures(g, '/models/props/crate.glb')).toBe(0);
@@ -125,11 +129,11 @@ describe('shared kit textures', () => {
 
   it('forgets a canonical texture once it is disposed', () => {
     const first = ktx([3, 3, 3, 3]);
-    shareKitTextures(sceneWith(first), '/models/tidehold/tavern.glb');
+    shareKitTextures(sceneWith(first), '/models/deepglass/arena_floor.glb');
     first.dispose();
     const next = ktx([3, 3, 3, 3]);
     const g = sceneWith(next);
-    expect(shareKitTextures(g, '/models/tidehold/smithy.glb')).toBe(0);
+    expect(shareKitTextures(g, '/models/deepglass/arena_floor_gate.glb')).toBe(0);
     expect(mapOf(g, 0)).toBe(next);
   });
 });

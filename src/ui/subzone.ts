@@ -48,10 +48,11 @@ export function nearestSubzone(
 //
 // A zone POI is a POINT with a fixed 32-yard enter radius; an authored location
 // is a RECTANGLE the maker dragged around a landmark with the Zone tool. A city
-// map is built almost entirely out of the latter (from a tavern's footprint to
-// a whole causeway), and squashing those rects to a point would both miss the
-// long thin ones (a ropewalk, a bridge span) and bleed 32 yards past the small
-// ones. So they keep their extent and are tested by containment, not distance.
+// map is built almost entirely out of the latter (Tidehold ships thirty of
+// them, from a tavern's footprint to the whole causeway), and squashing those
+// rects to a point would both miss the long thin ones (a ropewalk, a bridge
+// span) and bleed 32 yards past the small ones. So they keep their extent and
+// are tested by containment, not distance.
 export type NamedArea = NonNullable<WorldContent['locations']>[number];
 
 // Leave a named area only once you are this far OUTSIDE its rect, the rect
@@ -60,9 +61,9 @@ export type NamedArea = NonNullable<WorldContent['locations']>[number];
 export const AREA_EXIT_PAD = 6;
 
 /** The authored area the player is standing in, or null outside every one.
- *  Nested rects resolve SMALLEST-first, so standing in a square (inside a
- *  market district, inside the city) names the square: the tighter the maker
- *  drew the rect, the more specific the place they meant. */
+ *  Nested rects resolve SMALLEST-first, so standing in Baldemar's Square
+ *  (inside the Glass Market, inside the city) names the square: the tighter
+ *  the maker drew the rect, the more specific the place they meant. */
 export function namedAreaAt(
   x: number,
   z: number,

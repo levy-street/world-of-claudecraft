@@ -440,9 +440,9 @@ export function buildGatherNodes(
 ): GatherNodesView {
   // activeGatherNodes(), never the raw table: on an authored map it is empty,
   // because these veins are pinned to shipped overworld coordinates and would
-  // otherwise erupt wherever the built-in world's ore happens to sit (on one
-  // authored map, ore and herbs through a town and 223k triangles a frame to
-  // draw them). Building no templates at all also
+  // otherwise erupt wherever the built-in world's ore happens to sit, which
+  // in the Deepglass meant ore and herbs around and inside the stadium, and
+  // 223k triangles a frame to draw them. Building no templates at all also
   // keeps the node GLBs out of the world-entry decode.
   const nodes = activeGatherNodes();
   const templates = new Map<GatherNodeType, THREE.Object3D>();

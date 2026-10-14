@@ -220,6 +220,10 @@ export interface SpatialAudioSink {
     nearWater: boolean,
     crowd: number,
     points?: readonly AmbientPointSource[],
+    /** Inside the Deepglass bell: the engine drops every open-air bed and
+     *  raises the underwater one instead. Optional, so an engine without the
+     *  bed simply keeps playing the surface ambience. */
+    submerged?: boolean,
   ): void;
   /** Per-frame state of the map-authored point sounds (the editor's Sound
    *  tool). Static for a session, so the renderer passes the same resolved

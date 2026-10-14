@@ -187,9 +187,16 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     "You can't assist yourself.": 'hud.errors.assistSelf',
     'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
     'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',
+    // Tidehold housing deeds (buyPlot, src/sim/plots.ts).
+    'You already hold this deed.': 'hudChrome.plotSign.errAlreadyHeld',
+    "You can't afford this plot.": 'hudChrome.plotSign.errCannotAfford',
   };
   const key = exact[text];
   if (key) return t(key);
+
+  // buyPlot's sold-sign refusal splices the holder's name verbatim.
+  const deedHolder = /^(.+) holds this deed\.$/.exec(text);
+  if (deedHolder) return t('hudChrome.plotSign.errHeldBy', { name: deedHolder[1] });
 
   // The three shapes the cast gate's refusal ladder emits (castAbility in
   // sim/combat/casting_lifecycle.ts): one form, or the Bruin-and-Cat pair that

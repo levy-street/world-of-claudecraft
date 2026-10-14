@@ -40,8 +40,8 @@ export const treeSwayUniforms = {
  * Written once per frame by the renderer (both the prewarm frame and the live
  * sync, beside `sharedUniforms.uTime`). It shipped with NO caller at all, so
  * this uniform sat at its 1e6 start and every gate below evaluated to zero:
- * placed trees, bushes and palms were all silently frozen.
- * tests/tree_sway.test.ts pins the call sites.
+ * placed trees, bushes, palms and a ship's canvas were all silently frozen.
+ * tests/ship_motion.test.ts pins the call sites.
  */
 export function updateTreeSwayPlayer(x: number, z: number): void {
   treeSwayUniforms.uSwayPlayer.value.set(x, z);
@@ -60,18 +60,28 @@ const f = (n: number): string => n.toFixed(4);
  * `wocSwayWave * <heightWeight>`.
  *
  * Also leaves `wocSwayGate` and `wocSwayPh` in scope for callers that layer a
- * second term (the leaf shimmer below) on the same gate and phase.
+ * second term (the leaf shimmer below) on the same gate and phase. A `near`
+ * of null drops the distance gate (`wocSwayGate` is 1).
  */
-export function treeSwayWaveGlsl(): string {
+export function treeSwayWaveGlsl(
+  timeExpr = 'uTime',
+  near: number | null = NEAR_FULL,
+  far = NEAR_OFF,
+): string {
+  // near === null: no distance gate (placed kit grass sways wherever it draws)
+  const gate =
+    near === null
+      ? '1.0'
+      : `1.0 - smoothstep(${f(near)}, ${f(far)}, distance(wocSwayBase, uSwayPlayer))`;
   return `
-    float wocSwayGate = 1.0 - smoothstep(${f(NEAR_FULL)}, ${f(NEAR_OFF)}, distance(wocSwayBase, uSwayPlayer));
+    float wocSwayGate = ${gate};
     float wocSwayPh = wocSwayBase.x * 0.15 + wocSwayBase.y * 0.17;
     // A slow gust rolling across the grove (travelling along +X+Z, ~27s to
     // cross 100 yards) swells and eases the amplitude between 0.55 and 1.0.
     // Without it every plant leans on a fixed-amplitude metronome, which is
     // what makes cheap sway read as mechanical.
-    float wocGust = 0.775 + 0.225 * sin(uTime * 0.23 - (wocSwayBase.x + wocSwayBase.y) * 0.021);
-    float wocSwayWave = (sin(uTime * 0.9 + wocSwayPh) + 0.5 * sin(uTime * 1.7 + wocSwayPh * 1.3))
+    float wocGust = 0.775 + 0.225 * sin(${timeExpr} * 0.23 - (wocSwayBase.x + wocSwayBase.y) * 0.021);
+    float wocSwayWave = (sin(${timeExpr} * 0.9 + wocSwayPh) + 0.5 * sin(${timeExpr} * 1.7 + wocSwayPh * 1.3))
       * wocSwayGate * wocGust;
   `;
 }
@@ -111,21 +121,137 @@ export const LEAF_KIND_MUL = { tree: 1, bush: 1.35 } as const;
 
 export type SwayKind = keyof typeof LEAN_FRACTION;
 
+// ---- the Deepglass foliage kit's BAKED wind --------------------------------
+//
+// The kit (scripts/assets/deepglass, dg_foliage_lib.py rule 5) bakes wind data
+// into every vertex as a second UV set, three's `uv1`: x = FLEX (0 where a
+// card attaches to its branch, 1 at its tip; grass: root 0, blade tip 1),
+// y = PHASE (one value per bough, so a bough moves as a unit). That lets the
+// motion be hierarchical the way WoW foliage is (SPACEY, 2026-09-24: "the big
+// trees shouldnt really move much but the leaves and branches should move
+// nicely ... the grass should have really nice animation with some
+// variance"):
+//
+//   TRUNK   the whole-plant lean, capped small on a big tree (KIT_TREE_LEAN)
+//   BOUGH   each card bends and bobs from its attach point, flex^2 weighted,
+//           on its own phase, pushed along the wind by the gust
+//   LEAF    a fast, small flutter along the card normal, strongest at tips
+//   GRASS   blades bend from the root; a rolling wave travels across the
+//           field (world-position phase) so neighbouring tufts lean in turn,
+//           plus per-blade variance from the baked phase
+//
+// Cost: ~30 ALU per vertex on programs already compiled for sway, no extra
+// draws, no per-frame CPU, out of the shadow pass, and only within
+// KIT_WIND_FAR (50 yd) of the player: past it the block is branched around
+// (one uniform-coherent branch per instance).
+
+/** The kit's wind runs on a slowed clock: 0.49 of real time for every term,
+ *  trunk lean and gust included (SPACEY, 2026-09-24: "slow the animations down
+ *  by 30%", then "slow it down another 30%"). */
+export const KIT_WIND_TIME_SCALE = 0.49;
+
+/** The kit's wind is full within KIT_WIND_NEAR yards of the player and gone
+ *  by KIT_WIND_FAR (SPACEY, 2026-09-24: "the animations should only render at
+ *  50yds from the player"). Past it the whole block is branched around, so a
+ *  far tree costs no wind math at all, not just zero offset. */
+export const KIT_WIND_NEAR = 40;
+export const KIT_WIND_FAR = 50;
+
 /**
- * The grass wind's slowed clock: 0.49 of real time for every term (SPACEY,
- * 2026-09-24: "slow the animations down by 30%", then "slow it down another
- * 30%").
- *
- * GRASS is gated by its own VISIBILITY, not a fixed distance: a blade sways
- * exactly while it draws, wherever that is, and costs nothing once its fade
- * has collapsed or discarded it (SPACEY, 2026-09-24: "for the grass we dont
- * need animations at 50 yds only when they are visiable"). The blade carpet
- * and far band branch around their sway where their scale-collapse fade
- * reaches zero, the ambient tufts where their alpha fade does; painted
- * patches have no fade, so the prop / frustum culls that hide them are the
- * gate. Every grass system runs on this slowed clock.
+ * GRASS is gated by its own VISIBILITY, not the 50 yd: a blade sways exactly
+ * while it draws, wherever that is, and costs nothing once its fade has
+ * collapsed or discarded it (SPACEY, 2026-09-24: "for the grass we dont need
+ * animations at 50 yds only when they are visiable"). The blade carpet and
+ * far band branch around their sway where their scale-collapse fade reaches
+ * zero, the ambient tufts where their alpha fade does; painted patches and
+ * placed kit grass have no fade, so the prop / frustum culls that hide them
+ * are the gate. Every grass system runs on the kit's slowed clock.
  */
-export const GRASS_WIND_TIME_SCALE = 0.49;
+export const GRASS_WIND_TIME_SCALE = KIT_WIND_TIME_SCALE;
+
+/** Kit material names: `Leaves_dg_<sheet>` / `Bark_dg_*` / `Stone_dg_*`. */
+export function isKitFoliageMaterial(name: string): boolean {
+  return /^(Leaves|Bark|Stone)_dg_/.test(name);
+}
+
+export type KitWindMode = 'tree' | 'shrub' | 'grass';
+
+/** Crown lean of a kit TREE, in yards: a big conifer barely moves as a column
+ *  (3.8% of 30 yd was over a yard of sway at the top). */
+export function kitTreeLean(span: number): number {
+  return Math.min(span * LEAN_FRACTION.tree, 0.1 + span * 0.004);
+}
+
+/** Bough bend amplitude (yards at flex 1) and leaf flutter (yards). */
+export function kitWindAmps(mode: KitWindMode, span: number): { bough: number; flutter: number } {
+  if (mode === 'tree')
+    return { bough: Math.min(0.34, Math.max(0.1, span * 0.011)), flutter: 0.045 };
+  if (mode === 'shrub') return { bough: Math.max(0.05, span * 0.06), flutter: 0.028 };
+  // grass: the blade tip swings about a quarter of the tuft's height
+  return { bough: Math.max(0.08, span * 0.26), flutter: 0.012 };
+}
+
+/** Declares the baked-wind attribute when three has not (it only does for a
+ *  texture on UV channel 1). Goes after `#include <common>`. */
+export const KIT_WIND_ATTRIBUTE_GLSL = `
+    #ifndef USE_UV1
+      attribute vec2 uv1;
+    #endif
+`;
+
+/**
+ * The kit's baked wind for a LEAF material. Needs, in scope: `wocSwayGate`,
+ * `wocSwayPh`, `wocGust`, `wocSwayBase` (treeSwayWaveGlsl) and a world-scale
+ * float named by `worldScaleExpr`. Displaces `transformed` in object space;
+ * the wind direction is a fixed world direction brought into object space, so
+ * a stand of instances sways TOGETHER whatever their yaw.
+ */
+export function kitWindGlsl(mode: KitWindMode, span: number, worldScaleExpr: string): string {
+  const { bough, flutter } = kitWindAmps(mode, span);
+  const head = `
+    #ifdef USE_INSTANCING
+      mat3 wocM3 = mat3(modelMatrix * instanceMatrix);
+    #else
+      mat3 wocM3 = mat3(modelMatrix);
+    #endif
+    // row-vector multiply = transpose = the inverse rotation (scale drops out
+    // in the normalize): world wind -> object space
+    vec3 wocWD = normalize(vec3(0.83, 0.0, 0.55) * wocM3);
+    vec3 wocWS = normalize(vec3(-0.55, 0.0, 0.83) * wocM3);
+    float wocFlex = clamp(uv1.x, 0.0, 1.0);
+    float wocF2 = wocFlex * wocFlex;
+    float wocBPh = uv1.y * 6.2832 + wocSwayPh;
+    float wocKT = uTime * ${f(KIT_WIND_TIME_SCALE)};
+    vec3 wocOff;
+  `;
+  const body =
+    mode === 'grass'
+      ? `
+    // a rolling gust band crosses the field: tufts downwind lean in turn
+    float wocWave = 0.5 + 0.5 * sin(dot(wocSwayBase, vec2(0.14, 0.09)) - wocKT * 1.9);
+    float wocPush = (0.25 + 0.75 * wocWave * wocWave) * wocGust;
+    float wocGw = sin(wocKT * 2.7 + wocBPh) * 0.3 + sin(wocKT * 4.3 + wocBPh * 1.9) * 0.12;
+    wocOff = wocWD * ((wocPush + wocGw) * wocF2 * ${f(bough)})
+           + wocWS * (sin(wocKT * 1.9 + wocBPh * 2.3) * 0.2 * wocF2 * ${f(bough)});
+    // a bending blade shortens
+    wocOff.y -= wocPush * wocF2 * ${f(bough * 0.35)};
+    wocOff += objectNormal * (sin(wocKT * 9.0 + wocBPh * 3.0 + position.y * 7.0) * ${f(flutter)} * wocFlex);
+  `
+      : `
+    // BOUGH: bends from where it attaches, on its own phase, pushed downwind
+    float wocBr = (sin(wocKT * 1.15 + wocBPh) * 0.7 + sin(wocKT * 2.05 + wocBPh * 1.63) * 0.3) * wocGust;
+    wocOff = wocWD * ((0.3 + 0.7 * wocBr) * wocF2 * ${f(bough)})
+           + wocWS * (sin(wocKT * 0.83 + wocBPh * 1.37) * 0.35 * wocF2 * ${f(bough)});
+    wocOff.y += sin(wocKT * 1.6 + wocBPh * 0.9) * 0.3 * wocF2 * ${f(bough)};
+    // LEAF: a fast rustle along the card normal, strongest toward the tips
+    float wocFl = sin(wocKT * 6.8 + wocBPh * 2.9 + position.x * 4.1 + position.y * 2.3 + position.z * 3.7)
+      + 0.5 * sin(wocKT * 11.3 + position.x * 7.9 - position.z * 5.3);
+    wocOff += objectNormal * (wocFl * ${f(flutter)} * (0.3 + 0.7 * wocFlex));
+  `;
+  return `${head}${body}
+    transformed += wocOff * wocSwayGate / max(0.0001, ${worldScaleExpr});
+  `;
+}
 
 // Assets the MAKER has turned sway off for (MapDoc.assetSway, projected onto
 // WorldContent.assetSway). Sway is on by default, so this holds only the
@@ -175,10 +301,11 @@ const BUSH_ASSET =
 // beach palms, the dungeon pines, the village trees, the desert tree, and any
 // imported model that calls itself one.
 // SPACEY, 2026-09-20: "sometimes the imposters are the wrong 1s". One cause was
-// here rather than in the imposter system: "s-TREE-tlamp" matched, so placed
-// streetlamps were classified as TREES. They swayed in the wind, and on a
-// lamp-lit map most of what the foliage imposter tier was drawing was street
-// furniture.
+// here rather than in the imposter system: "s-TREE-tlamp" matched, so all 206
+// `props/streetlamp_veiled_crystal` on the Deepglass map were classified as
+// TREES. They swayed in the wind, and they were 206 of the 224 sprite-eligible
+// placements on the map, so most of what the foliage imposter tier was
+// drawing was street furniture.
 const TREE_ASSET =
   /(^|[^a-z])(tree|palm|oak|pine|twisted|birch|willow|cedar|spruce|cypress)([^a-z]|$)/i;
 

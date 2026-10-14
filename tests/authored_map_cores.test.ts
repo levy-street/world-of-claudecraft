@@ -33,6 +33,7 @@ import {
 import { zoneAllowedByResidencyFilter } from '../src/render/authored_map/zone_residency_core';
 import type { EditorLightingProfile } from '../src/render/editor_lighting';
 import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
+import { DEEPGLASS_CENTER, DEEPGLASS_RADIUS } from '../src/sim/deepglass/layout';
 import { groundHeight } from '../src/sim/world';
 
 describe('chase boom (authored maps only)', () => {
@@ -51,6 +52,33 @@ describe('chase boom (authored maps only)', () => {
     expect(easeBoomSolidLimit(4, Number.POSITIVE_INFINITY, 0.5)).toBe(4 + 0.5 * BOOM_SOLID_RELEASE);
   });
 
+  it('holds a flier inside the bell glass and never dollies it', () => {
+    const { input, out } = createChaseBoomScratch(-1);
+    Object.assign(input, {
+      seed: 1,
+      px: DEEPGLASS_CENTER.x,
+      pz: DEEPGLASS_CENTER.z,
+      eyeY: DEEPGLASS_CENTER.y,
+      yaw: 0,
+      pitch: -0.9,
+      dist: 500,
+      ceilingY: Number.POSITIVE_INFINITY,
+      dt: 1 / 60,
+      flying: true,
+    });
+    solveChaseBoom(input, out.solidLimit, out);
+    expect(out.dist).toBeLessThan(DEEPGLASS_RADIUS);
+    expect(out.dist).toBeGreaterThan(DEEPGLASS_RADIUS - 1);
+    const r = Math.hypot(
+      out.x - DEEPGLASS_CENTER.x,
+      out.y - DEEPGLASS_CENTER.y,
+      out.z - DEEPGLASS_CENTER.z,
+    );
+    expect(r).toBeLessThan(DEEPGLASS_RADIUS);
+    // no asset collider stops a flier: the limit only ever eases out
+    expect(out.solidLimit).toBe(Number.POSITIVE_INFINITY);
+  });
+
   it('seats the camera on the solved boom and under the ceiling', () => {
     const { input, out } = createChaseBoomScratch(-1);
     Object.assign(input, {
@@ -63,6 +91,7 @@ describe('chase boom (authored maps only)', () => {
       dist: 12,
       ceilingY: 11,
       dt: 1 / 60,
+      flying: false,
     });
     solveChaseBoom(input, Number.POSITIVE_INFINITY, out);
     expect(out.dist).toBeLessThanOrEqual(12 * (1 - LOOKUP_DOLLY) + 1e-9);
@@ -148,16 +177,17 @@ describe('editor shadow cache', () => {
 });
 
 describe('underworld test', () => {
-  it('is false inside an instance and above the ground', () => {
+  it('is false in the bell, inside an instance, and above the ground', () => {
     const g = groundHeight(0, 0, 1);
-    expect(cameraUnderWorld(0, g + 5, 0, 1)).toBe(false);
-    expect(cameraUnderWorld(DUNGEON_X_THRESHOLD + 1, -1000, 0, 1)).toBe(false);
+    expect(cameraUnderWorld(0, g + 5, 0, 1, false)).toBe(false);
+    expect(cameraUnderWorld(0, g - 10, 0, 1, true)).toBe(false);
+    expect(cameraUnderWorld(DUNGEON_X_THRESHOLD + 1, -1000, 0, 1, false)).toBe(false);
   });
 
   it('is true well under the sheet with no cave or carve in the column', () => {
     const g = groundHeight(0, 0, 1);
-    expect(cameraUnderWorld(0, g - 10, 0, 1)).toBe(true);
-    expect(cameraUnderWorld(0, g - 2, 0, 1)).toBe(false);
+    expect(cameraUnderWorld(0, g - 10, 0, 1, false)).toBe(true);
+    expect(cameraUnderWorld(0, g - 2, 0, 1, false)).toBe(false);
   });
 });
 

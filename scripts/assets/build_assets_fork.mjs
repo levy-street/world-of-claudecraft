@@ -1,6 +1,6 @@
 // FORK copy of build_assets.mjs with one addition: the spec's `keepAttributes`
-// flag (prune keeps vertex attributes no material reads; the Realm Builder
-// monument carries shader DATA in its UVs). Kept as
+// flag (prune keeps vertex attributes no material reads; the Deepglass burner
+// plume and the Realm Builder monument carry shader DATA in their UVs). Kept as
 // a sibling so upstream's build_assets.mjs stays byte-identical: it is an input
 // of the farm-prop / inscription-tome source fingerprints, and any edit there
 // would force every shipped GLB to be re-stamped.
@@ -294,9 +294,10 @@ async function processModel(io, item, outputRoot) {
   }
 
   // keepAttributes: prune strips any vertex attribute no material reads, which
-  // is right for downloaded packs and wrong for a mesh whose UVs are DATA for a
-  // runtime shader, where there is no texture anywhere to tell prune those
-  // channels matter.
+  // is right for downloaded packs and wrong for a mesh whose UVs are DATA, the
+  // burner plume (scripts/assets/deepglass/dg_plume.py) carries its own
+  // along/around/rim parameterisation for a runtime shader, and there is no
+  // texture anywhere to tell prune those channels matter.
   const transforms = [
     resample(),
     prune({

@@ -31,7 +31,7 @@ import { MUSIC_OVERRIDES } from './music_overrides.generated';
 import { closeMusicDirector } from './music_teardown';
 import { composeDungeonGravewyrmSanctum } from './music_theme_gravewyrm_sanctum';
 import { COMBAT_STREAM_URLS, pickCombatTrackIndex } from './music_tracks';
-import { applyZoneStreamTargets } from './music_zone_streams';
+import { type MusicVenue, type VenueTrack, venueLayerFor } from './music_venue_layer';
 import type { MusicZone } from './music_zones';
 
 export type { NoteEvent, Phrase, Theme } from './music_notes';
@@ -4332,6 +4332,7 @@ export class MusicDirector {
       enabled: this._enabled,
       menuPaused: this._menuPaused,
       bossActive: this.bossActive,
+      venueActive: venueLayerFor(this).armed,
       vol: this._vol,
     };
   }
@@ -4358,6 +4359,11 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, on ? 0.4 : 0.7);
     // handing the mix back must revive paused streams now, not a tick later
     if (!on) this.streamKeeper();
+  }
+
+  /** A sports venue's area music (music_venue_layer.ts); the HUD calls it every frame. */
+  setVenueTrack(venue: MusicVenue, track: VenueTrack | null): void {
+    venueLayerFor(this).setTrack(venue, track);
   }
 
   resetForDungeonEntry(dungeonId: string | null, zone?: MusicZone): void {
@@ -4423,6 +4429,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.2);
     }
     this.applyBossPlayback();
+    venueLayerFor(this).apply();
     // leaving volume 0 must revive paused streams now, not a tick later
     if (this.streamsAudible()) this.streamKeeper();
   }
@@ -4452,6 +4459,7 @@ export class MusicDirector {
     this.bossGain = ctx.createGain();
     this.bossGain.gain.value = 0;
     this.bossGain.connect(compressor);
+    venueLayerFor(this).attach(compressor);
 
     // Register both battle themes now (and warm their downloads whenever the
     // mix is audible, see streamKeeper): a fight can start at any moment and
@@ -4588,6 +4596,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.3);
     }
     this.applyBossPlayback();
+    venueLayerFor(this).apply();
     // re-enabling must revive paused streams now, not a keeper tick later
     if (on) this.streamKeeper();
   }
@@ -4607,6 +4616,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
     }
     this.applyBossPlayback();
+    venueLayerFor(this).apply();
   }
 
   /** Restore playback after closing the game menu. */
@@ -4619,6 +4629,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.35);
     }
     this.applyBossPlayback();
+    venueLayerFor(this).apply();
     // closing the menu must revive paused streams now, not a keeper tick later
     this.streamKeeper();
   }
@@ -4652,8 +4663,8 @@ export class MusicDirector {
         }
       }
     }
-    // Combat replaces the zone theme (music_zone_streams.ts).
-    applyZoneStreamTargets(this, zoneChanging, FADE_SECONDS / 3);
+    // Combat replaces the zone theme; a venue cue silences both (the layer).
+    venueLayerFor(this).applyStreamTargets(zoneChanging, FADE_SECONDS / 3);
   }
 }
 

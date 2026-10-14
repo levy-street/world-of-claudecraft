@@ -1,11 +1,12 @@
 // Studio fork content that belongs to AUTHORED maps, never to the built-in world.
 //
 // The Studio merge brought the fork's own game content along with the map
-// editor: the Scorching Wastes roster, Goldcrest Harbor's zone and the
-// map-objectives rehearsal champion. Registered in the built-in lookup tables,
-// every one of those changes the default world: the quest and item rows grow
-// every saved character, and every NPC row is ringed by a terrain calm pad.
-// So the built-in tables stay exactly the release's,
+// editor: the Scorching Wastes roster, Goldcrest Harbor's Deepglass steward,
+// the map-objectives rehearsal champion and the Deepglass venue's roster (the
+// marshal, the crowd, Tidehold's residents, Baldemar's selves, the Tidesow).
+// Registered in the built-in lookup tables, every one of those changes the
+// default world: the quest and item rows grow every saved character, and every
+// NPC row is ringed by a terrain calm pad. So the built-in tables stay exactly the release's,
 // and this overlay is merged into them only while an authored map is the
 // active content (data.ts setActiveWorldContent), then removed again when the
 // built-in world comes back.
@@ -13,7 +14,8 @@
 // Pure leaf over plain records: no rng, no SimContext. data.ts owns the tables
 // and hands them in, so this module never imports data.ts (no value cycle).
 
-import { GOLDCREST_ZONE } from './content/goldcrest';
+import { DEEPGLASS_EVENT_NPCS } from './content/deepglass_event';
+import { GOLDCREST_NPCS, GOLDCREST_ZONE } from './content/goldcrest';
 import { OBJECTIVE_BOT_MOB, OBJECTIVE_BOT_TEMPLATE_ID } from './content/objective_bots';
 import {
   SCORCHING_ITEMS,
@@ -22,22 +24,51 @@ import {
   SCORCHING_QUEST_ORDER,
   SCORCHING_QUESTS,
 } from './content/scorching_wastes';
-import type { DungeonDef, ItemDef, MobTemplate, NpcDef, QuestDef, ZoneDef } from './types';
+import {
+  DEEPBALL_ABILITIES,
+  DEEPGLASS_BALL_MOB,
+  DEEPGLASS_BALL_TEMPLATE_ID,
+} from './deepglass/abilities';
+import { TIDEHOLD_NPCS } from './deepglass/citadel';
+import { DEEPGLASS_MARSHAL } from './deepglass/world';
+import { PORTAL_WIZARD_NPCS } from './portal_wizard';
+import type {
+  AbilityDef,
+  DungeonDef,
+  ItemDef,
+  MobTemplate,
+  NpcDef,
+  QuestDef,
+  ZoneDef,
+} from './types';
 
 /** The Studio records an authored map may resolve by id. */
 export const STUDIO_CONTENT = {
+  // The deepball kit (the Deepglass sport, class-agnostic; no class lists it).
+  // Registered with the venue so the built-in ability inventory stays the
+  // release's.
+  abilities: { ...DEEPBALL_ABILITIES } as Record<string, AbilityDef>,
   items: { ...SCORCHING_ITEMS } as Record<string, ItemDef>,
   mobs: {
     ...SCORCHING_MOBS,
     [OBJECTIVE_BOT_TEMPLATE_ID]: OBJECTIVE_BOT_MOB,
+    // The Deepglass Tidesow: an inert ball entity the match driver spawns.
+    [DEEPGLASS_BALL_TEMPLATE_ID]: DEEPGLASS_BALL_MOB,
   } as Record<string, MobTemplate>,
   // All dynamic: the authored map that wants them places them itself, and
   // every reader that resolves an NPC by templateId (nameplates, gossip flags,
-  // vendor stock) finds the row here. The built-in NPC table is read by more
-  // than lookups (the terrain calm pads ring every row in it,
-  // terrain_calm_anchors.ts), so a dynamic row there would still reshape the
-  // default world's ground.
-  npcs: { ...SCORCHING_NPCS } as Record<string, NpcDef>,
+  // vendor stock) finds the row here. The Deepglass roster rides this overlay
+  // too: the built-in NPC table is read by more than lookups (the terrain calm
+  // pads ring every row in it, terrain_calm_anchors.ts), so a dynamic row
+  // there still reshapes the default world's ground.
+  npcs: {
+    ...SCORCHING_NPCS,
+    ...GOLDCREST_NPCS,
+    [DEEPGLASS_MARSHAL.id]: DEEPGLASS_MARSHAL,
+    ...PORTAL_WIZARD_NPCS,
+    ...DEEPGLASS_EVENT_NPCS,
+    ...TIDEHOLD_NPCS,
+  } as Record<string, NpcDef>,
   quests: { ...SCORCHING_QUESTS } as Record<string, QuestDef>,
   questOrder: [...SCORCHING_QUEST_ORDER] as readonly string[],
   // No Studio dungeon is registered today; the slot (and its list/index
@@ -53,6 +84,7 @@ export const STUDIO_CONTENT = {
 
 /** The live tables the overlay writes into (data.ts passes its own). */
 export interface StudioOverlayTables {
+  abilities: Record<string, AbilityDef>;
   items: Record<string, ItemDef>;
   mobs: Record<string, MobTemplate>;
   npcs: Record<string, NpcDef>;
@@ -65,6 +97,7 @@ export interface StudioOverlayTables {
 }
 
 interface Installed {
+  abilities: string[];
   items: string[];
   mobs: string[];
   npcs: string[];
@@ -112,6 +145,7 @@ export function setStudioOverlay(tables: StudioOverlayTables, on: boolean): void
   if (on === (installed !== null)) return;
   if (on) {
     const next: Installed = {
+      abilities: addMissing(tables.abilities, STUDIO_CONTENT.abilities),
       items: addMissing(tables.items, STUDIO_CONTENT.items),
       mobs: addMissing(tables.mobs, STUDIO_CONTENT.mobs),
       npcs: addMissing(tables.npcs, STUDIO_CONTENT.npcs),
@@ -157,6 +191,7 @@ export function setStudioOverlay(tables: StudioOverlayTables, on: boolean): void
     const at = tables.questOrder.indexOf(id);
     if (at >= 0) tables.questOrder.splice(at, 1);
   }
+  removeIds(tables.abilities, prev.abilities);
   removeIds(tables.items, prev.items);
   removeIds(tables.mobs, prev.mobs);
   removeIds(tables.npcs, prev.npcs);

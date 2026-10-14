@@ -6,6 +6,7 @@ import { MOUNT_SKIN_IDS } from './content/mount_skins';
 import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID } from './data';
+import { endDeepglassMatch, startDeepglassMatch } from './deepglass/match';
 import { isBalgathDevLootCommand, runBalgathDevLoot } from './dev/balgath_dev_loot';
 import {
   BALGATH_DEV_MECHANICS,
@@ -750,6 +751,32 @@ export function handleDevChat(
     }
     const meta = ctx.players.get(pid);
     if (meta) queueGatheringGrant(meta, professionId, amount);
+    return null;
+  }
+
+  // Deepball at the Deepglass. "/deepglass [perSide]" seats you in team A,
+  // fills both sides with bots, drops the Tidesow at the bell's centre and
+  // blows the whistle; "/deepglass end" tears it down. Only meaningful in the
+  // arena world (?map=deepglass), which is the gate below.
+  const dgMatch = /^\/(?:dev\s+)?deepglass(?:\s+(end|\d))?\s*$/i.exec(raw);
+  if (dgMatch) {
+    if (getActiveWorldContent().presentationMode !== 'deepglass') {
+      ctx.error(pid, '[dev] Not at the Deepglass. Boot the arena with ?map=deepglass.');
+      return null;
+    }
+    if (dgMatch[1]?.toLowerCase() === 'end') {
+      endDeepglassMatch(ctx);
+      emitDevLog(ctx, pid, '[dev] The bell is drained. Bout over.');
+      return null;
+    }
+    const perSide = clampInteger(Number(dgMatch[1] ?? 3), 1, 5);
+    const m = startDeepglassMatch(ctx, pid, perSide);
+    emitDevLog(
+      ctx,
+      pid,
+      `[dev] Deepball ${perSide}v${perSide}. Space boosts, look up/down to climb and dive, ` +
+        `fly into the Tidesow to carry it. ${m.teamA.length}v${m.teamB.length} seated.`,
+    );
     return null;
   }
 

@@ -1,6 +1,6 @@
-// The Studio-merge sim lines re-localize on the client: the authored-map flag
-// rehearsal's announcements and flag names
-// (src/sim/social/map_objectives_run.ts). Every
+// The Studio-merge sim lines re-localize on the client: the Tidehold deed
+// refusals (src/sim/plots.ts buyPlot) and the authored-map flag rehearsal's
+// announcements and flag names (src/sim/social/map_objectives_run.ts). Every
 // line is harvested from the REAL sim path, then run through the real client
 // matchers, so a rewording on either side fails here and not in a player's log.
 //
@@ -12,16 +12,92 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { customMapToWorldContent } from '../src/editor/custom_map';
 import { thornhollowMap } from '../src/editor/shipped_thornhollow';
 import { setActiveWorldContent } from '../src/sim/data';
+import { RING_PLOT_DEEDS } from '../src/sim/deepglass/citadel_ring';
+import { buildDeepglassWorld } from '../src/sim/deepglass/world';
+import { plotSignEntityId } from '../src/sim/plots';
 import { Sim } from '../src/sim/sim';
 import { mapObjectiveFlagAction, objectiveRun } from '../src/sim/social/map_objectives_run';
-import type { Entity } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 import { entityDisplayName } from '../src/ui/entity_display_core';
+import { type ErrorTextLockoutDeps, localizeErrorText } from '../src/ui/error_text_i18n_core';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import { localizeSimText } from '../src/ui/sim_i18n';
+
+const deps: ErrorTextLockoutDeps = {
+  raidLockouts: () => [],
+  formatLockoutDuration: (ms) => `<${ms}ms>`,
+};
 
 afterEach(() => {
   setLanguage('en');
   setActiveWorldContent(null);
+});
+
+function errors(sim: Sim): string[] {
+  return sim
+    .drainEvents()
+    .filter((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error')
+    .map((e) => e.text);
+}
+
+describe('Tidehold deed refusals', () => {
+  function plotSim() {
+    setActiveWorldContent(buildDeepglassWorld());
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: true,
+      world: buildDeepglassWorld(),
+    });
+    const sign = sim.entities.get(plotSignEntityId(0)) as Entity;
+    const p = sim.entities.get(sim.primaryId) as Entity;
+    p.pos = { x: sign.pos.x + 1.5, y: sign.pos.y, z: sign.pos.z };
+    sim.drainEvents();
+    const meta = sim.meta(sim.primaryId);
+    if (!meta) throw new Error('no player meta');
+    return { sim, sign, meta };
+  }
+
+  it('emits the three refusals the client matcher resolves to their keys', () => {
+    const { sim, sign, meta } = plotSim();
+    const deed = RING_PLOT_DEEDS[0];
+
+    expect(sim.buyPlot(deed.id)).toBe(false);
+    const [poor] = errors(sim);
+    expect(poor).toBe("You can't afford this plot.");
+    expect(localizeErrorText(poor, deps)).toBe(t('hudChrome.plotSign.errCannotAfford'));
+
+    meta.copper = deed.priceCopper * 2;
+    expect(sim.buyPlot(deed.id)).toBe(true);
+    sim.drainEvents();
+    expect(sim.buyPlot(deed.id)).toBe(false);
+    const [held] = errors(sim);
+    expect(held).toBe('You already hold this deed.');
+    expect(localizeErrorText(held, deps)).toBe(t('hudChrome.plotSign.errAlreadyHeld'));
+
+    // Another character holds it: the sign carries their name.
+    meta.ownedPlots = [];
+    sign.plotOwner = { characterId: 987_654, name: 'Wren' };
+    expect(sim.buyPlot(deed.id)).toBe(false);
+    const [other] = errors(sim);
+    expect(other).toBe('Wren holds this deed.');
+    expect(localizeErrorText(other, deps)).toBe(
+      t('hudChrome.plotSign.errHeldBy', { name: 'Wren' }),
+    );
+    expect(t('hudChrome.plotSign.errHeldBy', { name: 'Wren' })).toBe('Wren holds this deed.');
+  });
+
+  it('refuses a deed whose reserved sign id holds something that is not a plot sign', () => {
+    const { sim, sign, meta } = plotSim();
+    const deed = RING_PLOT_DEEDS[0];
+    meta.copper = deed.priceCopper + 5;
+    sign.templateId = 'not_a_plot_sign';
+    expect(sim.buyPlot(deed.id)).toBe(false);
+    expect(meta.copper).toBe(deed.priceCopper + 5);
+    expect(meta.ownedPlots ?? []).toEqual([]);
+    expect(sign.plotOwner ?? null).toBeNull();
+    expect(sim.drainEvents().some((e) => e.type === 'plotSign')).toBe(false);
+  });
 });
 
 describe('authored-map flag rehearsal text', () => {

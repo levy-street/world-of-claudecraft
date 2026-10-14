@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Input } from '../src/game/input';
+import { deepballAimFromPitch, Input } from '../src/game/input';
 import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
 import { Keybinds } from '../src/game/keybinds';
 
@@ -569,8 +569,11 @@ describe('Input autorun', () => {
       strafeLeft: false,
       strafeRight: false,
       jump: false,
+      boost: false,
+      dash: false,
       dive: false,
       surface: false,
+      aimPitch: undefined,
     });
     expect(cb.onAbilityUp).toHaveBeenCalledWith(0);
   });
@@ -2592,6 +2595,37 @@ describe('Input mouse-button bindings', () => {
 
     expect(cb.onAbilityDown).toHaveBeenLastCalledWith(3);
     expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
+  });
+});
+
+describe('deepball aim', () => {
+  it('reads the camera as an aim: negated, and measured from the resting pitch', () => {
+    // camPitch is POSITIVE looking down and RESTS at 0.32, so a player who has
+    // touched nothing must be aimed level, not 18 degrees into the floor.
+    expect(deepballAimFromPitch(0.32)).toBeCloseTo(0, 2);
+    expect(deepballAimFromPitch(1.32)).toBeLessThan(-0.9); // looking down aims down
+    expect(deepballAimFromPitch(-0.4)).toBeGreaterThan(0.6); // looking up aims up
+    // Clamped, and quantised so it does not resend the input frame on every
+    // mouse-move.
+    expect(deepballAimFromPitch(99)).toBeCloseTo(-1.35, 1);
+    expect(deepballAimFromPitch(-99)).toBeCloseTo(1.35, 1);
+    const q = deepballAimFromPitch(0.7);
+    expect(q).toBe(deepballAimFromPitch(0.7 + 1e-4));
+  });
+
+  it('sends the aim only in the bell, and stops the swim bands writing the vertical axis', () => {
+    const { input } = makeInput();
+    expect(input.readMoveInput().aimPitch).toBeUndefined();
+
+    input.deepballFlight = true;
+    input.camPitch = 1.2;
+    // The bands would latch a dive here (a steering look past SWIM_LOOK_DOWN
+    // while moving); in the bell that axis belongs to Ctrl alone.
+    const mi = input.readMoveInput();
+    expect(mi.aimPitch).toBeDefined();
+    expect(mi.dive).toBe(false);
+    expect(mi.surface).toBe(false);
+    expect(mi.swimSteer).toBe(1);
   });
 });
 

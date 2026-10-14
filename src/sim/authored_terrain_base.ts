@@ -2,7 +2,7 @@
 // before the maker's sculpt edits (terrain_edit_layer.ts) land on top. The
 // editor writes these fields; the sim reads them here so world.ts (at its
 // monolith ceiling) stays a thin consumer:
-//   - a presentation map (blank, interior, ...) is a FLAT SLATE at
+//   - a presentation map (blank, interior, Deepglass, ...) is a FLAT SLATE at
 //     y 0, unless the maker ran Generate Terrain (`terrainBase`): then the base
 //     is the shipped world's natural heightfield sampled at the picked offset
 //     (raw baseHeight: zone shapes, lakes, coasts, without the built-in camps,
@@ -42,6 +42,9 @@ export function authoredSlateBase(
 ): number | undefined {
   const active = getActiveWorldContent();
   if (!isAuthoredMapPresentation(active.presentationMode)) return undefined;
+  // The published Deepglass map was authored over the shipped heightfield (the
+  // slate was missing when it was made), so its unstamped ground keeps that look.
+  if (active.presentationMode === 'deepglass') return undefined;
   const tb = active.terrainBase;
   return tb ? baseHeight(x + tb.x, z + tb.z, seed) : 0;
 }

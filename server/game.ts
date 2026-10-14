@@ -6304,6 +6304,9 @@ export class GameServer {
       case 'pickup':
         this.sendCommandOutcome(session, msg, objectCmds.pickupCommandOutcome(sim, msg, pid));
         break;
+      case 'buyplot':
+        this.sendCommandOutcome(session, msg, objectCmds.buyPlotCommandOutcome(sim, msg, pid));
+        break;
       case 'accept':
         if (questWire.acceptQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;

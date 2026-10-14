@@ -1,5 +1,5 @@
 // Cave tube distance culling (render/cave_tube_lod.ts): a mine under a
-// mountain draws only while the camera is near it. SPACEY (authored mines):
+// mountain draws only while the camera is near it. SPACEY (Deepglass mines):
 // "insure the performance stays good, the cave only renders when you're close".
 
 import { readFileSync } from 'node:fs';

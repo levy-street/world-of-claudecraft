@@ -52,8 +52,10 @@ describe('ClientWorld neutralizeInputForClientPause', () => {
       strafeLeft: false,
       strafeRight: false,
       jump: false,
+      boost: false,
       dive: false,
       surface: false,
+      swimSteer: undefined,
     });
     expect(sent).toHaveLength(1);
     expect(JSON.parse(sent[0])).toEqual({

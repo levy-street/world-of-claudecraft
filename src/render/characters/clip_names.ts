@@ -46,6 +46,8 @@ function clipMapNames(c: ClipMap): string[] {
     c.swim,
     c.swimSurface,
     c.swimIdle,
+    // the Studio's burner glide (desiredBaseState reaches it only while gliding)
+    c.glide,
     c.wade,
     c.jump,
     c.jumpMoving,

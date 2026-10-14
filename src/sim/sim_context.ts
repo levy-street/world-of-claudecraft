@@ -109,13 +109,17 @@ export type RuntimeSimConfig = Required<
     | 'storagePrices'
     | 'vaultConsumptionAdmission'
     | 'courierBankExchange'
+    | 'playerStartOverride'
     | 'gathererIdentity'
     // Deliberately NOT defaulted: undefined is the "no day/night clock" world
     // (dayNightPhase() answers null), which tests and the RL env rely on.
     | 'dayNightNowMs'
   >
 > &
-  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'> & {
+  Pick<
+    SimConfig,
+    'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs' | 'playerStartOverride'
+  > & {
     vaultOpenNeedsSave?: boolean;
     vaultRewardNeedsSave?: boolean;
   };
@@ -1071,7 +1075,15 @@ export interface SimContextCallbacks {
   // Dev-only test-dummy spawner backing "/dev bot <name>" (handleDevChat, gated by
   // devCommands). Adds a stationary whisperable player near the primary; returns the
   // new pid, or -1 if the name is blank or already taken. Stays on Sim.
-  spawnDevBot(name: string): number;
+  // `cls` varies the bot's visual (visualKeyFor keys off the class templateId);
+  // omitted keeps the historical mage. Optional, so the member count the
+  // IWORLD_MEMBERS guard pins is unchanged.
+  spawnDevBot(name: string, cls?: PlayerClass): number;
+  // Fully remove a dev bot spawned above: entity AND player meta. Deepball's
+  // final whistle uses it, dropEntity alone leaves the meta in ctx.players,
+  // which permanently burns the bot's name and drains the roster a seat per
+  // bout (the "3v3, 3v3, 1v3" bug). Backed by Sim.removePlayer.
+  removeDevBot(pid: number): void;
   // /dev vendor: spawn the free-epic dev vendor next to the caller. Returns id or -1.
   spawnDevVendor(pid?: number): number;
   // /dev cascade: set up the controlled Cascada temporal playtest scenario (dummy +
@@ -1827,6 +1839,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     setPlayerLevel: host.setPlayerLevel,
     notice: host.notice,
     spawnDevBot: host.spawnDevBot,
+    removeDevBot: host.removeDevBot,
     spawnDevVendor: host.spawnDevVendor,
     startCascadePlaytest: host.startCascadePlaytest,
     startDevSandbox: host.startDevSandbox,

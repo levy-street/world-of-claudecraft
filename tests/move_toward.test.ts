@@ -3,10 +3,11 @@
 // thin delegate). Pins the delegate wiring and the arms a move must keep:
 // arrival, a speed-bounded step on open ground, the release's zero-step floor
 // snap on the built-in world, and the authored-map immobile hold that keeps a
-// body something else owns where its owner put it.
+// physics-owned body (the Tidesow) where its owner put it.
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { BUILTIN_WORLD, MOBS, PLAYER_START, setActiveWorldContent } from '../src/sim/data';
+import { MOBS, PLAYER_START, setActiveWorldContent } from '../src/sim/data';
+import { buildDeepglassWorld } from '../src/sim/deepglass/world';
 import { createMob } from '../src/sim/entity';
 import { MOVE_SLIDE_FAN, moveTowardImpl } from '../src/sim/mob/move_toward';
 import { Sim } from '../src/sim/sim';
@@ -77,10 +78,13 @@ describe('moveTowardImpl', () => {
   });
 
   it('holds an immobile body where it is on an authored map, turning only', () => {
-    // A map document over the shipped world: an authored map.
-    const world = { ...BUILTIN_WORLD, placements: [] };
-    setActiveWorldContent(world);
-    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true, world });
+    setActiveWorldContent(buildDeepglassWorld());
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: buildDeepglassWorld(),
+    });
     const e = mobAt(sim, 900_006, 0, 0);
     e.pos = { x: e.pos.x, y: e.pos.y + 30, z: e.pos.z };
     const before = { ...e.pos };

@@ -4,7 +4,7 @@
 // so the draw cost was never the problem: the point is that a mine dug under
 // a mountain is INVISIBLE from outside except at its mouths, yet every tube
 // was submitted (and shadow-cast) from anywhere on the map. SPACEY's rule for
-// authored mines: "the cave only renders when you're close". Each tube
+// the Deepglass mines: "the cave only renders when you're close". Each tube
 // hides once its footprint is further than CAVE_TUBE_VIEW_FAR from the
 // camera, measured to the nearest point of its XZ bounds so a long gallery
 // you are standing in never culls because its far end is far.

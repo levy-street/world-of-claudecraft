@@ -1,0 +1,22 @@
+{
+  "defaults": {
+    "type": "static"
+  },
+  "items": [
+    {
+      "src": "tmp/asset_src/deepglass/bridge_deck.glb",
+      "out": "models/deepglass/bridge_deck.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/bridge_lamp.glb",
+      "out": "models/deepglass/bridge_lamp.glb",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/deepglass/bridge_pylon.glb",
+      "out": "models/deepglass/bridge_pylon.glb",
+      "maxTex": 1024
+    }
+  ]
+}

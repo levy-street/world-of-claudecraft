@@ -1,10 +1,12 @@
 // Share identical KTX2 textures across a kit's GLBs.
 //
-// The Tidehold town kit takes part (houses, taverns, smithy, market, hall,
-// shops and their Edit-pieces twins; scripts/assets/blender_tidehold/bl_town.py).
-// It is built from ONE set of tiling maps and one detail atlas, but a GLB
-// embeds its own copy of every map it wears, and the loader keeps each GLB's
-// textures to itself: the same 1024 ashlar was on the GPU once per piece, ~45 MB of copies
+// Two kits take part: the Deepglass arena kit (arena_*.glb, bell_frame.glb,
+// bridge_*.glb; bl_dg_arena.py and dg_bridge.py) and the Tidehold town kit
+// (houses, taverns, smithy, market, hall, shops and their Edit-pieces twins;
+// scripts/assets/blender_tidehold/bl_town.py). Each is built from ONE set of
+// tiling maps and one detail atlas, but a GLB embeds its own
+// copy of every map it wears, and the loader keeps each GLB's textures to
+// itself: the same 1024 ashlar was on the GPU once per piece, ~45 MB of copies
 // across the kit. After a kit GLB parses, this swaps each texture for the
 // first byte-identical one already loaded and drops the copy before it is
 // ever uploaded.
@@ -19,7 +21,7 @@ import { dismissKtx2Source } from './ktx2_mip_release';
 // placed_texture_tier_core.ts) take part too: the leaf sheets are the same
 // bytes in every building of one tier.
 const KIT_URL =
-  /\/tidehold\/(?:house_[a-e]|tavern(?:_b)?|smithy|market|hall|shop_[ab]|bank)(?:\.parts)?(?:\.(?:half|quarter))?(?:\.[0-9a-f]+)?\.glb$/i;
+  /\/(?:deepglass\/(?:arena_|bell_frame|bridge_)[a-z0-9_]*|tidehold\/(?:house_[a-e]|tavern(?:_b)?|smithy|market|hall|shop_[ab]|bank)(?:\.parts)?(?:\.(?:half|quarter))?)(?:\.[0-9a-f]+)?\.glb$/i;
 
 export function isSharedKitTextureUrl(url: string): boolean {
   return KIT_URL.test(url.split('?')[0]);

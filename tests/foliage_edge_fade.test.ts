@@ -1,4 +1,4 @@
-// Edge-on fade for the kit foliage's cutout cards
+// Edge-on fade for the Deepglass foliage kits' cutout cards
 // (src/render/assets/foliage_edge_fade.ts): scoped to `Leaves_dg_*`
 // materials, injected before the alpha test, and CHAINED by the placed-asset
 // sway rather than replaced by it.
@@ -27,7 +27,7 @@ function scene(name: string) {
 }
 
 describe('foliage edge fade', () => {
-  it('applies only to the kit foliage', () => {
+  it('applies only to the Deepglass foliage kits', () => {
     expect(isEdgeFadeFoliage('Leaves_dg_pine')).toBe(true);
     expect(isEdgeFadeFoliage('Leaves_dg_bloom')).toBe(true);
     expect(isEdgeFadeFoliage('Leaves')).toBe(false);

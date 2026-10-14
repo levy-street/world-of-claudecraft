@@ -4898,7 +4898,13 @@ describe('Guide professions pages and routes', () => {
     expect(body).toContain('the rare grimoire takes two goldleaf besides its sunpetal');
     // The closing sentence: no counter stocks the herbs, the dust or the
     // gourd, and the vial is bought. Derived from the live vendor rosters.
-    const stocked = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
+    // FORK: Tidehold's reagent stall (th_market_reagents) deliberately sells the
+    // two low herbs; the release's own counters keep the gathered-only rule.
+    const stocked = new Set(
+      Object.values(NPCS)
+        .filter((n) => !n.id.startsWith('th_'))
+        .flatMap((n) => n.vendorItems ?? []),
+    );
     for (const id of [
       'silverleaf_herb',
       'goldleaf_herb',

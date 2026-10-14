@@ -65,9 +65,11 @@ import {
 import {
   BIND_ACTIONS,
   BIND_CATEGORIES,
+  bindActionLive,
   bindRefusalReason,
   type Keybinds,
   keyLabel,
+  liveBindActions,
 } from '../game/keybinds';
 import { isNativeAppShell, useTouchInterface } from '../game/mobile_controls';
 import { music } from '../game/music';
@@ -2186,6 +2188,7 @@ export class OptionsWindow {
       bindings: () => {
         const snapshot = this.deps.keybinds().snapshot();
         if (!attackMoveOn()) delete snapshot.attackMove;
+        for (const id of Object.keys(snapshot)) if (!bindActionLive(id)) delete snapshot[id];
         return snapshot;
       },
       actionName: name,
@@ -2216,13 +2219,15 @@ export class OptionsWindow {
               }
             },
             assignable: () =>
-              BIND_ACTIONS.filter((a) => attackMoveOn() || a.id !== 'attackMove').map((a) => ({
-                id: a.id,
-                label: t('hudChrome.keyboardMap.assignOption', {
-                  category: categoryLabel(a.category),
-                  action: name(a.id),
-                }),
-              })),
+              liveBindActions()
+                .filter((a) => attackMoveOn() || a.id !== 'attackMove')
+                .map((a) => ({
+                  id: a.id,
+                  label: t('hudChrome.keyboardMap.assignOption', {
+                    category: categoryLabel(a.category),
+                    action: name(a.id),
+                  }),
+                })),
             buildDropdown: (options, current, onChange, placeholder, a11y) =>
               this.deps.buildDropdown(options, current, onChange, placeholder, a11y),
           }
@@ -2247,7 +2252,7 @@ export class OptionsWindow {
       { value: GAMEPAD_ZOOM_IN, label: t('hudChrome.controller.zoomIn') },
       { value: GAMEPAD_ZOOM_OUT, label: t('hudChrome.controller.zoomOut') },
     ];
-    for (const a of BIND_ACTIONS) {
+    for (const a of liveBindActions()) {
       if (a.id === 'attackMove') continue; // mode-gated; not a useful pad default
       // Runtime suppresses flat action-bar slots while the cross hotbar is on,
       // so do not offer a binding that would be accepted here but never fire.
@@ -2650,7 +2655,7 @@ export class OptionsWindow {
         cols.appendChild(col);
         continue;
       }
-      const visible = BIND_ACTIONS.filter(
+      const visible = liveBindActions().filter(
         (a) => a.category === category && (a.id !== 'attackMove' || attackMoveOn),
       );
       if (visible.length === 0) continue;

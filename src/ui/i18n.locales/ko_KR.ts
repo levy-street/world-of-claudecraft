@@ -16407,6 +16407,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': '중앙',
   'hudChrome.breath.label': '숨',
   'hudChrome.breath.drowning': '익사 중!',
+  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
+  // non-Latin locales per src/ui/CLAUDE.md).
+  'hudChrome.portalWizard.gossipDeepglass': '딥글라스로 가는 길을 열어 주세요',
+  'hudChrome.portalWizard.gossipDeepglassAria': '발데마르에게 딥글라스로 가는 차원문을 요청합니다',
+  'hudChrome.portalWizard.gossipHome': '집으로 가는 길을 열어 주세요',
+  'hudChrome.portalWizard.gossipHomeAria': '발데마르에게 마을로 돌아가는 차원문을 요청합니다',
+  'hudChrome.portalWizard.portalOpen': '차원문이 열렸습니다. 걸어 들어가세요.',
   'abilityUi.resources.devotion': '헌신',
   'abilityUi.resources.focus': '집중',
   'abilityUi.tooltip.requiresStealthSkulduggery':

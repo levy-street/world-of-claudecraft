@@ -8,6 +8,7 @@ import {
   easeMovementVisualOffset,
 } from '../src/game/movement_visual';
 import { clickPlacedMover, pickPlacedMoverAt } from '../src/game/placed_mover_input';
+import { studioGossipDeps } from '../src/ui/hud/quest/studio_gossip_hooks';
 
 // Studio (authored-map) presentation changes are gated so the built-in world
 // plays exactly like the release. Each gate below has both arms pinned: the
@@ -123,5 +124,31 @@ describe('placed mover input', () => {
   it('picks the mover on an authored map', () => {
     const r = renderer();
     expect(pickPlacedMoverAt(r, 10, 10, false)).toBe(hit);
+  });
+});
+
+describe('studioGossipDeps', () => {
+  it('forwards each row to the hook wired at click time, and is inert unwired', () => {
+    const hooks: Parameters<typeof studioGossipDeps>[0] = {};
+    const deps = studioGossipDeps(hooks);
+    expect(() => {
+      deps.travelToDeepglass();
+      deps.startDeepglassBout(2);
+      deps.summonWizardPortal(9);
+    }).not.toThrow();
+    const travel = vi.fn();
+    const bout = vi.fn();
+    const portal = vi.fn();
+    Object.assign(hooks, {
+      travelToDeepglass: travel,
+      startDeepglassBout: bout,
+      summonWizardPortal: portal,
+    });
+    deps.travelToDeepglass();
+    deps.startDeepglassBout(3);
+    deps.summonWizardPortal(42);
+    expect(travel).toHaveBeenCalledTimes(1);
+    expect(bout).toHaveBeenCalledWith(3);
+    expect(portal).toHaveBeenCalledWith(42);
   });
 });

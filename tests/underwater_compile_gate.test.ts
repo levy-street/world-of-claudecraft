@@ -436,7 +436,7 @@ describe('renderer wiring', () => {
 
   it('drives the view from the player position on both frame paths', () => {
     const calls = source.match(
-      /this\.underwaterView\.frame\(\s*this\.camera,\s*this\.scene,\s*p\.pos,\s*this\.sim\.cfg\.seed,\s*dt,?\s*\)/g,
+      /this\.underwaterView\.frame\(\s*this\.camera,\s*this\.scene,\s*p\.pos,\s*this\.sim\.cfg\.seed,\s*dt,\s*this\.deepglassCityCull\(\) !== null,?\s*\)/g,
     );
     expect(calls).toHaveLength(2);
   });

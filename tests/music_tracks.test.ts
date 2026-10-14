@@ -137,6 +137,7 @@ describe('remastered soundtrack catalog', () => {
       'ember',
       'frost',
       'amber',
+      'tidehold',
       'fen',
       'night',
       'haunt',

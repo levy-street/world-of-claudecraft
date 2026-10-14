@@ -1,0 +1,22 @@
+{
+  "defaults": {
+    "type": "static"
+  },
+  "items": [
+    {
+      "src": "tmp/asset_src/deepglass/stair_flight_38.glb",
+      "out": "models/deepglass/stair_flight_38.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/stair_flight_43.glb",
+      "out": "models/deepglass/stair_flight_43.glb",
+      "maxTex": 2048
+    },
+    {
+      "src": "tmp/asset_src/deepglass/stair_flight_16.glb",
+      "out": "models/deepglass/stair_flight_16.glb",
+      "maxTex": 2048
+    }
+  ]
+}

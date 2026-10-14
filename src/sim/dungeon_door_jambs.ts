@@ -7,10 +7,16 @@
 // jambs, and the four built entrances, each its own door: the Sunken
 // Bastion's Drowned Gate Tower, the Hollow Crypt's Fallen Chapel, the Drowned
 // Temple's Moon Stair and the Wildheart Basin's Jaguar Maw (the
-// *_entrance.ts modules beside this one). Extracted from colliders.ts under
-// the monolith ratchet; the caller passes its camera-top resolver.
+// *_entrance.ts modules beside this one). The four built entrances are
+// overworld SITE dressing (sim/map_presentation.ts usesOverworldSiteDressing):
+// on an authored map (the Deepglass's Tidehold puts Castle B's wall-walk
+// flight where the Drowned Gate Tower's curtain stands) their doors keep the
+// plain jambs every authored map has always had, and the renderer draws no
+// set piece there either (render/static_world_features.ts). Extracted from
+// colliders.ts under the monolith ratchet; the caller passes its camera-top
+// resolver.
 import type { Collider } from './colliders';
-import { DUNGEON_LIST } from './data';
+import { DUNGEON_LIST, getActiveWorldContent } from './data';
 import {
   DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID,
   drownedTempleEntranceColliders,
@@ -19,6 +25,7 @@ import {
   HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID,
   hollowCryptEntranceColliders,
 } from './hollow_crypt_entrance';
+import { usesOverworldSiteDressing } from './map_presentation';
 import {
   DOOR_ARCH_HEIGHT,
   DOOR_ARCH_JAMB_HD,
@@ -41,6 +48,7 @@ export function dungeonDoorJambColliders(
 ): Collider[] {
   const out: Collider[] = [];
   const doorSpots = new Set<string>();
+  const builtEntrances = usesOverworldSiteDressing(getActiveWorldContent().presentationMode);
   for (const dungeon of DUNGEON_LIST) {
     if (dungeon.overworldDoor === false) continue;
     if (dungeon.id === 'nythraxis_crypt') continue;
@@ -51,19 +59,19 @@ export function dungeonDoorJambColliders(
       out.push(...sanctumSealGateColliders(seed, dungeon.doorPos));
       continue;
     }
-    if (dungeon.id === SUNKEN_BASTION_ENTRANCE_DUNGEON_ID) {
+    if (builtEntrances && dungeon.id === SUNKEN_BASTION_ENTRANCE_DUNGEON_ID) {
       out.push(...sunkenBastionEntranceColliders(seed, dungeon.doorPos));
       continue;
     }
-    if (dungeon.id === HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID) {
+    if (builtEntrances && dungeon.id === HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID) {
       out.push(...hollowCryptEntranceColliders(seed, dungeon.doorPos));
       continue;
     }
-    if (dungeon.id === DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID) {
+    if (builtEntrances && dungeon.id === DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID) {
       out.push(...drownedTempleEntranceColliders(seed, dungeon.doorPos));
       continue;
     }
-    if (dungeon.id === WILDHEART_BASIN_ENTRANCE_DUNGEON_ID) {
+    if (builtEntrances && dungeon.id === WILDHEART_BASIN_ENTRANCE_DUNGEON_ID) {
       out.push(...wildheartBasinEntranceColliders(seed, dungeon.doorPos));
       continue;
     }

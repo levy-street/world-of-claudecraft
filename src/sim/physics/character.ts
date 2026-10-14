@@ -70,8 +70,8 @@ import { overlapCollider, SKIN_WIDTH, sweepCollider } from './sweep';
  *
  * This constant is the built-in world's value. The kernel reads the band for
  * the ACTIVE content (traversal_band.ts): the Studio raised it to 1.0 for its
- * authored maps (a galleon deck fitting stood 0.93 above the deck plane and
- * became an unclimbable kerb), so an authored map strides 1.0 while
+ * authored maps (a Deepglass galleon deck fitting stood 0.93 above the deck
+ * plane and became an unclimbable kerb), so an authored map strides 1.0 while
  * the default world keeps the release's 0.9.
  */
 export const MAX_STEP_HEIGHT = 0.9;

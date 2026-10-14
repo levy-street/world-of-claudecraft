@@ -1,20 +1,34 @@
 // Grass sways only while it is VISIBLE, not to a fixed 50 yd (SPACEY,
 // 2026-09-24: "for the grass we dont need animations at 50 yds only when they
 // are visiable"): each grass system's own fade or cull gates its wind, and
-// every one runs on the slowed clock (tree_sway.ts GRASS_WIND_TIME_SCALE).
+// every one runs on the kit's slowed clock (tree_sway.ts GRASS_WIND_TIME_SCALE).
 
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { bladeSwayGlsl } from '../src/render/blade_grass';
 import { grassTuftWindGlsl } from '../src/render/grass_tuft_wind';
-import { GRASS_WIND_TIME_SCALE } from '../src/render/tree_sway';
+import { attachPlacedTreeSway } from '../src/render/placed_assets';
+import {
+  GRASS_WIND_TIME_SCALE,
+  KIT_WIND_TIME_SCALE,
+  treeSwayWaveGlsl,
+} from '../src/render/tree_sway';
 
+const VERT = '#include <common>\nvoid main() {\n#include <begin_vertex>\n}';
+const FRAG = 'void main() {\n#include <alphatest_fragment>\n}';
 const src = (file: string): string =>
   readFileSync(new URL(`../src/render/${file}`, import.meta.url), 'utf8');
 
+function compileVertex(mat: THREE.Material): string {
+  const sh = { vertexShader: VERT, fragmentShader: FRAG, uniforms: {} };
+  mat.onBeforeCompile(sh as never, {} as never);
+  return sh.vertexShader;
+}
+
 describe('grass wind is gated by visibility', () => {
-  it('runs on the slowed clock', () => {
-    expect(GRASS_WIND_TIME_SCALE).toBeCloseTo(0.49, 5);
+  it('shares the kit slowed clock', () => {
+    expect(GRASS_WIND_TIME_SCALE).toBe(KIT_WIND_TIME_SCALE);
   });
 
   it('blade carpet and far band: one sway, branched around once the fade collapses a blade', () => {
@@ -71,5 +85,20 @@ describe('grass wind is gated by visibility', () => {
     const s = src('grass_patch.ts');
     expect(s).toContain('float grassT = uTime * $' + '{GRASS_WIND_TIME_SCALE.toFixed(4)};');
     expect(s).not.toContain('sin(uTime * 1.7');
+  });
+
+  it('placed kit grass sways wherever it draws; kit shrubs keep the 50 yd gate', () => {
+    expect(treeSwayWaveGlsl('uTime', null)).toContain('float wocSwayGate = 1.0;');
+    const kit = (name: string) => {
+      const mat = new THREE.MeshStandardMaterial({ name });
+      const root = new THREE.Group();
+      root.add(new THREE.Mesh(new THREE.BufferGeometry(), mat));
+      attachPlacedTreeSway(root, 0, 0.6, 'bush');
+      return compileVertex(mat);
+    };
+    const grass = kit('Leaves_dg_grass');
+    expect(grass).toContain('float wocSwayGate = 1.0;');
+    expect(grass).not.toContain('smoothstep(40.0000, 50.0000');
+    expect(kit('Leaves_dg_under')).toContain('smoothstep(40.0000, 50.0000');
   });
 });

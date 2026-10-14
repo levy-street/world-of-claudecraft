@@ -4,9 +4,9 @@
 // `sheetWallBlocksStep` and `solidRockAtBody` decide "is this mover under a
 // sheet?" by comparing its feet against the ground height in that column.
 // Read BLIND, that height is the highest walkable surface there - which on
-// anything stacked is the deck over the mover's HEAD. On a map that owns a
-// carve (so the cheap early-out does not fire) a player amidships on a
-// two-deck ship read as twelve yards underground and every step became a walk
+// anything stacked is the deck over the mover's HEAD. On Tidehold (a map that
+// owns a carve, so the cheap early-out does not fire) a player amidships on
+// the galleon read as twelve yards underground and every step became a walk
 // into solid rock: a real-solver flood from amidships reached ONE cell.
 // The proxy now reads the body-aware ground, which drops only decks and plane
 // volumes out of reach above the feet. Terrain is never filtered, so a body

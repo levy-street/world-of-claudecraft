@@ -1,5 +1,5 @@
-// The chase camera's boom and ground clamps for authored (Studio) maps, pure:
-// no Three, no DOM. renderer.ts updateCamera is the
+// The chase camera's boom and ground clamps for authored (Studio) maps and
+// the Deepglass bell, pure: no Three, no DOM. renderer.ts updateCamera is the
 // thin consumer. On the BUILT-IN world none of this runs: the boom keeps the
 // requested distance and the ground clamp is the height-blind groundHeight,
 // exactly as the shipped renderer always did (the caller passes
@@ -12,6 +12,7 @@ import {
   groundHeightNear,
   onUnderSheet,
 } from '../../sim/world';
+import { bellBoomLimit } from '../deepglass_scene/deepglass_camera_core';
 
 /** How much of the boom is pulled in at FULL look-up. The extra look-up range
  *  is useless on its own: swinging the boom under the player just drives it
@@ -52,6 +53,8 @@ export interface ChaseBoomInput {
   /** Highest the camera may sit (the underwater ceiling). */
   ceilingY: number;
   dt: number;
+  /** The local player is in Deepglass flooded flight. */
+  flying: boolean;
   /** The input layer's look-up clamp (CAM_PITCH_UP). */
   pitchUp: number;
 }
@@ -82,6 +85,7 @@ export function createChaseBoomScratch(pitchUp: number): {
       dist: 0,
       ceilingY: 0,
       dt: 0,
+      flying: false,
       pitchUp,
     },
     out: { x: 0, y: 0, z: 0, dist: 0, solidLimit: Number.POSITIVE_INFINITY },
@@ -96,7 +100,11 @@ function seat(i: ChaseBoomInput, dist: number, out: ChaseBoomOut): void {
 }
 
 /**
- * Seat the boom on an authored map. Inside a buried cave tube or carve
+ * Seat the boom on an authored map (or in the bell). Inside the bell the boom
+ * must stay INSIDE the glass: near the perimeter the pivot-minus-boom point
+ * lands outside the sphere, over the caldera's massif, where the terrain clamp
+ * read that ground and catapulted the camera onto it. Shorten the boom to the
+ * last point inside the glass instead. Inside a buried cave tube or carve
  * cavity the boom must not pull back through the rock: clamp the distance to
  * the last point still inside the air (Infinity everywhere else, including at
  * open mouths). A placed asset's collider stops it the way rock does (SPACEY,
@@ -108,10 +116,14 @@ export function solveChaseBoom(
   prevSolidLimit: number,
   out: ChaseBoomOut,
 ): ChaseBoomOut {
-  const camDist = lookUpDollyDist(i.dist, i.pitch, i.pitchUp);
+  let camDist = i.dist;
+  if (!i.flying) camDist = lookUpDollyDist(camDist, i.pitch, i.pitchUp);
+  if (i.flying) camDist = Math.min(camDist, bellBoomLimit(i.px, i.eyeY, i.pz, i.yaw, i.pitch));
   seat(i, camDist, out);
   const sheetMax = cameraSheetMaxDist(i.seed, i.px, i.eyeY, i.pz, out.x, out.y, out.z, 0.35);
-  const solidMax = cameraBoomMaxDist(i.seed, i.px, i.eyeY, i.pz, out.x, out.y, out.z, 0.3);
+  const solidMax = i.flying
+    ? Number.POSITIVE_INFINITY
+    : cameraBoomMaxDist(i.seed, i.px, i.eyeY, i.pz, out.x, out.y, out.z, 0.3);
   out.solidLimit = easeBoomSolidLimit(prevSolidLimit, solidMax, i.dt);
   const boomMax = Math.min(sheetMax, out.solidLimit);
   if (boomMax < camDist) seat(i, Math.max(0.9, boomMax), out);
@@ -121,8 +133,8 @@ export function solveChaseBoom(
 /**
  * The ground clamp under the seated camera on an authored map. BODY-AWARE, not
  * the blind groundHeight: that answers with the highest walkable surface in the
- * camera's column, so standing under any upper storey (a gallery, a
- * bridge) the clamp read the deck over the player's
+ * camera's column, so standing under any upper storey (a galleon's
+ * quarterdeck, a gallery, a bridge) the clamp read the deck over the player's
  * HEAD as the floor and shoved the camera up onto it. The pivot's own height
  * picks the sheet. A player standing on an under-sheet (tube/carve floor)
  * needs the clamp to read THAT sheet, not the hillside overhead, and a void

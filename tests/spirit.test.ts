@@ -602,6 +602,9 @@ describe('spirit: stale movement intent does not survive death (#1651)', () => {
       strafeLeft: false,
       strafeRight: false,
       jump: false,
+      // The Deepglass throttle (Studio) is a declared MoveInput flag, minted
+      // false by emptyMoveInput like every other held key.
+      boost: false,
       dive: false,
       surface: false,
     });

@@ -49,11 +49,11 @@ describe('nearestSubzone', () => {
 
 const areas = [
   // The whole city, drawn wide.
-  { name: 'Harbor City', minX: -200, minZ: -200, maxX: 200, maxZ: 200 },
+  { name: 'Tidehold', minX: -200, minZ: -200, maxX: 200, maxZ: 200 },
   // A plaza inside it.
   { name: 'The Glass Market', minX: -40, minZ: -40, maxX: 40, maxZ: 40 },
   // A square inside the plaza.
-  { name: 'Lantern Square', minX: -10, minZ: -10, maxX: 10, maxZ: 10 },
+  { name: "Baldemar's Square", minX: -10, minZ: -10, maxX: 10, maxZ: 10 },
   // A long thin one: a rect a point+radius could never model.
   { name: 'Ropewalk', minX: 300, minZ: -4, maxX: 420, maxZ: 4 },
 ];
@@ -64,9 +64,9 @@ describe('namedAreaAt', () => {
   });
 
   it('names the SMALLEST rect containing the player', () => {
-    expect(namedAreaAt(0, 0, areas, null)).toBe('Lantern Square');
+    expect(namedAreaAt(0, 0, areas, null)).toBe("Baldemar's Square");
     expect(namedAreaAt(25, 25, areas, null)).toBe('The Glass Market');
-    expect(namedAreaAt(150, 150, areas, null)).toBe('Harbor City');
+    expect(namedAreaAt(150, 150, areas, null)).toBe('Tidehold');
   });
 
   it('covers a long thin rect a POI radius would miss or overshoot', () => {
@@ -90,7 +90,7 @@ describe('currentSubzone', () => {
   it('prefers an authored rect over a zone POI point covering the same ground', () => {
     const overlapping = [{ x: 0, z: 0, label: 'Somewhere Else' }];
     expect(currentSubzone(0, 0, overlapping, areas, null)).toEqual({
-      label: 'Lantern Square',
+      label: "Baldemar's Square",
       poiIndex: -1,
     });
   });

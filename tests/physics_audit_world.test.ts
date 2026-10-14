@@ -590,6 +590,10 @@ describe('programmatic collider sanity sweeps', () => {
     const cols: Collider[] = [];
     queryOpenWorldColliders(SEED, -240, -240, 240, 900, cols);
     const bad: string[] = [];
+    // The global NPCS table also carries the authored worlds' rosters (the
+    // Deepglass's Tidehold market keeps its stall keepers registered there so
+    // the gossip dialog can resolve them); those are all dynamic, and their
+    // coordinates mean nothing against the overworld's colliders.
     // Dynamic NPCs are placed by their own spawner at runtime (findSafePos, or
     // an authored world's reserved-id loop), never at the authored literal.
     for (const npc of Object.values(NPCS)) {

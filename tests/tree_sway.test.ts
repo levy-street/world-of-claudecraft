@@ -1,6 +1,13 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  isKitFoliageMaterial,
+  KIT_WIND_ATTRIBUTE_GLSL,
+  KIT_WIND_FAR,
+  KIT_WIND_NEAR,
+  KIT_WIND_TIME_SCALE,
+  kitTreeLean,
+  kitWindAmps,
+  kitWindGlsl,
   LEAF_KIND_MUL,
   LEAN_FRACTION,
   leafStrengthForMaterialName,
@@ -123,23 +130,51 @@ describe('sway GLSL', () => {
   });
 });
 
-describe('the sway gate uniform', () => {
-  it('has a renderer that actually writes the gate uniform every frame', () => {
-    // The placed-tree sway hangs off `uSwayPlayer`. It shipped with NO caller
-    // at all, so the gate sat at its 1e6 start and every placed tree was
-    // silently frozen. Pin the call.
-    const renderer = readFileSync('src/render/renderer.ts', 'utf8');
-    const calls = renderer.match(/updateTreeSwayPlayer\(/g) ?? [];
-    expect(calls.length).toBeGreaterThanOrEqual(2); // the prewarm frame and the live sync
-    expect(renderer).toContain("import { updateTreeSwayPlayer } from './tree_sway'");
-    // In the Studio the sim's dummy player rides the CAMERA, so a maker
-    // inspecting a tree from 120 yards out saw it frozen: both call sites rank
-    // from the free-cam look-at while the editor hosts the renderer (the same
-    // rule the point-light budget uses).
-    const lookAtCalls =
-      renderer.match(
-        /updateTreeSwayPlayer\(\s*this\.editorCam \? this\.cameraLookAt\.x : [\w.]+,\s*this\.editorCam \? this\.cameraLookAt\.z : [\w.]+,?\s*\)/g,
-      ) ?? [];
-    expect(lookAtCalls.length).toBe(calls.length);
+// The Deepglass kit's baked wind (tree_sway.ts kitWindGlsl, fed by the uv1
+// flex/phase the Blender builder bakes). SPACEY, 2026-09-24: "the big trees
+// shouldnt really move much but the leaves and branches should move nicely".
+
+describe('Deepglass kit baked wind', () => {
+  it('recognises only the kit materials', () => {
+    expect(isKitFoliageMaterial('Leaves_dg_pine')).toBe(true);
+    expect(isKitFoliageMaterial('Bark_dg_root')).toBe(true);
+    expect(isKitFoliageMaterial('Leaves')).toBe(false);
+    expect(isKitFoliageMaterial('Bark')).toBe(false);
+  });
+
+  it('keeps a big tree almost still as a column', () => {
+    // a 30 yd pine: the generic lean would swing the crown over a yard
+    expect(30 * LEAN_FRACTION.tree).toBeGreaterThan(1);
+    expect(kitTreeLean(30)).toBeLessThan(0.25);
+    // a sapling keeps its proportional lean
+    expect(kitTreeLean(2)).toBeCloseTo(2 * LEAN_FRACTION.tree, 5);
+  });
+
+  it('moves boughs more than leaves flutter, and grass the most for its size', () => {
+    const tree = kitWindAmps('tree', 30);
+    expect(tree.bough).toBeGreaterThan(tree.flutter);
+    expect(kitWindAmps('grass', 1).bough / 1).toBeGreaterThan(
+      kitWindAmps('shrub', 1.5).bough / 1.5,
+    );
+  });
+
+  it('reads the baked uv1 (flex, phase) and only declares it when three has not', () => {
+    for (const mode of ['tree', 'shrub', 'grass'] as const) {
+      const g = kitWindGlsl(mode, 10, 'wocSwayScale');
+      expect(g).toContain('uv1.x');
+      expect(g).toContain('uv1.y');
+      expect(g).toContain('wocSwayGate'); // gated like all sway: zero far away
+    }
+    expect(kitWindGlsl('grass', 1, 's')).toContain('wocWave'); // the rolling field wave
+    expect(KIT_WIND_ATTRIBUTE_GLSL).toContain('#ifndef USE_UV1');
+  });
+
+  it('stops within 50 yd of the player, on a clock slowed to 0.49', () => {
+    expect(KIT_WIND_FAR).toBe(50);
+    expect(KIT_WIND_NEAR).toBeLessThan(KIT_WIND_FAR);
+    expect(KIT_WIND_TIME_SCALE).toBeCloseTo(0.49, 5);
+    const wave = treeSwayWaveGlsl('(uTime * 0.49)', KIT_WIND_NEAR, KIT_WIND_FAR);
+    expect(wave).toContain('smoothstep(40.0000, 50.0000');
+    expect(wave).toContain('(uTime * 0.49) * 0.9');
   });
 });

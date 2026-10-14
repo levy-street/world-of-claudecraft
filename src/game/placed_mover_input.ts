@@ -2,9 +2,9 @@
 // bank's vault door, src/render/placed_movers.ts). Moved out of main.ts's
 // world-click and hover-cursor paths so the client keeps one call at each.
 //
-// Placed kit buildings exist only on authored maps, so the built-in world
-// skips the extra raycast outright and its click and hover paths stay exactly
-// what they were before the movers landed.
+// Placed kit buildings exist only on authored maps (Tidehold), so the built-in
+// world skips the extra raycast outright and its click and hover paths stay
+// exactly what they were before the movers landed.
 
 import { PLACED_MOVER_REACH } from '../render/placed_movers';
 import type { WorldPicking } from '../render/world_picking';
