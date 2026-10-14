@@ -24,8 +24,6 @@ import {
   SELTHE_CHORUS_MARK,
   SELTHE_DROWNING_ARIA,
   SELTHE_MERE_SURGE,
-  SELTHE_MOONWATER_BOLT,
-  SELTHE_SEA_SONG,
   SELTHE_SOLO_MARK,
   SELTHE_TUNING,
   SOLO_ECHO_TEMPLATE,
@@ -233,19 +231,13 @@ export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphS
       accent: TEMPLE_ACCENTS.tide,
     },
     // Selthe the caster: the Mere Surge's wedge (step out sideways), and a
-    // kick glyph under her bolt and her aria (both can be interrupted).
+    // kick glyph under her aria, the one bar of hers a kick cuts. Her bolt has
+    // no bar and her Score draws itself (temple_score_fx.ts).
     [SELTHE_MERE_SURGE]: {
       shape: 'cone',
       range: SELTHE_TUNING.surgeRange,
       arcDeg: SELTHE_TUNING.surgeArcDeg,
       color: TELEGRAPH_THREAT_COLORS.danger,
-      accent: TEMPLE_ACCENTS.tide,
-    },
-    [SELTHE_MOONWATER_BOLT]: {
-      shape: 'sigil',
-      range: 2.4,
-      arcDeg: 360,
-      color: TELEGRAPH_THREAT_COLORS.interrupt,
       accent: TEMPLE_ACCENTS.tide,
     },
     [SELTHE_DROWNING_ARIA]: {
@@ -270,14 +262,6 @@ export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphS
       arcDeg: 360,
       color: TELEGRAPH_THREAT_COLORS.lethal,
       accent: TEMPLE_ACCENTS.moon,
-    },
-    // Selthe's Sea-Song hits the whole court: a glyph under her, not a zone.
-    [SELTHE_SEA_SONG]: {
-      shape: 'sigil',
-      range: 3,
-      arcDeg: 360,
-      color: TELEGRAPH_THREAT_COLORS.danger,
-      accent: TEMPLE_ACCENTS.choir,
     },
   };
 }

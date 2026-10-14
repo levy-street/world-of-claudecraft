@@ -369,7 +369,23 @@ describe('/dev wildheart trigger: every boss mechanic fires on demand', () => {
   const cases: [string, string[], [number, number]][] = [
     ['wildheart_beastmaster', ['quake', 'stalk', 'hunt', 'ward', 'heel'], [-86, 60]],
     ['the_gorgebloom', ['seeds', 'pods', 'pollinate', 'lash', 'gorge'], [90, 40]],
-    ['wildheart_high_priest', ['pulse', 'spirit', 'prey', 'endhunt', 'ambush'], [0, 214]],
+    [
+      'wildheart_high_priest',
+      [
+        'pulse',
+        'spirit',
+        'spear',
+        'pin',
+        'prey',
+        'glyphs',
+        'sunstrike',
+        'endhunt',
+        'ambush',
+        'idol',
+        'breath',
+      ],
+      [0, 214],
+    ],
   ];
   for (const [templateId, triggers, [lx, lz]] of cases) {
     it(`${templateId}: ${triggers.join(', ')}`, () => {

@@ -7,10 +7,11 @@
 //    that kind's window (shown as a Wary aura); any other of the same kind
 //    slides off here until the window closes. Every hard control (a stun, a
 //    sap or fear, a sheep) shares the stun window;
-//  - Zulgar's Jaguar Avatar (Spirit of the Hunt, design 5.3) can be slowed and
-//    rooted during the hunt (zulgar.ts lifts his immunity for it), and a stun
-//    lands for half as long (a sheep or a sap slides off, as outside the hunt;
-//    a blind is a miss chance, not a control, and is never counted).
+//  - Zulgar's Jaguar Avatar (Spirit of the Hunt and the final phase, design
+//    5.3) can be slowed and rooted while he hunts (zulgar.ts lifts his
+//    immunity for it), and a stun lands for half as long (a sheep or a sap
+//    slides off, as outside the hunt; a blind is a miss chance, not a control,
+//    and is never counted).
 //
 // Pure: it reads the target's own encounter state and may shorten the
 // incoming stun aura in place (each applyAura call builds its own aura).
@@ -29,7 +30,8 @@ export function wildheartControlBlocks(target: Entity, aura: Aura): boolean {
     if (!group) return false;
     return st.windows[group] > 0;
   }
-  if (st.kind === 'zulgar' && st.phase === 'hunt' && controlGroupOf(aura.kind) === 'stun') {
+  const hunts = st.kind === 'zulgar' && (st.phase === 'hunt' || st.phase === 'final');
+  if (hunts && controlGroupOf(aura.kind) === 'stun') {
     // Only a true stun takes hold of the avatar (halved); a sheep or a sap
     // slides off as it does outside the hunt.
     if (aura.kind !== 'stun') return true;

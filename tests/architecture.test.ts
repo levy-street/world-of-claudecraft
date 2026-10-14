@@ -658,10 +658,15 @@ const UI_PURE_CORES = [
   // combat text's avoidance word.
   'src/ui/hud/dungeon/encounter_alert_view.ts',
   'src/ui/hud/dungeon/fct_avoidance_core.ts',
-  // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
+  // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond;
+  // Zulgar's breath, spear, Sunstruck window and sun glyphs) and its scene scan.
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
+  'src/ui/hud/dungeon/wildheart_alert_scene_core.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
+  // The Drowned Temple's alert (Choirmother Selthe's Score) and its scene scan.
+  'src/ui/hud/dungeon/temple_alert_view.ts',
+  'src/ui/hud/dungeon/temple_alert_scene_core.ts',
   // The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) and its
   // scene scan.
   'src/ui/hud/dungeon/sanctum_alert_view.ts',
@@ -915,6 +920,9 @@ const RENDER_PURE_CORES = [
   // the dazed loop a stunned body holds (ClipMap.stunned).
   'src/render/wildheart_basin/jaguar_model_core.ts',
   'src/render/wildheart_basin/zulgar_avatar_core.ts',
+  // Zulgar's hunt rework: the sun glyphs' four looks, the Sunstruck window,
+  // the Hunting Spear and the half the Idol's Breath marks.
+  'src/render/wildheart_basin/zulgar_hunt_fx_core.ts',
   'src/render/wildheart_basin/bond_cord_core.ts',
   'src/render/wildheart_basin/basin_fire_core.ts',
   'src/render/characters/stun_idle_core.ts',
@@ -985,6 +993,9 @@ const RENDER_PURE_CORES = [
   // the gaze eye and veil, the whirlpool, the spark's arcs and the swell.
   'src/render/drowned_temple/temple_trash_fx_core.ts',
   'src/render/drowned_temple/temple_lure_fx_core.ts',
+  // Selthe's Score: a moon tile's six looks, its pips and numeral strokes,
+  // her ward's water and Discord's wave.
+  'src/render/drowned_temple/temple_score_fx_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
   'src/render/ambience_state_core.ts',

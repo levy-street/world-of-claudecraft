@@ -7,7 +7,10 @@
 // and the pools their additive floor program (basin_lights.ts), built with the
 // interior so they compile behind its gate; they stand there from the start at
 // zero opacity and only their opacity moves (a uniform write, never a program
-// change). WildheartFx drives the level (setBasinMawGlow).
+// change). WildheartFx drives the level (setBasinMawGlow). The same jade cards
+// burn while the idol is awake in Zulgar's final phase (`breath`): the throat
+// smoulders, swells as it draws breath and blasts as it lets go; the portal's
+// gold stays dark until the way out really opens.
 
 import * as THREE from 'three';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -71,8 +74,11 @@ export function buildMawGlow(group: THREE.Group): void {
   group.add(root);
 }
 
-/** Drive the glow (0 dark, 1 full): an opacity write per card only. */
-export function setBasinMawGlow(strength: number): void {
+/** Drive the glow (0 dark, 1 full): an opacity write per card only. `breath`
+ *  lights the jade cards alone (the idol's throat, the final phase). */
+export function setBasinMawGlow(strength: number, breath = 0): void {
   const k = Math.max(0, Math.min(1, strength));
-  for (const { card, material } of glowSlots()) material.opacity = card.opacity * k;
+  const jade = Math.max(k, Math.max(0, Math.min(1, breath)));
+  for (const { card, material } of glowSlots())
+    material.opacity = card.opacity * (card.tone === 'jade' ? jade : k);
 }

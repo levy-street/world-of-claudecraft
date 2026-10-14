@@ -189,7 +189,7 @@ describe('Choirmother Selthe: stack for Chorus, spread for Solo', () => {
     const dmg = damageOver(stacked.f, SELTHE_TUNING.markSeconds, () => {
       for (const p of others) put(stacked.f, p, at.x + 1, at.z);
     });
-    // Three players share 400: about 133 each (plus the Sea-Song and swings).
+    // Three players share 400: about 133 each (plus her bolts on the tank).
     const markTook = dmg.get(mark.id) ?? 0;
     expect(markTook).toBeGreaterThan(120);
     expect(markTook).toBeLessThan(260);

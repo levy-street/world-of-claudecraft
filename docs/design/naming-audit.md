@@ -769,6 +769,18 @@ caster kit and the Tideglass Colossus's floor mechanic (`src/sim/encounters/drow
 | Mere Surge | Selthe's wedge of water | KEEP. No match; plain English, "Mere" is the game's own Mere Hydra word. |
 | Tideglass Fracture | the Colossus's prism slices | KEEP. No match; "Tideglass" is this game's own coined token (Tideglass Colossus, Tideglass Dirk). |
 
+Selthe's Score (web-verified 2026-10-14; `src/sim/encounters/drowned_temple/selthe_score.ts`).
+Plain descriptive English by brief; exact-phrase searches against the major game wikis found no
+boss mechanic, aura or object of any of these names.
+
+| Name | Where | Verdict |
+|---|---|---|
+| The Score | Selthe's melody on the moon tiles (her bar and her ward) | KEEP. No match; the ordinary word for written music. |
+| Moon Tile | the five tiles round her pool | KEEP. No match in a game wiki (a mobile puzzle game uses "Moon-tile" for its goal tile, an unrelated generic compound). |
+| Broken Voice | her stun and damage window once the Score is answered | KEEP. No match; plain English. |
+| Discord | the court-wide hit when the verse runs out | KEEP. A common English word used across many unrelated properties (shared vocabulary); no boss mechanic of the name found. |
+| False Note | a tile stepped out of turn | KEEP. No match; a common English idiom. |
+
 The second round of the same pass (web-verified 2026-10-04): the Mere Hydra's Combined Breath
 (`hydra_combo.ts`), Ysolei calling the moon (`ysolei_moon.ts`) and the Pearlguard Sentinel's new
 manta body (display only; the id `pearlguard_sentinel` is frozen).

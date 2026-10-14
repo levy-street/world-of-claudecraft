@@ -21,10 +21,12 @@
 // Zero rng here; a toppled body's spill draws its rolls on its own beats
 // (kit_hazard.ts).
 //
-// Two effects: 'topple' (the body dies and spills a hazard) and 'relight'
-// (the body stays; its dungeon module reads `Entity.kitUseCompletedBy` on its
-// next pass and decides what was lit: the Hollow Crypt's Remembrance Candles,
-// encounters/hollow_crypt/morthen_candles.ts). A def with `holdsThroughHits`
+// Three effects: 'topple' (the body dies and spills a hazard), and 'relight'
+// and 'free' (the body stays; its dungeon module reads
+// `Entity.kitUseCompletedBy` on its next pass and decides what happened: the
+// Hollow Crypt's Remembrance Candles, encounters/hollow_crypt/
+// morthen_candles.ts, and the Wildheart Basin's Hunting Spear, encounters/
+// wildheart_basin/zulgar_spear.ts). A def with `holdsThroughHits`
 // is not broken by a landed hit (combat/damage.ts asks kitUseHoldsThroughHits);
 // a step, a stun, death or drifting out of reach still break it.
 
@@ -137,7 +139,7 @@ export function completeKitUse(ctx: SimContext, p: Entity, castId: string, bodyI
     fx: 'nova',
     ability: def.castId,
   });
-  if (def.effect.kind === 'relight') {
+  if (def.effect.kind !== 'topple') {
     // The body stays: its dungeon module reads the completion on its pass.
     body.kitUseCompletedBy = p.id;
     return true;

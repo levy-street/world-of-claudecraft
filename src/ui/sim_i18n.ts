@@ -1382,6 +1382,14 @@ const baseEnTable = {
   'mechanic.templeDrowningAria': 'Drowning Aria',
   'mechanic.templeMereSurge': 'Mere Surge',
   'mechanic.templeTideglassFracture': 'Tideglass Fracture',
+  // Selthe's Score (encounters/drowned_temple/selthe_score.ts): its two
+  // damage names, her ward and her broken voice, and the tile objects' name.
+  'mechanic.templeDiscord': 'Discord',
+  'mechanic.templeFalseNote': 'False Note',
+  'mechanic.templeMoonTile': 'Moon Tile',
+  'aura.templeTheScore': 'The Score',
+  'aura.templeBrokenVoice': 'Broken Voice',
+  'aura.templeSpentVoice': 'Spent Voice',
   'mechanic.templePrismFlare': 'Prism Flare',
   'mechanic.templeNorthTide': 'North Tide',
   'mechanic.templeSouthTide': 'South Tide',
@@ -1586,12 +1594,20 @@ const baseEnTable = {
   'log.wildheartZulgarHunt': 'The jaguar wakes in me! Run, little prey!',
   'log.wildheartZulgarHuntEnds': 'The spirit sleeps... for now.',
   'log.wildheartZulgarAmbush': 'You cannot hide from the hunter!',
+  // Zulgar's hunt rework (zulgar_spear.ts, zulgar_idol.ts): two yells, the
+  // idol's emote and the Pinned player's refusal line (EXACT).
+  'log.wildheartZulgarSpear': 'Hold still, little prey.',
+  'log.wildheartZulgarIdolWakes': 'Wake, old stone! Breathe on them!',
+  'log.wildheartIdolBreath': 'The stone jaguar draws breath!',
+  'error.wildheartSpearNeedsHelp': 'You are pinned: a teammate must pull the spear out.',
   'mechanic.wildheartJaguarBite': 'Jaguar Bite',
   'mechanic.wildheartBeastPitQuake': 'Beast Pit Quake',
   'mechanic.wildheartVineLash': 'Vine Lash',
   'mechanic.wildheartGorge': 'Gorge',
   'mechanic.wildheartBloomSpit': 'Bloom Spit',
   'mechanic.wildheartPulse': 'Wildheart Pulse',
+  'mechanic.wildheartHuntingSpear': 'Hunting Spear',
+  'mechanic.wildheartIdolsBreath': "Idol's Breath",
   'aura.wildheartPackBond': 'Pack Bond',
   'aura.wildheartStalked': 'Stalked',
   'aura.wildheartRendingBite': 'Rending Bite',
@@ -1608,6 +1624,9 @@ const baseEnTable = {
   'aura.wildheartMauled': 'Mauled',
   'aura.wildheartSunstruck': 'Sunstruck',
   'aura.wildheartVanished': 'Vanished',
+  'aura.wildheartSunWary': 'Wary of the Sun',
+  'aura.wildheartPinned': 'Pinned',
+  'aura.wildheartIdolAwake': 'The Idol Wakes',
   // The Proving Shore (tutorial island): the compulsory greeting's ferry ride,
   // the two clicked ferry bells (sim/tutorial/greeting.ts +
   // interactions/ferry_bell.ts), and the
@@ -8209,6 +8228,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardWhiteoutGust': 'Weißout-Windbö',
   },
   zh_CN: {
+    'aura.templeSpentVoice': '嗓音疲惫',
     'log.passingStoneKneel': '你的手合拢在往生石上，海滨这才放你离去。',
     'aura.craftedMomentum': '匠造势能',
     'aura.craftedShelter': '匠造庇护',
@@ -9059,6 +9079,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardSweep': '宝藏横扫',
   },
   zh_TW: {
+    'aura.templeSpentVoice': '嗓音疲憊',
     'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
     'aura.craftedMomentum': '匠造勢能',
     'aura.craftedShelter': '匠造庇護',
@@ -9909,6 +9930,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardSweep': '寶藏橫掃',
   },
   ko_KR: {
+    'aura.templeSpentVoice': '지친 목소리',
     'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
     'aura.craftedMomentum': '장인의 기세',
     'aura.craftedShelter': '장인의 피난처',
@@ -10799,6 +10821,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardSweep': '보물 쓸기',
   },
   ja_JP: {
+    'aura.templeSpentVoice': '声の疲労',
     'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
     'aura.craftedMomentum': '匠の勢い',
     'aura.craftedShelter': '匠の庇護',
@@ -12691,6 +12714,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardWhiteoutGust': 'Rajada de Neblina Branca',
   },
   ru_RU: {
+    'aura.templeSpentVoice': 'Уставший голос',
     'log.passingStoneKneel': 'Вы сжимаете в ладони Камень Ухода, и берег отпускает вас.',
     'aura.craftedMomentum': 'Импульс мастера',
     'aura.craftedShelter': 'Укрытие мастера',
@@ -18072,6 +18096,13 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Resonant Slam': 'mechanic.templeResonantSlam',
   'Prism Flare': 'mechanic.templePrismFlare',
   'Tideglass Fracture': 'mechanic.templeTideglassFracture',
+  // Selthe's Score (selthe_score.ts).
+  Discord: 'mechanic.templeDiscord',
+  'False Note': 'mechanic.templeFalseNote',
+  'Moon Tile': 'mechanic.templeMoonTile',
+  'The Score': 'aura.templeTheScore',
+  'Broken Voice': 'aura.templeBrokenVoice',
+  'Spent Voice': 'aura.templeSpentVoice',
   Frostbitten: 'aura.templeFrostbitten',
   Submerged: 'aura.templeSubmerged',
   'Shell Up': 'aura.templeShellUp',
@@ -18195,6 +18226,11 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Mauled: 'aura.wildheartMauled',
   Sunstruck: 'aura.wildheartSunstruck',
   Vanished: 'aura.wildheartVanished',
+  'Wary of the Sun': 'aura.wildheartSunWary',
+  Pinned: 'aura.wildheartPinned',
+  'The Idol Wakes': 'aura.wildheartIdolAwake',
+  'Hunting Spear': 'mechanic.wildheartHuntingSpear',
+  "Idol's Breath": 'mechanic.wildheartIdolsBreath',
   'Dread Bellow': 'mechanic.cryptDreadBellow',
   'Wyrmcall Pyre': 'mechanic.cryptWyrmcallPyre',
   'Entombed': 'aura.cryptEntombed',

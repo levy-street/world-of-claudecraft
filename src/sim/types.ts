@@ -5218,10 +5218,14 @@ export interface KitUseDef {
    *  from the user. 'relight': the body's dungeon module reads the completion
    *  off the body (`Entity.kitUseCompletedBy`) and decides what it lights
    *  (the Hollow Crypt's Remembrance Candles, encounters/hollow_crypt/
-   *  morthen_candles.ts). */
+   *  morthen_candles.ts). 'free': the same hand-off to the dungeon module,
+   *  for a body that holds a player (the Wildheart Basin's Hunting Spear,
+   *  encounters/wildheart_basin/zulgar_spear.ts); only the prompt's copy
+   *  differs. */
   effect:
     | { kind: 'topple'; ahead: number; hazard: KitHazardDef }
-    | { kind: 'relight'; school: Aura['school'] };
+    | { kind: 'relight'; school: Aura['school'] }
+    | { kind: 'free'; school: Aura['school'] };
   /** The use is NOT broken by a hit that lands on the user (a step, a stun,
    *  death or drifting out of reach still break it): the candle's channel
    *  drains its lighter's health and the healer heals them through it. */
@@ -5577,15 +5581,16 @@ export interface SeltheFightState {
   kind: 'selthe';
   chorusTimer: number;
   soloTimer: number;
-  songTimer: number;
   /** Seconds to the next Mere Surge and the next Drowning Aria. */
   surgeTimer: number;
   ariaTimer: number;
-  /** The breath she takes after a bar before her next Moonwater Bolt. */
-  boltGap: number;
-  /** After a kick: seconds she casts neither bolt nor aria. */
+  /** Seconds to her next Moonwater Bolt (it runs only while she sings no
+   *  bar), and whether its gather cue has gone out. */
+  boltTimer: number;
+  boltCued: boolean;
+  /** After a kick: seconds she throws no bolt and sings no aria. */
   quiet: number;
-  /** The kickable bar she began (a bolt or the aria), so a cut one is seen. */
+  /** The kickable bar she began (the aria), so a cut one is seen. */
   kickable: string | null;
   /** The Mere Surge's locked aim while its bar runs. */
   surgeYaw: number | null;
@@ -5610,6 +5615,41 @@ export interface SeltheFightState {
   casts: number;
   /** Someone took a Chorus alone or a Solo caught a second player (the deed). */
   flubbed: boolean;
+  /** The moon tiles round her pool (selthe_score.ts): their spots
+   *  (instance-local) and their encounter objects, in tile order. */
+  tiles: { x: number; z: number; objectId: number }[];
+  /** Scores begun this fight, and whether the next one is owed (her health
+   *  crossed its mark and she is waiting for her bar and her marks to end). */
+  scores: number;
+  scoreQueued: boolean;
+  /** The Score in flight. */
+  score: SeltheScoreState | null;
+}
+
+/** One Score (encounters/drowned_temple/selthe_score.ts): she sings the
+ *  melody on the tiles, then the group steps on them in that order. */
+export interface SeltheScoreState {
+  phase: 'melody' | 'answer';
+  /** Which Score of the fight this is (0 the first): its notes and its clock. */
+  index: number;
+  /** The melody: tile indices in the order they ring. */
+  order: number[];
+  /** Heroic: the tiles go dark for the answer. */
+  hidden: boolean;
+  /** Seconds left in this phase (it mirrors her bar). */
+  timer: number;
+  /** Melody: notes rung so far and the seconds to the next. */
+  rung: number;
+  noteIn: number;
+  /** Answer: tiles sounded in order so far. */
+  progress: number;
+  /** Last correct singer, independent of the display aura and wrong notes. */
+  lastSingerId: number | null;
+  /** Who stands on each tile (player ids, by tile), so a step counts once,
+   *  on the way in. */
+  inside: number[][];
+  /** Tiles a wrong step soured, and the seconds until each clears. */
+  sour: { tile: number; remaining: number }[];
 }
 
 /** The Mere Hydra's fight, SHARED by its three heads (one object referenced
@@ -5831,12 +5871,51 @@ export interface GorgebloomFightState {
 }
 
 /** Zulgar's pull (encounters/wildheart_basin/zulgar.ts). */
+/** One sun glyph of Zulgar's terrace (zulgar_glyphs.ts). */
+export interface ZulgarGlyphState {
+  /** Its encounter object (the look: lit or dark, and its clocks). */
+  objectId: number;
+  lit: boolean;
+  /** Seconds a player has stood lighting it (0 when nobody does). */
+  kindle: number;
+  /** Seconds left before a spent glyph can be lit again. */
+  cold: number;
+}
+
+/** A Hunting Spear standing in the terrace (zulgar_spear.ts). */
+export interface ZulgarSpearState {
+  /** The spear's usable body and the player it pins. */
+  bodyId: number;
+  victimId: number;
+  /** Seconds it has stood, and bleeds dealt. */
+  age: number;
+  bleeds: number;
+  /** Where it pinned its victim (world): a shove never drags them off it. */
+  x: number;
+  y: number;
+  z: number;
+}
+
+/** The Idol's Breath of the final phase (zulgar_idol.ts). */
+export interface ZulgarIdolState {
+  /** Seconds to the next warning. */
+  timer: number;
+  /** The half the next exhale marks (+1 east, -1 west). */
+  side: 1 | -1;
+  /** The exhale in flight: its object, its half, and the seconds left of
+   *  its warning (then of its pour). */
+  breath: { objectId: number; side: 1 | -1; left: number; landed: boolean } | null;
+}
+
 export interface ZulgarFightState {
   kind: 'zulgar';
-  phase: 'fight' | 'hunt' | 'ambush';
+  /** `final`: The Idol Wakes (30 percent): the avatar hunts until he dies. */
+  phase: 'fight' | 'hunt' | 'ambush' | 'final';
   pulseTimer: number;
   /** Spirit of the Hunt thresholds fired (70 and 40 percent). */
   huntsFired: number;
+  /** The Idol Wakes has begun (its 30 percent threshold fires once a pull). */
+  idolFired: boolean;
   /** Seconds left of the hunt (or of the ambush). */
   huntLeft: number;
   /** The prey marks (two on heroic Twin Prey) and which one he chases. */
@@ -5852,9 +5931,20 @@ export interface ZulgarFightState {
   respite: { id: number; left: number }[];
   /** He roared over the kill, waiting out a respite with nobody to hunt. */
   waiting: boolean;
-  /** Seconds each sun glyph stays dark (0 = lit), and its object. */
-  glyphDark: number[];
-  glyphIds: number[];
+  /** The six sun glyphs, in SUN_GLYPHS order. */
+  glyphs: ZulgarGlyphState[];
+  /** Seconds a Sunstruck avatar is still wary of the sun: no glyph strikes
+   *  him again until it runs out. */
+  sunWary: number;
+  /** Seconds to the next Hunting Spear, the pick its bar is aimed at, and
+   *  the spears standing. */
+  spearTimer: number;
+  spearTargetId: number | null;
+  spears: ZulgarSpearState[];
+  /** The final phase's Prey clock (seconds to the next switch) and the
+   *  idol's breath; null until the idol wakes. */
+  markClock: number;
+  idol: ZulgarIdolState | null;
   /** Heroic Ambush: the marked spot (instance-local) and its circle. */
   ambushAt: { x: number; z: number } | null;
   ambushMarkId: number | null;
@@ -8115,7 +8205,7 @@ export interface Entity extends ClientMirroredEntityFields {
    *  Sexton Marrow, the Lady of the Bonechill, Cantor Ilvane). Sim authority
    *  only; the client reads casts, auras and the encounter objects. */
   cryptBossFight?: CryptBossFightState;
-  /** A 'relight' G3 use completed on this body (mob/trash_kit/encounter_use.ts):
+  /** A 'relight' or 'free' G3 use completed on this body (mob/trash_kit/encounter_use.ts):
    *  the user's entity id, read and cleared by the dungeon module that owns
    *  the body on its next pass. Sim authority only. */
   kitUseCompletedBy?: number;

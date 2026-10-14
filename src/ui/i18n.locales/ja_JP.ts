@@ -21617,4 +21617,86 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このキャラクターを削除する前に、未固定のスタンプカードをすべて別のキャラクターへ移してください。',
   'apiError.character.referral_bond_pending':
     '招待報酬のメンバーシップ債券をこのキャラクターに配布しています。配布が完了してから、もう一度削除をお試しください。',
+  // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, The Idol Wakes):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.auraEffect.wildheart.sunstruck': '光る太陽紋に焼かれた：移動速度が{pct}%低下する。',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    '光る太陽紋に焼かれた：受けるダメージが{pct}%増加する。',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'この効果が終わるまで、どの太陽紋も彼を焼けない。その間に踏まれた光る太陽紋は光ったまま残る。',
+  'hudChrome.auraEffect.wildheart.pinned':
+    '狩りの槍があなたをその場に釘付けにしている。{every}秒ごとに{bleed}の物理ダメージ（ヒロイックでは{heroicBleed}）の出血を受け、ワイルドハートの脈動はどこにいても命中してダメージが{pulse}%増加する。仲間は{pull}秒で槍を引き抜ける。他に動ける仲間がいなければ、自分で{wrench}秒かけて引き抜ける。{seconds}秒後には自然に抜ける。',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    '石のジャガーが目覚めた。{every}秒ごとに、床に{warning}秒の予兆を出してからテラスの片側ずつに息を吐く：その側にいる全員に{min}から{max}の自然ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）。ズルガーは倒されるまでジャガーの化身のままで、{seconds}秒ごと（ヒロイックでは{heroicSeconds}秒ごと）に獲物を替える。',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    '太陽紋を灯せる仲間がいない。消えた太陽紋の上に{seconds}秒立って灯し、ズルガーにそこを通らせろ',
+  'hudChrome.wildheartAlert.pinnedTitle': '釘付けにされた！',
+  'hudChrome.wildheartAlert.pinnedLine':
+    '仲間に狩りの槍を引き抜いてもらえ。釘付けの間はワイルドハートの脈動のダメージが増える',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    '助けに来られる仲間がいない：ワイルドハートの脈動が来る前に自分で狩りの槍を引き抜け',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'ズルガーが太陽に焼かれた！',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    '効果が終わるまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め',
+  'hudChrome.wildheartAlert.spearTitle': '仲間が釘付けにされた！',
+  'hudChrome.wildheartAlert.spearLine': '狩りの槍まで走り、ワイルドハートの脈動が来る前に引き抜け',
+  'hudChrome.wildheartAlert.glyphTitle': '太陽紋を灯せ',
+  'hudChrome.wildheartAlert.glyphLine':
+    '消えた太陽紋の上に{seconds}秒立つと灯る。ズルガーがそこを通ると、{duration}秒間受けるダメージが{pct}%増加する',
+  'hudChrome.wildheartAlert.glyphLightingTitle': '太陽紋を灯している',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    '灯るまで太陽紋の上にとどまれ。離れるとやり直しになる',
+  'hudChrome.wildheartAlert.breathTitle': '偶像の息吹！',
+  'hudChrome.wildheartAlert.breathLine':
+    '石のジャガーがテラスのこちら側に息を吐こうとしている。反対側へ渡れ',
+  'hudChrome.kitUse.freeLine':
+    '槍を地面から引き抜き、釘付けにされた者を解放する。攻撃を受けても中断されないが、移動やスタンでは中断される',
+  'hudChrome.kitUse.freeKey': '{name}を引き抜く',
+  'hudChrome.kitUse.freeTap': 'ここをタップして{name}を引き抜く',
+  'hudChrome.kitUse.freeClick': 'ここをクリックして{name}を引き抜く',
+  'hudChrome.kitUse.freeFar': '{range}ヤード以内に近づいて引き抜け',
+  'hudChrome.kitUse.freeAria': '{name}を引き抜く',
+  'hudChrome.kitUse.freeUsingLine': '槍を引き抜くまで動くな：移動やスタンで中断される',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': '狩りの槍',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': '偶像の目覚め',
+  'abilityUi.cast.kituse_wildheart_pull_spear': '槍を引き抜く',
+  'abilityUi.cast.wildheart_idols_breath': '偶像の息吹',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': '点灯中',
+  'abilityUi.cast.wildheart_sun_glyph_cold': '冷却中',
+  'entities.mobs.wildheart_hunting_spear.name': '狩りの槍',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': '楽譜',
+  'hudChrome.templeAlert.melodyLine':
+    '月のタイルが順番に鳴るのを見ておけ。仲間と交代しながら同じ順番で踏め',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'タイルが暗くなる前に順番を覚えろ。仲間と交代しながら同じ順番で踏め',
+  'hudChrome.templeAlert.answerTitle': '楽譜に答えろ！',
+  'hudChrome.templeAlert.answerLine':
+    '交代して踏め。{place}の印がある月のタイルに踏み入れ。鳴らした数：{total}枚中{done}枚',
+  'hudChrome.templeAlert.answerDarkLine':
+    '交代しながら覚えた順番どおりに踏め。同じタイルを踏み直すには、一度降りること。鳴らした数：{total}枚中{done}枚',
+  'hudChrome.templeAlert.stepOffTitle': '一度降りて、踏み直せ',
+  'hudChrome.templeAlert.stepOffLine':
+    '月のタイルは誰かが踏み入った時にだけ鳴る。このタイルから降りて、もう一度踏み入れ',
+  'hudChrome.templeAlert.falseTitle': '外れた音！',
+  'hudChrome.templeAlert.falseLine': 'そのタイルは順番が違う。答えは最初のタイルからやり直しになる',
+  'hudChrome.templeAlert.brokenTitle': 'セルセの声が砕けた！',
+  'hudChrome.templeAlert.brokenLine':
+    '効果が終わるまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め',
+  'hudChrome.templeAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.temple.scoreWard':
+    '楽譜を歌っている：終わるまでダメージを受けない。歌が終わる前に、鳴った順番どおりに月のタイルへ踏み入ると彼女の声が砕ける。交代して踏むこと。音を鳴らしたら、別のプレイヤーが次の正しい音を鳴らすまで待つ。生存者が一人なら、一人で最後まで答えられる。先に歌が終わると、不協和音が広間の全員に{min}から{max}の冷気ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    '声が砕けている：この効果が終わるまで受けるダメージが{pct}%増加する。',
+  'abilityUi.cast.temple_score': '楽譜',
+  'abilityUi.cast.temple_score_answer': '楽譜に答えろ',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    '楽譜（彼女は二度、月のタイルで旋律を歌う：鳴った順番どおりに踏み入ると彼女の声が砕ける）',
+  'hudChrome.templeAlert.spentTitle': '次は別の人が答える番',
+  'hudChrome.templeAlert.spentLine':
+    '別のプレイヤーが次の正しい音を鳴らすまで、タイルを鳴らせない。鳴らした数：{total}枚中{done}枚',
+  'hudChrome.auraEffect.temple.spentVoice':
+    '別のプレイヤーが次の正しい音を鳴らすまで、月のタイルを鳴らせない。この間にタイルを踏んでも答えはリセットされず、ダメージも受けない。解除不可。同じインスタンスで生きているプレイヤーが自分だけになるか、楽譜が終了すると解除される。',
 };

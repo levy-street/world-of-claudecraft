@@ -122,6 +122,7 @@ import {
 import { bastionAuraEffectDescriptor } from './bastion_aura_effect';
 import { cryptAuraEffectDescriptor } from './crypt_aura_effect';
 import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
+import { templeAuraEffectDescriptor } from './temple_aura_effect';
 import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
 import { wildheartAuraEffectDescriptor } from './wildheart_aura_effect';
 
@@ -195,6 +196,9 @@ export function auraEffectDescriptor(
   // The Hollow Crypt's trash and wing-boss marks say theirs (crypt_aura_effect.ts).
   const crypt = cryptAuraEffectDescriptor(a);
   if (crypt) return crypt;
+  // The Drowned Temple's boss auras say theirs (temple_aura_effect.ts).
+  const temple = templeAuraEffectDescriptor(a);
+  if (temple) return temple;
   // This is a four-second placement marker, not a damage-taken modifier. Its
   // countdown and localized name are the complete tooltip; the generic
   // vulnerability copy would misleadingly claim that it adds 0% damage taken.

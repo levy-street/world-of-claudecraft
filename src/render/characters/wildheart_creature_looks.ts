@@ -31,6 +31,8 @@ import {
   SAURIAN_HOWDAH_BREAK,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
+  ZULGAR_HUNTING_SPEAR,
+  ZULGAR_IDOL_WAKES,
   ZULGAR_PULSE,
   ZULGAR_SPIRIT_HUNT,
   ZULGAR_TUNING,
@@ -510,6 +512,22 @@ export const WILDHEART_SUNBONE_TOTEM_LOOK: VisualDef = {
   clickRadius: 1.4,
 };
 
+/** Zulgar's Hunting Spear (encounters/wildheart_basin/zulgar_spear.ts): the
+ *  usable body a teammate pulls out of the terrace. It draws no body: the
+ *  spear, its cord and the ring under its victim are the fx layer's own
+ *  (wildheart_basin/zulgar_spear_fx.ts). Its click capsule, nameplate and bar
+ *  stay, a spear tall, so the pull is easy to target; bound off the Sunbone
+ *  Totem's rig (never seen, and already in every Basin preload). */
+export const HUNTING_SPEAR_BODY_HEIGHT = 3.4;
+export const WILDHEART_HUNTING_SPEAR_LOOK: VisualDef = {
+  url: SUN_TOTEM_MODEL.url,
+  height: HUNTING_SPEAR_BODY_HEIGHT,
+  clips: { idle: 'Idle', walk: 'Idle', run: 'Idle', attack: [], hit: ['Hit'], death: 'Death' },
+  bodyless: true,
+  authoredAtlas: true,
+  clickRadius: 1.3,
+};
+
 /** The Sunbone Dread Totem: the same post under a great tusked troll skull
  *  washed in old blood, red light in its sockets, bone rattles on its bar.
  *  6.4 yd at its 1.6. Its Rattling Dread plays Rattle over the 2 s bar (the
@@ -596,10 +614,21 @@ export const WILDHEART_ZULGAR_LOOK: VisualDef = {
     hit: ['Hit'],
     death: 'Death',
     cast: 'Pulse',
-    castByAbility: { [ZULGAR_PULSE]: 'Pulse', [ZULGAR_SPIRIT_HUNT]: 'SpiritHunt' },
+    // The Hunting Spear is his overhead blow drawn out over its 1.5 s bar, the
+    // cast leaving his hand on the bar's end (it does not play out: the
+    // clip is his melee blow too); The Idol Wakes is the spirit taking him,
+    // slowed to its 2 s bar.
+    castByAbility: {
+      [ZULGAR_PULSE]: 'Pulse',
+      [ZULGAR_SPIRIT_HUNT]: 'SpiritHunt',
+      [ZULGAR_HUNTING_SPEAR]: 'Attack',
+      [ZULGAR_IDOL_WAKES]: 'SpiritHunt',
+    },
     castTimeScaleByAbility: {
       [ZULGAR_PULSE]: ZULGAR_CLIP.pulseStrike / ZULGAR_TUNING.pulseCast,
       [ZULGAR_SPIRIT_HUNT]: ZULGAR_CLIP.huntTaken / ZULGAR_TUNING.huntCast,
+      [ZULGAR_HUNTING_SPEAR]: ZULGAR_CLIP.attackHit / ZULGAR_TUNING.spearCast,
+      [ZULGAR_IDOL_WAKES]: ZULGAR_CLIP.huntTaken / ZULGAR_TUNING.idolWakeCast,
     },
     castPlayOut: ['Pulse', 'SpiritHunt'],
   },
@@ -712,6 +741,7 @@ export function wildheartPlaceholderLooks(
   out.mob_wildheart_beastmaster = WILDHEART_BEASTMASTER_LOOK;
   out.wildheart_sunbone_totem = WILDHEART_SUNBONE_TOTEM_LOOK;
   out.wildheart_sunbone_dread_totem = WILDHEART_SUNBONE_DREAD_TOTEM_LOOK;
+  out.wildheart_hunting_spear = WILDHEART_HUNTING_SPEAR_LOOK;
   return out;
 }
 
@@ -728,4 +758,5 @@ export const WILDHEART_MOB_KEYS: Readonly<Record<string, string>> = {
   fanglord_jaguar: 'wildheart_fanglord_jaguar',
   the_gorgebloom: 'wildheart_gorgebloom',
   great_saurian: 'wildheart_great_saurian',
+  wildheart_hunting_spear: 'wildheart_hunting_spear',
 };

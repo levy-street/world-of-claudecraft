@@ -691,6 +691,10 @@ const mergeStringsEn = {
       temple_moonwater_bolt: 'Moonwater Bolt',
       temple_drowning_aria: 'Drowning Aria',
       temple_mere_surge: 'Mere Surge',
+      // Selthe's Score (encounters/drowned_temple/selthe_score.ts): the melody's
+      // bar and the answer's (its time left is the verse's clock). Never kicked.
+      temple_score: 'The Score',
+      temple_score_answer: 'Answer the Score',
       temple_tideglass_fracture: 'Tideglass Fracture',
       temple_undertow: 'Undertow',
       temple_lunar_tide: 'Lunar Tide',
@@ -742,6 +746,15 @@ const mergeStringsEn = {
       wildheart_gorgebloom_gorge: 'Gorge',
       wildheart_zulgar_pulse: 'Wildheart Pulse',
       wildheart_zulgar_spirit_hunt: 'Spirit of the Hunt',
+      // Zulgar's hunt rework: his two new bars, the player's own bar on the
+      // spear, and the clocks his encounter objects carry (the stone jaguar's
+      // breath over its half, a sun glyph being lit or cooling).
+      wildheart_zulgar_hunting_spear: 'Hunting Spear',
+      wildheart_zulgar_idol_wakes: 'The Idol Wakes',
+      kituse_wildheart_pull_spear: 'Pull the Spear',
+      wildheart_idols_breath: "Idol's Breath",
+      wildheart_sun_glyph_kindle: 'Lighting',
+      wildheart_sun_glyph_cold: 'Cooling',
       // The Gravewyrm Sanctum rework (trash_kit/sanctum_cast_ids.ts,
       // encounters/gravewyrm_sanctum/ids.ts). Warming Rite and Goad can be kicked.
       sanctum_cinder_breath: 'Cinder Breath',

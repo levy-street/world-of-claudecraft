@@ -10,6 +10,12 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { GRAVEWYRM_SANCTUM_MOBS } from '../src/sim/content/gravewyrm_sanctum';
 import { MOBS } from '../src/sim/data';
 import {
+  moonTileTemplate,
+  SELTHE_ID,
+  SELTHE_SCORE,
+  SELTHE_SCORE_WARD,
+} from '../src/sim/encounters/drowned_temple/ids';
+import {
   MORTHEN_CANDLE_ID,
   MORTHEN_GRASP_TEMPLATE,
   MORTHEN_GRAVE_CHILL,
@@ -19,7 +25,12 @@ import {
   OSSICK_SHACKLED,
   TURNKEY_CAGED,
 } from '../src/sim/encounters/sunken_bastion/ids';
-import { ZULGAR_PREY } from '../src/sim/encounters/wildheart_basin/ids';
+import {
+  HUNTING_SPEAR_ID,
+  ZULGAR_ID,
+  ZULGAR_PINNED,
+  ZULGAR_PREY,
+} from '../src/sim/encounters/wildheart_basin/ids';
 import { createMob } from '../src/sim/entity';
 import { SANCTUM_BRANDED } from '../src/sim/mob/trash_kit/sanctum_cast_ids';
 import type { Entity } from '../src/sim/types';
@@ -43,13 +54,14 @@ const ALL_IDS: DungeonPromptId[] = [
   'wildheart',
   'sanctum',
   'crypt',
+  'temple',
   'kitUse',
 ];
 
 // ---- the pure policy --------------------------------------------------------------
 
 describe('dungeon prompt policy: what the hints setting governs', () => {
-  it('classifies every prompt, the four encounter alerts advisory and no other', () => {
+  it('classifies every prompt, the five encounter alerts advisory and no other', () => {
     // Literal, so reclassifying a prompt is a deliberate edit here too.
     expect(DUNGEON_PROMPT_ADVISORY).toEqual({
       cage: false,
@@ -58,6 +70,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       wildheart: true,
       sanctum: true,
       crypt: true,
+      temple: true,
       kitUse: false,
     });
     expect(Object.keys(DUNGEON_PROMPT_ADVISORY).sort()).toEqual([...ALL_IDS].sort());
@@ -72,6 +85,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
     expect(dungeonPromptEnabled('wildheart', false)).toBe(false);
     expect(dungeonPromptEnabled('sanctum', false)).toBe(false);
     expect(dungeonPromptEnabled('crypt', false)).toBe(false);
+    expect(dungeonPromptEnabled('temple', false)).toBe(false);
     // The prompts a player presses or steers by are never governed by it.
     expect(dungeonPromptEnabled('cage', false)).toBe(true);
     expect(dungeonPromptEnabled('chain', false)).toBe(true);
@@ -87,7 +101,9 @@ describe('dungeon prompt policy: the shared slot', () => {
     wildheart: false,
     sanctum: false,
     crypt: false,
+    temple: false,
     cryptSoft: false,
+    wildheartSoft: false,
   };
 
   it('nothing showing above: the use prompt takes the slot', () => {
@@ -95,7 +111,15 @@ describe('dungeon prompt policy: the shared slot', () => {
   });
 
   it('any prompt showing above holds the slot', () => {
-    for (const id of ['cage', 'chain', 'bastion', 'wildheart', 'sanctum', 'crypt'] as const) {
+    for (const id of [
+      'cage',
+      'chain',
+      'bastion',
+      'wildheart',
+      'sanctum',
+      'crypt',
+      'temple',
+    ] as const) {
       expect(usePromptYields({ ...none, [id]: true }), id).toBe(true);
     }
   });
@@ -107,8 +131,18 @@ describe('dungeon prompt policy: the shared slot', () => {
   });
 
   it('a soft Crypt readout beside another showing prompt changes nothing', () => {
-    for (const id of ['cage', 'chain', 'bastion', 'wildheart', 'sanctum'] as const) {
+    for (const id of ['cage', 'chain', 'bastion', 'wildheart', 'sanctum', 'temple'] as const) {
       expect(usePromptYields({ ...none, crypt: true, cryptSoft: true, [id]: true }), id).toBe(true);
+    }
+  });
+
+  it('a soft Wildheart alert (a spear to pull) does not hold it, alone', () => {
+    expect(usePromptYields({ ...none, wildheart: true, wildheartSoft: true })).toBe(false);
+    // The soft flag means nothing without a showing Wildheart alert.
+    expect(usePromptYields({ ...none, wildheartSoft: true })).toBe(false);
+    for (const id of ['cage', 'chain', 'bastion', 'sanctum', 'crypt', 'temple'] as const) {
+      const state = { ...none, wildheart: true, wildheartSoft: true, [id]: true };
+      expect(usePromptYields(state), id).toBe(true);
     }
   });
 });
@@ -173,6 +207,46 @@ const graspRing = () =>
     auras: [],
   }) as unknown as Entity;
 
+/** Zulgar's Hunting Spear standing 3 yd off (inside its 4 yd pull) or far off. */
+const spear = (x = 3) => createMob(52, MOBS[HUNTING_SPEAR_ID], 20, { x, y: 0, z: 0 });
+const zulgar = () => createMob(53, MOBS[ZULGAR_ID], 20, { x: 20, y: 0, z: 0 });
+/** Pinned by spear 52; `alone` = nobody stands free to help (value2 1). */
+const pinned = (alone: boolean): Auras => [
+  { id: ZULGAR_PINNED, sourceId: 52, value2: alone ? 1 : 0, remaining: 8, duration: 10 },
+];
+
+/** Choirmother Selthe singing the Score's melody, and one of her moon tiles. */
+const seltheSinging = () => {
+  const e = createMob(54, MOBS[SELTHE_ID], 16, { x: 20, y: 0, z: 0 });
+  e.castingAbility = SELTHE_SCORE;
+  e.castRemaining = 3;
+  e.castTotal = 5.1;
+  e.auras = [
+    {
+      id: SELTHE_SCORE_WARD,
+      name: 'The Score',
+      kind: 'buff_dr',
+      remaining: 19,
+      duration: 20,
+      value: 0,
+      value2: 0,
+      stacks: 3,
+      sourceId: 54,
+      school: 'frost',
+    },
+  ];
+  return e;
+};
+const moonTile = () =>
+  ({
+    id: 61,
+    kind: 'object',
+    templateId: moonTileTemplate('note', 1),
+    pos: { x: 12, y: 0, z: 0 },
+    scale: 2.5,
+    auras: [],
+  }) as unknown as Entity;
+
 const SENTENCED: Auras = [{ id: OLEN_SENTENCED, remaining: 4, duration: 8 }];
 const PREY: Auras = [{ id: ZULGAR_PREY, remaining: 4, duration: 8, value2: 1 }];
 const BRANDED: Auras = [{ id: SANCTUM_BRANDED, remaining: 6, duration: 12 }];
@@ -199,6 +273,15 @@ describe('DungeonPrompts: the hints setting hides the advisory alerts only', () 
       setup: (r) => r.add(graspRing()),
     },
     { name: "the Hollow Crypt's soft readout (the Rite)", id: 'crypt-alert', auras: RITE },
+    {
+      name: "the Drowned Temple's alert (Selthe's Score)",
+      id: 'temple-alert',
+      auras: [],
+      setup: (r) => {
+        r.add(seltheSinging());
+        r.add(moonTile());
+      },
+    },
   ];
 
   for (const c of cases) {
@@ -357,6 +440,72 @@ describe('DungeonPrompts: the shared slot under the hints setting', () => {
     r.prompts.paint(r.frame(false, [{ id: OSSICK_SHACKLED, sourceId: 71, value2: 12 }]));
     expect(r.shown('bastion-chain-alert')).toBe(true);
     expect(r.shown('kit-use-prompt')).toBe(false);
+    r.prompts.dispose();
+  });
+});
+
+// Zulgar's Hunting Spear: pulling it is an ACTION (the use prompt), whatever
+// the hints setting says; the alerts round it are advisory, and the two that
+// only say "pull the spear" give the slot to the prompt that does it.
+describe('DungeonPrompts: the Hunting Spear', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('hints off: a spear in reach still offers its pull, and the press targets it', () => {
+    const r = rig();
+    r.add(zulgar());
+    r.add(spear());
+    r.prompts.paint(r.frame(false));
+    expect(r.shown('wildheart-alert')).toBe(false);
+    expect(r.shown('kit-use-prompt')).toBe(true);
+    const root = r.layer.querySelector<HTMLElement>('#kit-use-prompt');
+    expect(root?.classList.contains('is-pressable')).toBe(true);
+    root?.dispatchEvent(new Event('pointerdown', { cancelable: true }));
+    expect(r.calls).toEqual(['target:52', 'interact']);
+    r.prompts.dispose();
+  });
+
+  it('hints on, a teammate: the alert points at a far spear, and yields once the prompt can offer it', () => {
+    const far = rig();
+    far.add(zulgar());
+    far.add(spear(30));
+    far.prompts.paint(far.frame(true));
+    expect(far.shown('wildheart-alert')).toBe(true);
+    expect(far.layer.querySelector('#wildheart-alert')?.classList.contains('is-spear')).toBe(true);
+    expect(far.shown('kit-use-prompt')).toBe(false);
+    far.prompts.dispose();
+    const near = rig();
+    near.add(zulgar());
+    near.add(spear());
+    near.prompts.paint(near.frame(true));
+    expect(near.shown('kit-use-prompt')).toBe(true);
+    expect(near.shown('wildheart-alert')).toBe(false);
+    near.prompts.dispose();
+  });
+
+  it('hints on, the victim in a group: told to wait for a teammate, with no press on offer', () => {
+    const r = rig();
+    r.add(zulgar());
+    r.add(spear());
+    r.prompts.paint(r.frame(true, pinned(false)));
+    expect(r.shown('wildheart-alert')).toBe(true);
+    expect(r.layer.querySelector('#wildheart-alert')?.classList.contains('is-pinned')).toBe(true);
+    expect(r.shown('kit-use-prompt')).toBe(false);
+    r.prompts.dispose();
+  });
+
+  it('hints on, the victim alone: the pull is theirs, so the prompt takes the slot', () => {
+    const r = rig();
+    r.add(zulgar());
+    r.add(spear());
+    r.prompts.paint(r.frame(true, pinned(true)));
+    expect(r.shown('kit-use-prompt')).toBe(true);
+    expect(r.shown('wildheart-alert')).toBe(false);
+    r.layer
+      .querySelector<HTMLElement>('#kit-use-prompt')
+      ?.dispatchEvent(new Event('pointerdown', { cancelable: true }));
+    expect(r.calls).toEqual(['target:52', 'interact']);
     r.prompts.dispose();
   });
 });

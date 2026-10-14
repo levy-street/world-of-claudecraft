@@ -18,7 +18,14 @@
 //                                           ward, heel (the Beastmaster); seeds,
 //                                           pods, pollinate, lash, gorge (the
 //                                           Gorgebloom); pulse, spirit, prey,
-//                                           endhunt, ambush (Zulgar)
+//                                           endhunt, ambush, glyphs, sunstrike,
+//                                           spear, pin, idol, breath (Zulgar:
+//                                           prey starts a hunt at once, glyphs
+//                                           lights all six, sunstrike opens his
+//                                           damage window, spear is the bar and
+//                                           pin the spear landed, idol jumps to
+//                                           the final phase, breath to its next
+//                                           exhale)
 //   /dev wildheart reset                    free the run and claim a fresh one
 //
 // Areas: landing, fern, bank, ford (or saurian), steps, hunt, huntupper, pits
@@ -96,7 +103,7 @@ export const WILDHEART_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev wildheart enter [normal|heroic] | tp <landing|fern|bank|ford|saurian|steps|hunt|huntupper|pits|beastmaster|ledge|behindfalls|falls|gorgebloom|causeway|island|plaza|convergence|stair|shrinestair|shrine|zulgar> | gates | kill <g1..g13|pa|pb|pc|pd|saurian|beastmaster|jaguar|gorgebloom|zulgar|trash|all> | pack <id> | spawn <stalker|ravager|hexcaller|binder|totem|dreadtotem|raptor|toad|lasher|saurian|rider|jaguar|sprout> | trigger <tail|stomp|howdah|enrage|quake|stalk|hunt|ward|heel|seeds|pods|pollinate|lash|gorge|pulse|spirit|prey|endhunt|ambush> | reset';
+  '[dev] /dev wildheart enter [normal|heroic] | tp <landing|fern|bank|ford|saurian|steps|hunt|huntupper|pits|beastmaster|ledge|behindfalls|falls|gorgebloom|causeway|island|plaza|convergence|stair|shrinestair|shrine|zulgar> | gates | kill <g1..g13|pa|pb|pc|pd|saurian|beastmaster|jaguar|gorgebloom|zulgar|trash|all> | pack <id> | spawn <stalker|ravager|hexcaller|binder|totem|dreadtotem|raptor|toad|lasher|saurian|rider|jaguar|sprout> | trigger <tail|stomp|howdah|enrage|quake|stalk|hunt|ward|heel|seeds|pods|pollinate|lash|gorge|pulse|spirit|prey|endhunt|ambush|glyphs|sunstrike|spear|pin|idol|breath> | reset';
 
 /** Raise one mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {

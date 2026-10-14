@@ -39,6 +39,7 @@ import {
   zoneAt,
 } from '../src/sim/data';
 import { onDungeonFinalBossKilledForDeeds } from '../src/sim/deeds';
+import { ZULGAR_TUNING } from '../src/sim/encounters/wildheart_basin/ids';
 import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { enterDungeon, updateDoorTriggers } from '../src/sim/instances/dungeons';
 import {
@@ -130,7 +131,11 @@ describe('Wildheart Basin dungeon content', () => {
     expect(boss.ccImmune).toBeUndefined();
     expect(boss.aoePulse).toBeUndefined();
     expect(boss.knockback?.name).toBe('Jaguar Roar');
-    expect(boss.enrage?.belowHpPct).toBe(0.3);
+    // The hunt rework: his last 30 percent is The Idol Wakes (the encounter's
+    // final phase, tests/wildheart_basin_zulgar_idol.test.ts), never a
+    // template enrage.
+    expect(boss.enrage).toBeUndefined();
+    expect(ZULGAR_TUNING.idolAtHpPct).toBe(0.3);
     // Scoped to Zulgar's own loot table: the Tier-2 loot pass added the rare
     // beastspear and the uncommon trio, and the rogue re-band gave the Fanglord
     // Beastmaster its own epic (duskwhisper), which is not a Zulgar drop.

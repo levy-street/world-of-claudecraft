@@ -52,14 +52,21 @@ import {
   startPulse,
   startSpiritHunt,
   tickZulgar,
+  wakeIdol,
   zulgarState,
 } from './zulgar';
+import { devSunstrike, lightGlyph } from './zulgar_glyphs';
+import { startIdolBreath } from './zulgar_idol';
+import { devPinNow, startHuntingSpear } from './zulgar_spear';
 
 export { jaguarState, syncPool } from './beastmaster';
 export { podSpot, terracePlayers } from './gorgebloom';
 export { breakHowdah, saurianState } from './great_saurian';
 export * from './ids';
 export { shrinePlayers } from './zulgar';
+export { glyphsLit } from './zulgar_glyphs';
+export { IDOL_BREATH_FIELD } from './zulgar_idol';
+export { isPinned, pinnedBy } from './zulgar_spear';
 
 /** A live fight whose mob lost its target for a moment (a Vanish, the tank
  *  falling) while still in combat and not evading: the fight holds, so a blip
@@ -110,7 +117,7 @@ export function tickWildheartEncounters(ctx: SimContext): void {
 }
 
 const HELP =
-  'Mechanics: tail, stomp, howdah, enrage (the Great Saurian); quake, stalk, hunt, ward, heel (the Beastmaster); seeds, pods, pollinate, lash, gorge (the Gorgebloom); pulse, spirit, prey, endhunt, ambush (Zulgar).';
+  'Mechanics: tail, stomp, howdah, enrage (the Great Saurian); quake, stalk, hunt, ward, heel (the Beastmaster); seeds, pods, pollinate, lash, gorge (the Gorgebloom); pulse, spirit, prey, endhunt, ambush, glyphs, sunstrike, spear, pin, idol, breath (Zulgar).';
 
 /** A dev trigger cuts whatever bar is running so the mechanic always shows. */
 function cutBar(boss: { castingAbility: string | null; castRemaining: number }): void {
@@ -195,12 +202,46 @@ function zulgarTrigger(ctx: SimContext, inst: InstanceSlot, what: string): strin
     return 'The hunt ends.';
   }
   if (what === 'ambush') {
+    if (st.phase === 'final') return 'The idol is awake: the hunt never ends.';
     if (st.phase === 'hunt') endHunt(ctx, inst, z, st);
     if (st.phase !== 'ambush') startAmbush(ctx, z, st);
     return 'Zulgar vanishes for an Ambush.';
   }
+  if (what === 'glyphs') {
+    let lit = 0;
+    for (let i = 0; i < st.glyphs.length; i++) if (lightGlyph(ctx, st, i, null)) lit++;
+    return `${lit} sun glyphs catch light (they strike only while he hunts).`;
+  }
+  if (what === 'sunstrike') {
+    devSunstrike(ctx, inst, z, st);
+    return 'Zulgar is Sunstruck.';
+  }
+  if (what === 'idol') {
+    if (st.phase === 'final') return 'The idol is already awake.';
+    cutBar(z);
+    wakeIdol(ctx, inst, z, st);
+    return 'The Idol Wakes: the final phase begins.';
+  }
+  if (what === 'breath') {
+    if (st.phase !== 'final') {
+      cutBar(z);
+      wakeIdol(ctx, inst, z, st);
+    }
+    const side = startIdolBreath(ctx, inst, z, st);
+    if (side === null) return 'The idol is already drawing breath.';
+    // Named by the screen, not the rose: the Basin's own gates call +x east
+    // while the HUD compass reads it west, so "left, facing the idol" is the
+    // one wording nobody can misread.
+    return `The stone jaguar draws breath over the ${side === 1 ? 'left' : 'right'} half (facing the idol).`;
+  }
   if (st.phase !== 'fight') return 'Zulgar is already hunting.';
   cutBar(z);
+  if (what === 'spear')
+    return startHuntingSpear(ctx, inst, z, st) ? 'Zulgar hefts a Hunting Spear.' : 'No target.';
+  if (what === 'pin') {
+    const victim = devPinNow(ctx, inst, z, st);
+    return victim ? `A Hunting Spear pins ${victim.name}.` : 'No target.';
+  }
   if (what === 'prey') return `Spirit of the Hunt marks ${beginHunt(ctx, inst, z, st)} Prey.`;
   if (what === 'spirit') {
     startSpiritHunt(ctx, z, st);
@@ -213,7 +254,19 @@ function zulgarTrigger(ctx: SimContext, inst: InstanceSlot, what: string): strin
 const SAURIAN_TRIGGERS = new Set(['tail', 'stomp', 'howdah', 'enrage']);
 const BEAST_TRIGGERS = new Set(['quake', 'stalk', 'hunt', 'ward', 'heel']);
 const BLOOM_TRIGGERS = new Set(['seeds', 'pods', 'pollinate', 'lash', 'gorge']);
-const ZULGAR_TRIGGERS = new Set(['pulse', 'spirit', 'prey', 'endhunt', 'ambush']);
+const ZULGAR_TRIGGERS = new Set([
+  'pulse',
+  'spirit',
+  'prey',
+  'endhunt',
+  'ambush',
+  'glyphs',
+  'sunstrike',
+  'spear',
+  'pin',
+  'idol',
+  'breath',
+]);
 
 /** Every `/dev wildheart trigger` mechanic name (the help line and tests). */
 export const WILDHEART_DEV_TRIGGERS: readonly string[] = [

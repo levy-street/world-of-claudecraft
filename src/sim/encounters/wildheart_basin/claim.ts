@@ -53,7 +53,12 @@ export function spawnBasinObject(
   obj.templateId = templateId;
   obj.dungeonId = WILDHEART_DUNGEON;
   obj.objectItemId = null;
+  // Never loot: the generic ground-object pass turns a spent object lootable
+  // again once its respawn clock runs out (at once, for one that never had
+  // one), and a lootable object is drawn as loot (a gold sparkle over it, a
+  // dot on the minimap). An encounter object is drawn by the Basin's own fx.
   obj.lootable = false;
+  obj.respawnTimer = Number.POSITIVE_INFINITY;
   obj.facing = 0;
   obj.prevFacing = 0;
   obj.scale = scale;

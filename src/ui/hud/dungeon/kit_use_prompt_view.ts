@@ -13,8 +13,10 @@
 // use's bar and what breaks it. The copy follows the use's effect: a 'topple'
 // (a Soul Brazier kicked over onto the pack) or a 'relight' (a Remembrance
 // Candle in Morthen's Rite: a channel that drains the lighter every second and
-// that a hit does not break, only a step or a stun). The painter is the shared
-// encounter alert's (encounter_alert_painter.ts), mounted by DungeonPrompts.
+// that a hit does not break, only a step or a stun) or a 'free' (Zulgar's
+// Hunting Spear, pulled out of the floor to free whoever it pins). The painter
+// is the shared encounter alert's (encounter_alert_painter.ts), mounted by
+// DungeonPrompts.
 
 import { MOBS } from '../../../sim/data';
 import { isKitUseCast, type KitUseDef } from '../../../sim/types';
@@ -82,14 +84,19 @@ function usableNow(body: KitUseBody): boolean {
 }
 
 /** The prompt's copy for one use effect (every key a t() leaf). */
+type UseEffect = 'topple' | 'relight' | 'free';
+
 interface UseCopy {
-  line: 'hudChrome.kitUse.toppleLine' | 'hudChrome.kitUse.relightLine';
-  key: 'hudChrome.kitUse.toppleKey' | 'hudChrome.kitUse.relightKey';
-  tap: 'hudChrome.kitUse.toppleTap' | 'hudChrome.kitUse.relightTap';
-  click: 'hudChrome.kitUse.toppleClick' | 'hudChrome.kitUse.relightClick';
-  far: 'hudChrome.kitUse.toppleFar' | 'hudChrome.kitUse.relightFar';
-  aria: 'hudChrome.kitUse.toppleAria' | 'hudChrome.kitUse.relightAria';
-  using: 'hudChrome.kitUse.usingLine' | 'hudChrome.kitUse.relightUsingLine';
+  line: `hudChrome.kitUse.${UseEffect}Line`;
+  key: `hudChrome.kitUse.${UseEffect}Key`;
+  tap: `hudChrome.kitUse.${UseEffect}Tap`;
+  click: `hudChrome.kitUse.${UseEffect}Click`;
+  far: `hudChrome.kitUse.${UseEffect}Far`;
+  aria: `hudChrome.kitUse.${UseEffect}Aria`;
+  using:
+    | 'hudChrome.kitUse.usingLine'
+    | 'hudChrome.kitUse.relightUsingLine'
+    | 'hudChrome.kitUse.freeUsingLine';
 }
 
 const TOPPLE_COPY: UseCopy = {
@@ -112,9 +119,20 @@ const RELIGHT_COPY: UseCopy = {
   using: 'hudChrome.kitUse.relightUsingLine',
 };
 
+const FREE_COPY: UseCopy = {
+  line: 'hudChrome.kitUse.freeLine',
+  key: 'hudChrome.kitUse.freeKey',
+  tap: 'hudChrome.kitUse.freeTap',
+  click: 'hudChrome.kitUse.freeClick',
+  far: 'hudChrome.kitUse.freeFar',
+  aria: 'hudChrome.kitUse.freeAria',
+  using: 'hudChrome.kitUse.freeUsingLine',
+};
+
 /** The copy family for a use (keyed on its effect kind). */
 export function kitUseCopy(def: KitUseDef | null | undefined): UseCopy {
-  return def?.effect.kind === 'relight' ? RELIGHT_COPY : TOPPLE_COPY;
+  if (def?.effect.kind === 'relight') return RELIGHT_COPY;
+  return def?.effect.kind === 'free' ? FREE_COPY : TOPPLE_COPY;
 }
 
 let useByCast: Map<string, KitUseDef> | null = null;

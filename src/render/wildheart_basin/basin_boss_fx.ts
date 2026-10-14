@@ -10,10 +10,11 @@
 //    the loam, the fat red pods swelling (throbbing once ripe) over their
 //    touch rings, the Vine Lash lane, Gorge's tank-buster mark, Bloom Spit,
 //    the pollen haze on the Pollinated, sprouts bursting in thorns;
-//  - Zulgar: the Wildheart Pulse ring, Spirit of the Hunt's jade sigil, the
-//    Jaguar Avatar's spirit glow and trail, the jade claw over his Prey
-//    (brighter on the one he chases now), the sun glyphs burning gold or
-//    smouldering dark, the Sunstruck flare, the heroic Ambush smoke.
+//  - Zulgar: the Wildheart Pulse ring, Spirit of the Hunt's and The Idol
+//    Wakes' jade sigils, the Hunting Spear's line to its target, the Jaguar
+//    Avatar's spirit glow and trail, the jade claw over his Prey (brighter on
+//    the one he chases now), the Sunstruck flare, the heroic Ambush smoke.
+//    His sun glyphs, his spear and the idol's breath are zulgar_hunt_fx.ts.
 // The one-shot bursts each boss event throws up are basin_boss_bursts.ts.
 //
 // Rules (src/render/CLAUDE.md): every mesh and material is built here once,
@@ -32,8 +33,6 @@ import {
   FANGLORD_JAGUAR_ID,
   WILDHEART_SEEDPOD,
   WILDHEART_SEEDPOD_RIPE,
-  WILDHEART_SUN_GLYPH_DARK,
-  WILDHEART_SUN_GLYPH_LIT,
 } from '../../sim/encounters/wildheart_basin/ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -53,7 +52,6 @@ import {
   bossCastYaw,
   bossLaneLength,
   chargeLook,
-  glyphLook,
   headMarkLook,
   podSwell,
   SEED_FLIGHT_SECONDS,
@@ -72,7 +70,6 @@ const FAN_SLOTS = 4;
 const LANE_SLOTS = 3;
 const CHARGE_SLOTS = 2;
 const POD_SLOTS = 12;
-const GLYPH_SLOTS = 6;
 const SEED_SLOTS = 12;
 const MARK_SLOTS = 6;
 const DRESS_SLOTS = 16;
@@ -107,17 +104,6 @@ interface PodSlot {
   z: number;
   landAt: number;
   ripeSince: number;
-}
-interface GlyphSlot {
-  disc: THREE.Mesh;
-  mat: THREE.ShaderMaterial;
-  /** The shaft of sunlight standing on a lit glyph. */
-  shaft: THREE.Mesh;
-  shaftMat: THREE.ShaderMaterial;
-  halo: THREE.Sprite;
-  haloMat: THREE.SpriteMaterial;
-  objectId: number;
-  emit: number;
 }
 interface SeedSlot {
   body: THREE.Mesh;
@@ -189,50 +175,6 @@ void main() {
   gl_FragColor = vec4(col * (1.0 + core * 0.8), a1 * uAlpha);
 }
 `;
-/** A sun glyph: a gold disc and its rays when lit, a smouldering ember dark. */
-const GLYPH_FRAG = /* glsl */ `
-uniform float uLit;
-uniform float uAlpha;
-uniform float uTime;
-varying vec3 vLocal;
-void main() {
-  float r = length(vLocal.xz);
-  if (r > 1.0) discard;
-  float a = atan(vLocal.z, vLocal.x);
-  float rays = pow(max(0.0, cos(a * 8.0 + uTime * 0.3)), 6.0) * smoothstep(0.3, 0.42, r)
-    * (1.0 - smoothstep(0.7, 0.92, r));
-  float disc = 1.0 - smoothstep(0.2, 0.3, r);
-  float band = smoothstep(0.8, 0.84, r) * (1.0 - smoothstep(0.9, 0.95, r));
-  float shimmer = 0.75 + 0.25 * sin(uTime * 2.0 + r * 10.0);
-  float litA = disc * 0.6 + rays * 0.6 * shimmer + band * 0.75;
-  float crack = pow(max(0.0, cos(a * 5.0 + r * 9.0)), 12.0) * step(r, 0.9);
-  float darkA = (disc * 0.22 + band * 0.3 + crack * 0.35) * (0.6 + 0.4 * sin(uTime * 1.3 + a * 3.0));
-  vec3 col = mix(vec3(0.62, 0.2, 0.06), vec3(1.0, 0.8, 0.36), uLit);
-  gl_FragColor = vec4(col, mix(darkA, litA, uLit) * uAlpha);
-}
-`;
-/** A lit sun glyph's shaft of light: brightest at its foot, rays turning. */
-const SHAFT_VERT = /* glsl */ `
-varying vec3 vLocal;
-void main() {
-  vLocal = position;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-const SHAFT_FRAG = /* glsl */ `
-uniform float uAlpha;
-uniform float uTime;
-varying vec3 vLocal;
-void main() {
-  float a = atan(vLocal.z, vLocal.x);
-  float v = vLocal.y;
-  float rays = 0.55 + 0.45 * pow(max(0.0, cos(a * 5.0 + uTime * 0.5 + v * 1.5)), 3.0);
-  float fall = (1.0 - smoothstep(0.0, 1.0, v)) * smoothstep(0.0, 0.04, v);
-  float motes = 0.8 + 0.2 * sin(v * 24.0 - uTime * 3.0 + a * 3.0);
-  gl_FragColor = vec4(vec3(1.0, 0.82, 0.45) * fall * rays * motes * uAlpha, 1.0);
-}
-`;
-
 const WARD_VERT = /* glsl */ `
 varying vec3 vN;
 varying vec3 vV;
@@ -266,7 +208,6 @@ export class BasinBossFx implements BossBurstHooks {
   private readonly lanes: LaneSlot[] = [];
   private readonly charges: ChargeSlot[] = [];
   private readonly pods: PodSlot[] = [];
-  private readonly glyphs: GlyphSlot[] = [];
   private readonly seeds: SeedSlot[] = [];
   private readonly marks: MarkSlot[] = [];
   private readonly dresses: DressSlot[] = [];
@@ -424,53 +365,6 @@ export class BasinBossFx implements BossBurstHooks {
         to: new THREE.Vector3(),
       });
     }
-    // The sun glyphs' overlay, their shafts of light and halo.
-    const shaftGeo = new THREE.CylinderGeometry(0.7, 1, 1, 32, 1, true).translate(0, 0.5, 0);
-    this.geometries.push(shaftGeo);
-    for (let i = 0; i < GLYPH_SLOTS; i++) {
-      const mat = new THREE.ShaderMaterial({
-        name: 'wildheartSunGlyph',
-        uniforms: { uLit: { value: 1 }, uAlpha: { value: 1 }, uTime: host.uTime },
-        vertexShader: DISC_VERT,
-        fragmentShader: GLYPH_FRAG,
-        transparent: true,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-        blending: THREE.AdditiveBlending,
-      });
-      this.materials.push(mat);
-      const disc = new THREE.Mesh(discGeo, mat);
-      disc.frustumCulled = false;
-      disc.visible = false;
-      disc.renderOrder = floorVfxRenderOrder('encounter', 3);
-      root.add(disc);
-      const shaftMat = new THREE.ShaderMaterial({
-        name: 'wildheartSunShaft',
-        uniforms: { uAlpha: { value: 0 }, uTime: host.uTime },
-        vertexShader: SHAFT_VERT,
-        fragmentShader: SHAFT_FRAG,
-        transparent: true,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-        blending: THREE.AdditiveBlending,
-      });
-      this.materials.push(shaftMat);
-      const shaft = new THREE.Mesh(shaftGeo, shaftMat);
-      shaft.frustumCulled = false;
-      shaft.visible = false;
-      root.add(shaft);
-      const halo = sprite(0xffc860, 0.5, 'wildheartGlyphHalo');
-      this.glyphs.push({
-        disc,
-        mat,
-        shaft,
-        shaftMat,
-        halo: halo.s,
-        haloMat: halo.mat,
-        objectId: -1,
-        emit: 0,
-      });
-    }
     // Head marks: the fang and the claw.
     const clawTex = huntSigilTexture();
     const ringGeo = new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2);
@@ -621,16 +515,6 @@ export class BasinBossFx implements BossBurstHooks {
       // A seed still in flight to it lands it; otherwise it is already down.
       const seed = this.seeds.find((s) => s.alive && s.targetId === e.id);
       p.landAt = seed ? seed.born + seed.flight : this.clock;
-      return;
-    }
-    if (t === WILDHEART_SUN_GLYPH_LIT || t === WILDHEART_SUN_GLYPH_DARK) {
-      if (this.glyphs.some((g) => g.objectId === e.id)) return;
-      const g = this.glyphs.find((s) => s.objectId < 0);
-      if (!g) return;
-      g.objectId = e.id;
-      g.emit = 0;
-      g.disc.visible = true;
-      g.halo.visible = true;
     }
   }
 
@@ -674,7 +558,6 @@ export class BasinBossFx implements BossBurstHooks {
     this.paintLanes(world);
     this.paintCharges(world, dt);
     this.paintPods(world, dt);
-    this.paintGlyphs(world, dt);
     this.paintSeeds();
     this.paintMarks(world);
     this.paintDresses(world, dt);
@@ -864,56 +747,6 @@ export class BasinBossFx implements BossBurstHooks {
           color: [0.85, 0.7, 0.3],
           alpha: 0.6,
           radius: 0.4,
-        });
-      }
-    }
-  }
-
-  private paintGlyphs(world: IWorld, dt: number): void {
-    for (const g of this.glyphs) {
-      if (g.objectId < 0) continue;
-      const obj = world.entities.get(g.objectId);
-      const t = obj?.templateId;
-      if (!obj || (t !== WILDHEART_SUN_GLYPH_LIT && t !== WILDHEART_SUN_GLYPH_DARK)) {
-        g.objectId = -1;
-        g.disc.visible = false;
-        g.halo.visible = false;
-        g.shaft.visible = false;
-        continue;
-      }
-      const lit = t === WILDHEART_SUN_GLYPH_LIT;
-      const look = glyphLook(lit, this.clock + g.objectId * 0.61);
-      const r = obj.scale || 1;
-      const { x, z } = obj.pos;
-      const gy = this.host.groundY(x, z);
-      g.disc.position.set(x, gy + 0.1, z);
-      g.disc.scale.setScalar(r);
-      g.mat.uniforms.uLit.value = look.lit;
-      g.mat.uniforms.uAlpha.value = look.alpha;
-      g.halo.position.set(x, gy + 0.9, z);
-      g.halo.scale.set(r * 2.6, r * 1.3, 1);
-      g.haloMat.color.setHex(lit ? 0xffc860 : 0xb0401a);
-      g.haloMat.opacity = look.halo;
-      // A lit glyph stands in a shaft of sunlight; a spent one has none.
-      g.shaft.visible = lit;
-      if (lit) {
-        g.shaft.position.set(x, gy + 0.05, z);
-        g.shaft.scale.set(r * 0.85, 11, r * 0.85);
-        g.shaftMat.uniforms.uAlpha.value = 0.32 * look.alpha;
-      }
-      // A lit glyph breathes gold sparks upward.
-      g.emit += dt * (lit ? 5 : 0.8) * this.host.density;
-      while (g.emit >= 1) {
-        g.emit -= 1;
-        this.host.puff(x, gy + 0.2, z, 1, {
-          speed: 0.3,
-          up: lit ? 2.2 : 0.8,
-          life: lit ? 1.6 : 1.2,
-          size: lit ? [0.3, 0.08] : [0.25, 0.08],
-          color: lit ? [1, 0.82, 0.4] : [0.9, 0.3, 0.1],
-          alpha: 0.9,
-          glow: true,
-          radius: r * 0.8,
         });
       }
     }
@@ -1154,12 +987,6 @@ export class BasinBossFx implements BossBurstHooks {
       p.objectId = -1;
       p.body.visible = false;
       p.glow.visible = false;
-    }
-    for (const g of this.glyphs) {
-      g.objectId = -1;
-      g.disc.visible = false;
-      g.halo.visible = false;
-      g.shaft.visible = false;
     }
     for (const s of this.seeds) {
       s.alive = false;

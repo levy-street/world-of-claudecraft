@@ -4180,7 +4180,17 @@ export const zh_CN: EnTranslations = {
         "pollinated": "触碰种荚会使其立刻长出荆棘幼芽。远离种子，让未授粉的玩家去踩碎它们；无人触碰的种荚会在{seconds}秒后发芽（英雄难度下它会在{heroic}秒后钻入地下，在最近的玩家身旁破土而出）。",
         "prey": "祖尔加在追猎你。引他踏过点亮的太阳符文，使他减速{slow}%。若被他追上，你会被撕咬，受到{damage}点伤害（英雄难度{heroic}点）并被击倒{stun}秒。",
         "avatar": "移动速度提高{pct}%，追猎它的猎物。减速和定身可以生效，击晕的持续时间减半。",
-        "vanished": "隐匿且免疫伤害。他即将扑向最远的玩家。"
+        "vanished": "隐匿且免疫伤害。他即将扑向最远的玩家。",
+        "sunstruck": "被点亮的太阳符文灼伤：移动速度降低{pct}%。",
+        "sunstruckExposed": "被点亮的太阳符文灼伤：受到的伤害提高{pct}%。",
+        "sunWary": "在此效果结束前，任何太阳符文都无法灼伤他。他踏过的已点亮符文会保持点亮。",
+        "pinned": "一支狩猎之矛把你钉在原地。你每{every}秒流血，受到{bleed}点物理伤害（英雄难度{heroicBleed}点），并且无论你站在哪里，荒野之心脉冲都会命中你，伤害提高{pulse}%。队友可以用{pull}秒拔出长矛。如果没有其他人能帮忙，你可以用{wrench}秒自己拔出。{seconds}秒后它会自行松脱。",
+        "idolAwake": "石美洲豹已经苏醒。每{every}秒，它会在地面预警{warning}秒后，轮流向平台的一半吐息：对该半场的所有人造成{min}到{max}点自然伤害（英雄难度{heroicMin}到{heroicMax}点）。祖尔加会保持美洲豹化身直到死亡，并且每{seconds}秒更换猎物（英雄难度{heroicSeconds}秒）。"
+      },
+      "temple": {
+        "scoreWard": "正在吟唱乐谱：在结束前不会受到伤害。在乐句结束前，按石板响起的顺序踏上月光石板，即可使她的嗓音破碎。轮流踩踏：奏响音符后，须等待另一名玩家奏响下一个正确音符。唯一的幸存者可以独自完成。如果乐句先结束，不谐之音会对庭院中的所有人造成{min}到{max}点冰霜伤害（英雄难度下为{heroicMin}到{heroicMax}点）。",
+        "brokenVoice": "她的嗓音已破碎：在此效果结束前，她受到的伤害提高{pct}%。",
+        "spentVoice": "另一名玩家奏响下一个正确音符前，你无法奏响月亮地砖。在此期间踩上地砖不会重置应答，也不会对你造成伤害。无法驱散。当你成为同一副本内唯一存活的玩家或乐谱结束时移除。"
       },
       "bastion": {
         "brineColumn": "你被困在海水之柱中：每{tick}秒受到{min}到{max}点自然伤害，最多持续{seconds}秒。打断或击晕潮缚侍僧即可挣脱。",
@@ -6518,6 +6528,7 @@ export const zh_CN: EnTranslations = {
         "summons_adds": "召唤增援",
         "lunar_tide": "月潮（周期性范围伤害）",
         "chorus_and_solo": "合唱与独唱（一个标记集合分摊，另一个标记分散）",
+        "the_score": "乐谱（她会两次在月光石板上吟唱旋律：按石板响起的顺序踏上去，即可使她的嗓音破碎）",
         "tideglass_reflections": "潮镜倒影（击杀彼此的镜像）",
         "hydra_three_elements": "三重元素（左侧头颅喷出18码的冰霜锥形吐息，使你减速70%，持续4秒；中间头颅向最多3名玩家脚下喷吐毒液，1.5秒后爆裂，并在落点灼烧6秒；右侧头颅沿一条26码长的直线射出激流，将你击退8码：每一种都要走出去。一个头颅倒下后，仍然存活的头颅会接手它的攻击）",
         "hydra_tsunami": "海啸（头颅沉入水中4.5秒，期间受到的伤害降低75%，一道巨浪席卷水池的一半，下一次换另一半：普通难度下造成160到190点冰霜伤害并把你推开10码。跑到另一半，或站到池边石柱后面；英雄难度下，巨浪会在3.5秒后回卷另一半。第一次海啸在开战24秒后到来，之后每一次都在上一次过去40秒后到来）",
@@ -6642,6 +6653,23 @@ export const zh_CN: EnTranslations = {
       "shadeLine": "光穿透了它：别管它，去找光束照亮的那个",
       "timeAria": "剩余{seconds}秒"
     },
+    "templeAlert": {
+      "melodyTitle": "乐谱",
+      "melodyLine": "观察月亮地砖依次奏响。与另一名玩家轮流踩出相同顺序",
+      "melodyDarkLine": "在地砖熄灭前记住顺序。与另一名玩家轮流踩出相同顺序",
+      "answerTitle": "回应乐谱！",
+      "answerLine": "轮流踩踏：踩上标记为{place}的月亮地砖。已奏响：{done}/{total}",
+      "answerDarkLine": "轮流凭记忆重复顺序。再次踩同一块地砖前先离开。已奏响：{done}/{total}",
+      "spentTitle": "该由另一道声音应答",
+      "spentLine": "另一名玩家奏响下一个正确音符前，你无法奏响地砖。已奏响：{done}/{total}",
+      "stepOffTitle": "先走下去，再踏上来",
+      "stepOffLine": "月光石板只有在有人踏上时才会奏响。离开这块石板，然后重新踏上去",
+      "falseTitle": "错音！",
+      "falseLine": "那块石板的顺序不对。回应将从第一块石板重新开始",
+      "brokenTitle": "塞尔瑟的嗓音破碎了！",
+      "brokenLine": "在效果结束前，她受到的伤害提高{pct}%：现在使用你最强的攻击",
+      "timeAria": "剩余{seconds}秒"
+    },
     "wildheartAlert": {
       "preyTitle": "你是猎物！",
       "preyLine": "祖尔加在追猎你：引他穿过点亮的太阳符文",
@@ -6652,7 +6680,21 @@ export const zh_CN: EnTranslations = {
       "pollinatedLine": "远离种子：你的触碰会让它们发芽",
       "bondTitle": "兽群羁绊",
       "bondLine": "在一起时它们伤害减半：把它们拉开",
-      "timeAria": "剩余{seconds}秒"
+      "timeAria": "剩余{seconds}秒",
+      "preyAloneLine": "没有其他人能点亮太阳符文。站在一个熄灭的符文上{seconds}秒将它点亮，再把祖尔加引过去",
+      "pinnedTitle": "被钉住了！",
+      "pinnedLine": "需要队友拔出狩猎之矛。被钉住时，荒野之心脉冲对你的伤害更高",
+      "pinnedSelfLine": "没有人能来帮忙：在荒野之心脉冲落下前自己拔出狩猎之矛",
+      "sunstruckTitle": "祖尔加被烈日灼伤了！",
+      "sunstruckLine": "在效果结束前他受到的伤害提高{pct}%：现在使用你最强的攻击",
+      "spearTitle": "有队友被钉住了！",
+      "spearLine": "跑到狩猎之矛旁，在荒野之心脉冲落下前把它拔出来",
+      "glyphTitle": "点亮太阳符文",
+      "glyphLine": "站在熄灭的太阳符文上{seconds}秒将它点亮。祖尔加踏过它时，会在{duration}秒内受到的伤害提高{pct}%",
+      "glyphLightingTitle": "正在点亮太阳符文",
+      "glyphLightingLine": "留在符文上直到它被点亮。离开就要重新开始",
+      "breathTitle": "神像吐息！",
+      "breathLine": "石美洲豹即将向平台的这一半吐息。跑到另一半去"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -6741,6 +6783,13 @@ export const zh_CN: EnTranslations = {
       "relightFar": "靠近到{range}码内才能重燃它",
       "relightAria": "重燃{name}",
       "relightUsingLine": "在它吸取你时保持不动：受到攻击不会打断，移动或昏迷会打断",
+      "freeLine": "把长矛从地面拔出，解救被钉住的人。受到攻击不会打断你，移动或昏迷会打断",
+      "freeKey": "拔出{name}",
+      "freeTap": "点击这里拔出{name}",
+      "freeClick": "单击这里拔出{name}",
+      "freeFar": "靠近到{range}码内才能拔出它",
+      "freeAria": "拔出{name}",
+      "freeUsingLine": "保持不动以拔出长矛：移动或昏迷会打断",
       "timeAria": "剩余{seconds}秒"
     },
     "cosmetics": {
@@ -14938,6 +14987,8 @@ export const zh_CN: EnTranslations = {
       "temple_moonwater_bolt": "月水箭",
       "temple_drowning_aria": "溺亡咏叹调",
       "temple_mere_surge": "湖涌",
+      "temple_score": "乐谱",
+      "temple_score_answer": "回应乐谱",
       "temple_tideglass_fracture": "潮镜碎裂",
       "temple_undertow": "暗流",
       "temple_lunar_tide": "月潮",
@@ -14975,6 +15026,12 @@ export const zh_CN: EnTranslations = {
       "wildheart_gorgebloom_gorge": "吞噬",
       "wildheart_zulgar_pulse": "荒野之心脉冲",
       "wildheart_zulgar_spirit_hunt": "狩猎之魂",
+      "wildheart_zulgar_hunting_spear": "狩猎之矛",
+      "wildheart_zulgar_idol_wakes": "神像苏醒",
+      "kituse_wildheart_pull_spear": "拔出长矛",
+      "wildheart_idols_breath": "神像吐息",
+      "wildheart_sun_glyph_kindle": "点亮中",
+      "wildheart_sun_glyph_cold": "冷却中",
       "sanctum_cinder_breath": "余烬吐息",
       "sanctum_warming_rite": "回暖仪式",
       "sanctum_goad": "驱策",
@@ -24806,6 +24863,9 @@ export const zh_CN: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "荆棘幼芽"
+      },
+      "wildheart_hunting_spear": {
+        "name": "狩猎之矛"
       },
       "buddy_ember_fox": {
         "name": "余烬狐"

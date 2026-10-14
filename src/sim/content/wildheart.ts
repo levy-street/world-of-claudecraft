@@ -50,6 +50,8 @@ import {
   GORGEBLOOM_ID,
   GREAT_SAURIAN_ID,
   HOWDAH_HEXCALLER_ID,
+  HUNTING_SPEAR_ID,
+  HUNTING_SPEAR_PULL_CAST,
   SPORE_TOAD_ID,
   SUNBONE_DREAD_TOTEM_ID,
   SUNBONE_TOTEM_ID,
@@ -59,6 +61,7 @@ import {
   WILDHEART_DUNGEON,
   WILDHEART_SPORE_CLOUD,
   ZULGAR_ID,
+  ZULGAR_TUNING,
 } from '../encounters/wildheart_basin/ids';
 import {
   WILDHEART_ANCESTRAL_SAP,
@@ -967,13 +970,58 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     scale: 2.8,
     color: 0xa3322a,
   },
+  // The Hunting Spear Zulgar pins a player with (encounters/wildheart_basin/
+  // zulgar_spear.ts): its usable body stands in the terrace while the pin
+  // holds, and a teammate pulls it out with the trash engine's G3 use (the
+  // victim's own, longer pull is opened by the encounter). A hit never breaks
+  // the pull: the tank can do it under Zulgar's swings, and the bleeding
+  // victim can do their own. The template's name is the name of the body a
+  // player targets; its id and cast id are ids.ts HUNTING_SPEAR_ID and
+  // HUNTING_SPEAR_PULL_CAST (pinned by tests/wildheart_basin_zulgar_spear.test.ts).
+  // No rig is drawn for it: the spear is the fx layer's own (render/
+  // wildheart_basin/zulgar_spear_fx.ts).
+  wildheart_hunting_spear: {
+    id: HUNTING_SPEAR_ID,
+    name: 'Hunting Spear',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    untameable: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 50,
+    hpPerLevel: 0,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 30,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    idleStationary: true,
+    xpMult: 0,
+    trashKit: {
+      usable: {
+        castId: HUNTING_SPEAR_PULL_CAST,
+        name: 'Pull the Spear',
+        channel: ZULGAR_TUNING.spearPullSeconds,
+        range: ZULGAR_TUNING.spearPullRange,
+        holdsThroughHits: true,
+        effect: { kind: 'free', school: 'physical' },
+      },
+    },
+    loot: [],
+    scale: 1,
+    color: 0xc9b48a,
+  },
   // Boss 3 (design section 5.3): Zulgar, Voice of the Basin, on the Jaguar
-  // Shrine Terrace. Jaguar Roar and the enrage stay template fields; the
-  // telegraphed Wildheart Pulse and the Spirit of the Hunt (the jaguar avatar
-  // chasing its Prey through the sun glyphs; heroic Twin Prey and Ambush)
-  // ride encounters/wildheart_basin/zulgar.ts, which also owns his control
+  // Shrine Terrace. Jaguar Roar stays a template field; the telegraphed
+  // Wildheart Pulse, the Hunting Spear, the Spirit of the Hunt (the jaguar
+  // avatar chasing its Prey through the sun glyphs the others light; heroic
+  // Twin Prey and Ambush) and the final phase (The Idol Wakes at 30 percent,
+  // in place of the template enrage he used to carry) ride
+  // encounters/wildheart_basin/zulgar.ts, which also owns his control
   // immunity (entity flags: immune outside the hunt, slowable and rootable
-  // during it), so the template carries no ccImmune.
+  // during it), so the template carries no ccImmune and no enrage.
   wildheart_high_priest: {
     id: 'wildheart_high_priest',
     name: 'Zulgar, Voice of the Basin',
@@ -991,10 +1039,8 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 19,
     knockback: { chance: 0.22, distance: 7, name: 'Jaguar Roar' },
-    enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.28 },
     yells: {
       engage: 'The basin has teeth. It will remember your blood!',
-      enrage: 'THE WILD HEART BEATS THROUGH ME!',
     },
     loot: [
       // 15000c base (rolls 9000c to 21000c, roughly 1g to 2g): the same

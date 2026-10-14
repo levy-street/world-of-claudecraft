@@ -23,7 +23,12 @@ import {
   FANGLORD_JAGUAR_ID,
   ZULGAR_AVATAR,
   ZULGAR_ID,
+  ZULGAR_IDOL_AWAKE,
+  ZULGAR_PINNED,
   ZULGAR_PREY,
+  ZULGAR_SUN_WARY,
+  ZULGAR_SUNSTRUCK,
+  ZULGAR_SUNSTRUCK_EXPOSED,
   ZULGAR_TUNING,
   ZULGAR_VANISHED,
 } from '../sim/encounters/wildheart_basin/ids';
@@ -82,6 +87,39 @@ export function wildheartAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDes
       return { key: `${KEY}.avatar`, nums: { pct: pct(ZULGAR_TUNING.huntSpeedMult - 1) } };
     case ZULGAR_VANISHED:
       return { key: `${KEY}.vanished`, nums: {} };
+    case ZULGAR_SUNSTRUCK:
+      return { key: `${KEY}.sunstruck`, nums: { pct: pct(ZULGAR_TUNING.sunstruckSlow) } };
+    case ZULGAR_SUNSTRUCK_EXPOSED:
+      return { key: `${KEY}.sunstruckExposed`, nums: { pct: pct(ZULGAR_TUNING.sunstruckVuln) } };
+    case ZULGAR_SUN_WARY:
+      return { key: `${KEY}.sunWary`, nums: {} };
+    case ZULGAR_PINNED:
+      return {
+        key: `${KEY}.pinned`,
+        nums: {
+          bleed: ZULGAR_TUNING.pinBleed,
+          heroicBleed: wildheartHeroicAmount(ZULGAR_ID, ZULGAR_TUNING.pinBleed),
+          every: ZULGAR_TUNING.pinBleedEvery,
+          pulse: pct(ZULGAR_TUNING.pinPulseMult - 1),
+          pull: ZULGAR_TUNING.spearPullSeconds,
+          wrench: ZULGAR_TUNING.spearWrenchSeconds,
+          seconds: ZULGAR_TUNING.pinSeconds,
+        },
+      };
+    case ZULGAR_IDOL_AWAKE:
+      return {
+        key: `${KEY}.idolAwake`,
+        nums: {
+          every: ZULGAR_TUNING.breathEvery,
+          warning: ZULGAR_TUNING.breathWarning,
+          min: ZULGAR_TUNING.breathMin,
+          max: ZULGAR_TUNING.breathMax,
+          heroicMin: wildheartHeroicAmount(ZULGAR_ID, ZULGAR_TUNING.breathMin),
+          heroicMax: wildheartHeroicAmount(ZULGAR_ID, ZULGAR_TUNING.breathMax),
+          seconds: ZULGAR_TUNING.finalPreySeconds,
+          heroicSeconds: ZULGAR_TUNING.twinSwitch * 2,
+        },
+      };
     default:
       return null;
   }

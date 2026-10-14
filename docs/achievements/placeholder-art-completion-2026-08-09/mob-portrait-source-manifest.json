@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c1291cf84f87633610ab0ec0da55b64c51ee4bba1ad6b21257f9dec139726af2",
+  "rendererFingerprint": "9c9246b45dde6c0f4e07ca53c6aab513857436e9baac309d01e0a375ddc9b601",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6082649,
-      "sha256": "4081a4a0f5735b1715f62f537e941875aa4f3d1b88e822c9c8fb127015efca5c",
+      "bytes": 6342877,
+      "sha256": "267d50a593fa1f9ad8f90c47aa9d890ea18edd898cda3185b1b7025fc55c57de",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 355,
+  "portraitCount": 356,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -13935,6 +13935,40 @@
         "path": "public/ui/mobs/wildheart_high_priest.webp",
         "bytes": 2952,
         "sha256": "4f6e217ed8057b465ffb66de357627cc74dbab8e5ce454b49c4687ba5003050d"
+      }
+    },
+    {
+      "id": "wildheart_hunting_spear",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "wildheart_hunting_spear",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_sunbone_totem.glb",
+          "path": "public/models/creatures/wildheart_sunbone_totem.glb",
+          "bytes": 1887784,
+          "sha256": "e04fce1afdacf36669ad30bad95c6b33ae08bb502c5c8fe8318db1069418ba61"
+        },
+        "idle": "Idle",
+        "height": 3.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "ab3d566581f772c8c08c9b78248231701c0727bc32887a93904ec4e49076dedf",
+      "output": {
+        "path": "public/ui/mobs/wildheart_hunting_spear.webp",
+        "bytes": 2564,
+        "sha256": "d8d5c49bf68c269f7a19b7a39f27669c4e85d7ceb469711748d80fbc16748530"
       }
     },
     {

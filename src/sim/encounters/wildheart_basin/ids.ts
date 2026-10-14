@@ -308,31 +308,92 @@ export const GORGEBLOOM_LINES = {
 } as const;
 
 // ---- Boss 3: Zulgar, Voice of the Basin (section 5.3) ------------------------------
+//
+// The hunt rework (2026-10-13, the owner's approved design): the sun glyphs
+// start dark and the players who are NOT the Prey light them; between hunts he
+// pins a player with a Hunting Spear; and at 30 percent the stone jaguar wakes
+// (The Idol Wakes) in place of the template enrage he used to carry.
+
+/** His terrace as the encounter reads it: this far round ZULGAR_SPOT (the
+ *  arena and a margin). The HUD's alert reads the same reach. */
+export const ZULGAR_TERRACE_RADIUS = 34;
 
 /** Wildheart Pulse: a 1.5 s bar, then a ring 14 yd round him. */
 export const ZULGAR_PULSE = 'wildheart_zulgar_pulse';
 /** Spirit of the Hunt: a 1.5 s bar as the jaguar spirit takes him. */
 export const ZULGAR_SPIRIT_HUNT = 'wildheart_zulgar_spirit_hunt';
 /** The Jaguar Avatar: an aura on Zulgar for the whole hunt (`remaining` =
- *  the hunt left). The renderer dresses him in the spirit jaguar and lights
- *  the stone jaguar's eyes while it holds. */
+ *  the hunt left; permanent once the idol wakes). The renderer dresses him in
+ *  the spirit jaguar and lights the stone jaguar's eyes while it holds. */
 export const ZULGAR_AVATAR = 'wildheart_jaguar_avatar';
 /** The Prey: the jade claw mark on the hunted player (`sourceId` = Zulgar;
  *  `value2` 1 on the prey he is chasing right now). */
 export const ZULGAR_PREY = 'wildheart_prey';
 /** Mauled: a caught prey is knocked down (a stun aura) and bitten. */
 export const ZULGAR_MAULED = 'wildheart_mauled';
-/** Sunstruck: a slow on the avatar when it crosses a lit sun glyph. */
+/** Sunstruck: a slow on the avatar when it crosses a lit sun glyph, and its
+ *  twin, the damage window (a `vulnerability` aura for the same seconds: the
+ *  renderer turns the spirit jaguar gold and the HUD says "burn him" off it). */
 export const ZULGAR_SUNSTRUCK = 'wildheart_sunstruck';
+export const ZULGAR_SUNSTRUCK_EXPOSED = 'wildheart_sunstruck_exposed';
+/** Wary of the Sun: once struck, no glyph strikes the avatar again until
+ *  this fades (an aura on him that shows the rule; the clock is the fight
+ *  state's). */
+export const ZULGAR_SUN_WARY = 'wildheart_sun_wary';
 /** The six sun glyphs (encounter objects, `scale` = radius): lit or dark. */
 export const WILDHEART_SUN_GLYPH_LIT = 'wildheart_sun_glyph_lit';
 export const WILDHEART_SUN_GLYPH_DARK = 'wildheart_sun_glyph_dark';
+/** A dark glyph's own clocks, carried on the glyph object as a cast bar (the
+ *  replicated presentation clock of an encounter object, as the Ghost
+ *  Captain's lanes carry theirs): KINDLE while a player stands on it lighting
+ *  it (`castTotal` the seconds it takes, `castRemaining` what is left,
+ *  `castTargetId` the one lighting it), COLD while a glyph that just struck
+ *  him cannot be lit again (`castRemaining` the seconds left). */
+export const WILDHEART_GLYPH_KINDLE = 'wildheart_sun_glyph_kindle';
+export const WILDHEART_GLYPH_COLD = 'wildheart_sun_glyph_cold';
+/** A glyph catching light (a `nova` spellfx on the glyph, from its lighter). */
+export const WILDHEART_GLYPH_LIT_FX = 'wildheart_sun_glyph_lights';
 /** Heroic Ambush: he vanishes (an aura on him; immune and hidden), a 6 yd
  *  circle marks the farthest player's spot (encounter object, `scale` =
  *  radius), and he pounces there. */
 export const ZULGAR_VANISHED = 'wildheart_zulgar_vanished';
 export const ZULGAR_AMBUSH = 'wildheart_zulgar_ambush';
 export const WILDHEART_AMBUSH_MARK = 'wildheart_ambush_mark';
+
+/** Hunting Spear: a 1.5 s bar at a player (`castTargetId`), then the spear
+ *  pins them. Also the spellfx of the throw landing and the damage name of
+ *  its bleed. */
+export const ZULGAR_HUNTING_SPEAR = 'wildheart_zulgar_hunting_spear';
+/** Pinned: the root the spear leaves on its victim (`sourceId` = the spear's
+ *  body, so a client finds the spear from the aura as it finds an Iron Cage;
+ *  `value2` 1 while the victim may wrench it out themself: nobody else stands
+ *  free to help). */
+export const ZULGAR_PINNED = 'wildheart_pinned';
+/** The spear standing in the terrace: a usable body (the trash engine's G3
+ *  use, mob/trash_kit/encounter_use.ts). A teammate targets it and presses
+ *  interact; the victim's own press is claimed by zulgar_spear.ts. */
+export const HUNTING_SPEAR_ID = 'wildheart_hunting_spear';
+/** The use's cast id (the player's bar). A literal: this leaf imports
+ *  nothing, and tests/wildheart_basin_zulgar_spear.test.ts pins it to
+ *  types.ts KIT_USE_CAST_PREFIX. */
+export const HUNTING_SPEAR_PULL_CAST = 'kituse_wildheart_pull_spear';
+/** The spear coming out (a `nova` spellfx on the freed player). */
+export const ZULGAR_SPEAR_FREED = 'wildheart_hunting_spear_freed';
+
+/** The Idol Wakes: the 2 s bar that opens the final phase when it begins
+ *  outside a hunt, and the aura on Zulgar that says the stone jaguar is awake
+ *  (the renderer burns its eyes and its throat off it). */
+export const ZULGAR_IDOL_WAKES = 'wildheart_zulgar_idol_wakes';
+export const ZULGAR_IDOL_AWAKE = 'wildheart_idol_awake';
+/** Idol's Breath: the warned half of the terrace (an encounter object on the
+ *  terrace's centre line; `facing` points across the marked half, a quarter
+ *  turn east or west; its cast bar is the warning's clock), then the breath
+ *  itself pouring over it (the same object, its template flipped, its cast
+ *  bar the seconds the breath plays out). Also the spellfx of the landing and
+ *  the damage name. */
+export const WILDHEART_IDOL_BREATH_WARNING = 'wildheart_idol_breath_warning';
+export const WILDHEART_IDOL_BREATH = 'wildheart_idol_breath';
+export const ZULGAR_IDOLS_BREATH = 'wildheart_idols_breath';
 
 export const ZULGAR_TUNING = {
   /** Wildheart Pulse: every 12 s a 1.5 s bar, 14 yd, 170 to 243 landed. */
@@ -348,8 +409,9 @@ export const ZULGAR_TUNING = {
   huntSeconds: 20,
   /** He chases at 110 percent of his run (a player's run speed, 7 yd a second). */
   huntSpeedMult: 1.1,
-  /** He catches his prey within this of his reach. */
-  catchReach: 1.5,
+  /** Avatar contact: standard 5 yd melee reach, not the giant priest's
+   *  scaled reach plus a catch bonus. This is centre-to-centre. */
+  catchReach: 5,
   /** Mauled: 500 landed and a 2 s knockdown; he feeds 1 s, then hunts on. */
   maulDamage: 500,
   maulStun: 2,
@@ -360,20 +422,150 @@ export const ZULGAR_TUNING = {
   preyRespite: 5,
   /** Stuns land half as long on the avatar. */
   huntStunScale: 0.5,
-  /** Sunstruck: 60 percent slower for 3 s; the glyph goes dark for 15 s. */
+
+  // ---- the sun glyphs ------------------------------------------------------
+  /** A player who is not the Prey lights a dark glyph by standing on it this
+   *  long (the bar on the glyph; stepping off resets it). Only while the
+   *  spirit hunts: every glyph goes dark again when a hunt ends. */
+  glyphKindleSeconds: 2,
+  /** With nobody else free to light on the terrace the Prey lights for
+   *  themself, and faster: he runs 7.7 yd a second against a player's 7, so a
+   *  lone Prey who stood 2 s would be caught on the glyph every time. One
+   *  second is the lead a Sunstruck (3 s at 40 percent of his run) buys on the
+   *  14 yd to the next glyph. */
+  glyphKindleAloneSeconds: 1,
+  /** A glyph that just struck him is spent: it cannot be lit again for this
+   *  long, so one player camping one glyph is no route (it would strike him
+   *  once every 10 s; two glyphs lit in turn strike him every 5). */
+  glyphColdSeconds: 8,
+  /** Sunstruck: 60 percent slower for 3 s, and he takes 25 percent more
+   *  damage for those 3 s (the size of every other boss's window: Ysolei's
+   *  Eclipsed, the Knellwyrm's Bared Ribs, Morthen's Shattered Ward). No pool
+   *  moves for it: the best route keeps him struck about 60 percent of a
+   *  hunt, so a perfect group gains about 15 percent while he is the avatar,
+   *  which is what the lighters and the Prey give up by not attacking. */
   sunstruckSlow: 0.6,
   sunstruckSeconds: 3,
-  glyphDarkSeconds: 15,
+  sunstruckVuln: 0.25,
+  /** Wary of the Sun: from a strike, no glyph strikes him again for this long
+   *  (the 3 s window and 2 s after it; a lit glyph he crosses meanwhile stays
+   *  lit). Without it six lit glyphs chain into one endless window: slowed,
+   *  he crawls the 7 yd from one glyph's rim to the next inside its 3 s. */
+  sunWarySeconds: 5,
+
+  // ---- Hunting Spear -------------------------------------------------------
+  // Priced off the Pulse (about 206 on everyone within 14 yd, one every
+  // 13.5 s: its 12 s clock waits out its own bar; 15 a second each). A spear
+  // costs nothing on impact. Pulled within 3 s it bled 45, a fifth of a Pulse;
+  // left in for its whole 10 s it bled 150 and its Pulse landed for half as
+  // much again (about 103 more): 253, or 9 a second over the 28.5 s between
+  // spears, for a mistake the whole group can see.
+  /** Due every 20 s (the first 8 s in), and thrown when the next Pulse is
+   *  `spearLeadsPulse` off, so every spear is followed by a Pulse on the same
+   *  fuse. In a plain phase that is before every second Pulse, 28.5 s apart
+   *  (two Pulse periods of 13.5 s and the spear's own bar); a due clock under
+   *  15 s would put one before EVERY Pulse. Never during a hunt, an Ambush or
+   *  the final phase, never over another bar; a hunt beginning pulls every
+   *  spear out. */
+  spearEvery: 20,
+  spearFirst: 8,
+  spearCast: 1.5,
+  /** Seconds left on the Pulse's clock when the spear's bar opens (the clock
+   *  waits out the spear's bar as it does every bar of his): the spear lands,
+   *  3.5 s later the Pulse's own 1.5 s bar opens, so the Pulse lands 5 s
+   *  after the pin. */
+  spearLeadsPulse: 3.5,
+  /** Pinned: rooted until the spear is pulled, at most this long. */
+  pinSeconds: 10,
+  /** The bleed: this much (landed) every `pinBleedEvery` s while Pinned. */
+  pinBleed: 15,
+  pinBleedEvery: 1,
+  /** A Pinned player is struck by the Wildheart Pulse wherever they stand
+   *  (it runs down the spear), for this much of its roll. */
+  pinPulseMult: 1.5,
+  /** A teammate pulls the spear in 1.5 s from within 4 yd (3.5 s to get
+   *  there before the Pulse lands); alone, the victim wrenches it out in 3 s
+   *  (2 s to spare). */
+  spearPullSeconds: 1.5,
+  spearWrenchSeconds: 3,
+  spearPullRange: 4,
+  /** The spear stands this far from its victim, on the side it came from. */
+  spearStandoff: 1.1,
+
+  // ---- the final phase: The Idol Wakes -------------------------------------
+  // It REPLACES the template enrage (under 30 percent: melee x 1.5 at x 1.28
+  // speed, so x 1.92). On the reference tank (level-20 prot, 2861 armor,
+  // Defensive Stance) his average swing lands 257 every 2.55 s, 101 a second;
+  // enraged, 194 a second, about 9,300 over the 48 s the last 30 percent of
+  // his 160 s plan takes. In the final phase he never swings (the avatar's
+  // swings are held), so that whole 194 a second is what the phase may spend.
+  // The Idol's Breath spends it on the people who do not move: 300 to 360 an
+  // exhale, one every 10 s, is 165 a second across a party of five that eats
+  // EVERY exhale (under what the tank alone used to take) and nothing across a
+  // party that crosses in time. One exhale is 35 percent of the 950 cloth
+  // pool, between the Pulse (22) and the Maul (53): the dearest mistake of
+  // the phase and the one with the longest warning. Heroic takes both through
+  // the claim's mechanic factor (2.5), as every boss mechanic here does.
+  /** The idol wakes at 30 percent: a 2 s bar from a plain phase; a hunt in
+   *  flight simply never ends. */
+  idolAtHpPct: 0.3,
+  idolWakeCast: 2,
+  /** He switches Prey every 8 s (heroic Twin Prey: a fresh pair every 12 s,
+   *  each chased for one 6 s turn). In the final phase the tank is hunted
+   *  like anyone: there is nothing left to tank. */
+  finalPreySeconds: 8,
+  /** A switch is unannounced, and the new Prey may be a melee at his feet:
+   *  he turns on it for 1.5 s before he runs (planted, as when he feeds), so
+   *  a fresh mark is never caught where it stands. At a run a player clears
+   *  his reach (melee range and 1.5 yd) in under a second; the other half
+   *  second is the time it takes to see the mark. The turn comes out of the
+   *  8 s, never on top of it: 6.5 s of chase per mark. */
+  finalSwitchPause: 1.5,
+  /** Idol's Breath: the first warning 5 s after it wakes, then one every
+   *  10 s, alternating halves. The warning stands 5 s: a player on the far
+   *  rim, 30 yd from the centre line, needs 4.3 s to cross at a run. */
+  breathFirst: 5,
+  breathEvery: 10,
+  breathWarning: 5,
+  breathMin: 300,
+  breathMax: 360,
+  /** Seconds the breath plays out over its half once it has landed (the hit
+   *  is the landing; the pour is its look). */
+  breathLinger: 1.6,
+
   /** Heroic Twin Prey: two marks, he switches every 6 s. */
   twinSwitch: 6,
   /** Heroic Ambush: 2 s gone, the circle paints 0.5 s in (1.5 s warning),
-   *  6 yd, 250 to 300 landed. */
+   *  6 yd, 250 to 300 landed. The glyphs stay lit until he lands, so a group
+   *  that stood the far player on a lit glyph opens a Sunstruck window on his
+   *  own pounce. */
   ambushSeconds: 2,
   ambushWarning: 1.5,
   ambushRadius: 6,
   ambushMin: 250,
   ambushMax: 300,
 } as const;
+
+/** The Idol's Breath marks one half of the terrace: +1 the east half (local
+ *  x above the centre line), -1 the west. */
+export type IdolBreathSide = 1 | -1;
+
+/** The facing an Idol's Breath object carries for a side (it points across
+ *  the marked half, away from the centre line). */
+export function idolBreathFacing(side: IdolBreathSide): number {
+  return (side * Math.PI) / 2;
+}
+
+/** The side an Idol's Breath object marks, read back off its facing. */
+export function idolBreathSideOf(facing: number): IdolBreathSide {
+  return Math.sin(facing) >= 0 ? 1 : -1;
+}
+
+/** Is a spot (instance-local x) inside the half an Idol's Breath marks? The
+ *  centre line itself is safe: the edge the floor paints is the edge tested. */
+export function inIdolBreathHalf(localX: number, side: IdolBreathSide): boolean {
+  return localX * side > 0;
+}
 
 export const ZULGAR_DEED = 'dgn_zulgar_uncaught';
 
@@ -382,4 +574,13 @@ export const ZULGAR_LINES = {
   hunt: 'The jaguar wakes in me! Run, little prey!',
   huntEnds: 'The spirit sleeps... for now.',
   ambush: 'You cannot hide from the hunter!',
+  spear: 'Hold still, little prey.',
+  idolWakes: 'Wake, old stone! Breathe on them!',
 } as const;
+
+/** The emote as the stone jaguar draws breath (re-localized by src/ui/sim_i18n.ts). */
+export const ZULGAR_IDOL_BREATH_LOG = 'The stone jaguar draws breath!';
+
+/** What a Pinned player is told when they press interact while a teammate
+ *  stands free to pull the spear (re-localized by src/ui/sim_i18n.ts). */
+export const ZULGAR_SPEAR_HELP_ERROR = 'You are pinned: a teammate must pull the spear out.';

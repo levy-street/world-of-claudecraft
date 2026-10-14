@@ -2,12 +2,13 @@
 // dungeon-rework/wildheart_basin.md section 5.3, src/sim/encounters/
 // wildheart_basin/zulgar.ts and control_gate.ts): the telegraphed Wildheart
 // Pulse, Spirit of the Hunt at 70 and 40 (the avatar, the Prey, Mauled, the
-// sun glyphs and Sunstruck, the control rules of the hunt), heroic Twin Prey
-// and Ambush, the deed, and the reset. On a real claimed Basin with a real
-// party (tests/helpers/wildheart_fight.ts).
+// control rules of the hunt), heroic Twin Prey and Ambush, the deed, and the
+// reset. On a real claimed Basin with a real party (tests/helpers/
+// wildheart_fight.ts). The rework's three additions have their own suites:
+// the sun glyphs (wildheart_basin_zulgar_glyphs), the Hunting Spear
+// (wildheart_basin_zulgar_spear) and the final phase (wildheart_basin_zulgar_idol).
 
 import { describe, expect, it } from 'vitest';
-import { SUN_GLYPHS } from '../src/sim/content/wildheart_basin_layout';
 import {
   ZULGAR_TUNING as T,
   WILDHEART_AMBUSH_MARK,
@@ -20,7 +21,6 @@ import {
   ZULGAR_PREY,
   ZULGAR_PULSE,
   ZULGAR_SPIRIT_HUNT,
-  ZULGAR_SUNSTRUCK,
   ZULGAR_VANISHED,
 } from '../src/sim/encounters/wildheart_basin';
 import type { Aura, Entity, ZulgarFightState } from '../src/sim/types';
@@ -140,28 +140,6 @@ describe('Spirit of the Hunt', () => {
     expect(st(z).mauled).toBe(true);
   });
 
-  it('a lit sun glyph makes the avatar Sunstruck and goes dark for 15 s', () => {
-    const f = fight();
-    const z = pull(f);
-    tick(f);
-    dev(f, 'prey');
-    expect(objects(f, WILDHEART_SUN_GLYPH_LIT)).toHaveLength(SUN_GLYPHS.length);
-    put(f, z, SUN_GLYPHS[0].x, SUN_GLYPHS[0].z);
-    tick(f);
-    const struck = aura(z, ZULGAR_SUNSTRUCK);
-    expect(struck?.kind).toBe('slow');
-    expect(struck?.value).toBeCloseTo(1 - T.sunstruckSlow, 6);
-    expect(objects(f, WILDHEART_SUN_GLYPH_DARK)).toHaveLength(1);
-    expect(st(z).glyphDark[0]).toBeGreaterThan(T.glyphDarkSeconds - 0.2);
-    // Outside the hunt a glyph never strikes.
-    dev(f, 'endhunt');
-    put(f, z, SUN_GLYPHS[1].x, SUN_GLYPHS[1].z);
-    tick(f);
-    expect(objects(f, WILDHEART_SUN_GLYPH_DARK)).toHaveLength(1);
-    run(f, T.glyphDarkSeconds);
-    expect(objects(f, WILDHEART_SUN_GLYPH_DARK)).toHaveLength(0);
-  });
-
   it('roots land on the avatar and stuns last half as long; outside the hunt neither', () => {
     const f = fight();
     const z = pull(f);
@@ -277,6 +255,7 @@ describe('Never Caught and the reset', () => {
     tick(f);
     expect(preyOf(f)).toHaveLength(0);
     expect(objects(f, WILDHEART_SUN_GLYPH_LIT)).toHaveLength(0);
+    expect(objects(f, WILDHEART_SUN_GLYPH_DARK)).toHaveLength(0);
     expect(aura(z, ZULGAR_AVATAR)).toBeUndefined();
     expect(z.wildheartFight).toBeUndefined();
     expect(z.ccImmune).toBe(true);

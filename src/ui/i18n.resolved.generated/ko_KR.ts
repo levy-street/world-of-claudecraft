@@ -4180,7 +4180,17 @@ export const ko_KR: EnTranslations = {
         "pollinated": "씨앗 꼬투리를 건드리면 즉시 가시 새싹이 자라납니다. 씨앗을 피하고 깨끗한 플레이어가 밟게 하세요. 아무도 건드리지 않은 꼬투리는 {seconds}초 뒤 싹이 틉니다(영웅 난이도에서는 {heroic}초 뒤 땅속으로 파고들어 가장 가까운 플레이어 곁에서 솟아납니다).",
         "prey": "줄가르가 당신을 사냥합니다. 빛나는 태양 문양을 밟게 하면 {slow}% 느려집니다. 붙잡히면 물어뜯겨 {damage}의 피해(영웅 난이도 {heroic})를 입고 {stun}초 동안 쓰러집니다.",
         "avatar": "이동 속도가 {pct}% 증가하고 사냥감을 쫓습니다. 감속과 속박은 통하며 기절 지속 시간은 절반이 됩니다.",
-        "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다."
+        "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다.",
+        "sunstruck": "빛나는 태양 문양에 그을림: 이동 속도가 {pct}% 감소합니다.",
+        "sunstruckExposed": "빛나는 태양 문양에 그을림: 받는 피해가 {pct}% 증가합니다.",
+        "sunWary": "이 효과가 끝날 때까지 어떤 태양 문양도 그를 그을릴 수 없습니다. 그동안 그가 밟은 빛나는 문양은 계속 빛납니다.",
+        "pinned": "사냥 창이 당신을 그 자리에 꿰어 고정했습니다. {every}초마다 {bleed}의 물리 피해(영웅 난이도 {heroicBleed})를 입는 출혈에 걸리며, 야생심장 파동은 어디에 서 있든 적중하고 피해가 {pulse}% 증가합니다. 아군이 {pull}초에 걸쳐 창을 뽑아 줄 수 있습니다. 도울 수 있는 사람이 아무도 없으면 직접 {wrench}초에 걸쳐 뽑으세요. {seconds}초 뒤에는 저절로 빠집니다.",
+        "idolAwake": "돌 재규어가 깨어났습니다. {every}초마다 바닥에 {warning}초 동안 경고를 띄운 뒤 테라스의 절반씩 번갈아 숨결을 내뿜습니다: 그 절반에 있는 모두에게 {min}~{max}의 자연 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 줄가르는 죽을 때까지 재규어 화신 상태를 유지하며 {seconds}초마다(영웅 난이도 {heroicSeconds}초마다) 사냥감을 바꿉니다."
+      },
+      "temple": {
+        "scoreWard": "악보를 노래하는 중: 끝날 때까지 피해를 받지 않습니다. 노래가 끝나기 전에 울린 순서대로 달의 타일에 올라서면 그녀의 목소리가 갈라집니다. 번갈아 밟으세요. 음을 울린 뒤에는 다른 플레이어가 다음 올바른 음을 울릴 때까지 기다려야 합니다. 혼자 살아남았다면 끝까지 혼자 답할 수 있습니다. 노래가 먼저 끝나면 불협화음이 뜰에 있는 모두에게 {min}~{max}의 냉기 피해(영웅 난이도에서는 {heroicMin}~{heroicMax})를 입힙니다.",
+        "brokenVoice": "목소리가 갈라졌습니다: 이 효과가 끝날 때까지 받는 피해가 {pct}% 증가합니다.",
+        "spentVoice": "다른 플레이어가 다음 올바른 음을 울릴 때까지 달 타일을 울릴 수 없습니다. 이 동안 타일을 밟아도 답이 초기화되거나 피해를 받지 않습니다. 해제할 수 없습니다. 같은 인스턴스에 살아 있는 플레이어가 자신뿐이거나 악보가 끝나면 사라집니다."
       },
       "bastion": {
         "brineColumn": "바닷물 기둥에 갇혔습니다: {tick}초마다 {min}~{max}의 자연 피해를 최대 {seconds}초 동안 받습니다. 조수결속 수행사제를 차단하거나 기절시키면 풀려납니다.",
@@ -6518,6 +6528,7 @@ export const ko_KR: EnTranslations = {
         "summons_adds": "증원 소환",
         "lunar_tide": "달의 파도(주기적 광역 피해)",
         "chorus_and_solo": "합창과 독창 (한 표식에는 모이고 다른 표식에서는 흩어지기)",
+        "the_score": "악보 (그녀가 두 번 달의 타일에 선율을 노래합니다: 울린 순서대로 올라서면 그녀의 목소리가 갈라집니다)",
         "tideglass_reflections": "조수유리 투영체 (서로의 거울상을 처치)",
         "hydra_three_elements": "세 가지 원소 (왼쪽 머리는 18야드 원뿔 범위에 냉기를 내뿜어 4초 동안 이동 속도를 70퍼센트 늦추고, 가운데 머리는 최대 3명의 발밑에 독을 뱉어 1.5초 뒤에 터지며 떨어진 자리에서 6초 동안 타오르고, 오른쪽 머리는 26야드 직선으로 급류를 쏘아 8야드 밀쳐 냅니다: 모두 범위 밖으로 피하세요. 머리 하나가 쓰러지면 남은 머리들이 그 공격을 이어받습니다)",
         "hydra_tsunami": "해일 (머리들이 4.5초 동안 물속으로 가라앉아 받는 피해가 75퍼센트 줄고, 파도가 웅덩이의 절반을 덮칩니다. 다음에는 반대쪽 절반입니다: 일반 난이도 기준 160~190 냉기 피해와 10야드 밀쳐내기. 반대쪽 절반으로 건너가거나 가장자리 기둥 뒤에 서세요. 영웅 난이도에서는 3.5초 뒤에 파도가 반대쪽 절반으로 되돌아옵니다. 첫 해일은 전투 시작 24초 뒤에, 그 뒤로는 앞선 해일이 지나간 지 40초 뒤에 옵니다)",
@@ -6642,6 +6653,23 @@ export const ko_KR: EnTranslations = {
       "shadeLine": "빛이 그대로 통과한다: 내버려 두고 빛이 비추는 자를 찾아라",
       "timeAria": "{seconds}초 남음"
     },
+    "templeAlert": {
+      "melodyTitle": "악보",
+      "melodyLine": "달 타일이 차례로 울리는 것을 지켜보세요. 다른 플레이어와 번갈아 같은 순서로 밟으세요",
+      "melodyDarkLine": "타일이 어두워지기 전에 순서를 기억하세요. 다른 플레이어와 번갈아 같은 순서로 밟으세요",
+      "answerTitle": "악보에 답하세요!",
+      "answerLine": "번갈아 밟으세요. {place} 표시가 있는 달 타일을 밟으세요. 진행: {total}개 중 {done}개",
+      "answerDarkLine": "번갈아 기억한 순서대로 밟으세요. 같은 타일을 다시 밟으려면 먼저 내려오세요. 진행: {total}개 중 {done}개",
+      "spentTitle": "다른 목소리가 답할 차례",
+      "spentLine": "다른 플레이어가 다음 올바른 음을 울릴 때까지 타일을 울릴 수 없습니다. 진행: {total}개 중 {done}개",
+      "stepOffTitle": "내려갔다가 다시 올라서세요",
+      "stepOffLine": "달의 타일은 누군가 올라설 때만 울립니다. 이 타일에서 내려갔다가 다시 올라서세요",
+      "falseTitle": "틀린 음!",
+      "falseLine": "그 타일은 차례가 아니었습니다. 답은 첫 번째 타일부터 다시 시작됩니다",
+      "brokenTitle": "셀세의 목소리가 갈라졌습니다!",
+      "brokenLine": "효과가 끝날 때까지 받는 피해가 {pct}% 증가합니다: 지금 가장 강한 공격을 쏟아부으세요",
+      "timeAria": "{seconds}초 남음"
+    },
     "wildheartAlert": {
       "preyTitle": "당신이 사냥감입니다!",
       "preyLine": "줄가르가 당신을 쫓습니다: 빛나는 태양 문양으로 끌고 가세요",
@@ -6652,7 +6680,21 @@ export const ko_KR: EnTranslations = {
       "pollinatedLine": "씨앗에서 떨어지세요: 닿으면 싹이 틉니다",
       "bondTitle": "무리의 유대",
       "bondLine": "함께 있으면 받는 피해가 절반입니다: 떼어 놓으세요",
-      "timeAria": "{seconds}초 남음"
+      "timeAria": "{seconds}초 남음",
+      "preyAloneLine": "태양 문양을 밝혀 줄 사람이 없습니다. 꺼진 문양 위에 {seconds}초 동안 서서 밝힌 뒤 줄가르를 그 위로 끌고 가세요",
+      "pinnedTitle": "꿰뚫려 고정됨!",
+      "pinnedLine": "아군이 사냥 창을 뽑아 줘야 합니다. 고정된 동안 야생심장 파동의 피해가 더 커집니다",
+      "pinnedSelfLine": "도와줄 사람이 없습니다: 야생심장 파동이 닿기 전에 직접 사냥 창을 뽑으세요",
+      "sunstruckTitle": "줄가르가 태양에 그을렸습니다!",
+      "sunstruckLine": "효과가 끝날 때까지 그가 받는 피해가 {pct}% 증가합니다: 지금 가장 강한 공격을 쓰세요",
+      "spearTitle": "아군이 꿰뚫려 고정됐습니다!",
+      "spearLine": "사냥 창으로 달려가 야생심장 파동이 닿기 전에 뽑으세요",
+      "glyphTitle": "태양 문양을 밝히세요",
+      "glyphLine": "꺼진 태양 문양 위에 {seconds}초 동안 서면 밝혀집니다. 줄가르가 그 위를 지나면 {duration}초 동안 받는 피해가 {pct}% 증가합니다",
+      "glyphLightingTitle": "태양 문양을 밝히는 중",
+      "glyphLightingLine": "문양이 밝혀질 때까지 그 위에 머무르세요. 벗어나면 처음부터 다시 시작합니다",
+      "breathTitle": "우상의 숨결!",
+      "breathLine": "돌 재규어가 테라스의 이쪽 절반에 숨결을 내뿜으려 합니다. 반대쪽 절반으로 건너가세요"
     },
     "sanctumAlert": {
       "quenchTitle": "담금질 물속이다!",
@@ -6741,6 +6783,13 @@ export const ko_KR: EnTranslations = {
       "relightFar": "{range}야드 안으로 다가가 다시 밝히세요",
       "relightAria": "{name} 다시 밝히기",
       "relightUsingLine": "빨아들이는 동안 가만히 있으세요: 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다",
+      "freeLine": "창을 바닥에서 뽑아 고정된 대상을 풀어 주세요. 공격을 받아도 끊기지 않지만, 이동하거나 기절하면 끊깁니다",
+      "freeKey": "{name} 뽑기",
+      "freeTap": "여기를 탭해 {name}을(를) 뽑으세요",
+      "freeClick": "여기를 클릭해 {name}을(를) 뽑으세요",
+      "freeFar": "{range}야드 안으로 다가가 뽑으세요",
+      "freeAria": "{name} 뽑기",
+      "freeUsingLine": "창을 뽑을 때까지 가만히 있으세요: 이동하거나 기절하면 끊깁니다",
       "timeAria": "{seconds}초 남음"
     },
     "cosmetics": {
@@ -14938,6 +14987,8 @@ export const ko_KR: EnTranslations = {
       "temple_moonwater_bolt": "월수 화살",
       "temple_drowning_aria": "익사의 아리아",
       "temple_mere_surge": "호수의 해일",
+      "temple_score": "악보",
+      "temple_score_answer": "악보에 답하기",
       "temple_tideglass_fracture": "조수유리 균열",
       "temple_undertow": "역류",
       "temple_lunar_tide": "달의 조수",
@@ -14975,6 +15026,12 @@ export const ko_KR: EnTranslations = {
       "wildheart_gorgebloom_gorge": "포식",
       "wildheart_zulgar_pulse": "야생심장 파동",
       "wildheart_zulgar_spirit_hunt": "사냥의 영혼",
+      "wildheart_zulgar_hunting_spear": "사냥 창",
+      "wildheart_zulgar_idol_wakes": "우상이 깨어나다",
+      "kituse_wildheart_pull_spear": "창 뽑기",
+      "wildheart_idols_breath": "우상의 숨결",
+      "wildheart_sun_glyph_kindle": "밝히는 중",
+      "wildheart_sun_glyph_cold": "식는 중",
       "sanctum_cinder_breath": "잿불 숨결",
       "sanctum_warming_rite": "온기의 의식",
       "sanctum_goad": "몰아세우기",
@@ -24806,6 +24863,9 @@ export const ko_KR: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "가시 새싹"
+      },
+      "wildheart_hunting_spear": {
+        "name": "사냥 창"
       },
       "buddy_ember_fox": {
         "name": "잉걸불 여우"

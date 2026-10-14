@@ -5,8 +5,9 @@
 // 1. The player's "Dungeon mechanic hints" setting (settings.showDungeonHints).
 //    It governs the ADVISORY prompts only: the encounter alerts whose panel is
 //    text explaining a mechanic (the Sunken Bastion's crown alert, the
-//    Wildheart Basin's, the Gravewyrm Sanctum's and the Hollow Crypt's, soft
-//    readouts included). None of them takes a press. The ACTION prompts are
+//    Wildheart Basin's, the Gravewyrm Sanctum's, the Hollow Crypt's and the
+//    Drowned Temple's, soft readouts included). None of them takes a press.
+//    The ACTION prompts are
 //    never governed by it: the Iron Cage escape (the panel IS the escape
 //    button), Gaoler Ossick's chain alert (a live gauge the player steers by:
 //    the links left on the anchor and the shackle's reach used, with the
@@ -17,10 +18,11 @@
 //    profile or governor (tests/dungeon_hints_setting.test.ts pins that).
 //
 // 2. The slot. The prompts share one slot, so the use prompt gives way to
-//    every prompt above it that is SHOWING, except a soft Crypt readout, which
-//    gives the slot to the use prompt instead. An advisory alert the setting
-//    hides is not showing, so it never holds the slot: with the hints off the
-//    use prompt takes the slot exactly as it does when no alert is up.
+//    every prompt above it that is SHOWING, except a soft Crypt readout and a
+//    soft Wildheart alert (the ones that say "pull the spear"), which give the
+//    slot to the use prompt instead. An advisory alert the setting hides is
+//    not showing, so it never holds the slot: with the hints off the use
+//    prompt takes the slot exactly as it does when no alert is up.
 
 /** Every prompt DungeonPrompts composes, in slot order (the use prompt last). */
 export type DungeonPromptId =
@@ -30,6 +32,7 @@ export type DungeonPromptId =
   | 'wildheart'
   | 'sanctum'
   | 'crypt'
+  | 'temple'
   | 'kitUse';
 
 /** Whether a prompt is ADVISORY (the hints setting governs it). A Record over
@@ -41,6 +44,7 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
   wildheart: true,
   sanctum: true,
   crypt: true,
+  temple: true,
   kitUse: false,
 };
 
@@ -59,12 +63,24 @@ export interface DungeonPromptSlotState {
   wildheart: boolean;
   sanctum: boolean;
   crypt: boolean;
+  temple: boolean;
   /** The showing Crypt alert is a SOFT readout (ignored while crypt is false). */
   cryptSoft: boolean;
+  /** The showing Wildheart alert is a SOFT one (ignored while wildheart is
+   *  false): it points at a Hunting Spear the use prompt can offer. */
+  wildheartSoft: boolean;
 }
 
 /** Whether a prompt above the use prompt holds the shared slot (the use prompt
- *  is then not built). A soft Crypt readout does not hold it. */
+ *  is then not built). A soft Crypt readout or Wildheart alert does not hold it. */
 export function usePromptYields(s: DungeonPromptSlotState): boolean {
-  return s.cage || s.chain || s.bastion || s.wildheart || s.sanctum || (s.crypt && !s.cryptSoft);
+  return (
+    s.cage ||
+    s.chain ||
+    s.bastion ||
+    (s.wildheart && !s.wildheartSoft) ||
+    s.sanctum ||
+    (s.crypt && !s.cryptSoft) ||
+    s.temple
+  );
 }

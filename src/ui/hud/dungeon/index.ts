@@ -1,7 +1,7 @@
 // HUD domain: dungeon encounter prompts the local player acts on: the Gaol
 // Turnkey's Iron Cage escape, Gaoler Ossick's chain alert, the Wildheart
-// Basin's, the Gravewyrm Sanctum's and the Hollow Crypt's alerts (the shared encounter alert
-// painter) and the trash engine's use prompt (a Soul Brazier to topple, a
+// Basin's, the Gravewyrm Sanctum's, the Hollow Crypt's and the Drowned Temple's alerts (the
+// shared encounter alert painter) and the trash engine's use prompt (a Soul Brazier to topple, a
 // Remembrance Candle to relight, on the same painter), composed by the HUD as one DungeonPrompts member; and the
 // floating avoidance word. Also the dungeon objectives tracker: the plate at
 // the top of the right tracker stack that names the dungeon and counts its
@@ -85,10 +85,32 @@ export type {
   SanctumAlertView,
 } from './sanctum_alert_view';
 export { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
+export type { TempleSceneEntity, TempleSceneWorld } from './temple_alert_scene_core';
+export { TempleAlertSceneScan } from './temple_alert_scene_core';
+export type {
+  TempleAlertEntity,
+  TempleAlertInput,
+  TempleAlertKind,
+  TempleAlertScene,
+  TempleAlertView,
+} from './temple_alert_view';
+export {
+  buildTempleAlertView,
+  EMPTY_TEMPLE_SCENE,
+  TEMPLE_ALERT_KINDS,
+} from './temple_alert_view';
+export type { WildheartSceneEntity, WildheartSceneWorld } from './wildheart_alert_scene_core';
+export { WildheartAlertSceneScan } from './wildheart_alert_scene_core';
 export type {
   WildheartAlertEntity,
   WildheartAlertInput,
   WildheartAlertKind,
+  WildheartAlertScene,
   WildheartAlertView,
 } from './wildheart_alert_view';
-export { buildWildheartAlertView, WILDHEART_ALERT_KINDS } from './wildheart_alert_view';
+export {
+  buildWildheartAlertView,
+  EMPTY_WILDHEART_SCENE,
+  WILDHEART_ALERT_KINDS,
+  WILDHEART_SOFT_ALERT_KINDS,
+} from './wildheart_alert_view';

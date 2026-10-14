@@ -26,17 +26,27 @@ export const HYDRA_HEAD_TEMPLATES: readonly string[] = [
 ];
 
 // ---- cast ids (real cast bars on the bosses) -------------------------------------
+/** Retired (the Score pass): her court-wide song every 10 s, a bar nobody
+ *  could answer. She never casts it; the id stays so the shipped cast-name
+ *  rows (and an old replay) still resolve. */
 export const SELTHE_SEA_SONG = 'temple_sea_song';
 /** Retired: Selthe's old backhand. She is a caster now and never casts it; the
  *  id stays so the shipped cast-name rows (and an old replay) still resolve. */
 export const SELTHE_TIDAL_SLAP = 'temple_tidal_slap';
-/** Selthe's filler: a bolt of moonwater at her foe (a bar, kickable). */
+/** Selthe's quiet filler: a bolt of moonwater thrown at her foe. No bar since
+ *  the Score pass (the id is the projectile's spellfx cue and its clip key). */
 export const SELTHE_MOONWATER_BOLT = 'temple_moonwater_bolt';
 /** Selthe's sung beam of water on one player (a channel, kickable; line of
  *  sight breaks it, a body in the way catches it). */
 export const SELTHE_DROWNING_ARIA = 'temple_drowning_aria';
 /** Selthe heaves her pool: a wave crashes through a wedge of the court. */
 export const SELTHE_MERE_SURGE = 'temple_mere_surge';
+/** The Score (selthe_score.ts): she sings a melody on the moon tiles (a bar,
+ *  never kicked), */
+export const SELTHE_SCORE = 'temple_score';
+/** ...then holds the verse open while the group answers it (a channel whose
+ *  time left is the answer's clock; never kicked). */
+export const SELTHE_SCORE_ANSWER = 'temple_score_answer';
 /** The ice head's frost cone (the cast id kept from the first pass; its bar
  *  reads Freezing Breath). */
 export const HYDRA_TIDE_BREATH = 'temple_tide_breath';
@@ -76,6 +86,15 @@ export const YSOLEI_FALLING_MOON = 'temple_falling_moon';
 // ---- aura ids ---------------------------------------------------------------------
 export const SELTHE_CHORUS_MARK = 'temple_chorus_mark';
 export const SELTHE_SOLO_MARK = 'temple_solo_mark';
+/** Her ward while a Score runs: she takes no damage (stacks: the melody's
+ *  notes; value2 1 when the tiles go dark for the answer, heroic). */
+export const SELTHE_SCORE_WARD = 'temple_score_ward';
+/** The last correct singer waits for a different player to sound a note. */
+export const SELTHE_SPENT_VOICE = 'temple_spent_voice';
+/** The Score was answered: her voice breaks and she reels (a stun), */
+export const SELTHE_BROKEN_VOICE = 'temple_broken_voice';
+/** ...and takes more damage for a while longer. */
+export const SELTHE_BROKEN_VOICE_EXPOSED = 'temple_broken_voice_exposed';
 export const HYDRA_ENRAGED = 'temple_enraged_hydra';
 /** A head under the water for the Tsunami: it takes far less damage. */
 export const HYDRA_SUBMERGED = 'temple_hydra_submerged';
@@ -110,6 +129,18 @@ export const SELTHE_ECHO_BURST = 'temple_echo_burst';
 export const SELTHE_ARIA_PULSE = 'temple_aria_pulse';
 /** A Drowning Aria broke (sight lost, kicked, its target fell or fled). */
 export const SELTHE_ARIA_BROKEN = 'temple_aria_broken';
+/** She gathers a Moonwater Bolt (a moment before it flies; targetId: her foe). */
+export const SELTHE_BOLT_GATHER = 'temple_bolt_gather';
+/** A moon tile rings its note in the melody (targetId: its tile object). */
+export const SELTHE_TILE_NOTE = 'temple_tile_note';
+/** A tile was stepped in its turn (targetId: its tile object). */
+export const SELTHE_TILE_SOUNDED = 'temple_tile_sounded';
+/** A tile was stepped out of turn (targetId: its tile object). */
+export const SELTHE_FALSE_NOTE = 'temple_false_note';
+/** The Score was answered: her voice breaks (targetId: Selthe). */
+export const SELTHE_VOICE_BREAKS = 'temple_voice_breaks';
+/** The verse ran out: Discord rolls over the court (targetId: Selthe). */
+export const SELTHE_DISCORD = 'temple_discord';
 /** One red Tideglass Fracture slice detonates (targetId: its slice object). */
 export const FRACTURE_BURST = 'temple_fracture_burst';
 export const REFLECTION_SHATTER = 'temple_reflection_shatter';
@@ -132,11 +163,11 @@ export const YSOLEI_ECLIPSE = 'temple_eclipse';
 export const YSOLEI_MOON_FALLS = 'temple_moon_falls';
 
 /** The boss bars a player interrupt can cut (Kick, Pummel, Counterspell),
- *  by the school the lockout lands in: Selthe's bolt and her aria. Spread into
- *  mob/healer_channel.ts SCRIPTED_INTERRUPTIBLE_CHANNELS. Every other Temple
- *  boss bar is a mechanic to dodge, never kicked. */
+ *  by the school the lockout lands in: Selthe's Drowning Aria, the one bar
+ *  of hers the group decides to kick. Spread into mob/healer_channel.ts
+ *  SCRIPTED_INTERRUPTIBLE_CHANNELS. Every other Temple boss bar is a mechanic
+ *  to dodge or to answer, never kicked. */
 export const TEMPLE_BOSS_CAST_SCHOOLS: Readonly<Record<string, { school: 'frost' }>> = {
-  [SELTHE_MOONWATER_BOLT]: { school: 'frost' },
   [SELTHE_DROWNING_ARIA]: { school: 'frost' },
 };
 
@@ -170,6 +201,42 @@ export const FRACTURE_TEMPLATES = {
 export type FractureState = keyof typeof FRACTURE_TEMPLATES;
 export const CHORUS_ECHO_TEMPLATE = 'temple_chorus_echo';
 export const SOLO_ECHO_TEMPLATE = 'temple_solo_echo';
+/** A moon tile round Selthe's pool (selthe_score.ts). Its template id is its
+ *  state and its place in the melody (its scale is the tile's radius):
+ *   dark  dormant, or hidden for the heroic answer;
+ *   note  ringing its note in the melody right now;
+ *   lit   part of the melody, its place shown (normal);
+ *   next  the tile the answer wants now, called out (normal);
+ *   done  stepped in its turn;
+ *   sour  just stepped out of turn. */
+export const MOON_TILE_STATES = ['dark', 'note', 'lit', 'next', 'done', 'sour'] as const;
+export type MoonTileState = (typeof MOON_TILE_STATES)[number];
+/** The longest melody (the second Score's): a tile's place runs 1 to this. */
+export const MOON_TILE_MAX_PLACE = 4;
+const MOON_TILE_PREFIX = 'temple_moon_tile_';
+
+/** The template a tile wears: its state, and its place in the melody (1 the
+ *  first note; 0 when it has none to show). */
+export function moonTileTemplate(state: MoonTileState, place = 0): string {
+  const n = Math.max(0, Math.min(MOON_TILE_MAX_PLACE, Math.floor(place)));
+  return n > 0 ? `${MOON_TILE_PREFIX}${state}_${n}` : `${MOON_TILE_PREFIX}${state}`;
+}
+
+const MOON_TILE_LOOKS: ReadonlyMap<string, { state: MoonTileState; place: number }> = (() => {
+  const out = new Map<string, { state: MoonTileState; place: number }>();
+  for (const state of MOON_TILE_STATES)
+    for (let place = 0; place <= MOON_TILE_MAX_PLACE; place++)
+      out.set(moonTileTemplate(state, place), { state, place });
+  return out;
+})();
+
+/** A moon tile's state and place off its template id (null: not a tile). The
+ *  returned record is shared: read it, never write it. */
+export function moonTileOf(
+  templateId: string,
+): Readonly<{ state: MoonTileState; place: number }> | null {
+  return MOON_TILE_LOOKS.get(templateId) ?? null;
+}
 export const RIPTIDE_TEMPLATE = 'temple_riptide_pool';
 /** A Moonlight Tear rolling at Ysolei (facing: its heading, scale: its radius). */
 export const MOON_TEAR_TEMPLATE = 'temple_moon_tear';
@@ -189,6 +256,7 @@ export const TEMPLE_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   ...Object.values(TSUNAMI_TEMPLATES),
   CHORUS_ECHO_TEMPLATE,
   SOLO_ECHO_TEMPLATE,
+  ...MOON_TILE_LOOKS.keys(),
   RIPTIDE_TEMPLATE,
   MOON_TEAR_TEMPLATE,
   MOONGLOW_TEMPLATE,
@@ -213,7 +281,7 @@ export function tideStateOf(templateId: string): TideState | null {
   return null;
 }
 
-// ---- Choirmother Selthe: stack for Chorus, spread for Solo ----------------------------
+// ---- Choirmother Selthe: stack for Chorus, spread for Solo, answer the Score ----------
 
 export const SELTHE_TUNING = {
   chorusFirst: 10,
@@ -225,33 +293,36 @@ export const SELTHE_TUNING = {
   chorusTotal: 400,
   soloRadius: 8,
   soloDamage: 150,
-  songFirst: 6,
-  songEvery: 10,
-  songCast: 1.5,
-  songMin: 35,
-  songMax: 45,
   // ---- the caster pass: she never swings her hands and never leaves her pool.
   // Moonwater Bolt replaces her melee as the tank's pressure. Her swing was
   // her weapon roll (63 to 98 on normal, average 80.5: the elite template's
   // 78.75 at 16, rolled 0.8 to 1.25) every 2.2 s: 36.6 raw DPS, about 23
   // after a level-16 tank's 36 percent armor reduction (armor / (armor + 400
   // + 85 x 16) at about 1,000 armor) and about 17 once a tank's dodges and
-  // parries (about a quarter of swings) are counted. Her other bars fill
-  // about 54 percent of the fight (Sea-Song 1.5 of 10 s, Surge 3 of 18,
-  // Aria 5 of 22) and each leaves a 0.5 s breath, so she bolts about 40
-  // percent of the time. A bolt is one weapon roll x boltWeaponShare of frost
-  // (no armor, no dodge or parry) every boltCast + boltGap = 2.5 s: 1.2 x
-  // 80.5 / 2.5 x 0.4 = about 15.5 DPS over the fight, just under the swing's
-  // 17, landing as heavy 76 to 118 bolts a kick can stop. Reading her live
-  // weapon keeps the heroic row's melee factor on it (the tank-swing floor),
-  // where her mechanics ride the row's mechanic factor.
-  boltCast: 2,
-  boltGap: 0.5,
-  boltWeaponShare: 1.2,
+  // parries (about a quarter of swings) are counted.
+  //
+  // The Score pass: the bolt is her QUIET filler now. It has no bar (so the
+  // one bar the group decides to kick is the Drowning Aria): she gathers it
+  // for boltWindup and throws it every boltEvery seconds of the time she
+  // sings no bar. With the Sea-Song retired her bars fill about 39 percent of
+  // the fight (Surge 3 of 18 s, Aria 5 of 22), so she is free about 61
+  // percent of it. A bolt is one weapon roll x boltWeaponShare of frost (no
+  // armor, no dodge or parry): 0.8 x 80.5 / 2.5 x 0.61 = about 15.7 DPS over
+  // the fight, the same pressure the barred bolt carried (1.2 x 80.5 / 2.5 x
+  // 0.4 = 15.5) and still just under the swing's 17, now as steady 50 to 78
+  // bolts instead of heavy 76 to 118 ones. Reading her live weapon keeps the
+  // heroic row's melee factor on it (the tank-swing floor), where her
+  // mechanics ride the row's mechanic factor.
+  boltEvery: 2.5,
+  /** She gathers the bolt this long before it flies (the gather cue's lead;
+   *  the damage lands on boltEvery). One second: her Bolt clip, played at
+   *  double speed, flings the orb on exactly this beat. */
+  boltWindup: 1,
+  boltWeaponShare: 0.8,
   boltRange: 45,
-  /** After a kick (any of her kickable bars cut short) she casts neither
-   *  bolt nor aria for this long, lockout or not (a boss shrugs the school
-   *  lockout's duration off by diminishing returns). */
+  /** After a kick (her aria cut short) she throws no bolt and sings no aria
+   *  for this long, lockout or not (a boss shrugs the school lockout's
+   *  duration off by diminishing returns). */
   kickQuiet: 3,
   // Drowning Aria: a sung beam on one player who is not the tank, a pulse a
   // second for 5 s, each pulse on the same body 10 harder than the last:
@@ -286,6 +357,71 @@ export const SELTHE_TUNING = {
   // Heroic Echo: each mark resolves again at the same spot 4 s later.
   echoAfter: 4,
   chorusEchoDamage: 120,
+  // ---- the Score (selthe_score.ts): her moment, at 60 and 30 percent ----------
+  // She stops (her clocks stand still, she takes no damage) and sings a melody
+  // on the moon tiles round her pool: three tiles the first time, four the
+  // second, one after another. Then the group steps on those tiles in that
+  // order before the verse ends.
+  /** Her health share at each Score, and the notes each melody carries. */
+  scoreAt: [0.6, 0.3],
+  scoreNotes: [3, 4],
+  /** The melody's bar: she draws breath for scoreIntro, then a tile rings
+   *  every scoreNoteEvery (it rings for scoreNoteRing of that). The second
+   *  melody uses the faster cadence. Pending echoes finish before either begins. */
+  scoreIntro: 1.5,
+  scoreNoteEvery: 1.2,
+  scoreNoteRing: 1,
+  scoreSecondNoteEvery: 0.75,
+  scoreSecondNoteRing: 0.6,
+  // The answer's clock, sized from run speed (types.ts RUN_SPEED, 7 yd/s) for
+  // ONE player doing the whole answer alone from the worst spot in the court.
+  // The tiles stand on an arc of scoreRingRadius round her, 50 degrees apart:
+  // neighbours are 11.0 yd apart and tiles two apart 19.9 yd. A melody only
+  // ever steps to a neighbour or one past it, with at most one such leap
+  // (scoreMelodies below), so its tiles are at most 30.9 yd of running end to
+  // end for three notes and 41.9 yd for four. The farthest a court player can
+  // stand from a tile is 43.7 yd (the far rim from an end tile), so the worst
+  // solo runs are 74.6 yd (10.7 s) and 85.6 yd (12.2 s), even ignoring that
+  // the melody's own 5 to 6 s are spent walking to the first tile. The clocks
+  // below leave a quarter more than that: 14 s and 16 s. A group of two or
+  // three splits the tiles and needs a fraction of it. Pinned by
+  // tests/drowned_temple_selthe_score.test.ts ("the reach proof").
+  scoreAnswer: [14, 16],
+  scoreRingRadius: 13,
+  /** Degrees between neighbouring tiles on the arc (five tiles: 200 degrees
+   *  round the front of her pool). */
+  scoreTileStepDeg: 50,
+  scoreTileCount: 5,
+  /** A step counts when a player comes within this of a tile's centre... */
+  scoreTileRadius: 2.5,
+  /** ...and they have left it once they are this much farther out (so a body
+   *  on the rim does not step it again and again). */
+  scoreTileLeave: 0.75,
+  /** A tile stepped out of turn shows sour for this long. */
+  scoreSourSeconds: 0.9,
+  // What the Score costs, paid for by the Sea-Song it replaces. The Sea-Song
+  // was 35 to 45 frost (average 40) to the whole court every 10 s from 6 s
+  // in: nine songs over her planned 90 s (dungeon_difficulty.ts), 360 frost a
+  // player that nothing could answer. The Score spends that same 360 only on
+  // mistakes: a verse that runs out is Discord, 150 to 170 frost (average
+  // 160) to everyone in the court, and a tile stepped out of turn is a False
+  // Note, 40 frost (one Sea-Song) to whoever stepped. Two failed Scores and
+  // one false step are 2 x 160 + 40 = 360, the retired Sea-Song exactly; a
+  // group that answers both takes none of it. Discord sits beside a Solo
+  // (150) and well under a lone Chorus (400): about a third of a level-16
+  // cloth wearer, so it hurts and does not wipe a healthy group. Heroic rides
+  // the row's mechanic factor like her other mechanics (675 to 765, a Solo's
+  // 675 on everyone).
+  discordMin: 150,
+  discordMax: 170,
+  falseNoteDamage: 40,
+  // Answered in time, her voice breaks: stunned for brokenStun, and taking
+  // brokenVuln more damage for brokenVulnSeconds from the same moment. The
+  // sizes are Castellan Olen's Breached window (sunken_bastion/ids.ts
+  // oathBrokenStun 4, oathBrokenVuln 0.2 for 10 s).
+  brokenStun: 4,
+  brokenVulnSeconds: 10,
+  brokenVuln: 0.2,
 } as const;
 
 export const COURT = CHOIR_COURT;
@@ -293,6 +429,111 @@ export const COURT = CHOIR_COURT;
 /** How a Chorus of `total` splits among the `n` players caught in it. */
 export function chorusShare(total: number, n: number): number {
   return n <= 0 ? 0 : total / n;
+}
+
+/** The moon tiles' spots (instance-local) round a singer standing at
+ *  (`cx`, `cz`): an arc of scoreTileCount tiles at scoreRingRadius, opening
+ *  toward the court's centre so every tile lies on the open floor in front of
+ *  her (none behind her body, none against the lamp pillars). Index 0 is one
+ *  end of the arc and the last index the other; neighbours in index are
+ *  neighbours on the floor. */
+export function moonTileSpots(cx: number, cz: number): { x: number; z: number }[] {
+  const n = SELTHE_TUNING.scoreTileCount;
+  const step = (SELTHE_TUNING.scoreTileStepDeg * Math.PI) / 180;
+  const dx = COURT.x - cx;
+  const dz = COURT.z - cz;
+  // Standing on the court's centre she would have no front: face its entrance.
+  const heading = Math.hypot(dx, dz) < 1e-6 ? Math.PI : Math.atan2(dx, dz);
+  const out: { x: number; z: number }[] = [];
+  for (let i = 0; i < n; i++) {
+    const a = heading + (i - (n - 1) / 2) * step;
+    out.push({
+      x: cx + Math.sin(a) * SELTHE_TUNING.scoreRingRadius,
+      z: cz + Math.cos(a) * SELTHE_TUNING.scoreRingRadius,
+    });
+  }
+  return out;
+}
+
+function buildMelodies(notes: number): number[][] {
+  const tiles = SELTHE_TUNING.scoreTileCount;
+  const out: number[][] = [];
+  const walk = (seq: number[], leaps: number): void => {
+    if (seq.length === notes) {
+      out.push([...seq]);
+      return;
+    }
+    const from = seq[seq.length - 1];
+    for (let next = 0; next < tiles; next++) {
+      if (seq.includes(next)) continue;
+      const gap = Math.abs(next - from);
+      if (gap > 2 || (gap === 2 && leaps > 0)) continue;
+      seq.push(next);
+      walk(seq, leaps + (gap === 2 ? 1 : 0));
+      seq.pop();
+    }
+  };
+  for (let first = 0; first < tiles; first++) walk([first], 0);
+  return out;
+}
+
+const SCORE_MELODIES: ReadonlyMap<number, readonly (readonly number[])[]> = new Map(
+  SELTHE_TUNING.scoreNotes.map((n) => [n, buildMelodies(n)]),
+);
+
+/** Every melody of `notes` notes she can sing, in a fixed order: no tile
+ *  twice, each note a neighbour of the last or one past it, and at most one
+ *  such leap, so the answer is never a run from one end of the arc to the
+ *  other and back. Empty for a note count she never sings. */
+export function scoreMelodies(notes: number): readonly (readonly number[])[] {
+  return SCORE_MELODIES.get(notes) ?? [];
+}
+
+/** The melody a Score sings: a hashed pick from the table (the caller hashes
+ *  the boss and the cast, like FRACTURE_SAFE_PATTERNS' rotation), never the
+ *  shared rng. */
+export function scoreMelody(notes: number, hash: number): number[] {
+  const all = scoreMelodies(notes);
+  return all.length === 0 ? [] : [...all[(hash >>> 0) % all.length]];
+}
+
+/** The melody's bar: her breath, then a slot for every note. */
+export function scoreMelodySeconds(notes: number): number {
+  return SELTHE_TUNING.scoreIntro + notes * scoreNoteEvery(notes);
+}
+
+/** Shared melody cadence, keyed by the note count mirrored on her ward. */
+export function scoreNoteEvery(notes: number): number {
+  return notes >= SELTHE_TUNING.scoreNotes[1]
+    ? SELTHE_TUNING.scoreSecondNoteEvery
+    : SELTHE_TUNING.scoreNoteEvery;
+}
+export function scoreNoteRing(notes: number): number {
+  return notes >= SELTHE_TUNING.scoreNotes[1]
+    ? SELTHE_TUNING.scoreSecondNoteRing
+    : SELTHE_TUNING.scoreNoteRing;
+}
+
+/** Which Score this is (0 the first) to its notes and its answer's clock. */
+export function scoreNotesOf(index: number): number {
+  const n = SELTHE_TUNING.scoreNotes;
+  return n[Math.max(0, Math.min(n.length - 1, index))];
+}
+export function scoreAnswerSeconds(index: number): number {
+  const a = SELTHE_TUNING.scoreAnswer;
+  return a[Math.max(0, Math.min(a.length - 1, index))];
+}
+
+/** Does a body at (`x`, `z`) stand on the tile at `spot`? `wasOn` widens the
+ *  rim by scoreTileLeave, so a body on the edge is not stepping on and off. */
+export function onMoonTile(
+  spot: { x: number; z: number },
+  x: number,
+  z: number,
+  wasOn: boolean,
+): boolean {
+  const reach = SELTHE_TUNING.scoreTileRadius + (wasOn ? SELTHE_TUNING.scoreTileLeave : 0);
+  return Math.hypot(x - spot.x, z - spot.z) <= reach;
 }
 
 // ---- The Mere Hydra: three elements, one moon pool ------------------------------------

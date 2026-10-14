@@ -10,7 +10,9 @@ a planted cast owns its tick.
 |---|---|
 | `ids.ts` | Leaf: ids, cast, aura and object template ids, tuning, and the pure geometry (`tideHalfAt`, `inTideHalf`, `chorusShare`). The renderer and tests key on it. |
 | `claim.ts` | The live Temple claims and the Temple's ephemeral encounter objects; the claim-generic reads are the Bastion's (`../sunken_bastion/claim.ts`), re-exported. |
-| `selthe.ts` | Choirmother Selthe, a caster who never leaves her pool or swings her hands: Chorus (split) and Solo (spread) marks (G16), Sea-Song, the kickable Moonwater Bolt (her tank pressure, from her weapon roll) and Drowning Aria (a beam a kick, a lost line of sight or a body stepping into it answers, `ariaCatcher`), the Mere Surge wedge; heroic Duet and Echo. |
+| `selthe.ts` | Choirmother Selthe, a caster who never leaves her pool or swings her hands: Chorus (split) and Solo (spread) marks (G16), the Moonwater Bolt (her quiet filler on the tank, from her weapon roll, with NO bar), the Drowning Aria (the one bar the group kicks: a beam a kick, a lost line of sight or a body stepping into it answers, `ariaCatcher`), the Mere Surge wedge; heroic Duet and Echo. The Sea-Song is retired (its id stays for old cast-name rows). |
+| `selthe_score_relay.ts` | Correct notes alternate living players through Spent Voice. Blocked entries are harmless; a sole living player can continue. State owns eligibility and a neutral aura mirrors the restriction. |
+| `selthe_score.ts` | The Score, Selthe's moment at 60 and 30 percent: she stops (her clocks stand still, she takes no damage), sings a melody on the five moon tiles round her pool (three notes, then four, hashed from `ids.ts` `scoreMelodies`), and the group steps ONTO those tiles in that order before the verse ends. Answered: Broken Voice (a stun, then more damage taken). Not answered: Discord over the court. A tile out of turn is a False Note and sends the answer back to its first tile. Heroic hides the tiles for the answer. The state rides the five tile objects (`moonTileTemplate`: state and place in the template id), her two bars and her ward aura. |
 | `mere_hydra.ts` | The Mere Hydra's coordinator: three stationary heads sharing one fight state (G17), the element clocks (each fired by whoever wields that element, `ids.ts` `hydraElementOwners`), Enraged Hydra stacks, the deed, the reset (a wipe regrows every fallen head whole). |
 | `hydra_elements.ts` | The three elemental attacks: ice (Freezing Breath cone and its chill), venom (Venom Spit pools that leave burning venom), water (Crushing Torrent lane and its shove). |
 | `hydra_tsunami.ts` | The Tsunami: the heads submerge (a bar, 75 percent less damage) and a wave rolls over one half of the pool, alternating sides; the other half and a rim column's lee are safe; heroic backwash. |
@@ -43,9 +45,11 @@ Rules:
   `tests/drowned_temple_hydra_finder.test.ts` (the Finder lines against the tuning).
 - Tests: `tests/drowned_temple_bosses.test.ts`, `tests/drowned_temple_hydra_elements.test.ts`,
   `tests/drowned_temple_colossus_chase.test.ts`, `tests/drowned_temple_ysolei_pass6.test.ts`,
-  `tests/drowned_temple_selthe_caster.test.ts`, `tests/drowned_temple_colossus_fracture.test.ts`,
+  `tests/drowned_temple_selthe_caster.test.ts`, `tests/drowned_temple_selthe_score.test.ts`,
+  `tests/drowned_temple_colossus_fracture.test.ts`,
   `tests/drowned_temple_hydra_combo.test.ts`, `tests/drowned_temple_ysolei_moon.test.ts`,
   `tests/drowned_temple_encounter_pass_dev.test.ts`;
-  dev triggers: `/dev temple trigger` (bolt, aria, surge, breath, spit, torrent, tsunami, regrow,
-  fracture, combo, frostlock, current, rime, tears, fullmoon, cocoon among them),
+  dev triggers: `/dev temple trigger` (bolt, aria, surge, score, score2, scorewin, scorefail,
+  breath, spit, torrent, tsunami, regrow, fracture, combo, frostlock, current, rime, tears,
+  fullmoon, cocoon among them),
   jumps: `/dev temple tp selthe|hydra|colossus|ysolei`.

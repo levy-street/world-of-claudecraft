@@ -25,7 +25,17 @@ import {
   startTsunami,
   tickMereHydra,
 } from './mere_hydra';
-import { startAria, startBolt, startChorus, startSolo, startSurge, tickSelthe } from './selthe';
+import {
+  clearMarks,
+  cutBar,
+  hurryBolt,
+  startAria,
+  startChorus,
+  startSolo,
+  startSurge,
+  tickSelthe,
+} from './selthe';
+import { breakVoice, failScore, resetScoreRun, startScore } from './selthe_score';
 import { raiseReflections, startLance, tickColossus } from './tideglass_colossus';
 import { startFracture } from './tideglass_fracture';
 import { startRisingTide, startUndertow, tickYsolei } from './ysolei';
@@ -50,9 +60,14 @@ export function tickTempleEncounters(ctx: SimContext): void {
 }
 
 const HELP =
-  'Mechanics: chorus, solo, duet, bolt, aria, surge (Selthe); breath, spit, torrent, tsunami, regrow, combo, frostlock, current, rime (the Hydra); reflections, lance, fracture (the Colossus); undertow, flood, tears, fullmoon (Ysolei); cocoon (an engaged Moonmantle Ray).';
+  'Mechanics: chorus, solo, duet, bolt, aria, surge, score, score2, scorewin, scorefail (Selthe); breath, spit, torrent, tsunami, regrow, combo, frostlock, current, rime (the Hydra); reflections, lance, fracture (the Colossus); undertow, flood, tears, fullmoon (Ysolei); cocoon (an engaged Moonmantle Ray).';
 
 const SELTHE_BARS = new Set(['bolt', 'aria', 'surge']);
+
+/** The Score triggers: the first (three tiles) or the second (four) from its
+ *  melody, and a running Score answered or run out (either starts one first
+ *  when none is running). */
+const SELTHE_SCORE_TRIGGERS = new Set(['score', 'score2', 'scorewin', 'scorefail']);
 
 const HYDRA_TRIGGERS = new Set(['breath', 'spit', 'torrent', 'tsunami', 'regrow']);
 
@@ -71,6 +86,7 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
     const boss = claimBoss(ctx, inst, SELTHE_ID);
     const st = boss?.templeFight;
     if (!boss || st?.kind !== 'selthe') return 'Pull Selthe first.';
+    if (st.score) return 'The Score is running.';
     if (what !== 'solo') startChorus(ctx, inst, boss, st);
     if (what !== 'chorus') startSolo(ctx, inst, boss, st);
     return 'Selthe marks her singers.';
@@ -79,22 +95,41 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
     const boss = claimBoss(ctx, inst, SELTHE_ID);
     const st = boss?.templeFight;
     if (!boss || st?.kind !== 'selthe') return 'Pull Selthe first.';
+    if (st.score) return 'The Score is running.';
     // A dev trigger cuts whatever bar is running (not as a kick: no hush).
-    if (boss.castingAbility !== null) {
-      boss.castingAbility = null;
-      boss.castRemaining = 0;
-      boss.castTargetId = null;
-      boss.channeling = false;
-      st.aria = null;
-      st.kickable = null;
-      boss.castTotal = 0;
-      st.surgeYaw = null;
+    cutBar(boss, st);
+    if (what === 'bolt') {
+      hurryBolt(st);
+      return 'Selthe gathers a Moonwater Bolt.';
     }
-    if (what === 'bolt')
-      return startBolt(ctx, inst, boss, st) ? 'Selthe gathers a Moonwater Bolt.' : 'No target.';
     if (what === 'aria')
       return startAria(ctx, inst, boss, st) ? 'Selthe sings a Drowning Aria.' : 'No target.';
     return startSurge(ctx, inst, boss, st) ? 'Selthe heaves a Mere Surge.' : 'No target.';
+  }
+  if (SELTHE_SCORE_TRIGGERS.has(what)) {
+    const boss = claimBoss(ctx, inst, SELTHE_ID);
+    const st = boss?.templeFight;
+    if (!boss || st?.kind !== 'selthe') return 'Pull Selthe first.';
+    if (what === 'score' || what === 'score2' || !st.score) {
+      // A clean slate: no bar, no marks, no Score or window in the way.
+      cutBar(boss, st);
+      clearMarks(ctx, st);
+      resetScoreRun(ctx, boss, st);
+      // An answer trigger with no Score running starts the next one owed.
+      const index = what === 'score' ? 0 : what === 'score2' ? 1 : Math.min(st.scores, 1);
+      if (!startScore(ctx, inst, boss, st, index)) return 'The moon tiles are not standing.';
+    }
+    if (what === 'scorewin') {
+      breakVoice(ctx, boss, st);
+      return "The Score is answered: Selthe's voice breaks.";
+    }
+    if (what === 'scorefail') {
+      failScore(ctx, inst, boss, st);
+      return 'The verse runs out: Discord rolls over the court.';
+    }
+    return what === 'score2'
+      ? 'Selthe sings the second Score: four moon tiles.'
+      : 'Selthe sings the first Score: three moon tiles.';
   }
   if (what in COMBO_TRIGGERS) {
     const heads = hydraHeads(ctx, inst);

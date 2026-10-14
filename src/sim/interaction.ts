@@ -41,6 +41,7 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
+import { trySpearWrench } from './encounters/wildheart_basin/zulgar_spear';
 import { tryStartEscort } from './escort';
 import { interactIgnivarRaidLore } from './ignivar_raid_lore';
 import { isInRaidInstance } from './instances/dungeons';
@@ -482,6 +483,9 @@ export function interact(
   // Locked in the Gaol Turnkey's Iron Cage: the interact press is an escape
   // press (rate-limited and counted by the encounter), never anything else.
   if (tryCageStruggle(ctx, p)) return;
+  // Pinned by Zulgar's Hunting Spear: the press is the victim's own pull on
+  // it (only while nobody stands free to help), never anything else.
+  if (trySpearWrench(ctx, p)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (
