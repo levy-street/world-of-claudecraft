@@ -339,9 +339,9 @@ Phase 1 starts with these owner-selected values:
   `BATTLEGROUND_ASSIST_HONOR`).
 
 Every Thornhollow Fields award above was DOUBLED on 2026-09-25 (owner tuning,
-alongside King of the Hill's ramp) so Warfare Season 2 gear is a goal of weeks,
-not a season: the figures further down that quote 60/20 and a 900-a-day session
-are the pre-doubling record.
+alongside King of the Hill's ramp, since flattened at the same total) so
+Warfare Season 2 gear is a goal of weeks, not a season: the figures further
+down that quote 60/20 and a 900-a-day session are the pre-doubling record.
 
 Every weekend is the Double Honor Weekend: every Thornhollow Fields Honor
 award (the result, the kill and assist drip, and the first-win bonus) pays
@@ -607,18 +607,19 @@ Everyone standing in the zone is already hostile to every stranger there (the
 free-for-all arm, and guildmates outside one party are strangers), so the hill
 needs no flag of its own.
 
-Honor RAMPS with the hold (owner tuning 2026-09-25, replacing a flat 1 a minute
-that paid 45 for a whole stand): each counted holder standing inside banks a
-second per pass, and every `HILL_ACCRUAL_SECONDS` (60) pays `hillHonorPerPayout`
-of the seconds the current holder has held the hill, `HILL_RAMP_STEP_HONOR` (2) a
-minute for the first `HILL_RAMP_STEP_SECONDS` (five minutes), 2 more each further
-five minutes, capped at `HILL_RAMP_MAX_HONOR` (12). The streak belongs to the
-holding party and restarts when the hill changes hands, so a long hold is the
-thing worth taking. A party's size (five) is the payee cap. A holder who steps
+Honor is FLAT (owner tuning 2026-10-14): each counted holder standing inside
+banks a second per pass, and every `HILL_ACCRUAL_SECONDS` (60) pays
+`HILL_HONOR_PER_PAYOUT` (9), however long the holding party has held. It replaces
+the 2026-09-25 ramp (2 a minute, 2 more each further five minutes held, capped at
+12, restarting when the hill changed hands), which itself replaced a flat 1 a
+minute that paid 45 for a whole stand. The flat rate keeps the ramp's total: the
+ramp paid 388 over the 44 paid minutes of a full stand, 8.8 a minute, and Honor is
+an integer, so 9 is the nearest whole rate (pinned in `tests/hill_rules.test.ts`).
+A party's size (five) is the payee cap. A holder who steps
 out banks nothing but keeps what they banked; leaving the party or the realm
 forfeits it, and a capture clears the books. A full party holding an uncontested
-hill for its whole stand earns about 380 each, about three Thornhollow Fields wins
-at the doubled award; two held hills a day is about 760, so 10,000 Honor is about
+hill for its whole stand earns about 390 each, about three Thornhollow Fields wins
+at the doubled award; two held hills a day is about 780, so 10,000 Honor is about
 13 days, level with a committed battleground day at the live result floor. No
 diminishing returns: the cap and the pace are the limit.
 

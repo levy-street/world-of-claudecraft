@@ -134,7 +134,7 @@ ratings.
   `hillTimes` from a window and a warning offset, `hillMinutesUntil`) and the
   circle test. No ctx, no rng, no clock. Every tuning literal (`HILL_RADIUS`,
   `HILL_WINDOW_SECONDS`, `HILL_WARNING_SECONDS`, `HILL_DURATION_SECONDS`,
-  `HILL_CAPTURE_SECONDS`, `HILL_ACCRUAL_SECONDS`, the payout ramp `hillHonorPerPayout` with `HILL_RAMP_STEP_SECONDS` and `HILL_RAMP_MAX_HONOR`) lives
+  `HILL_CAPTURE_SECONDS`, `HILL_ACCRUAL_SECONDS`, the flat payout `HILL_HONOR_PER_PAYOUT`) lives
   here and the copy resolves from it.
 - `hill.ts` owns the SYSTEM behind the `SimContext` seam: the session state as
   ONE live view (`Sim.hillState`, `ctx.hillState`: the announced or standing

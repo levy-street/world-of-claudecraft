@@ -8,11 +8,9 @@ import {
   HILL_CAPTURE_SECONDS,
   HILL_DURATION_SECONDS,
   HILL_FIRST_WINDOW_AT_SECONDS,
+  HILL_HONOR_PER_PAYOUT,
   HILL_LATEST_WARN_OFFSET_SECONDS,
   HILL_RADIUS,
-  HILL_RAMP_MAX_HONOR,
-  HILL_RAMP_STEP_HONOR,
-  HILL_RAMP_STEP_SECONDS,
   HILL_WARNING_SECONDS,
   HILL_WINDOW_SECONDS,
   type HillSpotProbe,
@@ -20,7 +18,6 @@ import {
   hillContains,
   hillContestStep,
   hillGroupKey,
-  hillHonorPerPayout,
   hillLeader,
   hillMinutesUntil,
   hillSpotIsOpen,
@@ -40,9 +37,7 @@ describe('the tuning literals the copy and the docs quote', () => {
     expect(HILL_LATEST_WARN_OFFSET_SECONDS).toBe(2 * 3_600);
     expect(HILL_CAPTURE_SECONDS).toBe(60);
     expect(HILL_ACCRUAL_SECONDS).toBe(60);
-    expect(HILL_RAMP_STEP_SECONDS).toBe(5 * 60);
-    expect(HILL_RAMP_STEP_HONOR).toBe(2);
-    expect(HILL_RAMP_MAX_HONOR).toBe(12);
+    expect(HILL_HONOR_PER_PAYOUT).toBe(9);
   });
 });
 
@@ -224,23 +219,24 @@ describe('hillContains', () => {
   });
 });
 
-describe('hillHonorPerPayout: the hold ramp', () => {
-  it('pays 2 a minute for the first five minutes, +2 each five after, capped at 12', () => {
-    expect(hillHonorPerPayout(0)).toBe(2);
-    expect(hillHonorPerPayout(299)).toBe(2);
-    expect(hillHonorPerPayout(300)).toBe(4);
-    expect(hillHonorPerPayout(10 * 60)).toBe(6);
-    expect(hillHonorPerPayout(20 * 60)).toBe(10);
-    expect(hillHonorPerPayout(25 * 60)).toBe(12);
-    expect(hillHonorPerPayout(45 * 60)).toBe(12);
-    expect(hillHonorPerPayout(-5)).toBe(2);
-  });
+/** The 2026-09-25 hold ramp the flat rate replaced (2 a minute, 2 more each
+ *  five minutes held, capped at 12), kept here only to pin that the flat rate
+ *  pays a full stand the same total. */
+function rampTotal(paidMinutes: number): number {
+  let total = 0;
+  for (let minute = 1; minute <= paidMinutes; minute++) {
+    total += Math.min(12, 2 * (1 + Math.floor(minute / 5)));
+  }
+  return total;
+}
 
-  it('pays about 380 for a full uncontested stand (owner tuning: doubled with the battlegrounds)', () => {
+describe('HILL_HONOR_PER_PAYOUT: the flat rate', () => {
+  it("is the ramp's average minute over a full stand, to the nearest whole Honor", () => {
     // One payout per minute of the 45-minute stand after the 60-second capture.
-    let total = 0;
-    for (let minute = 1; minute <= 44; minute++) total += hillHonorPerPayout(minute * 60);
-    expect(total).toBeGreaterThanOrEqual(360);
-    expect(total).toBeLessThanOrEqual(400);
+    const paidMinutes = (HILL_DURATION_SECONDS - HILL_CAPTURE_SECONDS) / HILL_ACCRUAL_SECONDS;
+    expect(paidMinutes).toBe(44);
+    expect(rampTotal(paidMinutes)).toBe(388);
+    expect(HILL_HONOR_PER_PAYOUT).toBe(Math.round(rampTotal(paidMinutes) / paidMinutes));
+    expect(paidMinutes * HILL_HONOR_PER_PAYOUT).toBe(396);
   });
 });

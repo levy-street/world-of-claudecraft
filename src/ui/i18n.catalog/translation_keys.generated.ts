@@ -8240,6 +8240,7 @@ export type TranslationKeyFlat =
   | 'guide.worldPvpPage.flagHeading'
   | 'guide.worldPvpPage.heading'
   | 'guide.worldPvpPage.hillBody'
+  | 'guide.worldPvpPage.hillBodyFlat'
   | 'guide.worldPvpPage.hillBodyRamp'
   | 'guide.worldPvpPage.hillHeading'
   | 'guide.worldPvpPage.intro'

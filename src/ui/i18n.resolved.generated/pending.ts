@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "es_ES": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "fr_FR": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "fr_CA": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "de_DE": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "nl_NL": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "pl_PL": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "id_ID": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "tr_TR": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "sv_SE": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "vi_VN": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ],
+  "da_DK": [
+    "guide.worldPvpPage.hillBodyFlat"
+  ]
 };

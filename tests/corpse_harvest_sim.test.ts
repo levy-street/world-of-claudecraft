@@ -2923,7 +2923,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );
     expect(fixtures).toEqual({ extracted: 13, unmappedOffered: 9 });
-  });
+    // A fresh Sim per harvest like the sweep above: about 15 s alone, and a
+    // loaded CI shard pushed it past the 20 s default (PR #4495, twice).
+  }, 60_000);
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {
     const mixedTemplates = () =>
