@@ -1,7 +1,6 @@
 import { applyFrameGeometrySetting } from './game/frame_geometry_settings';
 import { createSubscriptionStoreHooks, storeSnapshotForHud } from './net/subscription_sdk';
 import { captureReferralSlug } from './referral_signup';
-import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
 import { liftBootSplashWhenReady } from './ui/boot_splash';
 import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
@@ -503,6 +502,7 @@ import { wireCharselectRow } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
+import { classDetailAbilityDescription } from './ui/class_detail_ability_text';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { classIconUrl } from './ui/class_icon_art';
 import { claudiumBalanceAddress, currentWocDiscountBps } from './ui/claudium_view';
@@ -737,18 +737,6 @@ const RESOURCE_KEYS = {
 
 function classDisplayDescription(className: PlayerClass): string {
   return tEntity({ kind: 'class', id: className, field: 'description' });
-}
-
-function formatClassDetailNumber(value: number): string {
-  return formatNumber(value, { maximumFractionDigits: 1 });
-}
-
-function classDetailAmountRange(min: number, max: number): string {
-  if (min === max) return formatClassDetailNumber(min);
-  return t('abilityUi.tooltip.damageRange', {
-    min: formatClassDetailNumber(min),
-    max: formatClassDetailNumber(max),
-  });
 }
 
 function readHomepageMusicMuted(): boolean {
@@ -6929,70 +6917,8 @@ function renderClassDetails(
       if (!a) return '';
       const iconUrl = iconDataUrl('ability', spellId, 32);
 
-      // Format ability description dynamically by resolving rank 1 placeholders
-      let dmgText = '';
-      const primaryEffect = a.effects.find(
-        (eff) =>
-          eff.type === 'directDamage' ||
-          eff.type === 'heal' ||
-          eff.type === 'weaponDamage' ||
-          eff.type === 'weaponStrike' ||
-          eff.type === 'aoeDamage' ||
-          eff.type === 'aoeRoot' ||
-          eff.type === 'finisherDamage' ||
-          eff.type === 'drainTick',
-      );
-      if (primaryEffect) {
-        if (
-          primaryEffect.type === 'directDamage' ||
-          primaryEffect.type === 'heal' ||
-          primaryEffect.type === 'aoeDamage' ||
-          primaryEffect.type === 'aoeRoot' ||
-          primaryEffect.type === 'drainTick'
-        ) {
-          dmgText = classDetailAmountRange(primaryEffect.min, primaryEffect.max);
-        } else if (primaryEffect.type === 'weaponDamage' || primaryEffect.type === 'weaponStrike') {
-          dmgText = formatClassDetailNumber(primaryEffect.bonus);
-        } else if (primaryEffect.type === 'finisherDamage') {
-          dmgText = t('abilityUi.tooltip.finisherDamage', {
-            base: formatClassDetailNumber(primaryEffect.base),
-            perCombo: formatClassDetailNumber(primaryEffect.perCombo),
-          });
-        }
-      } else {
-        const secondaryEffect = a.effects.find(
-          (eff) =>
-            eff.type === 'dot' ||
-            eff.type === 'hot' ||
-            eff.type === 'absorb' ||
-            eff.type === 'imbue',
-        );
-        if (secondaryEffect) {
-          if (secondaryEffect.type === 'dot' && secondaryEffect.perCombo !== undefined) {
-            // A combo-point bleed finisher (rupture, rip): `total` alone is the
-            // damage at zero combo points, a state the caster can never reach.
-            // Render base plus per-combo-point, the same composition the
-            // finisherDamage arm above and the shared abilityEffectText formatter use.
-            dmgText = t('abilityUi.tooltip.finisherDamage', {
-              base: formatClassDetailNumber(secondaryEffect.total),
-              perCombo: formatClassDetailNumber(secondaryEffect.perCombo),
-            });
-          } else if (secondaryEffect.type === 'dot' || secondaryEffect.type === 'hot') {
-            dmgText = formatClassDetailNumber(secondaryEffect.total);
-          } else if (secondaryEffect.type === 'absorb') {
-            dmgText = formatClassDetailNumber(secondaryEffect.amount);
-          } else if (secondaryEffect.type === 'imbue') {
-            dmgText = formatAbilityImbueDamage(secondaryEffect);
-          }
-        }
-      }
       const abilityName = tEntity({ kind: 'ability', id: a.id, field: 'name' });
-      const resolvedDesc = tEntity({
-        kind: 'ability',
-        id: a.id,
-        field: 'description',
-        values: { damage: dmgText },
-      });
+      const resolvedDesc = classDetailAbilityDescription(a);
 
       return `
       <li class="details-spell-item">
