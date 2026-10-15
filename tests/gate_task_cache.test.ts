@@ -120,6 +120,7 @@ describe('gate cache inventory vs turbo.json', () => {
       'src/ui/entity_i18n.ts',
       'src/ui/server_i18n.newlocales.ts',
       'src/ui/server_i18n.ts',
+      'src/ui/server_i18n_gm_tools.ts',
       'src/ui/server_i18n_moderation.ts',
       'src/ui/sim_i18n.newlocales.ts',
       'src/ui/sim_i18n.ts',

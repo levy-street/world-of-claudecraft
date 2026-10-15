@@ -50,6 +50,12 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   unjail: 'moderationHistory.actionUnjail',
   spectate: 'moderationHistory.actionSpectate',
   unspectate: 'moderationHistory.actionUnspectate',
+  // In-game GM tools: audited, never punitive, so they stay neutral.
+  watch: 'moderationHistory.actionWatch',
+  unwatch: 'moderationHistory.actionUnwatch',
+  gm_invisible: 'moderationHistory.actionGmInvisible',
+  gm_visible: 'moderationHistory.actionGmVisible',
+  announce: 'moderationHistory.actionAnnounce',
   suspend: 'moderationHistory.actionSuspend',
   unsuspend: 'moderationHistory.actionUnsuspend',
   ban: 'moderationHistory.actionBan',

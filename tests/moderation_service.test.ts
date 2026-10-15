@@ -5,7 +5,9 @@ import {
   type ModerationHost,
   ModerationService,
   type ModerationSession,
+  type ModerationWatchlist,
 } from '../server/moderation_service';
+import type { StaffWatchEntry } from '../server/staff_watchlist_db';
 
 type Session = ModerationSession;
 
@@ -49,6 +51,32 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
   const ban = vi.fn<ModerationAudit['ban']>(async () => {});
   const suspend = vi.fn<ModerationAudit['suspend']>(async () => {});
   const forceRename = vi.fn<ModerationAudit['forceRename']>(async () => ({ accountId: 0 }));
+  const hiddenPids = new Set<number>();
+  const announcements: { from: string; text: string }[] = [];
+  // In-memory watchlist; `characters` is the offline name directory.
+  const characters = new Map<string, { accountId: number; characterName: string }>();
+  for (const session of byPid.values()) {
+    characters.set(session.name.toLowerCase(), {
+      accountId: session.accountId,
+      characterName: session.name,
+    });
+  }
+  const watches = new Map<number, StaffWatchEntry>();
+  const watchlist: ModerationWatchlist = {
+    findCharacter: async (name) => characters.get(name.toLowerCase()) ?? null,
+    add: async (input) => {
+      watches.set(input.accountId, {
+        accountId: input.accountId,
+        characterName: input.characterName,
+        note: input.note,
+        addedBy: null,
+        createdAt: '2026-10-15T00:00:00.000Z',
+      });
+    },
+    remove: async (accountId) => watches.delete(accountId),
+    forAccount: async (accountId) => watches.get(accountId) ?? null,
+    list: async () => ({ entries: [...watches.values()], total: watches.size }),
+  };
 
   const host: ModerationHost<Session> = {
     sessionByName: (name) =>
@@ -73,10 +101,28 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
       jailedPids.delete(target.pid);
       unjailed.push({ moderator, target });
     },
+    isGmHidden: (session) => hiddenPids.has(session.pid),
+    setGmHidden: (session, hidden) => {
+      if (hidden) hiddenPids.add(session.pid);
+      else hiddenPids.delete(session.pid);
+    },
+    onlineStaff: () => [...byPid.values()].filter(canAttemptModerationCommands),
+    announce: (from, text) => announcements.push({ from, text }),
   };
 
-  const service = new ModerationService(host, { recordAction, mute, ban, suspend, forceRename });
+  const service = new ModerationService(host, watchlist, {
+    recordAction,
+    mute,
+    ban,
+    suspend,
+    forceRename,
+  });
   return {
+    byPid,
+    characters,
+    watches,
+    hiddenPids,
+    announcements,
     service,
     kicked,
     killed,
@@ -586,5 +632,244 @@ describe('ModerationService', () => {
     expect(context.kicked).toEqual([]);
     expect(context.killed).toEqual([]);
     expect(context.jailed).toEqual([]);
+  });
+});
+
+// Drains the promise chains the service fires (audit, then watchlist, then notice).
+const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+describe('ModerationService GM tools', () => {
+  it('toggles invisibility only after the audit write, against the GM own account', async () => {
+    const actor = admin(1, 11);
+    const context = setup({ actor });
+
+    expect(context.service.handleChatCommand(actor, '/visible off')).toBe(true);
+    expect(context.hiddenPids.has(actor.pid)).toBe(false);
+    await settle();
+    expect(context.recordAction).toHaveBeenLastCalledWith({
+      action: 'gm_invisible',
+      accountId: 11,
+      adminAccountId: 11,
+      reason: 'Went invisible via in-game GM command',
+    });
+    expect(context.hiddenPids.has(actor.pid)).toBe(true);
+
+    context.service.handleChatCommand(actor, '/VISIBLE ON');
+    await settle();
+    expect(context.recordAction).toHaveBeenLastCalledWith(
+      expect.objectContaining({ action: 'gm_visible', accountId: 11 }),
+    );
+    expect(context.hiddenPids.has(actor.pid)).toBe(false);
+    expect(context.systemNotices.map((n) => n.text)).toEqual([
+      'You are now invisible. Players and creatures can no longer see or target you.',
+      'You are now visible.',
+    ]);
+  });
+
+  it('answers usage and no-op toggles without an audit write', async () => {
+    const actor = admin(1, 11);
+    const context = setup({ actor });
+    context.service.handleChatCommand(actor, '/visible');
+    context.service.handleChatCommand(actor, '/visible maybe');
+    context.service.handleChatCommand(actor, '/visible on');
+    await settle();
+    expect(context.recordAction).not.toHaveBeenCalled();
+    expect(context.notices.map((n) => n.text)).toEqual([
+      'Usage: /visible on|off',
+      'Usage: /visible on|off',
+      'You are already visible.',
+    ]);
+  });
+
+  it('drops a stale visibility completion so the latest command wins', async () => {
+    const actor = admin(1, 11);
+    const context = setup({ actor });
+    let releaseFirst: () => void = () => {};
+    context.recordAction.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          releaseFirst = resolve;
+        }),
+    );
+    context.service.handleChatCommand(actor, '/visible off'); // audit held open
+    context.hiddenPids.add(actor.pid); // as if an earlier toggle already landed
+    context.service.handleChatCommand(actor, '/visible on'); // newer command
+    await settle();
+    expect(context.hiddenPids.has(actor.pid)).toBe(false);
+    releaseFirst();
+    await settle();
+    // The stale "off" completion must not re-hide the GM.
+    expect(context.hiddenPids.has(actor.pid)).toBe(false);
+  });
+
+  it('lets a spectate-only role go invisible but refuses it /watch and /announce', async () => {
+    const actor = admin(1, 11, ['moderation.spectate']);
+    const target = player(2, 22);
+    const context = setup({ actor, sessions: [target] });
+    context.service.handleChatCommand(actor, '/visible off');
+    context.service.handleChatCommand(actor, '/watch "Player2"');
+    context.service.handleChatCommand(actor, '/announce hello');
+    await settle();
+    expect(context.hiddenPids.has(actor.pid)).toBe(true);
+    expect(context.watches.size).toBe(0);
+    expect(context.announcements).toEqual([]);
+    expect(context.notices.map((n) => n.text)).toEqual([
+      "You don't have permission to do that.",
+      "You don't have permission to do that.",
+    ]);
+  });
+
+  it('watches an offline player by account, lists, and unwatches with audit rows', async () => {
+    const actor = admin(1, 11);
+    const context = setup({ actor });
+    context.characters.set('suspect', { accountId: 33, characterName: 'Suspect' });
+
+    context.service.handleChatCommand(actor, '/watch "suspect" gold seller, check trades');
+    await settle();
+    expect(context.recordAction).toHaveBeenLastCalledWith({
+      action: 'watch',
+      accountId: 33,
+      adminAccountId: 11,
+      reason: 'gold seller, check trades',
+    });
+    expect(context.watches.get(33)).toMatchObject({
+      characterName: 'Suspect',
+      note: 'gold seller, check trades',
+    });
+
+    context.service.handleChatCommand(actor, '/watch');
+    await settle();
+    context.service.handleChatCommand(actor, '/unwatch "Suspect"');
+    await settle();
+    expect(context.recordAction).toHaveBeenLastCalledWith(
+      expect.objectContaining({ action: 'unwatch', accountId: 33 }),
+    );
+    expect(context.watches.size).toBe(0);
+    context.service.handleChatCommand(actor, '/unwatch "Suspect"');
+    await settle();
+    context.service.handleChatCommand(actor, '/watch');
+    await settle();
+
+    expect(context.systemNotices.map((n) => n.text)).toEqual([
+      'Added Suspect to the watchlist.',
+      'Watchlist (1):',
+      'Watched: Suspect (gold seller, check trades)',
+      'Removed Suspect from the watchlist.',
+    ]);
+    expect(context.notices.map((n) => n.text)).toEqual([
+      'Suspect is not on the watchlist.',
+      'The watchlist is empty.',
+    ]);
+  });
+
+  it('refuses malformed, unknown, own-account, and online staff watch targets', async () => {
+    const actor = admin(1, 11);
+    const otherStaff = admin(2, 22);
+    const context = setup({ actor, sessions: [otherStaff] });
+    context.service.handleChatCommand(actor, '/watch Bob');
+    context.service.handleChatCommand(actor, '/unwatch');
+    context.service.handleChatCommand(actor, '/watch "Nobody"');
+    await settle();
+    context.service.handleChatCommand(actor, '/watch "Admin1"');
+    await settle();
+    context.service.handleChatCommand(actor, '/watch "Admin2"');
+    await settle();
+    expect(context.recordAction).not.toHaveBeenCalled();
+    expect(context.notices.map((n) => n.text)).toEqual([
+      'Usage: /watch ["<name>" [note]]',
+      'Usage: /unwatch "<name>"',
+      "No character named 'Nobody'.",
+      "You can't moderate that player.",
+      "You can't moderate that player.",
+    ]);
+  });
+
+  it('pings every online GM on each login of a watched account, alts included', async () => {
+    const actor = admin(1, 11);
+    const spectator = admin(3, 44, ['moderation.spectate']);
+    const viewer = admin(4, 55, ['moderation.read']);
+    const main = player(2, 22);
+    const alt = { ...player(5, 22), name: 'AltOfMain' };
+    const context = setup({ actor, sessions: [spectator, viewer, main] });
+    context.watches.set(22, {
+      accountId: 22,
+      characterName: 'Player2',
+      note: 'botting reports',
+      addedBy: 'Admin1',
+      createdAt: '2026-10-15T00:00:00.000Z',
+    });
+
+    await context.service.notifyWatchedLogin(main);
+    await context.service.notifyWatchedLogin(main); // every login, not just the next
+    context.byPid.set(alt.pid, alt);
+    await context.service.notifyWatchedLogin(alt);
+
+    const pinged = (session: Session) =>
+      context.systemNotices.filter((n) => n.session === session).map((n) => n.text);
+    const once = ['Watchlist: Player2 just logged in.', 'Watch note: botting reports'];
+    expect(pinged(actor)).toEqual([
+      ...once,
+      ...once,
+      'Watchlist: AltOfMain just logged in (watched as Player2).',
+      'Watch note: botting reports',
+    ]);
+    expect(pinged(spectator)).toEqual(pinged(actor));
+    // A read-only viewer cannot act on it, so it is not pinged; neither is the player.
+    expect(pinged(viewer)).toEqual([]);
+    expect(pinged(main)).toEqual([]);
+  });
+
+  it('skips the watchlist lookup when no GM is online and never pings for staff', async () => {
+    const actor = admin(1, 11);
+    const target = player(2, 22);
+    const context = setup({ actor, sessions: [target] });
+    const entry = (accountId: number, characterName: string): StaffWatchEntry => ({
+      accountId,
+      characterName,
+      note: null,
+      addedBy: null,
+      createdAt: '2026-10-15T00:00:00.000Z',
+    });
+    // A watched staff account is never announced...
+    context.watches.set(11, entry(11, 'Admin1'));
+    await context.service.notifyWatchedLogin(actor);
+    // ...and with no GM online there is nobody to ping.
+    context.byPid.delete(actor.pid);
+    context.watches.set(22, entry(22, 'Player2'));
+    await context.service.notifyWatchedLogin(target);
+    expect(context.systemNotices).toEqual([]);
+  });
+
+  it('broadcasts an announcement after auditing its text, and refuses an empty one', async () => {
+    const actor = admin(1, 11);
+    const context = setup({ actor });
+    context.service.handleChatCommand(actor, '/announce');
+    context.service.handleChatCommand(
+      actor,
+      '/announce   Restart in 10 minutes,\n  log out safely.',
+    );
+    expect(context.announcements).toEqual([]);
+    await settle();
+    expect(context.recordAction).toHaveBeenCalledTimes(1);
+    expect(context.recordAction).toHaveBeenCalledWith({
+      action: 'announce',
+      accountId: 11,
+      adminAccountId: 11,
+      reason: 'Restart in 10 minutes, log out safely.',
+    });
+    expect(context.announcements).toEqual([
+      { from: 'Admin1', text: 'Restart in 10 minutes, log out safely.' },
+    ]);
+    expect(context.notices.map((n) => n.text)).toEqual(['Usage: /announce <message>']);
+  });
+
+  it('swallows the GM commands for non-staff without acting', async () => {
+    const actor = player(1, 11);
+    const context = setup({ actor });
+    expect(context.service.handleChatCommand(actor, '/visible off')).toBe(true);
+    expect(context.service.handleChatCommand(actor, '/announce hi')).toBe(true);
+    await settle();
+    expect(context.hiddenPids.size).toBe(0);
+    expect(context.announcements).toEqual([]);
   });
 });

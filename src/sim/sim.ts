@@ -272,6 +272,7 @@ import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import { gmHiddenFrom, isGmHidden } from './gm_presence';
 import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
@@ -7527,6 +7528,7 @@ export class Sim {
     // pulls, so the pack stays exactly where it spawned. The single aggro choke
     // point, so this covers proximity, social, and retaliation pulls alike.
     if (target.kind === 'player' && target.devNoAggro) return false;
+    if (isGmHidden(this.entities, target)) return false; // /visible off (gm_presence.ts)
     // [dev] /dev freezemobs: a frozen world acquires no aggro either (the AI
     // update skip alone would still let a proximity sweep seed a hate table).
     if (this.devMobsFrozen) return false;
@@ -9094,6 +9096,7 @@ export class Sim {
   }
 
   isHostileTo(attacker: Entity, target: Entity): boolean {
+    if (gmHiddenFrom(this.entities, attacker, target)) return false; // /visible off
     if (target.kind === 'mob') {
       if (target.templateId.startsWith('vision_')) return false;
       // A Protect Yumi cat is attackable only by the opposing team of its
@@ -9154,6 +9157,7 @@ export class Sim {
   }
 
   private isFriendlyTo(caster: Entity, target: Entity): boolean {
+    if (gmHiddenFrom(this.entities, caster, target)) return false; // /visible off
     if (target.kind === 'player') return !this.isHostileTo(caster, target);
     // A Protect Yumi cat is heal/shield-targetable only by its own team.
     if (target.kind === 'mob' && yumiMod.isYumiCat(target))

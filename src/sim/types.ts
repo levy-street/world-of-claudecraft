@@ -5793,6 +5793,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  can walk among freshly spawned mobs to verify placement without scattering
    *  them. Toggled by /dev noaggro (gated by ALLOW_DEV_COMMANDS); never persisted. */
   devNoAggro?: boolean;
+  /** Staff invisibility (/visible off): no other player sees this entity, its
+   *  corpse included, and no mob or other player can aggro, track, or target it.
+   *  Server-set through gm_presence.ts setGmHidden; never persisted. */
+  gmHidden?: boolean;
   /** Per-spawn dormancy override (DungeonSpawn.idleStationary): this mob never
    *  idle-wanders even if its template would. Set at spawn; see mob/locomotion.ts. */
   idleStationary?: boolean;

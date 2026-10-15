@@ -2432,6 +2432,51 @@ for (const key of Object.keys(DICT.en)) {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // ---- GM tools (server/moderation_service.ts) ----
+  // FIRST on purpose: the announcement and watch lines carry staff-authored free
+  // text, which a later, broader rule (e.g. "(.+) is not jailed.") could
+  // otherwise claim and mistranslate. The text itself passes through verbatim.
+  {
+    re: /^\[Announcement\] ([^:]+): (.+)$/,
+    build: (m) => tServer('moderation.announcement', { name: m[1], text: m[2] }),
+  },
+  {
+    re: /^Watchlist: (.+) just logged in \(watched as (.+)\)\.$/,
+    build: (m) => tServer('moderation.watchLoginAs', { name: m[1], watched: m[2] }),
+  },
+  {
+    re: /^Watchlist: (.+) just logged in\.$/,
+    build: (m) => tServer('moderation.watchLogin', { name: m[1] }),
+  },
+  { re: /^Watch note: (.+)$/, build: (m) => tServer('moderation.watchNote', { note: m[1] }) },
+  {
+    re: /^Watched: ([^()]+) \((.+)\)$/,
+    build: (m) => tServer('moderation.watchlistEntryNote', { name: m[1], note: m[2] }),
+  },
+  { re: /^Watched: (.+)$/, build: (m) => tServer('moderation.watchlistEntry', { name: m[1] }) },
+  {
+    re: /^Watchlist \((\d+)\):$/,
+    build: (m) => tServer('moderation.watchlistHeader', { count: m[1] }),
+  },
+  {
+    re: /^Added (.+) to the watchlist\.$/,
+    build: (m) => tServer('moderation.watchAdded', { name: m[1] }),
+  },
+  {
+    re: /^Removed (.+) from the watchlist\.$/,
+    build: (m) => tServer('moderation.watchRemoved', { name: m[1] }),
+  },
+  {
+    re: /^(.+) is not on the watchlist\.$/,
+    build: (m) => tServer('moderation.notWatched', { name: m[1] }),
+  },
+  { re: /^Usage: \/visible on\|off$/, build: () => tServer('moderation.visibleUsage') },
+  {
+    re: /^Usage: \/watch \["<name>" \[note\]\]$/,
+    build: () => tServer('moderation.watchUsage'),
+  },
+  { re: /^Usage: \/unwatch "<name>"$/, build: () => tServer('moderation.unwatchUsage') },
+  { re: /^Usage: \/announce <message>$/, build: () => tServer('moderation.announceUsage') },
   // ---- guild pledges (docs/prd/guild-pledge-board.md) ----
   {
     re: /^You have pledged to (.+)\.$/,

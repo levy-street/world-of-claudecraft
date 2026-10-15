@@ -10,25 +10,145 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "es_ES": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "fr_FR": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "fr_CA": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "de_DE": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "zh_CN": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "zh_TW": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "ko_KR": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "ja_JP": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "pt_BR": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "ru_RU": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "cs_CZ": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "nl_NL": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "pl_PL": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "id_ID": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "tr_TR": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "sv_SE": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "vi_VN": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ],
+  "da_DK": [
+    "moderationHistory.actionAnnounce",
+    "moderationHistory.actionGmInvisible",
+    "moderationHistory.actionGmVisible",
+    "moderationHistory.actionUnwatch",
+    "moderationHistory.actionWatch"
+  ]
 };

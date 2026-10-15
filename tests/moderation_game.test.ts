@@ -1003,3 +1003,104 @@ describe('server-side teleports end a live profession session', () => {
     }
   });
 });
+
+// Whether the viewer's latest snapshot carries the entity (a record or a keep).
+function lastSnapshotSees(ws: FakeWs, id: number): boolean {
+  const snaps = ws.send.mock.calls
+    .map(
+      (call) =>
+        JSON.parse(String(call[0])) as { t?: string; ents?: { id: number }[]; keep?: number[] },
+    )
+    .filter((frame) => frame.t === 'snap');
+  const snap = snaps[snaps.length - 1];
+  if (!snap) throw new Error('no snapshot sent');
+  return (snap.ents ?? []).some((rec) => rec.id === id) || (snap.keep ?? []).includes(id);
+}
+
+describe('GM invisibility and realm announcements', () => {
+  it('drops an invisible GM, alive or dead, from other snapshots and /who', async () => {
+    const server = new GameServer();
+    const gmWs = fakeWs();
+    const playerWs = fakeWs();
+    const gm = joined(
+      server.join(gmWs, 1, 101, 'Watcher', 'mage', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const bystander = joined(server.join(playerWs, 2, 102, 'Bystander', 'rogue', null));
+    internals(server).broadcastSnapshots();
+    expect(lastSnapshotSees(playerWs, gm.pid)).toBe(true);
+
+    command(server, gm, '/visible off');
+    await vi.waitFor(() => expect(entity(server, gm.pid).gmHidden).toBe(true));
+    expect(moderation.recordInGameAction).toHaveBeenCalledWith({
+      action: 'gm_invisible',
+      accountId: 1,
+      adminAccountId: 1,
+      reason: 'Went invisible via in-game GM command',
+    });
+    server.sim.tickCount++;
+    internals(server).broadcastSnapshots();
+    expect(lastSnapshotSees(playerWs, gm.pid)).toBe(false);
+    // The GM still sees the world, and the bystander, normally.
+    expect(lastSnapshotSees(gmWs, bystander.pid)).toBe(true);
+
+    // A forged target id for the GM is refused.
+    server.handleMessage(bystander, JSON.stringify({ t: 'cmd', cmd: 'target', id: gm.pid }));
+    expect(entity(server, bystander.pid).targetId).not.toBe(gm.pid);
+
+    playerWs.send.mockClear();
+    command(server, bystander, '/who');
+    const who = eventTexts(playerWs).join('\n');
+    expect(who).toContain('Bystander');
+    expect(who).not.toContain('Watcher');
+
+    // Dying while invisible leaves no visible corpse or nameplate.
+    const gmEntity = entity(server, gm.pid);
+    server.sim.dealDamage(null, gmEntity, gmEntity.maxHp + 1, false, 'physical', null, 'hit', true);
+    expect(gmEntity.dead).toBe(true);
+    server.sim.tickCount++;
+    internals(server).broadcastSnapshots();
+    expect(lastSnapshotSees(playerWs, gm.pid)).toBe(false);
+
+    command(server, gm, '/visible on');
+    await vi.waitFor(() => expect(entity(server, gm.pid).gmHidden).toBeUndefined());
+    server.sim.tickCount++;
+    internals(server).broadcastSnapshots();
+    expect(lastSnapshotSees(playerWs, gm.pid)).toBe(true);
+  });
+
+  it('broadcasts /announce to every session on the realm after the audit write', async () => {
+    const server = new GameServer();
+    const gmWs = fakeWs();
+    const aWs = fakeWs();
+    const bWs = fakeWs();
+    const gm = joined(
+      server.join(gmWs, 1, 101, 'Watcher', 'mage', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const a = joined(server.join(aWs, 2, 102, 'Alpha', 'rogue', null));
+    joined(server.join(bWs, 3, 103, 'Bravo', 'priest', null));
+
+    command(server, gm, '/announce World boss at the monument in 5 minutes!');
+    const line = '[Announcement] Watcher: World boss at the monument in 5 minutes!';
+    await vi.waitFor(() => expect(logEventTexts(bWs)).toContain(line));
+    expect(logEventTexts(aWs)).toContain(line);
+    expect(logEventTexts(gmWs)).toContain(line);
+    expect(moderation.recordInGameAction).toHaveBeenCalledWith({
+      action: 'announce',
+      accountId: 1,
+      adminAccountId: 1,
+      reason: 'World boss at the monument in 5 minutes!',
+    });
+
+    // A non-staff player typing the same text just chats; nothing is broadcast.
+    bWs.send.mockClear();
+    command(server, a, '/announce free gold');
+    await Promise.resolve();
+    expect(logEventTexts(bWs).some((text) => text.startsWith('[Announcement]'))).toBe(false);
+  });
+});

@@ -1689,7 +1689,12 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // RAISED 9840 -> 9846 for the GM tools (/visible, /watch, /announce): the
+    // logic lives in sibling modules (server/gm_tools_host.ts,
+    // server/staff_watchlist_db.ts, src/sim/gm_presence.ts); the residual here is
+    // three imports, the watched-login hook in join, and the one-line hidden-GM
+    // arm in canObserveEntity. Exact count by wc -l after biome, zero slack.
+    ceiling: 9846,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

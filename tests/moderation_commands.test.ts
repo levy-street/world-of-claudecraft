@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ANNOUNCE_TEXT_MAX,
   MODERATION_COMMAND_MINUTES_MAX,
   MODERATION_COMMAND_REASON_MAX,
   parseModerationChatCommand,
+  WATCH_NOTE_MAX,
 } from '../server/moderation_commands';
 
 describe('moderation chat commands', () => {
@@ -197,5 +199,72 @@ describe('moderation chat commands', () => {
     expect(parseModerationChatCommand('/unspectate now')).toBeNull();
     expect(parseModerationChatCommand('/jailer "Mira"')).toBeNull();
     expect(parseModerationChatCommand('hello /kick')).toBeNull();
+  });
+});
+
+describe('GM tool chat commands', () => {
+  it('parses /visible on|off case-insensitively and keeps bad arguments for the usage notice', () => {
+    expect(parseModerationChatCommand('/visible off')).toEqual({ kind: 'visible', on: false });
+    expect(parseModerationChatCommand('  /Visible   ON ')).toEqual({ kind: 'visible', on: true });
+    expect(parseModerationChatCommand('/visible')).toEqual({ kind: 'visible', on: null });
+    expect(parseModerationChatCommand('/visible sometimes')).toEqual({ kind: 'visible', on: null });
+    expect(parseModerationChatCommand('/visibles off')).toBeNull();
+  });
+
+  it('parses /watch as list, add with an optional note, or malformed', () => {
+    expect(parseModerationChatCommand('/watch')).toEqual({
+      kind: 'watch',
+      name: null,
+      note: null,
+      list: true,
+    });
+    expect(parseModerationChatCommand('/watch "Mira Sun"')).toEqual({
+      kind: 'watch',
+      name: 'Mira Sun',
+      note: null,
+      list: false,
+    });
+    expect(parseModerationChatCommand('/watch "Mira Sun"   alt of   a banned seller ')).toEqual({
+      kind: 'watch',
+      name: 'Mira Sun',
+      note: 'alt of a banned seller',
+      list: false,
+    });
+    expect(parseModerationChatCommand('/watch "Mira" "quoted note"')).toMatchObject({
+      note: 'quoted note',
+    });
+    expect(parseModerationChatCommand('/watch Mira')).toEqual({
+      kind: 'watch',
+      name: null,
+      note: null,
+      list: false,
+    });
+    const bounded = parseModerationChatCommand(`/watch "Mira" ${'n'.repeat(400)}`);
+    expect(bounded && 'note' in bounded ? bounded.note : '').toHaveLength(WATCH_NOTE_MAX);
+  });
+
+  it('parses /unwatch with a quoted name only', () => {
+    expect(parseModerationChatCommand('/unwatch "Mira Sun"')).toEqual({
+      kind: 'unwatch',
+      name: 'Mira Sun',
+    });
+    expect(parseModerationChatCommand('/unwatch')).toEqual({ kind: 'unwatch', name: null });
+    expect(parseModerationChatCommand('/unwatch Mira')).toEqual({ kind: 'unwatch', name: null });
+    expect(parseModerationChatCommand('/unwatch "Mira" extra')).toEqual({
+      kind: 'unwatch',
+      name: null,
+    });
+  });
+
+  it('parses /announce into one bounded line', () => {
+    expect(parseModerationChatCommand('/announce  Boss event at the\n\nmonument  ')).toEqual({
+      kind: 'announce',
+      text: 'Boss event at the monument',
+    });
+    expect(parseModerationChatCommand('/announce')).toEqual({ kind: 'announce', text: null });
+    expect(parseModerationChatCommand('/announce    ')).toEqual({ kind: 'announce', text: null });
+    const bounded = parseModerationChatCommand(`/announce ${'a'.repeat(400)}`);
+    expect(bounded && 'text' in bounded ? bounded.text : '').toHaveLength(ANNOUNCE_TEXT_MAX);
+    expect(parseModerationChatCommand('/announcement hi')).toBeNull();
   });
 });

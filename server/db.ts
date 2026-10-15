@@ -141,6 +141,7 @@ import { chooseArchiveName } from './reclaim_name';
 import { attachSchemaNoticeForwarder } from './schema_notices';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
+import { STAFF_WATCHLIST_SCHEMA } from './staff_watchlist_db';
 import {
   STORAGE_PURCHASE_SCHEMA,
   type StorageAppliedEffect,
@@ -1315,6 +1316,9 @@ export async function ensureSchema(): Promise<void> {
     // (idempotent), like the Discord tables.
     await client.query(GITHUB_SCHEMA);
     await client.query(GENERAL_CHAT_QUOTA_SCHEMA);
+    // The in-game /watch staff watchlist (server/staff_watchlist_db.ts).
+    // FK-references accounts(id), so it runs after SCHEMA.
+    await client.query(STAFF_WATCHLIST_SCHEMA);
     // Tier-2 global rate-limit backstop table (pg-backed fixed-window counters,
     // one row per (policy, key)) for the multi-realm deployment. Applied
     // unconditionally (idempotent), like the Discord/GitHub tables. See

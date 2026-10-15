@@ -31,6 +31,7 @@ import {
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
+import { gmHiddenFrom } from '../src/sim/gm_presence';
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
 import { parseItemCopyAnchor } from '../src/sim/item_copy_anchor';
 import { itemInstancePayloadsEqual } from '../src/sim/item_instance_merge';
@@ -276,6 +277,7 @@ import {
 import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
+import { gmToolsHost } from './gm_tools_host';
 import { groundTelegraphWireJson, groundTelegraphWorld } from './ground_telegraph_wire';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { handleGuildBankEscrowRefusal as handleEscrowRefusal } from './guild_bank_escrow_refusal';
@@ -446,6 +448,7 @@ import {
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { guildStampRankOf, SocialService } from './social';
 import { PgSocialDb } from './social_db';
+import { pgStaffWatchlist } from './staff_watchlist_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import {
   type StorageAppliedEffectDraft,
@@ -1860,7 +1863,7 @@ export class GameServer {
       error: (message, error) => console.error(message, ...(error === undefined ? [] : [error])),
       nowMs: Date.now,
     });
-    this.moderation = new ModerationService(this.moderationHost(), {
+    this.moderation = new ModerationService(this.moderationHost(), pgStaffWatchlist, {
       recordAction: (input) => recordInGameAction(input),
       mute: (input) => muteAccountChat(input),
       ban: (input) => moderateAccount({ ...input, action: 'ban' }),
@@ -2007,6 +2010,7 @@ export class GameServer {
       isJailed: (session) => session.jailed !== null,
       jail: (moderator, target, minutes) => this.jailSession(moderator, target, minutes),
       unjail: (moderator, target) => this.unjailSession(moderator, target),
+      ...gmToolsHost(this.sim, this.clients, (t, c) => this.broadcastSystem(t, c)),
     };
   }
 
@@ -3578,6 +3582,7 @@ export class GameServer {
     // the first guild stamp retro-credits an existing member's soc_guild_joined
     // silently instead of firing the live banner.
     void this.initSocial(session, true);
+    void this.moderation.notifyWatchedLogin(session); // /watch: ping online GMs
     // Stamp the $WOC holder-tier flair (best-effort: a balance read must never
     // affect joining the world).
     void this.refreshHolderTier(session).catch((err) =>
@@ -8171,6 +8176,7 @@ export class GameServer {
   }
 
   private canObserveEntity(viewer: Entity, e: Entity, d2: number): boolean {
+    if (gmHiddenFrom(this.sim.entities, viewer, e)) return false; // /visible off, corpse too
     if (e.kind !== 'player' || !isStealthed(e)) return true;
     if (this.sim.isHostileTo(viewer, e)) return false;
     const party = this.sim.partyOf(viewer.id);
@@ -9768,7 +9774,7 @@ export class GameServer {
       buildWhoRosterEntries(this.clients.values(), (session) => {
         const e = this.sim.entities.get(session.pid);
         const meta = this.sim.meta(session.pid);
-        if (!e || !meta) return null;
+        if (!e || !meta || e.gmHidden) return null; // a /visible off GM is not on /who
         const { zone, status } = this.presenceOf(session);
         return { name: session.name, cls: meta.cls, level: e.level, guild: e.guild, zone, status };
       }),
@@ -9780,9 +9786,9 @@ export class GameServer {
     return visibleWhoRows(this.whoRosterEntries(), viewer);
   }
 
-  private broadcastSystem(text: string): void {
+  private broadcastSystem(text: string, color = '#ffd100'): void {
     for (const session of this.clients.values()) {
-      this.send(session, { t: 'events', list: [{ type: 'log', text, color: '#ffd100' }] });
+      this.send(session, { t: 'events', list: [{ type: 'log', text, color }] });
     }
   }
 

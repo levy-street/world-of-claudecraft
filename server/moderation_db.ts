@@ -79,8 +79,32 @@ export const MODERATION_ACTIONS = [
   // tick, not a decision, and would otherwise write an audit row per save.
   'cheater_mark',
   'cheater_mark_lift',
+  // In-game GM tools (server/moderation_service.ts). None sanctions anyone, but
+  // each is a staff decision worth recovering: who watched an account and why,
+  // who went invisible and when, and what was broadcast to the whole realm
+  // (the announcement text is the stored reason; invisibility and announce
+  // rows are recorded against the GM's own account).
+  'watch',
+  'unwatch',
+  'gm_invisible',
+  'gm_visible',
+  'announce',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
+
+// The audit kinds the in-game chat commands write through recordInGameAction.
+export type InGameModerationAction =
+  | 'kick'
+  | 'kill'
+  | 'jail'
+  | 'unjail'
+  | 'spectate'
+  | 'unspectate'
+  | 'watch'
+  | 'unwatch'
+  | 'gm_invisible'
+  | 'gm_visible'
+  | 'announce';
 
 // A pg pool or a pinned pool client (both expose query); lets the audit-log INSERT
 // run inside a caller's transaction or standalone.
@@ -1227,7 +1251,7 @@ export async function setDailyRewardsIpBan(input: {
 // Audit-only record for an in-game action whose live effect is owned by the
 // GameServer. Unlike account sanctions, this changes no persistent account state.
 export async function recordInGameAction(input: {
-  action: 'kick' | 'kill' | 'jail' | 'unjail' | 'spectate' | 'unspectate';
+  action: InGameModerationAction;
   accountId: number;
   adminAccountId: number;
   reason: unknown;

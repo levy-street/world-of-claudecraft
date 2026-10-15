@@ -1,6 +1,8 @@
 import { formatDuration } from './duration';
 import { logger } from './http/logger';
 import { parseModerationChatCommand } from './moderation_commands';
+import type { InGameModerationAction } from './moderation_db';
+import type { StaffWatchEntry } from './staff_watchlist_db';
 
 export interface ModerationSession {
   pid: number;
@@ -29,11 +31,34 @@ export interface ModerationHost<TSession extends ModerationSession> {
   isJailed(session: TSession): boolean;
   jail(moderator: TSession, target: TSession, minutes: number): void;
   unjail(moderator: TSession, target: TSession): void;
+  // GM presence (/visible on|off, src/sim/gm_presence.ts). Session-only.
+  isGmHidden(session: TSession): boolean;
+  setGmHidden(session: TSession, hidden: boolean): void;
+  // Every online session on this realm that may run moderation commands (the
+  // GMs a watched login pings).
+  onlineStaff(): TSession[];
+  // One line to every session on this realm (/announce).
+  announce(fromName: string, text: string): void;
+}
+
+// The persistent staff watchlist (server/staff_watchlist_db.ts), keyed by
+// account so a watched player is caught on any character.
+export interface ModerationWatchlist {
+  findCharacter(name: string): Promise<{ accountId: number; characterName: string } | null>;
+  add(input: {
+    accountId: number;
+    characterName: string;
+    note: string | null;
+    addedByAccountId: number;
+  }): Promise<void>;
+  remove(accountId: number): Promise<boolean>;
+  forAccount(accountId: number): Promise<StaffWatchEntry | null>;
+  list(): Promise<{ entries: StaffWatchEntry[]; total: number }>;
 }
 
 export interface ModerationAudit {
   recordAction(input: {
-    action: 'kick' | 'kill' | 'jail' | 'unjail' | 'spectate' | 'unspectate';
+    action: InGameModerationAction;
     accountId: number;
     adminAccountId: number;
     reason: string;
@@ -66,11 +91,20 @@ const JAIL_REASON = 'Jailed by in-game moderator command';
 const UNJAIL_REASON = 'Released by in-game moderator command';
 const SPECTATE_REASON = 'Spectated via in-game moderator command';
 const UNSPECTATE_REASON = 'Stopped spectating via in-game moderator command';
+const INVISIBLE_REASON = 'Went invisible via in-game GM command';
+const VISIBLE_REASON = 'Became visible via in-game GM command';
+const WATCH_REASON = 'Watched via in-game GM command';
+const UNWATCH_REASON = 'Unwatched via in-game GM command';
 
 type ModerationCommandKind = NonNullable<ReturnType<typeof parseModerationChatCommand>>['kind'];
 
+// Observation (spectating, and going invisible to observe) rides
+// moderation.spectate; everything that touches another account or the whole
+// realm needs moderation.act.
 function requiredCommandPermission(kind: ModerationCommandKind): string {
-  return kind === 'spectate' || kind === 'unspectate' ? 'moderation.spectate' : 'moderation.act';
+  return kind === 'spectate' || kind === 'unspectate' || kind === 'visible'
+    ? 'moderation.spectate'
+    : 'moderation.act';
 }
 
 // Dispatch-site gate: whether this session may even attempt a moderation chat
@@ -86,6 +120,7 @@ export function canAttemptModerationCommands(session: ModerationSession): boolea
 export class ModerationService<TSession extends ModerationSession> {
   constructor(
     private readonly host: ModerationHost<TSession>,
+    private readonly watchlist: ModerationWatchlist,
     private readonly audit: ModerationAudit,
   ) {}
 
@@ -106,6 +141,10 @@ export class ModerationService<TSession extends ModerationSession> {
   private isCurrentSpectateOp(actor: TSession, op: number): boolean {
     return this.spectateOpSeq.get(actor.pid) === op;
   }
+
+  // The same stale-completion guard for /visible: a quick "off" then "on" must
+  // never land in reverse order because the first audit write was slower.
+  private readonly visibleOpSeq = new Map<number, number>();
 
   // True means the text belonged to this command family, including rejected
   // commands. The caller must not continue through ordinary chat routing.
@@ -153,6 +192,19 @@ export class ModerationService<TSession extends ModerationSession> {
         break;
       case 'unjail':
         this.unjail(actor, command.name, command.malformed);
+        break;
+      case 'visible':
+        this.visible(actor, command.on);
+        break;
+      case 'watch':
+        if (command.list) this.listWatches(actor);
+        else this.watch(actor, command.name, command.note);
+        break;
+      case 'unwatch':
+        this.unwatch(actor, command.name);
+        break;
+      case 'announce':
+        this.announce(actor, command.text);
         break;
     }
     return true;
@@ -385,6 +437,173 @@ export class ModerationService<TSession extends ModerationSession> {
         this.host.systemNotice(actor, `Released ${target.name} from jail.`);
       })
       .catch((err) => logger.error({ err }, 'failed to audit in-game unjail'));
+  }
+
+  // /visible off hides the GM from every player and mob (src/sim/gm_presence.ts);
+  // /visible on returns them. Audited against the GM's own account.
+  private visible(actor: TSession, on: boolean | null): void {
+    if (on === null) {
+      this.host.notice(actor, 'Usage: /visible on|off');
+      return;
+    }
+    if (this.host.isGmHidden(actor) === !on) {
+      this.host.notice(actor, on ? 'You are already visible.' : 'You are already invisible.');
+      return;
+    }
+    const op = (this.visibleOpSeq.get(actor.pid) ?? 0) + 1;
+    this.visibleOpSeq.set(actor.pid, op);
+    void this.audit
+      .recordAction({
+        action: on ? 'gm_visible' : 'gm_invisible',
+        accountId: actor.accountId,
+        adminAccountId: actor.accountId,
+        reason: on ? VISIBLE_REASON : INVISIBLE_REASON,
+      })
+      .then(() => {
+        if (this.visibleOpSeq.get(actor.pid) !== op) return;
+        this.host.setGmHidden(actor, !on);
+        this.host.systemNotice(
+          actor,
+          on
+            ? 'You are now visible.'
+            : 'You are now invisible. Players and creatures can no longer see or target you.',
+        );
+      })
+      .catch((err) => logger.error({ err }, 'failed to audit in-game visibility'));
+  }
+
+  // /watch "<name>" [note]. The player is usually offline, so the name resolves
+  // through the database (this realm's characters), not the live sessions.
+  private watch(actor: TSession, name: string | null, note: string | null): void {
+    if (name === null) {
+      this.host.notice(actor, 'Usage: /watch ["<name>" [note]]');
+      return;
+    }
+    void this.watchlist
+      .findCharacter(name)
+      .then(async (target) => {
+        if (!target) {
+          this.host.notice(actor, `No character named '${name}'.`);
+          return;
+        }
+        if (target.accountId === actor.accountId || this.host.sessionByName(name)?.isAdmin) {
+          this.host.notice(actor, "You can't moderate that player.");
+          return;
+        }
+        await this.audit.recordAction({
+          action: 'watch',
+          accountId: target.accountId,
+          adminAccountId: actor.accountId,
+          reason: note ?? WATCH_REASON,
+        });
+        await this.watchlist.add({
+          accountId: target.accountId,
+          characterName: target.characterName,
+          note,
+          addedByAccountId: actor.accountId,
+        });
+        this.host.systemNotice(actor, `Added ${target.characterName} to the watchlist.`);
+      })
+      .catch((err) => logger.error({ err }, 'failed to add in-game watch'));
+  }
+
+  private unwatch(actor: TSession, name: string | null): void {
+    if (name === null) {
+      this.host.notice(actor, 'Usage: /unwatch "<name>"');
+      return;
+    }
+    void this.watchlist
+      .findCharacter(name)
+      .then(async (target) => {
+        if (!target) {
+          this.host.notice(actor, `No character named '${name}'.`);
+          return;
+        }
+        if (!(await this.watchlist.forAccount(target.accountId))) {
+          this.host.notice(actor, `${target.characterName} is not on the watchlist.`);
+          return;
+        }
+        await this.audit.recordAction({
+          action: 'unwatch',
+          accountId: target.accountId,
+          adminAccountId: actor.accountId,
+          reason: UNWATCH_REASON,
+        });
+        await this.watchlist.remove(target.accountId);
+        this.host.systemNotice(actor, `Removed ${target.characterName} from the watchlist.`);
+      })
+      .catch((err) => logger.error({ err }, 'failed to remove in-game watch'));
+  }
+
+  // Bare /watch: the newest entries, one chat line each.
+  private listWatches(actor: TSession): void {
+    void this.watchlist
+      .list()
+      .then(({ entries, total }) => {
+        if (total === 0) {
+          this.host.notice(actor, 'The watchlist is empty.');
+          return;
+        }
+        this.host.systemNotice(actor, `Watchlist (${total}):`);
+        for (const entry of entries) {
+          this.host.systemNotice(
+            actor,
+            entry.note
+              ? `Watched: ${entry.characterName} (${entry.note})`
+              : `Watched: ${entry.characterName}`,
+          );
+        }
+        if (total > entries.length) {
+          this.host.systemNotice(actor, `...and ${total - entries.length} more.`);
+        }
+      })
+      .catch((err) => logger.error({ err }, 'failed to list in-game watches'));
+  }
+
+  // Called by the game after a player joins. Pings every GM online on this
+  // realm when the account is watched; staff logins are never pinged. The
+  // staff roster is read before AND after the lookup: before, to skip the
+  // query when nobody could be pinged; after, so a GM who logged out while it
+  // ran is not addressed and one who just arrived is.
+  async notifyWatchedLogin(player: TSession): Promise<void> {
+    if (player.isAdmin) return;
+    if (!this.host.onlineStaff().some((staff) => staff.pid !== player.pid)) return;
+    let entry: StaffWatchEntry | null;
+    try {
+      entry = await this.watchlist.forAccount(player.accountId);
+    } catch (err) {
+      logger.error({ err }, 'failed to read the staff watchlist on login');
+      return;
+    }
+    if (!entry) return;
+    const sameName = entry.characterName.toLowerCase() === player.name.toLowerCase();
+    const headline = sameName
+      ? `Watchlist: ${player.name} just logged in.`
+      : `Watchlist: ${player.name} just logged in (watched as ${entry.characterName}).`;
+    for (const staff of this.host.onlineStaff()) {
+      if (staff.pid === player.pid) continue;
+      this.host.systemNotice(staff, headline);
+      if (entry.note) this.host.systemNotice(staff, `Watch note: ${entry.note}`);
+    }
+  }
+
+  // /announce <text>: one line to everyone on this realm, signed with the GM's
+  // name so players can tell a real staff broadcast from a con. The text is the
+  // audit reason, recorded against the GM's own account.
+  private announce(actor: TSession, text: string | null): void {
+    if (text === null) {
+      this.host.notice(actor, 'Usage: /announce <message>');
+      return;
+    }
+    void this.audit
+      .recordAction({
+        action: 'announce',
+        accountId: actor.accountId,
+        adminAccountId: actor.accountId,
+        reason: text,
+      })
+      .then(() => this.host.announce(actor.name, text))
+      .catch((err) => logger.error({ err }, 'failed to audit in-game announce'));
   }
 
   private resolveNamedTarget(actor: TSession, name: string | null): TSession | null {

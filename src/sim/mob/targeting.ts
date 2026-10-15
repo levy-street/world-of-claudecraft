@@ -20,6 +20,7 @@
 // directly (already pure); only `entities` + the Nythraxis helpers route via the seam.
 
 import { MOBS } from '../data';
+import { isGmHidden } from '../gm_presence';
 import { combatProfileForMob } from '../mob_combat';
 import type { SimContext } from '../sim_context';
 import {
@@ -40,6 +41,8 @@ const VOSS_FRONTLINE_CLASSES = new Set(['warrior', 'rogue', 'hunter']);
 const MAX_AGGRO_RADIUS = 20;
 
 function mobCanSeeTarget(ctx: SimContext, mob: Entity, target: Entity): boolean {
+  // A hidden GM (or their pet) is never seen, so it is pruned from hate tables.
+  if (isGmHidden(ctx.entities, target)) return false;
   if (target.kind !== 'player') return true;
   const template = MOBS[mob.templateId];
   const baseRadius =
