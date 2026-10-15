@@ -14367,7 +14367,7 @@ export const pl_PL: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Żelazny hart",
-        "description": "Zaciśnij zęby i zignoruj ból: zużywa do 40 pkt. wściekłości (minimum 20), aby pochłonąć {absorbPerRage} pkt. obrażeń za każdy wydany punkt wściekłości przez maksymalnie 10 sek. (Ochrona)"
+        "description": "Zaciśnij zęby i zignoruj ból: tarcza pochłania obrażenia równe {damage}% twojego maksymalnego zdrowia w chwili użycia, przez maksymalnie {duration} sek. (Ochrona)"
       },
       "faultline": {
         "name": "Uskok",
@@ -24062,7 +24062,7 @@ export const pl_PL: EnTranslations = {
       },
       "forgewall": {
         "name": "Egida Kuźnomuru",
-        "bonus2": "Żelazna Determinacja zamienia furię w 5 punktów absorpcji za punkt zamiast 4.",
+        "bonus2": "Tarcza Żelaznej Determinacji pochłania 25% twojego maksymalnego zdrowia zamiast 20%.",
         "bonus4": "Rzucenie Pęknięcia Tarczy skraca pozostały czas odnowienia Żelaznej Determinacji o 2 sek."
       },
       "frostquench": {

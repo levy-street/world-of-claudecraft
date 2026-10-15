@@ -3890,13 +3890,13 @@ export interface AbilityDef {
   actionReplacement?: ActionReplacementRule | ActionReplacementRule[];
   // Necromancy spenders use Soul Fragments in addition to the ordinary mana bar.
   soulFragmentCost?: number;
-  // Spend-ALL ability (Iron Resolve): `cost` is only the MINIMUM gate; the
+  // Spend-ALL ability: `cost` is only the MINIMUM gate; the
   // actual bill is the caster's resource bar (capped by spendResourceCap when
   // set), snapshotted into the resolved cost at apply time so both the spend and
   // the effects (e.g. absorbSpentResource) read the true spent amount.
   spendsAllResource?: boolean;
   // Optional ceiling on a spendsAllResource bill: the ability spends at most this
-  // much resource (Iron Resolve caps at 40 rage), keeping the effect it feeds bounded.
+  // much resource, keeping the effect it feeds bounded.
   spendResourceCap?: number;
   learnLevel: number;
   // Quest-gated ability: even at or above learnLevel the ability stays hidden from

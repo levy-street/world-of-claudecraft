@@ -1497,7 +1497,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '8ヤード以内の敵最大5体を4秒間、恐怖で逃げ惑わせる恐ろしい叫び。ダメージで効果が解けることがあります。',
   'entities.abilities.intimidating_shout.name': '威圧の雄叫び',
   'entities.abilities.iron_resolve.description':
-    '歯を食いしばって痛みを堪え、最大40の怒り（最低20）を消費し、消費した怒り1につき{absorbPerRage}のダメージを吸収します。最大10秒間持続します。（防御）',
+    '歯を食いしばって痛みを堪え、発動時の最大体力の{damage}%に相当するダメージを吸収するシールドを得ます。最大{duration}秒間持続します。（防御）',
   'entities.abilities.iron_resolve.name': '鉄の決意',
   'entities.abilities.measured_fury.description':
     '制御された怒りが効率を高め、アビリティの怒りコストが10%減少します。（武器）',
@@ -10283,7 +10283,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '瀉血が必ずあなたを激昂させ、その回復量が最大体力の8%に上昇します。',
   'entities.itemSets.forgewall.name': 'フォージウォールの守り',
   'entities.itemSets.forgewall.bonus2':
-    '鉄の決意の怒りの変換が、1ポイントにつき4から5の吸収に上昇します。',
+    '鉄の決意のシールドが吸収する量が、最大体力の20%から25%に上昇します。',
   'entities.itemSets.forgewall.bonus4':
     '盾砕きを発動するたびに、鉄の決意の残りクールダウンが2秒短縮されます。',
   'entities.itemSets.dawnforged.name': 'ドーンフォージの祭服',

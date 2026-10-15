@@ -14367,7 +14367,7 @@ export const id_ID: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Tekad Besi",
-        "description": "Kertakkan gigi dan abaikan rasa sakit: menghabiskan hingga 40 amarah (minimal 20) untuk menyerap {absorbPerRage} kerusakan per amarah yang dihabiskan, bertahan hingga 10 detik. (Perlindungan)"
+        "description": "Kertakkan gigi dan abaikan rasa sakit: sebuah perisai menyerap kerusakan sebesar {damage}% dari nyawa maksimummu saat digunakan, bertahan hingga {duration} detik. (Perlindungan)"
       },
       "faultline": {
         "name": "Garis Patahan",
@@ -24062,7 +24062,7 @@ export const id_ID: EnTranslations = {
       },
       "forgewall": {
         "name": "Aegis Tembok Tungku",
-        "bonus2": "Tekad Besi mengubah amarah menjadi 5 serapan per poin, bukan 4.",
+        "bonus2": "Perisai Tekad Besi menyerap 25% dari nyawa maksimummu, bukan 20%.",
         "bonus4": "Merapal Retak Perisai mengurangi waktu pulih Tekad Besi yang tersisa sebesar 2 detik."
       },
       "frostquench": {

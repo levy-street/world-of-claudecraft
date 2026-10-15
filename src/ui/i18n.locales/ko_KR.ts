@@ -1491,7 +1491,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '8미터 안의 적 최대 5명을 4초 동안 공포에 질려 달아나게 하는 무시무시한 외침. 피해를 입으면 효과가 풀릴 수 있습니다.',
   'entities.abilities.intimidating_shout.name': '위협의 외침',
   'entities.abilities.iron_resolve.description':
-    '이를 악물고 고통을 무시합니다. 최대 40의 분노(최소 20)를 소모해 소모한 분노 1당 {absorbPerRage}의 피해를 흡수하며, 최대 10초 동안 지속됩니다. (방어 특성)',
+    '이를 악물고 고통을 무시합니다. 시전 시 최대 생명력의 {damage}%에 해당하는 피해를 흡수하는 보호막을 얻으며, 최대 {duration}초 동안 지속됩니다. (방어 특성)',
   'entities.abilities.iron_resolve.name': '강철 의지',
   'entities.abilities.measured_fury.description':
     '절제된 분노가 자원 운용을 다듬어 기술의 분노 소모가 10% 감소합니다. (무기 특성)',
@@ -10270,7 +10270,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.emberfury.bonus4':
     '사혈이 항상 당신을 격노시키며, 회복량이 최대 생명력의 8%로 증가합니다.',
   'entities.itemSets.forgewall.name': '벼림벽 아이기스',
-  'entities.itemSets.forgewall.bonus2': '강철 의지가 분노 1점당 4 대신 5의 흡수로 전환합니다.',
+  'entities.itemSets.forgewall.bonus2':
+    '강철 의지의 보호막이 최대 생명력의 20% 대신 25%를 흡수합니다.',
   'entities.itemSets.forgewall.bonus4':
     '방패 강타를 시전할 때마다 강철 의지의 남은 재사용 대기시간이 2초 감소합니다.',
   'entities.itemSets.dawnforged.name': '새벽벼림 예복',

@@ -1119,7 +1119,7 @@ function shouldTryAbility(caster: Entity, target: Entity, ability: string): bool
   if (ability === 'die_by_sword' && (hpPct > 0.7 || auraActive(caster, 'die_by_sword')))
     return false;
   if (ability === 'raised_guard' && auraActive(caster, 'raised_guard_dr')) return false;
-  if (ability === 'iron_resolve' && (caster.resource < 40 || auraActive(caster, 'iron_resolve')))
+  if (ability === 'iron_resolve' && (caster.resource < 20 || auraActive(caster, 'iron_resolve')))
     return false;
   if (ability === 'lay_on_hands' && hpPct > 0.25) return false;
   if (ability === 'divine_protection' && (hpPct > 0.85 || auraActive(caster, 'divine_protection')))

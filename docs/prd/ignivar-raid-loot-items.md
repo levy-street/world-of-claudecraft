@@ -79,7 +79,7 @@ design targets for the tuning pass.
 | Emberfury Gauntlets (`emberfury_gloves`) | gloves | 270 | Str 11, Sta 6 | none | haste 60, crit 25 |
 | Emberfury Legguards (`emberfury_legs`) | legs | 345 | Str 15, Sta 7 | none | haste 60, crit 25 |
 
-**Forgewall Aegis** (`forgewall`), prot (Ironguard), mail. 2 pieces: Iron Resolve converts rage at 5 absorb per point instead of 4. 4 pieces: Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec.
+**Forgewall Aegis** (`forgewall`), prot (Ironguard), mail. 2 pieces: Iron Resolve's shield absorbs 25% of your maximum health instead of 20%. 4 pieces: Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|

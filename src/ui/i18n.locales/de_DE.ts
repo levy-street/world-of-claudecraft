@@ -6347,7 +6347,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein furchteinflößender Schrei, der bis zu 5 Gegner im Umkreis von 8 m 4 Sek. lang in Furcht davonlaufen lässt. Schaden kann den Effekt brechen.',
   'entities.abilities.intimidating_shout.name': 'Drohruf',
   'entities.abilities.iron_resolve.description':
-    'Beißt die Zähne zusammen und ignoriert den Schmerz: Verbraucht bis zu 40 Wut (mindestens 20), um pro verbrauchtem Wutpunkt {absorbPerRage} Schaden zu absorbieren. Hält bis zu 10 Sek. an. (Schutz)',
+    'Beißt die Zähne zusammen und ignoriert den Schmerz: Ein Schild absorbiert Schaden in Höhe von {damage}% Eurer maximalen Gesundheit beim Wirken. Hält bis zu {duration} Sek. an. (Schutz)',
   'entities.abilities.iron_resolve.name': 'Eiserne Entschlossenheit',
   'entities.abilities.measured_fury.description':
     'Euer maßvoller Zorn lehrt Euch Sparsamkeit: Eure Fähigkeiten kosten 10% weniger Wut. (Waffen)',
@@ -17923,7 +17923,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Wenn dein Psalm der Abwehr vollständig verbraucht ist, wirkt dein nächster Läuterungshymnus innerhalb von 10 Sek. sofort. Höchstens einmal alle 15 Sek.',
   'entities.itemSets.emberscreed.name': 'Gewänder des Glutbekenntnisses',
   'entities.itemSets.forgewall.bonus2':
-    'Eiserne Entschlossenheit wandelt Wut mit 5 Absorption pro Punkt statt 4 um.',
+    'Der Schild von Eiserne Entschlossenheit absorbiert 25% Eurer maximalen Gesundheit statt 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Das Wirken von Schildbruch verringert die verbleibende Abklingzeit von Eiserne Entschlossenheit um 2 Sek.',
   'entities.itemSets.forgewall.name': 'Ägide der Schmiedemauer',

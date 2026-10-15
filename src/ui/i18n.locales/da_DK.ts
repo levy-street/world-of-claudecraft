@@ -6144,7 +6144,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Et skrækindjagende råb, der får op til 5 fjender inden for 8 m til at flygte i rædsel i 4 sek. Skade kan bryde effekten.',
   'entities.abilities.intimidating_shout.name': 'Frygtindgydende Råb',
   'entities.abilities.iron_resolve.description':
-    'Bid tænderne sammen og ignorér smerten: bruger op til 40 raseri (mindst 20) for at absorbere {absorbPerRage} skade pr. brugt raseripoint i op til 10 sek. (Beskyttelse)',
+    'Bid tænderne sammen og ignorér smerten: et skjold absorberer skade svarende til {damage}% af dit maksimale helbred ved brug, i op til {duration} sek. (Beskyttelse)',
   'entities.abilities.iron_resolve.name': 'Jernvilje',
   'entities.abilities.measured_fury.description':
     'Dit afmålte raseri skærper din økonomi: dine evner koster 10% mindre raseri. (Arms)',
@@ -17496,7 +17496,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Når din Psalm of Warding er fuldt opbrugt, er din næste Scouring Hymn inden for 10 sek. øjeblikkelig. Kan ikke ske mere end én gang hvert 15. sek.',
   'entities.itemSets.emberscreed.name': 'Glødernes trosgevandter',
   'entities.itemSets.forgewall.bonus2':
-    'Iron Resolve omdanner raseri til 5 absorption pr. point i stedet for 4.',
+    'Iron Resolves skjold absorberer 25% af dit maksimale helbred i stedet for 20%.',
   'entities.itemSets.forgewall.bonus4':
     'At kaste Shieldcrack reducerer Iron Resolves resterende nedkøling med 2 sek.',
   'entities.itemSets.forgewall.name': 'Forgewall-aegis',

@@ -6359,7 +6359,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Un urlo terrificante che fa fuggire per la paura fino a 5 nemici entro 8 m per 4 sec. Il danno può spezzare l'effetto.",
   'entities.abilities.intimidating_shout.name': 'Urlo Intimidatorio',
   'entities.abilities.iron_resolve.description':
-    'Stringi i denti e ignora il dolore: consuma fino a 40 rabbia (minimo 20) per assorbire {absorbPerRage} danni per ogni punto di rabbia speso, per un massimo di 10 s. (Protezione)',
+    'Stringi i denti e ignora il dolore: uno scudo assorbe danni pari al {damage}% della tua salute massima al momento del lancio, per un massimo di {duration} s. (Protezione)',
   'entities.abilities.iron_resolve.name': 'Fermezza di Ferro',
   'entities.abilities.measured_fury.description':
     'La tua furia misurata affina la tua economia: le tue abilità costano il 10% di rabbia in meno. (Armi)',
@@ -18493,7 +18493,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Quando il tuo Salmo della Protezione è consumato del tutto, il prossimo Inno Purificatore entro 10 s è istantaneo. Non può accadere più di una volta ogni 15 s.',
   'entities.itemSets.emberscreed.name': 'Vesti del Credo delle Braci',
   'entities.itemSets.forgewall.bonus2':
-    'Risolutezza Ferrea converte la rabbia in 5 assorbimento per punto invece di 4.',
+    'Lo scudo di Risolutezza Ferrea assorbe il 25% della tua salute massima invece del 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Lanciare Spacca-scudo riduce di 2 s il tempo di recupero rimanente di Risolutezza Ferrea.',
   'entities.itemSets.forgewall.name': 'Egida della Muraglia della Forgia',

@@ -1709,7 +1709,7 @@ const classAbilityNamesEn = {
       [
         'iron_resolve',
         'Iron Resolve',
-        'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb {absorbPerRage} damage per rage spent, lasting up to 10 sec. (Protection)',
+        'Grit your teeth and ignore the pain: a shield absorbs damage equal to {damage}% of your maximum health when cast, lasting up to {duration} sec. (Protection)',
       ],
       [
         'faultline',

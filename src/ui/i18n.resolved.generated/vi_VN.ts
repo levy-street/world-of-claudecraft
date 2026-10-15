@@ -14367,7 +14367,7 @@ export const vi_VN: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Ý Chí Sắt Đá",
-        "description": "Nghiến răng chịu đau: tiêu hao tối đa 40 nộ khí (tối thiểu 20) để hấp thụ {absorbPerRage} sát thương cho mỗi điểm nộ khí đã dùng, kéo dài tối đa 10 giây. (Hộ Vệ)"
+        "description": "Nghiến răng chịu đau: một lá chắn hấp thụ sát thương bằng {damage}% máu tối đa của bạn khi thi triển, kéo dài tối đa {duration} giây. (Hộ Vệ)"
       },
       "faultline": {
         "name": "Vết Nứt Địa Tầng",
@@ -24062,7 +24062,7 @@ export const vi_VN: EnTranslations = {
       },
       "forgewall": {
         "name": "Khiên Aegis Thành Rèn",
-        "bonus2": "Iron Resolve chuyển hóa cơn giận với 5 điểm hấp thụ mỗi điểm thay vì 4.",
+        "bonus2": "Lá chắn của Iron Resolve hấp thụ 25% máu tối đa của bạn thay vì 20%.",
         "bonus4": "Thi triển Shieldcrack giảm 2 giây thời gian hồi còn lại của Iron Resolve."
       },
       "frostquench": {

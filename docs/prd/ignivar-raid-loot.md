@@ -596,7 +596,7 @@ at least matching the retired flat-stat package it replaces.
 |---|---|---|---|
 | Slagbreaker Battlegear (slagbreaker) | arms, Battlecraft | Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20. | Casting Redhand reduces Breachmaker's remaining cooldown by 3 sec. |
 | Emberfury Harness (emberfury) | fury, Bloodrush | Your Enrage lasts 6 sec instead of 4. | Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health. |
-| Forgewall Aegis (forgewall) | prot, Ironguard | Iron Resolve converts rage at 5 absorb per point instead of 4. | Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec. |
+| Forgewall Aegis (forgewall) | prot, Ironguard | Iron Resolve's shield absorbs 25% of your maximum health instead of 20%. | Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec. |
 
 **Paladin (mail)**
 

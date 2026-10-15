@@ -6303,7 +6303,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um grito aterrorizante que faz até 5 inimigos a até 8 m fugirem de medo por 4 s. O dano pode quebrar o efeito.',
   'entities.abilities.intimidating_shout.name': 'Brado Intimidador',
   'entities.abilities.iron_resolve.description':
-    'Cerre os dentes e ignore a dor: gasta até 40 de raiva (mínimo de 20) para absorver {absorbPerRage} de dano por ponto de raiva gasto, por até 10 s. (Proteção)',
+    'Cerre os dentes e ignore a dor: um escudo absorve dano igual a {damage}% da sua vida máxima no momento do uso, por até {duration} s. (Proteção)',
   'entities.abilities.iron_resolve.name': 'Determinação de Ferro',
   'entities.abilities.measured_fury.description':
     'Sua fúria comedida apura sua economia: suas habilidades custam 10% menos raiva. (Armas)',
@@ -18376,7 +18376,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Quando seu Salmo de Proteção é totalmente consumido, seu próximo Hino Purificador em até 10 s é instantâneo. Só pode ocorrer uma vez a cada 15 s.',
   'entities.itemSets.emberscreed.name': 'Vestes do Credo das Brasas',
   'entities.itemSets.forgewall.bonus2':
-    'Determinação de Ferro converte raiva em 5 de absorção por ponto, em vez de 4.',
+    'O escudo de Determinação de Ferro absorve 25% da sua vida máxima em vez de 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Conjurar Quebra-escudo reduz o tempo de recarga restante de Determinação de Ferro em 2 s.',
   'entities.itemSets.forgewall.name': 'Égide da Muralha da Forja',

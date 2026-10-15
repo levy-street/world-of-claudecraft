@@ -6168,7 +6168,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Teriakan menakutkan yang membuat hingga 5 musuh dalam 8 m lari ketakutan selama 4 dtk. Kerusakan bisa mematahkan efeknya.',
   'entities.abilities.intimidating_shout.name': 'Teriakan Menggentarkan',
   'entities.abilities.iron_resolve.description':
-    'Kertakkan gigi dan abaikan rasa sakit: menghabiskan hingga 40 amarah (minimal 20) untuk menyerap {absorbPerRage} kerusakan per amarah yang dihabiskan, bertahan hingga 10 detik. (Perlindungan)',
+    'Kertakkan gigi dan abaikan rasa sakit: sebuah perisai menyerap kerusakan sebesar {damage}% dari nyawa maksimummu saat digunakan, bertahan hingga {duration} detik. (Perlindungan)',
   'entities.abilities.iron_resolve.name': 'Tekad Besi',
   'entities.abilities.measured_fury.description':
     'Amarah terukurmu mempertajam penghematanmu: kemampuanmu membutuhkan 10% lebih sedikit amarah. (Arms)',
@@ -17802,7 +17802,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Saat Mazmur Penjagaan Anda habis sepenuhnya, Nyanyian Pengikisan berikutnya dalam 10 detik bersifat instan. Tidak dapat terjadi lebih dari sekali tiap 15 detik.',
   'entities.itemSets.emberscreed.name': 'Busana Kredo Bara',
   'entities.itemSets.forgewall.bonus2':
-    'Tekad Besi mengubah amarah menjadi 5 serapan per poin, bukan 4.',
+    'Perisai Tekad Besi menyerap 25% dari nyawa maksimummu, bukan 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Merapal Retak Perisai mengurangi waktu pulih Tekad Besi yang tersisa sebesar 2 detik.',
   'entities.itemSets.forgewall.name': 'Aegis Tembok Tungku',

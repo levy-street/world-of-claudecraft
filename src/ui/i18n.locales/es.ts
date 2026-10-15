@@ -6174,7 +6174,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un grito aterrador que hace huir de miedo a hasta 5 enemigos en 8 m durante 4 s. El daño puede romper el efecto.',
   'entities.abilities.intimidating_shout.name': 'Grito Intimidante',
   'entities.abilities.iron_resolve.description':
-    'Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber {absorbPerRage} de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)',
+    'Aprietas los dientes e ignoras el dolor: un escudo absorbe daño equivalente al {damage}% de tu salud máxima al lanzarlo, durante un máximo de {duration} s. (Protección)',
   'entities.abilities.iron_resolve.name': 'Temple de Hierro',
   'entities.abilities.measured_fury.description':
     'Tu furia mesurada afina tu economía: tus habilidades cuestan un 10% menos de ira. (Armas)',
@@ -17751,7 +17751,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cuando tu Salmo de Protección se consume por completo, tu próximo Himno de Purga en 10 s es instantáneo. No puede ocurrir más de una vez cada 15 s.',
   'entities.itemSets.emberscreed.name': 'Vestimentas del Credo de Brasas',
   'entities.itemSets.forgewall.bonus2':
-    'Determinación de Hierro convierte la furia en 5 de absorción por punto en lugar de 4.',
+    'El escudo de Determinación de Hierro absorbe el 25% de tu salud máxima en lugar del 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Lanzar Rompeescudos reduce 2 s el tiempo de reutilización restante de Determinación de Hierro.',
   'entities.itemSets.forgewall.name': 'Égida de la Muralla de la Forja',

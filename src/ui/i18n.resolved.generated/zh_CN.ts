@@ -14367,7 +14367,7 @@ export const zh_CN: EnTranslations = {
       },
       "iron_resolve": {
         "name": "钢铁意志",
-        "description": "咬紧牙关、无视疼痛：消耗最多 40 点怒气（至少 20 点），每消耗 1 点怒气可吸收 {absorbPerRage} 点伤害，持续最多 10 秒。（防护）"
+        "description": "咬紧牙关、无视疼痛：获得一个护盾，吸收相当于施放时最大生命值 {damage}% 的伤害，持续最多 {duration} 秒。（防护）"
       },
       "faultline": {
         "name": "地裂",
@@ -24062,7 +24062,7 @@ export const zh_CN: EnTranslations = {
       },
       "forgewall": {
         "name": "锻墙圣盾",
-        "bonus2": "钢铁意志的怒气转化提高至每点 5 点吸收（原为 4 点）。",
+        "bonus2": "钢铁意志的护盾吸收量由最大生命值的 20% 提高至 25%。",
         "bonus4": "每次施放碎盾击，钢铁意志的剩余冷却时间缩短 2 秒。"
       },
       "frostquench": {

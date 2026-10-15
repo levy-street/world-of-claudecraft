@@ -219,7 +219,7 @@ Implementation routes:
 - **4pc:** "Shieldcrack reduces Faultline's remaining cooldown by 1 sec."
   Route: DATA, castNth refund on `shield_slam` (n 1) to `faultline`, 1 sec. With
   Shieldcrack every 6 sec, effective Faultline about 21 sec.
-- **PvE ceiling:** Forgewall 2pc (Iron Resolve 5 absorb per rage, +25 percent) and 4pc
+- **PvE ceiling:** Forgewall 2pc (Iron Resolve shield 25 percent of max health, up from 20) and 4pc
   (Shieldcrack refunds Iron Resolve 2 sec). Season 2 touches only a stun that bosses
   ignore; Faultline's damage is a minor share. Zero mitigation, so it cannot compete
   with Forgewall's absorb economy; it is trash-pack control only.

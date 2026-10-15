@@ -6495,7 +6495,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un cri terrifiant qui fait fuir de peur jusqu'à 5 ennemis dans un rayon de 8 m pendant 4 s. Les dégâts peuvent briser l'effet.",
   'entities.abilities.intimidating_shout.name': 'Cri intimidant',
   'entities.abilities.iron_resolve.description':
-    'Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber {absorbPerRage} points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)',
+    'Serrez les dents et ignorez la douleur : un bouclier absorbe des dégâts équivalant à {damage}% de vos points de vie maximum au moment du lancement, pendant un maximum de {duration} s. (Protection)',
   'entities.abilities.iron_resolve.name': 'Résolution de fer',
   'entities.abilities.measured_fury.description':
     'Votre fureur mesurée affine votre économie : vos techniques coûtent 10% de rage en moins. (Armes)',
@@ -18047,7 +18047,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Quand votre Psaume de protection est entièrement consommé, votre prochain Hymne de purification sous 10 s est instantané. Ne peut se produire plus d’une fois toutes les 15 s.',
   'entities.itemSets.emberscreed.name': 'Vêtements du Credo des braises',
   'entities.itemSets.forgewall.bonus2':
-    'Résolution de fer convertit la rage à raison de 5 points d’absorption par point au lieu de 4.',
+    'Le bouclier de Résolution de fer absorbe 25% de vos points de vie maximum au lieu de 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Lancer Brise-bouclier réduit le temps de recharge restant de Résolution de fer de 2 s.',
   'entities.itemSets.forgewall.name': 'Égide du Mur de forge',

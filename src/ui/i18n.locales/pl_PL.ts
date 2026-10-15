@@ -6308,7 +6308,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przerażający okrzyk, który zmusza do 5 wrogów w promieniu 8 m do ucieczki w strachu na 4 s. Obrażenia mogą przerwać efekt.',
   'entities.abilities.intimidating_shout.name': 'Zastraszający okrzyk',
   'entities.abilities.iron_resolve.description':
-    'Zaciśnij zęby i zignoruj ból: zużywa do 40 pkt. wściekłości (minimum 20), aby pochłonąć {absorbPerRage} pkt. obrażeń za każdy wydany punkt wściekłości przez maksymalnie 10 sek. (Ochrona)',
+    'Zaciśnij zęby i zignoruj ból: tarcza pochłania obrażenia równe {damage}% twojego maksymalnego zdrowia w chwili użycia, przez maksymalnie {duration} sek. (Ochrona)',
   'entities.abilities.iron_resolve.name': 'Żelazny hart',
   'entities.abilities.measured_fury.description':
     'Wyważona furia uczy cię oszczędności: twoje umiejętności kosztują o 10% mniej wściekłości. (specjalizacja Broń)',
@@ -17736,7 +17736,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Gdy Psalm Ochrony zostanie w pełni zużyty, twój następny Hymn Oczyszczenia w ciągu 10 sek. jest natychmiastowy. Efekt może wystąpić nie częściej niż raz na 15 sek.',
   'entities.itemSets.emberscreed.name': 'Szaty Credo Żaru',
   'entities.itemSets.forgewall.bonus2':
-    'Żelazna Determinacja zamienia furię w 5 punktów absorpcji za punkt zamiast 4.',
+    'Tarcza Żelaznej Determinacji pochłania 25% twojego maksymalnego zdrowia zamiast 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Rzucenie Pęknięcia Tarczy skraca pozostały czas odnowienia Żelaznej Determinacji o 2 sek.',
   'entities.itemSets.forgewall.name': 'Egida Kuźnomuru',

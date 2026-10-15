@@ -1450,7 +1450,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一聲駭人的怒吼，使 8 公尺內至多 5 名敵人在恐懼中逃竄 4 秒。傷害可能打斷該效果。',
   'entities.abilities.intimidating_shout.name': '破膽怒吼',
   'entities.abilities.iron_resolve.description':
-    '咬緊牙關、無視疼痛：消耗最多 40 點怒氣（至少 20 點），每消耗 1 點怒氣可吸收 {absorbPerRage} 點傷害，持續最多 10 秒。（防護）',
+    '咬緊牙關、無視疼痛：獲得一個護盾，吸收相當於施放時最大生命值 {damage}% 的傷害，持續最多 {duration} 秒。（防護）',
   'entities.abilities.iron_resolve.name': '鋼鐵意志',
   'entities.abilities.measured_fury.description':
     '你節制的怒火磨利了你的資源運用：你的技能消耗的怒氣降低 10%。（武器）',
@@ -9875,7 +9875,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.emberfury.bonus2': '你的激怒持續 6 秒（原為 4 秒）。',
   'entities.itemSets.emberfury.bonus4': '放血必定使你激怒，其治療量提高至你最大生命值的 8%。',
   'entities.itemSets.forgewall.name': '鍛牆聖盾',
-  'entities.itemSets.forgewall.bonus2': '鋼鐵意志的怒氣轉化提高至每點 5 點吸收（原為 4 點）。',
+  'entities.itemSets.forgewall.bonus2': '鋼鐵意志的護盾吸收量由最大生命值的 20% 提高至 25%。',
   'entities.itemSets.forgewall.bonus4': '每次施放碎盾擊，鋼鐵意志的剩餘冷卻時間縮短 2 秒。',
   'entities.itemSets.dawnforged.name': '曉鑄聖裝',
   'entities.itemSets.dawnforged.bonus2':

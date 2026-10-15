@@ -14367,7 +14367,7 @@ export const nl_NL: EnTranslations = {
       },
       "iron_resolve": {
         "name": "IJzeren Vastberadenheid",
-        "description": "Bijt op je tanden en negeer de pijn: verbruikt maximaal 40 woede (minimaal 20) om {absorbPerRage} schade per verbruikt woedepunt te absorberen, tot 10 sec. lang. (Protectie)"
+        "description": "Bijt op je tanden en negeer de pijn: een schild absorbeert schade gelijk aan {damage}% van je maximale gezondheid bij gebruik, tot {duration} sec. lang. (Protectie)"
       },
       "faultline": {
         "name": "Breuklijn",
@@ -24062,7 +24062,7 @@ export const nl_NL: EnTranslations = {
       },
       "forgewall": {
         "name": "Smederijmuur-Aegis",
-        "bonus2": "Iron Resolve zet woede om in 5 absorptie per punt in plaats van 4.",
+        "bonus2": "Het schild van Iron Resolve absorbeert 25% van je maximale gezondheid in plaats van 20%.",
         "bonus4": "Het uitspreken van Schildbreuk verkort de resterende afkoelperiode van IJzeren Vastberadenheid met 2 sec."
       },
       "frostquench": {

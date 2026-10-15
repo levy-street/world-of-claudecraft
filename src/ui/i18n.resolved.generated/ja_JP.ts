@@ -14367,7 +14367,7 @@ export const ja_JP: EnTranslations = {
       },
       "iron_resolve": {
         "name": "鉄の決意",
-        "description": "歯を食いしばって痛みを堪え、最大40の怒り（最低20）を消費し、消費した怒り1につき{absorbPerRage}のダメージを吸収します。最大10秒間持続します。（防御）"
+        "description": "歯を食いしばって痛みを堪え、発動時の最大体力の{damage}%に相当するダメージを吸収するシールドを得ます。最大{duration}秒間持続します。（防御）"
       },
       "faultline": {
         "name": "断層",
@@ -24062,7 +24062,7 @@ export const ja_JP: EnTranslations = {
       },
       "forgewall": {
         "name": "フォージウォールの守り",
-        "bonus2": "鉄の決意の怒りの変換が、1ポイントにつき4から5の吸収に上昇します。",
+        "bonus2": "鉄の決意のシールドが吸収する量が、最大体力の20%から25%に上昇します。",
         "bonus4": "盾砕きを発動するたびに、鉄の決意の残りクールダウンが2秒短縮されます。"
       },
       "frostquench": {

@@ -14367,7 +14367,7 @@ export const fr_CA: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Résolution de fer",
-        "description": "Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber {absorbPerRage} points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)"
+        "description": "Serrez les dents et ignorez la douleur : un bouclier absorbe des dégâts équivalant à {damage}% de vos points de vie maximum au moment du lancement, pendant un maximum de {duration} s. (Protection)"
       },
       "faultline": {
         "name": "Ligne de faille",
@@ -24062,7 +24062,7 @@ export const fr_CA: EnTranslations = {
       },
       "forgewall": {
         "name": "Égide du Mur de forge",
-        "bonus2": "Résolution de fer convertit la rage à raison de 5 points d’absorption par point au lieu de 4.",
+        "bonus2": "Le bouclier de Résolution de fer absorbe 25% de vos points de vie maximum au lieu de 20%.",
         "bonus4": "Lancer Brise-bouclier réduit le temps de recharge restant de Résolution de fer de 2 s."
       },
       "frostquench": {

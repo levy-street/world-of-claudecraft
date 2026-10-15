@@ -4280,9 +4280,9 @@ export function runEffects(
         break;
       }
       case 'absorbSpentResource': {
-        // Forgewall 2pc lives UPSTREAM: a buffPct row rewrites the RESOLVED
-        // mult (applyTalentMods' scaleEffect extension), so eff.mult already
-        // carries the wearer's 5-per-rage and the tooltip reads the same.
+        // A buffPct upgrade lives UPSTREAM: the row rewrites the RESOLVED
+        // mult (applyTalentMods' buffPct arm), so eff.mult already carries
+        // the upgraded rate and the tooltip reads the same.
         const amount = Math.round(res.cost * eff.mult);
         if (amount <= 0) break;
         ctx.applyAura(p, {

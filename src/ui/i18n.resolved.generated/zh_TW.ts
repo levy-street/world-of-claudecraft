@@ -14367,7 +14367,7 @@ export const zh_TW: EnTranslations = {
       },
       "iron_resolve": {
         "name": "鋼鐵意志",
-        "description": "咬緊牙關、無視疼痛：消耗最多 40 點怒氣（至少 20 點），每消耗 1 點怒氣可吸收 {absorbPerRage} 點傷害，持續最多 10 秒。（防護）"
+        "description": "咬緊牙關、無視疼痛：獲得一個護盾，吸收相當於施放時最大生命值 {damage}% 的傷害，持續最多 {duration} 秒。（防護）"
       },
       "faultline": {
         "name": "斷層",
@@ -24062,7 +24062,7 @@ export const zh_TW: EnTranslations = {
       },
       "forgewall": {
         "name": "鍛牆聖盾",
-        "bonus2": "鋼鐵意志的怒氣轉化提高至每點 5 點吸收（原為 4 點）。",
+        "bonus2": "鋼鐵意志的護盾吸收量由最大生命值的 20% 提高至 25%。",
         "bonus4": "每次施放碎盾擊，鋼鐵意志的剩餘冷卻時間縮短 2 秒。"
       },
       "frostquench": {

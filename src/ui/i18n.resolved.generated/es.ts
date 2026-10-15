@@ -14367,7 +14367,7 @@ export const es: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Temple de Hierro",
-        "description": "Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber {absorbPerRage} de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)"
+        "description": "Aprietas los dientes e ignoras el dolor: un escudo absorbe daño equivalente al {damage}% de tu salud máxima al lanzarlo, durante un máximo de {duration} s. (Protección)"
       },
       "faultline": {
         "name": "Falla",
@@ -24062,7 +24062,7 @@ export const es: EnTranslations = {
       },
       "forgewall": {
         "name": "Égida de la Muralla de la Forja",
-        "bonus2": "Determinación de Hierro convierte la furia en 5 de absorción por punto en lugar de 4.",
+        "bonus2": "El escudo de Determinación de Hierro absorbe el 25% de tu salud máxima en lugar del 20%.",
         "bonus4": "Lanzar Rompeescudos reduce 2 s el tiempo de reutilización restante de Determinación de Hierro."
       },
       "frostquench": {

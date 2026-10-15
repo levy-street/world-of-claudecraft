@@ -1091,11 +1091,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)',
   },
-  // Protection's rage-dump survival wall (operator design, Ignorar Dolor): the
-  // FIRST spendsAllResource ability. `cost` is the 20-rage minimum gate; casting
-  // spends up to spendResourceCap (40) rage from the bar and grants a damage-absorb
-  // shield (the priest-style 'absorb' aura kind, drained by dealDamage and read by
-  // the HUD absorb bar) soaking 4 damage per rage actually spent, up to 10 sec.
+  // Protection's survival wall (operator design, Ignorar Dolor): a flat 20 rage
+  // buys a damage-absorb shield (the priest-style 'absorb' aura kind, drained by
+  // dealDamage and read by the HUD absorb bar) worth 20% of the warrior's max
+  // health at cast time, up to 10 sec. It scales with the health pool, so it
+  // keeps pace with gear instead of capping at a fixed rage-bought amount.
   iron_resolve: {
     id: 'iron_resolve',
     name: 'Iron Resolve',
@@ -1103,16 +1103,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 14,
     specs: ['prot'],
     cost: 20,
-    spendsAllResource: true,
-    spendResourceCap: 40,
     castTime: 0,
     cooldown: 15,
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'absorbSpentResource', mult: 4, duration: 10 }],
+    effects: [{ type: 'absorb', amount: 0, casterMaxHpPct: 0.2, duration: 10 }],
     description:
-      'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)',
+      'Grit your teeth and ignore the pain: a shield absorbs damage equal to 20% of your maximum health when cast, lasting up to 10 sec. (Protection)',
   },
   // Protection's frontal control slam (operator design, Ola de Choque): modest
   // aoe damage plus a 3 sec stun, restricted to enemies in the MELEE_ARC
@@ -9140,14 +9138,27 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
                   bonus: Math.round(e.bonus * mul),
                   coat: scalePoisonCoatDamage(e.coat, mul),
                 }
-              : // Forgewall 2pc (the Crucible set doc's scaleEffect
-                // extension): Iron Resolve's rage-to-absorb rate is the
+              : // A spend-all shield's rage-to-absorb rate is the
                 // buff-shaped value on absorbSpentResource, so the generic
                 // per-ability knob reaches it and the tooltip splice reads
                 // the same resolved rate the dispatch consumes.
                 e.type === 'absorbSpentResource'
                 ? { ...e, mult: Math.round(e.mult * mul) }
-                : e,
+                : // Forgewall 2pc (Iron Resolve 20% to 25% of max health): a
+                  // shield's flat amount and its max-health fraction are both
+                  // buff-shaped, so the per-ability knob scales them and the
+                  // {damage} splice reads the same resolved fraction the
+                  // dispatch consumes.
+                  e.type === 'absorb'
+                  ? {
+                      ...e,
+                      amount: Math.round(e.amount * mul),
+                      casterMaxHpPct:
+                        e.casterMaxHpPct === undefined
+                          ? undefined
+                          : Math.round(e.casterMaxHpPct * mul * 10_000) / 10_000,
+                    }
+                  : e,
       );
     }
   }

@@ -6113,7 +6113,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Děsivý pokřik, který až 5 nepřátel do 8 m obrátí na útěk ve strachu na 4 s. Poškození může efekt zlomit.',
   'entities.abilities.intimidating_shout.name': 'Zastrašující pokřik',
   'entities.abilities.iron_resolve.description':
-    'Zatneš zuby a ignoruješ bolest: spotřebuješ až 40 vzteku (nejméně 20) a za každý spotřebovaný bod vzteku absorbuješ {absorbPerRage} poškození po dobu až 10 s. (Ochrana)',
+    'Zatneš zuby a ignoruješ bolest: štít pohltí poškození ve výši {damage} % tvého maximálního zdraví v okamžiku seslání, po dobu až {duration} s. (Ochrana)',
   'entities.abilities.iron_resolve.name': 'Železné odhodlání',
   'entities.abilities.measured_fury.description':
     'Tvá odměřená zuřivost zostřuje tvé hospodaření: schopnosti tě stojí o 10 % méně vzteku. (Arms)',
@@ -17430,7 +17430,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Po úplném spotřebování tvého Žalmu ochrany je další Očistný hymnus během 10 s okamžitý. Nemůže nastat častěji než jednou za 15 s.',
   'entities.itemSets.emberscreed.name': 'Roucha Vyznání uhlíků',
   'entities.itemSets.forgewall.bonus2':
-    'Železné odhodlání převádí zuřivost na 5 pohlcení za bod místo 4.',
+    'Štít Železného odhodlání pohltí 25 % tvého maximálního zdraví místo 20 %.',
   'entities.itemSets.forgewall.bonus4':
     'Seslání Rozlomení štítu zkrátí zbývající dobu obnovy Železného odhodlání o 2 s.',
   'entities.itemSets.forgewall.name': 'Égida Kovové hradby',

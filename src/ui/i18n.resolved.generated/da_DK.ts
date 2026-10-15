@@ -14367,7 +14367,7 @@ export const da_DK: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Jernvilje",
-        "description": "Bid tænderne sammen og ignorér smerten: bruger op til 40 raseri (mindst 20) for at absorbere {absorbPerRage} skade pr. brugt raseripoint i op til 10 sek. (Beskyttelse)"
+        "description": "Bid tænderne sammen og ignorér smerten: et skjold absorberer skade svarende til {damage}% af dit maksimale helbred ved brug, i op til {duration} sek. (Beskyttelse)"
       },
       "faultline": {
         "name": "Jordspalte",
@@ -24062,7 +24062,7 @@ export const da_DK: EnTranslations = {
       },
       "forgewall": {
         "name": "Forgewall-aegis",
-        "bonus2": "Iron Resolve omdanner raseri til 5 absorption pr. point i stedet for 4.",
+        "bonus2": "Iron Resolves skjold absorberer 25% af dit maksimale helbred i stedet for 20%.",
         "bonus4": "At kaste Shieldcrack reducerer Iron Resolves resterende nedkøling med 2 sek."
       },
       "frostquench": {

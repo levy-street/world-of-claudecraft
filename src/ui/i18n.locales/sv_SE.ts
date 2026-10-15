@@ -6152,7 +6152,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett skräckinjagande rop som får upp till 5 fiender inom 8 m att fly i skräck i 4 sek. Skada kan bryta effekten.',
   'entities.abilities.intimidating_shout.name': 'Skräckinjagande rop',
   'entities.abilities.iron_resolve.description':
-    'Bit ihop och ignorera smärtan: förbrukar upp till 40 raseri (minst 20) för att absorbera {absorbPerRage} skada per förbrukad raseripoäng i upp till 10 sek. (Beskydd)',
+    'Bit ihop och ignorera smärtan: en sköld absorberar skada motsvarande {damage}% av din maximala hälsa vid användning, i upp till {duration} sek. (Beskydd)',
   'entities.abilities.iron_resolve.name': 'Järnvilja',
   'entities.abilities.measured_fury.description':
     'Ditt avmätta raseri skärper din hushållning: dina förmågor kostar 10 % mindre raseri. (Vapen)',
@@ -17584,7 +17584,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'När din skyddande psalm är helt förbrukad blir din nästa Skurgärningshymn inom 10 sek omedelbar. Kan inte inträffa mer än en gång var 15:e sek.',
   'entities.itemSets.emberscreed.name': 'Glödernas trosklädnad',
   'entities.itemSets.forgewall.bonus2':
-    'Järnvilja omvandlar vrede till 5 absorption per poäng i stället för 4.',
+    'Järnviljas sköld absorberar 25% av din maximala hälsa i stället för 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Att kasta Sköldspricka minskar Järnviljas återstående väntetid med 2 sek.',
   'entities.itemSets.forgewall.name': 'Smedjemurens aegis',

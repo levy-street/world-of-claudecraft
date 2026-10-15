@@ -14367,7 +14367,7 @@ export const ko_KR: EnTranslations = {
       },
       "iron_resolve": {
         "name": "강철 의지",
-        "description": "이를 악물고 고통을 무시합니다. 최대 40의 분노(최소 20)를 소모해 소모한 분노 1당 {absorbPerRage}의 피해를 흡수하며, 최대 10초 동안 지속됩니다. (방어 특성)"
+        "description": "이를 악물고 고통을 무시합니다. 시전 시 최대 생명력의 {damage}%에 해당하는 피해를 흡수하는 보호막을 얻으며, 최대 {duration}초 동안 지속됩니다. (방어 특성)"
       },
       "faultline": {
         "name": "단층선",
@@ -24062,7 +24062,7 @@ export const ko_KR: EnTranslations = {
       },
       "forgewall": {
         "name": "벼림벽 아이기스",
-        "bonus2": "강철 의지가 분노 1점당 4 대신 5의 흡수로 전환합니다.",
+        "bonus2": "강철 의지의 보호막이 최대 생명력의 20% 대신 25%를 흡수합니다.",
         "bonus4": "방패 강타를 시전할 때마다 강철 의지의 남은 재사용 대기시간이 2초 감소합니다."
       },
       "frostquench": {

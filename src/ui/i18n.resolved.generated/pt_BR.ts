@@ -14367,7 +14367,7 @@ export const pt_BR: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Determinação de Ferro",
-        "description": "Cerre os dentes e ignore a dor: gasta até 40 de raiva (mínimo de 20) para absorver {absorbPerRage} de dano por ponto de raiva gasto, por até 10 s. (Proteção)"
+        "description": "Cerre os dentes e ignore a dor: um escudo absorve dano igual a {damage}% da sua vida máxima no momento do uso, por até {duration} s. (Proteção)"
       },
       "faultline": {
         "name": "Linha de Falha",
@@ -24062,7 +24062,7 @@ export const pt_BR: EnTranslations = {
       },
       "forgewall": {
         "name": "Égide da Muralha da Forja",
-        "bonus2": "Determinação de Ferro converte raiva em 5 de absorção por ponto, em vez de 4.",
+        "bonus2": "O escudo de Determinação de Ferro absorve 25% da sua vida máxima em vez de 20%.",
         "bonus4": "Conjurar Quebra-escudo reduz o tempo de recarga restante de Determinação de Ferro em 2 s."
       },
       "frostquench": {

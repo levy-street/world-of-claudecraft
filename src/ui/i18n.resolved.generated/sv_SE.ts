@@ -14367,7 +14367,7 @@ export const sv_SE: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Järnvilja",
-        "description": "Bit ihop och ignorera smärtan: förbrukar upp till 40 raseri (minst 20) för att absorbera {absorbPerRage} skada per förbrukad raseripoäng i upp till 10 sek. (Beskydd)"
+        "description": "Bit ihop och ignorera smärtan: en sköld absorberar skada motsvarande {damage}% av din maximala hälsa vid användning, i upp till {duration} sek. (Beskydd)"
       },
       "faultline": {
         "name": "Förkastningslinje",
@@ -24062,7 +24062,7 @@ export const sv_SE: EnTranslations = {
       },
       "forgewall": {
         "name": "Smedjemurens aegis",
-        "bonus2": "Järnvilja omvandlar vrede till 5 absorption per poäng i stället för 4.",
+        "bonus2": "Järnviljas sköld absorberar 25% av din maximala hälsa i stället för 20%.",
         "bonus4": "Att kasta Sköldspricka minskar Järnviljas återstående väntetid med 2 sek."
       },
       "frostquench": {

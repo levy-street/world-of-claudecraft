@@ -14367,7 +14367,7 @@ export const en_CA: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Iron Resolve",
-        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb {absorbPerRage} damage per rage spent, lasting up to 10 sec. (Protection)"
+        "description": "Grit your teeth and ignore the pain: a shield absorbs damage equal to {damage}% of your maximum health when cast, lasting up to {duration} sec. (Protection)"
       },
       "faultline": {
         "name": "Faultline",
@@ -24062,7 +24062,7 @@ export const en_CA: EnTranslations = {
       },
       "forgewall": {
         "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
+        "bonus2": "Iron Resolve's shield absorbs 25% of your maximum health instead of 20%.",
         "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
       },
       "frostquench": {

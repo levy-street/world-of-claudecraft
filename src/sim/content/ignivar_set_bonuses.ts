@@ -51,8 +51,8 @@ export const SLAGBREAKER_4PC_BREACHMAKER_REFUND_SEC = 3;
 export const EMBERFURY_2PC_ENRAGE_DURATION_BONUS = 2;
 /** Emberfury 4pc: Bloodletting's self-heal fraction of max health (base 0.03). */
 export const EMBERFURY_4PC_BLOODLETTING_HEAL_PCT_MAX = 0.08;
-/** Forgewall 2pc: absorb granted per rage spent by Iron Resolve (base 4). */
-export const FORGEWALL_2PC_ABSORB_PER_RAGE = 5;
+/** Forgewall 2pc: Iron Resolve's shield as a fraction of max health (base 0.2). */
+export const FORGEWALL_2PC_SHIELD_PCT_MAX = 0.25;
 /** Forgewall 4pc: seconds refunded from Iron Resolve per Shieldcrack cast. */
 export const FORGEWALL_4PC_IRON_RESOLVE_REFUND_SEC = 2;
 
@@ -393,14 +393,14 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
   forgewall: [
     {
       pieces: 2,
-      // Iron Resolve converts rage at 5 absorb per point instead of 4: the
-      // buffPct row scales the RESOLVED absorbSpentResource mult (4 x 1.25,
-      // applyTalentMods' scaleEffect extension), so the dispatch and the
-      // tooltip read the same rate. No cross-ability collateral: the row is
-      // scoped to iron_resolve alone.
+      // Iron Resolve's shield rises to 25 percent of max health, up from 20:
+      // the buffPct row scales the RESOLVED absorb casterMaxHpPct (0.2 x 1.25,
+      // applyTalentMods' buffPct absorb arm), so the dispatch and the
+      // tooltip read the same fraction. No cross-ability collateral: the row
+      // is scoped to iron_resolve alone.
       effect: {
         ability: [{ ability: 'iron_resolve', buffPct: 0.25 }],
-        tuning: { absorbPerRage: FORGEWALL_2PC_ABSORB_PER_RAGE },
+        tuning: { shieldPctMax: FORGEWALL_2PC_SHIELD_PCT_MAX },
       },
     },
     {

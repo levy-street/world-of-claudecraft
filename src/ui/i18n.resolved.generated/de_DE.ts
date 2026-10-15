@@ -14367,7 +14367,7 @@ export const de_DE: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Eiserne Entschlossenheit",
-        "description": "Beißt die Zähne zusammen und ignoriert den Schmerz: Verbraucht bis zu 40 Wut (mindestens 20), um pro verbrauchtem Wutpunkt {absorbPerRage} Schaden zu absorbieren. Hält bis zu 10 Sek. an. (Schutz)"
+        "description": "Beißt die Zähne zusammen und ignoriert den Schmerz: Ein Schild absorbiert Schaden in Höhe von {damage}% Eurer maximalen Gesundheit beim Wirken. Hält bis zu {duration} Sek. an. (Schutz)"
       },
       "faultline": {
         "name": "Bruchlinie",
@@ -24062,7 +24062,7 @@ export const de_DE: EnTranslations = {
       },
       "forgewall": {
         "name": "Ägide der Schmiedemauer",
-        "bonus2": "Eiserne Entschlossenheit wandelt Wut mit 5 Absorption pro Punkt statt 4 um.",
+        "bonus2": "Der Schild von Eiserne Entschlossenheit absorbiert 25% Eurer maximalen Gesundheit statt 20%.",
         "bonus4": "Das Wirken von Schildbruch verringert die verbleibende Abklingzeit von Eiserne Entschlossenheit um 2 Sek."
       },
       "frostquench": {

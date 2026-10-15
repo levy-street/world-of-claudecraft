@@ -523,7 +523,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: 'Iron Resolve converts rage at 5 absorb per point instead of 4.',
+        text: "Iron Resolve's shield absorbs 25% of your maximum health instead of 20%.",
       },
       {
         pieces: 4,

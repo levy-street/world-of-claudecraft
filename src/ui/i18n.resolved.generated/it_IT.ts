@@ -14367,7 +14367,7 @@ export const it_IT: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Fermezza di Ferro",
-        "description": "Stringi i denti e ignora il dolore: consuma fino a 40 rabbia (minimo 20) per assorbire {absorbPerRage} danni per ogni punto di rabbia speso, per un massimo di 10 s. (Protezione)"
+        "description": "Stringi i denti e ignora il dolore: uno scudo assorbe danni pari al {damage}% della tua salute massima al momento del lancio, per un massimo di {duration} s. (Protezione)"
       },
       "faultline": {
         "name": "Faglia",
@@ -24062,7 +24062,7 @@ export const it_IT: EnTranslations = {
       },
       "forgewall": {
         "name": "Egida della Muraglia della Forgia",
-        "bonus2": "Risolutezza Ferrea converte la rabbia in 5 assorbimento per punto invece di 4.",
+        "bonus2": "Lo scudo di Risolutezza Ferrea assorbe il 25% della tua salute massima invece del 20%.",
         "bonus4": "Lanciare Spacca-scudo riduce di 2 s il tempo di recupero rimanente di Risolutezza Ferrea."
       },
       "frostquench": {

@@ -1450,7 +1450,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一声骇人的怒吼，使 8 米内至多 5 名敌人在恐惧中逃窜 4 秒。伤害可能打断该效果。',
   'entities.abilities.intimidating_shout.name': '破胆怒吼',
   'entities.abilities.iron_resolve.description':
-    '咬紧牙关、无视疼痛：消耗最多 40 点怒气（至少 20 点），每消耗 1 点怒气可吸收 {absorbPerRage} 点伤害，持续最多 10 秒。（防护）',
+    '咬紧牙关、无视疼痛：获得一个护盾，吸收相当于施放时最大生命值 {damage}% 的伤害，持续最多 {duration} 秒。（防护）',
   'entities.abilities.iron_resolve.name': '钢铁意志',
   'entities.abilities.measured_fury.description':
     '你收放自如的怒火让消耗更精打细算：你的技能怒气消耗降低 10%。（武器）',
@@ -9874,7 +9874,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.emberfury.bonus2': '你的激怒持续 6 秒（原为 4 秒）。',
   'entities.itemSets.emberfury.bonus4': '放血必定使你激怒，其治疗量提高至你最大生命值的 8%。',
   'entities.itemSets.forgewall.name': '锻墙圣盾',
-  'entities.itemSets.forgewall.bonus2': '钢铁意志的怒气转化提高至每点 5 点吸收（原为 4 点）。',
+  'entities.itemSets.forgewall.bonus2': '钢铁意志的护盾吸收量由最大生命值的 20% 提高至 25%。',
   'entities.itemSets.forgewall.bonus4': '每次施放碎盾击，钢铁意志的剩余冷却时间缩短 2 秒。',
   'entities.itemSets.dawnforged.name': '晓铸圣装',
   'entities.itemSets.dawnforged.bonus2':

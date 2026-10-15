@@ -6339,7 +6339,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een angstaanjagende schreeuw die tot 5 vijanden binnen 8 m 4 sec lang in angst doet vluchten. Schade kan het effect breken.',
   'entities.abilities.intimidating_shout.name': 'Intimiderende Schreeuw',
   'entities.abilities.iron_resolve.description':
-    'Bijt op je tanden en negeer de pijn: verbruikt maximaal 40 woede (minimaal 20) om {absorbPerRage} schade per verbruikt woedepunt te absorberen, tot 10 sec. lang. (Protectie)',
+    'Bijt op je tanden en negeer de pijn: een schild absorbeert schade gelijk aan {damage}% van je maximale gezondheid bij gebruik, tot {duration} sec. lang. (Protectie)',
   'entities.abilities.iron_resolve.name': 'IJzeren Vastberadenheid',
   'entities.abilities.measured_fury.description':
     'Je beheerste woede scherpt je zuinigheid aan: je vaardigheden kosten 10% minder woede. (Wapens)',
@@ -17746,7 +17746,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Wanneer je Psalm of Warding volledig is verbruikt, is je volgende Scouring Hymn binnen 10 sec. onmiddellijk. Kan niet vaker dan eens per 15 sec. optreden.',
   'entities.itemSets.emberscreed.name': 'Gewaden van de Beloofde Sintels',
   'entities.itemSets.forgewall.bonus2':
-    'Iron Resolve zet woede om in 5 absorptie per punt in plaats van 4.',
+    'Het schild van Iron Resolve absorbeert 25% van je maximale gezondheid in plaats van 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Het uitspreken van Schildbreuk verkort de resterende afkoelperiode van IJzeren Vastberadenheid met 2 sec.',
   'entities.itemSets.forgewall.name': 'Smederijmuur-Aegis',
