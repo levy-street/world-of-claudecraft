@@ -18534,6 +18534,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.readyTitle': '你的每週獎勵已就緒',
   'hudChrome.weeklyRewards.readyDescription':
     '有一週已完成的獎勵正在等待。打開你獲得的寶庫，然後選擇一件物品領取。',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    '這些寶庫可抽取的全部戰利品表。在獲得寶庫的那一週擊敗首領，即可在寶庫管理員處選擇其戰利品；地城戰利品表僅包含你擊敗的首領，英雄難度擊殺同時解鎖普通難度。抽取時排除已抽取過的物品。所需等級比你的等級高出超過 {maxLevelOffset} 級的裝備不予顯示。',
   'hudChrome.weeklyRewards.previewClaimNotice':
     '獎勵已就緒。請前往東溪的寶庫管理員處開啟寶庫並領取獎勵。',
   'hudChrome.weeklyRewards.notNow': '稍後再說',

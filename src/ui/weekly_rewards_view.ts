@@ -1,5 +1,13 @@
 import type { PlayerClass } from '../sim/types';
-import { weeklyRewardTableOptions } from '../sim/weekly_reward_options';
+import {
+  weeklyFilterTablesByLevel,
+  weeklyRewardTableCandidates,
+} from '../sim/weekly_reward_options';
+import {
+  needsWeeklyBossTable,
+  WEEKLY_BOSS_TABLES,
+  type WeeklyBossUnlocks,
+} from '../sim/weekly_reward_tables';
 import {
   earnedWeeklyRolls,
   WEEKLY_POOL_IDS,
@@ -18,7 +26,28 @@ export function weeklyCountdown(resetAtMs: number, nowMs: number): string {
     seconds: n(total % 60),
   });
 }
-export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: PlayerClass) {
+/** Every boss at Heroic, which also unlocks its Normal table. */
+const EVERY_WEEKLY_BOSS_UNLOCK: WeeklyBossUnlocks = Object.freeze(
+  Object.fromEntries(WEEKLY_BOSS_TABLES.map(({ bossId }) => [bossId, 2])),
+);
+
+/**
+ * `eligible` (the keeper) lists only tables this week's boss kills unlock.
+ * `all` (the read-only Dungeon Finder preview) lists every table a vault can
+ * roll from, so players can plan runs before any boss dies.
+ */
+export type WeeklyLootCatalog = 'eligible' | 'all';
+
+export function buildWeeklyRewardsView(
+  info: WeeklyRewardInfo,
+  playerClass: PlayerClass,
+  options: { catalog?: WeeklyLootCatalog } = {},
+) {
+  const catalog = options.catalog ?? 'eligible';
+  const bossUnlocks =
+    catalog === 'all'
+      ? EVERY_WEEKLY_BOSS_UNLOCK
+      : (info.state.weeklyBossUnlocks ?? info.state.bossUnlocks);
   const earned = earnedWeeklyRolls(info.state);
   const progress = [
     info.state.raidClears.length,
@@ -32,6 +61,7 @@ export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: Play
   };
   return (['raid', 'dungeon', 'world', 'pvp'] as const).map((category, index) => ({
     category,
+    catalog,
     progress: progress[index],
     thresholds: WEEKLY_THRESHOLDS[category],
     available: category !== 'world' || info.worldQuestsAvailable,
@@ -49,24 +79,31 @@ export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: Play
     }),
     pools: WEEKLY_POOL_IDS.flatMap((pool, poolIndex) => {
       if (pool !== category && pool !== `${category}_heroic`) return [];
-      const tables = weeklyRewardTableOptions(
+      const candidates = weeklyRewardTableCandidates(
         {
           resetAtMs: 0,
           choices: [],
-          bossUnlocks: info.state.weeklyBossUnlocks ?? info.state.bossUnlocks,
+          bossUnlocks,
           raidUnlocks: info.state.raidUnlocks,
         },
         { pool },
         playerClass,
-        info.playerLevel,
       );
+      const tables = weeklyFilterTablesByLevel(candidates, info.playerLevel);
       const items = [...new Set(tables.flatMap((table) => table.items))].sort();
+      // Why a catalog is empty: nothing cleared yet, or everything is over level.
+      const emptyReason: 'noClears' | 'level' | null = tables.length
+        ? null
+        : catalog === 'eligible' && needsWeeklyBossTable(pool) && !candidates.length
+          ? 'noClears'
+          : 'level';
       return [
         {
           pool,
           tables,
           items,
           earned: earned[poolIndex],
+          emptyReason,
         },
       ];
     }),

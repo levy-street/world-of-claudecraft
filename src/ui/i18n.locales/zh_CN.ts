@@ -18525,6 +18525,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.readyTitle': '你的每周奖励已就绪',
   'hudChrome.weeklyRewards.readyDescription':
     '有一周已完成的奖励正在等待。打开你获得的宝库，然后选择一件物品领取。',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    '这些宝库可抽取的全部战利品表。在获得宝库的那一周击败首领，即可在宝库管理员处选择其战利品；地下城战利品表仅包含你击败的首领，英雄难度击杀同时解锁普通难度。抽取时排除已抽取过的物品。所需等级比你的等级高出超过 {maxLevelOffset} 级的装备不予显示。',
   'hudChrome.weeklyRewards.previewClaimNotice':
     '奖励已就绪。请前往东溪的宝库管理员处开启宝库并领取奖励。',
   'hudChrome.weeklyRewards.notNow': '稍后再说',

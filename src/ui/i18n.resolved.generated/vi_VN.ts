@@ -484,6 +484,7 @@ export const vi_VN: EnTranslations = {
       "worldPoolRule": "Trang bị Nythraxis Bình Thường. Không yêu cầu xóa raid.",
       "poolRule": "Mỗi vật phẩm được liệt kê có cơ hội bằng nhau. Vật phẩm phù hợp với hạn chế lớp của bạn. Raid đánh bại mở khoá chiếm đoạt ở mức độ khó đó. Vật phẩm Huyền Thoại được loại trừ.",
       "selectionPoolRule": "Đối với raid và ngục tối, chọn một hoặc nhiều bảng trước khi mở. Bảng ngục tối kết hợp các sếp bạn đã xóa ở mức độ khó này. Phép tính loại trừ các bản sao, vật phẩm Huyền Thoại và trang bị yêu cầu nhiều hơn {maxLevelOffset} cấp độ trên cấp độ của bạn.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Hiếm",
       "epic": "Kỳ Tích",
       "unavailable": "Chưa có sẵn",

@@ -85,6 +85,9 @@ The server saves the item and its actual source in the existing `tableId` field
 before revealing it. The multi-selection is transient, not stored. Retries retain
 both the original item and source. View possible loot groups collapsible tables
 under content categories and difficulty, with item icons, counts and tooltips.
+At the Vault Keeper it lists only tables this week's boss kills unlock. The
+read-only Dungeon Finder preview lists every class-eligible table instead, so
+players can plan runs before any boss dies; both apply the same level filter.
 
 Older records can prove final-boss kills from lifetime dungeon deeds and legacy
 raid unlocks; they cannot prove intermediate kills. Legacy weeks without a boss

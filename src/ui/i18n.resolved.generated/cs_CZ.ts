@@ -484,6 +484,7 @@ export const cs_CZ: EnTranslations = {
       "worldPoolRule": "Normální výbava Nythraxis. Vyčištění raidu se nevyžaduje.",
       "poolRule": "Každý uvedený předmět má stejnou šanci. Předměty odpovídají omezením tvé třídy. Poražené raidy odemknou svou kořist na dané obtížnosti. Legendární předměty jsou vyloučeny.",
       "selectionPoolRule": "U raidů a dungeonů vyber před otevřením jednu nebo víc tabulek. Tabulky dungeonů kombinují bossy, které jsi na této obtížnosti porazil(a). Losování vylučuje duplicity, legendární předměty a výbavu vyžadující o víc než {maxLevelOffset} úrovní víc, než je tvá úroveň.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Vzácné",
       "epic": "Epické",
       "unavailable": "Zatím nedostupné",

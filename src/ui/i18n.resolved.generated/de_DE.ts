@@ -484,6 +484,7 @@ export const de_DE: EnTranslations = {
       "worldPoolRule": "Normal-Ausrüstung von Nythraxis. Keine Schlachtzugsabschlüsse erforderlich.",
       "poolRule": "Jeder aufgeführte Gegenstand hat die gleiche Chance. Gegenstände entsprechen deinen Klassenbeschränkungen. Besiegte Schlachtzüge schalten ihre Beute auf diesem Schwierigkeitsgrad frei. Legendäre Gegenstände sind ausgeschlossen.",
       "selectionPoolRule": "Wähle bei Schlachtzügen und Dungeons vor dem Öffnen eine oder mehrere Tabellen. Dungeon-Tabellen kombinieren Bosse, die du auf diesem Schwierigkeitsgrad besiegt hast. Würfe schließen Duplikate, legendäre Gegenstände und Ausrüstung aus, die mehr als {maxLevelOffset} Stufen über deiner Stufe liegt.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Selten",
       "epic": "Episch",
       "unavailable": "Noch nicht verfügbar",

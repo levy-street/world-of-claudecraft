@@ -484,6 +484,7 @@ export const nl_NL: EnTranslations = {
       "worldPoolRule": "Normaal Nythraxis-uitrusting. Geen raiduitvoeringen vereist.",
       "poolRule": "Elk opgenoemd item heeft gelijke kans. Items passen je klas en sterkte-niveau aan.",
       "selectionPoolRule": "Selecteer voor raids en kerkers één of meer tabellen voordat je opent. Kerkertabellen combineren baaien die je op deze moeilijkheidsgraad hebt verslagen. Worpen sluiten duplicaten, legendarische items en uitrusting uit die meer dan {maxLevelOffset} niveaus boven je niveau vereist.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Zeldzaam",
       "epic": "Episch",
       "unavailable": "Nog niet beschikbaar",

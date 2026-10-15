@@ -484,6 +484,7 @@ export const tr_TR: EnTranslations = {
       "worldPoolRule": "Normal Nythraxis donanımı. Baskın temizlemesi gerekmez.",
       "poolRule": "Listelenen her öğenin eşit bir şansı vardır. Öğeler sınıf kısıtlamalarınızla eşleşir. Yenilen baskınları o zorlukta hazinelerini açarlar. Destansı öğeler hariç tutulur.",
       "selectionPoolRule": "Baskınlar ve zindanlar için, açmadan önce bir veya daha fazla tablo seç. Zindan tabloları bu zorlukta temizlediğin patronları birleştirir. Atışlar yinelenenleri, destansı öğeleri ve seviyelik {maxLevelOffset} seviyeden daha fazla gerektiren donanımları hariç tutar.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Nadir",
       "epic": "Destansı",
       "unavailable": "Henüz kullanılabilir değil",

@@ -484,6 +484,7 @@ export const it_IT: EnTranslations = {
       "worldPoolRule": "Equipaggiamento normale di Nythraxis. Nessun completamento d'incursione richiesto.",
       "poolRule": "Ogni oggetto elencato ha la stessa probabilità. Gli oggetti rispettano le restrizioni della tua classe. Le incursioni superate sbloccano il loro bottino a quella difficoltà. Gli oggetti leggendari sono esclusi.",
       "selectionPoolRule": "Per incursioni e spedizioni, seleziona una o più tabelle prima di aprire. Le tabelle di spedizione combinano i boss che hai superato a questa difficoltà. Le estrazioni escludono i duplicati, gli oggetti leggendari e l'equipaggiamento che richiede più di {maxLevelOffset} livelli sopra il tuo.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Raro",
       "epic": "Epico",
       "unavailable": "Non ancora disponibile",

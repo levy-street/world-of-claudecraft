@@ -484,6 +484,7 @@ export const es: EnTranslations = {
       "worldPoolRule": "Equipo Normal de Nythraxis. No requiere haber superado la banda.",
       "poolRule": "Todos los objetos listados tienen la misma probabilidad. Los objetos respetan las restricciones de tu clase. Las bandas derrotadas desbloquean su botín en esa dificultad. Los objetos legendarios quedan excluidos.",
       "selectionPoolRule": "Para bandas y mazmorras, selecciona una o más tablas antes de abrir. Las tablas de mazmorra combinan los jefes que has superado en esa dificultad. Las tiradas excluyen duplicados, objetos legendarios y equipo que exija más de {maxLevelOffset} niveles por encima del tuyo.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Raro",
       "epic": "Épico",
       "unavailable": "Todavía no disponible",

@@ -484,6 +484,7 @@ export const sv_SE: EnTranslations = {
       "worldPoolRule": "Normal Nythraxis-utrustning. Inga raidrensmaskiner krävs.",
       "poolRule": "Varje listat föremål har en lika chans. Föremål matchar dina klassrestriktioner. Besegrada raids låser upp sitt byte på denna svårighetsgrad. Legendariska föremål är uteslutna.",
       "selectionPoolRule": "För raids och fängelser, välj en eller flera tabeller innan du öppnar. Fängelsebord kombinerar bossar du har rensat på denna svårighetsgrad. Rullar exkluderar dubbletter, legendariska föremål och utrustning som kräver mer än {maxLevelOffset} nivåer över din nivå.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Sällsynt",
       "epic": "Epos",
       "unavailable": "Inte tillgänglig ännu",

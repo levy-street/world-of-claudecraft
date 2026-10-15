@@ -18766,10 +18766,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Учетные записи операторов нельзя отключить.',
   'apiError.kick.reason_required': 'Необходимо указать причину.',
   'apiError.kick.target_offline': 'Этот игрок больше не в сети на этом мире.',
-  'apiError.world_quest_block.admin_target': 'Учетные записи операторов нельзя лишить доступа к локальным заданиям.',
+  'apiError.world_quest_block.admin_target':
+    'Учетные записи операторов нельзя лишить доступа к локальным заданиям.',
   'apiError.world_quest_block.reason_required': 'Необходимо указать причину.',
-  'apiError.world_quest_block.already_blocked': 'Эта учетная запись уже лишена доступа к локальным заданиям.',
-  'apiError.world_quest_block.not_blocked': 'Эта учетная запись не лишена доступа к локальным заданиям.',
+  'apiError.world_quest_block.already_blocked':
+    'Эта учетная запись уже лишена доступа к локальным заданиям.',
+  'apiError.world_quest_block.not_blocked':
+    'Эта учетная запись не лишена доступа к локальным заданиям.',
   'entities.items.reins_goblin_rocket_sled.name': 'Ключ зажигания гоблинских ракетных саней',
   'entities.items.reins_rallycart_rxt.name': 'Ключ зажигания ралликарта RXT',
   'guide.settingsPage.ifAuraBarBelowFrame':
@@ -19815,6 +19818,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.readyTitle': 'Ваши еженедельные награды готовы',
   'hudChrome.weeklyRewards.readyDescription':
     'Награды за завершенную неделю ждут вас. Откройте заработанные хранилища и выберите один предмет.',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    'Все таблицы, из которых могут разыгрываться эти хранилища. Победите босса в ту неделю, когда заработано хранилище, чтобы его добычу можно было выбрать у смотрителя хранилища; таблица подземелья включает только побеждённых вами боссов, а победа на героической сложности открывает и обычную. Из розыгрыша исключены уже разыгранные предметы. Снаряжение, требуемый уровень которого превышает ваш более чем на {maxLevelOffset}, не показывается.',
   'hudChrome.weeklyRewards.previewClaimNotice':
     'Награды ждут вас. Посетите смотрителя хранилища в Иствруке, чтобы открыть хранилища и получить награду.',
   'hudChrome.weeklyRewards.notNow': 'Не сейчас',

@@ -484,6 +484,7 @@ export const fr_FR: EnTranslations = {
       "worldPoolRule": "Équipement Normal de Nythraxis. Aucune victoire de raid requise.",
       "poolRule": "Chaque objet listé a une chance égale. Les objets respectent les restrictions de votre classe. Les raids vaincus débloquent leur butin à cette difficulté. Les objets légendaires sont exclus.",
       "selectionPoolRule": "Pour les raids et les donjons, sélectionnez une ou plusieurs tables avant l'ouverture. Les tables de donjon regroupent les boss que vous avez vaincus à cette difficulté. Les tirages excluent les doublons, les objets légendaires et l'équipement exigeant plus de {maxLevelOffset} niveaux au-dessus du vôtre.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Rare",
       "epic": "Épique",
       "unavailable": "Pas encore disponible",

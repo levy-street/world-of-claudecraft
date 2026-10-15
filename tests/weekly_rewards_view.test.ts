@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { earnedWeeklyRolls, emptyWeeklyRewards } from '../src/sim/weekly_rewards';
+import { weeklyItemWithinLevel } from '../src/sim/weekly_reward_options';
+import { WEEKLY_BOSS_TABLES, weeklyBossLootPool } from '../src/sim/weekly_reward_tables';
+import {
+  earnedWeeklyRolls,
+  emptyWeeklyRewards,
+  type WeeklyPoolId,
+} from '../src/sim/weekly_rewards';
 import { buildWeeklyRewardsView, weeklyCountdown } from '../src/ui/weekly_rewards_view';
 
 describe('weekly reward presentation', () => {
@@ -84,6 +90,133 @@ describe('weekly reward presentation', () => {
       'mage',
     )[1];
     expect(dungeon.pools[1].tables.map((table) => table.id)).toEqual(['drowned_temple']);
+  });
+  it('previews every class-eligible boss table in the all catalog, kills or not', () => {
+    const state = emptyWeeklyRewards();
+    state.bossUnlocks = {};
+    state.weeklyBossUnlocks = {};
+    const info = {
+      playerLevel: 60,
+      state,
+      nowMs: 0,
+      canClaim: false,
+      worldQuestsAvailable: true,
+      readyWeeks: 0,
+    };
+    const [raid, dungeon] = buildWeeklyRewardsView(info, 'warrior', { catalog: 'all' });
+    const expected = (category: 'raid' | 'dungeon', pool: WeeklyPoolId) => [
+      ...new Set(
+        WEEKLY_BOSS_TABLES.filter(
+          (table) =>
+            table.category === category &&
+            weeklyBossLootPool(table.bossId, pool, 'warrior').some((id) =>
+              weeklyItemWithinLevel(id, 60),
+            ),
+        ).map((table) => (category === 'dungeon' ? table.dungeonId : table.bossId)),
+      ),
+    ];
+    for (const entry of [...raid.pools, ...dungeon.pools]) {
+      const category = entry.pool.startsWith('raid') ? 'raid' : 'dungeon';
+      expect(entry.tables.map((table) => table.id).sort()).toEqual(
+        expected(category, entry.pool).sort(),
+      );
+      expect(entry.emptyReason).toBeNull();
+    }
+    expect(dungeon.pools[0].tables.map((table) => table.id)).toEqual(
+      expect.arrayContaining([
+        'hollow_crypt',
+        'sunken_bastion',
+        'drowned_temple',
+        'gravewyrm_sanctum',
+        'wildheart_basin',
+      ]),
+    );
+    expect(dungeon.pools[1].tables.map((table) => table.id)).toEqual(
+      expect.arrayContaining(['hollow_crypt', 'gravewyrm_sanctum', 'wildheart_basin']),
+    );
+    for (const entry of raid.pools)
+      expect(entry.tables.map((table) => table.id)).toEqual(
+        expect.arrayContaining(['nythraxis_scourge_of_thornpeak']),
+      );
+    expect(raid.catalog).toBe('all');
+    // The default (keeper) catalog stays cleared-only and names the real reason,
+    // even when lifetime unlocks exist: only this week's kills count there.
+    state.bossUnlocks = { morthen: 2, nythraxis_scourge_of_thornpeak: 2 };
+    const keeper = buildWeeklyRewardsView(info, 'warrior');
+    for (const row of keeper.slice(0, 2)) {
+      expect(row.catalog).toBe('eligible');
+      for (const entry of row.pools) {
+        expect(entry.tables).toEqual([]);
+        expect(entry.emptyReason).toBe('noClears');
+      }
+    }
+  });
+  it('filters every previewed item by equip level, not just whole tables', () => {
+    const state = emptyWeeklyRewards();
+    const info = (playerLevel: number) => ({
+      playerLevel,
+      state,
+      nowMs: 0,
+      canClaim: false,
+      worldQuestsAvailable: true,
+      readyWeeks: 0,
+    });
+    const atMax = buildWeeklyRewardsView(info(60), 'warrior', { catalog: 'all' });
+    const low = buildWeeklyRewardsView(info(10), 'warrior', { catalog: 'all' });
+    let trimmed = false;
+    for (const [rowIndex, row] of low.slice(0, 2).entries())
+      for (const [poolIndex, entry] of row.pools.entries()) {
+        const full = atMax[rowIndex].pools[poolIndex];
+        for (const table of entry.tables) {
+          // Every listed item must be wearable within the offset at level 10.
+          for (const id of table.items) expect(weeklyItemWithinLevel(id, 10)).toBe(true);
+          const fullItems = full.tables.find((candidate) => candidate.id === table.id)!.items;
+          expect(fullItems).toEqual(expect.arrayContaining(table.items));
+          if (table.items.length < fullItems.length) trimmed = true;
+        }
+        expect(entry.items).toEqual([...new Set(entry.tables.flatMap((t) => t.items))].sort());
+        if (entry.tables.length < full.tables.length) trimmed = true;
+      }
+    // Positive control: level 10 really does drop something level 60 lists.
+    expect(trimmed).toBe(true);
+  });
+  it('reports the empty reason per pool, not per row', () => {
+    const state = emptyWeeklyRewards();
+    state.weeklyBossUnlocks = { ysolei: 1 };
+    const dungeon = buildWeeklyRewardsView(
+      {
+        playerLevel: 20,
+        state,
+        nowMs: 0,
+        canClaim: true,
+        worldQuestsAvailable: false,
+        readyWeeks: 0,
+      },
+      'mage',
+    )[1];
+    expect(dungeon.pools.map((entry) => [entry.pool, entry.emptyReason])).toEqual([
+      ['dungeon', null],
+      ['dungeon_heroic', 'noClears'],
+    ]);
+  });
+  it('names level as the empty reason once cleared tables exist but are over level', () => {
+    const state = emptyWeeklyRewards();
+    state.weeklyBossUnlocks = { nythraxis_scourge_of_thornpeak: 2 };
+    const raid = buildWeeklyRewardsView(
+      {
+        playerLevel: 1,
+        state,
+        nowMs: 0,
+        canClaim: true,
+        worldQuestsAvailable: true,
+        readyWeeks: 0,
+      },
+      'warrior',
+    )[0];
+    expect(raid.pools.map((entry) => [entry.tables.length, entry.emptyReason])).toEqual([
+      [0, 'level'],
+      [0, 'level'],
+    ]);
   });
   it('shows days, hours, minutes and seconds and clamps expired resets to zero', () => {
     expect(weeklyCountdown(90061000, 0)).toBe('01d 01h 01m 01s');

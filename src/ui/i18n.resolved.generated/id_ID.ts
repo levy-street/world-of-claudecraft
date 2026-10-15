@@ -484,6 +484,7 @@ export const id_ID: EnTranslations = {
       "worldPoolRule": "Perlengkapan Normal Nythraxis. Tidak ada penghapusan serangan yang diperlukan.",
       "poolRule": "Setiap item yang terdaftar memiliki kesempatan yang sama. Item sesuai dengan batasan kelasmu. Serangan yang dikalahkan membuka jarahan mereka pada kesulitan itu. Item legendaris dikecualikan.",
       "selectionPoolRule": "Untuk serangan dan dungeon, pilih satu atau lebih tabel sebelum membuka. Tabel dungeon menggabungkan bos yang telah Anda bersihkan pada kesulitan ini. Gulungan mengeluarkan duplikat, item legendaris dan perlengkapan yang memerlukan lebih dari {maxLevelOffset} level di atas level Anda.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Langka",
       "epic": "Epik",
       "unavailable": "Belum tersedia",

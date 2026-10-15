@@ -484,6 +484,7 @@ export const pl_PL: EnTranslations = {
       "worldPoolRule": "Zwykły sprzęt Nythraxisa. Brak wymaganych przelotów rajdu.",
       "poolRule": "Każdy wymieniony przedmiot ma równe szanse. Przedmioty pasują do ograniczeń twojej klasy. Pokonane rajdy odblokowują ich łup na tej trudności. Legendarne przedmioty są wykluczane.",
       "selectionPoolRule": "Dla rajdów i lochów wybierz jedną lub więcej tabel przed otwarciem. Tabele lochów łączą szefów, których pokonałeś na tej trudności. Losowania nie zawierają duplikatów, legendarne przedmioty i sprzętu wymagającego więcej niż {maxLevelOffset} poziomów powyżej twojego poziomu.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Rzadki",
       "epic": "Epicki",
       "unavailable": "Niedostępne",

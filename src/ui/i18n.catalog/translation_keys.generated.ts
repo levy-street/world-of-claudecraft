@@ -14010,6 +14010,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.weeklyRewards.poolRule'
   | 'hudChrome.weeklyRewards.poolSize'
   | 'hudChrome.weeklyRewards.previewClaimNotice'
+  | 'hudChrome.weeklyRewards.previewPoolRule'
   | 'hudChrome.weeklyRewards.previouslyRolled'
   | 'hudChrome.weeklyRewards.progress'
   | 'hudChrome.weeklyRewards.rare'

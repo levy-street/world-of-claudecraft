@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "es_ES": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "fr_FR": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "fr_CA": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "de_DE": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "nl_NL": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "pl_PL": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "id_ID": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "tr_TR": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "sv_SE": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "vi_VN": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ],
+  "da_DK": [
+    "hudChrome.weeklyRewards.previewPoolRule"
+  ]
 };

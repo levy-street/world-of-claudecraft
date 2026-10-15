@@ -18448,10 +18448,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': '管理者アカウントはキックできません。',
   'apiError.kick.reason_required': '理由の入力が必要です。',
   'apiError.kick.target_offline': 'そのプレイヤーはもうこのレルムにオンラインではありません。',
-  'apiError.world_quest_block.admin_target': '管理者アカウントはワールドクエストから除外できません。',
+  'apiError.world_quest_block.admin_target':
+    '管理者アカウントはワールドクエストから除外できません。',
   'apiError.world_quest_block.reason_required': '理由の入力が必要です。',
-  'apiError.world_quest_block.already_blocked': 'そのアカウントはすでにワールドクエストから除外されています。',
-  'apiError.world_quest_block.not_blocked': 'そのアカウントはワールドクエストから除外されていません。',
+  'apiError.world_quest_block.already_blocked':
+    'そのアカウントはすでにワールドクエストから除外されています。',
+  'apiError.world_quest_block.not_blocked':
+    'そのアカウントはワールドクエストから除外されていません。',
   'entities.items.reins_goblin_rocket_sled.name': 'ゴブリンロケットそりの始動キー',
   'entities.items.reins_rallycart_rxt.name': 'ラリーカートRXTの始動キー',
   'guide.settingsPage.ifAuraBarBelowFrame':
@@ -19472,6 +19475,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.readyTitle': '週間報酬の準備ができました',
   'hudChrome.weeklyRewards.readyDescription':
     '完了した週の報酬が待っています。獲得した宝物庫を開け、受け取る一品を選んでください。',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    'これらの宝物庫で抽選できるすべてのテーブルです。宝物庫を獲得した週にボスを撃破すると、宝物庫の番人のもとでその戦利品を選べるようになります。ダンジョンのテーブルには撃破したボスの戦利品だけが含まれ、ヒロイックでの撃破はノーマルも解放します。すでに抽選されたアイテムは抽選から除外されます。必要レベルが自分のレベルより{maxLevelOffset}を超えて高い装備は表示されません。',
   'hudChrome.weeklyRewards.previewClaimNotice':
     '報酬が待っています。イーストブルックの宝物庫の番人を訪ね、宝物庫を開けて報酬を受け取ってください。',
   'hudChrome.weeklyRewards.notNow': '後で',
