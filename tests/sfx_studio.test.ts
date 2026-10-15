@@ -42,6 +42,7 @@ const {
   codecCorrectionDb,
   exportProductionBundle,
   getPlaybackProfileState,
+  hashFile,
   loadDraft,
   MASTERING_REVISION,
   migrateLegacyWorkspacePlayback,
@@ -52,8 +53,11 @@ const {
   publishPlaybackProfile,
   publishProject,
   publishedPath,
+  publishedPathResolver,
   publishedStateHashForKey,
   publishedStateIdentity,
+  publishedUrl,
+  publishedUrlForHash,
   rebaseCleanPlaybackDraft,
   resetAudioDraft,
   restoredMixEntry,
@@ -1299,6 +1303,35 @@ describe('SFX runtime manifest generation', () => {
     expect(() => assertPublishedMasterIsMp3('/tmp/custom-source.wav')).toThrow(
       'must be conformed to MP3',
     );
+  });
+
+  it('resolves catalog paths and URLs from one inventory exactly as the per-key lookups do', () => {
+    const resolvePublished = publishedPathResolver();
+    const keys = (SFX as { key: string }[]).map(({ key }) => key);
+    // A sample, not every key: each per-key lookup walks the whole directory,
+    // which is the cost the resolver exists to avoid. First, last, and a
+    // numbered-take key (foot_grass resolves to its _1 take).
+    const sample = [keys[0], keys[Math.floor(keys.length / 2)], keys.at(-1), 'foot_grass'];
+    for (const key of sample) {
+      const path = publishedPath(key);
+      expect(resolvePublished(key), key).toBe(path);
+      expect(publishedUrlForHash(key, hashFile(path)), key).toBe(publishedUrl(key));
+    }
+    expect(basename(resolvePublished('foot_grass'))).toBe('foot_grass_1.mp3');
+    expect(() => resolvePublished('not_a_catalog_key')).toThrow('unknown SFX key');
+
+    // The resolver walks the SFX directory once, when it is created: a catalog
+    // build is one inventory snapshot, not one directory walk per key.
+    const fixture = manifestFixture(0);
+    const audioDir = join(fixture.root, 'public/audio/sfx');
+    writeFileSync(join(audioDir, 'foot_grass_1.mp3'), 'primary take');
+    writeFileSync(join(audioDir, 'foot_grass_2.mp3'), 'alternate take');
+    const resolveFixture = publishedPathResolver(fixture.root);
+    writeFileSync(join(audioDir, 'foot_grass_4.mp3'), 'take after a gap');
+    expect(() => publishedPath('foot_grass', fixture.root)).toThrow(
+      'invalid published SFX inventory for foot_grass',
+    );
+    expect(basename(resolveFixture('foot_grass'))).toBe('foot_grass_1.mp3');
   });
 
   it('rejects catalogs that exceed the shared runtime track cap', () => {

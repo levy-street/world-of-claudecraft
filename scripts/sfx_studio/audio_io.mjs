@@ -440,19 +440,46 @@ export async function analyzeLoopContinuity(path, channels) {
   };
 }
 
-function publicPath(key, repoRoot = REPO_ROOT) {
-  assertSfxKey(key);
+function publishedSfxRoot(repoRoot) {
   const repo = realpathSync(repoRoot);
   const publicRoot = existingPlainDirectory(join(repo, 'public'), repo);
   const audioRoot = existingPlainDirectory(join(publicRoot, 'audio'), publicRoot);
-  const sfxRoot = existingPlainDirectory(join(audioRoot, 'sfx'), audioRoot);
-  const discovered = discoverSfxTracks([...CATALOG.values()], sfxRoot);
+  return existingPlainDirectory(join(audioRoot, 'sfx'), audioRoot);
+}
+
+function publishedInventory(repoRoot) {
+  const sfxRoot = publishedSfxRoot(repoRoot);
+  return { sfxRoot, discovered: discoverSfxTracks([...CATALOG.values()], sfxRoot) };
+}
+
+function inventoryPath({ sfxRoot, discovered }, key) {
   if (discovered.errors.length) {
     throw new Error(`invalid published SFX inventory for ${key}: ${discovered.errors.join('; ')}`);
   }
   const filename = discovered.entries[key]?.tracks[0]?.filename;
   if (!filename) throw new Error(`published SFX is missing for ${key}`);
   return safeRegularFile(sfxRoot, filename);
+}
+
+function publicPath(key, repoRoot = REPO_ROOT) {
+  assertSfxKey(key);
+  return inventoryPath(publishedInventory(repoRoot), key);
+}
+
+/** publishedPath for many keys at once: discovery walks the whole SFX
+ *  directory, so a catalog build takes that inventory once instead of once per
+ *  key. Each call still checks the key, re-verifies the plain public/audio/sfx
+ *  directory chain against the one the inventory was taken from, and
+ *  containment-checks the returned file. */
+export function publishedPathResolver(repoRoot = REPO_ROOT) {
+  const inventory = publishedInventory(repoRoot);
+  return (key) => {
+    assertSfxKey(key);
+    if (publishedSfxRoot(repoRoot) !== inventory.sfxRoot) {
+      throw new Error('published SFX directory changed during the catalog build');
+    }
+    return inventoryPath(inventory, key);
+  };
 }
 
 function draftPath(key) {
@@ -1593,7 +1620,7 @@ export async function exportProductionBundle(expectedProfileHash, expectedWorksp
       runtimePack: _runtimePack,
       metadata,
       ...bundle
-    } = writeSfxProductionBundle(REPO_ROOT, exportRoot);
+    } = await writeSfxProductionBundle(REPO_ROOT, exportRoot);
     return { ...bundle, ...metadata };
   });
 }
@@ -1950,8 +1977,15 @@ export function sourceUrl(key, sourceId) {
 }
 
 export function publishedUrl(key) {
-  const hash = hashFile(publicPath(key)).slice(0, 12);
-  return `/audio/${key}.mp3?v=${hash}`;
+  return publishedUrlForHash(key, hashFile(publicPath(key)));
+}
+
+export function publishedUrlForHash(key, hash) {
+  assertSfxKey(key);
+  if (typeof hash !== 'string' || !/^[a-f0-9]{64}$/.test(hash)) {
+    throw new Error('published audio hash must be a full SHA-256 digest');
+  }
+  return `/audio/${key}.mp3?v=${hash.slice(0, 12)}`;
 }
 
 export function publishedPath(key, repoRoot = REPO_ROOT) {

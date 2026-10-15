@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -28,6 +28,9 @@ const {
   buildSfxConformArgs,
   conformSfxAudio,
   inspectSfxConformance,
+  inspectSfxConformanceAsync,
+  measureSfxLoudness,
+  measureSfxLufs,
   measureSfxTruePeakDb,
   SFX_AUDIO_EXTENSIONS,
 } = conformAudioModule;
@@ -269,6 +272,109 @@ describe('shared conform command', () => {
       expect(existsSync(join(sfxDirectory, 'amb_water.mp3'))).toBe(false);
     } finally {
       rmSync(directory, { force: true, recursive: true });
+    }
+  });
+});
+
+describe('one ebur128 pass and the async inspection', () => {
+  const published = (name: string) => join(ROOT, 'public/audio/sfx', name);
+
+  it('reads LUFS and true peak from one report exactly as the two separate passes do', () => {
+    if (!ffmpegPath) throw new Error('ffmpeg-static is unavailable');
+    for (const name of ['amb_birds.mp3', 'ui_click.mp3']) {
+      const file = published(name);
+      expect(measureSfxLoudness(file, ffmpegPath), name).toEqual({
+        lufs: measureSfxLufs(file, ffmpegPath),
+        truePeakDb: measureSfxTruePeakDb(file, ffmpegPath),
+      });
+    }
+  });
+
+  it('returns the synchronous verdict for every inspection branch', async () => {
+    if (!ffmpegPath) throw new Error('ffmpeg-static is unavailable');
+    const directory = mkdtempSync(join(tmpdir(), 'wocc-sfx-async-inspect-'));
+    try {
+      const lowBitrate = join(directory, 'low_bitrate.mp3');
+      execFileSync(ffmpegPath, [
+        '-hide_banner',
+        '-loglevel',
+        'error',
+        '-y',
+        '-f',
+        'lavfi',
+        '-i',
+        'sine=frequency=440:sample_rate=44100:duration=0.5',
+        '-codec:a',
+        'libmp3lame',
+        '-b:a',
+        `${MIN_SOURCE_BITRATE - 32}k`,
+        lowBitrate,
+      ]);
+      const cases = [
+        { file: published('ui_click.mp3'), preserveLoudness: false },
+        { file: published('amb_birds.mp3'), preserveLoudness: false },
+        { file: published('ambush.mp3'), preserveLoudness: true },
+        { file: published('amb_forge.mp3'), preserveLoudness: true },
+        { file: lowBitrate, preserveLoudness: false },
+      ];
+      const reports = [];
+      for (const { file, preserveLoudness } of cases) {
+        const options = { ffmpegPath, ffprobePath, preserveLoudness };
+        const expected = inspectSfxConformance(file, options);
+        expect(await inspectSfxConformanceAsync(file, options), file).toEqual(expected);
+        reports.push(expected);
+      }
+      // The cases must keep covering the peak branch, the LUFS branch (where both
+      // figures come from the one report), and the early reject with no ebur128 run.
+      expect(reports.map((report) => report.normBranch)).toEqual([
+        'peak',
+        'lufs',
+        'peak',
+        'lufs',
+        null,
+      ]);
+      expect(reports.at(-1)?.reject).toBe(true);
+      expect(Number.isFinite(reports[1].lufs) && Number.isFinite(reports[1].peakDb)).toBe(true);
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it('fails a report pass that exits nonzero with the synchronous error', async () => {
+    // ffprobe stands in for ffmpeg: the file probes fine, then the ebur128
+    // report invocation exits nonzero with real stderr, the async spawn arm.
+    const file = published('ui_click.mp3');
+    const options = { ffmpegPath: ffprobePath, ffprobePath };
+    let expected = '';
+    try {
+      inspectSfxConformance(file, options);
+    } catch (error) {
+      expected = (error as Error).message;
+    }
+    expect(expected.length).toBeGreaterThan(0);
+    await expect(inspectSfxConformanceAsync(file, options)).rejects.toThrow(new Error(expected));
+  });
+
+  it('fails an undecodable file with the synchronous error', async () => {
+    if (!ffmpegPath) throw new Error('ffmpeg-static is unavailable');
+    const directory = mkdtempSync(join(tmpdir(), 'wocc-sfx-async-undecodable-'));
+    try {
+      const malformed = join(directory, 'malformed.mp3');
+      writeFileSync(malformed, 'not audio');
+      const options = { ffmpegPath, ffprobePath };
+      const failureOf = async (inspect: () => unknown) => {
+        try {
+          await inspect();
+        } catch (error) {
+          return (error as Error).message;
+        }
+        throw new Error('inspection accepted an undecodable file');
+      };
+      const expected = await failureOf(() => inspectSfxConformance(malformed, options));
+      expect(expected).toMatch(/^ffprobe(\.exe)? failed$/);
+      expect(await failureOf(() => inspectSfxConformanceAsync(malformed, options))).toBe(expected);
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
     }
   });
 });

@@ -16,8 +16,8 @@ import {
   analyzeLoudness,
   hashFile,
   inspectAudio,
-  publishedPath,
-  publishedUrl,
+  publishedPathResolver,
+  publishedUrlForHash,
   REPO_ROOT,
   STUDIO_ROOT,
   toolchainStatus,
@@ -61,6 +61,7 @@ export async function collectSfxCatalog({ loudness = true } = {}) {
   const mix = readSfxMix(REPO_ROOT);
   const runtime = buildSfxManifestData(REPO_ROOT);
   const toolchain = await toolchainStatus();
+  const publishedPath = publishedPathResolver();
   const clips = await mapLimit(SFX, 4, async (source) => {
     const path = publishedPath(source.key);
     const hash = hashFile(path);
@@ -89,7 +90,7 @@ export async function collectSfxCatalog({ loudness = true } = {}) {
       preload: preloadForSfx(source.key),
       spatial: spatialForSfx(source.key),
       hash,
-      url: publishedUrl(source.key),
+      url: publishedUrlForHash(source.key, hash),
       analysis,
       mix: mix.clips[source.key] ?? null,
       modified: !!mix.clips[source.key] || playbackModified,

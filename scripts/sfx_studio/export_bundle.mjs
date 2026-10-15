@@ -12,9 +12,9 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { availableParallelism, tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
-import { inspectSfxConformance } from '../sfx/conform_audio.mjs';
+import { inspectSfxConformanceAsync } from '../sfx/conform_audio.mjs';
 import { SFX_CONFORMANCE_FFMPEG_PATH, SFX_CONFORMANCE_FFPROBE_PATH } from '../sfx/ffmpeg_paths.mjs';
 import {
   buildSfxManifestData,
@@ -39,6 +39,14 @@ const EXPORT_FORMAT = 'woc-sfx-production-bundle';
 const EXPORT_VERSION = 1;
 const MAX_CONFORMANCE_CACHE_ENTRIES = 1024;
 const conformanceCache = new Set();
+// Every published track is validated by spawning ffprobe and ffmpeg. Process
+// creation, not the analysis, dominates those short runs (about 25 ms per spawn
+// on Windows), so an export validates tracks concurrently. Half the host's cores
+// leaves room for the bounded test workers that run beside it in the gate.
+export const CONFORMANCE_CONCURRENCY = Math.max(
+  1,
+  Math.min(8, Math.floor(availableParallelism() / 2)),
+);
 
 // isCustomMaster only actually depends on the catalog itself (see
 // sfx_conform_inventory.mjs), so a cheap policy built with no discovered
@@ -75,29 +83,23 @@ function sourcePathForVariant(repoRoot, variant) {
   return join(repoRoot, 'public/audio/sfx', match[1]);
 }
 
-function validateProductionTrack(path, identity, bytes) {
-  if (conformanceCache.has(identity)) return;
-  const validationPath = join(
-    tmpdir(),
-    `.woc-sfx-export-${process.pid}-${randomBytes(8).toString('hex')}.mp3`,
-  );
-  const preserveLoudness = customMasterPolicy.isCustomMaster(basename(path));
-  let report;
-  try {
-    writeFileSync(validationPath, bytes, { flag: 'wx', mode: 0o600 });
-    report = inspectSfxConformance(validationPath, {
-      ffmpegPath: CONFORMANCE_FFMPEG_PATH,
-      ffprobePath: CONFORMANCE_FFPROBE_PATH,
-      preserveLoudness,
-    });
-  } catch (error) {
-    throw new Error(
-      `published SFX is not decodable: ${basename(path)} (${error.message ?? error})`,
-    );
-  } finally {
-    rmSync(validationPath, { force: true });
-  }
+function validationFilePath() {
+  return join(tmpdir(), `.woc-sfx-export-${process.pid}-${randomBytes(8).toString('hex')}.mp3`);
+}
 
+function conformanceOptions(preserveLoudness) {
+  return {
+    ffmpegPath: CONFORMANCE_FFMPEG_PATH,
+    ffprobePath: CONFORMANCE_FFPROBE_PATH,
+    preserveLoudness,
+  };
+}
+
+function undecodableTrack(path, error) {
+  return new Error(`published SFX is not decodable: ${basename(path)} (${error.message ?? error})`);
+}
+
+function assertConformingReport(path, report, preserveLoudness) {
   const errors = [...report.problems];
   if (report.reject) errors.push(`lossy source is below ${MIN_SOURCE_BITRATE} kbps`);
   if (report.codec !== 'mp3') errors.push('codec must be MP3');
@@ -113,9 +115,9 @@ function validateProductionTrack(path, identity, bytes) {
   if (expectedBranch === 'peak' && !Number.isFinite(report.peakDb)) {
     errors.push('peak loudness must be measurable');
   }
-  // A preserveLoudness (custom, hand-mastered) key deliberately skips LUFS
-  // measurement entirely (see inspectSfxConformance): peak safety is the
-  // only thing enforced for it, so a null lufs here is correct, not a defect.
+  // A preserveLoudness (custom, hand-mastered) key is never re-targeted to the
+  // LUFS target (see inspectSfxConformance): peak safety is the only thing
+  // enforced for it, so a missing lufs figure is not a defect.
   if (expectedBranch === 'lufs' && !preserveLoudness && !Number.isFinite(report.lufs)) {
     errors.push('integrated loudness must be measurable');
   }
@@ -125,15 +127,81 @@ function validateProductionTrack(path, identity, bytes) {
       `published SFX is not production-conforming: ${basename(path)} (${uniqueErrors.join('; ')})`,
     );
   }
-
-  if (conformanceCache.size >= MAX_CONFORMANCE_CACHE_ENTRIES) conformanceCache.clear();
-  conformanceCache.add(identity);
 }
 
-export function assertExportableSfxTrack(path) {
+function rememberConformingTrack(verdictKey) {
+  if (conformanceCache.size >= MAX_CONFORMANCE_CACHE_ENTRIES) conformanceCache.clear();
+  conformanceCache.add(verdictKey);
+}
+
+// The verdict depends on the bytes AND on the custom-master policy, which comes
+// from the filename: identical bytes published under a custom and a generic key
+// are two verdicts, never one cached answer.
+function exportTrack({ path, identity, bytes }) {
+  const preserveLoudness = customMasterPolicy.isCustomMaster(basename(path));
+  return {
+    path,
+    bytes,
+    preserveLoudness,
+    verdictKey: `${identity}:${preserveLoudness ? 'preserve' : 'target'}`,
+  };
+}
+
+async function validateProductionTrack({ path, bytes, preserveLoudness, verdictKey }) {
+  if (conformanceCache.has(verdictKey)) return;
+  const validationPath = validationFilePath();
+  let report;
+  try {
+    writeFileSync(validationPath, bytes, { flag: 'wx', mode: 0o600 });
+    report = await inspectSfxConformanceAsync(validationPath, conformanceOptions(preserveLoudness));
+  } catch (error) {
+    throw undecodableTrack(path, error);
+  } finally {
+    rmSync(validationPath, { force: true });
+  }
+  assertConformingReport(path, report, preserveLoudness);
+  rememberConformingTrack(verdictKey);
+}
+
+/** Validate tracks concurrently and throw exactly what a serial pass in track
+ *  order would: the first failing track's error. Tracks after a known failure
+ *  are not started, and a blob shared by several tracks under the same policy
+ *  is inspected once. */
+export async function validateProductionTracks(tracks, concurrency = CONFORMANCE_CONCURRENCY) {
+  if (!Number.isInteger(concurrency) || concurrency < 1) {
+    throw new RangeError(`conformance concurrency must be a positive integer: ${concurrency}`);
+  }
+  const inFlight = new Map();
+  const failures = new Map();
+  let firstFailure = tracks.length;
+  let cursor = 0;
+  async function worker() {
+    for (;;) {
+      const index = cursor++;
+      if (index >= tracks.length || index > firstFailure) return;
+      const track = exportTrack(tracks[index]);
+      let pending = inFlight.get(track.verdictKey);
+      if (!pending) {
+        pending = validateProductionTrack(track);
+        inFlight.set(track.verdictKey, pending);
+      }
+      try {
+        await pending;
+      } catch (error) {
+        failures.set(index, error);
+        firstFailure = Math.min(firstFailure, index);
+      }
+    }
+  }
+  const workers = Math.min(concurrency, Math.max(1, tracks.length));
+  await Promise.all(Array.from({ length: workers }, worker));
+  if (failures.has(firstFailure)) throw failures.get(firstFailure);
+}
+
+export async function assertExportableSfxTrack(path) {
   const bytes = readFileSync(path);
   const identity = sha256(bytes);
-  validateProductionTrack(path, identity, bytes);
+  await validateProductionTracks([{ path, identity, bytes }], 1);
   return identity;
 }
 
@@ -343,45 +411,65 @@ directory whose audio/sfx child is mapped by that setting.
 `);
 }
 
-function uniqueBlobEntries(repoRoot, entries) {
-  const blobs = new Map();
+// Returns the tracks read before the first failure alongside that failure, so
+// the caller can still report an earlier nonconforming track first.
+function readPublishedTracks(repoRoot, entries) {
+  const tracks = [];
   let totalAudioBytes = 0;
-  let trackCount = 0;
-  for (const entry of Object.values(entries)) {
-    for (const variant of entry.variants) {
-      const path = sourcePathForVariant(repoRoot, variant);
-      const descriptor = openSync(path, 'r');
-      let bytes;
-      try {
-        const before = fstatSync(descriptor);
-        if (!before.isFile() || before.size !== variant.bytes) {
+  try {
+    for (const entry of Object.values(entries)) {
+      for (const variant of entry.variants) {
+        const path = sourcePathForVariant(repoRoot, variant);
+        const descriptor = openSync(path, 'r');
+        let bytes;
+        try {
+          const before = fstatSync(descriptor);
+          if (!before.isFile() || before.size !== variant.bytes) {
+            throw new Error(`published SFX changed while exporting: ${basename(path)}`);
+          }
+          if (totalAudioBytes + before.size > SFX_MAX_TOTAL_AUDIO_BYTES) {
+            throw new Error('published SFX exceed the export audio budget');
+          }
+          bytes = readFileSync(descriptor);
+          const after = fstatSync(descriptor);
+          if (bytes.length !== before.size || after.size !== before.size) {
+            throw new Error(`published SFX changed while exporting: ${basename(path)}`);
+          }
+        } finally {
+          closeSync(descriptor);
+        }
+        const identity = sha256(bytes);
+        if (identity !== variant.sha256) {
           throw new Error(`published SFX changed while exporting: ${basename(path)}`);
         }
-        if (totalAudioBytes + before.size > SFX_MAX_TOTAL_AUDIO_BYTES) {
-          throw new Error('published SFX exceed the export audio budget');
-        }
-        bytes = readFileSync(descriptor);
-        const after = fstatSync(descriptor);
-        if (bytes.length !== before.size || after.size !== before.size) {
-          throw new Error(`published SFX changed while exporting: ${basename(path)}`);
-        }
-      } finally {
-        closeSync(descriptor);
+        totalAudioBytes += bytes.length;
+        tracks.push({ path, identity, bytes });
       }
-      const identity = sha256(bytes);
-      if (identity !== variant.sha256) {
-        throw new Error(`published SFX changed while exporting: ${basename(path)}`);
-      }
-      validateProductionTrack(path, identity, bytes);
-      totalAudioBytes += bytes.length;
-      trackCount++;
-      if (!blobs.has(identity)) blobs.set(identity, bytes);
     }
+  } catch (failure) {
+    return { tracks, failure };
   }
-  return { blobs, totalAudioBytes, trackCount };
+  return { tracks, failure: null };
 }
 
-export function buildSfxProductionBundle(repoRoot) {
+export async function uniqueBlobEntries(repoRoot, entries) {
+  // Read every track first, then validate them concurrently. A serial pass
+  // validated each track straight after reading it, so a read failure only
+  // surfaces when every earlier track conformed: validate the tracks read
+  // before it, then rethrow it.
+  const { tracks, failure } = readPublishedTracks(repoRoot, entries);
+  await validateProductionTracks(tracks);
+  if (failure) throw failure;
+  const blobs = new Map();
+  let totalAudioBytes = 0;
+  for (const { identity, bytes } of tracks) {
+    totalAudioBytes += bytes.length;
+    if (!blobs.has(identity)) blobs.set(identity, bytes);
+  }
+  return { blobs, totalAudioBytes, trackCount: tracks.length };
+}
+
+export async function buildSfxProductionBundle(repoRoot) {
   const entries = buildSfxManifestData(repoRoot);
   const catalogHash = catalogHashForEntries(entries);
   const playbackProfile = readSfxPlaybackProfile(repoRoot);
@@ -390,7 +478,7 @@ export function buildSfxProductionBundle(repoRoot) {
   const gainBytes = jsonBytes(playbackProfile.gainMap);
   const speedBytes = jsonBytes(playbackProfile.speedMap);
   const mixBytes = jsonBytes(mix);
-  const { blobs, totalAudioBytes, trackCount } = uniqueBlobEntries(repoRoot, entries);
+  const { blobs, totalAudioBytes, trackCount } = await uniqueBlobEntries(repoRoot, entries);
 
   const clipIdentity = Object.fromEntries(
     Object.entries(entries)
@@ -502,8 +590,8 @@ export function buildSfxProductionBundle(repoRoot) {
   };
 }
 
-export function writeSfxProductionBundle(repoRoot, outputRoot) {
-  const bundle = buildSfxProductionBundle(repoRoot);
+export async function writeSfxProductionBundle(repoRoot, outputRoot) {
+  const bundle = await buildSfxProductionBundle(repoRoot);
   mkdirSync(outputRoot, { recursive: true });
   const path = join(outputRoot, bundle.filename);
   const temporary = `${path}.${process.pid}.${randomBytes(6).toString('hex')}.tmp`;
