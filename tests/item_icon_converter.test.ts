@@ -14,6 +14,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { afterEach, describe, expect, it } from 'vitest';
+import { releaseSharpFileHandles } from './helpers/sharp_file_handles';
+
+releaseSharpFileHandles();
 
 // scripts/convert_item_icons_webp.mjs is the pre-commit tool that turns hand-authored item art
 // into the committed 128px WebP (npm run assets:items). It DELETES the source after a

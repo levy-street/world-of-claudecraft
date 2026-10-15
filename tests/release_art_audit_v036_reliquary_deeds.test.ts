@@ -287,16 +287,16 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       generationMode: 'OpenAI built-in image generation',
       generationSessionId: '019fe6e9-7ed7-7bc3-a44e-c7475af3a73f',
     });
-    expect(path.isAbsolute(generation.reconstructedFromThreadRecord)).toBe(true);
+    expect(path.posix.isAbsolute(generation.reconstructedFromThreadRecord)).toBe(true);
     expect(generation.assets.map(({ id }) => id)).toEqual([...RELIQUARY_DEED_IDS]);
 
     const catalog = new Map(generation.referenceCatalog.map((entry) => [entry.id, entry]));
     expect(catalog.size).toBe(generation.referenceCatalog.length);
     for (const reference of generation.referenceCatalog) {
-      expect(path.isAbsolute(reference.repositoryPath), reference.id).toBe(false);
-      expect(path.isAbsolute(reference.generationTimePath), reference.id).toBe(true);
+      expect(path.posix.isAbsolute(reference.repositoryPath), reference.id).toBe(false);
+      expect(path.posix.isAbsolute(reference.generationTimePath), reference.id).toBe(true);
       expect(reference.generationTimePath).toBe(
-        path.join(generation.worktree, reference.repositoryPath),
+        path.posix.join(generation.worktree, reference.repositoryPath),
       );
       const file = path.join(repoRoot, reference.repositoryPath);
       const bytes = readFileSync(file);

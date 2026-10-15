@@ -21,6 +21,10 @@ import {
   runIconAssetAudit,
   validateAcceptedArtManifest,
 } from '../scripts/lib/icon_asset_audit.mjs';
+import { releaseSharpFileHandles } from './helpers/sharp_file_handles';
+import { FILE_SYMLINKS, NO_FILE_SYMLINKS } from './helpers/symlink_fixture';
+
+releaseSharpFileHandles();
 
 const REPO_ROOT = path.join(__dirname, '..');
 const CLI = path.join(REPO_ROOT, 'scripts/icon_asset_audit.mjs');
@@ -782,7 +786,17 @@ describe('icon asset audit', () => {
     await expect(runIconAssetAudit({ manifestPath, outputDir, repoRoot: root })).rejects.toThrow(
       'source.path escapes repository root: ../outside.png',
     );
+  });
 
+  it('rejects deed source paths that escape the repository root through a symlink', async ({
+    skip,
+  }) => {
+    skip(!FILE_SYMLINKS, NO_FILE_SYMLINKS);
+    const root = fixtureRoot();
+    const outputDir = path.join(root, 'audit');
+    const manifestPath = path.join(root, 'accepted.json');
+    const value = await buildFixture(root, false);
+    value.assets = value.assets.filter((asset) => asset.kind === 'deed');
     const externalRoot = fixtureRoot();
     const externalSource = path.join(externalRoot, 'outside.png');
     const linkedSource = 'tmp/imagegen/accepted/deeds/linked.png';

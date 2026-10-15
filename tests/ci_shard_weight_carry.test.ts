@@ -8,6 +8,7 @@
 // scripts/ci_shard_weights_harvest.mjs, over full harvest and local-carry modes
 // with injected I/O, so output, parsing and refusal paths remain executable
 // rather than prose-only contracts.
+import { sep } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type {
   CarriedProvenance,
@@ -873,7 +874,10 @@ describe('the harvest entry: full harvest and local-carry modes (injected I/O)',
     base[victim] = 55;
     base.__provenance = { ...base.__provenance, files: 2, harvestedFiles: 1 };
     entryIo.readFileSync.mockReturnValue(JSON.stringify(base));
-    entryIo.existsSync.mockImplementation(((p: string) => !String(p).endsWith(victim)) as never);
+    // The entry resolves each row against the repo root with native separators.
+    entryIo.existsSync.mockImplementation(
+      ((p: string) => !String(p).split(sep).join('/').endsWith(victim)) as never,
+    );
     const { exitCode, out } = await runEntry(['--prune-missing']);
     expect(exitCode).toBe(0);
     expect(out).toContain(`dropped ${victim}`);

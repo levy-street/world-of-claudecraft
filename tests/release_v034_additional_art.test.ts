@@ -189,7 +189,10 @@ function hashOwners(dir: string): Map<string, string[]> {
   const owners = new Map<string, string[]>();
   for (const file of filesUnder(dir)) {
     const hash = hashFile(file);
-    owners.set(hash, [...(owners.get(hash) ?? []), path.relative(repoRoot, file)]);
+    owners.set(hash, [
+      ...(owners.get(hash) ?? []),
+      path.relative(repoRoot, file).split(path.sep).join('/'),
+    ]);
   }
   return owners;
 }

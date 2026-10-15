@@ -3,7 +3,7 @@
 // (a second full-scene render per frame) never runs for a shipped asset.
 
 import { readdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
@@ -226,7 +226,7 @@ describe('no material buys a second scene pass (src/render/CLAUDE.md)', () => {
             m.extensions?.KHR_materials_volume !== undefined,
         )
         .map((m) => m.name ?? '(unnamed)');
-      if (names.length > 0) found[relative(root, file)] = names;
+      if (names.length > 0) found[relative(root, file).split(sep).join('/')] = names;
     }
     // The vacuity floor: the walk must have seen the real model tree.
     expect(scanned).toBeGreaterThan(1000);

@@ -15,7 +15,7 @@
 // so the emitted *.test.ts matches the default vitest include glob when the child
 // vitest runs it by absolute path. They are always removed in afterAll.
 
-import { spawnSync } from 'node:child_process';
+import { type SpawnSyncOptions, spawnSync } from 'node:child_process';
 import {
   cpSync,
   existsSync,
@@ -26,7 +26,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
+import { dirname, join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import {
@@ -56,8 +56,21 @@ import {
 // tests/server/new_endpoint.test.ts -> the repo root is two directories up.
 const REPO = fileURLToPath(new URL('../../', import.meta.url));
 const SCRIPT = join(REPO, 'scripts', 'new_endpoint.mjs');
-const TSC = join(REPO, 'node_modules', '.bin', 'tsc');
-const VITEST = join(REPO, 'node_modules', '.bin', 'vitest');
+
+/**
+ * Run a node_modules/.bin entry the way this platform's package manager does.
+ * The bare entry is a sh shim; Windows runs its `.CMD` twin instead, which only
+ * cmd.exe can start (one quoted command line, so no argument array reaches the
+ * shell).
+ */
+function runBin(name: 'tsc' | 'vitest', args: string[], options: SpawnSyncOptions) {
+  const bin = join(REPO, 'node_modules', '.bin', name);
+  if (process.platform !== 'win32') return spawnSync(bin, args, { ...options, encoding: 'utf8' });
+  const line = [`${bin}.CMD`, ...args]
+    .map((arg) => (/[\s"&|<>^]/.test(arg) ? `"${arg}"` : arg))
+    .join(' ');
+  return spawnSync(line, { ...options, encoding: 'utf8', shell: true });
+}
 
 // Every file the generator appends to, seeded as a copy into each temp root.
 const APPEND_TARGETS = [
@@ -111,13 +124,14 @@ function gitPorcelain(): string {
  */
 function runChildVitest(root: string, testPaths: string[]): { status: number; out: string } {
   const config = join(root, 'vitest.golden.config.mjs');
+  // Include entries are globs, which take forward slashes on every platform.
+  const include = testPaths.map((p) => p.split(sep).join('/'));
   writeFileSync(
     config,
-    `export default { test: { include: ${JSON.stringify(testPaths)}, exclude: [] } };\n`,
+    `export default { test: { include: ${JSON.stringify(include)}, exclude: [] } };\n`,
   );
-  const result = spawnSync(VITEST, ['run', '--config', config], {
+  const result = runBin('vitest', ['run', '--config', config], {
     cwd: REPO,
-    encoding: 'utf8',
     // CI runners color the piped child output (ANSI then sits between "Tests" and the
     // count in the summary line, defeating the plain-text assertions below), so ask the
     // child for no color and strip whatever arrives anyway.
@@ -396,7 +410,7 @@ describe('toolchain pin: node_modules/.bin/tsc', () => {
     // back to the 6.x wrapper (the `typescript` alias, whose bin is tsc6)
     // keeps every other suite green while quietly forfeiting the native
     // toolchain's speed; this pin is the one place that flip goes red.
-    const probe = spawnSync(TSC, ['--version'], { cwd: REPO, encoding: 'utf8' });
+    const probe = runBin('tsc', ['--version'], { cwd: REPO });
     expect(probe.status, `tsc --version failed:\n${probe.stdout}\n${probe.stderr}`).toBe(0);
     expect(probe.stdout.trim()).toMatch(/^Version 7\./);
   });
@@ -502,7 +516,7 @@ describe('golden: all three rungs emit, type-check, and pass (one temp root)', (
         files,
       }),
     );
-    const tsc = spawnSync(TSC, ['-p', tsconfig, '--noEmit'], { cwd: REPO, encoding: 'utf8' });
+    const tsc = runBin('tsc', ['-p', tsconfig, '--noEmit'], { cwd: REPO });
     expect(tsc.status, `tsc failed:\n${tsc.stdout}\n${tsc.stderr}`).toBe(0);
 
     // All three emitted tests PASS, plus the code-catalog snapshot stays green against the

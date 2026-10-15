@@ -55,7 +55,13 @@ describe('runGateChild', () => {
     expect(result).toEqual({ status: 7, signal: null });
   });
 
-  it('retains the lock when the direct child exits until its resistant grandchild is dead', async () => {
+  it('retains the lock when the direct child exits until its resistant grandchild is dead', async ({
+    skip,
+  }) => {
+    skip(
+      process.platform === 'win32',
+      'process.kill on Windows terminates for every signal, so the SIGTERM handler under test never runs',
+    );
     const port = await freePort();
     const marker = path.join(tempDir, 'grandchild-pid.txt');
     const grandchildSource = `

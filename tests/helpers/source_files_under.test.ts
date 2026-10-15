@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { SOURCE_EXTENSIONS, sourceFilesUnder } from './source_files_under';
+import { FILE_SYMLINKS, NO_FILE_SYMLINKS, symlinkDir } from './symlink_fixture';
 
 // The paired test for the shared source walk, and the producer fixture the
 // guards that consume it cannot supply themselves: every scan root in this repo
@@ -106,7 +107,8 @@ describe('sourceFilesUnder', () => {
     expect(sourceFilesUnder(root).map((f) => f.file)).toContain('node_modules/dep.ts');
   });
 
-  it('follows a symlinked source FILE (a Dirent reads false for one)', () => {
+  it('follows a symlinked source FILE (a Dirent reads false for one)', ({ skip }) => {
+    skip(!FILE_SYMLINKS, NO_FILE_SYMLINKS);
     // The reason there is no `entry.isFile()` gate: Dirent is lstat-based, so
     // gating on it drops a symlinked module that a flat readdirSync().filter()
     // would have read. That is the silent narrowing this walk exists to stop.
@@ -130,8 +132,8 @@ describe('sourceFilesUnder', () => {
     // silently doubles any per-file count a consumer pins.
     write('real/inside.ts');
     write('real/deeper/lower.ts');
-    symlinkSync(path.join(root, 'real'), path.join(root, 'link_a'));
-    symlinkSync(path.join(root, 'real'), path.join(root, 'link_b'));
+    symlinkDir(path.join(root, 'real'), path.join(root, 'link_a'));
+    symlinkDir(path.join(root, 'real'), path.join(root, 'link_b'));
     const files = sourceFilesUnder(root).map((f) => f.file);
     // The first link reached in sorted order wins; `real/` itself is then a
     // revisit of the same realpath.
@@ -144,7 +146,7 @@ describe('sourceFilesUnder', () => {
     // case does not fail, it HANGS, and it takes the collection of every other
     // suite in the run with it.
     write('one/two/kept.ts');
-    symlinkSync(path.join(root, 'one'), path.join(root, 'one', 'two', 'loop'));
+    symlinkDir(path.join(root, 'one'), path.join(root, 'one', 'two', 'loop'));
     expect(sourceFilesUnder(root).map((f) => f.file)).toEqual(['one/two/kept.ts']);
   });
 
@@ -155,7 +157,7 @@ describe('sourceFilesUnder', () => {
     const outside = mkdtempSync(path.join(tmpdir(), 'woc-source-files-outside-'));
     try {
       writeFileSync(path.join(outside, 'stranger.ts'), 'export const s = 1;\n');
-      symlinkSync(outside, path.join(root, 'escape'));
+      symlinkDir(outside, path.join(root, 'escape'));
       expect(() => sourceFilesUnder(root)).toThrow(/links outside the scan root/);
     } finally {
       rmSync(outside, { recursive: true, force: true });

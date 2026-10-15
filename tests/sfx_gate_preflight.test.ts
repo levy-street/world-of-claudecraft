@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { writeFakeCommand } from './helpers/fake_command';
 
 describe('SFX gate toolchain preflight', () => {
   it('fails fast with a clear message when the resolved ffmpeg and ffprobe are broken', () => {
@@ -39,8 +40,7 @@ describe('SFX gate toolchain preflight', () => {
     // while ffprobe is forced onto a tiny runnable fixture. Do not rely on the
     // static package here: ffprobe-static@3.1.0 publishes no Linux arm64 binary.
     const dir = mkdtempSync(join(tmpdir(), 'woc-preflight-'));
-    const okTool = join(dir, 'ok-ffprobe');
-    writeFileSync(okTool, '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+    const okTool = writeFakeCommand(dir, 'ok-ffprobe');
     const result = spawnSync(process.execPath, ['scripts/gate.mjs'], {
       cwd: process.cwd(),
       encoding: 'utf8',

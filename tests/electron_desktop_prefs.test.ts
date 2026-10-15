@@ -21,6 +21,7 @@ import {
   sanitizeDesktopPrefs,
   saveDesktopPrefs,
 } from '../electron/desktop_prefs.cjs';
+import { FILE_SYMLINKS, NO_FILE_SYMLINKS } from './helpers/symlink_fixture';
 
 // The prefs file is the shell's only piece of persistence and it is UNTRUSTED
 // input (a user-writable path, hand-editable, truncatable by a crash), so every
@@ -685,7 +686,10 @@ describe('saveDesktopPrefs', () => {
     );
   });
 
-  it('refuses to write through a pre-existing scratch path, leaving its target alone', () => {
+  it('refuses to write through a pre-existing scratch path, leaving its target alone', ({
+    skip,
+  }) => {
+    skip(!FILE_SYMLINKS, NO_FILE_SYMLINKS);
     // The attack this closes: another local process pre-creates the scratch
     // path as a symlink to a file it wants overwritten, and every save writes
     // through it. O_EXCL refuses the symlink instead of following it.

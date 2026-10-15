@@ -21,6 +21,7 @@ import * as audioIo from '../scripts/sfx_studio/audio_io.mjs';
 // @ts-expect-error untyped zero-dependency authoring tool (scripts/*.mjs convention)
 import { startSfxStudio } from '../scripts/sfx_studio/server.mjs';
 import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
+import { FILE_SYMLINKS, NO_FILE_SYMLINKS, symlinkDir } from './helpers/symlink_fixture';
 
 const {
   hashFile,
@@ -157,21 +158,23 @@ describe.sequential('SFX Studio server security', () => {
     token = running.token;
     mkdirSync(sourceDir, { recursive: true });
     rmSync(sourceLink, { force: true });
-    symlinkSync(join(repoRoot, 'package.json'), sourceLink);
+    if (FILE_SYMLINKS) symlinkSync(join(repoRoot, 'package.json'), sourceLink);
     writeFileSync(executableSource, executableBody);
     writeFileSync(join(externalSourceDir, sourceId), 'not audio');
     rmSync(escapedSourceDir, { recursive: true, force: true });
-    symlinkSync(externalSourceDir, escapedSourceDir);
+    symlinkDir(externalSourceDir, escapedSourceDir);
     mkdirSync(versionDir, { recursive: true });
     rmSync(versionAudio, { force: true });
     rmSync(versionMeta, { force: true });
-    symlinkSync(join(repoRoot, 'package.json'), versionAudio);
+    if (FILE_SYMLINKS) symlinkSync(join(repoRoot, 'package.json'), versionAudio);
     writeFileSync(versionMeta, JSON.stringify({ audioHash: 'f'.repeat(64), mix: null }));
     mkdirSync(previewRoot, { recursive: true });
     rmSync(previewLink, { force: true });
-    symlinkSync(join(repoRoot, 'package.json'), previewLink);
     rmSync(repoModelLink, { force: true });
-    symlinkSync(join(repoRoot, 'package.json'), repoModelLink);
+    if (FILE_SYMLINKS) {
+      symlinkSync(join(repoRoot, 'package.json'), previewLink);
+      symlinkSync(join(repoRoot, 'package.json'), repoModelLink);
+    }
   }, 30_000);
 
   beforeEach(() => {
@@ -375,7 +378,7 @@ describe.sequential('SFX Studio server security', () => {
     const project = await projectResponse.json();
     expect(projectResponse.status, project.error).toBe(200);
     rmSync(exportRoot, { recursive: true, force: true });
-    symlinkSync(externalExportDir, exportRoot);
+    symlinkDir(externalExportDir, exportRoot);
     const response = await fetch(`${url}/api/export`, {
       method: 'POST',
       headers: {
@@ -451,7 +454,8 @@ describe.sequential('SFX Studio server security', () => {
     expect(current.playback.playbackRate).toBe(nextRate);
   });
 
-  it('rejects source symlinks that leave the cue source directory', async () => {
+  it('rejects source symlinks that leave the cue source directory', async ({ skip }) => {
+    skip(!FILE_SYMLINKS, NO_FILE_SYMLINKS);
     const response = await fetch(`${url}/source/foot_grass/${sourceId}`);
     expect(response.status).toBe(400);
     expect((await response.json()).error).toContain('regular file');
@@ -519,7 +523,10 @@ describe.sequential('SFX Studio server security', () => {
     }
   });
 
-  it('rejects preview and repository symlinks that escape their allowed roots', async () => {
+  it('rejects preview and repository symlinks that escape their allowed roots', async ({
+    skip,
+  }) => {
+    skip(!FILE_SYMLINKS, NO_FILE_SYMLINKS);
     const preview = await fetch(`${url}/preview/${previewName}`);
     expect(preview.status).toBe(400);
     expect((await preview.json()).error).toContain('symlink escapes the allowed root');
@@ -529,7 +536,8 @@ describe.sequential('SFX Studio server security', () => {
     expect((await repo.json()).error).toContain('symlink escapes the allowed root');
   });
 
-  it('hides and rejects symlinked version archives', async () => {
+  it('hides and rejects symlinked version archives', async ({ skip }) => {
+    skip(!FILE_SYMLINKS, NO_FILE_SYMLINKS);
     expect(
       listVersions('foot_grass').some(
         (version: { hash: string }) => version.hash === badVersionHash,

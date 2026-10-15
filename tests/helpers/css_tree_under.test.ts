@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { cssTreeUnder } from './css_tree_under';
+import { FILE_SYMLINKS, NO_FILE_SYMLINKS, symlinkDir } from './symlink_fixture';
 
 // The paired test for the shared stylesheet walk, and it carries the same weight
 // as helpers/ts_files_under.test.ts: `src/styles` is FLAT today, so every
@@ -120,7 +121,7 @@ describe('cssTreeUnder', () => {
     // subdirectory shape a hand-rolled `isDirectory()` test cannot see.
     write('real/inside.css');
     write('real/deeper/lower.css');
-    symlinkSync(path.join(root, 'real'), path.join(root, 'linked_dir'));
+    symlinkDir(path.join(root, 'real'), path.join(root, 'linked_dir'));
     const tree = cssTreeUnder(root);
     expect(tree.files.map((f) => f.file)).toEqual([
       'linked_dir/deeper/lower.css',
@@ -141,7 +142,8 @@ describe('cssTreeUnder', () => {
     expect(tree.dirs).toEqual(['theme.css']);
   });
 
-  it('follows a symlinked .css file (a Dirent reads false for one)', () => {
+  it('follows a symlinked .css file (a Dirent reads false for one)', ({ skip }) => {
+    skip(!FILE_SYMLINKS, NO_FILE_SYMLINKS);
     // The arm no consumer fixture can reach, and the reason there is no
     // `entry.isFile()` gate: Dirent is lstat-based, so gating on it drops a
     // symlinked sheet that the flat `readdirSync().filter()` this replaces would
@@ -152,7 +154,8 @@ describe('cssTreeUnder', () => {
     expect(cssTreeUnder(root).files.map((f) => f.file)).toEqual(['linked.css', 'real/module.css']);
   });
 
-  it('returns a BROKEN symlink named .css instead of dropping it from the scan', () => {
+  it('returns a BROKEN symlink named .css instead of dropping it from the scan', ({ skip }) => {
+    skip(!FILE_SYMLINKS, NO_FILE_SYMLINKS);
     // The arm behind `throwIfNoEntry: false`, and the reason it is written that
     // way: a dangling link resolves to neither a file nor a directory, so it
     // comes back as a file and the consumer's own readFileSync fails loudly.

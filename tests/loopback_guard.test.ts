@@ -4,7 +4,7 @@
 // DATABASE arm must agree with what node-postgres actually resolves,
 // including the ?host= query override a WHATWG-hostname check misses.
 import { readdirSync, readFileSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from '../scripts/lib/loopback_guard.mjs';
@@ -218,7 +218,8 @@ function scriptSources(dir: string): string[] {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) found.push(...scriptSources(path));
-    else if (entry.isFile() && entry.name.endsWith('.mjs')) found.push(relative(ROOT, path));
+    else if (entry.isFile() && entry.name.endsWith('.mjs'))
+      found.push(relative(ROOT, path).split(sep).join('/'));
   }
   return found;
 }

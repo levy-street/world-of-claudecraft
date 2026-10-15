@@ -14,6 +14,7 @@ import {
   walkShardTestFiles,
 } from '../scripts/lib/ci_shard_walk.mjs';
 import { stripComments } from './helpers/strip_comments';
+import { FILE_SYMLINKS, NO_FILE_SYMLINKS, symlinkDir } from './helpers/symlink_fixture';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
@@ -44,17 +45,22 @@ describe('walkShardTestFiles: the predicate, one entry class per arm', () => {
     plant('tests/c.browser.test.ts');
     plant('tests/notatest.ts');
     plant('tests/also.test.mjs');
+    // A symlink to a directory is neither a directory entry nor a matching
+    // name, so it is not walked (a junction on Windows, which Dirent reports as
+    // a symlink just the same). The file-link half is the next case.
+    symlinkDir(join(tmp, 'tests/nested'), join(tmp, 'tests/linkdir'));
+    expect(walkShardTestFiles(tmp)).toEqual(['tests/a.test.ts', 'tests/nested/deep/e.test.ts']);
+  });
+
+  it('collects a symlink to a matching file by its name', ({ skip }) => {
+    skip(!FILE_SYMLINKS, NO_FILE_SYMLINKS);
     // A symlink to a matching file is a non-directory entry whose NAME matches,
     // so it is collected (withFileTypes never follows it, and the pin's bare
-    // else never re-stats it); a symlink to a directory is neither a directory
-    // entry nor a matching name, so it is not walked.
+    // else never re-stats it).
+    tmp = mkdtempSync(join(tmpdir(), 'shard-walk-'));
+    plant('tests/a.test.ts');
     symlinkSync(join(tmp, 'tests/a.test.ts'), join(tmp, 'tests/link.test.ts'));
-    symlinkSync(join(tmp, 'tests/nested'), join(tmp, 'tests/linkdir'));
-    expect(walkShardTestFiles(tmp)).toEqual([
-      'tests/a.test.ts',
-      'tests/link.test.ts',
-      'tests/nested/deep/e.test.ts',
-    ]);
+    expect(walkShardTestFiles(tmp)).toEqual(['tests/a.test.ts', 'tests/link.test.ts']);
   });
 
   it('returns repo-relative POSIX paths sorted, and an empty list for an empty tests dir', () => {

@@ -18,6 +18,7 @@ import {
   resolveWorkerCount,
 } from '../scripts/lib/ci_shard_plan.mjs';
 import { collectSuiteVisibility } from '../scripts/lib/gate_discovery.mjs';
+import { VITEST_CLI } from './helpers/vitest_cli';
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 
@@ -753,10 +754,9 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
       writeFileSync(path.join(fixtureRoot, 'notes.md'), 'inert non-test seed\n');
       const runChild = (seeds: string[]) => {
         const child = spawn(
-          'npx',
+          process.execPath,
           [
-            '--no-install',
-            'vitest',
+            VITEST_CLI,
             'related',
             ...seeds,
             '--run',
@@ -771,8 +771,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
             // A SCRUBBED env, like runEntry below: this test itself runs
             // inside vitest, and an inherited VITEST_* worker environment
             // makes the child vitest misbehave (observed: it prints the RUN
-            // header, runs nothing, and exits 0). HOME rides along for the
-            // npx cache.
+            // header, runs nothing, and exits 0). HOME rides along.
             env: {
               PATH: process.env.PATH ?? '',
               ...(process.env.HOME ? { HOME: process.env.HOME } : {}),
@@ -1016,10 +1015,9 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     excludePath: string,
   ): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
     const child = spawn(
-      'npx',
+      process.execPath,
       [
-        '--no-install',
-        'vitest',
+        VITEST_CLI,
         'list',
         '--filesOnly',
         `--exclude=${excludePath}`,

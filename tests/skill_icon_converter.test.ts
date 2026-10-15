@@ -14,6 +14,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { afterEach, describe, expect, it } from 'vitest';
+import { releaseSharpFileHandles } from './helpers/sharp_file_handles';
+
+releaseSharpFileHandles();
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const script = path.join(repoRoot, 'scripts/convert_skill_icons_webp.mjs');
