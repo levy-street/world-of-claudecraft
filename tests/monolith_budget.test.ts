@@ -995,7 +995,12 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // LOWERED 12688 -> 12584 at the Style of Enemy Highlight options: the target
+    // selection reticle (build, terrain drape, per-frame sync) moved to
+    // selection_reticle.ts, which also carries the new Heavier Hostile Reticle;
+    // renderer.ts keeps a SelectionReticle field, the flag object and one sync
+    // call. wc -l after biome. Exact count, zero slack.
+    ceiling: 12584,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -2156,7 +2161,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 827 -> 826 at World PvP (PR 4146 review): the state gained the pvpFlag
     // the name row was built with, paid for by three comment trims. Exact count
     // (wc -l < src/render/nameplate_canvas.ts), zero slack.
-    ceiling: 826,
+    // LOWERED 826 -> 792 at the Style of Enemy Highlight options: the text pens
+    // moved to nameplate_text_styles.ts and the new target cues (framed plate,
+    // overhead chevron, screen-edge arrow) draw from nameplate_target_highlight.ts,
+    // leaving only their call sites here. wc -l after biome. Exact count, zero slack.
+    ceiling: 792,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

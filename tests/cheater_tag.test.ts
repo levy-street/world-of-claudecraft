@@ -377,14 +377,14 @@ describe('both Cheater-tag surfaces brand in the same red', () => {
     // field reorder inside the record and can never drift onto a NEIGHBOURING
     // style's fill (the block ends at the first line-initial `};`).
     const style = captured(
-      read('../src/render/nameplate_canvas.ts'),
+      read('../src/render/nameplate_text_styles.ts'),
       /(const CHEATER_STYLE: TextSpriteStyle = \{[\s\S]*?\n\};)/,
-      'the CHEATER_STYLE record in src/render/nameplate_canvas.ts',
+      'the CHEATER_STYLE record in src/render/nameplate_text_styles.ts',
     );
     const plate = captured(
       style,
       new RegExp(`fill: '(${HEX.source})'`),
-      'CHEATER_STYLE.fill in src/render/nameplate_canvas.ts',
+      'CHEATER_STYLE.fill in src/render/nameplate_text_styles.ts',
     );
     const token = captured(
       read('../src/styles/tokens.css'),

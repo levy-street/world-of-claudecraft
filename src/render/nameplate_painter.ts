@@ -60,10 +60,27 @@ import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
 } from './nameplate_projection';
-import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
+import {
+  newTargetOverlay,
+  TARGET_OVERLAY_ARROW,
+  TARGET_OVERLAY_CHEVRON,
+  TARGET_OVERLAY_NONE,
+} from './nameplate_target_highlight';
+import {
+  NAMEPLATE_ANCHOR_LIFT,
+  type NameplatePlan,
+  nameplatePlanInto,
+  newNameplatePlan,
+} from './nameplate_view';
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
+import {
+  edgeArrowInto,
+  newEdgeArrowPlacement,
+  newTargetHighlightFlags,
+  type TargetHighlightFlags,
+} from './target_highlight_core';
 import { WorldQuestTraceLabels } from './world_quest_trace_labels';
 
 const NAMEPLATE_LEVEL_NUMBER_OPTIONS = { maximumFractionDigits: 0 } as const;
@@ -168,6 +185,10 @@ export interface NameplatePainterDeps {
    *  live setting (nameplate_dot_scale.ts); injectable so a test can drive it. */
   nameplateDotScale?: () => number;
   isHostilePlayer: (e: Entity) => boolean;
+  /** The Style of Enemy Highlight cues, a live object the renderer owns and
+   *  main.ts keeps in step with the settings. Absent (a test host, the editor)
+   *  means every cue off. */
+  targetHighlight?: TargetHighlightFlags;
 }
 
 /** A scripted mob cast (a rift execution, a Buried Hoard control) is no ABILITIES
@@ -192,6 +213,13 @@ export class NameplatePainter {
   private readonly showPlayerNameplates: () => boolean;
   private readonly nameplateDotScale: () => number;
   private readonly isHostilePlayer: (e: Entity) => boolean;
+  private readonly targetHighlight: TargetHighlightFlags;
+  // The target cue drawn outside any plate this pass, its arrow scratch, and the
+  // distance caption cached by whole yards (re-formatted only when it changes).
+  private readonly targetOverlay = newTargetOverlay();
+  private readonly edgeArrow = newEdgeArrowPlacement();
+  private edgeArrowYards = -1;
+  private edgeArrowLabel = '';
   private readonly surface: NameplateCanvasSurface;
   private readonly states = new Map<number, NameplateCanvasState>();
   private readonly traceLabels = new WorldQuestTraceLabels();
@@ -249,6 +277,7 @@ export class NameplatePainter {
     this.showPlayerNameplates = deps.showPlayerNameplates;
     this.nameplateDotScale = deps.nameplateDotScale ?? nameplateDotScaleSetting;
     this.isHostilePlayer = deps.isHostilePlayer;
+    this.targetHighlight = deps.targetHighlight ?? newTargetHighlightFlags();
     this.surface = new NameplateCanvasSurface(deps.layer);
   }
 
@@ -263,6 +292,7 @@ export class NameplatePainter {
       this.surface.clearTextCache();
     }
     this.anchorCount = 0;
+    let targetPlated = false;
 
     const showNameplates = this.showNameplates();
     const showFriendlyNameplates = this.showFriendlyNameplates();
@@ -384,9 +414,11 @@ export class NameplatePainter {
         });
       }
       this.anchorCount++;
+      if (id === player.targetId) targetPlated = true;
     }
 
     declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);
+    const overlay = this.resolveTargetOverlay(player, width, height, targetPlated, languageChanged);
 
     // The repaint decision comes AFTER decluttering, because decluttering is
     // what moves an anchor: the gate must compare the anchors that will
@@ -402,6 +434,7 @@ export class NameplatePainter {
       const state = this.states.get(anchor.id);
       if (state) this.paintGate.notePlate(anchor.id, anchor.sx, anchor.sy, state);
     }
+    this.paintGate.noteOverlay(overlay.kind, overlay.x, overlay.y, overlay.angle, overlay.label);
     if (!this.paintGate.needsPaint()) {
       this.paintsSkipped++;
       return;
@@ -410,8 +443,9 @@ export class NameplatePainter {
     // Zero plates drawn (the toggle is off, or none are in view): drop the
     // layer so the compositor stops carrying a full-screen surface for it. The
     // first plate back unhides it below, before anything is drawn.
-    this.surface.setLayerHidden(this.anchorCount === 0);
-    if (this.anchorCount === 0) {
+    const nothingDrawn = this.anchorCount === 0 && overlay.kind === TARGET_OVERLAY_NONE;
+    this.surface.setLayerHidden(nothingDrawn);
+    if (nothingDrawn) {
       this.paintGate.commit();
       return;
     }
@@ -430,7 +464,70 @@ export class NameplatePainter {
       const state = this.states.get(anchor.id);
       if (state) this.surface.drawEmote(state, anchor.sx, anchor.sy);
     }
+    this.surface.drawTargetOverlay(overlay);
     this.paintGate.commit();
+  }
+
+  /**
+   * The Style of Enemy Highlight cue drawn outside any plate: the screen-edge
+   * arrow while a hostile target is off camera, or the overhead chevron over an
+   * on-screen hostile target that has no plate this pass (plates toggled off,
+   * or past plate range). A target WITH a plate carries its chevron on the
+   * plate itself (state.overheadMarker).
+   */
+  private resolveTargetOverlay(
+    player: Entity,
+    width: number,
+    height: number,
+    targetPlated: boolean,
+    languageChanged: boolean,
+  ) {
+    const overlay = this.targetOverlay;
+    overlay.kind = TARGET_OVERLAY_NONE;
+    overlay.label = '';
+    const cues = this.targetHighlight;
+    if ((!cues.edgeArrow && !cues.overhead) || player.targetId === null) return overlay;
+    const target = this.world.entities.get(player.targetId);
+    if (!target || target.dead || !this.isHostileEntity(target)) return overlay;
+    const view = this.views.get(target.id);
+    const head = this.tmpV;
+    if (view) {
+      head.copy(view.group.position);
+      head.y += (view.height + view.mountLift) * target.scale + NAMEPLATE_ANCHOR_LIFT;
+    } else {
+      head.set(target.pos.x, target.pos.y + 2 * target.scale, target.pos.z);
+    }
+    const cam = this.tmpV2.copy(head).applyMatrix4(this.camera.matrixWorldInverse);
+    head.project(this.camera);
+    const arrow = this.edgeArrow;
+    if (edgeArrowInto(arrow, cam.x, cam.y, cam.z, head.x, head.y, width, height)) {
+      if (!cues.edgeArrow) return overlay;
+      const yards = Math.round(
+        Math.hypot(target.pos.x - player.pos.x, target.pos.z - player.pos.z),
+      );
+      if (yards !== this.edgeArrowYards || languageChanged) {
+        this.edgeArrowYards = yards;
+        this.edgeArrowLabel = t('hudChrome.options.enemyHighlightDistance', {
+          yards: formatNumber(yards, NAMEPLATE_LEVEL_NUMBER_OPTIONS),
+        });
+      }
+      overlay.kind = TARGET_OVERLAY_ARROW;
+      overlay.x = arrow.x;
+      overlay.y = arrow.y;
+      overlay.angle = arrow.angle;
+      overlay.label = this.edgeArrowLabel;
+      return overlay;
+    }
+    if (!cues.overhead || targetPlated) return overlay;
+    overlay.kind = TARGET_OVERLAY_CHEVRON;
+    overlay.x = (head.x * 0.5 + 0.5) * width;
+    overlay.y = (-head.y * 0.5 + 0.5) * height - 4;
+    return overlay;
+  }
+
+  /** Hostile the way the plate reads it: a hostile mob, or an enemy player. */
+  private isHostileEntity(entity: Entity): boolean {
+    return entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity));
   }
 
   /** Surface repaint accounting for `Renderer.perfStats()`: how many passes
@@ -521,6 +618,9 @@ export class NameplatePainter {
       entity.dead && (entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity)));
     state.myPet = entity.ownerId === player.id;
     state.threat = plan.threat;
+    const highlighted = state.currentTarget && state.hostile && !entity.dead;
+    state.emphasis = highlighted && this.targetHighlight.nameplate;
+    state.overheadMarker = highlighted && this.targetHighlight.overhead;
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
     state.hpFill = entity.hp / Math.max(1, entity.maxHp);
     this.resolveDots(state, entity, player);

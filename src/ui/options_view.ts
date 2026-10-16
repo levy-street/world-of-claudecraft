@@ -131,6 +131,10 @@ export interface BoolToggleControl {
   disabled?: boolean;
   /** Rebuild the panel after dispatch so dependent controls refresh immediately. */
   rerender?: boolean;
+  /** Paint as a checkbox row (label after the box) instead of the On/Off plate:
+   *  for a set of independent options under one subhead, any mix of which may
+   *  be on (the Combat tab's enemy-highlight styles). Same store, same dispatch. */
+  check?: boolean;
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -179,6 +183,9 @@ export interface NoteControl {
    *  keeps the whole sentence including where the value sits (never a
    *  concatenation). */
   valueKeys?: Record<string, TranslationKey>;
+  /** Paint as a gold group heading (`.set-subhead`) that titles the rows under
+   *  it, instead of a muted explanatory line. */
+  subhead?: boolean;
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -322,7 +329,7 @@ const boolToggle = (
   s: OptionsSettingsSource,
   key: string,
   labelKey: TranslationKey,
-  opts: Pick<BoolToggleControl, 'disabled' | 'rerender'> = {},
+  opts: Pick<BoolToggleControl, 'disabled' | 'rerender' | 'check'> = {},
 ): BoolToggleControl => ({ control: 'boolToggle', key, labelKey, on: s.bool(key), ...opts });
 
 /** The option value nearest the stored setting (the level ladders persist
@@ -963,6 +970,15 @@ export const INTERFACE_TAB_LABEL_KEY: Record<InterfaceTab, TranslationKey> = {
   combat: 'hudChrome.interfaceTabs.combat',
 };
 
+/** The Combat tab's Style of Enemy Highlight checkboxes, in the order the group
+ *  lists them. Each is its own bool setting (all off by default). */
+const TARGET_HIGHLIGHT_ROWS: readonly (readonly [string, TranslationKey])[] = [
+  ['targetHighlightEdgeArrow', 'hudChrome.options.enemyHighlightEdgeArrow'],
+  ['targetHighlightNameplate', 'hudChrome.options.enemyHighlightNameplate'],
+  ['targetHighlightOverhead', 'hudChrome.options.enemyHighlightOverhead'],
+  ['targetHighlightReticle', 'hudChrome.options.enemyHighlightReticle'],
+];
+
 // Stamp a category onto each control in a per-tab sub-list. Kept pure (a plain
 // map) so the tagged list round-trips through the same determinism guard.
 const tag = (category: InterfaceTab, controls: OptionsControl[]): OptionsControl[] =>
@@ -1089,6 +1105,12 @@ export function buildInterfaceControls(
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
       boolToggle(s, 'stickyTarget', 'hudChrome.options.stickyTarget'),
+      // Style of Enemy Highlight: a heading over four independent checkboxes,
+      // each one extra cue for a hostile current target; any mix works together.
+      { control: 'note', textKey: 'hudChrome.options.enemyHighlightStyle', subhead: true },
+      ...TARGET_HIGHLIGHT_ROWS.map(([key, labelKey]) =>
+        boolToggle(s, key, labelKey, { check: true }),
+      ),
       // The two dot-tracking surfaces, both showing only the LOCAL player's own
       // debuffs: the icon row on an enemy's nameplate, and the standalone Target
       // dots frame that tracks them across every enemy at once.

@@ -79,6 +79,8 @@ export interface NameplatePaintFields {
   readonly myPet: boolean;
   readonly friendlyPet: boolean;
   readonly threat: boolean;
+  readonly emphasis: boolean;
+  readonly overheadMarker: boolean;
   readonly opacity: number;
   readonly frame: string;
   readonly comboPips: number;
@@ -119,6 +121,8 @@ interface PlateRecord {
   myPet: boolean;
   friendlyPet: boolean;
   threat: boolean;
+  emphasis: boolean;
+  overheadMarker: boolean;
   opacity: number;
   frame: string;
   comboPips: number;
@@ -211,6 +215,8 @@ function plateDiffers(
     record.myPet !== f.myPet ||
     record.friendlyPet !== f.friendlyPet ||
     record.threat !== f.threat ||
+    record.emphasis !== f.emphasis ||
+    record.overheadMarker !== f.overheadMarker ||
     record.opacity !== f.opacity ||
     record.frame !== f.frame ||
     record.comboPips !== f.comboPips ||
@@ -258,6 +264,8 @@ function writePlate(
   record.myPet = f.myPet;
   record.friendlyPet = f.friendlyPet;
   record.threat = f.threat;
+  record.emphasis = f.emphasis;
+  record.overheadMarker = f.overheadMarker;
   record.opacity = f.opacity;
   record.frame = f.frame;
   record.comboPips = f.comboPips;
@@ -317,6 +325,8 @@ function newRecord(): PlateRecord {
     myPet: false,
     friendlyPet: false,
     threat: false,
+    emphasis: false,
+    overheadMarker: false,
     opacity: 0,
     frame: '',
     comboPips: 0,
@@ -366,12 +376,25 @@ export class NameplatePaintGate {
   private pixelRatio = Number.NaN;
   private styleRevision = -1;
   private changed = true;
+  // The target cue drawn outside any plate (nameplate_target_highlight.ts): the
+  // painted one, and the one this pass will draw.
+  private overlayKind = 0;
+  private overlayX = Number.NaN;
+  private overlayY = Number.NaN;
+  private overlayAngle = Number.NaN;
+  private overlayLabel = '';
+  private pendingOverlayKind = 0;
+  private pendingOverlayX = 0;
+  private pendingOverlayY = 0;
+  private pendingOverlayAngle = 0;
+  private pendingOverlayLabel = '';
 
   /** Open a pass. A viewport, surface-pixel-ratio or style-revision change (a
    *  font load, a forced-colors flip, a language switch) repaints on its own. */
   beginPass(width: number, height: number, pixelRatio: number, styleRevision: number): void {
     this.pass++;
     this.pendingCount = 0;
+    this.pendingOverlayKind = 0;
     this.changed =
       width !== this.width ||
       height !== this.height ||
@@ -395,11 +418,32 @@ export class NameplatePaintGate {
     if (!record || plateDiffers(record, sx, sy, fields)) this.changed = true;
   }
 
+  /** Record the off-plate target cue this pass draws (kind 0 = none). A cue
+   *  that appears, vanishes, moves, turns or relabels repaints. */
+  noteOverlay(kind: number, x: number, y: number, angle: number, label: string): void {
+    this.pendingOverlayKind = kind;
+    this.pendingOverlayX = x;
+    this.pendingOverlayY = y;
+    this.pendingOverlayAngle = angle;
+    this.pendingOverlayLabel = label;
+  }
+
+  private overlayDiffers(): boolean {
+    if (this.pendingOverlayKind !== this.overlayKind) return true;
+    if (this.overlayKind === 0) return false;
+    return (
+      Math.abs(this.pendingOverlayX - this.overlayX) >= NAMEPLATE_ANCHOR_EPSILON_PX ||
+      Math.abs(this.pendingOverlayY - this.overlayY) >= NAMEPLATE_ANCHOR_EPSILON_PX ||
+      Math.abs(this.pendingOverlayAngle - this.overlayAngle) >= 0.01 ||
+      this.pendingOverlayLabel !== this.overlayLabel
+    );
+  }
+
   /** Whether this pass must repaint the surface. A plate that vanished shows up
    *  as a count mismatch: every noted plate matched a record, so equal counts
    *  and no per-plate difference means the exact same set. */
   needsPaint(): boolean {
-    return this.changed || this.pendingCount !== this.records.size;
+    return this.changed || this.pendingCount !== this.records.size || this.overlayDiffers();
   }
 
   /** Adopt this pass as the painted one. Only call it after painting. */
@@ -419,6 +463,11 @@ export class NameplatePaintGate {
       if (record.pass !== this.pass) this.records.delete(id);
     }
     for (let i = 0; i < this.pendingCount; i++) this.pendingFields[i] = null;
+    this.overlayKind = this.pendingOverlayKind;
+    this.overlayX = this.pendingOverlayX;
+    this.overlayY = this.pendingOverlayY;
+    this.overlayAngle = this.pendingOverlayAngle;
+    this.overlayLabel = this.pendingOverlayLabel;
     this.changed = false;
   }
 
@@ -426,6 +475,7 @@ export class NameplatePaintGate {
   invalidate(): void {
     this.records.clear();
     this.changed = true;
+    this.overlayKind = -1;
     this.width = Number.NaN;
     this.height = Number.NaN;
     this.pixelRatio = Number.NaN;

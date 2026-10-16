@@ -112,6 +112,7 @@ import {
 } from './keyboard_map';
 import type { KeyboardLayer } from './keyboard_map_core';
 import { KeyboardMapWindow } from './keyboard_map_window';
+import { optionsCheckRow, optionsSubheadRow } from './options_check_rows';
 import {
   buildChatTimestampRows,
   buildChatWindowResetRow,
@@ -773,13 +774,16 @@ export class OptionsWindow {
           this.settingToggle(parent, c, hooks);
           break;
         case 'boolToggle':
-          this.settingBoolToggle(parent, c, hooks, c.rerender ? (key) => rerender(key) : undefined);
+          if (c.check) optionsCheckRow(parent, c, hooks);
+          else
+            this.settingBoolToggle(parent, c, hooks, c.rerender ? (k) => rerender(k) : undefined);
           break;
         case 'choice':
           this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined, choiceBinding);
           break;
         case 'note':
-          this.noteRow(parent, c.textKey, c.valueKeys);
+          if (c.subhead) optionsSubheadRow(parent, t(c.textKey));
+          else this.noteRow(parent, c.textKey, c.valueKeys);
           break;
         case 'musicToggle':
           this.musicToggle(parent, c.labelKey);

@@ -38,7 +38,31 @@ import {
   roundedRect,
 } from './nameplate_paint_primitives';
 import { NAMEPLATE_BASE_WIDTH, nameplateHealthBarWidth } from './nameplate_pick_core';
+import {
+  drawOverheadChevron,
+  drawTargetEdgeArrow,
+  drawTargetPlateFrame,
+  scalePlateAboutAnchor,
+  TARGET_OVERLAY_ARROW,
+  TARGET_OVERLAY_CHEVRON,
+  type TargetOverlay,
+} from './nameplate_target_highlight';
+import {
+  AI_STYLE,
+  CAST_STYLE,
+  CHEATER_STYLE,
+  EMOTE_STYLE,
+  GUILD_STYLE,
+  GUILD_TIER_FILLS,
+  LEVEL_STYLE,
+  MARKER_STYLE,
+  NAME_STYLE,
+  TARGET_GUILD_STYLE,
+  TARGET_NAME_STYLE,
+  TITLE_STYLE,
+} from './nameplate_text_styles';
 
+export { GUILD_TIER_FILLS };
 export type NameplateFrame = '' | 'elite' | 'boss';
 export type { NameplateMarkerTone } from './nameplate_markers';
 export type { NameplateBadge } from './nameplate_paint_primitives';
@@ -76,6 +100,10 @@ export interface NameplateCanvasState {
   myPet: boolean;
   friendlyPet: boolean;
   threat: boolean;
+  /** Style of Enemy Highlight cues on this (hostile, targeted) plate: drawn 1.25x
+   *  inside a gold frame, and with a chevron above it (target_highlight_core.ts). */
+  emphasis: boolean;
+  overheadMarker: boolean;
   opacity: number;
   frame: NameplateFrame;
   comboPips: number;
@@ -129,6 +157,8 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     myPet: false,
     friendlyPet: false,
     threat: false,
+    emphasis: false,
+    overheadMarker: false,
     opacity: 1,
     frame: '',
     comboPips: 0,
@@ -160,89 +190,6 @@ export const NAMEPLATE_MIN_PIXEL_RATIO = 1;
 // case from a 1536-entry count alone.
 export const NAMEPLATE_TEXT_SPRITE_LIMIT = 512;
 export const NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES = 16 * 1024 * 1024;
-
-const TITLE_FONT = 'Cinzel, Georgia, serif';
-const NAME_STYLE: TextSpriteStyle = {
-  font: `700 12px ${TITLE_FONT}`,
-  fill: '#fff',
-  stroke: '#000',
-  lineWidth: 3,
-};
-const TARGET_NAME_STYLE: TextSpriteStyle = {
-  font: `700 14px ${TITLE_FONT}`,
-  fill: '#fff',
-  stroke: '#000',
-  lineWidth: 3,
-};
-const LEVEL_STYLE: TextSpriteStyle = {
-  font: `700 19px ${TITLE_FONT}`,
-  fill: '#fff',
-  stroke: '#000',
-  lineWidth: 3,
-};
-const AI_STYLE: TextSpriteStyle = {
-  font: `700 11px ${TITLE_FONT}`,
-  fill: '#7de9c3',
-  stroke: '#000',
-  lineWidth: 2,
-};
-// The operator-applied Cheater tag. Same weight and size as the AI chip it sits
-// beside so the row's metrics do not change shape, but a hot red rather than the
-// AI mint: the two are both operator-set flair and must never read as the same
-// thing. Deliberately NOT the hostile-name red (#ff5555), which the same row
-// already spends on "this unit will attack you"; the sanction is louder.
-const CHEATER_STYLE: TextSpriteStyle = {
-  font: `700 11px ${TITLE_FONT}`,
-  fill: '#ff6b6b',
-  stroke: '#000',
-  lineWidth: 2,
-};
-const TITLE_STYLE: TextSpriteStyle = {
-  font: `italic 10px ${TITLE_FONT}`,
-  fill: '#ffe9a0',
-  stroke: '#000',
-  lineWidth: 2,
-};
-const GUILD_STYLE: TextSpriteStyle = {
-  font: `700 11px ${TITLE_FONT}`,
-  fill: '#c9dcfb',
-  stroke: '#000',
-  lineWidth: 2,
-};
-/** Guild colour tiers (sim/guild_tier.ts): the guild line's fill by the
- *  guild's collective lifetime XP. Index IS the tier; 0 keeps the classic
- *  fill every fresh guild has always had. Cosmetic only. */
-export const GUILD_TIER_FILLS: readonly string[] = [
-  '#c9dcfb', // 0: the classic guild blue
-  '#9fe8a8', // 1: spring green, a few actives
-  '#5fd3e8', // 2: cyan, an established roster
-  '#e8b45f', // 3: amber, a serious guild
-  '#ffcf40', // 4: gold, the realm's elite
-];
-const TARGET_GUILD_STYLE: TextSpriteStyle = {
-  font: `700 13px ${TITLE_FONT}`,
-  fill: '#c9dcfb',
-  stroke: '#000',
-  lineWidth: 2,
-};
-const MARKER_STYLE: TextSpriteStyle = {
-  font: `700 24px ${TITLE_FONT}`,
-  fill: '#f2c84b',
-  stroke: '#000',
-  lineWidth: 2,
-};
-const CAST_STYLE: TextSpriteStyle = {
-  font: '700 9px Arial, sans-serif',
-  fill: '#fff',
-  stroke: '#000',
-  lineWidth: 1,
-};
-const EMOTE_STYLE: TextSpriteStyle = {
-  font: `800 11px ${TITLE_FONT}`,
-  fill: '#ffe9a3',
-  stroke: '#000',
-  lineWidth: 1,
-};
 
 // Pen sizes for the world-scale forged seal; geometry lives in the pure heraldry core.
 const HERALDRY_EDGE_WIDTH = 2;
@@ -391,6 +338,7 @@ export class NameplateCanvasSurface {
     const ctx = this.ctx;
     ctx.save();
     ctx.globalAlpha = state.opacity;
+    if (state.emphasis) scalePlateAboutAnchor(ctx, screenX, screenY);
     let y = screenY;
 
     if (state.castVisible) {
@@ -429,6 +377,9 @@ export class NameplateCanvasSurface {
 
     const rowHeight = this.drawNameRow(state, screenX, y);
     y -= rowHeight;
+    const frameWidth = Math.max(NAMEPLATE_BASE_WIDTH, this.heraldryInput.nameRowWidth);
+    if (state.emphasis)
+      drawTargetPlateFrame(ctx, screenX, y, screenY, frameWidth, this.forcedColorsActive());
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.marker) {
       if (state.markerTone === 'loot' || state.markerTone === 'harvest') {
@@ -480,7 +431,21 @@ export class NameplateCanvasSurface {
       y -= 31;
       this.drawImage(state.raidMarkerUrl, screenX - 15, y, 30, false);
     }
+    // Sits in the empty marker row unless something already fills the stack top.
+    const stackTop = state.marker || state.comboPips > 0 || state.raidMarkerUrl;
+    if (state.overheadMarker)
+      drawOverheadChevron(ctx, screenX, stackTop ? y - 3 : y + 20, this.forcedColorsActive());
     ctx.restore();
+  }
+
+  /** The target cue drawn outside any plate: the lone overhead chevron or the
+   *  screen-edge arrow (nameplate_target_highlight.ts). */
+  drawTargetOverlay(overlay: TargetOverlay): void {
+    if (overlay.kind === TARGET_OVERLAY_CHEVRON) {
+      drawOverheadChevron(this.ctx, overlay.x, overlay.y, this.forcedColorsActive());
+    } else if (overlay.kind === TARGET_OVERLAY_ARROW) {
+      drawTargetEdgeArrow(this.ctx, overlay, this.forcedColorsActive());
+    }
   }
 
   drawEmote(state: NameplateCanvasState, screenX: number, screenY: number): void {
@@ -506,6 +471,7 @@ export class NameplateCanvasSurface {
     const ctx = this.ctx;
     ctx.save();
     ctx.globalAlpha = state.opacity;
+    if (state.emphasis) scalePlateAboutAnchor(ctx, screenX, screenY);
     ctx.shadowColor = this.forcedColorsActive() ? 'transparent' : '#ffd65a66';
     ctx.shadowBlur = this.forcedColorsActive() ? 0 : 12;
     roundedRect(ctx, x, y, width, 42, 21);

@@ -1061,6 +1061,7 @@ const RENDER_PURE_CORES = [
   'src/render/shadow_pass_gate_core.ts',
   'src/render/shore_water_gate_core.ts',
   'src/render/static_merge_shadow_core.ts',
+  'src/render/target_highlight_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/texture_prep_core.ts',
   'src/render/terrain_splat_presence_core.ts',
@@ -2707,6 +2708,8 @@ const UI_DOM_MODULES = [
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/options_window_shell.ts',
   'src/ui/options_interface_rows.ts',
+  // Interface > Combat: the subhead and checkbox row shapes (createElement).
+  'src/ui/options_check_rows.ts',
   // Options > Performance > System Report: mints its own nodes (createElement)
   // and reads the desktop bridge for its availability gate. Decisions live in
   // the registered pure core src/ui/host_diag_view.ts; this half is nodes, one

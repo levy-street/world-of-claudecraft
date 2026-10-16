@@ -2691,6 +2691,16 @@ export const hudChromeStrings = {
     // target-of-target's) own melee/ranged swing timer, under the target
     // frame. Independent of showTargetOfTarget (the portrait mini-frame).
     showTargetSwingTimer: 'Show Target Swing Timer',
+    // Interface > Combat: the "Style of Enemy Highlight" group heading and its
+    // four independent checkboxes (all off by default, any mix allowed), each
+    // adding one cue for a hostile current target.
+    enemyHighlightStyle: 'Style of Enemy Highlight',
+    enemyHighlightEdgeArrow: 'Screen-Edge Arrow Off-Camera',
+    enemyHighlightNameplate: 'Big Framed Target Nameplate',
+    enemyHighlightOverhead: 'Floating Marker Overhead',
+    enemyHighlightReticle: 'Heavier Hostile Reticle',
+    // The distance printed beside the screen-edge arrow, in yards.
+    enemyHighlightDistance: '{yards} yd',
     // Interface panel toggle for the pet health strip under the player frame (on by
     // default; it only appears while you actually have a pet). Phrased from the
     // frame's own accessible name (unitFrame.petLabel) so the value stays NON-WORDY

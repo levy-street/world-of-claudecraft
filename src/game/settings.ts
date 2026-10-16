@@ -642,6 +642,18 @@ export const BOOL_SETTINGS = {
   // the wire (server/game.ts dynamicFields), and both bars hide themselves
   // when the target (or its own target) is unknown or not auto-attacking.
   showTargetSwingTimer: { def: false },
+  // off by default (the classic reticle alone, unchanged out of the box): the
+  // four "Style of Enemy Highlight" checkboxes in Options > Interface > Combat.
+  // Each one independently adds a cue for a HOSTILE current target and any mix
+  // works together: an arrow pinned to the screen edge while the target is off
+  // camera, a larger gold-framed nameplate, a chevron above the target's head,
+  // and a heavier ground reticle (wider band, tinted disc, outer dashed ring).
+  // Pure display preferences; render/target_highlight_core.ts maps each key to
+  // the renderer flag it drives.
+  targetHighlightEdgeArrow: { def: false },
+  targetHighlightNameplate: { def: false },
+  targetHighlightOverhead: { def: false },
+  targetHighlightReticle: { def: false },
   // on by default: the pet health strip under the player frame (hunter / warlock /
   // mage). It paints only while the player actually HAS a pet, so the six petless
   // classes never see it and the default costs them nothing. Purely a display

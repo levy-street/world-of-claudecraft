@@ -7815,6 +7815,14 @@
     flex: 0 0 auto;
     min-height: 40px;
   }
+  /* Checkbox rows keep the box and its name on one line; the whole label row
+     (44px floor above) is the tap target. */
+  body.mobile-touch .set-check-row {
+    flex-wrap: nowrap;
+  }
+  body.mobile-touch .set-check-row .set-name {
+    flex: 1 1 auto;
+  }
   body.mobile-touch .graphics-apply {
     grid-template-columns: minmax(0, 1fr);
   }

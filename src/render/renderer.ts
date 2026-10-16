@@ -719,7 +719,7 @@ import {
 import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
-import { drapeRingLocalY } from './selection_ring';
+import { SelectionReticle } from './selection_reticle';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
@@ -777,6 +777,7 @@ import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
+import { newTargetHighlightFlags, type TargetHighlightFlags } from './target_highlight_core';
 import {
   syncTemporalHourglassVisual,
   TemporalHourglassGroundVisuals,
@@ -1046,7 +1047,6 @@ const SWIM_FOOT_TRAIL = 0.19;
 const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
 // HDR boosts so the bloom pass picks these out (composer tiers only)
 const SELECTION_RING_BOOST = 1.5;
-const SELECTION_RING_SPIN = 0.6; // rad/s, slow classic target-reticle rotation
 
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
 const SPARKLE_BOOST = 1.5;
@@ -1328,19 +1328,9 @@ export class Renderer {
     typeof window !== 'undefined' && typeof window.matchMedia === 'function'
       ? window.matchMedia('(prefers-reduced-motion: reduce)')
       : null;
-  selectionRing: THREE.Group;
-  selectionRingMesh: THREE.Mesh;
-  selectionRingTicks: THREE.Group;
-  selectionRingMat: THREE.MeshBasicMaterial;
-  // center-relative XZ of every base-ring vertex (cached) + scratch draped Y,
-  // so sync() can re-drape the ring over the terrain without allocating.
-  selectionRingLocalXZ: Float32Array;
-  selectionRingDrapeY: Float32Array;
-  // last drape anchor: the drape is a pure function of (x, z, scale), so a
-  // stationary target skips the per-vertex groundHeight resample entirely.
-  private selRingX = Number.NaN;
-  private selRingZ = Number.NaN;
-  private selRingScale = Number.NaN;
+  private selectionReticle: SelectionReticle;
+  // Style of Enemy Highlight (Options > Interface > Combat), kept live by main.ts.
+  readonly targetHighlight: TargetHighlightFlags = newTargetHighlightFlags();
   private playerAuraRings: PlayerAuraRings;
   // Dev-only Tab-target cone overlay (enabled via ?targetcone=1 in main.ts).
   // Null until enabled; once built it is re-draped over the terrain in front of
@@ -1974,9 +1964,6 @@ export class Renderer {
   );
   /** Bound once: the puff runs per landing and must not allocate a closure. */
   private surfaceAtForPuff = (x: number, z: number, y: number) => this.surfaceAt(x, z, y);
-  private selectionDrapeSupportY = 0;
-  private selectionGroundSample = (x: number, z: number): number =>
-    Math.max(this.groundSample(x, z), this.selectionDrapeSupportY);
 
   private lowGfx: boolean;
   private post: PostPipeline | null = null;
@@ -2252,6 +2239,7 @@ export class Renderer {
       showOwnNameplate: () => this.showOwnNameplate,
       showPlayerNameplates: () => this.showPlayerNameplates,
       isHostilePlayer: (e) => this.isHostilePlayer(e),
+      targetHighlight: this.targetHighlight,
     });
 
     // Boot values match the vale/low presets; updateAmbience eases from here.
@@ -2780,64 +2768,13 @@ export class Renderer {
       );
     }
 
-    // selection ring, a classic target reticle: a base ring plus four
-    // inward-pointing ticks. The base ring is draped over the terrain each
-    // frame (see drapeRingLocalY / sync) so it stays legible on slopes instead
-    // of sinking into the uphill ground; the ticks keep the classic spin on a
-    // separate pivot. The ring is radially symmetric, so only the ticks read spin.
-    const ringGeo = new THREE.RingGeometry(0.9, 1.15, 48);
-    ringGeo.rotateX(-Math.PI / 2);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: 0xd4af37,
-      transparent: true,
-      opacity: 0.9,
-      depthWrite: false,
+    // selection ring: the target reticle (selection_reticle.ts owns the build,
+    // the terrain drape and the Heavier Hostile Reticle variant).
+    this.selectionReticle = new SelectionReticle(this.scene, {
+      terrain: (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      support: (x, z, unitY) => supportHeightAt(this.sim.cfg.seed, x, z, 0.5, unitY + 0.01),
+      sample: this.groundSample,
     });
-    this.selectionRingMat = ringMat;
-    this.selectionRing = new THREE.Group();
-    this.selectionRingMesh = new THREE.Mesh(ringGeo, ringMat);
-    // the draped ring deforms every frame; skip frustum culling so the (now
-    // out-of-date) bounding sphere can't cull it on steep slopes.
-    this.selectionRingMesh.frustumCulled = false;
-    this.selectionRing.add(this.selectionRingMesh);
-    // cache the ring's center-relative XZ so sync() can re-drape it cheaply.
-    const ringPos = ringGeo.getAttribute('position') as THREE.BufferAttribute;
-    this.selectionRingLocalXZ = new Float32Array(ringPos.count * 2);
-    for (let i = 0; i < ringPos.count; i++) {
-      this.selectionRingLocalXZ[i * 2] = ringPos.getX(i);
-      this.selectionRingLocalXZ[i * 2 + 1] = ringPos.getZ(i);
-    }
-    this.selectionRingDrapeY = new Float32Array(ringPos.count);
-    // four cardinal ticks on a spinning pivot, sharing the ring material so the
-    // per-frame hostile/friendly recolour carries over for free.
-    this.selectionRingTicks = new THREE.Group();
-    const tickGeo = new THREE.BufferGeometry();
-    tickGeo.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(
-        [
-          0.72,
-          0,
-          0, // inner tip (points toward the unit)
-          1.2,
-          0,
-          0.16, // outer corners
-          1.2,
-          0,
-          -0.16,
-        ],
-        3,
-      ),
-    );
-    for (let i = 0; i < 4; i++) {
-      const t = new THREE.Mesh(tickGeo, ringMat);
-      t.rotation.y = (i * Math.PI) / 2;
-      this.selectionRingTicks.add(t);
-    }
-    this.selectionRing.add(this.selectionRingTicks);
-    setRenderCategory(this.selectionRing, 'ui3d');
-    this.selectionRing.visible = false;
-    this.scene.add(this.selectionRing);
 
     this.playerAuraRings = new PlayerAuraRings(GFX.effectsTier, GFX.composer);
     setRenderCategory(this.playerAuraRings.group, 'ui3d');
@@ -11317,56 +11254,15 @@ export class Renderer {
 
     // selection ring
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
-    if (target) {
-      const tv = this.views.get(target.id);
-      if (tv) {
-        const cx = tv.group.position.x;
-        const cz = tv.group.position.z;
-        // anchor the reticle to the ground under the unit (a classic decal: it
-        // stays grounded even if the target jumps) and drape it over the slope.
-        // The drape is a pure function of (cx, cz, scale) and nothing else writes
-        // the ring's position attribute, so a stationary target reuses last
-        // frame's per-vertex groundHeight samples untouched.
-        if (cx !== this.selRingX || cz !== this.selRingZ || target.scale !== this.selRingScale) {
-          this.selRingX = cx;
-          this.selRingZ = cz;
-          this.selRingScale = target.scale;
-          const seed = this.sim.cfg.seed;
-          // A target standing on a prop top (crate/rock) gets the ring on that
-          // surface, not buried at terrain height under it.
-          const supportY = supportHeightAt(seed, cx, cz, 0.5, tv.group.position.y + 0.01);
-          const gy = Math.max(groundHeight(cx, cz, seed), supportY);
-          this.selectionDrapeSupportY = supportY;
-          this.selectionRing.position.set(cx, gy, cz);
-          this.selectionRing.scale.setScalar(target.scale);
-          const drape = drapeRingLocalY(
-            this.selectionRingLocalXZ,
-            cx,
-            cz,
-            gy,
-            target.scale,
-            0.08,
-            this.selectionGroundSample,
-            this.selectionRingDrapeY,
-          );
-          const ringPos = this.selectionRingMesh.geometry.getAttribute(
-            'position',
-          ) as THREE.BufferAttribute;
-          for (let i = 0; i < drape.length; i++) ringPos.setY(i, drape[i]);
-          ringPos.needsUpdate = true;
-          this.selectionRingTicks.position.y = 0.08; // ticks float just above the footing
-        }
-        this.selectionRingTicks.rotation.y += dt * SELECTION_RING_SPIN; // slow reticle spin
-        const ringMat = this.selectionRingMat;
-        ringMat.color.setHex(this.isHostileSelectionTarget(target) ? 0xcc2222 : 0xd4af37);
-        if (!this.lowGfx) ringMat.color.multiplyScalar(SELECTION_RING_BOOST); // subtle bloom edge
-        ringMat.opacity = 0.78 + 0.2 * Math.sin(this.time * 4.5); // gentle pulse
-        this.selectionRing.visible = true;
-      } else {
-        this.selectionRing.visible = false;
-      }
+    const tv = target ? this.views.get(target.id) : undefined;
+    if (target && tv) {
+      const { x, y, z } = tv.group.position;
+      const hostile = this.isHostileSelectionTarget(target);
+      const boost = this.lowGfx ? 1 : SELECTION_RING_BOOST;
+      const heavy = this.targetHighlight.reticle;
+      this.selectionReticle.sync(x, z, y, target.scale, hostile, heavy, dt, this.time, boost);
     } else {
-      this.selectionRing.visible = false;
+      this.selectionReticle.hide();
     }
     const playerView = this.views.get(p.id);
     if (playerView && !p.dead && this.playerAuraRings.hasVisibleRings()) {

@@ -394,6 +394,10 @@ import type { Renderer } from './render/renderer';
 import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
 import { MovementPredictionPipeline } from './render/self_prediction';
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
+import {
+  type TargetHighlightSettingKey,
+  targetHighlightFlagFor,
+} from './render/target_highlight_core';
 import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
 import { desktopBridge } from './runtime';
 import { breathFraction, stepBreathUsedSeconds } from './sim/breath';
@@ -2375,6 +2379,15 @@ async function startGame(
       settings.set('showAttackButton', !!value);
       return;
     }
+    // Style of Enemy Highlight: four independent checkboxes, each one renderer flag.
+    const highlightFlag = targetHighlightFlagFor(key);
+    if (highlightFlag) {
+      renderer.targetHighlight[highlightFlag] = settings.set(
+        key as TargetHighlightSettingKey,
+        !!value,
+      );
+      return;
+    }
     if (key === 'groundReticle') {
       const v = settings.set('groundReticle', !!value);
       if (!v) hud.cancelGroundAim();
@@ -2714,6 +2727,7 @@ async function startGame(
     next.showDevBadges = settings.get('showDevBadges');
     next.showOwnNameplate = settings.get('showOwnNameplate');
     next.showPlayerNameplates = settings.get('showPlayerNameplates');
+    Object.assign(next.targetHighlight, renderer.targetHighlight);
     setNameplateDotScale(settings.nameplateDotRenderScale());
     next.reduceMotionSetting = settings.get('reduceMotion');
     next.setHazardPaletteMode(hazardPaletteModeOf(settings.get('colorblindMode')));

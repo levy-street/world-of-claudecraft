@@ -914,6 +914,12 @@ const COMBAT_KEYS = [
   'walkByAutoloot',
   'groundReticle',
   'stickyTarget',
+  // Style of Enemy Highlight: the gold heading, then its four checkboxes.
+  'note:hudChrome.options.enemyHighlightStyle',
+  'targetHighlightEdgeArrow',
+  'targetHighlightNameplate',
+  'targetHighlightOverhead',
+  'targetHighlightReticle',
   // The two dot-tracking surfaces, with the nameplate row's size slider pinned
   // directly under the toggle it sizes.
   'showNameplateDots',
@@ -1054,6 +1060,12 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
         category: 'general',
       },
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
+      {
+        control: 'note',
+        textKey: 'hudChrome.options.enemyHighlightStyle',
+        subhead: true,
+        category: 'combat',
+      },
     ]);
 
     // Without it: the exact pre-existing list, with no GPU-preference row or

@@ -17907,6 +17907,16 @@
     padding-bottom: 4px;
     margin: 10px 0 6px;
   }
+  /* A checkbox option row (options_check_rows.ts, the Combat tab's Style of
+     Enemy Highlight group): the box leads, the name follows, and the whole
+     row is the click target. */
+  .set-check-row {
+    grid-template-columns: auto 1fr;
+    cursor: var(--cursor-point);
+  }
+  .set-check-row .ui-check {
+    margin: 0;
+  }
   .graphics-controls-disabled {
     opacity: 0.55;
   }

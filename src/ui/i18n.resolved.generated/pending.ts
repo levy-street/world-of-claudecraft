@@ -9,25 +9,140 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "es_ES": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "fr_FR": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "fr_CA": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "de_DE": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "zh_CN": [
+    "hudChrome.options.enemyHighlightDistance"
+  ],
+  "zh_TW": [
+    "hudChrome.options.enemyHighlightDistance"
+  ],
+  "ko_KR": [
+    "hudChrome.options.enemyHighlightDistance"
+  ],
+  "ja_JP": [
+    "hudChrome.options.enemyHighlightDistance"
+  ],
+  "pt_BR": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "ru_RU": [
+    "hudChrome.options.enemyHighlightDistance"
+  ],
+  "cs_CZ": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "nl_NL": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "pl_PL": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "id_ID": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "tr_TR": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "sv_SE": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "vi_VN": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ],
+  "da_DK": [
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
+  ]
 };
