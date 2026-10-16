@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { computeBackoffDelay } from '../src/net/backoff';
+import {
+  computeBackoffDelay,
+  RECONNECT_BASE_DELAY_MS,
+  RECONNECT_MAX_ATTEMPTS,
+  RECONNECT_MAX_DELAY_MS,
+  reconnectBackoffDelay,
+} from '../src/net/backoff';
 
 // The full-jitter reconnect backoff. The un-jittered step for an attempt is
 // min(maxMs, baseMs * 2 ** (attempt - 1)); the returned delay spreads that step
@@ -60,5 +66,28 @@ describe('computeBackoffDelay', () => {
     const high = computeBackoffDelay(3, BASE, MAX, RNG_CEIL);
     expect(high).toBeLessThan(step * 1.5);
     expect(high).toBeGreaterThan(step * 1.4999);
+  });
+});
+
+// The game socket's live schedule (ClientWorld.socketClosed). The constants are
+// pinned as literals so a retune is a deliberate edit here, and the schedule is
+// pinned to equal computeBackoffDelay over exactly those constants.
+describe('reconnectBackoffDelay', () => {
+  it('pins the live reconnect constants', () => {
+    expect(RECONNECT_BASE_DELAY_MS).toBe(BASE);
+    expect(RECONNECT_MAX_DELAY_MS).toBe(MAX);
+    expect(RECONNECT_MAX_ATTEMPTS).toBe(40);
+  });
+
+  it('is computeBackoffDelay over the live base and cap at every attempt', () => {
+    for (let attempt = 1; attempt <= RECONNECT_MAX_ATTEMPTS; attempt++) {
+      for (const rng of [RNG_FLOOR, RNG_MID, RNG_CEIL]) {
+        expect(reconnectBackoffDelay(attempt, rng)).toBe(
+          computeBackoffDelay(attempt, BASE, MAX, rng),
+        );
+      }
+    }
+    expect(reconnectBackoffDelay(1, RNG_FLOOR)).toBe(500);
+    expect(reconnectBackoffDelay(10, RNG_MID)).toBe(15_000);
   });
 });

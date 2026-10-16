@@ -23,7 +23,12 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
   is fatal or one of the two bounded transient classes (see Reconnect below).
 - `backoff.ts`: pure full-jitter reconnect schedule (`computeBackoffDelay`: 0.5x to
   1.5x of the exponential step, clamped at the max delay AFTER jitter, rng injected
-  so tests pin exact delays; `tests/backoff.test.ts`).
+  so tests pin exact delays), plus the game socket's live schedule constants and
+  `reconnectBackoffDelay` over them (`tests/backoff.test.ts`).
+- `socket_stall_watchdog.ts`: pure, clock-injected silent-stall decision
+  (`SocketStallWatchdog`): no frame for `STALL_WINDOW_MS` on an in-world transport
+  means the path died without a FIN/RST (see Reconnect below;
+  `tests/socket_stall_watchdog.test.ts`).
 - `entry_watch.ts`: `watchWorldEntry`, the world-entry poll loop `main.ts`'s
   `enterWorld` drives: polls a connecting world for readiness, gives up after
   `ENTRY_TIMEOUT_MS` with no sign of life, and exposes `noteActivity()` so a
@@ -149,7 +154,7 @@ old or future world-layout epochs fail closed BEFORE character admission.
 An unexpectedly dropped socket auto-reconnects with jittered exponential backoff
 (`computeBackoffDelay` in `backoff.ts`: `RECONNECT_BASE_DELAY_MS` doubling to the
 `RECONNECT_MAX_DELAY_MS` cap with 0.5x to 1.5x full jitter, up to
-`RECONNECT_MAX_ATTEMPTS`; constants + rationale in `online.ts`). The jitter exists so
+`RECONNECT_MAX_ATTEMPTS`; constants + rationale in `backoff.ts`). The jitter exists so
 a server restart never gets the whole realm reconnecting in lockstep; do not remove
 it or reintroduce a fixed schedule. The server holds the
 character in-world (linkdead) for five minutes and a re-auth resumes the session;
@@ -193,8 +198,20 @@ over for good (retries exhausted, or a fatal server `error` frame).
   path itself when `onclose` was never delivered (the zombie-socket case).
   `sendLogout()` signals a deliberate logout so the server skips the linkdead grace;
   call it before a page reload.
+- A silent stall (a dead path that never delivers `onclose`, so the socket still
+  reads OPEN) is caught by `socket_stall_watchdog.ts`, polled on the input-send
+  beat: once an in-world transport has gone its window (`STALL_WINDOW_MS` plus a
+  per-client jitter draw up to `STALL_WINDOW_SPREAD_MS`, so a realm-wide silence
+  never closes every client on one beat) with no frame of any kind, `ClientWorld`
+  detaches the socket's `onclose`, closes it, and runs `socketClosed()`, so the
+  normal jittered backoff starts at once instead of after TCP gives up.
+  Backgrounded time (the DOM or native lifecycle signal) and client freezes (a poll
+  gap over `STALL_MAX_POLL_GAP_MS`) restart the window rather than count toward it.
+  It arms only on a transport's first `snap` frame, so a slow handshake never trips
+  it and a server that sends `hello` but no snapshots cannot drive an endless
+  close/reconnect loop (`hello` resets the attempt count).
 Tests: `tests/linkdead.test.ts`, `tests/net_online_visibility_reconnect.test.ts`,
-`tests/entry_watch.test.ts`.
+`tests/entry_watch.test.ts`, `tests/socket_stall_watchdog.test.ts`.
 A reload instead of an in-socket reconnect (the mobile WebView eviction case) is
 handled by `resume_play.ts`, above.
 
@@ -288,4 +305,5 @@ failure, kept as stable English that `main.ts` re-localizes.
   release heading remains wire-owned until its input sequence is acknowledged,
   preventing a rounded snapshot from masquerading as an applied final heading.
 - Never read `Math.random`/timing into *gameplay*; `performance.now` here is for
-  render interpolation only (`lastSnapAt`, per-entity `netInterval`), not logic.
+  render interpolation (`lastSnapAt`, per-entity `netInterval`) and transport
+  liveness (the stall watchdog's frame clock), never game logic.

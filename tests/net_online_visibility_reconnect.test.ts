@@ -12,6 +12,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { INPUT_SEND_BACKPRESSURE_LIMIT_BYTES } from '../src/net/send_backpressure';
+import { STALL_WINDOW_MS } from '../src/net/socket_stall_watchdog';
 import type { PlayerClass } from '../src/sim/types';
 import { ONLINE_WORLD_AUTH_TYPE } from '../src/world_api';
 
@@ -411,7 +412,7 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
       world.onDisconnect = (reason) => {
         disconnected = reason;
       };
-      // Sit one below RECONNECT_MAX_ATTEMPTS (40 in src/net/online.ts): the
+      // Sit one below RECONNECT_MAX_ATTEMPTS (40 in src/net/backoff.ts): the
       // manual zombie close below burns the FINAL attempt and schedules the
       // last legitimate retry.
       (world as unknown as { reconnectAttempts: number }).reconnectAttempts = 39;
@@ -557,7 +558,11 @@ describe('ClientWorld onConnectionLost contract', () => {
 
   it('fires again with an updated nextRetryAtMs on the mobile-foreground fast-retry path', () => {
     withDomStubs((doc, _harness) => {
-      vi.spyOn(Math, 'random').mockReturnValueOnce(0.5).mockReturnValueOnce(0.75);
+      // the first draw is the ctor's per-client stall window (socket_stall_watchdog.ts)
+      vi.spyOn(Math, 'random')
+        .mockReturnValueOnce(0)
+        .mockReturnValueOnce(0.5)
+        .mockReturnValueOnce(0.75);
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const calls: Array<[number, number, number]> = [];
       world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) => {
@@ -836,6 +841,219 @@ describe('ClientWorld reconnect error-frame tolerance (first join attempt, never
 
       expect(w.sessionEnded).toBe(true);
       expect(reasons).toEqual(['character taken over']);
+    });
+  });
+});
+
+// The silent-stall watchdog wiring (decision core: src/net/socket_stall_watchdog.ts,
+// pinned in tests/socket_stall_watchdog.test.ts). A path that dies without a
+// FIN/RST leaves the socket OPEN with no onclose; ClientWorld polls the watchdog
+// on its input beat and, once the window passes with no frame, retires the
+// socket and drives the same socketClosed path a real drop takes. Time is the
+// mocked performance.now (frame arrivals) plus the injected poll time.
+describe('ClientWorld silent-stall watchdog', () => {
+  afterEach(() => {
+    StubWebSocket.instances = [];
+    vi.restoreAllMocks();
+  });
+
+  const SNAP = { t: 'snap', tick: 1, ents: [] };
+
+  type StallWire = {
+    onMessage(raw: string): void;
+    pollStallWatchdog(now: number): void;
+    reconnectAttempts: number;
+    connected: boolean;
+  };
+
+  // Construct a world whose first transport is in-world (hello at t=0) and
+  // return a driver that steps the 50 ms-class poll beat (500 ms here, inside the
+  // watchdog's poll-gap guard) and optionally delivers frames.
+  function inWorld(harness: TimerHarness) {
+    let nowMs = 0;
+    vi.spyOn(performance, 'now').mockImplementation(() => nowMs);
+    // pins the per-client window draw at its floor (STALL_WINDOW_MS)
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+    const wire = world as unknown as StallWire;
+    const lost: number[] = [];
+    world.onConnectionLost = (attempt) => lost.push(attempt);
+    const frame = (value: unknown) => wire.onMessage(JSON.stringify(value));
+    // hello, then the first snapshot arms the watchdog
+    frame({ t: 'hello', pid: 1, seed: 42 });
+    frame(SNAP);
+    const step = (toMs: number, opts: { frames?: boolean } = {}) => {
+      while (nowMs < toMs) {
+        nowMs = Math.min(toMs, nowMs + 500);
+        if (opts.frames) frame({ t: 'censor', words: [] });
+        wire.pollStallWatchdog(nowMs);
+      }
+    };
+    return { world, wire, lost, frame, step, harness, now: () => nowMs };
+  }
+
+  it('retires a silently dead socket after the window and starts the jittered reconnect', () => {
+    withDomStubs((_doc, harness) => {
+      const { world, wire, lost, step } = inWorld(harness);
+      const first = StubWebSocket.instances[0];
+      step(STALL_WINDOW_MS - 500);
+      expect(lost).toEqual([]);
+      expect(first.readyState).toBe(StubWebSocket.OPEN);
+      expect(harness.timers.length).toBe(0);
+      step(STALL_WINDOW_MS);
+      // the dead socket is closed with its onclose detached, and the normal
+      // close path ran exactly once: one attempt, one backoff timer, one overlay tick
+      expect(first.readyState).toBe(StubWebSocket.CLOSED);
+      expect(first.onclose).toBeNull();
+      expect(wire.connected).toBe(false);
+      expect(wire.reconnectAttempts).toBe(1);
+      expect(lost).toEqual([1]);
+      expect(harness.timers.length).toBe(1);
+      // the retry opens a fresh transport
+      harness.fire(harness.timers[0].id);
+      expect(StubWebSocket.instances.length).toBe(2);
+      world.close();
+    });
+  });
+
+  it('is polled on the input-send interval beat', () => {
+    withDomStubs((_doc, _harness) => {
+      let nowMs = 0;
+      vi.spyOn(performance, 'now').mockImplementation(() => nowMs);
+      vi.spyOn(Math, 'random').mockReturnValue(0);
+      const beats: Array<() => void> = [];
+      const win = (globalThis as unknown as { window: { setInterval: unknown } }).window;
+      win.setInterval = (cb: () => void) => {
+        beats.push(cb);
+        return beats.length;
+      };
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const lost: number[] = [];
+      world.onConnectionLost = (attempt) => lost.push(attempt);
+      (world as unknown as StallWire).onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
+      (world as unknown as StallWire).onMessage(JSON.stringify(SNAP));
+      expect(beats.length).toBe(1);
+      while (nowMs < STALL_WINDOW_MS) {
+        nowMs += 50;
+        beats[0]();
+      }
+      expect(lost).toEqual([1]);
+      expect(StubWebSocket.instances[0].readyState).toBe(StubWebSocket.CLOSED);
+      world.close();
+    });
+  });
+
+  it('never fires while frames keep arriving', () => {
+    withDomStubs((_doc, harness) => {
+      const { world, wire, lost, step } = inWorld(harness);
+      step(120_000, { frames: true });
+      expect(lost).toEqual([]);
+      expect(wire.reconnectAttempts).toBe(0);
+      expect(StubWebSocket.instances[0].readyState).toBe(StubWebSocket.OPEN);
+      world.close();
+    });
+  });
+
+  it('never fires while the tab is hidden, and counts a fresh window once visible', () => {
+    withDomStubs((doc, harness) => {
+      const { world, lost, step, now } = inWorld(harness);
+      doc.setVisible(false);
+      step(120_000);
+      expect(lost).toEqual([]);
+      expect(StubWebSocket.instances[0].readyState).toBe(StubWebSocket.OPEN);
+      doc.setVisible(true);
+      const visibleAt = now();
+      step(visibleAt + STALL_WINDOW_MS - 1_000);
+      expect(lost).toEqual([]);
+      step(visibleAt + STALL_WINDOW_MS);
+      expect(lost).toEqual([1]);
+      world.close();
+    });
+  });
+
+  it('does not double-fire after a real close already ran the close path', () => {
+    withDomStubs((_doc, harness) => {
+      const { world, wire, lost, step } = inWorld(harness);
+      const first = StubWebSocket.instances[0];
+      const realClose = first.onclose;
+      const closeSpy = vi.spyOn(first, 'close');
+      step(2_000);
+      first.readyState = StubWebSocket.CLOSED;
+      first.onclose?.();
+      expect(lost).toEqual([1]);
+      // well past the window with the backoff retry still pending: no second
+      // attempt, no extra timer
+      step(2_000 + 3 * STALL_WINDOW_MS);
+      expect(wire.reconnectAttempts).toBe(1);
+      expect(lost).toEqual([1]);
+      expect(harness.timers.length).toBe(1);
+      // the watchdog itself never ran on the already-closed socket
+      expect(closeSpy).not.toHaveBeenCalled();
+      expect(first.onclose).toBe(realClose);
+      world.close();
+    });
+  });
+
+  it('never fires on the fresh retry socket during a slow handshake after a real close', () => {
+    withDomStubs((_doc, harness) => {
+      const { world, lost, step } = inWorld(harness);
+      const first = StubWebSocket.instances[0];
+      step(2_000);
+      first.readyState = StubWebSocket.CLOSED;
+      first.onclose?.();
+      // the retry opens a fresh socket at once, and it sits in a slow
+      // handshake (no frame yet): the old transport's last frame must not trip
+      // the watchdog on the new one
+      harness.fire(harness.timers[0].id);
+      step(2_000 + 3 * STALL_WINDOW_MS);
+      expect(StubWebSocket.instances[1].readyState).toBe(StubWebSocket.OPEN);
+      expect(lost).toEqual([1]);
+      world.close();
+    });
+  });
+
+  it('a server that sends hello but never a snapshot cannot drive a close/reconnect loop', () => {
+    withDomStubs((_doc, harness) => {
+      const { world, lost, step, frame, now } = inWorld(harness);
+      step(STALL_WINDOW_MS);
+      expect(lost).toEqual([1]);
+      harness.fire(harness.timers[0].id);
+      // the resumed transport says hello (resetting the attempt count) but
+      // never streams a snapshot: the watchdog stays disarmed, no second close
+      frame({ t: 'hello', pid: 1, seed: 42 });
+      frame({ t: 'censor', words: [] });
+      step(now() + 10 * STALL_WINDOW_MS);
+      expect(lost).toEqual([1]);
+      expect(StubWebSocket.instances.length).toBe(2);
+      expect(StubWebSocket.instances[1].readyState).toBe(StubWebSocket.OPEN);
+      world.close();
+    });
+  });
+
+  it('fires once per stall, and the next transport re-arms only on its own first frame', () => {
+    withDomStubs((_doc, harness) => {
+      const { world, wire, lost, step, frame, now } = inWorld(harness);
+      step(STALL_WINDOW_MS);
+      expect(lost).toEqual([1]);
+      // the retry has not fired yet: further silence is not a second drop
+      step(now() + 3 * STALL_WINDOW_MS);
+      expect(lost).toEqual([1]);
+      expect(harness.timers.length).toBe(1);
+      harness.fire(harness.timers[0].id);
+      const second = StubWebSocket.instances[1];
+      // a slow handshake before the first frame never trips the watchdog
+      step(now() + 3 * STALL_WINDOW_MS);
+      expect(lost).toEqual([1]);
+      frame({ t: 'hello', pid: 1, seed: 42 });
+      expect(wire.reconnectAttempts).toBe(0);
+      frame(SNAP);
+      const helloAt = now();
+      step(helloAt + STALL_WINDOW_MS - 500);
+      expect(second.readyState).toBe(StubWebSocket.OPEN);
+      step(helloAt + STALL_WINDOW_MS);
+      expect(second.readyState).toBe(StubWebSocket.CLOSED);
+      expect(lost).toEqual([1, 1]);
+      world.close();
     });
   });
 });

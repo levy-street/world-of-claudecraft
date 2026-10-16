@@ -198,7 +198,7 @@ import { ActionBarLayoutUploader } from './action_bar_upload';
 import { anchorFields } from './anchor_fields';
 import { apiErrorFromBody } from './api_error';
 import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
-import { computeBackoffDelay } from './backoff';
+import { RECONNECT_MAX_ATTEMPTS, reconnectBackoffDelay } from './backoff';
 import { applyBankSelfWire, applyGuildBankSelfWire } from './bank_snapshot_wire';
 import { blankEntity } from './blank_entity';
 import { applyBookOfDeedsWire } from './book_wire';
@@ -262,6 +262,7 @@ import {
 } from './snapshot_timer_wire';
 import { socialInfoFromFrame } from './social_frame_wire';
 import { applySocialSelfWire } from './social_self_wire';
+import { drawStallWindowMs, SocketStallWatchdog } from './socket_stall_watchdog';
 import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './target_echo';
 import { applyFerryWire, applyTransportSnapshot, clientFerryView } from './transport_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
@@ -1146,22 +1147,6 @@ export class Api {
 // hold it at its last pose for this window. Short, so a genuine leaver barely lingers.
 const DESPAWN_GRACE_MS = 600;
 
-// Auto-reconnect backoff for an unexpectedly dropped game socket. The server
-// holds the character in-world (linkdead) for five minutes; the retry window
-// is deliberately longer, since past the grace a successful auth simply
-// performs a fresh join from the last save. Roughly 1s, 2s, 4s, 8s, then 15s
-// apart, with each delay spread over a 0.5x to 1.5x jitter band and clamped at
-// the 15s cap (computeBackoffDelay) so many clients dropped by one server blip
-// do not retry in lockstep. The clamp trims the band's upper half once the
-// schedule reaches the cap, so across 40 attempts the total runs from roughly
-// 4.6 minutes (every draw at the floor) to 9.4 minutes (every draw at the
-// ceiling), with an expected total near 8 minutes, before giving up for good.
-// Exported for the reconnect-overlay show-grace pin (tests/reconnect_overlay
-// .test.ts): the grace must clear attempt 1's full jitter band, and a band
-// widened here without that pin would quietly reintroduce the veil blink.
-export const RECONNECT_BASE_DELAY_MS = 1_000;
-export const RECONNECT_MAX_DELAY_MS = 15_000;
-const RECONNECT_MAX_ATTEMPTS = 40;
 // A pre-layout-gate server accepts only `t:'auth'`, so it rejects our current
 // discriminator with this otherwise-generic literal. During a handshake only,
 // turn that legacy response into the same actionable reason a current server
@@ -1646,6 +1631,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // see src/net/reconnect_policy.ts
   private timeoutRejections = 0;
   private reconnectTimer: number | undefined;
+  // undefined on Object.create(ClientWorld.prototype) fixtures (no initializers run)
+  private readonly stallWatchdog: SocketStallWatchdog | undefined = new SocketStallWatchdog(
+    drawStallWindowMs(Math.random),
+  );
+  private backgrounded = false; // last foreground/background signal, DOM or native
   // set by close() and by a server 'error' frame: the session is over for
   // good, so a subsequent socket close must not schedule a reconnect
   private sessionEnded = false;
@@ -1739,10 +1729,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.openSocket();
     // unconditional input stream beat; constants + gate shared with the
     // cadence-model matrix via input_send_cadence.ts (R13)
-    this.sendTimer = window.setInterval(
-      () => this.sendMovementTimerTick(),
-      INPUT_SEND_TIMER_INTERVAL_MS,
-    );
+    this.sendTimer = window.setInterval(() => {
+      this.pollStallWatchdog();
+      this.sendMovementTimerTick();
+    }, INPUT_SEND_TIMER_INTERVAL_MS);
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -1807,6 +1797,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // 'appStateChange' listener above, so a native app recovers a zombie socket
   // on the native lifecycle signal even when visibilitychange never fires.
   private handleForegroundBackground(visible: boolean): void {
+    this.backgrounded = !visible;
     if (!visible) {
       // Backgrounding (tab switch, tab close, phone lock) is the last reliable
       // beat to get an in-flight debounced layout edit to the server while the
@@ -1842,6 +1833,15 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // never delivered while suspended (the zombie-socket case). Drive the
     // same path a real close would have.
     if (this.connected) this.socketClosed();
+  }
+
+  // A path that died without a FIN/RST never delivers onclose (see
+  // socket_stall_watchdog.ts): retire the socket and take a real drop's path.
+  private pollStallWatchdog(now = performance.now()): void {
+    if (!this.stallWatchdog?.poll(now, this.backgrounded, this.connected)) return;
+    this.ws.onclose = null;
+    this.ws.close();
+    this.socketClosed();
   }
 
   private openSocket(): void {
@@ -1891,12 +1891,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return;
     }
     this.reconnectAttempts++;
-    const delayMs = computeBackoffDelay(
-      this.reconnectAttempts,
-      RECONNECT_BASE_DELAY_MS,
-      RECONNECT_MAX_DELAY_MS,
-      Math.random,
-    );
+    const delayMs = reconnectBackoffDelay(this.reconnectAttempts, Math.random);
     // Clear our own handle when the timer fires: a stale handle left in
     // reconnectTimer would make a later visibility event (while the socket is
     // still CONNECTING) take the pending-timer branch and open a second socket.
@@ -2249,6 +2244,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     } catch {
       return;
     }
+    this.stallWatchdog?.noteFrame(parseStart, msg.t === 'snap');
     const parseMs = performance.now() - parseStart;
     // A commandOutcome/corpseHarvestInfo reply routes to its owner; anything
     // else falls through unchanged.

@@ -1,8 +1,11 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { computeBackoffDelay } from '../src/net/backoff';
-import { RECONNECT_BASE_DELAY_MS, RECONNECT_MAX_DELAY_MS } from '../src/net/online';
+import {
+  computeBackoffDelay,
+  RECONNECT_BASE_DELAY_MS,
+  RECONNECT_MAX_DELAY_MS,
+} from '../src/net/backoff';
 import {
   hideReconnectOverlay,
   RECONNECT_OVERLAY_SHOW_GRACE_MS,
