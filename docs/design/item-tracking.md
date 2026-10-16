@@ -135,8 +135,16 @@ The copy-choice walks that destroy "the least special copy first" (an
 untargeted disenchant or sunder) read a copy whose payload is only its
 tracked identity as plain (`isPlainCopy`, `src/sim/item_plain_copy.ts`), so
 a Perfected copy is never spent while an ordinary one sits in the bags. The
-same rule keeps the bag corner glyph off an ordinary epic and lets the
-market's "lowest price of each" view collapse ordinary epic listings.
+other prefer-plain removers (trade staging, vendor sale, id-only salvage and
+apply-enchant, bulk discard, quest hand-in) and their capacity scratch twin
+(`consumeOneScratch`, `src/sim/bags.ts`) run the same order: payload-free
+copies, then identity-only copies with their payload carried out
+(`takeIdentityOnlyUnits`), then the special ones, so a traded copy keeps its
+guid and a destroyed one writes its own `consume` row. The bag destroy
+warning reads the same `isPlainCopy`. The same rule keeps the bag corner
+glyph off an ordinary epic and lets the market's "lowest price of each" view
+collapse ordinary epic listings. Mail and market escrow stay payload-free
+only: their `() => true` skip sees an identity-only copy as instanced.
 
 So a guid seen in any row after its `consume` row is a duplicated copy. The
 change history lives in the ledger only; the copy's own payload stays small

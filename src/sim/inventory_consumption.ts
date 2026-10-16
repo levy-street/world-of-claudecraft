@@ -1,6 +1,7 @@
 // Inventory counts and consumption behind SimContext. Materials use exact source
 // plans; other items retain newest-first removal and their existing payload rules.
 // Quest hooks fire once after each resolved removal, including a no-op request.
+import { takeIdentityOnlyUnits } from './item_plain_copy';
 import { isMaterialItemId } from './material_ids';
 import {
   countMaterialInventoryForHub,
@@ -140,7 +141,13 @@ export function removeEnchantableItem(
     count -= take;
     if (s.count <= 0) meta.inventory.splice(i, 1);
   }
-  // Pass 2: instanced copies that are not already enchanted. Per-unit
+  // Pass 2: the identity-only copies (an ordinary tracked epic,
+  // item_plain_copy.ts), payload carried so the enchant keeps the guid; never
+  // enchanted, so the enchant exclusion has nothing to drop here.
+  const identityOnly = takeIdentityOnlyUnits(meta.inventory, itemId, count);
+  consumed.push(...identityOnly);
+  count -= identityOnly.length;
+  // Pass 3: instanced copies that are not already enchanted. Per-unit
   // returns with the same clone-on-survival rule removeItem follows: the
   // enchant path mutates the payload it gets back, so a surviving stack's
   // shared payload must never be aliased out.

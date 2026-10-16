@@ -85,6 +85,7 @@ import {
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { isItemLocked } from './item_lock';
+import { takeIdentityOnlyUnits } from './item_plain_copy';
 import { recordTrackedChange, recordTrackedConsumed } from './item_tracking';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
 import { isMaterialItemId } from './material_ids';
@@ -253,8 +254,9 @@ export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | 
 // so "sell/discard/trade one" prefers the plain copy a player almost always means.
 // The optional `skip` predicate (Professions 2.0) spares any instanced
 // copy it matches from removal: the trade swap passes it to never consume a
-// trade-locked (boundTo-set) copy. Absent, the function is byte-identical to
-// before: fungible first, then ctx.removeItem for the remainder. Only the
+// trade-locked (boundTo-set) copy. Absent, the walk is fungible first, then
+// the identity-only copies (an ordinary tracked epic, item_plain_copy.ts),
+// then ctx.removeItem for the remainder. Only the
 // skip-aware path walks the inventory itself (removeItem cannot skip), and it
 // mirrors removeItem's highest-index-first order and clone-on-survival return
 // contract exactly, so a caller mutating a returned payload (the trade
@@ -293,13 +295,28 @@ export function removePreferFungible(
   const fungibleAvailable = ctx.countFungibleItem(itemId, pid);
   const fungibleTake = Math.min(fungibleAvailable, count);
   if (fungibleTake > 0) ctx.removeFungibleItem(itemId, fungibleTake, pid);
-  const remaining = count - fungibleTake;
-  if (remaining <= 0) return [];
-  if (!skip && !deprioritize) return ctx.removeItem(itemId, remaining, pid);
+  if (count - fungibleTake <= 0) return [];
+  // The second plain class (item_plain_copy.ts): a copy whose payload is only
+  // its tracked identity goes before any special copy, its payload carried
+  // out so the caller's consume row (or re-grant) keeps the guid. A
+  // deprioritized one waits for the deprioritized pass below.
   const r = ctx.resolve(pid);
+  const consumed: ItemInstancePayload[] = r
+    ? takeIdentityOnlyUnits(
+        r.meta.inventory,
+        itemId,
+        count - fungibleTake,
+        (instance) => !skip?.(instance) && !(deprioritize?.(instance) ?? false),
+      ).map((unit) => unit.instance)
+    : [];
+  const remaining = count - fungibleTake - consumed.length;
+  if (r && remaining <= 0) {
+    ctx.onInventoryChangedForQuests?.(r.meta);
+    return consumed;
+  }
+  if (!skip && !deprioritize) return consumed.concat(ctx.removeItem(itemId, remaining, pid));
   if (!r) return [];
   const { meta } = r;
-  const consumed: ItemInstancePayload[] = [];
   let left = remaining;
   // Two passes over the same highest-index-first order: the preferred class
   // first, then (only if still short) the deprioritized class. With no
@@ -353,9 +370,9 @@ export function sellerSignedCharmDeprioritize(
 
 // Per-unit removal that reports each removed unit's ItemInstancePayload AND
 // its plain-stack craftedRecipeId marker (bags.ts InvSlot.craftedRecipeId),
-// walking plain (non-instanced) slots first, then instanced ones, both
-// highest-index-first (the same order removeFungibleItem/removeItem use, so
-// a caller switching from those to this is a behavior-preserving swap). The
+// walking plain (non-instanced) slots first, then identity-only ones (an
+// ordinary tracked epic, item_plain_copy.ts), then the other instanced ones,
+// each highest-index-first (removePreferFungible's order). The
 // optional `skip` predicate spares any instanced copy it matches, same
 // contract as removePreferFungible's.
 //
@@ -403,6 +420,18 @@ export function removeSellUnitsFromInventory(
     left -= take;
     if (s.count <= 0) inventory.splice(i, 1);
   }
+  // The identity-only plain pass, mirroring removePreferFungible: an ordinary
+  // tracked copy ships before a special one, guid and provenance riding along.
+  // `skip` sees it (it is instanced), so the escrow's `() => true` still means
+  // payload-free stock only; a deprioritized one waits for its own pass.
+  const identityOnly = takeIdentityOnlyUnits(
+    inventory,
+    itemId,
+    left,
+    (instance) => !skip?.(instance) && !(deprioritize?.(instance) ?? false),
+  );
+  consumed.push(...identityOnly);
+  left -= identityOnly.length;
   // Two instanced passes over the same highest-index-first order, mirroring
   // removePreferFungible: the preferred class first, then (only if still
   // short) the deprioritized class, so a vendor sale spares the seller's own

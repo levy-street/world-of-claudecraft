@@ -59,6 +59,7 @@ import {
   selectedInventorySlot,
 } from './item_copy_ref';
 import { canStackInstancePayloads, isChargeBearingPayload } from './item_instance_merge';
+import { isIdentityOnlyCopy } from './item_plain_copy';
 import { isMaterialItemId, materialItemIds } from './material_ids';
 import {
   applyMaterialInventoryTake,
@@ -483,8 +484,10 @@ function removeMaterialStacked(inventory: InvSlot[], itemId: string, count: numb
  *  capacity simulations (#2350): removes ONE unit of `itemId` from a scratch
  *  inventory, choosing the victim slot exactly like the live removers do: a
  *  plain fungible slot first (highest index, removeFungibleItem's walk), then
- *  an instanced slot `excludeInstance` does not match (highest index,
- *  removeEnchantableItem's second pass), and only then an excluded instanced
+ *  an identity-only slot (an ordinary tracked epic, item_plain_copy.ts
+ *  takeIdentityOnlyUnits, the second plain pass every live remover runs),
+ *  then an instanced slot `excludeInstance` does not match (highest index,
+ *  removeEnchantableItem's third pass), and only then an excluded instanced
  *  slot (highest index: with no preferred copy left, the live paths fall back
  *  to the plain removeItem walk, where only excluded slots remain). With no
  *  `excludeInstance` it models items.ts removePreferFungible in its
@@ -511,6 +514,7 @@ export function consumeOneScratch(
   if (isMaterialItemId(itemId)) return consumeOneMaterialScratch(scratch, itemId, excludeInstance);
   const passes: ((s: InvSlot) => boolean)[] = [
     (s) => !s.instance,
+    (s) => isIdentityOnlyCopy(s.instance) && !excludeInstance?.(s.instance),
     (s) => !!s.instance && !excludeInstance?.(s.instance),
     (s) => !!s.instance,
   ];

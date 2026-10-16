@@ -244,6 +244,21 @@ describe('bag_item_context_menu: confirm escalation predicate', () => {
     expect(destroyConsumesSpecialCopy('salvage', held)).toBe(false);
   });
 
+  it('an ordinary tracked copy counts as plain: no warning beside a newer Perfected one', () => {
+    // Every epic copy carries a guid and provenance, so an identity-only
+    // payload is the ordinary copy each walk now destroys first.
+    const identity: Partial<ItemInstancePayload> = {
+      guid: '3f2504e0-4f89-41d3-9a0c-0305e82c3301',
+      provenance: { at: 1, by: 'Ada', source: 'world' },
+    };
+    const held = [copy(identity), copy({ ...identity, perfected: true })];
+    for (const action of ['disenchant', 'salvage', 'sunder'] as const) {
+      expect(destroyConsumesSpecialCopy(action, held)).toBe(false);
+    }
+    // Without the ordinary copy the Perfected one is the victim, and it warns.
+    expect(destroyConsumesSpecialCopy('salvage', [held[1]])).toBe(true);
+  });
+
   it('warns for salvage when only a special instanced copy is held', () => {
     expect(destroyConsumesSpecialCopy('salvage', [copy({ signer: 'Bob' })])).toBe(true);
     expect(destroyConsumesSpecialCopy('salvage', [copy({ rolled: { masterwork: true } })])).toBe(
