@@ -50,10 +50,10 @@ export function nextTreasureMapRarity(rarity: TreasureMapRarity): TreasureMapRar
 export const CARTOGRAPHERS_INK_ITEM_ID = 'cartographers_ink';
 export const CARTOGRAPHERS_INK_CURRENCY_COST = 60;
 /** Inks one redraw spends, by the map's CURRENT rarity. Epic to legendary is the
- *  steep one (15 inks, about a week of full world-quest days): a legendary hoard
- *  pays a guaranteed piece above everything outside a raid. */
+ *  steep one (8 inks, about three and a half full world-quest days): a legendary
+ *  hoard pays a guaranteed piece above everything outside a raid. */
 export const TREASURE_MAP_UPGRADE_INKS: Readonly<Record<TreasureMapRarity, number>> = Object.freeze(
-  { common: 1, rare: 3, epic: 15, legendary: 0 },
+  { common: 1, rare: 3, epic: 8, legendary: 0 },
 );
 
 /** The lowest level a Buried Hoard admits (the daily board's higher bracket). */

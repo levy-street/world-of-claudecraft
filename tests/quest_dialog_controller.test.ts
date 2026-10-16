@@ -1,6 +1,19 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// This suite exercises quest dialog rows, not WebGL portraits. Its char_window
+// import pulls in the real portrait module, whose GLB fetches can outlive
+// happy-dom teardown and throw ProgressEvent errors in Node (the
+// inspect_window.test.ts hazard), so keep that renderer boundary inert.
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,

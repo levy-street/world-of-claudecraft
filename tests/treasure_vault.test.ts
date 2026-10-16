@@ -515,6 +515,31 @@ describe("redrawing a map with Cartographer's Ink", () => {
     });
   });
 
+  it('redraws an epic map as a legendary one for exactly 8 inks', () => {
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.epic, 1);
+    sim.useItem(TREASURE_MAP_ITEM_IDS.epic);
+    const siteId = meta.treasureMap!.siteId;
+    sim.addItem(CARTOGRAPHERS_INK_ITEM_ID, 7);
+    sim.drainEvents();
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID);
+    expect(ofType(sim.drainEvents(), 'error').map((ev) => ev.text)).toEqual([
+      "Redrawing this map takes 8 Cartographer's Ink.",
+    ]);
+    expect(meta.treasureMap?.rarity).toBe('epic');
+    expect(sim.countItem(CARTOGRAPHERS_INK_ITEM_ID)).toBe(7);
+    sim.addItem(CARTOGRAPHERS_INK_ITEM_ID, 1);
+    sim.drainEvents();
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID);
+    const evs = sim.drainEvents();
+    expect(meta.treasureMap).toMatchObject({ rarity: 'legendary', siteId });
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.epic)).toBe(0);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.legendary)).toBe(1);
+    expect(sim.countItem(CARTOGRAPHERS_INK_ITEM_ID)).toBe(0);
+    expect(ofType(evs, 'treasureMapUpgraded')[0]).toMatchObject({ rarity: 'legendary', inks: 8 });
+  });
+
   it('refuses without a read map, without enough ink, and at the top rarity', () => {
     const sim = makeSim();
     const meta = metaOf(sim);

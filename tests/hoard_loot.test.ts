@@ -291,7 +291,7 @@ describe('the payout', () => {
     expect(RARITIES.map((rarity) => VAULT_PAYOUTS[rarity].gearChance)).toEqual([0.1, 0.3, 0.5, 1]);
     expect(VAULT_GUEST_GEAR_CHANCE).toEqual({ common: 0.05, rare: 0.1, epic: 0.2, legendary: 0.4 });
     // The legendary redraw is the steep one: it buys a guaranteed ilvl-32 piece.
-    expect(TREASURE_MAP_UPGRADE_INKS).toEqual({ common: 1, rare: 3, epic: 15, legendary: 0 });
+    expect(TREASURE_MAP_UPGRADE_INKS).toEqual({ common: 1, rare: 3, epic: 8, legendary: 0 });
   });
 
   function lootedGear(evs: readonly SimEvent[]): string[] {
