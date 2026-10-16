@@ -9,6 +9,7 @@
 
 import { seatGroundedAt } from './colliders';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
+import { isPlantedPracticeDummy } from './combat/pull_eligibility';
 import { isMoored } from './combat/trinkets';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { SKIN_WIDTH } from './physics';
@@ -27,6 +28,9 @@ export function applyKnockback(
   target: Entity,
   distance: number,
 ): number {
+  // A practice dummy stays planted on its marker (Typhoon used to blow one
+  // yards off its spot); guarded here so every knockback caller inherits it.
+  if (isPlantedPracticeDummy(target)) return 0;
   if (source.id !== target.id && ctx.isIceBlocked(target)) return 0;
   if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
   // The Mooring Stone holds its wearer where they stand (combat/trinkets.ts).
