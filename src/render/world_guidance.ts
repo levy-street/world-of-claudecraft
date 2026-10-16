@@ -8,6 +8,7 @@ import { GliderCourseVisual } from './glider_course_visual';
 import { IslandGuidance } from './island_guidance';
 import { MountBeacon } from './mount_beacon';
 import { RaceLine } from './race_line';
+import { type GliderRenderedViews, RewardGliderVisual } from './reward_glider_visual';
 import { ShadowInfiltrationVisual } from './shadow_infiltration_visual';
 import { WispMazeVisual } from './wisp_maze_visual';
 import { WorldQuestTraceVisual } from './world_quest_trace_visual';
@@ -20,6 +21,7 @@ export class WorldGuidance {
   private readonly trace: WorldQuestTraceVisual;
   private readonly cannon: CannonEncounterVisual;
   private readonly glider: GliderCourseVisual;
+  private readonly rewardGlider: RewardGliderVisual;
   private readonly shadow: ShadowInfiltrationVisual;
   private readonly wispMaze: WispMazeVisual;
 
@@ -64,6 +66,10 @@ export class WorldGuidance {
       groundAt,
       compileGate && ((root) => compileGate(root, true)),
     );
+    this.rewardGlider = new RewardGliderVisual(
+      scene,
+      compileGate && ((root) => compileGate(root, true)),
+    );
     this.shadow = new ShadowInfiltrationVisual(
       scene,
       groundAt,
@@ -80,6 +86,7 @@ export class WorldGuidance {
       this.trace.readyForEntry,
       this.cannon.readyForEntry,
       this.glider.readyForEntry,
+      this.rewardGlider.readyForEntry,
     ]).then(() => {});
   }
 
@@ -92,8 +99,9 @@ export class WorldGuidance {
     time: number,
     dt: number,
     reducedMotion = false,
-    renderedSelf?: { group: Pick<THREE.Object3D, 'position' | 'rotation'> },
+    renderedViews?: GliderRenderedViews,
   ): void {
+    const renderedSelf = renderedViews?.get(world.player.id);
     // Racing line (cosmetic; reads the self race view only).
     this.race.update(world.mountRaceView(), time, dt);
     // Island guidance trail (actionable on every tier; island-gated inside).
@@ -106,6 +114,7 @@ export class WorldGuidance {
     this.trace.update(world);
     this.cannon.update(world.vehicleSession, dt, reducedMotion);
     this.glider.update(world, renderedSelf?.group);
+    this.rewardGlider.update(world, renderedSelf?.group, renderedViews, dt);
     this.shadow.update(world);
     this.wispMaze.update(world, reducedMotion);
   }
@@ -114,6 +123,7 @@ export class WorldGuidance {
     this.trace.dispose();
     this.cannon.dispose();
     this.glider.dispose();
+    this.rewardGlider.dispose();
     this.shadow.dispose();
     this.wispMaze.dispose();
   }
