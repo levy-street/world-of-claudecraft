@@ -20592,4 +20592,116 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '刪除此角色前，請先將所有尚未鎖定的集章卡轉移至其他角色。',
   'apiError.character.referral_bond_pending':
     '一份推薦獎勵會員契約正在發放給此角色。請在發放完成後再嘗試刪除此角色。',
+  // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, The Idol Wakes):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.auraEffect.wildheart.sunstruck': '被點亮的太陽符文灼傷：移動速度降低{pct}%。',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed': '被點亮的太陽符文灼傷：受到的傷害提高{pct}%。',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    '在此效果結束前，任何太陽符文都無法灼傷他。他踏過的已點亮符文會保持點亮。',
+  'hudChrome.auraEffect.wildheart.pinned':
+    '一支狩獵之矛把你釘在原地。你每{every}秒流血，受到{bleed}點物理傷害（英雄難度{heroicBleed}點），而且無論你站在哪裡，荒野之心脈衝都會命中你，傷害提高{pulse}%。隊友可以用{pull}秒拔出長矛。如果沒有其他人能幫忙，你可以用{wrench}秒自己拔出。{seconds}秒後它會自行鬆脫。',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    '石美洲豹已經甦醒。每{every}秒，牠會在地面預警{warning}秒後，輪流向平台的一半吐息：對該半場的所有人造成{min}到{max}點自然傷害（英雄難度{heroicMin}到{heroicMax}點）。祖爾加會保持美洲豹化身直到死亡，並且每{seconds}秒更換獵物（英雄難度{heroicSeconds}秒）。',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    '沒有其他人能點亮太陽符文。站在一個熄滅的符文上{seconds}秒將它點亮，再把祖爾加引過去',
+  'hudChrome.wildheartAlert.pinnedTitle': '被釘住了！',
+  'hudChrome.wildheartAlert.pinnedLine':
+    '需要隊友拔出狩獵之矛。被釘住時，荒野之心脈衝對你的傷害更高',
+  'hudChrome.wildheartAlert.pinnedSelfLine': '沒有人能來幫忙：在荒野之心脈衝落下前自己拔出狩獵之矛',
+  'hudChrome.wildheartAlert.sunstruckTitle': '祖爾加被烈日灼傷了！',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    '在效果結束前他受到的傷害提高{pct}%：現在使用你最強的攻擊',
+  'hudChrome.wildheartAlert.spearTitle': '有隊友被釘住了！',
+  'hudChrome.wildheartAlert.spearLine': '跑到狩獵之矛旁，在荒野之心脈衝落下前把它拔出來',
+  'hudChrome.wildheartAlert.glyphTitle': '點亮太陽符文',
+  'hudChrome.wildheartAlert.glyphLine':
+    '站在熄滅的太陽符文上{seconds}秒將它點亮。祖爾加踏過它時，會在{duration}秒內受到的傷害提高{pct}%',
+  'hudChrome.wildheartAlert.glyphLightingTitle': '正在點亮太陽符文',
+  'hudChrome.wildheartAlert.glyphLightingLine': '留在符文上直到它被點亮。離開就要重新開始',
+  'hudChrome.wildheartAlert.breathTitle': '神像吐息！',
+  'hudChrome.wildheartAlert.breathLine': '石美洲豹即將向平台的這一半吐息。跑到另一半去',
+  'hudChrome.kitUse.freeLine':
+    '把長矛從地面拔出，解救被釘住的人。受到攻擊不會打斷你，移動或昏迷會打斷',
+  'hudChrome.kitUse.freeKey': '拔出{name}',
+  'hudChrome.kitUse.freeTap': '點擊這裡拔出{name}',
+  'hudChrome.kitUse.freeClick': '點選這裡拔出{name}',
+  'hudChrome.kitUse.freeFar': '靠近到{range}碼內才能拔出它',
+  'hudChrome.kitUse.freeAria': '拔出{name}',
+  'hudChrome.kitUse.freeUsingLine': '保持不動以拔出長矛：移動或昏迷會打斷',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': '狩獵之矛',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': '神像甦醒',
+  'abilityUi.cast.kituse_wildheart_pull_spear': '拔出長矛',
+  'abilityUi.cast.wildheart_idols_breath': '神像吐息',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': '點亮中',
+  'abilityUi.cast.wildheart_sun_glyph_cold': '冷卻中',
+  'entities.mobs.wildheart_hunting_spear.name': '狩獵之矛',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': '樂譜',
+  'hudChrome.templeAlert.melodyLine': '觀察月亮地磚依序奏響。與另一名玩家輪流踩出相同順序',
+  'hudChrome.templeAlert.melodyDarkLine': '在地磚熄滅前記住順序。與另一名玩家輪流踩出相同順序',
+  'hudChrome.templeAlert.answerTitle': '回應樂譜！',
+  'hudChrome.templeAlert.answerLine':
+    '輪流踩踏：踩上標記為{place}的月亮地磚。已奏響：{done}/{total}',
+  'hudChrome.templeAlert.answerDarkLine':
+    '輪流憑記憶重複順序。再次踩同一塊地磚前先離開。已奏響：{done}/{total}',
+  'hudChrome.templeAlert.stepOffTitle': '先走下去，再踏上來',
+  'hudChrome.templeAlert.stepOffLine':
+    '月光石板只有在有人踏上時才會奏響。離開這塊石板，然後重新踏上去',
+  'hudChrome.templeAlert.falseTitle': '錯音！',
+  'hudChrome.templeAlert.falseLine': '那塊石板的順序不對。回應將從第一塊石板重新開始',
+  'hudChrome.templeAlert.brokenTitle': '瑟爾瑟的嗓音破碎了！',
+  'hudChrome.templeAlert.brokenLine': '在效果結束前，她受到的傷害提高{pct}%：現在使用你最強的攻擊',
+  'hudChrome.templeAlert.timeAria': '剩餘{seconds}秒',
+  'hudChrome.auraEffect.temple.scoreWard':
+    '正在吟唱樂譜：在結束前不會受到傷害。在樂句結束前，按石板響起的順序踏上月光石板，即可使她的嗓音破碎。輪流踩踏：奏響音符後，須等待另一名玩家奏響下一個正確音符。唯一的倖存者可以獨自完成。如果樂句先結束，不諧之音會對庭院中的所有人造成{min}到{max}點冰霜傷害（英雄難度下為{heroicMin}到{heroicMax}點）。',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    '她的嗓音已破碎：在此效果結束前，她受到的傷害提高{pct}%。',
+  'abilityUi.cast.temple_score': '樂譜',
+  'abilityUi.cast.temple_score_answer': '回應樂譜',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    '樂譜（她會兩次在月光石板上吟唱旋律：按石板響起的順序踏上去，即可使她的嗓音破碎）',
+  'hudChrome.templeAlert.spentTitle': '該由另一道聲音應答',
+  'hudChrome.templeAlert.spentLine':
+    '另一名玩家奏響下一個正確音符前，你無法奏響地磚。已奏響：{done}/{total}',
+  'hudChrome.auraEffect.temple.spentVoice':
+    '另一名玩家奏響下一個正確音符前，你無法奏響月亮地磚。在此期間踩上地磚不會重置應答，也不會對你造成傷害。無法驅散。當你成為同一副本內唯一存活的玩家或樂譜結束時移除。',
+  // The Sledge Tusker's bait rework (the ice outcrops, Stuck in the Ice, the
+  // soulfire trail): the M16 non-Latin fills of its new English.
+  'hudChrome.sanctumAlert.trampleTitle': '踐踏！',
+  'hudChrome.sanctumAlert.trampleLeadLine': '把衝鋒引向冰岩，然後向側面躲開',
+  'hudChrome.sanctumAlert.trampleLine': '在巨牙獸衝鋒之前，從標出的路線向側面離開',
+  'hudChrome.sanctumAlert.soulfireTitle': '魂火！',
+  'hudChrome.sanctumAlert.soulfireLine': '你正站在燃燒的魂火中。離開它',
+  'hudChrome.sanctumAlert.stuckTitle': '巨牙獸卡住了！',
+  'hudChrome.sanctumAlert.stuckLine': '在牠掙脫之前，牠受到的傷害提高{pct}%：現在使用你最強的攻擊',
+  'hudChrome.sanctumAlert.trampleBaitTitle': '正衝向冰岩',
+  'hudChrome.sanctumAlert.trampleBaitLine': '這次踐踏會撞進一塊冰岩。不要進入路線，準備攻擊',
+  'hudChrome.sanctumAlert.baitHintTitle': '引誘踐踏',
+  'hudChrome.sanctumAlert.baitHintLine':
+    '牠會衝向最遠的玩家。站在冰岩後面，讓衝鋒撞上冰岩：巨牙獸會被卡住{seconds}秒，受到的傷害提高{pct}%',
+  'hudChrome.auraEffect.sanctum.tuskerStuck':
+    '牠的獠牙插進了一塊冰岩。{seconds}秒內無法移動或攻擊，隨後牠會掙脫，冰岩隨之碎裂。',
+  'hudChrome.auraEffect.sanctum.tuskerStuckExposed': '卡在冰岩裡：受到的傷害提高{pct}%。',
+  'abilityUi.cast.sanctum_soulfire_trail_burn': '燃燒中',
+  'abilityUi.cast.sanctum_ice_outcrop_held': '獠牙卡住',
+  // The Great Saurian's totem rework (the Sunbone Sap Totems, the heroic drum):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.wildheartAlert.saurianStompTitle': '撼地踐踏！',
+  'hudChrome.wildheartAlert.saurianStompLine': '在巨型蜥腳獸踐踏之前跑出圓環',
+  'hudChrome.wildheartAlert.sapTotemTitle': '樹汁圖騰！',
+  'hudChrome.wildheartAlert.sapTotemLine':
+    '日骨樹汁圖騰每{seconds}秒治療一次巨型蜥腳獸，直到被摧毀。立著的圖騰：{count}',
+  'hudChrome.wildheartAlert.drumTitle': '鼓聲催快了踐踏',
+  'hudChrome.wildheartAlert.drumLine':
+    '鼓聲響起期間，撼地踐踏的頻率翻倍。摧毀一個日骨樹汁圖騰可讓鼓聲停止{seconds}秒',
+  'hudChrome.auraEffect.wildheart.sapped':
+    '正在供給牠的日骨樹汁圖騰：{count}個。每個圖騰每{seconds}秒為牠恢復{pct}%的最大生命值。摧毀圖騰即可停止治療。',
+  'hudChrome.auraEffect.wildheart.howdahDrum':
+    '馱轎裡的鼓手在驅策牠：兩次撼地踐踏之間的間隔縮短{pct}%。摧毀一個日骨樹汁圖騰可讓鼓聲停止{seconds}秒。鼓會隨馱轎一同墜落。',
+  'hudChrome.auraEffect.wildheart.drumSilenced':
+    '鼓手亂了節拍：在效果結束前，撼地踐踏按正常間隔出現。',
+  'abilityUi.cast.wildheart_saurian_sap_tether': '先祖樹汁',
+  'entities.mobs.sunbone_sap_totem.name': '日骨樹汁圖騰',
 };

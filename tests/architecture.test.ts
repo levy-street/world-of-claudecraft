@@ -660,14 +660,21 @@ const UI_PURE_CORES = [
   // combat text's avoidance word.
   'src/ui/hud/dungeon/encounter_alert_view.ts',
   'src/ui/hud/dungeon/fct_avoidance_core.ts',
-  // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
+  // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond;
+  // Zulgar's breath, spear, Sunstruck window and sun glyphs) and its scene scan.
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
+  'src/ui/hud/dungeon/wildheart_alert_scene_core.ts',
+  'src/ui/hud/dungeon/wildheart_saurian_alert_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
+  // The Drowned Temple's alert (Choirmother Selthe's Score) and its scene scan.
+  'src/ui/hud/dungeon/temple_alert_view.ts',
+  'src/ui/hud/dungeon/temple_alert_scene_core.ts',
   // The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) and its
   // scene scan.
   'src/ui/hud/dungeon/sanctum_alert_view.ts',
   'src/ui/hud/dungeon/sanctum_alert_scene_core.ts',
+  'src/ui/hud/dungeon/sanctum_tusker_alert_view.ts',
   // The Hollow Crypt's alert (the grave mark, the Embrace, the Lament, the
   // Open Grave, Morthen's Rite Ring, the Knell's half, the Toll and Harmony
   // readouts) and its scene scan.
@@ -917,6 +924,12 @@ const RENDER_PURE_CORES = [
   // the dazed loop a stunned body holds (ClipMap.stunned).
   'src/render/wildheart_basin/jaguar_model_core.ts',
   'src/render/wildheart_basin/zulgar_avatar_core.ts',
+  // Zulgar's hunt rework: the sun glyphs' four looks, the Sunstruck window,
+  // the Hunting Spear and the half the Idol's Breath marks.
+  'src/render/wildheart_basin/zulgar_hunt_fx_core.ts',
+  // The Great Saurian's totem rework: the Sap Totem's height, the throw's arc,
+  // the tether's life, the rider's flare and the heroic drum's beat.
+  'src/render/wildheart_basin/saurian_totem_fx_core.ts',
   'src/render/wildheart_basin/bond_cord_core.ts',
   'src/render/wildheart_basin/basin_fire_core.ts',
   'src/render/characters/stun_idle_core.ts',
@@ -941,6 +954,10 @@ const RENDER_PURE_CORES = [
   // length, the object looks, the palette and the timelines).
   'src/render/gravewyrm_sanctum_fx/tusker_model_core.ts',
   'src/render/gravewyrm_sanctum_fx/sanctum_fx_core.ts',
+  // The Tusker's bait rework: the outcrops' looks and shape, the stuck window
+  // and the soulfire trail's life.
+  'src/render/gravewyrm_sanctum_fx/tusker_bait_fx_core.ts',
+  'src/render/gravewyrm_sanctum_fx/tusker_aim_fx_core.ts',
   // The trash engine's visuals: the catalog swept from the kits, the hazard
   // looks, the wall box, the nova's sight reach and wave, the use hint, the
   // freeze and encase timelines, the quench pools' placement.
@@ -987,6 +1004,9 @@ const RENDER_PURE_CORES = [
   // the gaze eye and veil, the whirlpool, the spark's arcs and the swell.
   'src/render/drowned_temple/temple_trash_fx_core.ts',
   'src/render/drowned_temple/temple_lure_fx_core.ts',
+  // Selthe's Score: a moon tile's six looks, its pips and numeral strokes,
+  // her ward's water and Discord's wave.
+  'src/render/drowned_temple/temple_score_fx_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
   'src/render/ambience_state_core.ts',

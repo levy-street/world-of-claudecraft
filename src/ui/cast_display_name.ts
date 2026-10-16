@@ -161,6 +161,8 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.temple_moonwater_bolt': true,
   'abilityUi.cast.temple_drowning_aria': true,
   'abilityUi.cast.temple_mere_surge': true,
+  'abilityUi.cast.temple_score': true,
+  'abilityUi.cast.temple_score_answer': true,
   'abilityUi.cast.temple_tideglass_fracture': true,
   'abilityUi.cast.temple_undertow': true,
   'abilityUi.cast.temple_lunar_tide': true,
@@ -194,6 +196,8 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.wildheart_snaring_tongue': true,
   'abilityUi.cast.wildheart_saurian_tail_swipe': true,
   'abilityUi.cast.wildheart_saurian_stomp': true,
+  // The Saurian's totem rework: a Sap Totem's own bar (its next mending).
+  'abilityUi.cast.wildheart_saurian_sap_tether': true,
   // The Wildheart Basin's three bosses.
   'abilityUi.cast.wildheart_beast_pit_quake': true,
   'abilityUi.cast.wildheart_jaguar_heel': true,
@@ -202,6 +206,14 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.wildheart_gorgebloom_gorge': true,
   'abilityUi.cast.wildheart_zulgar_pulse': true,
   'abilityUi.cast.wildheart_zulgar_spirit_hunt': true,
+  // Zulgar's hunt rework: his bars, the player's own bar on the Hunting Spear
+  // (the trash engine's G3 use), and his encounter objects' clocks.
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': true,
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': true,
+  'abilityUi.cast.kituse_wildheart_pull_spear': true,
+  'abilityUi.cast.wildheart_idols_breath': true,
+  'abilityUi.cast.wildheart_sun_glyph_kindle': true,
+  'abilityUi.cast.wildheart_sun_glyph_cold': true,
   // The Gravewyrm Sanctum rework: its trash kit and the Sledge Tusker.
   'abilityUi.cast.sanctum_cinder_breath': true,
   'abilityUi.cast.sanctum_warming_rite': true,
@@ -210,6 +222,10 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.sanctum_ice_block_toss': true,
   'abilityUi.cast.sanctum_tusker_tusk_sweep': true,
   'abilityUi.cast.sanctum_tusker_trample': true,
+  // The Tusker's bait rework: the clocks its encounter objects carry (a
+  // soulfire trail burning down, an outcrop holding its tusks).
+  'abilityUi.cast.sanctum_soulfire_trail_burn': true,
+  'abilityUi.cast.sanctum_ice_outcrop_held': true,
   // The Sanctum trash mechanics pass (trash_kit/sanctum_cast_ids.ts).
   'abilityUi.cast.sanctum_thaw_the_held': true,
   'abilityUi.cast.sanctum_counterweight_lash': true,

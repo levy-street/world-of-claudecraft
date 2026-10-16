@@ -1,8 +1,9 @@
 // Choirmother Selthe's water magic (sim: src/sim/encounters/drowned_temple/
 // selthe.ts; her clips: Bolt, Beam, Surge), composed by temple_fx.ts:
-//  - Moonwater Bolt: moonlit water gathers into an orb at her hands over the
-//    2 s bar, spiralling in, then the orb is flung at her foe trailing spray
-//    and bursts on them in a splash and a ring of foam;
+//  - Moonwater Bolt (her quiet filler, no bar): moonlit water gathers into an
+//    orb at her hands from the gather cue, spiralling in, then the orb is
+//    flung at her foe trailing spray and bursts on them in a splash and a
+//    ring of foam;
 //  - Drowning Aria: a torrent sung from her palms to whoever the beam strikes
 //    now (the cast's target, or a body that stepped into it): a bright core
 //    in a twisting sheath of turquoise water, spray boiling off the struck
@@ -22,12 +23,14 @@
 // as in the crypt and Ysolei layers). Reduced motion stills the beam's
 // flicker; the camera kicks ride the renderer's own reduced-motion gate.
 // State is read off IWorld (her cast bar and cast target, the spellfx cues),
-// so offline and online look the same.
+// so offline and online look the same. Her Score has its own layer
+// (temple_score_fx.ts).
 
 import * as THREE from 'three';
 import {
   SELTHE_ARIA_BROKEN,
   SELTHE_ARIA_PULSE,
+  SELTHE_BOLT_GATHER,
   SELTHE_DROWNING_ARIA,
   SELTHE_ID,
   SELTHE_MERE_SURGE,
@@ -43,7 +46,7 @@ const COLLAPSED = 1e-4;
 const SCAN_SEC = 0.5;
 /** Her hands at a cast: this high over her pool and this far ahead (her
  *  drawn 9 yd body; the art guide's Bolt holds the orb 5.4 up and 2.0 ahead
- *  through its bar, the aria's palms reach on to 3 ahead). */
+ *  through its gather, the aria's palms reach on to 3 ahead). */
 const HAND_UP = 5.4;
 const HAND_AHEAD = 2.2;
 /** A player's chest over their feet. */
@@ -64,8 +67,8 @@ float vnoise(vec2 p) {
 `;
 
 // Water droplets and foam: a translucent bead with a white highlight and a
-// bright rim (never the crypt's smoky dust).
-const SPRAY_FRAG = /* glsl */ `
+// bright rim (never the crypt's smoky dust). Shared with her Score's layer.
+export const SPRAY_FRAG = /* glsl */ `
 varying float vT;
 varying float vSeed;
 varying vec4 vColor;
@@ -231,6 +234,8 @@ export class TempleSeltheFx {
   private readonly flyOrb: THREE.Mesh;
   private readonly flyAlpha = { value: 0 };
   private flight: Flight | null = null;
+  /** Seconds since the gather cue (-1: no bolt gathering). */
+  private gatherAge = -1;
   private readonly core: THREE.Mesh;
   private readonly coreU: Required<Uni>;
   private readonly sheath: THREE.Mesh;
@@ -419,6 +424,13 @@ export class TempleSeltheFx {
   handleEvent(ev: SimEvent): boolean {
     if (ev.type !== 'spellfx') return false;
     const ab = ev.ability;
+    // The gather is seen, never claimed: the renderer's own windup arm plays
+    // her throw on the same cue.
+    if (ab === SELTHE_BOLT_GATHER) {
+      if (this.bossId === null || ev.sourceId !== this.bossId) this.rescan(true);
+      if (this.bossId === ev.sourceId) this.gatherAge = 0;
+      return false;
+    }
     if (
       ab !== SELTHE_MOONWATER_BOLT &&
       ab !== SELTHE_ARIA_PULSE &&
@@ -433,6 +445,7 @@ export class TempleSeltheFx {
     if (ab === SELTHE_MOONWATER_BOLT && target) {
       this.hands(b, this.a);
       this.flight = { age: 0, x0: this.a.x, y0: this.a.y, z0: this.a.z, targetId: target.id };
+      this.gatherAge = -1;
       this.gatherAlpha.value = 0;
       this.gatherOrb.scale.setScalar(COLLAPSED);
     } else if (ab === SELTHE_ARIA_PULSE && target) {
@@ -569,7 +582,7 @@ export class TempleSeltheFx {
     }
     const b = this.boss();
     const casting = b && !b.dead ? b.castingAbility : null;
-    this.stepGather(b, casting === SELTHE_MOONWATER_BOLT, dt);
+    this.stepGather(b && !b.dead ? b : null, dt);
     this.stepFlight(dt);
     this.stepBeam(b, casting === SELTHE_DROWNING_ARIA, dt);
     if (b && casting === SELTHE_MERE_SURGE) this.heave(b, dt);
@@ -595,6 +608,7 @@ export class TempleSeltheFx {
     const near = !!b && !!me && Math.hypot(b.pos.x - me.pos.x, b.pos.z - me.pos.z) <= AWAKE_RANGE;
     const playing =
       this.flight !== null ||
+      this.gatherAge >= 0 ||
       this.wallAge >= 0 ||
       this.beamLevel > 0.02 ||
       this.glow.lastDeath > clock ||
@@ -602,15 +616,19 @@ export class TempleSeltheFx {
     this.root.visible = !this.gated || near || playing;
   }
 
-  /** The orb swelling at her hands while the bolt's bar runs, moonwater
-   *  spiralling in to it. */
-  private stepGather(b: EntityView | null, on: boolean, dt: number): void {
-    if (!b || !on || b.castTotal <= 0) {
+  /** The orb swelling at her hands from the gather cue until the bolt flies
+   *  (or a little past it, if the throw never comes), moonwater spiralling in
+   *  to it. */
+  private stepGather(b: EntityView | null, dt: number): void {
+    if (this.gatherAge >= 0) this.gatherAge += dt;
+    if (this.gatherAge > SELTHE_TUNING.boltWindup + 0.3) this.gatherAge = -1;
+    if (!b || this.gatherAge < 0) {
+      this.gatherAge = -1;
       this.gatherAlpha.value = 0;
       this.gatherOrb.scale.setScalar(COLLAPSED);
       return;
     }
-    const k = Math.min(1, Math.max(0, 1 - b.castRemaining / b.castTotal));
+    const k = Math.min(1, this.gatherAge / SELTHE_TUNING.boltWindup);
     const at = this.hands(b, this.a);
     this.gatherOrb.position.copy(at);
     this.gatherOrb.scale.setScalar(0.25 + 0.75 * k);

@@ -4180,7 +4180,20 @@ export const ja_JP: EnTranslations = {
         "pollinated": "種莢に触れると、すぐに茨の芽が生える。種には近づかず、花粉のない者に踏み潰させよう。放置された種莢は{seconds}秒で芽吹く（ヒロイックでは{heroic}秒で地中に潜り、最も近い者の傍から現れる）。",
         "prey": "ズルガーがあなたを狙っている。光る太陽紋を踏ませると{slow}%鈍足になる。捕まると引き裂かれ、{damage}のダメージ（ヒロイックでは{heroic}）を受けて{stun}秒間倒される。",
         "avatar": "移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。",
-        "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。"
+        "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。",
+        "sunstruck": "光る太陽紋に焼かれた：移動速度が{pct}%低下する。",
+        "sunstruckExposed": "光る太陽紋に焼かれた：受けるダメージが{pct}%増加する。",
+        "sunWary": "この効果が終わるまで、どの太陽紋も彼を焼けない。その間に踏まれた光る太陽紋は光ったまま残る。",
+        "pinned": "狩りの槍があなたをその場に釘付けにしている。{every}秒ごとに{bleed}の物理ダメージ（ヒロイックでは{heroicBleed}）の出血を受け、ワイルドハートの脈動はどこにいても命中してダメージが{pulse}%増加する。仲間は{pull}秒で槍を引き抜ける。他に動ける仲間がいなければ、自分で{wrench}秒かけて引き抜ける。{seconds}秒後には自然に抜ける。",
+        "idolAwake": "石のジャガーが目覚めた。{every}秒ごとに、床に{warning}秒の予兆を出してからテラスの片側ずつに息を吐く：その側にいる全員に{min}から{max}の自然ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）。ズルガーは倒されるまでジャガーの化身のままで、{seconds}秒ごと（ヒロイックでは{heroicSeconds}秒ごと）に獲物を替える。",
+        "sapped": "陽骨の樹液トーテムが樹液を送っている：{count}本。それぞれが{seconds}秒ごとに最大体力の{pct}%を回復する。トーテムを破壊すれば回復は止まる。",
+        "howdahDrum": "輿の太鼓打ちが駆り立てている：大地を揺るがす踏みつけの間隔が{pct}%短くなる。陽骨の樹液トーテムを破壊すると太鼓は{seconds}秒間止まる。太鼓は輿とともに落ちる。",
+        "drumSilenced": "太鼓打ちが拍子を失った：この効果が終わるまで、大地を揺るがす踏みつけは通常の間隔で来る。"
+      },
+      "temple": {
+        "scoreWard": "楽譜を歌っている：終わるまでダメージを受けない。歌が終わる前に、鳴った順番どおりに月のタイルへ踏み入ると彼女の声が砕ける。交代して踏むこと。音を鳴らしたら、別のプレイヤーが次の正しい音を鳴らすまで待つ。生存者が一人なら、一人で最後まで答えられる。先に歌が終わると、不協和音が広間の全員に{min}から{max}の冷気ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。",
+        "brokenVoice": "声が砕けている：この効果が終わるまで受けるダメージが{pct}%増加する。",
+        "spentVoice": "別のプレイヤーが次の正しい音を鳴らすまで、月のタイルを鳴らせない。この間にタイルを踏んでも答えはリセットされず、ダメージも受けない。解除不可。同じインスタンスで生きているプレイヤーが自分だけになるか、楽譜が終了すると解除される。"
       },
       "bastion": {
         "brineColumn": "海水の柱に捕らわれ、{tick}秒ごとに{min}～{max}の自然ダメージを最大{seconds}秒間受ける。潮縛りの侍祭を妨害するかスタンさせれば抜け出せる。",
@@ -4226,7 +4239,9 @@ export const ja_JP: EnTranslations = {
         "shardFlare": "心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。",
         "branded": "{seconds}秒間、{interval}秒ごとに{value}の{school}ダメージを与える。融け水の池に入るとすぐに消える。",
         "creepingRime": "移動速度が{pct}%低下する（スタック1つにつき{per}%）。霧氷のブレスを受けるたびにスタックが1つ増え、効果時間が{seconds}秒にリセットされる。{max}スタックに達すると{freeze}秒間凍りつき（凍結）、スタックは消える。",
-        "icedOver": "忍び寄る霧氷で凍りついた：移動も行動もできない。"
+        "icedOver": "忍び寄る霧氷で凍りついた：移動も行動もできない。",
+        "tuskerStuck": "牙が氷の露頭に刺さっている。{seconds}秒間、移動も攻撃もできない。その後は抜け出し、露頭は砕ける。",
+        "tuskerStuckExposed": "氷の露頭に刺さっている：受けるダメージが{pct}%増加。"
       },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
@@ -6518,6 +6533,7 @@ export const ja_JP: EnTranslations = {
         "summons_adds": "増援を召喚",
         "lunar_tide": "ルナタイド（周期的な範囲ダメージ）",
         "chorus_and_solo": "合唱と独唱（片方の印には集まり、もう片方からは離れる）",
+        "the_score": "楽譜（彼女は二度、月のタイルで旋律を歌う：鳴った順番どおりに踏み入ると彼女の声が砕ける）",
         "tideglass_reflections": "潮硝子の映し身（互いの映し身を倒す）",
         "hydra_three_elements": "三つの属性（左の首は18ヤードの冷気の円錐を吐き、4秒間あなたの移動を70パーセント遅くする。中央の首は最大3人の足元に毒を吐き、1.5秒後に破裂して、落ちた場所で6秒間燃え続ける。右の首は26ヤードの直線に激流を放ち、あなたを8ヤード吹き飛ばす：どれも範囲の外へ出ること。首が1本倒れると、残った首がその攻撃を引き継ぐ）",
         "hydra_tsunami": "津波（首が4.5秒間水中に沈み、その間の被ダメージが75パーセント減る。波は池の半分を襲い、次はもう半分を襲う：ノーマルでは160から190の冷気ダメージと10ヤードの押し出し。もう半分へ渡るか、池の縁の柱の陰に立つこと。ヒロイックでは3.5秒後に波がもう半分へ打ち返す。最初の津波は戦闘開始から24秒後、その後は前の波が過ぎてから40秒後に来る）",
@@ -6642,6 +6658,23 @@ export const ja_JP: EnTranslations = {
       "shadeLine": "光が素通りしている：放っておき、光線が照らす者を探せ",
       "timeAria": "残り{seconds}秒"
     },
+    "templeAlert": {
+      "melodyTitle": "楽譜",
+      "melodyLine": "月のタイルが順番に鳴るのを見ておけ。仲間と交代しながら同じ順番で踏め",
+      "melodyDarkLine": "タイルが暗くなる前に順番を覚えろ。仲間と交代しながら同じ順番で踏め",
+      "answerTitle": "楽譜に答えろ！",
+      "answerLine": "交代して踏め。{place}の印がある月のタイルに踏み入れ。鳴らした数：{total}枚中{done}枚",
+      "answerDarkLine": "交代しながら覚えた順番どおりに踏め。同じタイルを踏み直すには、一度降りること。鳴らした数：{total}枚中{done}枚",
+      "spentTitle": "次は別の人が答える番",
+      "spentLine": "別のプレイヤーが次の正しい音を鳴らすまで、タイルを鳴らせない。鳴らした数：{total}枚中{done}枚",
+      "stepOffTitle": "一度降りて、踏み直せ",
+      "stepOffLine": "月のタイルは誰かが踏み入った時にだけ鳴る。このタイルから降りて、もう一度踏み入れ",
+      "falseTitle": "外れた音！",
+      "falseLine": "そのタイルは順番が違う。答えは最初のタイルからやり直しになる",
+      "brokenTitle": "セルセの声が砕けた！",
+      "brokenLine": "効果が終わるまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め",
+      "timeAria": "残り{seconds}秒"
+    },
     "wildheartAlert": {
       "preyTitle": "お前が獲物だ！",
       "preyLine": "ズルガーが狙っている：光る太陽紋を通らせろ",
@@ -6652,7 +6685,27 @@ export const ja_JP: EnTranslations = {
       "pollinatedLine": "種に近づくな：触れると芽吹く",
       "bondTitle": "群れの絆",
       "bondLine": "並んでいると被ダメージ半減：引き離せ",
-      "timeAria": "残り{seconds}秒"
+      "timeAria": "残り{seconds}秒",
+      "preyAloneLine": "太陽紋を灯せる仲間がいない。消えた太陽紋の上に{seconds}秒立って灯し、ズルガーにそこを通らせろ",
+      "pinnedTitle": "釘付けにされた！",
+      "pinnedLine": "仲間に狩りの槍を引き抜いてもらえ。釘付けの間はワイルドハートの脈動のダメージが増える",
+      "pinnedSelfLine": "助けに来られる仲間がいない：ワイルドハートの脈動が来る前に自分で狩りの槍を引き抜け",
+      "sunstruckTitle": "ズルガーが太陽に焼かれた！",
+      "sunstruckLine": "効果が終わるまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め",
+      "spearTitle": "仲間が釘付けにされた！",
+      "spearLine": "狩りの槍まで走り、ワイルドハートの脈動が来る前に引き抜け",
+      "glyphTitle": "太陽紋を灯せ",
+      "glyphLine": "消えた太陽紋の上に{seconds}秒立つと灯る。ズルガーがそこを通ると、{duration}秒間受けるダメージが{pct}%増加する",
+      "glyphLightingTitle": "太陽紋を灯している",
+      "glyphLightingLine": "灯るまで太陽紋の上にとどまれ。離れるとやり直しになる",
+      "breathTitle": "偶像の息吹！",
+      "breathLine": "石のジャガーがテラスのこちら側に息を吐こうとしている。反対側へ渡れ",
+      "saurianStompTitle": "大地を揺るがす踏みつけ！",
+      "saurianStompLine": "グレート・サウリアンが踏みつける前に輪の外へ走れ",
+      "sapTotemTitle": "樹液トーテム！",
+      "sapTotemLine": "陽骨の樹液トーテムは、破壊されるまで{seconds}秒ごとにグレート・サウリアンを回復する。立っているトーテム：{count}",
+      "drumTitle": "太鼓が踏みつけを速める",
+      "drumLine": "太鼓が鳴っている間、大地を揺るがす踏みつけは2倍の頻度で来る。陽骨の樹液トーテムを破壊すると太鼓が{seconds}秒間止まる"
     },
     "sanctumAlert": {
       "quenchTitle": "焼き入れの水の中だ！",
@@ -6697,7 +6750,18 @@ export const ja_JP: EnTranslations = {
       "rimeTitle": "忍び寄る霧氷！",
       "rimeLine": "忍び寄る霧氷 {stacks}/{max}：幼竜のブレスから出ろ",
       "slabTitle": "氷塊",
-      "slabLine": "堅い氷：視線を遮る。その陰に隠れて術者の呪文を避けろ"
+      "slabLine": "堅い氷：視線を遮る。その陰に隠れて術者の呪文を避けろ",
+      "trampleTitle": "踏みつぶし！",
+      "trampleLeadLine": "突進を氷の露頭へ誘い込み、それから横へよけろ",
+      "trampleLine": "巨牙獣が突進する前に、描かれた線から横へ出ろ",
+      "soulfireTitle": "魂火！",
+      "soulfireLine": "燃える魂火の上に立っている。そこから出ろ",
+      "stuckTitle": "巨牙獣が氷に刺さった！",
+      "stuckLine": "抜け出すまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め",
+      "trampleBaitTitle": "氷へ突進する",
+      "trampleBaitLine": "この踏みつぶしは氷の露頭に突き当たる。線に入らず、攻撃の準備をしろ",
+      "baitHintTitle": "踏みつぶしを誘え",
+      "baitHintLine": "最も遠いプレイヤーへ突進する。氷の露頭の後ろに立って突進をぶつけさせろ：巨牙獣は{seconds}秒間動けなくなり、受けるダメージが{pct}%増加する"
     },
     "cryptAlert": {
       "measuredTitle": "墓の採寸！",
@@ -6741,6 +6805,13 @@ export const ja_JP: EnTranslations = {
       "relightFar": "{range}ヤード以内に近づいて灯し直せ",
       "relightAria": "{name}を灯し直す",
       "relightUsingLine": "吸い取られる間も動くな：攻撃では中断されないが、動くかスタンで中断される",
+      "freeLine": "槍を地面から引き抜き、釘付けにされた者を解放する。攻撃を受けても中断されないが、移動やスタンでは中断される",
+      "freeKey": "{name}を引き抜く",
+      "freeTap": "ここをタップして{name}を引き抜く",
+      "freeClick": "ここをクリックして{name}を引き抜く",
+      "freeFar": "{range}ヤード以内に近づいて引き抜け",
+      "freeAria": "{name}を引き抜く",
+      "freeUsingLine": "槍を引き抜くまで動くな：移動やスタンで中断される",
       "timeAria": "残り{seconds}秒"
     },
     "cosmetics": {
@@ -14952,6 +15023,8 @@ export const ja_JP: EnTranslations = {
       "temple_moonwater_bolt": "月水の矢",
       "temple_drowning_aria": "溺れのアリア",
       "temple_mere_surge": "湖の大波",
+      "temple_score": "楽譜",
+      "temple_score_answer": "楽譜に答えろ",
       "temple_tideglass_fracture": "潮硝子の亀裂",
       "temple_undertow": "引き潮",
       "temple_lunar_tide": "月の潮",
@@ -14977,6 +15050,7 @@ export const ja_JP: EnTranslations = {
       "wildheart_entangling_lash": "絡みつく鞭",
       "wildheart_saurian_tail_swipe": "尾の薙ぎ払い",
       "wildheart_saurian_stomp": "大地を揺るがす踏みつけ",
+      "wildheart_saurian_sap_tether": "祖霊の樹液",
       "wildheart_quarry_mark": "獲物の印",
       "wildheart_war_roar": "戦の咆哮",
       "wildheart_toad_hex": "ヒキガエルの呪い",
@@ -14989,6 +15063,12 @@ export const ja_JP: EnTranslations = {
       "wildheart_gorgebloom_gorge": "貪り食い",
       "wildheart_zulgar_pulse": "ワイルドハートの脈動",
       "wildheart_zulgar_spirit_hunt": "狩りの魂",
+      "wildheart_zulgar_hunting_spear": "狩りの槍",
+      "wildheart_zulgar_idol_wakes": "偶像の目覚め",
+      "kituse_wildheart_pull_spear": "槍を引き抜く",
+      "wildheart_idols_breath": "偶像の息吹",
+      "wildheart_sun_glyph_kindle": "点灯中",
+      "wildheart_sun_glyph_cold": "冷却中",
       "sanctum_cinder_breath": "残り火のブレス",
       "sanctum_warming_rite": "温めの儀式",
       "sanctum_goad": "駆り立て",
@@ -14996,6 +15076,8 @@ export const ja_JP: EnTranslations = {
       "sanctum_ice_block_toss": "氷塊投げ",
       "sanctum_tusker_tusk_sweep": "牙薙ぎ",
       "sanctum_tusker_trample": "踏みつぶし",
+      "sanctum_soulfire_trail_burn": "燃焼中",
+      "sanctum_ice_outcrop_held": "牙が刺さっている",
       "sanctum_thaw_the_held": "Thaw the Held",
       "sanctum_counterweight_lash": "重り尾の鞭打ち",
       "sanctum_branding_iron": "焼き印",
@@ -24773,6 +24855,9 @@ export const ja_JP: EnTranslations = {
       "howdah_hexcaller": {
         "name": "輿の呪術師"
       },
+      "sunbone_sap_totem": {
+        "name": "陽骨の樹液トーテム"
+      },
       "fanglord_jaguar": {
         "name": "牙王の大ジャガー"
       },
@@ -24820,6 +24905,9 @@ export const ja_JP: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "茨の芽"
+      },
+      "wildheart_hunting_spear": {
+        "name": "狩りの槍"
       },
       "buddy_ember_fox": {
         "name": "燃えさし狐"

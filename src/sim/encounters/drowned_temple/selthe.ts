@@ -1,6 +1,6 @@
 // Choirmother Selthe in the Choir Court (docs/design/dungeon-rework/
-// drowned_temple.md, "Boss 1"): stack for Chorus, spread for Solo (G16 marks).
-// The caster pass: she never leaves her pool and never swings her hands; she
+// drowned_temple.md, "Boss 1"): stack for Chorus, spread for Solo (G16 marks),
+// answer the Score. She never leaves her pool and never swings her hands; she
 // fights with water (the numbers and their math: ids.ts SELTHE_TUNING).
 //
 //   Chorus          every 25 s (first at 10 s) one player is marked for 5 s;
@@ -10,24 +10,33 @@
 //   Solo            every 25 s, 12 s after each Chorus, one player is marked
 //                   for 5 s; on expiry 150 frost hits the mark AND everyone
 //                   within 8 yd.
-//   Sea-Song        every 10 s a 1.5 s bar, then 35 to 45 frost to the whole
-//                   court.
-//   Moonwater Bolt  her filler between bars: a 2 s bar on her foe (the tank),
-//                   one weapon roll x 0.8 of frost. Kickable.
+//   Moonwater Bolt  her quiet filler: no bar. While she sings nothing else
+//                   she throws a bolt at her foe (the tank) every 2.5 s, one
+//                   weapon roll x 0.8 of frost.
 //   Drowning Aria   every 22 s (first at 16 s) a 5 s sung beam on one player
 //                   who is not the tank: a pulse a second, each 10 harder than
 //                   the last on the same body. Kick it, break her sight of the
 //                   target, or step into it (the first body on the beam's line
-//                   catches the pulse, and the climb starts over).
+//                   catches the pulse, and the climb starts over). The ONE bar
+//                   of hers the group decides to kick.
 //   Mere Surge      every 18 s (first at 12 s) a 3 s bar facing one player,
 //                   then a wave crashes through a 60 degree wedge to 30 yd:
 //                   110 to 130 frost and an 8 yd shove. Step out sideways.
-//   Kicks           a cut bolt or aria silences her bolts and arias for 3 s.
+//   The Score       at 60 and 30 percent (selthe_score.ts): she stops, sings a
+//                   melody on the moon tiles, and the group steps on them in
+//                   that order. Answered: her voice breaks (a stun, then more
+//                   damage taken). Not answered: Discord over the whole court.
+//   Kicks           a cut aria silences her bolts and arias for 3 s.
 //   Heroic          Duet: Chorus and Solo land together on two players. Echo:
-//                   each mark resolves again at the same spot 4 s later.
+//                   each mark resolves again at the same spot 4 s later. The
+//                   Score's tiles go dark for the answer.
 //
-// Zero rng in every pick (the marks' and the aria's victims and the surge's
-// aim are hashed); the only draws are the damage rolls.
+// The Score pass retired the Sea-Song (35 to 45 frost to the court every 10 s
+// behind a 1.5 s bar): a bar and a hit nobody could answer, which taught the
+// group to stop reading her bar. Its damage pays for the Score's mistakes.
+//
+// Zero rng in every pick (the marks' and the aria's victims, the surge's aim
+// and the Score's melody are hashed); the only draws are the damage rolls.
 
 import { isLockedOut } from '../../combat/cc';
 import { applyKnockback } from '../../knockback';
@@ -50,18 +59,19 @@ import {
   chorusShare,
   SELTHE_ARIA_BROKEN,
   SELTHE_ARIA_PULSE,
+  SELTHE_BOLT_GATHER,
   SELTHE_CHORUS_BURST,
   SELTHE_CHORUS_MARK,
   SELTHE_DROWNING_ARIA,
   SELTHE_ECHO_BURST,
   SELTHE_MERE_SURGE,
   SELTHE_MOONWATER_BOLT,
-  SELTHE_SEA_SONG,
   SELTHE_SOLO_BURST,
   SELTHE_SOLO_MARK,
   SELTHE_TUNING,
   SOLO_ECHO_TEMPLATE,
 } from './ids';
+import { raiseMoonTiles, resetScore, stepScore } from './selthe_score';
 
 const T = SELTHE_TUNING;
 export const SELTHE_DEED = 'dgn_selthe_pitch';
@@ -72,10 +82,10 @@ function freshState(heroic: boolean): SeltheFightState {
     chorusTimer: T.chorusFirst,
     // Heroic Duet: the Solo lands with the Chorus.
     soloTimer: heroic ? T.chorusFirst : T.chorusFirst + T.soloOffset,
-    songTimer: T.songFirst,
     surgeTimer: T.surgeFirst,
     ariaTimer: T.ariaFirst,
-    boltGap: 0,
+    boltTimer: T.boltEvery,
+    boltCued: false,
     quiet: 0,
     kickable: null,
     surgeYaw: null,
@@ -85,16 +95,15 @@ function freshState(heroic: boolean): SeltheFightState {
     echoes: [],
     casts: 0,
     flubbed: false,
+    tiles: [],
+    scores: 0,
+    scoreQueued: false,
+    score: null,
   };
 }
 
-/** Her own bars (her bolts and arias can be kicked; the rest cannot). */
-const SELTHE_CASTS: readonly string[] = [
-  SELTHE_SEA_SONG,
-  SELTHE_MOONWATER_BOLT,
-  SELTHE_DROWNING_ARIA,
-  SELTHE_MERE_SURGE,
-];
+/** Her own bars outside the Score (the aria can be kicked; the surge cannot). */
+const SELTHE_CASTS: readonly string[] = [SELTHE_DROWNING_ARIA, SELTHE_MERE_SURGE];
 
 /** Players in the court (the arena and a margin round its rim). */
 function courtPlayers(ctx: SimContext, inst: InstanceSlot): Entity[] {
@@ -268,8 +277,9 @@ function stepMarks(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: Selthe
   }
 }
 
-/** Is she free to sing a kickable bar (no kick's hush, no school lockout)? */
-function canSingKickable(boss: Entity, st: SeltheFightState): boolean {
+/** Is her voice free for a bolt or an aria (no kick's hush, no school
+ *  lockout)? */
+function voiceFree(boss: Entity, st: SeltheFightState): boolean {
   return st.quiet <= 0 && !isLockedOut(boss, 'frost');
 }
 
@@ -306,14 +316,9 @@ export function ariaCatcher<P extends { id: number; pos: Vec3; dead: boolean }>(
   return best;
 }
 
-/** A Moonwater Bolt at her foe (the tank), or, when her foe is out of her
- *  sight or reach, at the nearest court player she can see. */
-export function startBolt(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  boss: Entity,
-  st: SeltheFightState,
-): boolean {
+/** Whom a Moonwater Bolt flies at: her foe (the tank), or, when her foe is
+ *  out of her sight or reach, the nearest court player she can see. */
+export function boltTarget(ctx: SimContext, inst: InstanceSlot, boss: Entity): Entity | null {
   const seen = (p: Entity) =>
     !p.dead && dist2d(p.pos, boss.pos) <= T.boltRange && ctx.hasLineOfSight(boss, p);
   const foe = boss.aggroTargetId !== null ? ctx.entities.get(boss.aggroTargetId) : undefined;
@@ -329,16 +334,14 @@ export function startBolt(
       }
     }
   }
-  if (!target) return false;
-  startCast(boss, SELTHE_MOONWATER_BOLT, T.boltCast, target.id);
-  st.kickable = SELTHE_MOONWATER_BOLT;
-  return true;
+  return target;
 }
 
-function landBolt(ctx: SimContext, boss: Entity, targetId: number | null): void {
-  const target = targetId !== null ? ctx.entities.get(targetId) : undefined;
-  if (!target || target.dead) return;
-  if (dist2d(target.pos, boss.pos) > T.boltRange || !ctx.hasLineOfSight(boss, target)) return;
+/** She throws her bolt: one weapon roll of frost on whoever it flies at. */
+function throwBolt(ctx: SimContext, inst: InstanceSlot, boss: Entity): boolean {
+  const target = boltTarget(ctx, inst, boss);
+  if (!target) return false;
+  boss.facing = angleTo(boss.pos, target.pos);
   ctx.emit({
     type: 'spellfx',
     sourceId: boss.id,
@@ -351,6 +354,38 @@ function landBolt(ctx: SimContext, boss: Entity, targetId: number | null): void 
   const roll = ctx.rng.range(boss.weapon.min, boss.weapon.max);
   const amount = Math.max(1, Math.round(roll * T.boltWeaponShare));
   ctx.dealDamage(boss, target, amount, false, 'frost', 'Moonwater Bolt', 'hit', true);
+  return true;
+}
+
+/** Her quiet filler, on its own clock (it runs only while she sings no bar):
+ *  a gather cue, then the bolt. No bar: nothing here is kicked. */
+function stepBolt(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: SeltheFightState): void {
+  st.boltTimer -= DT;
+  if (!st.boltCued && st.boltTimer <= T.boltWindup + 1e-6) {
+    const target = boltTarget(ctx, inst, boss);
+    if (target) {
+      st.boltCued = true;
+      boss.facing = angleTo(boss.pos, target.pos);
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: boss.id,
+        targetId: target.id,
+        school: 'frost',
+        fx: 'windup',
+        ability: SELTHE_BOLT_GATHER,
+      });
+    }
+  }
+  if (st.boltTimer > 1e-6) return;
+  st.boltTimer = T.boltEvery;
+  st.boltCued = false;
+  throwBolt(ctx, inst, boss);
+}
+
+/** Make her next bolt come now (the dev trigger): the gather, then the throw. */
+export function hurryBolt(st: SeltheFightState): void {
+  st.boltTimer = T.boltWindup;
+  st.boltCued = false;
 }
 
 /** A Drowning Aria on one court player who is not the tank, in her sight. */
@@ -482,92 +517,69 @@ function landSurge(ctx: SimContext, inst: InstanceSlot, boss: Entity, yaw: numbe
   }
 }
 
-function landSong(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
-  ctx.emit({
-    type: 'spellfx',
-    sourceId: boss.id,
-    targetId: boss.id,
-    school: 'frost',
-    fx: 'nova',
-    ability: SELTHE_SEA_SONG,
-  });
-  for (const p of courtPlayers(ctx, inst)) {
-    if (p.dead) continue;
-    ctx.dealDamage(
-      boss,
-      p,
-      mechanicDamage(ctx, boss, T.songMin, T.songMax),
-      false,
-      'frost',
-      'Sea-Song',
-      'hit',
-      true,
-    );
-  }
+/** A kickable bar that is gone before she finished it was cut (a kick): the
+ *  aria breaks, and she throws no bolt and sings no aria for a moment. The
+ *  contract: between two passes of this tick only a player interrupt clears
+ *  her bar (she is CC-immune, mobs take no spell pushback, an evade or a death
+ *  resets the fight first, and the dev triggers clear `kickable` with the
+ *  bar), so a new path that cancels her cast must clear `kickable` too. */
+function settleKick(ctx: SimContext, boss: Entity, st: SeltheFightState): void {
+  if (st.kickable === null || boss.castingAbility === st.kickable) return;
+  if (st.kickable === SELTHE_DROWNING_ARIA) endAria(ctx, boss, st, true);
+  st.kickable = null;
+  st.quiet = T.kickQuiet;
 }
 
-const PLAIN_BARS: readonly string[] = [SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, SELTHE_MERE_SURGE];
-
-function stepCasts(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: SeltheFightState): void {
-  // A kickable bar that is gone before she finished it was cut (a kick): an
-  // aria breaks, and she sings no bolt or aria for a moment. The contract:
-  // between two passes of this tick only a player interrupt clears her bar
-  // (she is CC-immune, mobs take no spell pushback, an evade or a death resets
-  // the fight first, and the dev triggers clear `kickable` with the bar), so a
-  // new path that cancels her cast must clear `kickable` too.
-  if (st.kickable !== null && boss.castingAbility !== st.kickable) {
-    if (st.kickable === SELTHE_DROWNING_ARIA) endAria(ctx, boss, st, true);
-    st.kickable = null;
-    st.quiet = T.kickQuiet;
-  }
+/** Her bars and her bolt. `held`: a Score is owed, so she starts no new bar
+ *  (a bar already in flight ends first, and her bolts go on meanwhile). */
+function stepCasts(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  boss: Entity,
+  st: SeltheFightState,
+  held: boolean,
+): void {
   st.quiet = Math.max(0, st.quiet - DT);
   // Her timers run under any bar; a mechanic that comes due mid-bar waits for
-  // the bar to end (at most a bolt's 2 s) and goes first.
-  st.songTimer -= DT;
-  st.surgeTimer -= DT;
-  st.ariaTimer -= DT;
+  // the bar to end and goes first.
+  if (!held) {
+    st.surgeTimer -= DT;
+    st.ariaTimer -= DT;
+  }
   const casting = boss.castingAbility;
   if (casting === SELTHE_DROWNING_ARIA) {
     stepAria(ctx, inst, boss, st);
-    if (boss.castingAbility === null) st.boltGap = T.boltGap;
+    if (boss.castingAbility === null) restBolt(st);
     return;
   }
-  if (casting !== null && PLAIN_BARS.includes(casting)) {
-    if (casting === SELTHE_MERE_SURGE && st.surgeYaw !== null) boss.facing = st.surgeYaw;
-    if (casting === SELTHE_MOONWATER_BOLT && boss.castTargetId !== null) {
-      const t = ctx.entities.get(boss.castTargetId);
-      if (t) boss.facing = angleTo(boss.pos, t.pos);
-    }
+  if (casting === SELTHE_MERE_SURGE) {
+    if (st.surgeYaw !== null) boss.facing = st.surgeYaw;
     boss.castRemaining = Math.max(0, boss.castRemaining - DT);
     if (boss.castRemaining > 0) return;
-    const targetId = boss.castTargetId;
     clearCastOf(boss, casting);
-    st.boltGap = T.boltGap;
-    if (casting === SELTHE_MOONWATER_BOLT) {
-      st.kickable = null;
-      landBolt(ctx, boss, targetId);
-    } else if (casting === SELTHE_MERE_SURGE) {
-      landSurge(ctx, inst, boss, st.surgeYaw ?? boss.facing);
-      st.surgeYaw = null;
-    } else landSong(ctx, inst, boss);
+    restBolt(st);
+    landSurge(ctx, inst, boss, st.surgeYaw ?? boss.facing);
+    st.surgeYaw = null;
     return;
   }
   if (ctx.isStunned(boss) || casting !== null) return;
-  if (st.surgeTimer <= 0) {
+  if (!held && st.surgeTimer <= 0) {
     st.surgeTimer = T.surgeEvery;
     if (startSurge(ctx, inst, boss, st)) return;
   }
-  if (st.ariaTimer <= 0 && canSingKickable(boss, st)) {
+  if (!held && st.ariaTimer <= 0 && voiceFree(boss, st)) {
     st.ariaTimer = T.ariaEvery;
     if (startAria(ctx, inst, boss, st)) return;
   }
-  if (st.songTimer <= 0) {
-    st.songTimer = T.songEvery;
-    startCast(boss, SELTHE_SEA_SONG, T.songCast, null);
-    return;
-  }
-  st.boltGap -= DT;
-  if (st.boltGap <= 0 && canSingKickable(boss, st)) startBolt(ctx, inst, boss, st);
+  if (voiceFree(boss, st)) stepBolt(ctx, inst, boss, st);
+  else restBolt(st);
+}
+
+/** A bar just ended (or her voice is hushed): the bolt's clock holds where it
+ *  stood, but a gather cut short starts over. */
+function restBolt(st: SeltheFightState): void {
+  st.boltCued = false;
+  st.boltTimer = Math.max(st.boltTimer, T.boltWindup);
 }
 
 /** She never swings her hands: hold her melee swing off every tick (the mob
@@ -577,17 +589,35 @@ function holdHands(boss: Entity): void {
   boss.autoAttack = false;
 }
 
-/** The fight ended: the marks fade and the echoes still ringing fall silent. */
+/** Her marks in flight fade off their players (the fight ended, or a dev
+ *  trigger clears the court for a Score). */
+export function clearMarks(ctx: SimContext, st: SeltheFightState): void {
+  for (const m of st.marks) {
+    const p = ctx.entities.get(m.playerId);
+    if (p)
+      p.auras = p.auras.filter((a) => a.id !== SELTHE_CHORUS_MARK && a.id !== SELTHE_SOLO_MARK);
+  }
+  st.marks = [];
+}
+
+/** Cut whatever bar of hers is running, not as a kick (no hush): a dev
+ *  trigger's clean slate. */
+export function cutBar(boss: Entity, st: SeltheFightState): void {
+  for (const id of SELTHE_CASTS) clearCastOf(boss, id);
+  st.aria = null;
+  st.kickable = null;
+  st.surgeYaw = null;
+}
+
+/** The fight ended: the marks fade, the echoes still ringing fall silent, the
+ *  Score stops and the moon tiles sink away. */
 export function resetSelthe(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   const st = boss.templeFight?.kind === 'selthe' ? boss.templeFight : null;
   if (st) {
-    for (const m of st.marks) {
-      const p = ctx.entities.get(m.playerId);
-      if (p)
-        p.auras = p.auras.filter((a) => a.id !== SELTHE_CHORUS_MARK && a.id !== SELTHE_SOLO_MARK);
-    }
+    clearMarks(ctx, st);
     for (const e of st.echoes) dropEncounterObject(ctx, inst, e.objectId);
   }
+  resetScore(ctx, inst, boss, st);
   for (const id of SELTHE_CASTS) clearCastOf(boss, id);
   boss.templeFight = undefined;
 }
@@ -615,17 +645,27 @@ export function tickSelthe(
   if (!st) {
     st = freshState(inst.difficulty === 'heroic');
     boss.templeFight = st;
+    raiseMoonTiles(ctx, inst, boss, st);
   }
+  // Marks already in flight fall and echoes ring out whatever she is doing.
   stepMarks(ctx, inst, boss, st);
-  st.chorusTimer -= DT;
-  st.soloTimer -= DT;
-  if (st.chorusTimer <= 0) {
-    st.chorusTimer = T.chorusEvery;
-    startChorus(ctx, inst, boss, st);
+  settleKick(ctx, boss, st);
+  // The Score (or the stun of her broken voice) owns her: every other clock
+  // of hers stands still until it is over.
+  if (stepScore(ctx, inst, boss, st)) return;
+  // A Score is owed: she starts no new mark or bar while the last ones end.
+  const held = st.scoreQueued;
+  if (!held) {
+    st.chorusTimer -= DT;
+    st.soloTimer -= DT;
+    if (st.chorusTimer <= 0) {
+      st.chorusTimer = T.chorusEvery;
+      startChorus(ctx, inst, boss, st);
+    }
+    if (st.soloTimer <= 0) {
+      st.soloTimer = T.chorusEvery;
+      startSolo(ctx, inst, boss, st);
+    }
   }
-  if (st.soloTimer <= 0) {
-    st.soloTimer = T.chorusEvery;
-    startSolo(ctx, inst, boss, st);
-  }
-  stepCasts(ctx, inst, boss, st);
+  stepCasts(ctx, inst, boss, st, held);
 }

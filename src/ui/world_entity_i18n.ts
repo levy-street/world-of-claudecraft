@@ -385,6 +385,8 @@ const MOB_IDS = [
   'vine_lasher',
   'great_saurian',
   'howdah_hexcaller',
+  // The totem the howdah's rider throws (encounters/wildheart_basin/saurian_totems.ts).
+  'sunbone_sap_totem',
   'fanglord_jaguar',
   'the_gorgebloom',
   'wildheart_high_priest',
@@ -404,6 +406,9 @@ const MOB_IDS = [
   'sanctum_shackle_bellows',
   // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
   'thorn_sprout',
+  // Zulgar's Hunting Spear: the usable body a teammate pulls out
+  // (encounters/wildheart_basin/zulgar_spear.ts).
+  'wildheart_hunting_spear',
   // Cosmetic buddy followers (src/sim/content/buddy_mobs.ts). Their nameplate
   // is off by default (the dedicated "Show Pet Names" option), but the
   // canonical-fallback name still has to resolve in every locale the moment

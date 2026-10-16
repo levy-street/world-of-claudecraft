@@ -4,7 +4,7 @@
 //    Static Coil ring, a kick glyph under a Lullaby or a Call the Tide; the
 //    Hydra's Tide Breath cones, the Colossus's Moonlight Lance lane and
 //    Resonant Slam ring, Ysolei's Lunar Tide ring and the Undertow's crash
-//    ring, a glyph under Selthe's Sea-Song;
+//    ring, the Mere Surge's wedge and a kick glyph under Selthe's aria;
 //  - Selthe's marks round their players: a GOLD ring that gathers (Chorus:
 //    stack in it) and a COLD BLUE ring that scatters (Solo: take it away);
 //  - the encounter objects' circles: the Brine Spit pools and the heroic
@@ -13,8 +13,9 @@
 //    shimmer on the half about to flood;
 //  - a thread of moonlight from every Tideglass Reflection to the player it
 //    mirrors, and the Mere Hydra's one body (temple_hydra.ts);
-//  - Selthe's water magic (temple_selthe_fx.ts) and the Colossus's prism
-//    slices, the Tideglass Fracture (temple_fracture_fx.ts);
+//  - Selthe's water magic (temple_selthe_fx.ts), her Score on the moon tiles
+//    (temple_score_fx.ts) and the Colossus's prism slices, the Tideglass
+//    Fracture (temple_fracture_fx.ts);
 //  - the encounter pass: the Hydra's Combined Breath, its Ice Wall, currents
 //    and crystals (temple_hydra_combo_fx.ts), Ysolei's moon, its tears and
 //    her Plenilune Ward (temple_moon_fx.ts), the Moonmantle Ray
@@ -72,6 +73,7 @@ import { TempleLureFx } from './temple_lure_fx';
 import { TempleMantaFx } from './temple_manta_fx';
 import { TempleMoonFx } from './temple_moon_fx';
 import { TempleMoonbridgeFx } from './temple_moonbridge_fx';
+import { TempleScoreFx } from './temple_score_fx';
 import { TempleSeltheFx } from './temple_selthe_fx';
 import { TempleTrashFx } from './temple_trash_fx';
 import { TempleYsoleiFx } from './temple_ysolei_fx';
@@ -132,6 +134,7 @@ export class TempleFx {
   // Laverock's finale: the fallen rising as moonlight while he sings.
   private readonly cantor: TempleCantorFinaleFx;
   private readonly selthe: TempleSeltheFx;
+  private readonly score: TempleScoreFx;
   private readonly fracture: TempleFractureFx;
   // The encounter pass: the Combined Breath, Ysolei's moon, the Moonmantle
   // Ray and the Moonbridge forming.
@@ -201,6 +204,15 @@ export class TempleFx {
     this.cantor = new TempleCantorFinaleFx(this.root, world, this.flashesOn);
     const calm = reducedMotion ?? (() => false);
     this.selthe = new TempleSeltheFx(this.root, world, groundY, this.flashesOn, shake, calm);
+    this.score = new TempleScoreFx(
+      this.root,
+      world,
+      groundY,
+      this.flashesOn,
+      shake,
+      calm,
+      playGesture,
+    );
     this.fracture = new TempleFractureFx(this.root, world, groundY, this.flashesOn, shake, calm);
     const kit = this.kit;
     const on = this.flashesOn;
@@ -214,6 +226,7 @@ export class TempleFx {
       .then(() => {
         // Linked: the caster and fracture layers may sleep while idle now.
         this.selthe.markGated();
+        this.score.markGated();
         this.fracture.markGated();
         this.combo.markGated();
         this.moon.markGated();
@@ -231,7 +244,8 @@ export class TempleFx {
     this.hydra.handleEvent(ev);
     this.ysolei.handleEvent(ev);
     this.cantor.handleEvent(ev);
-    if (this.selthe.handleEvent(ev) || this.fracture.handleEvent(ev)) return true;
+    if (this.selthe.handleEvent(ev) || this.score.handleEvent(ev)) return true;
+    if (this.fracture.handleEvent(ev)) return true;
     if (this.combo.handleEvent(ev) || this.moon.handleEvent(ev)) return true;
     if (this.manta.handleEvent(ev) || this.bridge.handleEvent(ev)) return true;
     if (this.trash.handleEvent(ev) || this.lure.handleEvent(ev)) return true;
@@ -265,6 +279,7 @@ export class TempleFx {
     this.ysolei.update(dt, this.clock);
     this.cantor.update(dt, this.clock);
     this.selthe.update(dt, this.clock);
+    this.score.update(dt, this.clock);
     this.fracture.update(dt, this.clock);
     this.combo.update(dt, this.clock);
     this.moon.update(dt, this.clock);
@@ -584,6 +599,7 @@ export class TempleFx {
     this.ysolei.dispose();
     this.cantor.dispose();
     this.selthe.dispose();
+    this.score.dispose();
     this.fracture.dispose();
     this.combo.dispose();
     this.moon.dispose();

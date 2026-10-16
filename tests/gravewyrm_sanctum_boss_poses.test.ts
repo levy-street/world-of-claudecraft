@@ -51,7 +51,7 @@ import {
   VELKHAR_SHADOW_VOLLEY,
   VELKHAR_SOULFIRE_TRENCH,
 } from '../src/sim/encounters/gravewyrm_sanctum/boss_ids';
-import { SLEDGE_TUSKER_ID } from '../src/sim/encounters/gravewyrm_sanctum/ids';
+import { SLEDGE_TUSKER_ID, TUSKER_TUNING } from '../src/sim/encounters/gravewyrm_sanctum/ids';
 import { clipLength, posedNodes } from './helpers/posed_glb';
 
 const glb = (url: string) => `public/${url}`;
@@ -177,9 +177,13 @@ describe('the Sledge Tusker strikes with its weight behind it', () => {
     expect(await clipLength(glb(TUSKER_MODEL.url), 'Attack')).toBeCloseTo(1.5, 2);
   });
 
-  it('plays the sweep and the trample warning at 1x, each on its bar end', () => {
+  it('plays the sweep at 1x and the trample warning across its whole bar, each on its bar end', () => {
     expect(sweepClipRate()).toBeCloseTo(1, 6);
-    expect(trampleClipRate()).toBeCloseTo(1, 6);
+    // The Trample's bar grew to 3 s so its lane can follow its target (the
+    // readability pass): the 2 s warning stretches over it at two thirds,
+    // the head still levelled on the bar's end.
+    expect(trampleClipRate() * TUSKER_TUNING.trampleCast).toBeCloseTo(TUSKER_CLIP.levelled, 9);
+    expect(trampleClipRate()).toBeGreaterThan(0.6);
     // The charge runs one stride cycle down the lane's 0.8 s.
     expect(chargeClipRate()).toBeCloseTo(TUSKER_CLIP.charge / 0.8, 6);
   });

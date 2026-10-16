@@ -34,6 +34,9 @@ import {
   SELTHE_DROWNING_ARIA,
   SELTHE_MERE_SURGE,
   SELTHE_MOONWATER_BOLT,
+  SELTHE_SCORE,
+  SELTHE_SCORE_ANSWER,
+  SELTHE_SEA_SONG,
   SELTHE_TUNING,
 } from '../src/sim/encounters/drowned_temple';
 import {
@@ -117,17 +120,19 @@ describe('the telegraphs', () => {
 });
 
 describe('the caster pass: Selthe’s marks and the Tideglass Fracture’s slices', () => {
-  it('paints the Mere Surge wedge with the sim’s own reach and arc, and a kick glyph under her bolt and aria', () => {
+  it('paints the Mere Surge wedge with the sim’s own reach and arc, and a kick glyph under her aria alone', () => {
     const specs = templeTelegraphSpecs();
     const surge = specs[SELTHE_MERE_SURGE];
     expect(surge?.shape).toBe('cone');
     expect(surge?.range).toBe(SELTHE_TUNING.surgeRange);
     expect(surge?.arcDeg).toBe(SELTHE_TUNING.surgeArcDeg);
     expect(surge?.color).toBe(TELEGRAPH_THREAT_COLORS.danger);
-    for (const id of [SELTHE_MOONWATER_BOLT, SELTHE_DROWNING_ARIA]) {
-      expect(specs[id]?.shape, id).toBe('sigil');
-      expect(specs[id]?.color, id).toBe(TELEGRAPH_THREAT_COLORS.interrupt);
-    }
+    expect(specs[SELTHE_DROWNING_ARIA]?.shape).toBe('sigil');
+    expect(specs[SELTHE_DROWNING_ARIA]?.color).toBe(TELEGRAPH_THREAT_COLORS.interrupt);
+    // Her bolt has no bar (nothing to kick), the Sea-Song is retired, and her
+    // Score draws itself on the moon tiles: none is a caster telegraph.
+    for (const id of [SELTHE_MOONWATER_BOLT, SELTHE_SEA_SONG, SELTHE_SCORE, SELTHE_SCORE_ANSWER])
+      expect(specs[id], id).toBeUndefined();
     // The fracture's slices are objects, never a caster telegraph.
     expect(specs[COLOSSUS_TIDEGLASS_FRACTURE]).toBeUndefined();
   });

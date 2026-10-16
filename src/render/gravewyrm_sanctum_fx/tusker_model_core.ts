@@ -165,7 +165,8 @@ export function sweepClipRate(): number {
   return barLockedRate(TUSKER_CLIP.sweepCross, TUSKER_TUNING.sweepCast);
 }
 
-/** The Trample warning's rate: the head is levelled on the 2 s bar's end. */
+/** The Trample warning's rate: the 2 s clip stretched over the 3 s bar (the
+ *  lane follows its target through it), the head levelled on its end. */
 export function trampleClipRate(): number {
   return barLockedRate(TUSKER_CLIP.levelled, TUSKER_TUNING.trampleCast);
 }
@@ -372,14 +373,16 @@ export function trailSledge(
   return pose;
 }
 
-/** The sledge's state: hauled behind the beast, left where it was unhitched,
- *  or tipped over (its braziers spilled on the road). */
-export type SledgeState = 'hitched' | 'dropped' | 'tipped';
+/** The sledge's state: hauled behind the beast (through its patrol AND the
+ *  first half of its fight: it drags the braziers down every charge), or
+ *  tipped over (its traces snapped, its braziers spilled on the road). */
+export type SledgeState = 'hitched' | 'tipped';
 
-/** What the sledge does next, from the Tusker's mirrored state: unhitched on
- *  its first engaged frame, tipped by the spill (or a view that joins a fight
- *  already past half health, or its death), hitched again once a reset pull
- *  has it out of combat at full health. */
+/** What the sledge does next, from the Tusker's mirrored state: it stays on
+ *  the hook when the beast is pulled, is tipped by the spill (or a view that
+ *  joins a fight already past half health), and is hitched again once a reset
+ *  pull has it out of combat at full health. A beast killed with its sledge
+ *  still hitched (a dev kill) leaves it standing behind the body. */
 export function nextSledgeState(
   state: SledgeState,
   t: { dead: boolean; inCombat: boolean; hpShare: number },
@@ -388,11 +391,7 @@ export function nextSledgeState(
   if (!t.dead && !t.inCombat && t.hpShare >= 0.999) return 'hitched';
   if (state === 'tipped') return 'tipped';
   if (spilled) return 'tipped';
-  if (t.dead) return state === 'hitched' ? 'hitched' : 'tipped';
-  if (t.inCombat) {
-    if (t.hpShare <= TUSKER_TUNING.spillAtHpPct) return 'tipped';
-    return 'dropped';
-  }
+  if (!t.dead && t.inCombat && t.hpShare <= TUSKER_TUNING.spillAtHpPct) return 'tipped';
   return state;
 }
 

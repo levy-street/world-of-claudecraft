@@ -4180,7 +4180,20 @@ export const zh_TW: EnTranslations = {
         "pollinated": "觸碰種莢會使其立刻長出荊棘幼芽。遠離種子，讓未授粉的玩家去踩碎它們；無人觸碰的種莢會在{seconds}秒後發芽（英雄難度下它會在{heroic}秒後鑽入地下，在最近的玩家身旁破土而出）。",
         "prey": "祖爾加在追獵你。引他踏過點亮的太陽符文，使他減速{slow}%。若被他追上，你會被撕咬，受到{damage}點傷害（英雄難度{heroic}點）並被擊倒{stun}秒。",
         "avatar": "移動速度提高{pct}%，追獵牠的獵物。減速和定身可以生效，擊暈的持續時間減半。",
-        "vanished": "隱匿且免疫傷害。他即將撲向最遠的玩家。"
+        "vanished": "隱匿且免疫傷害。他即將撲向最遠的玩家。",
+        "sunstruck": "被點亮的太陽符文灼傷：移動速度降低{pct}%。",
+        "sunstruckExposed": "被點亮的太陽符文灼傷：受到的傷害提高{pct}%。",
+        "sunWary": "在此效果結束前，任何太陽符文都無法灼傷他。他踏過的已點亮符文會保持點亮。",
+        "pinned": "一支狩獵之矛把你釘在原地。你每{every}秒流血，受到{bleed}點物理傷害（英雄難度{heroicBleed}點），而且無論你站在哪裡，荒野之心脈衝都會命中你，傷害提高{pulse}%。隊友可以用{pull}秒拔出長矛。如果沒有其他人能幫忙，你可以用{wrench}秒自己拔出。{seconds}秒後它會自行鬆脫。",
+        "idolAwake": "石美洲豹已經甦醒。每{every}秒，牠會在地面預警{warning}秒後，輪流向平台的一半吐息：對該半場的所有人造成{min}到{max}點自然傷害（英雄難度{heroicMin}到{heroicMax}點）。祖爾加會保持美洲豹化身直到死亡，並且每{seconds}秒更換獵物（英雄難度{heroicSeconds}秒）。",
+        "sapped": "正在供給牠的日骨樹汁圖騰：{count}個。每個圖騰每{seconds}秒為牠恢復{pct}%的最大生命值。摧毀圖騰即可停止治療。",
+        "howdahDrum": "馱轎裡的鼓手在驅策牠：兩次撼地踐踏之間的間隔縮短{pct}%。摧毀一個日骨樹汁圖騰可讓鼓聲停止{seconds}秒。鼓會隨馱轎一同墜落。",
+        "drumSilenced": "鼓手亂了節拍：在效果結束前，撼地踐踏按正常間隔出現。"
+      },
+      "temple": {
+        "scoreWard": "正在吟唱樂譜：在結束前不會受到傷害。在樂句結束前，按石板響起的順序踏上月光石板，即可使她的嗓音破碎。輪流踩踏：奏響音符後，須等待另一名玩家奏響下一個正確音符。唯一的倖存者可以獨自完成。如果樂句先結束，不諧之音會對庭院中的所有人造成{min}到{max}點冰霜傷害（英雄難度下為{heroicMin}到{heroicMax}點）。",
+        "brokenVoice": "她的嗓音已破碎：在此效果結束前，她受到的傷害提高{pct}%。",
+        "spentVoice": "另一名玩家奏響下一個正確音符前，你無法奏響月亮地磚。在此期間踩上地磚不會重置應答，也不會對你造成傷害。無法驅散。當你成為同一副本內唯一存活的玩家或樂譜結束時移除。"
       },
       "bastion": {
         "brineColumn": "你被困在海水之柱中：每{tick}秒受到{min}到{max}點自然傷害，最多持續{seconds}秒。打斷或擊暈潮縛侍僧即可掙脫。",
@@ -4226,7 +4239,9 @@ export const zh_TW: EnTranslations = {
         "shardFlare": "心之碎片閃耀：墓穴吐息每{breath}秒一次，振翼狂風每{gale}秒一次。",
         "branded": "每{interval}秒造成{value}點{school}傷害，持續{seconds}秒。踏入融水池可立即將其澆熄。",
         "creepingRime": "移動速度降低{pct}%，每層{per}%。每次霜凇吐息都會疊加一層並將持續時間重置為{seconds}秒。疊到{max}層時你會被凍結（冰封）{freeze}秒，並清除所有層數。",
-        "icedOver": "被蔓延霜凇凍結：無法移動或行動。"
+        "icedOver": "被蔓延霜凇凍結：無法移動或行動。",
+        "tuskerStuck": "牠的獠牙插進了一塊冰岩。{seconds}秒內無法移動或攻擊，隨後牠會掙脫，冰岩隨之碎裂。",
+        "tuskerStuckExposed": "卡在冰岩裡：受到的傷害提高{pct}%。"
       },
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。",
@@ -6518,6 +6533,7 @@ export const zh_TW: EnTranslations = {
         "summons_adds": "召喚增援",
         "lunar_tide": "月潮（週期性範圍傷害）",
         "chorus_and_solo": "合唱與獨唱（一個標記集合分攤，另一個標記分散）",
+        "the_score": "樂譜（她會兩次在月光石板上吟唱旋律：按石板響起的順序踏上去，即可使她的嗓音破碎）",
         "tideglass_reflections": "潮鏡倒影（擊殺彼此的鏡像）",
         "hydra_three_elements": "三重元素（左側頭顱噴出18碼的冰霜錐形吐息，使你減速70%，持續4秒；中間頭顱向最多3名玩家腳下噴吐毒液，1.5秒後爆裂，並在落點灼燒6秒；右側頭顱沿一條26碼長的直線射出激流，將你擊退8碼：每一種都要走出去。一個頭顱倒下後，仍然存活的頭顱會接手它的攻擊）",
         "hydra_tsunami": "海嘯（頭顱沉入水中4.5秒，期間受到的傷害降低75%，一道巨浪席捲水池的一半，下一次換另一半：普通難度下造成160到190點冰霜傷害並把你推開10碼。跑到另一半，或站到池邊石柱後面；英雄難度下，巨浪會在3.5秒後回捲另一半。第一次海嘯在開戰24秒後到來，之後每一次都在上一次過去40秒後到來）",
@@ -6642,6 +6658,23 @@ export const zh_TW: EnTranslations = {
       "shadeLine": "光穿透了它：別管它，去找光束照亮的那個",
       "timeAria": "剩餘{seconds}秒"
     },
+    "templeAlert": {
+      "melodyTitle": "樂譜",
+      "melodyLine": "觀察月亮地磚依序奏響。與另一名玩家輪流踩出相同順序",
+      "melodyDarkLine": "在地磚熄滅前記住順序。與另一名玩家輪流踩出相同順序",
+      "answerTitle": "回應樂譜！",
+      "answerLine": "輪流踩踏：踩上標記為{place}的月亮地磚。已奏響：{done}/{total}",
+      "answerDarkLine": "輪流憑記憶重複順序。再次踩同一塊地磚前先離開。已奏響：{done}/{total}",
+      "spentTitle": "該由另一道聲音應答",
+      "spentLine": "另一名玩家奏響下一個正確音符前，你無法奏響地磚。已奏響：{done}/{total}",
+      "stepOffTitle": "先走下去，再踏上來",
+      "stepOffLine": "月光石板只有在有人踏上時才會奏響。離開這塊石板，然後重新踏上去",
+      "falseTitle": "錯音！",
+      "falseLine": "那塊石板的順序不對。回應將從第一塊石板重新開始",
+      "brokenTitle": "瑟爾瑟的嗓音破碎了！",
+      "brokenLine": "在效果結束前，她受到的傷害提高{pct}%：現在使用你最強的攻擊",
+      "timeAria": "剩餘{seconds}秒"
+    },
     "wildheartAlert": {
       "preyTitle": "你是獵物！",
       "preyLine": "祖爾加在追獵你：引他穿過點亮的太陽符文",
@@ -6652,7 +6685,27 @@ export const zh_TW: EnTranslations = {
       "pollinatedLine": "遠離種子：你的觸碰會讓它們發芽",
       "bondTitle": "獸群羈絆",
       "bondLine": "在一起時牠們傷害減半：把牠們拉開",
-      "timeAria": "剩餘{seconds}秒"
+      "timeAria": "剩餘{seconds}秒",
+      "preyAloneLine": "沒有其他人能點亮太陽符文。站在一個熄滅的符文上{seconds}秒將它點亮，再把祖爾加引過去",
+      "pinnedTitle": "被釘住了！",
+      "pinnedLine": "需要隊友拔出狩獵之矛。被釘住時，荒野之心脈衝對你的傷害更高",
+      "pinnedSelfLine": "沒有人能來幫忙：在荒野之心脈衝落下前自己拔出狩獵之矛",
+      "sunstruckTitle": "祖爾加被烈日灼傷了！",
+      "sunstruckLine": "在效果結束前他受到的傷害提高{pct}%：現在使用你最強的攻擊",
+      "spearTitle": "有隊友被釘住了！",
+      "spearLine": "跑到狩獵之矛旁，在荒野之心脈衝落下前把它拔出來",
+      "glyphTitle": "點亮太陽符文",
+      "glyphLine": "站在熄滅的太陽符文上{seconds}秒將它點亮。祖爾加踏過它時，會在{duration}秒內受到的傷害提高{pct}%",
+      "glyphLightingTitle": "正在點亮太陽符文",
+      "glyphLightingLine": "留在符文上直到它被點亮。離開就要重新開始",
+      "breathTitle": "神像吐息！",
+      "breathLine": "石美洲豹即將向平台的這一半吐息。跑到另一半去",
+      "saurianStompTitle": "撼地踐踏！",
+      "saurianStompLine": "在巨型蜥腳獸踐踏之前跑出圓環",
+      "sapTotemTitle": "樹汁圖騰！",
+      "sapTotemLine": "日骨樹汁圖騰每{seconds}秒治療一次巨型蜥腳獸，直到被摧毀。立著的圖騰：{count}",
+      "drumTitle": "鼓聲催快了踐踏",
+      "drumLine": "鼓聲響起期間，撼地踐踏的頻率翻倍。摧毀一個日骨樹汁圖騰可讓鼓聲停止{seconds}秒"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -6697,7 +6750,18 @@ export const zh_TW: EnTranslations = {
       "rimeTitle": "蔓延霜凇！",
       "rimeLine": "蔓延霜凇 {stacks}/{max}：離開幼龍的吐息",
       "slabTitle": "冰塊",
-      "slabLine": "堅冰：它會阻擋視線。躲到它後面，避開施法者的法術"
+      "slabLine": "堅冰：它會阻擋視線。躲到它後面，避開施法者的法術",
+      "trampleTitle": "踐踏！",
+      "trampleLeadLine": "把衝鋒引向冰岩，然後向側面躲開",
+      "trampleLine": "在巨牙獸衝鋒之前，從標出的路線向側面離開",
+      "soulfireTitle": "魂火！",
+      "soulfireLine": "你正站在燃燒的魂火中。離開它",
+      "stuckTitle": "巨牙獸卡住了！",
+      "stuckLine": "在牠掙脫之前，牠受到的傷害提高{pct}%：現在使用你最強的攻擊",
+      "trampleBaitTitle": "正衝向冰岩",
+      "trampleBaitLine": "這次踐踏會撞進一塊冰岩。不要進入路線，準備攻擊",
+      "baitHintTitle": "引誘踐踏",
+      "baitHintLine": "牠會衝向最遠的玩家。站在冰岩後面，讓衝鋒撞上冰岩：巨牙獸會被卡住{seconds}秒，受到的傷害提高{pct}%"
     },
     "cryptAlert": {
       "measuredTitle": "量身定墓！",
@@ -6741,6 +6805,13 @@ export const zh_TW: EnTranslations = {
       "relightFar": "靠近到{range}碼內才能重燃它",
       "relightAria": "重燃{name}",
       "relightUsingLine": "在它吸取你時保持不動：受到攻擊不會打斷，移動或昏迷會打斷",
+      "freeLine": "把長矛從地面拔出，解救被釘住的人。受到攻擊不會打斷你，移動或昏迷會打斷",
+      "freeKey": "拔出{name}",
+      "freeTap": "點擊這裡拔出{name}",
+      "freeClick": "點選這裡拔出{name}",
+      "freeFar": "靠近到{range}碼內才能拔出它",
+      "freeAria": "拔出{name}",
+      "freeUsingLine": "保持不動以拔出長矛：移動或昏迷會打斷",
       "timeAria": "剩餘{seconds}秒"
     },
     "cosmetics": {
@@ -14952,6 +15023,8 @@ export const zh_TW: EnTranslations = {
       "temple_moonwater_bolt": "月水箭",
       "temple_drowning_aria": "溺亡詠嘆調",
       "temple_mere_surge": "湖湧",
+      "temple_score": "樂譜",
+      "temple_score_answer": "回應樂譜",
       "temple_tideglass_fracture": "潮鏡碎裂",
       "temple_undertow": "暗流",
       "temple_lunar_tide": "月潮",
@@ -14977,6 +15050,7 @@ export const zh_TW: EnTranslations = {
       "wildheart_entangling_lash": "纏繞鞭笞",
       "wildheart_saurian_tail_swipe": "甩尾",
       "wildheart_saurian_stomp": "撼地踐踏",
+      "wildheart_saurian_sap_tether": "先祖樹汁",
       "wildheart_quarry_mark": "獵物印記",
       "wildheart_war_roar": "戰爭咆哮",
       "wildheart_toad_hex": "蟾蜍妖術",
@@ -14989,6 +15063,12 @@ export const zh_TW: EnTranslations = {
       "wildheart_gorgebloom_gorge": "吞噬",
       "wildheart_zulgar_pulse": "荒野之心脈衝",
       "wildheart_zulgar_spirit_hunt": "狩獵之魂",
+      "wildheart_zulgar_hunting_spear": "狩獵之矛",
+      "wildheart_zulgar_idol_wakes": "神像甦醒",
+      "kituse_wildheart_pull_spear": "拔出長矛",
+      "wildheart_idols_breath": "神像吐息",
+      "wildheart_sun_glyph_kindle": "點亮中",
+      "wildheart_sun_glyph_cold": "冷卻中",
       "sanctum_cinder_breath": "餘燼吐息",
       "sanctum_warming_rite": "回暖儀式",
       "sanctum_goad": "驅策",
@@ -14996,6 +15076,8 @@ export const zh_TW: EnTranslations = {
       "sanctum_ice_block_toss": "投擲冰塊",
       "sanctum_tusker_tusk_sweep": "獠牙橫掃",
       "sanctum_tusker_trample": "踐踏",
+      "sanctum_soulfire_trail_burn": "燃燒中",
+      "sanctum_ice_outcrop_held": "獠牙卡住",
       "sanctum_thaw_the_held": "Thaw the Held",
       "sanctum_counterweight_lash": "配重尾鞭",
       "sanctum_branding_iron": "烙鐵",
@@ -24773,6 +24855,9 @@ export const zh_TW: EnTranslations = {
       "howdah_hexcaller": {
         "name": "馱轎巫咒師"
       },
+      "sunbone_sap_totem": {
+        "name": "日骨樹汁圖騰"
+      },
       "fanglord_jaguar": {
         "name": "獠牙領主的巨型美洲豹"
       },
@@ -24820,6 +24905,9 @@ export const zh_TW: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "荊棘幼芽"
+      },
+      "wildheart_hunting_spear": {
+        "name": "狩獵之矛"
       },
       "buddy_ember_fox": {
         "name": "餘燼狐"

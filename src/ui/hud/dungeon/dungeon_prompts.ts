@@ -2,32 +2,37 @@
 // call: the Iron Cage escape (cage_escape_*), Gaoler Ossick's chain alert
 // (gaol_chain_*), the Sunken Bastion's crown alert (bastion_alert_view.ts:
 // Vael's scythe and Fog Veil), the Wildheart Basin's alert (wildheart_alert_view.ts on the
-// shared encounter alert painter, encounter_alert_painter.ts: the Prey, the
-// Stalk, the pollen, the Pack Bond readout) and the Gravewyrm Sanctum's
+// shared encounter alert painter, encounter_alert_painter.ts: the Idol's
+// Breath, the Prey, the Hunting Spear, the Stalk, the pollen, the sun glyphs,
+// the Pack Bond readout) and the Gravewyrm Sanctum's
 // (sanctum_alert_view.ts on the same family: the chains, the meltwater, the
 // lake) and the Hollow Crypt's (crypt_alert_view.ts on the same family: the
 // grave mark, the Frozen Embrace, the Bride's Lament, the Open Grave, the
 // Burning Knell's half, Grasp of the Grave, the Reap, the Toll and Harmony
-// readouts, the Rite's candles and the Bound Souls), plus the trash engine's
+// readouts, the Rite's candles and the Bound Souls) and the Drowned Temple's
+// (temple_alert_view.ts on the same family: Choirmother Selthe's Score, its
+// melody, its answer and her broken voice), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
-// over, a Remembrance Candle to relight). It owns no DOM itself; it builds
+// over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns
+// no DOM itself; it builds
 // each view from the frame's inputs and hands it to that prompt's painter. The
 // frame hands it the world (its entities and roster version, and the target
 // command a use press needs): the prompts look bodies up by id, and the
-// Sanctum and Crypt alerts and the use prompt keep their scenes off the
-// roster (sanctum_alert_scene_core.ts, crypt_alert_scene_core.ts,
-// KitUseSceneScan).
+// Sanctum, Crypt, Wildheart and Temple alerts and the use prompt keep their
+// scenes off the roster (sanctum_alert_scene_core.ts, crypt_alert_scene_core.ts,
+// wildheart_alert_scene_core.ts, temple_alert_scene_core.ts, KitUseSceneScan).
 //
 // The prompts share one slot over the action bar, so the use prompt gives way
 // to every encounter prompt above it (a strike to dodge or a cage to break
 // outranks a brazier), except the Crypt alert's SOFT readouts (the Rite's
-// candle count, a Bound Soul on its way), which give the slot to the use
-// prompt when it has a body to offer (the relight prompt at a candle); the
-// interact press itself still kicks the brazier
+// candle count, a Bound Soul on its way) and the Wildheart alert's SOFT kinds
+// (a Hunting Spear to pull), which give the slot to the use prompt when it
+// has a body to offer (the relight prompt at a candle, the pull at a spear);
+// the interact press itself still kicks the brazier
 // whatever the slot shows (src/game/nearby_interaction_core.ts).
 //
 // The player's "Dungeon mechanic hints" setting hides the ADVISORY alerts (the
-// four encounter alert family members) and nothing else; a hidden alert is not
+// five encounter alert family members) and nothing else; a hidden alert is not
 // built and never holds the slot. Which prompt the setting governs and who
 // holds the slot are both decided in dungeon_prompt_policy_core.ts.
 
@@ -57,7 +62,15 @@ import {
 } from './kit_use_prompt_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
-import { buildWildheartAlertView, WILDHEART_ALERT_KINDS } from './wildheart_alert_view';
+import { TempleAlertSceneScan, type TempleSceneEntity } from './temple_alert_scene_core';
+import { buildTempleAlertView, TEMPLE_ALERT_KINDS } from './temple_alert_view';
+import { WildheartAlertSceneScan, type WildheartSceneEntity } from './wildheart_alert_scene_core';
+import {
+  buildWildheartAlertView,
+  WILDHEART_ALERT_KINDS,
+  WILDHEART_SOFT_ALERT_KINDS,
+  type WildheartAlertView,
+} from './wildheart_alert_view';
 
 const KIT_USE_HIDDEN = { visible: false } as const;
 /** An advisory alert the hints setting hides (never built that frame). */
@@ -90,7 +103,12 @@ export interface DungeonPromptsFrame {
   world: {
     entities: ReadonlyMap<
       number,
-      GaolChainEntity & SanctumSceneEntity & CryptSceneEntity & KitUseBody
+      GaolChainEntity &
+        SanctumSceneEntity &
+        CryptSceneEntity &
+        WildheartSceneEntity &
+        TempleSceneEntity &
+        KitUseBody
     >;
     entityRosterVersion: number;
     /** Select a body (the use prompt's press targets the body, then interacts). */
@@ -110,10 +128,13 @@ export class DungeonPrompts {
   private readonly chain: GaolChainAlert;
   private readonly bastion: EncounterAlert;
   private readonly wildheart: EncounterAlert;
+  private readonly wildheartScene = new WildheartAlertSceneScan();
   private readonly sanctum: EncounterAlert;
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private readonly crypt: EncounterAlert;
   private readonly cryptScene = new CryptAlertSceneScan();
+  private readonly temple: EncounterAlert;
+  private readonly templeScene = new TempleAlertSceneScan();
   private readonly kitUse: EncounterAlert;
   private readonly kitUseScene = new KitUseSceneScan();
   /** The body a press on the use prompt targets (-1: none on offer). */
@@ -129,7 +150,9 @@ export class DungeonPrompts {
     wildheart: false,
     sanctum: false,
     crypt: false,
+    temple: false,
     cryptSoft: false,
+    wildheartSoft: false,
   };
 
   constructor(deps: CageEscapeDeps) {
@@ -154,6 +177,11 @@ export class DungeonPrompts {
       id: 'crypt-alert',
       className: 'ui-panel-strong encounter-alert crypt-alert',
       kinds: CRYPT_ALERT_KINDS,
+    });
+    this.temple = new EncounterAlert(deps, {
+      id: 'temple-alert',
+      className: 'ui-panel-strong encounter-alert temple-alert',
+      kinds: TEMPLE_ALERT_KINDS,
     });
     // A press on the use prompt is the interact key's own 'use' arm: target
     // the body it names, then the ordinary interact.
@@ -199,10 +227,17 @@ export class DungeonPrompts {
       ? buildBastionAlertView({ auras: p.auras, targetId: p.targetId, entity })
       : HINT_HIDDEN;
     this.bastion.paint(bastion);
-    const wildheart = dungeonPromptEnabled('wildheart', hints)
-      ? buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity })
+    let wildheart: WildheartAlertView = dungeonPromptEnabled('wildheart', hints)
+      ? buildWildheartAlertView({
+          auras: p.auras,
+          targetId: p.targetId,
+          entity,
+          selfId: p.id,
+          selfPos: p.pos,
+          scene: this.wildheartScene.update(f.world),
+        })
       : HINT_HIDDEN;
-    this.wildheart.paint(wildheart);
+    const wildheartSoft = wildheart.visible && WILDHEART_SOFT_ALERT_KINDS.has(wildheart.kind);
     // The UI clock (seconds): an Ice Slab's cover hint shows for its first moments.
     const now = performance.now() / 1000;
     const sanctum = dungeonPromptEnabled('sanctum', hints)
@@ -228,6 +263,14 @@ export class DungeonPrompts {
         })
       : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
+    const temple = dungeonPromptEnabled('temple', hints)
+      ? buildTempleAlertView({
+          selfPos: p.pos,
+          auras: p.auras,
+          scene: this.templeScene.update(f.world),
+        })
+      : HINT_HIDDEN;
+    this.temple.paint(temple);
     // The use prompt last: it yields the shared slot to any prompt showing
     // above (a soft Crypt readout yields to it instead).
     const slot = this.slot;
@@ -237,7 +280,9 @@ export class DungeonPrompts {
     slot.wildheart = wildheart.visible;
     slot.sanctum = sanctum.visible;
     slot.crypt = crypt.visible;
+    slot.temple = temple.visible;
     slot.cryptSoft = cryptSoft;
+    slot.wildheartSoft = wildheartSoft;
     const use = usePromptYields(slot)
       ? null
       : buildKitUsePromptView({
@@ -249,6 +294,9 @@ export class DungeonPrompts {
         });
     if (cryptSoft && use?.visible) crypt = KIT_USE_HIDDEN;
     this.crypt.paint(crypt);
+    // A spear to pull, and the use prompt offers it: the prompt says it.
+    if (wildheartSoft && use?.visible) wildheart = KIT_USE_HIDDEN;
+    this.wildheart.paint(wildheart);
     this.kitUseBodyId = use?.visible ? use.bodyId : -1;
     this.kitUse.paint(use ?? KIT_USE_HIDDEN);
   }
@@ -260,6 +308,7 @@ export class DungeonPrompts {
     this.wildheart.dispose();
     this.sanctum.dispose();
     this.crypt.dispose();
+    this.temple.dispose();
     this.kitUse.dispose();
   }
 }

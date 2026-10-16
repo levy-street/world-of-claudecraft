@@ -4,7 +4,8 @@
 // number from the sim's own tuning, so the edge a player dodges is the edge
 // the sim tests), the cosmetic charge-ups, how each aura dresses its bearer
 // (head marks, glows, motes), the spirit cord's brightness, the seedpods'
-// swell, the seeds' arc and the shock rings' timeline.
+// swell, the seeds' arc and the shock rings' timeline. The sun glyphs, the
+// Hunting Spear and the Idol's Breath are zulgar_hunt_fx_core.ts.
 //
 // Three-free, DOM-free, deterministic. PLACEHOLDER looks: the art phase swaps
 // the looks, never the sizes (those are the sim's).
@@ -28,7 +29,9 @@ import {
   GORGEBLOOM_ID,
   THORN_SPROUT_ID,
   ZULGAR_AVATAR,
+  ZULGAR_HUNTING_SPEAR,
   ZULGAR_ID,
+  ZULGAR_IDOL_WAKES,
   ZULGAR_MAULED,
   ZULGAR_PREY,
   ZULGAR_PULSE,
@@ -78,6 +81,8 @@ export interface BossCastSpec {
 export const GORGE_MARK_RADIUS = 1.6;
 /** Half the jaguar's flank: the width of the Heel! leap's warning lane. */
 export const HEEL_LANE_HALF = 1.5;
+/** Half the width of the Hunting Spear's line from Zulgar to its target. */
+export const SPEAR_LANE_HALF = 0.9;
 
 const BASE: Omit<BossCastSpec, 'shape' | 'range' | 'color' | 'accent'> = {
   arcDeg: 360,
@@ -154,6 +159,26 @@ export function basinBossCastSpecs(): Readonly<Record<string, BossCastSpec>> {
       range: 5.5,
       color: BASIN_ACCENTS.spirit,
       accent: 0xd8fff0,
+    },
+    // Hunting Spear: the throw's line from Zulgar to the one it is meant for,
+    // as long as they stand apart (it pins: the control colour).
+    [ZULGAR_HUNTING_SPEAR]: {
+      ...BASE,
+      shape: 'lane',
+      range: 0,
+      halfWidth: SPEAR_LANE_HALF,
+      aim: 'target',
+      reachToTarget: true,
+      color: TELEGRAPH_THREAT_COLORS.control,
+      accent: BASIN_ACCENTS.physical,
+    },
+    // The Idol Wakes: a wider jade sigil as he calls the stone jaguar.
+    [ZULGAR_IDOL_WAKES]: {
+      ...BASE,
+      shape: 'charge',
+      range: 8,
+      color: BASIN_ACCENTS.spirit,
+      accent: 0xfff0a0,
     },
   };
 }
@@ -292,10 +317,12 @@ export const BASIN_AURA_LOOKS: Readonly<Record<string, BasinAuraLook>> = {
       trail: true,
     },
   },
-  // Sunstruck: a gold flare on the slowed avatar.
+  // Sunstruck: a gold flare on the slowed avatar, big enough to read as the
+  // damage window from across the terrace (the spirit jaguar turns gold too,
+  // zulgar_avatar_fx.ts, and a gold ring drains under him, zulgar_glyph_fx.ts).
   [ZULGAR_SUNSTRUCK]: {
-    glow: { color: 0xfff0a0, size: 1.1, lift: 0.6, alpha: 0.75, pulse: 0.4, pulseHz: 9 },
-    motes: { ...MOTES, rate: 16, color: [1, 0.92, 0.55], size: [0.3, 0.08], life: 0.9, up: 2 },
+    glow: { color: 0xffe07a, size: 1.7, lift: 0.55, alpha: 0.85, pulse: 0.4, pulseHz: 9 },
+    motes: { ...MOTES, rate: 30, color: [1, 0.88, 0.45], size: [0.36, 0.1], life: 1, up: 2.6 },
   },
   // Vanished: dark jade smoke where he stood (the art phase hides the model).
   [ZULGAR_VANISHED]: {
@@ -429,14 +456,6 @@ export function seedArcInto(
   return out;
 }
 
-// ---- the sun glyphs -----------------------------------------------------------------
-
-/** A sun glyph's overlay: lit burns gold, dark smoulders as an ember. */
-export function glyphLook(lit: boolean, t: number): { lit: number; alpha: number; halo: number } {
-  if (lit) return { lit: 1, alpha: 0.8 + 0.2 * Math.sin(t * 1.7), halo: 0.55 };
-  return { lit: 0, alpha: 0.55 + 0.15 * Math.sin(t * 1.1), halo: 0.12 };
-}
-
 // ---- shock rings --------------------------------------------------------------------
 
 /** A shock ring racing out to `radius` over `seconds`, fading. */
@@ -515,5 +534,10 @@ export const BOSS_SPLASH = {
     crown: { r0: 1.2, r1: ZULGAR_TUNING.ambushRadius, height: 3.2, life: 0.9 },
     ripple: { reach: ZULGAR_TUNING.ambushRadius + 1, life: 1.2, rings: 3 },
     tint: 0xd8c4a0,
+  },
+  /** A Hunting Spear biting the flags beside its victim. */
+  spear: {
+    crown: { r0: 0.25, r1: 1.5, height: 2.2, life: 0.6 },
+    tint: 0xb9b0a2,
   },
 } as const satisfies Record<string, BossSplash>;

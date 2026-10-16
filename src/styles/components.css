@@ -16684,6 +16684,7 @@
   #wildheart-alert,
   #sanctum-alert,
   #crypt-alert,
+  #temple-alert,
   #kit-use-prompt {
     bottom: calc(260px + var(--castbar-h) + 14px);
   }
@@ -16693,6 +16694,7 @@
   body.show-actionbar3 #wildheart-alert,
   body.show-actionbar3 #sanctum-alert,
   body.show-actionbar3 #crypt-alert,
+  body.show-actionbar3 #temple-alert,
   body.show-actionbar3 #kit-use-prompt {
     bottom: calc(312px + var(--castbar-h) + 14px);
   }
@@ -16702,6 +16704,7 @@
   body.mobile-touch #wildheart-alert,
   body.mobile-touch #sanctum-alert,
   body.mobile-touch #crypt-alert,
+  body.mobile-touch #temple-alert,
   body.mobile-touch #kit-use-prompt {
     bottom: 56%;
   }
@@ -16945,7 +16948,80 @@
     min-width: min(420px, calc(100vw - 32px));
   }
 
-  /* ---------- The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond) ---------- */
+  /* ---------- The Drowned Temple's alert (Choirmother Selthe's Score) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/temple_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: the melody and the
+     answer sit in the panel's gold, a false note throbs in the hostile tone, her broken
+     voice beats fast like every other damage window. Never tier-gated (graphics fairness). */
+  #temple-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #temple-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #temple-alert .fa-line {
+    font-size: 14px;
+  }
+  #temple-alert .fa-hint {
+    display: none;
+  }
+  #temple-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #temple-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  /* A mistake that just happened, and the tile that will not sound. */
+  #temple-alert.is-score-false,
+  #temple-alert.is-score-step-off {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #temple-alert.is-score-false .fa-title,
+  #temple-alert.is-score-false .fa-fill,
+  #temple-alert.is-score-step-off .fa-title {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  /* Her damage window: the panel's own gold, beating fast while it is open. */
+  #temple-alert.is-score-broken {
+    animation: bce-throb 0.45s ease-in-out infinite alternate;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #temple-alert.is-score-false,
+    #temple-alert.is-score-step-off,
+    #temple-alert.is-score-broken {
+      animation: none;
+    }
+  }
+  body.mobile-touch #temple-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond; Zulgar's
+     breath, spear, Sunstruck window and sun glyphs) ---------- */
   /* Self-mounted by the shared encounter alert painter
      (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/wildheart_alert_view.ts.
      It never takes the pointer. The state is carried by the text too. */
@@ -16988,17 +17064,35 @@
     width: 0;
     transition: width 80ms linear;
   }
+  /* A threat to the player themself: the hunt, the stone jaguar's breath, the pin. */
   #wildheart-alert.is-prey,
+  #wildheart-alert.is-prey-alone,
+  #wildheart-alert.is-breath,
+  #wildheart-alert.is-pinned,
+  #wildheart-alert.is-pinned-self,
   #wildheart-alert.is-stalked {
     border-color: var(--color-hostile);
     animation: bce-throb 0.9s ease-in-out infinite alternate;
   }
   #wildheart-alert.is-prey .fa-title,
+  #wildheart-alert.is-prey-alone .fa-title,
+  #wildheart-alert.is-breath .fa-title,
+  #wildheart-alert.is-pinned .fa-title,
+  #wildheart-alert.is-pinned-self .fa-title,
   #wildheart-alert.is-stalked .fa-title,
   #wildheart-alert.is-prey .fa-fill,
+  #wildheart-alert.is-prey-alone .fa-fill,
+  #wildheart-alert.is-breath .fa-fill,
+  #wildheart-alert.is-pinned .fa-fill,
+  #wildheart-alert.is-pinned-self .fa-fill,
   #wildheart-alert.is-stalked .fa-fill {
     color: var(--color-hostile);
     --bar-color: var(--color-hostile);
+  }
+  /* Zulgar's damage window: the panel's own gold, beating fast while it is open. The
+     glyphs to light and the spear to pull keep the steady gold of a thing to do. */
+  #wildheart-alert.is-sunstruck {
+    animation: bce-throb 0.45s ease-in-out infinite alternate;
   }
   #wildheart-alert.is-pollinated {
     border-color: var(--color-energy);
@@ -17014,8 +17108,21 @@
   #wildheart-alert.is-bonded .fa-title {
     color: var(--color-debuff-nature);
   }
+  /* The Great Saurian's totem rework: its Stomp's ring throbs in the hostile tone like
+     every strike; a Sap Totem to break and the heroic drum's rule keep the steady gold of
+     a thing to do. */
+  #wildheart-alert.is-saurian-stomp {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #wildheart-alert.is-saurian-stomp .fa-title,
+  #wildheart-alert.is-saurian-stomp .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
   @media (prefers-reduced-motion: reduce) {
-    #wildheart-alert {
+    #wildheart-alert,
+    #wildheart-alert[class*="is-"] {
       animation: none;
     }
   }
@@ -17139,6 +17246,38 @@
     color: var(--color-debuff-frost);
     --bar-color: var(--color-debuff-frost);
   }
+  /* The Sledge Tusker's bait rework: a lane or soulfire to leave throbs in the hostile
+     tone like every strike; its stuck window is the panel's own gold, beating fast while
+     it is open; a Trample that will end in the ice and the bait's lesson keep the steady
+     gold of a thing to do. */
+  #sanctum-alert.is-trample,
+  #sanctum-alert.is-soulfire {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #sanctum-alert.is-trample .fa-title,
+  #sanctum-alert.is-soulfire .fa-title,
+  #sanctum-alert.is-trample .fa-fill,
+  #sanctum-alert.is-soulfire .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #sanctum-alert.is-stuck {
+    animation: bce-throb 0.45s ease-in-out infinite alternate;
+  }
+  /* You are the Trample's target while its lane still follows you: the ice blue of
+     the lane that ends in an outcrop, throbbing (lead it, then step aside). The
+     marker over you in the world is gold instead (it must stand off that blue
+     lane); here the panel is off the road, so it names the goal's colour. */
+  #sanctum-alert.is-trample-lead {
+    border-color: var(--color-debuff-frost);
+    animation: bce-throb 0.6s ease-in-out infinite alternate;
+  }
+  #sanctum-alert.is-trample-lead .fa-title,
+  #sanctum-alert.is-trample-lead .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
   /* The Ice Slab's cover hint: calm, never a warning (it is shelter). */
   #sanctum-alert.is-slab {
     border-color: var(--color-friendly);
@@ -17149,7 +17288,8 @@
     --bar-color: var(--color-friendly);
   }
   @media (prefers-reduced-motion: reduce) {
-    #sanctum-alert {
+    #sanctum-alert,
+    #sanctum-alert[class*="is-"] {
       animation: none;
     }
   }

@@ -26,10 +26,13 @@ import {
   COLOSSUS_PRISM_FLARE,
   COLOSSUS_RESONANT_SLAM,
   COLOSSUS_TUNING,
+  SELTHE_BOLT_GATHER,
   SELTHE_CHORUS_MARK,
   SELTHE_DROWNING_ARIA,
   SELTHE_MERE_SURGE,
   SELTHE_MOONWATER_BOLT,
+  SELTHE_SCORE,
+  SELTHE_SCORE_ANSWER,
   SELTHE_SEA_SONG,
   SELTHE_SOLO_MARK,
   SELTHE_TUNING,
@@ -696,30 +699,44 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
     // The serpent tail: a chain of eight from the hips to the fluke.
     expect(parentOf(path, 'tail.1')).toBe('hips');
     expect(parentOf(path, 'tail.8')).toBe('tail.7');
-    // The bolt and the surge land on their bars' ends and play their
-    // follow-through out after; the song spans its bar.
-    expect(clipSeconds(path, 'Bolt')).toBeGreaterThan(SELTHE_TUNING.boltCast);
+    // The surge lands on its bar's end and plays its follow-through out
+    // after. The bolt's clip flings its orb 2 s in (it was cut for the bar
+    // the bolt once had), and the song's loop is 1.5 s.
+    expect(clipSeconds(path, 'Bolt')).toBeGreaterThan(2);
     expect(clipSeconds(path, 'Surge')).toBeGreaterThan(SELTHE_TUNING.surgeCast);
-    expect(clipSeconds(path, 'SeaSong')).toBeCloseTo(SELTHE_TUNING.songCast, 2);
+    expect(clipSeconds(path, 'SeaSong')).toBeCloseTo(1.5, 2);
   });
 
   it('casts water on her bars (no hand swings) and answers each mark with its gesture', () => {
     const v = visualOf('choirmother_selthe');
     const c = v.clips;
-    expect(c.castByAbility?.[SELTHE_SEA_SONG]).toBe('SeaSong');
-    expect(c.castByAbility?.[SELTHE_MOONWATER_BOLT]).toBe('Bolt');
     expect(c.castByAbility?.[SELTHE_DROWNING_ARIA]).toBe('Beam');
     expect(c.castByAbility?.[SELTHE_MERE_SURGE]).toBe('Surge');
-    // The bolt and the surge land on their bar's end (bar-locked); the aria loops.
-    expect(v.castClipSync).toEqual(
-      expect.arrayContaining([SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, SELTHE_MERE_SURGE]),
-    );
-    expect(v.castClipSync).not.toContain(SELTHE_DROWNING_ARIA);
+    // The surge lands on its bar's end (bar-locked); the aria loops.
+    expect(v.castClipSync).toEqual([SELTHE_MERE_SURGE]);
     expect(c.attackByAbility?.[SELTHE_CHORUS_MARK]).toBe('Chorus');
     expect(c.attackByAbility?.[SELTHE_SOLO_MARK]).toBe('Solo');
-    expect(SELTHE_TUNING.songCast).toBe(1.5);
-    expect(SELTHE_TUNING.boltCast).toBe(2);
     expect(SELTHE_TUNING.surgeCast).toBe(3);
+  });
+
+  it('sings the Score with her song, and throws her barless bolt on its gather cue', () => {
+    const path = 'public/models/creatures/woc_temple_selthe.glb';
+    const v = visualOf('choirmother_selthe');
+    const c = v.clips;
+    // Both Score bars loop the song (never bar-locked: the melody outlasts it).
+    expect(c.castByAbility?.[SELTHE_SCORE]).toBe('SeaSong');
+    expect(c.castByAbility?.[SELTHE_SCORE_ANSWER]).toBe('SeaSong');
+    expect(v.castClipSync).not.toContain(SELTHE_SCORE);
+    expect(v.castClipSync).not.toContain(SELTHE_SCORE_ANSWER);
+    // The retired Sea-Song and the bolt are no longer bars on her rig.
+    expect(c.castByAbility?.[SELTHE_SEA_SONG]).toBeUndefined();
+    expect(c.castByAbility?.[SELTHE_MOONWATER_BOLT]).toBeUndefined();
+    // The bolt's gather plays Bolt as a one-shot, sped so the fling (2 s into
+    // the clip) lands on the bolt's own gather time.
+    expect(c.attackByAbility?.[SELTHE_BOLT_GATHER]).toBe('Bolt');
+    const scale = c.attackTimeScaleByAbility?.[SELTHE_BOLT_GATHER] ?? 1;
+    expect(2 / scale).toBeCloseTo(SELTHE_TUNING.boltWindup, 6);
+    expect(clipSeconds(path, 'Bolt') / scale).toBeLessThan(SELTHE_TUNING.boltEvery);
   });
 });
 

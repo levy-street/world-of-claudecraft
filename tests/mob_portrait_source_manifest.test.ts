@@ -110,7 +110,9 @@ describe('mob portrait source manifest', () => {
     // muster_chaplain, muster_sergeant, muster_drillmaster, muster_effigy).
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 354.
     // The 2026-10-09 reviewed renderer receipt captures all 355 current rows.
-    expect(liveIds).toHaveLength(355);
+    // 356: plus the Hunting Spear of the Zulgar hunt rework (the usable body a
+    // teammate pulls out, wildheart_hunting_spear).
+    expect(liveIds).toHaveLength(356);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

@@ -1,18 +1,23 @@
-// Choirmother Selthe's caster pass (src/sim/encounters/drowned_temple/selthe.ts):
+// Choirmother Selthe's caster kit (src/sim/encounters/drowned_temple/selthe.ts):
 // she never leaves her pool and never swings her hands. Moonwater Bolt is her
-// filler on the tank and can be kicked; the Drowning Aria is a sung beam that a
-// kick, a lost line of sight or a body stepping into it answers; the Mere Surge
-// is a wedge of water to step out of. Driven through full Sim ticks in a real
-// claimed Temple with a real party (tests/helpers/temple_fight.ts).
+// quiet filler on the tank (no bar since the Score pass: nothing to kick); the
+// Drowning Aria is a sung beam that a kick, a lost line of sight or a body
+// stepping into it answers, and the one bar of hers the group kicks; the Mere
+// Surge is a wedge of water to step out of. The retired Sea-Song never plays.
+// Driven through full Sim ticks in a real claimed Temple with a real party
+// (tests/helpers/temple_fight.ts). The Score has its own suite
+// (tests/drowned_temple_selthe_score.test.ts).
 
 import { describe, expect, it } from 'vitest';
 import { DROWNED_TEMPLE_ANCHORS } from '../src/sim/content/drowned_temple_layout';
 import {
   COLOSSUS_ID,
+  SELTHE_BOLT_GATHER,
   SELTHE_DROWNING_ARIA,
   SELTHE_ID,
   SELTHE_MERE_SURGE,
   SELTHE_MOONWATER_BOLT,
+  SELTHE_SEA_SONG,
   SELTHE_TUNING,
   TEMPLE_BOSS_CAST_SCHOOLS,
   TERRACE,
@@ -51,16 +56,34 @@ function state(b: Entity): SeltheFightState {
   return st;
 }
 
-/** Hold every timed mechanic off so a test reads one bar in isolation (the
- *  fight state is born on the first engaged tick, which starts a bolt). */
+/** Hold every timed mechanic off so a test reads one thing in isolation (the
+ *  fight state is born on the first engaged tick). */
 function hush(f: Fight, b: Entity): void {
   if (b.templeFight?.kind !== 'selthe') run(f, 0.05);
   const st = state(b);
   st.chorusTimer = 999;
   st.soloTimer = 999;
-  st.songTimer = 999;
   st.surgeTimer = 999;
   st.ariaTimer = 999;
+}
+
+/** The spellfx cues of one ability since the last drain, as [fx, targetId]. */
+function cues(f: Fight, seconds: number, ability: string): [string, number][] {
+  const out: [string, number][] = [];
+  for (let t = 0; t < seconds - 0.025; t += 0.05) {
+    for (const p of [f.tank, ...f.others]) if (p.hp < 1e5) p.hp = 1e6;
+    for (const ev of f.sim.tick()) {
+      if (ev.type === 'spellfx' && ev.ability === ability) out.push([ev.fx, ev.targetId]);
+      if (ev.type === 'damage')
+        f.hits.push({
+          targetId: ev.targetId,
+          sourceId: ev.sourceId,
+          amount: ev.amount,
+          ability: ev.ability,
+        });
+    }
+  }
+  return out;
 }
 
 /** Pummel her (the warrior tank's real interrupt), the tank in her reach. */
@@ -85,52 +108,84 @@ describe('Selthe the caster: no hands, no steps', () => {
     // A long fight with the tank far off: about 13 s alone, near the default.
   }, 60_000);
 
-  it('bolts her foe between bars: one weapon roll x 0.8 of frost on each 2 s bar', () => {
+  it('throws a bolt at her foe every 2.5 s with NO bar: one weapon roll x 0.8 of frost', () => {
     const { f, b } = selthe();
     hush(f, b);
-    expect(b.castingAbility).toBe(SELTHE_MOONWATER_BOLT);
-    expect(b.castTargetId).toBe(f.tank.id);
-    expect(b.castTotal).toBe(T.boltCast);
     const from = f.hits.length;
-    run(f, T.boltCast + 0.1);
+    let barred = false;
+    run(f, T.boltEvery * 4 + 0.2, () => {
+      if (b.castingAbility !== null) barred = true;
+    });
+    // Her filler never shows a bar: there is nothing to kick.
+    expect(barred).toBe(false);
     const bolts = f.hits.slice(from).filter((h) => h.ability === 'Moonwater Bolt');
-    expect(bolts).toHaveLength(1);
-    expect(bolts[0].targetId).toBe(f.tank.id);
-    expect(bolts[0].amount).toBeGreaterThanOrEqual(
-      Math.round(b.weapon.min * T.boltWeaponShare) - 1,
-    );
-    expect(bolts[0].amount).toBeLessThanOrEqual(Math.round(b.weapon.max * T.boltWeaponShare) + 1);
+    expect(bolts).toHaveLength(4);
+    for (const bolt of bolts) {
+      expect(bolt.targetId).toBe(f.tank.id);
+      expect(bolt.amount).toBeGreaterThanOrEqual(Math.round(b.weapon.min * T.boltWeaponShare) - 1);
+      expect(bolt.amount).toBeLessThanOrEqual(Math.round(b.weapon.max * T.boltWeaponShare) + 1);
+    }
+    expect(T.boltWeaponShare).toBe(0.8);
+    expect(T.boltEvery).toBe(2.5);
   });
 
-  it('a kick cuts the bolt: no damage lands, and she falls quiet for 3 s', () => {
-    expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[SELTHE_MOONWATER_BOLT]?.school).toBe('frost');
+  it('gathers each bolt a moment before it flies (the cue the renderer draws)', () => {
+    const { f, b } = selthe();
+    hush(f, b);
+    state(b).boltTimer = T.boltEvery;
+    state(b).boltCued = false;
+    const gather = cues(f, T.boltEvery - T.boltWindup - 0.2, SELTHE_BOLT_GATHER);
+    expect(gather).toHaveLength(0);
+    // The gather goes out boltWindup before the throw, once, at her foe.
+    expect(cues(f, 0.3, SELTHE_BOLT_GATHER)).toEqual([['windup', f.tank.id]]);
+    const from = f.hits.length;
+    const flown = cues(f, T.boltWindup, SELTHE_MOONWATER_BOLT);
+    expect(flown).toEqual([['projectile', f.tank.id]]);
+    expect(f.hits.slice(from).filter((h) => h.ability === 'Moonwater Bolt')).toHaveLength(1);
+  });
+
+  it('the aria is the one bar a kick cuts; a kicked aria hushes her bolts for 3 s', () => {
     expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[SELTHE_DROWNING_ARIA]?.school).toBe('frost');
+    expect(Object.keys(TEMPLE_BOSS_CAST_SCHOOLS)).toEqual([SELTHE_DROWNING_ARIA]);
+    expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[SELTHE_MOONWATER_BOLT]).toBeUndefined();
     expect(TEMPLE_BOSS_CAST_SCHOOLS[SELTHE_MERE_SURGE]).toBeUndefined();
     const { f, b } = selthe();
     hush(f, b);
+    expect(startAria(f.sim.ctx, f.inst, b, state(b))).toBe(true);
     run(f, 0.5);
-    expect(b.castingAbility).toBe(SELTHE_MOONWATER_BOLT);
-    const from = f.hits.length;
+    expect(b.castingAbility).toBe(SELTHE_DROWNING_ARIA);
     pummel(f, b);
     run(f, 0.05);
     expect(b.castingAbility).toBeNull();
-    // Nothing more for the hush: no bolt lands, no new bar starts.
+    // Nothing for the hush: no bolt flies.
+    const from = f.hits.length;
     run(f, T.kickQuiet - 0.2);
     expect(f.hits.slice(from).filter((h) => h.ability === 'Moonwater Bolt')).toHaveLength(0);
-    expect(b.castingAbility).not.toBe(SELTHE_MOONWATER_BOLT);
-    // Then she bolts again.
-    expect(until(f, () => b.castingAbility === SELTHE_MOONWATER_BOLT, 6)).toBe(true);
+    // Then she bolts again (once the interrupt's school lockout has run too).
+    expect(until(f, () => f.hits.slice(from).some((h) => h.ability === 'Moonwater Bolt'), 8)).toBe(
+      true,
+    );
   });
+
+  it('never sings the retired Sea-Song: no bar, no court-wide hit, in a whole fight', () => {
+    const { f, b } = selthe();
+    const seen = new Set<string>();
+    run(f, 45, () => {
+      if (b.castingAbility) seen.add(b.castingAbility);
+    });
+    expect(seen.has(SELTHE_SEA_SONG)).toBe(false);
+    expect(seen.has(SELTHE_MOONWATER_BOLT)).toBe(false);
+    expect(f.hits.some((h) => h.ability === 'Sea-Song')).toBe(false);
+    // Her bars are the aria (kick it) and the surge (dodge it), nothing else.
+    expect([...seen].sort()).toEqual([SELTHE_DROWNING_ARIA, SELTHE_MERE_SURGE].sort());
+    // A long fight on a slow machine.
+  }, 60_000);
 });
 
 describe('the Drowning Aria: kick it, break its sight, or step into it', () => {
   function aria(): { f: Fight; b: Entity; target: Entity } {
     const { f, b } = selthe();
     hush(f, b);
-    // Cut the opening bolt quietly (not a kick) so the aria starts clean.
-    b.castingAbility = null;
-    b.castRemaining = 0;
-    state(b).kickable = null;
     expect(startAria(f.sim.ctx, f.inst, b, state(b))).toBe(true);
     const target = f.sim.ctx.entities.get(b.castTargetId ?? -1) as Entity;
     return { f, b, target };
@@ -231,9 +286,6 @@ describe('the Mere Surge: step out of the wedge', () => {
   it('hits and shoves everyone in the 60 degree wedge she aimed, nobody outside it', () => {
     const { f, b } = selthe();
     hush(f, b);
-    b.castingAbility = null;
-    b.castRemaining = 0;
-    state(b).kickable = null;
     const st = state(b);
     expect(startSurge(f.sim.ctx, f.inst, b, st)).toBe(true);
     const yaw = st.surgeYaw as number;

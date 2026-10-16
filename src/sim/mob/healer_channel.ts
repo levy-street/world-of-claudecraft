@@ -41,7 +41,7 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   ...BASTION_KIT_CAST_SCHOOLS,
   // The Drowned Temple's lullaby, tide call and coil (mob/trash_kit/temple_cast_ids.ts).
   ...TEMPLE_KIT_CAST_SCHOOLS,
-  // Choirmother Selthe's Moonwater Bolt and Drowning Aria
+  // Choirmother Selthe's Drowning Aria
   // (encounters/drowned_temple/ids.ts TEMPLE_BOSS_CAST_SCHOOLS).
   ...TEMPLE_BOSS_CAST_SCHOOLS,
   // Cantor Ilvane's Dirge of the Hollow (encounters/hollow_crypt/ilvane_ids.ts);

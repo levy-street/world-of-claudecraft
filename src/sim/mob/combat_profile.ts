@@ -1,12 +1,18 @@
 import { isLockedOut, isSilenced } from '../combat/cc';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
+import { ZULGAR_TUNING } from '../encounters/wildheart_basin/ids';
 import {
   advancePin,
   holdsAggroInInstance,
   pinInPlace,
   releasePin,
 } from '../instances/instance_combat_hold';
-import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from '../mob_combat';
+import {
+  combatProfileForMob,
+  DEFAULT_MOB_COMBAT_PROFILE,
+  effectiveMobMeleeRange,
+  type MobCombatProfile,
+} from '../mob_combat';
 import { holdHoardBoneReaper } from '../rift/hoard_bone_reaper';
 import { holdHoardBoulder } from '../rift/hoard_boulder';
 import { holdHoardCaveBoss } from '../rift/hoard_cave_kit';
@@ -77,7 +83,19 @@ export function startEvadeHome(mob: Entity): void {
   mob.rangedWindupReleaseTick = null;
 }
 
+// The avatar must actually reach its Prey and cross the sun glyphs en route.
+// Reusing the giant priest's profile stops pursuit outside maul contact.
+const ZULGAR_HUNT_PROFILE: MobCombatProfile = {
+  ...DEFAULT_MOB_COMBAT_PROFILE,
+  meleeRange: ZULGAR_TUNING.catchReach,
+  desiredRange: ZULGAR_TUNING.catchReach * 0.8,
+  movingRangeBonus: 0,
+};
+
 export function mobCombatProfile(mob: Entity): MobCombatProfile {
+  const fight = mob.wildheartFight;
+  if (fight?.kind === 'zulgar' && (fight.phase === 'hunt' || fight.phase === 'final'))
+    return ZULGAR_HUNT_PROFILE;
   return combatProfileForMob(mob.templateId, mob.scale);
 }
 

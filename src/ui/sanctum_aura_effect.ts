@@ -27,6 +27,9 @@ import {
   KORZUL_TUNING,
   KORZUL_WYRMS_EYE,
   SANCTUM_QUENCH_WATER,
+  TUSKER_STUCK,
+  TUSKER_STUCK_EXPOSED,
+  TUSKER_TUNING,
   VELKHAR_GRASP,
   VELKHAR_TUNING,
   VELKHAR_TWICE_WOKEN,
@@ -65,6 +68,12 @@ export function sanctumAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
     case KORGATH_ENRAGE:
     case KORZUL_ENRAGE:
       return { key: `${KEY}.enrage`, nums: { pct: pct(a.value) } };
+    // The Sledge Tusker stuck in an ice outcrop (sledge_tusker.ts): the hold,
+    // and its twin the damage window.
+    case TUSKER_STUCK:
+      return { key: `${KEY}.tuskerStuck`, nums: { seconds: TUSKER_TUNING.stuckSeconds } };
+    case TUSKER_STUCK_EXPOSED:
+      return { key: `${KEY}.tuskerStuckExposed`, nums: { pct: pct(a.value) } };
     case VELKHAR_GRASP:
       return {
         key: `${KEY}.grasp`,

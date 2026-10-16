@@ -330,6 +330,10 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_sunbone_totem',
   // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
   'wildheart_sunbone_dread_totem',
+  // the Great Saurian rider's Sunbone Sap Totem: the Sunbone Totem's body, war-red
+  'wildheart_sap_totem',
+  // Zulgar's Hunting Spear (PR #4501, which this branch stacks on)
+  'wildheart_hunting_spear',
 ];
 
 describe('authored surfaces', () => {

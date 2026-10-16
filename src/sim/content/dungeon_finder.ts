@@ -201,7 +201,7 @@ const SUNKEN_BASTION_ENCOUNTERS: readonly FinderEncounter[] = [
 const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
   // The rework's route (drowned_temple.md): the choir, the moon pool, the
   // prism, the altar.
-  { mobId: 'choirmother_selthe', mechanics: ['chorus_and_solo'] },
+  { mobId: 'choirmother_selthe', mechanics: ['chorus_and_solo', 'the_score'] },
   // The Mere Hydra (encounters/drowned_temple/mere_hydra.ts) stands between
   // Selthe's Court Stairs and the Prism Stair, which rises only once its three
   // heads are down (the prism_stair_rise gate). One boss, three bodies: the

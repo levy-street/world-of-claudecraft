@@ -10,12 +10,14 @@ import {
   COLOSSUS_MOONLIGHT_LANCE,
   COLOSSUS_PRISM_FLARE,
   COLOSSUS_RESONANT_SLAM,
+  SELTHE_BOLT_GATHER,
   SELTHE_CHORUS_MARK,
   SELTHE_DROWNING_ARIA,
   SELTHE_MERE_SURGE,
-  SELTHE_MOONWATER_BOLT,
-  SELTHE_SEA_SONG,
+  SELTHE_SCORE,
+  SELTHE_SCORE_ANSWER,
   SELTHE_SOLO_MARK,
+  SELTHE_VOICE_BREAKS,
   YSOLEI_CALL,
   YSOLEI_LUNAR_TIDE,
   YSOLEI_UNDERTOW,
@@ -6043,20 +6045,22 @@ export const VISUALS: Record<string, VisualDef> = {
   // kelp hanging from her forearms, and below the waist a violet serpent's
   // tail that falls to the floor and runs back along it to its fluke; a vast
   // silver lionfish fan opens behind her head. Her tail's bend stays planted
-  // on the floor while she leans and rears over it. Sea-Song (1.5 s bar)
-  // plays SeaSong: arms wide, head back, the fan flaring and shivering, the
-  // song on the bar's end. She is a caster and never swings her hands:
-  // Moonwater Bolt (2.0 s bar) plays Bolt, the water orb held before her
-  // chest through the bar, drawn back and flung on its end; Mere Surge (3.0 s
-  // bar) plays Surge, sinking low to gather the pool and hurling the wave up
-  // and out on the bar's end; the Drowning Aria (a 5 s channel) loops Beam,
-  // both palms thrust at her target. The bolt and the surge finish their
-  // follow-through. Her claws (Attack, Attack2) keep their weight should she
-  // ever swing them. The Chorus and Solo marks arrive as windup cues and play
-  // Chorus (her hands to her mouth, the fan folding in, then flung open) and
-  // Solo (her right arm raised, the fan flung wide). Dying, she rears up, the
-  // fan folds, and she slumps forward over her coils onto the floor. Drawn
-  // 9.0 at her 1.15.
+  // on the floor while she leans and rears over it. She is a caster and never
+  // swings her hands. Her Score (both its bars: the melody and the answer she
+  // holds open) loops SeaSong: arms wide, head back, the fan flaring and
+  // shivering (the clip the retired Sea-Song bar played once). Moonwater Bolt
+  // has no bar: its gather cue plays Bolt as a one-shot at double speed, the
+  // water orb held before her chest, drawn back and flung on the one-second
+  // beat the bolt flies on; Mere Surge (3.0 s bar) plays Surge, sinking low
+  // to gather the pool and hurling the wave up and out on the bar's end; the
+  // Drowning Aria (a 5 s channel) loops Beam, both palms thrust at her
+  // target. The surge finishes its follow-through. Her claws (Attack,
+  // Attack2) keep their weight should she ever swing them. The Chorus and
+  // Solo marks arrive as windup cues and play Chorus (her hands to her mouth,
+  // the fan folding in, then flung open) and Solo (her right arm raised, the
+  // fan flung wide). When her voice breaks she recoils (Hit). Dying, she
+  // rears up, the fan folds, and she slumps forward over her coils onto the
+  // floor. Drawn 9.0 at her 1.15.
   temple_selthe: {
     url: `${CREATURES}/woc_temple_selthe.glb`,
     height: 7.83,
@@ -6065,26 +6069,39 @@ export const VISUALS: Record<string, VisualDef> = {
       // Each claw lands on frame 18 of its 1.5 s swing at 1x (30 fps).
       contacts: { Attack: [0.567], Attack2: [0.567] },
       castByAbility: {
-        [SELTHE_SEA_SONG]: 'SeaSong',
-        [SELTHE_MOONWATER_BOLT]: 'Bolt',
+        [SELTHE_SCORE]: 'SeaSong',
+        [SELTHE_SCORE_ANSWER]: 'SeaSong',
         [SELTHE_DROWNING_ARIA]: 'Beam',
         [SELTHE_MERE_SURGE]: 'Surge',
       },
       castTimeScaleByAbility: {
-        [SELTHE_SEA_SONG]: 1,
-        [SELTHE_MOONWATER_BOLT]: 1,
+        [SELTHE_SCORE]: 1,
+        // The verse she holds open: the same song, drawn out.
+        [SELTHE_SCORE_ANSWER]: 0.6,
         [SELTHE_DROWNING_ARIA]: 1,
         [SELTHE_MERE_SURGE]: 1,
       },
-      castPlayOut: ['Bolt', 'Surge'],
-      attackByAbility: { [SELTHE_CHORUS_MARK]: 'Chorus', [SELTHE_SOLO_MARK]: 'Solo' },
-      attackTimeScaleByAbility: { [SELTHE_CHORUS_MARK]: 1, [SELTHE_SOLO_MARK]: 1 },
+      castPlayOut: ['Surge'],
+      attackByAbility: {
+        [SELTHE_CHORUS_MARK]: 'Chorus',
+        [SELTHE_SOLO_MARK]: 'Solo',
+        [SELTHE_BOLT_GATHER]: 'Bolt',
+        [SELTHE_VOICE_BREAKS]: 'Hit',
+      },
+      attackTimeScaleByAbility: {
+        [SELTHE_CHORUS_MARK]: 1,
+        [SELTHE_SOLO_MARK]: 1,
+        // The Bolt clip flings its orb 2 s in: at double speed that is the
+        // bolt's one-second gather (ids.ts SELTHE_TUNING.boltWindup).
+        [SELTHE_BOLT_GATHER]: 2,
+        [SELTHE_VOICE_BREAKS]: 1,
+      },
     },
     attackTimeScale: 1,
     walkRef: 2.5,
     runRef: 7,
-    // The bars land on their end; the aria's beam loops.
-    castClipSync: [SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, SELTHE_MERE_SURGE],
+    // The surge lands on its bar's end; the aria's beam and the Score's song loop.
+    castClipSync: [SELTHE_MERE_SURGE],
     castPlayOutHoldsAttacks: true,
     authoredAtlas: true,
     selfIllumination: 0.16,

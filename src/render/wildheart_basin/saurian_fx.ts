@@ -274,6 +274,12 @@ export class SaurianFx {
     for (const [id, t] of this.trackers) if (!t.seen) this.trackers.delete(id);
   }
 
+  /** Is this Saurian's howdah still on its back (the rider's totem fx ask)? */
+  howdahStanding(id: number): boolean {
+    const t = this.trackers.get(id);
+    return !t || !t.broken;
+  }
+
   // ------------------------------------------------------------------- frame
 
   update(dt: number, clock: number): void {

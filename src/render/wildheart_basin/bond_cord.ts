@@ -4,7 +4,8 @@
 // spirit flowing both ways along it, wisps shed off it and a jade glow pooled
 // on the ground under each body. It burns brighter, thicker and tauter as the
 // two close (the sim's bondStrength): the read the fight asks for, pull them
-// apart.
+// apart. Zulgar's Hunting Spear ties its victim with the same cord, thinner
+// (`thickness`, zulgar_spear_fx.ts).
 //
 // One draw for the braid (every strand and the core in one geometry, laid out
 // in the vertex shader on the cord's ends, so nothing is rebuilt per frame),
@@ -97,7 +98,12 @@ export class BondCord {
   private readonly pt = { x: 0, y: 0, z: 0 };
   private wisps = 0;
 
-  constructor(private readonly host: BasinFxHost) {
+  /** `thickness`: the braid, its strands, its core and its ground glows as a
+   *  share of the Pack Bond's own (1). */
+  constructor(
+    private readonly host: BasinFxHost,
+    private readonly thickness = 1,
+  ) {
     const geo = braidGeometry();
     this.geometries.push(geo);
     this.mat = new THREE.ShaderMaterial({
@@ -108,10 +114,10 @@ export class BondCord {
         uFrom: { value: this.from },
         uTo: { value: this.to },
         uSag: { value: 0 },
-        uBraid: { value: BOND_CORD.braid },
+        uBraid: { value: BOND_CORD.braid * thickness },
         uTwists: { value: BOND_CORD.twists },
-        uStrandR: { value: BOND_CORD.strand },
-        uCoreR: { value: BOND_CORD.core },
+        uStrandR: { value: BOND_CORD.strand * thickness },
+        uCoreR: { value: BOND_CORD.core * thickness },
       },
       vertexShader: CORD_VERT,
       fragmentShader: CORD_FRAG,
@@ -121,6 +127,7 @@ export class BondCord {
       side: THREE.DoubleSide,
     });
     this.mesh = new THREE.Mesh(geo, this.mat);
+    this.mesh.name = 'wildheart-spirit-cord';
     this.mesh.frustumCulled = false;
     this.mesh.visible = false;
     host.root.add(this.mesh);
@@ -162,7 +169,7 @@ export class BondCord {
     const sag = cordSag(span, strength);
     this.mat.uniforms.uSag.value = sag;
     this.mat.uniforms.uStrength.value = strength;
-    this.mat.uniforms.uBraid.value = braidRadius(0.5, strength);
+    this.mat.uniforms.uBraid.value = braidRadius(0.5, strength) * this.thickness;
     this.mesh.visible = true;
     const pulse = 0.85 + 0.15 * Math.sin(this.host.uTime.value * 2.4);
     this.poolMat.opacity = (0.12 + 0.28 * strength) * pulse;
@@ -171,7 +178,7 @@ export class BondCord {
       const x = feet[i * 2];
       const z = feet[i * 2 + 1];
       pool.position.set(x, this.host.groundY(x, z) + 0.08, z);
-      pool.scale.setScalar(BOND_CORD.pool * (0.75 + 0.35 * strength));
+      pool.scale.setScalar(BOND_CORD.pool * this.thickness * (0.75 + 0.35 * strength));
       pool.visible = true;
     }
     // Spirit wisps shed along it, drifting up; more as they close.

@@ -691,6 +691,10 @@ const mergeStringsEn = {
       temple_moonwater_bolt: 'Moonwater Bolt',
       temple_drowning_aria: 'Drowning Aria',
       temple_mere_surge: 'Mere Surge',
+      // Selthe's Score (encounters/drowned_temple/selthe_score.ts): the melody's
+      // bar and the answer's (its time left is the verse's clock). Never kicked.
+      temple_score: 'The Score',
+      temple_score_answer: 'Answer the Score',
       temple_tideglass_fracture: 'Tideglass Fracture',
       temple_undertow: 'Undertow',
       temple_lunar_tide: 'Lunar Tide',
@@ -726,6 +730,8 @@ const mergeStringsEn = {
       wildheart_entangling_lash: 'Entangling Lash',
       wildheart_saurian_tail_swipe: 'Tail Swipe',
       wildheart_saurian_stomp: 'Earthshaking Stomp',
+      // The Saurian's totem rework: a Sap Totem's own bar (its next mending).
+      wildheart_saurian_sap_tether: 'Ancestral Sap',
       // The Wildheart trash mechanics pass (trash_kit/wildheart_cast_ids.ts).
       // The War Roar and the Toad Hex can be kicked; the rest cannot.
       wildheart_quarry_mark: 'Quarry Mark',
@@ -742,6 +748,15 @@ const mergeStringsEn = {
       wildheart_gorgebloom_gorge: 'Gorge',
       wildheart_zulgar_pulse: 'Wildheart Pulse',
       wildheart_zulgar_spirit_hunt: 'Spirit of the Hunt',
+      // Zulgar's hunt rework: his two new bars, the player's own bar on the
+      // spear, and the clocks his encounter objects carry (the stone jaguar's
+      // breath over its half, a sun glyph being lit or cooling).
+      wildheart_zulgar_hunting_spear: 'Hunting Spear',
+      wildheart_zulgar_idol_wakes: 'The Idol Wakes',
+      kituse_wildheart_pull_spear: 'Pull the Spear',
+      wildheart_idols_breath: "Idol's Breath",
+      wildheart_sun_glyph_kindle: 'Lighting',
+      wildheart_sun_glyph_cold: 'Cooling',
       // The Gravewyrm Sanctum rework (trash_kit/sanctum_cast_ids.ts,
       // encounters/gravewyrm_sanctum/ids.ts). Warming Rite and Goad can be kicked.
       sanctum_cinder_breath: 'Cinder Breath',
@@ -751,6 +766,9 @@ const mergeStringsEn = {
       sanctum_ice_block_toss: 'Ice Block Toss',
       sanctum_tusker_tusk_sweep: 'Tusk Sweep',
       sanctum_tusker_trample: 'Trample',
+      // The Tusker's bait rework: the clocks on its encounter objects.
+      sanctum_soulfire_trail_burn: 'Burning',
+      sanctum_ice_outcrop_held: 'Tusks Stuck',
       // The Sanctum trash mechanics pass (trash_kit/sanctum_cast_ids.ts). Thaw
       // the Held and Branding Iron can be kicked.
       sanctum_thaw_the_held: 'Thaw the Held',

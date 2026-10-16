@@ -19,7 +19,10 @@
 // Goadsmith's brand burning on you, then Creeping Rime at 3 or 4 stacks (the
 // next Rime Breath freezes you); last, a hint: an Ice Slab the Ogre
 // Sledge-Hauler just threw down near you is solid cover (it blocks line of
-// sight), shown for its first SLAB_HINT_SECONDS. Every bar is the threat's own
+// sight), shown for its first SLAB_HINT_SECONDS. The Sledge Tusker's bait
+// rework sits between the bosses and the trash debuffs (sanctum_tusker_alert_view.ts:
+// leading its Trample while you are its target, its painted Trample lane, soulfire underfoot, its Stuck in the Ice window, a
+// Trample that will end in an outcrop, and the lesson of the bait). Every bar is the threat's own
 // time left (the caster's bar or the mark; the hint's own seconds). The
 // painter is the shared encounter alert's (encounter_alert_painter.ts).
 
@@ -65,8 +68,15 @@ import {
 } from '../../../sim/mob/trash_kit/sanctum_cast_ids';
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
+import {
+  buildTuskerAlert,
+  TUSKER_ALERT_KINDS,
+  type TuskerAlertEntity,
+  type TuskerAlertKind,
+} from './sanctum_tusker_alert_view';
 
 export type SanctumAlertKind =
+  | TuskerAlertKind
   | 'quench'
   | 'plunge'
   | 'descent'
@@ -92,6 +102,7 @@ export type SanctumAlertKind =
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const SANCTUM_ALERT_KINDS: readonly SanctumAlertKind[] = [
+  ...TUSKER_ALERT_KINDS,
   'quench',
   'plunge',
   'descent',
@@ -181,6 +192,12 @@ export interface SanctumAlertScene {
    *  at (the scene scan's `now`). */
   slabs: readonly SanctumAlertEntity[];
   slabBorn: readonly number[];
+  /** The Sledge Tusker's road (sanctum_tusker_alert_view.ts): the Tusker, the ice
+   *  outcrops, the soulfire on the road, and when this pull was first seen. */
+  tusker: TuskerAlertEntity | null;
+  outcrops: readonly TuskerAlertEntity[];
+  roadFires: readonly TuskerAlertEntity[];
+  tuskerPulledAt: number | null;
 }
 
 export interface SanctumAlertInput {
@@ -207,6 +224,10 @@ export const EMPTY_SANCTUM_SCENE: SanctumAlertScene = {
   bonewalkers: [],
   slabs: [],
   slabBorn: [],
+  tusker: null,
+  outcrops: [],
+  roadFires: [],
+  tuskerPulledAt: null,
 };
 
 // ---- small pure geometry ------------------------------------------------------
@@ -308,6 +329,17 @@ function markShare(a: AlertAura): number | null {
  *  share theirs). */
 function titleOf(kind: SanctumAlertKind): string {
   switch (kind) {
+    case 'trample':
+    case 'trample-lead':
+      return t('hudChrome.sanctumAlert.trampleTitle');
+    case 'soulfire':
+      return t('hudChrome.sanctumAlert.soulfireTitle');
+    case 'stuck':
+      return t('hudChrome.sanctumAlert.stuckTitle');
+    case 'trample-bait':
+      return t('hudChrome.sanctumAlert.trampleBaitTitle');
+    case 'bait-hint':
+      return t('hudChrome.sanctumAlert.baitHintTitle');
     case 'quench':
       return t('hudChrome.sanctumAlert.quenchTitle');
     case 'plunge':
@@ -612,6 +644,11 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
       );
     }
   }
+
+  // The Sledge Tusker's road (no boss fights there): its lane, its soulfire,
+  // its stuck window, a baited Trample, the lesson (sanctum_tusker_alert_view.ts).
+  const road = buildTuskerAlert(scene, me, input.now, selfId);
+  if (road) return live(road.kind, road.line, road.progress, road.seconds);
 
   // 16. A Goadsmith's brand burning on you: a meltwater pool puts it out.
   const brand = auraOf(input.auras, SANCTUM_BRANDED);

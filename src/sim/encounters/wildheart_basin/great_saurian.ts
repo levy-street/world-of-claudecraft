@@ -8,12 +8,24 @@
 //                       knockback. The cone stays where the bar was drawn.
 //   Earthshaking Stomp  every 16 s a 2 s bar (the floor ring is the warning),
 //                       then 12 yd round it: 160 to 200 and a 1 s knockdown.
+//   Sap Totems          (the rework, 2026-10-14) its rider fights from the
+//                       howdah from the pull: every 10 s he throws a Sunbone
+//                       Sap Totem onto the ford, 14 yd off, and each totem
+//                       mends the Saurian (0.8 percent every 2 s after a 4 s
+//                       arming bar) until the group breaks it; a broken
+//                       totem's backlash deals the Saurian the totem's own
+//                       health (saurian_totems.ts).
 //   Howdah Rider        once, at half health: the howdah breaks and a Howdah
 //                       Hexcaller leaps down, landing 1.8 s later behind its
 //                       right flank (the model's HowdahBreak clip throws its
 //                       own rider on the same beat); its interruptible
 //                       Ancestral Sap (the trash kit's mend) is channelled on
-//                       the Saurian.
+//                       the Saurian. On the ground he throws no more totems;
+//                       the ones standing mend on until they are broken.
+//   Heroic: the drum    a second rider beats a drum from the howdah: while it
+//                       beats the Stomp's clock runs twice as fast. A broken
+//                       totem silences it for 6 s; it goes down with the
+//                       howdah (saurian_drum.ts).
 //   Enrage              under a fifth of its health: 30 percent more damage,
 //                       its swings and both strikes.
 //
@@ -23,11 +35,13 @@
 // never idles in the ford.
 //
 // Deterministic: no pick is rolled (the cones and rings take everyone inside,
-// the rider lands on a fixed spot behind its right flank); the only rng draws are
-// the damage rolls, in claim-player order. Every visible state rides existing
-// entity fields (the cast bar, facing, the enrage aura, the rider's own body,
-// a `nova` spellfx at the break), so the online client mirrors it with no wire
-// change.
+// the rider lands on a fixed spot behind its right flank, a totem lands on a
+// hashed spot round it); the only rng draws are the damage rolls, in
+// claim-player order, as before. Every visible state rides existing entity
+// fields (the cast bar, facing, the enrage, fed and drum auras, the rider's
+// and the totems' own bodies and bars, `nova` spellfx at the break, the throw,
+// each mending, each backlash and each drum beat), so the online client
+// mirrors it with no wire change.
 
 import { applyKnockback } from '../../knockback';
 import { spawnKitAdd } from '../../mob/trash_kit/spawn';
@@ -49,6 +63,15 @@ import {
   SAURIAN_TAIL_SWIPE,
   SAURIAN_TUNING as T,
 } from './ids';
+import {
+  drumAboard,
+  drumBeating,
+  silenceDrum,
+  startDrum,
+  stepDrum,
+  stopDrum,
+} from './saurian_drum';
+import { clearTotems, crumbleTotems, stepTotems, stepTotemThrows } from './saurian_totems';
 
 function freshState(timers = true): SaurianFightState {
   return {
@@ -57,6 +80,10 @@ function freshState(timers = true): SaurianFightState {
     stompTimer: timers ? T.stompFirst : 99,
     tailYaw: null,
     plantedAt: null,
+    totemTimer: timers ? T.totemFirst : 99,
+    totemsThrown: 0,
+    totems: [],
+    drum: null,
     howdahBroken: false,
     riderId: null,
     enraged: false,
@@ -71,10 +98,15 @@ export function saurianState(saurian: Entity, timers = true): SaurianFightState 
   return saurian.wildheartFight;
 }
 
-/** The pull ended (a kill, an evade, a wipe): drop the bar and the state. The
- *  rider, once down, is a mob of the claim in its own right. */
-function endSaurianFight(saurian: Entity): void {
+/** The pull ended (an evade, a wipe): drop the bar, the totems, the drum and
+ *  the state. The rider, once down, is a mob of the claim in its own right. */
+function endSaurianFight(ctx: SimContext, inst: InstanceSlot, saurian: Entity): void {
   clearCastIf(saurian, SAURIAN_TAIL_SWIPE, SAURIAN_STOMP);
+  const st = saurian.wildheartFight?.kind === 'saurian' ? saurian.wildheartFight : null;
+  if (st) {
+    clearTotems(ctx, inst, saurian, st);
+    stopDrum(ctx, saurian, st);
+  }
   saurian.wildheartFight = undefined;
 }
 
@@ -152,13 +184,16 @@ function landStomp(
     fx: 'nova',
     ability: SAURIAN_STOMP,
   });
+  // Heroic, while the drum is aboard: the quickened Stomp is priced down
+  // (ids.ts). The roll is drawn exactly as before.
+  const scale = st.drum ? T.drumStompScale : 1;
   let n = 0;
   for (const p of claimPlayers(ctx, inst)) {
     if (dist2d(p.pos, saurian.pos) > T.stompRadius) continue;
     ctx.dealDamage(
       saurian,
       p,
-      mechanicDamage(ctx, saurian, T.stompMin, T.stompMax),
+      Math.max(1, Math.round(mechanicDamage(ctx, saurian, T.stompMin, T.stompMax) * scale)),
       false,
       'physical',
       'Earthshaking Stomp',
@@ -189,6 +224,8 @@ function landStomp(
 export function breakHowdah(ctx: SimContext, saurian: Entity, st: SaurianFightState): void {
   st.howdahBroken = true;
   st.riderLandsIn = T.riderLandDelay;
+  // The drum goes down with it; the rider throws no more totems.
+  stopDrum(ctx, saurian, st);
   ctx.emit({
     type: 'spellfx',
     sourceId: saurian.id,
@@ -325,6 +362,8 @@ function settleSaurianDeed(ctx: SimContext, inst: InstanceSlot, saurian: Entity)
   if (st.diedAt === undefined) {
     st.diedAt = ctx.time;
     clearCastIf(saurian, SAURIAN_TAIL_SWIPE, SAURIAN_STOMP);
+    crumbleTotems(ctx, saurian, st);
+    stopDrum(ctx, saurian, st);
   }
   tickRiderLeap(ctx, inst, saurian, st);
   watchRider(ctx, st);
@@ -354,15 +393,24 @@ export function tickSaurian(
   }
   if (!engaged) {
     dropEnrage(saurian);
-    if (saurian.wildheartFight) endSaurianFight(saurian);
+    if (saurian.wildheartFight) endSaurianFight(ctx, inst, saurian);
     return;
   }
+  const fresh = saurian.wildheartFight?.kind !== 'saurian';
   const st = saurianState(saurian);
+  // Heroic: the drum starts with the pull.
+  if (fresh && drumAboard(inst)) startDrum(ctx, saurian, st);
   tickRiderLeap(ctx, inst, saurian, st);
   watchRider(ctx, st);
-  // Both clocks run through the other strike's bar: "every 12 s", "every 16 s".
+  // The rider's totems: the broken ones snap back (and silence the drum),
+  // the standing ones mend, and he throws the next from his seat.
+  if (stepTotems(ctx, saurian, st) > 0) silenceDrum(ctx, saurian, st);
+  if (saurian.dead) return;
+  stepTotemThrows(ctx, inst, saurian, st);
+  // Both clocks run through the other strike's bar: "every 12 s", "every 16 s"
+  // (the Stomp's faster while the heroic drum beats).
   st.tailTimer -= DT;
-  st.stompTimer -= DT;
+  st.stompTimer -= DT * stepDrum(ctx, saurian, st);
   const share = saurian.maxHp > 0 ? saurian.hp / saurian.maxHp : 1;
   if (!st.howdahBroken && share <= T.howdahAtHpPct) breakHowdah(ctx, saurian, st);
   if (!st.enraged && share <= T.enrageAtHpPct) enrageSaurian(ctx, saurian, st);
@@ -384,4 +432,15 @@ export function tickSaurian(
   // One strike at a time: the stomp first when both are due.
   if (st.stompTimer <= 0) startStomp(saurian, st);
   else if (st.tailTimer <= 0) startTailSwipe(saurian, st);
+}
+
+/** A fight held on a lost target (index.ts `paused`): the totems still mend
+ *  and still snap back, so a blip never freezes them. */
+export function tickSaurianPaused(ctx: SimContext, saurian: Entity, st: SaurianFightState): void {
+  if (stepTotems(ctx, saurian, st) > 0) silenceDrum(ctx, saurian, st);
+}
+
+/** `/dev wildheart trigger drum`: is the drum beating now? */
+export function saurianDrumBeating(st: SaurianFightState): boolean {
+  return drumBeating(st);
 }

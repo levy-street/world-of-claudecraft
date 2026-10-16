@@ -325,7 +325,7 @@ describe('the sledge', () => {
     expect(pose.yaw).toBeCloseTo(1, 3);
   });
 
-  it('unhitches at the pull, tips at the spill (or past half health, or dead), re-hitches on a reset', () => {
+  it('stays hitched through the pull, tips at the spill (or past half health), re-hitches on a reset', () => {
     const t = (o: Partial<{ dead: boolean; inCombat: boolean; hpShare: number }>) => ({
       dead: false,
       inCombat: false,
@@ -333,17 +333,22 @@ describe('the sledge', () => {
       ...o,
     });
     expect(nextSledgeState('hitched', t({}), false)).toBe('hitched');
-    expect(nextSledgeState('hitched', t({ inCombat: true }), false)).toBe('dropped');
-    expect(nextSledgeState('dropped', t({ inCombat: true, hpShare: 0.7 }), false)).toBe('dropped');
-    expect(nextSledgeState('dropped', t({ inCombat: true, hpShare: 0.7 }), true)).toBe('tipped');
-    expect(nextSledgeState('dropped', t({ inCombat: true, hpShare: 0.5 }), false)).toBe('tipped');
-    expect(nextSledgeState('dropped', t({ dead: true, hpShare: 0 }), false)).toBe('tipped');
+    // The bait rework: the pull leaves it on the hook (it drags the braziers
+    // down every charge until half health).
+    expect(nextSledgeState('hitched', t({ inCombat: true }), false)).toBe('hitched');
+    expect(nextSledgeState('hitched', t({ inCombat: true, hpShare: 0.7 }), false)).toBe('hitched');
+    expect(nextSledgeState('hitched', t({ inCombat: true, hpShare: 0.7 }), true)).toBe('tipped');
+    expect(nextSledgeState('hitched', t({ inCombat: true, hpShare: 0.5 }), false)).toBe('tipped');
+    expect(nextSledgeState('tipped', t({ dead: true, hpShare: 0 }), false)).toBe('tipped');
     expect(nextSledgeState('tipped', t({ inCombat: true, hpShare: 0.9 }), false)).toBe('tipped');
     // An evade back to full health off the fight: on the hook again.
     expect(nextSledgeState('tipped', t({ hpShare: 1 }), false)).toBe('hitched');
-    expect(nextSledgeState('dropped', t({ hpShare: 1 }), false)).toBe('hitched');
-    // Walking home hurt, it still stands where it was left.
-    expect(nextSledgeState('dropped', t({ hpShare: 0.8 }), false)).toBe('dropped');
+    // Walking home hurt, a tipped sledge lies where it fell and a hitched one
+    // comes along.
+    expect(nextSledgeState('tipped', t({ hpShare: 0.8 }), false)).toBe('tipped');
+    expect(nextSledgeState('hitched', t({ hpShare: 0.8 }), false)).toBe('hitched');
+    // A beast killed above half health (a dev kill) leaves its sledge standing.
+    expect(nextSledgeState('hitched', t({ dead: true, hpShare: 0 }), false)).toBe('hitched');
   });
 
   it('eases each thrown bowl onto its own patch, a halved spot included', () => {

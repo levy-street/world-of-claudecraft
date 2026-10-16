@@ -90,7 +90,7 @@ export const DROWNED_TEMPLE_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev temple enter [normal|heroic] | tp <landing|steps|causeway|stones|island|colonnade|veil|court|selthe|terraces|terracehigh|ledge|grotto|pool|hydra|prism|prismhigh|terrace|colossus|bridge|altarlanding|altar|ysolei> | gates | kill <g1..g13|pa|pb|pc|hydra|selthe|colossus|ysolei|trash|all> | pack <id> | spawn <templeguard|acolyte|lurker|sentinel|snapper|wraith|siren|wisp|pilgrim|moonspawn|reflection> | trigger <chorus|solo|duet|bolt|aria|surge|breath|spit|torrent|tsunami|regrow|reflections|lance|fracture|undertow|flood> | reset';
+  '[dev] /dev temple enter [normal|heroic] | tp <landing|steps|causeway|stones|island|colonnade|veil|court|selthe|terraces|terracehigh|ledge|grotto|pool|hydra|prism|prismhigh|terrace|colossus|bridge|altarlanding|altar|ysolei> | gates | kill <g1..g13|pa|pb|pc|hydra|selthe|colossus|ysolei|trash|all> | pack <id> | spawn <templeguard|acolyte|lurker|sentinel|snapper|wraith|siren|wisp|pilgrim|moonspawn|reflection> | trigger <chorus|solo|duet|bolt|aria|surge|score|score2|scorewin|scorefail|breath|spit|torrent|tsunami|regrow|reflections|lance|fracture|undertow|flood> | reset';
 
 /** Raise one mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {

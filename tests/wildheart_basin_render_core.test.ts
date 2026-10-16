@@ -19,10 +19,10 @@ import {
   bossLaneLength,
   chargeLook,
   GORGE_MARK_RADIUS,
-  glyphLook,
   headMarkLook,
   PLAYER_BODY_HEIGHT,
   podSwell,
+  SPEAR_LANE_HALF,
   seedArcInto,
   shockRingLook,
 } from '../src/render/wildheart_basin/basin_boss_fx_core';
@@ -101,7 +101,9 @@ import {
   WILDHEART_SUN_GLYPH_DARK,
   WILDHEART_SUN_GLYPH_LIT,
   ZULGAR_AVATAR,
+  ZULGAR_HUNTING_SPEAR,
   ZULGAR_ID,
+  ZULGAR_IDOL_WAKES,
   ZULGAR_PREY,
   ZULGAR_PULSE,
   ZULGAR_SPIRIT_HUNT,
@@ -412,6 +414,8 @@ describe('the boss telegraphs draw the sim edge', () => {
         BLOOM_GORGE,
         ZULGAR_PULSE,
         ZULGAR_SPIRIT_HUNT,
+        ZULGAR_HUNTING_SPEAR,
+        ZULGAR_IDOL_WAKES,
       ].sort(),
     );
     const quake = specs[BEAST_PIT_QUAKE];
@@ -434,6 +438,23 @@ describe('the boss telegraphs draw the sim edge', () => {
     // The charge-ups are cosmetic sigils, not floor hazards.
     expect(specs[BLOOM_SEED_RAIN].shape).toBe('charge');
     expect(specs[ZULGAR_SPIRIT_HUNT].shape).toBe('charge');
+    expect(specs[ZULGAR_IDOL_WAKES].shape).toBe('charge');
+  });
+
+  it('runs the Hunting Spear line from Zulgar to the one it is meant for, in the control colour', () => {
+    const spear = specs[ZULGAR_HUNTING_SPEAR];
+    expect(spear.shape).toBe('lane');
+    expect(spear.reachToTarget).toBe(true);
+    expect(spear.aim).toBe('target');
+    expect(spear.halfWidth).toBe(SPEAR_LANE_HALF);
+    // It pins (a root): the palette's control colour.
+    expect(spear.color).toBe(TELEGRAPH_THREAT_COLORS.control);
+    const zulgar = { x: 0, z: 0, facing: 0 };
+    const victim = { x: -9, z: 12 };
+    const yaw = bossCastYaw(spear, zulgar, victim, null);
+    expect(Math.sin(yaw) * 15).toBeCloseTo(-9, 6);
+    expect(Math.cos(yaw) * 15).toBeCloseTo(12, 6);
+    expect(bossLaneLength(spear, 15)).toBe(15);
   });
 
   it('paints every boss hazard in the threat palette', () => {
@@ -563,12 +584,6 @@ describe('the boss encounter objects', () => {
     expect(seedArcInto(out, from, to, 0, 6)).toEqual(from);
     expect(seedArcInto(out, from, to, 1, 6)).toEqual(to);
     expect(seedArcInto(out, from, to, 0.5, 6).y).toBeCloseTo(4 + 6, 9);
-  });
-
-  it('burns a lit glyph gold and lets a dark one smoulder', () => {
-    expect(glyphLook(true, 0).lit).toBe(1);
-    expect(glyphLook(false, 0).lit).toBe(0);
-    expect(glyphLook(true, 0).halo).toBeGreaterThan(glyphLook(false, 0).halo);
   });
 });
 

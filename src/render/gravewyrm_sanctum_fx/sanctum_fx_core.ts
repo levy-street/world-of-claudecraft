@@ -9,7 +9,7 @@
 //
 // Three-free, DOM-free, deterministic.
 
-import { DUNGEONS, instanceOrigin, instanceSlotForZ, MOBS } from '../../sim/data';
+import { MOBS } from '../../sim/data';
 import {
   BONEGUARD_ID,
   BONEWALKER_ID,
@@ -17,7 +17,6 @@ import {
   GOADSMITH_ID,
   PYRE_TENDER_ID,
   RIME_WHELP_ID,
-  SANCTUM_DUNGEON,
   SANCTUM_OBJECT_TEMPLATES,
   SANCTUM_SOULFIRE_PATCH,
   SANCTUM_TOSS_RING,
@@ -30,7 +29,8 @@ import {
   TUSKER_TUNING,
   TUSKER_TUSK_SWEEP,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
-import { trampleReach } from '../../sim/encounters/gravewyrm_sanctum/sledge_tusker';
+import type { OutcropSpot } from '../../sim/encounters/gravewyrm_sanctum/tusker_road';
+import { planTrampleLaneWorld } from '../../sim/encounters/gravewyrm_sanctum/tusker_road_world';
 import {
   SANCTUM_BRANDING_IRON,
   SANCTUM_CINDER_BREATH,
@@ -82,7 +82,7 @@ export type SanctumTelegraphShape = 'cone' | 'lane' | 'sigil';
 export interface SanctumTelegraphSpec {
   shape: SanctumTelegraphShape;
   /** Yards: the cone's reach from the caster's centre, the sigil's radius (a
-   *  lane's length is measured per bar: tramplePaintLength). */
+   *  lane's length is measured per frame: tramplePaintLength). */
   range: number;
   /** Degrees of the cone's arc. */
   arcDeg: number;
@@ -197,17 +197,20 @@ export function telegraphYaw(spec: SanctumTelegraphSpec, facing: number): number
 }
 
 /**
- * The Trample lane's painted length from the Tusker's centre: the sim runs the
- * lane from its instance-local start along its locked facing until the road
- * ends (trampleReach, at most 30 yd), and tests it `body` yards further (the
- * charge's leading edge). `x`, `z` are world coordinates in the Sanctum.
+ * The Trample lane's painted length from the Tusker's centre: the sim's own
+ * plan (tusker_road.ts planTrampleLane) from the world spot it stands on. The
+ * lane runs along its locked facing until the road ends (at most 30 yd) and
+ * strikes a body radius further (the charge's leading edge), or, when its
+ * strip touches a standing ice outcrop, only as far as the outcrop's middle.
+ * `x`, `z` and the outcrops are world coordinates in the Sanctum.
  */
-export function tramplePaintLength(x: number, z: number, yaw: number): number {
-  const def = DUNGEONS[SANCTUM_DUNGEON];
-  const body = tuskerBodyRadius();
-  if (!def) return TUSKER_TUNING.trampleLength + body;
-  const o = instanceOrigin(def.index, instanceSlotForZ(z));
-  return trampleReach(x - o.x, z - o.z, yaw, TUSKER_TUNING.trampleLength) + body;
+export function tramplePaintLength(
+  x: number,
+  z: number,
+  yaw: number,
+  outcrops: readonly OutcropSpot[] = [],
+): number {
+  return planTrampleLaneWorld(x, z, yaw, outcrops).reach;
 }
 
 // ---- encounter objects -------------------------------------------------------------

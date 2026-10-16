@@ -35,6 +35,11 @@ const NAMES = [
   'Plenilune Ward',
   'Eclipsed',
   'Moonborne Might',
+  // Selthe's Score: its damage names, her ward and her broken voice.
+  'Discord',
+  'False Note',
+  'The Score',
+  'Broken Voice',
 ];
 
 describe('the Drowned Temple boss damage names localize', () => {

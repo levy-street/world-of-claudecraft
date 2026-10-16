@@ -30,6 +30,7 @@ import {
   TUSKER_TUSK_SWEEP,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
 import { sanctumDrawnHeight } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
+import { TUSKER_STRAIN_GESTURE } from '../gravewyrm_sanctum_fx/tusker_bait_fx_core';
 import {
   chargeClipRate,
   sweepClipRate,
@@ -56,6 +57,9 @@ export const TUSKER_TRACES_ON_GESTURE = 'sanctum_tusker_traces_on';
 /** A Glacier Splinter's Shatter (defined beside the other fx gestures in
  *  sanctum_fx_core.ts, re-exported for the looks' callers). */
 export { SPLINTER_SHATTERED_GESTURE } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
+/** Stuck in the Ice (the bait rework): it paws and heaves at the ice (its
+ *  TrampleWindup clip), sent by gravewyrm_sanctum_fx/tusker_bait_fx.ts. */
+export { TUSKER_STRAIN_GESTURE } from '../gravewyrm_sanctum_fx/tusker_bait_fx_core';
 /** A Soul Brazier kicked over (Topple Brazier): its standing body hides at
  *  once and the fx draw it fallen in its place (gravewyrm_sanctum_fx/
  *  sanctum_kit_fx.ts). */
@@ -87,11 +91,13 @@ export const SANCTUM_SLEDGE_TUSKER_LOOK: VisualDef = {
       [TUSKER_UNHITCH_GESTURE]: 'Unhitch',
       [TUSKER_CHARGE_GESTURE]: 'Charge',
       [TUSKER_ENRAGE]: 'Roar',
+      [TUSKER_STRAIN_GESTURE]: 'TrampleWindup',
     },
     attackTimeScaleByAbility: {
       [TUSKER_UNHITCH_GESTURE]: 1,
       [TUSKER_CHARGE_GESTURE]: chargeClipRate(),
       [TUSKER_ENRAGE]: 1,
+      [TUSKER_STRAIN_GESTURE]: 1,
     },
     hit: ['Hit'],
     death: 'Death',

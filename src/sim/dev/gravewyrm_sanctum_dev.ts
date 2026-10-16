@@ -13,8 +13,16 @@
 //   /dev sanctum pack <pack>              jump to where a pack stands (or walks)
 //   /dev sanctum spawn <type>             raise one mob 10 yd ahead, pulled
 //   /dev sanctum trigger <mechanic>       fire an engaged Tusker's mechanic now:
-//                                         sweep, trample, spill, enrage; or an
-//                                         engaged Korgath's: maul, flail,
+//                                         sweep, trample, spill, enrage, and
+//                                         the bait rework's: bait (a Trample
+//                                         aimed into the nearest ice outcrop),
+//                                         stick (its tusks go in now), trail
+//                                         (a soulfire trail down its facing),
+//                                         outcrops (stand them all up again),
+//                                         burst (the nearest one bursts now);
+//                                         a trample follows the farthest player
+//                                         until its lane locks;
+//                                         or an engaged Korgath's: maul, flail,
 //                                         charge, bellow, strain, stomp,
 //                                         enrage, break <tool>, rerivet <tool>
 //                                         (hammer, tongs, anvil, bellows)
@@ -37,12 +45,14 @@ import {
   KORZUL_ID,
   korgathDevTrigger,
   korzulDevTrigger,
+  restoreOutcrops,
   SLEDGE_TUSKER_ID,
   sanctumStoryTemplate,
   spillBraziers,
   startTrample,
   startTuskSweep,
   storyMarkers,
+  tuskerBaitDevTrigger,
   tuskerState,
   VELKHAR_ID,
   velkharDevTrigger,
@@ -111,7 +121,7 @@ export const GRAVEWYRM_SANCTUM_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev sanctum enter [normal|heroic] | tp <landing|court|road|tusker|upper|lower|fork|serac|seraclower|anchor|anchorlower|terrace|korgath|bridge|works|workslower|vault|velkhar|shore|lake|korzul> | gates | kill <g1..g12|pa|pb|pc|pd|tusker|korgath|velkhar|korzul|trash|all> | pack <id> | spawn <boneguard|scaleguard|thawcaller|goadsmith|pyretender|brazier|whelp|ogre|splinter|bonewalker|tusker> | trigger <sweep|trample|spill|enrage|maul|flail|charge|bellow|strain|stomp|break <tool>|rerivet <tool>> | face <0..8> | reset';
+  '[dev] /dev sanctum enter [normal|heroic] | tp <landing|court|road|tusker|upper|lower|fork|serac|seraclower|anchor|anchorlower|terrace|korgath|bridge|works|workslower|vault|velkhar|shore|lake|korzul> | gates | kill <g1..g12|pa|pb|pc|pd|tusker|korgath|velkhar|korzul|trash|all> | pack <id> | spawn <boneguard|scaleguard|thawcaller|goadsmith|pyretender|brazier|whelp|ogre|splinter|bonewalker|tusker> | trigger <sweep|trample|bait|stick|trail|burst|outcrops|spill|enrage|maul|flail|charge|bellow|strain|stomp|break <tool>|rerivet <tool>> | face <0..8> | reset';
 
 /** Raise one mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {
@@ -195,14 +205,21 @@ export function sanctumDevTrigger(ctx: SimContext, inst: InstanceSlot, what: str
   }
   const tusker = claimBoss(ctx, inst, SLEDGE_TUSKER_ID);
   if (!tusker || tusker.dead || !bossEngaged(tusker))
-    return 'Pull the Sledge Tusker first (sweep, trample, spill, enrage).';
+    return 'Pull the Sledge Tusker first (sweep, trample, bait, stick, trail, burst, outcrops, spill, enrage).';
   const st = tuskerState(tusker, false);
+  if (what === 'outcrops') {
+    if (st.stuck) return 'The Tusker is stuck in one: wait for it to wrench free.';
+    restoreOutcrops(ctx, inst);
+    return 'Every ice outcrop stands whole again.';
+  }
   if (tusker.castingAbility !== null) {
     tusker.castingAbility = null;
     tusker.castRemaining = 0;
   }
   st.charge = null;
   st.lane = null;
+  if (what === 'bait' || what === 'stick' || what === 'trail' || what === 'burst')
+    return tuskerBaitDevTrigger(ctx, inst, tusker, st, what);
   if (what === 'sweep') return startTuskSweep(tusker, st) ? 'Tusk Sweep.' : 'The Tusker is busy.';
   if (what === 'trample')
     return startTrample(ctx, inst, tusker, st) ? 'Trample.' : 'Nobody to trample.';
@@ -214,7 +231,7 @@ export function sanctumDevTrigger(ctx: SimContext, inst: InstanceSlot, what: str
     enrageTusker(ctx, tusker, st);
     return 'Enrage.';
   }
-  return 'Mechanics: sweep, trample, spill, enrage (the Sledge Tusker).';
+  return 'Mechanics: sweep, trample, bait, stick, trail, burst, outcrops, spill, enrage (the Sledge Tusker).';
 }
 
 /** Handles `/dev sanctum ...`; returns false for any other line. */

@@ -16,7 +16,7 @@ import { tickKorgath } from './korgath';
 import { tickKorgathBarks } from './korgath_barks';
 import { tickKorzul } from './korzul';
 import { tickRuneWallLore } from './rune_wall';
-import { stepPatches, tickTusker } from './sledge_tusker';
+import { tickTusker, tickTuskerPaused } from './sledge_tusker';
 import { tickStory } from './story';
 import { tickVelkhar } from './velkhar';
 
@@ -35,10 +35,27 @@ export {
   spillBraziers,
   startTrample,
   startTuskSweep,
+  stickInOutcrop,
   trampleReach,
+  tuskerBaitDevTrigger,
   tuskerState,
 } from './sledge_tusker';
 export { earnedStoryStep, raiseStory, storyMarkers, storyStep } from './story';
+export {
+  outcropObjects,
+  outcropsStanding,
+  restoreOutcrops,
+  standingOutcrops,
+} from './tusker_outcrops';
+export {
+  inTrail,
+  onSledgeRoad,
+  planTrampleLane,
+  TUSKER_BODY,
+  trampleAimLocked,
+  trampleAimYaw,
+} from './tusker_road';
+export { TRAIL_DAMAGE_NAME } from './tusker_trail';
 export { velkharDevTrigger } from './velkhar';
 
 /** A live fight whose mob lost its target for a moment (the tank falling)
@@ -61,8 +78,9 @@ export function tickSanctumEncounters(ctx: SimContext): void {
     const tusker = claimBoss(ctx, inst, SLEDGE_TUSKER_ID);
     if (tusker && !paused(tusker)) tickTusker(ctx, inst, tusker, bossEngaged(tusker));
     else if (tusker?.sanctumFight?.kind === 'tusker')
-      // A blip with no target holds the fight, but its braziers still burn out.
-      stepPatches(ctx, inst, tusker, tusker.sanctumFight);
+      // A blip with no target holds the fight, but its fires still burn out
+      // and a stuck beast still wrenches free.
+      tickTuskerPaused(ctx, inst, tusker, tusker.sanctumFight);
     // The three bosses (phase B), in route order. A paused fight holds.
     const korgath = claimBoss(ctx, inst, KORGATH_ID);
     if (korgath && !paused(korgath)) tickKorgath(ctx, inst, korgath, bossEngaged(korgath));

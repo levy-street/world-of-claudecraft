@@ -1,18 +1,18 @@
 // The Sledge Tusker's sledge and body effects (plan: tusker_model_core.ts,
 // the delivery's measured facts), composed by SanctumFx (sanctum_fx.ts):
 //  - the sledge (its own Blender prop, models/creatures/sledge_tusker_sledge.glb):
-//    hitched and hauled behind the beast while it patrols the road, dragged
-//    round its turns like a trailer (Haul in step with the beast's Walk),
-//    steam rising where it passes on the ice and soulfire burning in its three
-//    braziers; left where it was unhitched at the pull (the client latches the
-//    beast's pose on its first engaged frame, as the sim does); tipped by the
-//    Spilled Braziers (its Tip clip throws the three bowls, each eased onto
-//    the soulfire patch the sim lit for it); tipped on the beast's death if it
-//    still stood; hitched again after a reset pull;
-//  - the beast's clips the sim cannot play: the Unhitch at the pull (and its
-//    trace chains' latch), the Charge down the Trample lane, the Roar at the
-//    enrage (gestures through the renderer's triggerAttack seam, re-sent so a
-//    view rebuilt mid-fight shows the truth);
+//    hitched and hauled behind the beast while it patrols the road AND through
+//    the first half of its fight (the bait rework: it drags the braziers down
+//    every charge, slopping soulfire along the lane), dragged round its turns
+//    like a trailer (Haul in step with the beast's Walk), steam rising where
+//    it passes on the ice and soulfire burning in its three braziers; tipped
+//    by the Spilled Braziers at half health, where it stands (its traces snap,
+//    its Tip clip throws the three bowls, each eased onto the soulfire patch
+//    the sim lit for it); hitched again after a reset pull;
+//  - the beast's clips the sim cannot play: the Charge down the Trample lane,
+//    the Roar at the enrage (gestures through the renderer's triggerAttack
+//    seam), and its trace chains' latch (gone once the sledge has tipped,
+//    re-sent so a view rebuilt mid-fight shows the truth);
 //  - its weight on the ice: snow and ice chips at every footfall, the paws
 //    raking the ice through the Trample's warning, the trumpet's breath, the
 //    Tusk Sweep's spray across its front, the charge's wake, the enrage's slam
@@ -43,7 +43,6 @@ import {
   TUSKER_CHARGE_GESTURE,
   TUSKER_TRACES_GONE_GESTURE,
   TUSKER_TRACES_ON_GESTURE,
-  TUSKER_UNHITCH_GESTURE,
 } from '../characters/sanctum_creature_looks';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
@@ -128,7 +127,9 @@ interface Tracker {
   tipAt: number;
   /** The bowls' offsets onto their patches (sledge space, with the height). */
   bowlOff: { x: number; y: number; z: number }[] | null;
-  unhitchAt: number;
+  /** When this view first saw the beast (a sledge found tipped by a view
+   *  that has only just met it tipped long ago: no Tip is played). */
+  bornAt: number;
   tracesSentAt: number;
   /** The bar the effects already reacted to, its start and the beats fired. */
   bar: string;
@@ -275,7 +276,7 @@ export class TuskerFx {
         spilled: false,
         tipAt: -1e9,
         bowlOff: null,
-        unhitchAt: -1e9,
+        bornAt: this.clock,
         tracesSentAt: -1e9,
         bar: '',
         barAt: 0,
@@ -448,48 +449,21 @@ export class TuskerFx {
         rigidSledge(t, t.facing, t.scale, t.pose);
         this.playGesture?.(t.id, TUSKER_TRACES_ON_GESTURE);
         if (t.id === this.owner) this.play('Idle', 1, 0);
-      } else if (was === 'hitched') {
-        // The pull (or a view joining a fight already under way).
-        if (!e.dead && e.inCombat && share > TUSKER_TUNING.spillAtHpPct + 0.05) {
-          t.unhitchAt = this.clock;
-          this.playGesture?.(t.id, TUSKER_UNHITCH_GESTURE);
-        } else {
-          t.unhitchAt = this.clock - TUSKER_CLIP.unhitch - 1;
-        }
-        t.tracesSentAt = this.clock;
-        // A view joining a fight already past half health: tipped long ago.
-        if (next === 'tipped') this.tip(t, false);
-      } else if (next === 'tipped' && was === 'dropped') {
-        // The health crossing (the spill's event may land a frame later) or
-        // its death with the sledge still standing.
-        this.tip(t, true);
+      } else if (next === 'tipped') {
+        // The health crossing (the spill's event may land a frame later). A
+        // view that has only just met the beast finds it tipped long ago.
+        this.tip(t, this.clock - t.bornAt > 0.5);
       }
     }
     // The trace chains stay gone for as long as the sledge is off the hook.
-    if (
-      t.state !== 'hitched' &&
-      this.clock - t.unhitchAt > TUSKER_CLIP.unhitch + 0.3 &&
-      this.clock - t.tracesSentAt >= LATCH_RESEND
-    ) {
+    if (t.state === 'tipped' && this.clock - t.tracesSentAt >= LATCH_RESEND) {
       t.tracesSentAt = this.clock;
       this.playGesture?.(t.id, TUSKER_TRACES_GONE_GESTURE);
     }
-    // The hitch bar hits the ice behind it.
-    const sinceUnhitch = this.clock - t.unhitchAt;
-    if (sinceUnhitch >= TUSKER_CLIP.unhitchBar && sinceUnhitch - TUSKER_CLIP.unhitchBar < 0.06) {
-      const ring = sledgeToWorld(t.pose, 0, SLEDGE_MODEL.front, this.tmpPt);
-      const gy = this.host.groundY(ring.x, ring.z);
-      this.host.puff(ring.x, gy + 0.3, ring.z, 16, snowPuff(2.2, 2.4));
-      this.host.shards.burst(ring.x, gy + 0.2, ring.z, 5, {
-        speed: 3,
-        up: 3,
-        size: [0.15, 0.35],
-        radius: 1,
-      });
-    }
   }
 
-  /** Tip the sledge (the spill, a late view past half health, its death). */
+  /** Tip the sledge (the spill, or a late view past half health): its traces
+   *  snap off the beast and its hitch bar hits the ice. */
   private tip(t: Tracker, animate = true): void {
     // Already tipping this pull (the health crossing and the spill's event
     // arrive in either order): one Tip.
@@ -497,6 +471,20 @@ export class TuskerFx {
     t.state = 'tipped';
     t.tipAt = animate ? this.clock : this.clock - SLEDGE_TIP.length;
     t.bowlOff = null;
+    t.tracesSentAt = this.clock;
+    this.playGesture?.(t.id, TUSKER_TRACES_GONE_GESTURE);
+    if (animate) {
+      const ring = sledgeToWorld(t.pose, 0, SLEDGE_MODEL.front, this.tmpPt);
+      const gy = this.host.groundY(ring.x, ring.z);
+      this.host.puff(ring.x, gy + 0.3, ring.z, 16, snowPuff(2.2, 2.4));
+      this.host.shards.burst(ring.x, gy + 0.2, ring.z, 6, {
+        speed: 4,
+        up: 4,
+        size: [0.15, 0.4],
+        radius: 1,
+        iron: 0.6,
+      });
+    }
     if (t.id === this.owner) {
       const tip = this.actions.get('Tip');
       if (tip) {
@@ -788,14 +776,40 @@ export class TuskerFx {
       const rate = haulRate(t.speed, t.scale);
       if (rate > 0) this.play('Haul', rate);
       else this.play('Idle');
-    } else if (t.state === 'dropped') {
-      this.play('Idle');
     }
     mixer.update(dt);
     if (t.state === 'tipped') this.landBowls(t, gy);
     body.updateMatrixWorld(true);
     this.burnBraziers(t, dt);
     if (t.state === 'hitched' && t.speed > 0.5) this.steamTrail(t, dt);
+    if (t.state === 'hitched' && this.clock <= t.chargeUntil + 0.25) this.slop(t, dt);
+  }
+
+  /** Dragged down a charge, the braziers slop soulfire over the sledge's
+   *  sides (the trail it lights is tusker_bait_fx.ts's). */
+  private slop(t: Tracker, dt: number): void {
+    const n = Math.floor(dt * 90 * this.host.density + this.host.rand());
+    for (let i = 0; i < n; i++) {
+      const side = this.host.rand() < 0.5 ? -1 : 1;
+      const p = sledgeToWorld(
+        t.pose,
+        side * SLEDGE_MODEL.halfWidth * (0.4 + this.host.rand() * 0.8),
+        -SLEDGE_MODEL.back + this.host.rand() * (SLEDGE_MODEL.back + SLEDGE_MODEL.front),
+        this.tmpPt,
+      );
+      const gy = this.host.groundY(p.x, p.z);
+      this.host.puff(p.x, gy + 0.3 + this.host.rand() * SLEDGE_MODEL.fireY, p.z, 1, {
+        speed: 2.2,
+        up: 1.6,
+        life: 0.8,
+        size: [2, 0.6],
+        color: FLAME_HEAT,
+        alpha: 1,
+        pool: 'soulfire',
+        dir: [side * Math.cos(t.pose.yaw), 0.4, -side * Math.sin(t.pose.yaw)],
+        spread: 0.6,
+      });
+    }
   }
 
   /** Ease each thrown bowl onto its patch (the offsets are measured once the

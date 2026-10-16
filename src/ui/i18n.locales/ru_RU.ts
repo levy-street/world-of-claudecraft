@@ -22034,4 +22034,132 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Перед удалением этого персонажа перенесите все незакреплённые карточки с отметками на другого персонажа.',
   'apiError.character.referral_bond_pending':
     'Этому персонажу доставляется облигация подписки за приглашение друга. Повторите попытку удаления после завершения доставки.',
+  // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, The Idol Wakes):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Опалён горящим солнечным глифом: движется на {pct}% медленнее.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Опалён горящим солнечным глифом: получает на {pct}% больше урона.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'Пока действует этот эффект, ни один солнечный глиф не может его опалить. Горящий глиф, по которому он пройдёт, останется горящим.',
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Охотничье копьё пригвоздило вас к месту. Вы истекаете кровью: {bleed} физического урона ({heroicBleed} в героическом режиме) каждые {every} сек., а Импульс Дикого Сердца поражает вас, где бы вы ни стояли, и наносит на {pulse}% больше урона. Союзник может вырвать копьё за {pull} сек. Если помочь некому, вырвите его сами за {wrench} сек. Через {seconds} сек. оно отпустит само.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    'Каменный ягуар пробудился. Каждые {every} сек. после предупреждения на полу в течение {warning} сек. он выдыхает на одну половину террасы, затем на другую: от {min} до {max} урона от сил природы (от {heroicMin} до {heroicMax} в героическом режиме) всем, кто стоит на этой половине. Зулгар остаётся Аватаром ягуара до самой смерти и меняет Добычу каждые {seconds} сек. ({heroicSeconds} сек. в героическом режиме).',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    'Зажечь солнечные глифы больше некому. Встаньте на погасший глиф на {seconds} сек., чтобы зажечь его, затем проведите через него Зулгара',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Вы пригвождены!',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'Охотничье копьё должен вырвать союзник. Пока вы пригвождены, Импульс Дикого Сердца бьёт по вам сильнее',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Помочь некому: вырвите Охотничье копьё сами, пока не ударил Импульс Дикого Сердца',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Зулгар опалён солнцем!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Пока действует эффект, он получает на {pct}% больше урона: бейте сильнейшими атаками сейчас',
+  'hudChrome.wildheartAlert.spearTitle': 'Союзник пригвождён!',
+  'hudChrome.wildheartAlert.spearLine':
+    'Бегите к Охотничьему копью и вырвите его, пока не ударил Импульс Дикого Сердца',
+  'hudChrome.wildheartAlert.glyphTitle': 'Зажгите солнечные глифы',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Встаньте на погасший солнечный глиф на {seconds} сек., чтобы зажечь его. Когда Зулгар пройдёт через него, он {duration} сек. будет получать на {pct}% больше урона',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Вы зажигаете солнечный глиф',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    'Оставайтесь на глифе, пока он не загорится. Если сойти с него, придётся начать заново',
+  'hudChrome.wildheartAlert.breathTitle': 'Дыхание идола!',
+  'hudChrome.wildheartAlert.breathLine':
+    'Каменный ягуар вот-вот выдохнет на эту половину террасы. Перейдите на другую половину',
+  'hudChrome.kitUse.freeLine':
+    'Вырвите копьё из земли, чтобы освободить пригвождённого. Полученный удар не прервёт вас, а движение или оглушение прервёт',
+  'hudChrome.kitUse.freeKey': 'Вырвать: {name}',
+  'hudChrome.kitUse.freeTap': 'Нажмите здесь, чтобы вырвать: {name}',
+  'hudChrome.kitUse.freeClick': 'Щёлкните здесь, чтобы вырвать: {name}',
+  'hudChrome.kitUse.freeFar': 'Подойдите ближе чем на {range} м, чтобы вырвать его',
+  'hudChrome.kitUse.freeAria': 'Вырвать: {name}',
+  'hudChrome.kitUse.freeUsingLine':
+    'Не двигайтесь, пока вырываете копьё: движение или оглушение прервёт вас',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Охотничье копьё',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': 'Идол пробуждается',
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Вырвать копьё',
+  'abilityUi.cast.wildheart_idols_breath': 'Дыхание идола',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Зажигается',
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Остывает',
+  'entities.mobs.wildheart_hunting_spear.name': 'Охотничье копьё',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': 'Партитура',
+  'hudChrome.templeAlert.melodyLine':
+    'Следите, в каком порядке звучат лунные плиты. Повторите порядок, чередуясь с другим игроком',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'Запомните порядок, пока плиты не погасли. Повторите его, чередуясь с другим игроком',
+  'hudChrome.templeAlert.answerTitle': 'Ответьте на Партитуру!',
+  'hudChrome.templeAlert.answerLine':
+    'Чередуйтесь: наступите на лунную плиту с отметкой {place}. Сыграно: {done} из {total}',
+  'hudChrome.templeAlert.answerDarkLine':
+    'Чередуйтесь и повторите порядок по памяти. Сойдите с плиты, прежде чем наступить снова. Сыграно: {done} из {total}',
+  'hudChrome.templeAlert.stepOffTitle': 'Сойдите и наступите снова',
+  'hudChrome.templeAlert.stepOffLine':
+    'Лунная плита звучит, только когда на неё наступают. Сойдите с этой плиты и наступите на неё снова',
+  'hudChrome.templeAlert.falseTitle': 'Фальшивая нота!',
+  'hudChrome.templeAlert.falseLine':
+    'Эта плита была не в свой черёд. Ответ начинается заново с первой плиты',
+  'hudChrome.templeAlert.brokenTitle': 'Голос Селте сорван!',
+  'hudChrome.templeAlert.brokenLine':
+    'Пока действует эффект, она получает на {pct}% больше урона: бейте сильнейшими атаками',
+  'hudChrome.templeAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.temple.scoreWard':
+    'Поёт Партитуру: не получает урона, пока та не закончится. Наступите на лунные плиты в том порядке, в котором они звучали, прежде чем закончится куплет, и её голос сорвётся. Чередуйтесь: сыграв ноту, дождитесь, пока другой игрок сыграет следующую верную ноту. Единственный выживший может закончить в одиночку. Если куплет закончится раньше, Диссонанс нанесёт всем во дворе от {min} до {max} ед. урона от льда (в героическом режиме от {heroicMin} до {heroicMax}).',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    'Её голос сорван: пока действует эффект, она получает на {pct}% больше урона.',
+  'abilityUi.cast.temple_score': 'Партитура',
+  'abilityUi.cast.temple_score_answer': 'Ответ на Партитуру',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    'Партитура (дважды она поёт мелодию на лунных плитах: наступите на них в том порядке, в котором они звучали, и её голос сорвётся)',
+  'hudChrome.templeAlert.spentTitle': 'Теперь должен ответить другой голос',
+  'hudChrome.templeAlert.spentLine':
+    'Вы не можете озвучить плиту, пока другой игрок не сыграет следующую верную ноту. Сыграно: {done} из {total}',
+  'hudChrome.auraEffect.temple.spentVoice':
+    'Вы не можете озвучить лунную плиту, пока другой игрок не сыграет следующую верную ноту. Наступая на плиту под этим эффектом, вы не сбрасываете ответ и не получаете урон. Нельзя рассеять. Снимается, если вы остались единственным живым игроком в вашем экземпляре подземелья или партитура завершена.',
+  // The Sledge Tusker's bait rework (the ice outcrops, Stuck in the Ice, the
+  // soulfire trail): the M16 non-Latin fills of its new English.
+  'hudChrome.sanctumAlert.trampleTitle': 'Растаптывание!',
+  'hudChrome.sanctumAlert.trampleLeadLine':
+    'Направьте рывок в ледяной выступ, затем отойдите в сторону',
+  'hudChrome.sanctumAlert.trampleLine':
+    'Уйдите вбок с отмеченной полосы, пока бивнерог не бросился по ней',
+  'hudChrome.sanctumAlert.soulfireTitle': 'Душевный огонь!',
+  'hudChrome.sanctumAlert.soulfireLine': 'Вы стоите в горящем душевном огне. Выйдите из него',
+  'hudChrome.sanctumAlert.stuckTitle': 'Бивнерог застрял!',
+  'hudChrome.sanctumAlert.stuckLine':
+    'Он получает на {pct}% больше урона, пока не вырвется: используйте сильнейшие атаки сейчас',
+  'hudChrome.sanctumAlert.trampleBaitTitle': 'Рывок в лёд',
+  'hudChrome.sanctumAlert.trampleBaitLine':
+    'Это Растаптывание закончится в ледяном выступе. Не заходите на полосу и готовьтесь атаковать',
+  'hudChrome.sanctumAlert.baitHintTitle': 'Заманите Растаптывание',
+  'hudChrome.sanctumAlert.baitHintLine':
+    'Он бросается на самого дальнего игрока. Встаньте за ледяным выступом, чтобы рывок упёрся в него: бивнерог застрянет на {seconds} сек. и будет получать на {pct}% больше урона',
+  'hudChrome.auraEffect.sanctum.tuskerStuck':
+    'Его бивни увязли в ледяном выступе. Он не может двигаться и атаковать {seconds} сек., затем вырывается, и выступ раскалывается.',
+  'hudChrome.auraEffect.sanctum.tuskerStuckExposed':
+    'Застрял в ледяном выступе: получает на {pct}% больше урона.',
+  'abilityUi.cast.sanctum_soulfire_trail_burn': 'Горит',
+  'abilityUi.cast.sanctum_ice_outcrop_held': 'Бивни увязли',
+  // The Great Saurian's totem rework (the Sunbone Sap Totems, the heroic drum):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.wildheartAlert.saurianStompTitle': 'Сотрясающий топот!',
+  'hudChrome.wildheartAlert.saurianStompLine': 'Выбегите из круга, пока Великий завр не топнул',
+  'hudChrome.wildheartAlert.sapTotemTitle': 'Тотем сока!',
+  'hudChrome.wildheartAlert.sapTotemLine':
+    'Тотем сока Солнечной Кости исцеляет Великого завра каждые {seconds} сек., пока его не уничтожат. Тотемов стоит: {count}',
+  'hudChrome.wildheartAlert.drumTitle': 'Барабан торопит топот',
+  'hudChrome.wildheartAlert.drumLine':
+    'Пока бьёт барабан, Сотрясающий топот случается вдвое чаще. Уничтожьте Тотем сока Солнечной Кости, чтобы барабан умолк на {seconds} сек.',
+  'hudChrome.auraEffect.wildheart.sapped':
+    'Его питают Тотемы сока Солнечной Кости: {count}. Каждый восстанавливает {pct}% его максимального здоровья каждые {seconds} сек. Уничтожьте тотемы, чтобы прекратить исцеление.',
+  'hudChrome.auraEffect.wildheart.howdahDrum':
+    'Барабанщик в паланкине подгоняет его: время между Сотрясающими топотами сокращено на {pct}%. Уничтожение Тотема сока Солнечной Кости заставляет барабан умолкнуть на {seconds} сек. Барабан падает вместе с паланкином.',
+  'hudChrome.auraEffect.wildheart.drumSilenced':
+    'Барабанщик сбился с ритма: до конца эффекта Сотрясающий топот случается с обычной частотой.',
+  'abilityUi.cast.wildheart_saurian_sap_tether': 'Сок предков',
+  'entities.mobs.sunbone_sap_totem.name': 'Тотем сока Солнечной Кости',
 };
