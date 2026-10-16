@@ -503,7 +503,7 @@ function removeMaterialStacked(inventory: InvSlot[], itemId: string, count: numb
  *  copy. A capacity pre-check must model the removal identically to the
  *  remover it gates, or the guard re-opens the overflow class (#2139).
  *
- *  A MATERIAL does NOT take these three passes: it ranks by the canonical
+ *  A MATERIAL does NOT take these four passes: it ranks by the canonical
  *  source order instead, with `excludeInstance` judged per unit on its
  *  effective payload (consumeOneMaterialScratch says why). */
 export function consumeOneScratch(

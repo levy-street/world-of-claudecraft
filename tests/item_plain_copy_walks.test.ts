@@ -11,6 +11,7 @@
 // the #2139 bag-overflow class. Every command case drives a real Sim.
 import { describe, expect, it } from 'vitest';
 import { consumeOneScratch } from '../src/sim/bags';
+import { takeIdentityOnlyUnits } from '../src/sim/item_plain_copy';
 import { isItemGuid } from '../src/sim/item_provenance';
 import { removePreferFungible, removeSellUnitsFromInventory } from '../src/sim/items';
 import { isEnchantedInstance, resolveApplyEnchant } from '../src/sim/professions/enchanting';
@@ -205,6 +206,50 @@ describe('the capacity scratch agrees with every live remover, slot for slot', (
     const batch = removePreferFungible(sim.ctx, RING, 3, pid);
     expect(batch.map((p) => p.guid)).toEqual([identity(4).guid, identity(2).guid]);
     expect(batch[0].provenance).toEqual(identity(4).provenance);
+    // Past the plain classes the remainder rides removeItem, appended after
+    // the identity-only payloads: the newest special copy (the signed one).
+    meta(sim, pid).inventory = clone(mixed());
+    const mixedBatch = removePreferFungible(sim.ctx, RING, 4, pid);
+    expect(mixedBatch.map((p) => p.guid)).toEqual([
+      identity(4).guid,
+      identity(2).guid,
+      identity(5).guid,
+    ]);
+  });
+
+  it('the identity-only pass honors skip and deprioritize like the instanced passes', () => {
+    const units = removeSellUnitsFromInventory(
+      clone(mixed()),
+      RING,
+      4,
+      (instance) => instance.guid === identity(4).guid,
+      (instance) => instance.guid === identity(2).guid,
+    );
+    // payload-free, then no eligible identity-only copy (one skipped, one
+    // deprioritized), then the special copies, the deprioritized one last.
+    expect(units.map((u) => label(u.instance))).toEqual([
+      'payload-free',
+      identity(5).guid,
+      identity(3).guid,
+      identity(1).guid,
+    ]);
+  });
+
+  it('a partly spent identity-only stack hands out clones, never the surviving payload', () => {
+    const inventory: InvSlot[] = [{ itemId: RING, count: 3, instance: identity(6) }];
+    const survivor = inventory[0].instance;
+    const taken = takeIdentityOnlyUnits(inventory, RING, 2);
+    expect(taken).toHaveLength(2);
+    expect(inventory).toEqual([{ itemId: RING, count: 1, instance: identity(6) }]);
+    for (const unit of taken) {
+      expect(unit.instance).toEqual(identity(6));
+      expect(unit.instance).not.toBe(survivor);
+    }
+    // The final unit of a fully spent slot is the slot's own object.
+    const last = takeIdentityOnlyUnits(inventory, RING, 5);
+    expect(last.map((u) => u.instance)).toEqual([survivor]);
+    expect(last[0].instance).toBe(survivor);
+    expect(inventory).toHaveLength(0);
   });
 
   it('removeSellUnitsFromInventory (trade, vendor) walks the same order', () => {

@@ -279,7 +279,7 @@ export function removePreferFungible(
   // honoring `skip` outright). The trade drop arm passes the seller's own
   // signature, so shipping "one charm" no longer grabs the seller's
   // discount-bearing self-signed copy while a foreign or unsigned copy sat
-  // beside it. Absent, the walk is byte-identical to before.
+  // beside it. Absent, the walk takes no deprioritized pass.
   deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload[] {
   if (isMaterialItemId(itemId)) {
@@ -424,6 +424,9 @@ export function removeSellUnitsFromInventory(
   // tracked copy ships before a special one, guid and provenance riding along.
   // `skip` sees it (it is instanced), so the escrow's `() => true` still means
   // payload-free stock only; a deprioritized one waits for its own pass.
+  // `skipPlainStacks` closes only the payload-free pass above: its callers
+  // (the soulbound trade window, the mail instanced projection) already pass
+  // a `skip` that refuses an identity-only copy unless it is the exact copy.
   const identityOnly = takeIdentityOnlyUnits(
     inventory,
     itemId,

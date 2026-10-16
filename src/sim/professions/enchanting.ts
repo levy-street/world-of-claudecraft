@@ -818,7 +818,7 @@ export function baggedEnchantVictim(
     if (idx >= 0) return inventory[idx].instance;
   }
   const scratch = inventory.map((s) => ({ ...s }));
-  // consumeOneScratch's third pass falls back to an EXCLUDED (enchanted) copy
+  // consumeOneScratch's last pass falls back to an EXCLUDED (enchanted) copy
   // where the unconfirmed apply itself spends nothing (it denies
   // already_enchanted). That fallback is KEPT on purpose: with only enchanted
   // copies held, the Perfected gate then answers about a Perfected copy the

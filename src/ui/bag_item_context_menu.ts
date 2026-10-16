@@ -210,7 +210,9 @@ export function isSpecialCopy(instance: ItemInstancePayload | undefined): boolea
 }
 
 /** Whether the copy the destructive action WOULD consume is special, so the
- *  confirm escalates to the stronger warning. Both actions prefer a PLAIN
+ *  confirm escalates to the stronger warning. A slot-targeted destroy passes
+ *  only the selected copy (bag_item_action_menu.ts confirmDestroy), so the
+ *  walk below judges that copy alone. Untargeted, every action prefers a PLAIN
  *  copy first (payload-free, or carrying only its tracked identity: an
  *  ordinary epic, sim/item_plain_copy.ts isPlainCopy, the same read the
  *  walks use), so a player holding any plain copy is never warned (that

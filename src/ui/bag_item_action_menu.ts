@@ -341,8 +341,11 @@ export class BagItemActionMenu {
     // would title a destroy with a DIFFERENT copy's chosen name.
     const target = selected?.itemId === itemId ? selected : undefined;
     const name = def ? wornItemCellParts(def, target?.instance).name : itemId;
+    // Every verb destroys the SELECTED cell when one is named (the OK below
+    // forwards its index), so the warning judges that copy alone; only an
+    // unselected open falls back to the prefer-plain walk over every copy.
     const copies =
-      (action === 'disenchant' || action === 'sunder') && selected?.itemId === itemId
+      selected?.itemId === itemId
         ? [selected]
         : world.inventory.filter((slot) => slot.itemId === itemId);
     const special = destroyConsumesSpecialCopy(action, copies);
