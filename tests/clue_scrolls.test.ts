@@ -811,7 +811,10 @@ describe('the Treasure Casket', () => {
       markDeedsDirty: vi.fn(),
     } as unknown as SimContext;
     let spent = 0;
-    openTreasureCasket(ctx, meta, { level: 17 } as Entity, () => spent++);
+    openTreasureCasket(ctx, meta, { level: 17 } as Entity, () => {
+      spent++;
+      return undefined;
+    });
     return { grants, emits, meta, ctx, spent };
   }
 

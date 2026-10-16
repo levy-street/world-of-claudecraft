@@ -299,9 +299,11 @@ export function ensureTrackedInPlace(
 
 /**
  * Record a lifecycle step of a tracked copy that is NOT a grant: a change in
- * place (`modify`: Perfecting, an enchant, a Rift Forge upgrade, an unbind)
- * or the end of the copy (`consume`: sundered, salvaged, disenchanted,
- * destroyed, learned, spent). `source` names the action (a sim-composed id),
+ * place (`modify`: Perfecting, an enchant, a Rift Forge upgrade, an unbind),
+ * the end of the copy (`consume`: sundered, salvaged, disenchanted,
+ * destroyed, learned, spent), or the copy leaving its holder for a custodian
+ * that is not a character (`transfer`: the $WOC Exchange escrow, where `by`
+ * names the holder it left). `source` names the action (a sim-composed id),
  * `detail` the specifics (a rank, an enchant id, what it became) and
  * `relatedGuid` the other copy a swap or derivation names. A payload with no
  * guid (an untracked or pre-tracking copy) records nothing. Emits only: the
@@ -312,7 +314,7 @@ export function recordTrackedChange(
   meta: PlayerMeta,
   itemId: string,
   payload: ItemInstancePayload | undefined,
-  kind: 'modify' | 'consume',
+  kind: 'modify' | 'consume' | 'transfer',
   source: string,
   detail?: string,
   relatedGuid?: string,

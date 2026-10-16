@@ -864,7 +864,7 @@ export function useItem(
   // Consumables of one id are interchangeable in effect, so this matters less
   // than it does for gear; it is threaded anyway so the family has no id-only
   // holes left for a new command to copy.
-  const consumeOneUnit = (): ItemInstancePayload | undefined => {
+  const takeOneUnit = (): ItemInstancePayload | undefined => {
     if (slotIndex === undefined) {
       const [unit] = ctx.removeItem(itemId, 1, meta.entityId);
       return unit;
@@ -873,6 +873,14 @@ export function useItem(
     if (!taken) return undefined;
     ctx.onInventoryChangedForQuests?.(meta);
     return taken.instance;
+  };
+  // A spent tracked copy ends here: its final ledger row, source `use` and the
+  // use it went to. An arm that names what the copy became itself (the
+  // casket's payout) takes the bare takeOneUnit and writes its own row.
+  const consumeOneUnit = (): ItemInstancePayload | undefined => {
+    const unit = takeOneUnit();
+    recordTrackedChange(ctx, meta, itemId, unit, 'consume', 'use', def?.use?.type ?? def?.kind);
+    return unit;
   };
   if (!def) return;
   // The worn trinket is used where it sits, not from the bags (combat/trinkets.ts).
@@ -1025,7 +1033,7 @@ export function useItem(
     return;
   }
   if (def.use?.type === 'clueCasket') {
-    openTreasureCasket(ctx, meta, p, consumeOneUnit);
+    openTreasureCasket(ctx, meta, p, takeOneUnit);
     return;
   }
   if (def.use?.type === 'alliedHearthstone') {

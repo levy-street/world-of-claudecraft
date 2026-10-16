@@ -1207,7 +1207,10 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Lowered 11642 -> 11632 when the tracked-copy spend rows for the skin
+    // token and the mech chroma plate went to src/sim/cosmetic_token_spend.ts
+    // (the claim and the item-use binding call it); exact count, zero slack.
+    ceiling: 11632,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

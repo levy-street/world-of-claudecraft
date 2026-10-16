@@ -11,6 +11,7 @@ import { bagPools, canGrantCopies } from './bags';
 import { ITEMS } from './data';
 import { type ExtractOutcome, type ExtractRef, extractTradableCopy } from './inventory_extract';
 import { grantCopies } from './item_instance_transfer';
+import { recordTrackedChange } from './item_tracking';
 import { forceDismount as forceDismountImpl, mountOwned } from './mounts';
 import type { SimContext } from './sim_context';
 import type { InvSlot } from './types';
@@ -21,6 +22,13 @@ import type { InvSlot } from './types';
 // the pure leaf (inventory_extract.ts); this is the thin facade delegate a
 // foreign caller resolves, matching the inventory hub's shape. The sim stays
 // currency-blind here: what the broker does with the copy is server business.
+//
+// A tracked copy that leaves for escrow writes a `transfer` row (source
+// `wocEscrow`, `by` the seller it left), NOT a `consume`: the copy lives on,
+// guid and provenance intact, and comes back out through a Ravenpost parcel,
+// to a buyer (whose movement grant writes the ordinary transfer row naming
+// them) or home to the seller (the same holder, which writes nothing). A
+// consume here would make that later row read as a duplicate.
 export function extractTradableCopyImpl(
   ctx: SimContext,
   pid: number | undefined,
@@ -32,6 +40,15 @@ export function extractTradableCopyImpl(
   const out = extractTradableCopy(r.meta.inventory, ref, def);
   if (out.ok) {
     ctx.onInventoryChangedForQuests(r.meta);
+    recordTrackedChange(
+      ctx,
+      r.meta,
+      out.extracted.itemId,
+      out.extracted.instance,
+      'transfer',
+      'wocEscrow',
+      'escrow',
+    );
     // Ownership is derived from HOLDING the item (mountOwned reads the bags and
     // the bank), but a live ride is never re-validated once it has started. So
     // a seller who lists the mount they are riding would keep its speed for the

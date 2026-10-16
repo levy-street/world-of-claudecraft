@@ -512,8 +512,11 @@ export class Market {
   // are dev-gated bots.) Everything destroyed here is the deleted
   // character's OWN escrow (marketList escrows out of the seller's own bags), so
   // no other player's property rides along. Returns whether anything changed, so
-  // the caller only pays for a save when there was something to purge.
-  purgeMarketSeller(characterId: number, name: string): boolean {
+  // the caller only pays for a save when there was something to purge. Every
+  // destroyed copy (listing escrow and collection alike) is appended to
+  // `destroyed` when given, so the server can write the tracked copies' final
+  // ledger rows (server/character_purge_item_ledger.ts).
+  purgeMarketSeller(characterId: number, name: string, destroyed?: InvSlot[]): boolean {
     if (!Number.isFinite(characterId)) return false;
     const key = String(characterId);
     const owns = (k: string): boolean => k === key || (name !== '' && k === name);
@@ -523,10 +526,20 @@ export class Market {
       if (listing.house) continue;
       if (!owns(listing.sellerKey)) continue;
       this.marketListings.splice(i, 1);
+      destroyed?.push({
+        itemId: listing.itemId,
+        count: listing.count,
+        ...(listing.instance && { instance: listing.instance }),
+      });
       changed = true;
     }
-    if (this.marketCollections.delete(key)) changed = true;
-    if (name !== '' && name !== key && this.marketCollections.delete(name)) changed = true;
+    for (const collectionKey of name !== '' && name !== key ? [key, name] : [key]) {
+      const collection = this.marketCollections.get(collectionKey);
+      if (!collection) continue;
+      destroyed?.push(...collection.items);
+      this.marketCollections.delete(collectionKey);
+      changed = true;
+    }
     if (this.orderBook.purge(key, name)) changed = true;
     if (changed) this.bumpBook();
     return changed;
