@@ -15,6 +15,19 @@
 // deferred rebuild once the drag concludes.
 
 import { describe, expect, it, vi } from 'vitest';
+
+// This suite exercises the drag/render deferral, not WebGL portraits. Importing
+// the real portrait module starts GLB fetches that can outlive happy-dom
+// teardown and throw ProgressEvent errors in Node (the inspect_window.test.ts
+// hazard), so keep that renderer boundary inert.
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import { CharWindow, type CharWindowDeps } from '../src/ui/char_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 

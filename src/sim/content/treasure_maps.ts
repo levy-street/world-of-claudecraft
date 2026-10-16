@@ -84,8 +84,10 @@ function clampHeadCount(headCount: number): number {
 export interface VaultPayoutDef {
   /** Multiplier on the level-scaled casket copper (src/sim/clue_casket.ts). */
   copperMult: number;
-  /** Units of one top-tier gathered material. */
+  /** Units of one corpse-harvest specimen (VAULT_MATERIAL_POOL). */
   materials: number;
+  /** Units of one top-rung consumable (vaultConsumablePool). */
+  consumables: number;
   /** Odds the map's OWNER takes one piece off the fallen boss's own table
    *  (content/hoard_loot.ts), at the tier the map's rarity buys. */
   gearChance: number;
@@ -104,6 +106,7 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
   common: {
     copperMult: 0.3,
     materials: 4,
+    consumables: 2,
     gearChance: 0.1,
     markChance: 0.05,
     marks: 2,
@@ -113,6 +116,7 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
   rare: {
     copperMult: 0.6,
     materials: 6,
+    consumables: 3,
     gearChance: 0.3,
     markChance: 0.1,
     marks: 2,
@@ -122,6 +126,7 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
   epic: {
     copperMult: 0.9,
     materials: 8,
+    consumables: 4,
     gearChance: 0.5,
     markChance: 0.25,
     marks: 3,
@@ -131,6 +136,7 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
   legendary: {
     copperMult: 1.3,
     materials: 12,
+    consumables: 5,
     gearChance: 1,
     markChance: 1,
     marks: 5,
@@ -138,6 +144,31 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
     nextMapChance: 0,
   },
 });
+
+/** The material stack every vault payout carries: one of the corpse-harvest
+ *  specimens (HARVEST_COMPONENT_SPECIMENS in content/professions.ts, item
+ *  records in content/profession_items.ts), the four Pristine ones plus the
+ *  meat family's Prime Cut. Their sell values are comparable to the top-tier
+ *  node yields this pool replaced, so VAULT_PAYOUTS[r].materials keeps its
+ *  counts. */
+export const VAULT_MATERIAL_POOL: readonly string[] = Object.freeze([
+  'pristine_hide',
+  'pristine_silk',
+  'pristine_venom_gland',
+  'pristine_claw',
+  'prime_cut',
+]);
+
+/** The consumable stack every vault payout carries: the top rung of the
+ *  crafted potion and elixir ladders (content/profession_items.ts). None carries
+ *  a level requirement, so every entrant from HOARD_MIN_LEVEL can use them. A
+ *  mana draught is only offered to a mana class. */
+const VAULT_CONSUMABLES = Object.freeze(['sunpetal_healing_draught', 'elixir_of_the_serpent']);
+const VAULT_MANA_CONSUMABLES = Object.freeze([...VAULT_CONSUMABLES, 'sunpetal_mana_draught']);
+
+export function vaultConsumablePool(usesMana: boolean): readonly string[] {
+  return usesMana ? VAULT_MANA_CONSUMABLES : VAULT_CONSUMABLES;
+}
 
 /** The same roll for a GUEST (anyone in the hoard who did not read the map):
  *  the owner paid for the map, so the owner's odds are the map's headline. */

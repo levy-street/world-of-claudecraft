@@ -8932,6 +8932,8 @@ export const hudChromeStrings = {
       "Awarded to every member of the party that wins a ranked Rift's first clear",
     // The Buried Hoard pieces (content/hoard_loot.ts): rolled from the reward
     // chest, never from the keeper's own loot, and at the tier the map buys.
+    // Also the second source of the corpse-harvest specimens the same chest
+    // pays (VAULT_MATERIAL_POOL, content/treasure_maps.ts).
     sourceActivityBuriedHoard:
       'Found in the reward chest of a Buried Hoard, the vault a treasure map leads to',
     // The aria label folds the lines through formatList (Intl.ListFormat), so

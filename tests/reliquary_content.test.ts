@@ -73,6 +73,7 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
+import { VAULT_MATERIAL_POOL } from '../src/sim/content/treasure_maps';
 import { WEAPON_SKIN_LIST, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   ALL_RECIPES,
@@ -2840,8 +2841,9 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   rift_first_clear: RIFT_GEAR_ITEM_IDS,
   // Derived from the live piece list: treasure_vault.ts payOne rolls one piece
   // (at the tier the map buys, each tier discovering its piece through
-  // ItemDef.relicOf) when an entrant opens a hoard's reward chest.
-  buried_hoard: HOARD_BASE_ITEM_IDS,
+  // ItemDef.relicOf) when an entrant opens a hoard's reward chest. The same
+  // chest always pays one corpse-harvest specimen stack (rift/hoard_reward_roll.ts).
+  buried_hoard: [...HOARD_BASE_ITEM_IDS, ...VAULT_MATERIAL_POOL],
 };
 
 /**
@@ -3178,10 +3180,11 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // professions + farming, whose golden-harvest cell landed at masterwrought
   // Phase 18.
   professions_field_notes: 5,
-  // 7 = corpse_harvest + the four gathering professions with a jackpot slot
+  // 8 = corpse_harvest + the four gathering professions with a jackpot slot
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
-  // their Litany board keeper (Phase 21).
-  professions_specimens: 7,
+  // their Litany board keeper (Phase 21) + buried_hoard, whose reward chest
+  // pays the five corpse-harvest specimens.
+  professions_specimens: 8,
   professions_crucible: 3,
   professions_forgebreaker: 1,
   // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
@@ -3945,6 +3948,19 @@ describe('Reliquary source hints resolve against live content', () => {
     // reach the write site; alone, both sides here read the same array.
     expect([...(bySlotKind.get('rift_first_clear:item') ?? [])].sort()).toEqual(
       [...RIFT_GEAR_ITEM_IDS].sort(),
+    );
+    // The Buried Hoard ITEM slots are EXACTLY the hoard pieces plus the five
+    // specimens its reward chest pays, spelled literally so a hint that leaks
+    // onto any other relic fails here.
+    expect([...(bySlotKind.get('buried_hoard:item') ?? [])].sort()).toEqual(
+      [
+        ...HOARD_BASE_ITEM_IDS,
+        'pristine_hide',
+        'pristine_silk',
+        'pristine_venom_gland',
+        'pristine_claw',
+        'prime_cut',
+      ].sort(),
     );
     // Vacuity floor: five specimens, the two marks, and the three bands.
     expect(checked).toBeGreaterThanOrEqual(10);

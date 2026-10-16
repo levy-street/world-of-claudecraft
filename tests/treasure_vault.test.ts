@@ -11,7 +11,9 @@ import {
   TREASURE_MAP_ITEM_IDS,
   TREASURE_MAP_UPGRADE_INKS,
   TREASURE_SITES_BY_ID,
+  VAULT_MATERIAL_POOL,
   VAULT_PAYOUTS,
+  vaultConsumablePool,
   vaultDamageFactor,
   vaultHealthFactor,
 } from '../src/sim/content/treasure_maps';
@@ -464,8 +466,14 @@ describe('the vault run', () => {
     expect(looted[0].capped).toBe(false);
     expect(looted[0].rarity).toBe('common');
     expect(meta.copper).toBeGreaterThan(copperBefore);
+    expect(VAULT_MATERIAL_POOL).toContain(looted[0].itemIds![0]);
     expect(sim.countItem(looted[0].itemIds![0])).toBeGreaterThanOrEqual(
       VAULT_PAYOUTS.common.materials,
+    );
+    // makeSim plays a warrior: a rage class, so the pool without the mana draught.
+    expect(vaultConsumablePool(false)).toContain(looted[0].itemIds![1]);
+    expect(sim.countItem(looted[0].itemIds![1])).toBeGreaterThanOrEqual(
+      VAULT_PAYOUTS.common.consumables,
     );
     expect(meta.clueCasketsOpened).toBe(1);
     expect(inst.rewarded).toBe(true);
