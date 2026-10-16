@@ -1234,7 +1234,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // broken recipe (a moved banker failing the proximity gate, every vault op
     // refusing) would mint a no-op arm with nothing red. Pin the final state
     // both stores must reach; the numbers are the scenario's own arithmetic
-    // (71000 - 20000 - 50000 = 1000 copper; 10 ore deposited 6 then 2 back,
+    // (61000 - 20000 - 40000 = 1000 copper; 10 ore deposited 6 then 2 back,
     // then the step-12 sweep re-stocks the carried 6; the whole 4-stack of
     // logs; the bank ladder's first 500-copper rung; and the sweep takes the
     // 5 wolf_fang the bank arm returned to the bags, wolf_fang being a recipe

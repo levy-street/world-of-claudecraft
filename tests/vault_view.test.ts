@@ -67,7 +67,7 @@ describe('buildVaultView', () => {
     // The exact shape tests/vault_wire.test.ts pins for a locked vault near a
     // banker; the 20000 is the wire's number, not a client table's.
     const model = buildVaultView(vinfo({}, 0, 0, 20000), lookup);
-    expect(model).toEqual({ kind: 'locked', unlockCost: 20000, unlockCap: 40 });
+    expect(model).toEqual({ kind: 'locked', unlockCost: 20000, unlockCap: 100 });
     // A DIFFERENT wire price renders that price: the core echoes the server.
     const tuned = buildVaultView(vinfo({}, 0, 0, 123456), lookup);
     expect(tuned.kind).toBe('locked');
@@ -75,16 +75,17 @@ describe('buildVaultView', () => {
   });
 
   it('an empty unlocked vault is the empty state with the wire cap', () => {
-    const model = buildVaultView(vinfo({}, 1, 40, 50000), lookup);
+    // The rung-1 shape the sim emits: cap 100, the second rung's 40000 next.
+    const model = buildVaultView(vinfo({}, 1, 100, 40000), lookup);
     if (model.kind !== 'vault') throw new Error(`expected vault, got ${model.kind}`);
     expect(model.empty).toBe(true);
     expect(model.rows).toEqual([]);
-    expect(model.perMaterialCap).toBe(40);
+    expect(model.perMaterialCap).toBe(100);
     expect(model.upgrade).toEqual({
       currentUpgrades: 1,
-      nextCost: 50000,
+      nextCost: 40000,
       maxed: false,
-      nextCap: 80,
+      nextCap: 200,
     });
   });
 
@@ -302,15 +303,15 @@ describe('buildVaultView', () => {
   });
 
   it('the exhausted ladder is maxed with no next cap and no next price', () => {
-    const model = buildVaultView(vinfo({ copper_ore: 1 }, 5, 200, null), lookup);
+    const model = buildVaultView(vinfo({ copper_ore: 1 }, 10, 1000, null), lookup);
     if (model.kind !== 'vault') throw new Error('expected vault');
     expect(model.upgrade).toEqual({
-      currentUpgrades: 5,
+      currentUpgrades: 10,
       nextCost: null,
       maxed: true,
       nextCap: null,
     });
-    expect(model.perMaterialCap).toBe(200);
+    expect(model.perMaterialCap).toBe(1000);
   });
 });
 
@@ -616,7 +617,7 @@ describe('no client-side price constant (source scan)', () => {
     // BANK_EXPANSION_SLOTS precedent and stay allowed. Comments are stripped
     // so a mention in prose cannot trip it, nor mask a real import. The
     // literal arm loops the REAL exported table (an absence check against
-    // live values, not a self-comparison), so a fifth rung added later is
+    // live values, not a self-comparison), so an eleventh rung added later is
     // scanned without anyone editing this test; bank_window.ts joins the
     // list because its repaint signature reads the wire price and is the
     // third module a hardcoded rung could plausibly land in.
@@ -644,7 +645,7 @@ describe('no client-side price constant (source scan)', () => {
       }
     }
     // The loop above walks the live ladder: prove it saw the whole table.
-    expect(VAULT_UPGRADE_PRICES.length).toBe(5);
+    expect(VAULT_UPGRADE_PRICES.length).toBe(10);
   });
 });
 

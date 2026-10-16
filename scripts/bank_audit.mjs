@@ -25,8 +25,9 @@
 //
 // THE PERSONAL CONTAINER additionally carries the bank SOCKET STORE (Bank
 // Storage phase 07): 'unlock_socket' rows replay the copper ladder (the Nth
-// unlock per character costs exactly the Nth BANK_SOCKET_PRICES entry, at most
-// four ever) against state.bank.unlockedSockets, and 'socket_bag' /
+// unlock per character costs exactly the Nth BANK_SOCKET_PRICES entry, or the
+// Nth entry of a BANK_SOCKET_RETIRED_PRICES ladder, at most four ever)
+// against state.bank.unlockedSockets, and 'socket_bag' /
 // 'unsocket_bag' rows replay the socketed-bag multiset against
 // state.bank.socketBags, in maps SEPARATE from the slot replay's (a bag can
 // legitimately sit in a slot AS an item or in a socket AS capacity, so a
@@ -160,14 +161,21 @@ const GUILD_BUY_POSITION_SET = new Set(GUILD_BUY_POSITIONS);
 // carries the rung REACHED, so the integers 1 through this are the only honest
 // values a writer can emit. Lockstep-pinned against the sim ladder by
 // tests/bank_audit.test.ts, the KNOWN_CONTAINERS discipline.
-export const VAULT_MAX_RUNG = 5;
+export const VAULT_MAX_RUNG = 10;
 
 // The bank bag-socket ladder (BANK_SOCKET_PRICES in src/sim/bank.ts),
 // mirrored dependency-free like the guild ladder and the vault rung above and
 // lockstep-pinned by tests/bank_audit.test.ts. A legitimate unlock history is
 // a PREFIX of this list: the Nth unlock_socket row per character costs exactly
 // the Nth price, and a fifth row has no honest price at all.
-export const BANK_SOCKET_PRICES = [1000000, 2000000, 3500000, 5000000];
+export const BANK_SOCKET_PRICES = [750000, 1000000, 1250000, 1500000];
+
+// Socket ladders that were live before a compiled retune. A row is honest when
+// it carries the Nth price of the CURRENT ladder or of any retired one, since
+// an unlock bought before the retune keeps the price it was charged; mixed
+// histories (unlock 1 at a retired price, unlock 2 at the current) are fine.
+// Append the outgoing ladder here whenever BANK_SOCKET_PRICES changes.
+export const BANK_SOCKET_RETIRED_PRICES = [[1000000, 2000000, 3500000, 5000000]];
 
 // The op vocabulary this audit's shape chain handles (checkRowShape): the
 // dependency-free mirror of server/db.ts BankLedgerRow.op, the same
@@ -1248,7 +1256,10 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
               kind: 'socket_unlock_past_ladder',
               detail: `unlock_socket row ${row.id} is unlock ${unlockRows + 1} but the ladder has ${BANK_SOCKET_PRICES.length} rungs`,
             });
-          } else if (Number(row.copper_delta) !== -expected) {
+          } else if (
+            Number(row.copper_delta) !== -expected &&
+            !BANK_SOCKET_RETIRED_PRICES.some((l) => Number(row.copper_delta) === -l[unlockRows])
+          ) {
             findings.push({
               ...base,
               kind: 'bad_socket_price',

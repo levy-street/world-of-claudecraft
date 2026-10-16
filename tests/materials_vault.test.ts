@@ -2,7 +2,7 @@
 // (src/sim/materials_vault.ts + the Sim delegates vaultDeposit/vaultWithdraw/
 // vaultBuyUpgrade/vaultInfoFor). Where the bank spends ONE pooled slot budget over
 // every item, the vault gives every material id its own capacity, bought with a
-// five-rung gold ladder whose rung 0 is the unlock itself.
+// ten-rung gold ladder whose rung 0 is the unlock itself.
 //
 // THE ITEM-SAFETY COVENANT is this suite's first law: a vault op may move a
 // material between the bags and the stock, but the TOTAL held count of that id
@@ -36,11 +36,12 @@ import { tSim } from '../src/ui/sim_i18n';
 import { predictVaultDepositAll } from '../src/ui/vault_view';
 import { COMMAND_NAMES } from '../src/world_api';
 
-// The five-rung ladder, pinned as literals (never compared to the exported table,
+// The ten-rung ladder, pinned as literals (never compared to the exported table,
 // which would be a zero-protection self-comparison). Rung 0 IS the unlock.
-const PRICES = [20000, 50000, 100000, 200000, 400000];
-const LADDER_TOTAL = 770000; // 20000 + 50000 + 100000 + 200000 + 400000
-const CAPS = [40, 80, 120, 160, 200]; // 40 per purchased rung
+const PRICES = [20000, 40000, 70000, 120000, 200000, 320000, 500000, 750000, 1100000, 1600000];
+// 2g + 4g + 7g + 12g + 20g + 32g + 50g + 75g + 110g + 160g = 472g
+const LADDER_TOTAL = 4720000;
+const CAPS = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]; // 100 per purchased rung
 const UNLOCK_NOTICE = 'You unlock the Materials Vault.';
 const UPGRADE_NOTICE = 'You upgrade the Materials Vault.';
 const TOO_FAR = 'You are too far from the banker.';
@@ -163,20 +164,22 @@ const slotIndexOf = (m: Meta, itemId: string) => m.inventory.findIndex((s) => s.
 // ---------------------------------------------------------------------------
 describe('vault ladder constants and capacity math', () => {
   it('the upgrade ladder, base cap, and step are the pinned literals', () => {
-    expect([...VAULT_UPGRADE_PRICES]).toEqual([20000, 50000, 100000, 200000, 400000]);
-    expect(VAULT_UPGRADE_PRICES.length).toBe(5);
-    expect(VAULT_BASE_CAP).toBe(40);
-    expect(VAULT_UPGRADE_STEP).toBe(40);
+    expect([...VAULT_UPGRADE_PRICES]).toEqual([
+      20000, 40000, 70000, 120000, 200000, 320000, 500000, 750000, 1100000, 1600000,
+    ]);
+    expect(VAULT_UPGRADE_PRICES.length).toBe(10);
+    expect(VAULT_BASE_CAP).toBe(100);
+    expect(VAULT_UPGRADE_STEP).toBe(100);
   });
 
-  it('vaultCapacityPerMaterial is 0 while locked, then 40 more per purchased rung', () => {
-    const caps = [0, 1, 2, 3, 4, 5].map((upgrades) =>
+  it('vaultCapacityPerMaterial is 0 while locked, then 100 more per purchased rung', () => {
+    const caps = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((upgrades) =>
       vaultCapacityPerMaterial({ stock: {}, upgrades }),
     );
-    expect(caps).toEqual([0, 40, 80, 120, 160, 200]);
+    expect(caps).toEqual([0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]);
     // The stock never feeds the capacity: a stuffed vault has the same cap as an
     // empty one at the same rung.
-    expect(vaultCapacityPerMaterial({ stock: { copper_ore: 999 }, upgrades: 1 })).toBe(40);
+    expect(vaultCapacityPerMaterial({ stock: { copper_ore: 9999 }, upgrades: 1 })).toBe(100);
   });
 });
 
@@ -303,17 +306,17 @@ describe('every vault command is banker-gated', () => {
 
 // ---------------------------------------------------------------------------
 describe('buying vault upgrades', () => {
-  it('walks all five rungs, charging the exact table price and adding 40 cap each time', () => {
+  it('walks all ten rungs, charging the exact table price and adding 100 cap each time', () => {
     const sim = makeSim();
     const m = meta(sim);
     m.copper = LADDER_TOTAL;
     let copper = LADDER_TOTAL;
     expect(vaultCapacityPerMaterial(m.vault)).toBe(0); // locked until rung 0 is bought
-    for (let rung = 0; rung < 5; rung++) {
+    for (let rung = 0; rung < 10; rung++) {
       sim.drainEvents();
       sim.vaultBuyUpgrade();
       const evs = sim.drainEvents();
-      // Rung 0 is the UNLOCK and says so; rungs 1-4 are ordinary upgrades.
+      // Rung 0 is the UNLOCK and says so; rungs 1-9 are ordinary upgrades.
       expect(hasLog(evs, rung === 0 ? UNLOCK_NOTICE : UPGRADE_NOTICE)).toBe(true);
       expect(hasLog(evs, rung === 0 ? UPGRADE_NOTICE : UNLOCK_NOTICE)).toBe(false);
       copper -= PRICES[rung];
@@ -322,23 +325,24 @@ describe('buying vault upgrades', () => {
       expect(vaultCapacityPerMaterial(m.vault)).toBe(CAPS[rung]);
     }
     expect(m.copper).toBe(0);
-    expect(m.vault.upgrades).toBe(5);
-    expect(vaultCapacityPerMaterial(m.vault)).toBe(200);
+    expect(m.vault.upgrades).toBe(10);
+    expect(vaultCapacityPerMaterial(m.vault)).toBe(1000);
   });
 
-  it('refuses a sixth purchase once the ladder is finished, charging nothing', () => {
+  it('refuses an eleventh purchase once the ladder is finished, charging nothing', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.copper = LADDER_TOTAL + 999999; // plenty left over: only the cap can refuse
-    for (let rung = 0; rung < 5; rung++) sim.vaultBuyUpgrade();
-    expect(m.vault.upgrades).toBe(5);
+    m.copper = LADDER_TOTAL + 9999999; // plenty left over: only the cap can refuse
+    for (let rung = 0; rung < 10; rung++) sim.vaultBuyUpgrade();
+    expect(m.vault.upgrades).toBe(10);
+    expect(m.copper).toBe(9999999);
     const copperBefore = m.copper;
     sim.drainEvents();
     sim.vaultBuyUpgrade();
     expect(hasErr(sim.drainEvents(), 'Your vault cannot be upgraded further.')).toBe(true);
     expect(m.copper).toBe(copperBefore);
-    expect(m.vault.upgrades).toBe(5);
-    expect(vaultCapacityPerMaterial(m.vault)).toBe(200);
+    expect(m.vault.upgrades).toBe(10);
+    expect(vaultCapacityPerMaterial(m.vault)).toBe(1000);
   });
 
   it('refuses an unaffordable unlock, charging nothing and granting no rung', () => {
@@ -360,12 +364,12 @@ describe('buying vault upgrades', () => {
     sim.vaultBuyUpgrade();
     expect(m.copper).toBe(0);
     expect(m.vault.upgrades).toBe(1);
-    // Rung 1 costs 50000: at 49999 it must refuse and leave the rung at 1.
-    m.copper = 49999;
+    // Rung 1 costs 40000: at 39999 it must refuse and leave the rung at 1.
+    m.copper = 39999;
     sim.drainEvents();
     sim.vaultBuyUpgrade();
     expect(hasErr(sim.drainEvents(), 'You cannot afford that vault upgrade.')).toBe(true);
-    expect(m.copper).toBe(49999);
+    expect(m.copper).toBe(39999);
     expect(m.vault.upgrades).toBe(1);
   });
 });
@@ -391,7 +395,7 @@ describe('deposit rules', () => {
     // table, so the kind alone must never admit it.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault.upgrades = 5;
+    m.vault.upgrades = 10;
     sim.addItem('guardian_core', 2);
     const before = totalHeld(m, 'guardian_core');
     const bagSnap = clone(m.inventory);
@@ -536,28 +540,28 @@ describe('deposit rules', () => {
     // completely unaffected.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 40 }, special: [], upgrades: 1 };
+    m.vault = { stock: { copper_ore: 100 }, special: [], upgrades: 1 };
     sim.addItem('iron_ore', 9);
     sim.drainEvents();
     sim.vaultDeposit(slotIndexOf(m, 'iron_ore'));
     expect(errorTexts(sim.drainEvents())).toEqual([]);
-    expect(m.vault.stock).toEqual({ copper_ore: 40, iron_ore: 9 });
+    expect(m.vault.stock).toEqual({ copper_ore: 100, iron_ore: 9 });
   });
 
   it('a partial deposit up to the headroom is a SUCCESS, leaving the remainder carried', () => {
-    // Cap 40 with 30 stored leaves room for 10; a 20-stack deposit moves exactly
+    // Cap 100 with 90 stored leaves room for 10; a 20-stack deposit moves exactly
     // 10 and emits NO error (the bank's all-or-nothing rule deliberately does NOT
     // apply here: a material is fungible, so a partial move loses nothing).
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 30 }, special: [], upgrades: 1 };
+    m.vault = { stock: { copper_ore: 90 }, special: [], upgrades: 1 };
     sim.addItem('copper_ore', 20);
     const before = totalHeld(m, 'copper_ore');
-    expect(before).toBe(50);
+    expect(before).toBe(110);
     sim.drainEvents();
     sim.vaultDeposit(slotIndexOf(m, 'copper_ore'));
     expect(errorTexts(sim.drainEvents())).toEqual([]);
-    expect(m.vault.stock).toEqual({ copper_ore: 40 });
+    expect(m.vault.stock).toEqual({ copper_ore: 100 });
     expect(carriedCount(m, 'copper_ore')).toBe(10);
     expect(totalHeld(m, 'copper_ore')).toBe(before);
   });
@@ -565,14 +569,14 @@ describe('deposit rules', () => {
   it('refuses a deposit at exactly zero headroom, moving nothing', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 40 }, special: [], upgrades: 1 }; // sitting exactly on the cap
+    m.vault = { stock: { copper_ore: 100 }, special: [], upgrades: 1 }; // sitting exactly on the cap
     sim.addItem('copper_ore', 5);
     const before = totalHeld(m, 'copper_ore');
     const bagSnap = clone(m.inventory);
     sim.drainEvents();
     sim.vaultDeposit(slotIndexOf(m, 'copper_ore'));
     expect(hasErr(sim.drainEvents(), NO_HEADROOM)).toBe(true);
-    expect(m.vault.stock).toEqual({ copper_ore: 40 });
+    expect(m.vault.stock).toEqual({ copper_ore: 100 });
     expect(m.inventory).toEqual(bagSnap);
     expect(totalHeld(m, 'copper_ore')).toBe(before);
   });
@@ -1070,13 +1074,19 @@ describe('the vaultInfo read boundary', () => {
     sim.vaultBuyUpgrade();
     const unlocked = sim.vaultInfoFor(sim.playerId)!;
     expect(unlocked.upgrades).toBe(1);
-    expect(unlocked.perMaterialCap).toBe(40);
-    expect(unlocked.nextUpgradeCost).toBe(50000);
+    expect(unlocked.perMaterialCap).toBe(100);
+    expect(unlocked.nextUpgradeCost).toBe(40000);
 
-    for (let rung = 1; rung < 5; rung++) sim.vaultBuyUpgrade();
+    for (let rung = 1; rung < 9; rung++) sim.vaultBuyUpgrade();
+    const penultimate = sim.vaultInfoFor(sim.playerId)!;
+    expect(penultimate.upgrades).toBe(9);
+    expect(penultimate.perMaterialCap).toBe(900);
+    expect(penultimate.nextUpgradeCost).toBe(1600000);
+
+    sim.vaultBuyUpgrade();
     const maxed = sim.vaultInfoFor(sim.playerId)!;
-    expect(maxed.upgrades).toBe(5);
-    expect(maxed.perMaterialCap).toBe(200);
+    expect(maxed.upgrades).toBe(10);
+    expect(maxed.perMaterialCap).toBe(1000);
     expect(maxed.nextUpgradeCost).toBeNull();
   });
 });
@@ -1323,10 +1333,11 @@ describe('vault load-path sanitization', () => {
     });
   });
 
-  it('clamps upgrades into [0, 5] in both directions', () => {
-    expect(loadWith({ stock: {}, upgrades: 99 }).m.vault.upgrades).toBe(5);
+  it('clamps upgrades into [0, 10] in both directions', () => {
+    expect(loadWith({ stock: {}, upgrades: 99 }).m.vault.upgrades).toBe(10);
+    expect(loadWith({ stock: {}, upgrades: 11 }).m.vault.upgrades).toBe(10);
     expect(loadWith({ stock: {}, upgrades: -3 }).m.vault.upgrades).toBe(0);
-    expect(loadWith({ stock: {}, upgrades: 5 }).m.vault.upgrades).toBe(5);
+    expect(loadWith({ stock: {}, upgrades: 10 }).m.vault.upgrades).toBe(10);
     expect(loadWith({ stock: {}, upgrades: 0 }).m.vault.upgrades).toBe(0);
   });
 
@@ -1443,7 +1454,7 @@ describe('vault load-path sanitization', () => {
     const { sim, pid, m } = loadWith({ stock: { copper_ore: 999 }, upgrades: 1 });
     moveToBanker(sim, pid);
     expect(m.vault.stock).toEqual({ copper_ore: 999 });
-    expect(vaultCapacityPerMaterial(m.vault)).toBe(40);
+    expect(vaultCapacityPerMaterial(m.vault)).toBe(100);
 
     sim.addItem('copper_ore', 3, pid);
     const before = totalHeld(m, 'copper_ore');
@@ -1714,7 +1725,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   it('sweeps every eligible material in ONE call and leaves everything else alone', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, special: [], upgrades: 1 }; // cap 40 per material
+    m.vault = { stock: {}, special: [], upgrades: 1 }; // cap 100 per material
     sim.addItem('copper_ore', 10);
     sim.addItem('iron_ore', 4);
     sim.addItem(GEAR_IDS[0], 1); // not a material: must survive the sweep
@@ -1738,8 +1749,9 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   it('fills each material only to its headroom, descending by slot index', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, special: [], upgrades: 1 }; // cap 40
-    // 60 copper_ore = three 20-stacks (stackSize 20). Headroom 40: the sweep
+    m.vault = { stock: { copper_ore: 60 }, special: [], upgrades: 1 }; // cap 100
+    // 60 copper_ore = three 20-stacks (stackSize 20). Headroom 40 (cap 100 less
+    // the 60 already stored): the sweep
     // walks DESCENDING, so the two HIGHEST-index stacks splice out and the
     // FIRST stack survives untouched. The exact survivor pins the direction: an
     // ascending walk with the same clamp would leave the LAST stack instead
@@ -1750,12 +1762,12 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     sim.drainEvents();
     sim.vaultDepositAll();
     expect(errorTexts(sim.drainEvents())).toEqual([]); // the clamp is silent
-    expect(m.vault.stock).toEqual({ copper_ore: 40 });
+    expect(m.vault.stock).toEqual({ copper_ore: 100 });
     const carried = m.inventory.filter((s) => s.itemId === 'copper_ore');
     expect(carried).toHaveLength(1);
     expect(carried[0].count).toBe(20);
     expect(carried[0]).toBe(firstStack); // the SAME surviving slot object
-    expect(heldTotal(m, 'copper_ore')).toBe(60);
+    expect(heldTotal(m, 'copper_ore')).toBe(120);
   });
 
   it('sweeps instance-payload and crafted-provenance slots into special storage', () => {
@@ -1798,23 +1810,23 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   it('a material already AT its ceiling is skipped whole, silently', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 40 }, special: [], upgrades: 1 }; // headroom 0
+    m.vault = { stock: { copper_ore: 100 }, special: [], upgrades: 1 }; // headroom 0
     sim.addItem('copper_ore', 5);
     sim.drainEvents();
     sim.vaultDepositAll();
     expect(errorTexts(sim.drainEvents())).toEqual([]);
-    expect(m.vault.stock).toEqual({ copper_ore: 40 });
-    expect(heldTotal(m, 'copper_ore')).toBe(45);
+    expect(m.vault.stock).toEqual({ copper_ore: 100 });
+    expect(heldTotal(m, 'copper_ore')).toBe(105);
     expect(m.inventory.find((s) => s.itemId === 'copper_ore')?.count).toBe(5);
   });
 
   it('an over-capacity tolerated stock blocks new deposits without losing anything', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 90 }, special: [], upgrades: 1 }; // legacy over-cap (cap 40)
+    m.vault = { stock: { copper_ore: 190 }, special: [], upgrades: 1 }; // legacy over-cap (cap 100)
     sim.addItem('copper_ore', 5);
     sim.vaultDepositAll();
-    expect(m.vault.stock).toEqual({ copper_ore: 90 }); // never truncated
+    expect(m.vault.stock).toEqual({ copper_ore: 190 }); // never truncated
     expect(m.inventory.find((s) => s.itemId === 'copper_ore')?.count).toBe(5);
   });
 
@@ -1872,7 +1884,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   });
 
   it('fills a partial stack and REPLACES the carried remainder when headroom takes only part of it', () => {
-    // The mint-or-destroy line: cap 40, 25 pre-stocked, one carried 20-stack.
+    // The mint-or-destroy line: cap 100, 85 pre-stocked, one carried 20-stack.
     // 15 move, 5 stay, and the total is conserved exactly.
     //
     // The surviving five now arrive as a FRESH slot rather than a decremented
@@ -1884,11 +1896,11 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     // reference across a command.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 25 }, special: [], upgrades: 1 };
+    m.vault = { stock: { copper_ore: 85 }, special: [], upgrades: 1 };
     sim.addItem('copper_ore', 20);
     const stack = m.inventory.find((s) => s.itemId === 'copper_ore');
     sim.vaultDepositAll();
-    expect(m.vault.stock).toEqual({ copper_ore: 40 });
+    expect(m.vault.stock).toEqual({ copper_ore: 100 });
     const carried = m.inventory.filter((s) => s.itemId === 'copper_ore');
     expect(carried).toHaveLength(1);
     expect(carried[0]).not.toBe(stack);
@@ -1900,7 +1912,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     // Untouched, not half-edited: a refusal anywhere in the op would have left
     // the original exactly as it is here.
     expect(stack?.count).toBe(20);
-    expect(heldTotal(m, 'copper_ore')).toBe(45);
+    expect(heldTotal(m, 'copper_ore')).toBe(105);
   });
 
   it('a corrupt degenerate carried count is SKIPPED, never allowed to destroy stock', () => {
@@ -1926,9 +1938,9 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
 
   it('a past-precision carried count (1e21, Infinity) is SKIPPED: the sweep cannot mint', () => {
     // The mint vector this phase's QA closed: with cap headroom available,
-    // Math.min(1e21, 40) moves 40 real units into the vault while the
-    // decrement (1e21 - 40) is a float NO-OP, so the corrupt stack never
-    // drops and every sweep-withdraw cycle mints 40 more items from nothing.
+    // Math.min(1e21, 100) moves 100 real units into the vault while the
+    // decrement (1e21 - 100) is a float NO-OP, so the corrupt stack never
+    // drops and every sweep-withdraw cycle mints 100 more items from nothing.
     // The predicate's MAX_SAFE_INTEGER arm refuses the slot instead; honest
     // slots beside it still sweep normally.
     const sim = makeSim();
@@ -1971,7 +1983,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   // corrupt counts, applied identically to any sim the caller hands in.
   function seedDifferentialFixture(sim: Sim): void {
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 25, iron_ore: 40 }, special: [], upgrades: 1 };
+    m.vault = { stock: { copper_ore: 85, iron_ore: 100 }, special: [], upgrades: 1 };
     sim.addItem('copper_ore', 20); // partial: headroom 15 of 20
     sim.addItem('rough_hide', 3); // full move
     sim.addItem('baked_bread', 1); // non-material, refused/skipped
@@ -2000,7 +2012,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     expect(meta(a).vault).toEqual(meta(b).vault);
     // The fixture genuinely exercised every arm: partial move, full move,
     // at-cap skip, and the corrupt slots surviving untouched.
-    expect(meta(a).vault.stock).toEqual({ copper_ore: 40, iron_ore: 40, rough_hide: 3 });
+    expect(meta(a).vault.stock).toEqual({ copper_ore: 100, iron_ore: 100, rough_hide: 3 });
     expect(meta(a).inventory.some((s) => s.itemId === 'goldleaf_herb')).toBe(true);
   });
 
@@ -2191,7 +2203,7 @@ describe('double-send safety', () => {
     // Double-sent buy: two distinct rungs at their own table prices, never one
     // rung twice and never a double charge for one grant.
     m.vault.upgrades = 0; // back to locked so the pair is rung 0 then rung 1
-    m.copper = 70000; // exactly rung 0 (20000) + rung 1 (50000)
+    m.copper = 60000; // exactly rung 0 (20000) + rung 1 (40000)
     sim.vaultBuyUpgrade();
     sim.vaultBuyUpgrade();
     expect(m.vault.upgrades).toBe(2);
@@ -2498,7 +2510,7 @@ describe('the sweep and the targeted op share one whole-move rule (vaultRowMoves
   it('the sweep moves what fits of a bind-on-trade stack, exactly like vaultDeposit(0, 2)', () => {
     const viaSweep = makeSim();
     const a = meta(viaSweep);
-    a.vault = { stock: { copper_ore: 38 }, special: [], upgrades: 1 }; // headroom 2
+    a.vault = { stock: { copper_ore: 98 }, special: [], upgrades: 1 }; // headroom 2
     a.inventory = [bindOnTrade()];
     viaSweep.drainEvents();
     viaSweep.vaultDepositAll();
@@ -2506,7 +2518,7 @@ describe('the sweep and the targeted op share one whole-move rule (vaultRowMoves
 
     const viaTargeted = makeSim();
     const b = meta(viaTargeted);
-    b.vault = { stock: { copper_ore: 38 }, special: [], upgrades: 1 };
+    b.vault = { stock: { copper_ore: 98 }, special: [], upgrades: 1 };
     b.inventory = [bindOnTrade()];
     viaTargeted.vaultDeposit(0, 2);
 
@@ -2515,7 +2527,7 @@ describe('the sweep and the targeted op share one whole-move rule (vaultRowMoves
       expect(m.inventory[0]).toMatchObject({ count: 3, instance: { bindOnTrade: true } });
       expect(m.vault.special).toHaveLength(1);
       expect(m.vault.special[0]).toMatchObject({ count: 2, instance: { bindOnTrade: true } });
-      expect(vaultStoredCount(m.vault, 'copper_ore')).toBe(40);
+      expect(vaultStoredCount(m.vault, 'copper_ore')).toBe(100);
     }
     expect(a.vault.special).toEqual(b.vault.special);
     expect(a.inventory).toEqual(b.inventory);
@@ -2525,18 +2537,18 @@ describe('the sweep and the targeted op share one whole-move rule (vaultRowMoves
     const locked = (): InvSlot => ({ itemId: 'copper_ore', count: 5, instance: { locked: true } });
     const viaSweep = makeSim();
     const a = meta(viaSweep);
-    a.vault = { stock: { copper_ore: 38 }, special: [], upgrades: 1 };
+    a.vault = { stock: { copper_ore: 98 }, special: [], upgrades: 1 };
     a.inventory = [locked()];
     viaSweep.vaultDepositAll();
     const viaTargeted = makeSim();
     const b = meta(viaTargeted);
-    b.vault = { stock: { copper_ore: 38 }, special: [], upgrades: 1 };
+    b.vault = { stock: { copper_ore: 98 }, special: [], upgrades: 1 };
     b.inventory = [locked()];
     viaTargeted.vaultDeposit(0);
     for (const m of [a, b]) {
       expect(m.inventory).toEqual([locked()]);
       expect(m.vault.special).toEqual([]);
-      expect(m.vault.stock).toEqual({ copper_ore: 38 });
+      expect(m.vault.stock).toEqual({ copper_ore: 98 });
     }
   });
 });

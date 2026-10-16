@@ -4735,7 +4735,7 @@ function bankRoundTrip(): Scenario {
       // The Materials Vault arm, at the same bursar (nearBanker is already
       // satisfied). Count-only storage: PlayerMeta.vault holds one number per
       // material id plus the rung ladder, both already sampled by samplePlayerMeta.
-      // 6) stock the purse and the bags for the vault ladder: 20000 + 50000 for
+      // 6) stock the purse and the bags for the vault ladder: 20000 + 40000 for
       //    the two rungs, plus a 1000 REMAINDER on purpose. An exact 0 balance
       //    is inert to the canonicalizer (trace.ts drops inert keys), so the
       //    copper key would VANISH from the last snapshots and the second
@@ -4744,7 +4744,7 @@ function bankRoundTrip(): Scenario {
       //    TWO material ids, not one: a single-key stock cannot show two counts
       //    reconciling independently (the deposit of one leaving the other
       //    untouched, and the later withdraw moving only its own).
-      meta.copper = 71000;
+      meta.copper = 61000;
       sim.addItem('copper_ore', 10, pid);
       sim.addItem('ashwood_log', 4, pid);
       rec.snapshot('vault-setup');
@@ -4774,7 +4774,7 @@ function bankRoundTrip(): Scenario {
       sim.vaultWithdraw('copper_ore', 2, pid);
       rec.snapshot('vault-withdrew-partial');
 
-      // 11) the second rung: copper - 50000, upgrades 1 -> 2.
+      // 11) the second rung: copper - 40000, upgrades 1 -> 2.
       sim.vaultBuyUpgrade(pid);
       rec.snapshot('vault-bought-rung');
 
@@ -6494,16 +6494,16 @@ function bankSocketRoundTrip(): Scenario {
       const pid = sim.addPlayer('warrior', 'Socketwright');
       const meta = sim.players.get(pid) as PlayerMeta;
       // Stand at a bursar so the nearBanker gate passes (the bank_round_trip
-      // idiom); fund exactly two unlocks (1000000 + 2000000) plus 500000 over.
+      // idiom); fund exactly two unlocks (750000 + 1000000) plus 500000 over.
       const banker = sim.entities.get(sim.bankerIds[0]) as AnyEntity;
       teleport(sim, sim.entities.get(pid) as AnyEntity, banker.pos.x, banker.pos.z);
       rec.notes.pid = pid;
-      meta.copper = 3500000;
+      meta.copper = 2250000;
       sim.addItem('linen_pouch', 1, pid);
       sim.addItem('burlap_reagent_pouch', 1, pid);
 
-      // 1) two unlocks, cheapest first: the ladder charges 1000000 then
-      //    2000000, leaving 500000, with all sockets still empty.
+      // 1) two unlocks, cheapest first: the ladder charges 750000 then
+      //    1000000, leaving 500000, with all sockets still empty.
       sim.bankUnlockSocket(pid);
       sim.bankUnlockSocket(pid);
       rec.snapshot('two-sockets-unlocked');
@@ -6524,7 +6524,7 @@ function bankSocketRoundTrip(): Scenario {
       sim.bankUnsocketBag(0, pid);
       rec.snapshot('satchel-unsocketed');
 
-      // 5) the refusal arm: the third socket costs 3500000 and the purse
+      // 5) the refusal arm: the third socket costs 1250000 and the purse
       //    holds 500000, so nothing moves and nothing is charged.
       sim.bankUnlockSocket(pid);
       rec.snapshot('third-unlock-refused');

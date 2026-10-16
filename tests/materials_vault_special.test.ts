@@ -131,7 +131,7 @@ describe('identity-preserving Materials Vault stacks', () => {
   it('shares one per-item cap across pooled stock and special stacks', () => {
     const sim = makeSim();
     const meta = metaOf(sim);
-    meta.vault.stock.copper_ore = 38;
+    meta.vault.stock.copper_ore = 98;
     meta.vault.special.push({
       itemId: 'copper_ore',
       count: 1,
@@ -141,8 +141,8 @@ describe('identity-preserving Materials Vault stacks', () => {
 
     sim.vaultDeposit(0);
 
-    expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(40);
-    expect(meta.vault.stock.copper_ore).toBe(39);
+    expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(100);
+    expect(meta.vault.stock.copper_ore).toBe(99);
     // The remainder carries its EXACT per-unit quantities, never a bare count:
     // two units nobody recorded a gatherer for are two units in the unrecorded
     // bucket. (The crafted row already in `special` cannot share with plain
@@ -155,7 +155,7 @@ describe('identity-preserving Materials Vault stacks', () => {
   it('moves whole-move payload stacks whole but permits partial recipe-only moves', () => {
     const sim = makeSim();
     const meta = metaOf(sim);
-    meta.vault.stock.copper_ore = 39;
+    meta.vault.stock.copper_ore = 99;
     // A LOCKED payload is one identity per unit (vault_slot_ops.ts
     // vaultRowMovesWhole), so it deposits whole or not at all; a signer or
     // bind-on-trade payload splits like a plain stack now
@@ -174,7 +174,7 @@ describe('identity-preserving Materials Vault stacks', () => {
     sim.vaultDeposit(0);
     expect(meta.inventory).toEqual([instance]);
     expect(meta.vault.special).toEqual([]);
-    expect(meta.vault.stock.copper_ore).toBe(39);
+    expect(meta.vault.stock.copper_ore).toBe(99);
 
     meta.inventory.splice(0, 1, {
       itemId: 'copper_ore',
@@ -350,7 +350,7 @@ describe('a LOCKED material stack deposits as one whole vault row, never one row
     // cap (item_lock.ts / bags.ts instancedCountCap holds a locked stack to
     // stackSizeOf), so the only way a locked stack of 25 carries a stack cap
     // of 20 is a tolerated legacy/hand-edited holding; the vault's own
-    // per-material ceiling (40 at rung 1) still has room for all 25. The
+    // per-material ceiling (100 at rung 1) still has room for all 25. The
     // deposit must split it into TWO capped rows [20, 5], not 25 rows of 1.
     const sim = makeSim();
     const meta = metaOf(sim);

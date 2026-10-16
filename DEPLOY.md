@@ -418,6 +418,16 @@ For off-box safety, sync the directory to S3 occasionally:
   expansion or vault upgrade table joins the professions cap-raise class: the old
   binary clamps the raised value on load and persists the loss, so that release
   owes its own caveat here.
+- **Ten-rung Materials Vault (v0.45.0)**: the vault upgrade table grew from five
+  rungs (40 to 200 per material) to ten (100 to 1000), so this release is in the
+  professions cap-raise class above. Rolling back across it is DESTRUCTIVE for any
+  character who bought rung 6 or higher: the old binary clamps `vault.upgrades` to 5
+  on load and persists that, so the paid rungs (up to 427g each character) are gone,
+  while the stock itself survives because capacity never truncates. The same loss
+  happens on a mixed fleet where an old-binary realm loads such a character. Cut over
+  every realm in one pass, and treat a rollback as a restore-from-backup decision. A
+  `STORAGE_PRICES` override that still lists five `vaultUpgrades` entries is now
+  rejected at boot and that dimension falls back to the compiled ladder (logged).
 - **Vault identity rows over the bag stack size (v0.43.0)**: the Materials Vault now
   packs one row per material identity at the vault's own row size, so a row can hold
   more than the 20-unit bag stack (four legacy rows of twenty fold into one row of
@@ -1283,7 +1293,7 @@ For off-box safety, sync the directory to S3 occasionally:
   reconciliation rather than silently undercounting an unaudited write window.
 - **`STORAGE_PRICES`: the storage price override (server/storage_prices.ts).** One
   JSON object of copper price lists on ONE line, any subset of
-  `{"bankExpansions":[12 ints],"bankSockets":[4 ints],"vaultUpgrades":[5 ints]}`
+  `{"bankExpansions":[12 ints],"bankSockets":[4 ints],"vaultUpgrades":[10 ints]}`
   (vault rung 0 is the vault unlock). Boot-time only: the sim resolves it once at
   world construction, so a change needs a process restart. Each list is accepted
   only at its exact compiled length with entries that are safe integers of at

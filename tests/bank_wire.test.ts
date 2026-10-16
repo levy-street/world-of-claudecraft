@@ -510,7 +510,7 @@ describe('bank wire round-trip', () => {
   });
 
   it('the socket round trip resolves over the wire with exact owner-only fields at every step', () => {
-    // Literals throughout: socket prices 1000000 then 2000000 copper
+    // Literals throughout: socket prices 750000 then 1000000 copper
     // (src/sim/bank.ts BANK_SOCKET_PRICES), linen_pouch 6 general slots,
     // burlap_reagent_pouch 8 materials-only slots (src/sim/content/items.ts).
     const server = new GameServer();
@@ -531,7 +531,7 @@ describe('bank wire round-trip', () => {
     let bank = lastSnap(fw.sent).self.bank;
     expect(bank.socketsUnlocked).toBe(0);
     expect(bank.socketBags).toEqual([null, null, null, null]);
-    expect(bank.nextSocketCost).toBe(1000000);
+    expect(bank.nextSocketCost).toBe(750000);
     expect(bank.capacity).toBe(24);
     expect(bank.generalCapacity).toBe(24);
     expect(bank.materialsCapacity).toBe(0);
@@ -541,12 +541,12 @@ describe('bank wire round-trip', () => {
     // 1) unlock: exact copper spent, ONLY socketsUnlocked and nextSocketCost
     // move (an empty socket adds zero capacity).
     send(server, s, { cmd: 'bank_unlock_socket' });
-    expect(meta.copper).toBe(2000000);
+    expect(meta.copper).toBe(2250000);
     fw.sent.length = 0;
     (server as any).broadcastSnapshots();
     bank = lastSnap(fw.sent).self.bank;
     expect(bank.socketsUnlocked).toBe(1);
-    expect(bank.nextSocketCost).toBe(2000000);
+    expect(bank.nextSocketCost).toBe(1000000);
     expect(bank.capacity).toBe(24);
 
     // 2) socket the carried general pouch (no socket named: first empty).
@@ -589,7 +589,7 @@ describe('bank wire round-trip', () => {
     (client as any).applySnapshot(lastSnap(fw.sent));
     expect(client.bankInfo?.socketsUnlocked).toBe(1);
     expect(client.bankInfo?.socketBags).toEqual([null, null, null, null]);
-    expect(client.bankInfo?.nextSocketCost).toBe(2000000);
+    expect(client.bankInfo?.nextSocketCost).toBe(1000000);
     expect(client.bankInfo?.generalCapacity).toBe(24);
     expect(client.bankInfo?.materialsCapacity).toBe(0);
     expect(client.bankInfo?.generalUsed).toBe(0);
@@ -756,12 +756,12 @@ describe('bank wire round-trip', () => {
     const sim = server.sim as any;
     bringBankerToPlayer(sim, pid);
     const meta = sim.players.get(pid);
-    meta.copper = 999999; // one short of the first socket price
+    meta.copper = 749999; // one short of the first socket price
     sim.addItem('linen_pouch', 1, pid);
     const untouched = () => {
       expect(meta.bank.unlockedSockets).toBe(0);
       expect(meta.bank.socketBags).toEqual([null, null, null, null]);
-      expect(meta.copper).toBe(999999);
+      expect(meta.copper).toBe(749999);
       expect(meta.inventory.some((x: any) => x.itemId === 'linen_pouch')).toBe(true);
     };
 
@@ -848,9 +848,9 @@ describe('bank wire round-trip', () => {
 
   it('offline Sim and the wire path reach identical socket state for one action script', () => {
     // The shared script: 3500000 copper, both bags carried, unlock twice
-    // (1000000 + 2000000), socket the pouch first-empty, socket the satchel
+    // (750000 + 1000000), socket the pouch first-empty, socket the satchel
     // into socket 1, unsocket socket 0. End state: 2 sockets unlocked,
-    // the satchel alone socketed, the pouch back in the bags, 500000 copper.
+    // the satchel alone socketed, the pouch back in the bags, 1750000 copper.
     const drive = (world: any, pid: number) => {
       world.players.get(pid).copper = 3500000;
       world.addItem('linen_pouch', 1, pid);
@@ -898,7 +898,7 @@ describe('bank wire round-trip', () => {
     expect(offOut).toEqual({
       unlocked: 2,
       socketBags: [null, 'burlap_reagent_pouch', null, null],
-      copper: 500000,
+      copper: 1750000,
       carriedBags: ['linen_pouch'],
     });
     // ...and they equal each other (offline Sim == authoritative server Sim).
@@ -1052,11 +1052,11 @@ describe('bank wire round-trip', () => {
     (server as any).broadcastSnapshots();
     const snap = lastSnap(fw.sent);
     expect(snap.self.bank.nextExpansionCost).toBe(500); // BANK_EXPANSION_PRICES[0]
-    expect(snap.self.bank.nextSocketCost).toBe(1000000); // BANK_SOCKET_PRICES[0]
+    expect(snap.self.bank.nextSocketCost).toBe(750000); // BANK_SOCKET_PRICES[0]
     const client = bareClient(pid);
     (client as any).applySnapshot(snap);
     expect(client.bankInfo?.nextExpansionCost).toBe(500);
-    expect(client.bankInfo?.nextSocketCost).toBe(1000000);
+    expect(client.bankInfo?.nextSocketCost).toBe(750000);
   });
 });
 

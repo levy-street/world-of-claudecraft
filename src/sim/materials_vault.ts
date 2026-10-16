@@ -2,7 +2,7 @@
 // the slot-based bank (bank.ts) at the same banker counter. Where the bank pools
 // SLOTS over a list of item stacks, the vault gives every material id one
 // shared count ceiling: rung 0 unlocks it for 2 gold and every further rung
-// widens that ceiling by 40, so the ladder reads 40/80/120/160/200. Ordinary
+// widens that ceiling by 100, so the ladder reads 100/200/.../1000. Ordinary
 // UNATTRIBUTED auto-craftable material remains pooled in a compact id-to-count
 // map. Identity-bearing material lives beside it in a full InvSlot collection,
 // preserving instance glyphs, crafted provenance AND per-unit source buckets
@@ -117,16 +117,19 @@ import {
 } from './vault_slot_ops';
 
 /** Per-material ceiling the first (unlocking) rung grants. */
-export const VAULT_BASE_CAP = 40;
+export const VAULT_BASE_CAP = 100;
 /** Extra per-material ceiling each rung past the unlock adds. */
-export const VAULT_UPGRADE_STEP = 40;
+export const VAULT_UPGRADE_STEP = 100;
 /** Copper cost of each successive vault rung, cheapest first: index 0 is the
- *  2 gold UNLOCK, the rest widen the ceiling. The entry count is the purchase
- *  cap, so the ladder tops out at 200 per material. Data-as-code: the price is
+ *  2 gold UNLOCK, the rest widen the ceiling (2g, 4g, 7g, 12g, 20g, 32g, 50g,
+ *  75g, 110g, 160g; 472g total). The entry count is the purchase cap, so the
+ *  ladder tops out at 1000 per material. Data-as-code: the price is
  *  always this table lookup, never a client-supplied value, so it is inherently
  *  overflow-safe. These are the compiled sim defaults; the server-side override
  *  seam is a later phase. */
-export const VAULT_UPGRADE_PRICES: readonly number[] = [20000, 50000, 100000, 200000, 400000];
+export const VAULT_UPGRADE_PRICES: readonly number[] = [
+  20000, 40000, 70000, 120000, 200000, 320000, 500000, 750000, 1100000, 1600000,
+];
 
 /** GEOMETRY, not a price: the rung count client code may import (the client
  *  price-table guard bans VAULT_UPGRADE_PRICES itself from the client trees).
@@ -291,7 +294,7 @@ export function resolveVaultSpecialIndex(
 }
 
 /** How many of ONE material the vault can hold: nothing while locked, then
- *  40/80/120/160/200 as the rungs are bought. */
+ *  100/200/.../1000 as the rungs are bought. */
 export function vaultCapacityPerMaterial<T extends { upgrades: number }>(state: T): number {
   if (state.upgrades <= 0) return 0;
   return VAULT_BASE_CAP + VAULT_UPGRADE_STEP * (state.upgrades - 1);

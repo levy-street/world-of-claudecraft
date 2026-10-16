@@ -432,7 +432,7 @@ describe('bank ledger dispatch integration', () => {
     const sim = server.sim as any;
     bringBankerToPlayer(sim, pid);
     const meta = sim.players.get(pid);
-    meta.copper = 1000000; // exactly the first socket price (src/sim/bank.ts)
+    meta.copper = 750000; // exactly the first socket price (src/sim/bank.ts)
     sim.addItem('linen_pouch', 1, pid);
     sim.addItem('burlap_reagent_pouch', 1, pid);
 
@@ -449,7 +449,7 @@ describe('bank ledger dispatch integration', () => {
         itemId: null,
         count: null,
         instance: null,
-        copperDelta: -1000000,
+        copperDelta: -750000,
         purchasedSlotsAfter: 0,
         container: 'personal',
         containerId: null,

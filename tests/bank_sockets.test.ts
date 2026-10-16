@@ -42,9 +42,9 @@ const BANK_TEST_WORLD: WorldContent = {
 };
 
 // The socket price ladder as LITERALS (never compared to the exported constant,
-// which would be a zero-protection self-comparison): 100g/200g/350g/500g.
-const SOCKET_PRICES = [1000000, 2000000, 3500000, 5000000];
-const SOCKET_TOTAL = 11500000; // 1150g
+// which would be a zero-protection self-comparison): 75g/100g/125g/150g.
+const SOCKET_PRICES = [750000, 1000000, 1250000, 1500000];
+const SOCKET_TOTAL = 4500000; // 450g
 
 // Shipped bag fixtures: the joint-largest general bag (16 slots) and the top
 // materials-only satchel (24), plus small rungs for the mixed arms.
@@ -347,7 +347,7 @@ describe('sanitizeBankState socket tolerance', () => {
 
 // ---------------------------------------------------------------------------
 describe('bankUnlockSocket', () => {
-  it('unlocks in order for exact copper: 100g, 200g, 350g, 500g', () => {
+  it('unlocks in order for exact copper: 75g, 100g, 125g, 150g', () => {
     const sim = makeSim();
     const m = meta(sim);
     m.copper = SOCKET_TOTAL;
@@ -359,7 +359,7 @@ describe('bankUnlockSocket', () => {
       expect(m.bank.unlockedSockets).toBe(i + 1);
       expect(hasLog(sim.drainEvents(), 'You unlock a bank bag socket.')).toBe(true);
     }
-    expect(m.copper).toBe(0); // the whole ladder is exactly 1150g
+    expect(m.copper).toBe(0); // the whole ladder is exactly 450g
   });
 
   it('refuses the fifth unlock at the ceiling, mutating nothing', () => {
@@ -922,7 +922,7 @@ describe('BankInfo socket readouts', () => {
     const info = sim.bankInfoFor(sim.playerId)!;
     expect(info.socketsUnlocked).toBe(2);
     expect(info.socketBags).toEqual([GENERAL_16, SATCHEL_24, null, null]);
-    expect(info.nextSocketCost).toBe(3500000);
+    expect(info.nextSocketCost).toBe(1250000);
     expect(info.generalCapacity).toBe(40);
     expect(info.materialsCapacity).toBe(24);
     expect(info.capacity).toBe(64);
@@ -961,9 +961,9 @@ describe('BankInfo socket readouts', () => {
     const sim = makeSim();
     const m = meta(sim);
     m.copper = SOCKET_TOTAL;
-    expect(sim.bankInfoFor(sim.playerId)!.nextSocketCost).toBe(1000000);
+    expect(sim.bankInfoFor(sim.playerId)!.nextSocketCost).toBe(750000);
     sim.bankUnlockSocket();
-    expect(sim.bankInfoFor(sim.playerId)!.nextSocketCost).toBe(2000000);
+    expect(sim.bankInfoFor(sim.playerId)!.nextSocketCost).toBe(1000000);
     sim.bankUnlockSocket();
     sim.bankUnlockSocket();
     sim.bankUnlockSocket();
@@ -1138,7 +1138,7 @@ describe('determinism', () => {
     // Work-happened anchor first: two identical all-refused runs would also
     // compare equal, so pin the end state the script must actually reach.
     expect(a.bank.socketBags).toEqual([null, SATCHEL_8, null, null]);
-    expect(a.copper).toBe(8500000); // 1150g minus the first two unlocks
+    expect(a.copper).toBe(2750000); // 450g minus the first two unlocks
     expect(a).toEqual(b);
   });
 });

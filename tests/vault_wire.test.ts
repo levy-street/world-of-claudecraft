@@ -65,8 +65,9 @@ import { completeCraftCast } from './helpers/enchant_family_cast';
 // every refusal leaves none.
 //
 // Every value asserted is a LITERAL, never a value compared against itself. The
-// rung ladder is 20000/50000/100000/200000/400000 copper and the per-material
-// ceiling is 40/80/120/160/200 (src/sim/materials_vault.ts VAULT_UPGRADE_PRICES,
+// rung ladder is 20000/40000/70000/120000/200000/320000/500000/750000/1100000/
+// 1600000 copper and the per-material ceiling is 100/200/.../1000 in steps of
+// 100 (src/sim/materials_vault.ts VAULT_UPGRADE_PRICES,
 // VAULT_BASE_CAP, VAULT_UPGRADE_STEP). These are pinned here as bare numbers on
 // purpose. The ONE exception is `realm: REALM` in the ledger-row assertions
 // below, which is a self-comparison and is accepted as unmitigable: the realm
@@ -335,8 +336,8 @@ describe('materials vault wire round-trip', () => {
       stock: { copper_ore: 3 },
       special: [],
       upgrades: 1,
-      perMaterialCap: 40, // VAULT_BASE_CAP at rung 1
-      nextUpgradeCost: 50000, // VAULT_UPGRADE_PRICES[1]
+      perMaterialCap: 100, // VAULT_BASE_CAP at rung 1
+      nextUpgradeCost: 40000, // VAULT_UPGRADE_PRICES[1]
     });
     // The server's own state agrees with what it shipped (2 of the 5 stayed).
     expect(meta.vault.stock).toEqual({ copper_ore: 3 });
@@ -352,8 +353,8 @@ describe('materials vault wire round-trip', () => {
       stock: { copper_ore: 3 },
       special: [],
       upgrades: 1,
-      perMaterialCap: 40,
-      nextUpgradeCost: 50000,
+      perMaterialCap: 100,
+      nextUpgradeCost: 40000,
     });
     // The PRESENT path is by reference too, the twin of the omission test's
     // `toBe(vaultRef)` below: a mirror that rebuilt the value (`{ ...s.vault }`)
@@ -630,7 +631,7 @@ describe('materials vault wire round-trip', () => {
   it('each of the three ops resolves over the wire and the mirror reflects it on the next snapshot', () => {
     const server = new GameServer();
     const fw = fakeWs();
-    const { session, sim, pid, meta } = seat(server, fw, 1, 'Vaultops', 70000, [
+    const { session, sim, pid, meta } = seat(server, fw, 1, 'Vaultops', 60000, [
       ['copper_ore', 10],
     ]);
     const client = bareClient(pid);
@@ -642,15 +643,15 @@ describe('materials vault wire round-trip', () => {
       return client.vaultInfo;
     };
 
-    // 1) buy_upgrade (the unlock): 20000 copper, rung 1, ceiling 40.
+    // 1) buy_upgrade (the unlock): 20000 copper, rung 1, ceiling 100.
     send(server, session, { cmd: 'vault_buy_upgrade' });
-    expect(meta.copper).toBe(50000);
+    expect(meta.copper).toBe(40000);
     expect(applyLatest()).toEqual({
       stock: {},
       special: [],
       upgrades: 1,
-      perMaterialCap: 40,
-      nextUpgradeCost: 50000,
+      perMaterialCap: 100,
+      nextUpgradeCost: 40000,
     });
 
     // 2) deposit a partial count (6 of 10): the rest stays in the bags.
@@ -667,15 +668,15 @@ describe('materials vault wire round-trip', () => {
     expect(bagCount(sim, pid, 'copper_ore')).toBe(6);
     expect(applyLatest()?.stock).toEqual({ copper_ore: 4 });
 
-    // 4) the second rung: 50000 copper, ceiling 40 -> 80, next price 100000.
+    // 4) the second rung: 40000 copper, ceiling 100 -> 200, next price 70000.
     send(server, session, { cmd: 'vault_buy_upgrade' });
     expect(meta.copper).toBe(0);
     expect(applyLatest()).toEqual({
       stock: { copper_ore: 4 },
       special: [],
       upgrades: 2,
-      perMaterialCap: 80, // VAULT_BASE_CAP + VAULT_UPGRADE_STEP
-      nextUpgradeCost: 100000, // VAULT_UPGRADE_PRICES[2]
+      perMaterialCap: 200, // VAULT_BASE_CAP + VAULT_UPGRADE_STEP
+      nextUpgradeCost: 70000, // VAULT_UPGRADE_PRICES[2]
     });
   });
 
@@ -805,19 +806,20 @@ describe('materials vault wire round-trip', () => {
   it('server authority: a vault at the purchase cap buys nothing more', async () => {
     const server = new GameServer();
     const fw = fakeWs();
-    // 20000 + 50000 + 100000 + 200000 + 400000 = 770000, the whole ladder,
-    // plus 400000 spare so the refusal below cannot be an affordability one.
-    const { session, meta } = seat(server, fw, 1, 'Vaultcap', 1170000);
-    for (let i = 0; i < 5; i++) send(server, session, { cmd: 'vault_buy_upgrade' });
-    expect(meta.vault.upgrades).toBe(5); // VAULT_UPGRADE_PRICES.length
+    // 20000 + 40000 + 70000 + 120000 + 200000 + 320000 + 500000 + 750000 +
+    // 1100000 + 1600000 = 4720000, the whole ladder, plus 400000 spare so the
+    // refusal below cannot be an affordability one.
+    const { session, meta } = seat(server, fw, 1, 'Vaultcap', 5120000);
+    for (let i = 0; i < 10; i++) send(server, session, { cmd: 'vault_buy_upgrade' });
+    expect(meta.vault.upgrades).toBe(10); // VAULT_UPGRADE_PRICES.length
     expect(meta.copper).toBe(400000);
-    // Five ops, five immutable command batches of one row each.
-    expect(journalBatchCount(session)).toBe(5);
-    expect(journalLedgerRows(session)).toHaveLength(5);
+    // Ten ops, ten immutable command batches of one row each.
+    expect(journalBatchCount(session)).toBe(10);
+    expect(journalLedgerRows(session)).toHaveLength(10);
     const journalStart = journalBatchCount(session);
 
     send(server, session, { cmd: 'vault_buy_upgrade' });
-    expect(meta.vault.upgrades).toBe(5);
+    expect(meta.vault.upgrades).toBe(10);
     expect(meta.copper).toBe(400000);
     expect(journalBatchCount(session)).toBe(journalStart);
 
@@ -827,8 +829,8 @@ describe('materials vault wire round-trip', () => {
     expect(lastSnap(fw.sent).self.vault).toEqual({
       stock: {},
       special: [],
-      upgrades: 5,
-      perMaterialCap: 200, // 40 + 40 * 4
+      upgrades: 10,
+      perMaterialCap: 1000, // 100 + 100 * 9
       nextUpgradeCost: null,
     });
   });
@@ -928,8 +930,8 @@ describe('materials vault wire round-trip', () => {
       stock: { copper_ore: 3 },
       special: [],
       upgrades: 1,
-      perMaterialCap: 40,
-      nextUpgradeCost: 50000,
+      perMaterialCap: 100,
+      nextUpgradeCost: 40000,
     });
     // The bank-family posture, pinned: this is the moderator's OWN self block
     // carrying somebody else's private store, so a future change to
@@ -1071,8 +1073,8 @@ describe('materials vault wire round-trip', () => {
       container: 'vault',
       containerId: null,
     });
-    // The second rung is priced from the BEFORE snapshot (50000), not the new
-    // next price (100000), and the ladder position climbs to 2.
+    // The second rung is priced from the BEFORE snapshot (40000), not the new
+    // next price (70000), and the ladder position climbs to 2.
     expect(rows[3]).toEqual({
       realm: REALM,
       characterId: 71,
@@ -1081,7 +1083,7 @@ describe('materials vault wire round-trip', () => {
       itemId: null,
       count: null,
       instance: null,
-      copperDelta: -50000,
+      copperDelta: -40000,
       purchasedSlotsAfter: 2,
       container: 'vault',
       containerId: null,
@@ -1133,20 +1135,23 @@ describe('materials vault wire round-trip', () => {
   it('ledger rows: an op refused AT the banker (a full vault) writes nothing', async () => {
     const server = new GameServer();
     const fw = fakeWs();
-    // Rung 1 holds 40 per material; 60 in the bags (three 20-stacks) cannot all
+    // Rung 1 holds 100 per material; 120 in the bags (six 20-stacks) cannot all
     // fit, so the run walks the vault up to its ceiling and then past it.
     const { session, sim, pid, meta } = seat(server, fw, 1, 'Vaultfull', 20000, [
-      ['copper_ore', 60],
+      ['copper_ore', 120],
     ]);
     send(server, session, { cmd: 'vault_buy_upgrade' });
-    // Fill to 35 of the 40 ceiling out of the FIRST stack, leaving 5 headroom.
-    send(server, session, { cmd: 'vault_deposit', slot: itemIndex(sim, pid, 'copper_ore') });
+    // Fill to 95 of the 100 ceiling: four whole stacks off the FRONT of the
+    // bags, then 15 out of the fifth, leaving 5 headroom.
+    for (let i = 0; i < 4; i++) {
+      send(server, session, { cmd: 'vault_deposit', slot: itemIndex(sim, pid, 'copper_ore') });
+    }
     send(server, session, {
       cmd: 'vault_deposit',
       slot: itemIndex(sim, pid, 'copper_ore'),
       count: 15,
     });
-    expect(meta.vault.stock).toEqual({ copper_ore: 35 });
+    expect(meta.vault.stock).toEqual({ copper_ore: 95 });
     let journalStart = journalBatchCount(session);
 
     // A whole untouched 20-stack against 5 headroom: the vault's PARTIAL fill
@@ -1154,8 +1159,8 @@ describe('materials vault wire round-trip', () => {
     // MOVED (5), never what was asked for (20). Recording the request is the
     // shape that makes an audit read a phantom 15 into the vault.
     send(server, session, { cmd: 'vault_deposit', slot: lastItemIndex(sim, pid, 'copper_ore') });
-    expect(meta.vault.stock).toEqual({ copper_ore: 40 });
-    expect(bagCount(sim, pid, 'copper_ore')).toBe(20); // 5 left in slot 0 + 15 left in the last
+    expect(meta.vault.stock).toEqual({ copper_ore: 100 });
+    expect(bagCount(sim, pid, 'copper_ore')).toBe(20); // 5 left in the fifth + 15 left in the last
     const partial = journalLedgerRows(session, journalStart);
     expect(partial).toHaveLength(1);
     expect(partial[0].op).toBe('deposit');
@@ -1166,7 +1171,7 @@ describe('materials vault wire round-trip', () => {
     // Now the vault is full: the op is refused at the banker, so both snapshots
     // are non-null and IDENTICAL, and the differ writes no row.
     send(server, session, { cmd: 'vault_deposit', slot: itemIndex(sim, pid, 'copper_ore') });
-    expect(meta.vault.stock).toEqual({ copper_ore: 40 });
+    expect(meta.vault.stock).toEqual({ copper_ore: 100 });
     expect(bagCount(sim, pid, 'copper_ore')).toBe(20);
     expect(journalBatchCount(session)).toBe(journalStart);
   });
@@ -1555,18 +1560,18 @@ describe('materials vault wire round-trip', () => {
   });
 
   it('offline Sim and the wire path reach identical vault state for one action script', () => {
-    // The shared script: 70000 copper + 10 copper_ore, unlock, deposit 6,
+    // The shared script: 60000 copper + 10 copper_ore, unlock, deposit 6,
     // withdraw 2, buy the second rung, then gain 3 rough_hide and SWEEP
     // (vault_deposit_all rides the same equivalence script as the trio: if a
     // later phase gives the sweep a payload normalized only in the dispatch,
     // the two hosts diverge HERE). End state: 10 copper + 3 hide stocked,
-    // rung 2, ceiling 80, next price 100000, 0 copper, empty bags arm.
+    // rung 2, ceiling 200, next price 70000, 0 copper, empty bags arm.
     // biome-ignore lint/suspicious/noExplicitAny: the Sim internals this rig reaches for
     const offline = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true }) as any;
     const offPid = offline.playerId;
     bringBankerToPlayer(offline, offPid);
     offline.addItem('copper_ore', 10, offPid);
-    offline.players.get(offPid).copper = 70000;
+    offline.players.get(offPid).copper = 60000;
     offline.vaultBuyUpgrade(offPid);
     offline.vaultDeposit(itemIndex(offline, offPid, 'copper_ore'), 6, offPid);
     offline.vaultWithdraw('copper_ore', 2, offPid);
@@ -1577,7 +1582,7 @@ describe('materials vault wire round-trip', () => {
 
     const server = new GameServer();
     const fw = fakeWs();
-    const { session, sim, pid } = seat(server, fw, 1, 'Vaultpar', 70000, [['copper_ore', 10]]);
+    const { session, sim, pid } = seat(server, fw, 1, 'Vaultpar', 60000, [['copper_ore', 10]]);
     send(server, session, { cmd: 'vault_buy_upgrade' });
     send(server, session, {
       cmd: 'vault_deposit',
@@ -1595,8 +1600,8 @@ describe('materials vault wire round-trip', () => {
       stock: { copper_ore: 10, rough_hide: 3 },
       special: [],
       upgrades: 2,
-      perMaterialCap: 80,
-      nextUpgradeCost: 100000,
+      perMaterialCap: 200,
+      nextUpgradeCost: 70000,
     });
     expect(offline.players.get(offPid).copper).toBe(0);
     // ...and they equal each other (offline Sim == authoritative server Sim).
@@ -1983,8 +1988,8 @@ describe('vault_wire module units', () => {
           stock: { copper_ore: rawRev ?? 0 },
           special: [],
           upgrades: 1,
-          perMaterialCap: 40,
-          nextUpgradeCost: 50000,
+          perMaterialCap: 100,
+          nextUpgradeCost: 40000,
         };
       },
       craftVaultStockFor: () => {
@@ -2046,8 +2051,8 @@ describe('vault_wire module units', () => {
         stock: {},
         special: [],
         upgrades: 1,
-        perMaterialCap: 40,
-        nextUpgradeCost: 50000,
+        perMaterialCap: 100,
+        nextUpgradeCost: 40000,
       }),
       craftVaultStockFor: () => {
         builds++;
@@ -2151,7 +2156,7 @@ describe('storage price overrides ride the vault delta (phase 09)', () => {
     // idiom): seat(), broadcast(), and the encode all read server.sim at call
     // time, and the one constructor-time capture of the boot sim (the parse
     // subsystem, inert without PARSE_CAPTURE=1) plays no part in the vault
-    // flow. The override list must be EXACTLY the compiled length (5 rungs)
+    // flow. The override list must be EXACTLY the compiled length (10 rungs)
     // or the resolver drops the dimension; the locked vault quotes rung 0.
     // 333 appears in NO price table, so a regression to any compiled constant
     // fails on a number that cannot occur by coincidence.
@@ -2161,7 +2166,7 @@ describe('storage price overrides ride the vault delta (phase 09)', () => {
       seed: 7,
       playerClass: 'warrior',
       noPlayer: true,
-      storagePrices: { vaultUpgrades: [333, 334, 335, 336, 337] },
+      storagePrices: { vaultUpgrades: [333, 334, 335, 336, 337, 338, 339, 340, 341, 342] },
     });
     const fw = fakeWs();
     const { pid } = seat(server, fw, 1, 'Vaultovr', 0);

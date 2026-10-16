@@ -6629,14 +6629,14 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     // vault -> vaultInfo: the owner-only Materials Vault clone survives whole,
-    // both derived numbers included (rung 2 of the 40-per-rung ladder, priced
+    // both derived numbers included (rung 2 of the 100-per-rung ladder, priced
     // from the rung-2 literal in src/sim/materials_vault.ts).
     expect(client.vaultInfo).toEqual({
       stock: { copper_ore: 7 },
       special: [],
       upgrades: 2,
-      perMaterialCap: 80,
-      nextUpgradeCost: 100000,
+      perMaterialCap: 200,
+      nextUpgradeCost: 70000,
     });
     // cvault -> craftVaultStock: this harness player is inside a delve run
     // (see the seeding comment), so the gated null is all that can arrive

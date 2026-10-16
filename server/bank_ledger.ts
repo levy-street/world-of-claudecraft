@@ -64,7 +64,7 @@ import { REALM } from './realm';
 
 // The socket trio (Bank Storage phase 07) joins the personal vocabulary:
 // unlock_socket is the copper sink for a socket rung (the ladder's largest
-// unauditable sink before this row existed: up to 1150g per character with no
+// unauditable sink before this row existed: up to 450g per character with no
 // record), and socket_bag / unsocket_bag track the bank's socket store, a
 // container the slot replay cannot see (a socketed bag exists only as its
 // socketBags id, never as a bank slot). scripts/bank_audit.mjs replays the

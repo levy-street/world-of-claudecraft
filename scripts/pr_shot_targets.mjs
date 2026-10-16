@@ -5119,7 +5119,7 @@ export const TARGETS = [
         const sim = game?.sim;
         try {
           const meta = sim.players.get(sim.playerId);
-          // A rung-2 vault (an 80-unit ceiling) so four bag stacks of one herb
+          // A rung-2 vault (a 200-unit ceiling) so four bag stacks of one herb
           // fit, then four SOURCED stacks deposited one after another: the
           // rows shot shows whether they pack as one row or four, and the
           // per-unit gatherers give the picker honest source rows. A
@@ -5220,7 +5220,7 @@ export const TARGETS = [
         const game = window.__game;
         const sim = game?.sim;
         try {
-          // Fund two unlocks (1000000 + 2000000 copper) and carry two bags, so
+          // Fund two unlocks (750000 + 1000000 copper) and carry two bags, so
           // the row shows every cell state at once after the staging below: a
           // filled satchel, an empty unlocked socket, the priced next-unlock,
           // and a later locked cell; the pouch stays in the bags companion as
@@ -5324,7 +5324,7 @@ export const TARGETS = [
               sim.addItem(id, 5);
             } catch {}
           }
-          sim.vaultBuyUpgrade(); // rung 0: the unlock, ceiling 40
+          sim.vaultBuyUpgrade(); // rung 0: the unlock, ceiling 100
           sim.vaultDepositAll(); // the one batched sweep stocks the rows
           rows = Object.keys(meta.vault.stock).length;
         } catch {}
@@ -5458,7 +5458,7 @@ export const TARGETS = [
               sim.addItem('fine_copper_ore', 2);
             }
             if (!isLocked) {
-              sim.vaultBuyUpgrade(); // rung 0: the 2g unlock, ceiling 40
+              sim.vaultBuyUpgrade(); // rung 0: the 2g unlock, ceiling 100
               sim.vaultDepositAll(); // the one batched sweep stocks the rows
               sim.addItem('iron_ore', 4);
               signedSpecial = meta.vault.special.some(

@@ -713,13 +713,15 @@ describe('the stocked pane', () => {
   });
 
   it('the upgrade footer prices the next rung FROM THE WIRE and confirms through the prompt stack', () => {
-    const h = harness(vaultInfo({ stock: { copper_ore: 1 }, nextUpgradeCost: 77777 }));
+    const h = harness(
+      vaultInfo({ stock: { copper_ore: 1 }, perMaterialCap: 100, nextUpgradeCost: 77777 }),
+    );
     h.window.open();
     clickVaultTab(h);
     const btn = h.root.querySelector('.vault-upgrade-btn') as HTMLElement;
     expect(btn.querySelector('.money-inline')?.textContent).toBe('77777');
-    // The label advertises the NEXT ceiling: wire cap 40 + the 40 step.
-    expect(btn.textContent).toContain('80');
+    // The label advertises the NEXT ceiling: wire cap 100 + the 100 step.
+    expect(btn.textContent).toContain('200');
     btn.click();
     const prompt = document.querySelector('#prompt-stack .vault-buy-prompt') as HTMLElement;
     (prompt.querySelector('button') as HTMLElement).click();
@@ -796,8 +798,8 @@ describe('the stocked pane', () => {
     const h = harness(
       vaultInfo({
         stock: { copper_ore: 1 },
-        upgrades: 5,
-        perMaterialCap: 200,
+        upgrades: 10,
+        perMaterialCap: 1000,
         nextUpgradeCost: null,
       }),
     );
@@ -1155,26 +1157,28 @@ describe('signature-driven repaints', () => {
     // term hides behind the other two); the group is how a real rung
     // purchase moves them, and dropping the whole vault arm is the
     // regression that ships a footer advertising the rung just bought.
-    const h = harness(vaultInfo({ stock: { copper_ore: 1 }, nextUpgradeCost: 50000 }));
+    const h = harness(
+      vaultInfo({ stock: { copper_ore: 1 }, perMaterialCap: 100, nextUpgradeCost: 40000 }),
+    );
     h.window.open();
     clickVaultTab(h);
     expect(
       (h.root.querySelector('.vault-upgrade-btn') as HTMLElement).querySelector('.money-inline')
         ?.textContent,
-    ).toBe('50000');
+    ).toBe('40000');
     h.window.refreshIfChanged();
     h.world.vaultInfo = vaultInfo({
       stock: { copper_ore: 1 }, // byte-identical stock
       upgrades: 2,
-      perMaterialCap: 80,
-      nextUpgradeCost: 100000,
+      perMaterialCap: 200,
+      nextUpgradeCost: 70000,
     });
     h.window.refreshIfChanged();
     const upgrade = h.root.querySelector('.vault-upgrade-btn') as HTMLElement;
-    expect(upgrade.querySelector('.money-inline')?.textContent).toBe('100000');
-    expect(upgrade.textContent).toContain('120'); // the next ceiling: wire 80 + the 40 step
+    expect(upgrade.querySelector('.money-inline')?.textContent).toBe('70000');
+    expect(upgrade.textContent).toContain('300'); // the next ceiling: wire 200 + the 100 step
     expect(h.root.querySelector('.vault-cap-note')?.textContent).toBe(
-      'Each material holds up to 80.',
+      'Each material holds up to 200.',
     );
   });
 
@@ -1306,7 +1310,7 @@ describe('the vault render sinks resolve their catalog keys', () => {
     h.window.open();
     clickVaultTab(h);
     expect(h.root.querySelector('.vault-locked-intro')?.textContent).toBe(
-      'Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to 40 apiece.',
+      'Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to 100 apiece.',
     );
     const unlock = h.root.querySelector('.vault-unlock-btn') as HTMLElement;
     expect(unlock.querySelector('.bank-buy-label')?.textContent).toBe('Unlock the Materials Vault');
@@ -1318,13 +1322,16 @@ describe('the vault render sinks resolve their catalog keys', () => {
   });
 
   it('the upgrade confirm body', () => {
-    const h = harness(vaultInfo({ stock: { copper_ore: 1 } }));
+    // The rung-1 shape the sim emits: cap 100, the second rung's 4g next.
+    const h = harness(
+      vaultInfo({ stock: { copper_ore: 1 }, perMaterialCap: 100, nextUpgradeCost: 40000 }),
+    );
     h.window.open();
     clickVaultTab(h);
     (h.root.querySelector('.vault-upgrade-btn') as HTMLElement).click();
     const prompt = document.querySelector('#prompt-stack .vault-buy-prompt') as HTMLElement;
     expect(prompt.querySelector('.prompt-text')?.textContent).toBe(
-      'Widen every material ceiling to 80 for 5g 0s?',
+      'Widen every material ceiling to 200 for 4g 0s?',
     );
   });
 

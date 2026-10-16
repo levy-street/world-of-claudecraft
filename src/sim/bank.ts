@@ -78,12 +78,12 @@ export const BANK_MAX_BONUS_SLOTS = 16;
  *  diverge in a future tuning and must never alias. */
 export const BANK_BAG_SOCKETS = 4;
 /** Copper cost of each successive socket unlock, cheapest first, charged the
- *  exact-copper way BANK_EXPANSION_PRICES is (100g / 200g / 350g / 500g; 1g is
+ *  exact-copper way BANK_EXPANSION_PRICES is (75g / 100g / 125g / 150g; 1g is
  *  10000 copper). Data-as-code like the ladder: the price is always this table
  *  lookup, never a client-supplied value. These are the locked launch
  *  defaults; the server-side override seam is storage_prices.ts, and
  *  tests/bank_sockets.test.ts pins them as literals. */
-export const BANK_SOCKET_PRICES: readonly number[] = [1000000, 2000000, 3500000, 5000000];
+export const BANK_SOCKET_PRICES: readonly number[] = [750000, 1000000, 1250000, 1500000];
 
 /** Coerce a persisted/stamped bonus-slot value into [0, BANK_MAX_BONUS_SLOTS]. */
 export function clampBonusSlots(raw: unknown): number {

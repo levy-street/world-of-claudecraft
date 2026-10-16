@@ -2442,7 +2442,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and the 32
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
-        4711,
+        4711 +
+        // Plus 118 at the Materials Vault ladder retune (ten rungs, 100 per
+        // rung): the maximal vault's per-material ceiling moves 200 to 1000,
+        // one more digit on each of the 117 vault stock rows (+117), and
+        // vault.upgrades moves 5 to 10 (+1). MEASURED: the settled blob grew
+        // by exactly this 118 (233,360 to 233,478), predicted from the vault
+        // row's shape before the run.
+        118,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2526,7 +2533,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-    ).toBe(231729);
+      // 231,729 -> 231,847 at the Materials Vault ladder retune (+118, the
+      // vault row attributed above, kept here).
+    ).toBe(231847);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2554,7 +2563,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-    ).toBe(233348);
+      // 233,348 -> 233,466 at the Materials Vault ladder retune (+118, kept).
+    ).toBe(233466);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2645,8 +2655,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    expect(bytes, reMint).toBeGreaterThan(232980);
-    expect(bytes, reMint).toBeLessThan(233361);
+    // RE-BASED at the Materials Vault ladder retune: 233,478 bytes, up 118
+    // from 233,360. The one mover is the vault row: the maximal vault now sits
+    // at the ten-rung ceiling of 1000 per material instead of 200, one more
+    // digit on each of the 117 stock rows (+117), and vault.upgrades reads 10
+    // instead of 5 (+1), attributed in the growth equation above. The vault
+    // container keeps its shape; only its legal ceiling value moved. Floor at
+    // measurement minus 380, edge at measurement plus one: 233098..233479.
+    expect(bytes, reMint).toBeGreaterThan(233098);
+    expect(bytes, reMint).toBeLessThan(233479);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

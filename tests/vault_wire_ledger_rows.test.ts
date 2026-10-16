@@ -196,10 +196,10 @@ describe('materials vault ledger rows for mixed-identity stacks', () => {
     ]);
   });
 
-  it('a 120-ceiling vault stocked past 80 keeps taking mixed deposits and paying them back', async () => {
+  it('a 200-ceiling vault stocked past 100 keeps taking mixed deposits and paying them back', async () => {
     const server = new GameServer();
-    const { session, sim, pid, meta, fw } = seat(server, 3, 'Vaultwide', 3);
-    for (let i = 0; i < 5; i++) {
+    const { session, sim, pid, meta, fw } = seat(server, 3, 'Vaultwide', 2);
+    for (let i = 0; i < 6; i++) {
       sim.addItem('copper_ore', 20, pid, {
         materialSources: composition([
           { source: i % 2 ? signedAna : signedBob, count: 12 },
@@ -212,10 +212,10 @@ describe('materials vault ledger rows for mixed-identity stacks', () => {
 
     expect(session.escrowQuarantined).toBe(false);
     expect(kickFrames(fw)).toEqual([]);
-    expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(100);
+    expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(120);
     expect(carried(meta, 'copper_ore')).toBe(0);
     const info = sim.vaultInfoFor(pid);
-    expect(info?.perMaterialCap).toBe(120);
+    expect(info?.perMaterialCap).toBe(200);
     expect(decodeVaultInfoWire(JSON.parse(JSON.stringify(info)))).not.toBeNull();
 
     // Shift-click partial: 20 units (one bag stack) out of the three-identity row.
@@ -230,7 +230,7 @@ describe('materials vault ledger rows for mixed-identity stacks', () => {
     expect(session.escrowQuarantined).toBe(false);
     expect(session.left).toBe(false);
     expect(kickFrames(fw)).toEqual([]);
-    expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(80);
+    expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(100);
     expect(carried(meta, 'copper_ore')).toBe(20);
   });
 
