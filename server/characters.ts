@@ -628,6 +628,9 @@ export async function purgeDeletedCharacterWorldState(
   }
   // Outside the try on purpose: a mail walk that threw must not cost the
   // market half its rows. The write logs its own failure and never rejects.
+  // After the awaited saves, which NARROWS the window in which a crash reloads
+  // a purged copy that already has its consume row, but cannot close it: the
+  // save wrappers swallow their own errors (the delete handler's comment).
   await charactersDb.recordPurgedCharacterCopies(accountId, name, destroyed);
 }
 

@@ -69,6 +69,7 @@ describe('the real purges report what they destroyed', () => {
       count: 1,
       price: 5000,
       expiresAt: Infinity,
+      house: false,
       instance: listed,
     });
     (
@@ -150,6 +151,7 @@ describe('the real purges report what they destroyed', () => {
       count: 1,
       price: 5000,
       expiresAt: Infinity,
+      house: false,
       instance: listed,
     });
     expect(sim.purgeMarketSeller(DOOMED_ID, DOOMED.name)).toBe(true);

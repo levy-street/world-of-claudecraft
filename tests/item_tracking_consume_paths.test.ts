@@ -87,7 +87,12 @@ function registerRelic(): void {
 }
 
 function registerFood(): void {
-  ITEMS[TEST_FOOD] = { ...ITEMS.baked_bread, id: TEST_FOOD, quality: 'epic', stackSize: 1 };
+  ITEMS[TEST_FOOD] = {
+    ...ITEMS.baked_bread,
+    id: TEST_FOOD,
+    quality: 'epic',
+    stackSize: 1,
+  } as ItemDef;
 }
 
 describe('fixtures are tracked', () => {

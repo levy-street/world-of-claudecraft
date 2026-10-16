@@ -13,10 +13,13 @@
 // Beside the delete transaction, not inside it: the books are the live sim's
 // in-memory state and are only purged once the delete has committed, so the
 // rows describe exactly what the purge removed. They are written after the
-// purge's own saves, so a crash before the books persist (which reloads the
-// listings and mail) leaves no consume row behind for a copy that still
-// exists. A rejected insert logs and is dropped, the audit-twin posture of
-// server/item_ledger.ts: it never turns a committed delete into an error.
+// purge's own awaited saves, which narrows the window in which a crash
+// reloads purged listings or mail whose copies already have a consume row,
+// but cannot close it: the save wrappers swallow their own write errors, so
+// a failed save followed by a crash before the next autosave can still leave
+// such a row (docs/design/item-tracking.md, "Crash rollback"). A rejected
+// insert logs and is dropped, the audit-twin posture of server/item_ledger.ts:
+// it never turns a committed delete into an error.
 
 import type { InvSlot } from '../src/sim/types';
 import { characterDeleteLedgerInsert, trackedCopiesInSlots } from './character_delete_item_ledger';

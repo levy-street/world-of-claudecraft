@@ -164,7 +164,9 @@ through a sink, and `server/character_purge_item_ledger.ts` writes their
 rows beside the transaction, through the same INSERT (detail `market` or
 `mail`, `character_id` NULL, the account kept), once both books have saved.
 A copy on a letter that flies home to a live sender is not destroyed and
-writes nothing.
+writes nothing. Writing after the saves narrows, but cannot close, the
+crash window below: the save wrappers swallow their errors, so a failed
+save plus a crash can reload a purged copy whose consume row exists.
 
 The copy-choice walks that destroy "the least special copy first" (an
 untargeted disenchant or sunder) read a copy whose payload is only its
