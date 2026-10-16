@@ -26,6 +26,7 @@ vi.mock('../server/db', () => ({
 import { releaseCharacterLease } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { LINKDEAD_GRACE_MS, planJoin } from '../server/linkdead';
+import { mintResumeToken } from '../server/resume_token';
 import {
   isTransientReconnectRejection,
   isTransientTimeoutRejection,
@@ -135,6 +136,187 @@ describe('planJoin (pure decision core)', () => {
     expect(planJoin({ ...base, isGm: true, sameCharacter: null, liveOtherSessions: 1 })).toEqual({
       action: 'join',
     });
+  });
+
+  // The same-client arm: a reconnect that presented the held session's own
+  // resume token (server/resume_token.ts) while its socket still looks live.
+  const live = { accountId: 7, linkdead: false, left: false, escrowQuarantined: false };
+
+  it('supersedes a live same-account session when the reconnect proves it is the same client', () => {
+    expect(planJoin({ ...base, sameCharacter: live, sameClientProof: true })).toEqual({
+      action: 'supersede',
+    });
+  });
+
+  it('keeps rejecting a live session when the proof is absent or false', () => {
+    const reject = { action: 'reject', error: 'character already in world' };
+    expect(planJoin({ ...base, sameCharacter: live })).toEqual(reject);
+    expect(planJoin({ ...base, sameCharacter: live, sameClientProof: false })).toEqual(reject);
+  });
+
+  it('never supersedes across accounts, mid-teardown, or escrow-quarantined, even with proof', () => {
+    const reject = { action: 'reject', error: 'character already in world' };
+    for (const sameCharacter of [
+      { ...live, accountId: 8 },
+      { ...live, left: true },
+      { ...live, escrowQuarantined: true },
+    ]) {
+      expect(planJoin({ ...base, sameCharacter, sameClientProof: true })).toEqual(reject);
+    }
+  });
+
+  it('still plain-resumes a linkdead session whether or not proof is presented', () => {
+    const linkdead = { ...live, linkdead: true };
+    expect(planJoin({ ...base, sameCharacter: linkdead, sameClientProof: true })).toEqual({
+      action: 'resume',
+    });
+    expect(planJoin({ ...base, sameCharacter: linkdead, sameClientProof: false })).toEqual({
+      action: 'resume',
+    });
+  });
+
+  it('ignores proof when no session holds the character (the per-account cap still applies)', () => {
+    expect(
+      planJoin({ ...base, sameCharacter: null, sameClientProof: true, liveOtherSessions: 1 }),
+    ).toEqual({
+      action: 'reject',
+      error: 'too many characters on this account are already in the world',
+    });
+  });
+});
+
+// The last hello frame a fake socket was sent.
+function lastHello(ws: any): { resumeToken?: unknown; pid?: number } {
+  const hellos = ws.send.mock.calls
+    .map((c: any[]) => JSON.parse(c[0]))
+    .filter((m: any) => m.t === 'hello');
+  return hellos[hellos.length - 1];
+}
+
+describe('same-client reconnect over a socket the server still thinks is live', () => {
+  // A black-holed drop: no FIN/RST ever reached the server, so ws1 still reads
+  // OPEN and the session is NOT linkdead when the same tab reconnects on ws2.
+  function joinLive(name: string) {
+    const server = new GameServer();
+    const ws1 = fakeWs();
+    const session = expectJoined(server.join(ws1, 11, 101, name, 'warrior', null));
+    const token = lastHello(ws1).resumeToken as string;
+    return { server, ws1, session, token };
+  }
+
+  it('issues a fresh unguessable token on every hello', () => {
+    const { server, ws1, token } = joinLive('Tokened');
+    expect(token).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(lastHello(ws1).resumeToken).toBe(token);
+    // Another session on the same realm never shares it.
+    const other = fakeWs();
+    expectJoined(server.join(other, 12, 102, 'Othertok', 'warrior', null));
+    expect(lastHello(other).resumeToken).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(lastHello(other).resumeToken).not.toBe(token);
+  });
+
+  it('supersedes the stale socket and resumes immediately when the tab presents its token', () => {
+    const { server, ws1, session, token } = joinLive('Blackhole');
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 } }),
+    );
+    expect(server.sim.meta(session.pid)?.moveInput.forward).toBe(true);
+    expect(session.linkdead).toBe(false);
+
+    const ws2 = fakeWs();
+    const resumed = expectJoined(
+      server.join(ws2, 11, 101, 'Blackhole', 'warrior', null, false, { resumeToken: token }),
+    );
+
+    // Same session, same pid, now on the new socket; the stale one was reaped
+    // exactly as the keepalive sweep would have (terminated, grace entry ran:
+    // held movement zeroed), then resumed.
+    expect(resumed).toBe(session);
+    expect(ws1.terminate).toHaveBeenCalledTimes(1);
+    expect(resumed.ws).toBe(ws2);
+    expect(resumed.linkdead).toBe(false);
+    expect(resumed.graceUntil).toBe(0);
+    expect(server.sim.meta(session.pid)?.moveInput.forward).toBe(false);
+    expect(server.clients.size).toBe(1);
+    expect(lastHello(ws2)).toMatchObject({ pid: session.pid });
+    // The token rotated with the new hello, so the old one is spent.
+    const rotated = lastHello(ws2).resumeToken;
+    expect(rotated).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(rotated).not.toBe(token);
+
+    // The terminated socket's own late close is inert against the new socket.
+    expect(server.socketClosed(session, ws1)).toBe(false);
+    expect(session.linkdead).toBe(false);
+    expect(session.ws).toBe(ws2);
+
+    // A replay of the spent token cannot displace the new socket.
+    const ws3 = fakeWs();
+    expect(
+      server.join(ws3, 11, 101, 'Blackhole', 'warrior', null, false, { resumeToken: token }),
+    ).toEqual({ error: 'character already in world' });
+    expect(ws2.terminate).not.toHaveBeenCalled();
+    expect(session.ws).toBe(ws2);
+  });
+
+  // Every refusal leaves the live session exactly where it was.
+  function expectRefusedUntouched(
+    server: GameServer,
+    session: ClientSession,
+    ws1: any,
+    result: ClientSession | { error: string },
+  ) {
+    expect(result).toEqual({ error: 'character already in world' });
+    expect(ws1.terminate).not.toHaveBeenCalled();
+    expect(session.ws).toBe(ws1);
+    expect(session.linkdead).toBe(false);
+    expect(server.clients.size).toBe(1);
+  }
+
+  it('keeps refusing a reconnect that presents no token', () => {
+    const { server, ws1, session } = joinLive('NoToken');
+    const result = server.join(fakeWs(), 11, 101, 'NoToken', 'warrior', null);
+    expectRefusedUntouched(server, session, ws1, result);
+  });
+
+  it('keeps refusing a reconnect that presents a different token', () => {
+    const { server, ws1, session } = joinLive('Mismatch');
+    const otherToken = mintResumeToken();
+    const result = server.join(fakeWs(), 11, 101, 'Mismatch', 'warrior', null, false, {
+      resumeToken: otherToken,
+    });
+    expectRefusedUntouched(server, session, ws1, result);
+  });
+
+  it('refuses the right token from a different account (takeover stays explicit)', () => {
+    const { server, ws1, session, token } = joinLive('Foreign');
+    const result = server.join(fakeWs(), 12, 101, 'Foreign', 'warrior', null, false, {
+      resumeToken: token,
+    });
+    expectRefusedUntouched(server, session, ws1, result);
+  });
+
+  it('refuses the right token on an escrow-quarantined session', () => {
+    const { server, ws1, session, token } = joinLive('Quarantine');
+    session.escrowQuarantined = true;
+    const result = server.join(fakeWs(), 11, 101, 'Quarantine', 'warrior', null, false, {
+      resumeToken: token,
+    });
+    expectRefusedUntouched(server, session, ws1, result);
+  });
+
+  it('refuses the right token on a session already mid-teardown (left)', () => {
+    const { server, ws1, session, token } = joinLive('Leaving');
+    // leave() sets left synchronously, then parks on its save await with the
+    // session still indexed by character id.
+    void server.leave(session, 'test teardown');
+    expect(session.left).toBe(true);
+    const result = server.join(fakeWs(), 11, 101, 'Leaving', 'warrior', null, false, {
+      resumeToken: token,
+    });
+    expect(result).toEqual({ error: 'character already in world' });
+    expect(ws1.terminate).not.toHaveBeenCalled();
+    expect(session.ws).toBe(ws1);
   });
 });
 

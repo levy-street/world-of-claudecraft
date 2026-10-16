@@ -331,7 +331,12 @@ import {
 } from './interest_policy';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
-import { keepaliveSweepDelayed, shouldReapSession, WS_KEEPALIVE_PING_MS } from './keepalive_sweep';
+import {
+  keepaliveSweepDelayed,
+  shouldReapSession,
+  terminateIntoGrace,
+  WS_KEEPALIVE_PING_MS,
+} from './keepalive_sweep';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import {
   consumeListReadToken,
@@ -424,6 +429,7 @@ import * as questWire from './quest_command_wire';
 import * as questSnap from './quest_snapshot_wire';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
+import { resumeTokenMatches } from './resume_token';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { dispatchRiftCommand } from './rift_forge_dispatch';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
@@ -435,6 +441,7 @@ import {
   createKeyedSerialWriter,
   createSerialWriter,
 } from './serial_writer';
+import { issueHelloFrame } from './session_hello';
 import { buildRealmSimConfig } from './sim_boot_config';
 import { feedRealmCalendar } from './sim_calendar_feed';
 import {
@@ -930,6 +937,8 @@ export interface ClientSession
   // next to the close/error handlers in ws_auth.ts) clears it. Still set at
   // the next sweep means the socket is black-holed: terminate into the grace.
   awaitingPong: boolean;
+  // Rotated by every hello (server/session_hello.ts); see server/resume_token.ts.
+  resumeToken: string;
   // Advances only when rememberedChat is written (rememberChatChannel), so the
   // async General quota path can fence its sticky-channel set against a NEWER
   // channel selection without unrelated commands (/who, /unstuck) tripping it.
@@ -2787,11 +2796,7 @@ export class GameServer {
     for (const session of this.clients.values()) {
       if (session.linkdead || session.ws.readyState !== 1) continue;
       if (shouldReapSession(session, delayed, this.lastKeepaliveSweepAt)) {
-        const ws = session.ws;
-        try {
-          ws.terminate();
-        } catch {} // socket already torn down
-        this.socketClosed(session, ws);
+        terminateIntoGrace(session, (s, ws) => this.socketClosed(s, ws));
         continue;
       }
       session.awaitingPong = true;
@@ -3234,6 +3239,7 @@ export class GameServer {
         fbc?: string | null;
         sourceUrl?: string | null;
         leaseNonce?: string;
+        resumeToken?: string | null;
         dungeonEntryFacingWireVersion?: entryFacing.WireVersion;
         timerWireVersion?: 1 | StableTimerWireVersion;
         petSpecialWireVersion?: 0 | PetSpecialWireVersion;
@@ -3261,11 +3267,16 @@ export class GameServer {
       accountId,
       isGm,
       sameCharacter,
+      sameClientProof: resumeTokenMatches(sameCharacter?.resumeToken ?? '', meta.resumeToken),
       liveOtherSessions,
       maxPerAccount: MAX_ACTIVE_SESSIONS_PER_ACCOUNT,
     });
     if (plan.action === 'reject') return { error: plan.error };
-    if (plan.action === 'resume' && sameCharacter)
+    if (plan.action === 'supersede' && sameCharacter) {
+      console.log(`~ ${sameCharacter.name} reconnected (resume token), superseding stale socket`);
+      terminateIntoGrace(sameCharacter, (s, oldWs) => this.socketClosed(s, oldWs));
+    }
+    if ((plan.action === 'resume' || plan.action === 'supersede') && sameCharacter)
       return this.resumeSession(sameCharacter, ws, cls, meta);
     const mailRecoveryError = this.vault.joinError(characterId);
     if (mailRecoveryError) return { error: mailRecoveryError };
@@ -3390,6 +3401,7 @@ export class GameServer {
       linkdead: false,
       graceUntil: 0,
       awaitingPong: false,
+      resumeToken: '',
       ...createChatRateLimitState(Date.now() / 1000),
       chatChannelSequence: 0,
       generalChatRateLimit: meta.generalChatRateLimit ?? null,
@@ -3549,24 +3561,7 @@ export class GameServer {
       })
       .catch((err) => console.error('failed to open play session:', err));
 
-    this.send(session, {
-      t: 'hello',
-      pid,
-      seed: this.sim.cfg.seed,
-      name,
-      cls,
-      realm: REALM,
-      // Staff advert for admin-gated client surfaces (the /dev Spawns tab).
-      // Every gated command is re-checked server-side, so a forged true is inert.
-      admin: session.isAdmin,
-      // Soft (cosmetic) words the client masks locally when its profanity
-      // filter is on. Hard words are never sent — they're enforced server-side.
-      softWords: this.chatFilter.softWords(),
-      // Epoch ms of an active chat mute, or null. Lets the client show status
-      // at login; sending is still gated server-side regardless.
-      chatMutedUntil: session.chatMutedUntil ?? null,
-      movementWire: session.movementWireVersion,
-    });
+    this.send(session, issueHelloFrame(session, cls, this.helloWorld()));
     // Only the entering player sees their own world-entry notice; we don't
     // broadcast it to everyone (and likewise don't broadcast departures below).
     this.send(session, {
@@ -3617,6 +3612,10 @@ export class GameServer {
       console.error('curator standing refresh failed:', err);
     }
     return session;
+  }
+
+  private helloWorld() {
+    return { seed: this.sim.cfg.seed, realm: REALM, softWords: this.chatFilter.softWords() };
   }
 
   // Rebind a linkdead session to a fresh socket. The character never left the
@@ -3715,18 +3714,7 @@ export class GameServer {
     session.selfHeavyDirty = true;
     session.lastWireRev = -1;
     session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
-    this.send(session, {
-      t: 'hello',
-      pid: session.pid,
-      seed: this.sim.cfg.seed,
-      name: session.name,
-      cls,
-      realm: REALM,
-      admin: session.isAdmin,
-      softWords: this.chatFilter.softWords(),
-      chatMutedUntil: session.chatMutedUntil ?? null,
-      movementWire: session.movementWireVersion,
-    });
+    this.send(session, issueHelloFrame(session, cls, this.helloWorld()));
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence
     // flap), so the fresh join notice would read as a glitch.
@@ -9819,19 +9807,11 @@ export class GameServer {
     // would try to flush the already-huge buffer, so destroy the socket: the
     // 'close' handler funnels into the idempotent leave() for normal cleanup.
     if (isBackpressureExceeded(session.ws.bufferedAmount)) {
-      if (!session.left) {
-        const ws = session.ws;
-        try {
-          ws.terminate();
-        } catch {
-          /* socket already torn down */
-        }
-        // a stuck reader is a network-quality problem, exactly what the
-        // linkdead grace exists for: hold the character and let the client
-        // reconnect on a fresh socket (terminate's own close event is a
-        // no-op after this; socketClosed is idempotent per socket)
-        this.socketClosed(session, ws);
-      }
+      // a stuck reader is a network-quality problem, exactly what the
+      // linkdead grace exists for: hold the character and let the client
+      // reconnect on a fresh socket (terminate's own close event is a
+      // no-op after this; socketClosed is idempotent per socket)
+      if (!session.left) terminateIntoGrace(session, (s, ws) => this.socketClosed(s, ws));
       return;
     }
     gameMetricsCounters().wsMessage('out');

@@ -36,6 +36,7 @@ import type {
 import type { GameServer } from './game';
 import { noteClientFrame } from './keepalive_sweep';
 import { negotiateMovementWireVersion } from './movement_wire_version';
+import { presentedResumeToken } from './resume_token';
 import { kickStoragePurchaseRecovery } from './storage_purchases';
 import type { HandshakeFlushMode } from './ws_buffer';
 
@@ -294,6 +295,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     const petSpecialWireVersion: 0 | typeof PET_SPECIAL_WIRE_VERSION =
       msg.petSpecialWire === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
     const movementWireVersion = negotiateMovementWireVersion(msg.movementWire);
+    // Optional same-client proof an auto-reconnecting tab echoes from its last
+    // hello (server/resume_token.ts); only the in-world arm below consults it.
+    const resumeToken = presentedResumeToken(msg.resumeToken);
     const dungeonEntryFacingWireVersion: 0 | typeof DUNGEON_ENTRY_FACING_WIRE_VERSION =
       msg.dungeonEntryFacingWire === DUNGEON_ENTRY_FACING_WIRE_VERSION
         ? DUNGEON_ENTRY_FACING_WIRE_VERSION
@@ -414,7 +418,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           // same-account takeover may have rotated the nonce already, leaving the
           // row owned by the other process until the fence-out kick lands, within
           // one autosave). Either way, let planJoin adjudicate (a linkdead session
-          // resumes and keeps its nonce; a live duplicate is rejected) and never
+          // resumes and keeps its nonce; a live duplicate presenting the
+          // session's own resume token supersedes its stale socket and resumes
+          // the same way; any other live duplicate is rejected) and never
           // re-stamp the row with a fresh acquire that a doomed handshake could
           // leave mismatched.
           const moderation = chatModerationHydration.resolve(freshModeration);
@@ -428,6 +434,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             character.is_gm,
             {
               ...joinMeta,
+              resumeToken,
               mutedUntil: moderation.mutedUntil,
               reason: moderation.reason,
               chatStrikes: moderation.strikes,
@@ -609,6 +616,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         noteClientFrame(ws);
         ws.on('message', (data) => {
           noteClientFrame(ws);
+          // A socket a same-client supersede replaced (planJoin) may still flush a
+          // buffered frame on its way down; it must never drive the resumed session.
+          if (session.ws !== ws) return;
           game.handleMessage(session, String(data));
         });
         // A dropped socket starts the linkdead grace instead of logging the

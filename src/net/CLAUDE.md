@@ -193,6 +193,16 @@ over for good (retries exhausted, or a fatal server `error` frame).
   path itself when `onclose` was never delivered (the zombie-socket case).
   `sendLogout()` signals a deliberate logout so the server skips the linkdead grace;
   call it before a page reload.
+- Every `hello` carries a rotating same-client resume token (`server/resume_token.ts`);
+  `ClientWorld` keeps the latest in MEMORY ONLY (never storage, so no other tab or device
+  can present it) and `buildWebSocketAuthMessage` echoes it on the auto-reconnect auth
+  frame. The server then supersedes this tab's own black-holed socket at once instead of
+  answering 'character already in world' until its keepalive sweep notices; a fresh
+  `ClientWorld` has no token, so Enter World and Take Over behave exactly as before.
+  `openSocket` binds each socket's handlers to that socket, so a replaced socket's late
+  close or frame never drives the session (acted on, it would supersede the live socket
+  and ping-pong). A reconnect whose own `hello` was lost re-presents the rotated-out token
+  and simply falls back to the bounded conflict retry.
 Tests: `tests/linkdead.test.ts`, `tests/net_online_visibility_reconnect.test.ts`,
 `tests/entry_watch.test.ts`.
 A reload instead of an in-socket reconnect (the mobile WebView eviction case) is

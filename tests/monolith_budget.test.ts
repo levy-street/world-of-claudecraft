@@ -1689,7 +1689,12 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED 9840 -> 9820 by the same-client resume token: both hello frames
+    // moved to server/session_hello.ts and the terminate-into-grace reap (the
+    // sweep's and the backpressure terminate's) to server/keepalive_sweep.ts,
+    // paying for the planJoin supersede arm with lines to spare. wc -l after
+    // biome. Exact count, zero slack.
+    ceiling: 9820,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1868,7 +1873,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // LOWERED 5356 -> 5355 by the same-client resume token: the hello/censor
+    // soft-word decode moved to src/net/world_auth_message.ts softWordList,
+    // paying for the token field and the socket-identity guards in openSocket.
+    // wc -l after biome. Exact count, zero slack.
+    ceiling: 5355,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

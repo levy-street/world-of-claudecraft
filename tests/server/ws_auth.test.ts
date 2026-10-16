@@ -78,7 +78,9 @@ function baseChar(over: Partial<CharacterRow> = {}): CharacterRow {
 // spies may be reconfigured before construction too.
 function setup() {
   const ws = new FakeWs();
-  const session = { pid: 1, tag: 'fake-session' };
+  // Carries the joining socket, as GameServer.join's session does (the post-join
+  // message listener drops frames from any socket the session no longer rides).
+  const session: { pid: number; tag: string; ws: unknown } = { pid: 1, tag: 'fake-session', ws };
   const generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
   const chatModerationLiveState = new ChatModerationLiveState();
   const game = {
@@ -620,6 +622,58 @@ describe('createWsAuth: Warlock pet-special capability negotiation', () => {
     );
     expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
     expect(joinedMeta(resume.game)).toMatchObject({ petSpecialWireVersion: 1 });
+  });
+});
+
+describe('createWsAuth: same-client resume token intake', () => {
+  const token = 'Ab0_-'.repeat(8).concat('xyz'); // 43 base64url characters
+
+  it('forwards a well-formed token into the in-world arm for planJoin to adjudicate', async () => {
+    const resume = setup();
+    resume.game.hasSessionForCharacter.mockReturnValue(true);
+    await createWsAuth(resume.deps).authenticateWebSocket(
+      asWs(resume.ws),
+      authRaw({ resumeToken: token }),
+      resume.req,
+    );
+    expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
+    expect(joinedMeta(resume.game).resumeToken).toBe(token);
+  });
+
+  it('screens a malformed or absent token to null before it reaches game.join', async () => {
+    for (const presented of [undefined, 42, null, '', token.slice(1), `${token}A`, [token]]) {
+      const resume = setup();
+      resume.game.hasSessionForCharacter.mockReturnValue(true);
+      await createWsAuth(resume.deps).authenticateWebSocket(
+        asWs(resume.ws),
+        authRaw(presented === undefined ? {} : { resumeToken: presented }),
+        resume.req,
+      );
+      expect(joinedMeta(resume.game).resumeToken).toBeNull();
+    }
+  });
+
+  it('never hands the token to a fresh join (no held session to supersede)', async () => {
+    const fresh = setup();
+    await createWsAuth(fresh.deps).authenticateWebSocket(
+      asWs(fresh.ws),
+      authRaw({ resumeToken: token }),
+      fresh.req,
+    );
+    expect(fresh.deps.acquireCharacterLease).toHaveBeenCalledTimes(1);
+    expect(joinedMeta(fresh.game)).not.toHaveProperty('resumeToken');
+  });
+
+  it('drops a late frame from a socket a supersede already replaced', async () => {
+    const { ws, game, session, deps, req } = setup();
+    await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+    ws.emit('message', 'live-frame');
+    expect(game.handleMessage).toHaveBeenCalledTimes(1);
+    // planJoin's supersede arm moved the session onto a newer socket.
+    session.ws = new FakeWs();
+    ws.emit('message', 'stale-frame');
+    expect(game.handleMessage).toHaveBeenCalledTimes(1);
+    expect(game.handleMessage).not.toHaveBeenCalledWith(session, 'stale-frame');
   });
 });
 

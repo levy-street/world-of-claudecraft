@@ -267,7 +267,7 @@ import { applyFerryWire, applyTransportSnapshot, clientFerryView } from './trans
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { whoRosterFromFrame } from './who_frame_wire';
-import { buildWebSocketAuthMessage } from './world_auth_message';
+import { buildWebSocketAuthMessage, helloResumeToken, softWordList } from './world_auth_message';
 import { WorldInteractionRequests } from './world_interaction_requests';
 
 export { buildWebSocketAuthMessage } from './world_auth_message';
@@ -1660,6 +1660,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private readonly token: string;
   private readonly base: string;
   private readonly clientSeed: string;
+  // The last hello's same-client proof: memory only, never storage (world_auth_message.ts).
+  private resumeToken: string | null = null;
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
@@ -1850,14 +1852,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
     const wsUrl = this.base
       ? `${this.base.replace(/^http/, 'ws')}/ws`
       : buildWebSocketUrl(location.protocol, location.host);
-    this.ws = new WebSocket(wsUrl);
-    this.ws.onopen = () => {
-      this.ws.send(
-        JSON.stringify(buildWebSocketAuthMessage(this.token, this.characterId, this.clientSeed)),
-      );
-    };
-    this.ws.onmessage = (ev) => this.onMessage(String(ev.data));
-    this.ws.onclose = () => this.socketClosed();
+    const ws = new WebSocket(wsUrl);
+    this.ws = ws;
+    const auth = [this.token, this.characterId, this.clientSeed, this.resumeToken] as const;
+    ws.onopen = () => ws.send(JSON.stringify(buildWebSocketAuthMessage(...auth)));
+    // A replaced socket's late events never drive the session (no reconnect beside a live one).
+    ws.onmessage = (ev) => this.ws === ws && this.onMessage(String(ev.data));
+    ws.onclose = () => this.ws === ws && this.socketClosed();
   }
 
   // A dropped socket schedules a reconnect with exponential backoff: the
@@ -2262,10 +2263,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.cfg.seed = msg.seed;
       if (typeof msg.realm === 'string') this.realm = msg.realm;
       this.accountAdmin = msg.admin === true;
-      if (Array.isArray(msg.softWords)) {
-        this.profanityWords = msg.softWords.filter(
-          (w: unknown): w is string => typeof w === 'string',
-        );
+      this.resumeToken = helloResumeToken(msg);
+      const softWords = softWordList(msg.softWords);
+      if (softWords) {
+        this.profanityWords = softWords;
         this.profanityDirty = true;
       }
       if (this.reconnectAttempts > 0) {
@@ -2357,9 +2358,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
     if (msg.t === 'censor') {
       // live word-list update pushed after an admin edits the filter
-      this.profanityWords = Array.isArray(msg.words)
-        ? msg.words.filter((w: unknown): w is string => typeof w === 'string')
-        : [];
+      this.profanityWords = softWordList(msg.words) ?? [];
       this.profanityDirty = true;
       return;
     }
