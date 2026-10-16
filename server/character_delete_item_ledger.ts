@@ -89,6 +89,15 @@ function slotsIn(value: unknown, container: string, out: DeletedTrackedCopy[]): 
   }
 }
 
+/** Every tracked copy (a slot carrying a canonical guid) among `slots`, each
+ *  labelled `container`: the reader the world-state purge rows share
+ *  (server/character_purge_item_ledger.ts). Tolerant like the walk below. */
+export function trackedCopiesInSlots(slots: unknown, container: string): DeletedTrackedCopy[] {
+  const out: DeletedTrackedCopy[] = [];
+  slotsIn(slots, container, out);
+  return out;
+}
+
 /** Every tracked copy in the deleted character's stored containers (a copy
  *  carrying a canonical guid), in a stable order: bags, bank, vault, buyback,
  *  then equipment. Pure and tolerant: a malformed container is skipped, never

@@ -5208,12 +5208,12 @@ export class GameServer {
   // and mail every AUTOSAVE_SECONDS, so a blob-only edit would be clobbered
   // within half a minute; the caller follows these with saveMarket/saveMail so
   // the purge reaches Postgres through the same serial writer.
-  purgeMarketSeller(characterId: number, name: string): boolean {
-    return this.sim.purgeMarketSeller(characterId, name);
+  purgeMarketSeller(characterId: number, name: string, destroyed?: InvSlot[]): boolean {
+    return this.sim.purgeMarketSeller(characterId, name, destroyed);
   }
 
-  purgeMailOwner(characterId: number, name: string): boolean {
-    return this.sim.purgeMailOwner(characterId, name);
+  purgeMailOwner(characterId: number, name: string, destroyed?: InvSlot[]): boolean {
+    return this.sim.purgeMailOwner(characterId, name, destroyed);
   }
 
   // Close every open play_sessions row; called on graceful shutdown so the

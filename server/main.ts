@@ -2170,13 +2170,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         // the one shared helper, so an API_DISPATCH=legacy rollback keeps it.
         await purgeDeletedCharacterWorldState(
           {
-            purgeMarketSeller: (id, name) => liveGame().purgeMarketSeller(id, name),
+            purgeMarketSeller: (id, name, destroyed) =>
+              liveGame().purgeMarketSeller(id, name, destroyed),
             saveMarket: () => liveGame().saveMarket(),
-            purgeMailOwner: (id, name) => liveGame().purgeMailOwner(id, name),
+            purgeMailOwner: (id, name, destroyed) => liveGame().purgeMailOwner(id, name, destroyed),
             saveMail: () => liveGame().saveMail(),
           },
           characterId,
           character.name,
+          accountId,
         );
       }
       return json(
@@ -3250,11 +3252,13 @@ configureCharactersRuntime({
   applyAppearanceForCharacter: (characterId, appearance) =>
     liveGame().applyAppearanceForCharacter(characterId, appearance),
   saveMarket: () => liveGame().saveMarket(),
-  purgeMarketSeller: (characterId, name) => liveGame().purgeMarketSeller(characterId, name),
+  purgeMarketSeller: (characterId, name, destroyed) =>
+    liveGame().purgeMarketSeller(characterId, name, destroyed),
   rekeyMailOwner: (characterId, oldName, newName) =>
     liveGame().rekeyMailOwner(characterId, oldName, newName),
   saveMail: () => liveGame().saveMail(),
-  purgeMailOwner: (characterId, name) => liveGame().purgeMailOwner(characterId, name),
+  purgeMailOwner: (characterId, name, destroyed) =>
+    liveGame().purgeMailOwner(characterId, name, destroyed),
   initialCharacterState,
   publicOrigin,
 });

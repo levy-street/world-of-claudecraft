@@ -57,6 +57,7 @@ import {
 } from '../../server/ratelimit';
 import { DEEDS_RECENT_CAP } from '../../src/sim/deeds';
 import type { CharacterState } from '../../src/sim/sim';
+import type { InvSlot } from '../../src/sim/types';
 import { type FakeRes, fakeCtx } from './helpers';
 
 // The realm this test process serves (REALM_NAME unset -> the default). The list
@@ -1950,7 +1951,8 @@ describe('delete handler', () => {
 
   it('purges the deleted character world state and persists both books on success', async () => {
     const spies = purgeSpies();
-    setCharactersDbForTests({ deleteCharacter: async () => true });
+    const recordPurgedCharacterCopies = vi.fn(async () => 0);
+    setCharactersDbForTests({ deleteCharacter: async () => true, recordPurgedCharacterCopies });
     installRuntime({ isCharacterOnline: () => false, ...spies });
     const res = await callHandler('DELETE', '/api/characters/:id', {
       account: { accountId: 7, scope: 'full' },
@@ -1958,11 +1960,17 @@ describe('delete handler', () => {
       body: { name: 'Deleteme' },
     });
     expect(res.status).toBe(200);
-    // Both keys the sim matches on: the character id and its name at delete time.
-    expect(spies.purgeMarketSeller).toHaveBeenCalledWith(9, 'Deleteme');
-    expect(spies.purgeMailOwner).toHaveBeenCalledWith(9, 'Deleteme');
+    // Both keys the sim matches on: the character id and its name at delete time,
+    // plus the sink each purge reports its destroyed copies into.
+    expect(spies.purgeMarketSeller).toHaveBeenCalledWith(9, 'Deleteme', []);
+    expect(spies.purgeMailOwner).toHaveBeenCalledWith(9, 'Deleteme', []);
     expect(spies.saveMarket).toHaveBeenCalledTimes(1);
     expect(spies.saveMail).toHaveBeenCalledTimes(1);
+    // The tracked copies' consume rows are attributed to the deleting account.
+    expect(recordPurgedCharacterCopies).toHaveBeenCalledWith(7, 'Deleteme', {
+      market: [],
+      mail: [],
+    });
   });
 
   it('skips the market save when only the mailbox had something to purge', async () => {
@@ -2132,31 +2140,87 @@ describe('delete handler', () => {
 
 describe('purgeDeletedCharacterWorldState', () => {
   it('purges both books and persists each one that changed', async () => {
+    setCharactersDbForTests({ recordPurgedCharacterCopies: async () => 0 });
     const rt = {
       purgeMarketSeller: vi.fn(() => true),
       saveMarket: vi.fn(async () => {}),
       purgeMailOwner: vi.fn(() => true),
       saveMail: vi.fn(async () => {}),
     };
-    await purgeDeletedCharacterWorldState(rt, 42, 'Gone');
-    expect(rt.purgeMarketSeller).toHaveBeenCalledWith(42, 'Gone');
-    expect(rt.purgeMailOwner).toHaveBeenCalledWith(42, 'Gone');
+    await purgeDeletedCharacterWorldState(rt, 42, 'Gone', 7);
+    expect(rt.purgeMarketSeller).toHaveBeenCalledWith(42, 'Gone', []);
+    expect(rt.purgeMailOwner).toHaveBeenCalledWith(42, 'Gone', []);
     expect(rt.saveMarket).toHaveBeenCalledTimes(1);
     expect(rt.saveMail).toHaveBeenCalledTimes(1);
   });
 
   it('writes neither book when the character held nothing in either', async () => {
+    setCharactersDbForTests({ recordPurgedCharacterCopies: async () => 0 });
     const rt = {
       purgeMarketSeller: vi.fn(() => false),
       saveMarket: vi.fn(async () => {}),
       purgeMailOwner: vi.fn(() => false),
       saveMail: vi.fn(async () => {}),
     };
-    await purgeDeletedCharacterWorldState(rt, 42, 'Gone');
+    await purgeDeletedCharacterWorldState(rt, 42, 'Gone', 7);
     expect(rt.purgeMarketSeller).toHaveBeenCalledTimes(1);
     expect(rt.purgeMailOwner).toHaveBeenCalledTimes(1);
     expect(rt.saveMarket).not.toHaveBeenCalled();
     expect(rt.saveMail).not.toHaveBeenCalled();
+  });
+
+  // The tracked-copy end of the purge (server/character_purge_item_ledger.ts):
+  // what each purge's sink collected reaches the ledger writer, attributed to
+  // the deleting account, and only after both books saved.
+  it('hands every destroyed copy to the ledger writer after both saves', async () => {
+    const order: string[] = [];
+    const record = vi.fn(async () => {
+      order.push('ledger');
+      return 2;
+    });
+    setCharactersDbForTests({ recordPurgedCharacterCopies: record });
+    const listed = { itemId: 'crownforged_dreadhelm', count: 1 };
+    const parcel = { itemId: 'linen_scrap', count: 3 };
+    const rt = {
+      purgeMarketSeller: vi.fn((_id: number, _name: string, destroyed?: InvSlot[]) => {
+        destroyed?.push(listed);
+        return true;
+      }),
+      saveMarket: vi.fn(async () => {
+        order.push('saveMarket');
+      }),
+      purgeMailOwner: vi.fn((_id: number, _name: string, destroyed?: InvSlot[]) => {
+        destroyed?.push(parcel);
+        return true;
+      }),
+      saveMail: vi.fn(async () => {
+        order.push('saveMail');
+      }),
+    };
+    await purgeDeletedCharacterWorldState(rt, 42, 'Gone', 7);
+    expect(record).toHaveBeenCalledTimes(1);
+    expect(record).toHaveBeenCalledWith(7, 'Gone', { market: [listed], mail: [parcel] });
+    expect(order).toEqual(['saveMarket', 'saveMail', 'ledger']);
+  });
+
+  it('a mail walk that throws still records the market half', async () => {
+    const record = vi.fn(async () => 1);
+    setCharactersDbForTests({ recordPurgedCharacterCopies: record });
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const listed = { itemId: 'crownforged_dreadhelm', count: 1 };
+    const rt = {
+      purgeMarketSeller: vi.fn((_id: number, _name: string, destroyed?: InvSlot[]) => {
+        destroyed?.push(listed);
+        return true;
+      }),
+      saveMarket: vi.fn(async () => {}),
+      purgeMailOwner: vi.fn(() => {
+        throw new Error('walk failed');
+      }),
+      saveMail: vi.fn(async () => {}),
+    };
+    await purgeDeletedCharacterWorldState(rt, 42, 'Gone', 7);
+    expect(record).toHaveBeenCalledWith(7, 'Gone', { market: [listed], mail: [] });
   });
 });
 

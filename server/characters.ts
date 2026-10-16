@@ -47,7 +47,7 @@ import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
 import { activeRaidLockouts } from '../src/sim/raid_lockout_state';
 import { savedZoneId } from '../src/sim/saved_pos_exit';
 import type { CharacterState } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
+import type { InvSlot, PlayerClass } from '../src/sim/types';
 // The shared, host-agnostic bounds check for an untrusted look (the
 // action_bar.ts pattern). The renderer owns what the values MEAN; the server
 // only guarantees the stored document is small and well shaped.
@@ -59,6 +59,10 @@ import {
   characterDeleteHttpRefusal,
   characterDeleteRequestSignal,
 } from './character_delete_http';
+import {
+  emptyPurgedCharacterHoldings,
+  recordPurgedCharacterCopies,
+} from './character_purge_item_ledger';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import { rekeyOfflineCharacterSigner } from './character_signer_db';
 import {
@@ -206,14 +210,16 @@ export interface CharactersRuntime {
   ): boolean;
   /** game.saveMarket: persist the World Market after a rekey. */
   saveMarket(): Promise<void>;
-  /** game.purgeMarketSeller: drop a deleted character's listings + collection. */
-  purgeMarketSeller(characterId: number, name: string): boolean;
+  /** game.purgeMarketSeller: drop a deleted character's listings + collection,
+   *  appending every destroyed copy to `destroyed`. */
+  purgeMarketSeller(characterId: number, name: string, destroyed?: InvSlot[]): boolean;
   /** game.rekeyMailOwner: re-key the character's Ravenpost mailbox after a rename. */
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean;
   /** game.saveMail: persist the Ravenpost mail book after a rekey. */
   saveMail(): Promise<void>;
-  /** game.purgeMailOwner: clear a deleted character's Ravenpost mailbox. */
-  purgeMailOwner(characterId: number, name: string): boolean;
+  /** game.purgeMailOwner: clear a deleted character's Ravenpost mailbox,
+   *  appending every destroyed attachment to `destroyed`. */
+  purgeMailOwner(characterId: number, name: string, destroyed?: InvSlot[]): boolean;
   /** main.ts initialCharacterState: the serialized fresh-character state for create. */
   initialCharacterState(cls: PlayerClass, name: string, skin: number): CharacterState;
   /** main.ts publicOrigin: canonical share origin for the owner-sheet URLs. */
@@ -261,6 +267,7 @@ const REAL_CHARACTERS_DB = {
   renameCharacter,
   rekeyOfflineCharacterSigner,
   deleteCharacter,
+  recordPurgedCharacterCopies,
   lifetimeXpStanding,
   guildNameForCharacter,
   lifetimeXpRankForCharacter,
@@ -595,23 +602,33 @@ export async function rekeyRenamedCharacterOwnSigner(
  * rollback path), the buildCharacterList delegation precedent. Call it only AFTER the
  * DB delete reports success, mirroring renameHandler: a delete that matched no row
  * must never purge a live character's escrow.
+ *
+ * Every tracked (epic or legendary) copy the purge destroys writes its final
+ * `consume` ledger row once both books are saved, attributed to `accountId`
+ * (server/character_purge_item_ledger.ts); a copy on a returned letter flies
+ * home and is not among them.
  */
 export async function purgeDeletedCharacterWorldState(
   rt: Pick<CharactersRuntime, 'purgeMarketSeller' | 'saveMarket' | 'purgeMailOwner' | 'saveMail'>,
   characterId: number,
   name: string,
+  accountId: number,
 ): Promise<void> {
+  const destroyed = emptyPurgedCharacterHoldings();
   // Never let a purge failure turn a COMMITTED delete into a 500: the row is
   // gone and a client retry would 404 with the mail half never purged. The
   // live-book mutations self-heal through the autosave (the save wrappers
   // swallow their own write errors already); this catch covers the walks
   // themselves, matching that posture.
   try {
-    if (rt.purgeMarketSeller(characterId, name)) await rt.saveMarket();
-    if (rt.purgeMailOwner(characterId, name)) await rt.saveMail();
+    if (rt.purgeMarketSeller(characterId, name, destroyed.market)) await rt.saveMarket();
+    if (rt.purgeMailOwner(characterId, name, destroyed.mail)) await rt.saveMail();
   } catch (err) {
     console.error('failed to purge deleted character world state:', err);
   }
+  // Outside the try on purpose: a mail walk that threw must not cost the
+  // market half its rows. The write logs its own failure and never rejects.
+  await charactersDb.recordPurgedCharacterCopies(accountId, name, destroyed);
 }
 
 // ---------------------------------------------------------------------------
@@ -957,7 +974,7 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
   // no way to re-trigger the purge. They cannot close it outright (the game
   // save wrappers swallow their own errors and answer anyway; the 30 s
   // autosave is the failure-path backstop), but do not drop the await.
-  if (ok) await purgeDeletedCharacterWorldState(rt, character.id, character.name);
+  if (ok) await purgeDeletedCharacterWorldState(rt, character.id, character.name, accountId);
   json(ctx.res, ok ? 200 : 404, ok ? { ok: true } : NOT_FOUND);
 }
 
