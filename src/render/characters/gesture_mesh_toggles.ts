@@ -29,6 +29,62 @@ export interface MeshToggleDef {
   hideNow?: string;
   /** Show at once (consumed: no clip plays). */
   showNow?: string;
+  /** What is left where a whole-model hide took the body away, drawn by an
+   *  effect and not by the rig (the Chapel Gargoyle's rubble heap): while the
+   *  toggle hides, the rig's click capsule and its height (nameplate, selection
+   *  ring) shrink to it, so what the player sees is what they click. Yards at
+   *  e.scale = 1. */
+  remains?: MeshToggleRemainsDef;
+}
+
+/** The size of what a hidden body left behind (MeshToggleDef.remains). */
+export interface MeshToggleRemainsDef {
+  /** Its drawn height. */
+  height: number;
+  /** Its click radius. */
+  radius: number;
+}
+
+/** A hidden body's remains as a rig applies them. */
+export interface MeshToggleRemains extends MeshToggleRemainsDef {
+  /** How far under the body's own position they lie (0: where it stands). */
+  drop: number;
+}
+
+/**
+ * A gesture may say how far UNDER the body its remains lie, as a `@<yards>`
+ * suffix on a `hideNow` id (`crypt_gargoyle_rubble@5.62`): the sim never moves
+ * a dead mob, so one killed in the air leaves its remains on the floor below
+ * and the effect that draws them is the one that knows the floor. The id
+ * without its suffix, and the drop (0 with none, or with one that is no
+ * positive number).
+ */
+export function splitGestureDrop(gesture: string): { id: string; drop: number } {
+  const at = gesture.indexOf('@');
+  if (at < 0) return { id: gesture, drop: 0 };
+  const drop = Number(gesture.slice(at + 1));
+  return { id: gesture.slice(0, at), drop: Number.isFinite(drop) && drop > 0 ? drop : 0 };
+}
+
+/** The remains the toggles leave right now: those of the first hidden toggle
+ *  that declares any, `drops[i]` under the body; null when none does. */
+export function meshToggleRemains(
+  defs: readonly MeshToggleDef[],
+  states: readonly MeshToggleState[],
+  drops: readonly number[],
+): MeshToggleRemains | null {
+  for (let i = 0; i < defs.length; i++) {
+    const remains = defs[i].remains;
+    if (!remains || states[i].shown) continue;
+    return { height: remains.height, radius: remains.radius, drop: drops[i] ?? 0 };
+  }
+  return null;
+}
+
+/** The click capsule of a hidden body's remains: twice their height (a low
+ *  heap seen from a shallow camera is a thin target), on their radius. */
+export function remainsPickHeight(remains: MeshToggleRemainsDef): number {
+  return remains.height * 2;
 }
 
 /** A hidden bone's scale: small enough to vanish, never zero (a singular
@@ -122,6 +178,8 @@ export function stepMeshToggle(
 export class GestureMeshToggles {
   private readonly nodes: THREE.Object3D[][];
   private readonly states: MeshToggleState[];
+  /** How far under the body each toggle's remains lie (the hide's suffix). */
+  private readonly drops: number[];
 
   constructor(
     model: THREE.Object3D,
@@ -137,6 +195,7 @@ export class GestureMeshToggles {
       return found;
     });
     this.states = defs.map(() => ({ shown: true, hideIn: null, clipSeen: false }));
+    this.drops = defs.map(() => 0);
   }
 
   /** A presentation gesture. Returns true when it is CONSUMED (a hide or show
@@ -144,8 +203,12 @@ export class GestureMeshToggles {
    *  still plays. */
   handle(gesture: string): boolean {
     let consumed = false;
-    for (const [i, action] of meshToggleActions(this.defs, gesture)) {
+    // A hide may carry how far under the body its remains lie (splitGestureDrop).
+    const suffixed = gesture.indexOf('@') >= 0;
+    const { id, drop } = suffixed ? splitGestureDrop(gesture) : { id: gesture, drop: 0 };
+    for (const [i, action] of meshToggleActions(this.defs, id)) {
       applyMeshToggleAction(this.defs[i], this.states[i], action);
+      if (action === 'hide') this.drops[i] = drop;
       if (action !== 'schedule') {
         consumed = true;
         this.paint(i);
@@ -177,6 +240,12 @@ export class GestureMeshToggles {
    *  while the whole model is. */
   hidden(): MeshToggleHidden {
     return meshToggleHidden(this.defs, this.states);
+  }
+
+  /** What a whole-model hide left behind, for the rig's click capsule and
+   *  height; null while nothing that declares remains is hidden. */
+  remains(): MeshToggleRemains | null {
+    return meshToggleRemains(this.defs, this.states, this.drops);
   }
 
   /** A revived rig shows everything again. */

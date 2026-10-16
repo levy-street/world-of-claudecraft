@@ -172,6 +172,11 @@ import {
   HOARD_GESTURE_ICE_AGE_RELEASE,
 } from '../hoard_boss_gestures_core';
 import {
+  GARGOYLE_REMAINS,
+  GARGOYLE_RUBBLE_GESTURE,
+  GARGOYLE_WHOLE_GESTURE,
+} from '../hollow_crypt/crypt_gargoyle_crumble_core';
+import {
   MORTHEN_DEATH_LIFT,
   MORTHEN_GROWTH,
   MORTHEN_HOVER,
@@ -5103,6 +5108,19 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 5.1,
     runRef: 17,
     selfIllumination: 0.18,
+    // Carved stone does not lie down: a beat after it dies the whole model
+    // goes and a low heap of rubble stands in for it, drawn by
+    // hollow_crypt/crypt_gargoyle_crumble_fx.ts, which sends the gestures (and
+    // sends the hide again for a view built later). The click capsule and the
+    // nameplate shrink to the heap, so the heap is what is clicked and looted.
+    meshToggles: [
+      {
+        nodes: ['*'],
+        hideNow: GARGOYLE_RUBBLE_GESTURE,
+        showNow: GARGOYLE_WHOLE_GESTURE,
+        remains: GARGOYLE_REMAINS,
+      },
+    ],
   },
   // The Carrion Crow is always on the wing: `hover` lifts it and its Death clip
   // drops the body onto the floor.

@@ -166,6 +166,7 @@ describe('the kit host: slots and the crypt gate', () => {
       nets: 5,
       embers: 2,
       objects: 8,
+      rubble: 6,
     });
   });
 

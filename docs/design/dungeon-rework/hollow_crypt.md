@@ -160,7 +160,7 @@ templates: `src/sim/content/hollow_crypt_trash.ts`; floor telegraphs:
 | Gravecaller Necromancer (9, elite) | KayKit necromancer | Raise Bones: 3 s interruptible channel raising a Bone Minion (two alive at most), every 15 s | Kick it, or kill the minion fast |
 | Bone Minion (8) | KayKit minion | Left alive 8 s it grows into an elite Bone Brute; on death a Bone Burst: 1.8 s ring fuse, 12 to 18 within 3.5 yd | Burn it, then step out of its ring |
 | Bone Brute (9, elite) | KayKit skeleton golem | A heavy hitter | Do not let minions grow |
-| Chapel Gargoyle (9, elite) | A great, heavy stone gargoyle (about 4.5 yd crouched, twice a player): ram and swept horns, ember eyes, cracked weathered stone, ribbed stone wings | Waits as a statue on a whole arcade arch, cracks free and dives in when its pack is pulled (a shockwave where it lands); rakes with its talons; Stone Shriek: 2 s interruptible bar, 2.5 s stun within 10 yd, every 16 s (violet sonic rings, a shockwave on the stun) | Kick it or step out of the ring |
+| Chapel Gargoyle (9, elite) | A great, heavy stone gargoyle (about 4.5 yd crouched, twice a player): ram and swept horns, ember eyes, cracked weathered stone, ribbed stone wings | Waits as a statue on a whole arcade arch, cracks free and dives in when its pack is pulled (a shockwave where it lands); rakes with its talons; Stone Shriek: 2 s interruptible bar, 2.5 s stun within 10 yd, every 16 s (violet sonic rings, a shockwave on the stun). Dead, it does not lie down: cracks race over the stone, it bursts into falling blocks and a rolling dust cloud, and a low rubble heap is left, which is its lootable corpse (render only, `crypt_gargoyle_crumble_fx.ts`) | Kick it or step out of the ring |
 | Crow Caller (8, elite) | Hooded Gravecaller | Casts from range; Murder Call: 3 s interruptible bar summoning 4 Carrion Crows (a whole flock must fit under 6 alive), every 18 s | Kick it |
 | Carrion Crow (7) | New crow | Weak fast fliers in flocks | Area damage |
 | Ossuary Drake (10, elite) | A colossal skeletal wyvern: head about 10 yd up, wings about 34 yd across, a soul fire caged in its ribs; it walks on its wing knuckles and fights with its jaws, never its claws | Flies the Processional at 22 yd (two downbeats and a long glide), cries and glides down when pulled; bites; Barrowflame Breath (2 s bar while it draws the fire up, then a torrent of spectral fire over a 70 degree 14 yd cone, 26 to 34 fire, the cone left scorched), Tail Lash (1 s bar, 120 degree 10 yd cone behind it), Wing Gust (1.5 s bar, 10 yd ring, 8 yd knockback) | Tank faces it away, nobody behind, spread from the gust |
@@ -498,7 +498,9 @@ Open air at dusk turning to night. The render lives in `src/render/hollow_crypt/
     a tracery window framing the Rite Ring beyond.
   - Bone Stair: a spiral path up the crag, wisp rivers flowing up it.
   - Rite Ring: the roofless ritual circle, engraved glyph rings, four
-    Remembrance Candles on pillars, altar, the soul column visible from afar.
+    Remembrance Candles (fat tallow pillars on plinths of names, each in an
+    iron reliquary cage about two and a half players tall), altar, the soul
+    column visible from afar.
 - **Signature moments.** First vista; bell tower against the moon; the light
   column seen from every terrace; layered ground mist and chasm mist; soul-wisp
   rivers flowing toward the ring; gate reveals (a barrier crumbles, a web

@@ -103,11 +103,12 @@ export function pulseCharge(fill: number): number {
 // ---- the Remembrance Candles ----------------------------------------------------------------
 
 /** Measured off the shipped kit (public/models/props/hollow_crypt_kit.glb,
- *  Kit_RemembranceCandle: the tallow pillar tops out at 3.55 yd, its baked
- *  flame burns from there to 5.22). */
+ *  Kit_RemembranceCandle: the tallow pillar's wick stands at 3.55 yd inside
+ *  its iron cage, its baked flame burns from there to 5.22). The model is
+ *  held to these by tests/hollow_crypt_remembrance_candle.test.ts. */
 export const CANDLE_WICK_Y = 3.55;
 export const CANDLE_FLAME_TIP_Y = 5.22;
-/** The tallow pillar's radius (the kit's `candle(..., 3.1, 0.95)`). */
+/** The tallow pillar's radius at its waist, wax runs included. */
 export const CANDLE_TALLOW_RADIUS = 0.95;
 
 /** The Ledger of Names on the altar's lectern (instance-local), measured off
@@ -127,7 +128,8 @@ export function candleStateOf(templateId: string | null | undefined): CandleStat
 }
 
 export interface CandleLook {
-  /** The kit's baked flame and the crypt lights' flame cone and halo. */
+  /** The kit's baked lights (the flame, the names on the plinth, the votive
+   *  lights) and the crypt lights' flame cone and halo. */
   decorFlame: boolean;
   /** The candle's point light, as a share of its authored intensity. */
   light: number;
