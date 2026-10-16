@@ -1,8 +1,12 @@
 import * as THREE from 'three';
 import { EASTBROOK_FREIGHT_CARAVAN_MOB_ID, WORLD_QUEST_MOBS } from '../sim/content/world_quests';
 import { worldQuestCaravanForMob } from '../sim/world_quest_caravans';
-import { type AnimState, CharacterVisual } from './characters';
-import { logAssetMissOnce } from './characters/asset_miss_log';
+import { type AnimState, createRosterLookVisual } from './characters';
+
+/** The roster row (npc_looks.ts) a caravan's driver wears. */
+export function caravanDriverLookId(templateId: string): string {
+  return `${templateId}_driver`;
+}
 
 const SEATED: AnimState = {
   speed: 0,
@@ -32,22 +36,12 @@ export function buildCaravanDriver(
 ): CaravanDriverVisual | null {
   const caravan = worldQuestCaravanForMob(templateId);
   if (!caravan?.story) return null;
-  const willowfen = templateId === 'willowfen_remedy_caravan';
   const color =
     templateId === EASTBROOK_FREIGHT_CARAVAN_MOB_ID ? 0x9b794f : WORLD_QUEST_MOBS[templateId].color;
-  let visual: CharacterVisual;
-  try {
-    visual = new CharacterVisual(
-      willowfen ? 'npc_villager_robed' : 'npc_villager',
-      color,
-      0,
-      null,
-      null,
-    );
-  } catch (err) {
-    logAssetMissOnce(`${templateId}-driver`, 'Caravan driver asset unavailable:', err);
-    return null;
-  }
+  // The driver is a person with a face of their own: the caravan's roster row
+  // (npc_looks.ts `<caravan>_driver`), on a WOC class body.
+  const visual = createRosterLookVisual(caravanDriverLookId(templateId), color);
+  if (!visual) return null;
   visual.root.name = `${templateId}-driver`;
   visual.root.userData.caravanSpeaker = caravan.story.speaker;
   visual.root.scale.setScalar(0.82);

@@ -11,6 +11,126 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const da_DK: EnTranslations = {
+  "referralCards": {
+    "title": "Refer a Friend",
+    "subtitle": "Adventure together. Earn your stamps.",
+    "close": "Close Refer a Friend",
+    "launcher": "Stamp cards",
+    "pages": "Stamp card pages",
+    "firstPage": "First page",
+    "nextPage": "More cards",
+    "trailmateTitle": "Trailmate",
+    "friendshipAura": "Friendship",
+    "protectiveCharm": "Protective Charm",
+    "bankBonus": "Completed stamp cards",
+    "bankBonusHelp": "Help two bound friends complete their stamp cards to unlock 20 permanent bank slots.",
+    "friendshipUse": "Increase your Strength, Agility, Stamina, Intellect, and Spirit by {stats} for {duration} seconds.",
+    "readyCount": "Stamp cards: {count} rewards ready to collect",
+    "loading": "Connecting to your referral cards...",
+    "empty": "Invite a new player to begin your first stamp card together.",
+    "inviteTitle": "Invite a friend",
+    "inviteHelp": "Share this link with a friend before they create their account. Only new accounts created through your link become bound friends.",
+    "inviteLabel": "Your invitation link",
+    "inviteUnavailable": "Your invitation link is not available yet.",
+    "membership": "When your bound friend buys their first membership, you receive a membership bond.",
+    "cardBetween": "{you} and {friend}",
+    "yourCard": "{name}'s stamp card",
+    "unassigned": "Character not selected",
+    "start": "Start a card",
+    "startPrompt": "Start stamp cards with {friend}? Both of you must accept. Each character must be below level 5 and must not have completed the final Tutorial Island quest.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "declinePrompt": "Are you sure you want to decline? You can start later from the stamp card menu while both characters still meet the requirements.",
+    "declineConfirmed": "The card was not started. You can start from the stamp card menu while both characters still meet the requirements.",
+    "waiting": "Waiting for your bound friend to accept.",
+    "cancel": "Cancel",
+    "okay": "OK",
+    "understand": "Yes, I understand",
+    "confirmLock": "Yes, lock this card",
+    "lockFirst": "Redeeming The Fogbinder stamp reward permanently locks this card to {name}. You will no longer be able to move this card or its rewards to another character. Do you understand?",
+    "lockSecond": "Are you sure? Redeem The Fogbinder reward and permanently lock this card to {name}.",
+    "locked": "This card is locked to {name}. It can no longer be moved.",
+    "unlocked": "This card can move to another eligible character until you redeem The Fogbinder stamp reward. Redeeming that reward permanently locks it to this character.",
+    "move": "Move card to this character",
+    "movePrompt": "Move your card from {oldName} to {newName}? Your progress and all rewards earned from this card will move. Those rewards will be removed from {oldName}.",
+    "confirmMove": "Yes, move my card",
+    "summon": "Summon bound friend",
+    "summonPrompt": "{friend} wants to summon you to their location. Accept the summon?",
+    "summonHelp": "Bring your bound friend to your location. You can summon once every 30 minutes.",
+    "summonCooldown": "Summon ready in {minutes} min {seconds} sec",
+    "reward": "Reward: {reward}",
+    "earned": "Earned",
+    "redeemed": "Redeemed",
+    "emptyStamp": "Not yet earned",
+    "stamping": "Stamping your card...",
+    "redeem": "Redeem reward",
+    "previous": "Redeem earlier stamps first.",
+    "playTogether": "Complete milestones in a party with the characters on this card.",
+    "fallback": "Already completed a milestone quest alone? Rejoin your friend in a party for the Tutorial Island stamp. For later quest stamps, clear the matching dungeon together.",
+    "questGroup": "Stamp card quests",
+    "questWithFriend": "{quest} with {friend}",
+    "browseCards": "Browse all stamp card pages",
+    "nextQuest": "Stamp card: {quest}",
+    "questIndicator": "This quest advances your next stamp card reward.",
+    "completion": "Congratulations! {friend} completed their stamp card with your help.",
+    "openInvites": "Open Refer a Friend",
+    "referrerTitle": "Friends you helped",
+    "referrerCount": "{count} friends completed",
+    "friendTier": "Friends helped: {count}",
+    "awarded": "Awarded",
+    "pending": "Not yet awarded",
+    "celebration": {
+      "earned": "Adventure rewarded",
+      "title": "Reward claimed!",
+      "titleReward": "Title unlocked: {title}",
+      "together": "Earned together with {friend}.",
+      "continue": "Keep adventuring"
+    },
+    "milestones": {
+      "tutorial": "Tutorial Island final quest",
+      "hollow": "Into the Hollow",
+      "fogbinder": "The Fogbinder",
+      "gravewyrm": "Korzul the Gravewyrm",
+      "raid": "Defeat your first raid boss"
+    },
+    "rewards": {
+      "tutorial": "A unique title and a maximum-tier bag, bound to your character.",
+      "hollow": "A trinket that grants Stamina and a passive shield when your health is low.",
+      "fogbinder": "Your trinket evolves, gaining more Stamina and an active effect: +5 to all stats for 15 seconds, with a 2 minute cooldown.",
+      "gravewyrm": "Free mount training.",
+      "raid": "The exclusive Friendship Tank mount."
+    },
+    "referrerRewards": {
+      "1": "The exclusive Friendship Raptor mount.",
+      "2": "20 bank slots and 5 character slots.",
+      "3": "1,000 Claudium.",
+      "4": "1,000 Claudium.",
+      "5": "A Sapling buddy companion."
+    },
+    "reasons": {
+      "notParticipant": "This account is not part of this bound-friend link.",
+      "staleRevision": "Your card changed. Check its latest progress and try again.",
+      "invalidCharacters": "The party characters do not belong to this bound-friend link.",
+      "notTogether": "Both bound friends must be in the same party.",
+      "levelTooHigh": "New card characters must be below level 5.",
+      "tutorialCompleted": "A character has already completed the final Tutorial Island quest.",
+      "alreadyStarted": "This link already has a card. Each bound-friend link can have only one active card.",
+      "notPending": "There is no card invitation waiting for a response.",
+      "declinePending": "Your bound friend is deciding whether to decline the card.",
+      "declineNotConfirmed": "Confirm the decline before ending this invitation.",
+      "notActive": "Start a card together before collecting rewards.",
+      "wrongCharacter": "Use the characters named on the card, or move an unlocked card to an eligible character.",
+      "locked": "This card is locked to its character and cannot be moved.",
+      "sameCharacter": "This card is already on this character.",
+      "invalidMilestone": "That stamp does not belong to this card.",
+      "notEarned": "Complete this milestone together before redeeming it.",
+      "alreadyRedeemed": "This reward has already been redeemed.",
+      "previousRewardRequired": "Redeem the earlier stamp rewards first.",
+      "confirmationRequired": "Review the card lock warning before redeeming The Fogbinder reward.",
+      "newAccountsOnly": "Accounts can become bound friends only when a new account is created through a referral link. Existing accounts cannot be bound.",
+      "unavailable": "This action is not available right now. Please try again later."
+    }
+  },
   "meta": {
     "builtOn": "Bygget {date}"
   },
@@ -347,6 +467,26 @@ export const da_DK: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "Courier",
+      "close": "Close courier",
+      "ready": "Ready for a delivery",
+      "outbound": "Flying to the bank",
+      "returning": "Bringing your items back",
+      "waiting": "Waiting to return your items",
+      "bags": "Send to bank",
+      "bank": "Bring from bank",
+      "cargo": "Courier inventory",
+      "empty": "No items",
+      "send": "Send courier",
+      "selected": "{count} / {limit} stacks selected",
+      "select": "Select {item}, {count}",
+      "selectedItem": "Deselect {item}, {count}",
+      "instructions": "Select whole stacks. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.",
+      "membership": "Renew your membership to start another trip.",
+      "cargoSafe": "Carried items stay with the courier until there is room in your bags.",
+      "unavailable": "Summon your courier to plan a delivery."
+    },
     "framePresets": {
       "apply": "Anvend",
       "pickerLabel": "Rammeforudindstillinger: {name}",
@@ -513,6 +653,48 @@ export const da_DK: EnTranslations = {
       "sailing": "Sejer til {dest}"
     },
     "materialStackSelectionUnavailable": "Det materialevalg er ikke længere tilgængeligt.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "Nordurets Kanon",
       "objective": "Forsvar norduret",
@@ -826,6 +1008,50 @@ export const da_DK: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "Game subscription",
+        "monthlyTitle": "Monthly membership",
+        "annualTitle": "12-month membership bundle",
+        "annualPrice": "{price} for 12 months, paid upfront",
+        "annualTerms": "Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.",
+        "annualMount": "After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.",
+        "trialTerms": "Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.",
+        "startTrial": "Start 7-day free trial",
+        "resumeCheckout": "Resume checkout",
+        "checkoutClosed": "This checkout has closed without an outstanding reward. Choose a membership plan again to start a new checkout.",
+        "annualClaim": "Collect bundle mount",
+        "annualPending": "Return to the purchasing character after payment to collect the bundle mount. If payment is processing or the trial is active, try again after the paid charge.",
+        "annualDelivered": "Your bundle mount key has been delivered by mail.",
+        "tokenTitle": "Tradable membership token",
+        "benefitsTitle": "Active membership benefits",
+        "benefitBank": "Access your other characters' banks at any banker.",
+        "benefitSlots": "Unlock 10 additional character slots.",
+        "benefitArmour": "Claim soulbound armour with stats for your class and specialisation. It scales with your level and reaches item level 25 at level 20. Wear the full set for 20% more XP.",
+        "benefitTax": "Pay half the normal auction house tax.",
+        "benefitExpiry": "When membership ends, characters in the additional slots and armour bonuses are locked until renewal. Your base character slots remain playable.",
+        "tokenTerms": "{price} once for 30 days. Delivered by mail to this character. Redeem it to add membership time, or sell it at the auction house.",
+        "tokenBuy": "Buy membership token",
+        "tokenClaim": "Collect purchased token",
+        "tokenPending": "After payment, return to this character and collect your token. If payment is still processing, try again shortly.",
+        "tokenDelivered": "Your token has been delivered by mail.",
+        "price": "{price} per month",
+        "terms": "Renews monthly. Pay with fiat through Stripe. Cancel in billing settings.",
+        "subscribe": "Subscribe",
+        "manage": "Manage subscription",
+        "ending": "Cancels at the end of the billing period",
+        "error": "Could not open billing. Allow popups and try again.",
+        "status": {
+          "none": "Not subscribed",
+          "incomplete": "Payment incomplete",
+          "incomplete_expired": "Checkout expired",
+          "trialing": "Trial",
+          "active": "Active",
+          "past_due": "Payment overdue",
+          "canceled": "Canceled",
+          "unpaid": "Unpaid",
+          "paused": "Paused"
+        }
+      },
       "title": "WOC-butik",
       "close": "Luk WOC-butikken",
       "tabsLabel": "Sektioner i WOC-butikken",
@@ -1205,7 +1431,8 @@ export const da_DK: EnTranslations = {
       "drowning": "Drukner!"
     },
     "rest": {
-      "resting": "Hviler"
+      "resting": "Hviler",
+      "restArea": "Resting: you are in a rest area and gain rested experience here."
     },
     "paladin": {
       "devotion": "Hengivenhed",
@@ -1662,6 +1889,10 @@ export const da_DK: EnTranslations = {
       "replayAction": "Øv igen",
       "replayTarget": "Vælg den som mål igen"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Rift",
       "hoardTitle": "Begravet skattkammer",
@@ -1987,6 +2218,8 @@ export const da_DK: EnTranslations = {
       "name_goblin_rocket_sled": "Goblin-raketslæde",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Dreadspark jordryster",
+      "name_referral_tank": "Friendship Tank",
+      "name_referral_raptor": "Friendship Raptor",
       "name_drakemaw_raptor": "Dragegabets Raptor",
       "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork-mekafugl",
@@ -2004,6 +2237,8 @@ export const da_DK: EnTranslations = {
       "desc_rallycart_rxt": "En lille rallymaskine, der øger rejsehastigheden.",
       "desc_rallycart_skin": "En lille rallybil med et mægtigt brøl.",
       "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
+      "desc_referral_tank": "Earned by completing a referral stamp card.",
+      "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
       "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske.",
       "desc_avian_strider": "En høj sadelkloaksfugl, hvis tunge kløer og foldede vinger gør hver rejse til en tordnende sprint.",
       "desc_mech_bird": "En håndbygget urværks-krigskylling, der spurter på knækkende servoer, mens optræksnøglen stadig drejer.",
@@ -2080,6 +2315,10 @@ export const da_DK: EnTranslations = {
       "flagTakenLog": "{name} har taget {team}-flaget!",
       "flagDroppedLog": "{team}-flaget blev tabt.",
       "flagReturnedLog": "{team}-flaget blev returneret.",
+      "flagDroppedByLog": "{name} dropped the {team} flag.",
+      "flagReturnedByLog": "{name} returned the {team} flag.",
+      "flagNameCrimson": "Crimson Flag",
+      "flagNameAzure": "Azure Flag",
       "dropFlagConfirmTitle": "Tab flaget?",
       "dropFlagConfirmBody": "Du bærer fjendens flag. Taber du det, bliver det liggende på jorden, hvor begge hold kan nå det.",
       "dropFlagConfirmAccept": "Tab flaget",
@@ -2208,6 +2447,7 @@ export const da_DK: EnTranslations = {
       "showDevBadges": "Vis udviklermærker",
       "showOwnNameplate": "Vis mit navneskilt",
       "showPlayerNameplates": "Vis spillernavneskilte",
+      "showPetNames": "Show Pet Names",
       "uiScale": "UI-skala",
       "playerFrameScale": "Spillerrammens skala",
       "targetFrameScale": "Målrammens skala",
@@ -2225,6 +2465,8 @@ export const da_DK: EnTranslations = {
       "groundReticle": "Jordsigte-retikel",
       "mouseoverCast": "Museover-kast på grupperammer",
       "stickyTarget": "Bevar mål ved jordklik",
+      "showDungeonHints": "Dungeon mechanic hints",
+      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
       "showItemLevel": "Vis genstandsniveau",
       "showReliquaryTracker": "Vis Relikviesporer",
       "confirmVendorSell": "Bekræft før salg",
@@ -2845,6 +3087,9 @@ export const da_DK: EnTranslations = {
       "weapons": "Våben",
       "groupSeason2": "Krigsudspring Sæson 2: Forsporinger",
       "groupEntry": "Krigsudspring Sæson 1",
+      "companions": "Companions",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "owned": "Ejet",
       "buyAria": "Køb {item} for {honor}",
       "buyOwnedAria": "Køb {item} for {honor}, allerede ejet",
@@ -3112,8 +3357,10 @@ export const da_DK: EnTranslations = {
         "storm": "Hver stavekraft du kaster tilføjer en ladning, op til {max}. Ladninger varer {duration} sek, opdateret når du får en.",
         "heat": "Dine våben-slag hver tilføjer en varme-stak, op til {max}. Varme varer {duration} sek, opdateret når du får en stak.",
         "ignite": "Dine våben-kritiske slag tænder målet, hvilket giver {tick} Ildskade hvert {every} sek i {duration} sek. Et nyt kritisk slag opdaterer det. Skaden stiger med Angrebskraft eller Fjernkampskraft, hvilken som helst er højere.",
-        "guardHeat": "Hver gang du blokerer, undviger eller parerer et angreb, tilføjes en varme-stak, op til {max}. Varme varer {duration} sek, opdateret når du får en stak."
+        "guardHeat": "Hver gang du blokerer, undviger eller parerer et angreb, tilføjes en varme-stak, op til {max}. Varme varer {duration} sek, opdateret når du får en stak.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "I {duration} sek tager en fjende der rammer dig direkte Fysisk skade lig med {pct}% af det helbred der ramte tog fra dig. Periodisk skade udløser det ikke.",
         "anchor": "I {duration} sek modtager du {reduction}% mindre skade men bevæger dig med {speed}% hastighed. Fjerner ødelæggelser, rødder, øjeblikkelsesantal, frygt, polymorfer, stilhed, blindhed, hekse, afvæbninger og incapacitating effekter på dig, og du ignorerer nye og knockbacks mens det varer.",
@@ -3132,7 +3379,17 @@ export const da_DK: EnTranslations = {
         "kindlingOrb": "Sammenkald en glødelsekulensibryd ved siden af dig i {duration} sek. Hver stavekraft du kaster på en fjende får det til at affyre en bolt på denne fjende for {damage} Ildskade. Skaden stiger med Stavekraft.",
         "pierce": "I {duration} sek rammer dine auto-angreb, skud og fysiske evner (ikke blødninger) også den fjende tættest på dit mål inden for {reach} yd for {share}% af skaden håndteret.",
         "lantern": "Indstil en lygte ved dine fødder for {duration} sek. En direkte heling fra nogen på dig eller et fælles partiet medlem inden for {radius} yd af det helbreder også det mest såret andet fælles partiet medlem i dets lys for {share}% af helbredelsen.",
-        "heartNova": "Forbrug alle varme-stakke på en ildnovastjerne der giver {perHeat} Ildskade pr. stak ({max} ved {maxHeat} stakke) til hver fjende inden for {radius} yd og forledes hver kreatur det rammer. Skaden stiger med Angrebskraft. Kræver en varme-stak."
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "spiritPack": "Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.",
+        "seedburst": "Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.",
+        "tether": "Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.",
+        "harvest": "For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.",
+        "quench": "Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
+        "heartNova": "Forbrug alle varme-stakke på en ildnovastjerne der giver {perHeat} Ildskade pr. stak ({max} ved {maxHeat} stakke) til hver fjende inden for {radius} yd og forledes hver kreatur det rammer. Skaden stiger med Angrebskraft. Kræver en varme-stak.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -3581,6 +3838,14 @@ export const da_DK: EnTranslations = {
       "watchYouTube": "Se på YouTube",
       "streamerBadgeTitle": "Verificeret streamer"
     },
+    "buddyMenu": {
+      "rename": "Rename Buddy",
+      "nameLabel": "Buddy name",
+      "autolootEnable": "Enable Autoloot",
+      "autolootDisable": "Disable Autoloot",
+      "autolootHint": "Your buddy fetches loot from your own corpses within 30 yards.",
+      "cancel": "Cancel"
+    },
     "lootSettings": {
       "title": "Bytteindstillinger",
       "close": "Luk byttindstillinger",
@@ -3906,6 +4171,64 @@ export const da_DK: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.",
+        "packBondFury": "Deals {pct}% more damage while its partner stands close.",
+        "stalked": "The Great Jaguar hunts you and ignores taunts. Each bite deals {min} to {max} physical damage ({heroicMin} to {heroicMax} on Heroic) and opens a bleed. Kite it away from its master.",
+        "waryStuns": "A stun has landed on it. Further stuns slide off until this ends.",
+        "waryRoots": "A root has landed on it. Further roots slide off until this ends.",
+        "warySlows": "A slow has landed on it. Further slows slide off until this ends.",
+        "pollinated": "Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).",
+        "prey": "Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.",
+        "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
+        "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
+      },
+      "bastion": {
+        "brineColumn": "Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.",
+        "halberdWall": "Takes {pct}% less damage while another Drowned Watchman stands within {radius} yd. Pull them apart.",
+        "fogShroud": "Takes {pct}% less damage while it stands in the Fog Bank. Drag it out of the fog.",
+        "carrionGlut": "Fed on the dead ({stacks} of {max}): each stack makes its Soul Release {radius} yd wider and {pct}% stronger.",
+        "snappedFetters": "Its chains are broken. It no longer fights, cannot be harmed, and soon leaves.",
+        "anchored": "Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic)."
+      },
+      "crypt": {
+        "carrionEye": "Every crow in the fight hunts you for {seconds} sec. Run to your tank so the flock can be cut down together.",
+        "graniteSkin": "Takes {pct}% less damage, and the stone thickens every {every} sec, up to {max} layers. A stun shatters it and leaves it taking {cracked}% more damage for {seconds} sec.",
+        "measured": "When this ends, an Open Grave caves in where you stand: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. The grave stays for the rest of the fight, so carry the mark to the edge of the yard, away from the group.",
+        "graveDirt": "Standing in an Open Grave: movement speed reduced by {slow}% and {damage} Shadow damage every second ({heroic} on Heroic). On Heroic, lingering {linger} sec in a grave raises a Restless Bones. Step out of the grave.",
+        "dirtInEyes": "Reduces movement speed by {pct}%. Shovelful hits everyone in front of Sexton Marrow: stand behind him.",
+        "blow": "Increases damage taken by {pct}%: {per}% for each stack, {stacks} of {max} now. Each Gravedigger's Blow adds a stack and resets the duration to {seconds} sec.",
+        "graveVigor": "Attacks {pct}% faster while he stands in an Open Grave. Keep him out of the graves.",
+        "tolling": "Immune to damage while he strides to the bell rope and rings the Burial Bell. When the ringing ends, the Toll deals {min} to {max} Shadow damage ({heroicMin} to {heroicMax} on Heroic) to everyone, and every Open Grave gives up a Restless Bones.",
+        "embraced": "Held aloft in the Lady's arms: unable to act, taking {tick} Frost damage every second ({tickHeroic} on Heroic). If your group deals {share}% of her maximum health ({shareHeroic}% on Heroic) she sets you down gently; if she holds you {hold} sec at the top she drops you onto the ice for {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic).",
+        "lament": "When Bride's Lament ends, it deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone not within {radius} yd of a lit grave lantern. A lantern shelters the {cap} players nearest it, then goes dark and misses the next Lament.",
+        "lingering": "Your next Bride's Lament deals {pct}% more damage: {per}% for each stack, up to {max} stacks. Take the next one in a lantern's light.",
+        "slippery": "On slick ice: your speed changes by at most {grip} yd/sec each second, so you are slow to get going, slide on when you stop, and swing wide when you turn. Step off the ice to get your footing back.",
+        "harmony": "Takes {pct}% less damage: {per}% for each of her living Choristers. Kill the Choristers first.",
+        "crescendo": "Sings faster: the Dirge of the Hollow takes {cast} sec instead of {castNormal} sec and comes every {every} sec instead of {everyNormal} sec, and the Bone Organ plays {waves} waves of notes instead of {wavesNormal}.",
+        "gorged": "Deals {pct}% more damage: {per}% for each Bound Soul that reached him, {stacks} of {max} now, for the rest of the fight. Each soul that reaches him also heals him for {heal}% of his maximum health. Step into a soul's path to take it instead.",
+        "unquietWard": "Immune to damage while he channels the Rite of the Unquiet at the altar: {lit} of {total} Remembrance Candles relit. Relighting one is a {channel} sec channel that drains {drain}% of the lighter's maximum health every second ({drainHeroic}% on Heroic); hits do not break it, a step or a stun does. The last candle shatters the ward. On Heroic, light them in the order the Ledger names: a wrong candle snuffs the last one lit and deals {wrongMin} to {wrongMax} Shadow damage to the lighter.",
+        "riteBroken": "Stunned: the shattered ward leaves him unable to act for {seconds} sec.",
+        "shatteredWard": "Takes {pct}% more damage for {seconds} sec: the relit candles broke his ward. Spend your strongest attacks now.",
+        "graveChill": "Takes {bite} Shadow damage every second ({biteHeroic} on Heroic) while the Rite of the Unquiet holds, rising by {step} ({stepHeroic} on Heroic) every {every} sec. Relight the Remembrance Candles to end it.",
+        "graspMark": "Hands erupt from the ring under you in {fuse} sec: everyone within {radius} yd of where it was laid is rooted for {root} sec and takes {min} to {max} Shadow damage. Step out of the ring.",
+        "graspRoot": "Held by the grave's hands: unable to move for {seconds} sec.",
+        "knellAirborne": "On the wing over the Rite Ring, out of reach. It marks half of the ring for {mark} sec, then pours ghost fire over that half: {min} to {max} Fire damage to everyone in it. It burns {breaths} halves each flight, then lands."
+      },
+      "sanctum": {
+        "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
+        "enrage": "Deals {pct}% more damage.",
+        "grasp": "Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.",
+        "twiceWoken": "Rose again from the meltwater and deals {pct}% more damage.",
+        "doused": "His plate broke under him and the quench-water put out his Grave Inferno.",
+        "airborne": "In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.",
+        "wyrmsEye": "When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.",
+        "quenchWater": "In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.",
+        "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.",
+        "branded": "Deals {value} {school} damage every {interval} sec for {seconds} sec. Step into a meltwater pool to put it out at once.",
+        "creepingRime": "Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.",
+        "icedOver": "Frozen solid by Creeping Rime: unable to move or act."
+      },
       "sharedPyre": "Giver {total}% af hver spillers maksimale helbred, delt med antallet af spillere inde i cirklen ({perPlayer}% hver med {players} spillere).",
       "varkhulSharedPyre": "Giver {total}% af hver spillers maksimale helbred, delt mellem spillerne inde i cirklen ({perPlayer}% hver med {players} spillere). Hver manglende spiller giver desuden {missingPenalty}% af maksimalt helbred til hele raidet, inklusive spillerne inde i cirklen.",
       "makersBrand": "I {duration} sek. øger hver stak den skade, du tager fra Varkhul, med {pct}%. Stakker op til {max} gange. Tanks bør skifte ved {swap} stakke.",
@@ -3950,6 +4273,8 @@ export const da_DK: EnTranslations = {
       "cooldownCap": "{used} af {cap} sek. nedkølingsreduktion brugt i dette vindue",
       "bruinRushWindow": "Ulveform koster ingen mana og fastholder målet for jeres Bruin-storm, hvilket nedsætter dets hastighed med {pct}% i {sec} sek.",
       "funeralHarvestLock": "Funeral Harvest kan ikke skabe endnu en Sjælesplint lige nu",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Blytung forbandelse kan ikke rodfæste dette mål igen lige nu",
       "forbiddenReflectionReady": "Din næste kvalificerede Heksemester-nedkøling kan kastes igen",
       "forbiddenReflectionLock": "Forbudt Spejling kan ikke forberedes igen endnu",
@@ -4028,6 +4353,16 @@ export const da_DK: EnTranslations = {
         "riftGuard": "Du tager {pct}% mindre skade.",
         "sprint": "Bevægelseshastighed øget med {pct}%. Stakker ikke med andre hastighedsforøgelser.",
         "brand": "Modtaget helbredelse reduceres med {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "spiritPack": "A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.",
+        "seedburst": "A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.",
+        "tether": "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
+        "tetherLink": "You take {pct}% of the damage your chained ally would take.",
+        "harvest": "Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.",
+        "quench": "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenchOther": "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenched": "Attack speed slowed by {pct}%.",
         "forgeHeat": "Varme: {stacks}/{max}. Brug af Smedefatters temperament bruger det hele, og dets våbenskade multipliceres med {pct}%.",
         "tempered": "Dine nærkamps- og afstandsvåbenhit handler {damage} ekstra ildskade ({pct}% mere fra varme-stavebind). Forsvinder efter {maxDuration} sek inaktivitet eller efter {killExtend} sek efter at dræbe.",
         "temperedOther": "Nærkamps- og afstandsvåbenhit handler ekstra ildskade, {pct}% mere fra varme-stavebind.",
@@ -4036,6 +4371,10 @@ export const da_DK: EnTranslations = {
         "moltenIgnite": "Handler {damage} ildskade hver {every} sek. Et andet våbenkritisk slag genopfrisker varigheden.",
         "pierce": "Dine auto-angreb, skud og fysiske evner (ikke blødninger) rammer også fjenden nærmest dit mål inden for {reach} yd for {pct}% af den handled skade.",
         "lantern": "En direkte helbredelse fra hvem som helst på dig eller et flokmedlem inden for {radius} yd af lanternen healer alle inden for 5 yd for {pct}% mere.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Varme: {stacks}/{max}. Brug Cruciblehjertets kraft for at bruge det hele på en ildnova inden for {radius} m for {damage} skade.",
         "crucibleHeatOther": "Varme: {stacks}/{max}. Cruciblehjertets kraft bruger det hele på en ildnova inden for {radius} yd, der handler mere ildskade for hver stak og taunts hver kreatur, den rammer."
       },
@@ -4071,6 +4410,7 @@ export const da_DK: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Reducerer al skade modtaget med {pct}%",
+      "slumber": "Sover til daggry. Kan ikke angribes og vågner ikke for nogen.",
       "guardianWard": "Det næste dødelige fjendtlige slag genopretter dig til {pct}% helbred i stedet",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -4147,7 +4487,9 @@ export const da_DK: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rejser sig over Tornetop Højder!"
+      "spawn": "{name} rejser sig over {zone}!",
+      "wake": "{name} vågner over {zone}!",
+      "sleep": "{name} sover til daggry."
     },
     "auth": {
       "appleLoginCta": "Fortsæt med Apple",
@@ -4211,7 +4553,8 @@ export const da_DK: EnTranslations = {
         "foodVendor": "Leverandør af mad og drikke",
         "potionVendor": "Drikforhandler",
         "stableMaster": "Staldmester",
-        "generalGoods": "Generelle varer"
+        "generalGoods": "Generelle varer",
+        "innkeeper": "Innkeeper"
       }
     },
     "mobTooltip": {
@@ -4291,6 +4634,7 @@ export const da_DK: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minikort",
         "stanceBar": "Stillingsbjælke",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Erfaringsbjælke",
         "chat": "Chat",
         "actionBarGroup": "Handlingsbjælker",
@@ -4308,6 +4652,7 @@ export const da_DK: EnTranslations = {
         "deedTracker": "Bedriftssporer",
         "delveTracker": "Delve-sporer",
         "riftTracker": "Riftsporer",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Venstre hånd",
         "unitTooltip": "Tooltip"
       },
@@ -4880,6 +5225,19 @@ export const da_DK: EnTranslations = {
       "vaultCannotDeposit": "Kan ikke lægges i hvælvet",
       "tabsAria": "Bankfaneblade",
       "personalTab": "Personlig",
+      "accountTab": "Other characters",
+      "accountArmour": "Claim membership armour",
+      "referralArmour": "Claim friendship armour",
+      "accountMembership": "An active membership lets you access your other characters' banks here.",
+      "accountCharacters": "Character banks",
+      "accountEmpty": "Create another character to use their bank here.",
+      "accountSelect": "Select a character to load their bank.",
+      "accountUnavailable": "This bank is unavailable. Select the character again to refresh.",
+      "accountDeposit": "Your bags: deposit into this bank",
+      "accountWithdraw": "Selected bank: withdraw into your bags",
+      "accountDepositHint": "Click to deposit this stack into the selected character bank.",
+      "accountWithdrawHint": "Click to withdraw this stack into your bags.",
+      "accountBound": "Soulbound, locked and quest items cannot move between characters.",
       "guildTab": "Laug",
       "guildCapacityAria": "Brugte laugsbankpladser: {used} af {total}",
       "guildEmpty": "Laugsbanken er tom.",
@@ -4949,6 +5307,190 @@ export const da_DK: EnTranslations = {
       "logOpenBank": "{actor} åbnede laugsbanken for {amount}",
       "logCharterFee": "{actor} betalte laugets stiftelsesgebyr på {amount}",
       "logAdminPurge": "En administrator fjernede {count} {item}"
+    },
+    "collections": {
+      "title": "Hunting",
+      "close": "Close hunting",
+      "keybindLabel": "Hunting",
+      "launcherTitle": "Hunting: buddies, mounts and item sets",
+      "tabs": {
+        "buddies": "Buddies",
+        "mounts": "Mounts",
+        "sets": "Item Sets"
+      },
+      "state": {
+        "owned": "Collected",
+        "notOwned": "Not collected",
+        "unavailable": "Not obtainable yet",
+        "pending": "A presence follows you"
+      },
+      "presenceDefault": "You feel a presence watching you.",
+      "revealed": "{name} has decided to follow you.",
+      "cosmeticUnlocked": "New look for {name}: {look}.",
+      "presence": {
+        "ember_fox": "Something small and warm is padding along behind you.",
+        "moss_hare": "A rustle in the peat keeps pace with your steps.",
+        "frog": "A wet croak answers every step you take.",
+        "crimson_claw_crab": "Something clicks and scuttles just out of sight.",
+        "golden_sentinel": "A faint gilded glint watches from the grass.",
+        "nightfang": "Silent paws follow where you cannot see.",
+        "tuskhorn_boar": "A snort and a stamp: something stubborn is trailing you.",
+        "emerald_wolf": "Green eyes blink in the undergrowth, then follow.",
+        "tiger": "Stripes shift at the edge of your vision.",
+        "cate_coin": "You hear the faint ring of a coin that is not yours.",
+        "alon": "You feel watched, and quietly approved of.",
+        "trollface": "Somewhere behind you, something is grinning.",
+        "ansem": "A whisper of doors and darkness follows you.",
+        "triple_t": "Three footsteps fall where there should be one.",
+        "kekius": "A stifled laugh trails you down the road.",
+        "solbot": "A soft ticking keeps time with your stride.",
+        "frostfire": "Steam and frost swirl in your wake.",
+        "rocky": "Pebbles shift behind you with no wind to move them.",
+        "proud_grunt": "A boot stamps to attention somewhere behind you.",
+        "loot_goblin": "Something is counting your coins under its breath.",
+        "penny_goldspark": "Tiny tools clink in a pocket that is not yours.",
+        "stag": "A shadow with antlers falls across your path.",
+        "alpaca": "Something woolly and unhurried has decided to come along.",
+        "horse": "Hooves keep an easy, patient beat somewhere behind you.",
+        "sapling": "Little roots patter behind you, stirring the fallen leaves.",
+        "bull": "A low huff of breath stirs the dust behind you.",
+        "spider": "A thread of silk brushes your shoulder.",
+        "raptor": "Quick claws tick over stone at your heels.",
+        "skeleton": "Dry bones rattle in step with yours.",
+        "crystal_lich": "A cold hum rises from the wreckage, and it is watching you.",
+        "forgemaw": "The heat of the forge has not left you. Something walked out with it.",
+        "crystal_tide": "A drop of the sea refuses to fall from your line.",
+        "phantom": "The air behind you is a shade too still.",
+        "emberfall_phoenix": "A warmth like a banked fire settles at your back."
+      },
+      "cosmetic": {
+        "crystal_lich_frostbound": "Frostbound",
+        "crystal_lich_voltaic": "Voltaic",
+        "forgemaw_ashen": "Ashen",
+        "forgemaw_whitehot": "White-Hot",
+        "stag_acorn": "Acorn Crown",
+        "stag_gilded": "Gilded",
+        "moss_hare_verdant": "Verdant",
+        "proud_grunt_warlord": "Warlord",
+        "frog_sapphire": "Sapphire Frog"
+      },
+      "actions": {
+        "summon": "Summon",
+        "dismiss": "Dismiss",
+        "wear": "Wear",
+        "remove": "Remove"
+      },
+      "looks": {
+        "title": "Looks",
+        "unlocked": "Unlocked",
+        "locked": "Locked",
+        "worn": "Worn",
+        "none": "No looks authored for this companion yet"
+      },
+      "source": {
+        "bossLabel": "Boss pet",
+        "bossDrop": "{mob} ({location}), {chance}% per player per kill",
+        "bossDropWithHeroic": "{mob} ({location}), {chance}% per player, {heroicChance}% on Heroic",
+        "bossDropHeroicOnly": "{mob} ({location}), Heroic only, {chance}% per player",
+        "rollNote": "Every player rolls separately; nobody loses a roll to a party member.",
+        "deedLabel": "Earned by",
+        "deed": "The deed {deed}",
+        "challengeLabel": "Challenge",
+        "challengeSpeed": "Defeat {mob} within {seconds} seconds of the pull",
+        "challengeDps": "Deal {dps} damage per second to {mob} across the fight",
+        "craftLabel": "Crafted",
+        "craft": "{item} ({profession} recipe)",
+        "grantLabel": "Awarded",
+        "grantOnly": "Seasonal award: the monthly ladder and top-parse rewards",
+        "tokenLabel": "Token",
+        "token": "{item}, used once to attach the companion"
+      },
+      "buddyLore": {
+        "ember_fox": "A vixen out of the Eastbrook Vale hedgerows, named for the coal-red coat that shows through winter scrub. The trappers there gave up on the kits generations ago and started leaving food out instead.",
+        "moss_hare": "The Willowfen hare, green-furred from a lifetime bedded down in wet peat. Fen herbalists count them lucky and will not have one chased off a doorstep.",
+        "frog": "Mirefen Marsh raises them fat and unbothered, singing all night from the reed beds. The marsh guides swear a boat carrying one never runs aground.",
+        "crimson_claw_crab": "A Farshore tidal crab whose claw stays red long after it leaves the water. Dock crews used to race them along the boards for coin.",
+        "golden_sentinel": "A watch-beetle of the Amberfall, gilded by the resin it grew up in. The name is older than the resin: sentinels of a kind kept those groves long before anyone thought to bottle the sap.",
+        "nightfang": "A young Nightbloom hunter, silent even by the standards of its kind. It follows for the company and hunts nothing larger than a moth.",
+        "tuskhorn_boar": "Thornpeak stock, bred short-legged by shepherds who wanted a boar that could not put a fence down. It kept the temper regardless.",
+        "emerald_wolf": "A Wraithwood pup, its coat green in the canopy light that never quite reaches the forest floor. The wardens raise whichever orphans the wood leaves behind.",
+        "tiger": "Palmreach stripes on an animal that has never seen the Palmreach: the line has been kept in captivity since the old menageries closed. It answers to a whistle and to nothing else.",
+        "cate_coin": "A cat that will not be parted from the coin it sits on, and that nobody has ever seen eat. Eastbrook merchants still argue over which of the two is the pet.",
+        "alon": "A traveller's mascot from a road no map will admit to, turning up wherever a plan is going badly. It watches, it approves, and it offers no help whatsoever.",
+        "trollface": "A grinning thing the Wraithwood put out and would not take back. Every attempt to describe it ends with the describer laughing and giving up.",
+        "ansem": "It speaks of doors and of darkness and will not be drawn further on either. The Nightbloom cultists claim it as theirs; it wanders off whenever they hold a rite.",
+        "triple_t": "Three of something, or one thing three times over. The accounts disagree, and the creature will not hold still long enough to be counted.",
+        "kekius": "A laughing companion of unclear origin, adopted by the Galecrest race yards as a charm. It has outlived four stables that swore by it.",
+        "solbot": "A small sun-fed automaton, dug half-buried out of the Drakelands ash and still ticking. Whatever workshop built it left no mark anywhere on the casing.",
+        "frostfire": "Born in the Frostveil Reach where a hot spring surfaces through the ice field, and it has never settled on which half it belongs to. It steams in cold air and shivers in warm.",
+        "rocky": "A stone-shelled crawler off the Thornpeak scree, slow and thoroughly unbothered. Miners keep them for the way they go still a moment before a collapse.",
+        "proud_grunt": "A veteran of the Warfare stores who kept the salute and lost the rank. Warmarshal Draven Kole hands one to any soldier with honor enough to know what that costs.",
+        "loot_goblin": "It follows anyone carrying Heroic Marks and has never once been caught stealing. Quartermaster Vex maintains that this proves nothing at all.",
+        "penny_goldspark": "A gnome tinker's apprentice who charges by the hour and is worth every copper of it. Armorer Hode took her on to settle a debt and now sells the arrangement to anyone holding a thousand gold.",
+        "stag": "Evergarden bloodline, bred down from the great stags the wardens once rode. It still lowers its head at a raised hand, from a habit older than the animal.",
+        "alpaca": "The Galecrest herds keep them for wool and for temper: nothing stays calmer in a storm. This one will spit at exactly one person per journey.",
+        "horse": "Vale pony stock, bred small for the orchard lanes and never told it is not a warhorse. It keeps pace at your shoulder and will follow anyone who once fed it an apple.",
+        "sapling": "A young tree with a smile in its bark and a curious purple gaze. Its roots carry it in a cheerful waddle wherever you wander.",
+        "bull": "A Vale bull the size of a dog, which is the only reason anyone agreed to keep one indoors. The temperament did not scale down with the rest.",
+        "spider": "A Wraithwood weaver, palm-sized, that redecorates any pack it is carried in. The webbing is stronger than the thread it replaces.",
+        "raptor": "Drakelands hatchling stock, sold on before it learns how fast it can run. Every new owner is told to keep it fed, and none of them need telling twice.",
+        "skeleton": "It came up out of the Wraithwood barrows, dusted itself off, and has followed people about ever since. Nobody has established whose bones these were.",
+        "crystal_lich": "A splinter of Nythraxis itself, still humming with the cold that shaped it. It answers to whoever pulled it from the wreck of the raid, and it has not forgiven them for it.",
+        "forgemaw": "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
+        "crystal_tide": "A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.",
+        "phantom": "A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.",
+        "emberfall_phoenix": "It burns down to an ember every autumn and comes back up out of its own ash by spring, which is the whole of what anyone can tell you about it. Nobody has ever found a nest, and nobody has ever caught one twice."
+      },
+      "petKind": {
+        "beast": "Beasts",
+        "elemental": "Elementals",
+        "humanoid": "Humanoids",
+        "undead": "Undead",
+        "celebrity": "Celebrities"
+      },
+      "armor": {
+        "cloth": "Cloth",
+        "mail": "Mail",
+        "leather": "Leather"
+      },
+      "stat": {
+        "intellect": "Intellect",
+        "agility": "Agility",
+        "strength": "Strength",
+        "mixed": "Hybrid"
+      },
+      "set": {
+        "owned": "{owned} of {total} pieces",
+        "itemLevel": "ilvl {level}",
+        "bonusLabel": "{pieces} pieces"
+      },
+      "detail": {
+        "dropLabel": "Drops from",
+        "vendorLabel": "Sold by",
+        "bindLabel": "Binding",
+        "sellLabel": "Vendor pays",
+        "marketLabel": "World Market",
+        "exchangeLabel": "$WOC Exchange",
+        "setLabel": "Collected",
+        "drop": "{mob} ({location}), {chance}% per kill",
+        "heroicDrop": "{mob} ({location}), Heroic only, {chance}% per kill",
+        "dropWithHeroic": "{mob} ({location}), {chance}% per kill, {heroicChance}% on Heroic",
+        "globalDrop": "Any enemy, {chance}% per kill, one of {count} at this rarity",
+        "fishingDrop": "Fishing anywhere, {chance}% per catch",
+        "vendor": "{npc} ({location}) for {price}",
+        "honorPrice": "{amount} Honor",
+        "marksPrice": "{amount} Heroic Marks",
+        "noSource": "No source in the game yet",
+        "noItem": "No item grants this yet",
+        "tradeable": "Tradeable",
+        "soulbound": "Soulbound",
+        "noSell": "Cannot be sold",
+        "marketAtMerchant": "Shown at the Merchant",
+        "marketChecking": "Checking...",
+        "marketNone": "No listings",
+        "exchangeNone": "No listings",
+        "exchangeUnavailable": "Not available on this client"
+      }
     },
     "calendar": {
       "title": "Begivenhedskalender",
@@ -5949,10 +6491,42 @@ export const da_DK: EnTranslations = {
       "tagFastRun": "Hurtig runde",
       "mech": {
         "shadow_pulse": "Skyggeimpuls (pulserende omradesskade)",
+        "crypt_shovelful": "Shovelful (every 11 seconds he flings grave dirt over an 8 yard cone in front of him: one and a half times his swing and 50 percent slower movement for 6 seconds, so stand behind him)",
+        "crypt_measured_for_the_grave": "Measured for the Grave (every 15 seconds he marks a player other than the tank; 4 seconds later an Open Grave caves in under them, 42 to 52 damage within 3 yards on normal, and the pit stays for the fight: 9 damage a second and 40 percent slower movement inside, so lay the graves at the edge of the yard)",
+        "crypt_burial_toll": "Burial Toll (at 66 and 33 percent health he strides to the bell rope, immune to damage, and rings for 3 seconds: 30 to 38 shadow damage to everyone on normal, and every Open Grave raises a Restless Bones)",
+        "crypt_marrow_heroic": "Heroic: Gravedigger's Blow every 9 seconds on the tank (each stack makes them take 6 percent more damage for 20 seconds, up to 6 stacks), Grave Vigor (he swings 30 percent faster while he stands in a grave) and Unquiet Earth (anyone who stays 2 seconds in a grave raises a Restless Bones there)",
+        "crypt_brides_lament": "Bride's Lament (every 22 seconds a 3 second wail: 60 to 75 frost damage on normal to everyone outside the light of a lit grave lantern, half again for every Lingering Lament stack from the Laments you already took. A lantern shelters two players at most and goes dark for 28 seconds after it shelters anyone, so split up and take turns)",
+        "crypt_frozen_embrace": "Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 6 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)",
+        "crypt_rime_path": "Rime Path (she leaves slippery rime where she drifts for 25 seconds: on it you gather speed slowly and slide on when you stop or turn)",
+        "crypt_bridal_freeze": "Bridal Freeze (at half health the whole ravine floor freezes over: slippery ice for the rest of the fight)",
+        "crypt_lady_heroic": "Heroic: every lit lantern also burns out on its own after 30 seconds and stays dark for 10, and the Frozen Embrace takes two players and lets go at 4.4 percent of her health",
+        "crypt_dirge_of_the_hollow": "Dirge of the Hollow (every 16 seconds a 2.5 second song you can interrupt: if she finishes it, 105 to 125 shadow damage on normal and a 4 second silence to everyone within 45 yards who can see her, so interrupt it or hide behind a choir pillar)",
+        "crypt_harmony": "Harmony (each living Chorister makes her take 30 percent less damage: kill the Choristers first)",
+        "crypt_bone_organ": "Bone Organ (every 26 seconds she plays the Bone Organ: two waves of shadow notes burst down lanes of the loft, 100 to 115 damage on normal in a lane, the second wave filling the first one's gaps)",
+        "crypt_crescendo": "Crescendo (below 30 percent health her Dirge takes 1.8 seconds and comes every 11 seconds, and the organ plays a third wave)",
+        "crypt_ilvane_heroic": "Heroic: Encore (a Chorister that lies dead for 10 seconds while the other still stands rises again, so kill them together) and Unbroken Verse (every third Dirge cannot be interrupted: hide from it)",
+        "crypt_morthen_shadow_pulse": "Shadow Pulse (every 12 seconds a 2 second cast, then 24 to 30 shadow damage on normal to everyone within 12 yards of him, so step away; every 9 seconds in his Last Rites)",
+        "crypt_gravecall": "Gravecall (every 15 seconds a Bound Soul drifts from the next sarcophagus alcove toward him; when it reaches him he is Gorged on the Dead, 10 percent more damage for each soul up to 10 stacks, and heals 3 percent of his health. A player in its path takes it instead: 12 to 16 shadow damage on normal)",
+        "crypt_rite_of_the_unquiet": "Rite of the Unquiet (at 65 percent health he returns to the altar, immune inside the Unquiet Ward, while Grave Chill deals 3 shadow damage a second to everyone, rising by 1 every 5 seconds, and 2 Restless Bones climb out of the alcoves. Relight the 4 Remembrance Candles: each is a 4 second channel that drains 6 percent of the lighter's maximum health every second, which hits do not break but a step or a stun does. The last candle breaks the Rite: he is stunned for 8 seconds and takes 25 percent more damage)",
+        "crypt_reap_the_unquiet": "Reap the Unquiet (below 35 percent health the souls stop; every 14 seconds he sweeps his scythe after a 2 second cast: 55 to 65 shadow damage on normal to everyone in a 120 degree arc 14 yards in front of him. Shadow Pulse then comes every 9 seconds)",
+        "crypt_morthen_heroic": "Heroic: Name the Dead (the Ledger names the order of the candles: a wrong candle snuffs the last one lit and deals 252 to 288 shadow damage to the lighter, and each relight drains 8 percent a second), Grasp of the Grave (every 16 seconds 2 players get a 4 yard ring; 1.5 seconds later hands erupt in it: a 3 second root and 162 to 198 shadow damage) and the Knellwyrm's Burning Knell (it takes flight and marks half of the ring for 4.5 seconds, then pours ghost fire over that half for 1,000 to 1,120 fire damage, 3 halves each flight)",
         "reaping_arc": "Mejende Bue (frontal mejning)",
+        "hallowed_brine": "Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)",
+        "rebounding_bulwark": "Rebounding Bulwark (his shield rebounds to the nearest player within 10 yards of the last one hit, up to 3 players, 4 on heroic: spread out)",
+        "tide_sentence": "Sentence of the Tide (5 seconds after the mark, a column of light strikes everyone within 6 yards of the marked player, 8 on heroic: take it away from the group)",
+        "unbroken_oath": "Unbroken Oath (once, at half health, he kneels immune in a bubble for up to 60 seconds: kill his soldiers to break it, then he is stunned 4 seconds and takes 20 percent more damage for 10)",
+        "fog_veil": "Fog Veil (four figures, one real: the beacon's beam makes the real Vael's lantern flare)",
         "mist_surge": "Tågebølge (pulserende omradesskade)",
         "summons_adds": "Tilkalder forstærkninger",
         "lunar_tide": "Manetide (pulserende omradesskade)",
+        "chorus_and_solo": "Chorus and Solo (stack on one mark, spread from the other)",
+        "tideglass_reflections": "Tideglass Reflections (kill each other's mirror images)",
+        "hydra_three_elements": "Three Elements (the left head breathes an 18 yard cone of frost that slows you by 70 percent for 4 seconds, the centre head spits venom under up to 3 players that bursts after 1.5 seconds and burns for 6 seconds where it lands, and the right head fires a torrent down a 26 yard lane that throws you back 8 yards: step out of each one. When a head falls, the heads still standing take over its attack)",
+        "hydra_tsunami": "Tsunami (the heads sink for 4.5 seconds, taking 75 percent less damage, and a wave rolls over one half of the pool, the other half the next time: 160 to 190 frost damage on normal and a 10 yard shove. Cross to the other half or stand behind a rim column; on heroic the wave rolls back over the other half 3.5 seconds later. The first Tsunami comes 24 seconds into the fight, each later one 40 seconds after the last has passed)",
+        "hydra_combined_breath": "Combined Breath (between Tsunamis the heads fuse two of their attacks, always in the same order: Frostlocked Torrent freezes everyone in its lane for 2 seconds and leaves an Ice Wall that can shelter you from the next wave, Venom Current slides the venom pools outward, and Toxic Rime freezes the pools into crystals that burst after 4 seconds. Once between Tsunamis on normal, twice on heroic)",
+        "hydra_regrowth": "Regrowth (a fallen head grows back after 20 seconds at half health while another head still lives, and each fallen head makes the others deal 15 percent more damage: bring all three down close together)",
+        "rising_tide": "Rising Tide (half the island floods, move to the dry half)",
+        "undertow": "Undertow (pulls everyone in, run out before the crash)",
         "enrage": "Raserer ved lavt helbred",
         "shuddering_stomp": "Rystende Tramp (omradesbedøvelse)",
         "grave_inferno": "Gravsinferno (kanaliseret ild-AoE, hold afstand)",
@@ -5978,6 +6552,9 @@ export const da_DK: EnTranslations = {
         "deathless_court": "Det Dødsløse Hof (kun heroic, kongehofet rejser sig efter Dødsløs Rasen)",
         "bloodmane_rend": "Bloodmane Rend (blødning, hold øje med målbytte)",
         "tusk_sweep": "Tusk Sweep (frontal spalte)",
+        "grave_breath": "Grave Breath (frontal fire cone, it cracks the ice it covers)",
+        "plate_floor": "Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)",
+        "wyrm_flights": "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
         "ancestral_sap": "Ancestral Sap (helbreder sine allierede)",
         "call_of_the_hunt": "Call of the Hunt (fremskynder nærliggende allierede)",
         "thickhide_ward": "Thickhide Ward (skjolder nærliggende allierede)",
@@ -6001,8 +6578,172 @@ export const da_DK: EnTranslations = {
         "forgestorm": "Forgestorm (faldende meteorcirkler, flyt ud)",
         "shared_pyre": "Delt Pyre (samlingskreds, del skaden)",
         "anvils_decree": "Ambolt's Decreet (tre hammerslag over hele raid, heles igennem)",
-        "masters_assembly": "Mesterens forsamling (bloker smedebjælkerne, drej blokeringer)"
+        "masters_assembly": "Mesterens forsamling (bloker smedebjælkerne, drej blokeringer)",
+        "iron_cage": "Iron Cage (mash your interact key to break out, allies can smash the bars)",
+        "drowned_anchor": "Drowned Anchor (its victim is reeled toward the pit: run within 3 yards of a lit mooring post to moor the chain, the post then goes dark for 30 seconds, or break the chain with 12 hits, 16 on heroic)",
+        "shackle_pair": "Shackle Pair (two chained players must stay close together)",
+        "reaper_behind": "Shadow Crossing (three times in a row he rises behind a player, a different one each time while enough stand: step out of the scythe's arc)",
+        "pack_bond": "Pack Bond (together they take half damage: drag them 15 yards apart)",
+        "stalk": "Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)",
+        "shared_health": "Shared Health (one pool: hit whichever is safest)",
+        "heel_frenzied_bond": "Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)",
+        "seed_rain": "Seed Rain (clean players stomp the seeds before they sprout)",
+        "pollinate": "Pollinate (golden players stay off the seeds, or they sprout at once)",
+        "vine_lash": "Vine Lash (step out of the thorny lane or be rooted)",
+        "gorge": "Gorge (a heavy bite and a poison on the tank)",
+        "burrowing_seeds": "Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)",
+        "spirit_of_the_hunt": "Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)",
+        "twin_prey_ambush": "Twin Prey and Ambush (two Prey, then a pounce on the farthest player)",
+        "seal_shackles": "Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)",
+        "chain_strain": "Strain (step away from every pillar whose chain still holds)",
+        "korgath_stomp": "Shuddering Stomp (step out of the ring round him)",
+        "rerivet_last_link": "Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)",
+        "waking_thaw": "Waking Thaw (the dead climb out of the thaw pools)",
+        "unquenched_held": "Held or Unquenched (kill the dead on cold ice, never in meltwater)",
+        "soulfire_trench": "Soulfire Trench (a line of soulfire, then a strip of meltwater)",
+        "shadow_volley": "Shadow Volley (shadow damage to everyone)",
+        "warm_hands_twice_woken": "Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)"
       }
+    },
+    "bastionCage": {
+      "title": "Locked in the Iron Cage!",
+      "promptKey": "Press {key} again and again to break free",
+      "promptNoKey": "Press your interact key again and again to break free",
+      "promptClick": "Click here again and again to break free",
+      "promptTap": "Tap here again and again to break free",
+      "buttonAria": "Break free from the Iron Cage",
+      "progressAria": "Escape progress: {pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "Chained to the Drowned Anchor!",
+      "anchoredLine": "Run to a lit mooring post to moor the chain, or have your group break it before the winch drags you into the pit",
+      "allyTitle": "Break the chain!",
+      "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor, or help them reach a lit post",
+      "shackledTitle": "Shackled to {name}",
+      "shackledLine": "Stay within {range} yards to avoid chain damage to both of you ({dist} yards apart)",
+      "strainedLine": "Move within {range} yards of your partner to stop chain damage to both of you",
+      "brokenAria": "Chain broken: {pct}",
+      "reachAria": "Chain reach used: {pct}",
+      "linksLeft": "Chain links left: {count} of {total}",
+      "linkRule": "Every hit on the anchor breaks one link, however hard it lands",
+      "linksTarget": "{count} of {total} links",
+      "linkBroken": "Link broken!"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "The Sentence falls on you!",
+      "sentencedLine": "A column of light strikes everyone near you: move away from the group",
+      "brineTitle": "In the Hallowed Brine!",
+      "brineLine": "It burns you every second: step out of the pool",
+      "reapedTitle": "Death rises behind you!",
+      "reapedLine": "Move forward or sideways to avoid the scythe swinging behind you",
+      "veilTitle": "The Fog Veil",
+      "veilLine": "Find the Vael whose lantern flares in the beacon beam, then attack to break the veil",
+      "realTitle": "The beam found him!",
+      "realLine": "This is the real Vael: strike him to break the veil",
+      "shadeTitle": "A hollow shade",
+      "shadeLine": "Leave this decoy. Attack the Vael whose lantern flares in the beam to break the veil",
+      "timeAria": "{seconds} seconds left"
+    },
+    "wildheartAlert": {
+      "preyTitle": "You are the Prey!",
+      "preyLine": "Lure Zulgar through lit sun glyphs to slow him before he catches and mauls you",
+      "preyWaitLine": "Keep away from Zulgar: he will switch from the other marked player to chase you",
+      "stalkedTitle": "Stalked!",
+      "stalkedLine": "Run from the jaguar to avoid its bites. Lead it away from the Beastmaster to break Pack Bond",
+      "pollinatedTitle": "Pollinated!",
+      "pollinatedLine": "Avoid seedpods: touching them while Pollinated creates enemies. Unmarked allies can stomp them",
+      "bondTitle": "Pack Bond",
+      "bondLine": "Separate the Beastmaster and jaguar to remove their damage reduction and damage bonus",
+      "timeAria": "{seconds} seconds left"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "In the quench-water!",
+      "quenchLine": "Swim onto ice or the shore to escape the water damage and slow",
+      "plungeTitle": "Plunging Fire!",
+      "plungeLine": "Leave this ice platform now: fire will hit everyone on it and damage the ice",
+      "descentTitle": "Crashing Descent!",
+      "descentLine": "Leave the landing shadow to avoid Korzul crashing down and knocking you back",
+      "eyeTitle": "Wyrm's Eye on you!",
+      "eyeLine": "Move onto uncracked ice away from allies: your mark calls fire onto that platform",
+      "eyeCrackedLine": "Move onto uncracked ice away from allies: your marked fire would break this cracked platform",
+      "flailTitle": "Chain Flail!",
+      "flailLine": "Step sideways out of the marked strip to avoid the chain strike",
+      "chargeTitle": "Threshold Charge!",
+      "chargeLine": "Step sideways out of the marked strip: Korgath charges through it and knocks you back",
+      "trenchTitle": "Soulfire Trench!",
+      "trenchLine": "Step sideways out of the marked strip to avoid the fire damage. The ice then becomes meltwater",
+      "strainTitle": "Strain!",
+      "strainLine": "Move away from pillars with intact chains to avoid the blast and knockback",
+      "infernoTitle": "Grave Inferno!",
+      "infernoLine": "Move away from Korzul: each nearby fire pulse deals more damage",
+      "stompTitle": "Shuddering Stomp!",
+      "stompLine": "Move away from Korgath before the cast ends to avoid the stomp damage",
+      "breathTitle": "Grave Breath!",
+      "breathLine": "Move sideways out of the marked cone to avoid Korzul's breath damage",
+      "maulTitle": "Maul Arc!",
+      "maulLine": "Move behind Korgath to avoid the weapon swing hitting everyone in front",
+      "tailTitle": "Tail Sweep!",
+      "tailLine": "Move to Korzul's side to avoid the tail damage and knockback behind him",
+      "meltwaterTitle": "Bonewalker in meltwater",
+      "meltwaterLine": "Lure the Bonewalker chasing you onto dry ice before killing it: dying in water revives it and heals Velkhar",
+      "meltwaterTargetLine": "Stop attacking until the Bonewalker leaves the water: killing it there revives it and heals Velkhar",
+      "crackedTitle": "Cracked ice",
+      "crackedLine": "Move onto uncracked ice before drawing fire here: another fire hit breaks this platform",
+      "flightTitle": "Korzul takes flight",
+      "flightLine": "Group on uncracked ice to lure Korzul's landing, then leave the shadow to avoid the crash",
+      "lockboundTitle": "Lockbound",
+      "lockboundLine": "Attack the Seal Shackles to remove Korgath's damage reduction: {chains} chains grant {pct}% less damage taken",
+      "timeAria": "{seconds} seconds left",
+      "brandedTitle": "Branded!",
+      "brandedLine": "Enter a meltwater pool to remove the brand and stop its damage",
+      "rimeTitle": "Creeping Rime!",
+      "rimeLine": "Leave the whelps' breath to avoid freezing solid at full stacks: Creeping Rime {stacks}/{max}",
+      "slabTitle": "Ice Slab",
+      "slabLine": "Put the ice slab between you and enemy casters to block their line of sight"
+    },
+    "cryptAlert": {
+      "measuredTitle": "Measured for the Grave!",
+      "measuredLine": "Move to the yard's edge before the mark ends to keep the damaging grave away from your group",
+      "embracedTitle": "Frozen Embrace!",
+      "embracedLine": "Your group must damage the Lady of the Bonechill to free you from her grip",
+      "lamentTitle": "Bride's Lament!",
+      "lamentShelteredLine": "Stay in this lit lantern's light to avoid the wail damage: you have a shelter spot",
+      "lamentOpenLine": "Move into a lit lantern's light to avoid the wail damage: only two players fit per lantern",
+      "graveTitle": "In an Open Grave!",
+      "graveLine": "The grave dirt burns and slows you: step out of it",
+      "tollTitle": "Burial Toll!",
+      "tollLine": "Prepare to fight the skeletons raised from open graves: Marrow is immune while ringing the bell",
+      "harmonyTitle": "Harmony",
+      "harmonyLine": "Kill the Choristers to remove Ilvane's {pct}% damage reduction",
+      "knellTitle": "Burning Knell!",
+      "knellLine": "Ghost fire pours over this half of the ring when the bar runs out: get to the other half",
+      "graspTitle": "Grasp of the Grave!",
+      "graspLine": "Leave the marked ring before the hands erupt to avoid damage and being rooted",
+      "reapTitle": "Reap the Unquiet!",
+      "reapLine": "Move behind Morthen to avoid the scythe striking everyone in front",
+      "riteTitle": "Rite of the Unquiet",
+      "riteLine": "Relight all Remembrance Candles to break Morthen's immunity: {lit} of {total} lit",
+      "riteNamedLine": "Relight candles in the Ledger's order to break Morthen's immunity: a wrong candle undoes progress ({lit}/{total})",
+      "soulTitle": "Bound Soul",
+      "soulLine": "Intercept the drifting soul to stop it healing Morthen and increasing his damage. Catching it hurts you",
+      "timeAria": "{seconds} seconds left"
+    },
+    "kitUse": {
+      "toppleLine": "Topple the brazier onto nearby enemies to burn them with the spill",
+      "toppleKey": "Topple the {name} onto them",
+      "toppleTap": "Tap here to topple the {name} onto them",
+      "toppleClick": "Click here to topple the {name} onto them",
+      "toppleFar": "Get within {range} yd to kick it over",
+      "toppleAria": "Topple the {name}",
+      "usingLine": "Hold still: a hit, a step or a stun breaks it",
+      "relightLine": "Relight the candles to break Morthen's immunity. Channeling drains your health; moving or a stun cancels it",
+      "relightKey": "Relight the {name}",
+      "relightTap": "Tap here to relight the {name}",
+      "relightClick": "Click here to relight the {name}",
+      "relightFar": "Get within {range} yd to relight it",
+      "relightAria": "Relight the {name}",
+      "relightUsingLine": "Keep channeling to light the candle: it drains health. Hits do not interrupt; moving or a stun does",
+      "timeAria": "{seconds} seconds left"
     },
     "cosmetics": {
       "title": "Kosmetik",
@@ -6011,6 +6752,8 @@ export const da_DK: EnTranslations = {
       "tabMounts": "Ridedyr",
       "tabSkins": "Skind",
       "tabMech": "Mech",
+      "buddyActive": "Summoned",
+      "buddyDrag": "Drag to action bar",
       "legend": "Konto: deles af alle figurer. Figur: kun denne figur.",
       "scopeAccount": "Konto",
       "scopeCharacter": "Figur",
@@ -6231,6 +6974,14 @@ export const da_DK: EnTranslations = {
       "bordersSection": "Rammer",
       "bordersNone": "Ingen ramme",
       "bordersEmpty": "Udfør en bedrift, der giver en ramme, for at låse denne hylde op.",
+      "buddiesSection": "Buddies",
+      "buddiesNone": "No Buddy",
+      "buddiesEmpty": "Collect a companion to summon it from this shelf.",
+      "buddyDragHint": "Drag onto your action bar",
+      "looksSection": "Buddy Looks",
+      "looksNone": "Own Look",
+      "looksNoBuddy": "Summon a companion to choose its look here.",
+      "looksEmpty": "This companion has no looks unlocked yet.",
       "unlockedBanner": "Bedrift fuldbragt: {name}",
       "unlockedTitleHint": "Ny titel opnået: {title}. Vælg den i Bedrifternes Bog.",
       "unlockedBorderHint": "Ny ramme optjent: {name}. Bær den fra Bedrifternes Bog.",
@@ -6711,6 +7462,8 @@ export const da_DK: EnTranslations = {
       "delete_confirm": "Skriv karakterens navn for at bekræfte sletning.",
       "storage_purchase_open": "Et lagerkøb skal afsluttes eller løses, før figuren kan slettes.",
       "delete_busy": "Riget er optaget. Prøv at slette denne figur igen om et øjeblik.",
+      "referral_transfer_pending": "Move all unlocked stamp cards to another character before deleting this character.",
+      "referral_bond_pending": "A referral membership bond is being delivered to this character. Try deleting the character again after delivery finishes.",
       "already_in_world": "Karakteren er allerede i verdenen.",
       "taken_over": "Din karakter blev overtaget af en anden session.",
       "rename_required": "Denne karakter skal omdøbes, før den kan komme ind i verdenen.",
@@ -6947,6 +7700,95 @@ export const da_DK: EnTranslations = {
         "0": "Rigtigt kompost, bedeene vil leve. Den gamle møller begravede noget før han gik. Hans mølle drejer stadig i det fjerne hjørne af haven. Gå og stå ved siden af den.",
         "2": "Så møllen sendte dig ned ad kystvejen. Fyret holder en sidste hemmelighed: nordvest for det, lige uden for stien, var tørven skåret ud og lagt tilbage. Grav der."
       }
+    }
+  },
+  "dungeonGuide": {
+    "drownedTemple": {
+      "greet": {
+        "1": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you.",
+        "2": "Every full moon I come to this gate, and every full moon my nerve fails me. Not tonight. The Choir is singing, and I am the one who ran. Take me down to her, and I will keep out of your way."
+      },
+      "row": {
+        "join": "Come with us.",
+        "decline": "We go alone."
+      },
+      "joined": "Lead on. I am right behind you.",
+      "singing": "Let me sing. Go, and go gently.",
+      "accept": {
+        "1": "Thank you. I will walk behind you, and keep out of your way.",
+        "2": "Then I go down at last. Walk on. I will keep up."
+      },
+      "decline": "I understand. I will listen from up here, as I always have.",
+      "heroicWater": "The water stands high tonight, higher than I have ever seen it. She is close to waking.",
+      "memory": {
+        "votaries": "The drowned ones on the shore walked in after the gate closed. The moon never took them, only the water.",
+        "rubbing": "The Tidewatcher read my words on the shore-rock. 'It only sleeps.' I carved them the morning after."
+      },
+      "area": {
+        "steps": "The Pilgrim Steps. I ran up these that night, three at a time, and never looked back.",
+        "causeway": {
+          "1": "On rite nights the moon lay on this causeway like a second road.",
+          "2": "Look at the water. It still remembers how to hold the moon."
+        },
+        "colonnade": "The Colonnade of Tides. We walked it two by two, singing the rising verse.",
+        "veil": "Past that veil is the Choir Court. I have not stood there since I was a boy.",
+        "terraces": "The tidepools. The novices kept them clean and fed the small bright things living in them.",
+        "falls": "Behind the falls the water drowns every voice. I hid here when I skipped practice.",
+        "pool": "The moon pool. They knelt round it and drank from their shells. I could not lift mine.",
+        "prismStair": "The Prism Stair. We climbed it at moonrise to wake the great glass.",
+        "moonbridge": {
+          "1": "A bridge of moonlight. The elders said only the faithful could cross it.",
+          "2": "I was never faithful. Well. We shall see if it holds me."
+        },
+        "altarLanding": "This is where I stood. Right here. This is where I turned and ran."
+      },
+      "sight": {
+        "pilgrim": "The pilgrims of the shore villages. They carried their shrine on their backs every spring. Now they carry it forever.",
+        "acolyte": "The novices. I learned my letters beside them. They sing in their sleep now, and never wake.",
+        "templeguard": "The stair guard. They swore to hold the temple until the moon set. It never set.",
+        "snapper": "We drank the moon-water from shells like those. Mine I dropped on the stair.",
+        "siren": "That voice. She sang beside me in the choir. She still comes in half a beat early.",
+        "lurker": "The children netted those in the shallows. They were small as a thumb, and they glowed.",
+        "tidewisp": "That is the moon-water itself, the draught we were meant to drink. Do not let it touch you.",
+        "sentinel": "The moon rays of the gate pools. As novices we fed them pearls at moonrise. Now they keep the doors, and wear our pearls as hearts.",
+        "eel": "The lagoon eels. The novices fed them bread at dusk. They grew fat on our hymns.",
+        "reflection": "It shows you what the water would make of you. Break it!",
+        "moonspawn": "Those were never my people. They are hers, made of nothing but moonlight."
+      },
+      "selthe": {
+        "pre": {
+          "1": "Mother Selthe. She taught me to breathe from the belly. She taught us all to drown without dying.",
+          "2": "Choirmother Selthe. Every note I know, she put in me. Forgive me, Mother."
+        },
+        "post": {
+          "1": "She is quiet. In all my years in the Choir, she was never once quiet.",
+          "2": "Rest now, Mother. You were right about me. I never could hold the long notes."
+        }
+      },
+      "hydra": {
+        "pre": "The pool serpent. When I was a boy it had one head, and it ate from our hands.",
+        "post": "Listen. Under the falls they are still singing. Closer now."
+      },
+      "colossus": {
+        "pre": "The great prism. We sang into it to catch the moon. I never knew it could stand.",
+        "post": "The glass is broken. Nothing is left to catch the moon now, but her."
+      },
+      "ysolei": {
+        "pre": "There she is. All my life I have asked if she was a goddess or a monster. Show me.",
+        "preHeroic": "On a night like this the whole Choir sings with her. Hold fast, all of you."
+      },
+      "farewell": {
+        "answer": "She was neither. She was the moon in the water, and we were the ones who knelt.",
+        "verse": "The rite had a last verse, the one that lets the singers sleep. I never sang it.",
+        "stay": "They have waited long enough. I will stay, and sing it for them now.",
+        "goodbye": {
+          "1": "Go up into the night. If you hear singing at the full moon, it is only me.",
+          "2": "Thank you for bringing an old coward to the end of his song. Go now."
+        },
+        "emote": "{name} lifts his voice over the altar, and the lagoon falls still."
+      },
+      "wipe": "Get up. Please. Do not leave me down here alone again.",
+      "catchUp": "My legs are old, but I know every one of these stairs. I am here."
     }
   },
   "guide": {
@@ -7428,6 +8270,7 @@ export const da_DK: EnTranslations = {
       "framesGovernedAuraTracks": "Rediger rammer løsner også de seks valgfri aurabaner, når du har slået dem til fra Kamp-fanen i de samme grænsefladeindstillinger: Mine fordele-banen, Defensive nedkølinger-banen, Mine skjolde-banen, Offensive nedkølinger-banen, Bevægelse og stealth-banen samt Mine fordele på allierede-banen. Alle baner er slået fra som standard, og hver har sin egen navnebrik, mens den er løsnet.",
       "frameGroups": "{trackers} kan kombinere opgaver, bedrifter, rifter, dykkelejer, indsamlings-mål og Relikvie-sporing. {auras} kan kombinere Target-prikker og de seks aura-spor. Aktiver hver gruppe i Frames-indstillinger, eller lad det være fra for at flytte hver ramme separat. {tot} inkluderer en ressource-bar. {focus} har tre uafhængigt flytbare mål: Shift+F1 til Shift+F3 tildeler dem; Ctrl+F1 til Ctrl+F3 vælger dem. Træk skade- eller trusselsmåleren hvor som helst uden for dets knapper for at flytte det, og træk dets kanter for at tilpasse størrelse, selv mens rammer er låst. Mens rammer er låst op, har Vis eller Skjul Rammer sin egen grupperet menu. Højreklik en låst op ramme for Nulstil størrelse eller Ramme-muligheder. Interface > Frames indeholder også Frames-indstillinger og sammenfoldelig Party Frame-muligheder. Lås Target af Target til Target holder disse rammer sammen. Slå det fra for at flytte Target af Target separat; at slå det tilbage på bevarer den separate position til senere. Tildelte fokus-rammer skjuler deres setup-kontroller; højreklik og vælg Usæt fokus for at genoprette dem. Mouseover-casting fungerer også på fokus-rammer.",
       "framesGovernedTalkingHead": "Edit Frames løsner også dialogpanelet, som bærer en NPC's talte linje, mens den NPC er ude af dit syn; den bærer sin navnechip, mens den er løs.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Bjælker, timere og kamptekst",
       "barsBody": "Din castbjælke dukker op midt på skærmen, lige over dine handlingsbjælker, når du kaster eller kanaliserer, og viser besværgelsens navn og den resterende tid. Dit mål får sin egen castbjælke på sin ramme, så du kan se, hvad der er på vej, og svare på det.\n\nEn tynd svingbjælke sidder under din castbjælke og fyldes op mellem dine våbensving, så en nærkamps- eller afstandsangriber kan se, hvornår det næste automatiske slag lander.\n\nDin erfaringsbjælke løber i fuld bredde under dine handlingsbjælker, inddelt i segmenter, med en lysere strækning, der viser den udhvilede erfaring, du har opsparet.\n\nSvøm under vandet, og en blå åndedrætsbjælke dukker op øverst på skærmen. Den tømmes, mens dit hoved er under, blinker rødt, når den løber ud, og du begynder at drukne, og fyldes hurtigt op igen, i det øjeblik du dukker op. Mellemrum svømmer dig op, og tasten Svøm ned, Ctrl som standard, tager dig dybere.\n\nSkade og helbredelse svæver op over det, de rammer, som små tal, så du kan læse en kamp uden at læse tekst. Fanen Kamp i dit chatvindue holder den fulde skriftlige log.",
@@ -7442,6 +8285,7 @@ export const da_DK: EnTranslations = {
       "mapBodyZoneFirst": "M åbner verdenskortet på den zone, du står i, med din egen pil, interessepunkterne omkring dig, opgavegivere med deres mærker og områderne, hvor dine mål ligger, håndværksstationer, postkasser, opslagstavler og havebede, dungeonindgangene og alle indsamlingsnoder i zonen, gråtonede mens de vokser op igen og markerede, når dine værktøjer ikke rækker. Din gruppe vises også. Højreklik på kortet eller tryk på dets Verdenskort-knap, så trækker det sig tilbage til kontinentet med hver zone tegnet og navngivet, og et klik på en zone åbner zonens kort. Gå ind i en udgravning, dungeon, rift eller borg, så skifter kortet til en plantegning over den etage, du står på. Slagmarken i Tornehulemarkerne får sit eget feltkort.\n\nNede i højre side under minikortet holder en stak sporere din aktuelle forretning synlig uden at åbne noget: dine sporede opgaver og deres mål, din bedriftstatus, dine Relikvarium-sider, opskrifter du har fastgjort fra håndværk, udgravningen du er i, og enhver rift du deltager i. Opgavesporeren klapper sammen, når du vil have skærmen tilbage.",
       "gatheringGoalTrackerBody": "En indsamlingsmåls-sporer slutter sig til stakken, når du Sporer en opskrift i håndværksvinduet eller en bestilling på tavlen: Den navngiver opskriften eller bestillingen, du sporer, hvor meget du samler til, og hvor langt dine beholdte og oplagrede materialer bringer dig. Spor erstatter dit nuværende mål, og Ryd fjerner det udtrykkeligt. Ingen af delene ændrer nogensinde din høstpræference.",
       "hubPracticeTrackerBody": "Nær Østbæk-hubben slutter en øvelsessporer sig til stakken, når du tager de guidede øvelseslektioner der: Den holder dine bedste løb mod øvelsesdukkerne synlige. Mens en lektion er aktiv, fører en træningsstribe ved siden af dig gennem lektionens aktuelle trin, fra at åbne skademålerne til at sammenligne et andet løb.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "Chatvinduet",
       "chatBody": "Nederst til venstre. Tryk Enter for at begynde at skrive, og Enter igen for at sende.\n\nTo faner er altid der: Chat, den samlede log over alt, der bliver sagt omkring dig, og Kamp, den skriftlige log over din kamp. Plus-knappen tilføjer flere, én pr. kanal: Sig, Råb, Gruppe, Generelt, Verden, LFG, Lav og Officer, samt en Hvisk-fane, der samler hver hvisken, du sender og modtager, ét sted. At skrive i en kanalfane sender til den kanal, uden at du behøver skrive kommandoen igen.\n\nHele vinduet kan trækkes til et andet sted og ændre størrelse, og det husker, hvor du efterlod det.",
       "keyWindowsTitle": "Vinduer, du åbner med en tast",
@@ -9183,12 +10027,152 @@ export const da_DK: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "Target: {name}",
+      "choose": "Choose overlapping asset ({count})",
+      "chooser": "Choose an asset under the pointer",
+      "front": "Frontmost",
+      "behind": "Behind another asset",
+      "close": "Close",
+      "keyboard": "Use Previous/Next or arrow keys to compare. Enter selects; Escape closes.",
+      "hint": "Click again to cycle overlapping items, or choose from this list.",
+      "asset": "Asset {number}",
+      "overlapAt": "Overlaps at {name}",
+      "previous": "Previous",
+      "next": "Next",
+      "position": "{current} of {count}",
+      "details": "Item {number} · Floor {level} · Height {height}",
+      "ungroupedDetails": "Item {number} · Height {height}",
+      "hideAbove": "Hide floors above selected level",
+      "allFloors": "All floors visible",
+      "filteredFloors": "Floors above level {level} are hidden"
+    },
+    "quickActions": {
+      "title": "Selected asset",
+      "move": "Move",
+      "frame": "Frame",
+      "remove": "Remove",
+      "count": "{count} selected"
+    },
+    "buildMode": {
+      "materialNames": {
+        "WardenStone": "Smooth Stone",
+        "Cliff001": "Red Cliff",
+        "Cliff002": "Mossy Crag",
+        "Cliff003": "Craggy Rock",
+        "Cliff004": "Weathered Bluff",
+        "Rock052": "Rugged Stone",
+        "Rock053": "Ironrock",
+        "Rock054": "Sandstone Face",
+        "Rock055": "Rust Rock",
+        "Rock029": "Weathered Rock",
+        "Rock035": "Layered Stone",
+        "Rock051": "Granite",
+        "Rock056": "Meadow Stones",
+        "Rock057": "Veined Darkstone",
+        "Cliff005": "Strata Cliff",
+        "Cliff006": "Sunbaked Cliff",
+        "Concrete034": "Cast Concrete",
+        "Marble012": "Veined Marble",
+        "Bricks076C": "Mossy Brick",
+        "Gravel024": "Gravel",
+        "PavingStones046": "Paving Stones",
+        "Cobblestone001": "Cobbled Road",
+        "Cobblestone002": "Old Cobblestone",
+        "Tiles001": "Lichen Flagstones",
+        "Tiles002": "Slate Pavers",
+        "PavingStones131": "Mossy Setts",
+        "Metal032": "Brushed Steel",
+        "Metal034": "Painted Steel",
+        "Rust004": "Rusted Iron",
+        "Roots001": "Tangled Roots",
+        "Roots002": "Living Roots",
+        "Wood001": "Oak Planks",
+        "Wood002": "Pine Planks",
+        "Wood003": "Weathered Bark",
+        "Wood004": "Mossy Bark",
+        "Plaster001": "Lime Plaster"
+      },
+      "title": "Build a building",
+      "modeWall": "Walls",
+      "modeRoom": "Rooms",
+      "modeFloor": "Floors",
+      "modeObject": "Objects",
+      "modeFinish": "Wall finishes",
+      "building": "Building",
+      "buildingNumber": "Building {number}",
+      "noBuilding": "New building",
+      "newBuilding": "New building",
+      "levels": "Building floors",
+      "groundFloor": "Ground floor",
+      "floorNumber": "Floor {number}",
+      "addLevel": "Add floor",
+      "hideAbove": "Hide higher floors",
+      "settings": "Grid and foundation",
+      "gridSize": "Grid spacing",
+      "gridOff": "Off",
+      "gridCell": "{size} yards",
+      "floorHeight": "Floor height (yards)",
+      "baseY": "Foundation height (yards)",
+      "autoBase": "Set by first placement",
+      "foundationLocked": "Foundation settings are fixed after building starts.",
+      "wallSource": "Wall type",
+      "bareWall": "Bare wall",
+      "chosenAsset": "Chosen asset",
+      "thickness": "Wall thickness (yards)",
+      "pickAsset": "Choose asset",
+      "selectedAsset": "Asset: {name}",
+      "noAsset": "Choose an asset from the browser.",
+      "selectExisting": "Select an existing piece",
+      "wallHint": "Drag to draw a straight wall.",
+      "diagonal": "Diagonal walls",
+      "diagonalHint": "Drag between grid points to draw a wall at any angle.",
+      "roomHint": "Drag a rectangle to create a room with walls and a floor.",
+      "floorHint": "Drag a rectangle to add a floor on this level.",
+      "objectHint": "Place objects on the selected floor.",
+      "finishHint": "Choose a finish, then click a wall to paint it.",
+      "finishTexture": "Wall texture",
+      "bareFinish": "Original surface",
+      "importTexture": "Import texture",
+      "importingTexture": "Importing texture...",
+      "finishTile": "Texture repeat (yards)",
+      "finishSide": "Paint side",
+      "sideClicked": "Clicked side",
+      "sideFront": "Front",
+      "sideBack": "Back",
+      "sideBoth": "Both sides",
+      "finishRun": "Apply to connected walls",
+      "rotateLeft": "Rotate left",
+      "rotateRight": "Rotate right",
+      "smaller": "Smaller",
+      "larger": "Larger",
+      "fineRotation": "Fine rotation (15°)",
+      "transformReadout": "Rotation: {degrees}° | Size: {scale}x",
+      "transformEmpty": "Choose an asset to rotate or resize.",
+      "transformShortcuts": "Rotate: , and . | Resize: [ and ]",
+      "undo": "Undo",
+      "redo": "Redo",
+      "transformControls": "Asset controls",
+      "chooseWall": "Choose a wall asset and wait for its preview, or select Bare wall.",
+      "chooseAsset": "Choose an asset first.",
+      "choosePaintWall": "Click a building wall or a wall asset.",
+      "capacity": "This build is too large. Draw a smaller section or remove unused pieces.",
+      "invalid": "This wall or room could not fit. Adjust the grid or choose another piece.",
+      "importFailed": "Texture import failed. Use a PNG, JPG or WebP under 8 MB, up to 8192 pixels per side.",
+      "bare": "Original surface",
+      "importedTexture": "Imported texture {number}"
+    },
     "appTitle": "Korteditor",
     "docTitle": "Korteditor - World of ClaudeCraft",
     "untitledMap": "Unavngivet kort",
+    "flatMapName": "Flat World",
     "playtestPlayerName": "Kortmager",
+    "playtestBack": "Back to Editor",
+    "playtestBackTitle": "Return to the map editor (your map was saved when the playtest launched)",
     "topbar": {
       "label": "Editorhandlinger",
+      "dungeon": "Dungeon",
+      "dungeonTitle": "Edit an authored dungeon interior layout",
       "mapNameLabel": "Kortnavn",
       "dirty": "Ugemte ændringer",
       "dirtyDot": "Dette kort har ugemte ændringer",
@@ -9199,6 +10183,8 @@ export const da_DK: EnTranslations = {
       "neverSaved": "Ikke gemt endnu",
       "new": "Nyt",
       "newTitle": "Start et nyt kort fra den indbyggede verden",
+      "newFlat": "Blank Map",
+      "newFlatTitle": "Start a brand-new blank map with none of the base game content, at a size you choose",
       "open": "Åbn",
       "openTitle": "Åbn et gemt kort (browser eller server)",
       "save": "Gem",
@@ -9215,17 +10201,49 @@ export const da_DK: EnTranslations = {
       "uploadAsset": "Upload asset",
       "uploadAssetTitle": "Upload en GLB-model (op til 8 MiB) til at placere på dine kort",
       "uploadAssetDisabledTitle": "Log ind fra spillet for at uploade assets",
+      "importModel": "Import Model",
+      "importModelTitle": "Load a .glb or .gltf model from this computer and place it, fully offline (kept for this session)",
       "playtest": "Prøvespil",
       "playtestTitle": "Start spillet på dette kort (offline, med dine aktuelle ændringer)",
       "viewLabel": "Visningstilstand",
+      "workspace": "View",
+      "workspaceTitle": "View, map, preview, and workspace modes",
       "view3d": "3D",
       "view3dTitle": "Rediger i den renderede verden",
       "view2d": "2D",
       "view2dTitle": "Rediger på det symbolske oversigtskort",
+      "projectionPerspective": "Perspective",
+      "projectionOrthographic": "Orthographic",
+      "projectionTitle": "Toggle perspective/orthographic projection (Numpad 5)",
+      "axisGimbal": "Camera gimbal",
+      "axisGimbalTitle": "Show or hide the camera orientation gimbal",
+      "minimap": "Minimap",
+      "minimapTitle": "Toggle the corner minimap (top-down view that follows the camera)",
+      "music": "Music",
+      "musicTitle": "Play the soundtrack for the area under the camera (the music area's track, else the map track, else the zone's own cue). Fly around and it follows you.",
+      "mapWindow": "Map",
+      "mapWindowTitle": "Open the map of the current zone (with a button for the full world)",
+      "preview": "Preview",
+      "previewTitle": "See the map as it looks in-game: hides editor-only overlays (collider boxes, music areas, markers, rings, gizmos)",
+      "hitboxes": "Hitboxes",
+      "hitboxesTitle": "Show the collision shapes the game actually blocks with (blue = authored in Collision Master, red = auto-baked boxes)",
+      "zoneIsolateOff": "Full Build",
+      "zoneIsolateOn": "Zone: {zone}",
+      "zoneIsolateTitle": "Full Build ⇄ Zone: isolate the camera’s zone, everything outside it unloads until you switch back. View only; the map itself never changes.",
+      "fullBuildPreview": "Full Build Preview",
+      "fullBuildPreviewTitle": "Stream every zone of this map into the viewport (may take a while)",
+      "fullBuildProgress": "Building zones: {done}/{total}",
+      "fullBuildDone": "All {total} zones resident.",
+      "publishMap": "Publish to Game",
+      "publishMapTitle": "Write this map into the local repo as real game content (data/maps + src/sim/maps); boot it with ?map=<slug>",
+      "unpublishMap": "Remove from Game",
+      "unpublishMapTitle": "Uninstall this map from the local game: deletes the files Publish wrote and restores the standard ClaudeCraft world",
       "undoCount": "Fortryd: {count}",
       "undoCountTitle": "{count} trin kan fortrydes (Ctrl+Z for at fortryde, Ctrl+Y for at gentage)",
       "autosave": "Autogem",
       "autosaveTitle": "Gem automatisk kortet, mens der er ugemte ændringer. Slår sig selv fra, hvis et gem mislykkes.",
+      "presetPrompt": "Ask about presets on Lock In",
+      "presetPromptTitle": "After a Collision Master Lock In, ask whether to also save the boxes as a hitbox preset on this device. Turn this back on if you ticked \"Don't ask again\".",
       "undo": "Fortryd",
       "undoTitle": "Fortryd den seneste ændring (Ctrl+Z)",
       "redo": "Gentag",
@@ -9235,34 +10253,544 @@ export const da_DK: EnTranslations = {
       "signIn": "Log ind",
       "signInTitle": "Åbn spillets loginskærm i en ny fane",
       "help": "Hjælp",
-      "helpTitle": "Editorguide: værktøjer, genveje og rundvisningen"
+      "helpTitle": "Editorguide: værktøjer, genveje og rundvisningen",
+      "more": "More",
+      "moreTitle": "More actions: Save As, autosave, fork, import/export, upload",
+      "primaryTools": "Primary transform tools",
+      "settings": "Settings",
+      "settingsTitle": "Graphics and sound settings (shared with playtest)",
+      "worldLink": "Link to World",
+      "worldLinkTitle": "Place this map inside the base game world: drag its outline onto the world map, and playtest embeds it there with the base game running around it",
+      "generateTerrain": "Generate Terrain",
+      "generateTerrainTitle": "Generate this map’s terrain from a region of the base game world: drag the outline over the world map to pick which part of the old layout to use",
+      "evenBuildings": "Even Out Buildings",
+      "evenBuildingsTitle": "Fix buildings that were stretched sideways to fill their plot: each one keeps its height and its footprint area, but its width and depth are made equal so it stops looking squashed",
+      "evenBuildingsDone": "Evened out {count} buildings.",
+      "evenBuildingsNone": "No squashed buildings found."
+    },
+    "genTerrain": {
+      "title": "Generate Terrain",
+      "hint": "Pick which part of the old world layout this map’s terrain generates from: drag the gold rectangle over the region you want. Its hills, lakes, and coastlines become your map’s base terrain, you can sculpt on top of it afterwards. Generating replaces your current sculpt edits, and your map stays its own separate space.",
+      "dragHint": "Drag the gold rectangle over the terrain to copy. The dot marks your spawn point.",
+      "status": "Sampling the world layout around ({x}, {z}).",
+      "save": "Generate",
+      "clear": "Flatten Map",
+      "generated": "Terrain generated from the world layout around ({x}, {z}).",
+      "cleared": "Terrain source cleared: the map is a flat slate again."
+    },
+    "worldLink": {
+      "title": "Link to World",
+      "hint": "Drag your map’s outline to where it should sit in the base game world. Playtest stamps your map’s terrain, placements, and spawns right there, with the world’s own mobs, NPCs, and quests running around it. You can also place it in the open sea beyond the old world’s edges: your map rises there as new land. Your editing space stays exactly as it is; only playtest uses the link.",
+      "statusLinked": "Linked: your map’s origin sits at ({x}, {z}) in the world.",
+      "statusUnlinked": "Standalone: this map playtests as its own separate space.",
+      "dragHint": "Drag the gold rectangle to position your map. The dot marks your spawn point.",
+      "save": "Save Link",
+      "unlink": "Unlink",
+      "cancel": "Cancel",
+      "linked": "Map linked to the world at ({x}, {z}).",
+      "unlinked": "Map unlinked: it playtests standalone again.",
+      "standaloneOnly": "Only standalone authored maps can link to the world (open a Blank Map or import one first)."
+    },
+    "settings": {
+      "title": "Settings",
+      "hint": "Graphics and sound for the editor and playtest. These are the same settings the game uses, saved in this browser.",
+      "graphicsTitle": "Graphics quality",
+      "graphicsLow": "Low",
+      "graphicsMedium": "Medium",
+      "graphicsHigh": "High",
+      "graphicsUltra": "Ultra",
+      "graphicsHint": "Applies to the next playtest, and to the editor after a reload.",
+      "applyGraphics": "Reload editor to apply",
+      "soundTitle": "Sound",
+      "sfxVolume": "Effects volume",
+      "musicVolume": "Music volume",
+      "music": "Play music",
+      "close": "Close"
+    },
+    "fluid": {
+      "title": "Fluid Pool",
+      "hint": "Pick a fluid and click the ground to place a pool. Use the transform tools to move it, stretch its footprint, and slide the surface down into a dip.",
+      "selHint": "The gizmo scales the pool footprint (X/Z) and the Y arrow slides the surface height. Damage ticks once per second on anyone in the fluid.",
+      "kind": {
+        "lava": "Lava",
+        "acid": "Acid",
+        "spectral": "Spectral Fluid",
+        "water": "Still Water"
+      },
+      "hue": "Hue",
+      "light": "Lightness",
+      "dps": "Damage per second",
+      "surfaceOffset": "Surface height",
+      "fxBubbles": "Bubbles",
+      "fxSmoke": "Smoke",
+      "fxHaze": "Haze",
+      "fxLight": "Glow light",
+      "resetPreset": "Reset to preset"
+    },
+    "tunnel": {
+      "needExit": "Entrance placed. Keep clicking to lay the path (the last point is the exit), then hit Generate.",
+      "generate": "Generate cave ({count} ready)",
+      "tooShort": "The rig points are too close together - spread them at least a few yards apart.",
+      "modeDig": "Dig cave",
+      "modeCarve": "Carve",
+      "modeHole": "Cut hole",
+      "modePatch": "Patch hole",
+      "modeRemesh": "Remesh",
+      "modeSculpt": "Dig brush",
+      "modeFill": "Fill brush",
+      "modeSmooth": "Smooth",
+      "smoothHint": "Drag along a dug edge to SMOOTH it: each pass raises the Blend of every cut and fill under the brush, so creases and lumps along a dig stroke melt into one rounded surface. One undo step per stroke.",
+      "ghostTitle": "Pending cut",
+      "ghostHint": "The blue ghost is the solid the cut will remove. Drag it into place (click or hold anywhere on the ground), tune its size, shape and depth below, then press \"Lock in cut\" (or Enter) to commit it - or Cancel / Escape to discard it. Nothing is removed until you commit.",
+      "ghostConfirm": "Lock in cut",
+      "ghostLockHint": "Enter locks the cut in, Escape discards it. Tools 2-4 move, turn and scale the ghost first.",
+      "ghostCancel": "Cancel",
+      "carveHint": "Click the ground to spawn a blue GHOST of the solid, drag it into place and tune it, then press \"Lock in cut\" (or Enter) to carve a REAL room or tunnel out of the rock: the solid has a walkable floor, rock walls and a ceiling, and it re-meshes the ground around it. A ball makes a chamber, a pitched capsule bored into a hillside a tunnel, a box a hall - and raise Blend so neighbouring carves melt together into one clean cave. Walk in through any face that breaks the surface.",
+      "carveList": "Carves",
+      "carveLabel": "Carve {n}",
+      "carveDelete": "Delete carve",
+      "cutDepth": "Depth",
+      "sculptHint": "Drag across a carve wall, floor or ceiling to DIG rock away, like a clay brush: each pass carves a blended channel at the stamp size (set by the brush radius). Drag on open ground to gouge into the surface. One undo step per stroke.",
+      "fillHint": "Click the ground to drop an ERASE BOX, size it with the sliders or the gizmo (any width, length and height), then press \"Erase caves\" (or Enter): every carve, hole and dug volume inside the box is removed, and a carve the box only partly covers is filled back to solid rock where it is covered. One undo step.",
+      "eraseTitle": "Erase box",
+      "eraseGhostHint": "The box stands where you clicked; click again to move it. Everything cave-like inside it goes when you confirm.",
+      "eraseHalf": "Half width (yd)",
+      "eraseConfirm": "Erase caves",
+      "eraseDone": "Erased {n} cave record(s) inside the box",
+      "eraseNothing": "No caves inside the box",
+      "remeshHint": "Click to paint a DETAIL region (brush radius wide): every carve it touches re-meshes at the chosen cell size - finer OR coarser than the default. Spend fine topology exactly where a cave needs to read clean; turn the cell up to thin out a carve that costs too much. Finer cells cost more triangles.",
+      "remeshCell": "Detail (cell yards)",
+      "remeshAllTitle": "Remesh all caves",
+      "remeshAllHint": "One cell size for every carve and dug volume on the map: larger cells mean far fewer triangles. Applies to the whole map at once and re-meshes it; the regions below can still refine or coarsen single spots on top of it.",
+      "remeshGlobal": "Cave mesh detail (cell yards)",
+      "remeshAll": "Remesh all caves",
+      "remeshRegionsTitle": "Detail regions (brush)",
+      "remeshList": "Detail regions",
+      "remeshLabel": "Region {n} ({r} yd, {cell} yd cells)",
+      "remeshDelete": "Delete region",
+      "holeHint": "Click the ground to spawn a blue GHOST of the cut, drag it into place, then press \"Cut into the ground\" to punch it straight through the terrain mesh. The ground stops existing there and the mesh grows a rock rim around the opening, so line a cave mouth up underneath and you can walk or drop in. Pick the shape first: a ball, an oriented box for a slot or a doorway, or a capsule for an arch. Resize or delete any committed cut below; undo removes the last one.",
+      "holeList": "Cuts",
+      "holeLabel": "Cut {n}",
+      "holeRadius": "Radius",
+      "holeDelete": "Delete cut",
+      "cutBrush": "Next cut",
+      "cutShape": {
+        "sphere": "Ball",
+        "box": "Box",
+        "capsule": "Capsule",
+        "voxel": "Dug rock",
+        "tube": "Cave mouth (from the bore)"
+      },
+      "cutLength": "Length",
+      "cutHeight": "Height",
+      "cutYaw": "Turn",
+      "cutPitch": "Tilt",
+      "cutBlend": "Blend",
+      "cutWarp": "Undulation",
+      "digAlphaLabel": "Brush alpha",
+      "digAlpha": {
+        "round": "Round",
+        "halfmoon": "Half moon",
+        "ragged": "Ragged",
+        "crescent": "Crescent"
+      },
+      "digNoise": "Edge noise",
+      "digCell": "Dig detail (cell yards)",
+      "digCellHint": "Strokes bake straight into the map as one rock volume at this cell size (finer costs more memory and triangles). The cell is fixed once the first stroke lands.",
+      "digClear": "Clear dug rock",
+      "digVolumeFull": "The dug rock volume is as large as a map can hold; clear it or dig closer to what is already dug.",
+      "digCellCoarsened": "Dig detail set to {cell} yd for this brush size (a finer cell would not fit the volume budget).",
+      "cutWarpScale": "Undulation size",
+      "cutTaper": "Taper",
+      "cutWobble": "Wobble",
+      "cutWobbleLen": "Wobble length",
+      "cutBend": "Bend",
+      "cutArch": "Arch",
+      "ghostGizmoHint": "Press 2, 3 or 4 (Move, Rotate, Scale) to drag the ghost with the gizmo, then come back to the Caves tool to cut.",
+      "autoMouth": "Carve its own mouth",
+      "autoMouthHint": "The tube cuts the ground wherever it breaches the surface, so you no longer line a hole up with the mouth by hand. Buried stretches cut nothing, and ground under a stretch standing above the surface is left alone.",
+      "mouthBlend": "Mouth blend",
+      "patchHint": "Click the ground to lay a patch (brush radius wide, same shapes as a cut) that FILLS the ground back in wherever cuts overlap it - use it to trim the blank parts around each cut. A patch always beats the cuts it touches. Resize or delete any patch below; undo removes the last one.",
+      "patchList": "Patches",
+      "patchLabel": "Patch {n}",
+      "patchDelete": "Delete patch",
+      "listTitle": "Caves",
+      "caveLabel": "Cave {n} ({nodes} points)",
+      "width": "Width",
+      "height": "Interior height",
+      "variance": "Variance",
+      "floorVariance": "Floor bumps",
+      "stalactites": "Stalactites",
+      "stalagmites": "Stalagmites",
+      "spikeSize": "Formation size",
+      "startOpen": "Entrance open",
+      "endOpen": "Exit open",
+      "selectCave": "Select whole cave",
+      "noRig": "This cave has no rig nodes to grab - lay a new cave instead.",
+      "reverse": "Swap entrance/exit",
+      "delete": "Delete cave",
+      "texture": "Interior texture",
+      "texDefault": "Granite (default)",
+      "guideHint": "Blue nodes joined by a dotted line are your cave model (visible in every tool). Move a node with the Move tool, raise or sink it with the Y arrow, and scale it to widen the cave there - the tube re-generates live and ALWAYS keeps exactly the size you set. Green ball = entrance, red arrow = exit.",
+      "hint": "Click the ground to drop the ENTRANCE node, keep clicking to lay blue waypoints (the last one is the exit), then press Generate. The cave is a standalone tube built only from your nodes - the surrounding terrain never squishes or reshapes it. Turn on \"Carve its own mouth\" and the tube opens the ground wherever it breaches the surface; otherwise use Cut hole mode and slide the tube into place with Select whole cave + the Move tool."
+    },
+    "foliage": {
+      "kind": "Plant",
+      "kinds": {
+        "tree": "Tree",
+        "bush": "Bush",
+        "grass": "Grass clump",
+        "fern": "Fern",
+        "vine": "Vine"
+      },
+      "preset": "Starting point",
+      "presets": {
+        "bushRound": "Round bush",
+        "bushBerry": "Berry bush",
+        "bushDry": "Dry scrub",
+        "grassTuft": "Tuft",
+        "grassMeadow": "Meadow clump",
+        "fernForest": "Forest fern",
+        "vineHanging": "Hanging vine"
+      },
+      "footprint": "Spread",
+      "plantHeight": "Height",
+      "splay": "Splay",
+      "clumps": "Blade clumps",
+      "strands": "Strands",
+      "hang": "Hang",
+      "bake": "Keep as an asset",
+      "bakeHint": "Writes the plant to public/models/generated as a GLB, so it stops being a recipe and becomes an ordinary catalogue asset: it batches with the others, takes a collision bake, and can be placed on any map. Its settings ride along inside the file, so you can re-open and re-bake it later. Needs the dev server.",
+      "bakePrompt": "Name this plant",
+      "baked": "Kept as {id}. Re-run the asset catalogue to see it in the browser.",
+      "bakeFailed": "Could not keep the plant: {reason}"
+    },
+    "tree": {
+      "title": "Tree Generator",
+      "hint": "Click the ground to grow a tree there. Everything below shapes the NEXT tree; select a placed tree with the Select tool to reshape it live.",
+      "preset": "Preset",
+      "presetHint": "A starting point for the biome. Every setting stays editable afterwards.",
+      "openStudio": "Edit in Tree Studio",
+      "openStudioHint": "Opens the tree on its own in an empty scene, so you can shape it without a village in the way. Keep it when you are done and it becomes the tool default.",
+      "studioMapName": "Tree Studio",
+      "studioBanner": "Tree Studio",
+      "studioHint": "Shape the tree here, then keep it as the tool default or discard it. The map you came from is waiting.",
+      "studioKeep": "Use this tree",
+      "studioDiscard": "Discard",
+      "studioKept": "Tree Studio settings are now the tool default.",
+      "randomize": "New seed",
+      "randomizeHint": "Rerolls the branch growth and leaf scatter without changing any setting.",
+      "copyToTool": "Use as tool default",
+      "trunkSection": "Trunk",
+      "trunk": "Foundation",
+      "girth": "Girth",
+      "heightScale": "Trunk height",
+      "bark": "Bark texture",
+      "barkTile": "Bark tile (yd)",
+      "branchSection": "Branches",
+      "branches": "Per limb",
+      "branchDepth": "Levels",
+      "branchLen": "Length",
+      "branchAngle": "Spread",
+      "branchDroop": "Droop",
+      "branchTwist": "Gnarl",
+      "branchTaper": "Taper",
+      "canopySection": "Canopy volumes",
+      "canopyHint": "The leaves only ever go inside these spheres. Pick a shape to lay them out, then tune the spread and size - or edit a single sphere below to sculpt the crown by hand.",
+      "shape": "Shape",
+      "volumeCount": "Spheres",
+      "volumeSpread": "Spread",
+      "volumeRise": "Height",
+      "volumeScale": "Sphere size",
+      "volumeJitter": "Jitter",
+      "showVolumes": "Show spheres",
+      "editVolumes": "Edit spheres",
+      "resetVolumes": "Back to preset shape",
+      "volumeLabel": "Sphere {n}",
+      "volumeX": "X",
+      "volumeY": "Y",
+      "volumeZ": "Z",
+      "volumeR": "Radius",
+      "volumeSy": "Stretch",
+      "addVolume": "Add sphere",
+      "removeVolume": "Remove",
+      "leafSection": "Leaves",
+      "leafSet": "Leaf art",
+      "leaves": "Count",
+      "leafSize": "Size",
+      "leafSizeVar": "Size variation",
+      "leafOrient": "Orientation",
+      "leafFill": "Fill",
+      "leafFillHint": "0 hangs the leaves on the shell of each sphere; 1 fills it solid.",
+      "leafDroop": "Droop",
+      "leafJitter": "Rotation jitter",
+      "leafClump": "Clumping",
+      "leafBranchBias": "Pull to branches",
+      "leafTint": "Tint",
+      "leafTintVar": "Colour variation",
+      "leafGlow": "Glow",
+      "leafCross": "Crossed cards",
+      "leafCrossHint": "Two quads per leaf instead of one: twice the cost, a canopy with real depth.",
+      "windSection": "Wind and collision",
+      "sway": "Sway",
+      "collide": "Trunk hitbox",
+      "collideHint": "Radius of the trunk collider, as a multiple of its own girth. 0 lets players walk through.",
+      "stats": "{leaves} leaves, {branches} branches, {height} yd tall",
+      "orient": {
+        "volume": "Follow canopy",
+        "up": "Upright",
+        "out": "Outward",
+        "droop": "Drooping",
+        "random": "Random",
+        "billboard": "Face camera"
+      },
+      "shapeName": {
+        "sockets": "On the limbs",
+        "sphere": "Ball",
+        "dome": "Dome",
+        "cone": "Cone",
+        "umbrella": "Umbrella",
+        "column": "Column",
+        "weeping": "Weeping"
+      }
+    },
+    "rock": {
+      "title": "Rock Generator",
+      "hint": "Click the ground to grow a procedural boulder there. The sliders below shape the NEXT rock; select a placed rock with the Select tool to reshape it live. Use the gizmo to stretch rocks into slabs and cliff plates.",
+      "chainMode": "Bridge / ridge mode",
+      "chainHint": "Click to lay blue points; Generate lofts ONE merged solid body through them (spanning dips in a straight line) plus walkable tops, so the chain works as a bridge or ridge. The points stay after Generate: move or scale one with the gizmos and the body follows.",
+      "chainCount": "{count} points laid",
+      "generateChain": "Generate rock ridge",
+      "clearChain": "Clear points",
+      "chainTooShort": "Lay at least two points first.",
+      "size": "Size",
+      "noise": "Noise amount",
+      "detail": "Feature detail",
+      "sharp": "Sharpness",
+      "height": "Height",
+      "depth": "Embed depth",
+      "jag": "Jaggedness",
+      "texture": "Texture",
+      "baseTex": "Base texture",
+      "texStone": "Stone",
+      "texSandstone": "Sandstone",
+      "texBare": "Bare (tintable)",
+      "reroll": "Re-roll shape",
+      "selTitle": "Generated Rock",
+      "walkable": "Walkable top"
     },
     "tool": {
+      "building": "Build mode",
       "listLabel": "Editorværktøjer",
       "keyHint": "{name} ({key})",
       "select": "Vælg",
+      "move": "Move",
+      "rotate": "Rotate",
+      "scale": "Scale",
       "raise": "Hæv",
       "lower": "Sænk",
       "smooth": "Udglat",
       "flatten": "Planér",
+      "slope": "Slope",
+      "pond": "Pond",
+      "tunnel": "Caves",
+      "rock": "Rock Gen",
+      "build": "Build Model",
+      "fluid": "Fluid Pool",
       "paint": "Mal biom",
+      "eyedropper": "Eyedropper",
+      "decal": "Decal",
       "water": "Vand",
       "place": "Placér asset",
+      "foliage": "Paint Foliage",
+      "clutter": "Paint Clutter",
+      "meshFix": "Mesh Fix",
+      "tree": "Tree Generator",
+      "grassClear": "Remove Grass",
       "blocker": "Spærrevæg",
+      "collider": "Collider",
       "camp": "Lejr",
+      "entity": "Move NPCs and Mobs",
       "spawn": "Startpunkt",
+      "zone": "Zone",
+      "light": "Point Light",
+      "music": "Music",
+      "sound": "Point Sound",
       "region": "Region",
-      "erase": "Visk ud"
+      "erase": "Visk ud",
+      "city": "City Build"
+    },
+    "toolGroup": {
+      "terrain": "Terrain",
+      "assets": "Assets",
+      "world": "World",
+      "effects": "Effects"
+    },
+    "eyedropperTool": {
+      "empty": "Nothing painted here, click a painted texture to pick it."
+    },
+    "build": {
+      "entered": "Editing model, add shapes, apply a texture, toggle collision, then Done.",
+      "newHint": "Click the map to start a new model, or select one to edit it.",
+      "banner": "Building Model",
+      "bannerHint": "Add shapes and edit vertices/edges/faces with the modeling bar.",
+      "done": "Done",
+      "editModel": "Edit Model",
+      "panelTitle": "Built Model",
+      "shapes": "{n} shapes",
+      "texture": "Surface texture",
+      "material": "Material",
+      "materialMany": "Material controls apply to all {n} selected built models.",
+      "materialHint": "Library materials are projected onto the shape in the shader (no stretching on stairs, slopes or curves) and tint with hue, saturation and light.",
+      "hue": "Hue",
+      "saturation": "Saturation",
+      "light": "Light",
+      "resetLook": "Reset material tint",
+      "bare": "Plain (no texture)",
+      "tileSize": "Texture scale",
+      "tileSizeUnit": "yd / tile",
+      "collision": "Use mesh as collision",
+      "collisionHint": "The player is blocked where the model is solid. Walkable shapes (green) become ramps.",
+      "walkableTip": "Tip: use the modeling bar’s Walkable toggle to make a shape a ramp."
+    },
+    "city": {
+      "title": "City Build",
+      "tabKit": "Kit",
+      "tabWalls": "Walls",
+      "tabRoads": "Roads",
+      "tabPrefabs": "Prefabs",
+      "tabRoutes": "Routes",
+      "settings": "Build settings",
+      "gridSize": "Grid size",
+      "gridOff": "Off",
+      "rotSnap": "Rotation snap",
+      "snapHint": "Grid snapping applies to wall nodes, Kit placement, and prefab stamps.",
+      "kitPick": "Choose asset",
+      "kitChosen": "Placing: {name}",
+      "kitNone": "Pick an asset from the browser, then click the map to place it on the grid.",
+      "kitRotate": "Rotate (R)",
+      "kitScale": "Piece scale",
+      "kitTileSnap": "Connect tiles",
+      "kitTileHint": "Connect tiles snaps each piece to its own size and to the FIRST tile’s height, so floors join edge to edge and stay flat across bumpy ground. Esc or picking a new asset starts a fresh level; turn it off to use the world grid.",
+      "kitGhostBlocked": "Blocked: overlapping a placed asset.",
+      "wallStyle": "Wall style",
+      "wallDraw": "Draw wall",
+      "wallDrawing": "Click to add corners on the visible grid. Double-click a node or press Enter to finish. Backspace or Delete removes the last node; Esc cancels.",
+      "wallFinish": "Finish wall",
+      "wallCancel": "Cancel",
+      "wallUndoPoint": "Undo point",
+      "wallNodes": "{n} wall nodes placed.",
+      "wallPostEvery": "Post spacing",
+      "wallPostsOff": "No posts",
+      "wallScale": "Wall scale",
+      "wallHeight": "Height",
+      "wallThickness": "Thickness",
+      "wallClosed": "Close the loop",
+      "wallWalkTop": "Walkable top",
+      "wallStairs": "Stairs up",
+      "wallWalkHint": "Walkable top puts a patrol deck along the wall so players can walk it in playtest; Stairs up adds a staircase from the ground to the deck at each end (or beside a closed loop).",
+      "wallPlaced": "Wall run placed ({n} pieces).",
+      "wallBuildFailed": "The wall assets could not be generated. Your path is still available.",
+      "wallTooShort": "Draw at least two points to build a wall.",
+      "wallLiveEdit": "The controls above update your most recent wall live.",
+      "wallEditHint": "Select any wall piece to make that run active. Return to Walls to reshape it, or press Delete in Select to remove the whole run.",
+      "wallGateHint": "Gate segments are skipped so the wall leaves an opening.",
+      "styleStone": "Stone Wall",
+      "styleCastle": "Castle Wall",
+      "styleWoodFence": "Wood Fence",
+      "styleMetalFence": "Metal Fence",
+      "styleCastleFence": "Castle Fence",
+      "styleHexWall": "Hex Wall",
+      "roadType": "Road type",
+      "roadTypeRoad": "Road",
+      "roadTypePath": "Footpath",
+      "roadDraw": "Draw road",
+      "roadDrawing": "Click to add waypoints. Enter or double-click finishes, Esc cancels.",
+      "roadFinish": "Finish road",
+      "roadCancel": "Cancel",
+      "roadPlaced": "Road placed.",
+      "roadTooShort": "Draw at least two points to build a road.",
+      "roadLimit": "This map already has the maximum number of roads.",
+      "roadList": "Roads on this map",
+      "roadDelete": "Delete",
+      "roadLegacy": "Built-in road",
+      "roadAuthored": "Road {n}",
+      "roadHint": "Roads blend into the terrain like the built-in world roads and flatten bumps beneath them.",
+      "prefabSave": "Save selection as prefab",
+      "prefabName": "Prefab name",
+      "prefabSaved": "Prefab saved: {name}",
+      "prefabNone": "No prefabs yet. Select some placed assets and save them as a prefab.",
+      "prefabStamp": "Stamp",
+      "prefabDelete": "Delete",
+      "prefabStamped": "Prefab stamped ({n} pieces).",
+      "prefabNeedSelection": "Select one or more placed assets first (Shift+click or marquee).",
+      "prefabCount": "{n} pieces",
+      "routePick": "Click an NPC to edit its route.",
+      "routeEditing": "Route for {name}: click the map to add waypoints.",
+      "routeAddHint": "Each click adds a waypoint. Enter finishes, Esc stops editing.",
+      "routeMode": "Traversal",
+      "routeModeLoop": "Loop",
+      "routeModePingPong": "Ping-pong",
+      "routeSpeed": "Walk speed",
+      "routeWait": "Wait at waypoints",
+      "routeWaitUnit": "seconds",
+      "routeFinish": "Save route",
+      "routeClear": "Clear route",
+      "routeSaved": "Route saved ({n} waypoints).",
+      "routeCleared": "Route cleared.",
+      "routeNoNpc": "No NPC selected. Click an NPC in the viewport first.",
+      "routeCount": "{n} waypoints"
     },
     "inspector": {
-      "label": "Værktøjsindstillinger"
+      "label": "Værktøjsindstillinger",
+      "toolTab": "Tools",
+      "cameraTab": "Camera",
+      "lightingTab": "Lighting",
+      "sceneTab": "Scene"
+    },
+    "scene": {
+      "title": "Scene Collection",
+      "hint": "Every placed object. Click to select, double-click a name to rename.",
+      "none": "No objects placed yet.",
+      "count": "{n} objects",
+      "pinTitle": "Focus the camera on this object and select it",
+      "hideTitle": "Hide this object in the editor (it still exists in the map)",
+      "showTitle": "Show this object again",
+      "hiddenBadge": "hidden",
+      "renameLabel": "Object name",
+      "residentBadge": "resident",
+      "isolateTitle": "Isolate {zone}: unload everything outside this zone (view only)",
+      "zoneStream": "Stream the zones near the camera",
+      "zoneStreamHint": "Keep the {count} zones nearest the camera loaded, and swap the whole set when you fly clear of them.",
+      "zoneStreamAt": "Streaming {zone} ({count} zones). Fly clear of them to load the next set.",
+      "zoneStreamLocked": "Locked on {zone}. Unlock to follow the camera again.",
+      "zoneStreamOn": "Streaming {zone} — {count} zones resident, everything else unloaded.",
+      "streamGuide": "Show the resident perimeter",
+      "streamGuideHint": "Draws light red walls where the loaded zones end, so the edge of what is streamed is visible instead of guessed.",
+      "zoneLockTitle": "Lock this zone loaded: stay here until you unlock, whatever the camera does",
+      "zoneUnlockTitle": "Unlock: follow the camera into the next zone again"
+    },
+    "publish": {
+      "failed": "Publish blocked: {error}",
+      "noDevServer": "Publishing writes into the project, so it needs the local dev server (npm run dev).",
+      "rejected": "Publish rejected: {error}",
+      "done": "Published. Boot it at /index.html?map={slug}, commit the generated files to ship.",
+      "removeTitle": "Remove this map from the game?",
+      "removeConfirm": "Deletes the published files for \"{slug}\" (data/maps + src/sim/maps) and restores the standard ClaudeCraft world. Your map in the editor is not touched, and you can publish it again at any time.",
+      "removed": "Removed \"{slug}\" from the game. The standard ClaudeCraft world is back.",
+      "removedNothing": "Nothing to remove: \"{slug}\" was not published to this repo."
     },
     "brush": {
       "title": "Pensel",
+      "shape": "Brush shape",
+      "circle": "Circle",
+      "square": "Square",
       "size": "Penselstørrelse",
       "strength": "Styrke",
       "sizeHint": "Taster: [ og ] ændrer penslens størrelse; Shift+[ og Shift+] ændrer styrken.",
-      "editCount": "Terrænændringer: {count} / {max}"
+      "editCount": "Terrænændringer: {count} / {max}",
+      "reapplyWater": "Re-apply water",
+      "reapplyWaterTitle": "Rebuild the water from the current terrain. Strokes already refresh the water they touch; use this for anything left over, like a basin dug where the map had no water at all."
     },
     "biome": {
       "title": "Biom",
@@ -9276,18 +10804,316 @@ export const da_DK: EnTranslations = {
       "cave": "Hule",
       "erase": "Visk maling ud",
       "hint": "Malede celler tilsidesætter zonens biom for terrænform og farve.",
+      "hue": "Hue",
+      "light": "Light/Dark",
+      "saveSwatch": "Save tint as swatch",
+      "saveSwatchTitle": "Keep this hue/light version as its own swatch, so the tint can be reused after the sliders move on",
+      "swatchSaved": "Saved swatch \"{name}\".",
+      "removeSwatch": "Remove swatch",
+      "removeSwatchTitle": "Delete this custom swatch from the map. Terrain painted with it reverts to the base biome look.",
+      "swatchRemoved": "Removed swatch \"{name}\".",
+      "customHint": "Custom swatches color the ground only (terrain shape keeps the zone biome) and save with the map.",
+      "customFull": "Swatch limit reached ({max}).",
+      "textureSlotsFull": "Only {max} textured swatches render per map; extra ones show their flat color. Retire an unused texture to free a slot.",
+      "textureSlots": "Texture slots: {used} / {max} used · {free} free",
+      "textureSlotsTitle": "Each distinct texture on this map uses one of {max} slots. Snow textures ride the terrain snow layer and use none. Removing a texture swatch frees its slot.",
+      "textureSlotsOver": "Over the limit by {over}: the most recently added textures paint as flat color. Remove a texture swatch to free a slot.",
+      "importTexture": "Import texture swatch",
+      "importTextureTitle": "Pick an image file: painting with the new swatch tiles it over the ground (stored in this browser; other machines see its average color)",
+      "builtinGroup": "Texture library",
+      "builtinTitle": "Built-in ground textures that ship with the editor: picking one adds it to this map as a swatch (available on every machine)",
+      "tileSize": "Texture tile size (yd)",
+      "depth": "Surface depth",
+      "variation": "Variation",
+      "variationHint": "Breaks up the repeating grid by sampling the texture a second time through a rotated frame. 0% is the plain tiling and costs nothing; higher values cost one extra texture read wherever this swatch is painted. Surface depth shades the texture's own crevices from its ambient-occlusion map, which stops painted ground reading flat; it is priced the same way.",
+      "importTextureFailed": "Could not read that image.",
+      "autoRetexture": "Auto-Retexture Map",
+      "autoRetextureHint": "One click: repaints the whole map with fitting builtin textures by elevation, slope, water, zone and paths, sand in deserts and on beaches, cliffs on steep faces, varied grass and dirt, cobble in towns and on roads. Fully editable after: repaint anything with the brush.",
+      "autoRetextureDone": "Retextured {count} cells. Repaint any of it with the brush.",
       "clear": "Ryd al biommaling",
-      "clearConfirm": "Fjern alle malede biomceller fra dette kort?"
+      "clearConfirm": "Fjern alle malede biomceller fra dette kort?",
+      "hardness": "Brush hardness",
+      "edgeSoftness": "Edge softness",
+      "edgeDetail": "Edge detail",
+      "edgeHint": "How the boundary between two painted textures looks, across the whole map. A soft brush stores its rim as scattered single cells (one cell can only hold one texture), and the paint grid is a quarter of a yard, so with both of these at 0 a boundary is a hard line with speckle along it, whatever the hardness slider says. Edge softness widens the blend so that scatter reads as the gradual fade it stands for; Edge detail wanders the boundary with fine noise so it interlocks like real ground instead of following the grid. Both are free, no extra texture reads, but a wide softness blurs painted detail narrower than itself.",
+      "bucket": "Fill (replace texture)",
+      "bucketTitle": "Arm the bucket, then click the ground: every cell painted with the clicked texture switches to the selected swatch",
+      "bucketArmedHint": "Bucket armed: click the ground to replace the clicked texture map-wide.",
+      "bucketDone": "Replaced {count} painted cells.",
+      "pickTexture": "Pick the texture to paint",
+      "galleryTitle": "Choose a ground texture",
+      "galleryHint": "Browse every texture, then Lock In the one you want to paint with.",
+      "galleryLockIn": "Lock In",
+      "galleryCurrent": "Current",
+      "groupBiomes": "Biomes",
+      "groupSwatches": "Your swatches",
+      "galleryCount": "{n} textures",
+      "alphaTitle": "Brush alpha",
+      "alphaNone": "None",
+      "alphaImport": "Import alpha",
+      "alphaImportTitle": "Load a grayscale image as a brush mask: white paints, black masks out (kept in this browser)",
+      "alphaImportFailed": "Could not read that image as a brush alpha.",
+      "alphaRemove": "Remove this imported alpha",
+      "autoTitle": "Auto textures",
+      "autoSlopeRock": "Rock on steep slopes",
+      "autoScree": "Rock rubble on cliffs (high graphics)",
+      "autoSnowCaps": "Snow-capped peaks",
+      "autoRim": "Mountains at the map edge",
+      "autoShoreSand": "Sand near the water",
+      "autoAllOff": "Paint only (turn all off)",
+      "autoAllOffTitle": "Switch every automatic rule off so nothing re-textures the ground by slope, height or shoreline. Your paint is then the only thing on it.",
+      "autoHint": "Automatic texturing rules, applied UNDER your paint: while one is on it keeps re-tinting the ground it owns, so a cliff you have painted goes back to rock. Uncheck one to remove it map-wide. New maps start with all of these off."
+    },
+    "map": {
+      "zoneTitle": "Zone map",
+      "worldTitle": "World map",
+      "showWorld": "Show full world",
+      "showZone": "Show this zone",
+      "usePainted": "Use painted map",
+      "useLiveTerrain": "Use live terrain",
+      "pinHint": "Click the map to place a teleport pin.",
+      "teleportToPin": "Teleport to pin",
+      "close": "Close"
+    },
+    "zoneTool": {
+      "title": "Named Locations",
+      "hint": "Drag a box on the ground, then name it: standing inside shows that name as the location in playtest.",
+      "namePrompt": "Location name",
+      "none": "No named locations yet.",
+      "deleteTitle": "Remove this location",
+      "hideBoxes": "Hide area boxes"
+    },
+    "objectMove": {
+      "title": "Gameplay Object",
+      "kindFarmBed": "Farm bed",
+      "kindPracticeDummy": "Practice dummy",
+      "kindGatherNode": "Gather node",
+      "kindDungeonDoor": "Dungeon door",
+      "position": "Position: {x}, {z}",
+      "moved": "Moved on this map.",
+      "original": "At its original spot.",
+      "hint": "Drag it, or nudge it with the arrow keys. The move applies to this map only and the object keeps its identity, so saved progress still finds it.",
+      "reset": "Reset to original spot"
+    },
+    "lightTool": {
+      "title": "Point Lights",
+      "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",
+      "none": "No lights yet.",
+      "color": "Color",
+      "intensity": "Intensity",
+      "range": "Range (yd)",
+      "height": "Height (yd)",
+      "deleteTitle": "Remove this light",
+      "capReached": "Light limit reached ({max}).",
+      "lightN": "Light {num}",
+      "selectTitle": "Select this light in the world (bulb badge enlarges; Delete removes it)"
+    },
+    "soundTool": {
+      "title": "Point Sounds",
+      "hint": "Click the ground to drop a looping sound emitter, then pick a clip and set its max volume and radius. The falloff sphere shows how far it carries; it plays spatially in playtest.",
+      "none": "No point sounds yet.",
+      "clip": "Sound effect",
+      "volume": "Max volume",
+      "radius": "Radius (yd)",
+      "height": "Height (yd)",
+      "deleteTitle": "Remove this sound",
+      "capReached": "Point sound limit reached ({max}).",
+      "soundN": "Sound {num}",
+      "selectTitle": "Select this sound in the world (badge enlarges; Delete removes it)"
+    },
+    "decalTool": {
+      "title": "Decals",
+      "hint": "Pick a decal, then click the ground to stamp it. Stamps drape over the terrain and only load when the camera is near, so a map can carry plenty. Click a stamp to select it; Delete removes it.",
+      "none": "No decals stamped yet.",
+      "library": "Decal library",
+      "libraryTitle": "Built-in decals that ship with the editor (original CC0 art). Pick one, then click the ground to stamp it.",
+      "importDecal": "Import decal image",
+      "importTitle": "Pick a PNG/WebP with transparency: it becomes a stampable decal (stored in this browser, and packed into map bundles)",
+      "imported": "Imported",
+      "importFailed": "Could not read that image.",
+      "importedDecal": "Imported \"{name}\".",
+      "size": "Size (yd)",
+      "rotation": "Rotation",
+      "aspect": "Stretch",
+      "opacity": "Opacity",
+      "glow": "Glow",
+      "tint": "Tint",
+      "sortOrder": "Draw over",
+      "randomRotate": "Random rotation per stamp",
+      "stamped": "Stamped \"{name}\".",
+      "removed": "Removed decal.",
+      "capReached": "Decal limit reached ({max}).",
+      "decalN": "Decal {num}",
+      "deleteTitle": "Remove this decal",
+      "selectTitle": "Select this decal in the world (Delete removes it)",
+      "pickFirst": "Pick a decal from the library first.",
+      "catArcane": "Arcane",
+      "catBurn": "Burns",
+      "catDamage": "Damage",
+      "catGore": "Gore",
+      "catNature": "Nature",
+      "catTracks": "Tracks",
+      "catMarker": "Markers"
+    },
+    "markerTool": {
+      "title": "AI Markers",
+      "hint": "Editor-only notes for AI quest/event generation (\"quest giver here\", \"chest here\"). Never shown in playtest.",
+      "place": "Place markers instead of moving the spawn",
+      "kind": "Marker type",
+      "npc": "NPC",
+      "object": "Interactable object",
+      "none": "No markers yet.",
+      "defaultName": "{kind} {num}",
+      "deleteTitle": "Remove this marker",
+      "capReached": "Marker limit reached ({max})."
+    },
+    "appearance": {
+      "title": "Appearance (shader)",
+      "tint": "Tint color",
+      "opacity": "Opacity",
+      "glow": "Glow color",
+      "glowStrength": "Glow strength",
+      "fire": "Fire effect (animated flame)",
+      "reset": "Reset appearance",
+      "hint": "Renders the same in playtest: tint recolors, opacity fades (ghosts), glow adds emissive light."
+    },
+    "fire": {
+      "title": "Asset fire effects",
+      "hint": "Add independent procedural fire sources, select one, then use the Move gizmo in the viewport to place it precisely on the model.",
+      "legacy": "Legacy single flame",
+      "customize": "Open full controls",
+      "add": "+ Add fire emitter",
+      "removeAll": "Remove all fire",
+      "emitter": "Fire {count}",
+      "preset": "Effect preset",
+      "enabled": "Emitter enabled",
+      "anchor": "Attach to",
+      "anchorBase": "Model base",
+      "anchorCenter": "Model center",
+      "anchorTop": "Model top",
+      "position": "Position",
+      "positionX": "Local X (yd)",
+      "positionY": "Local Y (yd)",
+      "positionZ": "Local Z (yd)",
+      "flameShape": "Flame shape",
+      "scale": "Overall scale",
+      "width": "Flame width",
+      "height": "Flame height",
+      "layers": "Flame layers",
+      "intensity": "Shader intensity",
+      "opacity": "Flame opacity",
+      "light": "Glow light",
+      "glow": "Glow intensity",
+      "glowRange": "Glow radius (yd)",
+      "smoke": "Smoke",
+      "smokeAmount": "Smoke amount",
+      "smokeScale": "Smoke scale",
+      "smokeRise": "Smoke rise",
+      "colorMotion": "Color & motion",
+      "hue": "Fire hue",
+      "saturation": "Saturation",
+      "speed": "Animation speed",
+      "turbulence": "Turbulence",
+      "flicker": "Flicker",
+      "embers": "Flying embers",
+      "blend": "Blend mode",
+      "blendAdditive": "Additive glow",
+      "blendAlpha": "Natural alpha",
+      "duplicate": "Duplicate emitter",
+      "remove": "Remove emitter",
+      "style": {
+        "torch": "Torch",
+        "bonfire": "Bonfire",
+        "wildfire": "Wildfire",
+        "soulfire": "Soul fire",
+        "embers": "Ember bed"
+      }
+    },
+    "sculpt": {
+      "hint": "Drag to raise the ground; tick the box to carve downward instead.",
+      "shapeTitle": "Brush Shape",
+      "hardness": "Brush hardness",
+      "alphaTitle": "Sculpt alpha",
+      "alphaNone": "Round",
+      "alphaHint": "Alphas shape the actual terrain surface and stay identical in editor and playtest.",
+      "lower": "Lower instead of raise",
+      "grab": "Grab / pull (snake hook)",
+      "grabHint": "Press to grab the ground under the brush, then drag and the terrain follows your cursor in any direction - up lifts it, down shoves it in, sideways slides it across the map, like pulling clay. One grab is one undo step. Brush size sets how wide a chunk you pull.",
+      "shiftHint": "Hold Shift while dragging to do the opposite (raise becomes lower, and back).",
+      "autoTex": "Auto texture by angle",
+      "autoTexHint": "Each stroke repaints the sculpted area by ground angle: one texture below the threshold, another above it (instant cliffs).",
+      "autoTexAngle": "Steep from (degrees)",
+      "autoTexFlat": "Flat ground texture",
+      "autoTexSteep": "Steep ground texture",
+      "autoTexNone": "Leave as is"
+    },
+    "materials": {
+      "title": "Materials",
+      "hint": "Pick a texture for each part of this model. Textures tile in world space, ignore the model UVs, and save with the map.",
+      "loading": "The model is still loading. Select it again in a moment to edit its materials.",
+      "original": "Original",
+      "texture": "Texture",
+      "tile": "Texture scale (yards per tile)",
+      "color": "Tint",
+      "reset": "Restore original"
     },
     "flatten": {
+      "style": {
+        "smooth": "Smooth",
+        "sharpen": "Sharpen",
+        "noise": "Noise",
+        "terrace": "Terrace"
+      },
+      "styleHint": {
+        "smooth": "Averages the ground under the brush - repeated passes melt bumps away.",
+        "sharpen": "The inverse of Smooth: ridges crest harder and gullies bite deeper with each pass.",
+        "noise": "Paints natural undulation across the whole brush: layered swells and dips with finer detail on top. One stroke keeps one pattern, so dragging builds rolling ground; stroke again to layer new detail.",
+        "terrace": "Pulls slopes into stepped ledges. Brush strength sets the step height."
+      },
+      "noiseSize": "Bump size (yards)",
+      "noiseRough": "Roughness",
+      "noiseHint": "Small bumps with high roughness read as rocky, broken ground; big bumps with low roughness roll like meadow hills. Brush strength sets how tall they stand.",
       "hint": "Planér jævner jorden til højden under markøren, dér hvor trækket begynder.",
-      "hardEdge": "Hård kant"
+      "hardEdge": "Hård kant",
+      "smoothMode": "Smooth instead of flatten",
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "Level height (yards)",
+      "levelPlaceholder": "Drag start",
+      "levelClear": "Clear",
+      "levelHint": "Every drag levels the ground to this height. Right-click the ground to pick another.",
+      "levelHintNone": "Right-click the ground to lock its height, then drag anywhere to level to it. Empty: each drag levels to where it starts.",
+      "levelPicked": "Level locked at {height} yards."
+    },
+    "slope": {
+      "hint": "Right-click the ground where the slope should start. Then press where it should end and drag along the path: the ground eases into a smooth ramp between the two heights.",
+      "start": "Start height: {height} yards",
+      "noStart": "No start set yet. Right-click the ground to set one.",
+      "clearStart": "Clear start",
+      "needStart": "Right-click the ground first to set where the slope starts.",
+      "startPicked": "Slope start set at {height} yards."
+    },
+    "pond": {
+      "title": "Create a pond",
+      "add": "Add pond",
+      "radius": "Pond radius",
+      "depth": "Pond depth",
+      "hint": "Click the ground to dig a round pond and fill it with water. The circle includes the softly sloping bank. Undo removes the water and basin together.",
+      "invalid": "Cannot dig a pond on this ground. Choose another spot."
     },
     "water": {
       "title": "Vandstand",
       "level": "Vandstand",
       "hint": "Angiver vandoverfladens højde for hele kortet, fra {min} til {max} yard.",
-      "reset": "Nulstil til det indbyggede niveau"
+      "reset": "Nulstil til det indbyggede niveau",
+      "tintTitle": "Water tint",
+      "hue": "Hue",
+      "light": "Lightness",
+      "tintReset": "Reset tint",
+      "waterfallTitle": "Waterfalls",
+      "placeWaterfall": "Place waterfall",
+      "placeWaterfallTitle": "Arm the Place tool with an animated waterfall (click a cliff to drop it)",
+      "waterfallLabel": "Waterfall",
+      "waterfallHint": "An animated falling-water sheet with a foam pool. Scale it up a cliff with S or the gizmo; stretch just the height with the Y scale handle."
     },
     "place": {
       "title": "Placér asset",
@@ -9298,6 +11124,102 @@ export const da_DK: EnTranslations = {
       "chosen": "Placerer: {name}",
       "none": "Vælg et asset i browseren nedenfor, og klik derefter på jorden for at placere det."
     },
+    "collider": {
+      "title": "Collision Volumes",
+      "hint": "Pick a shape, then click the ground to drop it. Use Move, Rotate, and Scale (or the sliders below) to shape it.",
+      "shapeLabel": "Collider shape",
+      "box": "Box collider",
+      "sphere": "Sphere collider",
+      "plane": "Floor plane",
+      "wall": "Wall plane",
+      "width": "Width",
+      "height": "Height",
+      "depth": "Depth",
+      "diameter": "Diameter",
+      "floorOffset": "Floor height offset",
+      "sizeHint": "Dimensions are yards at scale 1; the Scale tool multiplies them.",
+      "playtestNote": "Volumes show green in the editor and are invisible in playtest: boxes and spheres block movement, floor planes raise the walkable ground.",
+      "hideVolumes": "Hide collision volumes",
+      "hideVolumesHint": "Hides the green volume overlays in the viewport (they still block in playtest)."
+    },
+    "foliageTool": {
+      "title": "Foliage Brush",
+      "hint": "Drag across the ground to scatter the enabled foliage inside the brush; each stroke is one undo step. Use Erase to remove pieces.",
+      "ambientTitle": "Existing map foliage",
+      "ambientHint": "Built-in trees and rocks are procedural and cannot be selected. Point the camera at an area, then convert this zone (recommended), the nearest batch, or the whole map.",
+      "makeZoneEditable": "Make THIS zone editable",
+      "makeZoneEditableHint": "Converts every tree and rock in the zone the camera is over into editable placements, the performance-safe way to edit a far area, one region at a time.",
+      "makeAmbientEditable": "Make nearby foliage editable",
+      "makeAllAmbientEditable": "Make ALL foliage editable",
+      "ambientAllHint": "Converting the whole map turns thousands of trees and rocks into individual placements, which uses more memory than the zone or batch options.",
+      "ambientEditableHint": "Ambient foliage is off. Every foliage piece painted with this brush can be selected, moved, rotated, scaled, or erased.",
+      "ambientConverted": "Made the {count} nearest foliage pieces editable.",
+      "ambientConvertedAll": "All ambient foliage ({count} pieces) is now editable.",
+      "ambientPartial": "Converted {count} pieces; raise the limit or convert again for the rest.",
+      "density": "Density",
+      "minScale": "Min size",
+      "maxScale": "Max size",
+      "grass": "Grass (animated)",
+      "grassHue": "Grass hue",
+      "grassLight": "Grass lightness",
+      "grassClump": "Clump size (strands)",
+      "grassPreview": "The color new grass will paint with",
+      "ferns": "Ferns and mushrooms",
+      "bushes": "Bushes",
+      "trees": "Trees",
+      "rocks": "Rocks",
+      "collide": "New foliage blocks movement",
+      "noneSelected": "Enable at least one foliage group to paint.",
+      "customTitle": "Custom brush asset",
+      "customHint": "Scatter your own asset instead of the built-in sets. Pick any model from the browser below, then brush as usual.",
+      "customPick": "Pick from asset browser",
+      "customChosen": "Brushing: {name}",
+      "customClear": "Back to built-in foliage",
+      "customNeedsPick": "Open the asset browser and pick an asset for the custom brush first."
+    },
+    "meshFixTool": {
+      "title": "Mesh Fix",
+      "hint": "Wireframe is on while this tool is active. Drag over the stretched terrain polys draped across a cave mouth (from outside or from inside the cave) to REMOVE them; every poly centred under the brush stops drawing. Draw-only: the ground you walk on is unchanged. One undo step per stroke.",
+      "restore": "Restore mode (bring removed polys back under the brush)",
+      "nudgeHint": "To MOVE a stretched poly instead of removing it, use Raise or Lower with a very small brush on its vertices.",
+      "count": "{n} removed spots",
+      "clear": "Restore everything",
+      "capReached": "Mesh Fix is full ({max} spots). Restore some before removing more.",
+      "miss": "Aim at the terrain mesh: nothing was under the cursor.",
+      "vertexMode": "Vertices mode (select and move single vertices)",
+      "vertexHint": "Every terrain vertex near the cursor shows as a small square; selected ones turn yellow. Click one to select it, drag a box to take several, Shift+click or Shift+drag to add, Ctrl/Cmd+click to toggle, Alt+click to drop. Then DRAG a selected vertex to move it up or down. Draw-only: the ground you walk on is unchanged.",
+      "vertexCount": "{sel} selected, {n} vertices moved",
+      "vertexReset": "Reset selected vertices",
+      "vertexClearSel": "Clear selection",
+      "vertexClearAll": "Reset every moved vertex"
+    },
+    "clutterTool": {
+      "title": "Clutter Brush",
+      "hint": "Drag across the ground to scatter the enabled clutter inside the brush; each stroke is one undo step. Pieces never block movement.",
+      "tierNote": "Clutter shows in game on High graphics and up; lower tiers skip it at no cost.",
+      "erase": "Erase mode (lift painted clutter under the brush)",
+      "density": "Density",
+      "minScale": "Min size",
+      "maxScale": "Max size",
+      "clumps": "Clumps (0 = even spread)",
+      "kindsTitle": "Clutter kinds",
+      "kinds": {
+        "tile_broken": "Cracked paving slabs",
+        "tile_shards": "Tile shards",
+        "pebbles": "Pebbles",
+        "stones": "Loose stones",
+        "letter": "Dropped letters",
+        "paper_scraps": "Crumpled paper",
+        "leaves": "Fallen leaves",
+        "straw": "Straw",
+        "splinters": "Wood splinters",
+        "pot_shards": "Broken pottery"
+      },
+      "noneSelected": "Enable at least one clutter kind to paint.",
+      "count": "{count} clutter stamps painted",
+      "clearAll": "Remove all painted clutter",
+      "capReached": "Clutter limit reached ({max} stamps); erase some to paint more."
+    },
     "blockerTool": {
       "title": "Spærrevæg",
       "hint": "Træk hen over jorden for at tegne en usynlig væg, som spillere ikke kan gå eller hoppe igennem. Slip for at placere den; en væg kortere end en halv yard kasseres.",
@@ -9305,6 +11227,7 @@ export const da_DK: EnTranslations = {
     },
     "camp": {
       "title": "Mob-lejr",
+      "chooseMob": "Choose a mob model",
       "mob": "Mob",
       "count": "Antal",
       "radius": "Radius",
@@ -9312,12 +11235,140 @@ export const da_DK: EnTranslations = {
       "hint": "Klik på åben jord for at tilføje en lejr, eller klik på en eksisterende lejr for at redigere den.",
       "playtestNote": "Mobs spawner kun i prøvespil, aldrig i editorvisningen.",
       "selected": "Lejr: {mob}",
-      "none": "Ingen lejr valgt."
+      "none": "Ingen lejr valgt.",
+      "catalogMeta": "{family} | Level {min}-{max}",
+      "statFamily": "Family: {value}",
+      "statAggro": "Aggro: {value} yd",
+      "statScale": "Scale: {value}",
+      "overrideLevels": "Override template levels",
+      "levelMin": "Minimum level",
+      "levelMax": "Maximum level",
+      "aiNotesPlaceholder": "Describe behavior, patrol logic, encounter pacing, or dialogue cues for the AI.",
+      "questNotesPlaceholder": "Explain how this camp should support objectives, rewards, or quest progression.",
+      "tagElite": "Elite",
+      "tagRare": "Rare",
+      "tagBoss": "Boss",
+      "tagCaster": "Caster",
+      "tagSupport": "Support",
+      "tagSummoner": "Summoner",
+      "tagEnrage": "Berserk",
+      "tagSwimmer": "Swimmer",
+      "tagStationary": "Fixed"
+    },
+    "authoring": {
+      "browseAll": "Browse all",
+      "search": "Search all models...",
+      "searchLabel": "Search catalog",
+      "filterLabel": "Filter catalog group",
+      "allGroups": "All",
+      "defaults": "Defaults",
+      "noResults": "No matching entries.",
+      "showing": "Showing {shown} of {total}. Refine the search to see the rest.",
+      "resultCount": "{count} entries",
+      "aiBrief": "AI and Quest Brief",
+      "aiNotes": "AI direction",
+      "questNotes": "Quest-building notes",
+      "vfxTitle": "Ambient VFX",
+      "vfxPreset": "Preset",
+      "vfxNone": "None",
+      "vfxArcane": "Arcane motes",
+      "vfxFire": "Fire embers",
+      "vfxFrost": "Frost shimmer",
+      "vfxHoly": "Holy glow",
+      "vfxNature": "Nature wisps",
+      "vfxShadow": "Shadow motes",
+      "vfxIntensity": "VFX intensity",
+      "vfxHint": "Pooled particles keep the effect lightweight in the editor and playtest."
+    },
+    "entityTool": {
+      "title": "NPCs and Mobs",
+      "hint": "Select an NPC to configure its rig, role, VFX, and AI brief. Select a mob to set its type, levels, stat modifiers, patrol, and respawn.",
+      "selected": "Selected: {name}",
+      "none": "Click a mob or NPC in the map view to select it.",
+      "facing": "Facing",
+      "oneMob": "1 mob",
+      "manyMobs": "{count} mobs",
+      "name": "Display name",
+      "titleField": "Title",
+      "role": "Story role",
+      "rolePlaceholder": "Quest giver, merchant, guard, trainer...",
+      "characterModel": "Rigged character",
+      "placeNpc": "Place NPC",
+      "chooseNpcModel": "Choose a character model",
+      "placeNpcHint": "{name} is ready. Click the terrain to place this NPC.",
+      "cancelPlacement": "Cancel placement",
+      "automaticModel": "Automatic template rig",
+      "automaticModelHint": "Use the character assigned by this NPC template.",
+      "aiNotesPlaceholder": "Describe personality, dialogue tone, schedules, reactions, and interaction rules.",
+      "questNotesPlaceholder": "Leave instructions for future AI-authored quests, objectives, and story beats.",
+      "categoryNpc": "NPCs",
+      "categoryPlayer": "Player rigs",
+      "categoryHumanoid": "Humanoids",
+      "categoryCreature": "Creatures",
+      "categoryForm": "Forms"
+    },
+    "mobTool": {
+      "hint": "Click a mob in the map view to edit its type, levels, stats, patrol, and respawn.",
+      "typeHeader": "Mob: {name}",
+      "typeHeaderMany": "Mob: {name} ({count} selected)",
+      "type": "Mob type",
+      "mixedType": "Mixed types",
+      "statLevels": "Template levels {min}-{max}",
+      "mixedHint": "The selected mobs differ. Values shown are the first one; edits apply to all of them.",
+      "overrideLevels": "Override level range",
+      "levelDefaultHint": "Using the template level range for this mob.",
+      "statsTitle": "Stat modifiers",
+      "statsHint": "Multipliers on the level-derived stats. Above 1 is a bonus, below 1 a penalty. Click a value to type an exact number.",
+      "statHealth": "Health",
+      "statDamage": "Damage",
+      "statArmor": "Armor",
+      "statMoveSpeed": "Move speed",
+      "statAttackSpeed": "Swing time",
+      "statScale": "Size",
+      "statDefault": "{value}x default",
+      "statBonus": "{value}x (+{percent}%)",
+      "statPenalty": "{value}x (-{percent}%)",
+      "statsReset": "Reset modifiers",
+      "respawnTitle": "Respawn",
+      "respawnDefault": "Default respawn speed",
+      "respawnDefaultHint": "Using the realm default for this mob (rares and bosses take longer).",
+      "respawnSeconds": "Respawn after",
+      "seconds": "{value}s",
+      "patrolTitle": "Patrol",
+      "patrolNone": "This mob wanders near its spawn point. Set a patrol to walk it along a path.",
+      "patrolNoneNpc": "This character stands where you placed it. Set a patrol to walk it along a path.",
+      "patrolSet": "Set patrol route",
+      "patrolEdit": "Edit patrol route",
+      "patrolClear": "Clear patrol",
+      "patrolPickHint": "Click the map to drop each waypoint in order. Double-click the last one, or press Enter, to finish.",
+      "patrolDraftPoints": "Waypoints placed: {count}",
+      "patrolPoints": "Patrolling {count} waypoints",
+      "patrolMode": "At the end of the path",
+      "patrolLoop": "Loop back to the start",
+      "patrolPingpong": "Turn around and walk back",
+      "patrolSpeed": "Walk speed",
+      "patrolWait": "Pause at each waypoint",
+      "patrolWaitHint": "The pause is stamped on every waypoint you place from now on.",
+      "patrolFinish": "Finish route",
+      "patrolUndoPoint": "Remove last point",
+      "patrolCancel": "Cancel",
+      "patrolNeedPoints": "Place at least two waypoints before finishing the route.",
+      "patrolFull": "A patrol route holds at most {max} waypoints.",
+      "patrolSaved": "Patrol set: {count} waypoints.",
+      "patrolRemoved": "Patrol cleared.",
+      "yardsPerSecond": "{value} yd/s",
+      "delete": "Delete mob",
+      "deleteMany": "Delete {count} mobs",
+      "deleted": "Deleted {count} mobs.",
+      "deleteNpc": "Delete character",
+      "deleteManyNpcs": "Delete {count} characters",
+      "deletedNpcs": "Deleted {count} characters."
     },
     "spawn": {
       "title": "Startpunkt",
       "hint": "Klik på jorden for at angive, hvor prøvespillet sætter spilleren af.",
       "position": "Start: {x}, {z}",
+      "area": "Spawn area: {width} x {height} yd",
       "unset": "Bruger den indbyggede startposition.",
       "clear": "Ryd startpunkt"
     },
@@ -9337,12 +11388,31 @@ export const da_DK: EnTranslations = {
       "hint": "Klik på et placeret asset for at fjerne det, eller klik på skulpteret jord for at fjerne det nyeste stempel under markøren.",
       "blockerHint": "Klikker du nær en spærrevæg, fjernes den væg i stedet."
     },
+    "grassClearTool": {
+      "title": "Remove Grass",
+      "hint": "Click or drag to scrub away the procedural meadow grass, including the grass baked into the built-in world. Use a large brush to clear a wide area in one stroke.",
+      "restore": "Restore all grass"
+    },
     "selection": {
       "title": "Markering",
+      "heightOffset": "Height offset (yards)",
+      "heightStep": "Step (yards)",
+      "raiseAsset": "Raise",
+      "lowerAsset": "Lower",
+      "heightHint": "Negative offsets sink assets below their base.",
       "none": "Intet markeret. Brug Vælg, og klik på et placeret asset.",
+      "squareCollision": "Square collision (follows rotation)",
       "asset": "Asset: {name}",
       "x": "X",
+      "y": "Y",
       "z": "Z",
+      "multiCount": "{count} assets selected",
+      "selectAllOfAsset": "Select all of this asset ({count})",
+      "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
+      "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "Set to ground",
+      "setGroundTitle": "Seat the selected assets back on the terrain under them, removing any float or lift",
+      "snapGround": "Snap to ground when moving",
       "rotation": "Rotation",
       "scale": "Skala",
       "collide": "Blokerer bevægelse",
@@ -9350,12 +11420,73 @@ export const da_DK: EnTranslations = {
       "radiusAuto": "Auto",
       "radiusAutoTitle": "Nulstil kollisionsradius, så den følger assetets skala",
       "radiusHint": "Auto udleder kollisionsradius af assetets skala; træk i skyderen for at tilsidesætte den.",
+      "collisionBaked": "Blocking with the baked model shape ({count} boxes hugging the mesh). Drag the radius slider to override with a simple circle; Auto restores the baked shape.",
+      "collisionCustom": "Custom footprint (circle/square) - overrides the baked model shape. Press Auto to restore it.",
       "footprints": "Vis kollisionsaftryk",
+      "sway": "Wind sway",
+      "swayHint": "Sways this asset in the wind. On by default for plants. Applies to EVERY placement of this asset on the map, not just the selected one.",
+      "collisionTitle": "Collision",
+      "collisionType": "Collision type",
+      "collisionTypeBaked": "Baked hitboxes",
+      "collisionTypeBasic": "Basic (radius)",
+      "collisionTypeMesh": "True collision (heavy)",
+      "collisionTypeNone": "No collision",
+      "collisionEdited": "Custom hitboxes ({count} boxes). The sim blocks with exactly these.",
+      "hitboxEdit": "Edit hitboxes",
+      "hitboxDone": "Done editing",
+      "hitboxAdd": "Add hitbox",
+      "hitboxDelete": "Delete selected",
+      "hitboxReset": "Reset to baked",
+      "hitboxSelected": "{count} hitboxes selected",
+      "hitboxHint": "Click a hitbox to select it; Ctrl/Shift+click selects several. Use the Move, Rotate, and Scale tools (or the gizmo) to shape them like any other object. Delete removes the selected boxes; Esc leaves edit mode.",
+      "hitboxCap": "Hitbox limit reached ({max} per asset).",
+      "hitboxSavePreset": "Save as preset",
+      "hitboxClearPreset": "Clear saved preset",
+      "hitboxPresetSaved": "Hitbox preset saved for {name}. New placements copy these boxes.",
+      "hitboxPresetCleared": "Hitbox preset cleared.",
+      "hitboxPresetHint": "Presets live on this device: every future placement of this asset spawns with the saved hitboxes.",
+      "meshBaking": "Baking true collision from the model mesh...",
+      "meshBakeDone": "True collision ready ({count} boxes).",
+      "meshBakeFailed": "Could not bake true collision for this asset.",
+      "meshReady": "True collision active: a dense box set hugging the real model mesh.",
+      "meshHint": "True collision rebuilds the hitboxes from the actual model mesh (many small boxes). Expensive - keep it for edge cases; it bakes once per asset when selected.",
+      "collisionCopyAll": "Copy collision to all {name} ({count})",
+      "collisionCopyAllHint": "Gives every other {name} on the map the same collision type and shape, sized to each copy so a small one never gets a giant footprint.",
+      "collisionCopyConfirmTitle": "Copy collision to all {name}?",
+      "collisionCopyConfirmBody": "All {count} other {name} on the map take this collision type and shape, each sized to its own scale (a small copy gets a small footprint, never this one), replacing their own. Ctrl+Z reverts the whole copy.",
+      "collisionCopyConfirm": "Copy to all",
+      "collisionCopied": "Copied collision to {count} {name}.",
+      "scaleAllTitle": "Scale all copies",
+      "scaleMin": "Scale min",
+      "scaleMax": "Scale max",
+      "scaleAllButton": "Scale all {name} ({count})",
+      "scaleAllHint": "Rolls a random scale between min and max onto every copy of this asset (set min and max equal for a uniform scale).",
+      "scaleAllConfirmTitle": "Scale all {name}?",
+      "scaleAllConfirmBody": "Every one of the {count} {name} on the map (this one included) gets a random scale between {min} and {max}, replacing its current scale. Ctrl+Z reverts it.",
+      "scaleAllConfirm": "Scale all",
+      "scaleAllDone": "Scaled {count} {name}.",
       "duplicate": "Duplikér",
       "delete": "Slet",
+      "pieces": "Edit pieces ({count})",
+      "piecesHint": "Splits this Blender-built building into its kit pieces and shell, each its own placement to move, rotate, scale or delete. Ctrl+Z puts the building back together.",
+      "piecesDone": "Split into {count} pieces.",
+      "piecesCap": "Not enough placement room to split this building.",
+      "combine": "Combine ({count})",
+      "combineHint": "Joins the selection into one object. The pieces of a split building become the building again; anything else is grouped, so it picks, drags and deletes as one.",
+      "combineRejoined": "Joined back into {name}.",
+      "combineGrouped": "Grouped {count} placements.",
+      "combineNeedsTwo": "Select at least two placements to combine.",
+      "ungroup": "Ungroup ({count})",
+      "ungroupDone": "Ungrouped {count} placements.",
       "deleteHint": "Delete fjerner markeringen; Ctrl+Z gendanner den.",
       "moveHint": "Flyt: træk dit asset hen over jorden i 3D-visningen, eller skub det med piletasterne (0,5 yd, Shift for 2 yd).",
       "wheelHint": "Shift+rul roterer dit asset, Alt+rul skalerer det, Ctrl+D duplikerer det."
+    },
+    "transform": {
+      "moveHint": "Drag a gizmo arrow to move along that axis, or the yellow square to move freely. Arrow keys nudge.",
+      "rotateHint": "Drag a gizmo ring to rotate around that axis. Shift+scroll also rotates in 15 degree steps.",
+      "scaleHint": "Drag a gizmo axis handle to stretch that axis, or the yellow center cube to scale uniformly.",
+      "pickHint": "Click an asset to select it; the gizmo appears on the selection."
     },
     "marker": {
       "title": "Markør",
@@ -9393,13 +11524,47 @@ export const da_DK: EnTranslations = {
       "searchPlaceholder": "Søg i assets...",
       "empty": "Ingen matchende assets.",
       "uploadedTab": "Uploadede",
+      "importedTab": "Imported",
+      "importedEmpty": "No imported models this session. Use Import Model to load a .glb or .gltf from this computer.",
+      "removeImported": "Remove imported model (this session only)",
       "uploadedEmpty": "Ingen uploadede assets endnu. Brug Upload asset til at tilføje en GLB-model (op til 8 MiB).",
       "uploadedSignIn": "Log ind fra spillet for at uploade og placere dine egne GLB-modeller.",
       "uploadedLoadFailed": "Kunne ikke indlæse dine uploadede assets.",
       "deleteAsset": "Slet uploadet asset",
       "deleteAssetConfirm": "Slet det uploadede asset \"{name}\"? Kort, der bruger det, mister modellen.",
       "pick": "Placér {name}",
+      "collisionMaster": "Collision Master: author this asset’s default collision",
       "categoryTab": "{category} ({count})",
+      "resizeHandle": "Drag to resize the asset browser",
+      "allTab": "All ({count})",
+      "favouritesTab": "Favourites ({count})",
+      "recentsTab": "Recent",
+      "favouritesEmpty": "No favourites yet. Click the star on any asset to keep it here.",
+      "recentsEmpty": "Nothing placed yet in this browser. Assets you place appear here.",
+      "favouriteAdd": "Add {name} to favourites",
+      "favouriteRemove": "Remove {name} from favourites",
+      "subcategoryAll": "All ({count})",
+      "subcategoryTab": "{name} ({count})",
+      "collision": {
+        "baked": "Collision: baked boxes (auto-generated shape)",
+        "authored": "Collision: authored in Collision Master",
+        "none": "Collision: none, placements block only by their soft circle, if any"
+      },
+      "subcategory": {
+        "buildings": "Buildings",
+        "props": "Props",
+        "nature": "Nature",
+        "environment": "Environment",
+        "structure": "Structure",
+        "furniture": "Furniture",
+        "containers": "Containers",
+        "lighting": "Lighting",
+        "decor": "Decor",
+        "other": "Other",
+        "enemies": "Enemies",
+        "players": "Players",
+        "modular": "Modular"
+      },
       "category": {
         "biome": "Biom",
         "chars": "Karakterer",
@@ -9413,6 +11578,113 @@ export const da_DK: EnTranslations = {
         "weapons": "Våben"
       }
     },
+    "collisionMaster": {
+      "title": "Collision Master",
+      "mapName": "Collision Master: {name}",
+      "assetLabel": "Authoring default collision for {name}.",
+      "hint": "Build this asset’s collision with the Selection panel below: pick the collision type, edit boxes with the gizmo (move / rotate / scale), add or delete boxes. Lock In saves it to the project as the asset’s default everywhere.",
+      "fromBake": "From bake",
+      "fromBakeTitle": "Start from the asset’s auto-baked voxel boxes",
+      "fittedBox": "Fitted box",
+      "fittedBoxTitle": "Start from one box fitted around the whole asset",
+      "singleBox": "Single box",
+      "singleBoxTitle": "Start from one plain box at the asset’s base",
+      "fromCylinder": "Start from cylinder",
+      "fromCylinderTitle": "Start from one editable cylinder around the asset base",
+      "fromClear": "Start from clear",
+      "fromClearTitle": "Remove every collision shape and begin with an empty scene",
+      "polySnap": "Poly snap brush",
+      "polySnapHint": "Drag across the model’s surface to lay a collision plane that hugs the geometry: the drag start/end set its length and yaw, the sampled heights its vertical band. Great for walls, roofs, and ramps.",
+      "devOnly": "Lock In writes to the project files, so it needs the local dev server (npm run dev).",
+      "lockIn": "Lock In",
+      "lockInTitle": "Save as this asset’s default collision (writes to the project) and return to your map",
+      "cancel": "Back to map",
+      "catalogOnly": "Collision Master works on catalogue assets. Imported models keep their import bake.",
+      "adopted": "Updated {count} placement(s) already in this map to use the collision you just authored.",
+      "copyEmpty": "No collision volumes to copy.",
+      "copied": "Copied {n} collision volume(s), paste with Ctrl+V (works across assets).",
+      "pasted": "Pasted {n} collision volume(s).",
+      "saveFailed": "Could not save your map before opening Collision Master.",
+      "stashOnly": "Browser storage is blocked, so the map is held in memory: you will return to it from Collision Master, but export it if you want a durable copy.",
+      "noBoxes": "No collision boxes to lock in. Add at least one box, or pick Basic/None.",
+      "meshUnsupported": "True Mesh is a per-map bake and cannot be a project default. Pick Baked, Basic, or None.",
+      "saveEndpointFailed": "Saving the default failed: {error}",
+      "saveUnreachable": "Could not reach the save endpoint (is the dev server running?). Your collision was downloaded as a file so nothing is lost; start \"npm run dev\" and Lock In again, or merge the file into data/asset_collision_overrides.json.",
+      "locked": "Locked in: {name} now uses this collision everywhere.",
+      "presetPromptTitle": "Save as preset too?",
+      "presetPromptBody": "Lock In already made this the default collision for {name} across the whole project, and every copy in your map now uses it. A preset goes one step further on this device only: each NEW placement of {name} spawns carrying these boxes as its own editable hitboxes, so you can tweak them per copy with Edit Hitboxes. Not needed for the collision to work.",
+      "presetPromptYes": "Save preset",
+      "presetPromptNo": "No thanks",
+      "presetPromptDontAsk": "Don't ask again (turn it back on under More > \"Ask about presets on Lock In\")",
+      "barLabel": "Collision modeling tools",
+      "modeObject": "Object",
+      "modeObjectTitle": "Object mode (Tab): move / rotate / scale whole volumes with the gizmo",
+      "modeVertex": "Vertex",
+      "modeVertexTitle": "Vertex select (Z): click a vertex and the gizmo moves ONLY that vertex; Ctrl+drag lassos several",
+      "modeEdge": "Edge",
+      "modeEdgeTitle": "Edge select (V): click an edge and the gizmo moves / rotates / scales its two vertices",
+      "modeFace": "Face",
+      "modeFaceTitle": "Face select (C): click a face and the gizmo moves / rotates / scales that face locally",
+      "addMenu": "Add",
+      "addMenuTitle": "Add a collision primitive: real triangulated solids (a cylinder is a true cylinder mesh)",
+      "primBox": "Box",
+      "primPlane": "Plane",
+      "primCylinder": "Cylinder",
+      "primSphere": "Sphere",
+      "primWedge": "Ramp",
+      "primTitle": "Add a {name} primitive to the collision set",
+      "polySnapShort": "Poly Snap",
+      "polyBuildShort": "Poly Build",
+      "polyBuildHint": "Poly Build: click-drag a face of the model to extrude it outward and hand-build shapes. Toggle off to orbit/select again.",
+      "polyBuildFail": "This model is at its detail limit, cannot extrude any further.",
+      "sculptTitle": "Dynamic mesh sculpt brush",
+      "sculptSettings": "Sculpt settings",
+      "sculptOff": "Sculpt: Off",
+      "sculptGrab": "Sculpt: Grab",
+      "sculptInflate": "Sculpt: Inflate",
+      "sculptDeflate": "Sculpt: Deflate",
+      "sculptSmooth": "Sculpt: Smooth",
+      "sculptPinch": "Sculpt: Pinch",
+      "sculptCrease": "Sculpt: Crease",
+      "sculptRelax": "Sculpt: Relax",
+      "sculptRadius": "Radius",
+      "sculptStrength": "Strength",
+      "sculptDetail": "Detail",
+      "dyntopo": "Dyntopo",
+      "dyntopoTitle": "Dynamic topology locally splits long edges and safely collapses short edges around the sculpt brush.",
+      "symmetry": "Symmetry",
+      "symmetryHint": "Mirror each sculpt stroke across the selected local X, Y, and Z axes.",
+      "loopCut": "Loop Cut",
+      "loopCutTitle": "Insert an edge loop: in Edge mode, pick an edge, then Loop Cut adds a parallel ring of edges around the shape (drag the new loop to slide it).",
+      "loopCutFail": "Pick a box edge in Edge mode first, loop cut needs a quad edge (not a cap/sphere).",
+      "weld": "Weld",
+      "weldTitle": "Merge the selected vertices at their center.",
+      "subdivide": "Subdivide",
+      "subdivideTitle": "Split every triangle into four shared-edge triangles for more modeling detail.",
+      "inset": "Inset",
+      "insetTitle": "Inset the selected face and create a connected border ring.",
+      "fill": "Fill",
+      "fillTitle": "Fill three or more selected boundary vertices with a new face.",
+      "mirror": "Mirror X",
+      "mirrorTitle": "Append a mirrored copy of the selected volume across its local X axis.",
+      "topologyFail": "That topology operation cannot be applied to the current selection.",
+      "rampToggle": "Walkable",
+      "rampToggleTitle": "Walkable ramp: the selected volume raises the walkable ground along its slope (the player walks up it) instead of blocking. Ramp primitives start walkable.",
+      "duplicate": "Dup",
+      "duplicateTitle": "Duplicate the selected boxes",
+      "delete": "Del",
+      "deleteTitle": "Delete the selected boxes",
+      "openFromSelection": "Collision Master",
+      "openFromSelectionTitle": "Author this asset’s DEFAULT collision in the Collision Master scene (saves to the project; your map auto-saves and you return here)",
+      "heroTitle": "Collision Master",
+      "heroStatus": "Asset collision: {mode}"
+    },
+    "importModel": {
+      "notModel": "Pick a .glb or .gltf file.",
+      "tooLarge": "That file is over the 64 MiB import limit.",
+      "imported": "Imported \"{name}\". It is kept for this session; re-import it after a reload.",
+      "failed": "Could not read that model file."
+    },
     "upload": {
       "notGlb": "Vælg en .glb-fil.",
       "tooLarge": "Den fil er over grænsen på 8 MiB.",
@@ -9424,15 +11696,21 @@ export const da_DK: EnTranslations = {
     "openDrawer": {
       "title": "Åbn kort",
       "close": "Luk",
+      "tabShipped": "Shipped Maps",
       "tabLocal": "Denne browser",
       "tabMine": "Mine serverkort",
       "tabPublic": "Offentlige kort",
       "colName": "Navn",
+      "colType": "Type",
       "colUpdated": "Opdateret",
       "colStatus": "Status",
       "statusPublic": "Offentlig",
       "statusPrivate": "Privat",
       "open": "Åbn",
+      "openCopy": "Open Copy",
+      "typePublished": "Published to Game ({slug})",
+      "typeShippedPublished": "{group} · your published version",
+      "publishedUnreadable": "Could not read the published map \"{slug}\" from the dev server.",
       "fork": "Forgren",
       "publish": "Udgiv",
       "unpublish": "Afpublicér",
@@ -9455,24 +11733,43 @@ export const da_DK: EnTranslations = {
       "savedServer": "Gemte \"{name}\" på serveren (v{version}).",
       "savedLocalOnly": "Gemte \"{name}\" i denne browser. Log ind for at gemme online.",
       "saveFailedLocal": "Lokalt gem mislykkedes (lager blokeret).",
+      "openFailedLocal": "That save could not be read (corrupt or truncated). Its file may still import via More > Import if you exported a copy.",
       "opened": "Åbnede \"{name}\".",
+      "waterReapplied": "Water rebuilt from the current terrain.",
+      "shippedMapOpened": "Opened an editable copy of \"{name}\".",
+      "publishedMapOpened": "Opened your published \"{name}\": this is the version the game ships for that map.",
       "imported": "Importerede \"{name}\".",
       "importFailed": "Importen blev annulleret, eller filen er ikke et gyldigt kort.",
+      "importMissingDeps": "{count} model/texture/skybox file(s) are missing, so parts of the map are blank. Re-import the .wocmap.zip bundle to include them.",
       "exported": "Downloadede \"{name}\".",
+      "bundleExported": "Exported \"{name}\" with its models, textures, and skybox. Import the .wocmap.zip (not a loose .json) on the other computer.",
+      "exportBlockedMissingDeps": "Export blocked: {count} referenced model, texture, or skybox file(s) are missing from this browser. Restore them before exporting so the engine receives a complete map.",
+      "exportBlockedInvalid": "Export blocked because the map did not pass the engine compatibility check. Save a copy and review the latest edits before trying again.",
       "newMap": "Nyt kort startet fra den indbyggede verden.",
+      "newFlatMap": "Blank map started.",
       "forked": "Forgrenet til \"{name}\". Du redigerer nu din egen kopi.",
       "published": "Kortet er udgivet. Alle kan nu finde og forgrene det.",
       "unpublished": "Kortet er ikke længere udgivet.",
       "deleted": "Kortet er slettet.",
       "assetPlacedFirst": "Vælg først et asset i browseren.",
       "loading3d": "Indlæser verdenen...",
+      "loading3dAssets": "Loading assets...",
+      "loading3dEngine": "Starting the engine...",
+      "loading3dZone": "Building the world...",
       "playtestLaunch": "Starter prøvespil...",
       "playtestFailed": "Kunne ikke starte prøvespillet (lager blokeret).",
       "draftSaved": "Kladden er autogemt.",
       "draftRestored": "Den autogemte kladde er gendannet.",
       "autosaveFailed": "Autogem mislykkedes (browserlageret er fuldt eller blokeret). Eksportér kortet for at have en sikkerhedskopi.",
       "terrainCapReached": "Grænsen for terrænændringer er nået ({max}). Overskydende stempler blev ikke tilføjet.",
+      "caveCapReached": "Cave limit reached ({max}). Delete or undo a cave first.",
+      "holeCapReached": "Hole limit reached ({max}). Delete or undo a hole first.",
       "placementCapReached": "Placeringsgrænsen er nået ({max}). Overskydende assets blev ikke tilføjet.",
+      "entityCapReached": "The map entity limit was reached. Some copied NPCs or mobs were not pasted.",
+      "selectionCopied": "Copied {count} selected item(s).",
+      "selectionPasted": "Pasted {count} item(s).",
+      "selectionNothingToCopy": "Select an asset, NPC, or mob before copying.",
+      "selectionNothingToPaste": "Copy an asset, NPC, or mob before pasting.",
       "blockerCapReached": "Grænsen for spærrevægge er nået ({max}). Den nye væg blev ikke tilføjet.",
       "campCapReached": "Grænsen for lejre er nået ({max}). Den nye lejr blev ikke tilføjet.",
       "autosaveOff": "Autogem slået fra: {reason} Gem manuelt, og slå det til igen."
@@ -9490,6 +11787,17 @@ export const da_DK: EnTranslations = {
     "prompt": {
       "saveAsTitle": "Gem som",
       "nameLabel": "Nyt kortnavn"
+    },
+    "newMap": {
+      "title": "New Map",
+      "hint": "Pick a preset or set the size in yards. The map is bounded: terrain rim walls and invisible perimeter blockers keep playtest inside it.",
+      "width": "Width (yards)",
+      "height": "Height (yards)",
+      "scale": "Scale multiplier",
+      "interior": "Interior (60 x 60)",
+      "zone": "Zone (240 x 360)",
+      "openWorld": "Open World (360 x 1080)",
+      "create": "Create"
     },
     "serverError": {
       "invalid_map_name": "Det kortnavn er ikke tilladt. Brug bogstaver, tal, mellemrum, apostroffer eller bindestreger.",
@@ -9513,6 +11821,168 @@ export const da_DK: EnTranslations = {
       "timeout": "Serveren var for længe om at svare. Prøv igen.",
       "unknown": "Noget gik galt i kommunikationen med serveren."
     },
+    "lighting": {
+      "title": "Lighting",
+      "presetLabel": "Lighting preset",
+      "day": "Day",
+      "overcast": "Overcast",
+      "dusk": "Dusk",
+      "night": "Night",
+      "customHint": "Custom lighting (edited from a preset).",
+      "sun": "Sun intensity",
+      "ambient": "Ambient intensity",
+      "environment": "Sky ambience",
+      "azimuth": "Sun direction",
+      "elevation": "Sun height",
+      "nightFloor": "Night brightness",
+      "nightFloorHint": "How much daylight the deepest night keeps. 0 is the shipped night; around 0.35 stays readable and cool instead of murky.",
+      "caveLight": "Cave brightness",
+      "caveLightHint": "How dark carved cave walls go with depth. 0 is the shipped cave dark; around 0.4 keeps a big cavern readable by torchlight.",
+      "sunColor": "Sun color",
+      "skyColor": "Sky tint",
+      "hint": "Map lighting is saved and used by both the editor and playtest.",
+      "skyboxTitle": "Skybox",
+      "skyboxDefault": "Default sky",
+      "skybox_toon_day": "Toon Blue Sky",
+      "skybox_vale_day": "Vale Day HDR",
+      "skybox_marsh_overcast": "Marsh Overcast HDR",
+      "skybox_peaks_dawn": "Peaks Dawn HDR",
+      "skybox_hollow_dusk": "Hollow Dusk HDR",
+      "skybox_amber_sunset": "Amber Sunset HDR",
+      "skybox_ember_storm": "Ember Storm HDR",
+      "skybox_frost_twilight": "Frost Twilight HDR",
+      "skybox_fen_day": "Fen Day HDR",
+      "skybox_night": "Night HDR",
+      "skybox_nightbloom_dream": "Nightbloom Dream HDR",
+      "skybox_wraithwood_gloom": "Wraithwood Gloom HDR",
+      "skybox_vale_backdrop": "Vale Painted Backdrop",
+      "skybox_marsh_backdrop": "Marsh Painted Backdrop",
+      "skybox_peaks_backdrop": "Peaks Painted Backdrop",
+      "skybox_space_galaxy": "Space Galaxy",
+      "skyboxUpload": "Upload skybox...",
+      "skyboxCustomActive": "Custom skybox active.",
+      "skyboxHint": "Pick a bundled sky or upload a panoramic (equirectangular) image. Saved with the map - playtest shows it in-game.",
+      "skyboxImported": "Skybox imported.",
+      "skyboxImportFailed": "Could not import that image.",
+      "skyboxTooLarge": "Skybox image is too large (max 24 MB).",
+      "skyboxMissing": "That skybox is not stored in this browser anymore.",
+      "birdsTitle": "Birds",
+      "birds": "Birds in the sky",
+      "birdCount": "How many",
+      "birdFormation": "Fly in V formation",
+      "worldSpeedTitle": "World Speed",
+      "worldSpeed": "Animation speed",
+      "worldSpeedHint": "Speeds up or slows every ambient motion (water, fire, foliage sway, birds, weather). Cosmetic only; it never changes playtest gameplay or timing.",
+      "worldSpeedReset": "Reset to normal speed",
+      "zoneTitle": "Zone atmosphere",
+      "zoneHint": "Choose a zone, then give it its own lighting, skybox, and ambience speed.",
+      "zoneSelect": "Zone to edit",
+      "zoneReset": "Use map atmosphere"
+    },
+    "music": {
+      "title": "Music",
+      "hint": "Pick the soundtrack for the whole map, or drag boxes to give areas their own track. Playtest switches as you cross them.",
+      "zoneTrack": "Map track",
+      "default": "Auto (biome theme)",
+      "areasTitle": "Music areas",
+      "areaTrack": "Track for new areas",
+      "rowTrack": "Track for this area",
+      "dragHint": "Drag a box on the ground to add an area with the track above. Click an area to select it (Delete removes it). Smaller areas win where they overlap.",
+      "none": "No music areas yet.",
+      "areaN": "Area {num}",
+      "selectArea": "Select this area in the world (its box highlights; Delete removes it)",
+      "removeArea": "Remove this music area",
+      "areaCap": "Music area limit reached ({max}).",
+      "previewZone": "Now playing: {zone}",
+      "previewOff": "Area music stopped.",
+      "previewDisabled": "Music is switched off in Settings.",
+      "track": {
+        "town_eastbrook": "Town: Eastbrook (warm pastoral)",
+        "town_fenbridge": "Town: Fenbridge (old medieval)",
+        "town_highwatch": "Town: Highwatch (brisk march)",
+        "town_goldcrest": "Town: Goldcrest Harbor (trading port)",
+        "vale": "Vale (playful meadow)",
+        "vale_legacy": "Vale legacy (original theme)",
+        "marsh": "Marsh (croaky swamp)",
+        "peaks": "Peaks (heroic folk)",
+        "dungeon_hollow_crypt": "Dungeon: Hollow Crypt (skeletal dance)",
+        "dungeon_sunken_bastion": "Dungeon: Sunken Bastion (flooded fortress)",
+        "dungeon_gravewyrm_sanctum": "Dungeon: Gravewyrm Sanctum (boss route)"
+      }
+    },
+    "weather": {
+      "title": "Weather",
+      "showSnowfall": "Show snowfall",
+      "snowfallHint": "A Studio preview setting, remembered in this browser.",
+      "zoneTitle": "Weather in this zone",
+      "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
+      "auto": "Auto",
+      "clear": "Clear",
+      "rain": "Rain",
+      "snow": "Snow",
+      "blizzard": "Blizzard",
+      "sparkle": "Golden sparkles",
+      "intensity": "Intensity",
+      "cloudCover": "Cloud cover",
+      "cloudHeight": "Cloud height (yd)",
+      "cloudHint": "Low clouds hug the terrain and read as rolling ground fog.",
+      "aurora": "Aurora",
+      "auroraHint": "Curtains hang high over the camera wherever it goes: brightest at night, faint by day.",
+      "scheduleTitle": "Dynamic weather",
+      "scheduleWins": "A schedule is running: it overrides the fixed weather above.",
+      "stepMode": "Weather for this step",
+      "stepMinutes": "Minutes this step lasts",
+      "minutesShort": "min",
+      "removeStep": "Remove this step",
+      "addStep": "Add step",
+      "addStepTitle": "Cycle through the steps in order, each holding for its minutes, then repeat",
+      "scheduleHint": "Steps loop in order (Rain 5 min, then Clear 10 min, ...). Saves with the map and runs in playtest."
+    },
+    "camera": {
+      "title": "Camera",
+      "axisWidget": "Camera axis views",
+      "snapPositiveX": "View from positive X",
+      "snapNegativeX": "View from negative X",
+      "snapPositiveY": "View from above",
+      "snapNegativeY": "View from below",
+      "snapPositiveZ": "View from positive Z",
+      "snapNegativeZ": "View from negative Z",
+      "focus": "Focus selection (.)",
+      "focusTitle": "Move the orbit pivot onto the selected object so the camera revolves around it; with nothing selected, frame the whole map",
+      "freeFly": "Free-Fly (Shift+F)",
+      "freeFlyHint": "WASD moves, Q/E goes up and down, dragging looks around like first person, and the wheel sets the speed.",
+      "invertPan": "Invert camera",
+      "showBoundary": "Show map boundary walls",
+      "showPlayer": "Show playtest player",
+      "wireframe": "Wireframe mode",
+      "xray": "Transparent X-ray mode",
+      "speedTitle": "Movement speeds",
+      "moveSpeed": "WASD move speed",
+      "lookSpeed": "Mouse look speed",
+      "panSpeed": "Pan speed",
+      "speedHint": "How fast the viewport camera flies, looks, and pans. Editor only. In Free-Fly the mouse wheel is the throttle: it changes this move speed instead of zooming.",
+      "flySpeedSet": "Fly speed {value}x",
+      "resetSpeeds": "Reset speeds",
+      "perfTitle": "Performance overlay",
+      "perfShow": "Show overlay in the viewport",
+      "perfHint": "A live readout pinned to the viewport corner while you edit.",
+      "perfFps": "FPS",
+      "perfFrameMs": "Frame time (ms)",
+      "perfAssets": "Placed assets",
+      "perfTris": "Scene polygons",
+      "perfSelTris": "Selected polygons",
+      "perfTerrain": "Terrain edits",
+      "perfStreaming": "Terrain streaming",
+      "perfCoords": "World (x, z)",
+      "assetViewTitle": "Asset view distance",
+      "assetViewDistance": "Placed assets fade out at",
+      "assetViewMax": "As far as the fog",
+      "assetViewHint": "How far placed decor renders before it fades out and stops drawing, to save performance. Lower it to cull distant assets sooner; raise it to see farther. Saved with the map, so playtest matches.",
+      "visibilityTitle": "Terrain visibility",
+      "visibilityDistance": "Visible terrain distance",
+      "loadingHaze": "Loading haze",
+      "visibilityHint": "Original-detail terrain streams near the camera. Haze hides each zone until it is ready. Higher distances use more GPU and memory."
+    },
     "hints": {
       "nav3d": "Træk for at kredse, rul for at zoome. Mens du trækker, flyver WASD, og Q/E ændrer højden.",
       "nav2d": "Træk for at panorere, rul for at zoome."
@@ -9527,14 +11997,24 @@ export const da_DK: EnTranslations = {
       "close": "Luk",
       "tool": {
         "select": "Vælg placerede assets for at flytte, rotere og skalere dem; klik på en 2D-markør for at redigere den.",
+        "move": "Move the selected asset with the 3-axis gizmo arrows.",
+        "rotate": "Rotate the selected asset with the gizmo rings.",
+        "scale": "Scale the selected asset with the gizmo handles, per axis or uniformly.",
         "raise": "Hæv terrænet under penslen.",
         "lower": "Sænk terrænet under penslen.",
         "smooth": "Udglat buler mod den lokale gennemsnitshøjde.",
         "flatten": "Jævn jorden til højden dér, hvor trækket begynder.",
+        "slope": "Right-click to set the start height, then drag from another height to lay a smooth ramp.",
+        "pond": "Click to dig a local pond with its own water surface.",
         "paint": "Mal biom-bunddække hen over zonens standard.",
         "water": "Angiv vandstanden for hele kortet.",
         "place": "Placér katalog-assets eller uploadede assets på jorden.",
+        "foliage": "Brush-paint grass, bushes, trees, and rocks with size variation.",
+        "clutter": "Brush-paint ground clutter (broken tiles, pebbles, letters, leaves) that renders on High graphics and up.",
+        "meshfix": "Remove stretched leftover terrain polys around a cut or cave mouth, or restore them. Wireframe turns on while the tool is active.",
+        "tree": "Grow a fully customizable tree: trunk, branches, canopy volumes and leaves.",
         "blocker": "Træk usynlige vægge, der blokerer bevægelse i prøvespil.",
+        "collider": "Drop box, sphere, or floor-plane collision volumes, invisible in playtest.",
         "camp": "Tilføj og rediger mob-lejre, der spawner i prøvespil.",
         "spawn": "Angiv, hvor prøvespillet sætter spilleren af.",
         "region": "Boks-markér terræn og assets for at kopiere og indsætte.",
@@ -9546,6 +12026,7 @@ export const da_DK: EnTranslations = {
         "undo": "Ctrl+Z fortryder den seneste ændring; Ctrl+Y eller Ctrl+Shift+Z gentager den.",
         "save": "Ctrl+S gemmer kortet.",
         "duplicate": "Ctrl+D duplikerer det valgte asset.",
+        "multiSelect": "Shift+click adds or removes assets. In the NPC and Mob tool, Ctrl+click selects multiple entities.",
         "nudge": "Piletasterne skubber det valgte asset 0,5 yard; hold Shift for 2 yard.",
         "wheel": "Shift+rul roterer det valgte asset; Alt+rul skalerer det.",
         "delete": "Delete fjerner det valgte asset eller den valgte lejr.",
@@ -9605,6 +12086,54 @@ export const da_DK: EnTranslations = {
       "stage": "Kortvisning",
       "toasts": "Editornotifikationer",
       "dialog": "Editordialog"
+    },
+    "dungeon": {
+      "title": "Dungeon layout",
+      "collapse": "Fold",
+      "expand": "Expand",
+      "exit": "Back to map",
+      "hint": "Click selects (again cycles overlaps). Drag moves. Arrows nudge, Delete removes, Ctrl+Z undoes. Shift-drag pans, middle-drag orbits.",
+      "none": "Nothing selected. Click an outline on the floor plan.",
+      "addRoom": "Add room",
+      "addDoor": "Add door",
+      "addBarrier": "Add barrier",
+      "addOpening": "Add opening",
+      "addDecor": "Add decor",
+      "delete": "Delete",
+      "validate": "Validate",
+      "save": "Save to source",
+      "saved": "Layout written to src/sim/dungeon_layout.ts (dev server)",
+      "saveFailed": "Dev save endpoint unavailable; downloaded the layout instead",
+      "unsaved": "Unsaved layout changes",
+      "noIssues": "No issues found",
+      "kind": {
+        "room": "Room",
+        "door": "Door",
+        "barrier": "Barrier",
+        "opening": "Visual opening",
+        "decor": "Decor",
+        "dais": "Boss dais"
+      },
+      "field": {
+        "id": "Id",
+        "key": "Model",
+        "style": "Style",
+        "x0": "West edge (x0)",
+        "x1": "East edge (x1)",
+        "z0": "Near edge (z0)",
+        "z1": "Far edge (z1)",
+        "x": "X",
+        "z": "Z",
+        "y": "Height offset",
+        "yaw": "Yaw (radians)",
+        "hw": "Half width",
+        "hd": "Half depth",
+        "r": "Collision radius",
+        "scale": "Scale",
+        "scaleX": "Scale X",
+        "scaleZ": "Scale Z",
+        "innerScale": "Inner scale"
+      }
     }
   },
   "skinEvent": {
@@ -9747,10 +12276,174 @@ export const da_DK: EnTranslations = {
     "realm": "Verden",
     "newCharacter": "Ny karakter",
     "appearance": "Udseende",
+    "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Tilpas",
     "body": "Krop",
     "genderMale": "Mand",
     "genderFemale": "Kvinde",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "Swept",
+        "long": "Long",
+        "mohawk": "Mohawk",
+        "quiff": "Cropped Quiff",
+        "undercut": "Undercut",
+        "topknot": "Topknot",
+        "shoulder": "Shoulder Length",
+        "bald": "Bald",
+        "waves": "Waves",
+        "ponytail": "High Ponytail",
+        "braid": "Braid",
+        "bob": "Bob",
+        "crown": "Braided Crown",
+        "twins": "Twin Braids",
+        "curls": "Curly Updo"
+      },
+      "beard": {
+        "none": "Clean Shaven",
+        "moustache": "Moustache",
+        "handlebar": "Handlebar",
+        "goatee": "Goatee",
+        "chin": "Chin Beard",
+        "boxed": "Boxed Beard",
+        "long": "Long Beard",
+        "chops": "Mutton Chops",
+        "chinstrap": "Chinstrap"
+      },
+      "nose": {
+        "default": "Classic",
+        "broad": "Broad",
+        "aquiline": "Aquiline",
+        "button": "Button",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "Classic",
+        "full": "Full",
+        "smirk": "Smirk",
+        "relaxed": "Relaxed",
+        "cupids_bow": "Cupid's Bow",
+        "narrow": "Narrow",
+        "thin": "Thin",
+        "rounded": "Rounded"
+      },
+      "brows": {
+        "default": "Classic",
+        "slim": "Slim",
+        "arched": "Arched",
+        "soft": "Soft",
+        "straight": "Straight",
+        "relaxed": "Relaxed",
+        "soft_arch": "Soft Arch",
+        "rounded": "Rounded"
+      },
+      "ears": {
+        "default": "Classic",
+        "large": "Large",
+        "pointed": "Pointed",
+        "round": "Round"
+      },
+      "eyes": {
+        "default": "Classic",
+        "almond": "Almond",
+        "hooded": "Hooded"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "Eyes and Brows",
+        "eyeColor": "Eye Color",
+        "hairstyle": "Hairstyle",
+        "facialHair": "Facial Hair",
+        "hairColor": "Hair Color",
+        "browColor": "Eyebrow Color",
+        "piercings": "Piercings"
+      },
+      "section": {
+        "hair": "Hairstyle",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "Brow Shape",
+        "ears": "Ears",
+        "eyes": "Eye Shape"
+      },
+      "slider": {
+        "eyeSpacing": "Eye Spacing",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "Brow Height",
+        "chinWidth": "Chin Width",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "Lobes",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "Nostril",
+        "septum": "Septum",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "Porcelain",
+        "ivory": "Ivory",
+        "rose": "Rose",
+        "peach": "Peach",
+        "fair": "Fair",
+        "beige": "Beige",
+        "sand": "Sand",
+        "honey": "Honey",
+        "olive": "Olive",
+        "caramel": "Caramel",
+        "tan": "Tan",
+        "bronze": "Bronze",
+        "chestnut": "Chestnut",
+        "umber": "Umber",
+        "mahogany": "Mahogany",
+        "ebony": "Ebony"
+      },
+      "eye": {
+        "brown": "Brown",
+        "darkBrown": "Dark Brown",
+        "hazel": "Hazel",
+        "amber": "Amber",
+        "green": "Green",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "Violet"
+      },
+      "hairColor": {
+        "platinum": "Platinum",
+        "blonde": "Blonde",
+        "golden": "Golden",
+        "copper": "Copper",
+        "red": "Red",
+        "auburn": "Auburn",
+        "lightBrown": "Light Brown",
+        "brown": "Brown",
+        "darkBrown": "Dark Brown",
+        "black": "Black",
+        "silver": "Silver",
+        "white": "White"
+      },
+      "matchHair": "Match Hair",
+      "resetDefault": "Reset to Default",
+      "customColorAria": "Pick a custom color",
+      "customSkinAria": "Pick a custom skin tone"
+    },
     "hair": "Hår",
     "brows": "Øjenbryn",
     "skinTone": "Hudtone",
@@ -11218,6 +13911,9 @@ export const da_DK: EnTranslations = {
   "character": {
     "loading": "Indlæser...",
     "noneYet": "Ingen karakterer endnu. Opret en nedenfor.",
+    "membershipRequired": "Renew your membership to play this character.",
+    "membershipSlots": "Unlock slots with a membership",
+    "emptySlot": "Available character slot",
     "levelClass": "Niveau {level} {className}",
     "inWorld": "i verden",
     "takeOver": "Overtag",
@@ -11227,6 +13923,7 @@ export const da_DK: EnTranslations = {
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dødninger",
     "lockoutWorldBosses": "Verdensbosser",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "Dette afbryder denne karakter fra en anden session og henter den hertil. Fortsæt?",
     "renameRequired": "omdøbning påkrævet",
     "delete": "Slet",
@@ -11811,6 +14508,7 @@ export const da_DK: EnTranslations = {
       "deathRecapCauterized": "Du er død. Kauteriseringens forbrænding overvældede dig.",
       "respawn": "Du føler dig udhvilet og hel igen.",
       "respawnKeeperToll": "Den blege vogter har genoplivet dig, men du er svagere for det: vogterens livstold er reduceret.",
+      "moonbridgeBanner": "The Moonbridge Rises",
       "ignoringChat": "Ignorerer chat fra {name}.",
       "noLongerIgnoring": "Ignorerer ikke længere {name}.",
       "playerNotNearby": "Den spiller er ikke i nærheden.",
@@ -12014,6 +14712,10 @@ export const da_DK: EnTranslations = {
     "social": {
       "title": "Socialt",
       "friendsTab": "Venner",
+      "friendFirstPage": "First page",
+      "friendNextPage": "Next page",
+      "boundFriend": "Bound friend",
+      "boundFriendLink": "Bound friends are linked by their referral invitation.",
       "guildTab": "Laug",
       "ignoreTab": "Ignorer",
       "leaveParty": "Forlad gruppe",
@@ -12241,7 +14943,161 @@ export const da_DK: EnTranslations = {
       "hoard_cast_screech": "Øredøvende skrigen",
       "hoard_cast_mimic_bite": "Hæslig bid",
       "hoard_cast_mimic_leap": "Knusende spring",
-      "hoard_cast_coin_spit": "Forbandede mønter"
+      "hoard_cast_coin_spit": "Forbandede mønter",
+      "crypt_grave_bolt": "Grave Bolt",
+      "crypt_raise_bones": "Raise Bones",
+      "crypt_murder_call": "Murder Call",
+      "crypt_stone_shriek": "Stone Shriek",
+      "crypt_grave_cleave": "Grave Cleave",
+      "crypt_barrowflame_breath": "Barrowflame Breath",
+      "crypt_tail_lash": "Tail Lash",
+      "crypt_wing_gust": "Wing Gust",
+      "crypt_grave_rupture": "Grave Rupture",
+      "crypt_carrion_eye": "Carrion Eye",
+      "crypt_marrow_crush": "Marrow Crush",
+      "crypt_rimesilk_spit": "Rimesilk Spit",
+      "crypt_gravespark_volley": "Gravespark Volley",
+      "crypt_morthen_rite_wakes": "The Rite Wakes",
+      "crypt_morthen_rise": "Rise of the Gravecaller",
+      "crypt_morthen_proclaim": "Grave Proclamation",
+      "crypt_morthen_descend": "Descent",
+      "crypt_knellwyrm_arrive": "Descending from the Sky",
+      "crypt_knellwyrm_pyre_strafe": "Pyre Strafe",
+      "crypt_knellwyrm_strafe_run": "Strafing Run",
+      "crypt_knellwyrm_dread_bellow": "Dread Bellow",
+      "crypt_marrow_shovelful": "Shovelful",
+      "crypt_marrow_measure": "Measured for the Grave",
+      "crypt_marrow_burial_toll": "Burial Toll",
+      "crypt_marrow_gravediggers_blow": "Gravedigger's Blow",
+      "crypt_lady_brides_lament": "Bride's Lament",
+      "crypt_lady_frozen_embrace": "Frozen Embrace",
+      "crypt_lady_embrace_hold": "Frozen Embrace",
+      "crypt_lady_bridal_freeze": "Bridal Freeze",
+      "crypt_ilvane_dirge": "Dirge of the Hollow",
+      "crypt_ilvane_unbroken_dirge": "Unbroken Verse",
+      "crypt_ilvane_bone_organ": "Bone Organ",
+      "crypt_morthen_shadow_pulse": "Shadow Pulse",
+      "crypt_morthen_rite_of_the_unquiet": "Rite of the Unquiet",
+      "crypt_morthen_reap_the_unquiet": "Reap the Unquiet",
+      "kituse_crypt_relight_candle": "Relight the Candle",
+      "crypt_knellwyrm_knell_rise": "Burning Knell",
+      "crypt_knellwyrm_knell_mark": "Burning Knell",
+      "crypt_knellwyrm_knell_breath": "Burning Knell",
+      "crypt_knellwyrm_knell_land": "Burning Knell",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "ghost_captain_broadside": "Spectral Broadside",
+      "ghost_captain_anchor": "Cursed Anchor",
+      "ghost_captain_boarding": "Phantom Boarding",
+      "bastion_boathook": "Boathook Drag",
+      "bastion_fog_bank": "Fog Bank",
+      "bastion_brine_column": "Brine Column",
+      "bastion_loose_on_my_mark": "Loose on My Mark",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn",
+      "bastion_iron_cage": "Iron Cage",
+      "bastion_drowned_anchor_cast": "Drowned Anchor",
+      "bastion_shackle_pair": "Shackle Pair",
+      "bastion_shadowstep": "Shadow Crossing",
+      "bastion_reaping_scythe": "Reaping Scythe",
+      "bastion_veil_rise": "Fog Veil",
+      "bastion_veil_gather": "Gathering Fog",
+      "bastion_vael_rise": "Death Rises",
+      "bastion_vael_sink": "Into the Fog",
+      "bastion_hallowed_brine": "Hallowed Brine",
+      "bastion_rebounding_bulwark": "Rebounding Bulwark",
+      "bastion_tide_sentence": "Sentence of the Tide",
+      "bastion_oath_kneel": "Unbroken Oath",
+      "bastion_oath_vigil": "Unbroken Oath",
+      "temple_lullaby": "Lullaby",
+      "cantor_last_verse": "The Last Verse",
+      "temple_call_the_tide": "Call the Tide",
+      "temple_static_coil": "Static Coil",
+      "temple_snapper_snap": "Snap",
+      "temple_trident_sweep": "Trident Sweep",
+      "temple_sea_song": "Sea-Song",
+      "temple_tidal_slap": "Tidal Slap",
+      "temple_tide_breath": "Freezing Breath",
+      "temple_moonlight_lance": "Moonlight Lance",
+      "temple_prism_flare": "Prism Flare",
+      "temple_resonant_slam": "Resonant Slam",
+      "temple_moonwater_bolt": "Moonwater Bolt",
+      "temple_drowning_aria": "Drowning Aria",
+      "temple_mere_surge": "Mere Surge",
+      "temple_tideglass_fracture": "Tideglass Fracture",
+      "temple_undertow": "Undertow",
+      "temple_lunar_tide": "Lunar Tide",
+      "temple_skewering_trident": "Skewering Trident",
+      "temple_pale_mending": "Pale Mending",
+      "temple_glimmer_venom": "Glimmer Venom",
+      "temple_pearl_slam": "Tidal Wingbeat",
+      "temple_lightning_spit": "Lightning Spit",
+      "temple_crushing_torrent": "Crushing Torrent",
+      "temple_hydra_tsunami": "Tsunami",
+      "temple_ysolei_call": "Moonspawn Call",
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "temple_frostlocked_torrent": "Frostlocked Torrent",
+      "temple_venom_current": "Venom Current",
+      "temple_toxic_rime": "Toxic Rime",
+      "temple_beckoning_moon": "Beckoning Moon",
+      "temple_falling_moon": "Falling Moon",
+      "temple_prism_glare": "Prism Glare",
+      "temple_arcing_spark": "Arcing Spark",
+      "temple_call_of_the_shallows": "Call of the Shallows",
+      "wildheart_ancestral_sap": "Ancestral Sap",
+      "wildheart_plant_totem": "Plant Totem",
+      "wildheart_entangling_lash": "Entangling Lash",
+      "wildheart_saurian_tail_swipe": "Tail Swipe",
+      "wildheart_saurian_stomp": "Earthshaking Stomp",
+      "wildheart_quarry_mark": "Quarry Mark",
+      "wildheart_war_roar": "War Roar",
+      "wildheart_toad_hex": "Toad Hex",
+      "wildheart_rattling_dread": "Rattling Dread",
+      "wildheart_snaring_tongue": "Snaring Tongue",
+      "wildheart_beast_pit_quake": "Beast Pit Quake",
+      "wildheart_jaguar_heel": "Heel!",
+      "wildheart_gorgebloom_seed_rain": "Seed Rain",
+      "wildheart_gorgebloom_vine_lash": "Vine Lash",
+      "wildheart_gorgebloom_gorge": "Gorge",
+      "wildheart_zulgar_pulse": "Wildheart Pulse",
+      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt",
+      "sanctum_cinder_breath": "Cinder Breath",
+      "sanctum_warming_rite": "Warming Rite",
+      "sanctum_goad": "Goad",
+      "sanctum_plant_brazier": "Plant Soul Brazier",
+      "sanctum_ice_block_toss": "Ice Block Toss",
+      "sanctum_tusker_tusk_sweep": "Tusk Sweep",
+      "sanctum_tusker_trample": "Trample",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "Counterweight Lash",
+      "sanctum_branding_iron": "Branding Iron",
+      "sanctum_rime_breath": "Rime Breath",
+      "kituse_sanctum_topple_brazier": "Topple Brazier",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
+      "sanctum_korgath_maul_arc": "Maul Arc",
+      "sanctum_korgath_chain_flail": "Chain Flail",
+      "sanctum_korgath_threshold_charge": "Threshold Charge",
+      "sanctum_korgath_foremans_bellow": "Foreman's Bellow",
+      "sanctum_korgath_strain": "Strain",
+      "sanctum_korgath_stomp": "Shuddering Stomp",
+      "sanctum_goadsmith_rerivet": "Re-rivet",
+      "sanctum_velkhar_soulfire_trench": "Soulfire Trench",
+      "sanctum_velkhar_shadow_volley": "Shadow Volley",
+      "sanctum_korzul_break_free": "Break Free",
+      "sanctum_korzul_grave_breath": "Grave Breath",
+      "sanctum_korzul_tail_sweep": "Tail Sweep",
+      "sanctum_korzul_grave_inferno": "Grave Inferno",
+      "sanctum_korzul_wing_gale": "Wing Gale",
+      "sanctum_korzul_plunging_fire": "Plunging Fire",
+      "sanctum_korzul_crashing_descent": "Crashing Descent"
     }
   },
   "questUi": {
@@ -12309,6 +15165,8 @@ export const da_DK: EnTranslations = {
       "rewards": "Belønninger",
       "xpReward": "{xp} erfaring",
       "itemReward": "Genstandsbelønning:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Kræver niveau {level}"
     },
@@ -12686,6 +15544,7 @@ export const da_DK: EnTranslations = {
       "incomplete": "Den quest er ikke fuldført.",
       "giverMissing": "Den quest-giver er ikke i nærheden.",
       "turnInMissing": "Den quest-aflevering er ikke i nærheden.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "For langt væk.",
       "escortAway": "Din eskorte er ikke på sin post lige nu og vender snart tilbage."
     }
@@ -12737,7 +15596,9 @@ export const da_DK: EnTranslations = {
       "flask": "Flaske",
       "scroll": "Rulle",
       "bag": "Taske",
-      "mount": "Ridedyr"
+      "mount": "Ridedyr",
+      "buddy": "Buddy",
+      "buddyCosmetic": "Buddy cosmetic"
     },
     "stats": {
       "armor": "Rustning",
@@ -12753,6 +15614,17 @@ export const da_DK: EnTranslations = {
       "parry": "Parering"
     },
     "tooltip": {
+      "referralFullSet": "Equip all {pieces} friendship armor pieces to gain {percent}% more experience while in a party with {member}. Their membership must be active.",
+      "referralInviter": "the member who invited you",
+      "referralRetained": "Armor stats keep scaling even when you are not in a party with your inviter.",
+      "referralDormant": "Inactive: this account has not received friendship armor through a member referral.",
+      "membershipToken": "Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.",
+      "membershipAdaptive": "Stats and armor adapt to your class and specialization.",
+      "membershipScaling": "Item level matches your level. At level 20, this armor perfects at item level 25.",
+      "membershipPerfected": "Perfected: item level {level}.",
+      "membershipFullSet": "Equip all {pieces} membership armor pieces to gain {percent}% more experience. Requires an active membership.",
+      "membershipRequired": "Armor stats and set benefits stop when membership expires and return when you renew.",
+      "membershipDormant": "Inactive: renew your membership to restore armor stats and set benefits.",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Aktuelt udrustet",
       "ifYouEquip": "Hvis du udruster denne",
@@ -13052,6 +15924,10 @@ export const da_DK: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "Courier",
+        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. It flies at 250% of normal running speed. Choose up to 24 stacks per trip. Membership is required to start a new trip."
+      },
       "sport_kick": {
         "name": "Spark",
         "description": "Spark bolden langs jorden mod sigtepunktet."
@@ -15829,6 +18705,30 @@ export const da_DK: EnTranslations = {
       "fenshadow_maul": {
         "name": "Kærskygge-Hammer"
       },
+      "foremans_barrowmaul": {
+        "name": "Formandens Gravhøjshammer"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrits Skårspyd"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Gravhøjsskulderværn"
+      },
+      "mirestone_stride": {
+        "name": "Mosestensskridt"
+      },
+      "foremans_wage_band": {
+        "name": "Formandens Lønring"
+      },
+      "mirelight_locket": {
+        "name": "Sumplys-medaljon"
+      },
+      "fenwright_grips": {
+        "name": "Mosebyggerens Greb"
+      },
       "wildgrove_cinch": {
         "name": "Vildlund-Livbælte"
       },
@@ -16878,6 +19778,114 @@ export const da_DK: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Hvilesten"
+      },
+      "whistle_ember_fox": {
+        "name": "Ember Fox Whistle"
+      },
+      "whistle_moss_hare": {
+        "name": "Moss Hare Whistle"
+      },
+      "whistle_frog": {
+        "name": "Frog Whistle"
+      },
+      "whistle_crimson_claw_crab": {
+        "name": "Crimson Claw Crab Whistle"
+      },
+      "whistle_golden_sentinel": {
+        "name": "Golden Sentinel Whistle"
+      },
+      "whistle_nightfang": {
+        "name": "Nightfang Whistle"
+      },
+      "whistle_tuskhorn_boar": {
+        "name": "Tuskhorn Boar Whistle"
+      },
+      "whistle_emerald_wolf": {
+        "name": "Emerald Wolf Whistle"
+      },
+      "whistle_tiger": {
+        "name": "Tiger Whistle"
+      },
+      "whistle_cate_coin": {
+        "name": "Cate Coin Whistle"
+      },
+      "whistle_alon": {
+        "name": "Alon Whistle"
+      },
+      "whistle_trollface": {
+        "name": "Trollface Whistle"
+      },
+      "whistle_ansem": {
+        "name": "Ansem Whistle"
+      },
+      "whistle_triple_t": {
+        "name": "Triple T Whistle"
+      },
+      "whistle_kekius": {
+        "name": "Kekius Whistle"
+      },
+      "whistle_solbot": {
+        "name": "Solbot Whistle"
+      },
+      "whistle_frostfire": {
+        "name": "Frostfire Whistle"
+      },
+      "whistle_rocky": {
+        "name": "Rocky Whistle"
+      },
+      "whistle_proud_grunt": {
+        "name": "Proud Grunt Whistle"
+      },
+      "whistle_loot_goblin": {
+        "name": "Loot Goblin Whistle"
+      },
+      "whistle_penny_goldspark": {
+        "name": "Penny Goldspark Whistle"
+      },
+      "whistle_stag": {
+        "name": "Stag Whistle"
+      },
+      "whistle_alpaca": {
+        "name": "Alpaca Whistle"
+      },
+      "whistle_horse": {
+        "name": "Horse Whistle"
+      },
+      "whistle_sapling": {
+        "name": "Sapling Whistle"
+      },
+      "whistle_bull": {
+        "name": "Bull Whistle"
+      },
+      "whistle_spider": {
+        "name": "Spider Whistle"
+      },
+      "whistle_raptor": {
+        "name": "Raptor Whistle"
+      },
+      "whistle_skeleton": {
+        "name": "Skeleton Whistle"
+      },
+      "whistle_crystal_lich": {
+        "name": "Crystal Lich Whistle"
+      },
+      "whistle_forgemaw": {
+        "name": "Forgemaw The Molten Whistle"
+      },
+      "whistle_crystal_tide": {
+        "name": "Crystal Tide Whistle"
+      },
+      "whistle_phantom": {
+        "name": "Phantom Whistle"
+      },
+      "whistle_emberfall_phoenix": {
+        "name": "Emberfall Phoenix Whistle"
+      },
+      "charm_stag_acorn": {
+        "name": "Acorn Crown Charm"
+      },
+      "charm_stag_gilded": {
+        "name": "Gilded Charm"
       },
       "lastflame_core": {
         "name": "Den sidste flammes kerne"
@@ -18451,6 +21459,1521 @@ export const da_DK: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Fortropsens Krigsdragt"
       },
+      "brookwatch_robe": {
+        "name": "Brookwatch Robe"
+      },
+      "brookwatch_leggings": {
+        "name": "Brookwatch Leggings"
+      },
+      "brookwatch_slippers": {
+        "name": "Brookwatch Slippers"
+      },
+      "brookwatch_hood": {
+        "name": "Brookwatch Hood"
+      },
+      "brookwatch_gloves": {
+        "name": "Brookwatch Gloves"
+      },
+      "brookwatch_mantle": {
+        "name": "Brookwatch Mantle"
+      },
+      "brookwatch_sash": {
+        "name": "Brookwatch Sash"
+      },
+      "brookwatch_jerkin": {
+        "name": "Brookwatch Jerkin"
+      },
+      "brookwatch_breeches": {
+        "name": "Brookwatch Breeches"
+      },
+      "brookwatch_boots": {
+        "name": "Brookwatch Boots"
+      },
+      "brookwatch_cap": {
+        "name": "Brookwatch Cap"
+      },
+      "brookwatch_grips": {
+        "name": "Brookwatch Grips"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "Brookwatch Shoulderpads"
+      },
+      "brookwatch_belt": {
+        "name": "Brookwatch Belt"
+      },
+      "brookwatch_hauberk": {
+        "name": "Brookwatch Hauberk"
+      },
+      "brookwatch_legguards": {
+        "name": "Brookwatch Legguards"
+      },
+      "brookwatch_sabatons": {
+        "name": "Brookwatch Sabatons"
+      },
+      "brookwatch_helm": {
+        "name": "Brookwatch Helm"
+      },
+      "brookwatch_gauntlets": {
+        "name": "Brookwatch Gauntlets"
+      },
+      "brookwatch_pauldrons": {
+        "name": "Brookwatch Pauldrons"
+      },
+      "brookwatch_girdle": {
+        "name": "Brookwatch Girdle"
+      },
+      "brookwatch_chainmail": {
+        "name": "Brookwatch Chainmail"
+      },
+      "brookwatch_chausses": {
+        "name": "Brookwatch Chausses"
+      },
+      "brookwatch_greaves": {
+        "name": "Brookwatch Greaves"
+      },
+      "brookwatch_coif": {
+        "name": "Brookwatch Coif"
+      },
+      "brookwatch_handguards": {
+        "name": "Brookwatch Handguards"
+      },
+      "brookwatch_spaulders": {
+        "name": "Brookwatch Spaulders"
+      },
+      "brookwatch_cord": {
+        "name": "Brookwatch Cord"
+      },
+      "hedgerow_robe": {
+        "name": "Hedgerow Robe"
+      },
+      "hedgerow_leggings": {
+        "name": "Hedgerow Leggings"
+      },
+      "hedgerow_slippers": {
+        "name": "Hedgerow Slippers"
+      },
+      "hedgerow_hood": {
+        "name": "Hedgerow Hood"
+      },
+      "hedgerow_gloves": {
+        "name": "Hedgerow Gloves"
+      },
+      "hedgerow_mantle": {
+        "name": "Hedgerow Mantle"
+      },
+      "hedgerow_sash": {
+        "name": "Hedgerow Sash"
+      },
+      "hedgerow_jerkin": {
+        "name": "Hedgerow Jerkin"
+      },
+      "hedgerow_breeches": {
+        "name": "Hedgerow Breeches"
+      },
+      "hedgerow_boots": {
+        "name": "Hedgerow Boots"
+      },
+      "hedgerow_cap": {
+        "name": "Hedgerow Cap"
+      },
+      "hedgerow_grips": {
+        "name": "Hedgerow Grips"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "Hedgerow Shoulderpads"
+      },
+      "hedgerow_belt": {
+        "name": "Hedgerow Belt"
+      },
+      "hedgerow_hauberk": {
+        "name": "Hedgerow Hauberk"
+      },
+      "hedgerow_legguards": {
+        "name": "Hedgerow Legguards"
+      },
+      "hedgerow_sabatons": {
+        "name": "Hedgerow Sabatons"
+      },
+      "hedgerow_helm": {
+        "name": "Hedgerow Helm"
+      },
+      "hedgerow_gauntlets": {
+        "name": "Hedgerow Gauntlets"
+      },
+      "hedgerow_pauldrons": {
+        "name": "Hedgerow Pauldrons"
+      },
+      "hedgerow_girdle": {
+        "name": "Hedgerow Girdle"
+      },
+      "hedgerow_chainmail": {
+        "name": "Hedgerow Chainmail"
+      },
+      "hedgerow_chausses": {
+        "name": "Hedgerow Chausses"
+      },
+      "hedgerow_greaves": {
+        "name": "Hedgerow Greaves"
+      },
+      "hedgerow_coif": {
+        "name": "Hedgerow Coif"
+      },
+      "hedgerow_handguards": {
+        "name": "Hedgerow Handguards"
+      },
+      "hedgerow_spaulders": {
+        "name": "Hedgerow Spaulders"
+      },
+      "hedgerow_cord": {
+        "name": "Hedgerow Cord"
+      },
+      "bogwalker_robe": {
+        "name": "Bogwalker Robe"
+      },
+      "bogwalker_leggings": {
+        "name": "Bogwalker Leggings"
+      },
+      "bogwalker_slippers": {
+        "name": "Bogwalker Slippers"
+      },
+      "bogwalker_hood": {
+        "name": "Bogwalker Hood"
+      },
+      "bogwalker_gloves": {
+        "name": "Bogwalker Gloves"
+      },
+      "bogwalker_mantle": {
+        "name": "Bogwalker Mantle"
+      },
+      "bogwalker_sash": {
+        "name": "Bogwalker Sash"
+      },
+      "bogwalker_jerkin": {
+        "name": "Bogwalker Jerkin"
+      },
+      "bogwalker_breeches": {
+        "name": "Bogwalker Breeches"
+      },
+      "bogwalker_boots": {
+        "name": "Bogwalker Boots"
+      },
+      "bogwalker_cap": {
+        "name": "Bogwalker Cap"
+      },
+      "bogwalker_grips": {
+        "name": "Bogwalker Grips"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "Bogwalker Shoulderpads"
+      },
+      "bogwalker_belt": {
+        "name": "Bogwalker Belt"
+      },
+      "bogwalker_hauberk": {
+        "name": "Bogwalker Hauberk"
+      },
+      "bogwalker_legguards": {
+        "name": "Bogwalker Legguards"
+      },
+      "bogwalker_sabatons": {
+        "name": "Bogwalker Sabatons"
+      },
+      "bogwalker_helm": {
+        "name": "Bogwalker Helm"
+      },
+      "bogwalker_gauntlets": {
+        "name": "Bogwalker Gauntlets"
+      },
+      "bogwalker_pauldrons": {
+        "name": "Bogwalker Pauldrons"
+      },
+      "bogwalker_girdle": {
+        "name": "Bogwalker Girdle"
+      },
+      "bogwalker_chainmail": {
+        "name": "Bogwalker Chainmail"
+      },
+      "bogwalker_chausses": {
+        "name": "Bogwalker Chausses"
+      },
+      "bogwalker_greaves": {
+        "name": "Bogwalker Greaves"
+      },
+      "bogwalker_coif": {
+        "name": "Bogwalker Coif"
+      },
+      "bogwalker_handguards": {
+        "name": "Bogwalker Handguards"
+      },
+      "bogwalker_spaulders": {
+        "name": "Bogwalker Spaulders"
+      },
+      "bogwalker_cord": {
+        "name": "Bogwalker Cord"
+      },
+      "thornspire_robe": {
+        "name": "Thornspire Robe"
+      },
+      "thornspire_leggings": {
+        "name": "Thornspire Leggings"
+      },
+      "thornspire_slippers": {
+        "name": "Thornspire Slippers"
+      },
+      "thornspire_hood": {
+        "name": "Thornspire Hood"
+      },
+      "thornspire_gloves": {
+        "name": "Thornspire Gloves"
+      },
+      "thornspire_mantle": {
+        "name": "Thornspire Mantle"
+      },
+      "thornspire_sash": {
+        "name": "Thornspire Sash"
+      },
+      "thornspire_jerkin": {
+        "name": "Thornspire Jerkin"
+      },
+      "thornspire_breeches": {
+        "name": "Thornspire Breeches"
+      },
+      "thornspire_boots": {
+        "name": "Thornspire Boots"
+      },
+      "thornspire_cap": {
+        "name": "Thornspire Cap"
+      },
+      "thornspire_grips": {
+        "name": "Thornspire Grips"
+      },
+      "thornspire_shoulderpads": {
+        "name": "Thornspire Shoulderpads"
+      },
+      "thornspire_belt": {
+        "name": "Thornspire Belt"
+      },
+      "thornspire_hauberk": {
+        "name": "Thornspire Hauberk"
+      },
+      "thornspire_legguards": {
+        "name": "Thornspire Legguards"
+      },
+      "thornspire_sabatons": {
+        "name": "Thornspire Sabatons"
+      },
+      "thornspire_helm": {
+        "name": "Thornspire Helm"
+      },
+      "thornspire_gauntlets": {
+        "name": "Thornspire Gauntlets"
+      },
+      "thornspire_pauldrons": {
+        "name": "Thornspire Pauldrons"
+      },
+      "thornspire_girdle": {
+        "name": "Thornspire Girdle"
+      },
+      "thornspire_chainmail": {
+        "name": "Thornspire Chainmail"
+      },
+      "thornspire_chausses": {
+        "name": "Thornspire Chausses"
+      },
+      "thornspire_greaves": {
+        "name": "Thornspire Greaves"
+      },
+      "thornspire_coif": {
+        "name": "Thornspire Coif"
+      },
+      "thornspire_handguards": {
+        "name": "Thornspire Handguards"
+      },
+      "thornspire_spaulders": {
+        "name": "Thornspire Spaulders"
+      },
+      "thornspire_cord": {
+        "name": "Thornspire Cord"
+      },
+      "hollowveil_robe": {
+        "name": "Hollowveil Robe"
+      },
+      "hollowveil_leggings": {
+        "name": "Hollowveil Leggings"
+      },
+      "hollowveil_slippers": {
+        "name": "Hollowveil Slippers"
+      },
+      "hollowveil_hood": {
+        "name": "Hollowveil Hood"
+      },
+      "hollowveil_gloves": {
+        "name": "Hollowveil Gloves"
+      },
+      "hollowveil_mantle": {
+        "name": "Hollowveil Mantle"
+      },
+      "hollowveil_sash": {
+        "name": "Hollowveil Sash"
+      },
+      "hollowveil_jerkin": {
+        "name": "Hollowveil Jerkin"
+      },
+      "hollowveil_breeches": {
+        "name": "Hollowveil Breeches"
+      },
+      "hollowveil_boots": {
+        "name": "Hollowveil Boots"
+      },
+      "hollowveil_cap": {
+        "name": "Hollowveil Cap"
+      },
+      "hollowveil_grips": {
+        "name": "Hollowveil Grips"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "Hollowveil Shoulderpads"
+      },
+      "hollowveil_belt": {
+        "name": "Hollowveil Belt"
+      },
+      "hollowveil_hauberk": {
+        "name": "Hollowveil Hauberk"
+      },
+      "hollowveil_legguards": {
+        "name": "Hollowveil Legguards"
+      },
+      "hollowveil_sabatons": {
+        "name": "Hollowveil Sabatons"
+      },
+      "hollowveil_helm": {
+        "name": "Hollowveil Helm"
+      },
+      "hollowveil_gauntlets": {
+        "name": "Hollowveil Gauntlets"
+      },
+      "hollowveil_pauldrons": {
+        "name": "Hollowveil Pauldrons"
+      },
+      "hollowveil_girdle": {
+        "name": "Hollowveil Girdle"
+      },
+      "hollowveil_chainmail": {
+        "name": "Hollowveil Chainmail"
+      },
+      "hollowveil_chausses": {
+        "name": "Hollowveil Chausses"
+      },
+      "hollowveil_greaves": {
+        "name": "Hollowveil Greaves"
+      },
+      "hollowveil_coif": {
+        "name": "Hollowveil Coif"
+      },
+      "hollowveil_handguards": {
+        "name": "Hollowveil Handguards"
+      },
+      "hollowveil_spaulders": {
+        "name": "Hollowveil Spaulders"
+      },
+      "hollowveil_cord": {
+        "name": "Hollowveil Cord"
+      },
+      "trailwarden_robe": {
+        "name": "Trailwarden Robe"
+      },
+      "trailwarden_leggings": {
+        "name": "Trailwarden Leggings"
+      },
+      "trailwarden_slippers": {
+        "name": "Trailwarden Slippers"
+      },
+      "trailwarden_hood": {
+        "name": "Trailwarden Hood"
+      },
+      "trailwarden_gloves": {
+        "name": "Trailwarden Gloves"
+      },
+      "trailwarden_mantle": {
+        "name": "Trailwarden Mantle"
+      },
+      "trailwarden_sash": {
+        "name": "Trailwarden Sash"
+      },
+      "trailwarden_jerkin": {
+        "name": "Trailwarden Jerkin"
+      },
+      "trailwarden_breeches": {
+        "name": "Trailwarden Breeches"
+      },
+      "trailwarden_boots": {
+        "name": "Trailwarden Boots"
+      },
+      "trailwarden_cap": {
+        "name": "Trailwarden Cap"
+      },
+      "trailwarden_grips": {
+        "name": "Trailwarden Grips"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "Trailwarden Shoulderpads"
+      },
+      "trailwarden_belt": {
+        "name": "Trailwarden Belt"
+      },
+      "trailwarden_hauberk": {
+        "name": "Trailwarden Hauberk"
+      },
+      "trailwarden_legguards": {
+        "name": "Trailwarden Legguards"
+      },
+      "trailwarden_sabatons": {
+        "name": "Trailwarden Sabatons"
+      },
+      "trailwarden_helm": {
+        "name": "Trailwarden Helm"
+      },
+      "trailwarden_gauntlets": {
+        "name": "Trailwarden Gauntlets"
+      },
+      "trailwarden_pauldrons": {
+        "name": "Trailwarden Pauldrons"
+      },
+      "trailwarden_girdle": {
+        "name": "Trailwarden Girdle"
+      },
+      "trailwarden_chainmail": {
+        "name": "Trailwarden Chainmail"
+      },
+      "trailwarden_chausses": {
+        "name": "Trailwarden Chausses"
+      },
+      "trailwarden_greaves": {
+        "name": "Trailwarden Greaves"
+      },
+      "trailwarden_coif": {
+        "name": "Trailwarden Coif"
+      },
+      "trailwarden_handguards": {
+        "name": "Trailwarden Handguards"
+      },
+      "trailwarden_spaulders": {
+        "name": "Trailwarden Spaulders"
+      },
+      "trailwarden_cord": {
+        "name": "Trailwarden Cord"
+      },
+      "highgale_robe": {
+        "name": "Highgale Robe"
+      },
+      "highgale_leggings": {
+        "name": "Highgale Leggings"
+      },
+      "highgale_slippers": {
+        "name": "Highgale Slippers"
+      },
+      "highgale_hood": {
+        "name": "Highgale Hood"
+      },
+      "highgale_gloves": {
+        "name": "Highgale Gloves"
+      },
+      "highgale_mantle": {
+        "name": "Highgale Mantle"
+      },
+      "highgale_sash": {
+        "name": "Highgale Sash"
+      },
+      "highgale_jerkin": {
+        "name": "Highgale Jerkin"
+      },
+      "highgale_breeches": {
+        "name": "Highgale Breeches"
+      },
+      "highgale_boots": {
+        "name": "Highgale Boots"
+      },
+      "highgale_cap": {
+        "name": "Highgale Cap"
+      },
+      "highgale_grips": {
+        "name": "Highgale Grips"
+      },
+      "highgale_shoulderpads": {
+        "name": "Highgale Shoulderpads"
+      },
+      "highgale_belt": {
+        "name": "Highgale Belt"
+      },
+      "highgale_hauberk": {
+        "name": "Highgale Hauberk"
+      },
+      "highgale_legguards": {
+        "name": "Highgale Legguards"
+      },
+      "highgale_sabatons": {
+        "name": "Highgale Sabatons"
+      },
+      "highgale_helm": {
+        "name": "Highgale Helm"
+      },
+      "highgale_gauntlets": {
+        "name": "Highgale Gauntlets"
+      },
+      "highgale_pauldrons": {
+        "name": "Highgale Pauldrons"
+      },
+      "highgale_girdle": {
+        "name": "Highgale Girdle"
+      },
+      "highgale_chainmail": {
+        "name": "Highgale Chainmail"
+      },
+      "highgale_chausses": {
+        "name": "Highgale Chausses"
+      },
+      "highgale_greaves": {
+        "name": "Highgale Greaves"
+      },
+      "brookwatch_tunic": {
+        "name": "Brookwatch Tunic"
+      },
+      "brookwatch_legwraps": {
+        "name": "Brookwatch Legwraps"
+      },
+      "brookwatch_treads": {
+        "name": "Brookwatch Treads"
+      },
+      "brookwatch_headguard": {
+        "name": "Brookwatch Headguard"
+      },
+      "brookwatch_handwraps": {
+        "name": "Brookwatch Handwraps"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "Brookwatch Shoulderguards"
+      },
+      "brookwatch_waistguard": {
+        "name": "Brookwatch Waistguard"
+      },
+      "hedgerow_tunic": {
+        "name": "Hedgerow Tunic"
+      },
+      "hedgerow_legwraps": {
+        "name": "Hedgerow Legwraps"
+      },
+      "hedgerow_treads": {
+        "name": "Hedgerow Treads"
+      },
+      "hedgerow_headguard": {
+        "name": "Hedgerow Headguard"
+      },
+      "hedgerow_handwraps": {
+        "name": "Hedgerow Handwraps"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "Hedgerow Shoulderguards"
+      },
+      "hedgerow_waistguard": {
+        "name": "Hedgerow Waistguard"
+      },
+      "bogwalker_tunic": {
+        "name": "Bogwalker Tunic"
+      },
+      "bogwalker_legwraps": {
+        "name": "Bogwalker Legwraps"
+      },
+      "bogwalker_treads": {
+        "name": "Bogwalker Treads"
+      },
+      "bogwalker_headguard": {
+        "name": "Bogwalker Headguard"
+      },
+      "bogwalker_handwraps": {
+        "name": "Bogwalker Handwraps"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "Bogwalker Shoulderguards"
+      },
+      "bogwalker_waistguard": {
+        "name": "Bogwalker Waistguard"
+      },
+      "thornspire_tunic": {
+        "name": "Thornspire Tunic"
+      },
+      "thornspire_legwraps": {
+        "name": "Thornspire Legwraps"
+      },
+      "thornspire_treads": {
+        "name": "Thornspire Treads"
+      },
+      "thornspire_headguard": {
+        "name": "Thornspire Headguard"
+      },
+      "thornspire_handwraps": {
+        "name": "Thornspire Handwraps"
+      },
+      "thornspire_shoulderguards": {
+        "name": "Thornspire Shoulderguards"
+      },
+      "thornspire_waistguard": {
+        "name": "Thornspire Waistguard"
+      },
+      "hollowveil_tunic": {
+        "name": "Hollowveil Tunic"
+      },
+      "hollowveil_legwraps": {
+        "name": "Hollowveil Legwraps"
+      },
+      "hollowveil_treads": {
+        "name": "Hollowveil Treads"
+      },
+      "hollowveil_headguard": {
+        "name": "Hollowveil Headguard"
+      },
+      "hollowveil_handwraps": {
+        "name": "Hollowveil Handwraps"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "Hollowveil Shoulderguards"
+      },
+      "hollowveil_waistguard": {
+        "name": "Hollowveil Waistguard"
+      },
+      "trailwarden_tunic": {
+        "name": "Trailwarden Tunic"
+      },
+      "trailwarden_legwraps": {
+        "name": "Trailwarden Legwraps"
+      },
+      "trailwarden_treads": {
+        "name": "Trailwarden Treads"
+      },
+      "trailwarden_headguard": {
+        "name": "Trailwarden Headguard"
+      },
+      "trailwarden_handwraps": {
+        "name": "Trailwarden Handwraps"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "Trailwarden Shoulderguards"
+      },
+      "trailwarden_waistguard": {
+        "name": "Trailwarden Waistguard"
+      },
+      "highgale_tunic": {
+        "name": "Highgale Tunic"
+      },
+      "highgale_legwraps": {
+        "name": "Highgale Legwraps"
+      },
+      "highgale_treads": {
+        "name": "Highgale Treads"
+      },
+      "highgale_headguard": {
+        "name": "Highgale Headguard"
+      },
+      "highgale_handwraps": {
+        "name": "Highgale Handwraps"
+      },
+      "highgale_shoulderguards": {
+        "name": "Highgale Shoulderguards"
+      },
+      "highgale_waistguard": {
+        "name": "Highgale Waistguard"
+      },
+      "highgale_coif": {
+        "name": "Highgale Coif"
+      },
+      "highgale_handguards": {
+        "name": "Highgale Handguards"
+      },
+      "highgale_spaulders": {
+        "name": "Highgale Spaulders"
+      },
+      "highgale_cord": {
+        "name": "Highgale Cord"
+      },
+      "breakwater_mantle": {
+        "name": "Breakwater Mantle"
+      },
+      "breakwater_shoulderpads": {
+        "name": "Breakwater Shoulderpads"
+      },
+      "breakwater_spaulders": {
+        "name": "Breakwater Spaulders"
+      },
+      "gravebell_treads": {
+        "name": "Gravebell Treads"
+      },
+      "gravebell_greaves": {
+        "name": "Gravebell Greaves"
+      },
+      "cryptbound_tunic": {
+        "name": "Cryptbound Tunic"
+      },
+      "cryptbound_chainmail": {
+        "name": "Cryptbound Chainmail"
+      },
+      "oathbroken_leggings": {
+        "name": "Oathbroken Leggings"
+      },
+      "oathbroken_breeches": {
+        "name": "Oathbroken Breeches"
+      },
+      "oathbroken_legwraps": {
+        "name": "Oathbroken Legwraps"
+      },
+      "oathbroken_legguards": {
+        "name": "Oathbroken Legguards"
+      },
+      "oathbroken_chausses": {
+        "name": "Oathbroken Chausses"
+      },
+      "seamist_legwraps": {
+        "name": "Seamist Legwraps"
+      },
+      "seamist_chausses": {
+        "name": "Seamist Chausses"
+      },
+      "warmonger_treads": {
+        "name": "Warmonger Treads"
+      },
+      "warmonger_greaves": {
+        "name": "Warmonger Greaves"
+      },
+      "sparkglass_leggings": {
+        "name": "Sparkglass Leggings"
+      },
+      "sparkglass_breeches": {
+        "name": "Sparkglass Breeches"
+      },
+      "sparkglass_legwraps": {
+        "name": "Sparkglass Legwraps"
+      },
+      "sparkglass_legguards": {
+        "name": "Sparkglass Legguards"
+      },
+      "sparkglass_chausses": {
+        "name": "Sparkglass Chausses"
+      },
+      "stillhymn_treads": {
+        "name": "Stillhymn Treads"
+      },
+      "stillhymn_greaves": {
+        "name": "Stillhymn Greaves"
+      },
+      "pearlglow_headguard": {
+        "name": "Pearlglow Headguard"
+      },
+      "pearlglow_coif": {
+        "name": "Pearlglow Coif"
+      },
+      "sealkeeper_gloves": {
+        "name": "Sealkeeper Gloves"
+      },
+      "sealkeeper_grips": {
+        "name": "Sealkeeper Grips"
+      },
+      "sealkeeper_handwraps": {
+        "name": "Sealkeeper Handwraps"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "Sealkeeper Gauntlets"
+      },
+      "sealkeeper_handguards": {
+        "name": "Sealkeeper Handguards"
+      },
+      "fetterbound_leggings": {
+        "name": "Fetterbound Leggings"
+      },
+      "fetterbound_breeches": {
+        "name": "Fetterbound Breeches"
+      },
+      "fetterbound_legwraps": {
+        "name": "Fetterbound Legwraps"
+      },
+      "fetterbound_legguards": {
+        "name": "Fetterbound Legguards"
+      },
+      "fetterbound_chausses": {
+        "name": "Fetterbound Chausses"
+      },
+      "shroudcaller_tunic": {
+        "name": "Shroudcaller Tunic"
+      },
+      "shroudcaller_chainmail": {
+        "name": "Shroudcaller Chainmail"
+      },
+      "wyrmshadow_tunic": {
+        "name": "Wyrmshadow Tunic"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "Wyrmshadow Chainmail"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "Cinderbrood Shoulderpads"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "Cinderbrood Shoulderguards"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "Cinderbrood Pauldrons"
+      },
+      "hoarfrost_mantle": {
+        "name": "Hoarfrost Mantle"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "Hoarfrost Shoulderpads"
+      },
+      "hoarfrost_spaulders": {
+        "name": "Hoarfrost Spaulders"
+      },
+      "blackmere_mantle": {
+        "name": "Blackmere Mantle"
+      },
+      "blackmere_shoulderpads": {
+        "name": "Blackmere Shoulderpads"
+      },
+      "blackmere_shoulderguards": {
+        "name": "Blackmere Shoulderguards"
+      },
+      "blackmere_pauldrons": {
+        "name": "Blackmere Pauldrons"
+      },
+      "blackmere_spaulders": {
+        "name": "Blackmere Spaulders"
+      },
+      "reedhush_mantle": {
+        "name": "Reedhush Mantle"
+      },
+      "reedhush_shoulderpads": {
+        "name": "Reedhush Shoulderpads"
+      },
+      "reedhush_shoulderguards": {
+        "name": "Reedhush Shoulderguards"
+      },
+      "reedhush_pauldrons": {
+        "name": "Reedhush Pauldrons"
+      },
+      "reedhush_spaulders": {
+        "name": "Reedhush Spaulders"
+      },
+      "cairnking_mantle": {
+        "name": "Cairnking Mantle"
+      },
+      "cairnking_shoulderpads": {
+        "name": "Cairnking Shoulderpads"
+      },
+      "cairnking_shoulderguards": {
+        "name": "Cairnking Shoulderguards"
+      },
+      "cairnking_pauldrons": {
+        "name": "Cairnking Pauldrons"
+      },
+      "cairnking_spaulders": {
+        "name": "Cairnking Spaulders"
+      },
+      "palehunt_mantle": {
+        "name": "Palehunt Mantle"
+      },
+      "palehunt_shoulderpads": {
+        "name": "Palehunt Shoulderpads"
+      },
+      "palehunt_shoulderguards": {
+        "name": "Palehunt Shoulderguards"
+      },
+      "palehunt_pauldrons": {
+        "name": "Palehunt Pauldrons"
+      },
+      "palehunt_spaulders": {
+        "name": "Palehunt Spaulders"
+      },
+      "jadeshrine_mantle": {
+        "name": "Jadeshrine Mantle"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "Jadeshrine Shoulderpads"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "Jadeshrine Shoulderguards"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "Jadeshrine Pauldrons"
+      },
+      "jadeshrine_spaulders": {
+        "name": "Jadeshrine Spaulders"
+      },
+      "gildhedge_mantle": {
+        "name": "Gildhedge Mantle"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "Gildhedge Shoulderpads"
+      },
+      "gildhedge_spaulders": {
+        "name": "Gildhedge Spaulders"
+      },
+      "saltwrack_mantle": {
+        "name": "Saltwrack Mantle"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "Saltwrack Shoulderpads"
+      },
+      "saltwrack_spaulders": {
+        "name": "Saltwrack Spaulders"
+      },
+      "brookwatch_vest": {
+        "name": "Brookwatch Vest"
+      },
+      "brookwatch_trousers": {
+        "name": "Brookwatch Trousers"
+      },
+      "brookwatch_moccasins": {
+        "name": "Brookwatch Moccasins"
+      },
+      "brookwatch_cowl": {
+        "name": "Brookwatch Cowl"
+      },
+      "brookwatch_mitts": {
+        "name": "Brookwatch Mitts"
+      },
+      "brookwatch_epaulets": {
+        "name": "Brookwatch Epaulets"
+      },
+      "brookwatch_cinch": {
+        "name": "Brookwatch Cinch"
+      },
+      "hedgerow_vest": {
+        "name": "Hedgerow Vest"
+      },
+      "hedgerow_trousers": {
+        "name": "Hedgerow Trousers"
+      },
+      "hedgerow_moccasins": {
+        "name": "Hedgerow Moccasins"
+      },
+      "hedgerow_cowl": {
+        "name": "Hedgerow Cowl"
+      },
+      "hedgerow_mitts": {
+        "name": "Hedgerow Mitts"
+      },
+      "hedgerow_epaulets": {
+        "name": "Hedgerow Epaulets"
+      },
+      "hedgerow_cinch": {
+        "name": "Hedgerow Cinch"
+      },
+      "bogwalker_vest": {
+        "name": "Bogwalker Vest"
+      },
+      "bogwalker_trousers": {
+        "name": "Bogwalker Trousers"
+      },
+      "bogwalker_moccasins": {
+        "name": "Bogwalker Moccasins"
+      },
+      "bogwalker_cowl": {
+        "name": "Bogwalker Cowl"
+      },
+      "bogwalker_mitts": {
+        "name": "Bogwalker Mitts"
+      },
+      "bogwalker_epaulets": {
+        "name": "Bogwalker Epaulets"
+      },
+      "bogwalker_cinch": {
+        "name": "Bogwalker Cinch"
+      },
+      "thornspire_vest": {
+        "name": "Thornspire Vest"
+      },
+      "thornspire_trousers": {
+        "name": "Thornspire Trousers"
+      },
+      "thornspire_moccasins": {
+        "name": "Thornspire Moccasins"
+      },
+      "thornspire_cowl": {
+        "name": "Thornspire Cowl"
+      },
+      "thornspire_mitts": {
+        "name": "Thornspire Mitts"
+      },
+      "thornspire_epaulets": {
+        "name": "Thornspire Epaulets"
+      },
+      "thornspire_cinch": {
+        "name": "Thornspire Cinch"
+      },
+      "hollowveil_vest": {
+        "name": "Hollowveil Vest"
+      },
+      "hollowveil_trousers": {
+        "name": "Hollowveil Trousers"
+      },
+      "hollowveil_moccasins": {
+        "name": "Hollowveil Moccasins"
+      },
+      "hollowveil_cowl": {
+        "name": "Hollowveil Cowl"
+      },
+      "hollowveil_mitts": {
+        "name": "Hollowveil Mitts"
+      },
+      "hollowveil_epaulets": {
+        "name": "Hollowveil Epaulets"
+      },
+      "hollowveil_cinch": {
+        "name": "Hollowveil Cinch"
+      },
+      "trailwarden_vest": {
+        "name": "Trailwarden Vest"
+      },
+      "trailwarden_trousers": {
+        "name": "Trailwarden Trousers"
+      },
+      "trailwarden_moccasins": {
+        "name": "Trailwarden Moccasins"
+      },
+      "trailwarden_cowl": {
+        "name": "Trailwarden Cowl"
+      },
+      "trailwarden_mitts": {
+        "name": "Trailwarden Mitts"
+      },
+      "trailwarden_epaulets": {
+        "name": "Trailwarden Epaulets"
+      },
+      "trailwarden_cinch": {
+        "name": "Trailwarden Cinch"
+      },
+      "highgale_vest": {
+        "name": "Highgale Vest"
+      },
+      "highgale_trousers": {
+        "name": "Highgale Trousers"
+      },
+      "highgale_moccasins": {
+        "name": "Highgale Moccasins"
+      },
+      "highgale_cowl": {
+        "name": "Highgale Cowl"
+      },
+      "highgale_mitts": {
+        "name": "Highgale Mitts"
+      },
+      "highgale_epaulets": {
+        "name": "Highgale Epaulets"
+      },
+      "highgale_cinch": {
+        "name": "Highgale Cinch"
+      },
+      "breakwater_shoulderguards": {
+        "name": "Breakwater Shoulderguards"
+      },
+      "breakwater_pauldrons": {
+        "name": "Breakwater Pauldrons"
+      },
+      "breakwater_epaulets": {
+        "name": "Breakwater Epaulets"
+      },
+      "gravebell_moccasins": {
+        "name": "Gravebell Moccasins"
+      },
+      "oathbroken_trousers": {
+        "name": "Oathbroken Trousers"
+      },
+      "sparkglass_trousers": {
+        "name": "Sparkglass Trousers"
+      },
+      "stillhymn_moccasins": {
+        "name": "Stillhymn Moccasins"
+      },
+      "sealkeeper_mitts": {
+        "name": "Sealkeeper Mitts"
+      },
+      "fetterbound_trousers": {
+        "name": "Fetterbound Trousers"
+      },
+      "wyrmshadow_vest": {
+        "name": "Wyrmshadow Vest"
+      },
+      "cinderbrood_spaulders": {
+        "name": "Cinderbrood Spaulders"
+      },
+      "cinderbrood_epaulets": {
+        "name": "Cinderbrood Epaulets"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "Hoarfrost Shoulderguards"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "Hoarfrost Pauldrons"
+      },
+      "hoarfrost_epaulets": {
+        "name": "Hoarfrost Epaulets"
+      },
+      "blackmere_epaulets": {
+        "name": "Blackmere Epaulets"
+      },
+      "reedhush_epaulets": {
+        "name": "Reedhush Epaulets"
+      },
+      "cairnking_epaulets": {
+        "name": "Cairnking Epaulets"
+      },
+      "palehunt_epaulets": {
+        "name": "Palehunt Epaulets"
+      },
+      "jadeshrine_epaulets": {
+        "name": "Jadeshrine Epaulets"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "Gildhedge Shoulderguards"
+      },
+      "gildhedge_pauldrons": {
+        "name": "Gildhedge Pauldrons"
+      },
+      "gildhedge_epaulets": {
+        "name": "Gildhedge Epaulets"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "Saltwrack Shoulderguards"
+      },
+      "saltwrack_pauldrons": {
+        "name": "Saltwrack Pauldrons"
+      },
+      "saltwrack_epaulets": {
+        "name": "Saltwrack Epaulets"
+      },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
+      "gravedirt_treads": {
+        "name": "Gravedirt Treads"
+      },
+      "bellrope_girdle": {
+        "name": "Bellrope Girdle"
+      },
+      "sextons_spadehaft": {
+        "name": "Sexton's Spadehaft"
+      },
+      "rimesilk_mantle": {
+        "name": "Rimesilk Mantle"
+      },
+      "bonechill_carapace_vest": {
+        "name": "Bonechill Hauberk"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "Rime-Laced Leggings"
+      },
+      "rimeweb_fang": {
+        "name": "Bride's Icicle"
+      },
+      "cantors_cassock": {
+        "name": "Cantor's Cassock"
+      },
+      "choirward_leggings": {
+        "name": "Choirward Leggings"
+      },
+      "choristers_gloves": {
+        "name": "Chorister's Gloves"
+      },
+      "cantors_hymnal": {
+        "name": "Cantor's Hymnal"
+      },
+      "gravecallers_vestments": {
+        "name": "Gravecaller's Vestments"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "Unquiet Stalker's Hood"
+      },
+      "sextons_burial_spade": {
+        "name": "Sexton's Burial Spade"
+      },
+      "rimesilk_hood": {
+        "name": "Rimesilk Hood"
+      },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "Jailer's Iron Gauntlets"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "Turnkey's Keyring Belt"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "Turnkey's Lantern Cowl"
+      },
+      "conchplate_girdle": {
+        "name": "Conchplate Girdle"
+      },
+      "pale_chorus_leggings": {
+        "name": "Pale Chorus Leggings"
+      },
+      "refrain_silk_gloves": {
+        "name": "Refrain Silk Gloves"
+      },
+      "chorus_conch": {
+        "name": "Chorus Conch"
+      },
+      "tideglass_pauldrons": {
+        "name": "Tideglass Pauldrons"
+      },
+      "moonburn_treads": {
+        "name": "Moonburn Treads"
+      },
+      "prism_etched_cowl": {
+        "name": "Prism-Etched Cowl"
+      },
+      "tideglass_shiv": {
+        "name": "Tideglass Shiv"
+      },
+      "pale_chorus_vestment": {
+        "name": "Pale Chorus Vestment"
+      },
+      "tideglass_warmaul": {
+        "name": "Tideglass Warmaul"
+      },
+      "beastpit_warbelt": {
+        "name": "Beastpit Warbelt"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "Jaguar-Hide Jerkin"
+      },
+      "hexbone_handwraps": {
+        "name": "Hexbone Handwraps"
+      },
+      "rootbound_sabatons": {
+        "name": "Rootbound Sabatons"
+      },
+      "pollen_dusted_leggings": {
+        "name": "Pollen-Dusted Leggings"
+      },
+      "bloomsilk_cowl": {
+        "name": "Bloomsilk Cowl"
+      },
+      "falls_blessed_staff": {
+        "name": "Falls-Blessed Staff"
+      },
+      "fanglords_hide_mantle": {
+        "name": "Fanglord's Hide Mantle"
+      },
+      "thornroot_greathelm": {
+        "name": "Thorncrowned Greathelm"
+      },
+      "foremans_grips": {
+        "name": "Foreman's Grips"
+      },
+      "serac_stride_boots": {
+        "name": "Serac-Stride Boots"
+      },
+      "seal_rune_mantle": {
+        "name": "Seal-Rune Mantle"
+      },
+      "thawbound_legguards": {
+        "name": "Thawbound Legguards"
+      },
+      "pyre_tenders_hood": {
+        "name": "Pyre-Tender's Hood"
+      },
+      "meltwater_cord": {
+        "name": "Meltwater Cord"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "Hammer of the Open Lock"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "Vestments of the Waking Rite"
+      },
+      "spadeworn_gauntlets": {
+        "name": "Spadeworn Gauntlets"
+      },
+      "gravedirt_grips": {
+        "name": "Gravedirt Grips"
+      },
+      "bellrope_mitts": {
+        "name": "Bellrope Mitts"
+      },
+      "rimewreath_coif": {
+        "name": "Rimewreath Coif"
+      },
+      "rime_laced_hood": {
+        "name": "Rime-Laced Hood"
+      },
+      "lamenting_veil": {
+        "name": "Lamenting Veil"
+      },
+      "choirward_pauldrons": {
+        "name": "Choirward Pauldrons"
+      },
+      "choristers_spaulders": {
+        "name": "Chorister's Spaulders"
+      },
+      "cantors_stole": {
+        "name": "Cantor's Stole"
+      },
+      "knellbound_hauberk": {
+        "name": "Knellbound Hauberk"
+      },
+      "candlewatch_jerkin": {
+        "name": "Candlewatch Jerkin"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "Robe of the Unquiet Rite"
+      },
+      "gravecallers_rod": {
+        "name": "Gravecaller's Rod"
+      },
+      "portcullis_girdle": {
+        "name": "Portcullis Girdle"
+      },
+      "cellwatch_belt": {
+        "name": "Cellwatch Belt"
+      },
+      "lanternwick_sash": {
+        "name": "Lanternwick Sash"
+      },
+      "turnkeys_shank": {
+        "name": "Turnkey's Shank"
+      },
+      "gaolyard_jerkin": {
+        "name": "Gaolyard Jerkin"
+      },
+      "brinewarden_robe": {
+        "name": "Brinewarden Robe"
+      },
+      "fogbinders_rod": {
+        "name": "Fogbinder's Rod"
+      },
+      "conchplate_sabatons": {
+        "name": "Conchplate Sabatons"
+      },
+      "pale_chorus_slippers": {
+        "name": "Pale Chorus Slippers"
+      },
+      "tideglass_gauntlets": {
+        "name": "Tideglass Gauntlets"
+      },
+      "moonburn_grips": {
+        "name": "Moonburn Grips"
+      },
+      "prism_etched_handwraps": {
+        "name": "Prism-Etched Handwraps"
+      },
+      "mere_crested_helm": {
+        "name": "Mere-Crested Helm"
+      },
+      "mereskin_hood": {
+        "name": "Mereskin Hood"
+      },
+      "merewater_cowl": {
+        "name": "Merewater Cowl"
+      },
+      "merecleaver": {
+        "name": "Merecleaver"
+      },
+      "moonwrack_stave": {
+        "name": "Moonwrack Stave"
+      },
+      "membership_token": {
+        "name": "Membership Token (30 Days)"
+      },
+      "referral_satchel": {
+        "name": "Friendship Satchel"
+      },
+      "referral_hollow_charm": {
+        "name": "Oathkeeper's Heart"
+      },
+      "referral_fog_charm": {
+        "name": "Awakened Oathkeeper's Heart"
+      },
+      "reins_referral_tank": {
+        "name": "Friendship Tank Reins"
+      },
+      "reins_referral_raptor": {
+        "name": "Friendship Raptor Reins"
+      },
+      "referral_helmet": {
+        "name": "Friendship Helm"
+      },
+      "referral_shoulder": {
+        "name": "Friendship Pauldrons"
+      },
+      "referral_chest": {
+        "name": "Friendship Cuirass"
+      },
+      "referral_waist": {
+        "name": "Friendship Girdle"
+      },
+      "referral_legs": {
+        "name": "Friendship Legguards"
+      },
+      "referral_gloves": {
+        "name": "Friendship Gauntlets"
+      },
+      "referral_feet": {
+        "name": "Friendship Boots"
+      },
+      "membership_helmet": {
+        "name": "Membership Helm"
+      },
+      "membership_shoulder": {
+        "name": "Membership Pauldrons"
+      },
+      "membership_chest": {
+        "name": "Membership Cuirass"
+      },
+      "membership_waist": {
+        "name": "Membership Girdle"
+      },
+      "membership_legs": {
+        "name": "Membership Legguards"
+      },
+      "membership_gloves": {
+        "name": "Membership Gauntlets"
+      },
+      "membership_feet": {
+        "name": "Membership Boots"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },
@@ -19306,6 +23829,24 @@ export const da_DK: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Digelens Hjerte"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
+      "fanglords_whistle": {
+        "name": "Fanglord's Whistle"
+      },
+      "gorgebloom_seedpod": {
+        "name": "Gorgebloom Seedpod"
+      },
+      "foremans_last_link": {
+        "name": "Foreman's Last Link"
+      },
+      "phial_of_the_tithe": {
+        "name": "Phial of the Tithe"
+      },
+      "quenchwater_flask": {
+        "name": "Quenchwater Flask"
+      },
       "rift_watchers_band": {
         "name": "Revnevogterens Ring"
       },
@@ -19440,6 +23981,9 @@ export const da_DK: EnTranslations = {
       "restless_bones": {
         "name": "Rastløse Knogler"
       },
+      "marrow_restless_bones": {
+        "name": "Restless Bones"
+      },
       "gorrak": {
         "name": "Gorrak den Nådesløse"
       },
@@ -19557,6 +24101,75 @@ export const da_DK: EnTranslations = {
       "morthen": {
         "name": "Morthen Gravkalderen"
       },
+      "ossuary_sentinel": {
+        "name": "Ossuary Sentinel"
+      },
+      "hollow_gravedigger": {
+        "name": "Hollow Gravedigger"
+      },
+      "rime_egg_sac": {
+        "name": "Rime Egg Sac"
+      },
+      "rimeweb_hatchling": {
+        "name": "Rimeweb Hatchling"
+      },
+      "rimeweb_spinner": {
+        "name": "Rimeweb Spinner"
+      },
+      "candlewright_acolyte": {
+        "name": "Candlewright Acolyte"
+      },
+      "hollow_chorister": {
+        "name": "Hollow Chorister"
+      },
+      "bound_soul": {
+        "name": "Bound Soul"
+      },
+      "rimeweb": {
+        "name": "Lady of the Bonechill"
+      },
+      "cantor_ilvane": {
+        "name": "Cantor Ilvane"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "Ossuary Warrior"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "Gravecaller Adept"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "Ossuary Cutthroat"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "Gravecaller Necromancer"
+      },
+      "crypt_bone_minion": {
+        "name": "Bone Minion"
+      },
+      "crypt_bone_brute": {
+        "name": "Bone Brute"
+      },
+      "crypt_bone_pile": {
+        "name": "Stirring Bones"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "Chapel Gargoyle"
+      },
+      "crypt_crow_caller": {
+        "name": "Crow Caller"
+      },
+      "crypt_carrion_crow": {
+        "name": "Carrion Crow"
+      },
+      "crypt_ossuary_drake": {
+        "name": "Ossuary Drake"
+      },
+      "crypt_knellwyrm": {
+        "name": "Knellwyrm"
+      },
+      "crypt_remembrance_candle": {
+        "name": "Remembrance Candle"
+      },
       "bastion_revenant": {
         "name": "Bastionens Genganger"
       },
@@ -19571,6 +24184,102 @@ export const da_DK: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael Fogbinderen"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Wreckbound Sailor"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "Shipwreck Captain"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
+      },
+      "bastion_gaol_cage": {
+        "name": "Iron Cage"
+      },
+      "bastion_drowned_anchor": {
+        "name": "Drowned Anchor"
+      },
+      "lagoon_snapper": {
+        "name": "Lagoon Snapper"
+      },
+      "ice_wraith": {
+        "name": "Ice Wraith"
+      },
+      "moonlit_siren": {
+        "name": "Moonlit Siren"
+      },
+      "tidewisp": {
+        "name": "Tidewisp"
+      },
+      "drowned_pilgrim": {
+        "name": "Drowned Pilgrim"
+      },
+      "mere_hydra_head_left": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_center": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_right": {
+        "name": "Mere Hydra"
+      },
+      "tideglass_colossus": {
+        "name": "Tideglass Colossus"
+      },
+      "tideglass_reflection": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_priest": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_mage": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_druid": {
+        "name": "Tideglass Reflection"
       },
       "sanctum_boneguard": {
         "name": "Helligdoms-Benvogter"
@@ -19725,8 +24434,26 @@ export const da_DK: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, den Vågnende Tinde"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Vækket Stormling"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Staldhest"
@@ -20100,8 +24827,179 @@ export const da_DK: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "Hugtandherre Bæstmester"
       },
+      "sunbone_totem_binder": {
+        "name": "Sunbone Totem-Binder"
+      },
+      "sunbone_totem": {
+        "name": "Sunbone Totem"
+      },
+      "sunbone_dread_totem": {
+        "name": "Sunbone Dread Totem"
+      },
+      "basin_raptor": {
+        "name": "Basin Raptor"
+      },
+      "spore_toad": {
+        "name": "Spore Toad"
+      },
+      "vine_lasher": {
+        "name": "Snarlvine Lasher"
+      },
+      "great_saurian": {
+        "name": "Great Saurian"
+      },
+      "howdah_hexcaller": {
+        "name": "Howdah Hexcaller"
+      },
+      "fanglord_jaguar": {
+        "name": "Fanglord's Great Jaguar"
+      },
+      "the_gorgebloom": {
+        "name": "The Gorgebloom"
+      },
       "wildheart_high_priest": {
         "name": "Zulgar, Bassinets Stemme"
+      },
+      "broodsworn_thawcaller": {
+        "name": "Broodsworn Thawcaller"
+      },
+      "broodsworn_goadsmith": {
+        "name": "Broodsworn Goadsmith"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "Broodsworn Pyre-Tender"
+      },
+      "soul_brazier": {
+        "name": "Soul Brazier"
+      },
+      "rime_whelp": {
+        "name": "Rime Whelp"
+      },
+      "ogre_sledge_hauler": {
+        "name": "Ogre Sledge-Hauler"
+      },
+      "glacier_splinter": {
+        "name": "Glacier Splinter"
+      },
+      "sledge_tusker": {
+        "name": "Sledge Tusker"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "Hammer Shackle"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "Tongs Shackle"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "Anvil Shackle"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "Bellows Shackle"
+      },
+      "thorn_sprout": {
+        "name": "Thorn Sprout"
+      },
+      "buddy_ember_fox": {
+        "name": "Ember Fox"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "Emberfall Phoenix"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "Crimson Claw Crab"
+      },
+      "buddy_golden_sentinel": {
+        "name": "Golden Sentinel"
+      },
+      "buddy_nightfang": {
+        "name": "Nightfang"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "Tuskhorn Boar"
+      },
+      "buddy_emerald_wolf": {
+        "name": "Emerald Wolf"
+      },
+      "buddy_tiger": {
+        "name": "Tiger"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "Trollface"
+      },
+      "buddy_ansem": {
+        "name": "Ansem"
+      },
+      "buddy_triple_t": {
+        "name": "Triple T"
+      },
+      "buddy_kekius": {
+        "name": "Kekius"
+      },
+      "buddy_solbot": {
+        "name": "Solbot"
+      },
+      "buddy_frostfire": {
+        "name": "Frostfire"
+      },
+      "buddy_rocky": {
+        "name": "Rocky"
+      },
+      "buddy_proud_grunt": {
+        "name": "Proud Grunt"
+      },
+      "buddy_loot_goblin": {
+        "name": "Loot Goblin"
+      },
+      "buddy_penny_goldspark": {
+        "name": "Penny Goldspark"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "Alpaca"
+      },
+      "buddy_horse": {
+        "name": "Tug, the Warhorse"
+      },
+      "buddy_sapling": {
+        "name": "Sapling"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "Spider"
+      },
+      "buddy_raptor": {
+        "name": "Raptor"
+      },
+      "buddy_skeleton": {
+        "name": "Skeleton"
+      },
+      "buddy_crystal_lich": {
+        "name": "Crystal Lich"
+      },
+      "buddy_forgemaw": {
+        "name": "Forgemaw The Molten"
+      },
+      "buddy_crystal_tide": {
+        "name": "Crystal Tide"
+      },
+      "buddy_phantom": {
+        "name": "Phantom"
       },
       "ironvein_foreman": {
         "name": "Jernåre-Formand"
@@ -20376,6 +25274,16 @@ export const da_DK: EnTranslations = {
         "title": "Vogter af Fenbridge",
         "greeting": "Hold ved porten, {className}. Bag de siv klarer mosen drabet for os."
       },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
+      },
       "brother_aldric_fen": {
         "name": "Broder Aldric",
         "title": "Dalens Præst",
@@ -20595,6 +25503,31 @@ export const da_DK: EnTranslations = {
         "name": "Havnemester Tamsin",
         "title": "Vogter af Wyrmwatch Kajerne",
         "greeting": "Kom ind fra kajen og varm dine hænder. Skibet ved vores kaj sejler op langs den lange østkyst til Wickharbor og tilbage igen. Langt mod vest sejler den anden færge mellem Østbæk og Nightbloom. Kortet på muren viser begge overfarter. Hvil dig ved ilden, før opstigningen til Wyrmwatch."
+      },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
+      "patron_amos_eelby": {
+        "name": "Amos Eelby",
+        "title": "Eel Fisher",
+        "greeting": "Pull up a bench, {className}. Grissel here swears the big eel under Fenbridge is a myth. I've had my hand on him twice. Twice! Slippery as a tax collector, and near as long as this bench."
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "Grissel Sedgeworth",
+        "title": "Peat Cutter",
+        "greeting": "Don't mind Amos. Forty years cutting peat and I've pulled more strange things out of this bog than he's pulled eels: boots, bones, a helmet with the head still worried about it. Warm yourself, the fire's free."
+      },
+      "patron_ned_oxley": {
+        "name": "Ned Oxley",
+        "title": "Drover",
+        "greeting": "Drove forty head down the causeway and lost two to the mire before Fenbridge. Maudie's ale is the only thing on this road that never lets a man down. Buy your own, mind."
+      },
+      "patron_hester_quillby": {
+        "name": "Hester Quillby",
+        "title": "Mapmaker",
+        "greeting": "Every map of this marsh I've ever bought was wrong within a season. The water moves the paths, and the paths move the water. So I draw my own, and I sit here where it's dry while the ink sets."
       },
       "reeve_ottoline": {
         "name": "Foged Ottoline",
@@ -20821,6 +25754,11 @@ export const da_DK: EnTranslations = {
         "title": "Apothekermester",
         "greeting": "Mål to gange og hæld én gang, {className}. Apotekeren har ingen tålmodighed med spildte reagenser."
       },
+      "steward_ansel_hale": {
+        "name": "Ansel Hale",
+        "title": "Steward of the Manor",
+        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
+      },
       "farmer_jessica": {
         "name": "Bonde Jessica",
         "title": "Lodholder",
@@ -20890,6 +25828,11 @@ export const da_DK: EnTranslations = {
         "name": "Øvelsesmester Hale",
         "title": "Kamptræner ved kajen",
         "greeting": "Dukken bag mig slår aldrig igen og går aldrig ned, {className}. Det vigtige er optællingen: Dine skademålere tæller hvert slag, du rammer den med. Målret den og åbn målerne, så fører jeg dig gennem resten."
+      },
+      "cantor_laverock": {
+        "name": "Laverock",
+        "title": "Last Cantor of the Pale Choir",
+        "greeting": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -21114,6 +26057,52 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridge Mønstringsordre"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -23298,6 +28287,12 @@ export const da_DK: EnTranslations = {
           },
           "7": {
             "label": "Den Sunkne Bastion"
+          },
+          "8": {
+            "label": "Gravhøjsområdet"
+          },
+          "9": {
+            "label": "Stjernefaldskrateret"
           }
         }
       },
@@ -23655,6 +28650,39 @@ export const da_DK: EnTranslations = {
             "label": "Gauntlet"
           }
         }
+      },
+      "goldcrest_harbor": {
+        "name": "Goldcrest Harbor",
+        "welcome": "Goldcrest Harbor, seat of the World Market. Every road, tide and ledger in the realm meets here.",
+        "pois": {
+          "0": {
+            "label": "The Grand Gate"
+          },
+          "1": {
+            "label": "Grand Plaza"
+          },
+          "2": {
+            "label": "The Goldcrest Exchange"
+          },
+          "3": {
+            "label": "Market Ward"
+          },
+          "4": {
+            "label": "Harbor Ward"
+          },
+          "5": {
+            "label": "Highcrown Citadel"
+          },
+          "6": {
+            "label": "The Lightspire"
+          },
+          "7": {
+            "label": "The Gold Light"
+          },
+          "8": {
+            "label": "The Golden Span"
+          }
+        }
       }
     },
     "dungeons": {
@@ -23931,6 +28959,16 @@ export const da_DK: EnTranslations = {
         "sender": "Børsmægleren",
         "subject": "Dit køb på Børsen",
         "body": "Salget er afregnet, og varen er din. Den vedhæftede pakke indeholder nøjagtig den genstand, du betalte for, holdt i depot fra det øjeblik, den blev noteret, til din betaling var gennemført.\n\nEt regnskab over salget føres i Børsens hovedbog.\n\n- Børsmægleren"
+      },
+      "membership_token_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Your membership token",
+        "body": "Your purchased token is enclosed. Redeem it to add 30 days of membership to your account, or trade it with another adventurer."
+      },
+      "membership_annual_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your annual membership mount",
+        "body": "Your annual membership payment is complete. Your tank mount key is enclosed. Keep the key in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required."
       },
       "woc_market_return": {
         "sender": "Børsmægleren",
@@ -24381,6 +29419,7 @@ export const da_DK: EnTranslations = {
     "mailboxName": "Postkasse",
     "noticeboardName": "Opslagstavle",
     "farmPatchName": "Havebede",
-    "realmBuilderMonumentName": "Rigsbygger-monument"
+    "realmBuilderMonumentName": "Rigsbygger-monument",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

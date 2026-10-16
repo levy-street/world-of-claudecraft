@@ -27,6 +27,14 @@ class RecordingContext {
   fill(): void {}
   stroke(): void {}
   arc(): void {}
+  // The painted field plate (field_map_painter.ts) also shades and textures.
+  imageSmoothingEnabled = true;
+  ellipse(): void {}
+  setLineDash(): void {}
+  strokeRect(): void {}
+  createLinearGradient(): { addColorStop(): void } {
+    return { addColorStop() {} };
+  }
   save(): void {}
   restore(): void {}
   clip(): void {}
@@ -84,7 +92,7 @@ describe('DungeonMapPainter', () => {
 
   afterEach(() => vi.unstubAllGlobals());
 
-  it.each(['hollow_crypt', IGNIVAR_MOLTEN_ASSEMBLY_ID])(
+  it.each(['hollow_crypt', 'sunken_bastion', IGNIVAR_MOLTEN_ASSEMBLY_ID])(
     'paints %s on the minimap and M-map with its localized title',
     (dungeonId) => {
       const painter = new DungeonMapPainter(

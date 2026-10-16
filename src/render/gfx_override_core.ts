@@ -18,6 +18,11 @@ export const GFX_OVERRIDE_VALUE_KINDS = {
   terrainRelief: 'number',
   bladeCarpetRadius: 'number',
   cliffScree: 'boolean',
+  cityClutter: 'boolean',
+  // Paired with its flag for the same reason canopyDetailTaps is: city_clutter
+  // consults both, so overriding the flag alone on a tier whose radius is the
+  // low default would draw a ring far tighter than the tier being emulated.
+  cityClutterRadius: 'number',
   canopyDetail: 'boolean',
   // The tap count rides beside its on/off flag for the same reason
   // surfaceDetailTaps rides beside surfaceDetail: overriding one alone leaves

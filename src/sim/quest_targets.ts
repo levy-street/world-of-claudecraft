@@ -10,12 +10,23 @@
 // interest-radius limited: a camp or quest giver far across the zone still resolves.
 
 import { FARM_PATCHES } from './content/farm_patches';
-import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
+import {
+  CAMPS,
+  ESCORTS,
+  GROUND_OBJECTS,
+  gatherNodesInActiveWorld,
+  getActiveWorldContent,
+  MOBS,
+  NPCS,
+  QUESTS,
+} from './data';
+import { farmPatchesFor } from './moved_objects';
 import { nodeMaterialFor } from './professions/gathering';
 import { fineGradeReachable, fineMaterialFor } from './professions/material_grades';
 import { ambientNpcQuestMarkerKind } from './quests/ambient_quest_marker';
 import { type QuestMarkerKind, questMarkerRank } from './quests/quest_marker_kind';
 import {
+  type GatherNodeDef,
   type GatherNodeType,
   type QuestObjective,
   type QuestProgress,
@@ -127,7 +138,7 @@ export function gatherNodeClusters(
   linkYd: number = NODE_CLUSTER_LINK_YD,
 ): { x: number; z: number }[][] {
   return clusterNodes(
-    GATHER_NODES.filter((n) => n.type === nodeType),
+    gatherNodesInActiveWorld().filter((n) => n.type === nodeType),
     linkYd,
   );
 }
@@ -154,28 +165,40 @@ export function gatherNodeClusters(
  * gatherNodeClusters, which builds fresh): callers must never mutate it,
  * which the readonly type enforces at compile time.
  */
-const yieldClusterMemo = new Map<string, readonly (readonly { x: number; z: number }[])[]>();
+const yieldClusterMemo = new WeakMap<
+  readonly GatherNodeDef[],
+  Map<string, readonly (readonly { x: number; z: number }[])[]>
+>();
 export function nodeYieldClusters(
   itemId: string,
   linkYd: number = NODE_CLUSTER_LINK_YD,
 ): readonly (readonly { x: number; z: number }[])[] {
+  // Keyed by the node table too: a map that moved nodes (moved_objects.ts)
+  // resolves its own memoized table, so its clusters never answer for the
+  // shipped world's, or the reverse.
+  const nodes = gatherNodesInActiveWorld();
+  let memo = yieldClusterMemo.get(nodes);
+  if (!memo) {
+    memo = new Map();
+    yieldClusterMemo.set(nodes, memo);
+  }
   const key = `${itemId}:${linkYd}`;
-  const hit = yieldClusterMemo.get(key);
+  const hit = memo.get(key);
   if (hit) return hit;
   const clusters = clusterNodes(
-    GATHER_NODES.filter((n) => {
+    nodes.filter((n) => {
       const base = nodeMaterialFor(n.type, n.zoneId).itemId;
       if (base === itemId) return true;
       return fineMaterialFor(base) === itemId && fineGradeReachable(base, n.tier);
     }),
     linkYd,
   );
-  yieldClusterMemo.set(key, clusters);
+  memo.set(key, clusters);
   return clusters;
 }
 
 function clusterNodes(
-  nodes: readonly (typeof GATHER_NODES)[number][],
+  nodes: readonly GatherNodeDef[],
   linkYd: number,
 ): { x: number; z: number }[][] {
   const root = nodes.map((_, i) => i);
@@ -364,7 +387,7 @@ export function questObjectiveAreas(
   // patchless objective is honestly earned at any bed in the world. Beds are
   // static content like GATHER_NODES (no entity id to resolve).
   const pushFarmPatches = (ref: QuestObjectiveRef, patchId: string | undefined): void => {
-    for (const patch of FARM_PATCHES) {
+    for (const patch of farmPatchesFor(getActiveWorldContent().objectMoves, FARM_PATCHES)) {
       if (patchId !== undefined && patch.id !== patchId) continue;
       // fresh {x,z}: never alias the deep-frozen FARM_PATCHES content
       pushEnclosing(
@@ -399,6 +422,15 @@ export function questObjectiveAreas(
         if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
         break;
       }
+      case 'event':
+        // Deliberately draws nothing, for the same reason as 'craft' below: an
+        // eventId is a named moment in an encounter (the Foreman's eye put out),
+        // not a place, so there is no point the map could honestly circle. The
+        // quests that carry one also carry the objective that DOES have an
+        // anchor (the boss himself), which is what the marker follows. An
+        // explicit arm rather than a fall-through so the exhaustiveness guard
+        // below keeps its value if a future event ever does earn a location.
+        break;
       case 'craft':
         // Deliberately draws nothing: a craft objective has no world anchor
         // the map could honestly circle (any matching station serves), and
@@ -478,7 +510,8 @@ export interface QuestGiverNpcMarker {
  * so (like questObjectiveAreas above) it is never interest-radius limited: a
  * quest giver far across an online zone still surfaces its glyph. Dynamic
  * NPCs (spawned on demand by their owning system, e.g. mid-encounter or
- * per-graveyard) are skipped: they carry no fixed placement to resolve here.
+ * per-graveyard) are skipped: they carry no fixed placement to resolve here,
+ * unless the def says `fixedPost` (always raised at `pos`, the Muster Commander).
  *
  * Classification is the shared quest_marker_kind rule; `questsDone` and the
  * optional cadence-blocked set are the same inputs both worlds hand it
@@ -493,7 +526,7 @@ export function questGiverNpcMarkers(
 ): QuestGiverNpcMarker[] {
   const out: QuestGiverNpcMarker[] = [];
   for (const npc of Object.values(NPCS)) {
-    if (npc.dynamic) continue;
+    if (npc.dynamic && !npc.fixedPost) continue;
     const refs: QuestGiverNpcQuestRef[] = [];
     for (const questId of npc.questIds) {
       const quest = QUESTS[questId];

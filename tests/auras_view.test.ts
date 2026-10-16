@@ -433,6 +433,34 @@ describe('createAurasView: derivation per mode', () => {
     expect(text(Number.POSITIVE_INFINITY)).toBe(''); // truly permanent: no label
   });
 
+  it('hides the countdown under a PERMANENT aura: a state, not a timer', () => {
+    // The world boss's standing ward and the slumber he wears in bed are backed by a long
+    // finite duration purely so nothing expires them; "1h" under the icon and "3600 seconds
+    // remaining" in the tooltip are the same lie the toggle rule already refuses to tell.
+    const v = createAurasView('all', deps());
+    const slot = v.tick(
+      entity([aura({ id: 'slumber', kind: 'buff_dr', remaining: 3600, permanent: true })]),
+    ).slots[0];
+    expect(slot.durationText).toBe('');
+    expect(slot.toggle).toBe(true);
+    expect(slot.expiring).toBe(false);
+    // The same aura without the bit is an ordinary timed buff.
+    expect(
+      v.tick(entity([aura({ id: 'slumber', kind: 'buff_dr', remaining: 3600 })])).slots[0]
+        .durationText,
+    ).toBe('1h');
+    // Scope, stated: the rule is about the BIT, not about buffs. A permanent DEBUFF is a
+    // state too (nothing will ever expire it), so it shows no countdown either; a timed
+    // debuff is untouched and keeps the timer the fairness contract protects.
+    expect(
+      v.tick(entity([aura({ id: 'brand', kind: 'dot', remaining: 3600, permanent: true })]))
+        .slots[0].durationText,
+    ).toBe('');
+    expect(
+      v.tick(entity([aura({ id: 'brand', kind: 'dot', remaining: 12 })])).slots[0].durationText,
+    ).toBe('12s');
+  });
+
   it('hides the countdown under toggle auras (stealth / forms / stance / Shadewolf)', () => {
     const v = createAurasView('all', deps());
     // The sim backs each toggle with a long finite duration (3600s), but a mode

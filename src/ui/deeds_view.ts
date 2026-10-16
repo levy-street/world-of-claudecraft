@@ -265,6 +265,7 @@ export interface DeedsViewInput {
   // none). Its rungs join the title picker AFTER the deed titles; they are not
   // deeds (src/sim/dev_badge_titles.ts), so they never touch entries or counts.
   devTier?: number;
+  referralTitleOwned?: boolean;
 }
 
 export interface DeedRecentModel {
@@ -431,6 +432,9 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
   }
   for (const id of wearableDevBadgeTitles(input.devTier)) {
     titles.push({ id, active: input.activeTitle === id });
+  }
+  if (input.referralTitleOwned) {
+    titles.push({ id: 'referral_trailmate', active: input.activeTitle === 'referral_trailmate' });
   }
 
   const focus = input.focusDeedId ?? null;
@@ -732,6 +736,7 @@ export function buildDeedUnlockPlan(
  *  online the accepted choice only shows up when the snapshot echo moves this
  *  signature. */
 export interface DeedsRefreshSigParts {
+  referralTitleOwned?: boolean;
   renown: number;
   earnedCount: number;
   // accountDeedsDigest over the account ledger: an alt's earn (a new id OR a
@@ -765,6 +770,7 @@ export function deedsRefreshSig(parts: DeedsRefreshSigParts): string {
     parts.watchRev,
     parts.statsDigest,
     parts.devTier ?? 0,
+    parts.referralTitleOwned ?? false,
   ]);
 }
 

@@ -11,6 +11,126 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const ja_JP: EnTranslations = {
+  "referralCards": {
+    "title": "フレンド招待",
+    "subtitle": "一緒に冒険して、スタンプを集めよう。",
+    "close": "フレンド招待を閉じる",
+    "launcher": "スタンプカード",
+    "pages": "スタンプカードのページ",
+    "firstPage": "最初のページ",
+    "nextPage": "ほかのカード",
+    "trailmateTitle": "旅の仲間",
+    "friendshipAura": "友情",
+    "protectiveCharm": "守りのお守り",
+    "bankBonus": "完了したスタンプカード",
+    "bankBonusHelp": "絆のフレンド2人のスタンプカード完成を手伝うと、銀行スロットが永久に20枠増えます。",
+    "friendshipUse": "筋力、敏捷性、スタミナ、知力、精神力が{stats}上昇します。持続時間：{duration}秒。",
+    "readyCount": "スタンプカード：報酬を{count}件受け取れます",
+    "loading": "招待スタンプカードに接続中...",
+    "empty": "新しいプレイヤーを招待して、一緒に最初のスタンプカードを始めましょう。",
+    "inviteTitle": "フレンドを招待",
+    "inviteHelp": "フレンドがアカウントを作る前に、このリンクを共有してください。あなたのリンクから新規作成したアカウントだけが絆のフレンドになります。",
+    "inviteLabel": "あなたの招待リンク",
+    "inviteUnavailable": "招待リンクはまだ利用できません。",
+    "membership": "絆のフレンドが初めてメンバーシップを購入すると、メンバーシップ債券を受け取れます。",
+    "cardBetween": "{you} と {friend}",
+    "yourCard": "{name}のスタンプカード",
+    "unassigned": "キャラクター未選択",
+    "start": "カードを始める",
+    "startPrompt": "{friend}とスタンプカードを始めますか？双方の承諾が必要です。両キャラクターともレベル5未満で、チュートリアル島の最終クエストを未完了である必要があります。",
+    "accept": "承諾",
+    "decline": "辞退",
+    "declinePrompt": "本当に辞退しますか？両キャラクターが条件を満たしていれば、後からスタンプカードメニューで開始できます。",
+    "declineConfirmed": "カードは開始されませんでした。両キャラクターが条件を満たしていれば、スタンプカードメニューで開始できます。",
+    "waiting": "絆のフレンドの承諾を待っています。",
+    "cancel": "キャンセル",
+    "okay": "確認",
+    "understand": "はい、理解しました",
+    "confirmLock": "はい、このカードを固定する",
+    "lockFirst": "フォグバインダーの報酬を受け取ると、このカードは{name}に永久に固定されます。カードも報酬も他のキャラクターに移せなくなります。理解しましたか？",
+    "lockSecond": "本当によろしいですか？フォグバインダーの報酬を受け取り、このカードを{name}に永久に固定します。",
+    "locked": "このカードは{name}に固定されています。もう移せません。",
+    "unlocked": "フォグバインダーの報酬を受け取るまでは、条件を満たす別のキャラクターにカードを移せます。受け取ると現在のキャラクターに永久に固定されます。",
+    "move": "このキャラクターにカードを移す",
+    "movePrompt": "カードを{oldName}から{newName}へ移しますか？進行状況と、このカードで獲得した報酬がすべて移ります。それらの報酬は{oldName}から削除されます。",
+    "confirmMove": "はい、カードを移す",
+    "summon": "絆のフレンドを召喚",
+    "summonPrompt": "{friend}が自分の場所にあなたを召喚しようとしています。召喚を受け入れますか？",
+    "summonHelp": "絆のフレンドを自分の場所に呼び寄せます。30分に1回召喚できます。",
+    "summonCooldown": "召喚可能まで{minutes}分{seconds}秒",
+    "reward": "報酬：{reward}",
+    "earned": "獲得済み",
+    "redeemed": "受取済み",
+    "emptyStamp": "未獲得",
+    "stamping": "カードにスタンプを押しています...",
+    "redeem": "報酬を受け取る",
+    "previous": "先に前のスタンプ報酬を受け取ってください。",
+    "playTogether": "このカードのキャラクター同士でパーティを組み、目標を達成しましょう。",
+    "fallback": "目標のクエストを一人で完了しましたか？フレンドと再びパーティを組むとチュートリアル島のスタンプを獲得できます。その後のクエストのスタンプは、対応するダンジョンを一緒にクリアすると獲得できます。",
+    "questGroup": "スタンプカードのクエスト",
+    "questWithFriend": "{friend}と{quest}",
+    "browseCards": "すべてのスタンプカードのページを見る",
+    "nextQuest": "スタンプカード：{quest}",
+    "questIndicator": "このクエストで次のスタンプカード報酬に近づきます。",
+    "completion": "おめでとう！{friend}があなたの助けでスタンプカードを完成させました。",
+    "openInvites": "フレンド招待を開く",
+    "referrerTitle": "手伝ったフレンド",
+    "referrerCount": "完了したフレンド：{count}人",
+    "friendTier": "手伝ったフレンド：{count}人",
+    "awarded": "付与済み",
+    "pending": "未付与",
+    "celebration": {
+      "earned": "冒険の成果",
+      "title": "報酬を獲得！",
+      "titleReward": "称号を獲得：{title}",
+      "together": "{friend}と共に獲得しました。",
+      "continue": "冒険を続ける"
+    },
+    "milestones": {
+      "tutorial": "チュートリアル島の最終クエスト",
+      "hollow": "虚ろへ",
+      "fogbinder": "フォグバインダー",
+      "gravewyrm": "墓ワームのコルズル",
+      "raid": "初めてのレイドボスを倒す"
+    },
+    "rewards": {
+      "tutorial": "特別な称号と、キャラクターに帰属する最大容量のバッグ。",
+      "hollow": "スタミナを増やし、体力が低いときに自動でシールドを張る装飾品。",
+      "fogbinder": "装飾品が進化してスタミナがさらに増加し、使用効果を得ます。全能力値が15秒間5上昇し、再使用まで2分かかります。",
+      "gravewyrm": "無料の騎乗訓練。",
+      "raid": "限定の友情タンクマウント。"
+    },
+    "referrerRewards": {
+      "1": "限定の友情ラプターマウント。",
+      "2": "銀行スロット20枠とキャラクタースロット5枠。",
+      "3": "Claudiumを1,000。",
+      "4": "Claudiumを1,000。",
+      "5": "若木の仲間。"
+    },
+    "reasons": {
+      "notParticipant": "このアカウントはこの絆のフレンド関係に含まれていません。",
+      "staleRevision": "カードが更新されました。最新の進行状況を確認してから、もう一度お試しください。",
+      "invalidCharacters": "パーティのキャラクターはこの絆のフレンド関係に含まれていません。",
+      "notTogether": "絆のフレンド同士で同じパーティに入る必要があります。",
+      "levelTooHigh": "新しいカードを始めるキャラクターはレベル5未満である必要があります。",
+      "tutorialCompleted": "いずれかのキャラクターがチュートリアル島の最終クエストを完了しています。",
+      "alreadyStarted": "この絆のフレンド関係にはすでにカードがあります。1組につき有効なカードは1枚だけです。",
+      "notPending": "返答待ちのカード招待はありません。",
+      "declinePending": "絆のフレンドがカードを辞退するかどうか確認しています。",
+      "declineNotConfirmed": "招待を終了する前に辞退を確定してください。",
+      "notActive": "報酬を受け取る前に、一緒にカードを始めてください。",
+      "wrongCharacter": "カードに記載されたキャラクターを使うか、未固定のカードを条件に合うキャラクターへ移してください。",
+      "locked": "このカードはキャラクターに固定されているため、移せません。",
+      "sameCharacter": "このカードはすでにこのキャラクターのものです。",
+      "invalidMilestone": "そのスタンプはこのカードのものではありません。",
+      "notEarned": "報酬を受け取る前に、この目標を一緒に達成してください。",
+      "alreadyRedeemed": "この報酬はすでに受取済みです。",
+      "previousRewardRequired": "先に前のスタンプ報酬を受け取ってください。",
+      "confirmationRequired": "フォグバインダーの報酬を受け取る前に、カード固定の警告を確認してください。",
+      "newAccountsOnly": "招待リンクから新規アカウントを作成したときだけ絆のフレンドになれます。既存のアカウント同士は結べません。",
+      "unavailable": "現在この操作は利用できません。後でもう一度お試しください。"
+    }
+  },
   "meta": {
     "builtOn": "ビルド日：{date}"
   },
@@ -347,6 +467,26 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "配達員",
+      "close": "配達員を閉じる",
+      "ready": "配達の準備完了",
+      "outbound": "銀行へ飛行中",
+      "returning": "アイテムを持って帰還中",
+      "waiting": "アイテムを返すため待機中",
+      "bags": "銀行へ送る",
+      "bank": "銀行から取り出す",
+      "cargo": "配達員の荷物",
+      "empty": "アイテムなし",
+      "send": "配達員を送る",
+      "selected": "{count} / {limit} スタック選択中",
+      "select": "{item}、{count}を選択",
+      "selectedItem": "{item}、{count}の選択を解除",
+      "instructions": "スタック全体を選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。",
+      "membership": "次の配達にはメンバーシップの更新が必要です。",
+      "cargoSafe": "バッグに空きができるまで、配達員がアイテムを保管します。",
+      "unavailable": "配達員を召喚して配達を計画しましょう。"
+    },
     "framePresets": {
       "apply": "適用",
       "pickerLabel": "フレームプリセット：{name}",
@@ -513,6 +653,48 @@ export const ja_JP: EnTranslations = {
       "sailing": "{dest}へ航行中"
     },
     "materialStackSelectionUnavailable": "この素材の選択は利用できなくなりました。",
+    "shardpike": {
+      "braceLabel": "シャードパイクを構える",
+      "braceTooltip": "石突きを地面に突き立て、穂先を上げる。横移動キーがバランス棒だ：ビームは自然に流れ、彼が地面を叩くたびに弾かれる。両端に触れさせず {set} 秒保てば穂先が定まる。固い地面が必要で、騎乗中は不可。",
+      "thrustLabel": "バロウグラス・スラスト",
+      "thrustTooltip": "定まった穂先を眼に突き入れ、{damage} のダメージを与える。レベルも攻撃力もパイク自体も、何一つこの値を伸ばさない。番人を盲目にしバロウハイドを剥ぎ取るので、湿地の他のあらゆる武器がようやく通るようになる。定まったパイクだけが放てる一撃で、射程 {reach} ヤード、猶予は {seconds} 秒。",
+      "braceTooltipLean": "石突きを地面に据え、穂先を掲げる。横移動キーか旋回キー、またはバーの上の二つのキーを押し続けて傾けろ。バーはひとりでに揺れ、彼の一撃ごとに弾かれる。{set}秒間端に触れさせなければパイクが据わる。固い地面が必要で、騎乗中は使えない。",
+      "releaseLabel": "シャードパイクを下ろす",
+      "releaseTooltip": "パイクを収める。降りるのに罰則はない：失うのは構えだけで機会そのものではなく、{rest} 秒後に再び構えられる。",
+      "whyResting": "パイクを下ろしたばかりだ。アイコンの残り時間を待て。",
+      "whyAlreadyCouched": "パイクはすでに構えている。構え直す前に下ろせ。",
+      "whyNotSet": "穂先が定まっていない。まず構えて支えろ。",
+      "whyNothingCouched": "下ろすものがない：パイクを構えていない。",
+      "beamLabel": "シャードパイクの均衡",
+      "beamStatus": "パイクの均衡 {balance}、定着 {set} パーセント。",
+      "beamDanger": "パイクの均衡 {balance}、取り落としかけている。",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "横移動キーでパイクを支えろ",
+      "promptCatchIt": "立て直せ、パイクが倒れる",
+      "promptEyeOut": "眼が潰れた、残り {seconds} 秒：全力で叩き込め",
+      "promptSealed": "眼は閉じている。{seconds} 秒後に再び開く",
+      "promptResetting": "パイクを構え直している、{seconds} 秒",
+      "promptCloser": "番人に近づけ、あと {yards} ヤード",
+      "promptBrace": "シャードパイクを構え、そのまま支えろ",
+      "promptFindBoss": "スケリットのシャードパイク：これで番人の眼を潰せ",
+      "promptFindBossMuster": "召集兵団のシャードパイク：これで監督の眼を潰せ",
+      "promptTakePike": "{key}を押すか武器棚をクリックして、シャードパイクを取れ",
+      "promptTakePikeClick": "武器棚をクリックしてシャードパイクを取れ",
+      "promptTakePikeTap": "武器棚をタップしてシャードパイクを取れ",
+      "promptPikeLevelCap": "召集軍が槍を貸すのはレベル {level} 以下の新兵だけです",
+      "promptHoldSteadyLean": "パイクを支えろ：{left}と{right}で傾けろ",
+      "leanLeft": "左に傾ける",
+      "leanRight": "右に傾ける",
+      "leanLeftKey": "左に傾ける（{key}）",
+      "leanRightKey": "右に傾ける（{key}）",
+      "promptTally": "{count} put out",
+      "promptLabel": "シャードパイクの指示",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "盲目にした！今こそレイド全員で叩き込め",
+      "promptStrikeLantern": "今だ、ランタンを突け、残り {seconds} 秒",
+      "promptLanternOut": "ランタンが消えた、残り {seconds} 秒：自分の武器で叩け",
+      "promptCloserEffigy": "藁の監督に近づけ、あと {yards} ヤード"
+    },
     "vehicle": {
       "title": "北の見張りの大砲",
       "objective": "北の見張り所を守れ",
@@ -826,6 +1008,50 @@ export const ja_JP: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "ゲームの定期購入",
+        "monthlyTitle": "月額メンバーシップ",
+        "annualTitle": "12か月メンバーシップセット",
+        "annualPrice": "12か月分を一括で{price}",
+        "annualTerms": "同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。",
+        "annualMount": "支払い後、購入したキャラクターで郵便から魂に縛られた戦車の鍵を受け取れます。戦車はセット用騎乗動物の仮モデルです。",
+        "trialTerms": "1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。",
+        "startTrial": "7日間の無料体験を開始",
+        "resumeCheckout": "購入手続きを再開",
+        "checkoutClosed": "この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。",
+        "annualClaim": "セットの騎乗動物を受け取る",
+        "annualPending": "支払い後、購入したキャラクターに戻って騎乗動物を受け取ってください。支払い処理中や無料体験中の場合は、課金後に再試行してください。",
+        "annualDelivered": "セットの騎乗動物の鍵が郵便で届きました。",
+        "tokenTitle": "取引可能なメンバーシップトークン",
+        "benefitsTitle": "有効なメンバーシップの特典",
+        "benefitBank": "どの銀行員からでも、ほかのキャラクターの銀行を利用できます。",
+        "benefitSlots": "キャラクター枠を10個追加で解放します。",
+        "benefitArmour": "クラスと専門化に合った能力値を持つ魂縛の防具を受け取れます。レベルに合わせて成長し、レベル20でアイテムレベル25になります。全身に装備すると獲得経験値が20%増加します。",
+        "benefitTax": "オークションの通常の手数料が半額になります。",
+        "benefitExpiry": "メンバーシップが切れると、追加枠のキャラクターと防具の特典は更新するまで利用できなくなります。基本枠のキャラクターは引き続き遊べます。",
+        "tokenTerms": "{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。",
+        "tokenBuy": "メンバーシップトークンを購入",
+        "tokenClaim": "購入したトークンを受け取る",
+        "tokenPending": "支払い後、このキャラクターに戻ってトークンを受け取ってください。支払い処理中の場合は、少し待ってから再試行してください。",
+        "tokenDelivered": "トークンが郵便で届きました。",
+        "price": "月額 {price}",
+        "terms": "毎月自動更新されます。Stripe で法定通貨によるお支払いができます。請求設定から解約できます。",
+        "subscribe": "定期購入する",
+        "manage": "定期購入を管理",
+        "ending": "現在の請求期間の終了時に解約されます",
+        "error": "請求ページを開けませんでした。ポップアップを許可して再試行してください。",
+        "status": {
+          "none": "未登録",
+          "incomplete": "支払い未完了",
+          "incomplete_expired": "決済の有効期限切れ",
+          "trialing": "試用中",
+          "active": "有効",
+          "past_due": "支払い期限超過",
+          "canceled": "解約済み",
+          "unpaid": "未払い",
+          "paused": "一時停止中"
+        }
+      },
       "title": "WOCストア",
       "close": "WOCストアを閉じる",
       "tabsLabel": "WOCストアのセクション",
@@ -1205,7 +1431,8 @@ export const ja_JP: EnTranslations = {
       "drowning": "溺れています！"
     },
     "rest": {
-      "resting": "休息中"
+      "resting": "休息中",
+      "restArea": "休息中：ここは休息所で、休息経験値がたまります。"
     },
     "paladin": {
       "devotion": "献身",
@@ -1662,6 +1889,10 @@ export const ja_JP: EnTranslations = {
       "replayAction": "もう一度練習する",
       "replayTarget": "もう一度これを標的にしよう"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "完了"
+    },
     "riftTracker": {
       "title": "リフト",
       "hoardTitle": "埋もれた財宝",
@@ -1987,6 +2218,8 @@ export const ja_JP: EnTranslations = {
       "name_goblin_rocket_sled": "ゴブリンロケットそり",
       "name_rallycart_rxt": "ラリーカートRXT",
       "name_terrorspark_groundshaker": "地揺らしのドレッドスパーク",
+      "name_referral_tank": "友情タンク",
+      "name_referral_raptor": "友情ラプター",
       "name_drakemaw_raptor": "火口のラプトル",
       "name_avian_strider": "ヴィリジアン・ヴェイルストライダー",
       "name_mech_bird": "ゼンマイ・メカバード",
@@ -2004,6 +2237,8 @@ export const ja_JP: EnTranslations = {
       "desc_rallycart_rxt": "小型ながら本格的なラリーマシン。移動速度を高めてくれる。",
       "desc_rallycart_skin": "小さな車体から豪快なエンジン音を響かせるラリーカー。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
+      "desc_referral_tank": "招待スタンプカードを完成させると獲得できます。",
+      "desc_referral_raptor": "最初の絆のフレンドがスタンプカードを完成させるのを手伝うと獲得できます。",
       "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
       "desc_avian_strider": "巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。",
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
@@ -2080,6 +2315,10 @@ export const ja_JP: EnTranslations = {
       "flagTakenLog": "{name}が{team}の旗を奪った!",
       "flagDroppedLog": "{team}の旗が落とされた。",
       "flagReturnedLog": "{team}の旗が戻された。",
+      "flagDroppedByLog": "{name} dropped the {team} flag.",
+      "flagReturnedByLog": "{name} returned the {team} flag.",
+      "flagNameCrimson": "Crimson Flag",
+      "flagNameAzure": "Azure Flag",
       "dropFlagConfirmTitle": "旗を落としますか？",
       "dropFlagConfirmBody": "敵の旗を運搬中です。落とすと旗は地面に残り、どちらの陣営も拾えます。",
       "dropFlagConfirmAccept": "旗を落とす",
@@ -2208,6 +2447,7 @@ export const ja_JP: EnTranslations = {
       "showDevBadges": "開発者バッジを表示",
       "showOwnNameplate": "自分のネームプレートを表示",
       "showPlayerNameplates": "プレイヤーのネームプレートを表示",
+      "showPetNames": "ペット名を表示",
       "uiScale": "UIスケール",
       "playerFrameScale": "プレイヤーフレームの大きさ",
       "targetFrameScale": "ターゲットフレームの大きさ",
@@ -2225,6 +2465,8 @@ export const ja_JP: EnTranslations = {
       "groundReticle": "地面ターゲットのレティクル",
       "mouseoverCast": "パーティフレームでマウスオーバーキャスト",
       "stickyTarget": "地面クリックでターゲットを維持",
+      "showDungeonHints": "ダンジョンのギミックヒント",
+      "showDungeonHintsNote": "ダンジョンのギミックとその対処法を説明するヒントパネルを表示します。オフにするとこのヒントだけが非表示になり、地面の警告、詠唱バー、デバフはそのまま表示されます。操作が必要なプロンプトは常に表示されます：脱出する檻、壊す鎖、使用するオブジェクト。",
       "showItemLevel": "アイテムレベルを表示",
       "showReliquaryTracker": "聖遺物庫トラッカーを表示",
       "confirmVendorSell": "売却前に確認する",
@@ -2845,6 +3087,9 @@ export const ja_JP: EnTranslations = {
       "weapons": "武器",
       "groupSeason2": "ウォーフェア シーズン2：ヴァンガード",
       "groupEntry": "ウォーフェア シーズン1",
+      "companions": "コンパニオン",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "owned": "所有済み",
       "buyAria": "{item}を{honor}で購入",
       "buyOwnedAria": "{item}を{honor}で購入、所有済み",
@@ -3112,8 +3357,10 @@ export const ja_JP: EnTranslations = {
         "storm": "呪文を唱えるたびにチャージを1つ得る（最大{max}）。チャージは{duration}秒持続し、得るたびに更新される。",
         "heat": "近接および遠隔武器の命中ごとに熱を1スタック得る（最大{max}）。熱は{duration}秒持続し、スタックを得るたびに更新される。",
         "ignite": "近接および遠隔武器のクリティカルヒットがターゲットに火をつけ、{every}秒ごとに{tick}の火炎ダメージを{duration}秒間与える。新たなクリティカルヒットで更新される。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
-        "guardHeat": "攻撃を受け流し、回避、またはブロックするたびに熱を1スタック得る（最大{max}）。熱は{duration}秒持続し、スタックを得るたびに更新される。"
+        "guardHeat": "攻撃を受け流し、回避、またはブロックするたびに熱を1スタック得る（最大{max}）。熱は{duration}秒持続し、スタックを得るたびに更新される。",
+        "stoneHeart": "致命的な攻撃を受けると、代わりに{statue}秒間石になる：ダメージを受けず、移動も行動もできない。その後、体力{restore}（最大体力の{restorePct}%）で復帰する。{icd}に1回しか発生しない。決闘とアリーナの試合では発動せず、とどめの一撃で決着がつく。"
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "{duration}秒間、あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。",
         "anchor": "{duration}秒間、受けるダメージが{reduction}%減少するが、移動速度が{speed}%になる。自身のスタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果を解除し、効果中は新たなそれらとノックバックを無視する。",
@@ -3132,7 +3379,17 @@ export const ja_JP: EnTranslations = {
         "kindlingOrb": "{duration}秒間、残り火のオーブを自分のそばに呼び出す。敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。ダメージは呪文力で増加する。",
         "pierce": "{duration}秒間、オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。",
         "lantern": "{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。",
-        "heartNova": "熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。"
+        "shackle": "{range}ヤード以内の対象を{duration}秒間その場に鎖で縛る。ボスなど行動阻害に耐性のあるクリーチャーは、代わりに移動速度が{slow}%低下する（減速にも耐性がある場合は無効）。",
+        "spiritPack": "{duration}秒間、霊のジャガーを呼び出して共に戦わせる。ジャガーは対象へ駆け寄り、{every}秒ごとに噛みついて{min}～{max}の物理ダメージを与え、あなたが別の敵を対象にするとそちらへ移る。敵を対象にしていない場合は、{range}ヤード以内であなたに最も近い敵を攻撃する。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加し、呼び出した時点で確定する。{range}ヤード以内の敵対的な対象が必要。",
+        "seedburst": "{range}ヤード以内の対象に種を植える。{delay}秒後、種は対象のいる場所（または死んだ場所）で弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。対象が先に死んでいた場合は{bonus}%増加（{empowered}）。ダメージは呪文力に応じて増加し、植えた時点で確定する。種が弾ける前にあなたが死ぬと、種は枯れる。",
+        "tether": "{range}ヤード以内の味方プレイヤー1人と{duration}秒間鎖でつながる。その味方の体力に届くはずのダメージの{share}%を代わりにあなたが受ける。あなたが死亡すると早期に終了する。自分以外の味方プレイヤーを対象にする必要がある。",
+        "harvest": "{duration}秒間、あなたから{radius}ヤード以内で敵対的なクリーチャーが死亡するたびに、最大体力の{pct}%（{health}）と最大マナの{pct}%を回復する。",
+        "quench": "{duration}秒以内の次の{hits}回の近接または遠隔武器の命中が、追加で{damage}の冷気ダメージを与える。最後の命中は対象を焼き入れし、{slowDuration}秒間その攻撃速度を{slow}%低下させる。効果が終わると未使用の命中は失われる。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加する。",
+        "heartNova": "熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。",
+        "foremanShape": "{duration}秒間、監督の姿をとる：単眼の巨人となって拳で戦い、すべてのアビリティとそのダメージを保持する。防具が{armorPct}%増加し、ノックバックされなくなる。騎乗は解除される。",
+        "musterStandard": "足元に召集兵団の軍旗を立てる。{duration}秒間、{soldiers}人の召集兵があなたのそばを行軍し、あなたの対象と近接戦闘を行い、それぞれ{every}秒ごとに{damage}の物理ダメージを与える。兵はあなたの対象だけを、すでに戦闘中のときにのみ攻撃する。それぞれあなたの最大体力の{hpPct}%を持つ。{leash}ヤード以上取り残されると、すぐにあなたのそばへ戻る。軍旗が倒れたとき、またはあなたが死んだときに去る。ダメージは攻撃力または遠隔攻撃力の高いほうで増加し、設置時に決まる。",
+        "gutteredGlare": "{duration}秒間の集中：長さ{length}ヤードの光線が向いている方向へ放たれ、進路上の最大{max}体の敵に{every}秒ごとに{tick}の秘術ダメージを与える（集中全体で各敵に{total}）。向きを変えると光線が薙ぎ払う。移動または詠唱で終了する。ダメージは呪文力で増加する。",
+        "grapnel": "{range}ヤード以内の見えているパーティまたはレイドメンバーに鉤を掛け、空中を引き寄せてあなたの傍らへ運び、着地時に{heal}回復させる。敵や、乗り物・船に乗っている味方、石化している味方、解除できない効果で拘束されている味方は引き寄せられない。回復量は治癒力で増加する。"
       }
     },
     "questShare": {
@@ -3581,6 +3838,14 @@ export const ja_JP: EnTranslations = {
       "watchYouTube": "YouTube で視聴",
       "streamerBadgeTitle": "認証済み配信者"
     },
+    "buddyMenu": {
+      "rename": "Rename Buddy",
+      "nameLabel": "Buddy name",
+      "autolootEnable": "自動収集を有効化",
+      "autolootDisable": "自動収集を無効化",
+      "autolootHint": "バディが30ヤード以内にあるあなた自身の死体から戦利品を回収します。",
+      "cancel": "キャンセル"
+    },
     "lootSettings": {
       "title": "分配設定",
       "close": "分配設定を閉じる",
@@ -3906,6 +4171,64 @@ export const ja_JP: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "相棒が近くにいる間、受けるダメージが{pct}%減少する。獣使いとジャガーを引き離せば絆は切れる。",
+        "packBondFury": "相棒が近くにいる間、与えるダメージが{pct}%増加する。",
+        "stalked": "大ジャガーがあなたを狙い、挑発を受け付けない。噛みつきは{min}～{max}の物理ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、出血させる。主から引き離せ。",
+        "waryStuns": "一度スタンを受けた。この効果が切れるまで、以降のスタンは効かない。",
+        "waryRoots": "一度拘束を受けた。この効果が切れるまで、以降の拘束は効かない。",
+        "warySlows": "一度鈍足を受けた。この効果が切れるまで、以降の鈍足は効かない。",
+        "pollinated": "種莢に触れると、すぐに茨の芽が生える。種には近づかず、花粉のない者に踏み潰させよう。放置された種莢は{seconds}秒で芽吹く（ヒロイックでは{heroic}秒で地中に潜り、最も近い者の傍から現れる）。",
+        "prey": "ズルガーがあなたを狙っている。光る太陽紋を踏ませると{slow}%鈍足になる。捕まると引き裂かれ、{damage}のダメージ（ヒロイックでは{heroic}）を受けて{stun}秒間倒される。",
+        "avatar": "移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。",
+        "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。"
+      },
+      "bastion": {
+        "brineColumn": "海水の柱に捕らわれ、{tick}秒ごとに{min}～{max}の自然ダメージを最大{seconds}秒間受ける。潮縛りの侍祭を妨害するかスタンさせれば抜け出せる。",
+        "halberdWall": "{radius}ヤード以内に別の溺れた見張り番がいる間、受けるダメージが{pct}%減少する。引き離せ。",
+        "fogShroud": "霧の帳の中にいる間、受けるダメージが{pct}%減少する。霧の外へ引きずり出せ。",
+        "carrionGlut": "死者を貪った（{stacks}/{max}）：スタックごとに魂の解放の範囲が{radius}ヤード広がり、ダメージが{pct}%増加する。",
+        "snappedFetters": "鎖が断ち切られた。もう戦わず、傷つけられず、まもなく去っていく。",
+        "anchored": "溺死の錨に繋がれている：動くことはできるが巻き上げ機から離れることはできず、溺死の穴へと巻き寄せられる。引っ掛けられた場所から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入れば鎖を係留できる（その柱は{dark}秒間消える）、または仲間が{links}回の攻撃で鎖を断つ（ヒロイックは{linksHeroic}回）。穴に落ちると最大体力の{pit}%を失う（ヒロイックは{pitHeroic}%）。"
+      },
+      "crypt": {
+        "carrionEye": "戦闘中のすべてのカラスが{seconds}秒間あなたを狙う。タンクのもとへ走り、群れをまとめて倒そう。",
+        "graniteSkin": "受けるダメージが{pct}%減少し、石は{every}秒ごとに厚くなる（最大{max}層）。スタンで砕け散り、{seconds}秒間受けるダメージが{cracked}%増加する。",
+        "measured": "これが切れると、立っている場所に開いた墓が崩れ落ち、{radius}ヤード以内の全員に{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。墓は戦闘中ずっと残るので、印は仲間から離れた墓地の端まで運ぶこと。",
+        "graveDirt": "開いた墓の中に立っている：移動速度が{slow}%低下し、毎秒{damage}の闇ダメージ（ヒロイックでは{heroic}）。ヒロイックでは墓の中に{linger}秒留まると安らがぬ骨が這い出る。墓から出ること。",
+        "dirtInEyes": "移動速度が{pct}%低下。ひとすくいの墓土は墓守マロウの前方にいる全員に当たる：背後に立つこと。",
+        "blow": "受けるダメージが{pct}%上昇：1スタックごとに{per}%、現在{stacks}/{max}スタック。墓掘りの一撃のたびにスタックが増え、効果時間が{seconds}秒に戻る。",
+        "graveVigor": "開いた墓の中に立っている間、攻撃速度が{pct}%上昇。墓から引き離すこと。",
+        "tolling": "鐘の綱へ歩み寄り埋葬の鐘を鳴らしている間、ダメージを受けない。鳴らし終えると全員に{min}～{max}の闇ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、開いた墓すべてから安らがぬ骨が這い出る。",
+        "embraced": "貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。",
+        "lament": "花嫁の哀歌が終わると、灯った墓のランタンから{radius}ヤード以内にいない全員に{min}～{max}の冷気ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。ランタンが守るのは最も近い{cap}人だけで、その後は消えて次の哀歌を守れない。",
+        "lingering": "次の花嫁の哀歌で受けるダメージが{pct}%増加：1スタックごとに{per}%、最大{max}スタック。次はランタンの光の中で受けること。",
+        "slippery": "すべりやすい氷の上：速度は毎秒最大{grip}ヤード/秒しか変わらないため、走り出しが遅く、止まっても滑り続け、曲がると大きく膨らむ。氷から降りれば足場が戻る。",
+        "harmony": "受けるダメージが{pct}%減少：生きている聖歌隊員1人ごとに{per}%。聖歌隊員を先に倒すこと。",
+        "crescendo": "歌が速くなる：虚ろの挽歌は{castNormal}秒ではなく{cast}秒になり、{everyNormal}秒ではなく{every}秒ごとに来る。骨のオルガンは{wavesNormal}波ではなく{waves}波の音符を奏でる。",
+        "gorged": "与えるダメージが{pct}%上昇：彼のもとに届いた縛られし魂1つごとに{per}%、現在{stacks}/{max}スタック、戦闘終了まで持続。魂が届くたびに最大体力の{heal}%も回復する。魂の進路に立てば代わりに受け止められる。",
+        "unquietWard": "祭壇で安らがぬ者の儀式を詠唱している間、ダメージを受けない：追憶のろうそく{total}本のうち{lit}本が再点火済み。1本を灯し直すには{channel}秒の詠唱が必要で、その間、灯す者の最大体力の{drain}%（ヒロイックでは{drainHeroic}%）が毎秒吸い取られる。攻撃を受けても中断されないが、動くかスタンで中断される。最後のろうそくで結界が砕ける。ヒロイックでは台帳が告げる順に灯すこと：違うろうそくを灯すと最後に灯したろうそくが消え、灯した者に{wrongMin}～{wrongMax}の闇ダメージ。",
+        "riteBroken": "スタン：砕けた結界のせいで{seconds}秒間行動できない。",
+        "shatteredWard": "{seconds}秒間、受けるダメージが{pct}%上昇：灯し直したろうそくが結界を砕いた。今こそ最大の攻撃を叩き込め。",
+        "graveChill": "安らがぬ者の儀式が続く間、毎秒{bite}の闇ダメージ（ヒロイックでは{biteHeroic}）を受け、{every}秒ごとに{step}（ヒロイックでは{stepHeroic}）ずつ増える。追憶のろうそくを灯し直して終わらせること。",
+        "graspMark": "{fuse}秒後、足元の輪から手が噴き出す：輪が置かれた場所から{radius}ヤード以内の全員が{root}秒間その場に縛られ、{min}～{max}の闇ダメージを受ける。輪から出ること。",
+        "graspRoot": "墓の手に掴まれている：{seconds}秒間移動できない。",
+        "knellAirborne": "儀式の環の上空を飛んでおり、攻撃が届かない。環の半分に{mark}秒間印を付け、その半分に亡霊の炎を浴びせる：中にいる全員に{min}～{max}の火炎ダメージ。1回の飛行で{breaths}回半分を焼き、その後着地する。"
+      },
+      "sanctum": {
+        "lockbound": "受けるダメージが{pct}%減少：まだ残っている鎖1本につき{per}%。封印の枷を壊すとその鎖が外れる。",
+        "enrage": "与えるダメージが{pct}%増加。",
+        "grasp": "融け水の中に立ち、与えるダメージが{pct}%増加。融け水の中で死ぬと沈み、{seconds}秒後に再び起き上がる。冷たい氷の上で倒せば二度と起きない。",
+        "twiceWoken": "融け水から再び起き上がり、与えるダメージが{pct}%増加。",
+        "doused": "足元の氷板が割れ、焼き入れの水が墓場のインフェルノを消した。",
+        "airborne": "空中にいて攻撃できない。最も多くのプレイヤーが立つ氷板へ墜落の降下で着地し、{radius}ヤード以内の全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。",
+        "wyrmsEye": "この効果が切れると、コルズルが立っている氷板全体に降り注ぐ炎を浴びせる：上にいる全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）、氷板にひびが入り、すでにひびがあれば砕ける。無傷の氷の上で仲間から離れて立て。",
+        "quenchWater": "開いた焼き入れの水の中：移動速度が{slow}%低下し、毎秒{damage}のダメージ（ヒロイックでは{heroic}）で焼かれる。どれかの氷板か岸まで泳げ。",
+        "shardFlare": "心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。",
+        "branded": "{seconds}秒間、{interval}秒ごとに{value}の{school}ダメージを与える。融け水の池に入るとすぐに消える。",
+        "creepingRime": "移動速度が{pct}%低下する（スタック1つにつき{per}%）。霧氷のブレスを受けるたびにスタックが1つ増え、効果時間が{seconds}秒にリセットされる。{max}スタックに達すると{freeze}秒間凍りつき（凍結）、スタックは消える。",
+        "icedOver": "忍び寄る霧氷で凍りついた：移動も行動もできない。"
+      },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
@@ -3950,6 +4273,8 @@ export const ja_JP: EnTranslations = {
       "cooldownCap": "この時間枠でクールダウン短縮を{used}/{cap}秒使用済み",
       "bruinRushWindow": "ウルフフォームのマナ消費がなくなり、ブルーインラッシュの対象を押さえ込んで{sec}秒間移動速度を{pct}%低下させる",
       "funeralHarvestLock": "フューネラル・ハーベストはまだ次の魂の欠片を生成できない",
+      "effigyPlankHide": "あらゆる打撃の {pct}% を受け流す。シャードパイクの突きで目のランタンを消すまで続く",
+      "effigyLanternOut": "あなたにとって藁の監督のランタンは消えている：あなたとペットの攻撃は板の皮を無視し、全力で通る",
       "leadenHexLock": "レドン・ヘックスはまだこの対象を再び移動不能にできない",
       "forbiddenReflectionReady": "次の対象となるウォーロックのクールダウンを再使用できる",
       "forbiddenReflectionLock": "フォービドゥン・リフレクションはまだ再準備できない",
@@ -4006,8 +4331,8 @@ export const ja_JP: EnTranslations = {
       "nextAttackCrit": "次の攻撃が必ずクリティカルになる",
       "healEcho": "体力が{threshold}%未満になると体力を{value}回復する",
       "trinket": {
-        "lastStandCooldown": "砦の印章の「最後の砦」シールドは使用済み。この効果が切れるまで、体力が{threshold}%を下回っても再び発動しない。",
-        "lastBastion": "{value}のダメージを吸収する。体力が{threshold}%未満でダメージを受けたときに砦の印章が張ったシールド。",
+        "lastStandCooldown": "防護シールドは使用済みです。この効果が切れるまで、体力が{threshold}%未満でダメージを受けても再発動しません。",
+        "lastBastion": "{value}ダメージを吸収します。体力が{threshold}%未満でダメージを受けたときに、装飾品が張ったシールドです。",
         "retaliate": "あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。",
         "moored": "受けるダメージが{reduction}%減少するが、移動速度が{speed}%になる。スタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果、ノックバックを無視する。",
         "hourglassStored": "過剰回復から蓄えた回復量{stored}を保持している。癒し手の砂時計を使うと、{range}ヤード以内で体力の割合が最も低いパーティメンバー（自分を含む）へのシールドに変える。",
@@ -4028,6 +4353,16 @@ export const ja_JP: EnTranslations = {
         "riftGuard": "受けるダメージが{pct}%減少する。",
         "sprint": "移動速度が{pct}%増加する。他の移動速度上昇効果とは重複しない。",
         "brand": "受ける回復量が{pct}%減少する。",
+        "shackle": "鎖で縛られている：移動できない。",
+        "shackleSlow": "鎖につながれている：移動速度が{pct}%低下。",
+        "spiritPack": "霊のジャガーが共に戦い、{every}秒ごとに対象へ噛みついて{min}～{max}の物理ダメージを与える。",
+        "seedburst": "ゴージブルームの種。この効果が切れると弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。それまでにこの敵が死んだ場合は{bonus}%増加（{empowered}）。",
+        "tether": "親方の最後の鎖環でつながれている：あなたの体力に届くはずのダメージの{pct}%を、代わりにあなたをつないだ者が受ける。",
+        "tetherLink": "つないだ味方が受けるはずのダメージの{pct}%をあなたが受ける。",
+        "harvest": "あなたから{radius}ヤード以内で敵対的なクリーチャーが死亡するたびに、最大体力と最大マナの{pct}%を回復する。",
+        "quench": "次の{stacks}回の武器の命中が追加で{damage}の冷気ダメージを与える。最後の命中は対象の攻撃速度を{slow}%低下させる。",
+        "quenchOther": "次の{stacks}回の武器の命中が追加の冷気ダメージを与える。最後の命中は対象の攻撃速度を{slow}%低下させる。",
+        "quenched": "攻撃速度が{pct}%低下。",
         "forgeHeat": "熱：{stacks}/{max}。鍛冶父の焼き入れを使うと熱をすべて消費し、その武器の炎のダメージが{pct}%増加する。",
         "tempered": "近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与える（消費した熱で{pct}%増加）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。",
         "temperedOther": "近接および遠隔武器の命中が追加の火炎ダメージを与え、消費した熱で{pct}%増加する。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
@@ -4036,6 +4371,10 @@ export const ja_JP: EnTranslations = {
         "moltenIgnite": "{every}秒ごとに{damage}の火炎ダメージを与える。新たな武器のクリティカルヒットで更新される。",
         "pierce": "オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{pct}%を与える。",
         "lantern": "ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{pct}%回復する。",
+        "foremanShape": "あなたは監督だ：防具が{armorPct}%増加し、ノックバックを受けない。",
+        "musterStandard": "召集兵団の軍旗が立っている。兵たちはあなたに付き従い、あなたの対象と戦う。",
+        "gutteredGlare": "光線が進路上の敵に{every}秒ごとに{tick}の秘術ダメージを与える。移動または詠唱で終了する。",
+        "stoneStatue": "石になっている：ダメージを受けず、行動できない。最大体力の{pct}%で復帰する。",
         "crucibleHeat": "熱：{stacks}/{max}。るつぼの心臓を使うと熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に{damage}の火炎ダメージを与え、命中したすべてのクリーチャーを挑発する。",
         "crucibleHeatOther": "熱：{stacks}/{max}。るつぼの心臓は熱をすべて消費して{radius}ヤード以内に炎のノヴァを放ち、スタックごとに火炎ダメージが増え、命中したすべてのクリーチャーを挑発する。"
       },
@@ -4071,6 +4410,7 @@ export const ja_JP: EnTranslations = {
       "dodge": "回避率を{pct}%上昇させる",
       "dodgeReduce": "回避率を{pct}%低下させる",
       "damageReduction": "受けるすべてのダメージを{pct}%軽減する",
+      "slumber": "夜明けまで眠っている。攻撃できず、誰が来ても目を覚まさない。",
       "guardianWard": "次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する",
       "armorFlat": "防御力を{value}低下させる",
       "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
@@ -4147,7 +4487,9 @@ export const ja_JP: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}がソーンピーク高地に立ち上がった！"
+      "spawn": "{name}が{zone}にそびえ立つ！",
+      "wake": "{name}が{zone}で目を覚ました！",
+      "sleep": "{name}は夜明けまで眠っている。"
     },
     "auth": {
       "appleLoginCta": "Appleで続ける",
@@ -4211,7 +4553,8 @@ export const ja_JP: EnTranslations = {
         "foodVendor": "飲食物商人",
         "potionVendor": "ポーション商人",
         "stableMaster": "厩舎長",
-        "generalGoods": "雑貨商人"
+        "generalGoods": "雑貨商人",
+        "innkeeper": "宿屋の主人"
       }
     },
     "mobTooltip": {
@@ -4291,6 +4634,7 @@ export const ja_JP: EnTranslations = {
         "menu": "メニュー",
         "minimap": "ミニマップ",
         "stanceBar": "スタンスバー",
+        "shardpikeBar": "シャードパイクバー",
         "xpBar": "経験値バー",
         "chat": "チャット",
         "actionBarGroup": "アクションバー",
@@ -4308,6 +4652,7 @@ export const ja_JP: EnTranslations = {
         "deedTracker": "功績トラッカー",
         "delveTracker": "デルヴトラッカー",
         "riftTracker": "リフトトラッカー",
+        "dungeonTracker": "ダンジョントラッカー",
         "swingBarOffhand": "オフハンド",
         "unitTooltip": "ツールチップ"
       },
@@ -4880,6 +5225,19 @@ export const ja_JP: EnTranslations = {
       "vaultCannotDeposit": "保管庫には預けられません",
       "tabsAria": "銀行タブ",
       "personalTab": "個人",
+      "accountTab": "ほかのキャラクター",
+      "accountArmour": "メンバーシップ防具を受け取る",
+      "referralArmour": "友情の防具を受け取る",
+      "accountMembership": "メンバーシップが有効な間、ここからほかのキャラクターの銀行を利用できます。",
+      "accountCharacters": "キャラクターの銀行",
+      "accountEmpty": "別のキャラクターを作成すると、その銀行をここで利用できます。",
+      "accountSelect": "キャラクターを選んで銀行を読み込んでください。",
+      "accountUnavailable": "この銀行は利用できません。キャラクターを選び直して更新してください。",
+      "accountDeposit": "自分のバッグ：この銀行に預ける",
+      "accountWithdraw": "選択中の銀行：自分のバッグに引き出す",
+      "accountDepositHint": "クリックすると、このスタックを選択中のキャラクターの銀行に預けます。",
+      "accountWithdrawHint": "クリックすると、このスタックを自分のバッグに引き出します。",
+      "accountBound": "魂縛、ロック済み、クエスト用のアイテムはキャラクター間で移動できません。",
       "guildTab": "ギルド",
       "guildCapacityAria": "使用中のギルド銀行スロット: {total}個中{used}個",
       "guildEmpty": "ギルド銀行は空です。",
@@ -4949,6 +5307,190 @@ export const ja_JP: EnTranslations = {
       "logOpenBank": "{actor} が {amount} でギルド銀行を開設しました",
       "logCharterFee": "{actor} がギルド設立費用 {amount} を支払いました",
       "logAdminPurge": "管理者が {item} を {count} 個削除しました"
+    },
+    "collections": {
+      "title": "ハンティング",
+      "close": "ハンティングを閉じる",
+      "keybindLabel": "ハンティング",
+      "launcherTitle": "ハンティング：バディ、マウント、装備セット",
+      "tabs": {
+        "buddies": "バディ",
+        "mounts": "マウント",
+        "sets": "Item Sets"
+      },
+      "state": {
+        "owned": "収集済み",
+        "notOwned": "未収集",
+        "unavailable": "まだ入手不可",
+        "pending": "何かが付いてきている"
+      },
+      "presenceDefault": "何かに見られている気がする。",
+      "revealed": "{name}があなたに付いていくことに決めた。",
+      "cosmeticUnlocked": "{name}の新しい姿：{look}。",
+      "presence": {
+        "ember_fox": "小さく温かい何かが、あなたの後ろをそっと歩いている。",
+        "moss_hare": "泥炭の中のかさかさという音が、あなたの歩みに合わせて続く。",
+        "frog": "あなたの一歩ごとに、湿った鳴き声が応える。",
+        "crimson_claw_crab": "視界の端で、何かがカチカチと音を立てて走り回る。",
+        "golden_sentinel": "草むらから、かすかな金色の光がこちらを見ている。",
+        "nightfang": "見えないところを、音のない足が付いてくる。",
+        "tuskhorn_boar": "鼻息とひづめの音。頑固な何かがあなたを追ってくる。",
+        "emerald_wolf": "下草の中で緑の目が瞬き、そして付いてくる。",
+        "tiger": "視界の端で縞模様が動く。",
+        "cate_coin": "自分のものではない硬貨の、かすかな音が聞こえる。",
+        "alon": "見られている。そして、静かに認められている気がする。",
+        "trollface": "あなたの後ろのどこかで、何かがにやりと笑っている。",
+        "ansem": "扉と闇のささやきがあなたに付いてくる。",
+        "triple_t": "一つのはずの足音が、三つ聞こえる。",
+        "kekius": "押し殺した笑い声が道の上であなたを追ってくる。",
+        "solbot": "柔らかな時を刻む音が、あなたの歩幅に合わせて鳴る。",
+        "frostfire": "蒸気と霜があなたの後ろで渦を巻く。",
+        "rocky": "風もないのに、後ろで小石が動く。",
+        "proud_grunt": "あなたの後ろのどこかで、軍靴が気をつけの音を鳴らす。",
+        "loot_goblin": "何かがあなたの硬貨をぼそぼそと数えている。",
+        "penny_goldspark": "自分のものではないポケットで、小さな道具がかちゃかちゃ鳴る。",
+        "stag": "角のある影が、あなたの道に落ちる。",
+        "alpaca": "毛むくじゃらで急がない何かが、一緒に来ることに決めたようだ。",
+        "horse": "どこか後ろで、蹄がゆったりと辛抱強い拍子を刻んでいる。",
+        "sapling": "小さな根が後ろで軽い足音を立て、落ち葉を揺らす。",
+        "bull": "低い鼻息が、あなたの後ろの土埃を舞い上げる。",
+        "spider": "一筋の糸があなたの肩をかすめる。",
+        "raptor": "すばやい爪が、あなたのかかとのそばで石を鳴らす。",
+        "skeleton": "乾いた骨があなたの歩みに合わせてかたかた鳴る。",
+        "crystal_lich": "残骸から冷たいうなりが立ちのぼり、それがあなたを見ている。",
+        "forgemaw": "炉の熱がまだあなたから離れない。何かがそれと共に歩き出た。",
+        "crystal_tide": "海のひとしずくが、あなたの釣り糸から落ちようとしない。",
+        "phantom": "あなたの後ろの空気が、ほんの少し静かすぎる。",
+        "emberfall_phoenix": "埋み火のような温もりが、あなたの背に落ち着く。"
+      },
+      "cosmetic": {
+        "crystal_lich_frostbound": "霜縛り",
+        "crystal_lich_voltaic": "雷光",
+        "forgemaw_ashen": "灰燼",
+        "forgemaw_whitehot": "白熱",
+        "stag_acorn": "どんぐりの冠",
+        "stag_gilded": "金箔",
+        "moss_hare_verdant": "新緑",
+        "proud_grunt_warlord": "ウォーロード",
+        "frog_sapphire": "サファイアの蛙"
+      },
+      "actions": {
+        "summon": "呼び出す",
+        "dismiss": "下がらせる",
+        "wear": "着せる",
+        "remove": "外す"
+      },
+      "looks": {
+        "title": "姿",
+        "unlocked": "解放済み",
+        "locked": "未解放",
+        "worn": "着用中",
+        "none": "この相棒にはまだ姿が用意されていない"
+      },
+      "source": {
+        "bossLabel": "ボスのペット",
+        "bossDrop": "{mob}（{location}）、討伐ごとにプレイヤー各自{chance}%",
+        "bossDropWithHeroic": "{mob}（{location}）、プレイヤー各自{chance}%、ヒロイックでは{heroicChance}%",
+        "bossDropHeroicOnly": "{mob}（{location}）、ヒロイック限定、プレイヤー各自{chance}%",
+        "rollNote": "判定はプレイヤーごとに別々に行われ、パーティメンバーに機会を奪われることはない。",
+        "deedLabel": "入手条件",
+        "deed": "功績「{deed}」",
+        "challengeLabel": "チャレンジ",
+        "challengeSpeed": "戦闘開始から{seconds}秒以内に{mob}を倒す",
+        "challengeDps": "戦闘を通して{mob}に毎秒{dps}のダメージを与える",
+        "craftLabel": "製作",
+        "craft": "{item}（{profession}のレシピ）",
+        "grantLabel": "授与",
+        "grantOnly": "シーズン報酬：月間ラダーとトップパース報酬",
+        "tokenLabel": "トークン",
+        "token": "{item}、一度使うと相棒が付いてくる"
+      },
+      "buddyLore": {
+        "ember_fox": "イーストブルック渓谷の生け垣から来た雌狐。冬枯れの茂みごしに覗く炭のように赤い毛からその名がついた。土地の罠師たちは何世代も前に子狐を狙うのをやめ、代わりに餌を置くようになった。",
+        "moss_hare": "ウィローフェンの野ウサギ。湿った泥炭に一生寝床を作るうちに毛が緑になった。沼の薬草師たちはこれを縁起物とし、戸口に来たものを追い払わせない。",
+        "frog": "マイアフェン湿地はこれを丸々と、のんきに育てる。葦の茂みから一晩じゅう鳴きどおしだ。沼の案内人たちは、これを乗せた舟は決して座礁しないと請け合う。",
+        "crimson_claw_crab": "遠つ岸の潮だまりのカニ。水から上げてしばらく経っても爪は赤いままだ。かつて波止場の連中は板の上でこれを競走させ、小銭を賭けていた。",
+        "golden_sentinel": "アンバーフォールの見張り甲虫。育った樹脂に鍍金されて金色になった。名のほうが樹脂より古い。誰かが樹液を瓶に詰めようと思いつくずっと前から、その種の歩哨がその林を守っていた。",
+        "nightfang": "ナイトブルームの若い狩人。同族の基準で見てもなお静かだ。連れ立つのは人恋しさからで、蛾より大きな獲物は狩らない。",
+        "tuskhorn_boar": "ソーンピーク高地の血統。柵を倒せない猪が欲しかった羊飼いたちによって、脚を短く掛け合わされた。気性のほうはそのまま残った。",
+        "emerald_wolf": "レイスウッドの子狼。林床までほとんど届かない木漏れ日の下では、その毛は緑に見える。森が残していった孤児は、どれもウォーデンたちが育てる。",
+        "tiger": "パームリーチの縞を持ちながら、パームリーチを見たことのない獣。古い見世物小屋が閉じて以来、この血統はずっと飼育下にある。応じるのは笛の音だけで、ほかには何にも応えない。",
+        "cate_coin": "腰を下ろしたコインから決して離れず、物を食べるところを誰も見たことがない猫。イーストブルックの商人たちは今も、どちらがペットなのかで揉めている。",
+        "alon": "どの地図も認めない道から来た旅人のマスコット。計画が狂っている場所に必ず現れる。見て、うなずいて、助けは一切しない。",
+        "trollface": "レイスウッドが世に出し、二度と引き取ろうとしなかった、にやりと笑うもの。これを説明しようとする試みは、いつも説明する側が笑い出して諦めるところで終わる。",
+        "ansem": "扉と闇について語るが、それ以上は決して口を割らない。ナイトブルームの信徒は自分たちのものだと言い張るが、儀式のたびにどこかへ行ってしまう。",
+        "triple_t": "何かが三つなのか、一つのものが三度あるのか。証言はどれも食い違い、当の生き物は数えられるほど長くはじっとしていない。",
+        "kekius": "出自不明の笑う相棒。ゲイルクレストの競走場が縁起物として迎え入れた。これを頼みにしていた厩舎を四つ見送っても、まだ健在だ。",
+        "solbot": "陽光を糧とする小さな自動機械。ドレイクランドの灰に半ば埋もれたところを掘り出されたが、まだ動いていた。これを造った工房は、筐体のどこにも刻印を残していない。",
+        "frostfire": "フロストヴェイルの果てで、氷原を突いて温泉が湧く場所に生まれた。自分がどちらの側のものなのか、いまだに決めかねている。冷たい空気の中では湯気を立て、暖かい所では震える。",
+        "rocky": "ソーンピーク高地のガレ場に棲む石殻の這うもの。のろく、そして何ごとにも動じない。落盤の直前に一瞬だけぴたりと止まる、そのために坑夫たちが飼っている。",
+        "proud_grunt": "戦備倉庫の古参兵。敬礼は保ち、階級は失った。戦元帥ドレイヴン・コールは、その代償を知るだけの名誉を持つ兵にこれを託す。",
+        "loot_goblin": "英雄の証を持つ者なら誰にでもついていくが、盗みを働くところを一度も押さえられていない。補給係ヴェックスは、それは何の証明にもならないと言い張っている。",
+        "penny_goldspark": "ノームの技師の弟子。時間で料金を取るが、その銅貨一枚ぶんの働きは必ずする。防具師ホードは借りを清算するために彼女を引き取り、今では千金を持つ者なら誰にでもこの取り決めを売っている。",
+        "stag": "エバーガーデンの血統。かつてウォーデンたちが乗った大鹿から小さく掛け合わされてきた。手を挙げれば今も頭を下げる。この個体より古い習いだ。",
+        "alpaca": "ゲイルクレストの群れは羊毛と気性のために飼っている。嵐の中でこれほど落ち着いた家畜はいない。この個体は道中きっかり一人に唾を吐く。",
+        "horse": "イーストブルック渓谷のポニーの血統で、果樹園の小道向けに小さく育てられ、自分が軍馬ではないとは一度も教えられていない。あなたの肩の横で歩調を合わせ、一度でもリンゴをくれた相手なら誰にでもついていく。",
+        "sapling": "樹皮に笑顔を浮かべ、好奇心に満ちた紫の瞳を持つ若木。根を足にして楽しげによちよちと歩き、どこへでもついてくる。",
+        "bull": "犬ほどの大きさのイーストブルック渓谷の雄牛。屋内で飼うのを誰もが承知した理由はそれだけだ。気性のほうは小さくならなかった。",
+        "spider": "レイスウッドの織り手。手のひらほどの大きさで、入れられた荷袋を必ず模様替えしてしまう。その糸は、置き換えられた縫い糸より丈夫だ。",
+        "raptor": "ドレイクランドの孵化個体。自分がどれだけ速く走れるかを覚える前に売りに出される。新しい飼い主は必ず「餌を切らすな」と言われ、二度言われる者はいない。",
+        "skeleton": "レイスウッドの塚から這い出し、自分の埃を払って、それ以来ずっと人についてまわっている。この骨が誰のものだったのかは、まだ誰も突き止めていない。",
+        "crystal_lich": "ナイスラクシスそのものの破片で、今なおそれを形づくった冷気を帯びて震えている。レイドの残骸から引き出した者に従うが、そのことをまだ許してはいない。",
+        "forgemaw": "最後の泉のるつぼで鍛えられ、ついに完成しなかったもの。槌の音がまだ響くうちにイグニヴァルの鋳場から歩み出た。見つけられるのはヒロイックの踏破だけだ。この溶けたものは自分を作った炉へ戻り続け、二度炎を生き延びた者について家まで来る。",
+        "crystal_tide": "自分のシーグラスの雫に乗る潮の精。イーストブルック渓谷から遠つ岸まで、夕飯を釣るつもりだった釣り人が静かな水から引き上げた。上がってきた時の水を離さず、戻れと言われても聞かない。",
+        "phantom": "レイスウッドの塚から出た手のひらほどの亡霊。布ばかりで骨はない。閉じたはずの荷袋の中に現れ、人恋しさから居着いてしまう。何を求めているのかは誰にも分からず、これまで一度も誰かを脅かそうとしたことがない。",
+        "emberfall_phoenix": "秋ごとに燃え尽きて一粒の燃えさしとなり、春には自らの灰から立ち上がってくる。誰に訊いても言えるのはそれだけだ。巣を見つけた者はおらず、同じ個体を二度捕らえた者もいない。"
+      },
+      "petKind": {
+        "beast": "ビースト",
+        "elemental": "エレメンタル",
+        "humanoid": "ヒューマノイド",
+        "undead": "アンデッド",
+        "celebrity": "セレブリティ"
+      },
+      "armor": {
+        "cloth": "布",
+        "mail": "Mail",
+        "leather": "革"
+      },
+      "stat": {
+        "intellect": "知力",
+        "agility": "敏捷性",
+        "strength": "筋力",
+        "mixed": "ハイブリッド"
+      },
+      "set": {
+        "owned": "{total}部位中{owned}部位",
+        "itemLevel": "アイテムレベル {level}",
+        "bonusLabel": "{pieces}部位"
+      },
+      "detail": {
+        "dropLabel": "ドロップ元",
+        "vendorLabel": "Sold by",
+        "bindLabel": "装備制限",
+        "sellLabel": "商人の買取額",
+        "marketLabel": "ワールドマーケット",
+        "exchangeLabel": "$WOC取引所",
+        "setLabel": "収集済み",
+        "drop": "{mob}（{location}）、討伐ごとに{chance}%",
+        "heroicDrop": "{mob}（{location}）、ヒロイック限定、討伐ごとに{chance}%",
+        "dropWithHeroic": "{mob}（{location}）、討伐ごとに{chance}%、ヒロイックでは{heroicChance}%",
+        "globalDrop": "任意の敵、討伐ごとに{chance}%、同レアリティ{count}種のうち1つ",
+        "fishingDrop": "どこでも釣り、釣り上げるごとに{chance}%",
+        "vendor": "{npc} ({location}) for {price}",
+        "honorPrice": "名誉{amount}",
+        "marksPrice": "英雄の証{amount}",
+        "noSource": "ゲーム内に入手手段はまだありません",
+        "noItem": "これを与えるアイテムはまだありません",
+        "tradeable": "取引可能",
+        "soulbound": "魂縛",
+        "noSell": "売却不可",
+        "marketAtMerchant": "商人のところで表示",
+        "marketChecking": "確認中…",
+        "marketNone": "出品なし",
+        "exchangeNone": "出品なし",
+        "exchangeUnavailable": "このクライアントでは利用できません"
+      }
     },
     "calendar": {
       "title": "イベントカレンダー",
@@ -5949,10 +6491,42 @@ export const ja_JP: EnTranslations = {
       "tagFastRun": "高速周回",
       "mech": {
         "shadow_pulse": "シャドウパルス（周期的な範囲ダメージ）",
+        "crypt_shovelful": "ひとすくいの墓土（11秒ごとに前方8ヤードの扇形に墓土を浴びせる：通常攻撃の1.5倍のダメージと6秒間の移動速度50%低下。背後に立つこと）",
+        "crypt_measured_for_the_grave": "墓の採寸（15秒ごとにタンク以外のプレイヤーに印を付ける。4秒後その足元に開いた墓が崩れ落ち、ノーマルでは3ヤード以内に42～52のダメージ。穴は戦闘中ずっと残り、中にいると毎秒9ダメージと移動速度40%低下。墓は墓地の端に作ること）",
+        "crypt_burial_toll": "埋葬の鐘（体力66%と33%で鐘の綱へ歩み寄り、ダメージ無効のまま3秒間鐘を鳴らす：ノーマルでは全員に30～38の闇ダメージ、さらに開いた墓すべてから安らがぬ骨が這い出る）",
+        "crypt_marrow_heroic": "ヒロイック：墓掘りの一撃が9秒ごとにタンクを襲う（1スタックごとに受けるダメージ6%上昇、20秒、最大6スタック）、墓の活力（墓の中に立つと攻撃速度30%上昇）、安らがぬ大地（墓の中に2秒留まるとそこから安らがぬ骨が這い出る）",
+        "crypt_brides_lament": "花嫁の哀歌（22秒ごとに3秒の慟哭：ノーマルでは灯った墓のランタンの光の外にいる全員に60～75の冷気ダメージ、すでに受けた哀歌の名残1スタックごとに半分ずつ増加。ランタン1つが守れるのは2人まで、誰かを守ると28秒間消える。分かれて交代で使うこと）",
+        "crypt_frozen_embrace": "凍てつく抱擁（30秒ごとにタンク以外のプレイヤーを捕らえ、5ヤードの高さまで共に浮かび上がる。毎秒6の冷気ダメージ。8秒以内に彼女の体力の6%を削れば静かに降ろすが、さもなくば落とし、ノーマルで150～180のダメージ）",
+        "crypt_rime_path": "霜の道（彼女が漂った跡に25秒間すべりやすい霜が残る。その上では加速が遅く、止まったり曲がったりしても滑り続ける）",
+        "crypt_bridal_freeze": "花嫁の凍結（体力が半分になると峡谷の床全体が凍りつき、戦闘の残りはずっとすべる氷になる）",
+        "crypt_lady_heroic": "ヒロイック：灯ったランタンは30秒経つと自然に消えて10秒間暗くなり、凍てつく抱擁は2人を捕らえる",
+        "crypt_dirge_of_the_hollow": "虚ろの挽歌（16秒ごとに中断できる2.5秒の歌：歌い切ると、ノーマルでは45ヤード以内で彼女が見える全員に105～125の闇ダメージと4秒の沈黙。中断するか聖歌隊の柱の陰に隠れること）",
+        "crypt_harmony": "調和（生きている聖歌隊員1人ごとに彼女の受けるダメージが30%減る：聖歌隊員を先に倒すこと）",
+        "crypt_bone_organ": "骨のオルガン（26秒ごとに骨のオルガンを奏でる：闇の音符が2波、聖歌隊席の床を筋状に炸裂し、ノーマルでは筋の中で100～115のダメージ。2波目は1波目の隙間を埋める）",
+        "crypt_crescendo": "クレッシェンド（体力30%未満で挽歌は1.8秒になり11秒ごとに来る。オルガンは3波目を奏でる）",
+        "crypt_ilvane_heroic": "ヒロイック：アンコール（もう一方が立っているまま10秒倒れていた聖歌隊員は再び起き上がる。同時に倒すこと）と途切れぬ詩節（3回目ごとの挽歌は中断できない。隠れること）",
+        "crypt_morthen_shadow_pulse": "シャドウパルス（12秒ごとに2秒の詠唱の後、ノーマルでは周囲12ヤード以内の全員に24～30の闇ダメージ。離れること。終の儀式中は9秒ごと）",
+        "crypt_gravecall": "墓呼び（15秒ごとに縛られし魂が次の石棺の壁龕から彼のもとへ漂う。届くと死者の飽食となり、魂1つごとに与えるダメージが10%上昇（最大10スタック）、体力の3%を回復する。進路に立つプレイヤーが代わりに受け止める：ノーマルでは12～16の闇ダメージ）",
+        "crypt_rite_of_the_unquiet": "安らがぬ者の儀式（体力65%で祭壇に戻り、安らがぬ者の結界の中でダメージを受けなくなる。その間、墓の冷気が全員に毎秒3の闇ダメージを与えて5秒ごとに1ずつ増え、壁龕から安らがぬ骨が2体這い出る。追憶のろうそく4本を灯し直すこと：1本ごとに4秒の詠唱で、灯す者の最大体力の6%を毎秒吸い取る。攻撃では中断されないが、動くかスタンで中断される。最後のろうそくで儀式が破れ、8秒間スタンし、受けるダメージが25%上昇する）",
+        "crypt_reap_the_unquiet": "安らがぬ者の刈り取り（体力35%未満で魂は止まり、14秒ごとに2秒の詠唱の後、大鎌を振るう：ノーマルでは前方14ヤード、120度の扇形にいる全員に55～65の闇ダメージ。以後シャドウパルスは9秒ごと）",
+        "crypt_morthen_heroic": "ヒロイック：死者の名を呼べ（台帳がろうそくの順番を告げる。違うろうそくを灯すと最後に灯したろうそくが消え、灯した者に252～288の闇ダメージ。再点火は毎秒8%を吸い取る）、墓の掌握（16秒ごとにプレイヤー2人の足元に4ヤードの輪が現れ、1.5秒後に手が噴き出す：3秒の移動不能と162～198の闇ダメージ）、弔鐘竜の燃える弔鐘（飛び立って環の半分に4.5秒間印を付け、その半分に亡霊の炎を浴びせて1,000～1,120の火炎ダメージ。1回の飛行で3回）",
         "reaping_arc": "リーピングアーク（前方クリーブ）",
+        "hallowed_brine": "聖なる潮水（半径9ヤードの暗い聖水の溜まり、ヒロイックは10ヤード：中にいる者は毎秒18ダメージ、ヒロイックは26、彼は中に立つ間ダメージを40パーセント軽減する、外へ引きずり出せ）",
+        "rebounding_bulwark": "跳ね返る大盾（盾は最後に当たった者から10ヤード以内の最も近いプレイヤーへ跳ね返る、最大3人、ヒロイックは4人：散開せよ）",
+        "tide_sentence": "潮の宣告（印から5秒後、光の柱が印の者から6ヤード以内の全員を打つ、ヒロイックは8ヤード：集団から離れて受けよ）",
+        "unbroken_oath": "不壊の誓い（一度だけ、体力が半分になると最大60秒、泡の中で無敵のまま跪く：兵士を倒して破れ、その後4秒気絶し10秒間ダメージが20パーセント増える）",
+        "fog_veil": "霧のヴェール（四つの姿、本物は一つ：灯台の光線で本物のヴァエルのランタンが燃え上がる）",
         "mist_surge": "ミストサージ（周期的な範囲ダメージ）",
         "summons_adds": "増援を召喚",
         "lunar_tide": "ルナタイド（周期的な範囲ダメージ）",
+        "chorus_and_solo": "合唱と独唱（片方の印には集まり、もう片方からは離れる）",
+        "tideglass_reflections": "潮硝子の映し身（互いの映し身を倒す）",
+        "hydra_three_elements": "三つの属性（左の首は18ヤードの冷気の円錐を吐き、4秒間あなたの移動を70パーセント遅くする。中央の首は最大3人の足元に毒を吐き、1.5秒後に破裂して、落ちた場所で6秒間燃え続ける。右の首は26ヤードの直線に激流を放ち、あなたを8ヤード吹き飛ばす：どれも範囲の外へ出ること。首が1本倒れると、残った首がその攻撃を引き継ぐ）",
+        "hydra_tsunami": "津波（首が4.5秒間水中に沈み、その間の被ダメージが75パーセント減る。波は池の半分を襲い、次はもう半分を襲う：ノーマルでは160から190の冷気ダメージと10ヤードの押し出し。もう半分へ渡るか、池の縁の柱の陰に立つこと。ヒロイックでは3.5秒後に波がもう半分へ打ち返す。最初の津波は戦闘開始から24秒後、その後は前の波が過ぎてから40秒後に来る）",
+        "hydra_combined_breath": "合体ブレス（津波と津波の間に、首が自分たちの攻撃を2つ融合させる、順番は常に同じ：凍てつく激流は直線上の全員を2秒間凍らせ、次の波を防げる氷の壁を残す。毒の潮流は毒の池を外へ滑らせる。毒の霧氷は毒の池を結晶に凍らせ、4秒後に破裂させる。ノーマルでは津波の間に1回、ヒロイックでは2回）",
+        "hydra_regrowth": "再生（ほかの首が生きている間、倒れた首は20秒後に体力半分で生え戻り、倒れた首1本ごとに残りの首の与ダメージが15パーセント増える：3本をほぼ同時に倒すこと）",
+        "rising_tide": "満ち潮（島の半分が浸水、乾いた側へ移動）",
+        "undertow": "引き潮（全員を引き寄せる、衝撃の前に逃げる）",
         "enrage": "低体力で激怒",
         "shuddering_stomp": "身震いの踏みつけ（範囲スタン）",
         "grave_inferno": "墓場のインフェルノ（詠唱火炎AoE、散開を維持）",
@@ -5978,6 +6552,9 @@ export const ja_JP: EnTranslations = {
         "deathless_court": "不死の宮廷（英雄限定、不死の憤怒の後に王家の廷臣が蘇る）",
         "bloodmane_rend": "ブラッドメインレンド（出血、対象交代に注意）",
         "tusk_sweep": "タスクスイープ（前方クリーブ）",
+        "grave_breath": "墓所のブレス（前方の炎の扇形、範囲内の氷にひびが入る）",
+        "plate_floor": "砕ける氷（炎で湖の氷板が割れて沈む、開いた水面に入らない）",
+        "wyrm_flights": "飛行フェーズ（70%と40%：ワームの目は無傷の氷の上へ、着地させたい場所に集合）",
         "ancestral_sap": "アンセストラルサップ（味方を回復）",
         "call_of_the_hunt": "コール・オブ・ザ・ハント（周囲の味方を加速）",
         "thickhide_ward": "シックハイドウォード（周囲の味方を守護）",
@@ -6001,8 +6578,172 @@ export const ja_JP: EnTranslations = {
         "forgestorm": "フォージストーム（降り注ぐ隕石円、範囲外へ移動）",
         "shared_pyre": "共有の火葬（集合円、ダメージを分担）",
         "anvils_decree": "金床の勅令（全体への三連ハンマー打撃、回復で耐える）",
-        "masters_assembly": "匠の組立（鍛冶場の光線を遮る、遮る役を交代）"
+        "masters_assembly": "匠の組立（鍛冶場の光線を遮る、遮る役を交代）",
+        "iron_cage": "鉄の檻（インタラクトキーを連打して脱出、味方は格子を叩き壊せる）",
+        "drowned_anchor": "溺死の錨（犠牲者は穴へ巻き寄せられる：灯った係留柱から3ヤード以内まで走れば鎖を係留でき、その柱は30秒間消える、または12回の攻撃で鎖を断つ、ヒロイックは16回）",
+        "shackle_pair": "連鎖の枷（鎖でつながれた二人は離れずに動く）",
+        "reaper_behind": "影渡り（三度続けてプレイヤーの背後に現れる、人数が足りる限り毎回別の者：大鎌の弧から出る）",
+        "pack_bond": "群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）",
+        "stalk": "忍び狩り（ジャガーが印の者を狙う。タンクは狙わず、ソロではあなたを狙う：引き回し、鈍足・拘束・スタンを）",
+        "shared_health": "体力共有（共通の体力：最も安全な方を攻撃）",
+        "heel_frenzied_bond": "戻れ！と狂乱の絆（ジャガーが主の元へ跳び、絆が20ヤードに広がる）",
+        "seed_rain": "種の雨（花粉のない者が芽吹く前に種を踏み潰す）",
+        "pollinate": "受粉（金色の者は種に触れるな、すぐに芽吹く）",
+        "vine_lash": "蔓の鞭（茨の帯から出ろ、さもなくば拘束される）",
+        "gorge": "貪り食い（タンクへの強烈な噛みつきと毒）",
+        "burrowing_seeds": "潜る種と花粉の雲（種は6秒で誰かの傍から芽吹き、金色は広がる）",
+        "spirit_of_the_hunt": "狩りの魂（獲物は化身を光る太陽紋へ導く。噛み倒された者には逃げる猶予がある）",
+        "twin_prey_ambush": "双つの獲物と待ち伏せ（獲物が二人、その後最も遠い者へ飛びかかる）",
+        "seal_shackles": "封印の枷（鎖を1本断つごとに彼の被ダメージが20%増え、攻撃が1つ解き放たれる）",
+        "chain_strain": "鎖の引き締め（鎖がまだ残る柱から離れる）",
+        "korgath_stomp": "震える踏みつけ（彼の周りの輪から出る）",
+        "rerivet_last_link": "再鋲打ちと最後の環（鎖を打ち直す突き棒鍛冶を阻止する。鎖が残り1本になると10秒ごとに鎖の引き締め）",
+        "waking_thaw": "目覚めの雪解け（死者が融氷の池から這い上がる）",
+        "unquenched_held": "封じか不滅か（死者は冷たい氷の上で倒せ、融水の中では倒すな）",
+        "soulfire_trench": "魂火の溝（魂火の線、その後に融水の帯が残る）",
+        "shadow_volley": "影の斉射（全員に闇ダメージ）",
+        "warm_hands_twice_woken": "温かな手と二度目の目覚め（英雄のみ、死者を動かし続けよ。再び起きた者は強くなる）"
       }
+    },
+    "bastionCage": {
+      "title": "鉄の檻に閉じ込められた！",
+      "promptKey": "{key} を連打して脱出",
+      "promptNoKey": "インタラクトキーを連打して脱出",
+      "promptClick": "ここをクリック連打して脱出",
+      "promptTap": "ここを連打して脱出",
+      "buttonAria": "鉄の檻から脱出する",
+      "progressAria": "脱出の進行度：{pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "溺死の錨に繋がれた！",
+      "anchoredLine": "灯った係留柱まで走って鎖を係留せよ、さもなくば巻き上げ機に穴へ引きずり込まれる前に仲間が鎖を断て",
+      "allyTitle": "鎖を断て！",
+      "allyLine": "{name} が穴へ引きずられている：溺死の錨を攻撃するか、灯った柱へ導け",
+      "shackledTitle": "{name} と枷で繋がれている",
+      "shackledLine": "互いに {range} ヤード以内にいること（現在 {dist} ヤード）",
+      "strainedLine": "離れすぎ！鎖が二人を締め付ける：{range} ヤード以内に戻れ",
+      "brokenAria": "鎖の破損：{pct}",
+      "reachAria": "鎖の張り具合：{pct}",
+      "linksLeft": "残りの鎖の環：{count}/{total}",
+      "linkRule": "錨への一撃ごとに、威力に関係なく環が一つ外れる",
+      "linksTarget": "鎖の環 {count}/{total}",
+      "linkBroken": "環を断った！"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "宣告があなたに下る！",
+      "sentencedLine": "光の柱があなたの近くの全員を打つ：集団から離れろ",
+      "brineTitle": "聖なる潮水の中にいる！",
+      "brineLine": "毎秒あなたを焼く：溜まりから出ろ",
+      "reapedTitle": "死が背後から現れる！",
+      "reapedLine": "大鎌の弧から出ろ：前へ、あるいは左右へ",
+      "veilTitle": "霧のヴェール",
+      "veilLine": "灯台の光線を見よ：ランタンが燃え上がる者が本物のヴァエルだ",
+      "realTitle": "光が彼を捉えた！",
+      "realLine": "これが本物のヴァエルだ：攻撃してヴェールを破れ",
+      "shadeTitle": "虚ろな影",
+      "shadeLine": "光が素通りしている：放っておき、光線が照らす者を探せ",
+      "timeAria": "残り{seconds}秒"
+    },
+    "wildheartAlert": {
+      "preyTitle": "お前が獲物だ！",
+      "preyLine": "ズルガーが狙っている：光る太陽紋を通らせろ",
+      "preyWaitLine": "今はもう一人の獲物を追っている：備えろ、標的が変わる",
+      "stalkedTitle": "狙われている！",
+      "stalkedLine": "ジャガーが狙っている：主から引き離せ",
+      "pollinatedTitle": "受粉した！",
+      "pollinatedLine": "種に近づくな：触れると芽吹く",
+      "bondTitle": "群れの絆",
+      "bondLine": "並んでいると被ダメージ半減：引き離せ",
+      "timeAria": "残り{seconds}秒"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "焼き入れの水の中だ！",
+      "quenchLine": "焼かれて鈍る：一番近い氷か岸まで泳げ",
+      "plungeTitle": "降り注ぐ炎！",
+      "plungeLine": "足元の氷板全体が燃え上がる：今すぐ降りろ",
+      "descentTitle": "墜落の降下！",
+      "descentLine": "ここに降りてくる：影から出ろ",
+      "eyeTitle": "ワームの眼に狙われた！",
+      "eyeLine": "印が消えると立っている氷板が燃える：無傷の氷の上で仲間から離れろ",
+      "eyeCrackedLine": "ひびの入った氷の上だ：印が消える前に無傷の氷板へ移れ",
+      "flailTitle": "鎖の殻竿！",
+      "flailLine": "鎖が描かれた線に沿って振り下ろされる：線から出ろ",
+      "chargeTitle": "敷居の突進！",
+      "chargeLine": "線に沿って突進してくる：線から出て、端から離れろ",
+      "trenchTitle": "魂火の溝！",
+      "trenchLine": "魂火が線を裂き、融け水を残す：そこから出ろ",
+      "strainTitle": "鎖の引き絞り！",
+      "strainLine": "無傷の柱が今にも弾ける：柱から離れろ",
+      "infernoTitle": "墓場のインフェルノ！",
+      "infernoLine": "脈動のたびに激しくなる：彼の届く範囲から出ろ",
+      "stompTitle": "身震いの踏みつけ！",
+      "stompLine": "足が下りる前に彼から離れろ",
+      "breathTitle": "墓のブレス！",
+      "breathLine": "ブレスの扇の中にいる：横へ抜けろ",
+      "maulTitle": "大槌の弧！",
+      "maulLine": "前方すべてをなぎ払う：背後へ回れ",
+      "tailTitle": "尾のなぎ払い！",
+      "tailLine": "背後に立っている：尾が来る前に離れろ",
+      "meltwaterTitle": "融け水の中",
+      "meltwaterLine": "お前のボーンウォーカーが融け水の中にいる：冷たい氷の上へ引きずり出せ",
+      "meltwaterTargetLine": "ターゲットは融け水の中で死ぬと再び起き上がる：冷たい氷の上まで待て",
+      "crackedTitle": "ひびの入った氷",
+      "crackedLine": "ここに炎が当たるとこの氷板は砕ける：彼の炎をここに向けさせるな",
+      "flightTitle": "コルズルが飛び立つ",
+      "flightLine": "無傷の氷の上に集まって降下地点を選び、その後に離れろ",
+      "lockboundTitle": "錠縛",
+      "lockboundLine": "鎖が{chains}本残っている：被ダメージが{pct}%減少。封印の枷を壊して剥がせ。",
+      "timeAria": "残り{seconds}秒",
+      "brandedTitle": "焼き印！",
+      "brandedLine": "焼き印は切れるまで燃え続ける：融け水の池で消せ",
+      "rimeTitle": "忍び寄る霧氷！",
+      "rimeLine": "忍び寄る霧氷 {stacks}/{max}：幼竜のブレスから出ろ",
+      "slabTitle": "氷塊",
+      "slabLine": "堅い氷：視線を遮る。その陰に隠れて術者の呪文を避けろ"
+    },
+    "cryptAlert": {
+      "measuredTitle": "墓の採寸！",
+      "measuredLine": "バーが尽きると足元に墓が崩れ落ちる：墓地の端まで運べ",
+      "embracedTitle": "凍てつく抱擁！",
+      "embracedLine": "宙に抱え上げられている：仲間が彼女を攻撃すれば降ろしてもらえる",
+      "lamentTitle": "花嫁の哀歌！",
+      "lamentShelteredLine": "灯ったランタンの光の中に君の居場所がある：動くな",
+      "lamentOpenLine": "慟哭が届く前に灯ったランタンの光に入れ：1つのランタンに2人まで",
+      "graveTitle": "開いた墓の中にいる！",
+      "graveLine": "墓土が君を焼き、足を鈍らせる：墓から出ろ",
+      "tollTitle": "埋葬の鐘！",
+      "tollLine": "鐘を鳴らす間はダメージを受けない：鐘の一撃と、それが呼び起こす死者に備えろ",
+      "harmonyTitle": "調和",
+      "harmonyLine": "聖歌隊員が彼女の受けるダメージを{pct}%減らしている：先に聖歌隊員を倒せ",
+      "knellTitle": "燃える弔鐘！",
+      "knellLine": "バーが尽きると環のこちら側の半分に亡霊の炎が降り注ぐ：反対側の半分へ移動しろ",
+      "graspTitle": "墓の掌握！",
+      "graspLine": "この輪から手が噴き出し、中にいる者を掴む：輪から出ろ",
+      "reapTitle": "安らがぬ者の刈り取り！",
+      "reapLine": "大鎌が彼の前方の地面を薙ぎ払う：背後に回れ",
+      "riteTitle": "安らがぬ者の儀式",
+      "riteLine": "追憶のろうそくを灯し直して結界を砕け：{total}本中{lit}本点灯",
+      "riteNamedLine": "台帳が次に告げるろうそくだけを灯し直せ：{total}本中{lit}本点灯",
+      "soulTitle": "縛られし魂",
+      "soulLine": "魂がモーセンのもとへ漂っている：進路に立ち、彼を肥えさせる前に受け止めろ",
+      "timeAria": "残り{seconds}秒"
+    },
+    "kitUse": {
+      "toppleLine": "敵の群れの上に蹴り倒せ：こぼれた炎が奴らを焼く",
+      "toppleKey": "{name}を奴らの上に倒す",
+      "toppleTap": "ここをタップして{name}を奴らの上に倒す",
+      "toppleClick": "ここをクリックして{name}を奴らの上に倒す",
+      "toppleFar": "{range}ヤード以内に近づいて蹴り倒せ",
+      "toppleAria": "{name}を倒す",
+      "usingLine": "動くな：攻撃を受ける、動く、スタンのいずれかで中断される",
+      "relightLine": "詠唱中は毎秒体力を吸い取られる：攻撃では中断されないが、動くかスタンで中断される",
+      "relightKey": "{name}を灯し直す",
+      "relightTap": "ここをタップして{name}を灯し直す",
+      "relightClick": "ここをクリックして{name}を灯し直す",
+      "relightFar": "{range}ヤード以内に近づいて灯し直せ",
+      "relightAria": "{name}を灯し直す",
+      "relightUsingLine": "吸い取られる間も動くな：攻撃では中断されないが、動くかスタンで中断される",
+      "timeAria": "残り{seconds}秒"
     },
     "cosmetics": {
       "title": "コスメティック",
@@ -6011,6 +6752,8 @@ export const ja_JP: EnTranslations = {
       "tabMounts": "マウント",
       "tabSkins": "スキン",
       "tabMech": "メカ",
+      "buddyActive": "Summoned",
+      "buddyDrag": "Drag to action bar",
       "legend": "アカウント：全キャラクターで共有。キャラクター：このキャラクターのみ。",
       "scopeAccount": "アカウント",
       "scopeCharacter": "キャラクター",
@@ -6223,7 +6966,7 @@ export const ja_JP: EnTranslations = {
       "watchFull": "追跡リストが満杯です（最大 {cap} 件）",
       "watchAria": "{name}をHUDトラッカーで追跡",
       "unwatchAria": "{name}の追跡をやめる",
-      "cosmeticsSection": "称号と枠飾り",
+      "cosmeticsSection": "称号、枠、相棒",
       "titlesSection": "称号",
       "titlesAria": "表示する称号を選択",
       "titlesNone": "称号なし",
@@ -6231,6 +6974,14 @@ export const ja_JP: EnTranslations = {
       "bordersSection": "枠飾り",
       "bordersNone": "枠飾りなし",
       "bordersEmpty": "枠飾り付きの功績を獲得するとこの棚が解放されます。",
+      "buddiesSection": "相棒",
+      "buddiesNone": "相棒なし",
+      "buddiesEmpty": "相棒を集めると、ここから呼び出せる。",
+      "buddyDragHint": "アクションバーへドラッグ",
+      "looksSection": "相棒の姿",
+      "looksNone": "元の姿",
+      "looksNoBuddy": "相棒を呼び出すと、ここで姿を選べる。",
+      "looksEmpty": "この相棒にはまだ解放された姿がない。",
       "unlockedBanner": "功績達成: {name}",
       "unlockedTitleHint": "新しい称号を獲得: {title}。功績の書で選択できます。",
       "unlockedBorderHint": "新しい枠飾りを獲得: {name}。功績の書で着用できます。",
@@ -6711,6 +7462,8 @@ export const ja_JP: EnTranslations = {
       "delete_confirm": "削除を確認するにはキャラクター名を入力してください。",
       "storage_purchase_open": "このキャラクターを削除するには、保管庫の購入を完了または解決する必要があります。",
       "delete_busy": "サーバーが混み合っています。しばらくしてからこのキャラクターの削除をお試しください。",
+      "referral_transfer_pending": "このキャラクターを削除する前に、未固定のスタンプカードをすべて別のキャラクターへ移してください。",
+      "referral_bond_pending": "招待報酬のメンバーシップ債券をこのキャラクターに配布しています。配布が完了してから、もう一度削除をお試しください。",
       "already_in_world": "キャラクターは既に世界にいます。",
       "taken_over": "あなたのキャラクターは別のセッションに引き継がれました。",
       "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。",
@@ -6947,6 +7700,95 @@ export const ja_JP: EnTranslations = {
         "0": "ちゃんとした堆肥だね、これで花壇は生き返る。昔の粉屋は去る前に何かを埋めていった。庭園の奥の隅で、あの風車はまだ回っている。そのそばに立ってごらん。",
         "2": "風車があなたを海沿いの道へ送ったか。灯台には最後の秘密がひとつある。北西、小道のすぐ脇で、芝が切られて元に戻されている。そこを掘れ。"
       }
+    }
+  },
+  "dungeonGuide": {
+    "drownedTemple": {
+      "greet": {
+        "1": "わしは蒼白聖歌隊でいちばん若い声だった。儀式の夜、わしは飲まずに逃げた。それ以来、満月のたびに水の下で皆が歌うのが聞こえる。死ぬ前に、あの方をこの目で見なければならん。後ろを歩かせてくれ。戦いはせんし、足手まといにもならん。",
+        "2": "満月のたびにこの門まで来ては、そのたびに勇気がくじける。だが今夜は違う。聖歌隊が歌っている。逃げたのはこのわしだ。あの方のもとまで連れて行ってくれ。邪魔はせん。"
+      },
+      "row": {
+        "join": "一緒に来てくれ。",
+        "decline": "我々だけで行く。"
+      },
+      "joined": "先に行ってくれ。すぐ後ろにいる。",
+      "singing": "歌わせてくれ。行きなさい、穏やかにな。",
+      "accept": {
+        "1": "ありがとう。後ろを歩こう。邪魔はせん。",
+        "2": "ならば、ようやく下りるとしよう。進んでくれ。ついて行く。"
+      },
+      "decline": "わかった。これまでどおり、ここから聴いていよう。",
+      "heroicWater": "今夜は水が高い。わしが見たこともないほどにな。あの方は目覚めかけておる。",
+      "memory": {
+        "votaries": "岸の溺れ人たちは、門が閉じたあとに入っていった者たちだ。月は彼らを奪わなかった。奪ったのは水だけだ。",
+        "rubbing": "潮見の番人が岸の岩に刻んだわしの言葉を読んだ。「眠っているだけ」。翌朝、わしが刻んだのだ。"
+      },
+      "area": {
+        "steps": "巡礼の階段だ。あの夜、わしは三段飛ばしで駆け上がり、一度も振り返らなかった。",
+        "causeway": {
+          "1": "儀式の夜には、月がこの土手道に二本目の道のように横たわっていた。",
+          "2": "水を見てごらん。月の抱き方を、今も覚えておる。"
+        },
+        "colonnade": "潮の列柱回廊だ。二人ずつ並んで、昇りの節を歌いながら歩いたものだ。",
+        "veil": "あの幕の向こうが聖歌の中庭だ。子どもの頃から一度も立っておらん。",
+        "terraces": "潮だまりだ。見習いたちが掃除をして、中に住む小さな光るものたちに餌をやっていた。",
+        "falls": "滝の裏では、水がどんな声もかき消す。稽古をさぼるとき、わしはここに隠れた。",
+        "pool": "月の池だ。皆はそのまわりにひざまずき、貝殻から飲んだ。わしは自分のを持ち上げられなかった。",
+        "prismStair": "プリズムの階段だ。月の出に登って、大いなる硝子を目覚めさせたものだ。",
+        "moonbridge": {
+          "1": "月光の橋だ。信心深い者だけが渡れると、長老たちは言っていた。",
+          "2": "わしは信心深くなどなかった。さて、わしを支えてくれるかどうか。"
+        },
+        "altarLanding": "ここにわしは立っていた。まさにここだ。ここで背を向けて逃げたのだ。"
+      },
+      "sight": {
+        "pilgrim": "岸の村々の巡礼者たちだ。毎年春になると祠を背負って歩いた。今は永遠に背負っておる。",
+        "acolyte": "見習いの娘たちだ。わしは彼女らの隣で文字を覚えた。今は眠りながら歌い、決して目覚めん。",
+        "templeguard": "階段の衛兵だ。月が沈むまで神殿を守ると誓った。月は沈まなかった。",
+        "snapper": "わしらはあのような貝殻で月の水を飲んだ。わしのは階段に落としてしまった。",
+        "siren": "あの声だ。聖歌隊でわしの隣で歌っていた。今も半拍早く入ってくる。",
+        "lurker": "子どもたちが浅瀬で網ですくっていたものだ。親指ほどの大きさで、光っておった。",
+        "tidewisp": "あれこそ月の水そのもの、わしらが飲むはずだった一杯だ。触れさせてはならん。",
+        "sentinel": "門の池の月エイだ。見習いの頃、月の出に真珠を与えたものだ。今は彼らが扉を守り、我らの真珠を心臓として身につけておる。",
+        "eel": "潟のウナギだ。見習いたちが夕暮れにパンをやっていた。わしらの賛歌で太ったのさ。",
+        "reflection": "水がお前たちを何に変えるか、それを見せておるのだ。壊せ!",
+        "moonspawn": "あれはわしの仲間などではない。あの方のものだ。月光だけでできておる。"
+      },
+      "selthe": {
+        "pre": {
+          "1": "セルセ母さまだ。腹から息をすることを教えてくれた。死なずに溺れることを、皆に教えたのだ。",
+          "2": "聖歌母セルセ。わしが知る音はすべて、あの方が授けてくれた。お許しください、母さま。"
+        },
+        "post": {
+          "1": "静かになった。聖歌隊にいたあいだ、あの方が静かだったことなど一度もなかった。",
+          "2": "もうお休みください、母さま。あなたの言うとおりでした。わしは長い音を保てなかった。"
+        }
+      },
+      "hydra": {
+        "pre": "池の大蛇だ。わしが子どもの頃は頭が一つで、わしらの手から餌を食べたものだ。",
+        "post": "聴いてごらん。滝の下で、まだ皆が歌っておる。さっきより近い。"
+      },
+      "colossus": {
+        "pre": "大いなるプリズムだ。月を捕らえようと、その中に向かって歌った。立ち上がれるとは知らなんだ。",
+        "post": "硝子は砕けた。もう月を捕らえるものは何も残っておらん。あの方を除いてはな。"
+      },
+      "ysolei": {
+        "pre": "あそこにおられる。生涯ずっと、あの方が女神か怪物かと問い続けてきた。見せてくれ。",
+        "preHeroic": "こんな夜には、聖歌隊の皆があの方とともに歌う。皆、踏みとどまれ。"
+      },
+      "farewell": {
+        "answer": "どちらでもなかった。あれは水に映る月で、ひざまずいたのはわしらのほうだった。",
+        "verse": "儀式には最後の一節があった。歌い手たちを眠らせる節だ。わしはそれを歌わなかった。",
+        "stay": "皆、もう十分に待った。わしはここに残り、今それを歌ってやろう。",
+        "goodbye": {
+          "1": "夜空のもとへ上っていきなさい。満月に歌が聞こえたら、それはわしだ。",
+          "2": "年老いた臆病者を歌の終わりまで連れてきてくれて、ありがとう。さあ、行きなさい。"
+        },
+        "emote": "{name}が祭壇の上で声を上げると、潟は静まり返った。"
+      },
+      "wipe": "起きてくれ。頼む。またこの底にわしを独り残さんでくれ。",
+      "catchUp": "脚は老いたが、この階段は一段残らず知っておる。ここにいるぞ。"
     }
   },
   "guide": {
@@ -7428,6 +8270,7 @@ export const ja_JP: EnTranslations = {
       "framesGovernedAuraTracks": "「フレーム編集」は、同じ「インターフェース」オプションの「戦闘」タブでオンにした任意の6つのオーラトラック、すなわち「自分のバフ」トラック、「防御クールダウン」トラック、「自分のシールド」トラック、「攻撃クールダウン」トラック、「移動とステルス」トラック、「味方へのバフ」トラックも緩めます。どのトラックも初期状態ではオフで、緩んでいる間はそれぞれに名前のチップが付きます。",
       "frameGroups": "{trackers} はクエスト、功績、リフト、地下探索、採集目標、聖遺物の追跡をまとめられます。{auras} は対象の継続ダメージと6種のオーラ追跡をまとめられます。フレーム設定で有効にするとまとめて移動でき、無効なら個別に移動できます。{tot} にはリソースバーがあります。{focus} の3つの対象は個別に移動できます。Shift+F1～F3で設定し、Ctrl+F1～F3で選択します。ダメージと脅威メーターはロック中でも、ボタン以外をドラッグして移動し、端をドラッグしてサイズ変更できます。ロック解除中は専用のグループ別メニューで表示を切り替えられます。フレームを右クリックするとサイズのリセットや関連設定を開けます。インターフェースのフレームタブには共通設定と折りたたみ可能なパーティ設定があります。「ターゲットのターゲットをターゲットに固定」をオフにすると個別に移動でき、オンに戻しても個別の位置は保存されます。フォーカスを設定すると設定ボタンと説明が隠れます。右クリックして「フォーカスを解除」を選ぶと元に戻ります。マウスオーバーキャストはフォーカスフレームでも使えます。",
       "framesGovernedTalkingHead": "「フレームを編集」では会話パネルも動かせるようになります。会話パネルは、話しているNPCが視界の外にいるときにそのセリフを表示するもので、ロック解除中は名前チップを表示します。",
+      "framesGovernedShardpike": "「フレームを編集」ではシャードパイクバーも動かせるようになります。シャードパイクバーは、シャードパイクを持っているあいだだけアクションバーの横に現れるクエスト道具の短い列で、ロック解除中は名前チップを表示します。戦闘中ではなく戦闘前に配置しておけます。",
       "framesGovernedUnitTooltip": "「フレーム編集」ではツールチップフレームも動かせるようになります。マウスを合わせた対象のカードが表示される位置で、クリーチャーならレベルと種類、ほかのプレイヤーなら称号、ギルド、レベルとクラス、そして専門化とその役割が表示されます。好きな場所へドラッグすると、カードはそこから画面の近い端を避ける向きに広がります。「フレーム設定」の「フレームの表示・非表示」でツールチップのチェックを外すと、このカードを完全に非表示にできます。",
       "barsTitle": "バー、タイマー、戦闘テキスト",
       "barsBody": "詠唱やチャネルを行うと、画面中央、アクションバーのすぐ上にキャストバーが現れ、呪文の名前と残り時間を伝えます。ターゲットにもそのフレーム上に専用のキャストバーが出るので、何が来るのかを見て応じられます。\n\nキャストバーの下には細いスイングバーがあり、武器を振るたびに満ちていきます。近接や遠隔で戦う人は、次の自動攻撃がいつ当たるのかを見て取れます。\n\n経験値バーはアクションバーの下を画面幅いっぱいに走り、区切りが刻まれ、明るく伸びた部分が蓄えている休息経験値を示します。\n\n水中を泳ぐと、画面上部に青い息バーが現れます。頭が沈んでいる間は減り続け、尽きて溺れ始めると赤く点滅し、水面に出た瞬間に素早く戻ります。スペースで浮上し、初期設定でCtrlの「潜水」キーを押せばさらに深く潜れます。\n\nダメージと回復は、当たった相手の上に小さな数字となって浮かび上がるので、文字を読まなくても戦いの流れがつかめます。書かれた記録はすべて、チャットボックスの「戦闘」タブに残ります。",
@@ -7442,6 +8285,7 @@ export const ja_JP: EnTranslations = {
       "mapBodyZoneFirst": "Mを押すと、今立っているゾーンのワールドマップが開きます。自分の矢印、周囲の名所、印を掲げたクエストの依頼人と目標のあるエリア、作業場、メールボックス、掲示板、菜園、ダンジョン入口、そしてそのゾーンにあるすべての採集ノードが載り、ノードは再生を待つ間は灰色になり、手持ちの道具では採れないものには印が付きます。パーティの位置も表示されます。マップを右クリックするか「ワールドマップ」ボタンを押すと大陸全体まで引き、すべてのゾーンが名前とともに描かれ、ゾーンをクリックするとそのゾーンのマップが開きます。デルヴ、ダンジョン、リフト、城砦に足を踏み入れると、マップは今いる場所の見取り図に切り替わり、ソーンホロウ平原の戦場には専用の戦場マップがあります。\n\n画面の右側、ミニマップの下には、何も開かなくても今の用事が見えるようにトラッカーが積み重なります。追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、製作でピン留めしたレシピ、潜っているデルヴ、そして参加中のリフトです。クエストトラッカーは、画面を広く使いたいときに折りたためます。",
       "gatheringGoalTrackerBody": "製作ウィンドウでレシピを、または依頼ボードで依頼を「追跡」すると、採集目標トラッカーがこのスタックに加わります。追跡中のレシピまたは依頼の名前、目標の個数、そして所持・保管している素材でどこまで届くかを表示します。「追跡」は現在の目標を置き換え、「クリア」で明示的に解除します。どちらも採取設定を変えることはありません。",
       "hubPracticeTrackerBody": "Eastbrookの拠点付近では、そこでのガイド付き練習レッスンを受けると練習トラッカーがスタックに加わり、練習用ダミーに対する自己ベストの記録を表示し続けます。レッスンが進行中は、その隣のコーチングストリップが現在のステップを、ダメージメーターを開くことから2回目の記録を比較することまで案内します。",
+      "dungeonTrackerBody": "グループダンジョンの中では、ダンジョントラッカーがスタックの一番上に入ります。ダンジョン名を記したプレート（ヒロイックで挑戦中は「ヒロイック」と表示）と、攻略が進むにつれて満ちていくレール、その下にはそのダンジョンのボスがルートで出会う順に並び、倒れるまではそれぞれ 0 / 1 と数えられます。戦闘に第二幕があるボスは戦闘全体が終わるまで未完了のままなので、リストが完了と表示されるのは攻略が本当に終わったときだけです。あなたが外に出ればトラッカーも消え、フレーム編集では他のトラッカーと同じように、専用の名前チップを付けて動かせるようになります。",
       "chatTitle": "チャットボックス",
       "chatBody": "画面の左下にあります。Enterで入力を始め、もう一度Enterで送信します。\n\n常に2つのタブがあります。周囲の発言をまとめた記録の「チャット」と、あなたの戦いの記録である「戦闘」です。プラスボタンを押せば、チャンネルごとにタブを増やせます。発言、叫び、パーティ、一般、ワールド、LFG、ギルド、オフィサー、そして送受信したささやきを一か所に集める「ウィスパー」タブです。チャンネルのタブで打てば、コマンドを打ち直さなくてもそのチャンネルへ送られます。\n\nボックス全体は別の場所へドラッグでき、大きさも変えられます。置いた場所はちゃんと覚えています。",
       "keyWindowsTitle": "キーで開くウィンドウ",
@@ -8184,8 +9028,8 @@ export const ja_JP: EnTranslations = {
       "hollowBody": "墓荒らしに遭った礼拝堂の地下墓所。死んだばかりの者たちが安らぎを拒んでいます。新たなパーティにとって、最初の本当の試練です。",
       "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
-      "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
-      "wildheartBody": "温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。",
+      "sanctumBody": "ソーンピークの高みに隠された氷河。一頭の竜が氷の中に囚われ、カルトは盗んだ魂を燃やしてその氷を解かそうとしている。高い峠から氷の塔、鍛冶神の砕けた鎖、カルトの炎を越えて、氷河の麓の凍った湖へと下っていきます。",
+      "wildheartBody": "沈んだ偶像の奥に隠されたジャングルのカルデラ。断崖に囲まれ、滝の轟きが響く。川の浅瀬を渡り、狩りの段丘と滝を抜け、植民地の廃墟を越えて、巨大な石のジャガーの頭の下にそびえる階段状の神殿へ登れ。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
@@ -9183,12 +10027,152 @@ export const ja_JP: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "対象：{name}",
+      "choose": "重なったアセットを選ぶ（{count}）",
+      "chooser": "ポインターの下のアセットを選択",
+      "front": "最前面",
+      "behind": "別のアセットの背後",
+      "close": "閉じる",
+      "keyboard": "前へ・次へ、または矢印キーで比較します。Enterで選択、Escapeで閉じます。",
+      "hint": "再度クリックすると重なったアイテムを切り替えられます。このリストからも選べます。",
+      "asset": "アセット{number}",
+      "overlapAt": "{name}の位置で重なったアセット",
+      "previous": "前へ",
+      "next": "次へ",
+      "position": "{count}件中{current}件目",
+      "details": "アイテム{number} · {level}階 · 高さ{height}",
+      "ungroupedDetails": "アイテム{number} · 高さ{height}",
+      "hideAbove": "選択した階より上を非表示",
+      "allFloors": "すべての階を表示中",
+      "filteredFloors": "{level}階より上は非表示です"
+    },
+    "quickActions": {
+      "title": "選択中のアセット",
+      "move": "移動",
+      "frame": "画面に収める",
+      "remove": "削除",
+      "count": "{count}件選択中"
+    },
+    "buildMode": {
+      "materialNames": {
+        "WardenStone": "滑らかな石",
+        "Cliff001": "Red Cliff",
+        "Cliff002": "Mossy Crag",
+        "Cliff003": "Craggy Rock",
+        "Cliff004": "Weathered Bluff",
+        "Rock052": "Rugged Stone",
+        "Rock053": "Ironrock",
+        "Rock054": "Sandstone Face",
+        "Rock055": "Rust Rock",
+        "Rock029": "Weathered Rock",
+        "Rock035": "Layered Stone",
+        "Rock051": "Granite",
+        "Rock056": "Meadow Stones",
+        "Rock057": "Veined Darkstone",
+        "Cliff005": "Strata Cliff",
+        "Cliff006": "Sunbaked Cliff",
+        "Concrete034": "Cast Concrete",
+        "Marble012": "Veined Marble",
+        "Bricks076C": "Mossy Brick",
+        "Gravel024": "Gravel",
+        "PavingStones046": "Paving Stones",
+        "Cobblestone001": "Cobbled Road",
+        "Cobblestone002": "Old Cobblestone",
+        "Tiles001": "Lichen Flagstones",
+        "Tiles002": "Slate Pavers",
+        "PavingStones131": "Mossy Setts",
+        "Metal032": "Brushed Steel",
+        "Metal034": "Painted Steel",
+        "Rust004": "Rusted Iron",
+        "Roots001": "Tangled Roots",
+        "Roots002": "Living Roots",
+        "Wood001": "Oak Planks",
+        "Wood002": "Pine Planks",
+        "Wood003": "Weathered Bark",
+        "Wood004": "Mossy Bark",
+        "Plaster001": "Lime Plaster"
+      },
+      "title": "Build a building",
+      "modeWall": "Walls",
+      "modeRoom": "Rooms",
+      "modeFloor": "Floors",
+      "modeObject": "Objects",
+      "modeFinish": "Wall finishes",
+      "building": "Building",
+      "buildingNumber": "Building {number}",
+      "noBuilding": "New building",
+      "newBuilding": "New building",
+      "levels": "Building floors",
+      "groundFloor": "Ground floor",
+      "floorNumber": "Floor {number}",
+      "addLevel": "Add floor",
+      "hideAbove": "Hide higher floors",
+      "settings": "Grid and foundation",
+      "gridSize": "Grid spacing",
+      "gridOff": "Off",
+      "gridCell": "{size} yards",
+      "floorHeight": "Floor height (yards)",
+      "baseY": "Foundation height (yards)",
+      "autoBase": "Set by first placement",
+      "foundationLocked": "Foundation settings are fixed after building starts.",
+      "wallSource": "Wall type",
+      "bareWall": "Bare wall",
+      "chosenAsset": "Chosen asset",
+      "thickness": "Wall thickness (yards)",
+      "pickAsset": "Choose asset",
+      "selectedAsset": "Asset: {name}",
+      "noAsset": "Choose an asset from the browser.",
+      "selectExisting": "Select an existing piece",
+      "wallHint": "Drag to draw a straight wall.",
+      "diagonal": "斜めの壁",
+      "diagonalHint": "グリッド上の点から別の点へドラッグして、任意の角度の壁を作成します。",
+      "roomHint": "Drag a rectangle to create a room with walls and a floor.",
+      "floorHint": "Drag a rectangle to add a floor on this level.",
+      "objectHint": "Place objects on the selected floor.",
+      "finishHint": "Choose a finish, then click a wall to paint it.",
+      "finishTexture": "Wall texture",
+      "bareFinish": "Original surface",
+      "importTexture": "Import texture",
+      "importingTexture": "Importing texture...",
+      "finishTile": "Texture repeat (yards)",
+      "finishSide": "Paint side",
+      "sideClicked": "Clicked side",
+      "sideFront": "Front",
+      "sideBack": "Back",
+      "sideBoth": "Both sides",
+      "finishRun": "Apply to connected walls",
+      "rotateLeft": "Rotate left",
+      "rotateRight": "Rotate right",
+      "smaller": "Smaller",
+      "larger": "Larger",
+      "fineRotation": "Fine rotation (15°)",
+      "transformReadout": "Rotation: {degrees}° | Size: {scale}x",
+      "transformEmpty": "Choose an asset to rotate or resize.",
+      "transformShortcuts": "Rotate: , and . | Resize: [ and ]",
+      "undo": "Undo",
+      "redo": "Redo",
+      "transformControls": "Asset controls",
+      "chooseWall": "Choose a wall asset and wait for its preview, or select Bare wall.",
+      "chooseAsset": "Choose an asset first.",
+      "choosePaintWall": "Click a building wall or a wall asset.",
+      "capacity": "This build is too large. Draw a smaller section or remove unused pieces.",
+      "invalid": "This wall or room could not fit. Adjust the grid or choose another piece.",
+      "importFailed": "Texture import failed. Use a PNG, JPG or WebP under 8 MB, up to 8192 pixels per side.",
+      "bare": "Original surface",
+      "importedTexture": "Imported texture {number}"
+    },
     "appTitle": "マップエディター",
     "docTitle": "マップエディター - World of ClaudeCraft",
     "untitledMap": "無題のマップ",
+    "flatMapName": "Flat World",
     "playtestPlayerName": "マップ職人",
+    "playtestBack": "Back to Editor",
+    "playtestBackTitle": "Return to the map editor (your map was saved when the playtest launched)",
     "topbar": {
       "label": "エディター操作",
+      "dungeon": "Dungeon",
+      "dungeonTitle": "Edit an authored dungeon interior layout",
       "mapNameLabel": "マップ名",
       "dirty": "未保存の変更があります",
       "dirtyDot": "このマップには未保存の変更があります",
@@ -9199,6 +10183,8 @@ export const ja_JP: EnTranslations = {
       "neverSaved": "まだ保存されていません",
       "new": "新規",
       "newTitle": "内蔵ワールドから新しいマップを作成",
+      "newFlat": "Blank Map",
+      "newFlatTitle": "Start a brand-new blank map with none of the base game content, at a size you choose",
       "open": "開く",
       "openTitle": "保存済みマップを開く（ブラウザーまたはサーバー）",
       "save": "保存",
@@ -9215,17 +10201,49 @@ export const ja_JP: EnTranslations = {
       "uploadAsset": "アセットをアップロード",
       "uploadAssetTitle": "マップに配置できる GLB モデル（最大 8 MiB）をアップロード",
       "uploadAssetDisabledTitle": "アセットをアップロードするにはゲームでログインしてください",
+      "importModel": "Import Model",
+      "importModelTitle": "Load a .glb or .gltf model from this computer and place it, fully offline (kept for this session)",
       "playtest": "プレイテスト",
       "playtestTitle": "このマップでゲームを起動（オフライン、現在の編集を含む）",
       "viewLabel": "表示モード",
+      "workspace": "View",
+      "workspaceTitle": "View, map, preview, and workspace modes",
       "view3d": "3D",
       "view3dTitle": "レンダリングされたワールドで編集",
       "view2d": "2D",
       "view2dTitle": "俯瞰の記号マップで編集",
+      "projectionPerspective": "Perspective",
+      "projectionOrthographic": "Orthographic",
+      "projectionTitle": "Toggle perspective/orthographic projection (Numpad 5)",
+      "axisGimbal": "Camera gimbal",
+      "axisGimbalTitle": "Show or hide the camera orientation gimbal",
+      "minimap": "Minimap",
+      "minimapTitle": "Toggle the corner minimap (top-down view that follows the camera)",
+      "music": "Music",
+      "musicTitle": "Play the soundtrack for the area under the camera (the music area's track, else the map track, else the zone's own cue). Fly around and it follows you.",
+      "mapWindow": "Map",
+      "mapWindowTitle": "Open the map of the current zone (with a button for the full world)",
+      "preview": "Preview",
+      "previewTitle": "See the map as it looks in-game: hides editor-only overlays (collider boxes, music areas, markers, rings, gizmos)",
+      "hitboxes": "Hitboxes",
+      "hitboxesTitle": "Show the collision shapes the game actually blocks with (blue = authored in Collision Master, red = auto-baked boxes)",
+      "zoneIsolateOff": "Full Build",
+      "zoneIsolateOn": "Zone: {zone}",
+      "zoneIsolateTitle": "Full Build ⇄ Zone: isolate the camera’s zone, everything outside it unloads until you switch back. View only; the map itself never changes.",
+      "fullBuildPreview": "Full Build Preview",
+      "fullBuildPreviewTitle": "Stream every zone of this map into the viewport (may take a while)",
+      "fullBuildProgress": "Building zones: {done}/{total}",
+      "fullBuildDone": "All {total} zones resident.",
+      "publishMap": "Publish to Game",
+      "publishMapTitle": "Write this map into the local repo as real game content (data/maps + src/sim/maps); boot it with ?map=<slug>",
+      "unpublishMap": "Remove from Game",
+      "unpublishMapTitle": "Uninstall this map from the local game: deletes the files Publish wrote and restores the standard ClaudeCraft world",
       "undoCount": "元に戻す：{count}",
       "undoCountTitle": "{count} 手戻せます（Ctrl+Z で元に戻す、Ctrl+Y でやり直し）",
       "autosave": "自動保存",
       "autosaveTitle": "未保存の変更がある間、マップを自動保存します。保存に失敗すると自動的にオフになります。",
+      "presetPrompt": "Ask about presets on Lock In",
+      "presetPromptTitle": "After a Collision Master Lock In, ask whether to also save the boxes as a hitbox preset on this device. Turn this back on if you ticked \"Don't ask again\".",
       "undo": "元に戻す",
       "undoTitle": "直前の変更を元に戻す（Ctrl+Z）",
       "redo": "やり直す",
@@ -9235,34 +10253,544 @@ export const ja_JP: EnTranslations = {
       "signIn": "ログイン",
       "signInTitle": "ゲームのログイン画面を新しいタブで開く",
       "help": "ヘルプ",
-      "helpTitle": "エディターガイド：ツール、ショートカット、チュートリアル"
+      "helpTitle": "エディターガイド：ツール、ショートカット、チュートリアル",
+      "more": "More",
+      "moreTitle": "More actions: Save As, autosave, fork, import/export, upload",
+      "primaryTools": "Primary transform tools",
+      "settings": "Settings",
+      "settingsTitle": "Graphics and sound settings (shared with playtest)",
+      "worldLink": "Link to World",
+      "worldLinkTitle": "Place this map inside the base game world: drag its outline onto the world map, and playtest embeds it there with the base game running around it",
+      "generateTerrain": "Generate Terrain",
+      "generateTerrainTitle": "Generate this map’s terrain from a region of the base game world: drag the outline over the world map to pick which part of the old layout to use",
+      "evenBuildings": "Even Out Buildings",
+      "evenBuildingsTitle": "Fix buildings that were stretched sideways to fill their plot: each one keeps its height and its footprint area, but its width and depth are made equal so it stops looking squashed",
+      "evenBuildingsDone": "Evened out {count} buildings.",
+      "evenBuildingsNone": "No squashed buildings found."
+    },
+    "genTerrain": {
+      "title": "Generate Terrain",
+      "hint": "Pick which part of the old world layout this map’s terrain generates from: drag the gold rectangle over the region you want. Its hills, lakes, and coastlines become your map’s base terrain, you can sculpt on top of it afterwards. Generating replaces your current sculpt edits, and your map stays its own separate space.",
+      "dragHint": "Drag the gold rectangle over the terrain to copy. The dot marks your spawn point.",
+      "status": "Sampling the world layout around ({x}, {z}).",
+      "save": "Generate",
+      "clear": "Flatten Map",
+      "generated": "Terrain generated from the world layout around ({x}, {z}).",
+      "cleared": "Terrain source cleared: the map is a flat slate again."
+    },
+    "worldLink": {
+      "title": "Link to World",
+      "hint": "Drag your map’s outline to where it should sit in the base game world. Playtest stamps your map’s terrain, placements, and spawns right there, with the world’s own mobs, NPCs, and quests running around it. You can also place it in the open sea beyond the old world’s edges: your map rises there as new land. Your editing space stays exactly as it is; only playtest uses the link.",
+      "statusLinked": "Linked: your map’s origin sits at ({x}, {z}) in the world.",
+      "statusUnlinked": "Standalone: this map playtests as its own separate space.",
+      "dragHint": "Drag the gold rectangle to position your map. The dot marks your spawn point.",
+      "save": "Save Link",
+      "unlink": "Unlink",
+      "cancel": "Cancel",
+      "linked": "Map linked to the world at ({x}, {z}).",
+      "unlinked": "Map unlinked: it playtests standalone again.",
+      "standaloneOnly": "Only standalone authored maps can link to the world (open a Blank Map or import one first)."
+    },
+    "settings": {
+      "title": "Settings",
+      "hint": "Graphics and sound for the editor and playtest. These are the same settings the game uses, saved in this browser.",
+      "graphicsTitle": "Graphics quality",
+      "graphicsLow": "Low",
+      "graphicsMedium": "Medium",
+      "graphicsHigh": "High",
+      "graphicsUltra": "Ultra",
+      "graphicsHint": "Applies to the next playtest, and to the editor after a reload.",
+      "applyGraphics": "Reload editor to apply",
+      "soundTitle": "Sound",
+      "sfxVolume": "Effects volume",
+      "musicVolume": "Music volume",
+      "music": "Play music",
+      "close": "Close"
+    },
+    "fluid": {
+      "title": "Fluid Pool",
+      "hint": "Pick a fluid and click the ground to place a pool. Use the transform tools to move it, stretch its footprint, and slide the surface down into a dip.",
+      "selHint": "The gizmo scales the pool footprint (X/Z) and the Y arrow slides the surface height. Damage ticks once per second on anyone in the fluid.",
+      "kind": {
+        "lava": "Lava",
+        "acid": "Acid",
+        "spectral": "Spectral Fluid",
+        "water": "Still Water"
+      },
+      "hue": "Hue",
+      "light": "Lightness",
+      "dps": "Damage per second",
+      "surfaceOffset": "Surface height",
+      "fxBubbles": "Bubbles",
+      "fxSmoke": "Smoke",
+      "fxHaze": "Haze",
+      "fxLight": "Glow light",
+      "resetPreset": "Reset to preset"
+    },
+    "tunnel": {
+      "needExit": "Entrance placed. Keep clicking to lay the path (the last point is the exit), then hit Generate.",
+      "generate": "Generate cave ({count} ready)",
+      "tooShort": "The rig points are too close together - spread them at least a few yards apart.",
+      "modeDig": "Dig cave",
+      "modeCarve": "Carve",
+      "modeHole": "Cut hole",
+      "modePatch": "Patch hole",
+      "modeRemesh": "Remesh",
+      "modeSculpt": "Dig brush",
+      "modeFill": "Fill brush",
+      "modeSmooth": "Smooth",
+      "smoothHint": "Drag along a dug edge to SMOOTH it: each pass raises the Blend of every cut and fill under the brush, so creases and lumps along a dig stroke melt into one rounded surface. One undo step per stroke.",
+      "ghostTitle": "Pending cut",
+      "ghostHint": "The blue ghost is the solid the cut will remove. Drag it into place (click or hold anywhere on the ground), tune its size, shape and depth below, then press \"Lock in cut\" (or Enter) to commit it - or Cancel / Escape to discard it. Nothing is removed until you commit.",
+      "ghostConfirm": "Lock in cut",
+      "ghostLockHint": "Enter locks the cut in, Escape discards it. Tools 2-4 move, turn and scale the ghost first.",
+      "ghostCancel": "Cancel",
+      "carveHint": "Click the ground to spawn a blue GHOST of the solid, drag it into place and tune it, then press \"Lock in cut\" (or Enter) to carve a REAL room or tunnel out of the rock: the solid has a walkable floor, rock walls and a ceiling, and it re-meshes the ground around it. A ball makes a chamber, a pitched capsule bored into a hillside a tunnel, a box a hall - and raise Blend so neighbouring carves melt together into one clean cave. Walk in through any face that breaks the surface.",
+      "carveList": "Carves",
+      "carveLabel": "Carve {n}",
+      "carveDelete": "Delete carve",
+      "cutDepth": "Depth",
+      "sculptHint": "Drag across a carve wall, floor or ceiling to DIG rock away, like a clay brush: each pass carves a blended channel at the stamp size (set by the brush radius). Drag on open ground to gouge into the surface. One undo step per stroke.",
+      "fillHint": "Click the ground to drop an ERASE BOX, size it with the sliders or the gizmo (any width, length and height), then press \"Erase caves\" (or Enter): every carve, hole and dug volume inside the box is removed, and a carve the box only partly covers is filled back to solid rock where it is covered. One undo step.",
+      "eraseTitle": "Erase box",
+      "eraseGhostHint": "The box stands where you clicked; click again to move it. Everything cave-like inside it goes when you confirm.",
+      "eraseHalf": "Half width (yd)",
+      "eraseConfirm": "Erase caves",
+      "eraseDone": "Erased {n} cave record(s) inside the box",
+      "eraseNothing": "No caves inside the box",
+      "remeshHint": "Click to paint a DETAIL region (brush radius wide): every carve it touches re-meshes at the chosen cell size - finer OR coarser than the default. Spend fine topology exactly where a cave needs to read clean; turn the cell up to thin out a carve that costs too much. Finer cells cost more triangles.",
+      "remeshCell": "Detail (cell yards)",
+      "remeshAllTitle": "Remesh all caves",
+      "remeshAllHint": "One cell size for every carve and dug volume on the map: larger cells mean far fewer triangles. Applies to the whole map at once and re-meshes it; the regions below can still refine or coarsen single spots on top of it.",
+      "remeshGlobal": "Cave mesh detail (cell yards)",
+      "remeshAll": "Remesh all caves",
+      "remeshRegionsTitle": "Detail regions (brush)",
+      "remeshList": "Detail regions",
+      "remeshLabel": "Region {n} ({r} yd, {cell} yd cells)",
+      "remeshDelete": "Delete region",
+      "holeHint": "Click the ground to spawn a blue GHOST of the cut, drag it into place, then press \"Cut into the ground\" to punch it straight through the terrain mesh. The ground stops existing there and the mesh grows a rock rim around the opening, so line a cave mouth up underneath and you can walk or drop in. Pick the shape first: a ball, an oriented box for a slot or a doorway, or a capsule for an arch. Resize or delete any committed cut below; undo removes the last one.",
+      "holeList": "Cuts",
+      "holeLabel": "Cut {n}",
+      "holeRadius": "Radius",
+      "holeDelete": "Delete cut",
+      "cutBrush": "Next cut",
+      "cutShape": {
+        "sphere": "Ball",
+        "box": "Box",
+        "capsule": "Capsule",
+        "voxel": "Dug rock",
+        "tube": "Cave mouth (from the bore)"
+      },
+      "cutLength": "Length",
+      "cutHeight": "Height",
+      "cutYaw": "Turn",
+      "cutPitch": "Tilt",
+      "cutBlend": "Blend",
+      "cutWarp": "Undulation",
+      "digAlphaLabel": "Brush alpha",
+      "digAlpha": {
+        "round": "Round",
+        "halfmoon": "Half moon",
+        "ragged": "Ragged",
+        "crescent": "Crescent"
+      },
+      "digNoise": "Edge noise",
+      "digCell": "Dig detail (cell yards)",
+      "digCellHint": "Strokes bake straight into the map as one rock volume at this cell size (finer costs more memory and triangles). The cell is fixed once the first stroke lands.",
+      "digClear": "Clear dug rock",
+      "digVolumeFull": "The dug rock volume is as large as a map can hold; clear it or dig closer to what is already dug.",
+      "digCellCoarsened": "Dig detail set to {cell} yd for this brush size (a finer cell would not fit the volume budget).",
+      "cutWarpScale": "Undulation size",
+      "cutTaper": "Taper",
+      "cutWobble": "Wobble",
+      "cutWobbleLen": "Wobble length",
+      "cutBend": "Bend",
+      "cutArch": "Arch",
+      "ghostGizmoHint": "Press 2, 3 or 4 (Move, Rotate, Scale) to drag the ghost with the gizmo, then come back to the Caves tool to cut.",
+      "autoMouth": "Carve its own mouth",
+      "autoMouthHint": "The tube cuts the ground wherever it breaches the surface, so you no longer line a hole up with the mouth by hand. Buried stretches cut nothing, and ground under a stretch standing above the surface is left alone.",
+      "mouthBlend": "Mouth blend",
+      "patchHint": "Click the ground to lay a patch (brush radius wide, same shapes as a cut) that FILLS the ground back in wherever cuts overlap it - use it to trim the blank parts around each cut. A patch always beats the cuts it touches. Resize or delete any patch below; undo removes the last one.",
+      "patchList": "Patches",
+      "patchLabel": "Patch {n}",
+      "patchDelete": "Delete patch",
+      "listTitle": "Caves",
+      "caveLabel": "Cave {n} ({nodes} points)",
+      "width": "Width",
+      "height": "Interior height",
+      "variance": "Variance",
+      "floorVariance": "Floor bumps",
+      "stalactites": "Stalactites",
+      "stalagmites": "Stalagmites",
+      "spikeSize": "Formation size",
+      "startOpen": "Entrance open",
+      "endOpen": "Exit open",
+      "selectCave": "Select whole cave",
+      "noRig": "This cave has no rig nodes to grab - lay a new cave instead.",
+      "reverse": "Swap entrance/exit",
+      "delete": "Delete cave",
+      "texture": "Interior texture",
+      "texDefault": "Granite (default)",
+      "guideHint": "Blue nodes joined by a dotted line are your cave model (visible in every tool). Move a node with the Move tool, raise or sink it with the Y arrow, and scale it to widen the cave there - the tube re-generates live and ALWAYS keeps exactly the size you set. Green ball = entrance, red arrow = exit.",
+      "hint": "Click the ground to drop the ENTRANCE node, keep clicking to lay blue waypoints (the last one is the exit), then press Generate. The cave is a standalone tube built only from your nodes - the surrounding terrain never squishes or reshapes it. Turn on \"Carve its own mouth\" and the tube opens the ground wherever it breaches the surface; otherwise use Cut hole mode and slide the tube into place with Select whole cave + the Move tool."
+    },
+    "foliage": {
+      "kind": "Plant",
+      "kinds": {
+        "tree": "Tree",
+        "bush": "Bush",
+        "grass": "Grass clump",
+        "fern": "Fern",
+        "vine": "Vine"
+      },
+      "preset": "Starting point",
+      "presets": {
+        "bushRound": "Round bush",
+        "bushBerry": "Berry bush",
+        "bushDry": "Dry scrub",
+        "grassTuft": "Tuft",
+        "grassMeadow": "Meadow clump",
+        "fernForest": "Forest fern",
+        "vineHanging": "Hanging vine"
+      },
+      "footprint": "Spread",
+      "plantHeight": "Height",
+      "splay": "Splay",
+      "clumps": "Blade clumps",
+      "strands": "Strands",
+      "hang": "Hang",
+      "bake": "Keep as an asset",
+      "bakeHint": "Writes the plant to public/models/generated as a GLB, so it stops being a recipe and becomes an ordinary catalogue asset: it batches with the others, takes a collision bake, and can be placed on any map. Its settings ride along inside the file, so you can re-open and re-bake it later. Needs the dev server.",
+      "bakePrompt": "Name this plant",
+      "baked": "Kept as {id}. Re-run the asset catalogue to see it in the browser.",
+      "bakeFailed": "Could not keep the plant: {reason}"
+    },
+    "tree": {
+      "title": "Tree Generator",
+      "hint": "Click the ground to grow a tree there. Everything below shapes the NEXT tree; select a placed tree with the Select tool to reshape it live.",
+      "preset": "Preset",
+      "presetHint": "A starting point for the biome. Every setting stays editable afterwards.",
+      "openStudio": "Edit in Tree Studio",
+      "openStudioHint": "Opens the tree on its own in an empty scene, so you can shape it without a village in the way. Keep it when you are done and it becomes the tool default.",
+      "studioMapName": "Tree Studio",
+      "studioBanner": "Tree Studio",
+      "studioHint": "Shape the tree here, then keep it as the tool default or discard it. The map you came from is waiting.",
+      "studioKeep": "Use this tree",
+      "studioDiscard": "Discard",
+      "studioKept": "Tree Studio settings are now the tool default.",
+      "randomize": "New seed",
+      "randomizeHint": "Rerolls the branch growth and leaf scatter without changing any setting.",
+      "copyToTool": "Use as tool default",
+      "trunkSection": "Trunk",
+      "trunk": "Foundation",
+      "girth": "Girth",
+      "heightScale": "Trunk height",
+      "bark": "Bark texture",
+      "barkTile": "Bark tile (yd)",
+      "branchSection": "Branches",
+      "branches": "Per limb",
+      "branchDepth": "Levels",
+      "branchLen": "Length",
+      "branchAngle": "Spread",
+      "branchDroop": "Droop",
+      "branchTwist": "Gnarl",
+      "branchTaper": "Taper",
+      "canopySection": "Canopy volumes",
+      "canopyHint": "The leaves only ever go inside these spheres. Pick a shape to lay them out, then tune the spread and size - or edit a single sphere below to sculpt the crown by hand.",
+      "shape": "Shape",
+      "volumeCount": "Spheres",
+      "volumeSpread": "Spread",
+      "volumeRise": "Height",
+      "volumeScale": "Sphere size",
+      "volumeJitter": "Jitter",
+      "showVolumes": "Show spheres",
+      "editVolumes": "Edit spheres",
+      "resetVolumes": "Back to preset shape",
+      "volumeLabel": "Sphere {n}",
+      "volumeX": "X",
+      "volumeY": "Y",
+      "volumeZ": "Z",
+      "volumeR": "Radius",
+      "volumeSy": "Stretch",
+      "addVolume": "Add sphere",
+      "removeVolume": "Remove",
+      "leafSection": "Leaves",
+      "leafSet": "Leaf art",
+      "leaves": "Count",
+      "leafSize": "Size",
+      "leafSizeVar": "Size variation",
+      "leafOrient": "Orientation",
+      "leafFill": "Fill",
+      "leafFillHint": "0 hangs the leaves on the shell of each sphere; 1 fills it solid.",
+      "leafDroop": "Droop",
+      "leafJitter": "Rotation jitter",
+      "leafClump": "Clumping",
+      "leafBranchBias": "Pull to branches",
+      "leafTint": "Tint",
+      "leafTintVar": "Colour variation",
+      "leafGlow": "Glow",
+      "leafCross": "Crossed cards",
+      "leafCrossHint": "Two quads per leaf instead of one: twice the cost, a canopy with real depth.",
+      "windSection": "Wind and collision",
+      "sway": "Sway",
+      "collide": "Trunk hitbox",
+      "collideHint": "Radius of the trunk collider, as a multiple of its own girth. 0 lets players walk through.",
+      "stats": "{leaves} leaves, {branches} branches, {height} yd tall",
+      "orient": {
+        "volume": "Follow canopy",
+        "up": "Upright",
+        "out": "Outward",
+        "droop": "Drooping",
+        "random": "Random",
+        "billboard": "Face camera"
+      },
+      "shapeName": {
+        "sockets": "On the limbs",
+        "sphere": "Ball",
+        "dome": "Dome",
+        "cone": "Cone",
+        "umbrella": "Umbrella",
+        "column": "Column",
+        "weeping": "Weeping"
+      }
+    },
+    "rock": {
+      "title": "Rock Generator",
+      "hint": "Click the ground to grow a procedural boulder there. The sliders below shape the NEXT rock; select a placed rock with the Select tool to reshape it live. Use the gizmo to stretch rocks into slabs and cliff plates.",
+      "chainMode": "Bridge / ridge mode",
+      "chainHint": "Click to lay blue points; Generate lofts ONE merged solid body through them (spanning dips in a straight line) plus walkable tops, so the chain works as a bridge or ridge. The points stay after Generate: move or scale one with the gizmos and the body follows.",
+      "chainCount": "{count} points laid",
+      "generateChain": "Generate rock ridge",
+      "clearChain": "Clear points",
+      "chainTooShort": "Lay at least two points first.",
+      "size": "Size",
+      "noise": "Noise amount",
+      "detail": "Feature detail",
+      "sharp": "Sharpness",
+      "height": "Height",
+      "depth": "Embed depth",
+      "jag": "Jaggedness",
+      "texture": "Texture",
+      "baseTex": "Base texture",
+      "texStone": "Stone",
+      "texSandstone": "Sandstone",
+      "texBare": "Bare (tintable)",
+      "reroll": "Re-roll shape",
+      "selTitle": "Generated Rock",
+      "walkable": "Walkable top"
     },
     "tool": {
+      "building": "Build mode",
       "listLabel": "エディターツール",
       "keyHint": "{name}（{key}）",
       "select": "選択",
+      "move": "Move",
+      "rotate": "Rotate",
+      "scale": "Scale",
       "raise": "隆起",
       "lower": "沈降",
       "smooth": "なめらか",
       "flatten": "平坦化",
+      "slope": "斜面",
+      "pond": "池",
+      "tunnel": "Caves",
+      "rock": "Rock Gen",
+      "build": "Build Model",
+      "fluid": "Fluid Pool",
       "paint": "バイオーム塗り",
+      "eyedropper": "Eyedropper",
+      "decal": "Decal",
       "water": "水面",
       "place": "アセット配置",
+      "foliage": "Paint Foliage",
+      "clutter": "Paint Clutter",
+      "meshFix": "Mesh Fix",
+      "tree": "Tree Generator",
+      "grassClear": "Remove Grass",
       "blocker": "ブロッカー壁",
+      "collider": "Collider",
       "camp": "キャンプ",
+      "entity": "Move NPCs and Mobs",
       "spawn": "スポーン地点",
+      "zone": "Zone",
+      "light": "Point Light",
+      "music": "Music",
+      "sound": "Point Sound",
       "region": "範囲",
-      "erase": "消去"
+      "erase": "消去",
+      "city": "City Build"
+    },
+    "toolGroup": {
+      "terrain": "Terrain",
+      "assets": "Assets",
+      "world": "World",
+      "effects": "Effects"
+    },
+    "eyedropperTool": {
+      "empty": "Nothing painted here, click a painted texture to pick it."
+    },
+    "build": {
+      "entered": "Editing model, add shapes, apply a texture, toggle collision, then Done.",
+      "newHint": "Click the map to start a new model, or select one to edit it.",
+      "banner": "Building Model",
+      "bannerHint": "Add shapes and edit vertices/edges/faces with the modeling bar.",
+      "done": "Done",
+      "editModel": "Edit Model",
+      "panelTitle": "Built Model",
+      "shapes": "{n} shapes",
+      "texture": "Surface texture",
+      "material": "Material",
+      "materialMany": "Material controls apply to all {n} selected built models.",
+      "materialHint": "Library materials are projected onto the shape in the shader (no stretching on stairs, slopes or curves) and tint with hue, saturation and light.",
+      "hue": "Hue",
+      "saturation": "Saturation",
+      "light": "Light",
+      "resetLook": "Reset material tint",
+      "bare": "Plain (no texture)",
+      "tileSize": "Texture scale",
+      "tileSizeUnit": "yd / tile",
+      "collision": "Use mesh as collision",
+      "collisionHint": "The player is blocked where the model is solid. Walkable shapes (green) become ramps.",
+      "walkableTip": "Tip: use the modeling bar’s Walkable toggle to make a shape a ramp."
+    },
+    "city": {
+      "title": "City Build",
+      "tabKit": "Kit",
+      "tabWalls": "Walls",
+      "tabRoads": "Roads",
+      "tabPrefabs": "Prefabs",
+      "tabRoutes": "Routes",
+      "settings": "Build settings",
+      "gridSize": "Grid size",
+      "gridOff": "Off",
+      "rotSnap": "Rotation snap",
+      "snapHint": "Grid snapping applies to wall nodes, Kit placement, and prefab stamps.",
+      "kitPick": "Choose asset",
+      "kitChosen": "Placing: {name}",
+      "kitNone": "Pick an asset from the browser, then click the map to place it on the grid.",
+      "kitRotate": "Rotate (R)",
+      "kitScale": "Piece scale",
+      "kitTileSnap": "Connect tiles",
+      "kitTileHint": "Connect tiles snaps each piece to its own size and to the FIRST tile’s height, so floors join edge to edge and stay flat across bumpy ground. Esc or picking a new asset starts a fresh level; turn it off to use the world grid.",
+      "kitGhostBlocked": "Blocked: overlapping a placed asset.",
+      "wallStyle": "Wall style",
+      "wallDraw": "Draw wall",
+      "wallDrawing": "Click to add corners on the visible grid. Double-click a node or press Enter to finish. Backspace or Delete removes the last node; Esc cancels.",
+      "wallFinish": "Finish wall",
+      "wallCancel": "Cancel",
+      "wallUndoPoint": "Undo point",
+      "wallNodes": "{n} wall nodes placed.",
+      "wallPostEvery": "Post spacing",
+      "wallPostsOff": "No posts",
+      "wallScale": "Wall scale",
+      "wallHeight": "Height",
+      "wallThickness": "Thickness",
+      "wallClosed": "Close the loop",
+      "wallWalkTop": "Walkable top",
+      "wallStairs": "Stairs up",
+      "wallWalkHint": "Walkable top puts a patrol deck along the wall so players can walk it in playtest; Stairs up adds a staircase from the ground to the deck at each end (or beside a closed loop).",
+      "wallPlaced": "Wall run placed ({n} pieces).",
+      "wallBuildFailed": "The wall assets could not be generated. Your path is still available.",
+      "wallTooShort": "Draw at least two points to build a wall.",
+      "wallLiveEdit": "The controls above update your most recent wall live.",
+      "wallEditHint": "Select any wall piece to make that run active. Return to Walls to reshape it, or press Delete in Select to remove the whole run.",
+      "wallGateHint": "Gate segments are skipped so the wall leaves an opening.",
+      "styleStone": "Stone Wall",
+      "styleCastle": "Castle Wall",
+      "styleWoodFence": "Wood Fence",
+      "styleMetalFence": "Metal Fence",
+      "styleCastleFence": "Castle Fence",
+      "styleHexWall": "Hex Wall",
+      "roadType": "Road type",
+      "roadTypeRoad": "Road",
+      "roadTypePath": "Footpath",
+      "roadDraw": "Draw road",
+      "roadDrawing": "Click to add waypoints. Enter or double-click finishes, Esc cancels.",
+      "roadFinish": "Finish road",
+      "roadCancel": "Cancel",
+      "roadPlaced": "Road placed.",
+      "roadTooShort": "Draw at least two points to build a road.",
+      "roadLimit": "This map already has the maximum number of roads.",
+      "roadList": "Roads on this map",
+      "roadDelete": "Delete",
+      "roadLegacy": "Built-in road",
+      "roadAuthored": "Road {n}",
+      "roadHint": "Roads blend into the terrain like the built-in world roads and flatten bumps beneath them.",
+      "prefabSave": "Save selection as prefab",
+      "prefabName": "Prefab name",
+      "prefabSaved": "Prefab saved: {name}",
+      "prefabNone": "No prefabs yet. Select some placed assets and save them as a prefab.",
+      "prefabStamp": "Stamp",
+      "prefabDelete": "Delete",
+      "prefabStamped": "Prefab stamped ({n} pieces).",
+      "prefabNeedSelection": "Select one or more placed assets first (Shift+click or marquee).",
+      "prefabCount": "{n} pieces",
+      "routePick": "Click an NPC to edit its route.",
+      "routeEditing": "Route for {name}: click the map to add waypoints.",
+      "routeAddHint": "Each click adds a waypoint. Enter finishes, Esc stops editing.",
+      "routeMode": "Traversal",
+      "routeModeLoop": "Loop",
+      "routeModePingPong": "Ping-pong",
+      "routeSpeed": "Walk speed",
+      "routeWait": "Wait at waypoints",
+      "routeWaitUnit": "seconds",
+      "routeFinish": "Save route",
+      "routeClear": "Clear route",
+      "routeSaved": "Route saved ({n} waypoints).",
+      "routeCleared": "Route cleared.",
+      "routeNoNpc": "No NPC selected. Click an NPC in the viewport first.",
+      "routeCount": "{n} waypoints"
     },
     "inspector": {
-      "label": "ツールオプション"
+      "label": "ツールオプション",
+      "toolTab": "Tools",
+      "cameraTab": "Camera",
+      "lightingTab": "Lighting",
+      "sceneTab": "Scene"
+    },
+    "scene": {
+      "title": "Scene Collection",
+      "hint": "Every placed object. Click to select, double-click a name to rename.",
+      "none": "No objects placed yet.",
+      "count": "{n} objects",
+      "pinTitle": "Focus the camera on this object and select it",
+      "hideTitle": "Hide this object in the editor (it still exists in the map)",
+      "showTitle": "Show this object again",
+      "hiddenBadge": "hidden",
+      "renameLabel": "Object name",
+      "residentBadge": "resident",
+      "isolateTitle": "Isolate {zone}: unload everything outside this zone (view only)",
+      "zoneStream": "Stream the zones near the camera",
+      "zoneStreamHint": "Keep the {count} zones nearest the camera loaded, and swap the whole set when you fly clear of them.",
+      "zoneStreamAt": "Streaming {zone} ({count} zones). Fly clear of them to load the next set.",
+      "zoneStreamLocked": "Locked on {zone}. Unlock to follow the camera again.",
+      "zoneStreamOn": "Streaming {zone} — {count} zones resident, everything else unloaded.",
+      "streamGuide": "Show the resident perimeter",
+      "streamGuideHint": "Draws light red walls where the loaded zones end, so the edge of what is streamed is visible instead of guessed.",
+      "zoneLockTitle": "Lock this zone loaded: stay here until you unlock, whatever the camera does",
+      "zoneUnlockTitle": "Unlock: follow the camera into the next zone again"
+    },
+    "publish": {
+      "failed": "Publish blocked: {error}",
+      "noDevServer": "Publishing writes into the project, so it needs the local dev server (npm run dev).",
+      "rejected": "Publish rejected: {error}",
+      "done": "Published. Boot it at /index.html?map={slug}, commit the generated files to ship.",
+      "removeTitle": "Remove this map from the game?",
+      "removeConfirm": "Deletes the published files for \"{slug}\" (data/maps + src/sim/maps) and restores the standard ClaudeCraft world. Your map in the editor is not touched, and you can publish it again at any time.",
+      "removed": "Removed \"{slug}\" from the game. The standard ClaudeCraft world is back.",
+      "removedNothing": "Nothing to remove: \"{slug}\" was not published to this repo."
     },
     "brush": {
       "title": "ブラシ",
+      "shape": "ブラシの形",
+      "circle": "円形",
+      "square": "正方形",
       "size": "ブラシサイズ",
       "strength": "強さ",
       "sizeHint": "キー：[ と ] でブラシサイズ、Shift+[ と Shift+] で強さを調整。",
-      "editCount": "地形編集数：{count} / {max}"
+      "editCount": "地形編集数：{count} / {max}",
+      "reapplyWater": "Re-apply water",
+      "reapplyWaterTitle": "Rebuild the water from the current terrain. Strokes already refresh the water they touch; use this for anything left over, like a basin dug where the map had no water at all."
     },
     "biome": {
       "title": "バイオーム",
@@ -9276,18 +10804,316 @@ export const ja_JP: EnTranslations = {
       "cave": "洞窟",
       "erase": "塗りを消す",
       "hint": "塗ったマスはゾーンのバイオームを上書きし、地形の形状と色を変えます。",
+      "hue": "Hue",
+      "light": "Light/Dark",
+      "saveSwatch": "Save tint as swatch",
+      "saveSwatchTitle": "Keep this hue/light version as its own swatch, so the tint can be reused after the sliders move on",
+      "swatchSaved": "Saved swatch \"{name}\".",
+      "removeSwatch": "Remove swatch",
+      "removeSwatchTitle": "Delete this custom swatch from the map. Terrain painted with it reverts to the base biome look.",
+      "swatchRemoved": "Removed swatch \"{name}\".",
+      "customHint": "Custom swatches color the ground only (terrain shape keeps the zone biome) and save with the map.",
+      "customFull": "Swatch limit reached ({max}).",
+      "textureSlotsFull": "Only {max} textured swatches render per map; extra ones show their flat color. Retire an unused texture to free a slot.",
+      "textureSlots": "Texture slots: {used} / {max} used · {free} free",
+      "textureSlotsTitle": "Each distinct texture on this map uses one of {max} slots. Snow textures ride the terrain snow layer and use none. Removing a texture swatch frees its slot.",
+      "textureSlotsOver": "Over the limit by {over}: the most recently added textures paint as flat color. Remove a texture swatch to free a slot.",
+      "importTexture": "Import texture swatch",
+      "importTextureTitle": "Pick an image file: painting with the new swatch tiles it over the ground (stored in this browser; other machines see its average color)",
+      "builtinGroup": "Texture library",
+      "builtinTitle": "Built-in ground textures that ship with the editor: picking one adds it to this map as a swatch (available on every machine)",
+      "tileSize": "Texture tile size (yd)",
+      "depth": "Surface depth",
+      "variation": "Variation",
+      "variationHint": "Breaks up the repeating grid by sampling the texture a second time through a rotated frame. 0% is the plain tiling and costs nothing; higher values cost one extra texture read wherever this swatch is painted. Surface depth shades the texture's own crevices from its ambient-occlusion map, which stops painted ground reading flat; it is priced the same way.",
+      "importTextureFailed": "Could not read that image.",
+      "autoRetexture": "Auto-Retexture Map",
+      "autoRetextureHint": "One click: repaints the whole map with fitting builtin textures by elevation, slope, water, zone and paths, sand in deserts and on beaches, cliffs on steep faces, varied grass and dirt, cobble in towns and on roads. Fully editable after: repaint anything with the brush.",
+      "autoRetextureDone": "Retextured {count} cells. Repaint any of it with the brush.",
       "clear": "バイオーム塗りをすべて消去",
-      "clearConfirm": "このマップの塗られたバイオームのマスをすべて削除しますか？"
+      "clearConfirm": "このマップの塗られたバイオームのマスをすべて削除しますか？",
+      "hardness": "Brush hardness",
+      "edgeSoftness": "Edge softness",
+      "edgeDetail": "Edge detail",
+      "edgeHint": "How the boundary between two painted textures looks, across the whole map. A soft brush stores its rim as scattered single cells (one cell can only hold one texture), and the paint grid is a quarter of a yard, so with both of these at 0 a boundary is a hard line with speckle along it, whatever the hardness slider says. Edge softness widens the blend so that scatter reads as the gradual fade it stands for; Edge detail wanders the boundary with fine noise so it interlocks like real ground instead of following the grid. Both are free, no extra texture reads, but a wide softness blurs painted detail narrower than itself.",
+      "bucket": "Fill (replace texture)",
+      "bucketTitle": "Arm the bucket, then click the ground: every cell painted with the clicked texture switches to the selected swatch",
+      "bucketArmedHint": "Bucket armed: click the ground to replace the clicked texture map-wide.",
+      "bucketDone": "Replaced {count} painted cells.",
+      "pickTexture": "Pick the texture to paint",
+      "galleryTitle": "Choose a ground texture",
+      "galleryHint": "Browse every texture, then Lock In the one you want to paint with.",
+      "galleryLockIn": "Lock In",
+      "galleryCurrent": "Current",
+      "groupBiomes": "Biomes",
+      "groupSwatches": "Your swatches",
+      "galleryCount": "{n} textures",
+      "alphaTitle": "Brush alpha",
+      "alphaNone": "None",
+      "alphaImport": "Import alpha",
+      "alphaImportTitle": "Load a grayscale image as a brush mask: white paints, black masks out (kept in this browser)",
+      "alphaImportFailed": "Could not read that image as a brush alpha.",
+      "alphaRemove": "Remove this imported alpha",
+      "autoTitle": "Auto textures",
+      "autoSlopeRock": "Rock on steep slopes",
+      "autoScree": "Rock rubble on cliffs (high graphics)",
+      "autoSnowCaps": "Snow-capped peaks",
+      "autoRim": "Mountains at the map edge",
+      "autoShoreSand": "Sand near the water",
+      "autoAllOff": "Paint only (turn all off)",
+      "autoAllOffTitle": "Switch every automatic rule off so nothing re-textures the ground by slope, height or shoreline. Your paint is then the only thing on it.",
+      "autoHint": "Automatic texturing rules, applied UNDER your paint: while one is on it keeps re-tinting the ground it owns, so a cliff you have painted goes back to rock. Uncheck one to remove it map-wide. New maps start with all of these off."
+    },
+    "map": {
+      "zoneTitle": "Zone map",
+      "worldTitle": "World map",
+      "showWorld": "Show full world",
+      "showZone": "Show this zone",
+      "usePainted": "Use painted map",
+      "useLiveTerrain": "Use live terrain",
+      "pinHint": "Click the map to place a teleport pin.",
+      "teleportToPin": "Teleport to pin",
+      "close": "Close"
+    },
+    "zoneTool": {
+      "title": "Named Locations",
+      "hint": "Drag a box on the ground, then name it: standing inside shows that name as the location in playtest.",
+      "namePrompt": "Location name",
+      "none": "No named locations yet.",
+      "deleteTitle": "Remove this location",
+      "hideBoxes": "Hide area boxes"
+    },
+    "objectMove": {
+      "title": "ゲームプレイオブジェクト",
+      "kindFarmBed": "畑の苗床",
+      "kindPracticeDummy": "練習用ダミー",
+      "kindGatherNode": "採集ポイント",
+      "kindDungeonDoor": "ダンジョン入口",
+      "position": "位置：{x}, {z}",
+      "moved": "このマップで移動済みです。",
+      "original": "元の位置にあります。",
+      "hint": "ドラッグするか、矢印キーで微調整します。移動はこのマップにだけ適用され、オブジェクトの識別子は変わらないため、保存された進行状況からも見つかります。",
+      "reset": "元の位置に戻す"
+    },
+    "lightTool": {
+      "title": "Point Lights",
+      "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",
+      "none": "No lights yet.",
+      "color": "Color",
+      "intensity": "Intensity",
+      "range": "Range (yd)",
+      "height": "Height (yd)",
+      "deleteTitle": "Remove this light",
+      "capReached": "Light limit reached ({max}).",
+      "lightN": "Light {num}",
+      "selectTitle": "Select this light in the world (bulb badge enlarges; Delete removes it)"
+    },
+    "soundTool": {
+      "title": "Point Sounds",
+      "hint": "Click the ground to drop a looping sound emitter, then pick a clip and set its max volume and radius. The falloff sphere shows how far it carries; it plays spatially in playtest.",
+      "none": "No point sounds yet.",
+      "clip": "Sound effect",
+      "volume": "Max volume",
+      "radius": "Radius (yd)",
+      "height": "Height (yd)",
+      "deleteTitle": "Remove this sound",
+      "capReached": "Point sound limit reached ({max}).",
+      "soundN": "Sound {num}",
+      "selectTitle": "Select this sound in the world (badge enlarges; Delete removes it)"
+    },
+    "decalTool": {
+      "title": "Decals",
+      "hint": "Pick a decal, then click the ground to stamp it. Stamps drape over the terrain and only load when the camera is near, so a map can carry plenty. Click a stamp to select it; Delete removes it.",
+      "none": "No decals stamped yet.",
+      "library": "Decal library",
+      "libraryTitle": "Built-in decals that ship with the editor (original CC0 art). Pick one, then click the ground to stamp it.",
+      "importDecal": "Import decal image",
+      "importTitle": "Pick a PNG/WebP with transparency: it becomes a stampable decal (stored in this browser, and packed into map bundles)",
+      "imported": "Imported",
+      "importFailed": "Could not read that image.",
+      "importedDecal": "Imported \"{name}\".",
+      "size": "Size (yd)",
+      "rotation": "Rotation",
+      "aspect": "Stretch",
+      "opacity": "Opacity",
+      "glow": "Glow",
+      "tint": "Tint",
+      "sortOrder": "Draw over",
+      "randomRotate": "Random rotation per stamp",
+      "stamped": "Stamped \"{name}\".",
+      "removed": "Removed decal.",
+      "capReached": "Decal limit reached ({max}).",
+      "decalN": "Decal {num}",
+      "deleteTitle": "Remove this decal",
+      "selectTitle": "Select this decal in the world (Delete removes it)",
+      "pickFirst": "Pick a decal from the library first.",
+      "catArcane": "Arcane",
+      "catBurn": "Burns",
+      "catDamage": "Damage",
+      "catGore": "Gore",
+      "catNature": "Nature",
+      "catTracks": "Tracks",
+      "catMarker": "Markers"
+    },
+    "markerTool": {
+      "title": "AI Markers",
+      "hint": "Editor-only notes for AI quest/event generation (\"quest giver here\", \"chest here\"). Never shown in playtest.",
+      "place": "Place markers instead of moving the spawn",
+      "kind": "Marker type",
+      "npc": "NPC",
+      "object": "Interactable object",
+      "none": "No markers yet.",
+      "defaultName": "{kind} {num}",
+      "deleteTitle": "Remove this marker",
+      "capReached": "Marker limit reached ({max})."
+    },
+    "appearance": {
+      "title": "Appearance (shader)",
+      "tint": "Tint color",
+      "opacity": "Opacity",
+      "glow": "Glow color",
+      "glowStrength": "Glow strength",
+      "fire": "Fire effect (animated flame)",
+      "reset": "Reset appearance",
+      "hint": "Renders the same in playtest: tint recolors, opacity fades (ghosts), glow adds emissive light."
+    },
+    "fire": {
+      "title": "Asset fire effects",
+      "hint": "Add independent procedural fire sources, select one, then use the Move gizmo in the viewport to place it precisely on the model.",
+      "legacy": "Legacy single flame",
+      "customize": "Open full controls",
+      "add": "+ Add fire emitter",
+      "removeAll": "Remove all fire",
+      "emitter": "Fire {count}",
+      "preset": "Effect preset",
+      "enabled": "Emitter enabled",
+      "anchor": "Attach to",
+      "anchorBase": "Model base",
+      "anchorCenter": "Model center",
+      "anchorTop": "Model top",
+      "position": "Position",
+      "positionX": "Local X (yd)",
+      "positionY": "Local Y (yd)",
+      "positionZ": "Local Z (yd)",
+      "flameShape": "Flame shape",
+      "scale": "Overall scale",
+      "width": "Flame width",
+      "height": "Flame height",
+      "layers": "Flame layers",
+      "intensity": "Shader intensity",
+      "opacity": "Flame opacity",
+      "light": "Glow light",
+      "glow": "Glow intensity",
+      "glowRange": "Glow radius (yd)",
+      "smoke": "Smoke",
+      "smokeAmount": "Smoke amount",
+      "smokeScale": "Smoke scale",
+      "smokeRise": "Smoke rise",
+      "colorMotion": "Color & motion",
+      "hue": "Fire hue",
+      "saturation": "Saturation",
+      "speed": "Animation speed",
+      "turbulence": "Turbulence",
+      "flicker": "Flicker",
+      "embers": "Flying embers",
+      "blend": "Blend mode",
+      "blendAdditive": "Additive glow",
+      "blendAlpha": "Natural alpha",
+      "duplicate": "Duplicate emitter",
+      "remove": "Remove emitter",
+      "style": {
+        "torch": "Torch",
+        "bonfire": "Bonfire",
+        "wildfire": "Wildfire",
+        "soulfire": "Soul fire",
+        "embers": "Ember bed"
+      }
+    },
+    "sculpt": {
+      "hint": "Drag to raise the ground; tick the box to carve downward instead.",
+      "shapeTitle": "Brush Shape",
+      "hardness": "Brush hardness",
+      "alphaTitle": "Sculpt alpha",
+      "alphaNone": "Round",
+      "alphaHint": "Alphas shape the actual terrain surface and stay identical in editor and playtest.",
+      "lower": "Lower instead of raise",
+      "grab": "Grab / pull (snake hook)",
+      "grabHint": "Press to grab the ground under the brush, then drag and the terrain follows your cursor in any direction - up lifts it, down shoves it in, sideways slides it across the map, like pulling clay. One grab is one undo step. Brush size sets how wide a chunk you pull.",
+      "shiftHint": "Hold Shift while dragging to do the opposite (raise becomes lower, and back).",
+      "autoTex": "Auto texture by angle",
+      "autoTexHint": "Each stroke repaints the sculpted area by ground angle: one texture below the threshold, another above it (instant cliffs).",
+      "autoTexAngle": "Steep from (degrees)",
+      "autoTexFlat": "Flat ground texture",
+      "autoTexSteep": "Steep ground texture",
+      "autoTexNone": "Leave as is"
+    },
+    "materials": {
+      "title": "マテリアル",
+      "hint": "このモデルの各パーツのテクスチャを選びます。テクスチャはワールド空間でタイル表示され、モデルのUVは使わず、マップと一緒に保存されます。",
+      "loading": "モデルを読み込み中です。少ししてからもう一度選択するとマテリアルを編集できます。",
+      "original": "オリジナル",
+      "texture": "テクスチャ",
+      "tile": "テクスチャの縮尺（1タイルあたりのヤード）",
+      "color": "Tint",
+      "reset": "元に戻す"
     },
     "flatten": {
+      "style": {
+        "smooth": "Smooth",
+        "sharpen": "Sharpen",
+        "noise": "Noise",
+        "terrace": "Terrace"
+      },
+      "styleHint": {
+        "smooth": "Averages the ground under the brush - repeated passes melt bumps away.",
+        "sharpen": "The inverse of Smooth: ridges crest harder and gullies bite deeper with each pass.",
+        "noise": "Paints natural undulation across the whole brush: layered swells and dips with finer detail on top. One stroke keeps one pattern, so dragging builds rolling ground; stroke again to layer new detail.",
+        "terrace": "Pulls slopes into stepped ledges. Brush strength sets the step height."
+      },
+      "noiseSize": "Bump size (yards)",
+      "noiseRough": "Roughness",
+      "noiseHint": "Small bumps with high roughness read as rocky, broken ground; big bumps with low roughness roll like meadow hills. Brush strength sets how tall they stand.",
       "hint": "平坦化は、ドラッグ開始時のカーソル下の高さに地面をならします。",
-      "hardEdge": "ハードエッジ"
+      "hardEdge": "ハードエッジ",
+      "smoothMode": "Smooth instead of flatten",
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "目標の高さ（ヤード）",
+      "levelPlaceholder": "ドラッグ開始点",
+      "levelClear": "クリア",
+      "levelHint": "ドラッグするたびに地面をこの高さに平らにします。地面を右クリックすると別の高さを選べます。",
+      "levelHintNone": "地面を右クリックするとその高さを固定し、どこでもドラッグしてその高さに平らにできます。空欄の場合は、各ドラッグの開始点の高さに平らにします。",
+      "levelPicked": "高さを {height} ヤードに固定しました。"
+    },
+    "slope": {
+      "hint": "斜面を始めたい地面を右クリックします。次に終点で押したまま道に沿ってドラッグすると、2つの高さの間が滑らかな坂になります。",
+      "start": "始点の高さ：{height} ヤード",
+      "noStart": "始点が未設定です。地面を右クリックして設定してください。",
+      "clearStart": "始点をクリア",
+      "needStart": "先に地面を右クリックして、斜面の始点を設定してください。",
+      "startPicked": "斜面の始点を {height} ヤードに設定しました。"
+    },
+    "pond": {
+      "title": "池を作る",
+      "add": "池を追加",
+      "radius": "池の半径",
+      "depth": "池の深さ",
+      "hint": "地面をクリックすると丸い池を掘って水を入れます。円には緩やかな岸も含まれます。元に戻すと水とくぼみを一緒に取り消します。",
+      "invalid": "この地面には池を掘れません。別の場所を選んでください。"
     },
     "water": {
       "title": "水面の高さ",
       "level": "水面の高さ",
       "hint": "マップ全体の水面の高さを設定します（{min} から {max} ヤード）。",
-      "reset": "既定の高さに戻す"
+      "reset": "既定の高さに戻す",
+      "tintTitle": "Water tint",
+      "hue": "Hue",
+      "light": "Lightness",
+      "tintReset": "Reset tint",
+      "waterfallTitle": "Waterfalls",
+      "placeWaterfall": "Place waterfall",
+      "placeWaterfallTitle": "Arm the Place tool with an animated waterfall (click a cliff to drop it)",
+      "waterfallLabel": "Waterfall",
+      "waterfallHint": "An animated falling-water sheet with a foam pool. Scale it up a cliff with S or the gizmo; stretch just the height with the Y scale handle."
     },
     "place": {
       "title": "アセット配置",
@@ -9298,6 +11124,102 @@ export const ja_JP: EnTranslations = {
       "chosen": "配置中：{name}",
       "none": "下のブラウザーでアセットを選び、地面をクリックして配置します。"
     },
+    "collider": {
+      "title": "Collision Volumes",
+      "hint": "Pick a shape, then click the ground to drop it. Use Move, Rotate, and Scale (or the sliders below) to shape it.",
+      "shapeLabel": "Collider shape",
+      "box": "Box collider",
+      "sphere": "Sphere collider",
+      "plane": "Floor plane",
+      "wall": "Wall plane",
+      "width": "Width",
+      "height": "Height",
+      "depth": "Depth",
+      "diameter": "Diameter",
+      "floorOffset": "Floor height offset",
+      "sizeHint": "Dimensions are yards at scale 1; the Scale tool multiplies them.",
+      "playtestNote": "Volumes show green in the editor and are invisible in playtest: boxes and spheres block movement, floor planes raise the walkable ground.",
+      "hideVolumes": "Hide collision volumes",
+      "hideVolumesHint": "Hides the green volume overlays in the viewport (they still block in playtest)."
+    },
+    "foliageTool": {
+      "title": "Foliage Brush",
+      "hint": "Drag across the ground to scatter the enabled foliage inside the brush; each stroke is one undo step. Use Erase to remove pieces.",
+      "ambientTitle": "Existing map foliage",
+      "ambientHint": "Built-in trees and rocks are procedural and cannot be selected. Point the camera at an area, then convert this zone (recommended), the nearest batch, or the whole map.",
+      "makeZoneEditable": "Make THIS zone editable",
+      "makeZoneEditableHint": "Converts every tree and rock in the zone the camera is over into editable placements, the performance-safe way to edit a far area, one region at a time.",
+      "makeAmbientEditable": "Make nearby foliage editable",
+      "makeAllAmbientEditable": "Make ALL foliage editable",
+      "ambientAllHint": "Converting the whole map turns thousands of trees and rocks into individual placements, which uses more memory than the zone or batch options.",
+      "ambientEditableHint": "Ambient foliage is off. Every foliage piece painted with this brush can be selected, moved, rotated, scaled, or erased.",
+      "ambientConverted": "Made the {count} nearest foliage pieces editable.",
+      "ambientConvertedAll": "All ambient foliage ({count} pieces) is now editable.",
+      "ambientPartial": "Converted {count} pieces; raise the limit or convert again for the rest.",
+      "density": "Density",
+      "minScale": "Min size",
+      "maxScale": "Max size",
+      "grass": "Grass (animated)",
+      "grassHue": "Grass hue",
+      "grassLight": "Grass lightness",
+      "grassClump": "Clump size (strands)",
+      "grassPreview": "The color new grass will paint with",
+      "ferns": "Ferns and mushrooms",
+      "bushes": "Bushes",
+      "trees": "Trees",
+      "rocks": "Rocks",
+      "collide": "New foliage blocks movement",
+      "noneSelected": "Enable at least one foliage group to paint.",
+      "customTitle": "Custom brush asset",
+      "customHint": "Scatter your own asset instead of the built-in sets. Pick any model from the browser below, then brush as usual.",
+      "customPick": "Pick from asset browser",
+      "customChosen": "Brushing: {name}",
+      "customClear": "Back to built-in foliage",
+      "customNeedsPick": "Open the asset browser and pick an asset for the custom brush first."
+    },
+    "meshFixTool": {
+      "title": "Mesh Fix",
+      "hint": "Wireframe is on while this tool is active. Drag over the stretched terrain polys draped across a cave mouth (from outside or from inside the cave) to REMOVE them; every poly centred under the brush stops drawing. Draw-only: the ground you walk on is unchanged. One undo step per stroke.",
+      "restore": "Restore mode (bring removed polys back under the brush)",
+      "nudgeHint": "To MOVE a stretched poly instead of removing it, use Raise or Lower with a very small brush on its vertices.",
+      "count": "{n} removed spots",
+      "clear": "Restore everything",
+      "capReached": "Mesh Fix is full ({max} spots). Restore some before removing more.",
+      "miss": "Aim at the terrain mesh: nothing was under the cursor.",
+      "vertexMode": "Vertices mode (select and move single vertices)",
+      "vertexHint": "Every terrain vertex near the cursor shows as a small square; selected ones turn yellow. Click one to select it, drag a box to take several, Shift+click or Shift+drag to add, Ctrl/Cmd+click to toggle, Alt+click to drop. Then DRAG a selected vertex to move it up or down. Draw-only: the ground you walk on is unchanged.",
+      "vertexCount": "{sel} selected, {n} vertices moved",
+      "vertexReset": "Reset selected vertices",
+      "vertexClearSel": "Clear selection",
+      "vertexClearAll": "Reset every moved vertex"
+    },
+    "clutterTool": {
+      "title": "Clutter Brush",
+      "hint": "Drag across the ground to scatter the enabled clutter inside the brush; each stroke is one undo step. Pieces never block movement.",
+      "tierNote": "Clutter shows in game on High graphics and up; lower tiers skip it at no cost.",
+      "erase": "Erase mode (lift painted clutter under the brush)",
+      "density": "Density",
+      "minScale": "Min size",
+      "maxScale": "Max size",
+      "clumps": "Clumps (0 = even spread)",
+      "kindsTitle": "Clutter kinds",
+      "kinds": {
+        "tile_broken": "Cracked paving slabs",
+        "tile_shards": "Tile shards",
+        "pebbles": "Pebbles",
+        "stones": "Loose stones",
+        "letter": "Dropped letters",
+        "paper_scraps": "Crumpled paper",
+        "leaves": "Fallen leaves",
+        "straw": "Straw",
+        "splinters": "Wood splinters",
+        "pot_shards": "Broken pottery"
+      },
+      "noneSelected": "Enable at least one clutter kind to paint.",
+      "count": "{count} clutter stamps painted",
+      "clearAll": "Remove all painted clutter",
+      "capReached": "Clutter limit reached ({max} stamps); erase some to paint more."
+    },
     "blockerTool": {
       "title": "ブロッカー壁",
       "hint": "地面に沿ってドラッグすると、プレイヤーが歩いても跳んでも通れない見えない壁を描けます。離すと設置されます。半ヤード未満の壁は破棄されます。",
@@ -9305,6 +11227,7 @@ export const ja_JP: EnTranslations = {
     },
     "camp": {
       "title": "モンスターキャンプ",
+      "chooseMob": "Choose a mob model",
       "mob": "モンスター",
       "count": "数",
       "radius": "半径",
@@ -9312,12 +11235,140 @@ export const ja_JP: EnTranslations = {
       "hint": "空き地をクリックでキャンプを追加、既存のキャンプをクリックで編集します。",
       "playtestNote": "モンスターはプレイテストでのみ出現し、エディター画面には現れません。",
       "selected": "キャンプ：{mob}",
-      "none": "キャンプが選択されていません。"
+      "none": "キャンプが選択されていません。",
+      "catalogMeta": "{family} | Level {min}-{max}",
+      "statFamily": "Family: {value}",
+      "statAggro": "Aggro: {value} yd",
+      "statScale": "Scale: {value}",
+      "overrideLevels": "Override template levels",
+      "levelMin": "Minimum level",
+      "levelMax": "Maximum level",
+      "aiNotesPlaceholder": "Describe behavior, patrol logic, encounter pacing, or dialogue cues for the AI.",
+      "questNotesPlaceholder": "Explain how this camp should support objectives, rewards, or quest progression.",
+      "tagElite": "Elite",
+      "tagRare": "Rare",
+      "tagBoss": "Boss",
+      "tagCaster": "Caster",
+      "tagSupport": "Support",
+      "tagSummoner": "Summoner",
+      "tagEnrage": "Berserk",
+      "tagSwimmer": "Swimmer",
+      "tagStationary": "Fixed"
+    },
+    "authoring": {
+      "browseAll": "Browse all",
+      "search": "Search all models...",
+      "searchLabel": "Search catalog",
+      "filterLabel": "Filter catalog group",
+      "allGroups": "All",
+      "defaults": "Defaults",
+      "noResults": "No matching entries.",
+      "showing": "Showing {shown} of {total}. Refine the search to see the rest.",
+      "resultCount": "{count} entries",
+      "aiBrief": "AI and Quest Brief",
+      "aiNotes": "AI direction",
+      "questNotes": "Quest-building notes",
+      "vfxTitle": "Ambient VFX",
+      "vfxPreset": "Preset",
+      "vfxNone": "None",
+      "vfxArcane": "Arcane motes",
+      "vfxFire": "Fire embers",
+      "vfxFrost": "Frost shimmer",
+      "vfxHoly": "Holy glow",
+      "vfxNature": "Nature wisps",
+      "vfxShadow": "Shadow motes",
+      "vfxIntensity": "VFX intensity",
+      "vfxHint": "Pooled particles keep the effect lightweight in the editor and playtest."
+    },
+    "entityTool": {
+      "title": "NPCs and Mobs",
+      "hint": "Select an NPC to configure its rig, role, VFX, and AI brief. Select a mob to set its type, levels, stat modifiers, patrol, and respawn.",
+      "selected": "Selected: {name}",
+      "none": "Click a mob or NPC in the map view to select it.",
+      "facing": "Facing",
+      "oneMob": "1 mob",
+      "manyMobs": "{count} mobs",
+      "name": "Display name",
+      "titleField": "Title",
+      "role": "Story role",
+      "rolePlaceholder": "Quest giver, merchant, guard, trainer...",
+      "characterModel": "Rigged character",
+      "placeNpc": "Place NPC",
+      "chooseNpcModel": "Choose a character model",
+      "placeNpcHint": "{name} is ready. Click the terrain to place this NPC.",
+      "cancelPlacement": "Cancel placement",
+      "automaticModel": "Automatic template rig",
+      "automaticModelHint": "Use the character assigned by this NPC template.",
+      "aiNotesPlaceholder": "Describe personality, dialogue tone, schedules, reactions, and interaction rules.",
+      "questNotesPlaceholder": "Leave instructions for future AI-authored quests, objectives, and story beats.",
+      "categoryNpc": "NPCs",
+      "categoryPlayer": "Player rigs",
+      "categoryHumanoid": "Humanoids",
+      "categoryCreature": "Creatures",
+      "categoryForm": "Forms"
+    },
+    "mobTool": {
+      "hint": "Click a mob in the map view to edit its type, levels, stats, patrol, and respawn.",
+      "typeHeader": "Mob: {name}",
+      "typeHeaderMany": "Mob: {name} ({count} selected)",
+      "type": "Mob type",
+      "mixedType": "Mixed types",
+      "statLevels": "Template levels {min}-{max}",
+      "mixedHint": "The selected mobs differ. Values shown are the first one; edits apply to all of them.",
+      "overrideLevels": "Override level range",
+      "levelDefaultHint": "Using the template level range for this mob.",
+      "statsTitle": "Stat modifiers",
+      "statsHint": "Multipliers on the level-derived stats. Above 1 is a bonus, below 1 a penalty. Click a value to type an exact number.",
+      "statHealth": "Health",
+      "statDamage": "Damage",
+      "statArmor": "Armor",
+      "statMoveSpeed": "Move speed",
+      "statAttackSpeed": "Swing time",
+      "statScale": "Size",
+      "statDefault": "{value}x default",
+      "statBonus": "{value}x (+{percent}%)",
+      "statPenalty": "{value}x (-{percent}%)",
+      "statsReset": "Reset modifiers",
+      "respawnTitle": "Respawn",
+      "respawnDefault": "Default respawn speed",
+      "respawnDefaultHint": "Using the realm default for this mob (rares and bosses take longer).",
+      "respawnSeconds": "Respawn after",
+      "seconds": "{value}s",
+      "patrolTitle": "Patrol",
+      "patrolNone": "This mob wanders near its spawn point. Set a patrol to walk it along a path.",
+      "patrolNoneNpc": "This character stands where you placed it. Set a patrol to walk it along a path.",
+      "patrolSet": "Set patrol route",
+      "patrolEdit": "Edit patrol route",
+      "patrolClear": "Clear patrol",
+      "patrolPickHint": "Click the map to drop each waypoint in order. Double-click the last one, or press Enter, to finish.",
+      "patrolDraftPoints": "Waypoints placed: {count}",
+      "patrolPoints": "Patrolling {count} waypoints",
+      "patrolMode": "At the end of the path",
+      "patrolLoop": "Loop back to the start",
+      "patrolPingpong": "Turn around and walk back",
+      "patrolSpeed": "Walk speed",
+      "patrolWait": "Pause at each waypoint",
+      "patrolWaitHint": "The pause is stamped on every waypoint you place from now on.",
+      "patrolFinish": "Finish route",
+      "patrolUndoPoint": "Remove last point",
+      "patrolCancel": "Cancel",
+      "patrolNeedPoints": "Place at least two waypoints before finishing the route.",
+      "patrolFull": "A patrol route holds at most {max} waypoints.",
+      "patrolSaved": "Patrol set: {count} waypoints.",
+      "patrolRemoved": "Patrol cleared.",
+      "yardsPerSecond": "{value} yd/s",
+      "delete": "Delete mob",
+      "deleteMany": "Delete {count} mobs",
+      "deleted": "Deleted {count} mobs.",
+      "deleteNpc": "Delete character",
+      "deleteManyNpcs": "Delete {count} characters",
+      "deletedNpcs": "Deleted {count} characters."
     },
     "spawn": {
       "title": "スポーン地点",
       "hint": "地面をクリックして、プレイテストでプレイヤーが降り立つ場所を設定します。",
       "position": "スポーン：{x}、{z}",
+      "area": "Spawn area: {width} x {height} yd",
       "unset": "内蔵の開始位置を使用します。",
       "clear": "スポーン地点をクリア"
     },
@@ -9337,12 +11388,31 @@ export const ja_JP: EnTranslations = {
       "hint": "配置済みアセットをクリックで削除、彫刻した地面をクリックでカーソル下の最新のスタンプを削除します。",
       "blockerHint": "ブロッカー壁の近くをクリックすると、代わりにその壁を削除します。"
     },
+    "grassClearTool": {
+      "title": "Remove Grass",
+      "hint": "Click or drag to scrub away the procedural meadow grass, including the grass baked into the built-in world. Use a large brush to clear a wide area in one stroke.",
+      "restore": "Restore all grass"
+    },
     "selection": {
       "title": "選択",
+      "heightOffset": "高さのオフセット（ヤード）",
+      "heightStep": "移動量（ヤード）",
+      "raiseAsset": "上げる",
+      "lowerAsset": "下げる",
+      "heightHint": "負の値で、アセットを基準位置より下に沈めます。",
       "none": "何も選択されていません。「選択」ツールで配置済みアセットをクリックしてください。",
+      "squareCollision": "Square collision (follows rotation)",
       "asset": "アセット：{name}",
       "x": "X",
+      "y": "Y",
       "z": "Z",
+      "multiCount": "{count} assets selected",
+      "selectAllOfAsset": "Select all of this asset ({count})",
+      "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
+      "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "地面に合わせる",
+      "setGroundTitle": "選択したアセットを真下の地形に戻し、浮きや持ち上げを解除します",
+      "snapGround": "移動時に地面に合わせる",
       "rotation": "回転",
       "scale": "スケール",
       "collide": "移動をブロック",
@@ -9350,12 +11420,73 @@ export const ja_JP: EnTranslations = {
       "radiusAuto": "自動",
       "radiusAutoTitle": "衝突半径をアセットのスケールに追従するようリセット",
       "radiusHint": "「自動」はアセットのスケールから衝突半径を導きます。スライダーをドラッグすると上書きできます。",
+      "collisionBaked": "Blocking with the baked model shape ({count} boxes hugging the mesh). Drag the radius slider to override with a simple circle; Auto restores the baked shape.",
+      "collisionCustom": "Custom footprint (circle/square) - overrides the baked model shape. Press Auto to restore it.",
       "footprints": "当たり判定の範囲を表示",
+      "sway": "Wind sway",
+      "swayHint": "Sways this asset in the wind. On by default for plants. Applies to EVERY placement of this asset on the map, not just the selected one.",
+      "collisionTitle": "Collision",
+      "collisionType": "Collision type",
+      "collisionTypeBaked": "Baked hitboxes",
+      "collisionTypeBasic": "Basic (radius)",
+      "collisionTypeMesh": "True collision (heavy)",
+      "collisionTypeNone": "No collision",
+      "collisionEdited": "Custom hitboxes ({count} boxes). The sim blocks with exactly these.",
+      "hitboxEdit": "Edit hitboxes",
+      "hitboxDone": "Done editing",
+      "hitboxAdd": "Add hitbox",
+      "hitboxDelete": "Delete selected",
+      "hitboxReset": "Reset to baked",
+      "hitboxSelected": "{count} hitboxes selected",
+      "hitboxHint": "Click a hitbox to select it; Ctrl/Shift+click selects several. Use the Move, Rotate, and Scale tools (or the gizmo) to shape them like any other object. Delete removes the selected boxes; Esc leaves edit mode.",
+      "hitboxCap": "Hitbox limit reached ({max} per asset).",
+      "hitboxSavePreset": "Save as preset",
+      "hitboxClearPreset": "Clear saved preset",
+      "hitboxPresetSaved": "Hitbox preset saved for {name}. New placements copy these boxes.",
+      "hitboxPresetCleared": "Hitbox preset cleared.",
+      "hitboxPresetHint": "Presets live on this device: every future placement of this asset spawns with the saved hitboxes.",
+      "meshBaking": "Baking true collision from the model mesh...",
+      "meshBakeDone": "True collision ready ({count} boxes).",
+      "meshBakeFailed": "Could not bake true collision for this asset.",
+      "meshReady": "True collision active: a dense box set hugging the real model mesh.",
+      "meshHint": "True collision rebuilds the hitboxes from the actual model mesh (many small boxes). Expensive - keep it for edge cases; it bakes once per asset when selected.",
+      "collisionCopyAll": "Copy collision to all {name} ({count})",
+      "collisionCopyAllHint": "Gives every other {name} on the map the same collision type and shape, sized to each copy so a small one never gets a giant footprint.",
+      "collisionCopyConfirmTitle": "Copy collision to all {name}?",
+      "collisionCopyConfirmBody": "All {count} other {name} on the map take this collision type and shape, each sized to its own scale (a small copy gets a small footprint, never this one), replacing their own. Ctrl+Z reverts the whole copy.",
+      "collisionCopyConfirm": "Copy to all",
+      "collisionCopied": "Copied collision to {count} {name}.",
+      "scaleAllTitle": "Scale all copies",
+      "scaleMin": "Scale min",
+      "scaleMax": "Scale max",
+      "scaleAllButton": "Scale all {name} ({count})",
+      "scaleAllHint": "Rolls a random scale between min and max onto every copy of this asset (set min and max equal for a uniform scale).",
+      "scaleAllConfirmTitle": "Scale all {name}?",
+      "scaleAllConfirmBody": "Every one of the {count} {name} on the map (this one included) gets a random scale between {min} and {max}, replacing its current scale. Ctrl+Z reverts it.",
+      "scaleAllConfirm": "Scale all",
+      "scaleAllDone": "Scaled {count} {name}.",
       "duplicate": "複製",
       "delete": "削除",
+      "pieces": "Edit pieces ({count})",
+      "piecesHint": "Splits this Blender-built building into its kit pieces and shell, each its own placement to move, rotate, scale or delete. Ctrl+Z puts the building back together.",
+      "piecesDone": "Split into {count} pieces.",
+      "piecesCap": "Not enough placement room to split this building.",
+      "combine": "Combine ({count})",
+      "combineHint": "Joins the selection into one object. The pieces of a split building become the building again; anything else is grouped, so it picks, drags and deletes as one.",
+      "combineRejoined": "Joined back into {name}.",
+      "combineGrouped": "Grouped {count} placements.",
+      "combineNeedsTwo": "Select at least two placements to combine.",
+      "ungroup": "Ungroup ({count})",
+      "ungroupDone": "Ungrouped {count} placements.",
       "deleteHint": "削除は選択を取り除きます。Ctrl+Z で元に戻せます。",
       "moveHint": "移動：3D ビューで地面に沿ってアセットをドラッグするか、矢印キーで微調整します（0.5 ヤード、Shift で 2 ヤード）。",
       "wheelHint": "Shift+スクロールで回転、Alt+スクロールで拡大縮小、Ctrl+D で複製します。"
+    },
+    "transform": {
+      "moveHint": "Drag a gizmo arrow to move along that axis, or the yellow square to move freely. Arrow keys nudge.",
+      "rotateHint": "Drag a gizmo ring to rotate around that axis. Shift+scroll also rotates in 15 degree steps.",
+      "scaleHint": "Drag a gizmo axis handle to stretch that axis, or the yellow center cube to scale uniformly.",
+      "pickHint": "Click an asset to select it; the gizmo appears on the selection."
     },
     "marker": {
       "title": "マーカー",
@@ -9393,13 +11524,47 @@ export const ja_JP: EnTranslations = {
       "searchPlaceholder": "アセットを検索...",
       "empty": "一致するアセットがありません。",
       "uploadedTab": "アップロード済み",
+      "importedTab": "Imported",
+      "importedEmpty": "No imported models this session. Use Import Model to load a .glb or .gltf from this computer.",
+      "removeImported": "Remove imported model (this session only)",
       "uploadedEmpty": "アップロードしたアセットはまだありません。「アセットをアップロード」で GLB モデル（最大 8 MiB）を追加してください。",
       "uploadedSignIn": "ゲームでログインすると、自分の GLB モデルをアップロードして配置できます。",
       "uploadedLoadFailed": "アップロード済みアセットを読み込めませんでした。",
       "deleteAsset": "アップロード済みアセットを削除",
       "deleteAssetConfirm": "アップロード済みアセット「{name}」を削除しますか？使用中のマップからモデルが消えます。",
       "pick": "{name}を配置",
+      "collisionMaster": "Collision Master: author this asset’s default collision",
       "categoryTab": "{category}（{count}）",
+      "resizeHandle": "Drag to resize the asset browser",
+      "allTab": "All ({count})",
+      "favouritesTab": "Favourites ({count})",
+      "recentsTab": "Recent",
+      "favouritesEmpty": "No favourites yet. Click the star on any asset to keep it here.",
+      "recentsEmpty": "Nothing placed yet in this browser. Assets you place appear here.",
+      "favouriteAdd": "Add {name} to favourites",
+      "favouriteRemove": "Remove {name} from favourites",
+      "subcategoryAll": "All ({count})",
+      "subcategoryTab": "{name} ({count})",
+      "collision": {
+        "baked": "Collision: baked boxes (auto-generated shape)",
+        "authored": "Collision: authored in Collision Master",
+        "none": "Collision: none, placements block only by their soft circle, if any"
+      },
+      "subcategory": {
+        "buildings": "Buildings",
+        "props": "Props",
+        "nature": "Nature",
+        "environment": "Environment",
+        "structure": "Structure",
+        "furniture": "Furniture",
+        "containers": "Containers",
+        "lighting": "Lighting",
+        "decor": "Decor",
+        "other": "Other",
+        "enemies": "Enemies",
+        "players": "Players",
+        "modular": "Modular"
+      },
       "category": {
         "biome": "バイオーム",
         "chars": "キャラクター",
@@ -9413,6 +11578,113 @@ export const ja_JP: EnTranslations = {
         "weapons": "武器"
       }
     },
+    "collisionMaster": {
+      "title": "Collision Master",
+      "mapName": "Collision Master: {name}",
+      "assetLabel": "Authoring default collision for {name}.",
+      "hint": "Build this asset’s collision with the Selection panel below: pick the collision type, edit boxes with the gizmo (move / rotate / scale), add or delete boxes. Lock In saves it to the project as the asset’s default everywhere.",
+      "fromBake": "From bake",
+      "fromBakeTitle": "Start from the asset’s auto-baked voxel boxes",
+      "fittedBox": "Fitted box",
+      "fittedBoxTitle": "Start from one box fitted around the whole asset",
+      "singleBox": "Single box",
+      "singleBoxTitle": "Start from one plain box at the asset’s base",
+      "fromCylinder": "Start from cylinder",
+      "fromCylinderTitle": "Start from one editable cylinder around the asset base",
+      "fromClear": "Start from clear",
+      "fromClearTitle": "Remove every collision shape and begin with an empty scene",
+      "polySnap": "Poly snap brush",
+      "polySnapHint": "Drag across the model’s surface to lay a collision plane that hugs the geometry: the drag start/end set its length and yaw, the sampled heights its vertical band. Great for walls, roofs, and ramps.",
+      "devOnly": "Lock In writes to the project files, so it needs the local dev server (npm run dev).",
+      "lockIn": "Lock In",
+      "lockInTitle": "Save as this asset’s default collision (writes to the project) and return to your map",
+      "cancel": "Back to map",
+      "catalogOnly": "Collision Master works on catalogue assets. Imported models keep their import bake.",
+      "adopted": "Updated {count} placement(s) already in this map to use the collision you just authored.",
+      "copyEmpty": "No collision volumes to copy.",
+      "copied": "Copied {n} collision volume(s), paste with Ctrl+V (works across assets).",
+      "pasted": "Pasted {n} collision volume(s).",
+      "saveFailed": "Could not save your map before opening Collision Master.",
+      "stashOnly": "Browser storage is blocked, so the map is held in memory: you will return to it from Collision Master, but export it if you want a durable copy.",
+      "noBoxes": "No collision boxes to lock in. Add at least one box, or pick Basic/None.",
+      "meshUnsupported": "True Mesh is a per-map bake and cannot be a project default. Pick Baked, Basic, or None.",
+      "saveEndpointFailed": "Saving the default failed: {error}",
+      "saveUnreachable": "Could not reach the save endpoint (is the dev server running?). Your collision was downloaded as a file so nothing is lost; start \"npm run dev\" and Lock In again, or merge the file into data/asset_collision_overrides.json.",
+      "locked": "Locked in: {name} now uses this collision everywhere.",
+      "presetPromptTitle": "Save as preset too?",
+      "presetPromptBody": "Lock In already made this the default collision for {name} across the whole project, and every copy in your map now uses it. A preset goes one step further on this device only: each NEW placement of {name} spawns carrying these boxes as its own editable hitboxes, so you can tweak them per copy with Edit Hitboxes. Not needed for the collision to work.",
+      "presetPromptYes": "Save preset",
+      "presetPromptNo": "No thanks",
+      "presetPromptDontAsk": "Don't ask again (turn it back on under More > \"Ask about presets on Lock In\")",
+      "barLabel": "Collision modeling tools",
+      "modeObject": "Object",
+      "modeObjectTitle": "Object mode (Tab): move / rotate / scale whole volumes with the gizmo",
+      "modeVertex": "Vertex",
+      "modeVertexTitle": "Vertex select (Z): click a vertex and the gizmo moves ONLY that vertex; Ctrl+drag lassos several",
+      "modeEdge": "Edge",
+      "modeEdgeTitle": "Edge select (V): click an edge and the gizmo moves / rotates / scales its two vertices",
+      "modeFace": "Face",
+      "modeFaceTitle": "Face select (C): click a face and the gizmo moves / rotates / scales that face locally",
+      "addMenu": "Add",
+      "addMenuTitle": "Add a collision primitive: real triangulated solids (a cylinder is a true cylinder mesh)",
+      "primBox": "Box",
+      "primPlane": "Plane",
+      "primCylinder": "Cylinder",
+      "primSphere": "Sphere",
+      "primWedge": "Ramp",
+      "primTitle": "Add a {name} primitive to the collision set",
+      "polySnapShort": "Poly Snap",
+      "polyBuildShort": "Poly Build",
+      "polyBuildHint": "Poly Build: click-drag a face of the model to extrude it outward and hand-build shapes. Toggle off to orbit/select again.",
+      "polyBuildFail": "This model is at its detail limit, cannot extrude any further.",
+      "sculptTitle": "Dynamic mesh sculpt brush",
+      "sculptSettings": "Sculpt settings",
+      "sculptOff": "Sculpt: Off",
+      "sculptGrab": "Sculpt: Grab",
+      "sculptInflate": "Sculpt: Inflate",
+      "sculptDeflate": "Sculpt: Deflate",
+      "sculptSmooth": "Sculpt: Smooth",
+      "sculptPinch": "Sculpt: Pinch",
+      "sculptCrease": "Sculpt: Crease",
+      "sculptRelax": "Sculpt: Relax",
+      "sculptRadius": "Radius",
+      "sculptStrength": "Strength",
+      "sculptDetail": "Detail",
+      "dyntopo": "Dyntopo",
+      "dyntopoTitle": "Dynamic topology locally splits long edges and safely collapses short edges around the sculpt brush.",
+      "symmetry": "Symmetry",
+      "symmetryHint": "Mirror each sculpt stroke across the selected local X, Y, and Z axes.",
+      "loopCut": "Loop Cut",
+      "loopCutTitle": "Insert an edge loop: in Edge mode, pick an edge, then Loop Cut adds a parallel ring of edges around the shape (drag the new loop to slide it).",
+      "loopCutFail": "Pick a box edge in Edge mode first, loop cut needs a quad edge (not a cap/sphere).",
+      "weld": "Weld",
+      "weldTitle": "Merge the selected vertices at their center.",
+      "subdivide": "Subdivide",
+      "subdivideTitle": "Split every triangle into four shared-edge triangles for more modeling detail.",
+      "inset": "Inset",
+      "insetTitle": "Inset the selected face and create a connected border ring.",
+      "fill": "Fill",
+      "fillTitle": "Fill three or more selected boundary vertices with a new face.",
+      "mirror": "Mirror X",
+      "mirrorTitle": "Append a mirrored copy of the selected volume across its local X axis.",
+      "topologyFail": "That topology operation cannot be applied to the current selection.",
+      "rampToggle": "Walkable",
+      "rampToggleTitle": "Walkable ramp: the selected volume raises the walkable ground along its slope (the player walks up it) instead of blocking. Ramp primitives start walkable.",
+      "duplicate": "Dup",
+      "duplicateTitle": "Duplicate the selected boxes",
+      "delete": "Del",
+      "deleteTitle": "Delete the selected boxes",
+      "openFromSelection": "Collision Master",
+      "openFromSelectionTitle": "Author this asset’s DEFAULT collision in the Collision Master scene (saves to the project; your map auto-saves and you return here)",
+      "heroTitle": "Collision Master",
+      "heroStatus": "Asset collision: {mode}"
+    },
+    "importModel": {
+      "notModel": "Pick a .glb or .gltf file.",
+      "tooLarge": "That file is over the 64 MiB import limit.",
+      "imported": "Imported \"{name}\". It is kept for this session; re-import it after a reload.",
+      "failed": "Could not read that model file."
+    },
     "upload": {
       "notGlb": ".glb ファイルを選択してください。",
       "tooLarge": "そのファイルは 8 MiB の上限を超えています。",
@@ -9424,15 +11696,21 @@ export const ja_JP: EnTranslations = {
     "openDrawer": {
       "title": "マップを開く",
       "close": "閉じる",
+      "tabShipped": "Shipped Maps",
       "tabLocal": "このブラウザー",
       "tabMine": "自分のサーバーマップ",
       "tabPublic": "公開マップ",
       "colName": "名前",
+      "colType": "Type",
       "colUpdated": "更新日時",
       "colStatus": "状態",
       "statusPublic": "公開",
       "statusPrivate": "非公開",
       "open": "開く",
+      "openCopy": "Open Copy",
+      "typePublished": "Published to Game ({slug})",
+      "typeShippedPublished": "{group} · your published version",
+      "publishedUnreadable": "Could not read the published map \"{slug}\" from the dev server.",
       "fork": "フォーク",
       "publish": "公開する",
       "unpublish": "公開を停止",
@@ -9455,24 +11733,43 @@ export const ja_JP: EnTranslations = {
       "savedServer": "「{name}」をサーバーに保存しました（v{version}）。",
       "savedLocalOnly": "「{name}」をこのブラウザーに保存しました。ログインするとオンライン保存できます。",
       "saveFailedLocal": "ローカル保存に失敗しました（ストレージがブロックされています）。",
+      "openFailedLocal": "That save could not be read (corrupt or truncated). Its file may still import via More > Import if you exported a copy.",
       "opened": "「{name}」を開きました。",
+      "waterReapplied": "Water rebuilt from the current terrain.",
+      "shippedMapOpened": "Opened an editable copy of \"{name}\".",
+      "publishedMapOpened": "Opened your published \"{name}\": this is the version the game ships for that map.",
       "imported": "「{name}」をインポートしました。",
       "importFailed": "インポートがキャンセルされたか、ファイルが有効なマップではありません。",
+      "importMissingDeps": "{count} model/texture/skybox file(s) are missing, so parts of the map are blank. Re-import the .wocmap.zip bundle to include them.",
       "exported": "「{name}」をダウンロードしました。",
+      "bundleExported": "Exported \"{name}\" with its models, textures, and skybox. Import the .wocmap.zip (not a loose .json) on the other computer.",
+      "exportBlockedMissingDeps": "Export blocked: {count} referenced model, texture, or skybox file(s) are missing from this browser. Restore them before exporting so the engine receives a complete map.",
+      "exportBlockedInvalid": "Export blocked because the map did not pass the engine compatibility check. Save a copy and review the latest edits before trying again.",
       "newMap": "内蔵ワールドから新しいマップを開始しました。",
+      "newFlatMap": "Blank map started.",
       "forked": "「{name}」としてフォークしました。今は自分のコピーを編集しています。",
       "published": "マップを公開しました。誰でも見つけてフォークできます。",
       "unpublished": "マップの公開を停止しました。",
       "deleted": "マップを削除しました。",
       "assetPlacedFirst": "先にブラウザーでアセットを選んでください。",
       "loading3d": "ワールドを読み込み中...",
+      "loading3dAssets": "Loading assets...",
+      "loading3dEngine": "Starting the engine...",
+      "loading3dZone": "Building the world...",
       "playtestLaunch": "プレイテストを起動中...",
       "playtestFailed": "プレイテストを開始できませんでした（ストレージがブロックされています）。",
       "draftSaved": "下書きを自動保存しました。",
       "draftRestored": "自動保存の下書きを復元しました。",
       "autosaveFailed": "自動保存に失敗しました（ブラウザのストレージが満杯かブロックされています）。バックアップとしてマップをエクスポートしてください。",
       "terrainCapReached": "地形編集の上限に達しました（{max}）。超過分のスカルプトは追加されませんでした。",
+      "caveCapReached": "Cave limit reached ({max}). Delete or undo a cave first.",
+      "holeCapReached": "Hole limit reached ({max}). Delete or undo a hole first.",
       "placementCapReached": "配置数の上限に達しました（{max}）。超過分のアセットは追加されませんでした。",
+      "entityCapReached": "The map entity limit was reached. Some copied NPCs or mobs were not pasted.",
+      "selectionCopied": "Copied {count} selected item(s).",
+      "selectionPasted": "Pasted {count} item(s).",
+      "selectionNothingToCopy": "Select an asset, NPC, or mob before copying.",
+      "selectionNothingToPaste": "Copy an asset, NPC, or mob before pasting.",
       "blockerCapReached": "ブロッカー壁の上限（{max}）に達しました。新しい壁は追加されませんでした。",
       "campCapReached": "キャンプの上限（{max}）に達しました。新しいキャンプは追加されませんでした。",
       "autosaveOff": "自動保存をオフにしました：{reason} 手動で保存してから、再度オンにしてください。"
@@ -9490,6 +11787,17 @@ export const ja_JP: EnTranslations = {
     "prompt": {
       "saveAsTitle": "名前を付けて保存",
       "nameLabel": "新しいマップ名"
+    },
+    "newMap": {
+      "title": "New Map",
+      "hint": "Pick a preset or set the size in yards. The map is bounded: terrain rim walls and invisible perimeter blockers keep playtest inside it.",
+      "width": "Width (yards)",
+      "height": "Height (yards)",
+      "scale": "Scale multiplier",
+      "interior": "Interior (60 x 60)",
+      "zone": "Zone (240 x 360)",
+      "openWorld": "Open World (360 x 1080)",
+      "create": "Create"
     },
     "serverError": {
       "invalid_map_name": "そのマップ名は使用できません。文字、数字、スペース、アポストロフィ、ハイフンを使ってください。",
@@ -9513,6 +11821,168 @@ export const ja_JP: EnTranslations = {
       "timeout": "サーバーの応答がタイムアウトしました。もう一度お試しください。",
       "unknown": "サーバーとの通信で問題が発生しました。"
     },
+    "lighting": {
+      "title": "Lighting",
+      "presetLabel": "Lighting preset",
+      "day": "Day",
+      "overcast": "Overcast",
+      "dusk": "Dusk",
+      "night": "Night",
+      "customHint": "Custom lighting (edited from a preset).",
+      "sun": "Sun intensity",
+      "ambient": "Ambient intensity",
+      "environment": "Sky ambience",
+      "azimuth": "Sun direction",
+      "elevation": "Sun height",
+      "nightFloor": "Night brightness",
+      "nightFloorHint": "How much daylight the deepest night keeps. 0 is the shipped night; around 0.35 stays readable and cool instead of murky.",
+      "caveLight": "Cave brightness",
+      "caveLightHint": "How dark carved cave walls go with depth. 0 is the shipped cave dark; around 0.4 keeps a big cavern readable by torchlight.",
+      "sunColor": "Sun color",
+      "skyColor": "Sky tint",
+      "hint": "Map lighting is saved and used by both the editor and playtest.",
+      "skyboxTitle": "Skybox",
+      "skyboxDefault": "Default sky",
+      "skybox_toon_day": "Toon Blue Sky",
+      "skybox_vale_day": "Vale Day HDR",
+      "skybox_marsh_overcast": "Marsh Overcast HDR",
+      "skybox_peaks_dawn": "Peaks Dawn HDR",
+      "skybox_hollow_dusk": "Hollow Dusk HDR",
+      "skybox_amber_sunset": "Amber Sunset HDR",
+      "skybox_ember_storm": "Ember Storm HDR",
+      "skybox_frost_twilight": "Frost Twilight HDR",
+      "skybox_fen_day": "Fen Day HDR",
+      "skybox_night": "Night HDR",
+      "skybox_nightbloom_dream": "Nightbloom Dream HDR",
+      "skybox_wraithwood_gloom": "Wraithwood Gloom HDR",
+      "skybox_vale_backdrop": "Vale Painted Backdrop",
+      "skybox_marsh_backdrop": "Marsh Painted Backdrop",
+      "skybox_peaks_backdrop": "Peaks Painted Backdrop",
+      "skybox_space_galaxy": "Space Galaxy",
+      "skyboxUpload": "Upload skybox...",
+      "skyboxCustomActive": "Custom skybox active.",
+      "skyboxHint": "Pick a bundled sky or upload a panoramic (equirectangular) image. Saved with the map - playtest shows it in-game.",
+      "skyboxImported": "Skybox imported.",
+      "skyboxImportFailed": "Could not import that image.",
+      "skyboxTooLarge": "Skybox image is too large (max 24 MB).",
+      "skyboxMissing": "That skybox is not stored in this browser anymore.",
+      "birdsTitle": "Birds",
+      "birds": "Birds in the sky",
+      "birdCount": "How many",
+      "birdFormation": "Fly in V formation",
+      "worldSpeedTitle": "World Speed",
+      "worldSpeed": "Animation speed",
+      "worldSpeedHint": "Speeds up or slows every ambient motion (water, fire, foliage sway, birds, weather). Cosmetic only; it never changes playtest gameplay or timing.",
+      "worldSpeedReset": "Reset to normal speed",
+      "zoneTitle": "Zone atmosphere",
+      "zoneHint": "Choose a zone, then give it its own lighting, skybox, and ambience speed.",
+      "zoneSelect": "Zone to edit",
+      "zoneReset": "Use map atmosphere"
+    },
+    "music": {
+      "title": "Music",
+      "hint": "Pick the soundtrack for the whole map, or drag boxes to give areas their own track. Playtest switches as you cross them.",
+      "zoneTrack": "Map track",
+      "default": "Auto (biome theme)",
+      "areasTitle": "Music areas",
+      "areaTrack": "Track for new areas",
+      "rowTrack": "Track for this area",
+      "dragHint": "Drag a box on the ground to add an area with the track above. Click an area to select it (Delete removes it). Smaller areas win where they overlap.",
+      "none": "No music areas yet.",
+      "areaN": "Area {num}",
+      "selectArea": "Select this area in the world (its box highlights; Delete removes it)",
+      "removeArea": "Remove this music area",
+      "areaCap": "Music area limit reached ({max}).",
+      "previewZone": "Now playing: {zone}",
+      "previewOff": "Area music stopped.",
+      "previewDisabled": "Music is switched off in Settings.",
+      "track": {
+        "town_eastbrook": "Town: Eastbrook (warm pastoral)",
+        "town_fenbridge": "Town: Fenbridge (old medieval)",
+        "town_highwatch": "Town: Highwatch (brisk march)",
+        "town_goldcrest": "Town: Goldcrest Harbor (trading port)",
+        "vale": "Vale (playful meadow)",
+        "vale_legacy": "Vale legacy (original theme)",
+        "marsh": "Marsh (croaky swamp)",
+        "peaks": "Peaks (heroic folk)",
+        "dungeon_hollow_crypt": "Dungeon: Hollow Crypt (skeletal dance)",
+        "dungeon_sunken_bastion": "Dungeon: Sunken Bastion (flooded fortress)",
+        "dungeon_gravewyrm_sanctum": "Dungeon: Gravewyrm Sanctum (boss route)"
+      }
+    },
+    "weather": {
+      "title": "Weather",
+      "showSnowfall": "降雪を表示",
+      "snowfallHint": "スタジオのプレビュー設定です。このブラウザーに保存されます。",
+      "zoneTitle": "Weather in this zone",
+      "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
+      "auto": "Auto",
+      "clear": "Clear",
+      "rain": "Rain",
+      "snow": "Snow",
+      "blizzard": "Blizzard",
+      "sparkle": "Golden sparkles",
+      "intensity": "Intensity",
+      "cloudCover": "Cloud cover",
+      "cloudHeight": "Cloud height (yd)",
+      "cloudHint": "Low clouds hug the terrain and read as rolling ground fog.",
+      "aurora": "Aurora",
+      "auroraHint": "Curtains hang high over the camera wherever it goes: brightest at night, faint by day.",
+      "scheduleTitle": "Dynamic weather",
+      "scheduleWins": "A schedule is running: it overrides the fixed weather above.",
+      "stepMode": "Weather for this step",
+      "stepMinutes": "Minutes this step lasts",
+      "minutesShort": "min",
+      "removeStep": "Remove this step",
+      "addStep": "Add step",
+      "addStepTitle": "Cycle through the steps in order, each holding for its minutes, then repeat",
+      "scheduleHint": "Steps loop in order (Rain 5 min, then Clear 10 min, ...). Saves with the map and runs in playtest."
+    },
+    "camera": {
+      "title": "Camera",
+      "axisWidget": "Camera axis views",
+      "snapPositiveX": "View from positive X",
+      "snapNegativeX": "View from negative X",
+      "snapPositiveY": "View from above",
+      "snapNegativeY": "View from below",
+      "snapPositiveZ": "View from positive Z",
+      "snapNegativeZ": "View from negative Z",
+      "focus": "Focus selection (.)",
+      "focusTitle": "Move the orbit pivot onto the selected object so the camera revolves around it; with nothing selected, frame the whole map",
+      "freeFly": "Free-Fly (Shift+F)",
+      "freeFlyHint": "WASD moves, Q/E goes up and down, dragging looks around like first person, and the wheel sets the speed.",
+      "invertPan": "Invert camera",
+      "showBoundary": "Show map boundary walls",
+      "showPlayer": "Show playtest player",
+      "wireframe": "Wireframe mode",
+      "xray": "Transparent X-ray mode",
+      "speedTitle": "Movement speeds",
+      "moveSpeed": "WASD move speed",
+      "lookSpeed": "Mouse look speed",
+      "panSpeed": "Pan speed",
+      "speedHint": "How fast the viewport camera flies, looks, and pans. Editor only. In Free-Fly the mouse wheel is the throttle: it changes this move speed instead of zooming.",
+      "flySpeedSet": "Fly speed {value}x",
+      "resetSpeeds": "Reset speeds",
+      "perfTitle": "Performance overlay",
+      "perfShow": "Show overlay in the viewport",
+      "perfHint": "A live readout pinned to the viewport corner while you edit.",
+      "perfFps": "FPS",
+      "perfFrameMs": "Frame time (ms)",
+      "perfAssets": "Placed assets",
+      "perfTris": "Scene polygons",
+      "perfSelTris": "Selected polygons",
+      "perfTerrain": "Terrain edits",
+      "perfStreaming": "Terrain streaming",
+      "perfCoords": "World (x, z)",
+      "assetViewTitle": "Asset view distance",
+      "assetViewDistance": "Placed assets fade out at",
+      "assetViewMax": "As far as the fog",
+      "assetViewHint": "How far placed decor renders before it fades out and stops drawing, to save performance. Lower it to cull distant assets sooner; raise it to see farther. Saved with the map, so playtest matches.",
+      "visibilityTitle": "Terrain visibility",
+      "visibilityDistance": "Visible terrain distance",
+      "loadingHaze": "Loading haze",
+      "visibilityHint": "Original-detail terrain streams near the camera. Haze hides each zone until it is ready. Higher distances use more GPU and memory."
+    },
     "hints": {
       "nav3d": "ドラッグで旋回、スクロールでズーム。ドラッグ中は WASD で飛行、Q/E で高さを変更。",
       "nav2d": "ドラッグで移動、スクロールでズーム。"
@@ -9527,14 +11997,24 @@ export const ja_JP: EnTranslations = {
       "close": "閉じる",
       "tool": {
         "select": "配置済みアセットを選択して移動、回転、拡大縮小します。2D マーカーはクリックで編集できます。",
+        "move": "Move the selected asset with the 3-axis gizmo arrows.",
+        "rotate": "Rotate the selected asset with the gizmo rings.",
+        "scale": "Scale the selected asset with the gizmo handles, per axis or uniformly.",
         "raise": "ブラシの下の地形を盛り上げます。",
         "lower": "ブラシの下の地形を下げます。",
         "smooth": "起伏を周囲の平均の高さへならします。",
         "flatten": "ドラッグ開始地点の高さに地面を平らにします。",
+        "slope": "右クリックで始点の高さを決め、別の高さからドラッグすると滑らかな斜面を作れます。",
+        "pond": "クリックすると独立した水面を持つ池を掘ります。",
         "paint": "ゾーンの既定の上にバイオームの地表を塗ります。",
         "water": "マップ全体の水面の高さを設定します。",
         "place": "カタログまたはアップロードしたアセットを地面に配置します。",
+        "foliage": "Brush-paint grass, bushes, trees, and rocks with size variation.",
+        "clutter": "Brush-paint ground clutter (broken tiles, pebbles, letters, leaves) that renders on High graphics and up.",
+        "meshfix": "Remove stretched leftover terrain polys around a cut or cave mouth, or restore them. Wireframe turns on while the tool is active.",
+        "tree": "Grow a fully customizable tree: trunk, branches, canopy volumes and leaves.",
         "blocker": "プレイテストで移動を妨げる見えない壁をドラッグで描きます。",
+        "collider": "Drop box, sphere, or floor-plane collision volumes, invisible in playtest.",
         "camp": "プレイテストで出現するモブキャンプを追加、編集します。",
         "spawn": "プレイテストでプレイヤーが降り立つ場所を設定します。",
         "region": "地形とアセットをボックス選択してコピー、貼り付けします。",
@@ -9546,6 +12026,7 @@ export const ja_JP: EnTranslations = {
         "undo": "Ctrl+Z で元に戻す、Ctrl+Y または Ctrl+Shift+Z でやり直します。",
         "save": "Ctrl+S でマップを保存します。",
         "duplicate": "Ctrl+D で選択中のアセットを複製します。",
+        "multiSelect": "Shift+click adds or removes assets. In the NPC and Mob tool, Ctrl+click selects multiple entities.",
         "nudge": "矢印キーで選択中のアセットを 0.5 ヤード動かします。Shift を押しながらで 2 ヤードです。",
         "wheel": "Shift+スクロールで選択中のアセットを回転、Alt+スクロールで拡大縮小します。",
         "delete": "Delete で選択中のアセットまたはキャンプを削除します。",
@@ -9605,6 +12086,54 @@ export const ja_JP: EnTranslations = {
       "stage": "マップビューポート",
       "toasts": "エディター通知",
       "dialog": "エディターダイアログ"
+    },
+    "dungeon": {
+      "title": "Dungeon layout",
+      "collapse": "Fold",
+      "expand": "Expand",
+      "exit": "Back to map",
+      "hint": "Click selects (again cycles overlaps). Drag moves. Arrows nudge, Delete removes, Ctrl+Z undoes. Shift-drag pans, middle-drag orbits.",
+      "none": "Nothing selected. Click an outline on the floor plan.",
+      "addRoom": "Add room",
+      "addDoor": "Add door",
+      "addBarrier": "Add barrier",
+      "addOpening": "Add opening",
+      "addDecor": "Add decor",
+      "delete": "Delete",
+      "validate": "Validate",
+      "save": "Save to source",
+      "saved": "Layout written to src/sim/dungeon_layout.ts (dev server)",
+      "saveFailed": "Dev save endpoint unavailable; downloaded the layout instead",
+      "unsaved": "Unsaved layout changes",
+      "noIssues": "No issues found",
+      "kind": {
+        "room": "Room",
+        "door": "Door",
+        "barrier": "Barrier",
+        "opening": "Visual opening",
+        "decor": "Decor",
+        "dais": "Boss dais"
+      },
+      "field": {
+        "id": "Id",
+        "key": "Model",
+        "style": "Style",
+        "x0": "West edge (x0)",
+        "x1": "East edge (x1)",
+        "z0": "Near edge (z0)",
+        "z1": "Far edge (z1)",
+        "x": "X",
+        "z": "Z",
+        "y": "Height offset",
+        "yaw": "Yaw (radians)",
+        "hw": "Half width",
+        "hd": "Half depth",
+        "r": "Collision radius",
+        "scale": "Scale",
+        "scaleX": "Scale X",
+        "scaleZ": "Scale Z",
+        "innerScale": "Inner scale"
+      }
     }
   },
   "skinEvent": {
@@ -9747,10 +12276,174 @@ export const ja_JP: EnTranslations = {
     "realm": "ワールド",
     "newCharacter": "新規キャラクター",
     "appearance": "外見",
+    "modelLoading": "キャラクターを読み込み中...",
+    "previewPinchHint": "ピンチでズーム",
     "customize": "カスタマイズ",
     "body": "体型",
     "genderMale": "男性",
     "genderFemale": "女性",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "流し髪",
+        "long": "Long",
+        "mohawk": "モヒカン",
+        "quiff": "ショートリーゼント",
+        "undercut": "ツーブロック",
+        "topknot": "トップノット",
+        "shoulder": "ミディアム",
+        "bald": "Bald",
+        "waves": "ウェーブ",
+        "ponytail": "ハイポニーテール",
+        "braid": "三つ編み",
+        "bob": "Bob",
+        "crown": "クラウンブレイド",
+        "twins": "ツインおさげ",
+        "curls": "カールアップ"
+      },
+      "beard": {
+        "none": "ひげなし",
+        "moustache": "口ひげ",
+        "handlebar": "カイゼルひげ",
+        "goatee": "やぎひげ",
+        "chin": "あごひげ",
+        "boxed": "整えたフルひげ",
+        "long": "長いひげ",
+        "chops": "もみあげひげ",
+        "chinstrap": "チンストラップ"
+      },
+      "nose": {
+        "default": "クラシック",
+        "broad": "幅広",
+        "aquiline": "わし鼻",
+        "button": "小さな丸鼻",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "クラシック",
+        "full": "Full",
+        "smirk": "にやり",
+        "relaxed": "リラックス",
+        "cupids_bow": "M字リップ",
+        "narrow": "小ぶり",
+        "thin": "Thin",
+        "rounded": "丸み"
+      },
+      "brows": {
+        "default": "クラシック",
+        "slim": "Slim",
+        "arched": "アーチ眉",
+        "soft": "Soft",
+        "straight": "平行眉",
+        "relaxed": "ゆるやか",
+        "soft_arch": "Soft Arch",
+        "rounded": "丸眉"
+      },
+      "ears": {
+        "default": "クラシック",
+        "large": "大きめ",
+        "pointed": "とがり耳",
+        "round": "丸耳"
+      },
+      "eyes": {
+        "default": "クラシック",
+        "almond": "アーモンド",
+        "hooded": "奥二重"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "目と眉",
+        "eyeColor": "目の色",
+        "hairstyle": "髪型",
+        "facialHair": "ひげ",
+        "hairColor": "髪の色",
+        "browColor": "眉の色",
+        "piercings": "ピアス"
+      },
+      "section": {
+        "hair": "髪型",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "眉の形",
+        "ears": "Ears",
+        "eyes": "目の形"
+      },
+      "slider": {
+        "eyeSpacing": "目の間隔",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "眉の高さ",
+        "chinWidth": "あごの幅",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "耳たぶ",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "小鼻",
+        "septum": "セプタム",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "ポーセリン",
+        "ivory": "アイボリー",
+        "rose": "Rose",
+        "peach": "ピーチ",
+        "fair": "Fair",
+        "beige": "ベージュ",
+        "sand": "Sand",
+        "honey": "ハニー",
+        "olive": "オリーブ",
+        "caramel": "キャラメル",
+        "tan": "Tan",
+        "bronze": "ブロンズ",
+        "chestnut": "栗色",
+        "umber": "褐色",
+        "mahogany": "マホガニー",
+        "ebony": "エボニー"
+      },
+      "eye": {
+        "brown": "ブラウン",
+        "darkBrown": "ダークブラウン",
+        "hazel": "ヘーゼル",
+        "amber": "アンバー",
+        "green": "グリーン",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "バイオレット"
+      },
+      "hairColor": {
+        "platinum": "プラチナ",
+        "blonde": "ブロンド",
+        "golden": "ゴールド",
+        "copper": "カッパー",
+        "red": "Red",
+        "auburn": "オーバーン",
+        "lightBrown": "ライトブラウン",
+        "brown": "ブラウン",
+        "darkBrown": "ダークブラウン",
+        "black": "ブラック",
+        "silver": "シルバー",
+        "white": "ホワイト"
+      },
+      "matchHair": "髪の色に合わせる",
+      "resetDefault": "初期設定に戻す",
+      "customColorAria": "カスタムカラーを選択",
+      "customSkinAria": "カスタムの肌の色を選択"
+    },
     "hair": "髪型",
     "brows": "眉",
     "skinTone": "肌の色",
@@ -11218,6 +13911,9 @@ export const ja_JP: EnTranslations = {
   "character": {
     "loading": "読み込み中...",
     "noneYet": "まだキャラクターがいません。下で作成してください。",
+    "membershipRequired": "このキャラクターで遊ぶにはメンバーシップを更新してください。",
+    "membershipSlots": "メンバーシップでキャラクター枠を解放",
+    "emptySlot": "利用可能なキャラクター枠",
     "levelClass": "レベル{level} {className}",
     "inWorld": "世界にいます",
     "takeOver": "引き継ぐ",
@@ -11227,6 +13923,7 @@ export const ja_JP: EnTranslations = {
     "lockoutRaids": "レイド",
     "lockoutDungeons": "ダンジョン",
     "lockoutWorldBosses": "ワールドボス",
+    "lockoutWeeklyQuests": "週間クエスト",
     "takeOverConfirm": "このキャラクターを別のセッションから切断し、こちらに移します。続けますか？",
     "renameRequired": "名前変更が必要",
     "delete": "削除",
@@ -11811,6 +14508,7 @@ export const ja_JP: EnTranslations = {
       "deathRecapCauterized": "死亡しました。焼灼の炎に飲み込まれました。",
       "respawn": "再び休まり、完全な状態になりました。",
       "respawnKeeperToll": "霊魂の癒し手があなたを復活させたが、その代償として弱っている。復活の後遺症が消えるまで、すべての能力値が下がる。",
+      "moonbridgeBanner": "月の橋が架かる",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
       "playerNotNearby": "そのプレイヤーは近くにいません。",
@@ -12014,6 +14712,10 @@ export const ja_JP: EnTranslations = {
     "social": {
       "title": "ソーシャル",
       "friendsTab": "フレンド",
+      "friendFirstPage": "最初のページ",
+      "friendNextPage": "次のページ",
+      "boundFriend": "絆のフレンド",
+      "boundFriendLink": "絆のフレンドは招待リンクで結ばれています。",
       "guildTab": "ギルド",
       "ignoreTab": "無視",
       "leaveParty": "パーティを抜ける",
@@ -12241,7 +14943,161 @@ export const ja_JP: EnTranslations = {
       "hoard_cast_screech": "耳をつんざく叫び",
       "hoard_cast_mimic_bite": "貪欲な噛みつき",
       "hoard_cast_mimic_leap": "押し潰す跳躍",
-      "hoard_cast_coin_spit": "呪われた金貨"
+      "hoard_cast_coin_spit": "呪われた金貨",
+      "crypt_grave_bolt": "墓所の矢",
+      "crypt_raise_bones": "骨の蘇生",
+      "crypt_murder_call": "鴉群の呼び声",
+      "crypt_stone_shriek": "石の絶叫",
+      "crypt_grave_cleave": "墓所の薙ぎ払い",
+      "crypt_barrowflame_breath": "塚炎の吐息",
+      "crypt_tail_lash": "尾の一撃",
+      "crypt_wing_gust": "翼の突風",
+      "crypt_grave_rupture": "墓所の破裂",
+      "crypt_carrion_eye": "屍肉喰らいの眼",
+      "crypt_marrow_crush": "髄砕き",
+      "crypt_rimesilk_spit": "霜糸吐き",
+      "crypt_gravespark_volley": "墓火花の一斉射",
+      "crypt_morthen_rite_wakes": "儀式の目覚め",
+      "crypt_morthen_rise": "墓呼びの昇天",
+      "crypt_morthen_proclaim": "墓所の宣告",
+      "crypt_morthen_descend": "降臨",
+      "crypt_knellwyrm_arrive": "天より降下",
+      "crypt_knellwyrm_pyre_strafe": "火葬の掃射",
+      "crypt_knellwyrm_strafe_run": "掃射飛行",
+      "crypt_knellwyrm_dread_bellow": "恐怖の咆哮",
+      "crypt_marrow_shovelful": "ひとすくいの墓土",
+      "crypt_marrow_measure": "墓の採寸",
+      "crypt_marrow_burial_toll": "埋葬の鐘",
+      "crypt_marrow_gravediggers_blow": "墓掘りの一撃",
+      "crypt_lady_brides_lament": "花嫁の哀歌",
+      "crypt_lady_frozen_embrace": "凍てつく抱擁",
+      "crypt_lady_embrace_hold": "凍てつく抱擁",
+      "crypt_lady_bridal_freeze": "花嫁の凍結",
+      "crypt_ilvane_dirge": "虚ろの挽歌",
+      "crypt_ilvane_unbroken_dirge": "途切れぬ詩節",
+      "crypt_ilvane_bone_organ": "骨のオルガン",
+      "crypt_morthen_shadow_pulse": "シャドウパルス",
+      "crypt_morthen_rite_of_the_unquiet": "安らがぬ者の儀式",
+      "crypt_morthen_reap_the_unquiet": "安らがぬ者の刈り取り",
+      "kituse_crypt_relight_candle": "ろうそくを灯し直す",
+      "crypt_knellwyrm_knell_rise": "燃える弔鐘",
+      "crypt_knellwyrm_knell_mark": "燃える弔鐘",
+      "crypt_knellwyrm_knell_breath": "燃える弔鐘",
+      "crypt_knellwyrm_knell_land": "燃える弔鐘",
+      "bastion_brine_mend": "塩水の癒し",
+      "bastion_fog_ward": "霧の守り",
+      "bastion_halberd_sweep": "ハルバード薙ぎ",
+      "bastion_piercing_bolt": "貫通の矢",
+      "bastion_claw_sweep": "爪の薙ぎ払い",
+      "bastion_shell_slam": "甲羅叩きつけ",
+      "ghost_captain_broadside": "幽霊船の一斉砲撃",
+      "ghost_captain_anchor": "呪いの錨",
+      "ghost_captain_boarding": "幻影の斬り込み",
+      "bastion_boathook": "鉤竿引き",
+      "bastion_fog_bank": "霧の帳",
+      "bastion_brine_column": "塩水の柱",
+      "bastion_loose_on_my_mark": "我が合図で放て",
+      "bastion_oathbound_charge": "誓約の突進",
+      "bastion_gaolers_cudgel": "牢番の棍棒",
+      "bastion_mist_surge": "霧の奔流",
+      "bastion_drowning_hymn": "溺れの聖歌",
+      "bastion_iron_cage": "鉄の檻",
+      "bastion_drowned_anchor_cast": "溺死の錨",
+      "bastion_shackle_pair": "連鎖の枷",
+      "bastion_shadowstep": "影渡り",
+      "bastion_reaping_scythe": "刈り取りの大鎌",
+      "bastion_veil_rise": "霧のヴェール",
+      "bastion_veil_gather": "集う霧",
+      "bastion_vael_rise": "死が昇る",
+      "bastion_vael_sink": "霧の中へ",
+      "bastion_hallowed_brine": "聖なる潮水",
+      "bastion_rebounding_bulwark": "跳ね返る大盾",
+      "bastion_tide_sentence": "潮の宣告",
+      "bastion_oath_kneel": "不壊の誓い",
+      "bastion_oath_vigil": "不壊の誓い",
+      "temple_lullaby": "子守歌",
+      "cantor_last_verse": "最後の一節",
+      "temple_call_the_tide": "潮の呼び声",
+      "temple_static_coil": "静電のとぐろ",
+      "temple_snapper_snap": "噛みつき",
+      "temple_trident_sweep": "三叉槍の薙ぎ払い",
+      "temple_sea_song": "海の歌",
+      "temple_tidal_slap": "潮の平手打ち",
+      "temple_tide_breath": "凍てつく吐息",
+      "temple_moonlight_lance": "月光の槍",
+      "temple_prism_flare": "プリズムの閃光",
+      "temple_resonant_slam": "共鳴の叩きつけ",
+      "temple_moonwater_bolt": "月水の矢",
+      "temple_drowning_aria": "溺れのアリア",
+      "temple_mere_surge": "湖の大波",
+      "temple_tideglass_fracture": "潮硝子の亀裂",
+      "temple_undertow": "引き潮",
+      "temple_lunar_tide": "月の潮",
+      "temple_skewering_trident": "串刺しの三叉槍",
+      "temple_pale_mending": "蒼白の癒し",
+      "temple_glimmer_venom": "煌めく毒",
+      "temple_pearl_slam": "潮の羽ばたき",
+      "temple_lightning_spit": "稲妻の吐きかけ",
+      "temple_crushing_torrent": "押し潰す奔流",
+      "temple_hydra_tsunami": "津波",
+      "temple_ysolei_call": "月の落とし子の呼び声",
+      "temple_ysolei_wrath": "溺れし憤怒",
+      "temple_frostlocked_torrent": "凍てつく激流",
+      "temple_venom_current": "毒の潮流",
+      "temple_toxic_rime": "毒の霧氷",
+      "temple_beckoning_moon": "月招き",
+      "temple_falling_moon": "落ちる月",
+      "temple_prism_glare": "プリズムの眼光",
+      "temple_arcing_spark": "弧光の火花",
+      "temple_call_of_the_shallows": "浅瀬の呼び声",
+      "wildheart_ancestral_sap": "祖霊の樹液",
+      "wildheart_plant_totem": "トーテム設置",
+      "wildheart_entangling_lash": "絡みつく鞭",
+      "wildheart_saurian_tail_swipe": "尾の薙ぎ払い",
+      "wildheart_saurian_stomp": "大地を揺るがす踏みつけ",
+      "wildheart_quarry_mark": "獲物の印",
+      "wildheart_war_roar": "戦の咆哮",
+      "wildheart_toad_hex": "ヒキガエルの呪い",
+      "wildheart_rattling_dread": "骨鳴りの恐怖",
+      "wildheart_snaring_tongue": "絡め取る舌",
+      "wildheart_beast_pit_quake": "獣穴の地震",
+      "wildheart_jaguar_heel": "戻れ！",
+      "wildheart_gorgebloom_seed_rain": "種の雨",
+      "wildheart_gorgebloom_vine_lash": "蔓の鞭",
+      "wildheart_gorgebloom_gorge": "貪り食い",
+      "wildheart_zulgar_pulse": "ワイルドハートの脈動",
+      "wildheart_zulgar_spirit_hunt": "狩りの魂",
+      "sanctum_cinder_breath": "残り火のブレス",
+      "sanctum_warming_rite": "温めの儀式",
+      "sanctum_goad": "駆り立て",
+      "sanctum_plant_brazier": "魂の火鉢を置く",
+      "sanctum_ice_block_toss": "氷塊投げ",
+      "sanctum_tusker_tusk_sweep": "牙薙ぎ",
+      "sanctum_tusker_trample": "踏みつぶし",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "重り尾の鞭打ち",
+      "sanctum_branding_iron": "焼き印",
+      "sanctum_rime_breath": "霧氷のブレス",
+      "kituse_sanctum_topple_brazier": "火鉢倒し",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
+      "sanctum_korgath_maul_arc": "大槌の弧撃",
+      "sanctum_korgath_chain_flail": "鎖の鞭打ち",
+      "sanctum_korgath_threshold_charge": "境界の突進",
+      "sanctum_korgath_foremans_bellow": "親方の咆哮",
+      "sanctum_korgath_strain": "鎖の引き締め",
+      "sanctum_korgath_stomp": "震える踏みつけ",
+      "sanctum_goadsmith_rerivet": "再鋲打ち",
+      "sanctum_velkhar_soulfire_trench": "魂火の溝",
+      "sanctum_velkhar_shadow_volley": "影の斉射",
+      "sanctum_korzul_break_free": "氷の封印を破る",
+      "sanctum_korzul_grave_breath": "墓所のブレス",
+      "sanctum_korzul_tail_sweep": "尾の薙ぎ払い",
+      "sanctum_korzul_grave_inferno": "墓場のインフェルノ",
+      "sanctum_korzul_wing_gale": "翼の烈風",
+      "sanctum_korzul_plunging_fire": "降り注ぐ炎",
+      "sanctum_korzul_crashing_descent": "墜落着地"
     }
   },
   "questUi": {
@@ -12309,6 +15165,8 @@ export const ja_JP: EnTranslations = {
       "rewards": "報酬",
       "xpReward": "経験値 {xp}",
       "itemReward": "アイテム報酬:",
+      "chooseReward": "報酬を選択：",
+      "rewardChoices": "これらの報酬から1つを選べます：",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "レベル{level}が必要"
     },
@@ -12686,6 +15544,7 @@ export const ja_JP: EnTranslations = {
       "incomplete": "そのクエストは完了していません。",
       "giverMissing": "そのクエストの依頼主が近くにいません。",
       "turnInMissing": "そのクエストの報告先が近くにいません。",
+      "rewardNotOffered": "その報酬は提供されていません。",
       "tooFar": "遠すぎます。",
       "escortAway": "護衛する相手は今その場所にいません。しばらくすれば戻ってきます。"
     }
@@ -12737,7 +15596,9 @@ export const ja_JP: EnTranslations = {
       "flask": "フラスコ",
       "scroll": "巻物",
       "bag": "バッグ",
-      "mount": "マウント"
+      "mount": "マウント",
+      "buddy": "バディ",
+      "buddyCosmetic": "相棒の姿"
     },
     "stats": {
       "armor": "防御力",
@@ -12753,6 +15614,17 @@ export const ja_JP: EnTranslations = {
       "parry": "受け流し"
     },
     "tooltip": {
+      "referralFullSet": "友情の防具を全{pieces}部位装備し、{member}とパーティーを組むと経験値が{percent}%増加します。招待者のメンバーシップが有効である必要があります。",
+      "referralInviter": "あなたを招待したメンバー",
+      "referralRetained": "招待者とパーティーを組んでいなくても、防具の能力値はレベルに応じて成長します。",
+      "referralDormant": "無効：このアカウントはメンバーの招待による友情の防具を獲得していません。",
+      "membershipToken": "使用：このトークンを消費し、アカウントのメンバーシップ期間に{days}日を追加します。残りの期間は失われません。使用前なら取引やオークションでの売却が可能です。",
+      "membershipAdaptive": "能力値と防具の種類がクラスと専門化に合わせて変わります。",
+      "membershipScaling": "アイテムレベルは自分のレベルに合わせて上がります。レベル20になると完成し、アイテムレベル25になります。",
+      "membershipPerfected": "完成：アイテムレベル{level}。",
+      "membershipFullSet": "メンバーシップ防具を全{pieces}部位装備すると、獲得経験値が{percent}%増加します。有効なメンバーシップが必要です。",
+      "membershipRequired": "メンバーシップが切れると防具の能力値とセット効果は無効になり、更新すると再び有効になります。",
+      "membershipDormant": "無効：メンバーシップを更新すると、防具の能力値とセット効果が戻ります。",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "現在の装備",
       "ifYouEquip": "これを装備すると",
@@ -13052,6 +15924,10 @@ export const ja_JP: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "配達員",
+        "description": "空飛ぶロバを召喚し、バッグと最寄りの銀行の間で荷物を運びます。通常の走行速度の250%で飛びます。1回につき最大24スタックを選択できます。新しい配達にはメンバーシップが必要です。"
+      },
       "sport_kick": {
         "name": "キック",
         "description": "狙った地点へボールをグラウンダーで蹴り出す。"
@@ -15829,6 +18705,30 @@ export const ja_JP: EnTranslations = {
       "fenshadow_maul": {
         "name": "沼影の大槌"
       },
+      "foremans_barrowmaul": {
+        "name": "監督の塚砕き"
+      },
+      "skerrits_shardpike": {
+        "name": "スケリットのシャードパイク"
+      },
+      "loomshard_eye": {
+        "name": "バロウグラスの眼"
+      },
+      "barrowhide_pauldrons": {
+        "name": "塚山の肩当て"
+      },
+      "mirestone_stride": {
+        "name": "泥石の歩み"
+      },
+      "foremans_wage_band": {
+        "name": "職長の賃金の指輪"
+      },
+      "mirelight_locket": {
+        "name": "沼灯りのロケット"
+      },
+      "fenwright_grips": {
+        "name": "沼地職人のグリップ"
+      },
       "wildgrove_cinch": {
         "name": "野林の締め帯"
       },
@@ -16878,6 +19778,114 @@ export const ja_JP: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "たましいの石"
+      },
+      "whistle_ember_fox": {
+        "name": "燃えさし狐の笛"
+      },
+      "whistle_moss_hare": {
+        "name": "コケウサギの笛"
+      },
+      "whistle_frog": {
+        "name": "カエルの笛"
+      },
+      "whistle_crimson_claw_crab": {
+        "name": "紅爪ガニの笛"
+      },
+      "whistle_golden_sentinel": {
+        "name": "黄金の歩哨の笛"
+      },
+      "whistle_nightfang": {
+        "name": "ナイトファングの笛"
+      },
+      "whistle_tuskhorn_boar": {
+        "name": "タスクホーン・ボアの笛"
+      },
+      "whistle_emerald_wolf": {
+        "name": "エメラルドウルフの笛"
+      },
+      "whistle_tiger": {
+        "name": "トラの笛"
+      },
+      "whistle_cate_coin": {
+        "name": "ケイトコインの笛"
+      },
+      "whistle_alon": {
+        "name": "アロンの笛"
+      },
+      "whistle_trollface": {
+        "name": "トロールフェイスの笛"
+      },
+      "whistle_ansem": {
+        "name": "アンセムの笛"
+      },
+      "whistle_triple_t": {
+        "name": "トリプルTの笛"
+      },
+      "whistle_kekius": {
+        "name": "ケキウスの笛"
+      },
+      "whistle_solbot": {
+        "name": "ソルボットの笛"
+      },
+      "whistle_frostfire": {
+        "name": "フロストファイアの笛"
+      },
+      "whistle_rocky": {
+        "name": "ロッキーの笛"
+      },
+      "whistle_proud_grunt": {
+        "name": "誇り高きグラントの笛"
+      },
+      "whistle_loot_goblin": {
+        "name": "戦利品ゴブリンの笛"
+      },
+      "whistle_penny_goldspark": {
+        "name": "ペニー・ゴールドスパークの笛"
+      },
+      "whistle_stag": {
+        "name": "牡鹿の笛"
+      },
+      "whistle_alpaca": {
+        "name": "アルパカの笛"
+      },
+      "whistle_horse": {
+        "name": "馬の笛"
+      },
+      "whistle_sapling": {
+        "name": "若木の笛"
+      },
+      "whistle_bull": {
+        "name": "雄牛の笛"
+      },
+      "whistle_spider": {
+        "name": "クモの笛"
+      },
+      "whistle_raptor": {
+        "name": "ラプターの笛"
+      },
+      "whistle_skeleton": {
+        "name": "スケルトンの笛"
+      },
+      "whistle_crystal_lich": {
+        "name": "クリスタルリッチの笛"
+      },
+      "whistle_forgemaw": {
+        "name": "溶けたフォージモウの笛"
+      },
+      "whistle_crystal_tide": {
+        "name": "クリスタルタイドの笛"
+      },
+      "whistle_phantom": {
+        "name": "ファントムの笛"
+      },
+      "whistle_emberfall_phoenix": {
+        "name": "エンバーフォール・フェニックスの笛"
+      },
+      "charm_stag_acorn": {
+        "name": "どんぐりの冠のお守り"
+      },
+      "charm_stag_gilded": {
+        "name": "金箔のお守り"
       },
       "lastflame_core": {
         "name": "最後の炎の核"
@@ -18451,6 +21459,1521 @@ export const ja_JP: EnTranslations = {
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
       },
+      "brookwatch_robe": {
+        "name": "小川監視のローブ"
+      },
+      "brookwatch_leggings": {
+        "name": "小川監視のレギンス"
+      },
+      "brookwatch_slippers": {
+        "name": "小川監視のスリッパー"
+      },
+      "brookwatch_hood": {
+        "name": "小川監視のフード"
+      },
+      "brookwatch_gloves": {
+        "name": "小川監視の手甲"
+      },
+      "brookwatch_mantle": {
+        "name": "小川監視のマント"
+      },
+      "brookwatch_sash": {
+        "name": "小川監視のサッシュ"
+      },
+      "brookwatch_jerkin": {
+        "name": "小川監視のジャーキン"
+      },
+      "brookwatch_breeches": {
+        "name": "小川監視のブリーチーズ"
+      },
+      "brookwatch_boots": {
+        "name": "小川監視のブーツ"
+      },
+      "brookwatch_cap": {
+        "name": "小川監視のキャップ"
+      },
+      "brookwatch_grips": {
+        "name": "小川監視のグリップ"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "小川監視のショルダーパッド"
+      },
+      "brookwatch_belt": {
+        "name": "小川監視のベルト"
+      },
+      "brookwatch_hauberk": {
+        "name": "小川監視のホーバーク"
+      },
+      "brookwatch_legguards": {
+        "name": "小川監視のレグガード"
+      },
+      "brookwatch_sabatons": {
+        "name": "小川監視のサバトン"
+      },
+      "brookwatch_helm": {
+        "name": "小川監視のヘルム"
+      },
+      "brookwatch_gauntlets": {
+        "name": "小川監視の籠手"
+      },
+      "brookwatch_pauldrons": {
+        "name": "小川監視の肩甲"
+      },
+      "brookwatch_girdle": {
+        "name": "小川監視のガードル"
+      },
+      "brookwatch_chainmail": {
+        "name": "小川監視のチェーンメイル"
+      },
+      "brookwatch_chausses": {
+        "name": "小川監視のチョース"
+      },
+      "brookwatch_greaves": {
+        "name": "小川監視のグリーブ"
+      },
+      "brookwatch_coif": {
+        "name": "小川監視のコイフ"
+      },
+      "brookwatch_handguards": {
+        "name": "小川監視のハンドガード"
+      },
+      "brookwatch_spaulders": {
+        "name": "小川監視のスポルダー"
+      },
+      "brookwatch_cord": {
+        "name": "小川監視のコード"
+      },
+      "hedgerow_robe": {
+        "name": "垣根のローブ"
+      },
+      "hedgerow_leggings": {
+        "name": "垣根のレギンス"
+      },
+      "hedgerow_slippers": {
+        "name": "垣根のスリッパー"
+      },
+      "hedgerow_hood": {
+        "name": "垣根のフード"
+      },
+      "hedgerow_gloves": {
+        "name": "垣根の手甲"
+      },
+      "hedgerow_mantle": {
+        "name": "垣根のマント"
+      },
+      "hedgerow_sash": {
+        "name": "垣根のサッシュ"
+      },
+      "hedgerow_jerkin": {
+        "name": "垣根のジャーキン"
+      },
+      "hedgerow_breeches": {
+        "name": "垣根のブリーチーズ"
+      },
+      "hedgerow_boots": {
+        "name": "垣根のブーツ"
+      },
+      "hedgerow_cap": {
+        "name": "垣根のキャップ"
+      },
+      "hedgerow_grips": {
+        "name": "垣根のグリップ"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "垣根のショルダーパッド"
+      },
+      "hedgerow_belt": {
+        "name": "垣根のベルト"
+      },
+      "hedgerow_hauberk": {
+        "name": "垣根のホーバーク"
+      },
+      "hedgerow_legguards": {
+        "name": "垣根のレグガード"
+      },
+      "hedgerow_sabatons": {
+        "name": "垣根のサバトン"
+      },
+      "hedgerow_helm": {
+        "name": "垣根のヘルム"
+      },
+      "hedgerow_gauntlets": {
+        "name": "垣根の籠手"
+      },
+      "hedgerow_pauldrons": {
+        "name": "垣根の肩甲"
+      },
+      "hedgerow_girdle": {
+        "name": "垣根のガードル"
+      },
+      "hedgerow_chainmail": {
+        "name": "垣根のチェーンメイル"
+      },
+      "hedgerow_chausses": {
+        "name": "垣根のチョース"
+      },
+      "hedgerow_greaves": {
+        "name": "垣根のグリーブ"
+      },
+      "hedgerow_coif": {
+        "name": "垣根のコイフ"
+      },
+      "hedgerow_handguards": {
+        "name": "垣根のハンドガード"
+      },
+      "hedgerow_spaulders": {
+        "name": "垣根のスポルダー"
+      },
+      "hedgerow_cord": {
+        "name": "垣根のコード"
+      },
+      "bogwalker_robe": {
+        "name": "泥沼行きのローブ"
+      },
+      "bogwalker_leggings": {
+        "name": "泥沼行きのレギンス"
+      },
+      "bogwalker_slippers": {
+        "name": "泥沼行きのスリッパー"
+      },
+      "bogwalker_hood": {
+        "name": "泥沼行きのフード"
+      },
+      "bogwalker_gloves": {
+        "name": "泥沼行きの手甲"
+      },
+      "bogwalker_mantle": {
+        "name": "泥沼行きのマント"
+      },
+      "bogwalker_sash": {
+        "name": "泥沼行きのサッシュ"
+      },
+      "bogwalker_jerkin": {
+        "name": "泥沼行きのジャーキン"
+      },
+      "bogwalker_breeches": {
+        "name": "泥沼行きのブリーチーズ"
+      },
+      "bogwalker_boots": {
+        "name": "泥沼行きのブーツ"
+      },
+      "bogwalker_cap": {
+        "name": "泥沼行きのキャップ"
+      },
+      "bogwalker_grips": {
+        "name": "泥沼行きのグリップ"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "泥沼行きのショルダーパッド"
+      },
+      "bogwalker_belt": {
+        "name": "泥沼行きのベルト"
+      },
+      "bogwalker_hauberk": {
+        "name": "泥沼行きのホーバーク"
+      },
+      "bogwalker_legguards": {
+        "name": "泥沼行きのレグガード"
+      },
+      "bogwalker_sabatons": {
+        "name": "泥沼行きのサバトン"
+      },
+      "bogwalker_helm": {
+        "name": "泥沼行きのヘルム"
+      },
+      "bogwalker_gauntlets": {
+        "name": "泥沼行きの籠手"
+      },
+      "bogwalker_pauldrons": {
+        "name": "泥沼行きの肩甲"
+      },
+      "bogwalker_girdle": {
+        "name": "泥沼行きのガードル"
+      },
+      "bogwalker_chainmail": {
+        "name": "泥沼行きのチェーンメイル"
+      },
+      "bogwalker_chausses": {
+        "name": "泥沼行きのチョース"
+      },
+      "bogwalker_greaves": {
+        "name": "泥沼行きのグリーブ"
+      },
+      "bogwalker_coif": {
+        "name": "泥沼行きのコイフ"
+      },
+      "bogwalker_handguards": {
+        "name": "泥沼行きのハンドガード"
+      },
+      "bogwalker_spaulders": {
+        "name": "泥沼行きのスポルダー"
+      },
+      "bogwalker_cord": {
+        "name": "泥沼行きのコード"
+      },
+      "thornspire_robe": {
+        "name": "棘塔のローブ"
+      },
+      "thornspire_leggings": {
+        "name": "棘塔のレギンス"
+      },
+      "thornspire_slippers": {
+        "name": "棘塔のスリッパー"
+      },
+      "thornspire_hood": {
+        "name": "棘塔のフード"
+      },
+      "thornspire_gloves": {
+        "name": "棘塔の手甲"
+      },
+      "thornspire_mantle": {
+        "name": "棘塔のマント"
+      },
+      "thornspire_sash": {
+        "name": "棘塔のサッシュ"
+      },
+      "thornspire_jerkin": {
+        "name": "棘塔のジャーキン"
+      },
+      "thornspire_breeches": {
+        "name": "棘塔のブリーチーズ"
+      },
+      "thornspire_boots": {
+        "name": "棘塔のブーツ"
+      },
+      "thornspire_cap": {
+        "name": "棘塔のキャップ"
+      },
+      "thornspire_grips": {
+        "name": "棘塔のグリップ"
+      },
+      "thornspire_shoulderpads": {
+        "name": "棘塔のショルダーパッド"
+      },
+      "thornspire_belt": {
+        "name": "棘塔のベルト"
+      },
+      "thornspire_hauberk": {
+        "name": "棘塔のホーバーク"
+      },
+      "thornspire_legguards": {
+        "name": "棘塔のレグガード"
+      },
+      "thornspire_sabatons": {
+        "name": "棘塔のサバトン"
+      },
+      "thornspire_helm": {
+        "name": "棘塔のヘルム"
+      },
+      "thornspire_gauntlets": {
+        "name": "棘塔の籠手"
+      },
+      "thornspire_pauldrons": {
+        "name": "棘塔の肩甲"
+      },
+      "thornspire_girdle": {
+        "name": "棘塔のガードル"
+      },
+      "thornspire_chainmail": {
+        "name": "棘塔のチェーンメイル"
+      },
+      "thornspire_chausses": {
+        "name": "棘塔のチョース"
+      },
+      "thornspire_greaves": {
+        "name": "棘塔のグリーブ"
+      },
+      "thornspire_coif": {
+        "name": "棘塔のコイフ"
+      },
+      "thornspire_handguards": {
+        "name": "棘塔のハンドガード"
+      },
+      "thornspire_spaulders": {
+        "name": "棘塔のスポルダー"
+      },
+      "thornspire_cord": {
+        "name": "棘塔のコード"
+      },
+      "hollowveil_robe": {
+        "name": "空洞の帳のローブ"
+      },
+      "hollowveil_leggings": {
+        "name": "空洞の帳のレギンス"
+      },
+      "hollowveil_slippers": {
+        "name": "空洞の帳のスリッパー"
+      },
+      "hollowveil_hood": {
+        "name": "空洞の帳のフード"
+      },
+      "hollowveil_gloves": {
+        "name": "空洞の帳の手甲"
+      },
+      "hollowveil_mantle": {
+        "name": "空洞の帳のマント"
+      },
+      "hollowveil_sash": {
+        "name": "空洞の帳のサッシュ"
+      },
+      "hollowveil_jerkin": {
+        "name": "空洞の帳のジャーキン"
+      },
+      "hollowveil_breeches": {
+        "name": "空洞の帳のブリーチーズ"
+      },
+      "hollowveil_boots": {
+        "name": "空洞の帳のブーツ"
+      },
+      "hollowveil_cap": {
+        "name": "空洞の帳のキャップ"
+      },
+      "hollowveil_grips": {
+        "name": "空洞の帳のグリップ"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "空洞の帳のショルダーパッド"
+      },
+      "hollowveil_belt": {
+        "name": "空洞の帳のベルト"
+      },
+      "hollowveil_hauberk": {
+        "name": "空洞の帳のホーバーク"
+      },
+      "hollowveil_legguards": {
+        "name": "空洞の帳のレグガード"
+      },
+      "hollowveil_sabatons": {
+        "name": "空洞の帳のサバトン"
+      },
+      "hollowveil_helm": {
+        "name": "空洞の帳のヘルム"
+      },
+      "hollowveil_gauntlets": {
+        "name": "空洞の帳の籠手"
+      },
+      "hollowveil_pauldrons": {
+        "name": "空洞の帳の肩甲"
+      },
+      "hollowveil_girdle": {
+        "name": "空洞の帳のガードル"
+      },
+      "hollowveil_chainmail": {
+        "name": "空洞の帳のチェーンメイル"
+      },
+      "hollowveil_chausses": {
+        "name": "空洞の帳のチョース"
+      },
+      "hollowveil_greaves": {
+        "name": "空洞の帳のグリーブ"
+      },
+      "hollowveil_coif": {
+        "name": "空洞の帳のコイフ"
+      },
+      "hollowveil_handguards": {
+        "name": "空洞の帳のハンドガード"
+      },
+      "hollowveil_spaulders": {
+        "name": "空洞の帳のスポルダー"
+      },
+      "hollowveil_cord": {
+        "name": "空洞の帳のコード"
+      },
+      "trailwarden_robe": {
+        "name": "径守のローブ"
+      },
+      "trailwarden_leggings": {
+        "name": "径守のレギンス"
+      },
+      "trailwarden_slippers": {
+        "name": "径守のスリッパー"
+      },
+      "trailwarden_hood": {
+        "name": "径守のフード"
+      },
+      "trailwarden_gloves": {
+        "name": "径守の手甲"
+      },
+      "trailwarden_mantle": {
+        "name": "径守のマント"
+      },
+      "trailwarden_sash": {
+        "name": "径守のサッシュ"
+      },
+      "trailwarden_jerkin": {
+        "name": "径守のジャーキン"
+      },
+      "trailwarden_breeches": {
+        "name": "径守のブリーチーズ"
+      },
+      "trailwarden_boots": {
+        "name": "径守のブーツ"
+      },
+      "trailwarden_cap": {
+        "name": "径守のキャップ"
+      },
+      "trailwarden_grips": {
+        "name": "径守のグリップ"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "径守のショルダーパッド"
+      },
+      "trailwarden_belt": {
+        "name": "径守のベルト"
+      },
+      "trailwarden_hauberk": {
+        "name": "径守のホーバーク"
+      },
+      "trailwarden_legguards": {
+        "name": "径守のレグガード"
+      },
+      "trailwarden_sabatons": {
+        "name": "径守のサバトン"
+      },
+      "trailwarden_helm": {
+        "name": "径守のヘルム"
+      },
+      "trailwarden_gauntlets": {
+        "name": "径守の籠手"
+      },
+      "trailwarden_pauldrons": {
+        "name": "径守の肩甲"
+      },
+      "trailwarden_girdle": {
+        "name": "径守のガードル"
+      },
+      "trailwarden_chainmail": {
+        "name": "径守のチェーンメイル"
+      },
+      "trailwarden_chausses": {
+        "name": "径守のチョース"
+      },
+      "trailwarden_greaves": {
+        "name": "径守のグリーブ"
+      },
+      "trailwarden_coif": {
+        "name": "径守のコイフ"
+      },
+      "trailwarden_handguards": {
+        "name": "径守のハンドガード"
+      },
+      "trailwarden_spaulders": {
+        "name": "径守のスポルダー"
+      },
+      "trailwarden_cord": {
+        "name": "径守のコード"
+      },
+      "highgale_robe": {
+        "name": "高き疾風のローブ"
+      },
+      "highgale_leggings": {
+        "name": "高き疾風のレギンス"
+      },
+      "highgale_slippers": {
+        "name": "高き疾風のスリッパー"
+      },
+      "highgale_hood": {
+        "name": "高き疾風のフード"
+      },
+      "highgale_gloves": {
+        "name": "高き疾風の手甲"
+      },
+      "highgale_mantle": {
+        "name": "高き疾風のマント"
+      },
+      "highgale_sash": {
+        "name": "高き疾風のサッシュ"
+      },
+      "highgale_jerkin": {
+        "name": "高き疾風のジャーキン"
+      },
+      "highgale_breeches": {
+        "name": "高き疾風のブリーチーズ"
+      },
+      "highgale_boots": {
+        "name": "高き疾風のブーツ"
+      },
+      "highgale_cap": {
+        "name": "高き疾風のキャップ"
+      },
+      "highgale_grips": {
+        "name": "高き疾風のグリップ"
+      },
+      "highgale_shoulderpads": {
+        "name": "高き疾風のショルダーパッド"
+      },
+      "highgale_belt": {
+        "name": "高き疾風のベルト"
+      },
+      "highgale_hauberk": {
+        "name": "高き疾風のホーバーク"
+      },
+      "highgale_legguards": {
+        "name": "高き疾風のレグガード"
+      },
+      "highgale_sabatons": {
+        "name": "高き疾風のサバトン"
+      },
+      "highgale_helm": {
+        "name": "高き疾風のヘルム"
+      },
+      "highgale_gauntlets": {
+        "name": "高き疾風の籠手"
+      },
+      "highgale_pauldrons": {
+        "name": "高き疾風の肩甲"
+      },
+      "highgale_girdle": {
+        "name": "高き疾風のガードル"
+      },
+      "highgale_chainmail": {
+        "name": "高き疾風のチェーンメイル"
+      },
+      "highgale_chausses": {
+        "name": "高き疾風のチョース"
+      },
+      "highgale_greaves": {
+        "name": "高き疾風のグリーブ"
+      },
+      "brookwatch_tunic": {
+        "name": "小川監視のチュニック"
+      },
+      "brookwatch_legwraps": {
+        "name": "小川監視のレッグラップ"
+      },
+      "brookwatch_treads": {
+        "name": "小川監視の短靴"
+      },
+      "brookwatch_headguard": {
+        "name": "小川監視のヘッドガード"
+      },
+      "brookwatch_handwraps": {
+        "name": "小川監視のハンドラップ"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "小川監視のショルダーガード"
+      },
+      "brookwatch_waistguard": {
+        "name": "小川監視のウエストガード"
+      },
+      "hedgerow_tunic": {
+        "name": "垣根のチュニック"
+      },
+      "hedgerow_legwraps": {
+        "name": "垣根のレッグラップ"
+      },
+      "hedgerow_treads": {
+        "name": "垣根の短靴"
+      },
+      "hedgerow_headguard": {
+        "name": "垣根のヘッドガード"
+      },
+      "hedgerow_handwraps": {
+        "name": "垣根のハンドラップ"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "垣根のショルダーガード"
+      },
+      "hedgerow_waistguard": {
+        "name": "垣根のウエストガード"
+      },
+      "bogwalker_tunic": {
+        "name": "泥沼行きのチュニック"
+      },
+      "bogwalker_legwraps": {
+        "name": "泥沼行きのレッグラップ"
+      },
+      "bogwalker_treads": {
+        "name": "泥沼行きの短靴"
+      },
+      "bogwalker_headguard": {
+        "name": "泥沼行きのヘッドガード"
+      },
+      "bogwalker_handwraps": {
+        "name": "泥沼行きのハンドラップ"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "泥沼行きのショルダーガード"
+      },
+      "bogwalker_waistguard": {
+        "name": "泥沼行きのウエストガード"
+      },
+      "thornspire_tunic": {
+        "name": "棘塔のチュニック"
+      },
+      "thornspire_legwraps": {
+        "name": "棘塔のレッグラップ"
+      },
+      "thornspire_treads": {
+        "name": "棘塔の短靴"
+      },
+      "thornspire_headguard": {
+        "name": "棘塔のヘッドガード"
+      },
+      "thornspire_handwraps": {
+        "name": "棘塔のハンドラップ"
+      },
+      "thornspire_shoulderguards": {
+        "name": "棘塔のショルダーガード"
+      },
+      "thornspire_waistguard": {
+        "name": "棘塔のウエストガード"
+      },
+      "hollowveil_tunic": {
+        "name": "空洞の帳のチュニック"
+      },
+      "hollowveil_legwraps": {
+        "name": "空洞の帳のレッグラップ"
+      },
+      "hollowveil_treads": {
+        "name": "空洞の帳の短靴"
+      },
+      "hollowveil_headguard": {
+        "name": "空洞の帳のヘッドガード"
+      },
+      "hollowveil_handwraps": {
+        "name": "空洞の帳のハンドラップ"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "空洞の帳のショルダーガード"
+      },
+      "hollowveil_waistguard": {
+        "name": "空洞の帳のウエストガード"
+      },
+      "trailwarden_tunic": {
+        "name": "径守のチュニック"
+      },
+      "trailwarden_legwraps": {
+        "name": "径守のレッグラップ"
+      },
+      "trailwarden_treads": {
+        "name": "径守の短靴"
+      },
+      "trailwarden_headguard": {
+        "name": "径守のヘッドガード"
+      },
+      "trailwarden_handwraps": {
+        "name": "径守のハンドラップ"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "径守のショルダーガード"
+      },
+      "trailwarden_waistguard": {
+        "name": "径守のウエストガード"
+      },
+      "highgale_tunic": {
+        "name": "高き疾風のチュニック"
+      },
+      "highgale_legwraps": {
+        "name": "高き疾風のレッグラップ"
+      },
+      "highgale_treads": {
+        "name": "高き疾風の短靴"
+      },
+      "highgale_headguard": {
+        "name": "高き疾風のヘッドガード"
+      },
+      "highgale_handwraps": {
+        "name": "高き疾風のハンドラップ"
+      },
+      "highgale_shoulderguards": {
+        "name": "高き疾風のショルダーガード"
+      },
+      "highgale_waistguard": {
+        "name": "高き疾風のウエストガード"
+      },
+      "highgale_coif": {
+        "name": "高き疾風のコイフ"
+      },
+      "highgale_handguards": {
+        "name": "高き疾風のハンドガード"
+      },
+      "highgale_spaulders": {
+        "name": "高き疾風のスポルダー"
+      },
+      "highgale_cord": {
+        "name": "高き疾風のコード"
+      },
+      "breakwater_mantle": {
+        "name": "防波堤のマント"
+      },
+      "breakwater_shoulderpads": {
+        "name": "防波堤のショルダーパッド"
+      },
+      "breakwater_spaulders": {
+        "name": "防波堤のスポルダー"
+      },
+      "gravebell_treads": {
+        "name": "墓鐘の短靴"
+      },
+      "gravebell_greaves": {
+        "name": "墓鐘のグリーブ"
+      },
+      "cryptbound_tunic": {
+        "name": "墓所縛りのチュニック"
+      },
+      "cryptbound_chainmail": {
+        "name": "墓所縛りのチェーンメイル"
+      },
+      "oathbroken_leggings": {
+        "name": "誓い破りのレギンス"
+      },
+      "oathbroken_breeches": {
+        "name": "誓い破りのブリーチーズ"
+      },
+      "oathbroken_legwraps": {
+        "name": "誓い破りのレッグラップ"
+      },
+      "oathbroken_legguards": {
+        "name": "誓い破りのレグガード"
+      },
+      "oathbroken_chausses": {
+        "name": "誓い破りのチョース"
+      },
+      "seamist_legwraps": {
+        "name": "海霧のレッグラップ"
+      },
+      "seamist_chausses": {
+        "name": "海霧のチョース"
+      },
+      "warmonger_treads": {
+        "name": "戦狂いの短靴"
+      },
+      "warmonger_greaves": {
+        "name": "戦狂いのグリーブ"
+      },
+      "sparkglass_leggings": {
+        "name": "火花水晶のレギンス"
+      },
+      "sparkglass_breeches": {
+        "name": "火花水晶のブリーチーズ"
+      },
+      "sparkglass_legwraps": {
+        "name": "火花水晶のレッグラップ"
+      },
+      "sparkglass_legguards": {
+        "name": "火花水晶のレグガード"
+      },
+      "sparkglass_chausses": {
+        "name": "火花水晶のチョース"
+      },
+      "stillhymn_treads": {
+        "name": "静寂の聖歌の短靴"
+      },
+      "stillhymn_greaves": {
+        "name": "静寂の聖歌のグリーブ"
+      },
+      "pearlglow_headguard": {
+        "name": "真珠の輝きのヘッドガード"
+      },
+      "pearlglow_coif": {
+        "name": "真珠の輝きのコイフ"
+      },
+      "sealkeeper_gloves": {
+        "name": "封印守りの手甲"
+      },
+      "sealkeeper_grips": {
+        "name": "封印守りのグリップ"
+      },
+      "sealkeeper_handwraps": {
+        "name": "封印守りのハンドラップ"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "封印守りの籠手"
+      },
+      "sealkeeper_handguards": {
+        "name": "封印守りのハンドガード"
+      },
+      "fetterbound_leggings": {
+        "name": "枷縛りのレギンス"
+      },
+      "fetterbound_breeches": {
+        "name": "枷縛りのブリーチーズ"
+      },
+      "fetterbound_legwraps": {
+        "name": "枷縛りのレッグラップ"
+      },
+      "fetterbound_legguards": {
+        "name": "枷縛りのレグガード"
+      },
+      "fetterbound_chausses": {
+        "name": "枷縛りのチョース"
+      },
+      "shroudcaller_tunic": {
+        "name": "屍衣呼びのチュニック"
+      },
+      "shroudcaller_chainmail": {
+        "name": "屍衣呼びのチェーンメイル"
+      },
+      "wyrmshadow_tunic": {
+        "name": "竜影のチュニック"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "竜影のチェーンメイル"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "残り火の眷属のショルダーパッド"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "残り火の眷属のショルダーガード"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "残り火の眷属の肩甲"
+      },
+      "hoarfrost_mantle": {
+        "name": "霧氷のマント"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "霧氷のショルダーパッド"
+      },
+      "hoarfrost_spaulders": {
+        "name": "霧氷のスポルダー"
+      },
+      "blackmere_mantle": {
+        "name": "黒き湖のマント"
+      },
+      "blackmere_shoulderpads": {
+        "name": "黒き湖のショルダーパッド"
+      },
+      "blackmere_shoulderguards": {
+        "name": "黒き湖のショルダーガード"
+      },
+      "blackmere_pauldrons": {
+        "name": "黒き湖の肩甲"
+      },
+      "blackmere_spaulders": {
+        "name": "黒き湖のスポルダー"
+      },
+      "reedhush_mantle": {
+        "name": "葦の静けさのマント"
+      },
+      "reedhush_shoulderpads": {
+        "name": "葦の静けさのショルダーパッド"
+      },
+      "reedhush_shoulderguards": {
+        "name": "葦の静けさのショルダーガード"
+      },
+      "reedhush_pauldrons": {
+        "name": "葦の静けさの肩甲"
+      },
+      "reedhush_spaulders": {
+        "name": "葦の静けさのスポルダー"
+      },
+      "cairnking_mantle": {
+        "name": "塚の王のマント"
+      },
+      "cairnking_shoulderpads": {
+        "name": "塚の王のショルダーパッド"
+      },
+      "cairnking_shoulderguards": {
+        "name": "塚の王のショルダーガード"
+      },
+      "cairnking_pauldrons": {
+        "name": "塚の王の肩甲"
+      },
+      "cairnking_spaulders": {
+        "name": "塚の王のスポルダー"
+      },
+      "palehunt_mantle": {
+        "name": "蒼白の狩りのマント"
+      },
+      "palehunt_shoulderpads": {
+        "name": "蒼白の狩りのショルダーパッド"
+      },
+      "palehunt_shoulderguards": {
+        "name": "蒼白の狩りのショルダーガード"
+      },
+      "palehunt_pauldrons": {
+        "name": "蒼白の狩りの肩甲"
+      },
+      "palehunt_spaulders": {
+        "name": "蒼白の狩りのスポルダー"
+      },
+      "jadeshrine_mantle": {
+        "name": "翡翠の祠のマント"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "翡翠の祠のショルダーパッド"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "翡翠の祠のショルダーガード"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "翡翠の祠の肩甲"
+      },
+      "jadeshrine_spaulders": {
+        "name": "翡翠の祠のスポルダー"
+      },
+      "gildhedge_mantle": {
+        "name": "金の生垣のマント"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "金の生垣のショルダーパッド"
+      },
+      "gildhedge_spaulders": {
+        "name": "金の生垣のスポルダー"
+      },
+      "saltwrack_mantle": {
+        "name": "塩の難破のマント"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "塩の難破のショルダーパッド"
+      },
+      "saltwrack_spaulders": {
+        "name": "塩の難破のスポルダー"
+      },
+      "brookwatch_vest": {
+        "name": "小川監視のベスト"
+      },
+      "brookwatch_trousers": {
+        "name": "小川監視のトラウザー"
+      },
+      "brookwatch_moccasins": {
+        "name": "小川監視のモカシン"
+      },
+      "brookwatch_cowl": {
+        "name": "小川監視のカウル"
+      },
+      "brookwatch_mitts": {
+        "name": "小川監視のミトン"
+      },
+      "brookwatch_epaulets": {
+        "name": "小川監視のエポレット"
+      },
+      "brookwatch_cinch": {
+        "name": "小川監視のシンチ"
+      },
+      "hedgerow_vest": {
+        "name": "垣根のベスト"
+      },
+      "hedgerow_trousers": {
+        "name": "垣根のトラウザー"
+      },
+      "hedgerow_moccasins": {
+        "name": "垣根のモカシン"
+      },
+      "hedgerow_cowl": {
+        "name": "垣根のカウル"
+      },
+      "hedgerow_mitts": {
+        "name": "垣根のミトン"
+      },
+      "hedgerow_epaulets": {
+        "name": "垣根のエポレット"
+      },
+      "hedgerow_cinch": {
+        "name": "垣根のシンチ"
+      },
+      "bogwalker_vest": {
+        "name": "泥沼行きのベスト"
+      },
+      "bogwalker_trousers": {
+        "name": "泥沼行きのトラウザー"
+      },
+      "bogwalker_moccasins": {
+        "name": "泥沼行きのモカシン"
+      },
+      "bogwalker_cowl": {
+        "name": "泥沼行きのカウル"
+      },
+      "bogwalker_mitts": {
+        "name": "泥沼行きのミトン"
+      },
+      "bogwalker_epaulets": {
+        "name": "泥沼行きのエポレット"
+      },
+      "bogwalker_cinch": {
+        "name": "泥沼行きのシンチ"
+      },
+      "thornspire_vest": {
+        "name": "棘塔のベスト"
+      },
+      "thornspire_trousers": {
+        "name": "棘塔のトラウザー"
+      },
+      "thornspire_moccasins": {
+        "name": "棘塔のモカシン"
+      },
+      "thornspire_cowl": {
+        "name": "棘塔のカウル"
+      },
+      "thornspire_mitts": {
+        "name": "棘塔のミトン"
+      },
+      "thornspire_epaulets": {
+        "name": "棘塔のエポレット"
+      },
+      "thornspire_cinch": {
+        "name": "棘塔のシンチ"
+      },
+      "hollowveil_vest": {
+        "name": "空洞の帳のベスト"
+      },
+      "hollowveil_trousers": {
+        "name": "空洞の帳のトラウザー"
+      },
+      "hollowveil_moccasins": {
+        "name": "空洞の帳のモカシン"
+      },
+      "hollowveil_cowl": {
+        "name": "空洞の帳のカウル"
+      },
+      "hollowveil_mitts": {
+        "name": "空洞の帳のミトン"
+      },
+      "hollowveil_epaulets": {
+        "name": "空洞の帳のエポレット"
+      },
+      "hollowveil_cinch": {
+        "name": "空洞の帳のシンチ"
+      },
+      "trailwarden_vest": {
+        "name": "径守のベスト"
+      },
+      "trailwarden_trousers": {
+        "name": "径守のトラウザー"
+      },
+      "trailwarden_moccasins": {
+        "name": "径守のモカシン"
+      },
+      "trailwarden_cowl": {
+        "name": "径守のカウル"
+      },
+      "trailwarden_mitts": {
+        "name": "径守のミトン"
+      },
+      "trailwarden_epaulets": {
+        "name": "径守のエポレット"
+      },
+      "trailwarden_cinch": {
+        "name": "径守のシンチ"
+      },
+      "highgale_vest": {
+        "name": "高き疾風のベスト"
+      },
+      "highgale_trousers": {
+        "name": "高き疾風のトラウザー"
+      },
+      "highgale_moccasins": {
+        "name": "高き疾風のモカシン"
+      },
+      "highgale_cowl": {
+        "name": "高き疾風のカウル"
+      },
+      "highgale_mitts": {
+        "name": "高き疾風のミトン"
+      },
+      "highgale_epaulets": {
+        "name": "高き疾風のエポレット"
+      },
+      "highgale_cinch": {
+        "name": "高き疾風のシンチ"
+      },
+      "breakwater_shoulderguards": {
+        "name": "防波堤のショルダーガード"
+      },
+      "breakwater_pauldrons": {
+        "name": "防波堤の肩甲"
+      },
+      "breakwater_epaulets": {
+        "name": "防波堤のエポレット"
+      },
+      "gravebell_moccasins": {
+        "name": "墓鐘のモカシン"
+      },
+      "oathbroken_trousers": {
+        "name": "誓い破りのトラウザー"
+      },
+      "sparkglass_trousers": {
+        "name": "火花水晶のトラウザー"
+      },
+      "stillhymn_moccasins": {
+        "name": "静寂の聖歌のモカシン"
+      },
+      "sealkeeper_mitts": {
+        "name": "封印守りのミトン"
+      },
+      "fetterbound_trousers": {
+        "name": "枷縛りのトラウザー"
+      },
+      "wyrmshadow_vest": {
+        "name": "竜影のベスト"
+      },
+      "cinderbrood_spaulders": {
+        "name": "残り火の眷属のスポルダー"
+      },
+      "cinderbrood_epaulets": {
+        "name": "残り火の眷属のエポレット"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "霧氷のショルダーガード"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "霧氷の肩甲"
+      },
+      "hoarfrost_epaulets": {
+        "name": "霧氷のエポレット"
+      },
+      "blackmere_epaulets": {
+        "name": "黒き湖のエポレット"
+      },
+      "reedhush_epaulets": {
+        "name": "葦の静けさのエポレット"
+      },
+      "cairnking_epaulets": {
+        "name": "塚の王のエポレット"
+      },
+      "palehunt_epaulets": {
+        "name": "蒼白の狩りのエポレット"
+      },
+      "jadeshrine_epaulets": {
+        "name": "翡翠の祠のエポレット"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "金の生垣のショルダーガード"
+      },
+      "gildhedge_pauldrons": {
+        "name": "金の生垣の肩甲"
+      },
+      "gildhedge_epaulets": {
+        "name": "金の生垣のエポレット"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "塩の難破のショルダーガード"
+      },
+      "saltwrack_pauldrons": {
+        "name": "塩の難破の肩甲"
+      },
+      "saltwrack_epaulets": {
+        "name": "塩の難破のエポレット"
+      },
+      "muster_shardpike": {
+        "name": "召集兵団のシャードパイク"
+      },
+      "knucklebone_of_balgath": {
+        "name": "バルガスの拳骨"
+      },
+      "muster_standard": {
+        "name": "召集兵団の軍旗"
+      },
+      "guttered_eye": {
+        "name": "燃え尽きた眼"
+      },
+      "barrowstone_heart": {
+        "name": "塚石の心臓"
+      },
+      "muster_grapnel": {
+        "name": "召集兵団の鉤縄"
+      },
+      "craterglass_stave": {
+        "name": "隕坑硝子の杖"
+      },
+      "gravedirt_treads": {
+        "name": "墓土のトレッド"
+      },
+      "bellrope_girdle": {
+        "name": "鐘縄の帯"
+      },
+      "sextons_spadehaft": {
+        "name": "墓守の鋤柄"
+      },
+      "rimesilk_mantle": {
+        "name": "霜絹のマントル"
+      },
+      "bonechill_carapace_vest": {
+        "name": "ボーンチルのホーバーク"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "霜綴りのレギンス"
+      },
+      "rimeweb_fang": {
+        "name": "花嫁の氷柱"
+      },
+      "cantors_cassock": {
+        "name": "聖歌隊長の法衣"
+      },
+      "choirward_leggings": {
+        "name": "聖歌守りのレギンス"
+      },
+      "choristers_gloves": {
+        "name": "聖歌隊員の手袋"
+      },
+      "cantors_hymnal": {
+        "name": "聖歌隊長の賛美歌集"
+      },
+      "gravecallers_vestments": {
+        "name": "墓呼びの祭服"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "安らがぬ追跡者のフード"
+      },
+      "sextons_burial_spade": {
+        "name": "墓守の埋葬鋤"
+      },
+      "rimesilk_hood": {
+        "name": "霜絹のフード"
+      },
+      "knight_commanders_longsword": {
+        "name": "騎士団長の長剣"
+      },
+      "gaolers_chain_girdle": {
+        "name": "牢番の鎖帯"
+      },
+      "rusted_shackle_grips": {
+        "name": "錆びた枷の手袋"
+      },
+      "drowned_wardens_mantle": {
+        "name": "溺れた看守の肩衣"
+      },
+      "gaolyard_cudgel": {
+        "name": "牢獄庭の棍棒"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "溺れた指揮官の胸当て"
+      },
+      "gaolyard_striders": {
+        "name": "牢獄庭の長靴"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "看守の鉄篭手"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "牢番の鍵束ベルト"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "牢番のランタン頭巾"
+      },
+      "conchplate_girdle": {
+        "name": "巻貝板の腰帯"
+      },
+      "pale_chorus_leggings": {
+        "name": "蒼白聖歌のレギンス"
+      },
+      "refrain_silk_gloves": {
+        "name": "リフレインの絹手袋"
+      },
+      "chorus_conch": {
+        "name": "聖歌の巻貝"
+      },
+      "tideglass_pauldrons": {
+        "name": "潮硝子の肩当て"
+      },
+      "moonburn_treads": {
+        "name": "月焼けの靴"
+      },
+      "prism_etched_cowl": {
+        "name": "プリズム刻みの頭巾"
+      },
+      "tideglass_shiv": {
+        "name": "潮硝子の小刀"
+      },
+      "pale_chorus_vestment": {
+        "name": "蒼白聖歌の祭服"
+      },
+      "tideglass_warmaul": {
+        "name": "潮硝子の戦槌"
+      },
+      "beastpit_warbelt": {
+        "name": "獣の穴の戦帯"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "ジャガー革のジャーキン"
+      },
+      "hexbone_handwraps": {
+        "name": "呪骨のハンドラップ"
+      },
+      "rootbound_sabatons": {
+        "name": "根縛りのサバトン"
+      },
+      "pollen_dusted_leggings": {
+        "name": "花粉まみれのレギンス"
+      },
+      "bloomsilk_cowl": {
+        "name": "花絹のカウル"
+      },
+      "falls_blessed_staff": {
+        "name": "滝に祝福された杖"
+      },
+      "fanglords_hide_mantle": {
+        "name": "牙王の獣皮マントル"
+      },
+      "thornroot_greathelm": {
+        "name": "茨冠のグレートヘルム"
+      },
+      "foremans_grips": {
+        "name": "親方の籠手"
+      },
+      "serac_stride_boots": {
+        "name": "氷塔渡りのブーツ"
+      },
+      "seal_rune_mantle": {
+        "name": "封印ルーンのマントル"
+      },
+      "thawbound_legguards": {
+        "name": "融けた枷のレッグガード"
+      },
+      "pyre_tenders_hood": {
+        "name": "火葬番の頭巾"
+      },
+      "meltwater_cord": {
+        "name": "雪解け水の飾り紐"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "開かれた錠の大槌"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "目覚めの儀の祭服"
+      },
+      "spadeworn_gauntlets": {
+        "name": "鋤擦れの籠手"
+      },
+      "gravedirt_grips": {
+        "name": "墓土のグリップ"
+      },
+      "bellrope_mitts": {
+        "name": "鐘縄のミトン"
+      },
+      "rimewreath_coif": {
+        "name": "霜花冠の鎖頭巾"
+      },
+      "rime_laced_hood": {
+        "name": "霜綴りのフード"
+      },
+      "lamenting_veil": {
+        "name": "嘆きのヴェール"
+      },
+      "choirward_pauldrons": {
+        "name": "聖歌守りの肩鎧"
+      },
+      "choristers_spaulders": {
+        "name": "聖歌隊員の肩当て"
+      },
+      "cantors_stole": {
+        "name": "聖歌隊長のストール"
+      },
+      "knellbound_hauberk": {
+        "name": "弔鐘縛りのホーバーク"
+      },
+      "candlewatch_jerkin": {
+        "name": "灯守りの胴着"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "安らがぬ儀式のローブ"
+      },
+      "gravecallers_rod": {
+        "name": "墓呼びのロッド"
+      },
+      "portcullis_girdle": {
+        "name": "落とし格子の腰帯"
+      },
+      "cellwatch_belt": {
+        "name": "牢見張りのベルト"
+      },
+      "lanternwick_sash": {
+        "name": "ランタン芯の飾り帯"
+      },
+      "turnkeys_shank": {
+        "name": "牢番の隠し刃"
+      },
+      "gaolyard_jerkin": {
+        "name": "牢獄庭の胴着"
+      },
+      "brinewarden_robe": {
+        "name": "潮看守のローブ"
+      },
+      "fogbinders_rod": {
+        "name": "フォグバインダーのロッド"
+      },
+      "conchplate_sabatons": {
+        "name": "巻貝板のサバトン"
+      },
+      "pale_chorus_slippers": {
+        "name": "蒼白聖歌のスリッパ"
+      },
+      "tideglass_gauntlets": {
+        "name": "潮硝子の籠手"
+      },
+      "moonburn_grips": {
+        "name": "月焼けのグリップ"
+      },
+      "prism_etched_handwraps": {
+        "name": "プリズム刻みのハンドラップ"
+      },
+      "mere_crested_helm": {
+        "name": "湖冠の兜"
+      },
+      "mereskin_hood": {
+        "name": "湖竜皮のフード"
+      },
+      "merewater_cowl": {
+        "name": "湖水の頭巾"
+      },
+      "merecleaver": {
+        "name": "湖断ちの大斧"
+      },
+      "moonwrack_stave": {
+        "name": "ムーンラックの杖"
+      },
+      "membership_token": {
+        "name": "メンバーシップトークン（30日）"
+      },
+      "referral_satchel": {
+        "name": "友情のサッチェル"
+      },
+      "referral_hollow_charm": {
+        "name": "誓いを守る者の心"
+      },
+      "referral_fog_charm": {
+        "name": "覚醒した誓いを守る者の心"
+      },
+      "reins_referral_tank": {
+        "name": "友情タンクの手綱"
+      },
+      "reins_referral_raptor": {
+        "name": "友情ラプターの手綱"
+      },
+      "referral_helmet": {
+        "name": "友情の兜"
+      },
+      "referral_shoulder": {
+        "name": "友情の肩当て"
+      },
+      "referral_chest": {
+        "name": "友情の胸当て"
+      },
+      "referral_waist": {
+        "name": "友情の帯"
+      },
+      "referral_legs": {
+        "name": "友情の脚甲"
+      },
+      "referral_gloves": {
+        "name": "友情の手甲"
+      },
+      "referral_feet": {
+        "name": "友情のブーツ"
+      },
+      "membership_helmet": {
+        "name": "メンバーシップの兜"
+      },
+      "membership_shoulder": {
+        "name": "メンバーシップの肩当て"
+      },
+      "membership_chest": {
+        "name": "メンバーシップの胸当て"
+      },
+      "membership_waist": {
+        "name": "メンバーシップの腰帯"
+      },
+      "membership_legs": {
+        "name": "メンバーシップの脚甲"
+      },
+      "membership_gloves": {
+        "name": "メンバーシップの手甲"
+      },
+      "membership_feet": {
+        "name": "メンバーシップの長靴"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -19306,6 +23829,24 @@ export const ja_JP: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "るつぼの心臓"
       },
+      "gaolers_iron_key": {
+        "name": "牢番の鉄鍵"
+      },
+      "fanglords_whistle": {
+        "name": "牙王の呼び笛"
+      },
+      "gorgebloom_seedpod": {
+        "name": "ゴージブルームの種莢"
+      },
+      "foremans_last_link": {
+        "name": "親方の最後の鎖環"
+      },
+      "phial_of_the_tithe": {
+        "name": "十分の一税の小瓶"
+      },
+      "quenchwater_flask": {
+        "name": "焼き入れ水のフラスコ"
+      },
       "rift_watchers_band": {
         "name": "裂け目の監視者の指輪"
       },
@@ -19440,6 +23981,9 @@ export const ja_JP: EnTranslations = {
       "restless_bones": {
         "name": "安らがぬ骨"
       },
+      "marrow_restless_bones": {
+        "name": "安らがぬ骨"
+      },
       "gorrak": {
         "name": "無慈悲なるゴラック"
       },
@@ -19557,6 +24101,75 @@ export const ja_JP: EnTranslations = {
       "morthen": {
         "name": "墓呼びのモーセン"
       },
+      "ossuary_sentinel": {
+        "name": "納骨堂の番兵"
+      },
+      "hollow_gravedigger": {
+        "name": "虚ろの墓掘り"
+      },
+      "rime_egg_sac": {
+        "name": "霜の卵嚢"
+      },
+      "rimeweb_hatchling": {
+        "name": "霜網の子蜘蛛"
+      },
+      "rimeweb_spinner": {
+        "name": "霜網の紡ぎ手"
+      },
+      "candlewright_acolyte": {
+        "name": "蝋燭職人の侍祭"
+      },
+      "hollow_chorister": {
+        "name": "虚ろの聖歌隊員"
+      },
+      "bound_soul": {
+        "name": "縛られし魂"
+      },
+      "rimeweb": {
+        "name": "骨冷えの貴婦人"
+      },
+      "cantor_ilvane": {
+        "name": "聖歌隊長イルヴェイン"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "納骨堂の戦士"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "墓呼びの徒弟"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "納骨堂の喉裂き"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "墓呼びの死霊術師"
+      },
+      "crypt_bone_minion": {
+        "name": "骨の下僕"
+      },
+      "crypt_bone_brute": {
+        "name": "骨の巨兵"
+      },
+      "crypt_bone_pile": {
+        "name": "蠢く骨"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "礼拝堂のガーゴイル"
+      },
+      "crypt_crow_caller": {
+        "name": "鴉呼び"
+      },
+      "crypt_carrion_crow": {
+        "name": "腐肉喰らいの鴉"
+      },
+      "crypt_ossuary_drake": {
+        "name": "納骨堂の骨竜"
+      },
+      "crypt_knellwyrm": {
+        "name": "弔鐘竜"
+      },
+      "crypt_remembrance_candle": {
+        "name": "追憶のろうそく"
+      },
       "bastion_revenant": {
         "name": "砦の亡霊"
       },
@@ -19571,6 +24184,102 @@ export const ja_JP: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "フォグバインダーのヴァエル"
+      },
+      "drowned_watchman": {
+        "name": "溺れた見張り番"
+      },
+      "fogbound_arbalest": {
+        "name": "霧縛りの弩兵"
+      },
+      "barnacle_crawler": {
+        "name": "難破船に縛られた船員"
+      },
+      "bastion_warhound": {
+        "name": "砦の軍用犬"
+      },
+      "mistweaver": {
+        "name": "霧の詠唱者"
+      },
+      "drowned_sergeant": {
+        "name": "溺れた軍曹"
+      },
+      "shackled_prisoner": {
+        "name": "枷の囚人"
+      },
+      "gaol_turnkey": {
+        "name": "牢の鍵番"
+      },
+      "turretback_hermit": {
+        "name": "難破船の船長"
+      },
+      "vael_fog_shade": {
+        "name": "フォグバインダーのヴァエル"
+      },
+      "gaoler_ossick": {
+        "name": "牢番オシック"
+      },
+      "bastion_gaol_cage": {
+        "name": "鉄の檻"
+      },
+      "bastion_drowned_anchor": {
+        "name": "溺死の錨"
+      },
+      "lagoon_snapper": {
+        "name": "潟湖のスナッパー"
+      },
+      "ice_wraith": {
+        "name": "氷のレイス"
+      },
+      "moonlit_siren": {
+        "name": "月照らしのセイレーン"
+      },
+      "tidewisp": {
+        "name": "潮の精"
+      },
+      "drowned_pilgrim": {
+        "name": "溺れた巡礼者"
+      },
+      "mere_hydra_head_left": {
+        "name": "湖のヒュドラ"
+      },
+      "mere_hydra_head_center": {
+        "name": "湖のヒュドラ"
+      },
+      "mere_hydra_head_right": {
+        "name": "湖のヒュドラ"
+      },
+      "tideglass_colossus": {
+        "name": "潮硝子の巨像"
+      },
+      "tideglass_reflection": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_priest": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_mage": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_druid": {
+        "name": "潮硝子の映し身"
       },
       "sanctum_boneguard": {
         "name": "聖所の骨衛兵"
@@ -19725,8 +24434,26 @@ export const ja_JP: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "サンザール、目覚めし峰"
       },
+      "balgath_cyclops": {
+        "name": "バルガス、単眼の監督"
+      },
       "thunzharr_stormling": {
         "name": "目覚めた嵐の精"
+      },
+      "muster_footman": {
+        "name": "召集兵団の歩兵"
+      },
+      "muster_chaplain": {
+        "name": "召集兵団の従軍司祭"
+      },
+      "muster_sergeant": {
+        "name": "召集兵団の軍曹"
+      },
+      "muster_drillmaster": {
+        "name": "召集兵団の教練係"
+      },
+      "muster_effigy": {
+        "name": "藁の監督"
       },
       "stable_horse": {
         "name": "厩舎の馬"
@@ -20100,8 +24827,179 @@ export const ja_JP: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "牙王の獣使い"
       },
+      "sunbone_totem_binder": {
+        "name": "陽骨のトーテム使い"
+      },
+      "sunbone_totem": {
+        "name": "陽骨のトーテム"
+      },
+      "sunbone_dread_totem": {
+        "name": "陽骨の恐怖トーテム"
+      },
+      "basin_raptor": {
+        "name": "盆地のラプトル"
+      },
+      "spore_toad": {
+        "name": "胞子ガエル"
+      },
+      "vine_lasher": {
+        "name": "絡み蔓の鞭打ち"
+      },
+      "great_saurian": {
+        "name": "グレート・サウリアン"
+      },
+      "howdah_hexcaller": {
+        "name": "輿の呪術師"
+      },
+      "fanglord_jaguar": {
+        "name": "牙王の大ジャガー"
+      },
+      "the_gorgebloom": {
+        "name": "ゴージブルーム"
+      },
       "wildheart_high_priest": {
         "name": "盆地の声ズルガー"
+      },
+      "broodsworn_thawcaller": {
+        "name": "竜誓団の解氷術師"
+      },
+      "broodsworn_goadsmith": {
+        "name": "竜誓団の突き棒鍛冶"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "竜誓団の薪守り"
+      },
+      "soul_brazier": {
+        "name": "魂の火鉢"
+      },
+      "rime_whelp": {
+        "name": "霧氷の幼竜"
+      },
+      "ogre_sledge_hauler": {
+        "name": "オーガのそり引き"
+      },
+      "glacier_splinter": {
+        "name": "氷河の破片"
+      },
+      "sledge_tusker": {
+        "name": "そり引きの巨牙獣"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "大槌の枷"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "火ばさみの枷"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "金床の枷"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "ふいごの枷"
+      },
+      "thorn_sprout": {
+        "name": "茨の芽"
+      },
+      "buddy_ember_fox": {
+        "name": "燃えさし狐"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "エンバーフォール・フェニックス"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "紅爪ガニ"
+      },
+      "buddy_golden_sentinel": {
+        "name": "黄金の歩哨"
+      },
+      "buddy_nightfang": {
+        "name": "ナイトファング"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "タスクホーン・ボア"
+      },
+      "buddy_emerald_wolf": {
+        "name": "エメラルドウルフ"
+      },
+      "buddy_tiger": {
+        "name": "トラ"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "トロールフェイス"
+      },
+      "buddy_ansem": {
+        "name": "アンセム"
+      },
+      "buddy_triple_t": {
+        "name": "トリプルT"
+      },
+      "buddy_kekius": {
+        "name": "ケキウス"
+      },
+      "buddy_solbot": {
+        "name": "ソルボット"
+      },
+      "buddy_frostfire": {
+        "name": "フロストファイア"
+      },
+      "buddy_rocky": {
+        "name": "ロッキー"
+      },
+      "buddy_proud_grunt": {
+        "name": "誇り高きグラント"
+      },
+      "buddy_loot_goblin": {
+        "name": "戦利品ゴブリン"
+      },
+      "buddy_penny_goldspark": {
+        "name": "ペニー・ゴールドスパーク"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "アルパカ"
+      },
+      "buddy_horse": {
+        "name": "馬"
+      },
+      "buddy_sapling": {
+        "name": "若木"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "クモ"
+      },
+      "buddy_raptor": {
+        "name": "ラプター"
+      },
+      "buddy_skeleton": {
+        "name": "スケルトン"
+      },
+      "buddy_crystal_lich": {
+        "name": "クリスタルリッチ"
+      },
+      "buddy_forgemaw": {
+        "name": "溶けたフォージモウ"
+      },
+      "buddy_crystal_tide": {
+        "name": "クリスタルタイド"
+      },
+      "buddy_phantom": {
+        "name": "ファントム"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
@@ -20185,7 +25083,7 @@ export const ja_JP: EnTranslations = {
         "name": "蒼白聖歌隊の侍祭"
       },
       "pearlguard_sentinel": {
-        "name": "真珠衛の歩哨"
+        "name": "月套のエイ"
       },
       "sethrael_palecoil": {
         "name": "蒼渦のセスラエル"
@@ -20375,6 +25273,16 @@ export const ja_JP: EnTranslations = {
         "name": "番人フェンウィック",
         "title": "フェンブリッジの番人",
         "greeting": "門で止まりなさい、{className}。葦の向こうでは沼が我々の代わりに命を奪います。"
+      },
+      "socketwright_skerrit": {
+        "name": "マベン・スケリット",
+        "title": "嵌め込み職人",
+        "greeting": "あの眼を研いで彼の眼窩に据えてから四十年、一日分の払いももらっていない。番人に痛い目を見せたいのか、{className}？なら俺の仕事を狙え。"
+      },
+      "muster_commander": {
+        "name": "召集兵団の指揮官",
+        "title": "フェンブリッジ召集兵団",
+        "greeting": "まず槍、それから全員だ、{className}。それがすべてで、それがこの陣を生かしてきた。"
       },
       "brother_aldric_fen": {
         "name": "アルドリック修道士",
@@ -20595,6 +25503,31 @@ export const ja_JP: EnTranslations = {
         "name": "港務長タムシン",
         "title": "ワームウォッチ波止場の番人",
         "greeting": "波止場から中へどうぞ、手を温めていきなさい。うちの桟橋の船は長い東の海岸を北へ上ってウィックハーバーへ向かい、また戻ってきます。はるか西では、もう一隻の渡し船がイーストブルックとナイトブルームの間を行き来しています。壁の地図に二つの航路が描いてありますよ。ワームウォッチへ登る前に、火のそばでひと休みしていきなさい。"
+      },
+      "innkeeper_maudie": {
+        "name": "モーディ・タップライト",
+        "title": "宿屋の女将",
+        "greeting": "湿気から逃れて中へどうぞ、旅の方。火のそばへ下りる段差に気をつけてね。やかんは火にかけてあるし、長椅子は温かいし、二階の部屋も乾いていますよ。フェンブリッジから来た旅人たちは、湿地の道は昼間なら静かだと口をそろえるけれど、日が暮れてから歩く人はいません。少し座って、足を休めていきなさい。"
+      },
+      "patron_amos_eelby": {
+        "name": "エイモス・イールビー",
+        "title": "ウナギ漁師",
+        "greeting": "長椅子に座りな、{className}。このグリセルはフェンブリッジの下の大ウナギなんぞ作り話だと言い張るがな、わしは二度もあいつに手をかけたんだ。二度だぞ！徴税人みたいにぬるぬるで、この長椅子くらいの長さはあったわい。"
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "グリセル・セッジワース",
+        "title": "泥炭掘り",
+        "greeting": "エイモスの話は気にしなくていいよ。四十年泥炭を掘ってきたけど、この沼からは、あの人が釣ったウナギより妙な物をたくさん掘り出してきたさ。長靴に骨に、中の頭がまだ心配そうな兜までね。温まっていきな、火はただだよ。"
+      },
+      "patron_ned_oxley": {
+        "name": "ネッド・オクスリー",
+        "title": "牛追い",
+        "greeting": "土手道で牛を四十頭追ってきたが、フェンブリッジの手前で二頭を泥沼に取られた。この道で男を裏切らないのはモーディのエールだけさ。自分の分は自分で払えよ。"
+      },
+      "patron_hester_quillby": {
+        "name": "ヘスター・クウィルビー",
+        "title": "地図職人",
+        "greeting": "この湿地の地図は、買ったものがどれも一季節もたずに間違いになったわ。水が道を動かして、道が水を動かすの。だから自分で描いて、インクが乾くまで、ここの乾いた席に座っているのよ。"
       },
       "reeve_ottoline": {
         "name": "代官オトリーヌ",
@@ -20821,6 +25754,11 @@ export const ja_JP: EnTranslations = {
         "title": "薬房の主",
         "greeting": "二度量って一度で注ぐ、{className}。薬房ではこぼした試薬に容赦はしない。"
       },
+      "steward_ansel_hale": {
+        "name": "アンセル・ヘイル",
+        "title": "館の家令",
+        "greeting": "館へようこそ、{className}。炉辺で温まっていくといい。絨毯に気をつけて、上座の卓には触れぬように。広場の者が家路を見失わぬよう、灯籠は夜通し灯している。"
+      },
       "farmer_jessica": {
         "name": "農婦ジェシカ",
         "title": "菜園の管理人",
@@ -20890,6 +25828,11 @@ export const ja_JP: EnTranslations = {
         "name": "教練官ヘイル",
         "title": "波止場の稽古師範",
         "greeting": "後ろのダミーは打ち返しもしなければ倒れもしない、{className}。大事なのは記録だ。お前が当てた一撃は残らずダメージメーターが数えてくれる。あれを標的にしてメーターを開け、あとは俺が教えてやる。"
+      },
+      "cantor_laverock": {
+        "name": "ラヴェロック",
+        "title": "蒼白聖歌隊最後の詠唱者",
+        "greeting": "わしは蒼白聖歌隊でいちばん若い声だった。儀式の夜、わしは飲まずに逃げた。それ以来、満月のたびに水の下で皆が歌うのが聞こえる。死ぬ前に、あの方をこの目で見なければならん。後ろを歩かせてくれ。戦いはせんし、足手まといにもならん。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
@@ -21114,6 +26057,52 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "フェンブリッジ召集令"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "召集兵団の呼び出し",
+        "text": "割ける槍はすべて星墜の火口の周りに陣を敷かせた、{playerName}。そこから歩き出てくる奴を囲むためだ。召集兵団の指揮官は火口を見下ろす南の高台で陣を守っている。ここから南東だ。指揮官に報告しろ。奴との戦い方を教わるだろう。よく聞け。聞かなかった者たちは葦の中に沈んでいる。",
+        "completion": "フェンウィックの使いか？よし。一度しか言わん、奴は一言も言わんからな。バルガスは我々の哨所を巡る：火口の縁、西の平地、南の高台、南西の縁の切れ目、そしてまた一周だ。立ち止まった哨所はすべて踏み潰される。鋼は奴に通らん。皮がはじき返し、奴を斬りつけるだけのレイドは疲れ果てて死ぬ。唯一の弱点は目だ。構えた槍をバロウグラスに突き通せば奴は盲目になり、盲目の間は皮が剥がれ落ちる。その時こそレイド全員で叩き込め、全力でな。やがて皮は閉じ、次の好機を待つ。まず槍、それから全員だ、{playerName}。武器棚が槍を貸すのはレベル19以下の新兵だけだ。若い者が目を潰し、古参がその好機を生かす。",
+        "objectives": {
+          "0": {
+            "label": "召集兵団の指揮官に報告する"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "まず槍を",
+        "text": "口で言うのは安いが、槍は安くない。俺の隣の武器棚からシャードパイクを取れ。それから陣の西端にいる藁の監督のところへ行け。若い連中が板と藁で作った、本物の半分の大きさの人形で、目のところにランタンが入っている。槍を構え、教練係が地面を叩いている間も穂先をまっすぐ保て。本物はもっと激しく揺らすからな。腕が定まったら、穂先をランタンに通せ。板が剥がれ落ちる：そうしたら自分の武器で叩いてみろ、{playerName}。違いが分かるはずだ。武器棚が槍を貸すのはレベル19以下の新兵だけだ。",
+        "completion": "通る手応えがあっただろう？本物なら、レイド全員が振るう十四呼吸の間だ。そしてまた皮が閉じる。この教えを忘れるな。監督が必ず試してくる。",
+        "objectives": {
+          "0": {
+            "label": "召集兵団の武器棚からシャードパイクを取った"
+          },
+          "1": {
+            "label": "藁の監督のランタンを消した"
+          },
+          "2": {
+            "label": "板が落ちている間に当てた打撃"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "監督のかけら",
+        "text": "奴は毎週立ち上がり、我々は毎週また叩き伏せる。それには討伐隊が要るが、召集兵団だけでは揃えられない。次にバルガスへ挑む討伐隊を見つけて、奴を倒す手助けをしろ、{playerName}。奴を斬るもよし、斬る者を守るもよし、癒すもよし。奴と戦った者の手はすべて数に入る。奴が倒れたら、戻って私に報告しろ。召集兵団は討ち取るたびに払う。",
+        "completion": "再び倒したか。しかもお前はその戦いにいた。今夜のうちにフェンブリッジへ報告を送る。こんな辺境では財布も薄いが、これはお前のものだ。奴がまた立ち上がったら戻って来い。",
+        "objectives": {
+          "0": {
+            "label": "バルガスを討伐"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "嵌め込み職人の未払い",
+        "text": "あの眼窩にバロウグラスを据えたのは俺だ。レンズを研ぎ、座らせ、楔で正しく固めた。塚の主たちは銅貨一枚も払わず、いま俺の仕事が湿地を踏み均して歩き回っている。俺のシャードパイクを持って行け。石突きを突き立て、穂先を据えて、どれだけかかろうと保て。腕が定まったら、それを眼に通せ。彼のまとう皮はあの欠片に縛られている、{playerName}：盲目にすれば、湿地のあらゆる刃がようやく通る。",
+        "completion": "手応えがあっただろう？四十年分の利息、眼窩を通して払わせた。パイクはあんたのものだ。彼は治る、いつもそうだ。だから気が向いたらまた取り立てに行けばいい。",
+        "objectives": {
+          "0": {
+            "label": "番人の眼を潰す"
           }
         }
       },
@@ -23298,6 +28287,12 @@ export const ja_JP: EnTranslations = {
           },
           "7": {
             "label": "沈んだ砦"
+          },
+          "8": {
+            "label": "塚山の領域"
+          },
+          "9": {
+            "label": "星落ちのクレーター"
           }
         }
       },
@@ -23655,6 +28650,39 @@ export const ja_JP: EnTranslations = {
             "label": "ガントレット"
           }
         }
+      },
+      "goldcrest_harbor": {
+        "name": "Goldcrest Harbor",
+        "welcome": "Goldcrest Harbor, seat of the World Market. Every road, tide and ledger in the realm meets here.",
+        "pois": {
+          "0": {
+            "label": "The Grand Gate"
+          },
+          "1": {
+            "label": "Grand Plaza"
+          },
+          "2": {
+            "label": "The Goldcrest Exchange"
+          },
+          "3": {
+            "label": "Market Ward"
+          },
+          "4": {
+            "label": "Harbor Ward"
+          },
+          "5": {
+            "label": "Highcrown Citadel"
+          },
+          "6": {
+            "label": "The Lightspire"
+          },
+          "7": {
+            "label": "The Gold Light"
+          },
+          "8": {
+            "label": "The Golden Span"
+          }
+        }
       }
     },
     "dungeons": {
@@ -23710,7 +28738,7 @@ export const ja_JP: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "ワイルドハート盆地",
-        "enterText": "温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。",
+        "enterText": "偶像の口をくぐると、盆地を見下ろす高い岩棚に出た。崖の縁から滝が轟き落ち、はるか下では何か巨大なものが浅瀬を渡っている。",
         "leaveText": "石の牙の下をくぐり、パームリーチの陽光へ戻った。"
       },
       "the_last_keep": {
@@ -23931,6 +28959,16 @@ export const ja_JP: EnTranslations = {
         "sender": "取引所仲買人",
         "subject": "取引所でのご購入品",
         "body": "取引は決済され、品物はあなたのものです。同封の小包には、あなたが代金を支払ったまさにその品が入っています。出品の瞬間から支払いが確定するまで、取引所が責任を持って預かっていました。\n\nこの取引の記録は取引所の台帳に残ります。\n\n- 取引所仲買人"
+      },
+      "membership_token_delivery": {
+        "sender": "レイヴンポスト",
+        "subject": "メンバーシップトークンのお届け",
+        "body": "購入したトークンを同封しました。使用するとアカウントのメンバーシップ期間に30日が追加されます。ほかの冒険者と取引することもできます。"
+      },
+      "membership_annual_reward": {
+        "sender": "レイヴンポスト",
+        "subject": "年間メンバーシップの騎乗動物",
+        "body": "年間メンバーシップの支払いが完了しました。戦車の鍵を同封しました。所有するには鍵をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。"
       },
       "woc_market_return": {
         "sender": "取引所仲買人",
@@ -24381,6 +29419,7 @@ export const ja_JP: EnTranslations = {
     "mailboxName": "メールボックス",
     "noticeboardName": "掲示板",
     "farmPatchName": "菜園",
-    "realmBuilderMonumentName": "王国建設者の記念碑"
+    "realmBuilderMonumentName": "王国建設者の記念碑",
+    "musterRackName": "召集兵団の武器棚"
   }
 };

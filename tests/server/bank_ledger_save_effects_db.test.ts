@@ -9,6 +9,10 @@ const h = vi.hoisted(() => {
   const bootCalls: string[] = [];
   const bootQuery = vi.fn((sql: string, values?: unknown[]) => {
     bootCalls.push(String(sql));
+    // Empty legacy edge tables still return a completed checkpoint row.
+    if (String(sql).includes('UPDATE account_social_migration_progress SET')) {
+      return Promise.resolve({ rows: [{ complete: true }], rowCount: 1 });
+    }
     if (String(sql).includes("to_regclass('public.rate_limits')")) {
       return Promise.resolve({ rows: [{ reg: 'public.rate_limits' }], rowCount: 1 });
     }

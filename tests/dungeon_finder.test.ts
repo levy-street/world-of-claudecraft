@@ -8,9 +8,10 @@ import {
   FINDER_ACTIVITIES,
   FINDER_PRE_SPEC_ROLES,
   finderActivity,
+  finderEncounterBodyIds,
 } from '../src/sim/content/dungeon_finder';
 import { FIRST_TALENT_LEVEL, type Role, TALENTS } from '../src/sim/content/talents';
-import { DUNGEONS } from '../src/sim/data';
+import { DUNGEONS, MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
   assignFinderRoles,
@@ -160,14 +161,99 @@ describe('finder catalogue metadata', () => {
     }
   });
 
-  it('every catalogued dungeon id and encounter mob id exists in the content tables', async () => {
-    const { DUNGEONS, MOBS } = await import('../src/sim/data');
+  it('every catalogued dungeon id and encounter mob id exists in the content tables', () => {
     for (const a of FINDER_ACTIVITIES) {
       expect(DUNGEONS[a.dungeonId], a.dungeonId).toBeDefined();
       expect(DUNGEONS[a.entranceDungeonId], a.entranceDungeonId).toBeDefined();
       for (const e of a.encounters) expect(MOBS[e.mobId], e.mobId).toBeDefined();
       expect(a.encounters.some((e) => e.final)).toBe(true);
     }
+  });
+
+  it('lists the Mere Hydra as the second Drowned Temple boss on both difficulties', () => {
+    for (const id of ['drowned_temple_normal', 'drowned_temple_heroic']) {
+      const a = finderActivity(id);
+      // Route order: the Prism Stair to the Colossus rises only once the
+      // Hydra's pack is dead (the prism_stair_rise gate, pinned below).
+      expect(
+        a?.encounters.map((e) => e.mobId),
+        id,
+      ).toEqual(['choirmother_selthe', 'mere_hydra_head_center', 'tideglass_colossus', 'ysolei']);
+      expect(
+        a?.encounters.filter((e) => e.final).map((e) => e.mobId),
+        id,
+      ).toEqual(['ysolei']);
+      const hydra = a?.encounters[1];
+      expect(hydra?.otherBodyIds, id).toEqual(['mere_hydra_head_left', 'mere_hydra_head_right']);
+      expect(hydra?.mechanics, id).toEqual([
+        'hydra_three_elements',
+        'hydra_tsunami',
+        'hydra_combined_breath',
+        'hydra_regrowth',
+      ]);
+      expect(hydra ? finderEncounterBodyIds(hydra) : [], id).toEqual([
+        'mere_hydra_head_center',
+        'mere_hydra_head_left',
+        'mere_hydra_head_right',
+      ]);
+    }
+    // The Finder shows the encounter under its own mob's name, and that name
+    // is the boss's, never a head's.
+    expect(MOBS.mere_hydra_head_center.name).toBe('Mere Hydra');
+    // Where it sits on the route, from the dungeon's own gates and placements.
+    const temple = DUNGEONS.drowned_temple;
+    const stair = temple.gates?.find((g) => g.id === 'prism_stair_rise');
+    expect(stair?.packs).toContain('hydra');
+    const hydraPack = temple.spawns.filter((s) => s.packId === 'hydra').map((s) => s.mobId);
+    expect(hydraPack.sort()).toEqual([
+      'mere_hydra_head_center',
+      'mere_hydra_head_left',
+      'mere_hydra_head_right',
+    ]);
+    // Selthe's kill opens the Court Stairs toward the pool; the Colossus's
+    // ward sits past the stair the Hydra's death raises.
+    expect(temple.gates?.find((g) => g.id === 'court_stair_west')?.bosses).toEqual([
+      'choirmother_selthe',
+    ]);
+    expect(temple.gates?.find((g) => g.id === 'prism_ward')?.sealWhileEngaged).toBe(
+      'tideglass_colossus',
+    );
+  });
+
+  it('a boss of several bodies names real, distinct bodies its own dungeon places once', () => {
+    const several: string[] = [];
+    for (const a of FINDER_ACTIVITIES) {
+      const owned = new Set<string>();
+      for (const e of a.encounters) {
+        const bodies = finderEncounterBodyIds(e);
+        expect(bodies[0]).toBe(e.mobId);
+        if (e.otherBodyIds === undefined) {
+          expect(bodies).toEqual([e.mobId]);
+          continue;
+        }
+        several.push(`${a.id}:${e.mobId}`);
+        expect(e.otherBodyIds.length, `${a.id}/${e.mobId}`).toBeGreaterThan(0);
+        expect(new Set(bodies).size, `${a.id}/${e.mobId} distinct`).toBe(bodies.length);
+        for (const bodyId of bodies) {
+          expect(MOBS[bodyId], bodyId).toBeDefined();
+          // Every body wears the boss's name, so no surface can show another.
+          expect(MOBS[bodyId].name, bodyId).toBe(MOBS[e.mobId].name);
+          expect(
+            DUNGEONS[a.dungeonId].spawns.filter((sp) => sp.mobId === bodyId).length,
+            `${a.id}: ${bodyId} placements`,
+          ).toBe(1);
+          expect(owned.has(bodyId), `${a.id}: ${bodyId} in one encounter`).toBe(false);
+          owned.add(bodyId);
+        }
+      }
+      // No other encounter of the activity is one of those bodies.
+      for (const e of a.encounters)
+        if (e.otherBodyIds === undefined) expect(owned.has(e.mobId), e.mobId).toBe(false);
+    }
+    expect(several).toEqual([
+      'drowned_temple_normal:mere_hydra_head_center',
+      'drowned_temple_heroic:mere_hydra_head_center',
+    ]);
   });
 
   it('the raid entrance points at the Abandoned Crypt overworld door', () => {
@@ -256,15 +342,21 @@ describe('finder catalogue metadata', () => {
       expect(a?.kind).toBe('dungeon');
       expect(a?.dungeonId).toBe('wildheart_basin');
       expect(a?.entranceDungeonId).toBe('wildheart_basin');
+      // The rework: the three boss cores (design section 5), no trash rows.
       expect(a?.encounters.map((e) => e.mobId)).toEqual([
-        'wildheart_stalker',
-        'wildheart_ravager',
-        'wildheart_hexcaller',
         'wildheart_beastmaster',
+        'the_gorgebloom',
         'wildheart_high_priest',
       ]);
       expect(a?.encounters.at(-1)?.final).toBe(true);
     }
+    // Heroic adds each boss's twists; the normal preview never carries them.
+    const twists = ['heel_frenzied_bond', 'burrowing_seeds', 'twin_prey_ambush'];
+    const normalMechs = normal?.encounters.flatMap((e) => e.mechanics) ?? [];
+    for (const t of twists) expect(normalMechs).not.toContain(t);
+    heroic?.encounters.forEach((e, i) => {
+      expect(e.mechanics).toContain(twists[i]);
+    });
     expect(normal?.lockout).toBe('none');
     expect(heroic?.lockout).toBe('daily');
   });

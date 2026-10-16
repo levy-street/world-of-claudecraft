@@ -295,6 +295,19 @@ describe('PooledVisualLifecycle (the renderer take/store halves)', () => {
     expect(visual.setFarBakeGate).toHaveBeenCalledWith(gate);
   });
 
+  it('take and store both forget the last entity presentation state', () => {
+    const pool = new CharacterVisualPool<ReturnType<typeof stubVisual>>();
+    const lifecycle = new PooledVisualLifecycle(pool, {
+      farBakeGate: () => null,
+      maxPooled: () => 8,
+    });
+    const visual = { ...stubVisual(), resetForReuse: vi.fn() };
+    lifecycle.store('mob:bloom', visual);
+    expect(visual.resetForReuse).toHaveBeenCalledTimes(1);
+    expect(lifecycle.take('mob:bloom', 0)).toBe(visual);
+    expect(visual.resetForReuse).toHaveBeenCalledTimes(2);
+  });
+
   it('store parks the visual detached and hidden under the live cap', () => {
     const pool = new CharacterVisualPool<ReturnType<typeof stubVisual>>();
     let cap = 1;
@@ -319,6 +332,30 @@ describe('PooledVisualLifecycle (the renderer take/store halves)', () => {
     cap = 2;
     lifecycle.store('mob:wolf', stubVisual());
     expect(pool.size).toBe(2);
+  });
+
+  it('store tells a visual it is parked, before the pool can evict it; a visual with nothing to drop needs no hook', () => {
+    // guards: a body streamed out with a far bake still queued for it kept its place in
+    // the line, ahead of the looks visible bodies were waiting on
+    const pool = new CharacterVisualPool<ReturnType<typeof stubVisual>>();
+    const lifecycle = new PooledVisualLifecycle(pool, {
+      farBakeGate: () => null,
+      maxPooled: () => 0,
+    });
+    const order: string[] = [];
+    const waiting = {
+      ...stubVisual(),
+      parked: vi.fn(() => order.push('parked')),
+      dispose: vi.fn(() => order.push('dispose')),
+    };
+    // cap 0: pooling is off, so the incoming visual is disposed by the store itself
+    lifecycle.store('mob:wolf', waiting);
+    expect(waiting.parked).toHaveBeenCalledTimes(1);
+    expect(order).toEqual(['parked', 'dispose']);
+    // the hook is optional: a visual without one parks as before
+    const plain = stubVisual();
+    expect(() => lifecycle.store('mob:bear', plain)).not.toThrow();
+    expect(plain.dispose).toHaveBeenCalledTimes(1);
   });
 });
 

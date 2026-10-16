@@ -189,12 +189,15 @@ export function blankEntity(id: number): Entity {
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
     evadeStall: 0,
+    chaseRoute: undefined,
+    routeDenied: undefined,
     chaseStall: 0,
     evadeEpoch: 0,
     chainPullInbound: false,
     // The instance combat hold's pin clock (instances/instance_combat_hold.ts):
     // present from birth on the mirror too, so both hosts build one entity shape.
     evadeInPlace: undefined,
+    gateSealTick: undefined,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -221,6 +224,10 @@ export function blankEntity(id: number): Entity {
     skinCatalog: 'class',
     skin: 0,
     mountKey: '',
+    // The active cosmetic buddy, the mountKey twin: an identity field the
+    // snapshot mirror fills, blank on a fresh shell (src/sim/content/buddies.ts).
+    buddyKey: '',
+    buddyAutoloot: false,
     mountCastRemaining: 0,
     mountCastKey: '',
     mainhandItemId: null,

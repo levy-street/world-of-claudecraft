@@ -10,6 +10,7 @@
 
 import { DUNGEONS } from './data';
 import { MAX_AGGRO_RADIUS } from './mob/locomotion';
+import { dungeonDoorPos, movesKind, type ObjectMoves } from './moved_objects';
 
 // The clear radius around a door is exactly the aggro-radius clamp (imported, not a
 // re-typed literal), so a mob spawned strictly outside this ring can never aggro a
@@ -38,13 +39,42 @@ export const DUNGEON_DOORS: ReadonlyArray<{ x: number; z: number }> = (() => {
   return doors;
 })();
 
+// The doors as a world with moved doors (moved_objects.ts) stands them: the
+// shipped list itself when the world moves none. Memoized on the frozen moves
+// record, so a camp loop asks once per world.
+const MOVED_DOORS = new WeakMap<ObjectMoves, ReadonlyArray<{ x: number; z: number }>>();
+function doorsFor(moves: ObjectMoves | undefined): ReadonlyArray<{ x: number; z: number }> {
+  if (!moves || !movesKind(moves, 'dungeonDoor')) {
+    return DUNGEON_DOORS;
+  }
+  const hit = Object.isFrozen(moves) ? MOVED_DOORS.get(moves) : undefined;
+  if (hit) return hit;
+  const seen = new Set<string>();
+  const doors: { x: number; z: number }[] = [];
+  for (const d of Object.values(DUNGEONS)) {
+    if (d.overworldDoor === false || !d.doorPos) continue;
+    const door = dungeonDoorPos(moves, d);
+    const key = `${door.x},${door.z}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    doors.push({ x: door.x, z: door.z });
+  }
+  if (Object.isFrozen(moves)) MOVED_DOORS.set(moves, doors);
+  return doors;
+}
+
 // If (x,z) falls inside any door's clear ring, push it straight out to the ring's
 // edge (along the door-to-point direction); a point exactly on a door is pushed
 // along +x so the result is deterministic. Points already clear are returned as-is.
-export function projectOutsideDungeonDoors(x: number, z: number): { x: number; z: number } {
+// `moves` is the spawning world's moved objects: a moved door keeps its ring.
+export function projectOutsideDungeonDoors(
+  x: number,
+  z: number,
+  moves?: ObjectMoves,
+): { x: number; z: number } {
   let px = x;
   let pz = z;
-  for (const door of DUNGEON_DOORS) {
+  for (const door of doorsFor(moves)) {
     const dx = px - door.x;
     const dz = pz - door.z;
     const dist = Math.hypot(dx, dz);

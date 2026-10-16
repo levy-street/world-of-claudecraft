@@ -1,0 +1,11 @@
+{
+  "note": "The Fenbridge muster grapnel (Balgath loot): ONE GLB, root Muster_Grapnel (origin at the ring eye) with the Grapnel_Hook mesh. The raw GLB comes from the deterministic Blender factory scripts/assets/muster_grapnel/model.py, driven by export_muster_grapnel.mjs, which stamps the source fingerprint and runs this spec. Vertex-coloured, texture-free (no KTX2 step), original work with no reference image.",
+  "items": [
+    {
+      "src": "tmp/asset_src/muster_grapnel/muster_grapnel.glb",
+      "out": "models/vfx/muster_grapnel.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

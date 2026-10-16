@@ -95,6 +95,10 @@ const questStringsEn = {
       rewards: 'Rewards',
       xpReward: '{xp} experience',
       itemReward: 'Item reward:',
+      // Choose-one quest rewards: the turn-in heading, and the preview heading
+      // on the accept step and in the quest log.
+      chooseReward: 'Choose your reward:',
+      rewardChoices: 'You will be able to choose one of these rewards:',
       objectiveProgress: '{label}: {current}/{total}',
       requiresLevel: 'Requires Level {level}',
     },
@@ -488,6 +492,7 @@ const questStringsEn = {
       incomplete: 'That quest is not complete.',
       giverMissing: 'That quest giver is not nearby.',
       turnInMissing: 'That quest turn-in is not nearby.',
+      rewardNotOffered: 'That reward is not offered.',
       tooFar: 'Too far away.',
       escortAway: 'Your escort is not at their post right now. They will return there shortly.',
     },

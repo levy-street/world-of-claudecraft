@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Vildhjertebassinet',
-    desc: 'Kendetegnende våben fra Zulgar og Hugtandherre Bæstmester.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroisk: Vildhjertebassinet',
-    desc: 'Episke genstande kun fra heroisk tilstand, fra Zulgar, Bassinets Stemme.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-raid',
@@ -61,6 +59,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, den Vågnende Tinde',
     desc: 'Personligt episk bytte fra den Vågnende Tindes verdensboss.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, den Begravede Formand',
+    desc: 'Bytte slæbt op af gravhøjene i Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Det Sammenstyrtede Relikvarium',

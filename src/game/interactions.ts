@@ -1,7 +1,9 @@
+import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
 import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { ESCORTS } from '../sim/data';
+import { kitUsableNow } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
   dist2d,
@@ -164,6 +166,16 @@ export function hoverCursorKind(
   // An escortee is a quest NPC that happens to be mob-kind; hovering it must
   // read as interactive, or the only cue that it can be talked to is gone.
   if (isEscorteeEntity(e)) return 'friendly';
+  // A usable encounter body the player cannot attack (a Remembrance Candle in
+  // Morthen's Rite) is something to USE: the gauntlet says so where the plain
+  // arrow said nothing. An attackable one (a Soul Brazier) already returned
+  // the attack cursor above.
+  if (kitUsableNow(e)) return 'friendly';
+  // The muster's weapon rack is scenery that DOES something (a click lends a pike), and
+  // the gauntlet is the one cue that says so before anyone reads the prompt.
+  if (e.kind === 'object' && e.templateId === MUSTER_RACK_TEMPLATE_ID && e.lootable) {
+    return 'friendly';
+  }
   if (e.kind === 'player' && e.id !== playerId) return 'friendly';
   void partyMemberIds;
   return 'default';

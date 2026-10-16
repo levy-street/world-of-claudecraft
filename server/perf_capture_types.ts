@@ -14,6 +14,16 @@ export interface PerfCaptureResult {
   aggroVisitsMaxPerTick: number;
   threatVisitsTotal: number;
   threatVisitsMaxPerTick: number;
+  routePlansTotal: number;
+  routePlansMaxPerTick: number;
+  routeNodesTotal: number;
+  routeNodesMaxPerTick: number;
+  routeFailedTotal: number;
+  routeFailedMaxPerTick: number;
+  routeDeferredTotal: number;
+  routeDeferredMaxPerTick: number;
+  sightQueriesTotal: number;
+  sightQueriesMaxPerTick: number;
   movementConsumedTotal: number;
   movementStarvedTotal: number;
   movementExtrapolatedTotal: number;

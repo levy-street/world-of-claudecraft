@@ -4,7 +4,9 @@ import type { AnimState } from '../src/render/characters/anim_state';
 import type { CharacterVisual as Visual } from '../src/render/characters/visual';
 
 const NATIVE = 'Warrior_Bladestorm_Loop';
+const KAYKIT_FIXTURE_KEY = 'player_warrior';
 let CharacterVisual: typeof Visual;
+let restoreFixture: () => void;
 function source() {
   const scene = new THREE.Group();
   const root = new THREE.Group();
@@ -40,6 +42,16 @@ function source() {
 }
 beforeAll(async () => {
   vi.resetModules();
+  const { KAYKIT_KNIGHT_WARRIOR, VISUALS } = await import('../src/render/characters/manifest');
+  const original = VISUALS[KAYKIT_FIXTURE_KEY];
+  // This suite pins the retained KayKit native clips, including the short
+  // entry blends keyed to the historical warrior identity. Install that
+  // exact definition before preload instead of mixing these clips with the
+  // live WOC player's distinct vocabulary and rig policy.
+  VISUALS[KAYKIT_FIXTURE_KEY] = KAYKIT_KNIGHT_WARRIOR;
+  restoreFixture = () => {
+    VISUALS[KAYKIT_FIXTURE_KEY] = original;
+  };
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn(() => Promise.resolve(source())),
     loadHdr: vi.fn(() => new Promise(() => undefined)),
@@ -61,6 +73,7 @@ beforeAll(async () => {
   ({ CharacterVisual } = await import('../src/render/characters/visual'));
 });
 afterAll(() => {
+  restoreFixture?.();
   vi.restoreAllMocks();
   vi.doUnmock('../src/render/assets/loader');
   vi.resetModules();
@@ -92,7 +105,7 @@ type Peek = {
   playOneShot(name: string, scale: number): void;
 };
 function setup() {
-  const visual = new CharacterVisual('player_warrior', 0xffffff, 0);
+  const visual = new CharacterVisual(KAYKIT_FIXTURE_KEY, 0xffffff, 0);
   return { visual, peek: visual as unknown as Peek };
 }
 

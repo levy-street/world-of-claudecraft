@@ -77,6 +77,7 @@ export function socialDot(online: boolean, status: string | undefined): string {
 }
 
 export interface FriendRow {
+  tier?: 'bound';
   name: string;
   cls: string;
   level: number;
@@ -94,6 +95,7 @@ export interface FriendRow {
 export function friendRows(social: SocialInfo | null): FriendRow[] {
   const friends = social?.friends ?? [];
   return friends.map((f: FriendInfo) => ({
+    ...(f.tier === 'bound' ? { tier: f.tier } : {}),
     name: f.name,
     cls: f.cls,
     level: f.level,
@@ -113,6 +115,15 @@ export interface IgnoreRow {
 export function blockRows(social: SocialInfo | null): IgnoreRow[] {
   const blocks = social?.blocks ?? [];
   return blocks.map((b) => ({ name: b.name }));
+}
+
+export function socialPageControls(social: SocialInfo | null, kind: 'friend' | 'block') {
+  const cursor = kind === 'friend' ? social?.friendsCursor : social?.blocksCursor;
+  const next = kind === 'friend' ? social?.friendsNextCursor : social?.blocksNextCursor;
+  return {
+    first: typeof cursor === 'number' && cursor > 0,
+    next: typeof next === 'number' && Number.isSafeInteger(next) && next > 0 ? next : null,
+  };
 }
 
 /** Blocked-tab rows in source order: the IGNORED list (chat-only, the light tier). */

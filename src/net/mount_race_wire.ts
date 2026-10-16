@@ -111,3 +111,22 @@ export function applyMountRaceEventToMirror(
   }
   return mirror;
 }
+
+/** The mirror counted down to the caller's `nowMs` (the read ClientWorld's
+ *  mountRaceView() serves): the countdown and lap deadlines turned back into
+ *  ticks left, null when no race runs. Moved here whole from online.ts. */
+export function mountRaceViewAt(s: MountRaceMirror | null, nowMs: number): MountRaceView | null {
+  if (!s) return null;
+  const goMs = Math.max(0, s.goDeadlineMs - nowMs);
+  const remMs = Math.max(0, s.deadlineMs - nowMs);
+  return {
+    raceId: s.raceId,
+    phase: s.phase,
+    clearedMask: s.clearedMask,
+    cleared: s.cleared,
+    jumpsTotal: s.jumpsTotal,
+    goTicksLeft: s.phase === 'countdown' ? Math.round((goMs / 1000) * TICK_RATE) : 0,
+    ticksLeft: s.phase === 'racing' ? Math.round((remMs / 1000) * TICK_RATE) : s.timeLimitTicks,
+    timeLimitTicks: s.timeLimitTicks,
+  };
+}

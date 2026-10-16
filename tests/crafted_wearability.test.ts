@@ -178,6 +178,13 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // gap-fill drops at normal+heroic): 28 new gated equippables sourced at
     // the level-29/33 raid rungs, every one deriving the same level-20 gate;
     // no existing shelf row moved.
+    // Re-pinned 515 -> 519 for Balgath, the One-Eyed Foreman (the Mirefen world
+    // boss): his four ungated spoils (foremans_barrowmaul, loomshard_eye,
+    // barrowhide_pauldrons, mirestone_stride) are epics sourced at the level-20
+    // boss, so they join this population and derive the same level-20 gate the
+    // sweep below asserts. His three Foreman's Wage rares do NOT: their rows carry
+    // LootEntry.maxPlayerLevel 13, so item_level.ts sources them at 13 and they
+    // stay level-13 content outside this shelf. No existing shelf row moved.
     // The Crucible crafting tier adds 33 items without moving any old shelf gate.
     expect(Object.keys(CRUCIBLE_COLLECTION_ITEMS)).toHaveLength(33);
     // Re-pinned 515 -> 533 by the trinket slot (PR 4173): 18 trinkets sourced
@@ -188,7 +195,16 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // deriving the same level-20 gate; no existing shelf row moved.
     // Re-pinned 672 -> 768 at the release/v0.44.0 merge into feature/buried-hoards (2026-09-28): the 96 Buried Hoard boss
     // loot pieces (content/hoard_loot.ts) join on the same level-20 gate.
-    expect(shelf.length).toBe(768);
+    // Re-pinned 768 -> 814 by the quest blue rewards: the 46 rares generated for
+    // the twelve level-20 quests that reward a blue (content/quest_leveling_gear.ts)
+    // source at 20 and join on the same gate; no existing shelf row moved.
+    // Re-pinned 814 -> 832 by the leather caster role and the own-armor rule:
+    // 18 more level-20 quest rares on the same gate.
+    // Re-pinned 832 -> 842 on the v0.45.0 integration: the Mirefen world boss's
+    // four level-20 drops plus Balgath's loot (five trinkets and the Craterglass
+    // Stave), the same +10 its own branch measured (768 -> 778).
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 897.
+    expect(shelf.length).toBe(897);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

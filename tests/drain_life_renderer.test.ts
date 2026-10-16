@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { DrainChannelStopLatch } from '../src/render/drain_channel_visual_core';
 import { Renderer } from '../src/render/renderer';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { withMeleeContact } from './helpers/renderer_contact';
 
 interface DrainRendererHarness {
   handleEvent(event: SimEvent): void;
@@ -44,6 +45,7 @@ function makeHarness() {
   renderer.time = 1;
   renderer.triggerAttack = vi.fn();
   renderer.triggerHit = vi.fn();
+  withMeleeContact(renderer);
   renderer.abilityVfx = { handleSpellfx: vi.fn(() => false), onDamage: vi.fn() };
   return { renderer, drainBeam, demonicDrainBeam, drainLifeTick };
 }

@@ -1,0 +1,21 @@
+export const courierStrings = {
+  title: 'Courier',
+  close: 'Close courier',
+  ready: 'Ready for a delivery',
+  outbound: 'Flying to the bank',
+  returning: 'Bringing your items back',
+  waiting: 'Waiting to return your items',
+  bags: 'Send to bank',
+  bank: 'Bring from bank',
+  cargo: 'Courier inventory',
+  empty: 'No items',
+  send: 'Send courier',
+  selected: '{count} / {limit} stacks selected',
+  select: 'Select {item}, {count}',
+  selectedItem: 'Deselect {item}, {count}',
+  instructions:
+    'Select whole stacks. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.',
+  membership: 'Renew your membership to start another trip.',
+  cargoSafe: 'Carried items stay with the courier until there is room in your bags.',
+  unavailable: 'Summon your courier to plan a delivery.',
+};

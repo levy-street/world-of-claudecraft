@@ -27,11 +27,13 @@ import {
   DEFAULT_MOUNT,
   DEVELOPER_MOUNTS,
   isDeveloperMount,
+  MEMBERSHIP_REWARD_MOUNTS,
   MOUNT_KEYS,
   MOUNTS,
   mountDef,
   normalizeMountKey,
   normalizeSelectedMount,
+  REFERRAL_REWARD_MOUNTS,
   TRAINING_MOUNT_KEY,
 } from '../src/sim/content/mounts';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
@@ -107,10 +109,10 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly eleven mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(11);
+  it('keeps the horse first and appends the two referral milestone mounts', () => {
+    expect(MOUNT_KEYS).toHaveLength(13);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
-    expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
+    expect(MOUNT_KEYS.slice(-2)).toEqual(['referral_tank', 'referral_raptor']);
     expect(DEFAULT_MOUNT).toBe('valorsteed');
     // Every developer-only mount is a real catalog key, and the tank keeps the
     // tail so a new PLAYER-facing mount always lands above it.
@@ -179,13 +181,17 @@ describe('mount reins items (the collection: owning the item is owning the mount
   const reinsFor = (key: string) =>
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
-  it('every mount has exactly one reins item; player reins are unbound, dev mounts stay bound', () => {
+  it('each mount has one reins item; developer and annual rewards remain soulbound', () => {
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (isDeveloperMount(key)) {
+      if (
+        isDeveloperMount(key) ||
+        MEMBERSHIP_REWARD_MOUNTS.includes(key) ||
+        REFERRAL_REWARD_MOUNTS.includes(key)
+      ) {
         // Bound reins, for the same leak reason from different doors: a
         // developer-only mount has no player acquisition path, and the store
         // mount's reins is a real-money grant (server/claudium.ts). Either
@@ -251,20 +257,26 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // takes equal-rate secondary paths to both rather than a fifth signature
     // mount (owner call, 2026-08-01). Rate parity below is what keeps that
     // honest: every path still pays the one rarity rate.
-    // NO SOURCE YET (owner call, 2026-08-04): the Drakemaw Raptor briefly took an
-    // open-world-rare path, dropping off the four Drakemaw Broodlords. That is
-    // reverted: the broodlord is the 90% source of the quest chain's own
-    // emberwing_scale, so hanging the only farmable epic mount on it camped the
-    // Drakemaw belt and tap-blocked every leveler questing through. The reins move
-    // to a dedicated world boss in a follow-up; until then the def ships with no
-    // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
-    // decision and never an accident: when the world boss lands, delete the entry
-    // and the rarity-derived rule below takes back over.
-    const NO_SOURCE_YET: readonly string[] = [
-      'reins_drakemaw_raptor',
-      'reins_goblin_rocket_sled',
-      'reins_rallycart_rxt',
-    ];
+    // NO SOURCE YET: a def that ships with no acquisition path at all, listed
+    // EXPLICITLY so a sourceless mount is a decision and never an accident. The
+    // Drakemaw Raptor used to head this list (owner call, 2026-08-04: an
+    // open-world-rare path off the four Drakemaw Broodlords camped the Drakemaw
+    // belt and tap-blocked every leveler questing through, so it was reverted and
+    // the reins were held for a dedicated world boss). THIS change is that
+    // follow-up, so its entry is gone and WORLD_BOSS_SOURCES below carries it.
+    const NO_SOURCE_YET: readonly string[] = ['reins_goblin_rocket_sled', 'reins_rallycart_rxt'];
+    // WORLD-BOSS MOUNTS (2026-08-25): the Drakemaw Raptor's reins ride the Mirefen
+    // world boss Balgath's table as a personal, ungrouped 1% draw (content/zone2.ts),
+    // the "dedicated world boss" the 2026-08-04 owner call held them back for after
+    // the broodlord path camped the Drakemaw belt. A world boss is the one MOB table
+    // a mount may sit on: the kill takes a raid, the loot is personal, and the
+    // world-boss lockout makes it once a day per character, so the 1% is a daily roll
+    // rather than a farm. Pinned EXPLICITLY (boss id and rate) so a second table or a
+    // rate change is a decision here, never an accident.
+    const WORLD_BOSS_MOUNT_CHANCE = 0.01;
+    const WORLD_BOSS_SOURCES: Record<string, readonly string[]> = {
+      reins_drakemaw_raptor: ['balgath_cyclops'],
+    };
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -276,14 +288,27 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (key === 'valorsteed') continue; // the purchase, not a drop
       if (key === 'avian_strider') continue; // the Rift Watch Champion purchase, pinned above
       if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
+      if (MEMBERSHIP_REWARD_MOUNTS.includes(key)) continue; // paid receipt delivery, pinned below
+      if (REFERRAL_REWARD_MOUNTS.includes(key)) continue; // transactional milestone delivery, referral_rewards.test.ts
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
-      // No mount is ever on a NORMAL mob table, at any rarity.
+      // No mount is ever on a NORMAL mob table, at any rarity. The only mob tables a
+      // mount may ride are the pinned world bosses', and there it is an ungrouped
+      // draw at the world-boss rate.
+      const bossSources = WORLD_BOSS_SOURCES[itemId] ?? [];
       for (const mob of Object.values(MOBS)) {
-        expect(
-          mob.loot.find((l) => l.itemId === itemId),
-          `${itemId} must not be on normal table ${mob.id}`,
-        ).toBeUndefined();
+        const row = mob.loot.find((l) => l.itemId === itemId);
+        if (bossSources.includes(mob.id)) {
+          expect(mob.worldBoss, `${mob.id} carries a mount, so it must be a world boss`).toBe(true);
+          expect(row, `${itemId} is missing from world boss ${mob.id}`).toBeDefined();
+          expect(row?.chance, `${itemId} on ${mob.id} pays the world-boss rate`).toBe(
+            WORLD_BOSS_MOUNT_CHANCE,
+          );
+          expect(row?.rollGroup, `${itemId} is an independent draw`).toBeUndefined();
+          expect(row?.maxPlayerLevel, `${itemId} is for everyone who fought`).toBeUndefined();
+          continue;
+        }
+        expect(row, `${itemId} must not be on normal table ${mob.id}`).toBeUndefined();
       }
 
       const heroicEntries = Object.entries(HEROIC_BOSS_LOOT).flatMap(([bossId, entries]) =>
@@ -295,9 +320,10 @@ describe('mount reins items (the collection: owning the item is owning the mount
       // every catalog reins below has an in-world story or is dev-only.
 
       if (rarity === 'epic') {
-        // Rift S clears are the sole source, EXCEPT a mount held sourceless on
-        // purpose. Either way it stays out of every heroic table, so the heroic
-        // tier's mount supply is unchanged.
+        // Rift S clears are the sole source, EXCEPT a world-boss mount (whose ONE
+        // source is its boss) and a mount held sourceless on purpose. Either way it
+        // stays out of every heroic table, so the heroic tier's mount supply is
+        // unchanged.
         expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
         if (itemId === CASKET_MOUNT_REINS_ITEM_ID) {
           // The Treasure Casket's rare mount: the casket is its sole source,
@@ -315,7 +341,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
         if (NO_SOURCE_YET.includes(itemId)) {
           // The mob-table sweep above already proved it drops off nothing. Pin
           // the remaining three pools too, so "no path" means no path: the day
-          // its world boss lands, it gets ONE source, not a quiet second one.
+          // its source lands, it gets ONE, not a quiet second one.
           for (const [pool, name] of [
             [RIFT_EPIC_MOUNT_REINS, 'rift S'],
             [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
@@ -324,6 +350,21 @@ describe('mount reins items (the collection: owning the item is owning the mount
             expect(
               pool as readonly string[],
               `${itemId} has no source yet: not in ${name}`,
+            ).not.toContain(itemId);
+          }
+          continue;
+        }
+        if (bossSources.length > 0) {
+          // The mob-table sweep above proved it drops off exactly its boss. Pin the
+          // three rift pools too, so ONE source means one: never a quiet second door.
+          for (const [pool, name] of [
+            [RIFT_EPIC_MOUNT_REINS, 'rift S'],
+            [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
+            [RIFT_GREEN_MOUNT_REINS, 'rift green'],
+          ] as const) {
+            expect(
+              pool as readonly string[],
+              `${itemId} is a world-boss mount: not in ${name}`,
             ).not.toContain(itemId);
           }
           continue;
@@ -356,8 +397,8 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it.each([...DEVELOPER_MOUNTS])(
-    'keeps %s developer-only and absent from every normal acquisition table',
+  it.each([...DEVELOPER_MOUNTS, ...MEMBERSHIP_REWARD_MOUNTS, ...REFERRAL_REWARD_MOUNTS])(
+    'keeps %s absent from every normal acquisition table',
     (mountKey) => {
       const itemId = mountItemId(mountKey)!;
       const item = ITEMS[itemId] as MountItemDef;
@@ -782,10 +823,22 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     }
   });
 
-  it('the developer tank stays refused by the exchange pipes (still soulbound)', () => {
+  it('the annual reward tank stays refused by the exchange pipes (still soulbound)', () => {
     expect(guildBankPipeRefusal({ itemId: 'reins_terrorspark_groundshaker', count: 1 })).not.toBe(
       null,
     );
+  });
+
+  it('the annual tank remains owned and rideable after membership expires', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    sim.addItem('reins_terrorspark_groundshaker', 1, pid);
+    sim.setMembership(pid, 30);
+    sim.setMembership(pid, 0);
+    expect(mountOwned(sim.players.get(pid)!, 'terrorspark_groundshaker')).toBe(true);
+    summonMountItem(sim.ctx, pid, 'terrorspark_groundshaker');
+    finishTransition(sim, pid);
+    expect(sim.entities.get(pid)!.mountKey).toBe('terrorspark_groundshaker');
   });
 
   it('vendor sell still refuses reins (noVendorSell: sellValue 0 protects the collection)', () => {

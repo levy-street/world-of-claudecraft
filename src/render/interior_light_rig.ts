@@ -10,8 +10,10 @@
 // means in light.
 import * as THREE from 'three';
 import { sharedUniforms } from './gfx';
+import { SANCTUM_KEY_DIRECTION } from './gravewyrm_sanctum/sanctum_plan_core';
 import { applyIgnivarRaidLighting, type IgnivarRaidFogState } from './ignivar_raid_environment';
 import { RIM_GLOW_DEFAULT_COLOR } from './pbr_fragment_shader';
+import { BASIN_SUN_DIRECTION } from './wildheart_basin/basin_plan_core';
 
 /** Every fog scene state the renderer resolves to (single source of truth). */
 export type FogSceneState =
@@ -29,21 +31,20 @@ export type FogSceneState =
   | 'underwater'
   | 'rift'
   | 'practice'
-  | 'wildheartField'
+  | 'wildheartBasin'
+  | 'hollowCrypt'
+  | 'sunkenBastion'
+  | 'drownedTemple'
+  | 'gravewyrmSanctum'
   | 'lastkeep'
   | 'dawnhold';
 
-/** The states whose scene is open to the sky: the overworld, Wildheart's field
- *  and the Thornhollow Fields hollow keep the sky dome (hiding it there left a
- *  black void above the ramparts); every interior, the maze, the rift and the
- *  water hide it. */
+/** The states whose scene is open to the sky: the overworld and the
+ *  Thornhollow Fields hollow keep the sky dome (hiding it there left a black
+ *  void above the ramparts); every interior, the maze, the rift and the water
+ *  hide it, and the open-air dungeon fields carry their own sky. */
 export function isOpenAirFogState(state: FogSceneState): boolean {
-  return (
-    state === 'outdoor' ||
-    state === 'hoardValley' ||
-    state === 'wildheartField' ||
-    state === 'battleground'
-  );
+  return state === 'outdoor' || state === 'hoardValley' || state === 'battleground';
 }
 
 // dungeon interiors: kill the daylight so torchlight carries the scene
@@ -67,25 +68,95 @@ const YUMI_MAZE_SUN_INTENSITY = 1.32;
 const YUMI_MAZE_HEMI_INTENSITY = 0.38;
 const YUMI_MAZE_ENV_INTENSITY = 0.25;
 const YUMI_MAZE_RIM_BOOST = 1.7;
-// Wildheart's sunlit caldera: the legs carry what used to be a second
-// directional (0.88) and hemisphere (0.9) fill pair added by wildheart_props.ts
-// on top of these, folded in here so the light census never changes. The
-// fill sun cast no shadow, so it lit the faces the shadowed world sun leaves
-// dark (the gate arch fronts, the ground under the totems); the unshadowed
-// hemisphere takes that share and the sun a little less than the plain sum
-// (ground band measured at 41 before, 45 after, headless at the gate).
-const WILDHEART_SUN_INTENSITY = 2.4;
-const WILDHEART_HEMI_INTENSITY = 1.8;
-// Where the caldera's sun stands: the direction the removed fill pair aimed
-// from (position (-45, 72, -35) at target (0, 2, 135)), so the gate arch and
-// the totems keep their lit faces. The renderer's per-frame key-light aim
-// takes it in place of the world sun while the field is the fog state.
-export const WILDHEART_KEY_LIGHT_DIRECTION = new THREE.Vector3(-45, 70, -170).normalize();
-const WILDHEART_ENV_INTENSITY = 0.28;
-const WILDHEART_RIM_BOOST = 1.5;
-const WILDHEART_SUN_COLOR = 0xffd48c;
-const WILDHEART_HEMI_SKY_COLOR = 0xd8ebca;
-const WILDHEART_HEMI_GROUND_COLOR = 0x5b4a2d;
+// The Wildheart Basin: an OPEN-AIR jungle caldera on a humid gold-green
+// afternoon, under its own sky (render/wildheart_basin). The one sun is the
+// key light, warm gold and low in the south-west behind the Idol Maw (so the
+// falls' rainbows read from the maw), with a pale green-gold sky bounce off
+// the humid air and a mossy ground bounce off the canopy. The braziers and
+// the jaguar's eyes ride the light sink; nothing else lights the basin.
+// Golden hour: a strong warm key against a cool, low sky fill, so the light
+// has a side and a shadow side (the flat, front-lit noon it replaced read as
+// paper).
+const WILDHEART_SUN_INTENSITY = 3.2;
+const WILDHEART_HEMI_INTENSITY = 0.82;
+/** Where the afternoon sun hangs (from the ground toward it). The renderer's
+ *  per-frame key-light aim takes it in place of the world sun while the basin
+ *  is the fog state. */
+export const WILDHEART_KEY_LIGHT_DIRECTION = new THREE.Vector3(...BASIN_SUN_DIRECTION);
+const WILDHEART_ENV_INTENSITY = 0.32;
+const WILDHEART_RIM_BOOST = 1.6;
+const WILDHEART_SUN_COLOR = 0xffc075;
+const WILDHEART_HEMI_SKY_COLOR = 0x9fc3cf;
+const WILDHEART_HEMI_GROUND_COLOR = 0x3b4a23;
+// The Hollow Crypt: an OPEN-AIR necropolis under a vast moon. It hides the
+// world's day-night dome (its own moonlit sky rides the interior group, so the
+// look never depends on the realm's clock) and grades the one sun into a cold
+// moon key from behind the crag, with a violet sky bounce and an umber floor
+// bounce so the tallow lanterns carry the only warm tones.
+const HOLLOW_CRYPT_SUN_INTENSITY = 2.5;
+const HOLLOW_CRYPT_HEMI_INTENSITY = 0.95;
+const HOLLOW_CRYPT_ENV_INTENSITY = 0.42;
+const HOLLOW_CRYPT_RIM_BOOST = 2.1;
+const HOLLOW_CRYPT_SUN_COLOR = 0xbfd0ff;
+const HOLLOW_CRYPT_HEMI_SKY_COLOR = 0x5a64a0;
+const HOLLOW_CRYPT_HEMI_GROUND_COLOR = 0x4a3d45;
+/** Where the moon hangs (from the ground toward it): north-north-west over
+ *  the crag, low enough to throw long shadows toward the entrance. */
+export const HOLLOW_CRYPT_MOON_DIRECTION = new THREE.Vector3(-0.3, 0.3, 0.9).normalize();
+// The Sunken Bastion: an OPEN-AIR sea fortress at storm tide, at dusk. Its own
+// sky rides the interior group (the realm clock never changes the look); the
+// one sun is a low, pale disc sinking behind the fog banks in the south-west,
+// raking the fortress from the side as the party looks up the headland, with
+// a grey-green sea-fog bounce and a cold slate floor bounce. The beacon's beam
+// and the lanterns carry the only warm light.
+const SUNKEN_BASTION_SUN_INTENSITY = 2.25;
+const SUNKEN_BASTION_HEMI_INTENSITY = 0.74;
+const SUNKEN_BASTION_ENV_INTENSITY = 0.32;
+const SUNKEN_BASTION_RIM_BOOST = 1.9;
+const SUNKEN_BASTION_SUN_COLOR = 0xffd9a8;
+const SUNKEN_BASTION_HEMI_SKY_COLOR = 0x86968c;
+const SUNKEN_BASTION_HEMI_GROUND_COLOR = 0x3b362c;
+/** Where the storm sun hangs (from the ground toward it): low in the west,
+ *  a little north, behind the fog banks over the fen-sea, so it rakes the
+ *  headland from the side as the party climbs it (long shadows, lit edges). */
+export const SUNKEN_BASTION_SUN_DIRECTION = new THREE.Vector3(-0.86, 0.3, 0.3).normalize();
+// The Drowned Temple: an OPEN-AIR lagoon at the night the temple drowned, under
+// a moon impossibly large and close, hanging low over the crater's north rim.
+// The moon is the key light (cool silver, strong, long soft shadows toward the
+// entrance), a violet night sky bounce overhead, a deep teal bounce off the
+// lagoon. Braziers of pale fire and the altar's column are the only other light.
+const DROWNED_TEMPLE_MOON_INTENSITY = 2.35;
+const DROWNED_TEMPLE_HEMI_INTENSITY = 0.82;
+const DROWNED_TEMPLE_ENV_INTENSITY = 0.36;
+const DROWNED_TEMPLE_RIM_BOOST = 2.2;
+const DROWNED_TEMPLE_MOON_COLOR = 0xd6e2ff;
+const DROWNED_TEMPLE_HEMI_SKY_COLOR = 0x6272a8;
+const DROWNED_TEMPLE_HEMI_GROUND_COLOR = 0x173640;
+/** Where the moon hangs (from the ground toward it): low over the north rim,
+ *  a little west, straight down the route from the Moongate Landing, so the
+ *  whole temple is seen against it and every column throws its shadow back
+ *  toward the party. */
+// The Gravewyrm Sanctum: an OPEN-AIR glacier cirque at the blue hour of a
+// clear polar dusk, under its own sky (render/gravewyrm_sanctum). No sun: the
+// key is the cold sky itself, strongest from the bright west where the
+// afterglow lingers behind the peaks, a pale blue-white with long soft
+// shadows; a deep blue sky bounce overhead and a bright snow bounce from
+// below (the snow and the ice throw the dusk back up). The only warm light is
+// the shard's: the rim tint goes rose-gold, so every silhouette is edged by
+// the heart in the ice. The pyres and braziers ride the light sink.
+const GRAVEWYRM_SANCTUM_KEY_INTENSITY = 2.3;
+const GRAVEWYRM_SANCTUM_HEMI_INTENSITY = 1.0;
+const GRAVEWYRM_SANCTUM_ENV_INTENSITY = 0.42;
+const GRAVEWYRM_SANCTUM_RIM_BOOST = 2.0;
+const GRAVEWYRM_SANCTUM_KEY_COLOR = 0xc4d4ff;
+const GRAVEWYRM_SANCTUM_HEMI_SKY_COLOR = 0x5f78b4;
+const GRAVEWYRM_SANCTUM_HEMI_GROUND_COLOR = 0x8296b8;
+/** The rim tint: the shard's rose-gold (design section 8, "a warm rim from
+ *  the shard glow"). */
+export const GRAVEWYRM_SANCTUM_RIM_COLOR = 0xf2b880;
+/** Where the cold key comes from (from the ground toward it). */
+export const GRAVEWYRM_SANCTUM_KEY_DIRECTION = new THREE.Vector3(...SANCTUM_KEY_DIRECTION);
+export const DROWNED_TEMPLE_MOON_DIRECTION = new THREE.Vector3(-0.14, 0.27, 0.95).normalize();
 // The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
 // ambient floor (over the candle-orange torch lights the interior itself
 // carries) so its halls read golden and inhabited while staying indoors-dim.
@@ -132,7 +203,23 @@ export interface OutdoorLightLegs {
 /** Copy the state's own key-light direction into `out` when it has one; the
  *  outdoor sun and moon keep theirs otherwise. Returns whether it did. */
 export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vector3): boolean {
-  if (state !== 'wildheartField') return false;
+  if (state === 'hollowCrypt') {
+    out.copy(HOLLOW_CRYPT_MOON_DIRECTION);
+    return true;
+  }
+  if (state === 'sunkenBastion') {
+    out.copy(SUNKEN_BASTION_SUN_DIRECTION);
+    return true;
+  }
+  if (state === 'drownedTemple') {
+    out.copy(DROWNED_TEMPLE_MOON_DIRECTION);
+    return true;
+  }
+  if (state === 'gravewyrmSanctum') {
+    out.copy(GRAVEWYRM_SANCTUM_KEY_DIRECTION);
+    return true;
+  }
+  if (state !== 'wildheartBasin') return false;
   out.copy(WILDHEART_KEY_LIGHT_DIRECTION);
   return true;
 }
@@ -149,7 +236,11 @@ export function applyInteriorLightRig(
   outdoor: OutdoorLightLegs,
 ): void {
   const mazeNight = state === 'yumiMaze';
-  const wildheartSun = state === 'wildheartField';
+  const wildheartSun = state === 'wildheartBasin';
+  const cryptMoon = state === 'hollowCrypt';
+  const bastionDusk = state === 'sunkenBastion';
+  const templeMoon = state === 'drownedTemple';
+  const sanctumDusk = state === 'gravewyrmSanctum';
   const keepHearth = state === 'lastkeep';
   const dawnholdDay = state === 'dawnhold';
   const ignivarForge = state === 'ignivarApproach' || state === 'ignivar' || state === 'varkhul';
@@ -161,48 +252,80 @@ export function applyInteriorLightRig(
     state === 'delve';
   targets.sun.intensity = mazeNight
     ? YUMI_MAZE_SUN_INTENSITY
-    : wildheartSun
-      ? WILDHEART_SUN_INTENSITY
-      : keepHearth
-        ? LASTKEEP_SUN_INTENSITY
-        : dawnholdDay
-          ? DAWNHOLD_SUN_INTENSITY
-          : underground
-            ? DUNGEON_SUN_INTENSITY
-            : outdoor.sunIntensity;
+    : cryptMoon
+      ? HOLLOW_CRYPT_SUN_INTENSITY
+      : bastionDusk
+        ? SUNKEN_BASTION_SUN_INTENSITY
+        : templeMoon
+          ? DROWNED_TEMPLE_MOON_INTENSITY
+          : sanctumDusk
+            ? GRAVEWYRM_SANCTUM_KEY_INTENSITY
+            : wildheartSun
+              ? WILDHEART_SUN_INTENSITY
+              : keepHearth
+                ? LASTKEEP_SUN_INTENSITY
+                : dawnholdDay
+                  ? DAWNHOLD_SUN_INTENSITY
+                  : underground
+                    ? DUNGEON_SUN_INTENSITY
+                    : outdoor.sunIntensity;
   targets.hemi.intensity = mazeNight
     ? YUMI_MAZE_HEMI_INTENSITY
-    : wildheartSun
-      ? WILDHEART_HEMI_INTENSITY
-      : keepHearth
-        ? LASTKEEP_HEMI_INTENSITY
-        : dawnholdDay
-          ? DAWNHOLD_HEMI_INTENSITY
-          : underground
-            ? DUNGEON_HEMI_INTENSITY
-            : outdoor.hemiIntensity;
+    : cryptMoon
+      ? HOLLOW_CRYPT_HEMI_INTENSITY
+      : bastionDusk
+        ? SUNKEN_BASTION_HEMI_INTENSITY
+        : templeMoon
+          ? DROWNED_TEMPLE_HEMI_INTENSITY
+          : sanctumDusk
+            ? GRAVEWYRM_SANCTUM_HEMI_INTENSITY
+            : wildheartSun
+              ? WILDHEART_HEMI_INTENSITY
+              : keepHearth
+                ? LASTKEEP_HEMI_INTENSITY
+                : dawnholdDay
+                  ? DAWNHOLD_HEMI_INTENSITY
+                  : underground
+                    ? DUNGEON_HEMI_INTENSITY
+                    : outdoor.hemiIntensity;
   targets.scene.environmentIntensity = mazeNight
     ? YUMI_MAZE_ENV_INTENSITY
-    : wildheartSun
-      ? WILDHEART_ENV_INTENSITY
-      : keepHearth
-        ? LASTKEEP_ENV_INTENSITY
-        : dawnholdDay
-          ? DAWNHOLD_ENV_INTENSITY
-          : underground
-            ? DUNGEON_ENV_INTENSITY
-            : outdoor.envIntensity;
+    : cryptMoon
+      ? HOLLOW_CRYPT_ENV_INTENSITY
+      : bastionDusk
+        ? SUNKEN_BASTION_ENV_INTENSITY
+        : templeMoon
+          ? DROWNED_TEMPLE_ENV_INTENSITY
+          : sanctumDusk
+            ? GRAVEWYRM_SANCTUM_ENV_INTENSITY
+            : wildheartSun
+              ? WILDHEART_ENV_INTENSITY
+              : keepHearth
+                ? LASTKEEP_ENV_INTENSITY
+                : dawnholdDay
+                  ? DAWNHOLD_ENV_INTENSITY
+                  : underground
+                    ? DUNGEON_ENV_INTENSITY
+                    : outdoor.envIntensity;
   targets.rim.value = mazeNight
     ? YUMI_MAZE_RIM_BOOST
-    : wildheartSun
-      ? WILDHEART_RIM_BOOST
-      : keepHearth
-        ? LASTKEEP_RIM_BOOST
-        : dawnholdDay
-          ? DAWNHOLD_RIM_BOOST
-          : underground
-            ? DUNGEON_RIM_BOOST
-            : 1;
+    : cryptMoon
+      ? HOLLOW_CRYPT_RIM_BOOST
+      : bastionDusk
+        ? SUNKEN_BASTION_RIM_BOOST
+        : templeMoon
+          ? DROWNED_TEMPLE_RIM_BOOST
+          : sanctumDusk
+            ? GRAVEWYRM_SANCTUM_RIM_BOOST
+            : wildheartSun
+              ? WILDHEART_RIM_BOOST
+              : keepHearth
+                ? LASTKEEP_RIM_BOOST
+                : dawnholdDay
+                  ? DAWNHOLD_RIM_BOOST
+                  : underground
+                    ? DUNGEON_RIM_BOOST
+                    : 1;
   // The rim tint defaults cool everywhere; the forge applier below re-grades
   // it, and setting it first means leaving the raid restores it in the same
   // settle that restores the legs.
@@ -211,7 +334,25 @@ export function applyInteriorLightRig(
   // crucible have other hands dressing them); zeroed by every other settle
   // (same restore pattern as the rim tint).
   sharedUniforms.uRoofDarkStrength.value = state === 'ignivarApproach' ? 1 : 0;
-  if (wildheartSun) {
+  if (cryptMoon) {
+    targets.sun.color.setHex(HOLLOW_CRYPT_SUN_COLOR);
+    targets.hemi.color.setHex(HOLLOW_CRYPT_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(HOLLOW_CRYPT_HEMI_GROUND_COLOR);
+  } else if (bastionDusk) {
+    targets.sun.color.setHex(SUNKEN_BASTION_SUN_COLOR);
+    targets.hemi.color.setHex(SUNKEN_BASTION_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(SUNKEN_BASTION_HEMI_GROUND_COLOR);
+  } else if (templeMoon) {
+    targets.sun.color.setHex(DROWNED_TEMPLE_MOON_COLOR);
+    targets.hemi.color.setHex(DROWNED_TEMPLE_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(DROWNED_TEMPLE_HEMI_GROUND_COLOR);
+  } else if (sanctumDusk) {
+    targets.sun.color.setHex(GRAVEWYRM_SANCTUM_KEY_COLOR);
+    targets.hemi.color.setHex(GRAVEWYRM_SANCTUM_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(GRAVEWYRM_SANCTUM_HEMI_GROUND_COLOR);
+    // The shard's warm rim (reset to the cool default by every other settle).
+    targets.rimColor.value.setHex(GRAVEWYRM_SANCTUM_RIM_COLOR);
+  } else if (wildheartSun) {
     targets.sun.color.setHex(WILDHEART_SUN_COLOR);
     targets.hemi.color.setHex(WILDHEART_HEMI_SKY_COLOR);
     targets.hemi.groundColor.setHex(WILDHEART_HEMI_GROUND_COLOR);

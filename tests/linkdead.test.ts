@@ -189,6 +189,14 @@ describe('linkdead grace lifecycle', () => {
     expect(setTrackingConnection).toHaveBeenCalledTimes(1);
     expect(setTrackingConnection).toHaveBeenCalledWith(session.botTrackingContext, false);
 
+    const referralPage = vi.spyOn(
+      (
+        server as unknown as {
+          referral: { command: (session: ClientSession, action: { type: 'page' }) => void };
+        }
+      ).referral,
+      'command',
+    );
     const ws2 = fakeWs();
     const resumeMeta = {
       ip: '203.0.113.45',
@@ -199,6 +207,7 @@ describe('linkdead grace lifecycle', () => {
       server.join(ws2, 11, 101, 'Comeback', 'warrior', null, false, resumeMeta),
     );
 
+    expect(referralPage).toHaveBeenCalledWith(session, { type: 'page' });
     expect(resumed).toBe(session);
     expect(resumed.linkdead).toBe(false);
     expect(resumed.graceUntil).toBe(0);

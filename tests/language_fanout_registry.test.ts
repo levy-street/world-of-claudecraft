@@ -138,7 +138,13 @@ const FANOUT_ARMS: readonly string[] = [
   'this.weeklyQuestsWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
+  // The dungeon objectives tracker: its text gate is the view core's `rev`
+  // (dungeon id, difficulty, boss ids and done flags) and its strip page is
+  // remembered per run object, none of which a locale switch moves. Listed
+  // BEFORE the quest tracker's arm in the fan-out, which reads that page.
+  'this.dungeonTracker.relocalize|',
   'this.questTracker.relocalize|',
+  'this.referralCards.relocalize|',
   'this.delveTracker.relocalize|',
   'this.riftTracker.relocalize|',
   // The gathering goal tracker (Intentional Gathering PR4): its repaint
@@ -194,6 +200,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.renderTownFocus|this.townFocusOpen',
   'this.marketWindow.render|this.marketWindow.isOpen',
   'this.bankWindow.render|this.bankWindow.isOpen',
+  'this.courierWindow.render|this.courierWindow.isOpen()',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
   // The journal's relocalize gates itself (isOpen inside) and additionally
@@ -343,6 +350,12 @@ interface AnsweredSurface extends GatedModule {
 
 const ANSWERED: readonly AnsweredSurface[] = [
   {
+    file: 'hud/courier/courier_window.ts',
+    memos: ['cheapSignature', 'lastSignature'],
+    answer: 'this.courierWindow.render',
+    why: 'phase, membership, custody, bank contents and selection are locale-independent; the open-window arm forces one render while retaining the selected stacks',
+  },
+  {
     file: 'hud/loot/loot_window_controller.ts',
     memos: ['corpseSig', 'harvestStatusSig'],
     answer: 'this.lootWindow.relocalize',
@@ -475,9 +488,21 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'hud/quest/quest_dialog_controller.ts',
-    memos: ['investigationSig', 'lastClueRowSig', 'lastGossipRowSig', 'lastIntroHintVisible'],
+    memos: [
+      'investigationSig',
+      'lastClueRowSig',
+      'lastGossipRowSig',
+      'lastGuideState',
+      'lastIntroHintVisible',
+    ],
     answer: 'this.questDialog.relocalize',
-    why: 'the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it)',
+    why: "the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it), and a dungeon guide's offer state (an enum, never text)",
+  },
+  {
+    file: 'hud/dungeon/dungeon_tracker_painter.ts',
+    memos: ['lastGeneration', 'lastRev', 'lastStripGeneration', 'lastStripRun'],
+    answer: 'this.dungeonTracker.relocalize',
+    why: "the view core's rev (dungeon id, difficulty, boss ids and done flags) gating every t(), formatter and entity name on the plate, and the run object the touch strip page was built from; relocalize bumps the generation both gates compare, so each re-resolves exactly once and re-latches",
   },
   {
     file: 'hud/rift/rift_floor_tracker_controller.ts',
@@ -685,6 +710,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastClock is the authoritative world-quest clock in seconds, compared so the bar can re-anchor its wall-clock extrapolation of the forge timer between snapshots. It is a number that never holds text, and the bar repaints its localized labels on every update through the shared action bar painter, so a locale switch lands on the next frame.',
   },
   {
+    file: 'collections/collections_window.ts',
+    memos: ['lastSig', 'paintedTab'],
+    reason:
+      'Retained dormant painter: Hunting has no live HUD instance, shell root or keybind. The lastSig and paintedTab memos cannot gate any player-visible surface. tests/collections_window.test.ts pins that retirement; restoring the menu requires restoring its relocalize fanout arm.',
+  },
+  {
     file: 'movable_frame.ts',
     memos: ['lastBottom', 'lastHoverCursor', 'lastHoverEdge'],
     reason:
@@ -704,9 +735,9 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   },
   {
     file: 'hud/quest/quest_tracker_controller.ts',
-    memos: ['lastHtml'],
+    memos: ['lastDungeonRowId', 'lastHtml'],
     reason:
-      'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature.',
+      'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature. lastDungeonRowId gates nothing that is drawn: it is the first-sighting edge of the dungeon run on the touch strip, deciding only whether the strip JUMPS to that page on this tick (stepping into a dungeon takes the strip once). It holds a page id (the dungeon id and difficulty), never text; the page itself is re-resolved on every update, and the strip repaints it through its own locale generation.',
   },
   {
     file: 'hud/practice/practice_dps_controller.ts',
@@ -1676,7 +1707,8 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // 37 on the merged tree: both pairs above are present.
       // 38 at the release/v0.43.0 merge into feature/world-quests: the forge
       // action bar's numeric world-quest clock memo.
-    ).toBe(38);
+      // The retired Hunting painter adds its dormant memo classification.
+    ).toBe(39);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {
@@ -1743,8 +1775,10 @@ function builderOwnedClasses(armCall: string): Set<string> {
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
   const hud = strippedHudSource;
   const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
-  if (!assigned) return owned;
-  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  // Both composition forms retain a real source-owned builder: direct factory
+  // assignment and a member returned from a previously built component family.
+  const direct = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  const built = assigned ? new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud) : direct;
   if (!built) return owned;
   for (const { source } of uiSources) {
     if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;

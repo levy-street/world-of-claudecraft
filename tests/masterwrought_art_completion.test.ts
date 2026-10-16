@@ -824,7 +824,18 @@ describe('Masterwrought art completion evidence', () => {
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
     // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
     // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
-    expect(currentOwnerIds).toHaveLength(1464);
+    // + the 245 choose-one leveling quest armor paintings
+    // (quest-leveling-gear-icons-2026-10-06): 1,709, likewise outside it.
+    // + the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07): 1,785, likewise
+    // outside it.
+    // + the 8 membership and 7 referral paintings (PR 4281): 1,800, likewise
+    // outside it.
+    // + the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07): 1,860, likewise outside
+    // it.
+    // + the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
+    // Wage rares) and Balgath's loot (six items) on the v0.45.0 integration: 1,890.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
+    expect(currentOwnerIds).toHaveLength(2005);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -858,6 +869,42 @@ describe('Masterwrought art completion evidence', () => {
     const bramblehideIds = bramblehideBatches[0].itemIds;
     expect(bramblehideIds).toHaveLength(22);
     expect(duplicateValues(bramblehideIds)).toEqual([]);
+
+    // The Mirefen world boss's three batches: another later additive wave, pinned the same
+    // way (batch identity and size asserted, ids stripped by exact value) so a rename,
+    // split or merge of any of them fails loudly rather than quietly changing the frozen
+    // completion union below.
+    const balgathBatchIds = [
+      'balgath-boss-icons-2026-08-18',
+      'shardpike-mechanic-icons-2026-08-20',
+      'foremans-wage-icons-2026-08-25',
+    ];
+    const balgathIds = new Set<string>();
+    for (const batchId of balgathBatchIds) {
+      const batches = mapping.generatedBatches.filter(({ batchId: id }) => id === batchId);
+      expect(batches, batchId).toHaveLength(1);
+      for (const id of batches[0].itemIds) balgathIds.add(id);
+    }
+    expect(balgathIds.size).toBe(8);
+    expect(datedIds.filter((id) => balgathIds.has(id))).toEqual([]);
+
+    // The Mirefen muster rework's lent pike: one more later additive batch, pinned the
+    // same way and stripped by exact id below.
+    const musterBatches = mapping.generatedBatches.filter(
+      ({ batchId: id }) => id === 'muster-shardpike-icon-2026-09-26',
+    );
+    expect(musterBatches).toHaveLength(1);
+    const musterIds = new Set(musterBatches[0].itemIds);
+    expect([...musterIds]).toEqual(['muster_shardpike']);
+    // ...and Balgath's own loot (five trinkets and the Craterglass Stave), one more
+    // additive batch, stripped by its exact ids the same way.
+    const balgathLootBatches = mapping.generatedBatches.filter(
+      ({ batchId: id }) => id === 'balgath-loot-icons-2026-09-28',
+    );
+    expect(balgathLootBatches).toHaveLength(1);
+    expect(balgathLootBatches[0].itemIds).toHaveLength(6);
+    for (const id of balgathLootBatches[0].itemIds) musterIds.add(id);
+    expect(datedIds.filter((id) => musterIds.has(id))).toEqual([]);
 
     // These 25 ids are a later additive wave that never appears in the dated file's own
     // 1,255-item passIds union at all: confirm that up front (no overlap with datedIds)
@@ -958,12 +1005,85 @@ describe('Masterwrought art completion evidence', () => {
     expect(hoardBranchIds.size).toBe(119);
     expect(datedIds.filter((id) => hoardBranchIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => hoardBranchIds.has(id))).toHaveLength(119);
+    // The choose-one leveling quest armor (quest-leveling-gear-icons-2026-10-06)
+    // and its rares (quest-blue-rewards-icons-2026-10-07) and role fill
+    // (quest-role-fill-icons-2026-10-07), additive beyond the dated completion union like the hoard
+    // batches.
+    const questGearIds = new Set(
+      mapping.generatedBatches
+        .filter(
+          ({ batchId }) =>
+            batchId === 'quest-leveling-gear-icons-2026-10-06' ||
+            batchId === 'quest-blue-rewards-icons-2026-10-07' ||
+            batchId === 'quest-role-fill-icons-2026-10-07',
+        )
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(questGearIds.size).toBe(396);
+    expect(datedIds.filter((id) => questGearIds.has(id))).toEqual([]);
+
+    // Membership paintings are additive; they do not amend the dated approval.
+    const membershipIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'membership-items-2026-10-05')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(sorted([...membershipIds])).toEqual([
+      'membership_chest',
+      'membership_feet',
+      'membership_gloves',
+      'membership_helmet',
+      'membership_legs',
+      'membership_shoulder',
+      'membership_token',
+      'membership_waist',
+    ]);
+    expect(datedIds.filter((id) => membershipIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => membershipIds.has(id))).toHaveLength(8);
+
+    const referralIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'referral-items-2026-10-07')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(sorted([...referralIds])).toEqual([
+      'referral_chest',
+      'referral_feet',
+      'referral_gloves',
+      'referral_helmet',
+      'referral_legs',
+      'referral_shoulder',
+      'referral_waist',
+    ]);
+    expect(datedIds.filter((id) => referralIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => referralIds.has(id))).toHaveLength(7);
+
+    // The five-dungeon rework's five loot batches: 11 + 11 + 11 + 11 + 16
+    // (the Hollow Crypt's, its Heroic Hymnal included) = 60 ids, additive the
+    // same way.
+    const dungeonReworkBatchIds: readonly (string | undefined)[] = [
+      'sunken-bastion-icons-2026-09-29',
+      'drowned-temple-icons-2026-09-30',
+      'wildheart-basin-icons-2026-10-02',
+      'gravewyrm-sanctum-icons-2026-10-03',
+      'hollow-crypt-icons-2026-10-03',
+      // The lower dungeons' normal blues: 55 more ids, 115 in all.
+      'lower-dungeon-blues-icons-2026-10-08',
+    ];
+    const dungeonReworkIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => dungeonReworkBatchIds.includes(batchId))
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(dungeonReworkIds.size).toBe(115);
+    expect(datedIds.filter((id) => dungeonReworkIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => dungeonReworkIds.has(id))).toHaveLength(115);
 
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
-    // faction quartermaster, and Clue Scroll batches, and the Buried Hoards
-    // branch's three batches)
+    // faction quartermaster, and Clue Scroll batches, the Buried Hoards
+    // branch's three batches, and the Mirefen world boss's icon batches)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -985,7 +1105,13 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
         !season2WeaponIds.has(id) &&
-        !hoardBranchIds.has(id),
+        !hoardBranchIds.has(id) &&
+        !questGearIds.has(id) &&
+        !membershipIds.has(id) &&
+        !referralIds.has(id) &&
+        !balgathIds.has(id) &&
+        !musterIds.has(id) &&
+        !dungeonReworkIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

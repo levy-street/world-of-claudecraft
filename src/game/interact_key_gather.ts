@@ -8,7 +8,7 @@
 // main.ts is a firewall, not a home (tests/monolith_budget.test.ts), so the
 // wiring lives here where tests/interact_key_gather.test.ts can drive it.
 
-import { GATHER_NODES } from '../sim/data';
+import { gatherNodesInActiveWorld } from '../sim/data';
 import { gatherNodeToolGateFor } from '../ui/gather_node_tooltip_controller';
 import { gatherEffectPrompt } from '../ui/hud/professions/gathering_view';
 import { t } from '../ui/i18n';
@@ -47,7 +47,7 @@ export function interactKeyGatherOptions(
   effectConfirm: GatherEffectConfirmGate,
 ): NearbyGatherOptions {
   return {
-    nodes: GATHER_NODES,
+    nodes: gatherNodesInActiveWorld(),
     toolGateFor: (node) => gatherNodeToolGateFor(world, node),
     tooFarText: t('questUi.errors.tooFar'),
     notReadyText: t('hudChrome.gathering.notReady'),

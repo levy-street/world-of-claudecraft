@@ -1,0 +1,176 @@
+// ---------------------------------------------------------------------------
+// Where buddies and their cosmetics COME FROM: the acquisition tables.
+//
+// Design (owner plan, 2026-09-09): buddies are rare. They are never bag loot
+// and never a store row. There are exactly two ways to a companion:
+//
+//   1. BOSS PETS. A boss kill rolls ONCE PER ELIGIBLE PLAYER, independently
+//      (nobody loses a roll to a party member), at very low odds. A win does
+//      not drop an item: the companion ATTACHES to the character as a pending
+//      buddy, the player reads a per-companion "presence" line in chat, and
+//      the buddy reveals itself (owned + summoned) when they walk out of the
+//      instance or away from the world boss (src/sim/buddy_drops.ts).
+//   2. ACHIEVEMENT PETS. A Book of Deeds entry names a companion; earning the
+//      deed grants it outright (src/sim/deeds.ts grantDeed -> buddies.ts).
+//
+// Cosmetics for BOSS pets are mostly challenge unlocks on the boss that drops
+// the pet (a speed kill, a damage rate). Cosmetics for ACHIEVEMENT pets are
+// mostly crafted (a token item whose recipe eats rare gathered materials).
+// Both kinds can also be a vendor token (the store) or a plain grant (the
+// monthly ladder / top-parse awards an out-of-game job hands out through the
+// admin grant endpoint, server/admin.ts).
+//
+// The whistle items (content/items.ts, kind 'buddy') survive as GRANT TOKENS
+// only: soulbound, consumed on use, attaching an active companion. Historical
+// tokens remain defined for existing inventories, but cannot grant a retired
+// companion or be bought. The admin/mail paths can hand out active tokens.
+//
+// Everything the Hunting pane says about a source is DERIVED from these
+// tables (src/ui/collections/collection_sources.ts). Author a source here and
+// the window reports it; leave one out and the window honestly says
+// "not obtainable yet".
+//
+// `src/sim`-pure, rng-free (the rolls live in buddy_drops.ts).
+// ---------------------------------------------------------------------------
+
+import type { BuddyKey } from './buddies';
+
+export interface BuddyBossDrop {
+  key: BuddyKey;
+  /** Mob template id of the boss. */
+  bossId: string;
+  /** 0..1 per-player chance on a normal (or non-instanced) kill. */
+  chance: number;
+  /** Per-player chance under a heroic claim; defaults to `chance`. */
+  heroicChance?: number;
+  /** True when only a heroic claim rolls at all. */
+  heroicOnly?: boolean;
+}
+
+// CALIBRATE: every rate below is a design placeholder for the owner to tune.
+export const BUDDY_BOSS_DROPS: readonly BuddyBossDrop[] = [
+  // The raid pets.
+  {
+    key: 'crystal_lich',
+    bossId: 'nythraxis_scourge_of_thornpeak',
+    chance: 0.005,
+    heroicChance: 0.01,
+  },
+  // Forgemaw is the one heroic-only companion: both Crucible bosses carry it,
+  // neither on Normal.
+  { key: 'forgemaw', bossId: 'ignivar_herald_of_the_last_flame', chance: 0.01, heroicOnly: true },
+  {
+    key: 'forgemaw',
+    bossId: 'varkhul_forgefather_of_the_last_flame',
+    chance: 0.01,
+    heroicOnly: true,
+  },
+];
+
+/** Deed id -> the companion earning it grants. The deed keeps its own
+ *  title/border reward; the buddy rides beside it. */
+export const BUDDY_DEED_REWARDS: Readonly<Record<string, BuddyKey>> = {};
+
+// Cosmetic challenges: resolved at the boss's death for every player the
+// encounter credits (src/sim/buddy_challenges.ts). A 'speed' task measures
+// from the first damage of the attempt to the kill; a 'dps' task is the
+// player's OWN damage on the boss over that same window. Both re-arm when the
+// boss evades or respawns, exactly like the deed encounter tasks.
+export type BuddyCosmeticChallenge =
+  | { cosmeticId: string; bossId: string; kind: 'speed'; seconds: number }
+  | { cosmeticId: string; bossId: string; kind: 'dps'; dps: number };
+
+// CALIBRATE: placeholders, retune against live pull timings and parses.
+export const BUDDY_COSMETIC_CHALLENGES: readonly BuddyCosmeticChallenge[] = [
+  {
+    cosmeticId: 'crystal_lich_frostbound',
+    bossId: 'nythraxis_scourge_of_thornpeak',
+    kind: 'speed',
+    seconds: 300,
+  },
+  {
+    cosmeticId: 'crystal_lich_voltaic',
+    bossId: 'nythraxis_scourge_of_thornpeak',
+    kind: 'dps',
+    dps: 600,
+  },
+  {
+    cosmeticId: 'forgemaw_ashen',
+    bossId: 'ignivar_herald_of_the_last_flame',
+    kind: 'speed',
+    seconds: 240,
+  },
+  {
+    cosmeticId: 'forgemaw_whitehot',
+    bossId: 'varkhul_forgefather_of_the_last_flame',
+    kind: 'dps',
+    dps: 600,
+  },
+];
+
+/** Deed id -> the cosmetic earning it unlocks. */
+export const BUDDY_COSMETIC_DEED_REWARDS: Readonly<Record<string, string>> = {};
+
+/** Cosmetics that NOTHING in the game hands out: they exist to be granted by
+ *  an out-of-game award (the monthly PvP ladder, the monthly top parse per
+ *  boss and spec, the zodiac/gemstone seasonal rewards) through the admin
+ *  grant endpoint. Listed so the Hunting pane can say "seasonal reward"
+ *  instead of "not obtainable". */
+export const BUDDY_COSMETIC_GRANT_ONLY: ReadonlySet<string> = new Set();
+
+/** How far a player has to walk from an open-world boss kill before a pending
+ *  companion from it reveals itself. Instance kills reveal on the zone-out. */
+export const BUDDY_WORLD_REVEAL_DISTANCE = 80;
+
+const BOSS_DROPS_BY_BOSS = new Map<string, BuddyBossDrop[]>();
+for (const drop of BUDDY_BOSS_DROPS) {
+  const list = BOSS_DROPS_BY_BOSS.get(drop.bossId) ?? [];
+  list.push(drop);
+  BOSS_DROPS_BY_BOSS.set(drop.bossId, list);
+}
+
+const CHALLENGES_BY_BOSS = new Map<string, BuddyCosmeticChallenge[]>();
+for (const challenge of BUDDY_COSMETIC_CHALLENGES) {
+  const list = CHALLENGES_BY_BOSS.get(challenge.bossId) ?? [];
+  list.push(challenge);
+  CHALLENGES_BY_BOSS.set(challenge.bossId, list);
+}
+
+/** The per-player rolls a kill of `bossId` makes (empty for every other mob). */
+export function buddyBossDropsFor(bossId: string): readonly BuddyBossDrop[] {
+  return BOSS_DROPS_BY_BOSS.get(bossId) ?? [];
+}
+
+/** The cosmetic challenges a kill of `bossId` resolves (empty for every other mob). */
+export function buddyCosmeticChallengesFor(bossId: string): readonly BuddyCosmeticChallenge[] {
+  return CHALLENGES_BY_BOSS.get(bossId) ?? [];
+}
+
+/** Bosses whose attempts need the damage/timing tracker running at all. */
+export const BUDDY_CHALLENGE_BOSSES: ReadonlySet<string> = new Set(CHALLENGES_BY_BOSS.keys());
+
+/** Every boss-drop row for one companion, for the Hunting pane. */
+export function buddyBossDropsOf(key: BuddyKey): readonly BuddyBossDrop[] {
+  return BUDDY_BOSS_DROPS.filter((drop) => drop.key === key);
+}
+
+/** The deed (if any) that grants one companion. */
+export function buddyDeedOf(key: BuddyKey): string | null {
+  for (const [deedId, buddy] of Object.entries(BUDDY_DEED_REWARDS)) {
+    if (buddy === key) return deedId;
+  }
+  return null;
+}
+
+/** The deed (if any) that unlocks one cosmetic. */
+export function buddyCosmeticDeedOf(cosmeticId: string): string | null {
+  for (const [deedId, id] of Object.entries(BUDDY_COSMETIC_DEED_REWARDS)) {
+    if (id === cosmeticId) return deedId;
+  }
+  return null;
+}
+
+/** Every challenge row for one cosmetic, for the Hunting pane. */
+export function buddyCosmeticChallengesOf(cosmeticId: string): readonly BuddyCosmeticChallenge[] {
+  return BUDDY_COSMETIC_CHALLENGES.filter((challenge) => challenge.cosmeticId === cosmeticId);
+}

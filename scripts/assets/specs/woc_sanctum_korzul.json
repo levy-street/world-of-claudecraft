@@ -1,0 +1,33 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/sanctum_korzul_woc.glb",
+      "out": "models/creatures/woc_sanctum_korzul.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Hit",
+        "Roar",
+        "Bite",
+        "Claw",
+        "BreathGround",
+        "TailSwipe",
+        "WingBuffet",
+        "GraveInferno",
+        "BreakFree",
+        "Frozen",
+        "FrozenAwaken",
+        "TakeOff",
+        "FlyIdle",
+        "FlyForward",
+        "BreathAir",
+        "Land",
+        "Descent",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

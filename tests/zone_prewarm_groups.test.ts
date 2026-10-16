@@ -30,6 +30,9 @@ const state = vi.hoisted(() => ({
   activeCalls: [] as string[],
   auraGlowCalls: [] as string[],
   unavailable: new Set<string>(),
+  /** Model keys whose body files are still cold (visualAssetsResident false). */
+  cold: new Set<string>(),
+  residencyAsks: [] as string[],
   modelKeys: {} as Record<string, string>,
   buildQuestObject: null as ((itemId: string, id: number) => unknown) | null,
 }));
@@ -37,6 +40,10 @@ const state = vi.hoisted(() => ({
 vi.mock('../src/render/characters', async () => {
   const MockThree = await import('three');
   return {
+    visualAssetsResident: (key: string) => {
+      state.residencyAsks.push(key);
+      return !state.cold.has(key);
+    },
     createCharacterVisual: (entity: Pick<Entity, 'templateId'>, form?: string) => {
       state.createCalls.push(entity.templateId);
       state.createForms.push(form);
@@ -111,6 +118,8 @@ beforeEach(() => {
   state.activeCalls.length = 0;
   state.auraGlowCalls.length = 0;
   state.unavailable.clear();
+  state.cold.clear();
+  state.residencyAsks.length = 0;
   state.modelKeys = {};
   state.buildQuestObject = null;
 });
@@ -161,6 +170,30 @@ describe('buildNpcPrewarmGroup warmed/planned/trimmed semantics', () => {
     expect(built.warmed).toBe(0);
     expect(built.planned).toBe(2);
     expect(host.prewarmedNpcModels.size).toBe(0);
+  });
+});
+
+describe('cold body files are asked about, never built over', () => {
+  it('skips an NPC whose body is cold without calling the builder, and retries it once warm', () => {
+    state.cold.add('model:npc_guard');
+    const host = makeHost(['npc_guard', 'npc_knight']);
+    const built = buildNpcPrewarmGroup(host, ZONE, NO_DEADLINE);
+    expect(state.residencyAsks).toContain('model:npc_guard');
+    expect(state.createCalls).toEqual(['npc_knight']);
+    expect(built.warmed).toBe(1);
+    expect(host.prewarmedNpcModels.has('model:npc_guard')).toBe(false);
+    state.cold.clear();
+    buildNpcPrewarmGroup(host, ZONE, NO_DEADLINE);
+    expect(state.createCalls).toEqual(['npc_knight', 'npc_guard']);
+  });
+
+  it('skips a mob template whose body is cold (the lazily loaded training dummy)', () => {
+    state.cold.add('model:rare_oddity');
+    const host = makeHost(['forest_wolf', 'rare_oddity']);
+    buildEntityPrewarmGroup(host, ZONE);
+    expect(state.residencyAsks).toContain('model:rare_oddity');
+    expect(state.createCalls).not.toContain('rare_oddity');
+    expect(state.createCalls).toContain('forest_wolf');
   });
 });
 

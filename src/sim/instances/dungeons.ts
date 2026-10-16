@@ -18,6 +18,7 @@
 import { supportHeightAt } from '../colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import {
+  DUNGEON_FLOOR_Y,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
@@ -28,8 +29,14 @@ import {
   MOBS,
   NPCS,
 } from '../data';
+import { tickDungeonGuides } from '../dungeon_guide';
+import { tickTempleEncounters } from '../encounters/drowned_temple';
+import { tickSanctumEncounters } from '../encounters/gravewyrm_sanctum';
+import { tickCryptEncounters } from '../encounters/hollow_crypt';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
+import { tickBastionEncounters } from '../encounters/sunken_bastion';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
+import { tickWildheartEncounters } from '../encounters/wildheart_basin';
 import { createGroundObject, createMob, createNpc } from '../entity';
 import { updateIgnivarForgeLift } from '../ignivar_forge_lift';
 import {
@@ -42,6 +49,9 @@ import {
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { updateIgnivarRaidProgression } from '../ignivar_raid_progression';
+import { placeOnPatrolPoint, stampDungeonPatrol } from '../mob/patrol';
+import { tickTrashKits } from '../mob/trash_kit';
+import { dungeonDoorPos } from '../moved_objects';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from '../raid_rooms';
@@ -60,12 +70,15 @@ import {
   NYTHRAXIS_ROOM_RADIUS,
   type Vec3,
 } from '../types';
+import { setCombatWalls } from './combat_wall_state';
 import {
   applyDungeonMobTuning,
   claimDifficultyForDungeon,
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from './difficulty';
+import { dungeonReentryPoint } from './dungeon_checkpoints';
+import { tickDungeonGates } from './dungeon_gates';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
 import {
   IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS,
@@ -174,7 +187,8 @@ export function spawnBossExitPortal(ctx: SimContext, mob: Entity): void {
   const dungeon = DUNGEONS[inst.dungeonId];
   const portal = dungeon?.bossExitPortal;
   if (!portal) return;
-  if (mob.templateId !== HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId) return;
+  if (mob.templateId !== (portal.after ?? HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId))
+    return;
   const origin = instanceOrigin(dungeon.index, inst.slot);
   const exit = createGroundObject(
     ctx.nextId++,
@@ -371,7 +385,7 @@ export function enterDungeon(
   if (!r || !dungeon) return false;
   const bypass = devBypass && ctx.devCommands;
   // A living player enters normally; a ghost that has run its spirit back re-enters to
-  // resurrect at the entrance (below). A fresh corpse (dead, spirit not yet released)
+  // resurrect at its arrival point (below). A fresh corpse (dead, spirit not yet released)
   // cannot move, so it never reaches the door.
   if (r.e.dead && !r.e.ghost) return false;
   const party = ctx.partyOf(r.meta.entityId);
@@ -671,9 +685,10 @@ export function enterDungeon(
   }
   const origin = instanceOriginOf(inst);
   const p = r.e;
+  const entry = dungeonReentryPoint(ctx, inst, p);
   // A live gather/fishing session never survives the door (R28 family).
   cancelProfessionSessionOnDisplacement(ctx, p);
-  p.pos = ctx.groundPos(origin.x + dungeon.entry.x, origin.z + dungeon.entry.z);
+  p.pos = ctx.groundPos(origin.x + entry.x, origin.z + entry.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   settleTeleportArrival(p);
@@ -694,9 +709,9 @@ export function enterDungeon(
   // a player standing in an instance and teleport them back inside fully restored
   // (issue #1600). No-op if they were not queued; notifies any 2v2 teammate.
   arenaQueueLeave(ctx, r.meta.entityId);
-  // A ghost that ran its spirit back and re-entered resurrects at the entrance,
-  // penalty-free: the re-entry IS the corpse run under the instance death model (no
-  // Spirit Healer inside an instance).
+  // A ghost that ran its spirit back resurrects where it arrives (the entrance, or a
+  // cleared arena: dungeon_checkpoints.ts), penalty-free: the re-entry IS the corpse
+  // run under the instance death model (no Spirit Healer inside an instance).
   // Nythraxis has a nested entrance: a returning ghost must cross the approach crypt
   // before reaching the royal door. Keep that spirit released through the outer
   // transition and resurrect only after it reaches its defeated arena claim.
@@ -910,9 +925,12 @@ export function detachFromDungeon(
   if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
   cancelProfessionSessionOnDisplacement(ctx, p);
   const drop = dungeon.leaveOffset ?? { x: 0, z: -DUNGEON_DOOR_RETURN_INSET };
+  // A Studio map may move the door (moved_objects.ts): leaving drops the
+  // player in front of where it stands.
+  const door = dungeonDoorPos(ctx.objectMoves, dungeon);
   return {
-    x: dungeon.doorPos.x + drop.x,
-    z: dungeon.doorPos.z + drop.z,
+    x: door.x + drop.x,
+    z: door.z + drop.z,
     facing: Math.atan2(drop.x, drop.z),
   };
 }
@@ -965,6 +983,9 @@ function claimInstance(
   inst.raidReturnKeys = new Set();
   inst.raidBossWelcomeKeys = new Set();
   const origin = instanceOriginOf(inst);
+  // A fresh claim starts with no combat wall in the process-wide collision
+  // view (another world may have left one in this slot: combat_wall_state.ts).
+  setCombatWalls(origin.x, origin.z, []);
   const mobDifficultyTuningId = dungeon.mobDifficultyTuningId ?? inst.dungeonId;
   for (const spawn of dungeon.spawns) {
     const template = MOBS[spawn.mobId];
@@ -987,6 +1008,23 @@ function claimInstance(
     mob.facing = spawn.facing ?? Math.PI; // most packs face the entrance; authored set-pieces may override
     mob.prevFacing = mob.facing;
     if (spawn.idleStationary) mob.idleStationary = true; // hand-placed pack holds formation
+    if (spawn.patrol) {
+      mob.dungeonPatrol = stampDungeonPatrol(spawn.patrol, origin.x, origin.z);
+      // A ground patroller starts on its patrol point for the claim's clock.
+      placeOnPatrolPoint(ctx, mob);
+    }
+    // A perched placement waits on its perch (mob/trash_kit): on it from the start.
+    if (spawn.perch) {
+      const perchY = DUNGEON_FLOOR_Y + spawn.perch.y;
+      mob.perchY = perchY;
+      mob.pos.y = perchY;
+      mob.prevPos.y = perchY;
+    }
+    // A flying patrol starts on the wing.
+    if (mob.dungeonPatrol?.flightY !== undefined) {
+      mob.pos.y = mob.dungeonPatrol.flightY;
+      mob.prevPos.y = mob.dungeonPatrol.flightY;
+    }
     ctx.addEntity(mob);
     inst.mobIds.push(mob.id);
   }
@@ -1032,8 +1070,8 @@ function claimInstance(
   ctx.addEntity(exit);
   inst.exitId = exit.id;
   // No Spirit Healer is spawned inside an instance: a ghost releases at the OUTDOOR
-  // graveyard nearest the door and runs its spirit back to re-enter and resurrect at
-  // the entrance (see enterDungeon / spirit.ts ghostGraveyard).
+  // graveyard nearest the door and runs its spirit back to re-enter and resurrect where
+  // it arrives (see enterDungeon / spirit.ts ghostGraveyard).
 }
 
 // Exported for the dev practice raids only (nythraxis_dev_raid.ts switches a
@@ -1473,6 +1511,24 @@ export function awardHeroicMarks(
 // player's entity outside the claim footprint on purpose. Covered end to end
 // by tests/dungeon_instance_disconnect_reset.test.ts.
 export function updateInstances(ctx: SimContext): void {
+  // In-dungeon gates and seals follow their packs and bosses every tick.
+  tickDungeonGates(ctx);
+  // Dungeon trash kits (bolts, raises, leaps, dives, landings), after the mob AI.
+  tickTrashKits(ctx);
+  // The Sunken Bastion's boss fights (encounters/sunken_bastion), same slot.
+  tickBastionEncounters(ctx);
+  // The Drowned Temple's boss fights (encounters/drowned_temple), same slot.
+  tickTempleEncounters(ctx);
+  // The Wildheart Basin's encounters (encounters/wildheart_basin), same slot.
+  tickWildheartEncounters(ctx);
+  // The Gravewyrm Sanctum's encounters (encounters/gravewyrm_sanctum), same slot.
+  tickSanctumEncounters(ctx);
+  // The Hollow Crypt's finale (encounters/hollow_crypt): Morthen's entrance
+  // and the Knellwyrm, same slot.
+  tickCryptEncounters(ctx);
+  // The optional lore guides (dungeon_guide): after every encounter, so a boss
+  // pulled or killed this tick already reads as such. Draws no shared rng.
+  tickDungeonGuides(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
   updateIgnivarForgeLift(ctx);

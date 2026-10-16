@@ -77,6 +77,10 @@ describe('the world quest champion encore', () => {
     // Two participants (the player and a pretend second player's pet owner) both get paid.
     const copperBefore = meta.copper;
     addThreat(mob, sim.playerId, 10);
+    // One tick of the fight puts the player on the champion's list. Its idle scan does not
+    // pull first: proximity aggro needs a line of sight (mob/aggro_sight.ts), and on this
+    // seed the champion's spawn has none to the player's spot.
+    sim.tick();
     sim.player.targetId = mob.id;
     sim.chat('/dev killtarget');
     sim.tick();

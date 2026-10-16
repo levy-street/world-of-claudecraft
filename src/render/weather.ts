@@ -1,7 +1,22 @@
 import * as THREE from 'three';
 import type { BiomeId } from '../sim/types';
 import { transitionAlpha, WEATHER_ENVIRONMENT_RESPONSE } from './environment_transition_core';
-import { type PrecipMode, precipSpawnXZ, remotePrecipPlan } from './weather_field_core';
+import {
+  type PrecipMode,
+  precipForBiome,
+  precipSpawnXZ,
+  remotePrecipPlan,
+} from './weather_field_core';
+
+// The Studio's "Show snowfall" preview toggle: one browser-wide view
+// preference every Weather reads on update (never gameplay state, never sent
+// anywhere). Module-level so the editor reaches it without a renderer hook.
+let studioSnowVisible = true;
+
+/** Show or hide falling snow in the editor's preview (rain is unaffected). */
+export function setStudioSnowVisible(on: boolean): void {
+  studioSnowVisible = on;
+}
 
 // Ambient precipitation. One pooled THREE.Points cloud rides inside a box that
 // follows the camera (the same "ride along" trick the sky dome uses), so a
@@ -151,6 +166,10 @@ export class Weather {
    *  LIVE weather rather than the constructed staging state. */
   private liveUpdatesRun = false;
   private enabled = true;
+  // Starts from the Studio preference; a later change to it is adopted on the
+  // next update (studioSeen), while a direct setSnowEnabled call still holds.
+  private snowEnabled = studioSnowVisible;
+  private studioSeen = studioSnowVisible;
   private time = 0;
   // Remote-weather state: the cached box plan, its refresh clock, and whether
   // spawns are currently masked to the weathered zone's cells (plan found a
@@ -208,6 +227,19 @@ export class Weather {
 
   setEnabled(on: boolean): void {
     this.enabled = on;
+  }
+
+  /** Studio visibility preference, independent of the master weather setting. */
+  setSnowEnabled(on: boolean): void {
+    if (this.snowEnabled === on) return;
+    this.snowEnabled = on;
+    this.planTimer = 0;
+    if (!on && this.mode === 'snow') {
+      this.intensity = 0;
+      this.material.opacity = 0;
+      this.points.visible = false;
+      this.wasLive = false;
+    }
   }
 
   /**
@@ -308,6 +340,10 @@ export class Weather {
     biome: BiomeId | null,
     biomeAt: (x: number, z: number) => BiomeId,
   ): void {
+    if (this.studioSeen !== studioSnowVisible) {
+      this.studioSeen = studioSnowVisible;
+      this.setSnowEnabled(studioSnowVisible);
+    }
     // Any weathered biome in the box drives the mode (own zone first); the
     // player's own biome staying clear no longer clears the box. `biome`
     // stays the suppression channel: null (indoors/underwater) always stops.
@@ -328,7 +364,20 @@ export class Weather {
       this.planTimer -= dt;
       if (this.planTimer <= 0) {
         this.planTimer = PLAN_INTERVAL;
-        const plan = remotePrecipPlan(cam.x, cam.z, HX, HZ, biomeAt);
+        // Removing snowy cells from the scan also lets neighbouring rain stay
+        // visible when the nearer snowy biome is hidden by the Studio toggle.
+        const plan = remotePrecipPlan(
+          cam.x,
+          cam.z,
+          HX,
+          HZ,
+          this.snowEnabled
+            ? biomeAt
+            : (x, z) => {
+                const sampled = biomeAt(x, z);
+                return precipForBiome(sampled) === 'snow' ? 'vale' : sampled;
+              },
+        );
         this.planMode = plan.mode;
         this.planLocal = plan.local;
       }

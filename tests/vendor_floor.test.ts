@@ -825,8 +825,9 @@ describe('stock rows: the phase 11n pulls', () => {
       // The two honor trinkets (WARFARE_TRINKET_STOCK) joined both honor
       // counters: 47 to 49 each.
       // Plus the 139 Warfare Season 2 rows (second release/v0.44.0 base merge): 188.
-      warmarshal_draven_kole: 188,
-      fury: 188,
+      // Both honor vendors also carry the Tug companion whistle.
+      warmarshal_draven_kole: 189,
+      fury: 189,
       stablemaster_marla: 2,
       wardsmith_orun: 3,
       // The three faction quartermasters (faction_vendors.ts): the standing
@@ -840,6 +841,9 @@ describe('stock rows: the phase 11n pulls', () => {
       npc_rift_watch_quartermaster: 18,
       npc_church_order_quartermaster: 18,
       npc_automaton_quartermaster: 17,
+      // The Mirefen tavern's innkeeper (feature/walkable-tavern-aaa): bread and water
+      // for the road and the marsh's own fare, six existing food and drink rows.
+      innkeeper_maudie: 6,
     });
   });
 });

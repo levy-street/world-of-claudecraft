@@ -20,7 +20,7 @@ const h = vi.hoisted(() => {
     failLargeAccountIndexCreate: false,
     failReceiptsValidate: false,
   };
-  const query = vi.fn((sql: string) => {
+  const query = vi.fn((sql: string, _values?: unknown[]) => {
     calls.push(String(sql));
     // A test flips this flag to simulate an interrupted concurrent index
     // build, exercising the post-commit loop's unlock-in-finally guarantee.
@@ -62,6 +62,11 @@ const h = vi.hoisted(() => {
     const statements = topLevel.split(';').filter((part) => part.trim().length > 0);
     if (statements.length > 1) {
       return Promise.resolve(statements.map(() => ({ rows: [], rowCount: 0 })));
+    }
+    // Empty legacy tables finish after one bounded page per source. The real
+    // checkpoint UPDATE always returns its complete boolean, even for no edges.
+    if (String(sql).includes('UPDATE account_social_migration_progress SET')) {
+      return Promise.resolve({ rows: [{ complete: true }], rowCount: 1 });
     }
     // The growth-budget gauge readback (a single-statement SELECT): seed the
     // counters so the wiring test can assert they reach the observer.
@@ -168,6 +173,7 @@ const emptyMarket: MarketSave = { listings: [], collections: [], nextListingId: 
 describe('ensureSchema wires every schema module at boot', () => {
   beforeEach(() => {
     h.calls.length = 0;
+    h.query.mockClear();
     h.state.announcesWriterCapability = true;
     h.state.rateLimitsExists = true;
     h.state.invalidMetricsIndexExists = false;
@@ -190,6 +196,40 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect('connectionTimeoutMillis' in cfg).toBe(false);
     // The pool was never dipped into for boot work.
     expect(h.connect).not.toHaveBeenCalled();
+  });
+
+  it('commits schema before bounded account-edge migration transactions and final marker', async () => {
+    await ensureSchema();
+    const schemaCommit = h.calls.indexOf('COMMIT');
+    const accountDdl = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS account_friendships'),
+    );
+    expect(accountDdl).toBeGreaterThan(-1);
+    expect(accountDdl).toBeLessThan(schemaCommit);
+    const batches = h.query.mock.calls.filter(([sql]) =>
+      sql.includes('UPDATE account_social_migration_progress SET'),
+    );
+    expect(batches.map(([, values]) => values)).toEqual([
+      ['friendships', 500],
+      ['blocks', 500],
+    ]);
+    const migrationLock = h.calls.indexOf('SELECT pg_advisory_lock($1)');
+    expect(migrationLock).toBeGreaterThan(schemaCommit);
+    let priorCommit = schemaCommit;
+    for (const [sql] of batches) {
+      const page = h.calls.indexOf(sql);
+      const begin = h.calls.findIndex((call, i) => i > priorCommit && call === 'BEGIN');
+      expect(begin).toBeGreaterThan(migrationLock);
+      expect(page).toBeGreaterThan(begin);
+      expect(h.calls.slice(begin, page).join('\n')).toContain("SET LOCAL statement_timeout = '5s'");
+      priorCommit = h.calls.findIndex((call, i) => i > page && call === 'COMMIT');
+      expect(priorCommit).toBeGreaterThan(page);
+    }
+    const marker = h.calls.findIndex((sql) =>
+      sql.startsWith('INSERT INTO account_social_migrations (name)'),
+    );
+    expect(marker).toBeGreaterThan(priorCommit);
+    expect(h.calls.indexOf('SELECT pg_advisory_unlock($1)')).toBeGreaterThan(marker);
   });
 
   it('applies the Discord schema so its tables exist before the feature is enabled', async () => {
@@ -784,8 +824,8 @@ describe('ensureSchema wires every schema module at boot', () => {
     const concurrentIndex = h.calls.findIndex((sql) =>
       sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_account_started_id'),
     );
-    const sessionLock = h.calls.findIndex((sql) => sql.includes('pg_advisory_lock($1)'));
-    const sessionUnlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
+    const sessionLock = h.calls.lastIndexOf('SELECT pg_advisory_lock($1)');
+    const sessionUnlock = h.calls.lastIndexOf('SELECT pg_advisory_unlock($1)');
     expect(commitIndex).toBeGreaterThan(-1);
     expect(concurrentIndex).toBeGreaterThan(commitIndex);
     expect(sessionLock).toBeGreaterThan(commitIndex);
@@ -908,9 +948,17 @@ describe('ensureSchema wires every schema module at boot', () => {
     // make this pin pass or fail for the wrong reason.
     expect(h.calls.some((sql) => sql.includes('CREATE INDEX CONCURRENTLY'))).toBe(false);
     expect(h.calls.some((sql) => sql.includes('DROP INDEX CONCURRENTLY'))).toBe(false);
-    // ...nor the SESSION-level lock the concurrent phase takes (boot uses the
-    // transaction-scoped pg_advisory_xact_lock).
-    expect(h.calls.some((sql) => sql.includes('pg_advisory_lock($1)'))).toBe(false);
+    // The resumable account-edge migration has its own session lock after the
+    // DDL commit; the concurrent-index schema lock still waits until listen.
+    const schemaLock = h.query.mock.calls.find(([sql]) =>
+      sql.includes('pg_advisory_xact_lock'),
+    )?.[1]?.[0];
+    expect(schemaLock).toBeDefined();
+    expect(
+      h.query.mock.calls.some(
+        ([sql, values]) => sql === 'SELECT pg_advisory_lock($1)' && values?.[0] === schemaLock,
+      ),
+    ).toBe(false);
     // And the concurrent phase really does issue them, so this is not vacuous.
     h.calls.length = 0;
     await runConcurrentIndexMigrations();
@@ -1289,6 +1337,7 @@ describe('ensureSchema wires every schema module at boot', () => {
       'bank_ledger_account_large_recent',
       'bank_ledger_container_money_recent',
       'woc_market_sales_realm_created',
+      'referrals_referrer_referee',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'guilds_realm_lower_name_prefix',

@@ -23,10 +23,18 @@ import type { Entity } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-// A pickup deliberately authored onto a walkable structure would go here, as
-// `'<itemId>@<x>,<z>'`, with the reason. Empty on purpose: every shipped
-// pickup stands on natural ground.
-const ON_STRUCTURE_ALLOWLIST: ReadonlySet<string> = new Set<string>();
+// A pickup deliberately authored onto a walkable structure goes here, as
+// `'<itemId>@<x>,<z>'`, with the reason. Every other shipped pickup stands on
+// natural ground.
+const ON_STRUCTURE_ALLOWLIST: ReadonlySet<string> = new Set<string>([
+  // One of the four Warded Shore-Rocks lies on a tread of the Moon Stair, the
+  // built flight to the Drowned Temple's moongate (src/sim/drowned_temple_stair.ts).
+  // Its spot is unchanged (a pickup is a terrain calm anchor: moving it would
+  // reshape the gully the flight is fitted to); the flight is an open ramp from
+  // the mirror to the dais, and tests/drowned_temple_entrance.test.ts walks a
+  // player to the rock and pins it on the tread's own surface.
+  'moongate_rubbing@-68,783',
+]);
 
 // groundHeight adds the walkable lift fields (castle walls and bastions, the
 // beacon spiral, the Vale Cup tiers) over terrainHeight, so any gap between
@@ -175,6 +183,43 @@ describe('authored ground pickups stand on reachable natural ground', () => {
       // The spawned entity's own y, not just the authored column: this is what
       // the client renders and what the interact range measures against.
       expect(c.pos.y).toBeCloseTo(terrainHeight(c.pos.x, c.pos.z, sim.cfg.seed), 5);
+    }
+  });
+});
+
+// The Gravewyrm Sanctum's Seal Gate (src/sim/sanctum_seal_gate.ts) was built
+// over the old spots of four key shards and three sigils (under its east
+// pylon, in its gate tunnel and in its rock wall), so they moved into the gate plaza in front of it, which
+// the quest text already named ("scattered in the gate plaza"). Each one must
+// lie in that plaza on open ground a body can stand on beside it.
+describe('the Sanctum key shards and sigils lie in the gate plaza', () => {
+  const door = { x: 0, z: 858 };
+  const items = ['sanctum_key_shard', 'gravewyrm_sigil'];
+
+  it('none is left in the gate tunnel or its walls, every one is in the plaza', () => {
+    for (const def of GROUND_OBJECTS.filter((g) => items.includes(g.itemId))) {
+      expect(def.positions.length).toBe(4);
+      for (const p of def.positions) {
+        // the plaza runs z 842 to 856, in front of the gate line at z 858
+        expect(p.z, `${def.itemId} at ${p.x},${p.z}`).toBeGreaterThanOrEqual(door.z - 16);
+        expect(p.z, `${def.itemId} at ${p.x},${p.z}`).toBeLessThanOrEqual(door.z - 2);
+        expect(Math.abs(p.x - door.x), `${def.itemId} at ${p.x},${p.z}`).toBeLessThanOrEqual(10);
+      }
+    }
+  });
+
+  it('every one stands clear of the Seal Gate and its props, on natural ground', () => {
+    const sim = makeSim();
+    const seed = sim.cfg.seed;
+    for (const def of GROUND_OBJECTS.filter((g) => items.includes(g.itemId))) {
+      for (const p of def.positions) {
+        const at = `${def.itemId} at ${p.x},${p.z}`;
+        expect(isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS), at).toBe(false);
+        expect(
+          groundHeight(p.x, p.z, seed) - terrainHeight(p.x, p.z, seed),
+          at,
+        ).toBeLessThanOrEqual(LIFT_EPSILON);
+      }
     }
   });
 });

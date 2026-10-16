@@ -987,6 +987,22 @@ export const SFX = [
     stereo: true,
     prompt: 'A soft muffled snowy wind, quiet and cold. Seamless loop, no music.',
   },
+  {
+    // Project-generated (not ElevenLabs): scripts/gen_tavern_ambience_sfx.mjs synthesizes
+    // the Mirefen tavern's room of talk, mugs and hearth crackle from fixed seeds and mixes
+    // in the Fenbridge town theme rendered from the procedural score, baking a crossfaded
+    // wrap so the runtime's plain loop=true playback has no seam. custom is load-bearing: the
+    // generator masters the bed itself (about -17 LUFS, peaks near -8 dBFS), so conform only
+    // enforces the true-peak ceiling and never retargets it. stereo: a non-positional bed
+    // (src/game/sfx.ts plays it through the tavern ambience's lowpass, never a panner).
+    key: 'amb_tavern',
+    duration: 44,
+    loop: true,
+    stereo: true,
+    custom: true,
+    prompt:
+      'A lively medieval tavern room: overlapping talk and laughter, mugs clinking, a hearth crackling and a little lute music from the corner. Seamless loop.',
+  },
 
   // --- Custom recordings (not ElevenLabs) ----------------------------------
   { key: 'quest_accept', custom: true },

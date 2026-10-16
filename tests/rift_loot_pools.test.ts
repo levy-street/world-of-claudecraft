@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../src/sim/content/heroic_loot';
+import {
+  NYTHRAXIS_RELOCATED_ITEM_IDS,
+  NYTHRAXIS_RELOCATED_TRINKET_IDS,
+} from '../src/sim/content/nythraxis_loot';
 import { RIFT_EPIC_ITEM_IDS, RIFT_LEGENDARY_ITEM_IDS } from '../src/sim/content/rift/items';
 import { ITEMS } from '../src/sim/data';
 import { canEquipItem, weaponArchetypeForItem } from '../src/sim/equipment_rules';
@@ -69,11 +73,19 @@ describe('rift clear-loot pools', () => {
       'ignivar_herald_of_the_last_flame',
       'varkhul_forgefather_of_the_last_flame',
     ]);
+    // The raid pieces and trinkets relocated off Nythraxis onto five-man heroic
+    // bosses keep their raid tier and are excluded the same way.
+    const relocated = new Set<string>([
+      ...NYTHRAXIS_RELOCATED_TRINKET_IDS,
+      ...NYTHRAXIS_RELOCATED_ITEM_IDS.map((id) => `heroic_${id}`),
+    ]);
+    for (const id of relocated) expect(pool, id).not.toContain(id);
     for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
       if (RAID_BOSS_IDS.has(bossId)) continue;
       for (const entry of entries) {
         const item = entry.itemId ? ITEMS[entry.itemId] : undefined;
         if (!item?.slot || item.quality !== 'epic') continue;
+        if (relocated.has(entry.itemId ?? '')) continue;
         if (entry.preserveSourceTier) {
           expect(pool).not.toContain(entry.itemId);
           continue;

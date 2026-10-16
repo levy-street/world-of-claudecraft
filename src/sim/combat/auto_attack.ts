@@ -744,13 +744,15 @@ export function meleeSwing(
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {
     applyThornsReaction(ctx, target, attacker);
-    // innate "spiked hide" mobs (e.g. bristleback boars) reflect on every hit
+    // innate "spiked hide" mobs (e.g. bristleback boars) reflect on every hit;
+    // a tuned dungeon spawn scales its spikes by its mechanic factor (the
+    // Snarlvine Lasher's Snarlbark on heroic). Untuned mobs keep the value.
     const spikes = MOBS[target.templateId]?.thorns;
     if (spikes && !attacker.dead) {
       ctx.dealDamage(
         target,
         attacker,
-        spikes.value,
+        Math.max(1, Math.round(spikes.value * (target.mechanicDamageMult ?? 1))),
         false,
         spikes.school ?? 'physical',
         spikes.name ?? 'Spiked Hide',

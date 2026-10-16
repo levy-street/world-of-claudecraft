@@ -17,6 +17,8 @@ const rig = vi.hoisted(() => ({
   renders: 0,
   drawn: '',
   encodes: [] as Array<{ tag: string; cb: (blob: Blob | null) => void }>,
+  /** Every default-kit dressing a capture asked of its visual: [visual key, helm hidden]. */
+  dressings: [] as Array<[string, boolean]>,
 }));
 
 /** What jsdom's FileReader makes of the fake toBlob payload below. */
@@ -62,7 +64,39 @@ vi.mock('../src/render/assets/preload', () => ({
 }));
 vi.mock('../src/render/characters/assets', () => ({
   ensureSkinTexture: () => null,
+  // every body resident: the streamed-WOC wait (trackWocFilesPending) never holds a capture here
+  visualAssetsResident: () => true,
+  onCharacterAssetReady: () => () => undefined,
 }));
+vi.mock('../src/render/characters/woc_armor_dressing', () => ({ wocPortraitKit: () => [] }));
+// the split head files: every one resident unless a case HOLDS it, each fetch kicked for a
+// missing one recorded, the ready listeners the case fires when a held file lands
+const heads = vi.hoisted(() => ({
+  held: new Set<string>(),
+  kicked: [] as string[],
+  ready: new Set<(url: string) => void>(),
+}));
+vi.mock('../src/render/characters/woc_head_packs', async () => {
+  const { wocHeadAppearanceUrls } = await import('../src/render/characters/woc_head_stream_core');
+  const { wocHeadTypeForGender } = await import('../src/render/characters/woc_head_catalog');
+  const urlsOf = (fit: string, app: unknown) =>
+    wocHeadAppearanceUrls(app as Record<string, unknown>, wocHeadTypeForGender(fit));
+  return {
+    // the head measure (woc_portrait_bounds.ts) finds hung pieces by this wrapper tag
+    WOC_HEAD_WRAPPER: 'wocHeadPack',
+    ensureWocHeadForAppearance: (fit: string, app: unknown) => {
+      const missing = urlsOf(fit, app).filter((u) => heads.held.has(u));
+      heads.kicked.push(...missing);
+      return missing.length === 0;
+    },
+    wocHeadAppearanceResident: (fit: string, app: unknown) =>
+      urlsOf(fit, app).every((u) => !heads.held.has(u)),
+    onWocHeadFileReady: (listener: (url: string) => void) => {
+      heads.ready.add(listener);
+      return () => heads.ready.delete(listener);
+    },
+  };
+});
 // Partial on purpose: characters/manifest.ts now pulls npc_looks, which reads
 // NEUTRAL_FACE from this module at load time, so the real exports stay and only
 // the signature this test keys its cache on is faked.
@@ -80,6 +114,7 @@ vi.mock('../src/render/characters/visual', async () => {
   return {
     CharacterVisual: class {
       root = new THREE.Object3D();
+      private readonly visualKey: string;
       constructor(
         visualKey: string,
         _color: number,
@@ -89,10 +124,21 @@ vi.mock('../src/render/characters/visual', async () => {
         _form?: unknown,
         look?: { app?: { sig?: string } },
       ) {
+        this.visualKey = visualKey;
         rig.builds.push(visualKey);
         this.root.userData.tag = look
           ? `${visualKey}:mod:${look.app?.sig}`
           : `${visualKey}:${skin}`;
+      }
+      // The WOC head a class capture is dressed in: tagged by its hairstyle, so
+      // an encode names the head the frame was drawn with.
+      setWocHeadLook(app?: { headHair?: string }) {
+        this.root.userData.tag += `:head:${app?.headHair ?? '?'}`;
+        return true;
+      }
+      setWocDefaultEquipment(helmHidden: boolean) {
+        rig.dressings.push([this.visualKey, helmHidden]);
+        return true;
       }
       update() {}
       dispose() {}
@@ -100,11 +146,13 @@ vi.mock('../src/render/characters/visual', async () => {
   };
 });
 
-import type { ModularLook } from '../src/render/characters/modular';
+import { DEFAULT_APPEARANCE, type ModularLook } from '../src/render/characters/modular';
 import {
   COMPOSED_PORTRAIT_SKIN,
   cachedPortraitByKey,
+  cachedPortraitDataUrl,
   composedPortraitKey,
+  isComposedPortraitKey,
   MODULAR_PORTRAIT_CACHE_MAX,
   modularPortraitDataUrl,
   onPortraitUpdate,
@@ -112,8 +160,10 @@ import {
   portraitsReady,
   resetPortraitRendererForGraphicsRebuild,
   visualPortraitDataUrl,
+  visualPortraitKey,
 } from '../src/render/characters/portrait';
 import { PORTRAIT_CAPTURE_RETRY_BASE_MS } from '../src/render/characters/portrait_capture_lane_core';
+import { WOC_HEAD_MORPH_KEYS } from '../src/render/characters/woc_head_catalog';
 import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
 
 // The retry backoff is measured against the render-wide gpu-prep clock, so the
@@ -151,6 +201,7 @@ describe('live portrait capture', () => {
     expect(rig.encodes).toEqual([]);
     rig.builds.length = 0;
     rig.renders = 0;
+    rig.dressings.length = 0;
   });
 
   it('answers null on a miss and kicks ONE async capture for a crowd of the same class', async () => {
@@ -389,5 +440,135 @@ describe('live portrait capture', () => {
     await vi.waitFor(() =>
       expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('rb0'))).toBe(ASYNC_URL),
     );
+  });
+
+  // A WOC class body wears its player's modular head: the live portrait keys
+  // on that head, and a default head keeps the key it had before heads.
+  const LONG_HAIR = { ...DEFAULT_APPEARANCE, headHair: 'long' };
+
+  it('keeps the pre-head key for a default or absent head, and appends the head otherwise', () => {
+    expect(visualPortraitKey('player_warrior', 0)).toBe('player_warrior:0:headshot');
+    expect(visualPortraitKey('player_warrior', 0, 'headshot', null)).toBe(
+      'player_warrior:0:headshot',
+    );
+    expect(visualPortraitKey('player_warrior', 0, 'headshot', DEFAULT_APPEARANCE)).toBe(
+      'player_warrior:0:headshot',
+    );
+    const key = visualPortraitKey('player_warrior', 1, 'body', LONG_HAIR);
+    expect(key.startsWith('player_warrior:1:body:head:a.long.')).toBe(true);
+    // never mistaken for a composed capture
+    expect(isComposedPortraitKey(key)).toBe(false);
+    // a body with no modular head ignores the appearance entirely
+    expect(visualPortraitKey('player_mech', 2, 'headshot', LONG_HAIR)).toBe(
+      'player_mech:2:headshot',
+    );
+  });
+
+  it('dresses a head-keyed capture in that head and files it under the head key only', async () => {
+    const updated = vi.fn();
+    onPortraitUpdate(updated);
+    expect(visualPortraitDataUrl('player_warrior', 7, 'headshot', LONG_HAIR)).toBeNull();
+    await settleCapture('player_warrior:7:head:long');
+    await vi.waitFor(() =>
+      expect(visualPortraitDataUrl('player_warrior', 7, 'headshot', LONG_HAIR)).toBe(ASYNC_URL),
+    );
+    // reported by (visual, skin), so every frame holding that body re-asks with its own head
+    expect(updated).toHaveBeenCalledWith('player_warrior', 7);
+    // the default face is still its own entry: a custom head never answers for it
+    expect(cachedPortraitDataUrl('player_warrior', 7)).toBeNull();
+    expect(rig.builds).toEqual(['player_warrior']);
+  });
+
+  it('shares ONE capture between a default head and no head, and never dresses it', async () => {
+    expect(visualPortraitDataUrl('player_warrior', 8, 'headshot', DEFAULT_APPEARANCE)).toBeNull();
+    expect(visualPortraitDataUrl('player_warrior', 8)).toBeNull();
+    await vi.waitFor(() => expect(rig.encodes).toHaveLength(1));
+    expect(rig.encodes[0].tag).toBe('player_warrior:8');
+    await settleCapture('player_warrior:8');
+    await vi.waitFor(() => expect(visualPortraitDataUrl('player_warrior', 8)).toBe(ASYNC_URL));
+    expect(visualPortraitDataUrl('player_warrior', 8, 'headshot', DEFAULT_APPEARANCE)).toBe(
+      ASYNC_URL,
+    );
+  });
+
+  it('bounds the head-keyed entries with the composed cap: the oldest head is evicted', async () => {
+    // distinct heads by face controls, one signature step (0.05) apart
+    const [k0, k1] = WOC_HEAD_MORPH_KEYS;
+    const heads = Array.from({ length: MODULAR_PORTRAIT_CACHE_MAX + 1 }, (_, i) => ({
+      ...LONG_HAIR,
+      headShape: { [k0]: ((i % 40) - 20) / 20, [k1]: Math.floor(i / 40) / 20 },
+    }));
+    const keys = new Set(heads.map((h) => visualPortraitKey('player_warrior', 9, 'headshot', h)));
+    expect(keys.size).toBe(heads.length);
+    for (const h of heads) {
+      expect(visualPortraitDataUrl('player_warrior', 9, 'headshot', h)).toBeNull();
+    }
+    await vi.waitFor(() => expect(rig.encodes).toHaveLength(heads.length));
+    for (let i = 0; i < heads.length; i++) await settleCapture('player_warrior:9:head:long');
+    const last = heads[heads.length - 1];
+    await vi.waitFor(() =>
+      expect(visualPortraitDataUrl('player_warrior', 9, 'headshot', last)).toBe(ASYNC_URL),
+    );
+    expect(cachedPortraitByKey(visualPortraitKey('player_warrior', 9, 'headshot', heads[0]))).toBe(
+      null,
+    );
+    expect(cachedPortraitByKey(visualPortraitKey('player_warrior', 9, 'headshot', heads[1]))).toBe(
+      ASYNC_URL,
+    );
+  });
+
+  it('waits for exactly the head files its look draws, never the library, then captures', async () => {
+    const MOHAWK = { ...DEFAULT_APPEARANCE, headHair: 'mohawk' };
+    const mohawk = 'models/chars/players/woc/head_type_a_hair_mohawk.glb';
+    heads.held.add(mohawk);
+    heads.kicked.length = 0;
+    const updated = vi.fn();
+    onPortraitUpdate(updated);
+    expect(visualPortraitDataUrl('player_warrior', 13, 'headshot', MOHAWK)).toBeNull();
+    await flush();
+    // nothing is built while its hairstyle streams, and only that file was asked for
+    expect(rig.builds).toEqual([]);
+    expect(heads.kicked).toEqual([mohawk]);
+    // a default head on the same body needs none of it: it captures meanwhile
+    expect(visualPortraitDataUrl('player_warrior', 14)).toBeNull();
+    await settleCapture('player_warrior:14');
+    // the file lands: the consumers are told to re-ask, and the re-ask captures that head
+    heads.held.delete(mohawk);
+    for (const listener of heads.ready) listener(mohawk);
+    expect(updated).toHaveBeenCalledWith('player_warrior', 13);
+    expect(visualPortraitDataUrl('player_warrior', 13, 'headshot', MOHAWK)).toBeNull();
+    await settleCapture('player_warrior:13:head:mohawk');
+    await vi.waitFor(() =>
+      expect(visualPortraitDataUrl('player_warrior', 13, 'headshot', MOHAWK)).toBe(ASYNC_URL),
+    );
+    expect(heads.kicked).toEqual([mohawk]);
+  });
+
+  it('wakes EVERY skin waiting on the same body when its head file lands', async () => {
+    const QUIFF = { ...DEFAULT_APPEARANCE, headHair: 'quiff' };
+    const quiff = 'models/chars/players/woc/head_type_a_hair_quiff.glb';
+    heads.held.add(quiff);
+    const updated = vi.fn();
+    onPortraitUpdate(updated);
+    expect(visualPortraitDataUrl('player_warrior', 15, 'headshot', QUIFF)).toBeNull();
+    expect(visualPortraitDataUrl('player_warrior', 16, 'headshot', QUIFF)).toBeNull();
+    heads.held.delete(quiff);
+    for (const listener of heads.ready) listener(quiff);
+    // both chips hydrate by their own (body, skin), so both are told to re-ask
+    expect(updated).toHaveBeenCalledWith('player_warrior', 15);
+    expect(updated).toHaveBeenCalledWith('player_warrior', 16);
+  });
+
+  it('never dresses a capture through the visual dressing API, which streams armor', async () => {
+    // Every CharacterVisual dressing setter reaches WocArmorDressing.want, which fetches
+    // the LIVE tier's armor: a portrait's kit is the no-fetch one it waited for, so the
+    // helm comes off portrait-side instead (woc_portrait_bounds.ts uncoverWocPortraitHead).
+    expect(visualPortraitDataUrl('player_warrior', 11, 'headshot', LONG_HAIR)).toBeNull();
+    await settleCapture('player_warrior:11:head:long');
+    expect(visualPortraitDataUrl('player_warrior', 12)).toBeNull();
+    await settleCapture('player_warrior:12');
+    expect(visualPortraitDataUrl('player_mech', 11)).toBeNull();
+    await settleCapture('player_mech:11');
+    expect(rig.dressings).toEqual([]);
   });
 });

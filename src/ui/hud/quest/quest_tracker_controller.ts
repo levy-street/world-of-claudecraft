@@ -55,6 +55,12 @@ export interface QuestTrackerControllerDeps {
   questTitle(questId: string): string;
   objectiveLabel(questId: string, objectiveIndex: number): string;
   click(): void;
+  /**
+   * The group dungeon run as a strip page, or null outside one
+   * (hud/dungeon dungeonStripQuest). TOUCH ONLY: on desktop the run has a
+   * tracker of its own at the top of the stack, so it never joins these rows.
+   */
+  dungeonRow?(): TrackedQuest | null;
 }
 
 /** Owns quest tracker projection, collapse persistence, and elided DOM updates.
@@ -83,6 +89,9 @@ export class QuestTrackerController {
   // tracker rewrote itself each update and the pulse strobed as it was
   // stripped and re-added in a fight.
   private lastHtml: string | null = null;
+  /** The dungeon strip page seen on the previous update: its first sighting
+   *  takes the strip once (see update). An id, never text. */
+  private lastDungeonRowId: string | null = null;
   /** A live movement lesson must remain readable. While it is present its
    *  section's header is a truthful disabled control and cannot mutate the
    *  saved choice. Null when no lesson holds a section open. */
@@ -278,6 +287,19 @@ export class QuestTrackerController {
     // On touch the strip IS the tracker: the right-anchored markup is hidden in
     // hud.mobile.css, so rendering it would be a string build a phone never sees.
     if (this.strip?.active() === true) {
+      // The dungeon run joins the strip as a page of its own, AFTER the quests:
+      // the selection is positional, so a page that came and went at the front
+      // would shift every quest under the player's thumb. It takes the strip
+      // ONCE, on the tick it first appears (stepping into the dungeon), and is
+      // an ordinary page after that: the player can cycle away, and a boss
+      // falling brings it back through the strip's own progress jump (which a
+      // quest that progressed on the same tick still wins, being listed first).
+      const dungeon = this.deps.dungeonRow?.() ?? null;
+      if (dungeon) {
+        quests.push(dungeon);
+        if (dungeon.id !== this.lastDungeonRowId) focusQuestId ??= dungeon.id;
+      }
+      this.lastDungeonRowId = dungeon ? dungeon.id : null;
       this.strip.update(quests, now, focusQuestId);
       this.paintedSections = new Set();
       if (this.deps.element.innerHTML !== '') this.deps.element.innerHTML = '';

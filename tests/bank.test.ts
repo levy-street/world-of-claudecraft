@@ -1934,11 +1934,11 @@ describe('sanitizeBankState', () => {
       sanitizeBankState({ inventory: [], purchasedSlots: 0, bonusSlots: n }).bonusSlots;
     expect(bs(-4)).toBe(0);
     expect(bs(5)).toBe(5);
-    expect(bs(16)).toBe(16); // the ceiling itself is admitted...
-    expect(bs(17)).toBe(16); // ...and anything past it clamps (tampered-save capacity mint)
-    expect(bs(9999)).toBe(16);
+    expect(bs(36)).toBe(36); // the ceiling itself is admitted...
+    expect(bs(37)).toBe(36); // ...and anything past it clamps (tampered-save capacity mint)
+    expect(bs(9999)).toBe(36);
     expect(bs(7.9)).toBe(7); // floored, like purchasedSlots
-    expect(BANK_MAX_BONUS_SLOTS).toBe(16); // 2 email + 2 discord + 2 wallet + 10 referral
+    expect(BANK_MAX_BONUS_SLOTS).toBe(36); // Existing 16 plus permanent 20 from stamp cards.
   });
 });
 
@@ -2260,14 +2260,14 @@ describe('server-stamped bank bonus', () => {
     { id: 'referral', slots: 6, maxSlots: 10, count: 3, cap: 5 },
   ];
 
-  it('clampBonusSlots pins the [0, 16] registry ceiling as literals', () => {
+  it('clampBonusSlots pins the [0, 36] registry ceiling as literals', () => {
     expect(clampBonusSlots(-3)).toBe(0);
     expect(clampBonusSlots(0)).toBe(0);
     expect(clampBonusSlots(10.9)).toBe(10);
-    expect(clampBonusSlots(16)).toBe(16);
-    expect(clampBonusSlots(17)).toBe(16);
+    expect(clampBonusSlots(36)).toBe(36);
+    expect(clampBonusSlots(37)).toBe(36);
     expect(clampBonusSlots(Number.NaN)).toBe(0);
-    expect(clampBonusSlots(Number.POSITIVE_INFINITY)).toBe(16);
+    expect(clampBonusSlots(Number.POSITIVE_INFINITY)).toBe(36);
     expect(clampBonusSlots('junk')).toBe(0);
   });
 

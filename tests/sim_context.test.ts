@@ -8,6 +8,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { createDeedRuntime } from '../src/sim/deeds';
+import { freshMusterArmy } from '../src/sim/mirefen_muster';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -150,6 +151,7 @@ const CALLBACK_KEYS = [
   'lockoutNowMs',
   'raidResetMs',
   'weeklyRaidResetMs',
+  'dayNightPhase',
   'instanceKeyFor',
   'instanceOriginOf',
   'instanceClaimIdAt',
@@ -393,6 +395,7 @@ function makeFakeHost() {
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
     worldBossEntityIds: [],
+    musterArmy: freshMusterArmy(),
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),
@@ -405,7 +408,10 @@ function makeFakeHost() {
     grantDeed: vi.fn(() => true),
     emit: vi.fn(),
     error: vi.fn(),
-    reserveVaultConsumption: vi.fn(() => ({ commit: vi.fn(), cancel: vi.fn() })),
+    reserveVaultConsumption: vi.fn(() => ({
+      commit: vi.fn(),
+      cancel: vi.fn(),
+    })),
     dealDamage: vi.fn(),
     handleDeath: vi.fn(),
     cancelCast: vi.fn(),
@@ -482,6 +488,7 @@ function makeFakeHost() {
     lockoutNowMs: vi.fn(() => 0),
     raidResetMs: vi.fn((nowMs: number) => nowMs),
     weeklyRaidResetMs: vi.fn((nowMs: number) => nowMs),
+    dayNightPhase: vi.fn(() => null),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     instanceClaimIdAt: vi.fn(() => null),
@@ -683,7 +690,11 @@ describe('createSimContext (isolated, fake host)', () => {
     const ctx = createSimContext(host);
     expect(ctx.guildBanks).toBe(host.guildBanks);
     host.guildBanks.set(3, { treasury: 0, inventory: [], purchasedSlots: 0 });
-    expect(ctx.guildBanks.get(3)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 0 });
+    expect(ctx.guildBanks.get(3)).toEqual({
+      treasury: 0,
+      inventory: [],
+      purchasedSlots: 0,
+    });
   });
 
   it('passes every callback through to the host by identity (no rewrapping)', () => {
@@ -781,7 +792,12 @@ describe('Sim.ctx (real seam delegation)', () => {
       const sim = makeSim(7);
       for (let i = 0; i < 40; i++) sim.tick();
       const p = sim.entities.get(sim.primaryId) as Entity;
-      return { time: sim.ctx.time, tick: sim.ctx.tickCount, hp: p.hp, pos: { ...p.pos } };
+      return {
+        time: sim.ctx.time,
+        tick: sim.ctx.tickCount,
+        hp: p.hp,
+        pos: { ...p.pos },
+      };
     };
     expect(run()).toEqual(run());
   });

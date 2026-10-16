@@ -18,6 +18,24 @@ export const TARGET_HEIGHT = 2.2;
 // what the scale sliders said. Per-placement scale still multiplies on top,
 // and the collide-radius factors are tuned against these same heights so the
 // blocking circle keeps tracking the visual silhouette.
+
+// City ground clutter (scripts/assets/clutter/make_city_clutter.mjs): tiny
+// pieces authored in yards, ground at the origin. Scale 1 = as built, so a
+// pebble placed by hand is a pebble, not a 2.2 yd boulder. The painted
+// clutter layer (render/city_clutter.ts) uses the raw models directly.
+export const CITY_CLUTTER_MAX_DIM: Record<string, number> = {
+  tile_broken: 0.61,
+  tile_shards: 0.569,
+  pebbles: 0.435,
+  stones: 0.43,
+  letter: 0.496,
+  paper_scraps: 0.407,
+  leaves: 0.495,
+  straw: 0.591,
+  splinters: 0.5,
+  pot_shards: 0.438,
+};
+
 export function targetHeightFor(path: string): number {
   // The loader normalizes by the largest source dimension. This model is already
   // authored at 14 x 11 x 7.2 yards, so preserving its 14-yard width keeps the
@@ -27,6 +45,9 @@ export function targetHeightFor(path: string): number {
   // arcade-floor height matches the wall-tower blueprint at placement scale 1;
   // preserve that instead of squashing to TARGET_HEIGHT.
   if (/\/city\/wall_tower\.glb$/i.test(path)) return 9.6;
+  // City ground clutter: authored yards, scale 1 = as built.
+  const clutter = /\/clutter\/([a-z0-9_]+)\.glb$/i.exec(path);
+  if (clutter && CITY_CLUTTER_MAX_DIM[clutter[1]]) return CITY_CLUTTER_MAX_DIM[clutter[1]];
   // Palms live in the biome set but are trees: match them wherever they sit.
   if (/beach_palm/i.test(path)) return 4;
   if (/desert_cactus_tall/i.test(path)) return 4.5;

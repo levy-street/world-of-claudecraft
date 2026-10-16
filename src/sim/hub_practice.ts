@@ -29,6 +29,7 @@ import {
 import { MOBS } from './data';
 import { createMob, createNpc } from './entity';
 import { playerDummyRestHp } from './mob/practice_dummies';
+import { practiceDummyPos } from './moved_objects';
 import type { SimContext } from './sim_context';
 import type { WorldContent } from './types';
 
@@ -40,12 +41,19 @@ export function hubPracticeEnabled(world: WorldContent): boolean {
 
 export function spawnHubPractice(ctx: SimContext, world: WorldContent): void {
   if (!hubPracticeEnabled(world)) return;
+  // A Studio map may move either dummy (moved_objects.ts); the spawn order and
+  // ids never change, only the mark each one stands on.
+  const dummyPos = practiceDummyPos(
+    world.objectMoves,
+    HUB_TRAINING_DUMMY_ID,
+    HUB_TRAINING_DUMMY_POS,
+  );
   const dummyTemplate = MOBS[HUB_TRAINING_DUMMY_ID];
   const dummy = createMob(
     ctx.nextId++,
     dummyTemplate,
     dummyTemplate.maxLevel,
-    ctx.groundPos(HUB_TRAINING_DUMMY_POS.x, HUB_TRAINING_DUMMY_POS.z),
+    ctx.groundPos(dummyPos.x, dummyPos.z),
   );
   dummy.facing = 0;
   dummy.prevFacing = 0;
@@ -53,12 +61,17 @@ export function spawnHubPractice(ctx: SimContext, world: WorldContent): void {
   const def = world.npcs[HUB_SPARRING_MASTER_ID];
   const hale = createNpc(ctx.nextId++, def, ctx.groundPos(def.pos.x, def.pos.z));
   ctx.addEntity(hale);
+  const healingPos = practiceDummyPos(
+    world.objectMoves,
+    HUB_HEALING_DUMMY_ID,
+    HUB_HEALING_DUMMY_POS,
+  );
   const healingTemplate = MOBS[HUB_HEALING_DUMMY_ID];
   const healingDummy = createMob(
     ctx.nextId++,
     healingTemplate,
     healingTemplate.maxLevel,
-    ctx.groundPos(HUB_HEALING_DUMMY_POS.x, HUB_HEALING_DUMMY_POS.z),
+    ctx.groundPos(healingPos.x, healingPos.z),
   );
   healingDummy.facing = 0;
   healingDummy.prevFacing = 0;
@@ -68,4 +81,18 @@ export function spawnHubPractice(ctx: SimContext, world: WorldContent): void {
   // template's own level-5 hp is the pool, set by createMob above.
   healingDummy.hp = playerDummyRestHp(healingDummy.maxHp);
   ctx.addEntity(healingDummy);
+}
+
+/** The dev-only Highwatch healer practice dummy a no-player dev host gets
+ *  (moved here from the Sim constructor under the monolith ratchet). */
+export function spawnDevHealerPracticeDummy(ctx: SimContext): void {
+  const pos = ctx.groundPos(-34, 648);
+  const dummy = createMob(ctx.nextId++, MOBS.training_dummy, 20, pos);
+  dummy.name = 'Healing Dummy';
+  dummy.color = 0x74c476;
+  dummy.hostile = false;
+  dummy.friendlyPracticeTarget = true;
+  dummy.facing = 0;
+  dummy.prevFacing = 0;
+  ctx.addEntity(dummy);
 }

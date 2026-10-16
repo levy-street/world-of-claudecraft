@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   CharacterDeleteClientGone,
   CharacterDeleteQueueSaturated,
+  CharacterReferralRewardPending,
   CharacterStoragePurchaseOpen,
 } from '../../server/character_delete_db';
 import {
@@ -15,6 +16,20 @@ import {
 import { FakeRes } from './helpers/fake_http';
 
 describe('characterDeleteHttpRefusal', () => {
+  it.each([
+    ['transferable', 'character.referral_transfer_pending', 'Move all unlocked stamp cards'],
+    ['bond', 'character.referral_bond_pending', 'after delivery finishes'],
+  ] as const)(
+    'maps the %s custody refusal without leaking character identity',
+    (reason, code, hint) => {
+      const refusal = characterDeleteHttpRefusal(new CharacterReferralRewardPending(42, reason));
+      expect(refusal?.status).toBe(409);
+      expect(refusal?.body.code).toBe(code);
+      expect(refusal?.body.error).toContain(hint);
+      expect(JSON.stringify(refusal)).not.toContain('42');
+    },
+  );
+
   it.each(['pending', 'unresolved'] as const)(
     'maps an open %s storage purchase to the same non-sensitive 409 contract',
     (status) => {

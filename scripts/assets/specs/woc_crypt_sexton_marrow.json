@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_sexton_marrow_woc.glb",
+      "out": "models/creatures/woc_crypt_sexton_marrow.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Attack",
+        "Attack2",
+        "Hit",
+        "Death",
+        "Shovelful",
+        "Measure",
+        "GravediggersBlow",
+        "BellRing"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

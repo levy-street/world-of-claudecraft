@@ -22,6 +22,7 @@ import { forgefatherIsleRockWeight } from '../sim/content/ember_coast';
 import {
   COLUMN_ZONES,
   columnBlendAt,
+  isBuiltinWorldActive,
   STRIP_ZONES,
   WORLD_MAX_X,
   WORLD_MAX_Z,
@@ -47,6 +48,7 @@ import {
   shoreWaterGate,
 } from './shore_water_gate_core';
 import { meshTerrainHeight } from './terrain_mesh_height';
+import { paintTintAt } from './terrain_paint_tint';
 import { BIOME_PALETTE, ROCK_SLOPE_START, TERRAIN_TONES } from './terrain_palette';
 
 /** Square far-mesh tile edge, world units. Divisible by every tier spacing.
@@ -486,8 +488,35 @@ const stripPalette = (zn: (typeof ZONES)[number]): FarPalette =>
 
 /** The same strip-cascade plus column blend paletteAt uses in terrain.ts,
  *  over linear triples. Writes into the module scratch (hot loop). */
+const authoredFarPalettes = new Map<string, FarPalette>();
+
 function farPaletteAt(x: number, z: number): FarPalette {
   const out = farPaletteScratch;
+  // An authored map's vista wears its own zone's palette, exactly like its
+  // near terrain (terrain_chunk_build.ts paletteAt): the strip cascade is the
+  // shipped world's z-band layout and painted a maker's horizon in rainbow
+  // bands of built-in realms.
+  if (!isBuiltinWorldActive()) {
+    const biome = zoneBiomeAt(x, z);
+    let pal = authoredFarPalettes.get(biome);
+    if (!pal) {
+      const p = BIOME_PALETTE[biome];
+      pal = {
+        grass: srgbHexToLinear(p.grass),
+        grassDark: srgbHexToLinear(p.grassDark),
+        grassYellow: srgbHexToLinear(p.grassYellow),
+        dirt: srgbHexToLinear(p.dirt),
+        sand: srgbHexToLinear(p.sand),
+      };
+      authoredFarPalettes.set(biome, pal);
+    }
+    copy3(out.grass, pal.grass);
+    copy3(out.grassDark, pal.grassDark);
+    copy3(out.grassYellow, pal.grassYellow);
+    copy3(out.dirt, pal.dirt);
+    copy3(out.sand, pal.sand);
+    return out;
+  }
   const first = stripPalette(STRIP_ZONES[0]);
   copy3(out.grass, first.grass);
   copy3(out.grassDark, first.grassDark);
@@ -754,6 +783,20 @@ export function farGroundColor(
     const alt = softRamp(h, 12, 42, cellRise);
     lerp3(out, TONE.hazyPeak, rim * (FAR_RIM_TINT_BASE + alt * FAR_RIM_TINT_ALT));
     grassW *= 1 - rim * 0.85;
+  }
+
+  // The map's PAINT layer: the same authored ground the near chunks draw
+  // (terrain_paint_tint.ts), so a painted plaza reads stone from a kilometre
+  // out instead of popping from meadow-green when its detail chunks stream in.
+  // One tap, the far mesh's own vertex spacing is coarser than any feather.
+  const paint = paintTintAt(x, z);
+  if (paint) {
+    const t = paint.strength;
+    out[0] += (paint.r - out[0]) * t;
+    out[1] += (paint.g - out[1]) * t;
+    out[2] += (paint.b - out[2]) * t;
+    if (paint.snow > 0) lerp3(out, TONE.snowCap, paint.snow * 0.6);
+    grassW *= 1 - t;
   }
   return grassW;
 }

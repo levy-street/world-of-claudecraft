@@ -104,6 +104,7 @@ import {
   requestIp,
 } from './ratelimit';
 import { publicOriginFromRequest, REALM, REALM_PUBLIC_ORIGIN } from './realm';
+import { type ReferralSignup, resolveReferralSignup } from './referral_armour_db';
 
 const STATE_TTL_MINUTES = 10;
 // A first-time login's "create new or link existing?" choice is parked this long
@@ -529,7 +530,8 @@ export async function handleDiscordLoginNew(
     let accountId = await accountForDiscord(pool, user.id);
     let username: string;
     if (accountId === null) {
-      const account = await provisionDiscordAccount(user, meta);
+      const referral = await resolveReferralSignup(body.ref);
+      const account = await provisionDiscordAccount(user, meta, referral);
       const linked = await linkDiscordToAccount(pool, account.id, {
         discordUserId: user.id,
         username: discordDisplayName(user),
@@ -802,6 +804,7 @@ function sanitizeBaseUsername(name: string): string {
 async function provisionDiscordAccount(
   user: DiscordUser,
   meta: { ip: string; userAgent: string },
+  referral: ReferralSignup | null,
 ): Promise<AccountRow> {
   const base = sanitizeBaseUsername(discordDisplayName(user));
   for (let i = 0; i < 8; i++) {
@@ -815,6 +818,7 @@ async function provisionDiscordAccount(
       // real password is set (which is what the unlink flow requires first).
       return await createAccount(candidate, await hashPassword(newToken()), meta, {
         passwordSet: false,
+        referral,
       });
     } catch (err) {
       if (isUniqueViolation(err)) continue;
@@ -822,7 +826,10 @@ async function provisionDiscordAccount(
     }
   }
   const fallback = `disc${randomBytes(8).toString('hex').slice(0, 18)}`;
-  return createAccount(fallback, await hashPassword(newToken()), meta, { passwordSet: false });
+  return createAccount(fallback, await hashPassword(newToken()), meta, {
+    passwordSet: false,
+    referral,
+  });
 }
 
 // ── GET /api/discord (status + presence for the HUD widget) ────────────────────

@@ -25,6 +25,9 @@ import {
 } from './meadow_tuning';
 
 export interface GrassGroundBake {
+  /** The WebGLRenderer whose context owns `texture`. A renderer may only
+   *  retire the bake it made itself, see clearGrassGroundBakeFor. */
+  owner: THREE.WebGLRenderer;
   /** Tileable linear-space albedo, RepeatWrapping, mipped, anisotropic. */
   texture: THREE.Texture;
   /** Per-channel mean of the baked patch (linear). This IS the blades'
@@ -44,6 +47,29 @@ export function setGrassGroundBake(bake: GrassGroundBake | null): void {
 
 export function getGrassGroundBake(): GrassGroundBake | null {
   return activeBake;
+}
+
+/**
+ * Retire the bake IF it is still the one `owner` made.
+ *
+ * Renderer.shutdown() must clear this singleton, left set, the next
+ * renderer's terrain materials bind a texture from a dead GL context and the
+ * ground samples white. But `shutdownTask` is ASYNC, so an outgoing renderer's
+ * teardown can land AFTER the incoming one has already baked and built its
+ * materials; an unconditional dispose there kills the good bake instead, and
+ * the ground goes white a second time, worse, progressively, as terrain
+ * chunks re-mesh while the player walks and each new material binds the
+ * corpse. (Tried unconditionally on 2026-09-22, made it worse, and this is
+ * the guard that makes the clear safe.)
+ *
+ * Ownership settles it: a late teardown finds `activeBake.owner` is no longer
+ * its own renderer and leaves the live bake alone.
+ */
+export function clearGrassGroundBakeFor(owner: THREE.WebGLRenderer): boolean {
+  if (!activeBake || activeBake.owner !== owner) return false;
+  activeBake.texture.dispose();
+  activeBake = null;
+  return true;
 }
 
 // Same integer hash family the carpet uses for placement decisions.
@@ -185,5 +211,5 @@ export function bakeGrassGroundTexture(
   mat.dispose();
   im.dispose();
 
-  return { texture: rt.texture, mean };
+  return { owner: renderer, texture: rt.texture, mean };
 }

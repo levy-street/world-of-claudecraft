@@ -17,6 +17,7 @@ import {
   migrateLegacyInstancePos,
   zoneAt,
 } from './data';
+import { dungeonDoorPos } from './moved_objects';
 
 export interface SavedPos {
   x: number;
@@ -73,7 +74,8 @@ export function resolveSavedPosExit(saved: SavedPos | null | undefined): SavedPo
   }
   if (pos && pos.x > DUNGEON_X_THRESHOLD) {
     const dungeon = dungeonAt(pos.x) ?? DUNGEON_LIST[0];
-    return { pos: { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 }, instanceExit: true };
+    const door = dungeonDoorPos(getActiveWorldContent().objectMoves, dungeon);
+    return { pos: { x: door.x, z: door.z - 4 }, instanceExit: true };
   }
   return { pos, instanceExit };
 }

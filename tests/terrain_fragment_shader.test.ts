@@ -109,7 +109,7 @@ describe('insane terrain fragment shader', () => {
     // past the wocDetailFade band where their maps have mipped flat.
     expect(fragmentShader).toContain(
       `if ( (wocHasDirt || wocHasRock) && wocNearDetail )
-          fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;`,
+          fineHard = WOC_NRM(tuv * 2.4, WOC_N_ROCK).xy * 2.0 - 1.0;`,
     );
   });
 
@@ -120,6 +120,8 @@ describe('insane terrain fragment shader', () => {
       colors: new Float32Array([1, 1, 1, 1, 1, 1, 1, 1, 1]),
       uvs: new Float32Array([0, 0, 1, 0, 0, 1]),
       indices: new Uint16Array([0, 1, 2]),
+      rim: null,
+      clip: null,
     };
     const grassMud = finishChunkGeometry({
       ...common,
@@ -172,12 +174,23 @@ describe('insane terrain fragment shader', () => {
     expect(fragmentShader).toContain('vec3 wocReliefUnitN = normalize(vWNorm);');
     expect(fragmentShader.match(/normalize\(vWNorm\)/g)).toHaveLength(2);
     expect(fragmentShader).toContain('float wocCamDist = length(pRay);');
-    expect(fragmentShader).toContain('if (upW > 0.55 && pDist < 36.0) {');
+    // Studio gates parallax on the ground-UV plane's dominance (its pDir is a
+    // world-XZ frame). The built-in world keeps the top-down UV with a zero
+    // wocTAN, so `upW >= max(0, 0)` is implied by `upW > 0.55` there and the
+    // shipped guard is unchanged in effect.
+    expect(fragmentShader).toContain('vec3 wocTAN = vec3(0.0); vec2 wocTPlane = vWPos.xz;');
     expect(fragmentShader).toContain(
-      'vec3 alb = grassAlb * vSplatR.x\n' +
-        '                 + dirtAlb * vSplatR.y\n' +
-        '                 + rockAlb * vSplatR.z\n' +
-        '                 + sandAlb * vSplatR.w;',
+      'if (upW >= max(wocTAN.x, wocTAN.z) && upW > 0.55 && pDist < 36.0) {',
+    );
+    // The Studio merge names the splat weights wocHW so authored maps can
+    // height-blend them; in the built-in world nothing runs between the copy
+    // and the sum, so this is the release's plain vSplatR-weighted composite.
+    expect(fragmentShader).toContain(
+      'vec4 wocHW = vSplatR;\n' +
+        '        vec3 alb = grassAlb * wocHW.x\n' +
+        '                 + dirtAlb * wocHW.y\n' +
+        '                 + rockAlb * wocHW.z\n' +
+        '                 + sandAlb * wocHW.w;',
     );
     expect(fragmentShader).toContain(
       'diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;',
@@ -211,13 +224,13 @@ describe('insane terrain fragment shader', () => {
     expect(fragmentShader).toContain('if (wocDetailN > 0.0) {');
     const detailGate = fragmentShader.indexOf('if (wocDetailN > 0.0) {');
     for (const tap of [
-      'texture2D(uGrassN, combT + grassJitter)',
-      'texture2D(uDirtN, tuv * 0.55)',
-      'texture2D(uRockN, tuv * 0.6)',
-      'texture2D(uSandN, tuv)',
-      'texture2D(uRockN, tuv * 2.4)',
-      'texture2D(uGrassN, combT * 3.0)',
-      'texture2D(uRockN, tuv * 1.8)',
+      'WOC_NRM(combT + grassJitter, WOC_N_GRASS)',
+      'WOC_NRM(tuv * 0.55, WOC_N_DIRT)',
+      'WOC_NRM(tuv * 0.6, WOC_N_ROCK)',
+      'WOC_NRM(tuv, WOC_N_SAND)',
+      'WOC_NRM(tuv * 2.4, WOC_N_ROCK)',
+      'WOC_NRM(combT * 3.0, WOC_N_GRASS)',
+      'WOC_NRM(tuv * 1.8, WOC_N_ROCK)',
     ]) {
       expect(fragmentShader.indexOf(tap)).toBeGreaterThan(detailGate);
     }
@@ -226,7 +239,7 @@ describe('insane terrain fragment shader', () => {
     expect(fragmentShader).toContain('detN *= smoothstep(0.5, 0.82, vWNorm.y) * wocDetailN;');
     // The CLIFF wall normals stay OUTSIDE the gate: wall relief is what keeps
     // a mountainside reading as rock right out to the detail horizon.
-    expect(fragmentShader.indexOf('texture2D(uRockN, vWPos.yz * 0.132)')).toBeGreaterThan(
+    expect(fragmentShader.indexOf('WOC_NRM(vWPos.yz * 0.132, WOC_N_ROCK)')).toBeGreaterThan(
       fragmentShader.indexOf('normal = normalize(normal + tbn * vec3(detN, 0.0));'),
     );
   });

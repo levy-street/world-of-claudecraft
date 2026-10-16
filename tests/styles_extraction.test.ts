@@ -102,6 +102,7 @@ describe('CSS extraction: barrel + seam wiring', () => {
       'library.css',
       'hud.css',
       'components.css',
+      'referral_cards.css',
       'shell.css',
       'hud.mobile.css',
       'shell.website.css',

@@ -14,8 +14,8 @@
 //
 // Deterministic and rng-free. The colliders join the static grid with the rest of the
 // harbor (wyrmwatch_harbor.ts, built-in world only); the harbormaster is spawned at world
-// init under her reserved id (spawnHarborHouseKeeper, from sim.ts), so the sequential id
-// stream every other entity takes is untouched.
+// init under her reserved id (spawnHarborHouseKeeper, from sim.ts through
+// built_world_keepers.ts), so the sequential id stream every other entity takes is untouched.
 
 import type { Collider } from './colliders';
 import {

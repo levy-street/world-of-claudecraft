@@ -1061,6 +1061,89 @@ const dotsOffSeed = async (page) => {
   );
 };
 
+// The "Dungeon mechanic hints" option (settings.showDungeonHints): stated ON
+// before the document loads, on the standing lowest preset. The harness
+// profile's localStorage outlives page.close, so a "hidden" variant's off
+// (set through the real options row below) would otherwise leak into the next
+// shot.
+const dungeonHintsOnSeed = async (page) => {
+  await lowGraphicsSeed(page);
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.showDungeonHints = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+
+/** Turn the hints off the way a player does: Options, Interface, Combat, the
+ *  row's own button. Throws unless the button then reads off. */
+async function turnDungeonHintsOffThroughTheOption(page) {
+  await openInterfaceCombatTab(page);
+  const pressed = await page.evaluate(() => {
+    const toggle = document.querySelector('#options-menu [data-setting-key="showDungeonHints"]');
+    toggle?.click();
+    return toggle?.getAttribute('aria-pressed') ?? null;
+  });
+  if (pressed !== 'false')
+    throw new Error(`the Dungeon mechanic hints row did not turn off (aria-pressed=${pressed})`);
+  await wait(300);
+  await page.evaluate(() => window.__game?.hud?.toggleOptionsMenu?.());
+  await wait(500);
+}
+
+/** A real Sunken Bastion fight for the hints shots: a fresh run, the jump to
+ *  Knight-Commander Olen, the pull, then his Sentence of the Tide fired through
+ *  the playtest trigger until the Sentenced mark is on the local player. The
+ *  mark lasts five seconds, shorter than a software-rendered capture can be
+ *  trusted to take, so its clock (and the fight's own copy) is HELD for the
+ *  shot: the staging the frames disclose. Returns once the mark is up. */
+async function stageOlenSentence(page) {
+  const chat = async (line, ms) => {
+    await page.evaluate((l) => window.__game.world.chat(l), line);
+    await wait(ms);
+  };
+  for (const line of ['/dev level 20', '/dev god', '/dev bastion enter', '/dev bastion gates'])
+    await chat(line, 1300);
+  await chat('/dev bastion tp olen', 1500);
+  await waitForCurtainStreak(page);
+  await sweepOverlays(page, 3);
+  const pulled = await page.evaluate(() => {
+    const w = window.__game.world;
+    for (const e of w.ctx.entities.values()) {
+      if (e.kind !== 'mob' || e.templateId !== 'knight_commander_olen' || e.dead) continue;
+      // A deep pool so the fight outlasts the capture.
+      e.maxHp = 1e6;
+      e.hp = 1e6;
+      w.ctx.aggroMob(e, w.player, false);
+      w.targetEntity(e.id);
+      return true;
+    }
+    return false;
+  });
+  if (!pulled) throw new Error('Knight-Commander Olen is not in the room');
+  let marked = false;
+  for (let i = 0; i < 240 && !marked; i++) {
+    await chat('/dev bastion trigger sentence', 250);
+    marked = await page.evaluate(() =>
+      window.__game.world.player.auras.some((a) => a.id === 'bastion_sentenced'),
+    );
+  }
+  if (!marked) throw new Error('the Sentence of the Tide never marked the player');
+  await page.evaluate(() => {
+    const w = window.__game.world;
+    const hold = () => {
+      for (const a of w.player.auras) if (a.id === 'bastion_sentenced') a.remaining = 3;
+      for (const e of w.ctx.entities.values()) {
+        const sentence = e.bastionFight?.kind === 'olen' ? e.bastionFight.sentence : null;
+        if (sentence) sentence.remaining = 3;
+      }
+    };
+    hold();
+    const timer = setInterval(hold, 50);
+    setTimeout(() => clearInterval(timer), 30000);
+  });
+  // The trigger's own log lines scroll the chat; let the HUD paint the mark.
+  await wait(1200);
+}
+
 // Hub practice lessons (hub_lesson_controller.ts / hub_lesson_view.ts): shared
 // drivers for the two recipes below. Every one of these is a REAL interaction
 // through the actual control the coach names, never a synthetic completion of
@@ -4600,6 +4683,81 @@ export const TARGETS = [
     },
   },
   {
+    // The "Dungeon mechanic hints" option (settings.showDungeonHints): its row,
+    // and one boss alert with the hints on and off. Keyed on the prompts' own
+    // modules (not options_view) so the options_view target order pinned in
+    // tests/pr_shot_targets.test.ts stays as it is.
+    key: 'dungeon-hints',
+    label:
+      'Dungeon mechanic hints: the Interface, Combat row, and a boss alert over the action bar with the hints on and off',
+    when: ['ui/hud/dungeon/dungeon_prompt'],
+    variants: [
+      { key: 'options-desktop', beforeLoad: dungeonHintsOnSeed },
+      { key: 'options-mobile', mobile: true, beforeLoad: dungeonHintsOnSeed },
+      { key: 'fight-shown-desktop', fight: true, hints: true, beforeLoad: dungeonHintsOnSeed },
+      { key: 'fight-hidden-desktop', fight: true, hints: false, beforeLoad: dungeonHintsOnSeed },
+      {
+        key: 'fight-shown-mobile',
+        mobile: true,
+        fight: true,
+        hints: true,
+        beforeLoad: dungeonHintsOnSeed,
+      },
+      {
+        key: 'fight-hidden-mobile',
+        mobile: true,
+        fight: true,
+        hints: false,
+        beforeLoad: dungeonHintsOnSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await sweepOverlays(page);
+      if (!variant?.fight) {
+        await openInterfaceCombatTab(page);
+        const row = await pollForSize(page, '#options-menu [data-setting-key="showDungeonHints"]');
+        if (!row) throw new Error('the Dungeon mechanic hints row is not in the Combat tab');
+        // A phone's panel is short enough to cut the row's button off under
+        // the footer: bring the row to the middle of the list when (and only
+        // when) its button is not wholly on screen, then prove it is.
+        const framed = await page.evaluate(() => {
+          const toggle = document.querySelector(
+            '#options-menu [data-setting-key="showDungeonHints"]',
+          );
+          const row = toggle?.closest('.set-row');
+          if (!toggle || !row) return false;
+          let scroller = row.parentElement;
+          while (scroller && scroller.scrollHeight <= scroller.clientHeight + 1)
+            scroller = scroller.parentElement;
+          const inView = () => {
+            const box = (scroller ?? document.documentElement).getBoundingClientRect();
+            const r = toggle.getBoundingClientRect();
+            return r.height > 0 && r.top >= box.top && r.bottom <= box.bottom;
+          };
+          if (!inView()) row.scrollIntoView({ block: 'center' });
+          return inView();
+        });
+        if (!framed) throw new Error('the Dungeon mechanic hints button is cut off in the panel');
+        await wait(300);
+        return { clip: '#options-menu' };
+      }
+      // The hidden arm flips the real row first, then fights the same fight.
+      if (!variant.hints) await turnDungeonHintsOffThroughTheOption(page);
+      await stageOlenSentence(page);
+      const state = await page.evaluate(() => {
+        const alert = document.querySelector('#bastion-alert');
+        return {
+          marked: window.__game.world.player.auras.some((a) => a.id === 'bastion_sentenced'),
+          alertShown: !!alert && getComputedStyle(alert).display !== 'none',
+          setting: window.__game.hud.optionsHooks?.settings.get('showDungeonHints'),
+        };
+      });
+      if (!state.marked || state.setting !== variant.hints || state.alertShown !== variant.hints)
+        throw new Error(`dungeon hints (${variant.key}) staged wrong: ${JSON.stringify(state)}`);
+      return {};
+    },
+  },
+  {
     key: 'keybinds-input-toggles',
     label: 'Key Bindings panel: the input toggles above the key list',
     when: ['ui/options_window'],
@@ -6908,12 +7066,12 @@ export const TARGETS = [
   // The Wildheart Basin's light grade: the caldera used to add its own fill
   // pair to the world scene (a light census change that relinked every
   // material for the rest of the session); the grade now lives in
-  // interior_light_rig.ts's wildheartField state. A lighting comparison, so
+  // interior_light_rig.ts's wildheartBasin state. A lighting comparison, so
   // the shot keeps the app's default preset rather than the standing lowest.
   {
     key: 'wildheart-basin-light-rig',
     label: 'Wildheart Basin: the caldera grade through the one sun/hemi pair',
-    when: ['render/wildheart_props', 'render/interior_light_rig'],
+    when: ['render/wildheart_basin/', 'render/interior_light_rig'],
     variants: [{ key: 'desktop' }],
     async capture(page) {
       const entered = await page.evaluate(() => {
@@ -14351,6 +14509,79 @@ export const TARGETS = [
     },
   },
   {
+    key: 'quest-reward-choice',
+    label: 'Choose-one quest reward cards at turn-in (Wolves at the Gate, Marshal Redbrook)',
+    when: [
+      'ui/hud/quest/quest_reward_choice_view',
+      'ui/hud/quest/quest_dialog_controller',
+      'sim/content/quest_choice_rewards',
+    ],
+    // A warrior (the offline default) wears every armor weight, so the turn-in
+    // shows every card with the spec default checked. The quest is forced ready
+    // in the offline log (its collect items in the bags) and the player parked
+    // beside the quest's turn-in NPC (the marshal by default). The old-wolf
+    // variant shoots The Old Wolf, whose authored Greyjaw's Pelt Leggings sit in
+    // the same list as the band set; the olen variant a dungeon-boss quest, whose
+    // authored blue sits beside the rares generated for the other roles.
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'compact', mobile: true, tier: 'compact', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'old-wolf-desktop',
+        quest: { id: 'q_greyjaw', counts: [1], collect: 'greyjaw_fang' },
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'olen-desktop',
+        quest: { id: 'q_olen', counts: [1], npc: 'scout_maren' },
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      const quest = variant.quest ?? { id: 'q_wolves', counts: [8] };
+      const questId = quest.id;
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      if (variant.mobile) await enterTouchTier(page, variant.tier);
+      const setup = await page.evaluate((quest) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const npcId = quest.npc ?? 'marshal_redbrook';
+        const marshal = [...sim.entities.values()].find(
+          (e) => e.kind === 'npc' && e.templateId === npcId,
+        );
+        if (!marshal) return { ok: false, reason: `no ${npcId} entity` };
+        if (quest.collect) sim.addItem(quest.collect, 1);
+        sim.questLog.set(quest.id, { questId: quest.id, counts: quest.counts, state: 'ready' });
+        const p = sim.player;
+        p.pos = sim.groundPos(marshal.pos.x + 1.5, marshal.pos.z);
+        p.prevPos = { ...p.pos };
+        sim.rebucket?.(p);
+        game.hud.openQuestDialog(marshal.id);
+        return { ok: true };
+      }, quest);
+      if (!setup.ok) throw new Error(`quest-reward-choice setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#quest-dialog'))) throw new Error('quest dialog did not open');
+      await page.evaluate((questId) => {
+        document.querySelector(`#quest-dialog [data-quest="${questId}"]`)?.click();
+      }, questId);
+      await wait(600);
+      await sweepOverlays(page, 4);
+      // The dialog focuses the checked card, whose focus opens its tooltip; drop
+      // focus and park the pointer so the shot shows the whole card grid.
+      await page.mouse.move(2, 2);
+      await page.evaluate(() => {
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      });
+      await wait(400);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
     key: 'gossip-crafting-shortcut',
     label: "Station master gossip Crafting shortcut (crafting window to the master's craft)",
     when: ['ui/hud/quest/master_craft_core.ts', 'ui/hud/quest/quest_dialog_controller.ts'],
@@ -18861,6 +19092,88 @@ export const TARGETS = [
       });
       await wait(800);
       return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'dungeon-objectives-tracker',
+    label:
+      'Dungeon objectives tracker: the plate and boss rows at the top of the right tracker ' +
+      'stack inside the Hollow Crypt (on entry, with one boss down, and a finished heroic ' +
+      'run), plus the same run as a page of the quest strip on a landscape phone',
+    // The tracker pair (dungeon_tracker_view.ts + dungeon_tracker_painter.ts) and the sim
+    // read behind it. Three quests are tracked in every arm so the frame also shows the
+    // tracker sharing the stack with the quest tracker.
+    when: ['ui/hud/dungeon/dungeon_tracker', 'sim/instances/dungeon_run'],
+    variants: [
+      { key: 'entry', beforeLoad: lowGraphicsSeed },
+      { key: 'boss-down', beforeLoad: lowGraphicsSeed, kills: ['marrow'] },
+      { key: 'heroic-complete', beforeLoad: lowGraphicsSeed, heroic: true, complete: true },
+      // On touch the plate stands down and the run is a quest strip page.
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed, heroic: true, kills: ['marrow'] },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      const staged = await page.evaluate((heroic) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+        for (const id of ['q_wolves', 'q_af_goldmelt_road', 'q_dk_ash_on_the_wind'])
+          sim.questLog.set(id, { questId: id, counts: [0, 0, 0], state: 'active' });
+        sim.chat('/dev level 20');
+        sim.chat('/dev god');
+        sim.chat(heroic ? '/dev crypt enter heroic' : '/dev crypt enter');
+        return { ok: true };
+      }, variant?.heroic === true);
+      if (!staged.ok) throw new Error(staged.reason);
+      // The run is the sim's own read: wait for it rather than for a fixed delay.
+      await page.waitForFunction(() => window.__game.sim.dungeonRun?.dungeonId === 'hollow_crypt', {
+        timeout: 60000,
+        polling: 250,
+      });
+      await awaitWorldPainted(page);
+      const kills = variant?.complete ? ['marrow', 'rimeweb', 'ilvane'] : (variant?.kills ?? []);
+      for (const boss of kills) {
+        await page.evaluate((line) => window.__game.sim.chat(line), `/dev crypt kill ${boss}`);
+        await wait(400);
+      }
+      if (variant?.complete) {
+        // The last row belongs to Morthen AND the finale his dying rite summons:
+        // slay him the way a group must (risen), then the Knellwyrm it calls down.
+        await page.evaluate(() => window.__game.sim.chat('/dev crypt wyrm'));
+        await page.waitForFunction(
+          () => {
+            const sim = window.__game.sim;
+            for (const e of sim.entities.values()) {
+              if (e.templateId !== 'crypt_knellwyrm' || e.dead) continue;
+              sim.ctx.handleDeath(e, sim.player);
+              return true;
+            }
+            return false;
+          },
+          { timeout: 60000, polling: 250 },
+        );
+        await page.waitForFunction(
+          () => window.__game.sim.dungeonRun?.bosses.every((boss) => boss.defeated) === true,
+          { timeout: 30000, polling: 250 },
+        );
+      }
+      if (variant?.mobile) {
+        // The strip page is the touch presentation; the plate must be gone.
+        if (!(await pollForSize(page, '#quest-strip'))) throw new Error('quest strip not shown');
+      } else if (!(await pollForSize(page, '#dungeon-tracker .dgt-plate'))) {
+        throw new Error('dungeon tracker plate not shown');
+      }
+      // Past the kill highlight and the banner a boss death raises.
+      await wait(4500);
+      await page.evaluate(() => {
+        for (const id of ['tutorial-greeting', 'profession-tutorial'])
+          document.getElementById(id)?.remove();
+      });
+      // Full frame on every arm: the tracker's place in the whole HUD is the
+      // evidence, and a clipped capture resizes the page under the chat frame.
+      return {};
     },
   },
   {

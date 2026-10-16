@@ -12,6 +12,7 @@ import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { WEAPON_SKIN_LIST } from '../src/sim/content/weapon_skins';
 import { CosmeticsWindow } from '../src/ui/hud/cosmetics/cosmetics_window';
+import { t } from '../src/ui/i18n';
 
 vi.mock('../src/game/audio', () => ({ audio: { click: vi.fn() } }));
 
@@ -22,6 +23,7 @@ interface FakeWorld {
     skinCatalog: 'class' | 'mech';
     skin: number;
     mountSkinId: string | null;
+    buddyKey?: string;
   };
   accountCosmetics: {
     completedQuestIds: string[];
@@ -31,6 +33,9 @@ interface FakeWorld {
     mountSkinIds: string[];
   };
   ownedMounts: () => string[];
+  ownedBuddies: () => string[];
+  pendingBuddies: () => string[];
+  summonBuddy: ReturnType<typeof vi.fn>;
   changeMountSkin: ReturnType<typeof vi.fn>;
   changeWeaponSkin: ReturnType<typeof vi.fn>;
   changeSkin: ReturnType<typeof vi.fn>;
@@ -54,6 +59,11 @@ function fakeWorld(): FakeWorld {
       mountSkinIds: ['mech_bird'],
     },
     ownedMounts: () => ['valorsteed'],
+    ownedBuddies: () => ['horse'],
+    pendingBuddies: () => ['crystal_lich'],
+    summonBuddy: vi.fn((key: string) => {
+      world.player.buddyKey = world.player.buddyKey === key ? '' : key;
+    }),
     changeMountSkin: vi.fn((id: string | null) => {
       world.player.mountSkinId = id;
     }),
@@ -144,12 +154,66 @@ describe('CosmeticsWindow', () => {
     }
   });
 
+  it('equips and dismisses only collected buddies, while preserving pending and locked states', () => {
+    const world = fakeWorld();
+    const { w, el } = makeWindow(world);
+    w.open('buddies');
+    expect(el.querySelectorAll('.cos-card')).toHaveLength(4);
+    expect(card(el, 'horse').textContent).toContain('Tug, the Warhorse');
+    expect(el.querySelectorAll('.cos-scope-account')).toHaveLength(4);
+    expect(card(el, 'horse').querySelector('.cos-scope-account')?.textContent).toBe('Account');
+    expect(el.querySelector('.cos-scope-character')).toBeNull();
+    expect(el.querySelector('[data-buddy-drag], [draggable="true"]')).toBeNull();
+    expect(card(el, 'crystal_lich').textContent).toContain('A presence follows you');
+    expect(action(el, 'summon-buddy', 'crystal_lich')).toBeNull();
+    expect(action(el, 'summon-buddy', 'forgemaw')).toBeNull();
+    expect(action(el, 'summon-buddy', 'sapling')).toBeNull();
+    const summon = action(el, 'summon-buddy', 'horse')!;
+    summon.focus();
+    summon.click();
+    expect(world.summonBuddy).toHaveBeenCalledExactlyOnceWith('horse');
+    expect(action(el, 'summon-buddy', 'horse')?.textContent).toBe('Dismiss');
+    expect(document.activeElement).toBe(action(el, 'summon-buddy', 'horse'));
+    action(el, 'summon-buddy', 'horse')?.click();
+    expect(world.summonBuddy).toHaveBeenCalledTimes(2);
+    expect(action(el, 'summon-buddy', 'horse')?.textContent).toBe('Summon');
+  });
+
+  it('offers no buddy drag controls and does not create action-bar drag payloads', () => {
+    const world = fakeWorld();
+    const { w, el } = makeWindow(world);
+    w.open('buddies');
+    expect(el.querySelector('[data-buddy-drag], [draggable="true"]')).toBeNull();
+    expect(el.textContent).not.toContain('Drag to action bar');
+    const drag = new Event('dragstart', { bubbles: true });
+    const transfer = { setData: vi.fn(), effectAllowed: '' };
+    Object.defineProperty(drag, 'dataTransfer', { value: transfer });
+    card(el, 'horse').dispatchEvent(drag);
+    expect(transfer.setData).not.toHaveBeenCalled();
+    expect(world.summonBuddy).not.toHaveBeenCalled();
+  });
+
+  it('refreshes a revealed buddy and skips unchanged companion snapshots', () => {
+    const world = fakeWorld();
+    const { w, el } = makeWindow(world);
+    w.open('buddies');
+    const original = card(el, 'horse');
+    w.refreshIfChanged();
+    expect(card(el, 'horse')).toBe(original);
+    world.ownedBuddies = () => ['horse', 'crystal_lich'];
+    world.pendingBuddies = () => [];
+    world.player.buddyKey = 'crystal_lich';
+    w.refreshIfChanged();
+    expect(action(el, 'summon-buddy', 'crystal_lich')?.textContent).toBe('Dismiss');
+    expect(card(el, 'crystal_lich').textContent).not.toContain('A presence follows you');
+  });
+
   it('opens on the Mounts tab with every catalog skin, actions only on owned ones', () => {
     const world = fakeWorld();
     const { w, el } = makeWindow(world);
     w.toggle();
     expect(w.isOpen).toBe(true);
-    expect(el.querySelectorAll('.cos-tab')).toHaveLength(3);
+    expect(el.querySelectorAll('.cos-tab')).toHaveLength(4);
     expect(el.querySelector('.cos-tab.on')?.getAttribute('data-tab')).toBe('mounts');
     expect(card(el, 'mech_bird')).toBeTruthy();
     expect(card(el, 'chimeglass_tortoise')).toBeTruthy();
@@ -241,13 +305,22 @@ describe('CosmeticsWindow', () => {
     expect(world.changeWeaponSkin).toHaveBeenLastCalledWith(null, 'sword');
   });
 
-  it('wears and takes off a mech chroma through changeSkin / unequipMechChroma', () => {
+  // The Combat Mech is switched off (COMBAT_MECH_WEARABLE in cosmetics_view.ts):
+  // an owned chroma keeps its card, but Wear is disabled and labelled
+  // unavailable. Taking a worn one off still works. When the switch flips back,
+  // the click below goes back to expecting changeSkin(0, 'mech').
+  it('shows Wear disabled on an owned mech chroma, and still takes a worn one off', () => {
     const world = fakeWorld();
     const { w, el } = makeWindow(world);
     w.open('mech');
     const id = MECH_CHROMAS[0].id;
-    action(el, 'wear-mech', id)?.click();
-    expect(world.changeSkin).toHaveBeenCalledWith(0, 'mech');
+    const wear = action(el, 'wear-mech', id);
+    expect(wear).not.toBeNull();
+    expect(wear?.disabled).toBe(true);
+    expect(wear?.getAttribute('aria-disabled')).toBe('true');
+    expect(wear?.textContent).toBe(t('hudChrome.wocStore.unavailable'));
+    wear?.click();
+    expect(world.changeSkin).not.toHaveBeenCalled();
     world.player.skinCatalog = 'mech';
     world.player.skin = 0;
     w.refreshIfChanged();

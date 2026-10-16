@@ -894,14 +894,17 @@ describe('world boss pathing (phases through obstacles)', () => {
     const { boss } = spawnBossNow(sim);
     // Reuse the boss entity but masquerade as an unflagged template: the gate
     // reads MOBS[templateId], so a plain wolf template must NOT phase.
+    // Run front to back: the painted bank's strongroom stands out from the
+    // middle of its back wall, so a start a step behind that wall would be
+    // inside the strongroom, not beside the bank.
     const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
     const start = localToWorld(
       bank.position,
       bank.rotation,
       0,
-      bank.nativeDimensions.depth / 2 + 0.7,
+      -bank.nativeDimensions.depth / 2 - 0.7,
     );
-    const end = localToWorld(bank.position, bank.rotation, 0, -bank.nativeDimensions.depth / 2 - 5);
+    const end = localToWorld(bank.position, bank.rotation, 0, bank.nativeDimensions.depth / 2 + 5);
     boss.templateId = 'forest_wolf';
     boss.pos = { ...start, y: 0 };
     (sim as any).moveToward(boss, { ...end, y: 0 }, 7);

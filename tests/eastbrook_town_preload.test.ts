@@ -41,12 +41,19 @@ afterEach(() => {
 });
 
 describe('Eastbrook town preload', () => {
+  // Re-pinned 2026-10 for the Tidehold rebuild: six placed buildings replaced
+  // the eleven kit shells (src/render/eastbrook_placed_building.ts). A placed
+  // building's URL names the MODEL and stays the key everything is looked up
+  // by; the FILE it is read from follows the profile's texture tier
+  // (townSourceFile in src/render/eastbrook_town.ts), so the third column is
+  // the file suffix the six buildings load with: the half-size maps on Low,
+  // the model's own file on Standard.
   it.each([
-    ['Low', '?gfx=low'],
-    ['Standard', '?gfx=ultra'],
+    ['Low', '?gfx=low', '.half.glb'],
+    ['Standard', '?gfx=ultra', '.glb'],
   ] as const)(
-    'registers all ten shipping assets plus both support models on %s',
-    async (_materialPath, search) => {
+    'registers all nine shipping assets plus both support models on %s',
+    async (_materialPath, search, placedFileSuffix) => {
       vi.stubGlobal('window', { location: { search } });
       vi.stubGlobal('location', { search });
       const scene = new THREE.Group();
@@ -67,10 +74,37 @@ describe('Eastbrook town preload', () => {
       // Eastbrook had never used, so the deduped URL set grows by exactly one
       // (the other two re-use hexb_home_a and hexb_home_b shells the town
       // already loads).
-      expect(newUrls).toHaveLength(10);
-      expect(new Set(newUrls).size).toBe(10);
-      expect(allUrls).toHaveLength(12);
-      expect(mocks.loadGltf.mock.calls.map(([url]) => url)).toEqual(allUrls);
+      // Re-pinned 2026-10 for the Tidehold rebuild: the seven kit shell URLs
+      // (eleven lots over seven models) leave and the six painted Tidehold
+      // models arrive, one lot each, so the deduped set goes 10 to 9: the six
+      // buildings, the monument, the market stall and the wall wing. The two
+      // support models make 11.
+      expect(newUrls).toHaveLength(9);
+      expect(new Set(newUrls).size).toBe(9);
+      expect(allUrls).toHaveLength(11);
+      const placedUrls = [
+        '/models/tidehold/bank.glb',
+        '/models/tidehold/smithy.glb',
+        '/models/tidehold/tavern.glb',
+        '/models/tidehold/hall.glb',
+        '/models/tidehold/shop_a.glb',
+        '/models/tidehold/house_b.glb',
+      ];
+      expect(newUrls.slice(0, placedUrls.length)).toEqual(placedUrls);
+      expect(allUrls.filter((url) => url.startsWith('/models/tidehold/'))).toEqual(placedUrls);
+      expect(allUrls.some((url) => url.startsWith('/models/biome/'))).toBe(false);
+      // One load per URL, in URL order. Only the placed buildings swap the
+      // FILE for their texture tier; every other asset loads its own URL on
+      // every tier.
+      const expectedFiles = allUrls.map((url) =>
+        placedUrls.includes(url) ? url.replace(/\.glb$/, placedFileSuffix) : url,
+      );
+      const loadedFiles = mocks.loadGltf.mock.calls.map(([url]) => url);
+      expect(loadedFiles).toEqual(expectedFiles);
+      expect(loadedFiles[0]).toBe(`/models/tidehold/bank${placedFileSuffix}`);
+      expect(loadedFiles.filter((file) => file.endsWith('.half.glb'))).toHaveLength(
+        placedFileSuffix === '.half.glb' ? placedUrls.length : 0,
+      );
       const eastbrookTextureUrls = [
         '/textures/eastbrook_surface_atlas.webp',
         '/textures/eastbrook_surface_normal.webp',
@@ -104,7 +138,15 @@ describe('Eastbrook town preload', () => {
       await gate;
 
       const data = await import('../src/sim/data');
-      data.setActiveWorldContent({ ...data.BUILTIN_WORLD, zones: [] });
+      // A custom world WITHOUT the town: the gate is data-driven
+      // (authored_town_gate.ts), so an editor copy that still carries
+      // Eastbrook's buildings correctly gets the real town; this arm pins the
+      // other side, a world whose maker removed them builds an empty root.
+      data.setActiveWorldContent({
+        ...data.BUILTIN_WORLD,
+        zones: [],
+        props: { ...data.BUILTIN_WORLD.props, buildings: [] },
+      });
       const custom = module.buildEastbrookTownView(20061);
       expect(custom.group.name).toBe(module.EASTBROOK_TOWN_ROOT_NAME);
       expect(custom.group.children).toEqual([]);
@@ -115,9 +157,25 @@ describe('Eastbrook town preload', () => {
       // the five kit buildings, whose clones share decoded KTX2 palette
       // textures, plus the Realm Builder monument, which is off the merged
       // micro-batch precisely so it can keep its baked albedo.
+      // Re-pinned 2026-10 for the Tidehold rebuild: the kit buildings are gone
+      // from the town's set and the six placed buildings take their place in
+      // this rule, for the same reason: every clone draws the painted atlases
+      // of its model's loader-cache scene. What is left to release is the four
+      // assets the vertex-colour bake copies out of: the stall, the wall wing,
+      // the bench and the fence.
       const keepsOwnMaterials = (url: string): boolean =>
-        url.startsWith('/models/biome/') || url === EASTBROOK_LAYOUT.civic.monument.assetId;
+        url.startsWith('/models/tidehold/') || url === EASTBROOK_LAYOUT.civic.monument.assetId;
+      expect(allUrls.filter(keepsOwnMaterials)).toEqual([
+        ...placedUrls,
+        EASTBROOK_LAYOUT.civic.monument.assetId,
+      ]);
       const released = allUrls.filter((url) => !keepsOwnMaterials(url));
+      expect(released).toEqual([
+        EASTBROOK_LAYOUT.market.stalls[0].assetId,
+        EASTBROOK_LAYOUT.wall.assetId,
+        EASTBROOK_LAYOUT.civic.benches[0].assetId,
+        EASTBROOK_LAYOUT.fences[0].assetId,
+      ]);
       expect(mocks.releaseGltf.mock.calls.map(([url]) => url)).toEqual(released);
 
       data.setActiveWorldContent(data.BUILTIN_WORLD);
@@ -126,10 +184,22 @@ describe('Eastbrook town preload', () => {
       expect(first.group.name).toBe(module.EASTBROOK_TOWN_ROOT_NAME);
       expect(second.group.name).toBe(module.EASTBROOK_TOWN_ROOT_NAME);
       expect(first.group).not.toBe(second.group);
-      // The five kit buildings keep their GLB cache entries resident: their
-      // clones share the decoded KTX2 palette textures, so releasing would
-      // break a later same-page rebuild (the kit-building path in
-      // eastbrook_town.ts, docs/design/eastbrook-revamp/site-plan.md).
+      // Both rebuilds found every placed building's source under its MODEL
+      // url, whichever tier file it was read from, and stood it: the group
+      // names the model, never the tier file.
+      for (const view of [first, second]) {
+        for (const building of EASTBROOK_LAYOUT.buildings) {
+          const group = view.group.getObjectByName(`eastbrookBuilding:${building.id}`);
+          expect(group, building.id).toBeInstanceOf(THREE.Group);
+          expect(group?.userData.assetUrl, building.id).toBe(building.assetId);
+          expect(placedUrls).toContain(building.assetId);
+        }
+      }
+      // The six placed buildings keep their GLB cache entries resident: their
+      // clones share the model's painted atlases, so releasing would break a
+      // later same-page rebuild (the placed path in eastbrook_town.ts and
+      // eastbrook_placed_building.ts). No tier file is released either: the
+      // tier never changed under this page.
       expect(mocks.releaseGltf.mock.calls.map(([url]) => url)).toEqual(released);
       data.setActiveWorldContent(null);
     },

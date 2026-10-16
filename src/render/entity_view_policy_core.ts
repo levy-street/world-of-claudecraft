@@ -39,6 +39,19 @@ export function isDistanceCullExemptObject(entity: Entity): boolean {
   );
 }
 
+/**
+ * The telemetry label for a view that was just created.
+ *
+ * Lives here rather than on the coordinator because it is a pure classification of an
+ * entity, which is what this module is for, and because the length cap is a contract with
+ * the perf overlay that reads it: an unbounded templateId would let one exotic spawn widen
+ * every row of that table.
+ */
+export function createdViewType(e: Entity): string {
+  const id = e.templateId || e.kind;
+  return `${e.kind}:${id}`.slice(0, 64);
+}
+
 export function entityViewDistanceSq(a: Entity, b: Entity): number {
   const dx = a.pos.x - b.pos.x;
   const dz = a.pos.z - b.pos.z;

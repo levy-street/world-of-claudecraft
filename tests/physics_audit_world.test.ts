@@ -6,6 +6,7 @@ import {
   colliderTopAt,
   DOCK_HUT_ROOF_EAVE,
   DOCK_HUT_ROOF_TOP,
+  insidePrism,
   interiorColliderFrame,
   isBlocked,
   queryOpenWorldColliders,
@@ -17,13 +18,17 @@ import {
 import {
   ARENA_X,
   BUILTIN_WORLD,
+  DUNGEON_X_THRESHOLD,
   DUNGEONS,
   GATHER_NODES,
   instanceOrigin,
   NPCS,
+  setActiveWorldContent,
   YUMI_BAND_X_MIN,
 } from '../src/sim/data';
 import { CRYPT_LAYOUT, DAIS_HEIGHT, tombSlotRoll } from '../src/sim/dungeon_layout';
+import { morthenEntranceHeight } from '../src/sim/encounters/hollow_crypt/ids';
+import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 import {
   CHAPEL_HALL_ROOF_EAVE,
   CHAPEL_HALL_ROOF_TOP,
@@ -35,7 +40,7 @@ import {
   TOWN_WALL_TALL_PILLAR_ALONG,
 } from '../src/sim/prop_layout';
 import { Sim } from '../src/sim/sim';
-import type { MoveInput } from '../src/sim/types';
+import type { MoveInput, StaticObbPropDef } from '../src/sim/types';
 import { groundHeight, terrainHeight } from '../src/sim/world';
 
 // The physics-asset audit, world half (docs/design/physics-asset-audit.md):
@@ -57,7 +62,12 @@ const IDLE: MoveInput = {
 };
 
 function makeSim(): Sim {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+  });
   sim.setPlayerLevel(60);
   return sim;
 }
@@ -104,11 +114,16 @@ function maxStoodHeight(sim: Sim, ticks: number): number {
 }
 
 describe('full-height props reject standing (jump-spam 4s each)', () => {
+  // The Mirefen murloc huts west of Fenbridge (fenbridge_layout.ts keeps them):
+  // the run starts beside the first, facing it. It used to start at (-3, 292),
+  // a spot the huts left long ago, and so walked up Fenbridge's main street,
+  // where the grand bank's standable strongbox now stands in its path.
+  const [mudHutX, mudHutZ] = FENBRIDGE_LAYOUT.preservedProps.mudHuts[0];
   const cases: [string, number, number, number][] = [
     // name, startX, startZ, facing toward the prop
     ['civic well beacon', -0.75, 2 - 3.1, 0],
     ['tent', 62, -61 - 2.8, 0],
-    ['mud hut stem', -3, 292, 0], // zone2 murloc camp (approx; adjust below)
+    ['mud hut stem', mudHutX, mudHutZ - 2.8, 0],
     ['inn wall', -12.5, 16.5 - 4.8, 0],
     ['bank wall', 18 - 5.4, 10.5, Math.PI / 2],
     ['Grand Armoury wall', 12, -5.5, Math.PI / 2],
@@ -128,7 +143,15 @@ describe('full-height props reject standing (jump-spam 4s each)', () => {
 });
 
 describe('the town wall is a vaultable parapet, not a curtain', () => {
-  it('a jump vaults onto the parapet, and over it to the outside', () => {
+  // Skipped: there is no parapet here to vault. Since the harbor move the
+  // built-in world has had no parapet wall (and since the open Fenbridge, no
+  // props.walls entry at all), so this run from (0, -25.4) never meets a wall
+  // at all. It kept passing by landing
+  // on a churchyard headstone south of the start; the painted apothecary
+  // shop's level pad re-seats those stones, and the run now ends against the
+  // shop's north wall. The parapet arm needs a fixture wall to be tested
+  // honestly, not a lucky headstone.
+  it.skip('a jump vaults onto the parapet, and over it to the outside', () => {
     // Mid-arc of the south run, between gates. The drawn wing is a stone
     // parapet with an open iron railing: the slab top is standable at its
     // drawn height and a jump crosses the wall entirely.
@@ -148,21 +171,52 @@ describe('the town wall is a vaultable parapet, not a curtain', () => {
   });
 
   it('the tall lantern pylons stay full-height even for a body on the parapet', () => {
-    const walls = BUILTIN_WORLD.props.walls ?? [];
-    expect(walls.length).toBeGreaterThan(0);
-    for (const wall of walls.slice(0, 6)) {
-      const mirror = wall.mirrored ? -1 : 1;
-      const along = TOWN_WALL_TALL_PILLAR_ALONG * mirror * (wall.w / 2);
-      const px = wall.x + Math.sin(wall.rot + Math.PI / 2) * along;
-      const pz = wall.z + Math.cos(wall.rot + Math.PI / 2) * along;
-      const parapetY = groundHeight(px, pz, SEED) + wall.height * TOWN_WALL_PARAPET_FRAC + 1e-3;
-      // A mover standing at parapet height is still pushed out of the pylon.
-      const res = resolvePosition(SEED, px, pz, 0.4, false, undefined, {
-        y: parapetY,
-        lift: 0,
-      });
-      const moved = Math.hypot(res.x - px, res.z - pz);
-      expect(moved, `${wall.id} pylon holds at parapet height`).toBeGreaterThan(1e-4);
+    // Re-staged for the open Fenbridge (2026-10): its palisade was the last
+    // built-in props.walls entry (Eastbrook's ring retired with the harbor
+    // move), so the built-in world carries no wall at all now. Two fixture
+    // wings in a custom world (one mirrored, so the pylon swaps ends) drive
+    // the parapet arm of colliders.ts instead, the arm the pylons belong to;
+    // the palisade was a full-height curtain, which no pylon probe could fail.
+    expect(BUILTIN_WORLD.props.walls ?? []).toEqual([]);
+    const wing = {
+      assetId: '/models/props/eastbrook_wall_wing.glb',
+      w: 6.5,
+      d: 0.65,
+      rot: 0.4,
+      height: 2.7,
+    };
+    const walls: StaticObbPropDef[] = [
+      { ...wing, id: 'fixture_wall_wing', x: -60, z: 0 },
+      { ...wing, id: 'fixture_wall_wing_mirrored', x: -60, z: 20, mirrored: true },
+    ];
+    // Open, dry ground before the wings go in, so every push below is theirs.
+    for (const wall of walls) expect(isBlocked(SEED, wall.x, wall.z, 3.5), wall.id).toBe(false);
+    setActiveWorldContent({ ...BUILTIN_WORLD, props: { ...BUILTIN_WORLD.props, walls } });
+    try {
+      for (const wall of walls) {
+        const parapetFrom = (x: number, z: number): number =>
+          groundHeight(x, z, SEED) + wall.height * TOWN_WALL_PARAPET_FRAC + 1e-3;
+        // A body standing on the parapet's middle is carried, not pushed: the
+        // parapet itself is standable at its drawn height.
+        const onParapet = resolvePosition(SEED, wall.x, wall.z, 0.4, false, undefined, {
+          y: parapetFrom(wall.x, wall.z),
+          lift: 0,
+        });
+        expect(Math.hypot(onParapet.x - wall.x, onParapet.z - wall.z), wall.id).toBeLessThan(1e-9);
+        const mirror = wall.mirrored ? -1 : 1;
+        const along = TOWN_WALL_TALL_PILLAR_ALONG * mirror * (wall.w / 2);
+        const px = wall.x + Math.sin(wall.rot + Math.PI / 2) * along;
+        const pz = wall.z + Math.cos(wall.rot + Math.PI / 2) * along;
+        // A mover standing at parapet height is still pushed out of the pylon.
+        const res = resolvePosition(SEED, px, pz, 0.4, false, undefined, {
+          y: parapetFrom(px, pz),
+          lift: 0,
+        });
+        const moved = Math.hypot(res.x - px, res.z - pz);
+        expect(moved, `${wall.id} pylon holds at parapet height`).toBeGreaterThan(1e-4);
+      }
+    } finally {
+      setActiveWorldContent(null);
     }
   });
 });
@@ -217,15 +271,41 @@ describe('interactable landmarks are solid (the v0.31 walk-through sweep)', () =
   });
 
   it('dungeon door jambs block while the mouth stays a walkable trigger lane', () => {
-    const door = DUNGEONS.hollow_crypt.doorPos;
+    // Dawnhold Castle keeps the generic arch. The five-man dungeons no longer
+    // do: each door is a built set piece with its own colliders now
+    // (src/sim/dungeon_door_jambs.ts).
+    const door = DUNGEONS.dawnhold_castle.doorPos;
     for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {
       expect(isBlocked(SEED, door.x + sx, door.z, 0.4), `jamb ${sx}`).toBe(true);
+      // a generic jamb is a slim post: a yard further out the ground is open
+      expect(isBlocked(SEED, door.x + sx * 2, door.z, 0.2), `beside jamb ${sx}`).toBe(false);
     }
     // A body walking the centreline reaches the trigger point itself.
     expect(isBlocked(SEED, door.x, door.z, 0.5)).toBe(false);
     // The Abandoned Crypt draws no arch (invisible click box): no jambs.
     const nyth = DUNGEONS.nythraxis_crypt.doorPos;
     expect(isBlocked(SEED, nyth.x + DOOR_ARCH_JAMB_X, nyth.z, 0.4)).toBe(false);
+  });
+
+  it('the Sanctum Seal Gate pylons block while its mouth stays a walkable trigger lane', () => {
+    // The Seal Gate (src/sim/sanctum_seal_gate.ts) hands its own pylons in
+    // place of the generic jambs: the plinths wall |x| 2.0 to 5.3, the lane
+    // between them is the walk-in trigger, and the exit drop 4yd south is open.
+    const door = DUNGEONS.gravewyrm_sanctum.doorPos;
+    for (const sx of [-1, 1]) {
+      expect(isBlocked(SEED, door.x + sx * 3.65, door.z, 0.4), `pylon ${sx}`).toBe(true);
+      expect(isBlocked(SEED, door.x + sx * DOOR_ARCH_JAMB_X, door.z, 0.4), `no jamb ${sx}`).toBe(
+        false,
+      );
+    }
+    expect(isBlocked(SEED, door.x, door.z, 0.5)).toBe(false);
+    expect(isBlocked(SEED, door.x, door.z - 4, 0.6)).toBe(false);
+    const sim = makeSim();
+    teleport(sim, door.x, door.z - 8, 0);
+    hold(sim, { forward: true }, 40);
+    expect(sim.player.pos.x, 'walked through the gate into the instance').toBeGreaterThan(
+      DUNGEON_X_THRESHOLD,
+    );
   });
 
   it('the delve arch slab is solid and the exit drop lands clear of it', () => {
@@ -303,17 +383,23 @@ describe('rebuild market stall (flat canopy at the authored height)', () => {
 });
 
 describe('chapel flows', () => {
-  // Re-anchored to the zone3 chapel (Highpass): the v0.31 civic rebuild
-  // replaced the Eastbrook chapel with a kit GLB (full-height OBB); the
+  // Re-anchored to Icemantle's chapel (Frostveil): the v0.31 civic rebuild
+  // replaced the Eastbrook chapel with a kit GLB (full-height OBB), and the
+  // Highwatch rebuild replaced the zone3 one with a painted building; the
   // composed tower-plus-hall physics now lives wherever the legacy
   // procedural chapel still stands.
-  const rot = 0.9;
-  const cx = -16;
-  const cz = 650;
+  const rot = -2;
+  const cx = -18;
+  const cz = 1570;
   const fx = Math.sin(rot);
   const fz = Math.cos(rot);
 
   it('climb the hall roof, walk into the tower face (blocked), fall off a side', () => {
+    const chapel = BUILTIN_WORLD.props.buildings.find(
+      (b) => b.kind === 'chapel' && !b.assetId && b.x === cx && b.z === cz,
+    );
+    // a rebuild that replaces this chapel moves the flow to another procedural one
+    expect(chapel, 'the procedural chapel this flow stands on').toMatchObject({ rot, w: 5, d: 7 });
     const sim = makeSim();
     const startX = cx + fx * (3.5 + 1.7);
     const startZ = cz + fz * (3.5 + 1.7);
@@ -429,7 +515,10 @@ describe('abilities x collision', () => {
       Math.atan2(-LEGACY_STALL_APPROACH.x, -LEGACY_STALL_APPROACH.z),
     );
     const p = sim.player;
-    sim.castAbility('heroic_leap', p.id, { x: LEGACY_STALL.x, z: LEGACY_STALL.z });
+    sim.castAbility('heroic_leap', p.id, {
+      x: LEGACY_STALL.x,
+      z: LEGACY_STALL.z,
+    });
     for (let i = 0; i < 40 && p.leap; i++) sim.tick();
     expect(p.leap ?? null).toBeNull();
     const g = groundHeight(LEGACY_STALL.x, LEGACY_STALL.z, SEED);
@@ -445,9 +534,11 @@ describe('abilities x collision', () => {
     expect(p.pos.y - groundHeight(p.pos.x, p.pos.z, SEED)).toBeLessThan(0.15);
   });
 
+  // The shared crypt nave (CRYPT_LAYOUT) lives on in the Abandoned Crypt; the
+  // Hollow Crypt moved to its own open-air field in the rework.
   it('Vaulting Charge onto the crypt dais lands at the lifted floor', () => {
     const sim = makeSim();
-    const o = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
+    const o = instanceOrigin(DUNGEONS.nythraxis_crypt.index, 0);
     const d = CRYPT_LAYOUT.dais;
     teleport(sim, o.x + d.x, o.z + d.z - d.r - 4, 0);
     const p = sim.player;
@@ -460,7 +551,7 @@ describe('abilities x collision', () => {
 describe('dungeon deep sweep', () => {
   it('dais rim walk-up from 8 directions', () => {
     const sim = makeSim();
-    const o = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
+    const o = instanceOrigin(DUNGEONS.nythraxis_crypt.index, 0);
     const d = CRYPT_LAYOUT.dais;
     for (let k = 0; k < 8; k++) {
       const ang = (k / 8) * Math.PI * 2;
@@ -477,34 +568,9 @@ describe('dungeon deep sweep', () => {
     }
   });
 
-  it('cargo slots: both stack kinds climb, both casks vault, gap walkable', () => {
-    const sim = makeSim();
-    const o = instanceOrigin(DUNGEONS.sunken_bastion.index, 0);
-    // Find one r<0.5 slot (crates+barrel) and one r>=0.5 (box+keg).
-    const slots = CRYPT_LAYOUT.tombs.map((t) => ({ t, r: tombSlotRoll(t.x, t.z) }));
-    const crateSlot = slots.find((s) => s.r < 0.5);
-    const boxSlot = slots.find((s) => s.r >= 0.5);
-    expect(crateSlot && boxSlot).toBeTruthy();
-    if (!crateSlot || !boxSlot) return;
-    for (const { t, r } of [crateSlot, boxSlot]) {
-      // Two tiers: vault the broad lower tier; the crates variant then
-      // strides to its wide top crate. (The box variant's top box is a tiny
-      // finial you can bump but not sanely stand on: the tier is the stand.)
-      const standTop = r < 0.5 ? 2.14 : 1.2;
-      teleport(sim, o.x + t.x, o.z + t.z - 1.0 - 1.0 - 1.5, 0);
-      const p = sim.player;
-      let onStack = false;
-      for (let i = 0; i < 160 && !onStack; i++) {
-        hold(sim, { forward: true, jump: true }, 1);
-        if (p.onGround && Math.abs(p.pos.y - standTop) < 0.05) onStack = true;
-      }
-      expect(onStack).toBe(true);
-      // Walk the gap between stack and cask at floor level.
-      teleport(sim, o.x + t.x - 2.5, o.z + t.z + 0.2, Math.PI / 2);
-      hold(sim, { forward: true }, 30);
-      expect(p.pos.y).toBeLessThan(0.1);
-    }
-  });
+  // The cargo slots walk-test retired with the Sunken Bastion's open-air
+  // rework (no live dungeon ships the cargo dressing now); its collider
+  // shape stays pinned in tests/dungeon_parkour.test.ts.
 
   it('temple altars and sanctum stubs stay walls', () => {
     const sim = makeSim();
@@ -523,8 +589,15 @@ describe('dungeon deep sweep', () => {
     for (const e of sim.entities.values()) {
       if (e.kind !== 'mob' || e.dead) continue;
       if (e.pos.x < 600) continue; // instance mobs only
-      const g = groundHeight(e.pos.x, e.pos.z, SEED);
-      expect(Math.abs(e.pos.y - g)).toBeLessThan(0.01);
+      // A perched gargoyle waits on its arch, a flying patrol on the wing
+      // (mob/trash_kit): each at its own authored height, not the floor.
+      const up = e.perchY ?? e.dungeonPatrol?.flightY;
+      // Morthen waits buried under the Rite Ring for his entrance
+      // (encounters/hollow_crypt/morthen_rise.ts): his floor plus the
+      // entrance's authored height, 0 once he has risen.
+      const rite = e.cryptRite ? morthenEntranceHeight(e.cryptRite.phase, e.cryptRite.t) : 0;
+      const g = up ?? groundHeight(e.pos.x, e.pos.z, SEED) + rite;
+      expect(Math.abs(e.pos.y - g), e.templateId).toBeLessThan(0.01);
       checked++;
     }
     console.log('mob y checks:', checked);
@@ -569,7 +642,10 @@ describe('programmatic collider sanity sweeps', () => {
     const cols: Collider[] = [];
     queryOpenWorldColliders(SEED, -240, -240, 240, 900, cols);
     const bad: string[] = [];
+    // Dynamic NPCs are placed by their own spawner at runtime (findSafePos, or
+    // an authored world's reserved-id loop), never at the authored literal.
     for (const npc of Object.values(NPCS)) {
+      if ((npc as { dynamic?: boolean }).dynamic) continue;
       const pos = (npc as { pos?: { x: number; z: number } }).pos;
       if (!pos) continue;
       for (const c of cols) {
@@ -577,13 +653,15 @@ describe('programmatic collider sanity sweeps', () => {
         const hit =
           c.type === 'circle'
             ? Math.hypot(pos.x - c.x, pos.z - c.z) < c.r - 0.05
-            : (() => {
-                const cos = Math.cos(-c.rot);
-                const sin = Math.sin(-c.rot);
-                const lx = (pos.x - c.x) * cos + (pos.z - c.z) * sin;
-                const lz = -(pos.x - c.x) * sin + (pos.z - c.z) * cos;
-                return Math.abs(lx) < c.hw - 0.05 && Math.abs(lz) < c.hd - 0.05;
-              })();
+            : c.type === 'prism'
+              ? insidePrism(c, pos.x, pos.z)
+              : (() => {
+                  const cos = Math.cos(-c.rot);
+                  const sin = Math.sin(-c.rot);
+                  const lx = (pos.x - c.x) * cos + (pos.z - c.z) * sin;
+                  const lz = -(pos.x - c.x) * sin + (pos.z - c.z) * cos;
+                  return Math.abs(lx) < c.hw - 0.05 && Math.abs(lz) < c.hd - 0.05;
+                })();
         if (hit)
           bad.push(
             `${(npc as { id?: string }).id} inside collider at (${c.x.toFixed(1)},${c.z.toFixed(1)})`,
@@ -595,7 +673,10 @@ describe('programmatic collider sanity sweeps', () => {
   });
 
   it('interior sets: standable tops sane, colliderTopAt within [eave, ridge]', () => {
-    for (const id of ['hollow_crypt', 'sunken_bastion', 'nythraxis_crypt']) {
+    // Room-plan interiors with furniture (the Hollow Crypt's and the Sunken
+    // Bastion's open-air fields carry no standable tops: their obstacles are
+    // cliffs, walls and props).
+    for (const id of ['nythraxis_crypt']) {
       const o = instanceOrigin(DUNGEONS[id].index, 0);
       const frame = interiorColliderFrame(o.x, o.z + 40);
       expect(frame).not.toBeNull();

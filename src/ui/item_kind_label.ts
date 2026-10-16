@@ -48,6 +48,8 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   scroll: 'itemUi.kind.scroll',
   bag: 'itemUi.kind.bag',
   mount: 'itemUi.kind.mount',
+  buddy: 'itemUi.kind.buddy',
+  buddy_cosmetic: 'itemUi.kind.buddyCosmetic',
   recipe: 'itemUi.kind.recipe',
 };
 

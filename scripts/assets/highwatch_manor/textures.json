@@ -1,0 +1,54 @@
+{
+  "about": "The painted maps the Highwatch manor wears: Highwatch's Alpine slate look of the painted Tidehold town, the look the painted Highwatch buildings wear. tex/ holds unchanged copies of maps from the ClaudeCraft Studio repository's scripts/assets/blender_tidehold town texture library: tex/harbour/ the harbour colour set (town_tex_painted_var/harbour), tex/roof_square_slate/ the square slate pattern layout in the harbour palette that look wears on its roofs (town_tex_painted_pat/harbour/roof_square_slate), and tex/default/ the default painted set's prop cloth (town_tex_painted), the neutral woven detail map the look's own furnishings wear under their colours. The look's ashlar wall pattern is not worn: the manor's stone is modelled block by block (its joints are geometry), so every stone face wears the jointless dressed granite, as the Mirefen tavern's modelled ashlar does. yards is the town kit's repeat (bl_town_lib.py K; the prop cloth's PROP_K); normalStrength is the kit's normal strength, baked into the shipped normal map; roughness is the painted buildings' own. neutral (the cloth only): the map's mean in sRGB, a grey, so a textile's colour is measured from it and the textile keeps its own colour under the weave. headroom: a painted face's colour (its tint over the map, and the warm light and the weathering baked over that) is stored divided by it, so the light can lift the paint up to that many times the map before the colour clamps; build.mjs writes the linear factor that undoes it (vertexColourScale, 1 / srgbToLinear(1 / headroom)) into each painted material's extras, and the runtime multiplies the colour by it. manor_texture.py lays them on in Blender, build.mjs embeds them at each texture tier.",
+  "headroom": 1.5,
+  "materials": {
+    "ManorPlaster": {
+      "color": "tex/harbour/TownPlaster_Color.jpg",
+      "normal": "tex/harbour/TownPlaster_Normal.jpg",
+      "normalStrength": 0.6,
+      "yards": 4.0,
+      "roughness": 0.86
+    },
+    "ManorTimber": {
+      "color": "tex/harbour/TownTimber_Color.jpg",
+      "normal": "tex/harbour/TownTimber_Normal.jpg",
+      "normalStrength": 0.9,
+      "yards": 2.2,
+      "roughness": 0.86
+    },
+    "ManorSlate": {
+      "color": "tex/roof_square_slate/TownRoof_Color.jpg",
+      "normal": "tex/roof_square_slate/TownRoof_Normal.jpg",
+      "normalStrength": 1.4,
+      "yards": 3.0,
+      "roughness": 0.86
+    },
+    "ManorFloor": {
+      "color": "tex/harbour/TownFloor_Color.jpg",
+      "normal": "tex/harbour/TownFloor_Normal.jpg",
+      "normalStrength": 0.8,
+      "yards": 3.0,
+      "roughness": 0.86
+    },
+    "ManorDressed": {
+      "color": "tex/harbour/TownDressed_Color.jpg",
+      "normal": "tex/harbour/TownDressed_Normal.jpg",
+      "normalStrength": 0.8,
+      "yards": 2.4,
+      "roughness": 0.86
+    },
+    "ManorCloth": {
+      "color": "tex/default/TownPropCloth_Color.jpg",
+      "normal": "tex/default/TownPropCloth_Normal.jpg",
+      "normalStrength": 0.6,
+      "yards": 0.6,
+      "roughness": 0.95,
+      "neutral": 0.841
+    }
+  },
+  "tiers": {
+    "full": { "suffix": "", "color": 1024, "normal": 128 },
+    "half": { "suffix": ".half", "color": 512, "normal": 64 },
+    "quarter": { "suffix": ".quarter", "color": 256, "normal": 32 }
+  }
+}

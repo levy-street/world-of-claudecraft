@@ -448,14 +448,14 @@ describe('in-window [data-page] rows share the jump', () => {
 
   it('an Overview nearly-complete row lands on its page under its own rail', () => {
     const state = baseState();
-    // Four of the five Hollow Crypt relics: one remaining puts the page on the
+    // Every Hollow Crypt relic but one: one remaining puts the page on the
     // nearly-complete strip.
-    for (const relic of RELIQUARY_PAGES_BY_ID[CRYPT_PAGE]?.relics.slice(0, 4) ?? []) {
+    for (const relic of RELIQUARY_PAGES_BY_ID[CRYPT_PAGE]?.relics.slice(0, -1) ?? []) {
       if (relic.kind === 'item') state.itemsDiscovered.add(relic.itemId);
     }
     const { el } = makeWindow(state);
     const row = el.querySelector<HTMLElement>(`.reliquary-nearly-row[data-page="${CRYPT_PAGE}"]`);
-    expect(row, 'the nearly strip holds the four-of-five page').not.toBeNull();
+    expect(row, 'the nearly strip holds the all-but-one page').not.toBeNull();
     row?.click();
     expect(activeNav(el)).toBe('conquerors');
     expect(paintedPage(el)).toBe(reliquaryPageName(CRYPT_PAGE));

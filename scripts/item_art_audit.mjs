@@ -145,14 +145,33 @@ const build = await buildItemArtAudit({
     // feature/buried-hoards: the release's faction ladder, trinket slot and
     // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
     // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
-    catalogCount: 1464,
-    liveItemCount: 1482,
-    pendingArtCount: 135,
-    generatedHeroicDefinitions: 78,
-    heroicDefinitionsWithOwnWebp: 59,
-    heroicWeaponArtAliases: 19,
-    sheetPageCount: 36,
-    groupCount: 26,
+    // + the 245 choose-one leveling quest armor paintings
+    // (quest-leveling-gear-icons-2026-10-06): 1709 / 1727 on 38 sheet pages,
+    // measured with `node scripts/item_art_audit.mjs --verify-only`.
+    // + the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07):
+    // 1785 / 1803 on 39 sheet pages, measured the same way.
+    // + PR 4281's 8 membership and 7 referral paintings on the membership
+    // integration: 1800 / 1818 on 39 sheet pages, measured the same way.
+    // + the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07):
+    // 1860 / 1878 on 39 sheet pages, measured the same way.
+    // Both on the membership integration: 1875 / 1893 on 40 sheet pages, measured
+    // the same way.
+    // + the Mirefen world-boss branch's fifteen items (balgath-boss, shardpike-mechanic,
+    // foremans-wage, muster-shardpike and balgath-loot batches) on the v0.45.0
+    // integration: 1890 / 1908.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005 / 2034 on 42
+    // sheet pages, re-measured with `--verify-only` (116 generated Heroic definitions,
+    // 86 with their own WebP, 30 weapon art aliases).
+    // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
+    catalogCount: 2039,
+    liveItemCount: 2068,
+    // Five referral rewards reuse existing art until their own paintings land.
+    pendingArtCount: 142,
+    generatedHeroicDefinitions: 116,
+    heroicDefinitionsWithOwnWebp: 86,
+    heroicWeaponArtAliases: 30,
+    sheetPageCount: 44,
+    groupCount: 28,
   },
 });
 assertItemArtAuditPass(build);

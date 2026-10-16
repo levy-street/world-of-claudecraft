@@ -32,6 +32,36 @@ Everything else is a sibling module in one of these families:
   precipitation and masked spawns keep it over that zone's own cells, so a
   neighbouring realm's snow is visible from outside; decisions in
   `weather_field_core.ts`), `character_effects.ts`.
+- **Gloamveil's floor and smoke layer** (`gloam_field.ts`, owned by `Vfx`): the
+  Shadow priest's form outside the body. One field per renderer holds the dark
+  smoke (`gloam_smoke.ts`, an ALPHA-blended cloud: the additive cloud in
+  `vfx.ts` can only add light, so "dark" there is invisible) and one draped
+  pool per wearer with its wake and entry ring (`gloam_pool.ts`). The renderer
+  drives it: the entity loop reports each presented wearer once a frame
+  (`vfx.gloam.wearer`) with the rig's cue, then closes the frame
+  (`vfx.gloam.update`) with the viewer's reduced-motion setting. Everything
+  else is decided in three pure cores: what each tier and reduced motion keep
+  and who is tracked (`gloam_field_core.ts`), where a stain lies and when it
+  may be laid (`gloam_pool_core.ts`), the puff pool (`gloam_smoke_core.ts`).
+  Its contracts, each pinned in `tests/gloam_field.test.ts`: every stain sits
+  on the top rung of the `ground` band, alone, so the dark never covers a
+  player or encounter floor effect (`docs/design/vfx-floor-layering.md`);
+  ground samples come from the renderer's own seed-bound sampler, which
+  costs about ten microseconds a call, so the floor is REMEMBERED on a
+  world-aligned grid of the pool's own cell (`GloamGround`) and a lay reads it
+  between nodes: a moving pool is laid every frame and samples only the nodes
+  it has just reached, the entry ring samples only the vertices its front is
+  about to reach, and every new sample is spent from ONE per-frame allowance
+  shared by all of them (where it runs out a vertex keeps the height it had
+  and the lay is finished on a later frame, and the field rotates who is
+  served first); every stain draws with one of two materials built once
+  (per-stain values are written in `onBeforeRender`); the root is attached
+  through `attachSceneGroupGated` over hidden stand-ins, at construction and
+  again on a context restore, so its three programs link before anything
+  under it draws and a gate that never settles is caught by the watchdog; a
+  pool whose wearer is gone is parked and reused (a bounded few), so a camera
+  turning away and back mints no buffer; the field disposes everything it
+  built. The body half is `characters/gloam_climb.ts`.
 - **Cross-surface shader services** own a shared uniform block plus a GLSL
   snippet that SEVERAL materials splice, never a copy per material.
   `biome_haze_field.ts` (+ its `_core`) is the reference: one small world-space
@@ -56,6 +86,39 @@ Everything else is a sibling module in one of these families:
   (`chosen_cadence_pressure_core.ts`), never the wall interval, and every consumer that
   reads a frame interval as load goes through `frameLoadMs`. A new renderer clears the
   renderer-side readings (`resetChosenCadenceForRenderer`).
+- **Far-visible landmarks:** `boss_impostor.ts` (+ its `_core`) keeps a WORLD
+  BOSS on screen from across the zone, long past the 80yd entity band, by
+  baking a ring of yaw views of his real model into one atlas and drawing a
+  camera-facing quad that blends the two bracketing views. Same technique as
+  the far-foliage impostors, but the subject MOVES and TURNS, so the bearing is
+  taken relative to his own facing. The HANDOFF to the rig is a hard cut keyed
+  off the rig's own visibility (`bossImpostorShows`: the sprite draws only while
+  the renderer is NOT drawing his rig), never a second distance curve: a curve
+  of its own has to reproduce the rig's 80-in/96-out hysteresis to the frame or
+  it opens a double-draw band each way, which is what the first cut shipped. The
+  cut is invisible because the quad sits on the far mesh's exact frame
+  (`bossImpostorFrameMetrics` / `bossImpostorQuadPlacement`, on the same
+  interpolated pose), is baked from the same `idleGeo` the far LOD draws, and is
+  re-graded by the live day/night grade (`bossImpostorLightGrade`), so a
+  midnight sprite is as dark as the rig it replaces. A sleeping boss draws no
+  sprite at all (he is a landmark at his lair, not on the horizon). Three
+  enforcement points must agree or the feature is a silent no-op: this module,
+  the server's interest widening (`server/interest_policy.ts` `landmarkRange`),
+  and the shared candidate query that would otherwise never return him. When
+  copying the bake loop, copy the `setRenderTarget`-per-cell too: three latches
+  a target's viewport and scissor at BIND time, so mutating them on an
+  already-bound target puts every view in one cell and the sprite draws as a
+  grey rectangle.
+- **World-boss ward cues** (`eye_ward_marker_core.ts` + `characters/eye_ward_marker.ts`,
+  `eye_ward_badge.ts` + `eye_ward_badge_field.ts`, driven by
+  `eye_ward_marker_drive.ts`): the reticle on the boss's eye and the state badge
+  over his head. The split that matters is the `EyeWardMarkerRole`: "aim the pike
+  HERE" is an instruction and is gated on carrying the pike, while "his ward is
+  down, your damage lands" is the raid's damage window and shows for EVERYONE.
+  Collapsing the two is how the twenty players doing the damage ended up never
+  being told. State is read off the boss's own ward AURAS, which the sim already
+  maintains as pure presentation of two timestamps, so a second viewer needs no
+  new wire field.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see
   Performance) and `crowd_lod.ts` (pure character LOD policy: the band plan
   `characterLodBands` returns, which pulls shadow/anim cadence in as rig counts
@@ -63,7 +126,11 @@ Everything else is a sibling module in one of these families:
   the frozen single-draw far mesh takes over. Its extension eases out on the
   crowd knee, the per-tier `GFX.farCharacterAnimScale` ceiling, and live budget
   pressure; cosmetic-only, and `showsStaticFarMesh` keeps anything a player
-  reacts to out of the frozen mesh inside the uncrowded base range).
+  reacts to out of the frozen mesh inside the uncrowded base range). The per-view
+  swap goes through `far_lod_latch.ts` / `far_lod_latch_core.ts` (distance
+  hysteresis, a dwell, a moving grace; the applied far scale slews per frame), so a
+  noisy edge never flickers a creature between rig and far mesh; an actionable pose
+  still returns to the rig at once.
 - **Zone-feature cull:** `zone_feature_sweep.ts` is the per-frame sweep the renderer
   drives over every attached feature cull group, a thin consumer of
   `zone_feature_visibility_core.ts` (the fog or detail-horizon rule on the group's
@@ -119,6 +186,61 @@ Everything else is a sibling module in one of these families:
   moves). All display-only, all gated by the reduced-motion switch; driven
   from `renderer.ts` `updateCamera` and the hud event hooks
   (`tests/camera_*_core.test.ts`).
+- `interior_camera.ts` over `interior_camera_core.ts`: the indoor camera clamp, the ONE
+  scoped exception on the built-in world to the pinned rule that scene geometry never shortens
+  the chase boom (`tests/graphics_overhaul_integration.test.ts`). A walk-in building registers
+  its AIR (boxes, optionally rounded by a vertical cylinder, plus its openings onto the world;
+  square to the world's axes, or to the building's own `InteriorFrame`, an origin and a turn,
+  for one stood at any other angle: every query still takes world points) with
+  `registerCameraInterior` when it is built and drops it on teardown; while the player's
+  eye stands in it, the drawn camera stays in that air (pull-in at once, eased release, the
+  least flattening under a lintel or a ceiling, a lift or swing over a cramped spot, a cut to
+  the eyes in a corner nothing escapes; a `preserve-angle` interior instead keeps the
+  requested ray and only shortens the boom along it); walking in, the lens is held under the
+  door's head and follows through the doorway from outside (`interiorEntryCap`, a ray out
+  through an opening runs on past it), so nothing is cut away round the player; bodies
+  outside lose their nameplates and chat bubbles unless seen through an opening. Outdoors it
+  touches nothing. Reference registrants: every town view that stands painted buildings (the
+  placed-town view `placed_town_buildings.ts` behind Highwatch, `eastbrook_town.ts`,
+  `fenbridge_town.ts`) registers each walk-in building's air through its own registrar
+  (`placed_town_interiors.ts`: cleared as the view builds, one `add` per building it stands)
+  from `placed_town_interior_core.ts` (rooms and doors per model at authored size, carried to
+  the record's scale, turn and seat; a new walk-in model needs its entry there, pinned against
+  its baked collision by `tests/placed_town_interior_core.test.ts`). The Highwatch and
+  Fenbridge views also hand the same doors to their camera fade, so a walk-in building stays
+  solid while the player steps in with the lens still outside looking through the door
+  (`fenbridge_town_visibility_core.ts` `doorways`, read in `doorwayFrame` for a turned
+  building); Eastbrook's roof fade takes no doors, so there a walk-in building fades while the
+  lens is outside it. The Mirefen tavern (`mirefen_tavern.ts`) registers its own air from
+  `mirefen_tavern_interior_core.ts`. The Highwatch manor's fires and lamps
+  (`highwatch_manor_lights.ts`) join the props' fire-light budget and the scenery flame pass,
+  the campfire's rule. The chase camera's floor (ground, rift tier, maze hedges) is
+  `chase_camera_floor_core.ts`.
+- **Studio (authored maps) and the editor:** two directories, each with its
+  own `CLAUDE.md` and `index.ts` barrel. `authored_map/` holds what the
+  renderer does ONLY on an authored map (chase-boom clamps and look-up dolly,
+  the gameplay fog band, authored lighting, cave/carve/rail/fluid/decal layers,
+  the under-world mask); every call site is gated on `isBuiltinWorldActive()`
+  or the editor camera, so the built-in world draws exactly what the release
+  did. `editor_api/` is `renderer.editor`, the map editor's facade (a new
+  editor hook lands there, never as a public `Renderer` method).
+- **Renderer facades and per-frame helpers** extracted under the monolith
+  ratchet: `renderer.picking` (`world_picking.ts`: entity, gather-node, mover
+  and ground picks), the speech bubbles (`chat_bubble_layer.ts`), click
+  markers / AoE rings / ground-aim reticle (`ground_feedback.ts`), the Tab cone overlay
+  (`target_cone_overlay.ts`), god-ray shafts (`god_ray_shafts.ts`), and the
+  per-biome fog/light/god-ray tables (`outdoor_biome_presets.ts`). A new
+  public picking method lands on its facade, not on `Renderer`.
+- **Sitting on furniture** (the seats are `src/sim/seat_anchor.ts`): the sim keeps a seated
+  body on its seat's STAND spot; `seated_pose.ts` over the pure `seated_pose_core.ts` draws it
+  in the seat (the root at the seat anchor, turned to the seat, the rig ROOT lifted onto the
+  seat surface so the group's step smoothing never eases over a seat) and walks it in and out.
+  Two hooks and nothing else: `entityRenderPose` (`deck_frame.ts`) calls `applySeatedPose`,
+  the animation fill calls `applySeatAnim`. The chair clips (`sit_anims.glb`, wired by
+  `manifest.ts` `seats()` onto every Rig_Medium body, chosen by `characters/seat_clips.ts`)
+  are authored in the seat's anchor space, so the visual SNAPS (never crossfades) into and
+  out of the seated states. The pointer's seat pick is `seat_pick.ts` over
+  `seat_pick_core.ts`, driven by `src/game/seat_interact.ts`.
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD
 selection) is its own Three/DOM/i18n-free `*_core.ts` or `*_view.ts` module,
@@ -203,6 +325,12 @@ rules, all CI-enforced:
 - **Never `dispose()` a shared GLB-cache texture that may still be drawn.** With the
   KTX2 mip release (`assets/ktx2_mip_release.ts`) its CPU data is full-shape stubs and
   its restore source drops on dispose, so a later re-upload renders black.
+- **A geometry's coarser levels are index lists in `assets/geometry_lod.ts`** (filled by
+  the loader's `WOC_lod` plugin, `assets/woc_lod_plugin.ts`). A level draws through a
+  variant over the source's own attribute objects, which goes with its source's dispose
+  and never alone; a transform keeps a level only through `carryGeometryLod` or
+  `mergeGeometryLod`, so anything else derived from a geometry carries no levels (it draws
+  the one index it was given). The WOC flows that use them are in `characters/CLAUDE.md`.
 - **`preload.ts` is the boot gate, and it has TWO lanes.** `startGame` awaits
   `assetsReady()` either way, so `build*()` still reads resolved assets
   synchronously; the lanes differ only in WHEN the fetch starts. A new module-load
@@ -212,13 +340,75 @@ rules, all CI-enforced:
     when invoked, never close over one already in flight.
   - `registerPreload(promise)` stays eager, for the few assets the LAUNCHER itself
     draws. Today that is `characters/assets.ts` (the character-creation preview) and
-    `placed_assets.ts` (which runs during world build, not at import).
+    `placed_assets.ts` (which runs during world build, not at import). The character
+    boot set registers at the loader's BACKGROUND priority: the launcher's stage asks
+    for its own body's files as demands (`directBuildAssetsResident`) and never waits
+    on the set, so a creature it will never draw cannot hold its character back.
   Fetching world content at import meant merely reaching the home screen decoded the
   whole set, and the spike crossed WKWebView's per-process ceiling: a 12 GB iPhone 17
   Pro was killed 1.6s in and reloaded forever, unseen by the entry crash guard (it
   only arms inside `startGame`). Guarded by `tests/defer_launcher_preloads.test.ts`,
   which also pins that the lane opens BEFORE the `assetsReady()` that gates the
   Renderer, and fails on any new eager registrant outside the two allowed files.
+- **Player bodies have a loading model of their own: nothing a body needs in order
+  to be DRAWN streams on first sight.** A player is the entity a player reacts to
+  most, so its body, nameplate and click target exist the frame it enters range
+  (the fairness rule: enemy positions are actionable), on every device and link.
+  Three tiers, the file sets in the pure `characters/woc_entry_core.ts` and
+  `characters/woc_crowd_prefetch_core.ts`:
+  - **Entry-critical, awaited.** Both body fits' base and animation library and
+    both head cores: the minimum to draw ANY player. One task in the deferred lane
+    (`characters/woc_entry_preload.ts`, registered by `characters/assets.ts`), so
+    it starts at Play, never on the launcher, and `assetsReady()` waits for it
+    before the Renderer exists. A file of it that cannot be fetched fails the
+    entry, loudly, like any critical asset.
+  - **Prefetched right after first paint, never awaited.** The rest of the crowd
+    set: every hairstyle and facial hair file, every armor set of both fits at
+    the tier OTHER characters draw, every under-armor atlas
+    (`characters/woc_crowd_prefetch.ts`, started by the same first painted frame
+    as the creature stream, `startStreamedCharacterPreloads`). Background work
+    end to end: the downloads wait behind every file somebody needs now, an
+    armor pack is prepared as a BACKGROUND unit of the work queue, nothing is
+    attached, and a failure is nobody's loss. Only on an unconstrained profile:
+    a constrained one (every phone, every iOS host) prefetches NOTHING, since
+    its page runs near its memory ceiling and no device measurement says the
+    whole crowd set fits, and neither does a browser that sends the Save-Data
+    hint. It re-plans when a preset change moves the crowd's
+    tier, and never runs on the launcher. `?woccrowdprefetch=off` (dev) switches
+    it off, the A/B arm that prices it.
+  - **On demand, each with a stand-in that draws meanwhile.** A hair or beard file
+    (the bare head), an armor set (the body's own suit), an under-armor atlas
+    (the suit's own atlas), the top detail tier (the medium file). The prefetch
+    only makes the stand-in rare; a body that meets a file before it lands draws
+    the stand-in on every profile. A new streamed piece of a player body names
+    its stand-in or joins the entry-critical set; it never holds the body back.
+  The launcher is the one place a body itself is fetched on demand: its previews
+  ask per body (`visualAssetsResident`, and `directBuildAssetsResident` for the
+  weapons the build hangs too, built on `onCharacterAssetReady`; a fetch that
+  failed is asked for again after its cooldown, so the wait ends).
+  `characters/woc_entry_prepare.ts` then runs under the curtain, ahead of the
+  prewarm's budget clock: the local player's own hair and beard get a bounded
+  chance to settle, and both fits are prepared, so neither happens in a live
+  frame. Guards: `tests/woc_entry_preload.test.ts` (the sets derived from the
+  manifest and catalog, nothing started before the lane opens, the wait and what
+  it does not wait for), `tests/woc_entry_prepare.test.ts`,
+  `tests/woc_crowd_prefetch.test.ts` (the plan per profile, nothing on a
+  constrained one, background and once, started by the first painted frame only).
+- **The load queues have two classes** (`assets/load_queue_core.ts`, the queue
+  `loader.ts` schedules on). `loadGltf(url)` is a DEMAND; `{ priority:
+  'background' }` is speculative bulk (the post-entry creature stream on the iOS
+  memory profile, the crowd prefetch above; `loadKtx2Texture` takes the same
+  option for an atlas fetched ahead of need). A waiting demand always starts
+  before any waiting background load, first come first served inside a class,
+  and a background load still waiting when its file is demanded is promoted, on
+  the same promise. Background loads never hold every slot of a queue that has
+  more than one: one stays free for a demand, which would otherwise wait out a
+  bulk download already on the wire (and its retries). So a file somebody needs
+  now never waits out a stream of files nobody has asked for. A new bulk fetch
+  passes `background`; nothing else changes for a caller. Guards:
+  `tests/load_queue_core.test.ts`,
+  `tests/render_asset_load_priority.test.ts`,
+  `tests/character_stream_priority.test.ts`.
 - **Preload sets are tier-INDEPENDENT.** They freeze at the import-time tier
   guess but placement runs against the LIVE tier, so a preload set must be a
   superset of EVERY tier's placement set or world entry crashes with "asset not
@@ -602,7 +792,8 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   Warm nothing whose cost you have not measured: Brother Aldric was in this
   spec until an A/B from a start zone that had never compiled his model showed
   his spawn linking ZERO programs (the player bodies on screen already carry
-  them). Varkhul's rig is the measured opposite (the harvest caught its body
+  them; that was his old stock rig, and the spawn has not been measured again on
+  the priest's WOC body he wears now). Varkhul's rig is the measured opposite (the harvest caught its body
   programs linking live at the pull), so the Varkhul set stages it first,
   through the live view's own factory, beside a held Forgestorm warning twin
   (each storm disposes its warnings, and a program no material uses survives
@@ -710,7 +901,12 @@ GPU work signs. Each rule names its seam and its guard.
   included. Seam: `characters/look_pieces.ts` (`composedLookPiecesFor`,
   `perfStats().lookPieces`) and `AssembleOptions.deferDecals`, guarded by
   `tests/look_pieces.test.ts`, `tests/deferred_face_decals.test.ts` and
-  `tests/renderer_look_pieces_hold.test.ts`.
+  `tests/renderer_look_pieces_hold.test.ts`. A WOC body's far LOD is the same
+  shape (`characters/woc_far_bake.ts` `queueWocFarBake`: the bake as vertex-band
+  units, one look at a time and one bake per look, then one mount unit per
+  body, the rig standing in; `tests/woc_far_queue.test.ts`): no far bake runs
+  inside `setFar`, `setProxyShadow` or `update()` for a body that has a compile
+  gate and the work queue that came with it.
 - **No material buys a second scene pass: transmission is forbidden.** A material with
   `transmission > 0` (a `MeshPhysicalMaterial`; GLTFLoader mints one for a glTF material
   carrying `KHR_materials_transmission`) makes three draw the whole opaque scene a second

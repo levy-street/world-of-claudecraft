@@ -80,6 +80,17 @@ interface ProvenSafeBase {
 /** Bases that are non-negative by provenance rather than by syntax. */
 const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
   {
+    file: 'src/render/campfire_flame.ts',
+    base: 'flameH',
+    sites: 1,
+    // flameH is the layer's normalized height, and it is CLAMPED to [0,1] on
+    // the line above the pow(): transformed.y can go either side of the layer
+    // height on a swaying ring, so the clamp, not the geometry, is what keeps
+    // the base non-negative. The anchor pins the clamp, so the row dies with it.
+    anchor: /float flameH = clamp\(transformed\.y \/ \$\{height\.toFixed\(4\)\}, 0\.0, 1\.0\);/,
+    why: 'flameH is a clamp(..., 0.0, 1.0) one line above the pow()',
+  },
+  {
     file: 'src/render/weapon_vfx.ts',
     base: 'w',
     sites: 1,
@@ -130,11 +141,22 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ability_vfx/solid_impact_fragments.ts': 2,
   'src/render/ability_vfx/warrior_rage_material.ts': 1,
   'src/render/characters/surface_response.ts': 5,
+  // Gloamveil's climbing tongues (one templated line for the three
+  // families) and the pool's two tendril lobes: every base is a
+  // clamp(0.5 + 0.5 * sin(x), 0.0, 1.0).
+  'src/render/characters/gloam_climb_core.ts': 1,
+  'src/render/gloam_pool.ts': 2,
   'src/render/ability_vfx/rings.ts': 1,
   'src/render/ability_vfx/shells.ts': 1,
   // the armour-dye sRGB<->linear pair (bases clamped with max(c, 0))
   'src/render/characters/armor_dye.ts': 2,
-  'src/render/dungeon.ts': 1,
+  // the WOC head tint's sRGB<->linear pair and the skin transfer's softened
+  // colour offset (bases clamped with max(x, 0))
+  'src/render/characters/woc_head_tint.ts': 3,
+  // the campfire flame's lick ramp (base is a clamped normalized height)
+  'src/render/campfire_flame.ts': 1,
+  // the brazier flame's taper ramp
+  'src/render/placed_assets.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
   'src/render/hoard_entrance.ts': 3,
   // the Buried Hoard glow cards, sparks, reward-chest rays and column (bases
@@ -154,6 +176,89 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/water.ts': 1,
   'src/render/weapon_vfx.ts': 4,
   'src/render/worn_stone.ts': 1,
+  // the five-dungeon rework's interiors, skies, water and boss fx, plus the
+  // shared floor-telegraph material and the Sanctum seal gate (the bases that
+  // were not already a recognized clamp now take max(x, 0.0), or abs() for the
+  // symmetric Gaussian of the Sanctum lake's ripple ring)
+  // Laverock's finale: the column's axis glow, the pool's glow, the moon's road
+  // on the lagoon and the stream ribbon's core (bases abs(), max(x, 0)).
+  'src/render/drowned_temple/temple_cantor_finale_fx.ts': 4,
+  'src/render/drowned_temple/temple_fracture_fx.ts': 1,
+  'src/render/drowned_temple/temple_hydra_combo_fx.ts': 8,
+  'src/render/drowned_temple/temple_landmarks.ts': 2,
+  'src/render/drowned_temple/temple_manta_fx.ts': 2,
+  'src/render/drowned_temple/temple_moon_fx.ts': 5,
+  'src/render/drowned_temple/temple_moonbridge_fx.ts': 1,
+  'src/render/drowned_temple/temple_selthe_fx.ts': 4,
+  'src/render/drowned_temple/temple_sky_lagoon.ts': 7,
+  'src/render/drowned_temple/temple_tsunami_core.ts': 1,
+  'src/render/drowned_temple/temple_tsunami_fx.ts': 3,
+  'src/render/floor_telegraph/telegraph_material.ts': 1,
+  'src/render/gravewyrm_sanctum/sanctum_air.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_face.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_fire.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_lake.ts': 3,
+  'src/render/gravewyrm_sanctum/sanctum_sky.ts': 3,
+  'src/render/gravewyrm_sanctum/sanctum_steam.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_vault.ts': 1,
+  'src/render/gravewyrm_sanctum/sanctum_works.ts': 2,
+  'src/render/gravewyrm_sanctum_bosses/sanctum_boss_art.ts': 2,
+  'src/render/hollow_crypt/crypt_atmosphere.ts': 6,
+  'src/render/hollow_crypt/crypt_creature_fx.ts': 2,
+  'src/render/hollow_crypt/crypt_finale_fx.ts': 2,
+  'src/render/hollow_crypt/crypt_fx_particles.ts': 1,
+  'src/render/hollow_crypt/crypt_gates.ts': 1,
+  'src/render/hollow_crypt/crypt_lights.ts': 1,
+  'src/render/hollow_crypt/ilvane_dirge_fx.ts': 4,
+  'src/render/hollow_crypt/lady_fx.ts': 2,
+  'src/render/hollow_crypt/marrow_fx.ts': 1,
+  'src/render/hollow_crypt/crypt_particles.ts': 1,
+  'src/render/hollow_crypt/morthen_fx.ts': 1,
+  'src/render/hollow_crypt/morthen_rite_fx.ts': 3,
+  'src/render/hollow_crypt/morthen_ward_fx.ts': 1,
+  'src/render/sanctum_seal_gate_surface.ts': 1,
+  'src/render/sunken_bastion/bastion_beacon.ts': 4,
+  'src/render/sunken_bastion/bastion_creature_fx.ts': 1,
+  'src/render/sunken_bastion/bastion_flood.ts': 2,
+  'src/render/sunken_bastion/bastion_olen_fx.ts': 1,
+  'src/render/sunken_bastion/bastion_rain.ts': 1,
+  'src/render/sunken_bastion/bastion_shore.ts': 1,
+  'src/render/sunken_bastion/bastion_sky_sea.ts': 5,
+  // The trash mechanics' shell program: the fresnel, the ward's sweep and the
+  // band's core, each clamped to [0, 1].
+  'src/render/sunken_bastion/bastion_trash_fx_kit.ts': 3,
+  'src/render/sunken_bastion/bastion_water.ts': 2,
+  'src/render/wildheart_basin/basin_air.ts': 1,
+  'src/render/wildheart_basin/basin_boss_fx.ts': 5,
+  'src/render/wildheart_basin/basin_falls.ts': 3,
+  'src/render/wildheart_basin/basin_fire.ts': 1,
+  'src/render/wildheart_basin/basin_seedpod.ts': 1,
+  'src/render/wildheart_basin/basin_sky.ts': 3,
+  'src/render/wildheart_basin/basin_thorns.ts': 1,
+  'src/render/wildheart_basin/basin_water.ts': 4,
+  'src/render/wildheart_basin/bond_cord.ts': 2,
+  // The dungeon trash pass: the Temple kit's shells, the Sanctum kit's brazier
+  // and the trash engine's pools, orbs, walls, novas and body marks, every
+  // base wrapped in max(x, 0.0).
+  'src/render/drowned_temple/temple_trash_fx.ts': 14,
+  'src/render/gravewyrm_sanctum_fx/sanctum_kit_fx.ts': 2,
+  'src/render/trash_engine_fx/engine_body_fx.ts': 1,
+  'src/render/trash_engine_fx/engine_hazards.ts': 3,
+  'src/render/trash_engine_fx/engine_nova.ts': 1,
+  'src/render/trash_engine_fx/engine_walkers.ts': 2,
+  'src/render/trash_engine_fx/engine_walls.ts': 1,
+  // Pinned at the v0.45.0 integration merge of the Studio import, at the measured
+  // counts: sites neither parent's pin listed (the temple flood's pow moved out of
+  // dungeon.ts into temple_water_shader.ts, and the Bastion's ghost discharge and
+  // ghost fx replaced the boss fx row on the integration side; the Studio's
+  // cut cavity, model generator, triplanar maps and wall finishes).
+  'src/render/cut_cavity_mesh.ts': 1,
+  'src/render/model_gen.ts': 1,
+  'src/render/sunken_bastion/bastion_ghost_discharge.ts': 3,
+  'src/render/sunken_bastion/bastion_ghost_fx.ts': 1,
+  'src/render/temple_water_shader.ts': 1,
+  'src/render/triplanar_maps.ts': 1,
+  'src/render/wall_finishes.ts': 1,
 };
 
 // Generated locale bundles are megabytes of prose with no shader in them; a
@@ -326,7 +431,9 @@ const POW_CALL = /(^|[^.A-Za-z0-9_])pow\s*\(/g;
 function powSites(roots: string[], base: string): PowSite[] {
   const sites: PowSite[] = [];
   for (const root of roots) {
-    for (const entry of sourceFilesUnder(join(base, root), { skipDirectories: SKIPPED_DIRS })) {
+    for (const entry of sourceFilesUnder(join(base, root), {
+      skipDirectories: SKIPPED_DIRS,
+    })) {
       const file = `${root}/${entry.file}`;
       const raw = readFileSync(entry.full, 'utf8');
       if (!raw.includes('pow')) continue;

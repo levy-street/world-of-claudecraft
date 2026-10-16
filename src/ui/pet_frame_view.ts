@@ -15,6 +15,7 @@
 
 import { isTemporaryNecromancyUndeadTemplateId } from '../sim/content/necromancy';
 import { DELVE_COMPANIONS } from '../sim/data';
+import { isBuddyMob } from '../sim/pet/buddy_ai';
 import type { UnitFrameDescriptor } from './unit_frame';
 
 /** The mob templates that are delve COMPANIONS rather than pets. A companion also
@@ -54,6 +55,11 @@ export interface PetFrameUnit {
  * too, so without this a hunter inside a delve, whose real pet is stowed for the run,
  * would see the companion's health under a frame labelled as their pet, and clicking
  * it would select a different entity than the pet bar and the pet keybinds act on.
+ *
+ * A cosmetic buddy (src/sim/content/buddy_mobs.ts) is excluded for the same
+ * reason: it is a real owned mob entity purely so it can heel like a pet, but
+ * it has no health worth framing (createMob always gives it 1 hp) and no
+ * commands the pet frame's buttons could send.
  */
 export function findOwnPet<T extends PetFrameUnit>(
   entities: Iterable<T>,
@@ -62,6 +68,7 @@ export function findOwnPet<T extends PetFrameUnit>(
   for (const e of entities) {
     if (e.kind !== 'mob' || e.ownerId !== playerId) continue;
     if (DELVE_COMPANION_TEMPLATE_IDS.has(e.templateId)) continue;
+    if (isBuddyMob(e)) continue;
     // The class-overhaul exclusions, kept identical to the sim's petOf rule
     // (pet/pet_selection.ts isPrimaryOwnedPetEntity) and the pet-bar rule
     // (pet_entity.ts isControllableOwnedPet): the Destruction Pyre Colossus
@@ -99,9 +106,10 @@ export interface PartyPetInfo {
  * the wire: no ability in the game reaches past 35 yards, so a pet you cannot see is
  * one you could not act on anyway.
  *
- * Delve companions are excluded for the same reason findOwnPet excludes them: they
- * carry an ownerId too, and showing one as a party member's pet would be wrong.
- * The FIRST match per owner wins, matching the sim's one-pet-per-owner rule.
+ * Delve companions and cosmetic buddies are excluded for the same reason
+ * findOwnPet excludes them: they carry an ownerId too, and showing one as a
+ * party member's pet would be wrong. The FIRST match per owner wins,
+ * matching the sim's one-pet-per-owner rule.
  */
 export function findPetsByOwner<T extends PetFrameUnit>(
   entities: Iterable<T>,
@@ -110,6 +118,7 @@ export function findPetsByOwner<T extends PetFrameUnit>(
   for (const e of entities) {
     if (e.kind !== 'mob' || e.ownerId === null) continue;
     if (DELVE_COMPANION_TEMPLATE_IDS.has(e.templateId)) continue;
+    if (isBuddyMob(e)) continue;
     if (byOwner.has(e.ownerId)) continue;
     byOwner.set(e.ownerId, {
       id: e.id,

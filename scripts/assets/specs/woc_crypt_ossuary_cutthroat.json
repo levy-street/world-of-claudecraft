@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_ossuary_cutthroat_woc.glb",
+      "out": "models/creatures/woc_crypt_ossuary_cutthroat.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "Attack2", "React", "Death"],
+      "maxTex": 1024
+    }
+  ]
+}

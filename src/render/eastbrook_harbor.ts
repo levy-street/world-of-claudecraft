@@ -7,7 +7,7 @@
 // non-built-in worlds like every authored-town module.
 
 import * as THREE from 'three';
-import { BUILTIN_WORLD, getActiveWorldContent } from '../sim/data';
+import { activeWorldIsBuiltinShaped } from '../sim/builtin_shaped_world';
 import { EASTBROOK_HARBOR_DECKS } from '../sim/eastbrook_harbor';
 import type { GaleDeckDef } from '../sim/gale_harbor';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
@@ -43,7 +43,8 @@ export function buildEastbrookHarbor(seed: number): THREE.Group {
  * Planks and stilts for a list of harbor decks in New Eastbrook's harbor
  * wood (the same two materials, so no new program): the Eastbrook
  * waterfront, and the ferry piers at the far berths (render/ferry_piers.ts).
- * Empty on non-built-in worlds.
+ * Empty unless the world is the built-in world or a copy of it
+ * (sim/builtin_shaped_world.ts), matching the decks the sim walks.
  */
 export function buildHarborWood(
   name: string,
@@ -52,7 +53,7 @@ export function buildHarborWood(
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = name;
-  if (getActiveWorldContent() !== BUILTIN_WORLD) return group;
+  if (!activeWorldIsBuiltinShaped()) return group;
   const wood = new THREE.MeshStandardMaterial({ color: 0x8a6a4a, roughness: 0.9 });
   const postWood = new THREE.MeshStandardMaterial({ color: 0x6b523d, roughness: 0.92 });
   const { planks, posts } = buildDeckWood(decks, (x, z) => terrainHeight(x, z, seed), WATER_LEVEL, {

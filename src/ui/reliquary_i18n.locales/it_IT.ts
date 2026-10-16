@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Il Bacino di Wildheart',
-    desc: 'Armi distintive di Zulgar e del Domabestie Signore delle Zanne.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Eroico: Il Bacino di Wildheart',
-    desc: 'Epici esclusivi della modalità eroica di Zulgar, Voce del Bacino.',
   },
   conquerors_nythraxis: {
     name: 'Raid di Nythraxis',
@@ -61,6 +59,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, il Picco Risvegliato',
     desc: 'Bottini epici personali del boss mondiale del Picco Risvegliato.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, il Caposquadra Sepolto',
+    desc: 'Bottino trascinato fuori dai tumuli di Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Il Reliquiario Crollato',

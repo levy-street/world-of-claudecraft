@@ -65,24 +65,38 @@ describe('nameplate health-bar picking', () => {
 
   it('wires nameplates ahead of the direct 3D raycast without enabling overlay pointer events', () => {
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    // Picking moved out of renderer.ts into world_picking.ts (renderer.picking).
+    const renderer = readFileSync(
+      new URL('../src/render/world_picking.ts', import.meta.url),
+      'utf8',
+    );
+    const rendererHost = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    );
+    expect(rendererHost).toContain(
+      'nameplatePick: (x, y) => this.nameplatePainter.pickEntityAt(x, y),',
+    );
     const canvas = readFileSync(
       new URL('../src/render/nameplate_canvas.ts', import.meta.url),
       'utf8',
     );
 
     const handlePick = main.indexOf('function handlePick(x: number, y: number, button: number)');
-    const directEntityPick = main.indexOf('let id = renderer.pickDirect(x, y);', handlePick);
-    const gatherNodePick = main.indexOf('renderer.pickGatherNode(x, y);', directEntityPick);
-    const sloppyEntityPick = main.indexOf('renderer.pickSloppy(x, y);', gatherNodePick);
+    const directEntityPick = main.indexOf(
+      'let id = renderer.picking.pickDirect(x, y);',
+      handlePick,
+    );
+    const gatherNodePick = main.indexOf('renderer.picking.pickGatherNode(x, y);', directEntityPick);
+    const sloppyEntityPick = main.indexOf('renderer.picking.pickSloppy(x, y);', gatherNodePick);
     expect(handlePick).toBeGreaterThanOrEqual(0);
     expect(directEntityPick).toBeGreaterThan(handlePick);
     expect(gatherNodePick).toBeGreaterThan(directEntityPick);
     expect(sloppyEntityPick).toBeGreaterThan(gatherNodePick);
     const directPick = renderer.indexOf(
-      'pickDirect(clientX: number, clientY: number): number | null',
+      'pickDirect(clientX: number, clientY: number, attackIntent = false): number | null',
     );
-    const nameplatePick = renderer.indexOf('this.nameplatePainter.pickEntityAt(', directPick);
+    const nameplatePick = renderer.indexOf('this.host.nameplatePick(', directPick);
     const nameplateWins = renderer.indexOf(
       'if (nameplate !== null) return nameplate;',
       nameplatePick,

@@ -168,9 +168,43 @@ describe('every number on a piece is derived, never hand-picked', () => {
   });
 
   it('the armour curve is the live median of shipped gear, not a number that can rot', () => {
+    // The lower dungeons' blue-roll armour added on 2026-10-08 (hollow_crypt_items.ts,
+    // sunken_bastion_items.ts, drowned_temple_items.ts) is item level 11 to 21, so it
+    // sits below this window, but each piece's generated Heroic copy reads item
+    // level 25 while keeping its base armour, an outlier no authored ilvl-25 piece
+    // shares. The table predates them, and re-deriving it would move every owned
+    // hoard piece's armour, so their copies are not precedent for the curve.
+    const LATER_LOW_LEVEL_BASES = new Set([
+      'spadeworn_gauntlets',
+      'gravedirt_grips',
+      'bellrope_mitts',
+      'rimewreath_coif',
+      'rime_laced_hood',
+      'lamenting_veil',
+      'choirward_pauldrons',
+      'choristers_spaulders',
+      'cantors_stole',
+      'knellbound_hauberk',
+      'candlewatch_jerkin',
+      'robe_of_the_unquiet_rite',
+      'portcullis_girdle',
+      'cellwatch_belt',
+      'lanternwick_sash',
+      'gaolyard_jerkin',
+      'brinewarden_robe',
+      'conchplate_sabatons',
+      'pale_chorus_slippers',
+      'tideglass_gauntlets',
+      'moonburn_grips',
+      'prism_etched_handwraps',
+      'mere_crested_helm',
+      'mereskin_hood',
+      'merewater_cowl',
+    ]);
     const samples = new Map<string, number[]>();
     for (const item of Object.values(ITEMS)) {
       if (Object.hasOwn(HOARD_ITEMS, item.id)) continue;
+      if (item.heroicOf && LATER_LOW_LEVEL_BASES.has(item.heroicOf)) continue;
       if (item.kind !== 'armor' || !item.armorType || (item as { shield?: true }).shield) continue;
       const level = itemLevel(item);
       const armor = item.stats?.armor;

@@ -27,10 +27,25 @@ function distance(a: Point2, b: Point2): number {
   return Math.hypot(a.x - b.x, a.z - b.z);
 }
 
+/** A world point in a placed model's own axes about its anchor (the inverse of localToWorld). */
+function toModelAxes(anchor: Point2, rotation: number, point: Point2): Point2 {
+  const dx = point.x - anchor.x;
+  const dz = point.z - anchor.z;
+  const cos = Math.cos(rotation);
+  const sin = Math.sin(rotation);
+  return { x: dx * cos - dz * sin, z: dx * sin + dz * cos };
+}
+
 function nonWallSolidObbs(): Obb2[] {
   return [
     ...EASTBROOK_LAYOUT.preservedBuildings.map((building) => building.footprint),
     ...EASTBROOK_LAYOUT.buildings.map((building) => building.footprint),
+    // Added 2026-10 for the Tidehold rebuild: a placed building's footprint is
+    // its WALL box, and the parts that stand outside it (a bell tower, a
+    // strongroom, a forge shelter) are its annexes, every bit as solid. A kit
+    // shell's footprint was the whole building, so sweeping the wall boxes
+    // alone would leave every clearance check below blind to solid ground.
+    ...EASTBROOK_LAYOUT.buildings.flatMap((building) => building.annexes),
     ...EASTBROOK_LAYOUT.market.stalls.map((stall) => stall.footprint),
     ...EASTBROOK_LAYOUT.civic.benches.map((bench) => bench.footprint),
     ...EASTBROOK_LAYOUT.fences.map((fence) => fence.footprint),
@@ -371,7 +386,7 @@ describe('authoritative Eastbrook replacement plan', () => {
     expect(EASTBROOK_LAYOUT.preservedBuildings).toEqual([]);
   });
 
-  it('literally pins every new building and derives each front from local +Z', () => {
+  it('literally pins every placed building and derives each front from local -Z', () => {
     // Re-pinned 2026-08 for the harbor move (d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md), then again for owner
     // refinement round 3: every kit lot grew so its door reads at player
@@ -386,6 +401,28 @@ describe('authoritative Eastbrook replacement plan', () => {
     // same position, same rotation and footprint, but the assetId is
     // '/models/biome/hex_church.glb' and the height rose from 7 to 9 so the
     // spire reads, which is why only those two fields moved in this table.
+    // Re-pinned 2026-10 for the Tidehold rebuild: six placed buildings
+    // (makePlacedBuilding) replaced the eleven kit shells, so every row below
+    // is new. The bank, smithy, inn and chapel keep their ids on new models
+    // and new ground, the apothecary's shop and the quay cottage are new ids,
+    // and the other seven kit lots (the weaving workshop, the toolworks, the
+    // four homes and the harbour market) are gone. position, nativeDimensions
+    // and maxCornerRadius are the WALL box now (the eaves, the stair and the
+    // awning reach past it), and each row carries what a placed building
+    // adds: placement (the model's own anchor, turn, size and seat), annexes
+    // (the solid parts outside the wall box) and reach (the model's whole
+    // ground rectangle). The standing point is pinned literally as well: the
+    // door sits wherever the model has it along the front, so the point no
+    // longer follows from the other pinned fields the way a kit shell's did.
+    // Each placement also carries the model's authored size (its baked
+    // collision scales by it), and every building whose model bakes an open
+    // doorway is walk-in (sim/town_walk_in.ts): all but the quay cottage.
+    // Re-pinned again for the World of ClaudeCraft Studio map's arrangement:
+    // the six stand where that map sets them out round an open middle (the
+    // chapel, the apothecary's shop and the inn nudged off the strand and the
+    // farm plots), each at its own grand size (the apothecary's shop at 1.5,
+    // the rest at 1.3), and every measurement is the model's own at authored
+    // size carried to that size.
     expect(
       EASTBROOK_LAYOUT.buildings.map((building) => ({
         id: building.id,
@@ -395,183 +432,365 @@ describe('authoritative Eastbrook replacement plan', () => {
         nativeDimensions: building.nativeDimensions,
         rotation: building.rotation,
         maxCornerRadius: building.maxCornerRadius,
+        frontClearance: building.frontClearance,
+        frontStandingPoint: building.frontStandingPoint,
+        placement: building.placement,
+        annexes: building.annexes,
+        reach: building.reach,
+        walkIn: building.walkIn,
       })),
     ).toEqual([
       {
         id: 'eastbrook_bank',
-        assetId: '/models/biome/hexb_townhall.glb',
+        assetId: '/models/tidehold/bank.glb',
         kind: 'house',
         position: {
-          x: 12,
-          z: -94,
+          x: -61.99,
+          z: -118.33,
         },
         nativeDimensions: {
-          width: 8.6,
-          height: 12.7,
-          depth: 6.9,
+          width: 23.400000000000002,
+          height: 27.90065,
+          depth: 16.239990000000002,
         },
-        rotation: -2.356194490192345,
-        maxCornerRadius: 5.512939324897382,
+        rotation: 3.9269908169872414,
+        maxCornerRadius: 14.241640312830015,
+        frontClearance: 1.8,
+        frontStandingPoint: {
+          x: -54.975504266163355,
+          z: -111.31550426616334,
+        },
+        placement: {
+          x: -61.99,
+          z: -118.33,
+          rotation: 3.9269908169872414,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 22.6067,
+        },
+        annexes: [
+          {
+            id: 'eastbrook_bank:strongroom',
+            center: {
+              x: -69.52775828744859,
+              z: -125.8677582874486,
+            },
+            halfWidth: 3.77,
+            halfDepth: 2.5400050000000003,
+            rotation: 3.9269908169872414,
+          },
+          {
+            id: 'eastbrook_bank:turret',
+            center: {
+              x: -46.87909273070442,
+              z: -120.8543217113613,
+            },
+            halfWidth: 2.10002,
+            halfDepth: 2.10002,
+            rotation: 3.9269908169872414,
+          },
+        ],
+        reach: {
+          id: 'eastbrook_bank',
+          center: {
+            x: -62.06409064853273,
+            z: -119.69341501121265,
+          },
+          halfWidth: 14.694355,
+          halfDepth: 12.895155,
+          rotation: 3.9269908169872414,
+        },
+        walkIn: true,
       },
       {
         id: 'eastbrook_smithy',
-        assetId: '/models/biome/hexb_workshop.glb',
+        assetId: '/models/tidehold/smithy.glb',
         kind: 'house',
         position: {
-          x: -2,
-          z: -122,
+          x: -4.2,
+          z: -75.2,
         },
         nativeDimensions: {
-          width: 8.4,
-          height: 9.6,
-          depth: 6.6,
+          width: 14.3,
+          height: 15.265170000000003,
+          depth: 11.700000000000001,
         },
-        rotation: -2.0344439357957027,
-        maxCornerRadius: 5.341348144429457,
+        rotation: 0.3490658503988659,
+        maxCornerRadius: 9.238235762308735,
+        frontClearance: 1.8,
+        frontStandingPoint: {
+          x: -8.282374584867384,
+          z: -81.85509712542417,
+        },
+        placement: {
+          x: -4.2,
+          z: -75.2,
+          rotation: 0.3490658503988659,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 19.797,
+        },
+        annexes: [
+          {
+            id: 'eastbrook_smithy:forge_shelter',
+            center: {
+              x: 6.900320054667162,
+              z: -79.37852920114891,
+            },
+            halfWidth: 4.70002,
+            halfDepth: 6.24,
+            rotation: 0.3490658503988659,
+          },
+        ],
+        reach: {
+          id: 'eastbrook_smithy',
+          center: {
+            x: -0.1429077294915601,
+            z: -77.08477299988107,
+          },
+          halfWidth: 12.86805,
+          halfDepth: 7.598565,
+          rotation: 0.3490658503988659,
+        },
+        walkIn: true,
       },
       {
         id: 'eastbrook_inn',
-        assetId: '/models/biome/hexb_tavern.glb',
+        assetId: '/models/tidehold/tavern.glb',
         kind: 'inn',
         position: {
-          x: -38,
-          z: -88,
+          x: -30.34,
+          z: -60.63,
         },
         nativeDimensions: {
-          width: 8.6,
-          height: 11.5,
-          depth: 6.9,
+          width: 26,
+          height: 23.063740000000003,
+          depth: 16.900000000000002,
         },
-        rotation: -2.5535900500422257,
-        maxCornerRadius: 5.512939324897382,
+        rotation: 0.4188790204786391,
+        maxCornerRadius: 15.504918574439532,
+        frontClearance: 1.8,
+        frontStandingPoint: {
+          x: -34.50905059152695,
+          z: -69.99384094083666,
+        },
+        placement: {
+          x: -30.34,
+          z: -60.63,
+          rotation: 0.4188790204786391,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 22.6483,
+        },
+        annexes: [
+          {
+            id: 'eastbrook_inn:front_bench',
+            center: {
+              x: -40.228289966143066,
+              z: -66.5389890801282,
+            },
+            halfWidth: 3.5100000000000002,
+            halfDepth: 0.579995,
+            rotation: 0.4188790204786391,
+          },
+          {
+            id: 'eastbrook_inn:barrels',
+            center: {
+              x: -19.98597328159719,
+              z: -72.21274279756746,
+            },
+            halfWidth: 0.709995,
+            halfDepth: 1.489995,
+            rotation: 0.4188790204786391,
+          },
+        ],
+        reach: {
+          id: 'eastbrook_inn',
+          center: {
+            x: -30.04339519859521,
+            z: -60.83349292932096,
+          },
+          halfWidth: 14.721395,
+          halfDepth: 10.919805000000002,
+          rotation: 0.4188790204786391,
+        },
+        walkIn: true,
       },
       {
         id: 'eastbrook_chapel',
-        assetId: '/models/biome/hex_church.glb',
+        assetId: '/models/tidehold/hall.glb',
         kind: 'chapel',
         position: {
-          x: 2,
-          z: -78,
+          x: 28.2,
+          z: -119.62,
         },
         nativeDimensions: {
-          width: 5.5,
-          height: 9,
-          depth: 6,
+          width: 15.600000000000001,
+          height: 38.29974,
+          depth: 28.6,
         },
-        rotation: 0.7853981633974483,
-        maxCornerRadius: 4.0697051490249265,
+        rotation: 2.181661564992912,
+        maxCornerRadius: 16.28895331198417,
+        frontClearance: 1.8,
+        frontStandingPoint: {
+          x: 15.011652086947231,
+          z: -110.38541937474815,
+        },
+        placement: {
+          x: 28.2,
+          z: -119.62,
+          rotation: 2.181661564992912,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 30.4998,
+        },
+        annexes: [
+          {
+            id: 'eastbrook_chapel:bell_tower',
+            center: {
+              x: 12.461480334358251,
+              z: -121.698607980791,
+            },
+            halfWidth: 3.5100000000000002,
+            halfDepth: 3.5100000000000002,
+            rotation: 2.181661564992912,
+          },
+          {
+            id: 'eastbrook_chapel:notice_board',
+            center: {
+              x: 18.765934983083575,
+              z: -106.34876730455706,
+            },
+            halfWidth: 1.1700000000000002,
+            halfDepth: 0.39,
+            rotation: 2.181661564992912,
+          },
+        ],
+        reach: {
+          id: 'eastbrook_chapel',
+          center: {
+            x: 26.493768138323652,
+            z: -121.48106550037888,
+          },
+          halfWidth: 12.253475000000002,
+          halfDepth: 15.7378,
+          rotation: 2.181661564992912,
+        },
+        walkIn: true,
       },
       {
-        id: 'eastbrook_weaving_workshop',
-        assetId: '/models/biome/hexb_home_a.glb',
+        id: 'eastbrook_apothecary',
+        assetId: '/models/tidehold/shop_a.glb',
         kind: 'house',
         position: {
-          x: -28,
-          z: -122,
+          x: -30.59,
+          z: -127.63,
         },
         nativeDimensions: {
-          width: 6.9,
-          height: 9.4,
-          depth: 5.6,
+          width: 16.5,
+          height: 22.869549999999997,
+          depth: 12.600000000000001,
         },
-        rotation: 2.5535900500422257,
-        maxCornerRadius: 4.443253312607778,
+        rotation: 3.0543261909900767,
+        maxCornerRadius: 10.380390166077573,
+        frontClearance: 2.0769230769230766,
+        frontStandingPoint: {
+          x: -28.92922967728904,
+          z: -119.07577986185245,
+        },
+        placement: {
+          x: -30.59,
+          z: -127.63,
+          rotation: 3.0543261909900767,
+          scale: 1.5,
+          lift: -1.55,
+          modelSize: 16.2797,
+        },
+        annexes: [
+          {
+            id: 'eastbrook_apothecary:stall_counter',
+            center: {
+              x: -34.91613103664438,
+              z: -119.08989950300453,
+            },
+            halfWidth: 2.71155,
+            halfDepth: 0.5769,
+            rotation: 3.0543261909900767,
+          },
+          {
+            id: 'eastbrook_apothecary:stall_barrels',
+            center: {
+              x: -38.64224065120936,
+              z: -119.65921778195442,
+            },
+            halfWidth: 1.107675,
+            halfDepth: 1.6269,
+            rotation: 3.0543261909900767,
+          },
+        ],
+        reach: {
+          id: 'eastbrook_apothecary',
+          center: {
+            x: -30.6945999646586,
+            z: -126.43441693308519,
+          },
+          halfWidth: 9.753,
+          halfDepth: 9.150075000000001,
+          rotation: 3.0543261909900767,
+        },
+        walkIn: true,
       },
       {
-        id: 'eastbrook_toolworks',
-        assetId: '/models/biome/hexb_home_b.glb',
+        id: 'eastbrook_quay_cottage',
+        assetId: '/models/tidehold/house_b.glb',
         kind: 'house',
         position: {
-          x: -16,
-          z: -128,
+          x: -59.11,
+          z: -51.35,
         },
         nativeDimensions: {
-          width: 6.9,
-          height: 10.6,
-          depth: 5.6,
+          width: 16.57994,
+          height: 19.42387,
+          depth: 11.119940000000001,
         },
-        rotation: 0.5880026035475675,
-        maxCornerRadius: 4.443253312607778,
-      },
-      {
-        id: 'eastbrook_home_market',
-        assetId: '/models/biome/hexb_home_a.glb',
-        kind: 'house',
-        position: {
-          x: -33,
-          z: -111,
+        rotation: 0.8028514559173916,
+        maxCornerRadius: 9.981826937079205,
+        frontClearance: 1.8,
+        frontStandingPoint: {
+          x: -64.40431935029846,
+          z: -56.46266476682711,
         },
-        nativeDimensions: {
-          width: 6.9,
-          height: 9.4,
-          depth: 5.6,
+        placement: {
+          x: -59.11,
+          z: -51.35,
+          rotation: 0.8028514559173916,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 15.9799,
         },
-        rotation: 0.2,
-        maxCornerRadius: 4.443253312607778,
-      },
-      {
-        id: 'eastbrook_home_east',
-        assetId: '/models/biome/hexb_home_b.glb',
-        kind: 'house',
-        position: {
-          x: 22,
-          z: -106,
+        annexes: [
+          {
+            id: 'eastbrook_quay_cottage:crates',
+            center: {
+              x: -67.16406219932666,
+              z: -46.421566629051654,
+            },
+            halfWidth: 0.74997,
+            halfDepth: 1.46003,
+            rotation: 0.8028514559173916,
+          },
+        ],
+        reach: {
+          id: 'eastbrook_quay_cottage',
+          center: {
+            x: -59.38461929359355,
+            z: -51.06562339673212,
+          },
+          halfWidth: 9.757995,
+          halfDepth: 7.604805,
+          rotation: 0.8028514559173916,
         },
-        nativeDimensions: {
-          width: 6.9,
-          height: 10.6,
-          depth: 5.6,
-        },
-        rotation: -1.46,
-        maxCornerRadius: 4.443253312607778,
-      },
-      {
-        id: 'eastbrook_quayside_home',
-        assetId: '/models/biome/hexb_home_b.glb',
-        kind: 'house',
-        position: {
-          x: -82,
-          z: -102,
-        },
-        nativeDimensions: {
-          width: 6.9,
-          height: 10.6,
-          depth: 5.6,
-        },
-        rotation: -2.2,
-        maxCornerRadius: 4.443253312607778,
-      },
-      {
-        id: 'eastbrook_harbour_market',
-        assetId: '/models/biome/hexb_market.glb',
-        kind: 'house',
-        position: {
-          x: -68,
-          z: -108,
-        },
-        nativeDimensions: {
-          width: 8.6,
-          height: 7.5,
-          depth: 7,
-        },
-        rotation: -2.2,
-        maxCornerRadius: 5.544366510251644,
-      },
-      {
-        id: 'eastbrook_dock_home',
-        assetId: '/models/biome/hexb_home_a.glb',
-        kind: 'house',
-        position: {
-          x: -50,
-          z: -112,
-        },
-        nativeDimensions: {
-          width: 6.9,
-          height: 9.4,
-          depth: 5.6,
-        },
-        rotation: -2.2,
-        maxCornerRadius: 4.443253312607778,
+        walkIn: false,
       },
     ]);
 
@@ -583,13 +802,41 @@ describe('authoritative Eastbrook replacement plan', () => {
         halfDepth: building.nativeDimensions.depth / 2,
         rotation: building.rotation,
       });
-      expect(building.frontStandingPoint).toEqual(
-        localToWorld(
-          building.position,
-          building.rotation,
-          0,
-          building.nativeDimensions.depth / 2 + building.frontClearance,
-        ),
+      // Rewritten 2026-10 for the Tidehold rebuild. A kit shell faced local +Z
+      // with its door on the centre line of its wall face, so this used to be
+      // localToWorld(position, rotation, 0, depth / 2 + frontClearance). A
+      // placed model faces local -Z and its door is wherever the model has it
+      // along that face. So the standing point pinned above is read back in
+      // the model's own axes about its anchor: it stands frontClearance out
+      // from the wall's -Z face (at the foot of the stoop, inside the model's
+      // reach), within the width of the wall it serves, and inside the 2 yd
+      // halo an inn's rest area keeps round its walls. (To nine places, not
+      // bit for bit: the row exports its boxes in world space, so the
+      // model-axis sum cannot be replayed.)
+      const anchor = { x: building.placement.x, z: building.placement.z };
+      const turn = building.placement.rotation;
+      expect(turn, `${building.id} turn`).toBe(building.rotation);
+      const reach = toModelAxes(anchor, turn, building.reach.center);
+      const walls = toModelAxes(anchor, turn, building.position);
+      const front = toModelAxes(anchor, turn, building.frontStandingPoint);
+      const wallFront = walls.z - building.nativeDimensions.depth / 2;
+      expect(front.z, `${building.id} front`).toBeCloseTo(wallFront - building.frontClearance, 9);
+      // the step grows with the building: exactly 1.8 yd at the town's 1.3
+      // (inside the 2 yd rest halo at the inn), 2.08 at the apothecary's 1.5,
+      // whose grown stoop would stand in a body's way at 1.8
+      expect(building.frontClearance, `${building.id} clearance`).toBe(
+        1.8 * (building.placement.scale / 1.3),
+      );
+      if (building.placement.scale === 1.3) expect(building.frontClearance).toBe(1.8);
+      if (building.kind === 'inn') expect(building.frontClearance).toBeLessThan(2);
+      expect(front.z, `${building.id} faces -Z`).toBeLessThan(wallFront);
+      // at the stoop: never more than a stride out past the model's own front
+      // edge (the chapel's point is at the very foot of its stair)
+      expect(front.z, `${building.id} at the stoop`).toBeGreaterThan(
+        reach.z - building.reach.halfDepth - 0.5,
+      );
+      expect(Math.abs(front.x - walls.x), `${building.id} door`).toBeLessThanOrEqual(
+        building.nativeDimensions.width / 2,
       );
     }
   });
@@ -759,6 +1006,10 @@ describe('authoritative Eastbrook replacement plan', () => {
     // docs/design/eastbrook-revamp/site-plan.md): the yard fences derive
     // from the smithy, which moved to the crafts district at (-2, -122);
     // width and height are unchanged.
+    // Checked 2026-10 for the Tidehold rebuild, and not one number moved: the
+    // placed smithy stands on the square now, so the yard fences derive from
+    // FORGE_LOT, the kit workshop's old lot at that same (-2, -122), and
+    // close the crafts yard off from the green where they always stood.
     expect(
       EASTBROOK_LAYOUT.fences.map((fence) => ({
         id: fence.id,
@@ -865,6 +1116,11 @@ describe('wall and road geometry', () => {
     // barracks garrison that took the lot is a zone1 decor collider, not a
     // layout solid; its own clearance from this target is covered by the
     // gameplay-integration fixed-seed projection.
+    // Re-pinned 2026-10 for the Tidehold rebuild: the chapel moved to the
+    // harbour end of the main street, so the nearest LAYOUT solid was the
+    // apothecary's shop on the square. Re-pinned again for the World of
+    // ClaudeCraft Studio map's arrangement: the inn up the slope north of the
+    // farm plots is the nearest now, still seventy yards off.
     const wanderTarget = { x: 29.4338221478, z: 0.9998592577 };
     expect(EASTBROOK_LAYOUT.wall.segments).toHaveLength(0);
     const clearances = nonWallSolidObbs()
@@ -874,8 +1130,8 @@ describe('wall and road geometry', () => {
       }))
       .sort((left, right) => left.clearance - right.clearance);
     expect(clearances[0]).toEqual({
-      id: 'eastbrook_chapel',
-      clearance: 79.73738253357934,
+      id: 'eastbrook_inn',
+      clearance: 74.03488192823825,
     });
     expect(clearances[0].clearance).toBeGreaterThan(PLAYER_RADIUS);
   });
@@ -886,7 +1142,10 @@ describe('wall and road geometry', () => {
     // round 3: the town is open so every gateId is null; the main street to
     // the quay runs a wider halfWidth 2 spine, the side lanes stay 1.5, and
     // the inn lane joins the inn square to that spine (appended last: zone1
-    // spreads these entries by index).
+    // spreads these entries by index). Re-pinned for the World of ClaudeCraft
+    // Studio map's arrangement: the north road swings round the smithy's
+    // forge shelter, the crafts lane stops short of the apothecary's shop, and
+    // the inn lane climbs to the inn's door north of the farm plots.
     expect(
       EASTBROOK_LAYOUT.roads.map((road) => ({
         id: road.id,
@@ -899,8 +1158,8 @@ describe('wall and road geometry', () => {
       {
         id: 'north',
         existingRoadPoint: {
-          x: 6,
-          z: -72,
+          x: 12.5,
+          z: -71,
         },
         gateId: null,
         halfWidth: 1.5,
@@ -910,16 +1169,20 @@ describe('wall and road geometry', () => {
             z: -88.6,
           },
           {
-            x: 12,
-            z: -85,
+            x: 15.8,
+            z: -83,
           },
           {
-            x: 10,
-            z: -80,
+            x: 17,
+            z: -76,
           },
           {
-            x: 6,
-            z: -72,
+            x: 12.5,
+            z: -71,
+          },
+          {
+            x: 4,
+            z: -67,
           },
           {
             x: 0,
@@ -1000,8 +1263,8 @@ describe('wall and road geometry', () => {
             z: -123,
           },
           {
-            x: -22,
-            z: -120.5,
+            x: -18.5,
+            z: -121.5,
           },
         ],
       },
@@ -1108,12 +1371,20 @@ describe('wall and road geometry', () => {
         halfWidth: 1.5,
         points: [
           {
-            x: -40.8,
-            z: -92.2,
+            x: -35.75,
+            z: -72.77,
           },
           {
-            x: -42,
-            z: -95,
+            x: -37,
+            z: -82,
+          },
+          {
+            x: -38.5,
+            z: -90,
+          },
+          {
+            x: -40.5,
+            z: -96,
           },
           {
             x: -44,
@@ -1136,9 +1407,21 @@ describe('layout clearance and service anchors', () => {
     // sweep retired with the ring wall; the harbor town is open and its lots
     // spread across districts, so the pairwise overlap sweep is the whole
     // contract now.
+    // Extended 2026-10 for the Tidehold rebuild: the solids include every
+    // placed building's annexes now. An annex is part of its own building
+    // (the bank's turret stands on its own wall corner), so a building is
+    // never swept against itself; every other pair still is, annex or not.
+    // Unique ids are what keep that one skip from hiding a second solid.
     const obbs = nonWallSolidObbs();
+    expect(new Set(obbs.map((obb) => obb.id)).size).toBe(obbs.length);
+    const annexOwner = new Map<string, string>();
+    for (const building of EASTBROOK_LAYOUT.buildings) {
+      for (const annex of building.annexes) annexOwner.set(annex.id, building.id);
+    }
+    const ownerOf = (obb: Obb2): string => annexOwner.get(obb.id) ?? obb.id;
     for (let left = 0; left < obbs.length; left++) {
       for (let right = left + 1; right < obbs.length; right++) {
+        if (ownerOf(obbs[left]) === ownerOf(obbs[right])) continue;
         expect(
           obbsOverlap(obbs[left], obbs[right]),
           `${obbs[left].id} overlaps ${obbs[right].id}`,
@@ -1201,6 +1484,25 @@ describe('layout clearance and service anchors', () => {
     // The authored playerStart is the offline and editor spawn; a real new
     // character arrives at the ferry landing, which is why the givers moved
     // toward the quay side of the square rather than toward this spawn.
+    // Re-pinned 2026-10 for the Tidehold rebuild: the stands that hung off a
+    // kit shell moved with the six placed buildings. apothecary_lin keeps her
+    // shop now and stands at its door looking out over the square (anchored
+    // on 'eastbrook_apothecary' rather than the civic square), brother_aldric
+    // greets at the foot of the chapel steps at the harbour end,
+    // smith_haldren stands at the placed smithy's door on the main street
+    // (anchored on 'eastbrook_smithy'; the kit 'eastbrook_blacksmith' is
+    // gone), bursar_fernando and card_master flank the bank's door, and
+    // fisherman_brandt and marshal_redbrook each stepped clear of a new
+    // shopfront. The other nine NPC rows are the numbers they were, and so
+    // is every station row: the stations and their masters derive from the
+    // kit workshops' old lots (FORGE_LOT, LOOM_LOT, TOOLWORKS_LOT,
+    // KITCHENS_LOT) now that the workshops themselves are gone.
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // smith, the priest, the apothecary, the bursar and the card master stand
+    // at their buildings' new doors, the churchyard (and with it the graveyard
+    // and its stones) moved beside the chapel, the loom left its lot to the
+    // apothecary's shop for the lane's last bend, and Saul and FURY stepped
+    // round the north road's new swing.
     expect(EASTBROOK_LAYOUT.services.playerStart).toEqual({
       id: 'eastbrook_player_start',
       position: { x: -94, z: -58 },
@@ -1239,17 +1541,59 @@ describe('layout clearance and service anchors', () => {
     });
     expect(EASTBROOK_LAYOUT.services.graveyard).toEqual({
       id: 'gy_eastbrook',
-      position: { x: -2, z: -70 },
-      legacyReleasePoint: { x: 0, z: -70 },
+      position: {
+        x: 37.5,
+        z: -99.3,
+      },
+      legacyReleasePoint: {
+        x: 39.5,
+        z: -99.3,
+      },
       healerTemplateId: 'spirit_healer',
       healerFacing: Math.PI,
       headstones: [
-        { id: 'gy_eastbrook_headstone_0', position: { x: -2, z: -70 } },
-        { id: 'gy_eastbrook_headstone_1', position: { x: 0.2, z: -70 } },
-        { id: 'gy_eastbrook_headstone_2', position: { x: 2.4, z: -70 } },
-        { id: 'gy_eastbrook_headstone_3', position: { x: -2, z: -67.4 } },
-        { id: 'gy_eastbrook_headstone_4', position: { x: 0.2, z: -67.4 } },
-        { id: 'gy_eastbrook_headstone_5', position: { x: 2.4, z: -67.4 } },
+        {
+          id: 'gy_eastbrook_headstone_0',
+          position: {
+            x: 37.5,
+            z: -99.3,
+          },
+        },
+        {
+          id: 'gy_eastbrook_headstone_1',
+          position: {
+            x: 39.7,
+            z: -99.3,
+          },
+        },
+        {
+          id: 'gy_eastbrook_headstone_2',
+          position: {
+            x: 41.9,
+            z: -99.3,
+          },
+        },
+        {
+          id: 'gy_eastbrook_headstone_3',
+          position: {
+            x: 37.5,
+            z: -96.7,
+          },
+        },
+        {
+          id: 'gy_eastbrook_headstone_4',
+          position: {
+            x: 39.7,
+            z: -96.7,
+          },
+        },
+        {
+          id: 'gy_eastbrook_headstone_5',
+          position: {
+            x: 41.9,
+            z: -96.7,
+          },
+        },
       ],
     });
     expect(EASTBROOK_LAYOUT.services.rest).toEqual({
@@ -1291,8 +1635,8 @@ describe('layout clearance and service anchors', () => {
         type: 'loom',
         masterNpcId: 'weaver_ottilie',
         position: {
-          x: -25.614789156231517,
-          z: -125.57781626565273,
+          x: -18.5,
+          z: -116.5,
         },
         interactionRadius: 20,
       },
@@ -1324,27 +1668,39 @@ describe('layout clearance and service anchors', () => {
         2.4805494847391065,
         'eastbrook_market_stall_world_market',
       ],
-      ['marshal_redbrook', -1, -93, -2.1763409903998667, 'eastbrook_noticeboard'],
+      ['marshal_redbrook', 1.5, -95.3, -1.9787985229559204, 'eastbrook_noticeboard'],
       ['trader_wilkes', -25, -94, 2.1995926132103296, 'eastbrook_civic_square'],
-      ['apothecary_lin', -11, -89, -2.9147938055359073, 'eastbrook_civic_square'],
+      ['apothecary_lin', -24.5, -112.5, 0.7853981633974483, 'eastbrook_apothecary'],
       [
         'brother_aldric',
-        5.181980515339464,
-        -74.81801948466054,
-        0.7853981633974483,
+        15.011652086947231,
+        -110.38541937474815,
+        -0.9599310885968813,
         'eastbrook_chapel',
       ],
-      ['smith_haldren', -3.4, -112.5, -1.6631256615264958, 'eastbrook_blacksmith'],
-      ['fisherman_brandt', -25, -104, 1.3909428270024184, 'eastbrook_civic_square'],
-      ['foreman_odell', -16, -111, 0.21866894587394195, 'eastbrook_civic_square'],
+      [
+        'smith_haldren',
+        -8.282374584867384,
+        -81.85509712542417,
+        -2.7925268031909276,
+        'eastbrook_smithy',
+      ],
+      ['fisherman_brandt', -22.3, -104.6, 1.2672255874712333, 'eastbrook_civic_square'],
+      ['foreman_odell', -3.5, -104.5, -1.3370531459259951, 'eastbrook_civic_square'],
       [
         'bursar_fernando',
-        8.49982143312659,
-        -97.50017856687342,
-        -2.356194490192345,
+        -55.21592057176678,
+        -105.19195954108784,
+        0.7853981633974481,
         'eastbrook_bank',
       ],
-      ['card_master', 20, -98, -2.677945044588987, 'eastbrook_bank'],
+      [
+        'card_master',
+        -48.85195954108786,
+        -111.55592057176676,
+        0.7853981633974481,
+        'eastbrook_bank',
+      ],
       ['chronicler_saul', 10.2, -87.5, 0.5880026035475675, 'mailbox_eastbrook'],
       [
         'forgemistress_darva',
@@ -1360,13 +1716,7 @@ describe('layout clearance and service anchors', () => {
         -0.669638945676638,
         'station_eastbrook_kitchens',
       ],
-      [
-        'weaver_ottilie',
-        -27.278889744907204,
-        -126.68721665810318,
-        2.5535900500422257,
-        'station_eastbrook_loom',
-      ],
+      ['weaver_ottilie', -20.5, -117.5, 1.1071487177940904, 'station_eastbrook_loom'],
       [
         'tinker_gizzel',
         -16.277350098112613,
@@ -1374,7 +1724,7 @@ describe('layout clearance and service anchors', () => {
         0.5880026035475675,
         'station_eastbrook_toolworks',
       ],
-      ['fury', 16, -78, -2.2455372690184494, 'eastbrook_chapel'],
+      ['fury', 21, -83.5, -2.0570389598824015, 'eastbrook_chapel'],
     ]);
 
     const pointAnchors = [

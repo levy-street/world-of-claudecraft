@@ -1,6 +1,7 @@
 // Book of Deeds evaluator behavior: per-trigger grants with negative cases,
 // the meta fixpoint, Fiesta standardization safety, retro-on-join credit,
 // milestone unification, persistence round-trips, and determinism.
+
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
 import { dealDamage } from '../src/sim/combat/damage';
@@ -24,6 +25,7 @@ import {
   updateDeeds,
 } from '../src/sim/deeds';
 import { createMob } from '../src/sim/entity';
+import { MUSTER_PIKE_MAX_LEVEL } from '../src/sim/lance_balance_core';
 import { announceAttunement } from '../src/sim/professions/attunement_events';
 import { BATTLEFIELD_XP_TRICKLE } from '../src/sim/professions/battlefield_xp';
 import { queueGatheringGrant } from '../src/sim/professions/gathering';
@@ -786,6 +788,20 @@ describe('retro on join', () => {
       true,
     );
     expect(sim.players.get(edge)!.deedsEarned.has('cmb_giantslayer')).toBe(true);
+  });
+
+  it('Point Taken heals past the pike cap, where the drill can never be finished', () => {
+    // The muster lends its pikes to level 19 and below (muster_pike.ts), so the drill behind
+    // the deed strands for a level 20 who never did it (docs/design/deeds.md rule 5).
+    const sim = makeSim();
+    const capped = sim.addPlayer('warrior', 'PikeCapped', {
+      state: { ...veteranState(), level: MUSTER_PIKE_MAX_LEVEL + 1 },
+    });
+    expect(sim.players.get(capped)!.deedsEarned.has('cmb_point_taken')).toBe(true);
+    const young = sim.addPlayer('warrior', 'PikeYoung', {
+      state: { ...veteranState(), level: MUSTER_PIKE_MAX_LEVEL },
+    });
+    expect(sim.players.get(young)!.deedsEarned.has('cmb_point_taken')).toBe(false);
   });
 
   it('the heals unlock feat_book_complete in the same join for an otherwise complete book', () => {

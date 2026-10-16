@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
 import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
+import { landWocBodies } from './helpers/woc_streamed';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 type BuildSpansModule = typeof import('../src/render/build_spans');
@@ -32,6 +33,9 @@ async function loadFresh(): Promise<{ assets: AssetsModule; spans: BuildSpansMod
   const spans = (await import('../src/render/build_spans')) as BuildSpansModule;
   const assets = (await import('../src/render/characters/assets')) as AssetsModule;
   await assets.charactersReady();
+  // The part library left the boot preload when the world's NPCs stopped composing
+  // from it (its def is lazyPreload): ask for it the way a host does and let it land.
+  await landWocBodies(assets, [MODULAR_WARRIOR_KEY]);
   return { assets, spans };
 }
 

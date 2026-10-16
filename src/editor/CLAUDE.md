@@ -40,6 +40,14 @@ viewport, the 2D canvas/view/model trio).
   `user/<sha256>` scheme; resolution is PURE (a map referencing another player's
   public upload renders with no registry entry), the session registry only labels
   the asset browser's Uploaded tab.
+- **Built-in gameplay objects move by id, never as placements**: farm beds,
+  practice dummies, gather nodes and dungeon doors keep their ids (persisted
+  save keys, spawn slots), so a move is a `MapDoc.objectMoves` entry keyed
+  `<kind>:<id>` that the projection carries into `WorldContent.objectMoves`
+  and every sim reader resolves through `src/sim/moved_objects.ts`.
+  `object_moves_core.ts` (roster, record edit, pick) and
+  `object_move_controller.ts` (select, drag, nudge, Reset, one undo per
+  gesture) own the editor half; `3d/movable_objects_view.ts` the live preview.
 - **The tutorial can never block**: `tutorial.ts` drives the pure `TutorialModel`
   (`tutorial_core.ts`) over real UI anchors; Skip is always available, a
   missing/hidden anchor step is skipped, Esc bails, and a blocked localStorage

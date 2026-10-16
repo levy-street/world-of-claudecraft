@@ -1,5 +1,5 @@
 import {
-  GATHER_NODES,
+  gatherNodesInActiveWorld,
   getActiveWorldContent,
   WORLD_MAX_X,
   WORLD_MAX_Z,
@@ -110,6 +110,11 @@ function computeSpot(seed: number, ci: number, cj: number): ScreeSpot | null {
   }
   const h = terrainHeight(x, z, seed);
   if (h < waterLevel() + 0.5) return null; // shorelines keep their own dressing
+  // An authored map can switch the rubble off (TerrainStyle.scree === false):
+  // a carved terraced city's terraces read as cliffs to the probes below, and its
+  // streets filled with boulders on the high tiers (SPACEY: "random rock clutter
+  // rendered around city circle").
+  if (getActiveWorldContent().terrainStyle?.scree === false) return null;
   // local relief: max height delta over four short probes, the same signal
   // the terrain shader's slope treatment keys from
   const hE = terrainHeight(x + PROBE, z, seed);
@@ -146,10 +151,10 @@ function computeSpot(seed: number, ci: number, cj: number): ScreeSpot | null {
     const dz = z - zone.hub.z;
     if (dx * dx + dz * dz < HUB_EXCLUSION_RADIUS * HUB_EXCLUSION_RADIUS) return null;
   }
-  // Static GATHER_NODES by design, unlike the active-content hub read above:
-  // gather nodes are not part of WorldContent, so a custom map has none to
-  // exclude around and the builtin table is the only source there is.
-  for (const node of GATHER_NODES) {
+  // The shipped node table on every world (a custom map authors no veins of
+  // its own), at the spot the active map moved each one to, if it did
+  // (sim/moved_objects.ts), so the scree stays clear of where a vein stands.
+  for (const node of gatherNodesInActiveWorld()) {
     const dx = x - node.pos.x;
     const dz = z - node.pos.z;
     if (dx * dx + dz * dz < NODE_EXCLUSION_RADIUS * NODE_EXCLUSION_RADIUS) return null;

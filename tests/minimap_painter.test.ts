@@ -112,6 +112,7 @@ describe('minimap_painter: no magic values (canvas sub-rule)', () => {
     // suite.
     expect(code.match(/this\.resolveColors\(\)/g) ?? []).toHaveLength(2);
     const drawMarkersBody = sliceFrom(code, 'private drawMarkers(');
+    expect(drawMarkersBody.length).toBeGreaterThan(0);
     expect(drawMarkersBody).not.toContain('resolveColors');
   });
 

@@ -13,6 +13,20 @@ const characterVisualSource = readFileSync(
   new URL('../src/render/characters/visual.ts', import.meta.url),
   'utf8',
 );
+const clipNamesSource = readFileSync(
+  new URL('../src/render/characters/clip_names.ts', import.meta.url),
+  'utf8',
+);
+
+/** Every clip a def plays: its body GLB's plus its animation libraries' (a WOC body ships
+ *  its clips in a separate anims file, animUrls). */
+function defClipDurations(def: { url: string; animUrls?: readonly string[] }): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const url of [def.url, ...(def.animUrls ?? [])]) {
+    for (const [name, d] of clipDurations(url.replace(/^\//, ''))) out.set(name, d);
+  }
+  return out;
+}
 
 /** Clip name -> duration (seconds), read straight out of a GLB's accessors. */
 function clipDurations(glbRelative: string): Map<string, number> {
@@ -99,7 +113,7 @@ describe('idle-breaker clips', () => {
 
   it('names only clips the shipped GLB really carries', () => {
     for (const [key, def] of rigsWithVariants) {
-      const durations = clipDurations(def.url.replace(/^\//, ''));
+      const durations = defClipDurations(def);
       for (const name of def.clips.idleVariants ?? []) {
         expect(durations.has(name), `${key} declares a missing idle variant: ${name}`).toBe(true);
       }
@@ -119,11 +133,10 @@ describe('idle-breaker clips', () => {
   });
 
   it('registers every scheduled idle clip in the CharacterVisual action map', () => {
-    const start = characterVisualSource.indexOf('function clipNamesOf(def: VisualDef): string[] {');
-    const end = characterVisualSource.indexOf('\nfunction firstLoadedEmoteClip(', start);
+    // The clip-name listing lives in clip_names.ts; visual.ts registers what it returns.
+    const start = clipNamesSource.indexOf('function clipNamesOf(def: VisualDef): string[] {');
     expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const actionMap = characterVisualSource.slice(start, end);
+    const actionMap = clipNamesSource.slice(start);
 
     const registration = characterVisualSource.match(
       /for \(const name of \[([\s\S]*?)\]\) \{([\s\S]*?)\n {6}\}/,
@@ -172,7 +185,7 @@ describe('idle-breaker clips', () => {
     expect(jitter).toBe(0);
     expect(min).toBe(5);
     for (const [key, def] of rigsWithVariants) {
-      const durations = clipDurations(def.url.replace(/^\//, ''));
+      const durations = defClipDurations(def);
       const longest = Math.max(
         ...(def.clips.idleVariants ?? []).map((name) => durations.get(name) ?? 0),
       );

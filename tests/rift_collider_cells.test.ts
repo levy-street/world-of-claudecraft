@@ -7,6 +7,7 @@ import {
 } from '../src/sim/collider_cells';
 import {
   allocRiftCollisionToken,
+  type Collider,
   clearRiftRegion,
   isBlocked,
   lineOfSightClear,
@@ -144,7 +145,7 @@ describe('rift collider cell index', () => {
 
   it('keeps each cell list in the original list order', () => {
     for (const { colliders } of floors) {
-      const order = new Map(colliders.map((c, i) => [c, i]));
+      const order = new Map<Collider, number>(colliders.map((c, i) => [c, i]));
       const index = buildColliderCellIndex(colliders);
       for (const list of index.cells.values()) {
         for (let i = 1; i < list.length; i++) {

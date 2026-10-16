@@ -1,4 +1,5 @@
 import { uninstallOccluderFadeGate } from './occluder_fade_gate';
+import { clearSetPieceOccluders } from './set_piece_occluders';
 import { disposeShaderWarmAudit } from './shader_warm_audit';
 import { disposeShaderWarm } from './shader_warm_client';
 
@@ -56,6 +57,10 @@ export function disposeRendererPrewarmAndGroundFx(
   // The occluder-fade gate and its twins were linked on this renderer's
   // context; a later renderer installs its own (occluder_fade_gate.ts).
   bestEffort(() => uninstallOccluderFadeGate());
+  // The set pieces' camera occluder sets fade this renderer's meshes on this
+  // renderer's programs (set_piece_occluders.ts): they go with it, so no set
+  // of a torn-down scene is tested or faded by the next renderer's frames.
+  bestEffort(() => clearSetPieceOccluders());
   // The shader warm audit holds this renderer's compile arms and listens to
   // its links; the next renderer's first announcement binds its own.
   bestEffort(() => disposeShaderWarmAudit());

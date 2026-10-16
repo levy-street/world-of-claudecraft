@@ -72,8 +72,12 @@ describe('terrain vertex pipeline', () => {
     // splits follow the moved heights (the 4 yd lattice probe puts every moved
     // height inside x 0..64, z -148..-20). Measured on the merged tree; CI
     // shard 3 read the same fingerprint.
+    // Re-minted for the World of ClaudeCraft Studio map's arrangement of the
+    // town: the north road swings round the smithy that took the chapel rise,
+    // and the road's eased curve and calm band reach the probe chunk's south
+    // edge, so a few splits flip. Computed twice in separate processes.
     expect(triangleMultisetFingerprint(state.indices)).toBe(
-      'b98465349b97538018dd906b2b456b705d9e16ec252a77b8964b5a90634906f8',
+      'b17252937f0e3dccaf1777e03f36435fe42d33de346386bf5e969d00b886c876',
     );
     const tiledAcmr = acmr(state.indices, 16);
     expect(tiledAcmr).toBeLessThan(0.7);

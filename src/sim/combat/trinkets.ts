@@ -28,15 +28,24 @@ import {
   trinketCooldownKey,
   trinketSpec,
 } from '../content/trinkets';
-import { ITEMS } from '../data';
+import { ITEMS, MOBS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import { type Aura, type Entity, MELEE_RANGE } from '../types';
 import { meleeSwing } from './auto_attack';
+import { isForemanShaped, useBalgathTrinket } from './balgath_trinkets';
 import { isUnbreakableControlAura } from './cc';
 import { applyHeal } from './heal';
 import { relocateSwept } from './heroic_leap';
+import {
+  applyHarvest,
+  applyQuench,
+  applyTether,
+  quenchStrike,
+  tetherTarget,
+} from './sanctum_trinkets';
+import { plantSeedpod, summonSpiritJaguar } from './wildheart_trinkets';
 
 /** The control kinds the Mooring Stone shrugs off and the Medallion breaks. */
 const CONTROL_KINDS: ReadonlySet<string> = new Set([
@@ -200,7 +209,29 @@ export function useWornTrinket(
   }
   let cooldown = spec.cooldown;
   const use = spec.use;
+  // Balgath's trinkets live in their own module (combat/balgath_trinkets.ts).
+  const balgath = useBalgathTrinket(ctx, meta, p, use);
+  if (balgath === false) return false;
+  if (balgath === true) {
+    p.cooldowns.set(key, cooldown);
+    return true;
+  }
   switch (use.kind) {
+    case 'friendship': {
+      for (const stat of ['str', 'agi', 'sta', 'int', 'spi'] as const) {
+        ctx.applyAura(p, {
+          id: `referral_friendship_${stat}`,
+          name: 'Friendship',
+          kind: `buff_${stat}`,
+          value: use.stats,
+          remaining: use.duration,
+          duration: use.duration,
+          sourceId: p.id,
+          school: 'arcane',
+        });
+      }
+      break;
+    }
     case 'retaliate': {
       ctx.applyAura(
         p,
@@ -477,6 +508,59 @@ export function useWornTrinket(
       placeLantern(ctx, p, use);
       break;
     }
+    case 'shackle': {
+      const target = hostileTarget(ctx, p, use.range);
+      if (!target) {
+        ctx.error(meta.entityId, 'You have no target.');
+        return false;
+      }
+      // A creature immune to control (every boss) is slowed instead of rooted.
+      const immune =
+        target.kind === 'mob' && (MOBS[target.templateId]?.ccImmune || target.ccImmune);
+      ctx.applyAura(target, {
+        id: TRINKET_AURA.shackle,
+        name: "Gaoler's Iron Key",
+        kind: immune ? 'slow' : 'root',
+        remaining: use.duration,
+        duration: use.duration,
+        value: immune ? use.slow : 0,
+        sourceId: p.id,
+        school: 'physical',
+      });
+      fxOn(ctx, p, target, 'physical', 'trinket_gaolers_iron_key');
+      break;
+    }
+    case 'spiritPack':
+    case 'seedburst': {
+      // The Wildheart Basin's two (combat/wildheart_trinkets.ts): both need a
+      // hostile target in range.
+      const target = hostileTarget(ctx, p, use.range);
+      if (!target) {
+        ctx.error(meta.entityId, 'You have no target.');
+        return false;
+      }
+      if (use.kind === 'spiritPack') summonSpiritJaguar(ctx, p, target, use);
+      else plantSeedpod(ctx, p, target, use);
+      break;
+    }
+    case 'tether': {
+      // The Gravewyrm Sanctum's three (combat/sanctum_trinkets.ts).
+      const ally = tetherTarget(ctx, p, use.range);
+      if (!ally) {
+        ctx.error(meta.entityId, 'You need an ally as your target.');
+        return false;
+      }
+      applyTether(ctx, p, ally, use);
+      break;
+    }
+    case 'harvest': {
+      applyHarvest(ctx, p, use);
+      break;
+    }
+    case 'quench': {
+      applyQuench(ctx, p, use);
+      break;
+    }
     case 'heartNova': {
       const stacks = findAura(p, TRINKET_AURA.guardHeat)?.stacks ?? 0;
       if (stacks <= 0) {
@@ -546,6 +630,12 @@ export function isMoored(target: Entity): boolean {
   return target.auras.some((held) => held.id === TRINKET_AURA.anchor);
 }
 
+/** Whether a worn trinket holds this body against a knockback (knockback.ts): the
+ *  Mooring Stone's anchor or the Knucklebone of Balgath's Shape of the Foreman. */
+export function trinketRefusesKnockback(target: Entity): boolean {
+  return isMoored(target) || isForemanShaped(target);
+}
+
 // ---- passives off the gear-proc hooks -----------------------------------------
 
 export type TrinketTrigger = 'weaponHit' | 'weaponCrit' | 'spellCast' | 'kill';
@@ -574,6 +664,7 @@ export function runTrinketTrigger(
     if (passive?.kind === 'twinStrike') twinStrike(ctx, source, target, passive);
     // Last, so an earlier rider never lands on a target the fire just killed.
     if (worn.spec.use.kind === 'temper') temperStrike(ctx, source, target, worn.spec.use);
+    else if (worn.spec.use.kind === 'quench') quenchStrike(ctx, source, target, worn.spec.use);
   }
   if (trigger === 'weaponHit' && passive?.kind === 'heat') {
     addStack(ctx, source, TRINKET_AURA.heat, 'Forge Heat', passive.max, passive.duration);
@@ -868,10 +959,10 @@ export function onTrinketDamage(
       target.hp / Math.max(1, target.maxHp) < passive.belowHp &&
       !findAura(target, TRINKET_AURA.lastStandIcd)
     ) {
-      ctx.applyAura(
-        target,
-        marker(target, TRINKET_AURA.lastStandIcd, 'Bastion Sigil', passive.icd),
-      );
+      ctx.applyAura(target, {
+        ...marker(target, TRINKET_AURA.lastStandIcd, 'Protective Charm', passive.icd),
+        value2: passive.belowHp,
+      });
       ctx.applyAura(target, {
         id: TRINKET_AURA.lastStand,
         name: 'Last Bastion',
@@ -879,6 +970,7 @@ export function onTrinketDamage(
         remaining: passive.duration,
         duration: passive.duration,
         value: Math.round(target.maxHp * passive.absorb),
+        value2: passive.belowHp,
         sourceId: target.id,
         school: 'holy',
       });

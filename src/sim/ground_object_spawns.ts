@@ -5,6 +5,7 @@
 import { DUNGEON_LIST, INSTANCE_SLOT_COUNT } from './data';
 import { createGroundObject } from './entity';
 import { freshInstanceSlot } from './instances/instance_slot';
+import { dungeonDoorPos } from './moved_objects';
 import type { InstanceSlot } from './sim';
 import type { Entity, GroundObjectDef, Vec3, WorldContent } from './types';
 import { STABLE_GROUND_OBJECT_ENTITY_ID_MIN } from './types';
@@ -93,11 +94,13 @@ export function spawnStaticWorldObjects(world: WorldContent, deps: StaticObjectS
 
   for (const dungeon of DUNGEON_LIST) {
     if (dungeon.overworldDoor !== false) {
+      // A Studio map may move the door (moved_objects.ts); same slot, same id.
+      const doorPos = dungeonDoorPos(world.objectMoves, dungeon);
       const door = createGroundObject(
         deps.allocateEntityId(),
         '',
         dungeon.id === 'nythraxis_crypt' ? 'Abandoned Crypt' : dungeon.name,
-        deps.groundPos(dungeon.doorPos.x, dungeon.doorPos.z),
+        deps.groundPos(doorPos.x, doorPos.z),
       );
       door.templateId = 'dungeon_door';
       door.dungeonId = dungeon.id;

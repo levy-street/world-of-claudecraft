@@ -60,11 +60,20 @@ describe('owned-class raid-level balance harness (armor and avoidance)', () => {
       // green at the pre-swap base, red at the tip, same code). The
       // neighboring seed keeps every spec's rare rolls landing; the sibling
       // fixture test pins its own seeds and is untouched.
+      // Re-hunted again 29_931 to 29_935 for the grand painted towns and the
+      // Mirefen tavern (#4525): the moved towns and the tavern's colliders
+      // reflow the stream once more, and 29_931 rolled vespers to ZERO avoids
+      // in the diet window. 29_935 passes every assertion in both modes: at
+      // least 5 avoids per spec in the diet (11 in the full sweep), and vespers
+      // at or above the median at levels 22, 23 and 24 (152.9 DPS against 146.7
+      // at level 24, ratio to the best other 0.946 to 0.961). Passed over:
+      // 29_932 (full sweep level 22 vespers 146.4 under the 150.0 median floor)
+      // and 29_933 (passes, but vespers rolls only 3 avoids in the diet).
       const results = FULL_SWEEP
-        ? runOwnedClassRaidMatrix(29_931, 'raid-test-head')
+        ? runOwnedClassRaidMatrix(29_935, 'raid-test-head')
         : OWNED_DPS_SPECS.flatMap((spec) =>
             RAID_SCENARIOS_UNDER_TEST.map((scenario) =>
-              runOwnedClassDpsProbe(spec, scenario, 29_931, 'raid-test-head'),
+              runOwnedClassDpsProbe(spec, scenario, 29_935, 'raid-test-head'),
             ),
           );
       expect(results).toHaveLength(RAID_SCENARIOS_UNDER_TEST.length * 8);

@@ -576,11 +576,17 @@ describe('Guide generated delve content', () => {
     // GUIDE-2: the name + role / name + title lines must come from a format key, not a hardcoded
     // ", " concatenation, so the separator and punctuation stay translator-controlled.
     setLanguage('en');
-    expect(t('guide.delvesPage.companionFmt' as never, { name: 'Vesh', role: 'Healer' })).toBe(
-      'Vesh, Healer',
-    );
     expect(
-      t('guide.delvesPage.keeperFmt' as never, { name: 'Halven', title: 'Reliquary Keeper' }),
+      t('guide.delvesPage.companionFmt' as never, {
+        name: 'Vesh',
+        role: 'Healer',
+      }),
+    ).toBe('Vesh, Healer');
+    expect(
+      t('guide.delvesPage.keeperFmt' as never, {
+        name: 'Halven',
+        title: 'Reliquary Keeper',
+      }),
     ).toBe('Halven, Reliquary Keeper');
   });
 });
@@ -687,7 +693,11 @@ describe('Guide bestiary completeness', () => {
 
   it('renders the residents cross-links into the bestiary on the world page', () => {
     setLanguage('en');
-    const html = worldPage.render({ params: [], sub: 'world', titleKey: 'guide.nav.world' });
+    const html = worldPage.render({
+      params: [],
+      sub: 'world',
+      titleKey: 'guide.nav.world',
+    });
     // The marsh card links its troll residents to the bestiary's own family anchor,
     // with the localized family label as the link text.
     expect(html).toContain(`href="${hrefFor('bestiary')}#fam-troll"`);
@@ -708,7 +718,11 @@ describe('Guide bestiary completeness', () => {
   // there are fourteen zones, so it is pinned here instead: one anchor per zone, all distinct.
   it('gives every zone its own card anchor, so no zone can inherit another zone copy', () => {
     setLanguage('en');
-    const html = worldPage.render({ params: [], sub: 'world', titleKey: 'guide.nav.world' });
+    const html = worldPage.render({
+      params: [],
+      sub: 'world',
+      titleKey: 'guide.nav.world',
+    });
     const ids = [...html.matchAll(/id="(zone-[a-z0-9_]+)"/g)].map((m) => m[1]);
     expect(ids.length, 'one card anchor per zone').toBe(GUIDE_ZONES.length);
     expect(new Set(ids).size, `duplicate zone anchor: ${ids.join(', ')}`).toBe(ids.length);
@@ -848,7 +862,10 @@ describe('Guide deeds spoiler safety', () => {
     // rewardBorder:true and no title. Pins value correctness the freshness gate cannot (a
     // consistently-wrong mapping regenerates identically).
     const title = GUIDE_DEEDS.find((d) => d.id === 'prog_veteran');
-    expect(DEEDS.prog_veteran.reward).toEqual({ kind: 'title', text: 'Veteran' });
+    expect(DEEDS.prog_veteran.reward).toEqual({
+      kind: 'title',
+      text: 'Veteran',
+    });
     expect(title?.rewardTitle).toBe('Veteran');
     expect(title?.rewardBorder).toBeUndefined();
 
@@ -1160,7 +1177,11 @@ describe('Guide deeds page render (continued)', () => {
     setLanguage('en');
     // GuidePage.render requires a PageContext; this page renders the same for any ctx
     // (the route wiring itself is pinned in its own test above).
-    const html = deedsPage.render({ params: [], sub: 'deeds', titleKey: 'guide.nav.deeds' });
+    const html = deedsPage.render({
+      params: [],
+      sub: 'deeds',
+      titleKey: 'guide.nav.deeds',
+    });
     expect(html.length).toBeGreaterThan(0);
     expect((html.match(/<h1>/g) ?? []).length).toBe(1);
     // one row per public deed (the name cell renders exactly once per row)
@@ -1760,7 +1781,11 @@ describe('Guide model stills', () => {
     expect(bytes.toString('ascii', 0, 4)).toBe('RIFF');
     expect(bytes.toString('ascii', 8, 12)).toBe('WEBP');
     const decoded = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-    expect(decoded.info).toMatchObject({ width: 320, height: 320, channels: 4 });
+    expect(decoded.info).toMatchObject({
+      width: 320,
+      height: 320,
+      channels: 4,
+    });
     let visiblePixels = 0;
     for (let offset = 3; offset < decoded.data.length; offset += 4) {
       if (decoded.data[offset] > 0) visiblePixels++;
@@ -2118,7 +2143,14 @@ describe('Guide professions generated content accuracy', () => {
     // above), so the fallback branch is driven directly. Its aura value is
     // the def's baked English proper noun, the page's GUIDE_DEEDS policy.
     const row = {
-      effect: { wellfed: { aura: 'Test Boon', kind: 'buff_spellpower', value: 3, minutes: 10 } },
+      effect: {
+        wellfed: {
+          aura: 'Test Boon',
+          kind: 'buff_spellpower',
+          value: 3,
+          minutes: 10,
+        },
+      },
     } as unknown as Parameters<typeof effectLines>[0];
     const html = effectLines(row);
     expect(html).toContain('guide-prof-effect');
@@ -2245,7 +2277,12 @@ describe('Guide professions generated content accuracy', () => {
     // exactly 1), so the count and the word are pinned together: change the bill
     // without changing the sentence and this reds, which is the only way the
     // page cannot quietly start lying about a number a player can count.
-    const countWord: Record<number, string> = { 1: 'a', 2: 'two', 3: 'three', 4: 'four' };
+    const countWord: Record<number, string> = {
+      1: 'a',
+      2: 'two',
+      3: 'three',
+      4: 'four',
+    };
     const reagentCount = (recipeId: string, itemId: string): number => {
       const recipe = ALL_RECIPES.find((r) => r.id === recipeId);
       expect(recipe, `${recipeId} must exist`).toBeDefined();
@@ -2376,7 +2413,11 @@ describe('Guide professions generated content accuracy', () => {
     expect(warblade?.station).toBe('forge');
     expect(warblade?.acquisition).toBe('trainer');
     expect(warblade?.feeCopper).toBe(10000);
-    expect(warblade?.gain).toEqual({ reducedAt: 75, minimalAt: 100, zeroAt: 125 });
+    expect(warblade?.gain).toEqual({
+      reducedAt: 75,
+      minimalAt: 100,
+      zeroAt: 125,
+    });
     expect(TIER_SKILL_STEP).toBe(25);
     // A grandfathered tool recipe: known to everyone, no fee, tier 3.
     const eng = GUIDE_PROF_CRAFTS.find((c) => c.id === 'engineering');
@@ -2851,7 +2892,11 @@ describe('Guide professions gathering accuracy', () => {
   });
 
   it('aggregates every world node into its zone row (tool tier = node tier)', () => {
-    const typeFor: Record<string, string> = { mining: 'ore', logging: 'wood', herbalism: 'herb' };
+    const typeFor: Record<string, string> = {
+      mining: 'ore',
+      logging: 'wood',
+      herbalism: 'herb',
+    };
     for (const g of GUIDE_PROF_GATHERING) {
       if (g.id === 'fishing') continue;
       if (g.id === 'farming') {
@@ -3186,9 +3231,12 @@ describe('Guide professions gathering accuracy', () => {
     expect(t('guide.profPages.toolCraftedOrMarks', { craft: 'X', marks: '24' })).toContain(
       `three ${litany} clears`,
     );
-    expect(t('guide.profPages.toolCraftedOrMarksHeroic', { craft: 'X', marks: '56' })).toContain(
-      `Heroic ${litany} clear`,
-    );
+    expect(
+      t('guide.profPages.toolCraftedOrMarksHeroic', {
+        craft: 'X',
+        marks: '56',
+      }),
+    ).toContain(`Heroic ${litany} clear`);
 
     // Every shipped locale, read off the resolved bundles: both tokens present
     // AND neither threshold spelled out as a literal. The second half is what a
@@ -3264,7 +3312,10 @@ describe('Guide professions gathering accuracy', () => {
     expect(bite).toContain(`${f.reelWindowSec + f.reelRodBonusSec} second window`);
     expect(bite).toContain(`the Silverstream to ${f.biteMaxSec - 2 * f.rodBiteReductionSec} with`);
     expect(f.schedule).toEqual(
-      FISHING_GAIN_SCHEDULE.map((row) => ({ below: row.belowProficiency, gain: row.gain })),
+      FISHING_GAIN_SCHEDULE.map((row) => ({
+        below: row.belowProficiency,
+        gain: row.gain,
+      })),
     );
     // The four VALUES were re-derived at masterwrought Phase 11i (DECISION F)
     // from a measured casts-to-200 model; the four BOUNDARIES are frozen,
@@ -3329,7 +3380,12 @@ describe('Guide professions gathering accuracy', () => {
   it('publishes the exact shared curve, cast, and rare-event numbers', () => {
     const c = GUIDE_PROF_CURVE;
     expect(c.tierStep).toBe(TIER_SKILL_STEP);
-    expect(c.multipliers).toEqual({ full: 1, reduced: 0.5, minimal: 0.25, none: 0 });
+    expect(c.multipliers).toEqual({
+      full: 1,
+      reduced: 0.5,
+      minimal: 0.25,
+      none: 0,
+    });
     expect(c.gatherTierStep).toBe(GATHER_GAIN_TIER_STEP);
     expect(c.cast).toEqual({
       baseSec: GATHER_CAST_BASE_SEC,
@@ -3399,7 +3455,10 @@ describe('Guide professions gathering accuracy', () => {
     // writes. The deed sweep runs the other way too, so a fifth flavor with a
     // deed and no sentence reds here rather than shipping a note one short.
     setLanguage('en');
-    const en = t('guide.profPages.rareBodyFourFlavors', { oneIn: '90', mult: '5' });
+    const en = t('guide.profPages.rareBodyFourFlavors', {
+      oneIn: '90',
+      mult: '5',
+    });
     // GATHER_RARE_EVENT_SOURCES is derived from the flavor record typed over the
     // source union, so a fifth source reaches this loop the day it compiles.
     expect(GATHER_RARE_EVENT_SOURCES.length).toBeGreaterThanOrEqual(4);
@@ -3410,7 +3469,10 @@ describe('Guide professions gathering accuracy', () => {
       const deed = DEEDS[`col_${flavor}`];
       expect(deed, `col_${flavor} exists`).toBeDefined();
       expect(deed.renown, `${flavor} deed is cosmetic-only`).toBe(0);
-      expect(deed.trigger).toEqual({ kind: 'visit', markId: `gather_event:${flavor}` });
+      expect(deed.trigger).toEqual({
+        kind: 'visit',
+        markId: `gather_event:${flavor}`,
+      });
     }
     expect(en).toContain('zero-Renown deed');
     const gatherMarks = Object.values(DEEDS).flatMap((d) =>
@@ -3523,7 +3585,11 @@ describe('Guide professions enchanting and economy accuracy', () => {
     expect(e.typedSecondaries.meleeWeapons).toBe(ITEMS.resonant_steel.name);
     expect(e.typedSecondaries.timberWeapons.material).toBe(ITEMS.resonant_timber.name);
     expect(e.typedSecondaries.timberWeapons.families).toEqual([...TIMBER_WEAPON_TYPES].sort());
-    expect(e.typedSecondaries.counts).toEqual({ rare: 1, epicMin: 1, epicMax: 2 });
+    expect(e.typedSecondaries.counts).toEqual({
+      rare: 1,
+      epicMin: 1,
+      epicMax: 2,
+    });
     expect(e.salvageByQuality).toEqual(
       Object.entries(SALVAGE_MATERIAL_BY_QUALITY).map(([quality, m]) => ({
         quality,
@@ -3563,7 +3629,11 @@ describe('Guide professions enchanting and economy accuracy', () => {
       rare: UNBIND_FEE_BY_QUALITY_TIER[1],
       epic: UNBIND_FEE_BY_QUALITY_TIER[2],
     });
-    expect(e.unbindFeeCopper).toEqual({ uncommon: 2500, rare: 10000, epic: 40000 });
+    expect(e.unbindFeeCopper).toEqual({
+      uncommon: 2500,
+      rare: 10000,
+      epic: 40000,
+    });
     const mw = GUIDE_PROF_MASTERWORK;
     expect(mw.basePct).toBe(Math.round(MASTERWORK_BASE_CHANCE * 100));
     expect(mw.perTierAbovePct).toBe(Math.round(MASTERWORK_PER_TIER_ABOVE_CHANCE * 100));
@@ -3864,8 +3934,11 @@ describe('Guide professions pages and routes', () => {
     expect(MASTERWROUGHT_EQUIP_CAP).toBe(2);
     expect(MASTERWROUGHT_LEGENDARY_CAP).toBe(1);
     const gearHtml =
-      pageFor('gear')?.render({ params: [], sub: 'gear', titleKey: 'guide.nav.gear' } as never) ??
-      '';
+      pageFor('gear')?.render({
+        params: [],
+        sub: 'gear',
+        titleKey: 'guide.nav.gear',
+      } as never) ?? '';
     expect(gearHtml).toContain('at most two Masterwrought pieces at once');
     expect(gearHtml).toContain('at most one legendary Masterwrought piece among the two');
     // The enchanting page's Infusion tail is corrected: Perfecting is live,
@@ -4571,7 +4644,9 @@ describe('Guide professions pages and routes', () => {
 
     // The ladder's shape, on the key that states it.
     expect(FISHING_CATCH_BAND_THRESHOLDS).toHaveLength(6);
-    const tables = prose('guide.profPages.fish.tablesNoteSixBands', { rare: 'Sunglint Koi' });
+    const tables = prose('guide.profPages.fish.tablesNoteSixBands', {
+      rare: 'Sunglint Koi',
+    });
     expect(tables, 'the catch-table page must say SIX bands').toContain('six catch bands');
     expect(tables, 'and band 2 must carry its shipped threshold').toContain(
       `band 2 at ${FISHING_CATCH_BAND_THRESHOLDS[2]}`,
@@ -4740,7 +4815,11 @@ describe('Guide professions pages and routes', () => {
       'Copper Ore x4',
     );
     expect(
-      t('guide.profPages.gainFmt' as never, { reduced: '75', minimal: '100', zero: '125' }),
+      t('guide.profPages.gainFmt' as never, {
+        reduced: '75',
+        minimal: '100',
+        zero: '125',
+      }),
     ).toBe('75 / 100 / 125');
   });
 
@@ -5098,7 +5177,10 @@ describe('Guide professions pages and routes', () => {
     const grimoire = recipe('recipe_sunpetal_grimoire');
     const goldleafScroll = recipe('recipe_goldleaf_scroll');
     const LIVE: Record<Item, { count: number; clause: 'grimoire' | 'scroll' }> = {
-      goldleaf_herb: { count: count(grimoire, 'goldleaf_herb'), clause: 'grimoire' },
+      goldleaf_herb: {
+        count: count(grimoire, 'goldleaf_herb'),
+        clause: 'grimoire',
+      },
       arcane_essence: {
         count: count(scroll, 'arcane_essence') - count(goldleafScroll, 'arcane_essence'),
         clause: 'scroll',
@@ -5547,7 +5629,12 @@ describe('Guide professions pages and routes', () => {
       ko_KR: { 2: ['2마리'], 4: ['4마리'], 8: ['8마리'], 10: ['10마리'] },
       zh_CN: { 2: ['两条', '二条'], 4: ['四条'], 8: ['八条'], 10: ['十条'] },
       zh_TW: { 2: ['兩條', '二條'], 4: ['四條'], 8: ['八條'], 10: ['十條'] },
-      ru_RU: { 2: ['два', 'две'], 4: ['четыре'], 8: ['восемь'], 10: ['десять'] },
+      ru_RU: {
+        2: ['два', 'две'],
+        4: ['четыре'],
+        8: ['восемь'],
+        10: ['десять'],
+      },
     };
     // Russian declines every name inside the prose, so its needles are explicit
     // per-item stems for the REAGENTS (the heads are matched by the full
@@ -5771,7 +5858,11 @@ describe('the craft ladder prose keeps its counts derived or count-free (Masterw
     // Every figure is derived from the item table, never restated.
     const body = t('guide.profPages.craftProse.alchemy.ladderBody');
     const elixir = (id: string): { value?: number; duration?: number } =>
-      (ITEMS[id] as unknown as { elixir?: { value?: number; duration?: number } }).elixir ?? {};
+      (
+        ITEMS[id] as unknown as {
+          elixir?: { value?: number; duration?: number };
+        }
+      ).elixir ?? {};
 
     // The three elixir rungs, each "<value> [Stamina] for <minutes> minutes".
     // The first names the stat and the other two lean on it, which is why the
@@ -5891,7 +5982,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // The successor says so; every other clause is the predecessor's byte for
     // byte. The live vendor arm is the sibling pin below.
     setLanguage('en');
-    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const html = arena.render({
+      params: [],
+      sub: 'arena',
+      titleKey: 'guide.nav.arena',
+    });
     const body = t('guide.arenaPage.honorFinalNoteSoldBack');
     const predecessor = guideStrings.arenaPage.honorFinalNote;
     expect(html).toContain(esc(body));
@@ -5925,7 +6020,10 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     for (const id of honorRows) {
       // The Warfare tier: the entry tier, the two honor trinkets and Warfare Season 2.
       expect(
-        id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id) || SEASON2_STOCK.includes(id),
+        id in WARFARE_ITEMS ||
+          WARFARE_TRINKET_STOCK.includes(id) ||
+          SEASON2_STOCK.includes(id) ||
+          id === 'whistle_horse',
         id,
       ).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);
@@ -5951,7 +6049,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       entities: Map<number, { id: number; templateId?: string; pos: { x: number; z: number } }>;
       players: Map<
         number,
-        { copper: number; inventory: unknown[]; vendorBuyback: { itemId: string; count: number }[] }
+        {
+          copper: number;
+          inventory: unknown[];
+          vendorBuyback: { itemId: string; count: number }[];
+        }
       >;
       rebucket(e: unknown): void;
     };
@@ -5996,7 +6098,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // endArenaMatch skips it on a forfeit, which the kept clause still says.
     // Every figure is derived, none restated, and the live module is driven.
     setLanguage('en');
-    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const html = arena.render({
+      params: [],
+      sub: 'arena',
+      titleKey: 'guide.nav.arena',
+    });
     const body = t('guide.arenaPage.rewardsBodyLossShare');
     const predecessor = guideStrings.arenaPage.rewardsBody;
     expect(html).toContain(esc(body));
@@ -6037,7 +6143,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     const day = (resetDay: string) =>
       ({ resetDay, emit: () => {} }) as unknown as Parameters<Award>[0];
     const fresh = () =>
-      ({ entityId: 1, honor: 0, lifetimeHonor: 0 }) as unknown as Parameters<Award>[1];
+      ({
+        entityId: 1,
+        honor: 0,
+        lifetimeHonor: 0,
+      }) as unknown as Parameters<Award>[1];
     const [format] = formats;
     const meta = fresh();
     const today = day('2026-09-03');
@@ -6099,7 +6209,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     type Award = typeof awardRankedArenaResultHonor;
     const day = (resetDay: string) =>
       ({ resetDay, emit: () => {} }) as unknown as Parameters<Award>[0];
-    const meta = { entityId: 1, honor: 0, lifetimeHonor: 0 } as unknown as Parameters<Award>[1];
+    const meta = {
+      entityId: 1,
+      honor: 0,
+      lifetimeHonor: 0,
+    } as unknown as Parameters<Award>[1];
     const [format] = Object.keys(RANKED_ARENA_WIN_HONOR) as (keyof typeof RANKED_ARENA_WIN_HONOR)[];
     const noon = Date.UTC(2026, 8, 3, 12, 0, 0);
     const reset = nextRaidResetMs(noon);
@@ -6127,7 +6241,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // effects are Warfare rating, a hostile-player crowd-control reduction
     // (src/sim/stun_dr.ts) or a pvpOnly proc (src/sim/combat/set_procs.ts).
     setLanguage('en');
-    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const html = arena.render({
+      params: [],
+      sub: 'arena',
+      titleKey: 'guide.nav.arena',
+    });
     const body = t('guide.arenaPage.warfareBodyStatsStay');
     const predecessor = guideStrings.arenaPage.warfareBody;
     expect(html).toContain(esc(body));
@@ -6183,7 +6301,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // to the tables: no WARFARE row carries crit, hit or haste rating, and every
     // slotted PvE epic at the same item level carries at least one.
     setLanguage('en');
-    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const html = arena.render({
+      params: [],
+      sub: 'arena',
+      titleKey: 'guide.nav.arena',
+    });
     const body = t('guide.arenaPage.warfareTradeBodyRatingSpent');
     const predecessor = guideStrings.arenaPage.warfareTradeBody;
     expect(html).toContain(esc(body));
@@ -6235,7 +6357,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // in table order through the calendar window's own title keys.
     setLanguage('en');
     const html =
-      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+      pageFor('social')?.render({
+        params: [],
+        sub: 'social',
+        titleKey: 'guide.nav.social',
+      }) ?? '';
     const body = t('guide.social.calendarBodyDoubleHonor' as never);
     expect(html).toContain(esc(body));
     const camel = (id: string) => id.replace(/_([a-z])/g, (_m, c: string) => c.toUpperCase());
@@ -6295,7 +6421,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // in the rebindable BIND_ACTIONS registry. Driven through the real router.
     setLanguage('en');
     const html =
-      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+      pageFor('social')?.render({
+        params: [],
+        sub: 'social',
+        titleKey: 'guide.nav.social',
+      }) ?? '';
     const body = t('guide.social.emotesBodyNamedTarget' as never);
     expect(html).toContain(esc(body));
     type Ev = ReturnType<Sim['tick']>[number];
@@ -6365,7 +6495,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // driven live.
     setLanguage('en');
     const html =
-      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+      pageFor('social')?.render({
+        params: [],
+        sub: 'social',
+        titleKey: 'guide.nav.social',
+      }) ?? '';
     const body = t('guide.social.finderBodyLeaderQueues' as never);
     expect(html).toContain(esc(body));
     type Ev = ReturnType<Sim['tick']>[number];
@@ -6424,7 +6558,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // one. The three choice names are the loot prompt's own labels.
     setLanguage('en');
     const html =
-      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+      pageFor('social')?.render({
+        params: [],
+        sub: 'social',
+        titleKey: 'guide.nav.social',
+      }) ?? '';
     const body = t('guide.social.lootRollBodyNeedBeatsGreed' as never);
     expect(html).toContain(esc(body));
     const need = t('itemUi.lootRoll.need' as never);
@@ -6466,7 +6604,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     sim.partyAccept(greeder);
     const itemId = 'greyjaw_hide_boots';
     expect(['poor', 'common']).not.toContain(ITEMS[itemId].quality);
-    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     mob.dead = true;
     mob.lootable = true;
     mob.tappedById = needer;
@@ -6559,6 +6701,10 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       delveTracker: 'the delve you are in',
       riftTracker: 'any rift you are taking part in',
       gatheringGoalTracker: 'the recipe or commission you are tracking',
+      // The dungeon objectives tracker, named by its own key
+      // (guide.interfacePage.dungeonTrackerBody) beside the two tracker
+      // paragraphs it joined, which is also where the tracker list checks it.
+      dungeonTracker: 'a dungeon tracker takes the top of the stack',
       // The frames the 0.42 round added to the registry with no prior prose,
       // named by guide.interfacePage.framesGovernedExtra.
       petBar: 'the pet action bar beside your pet frame',
@@ -6577,6 +6723,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       auraTrack_utility: `the ${t('hudChrome.auraTracks.utility')} track`,
       auraTrack_friendly: `the ${t('hudChrome.auraTracks.friendly')} track`,
       talkingHead: 'the Dialogue panel',
+      shardpikeBar: 'the Shardpike bar',
       // guide.interfacePage.framesGovernedUnitTooltip, named by its live chip.
       unitTooltip: `the ${t('hudChrome.interfaceUnlock.frameNames.unitTooltip')} frame`,
     };
@@ -6717,6 +6864,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       'rift-tracker': 'any rift you are taking part in',
       'gathering-goal-tracker': 'the recipe or commission you are tracking',
       'practice-tracker': 'it keeps your best runs against the practice dummies in view',
+      'dungeon-tracker': 'a dungeon tracker takes the top of the stack',
       'hub-lesson-coach': 'walks you through the current step of the lesson',
     };
     expect([...trackerIds].sort()).toEqual(Object.keys(trackerPhrase).sort());

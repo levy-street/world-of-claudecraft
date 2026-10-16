@@ -23,6 +23,7 @@ import type { SimEvent } from '../src/sim/types';
 // vaults) hand off to the vault outcome journal and the claim persister.
 // None is a player-rendered event. Keep ordinary ticks allocation-free.
 const SERVER_ONLY_EVENT_TYPES: ReadonlySet<SimEvent['type']> = new Set([
+  'referralEvidence',
   'vaultCraftConsume',
   'lootRollAwarded',
   'craftRoll',

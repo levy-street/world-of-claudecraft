@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/sanctum_korzul_frozen_woc.glb",
+      "out": "models/props/gravewyrm_sanctum_korzul_frozen.glb",
+      "type": "static",
+      "maxTex": 1024
+    }
+  ]
+}

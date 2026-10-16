@@ -50,17 +50,23 @@ describe('warlock ability-specific spellcasts (issue #2889)', () => {
   });
 
   it('wires the donor GLB and an attackByAbility override for every mapped ability', () => {
-    const block = manifestBlock('player_warlock: swims({', 'player_druid: swims({');
+    const block = manifestBlock(
+      'export const KAYKIT_WARLOCK: VisualDef = swims({',
+      'export const KAYKIT_DRUID',
+    );
     expect(block).toContain('warlock_ability_anims.glb');
     expect(block).toContain('attackByAbility');
     for (const clip of WARLOCK_CAST_CLIPS) expect(block).toContain(`'${clip}'`);
   });
 
   it('every mapped ability id is a real warlock ability, and every referenced clip is shipped', () => {
-    const warlockBlock = manifestBlock('player_warlock: swims({', 'player_druid: swims({');
+    const warlockBlock = manifestBlock(
+      'export const KAYKIT_WARLOCK: VisualDef = swims({',
+      'export const KAYKIT_DRUID',
+    );
     const abilityStart = warlockBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
-    const abilityEnd = warlockBlock.indexOf('\n      },', abilityStart);
+    const abilityEnd = warlockBlock.indexOf('\n    },', abilityStart);
     expect(abilityEnd).toBeGreaterThan(abilityStart);
     const block = warlockBlock.slice(abilityStart, abilityEnd);
     const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z_]+)',$/gm)];

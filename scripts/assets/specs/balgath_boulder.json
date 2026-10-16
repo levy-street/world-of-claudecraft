@@ -1,0 +1,11 @@
+{
+  "note": "Balgath's Boulder Toss VFX kit: ONE GLB with eleven named mesh nodes (boulder, chunk_0..5, shard_0..3). The raw GLB comes from the deterministic Blender factory scripts/assets/balgath_boulder/model.py, driven by export_balgath_boulder.mjs, which stamps the source fingerprint and runs this spec. Vertex-coloured, texture-free (no KTX2 step), original work with no reference image.",
+  "items": [
+    {
+      "src": "tmp/asset_src/balgath_boulder/balgath_boulder.glb",
+      "out": "models/vfx/balgath_boulder.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

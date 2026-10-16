@@ -3,11 +3,19 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../sim/building_layout';
 import { BUILTIN_WORLD, getActiveWorldContent } from '../sim/data';
 import { EASTBROOK_LAYOUT, localToWorld, wallSegmentMirrored } from '../sim/eastbrook_layout';
+import {
+  forEachSegmentFootprintSample,
+  pitchedSegmentPlacement,
+  type SegmentPoint,
+} from '../sim/pitched_segment';
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
+import { mediaAssetExists } from './assets/media';
 import { registerDeferredPreload } from './assets/preload';
+import { activeWorldHasAuthoredTown } from './authored_town_gate';
 import { buildEastbrookHarbor } from './eastbrook_harbor';
+import { buildEastbrookPlacedBuilding, isPlacedBuildingAsset } from './eastbrook_placed_building';
 import {
   applyEastbrookTownSurfaceDetail,
   EASTBROOK_SURFACE_ATLAS_URL,
@@ -27,7 +35,7 @@ import {
 } from './eastbrook_town_visibility_core';
 import { buildEastbrookWeeklyVault, WEEKLY_VAULT_TRIANGLES } from './eastbrook_weekly_vault';
 import { indexExactVertexTuples } from './exact_index_geometry';
-import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
+import { EMISSIVE_GLOW, GFX, type GfxSettings, surfaceMat } from './gfx';
 import { type KitWindowPane, kitWindowPanes } from './kit_window_panes_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import {
@@ -37,6 +45,9 @@ import {
   occluderFadeRecordFor,
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
+import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { createPlacedTownInteriors } from './placed_town_interiors';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import {
   buildRealmBuilderMonumentBody,
   buildRealmBuilderMonumentFx,
@@ -101,14 +112,32 @@ const ASSET_INSTANCE_COUNTS = (() => {
 const loadedSources = new Map<string, THREE.Group>();
 const preparedTemplates = new Map<string, TownAssetTemplate>();
 const sourceLoadTasks = new Map<string, Promise<void>>();
+/** The indoor camera's rooms of the live view's walk-in buildings (dropped when the next
+ *  view builds). */
+const cameraInteriors = createPlacedTownInteriors();
+/** The FILE each resident source was read from. A placed building's URL names
+ *  the model; the file follows the profile's texture tier (same geometry, see
+ *  placed_texture_tier_core.ts), so everything else here stays keyed on the
+ *  URL and a tier change is one replaced source. */
+const loadedSourceFiles = new Map<string, string>();
 
-function prepareTownSource(url: string): Promise<void> {
-  if (loadedSources.has(url)) return Promise.resolve();
+function townSourceFile(url: string, tier: PlacedTextureTier): string {
+  return isPlacedBuildingAsset(url) ? placedTextureTierPath(url, tier, mediaAssetExists) : url;
+}
+
+function prepareTownSource(url: string, tier = GFX.placedTextureTier): Promise<void> {
+  const file = townSourceFile(url, tier);
+  const residentFile = loadedSourceFiles.get(url);
+  if (loadedSources.has(url) && residentFile === file) return Promise.resolve();
   const existing = sourceLoadTasks.get(url);
   if (existing) return existing;
-  const task = loadGltf(url)
+  const task = loadGltf(file)
     .then((gltf) => {
       loadedSources.set(url, gltf.scene);
+      loadedSourceFiles.set(url, file);
+      // The tier this replaces is no longer wanted: drop its cache entry (the
+      // retiring view's clones keep its textures alive until they go).
+      if (residentFile !== undefined && residentFile !== file) releaseGltf(residentFile);
       sourceLoadTasks.delete(url);
     })
     .catch((err) => {
@@ -119,8 +148,17 @@ function prepareTownSource(url: string): Promise<void> {
   return task;
 }
 
-export function prepareEastbrookTownProfileAssets(): Promise<void> {
-  return Promise.all(ALL_ASSET_URLS.map(prepareTownSource)).then(() => undefined);
+/**
+ * `target` is the profile about to be activated: a rebuild prepares its assets
+ * BEFORE the live settings switch, so the texture tier must come from the
+ * target, never from the profile being retired.
+ */
+export function prepareEastbrookTownProfileAssets(
+  target: Pick<GfxSettings, 'placedTextureTier'> = GFX,
+): Promise<void> {
+  return Promise.all(
+    ALL_ASSET_URLS.map((url) => prepareTownSource(url, target.placedTextureTier)),
+  ).then(() => undefined);
 }
 
 export function resetEastbrookTownProfileCaches(): void {
@@ -364,14 +402,19 @@ function isKitBuildingAsset(url: string): boolean {
  * Assets that keep their OWN GLB materials instead of being baked into the
  * vertex-colour micro-batch.
  *
- * Two different reasons land here. The kit buildings' colour lives in KTX2
+ * Three different reasons land here. The kit buildings' colour lives in KTX2
  * palette textures the CPU cannot sample. The Realm Builder monument is a
  * judgement call: its baked albedo carries the carving that makes it a statue
  * rather than a shape, and the owner rejected the palette-colour version on
- * sight, so it draws as its own textured prop.
+ * sight, so it draws as its own textured prop. The placed Tidehold buildings
+ * are painted: every wall and roof carries its relief in its own atlases.
  */
 function keepsOwnMaterials(url: string): boolean {
-  return isKitBuildingAsset(url) || url === EASTBROOK_LAYOUT.civic.monument.assetId;
+  return (
+    isKitBuildingAsset(url) ||
+    isPlacedBuildingAsset(url) ||
+    url === EASTBROOK_LAYOUT.civic.monument.assetId
+  );
 }
 
 // Kit materials keep their GLB textures; on the Lambert tiers they downgrade
@@ -848,68 +891,6 @@ function placementMatrix(
   );
 }
 
-type SegmentPoint = Readonly<{ x: number; z: number }>;
-
-interface PitchedSegmentPlacement {
-  centerX: number;
-  centerY: number;
-  centerZ: number;
-  rotation: number;
-  pitch: number;
-  spatialLength: number;
-  terrainOffset: number;
-}
-
-function forEachSegmentFootprintSample(
-  start: SegmentPoint,
-  end: SegmentPoint,
-  width: number,
-  visit: (x: number, z: number, progress: number) => void,
-): void {
-  const dx = end.x - start.x;
-  const dz = end.z - start.z;
-  const length = Math.hypot(dx, dz);
-  const alongSteps = Math.max(1, Math.ceil(length / BUILDING_TERRAIN_SAMPLE_STEP));
-  const acrossSteps = Math.max(1, Math.ceil(width / BUILDING_TERRAIN_SAMPLE_STEP));
-  const normalX = length > 1e-8 ? -dz / length : 0;
-  const normalZ = length > 1e-8 ? dx / length : 1;
-  for (let along = 0; along <= alongSteps; along++) {
-    const progress = along / alongSteps;
-    const centerX = start.x + dx * progress;
-    const centerZ = start.z + dz * progress;
-    for (let across = 0; across <= acrossSteps; across++) {
-      const lateral = -width / 2 + (width * across) / acrossSteps;
-      visit(centerX + normalX * lateral, centerZ + normalZ * lateral, progress);
-    }
-  }
-}
-
-function pitchedSegmentPlacement(
-  start: SegmentPoint,
-  end: SegmentPoint,
-  width: number,
-  groundAt: GroundAt,
-): PitchedSegmentPlacement {
-  const startY = groundAt(start.x, start.z);
-  const endY = groundAt(end.x, end.z);
-  const horizontalLength = Math.hypot(end.x - start.x, end.z - start.z);
-  const deltaY = endY - startY;
-  let minimumResidual = 0;
-  forEachSegmentFootprintSample(start, end, width, (x, z, progress) => {
-    const pitchedBottomY = startY + deltaY * progress;
-    minimumResidual = Math.min(minimumResidual, groundAt(x, z) - pitchedBottomY);
-  });
-  return {
-    centerX: (start.x + end.x) / 2,
-    centerY: (startY + endY) / 2 + minimumResidual,
-    centerZ: (start.z + end.z) / 2,
-    rotation: Math.atan2(-(end.z - start.z), end.x - start.x),
-    pitch: Math.atan2(deltaY, horizontalLength),
-    spatialLength: Math.hypot(horizontalLength, deltaY),
-    terrainOffset: minimumResidual,
-  };
-}
-
 function reflectedGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
   const geometry = source.clone().applyMatrix4(new THREE.Matrix4().makeScale(-1, 1, 1));
   const index = geometry.getIndex();
@@ -973,7 +954,15 @@ function buildMicroBatches(
   // in the town is selected by the civic emissive mask, so it now selects
   // nothing at all (see the note on the civic flag in addPlacedCivicEmissiveGeometry).
 
-  for (const bench of EASTBROOK_LAYOUT.civic.benches) {
+  // A document that owns the square's dressing as placements
+  // (promotedScenery.authoredTownDressing) draws the benches, stalls and yard
+  // fences itself, so these three loops stand down together.
+  const dressingPromoted = activeWorldPromoted('authoredTownDressing');
+  const benches = dressingPromoted ? [] : EASTBROOK_LAYOUT.civic.benches;
+  const stalls = dressingPromoted ? [] : EASTBROOK_LAYOUT.market.stalls;
+  const fences = dressingPromoted ? [] : EASTBROOK_LAYOUT.fences;
+
+  for (const bench of benches) {
     const template = templates.get(bench.assetId);
     if (!template) throw new Error(`Eastbrook town template is missing: ${bench.assetId}`);
     const horizontalScale = Math.min(bench.width / template.size.x, bench.depth / template.size.z);
@@ -992,7 +981,7 @@ function buildMicroBatches(
     );
   }
 
-  for (const stall of EASTBROOK_LAYOUT.market.stalls) {
+  for (const stall of stalls) {
     const template = templates.get(stall.assetId);
     if (!template) throw new Error(`Eastbrook town template is missing: ${stall.assetId}`);
     add(
@@ -1010,7 +999,7 @@ function buildMicroBatches(
     );
   }
 
-  for (const fence of EASTBROOK_LAYOUT.fences) {
+  for (const fence of fences) {
     const template = templates.get(fence.assetId);
     if (!template) throw new Error(`Eastbrook town template is missing: ${fence.assetId}`);
     const placement = pitchedSegmentPlacement(fence.start, fence.end, fence.width, groundAt);
@@ -1179,6 +1168,8 @@ function buildFromTemplates(
     textureUuid: null,
     materialBindings: 0,
   };
+  // the previous view's rooms go with it: a world without the town keeps no air
+  cameraInteriors.clear();
   if (!builtInWorld) {
     group.userData.drawStats = eastbrookTownDrawStats(group);
     return {
@@ -1192,8 +1183,39 @@ function buildFromTemplates(
 
   const roofHideTargets: RoofHideTarget[] = [];
   const buildingGroups: THREE.Object3D[] = [];
-  for (const building of EASTBROOK_LAYOUT.buildings) {
+  // The document may own the town's BUILDINGS as placements (the
+  // promoted-scenery contract): only the building loop stands down, the
+  // wells, stalls, fences, streets, wall and harbor stay town-drawn.
+  const buildingsPromoted = activeWorldPromoted('authoredTowns');
+  const buildingList = buildingsPromoted ? [] : EASTBROOK_LAYOUT.buildings;
+  for (const building of buildingList) {
     const kitTemplate = templates.get(building.assetId);
+    if (kitTemplate?.raw && isPlacedBuildingAsset(building.assetId)) {
+      // A painted Tidehold building, stood as the Studio map stands it
+      // (eastbrook_placed_building.ts). A reveal root and a roof-hide target
+      // like every other building, so the two lists stay index-aligned.
+      const placed = buildEastbrookPlacedBuilding(building, kitTemplate.raw, groundAt);
+      // a walk-in one keeps the indoor camera to its rooms (placed_town_interiors.ts)
+      cameraInteriors.add(building, groundAt);
+      group.add(placed.group);
+      roofHideTargets.push({
+        group: placed.group,
+        mats: placed.mats,
+        hidden: false,
+        alpha: 1,
+        x: building.position.x,
+        z: building.position.z,
+        halfWidth: building.nativeDimensions.width / 2,
+        halfDepth: building.nativeDimensions.depth / 2,
+        cosine: Math.cos(building.rotation),
+        sine: Math.sin(building.rotation),
+        topY: placed.topY,
+        cullRadius: placed.cullRadius,
+        walkIn: building.walkIn,
+      });
+      buildingGroups.push(placed.group);
+      continue;
+    }
     if (kitTemplate?.raw) {
       const built = buildKitBuilding(building, kitTemplate.raw, groundAt);
       group.add(built.group);
@@ -1421,7 +1443,10 @@ export function buildEastbrookTownView(seed: number): EastbrookTownView {
   // root stays isolated, while loader-owned decoded sources can be released and
   // a later same-page switch to the built-in world remains synchronous.
   if (loadedSources.size > 0) prepareTemplates(loadedSources, preparedTemplates, true);
-  if (getActiveWorldContent() !== BUILTIN_WORLD) {
+  // Data-gated, not identity-gated: an editor copy of the built-in world
+  // still carries this town's buildings and must get its real art, or the
+  // kit buildings it replaces draw in Studio instead (authored_town_gate.ts).
+  if (!activeWorldHasAuthoredTown(isEastbrookRebuildBuilding)) {
     return buildFromTemplates(preparedTemplates, () => 0, false, undefined);
   }
   prepareTemplates(loadedSources, preparedTemplates, true);
@@ -1543,10 +1568,20 @@ export function eastbrookTownTriangleBudget(
     };
   });
   const assetTriangles = assets.reduce((sum, asset) => sum + asset.repeatedTriangles, 0);
-  const maximumFoundationTriangles = EASTBROOK_LAYOUT.buildings.length * 12;
+  // A placed building buries its own footing and draws no skirt.
+  const maximumFoundationTriangles =
+    EASTBROOK_LAYOUT.buildings.filter((building) => !isPlacedBuildingAsset(building.assetId))
+      .length * 12;
   const proceduralTriangles = WEEKLY_VAULT_TRIANGLES;
   const maximumRuntimeTriangles = assetTriangles + maximumFoundationTriangles + proceduralTriangles;
-  const hardCeiling = 40_000;
+  // The Tidehold rebuild: the eleven kit shells (21,924 triangles between
+  // them) gave way to six painted buildings (46,128, furniture included), so
+  // the ceiling moved from 40,000 to 64,000, the measured total plus a
+  // twentieth. Fenbridge's town draws under 88,000 by the same rule. Two
+  // levers stay unpulled: dropping the furniture groups from buildings nobody
+  // can enter (22,128 of those triangles), and the far twins
+  // (`<name>.lod.glb`) the placed-asset pipeline already swaps to at range.
+  const hardCeiling = 64_000;
   // Round 8 (owner): raised 30,000 to 33,000 to pay for the Realm Builder
   // monument at full sculpt resolution and double size. The earlier pass
   // collapse-decimated the statue to 45 percent to fit under 30,000, and the
@@ -1567,6 +1602,39 @@ export function eastbrookTownTriangleBudget(
     meetsTarget: maximumRuntimeTriangles <= target,
     assets,
   };
+}
+
+/**
+ * One town model as a standalone object drawn exactly as the town draws it:
+ * the same extracted, semantic-recoloured geometry (base centred, bottom at
+ * y = 0) under the town's atlas materials. Placed assets
+ * (render/town_styled_placed_assets.ts) use it for the Eastbrook-only models a
+ * Studio document promotes, so a moved market stall keeps its painted look.
+ *
+ * Both materials are hook-preserving CLONES (the same program key as the
+ * town's shared entries until a placed-asset patch lands): placed batching
+ * installs its fade on whatever material it is handed, and that must never be
+ * the shared entry the town's own batches still draw with. Null until the
+ * town's atlas has loaded, so a template never caches an atlas-less look.
+ */
+export function eastbrookStyledPlacedObject(
+  source: THREE.Object3D,
+  url: string,
+): THREE.Object3D | null {
+  const atlas = eastbrookSurfaceAtlasTexture();
+  if (!atlas) return null;
+  const template = extractTemplate(source, url);
+  const group = new THREE.Group();
+  if (template.opaque) {
+    const mesh = new THREE.Mesh(template.opaque, townMaterial(false, atlas, true));
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+  if (template.emissive) {
+    group.add(new THREE.Mesh(template.emissive, townMaterial(true, atlas, true)));
+  }
+  return group;
 }
 
 /** Test-only access to the tier-independent preload and deterministic build contract. */

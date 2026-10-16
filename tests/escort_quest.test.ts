@@ -3,7 +3,8 @@
 // waves that attack the escortee and pause the walk, failure + respawn, and
 // the success credit that readies the quest.
 import { describe, expect, it } from 'vitest';
-import { visualKeyFor } from '../src/render/characters/manifest';
+import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { npcLookFor } from '../src/render/characters/npc_looks';
 import {
   BUILTIN_WORLD,
   ESCORTS,
@@ -168,15 +169,16 @@ describe('escort content integrity', () => {
   // Every escortee needs an explicit body in the character manifest. The
   // humanoid family default is the hooded outlaw (mob_bandit), so an
   // unregistered escortee reads as the bandits the player is protecting them
-  // from: only Wren was registered, and Mosley, Suli and Bram were not.
+  // from. Each one wears its authored look on the WOC body of its class, as the
+  // hub NPCs do (render/characters/npc_looks.ts MOB_LOOK_IDS).
   it('gives every escortee an explicit character model, never the outlaw fallback', () => {
     for (const def of Object.values(ESCORTS)) {
       if (def.worldQuestId !== undefined) continue;
       const key = visualKeyFor({ kind: 'mob', templateId: def.npcMobId } as Entity);
       expect(key, `${def.id} escortee model`).not.toBe('mob_bandit');
-      expect(key.startsWith('npc_'), `${def.id} escortee model is ${key}`).toBe(true);
-      // The body is shared, so each escortee's own tint is what tells them apart.
-      expect(MOBS[def.npcMobId].color, `${def.id} tint`).toBeTypeOf('number');
+      expect(VISUALS[key]?.wocCharacter, `${def.id} escortee model is ${key}`).toBeDefined();
+      // Its own face tells it apart now, not a tint on a shared body.
+      expect(npcLookFor(def.npcMobId, 'mob'), `${def.id} look`).not.toBeNull();
     }
   });
 });

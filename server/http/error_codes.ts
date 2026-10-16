@@ -107,6 +107,8 @@ export const ERROR_CODES = deepFreeze({
   'character.storage_purchase_open': { params: [] },
   // identity: the realm background gate refused the delete; retry in a moment
   'character.delete_busy': { params: [] },
+  'character.referral_transfer_pending': { params: [] },
+  'character.referral_bond_pending': { params: [] },
   // identity: "character already in world"
   'character.already_in_world': { params: [] },
   // identity: "character taken over"

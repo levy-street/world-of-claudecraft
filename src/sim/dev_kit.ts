@@ -310,9 +310,9 @@ function roleIdentitySum(role: DevKitRole, item: ItemDef): number {
  *  wants general capacity; specialty satchels are equipped deliberately. */
 export function bestKitBag(): ItemDef | null {
   // Deliberately the same kind-based filter server/pbe_boost.ts bestBoostBag
-  // uses, so a mis-authored bag def cannot make the two pickers disagree.
+  // uses. Protected rewards need their owning grant's custody receipt.
   const bags = Object.values(ITEMS).filter(
-    (item) => item.kind === 'bag' && !isMaterialsOnlyBag(item) && !item.unique,
+    (item) => item.kind === 'bag' && !isMaterialsOnlyBag(item) && !item.unique && !item.noDiscard,
   );
   return bestBy(bags, (item) => item.bagSlots ?? 0);
 }

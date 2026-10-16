@@ -17,6 +17,7 @@ import { t } from '../../i18n';
 import { mountSkinDescription, mountSkinDisplayName } from '../../mount_labels';
 import { svgIcon } from '../../ui_icons';
 import { armorySkinArt, mountSkinArt } from '../../woc_store_view';
+import { buddyCosmeticsHtml } from './buddy_cosmetics_view';
 import {
   type CosmeticsScope,
   type CosmeticsSnapshot,
@@ -152,14 +153,19 @@ function mechCardHtml(card: MechChromaCard): string {
   const state = card.worn
     ? `<span class="cos-state worn">${esc(t('hudChrome.cosmetics.worn'))}</span>`
     : `<span class="cos-state owned">${esc(t('hudChrome.cosmetics.owned'))}</span>`;
+  // An unavailable card keeps its Wear button in place, disabled, so the card
+  // does not reflow when the mech comes back. The label borrows the store's
+  // already translated "Unavailable" while the switch is off.
+  const unavailable = card.action === 'unavailable';
   const action =
     card.action === 'takeOff'
       ? actionButton('takeoff-mech', card.id, t('hudChrome.cosmetics.takeOff'))
       : actionButton(
           'wear-mech',
           card.id,
-          t('hudChrome.cosmetics.wear'),
+          unavailable ? t('hudChrome.wocStore.unavailable') : t('hudChrome.cosmetics.wear'),
           ` data-index="${card.index}"`,
+          unavailable,
         );
   return (
     `<article class="cos-card ui-card cos-mech rarity-${esc(card.rank)} owned${card.worn ? ' worn' : ''}" ` +
@@ -179,6 +185,8 @@ function emptyHtml(text: string): string {
 /** The whole tab panel for the snapshot's selected tab. */
 export function cosmeticsPanelHtml(s: CosmeticsSnapshot): string {
   switch (s.tab) {
+    case 'buddies':
+      return buddyCosmeticsHtml(s.buddies);
     case 'mounts': {
       const hint = s.ownsAnyMount
         ? ''
@@ -206,6 +214,7 @@ export function cosmeticsPanelHtml(s: CosmeticsSnapshot): string {
 
 /** The action a delegated click resolves to, from the button's data attributes. */
 export type CosmeticsAction =
+  | { kind: 'summon-buddy'; id: string }
   | { kind: 'preview-mount'; id: string }
   | { kind: 'preview-skin'; id: string }
   | { kind: 'wear-mount'; id: string }
@@ -223,6 +232,8 @@ export function cosmeticsActionFrom(dataset: {
 }): CosmeticsAction | null {
   const id = dataset.id ?? '';
   switch (dataset.act) {
+    case 'summon-buddy':
+      return id ? { kind: 'summon-buddy', id } : null;
     case 'preview-mount':
       return id ? { kind: 'preview-mount', id } : null;
     case 'preview-skin':

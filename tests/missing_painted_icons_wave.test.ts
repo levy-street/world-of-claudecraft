@@ -241,6 +241,8 @@ const ALLOWED_REFERENCE_ROLES = [
 // Choice-row talents, modifier art, retired summon paintings, and pet signature
 // actions are image ids without live ABILITIES rows by design.
 const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
+  // The Shardpike bar's three verbs: painted art on a quest tool's ACTIONS, which have no
+  // ABILITIES row of their own to be image-backed from.
   'anger_management',
   'attack',
   'battle_rhythm',
@@ -254,6 +256,9 @@ const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'elemental_convergence',
   'emberkin_felbolt',
   'gloomshade_abyssal_chain',
+  'lance_brace',
+  'lance_release',
+  'lance_thrust',
   'lingering_dread',
   'overflowing_power',
   'pet_aggressive',
@@ -311,15 +316,23 @@ describe('missing painted icon accepted-art manifest', () => {
     // The Nythraxis gap-fill one-handers add three generated heroic resolvers at
     // the current head (heroic_courtiers_bonefang, heroic_gravecourt_hewer,
     // heroic_thornpeak_wardblade): 210/16/12 become 213/19/15.
+    // The five-dungeon rework's six generated Heroic weapons
+    // (heroic_falls_blessed_staff, heroic_gaolyard_cudgel,
+    // heroic_knight_commanders_longsword, heroic_rimeweb_fang,
+    // heroic_sextons_spadehaft, heroic_tideglass_shiv) add their resolvers the
+    // same way: 213/19/15 become 219/25/21. The lower dungeons' normal blues'
+    // five (heroic_gravecallers_rod, heroic_turnkeys_shank,
+    // heroic_fogbinders_rod, heroic_merecleaver, heroic_moonwrack_stave):
+    // 219/25/21 become 224/30/26.
     expect(accepted.scope).toEqual({
-      targetRows: 213,
+      targetRows: 224,
       rasterPaintings: 194,
       abilities: 90,
       items: 101,
       deeds: 3,
-      heroicWeaponResolvers: 19,
+      heroicWeaponResolvers: 30,
       originalInventoryRows: 197,
-      supplementalCurrentHeadRows: 15,
+      supplementalCurrentHeadRows: 26,
     });
     expect(accepted.assets).toHaveLength(194);
     expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(90);
@@ -336,7 +349,7 @@ describe('missing painted icon accepted-art manifest', () => {
         accepted.assets.filter((asset) => asset.kind === kind).map((asset) => asset.id),
       ).toEqual(ids);
     }
-    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(19);
+    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(30);
     expect(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id)).toEqual(
       sorted(new Set(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id))),
     );
@@ -688,8 +701,13 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // the pending side on the exploration crest.
     // 319 at the 2026-09-28 release/v0.44.0 merge into Buried Hoards: the
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
-    expect(DEED_ORDER).toHaveLength(319);
+    // 322 with the Mirefen world-boss branch's three combat deeds, all pending.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, its 24 pending on the dungeon crest.
+    expect(DEED_ORDER).toHaveLength(346);
+    expect(DEED_ART_PENDING.has('cmb_point_taken')).toBe(true);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
+    expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);
+    expect(DEED_ART_PENDING.has('cmb_balgath_ten')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(
@@ -744,6 +762,45 @@ describe('missing painted deed and Heroic weapon integration', () => {
     }
   });
 
+  // Every Heroic base's held model has changed since the accepted-art record was cut: the
+  // items moved onto the character pack's weapon sets, each drawing the set one rarity below
+  // its own (a rare base a field model, an epic base a rare one, a legendary base an epic
+  // one). The record keeps the variant each drew when it was accepted.
+  const REMODELLED_SINCE_ACCEPTED: Record<string, string> = {
+    fanglords_beastspear: 'spear_field_iron',
+    gravewyrm_thornmaul: 'hammer_field_2h_iron',
+    staff_of_velkhar: 'staff_field_iron',
+    bonewrought_greatsword: 'sword_rare_a_violet',
+    wyrmfang_greatblade: 'sword_rare_a_ember',
+    wildheart_tuskblade: 'sword_rare_a_ivory',
+    direfang_greatblade: 'sword_rare_a_violet',
+    thornpeak_wardblade: 'sword_rare_b_teal',
+    fang_of_korzul: 'dagger_rare_b_violet',
+    courtiers_bonefang: 'dagger_rare_b_teal',
+    wildheart_fangknife: 'dagger_rare_b_ember',
+    duskwhisper: 'dagger_rare_a_violet',
+    maul_of_the_scourged_wilds: 'hammer_rare_b_violet',
+    gravecourt_hewer: 'axe_rare_a_violet',
+    // The five-dungeon rework's bases on the v0.45.0 integration (the placeholder pack
+    // finishes in src/ui/weapon_variants.ts).
+    falls_blessed_staff: 'staff_field_iron',
+    gaolyard_cudgel: 'hammer_field_steel',
+    knight_commanders_longsword: 'sword_field_steel',
+    rimeweb_fang: 'dagger_field_steel',
+    sextons_spadehaft: 'axe_field_iron',
+    tideglass_shiv: 'dagger_field_bronze',
+    gravecallers_rod: 'wand_field_steel',
+    turnkeys_shank: 'dagger_field_iron',
+    fogbinders_rod: 'wand_field_iron',
+    merecleaver: 'axe_field_steel',
+    moonwrack_stave: 'staff_field_steel',
+    staff_of_the_gravewyrm: 'staff_rare_a_teal',
+    nightfangs_greatstaff: 'staff_rare_b_violet',
+    wildheart_hexwood_staff: 'staff_rare_b_ember',
+    deathless_heartwood: 'staff_epic_hexwood_basin_turquoise',
+    kingsbane_last_oath: 'sword_epic_deathless_crucible_heart',
+  };
+
   it('keeps the historical Heroic resolver record while serving its base painting today', () => {
     const accepted = manifest();
     const live = Object.values(ITEMS)
@@ -759,18 +816,26 @@ describe('missing painted deed and Heroic weapon integration', () => {
       expect(base?.kind, `${target.id} base ${target.baseId} must remain a weapon`).toBe('weapon');
       expect(Object.hasOwn(ITEM_WEAPON_VARIANTS, target.id), target.id).toBe(false);
       expect(Object.hasOwn(ITEM_WEAPON_VARIANTS, target.baseId), target.baseId).toBe(true);
-      expect(ITEM_WEAPON_VARIANTS[target.baseId]).toBe(target.variant);
+      // The record's own fields stay as accepted: one variant, its preview and its model.
       expect(target.bagIconUrl).toBe(`/ui/weapons/${target.variant}.jpg`);
       expect(target.portraitPath).toBe(`public/ui/weapons/${target.variant}.jpg`);
       expect(target.heldModelPath).toBe(`public/models/weapons/${target.variant}.glb`);
-      expect(existsSync(path.join(repoRoot, target.portraitPath))).toBe(true);
-      expect(existsSync(path.join(repoRoot, target.heldModelPath))).toBe(true);
       // The accepted-art manifest is immutable historical evidence of the old JPG lane. The
-      // current runtime intentionally supersedes only its bag/portrait URL with base-id art;
-      // the held model and legacy preview remain available to rendering/tooling.
+      // current runtime supersedes its bag/portrait URL with base-id art, and the bases
+      // have since moved onto the character pack's weapon sets
+      // (REMODELLED_SINCE_ACCEPTED): for those the record names the model the base drew
+      // when it was accepted.
+      const liveVariant = REMODELLED_SINCE_ACCEPTED[target.baseId] ?? target.variant;
+      expect(ITEM_WEAPON_VARIANTS[target.baseId], target.baseId).toBe(liveVariant);
+      expect(existsSync(path.join(repoRoot, `public/ui/weapons/${liveVariant}.jpg`))).toBe(true);
+      expect(existsSync(path.join(repoRoot, `public/models/weapons/${liveVariant}.glb`))).toBe(
+        true,
+      );
       expect(weaponIconUrl(target.id)).toBe(`/ui/items/${target.baseId}.webp`);
       expect(iconDataUrl('item', target.id)).toBe(`/ui/items/${target.baseId}.webp`);
-      expect(itemWeaponModelUrl(target.id)).toBe(`models/weapons/${target.variant}.glb`);
+      // a Heroic copy draws whatever its base draws today
+      expect(itemWeaponModelUrl(target.id)).toBe(`models/weapons/${liveVariant}.glb`);
+      expect(itemWeaponModelUrl(target.id)).toBe(itemWeaponModelUrl(target.baseId));
       expect(iconDataUrl('item', target.id)).toBe(iconDataUrl('item', target.baseId));
     }
   });

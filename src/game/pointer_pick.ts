@@ -25,9 +25,12 @@ export interface ClickPick {
 export function clickPickFromMouseGesture(g: MousePickGesture): ClickPick | null {
   if (g.button !== g.downButton) return null;
   if (!g.releaseOnCanvas && !g.pointerLocked) return null;
-  const duration = Number.isFinite(g.pressDurationMs) ? Math.max(0, g.pressDurationMs ?? 0) : Number.POSITIVE_INFINITY;
+  const duration = Number.isFinite(g.pressDurationMs)
+    ? Math.max(0, g.pressDurationMs ?? 0)
+    : Number.POSITIVE_INFINITY;
   const maxClickDurationMs = g.maxClickDurationMs ?? DEFAULT_CLICK_PICK_MAX_MS;
   if (duration > maxClickDurationMs) return null;
-  if (g.button === 2 && g.movementDrag > (g.dragThreshold ?? DEFAULT_CLICK_PICK_DRAG_THRESHOLD)) return null;
+  if (g.button === 2 && g.movementDrag > (g.dragThreshold ?? DEFAULT_CLICK_PICK_DRAG_THRESHOLD))
+    return null;
   return { x: g.downX, y: g.downY, button: g.button };
 }

@@ -10,6 +10,17 @@
       }
     ]
   },
+  "amb_tavern": {
+    "ceilingDb": 6.5,
+    "tracks": [
+      {
+        "filename": "amb_tavern.mp3",
+        "sha256": "5770aff9d370ab05c0f0f31feb4ad7b593b4117a471781169363dc8b4bda1847",
+        "size": 1048912,
+        "peakDb": -7.5
+      }
+    ]
+  },
   "ambush": {
     "ceilingDb": 5.1,
     "tracks": [

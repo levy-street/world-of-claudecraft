@@ -121,7 +121,10 @@ export const WORLD_QUEST_ESCORTS: Record<string, EscortDef> = {
     ambushes: [
       { atWaypoint: 2, mobId: 'vale_bandit', count: 3, level: 5, radius: 6 },
       { atWaypoint: 5, mobId: 'vale_bandit', count: 4, level: 5, radius: 7 },
-      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 5, radius: 8 },
+      // radius 7, not 8: at 8 the fourth bandit lands against the painted
+      // smithy's north wall, 0.15 yd of clearance (spawns are not collision
+      // checked); at 7 every spawn has at least 0.95 yd
+      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 5, radius: 7 },
     ],
     creditRadius: 35,
     respawnSeconds: 30,
@@ -316,7 +319,9 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
       { x: -63, z: -90 },
       { x: -66, z: -94 },
       { x: -70, z: -89 },
-      { x: -76, z: -95 },
+      // a stride north of the Weekly Vault's corner (the vault took the
+      // ground beside it in the Tidehold rebuild)
+      { x: -77, z: -94 },
       { x: -86, z: -90 },
       { x: -68, z: -78 },
     ],

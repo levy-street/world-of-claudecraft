@@ -83,6 +83,8 @@ import {
   newToken,
   verifyPassword,
 } from './auth';
+import { queueBuddyGrant } from './buddy_grants_db';
+import { type BuddyGrant, buddyGrantBodyError } from './buddy_wire';
 import {
   type BugReportResolution,
   getBugReportScreenshot,
@@ -2043,6 +2045,7 @@ export type AdminRuntime = Pick<
   | 'adminCharacterOnline'
   | 'adminRestoreItem'
   | 'adminRestoreToolEffectSlot'
+  | 'adminGrantBuddy'
   | 'social'
 >;
 
@@ -3286,6 +3289,42 @@ async function restoreItemHandler(ctx: Ctx): Promise<void> {
   }
 }
 
+/** POST /admin/api/moderation/characters/:id/grant-buddy: attach a buddy
+ *  companion on a character (the channel the
+ *  monthly PvP ladder, top-parse and zodiac awards land through; owner plan
+ *  2026-09-09). Body: { buddyKey }, plus reason. Audit
+ *  first, then: ONLINE targets take the sim's grant path at once; OFFLINE
+ *  targets are queued (server/buddy_grants_db.ts queueBuddyGrant) and drained at the
+ *  character's next join, so an award never depends on the winner being
+ *  logged in. Idempotent on the sim side: an already-owned grant answers
+ *  409 rather than re-announcing. */
+async function grantBuddyHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  const bodyError = buddyGrantBodyError(body);
+  if (bodyError) return fail(ctx.res, 400, bodyError);
+  const grant: BuddyGrant = { buddyKey: String(body.buddyKey) };
+  try {
+    await adminDb().recordProfessionsRestore({
+      characterId: id,
+      adminAccountId: ctxAccountId(ctx),
+      action: 'grant_buddy',
+      detail: grant.buddyKey ?? '',
+      reason: body.reason,
+    });
+    const result = rt.adminGrantBuddy(id, grant);
+    if (result === 'already_owned') return fail(ctx.res, 409, 'character already has that');
+    if (result === 'offline') {
+      await queueBuddyGrant(id, grant);
+      return ok(ctx.res, { ok: true, queued: true });
+    }
+    return ok(ctx.res, { ok: true, queued: false });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'buddy grant failed');
+  }
+}
+
 /** POST /admin/api/moderation/characters/:id/restore-slot: the R35 GM
  *  tool-effect slot re-mint, same ordering contract as restore-item; the
  *  sim action refuses no_tool (charges are sized by the best owned tool,
@@ -3898,6 +3937,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('character')],
     meta: adminTargetMeta('character'),
     handler: restoreSlotHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/grant-buddy',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: grantBuddyHandler,
   },
   {
     method: 'POST',

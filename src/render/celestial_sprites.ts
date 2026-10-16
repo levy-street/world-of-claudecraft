@@ -492,3 +492,38 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
     },
   };
 }
+
+/**
+ * Aim and fade the camera-riding sun and moon sprites for this frame, moved
+ * out of renderer.ts. The basin keeps directional daylight and the sky dome,
+ * but these sprites can clip against its high rim as oversized wedges, so they
+ * are reserved for the overworld (`outdoor`). Keeps the moon's shape on the
+ * lunar clock (no-op between phase buckets) and runs the sun's disc to sunset
+ * orange (`sunWarmth`) on the same horizon curve the sky glow uses.
+ */
+export function aimCelestialSprites(
+  celestial: CelestialSprites | null,
+  sunSprites: readonly THREE.Sprite[],
+  moonSprites: readonly THREE.Sprite[],
+  camera: THREE.Camera,
+  sunDir: THREE.Vector3,
+  moonDir: THREE.Vector3,
+  sunUp: number,
+  moonUp: number,
+  outdoor: boolean,
+  lunarPhase: number,
+  sunWarmth: number,
+): void {
+  celestial?.setMoonPhase(lunarPhase);
+  celestial?.setSunWarmth(sunWarmth);
+  for (const sp of sunSprites) {
+    sp.position.copy(camera.position).addScaledVector(sunDir, 760);
+    sp.visible = outdoor && sunUp > 0.02;
+    sp.material.opacity = (sp.userData.baseOpacity as number) * sunUp;
+  }
+  for (const sp of moonSprites) {
+    sp.position.copy(camera.position).addScaledVector(moonDir, 760);
+    sp.visible = outdoor && moonUp > 0.02;
+    sp.material.opacity = (sp.userData.baseOpacity as number) * moonUp;
+  }
+}

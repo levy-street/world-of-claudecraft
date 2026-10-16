@@ -331,7 +331,7 @@ describe('shared caches an interior root draws from are not claimable', () => {
       'dawnhold_dressing',
       'lastkeep_dressing',
       'rift_decor',
-      'wildheart_props',
+      'wildheart_basin/basin_kit',
     ]) {
       const source = readFileSync(new URL(`../src/render/${module}.ts`, import.meta.url), 'utf8');
       expect(source, `${module} must mark its shared kit`).toContain('markSharedGeometry');

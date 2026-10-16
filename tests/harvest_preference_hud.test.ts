@@ -29,6 +29,7 @@ import {
 import { makeWindowFocus } from '../src/ui/window_focus';
 import { syncWindowOpenBodyClasses } from '../src/ui/window_open_state';
 import type { IWorld } from '../src/world_api';
+import { contactAtOnce } from './helpers/renderer_contact';
 import { stripComments } from './helpers/strip_comments';
 
 // happy-dom rewrites import.meta.url to an http scheme (the localization_fixes idiom).
@@ -232,7 +233,7 @@ describe('the spectator bug: the generic pid gate is not enough for harvestPrefe
     // that method's body reaches are stamped on directly.
     const hud = Object.create(Hud.prototype) as HudTestHarness;
     hud.sim = sim;
-    hud.renderer = { handleEvent: vi.fn() };
+    hud.renderer = { handleEvent: vi.fn(), atContact: contactAtOnce };
     hud.meters = { onEvent: vi.fn() };
     hud.harvestPreferenceController = { open };
     hud.isNythraxisEvent = () => false;

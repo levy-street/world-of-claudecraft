@@ -2,12 +2,13 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { GUILD_RANK_PERMISSIONS } from '../src/sim/guild_ranks';
 import { guildRanksPanelView } from '../src/ui/guild_ranks_view';
-import type { GuildRow } from '../src/ui/social_view';
+import { type GuildRow, socialPageControls } from '../src/ui/social_view';
 import {
   guildMemberRowHtml,
   guildRanksPanelHtml,
   rankLabelText,
   rosterExpandConfirmHtml,
+  socialPagerHtml,
   splicePriceHtml,
 } from '../src/ui/social_window';
 import type { SocialInfo } from '../src/world_api';
@@ -27,6 +28,29 @@ const hudChromeCatalog = readFileSync(
   'utf8',
 );
 const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
+
+describe('social block list paging', () => {
+  it('provides both return and continuation controls for inherited overflow pages', () => {
+    const html = socialPagerHtml('block', { first: true, next: 12 });
+    expect(html).toContain('data-act="block-page" data-cursor="0"');
+    expect(html).toContain('data-act="block-page" data-cursor="12"');
+    expect(painter).toContain('w.socialBlocksPage(Number(node.dataset.cursor ?? 0))');
+  });
+  it('selects block metadata independently and rejects unsafe continuation values', () => {
+    const social = {
+      blocksCursor: 1,
+      blocksNextCursor: 8,
+      friendsCursor: 0,
+      friendsNextCursor: 4,
+    } as SocialInfo;
+    expect(socialPageControls(social, 'block')).toEqual({ first: true, next: 8 });
+    expect(socialPageControls(social, 'friend')).toEqual({ first: false, next: 4 });
+    expect(
+      socialPageControls({ ...social, blocksNextCursor: Number.NaN }, 'block').next,
+    ).toBeNull();
+    expect(socialPagerHtml('block', socialPageControls(null, 'block'))).toBe('');
+  });
+});
 
 describe('social_window: .soc-body layout never uses CSS multicol', () => {
   // Regression for a review finding on the wide-landscape relayout: `.soc-body` is a

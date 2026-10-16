@@ -15,6 +15,7 @@ import { loadGltf, releaseGltf } from '../render/assets/loader';
 import { hideBlackPointLights } from '../render/point_light_carriers';
 import { assetById } from './asset_catalog.generated';
 import { hashHue, ThumbBook, thumbPose } from './asset_thumbs_core';
+import { localAssetUrl } from './local_assets';
 import { userAssetPath } from './user_assets';
 
 // 2x the cell's 72x54 CSS size for crisp thumbnails on HiDPI screens.
@@ -50,7 +51,7 @@ let pumpScheduled = false;
 
 /** Resolve an asset id to its GLB URL the same way placement rendering does. */
 function assetGlbPath(assetId: string): string | null {
-  return userAssetPath(assetId) ?? assetById(assetId)?.path ?? null;
+  return localAssetUrl(assetId) ?? userAssetPath(assetId) ?? assetById(assetId)?.path ?? null;
 }
 
 function ensureGl(): GlHost | null {

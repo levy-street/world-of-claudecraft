@@ -3,7 +3,11 @@
 // generator). It reuses the renderer's pure GLB loader (loadGltf) so the Guide loads
 // exactly ONE model on demand instead of the renderer's full ~23 MB boot preload, and
 // mirrors the renderer's assembleModel logic (accessory allowlist, weapon attachments,
-// orientation fixups, subtle tint) so a figure here looks like it does in game.
+// orientation fixups, subtle tint) so a figure here looks like it does in game. A split
+// WOC body adds its animation library (`animUrls`) and its kit's armor files (`armor`),
+// bound to the base's skeleton by bone name through the renderer's own loader-free bind
+// (render/characters/woc_armor_bind.ts), and wears its fit's modular head at the default
+// look through the renderer's own head store and dressing (woc_head.ts).
 //
 // This file is only ever reached through the lazy viewer chunk (scene.ts dynamically
 // imports it), so its three.js + loader cost never lands in the main Guide bundle.
@@ -11,7 +15,15 @@
 import * as THREE from 'three';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { loadGltf } from '../../render/assets/loader';
+import {
+  hangWocRigidArmor,
+  instantiateWocArmor,
+  prepareWocArmor,
+  wocRigBindOf,
+  wocRigSkeletonOf,
+} from '../../render/characters/woc_armor_bind';
 import type { GuideModelSpec } from '../content.generated';
+import { dressGuideWocHead, guideWocHeadOf, guideWocHeadReady, hangGuideWocHead } from './woc_head';
 
 export interface BuiltModel {
   /** Normalized root: centered on x/z, feet at y=0, at the rig's NATIVE scale (the camera
@@ -85,11 +97,43 @@ export function skinAwareBounds(root: THREE.Object3D): THREE.Box3 {
 }
 
 export async function buildModel(spec: GuideModelSpec, tint: number | null): Promise<BuiltModel> {
-  const gltf = await loadGltf(spec.url);
+  // A WOC body's modular head files are fetched beside its base, as the game fetches them.
+  const head = guideWocHeadOf(spec);
+  const [gltf, libraries, armor, headReady] = await Promise.all([
+    loadGltf(spec.url),
+    Promise.all((spec.animUrls ?? []).map((url) => loadGltf(url))),
+    Promise.all((spec.armor ?? []).map((url) => loadGltf(url))),
+    head ? guideWocHeadReady(head.type) : null,
+  ]);
+  // A WOC base file ends at the neck: its head files are as much the figure as its base,
+  // so a figure whose head did not land fails to build exactly as one whose base did not
+  // (never a headless figure, or a still of one).
+  if (head && !headReady) {
+    throw new Error(`WOC head files for the ${head.fit} body failed to load: ${spec.url}`);
+  }
   // SkeletonUtils clone duplicates the hierarchy + skeleton but SHARES geometries and
   // materials with the cached GLTF, so we must clone any material before mutating it.
   const model = cloneSkinned(gltf.scene);
   const ownedMaterials: THREE.Material[] = [];
+  // The rebaked armor geometry is this build's own (the parse stays a shared cache).
+  const ownedGeometries: THREE.BufferGeometry[] = [];
+
+  // A split WOC body's kit: each armor file's parts, rebaked into the base's bind space
+  // and bound to its skeleton by bone name, exactly as the game attaches them.
+  const rig = armor.length > 0 ? wocRigBindOf(model) : null;
+  const skeleton = armor.length > 0 ? wocRigSkeletonOf(model) : null;
+  if (rig && skeleton) {
+    for (const pack of armor) {
+      const prepared = prepareWocArmor(cloneSkinned(pack.scene), rig);
+      for (const t of prepared.templates) ownedGeometries.push(t.geometry);
+      for (const mesh of instantiateWocArmor(prepared.templates, skeleton, rig.bindMatrix)) {
+        model.add(mesh);
+      }
+      hangWocRigidArmor(prepared.rigid, model);
+    }
+  }
+  // ...then its head, hung hidden on the `head` bone exactly where assembleModel hangs it.
+  if (head) hangGuideWocHead(model, head);
 
   // Tag the character's own meshes so a tint hits the body, not attached weapons.
   model.traverse((o) => {
@@ -124,6 +168,11 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
     }
     if (att.position) prop.position.set(att.position[0], att.position[1], att.position[2]);
     if (att.rotationY) prop.rotation.y = att.rotationY;
+    // The prop's own size about the hand, as the game draws it (assets.ts attachProp).
+    if (att.size !== undefined && att.size !== 1) {
+      prop.position.multiplyScalar(att.size);
+      prop.scale.multiplyScalar(att.size);
+    }
     bone.add(prop);
   }
 
@@ -162,6 +211,10 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
     });
   }
 
+  // The head's default look over the material pass (the game wraps its tints after
+  // applyMaterials): pieces, morphs, then the head and body-skin tints.
+  const undressHead = head ? dressGuideWocHead(model, head) : null;
+
   // Orientation: yaw to face +Z (the camera looks down -Z); lift floating rigs.
   if (spec.yaw) model.rotation.y = spec.yaw;
   if (spec.hover) model.position.y += spec.hover;
@@ -184,12 +237,18 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
   const sphere = finalBox.getBoundingSphere(new THREE.Sphere());
   const height = finalBox.max.y - finalBox.min.y;
 
-  // Idle animation (or the first clip the rig ships).
+  // Idle animation (or the rig's own Idle, or the first clip it or its library ships).
+  // A body whose authored idle lives in an extra animation GLB (VisualDef.animUrls,
+  // e.g. the muster drillmaster's Drill_Rest) is not in this base file: pose the shared
+  // Idle rather than whichever one-shot happens to be first.
   let mixer: THREE.AnimationMixer | null = null;
-  const clips = gltf.animations ?? [];
+  const clips = [...(gltf.animations ?? []), ...libraries.flatMap((lib) => lib.animations ?? [])];
   if (clips.length > 0) {
     mixer = new THREE.AnimationMixer(model);
-    const idle = (spec.idle && THREE.AnimationClip.findByName(clips, spec.idle)) || clips[0];
+    const idle =
+      (spec.idle && THREE.AnimationClip.findByName(clips, spec.idle)) ||
+      THREE.AnimationClip.findByName(clips, 'Idle') ||
+      clips[0];
     if (idle) mixer.clipAction(idle).play();
   }
 
@@ -200,6 +259,11 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
     // memoizes the GLTF), so we only dispose the material clones WE created for the tint.
     for (const mat of ownedMaterials) mat.dispose();
     ownedMaterials.length = 0;
+    for (const geo of ownedGeometries) geo.dispose();
+    ownedGeometries.length = 0;
+    // The head's tint-wrapped material clones are this build's own; its pieces share the
+    // head files' geometry and materials, which stay resident with the files.
+    undressHead?.();
     // SkeletonUtils.clone gave this build its OWN skeletons; three allocates a per-skeleton
     // bone DataTexture on first render that is NOT part of the shared GLTF cache, so dispose
     // it here (idempotent when several meshes share one skeleton) to avoid leaking one GPU

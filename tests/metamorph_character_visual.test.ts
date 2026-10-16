@@ -127,9 +127,11 @@ describe('Metamorphosis character integration', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     // Built through the shared lazy-form builder, and the one form that asks it
     // for no compile gate: Metamorphosis grows out of the body it replaces.
-    expect(source).toContain(
-      "this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false)",
-    );
+    // (the form-rig sync, characters/form_rig_sync.ts, routes each form to it)
+    expect(source).toContain('this.buildFormVisual(e, v, key, slot, gate)');
+    expect(
+      readFileSync(new URL('../src/render/characters/form_rig_sync.ts', import.meta.url), 'utf8'),
+    ).toContain("metamorph: { key: 'form_metamorph', slot: 'metamorphVisual', gate: false }");
     expect(source).toContain('this.createCharacterVisualWithRetry(e, formKey, formKey)');
     expect(source).toContain('v.metamorphVisual?.setFar(v.isFar && active === v.metamorphVisual);');
     // The player prewarm builder (metamorph-first, then per-class rigs) moved
@@ -156,7 +158,11 @@ describe('Metamorphosis character integration', () => {
     expect(source).toContain(
       'v.metamorphVisual?.setProxyShadow(shadowPlan.formProxy && active === v.metamorphVisual)',
     );
-    expect(source).toContain('const displayScale = e.scale;');
+    // The entity's own scale, times only the Bastion's fed-crawler swell (a
+    // per-body dungeon visual, 1 for every other body): no form scale.
+    expect(source).toContain(
+      'const displayScale = e.scale * (this.riftDeathZoneVisuals?.bodySwell(e.id) ?? 1);',
+    );
     expect(source).not.toContain('setMetamorph(');
     expect(source).not.toContain('LICH_FORM_SCALE');
   });

@@ -41,11 +41,15 @@ export interface CharselectLockoutRow {
  *  them: raids, then dungeons, then world bosses. */
 const LOCKOUT_GROUP_KEY: Record<
   RaidLockoutKind,
-  'character.lockoutRaids' | 'character.lockoutDungeons' | 'character.lockoutWorldBosses'
+  | 'character.lockoutRaids'
+  | 'character.lockoutDungeons'
+  | 'character.lockoutWorldBosses'
+  | 'character.lockoutWeeklyQuests'
 > = {
   raid: 'character.lockoutRaids',
   dungeon: 'character.lockoutDungeons',
   worldBoss: 'character.lockoutWorldBosses',
+  weeklyQuest: 'character.lockoutWeeklyQuests',
 };
 
 /** The localized zone name for a roster row, or null when the server sent no

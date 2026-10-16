@@ -342,6 +342,14 @@ export const EASTBROOK_TOWN_PERF_SCENARIOS = Object.freeze([
 // so each target follows its stall's derived front standing point and each
 // camera rides the same move, holding its former offset from the target. Both
 // targets and both cameras re-probed collision-clear at camera height.
+// Re-aimed 2026-10 for the Tidehold rebuild: six placed buildings replaced the
+// eleven kit shells and face local -Z. Of these views only Lin's subject moved
+// (to her shop door on the square); every other subject holds its point, and
+// each camera re-probed collision-clear at seed 20061.
+// Re-aimed for the World of ClaudeCraft Studio map's arrangement of the same
+// town: Lin's shop went down to the strand and FURY stepped off the north
+// road's new swing round the smithy, so their two portraits follow them;
+// every other subject holds its point.
 export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
   Object.freeze({
     name: 'stall-world-market',
@@ -357,11 +365,15 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
   }),
   // The live portrait follows Lin to the civic square. Historical
   // captures retain their original camera records and frozen source identity.
+  // World of ClaudeCraft Studio map's arrangement: she stands at
+  // (-24.5, -112.5) between the square and her shop down on the strand,
+  // facing the square. The target is her stand; the camera holds its 5 yd on
+  // her public-facing side, toward the square.
   Object.freeze({
     name: 'apothecary-lin',
     subject: 'apothecary_lin',
-    camera: Object.freeze({ x: -12, y: 6, z: -94 }),
-    target: Object.freeze({ x: -11, y: 2.5, z: -89 }),
+    camera: Object.freeze({ x: -20.96, y: 6, z: -108.96 }),
+    target: Object.freeze({ x: -24.5, y: 2.5, z: -112.5 }),
   }),
   Object.freeze({
     name: 'ravenpost-mailbox',
@@ -399,12 +411,15 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
   // (16, -78). The view is re-seated, never retired: same name, same subject,
   // target on his authored stand and the camera carrying its former 4.47 yd
   // offset, which still lands on his (re-derived) public-facing side and probes
-  // collision-clear at camera height.
+  // collision-clear at camera height. Re-seated again for the World of
+  // ClaudeCraft Studio map's arrangement: the north road swings round the
+  // smithy over his old stand, so he stands at (21, -83.5) and the camera
+  // keeps its 4.47 yd on his public-facing side.
   Object.freeze({
     name: 'west-wall-quartermaster',
     subject: 'fury',
-    camera: Object.freeze({ x: 12, y: 6, z: -80 }),
-    target: Object.freeze({ x: 16, y: 2.5, z: -78 }),
+    camera: Object.freeze({ x: 17.05, y: 6, z: -85.59 }),
+    target: Object.freeze({ x: 21, y: 2.5, z: -83.5 }),
   }),
 ]);
 
@@ -419,6 +434,14 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
 // though v3 parted the two buildings by about 53 yards; the only region
 // public-side of BOTH fronts is east of the bank, so that camera is now a
 // wide establishing shot across the civic square.
+// Re-aimed 2026-10 for the Tidehold rebuild: six placed buildings replaced the
+// eleven kit shells and face local -Z, so every door, and every public face,
+// turned. The bank, smithy and inn targets sit on their buildings' front
+// standing points (1.8 yd off the wall at the door) and each camera stands
+// outside the model, on the door side. The weaving workshop and the toolworks
+// went with the shells; their stations and masters still hold the crafts
+// lane, so those halves of the pairing are the stations now, whose public
+// side is the way their masters face (the retired lots' own turn).
 export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
   'armoury-relation': Object.freeze({
     // Round 4: the armoury retired from placement and the KayKit barracks
@@ -427,17 +450,29 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
     camera: Object.freeze({ x: 34, y: 15, z: 25 }),
     target: Object.freeze({ x: 12.5, y: 4, z: -5.5 }),
   }),
+  // World of ClaudeCraft Studio map's arrangement: the bank stands at the
+  // harbour end of the main street, its door looking up the street to the
+  // square; the camera stands 11 yd out on the bursar's side of the door, so
+  // he and the banker chest sit in the near frame.
   'bank-and-chest': Object.freeze({
-    camera: Object.freeze({ x: 5, y: 7, z: -101 }),
-    target: Object.freeze({ x: 8.994796179957174, y: 3.2, z: -97.00520382004282 }),
+    camera: Object.freeze({ x: -49.32, y: 7, z: -101.42 }),
+    target: Object.freeze({ x: -54.98, y: 3.2, z: -111.32 }),
   }),
+  // The smithy stands north of the square on the old chapel rise, its door
+  // looking down to the square; the camera stands 12 yd out, a step toward
+  // the forge shelter at its west end, so the shelter is in frame with the
+  // door.
   'smithy-and-forge': Object.freeze({
-    camera: Object.freeze({ x: -9.5, y: 7, z: -126 }),
-    target: Object.freeze({ x: -6.293250516799596, y: 3, z: -124.1466252583998 }),
+    camera: Object.freeze({ x: -12, y: 7, z: -93.65 }),
+    target: Object.freeze({ x: -8.28, y: 3, z: -81.86 }),
   }),
+  // The inn stands up the slope north of the farm plots; its kitchen yard
+  // keeps its old ground beside the inn lane, so the camera stands down the
+  // lane just past the yard and looks up it to the door, the kitchens in the
+  // near frame.
   'inn-and-kitchens': Object.freeze({
-    camera: Object.freeze({ x: -43, y: 8, z: -94 }),
-    target: Object.freeze({ x: -42.82589170715949, y: 3, z: -90.73189846640925 }),
+    camera: Object.freeze({ x: -46, y: 9, z: -93 }),
+    target: Object.freeze({ x: -34.51, y: 3, z: -69.99 }),
   }),
   'chapel-and-weaving': Object.freeze({
     // Round 8: the aim was (-13, -100), the middle of the square, and the
@@ -445,9 +480,17 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
     // collider fails the clearance probe. Moved a yard past the plinth's west
     // face, still an establishing shot across the square with the statue as
     // its backdrop.
-    camera: Object.freeze({ x: 26, y: 12, z: -100 }),
+    // Tidehold: the placed bank's model covered the old camera spot at
+    // (26, -100), so the camera stepped 10 yd in. The bank has gone to the
+    // harbour end since and the chapel stands on the rise west of the
+    // square; the same spot is public-side of the chapel's door and of the
+    // loom station (the weaving half), between the square and the chapel.
+    camera: Object.freeze({ x: 16, y: 12, z: -100.5 }),
     target: Object.freeze({ x: -10.5, y: 3, z: -100 }),
   }),
+  // Tidehold: the toolworks building retired with the kit shells, and the
+  // toolworks station still stands on its old front standing point with
+  // Tinker Gizzel beside it, so this view keeps its station framing as is.
   'toolworks-service-perimeter': Object.freeze({
     camera: Object.freeze({ x: -11, y: 7, z: -120 }),
     target: Object.freeze({ x: -13.614789156231515, y: 5, z: -124.42218373434727 }),
@@ -520,7 +563,11 @@ export const EASTBROOK_POLISH_BASELINE_REVISION = '3ab740db453bd8b5858a52c304edc
 // 51 yd, the farthest being apothecary-lin at 50.6, so the captures show the
 // statue BODY and can never show the impostor card. The one polish view beyond
 // that range (camera (34, 15, 25), target (12.5, 4, -5.5)) is aimed at another
-// district, away from the monument. The civicShader leaf still seals the
+// district, away from the monument. (The 2026-10 Tidehold re-aim moved the
+// farthest live camera to inn-and-kitchens at 58 yd, still inside 72; Lin's
+// is now 6 yd off the statue. The World of ClaudeCraft Studio map's
+// arrangement re-aimed the service and portrait cameras it moved to within
+// 36 yd of it, FURY's portrait the farthest at 35.8.) The civicShader leaf still seals the
 // wiring (which strings, which uniforms, fog: true), and the bytes themselves
 // now carry a stronger guard than a sha256: a real driver links them in
 // tests/browser/dry_compile_sources.browser.test.ts. Add the module as a leaf

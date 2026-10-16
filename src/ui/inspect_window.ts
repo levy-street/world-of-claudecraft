@@ -15,7 +15,13 @@
 // char_view's arrays via the pure core, so inspect inherits the sheet's 6/6 split.
 
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, ItemInstancePayload, PlayerClass, SkinCatalog } from '../sim/types';
+import type {
+  EquipSlot,
+  ItemDef,
+  ItemInstancePayload,
+  PlayerClass,
+  SkinCatalog,
+} from '../sim/types';
 import { attachAvatarFallback } from './avatar_fallback';
 import type { PaperdollSlot } from './char_view';
 import { CURATOR_SIGIL_GLOW, curatorSigilBadgeClass, curatorSigilDataUrl } from './curator_sigil';
@@ -35,7 +41,7 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
-import { classDisplayName, itemDisplayName } from './entity_i18n';
+import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import {
   holderCardBadgeClass,
@@ -65,10 +71,17 @@ import { wornItemCellParts } from './worn_item_cell_view';
 
 /** The inspected entity fields the painter reads (a structural subset of the
  *  live EntityView / ClientWorld mirror; all already client-side). */
+/** The creation pick's shape (ModularAppearance's gender), kept structural so
+ *  this painter imports nothing from the render layer. */
+type BodyPick = { readonly gender?: unknown } | null | undefined;
+
 export interface InspectEntity {
   templateId: string;
   name: string;
   level: number;
+  specId?: string | null;
+  membershipActive?: boolean;
+  referralInviterName?: string;
   skin?: number;
   /** Which catalog `skin` indexes into (the wire `cat` identity field). */
   skinCatalog?: SkinCatalog;
@@ -78,6 +91,11 @@ export interface InspectEntity {
   border?: string | null;
   equippedItems: Partial<Record<EquipSlot, string>>;
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
+  /** The paperdoll eye (the wire helm bit): a WOC body on the stage hides its
+   *  helm exactly as the world does. */
+  helmHidden?: boolean;
+  /** The creation pick (body/face), which selects a WOC class's body file. */
+  modularAppearance?: BodyPick;
   /** The server-resolved active Armory weapon skin (wire wsk), render-only. */
   weaponSkinId?: string | null;
   holderTier?: number;
@@ -109,7 +127,13 @@ export interface InspectRemoteProfile {
 /** Hud-supplied glue. The presentation bag (icon/tooltip) plus world-free window
  *  concerns: focus capture/return, and the shared turntable mount (Hud owns the
  *  single WebGL preview lifecycle, so it re-parents the canvas into the stage). */
-export interface InspectWindowDeps extends PainterHostPresentation {
+export interface InspectWindowDeps extends Omit<PainterHostPresentation, 'itemTooltip'> {
+  /** Resolve adaptive equipment against its wearer, never the viewing player. */
+  itemTooltip(
+    item: ItemDef,
+    instance: ItemInstancePayload | undefined,
+    wearer: InspectEntity,
+  ): string;
   root(): HTMLElement;
   closeOthers(): void;
   hideTooltip(): void;
@@ -133,6 +157,11 @@ export interface InspectWindowDeps extends PainterHostPresentation {
        *  so the turntable shows the face they built, not the stock class rig;
        *  null for a pre-creator character. */
       look: ModularLook | null;
+      /** The inspected player's mirrored worn set and helm-visibility bit, so
+       *  a WOC modular body on the stage wears exactly what the world draws. */
+      wornEquipment: Readonly<Partial<Record<EquipSlot, string>>>;
+      helmHidden: boolean;
+      appearance: BodyPick;
     },
   ): void;
 }
@@ -261,10 +290,10 @@ export class InspectWindow {
     }
     const leftCol = el.querySelector('#inspect-equip-left');
     const rightCol = el.querySelector('#inspect-equip-right');
-    for (const cell of model.gear.left) leftCol?.appendChild(this.buildSlotRow(cell));
-    for (const cell of model.gear.right) rightCol?.appendChild(this.buildSlotRow(cell));
+    for (const cell of model.gear.left) leftCol?.appendChild(this.buildSlotRow(cell, e));
+    for (const cell of model.gear.right) rightCol?.appendChild(this.buildSlotRow(cell, e));
     const weaponsRow = el.querySelector('#inspect-equip-weapons');
-    for (const cell of model.gear.weapons) weaponsRow?.appendChild(this.buildSlotRow(cell));
+    for (const cell of model.gear.weapons) weaponsRow?.appendChild(this.buildSlotRow(cell, e));
     const stage = el.querySelector<HTMLElement>('#inspect-model-preview');
     if (stage) {
       this.deps.mountPreview(stage, {
@@ -275,6 +304,9 @@ export class InspectWindow {
         offhand: e.equippedItems.offhand ?? null,
         weaponSkinId: e.weaponSkinId ?? null,
         look: look ?? null,
+        wornEquipment: e.equippedItems,
+        helmHidden: e.helmHidden ?? false,
+        appearance: e.modularAppearance ?? null,
       });
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
@@ -325,7 +357,7 @@ export class InspectWindow {
   // effective quality (row color, icon rim, glow) and a promoted copy's
   // player-chosen name replaces the def name. The chosen name is
   // player-authored text, so it is esc'd raw, never through t().
-  private buildSlotRow(cell: PaperdollSlot): HTMLElement {
+  private buildSlotRow(cell: PaperdollSlot, wearer: InspectEntity): HTMLElement {
     const { slot, item, instance } = cell;
     const row = document.createElement('div');
     row.className = 'equip-slot';
@@ -339,7 +371,9 @@ export class InspectWindow {
     if (item) {
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
       if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance ?? undefined));
+      this.deps.attachTooltip(row, () =>
+        this.deps.itemTooltip(item, instance ?? undefined, wearer),
+      );
     }
     return row;
   }

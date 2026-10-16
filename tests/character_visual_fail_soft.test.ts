@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import type { Entity } from '../src/sim/types';
+import { failWocHeads } from './helpers/woc_streamed';
 
 // Issue #2079: a character asset that was never registered as preloaded used to
 // throw synchronously from resolvedGltf inside the per-frame render path
@@ -49,6 +50,101 @@ describe('createCharacterVisual fails soft on a missing preload (issue 2079)', (
       args.some((a) => typeof a === 'string' && a.includes('mob_training_dummy')),
     );
     expect(missLogs).toHaveLength(1);
+    errSpy.mockRestore();
+  });
+});
+
+// PR 4360 review, B1. A WOC player body used to be a SILENT null while its base or animation
+// library streamed (no log, no retry cooldown, retried every frame), and since a fetch that
+// failed never ended that wait, a dead file hid every player of that body for the session.
+// Both fits' files are resident from world entry now (woc_entry_preload.ts), so a base that
+// is missing anyway is a miss like any other body's: logged once, and left to the caller's
+// retry cooldown (no build is a quiet wait any more, so the renderer books every null).
+describe('a WOC body whose base is missing takes the same fail-soft path', () => {
+  const wocPlayer = (app: Record<string, unknown> | null): Entity =>
+    ({
+      kind: 'player',
+      id: 7,
+      templateId: 'warrior',
+      color: 0xffffff,
+      skin: 0,
+      mainhandItemId: null,
+      offhandItemId: null,
+      auras: [],
+      modularAppearance: app,
+    }) as unknown as Entity;
+
+  const BASE = 'models/chars/players/woc/base_male.glb';
+
+  /** A fresh module world. Nothing lands but the files `landing` names. */
+  async function world(landing: readonly string[] = []) {
+    vi.resetModules();
+    const fetched: string[] = [];
+    vi.doMock('../src/render/assets/loader', () => ({
+      loadGltf: vi.fn((url: string) => {
+        fetched.push(url);
+        return landing.includes(url)
+          ? Promise.resolve({ scene: new THREE.Group(), animations: [] })
+          : new Promise(() => undefined);
+      }),
+      loadTexture: vi.fn(() => new Promise(() => undefined)),
+      loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
+      releaseGltf: vi.fn(),
+    }));
+    const index = await import('../src/render/characters/index');
+    // The head is not what this body waits on: its files have failed (a failed head file
+    // ends the head's own wait, woc_head_stream_core.ts wocHeadAwaited). Stamped after the
+    // slow imports, so the failure cannot age out of its cooldown before the case reads it.
+    failWocHeads(await import('../src/render/characters/woc_head_packs'));
+    const assets = await import('../src/render/characters/assets');
+    return { fetched, assets, ...index };
+  }
+
+  const missLogs = (spy: { mock: { calls: unknown[][] } }, key: string): number =>
+    spy.mock.calls.filter((args) =>
+      args.some((a) => typeof a === 'string' && a.includes(`(${key})`)),
+    ).length;
+
+  it('returns null with one logged miss, not a streaming wait', async () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { createCharacterVisual, fetched } = await world();
+    const before = fetched.filter((url) => url === BASE).length;
+
+    expect(createCharacterVisual(wocPlayer(null))).toBeNull();
+    expect(createCharacterVisual(wocPlayer(null))).toBeNull();
+
+    expect(missLogs(errSpy, 'player_warrior')).toBe(1);
+    // the miss itself puts the missing base back on the wire, once (the retries ride it)
+    expect(fetched.filter((url) => url === BASE).length).toBe(before + 1);
+    errSpy.mockRestore();
+  });
+
+  it('is no quieter for a speculative build, or for the other body fit', async () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { createCharacterVisual } = await world();
+    expect(createCharacterVisual(wocPlayer(null), undefined, { fetchStreamed: false })).toBeNull();
+    expect(createCharacterVisual(wocPlayer({ gender: 'female' }))).toBeNull();
+    expect(missLogs(errSpy, 'player_warrior')).toBe(1);
+    expect(missLogs(errSpy, 'player_warrior_female')).toBe(1);
+    errSpy.mockRestore();
+  });
+
+  it('is the same miss when the base is resident and only the animation library is not', async () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { createCharacterVisual, assets, fetched } = await world([BASE]);
+    // the base lands; the library stays on the wire
+    assets.ensureCharacterUrl(BASE);
+    for (let i = 0; i < 10; i++) await Promise.resolve();
+    expect(fetched).toContain(BASE);
+    expect(assets.visualAssetsResident('player_warrior', false)).toBe(false);
+
+    expect(createCharacterVisual(wocPlayer(null))).toBeNull();
+    expect(missLogs(errSpy, 'player_warrior')).toBe(1);
+    // and the log names the file that is missing
+    const logged = errSpy.mock.calls
+      .flat()
+      .map((a) => (a instanceof Error ? a.message : String(a)));
+    expect(logged.some((text) => text.includes('anims_male.glb'))).toBe(true);
     errSpy.mockRestore();
   });
 });

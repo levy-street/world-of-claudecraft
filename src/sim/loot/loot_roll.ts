@@ -40,6 +40,7 @@ import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { publicInstanceView } from '../item_instance_transfer';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
+import { corpseKeepsBody } from '../mob/boss_corpse_sink';
 import { isHarvestableCorpse } from '../professions/gathering';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -323,7 +324,13 @@ export function rollLoot(
       questSlots.add(slot);
       continue;
     }
-    if (!ctx.rng.chance(entry.chance)) continue;
+    // A heroic claim can retune THIS row's odds (LootEntry.heroicChance), the
+    // same value swap on the same single draw that heroicCopper performs for
+    // the money arm below: no extra draw, so the trace and the parity goldens
+    // are untouched on both difficulties.
+    const rowChance =
+      heroicClaim && entry.heroicChance !== undefined ? entry.heroicChance : entry.chance;
+    if (!ctx.rng.chance(rowChance)) continue;
     if (entry.copper) {
       // A heroic claim substitutes the raised finale money base (see
       // LootEntry.heroicCopper): a VALUE swap on the same single int draw at
@@ -364,6 +371,9 @@ export function rollLoot(
       }
     }
   }
+  // Buddies are deliberately NOT corpse loot: the per-player companion roll
+  // rides the boss death site instead (src/sim/buddy_drops.ts, content/
+  // buddy_sources.ts), so no kill anywhere draws for one here.
   if (copper > 0 || items.length > 0) {
     // A soulbound drop pins its bind-on-pickup trade group NOW, from the
     // kill-time `eligible` set, so a member who disconnects before the roll
@@ -1152,6 +1162,10 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
       return;
     }
     mob.lootable = false;
+    // A body that sinks out at the end of its window (mob/boss_corpse_sink.ts) keeps
+    // lying for the whole of it: nothing left to take, but no four-second vanish either.
+    // After the harvest arm above, so a sinking body that still owes a harvest keeps it.
+    if (corpseKeepsBody(MOBS[mob.templateId])) return;
     mob.corpseTimer = Math.min(mob.corpseTimer, 4);
   }
 }

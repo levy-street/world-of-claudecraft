@@ -59,7 +59,12 @@ describe('Crucible floor soundtrack', () => {
         lastCombatEventAt: 19999,
         lastBossCombatEventAt: 19999,
         entities: [
-          { kind: 'mob', dead: false, templateId: 'forge_guard', aggroTargetId: 7 },
+          {
+            kind: 'mob',
+            dead: false,
+            templateId: 'forge_guard',
+            aggroTargetId: 7,
+          },
           {
             kind: 'mob',
             dead: false,
@@ -96,7 +101,11 @@ describe('Crucible floor soundtrack', () => {
               : [],
         }),
       );
-      expect(decision).toMatchObject({ crucibleFloor: 4, bossEngaged: false, musicCombat: false });
+      expect(decision).toMatchObject({
+        crucibleFloor: 4,
+        bossEngaged: false,
+        musicCombat: false,
+      });
     },
   );
 
@@ -118,13 +127,25 @@ describe('Crucible floor soundtrack', () => {
 
   it('leaves ordinary dungeon combat and Nythraxis music intact', () => {
     const ordinary = instanceMusicDecision(input('hollow_crypt', { lastCombatEventAt: 19999 }));
-    expect(ordinary).toMatchObject({ crucibleFloor: null, inCombat: true, musicCombat: true });
+    expect(ordinary).toMatchObject({
+      crucibleFloor: null,
+      inCombat: true,
+      musicCombat: true,
+    });
     const nythraxis = instanceMusicDecision(input('nythraxis_boss_arena'));
-    expect(nythraxis).toMatchObject({ crucibleFloor: null, musicCombat: true, bossEngaged: true });
+    expect(nythraxis).toMatchObject({
+      crucibleFloor: null,
+      musicCombat: true,
+      bossEngaged: true,
+    });
   });
 
   it('passes distinct floor tracks through entry, combat, backtracking, exit, and reentry', () => {
-    const port = { resetForDungeonEntry: vi.fn(), update: vi.fn(), setBossCombat: vi.fn() };
+    const port = {
+      resetForDungeonEntry: vi.fn(),
+      update: vi.fn(),
+      setBossCombat: vi.fn(),
+    };
     const controller = new InstanceMusicController(port);
     for (const id of [
       'ignivar_forge_approach',

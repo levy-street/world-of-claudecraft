@@ -62,6 +62,7 @@ import {
   validateMaterialSlotSourcesOnLoad,
 } from './material_slot_load';
 import { type MaterialComposition, takeMaterialCount } from './material_sources';
+import { membershipActive } from './membership';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -165,6 +166,8 @@ export interface MarketListing {
   itemId: string;
   count: number;
   price: number; // total copper buyout for the whole stack
+  /** Fee entitlement captured when listed, honoured even while the seller is offline. */
+  membershipDiscount?: true;
   expiresAt: number; // sim.time seconds; Infinity for the Merchant's own stock
   house: boolean; // the Merchant's standing stock: never expires, never depletes, pays no one
   /** The escrowed copy's full payload for an instanced listing (#1165
@@ -208,6 +211,7 @@ export interface MarketSave {
     count: number;
     price: number;
     secondsLeft: number;
+    membershipDiscount?: true;
     /** Additive (#1165): the escrowed payload of an instanced listing. Absent
      *  on plain rows and on every pre-payload save, which load unchanged. */
     instance?: ItemInstancePayload;
@@ -301,7 +305,7 @@ export class Market {
       previewPlainBucketCount: (meta, itemId, want) =>
         this.previewPlainBucketCount(meta, itemId, want),
       escrowPlainBuckets: (meta, itemId, want) => this.escrowPlainBuckets(meta, itemId, want),
-      cutPct: () => MARKET_CUT,
+      cutPct: (meta) => (membershipActive(meta, this.ctx.time) ? MARKET_CUT / 2 : MARKET_CUT),
       minPrice: () => MARKET_MIN_PRICE,
       maxPrice: () => MARKET_MAX_PRICE,
     });
@@ -386,7 +390,7 @@ export class Market {
     const e = this.ctx.entities.get(pid);
     if (!meta || !e) return null;
     if (!this.nearMerchant(e)) return null;
-    return this.browseRev;
+    return this.browseRev * 2 + Number(membershipActive(meta, this.ctx.time));
   }
 
   // Public ctor-seed entry: the Sim ctor calls this right after the NPC loop sets
@@ -703,6 +707,7 @@ export class Market {
         itemId,
         count: bucketCount,
         price: bucketPrice,
+        ...(membershipActive(meta, this.ctx.time) ? { membershipDiscount: true as const } : {}),
         expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
         house: false,
         ...(bucket.materialSources === undefined
@@ -841,6 +846,7 @@ export class Market {
       itemId,
       count: 1,
       price: ask,
+      ...(membershipActive(meta, this.ctx.time) ? { membershipDiscount: true as const } : {}),
       expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
       house: false,
       ...(escrowed.instance === undefined ? {} : { instance: escrowed.instance }),
@@ -1004,7 +1010,12 @@ export class Market {
       partial ? partial.grantMaterialSources : listing.materialSources,
     );
     if (!listing.house) {
-      const proceeds = Math.max(0, Math.floor(boughtPrice * (1 - MARKET_CUT)));
+      const proceeds = Math.max(
+        0,
+        Math.floor(
+          boughtPrice * (1 - (listing.membershipDiscount === true ? MARKET_CUT / 2 : MARKET_CUT)),
+        ),
+      );
       const col = this.collectionFor(listing.sellerKey);
       col.copper += proceeds;
       // Itemize the sale beside the gold it produced. A full buy's row is
@@ -1465,7 +1476,7 @@ export class Market {
       // straight to the UI, and the live ledger must not be reachable from it.
       collectionSales: col ? col.sales.entries.map((e) => ({ ...e })) : [],
       collectionSalesOmitted: col?.sales.omitted ?? 0,
-      cutPct: Math.round(MARKET_CUT * 100),
+      cutPct: (membershipActive(meta, this.ctx.time) ? MARKET_CUT / 2 : MARKET_CUT) * 100,
       maxListings: MARKET_MAX_LISTINGS,
       myListingCount,
       // The Sell tab's current-lowest-price reference (issue #3043), echoed
@@ -1518,6 +1529,7 @@ export class Market {
           itemId: l.itemId,
           count: l.count,
           price: l.price,
+          ...(l.membershipDiscount === true ? { membershipDiscount: true as const } : {}),
           secondsLeft: Number.isFinite(l.expiresAt)
             ? Math.max(0, Math.round(l.expiresAt - this.ctx.time))
             : MARKET_LISTING_DURATION,
@@ -1608,6 +1620,7 @@ export class Market {
       }
       const listing = {
         id: plan.ids[i],
+        ...(l.membershipDiscount === true ? { membershipDiscount: true as const } : {}),
         sellerKey: String(l.sellerKey ?? ''),
         sellerName: String(l.sellerName ?? l.sellerKey ?? '?'),
         itemId: l.itemId,

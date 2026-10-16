@@ -44,11 +44,19 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // release/v0.43.0 merge into feature/world-quests forks it once more, through
 // the branch's hedge_knight camp move in src/sim/content/evergarden.ts
 // (c43178a68c): retribution 59.2 back to 55.75; holy and protection unmoved.
+// The four built dungeon entrances (src/sim/*_entrance.ts) fork it once more:
+// their colliders push the spawn point of three neighbouring world mobs, the
+// Wildheart Basin door moved and the Idol Guardian's camp with it, and every
+// world mob's idle wander draws from the shared stream. Retribution 55.75 to
+// 53.9; holy and protection unmoved. The Fenbridge rebuild forks it once more
+// (the painted buildings, the open ring, the walk-in floors, re-threaded
+// streets and lamps: world-gen inputs): protection 40.15 to 41.7, retribution
+// 53.9 to 48.35; holy unmoved.
 // The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 41.25,
-  protection: 40.15,
-  retribution: 55.75,
+  protection: 41.7,
+  retribution: 48.35,
 };
 
 function addDummy(sim: Sim): Entity {

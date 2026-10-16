@@ -77,6 +77,7 @@ export const interfacePage: GuidePage = {
               ]),
             }) +
             paras('guide.interfacePage.framesGovernedTalkingHead') +
+            paras('guide.interfacePage.framesGovernedShardpike') +
             paras('guide.interfacePage.framesGovernedUnitTooltip'),
         )}
 
@@ -89,7 +90,8 @@ export const interfacePage: GuidePage = {
           'guide.interfacePage.mapTitle',
           paras('guide.interfacePage.mapBodyZoneFirst') +
             paras('guide.interfacePage.gatheringGoalTrackerBody') +
-            paras('guide.interfacePage.hubPracticeTrackerBody'),
+            paras('guide.interfacePage.hubPracticeTrackerBody') +
+            paras('guide.interfacePage.dungeonTrackerBody'),
         )}
         ${section('guide.interfacePage.chatTitle', paras('guide.interfacePage.chatBody'))}
 

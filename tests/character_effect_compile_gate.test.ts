@@ -343,6 +343,42 @@ describe('a transparent character effect swaps in only once its programs are lin
     visual.dispose();
   });
 
+  it('plans a swap still in flight again when the gate is replaced under it', async () => {
+    // guards: a swap dropped with its gate and never planned again left the rig in the
+    // materials of the state it had left (an opaque body under stealth) until some
+    // unrelated edge happened to sweep the rig
+    const visual = await makeVisual();
+    const first: GateCall[] = [];
+    const second: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => first.push({ target, settle: onSettled }));
+    visual.setGhost(true);
+    expect(first).toHaveLength(1);
+    expect(rigIsTranslucent(visual)).toBe(false);
+    // the gate is replaced (a pooled body handed out again) with the link in flight
+    visual.setFarBakeGate((target, onSettled) => second.push({ target, settle: onSettled }));
+    // the old scratch is gone, and the SAME swap waits behind the new gate
+    expect(first[0].target.parent).toBeNull();
+    expect(second).toHaveLength(1);
+    expect(scratchOf(visual)).toBe(second[0].target);
+    expect(second[0].target).not.toBe(first[0].target);
+    // the old gate's late settle commits nothing
+    first[0].settle();
+    visual.update(FRAME, anim(), true);
+    expect(rigIsTranslucent(visual)).toBe(false);
+    // the new gate's does, on the per-frame path
+    second[0].settle();
+    expect(rigIsTranslucent(visual)).toBe(false);
+    visual.update(FRAME, anim(), true);
+    expect(rigIsTranslucent(visual)).toBe(true);
+    expect(scratchOf(visual)).toBeNull();
+    // nothing in flight: a new gate plans nothing
+    const third: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => third.push({ target, settle: onSettled }));
+    expect(third).toHaveLength(0);
+    expect(rigIsTranslucent(visual)).toBe(true);
+    visual.dispose();
+  });
+
   it('keeps the opaque body and never throws when the gate rejects', async () => {
     const visual = await makeVisual();
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);

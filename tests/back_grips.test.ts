@@ -6,6 +6,7 @@ import {
   BACK_GRIP_FAMILIES,
   backGripFor,
   quatFromEulerXYZ,
+  slotToChestScale,
 } from '../src/render/characters/back_grips';
 import { KAYKIT_SHIELD_ACCESSORIES } from '../src/render/characters/held_item_grips';
 
@@ -194,5 +195,32 @@ describe('every weapon grip family has a tuned on-back carry', () => {
     expect(families.length).toBeGreaterThan(5);
     const missing = families.filter((f) => !BACK_GRIP_FAMILIES.has(f));
     expect(missing, `item families with no BACK_GRIPS carry: ${missing.join(', ')}`).toEqual([]);
+  });
+});
+
+describe('slotToChestScale (the sheathe ratio for scaled slot bones)', () => {
+  const node = (x: number, parent: { scale: { x: number }; parent: null } | null = null) => ({
+    scale: { x },
+    parent: parent as never,
+  });
+  it('is 1 on an unscaled chain (every KayKit rig: nothing changes)', () => {
+    const chest = node(1);
+    const hand = node(1, chest as never);
+    const slot = node(1, hand as never);
+    expect(slotToChestScale(slot as never, chest as never)).toBe(1);
+  });
+  it('is the product of the slot chain below the chest (the WOC warrior)', () => {
+    const chest = node(1);
+    const hand = node(1, chest as never);
+    const slot = node(0.4574, hand as never);
+    expect(slotToChestScale(slot as never, chest as never)).toBeCloseTo(0.4574, 6);
+  });
+  it('never reads past the chest, and is 1 when the chest is not an ancestor', () => {
+    const wrap = node(2.42);
+    const chest = node(1, wrap as never);
+    const slot = node(0.5, chest as never);
+    expect(slotToChestScale(slot as never, chest as never)).toBe(0.5);
+    const other = node(1);
+    expect(slotToChestScale(slot as never, other as never)).toBe(1);
   });
 });

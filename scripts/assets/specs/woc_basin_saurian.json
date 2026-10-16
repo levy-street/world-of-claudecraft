@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/basin_saurian_woc.glb",
+      "out": "models/creatures/woc_basin_saurian.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Hit",
+        "Attack",
+        "Roar",
+        "TailSwipe",
+        "Stomp",
+        "Enrage",
+        "HowdahBreak",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

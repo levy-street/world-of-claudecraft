@@ -164,8 +164,12 @@ describe('reveal gate wiring (source pins)', () => {
     );
     expect(entryArm).not.toContain('setBandRevealGate');
     expect(entryArm).not.toContain('this.foliage.setRevealGate');
-    expect(wiring).toContain('this.eastbrookTownView.setRevealGate(');
-    expect(wiring).toContain('this.fenbridgeTownView.setRevealGate(');
+    // every rebuilt town's view (Eastbrook, Fenbridge, Highwatch) gets its own
+    // gate over its own roots, in one loop
+    expect(wiring).toContain('for (const town of this.townViews) {');
+    expect(wiring).toContain(
+      'town.setRevealGate(createRevealGate(revealHost, () => town.staticRevealRoots()));',
+    );
     // The foliage buckets ride the SAME host and the same queue: one more
     // createRevealGate, never a second host (foliage.ts revealRoots hands back
     // the one representative bucket mesh per program key).

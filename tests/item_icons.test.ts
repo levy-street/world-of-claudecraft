@@ -18,6 +18,7 @@ import {
   UI_ITEM_IMAGE_IDS,
   WEAPON_IMAGE_IDS,
 } from '../src/ui/icons';
+import { ITEM_ART_PLACEHOLDERS } from '../src/ui/item_art_placeholders';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // Gate for the committed WebP item icons (mirror of tests/skill_icons.test.ts). Art under
@@ -314,6 +315,31 @@ function missingPaintedWaveItemIds(): string[] {
 }
 
 describe('item webp icons', () => {
+  it('keeps the five referral placeholders on their existing art owners without copied files', () => {
+    expect(ITEM_ART_PLACEHOLDERS).toEqual({
+      referral_fog_charm: 'gleamstag_charm',
+      referral_hollow_charm: 'makers_charm',
+      referral_satchel: 'resonant_weave_bag',
+      reins_referral_raptor: 'reins_drakemaw_raptor',
+      reins_referral_tank: 'reins_terrorspark_groundshaker',
+    });
+    const m = mapping();
+    const owners = [
+      ...m.entries.map((entry) => entry.itemId),
+      ...(m.generatedBatches ?? []).flatMap((batch) => batch.itemIds),
+    ];
+    for (const [id, source] of Object.entries(ITEM_ART_PLACEHOLDERS)) {
+      expect(ITEM_ART_PENDING.has(id), id).toBe(true);
+      expect(ITEM_ART_PENDING.has(source), source).toBe(false);
+      expect(existsSync(path.join(itemsDir, `${id}.webp`)), id).toBe(false);
+      expect(existsSync(path.join(itemsDir, `${source}.webp`)), source).toBe(true);
+      expect(
+        owners.filter((owner) => owner === source),
+        source,
+      ).toHaveLength(1);
+      expect(iconDataUrl('item', id), id).toBe(`/ui/items/${source}.webp`);
+    }
+  });
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
     // 123 -> 125 at Masterwrought phase 09: duskforged_warblade + ridgebreaker joined
@@ -324,7 +350,10 @@ describe('item webp icons', () => {
     // plus the three faction vendor weapons (riftwarden_voidblade,
     // dawnkeeper_consecrated_mace, forgemaster_crag_cleaver): 138 -> 141, plus the four Warfare Season 2 honor weapons
     // (warfare-season2-weapons-2026-09-25): 145.
-    expect(WEAPON_IMAGE_IDS.size).toBe(145);
+    // 148 with the Mirefen world-boss branch's three held weapons, 149 with Balgath's
+    // Craterglass Stave.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 163.
+    expect(WEAPON_IMAGE_IDS.size).toBe(163);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -365,12 +394,14 @@ describe('item webp icons', () => {
     );
   });
 
-  it('A3) a pending id serves the drawn icon instead of a url pointing at a missing file', () => {
-    // The whole point of the pending list: itemImageUrl declines, so iconDataUrl composes the
-    // procedural recipe rather than handing an <img> a 404. Asserted on the real surface the
-    // bag bar, tooltips, loot and the vendor call.
+  it('A3) a pending id serves a procedural or declared existing icon instead of missing art', () => {
+    // Most pending ids use a procedural recipe. Explicit placeholders reuse a committed
+    // source URL while remaining in the debt ledger; neither path may hand an <img> a 404.
     for (const id of ITEM_ART_PENDING) {
-      expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
+      const source = ITEM_ART_PLACEHOLDERS[id];
+      expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBe(
+        source ? `/ui/items/${source}.webp` : null,
+      );
     }
     // The completion wave, the Crucible wave (crucible-set-icons-2026-08-29), and the
     // release's Roots' Bramblehide plus Nythraxis gap-fill wave
@@ -384,10 +415,25 @@ describe('item webp icons', () => {
     // follow-up art pass.
     const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(season2Armor).toHaveLength(135);
+    // The Hollow Crypt rework's per-boss loot left the ledger when its wave
+    // (hollow-crypt-icons-2026-10-03) painted every non-weapon piece and the
+    // generated Heroic Hymnal: HOLLOW_CRYPT_ART_PENDING_ITEM_IDS is declared
+    // empty in content/hollow_crypt_items.ts.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
-    ).toEqual([...season2Armor].sort());
+    ).toEqual(
+      [
+        ...season2Armor,
+        'whistle_emberfall_phoenix',
+        'whistle_horse',
+        'referral_fog_charm',
+        'referral_hollow_charm',
+        'referral_satchel',
+        'reins_referral_raptor',
+        'reins_referral_tank',
+      ].sort(),
+    );
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });
@@ -473,6 +519,7 @@ describe('item webp icons', () => {
       'loombound_reagent_satchel',
       'mistcallers_duffel',
       'necromancers_reagent_satchel',
+      'referral_satchel',
       'resonant_weave_bag',
       'rift_surveyors_satchel',
       'silkspun_satchel',
@@ -489,7 +536,7 @@ describe('item webp icons', () => {
       // the canvas recipe and throw, so a dropped id fails here rather than silently
       // regressing to the procedural sack.
       expect(iconDataUrl('item', id), `${id} must serve committed bag art`).toBe(
-        `/ui/items/${id}.webp`,
+        `/ui/items/${ITEM_ART_PLACEHOLDERS[id] ?? id}.webp`,
       );
     }
   });

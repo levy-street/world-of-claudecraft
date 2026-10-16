@@ -163,3 +163,6 @@ output/
 # task workspaces (git worktrees + design sources; never committed)
 workspaces/
 docs/screenshots/goblin-rocket-sled/
+
+# the Highwatch manor exporter's intermediate GLB (build_manor.py writes it, build.mjs ships it)
+scripts/assets/highwatch_manor/manor_source.glb

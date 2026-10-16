@@ -227,16 +227,20 @@ describe('entry detail horizon admission', () => {
       );
       expect(liveStart).toBeGreaterThan(prewarmStart);
       const liveFrame = source.slice(liveStart, source.indexOf('this.fish.update(', liveStart));
-      const painters = ['propsView', 'eastbrookTownView', 'fenbridgeTownView', 'foliage'];
+      // The rebuilt towns (Eastbrook, Fenbridge, Highwatch) are one painter:
+      // a loop over the town views at each frame site.
+      const painters = ['this.propsView', 'town', 'this.foliage'];
       for (const painter of painters) {
-        const inPrewarm = prewarmFrame.slice(prewarmFrame.indexOf(`this.${painter}.update(`));
+        const inPrewarm = prewarmFrame.slice(prewarmFrame.indexOf(`${painter}.update(`));
         expect(inPrewarm.slice(0, inPrewarm.indexOf(');'))).toContain(
           'this.entryDetailHorizon.sceneryCullFar(fogFar)',
         );
-        const inLive = liveFrame.slice(liveFrame.indexOf(`this.${painter}.update(`));
+        const inLive = liveFrame.slice(liveFrame.indexOf(`${painter}.update(`));
         expect(inLive.slice(0, inLive.indexOf(');'))).toContain('sceneryFar');
       }
-      // Exactly the four painters, no raw fogFar left in their calls, at each site.
+      expect(prewarmFrame).toContain('for (const town of this.townViews) {');
+      expect(liveFrame).toContain('for (const town of this.townViews) {');
+      // Exactly the three painters, no raw fogFar left in their calls, at each site.
       expect(prewarmFrame.split('this.entryDetailHorizon.sceneryCullFar(fogFar)').length - 1).toBe(
         painters.length,
       );

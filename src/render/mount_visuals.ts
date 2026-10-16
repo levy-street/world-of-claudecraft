@@ -278,6 +278,8 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // on the authored cushion when parked.
 
   terrorspark_groundshaker: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
+  referral_tank: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
+  referral_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
   drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),

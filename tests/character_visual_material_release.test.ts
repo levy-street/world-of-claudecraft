@@ -9,6 +9,7 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX } from '../src/render/characters/tinted_material_cache_core';
+import { landWocBodies } from './helpers/woc_streamed';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 type VisualModule = typeof import('../src/render/characters/visual');
@@ -31,6 +32,7 @@ async function loadModules(): Promise<{ assets: AssetsModule; visual: VisualModu
   }));
   const assets = (await import('../src/render/characters/assets')) as AssetsModule;
   await assets.charactersReady();
+  await landWocBodies(assets);
   const visual = (await import('../src/render/characters/visual')) as VisualModule;
   return { assets, visual };
 }

@@ -547,7 +547,7 @@ class FakeTransport implements SocialTransport {
   ): void {
     this.membershipStamps.push({ id, membership });
   }
-  isBlocking(recipientId: number, senderCharacterId: number): boolean {
+  isBlocking(recipientId: number, senderCharacterId: number, _senderAccountId?: number): boolean {
     return !!this.db.blocks.get(recipientId)?.has(senderCharacterId);
   }
   notLoaded = new Set<number>();
@@ -1407,6 +1407,71 @@ describe('guilds', () => {
     expect(h.tx.eventsFor(2).some((e) => e.type === 'guildInvite')).toBe(true);
     await h.svc.guildAccept(h.actor(2));
     expect((await h.svc.snapshot(2)).guild?.name).toBe('Knights');
+  });
+
+  it.each(['guildChat', 'officerChat'] as const)(
+    'keeps account blocks when %s sender logs out during the roster read',
+    async (method) => {
+      await h.svc.guildCreate(h.actor(1), 'Knights');
+      for (const [id, name] of [
+        [2, 'Bet'],
+        [3, 'Gimel'],
+      ] as const) {
+        await h.svc.guildInvite(h.actor(1), name);
+        await h.svc.guildAccept(h.actor(id));
+        await h.svc.guildPromote(h.actor(1), name);
+      }
+      h.tx.clear();
+      // Production keeps account IDs, not every alt character ID, in this cache.
+      const blockedAccounts = new Set([101]);
+      vi.spyOn(h.tx, 'isBlocking').mockImplementation(
+        (recipient, sender, account) =>
+          recipient === 2 && blockedAccounts.has(account ?? (h.tx.online.has(sender) ? 101 : -1)),
+      );
+      const members = h.db.guildMembers.bind(h.db);
+      let release!: () => void;
+      let started!: () => void;
+      const waiting = new Promise<void>((done) => {
+        release = done;
+      });
+      const entered = new Promise<void>((done) => {
+        started = done;
+      });
+      h.db.guildMembers = async (id) => {
+        started();
+        await waiting;
+        return members(id);
+      };
+      const delivery = h.svc[method]({ ...h.actor(1), accountId: 101 }, 'delayed message');
+      await entered;
+      h.tx.online.delete(1);
+      release();
+      expect(await delivery).toBe(true);
+      expect(h.tx.eventsFor(2)).toEqual([]);
+      expect(
+        h.tx
+          .eventsFor(3)
+          .some((event) => event.type === 'chat' && event.text === 'delayed message'),
+      ).toBe(true);
+    },
+  );
+
+  it('keeps account blocks when a guild inviter logs out during the roster read', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    h.tx.clear();
+    vi.spyOn(h.tx, 'isBlocking').mockImplementation(
+      (recipient, sender, account) =>
+        recipient === 2 && (account ?? (h.tx.online.has(sender) ? 101 : -1)) === 101,
+    );
+    const members = h.db.guildMembers.bind(h.db);
+    h.db.guildMembers = async (id) => {
+      h.tx.online.delete(1);
+      return members(id);
+    };
+    expect(await h.svc.guildInvite({ ...h.actor(1), accountId: 101 }, 'Bet')).toBe('blocked');
+    expect(h.tx.eventsFor(2)).toEqual([]);
+    await h.svc.guildAccept(h.actor(2));
+    expect(await h.db.guildMembership(2)).toBeNull();
   });
 
   it('routes guild chat only to guild members', async () => {

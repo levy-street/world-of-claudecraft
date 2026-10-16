@@ -40,8 +40,11 @@ describe('the render-side stow cache stays single-writer with mount folded into 
   });
 
   it('feeds that call the swim/mount overlay, not a second diff against the bare sim bit', () => {
+    // `mountKey` is the mount the body PRESENTS this frame (the entity's own, or the one a
+    // rider killed by a blade still sits on until the blow lands: contact_queue.ts
+    // heldUntilCollapse), so the overlay and the mount drawn can never disagree
     expect(rendererSource).toMatch(
-      /const stowed = weaponStowedOverlay\(e\.weaponStowed, swimming, e\.mountKey !== ''\)/,
+      /const stowed = weaponStowedOverlay\(e\.weaponStowed, swimming, mountKey !== ''\)/,
     );
     expect(rendererSource).not.toMatch(/if \(e\.weaponStowed !== v\.weaponStowed\)/);
   });

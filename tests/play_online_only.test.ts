@@ -55,8 +55,13 @@ describe('/play is online-only', () => {
     expect(mainTs).toContain("if (offlineBackBtn) offlineBackBtn.addEventListener('click'");
     expect(mainTs).toContain("serverTrigger?.querySelector('.server-dot')");
     // The character-preview boot probe must skip a missing #offline-select, not
-    // dereference it (and a missing panel must not be treated as the active one).
-    expect(mainTs).toContain('return panel !== null && !panel.hasAttribute(');
+    // dereference it (and a missing panel must not be treated as the active one). It lives
+    // in src/game/launcher_preview_stage.ts (activePreviewPanel, driven with a page missing
+    // the panel by tests/launcher_preview_stage.test.ts); main.ts calls it.
+    expect(read('src/game/launcher_preview_stage.ts')).toContain(
+      "if (panel && !panel.hasAttribute('hidden')) return id;",
+    );
+    expect(mainTs).toContain('const stagePanel = activePreviewPanel();');
   });
 });
 

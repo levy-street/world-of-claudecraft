@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Das Wildherzbecken',
-    desc: 'Bezeichnende Waffen von Zulgar und dem Fangfürst, Bestienmeister.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroisch: Das Wildherzbecken',
-    desc: 'Nur heroisch erhältliche Epics von Zulgar, Stimme des Beckens.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-Schlachtzug',
@@ -61,6 +59,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, der Erwachende Gipfel',
     desc: 'Persönliche epische Beute vom Weltboss des Erwachenden Gipfels.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, der Begrabene Vorarbeiter',
+    desc: 'Beute, zurückgeschleppt aus den Hügelgräbern des Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Das Eingestürzte Reliquiar',

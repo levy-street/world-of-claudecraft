@@ -11,7 +11,8 @@ import type {
 } from '../sim/types';
 import type { ActivityChoice } from '../sim/world_quest_activity';
 import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
-import type { HoardBossCueView } from '../world_api/dungeons';
+import type { DungeonRunView, HoardBossCueView } from '../world_api/dungeons';
+import { nextDungeonRun } from './dungeon_run_wire';
 import { HoardBossCueMirror } from './hoard_boss_cue_mirror';
 import { applyQuestSelfWire } from './quest_snapshot_wire';
 import { decodeVehicleSession } from './vehicle_session_wire';
@@ -34,7 +35,10 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_reroll'; quest: string }
   | { cmd: 'world_quest_weekly_choose'; quest: string }
   | { cmd: 'world_quest_weekly_commend'; faction: string }
-  | { cmd: 'clue_hunt_abandon' };
+  | { cmd: 'clue_hunt_abandon' }
+  | { cmd: 'lance_brace' }
+  | { cmd: 'lance_thrust' }
+  | { cmd: 'lance_release' };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -56,6 +60,9 @@ export class QuestWorldWireState {
   clueHunt: Readonly<{ huntId: string; step: number }> | null = null;
   /** The read treasure map mirrored from the `tmap` self key (null when none). */
   treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null = null;
+  /** The group dungeon run the player stands in, mirrored from the `dgrun`
+   *  self key (null outside one); the same object until the run changes. */
+  dungeonRun: DungeonRunView | null = null;
   /** Client clock mirror of the authoritative Buried Hoard boss telegraphs;
    *  the host feeds it every routed event (ClientWorld's event loop). */
   protected readonly hoardBossCueMirror = new HoardBossCueMirror(() => performance.now());
@@ -86,12 +93,18 @@ export class QuestWorldWireState {
 
   /** The owner-only quest family plus the world-boss and vehicle mirrors of one self record. */
   applyQuestSelfSnapshot(
-    self: Parameters<typeof applyQuestSelfWire>[1] & { wba?: unknown; vehicle?: unknown },
+    self: Parameters<typeof applyQuestSelfWire>[1] & {
+      wba?: unknown;
+      vehicle?: unknown;
+      dgrun?: unknown;
+    },
     simTime?: unknown,
   ): void {
     applyQuestSelfWire(this, self, simTime);
     if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
     if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
+    // Delta key: absent means unchanged, an explicit null means the run ended.
+    if (self.dgrun !== undefined) this.dungeonRun = nextDungeonRun(this.dungeonRun, self.dgrun);
   }
 
   enterVehicle(stationId: string): void {
@@ -207,6 +220,7 @@ export class QuestWorldWireState {
     this.weeklyQuestResetAtMs = 0;
     this.clueHunt = null;
     this.treasureMap = null;
+    this.dungeonRun = null;
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

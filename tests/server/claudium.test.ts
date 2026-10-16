@@ -783,10 +783,56 @@ describe('Claudium economy-service transport contract', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledOnce();
+    expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
+      'https://economy.example/v1/claudium/stripe/webhook',
+    );
     const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
     expect(request.headers).toMatchObject({ 'stripe-signature': 't=123,v1=signature' });
     expect(Buffer.from(request.body as Uint8Array).equals(rawBody)).toBe(true);
   });
+
+  // Membership billing has its own Stripe endpoint and signing secret on the service, so its
+  // events must reach that endpoint, not the Claudium one, and with no session (Stripe has none).
+  it.each([
+    { received: true, status: 200 },
+    { received: false, status: 400 },
+  ])(
+    'relays the membership webhook to the service membership endpoint: answers $status',
+    async ({ received, status }) => {
+      vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+      vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
+      const fetchMock = vi.fn(async (_input: string | URL | Request, _init?: RequestInit) =>
+        Promise.resolve(new Response(JSON.stringify({ received }), { status })),
+      );
+      vi.stubGlobal('fetch', fetchMock);
+      const path = '/api/claudium/membership/stripe/webhook';
+      const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
+      if (!route) throw new Error(`missing ${path}`);
+      expect(route.middleware ?? []).toHaveLength(0);
+      const rawBody = Buffer.from('{\n  "type": "invoice.paid"\n}\n');
+      const res = new FakeRes();
+
+      await route.handler(
+        fakeCtx({
+          method: 'POST',
+          url: path,
+          headers: { 'stripe-signature': 't=123,v1=membership' },
+          body: rawBody,
+          res: res as never,
+        }),
+      );
+
+      expect(res.statusCode).toBe(status);
+      expect(responseJson(res)).toEqual({ received });
+      expect(fetchMock).toHaveBeenCalledOnce();
+      expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
+        'https://economy.example/v1/claudium/membership/stripe/webhook',
+      );
+      const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
+      expect(request.headers).toMatchObject({ 'stripe-signature': 't=123,v1=membership' });
+      expect(Buffer.from(request.body as Uint8Array).equals(rawBody)).toBe(true);
+    },
+  );
 
   it('keeps accountId numeric in purchase JSON bodies', async () => {
     vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');

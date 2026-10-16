@@ -379,11 +379,15 @@ describe('Book of Deeds webp icons', () => {
     // The release's Eastbrook ferry round trip (exp_harbor_to_harbor) joins the
     // pending set on the exploration crest: 318 live, still 289 painted.
     // The Buried Hoards Coinsack catch (cmb_coinsack_caught) joins on the combat
-    // crest beside the ferry round trip: 319 live, still 289 painted.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(319);
+    // crest beside the ferry round trip: 319 live, still 289 painted. The Mirefen
+    // world-boss branch's three combat deeds append behind it: 322 live, still 289
+    // painted, 33 pending, cmb_point_taken last.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(346);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(289);
-    expect(DEED_ART_PENDING_IDS).toHaveLength(30);
-    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('exp_harbor_to_harbor');
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57 pending, Morthen's last.
+    expect(DEED_ART_PENDING_IDS).toHaveLength(57);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('dgn_morthen_candlelight');
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);

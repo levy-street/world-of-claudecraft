@@ -18,9 +18,18 @@ function heroicMobTuningFor(dungeonId: string): HeroicMobTuning | undefined {
   return HEROIC_MOB_TUNING[dungeonId] ?? HEROIC_DUNGEON_TUNING[dungeonId];
 }
 
-// Every heroic-instance mob moves at least this fast (player RUN_SPEED is 7),
-// so heroic pulls cannot be kited on foot; escapes need a sprint cooldown.
+// Every heroic-instance mob that walks moves at least this fast (player
+// RUN_SPEED is 7), so heroic pulls cannot be kited on foot; escapes need a
+// sprint cooldown.
 export const HEROIC_MIN_MOVE_SPEED = 8;
+
+/** A template's heroic move speed. The floor lifts a slow walker; a template
+ *  authored immobile (moveSpeed 0: an egg sac, a totem, a shackle, a rooted
+ *  boss) stays immobile, or the floor would set it wandering and chasing. */
+export function heroicMoveSpeed(templateMoveSpeed: number): number {
+  if (templateMoveSpeed <= 0) return templateMoveSpeed;
+  return Math.max(templateMoveSpeed, HEROIC_MIN_MOVE_SPEED);
+}
 
 export function claimDifficultyForDungeon(
   dungeonId: string,
@@ -80,7 +89,7 @@ export function mobTemplateForDungeonDifficulty(
     dmgBase: template.dmgBase * dmgMult,
     dmgPerLevel: template.dmgPerLevel * dmgMult,
     armorPerLevel: template.armorPerLevel * tuning.armorMultiplier,
-    moveSpeed: Math.max(template.moveSpeed, HEROIC_MIN_MOVE_SPEED),
+    moveSpeed: heroicMoveSpeed(template.moveSpeed),
   };
 }
 

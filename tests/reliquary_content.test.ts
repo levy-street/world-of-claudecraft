@@ -46,6 +46,7 @@ import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
   RELIQUARY_ACTIVITY_SOURCE_IDS,
+  RELIQUARY_ART_PENDING_HEROIC,
   RELIQUARY_HEROIC_GEAR,
   RELIQUARY_HORIZON_MOUNTS,
   RELIQUARY_HORIZON_TITLES,
@@ -127,6 +128,13 @@ function markRelicIds(page: ReliquaryPageDef): string[] {
 /** Mount reins are Horizons-owned; Conqueror heroic pages must not list them. */
 function isMountReinsId(itemId: string): boolean {
   return itemId.startsWith('reins_');
+}
+
+/** Buddy whistles are cosmetics, not relics: like mount reins they name a
+ *  collectible the Collections window tracks and no Reliquary page ever
+ *  catalogs, so a boss table that drops one owes the museum nothing for it. */
+function isBuddyWhistleId(itemId: string): boolean {
+  return ITEMS[itemId]?.kind === 'buddy';
 }
 
 /** `heroic_<base>` ids are auto-generated stat copies (heroic_variants.ts), not the heroic
@@ -382,11 +390,13 @@ describe('Reliquary Conqueror catalog structure', () => {
     // closeout of docs/prd/ignivar-raid-loot.md) + the Roots' Bramblehide
     // set page (the eighth epic armor family).
     // +1: conquerors_vanguard_gallery (Warfare Season 2).
-    expect(CONQUEROR_PAGES.length).toBe(34);
+    // +1: the Buried Hoards page.
+    // +1: conquerors_balgath (the Mirefen world boss).
+    expect(CONQUEROR_PAGES.length).toBe(35);
     expect(PROFESSION_PAGES.length).toBe(5);
     expect(HORIZON_PAGES.length).toBe(5);
-    // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(44);
+    // Literal: update when product adds a page (45 with the Mirefen world boss page).
+    expect(RELIQUARY_PAGES.length).toBe(45);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -471,7 +481,11 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title joins it: 445.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
     // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
-    expect(full).toEqual({ owned: 495, total: 495 });
+    // The seven Mirefen world boss relics (conquerors_balgath) plus his Craterglass
+    // Stave and five trinkets on the same page: 495 + 13 = 508.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 558.
+    // Two referral reward mounts join Horizons.
+    expect(full).toEqual({ owned: 560, total: 560 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -504,7 +518,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
-    expect(character).toEqual({ owned: 466, total: 466 });
+    // 466 + 13 with the Mirefen world boss page's relics, staff and trinkets: 479.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529.
+    expect(character).toEqual({ owned: 531, total: 531 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -568,14 +584,17 @@ describe('Reliquary Conqueror catalog structure', () => {
       // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
       // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
-    ).toBe(682);
+      // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
+      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
+    ).toBe(747); // plus two referral reward mounts
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
     // masterwrought Phase 18 gather_event:golden_harvest field note. Neither
     // branch's new content (Crucible/Forgebreaker items, Roots' Bramblehide
-    // set, the Nythraxis gap-fill drops, the two new pending mounts) is a
-    // mark, so this total is unchanged by the merge.
+    // set, the Nythraxis gap-fill drops, the two new pending mounts, the
+    // seven Mirefen world boss items) is a mark, so this total is unchanged
+    // by the merge.
     expect(
       RELIQUARY_MARK_IDS.size,
       `mark total moved; by namespace: ${[
@@ -656,7 +675,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(page.clearSource).toEqual({
       kind: 'dungeon',
       dungeonId: 'hollow_crypt',
-      difficulty: 'any',
+      difficulty: 'normal',
     });
     const relics = itemRelicIds(page);
     expect(relics).toContain('cryptbone_helm');
@@ -803,7 +822,9 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the five Crucible raid trinkets (each on its boss's Normal and
     // Heroic page, one id each): 350.
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(521);
+    // Plus the Mirefen world boss page's 13 items (seven relics, staff, five trinkets): 534.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 583.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(583);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -944,9 +965,12 @@ describe('Reliquary dungeon clear meters count every difficulty that pays the pa
     }
   });
 
-  it('the five-man and Nythraxis pages count both difficulties; the Crucible raid pages keep the Normal filter', () => {
+  it('the five-man and Nythraxis pages count both difficulties; the Crucible raid pages and the Hollow Crypt keep the Normal filter', () => {
     const byId = Object.fromEntries(dungeonPages.map((d) => [d.page.id, d.difficulty]));
-    expect(byId.conquerors_hollow_crypt).toBe('any');
+    // Morthen's four uncommon brand pieces drop on Normal alone since Heroic
+    // stopped paying uncommon gear (2026-10-09); Heroic runs count on the
+    // Heroic Hollow Crypt page instead.
+    expect(byId.conquerors_hollow_crypt).toBe('normal');
     expect(byId.conquerors_sunken_bastion).toBe('any');
     expect(byId.conquerors_drowned_temple).toBe('any');
     expect(byId.conquerors_gravewyrm_sanctum).toBe('any');
@@ -1061,11 +1085,31 @@ describe('Reliquary clear sources map to live content', () => {
 
 describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
   const HEROIC_PAGE_BY_BOSS: Record<string, string> = {
+    // The Hollow Crypt rework: four bosses, one shared heroic page.
+    sexton_marrow: 'conquerors_hollow_crypt_heroic',
+    rimeweb: 'conquerors_hollow_crypt_heroic',
+    cantor_ilvane: 'conquerors_hollow_crypt_heroic',
     morthen: 'conquerors_hollow_crypt_heroic',
+    // The Sunken Bastion rework: four bosses, one shared heroic page (the Gaol
+    // Turnkey took two of Vael's heroic epics on 2026-10-08).
+    knight_commander_olen: 'conquerors_sunken_bastion_heroic',
+    gaoler_ossick: 'conquerors_sunken_bastion_heroic',
+    gaol_turnkey: 'conquerors_sunken_bastion_heroic',
     vael_the_mistcaller: 'conquerors_sunken_bastion_heroic',
+    // The Drowned Temple rework: four bosses, one shared heroic page (the Mere
+    // Hydra's center head took two of Ysolei's heroic epics on 2026-10-08).
+    choirmother_selthe: 'conquerors_drowned_temple_heroic',
+    tideglass_colossus: 'conquerors_drowned_temple_heroic',
+    mere_hydra_head_center: 'conquerors_drowned_temple_heroic',
     ysolei: 'conquerors_drowned_temple_heroic',
     korzul_the_gravewyrm: 'conquerors_gravewyrm_sanctum_heroic',
+    // The Wildheart Basin rework: three bosses, one shared heroic page.
+    wildheart_beastmaster: 'conquerors_wildheart_basin_heroic',
+    the_gorgebloom: 'conquerors_wildheart_basin_heroic',
     wildheart_high_priest: 'conquerors_wildheart_basin_heroic',
+    // The Gravewyrm Sanctum rework: three bosses, one shared heroic page.
+    korgath_the_bound: 'conquerors_gravewyrm_sanctum_heroic',
+    grand_necromancer_velkhar: 'conquerors_gravewyrm_sanctum_heroic',
     [NYTHRAXIS_RAID_BOSS_ID]: 'conquerors_nythraxis_heroic',
     ignivar_herald_of_the_last_flame: 'conquerors_ignivar_heroic',
     varkhul_forgefather_of_the_last_flame: 'conquerors_varkhul_heroic',
@@ -1171,8 +1215,16 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     }
     // Anti-vacuity: something is actually excluded, and every id of every excluded boss is
     // a carve-out, so GEAR_BOSSES cannot silently shed a boss that still owes the catalog.
+    // Korgath and Velkhar were the last all-carve-out bosses until the
+    // Gravewyrm Sanctum rework gave each a new epic and trinket, so no whole
+    // boss drops out today; the walk still proves the filter excludes ids.
     const droppedBosses = Object.keys(HEROIC_BOSS_LOOT).filter((b) => !GEAR_BOSSES.includes(b));
-    expect(droppedBosses.length).toBeGreaterThan(0);
+    const excludesSomething = Object.values(HEROIC_BOSS_LOOT).some(
+      (entries) =>
+        catalogueableHeroicIds(entries).length <
+        new Set(entries.flatMap((e) => (typeof e.itemId === 'string' ? [e.itemId] : []))).size,
+    );
+    expect(excludesSomething).toBe(true);
     for (const bossId of droppedBosses) {
       for (const entry of HEROIC_BOSS_LOOT[bossId]) {
         if (entry.preserveSourceTier) continue;
@@ -1198,7 +1250,10 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     // dead data without this pin.
     expect(Object.keys(RELIQUARY_HEROIC_GEAR).sort()).toEqual(AUTHORED_BOSSES);
     for (const bossId of AUTHORED_BOSSES) {
-      const liveGear = catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]);
+      // New epics waiting for their art are carved out until the art pass.
+      const liveGear = catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]).filter(
+        (id) => !RELIQUARY_ART_PENDING_HEROIC.includes(id),
+      );
       const authored = [
         ...(RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR] ?? []),
       ]
@@ -1208,14 +1263,23 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     }
   });
 
-  it('each heroic page relics exactly match RELIQUARY_HEROIC_GEAR for its boss', () => {
+  it('each heroic page relics exactly match RELIQUARY_HEROIC_GEAR for its bosses', () => {
+    // A page may serve several bosses of one dungeon (the Hollow Crypt's four):
+    // it lists exactly the union of their heroic gear.
+    const byPage = new Map<string, string[]>();
     for (const [bossId, pageId] of Object.entries(HEROIC_PAGE_BY_BOSS)) {
+      byPage.set(pageId, [...(byPage.get(pageId) ?? []), bossId]);
+    }
+    for (const [pageId, bosses] of byPage) {
       const page = RELIQUARY_PAGES_BY_ID[pageId];
       expect(page, pageId).toBeDefined();
-      const gear = RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR];
-      expect(gear, bossId).toBeDefined();
-      if (!page || !gear) continue;
-      expect(itemRelicIds(page).sort()).toEqual([...gear].slice().sort());
+      const gear = bosses.flatMap((bossId) => {
+        const list = RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR];
+        expect(list, bossId).toBeDefined();
+        return [...(list ?? [])];
+      });
+      if (!page) continue;
+      expect(itemRelicIds(page).sort()).toEqual([...new Set(gear)].sort());
     }
   });
 
@@ -1413,7 +1477,9 @@ describe('Reliquary Rares of the Realm pages pin against the live rare tables', 
   function rarePlusLootIds(templateId: string): string[] {
     const out: string[] = [];
     for (const row of MOBS[templateId]?.loot ?? []) {
-      if (typeof row.itemId === 'string' && isRarePlus(row.itemId)) out.push(row.itemId);
+      if (typeof row.itemId !== 'string' || !isRarePlus(row.itemId)) continue;
+      if (isBuddyWhistleId(row.itemId)) continue; // a cosmetic, never a relic
+      out.push(row.itemId);
     }
     return out;
   }
@@ -1610,7 +1676,10 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     // order.
     expect(FURY_NPC_ID).toBe('fury');
     for (const npcId of ['fury', 'warmarshal_draven_kole']) {
-      const stock = new Set(NPCS[npcId]?.vendorItems ?? []);
+      // The shared companion whistle is excluded from the gear collection.
+      const stock = new Set(
+        (NPCS[npcId]?.vendorItems ?? []).filter((id) => ITEMS[id]?.kind !== 'buddy'),
+      );
       expect(stock.size, npcId).toBe(HONOR_QUARTERMASTER_STOCK.length);
       for (const id of HONOR_QUARTERMASTER_STOCK) {
         expect(stock.has(id), `${npcId} sells ${id}`).toBe(true);
@@ -1885,9 +1954,11 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
 const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   sunken_bastion: { pageId: 'conquerors_sunken_bastion', floor: 8 },
   drowned_temple: { pageId: 'conquerors_drowned_temple', floor: 5 },
-  gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 32 },
-  wildheart_basin: { pageId: 'conquerors_wildheart_basin', floor: 4 },
-  nythraxis_boss_arena: { pageId: 'conquerors_nythraxis', floor: 16 },
+  // Sanctum and Basin grew by the relocated Nythraxis raid pieces (9 and 10,
+  // content/nythraxis_loot.ts); the raid page shrank by the same nineteen.
+  gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 41 },
+  wildheart_basin: { pageId: 'conquerors_wildheart_basin', floor: 14 },
+  nythraxis_boss_arena: { pageId: 'conquerors_nythraxis', floor: 11 },
   // The Crucible raid rooms (per-boss pages). The derivation excludes the
   // sigil redemption tokens by kind; the token-liveness arm below proves the
   // filter excludes something real.
@@ -2079,6 +2150,7 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     const page = RELIQUARY_PAGES_BY_ID.conquerors_drowned_temple;
     expect(page.desc).toBeDefined();
     expect(page.desc).toContain(MOBS.choirmother_selthe.name);
+    expect(page.desc).toContain(MOBS.tideglass_colossus.name);
     expect(page.desc).toContain(MOBS.ysolei.name);
   });
 
@@ -2090,11 +2162,25 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     // alone, "Nythraxis" on the heroic page) are not pinnable against MOBS
     // and stay curated prose.
     const DESC_BOSSES: Record<string, string[]> = {
-      conquerors_sunken_bastion: ['vael_the_mistcaller'],
-      conquerors_sunken_bastion_heroic: ['vael_the_mistcaller'],
+      // The Bastion rework's fog shades wear Vael's own name (the veil hides
+      // him among them), so a desc naming him names them too.
+      conquerors_sunken_bastion: ['gaoler_ossick', 'vael_the_mistcaller', 'vael_fog_shade'],
+      conquerors_sunken_bastion_heroic: ['gaoler_ossick', 'vael_the_mistcaller', 'vael_fog_shade'],
+      // The Drowned Temple heroic page names its first two bosses in full and
+      // Ysolei by her short form.
+      conquerors_drowned_temple_heroic: ['choirmother_selthe', 'tideglass_colossus'],
       conquerors_gravewyrm_sanctum: ['korzul_the_gravewyrm'],
-      conquerors_gravewyrm_sanctum_heroic: ['korzul_the_gravewyrm'],
-      conquerors_wildheart_basin_heroic: ['wildheart_high_priest'],
+      // The Gravewyrm Sanctum heroic page names all three bosses in full.
+      conquerors_gravewyrm_sanctum_heroic: [
+        'korgath_the_bound',
+        'grand_necromancer_velkhar',
+        'korzul_the_gravewyrm',
+      ],
+      // The Wildheart Basin pages name the Fanglord Beastmaster in full (and
+      // Zulgar in full on the heroic page); "the Gorgebloom" is the lower-case
+      // running form of "The Gorgebloom".
+      conquerors_wildheart_basin: ['wildheart_beastmaster'],
+      conquerors_wildheart_basin_heroic: ['wildheart_beastmaster', 'wildheart_high_priest'],
       conquerors_hollow_crypt_heroic: ['morthen'],
       conquerors_nythraxis: ['nythraxis_scourge_of_thornpeak'],
       conquerors_ignivar: ['ignivar_herald_of_the_last_flame'],
@@ -2122,7 +2208,7 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       if (named.length > 0) derivedPairs[page.id] = named;
     }
     const expected: Record<string, string[]> = {
-      conquerors_drowned_temple: ['choirmother_selthe', 'ysolei'],
+      conquerors_drowned_temple: ['choirmother_selthe', 'tideglass_colossus', 'ysolei'],
       ...Object.fromEntries(
         Object.entries(DESC_BOSSES).map(([pageId, mobIds]) => [pageId, [...mobIds].sort()]),
       ),
@@ -2139,7 +2225,14 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     const derived = dungeonRarePlusLootIds('hollow_crypt');
     // Literal: update when catalog content lands (snug vacuity floor).
     expect(derived.length).toBeGreaterThanOrEqual(1);
-    expect(pageIds.filter((id) => isRarePlus(id)).sort()).toEqual(derived);
+    // The rework's three new rare chase rows join the page with their painted
+    // art (a relic cell needs committed dark-card art); until then they are
+    // the only derived rare+ ids the page leaves out.
+    const ART_PENDING_RARES = ['cantors_hymnal', 'rimeweb_fang', 'sextons_spadehaft'];
+    for (const id of ART_PENDING_RARES) expect(derived, id).toContain(id);
+    expect(pageIds.filter((id) => isRarePlus(id)).sort()).toEqual(
+      derived.filter((id) => !ART_PENDING_RARES.includes(id)),
+    );
     const CURATED_UNCOMMON = [
       'cryptbone_greaves',
       'cryptbone_helm',
@@ -2210,6 +2303,7 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
     // pages; a NEW worldBoss: true mob reds here until it is paged and mapped.
     const WORLD_BOSS_PAGES: Record<string, string> = {
       thunzharr_waking_peak: 'conquerors_thunzharr',
+      balgath_cyclops: 'conquerors_balgath',
     };
     const bossIds = Object.values(MOBS)
       .filter((m) => m.worldBoss === true)
@@ -2842,6 +2936,7 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // (at the tier the map buys, each tier discovering its piece through
   // ItemDef.relicOf) when an entrant opens a hoard's reward chest.
   buried_hoard: HOARD_BASE_ITEM_IDS,
+  referral_cards: ['reins_referral_raptor', 'reins_referral_tank'],
 };
 
 /**
@@ -3023,7 +3118,10 @@ function judgeSlotRoutes(
   for (const rank of ROUTE_MAPS.riftRanksByItem.get(awardId) ?? []) {
     judge('riftReins', `riftReins:${rank}`, names('rift', rank));
   }
-  if (relicKind === 'weapon_skin' && ROUTE_MAPS.storeSkinIds.has(slotId)) {
+  if (
+    (relicKind === 'weapon_skin' && ROUTE_MAPS.storeSkinIds.has(slotId)) ||
+    (relicKind === 'mount' && slotId === 'terrorspark_groundshaker')
+  ) {
     judge('store', `store:${RELIQUARY_STORE_SOURCE_ID}`, names('store', RELIQUARY_STORE_SOURCE_ID));
   }
   for (const activityId of ROUTE_MAPS.activitiesBySlot.get(slotId) ?? []) {
@@ -3051,22 +3149,25 @@ const RELIC_SLOTS = RELIQUARY_PAGES.flatMap((page) =>
  * row here in the same change.
  */
 const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
-  // The five gaps are CONTENT gaps, not vocabulary gaps: no live table awards
+  // The two gaps are CONTENT gaps, not vocabulary gaps: no live table awards
   // any of them, so there is no door to name. Every other slot the catalog
   // used to leave pending turned out to be a several-doors slot rather than a
   // no-answer slot, and Phase 13b authored all of them (a relic lists every
   // comparable route it really has).
   //
-  // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
-  // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
-  // slot stays listed and sourceless until the mount gets a route.
-  // terrorspark_groundshaker and lanternback_troll: DEVELOPER_MOUNTS,
-  // dev-grant only, deliberately absent from
-  // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
-  // def comments in content/mounts.ts).
+  // drakemaw_raptor LEFT this list on 2026-08-25: the reins now ride the
+  // Mirefen world boss's table (content/zone2.ts, the "dedicated world boss"
+  // the 2026-08-04 owner call held them back for), so its Horizons slot names
+  // that door (MOUNT_SOURCES in content/reliquary.ts).
+  // terrorspark_groundshaker left this list when the annual membership
+  // bundle began granting its soulbound reins through the WOC Store.
+  // lanternback_troll: DEVELOPER_MOUNTS, dev-grant only, deliberately absent
+  // from vendors, quests, mob loot, heroic loot, and the rift reins pools (see
+  // the def comments in content/mounts.ts).
   // avian_strider left this list when the Rift Watch quartermaster's Champion
-  // row gave it a route (content/faction_vendors.ts; MOUNT_SOURCES hints it).
-  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll', 'terrorspark_groundshaker'],
+  // row gave it a route (content/faction_vendors.ts), and drakemaw_raptor when
+  // Balgath's table did (MOUNT_SOURCES hints both).
+  horizons_mounts: ['lanternback_troll'],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -3137,18 +3238,25 @@ function slotKey(pageId: string, slotId: string): string {
  *  even while every surviving hint still validates. Update deliberately with
  *  the authoring, the same regime as the totals pins above. */
 const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
-  conquerors_hollow_crypt: 1,
-  conquerors_hollow_crypt_heroic: 1,
-  conquerors_sunken_bastion: 2,
-  conquerors_sunken_bastion_heroic: 1,
-  conquerors_drowned_temple: 2,
-  conquerors_drowned_temple_heroic: 1,
+  // Four since every Crypt boss's blue roll joined the page (2026-10-08).
+  conquerors_hollow_crypt: 4,
+  // The Hollow Crypt rework: four bosses pay the heroic page.
+  conquerors_hollow_crypt_heroic: 4,
+  // Four since the Gaol Turnkey's blue roll joined the page (2026-10-08).
+  conquerors_sunken_bastion: 4,
+  conquerors_sunken_bastion_heroic: 4,
+  // Four since the Mere Hydra's blue roll joined the page (2026-10-08).
+  conquerors_drowned_temple: 4,
+  conquerors_drowned_temple_heroic: 4,
   // NINE since Masterwrought phase 11l: the trophy recipe route added
   // fromProfession('leatherworking') beside the quiver's korzul hint.
   conquerors_gravewyrm_sanctum: 9,
-  conquerors_gravewyrm_sanctum_heroic: 1,
-  conquerors_wildheart_basin: 2,
-  conquerors_wildheart_basin_heroic: 1,
+  // The Gravewyrm Sanctum rework: all three bosses pay the heroic page.
+  conquerors_gravewyrm_sanctum_heroic: 3,
+  // The Wildheart Basin rework: the Gorgebloom's staff joins the normal page;
+  // all three bosses pay the heroic page.
+  conquerors_wildheart_basin: 3,
+  conquerors_wildheart_basin_heroic: 3,
   conquerors_nythraxis: 1,
   conquerors_nythraxis_heroic: 1,
   // The Crucible raid pages: each room's one boss drops every relic, so all
@@ -3158,6 +3266,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_varkhul: 1,
   conquerors_varkhul_heroic: 1,
   conquerors_thunzharr: 1,
+  // One door: everything on his page comes off the boss himself.
+  conquerors_balgath: 1,
   conquerors_collapsed_reliquary: 2,
   conquerors_drowned_litany: 2,
   conquerors_set_deathlord: 4,
@@ -3167,8 +3277,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_set_nighttalon: 2,
   conquerors_set_soulflame: 2,
   conquerors_set_stormcallers: 2,
-  // Roots' Bramblehide: the whole family drops from the one raid boss.
-  conquerors_set_bramblehide: 1,
+  // Roots' Bramblehide: three since the family moved off the raid boss onto
+  // the three Wildheart Basin bosses (2026-10-08).
+  conquerors_set_bramblehide: 3,
   // 8 = activity (masterworkFirst) + the seven gear-capable craft
   // professions (engineering hinted since masterwrought Phase 11o un-pended
   // it; the count read 7 while its mark rode SOURCE_PENDING_RULING
@@ -3184,19 +3295,20 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   professions_specimens: 7,
   professions_crucible: 3,
   professions_forgebreaker: 1,
-  // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
-  // pending-ruling absences resolve to nothing. The storefront door left with
-  // the Mech Bird: a paid mount is a mount SKIN now, never a relic.
-  // 11 with the Rift Watch quartermaster's door: the Viridian Valestrider's
-  // Champion-standing reins (content/faction_vendors.ts).
-  horizons_mounts: 11,
+  // 13 = the four heroic bosses + the raid + Marla + rift A/B/S + the Mirefen
+  // world boss, whose reins joined his table, + the Rift Watch quartermaster
+  // (the Viridian Valestrider's Champion reins, content/faction_vendors.ts) +
+  // the WOC Store's annual membership tank reward; the one pending-ruling
+  // absence resolves to nothing.
+  horizons_mounts: 14, // plus the referral-card reward activity
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
   // Crucible raid's flawless title + the three faction standing Champion
-  // titles + the Clue Scroll Treasure Hunter title.
-  horizons_titles: 49,
+  // titles + the Clue Scroll Treasure Hunter title + the Drowned Temple lore
+  // guide's Witness of the Choir.
+  horizons_titles: 50,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.
@@ -3229,7 +3341,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
  *  default could never be right for them. Named literally (not derived from the
  *  authoring) so under-authoring one of them cannot quietly pass. */
 const KNOWN_MULTI_SOURCE_PAGES = [
-  // The four dungeons whose relics span two or more of their own bosses.
+  // The dungeons whose relics span two or more of their own bosses.
+  'conquerors_hollow_crypt_heroic',
   'conquerors_sunken_bastion',
   'conquerors_drowned_temple',
   'conquerors_gravewyrm_sanctum',
@@ -3838,6 +3951,7 @@ describe('Reliquary source hints resolve against live content', () => {
       'masterwork_craft',
       'rift_first_clear',
       'buried_hoard',
+      'referral_cards',
     ]);
   });
 
@@ -3868,21 +3982,23 @@ describe('Reliquary source hints resolve against live content', () => {
     expect(Object.values(QUESTS.q_riding_lessons.itemRewards ?? {})).toEqual([]);
   });
 
-  it('every store hint sits on a live Armory skin and names the one storefront', () => {
-    // The storefront is an id space of exactly one, so the truth standard is
-    // the SLOT: only an account weapon skin is granted this way
-    // (grantWeaponSkinsToAccount), and it must be a live WEAPON_SKINS id.
+  it('every store hint names a live Armory skin or the annual membership mount', () => {
+    // Store cosmetics are live WEAPON_SKINS ids. The annual membership's
+    // fixed tank reins are the sole paid mount-item exception.
     const offenders: string[] = [];
     let checked = 0;
     for (const { page, relic, slotId } of RELIC_SLOTS) {
       for (const hint of reliquaryRelicSource(page, relic)) {
         if (hint.sourceKind !== 'store') continue;
         checked += 1;
-        if (relic.kind !== 'weapon_skin') {
-          // The store's other cosmetic family, the mount SKINS
-          // (content/mount_skins.ts), are account cosmetics and never relics:
-          // a mount slot with a store hint would be a mount item sold for
-          // money, which no longer exists.
+        if (relic.kind === 'mount' && slotId === 'terrorspark_groundshaker') {
+          expect(ITEMS.reins_terrorspark_groundshaker).toMatchObject({
+            kind: 'mount',
+            mount: slotId,
+            soulbound: true,
+          });
+        } else if (relic.kind !== 'weapon_skin') {
+          // Other mount skins are account cosmetics, never mount-item relics.
           offenders.push(`${page.id}:${slotId} is a ${relic.kind} slot with a store hint`);
         } else if (!Object.hasOwn(WEAPON_SKINS, slotId)) {
           offenders.push(`${page.id}:${slotId} is not a live Armory skin`);
@@ -3938,6 +4054,7 @@ describe('Reliquary source hints resolve against live content', () => {
     // literally (interaction.ts and professions/crafting.ts respectively).
     expect(bySlotKind.get('corpse_harvest:mark')).toEqual(['gather_event:perfect_specimen']);
     expect(bySlotKind.get('masterwork_craft:mark')).toEqual(['masterwork:first']);
+    expect(bySlotKind.get('referral_cards:mount')).toEqual(['referral_raptor', 'referral_tank']);
     // The rift first-clear ITEM slots are EXACTLY the live Riftbound band
     // array, the same bidirectional regime as the corpse-harvest specimens
     // above. The array itself is bound to the independent mint literals by
@@ -4152,7 +4269,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the three mounts content awards no route at all', () => {
+  it('the surviving pending rows are the two mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -4160,13 +4277,10 @@ describe('Reliquary source hint coverage', () => {
     // hand-listed set of CONTENT gaps, and hand-listing is the point: a new
     // mount must now be authored or deliberately added here, never auto-enrol.
     // (masterwork:engineering was a row here too until masterwrought Phase
-    // 11o's stats-bearing ocular un-pended it; see the pending-table comment.)
+    // 11o's stats-bearing ocular un-pended it; see the pending-table comment.
+    // drakemaw_raptor left it when the Mirefen world boss took its reins.)
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
-    expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
-      'drakemaw_raptor',
-      'lanternback_troll',
-      'terrorspark_groundshaker',
-    ]);
+    expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual(['lanternback_troll']);
     // All are still live catalog slots, so the exclusion cannot outlive them.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
       expect(RELIQUARY_HORIZON_MOUNTS, mountId).toContain(mountId);
@@ -4559,7 +4673,7 @@ describe('Reliquary source hint coverage', () => {
     expect(delveOnly.counts.vendor).toBeGreaterThanOrEqual(1);
   });
 
-  it('the five pending mounts really have ZERO live award routes (the row is justified)', () => {
+  it('the two pending mounts really have ZERO live award routes (the row is justified)', () => {
     // The surviving SOURCE_PENDING_RULING row's whole claim is "no live table
     // awards any pending mount", and the acknowledgment sweep can never check it
     // (it short-circuits on un-hinted relics). This is the inverse sweep: the
@@ -4706,10 +4820,12 @@ describe('Reliquary source hint coverage', () => {
         'mark x activity',
         'mark x boss',
         'mark x zone',
-        // mount: heroic tables, Marla's counter, the rift reins ladder.
+        // mount: heroic tables, vendors, the rift ladder and the annual bundle.
+        'mount x activity',
         'mount x boss',
         'mount x vendor',
         'mount x rift',
+        'mount x store',
         // weapon_skin: the account storefront, page-wide.
         'weapon_skin x store',
         // title: the deed that grants it, always.
@@ -4730,11 +4846,13 @@ describe('Reliquary source hint coverage', () => {
       if (inherited === 0) offenders.push(`${page.id} defaults but every relic owns a hint`);
     }
     expect(offenders).toEqual([]);
-    // All fifteen defaults are live today (nine boss pages, the storefront
-    // on the skins page, the four Crucible raid pages, and Forgebreaker's
-    // one Weaponcrafting door); update
+    // All ten defaults are live today (the boss pages that keep one, the Mirefen world
+    // boss page, the storefront on the skins page, the four Crucible raid pages, and
+    // Forgebreaker's one Weaponcrafting door); update
     // deliberately with the authoring.
-    expect(defaults).toBe(15);
+    // The Mirefen world boss page adds one default (16); the five-dungeon rework's
+    // heroic pages and the Hollow Crypt normal page drop six (PR 4352): 10.
+    expect(defaults).toBe(10);
   });
 });
 
@@ -4752,8 +4870,11 @@ describe('reliquaryRelicSource precedence', () => {
       { sourceKind: 'boss', sourceId: 'korzul_the_gravewyrm' },
     ]);
     // A relic hint WINS over a page default that disagrees.
-    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt;
-    expect(defaulted.sourceDefault).toEqual({ sourceKind: 'boss', sourceId: 'morthen' });
+    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_thunzharr;
+    expect(defaulted.sourceDefault).toEqual({
+      sourceKind: 'boss',
+      sourceId: 'thunzharr_waking_peak',
+    });
     expect(
       reliquaryRelicSource(defaulted, {
         kind: 'item',
@@ -4781,8 +4902,11 @@ describe('reliquaryRelicSource precedence', () => {
     // The precedence rule multi-hint made possible to get wrong: a resolver
     // that concatenated instead of replacing would quietly append a door the
     // authoring left out, and every count pin in this file would still pass.
-    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt;
-    expect(defaulted.sourceDefault).toEqual({ sourceKind: 'boss', sourceId: 'morthen' });
+    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_thunzharr;
+    expect(defaulted.sourceDefault).toEqual({
+      sourceKind: 'boss',
+      sourceId: 'thunzharr_waking_peak',
+    });
     const answered = reliquaryRelicSource(defaulted, {
       kind: 'item',
       itemId: 'cryptbone_helm',
@@ -4795,13 +4919,13 @@ describe('reliquaryRelicSource precedence', () => {
       { sourceKind: 'boss', sourceId: 'ysolei' },
       { sourceKind: 'vendor', sourceId: 'brother_halven' },
     ]);
-    expect(answered.some((h) => h.sourceId === 'morthen')).toBe(false);
+    expect(answered.some((h) => h.sourceId === 'thunzharr_waking_peak')).toBe(false);
   });
 
   it('falls back to the page default as a one-element list, then to the empty list', () => {
     const bare: ReliquaryRelicDef = { kind: 'item', itemId: 'cryptbone_helm' };
-    expect(reliquaryRelicSource(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt, bare)).toEqual([
-      { sourceKind: 'boss', sourceId: 'morthen' },
+    expect(reliquaryRelicSource(RELIQUARY_PAGES_BY_ID.conquerors_thunzharr, bare)).toEqual([
+      { sourceKind: 'boss', sourceId: 'thunzharr_waking_peak' },
     ]);
     // A page with no default answers the empty list for an un-hinted relic.
     // That IS the answer ("content names no source"), not a missing value.
@@ -4822,7 +4946,7 @@ describe('reliquaryRelicSource precedence', () => {
     // page reusing a live catalog id must answer with its OWN default; an
     // id-keyed lookup would silently hand back the live row's boss instead.
     const shadow: ReliquaryPageDef = {
-      id: 'conquerors_hollow_crypt',
+      id: 'conquerors_thunzharr',
       shelf: 'conquerors',
       name: 'Synthetic shadow of a live page id',
       sourceDefault: { sourceKind: 'zone', sourceId: 'synthetic_zone' },
@@ -4832,7 +4956,7 @@ describe('reliquaryRelicSource precedence', () => {
     // source, so this test cannot pass by the two happening to agree.
     expect(RELIQUARY_PAGES_BY_ID[shadow.id].sourceDefault).toEqual({
       sourceKind: 'boss',
-      sourceId: 'morthen',
+      sourceId: 'thunzharr_waking_peak',
     });
     expect(reliquaryRelicSource(shadow, shadow.relics[0])).toEqual([
       { sourceKind: 'zone', sourceId: 'synthetic_zone' },

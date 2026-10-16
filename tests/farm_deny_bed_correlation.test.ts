@@ -260,6 +260,10 @@ describe('every plantCrop deny arm carries the bed it was asked about', () => {
 const FARMING_SRC = resolve(process.cwd(), 'src/sim/professions/farming.ts');
 const PLANT_CROP_OPENER = 'export function plantCrop(';
 
+// The bed lookup line the injection arms anchor on (plantCrop's first
+// statement after the busy gate; a Studio map's moved bed resolves through it).
+const BED_LOOKUP_LINE = '  const bed = farmBedFor(ctx.objectMoves, farmBedById(bedId));';
+
 function farmingSource(): string {
   return readFileSync(FARMING_SRC, 'utf8');
 }
@@ -335,12 +339,12 @@ describe('the deny-reason extractor behind that floor', () => {
     // source text (never the file), so the extractor is proven against the
     // shape it actually has to read.
     const injected = farmingSource().replace(
-      '  const bed = farmBedById(bedId);',
+      BED_LOOKUP_LINE,
       "  if (bedId === 'scratch_only') {\n" +
         "    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'scratch_only', cropId });\n" +
         '    return;\n' +
         '  }\n' +
-        '  const bed = farmBedById(bedId);',
+        BED_LOOKUP_LINE,
     );
     expect(injected).not.toBe(farmingSource());
     expect(plantDenyReasonsIn(injected).has('scratch_only')).toBe(true);
@@ -350,13 +354,13 @@ describe('the deny-reason extractor behind that floor', () => {
     // A reason routed through anything else (a helper, a differently named
     // variable) must fail loudly rather than shrink the set in silence.
     const injected = farmingSource().replace(
-      '  const bed = farmBedById(bedId);',
+      BED_LOOKUP_LINE,
       "  if (bedId === 'scratch_only') {\n" +
         '    const why = pickReason();\n' +
         "    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: why, cropId });\n" +
         '    return;\n' +
         '  }\n' +
-        '  const bed = farmBedById(bedId);',
+        BED_LOOKUP_LINE,
     );
     expect(() => plantDenyReasonsIn(injected)).toThrow(/teach this extractor/);
   });
@@ -366,12 +370,12 @@ describe('the deny-reason extractor behind that floor', () => {
     // was blind: this arm adds NO new reason word, so the reason-set floor
     // sees nothing at all. Injected into the REAL source text, never the file.
     const injected = farmingSource().replace(
-      '  const bed = farmBedById(bedId);',
+      BED_LOOKUP_LINE,
       "  if (bedId === 'scratch_only') {\n" +
         "    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'locked' });\n" +
         '    return;\n' +
         '  }\n' +
-        '  const bed = farmBedById(bedId);',
+        BED_LOOKUP_LINE,
     );
     expect(injected).not.toBe(farmingSource());
     // Unchanged reason set: the old floor's whole input.
@@ -385,9 +389,8 @@ describe('the deny-reason extractor behind that floor', () => {
 
   it('never reads a reason out of a COMMENT', () => {
     const injected = farmingSource().replace(
-      '  const bed = farmBedById(bedId);',
-      "  // a future arm will emit reason: 'commented_only' here\n" +
-        '  const bed = farmBedById(bedId);',
+      BED_LOOKUP_LINE,
+      "  // a future arm will emit reason: 'commented_only' here\n" + BED_LOOKUP_LINE,
     );
     expect(plantDenyReasonsIn(injected).has('commented_only')).toBe(false);
   });

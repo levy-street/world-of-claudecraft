@@ -4120,6 +4120,16 @@
   body.mobile-touch #quest-tracker {
     display: none;
   }
+  /* The dungeon objectives tracker follows it for the same reason, and harder:
+     its seat at the top of this stack sits directly on the action ring on a
+     landscape phone, and a plate there would cover buttons a player fights
+     with. On touch the run is a PAGE of #quest-strip instead (the dungeon as
+     the title, each boss a counted line: dungeonStripQuest in
+     src/ui/hud/dungeon/dungeon_tracker_view.ts), so nothing is lost and the
+     stack keeps its phone footprint. */
+  body.mobile-touch #dungeon-tracker {
+    display: none;
+  }
   body.mobile-touch #meters-window {
     position: fixed;
     left: calc(max(18px, env(safe-area-inset-left)) + 132px);
@@ -7470,6 +7480,21 @@
       min-height: 40px;
     }
   }
+  body.mobile-touch #collections-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
   body.mobile-touch #reliquary-window {
     position: fixed;
     left: max(10px, env(safe-area-inset-left));
@@ -10243,5 +10268,19 @@
   }
   body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-detail {
     font-size: 16px;
+  }
+  body.mobile-touch #courier-window {
+    left: 8px;
+    right: 8px;
+    top: max(8px, env(safe-area-inset-top));
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    transform: none;
+  }
+  @media (max-width: 500px) {
+    body.mobile-touch #courier-window .courier-columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 }

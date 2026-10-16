@@ -1153,8 +1153,15 @@ export class MapSemanticAccessibilityCore {
         'literal',
         ally.name,
       );
-    for (const poi of model.pois)
-      this.add(poi.mx, poi.my, 'pointOfInterest', 'poi', poi.zoneId, poi.poiIndex);
+    for (const poi of model.pois) {
+      // An authored named area (poiIndex -1) has no positional catalog key: its
+      // maker-typed label is the name, read verbatim like a party member's.
+      if (poi.poiIndex < 0 && poi.label !== undefined) {
+        this.add(poi.mx, poi.my, 'pointOfInterest', 'literal', poi.label);
+      } else {
+        this.add(poi.mx, poi.my, 'pointOfInterest', 'poi', poi.zoneId, poi.poiIndex);
+      }
+    }
     return this.finish();
   }
 

@@ -1959,4 +1959,76 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const awarded = alice?.inventory.find((slot) => slot.itemId === 'sigil_anvil_helmet');
     expect(awarded?.instance?.partyTrade?.eligibleIds).toEqual([101, 102]);
   });
+
+  it('mob_cast_sight_route: a caster with no line of sight plans a way round, walks it and casts, twice; a windup and a bar whose target hides both fail', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'mob_cast_sight_route')!);
+    type Leg = { plans: number; sparks: number; blind: number; sees: boolean };
+    const first = rec.notes.first as Leg;
+    const second = rec.notes.second as Leg;
+    // Both legs really begin with the monument between the pair, so the
+    // route below is a route round something and not a straight walk.
+    expect(rec.notes.hiddenAtStart).toBe(true);
+    expect(rec.notes.hiddenAgain).toBe(true);
+    for (const leg of [first, second]) {
+      // The search ran, the caster ended in sight of its target, and its
+      // Spark landed from there.
+      expect(leg.plans).toBeGreaterThan(0);
+      expect(leg.sees).toBe(true);
+      expect(leg.sparks).toBeGreaterThan(0);
+      // THE RULE: no Spark landed on a tick that began with the target hidden.
+      expect(leg.blind).toBe(0);
+    }
+    // The route record the golden samples is the Adept's own.
+    const adept = rec.sim.entities.get(rec.notes.adeptId as number);
+    expect(adept?.chaseRoute?.targetId).toBe(rec.notes.pid);
+
+    // THE WINDUP THAT FAILS: committed, its target hidden before the release
+    // tick, run out, nothing landed, and the committed state cleared.
+    expect(rec.notes.windup).toEqual({
+      committed: true,
+      hidden: true,
+      ranOut: true,
+      landed: 0,
+      // No projectile left its hand. That cue is the first thing a resolving
+      // cast does, before its resist roll and its damage roll, so "none
+      // thrown" is "nothing drawn by the cast". (A raw draw count across these
+      // ticks cannot say it here: the world's idle mobs draw their wander
+      // every tick. The unit suite, tests/mob_cast_line_of_sight.test.ts,
+      // observes the stream itself at zero draws, and this scenario's golden
+      // pins the whole draw order, so a failed cast that began to roll turns
+      // the gate red.)
+      thrown: 0,
+      cleared: true,
+    });
+    // The window really crossed the release tick, and the frames either side
+    // of it are in the golden.
+    const frame = (label: string) => {
+      const f = trace.frames.find((fr) => fr.label === label);
+      if (!f) throw new Error(`no frame ${label}`);
+      return f;
+    };
+    expect(frame('windup-fizzled').tick).toBeGreaterThan(frame('windup-target-hides').tick);
+    expect(frame('bar-fizzled').tick).toBeGreaterThan(frame('bar-target-hides').tick);
+
+    // THE BAR THAT FAILS: a Grave Bolt begun at the player, who hid while it
+    // ran; it ran its length, nothing landed, and it was handed back to be
+    // begun again within the sight retry (never put on its nine second cooldown).
+    const bar = rec.notes.bar as {
+      begun: boolean;
+      victim: number | null;
+      hidden: boolean;
+      ended: boolean;
+      ranItsLength: number;
+      landed: number;
+      timer: number | null;
+    };
+    expect(bar.begun).toBe(true);
+    expect(bar.victim).toBe(rec.notes.pid);
+    expect(bar.hidden).toBe(true);
+    expect(bar.ended).toBe(true);
+    expect(bar.ranItsLength).toBeGreaterThan(20);
+    expect(bar.landed).toBe(0);
+    expect(bar.timer).not.toBeNull();
+    expect(bar.timer as number).toBeLessThanOrEqual(1);
+  });
 });

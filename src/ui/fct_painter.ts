@@ -76,7 +76,15 @@
 //    drops the queue and detaches the live nodes for a host that tears its painter
 //    down (the tests, a future HUD teardown); the live HUD keeps one painter for the
 //    page's life and never calls it.
-// Only the FCT number is staged. Nothing a player reacts to (target HP, nameplates, cast
+// CONTACT STAGING (2026-09-28): every melee swing is staged the same way. A swing's one-shot
+// starts on its damage event and its blade lands a clip-authored beat later (ClipMap.contacts),
+// so the renderer records that beat per event (contact_queue.ts) and stagedShape() holds the
+// number until the later of the two stagings.
+// ONE BEAT PER STRIKE: a strike can float a second thing beside its number (its "Absorbed N",
+// spawned first). That floater is spawned WITH its strike (spawn's third argument) and held to
+// the same beat; the stager counts strikes, not floaters, so the delay is resolved once there
+// and the strike's own stagedShape() takes that answer instead of the next ordinal.
+// Only FCT is staged. Nothing a player reacts to (target HP, nameplates, cast
 // bars, the combat log line) is delayed by any of this.
 //
 // ACCESSIBILITY: FCT divs are decorative transient text (not focusable,
@@ -205,6 +213,11 @@ export class FctPainter {
   // The per-frame strike-ordinal tracker, fed the ONE authored beat table (src/game
   // owns it; the pure core takes it injected so it stays game-layer-free).
   private readonly beats = new FctBeatStager(FURY_AUDIO.red_harvest.times);
+  private readonly contactDelaySec: ((strike: FctBeatStrike) => number) | null;
+  // The strike a floater was last spawned WITH, and the delay resolved for it there: that
+  // strike's own stagedShape(), staged next, takes this beat (ONE BEAT PER STRIKE above).
+  private pairedStrike: FctBeatStrike | null = null;
+  private pairedDelaySec = 0;
   private readonly random: () => number;
   // The pre-allocated pool size. On the full tiers this is also the live cap, so eviction
   // fires only at pool-full (the pre-tiering behavior); on low fctMaxConcurrent caps the
@@ -226,6 +239,9 @@ export class FctPainter {
       doc?: Document;
       random?: () => number;
       getFxTier?: () => UiEffectsTier;
+      /** Seconds a damage number waits for its swing's blade contact (renderer
+       *  contact_queue.ts); absent = no contact staging. */
+      contactDelaySec?: (strike: FctBeatStrike) => number;
     } = {},
   ) {
     const {
@@ -237,6 +253,7 @@ export class FctPainter {
       // test) is untiered (byte-faithful to the pre-tiering behavior).
       getFxTier = () => 'ultra' as UiEffectsTier,
     } = opts;
+    this.contactDelaySec = opts.contactDelaySec ?? null;
     this.cap = cap;
     this.getFxTier = getFxTier;
     // Math.random for the horizontal jitter is allowed on the PAINTER (not the pure core);
@@ -274,10 +291,21 @@ export class FctPainter {
    * strike of the same cast still lands on its own beat rather than sliding forward.
    */
   stagedShape(strike: FctBeatStrike, now: number, src: FctSpawnSource): FctSpawnShape | null {
-    const delaySec = this.beats.delaySec(strike, now);
+    // a floater already spawned with this strike resolved its beat: the number shares it.
+    // The pairing is for the next shape staged and no later (the hud stages a strike's
+    // number right after its paired floater), so it is cleared whatever this one is for.
+    const paired = strike === this.pairedStrike;
+    const delaySec = paired ? this.pairedDelaySec : this.strikeDelaySec(strike, now);
+    this.pairedStrike = null;
     const shape = fctSpawnShape(src);
     if (shape === null || delaySec <= 0) return shape;
     return { ...shape, delaySec };
+  }
+
+  /** Seconds a strike's floaters wait: an authored beat (Red Harvest) or the swing's blade
+   *  contact, whichever is later. Consumes the strike's beat ordinal: ask once per strike. */
+  private strikeDelaySec(strike: FctBeatStrike, now: number): number {
+    return Math.max(this.beats.delaySec(strike, now), this.contactDelaySec?.(strike) ?? 0);
   }
 
   /**
@@ -285,9 +313,19 @@ export class FctPainter {
    * `delaySec` (an authored contact beat: see BEAT STAGING above). A held entry claims no
    * node and is not described or projected until it is released, so the number appears over
    * where the unit is AT CONTACT rather than where it stood on the cast tick.
+   *
+   * `strike` is the damage occasion a floater reports beside that strike's own number (its
+   * "Absorbed N"): it is held to the strike's beat, so the two land together with the blade.
+   * Spawn it BEFORE the strike's stagedShape(), which then shares the beat resolved here.
    */
-  spawn(event: FctEvent, now: number): void {
-    const delayMs = (event.delaySec ?? 0) * MS_PER_SEC;
+  spawn(event: FctEvent, now: number, strike?: FctBeatStrike): void {
+    let delaySec = event.delaySec ?? 0;
+    if (strike) {
+      this.pairedStrike = strike;
+      this.pairedDelaySec = this.strikeDelaySec(strike, now);
+      delaySec = Math.max(delaySec, this.pairedDelaySec);
+    }
+    const delayMs = delaySec * MS_PER_SEC;
     if (delayMs > 0) {
       this.hold(event, now, now + delayMs);
       return;
@@ -390,6 +428,7 @@ export class FctPainter {
   dispose(): void {
     while (this.pending.length > 0) this.recyclePending(this.pending.pop() as FctPending);
     this.beats.reset();
+    this.pairedStrike = null;
     for (let i = this.live.length - 1; i >= 0; i--) {
       const slot = this.live[i];
       slot.node.remove();

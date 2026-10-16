@@ -151,6 +151,148 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
   // carries the bulk); the 180 yaw about the haft is the owner's final pick
   // for how the head reads at rest.
   hammer_varkhul: { rot: [0, 180, 0], rotOffhand: [0, 0, 0], scale: 1.66 },
+  // The starter staff. Its file is turned head-up about the grip so the crook rides
+  // over the shoulder in the carry (the carry reads the file, not this table). In the
+  // HAND the owner wants the crook at the front end, so the hand alone turns it back.
+  // Its leather wrap sits just crook-side of the file's origin, and the staff family lifts
+  // every staff 0.18 the other way, which left the fist on bare wood behind the wrap (owner
+  // review). The offset slides the staff back through the hand until the fist closes on
+  // the wrap.
+  staff_starter: { rot: [180, 0, 0], pos: [0, -0.34, 0] },
+  // A weapon sits IN the fist when its handle passes through the slot's own axis, and a
+  // one-sided head faces the cut when it lies toward the right hand's +X (the side that
+  // points at the ground in the idle hold, and at the enemy in the battle stance and through
+  // the swing). tests/pack_weapon_hand_seat.test.ts measures both off the files.
+  // The pack's one-hand axes are centred on their BOX, blade and all, so the haft runs 0.14
+  // to 0.2 beside the origin and the axe floated beside the fist (owner review). `pos` brings
+  // the haft back through the hand. The starter axe is also authored blade to the other side
+  // (edge up in the hand), so it takes a half turn about the haft as well.
+  axe_starter: { rot: [0, 180, 0], pos: [0.202, 0, 0] },
+  axe_field_iron: { pos: [0.148, 0, 0] },
+  axe_field_steel: { pos: [0.148, 0, 0] },
+  axe_field_bronze: { pos: [0.148, 0, 0] },
+  axe_rare_a_teal: { pos: [0.138, 0, 0] },
+  axe_rare_a_ember: { pos: [0.138, 0, 0] },
+  axe_rare_a_violet: { pos: [0.138, 0, 0] },
+  // The owner's sizing pass ("weapons that look a bit too big for their hands"). The pack
+  // weapons were made to the family lengths, which were set for the kit bodies before the
+  // character pack body existed. That body measures 2.14 hand-slot units from foot to
+  // crown (male; the female 2.12), so a 2.4 greatsword is longer than the character is
+  // tall and a 1.28 dagger is 60 percent of it. Most shapes carry their length. Four did
+  // not, and are scaled here: the daggers draw at 0.7, a blade under half a one-hand
+  // sword's length whose hilt is a fist and a half; the greatswords draw at 2.15 where they
+  // were 2.4; the two-hand axe at 1.88 where it was 2.1; the two-hand mauls near 1.6. An
+  // offset on the same row is in hand units, so it shrinks with the scale.
+  dagger_starter: { scale: 0.7 },
+  dagger_field_iron: { scale: 0.7 },
+  dagger_field_steel: { scale: 0.7 },
+  dagger_field_bronze: { scale: 0.7 },
+  dagger_rare_a_teal: { scale: 0.7 },
+  dagger_rare_a_ember: { scale: 0.7 },
+  dagger_rare_a_violet: { scale: 0.7 },
+  dagger_rare_a_frost: { scale: 0.7 },
+  dagger_rare_a_bone: { scale: 0.7 },
+  // The curved rare dagger: its hilt bows away from the origin and its bevelled edge is
+  // authored to the up side (owner review: upside down). A half turn about the hilt puts
+  // the edge down, and the offset centres the bowed hilt in the palm.
+  dagger_rare_b_teal: { rot: [0, 180, 0], pos: [0.0245, 0, 0], scale: 0.7 },
+  dagger_rare_b_ember: { rot: [0, 180, 0], pos: [0.0245, 0, 0], scale: 0.7 },
+  dagger_rare_b_violet: { rot: [0, 180, 0], pos: [0.0245, 0, 0], scale: 0.7 },
+  // The field staves and the field spear, by the same recipe: their files are head-up
+  // for the carry, and the hand alone turns the head to the front end.
+  staff_field_iron: { rot: [180, 0, 0] },
+  staff_field_steel: { rot: [180, 0, 0] },
+  staff_field_bronze: { rot: [180, 0, 0] },
+  spear_field_iron: { rot: [180, 0, 0] },
+  // The field two-handers ride one-hand sized families (VAR_SWORD, VAR_HAMMER), whose
+  // clamps would shrink them to one-hand length. Each carries a scale that sets its length
+  // against the clamp: the greatsword 2.15 on the sword clamp of 2.0 (1.075; its file is
+  // 2.4, the size the sizing pass above took it down from), the maul 1.575 on the hammer
+  // clamp of 1.5 (1.05).
+  // The maul was made 2.2 long; the owner found the handle too long, so the bare haft
+  // between wrap and head was shortened by 0.45 in the files (the head and grip are as
+  // made), and the sizing pass then took the whole of it down a tenth.
+  // Plain number literals on purpose: the asset pipeline reads this table as text.
+  sword_field_2h_iron: { scale: 1.075 },
+  sword_field_2h_steel: { scale: 1.075 },
+  hammer_field_2h_iron: { scale: 1.05 },
+  hammer_field_2h_steel: { scale: 1.05 },
+  // The rare staves and polearms, by the same recipe as the field ones: head-up files,
+  // turned back in the hand.
+  staff_rare_a_teal: { rot: [180, 0, 0] },
+  staff_rare_a_ember: { rot: [180, 0, 0] },
+  staff_rare_a_violet: { rot: [180, 0, 0] },
+  staff_rare_a_obsidian: { rot: [180, 0, 0] },
+  staff_rare_b_teal: { rot: [180, 0, 0] },
+  staff_rare_b_ember: { rot: [180, 0, 0] },
+  staff_rare_b_violet: { rot: [180, 0, 0] },
+  spear_rare_a_teal: { rot: [180, 0, 0] },
+  spear_rare_b_ember: { rot: [180, 0, 0] },
+  // The rare set has no two-hand sword or axe of its own, and its war maul is 2.15 long on
+  // a family clamped at 1.5. A finish serves one hand only, because a model has one size:
+  // the two-hand finishes carry a scale, the rest draw at one-hand length. The straight
+  // sword's ember and violet finishes are greatswords at the field greatsword's 2.15 (teal
+  // stays one-hand: guards hold it); the double-bit axe's ember is a two-hander at 1.875;
+  // the maul's teal and violet draw at two-hand size, 1.6 (ember stays one-hand: smiths
+  // hold it). Those two maul files had 0.45 of bare haft taken out, like the field maul
+  // (owner: shorter handle), so they are 1.7 long where the ember file keeps the made 2.15.
+  // The straight sword's repainted finishes follow the same split: jade, spectral, molten,
+  // royal and ivory are greatswords, anvil is one-hand.
+  // (The greatswords were 2.4, the axe 2.1 and the mauls 1.7 before the sizing pass.)
+  sword_rare_a_ember: { scale: 1.075 },
+  sword_rare_a_violet: { scale: 1.075 },
+  sword_rare_a_jade: { scale: 1.075 },
+  sword_rare_a_spectral: { scale: 1.075 },
+  sword_rare_a_molten: { scale: 1.075 },
+  sword_rare_a_royal: { scale: 1.075 },
+  sword_rare_a_ivory: { scale: 1.075 },
+  axe_rare_b_ember: { scale: 1.25 },
+  hammer_rare_b_teal: { scale: 1.0667 },
+  hammer_rare_b_violet: { scale: 1.0667 },
+  // The epic staves, by the same recipe: head-up files, turned back in the hand.
+  // (the gnarled bone staff bends away from its origin at the grip: the offset centres it)
+  staff_epic_gravewyrm_bone_emerald: { rot: [180, 0, 0], pos: [0.013, 0, -0.055] },
+  staff_epic_hexwood_basin_turquoise: { rot: [180, 0, 0] },
+  staff_epic_hexwood_last_spring: { rot: [180, 0, 0] },
+  staff_epic_moonfang_bone_moon: { rot: [180, 0, 0] },
+  staff_epic_moonfang_lunar_tide: { rot: [180, 0, 0] },
+  // The epic two-handers on one-hand sized families carry a scale that sets their length
+  // against the clamp. The greatswords were made 2.5, 2.55 and 2.45 long; like every
+  // greatsword they draw a tenth under that after the sizing pass (2.24, 2.285, 2.195 on
+  // the sword clamp of 2.0). The wildwood maul draws at its made 2.2 on the hammer clamp of
+  // 1.5: no item draws it, and its haft has not been shortened like the other mauls'.
+  // The gravecleaver is a one-hand axe authored a tenth over the axe clamp (1.65 against
+  // 1.5), and keeps that.
+  // The deathless greatsword's crucible finish carries no scale: a one-hand legendary
+  // draws it, at the sword clamp.
+  sword_epic_deathless_spectral_teal: { scale: 1.1425 },
+  sword_epic_ossuary_ivory_amethyst: { scale: 1.12 },
+  sword_epic_ossuary_wyrm_teal: { scale: 1.12 },
+  sword_epic_tusk_ivory_jade: { scale: 1.0975 },
+  sword_epic_tusk_predator_steel: { scale: 1.0975 },
+  hammer_epic_wildwood_living_forest: { scale: 1.4667 },
+  hammer_epic_wildwood_scorched_resin: { scale: 1.4667 },
+  // ...and, like the other one-hand axes, it is centred on its box: the offset brings the
+  // haft into the fist.
+  axe_epic_gravecleaver_fossil_gravegreen: { scale: 1.1, pos: [0.127, 0, 0] },
+  axe_epic_gravecleaver_slag_ember: { scale: 1.1, pos: [0.127, 0, 0] },
+  // The epic daggers put their origin where the hilt meets the guard, not mid-hilt, so the
+  // fist closed on the guard with the whole hilt trailing behind it. Each is raised along
+  // the hand until the fist holds the hilt and the guard sits on top of it (the cinder kris
+  // is also a touch off its own axis).
+  // The dragonfang is also authored with its point curling to the side a hand holds DOWN,
+  // so the fang hung like a hook (owner: upside down). A half turn about the hilt puts the
+  // outer curve down and the point up.
+  // Their hilts are barely a fist long, so the sizing pass takes these down less than the
+  // other daggers (0.85, not 0.7): any smaller and the fist would not fit between pommel
+  // and guard.
+  dagger_epic_dragonfang_basin_jade: { rot: [0, 180, 0], pos: [0, 0.085, 0], scale: 0.85 },
+  dagger_epic_dragonfang_ivory_violet: { rot: [0, 180, 0], pos: [0, 0.085, 0], scale: 0.85 },
+  dagger_epic_dragonfang_moonlit_pearl: { rot: [0, 180, 0], pos: [0, 0.085, 0], scale: 0.85 },
+  dagger_epic_cinder_coal_ember: { pos: [-0.013, 0.083, 0], scale: 0.85 },
+  dagger_epic_marrow_ivory_amber: { pos: [0, 0.07, 0], scale: 0.85 },
+  // The crozier's shaft runs beside its origin too.
+  hammer_epic_spring_verdant_ivory: { pos: [0.051, 0, 0.009] },
 };
 
 export interface GripTransform {

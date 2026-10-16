@@ -7,6 +7,7 @@ import {
   applyMountRaceEventToMirror,
   decodeMountRaceView,
   type MountRaceMirror,
+  mountRaceViewAt,
 } from '../src/net/mount_race_wire';
 import { MOUNT_RACE_COURSE } from '../src/sim/content/mounts';
 import { type SimEvent, TICK_RATE } from '../src/sim/types';
@@ -149,5 +150,42 @@ describe('applyMountRaceEventToMirror', () => {
     expect(applyMountRaceEventToMirror(null, { type: 'levelup', level: 2 } as SimEvent, NOW)).toBe(
       null,
     );
+  });
+});
+
+describe('mountRaceViewAt', () => {
+  it('counts the mirror down to the injected clock and round-trips the decode', () => {
+    const row = {
+      raceId: 'r1',
+      phase: 'racing' as const,
+      clearedMask: 5,
+      cleared: 2,
+      jumpsTotal: 6,
+      goTicksLeft: 0,
+      ticksLeft: TICK_RATE * 3,
+      timeLimitTicks: TICK_RATE * 30,
+    };
+    const mirror = decodeMountRaceView(row, NOW);
+    expect(mountRaceViewAt(mirror, NOW)).toEqual(row);
+    // One second later the lap has a second less; past the deadline it reads 0.
+    expect(mountRaceViewAt(mirror, NOW + 1000)?.ticksLeft).toBe(TICK_RATE * 2);
+    expect(mountRaceViewAt(mirror, NOW + 60_000)?.ticksLeft).toBe(0);
+    expect(mountRaceViewAt(null, NOW)).toBeNull();
+  });
+
+  it('a countdown reads its go ticks and the full time limit', () => {
+    const mirror: MountRaceMirror = {
+      raceId: 'r2',
+      phase: 'countdown',
+      clearedMask: 0,
+      cleared: 0,
+      jumpsTotal: 6,
+      goDeadlineMs: NOW + 2000,
+      deadlineMs: NOW + 40_000,
+      timeLimitTicks: TICK_RATE * 30,
+    };
+    const view = mountRaceViewAt(mirror, NOW);
+    expect(view?.goTicksLeft).toBe(TICK_RATE * 2);
+    expect(view?.ticksLeft).toBe(TICK_RATE * 30);
   });
 });

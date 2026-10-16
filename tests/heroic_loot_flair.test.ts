@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../src/sim/content/heroic_loot';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
+import { NYTHRAXIS_RELOCATED_ITEM_IDS } from '../src/sim/content/nythraxis_loot';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { TWOHAND_DPS_MULT, weaponDpsBudget } from '../src/sim/item_budget';
@@ -30,11 +31,14 @@ describe('heroic loot flair: variant generation', () => {
     // Fanglord Beastmaster) is an ilvl-31 boss piece of the one-rating tier. The
     // Nythraxis raid boss's own set pieces and legendaries are one tier up again:
     // epics at 33, legendaries at 37 (anchored on the raid boss's normal loot).
-    const raidBases = new Set(
-      (MOBS.nythraxis_scourge_of_thornpeak?.loot ?? []).flatMap((e: any) =>
+    // The raid pieces relocated to the dungeons (content/nythraxis_loot.ts) keep
+    // the raid tier wherever they drop now.
+    const raidBases = new Set<string>([
+      ...(MOBS.nythraxis_scourge_of_thornpeak?.loot ?? []).flatMap((e: any) =>
         e.itemId ? [e.itemId] : [],
       ),
-    );
+      ...NYTHRAXIS_RELOCATED_ITEM_IDS,
+    ]);
     const fiveManBossVariantIds = new Set(
       Object.entries(HEROIC_BOSS_LOOT)
         .filter(([bossId]) => bossId !== NYTHRAXIS_RAID_BOSS_ID)

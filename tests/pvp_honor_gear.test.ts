@@ -4,6 +4,7 @@ import {
   FURY_NPC,
   FURY_STOCK,
   HONOR_QUARTERMASTER_STOCK,
+  HONOR_VENDOR_STOCK,
   WARFARE_ITEMS,
   WARFARE_JEWELRY_STAT_FRACTION,
   WARFARE_RATING_FRACTION,
@@ -203,12 +204,17 @@ describe('FURY WARFARE stock', () => {
     // chapel step (7 yd from Brother Aldric) for the town's eastern edge. The
     // placement still derives from EASTBROOK_NPC_PLACEMENTS_BY_ID.fury, so his
     // facing moved with him.
-    expect(NPCS.fury.pos).toEqual({ x: 16, z: -78 });
-    expect(NPCS.fury.facing).toBe(-2.2455372690184494);
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // smithy's forge shelter took the north road's old line, so the road swings
+    // west round it over his stand and he keeps the town's edge a few strides
+    // on, between that road and the coast track.
+    expect(NPCS.fury.pos).toEqual({ x: 21, z: -83.5 });
+    expect(NPCS.fury.facing).toBe(-2.0570389598824015);
     expect(NPCS.fury.dynamic).toBe(true);
     // The entry tier first, then the two honor trinkets, then Warfare Season 2
-    // (pinned as the tail in warfare_season2.test.ts).
-    expect(NPCS.fury.vendorItems).toEqual(HONOR_QUARTERMASTER_STOCK);
+    // (pinned as the gear tail in warfare_season2.test.ts), then the buddy.
+    expect(NPCS.fury.vendorItems).toEqual(HONOR_VENDOR_STOCK);
+    expect(HONOR_VENDOR_STOCK).toEqual([...HONOR_QUARTERMASTER_STOCK, 'whistle_horse']);
     expect(HONOR_QUARTERMASTER_STOCK.slice(0, FURY_STOCK.length)).toEqual(FURY_STOCK);
     expect(
       HONOR_QUARTERMASTER_STOCK.slice(

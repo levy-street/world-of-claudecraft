@@ -202,6 +202,8 @@ describe('title relics resolve the deed crest', () => {
       'prog_church_order_champion',
       'prog_automatons_champion',
       'exp_clue_ten_caskets',
+      // The Drowned Temple lore guide's Witness of the Choir (dungeon crest).
+      'dgn_drowned_temple_cantor',
     ]);
     for (const id of pending) expect(DEED_ART_PENDING.has(id), id).toBe(true);
     for (const id of RELIQUARY_HORIZON_TITLES) {

@@ -403,7 +403,21 @@ describe('generated chunk geometry is stable', () => {
     // freight yard's five new crate spots each carry a ground-object calm pad.
     // Checked against the dense height atlas re-minted in the same commit: 9
     // points move, all within 5.4 yd of a new crate. Measured on the merged tree.
-    expect(digestOf(inRect)).toBe('d74e213f712eedd077e835eaf282b7bd');
+    // Re-minted for the painted Tidehold town (the Studio rebuild map's six
+    // buildings in the built-in world): six level pads under the buildings
+    // (zone1.ts EASTBROOK_BUILDING_PAD_TERRAIN_EDITS), the retired KayKit
+    // smithy's decor-prop calm pad leaving the civic green, and the moved town
+    // NPCs' calm pads. The quay and the coastline are pinned unchanged by
+    // tests/eastbrook_placed_buildings.test.ts (the quay to the bit, no ground
+    // crossing the sea surface). Computed twice in separate processes.
+    // Re-minted for the World of ClaudeCraft Studio map's arrangement of the
+    // same town: the buildings moved to that map's sites on grids of level
+    // stamps, the churchyard and the strand camp moved with their calm pads,
+    // the chapel-rise ruin and the north road's old line gave way to the
+    // smithy, and the moved NPCs carried their calm pads. The quay and the
+    // coastline are still pinned by tests/eastbrook_placed_buildings.test.ts.
+    // Computed twice in separate processes.
+    expect(digestOf(inRect)).toBe('524a6cac34e20d3be66afb854ef72f50');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

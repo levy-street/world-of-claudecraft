@@ -69,16 +69,27 @@ describe('held weapon models', () => {
       'heroic_deathless_heartwood',
       'heroic_direfang_greatblade',
       'heroic_duskwhisper',
+      'heroic_falls_blessed_staff',
       'heroic_fang_of_korzul',
       'heroic_fanglords_beastspear',
+      'heroic_fogbinders_rod',
+      'heroic_gaolyard_cudgel',
+      'heroic_gravecallers_rod',
       'heroic_gravecourt_hewer',
       'heroic_gravewyrm_thornmaul',
       'heroic_kingsbane_last_oath',
+      'heroic_knight_commanders_longsword',
       'heroic_maul_of_the_scourged_wilds',
+      'heroic_merecleaver',
+      'heroic_moonwrack_stave',
       'heroic_nightfangs_greatstaff',
+      'heroic_rimeweb_fang',
+      'heroic_sextons_spadehaft',
       'heroic_staff_of_the_gravewyrm',
       'heroic_staff_of_velkhar',
       'heroic_thornpeak_wardblade',
+      'heroic_tideglass_shiv',
+      'heroic_turnkeys_shank',
       'heroic_wildheart_fangknife',
       'heroic_wildheart_hexwood_staff',
       'heroic_wildheart_tuskblade',
@@ -163,15 +174,25 @@ describe('held weapon models', () => {
   });
 
   it('itemWeaponModelUrl resolves mapped items and ignores everything else', () => {
-    expect(itemWeaponModelUrl('worn_sword')).toBe('models/weapons/sword_a.glb');
-    expect(itemWeaponModelUrl('fen_reaver_glaive')).toBe('models/weapons/scythe.glb');
-    expect(itemWeaponModelUrl('eastbrook_greatsword')).toBe('models/weapons/adv_sword_2handed.glb');
-    expect(itemWeaponModelUrl('highwatch_greatsword')).toBe('models/weapons/adv_sword_2handed.glb');
+    expect(itemWeaponModelUrl('worn_sword')).toBe('models/weapons/sword_starter.glb');
+    expect(itemWeaponModelUrl('fen_reaver_glaive')).toBe('models/weapons/spear_field_iron.glb');
+    expect(itemWeaponModelUrl('eastbrook_greatsword')).toBe(
+      'models/weapons/sword_field_2h_iron.glb',
+    );
+    expect(itemWeaponModelUrl('highwatch_greatsword')).toBe(
+      'models/weapons/sword_field_2h_steel.glb',
+    );
+    expect(itemWeaponModelUrl('vanguard_verdict_greatsword')).toBe(
+      'models/weapons/sword_rare_a_royal.glb',
+    );
     expect(itemWeaponModelUrl('deathless_greatblade')).toBe(
-      'models/weapons/adv_sword_2handed_color.glb',
+      'models/weapons/sword_rare_a_spectral.glb',
     );
     expect(itemWeaponModelUrl('heroic_wyrmfang_greatblade')).toBe(
-      'models/weapons/adv_sword_2handed_color.glb',
+      'models/weapons/sword_rare_a_ember.glb',
+    );
+    expect(itemWeaponModelUrl('kingsbane_last_oath')).toBe(
+      'models/weapons/sword_epic_deathless_crucible_heart.glb',
     );
     expect(itemWeaponModelUrl('chest_armor_not_a_weapon')).toBeNull();
     expect(itemWeaponModelUrl(null)).toBeNull();
@@ -223,10 +244,15 @@ describe('held weapon models', () => {
       .map((item) => item.id)
       .sort();
     expect(unmapped).toEqual([
+      // The dungeon reworks' held offhands: the Hollow Crypt's Cantor's Hymnal
+      // and the Drowned Temple's Chorus Conch (each with its Heroic clone). A
+      // hymnal and a conch have no shared held model yet.
+      'cantors_hymnal',
       // The Buried Hoard held offhands (a chalice and a void orb, each in its three
       // map-rarity tiers) are the orb class of gap: the shared art set has no
       // chalice or orb model, so they need new art, not a table row.
       'chalice_of_living_tides',
+      'chorus_conch',
       // The two Crucible held offhands follow the wraithfire_orb precedent
       // (a held orb/censer with no dedicated GLB yet).
       'cinder_of_the_first_design',
@@ -251,6 +277,8 @@ describe('held weapon models', () => {
       // cosmetic only. Commissioning is the maintainer's art wave.
       'gravewyrm_bone_quiver',
       'gyrelens_array',
+      'heroic_cantors_hymnal',
+      'heroic_chorus_conch',
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',
@@ -294,10 +322,20 @@ describe('held weapon models', () => {
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {
-    expect(itemOffhandModelUrl('eastbrook_buckler')).toBe('models/weapons/shield_round.glb');
-    expect(itemOffhandModelUrl('highwatch_wallshield')).toBe('models/weapons/shield_square.glb');
-    expect(itemOffhandModelUrl('rusty_dagger')).toBe('models/weapons/dagger_a.glb');
-    expect(itemOffhandModelUrl('heroic_fang_of_korzul')).toBe('models/weapons/dagger_c.glb');
+    expect(itemOffhandModelUrl('eastbrook_buckler')).toBe('models/weapons/shield_starter.glb');
+    expect(itemOffhandModelUrl('highwatch_wallshield')).toBe(
+      'models/weapons/shield_field_steel.glb',
+    );
+    expect(itemOffhandModelUrl('bonewrought_bulwark')).toBe(
+      'models/weapons/shield_rare_a_teal.glb',
+    );
+    expect(itemOffhandModelUrl('duskforged_bulwark')).toBe(
+      'models/weapons/shield_rare_a_violet.glb',
+    );
+    expect(itemOffhandModelUrl('rusty_dagger')).toBe('models/weapons/dagger_starter.glb');
+    expect(itemOffhandModelUrl('heroic_fang_of_korzul')).toBe(
+      'models/weapons/dagger_rare_b_violet.glb',
+    );
     expect(itemOffhandModelUrl('chest_armor_not_an_offhand')).toBeNull();
     expect(itemOffhandModelUrl(null)).toBeNull();
     expect(itemOffhandModelUrl(undefined)).toBeNull();
@@ -308,6 +346,8 @@ describe('held weapon models', () => {
     for (const url of [
       itemOffhandModelUrl('eastbrook_buckler'),
       itemOffhandModelUrl('highwatch_wallshield'),
+      itemOffhandModelUrl('bonewrought_bulwark'),
+      itemOffhandModelUrl('pearlward_aegis'),
     ]) {
       expect(url).not.toBeNull();
       if (!url) continue;
@@ -372,6 +412,9 @@ describe('held weapon models', () => {
       'fang',
       'knife',
       'staff',
+      // The staff family's older spelling, on a bespoke model: craterglass_stave
+      // (VAR_STAFF in assets.ts).
+      'stave',
       'hammer',
       'axe',
       'mace',
@@ -399,7 +442,7 @@ describe('held weapon models', () => {
       const def = VISUALS[key];
       // both hunter bodies: the fixed rig and its composed (modular) variant
       // share the class hand layout, so both keep the crossbow
-      if (key === 'player_hunter' || key === 'player_hunter_modular') {
+      if (key.startsWith('player_hunter')) {
         expect(def.weaponSlots, 'hunter must keep its crossbow').toBeUndefined();
       } else {
         expect(def.weaponSlots?.includes(0), `${key} should swap its mainhand`).toBe(true);

@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Kotlina Dzikiego Serca',
-    desc: 'Charakterystyczne bronie od Zulgara oraz Kłolorda, Pogromcy Bestii.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroiczna: Kotlina Dzikiego Serca',
-    desc: 'Epiki dostępne wyłącznie heroicznie od Zulgara, Głosu Kotliny.',
   },
   conquerors_nythraxis: {
     name: 'Rajd Nythraxis',
@@ -61,6 +59,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, Budzący się Szczyt',
     desc: 'Osobiste epickie łupy od światowego bossa Budzącego się Szczytu.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, Pogrzebany Sztygar',
+    desc: 'Łupy wywleczone z kurhanów Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Zawalony Relikwiarz',

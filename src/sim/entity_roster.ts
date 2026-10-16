@@ -27,10 +27,11 @@ import { stripSunGodVerdicts } from './combat/paladin_sun_verdict';
 import { stripPaladinDevotionsFromSource } from './combat/paladin_support';
 import { tickRingOfFrost } from './combat/ring_of_frost';
 import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
-import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
+import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, getActiveWorldContent, zoneAt } from './data';
 import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
 import { guardAndReportPose, isPosFinite } from './finite_pose_guard';
+import { dungeonDoorPos } from './moved_objects';
 import { cancelCorpseHarvestForCorpse } from './professions/corpse_harvest_session';
 import { aurasSurvivingDeath } from './resurrection';
 import { isRiftEntranceTemplate } from './rift/vault_seed';
@@ -412,7 +413,8 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): boolean {
 // guard does not see it as a literal emit.
 export function graveyardReadout(p: Entity): string {
   const dungeon = dungeonAt(p.pos.x);
-  const zone = zoneAt(dungeon ? dungeon.doorPos.x : p.pos.x, dungeon ? dungeon.doorPos.z : p.pos.z);
+  const door = dungeon ? dungeonDoorPos(getActiveWorldContent().objectMoves, dungeon) : p.pos;
+  const zone = zoneAt(door.x, door.z);
   const gy = zone.graveyard;
   return `If you fall here, your spirit returns to the ${zone.name} graveyard at (${Math.floor(gy.x)}, ${Math.floor(gy.z)}).`;
 }

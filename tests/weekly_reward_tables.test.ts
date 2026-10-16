@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { BUILTIN_WORLD, ITEMS, MOBS, NPCS } from '../src/sim/data';
+import { regrowHead } from '../src/sim/encounters/drowned_temple/hydra_regrowth';
 import { createMob } from '../src/sim/entity';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { freshInstanceSlot } from '../src/sim/instances/instance_slot';
@@ -9,6 +10,7 @@ import {
   sanitizeWeeklyBossUnlocks,
   WEEKLY_BOSS_TABLES,
   weeklyAvailableBossTables,
+  weeklyBossBodies,
   weeklyBossChoiceExhausted,
   weeklyBossLootPool,
   weeklyBossTable,
@@ -24,6 +26,7 @@ import {
   WEEKLY_KEEPER_ID,
   weeklyRewardInfoFor,
 } from '../src/sim/weekly_rewards';
+import { boss, fight } from './helpers/temple_fight';
 
 function setup() {
   const sim = new Sim({
@@ -262,5 +265,131 @@ describe('weekly boss-table eligibility', () => {
     sim.claimWeeklyReward('1000:0', pid);
     expect(state.vaults).toHaveLength(0);
     expect(sim.countItem(items[0], pid)).toBe(1);
+  });
+});
+
+// The Mere Hydra is one boss of three placed bodies (FinderEncounter.otherBodyIds):
+// one table, keyed on the centre head, unlocked by the kill and never by a head.
+describe('weekly boss table of a several-bodied boss (the Mere Hydra)', () => {
+  const HEADS = ['mere_hydra_head_left', 'mere_hydra_head_center', 'mere_hydra_head_right'];
+
+  it('registers one table, on the centre head, and maps every head to it', () => {
+    expect(weeklyBossTable('mere_hydra_head_center')).toEqual({
+      bossId: 'mere_hydra_head_center',
+      dungeonId: 'drowned_temple',
+      category: 'dungeon',
+    });
+    expect(weeklyBossTable('mere_hydra_head_left')).toBeUndefined();
+    expect(weeklyBossTable('mere_hydra_head_right')).toBeUndefined();
+    for (const head of HEADS) {
+      expect(weeklyBossBodies(head)?.bossId, head).toBe('mere_hydra_head_center');
+      // The boss itself leads its own bodies.
+      expect(weeklyBossBodies(head)?.bodyIds, head).toEqual([
+        'mere_hydra_head_center',
+        'mere_hydra_head_left',
+        'mere_hydra_head_right',
+      ]);
+    }
+    // Every ordinary boss, and every other mob, is its own single body.
+    for (const { bossId } of WEEKLY_BOSS_TABLES)
+      if (bossId !== 'mere_hydra_head_center') expect(weeklyBossBodies(bossId)).toBeUndefined();
+    expect(weeklyBossBodies('drowned_pilgrim')).toBeUndefined();
+    // Its shelf is the loot the kill really pays, per difficulty.
+    expect(weeklyBossLootPool('mere_hydra_head_center', 'dungeon', 'warrior')).toContain(
+      'merecleaver',
+    );
+    expect(
+      weeklyBossLootPool('mere_hydra_head_center', 'dungeon_heroic', 'warrior').length,
+    ).toBeGreaterThan(0);
+  });
+
+  it.each([
+    ['normal', 1],
+    ['heroic', 2],
+  ] as const)('unlocks on the %s kill only when the third head falls', (difficulty, tier) => {
+    const f = fight(difficulty);
+    const meta = f.sim.players.get(f.tank.id)!;
+    const state = stateFor(f.sim.ctx, meta);
+    const heads = HEADS.map((id) => boss(f, id));
+    // The centre head first: it owns the table, and its death alone is no kill.
+    f.sim.ctx.handleDeath(heads[1], f.tank);
+    expect(state.bossUnlocks?.mere_hydra_head_center).toBeUndefined();
+    f.sim.ctx.handleDeath(heads[0], f.tank);
+    expect(state.bossUnlocks?.mere_hydra_head_center).toBeUndefined();
+    f.sim.ctx.handleDeath(heads[2], f.tank);
+    expect(state.bossUnlocks?.mere_hydra_head_center).toBe(tier);
+    // No head has a ledger row of its own, and the Hydra is not the finale.
+    expect(state.bossUnlocks?.mere_hydra_head_left).toBeUndefined();
+    expect(state.bossUnlocks?.mere_hydra_head_right).toBeUndefined();
+    expect(state.dungeons).toEqual([]);
+    // The whole party in the claim is credited, not only the one who struck.
+    for (const other of f.others) {
+      const otherState = stateFor(f.sim.ctx, f.sim.players.get(other.id)!);
+      expect(otherState.bossUnlocks?.mere_hydra_head_center).toBe(tier);
+    }
+  });
+
+  it('a wipe with heads down unlocks nothing, and a kill ending on a regrown head still does', () => {
+    const f = fight('normal');
+    const meta = f.sim.players.get(f.tank.id)!;
+    const state = stateFor(f.sim.ctx, meta);
+    const heads = HEADS.map((id) => boss(f, id));
+    // Two who must never be credited by the claim-roster fallback below: a
+    // party member who never set foot in the claim, and a stranger.
+    const waiting = f.sim.addPlayer('priest', 'Doorwaiter');
+    f.sim.partyInvite(waiting, f.tank.id);
+    f.sim.partyAccept(waiting);
+    const stranger = f.sim.addPlayer('rogue', 'Passerby');
+    const unlockOf = (pid: number) =>
+      stateFor(f.sim.ctx, f.sim.players.get(pid)!).bossUnlocks?.mere_hydra_head_center;
+    f.sim.ctx.handleDeath(heads[0], f.tank);
+    f.sim.ctx.handleDeath(heads[1], f.tank);
+    // The wipe stands both back up (mere_hydra.ts resetHydra regrows them whole).
+    regrowHead(f.sim.ctx, heads[0], 1);
+    regrowHead(f.sim.ctx, heads[1], 1);
+    expect(state.bossUnlocks?.mere_hydra_head_center).toBeUndefined();
+    // The next attempt: the last body to fall is one that grew back, which
+    // carries no kill credit of its own (Entity.regrown).
+    f.sim.ctx.handleDeath(heads[2], f.tank);
+    f.sim.ctx.handleDeath(heads[1], f.tank);
+    expect(state.bossUnlocks?.mere_hydra_head_center).toBeUndefined();
+    expect(heads[0].regrown).toBe(true);
+    f.sim.ctx.handleDeath(heads[0], f.tank);
+    expect(state.bossUnlocks?.mere_hydra_head_center).toBe(1);
+    // The roster that stood in for the missing recipients is the claim's own:
+    // everyone who entered it, and nobody else.
+    for (const other of f.others) expect(unlockOf(other.id), 'a member inside').toBe(1);
+    expect(unlockOf(waiting), 'a party member who never entered').toBeUndefined();
+    expect(unlockOf(stranger), 'a stranger').toBeUndefined();
+  });
+
+  it('a last head on its first life that dies with nobody to credit unlocks nothing', () => {
+    // Only a head that grew back may arrive without recipients. A first-life
+    // body nobody is credited for is the same no-credit death it is for any
+    // other boss, never a reason to pay the whole roster.
+    const f = fight('normal');
+    const state = stateFor(f.sim.ctx, f.sim.players.get(f.tank.id)!);
+    const heads = HEADS.map((id) => boss(f, id));
+    f.sim.ctx.handleDeath(heads[0], f.tank);
+    f.sim.ctx.handleDeath(heads[1], f.tank);
+    expect(heads[2].regrown).not.toBe(true);
+    expect(heads[2].tappedById).toBeNull();
+    f.sim.ctx.handleDeath(heads[2], null);
+    expect(heads.every((h) => h.dead)).toBe(true);
+    expect(state.bossUnlocks?.mere_hydra_head_center).toBeUndefined();
+  });
+
+  it('an ordinary boss with nobody to credit still unlocks nothing', () => {
+    // The early return this change reordered: single-bodied bosses keep it.
+    const { sim, meta, state } = setup();
+    const inst = freshInstanceSlot('hollow_crypt', 1);
+    inst.enteredBy.add(meta.entityId);
+    const before = { ...state.bossUnlocks };
+    const marrow = createMob(90001, MOBS.sexton_marrow, 20, { x: 0, y: 0, z: 0 });
+    recordWeeklyBossKill(sim.ctx, marrow, [], inst);
+    expect(state.bossUnlocks).toEqual(before);
+    // And with a recipient it is credited as before.
+    recordWeeklyBossKill(sim.ctx, marrow, [meta], inst);
+    expect(state.bossUnlocks?.sexton_marrow).toBe(1);
   });
 });

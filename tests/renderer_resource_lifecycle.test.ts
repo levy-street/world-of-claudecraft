@@ -12,6 +12,11 @@ import {
   disposeRendererWorldViews,
 } from '../src/render/renderer_resource_lifecycle';
 import {
+  registerSetPieceOccluders,
+  setPieceOccludersInternalsForTest,
+  updateSetPieceOccluders,
+} from '../src/render/set_piece_occluders';
+import {
   expectRootProgramSources,
   resetShaderWarmAuditForTest,
   shaderWarmAuditSnapshot,
@@ -340,6 +345,45 @@ describe('renderer resource lifecycle', () => {
     // context with the worker itself.
     expect(posted.map((message) => message.kind)).toEqual(['init']);
     expect(terminations).toBe(1);
+  });
+
+  it('lets the set piece occluder sets go with the renderer whose meshes they fade', () => {
+    // The registry is module level and the per-frame pass walks it: a set
+    // left standing after the teardown would have the NEXT renderer's frames
+    // test and fade the meshes of a scene that is gone. Read through the
+    // registry's own readout and the set's own state, not a spy.
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial());
+    const root = new THREE.Group().add(mesh);
+    const handle = registerSetPieceOccluders(
+      [{ type: 'obb', x: 0, z: 0, hw: 3, hd: 0.5, rot: 0, topY: 8 }],
+      [root],
+    );
+    // the camera has gone round behind the wall: the set is ghosted
+    updateSetPieceOccluders(0, 4, 6, 0, 1.6, -3, 1 / 60);
+    expect(handle.alpha()).toBeLessThan(1);
+    expect(setPieceOccludersInternalsForTest.setCount()).toBe(1);
+
+    const errors: unknown[] = [];
+    disposeRendererPrewarmAndGroundFx({ prewarmDepthMaterials: new Map() }, (cleanup) => {
+      try {
+        cleanup();
+      } catch (error) {
+        errors.push(error);
+      }
+    });
+
+    expect(errors).toEqual([]);
+    expect(setPieceOccludersInternalsForTest.setCount()).toBe(0);
+    // left as authored: solid, on its own order, with no veil twin on it
+    expect(handle.alpha()).toBe(1);
+    expect((mesh.material as THREE.Material).transparent).toBe(false);
+    expect(mesh.renderOrder).toBe(0);
+    expect(mesh.children).toHaveLength(0);
+    // and no later frame touches it
+    const tested = setPieceOccludersInternalsForTest.boxTests();
+    updateSetPieceOccluders(0, 4, 6, 0, 1.6, -3, 1 / 60);
+    expect(setPieceOccludersInternalsForTest.boxTests()).toBe(tested);
+    expect(handle.alpha()).toBe(1);
   });
 
   it('lets the shader warm audit go with the renderer it was listening to', async () => {

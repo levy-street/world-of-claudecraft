@@ -23,7 +23,7 @@ import {
   resolveNeedleOfFate,
   resolveSentence,
 } from '../src/sim/combat/affliction';
-import { SOUL_FRAGMENT_CAP } from '../src/sim/combat/necromancy';
+import { SOUL_FRAGMENT_CAP, soulFragmentCount } from '../src/sim/combat/necromancy';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   GRAVEBRAND_2PC_REAPING_COOLDOWN_CUT_SEC,
@@ -377,7 +377,14 @@ describe('Gravebrand 4pc: unison strikes deal 25 percent more damage', () => {
     const sim = liveWarlock(518, 'demonology');
     const target = addHostileTarget(sim);
     finishCast(sim, 'raise_graveguard');
-    for (let fragment = 0; fragment < 4; fragment++) finishCast(sim, 'soul_harvest', target);
+    // Two commands cost four Soul Fragments. Each harvest is a real cast, and a
+    // real cast keeps the floor chance of a full resist whatever hitBonus says,
+    // so the bank is filled by count rather than by four casts taken on trust:
+    // a resisted harvest is cast again (bounded).
+    for (let cast = 0; cast < 8 && soulFragmentCount(sim.player) < 4; cast++) {
+      finishCast(sim, 'soul_harvest', target);
+    }
+    expect(soulFragmentCount(sim.player)).toBe(4);
     const firstEvents = finishCast(sim, 'reaping_command', target);
     const first = expectDefined(
       firstEvents.find(

@@ -179,6 +179,9 @@ services:
       WOC_DAILY_REWARD_CONFIG_TTL_MS: ${WOC_DAILY_REWARD_CONFIG_TTL_MS:-}
       WOC_ECONOMY_SERVICE_URL: ${WOC_ECONOMY_SERVICE_URL:-}
       WOC_ECONOMY_INTERNAL_SECRET: ${WOC_ECONOMY_INTERNAL_SECRET:-}
+      # Game memberships: exactly 1 offers them in the store (server/subscription_proxy.ts);
+      # unset keeps them off.
+      WOC_SUBSCRIPTIONS_ENABLED: ${WOC_SUBSCRIPTIONS_ENABLED:-}
       # The $WOC Exchange. Ships disabled: unset leaves every path answering
       # woc_market.disabled and the sweep never starts. WOC_MARKET_SERVICE_URL
       # points at the economy service's /v1/market/ prefix, authenticated with

@@ -2866,10 +2866,11 @@ export const DEEDS: Record<string, DeedDef> = {
   // tests/deeds_content.test.ts): the capstone is a dynamic meta over a
   // growing catalog, the feat_book_complete class, and the flag is what
   // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Two catalog slots are
-  // owner-pended today (reins_drakemaw_raptor, reins_terrorspark_groundshaker;
+  // owner-pended today (reins_lanternback_troll, reins_terrorspark_groundshaker;
   // masterwork:engineering was the third until masterwrought Phase 11o's
-  // stats-bearing copperlens_ocular made the mark earnable, 2026-08-25), so
-  // a non-feat capstone would dead-end
+  // stats-bearing copperlens_ocular made the mark earnable, 2026-08-25, and
+  // reins_drakemaw_raptor left the list when the Mirefen world boss took it),
+  // so a non-feat capstone would dead-end
   // The Whole Book for every player (the retroFallbackGrants stranded-heal
   // doctrine names exactly that failure). It stays on the Collection shelf
   // beside its ladder; grant, marquee, and feed behavior are unaffected.
@@ -3359,8 +3360,9 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'the Unscorched' },
   },
-  // Roots' Bramblehide, the feral druid's Strength leather family off the
-  // Nythraxis raid (zone3.ts). Appended at the END per the append-only
+  // Roots' Bramblehide, the feral druid's Strength leather family (zone3.ts),
+  // shipped off the Nythraxis raid and relocated to the Wildheart Basin bosses on
+  // 2026-10-08 (content/nythraxis_loot.ts). Appended at the END per the append-only
   // contract; col_seven_regalia keeps its shipped seven-family trigger (rule
   // 9: never retro-edit an existing trigger), so this family is not part of
   // that meta.
@@ -3596,6 +3598,271 @@ export const DEEDS: Record<string, DeedDef> = {
         'ferry:drakelands_wickharbor',
       ],
     },
+  },
+  // Appended, never inserted: DEED_ORDER is derived from this object's key order and its
+  // indices are pinned by tests/deeds_content.test.ts, so adding a deed anywhere but the
+  // end silently re-points every later one.
+  cmb_balgath: {
+    id: 'cmb_balgath',
+    name: 'Foreman No More',
+    desc: 'Put the Buried Foreman back in his barrow.',
+    category: 'combat',
+    renown: 10,
+    trigger: { kind: 'stat', stat: 'balgathKills', count: 1 },
+  },
+  cmb_balgath_ten: {
+    id: 'cmb_balgath_ten',
+    name: 'The Mound Keeps Nothing',
+    desc: 'Bring down the Buried Foreman ten times.',
+    category: 'combat',
+    renown: 10,
+    trigger: { kind: 'stat', stat: 'balgathKills', count: 10 },
+  },
+  // The muster's pike drill (content/mirefen_muster_quests.ts): the lesson that makes a
+  // level 6 useful at the Foreman's pull. Routine Renown, earned by finishing the drill.
+  cmb_point_taken: {
+    id: 'cmb_point_taken',
+    name: 'Point Taken',
+    desc: "Put out the Straw Foreman's lantern at the muster's drill yard and make its planks count.",
+    category: 'combat',
+    renown: 5,
+    trigger: { kind: 'quest', questId: 'q_muster_pike_drill' },
+  },
+  // The Sunken Bastion rework (docs/design/dungeon-rework/sunken_bastion.md,
+  // "Deeds"): one per boss core and one for the showpiece, granted by the
+  // encounter modules (src/sim/encounters/sunken_bastion) to every player in
+  // the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract.
+  dgn_olen_buttress: {
+    id: 'dgn_olen_buttress',
+    name: 'Hold the Wall',
+    desc: 'Defeat Knight-Commander Olen without his Rebounding Bulwark ever striking a second player.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_ossick_moored: {
+    id: 'dgn_ossick_moored',
+    name: 'Safe Harbor',
+    desc: 'Defeat Gaoler Ossick without anyone being dragged into the Drowning Pit.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_vael_beacon: {
+    id: 'dgn_vael_beacon',
+    name: "By the Beacon's Light",
+    desc: 'Defeat Vael the Fogbinder without bursting a single Fog Shade.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_turretback: {
+    id: 'dgn_turretback',
+    name: 'Eviction Notice',
+    desc: 'Defeat the Shipwreck Captain without anyone being hit by Spectral Broadside.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Drowned Temple rework (docs/design/dungeon-rework/drowned_temple.md,
+  // "Deeds"): one per boss core and one for the Mere Hydra, granted by the
+  // encounter modules (src/sim/encounters/drowned_temple) to every player in
+  // the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract. Names are generic English phrases, checked at
+  // authoring (2026-09-30).
+  dgn_selthe_pitch: {
+    id: 'dgn_selthe_pitch',
+    name: 'Every Voice in Tune',
+    desc: 'Defeat Choirmother Selthe with every Chorus shared by two or more and no Solo touching anyone else.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_colossus_mirror: {
+    id: 'dgn_colossus_mirror',
+    name: 'Break the Glass',
+    desc: 'Defeat the Tideglass Colossus with every Reflection broken within 15 seconds of rising.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_ysolei_high_and_dry: {
+    id: 'dgn_ysolei_high_and_dry',
+    name: 'High and Dry',
+    desc: 'Defeat Ysolei, Avatar of the Drowned Moon, without anyone being struck by her Tidal Crash.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_mere_hydra: {
+    id: 'dgn_mere_hydra',
+    name: 'All Heads Down',
+    desc: 'Slay all three heads of the Mere Hydra within 10 seconds of each other.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Hollow Crypt's fourth pass: the Knellwyrm finale Morthen's dying rite
+  // summons (src/sim/encounters/hollow_crypt/knellwyrm.ts), granted to every
+  // player in the claim at the kill. Cosmetic only; appended at the END per
+  // the append-only contract. Generic English idiom, checked 2026-09-30.
+  dgn_crypt_knellwyrm: {
+    id: 'dgn_crypt_knellwyrm',
+    name: 'Not a Hair Singed',
+    desc: 'Defeat the Knellwyrm without anyone being burned by its Pyre Strafe.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Sunken Bastion's fifth pass: the Gaol Turnkey, the gaol's miniboss
+  // (src/sim/encounters/sunken_bastion/turnkey.ts), granted to every player in
+  // the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract. Generic English idiom, checked 2026-09-30.
+  dgn_turnkey_cage: {
+    id: 'dgn_turnkey_cage',
+    name: 'No Cage Can Hold Us',
+    desc: 'Defeat the Gaol Turnkey without anyone being crushed in an Iron Cage.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
+  // section 9): one encounter deed per boss core and one for the Great
+  // Saurian, granted by the encounter modules (src/sim/encounters/
+  // wildheart_basin) to every player in the claim at the kill. Cosmetic only;
+  // appended at the END per the append-only contract. The design's "Divide and
+  // Conquer" is an exact World of Warcraft achievement name (the IP check,
+  // 2026-10-02), so it ships as "Kept at Bay"; the other three names returned
+  // no game use.
+  dgn_beastmaster_apart: {
+    id: 'dgn_beastmaster_apart',
+    name: 'Kept at Bay',
+    desc: 'Defeat the Fanglord Beastmaster and his Great Jaguar with Pack Bond up for less than 10 seconds in all.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_gorgebloom_clean: {
+    id: 'dgn_gorgebloom_clean',
+    name: 'Weed Control',
+    desc: 'Defeat the Gorgebloom without a single Thorn Sprout growing.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_zulgar_uncaught: {
+    id: 'dgn_zulgar_uncaught',
+    name: 'Never Caught',
+    desc: 'Defeat Zulgar, Voice of the Basin without anyone being Mauled.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_great_saurian: {
+    id: 'dgn_great_saurian',
+    name: 'Toppled Titan',
+    desc: 'Defeat the Great Saurian and its Howdah Hexcaller within 20 seconds of each other.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Gravewyrm Sanctum rework (docs/design/dungeon-rework/gravewyrm_sanctum.md
+  // section 10): one deed per boss core and one for the Sledge Tusker, granted
+  // by the encounter modules (src/sim/encounters/gravewyrm_sanctum) to every
+  // player in the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract. The five names are common English phrases with no
+  // distinctive game use (the IP check, 2026-10-03; "Cold Comfort" is also a
+  // Guild Wars 2 achievement title, an everyday idiom kept as shared
+  // vocabulary).
+  dgn_korgath_all_chains: {
+    id: 'dgn_korgath_all_chains',
+    name: 'A Kinder End',
+    desc: 'Defeat Korgath the Bound with all four of his chains broken.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_korgath_still_bound: {
+    id: 'dgn_korgath_still_bound',
+    name: 'The Lock Holds',
+    desc: 'Defeat Korgath the Bound on Heroic difficulty with at least two of his chains never broken.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_velkhar_cold: {
+    id: 'dgn_velkhar_cold',
+    name: 'Cold Comfort',
+    desc: 'Defeat Grand Necromancer Velkhar without a single Raised Bonewalker rising a second time.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_korzul_thin_ice: {
+    id: 'dgn_korzul_thin_ice',
+    name: 'Thin Ice',
+    desc: 'Defeat Korzul the Gravewyrm with at least twelve of the nineteen lake plates unbroken.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_sledge_tusker: {
+    id: 'dgn_sledge_tusker',
+    name: 'Cold Cargo',
+    desc: 'Defeat the Sledge Tusker without anyone being hit by its Trample.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Drowned Temple's lore guide (src/sim/dungeon_guide, content/
+  // drowned_temple_cantor.ts): granted to everyone in the claim when Ysolei
+  // falls while Laverock walks with the group. Cosmetic only: the title.
+  dgn_drowned_temple_cantor: {
+    id: 'dgn_drowned_temple_cantor',
+    name: 'The Last Verse',
+    desc: 'Defeat Ysolei, Avatar of the Drowned Moon, with the Last Cantor of the Pale Choir at your side.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Witness of the Choir' },
+  },
+  // The Hollow Crypt's wing bosses (src/sim/encounters/hollow_crypt: marrow.ts,
+  // lady.ts, ilvane.ts), granted to everyone in the claim at the kill.
+  // Cosmetic only; appended at the END per the append-only contract.
+  dgn_marrow_tidy: {
+    id: 'dgn_marrow_tidy',
+    name: 'A Tidy Churchyard',
+    desc: 'Defeat Sexton Marrow with every Open Grave laid at the edge of the Bell Yard.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_lady_nobody_hanging: {
+    id: 'dgn_lady_nobody_hanging',
+    name: 'Nobody Left Hanging',
+    desc: 'Defeat the Lady of the Bonechill without her ever dropping anyone from her Frozen Embrace.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_ilvane_hush: {
+    id: 'dgn_ilvane_hush',
+    name: 'Hush Now',
+    desc: 'Defeat Cantor Ilvane without her Dirge of the Hollow ever striking anyone.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // Morthen the Gravecaller's Rite (encounters/hollow_crypt/morthen.ts), granted
+  // to everyone in the claim at the kill. Cosmetic only; appended at the END.
+  dgn_morthen_candlelight: {
+    id: 'dgn_morthen_candlelight',
+    name: 'Every Candle Lit',
+    desc: 'Defeat Morthen the Gravecaller after relighting all four Remembrance Candles within 20 seconds of his Unquiet Ward rising.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
   },
 };
 

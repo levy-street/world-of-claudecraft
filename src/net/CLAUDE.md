@@ -149,7 +149,7 @@ old or future world-layout epochs fail closed BEFORE character admission.
 An unexpectedly dropped socket auto-reconnects with jittered exponential backoff
 (`computeBackoffDelay` in `backoff.ts`: `RECONNECT_BASE_DELAY_MS` doubling to the
 `RECONNECT_MAX_DELAY_MS` cap with 0.5x to 1.5x full jitter, up to
-`RECONNECT_MAX_ATTEMPTS`; constants + rationale in `online.ts`). The jitter exists so
+`RECONNECT_MAX_ATTEMPTS`; constants + rationale in `reconnect_policy.ts`). The jitter exists so
 a server restart never gets the whole realm reconnecting in lockstep; do not remove
 it or reintroduce a fixed schedule. The server holds the
 character in-world (linkdead) for five minutes and a re-auth resumes the session;

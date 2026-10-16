@@ -1,0 +1,58 @@
+{
+  "about": "The painted maps the Mirefen tavern wears: the Fenrire (moss) look of the painted Tidehold town, the look the painted Fenbridge buildings wear. tex/ holds unchanged copies of the ClaudeCraft Studio repository's scripts/assets/blender_tidehold/town_tex_painted_var/fenrire maps. yards is the town kit's repeat (bl_town_lib.py K); normalStrength is the kit's normal strength, baked into the shipped normal map; roughness is the painted buildings' own. headroom: a painted face's colour (its tint over the map and the warm light baked over that) is stored divided by it, so the light can lift the paint up to that many times the map before the colour clamps; build.mjs writes the linear factor that undoes it (vertexColourScale, 1 / srgbToLinear(1 / headroom)) into each painted material's extras, and the runtime multiplies the colour by it. tavern_texture.py lays them on in Blender, build.mjs embeds them at each texture tier.",
+  "headroom": 1.5,
+  "materials": {
+    "TavernPlaster": {
+      "color": "tex/TownPlaster_Color.jpg",
+      "normal": "tex/TownPlaster_Normal.jpg",
+      "normalStrength": 0.6,
+      "yards": 4.0,
+      "roughness": 0.86
+    },
+    "TavernTimber": {
+      "color": "tex/TownTimber_Color.jpg",
+      "normal": "tex/TownTimber_Normal.jpg",
+      "normalStrength": 0.9,
+      "yards": 2.2,
+      "roughness": 0.86
+    },
+    "TavernStone": {
+      "color": "tex/TownStone_Color.jpg",
+      "normal": "tex/TownStone_Normal.jpg",
+      "normalStrength": 1.0,
+      "yards": 5.4,
+      "roughness": 0.86
+    },
+    "TavernRoof": {
+      "color": "tex/TownRoof_Color.jpg",
+      "normal": "tex/TownRoof_Normal.jpg",
+      "normalStrength": 1.4,
+      "yards": 3.0,
+      "roughness": 0.86
+    },
+    "TavernFloor": {
+      "color": "tex/TownFloor_Color.jpg",
+      "normal": "tex/TownFloor_Normal.jpg",
+      "normalStrength": 0.8,
+      "yards": 3.0,
+      "roughness": 0.86
+    },
+    "TavernCloth": {
+      "color": "tex/TownCloth_Color.jpg",
+      "yards": 2.0,
+      "roughness": 0.95
+    },
+    "TavernDressed": {
+      "color": "tex/TownDressed_Color.jpg",
+      "normal": "tex/TownDressed_Normal.jpg",
+      "normalStrength": 0.8,
+      "yards": 2.4,
+      "roughness": 0.86
+    }
+  },
+  "tiers": {
+    "full": { "suffix": "", "color": 1024, "normal": 128 },
+    "half": { "suffix": ".half", "color": 512, "normal": 64 },
+    "quarter": { "suffix": ".quarter", "color": 256, "normal": 32 }
+  }
+}

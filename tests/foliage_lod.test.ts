@@ -49,7 +49,11 @@ function detailAt(
 // numeric literal OR the MAX_OUTDOOR_FOG_FAR constant (the open-sky realms), and
 // the row-count pin below makes a silently unparseable row a failure, not a
 // silently shrunken sweep.
-const rendererSrc = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+// The fog presets moved out of renderer.ts into their own data module.
+const presetsSrc = readFileSync(
+  new URL('../src/render/outdoor_biome_presets.ts', import.meta.url),
+  'utf8',
+);
 
 function maxOutdoorFogFar(): number {
   const src = readFileSync(new URL('../src/render/zone_streaming.ts', import.meta.url), 'utf8');
@@ -67,8 +71,8 @@ function shippedBiomeFog(): { biome: string; near: number; far: number }[] {
   // field) silently moved it in front of the table, leaving this sweep parsing a
   // 230 KB body with no fog row in it. `[^=]*` crosses the Record<...> type, whose
   // own brace is what kept the anchor off the declaration in the first place.
-  const block = /static BIOME_FOG[^=]*=\s*\{([\s\S]*?)\n {2}\};/.exec(rendererSrc);
-  expect(block, 'BIOME_FOG table not found in renderer.ts').not.toBe(null);
+  const block = /export const BIOME_FOG[^=]*=\s*\{([\s\S]*?)\n\};/.exec(presetsSrc);
+  expect(block, 'BIOME_FOG table not found in outdoor_biome_presets.ts').not.toBe(null);
   const body = (block as RegExpExecArray)[1];
   const rows = [...body.matchAll(/(\w+):\s*\{[^}]*near:\s*([\d.]+),\s*far:\s*([\w.]+)/g)].map(
     (m) => ({
@@ -89,8 +93,8 @@ function shippedBiomeFog(): { biome: string; near: number; far: number }[] {
 // The one preset the lean tier ever sees: outdoorFogPreset() returns LOW_FOG on
 // the low tier, so the lean sweep runs against it rather than the biome table.
 function shippedLowFog(): { biome: string; near: number; far: number } {
-  const m = /LOW_FOG = \{ color: \w+, near: ([\d.]+), far: ([\d.]+) \}/.exec(rendererSrc);
-  expect(m, 'LOW_FOG preset not found in renderer.ts').not.toBe(null);
+  const m = /LOW_FOG = \{ color: \w+, near: ([\d.]+), far: ([\d.]+) \}/.exec(presetsSrc);
+  expect(m, 'LOW_FOG preset not found in outdoor_biome_presets.ts').not.toBe(null);
   const [, near, far] = m as RegExpExecArray;
   return { biome: 'low-tier', near: Number(near), far: Number(far) };
 }

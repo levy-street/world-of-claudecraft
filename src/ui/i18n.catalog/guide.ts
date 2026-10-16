@@ -658,7 +658,7 @@ export const guideStrings = {
     // Death and recovery: light penalty, no lost progress.
     deathTitle: 'When you fall',
     deathBody:
-      "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
+      "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance or, in most dungeons, in the arena of the last boss your group has already beaten when the way there is safe. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
     // Threat: how an enemy picks who to hit (src/sim/threat.ts, and the healing
     // split in src/sim/combat/heal.ts, which keys on the HEALED target's hate
     // tables, not on party membership).
@@ -764,6 +764,12 @@ export const guideStrings = {
     // for the same reason as the aura tracks. Wordy (M16): non-Latin fills ride along.
     framesGovernedTalkingHead:
       "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+    // The Shardpike bar (src/ui/hud/shardpike/) joined HUD_FRAME_SPECS with the
+    // Balgath world boss. Own key for the same reason as the two above: a
+    // reword of framesGovernedExtra would go stale in every non-Latin fill.
+    // Wordy (M16): the five non-Latin fills land in this same change.
+    framesGovernedShardpike:
+      'Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.',
     // The mouseover tooltip's movable seat (interface_unlock_core.ts
     // 'unitTooltip', unit_tooltip_seat.ts) joined HUD_FRAME_SPECS with the
     // player card's title, guild, and spec lines (player_tooltip_view.ts).
@@ -816,6 +822,15 @@ export const guideStrings = {
     // is a standing tracker regardless of where it is earned.
     hubPracticeTrackerBody:
       'Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.',
+
+    // The dungeon objectives tracker (src/ui/hud/dungeon/dungeon_tracker_*):
+    // added ALONGSIDE the trackers above for the same reason, and it is also
+    // this page's prose for its HUD_FRAME_SPECS row. The rows are the sim's own
+    // boss list (src/sim/instances/dungeon_run.ts), so nothing here names a
+    // dungeon or a boss. Wordy (M16): the five non-Latin fills land in this
+    // same change.
+    dungeonTrackerBody:
+      "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
 
     chatTitle: 'The chat box',
     chatBody:
@@ -1995,9 +2010,9 @@ export const guideStrings = {
     templeBody:
       'A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.',
     sanctumBody:
-      "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
+      "A hidden glacier high on Thornpeak, where a dragon lies frozen in the ice and the cult burns stolen souls to thaw it. Descend from the high pass past ice towers, the Smith's broken chains and the cult's fires to the frozen lake at the glacier's foot.",
     wildheartBody:
-      'A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to see who waits at the top.',
+      'A hidden jungle caldera behind the Sunken Idol, ringed by cliffs and loud with waterfalls. Wade the river ford, hunt through the terraces and the falls, cross the ruined colony and climb the stepped shrine under a colossal stone jaguar.',
     raidName: 'The endgame raid',
     raidBody:
       'Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',

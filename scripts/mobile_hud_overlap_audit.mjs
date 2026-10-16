@@ -170,8 +170,8 @@ const allow = (name, msg) => {
 // logs this line, and the retry gate builds the view once the GLB lands.
 // models/creatures/training_dummy.glb is `lazyPreload: true` in
 // src/render/characters/manifest.ts (one hub, deliberately out of the eager boot
-// sweep) and the brasscrown walking staff is an npc_modular prop attachment on
-// the same path.
+// sweep) and the brasscrown walking staff is an NPC prop (manifest.ts NPC_PROP_ATTACH,
+// also an Armory skin model, so it streams on demand) on the same path.
 //
 // The BOUNDARY is what keeps this honest: the handshake fires ONCE per url per
 // session. A REPEAT is the permanent-stall bug this exact message described

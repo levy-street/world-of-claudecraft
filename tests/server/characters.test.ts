@@ -23,6 +23,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   CharacterDeleteClientGone,
   CharacterDeleteQueueSaturated,
+  CharacterReferralRewardPending,
   CharacterStoragePurchaseOpen,
 } from '../../server/character_delete_db';
 import {
@@ -70,7 +71,17 @@ type DbOverrides = Parameters<typeof setCharactersDbOverrides>[0];
 
 /** Every override stays Postgres-free now that signer rekeys always read fresh state. */
 function setCharactersDbForTests(overrides: DbOverrides): void {
-  setCharactersDbOverrides({ rekeyOfflineCharacterSigner: async () => true, ...overrides });
+  setCharactersDbOverrides({
+    referralCapacityEarned: async () => false,
+    getMembership: async () => ({
+      active: false,
+      expiresAt: null,
+      authorizedUntil: 0,
+      recurringExpiresAt: null,
+    }),
+    rekeyOfflineCharacterSigner: async () => true,
+    ...overrides,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -351,6 +362,21 @@ describe('auth guards', () => {
 // ---------------------------------------------------------------------------
 
 describe('character list handlers', () => {
+  it('reports permanent referral slots separately from active membership slots', () => {
+    const noMembership = {
+      active: false,
+      expiresAt: null,
+      authorizedUntil: 0,
+      recurringExpiresAt: null,
+    };
+    expect(buildCharacterList([], () => false, {}, 100, noMembership, true)).toMatchObject({
+      characterLimit: 15,
+    });
+    expect(
+      buildCharacterList([], () => false, {}, 100, { active: true, expiresAt: 1000 }, true),
+    ).toMatchObject({ characterLimit: 25 });
+  });
+
   it('GET /api/me/characters and GET /api/characters return byte-identical bodies', async () => {
     const rowA = charRow({
       id: 1,
@@ -399,9 +425,13 @@ describe('character list handlers', () => {
 
     const expected = {
       realm: REALM,
+      membership: { active: false, expiresAt: null },
+      characterLimit: 10,
       characters: [
         {
           id: 1,
+          membershipSlot: false,
+          membershipLocked: false,
           name: 'Aaa',
           class: 'warrior',
           level: 10,
@@ -426,6 +456,8 @@ describe('character list handlers', () => {
         },
         {
           id: 2,
+          membershipSlot: false,
+          membershipLocked: false,
           name: 'Bbb',
           class: 'mage',
           level: 5,
@@ -1892,6 +1924,30 @@ describe('takeover handler', () => {
 // ---------------------------------------------------------------------------
 
 describe('delete handler', () => {
+  it.each([
+    ['transferable', 'character.referral_transfer_pending'],
+    ['bond', 'character.referral_bond_pending'],
+  ] as const)('409s without purging a character with a %s referral guard', async (reason, code) => {
+    const spies = purgeSpies();
+    setCharactersDbForTests({
+      deleteCharacter: async () => {
+        throw new CharacterReferralRewardPending(9, reason);
+      },
+    });
+    installRuntime({ isCharacterOnline: () => false, ...spies });
+    const res = await callHandler('DELETE', '/api/characters/:id', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
+      body: { name: 'Deleteme' },
+    });
+    expect(res.status).toBe(409);
+    expect(res.body).toMatchObject({ code });
+    expect(spies.purgeMarketSeller).not.toHaveBeenCalled();
+    expect(spies.purgeMailOwner).not.toHaveBeenCalled();
+    expect(spies.saveMarket).not.toHaveBeenCalled();
+    expect(spies.saveMail).not.toHaveBeenCalled();
+  });
+
   it.each(['pending', 'unresolved'] as const)(
     '409s without purging when the character has an open %s storage purchase',
     async (status) => {

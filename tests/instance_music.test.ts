@@ -6,6 +6,7 @@ import {
   type InstanceMusicEntity,
   type InstanceMusicInput,
   instanceMusicDecision,
+  resolveMapMusicZone,
 } from '../src/game/instance_music';
 import { ZONE_STREAM_URLS } from '../src/game/music_tracks';
 import { DELVE_X_MIN, DUNGEONS, instanceOrigin, ZONES } from '../src/sim/data';
@@ -171,5 +172,51 @@ describe('instance music policy: the authoritative in-combat flag', () => {
     expect(recent.inCombat).toBe(true);
     const calm = instanceMusicDecision(input({ inCombat: false }));
     expect(calm.inCombat).toBe(false);
+  });
+});
+
+describe('an authored map’s own soundtrack', () => {
+  // WorldContent.music is what the Studio's "Map track" writes; before this
+  // the game ignored it and an authored world resolved its score through the
+  // OVERWORLD's zone table at its own coordinates, so the cue churned as the
+  // player walked.
+  it('outranks the location walk when the map names a known track', () => {
+    const d = instanceMusicDecision(input({ mapMusic: { zoneTrack: 'amber' } }));
+    expect(d.zone).toBe('amber');
+    // No map music, or an unknown id: the location decides as before.
+    expect(instanceMusicDecision(input({ mapMusic: null })).zone).toBe('town_eastbrook');
+    expect(instanceMusicDecision(input({ mapMusic: { zoneTrack: 'not_a_track' } })).zone).toBe(
+      'town_eastbrook',
+    );
+  });
+
+  it('lets the smallest containing area win over the map-wide track', () => {
+    const pos = { x: eastbrook.hub.x, z: eastbrook.hub.z };
+    const big = { minX: pos.x - 100, maxX: pos.x + 100, minZ: pos.z - 100, maxZ: pos.z + 100 };
+    const small = { minX: pos.x - 5, maxX: pos.x + 5, minZ: pos.z - 5, maxZ: pos.z + 5 };
+    const music = {
+      zoneTrack: 'amber',
+      areas: [
+        { ...big, track: 'frost' },
+        { ...small, track: 'gale' },
+        // Off to the side: must not count.
+        { minX: pos.x + 50, maxX: pos.x + 60, minZ: pos.z, maxZ: pos.z + 10, track: 'jungle' },
+      ],
+    };
+    expect(resolveMapMusicZone(music, pos.x, pos.z)).toBe('gale');
+    expect(resolveMapMusicZone(music, pos.x + 30, pos.z)).toBe('frost');
+    expect(resolveMapMusicZone(music, pos.x + 500, pos.z)).toBe('amber');
+    // An area naming an unknown track is skipped, not honoured.
+    expect(resolveMapMusicZone({ areas: [{ ...small, track: 'bogus' }] }, pos.x, pos.z)).toBe(null);
+  });
+
+  it('is still outranked by a rift floor, whose theme is the world’s call', () => {
+    const d = instanceMusicDecision(
+      input({
+        mapMusic: { zoneTrack: 'amber' },
+        riftFloor: { instanceId: 1, floorIndex: 0, themeName: 'Frostbound' },
+      }),
+    );
+    expect(d.zone).toBe('rift_frost');
   });
 });

@@ -1,7 +1,6 @@
 // Postgres-backed SocialDb. The schema is appended to the main ensureSchema()
-// run in db.ts. All relationships are keyed by character id; the realm column
-// on `characters` scopes a character to a world/shard (one realm today, but
-// stored now so cross-realm friends/guilds need no migration later).
+// run in db.ts. Friends and blocks are account-global, with realm-local
+// character identities for display. Guilds and chat ignores remain character keyed.
 
 import type { Pool } from 'pg';
 import {
@@ -13,6 +12,11 @@ import {
 } from '../src/sim/guild_ranks';
 import { guildRosterCap, guildRosterPagesBought } from '../src/sim/guild_roster';
 import type { GuildPledgeSettings } from '../src/world_api/social_graph';
+import {
+  ACCOUNT_FRIENDS_SCHEMA,
+  type AccountSocialDatabaseAdmission,
+  PgAccountFriendsDb,
+} from './account_friends_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
 import {
   GUILD_NAME_ADVISORY_LOCK_SQL,
@@ -283,6 +287,7 @@ CREATE TABLE IF NOT EXISTS guild_banks (
   data JSONB NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+${ACCOUNT_FRIENDS_SCHEMA}
 `;
 
 const CHAR_COLS = 'id, name, class AS cls, level, realm';
@@ -294,7 +299,14 @@ export class PgSocialDb implements SocialDb {
     this.loadGuildMembers(guildId),
   );
 
-  constructor(private readonly pool: Pool) {}
+  private readonly accountFriends: PgAccountFriendsDb;
+
+  constructor(
+    private readonly pool: Pool,
+    database?: AccountSocialDatabaseAdmission,
+  ) {
+    this.accountFriends = new PgAccountFriendsDb(pool, database);
+  }
 
   /** Atomic paid creation lives outside the SocialDb interface, but it still
    *  has to invalidate this instance-local roster cache after commit. */
@@ -326,71 +338,52 @@ export class PgSocialDb implements SocialDb {
     return res.rows[0] ?? null;
   }
 
-  async addFriend(charId: number, friendId: number): Promise<void> {
-    await this.pool.query(
-      'INSERT INTO friendships (character_id, friend_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-      [charId, friendId],
-    );
+  addFriend(charId: number, friendId: number) {
+    return this.accountFriends.addFriend(charId, friendId);
   }
 
-  async removeFriend(charId: number, friendId: number): Promise<void> {
-    await this.pool.query('DELETE FROM friendships WHERE character_id = $1 AND friend_id = $2', [
-      charId,
-      friendId,
-    ]);
+  removeFriend(charId: number, friendId: number) {
+    return this.accountFriends.removeFriend(charId, friendId);
   }
 
-  async listFriends(charId: number): Promise<(CharInfo & { activeTitle: string | null })[]> {
-    // state->>'activeTitle' rides the same JOINed characters row (the
-    // charactersForDeedsBoard read precedent in server/db.ts): no extra query.
-    const res = await this.pool.query(
-      `SELECT c.id, c.name, c.class AS cls, c.level, c.realm,
-              c.state->>'activeTitle' AS active_title
-       FROM friendships f JOIN characters c ON c.id = f.friend_id
-       WHERE f.character_id = $1 ORDER BY c.name`,
-      [charId],
-    );
-    return res.rows.map(({ active_title, ...r }) => ({
-      ...r,
-      activeTitle: typeof active_title === 'string' && active_title !== '' ? active_title : null,
-    }));
+  listFriends(charId: number) {
+    return this.accountFriends.listFriends(charId);
   }
 
-  async whoFriended(charId: number): Promise<number[]> {
-    const res = await this.pool.query('SELECT character_id FROM friendships WHERE friend_id = $1', [
-      charId,
-    ]);
-    return res.rows.map((r) => r.character_id);
+  listFriendPage(charId: number, afterCursor = 0) {
+    return this.accountFriends.listFriendPage(charId, afterCursor);
   }
 
-  async addBlock(charId: number, blockedId: number): Promise<void> {
-    await this.pool.query(
-      'INSERT INTO blocks (character_id, blocked_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-      [charId, blockedId],
-    );
+  whoFriended(charId: number, onlineCharacterIds?: readonly number[]) {
+    return this.accountFriends.whoFriended(charId, onlineCharacterIds);
   }
 
-  async removeBlock(charId: number, blockedId: number): Promise<void> {
-    await this.pool.query('DELETE FROM blocks WHERE character_id = $1 AND blocked_id = $2', [
-      charId,
-      blockedId,
-    ]);
+  addBlock(charId: number, blockedId: number) {
+    return this.accountFriends.addBlock(charId, blockedId);
   }
 
-  async listBlocks(charId: number): Promise<CharRef[]> {
-    const res = await this.pool.query(
-      `SELECT c.id, c.name FROM blocks b JOIN characters c ON c.id = b.blocked_id
-       WHERE b.character_id = $1 ORDER BY c.name`,
-      [charId],
-    );
-    return res.rows;
+  removeBlock(charId: number, blockedId: number) {
+    return this.accountFriends.removeBlock(charId, blockedId);
   }
 
-  async blockedIds(charId: number): Promise<number[]> {
-    const res = await this.pool.query('SELECT blocked_id FROM blocks WHERE character_id = $1', [
-      charId,
-    ]);
-    return res.rows.map((r) => r.blocked_id);
+  listBlocks(charId: number) {
+    return this.accountFriends.listBlocks(charId);
+  }
+
+  listBlockPage(charId: number, afterCursor = 0) {
+    return this.accountFriends.listBlockPage(charId, afterCursor);
+  }
+
+  blockedIds(charId: number, candidates?: readonly number[]) {
+    return this.accountFriends.blockedIds(charId, candidates);
+  }
+
+  blockedAccountIds(charId: number) {
+    return this.accountFriends.blockedAccountIds(charId);
+  }
+
+  blockedAccountIdsForAccounts(accountIds: readonly number[]) {
+    return this.accountFriends.blockedAccountIdsForAccounts(accountIds);
   }
 
   async addIgnore(charId: number, ignoredId: number): Promise<void> {

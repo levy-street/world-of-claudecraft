@@ -108,13 +108,15 @@ describe('forgefather fortress walkability', () => {
         const covers =
           b.type === 'circle'
             ? Math.hypot(dx, dz) <= b.r + 0.4
-            : (() => {
-                const cos = Math.cos(-b.rot);
-                const sin = Math.sin(-b.rot);
-                const lx = dx * cos + dz * sin;
-                const lz = -dx * sin + dz * cos;
-                return Math.abs(lx) <= b.hw + 0.4 && Math.abs(lz) <= b.hd + 0.4;
-              })();
+            : b.type !== 'obb'
+              ? false // the fork's prism colliders never come from this fortress
+              : (() => {
+                  const cos = Math.cos(-b.rot);
+                  const sin = Math.sin(-b.rot);
+                  const lx = dx * cos + dz * sin;
+                  const lz = -dx * sin + dz * cos;
+                  return Math.abs(lx) <= b.hw + 0.4 && Math.abs(lz) <= b.hd + 0.4;
+                })();
         if (!covers) continue;
         if (b.moveTopY === undefined || b.moveTopY > walk + 0.3) return true;
       }

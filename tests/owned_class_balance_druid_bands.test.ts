@@ -46,10 +46,21 @@ describe('owned-class level 20 balance harness (Druid bands)', () => {
       // code moved). Re-derived at the same relative margins: moongrove
       // 127 to 166 full / 128 to 166 diet, wildfang 154 to 191 / 155 to 193.
       // FLAGGED for the class owner: the nightly full sweep is the arbiter.
+      // Re-measured at the dungeon entrances (PR #4478: four built world doors
+      // move the spawn point of a few neighbouring mobs and the Wildheart Basin
+      // door itself, so the shared rng stream forked again; no druid code
+      // moved): moongrove 145.48 full / 146.15 diet, still inside its bands and
+      // left alone; wildfang 200.09 / 197.60. Wildfang re-derived at the same
+      // relative margins: 187 to 232 full / 185 to 229 diet. This is the pinned
+      // seed landing elsewhere, not a faster cat: over seeds 29904 to 29911 on
+      // the 60 s diet Wildfang averages 192.7 on the integration branch without
+      // the entrances (181.9 to 204.7, five of the eight over the old 193 edge)
+      // and 190.9 with them (177.7 to 204.4). FLAGGED for the class owner: a
+      // one-seed band this narrow sits inside that spread on both sides.
       expect(moongrove.dps).toBeGreaterThanOrEqual(band(127, 128));
       expect(moongrove.dps).toBeLessThanOrEqual(band(166, 166));
-      expect(wildfang.dps).toBeGreaterThanOrEqual(band(154, 155));
-      expect(wildfang.dps).toBeLessThanOrEqual(band(191, 193));
+      expect(wildfang.dps).toBeGreaterThanOrEqual(band(187, 185));
+      expect(wildfang.dps).toBeLessThanOrEqual(band(232, 229));
     },
     FULL_SWEEP ? 180_000 : 90_000,
   );

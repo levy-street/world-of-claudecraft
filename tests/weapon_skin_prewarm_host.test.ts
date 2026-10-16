@@ -93,6 +93,7 @@ import {
 } from '../src/render/worn_stone';
 import { WEAPON_TYPE_BY_ITEM } from '../src/sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import { failWocHeads, landWocBodies } from './helpers/woc_streamed';
 
 /** An iPhone session forced to ultra, resolved the way the client resolves
  *  one: the platform alone turns the iOS memory profile on. */
@@ -272,6 +273,11 @@ beforeAll(async () => {
   // prepares none, so prepare them as that boot does.
   await prepareSurfaceDetailProfileAssets(gfxInternalsForTest.settingsFor('insane'));
   await charactersReady();
+  // The warrior is a WOC body: its base and clip library stream on demand, never in the boot
+  // preload, so land them through the stub loader as the renderer's retry would; and the
+  // stub rig can hang no head, so end the head wait a WOC body otherwise holds its draw for.
+  failWocHeads(await import('../src/render/characters/woc_head_packs'));
+  await landWocBodies(await import('../src/render/characters/assets'), ['player_warrior']);
   const urls = WORN_KEYS.map((key) => weaponSkinModelUrl(skinIdFor(key)) as string);
   const arrived = new Set<string>();
   const stop = onCharacterAssetReady((url) => arrived.add(url));

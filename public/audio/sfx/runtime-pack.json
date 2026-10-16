@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "1c37ba84139d045212abe58aeb360e2941b67dbf9566af8363cba67bd611f586",
-  "catalogHash": "a3b920124b582aa93294d8b6b200532b1d1f0df056b45517fd11f20d0c09ab47",
+  "bundleId": "952a1d2cd5b5eafdbb8b85affc68f606d85c5ba6158305361b637db6a258b45e",
+  "catalogHash": "80c931114eb36491af099000800d712da876bc1732275906903c85e0f2d38f71",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -71,6 +71,18 @@
           "url": "/audio/sfx/amb_snow.mp3?v=c32c3180bd67",
           "bytes": 193767,
           "sha256": "c32c3180bd678e6949c2a681bc394860b76c628df964f14a9152f1404e904cb0"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "amb_tavern": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/amb_tavern.mp3?v=5770aff9d370",
+          "bytes": 1048912,
+          "sha256": "5770aff9d370ab05c0f0f31feb4ad7b593b4117a471781169363dc8b4bda1847"
         }
       ],
       "gain": 1,

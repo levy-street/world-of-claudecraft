@@ -1,15 +1,34 @@
 import * as THREE from 'three';
-import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
-import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import {
+  getActiveWorldContent,
+  isBuiltinWorldActive,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+} from '../sim/data';
+import { grassClearedAt } from '../sim/grass_clear';
+import {
+  roadDistance,
+  terrainCutAtHeight,
+  terrainHeight,
+  WATER_LEVEL,
+  zoneBiomeAt,
+} from '../sim/world';
+import {
+  activateDenseSlot,
+  type DenseSlotState,
+  deactivateDenseSlot,
+} from './blade_grass_dense_core';
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
 import { GRASS_BIOME_DENSITY } from './foliage';
-import { insideGrassHubExclusion } from './foliage_core';
+import { insideGrassHubExclusion, insidePavedGrassExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
 import { GFX, sharedUniforms } from './gfx';
 import { MEADOW_CARPET_FADE_START } from './meadow_tuning';
 import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
+import { GRASS_WIND_TIME_SCALE } from './tree_sway';
 
 // Near-field blade carpet: a single InstancedMesh of low-poly SOLID grass
 // clusters riding a toroidal grid around the player. The card-tuft system in
@@ -140,11 +159,12 @@ export function clusterGeometry(rng: () => number): THREE.BufferGeometry {
 // vertical spread, rounded up. Used to bound how far a cluster reaches beyond
 // its instance origin, never to place one.
 const CLUSTER_MAX_SCALE = 1.8;
-// Local-space reach of the shader's sway at a blade tip, which rides inside
-// the same instance scale: amplitude 0.085 across the two sine terms (1 + 0.4),
-// weighted by position.y squared (a blade reaches y = 0.55 + 0.55), applied to
-// x and to 0.7 of z, so the displacement is that magnitude times hypot(1, 0.7).
-const CLUSTER_SWAY_REACH = 0.085 * (1 + 0.4) * (1.1 * 1.1) * Math.SQRT2;
+// Local-space reach of the shader's sway at a blade tip (bladeSwayGlsl), which
+// rides inside the same instance scale: amplitude 0.085 across the two sine
+// terms (1 + 0.4) at 0.6 plus the rolling wave's 0.2 + 0.9, times the 1.25
+// variance ceiling, weighted by position.y squared (a blade reaches
+// y = 0.55 + 0.55), along a unit wind direction.
+const CLUSTER_SWAY_REACH = 0.085 * ((1 + 0.4) * 0.6 + 0.2 + 0.9) * 1.25 * (1.1 * 1.1);
 
 /**
  * World-space slack a placed cluster reaches beyond its instance origin: the
@@ -163,6 +183,48 @@ export function clusterPlacementPad(geo: THREE.BufferGeometry): number {
     if (d > maxSq) maxSq = d;
   }
   return (Math.sqrt(maxSq) + CLUSTER_SWAY_REACH) * CLUSTER_MAX_SCALE;
+}
+
+/**
+ * Per-blade sway, shared by the carpet and the far band (blade_grass_band.ts)
+ * so the meadow has one wind across their seam. Needs `bgOrigin` (the cluster's
+ * world origin) and `bgFade` (its scale-collapse fade) in scope. Runs only
+ * while the blade is visible: where the fade has collapsed it the block is
+ * branched around (SPACEY, 2026-09-24: "only when they are visiable").
+ */
+export function bladeSwayGlsl(classic = false): string {
+  // The built-in world keeps the sway it shipped with: one clock, no rolling
+  // wave or per-cluster variance, a fixed x/z lean, always on.
+  if (classic) {
+    return `
+          float bgPhase = bgOrigin.x * 1.7 + bgOrigin.z * 2.3;
+          float bgSway = (sin(uTime * 2.1 + bgPhase) + 0.4 * sin(uTime * 3.7 + bgPhase * 1.31))
+            * 0.085 * position.y * position.y;
+          transformed.x += bgSway;
+          transformed.z += bgSway * 0.7;`;
+  }
+  return `
+          if (bgFade > 0.0) {
+            // weighted by height squared so roots stay planted; phase from the
+            // instance origin desynchronises neighbours
+            float bgPhase = bgOrigin.x * 1.7 + bgOrigin.z * 2.3;
+            // the slowed grass clock (SPACEY, 2026-09-24: "slow the animations
+            // down by 30%", then "another 30%")
+            float bgT = uTime * ${GRASS_WIND_TIME_SCALE.toFixed(4)};
+            // a rolling gust band sweeps the field (world-position phase), so
+            // patches downwind lean in turn instead of every blade shivering in
+            // place; per-cluster amplitude varies 0.75-1.25 from a cheap hash
+            // (SPACEY, 2026-09-24: "really nice animation with some variance")
+            float bgWave = 0.5 + 0.5 * sin(bgOrigin.x * 0.14 + bgOrigin.z * 0.09 - bgT * 1.9);
+            float bgVar = 0.75 + 0.5 * fract(sin(bgPhase * 12.9898) * 43758.5453);
+            float bgSway = ((sin(bgT * 2.1 + bgPhase) + 0.4 * sin(bgT * 3.7 + bgPhase * 1.31)) * 0.6
+                + (0.2 + 0.9 * bgWave * bgWave))
+              * 0.085 * bgVar * position.y * position.y;
+            // one WORLD wind direction brought into each cluster's own frame
+            // (they are yawed at random), so a gust leans a patch coherently
+            vec3 bgWD = normalize(vec3(0.83, 0.0, 0.55) * mat3(instanceMatrix));
+            transformed += bgWD * bgSway;
+          }`;
 }
 
 export function buildBladeGrass(
@@ -195,6 +257,12 @@ export function buildBladeGrass(
     // culling the back faces read as half the blades missing per cluster
     side: THREE.DoubleSide,
   });
+  // Resolved once at build: a content swap rebuilds the carpet.
+  const classicSway = isBuiltinWorldActive();
+  // The sway variant is chosen in JS, so name it in the program key (three's
+  // default key is the hook source, identical for both variants).
+  mat.customProgramCacheKey = () =>
+    `${mat.onBeforeCompile.toString()}|blade-sway:${classicSway ? 'classic' : 'wind'}`;
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uPlayerPos;
@@ -214,13 +282,7 @@ export function buildBladeGrass(
           // sort; shrinking toward the root is invisible in motion
           float bgFade = 1.0 - smoothstep(${(RADIUS * FADE_START).toFixed(1)}, ${RADIUS.toFixed(1)}, distance(bgOrigin.xz, uPlayerPos));
           transformed *= bgFade;
-          // per-blade sway, weighted by height squared so roots stay planted;
-          // phase from the instance origin desynchronises neighbours
-          float bgPhase = bgOrigin.x * 1.7 + bgOrigin.z * 2.3;
-          float bgSway = (sin(uTime * 2.1 + bgPhase) + 0.4 * sin(uTime * 3.7 + bgPhase * 1.31))
-            * 0.085 * position.y * position.y;
-          transformed.x += bgSway;
-          transformed.z += bgSway * 0.7;
+          ${bladeSwayGlsl(classicSway)}
         #endif`,
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
@@ -271,10 +333,20 @@ export function buildBladeGrass(
       // the patch structure just modulates it
       ok = r1 < (0.44 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
       if (ok) ok = roadDistance(x, z) > 2.4;
+      // The maker's painted no-grass discs (sim/grass_clear.ts). They had a
+      // spatial index, a document field, an editor brush and a sanitizer, and
+      // no consumer anywhere in the render, so a paved plaza still grew a
+      // meadow through it. This is that consumer: the blade carpet is what
+      // actually shows on a city floor.
+      if (ok) ok = !grassClearedAt(getActiveWorldContent().grassClear, x, z);
       if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
+      if (ok) ok = !insidePavedGrassExclusion(x, z);
       if (ok) {
         const h = terrainHeight(x, z, seed);
         ok = h > WATER_LEVEL + 1.4;
+        // a boolean cut removes the ground sheet: no carpet floating over the
+        // opening (same evaluator the mesher drops quads with)
+        if (ok) ok = !terrainCutAtHeight(x, z, h);
         // keep the carpet off banks: the same slope band where the terrain
         // shader fades its relief (planar smear territory)
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;

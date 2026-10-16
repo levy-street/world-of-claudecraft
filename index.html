@@ -377,6 +377,7 @@
     </nav>
 
     <div id="right-tracker-stack" class="ui-outline">
+      <div id="dungeon-tracker" role="group"></div>
       <div id="quest-tracker"><div id="qt-body"></div></div>
       <div id="deed-tracker"></div>
       <div id="reliquary-tracker"></div>
@@ -442,6 +443,11 @@
           </div>
           <div id="stancebar"></div>
             <div id="petbar" class="panel"></div>
+            <!-- The Shardpike bar: a second action bar that appears only while the quest
+                 pike is in hand (src/ui/hud/shardpike/). Empty here; the painter builds
+                 its buttons on the first visible frame, so a session that never takes the
+                 quest carries no extra chrome. -->
+            <div id="shardpike-bar" class="panel" style="display: none"></div>
           <div id="actionbar-group">
             <div id="actionbar3" class="panel"></div>
             <div id="actionbar2" class="panel"></div>
@@ -610,6 +616,7 @@
     <div id="woc-market-window" class="window panel ui-window"></div>
     <div id="mailbox-window" class="window panel ui-window"></div>
     <div id="bank-window" class="window panel ui-window"></div>
+    <div id="courier-window" class="window panel ui-window"></div>
     <div id="deeds-window" class="window panel ui-window"></div>
     <div id="reliquary-window" class="window panel ui-window"></div>
     <div id="loot-explorer-window" class="window panel"></div>
@@ -674,6 +681,7 @@
     </div>
     <div id="low-health-vignette"></div>
     <div id="subzone-banner" class="ui-cin"></div>
+    <div id="shardpike-prompt"></div>
 
     <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <div class="death-panel ui-panel-strong">
@@ -2001,6 +2009,19 @@
     </div>
   </div>
 
+  <!-- Dev-only offscreen frame pump, opt-in with ?headless=1. An agent-driven
+       browser pane renders the page hidden, and Chrome then throttles rAF and
+       never fires requestIdleCallback, so the shader prewarm never finishes and
+       world entry hangs. This must install BEFORE any game module runs, hence a
+       separate module script above the entry: module scripts execute in
+       document order, and the top-level await here holds main.ts until the
+       pump is in place. No-ops in production (see headless_pump.ts). -->
+  <script type="module">
+    if (new URLSearchParams(location.search).has('headless')) {
+      const m = await import('/src/dev/headless_pump.ts');
+      m.installHeadlessPump();
+    }
+  </script>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

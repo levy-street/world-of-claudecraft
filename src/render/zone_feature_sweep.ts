@@ -10,6 +10,7 @@ import type * as THREE from 'three';
 import {
   type FeatureFootprint,
   isZoneFeatureInReach,
+  isZoneFeatureInRect,
   isZoneFeatureShadowCasting,
   isZoneFeatureVisible,
   zoneFeatureReach,
@@ -64,6 +65,12 @@ export function zoneFeatureEntryFor(
  * pass would otherwise redraw whole neighbour towns that cannot land one
  * texel in the shadow volume), with the per-mesh castShadow writes made only
  * on a state flip, never as a steady per-frame traversal.
+ *
+ * `isolate` is the editor's zone-isolate rect: it narrows visibility from
+ * "near enough to see" to "belongs to the isolated zone" (streetlamps,
+ * braziers and water flora register one cull child PER ZONE, so the rect test
+ * lands at the right granularity). It gates drawing only; the shadow cull is
+ * an independent gate.
  */
 export function sweepZoneFeatures(
   entries: readonly ZoneFeatureEntry[],
@@ -71,11 +78,14 @@ export function sweepZoneFeatures(
   camZ: number,
   cullFar: number,
   shadowHalfExtent: number,
+  isolate: { minX: number; maxX: number; minZ: number; maxZ: number } | null = null,
 ): void {
   for (const entry of entries) {
     entry.inReach = isZoneFeatureInReach(entry.footprint, camX, camZ, entry.reach, entry.inReach);
     entry.group.visible =
-      entry.inReach && isZoneFeatureVisible(entry.footprint, camX, camZ, cullFar);
+      entry.inReach &&
+      isZoneFeatureVisible(entry.footprint, camX, camZ, cullFar) &&
+      (!isolate || isZoneFeatureInRect(entry.footprint, isolate));
     const casting = isZoneFeatureShadowCasting(
       entry.footprint,
       camX,

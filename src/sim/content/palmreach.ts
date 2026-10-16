@@ -542,7 +542,10 @@ export const PALMREACH_CAMPS: CampDef[] = [
   { mobId: 'thicket_boar', center: { x: -410, z: 960 }, radius: 10, count: 3 },
   { mobId: 'canopy_weaver', center: { x: -326, z: 1060 }, radius: 10, count: 3 },
   { mobId: 'canopy_weaver', center: { x: -426, z: 1120 }, radius: 10, count: 2 },
-  { mobId: 'idol_guardian', center: { x: -256, z: 1090 }, radius: 5, count: 1 },
+  // Stood in the east half of its ring (centre (-256, 1090), radius 8), away
+  // from the Wildheart Basin door at (-237, 1093): a party gathering at the
+  // Jaguar Maw's exit drop is no longer a short wander from its 14 yd aggro.
+  { mobId: 'idol_guardian', center: { x: -261, z: 1092 }, radius: 2, count: 1 },
 ];
 export const PALMREACH_OBJECTS: GroundObjectDef[] = [
   {

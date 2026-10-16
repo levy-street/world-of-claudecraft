@@ -380,6 +380,18 @@ y=0 base, required clips, in-place clips. Hard errors block; warnings ship but a
 - CREDITS.md attribution is auto-appended by `--apply` (idempotent).
 - `npm run asset:budget` is the advisory whole-tree size check; keep it in mind.
 
+## Multiview (Smart Mesh P2.0)
+The art team's model step builds from separate front, left and back views of a T-pose
+concept (not one sheet): `tripo.generateModelFromViews({ views: { front, left, back } })`
+posts to `/generation/multiview-to-model` on `MODEL_P2` (`P2-20260801`, Tripo Studio's
+"Smart Mesh P2.0") with `face_limit` (aim 3,000 to 5,000 for a mob; P2 takes 48 to 50,000
+triangles), `textureSize` (`texture_size`, the map's edge in pixels: the art guide asks for
+1024; `texture_quality` is one of fast, standard, detailed, extreme) and optional `quad`
+(P2 only; P1 rejects it). Front is required; the order is fixed by `MULTIVIEW_ANGLES`.
+The model ids the v3 API accepts are listed by its own error for an unknown `model`
+(P1-20260311, P2-20260801, v2.5-20250123, v3.0-20250812, v3.1-20260211 as of 2026-10-09);
+the legacy `api.tripo3d.ai/v2` task endpoint does NOT know P2.
+
 ## Costs and limits (Tripo, July 2026)
 | Operation | Credits |
 |---|---|

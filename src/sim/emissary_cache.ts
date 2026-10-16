@@ -9,6 +9,7 @@ import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
 import { DUNGEON_MOBS } from './content/dungeons';
 import { NYTHRAXIS_RAID_BOSS_ID } from './content/heroic_loot';
 import { IGNIVAR_LOOT_ITEM_IDS } from './content/ignivar_loot';
+import { NYTHRAXIS_RELOCATED_ITEM_IDS } from './content/nythraxis_loot';
 import { ITEMS } from './data';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -37,6 +38,9 @@ export function emissaryCacheRaidPool(): readonly string[] {
   for (const entry of DUNGEON_MOBS[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []) {
     if (entry.itemId) push(entry.itemId);
   }
+  // The raid pieces relocated off Nythraxis onto the dungeon bosses
+  // (content/nythraxis_loot.ts) are still Normal raid pieces: the cache keeps them.
+  for (const id of NYTHRAXIS_RELOCATED_ITEM_IDS) push(id);
   for (const id of IGNIVAR_LOOT_ITEM_IDS) push(id);
   return out;
 }

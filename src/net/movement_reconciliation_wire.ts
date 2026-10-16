@@ -1,8 +1,8 @@
 import type { FerryDeckMirror } from '../sim/types';
-import { QuestWorldWireState } from './quest_world_wire_state';
+import { LanceWireState } from './lance_wire_state';
 import { parseFerryDeck } from './transport_wire';
 
-export class ReconWireState extends QuestWorldWireState {
+export class ReconWireState extends LanceWireState {
   reconAuthoritativeX: number | null = null;
   reconAuthoritativeY: number | null = null;
   reconAuthoritativeZ: number | null = null;

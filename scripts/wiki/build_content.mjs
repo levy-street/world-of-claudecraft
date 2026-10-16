@@ -56,6 +56,7 @@ const entrySource = `
   export { armorySkinStrings } from './src/ui/i18n.catalog/armory.ts';
   export { guideStrings } from './src/ui/i18n.catalog/guide.ts';
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
+  export { wocArmorPackUrl } from './src/render/characters/woc_armor_core.ts';
   export {
     CRAFT_RING, STATIONS, STATION_TYPE_BY_CRAFT, STATION_RADIUS, PERK_THRESHOLDS,
     CRAFT_GOLD_SINK_COPPER_PER_BUDGET, CRAFT_CAST_DURATION_FIELD_SEC,
@@ -156,6 +157,7 @@ const {
   guideStrings,
   VISUALS,
   visualKeyFor,
+  wocArmorPackUrl,
   CONSUME_DURATION,
   DT,
   FISHING_SESSION_CAP_SEC,
@@ -250,12 +252,17 @@ const hex = (n) => `#${(n >>> 0).toString(16).padStart(6, '0').slice(-6)}`;
 const abilityRef = (aid) => ({ id: aid, name: ABILITIES[aid]?.name ?? aid });
 
 // 3D model registry, mirrored from the renderer's VisualDef manifest so the Guide's
-// interactive viewer (src/guide/viewer) can build the EXACT in-game model from one GLB
-// on demand, without importing the renderer's bulk-preload asset pipeline. We bake only
-// the structural fields the standalone viewer needs (GLB url, idle clip name, height,
+// interactive viewer (src/guide/viewer) can build the EXACT in-game model on demand,
+// without importing the renderer's bulk-preload asset pipeline. We bake only the
+// structural fields the standalone viewer needs (GLB url, idle clip name, height,
 // orientation, the KayKit accessory allowlist, weapon attachments, tint strength) and
 // dedupe by visual key, since many creatures share one model. Per-entity color is carried
-// on each class/creature/pet as `tint`, resolved here from the VisualDef tint mode.
+// on each class/creature/pet as `tint`, resolved here from the VisualDef tint mode. A WOC
+// body is split (src/render/characters/woc_armor_core.ts): its clips ride a separate
+// animation library (`animUrls`) and its default kit its class set's armor files
+// (`armor`, the medium file: a complete GLB the viewer's plain loader reads, every map at
+// half the full layout; the top levels the game lays over it for a close-up stay in game),
+// bound to the base's skeleton by bone name exactly as in game.
 const MODELS = {};
 function modelKeyFor(visualKey) {
   const def = VISUALS[visualKey];
@@ -279,12 +286,18 @@ function modelKeyFor(visualKey) {
           if (a.position) o.position = a.position;
           if (a.rotationY) o.rotationY = a.rotationY;
           if (a.gripRef) o.gripRef = a.gripRef;
+          if (a.size !== undefined && a.size !== 1) o.size = a.size;
           return o;
         });
       }
     }
     if (def.weaponFix) spec.weaponFix = def.weaponFix;
     if (def.tint !== undefined) spec.tintStrength = def.tintStrength ?? 0.4;
+    if (def.wocCharacter) {
+      if (def.animUrls?.length) spec.animUrls = [...def.animUrls];
+      const sets = [...new Set(Object.values(def.wocCharacter.items).map((item) => item.set))];
+      spec.armor = sets.map((set) => wocArmorPackUrl(def.wocCharacter.fit, set, 'medium'));
+    }
     MODELS[visualKey] = spec;
   }
   return visualKey;
@@ -696,6 +709,9 @@ function reliquaryRelicName(relic) {
 // Reliquary keeps the full page name; the public wiki uses a safe label.
 const RELIQUARY_WIKI_PAGE_NAME = {
   conquerors_thunzharr: 'The Waking Peak (World Boss)',
+  // Same spoiler rule: the page name carries the boss's own name, which
+  // tests/guide.test.ts forbids in generated content.
+  conquerors_balgath: 'Starfall Crater (World Boss)',
 };
 
 const reliquary = RELIQUARY_PAGES.filter(
@@ -1407,7 +1423,7 @@ export interface GuideClassSpec { id: string; name: string; role: GuideRole; sig
 // Interactive 3D model data, mirrored from the renderer's VisualDef manifest. The Guide's
 // standalone viewer builds the model from one GLB on demand; entities reference a model by
 // visual key into GUIDE_MODELS and carry their own tint color.
-export interface GuideModelAttach { url: string; bone: string; position?: [number, number, number]; rotationY?: number; gripRef?: string; }
+export interface GuideModelAttach { url: string; bone: string; position?: [number, number, number]; rotationY?: number; gripRef?: string; size?: number; }
 export interface GuideModelWeaponFix { node: string; rotX?: number; rotY?: number; rotZ?: number; }
 export interface GuideModelSpec {
   url: string;
@@ -1419,6 +1435,10 @@ export interface GuideModelSpec {
   attach?: GuideModelAttach[];
   weaponFix?: GuideModelWeaponFix[];
   tintStrength?: number;
+  /** Clip libraries played on this model (a split WOC body's animation library). */
+  animUrls?: string[];
+  /** Armor files bound to this model's skeleton by bone name (a split WOC body's kit). */
+  armor?: string[];
 }
 
 export interface GuideClassInfo {

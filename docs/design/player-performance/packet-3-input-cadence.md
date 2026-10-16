@@ -132,12 +132,12 @@ R5. Per-class post-parse lanes (the reserved-lane requirement), with detector-sa
       can burn, and because the lane is more generous than the ladder, the ladder's
       error messaging still fires on the passed subset.
     - name-screen lane (added at the Masterwrought phase 13 QA hot-path review),
-      cmd 'pet_rename' and cmd 'perfect_item' carrying a `name` field: refill 2/s,
-      burst 5. The two handlers that run the obscenity matcher on player text BEFORE
+      cmd 'pet_rename', 'buddy_rename', 'guild_create', and cmd 'perfect_item'
+      carrying a `name` field: refill 2/s, burst 5. These handlers run the obscenity matcher on player text BEFORE
       any sim gate; an ALLOWED under-ceiling frame books no drop, so on the command
       lane a hostile client could spend the matcher's cost per frame indefinitely
-      while naming an empty slot. Both are dialog actions at single digits per
-      minute for a real player; both handlers are shape-first (the matcher prices
+      while naming an empty slot. These are dialog actions at single digits per
+      minute for a real player; the handlers are shape-first (the matcher prices
       the sim's normalized value, never the raw token). Drops tally like every other
       lane drop. An unnamed perfect_item frame stays on the command lane.
     - parsed frames of any OTHER shape (unknown t, non-object JSON, unknown cmd)

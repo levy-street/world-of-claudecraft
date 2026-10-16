@@ -33,7 +33,7 @@ import {
   pathCrossesFence,
   resolveMovement,
 } from '../src/sim/colliders';
-import { ZONE1_PROPS } from '../src/sim/content/zone1';
+import { ZONE1_PROPS, ZONE1_ROADS } from '../src/sim/content/zone1';
 import { BUILTIN_WORLD, NPCS, PROPS, STATIONS, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_BUILDINGS_BY_ID, EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import {
@@ -86,7 +86,12 @@ function garrisonDecorProp(key: string) {
   return prop;
 }
 
-function expectWalkableRoute(from: { x: number; z: number }, to: { x: number; z: number }): void {
+// Returns where the follower actually stopped (within 0.2 yd of `to`), so a
+// walk made of several legs can start each leg from the last one's arrival.
+function expectWalkableRoute(
+  from: { x: number; z: number },
+  to: { x: number; z: number },
+): { x: number; z: number } {
   let route = findPlayerPath(SEED, from, to, 128);
   expect(route.length, 'route has no waypoints').toBeGreaterThan(0);
   let current = { ...from };
@@ -160,6 +165,15 @@ function expectWalkableRoute(from: { x: number; z: number }, to: { x: number; z:
     }
   }
   expect(Math.hypot(to.x - current.x, to.z - current.z), 'route endpoint').toBeLessThanOrEqual(0.2);
+  return current;
+}
+
+// One unbroken walk through the points in order: every leg goes through
+// expectWalkableRoute with all of its per-stride checks, and each leg starts
+// where the one before it stopped, never back on the waypoint itself.
+function expectWalkableLegs(points: readonly { x: number; z: number }[]): void {
+  let at = points[0];
+  for (let leg = 1; leg < points.length; leg++) at = expectWalkableRoute(at, points[leg]);
 }
 
 describe('Eastbrook Grand Armoury retirement (round 4)', () => {
@@ -172,9 +186,11 @@ describe('Eastbrook Grand Armoury retirement (round 4)', () => {
     // the armoury row left, so the table is exactly the authored lots.
     // Round 6 (owner) then removed eastbrook_home_rise from the layout after
     // live review, dropping the authored lots to eight rows, and afterwards
-    // appended the harbour quarter's three coastal buildings, so the table is
-    // eleven rows now.
-    expect(ZONE1_PROPS.buildings).toHaveLength(12);
+    // appended the harbour quarter's three coastal buildings, so the table was
+    // eleven rows, twelve with the Weekly Vault.
+    // Re-pinned 2026-10 for the Tidehold rebuild: six placed buildings replaced
+    // the eleven kit shells, so the table is those six plus the Weekly Vault.
+    expect(ZONE1_PROPS.buildings).toHaveLength(7);
     expect(ZONE1_PROPS.buildings.map((building) => building.id)).toEqual([
       ...EASTBROOK_LAYOUT.buildings.map((building) => building.id),
       EASTBROOK_LAYOUT.weeklyVault.id,
@@ -277,6 +293,9 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     // authored behavior at his stand is now NO rest. The move is deliberate,
     // and this row follows it rather than the reverse: rest belongs to the
     // inn, not to the Card Master.
+    // (The Tidehold rebuild, 2026-10, moved both again and kept them apart:
+    // he flanks the bank's door at (16.3, -109.5) and the inn is the painted
+    // tavern walled around (-40.51, -72.3).)
     expect(isResting(player)).toBe(false);
     // The landmark's narrow threshold halo stays the adapter's rule for
     // custom worlds that place it.
@@ -321,21 +340,30 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     if (!fenbridgeInn) throw new Error('missing Fenbridge inn fixture');
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
-      assetId: '/models/props/fenbridge_crooked_reed_inn.glb',
-      x: -21.25,
-      z: 317,
-      w: 9,
-      d: 8,
+      // the painted tavern on the main street, stood grand at 1.2 (fenbridge_layout.ts)
+      assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
+      x: 13.55,
+      z: 298,
+      w: 24,
+      d: 15.6,
       rot: FENBRIDGE_BUILDINGS_BY_ID.fenbridge_crooked_reed_inn.rotation,
     });
 
     const restPadding = buildingRestPadding(fenbridgeInn);
-    const restPoint = authoredInn.frontStandingPoint;
+    // on the door's line, a step inside the padded rest area (the grand inn's
+    // visitor stand is 2.16 yd off its wall, just past it)
+    const restPoint = localToWorld(
+      authoredInn.position,
+      authoredInn.rotation,
+      authoredInn.sockets.entrance.localPosition.x,
+      -(authoredInn.nativeDimensions.depth / 2 + restPadding - 0.25),
+    );
     const outsideRestPoint = localToWorld(
       authoredInn.position,
       authoredInn.rotation,
       authoredInn.sockets.entrance.localPosition.x,
-      authoredInn.nativeDimensions.depth / 2 + restPadding + 0.25,
+      // the painted tavern's door is on its -Z face
+      -(authoredInn.nativeDimensions.depth / 2 + restPadding + 0.25),
     );
     expect(restPadding).toBe(2);
     expect(buildingContainsPoint(fenbridgeInn, restPoint.x, restPoint.z, restPadding)).toBe(true);
@@ -402,7 +430,23 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     );
     if (!toolworksStation) throw new Error('Eastbrook toolworks station is missing');
     const toolworks = toolworksStation.pos;
+    // The Tidehold rebuild (2026-10) stood the apothecary's shop, 14 yd of
+    // sealed rear wall, across the beeline from the barracks approach down to
+    // the toolworks bench. A player comes down the north road east of the
+    // shop instead, so that walk goes through the road's town end at
+    // (14.6, -88.6), on the road itself (pinned here), and then across the
+    // square. The walk back up takes the same road: since the shop became
+    // walk-in it collides on its own baked boxes, and its stall counter and
+    // barrels meet in a corner that holds a body walking the beeline into it.
+    // Every other walk keeps its beeline.
+    const northRoadTownEnd = { x: 14.6, z: -88.6 };
+    expect(ZONE1_ROADS[0]).toContainEqual(northRoadTownEnd);
     for (const destination of [square, NPCS.card_master.pos, toolworks]) {
+      if (destination === toolworks) {
+        expectWalkableLegs([approach, northRoadTownEnd, toolworks]);
+        expectWalkableLegs([toolworks, northRoadTownEnd, approach]);
+        continue;
+      }
       expectWalkableRoute(approach, destination);
       expectWalkableRoute(destination, approach);
     }

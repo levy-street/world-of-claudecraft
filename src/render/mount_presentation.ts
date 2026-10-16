@@ -116,8 +116,8 @@ export interface MountPresentationInputs {
 /**
  * The mount's locomotion, borrowed from its rider: the shared gait facts copied
  * into the mount's own scratch, with the REAL airborne flag (the rider's is
- * suppressed while seated; the mount carries the jump) and none of the
- * rider-only facts (casting, sitting, dead never reach a gait clip).
+ * suppressed while seated; the mount carries the jump), the rider's turn bank,
+ * and none of the rider-only facts (casting, sitting, dead never reach a gait clip).
  */
 export function borrowRiderLocomotion(mount: AnimState, rider: AnimState, airborne: boolean): void {
   mount.speed = rider.speed;
@@ -125,7 +125,12 @@ export function borrowRiderLocomotion(mount: AnimState, rider: AnimState, airbor
   mount.running = rider.running;
   mount.airborne = airborne;
   mount.backwards = rider.backwards;
+  // a direction fact like the backpedal: a mount rig with side runs strafes too
+  mount.strafe = rider.strafe;
   mount.swimming = rider.swimming;
+  // The mount banks with its rider: without this the rider leans into a turn
+  // and the animal under them stays bolt upright.
+  mount.bankRoll = rider.bankRoll;
 }
 
 // Dormant since the Rallycart RXT retired (RETIRED_MOUNT_SKIN_IDS): no live

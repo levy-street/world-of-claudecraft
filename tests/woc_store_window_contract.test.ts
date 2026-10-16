@@ -394,8 +394,10 @@ describe('WOC Store window contract', () => {
       'this.claudiumHooks?.storeSnapshot()',
     );
 
-    const hook = main.slice(main.indexOf('storeSnapshot: async () =>'));
-    const storeSnapshot = hook.slice(0, hook.indexOf('snapshot: async () =>'));
+    expect(main).toContain('storeSnapshot: () => storeSnapshotForHud(economy)');
+    const storeSnapshot = stripComments(
+      readFileSync(new URL('../src/net/subscription_sdk.ts', import.meta.url), 'utf8'),
+    );
     expect(storeSnapshot).toContain('economy.storeSnapshot()');
     expect(storeSnapshot).not.toContain('economy.skus()');
     expect(storeSnapshot).not.toContain("economy.price('woc')");

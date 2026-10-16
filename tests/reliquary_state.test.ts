@@ -169,7 +169,7 @@ describe('Reliquary first discover of a catalogued relic', () => {
     expect(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt.clearSource).toEqual({
       kind: 'dungeon',
       dungeonId: 'hollow_crypt',
-      difficulty: 'any',
+      difficulty: 'normal',
     });
     expect(meta.deedStats.dungeonClears.hollow_crypt).toBeUndefined();
 
@@ -1596,30 +1596,47 @@ describe('Reliquary pure completion + curator rank', () => {
 
   it('a five-man page whose relics Heroic also pays counts Heroic clears on its meter', () => {
     // The player report behind this pin: farming the Hollow Crypt on Heroic
-    // drops every one of the page's five relics, yet the page meter (and the
+    // dropped every one of the page's relics, yet the page meter (and the
     // first-find clear stamp) read only the bare Normal key, so "N clears"
-    // sat still run after run. The five-man pages count both difficulties;
-    // the heroic-only epic pages keep the heroic filter.
+    // sat still run after run. A five-man page Heroic pays in full counts both
+    // difficulties; the heroic-only epic pages keep the heroic filter. The
+    // Sunken Bastion carries the pin since the Hollow Crypt page's uncommon
+    // brand pieces went Normal-only (2026-10-09, the next test).
     const sim = makeSim();
     const { meta } = primary(sim);
-    expect(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt?.clearSource).toEqual({
+    expect(RELIQUARY_PAGES_BY_ID.conquerors_sunken_bastion?.clearSource).toEqual({
       kind: 'dungeon',
-      dungeonId: 'hollow_crypt',
+      dungeonId: 'sunken_bastion',
       difficulty: 'any',
     });
     // ONLY the heroic key exists; the bare normal key stays absent.
-    meta.deedStats.dungeonClears['hollow_crypt:heroic'] = 4;
-    expect(meta.deedStats.dungeonClears.hollow_crypt).toBeUndefined();
-    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt')).toBe(4);
-    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt_heroic')).toBe(4);
+    meta.deedStats.dungeonClears['sunken_bastion:heroic'] = 4;
+    expect(meta.deedStats.dungeonClears.sunken_bastion).toBeUndefined();
+    expect(sim.reliquaryPageClearCount('conquerors_sunken_bastion')).toBe(4);
+    expect(sim.reliquaryPageClearCount('conquerors_sunken_bastion_heroic')).toBe(4);
     // Both keys sum on the five-man page; the heroic page still reads its own.
-    meta.deedStats.dungeonClears.hollow_crypt = 2;
-    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt')).toBe(6);
-    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt_heroic')).toBe(4);
+    meta.deedStats.dungeonClears.sunken_bastion = 2;
+    expect(sim.reliquaryPageClearCount('conquerors_sunken_bastion')).toBe(6);
+    expect(sim.reliquaryPageClearCount('conquerors_sunken_bastion_heroic')).toBe(4);
     // The first-find stamp reads the same meter, so a relic taken on the
     // fourth Heroic run is "first found on clear 6", never a sparse entry.
+    markItemDiscovered(sim.ctx, meta, 'tideguard_greaves');
+    expect(meta.reliquary.firstFind.tideguard_greaves).toEqual({ clears: 6 });
+  });
+
+  it('the Hollow Crypt page counts Normal clears once Heroic stopped paying its uncommon pieces', () => {
+    // Morthen's four uncommon brand pieces drop on Normal alone (a Heroic kill
+    // pays no uncommon gear, 2026-10-09), so a Heroic run is not a run at this
+    // page's spoils: its Heroic clears count on the Heroic page instead.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.deedStats.dungeonClears['hollow_crypt:heroic'] = 4;
+    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt')).toBe(0);
+    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt_heroic')).toBe(4);
+    meta.deedStats.dungeonClears.hollow_crypt = 2;
+    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt')).toBe(2);
     markItemDiscovered(sim.ctx, meta, 'cryptbone_helm');
-    expect(meta.reliquary.firstFind.cryptbone_helm).toEqual({ clears: 6 });
+    expect(meta.reliquary.firstFind.cryptbone_helm).toEqual({ clears: 2 });
   });
 
   it('a heroic-only dungeonClears key never leaks into a Normal-filtered raid page readout', () => {
@@ -2719,20 +2736,18 @@ describe('Reliquary catalog index memo', () => {
     // A hand-carried literal, not the production filter restated (which would
     // prove nothing): base 39 pages minus the vault and riftbound flags (37).
     //
-    // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought.
-    // BOTH parent pins for the record: ours 41 pages / 38 scoring (the vault,
-    // riftbound and personal-Forgebreaker flags; Crucible crafts remain part
-    // of completion), the release 40 pages / 38 scoring (the vault and
-    // riftbound flags only). Counted directly off the resolved
-    // src/sim/content/reliquary.ts RELIQUARY_PAGES literal: 42 top-level page
+    // RE-PINNED at the merge of feature/mirefen-world-boss into
+    // release/v0.44.0. Counted directly off the resolved
+    // src/sim/content/reliquary.ts RELIQUARY_PAGES literal: 43 top-level page
     // entries, 3 carrying excludeFromCompletion (the vault, riftbound and
     // personal-Forgebreaker flags), so 39 scoring pages, matching the
     // arithmetic reconciliation (base 39 + ours' delta +2 + theirs' delta +1
     // = 42; flagged base 2 + ours' delta +1 + theirs' delta +0 = 3).
     // The Warfare Season 2 Vanguard Gallery, appended after the reconciliation
     // above, is flagged personal, so the scoring set stays at 39.
-    // The Buried Hoards page (2026-09-28 merge) scores: 40.
-    expect(first?.length).toBe(40);
+    // The Buried Hoards page (2026-09-28 merge) scores: 40. The Mirefen world boss
+    // page is an ordinary conquerors page, so it scores too: 41.
+    expect(first?.length).toBe(41);
     expect(first?.some((p) => p.excludeFromCompletion !== undefined)).toBe(false);
 
     // An UNFLAGGED synthetic table answers the caller's own array by identity:

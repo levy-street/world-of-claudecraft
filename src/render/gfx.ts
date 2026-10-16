@@ -234,6 +234,10 @@ export interface GfxSettings {
   readonly bladeCarpetRadius: number;
   /** cliff-scree rubble scatter (visual dressing; the sim dome is tier-free) */
   readonly cliffScree: boolean;
+  /** painted ground clutter (Studio Paint Clutter stamps): High and up */
+  readonly cityClutter: boolean;
+  /** how far from the camera painted clutter is drawn, world yards */
+  readonly cityClutterRadius: number;
   /** canopy clump-detail layer (canopy_detail.ts) */
   readonly canopyDetail: boolean;
   /**
@@ -310,6 +314,14 @@ export interface GfxSettings {
    * app. Set purely from `platform === 'ios'`; it does not require `nativeApp`.
    */
   readonly iosMemoryProfile: boolean;
+  /**
+   * Which texture set a placed town building loads (`placed_texture_tier_core.ts`): the
+   * full maps, the half-size set (a quarter of the memory) or the quarter-size one (a
+   * sixteenth). Phone-class memory profiles take the quarter set and the low tier the half
+   * set. Cosmetic sharpness only: the geometry, and so the collision, is the same in every
+   * set (fairness rule).
+   */
+  readonly placedTextureTier: 'full' | 'half' | 'quarter';
   /** Global cap for inactive skinned character rigs retained for reuse. */
   readonly maxPooledCharacterVisuals: number;
   /** Global cap for inactive ground-object views (harvest nodes, loot, quest pickups) retained for reuse. */
@@ -1259,6 +1271,25 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
           ? 24
           : 0,
     cliffScree: !iosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
+    // Painted clutter (Studio Paint Clutter stamps). Originally High-and-up
+    // (SPACEY: "only renders when the graphics are set high enough, even if
+    // painted in the Studio"), but MEDIUM is the auto-default for every Apple
+    // Silicon Mac, resolveDefaultGraphicsPreset returns PRESET_MEDIUM there
+    // for THERMAL reasons, not because the GPU is weak, so a High gate hid
+    // authored ground dressing from a large class of perfectly capable
+    // machines, and from the map's own author in playtest while the editor
+    // (which forces the layer on) still showed it. Medium now draws it in a
+    // TIGHT ring instead: cost scales with the radius squared, so 30yd buys
+    // the dressing the player is actually looking at for well under the full
+    // 45yd bill. Low and the iOS memory profile still build nothing.
+    cityClutter: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
+    cityClutterRadius: gfxTierAtLeast(tier, 'insane')
+      ? 75
+      : gfxTierAtLeast(tier, 'ultra')
+        ? 60
+        : gfxTierAtLeast(tier, 'high')
+          ? 45
+          : 30,
     canopyDetail: !iosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
     // Insane is the declared showcase tier and only ever a manual opt-in, so
     // it keeps the full six; ultra takes the AO half over a tightened band.
@@ -1339,6 +1370,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     constrainedMemory,
     iosMemoryProfile,
     tightMemory: tightMemoryProfile,
+    placedTextureTier: constrainedMemory ? 'quarter' : tier === 'low' ? 'half' : 'full',
     // Bounded on EVERY profile, desktop included. A pooled visual retains its
     // per-instance Skeleton and GPU bone-matrix DataTexture so a re-entering
     // mob/NPC skips the skeleton re-upload hitch pooling exists for, and the

@@ -64,7 +64,9 @@ describe('persisted overworld position escape', () => {
   // path against the moved buildings and stalls.
   it.each([
     ['barracks garrison lot', { x: 17.5, z: -5.5 } as { x: number; z: number }],
-    ['new bank', EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank.position],
+    // the quay cottage, because it is still sealed: the bank this row used to
+    // name is a walk-in room now (the case below)
+    ['quay cottage', EASTBROOK_BUILDINGS_BY_ID.eastbrook_quay_cottage.position],
     ['market stall', EASTBROOK_LAYOUT.market.stalls[0].position],
   ])('moves a save trapped inside the %s to deterministic clear ground', (_label, position) => {
     expect(isBlocked(SEED, position.x, position.z, 0.5)).toBe(true);
@@ -75,6 +77,17 @@ describe('persisted overworld position escape', () => {
     expect(resolved).not.toEqual(position);
     expect({ x: second.pos.x, z: second.pos.z }).toEqual(resolved);
     expect(isBlocked(SEED, resolved.x, resolved.z, 0.5)).toBe(false);
+  });
+
+  it('keeps a save standing inside a walk-in building, which its door lets out', () => {
+    // the bank's centre is its own floor (sim/town_walk_in.ts): the save
+    // probes as a body standing there (sim/spawn_footing.ts), so its upper
+    // storey overhead does not shove the player into the street
+    const position = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank.position;
+    const bank = EASTBROOK_LAYOUT.buildings.find((building) => building.id === 'eastbrook_bank');
+    expect(bank?.walkIn).toBe(true);
+    const { player } = loadAt(position);
+    expect({ x: player.pos.x, z: player.pos.z }).toEqual(position);
   });
 
   it('does not apply built-in Eastbrook colliders to a custom world', () => {

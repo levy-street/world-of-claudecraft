@@ -23,13 +23,21 @@ import type { Entity } from '../types';
 
 export const FERRY_BELL_OBJECT_ID = 'ps_ferry_bell';
 
-/** Where the island bell sets a graduate down: the harbor town's dock road,
- *  beside the return bell at (-7.5, -100), facing up the crafts lane toward
- *  the Ravenpost mailbox so the first thing a graduate sees is the town, not
- *  the sea. Well clear of the authored spawn at (-94, -58), so an arrival
- *  never stacks on a fresh spawn. The optional golden guidance leads from
- *  here to Marshal on the civic square. */
-export const FERRY_BELL_TOWN_LANDING = { x: -4.5, z: -101.5, facing: -0.87 } as const;
+/** Where the island bell sets a graduate down: the civic square, a few
+ *  strides north of the return bell at (-7.5, -100), facing west across the
+ *  square past the Ravenpost mailbox and the monument and down the main
+ *  street, so the first thing a graduate sees is the town, not the sea. Well
+ *  clear of the authored spawn at (-94, -58), so an arrival never stacks on a
+ *  fresh spawn. The optional golden guidance leads from here to Marshal on
+ *  the civic square.
+ *
+ *  Moved 4.3 yd north-west in the Tidehold rebuild: the Weekly Vault took the
+ *  green south of the square, and the old point at (-4.5, -101.5) stood a
+ *  stride off its front wall, on the weekly emissary's spot, with the chase
+ *  camera inside the hall. From here the camera settles in the open square,
+ *  and the walk to each starter quest giver is clear
+ *  (tests/eastbrook_combat_giver_visibility.test.ts). */
+export const FERRY_BELL_TOWN_LANDING = { x: -6, z: -97.5, facing: -1.3 } as const;
 
 /** Whether this character has never worked the shore: no Proving Shore quest
  *  in the log and none turned in. The arrival note is a TEACHING moment (it

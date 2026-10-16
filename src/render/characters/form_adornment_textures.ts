@@ -1,5 +1,5 @@
 // The canvas art of the shapeshift form adornments (form_adornment_core.ts):
-// Moonwing's wing and crescent, Gloamveil's veil and eye glow. Painted once
+// Moonwing's wing and crescent. Painted once
 // per session by the adornment kits that own them (never per rig), in white or
 // in alpha only, so the kit's material colour does the tinting and one texture
 // serves every rig.
@@ -121,36 +121,5 @@ export function crescentTexture(): THREE.Texture {
     ctx.shadowColor = 'rgba(255,255,255,1)';
     ctx.shadowBlur = 10;
     ctx.drawImage(moon, 0, 0);
-  });
-}
-
-/** The gloom veil: a near-opaque dark oval that feathers out at its rim. The
- *  colour comes from the material, this is alpha only. */
-export function veilTexture(): THREE.Texture {
-  const s = 128;
-  return paintedTexture(s, s, (ctx) => {
-    const c = s / 2;
-    const veil = ctx.createRadialGradient(c, c, 0, c, c, c);
-    veil.addColorStop(0, 'rgba(255,255,255,0.97)');
-    veil.addColorStop(0.62, 'rgba(255,255,255,0.93)');
-    veil.addColorStop(0.86, 'rgba(255,255,255,0.45)');
-    veil.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = veil;
-    ctx.fillRect(0, 0, s, s);
-  });
-}
-
-/** A burning eye: a hot white core inside a soft glow. */
-export function eyeGlowTexture(): THREE.Texture {
-  const s = 64;
-  return paintedTexture(s, s, (ctx) => {
-    const c = s / 2;
-    const glow = ctx.createRadialGradient(c, c, 0, c, c, c);
-    glow.addColorStop(0, 'rgba(255,255,255,1)');
-    glow.addColorStop(0.22, 'rgba(255,255,255,0.95)');
-    glow.addColorStop(0.5, 'rgba(255,255,255,0.35)');
-    glow.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, s, s);
   });
 }

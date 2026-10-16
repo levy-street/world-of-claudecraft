@@ -94,7 +94,11 @@ describe('grounded line-of-sight elevation', () => {
     expect(stall.height).toBe(2.7);
     // The stall tracks EASTBROOK_LAYOUT, so the New Eastbrook rebuild moved it
     // into the harbor basin; the terrain sanity pin follows the new site.
-    expect(terrainY).toBeCloseTo(-0.64);
+    // Re-pinned 2026-10 for the Tidehold rebuild: the taper of the level pad
+    // under the apothecary's shop lifted the ground here by 0.08 yd. Re-pinned
+    // for the World of ClaudeCraft Studio map's arrangement: no building pad
+    // reaches the square now, so the stall stands on the plat's own grade.
+    expect(terrainY).toBeCloseTo(-0.642);
     expect(canopyY).toBeCloseTo(terrainY + stall.height);
     const stallCollider = colliderInternalsForTest
       .staticWorldColliders(WORLD_SEED)

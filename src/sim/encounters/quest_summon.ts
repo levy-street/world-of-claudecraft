@@ -4,7 +4,7 @@
 // island grew its own summon; the double-summon guard, the summoner tap, and
 // the opening aggro all live here so every summon behaves identically.
 import { MOBS } from '../data';
-import { createMob } from '../entity';
+import { spawnOpenWorldMob } from '../mob/open_world_tuning';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Vec3 } from '../types';
 
@@ -35,7 +35,12 @@ export function summonQuestMob(
   if (existing) return;
   const template = MOBS[templateId];
   if (!template) return;
-  const mob = createMob(ctx.nextId++, template, template.maxLevel, ctx.groundPos(pos.x, pos.z + 3));
+  const mob = spawnOpenWorldMob(
+    ctx.nextId++,
+    template,
+    template.maxLevel,
+    ctx.groundPos(pos.x, pos.z + 3),
+  );
   mob.facing = Math.PI;
   mob.prevFacing = mob.facing;
   mob.tappedById = ownerPid;

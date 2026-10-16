@@ -7,7 +7,8 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { buildHalo, HALO_RADIUS, HALO_UP_OFFSET } from '../src/render/characters/halo';
-import { VISUALS } from '../src/render/characters/manifest';
+import { KAYKIT_PRIEST, VISUALS } from '../src/render/characters/manifest';
+import { landWocBodies } from './helpers/woc_streamed';
 
 function planeSize(mesh: THREE.Mesh): { width: number; height: number } {
   const geo = mesh.geometry as THREE.PlaneGeometry;
@@ -74,17 +75,18 @@ describe('class halo geometry', () => {
       loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
       releaseGltf: vi.fn(),
     }));
-    const { charactersReady } = await import('../src/render/characters/assets');
-    await charactersReady();
+    const assets = await import('../src/render/characters/assets');
+    await assets.charactersReady();
+    await landWocBodies(assets, ['player_priest']);
     const { CharacterVisual } = await import('../src/render/characters/visual');
     const visual = new CharacterVisual('player_priest', 0xffffff, 0);
     const halo = visual.root.getObjectByName('class_halo') as THREE.Mesh;
     const emissive = visual.root.getObjectByName('authored_emissive_fx') as THREE.Mesh;
     expect(halo).toBeDefined();
     expect(emissive).toBeDefined();
-    expect(halo.position.y).toBe(1.45);
+    expect(halo.position.y).toBe(0.28);
     // no radius override: the priest rides the shared default-size geometry
-    expect((halo.geometry as THREE.PlaneGeometry).parameters.width).toBeCloseTo(1.0);
+    expect((halo.geometry as THREE.PlaneGeometry).parameters.width).toBeCloseTo(0.4);
     // the caster sweeps must not overwrite buildHalo's castShadow = false
     expect(halo.castShadow).toBe(false);
     expect(emissive.castShadow).toBe(false);
@@ -146,10 +148,19 @@ describe('class halo geometry', () => {
     // Raise-only: the default-size ring clears the cone at tip height, and
     // staying below the hat's bounding-box top keeps portrait framing
     // untouched for priests.
-    expect(priest.haloUpOffset).toBe(1.45);
-    expect(priest.haloRadius).toBeUndefined();
+    // Measured against the WOC priest hood (tmp/woc/halo_measure.mjs): the
+    // hood tip sits 0.24 rig units above the head bone and this rig's units
+    // are about 2.5x the KayKit mage's after height normalization, so the
+    // 1.45 offset and the default radius that cleared the mage hat become
+    // 0.28 up and a 0.2 radius here. Pinned so a halo tuned for the other rig
+    // never comes back; the retired KayKit priest keeps the hat-tuned pair
+    // for the modular fallback's sake.
+    expect(priest.haloUpOffset).toBe(0.28);
+    expect(priest.haloRadius).toBe(0.2);
+    expect(KAYKIT_PRIEST.haloUpOffset).toBe(1.45);
+    expect(KAYKIT_PRIEST.haloRadius).toBeUndefined();
     for (const [key, def] of Object.entries(VISUALS)) {
-      if (key === 'player_priest') continue;
+      if (key === 'player_priest' || key === 'player_priest_female') continue;
       // placement overrides are meaningless without a halo; a future second
       // haloed visual may legitimately set all three
       if (def.halo === undefined) {

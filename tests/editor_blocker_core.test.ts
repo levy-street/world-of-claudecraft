@@ -89,8 +89,12 @@ describe('nearestBlockerIndex', () => {
 
 describe('effectiveCollideRadius', () => {
   it('prefers the override and falls back to the derived radius', () => {
-    expect(effectiveCollideRadius({ scale: 2, collideRadius: 5 })).toBe(5);
-    expect(effectiveCollideRadius({ scale: 2 })).toBe(collideRadiusFor(2));
+    expect(
+      effectiveCollideRadius({ assetId: 'props/well', scale: 2, collideRadius: 5, collide: true }),
+    ).toBe(5);
+    expect(effectiveCollideRadius({ assetId: 'props/well', scale: 2, collide: true })).toBe(
+      collideRadiusFor(2),
+    );
   });
 
   it('flows into the playtest PlacedAssets (both paths read the same record)', () => {

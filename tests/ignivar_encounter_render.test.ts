@@ -1384,9 +1384,11 @@ describe('Ignivar encounter renderer', () => {
     );
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     expect(renderer).toContain('disposeRaidEncounterVisuals(v.group);');
-    expect(renderer).toContain(
-      'isStableIgnivarWaterConduitTransition(v.builtTemplateId, e.templateId)',
-    );
+    // The renderer asks the object seam; the seam still answers for the conduit.
+    expect(renderer).toContain('isStableObjectTransition(v.builtTemplateId, e.templateId)');
+    expect(
+      readFileSync(new URL('../src/render/gate_objects.ts', import.meta.url), 'utf8'),
+    ).toContain('return isStableIgnivarWaterConduitTransition(from, to);');
     expect(renderer).toContain('if (ignivarBossFacingLocked(e)) facing = e.facing;');
     expect(renderer).toContain('characterBodyOnScreen || raidEncounterBypassesCharacterCulling(e)');
     expect(renderer).toMatch(

@@ -46,7 +46,13 @@ describe('proving shore placement', () => {
     // The home ride's destination as a bare literal (the ferry_prewarm suite
     // compares constant to constant, which a bad edit moves in lockstep).
     // The revised handoff keeps the landing here and guides into the square.
-    expect(FERRY_BELL_TOWN_LANDING).toEqual({ x: -4.5, z: -101.5, facing: -0.87 });
+    // Re-pinned 2026-10 for the Tidehold rebuild: 4.3 yd north-west of the old
+    // point at (-4.5, -101.5), which the Weekly Vault's new front wall stands
+    // a stride behind. Still beside the return bell at (-7.5, -100).
+    expect(FERRY_BELL_TOWN_LANDING).toEqual({ x: -6, z: -97.5, facing: -1.3 });
+    expect(
+      Math.hypot(FERRY_BELL_TOWN_LANDING.x + 7.5, FERRY_BELL_TOWN_LANDING.z + 100),
+    ).toBeLessThan(4);
   });
 
   it('hub, graveyard, pois, arrival, npcs, camps, and crates sit on dry walkable ground', () => {

@@ -50,11 +50,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: '荒野之心盆地',
-    desc: '来自祖尔加与獠牙领主驯兽师的标志性武器。',
   },
   conquerors_wildheart_basin_heroic: {
     name: '英雄：荒野之心盆地',
-    desc: '盆地之声祖尔加身上仅限英雄难度掉落的史诗物品。',
   },
   // The arena entity reads 尼思拉克西斯团队竞技场; the page collects the raid's
   // spoils rather than naming the room, so the arena noun gives way to the
@@ -71,6 +69,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: '桑扎尔，觉醒之峰',
     desc: '来自觉醒之峰世界首领的个人史诗战利品。',
+  },
+  conquerors_balgath: {
+    name: '巴尔加斯，被埋葬的工头',
+    desc: '从迷雾沼泽古冢中拖出的战利品。',
   },
   conquerors_collapsed_reliquary: {
     name: '坍塌的圣物库',

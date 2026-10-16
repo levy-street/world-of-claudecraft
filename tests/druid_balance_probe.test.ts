@@ -106,14 +106,45 @@ const FERAL_LOADOUT = {
 // Measured identically on the integration tip and on the faction ladder
 // branch (PR 4169). Moongrove (5982/225/5983/7) and Bruin (3060/139/
 // 10541.4575/4) stayed inside their bands and keep their anchors.
+// RE-MEASURED 2026-10-13 for all three arms, at the four built dungeon
+// entrances (src/sim/*_entrance.ts). No druid, combat or tuning code moved:
+// the entrances' colliders push the spawn point of three neighbouring world
+// mobs, the Wildheart Basin door moved and the Idol Guardian's camp with it,
+// and every world mob's idle wander draws from the shared stream, so this
+// seed's whole trace re-rolls. Moongrove 5956/212/5957/7 to 5637/273/5638/7
+// (only the wolf's incoming left its old band), wildfang 5315/201/6228.5225/8
+// to 6126/172/7178.609/10 (off the low eight-payoff trace it had sat on since
+// 2026-09-20), bruin 3082/131/10651.925/4 to 2721/142/8804.0075/4. Each new
+// row is an ordinary trace of the same rotation on this tree, read against
+// the neighbouring seeds: moongrove 5329 to 6004 damage and 208 to 285
+// incoming over seeds 42421 to 42436 (payoffs 7 on every one); wildfang 5962
+// to 7419 damage, 168 to 266 incoming and 10 or 12 payoffs over 42421 to
+// 42428; bruin 2309 to 3240 damage, 96 to 161 incoming and 3 or 4 payoffs
+// over the same eight. The matrix test below, whose bands are design bands
+// rather than measurements, still holds on this tree. BAND stays 0.08.
+// RE-MEASURED 2026-10-15 for all three arms and the tank probe's two incoming
+// figures, at the Fenbridge rebuild (src/sim/fenbridge_layout.ts: the painted
+// buildings, the open ring, the walk-in floors, the re-threaded streets and
+// lamps). No druid, combat or tuning code moved: the town's colliders and
+// walkable ground are world-gen inputs and every world mob's idle wander draws
+// from the shared stream, so this seed's whole trace re-rolls. Moongrove
+// 5637/273/5638/7 to 5455/251/5456/7, wildfang 6126/172/7178.609/10 to
+// 6558/197/7684.697/10, bruin 2721/142/8804.0075/4 to 2891/159/9807.33125/4.
+// The neighbouring seeds on this tree: moongrove 5557 to 6068 damage and 193
+// to 285 incoming over 42421 to 42436 (payoffs 7 on every one); wildfang 6120
+// to 7439 damage, 191 to 278 incoming and 10 or 12 payoffs over 42421 to
+// 42428; bruin 2309 to 3075 damage, 96 to 160 incoming and 3 or 4 payoffs over
+// the same eight. The tank probe at 42920 re-rolls the same way: wolf incoming
+// 220 to 262, bear 143 to 157 (40 percent less, inside the 30 to 42 percent
+// bounds); its threat product and Marrowbreak snap stayed in band.
 const LIVE_MOB_MEASURED = {
-  moongrove: { damage: 5956, incomingDamage: 212, threat: 5957, payoffs: 7 },
-  wildfang: { damage: 5315, incomingDamage: 201, threat: 6228.5225, payoffs: 8 },
-  bruin: { damage: 3082, incomingDamage: 131, threat: 10651.925, payoffs: 4 },
+  moongrove: { damage: 5455, incomingDamage: 251, threat: 5456, payoffs: 7 },
+  wildfang: { damage: 6558, incomingDamage: 197, threat: 7684.697, payoffs: 10 },
+  bruin: { damage: 2891, incomingDamage: 159, threat: 9807.33125, payoffs: 4 },
 } as const;
 const BRUIN_TANK_MEASURED = {
-  wolfIncomingDamage: 220,
-  bruinIncomingDamage: 143,
+  wolfIncomingDamage: 262,
+  bruinIncomingDamage: 157,
   bruinMitigationPct: 0.35,
   bruinThreatFrom100Damage: 214.5,
   marrowbreakSnapThreat: 990.99,
@@ -218,7 +249,8 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     expect(result.head).toBe('test-head');
     expect(result.bruinIncomingDamage).toBeLessThan(result.wolfIncomingDamage);
     // The two incoming figures and the mitigation they imply are banded on
-    // the 2026-09-08 measurement (wolf 220, bear 143, 35 percent less):
+    // the 2026-09-08 measurement (wolf 220, bear 143, 35 percent less),
+    // re-measured 2026-10-15 for the Fenbridge rebuild (wolf 262, bear 157):
     // the drift the audit read (bear +12 percent) reds on the bear figure.
     const [wolfLo, wolfHi] = within(BRUIN_TANK_MEASURED.wolfIncomingDamage);
     expect(result.wolfIncomingDamage).toBeGreaterThanOrEqual(wolfLo);

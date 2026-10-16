@@ -11,6 +11,126 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const vi_VN: EnTranslations = {
+  "referralCards": {
+    "title": "Refer a Friend",
+    "subtitle": "Adventure together. Earn your stamps.",
+    "close": "Close Refer a Friend",
+    "launcher": "Stamp cards",
+    "pages": "Stamp card pages",
+    "firstPage": "First page",
+    "nextPage": "More cards",
+    "trailmateTitle": "Trailmate",
+    "friendshipAura": "Friendship",
+    "protectiveCharm": "Protective Charm",
+    "bankBonus": "Completed stamp cards",
+    "bankBonusHelp": "Help two bound friends complete their stamp cards to unlock 20 permanent bank slots.",
+    "friendshipUse": "Increase your Strength, Agility, Stamina, Intellect, and Spirit by {stats} for {duration} seconds.",
+    "readyCount": "Stamp cards: {count} rewards ready to collect",
+    "loading": "Connecting to your referral cards...",
+    "empty": "Invite a new player to begin your first stamp card together.",
+    "inviteTitle": "Invite a friend",
+    "inviteHelp": "Share this link with a friend before they create their account. Only new accounts created through your link become bound friends.",
+    "inviteLabel": "Your invitation link",
+    "inviteUnavailable": "Your invitation link is not available yet.",
+    "membership": "When your bound friend buys their first membership, you receive a membership bond.",
+    "cardBetween": "{you} and {friend}",
+    "yourCard": "{name}'s stamp card",
+    "unassigned": "Character not selected",
+    "start": "Start a card",
+    "startPrompt": "Start stamp cards with {friend}? Both of you must accept. Each character must be below level 5 and must not have completed the final Tutorial Island quest.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "declinePrompt": "Are you sure you want to decline? You can start later from the stamp card menu while both characters still meet the requirements.",
+    "declineConfirmed": "The card was not started. You can start from the stamp card menu while both characters still meet the requirements.",
+    "waiting": "Waiting for your bound friend to accept.",
+    "cancel": "Cancel",
+    "okay": "OK",
+    "understand": "Yes, I understand",
+    "confirmLock": "Yes, lock this card",
+    "lockFirst": "Redeeming The Fogbinder stamp reward permanently locks this card to {name}. You will no longer be able to move this card or its rewards to another character. Do you understand?",
+    "lockSecond": "Are you sure? Redeem The Fogbinder reward and permanently lock this card to {name}.",
+    "locked": "This card is locked to {name}. It can no longer be moved.",
+    "unlocked": "This card can move to another eligible character until you redeem The Fogbinder stamp reward. Redeeming that reward permanently locks it to this character.",
+    "move": "Move card to this character",
+    "movePrompt": "Move your card from {oldName} to {newName}? Your progress and all rewards earned from this card will move. Those rewards will be removed from {oldName}.",
+    "confirmMove": "Yes, move my card",
+    "summon": "Summon bound friend",
+    "summonPrompt": "{friend} wants to summon you to their location. Accept the summon?",
+    "summonHelp": "Bring your bound friend to your location. You can summon once every 30 minutes.",
+    "summonCooldown": "Summon ready in {minutes} min {seconds} sec",
+    "reward": "Reward: {reward}",
+    "earned": "Earned",
+    "redeemed": "Redeemed",
+    "emptyStamp": "Not yet earned",
+    "stamping": "Stamping your card...",
+    "redeem": "Redeem reward",
+    "previous": "Redeem earlier stamps first.",
+    "playTogether": "Complete milestones in a party with the characters on this card.",
+    "fallback": "Already completed a milestone quest alone? Rejoin your friend in a party for the Tutorial Island stamp. For later quest stamps, clear the matching dungeon together.",
+    "questGroup": "Stamp card quests",
+    "questWithFriend": "{quest} with {friend}",
+    "browseCards": "Browse all stamp card pages",
+    "nextQuest": "Stamp card: {quest}",
+    "questIndicator": "This quest advances your next stamp card reward.",
+    "completion": "Congratulations! {friend} completed their stamp card with your help.",
+    "openInvites": "Open Refer a Friend",
+    "referrerTitle": "Friends you helped",
+    "referrerCount": "{count} friends completed",
+    "friendTier": "Friends helped: {count}",
+    "awarded": "Awarded",
+    "pending": "Not yet awarded",
+    "celebration": {
+      "earned": "Adventure rewarded",
+      "title": "Reward claimed!",
+      "titleReward": "Title unlocked: {title}",
+      "together": "Earned together with {friend}.",
+      "continue": "Keep adventuring"
+    },
+    "milestones": {
+      "tutorial": "Tutorial Island final quest",
+      "hollow": "Into the Hollow",
+      "fogbinder": "The Fogbinder",
+      "gravewyrm": "Korzul the Gravewyrm",
+      "raid": "Defeat your first raid boss"
+    },
+    "rewards": {
+      "tutorial": "A unique title and a maximum-tier bag, bound to your character.",
+      "hollow": "A trinket that grants Stamina and a passive shield when your health is low.",
+      "fogbinder": "Your trinket evolves, gaining more Stamina and an active effect: +5 to all stats for 15 seconds, with a 2 minute cooldown.",
+      "gravewyrm": "Free mount training.",
+      "raid": "The exclusive Friendship Tank mount."
+    },
+    "referrerRewards": {
+      "1": "The exclusive Friendship Raptor mount.",
+      "2": "20 bank slots and 5 character slots.",
+      "3": "1,000 Claudium.",
+      "4": "1,000 Claudium.",
+      "5": "A Sapling buddy companion."
+    },
+    "reasons": {
+      "notParticipant": "This account is not part of this bound-friend link.",
+      "staleRevision": "Your card changed. Check its latest progress and try again.",
+      "invalidCharacters": "The party characters do not belong to this bound-friend link.",
+      "notTogether": "Both bound friends must be in the same party.",
+      "levelTooHigh": "New card characters must be below level 5.",
+      "tutorialCompleted": "A character has already completed the final Tutorial Island quest.",
+      "alreadyStarted": "This link already has a card. Each bound-friend link can have only one active card.",
+      "notPending": "There is no card invitation waiting for a response.",
+      "declinePending": "Your bound friend is deciding whether to decline the card.",
+      "declineNotConfirmed": "Confirm the decline before ending this invitation.",
+      "notActive": "Start a card together before collecting rewards.",
+      "wrongCharacter": "Use the characters named on the card, or move an unlocked card to an eligible character.",
+      "locked": "This card is locked to its character and cannot be moved.",
+      "sameCharacter": "This card is already on this character.",
+      "invalidMilestone": "That stamp does not belong to this card.",
+      "notEarned": "Complete this milestone together before redeeming it.",
+      "alreadyRedeemed": "This reward has already been redeemed.",
+      "previousRewardRequired": "Redeem the earlier stamp rewards first.",
+      "confirmationRequired": "Review the card lock warning before redeeming The Fogbinder reward.",
+      "newAccountsOnly": "Accounts can become bound friends only when a new account is created through a referral link. Existing accounts cannot be bound.",
+      "unavailable": "This action is not available right now. Please try again later."
+    }
+  },
   "meta": {
     "builtOn": "Dựng {date}"
   },
@@ -347,6 +467,26 @@ export const vi_VN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "Courier",
+      "close": "Close courier",
+      "ready": "Ready for a delivery",
+      "outbound": "Flying to the bank",
+      "returning": "Bringing your items back",
+      "waiting": "Waiting to return your items",
+      "bags": "Send to bank",
+      "bank": "Bring from bank",
+      "cargo": "Courier inventory",
+      "empty": "No items",
+      "send": "Send courier",
+      "selected": "{count} / {limit} stacks selected",
+      "select": "Select {item}, {count}",
+      "selectedItem": "Deselect {item}, {count}",
+      "instructions": "Select whole stacks. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.",
+      "membership": "Renew your membership to start another trip.",
+      "cargoSafe": "Carried items stay with the courier until there is room in your bags.",
+      "unavailable": "Summon your courier to plan a delivery."
+    },
     "framePresets": {
       "apply": "Áp Dụng",
       "pickerLabel": "Cấu Hình Khung: {name}",
@@ -513,6 +653,48 @@ export const vi_VN: EnTranslations = {
       "sailing": "Đang Buồn Đến {dest}"
     },
     "materialStackSelectionUnavailable": "Lựa chọn nguyên liệu đó không còn khả dụng.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "Pháo Canh Giữ Phía Bắc",
       "objective": "Bảo vệ canh giữ phía bắc",
@@ -826,6 +1008,50 @@ export const vi_VN: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "Game subscription",
+        "monthlyTitle": "Monthly membership",
+        "annualTitle": "12-month membership bundle",
+        "annualPrice": "{price} for 12 months, paid upfront",
+        "annualTerms": "Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.",
+        "annualMount": "After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.",
+        "trialTerms": "Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.",
+        "startTrial": "Start 7-day free trial",
+        "resumeCheckout": "Resume checkout",
+        "checkoutClosed": "This checkout has closed without an outstanding reward. Choose a membership plan again to start a new checkout.",
+        "annualClaim": "Collect bundle mount",
+        "annualPending": "Return to the purchasing character after payment to collect the bundle mount. If payment is processing or the trial is active, try again after the paid charge.",
+        "annualDelivered": "Your bundle mount key has been delivered by mail.",
+        "tokenTitle": "Tradable membership token",
+        "benefitsTitle": "Active membership benefits",
+        "benefitBank": "Access your other characters' banks at any banker.",
+        "benefitSlots": "Unlock 10 additional character slots.",
+        "benefitArmour": "Claim soulbound armour with stats for your class and specialisation. It scales with your level and reaches item level 25 at level 20. Wear the full set for 20% more XP.",
+        "benefitTax": "Pay half the normal auction house tax.",
+        "benefitExpiry": "When membership ends, characters in the additional slots and armour bonuses are locked until renewal. Your base character slots remain playable.",
+        "tokenTerms": "{price} once for 30 days. Delivered by mail to this character. Redeem it to add membership time, or sell it at the auction house.",
+        "tokenBuy": "Buy membership token",
+        "tokenClaim": "Collect purchased token",
+        "tokenPending": "After payment, return to this character and collect your token. If payment is still processing, try again shortly.",
+        "tokenDelivered": "Your token has been delivered by mail.",
+        "price": "{price} per month",
+        "terms": "Renews monthly. Pay with fiat through Stripe. Cancel in billing settings.",
+        "subscribe": "Subscribe",
+        "manage": "Manage subscription",
+        "ending": "Cancels at the end of the billing period",
+        "error": "Could not open billing. Allow popups and try again.",
+        "status": {
+          "none": "Not subscribed",
+          "incomplete": "Payment incomplete",
+          "incomplete_expired": "Checkout expired",
+          "trialing": "Trial",
+          "active": "Active",
+          "past_due": "Payment overdue",
+          "canceled": "Canceled",
+          "unpaid": "Unpaid",
+          "paused": "Paused"
+        }
+      },
       "title": "Cửa hàng WOC",
       "close": "Đóng cửa hàng WOC",
       "tabsLabel": "Các phần của Cửa hàng WOC",
@@ -1205,7 +1431,8 @@ export const vi_VN: EnTranslations = {
       "drowning": "Đang chết đuối!"
     },
     "rest": {
-      "resting": "Đang Nghỉ Ngơi"
+      "resting": "Đang Nghỉ Ngơi",
+      "restArea": "Resting: you are in a rest area and gain rested experience here."
     },
     "paladin": {
       "devotion": "Sùng Tín",
@@ -1662,6 +1889,10 @@ export const vi_VN: EnTranslations = {
       "replayAction": "Luyện tập lại",
       "replayTarget": "Nhắm lại mục tiêu"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Rạn Nứt",
       "hoardTitle": "Hoard",
@@ -1987,6 +2218,8 @@ export const vi_VN: EnTranslations = {
       "name_goblin_rocket_sled": "Xe trượt tên lửa goblin",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Kẻ Nghiền Đất Tia Kinh Hoàng",
+      "name_referral_tank": "Friendship Tank",
+      "name_referral_raptor": "Friendship Raptor",
       "name_drakemaw_raptor": "Cuồng Long Drakemaw",
       "name_avian_strider": "Chim Xanh Lưỡng Cực",
       "name_mech_bird": "Chim Mech Cluckwork",
@@ -2004,6 +2237,8 @@ export const vi_VN: EnTranslations = {
       "desc_rallycart_rxt": "Một cỗ máy đua rally nhỏ gọn giúp tăng tốc độ di chuyển.",
       "desc_rallycart_skin": "Một chiếc xe đua nhỏ có tiếng gầm vang dội.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
+      "desc_referral_tank": "Earned by completing a referral stamp card.",
+      "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
       "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn.",
       "desc_avian_strider": "Một chiếc yên ngựa trên chim cao lớn với vuốt nặng và cánh gấp lại biến mỗi hành trình thành một cuộc lao tới ầm ầm.",
       "desc_mech_bird": "Một con gà chiến đồng hồ được chế tạo bằng tay chạy nước rút trên các động cơ servo, phím lên dây cót vẫn quay.",
@@ -2080,6 +2315,10 @@ export const vi_VN: EnTranslations = {
       "flagTakenLog": "{name} đã cướp được cờ {team}!",
       "flagDroppedLog": "Cờ {team} đã rơi xuống đất.",
       "flagReturnedLog": "Cờ {team} đã được trả về.",
+      "flagDroppedByLog": "{name} dropped the {team} flag.",
+      "flagReturnedByLog": "{name} returned the {team} flag.",
+      "flagNameCrimson": "Crimson Flag",
+      "flagNameAzure": "Azure Flag",
       "dropFlagConfirmTitle": "Thả cờ?",
       "dropFlagConfirmBody": "Bạn đang mang cờ địch. Thả nó xuống sẽ để nó nằm trên mặt đất, nơi cả hai đội đều có thể lấy được.",
       "dropFlagConfirmAccept": "Thả cờ",
@@ -2208,6 +2447,7 @@ export const vi_VN: EnTranslations = {
       "showDevBadges": "Hiện Huy Hiệu Nhà Phát Triển",
       "showOwnNameplate": "Hiện Bảng Tên Của Tôi",
       "showPlayerNameplates": "Hiện Bảng Tên Người Chơi",
+      "showPetNames": "Show Pet Names",
       "uiScale": "Tỷ Lệ Giao Diện",
       "playerFrameScale": "Tỷ Lệ Khung Người Chơi",
       "targetFrameScale": "Tỷ Lệ Khung Mục Tiêu",
@@ -2225,6 +2465,8 @@ export const vi_VN: EnTranslations = {
       "groundReticle": "Vòng ngắm mục tiêu mặt đất",
       "mouseoverCast": "Thi Triển Khi Rê Chuột Trên Khung Tổ Đội",
       "stickyTarget": "Giữ Mục Tiêu Khi Nhấp Đất",
+      "showDungeonHints": "Dungeon mechanic hints",
+      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "showReliquaryTracker": "Hiển thị Trình theo dõi Thánh tích",
       "confirmVendorSell": "Xác Nhận Trước Khi Bán",
@@ -2845,6 +3087,9 @@ export const vi_VN: EnTranslations = {
       "weapons": "Vũ Khí",
       "groupSeason2": "Mùa Giải Tranh Hùng 2: Đội Tiền Phong",
       "groupEntry": "Mùa Giải Tranh Hùng 1",
+      "companions": "Companions",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "owned": "Sở Hữu",
       "buyAria": "Mua {item} với giá {honor}",
       "buyOwnedAria": "Mua {item} với giá {honor}, đã sở hữu",
@@ -3112,8 +3357,10 @@ export const vi_VN: EnTranslations = {
         "storm": "Mỗi phép thuật bạn thi triển sẽ thêm một sạc, tối đa {max}. Sạc kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được sạc.",
         "heat": "Các cú đánh vũ khí cận chiến và tầm xa của bạn mỗi cái sẽ thêm một chồng nhiệt, tối đa {max}. Nhiệt kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được chồng.",
         "ignite": "Các cú đánh tấn công quan trọng vũ khí cận chiến và tầm xa của bạn làm mục tiêu bốc cháy, gây {tick} sát thương Lửa mỗi {every} giây trong {duration} giây. Một cú đánh tấn công quan trọng mới làm mới nó. Sát thương tăng theo Sức Mạnh Tấn Công hoặc Sức Mạnh Tấn Công Tầm Xa, cái nào cao hơn.",
-        "guardHeat": "Mỗi lần bạn chặn, né tránh hoặc khóa một cuộc tấn công sẽ thêm một chồng nhiệt, tối đa {max}. Nhiệt kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được chồng."
+        "guardHeat": "Mỗi lần bạn chặn, né tránh hoặc khóa một cuộc tấn công sẽ thêm một chồng nhiệt, tối đa {max}. Nhiệt kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được chồng.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "Trong {duration} giây, kẻ thù tấn công bạn trực tiếp nhận sát thương Vật Lý bằng {pct}% sức khỏe mà tấn công đó cướp từ bạn. Sát thương Định Kỳ không kích hoạt nó.",
         "anchor": "Trong {duration} giây, nhận {reduction}% ít sát thương hơn nhưng di chuyển ở tốc độ {speed}%. Loại bỏ bất kỳ sự sửng sốt, bị cột, chậm, sợ hãi, biến hóa, im lặng, mù, bị nguyền rủa, bị tước vũ khí và những tác động gây tê liệt trên bạn, và bạn bỏ qua những cái mới và lực đẩy trong khi nó tồn tại.",
@@ -3132,7 +3379,17 @@ export const vi_VN: EnTranslations = {
         "kindlingOrb": "Triệu hồi một quả cầu tro than bên cạnh bạn trong {duration} giây. Mỗi phép thuật bạn thi triển ở kẻ thù làm nó bắn một tia ở kẻ thù đó {damage} sát thương Lửa. Sát thương tăng theo Sức Mạnh Phép Thuật.",
         "pierce": "Trong {duration} giây, các tấn công tự động, bắn và khả năng vật lý của bạn (không chảy máu) cũng tấn công kẻ thù gần mục tiêu nhất của bạn trong {reach} thước {share}% sát thương gây ra.",
         "lantern": "Đặt một chiếc lụp ở chân bạn trong {duration} giây. Một chữa lành trực tiếp từ bất kỳ ai trên bạn hoặc thành viên nhóm trong {radius} thước của nó cũng chữa lành thành viên nhóm khác bị thương nhất khác trong ánh sáng của nó {share}% chữa lành.",
-        "heartNova": "Dùng hết tất cả chồng nhiệt trên một nova lửa gây {perHeat} sát thương Lửa mỗi chồng ({max} tại {maxHeat} chồng) cho mỗi kẻ thù trong {radius} thước và chế áp mọi sinh vật nó đánh trúng. Sát thương tăng theo Sức Mạnh Tấn Công. Yêu cầu một chồng nhiệt."
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "spiritPack": "Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.",
+        "seedburst": "Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.",
+        "tether": "Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.",
+        "harvest": "For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.",
+        "quench": "Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
+        "heartNova": "Dùng hết tất cả chồng nhiệt trên một nova lửa gây {perHeat} sát thương Lửa mỗi chồng ({max} tại {maxHeat} chồng) cho mỗi kẻ thù trong {radius} thước và chế áp mọi sinh vật nó đánh trúng. Sát thương tăng theo Sức Mạnh Tấn Công. Yêu cầu một chồng nhiệt.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -3581,6 +3838,14 @@ export const vi_VN: EnTranslations = {
       "watchYouTube": "Xem trên YouTube",
       "streamerBadgeTitle": "Người phát trực tiếp đã được xác minh"
     },
+    "buddyMenu": {
+      "rename": "Rename Buddy",
+      "nameLabel": "Buddy name",
+      "autolootEnable": "Enable Autoloot",
+      "autolootDisable": "Disable Autoloot",
+      "autolootHint": "Your buddy fetches loot from your own corpses within 30 yards.",
+      "cancel": "Cancel"
+    },
     "lootSettings": {
       "title": "Cài Đặt Chiến Lợi Phẩm",
       "close": "Đóng cài đặt chiến lợi phẩm",
@@ -3906,6 +4171,64 @@ export const vi_VN: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.",
+        "packBondFury": "Deals {pct}% more damage while its partner stands close.",
+        "stalked": "The Great Jaguar hunts you and ignores taunts. Each bite deals {min} to {max} physical damage ({heroicMin} to {heroicMax} on Heroic) and opens a bleed. Kite it away from its master.",
+        "waryStuns": "A stun has landed on it. Further stuns slide off until this ends.",
+        "waryRoots": "A root has landed on it. Further roots slide off until this ends.",
+        "warySlows": "A slow has landed on it. Further slows slide off until this ends.",
+        "pollinated": "Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).",
+        "prey": "Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.",
+        "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
+        "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
+      },
+      "bastion": {
+        "brineColumn": "Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.",
+        "halberdWall": "Takes {pct}% less damage while another Drowned Watchman stands within {radius} yd. Pull them apart.",
+        "fogShroud": "Takes {pct}% less damage while it stands in the Fog Bank. Drag it out of the fog.",
+        "carrionGlut": "Fed on the dead ({stacks} of {max}): each stack makes its Soul Release {radius} yd wider and {pct}% stronger.",
+        "snappedFetters": "Its chains are broken. It no longer fights, cannot be harmed, and soon leaves.",
+        "anchored": "Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic)."
+      },
+      "crypt": {
+        "carrionEye": "Every crow in the fight hunts you for {seconds} sec. Run to your tank so the flock can be cut down together.",
+        "graniteSkin": "Takes {pct}% less damage, and the stone thickens every {every} sec, up to {max} layers. A stun shatters it and leaves it taking {cracked}% more damage for {seconds} sec.",
+        "measured": "When this ends, an Open Grave caves in where you stand: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. The grave stays for the rest of the fight, so carry the mark to the edge of the yard, away from the group.",
+        "graveDirt": "Standing in an Open Grave: movement speed reduced by {slow}% and {damage} Shadow damage every second ({heroic} on Heroic). On Heroic, lingering {linger} sec in a grave raises a Restless Bones. Step out of the grave.",
+        "dirtInEyes": "Reduces movement speed by {pct}%. Shovelful hits everyone in front of Sexton Marrow: stand behind him.",
+        "blow": "Increases damage taken by {pct}%: {per}% for each stack, {stacks} of {max} now. Each Gravedigger's Blow adds a stack and resets the duration to {seconds} sec.",
+        "graveVigor": "Attacks {pct}% faster while he stands in an Open Grave. Keep him out of the graves.",
+        "tolling": "Immune to damage while he strides to the bell rope and rings the Burial Bell. When the ringing ends, the Toll deals {min} to {max} Shadow damage ({heroicMin} to {heroicMax} on Heroic) to everyone, and every Open Grave gives up a Restless Bones.",
+        "embraced": "Held aloft in the Lady's arms: unable to act, taking {tick} Frost damage every second ({tickHeroic} on Heroic). If your group deals {share}% of her maximum health ({shareHeroic}% on Heroic) she sets you down gently; if she holds you {hold} sec at the top she drops you onto the ice for {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic).",
+        "lament": "When Bride's Lament ends, it deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone not within {radius} yd of a lit grave lantern. A lantern shelters the {cap} players nearest it, then goes dark and misses the next Lament.",
+        "lingering": "Your next Bride's Lament deals {pct}% more damage: {per}% for each stack, up to {max} stacks. Take the next one in a lantern's light.",
+        "slippery": "On slick ice: your speed changes by at most {grip} yd/sec each second, so you are slow to get going, slide on when you stop, and swing wide when you turn. Step off the ice to get your footing back.",
+        "harmony": "Takes {pct}% less damage: {per}% for each of her living Choristers. Kill the Choristers first.",
+        "crescendo": "Sings faster: the Dirge of the Hollow takes {cast} sec instead of {castNormal} sec and comes every {every} sec instead of {everyNormal} sec, and the Bone Organ plays {waves} waves of notes instead of {wavesNormal}.",
+        "gorged": "Deals {pct}% more damage: {per}% for each Bound Soul that reached him, {stacks} of {max} now, for the rest of the fight. Each soul that reaches him also heals him for {heal}% of his maximum health. Step into a soul's path to take it instead.",
+        "unquietWard": "Immune to damage while he channels the Rite of the Unquiet at the altar: {lit} of {total} Remembrance Candles relit. Relighting one is a {channel} sec channel that drains {drain}% of the lighter's maximum health every second ({drainHeroic}% on Heroic); hits do not break it, a step or a stun does. The last candle shatters the ward. On Heroic, light them in the order the Ledger names: a wrong candle snuffs the last one lit and deals {wrongMin} to {wrongMax} Shadow damage to the lighter.",
+        "riteBroken": "Stunned: the shattered ward leaves him unable to act for {seconds} sec.",
+        "shatteredWard": "Takes {pct}% more damage for {seconds} sec: the relit candles broke his ward. Spend your strongest attacks now.",
+        "graveChill": "Takes {bite} Shadow damage every second ({biteHeroic} on Heroic) while the Rite of the Unquiet holds, rising by {step} ({stepHeroic} on Heroic) every {every} sec. Relight the Remembrance Candles to end it.",
+        "graspMark": "Hands erupt from the ring under you in {fuse} sec: everyone within {radius} yd of where it was laid is rooted for {root} sec and takes {min} to {max} Shadow damage. Step out of the ring.",
+        "graspRoot": "Held by the grave's hands: unable to move for {seconds} sec.",
+        "knellAirborne": "On the wing over the Rite Ring, out of reach. It marks half of the ring for {mark} sec, then pours ghost fire over that half: {min} to {max} Fire damage to everyone in it. It burns {breaths} halves each flight, then lands."
+      },
+      "sanctum": {
+        "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
+        "enrage": "Deals {pct}% more damage.",
+        "grasp": "Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.",
+        "twiceWoken": "Rose again from the meltwater and deals {pct}% more damage.",
+        "doused": "His plate broke under him and the quench-water put out his Grave Inferno.",
+        "airborne": "In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.",
+        "wyrmsEye": "When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.",
+        "quenchWater": "In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.",
+        "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.",
+        "branded": "Deals {value} {school} damage every {interval} sec for {seconds} sec. Step into a meltwater pool to put it out at once.",
+        "creepingRime": "Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.",
+        "icedOver": "Frozen solid by Creeping Rime: unable to move or act."
+      },
       "sharedPyre": "Gây {total}% máu tối đa của mỗi người chơi, chia đều cho số người chơi đứng trong vòng tròn ({perPlayer}% mỗi người khi có {players} người).",
       "varkhulSharedPyre": "Gây {total}% máu tối đa của mỗi người chơi, chia đều cho những người chơi đứng trong vòng tròn ({perPlayer}% mỗi người khi có {players} người). Mỗi người chơi còn thiếu cũng gây thêm {missingPenalty}% máu tối đa lên toàn bộ raid, kể cả những người đang đứng trong vòng tròn.",
       "makersBrand": "Trong {duration} giây, mỗi tầng cộng dồn tăng thêm {pct}% sát thương nhận từ Varkhul. Cộng dồn tối đa {max} tầng. Tank nên đổi người ở {swap} tầng.",
@@ -3950,6 +4273,8 @@ export const vi_VN: EnTranslations = {
       "cooldownCap": "{used} trên {cap} giây giảm thời gian hồi chiêu đã dùng trong khung này",
       "bruinRushWindow": "Hình Sói không tốn mana và ghim mục tiêu Cú Lao Bruin của bạn, làm chậm nó {pct}% trong {sec} giây",
       "funeralHarvestLock": "Thu Hoạch Tang Lễ chưa thể tạo thêm Mảnh Linh Hồn",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Bùa Trì Trệ chưa thể trói mục tiêu này lại",
       "forbiddenReflectionReady": "Kỹ năng hồi chiêu Thuật Sĩ Hắc Ám hợp lệ tiếp theo của bạn có thể được thi triển lại",
       "forbiddenReflectionLock": "Phản Chiếu Cấm Kỵ chưa thể chuẩn bị lại",
@@ -4028,6 +4353,16 @@ export const vi_VN: EnTranslations = {
         "riftGuard": "Bạn chịu {pct}% ít sát thương hơn.",
         "sprint": "Tốc độ di chuyển tăng {pct}%. Không chồng với các tăng tốc độ khác.",
         "brand": "Chữa lành nhận được giảm {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "spiritPack": "A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.",
+        "seedburst": "A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.",
+        "tether": "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
+        "tetherLink": "You take {pct}% of the damage your chained ally would take.",
+        "harvest": "Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.",
+        "quench": "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenchOther": "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenched": "Attack speed slowed by {pct}%.",
         "forgeHeat": "Nhiệt: {stacks}/{max}. Sử dụng Tính Khí Cha Lò Rèn tiêu tệm tất cả, và lửa vũ khí của nó gây sát thương thêm {pct}%.",
         "tempered": "Các cú đánh vũ khí cận chiến và tầm xa của bạn gây thêm {damage} sát thương Lửa ({pct}% nhiều hơn từ nhiệt tiêu tệm). Mỗi cú giết thêm {killExtend} giây, tối đa {maxDuration} giây tính tổng cộng.",
         "temperedOther": "Các cú đánh vũ khí cận chiến và tầm xa gây thêm sát thương Lửa, {pct}% nhiều hơn từ nhiệt tiêu tệm. Sát thương tăng theo Sức Mạnh Tấn Công hoặc Sức Mạnh Tấn Công Tầm Xa, tùy theo cái nào cao hơn.",
@@ -4036,6 +4371,10 @@ export const vi_VN: EnTranslations = {
         "moltenIgnite": "Gây {damage} sát thương Lửa mỗi {every} giây. Một cú chí mạng vũ khí khác làm tươi nó.",
         "pierce": "Các cú tấn công tự động, bắn và khả năng Vật Lý của bạn (không chứng chảy máu) cũng tấn công kẻ thù gần mục tiêu của bạn nhất trong vòng {reach} thước với {pct}% sát thương gây ra.",
         "lantern": "Một chữa lành trực tiếp từ bất kỳ ai trên bạn hoặc thành viên nhóm trong vòng {radius} thước của chiếc đèn cũng chữa lành cho thành viên nhóm khác bị thương nhất khác trong ánh sáng của nó {pct}% chữa lành.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Nhiệt: {stacks}/{max}. Sử dụng Trái Tim Lò Luyện để tiêu tệm tất cả trên một vụ nổ lửa gây {damage} sát thương Lửa với mỗi kẻ thù trong vòng {radius} thước và người điều khiển tất cả sinh vật nó trúng.",
         "crucibleHeatOther": "Nhiệt: {stacks}/{max}. Trái Tim Lò Luyện tiêu tệm tất cả trên một vụ nổ lửa trong vòng {radius} thước gây sát thương Lửa nhiều hơn với mỗi chồng và người điều khiển tất cả sinh vật nó trúng."
       },
@@ -4071,6 +4410,7 @@ export const vi_VN: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Giảm {pct}% toàn bộ sát thương nhận vào",
+      "slumber": "Ngủ đến bình minh. Không thể bị tấn công và sẽ không thức giấc vì bất kỳ ai.",
       "guardianWard": "Đòn chí mạng tiếp theo của kẻ địch thay vào đó hồi bạn lên {pct}% máu",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -4147,7 +4487,9 @@ export const vi_VN: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} trỗi dậy trên Cao Nguyên Đỉnh Gai!"
+      "spawn": "{name} trỗi dậy trên {zone}!",
+      "wake": "{name} thức giấc trên {zone}!",
+      "sleep": "{name} ngủ đến bình minh."
     },
     "auth": {
       "appleLoginCta": "Tiếp Tục với Apple",
@@ -4211,7 +4553,8 @@ export const vi_VN: EnTranslations = {
         "foodVendor": "Nhà cung cấp Thực phẩm & Đồ uống",
         "potionVendor": "Nhà cung cấp thuốc",
         "stableMaster": "Bậc thầy ổn định",
-        "generalGoods": "Hàng Tổng Hợp"
+        "generalGoods": "Hàng Tổng Hợp",
+        "innkeeper": "Innkeeper"
       }
     },
     "mobTooltip": {
@@ -4291,6 +4634,7 @@ export const vi_VN: EnTranslations = {
         "menu": "Menu",
         "minimap": "Bản Đồ Nhỏ",
         "stanceBar": "Thanh Thế Đứng",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Thanh Kinh Nghiệm",
         "chat": "Trò Chuyện",
         "actionBarGroup": "Các Thanh Hành Động",
@@ -4308,6 +4652,7 @@ export const vi_VN: EnTranslations = {
         "deedTracker": "Theo Dõi Chiến Công",
         "delveTracker": "Theo Dõi Delve",
         "riftTracker": "Theo Dõi Khe Nứt",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Tay Phụ",
         "unitTooltip": "Tooltip"
       },
@@ -4880,6 +5225,19 @@ export const vi_VN: EnTranslations = {
       "vaultCannotDeposit": "Không thể cất vào kho",
       "tabsAria": "Các thẻ ngân hàng",
       "personalTab": "Cá Nhân",
+      "accountTab": "Other characters",
+      "accountArmour": "Claim membership armour",
+      "referralArmour": "Claim friendship armour",
+      "accountMembership": "An active membership lets you access your other characters' banks here.",
+      "accountCharacters": "Character banks",
+      "accountEmpty": "Create another character to use their bank here.",
+      "accountSelect": "Select a character to load their bank.",
+      "accountUnavailable": "This bank is unavailable. Select the character again to refresh.",
+      "accountDeposit": "Your bags: deposit into this bank",
+      "accountWithdraw": "Selected bank: withdraw into your bags",
+      "accountDepositHint": "Click to deposit this stack into the selected character bank.",
+      "accountWithdrawHint": "Click to withdraw this stack into your bags.",
+      "accountBound": "Soulbound, locked and quest items cannot move between characters.",
       "guildTab": "Bang Hội",
       "guildCapacityAria": "Ô ngân hàng bang hội đã dùng: {used} trên {total}",
       "guildEmpty": "Ngân hàng bang hội trống rỗng.",
@@ -4949,6 +5307,190 @@ export const vi_VN: EnTranslations = {
       "logOpenBank": "{actor} đã mở ngân hàng bang hội với giá {amount}",
       "logCharterFee": "{actor} đã trả phí thành lập bang hội là {amount}",
       "logAdminPurge": "Một quản trị viên đã xóa {count} {item}"
+    },
+    "collections": {
+      "title": "Hunting",
+      "close": "Close hunting",
+      "keybindLabel": "Hunting",
+      "launcherTitle": "Hunting: buddies, mounts and item sets",
+      "tabs": {
+        "buddies": "Buddies",
+        "mounts": "Mounts",
+        "sets": "Item Sets"
+      },
+      "state": {
+        "owned": "Collected",
+        "notOwned": "Not collected",
+        "unavailable": "Not obtainable yet",
+        "pending": "A presence follows you"
+      },
+      "presenceDefault": "You feel a presence watching you.",
+      "revealed": "{name} has decided to follow you.",
+      "cosmeticUnlocked": "New look for {name}: {look}.",
+      "presence": {
+        "ember_fox": "Something small and warm is padding along behind you.",
+        "moss_hare": "A rustle in the peat keeps pace with your steps.",
+        "frog": "A wet croak answers every step you take.",
+        "crimson_claw_crab": "Something clicks and scuttles just out of sight.",
+        "golden_sentinel": "A faint gilded glint watches from the grass.",
+        "nightfang": "Silent paws follow where you cannot see.",
+        "tuskhorn_boar": "A snort and a stamp: something stubborn is trailing you.",
+        "emerald_wolf": "Green eyes blink in the undergrowth, then follow.",
+        "tiger": "Stripes shift at the edge of your vision.",
+        "cate_coin": "You hear the faint ring of a coin that is not yours.",
+        "alon": "You feel watched, and quietly approved of.",
+        "trollface": "Somewhere behind you, something is grinning.",
+        "ansem": "A whisper of doors and darkness follows you.",
+        "triple_t": "Three footsteps fall where there should be one.",
+        "kekius": "A stifled laugh trails you down the road.",
+        "solbot": "A soft ticking keeps time with your stride.",
+        "frostfire": "Steam and frost swirl in your wake.",
+        "rocky": "Pebbles shift behind you with no wind to move them.",
+        "proud_grunt": "A boot stamps to attention somewhere behind you.",
+        "loot_goblin": "Something is counting your coins under its breath.",
+        "penny_goldspark": "Tiny tools clink in a pocket that is not yours.",
+        "stag": "A shadow with antlers falls across your path.",
+        "alpaca": "Something woolly and unhurried has decided to come along.",
+        "horse": "Hooves keep an easy, patient beat somewhere behind you.",
+        "sapling": "Little roots patter behind you, stirring the fallen leaves.",
+        "bull": "A low huff of breath stirs the dust behind you.",
+        "spider": "A thread of silk brushes your shoulder.",
+        "raptor": "Quick claws tick over stone at your heels.",
+        "skeleton": "Dry bones rattle in step with yours.",
+        "crystal_lich": "A cold hum rises from the wreckage, and it is watching you.",
+        "forgemaw": "The heat of the forge has not left you. Something walked out with it.",
+        "crystal_tide": "A drop of the sea refuses to fall from your line.",
+        "phantom": "The air behind you is a shade too still.",
+        "emberfall_phoenix": "A warmth like a banked fire settles at your back."
+      },
+      "cosmetic": {
+        "crystal_lich_frostbound": "Frostbound",
+        "crystal_lich_voltaic": "Voltaic",
+        "forgemaw_ashen": "Ashen",
+        "forgemaw_whitehot": "White-Hot",
+        "stag_acorn": "Acorn Crown",
+        "stag_gilded": "Gilded",
+        "moss_hare_verdant": "Verdant",
+        "proud_grunt_warlord": "Warlord",
+        "frog_sapphire": "Sapphire Frog"
+      },
+      "actions": {
+        "summon": "Summon",
+        "dismiss": "Dismiss",
+        "wear": "Wear",
+        "remove": "Remove"
+      },
+      "looks": {
+        "title": "Looks",
+        "unlocked": "Unlocked",
+        "locked": "Locked",
+        "worn": "Worn",
+        "none": "No looks authored for this companion yet"
+      },
+      "source": {
+        "bossLabel": "Boss pet",
+        "bossDrop": "{mob} ({location}), {chance}% per player per kill",
+        "bossDropWithHeroic": "{mob} ({location}), {chance}% per player, {heroicChance}% on Heroic",
+        "bossDropHeroicOnly": "{mob} ({location}), Heroic only, {chance}% per player",
+        "rollNote": "Every player rolls separately; nobody loses a roll to a party member.",
+        "deedLabel": "Earned by",
+        "deed": "The deed {deed}",
+        "challengeLabel": "Challenge",
+        "challengeSpeed": "Defeat {mob} within {seconds} seconds of the pull",
+        "challengeDps": "Deal {dps} damage per second to {mob} across the fight",
+        "craftLabel": "Crafted",
+        "craft": "{item} ({profession} recipe)",
+        "grantLabel": "Awarded",
+        "grantOnly": "Seasonal award: the monthly ladder and top-parse rewards",
+        "tokenLabel": "Token",
+        "token": "{item}, used once to attach the companion"
+      },
+      "buddyLore": {
+        "ember_fox": "A vixen out of the Eastbrook Vale hedgerows, named for the coal-red coat that shows through winter scrub. The trappers there gave up on the kits generations ago and started leaving food out instead.",
+        "moss_hare": "The Willowfen hare, green-furred from a lifetime bedded down in wet peat. Fen herbalists count them lucky and will not have one chased off a doorstep.",
+        "frog": "Mirefen Marsh raises them fat and unbothered, singing all night from the reed beds. The marsh guides swear a boat carrying one never runs aground.",
+        "crimson_claw_crab": "A Farshore tidal crab whose claw stays red long after it leaves the water. Dock crews used to race them along the boards for coin.",
+        "golden_sentinel": "A watch-beetle of the Amberfall, gilded by the resin it grew up in. The name is older than the resin: sentinels of a kind kept those groves long before anyone thought to bottle the sap.",
+        "nightfang": "A young Nightbloom hunter, silent even by the standards of its kind. It follows for the company and hunts nothing larger than a moth.",
+        "tuskhorn_boar": "Thornpeak stock, bred short-legged by shepherds who wanted a boar that could not put a fence down. It kept the temper regardless.",
+        "emerald_wolf": "A Wraithwood pup, its coat green in the canopy light that never quite reaches the forest floor. The wardens raise whichever orphans the wood leaves behind.",
+        "tiger": "Palmreach stripes on an animal that has never seen the Palmreach: the line has been kept in captivity since the old menageries closed. It answers to a whistle and to nothing else.",
+        "cate_coin": "A cat that will not be parted from the coin it sits on, and that nobody has ever seen eat. Eastbrook merchants still argue over which of the two is the pet.",
+        "alon": "A traveller's mascot from a road no map will admit to, turning up wherever a plan is going badly. It watches, it approves, and it offers no help whatsoever.",
+        "trollface": "A grinning thing the Wraithwood put out and would not take back. Every attempt to describe it ends with the describer laughing and giving up.",
+        "ansem": "It speaks of doors and of darkness and will not be drawn further on either. The Nightbloom cultists claim it as theirs; it wanders off whenever they hold a rite.",
+        "triple_t": "Three of something, or one thing three times over. The accounts disagree, and the creature will not hold still long enough to be counted.",
+        "kekius": "A laughing companion of unclear origin, adopted by the Galecrest race yards as a charm. It has outlived four stables that swore by it.",
+        "solbot": "A small sun-fed automaton, dug half-buried out of the Drakelands ash and still ticking. Whatever workshop built it left no mark anywhere on the casing.",
+        "frostfire": "Born in the Frostveil Reach where a hot spring surfaces through the ice field, and it has never settled on which half it belongs to. It steams in cold air and shivers in warm.",
+        "rocky": "A stone-shelled crawler off the Thornpeak scree, slow and thoroughly unbothered. Miners keep them for the way they go still a moment before a collapse.",
+        "proud_grunt": "A veteran of the Warfare stores who kept the salute and lost the rank. Warmarshal Draven Kole hands one to any soldier with honor enough to know what that costs.",
+        "loot_goblin": "It follows anyone carrying Heroic Marks and has never once been caught stealing. Quartermaster Vex maintains that this proves nothing at all.",
+        "penny_goldspark": "A gnome tinker's apprentice who charges by the hour and is worth every copper of it. Armorer Hode took her on to settle a debt and now sells the arrangement to anyone holding a thousand gold.",
+        "stag": "Evergarden bloodline, bred down from the great stags the wardens once rode. It still lowers its head at a raised hand, from a habit older than the animal.",
+        "alpaca": "The Galecrest herds keep them for wool and for temper: nothing stays calmer in a storm. This one will spit at exactly one person per journey.",
+        "horse": "Vale pony stock, bred small for the orchard lanes and never told it is not a warhorse. It keeps pace at your shoulder and will follow anyone who once fed it an apple.",
+        "sapling": "A young tree with a smile in its bark and a curious purple gaze. Its roots carry it in a cheerful waddle wherever you wander.",
+        "bull": "A Vale bull the size of a dog, which is the only reason anyone agreed to keep one indoors. The temperament did not scale down with the rest.",
+        "spider": "A Wraithwood weaver, palm-sized, that redecorates any pack it is carried in. The webbing is stronger than the thread it replaces.",
+        "raptor": "Drakelands hatchling stock, sold on before it learns how fast it can run. Every new owner is told to keep it fed, and none of them need telling twice.",
+        "skeleton": "It came up out of the Wraithwood barrows, dusted itself off, and has followed people about ever since. Nobody has established whose bones these were.",
+        "crystal_lich": "A splinter of Nythraxis itself, still humming with the cold that shaped it. It answers to whoever pulled it from the wreck of the raid, and it has not forgiven them for it.",
+        "forgemaw": "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
+        "crystal_tide": "A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.",
+        "phantom": "A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.",
+        "emberfall_phoenix": "It burns down to an ember every autumn and comes back up out of its own ash by spring, which is the whole of what anyone can tell you about it. Nobody has ever found a nest, and nobody has ever caught one twice."
+      },
+      "petKind": {
+        "beast": "Beasts",
+        "elemental": "Elementals",
+        "humanoid": "Humanoids",
+        "undead": "Undead",
+        "celebrity": "Celebrities"
+      },
+      "armor": {
+        "cloth": "Cloth",
+        "mail": "Mail",
+        "leather": "Leather"
+      },
+      "stat": {
+        "intellect": "Intellect",
+        "agility": "Agility",
+        "strength": "Strength",
+        "mixed": "Hybrid"
+      },
+      "set": {
+        "owned": "{owned} of {total} pieces",
+        "itemLevel": "ilvl {level}",
+        "bonusLabel": "{pieces} pieces"
+      },
+      "detail": {
+        "dropLabel": "Drops from",
+        "vendorLabel": "Sold by",
+        "bindLabel": "Binding",
+        "sellLabel": "Vendor pays",
+        "marketLabel": "World Market",
+        "exchangeLabel": "$WOC Exchange",
+        "setLabel": "Collected",
+        "drop": "{mob} ({location}), {chance}% per kill",
+        "heroicDrop": "{mob} ({location}), Heroic only, {chance}% per kill",
+        "dropWithHeroic": "{mob} ({location}), {chance}% per kill, {heroicChance}% on Heroic",
+        "globalDrop": "Any enemy, {chance}% per kill, one of {count} at this rarity",
+        "fishingDrop": "Fishing anywhere, {chance}% per catch",
+        "vendor": "{npc} ({location}) for {price}",
+        "honorPrice": "{amount} Honor",
+        "marksPrice": "{amount} Heroic Marks",
+        "noSource": "No source in the game yet",
+        "noItem": "No item grants this yet",
+        "tradeable": "Tradeable",
+        "soulbound": "Soulbound",
+        "noSell": "Cannot be sold",
+        "marketAtMerchant": "Shown at the Merchant",
+        "marketChecking": "Checking...",
+        "marketNone": "No listings",
+        "exchangeNone": "No listings",
+        "exchangeUnavailable": "Not available on this client"
+      }
     },
     "calendar": {
       "title": "Lịch Sự Kiện",
@@ -5949,10 +6491,42 @@ export const vi_VN: EnTranslations = {
       "tagFastRun": "Chạy nhanh",
       "mech": {
         "shadow_pulse": "Xung Bóng Tối (sát thương vùng theo nhịp)",
+        "crypt_shovelful": "Shovelful (every 11 seconds he flings grave dirt over an 8 yard cone in front of him: one and a half times his swing and 50 percent slower movement for 6 seconds, so stand behind him)",
+        "crypt_measured_for_the_grave": "Measured for the Grave (every 15 seconds he marks a player other than the tank; 4 seconds later an Open Grave caves in under them, 42 to 52 damage within 3 yards on normal, and the pit stays for the fight: 9 damage a second and 40 percent slower movement inside, so lay the graves at the edge of the yard)",
+        "crypt_burial_toll": "Burial Toll (at 66 and 33 percent health he strides to the bell rope, immune to damage, and rings for 3 seconds: 30 to 38 shadow damage to everyone on normal, and every Open Grave raises a Restless Bones)",
+        "crypt_marrow_heroic": "Heroic: Gravedigger's Blow every 9 seconds on the tank (each stack makes them take 6 percent more damage for 20 seconds, up to 6 stacks), Grave Vigor (he swings 30 percent faster while he stands in a grave) and Unquiet Earth (anyone who stays 2 seconds in a grave raises a Restless Bones there)",
+        "crypt_brides_lament": "Bride's Lament (every 22 seconds a 3 second wail: 60 to 75 frost damage on normal to everyone outside the light of a lit grave lantern, half again for every Lingering Lament stack from the Laments you already took. A lantern shelters two players at most and goes dark for 28 seconds after it shelters anyone, so split up and take turns)",
+        "crypt_frozen_embrace": "Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 6 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)",
+        "crypt_rime_path": "Rime Path (she leaves slippery rime where she drifts for 25 seconds: on it you gather speed slowly and slide on when you stop or turn)",
+        "crypt_bridal_freeze": "Bridal Freeze (at half health the whole ravine floor freezes over: slippery ice for the rest of the fight)",
+        "crypt_lady_heroic": "Heroic: every lit lantern also burns out on its own after 30 seconds and stays dark for 10, and the Frozen Embrace takes two players and lets go at 4.4 percent of her health",
+        "crypt_dirge_of_the_hollow": "Dirge of the Hollow (every 16 seconds a 2.5 second song you can interrupt: if she finishes it, 105 to 125 shadow damage on normal and a 4 second silence to everyone within 45 yards who can see her, so interrupt it or hide behind a choir pillar)",
+        "crypt_harmony": "Harmony (each living Chorister makes her take 30 percent less damage: kill the Choristers first)",
+        "crypt_bone_organ": "Bone Organ (every 26 seconds she plays the Bone Organ: two waves of shadow notes burst down lanes of the loft, 100 to 115 damage on normal in a lane, the second wave filling the first one's gaps)",
+        "crypt_crescendo": "Crescendo (below 30 percent health her Dirge takes 1.8 seconds and comes every 11 seconds, and the organ plays a third wave)",
+        "crypt_ilvane_heroic": "Heroic: Encore (a Chorister that lies dead for 10 seconds while the other still stands rises again, so kill them together) and Unbroken Verse (every third Dirge cannot be interrupted: hide from it)",
+        "crypt_morthen_shadow_pulse": "Shadow Pulse (every 12 seconds a 2 second cast, then 24 to 30 shadow damage on normal to everyone within 12 yards of him, so step away; every 9 seconds in his Last Rites)",
+        "crypt_gravecall": "Gravecall (every 15 seconds a Bound Soul drifts from the next sarcophagus alcove toward him; when it reaches him he is Gorged on the Dead, 10 percent more damage for each soul up to 10 stacks, and heals 3 percent of his health. A player in its path takes it instead: 12 to 16 shadow damage on normal)",
+        "crypt_rite_of_the_unquiet": "Rite of the Unquiet (at 65 percent health he returns to the altar, immune inside the Unquiet Ward, while Grave Chill deals 3 shadow damage a second to everyone, rising by 1 every 5 seconds, and 2 Restless Bones climb out of the alcoves. Relight the 4 Remembrance Candles: each is a 4 second channel that drains 6 percent of the lighter's maximum health every second, which hits do not break but a step or a stun does. The last candle breaks the Rite: he is stunned for 8 seconds and takes 25 percent more damage)",
+        "crypt_reap_the_unquiet": "Reap the Unquiet (below 35 percent health the souls stop; every 14 seconds he sweeps his scythe after a 2 second cast: 55 to 65 shadow damage on normal to everyone in a 120 degree arc 14 yards in front of him. Shadow Pulse then comes every 9 seconds)",
+        "crypt_morthen_heroic": "Heroic: Name the Dead (the Ledger names the order of the candles: a wrong candle snuffs the last one lit and deals 252 to 288 shadow damage to the lighter, and each relight drains 8 percent a second), Grasp of the Grave (every 16 seconds 2 players get a 4 yard ring; 1.5 seconds later hands erupt in it: a 3 second root and 162 to 198 shadow damage) and the Knellwyrm's Burning Knell (it takes flight and marks half of the ring for 4.5 seconds, then pours ghost fire over that half for 1,000 to 1,120 fire damage, 3 halves each flight)",
         "reaping_arc": "Vòng Chém Gặt (chém ngang phía trước)",
+        "hallowed_brine": "Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)",
+        "rebounding_bulwark": "Rebounding Bulwark (his shield rebounds to the nearest player within 10 yards of the last one hit, up to 3 players, 4 on heroic: spread out)",
+        "tide_sentence": "Sentence of the Tide (5 seconds after the mark, a column of light strikes everyone within 6 yards of the marked player, 8 on heroic: take it away from the group)",
+        "unbroken_oath": "Unbroken Oath (once, at half health, he kneels immune in a bubble for up to 60 seconds: kill his soldiers to break it, then he is stunned 4 seconds and takes 20 percent more damage for 10)",
+        "fog_veil": "Fog Veil (four figures, one real: the beacon's beam makes the real Vael's lantern flare)",
         "mist_surge": "Sóng Sương Mù (sát thương vùng theo nhịp)",
         "summons_adds": "Triệu hồi quân tiếp viện",
         "lunar_tide": "Triều Nguyệt (sát thương vùng theo nhịp)",
+        "chorus_and_solo": "Chorus and Solo (stack on one mark, spread from the other)",
+        "tideglass_reflections": "Tideglass Reflections (kill each other's mirror images)",
+        "hydra_three_elements": "Three Elements (the left head breathes an 18 yard cone of frost that slows you by 70 percent for 4 seconds, the centre head spits venom under up to 3 players that bursts after 1.5 seconds and burns for 6 seconds where it lands, and the right head fires a torrent down a 26 yard lane that throws you back 8 yards: step out of each one. When a head falls, the heads still standing take over its attack)",
+        "hydra_tsunami": "Tsunami (the heads sink for 4.5 seconds, taking 75 percent less damage, and a wave rolls over one half of the pool, the other half the next time: 160 to 190 frost damage on normal and a 10 yard shove. Cross to the other half or stand behind a rim column; on heroic the wave rolls back over the other half 3.5 seconds later. The first Tsunami comes 24 seconds into the fight, each later one 40 seconds after the last has passed)",
+        "hydra_combined_breath": "Combined Breath (between Tsunamis the heads fuse two of their attacks, always in the same order: Frostlocked Torrent freezes everyone in its lane for 2 seconds and leaves an Ice Wall that can shelter you from the next wave, Venom Current slides the venom pools outward, and Toxic Rime freezes the pools into crystals that burst after 4 seconds. Once between Tsunamis on normal, twice on heroic)",
+        "hydra_regrowth": "Regrowth (a fallen head grows back after 20 seconds at half health while another head still lives, and each fallen head makes the others deal 15 percent more damage: bring all three down close together)",
+        "rising_tide": "Rising Tide (half the island floods, move to the dry half)",
+        "undertow": "Undertow (pulls everyone in, run out before the crash)",
         "enrage": "Nổi giận khi máu thấp",
         "shuddering_stomp": "Giậm Chân Rùng Rợn (làm choáng vùng)",
         "grave_inferno": "Địa Ngục Mộ Phần (AoE lửa kênh, giữ khoảng cách)",
@@ -5978,6 +6552,9 @@ export const vi_VN: EnTranslations = {
         "deathless_court": "Triều Đình Bất Tử (chỉ heroic, triều đình hoàng gia trỗi dậy sau Cơn Thịnh Nộ Bất Tử)",
         "bloodmane_rend": "Bloodmane Rend (chảy máu, theo dõi các giao dịch hoán đổi mục tiêu)",
         "tusk_sweep": "Quét ngà (khe hở trán)",
+        "grave_breath": "Grave Breath (frontal fire cone, it cracks the ice it covers)",
+        "plate_floor": "Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)",
+        "wyrm_flights": "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
         "ancestral_sap": "Sap tổ tiên (chữa lành các đồng minh của nó)",
         "call_of_the_hunt": "Call of the Hunt (đẩy nhanh các đồng minh gần đó)",
         "thickhide_ward": "Thickhide Ward (khiên chắn cho các đồng minh gần đó)",
@@ -6001,8 +6578,172 @@ export const vi_VN: EnTranslations = {
         "forgestorm": "Forgestorm (vòng tròn sao băng rơi xuống, di chuyển ra ngoài)",
         "shared_pyre": "Dãy Pyre Chung (tập hợp vòng tròn, chia sẻ sát thương)",
         "anvils_decree": "Nghị định của Anvil (ba cuộc tấn công búa toàn diện, chữa lành)",
-        "masters_assembly": "Hội đồng tổng thể (chặn dầm rèn, xoay chặn)"
+        "masters_assembly": "Hội đồng tổng thể (chặn dầm rèn, xoay chặn)",
+        "iron_cage": "Iron Cage (mash your interact key to break out, allies can smash the bars)",
+        "drowned_anchor": "Drowned Anchor (its victim is reeled toward the pit: run within 3 yards of a lit mooring post to moor the chain, the post then goes dark for 30 seconds, or break the chain with 12 hits, 16 on heroic)",
+        "shackle_pair": "Shackle Pair (two chained players must stay close together)",
+        "reaper_behind": "Shadow Crossing (three times in a row he rises behind a player, a different one each time while enough stand: step out of the scythe's arc)",
+        "pack_bond": "Pack Bond (together they take half damage: drag them 15 yards apart)",
+        "stalk": "Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)",
+        "shared_health": "Shared Health (one pool: hit whichever is safest)",
+        "heel_frenzied_bond": "Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)",
+        "seed_rain": "Seed Rain (clean players stomp the seeds before they sprout)",
+        "pollinate": "Pollinate (golden players stay off the seeds, or they sprout at once)",
+        "vine_lash": "Vine Lash (step out of the thorny lane or be rooted)",
+        "gorge": "Gorge (a heavy bite and a poison on the tank)",
+        "burrowing_seeds": "Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)",
+        "spirit_of_the_hunt": "Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)",
+        "twin_prey_ambush": "Twin Prey and Ambush (two Prey, then a pounce on the farthest player)",
+        "seal_shackles": "Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)",
+        "chain_strain": "Strain (step away from every pillar whose chain still holds)",
+        "korgath_stomp": "Shuddering Stomp (step out of the ring round him)",
+        "rerivet_last_link": "Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)",
+        "waking_thaw": "Waking Thaw (the dead climb out of the thaw pools)",
+        "unquenched_held": "Held or Unquenched (kill the dead on cold ice, never in meltwater)",
+        "soulfire_trench": "Soulfire Trench (a line of soulfire, then a strip of meltwater)",
+        "shadow_volley": "Shadow Volley (shadow damage to everyone)",
+        "warm_hands_twice_woken": "Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)"
       }
+    },
+    "bastionCage": {
+      "title": "Locked in the Iron Cage!",
+      "promptKey": "Press {key} again and again to break free",
+      "promptNoKey": "Press your interact key again and again to break free",
+      "promptClick": "Click here again and again to break free",
+      "promptTap": "Tap here again and again to break free",
+      "buttonAria": "Break free from the Iron Cage",
+      "progressAria": "Escape progress: {pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "Chained to the Drowned Anchor!",
+      "anchoredLine": "Run to a lit mooring post to moor the chain, or have your group break it before the winch drags you into the pit",
+      "allyTitle": "Break the chain!",
+      "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor, or help them reach a lit post",
+      "shackledTitle": "Shackled to {name}",
+      "shackledLine": "Stay within {range} yards to avoid chain damage to both of you ({dist} yards apart)",
+      "strainedLine": "Move within {range} yards of your partner to stop chain damage to both of you",
+      "brokenAria": "Chain broken: {pct}",
+      "reachAria": "Chain reach used: {pct}",
+      "linksLeft": "Chain links left: {count} of {total}",
+      "linkRule": "Every hit on the anchor breaks one link, however hard it lands",
+      "linksTarget": "{count} of {total} links",
+      "linkBroken": "Link broken!"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "The Sentence falls on you!",
+      "sentencedLine": "A column of light strikes everyone near you: move away from the group",
+      "brineTitle": "In the Hallowed Brine!",
+      "brineLine": "It burns you every second: step out of the pool",
+      "reapedTitle": "Death rises behind you!",
+      "reapedLine": "Move forward or sideways to avoid the scythe swinging behind you",
+      "veilTitle": "The Fog Veil",
+      "veilLine": "Find the Vael whose lantern flares in the beacon beam, then attack to break the veil",
+      "realTitle": "The beam found him!",
+      "realLine": "This is the real Vael: strike him to break the veil",
+      "shadeTitle": "A hollow shade",
+      "shadeLine": "Leave this decoy. Attack the Vael whose lantern flares in the beam to break the veil",
+      "timeAria": "{seconds} seconds left"
+    },
+    "wildheartAlert": {
+      "preyTitle": "You are the Prey!",
+      "preyLine": "Lure Zulgar through lit sun glyphs to slow him before he catches and mauls you",
+      "preyWaitLine": "Keep away from Zulgar: he will switch from the other marked player to chase you",
+      "stalkedTitle": "Stalked!",
+      "stalkedLine": "Run from the jaguar to avoid its bites. Lead it away from the Beastmaster to break Pack Bond",
+      "pollinatedTitle": "Pollinated!",
+      "pollinatedLine": "Avoid seedpods: touching them while Pollinated creates enemies. Unmarked allies can stomp them",
+      "bondTitle": "Pack Bond",
+      "bondLine": "Separate the Beastmaster and jaguar to remove their damage reduction and damage bonus",
+      "timeAria": "{seconds} seconds left"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "In the quench-water!",
+      "quenchLine": "Swim onto ice or the shore to escape the water damage and slow",
+      "plungeTitle": "Plunging Fire!",
+      "plungeLine": "Leave this ice platform now: fire will hit everyone on it and damage the ice",
+      "descentTitle": "Crashing Descent!",
+      "descentLine": "Leave the landing shadow to avoid Korzul crashing down and knocking you back",
+      "eyeTitle": "Wyrm's Eye on you!",
+      "eyeLine": "Move onto uncracked ice away from allies: your mark calls fire onto that platform",
+      "eyeCrackedLine": "Move onto uncracked ice away from allies: your marked fire would break this cracked platform",
+      "flailTitle": "Chain Flail!",
+      "flailLine": "Step sideways out of the marked strip to avoid the chain strike",
+      "chargeTitle": "Threshold Charge!",
+      "chargeLine": "Step sideways out of the marked strip: Korgath charges through it and knocks you back",
+      "trenchTitle": "Soulfire Trench!",
+      "trenchLine": "Step sideways out of the marked strip to avoid the fire damage. The ice then becomes meltwater",
+      "strainTitle": "Strain!",
+      "strainLine": "Move away from pillars with intact chains to avoid the blast and knockback",
+      "infernoTitle": "Grave Inferno!",
+      "infernoLine": "Move away from Korzul: each nearby fire pulse deals more damage",
+      "stompTitle": "Shuddering Stomp!",
+      "stompLine": "Move away from Korgath before the cast ends to avoid the stomp damage",
+      "breathTitle": "Grave Breath!",
+      "breathLine": "Move sideways out of the marked cone to avoid Korzul's breath damage",
+      "maulTitle": "Maul Arc!",
+      "maulLine": "Move behind Korgath to avoid the weapon swing hitting everyone in front",
+      "tailTitle": "Tail Sweep!",
+      "tailLine": "Move to Korzul's side to avoid the tail damage and knockback behind him",
+      "meltwaterTitle": "Bonewalker in meltwater",
+      "meltwaterLine": "Lure the Bonewalker chasing you onto dry ice before killing it: dying in water revives it and heals Velkhar",
+      "meltwaterTargetLine": "Stop attacking until the Bonewalker leaves the water: killing it there revives it and heals Velkhar",
+      "crackedTitle": "Cracked ice",
+      "crackedLine": "Move onto uncracked ice before drawing fire here: another fire hit breaks this platform",
+      "flightTitle": "Korzul takes flight",
+      "flightLine": "Group on uncracked ice to lure Korzul's landing, then leave the shadow to avoid the crash",
+      "lockboundTitle": "Lockbound",
+      "lockboundLine": "Attack the Seal Shackles to remove Korgath's damage reduction: {chains} chains grant {pct}% less damage taken",
+      "timeAria": "{seconds} seconds left",
+      "brandedTitle": "Branded!",
+      "brandedLine": "Enter a meltwater pool to remove the brand and stop its damage",
+      "rimeTitle": "Creeping Rime!",
+      "rimeLine": "Leave the whelps' breath to avoid freezing solid at full stacks: Creeping Rime {stacks}/{max}",
+      "slabTitle": "Ice Slab",
+      "slabLine": "Put the ice slab between you and enemy casters to block their line of sight"
+    },
+    "cryptAlert": {
+      "measuredTitle": "Measured for the Grave!",
+      "measuredLine": "Move to the yard's edge before the mark ends to keep the damaging grave away from your group",
+      "embracedTitle": "Frozen Embrace!",
+      "embracedLine": "Your group must damage the Lady of the Bonechill to free you from her grip",
+      "lamentTitle": "Bride's Lament!",
+      "lamentShelteredLine": "Stay in this lit lantern's light to avoid the wail damage: you have a shelter spot",
+      "lamentOpenLine": "Move into a lit lantern's light to avoid the wail damage: only two players fit per lantern",
+      "graveTitle": "In an Open Grave!",
+      "graveLine": "The grave dirt burns and slows you: step out of it",
+      "tollTitle": "Burial Toll!",
+      "tollLine": "Prepare to fight the skeletons raised from open graves: Marrow is immune while ringing the bell",
+      "harmonyTitle": "Harmony",
+      "harmonyLine": "Kill the Choristers to remove Ilvane's {pct}% damage reduction",
+      "knellTitle": "Burning Knell!",
+      "knellLine": "Ghost fire pours over this half of the ring when the bar runs out: get to the other half",
+      "graspTitle": "Grasp of the Grave!",
+      "graspLine": "Leave the marked ring before the hands erupt to avoid damage and being rooted",
+      "reapTitle": "Reap the Unquiet!",
+      "reapLine": "Move behind Morthen to avoid the scythe striking everyone in front",
+      "riteTitle": "Rite of the Unquiet",
+      "riteLine": "Relight all Remembrance Candles to break Morthen's immunity: {lit} of {total} lit",
+      "riteNamedLine": "Relight candles in the Ledger's order to break Morthen's immunity: a wrong candle undoes progress ({lit}/{total})",
+      "soulTitle": "Bound Soul",
+      "soulLine": "Intercept the drifting soul to stop it healing Morthen and increasing his damage. Catching it hurts you",
+      "timeAria": "{seconds} seconds left"
+    },
+    "kitUse": {
+      "toppleLine": "Topple the brazier onto nearby enemies to burn them with the spill",
+      "toppleKey": "Topple the {name} onto them",
+      "toppleTap": "Tap here to topple the {name} onto them",
+      "toppleClick": "Click here to topple the {name} onto them",
+      "toppleFar": "Get within {range} yd to kick it over",
+      "toppleAria": "Topple the {name}",
+      "usingLine": "Hold still: a hit, a step or a stun breaks it",
+      "relightLine": "Relight the candles to break Morthen's immunity. Channeling drains your health; moving or a stun cancels it",
+      "relightKey": "Relight the {name}",
+      "relightTap": "Tap here to relight the {name}",
+      "relightClick": "Click here to relight the {name}",
+      "relightFar": "Get within {range} yd to relight it",
+      "relightAria": "Relight the {name}",
+      "relightUsingLine": "Keep channeling to light the candle: it drains health. Hits do not interrupt; moving or a stun does",
+      "timeAria": "{seconds} seconds left"
     },
     "cosmetics": {
       "title": "Mỹ phẩm",
@@ -6011,6 +6752,8 @@ export const vi_VN: EnTranslations = {
       "tabMounts": "Thú cưỡi",
       "tabSkins": "Ngoại hình",
       "tabMech": "Cỗ máy",
+      "buddyActive": "Summoned",
+      "buddyDrag": "Drag to action bar",
       "legend": "Tài khoản: dùng chung cho mọi nhân vật. Nhân vật: chỉ nhân vật này.",
       "scopeAccount": "Tài khoản",
       "scopeCharacter": "Nhân vật",
@@ -6231,6 +6974,14 @@ export const vi_VN: EnTranslations = {
       "bordersSection": "Viền",
       "bordersNone": "Không viền",
       "bordersEmpty": "Hãy lập một kỳ công có thưởng viền để mở khóa kệ này.",
+      "buddiesSection": "Buddies",
+      "buddiesNone": "No Buddy",
+      "buddiesEmpty": "Collect a companion to summon it from this shelf.",
+      "buddyDragHint": "Drag onto your action bar",
+      "looksSection": "Buddy Looks",
+      "looksNone": "Own Look",
+      "looksNoBuddy": "Summon a companion to choose its look here.",
+      "looksEmpty": "This companion has no looks unlocked yet.",
       "unlockedBanner": "Đã lập kỳ công: {name}",
       "unlockedTitleHint": "Đã nhận danh hiệu mới: {title}. Hãy chọn nó trong Sách Kỳ Công.",
       "unlockedBorderHint": "Đã nhận viền mới: {name}. Hãy đeo nó từ Sách Kỳ Công.",
@@ -6711,6 +7462,8 @@ export const vi_VN: EnTranslations = {
       "delete_confirm": "Nhập tên nhân vật để xác nhận xóa.",
       "storage_purchase_open": "Phải hoàn tất hoặc xử lý giao dịch mua kho trước khi xóa nhân vật này.",
       "delete_busy": "Vương quốc đang bận. Hãy thử xóa nhân vật này lại sau một lát.",
+      "referral_transfer_pending": "Move all unlocked stamp cards to another character before deleting this character.",
+      "referral_bond_pending": "A referral membership bond is being delivered to this character. Try deleting the character again after delivery finishes.",
       "already_in_world": "Nhân vật đã ở trong thế giới.",
       "taken_over": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
       "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới.",
@@ -6947,6 +7700,95 @@ export const vi_VN: EnTranslations = {
         "0": "Mủ thích hợp, những chiếc giường sẽ sống. Người xay cũ đã chôn cái gì đó trước khi anh ta rời đi. Cái xay của anh ta vẫn quay ở góc xa của những khu vườn. Đi và đứng cạnh nó.",
         "2": "Vậy là xay tạo hình khiến bạn đi xuống con đường bờ biển. Ngọn hải đăng giữ một bí mật cuối cùng: phía tây bắc của nó, chỉ dưới con đường, thảm cỏ đã bị cắt và xếp lại. Đào ở đó."
       }
+    }
+  },
+  "dungeonGuide": {
+    "drownedTemple": {
+      "greet": {
+        "1": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you.",
+        "2": "Every full moon I come to this gate, and every full moon my nerve fails me. Not tonight. The Choir is singing, and I am the one who ran. Take me down to her, and I will keep out of your way."
+      },
+      "row": {
+        "join": "Come with us.",
+        "decline": "We go alone."
+      },
+      "joined": "Lead on. I am right behind you.",
+      "singing": "Let me sing. Go, and go gently.",
+      "accept": {
+        "1": "Thank you. I will walk behind you, and keep out of your way.",
+        "2": "Then I go down at last. Walk on. I will keep up."
+      },
+      "decline": "I understand. I will listen from up here, as I always have.",
+      "heroicWater": "The water stands high tonight, higher than I have ever seen it. She is close to waking.",
+      "memory": {
+        "votaries": "The drowned ones on the shore walked in after the gate closed. The moon never took them, only the water.",
+        "rubbing": "The Tidewatcher read my words on the shore-rock. 'It only sleeps.' I carved them the morning after."
+      },
+      "area": {
+        "steps": "The Pilgrim Steps. I ran up these that night, three at a time, and never looked back.",
+        "causeway": {
+          "1": "On rite nights the moon lay on this causeway like a second road.",
+          "2": "Look at the water. It still remembers how to hold the moon."
+        },
+        "colonnade": "The Colonnade of Tides. We walked it two by two, singing the rising verse.",
+        "veil": "Past that veil is the Choir Court. I have not stood there since I was a boy.",
+        "terraces": "The tidepools. The novices kept them clean and fed the small bright things living in them.",
+        "falls": "Behind the falls the water drowns every voice. I hid here when I skipped practice.",
+        "pool": "The moon pool. They knelt round it and drank from their shells. I could not lift mine.",
+        "prismStair": "The Prism Stair. We climbed it at moonrise to wake the great glass.",
+        "moonbridge": {
+          "1": "A bridge of moonlight. The elders said only the faithful could cross it.",
+          "2": "I was never faithful. Well. We shall see if it holds me."
+        },
+        "altarLanding": "This is where I stood. Right here. This is where I turned and ran."
+      },
+      "sight": {
+        "pilgrim": "The pilgrims of the shore villages. They carried their shrine on their backs every spring. Now they carry it forever.",
+        "acolyte": "The novices. I learned my letters beside them. They sing in their sleep now, and never wake.",
+        "templeguard": "The stair guard. They swore to hold the temple until the moon set. It never set.",
+        "snapper": "We drank the moon-water from shells like those. Mine I dropped on the stair.",
+        "siren": "That voice. She sang beside me in the choir. She still comes in half a beat early.",
+        "lurker": "The children netted those in the shallows. They were small as a thumb, and they glowed.",
+        "tidewisp": "That is the moon-water itself, the draught we were meant to drink. Do not let it touch you.",
+        "sentinel": "The moon rays of the gate pools. As novices we fed them pearls at moonrise. Now they keep the doors, and wear our pearls as hearts.",
+        "eel": "The lagoon eels. The novices fed them bread at dusk. They grew fat on our hymns.",
+        "reflection": "It shows you what the water would make of you. Break it!",
+        "moonspawn": "Those were never my people. They are hers, made of nothing but moonlight."
+      },
+      "selthe": {
+        "pre": {
+          "1": "Mother Selthe. She taught me to breathe from the belly. She taught us all to drown without dying.",
+          "2": "Choirmother Selthe. Every note I know, she put in me. Forgive me, Mother."
+        },
+        "post": {
+          "1": "She is quiet. In all my years in the Choir, she was never once quiet.",
+          "2": "Rest now, Mother. You were right about me. I never could hold the long notes."
+        }
+      },
+      "hydra": {
+        "pre": "The pool serpent. When I was a boy it had one head, and it ate from our hands.",
+        "post": "Listen. Under the falls they are still singing. Closer now."
+      },
+      "colossus": {
+        "pre": "The great prism. We sang into it to catch the moon. I never knew it could stand.",
+        "post": "The glass is broken. Nothing is left to catch the moon now, but her."
+      },
+      "ysolei": {
+        "pre": "There she is. All my life I have asked if she was a goddess or a monster. Show me.",
+        "preHeroic": "On a night like this the whole Choir sings with her. Hold fast, all of you."
+      },
+      "farewell": {
+        "answer": "She was neither. She was the moon in the water, and we were the ones who knelt.",
+        "verse": "The rite had a last verse, the one that lets the singers sleep. I never sang it.",
+        "stay": "They have waited long enough. I will stay, and sing it for them now.",
+        "goodbye": {
+          "1": "Go up into the night. If you hear singing at the full moon, it is only me.",
+          "2": "Thank you for bringing an old coward to the end of his song. Go now."
+        },
+        "emote": "{name} lifts his voice over the altar, and the lagoon falls still."
+      },
+      "wipe": "Get up. Please. Do not leave me down here alone again.",
+      "catchUp": "My legs are old, but I know every one of these stairs. I am here."
     }
   },
   "guide": {
@@ -7428,6 +8270,7 @@ export const vi_VN: EnTranslations = {
       "framesGovernedAuraTracks": "Chỉnh Khung cũng mở khóa sáu thanh hào quang tùy chọn sau khi bạn bật chúng trong thẻ Chiến Đấu của cùng cửa sổ tùy chọn Giao Diện: Bùa Lợi Của Tôi, Hồi Chiêu Phòng Thủ, Lá Chắn Của Tôi, Hồi Chiêu Tấn Công, Di Chuyển Và Tàng Hình, và Bùa Lợi Của Tôi Trên Đồng Minh. Mặc định mọi thanh đều tắt; mỗi thanh hiện nhãn tên riêng khi được mở khóa.",
       "frameGroups": "{trackers} có thể kết hợp các nhiệm vụ, công tích, vết nứt, đào sâu, mục tiêu thu thập, và theo dõi Reliquary. {auras} có thể kết hợp các chấm Mục tiêu và sáu rãnh hào quang. Bật một trong hai nhóm trong Cài đặt Khung, hoặc bỏ nó để di chuyển từng khung riêng biệt. {tot} bao gồm một thanh tài nguyên. {focus} có ba mục tiêu có thể di chuyển độc lập: Shift+F1 qua Shift+F3 gán chúng; Ctrl+F1 qua Ctrl+F3 chọn chúng. Kéo mét thiệt hại hoặc mối đe dọa bất kỳ nơi nào bên ngoài các nút của nó để di chuyển nó, và kéo các cạnh của nó để thay đổi kích thước nó, thậm chí khi các khung bị khóa. Trong khi các khung bị mở khóa, Hiển thị hoặc Ẩn Khung có trình đơn được nhóm riêng. Nhấp chuột phải một khung bị mở khóa để Kích thước Đặt lại hoặc Tùy chọn Khung. Giao diện > Khung cũng chứa Cài đặt Khung và Tùy chọn Khung Đảng có thể thu gọn. Khóa Mục tiêu Mục tiêu với Mục tiêu giữ các khung đó cùng nhau. Tắt nó để di chuyển Mục tiêu của Mục tiêu riêng biệt; bật nó trở lại bảo tồn vị trí riêng biệt cho sau này. Các khung tiêu điểm được gán ẩn các điều khiển thiết lập của chúng; nhấp chuột phải và chọn Bỏ đặt Tiêu điểm để khôi phục chúng. Khả năng đúc chuột qua cũng hoạt động trên các khung tiêu điểm.",
       "framesGovernedTalkingHead": "Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
@@ -7442,6 +8285,7 @@ export const vi_VN: EnTranslations = {
       "mapBodyZoneFirst": "M mở bản đồ thế giới tại vùng bạn đang đứng, với mũi tên của riêng bạn trên đó, các điểm quan tâm quanh bạn, những người giao nhiệm vụ cùng dấu hiệu của họ và khu vực chứa mục tiêu của bạn, các trạm chế tác, hòm thư, bảng tin và luống vườn, các cửa hầm ngục, và mọi điểm thu hoạch trong vùng, mờ đi khi đang mọc lại và được đánh dấu khi công cụ của bạn chưa đủ. Nhóm của bạn cũng hiện trên đó. Nhấp chuột phải vào bản đồ, hoặc bấm nút Bản đồ thế giới của nó, bản đồ sẽ lùi về toàn lục địa, mỗi vùng được vẽ cùng tên, và bấm vào một vùng sẽ mở bản đồ của vùng đó. Bước vào một hang sâu, một hầm ngục, một Vết Nứt hay một pháo đài, bản đồ sẽ chuyển sang bản vẽ mặt bằng nơi bạn đang đứng; chiến trường Cánh Đồng Gai Trũng có bản đồ chiến trường riêng của nó.\n\nỞ bên phải, dưới minimap, một cụm theo dõi giữ công việc hiện tại của bạn trong tầm mắt mà không cần mở gì cả: các nhiệm vụ bạn đang theo dõi cùng mục tiêu của chúng, tiến độ kỳ công, các trang Kỳ Trân Các của bạn, các công thức bạn đã ghim từ chế tác, hang sâu bạn đang ở trong, và bất kỳ Vết Nứt nào bạn đang tham gia. Trình theo dõi nhiệm vụ thu gọn lại khi bạn muốn lấy lại màn hình.",
       "gatheringGoalTrackerBody": "Bảng mục tiêu thu thập được thêm vào cụm theo dõi khi bạn chọn Theo Dõi một công thức trong cửa sổ chế tác hoặc một đơn trên bảng đơn đặt chế tác: nó hiện tên công thức hoặc đơn, số lượng cần chuẩn bị và mức đáp ứng của nguyên liệu đang mang cùng nguyên liệu đã cất. Theo Dõi thay mục tiêu hiện tại, còn Xóa chủ động bỏ mục tiêu; cả hai đều không thay đổi ưu tiên thu hoạch.",
       "hubPracticeTrackerBody": "Gần trung tâm Đông Khê, bảng theo dõi luyện tập được thêm vào cụm khi bạn nhận các bài tập hướng dẫn tại đó: nó giữ thành tích tốt nhất với hình nhân tập trong tầm mắt. Khi bài học đang diễn ra, dải hướng dẫn bên cạnh dẫn bạn qua từng bước, từ mở Bảng Thống Kê Sát Thương đến so sánh lượt tập thứ hai.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "Khung trò chuyện",
       "chatBody": "Góc dưới bên trái. Nhấn Enter để bắt đầu gõ và Enter lần nữa để gửi.\n\nLuôn có hai tab: Trò Chuyện, nhật ký gộp mọi thứ được nói quanh bạn, và Chiến Đấu, ghi chép bằng văn bản của trận đánh. Nút dấu cộng thêm nhiều tab hơn, mỗi tab cho một kênh: Nói, Hét, Tổ Đội, Chung, Thế Giới, Tìm Đội, Bang Hội, và Sĩ Quan, cùng một tab Nhắn Riêng gom mọi tin nhắn riêng bạn gửi và nhận vào một chỗ. Gõ trong một tab kênh sẽ gửi thẳng đến kênh đó mà bạn không cần gõ lại lệnh.\n\nCả khung có thể được kéo sang chỗ khác và đổi kích thước, và nó sẽ nhớ vị trí bạn để lại.",
       "keyWindowsTitle": "Các cửa sổ bạn mở bằng phím",
@@ -9183,12 +10027,152 @@ export const vi_VN: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "Target: {name}",
+      "choose": "Choose overlapping asset ({count})",
+      "chooser": "Choose an asset under the pointer",
+      "front": "Frontmost",
+      "behind": "Behind another asset",
+      "close": "Close",
+      "keyboard": "Use Previous/Next or arrow keys to compare. Enter selects; Escape closes.",
+      "hint": "Click again to cycle overlapping items, or choose from this list.",
+      "asset": "Asset {number}",
+      "overlapAt": "Overlaps at {name}",
+      "previous": "Previous",
+      "next": "Next",
+      "position": "{current} of {count}",
+      "details": "Item {number} · Floor {level} · Height {height}",
+      "ungroupedDetails": "Item {number} · Height {height}",
+      "hideAbove": "Hide floors above selected level",
+      "allFloors": "All floors visible",
+      "filteredFloors": "Floors above level {level} are hidden"
+    },
+    "quickActions": {
+      "title": "Selected asset",
+      "move": "Move",
+      "frame": "Frame",
+      "remove": "Remove",
+      "count": "{count} selected"
+    },
+    "buildMode": {
+      "materialNames": {
+        "WardenStone": "Smooth Stone",
+        "Cliff001": "Red Cliff",
+        "Cliff002": "Mossy Crag",
+        "Cliff003": "Craggy Rock",
+        "Cliff004": "Weathered Bluff",
+        "Rock052": "Rugged Stone",
+        "Rock053": "Ironrock",
+        "Rock054": "Sandstone Face",
+        "Rock055": "Rust Rock",
+        "Rock029": "Weathered Rock",
+        "Rock035": "Layered Stone",
+        "Rock051": "Granite",
+        "Rock056": "Meadow Stones",
+        "Rock057": "Veined Darkstone",
+        "Cliff005": "Strata Cliff",
+        "Cliff006": "Sunbaked Cliff",
+        "Concrete034": "Cast Concrete",
+        "Marble012": "Veined Marble",
+        "Bricks076C": "Mossy Brick",
+        "Gravel024": "Gravel",
+        "PavingStones046": "Paving Stones",
+        "Cobblestone001": "Cobbled Road",
+        "Cobblestone002": "Old Cobblestone",
+        "Tiles001": "Lichen Flagstones",
+        "Tiles002": "Slate Pavers",
+        "PavingStones131": "Mossy Setts",
+        "Metal032": "Brushed Steel",
+        "Metal034": "Painted Steel",
+        "Rust004": "Rusted Iron",
+        "Roots001": "Tangled Roots",
+        "Roots002": "Living Roots",
+        "Wood001": "Oak Planks",
+        "Wood002": "Pine Planks",
+        "Wood003": "Weathered Bark",
+        "Wood004": "Mossy Bark",
+        "Plaster001": "Lime Plaster"
+      },
+      "title": "Build a building",
+      "modeWall": "Walls",
+      "modeRoom": "Rooms",
+      "modeFloor": "Floors",
+      "modeObject": "Objects",
+      "modeFinish": "Wall finishes",
+      "building": "Building",
+      "buildingNumber": "Building {number}",
+      "noBuilding": "New building",
+      "newBuilding": "New building",
+      "levels": "Building floors",
+      "groundFloor": "Ground floor",
+      "floorNumber": "Floor {number}",
+      "addLevel": "Add floor",
+      "hideAbove": "Hide higher floors",
+      "settings": "Grid and foundation",
+      "gridSize": "Grid spacing",
+      "gridOff": "Off",
+      "gridCell": "{size} yards",
+      "floorHeight": "Floor height (yards)",
+      "baseY": "Foundation height (yards)",
+      "autoBase": "Set by first placement",
+      "foundationLocked": "Foundation settings are fixed after building starts.",
+      "wallSource": "Wall type",
+      "bareWall": "Bare wall",
+      "chosenAsset": "Chosen asset",
+      "thickness": "Wall thickness (yards)",
+      "pickAsset": "Choose asset",
+      "selectedAsset": "Asset: {name}",
+      "noAsset": "Choose an asset from the browser.",
+      "selectExisting": "Select an existing piece",
+      "wallHint": "Drag to draw a straight wall.",
+      "diagonal": "Diagonal walls",
+      "diagonalHint": "Drag between grid points to draw a wall at any angle.",
+      "roomHint": "Drag a rectangle to create a room with walls and a floor.",
+      "floorHint": "Drag a rectangle to add a floor on this level.",
+      "objectHint": "Place objects on the selected floor.",
+      "finishHint": "Choose a finish, then click a wall to paint it.",
+      "finishTexture": "Wall texture",
+      "bareFinish": "Original surface",
+      "importTexture": "Import texture",
+      "importingTexture": "Importing texture...",
+      "finishTile": "Texture repeat (yards)",
+      "finishSide": "Paint side",
+      "sideClicked": "Clicked side",
+      "sideFront": "Front",
+      "sideBack": "Back",
+      "sideBoth": "Both sides",
+      "finishRun": "Apply to connected walls",
+      "rotateLeft": "Rotate left",
+      "rotateRight": "Rotate right",
+      "smaller": "Smaller",
+      "larger": "Larger",
+      "fineRotation": "Fine rotation (15°)",
+      "transformReadout": "Rotation: {degrees}° | Size: {scale}x",
+      "transformEmpty": "Choose an asset to rotate or resize.",
+      "transformShortcuts": "Rotate: , and . | Resize: [ and ]",
+      "undo": "Undo",
+      "redo": "Redo",
+      "transformControls": "Asset controls",
+      "chooseWall": "Choose a wall asset and wait for its preview, or select Bare wall.",
+      "chooseAsset": "Choose an asset first.",
+      "choosePaintWall": "Click a building wall or a wall asset.",
+      "capacity": "This build is too large. Draw a smaller section or remove unused pieces.",
+      "invalid": "This wall or room could not fit. Adjust the grid or choose another piece.",
+      "importFailed": "Texture import failed. Use a PNG, JPG or WebP under 8 MB, up to 8192 pixels per side.",
+      "bare": "Original surface",
+      "importedTexture": "Imported texture {number}"
+    },
     "appTitle": "Trình Chỉnh Sửa Bản Đồ",
     "docTitle": "Trình Chỉnh Sửa Bản Đồ - World of ClaudeCraft",
     "untitledMap": "Bản Đồ Chưa Đặt Tên",
+    "flatMapName": "Flat World",
     "playtestPlayerName": "Người Tạo Bản Đồ",
+    "playtestBack": "Back to Editor",
+    "playtestBackTitle": "Return to the map editor (your map was saved when the playtest launched)",
     "topbar": {
       "label": "Thao tác trình chỉnh sửa",
+      "dungeon": "Dungeon",
+      "dungeonTitle": "Edit an authored dungeon interior layout",
       "mapNameLabel": "Tên bản đồ",
       "dirty": "Thay đổi chưa lưu",
       "dirtyDot": "Bản đồ này có thay đổi chưa lưu",
@@ -9199,6 +10183,8 @@ export const vi_VN: EnTranslations = {
       "neverSaved": "Chưa lưu",
       "new": "Mới",
       "newTitle": "Bắt đầu bản đồ mới từ thế giới dựng sẵn",
+      "newFlat": "Blank Map",
+      "newFlatTitle": "Start a brand-new blank map with none of the base game content, at a size you choose",
       "open": "Mở",
       "openTitle": "Mở một bản đồ đã lưu (trình duyệt hoặc máy chủ)",
       "save": "Lưu",
@@ -9215,17 +10201,49 @@ export const vi_VN: EnTranslations = {
       "uploadAsset": "Tải Lên Vật Thể",
       "uploadAssetTitle": "Tải lên một mô hình GLB (tối đa 8 MiB) để đặt vào bản đồ của bạn",
       "uploadAssetDisabledTitle": "Đăng nhập từ trò chơi để tải lên vật thể",
+      "importModel": "Import Model",
+      "importModelTitle": "Load a .glb or .gltf model from this computer and place it, fully offline (kept for this session)",
       "playtest": "Chơi Thử",
       "playtestTitle": "Khởi động trò chơi trên bản đồ này (ngoại tuyến, gồm cả chỉnh sửa hiện tại)",
       "viewLabel": "Chế độ xem",
+      "workspace": "View",
+      "workspaceTitle": "View, map, preview, and workspace modes",
       "view3d": "3D",
       "view3dTitle": "Chỉnh sửa trong thế giới được kết xuất",
       "view2d": "2D",
       "view2dTitle": "Chỉnh sửa trên bản đồ 2D ký hiệu nhìn từ trên cao",
+      "projectionPerspective": "Perspective",
+      "projectionOrthographic": "Orthographic",
+      "projectionTitle": "Toggle perspective/orthographic projection (Numpad 5)",
+      "axisGimbal": "Camera gimbal",
+      "axisGimbalTitle": "Show or hide the camera orientation gimbal",
+      "minimap": "Minimap",
+      "minimapTitle": "Toggle the corner minimap (top-down view that follows the camera)",
+      "music": "Music",
+      "musicTitle": "Play the soundtrack for the area under the camera (the music area's track, else the map track, else the zone's own cue). Fly around and it follows you.",
+      "mapWindow": "Map",
+      "mapWindowTitle": "Open the map of the current zone (with a button for the full world)",
+      "preview": "Preview",
+      "previewTitle": "See the map as it looks in-game: hides editor-only overlays (collider boxes, music areas, markers, rings, gizmos)",
+      "hitboxes": "Hitboxes",
+      "hitboxesTitle": "Show the collision shapes the game actually blocks with (blue = authored in Collision Master, red = auto-baked boxes)",
+      "zoneIsolateOff": "Full Build",
+      "zoneIsolateOn": "Zone: {zone}",
+      "zoneIsolateTitle": "Full Build ⇄ Zone: isolate the camera’s zone, everything outside it unloads until you switch back. View only; the map itself never changes.",
+      "fullBuildPreview": "Full Build Preview",
+      "fullBuildPreviewTitle": "Stream every zone of this map into the viewport (may take a while)",
+      "fullBuildProgress": "Building zones: {done}/{total}",
+      "fullBuildDone": "All {total} zones resident.",
+      "publishMap": "Publish to Game",
+      "publishMapTitle": "Write this map into the local repo as real game content (data/maps + src/sim/maps); boot it with ?map=<slug>",
+      "unpublishMap": "Remove from Game",
+      "unpublishMapTitle": "Uninstall this map from the local game: deletes the files Publish wrote and restores the standard ClaudeCraft world",
       "undoCount": "Hoàn tác: {count}",
       "undoCountTitle": "{count} bước có thể hoàn tác (Ctrl+Z để hoàn tác, Ctrl+Y để làm lại)",
       "autosave": "Tự Động Lưu",
       "autosaveTitle": "Tự động lưu bản đồ khi có thay đổi chưa lưu. Tự tắt nếu một lần lưu thất bại.",
+      "presetPrompt": "Ask about presets on Lock In",
+      "presetPromptTitle": "After a Collision Master Lock In, ask whether to also save the boxes as a hitbox preset on this device. Turn this back on if you ticked \"Don't ask again\".",
       "undo": "Hoàn Tác",
       "undoTitle": "Hoàn tác thay đổi gần nhất (Ctrl+Z)",
       "redo": "Làm Lại",
@@ -9235,34 +10253,544 @@ export const vi_VN: EnTranslations = {
       "signIn": "Đăng nhập",
       "signInTitle": "Mở màn hình đăng nhập trò chơi trong thẻ mới",
       "help": "Trợ Giúp",
-      "helpTitle": "Cẩm nang trình chỉnh sửa: công cụ, phím tắt và phần hướng dẫn"
+      "helpTitle": "Cẩm nang trình chỉnh sửa: công cụ, phím tắt và phần hướng dẫn",
+      "more": "More",
+      "moreTitle": "More actions: Save As, autosave, fork, import/export, upload",
+      "primaryTools": "Primary transform tools",
+      "settings": "Settings",
+      "settingsTitle": "Graphics and sound settings (shared with playtest)",
+      "worldLink": "Link to World",
+      "worldLinkTitle": "Place this map inside the base game world: drag its outline onto the world map, and playtest embeds it there with the base game running around it",
+      "generateTerrain": "Generate Terrain",
+      "generateTerrainTitle": "Generate this map’s terrain from a region of the base game world: drag the outline over the world map to pick which part of the old layout to use",
+      "evenBuildings": "Even Out Buildings",
+      "evenBuildingsTitle": "Fix buildings that were stretched sideways to fill their plot: each one keeps its height and its footprint area, but its width and depth are made equal so it stops looking squashed",
+      "evenBuildingsDone": "Evened out {count} buildings.",
+      "evenBuildingsNone": "No squashed buildings found."
+    },
+    "genTerrain": {
+      "title": "Generate Terrain",
+      "hint": "Pick which part of the old world layout this map’s terrain generates from: drag the gold rectangle over the region you want. Its hills, lakes, and coastlines become your map’s base terrain, you can sculpt on top of it afterwards. Generating replaces your current sculpt edits, and your map stays its own separate space.",
+      "dragHint": "Drag the gold rectangle over the terrain to copy. The dot marks your spawn point.",
+      "status": "Sampling the world layout around ({x}, {z}).",
+      "save": "Generate",
+      "clear": "Flatten Map",
+      "generated": "Terrain generated from the world layout around ({x}, {z}).",
+      "cleared": "Terrain source cleared: the map is a flat slate again."
+    },
+    "worldLink": {
+      "title": "Link to World",
+      "hint": "Drag your map’s outline to where it should sit in the base game world. Playtest stamps your map’s terrain, placements, and spawns right there, with the world’s own mobs, NPCs, and quests running around it. You can also place it in the open sea beyond the old world’s edges: your map rises there as new land. Your editing space stays exactly as it is; only playtest uses the link.",
+      "statusLinked": "Linked: your map’s origin sits at ({x}, {z}) in the world.",
+      "statusUnlinked": "Standalone: this map playtests as its own separate space.",
+      "dragHint": "Drag the gold rectangle to position your map. The dot marks your spawn point.",
+      "save": "Save Link",
+      "unlink": "Unlink",
+      "cancel": "Cancel",
+      "linked": "Map linked to the world at ({x}, {z}).",
+      "unlinked": "Map unlinked: it playtests standalone again.",
+      "standaloneOnly": "Only standalone authored maps can link to the world (open a Blank Map or import one first)."
+    },
+    "settings": {
+      "title": "Settings",
+      "hint": "Graphics and sound for the editor and playtest. These are the same settings the game uses, saved in this browser.",
+      "graphicsTitle": "Graphics quality",
+      "graphicsLow": "Low",
+      "graphicsMedium": "Medium",
+      "graphicsHigh": "High",
+      "graphicsUltra": "Ultra",
+      "graphicsHint": "Applies to the next playtest, and to the editor after a reload.",
+      "applyGraphics": "Reload editor to apply",
+      "soundTitle": "Sound",
+      "sfxVolume": "Effects volume",
+      "musicVolume": "Music volume",
+      "music": "Play music",
+      "close": "Close"
+    },
+    "fluid": {
+      "title": "Fluid Pool",
+      "hint": "Pick a fluid and click the ground to place a pool. Use the transform tools to move it, stretch its footprint, and slide the surface down into a dip.",
+      "selHint": "The gizmo scales the pool footprint (X/Z) and the Y arrow slides the surface height. Damage ticks once per second on anyone in the fluid.",
+      "kind": {
+        "lava": "Lava",
+        "acid": "Acid",
+        "spectral": "Spectral Fluid",
+        "water": "Still Water"
+      },
+      "hue": "Hue",
+      "light": "Lightness",
+      "dps": "Damage per second",
+      "surfaceOffset": "Surface height",
+      "fxBubbles": "Bubbles",
+      "fxSmoke": "Smoke",
+      "fxHaze": "Haze",
+      "fxLight": "Glow light",
+      "resetPreset": "Reset to preset"
+    },
+    "tunnel": {
+      "needExit": "Entrance placed. Keep clicking to lay the path (the last point is the exit), then hit Generate.",
+      "generate": "Generate cave ({count} ready)",
+      "tooShort": "The rig points are too close together - spread them at least a few yards apart.",
+      "modeDig": "Dig cave",
+      "modeCarve": "Carve",
+      "modeHole": "Cut hole",
+      "modePatch": "Patch hole",
+      "modeRemesh": "Remesh",
+      "modeSculpt": "Dig brush",
+      "modeFill": "Fill brush",
+      "modeSmooth": "Smooth",
+      "smoothHint": "Drag along a dug edge to SMOOTH it: each pass raises the Blend of every cut and fill under the brush, so creases and lumps along a dig stroke melt into one rounded surface. One undo step per stroke.",
+      "ghostTitle": "Pending cut",
+      "ghostHint": "The blue ghost is the solid the cut will remove. Drag it into place (click or hold anywhere on the ground), tune its size, shape and depth below, then press \"Lock in cut\" (or Enter) to commit it - or Cancel / Escape to discard it. Nothing is removed until you commit.",
+      "ghostConfirm": "Lock in cut",
+      "ghostLockHint": "Enter locks the cut in, Escape discards it. Tools 2-4 move, turn and scale the ghost first.",
+      "ghostCancel": "Cancel",
+      "carveHint": "Click the ground to spawn a blue GHOST of the solid, drag it into place and tune it, then press \"Lock in cut\" (or Enter) to carve a REAL room or tunnel out of the rock: the solid has a walkable floor, rock walls and a ceiling, and it re-meshes the ground around it. A ball makes a chamber, a pitched capsule bored into a hillside a tunnel, a box a hall - and raise Blend so neighbouring carves melt together into one clean cave. Walk in through any face that breaks the surface.",
+      "carveList": "Carves",
+      "carveLabel": "Carve {n}",
+      "carveDelete": "Delete carve",
+      "cutDepth": "Depth",
+      "sculptHint": "Drag across a carve wall, floor or ceiling to DIG rock away, like a clay brush: each pass carves a blended channel at the stamp size (set by the brush radius). Drag on open ground to gouge into the surface. One undo step per stroke.",
+      "fillHint": "Click the ground to drop an ERASE BOX, size it with the sliders or the gizmo (any width, length and height), then press \"Erase caves\" (or Enter): every carve, hole and dug volume inside the box is removed, and a carve the box only partly covers is filled back to solid rock where it is covered. One undo step.",
+      "eraseTitle": "Erase box",
+      "eraseGhostHint": "The box stands where you clicked; click again to move it. Everything cave-like inside it goes when you confirm.",
+      "eraseHalf": "Half width (yd)",
+      "eraseConfirm": "Erase caves",
+      "eraseDone": "Erased {n} cave record(s) inside the box",
+      "eraseNothing": "No caves inside the box",
+      "remeshHint": "Click to paint a DETAIL region (brush radius wide): every carve it touches re-meshes at the chosen cell size - finer OR coarser than the default. Spend fine topology exactly where a cave needs to read clean; turn the cell up to thin out a carve that costs too much. Finer cells cost more triangles.",
+      "remeshCell": "Detail (cell yards)",
+      "remeshAllTitle": "Remesh all caves",
+      "remeshAllHint": "One cell size for every carve and dug volume on the map: larger cells mean far fewer triangles. Applies to the whole map at once and re-meshes it; the regions below can still refine or coarsen single spots on top of it.",
+      "remeshGlobal": "Cave mesh detail (cell yards)",
+      "remeshAll": "Remesh all caves",
+      "remeshRegionsTitle": "Detail regions (brush)",
+      "remeshList": "Detail regions",
+      "remeshLabel": "Region {n} ({r} yd, {cell} yd cells)",
+      "remeshDelete": "Delete region",
+      "holeHint": "Click the ground to spawn a blue GHOST of the cut, drag it into place, then press \"Cut into the ground\" to punch it straight through the terrain mesh. The ground stops existing there and the mesh grows a rock rim around the opening, so line a cave mouth up underneath and you can walk or drop in. Pick the shape first: a ball, an oriented box for a slot or a doorway, or a capsule for an arch. Resize or delete any committed cut below; undo removes the last one.",
+      "holeList": "Cuts",
+      "holeLabel": "Cut {n}",
+      "holeRadius": "Radius",
+      "holeDelete": "Delete cut",
+      "cutBrush": "Next cut",
+      "cutShape": {
+        "sphere": "Ball",
+        "box": "Box",
+        "capsule": "Capsule",
+        "voxel": "Dug rock",
+        "tube": "Cave mouth (from the bore)"
+      },
+      "cutLength": "Length",
+      "cutHeight": "Height",
+      "cutYaw": "Turn",
+      "cutPitch": "Tilt",
+      "cutBlend": "Blend",
+      "cutWarp": "Undulation",
+      "digAlphaLabel": "Brush alpha",
+      "digAlpha": {
+        "round": "Round",
+        "halfmoon": "Half moon",
+        "ragged": "Ragged",
+        "crescent": "Crescent"
+      },
+      "digNoise": "Edge noise",
+      "digCell": "Dig detail (cell yards)",
+      "digCellHint": "Strokes bake straight into the map as one rock volume at this cell size (finer costs more memory and triangles). The cell is fixed once the first stroke lands.",
+      "digClear": "Clear dug rock",
+      "digVolumeFull": "The dug rock volume is as large as a map can hold; clear it or dig closer to what is already dug.",
+      "digCellCoarsened": "Dig detail set to {cell} yd for this brush size (a finer cell would not fit the volume budget).",
+      "cutWarpScale": "Undulation size",
+      "cutTaper": "Taper",
+      "cutWobble": "Wobble",
+      "cutWobbleLen": "Wobble length",
+      "cutBend": "Bend",
+      "cutArch": "Arch",
+      "ghostGizmoHint": "Press 2, 3 or 4 (Move, Rotate, Scale) to drag the ghost with the gizmo, then come back to the Caves tool to cut.",
+      "autoMouth": "Carve its own mouth",
+      "autoMouthHint": "The tube cuts the ground wherever it breaches the surface, so you no longer line a hole up with the mouth by hand. Buried stretches cut nothing, and ground under a stretch standing above the surface is left alone.",
+      "mouthBlend": "Mouth blend",
+      "patchHint": "Click the ground to lay a patch (brush radius wide, same shapes as a cut) that FILLS the ground back in wherever cuts overlap it - use it to trim the blank parts around each cut. A patch always beats the cuts it touches. Resize or delete any patch below; undo removes the last one.",
+      "patchList": "Patches",
+      "patchLabel": "Patch {n}",
+      "patchDelete": "Delete patch",
+      "listTitle": "Caves",
+      "caveLabel": "Cave {n} ({nodes} points)",
+      "width": "Width",
+      "height": "Interior height",
+      "variance": "Variance",
+      "floorVariance": "Floor bumps",
+      "stalactites": "Stalactites",
+      "stalagmites": "Stalagmites",
+      "spikeSize": "Formation size",
+      "startOpen": "Entrance open",
+      "endOpen": "Exit open",
+      "selectCave": "Select whole cave",
+      "noRig": "This cave has no rig nodes to grab - lay a new cave instead.",
+      "reverse": "Swap entrance/exit",
+      "delete": "Delete cave",
+      "texture": "Interior texture",
+      "texDefault": "Granite (default)",
+      "guideHint": "Blue nodes joined by a dotted line are your cave model (visible in every tool). Move a node with the Move tool, raise or sink it with the Y arrow, and scale it to widen the cave there - the tube re-generates live and ALWAYS keeps exactly the size you set. Green ball = entrance, red arrow = exit.",
+      "hint": "Click the ground to drop the ENTRANCE node, keep clicking to lay blue waypoints (the last one is the exit), then press Generate. The cave is a standalone tube built only from your nodes - the surrounding terrain never squishes or reshapes it. Turn on \"Carve its own mouth\" and the tube opens the ground wherever it breaches the surface; otherwise use Cut hole mode and slide the tube into place with Select whole cave + the Move tool."
+    },
+    "foliage": {
+      "kind": "Plant",
+      "kinds": {
+        "tree": "Tree",
+        "bush": "Bush",
+        "grass": "Grass clump",
+        "fern": "Fern",
+        "vine": "Vine"
+      },
+      "preset": "Starting point",
+      "presets": {
+        "bushRound": "Round bush",
+        "bushBerry": "Berry bush",
+        "bushDry": "Dry scrub",
+        "grassTuft": "Tuft",
+        "grassMeadow": "Meadow clump",
+        "fernForest": "Forest fern",
+        "vineHanging": "Hanging vine"
+      },
+      "footprint": "Spread",
+      "plantHeight": "Height",
+      "splay": "Splay",
+      "clumps": "Blade clumps",
+      "strands": "Strands",
+      "hang": "Hang",
+      "bake": "Keep as an asset",
+      "bakeHint": "Writes the plant to public/models/generated as a GLB, so it stops being a recipe and becomes an ordinary catalogue asset: it batches with the others, takes a collision bake, and can be placed on any map. Its settings ride along inside the file, so you can re-open and re-bake it later. Needs the dev server.",
+      "bakePrompt": "Name this plant",
+      "baked": "Kept as {id}. Re-run the asset catalogue to see it in the browser.",
+      "bakeFailed": "Could not keep the plant: {reason}"
+    },
+    "tree": {
+      "title": "Tree Generator",
+      "hint": "Click the ground to grow a tree there. Everything below shapes the NEXT tree; select a placed tree with the Select tool to reshape it live.",
+      "preset": "Preset",
+      "presetHint": "A starting point for the biome. Every setting stays editable afterwards.",
+      "openStudio": "Edit in Tree Studio",
+      "openStudioHint": "Opens the tree on its own in an empty scene, so you can shape it without a village in the way. Keep it when you are done and it becomes the tool default.",
+      "studioMapName": "Tree Studio",
+      "studioBanner": "Tree Studio",
+      "studioHint": "Shape the tree here, then keep it as the tool default or discard it. The map you came from is waiting.",
+      "studioKeep": "Use this tree",
+      "studioDiscard": "Discard",
+      "studioKept": "Tree Studio settings are now the tool default.",
+      "randomize": "New seed",
+      "randomizeHint": "Rerolls the branch growth and leaf scatter without changing any setting.",
+      "copyToTool": "Use as tool default",
+      "trunkSection": "Trunk",
+      "trunk": "Foundation",
+      "girth": "Girth",
+      "heightScale": "Trunk height",
+      "bark": "Bark texture",
+      "barkTile": "Bark tile (yd)",
+      "branchSection": "Branches",
+      "branches": "Per limb",
+      "branchDepth": "Levels",
+      "branchLen": "Length",
+      "branchAngle": "Spread",
+      "branchDroop": "Droop",
+      "branchTwist": "Gnarl",
+      "branchTaper": "Taper",
+      "canopySection": "Canopy volumes",
+      "canopyHint": "The leaves only ever go inside these spheres. Pick a shape to lay them out, then tune the spread and size - or edit a single sphere below to sculpt the crown by hand.",
+      "shape": "Shape",
+      "volumeCount": "Spheres",
+      "volumeSpread": "Spread",
+      "volumeRise": "Height",
+      "volumeScale": "Sphere size",
+      "volumeJitter": "Jitter",
+      "showVolumes": "Show spheres",
+      "editVolumes": "Edit spheres",
+      "resetVolumes": "Back to preset shape",
+      "volumeLabel": "Sphere {n}",
+      "volumeX": "X",
+      "volumeY": "Y",
+      "volumeZ": "Z",
+      "volumeR": "Radius",
+      "volumeSy": "Stretch",
+      "addVolume": "Add sphere",
+      "removeVolume": "Remove",
+      "leafSection": "Leaves",
+      "leafSet": "Leaf art",
+      "leaves": "Count",
+      "leafSize": "Size",
+      "leafSizeVar": "Size variation",
+      "leafOrient": "Orientation",
+      "leafFill": "Fill",
+      "leafFillHint": "0 hangs the leaves on the shell of each sphere; 1 fills it solid.",
+      "leafDroop": "Droop",
+      "leafJitter": "Rotation jitter",
+      "leafClump": "Clumping",
+      "leafBranchBias": "Pull to branches",
+      "leafTint": "Tint",
+      "leafTintVar": "Colour variation",
+      "leafGlow": "Glow",
+      "leafCross": "Crossed cards",
+      "leafCrossHint": "Two quads per leaf instead of one: twice the cost, a canopy with real depth.",
+      "windSection": "Wind and collision",
+      "sway": "Sway",
+      "collide": "Trunk hitbox",
+      "collideHint": "Radius of the trunk collider, as a multiple of its own girth. 0 lets players walk through.",
+      "stats": "{leaves} leaves, {branches} branches, {height} yd tall",
+      "orient": {
+        "volume": "Follow canopy",
+        "up": "Upright",
+        "out": "Outward",
+        "droop": "Drooping",
+        "random": "Random",
+        "billboard": "Face camera"
+      },
+      "shapeName": {
+        "sockets": "On the limbs",
+        "sphere": "Ball",
+        "dome": "Dome",
+        "cone": "Cone",
+        "umbrella": "Umbrella",
+        "column": "Column",
+        "weeping": "Weeping"
+      }
+    },
+    "rock": {
+      "title": "Rock Generator",
+      "hint": "Click the ground to grow a procedural boulder there. The sliders below shape the NEXT rock; select a placed rock with the Select tool to reshape it live. Use the gizmo to stretch rocks into slabs and cliff plates.",
+      "chainMode": "Bridge / ridge mode",
+      "chainHint": "Click to lay blue points; Generate lofts ONE merged solid body through them (spanning dips in a straight line) plus walkable tops, so the chain works as a bridge or ridge. The points stay after Generate: move or scale one with the gizmos and the body follows.",
+      "chainCount": "{count} points laid",
+      "generateChain": "Generate rock ridge",
+      "clearChain": "Clear points",
+      "chainTooShort": "Lay at least two points first.",
+      "size": "Size",
+      "noise": "Noise amount",
+      "detail": "Feature detail",
+      "sharp": "Sharpness",
+      "height": "Height",
+      "depth": "Embed depth",
+      "jag": "Jaggedness",
+      "texture": "Texture",
+      "baseTex": "Base texture",
+      "texStone": "Stone",
+      "texSandstone": "Sandstone",
+      "texBare": "Bare (tintable)",
+      "reroll": "Re-roll shape",
+      "selTitle": "Generated Rock",
+      "walkable": "Walkable top"
     },
     "tool": {
+      "building": "Build mode",
       "listLabel": "Công cụ chỉnh sửa",
       "keyHint": "{name} ({key})",
       "select": "Chọn",
+      "move": "Move",
+      "rotate": "Rotate",
+      "scale": "Scale",
       "raise": "Nâng Cao",
       "lower": "Hạ Thấp",
       "smooth": "Làm Mịn",
       "flatten": "San Phẳng",
+      "slope": "Slope",
+      "pond": "Pond",
+      "tunnel": "Caves",
+      "rock": "Rock Gen",
+      "build": "Build Model",
+      "fluid": "Fluid Pool",
       "paint": "Tô Quần Xã",
+      "eyedropper": "Eyedropper",
+      "decal": "Decal",
       "water": "Nước",
       "place": "Đặt Vật Thể",
+      "foliage": "Paint Foliage",
+      "clutter": "Paint Clutter",
+      "meshFix": "Mesh Fix",
+      "tree": "Tree Generator",
+      "grassClear": "Remove Grass",
       "blocker": "Tường Chắn",
+      "collider": "Collider",
       "camp": "Trại Quái",
+      "entity": "Move NPCs and Mobs",
       "spawn": "Điểm Xuất Hiện",
+      "zone": "Zone",
+      "light": "Point Light",
+      "music": "Music",
+      "sound": "Point Sound",
       "region": "Vùng Chọn",
-      "erase": "Xóa"
+      "erase": "Xóa",
+      "city": "City Build"
+    },
+    "toolGroup": {
+      "terrain": "Terrain",
+      "assets": "Assets",
+      "world": "World",
+      "effects": "Effects"
+    },
+    "eyedropperTool": {
+      "empty": "Nothing painted here, click a painted texture to pick it."
+    },
+    "build": {
+      "entered": "Editing model, add shapes, apply a texture, toggle collision, then Done.",
+      "newHint": "Click the map to start a new model, or select one to edit it.",
+      "banner": "Building Model",
+      "bannerHint": "Add shapes and edit vertices/edges/faces with the modeling bar.",
+      "done": "Done",
+      "editModel": "Edit Model",
+      "panelTitle": "Built Model",
+      "shapes": "{n} shapes",
+      "texture": "Surface texture",
+      "material": "Material",
+      "materialMany": "Material controls apply to all {n} selected built models.",
+      "materialHint": "Library materials are projected onto the shape in the shader (no stretching on stairs, slopes or curves) and tint with hue, saturation and light.",
+      "hue": "Hue",
+      "saturation": "Saturation",
+      "light": "Light",
+      "resetLook": "Reset material tint",
+      "bare": "Plain (no texture)",
+      "tileSize": "Texture scale",
+      "tileSizeUnit": "yd / tile",
+      "collision": "Use mesh as collision",
+      "collisionHint": "The player is blocked where the model is solid. Walkable shapes (green) become ramps.",
+      "walkableTip": "Tip: use the modeling bar’s Walkable toggle to make a shape a ramp."
+    },
+    "city": {
+      "title": "City Build",
+      "tabKit": "Kit",
+      "tabWalls": "Walls",
+      "tabRoads": "Roads",
+      "tabPrefabs": "Prefabs",
+      "tabRoutes": "Routes",
+      "settings": "Build settings",
+      "gridSize": "Grid size",
+      "gridOff": "Off",
+      "rotSnap": "Rotation snap",
+      "snapHint": "Grid snapping applies to wall nodes, Kit placement, and prefab stamps.",
+      "kitPick": "Choose asset",
+      "kitChosen": "Placing: {name}",
+      "kitNone": "Pick an asset from the browser, then click the map to place it on the grid.",
+      "kitRotate": "Rotate (R)",
+      "kitScale": "Piece scale",
+      "kitTileSnap": "Connect tiles",
+      "kitTileHint": "Connect tiles snaps each piece to its own size and to the FIRST tile’s height, so floors join edge to edge and stay flat across bumpy ground. Esc or picking a new asset starts a fresh level; turn it off to use the world grid.",
+      "kitGhostBlocked": "Blocked: overlapping a placed asset.",
+      "wallStyle": "Wall style",
+      "wallDraw": "Draw wall",
+      "wallDrawing": "Click to add corners on the visible grid. Double-click a node or press Enter to finish. Backspace or Delete removes the last node; Esc cancels.",
+      "wallFinish": "Finish wall",
+      "wallCancel": "Cancel",
+      "wallUndoPoint": "Undo point",
+      "wallNodes": "{n} wall nodes placed.",
+      "wallPostEvery": "Post spacing",
+      "wallPostsOff": "No posts",
+      "wallScale": "Wall scale",
+      "wallHeight": "Height",
+      "wallThickness": "Thickness",
+      "wallClosed": "Close the loop",
+      "wallWalkTop": "Walkable top",
+      "wallStairs": "Stairs up",
+      "wallWalkHint": "Walkable top puts a patrol deck along the wall so players can walk it in playtest; Stairs up adds a staircase from the ground to the deck at each end (or beside a closed loop).",
+      "wallPlaced": "Wall run placed ({n} pieces).",
+      "wallBuildFailed": "The wall assets could not be generated. Your path is still available.",
+      "wallTooShort": "Draw at least two points to build a wall.",
+      "wallLiveEdit": "The controls above update your most recent wall live.",
+      "wallEditHint": "Select any wall piece to make that run active. Return to Walls to reshape it, or press Delete in Select to remove the whole run.",
+      "wallGateHint": "Gate segments are skipped so the wall leaves an opening.",
+      "styleStone": "Stone Wall",
+      "styleCastle": "Castle Wall",
+      "styleWoodFence": "Wood Fence",
+      "styleMetalFence": "Metal Fence",
+      "styleCastleFence": "Castle Fence",
+      "styleHexWall": "Hex Wall",
+      "roadType": "Road type",
+      "roadTypeRoad": "Road",
+      "roadTypePath": "Footpath",
+      "roadDraw": "Draw road",
+      "roadDrawing": "Click to add waypoints. Enter or double-click finishes, Esc cancels.",
+      "roadFinish": "Finish road",
+      "roadCancel": "Cancel",
+      "roadPlaced": "Road placed.",
+      "roadTooShort": "Draw at least two points to build a road.",
+      "roadLimit": "This map already has the maximum number of roads.",
+      "roadList": "Roads on this map",
+      "roadDelete": "Delete",
+      "roadLegacy": "Built-in road",
+      "roadAuthored": "Road {n}",
+      "roadHint": "Roads blend into the terrain like the built-in world roads and flatten bumps beneath them.",
+      "prefabSave": "Save selection as prefab",
+      "prefabName": "Prefab name",
+      "prefabSaved": "Prefab saved: {name}",
+      "prefabNone": "No prefabs yet. Select some placed assets and save them as a prefab.",
+      "prefabStamp": "Stamp",
+      "prefabDelete": "Delete",
+      "prefabStamped": "Prefab stamped ({n} pieces).",
+      "prefabNeedSelection": "Select one or more placed assets first (Shift+click or marquee).",
+      "prefabCount": "{n} pieces",
+      "routePick": "Click an NPC to edit its route.",
+      "routeEditing": "Route for {name}: click the map to add waypoints.",
+      "routeAddHint": "Each click adds a waypoint. Enter finishes, Esc stops editing.",
+      "routeMode": "Traversal",
+      "routeModeLoop": "Loop",
+      "routeModePingPong": "Ping-pong",
+      "routeSpeed": "Walk speed",
+      "routeWait": "Wait at waypoints",
+      "routeWaitUnit": "seconds",
+      "routeFinish": "Save route",
+      "routeClear": "Clear route",
+      "routeSaved": "Route saved ({n} waypoints).",
+      "routeCleared": "Route cleared.",
+      "routeNoNpc": "No NPC selected. Click an NPC in the viewport first.",
+      "routeCount": "{n} waypoints"
     },
     "inspector": {
-      "label": "Tùy chọn công cụ"
+      "label": "Tùy chọn công cụ",
+      "toolTab": "Tools",
+      "cameraTab": "Camera",
+      "lightingTab": "Lighting",
+      "sceneTab": "Scene"
+    },
+    "scene": {
+      "title": "Scene Collection",
+      "hint": "Every placed object. Click to select, double-click a name to rename.",
+      "none": "No objects placed yet.",
+      "count": "{n} objects",
+      "pinTitle": "Focus the camera on this object and select it",
+      "hideTitle": "Hide this object in the editor (it still exists in the map)",
+      "showTitle": "Show this object again",
+      "hiddenBadge": "hidden",
+      "renameLabel": "Object name",
+      "residentBadge": "resident",
+      "isolateTitle": "Isolate {zone}: unload everything outside this zone (view only)",
+      "zoneStream": "Stream the zones near the camera",
+      "zoneStreamHint": "Keep the {count} zones nearest the camera loaded, and swap the whole set when you fly clear of them.",
+      "zoneStreamAt": "Streaming {zone} ({count} zones). Fly clear of them to load the next set.",
+      "zoneStreamLocked": "Locked on {zone}. Unlock to follow the camera again.",
+      "zoneStreamOn": "Streaming {zone} — {count} zones resident, everything else unloaded.",
+      "streamGuide": "Show the resident perimeter",
+      "streamGuideHint": "Draws light red walls where the loaded zones end, so the edge of what is streamed is visible instead of guessed.",
+      "zoneLockTitle": "Lock this zone loaded: stay here until you unlock, whatever the camera does",
+      "zoneUnlockTitle": "Unlock: follow the camera into the next zone again"
+    },
+    "publish": {
+      "failed": "Publish blocked: {error}",
+      "noDevServer": "Publishing writes into the project, so it needs the local dev server (npm run dev).",
+      "rejected": "Publish rejected: {error}",
+      "done": "Published. Boot it at /index.html?map={slug}, commit the generated files to ship.",
+      "removeTitle": "Remove this map from the game?",
+      "removeConfirm": "Deletes the published files for \"{slug}\" (data/maps + src/sim/maps) and restores the standard ClaudeCraft world. Your map in the editor is not touched, and you can publish it again at any time.",
+      "removed": "Removed \"{slug}\" from the game. The standard ClaudeCraft world is back.",
+      "removedNothing": "Nothing to remove: \"{slug}\" was not published to this repo."
     },
     "brush": {
       "title": "Cọ",
+      "shape": "Brush shape",
+      "circle": "Circle",
+      "square": "Square",
       "size": "Cỡ cọ",
       "strength": "Cường độ",
       "sizeHint": "Phím: [ và ] đổi cỡ cọ; Shift+[ và Shift+] đổi cường độ.",
-      "editCount": "Chỉnh sửa địa hình: {count} / {max}"
+      "editCount": "Chỉnh sửa địa hình: {count} / {max}",
+      "reapplyWater": "Re-apply water",
+      "reapplyWaterTitle": "Rebuild the water from the current terrain. Strokes already refresh the water they touch; use this for anything left over, like a basin dug where the map had no water at all."
     },
     "biome": {
       "title": "Quần Xã",
@@ -9276,18 +10804,316 @@ export const vi_VN: EnTranslations = {
       "cave": "Hang Động",
       "erase": "Tẩy lớp tô",
       "hint": "Các ô đã tô sẽ ghi đè quần xã của vùng về hình dạng và màu sắc địa hình.",
+      "hue": "Hue",
+      "light": "Light/Dark",
+      "saveSwatch": "Save tint as swatch",
+      "saveSwatchTitle": "Keep this hue/light version as its own swatch, so the tint can be reused after the sliders move on",
+      "swatchSaved": "Saved swatch \"{name}\".",
+      "removeSwatch": "Remove swatch",
+      "removeSwatchTitle": "Delete this custom swatch from the map. Terrain painted with it reverts to the base biome look.",
+      "swatchRemoved": "Removed swatch \"{name}\".",
+      "customHint": "Custom swatches color the ground only (terrain shape keeps the zone biome) and save with the map.",
+      "customFull": "Swatch limit reached ({max}).",
+      "textureSlotsFull": "Only {max} textured swatches render per map; extra ones show their flat color. Retire an unused texture to free a slot.",
+      "textureSlots": "Texture slots: {used} / {max} used · {free} free",
+      "textureSlotsTitle": "Each distinct texture on this map uses one of {max} slots. Snow textures ride the terrain snow layer and use none. Removing a texture swatch frees its slot.",
+      "textureSlotsOver": "Over the limit by {over}: the most recently added textures paint as flat color. Remove a texture swatch to free a slot.",
+      "importTexture": "Import texture swatch",
+      "importTextureTitle": "Pick an image file: painting with the new swatch tiles it over the ground (stored in this browser; other machines see its average color)",
+      "builtinGroup": "Texture library",
+      "builtinTitle": "Built-in ground textures that ship with the editor: picking one adds it to this map as a swatch (available on every machine)",
+      "tileSize": "Texture tile size (yd)",
+      "depth": "Surface depth",
+      "variation": "Variation",
+      "variationHint": "Breaks up the repeating grid by sampling the texture a second time through a rotated frame. 0% is the plain tiling and costs nothing; higher values cost one extra texture read wherever this swatch is painted. Surface depth shades the texture's own crevices from its ambient-occlusion map, which stops painted ground reading flat; it is priced the same way.",
+      "importTextureFailed": "Could not read that image.",
+      "autoRetexture": "Auto-Retexture Map",
+      "autoRetextureHint": "One click: repaints the whole map with fitting builtin textures by elevation, slope, water, zone and paths, sand in deserts and on beaches, cliffs on steep faces, varied grass and dirt, cobble in towns and on roads. Fully editable after: repaint anything with the brush.",
+      "autoRetextureDone": "Retextured {count} cells. Repaint any of it with the brush.",
       "clear": "Xóa toàn bộ lớp tô quần xã",
-      "clearConfirm": "Gỡ mọi ô quần xã đã tô khỏi bản đồ này?"
+      "clearConfirm": "Gỡ mọi ô quần xã đã tô khỏi bản đồ này?",
+      "hardness": "Brush hardness",
+      "edgeSoftness": "Edge softness",
+      "edgeDetail": "Edge detail",
+      "edgeHint": "How the boundary between two painted textures looks, across the whole map. A soft brush stores its rim as scattered single cells (one cell can only hold one texture), and the paint grid is a quarter of a yard, so with both of these at 0 a boundary is a hard line with speckle along it, whatever the hardness slider says. Edge softness widens the blend so that scatter reads as the gradual fade it stands for; Edge detail wanders the boundary with fine noise so it interlocks like real ground instead of following the grid. Both are free, no extra texture reads, but a wide softness blurs painted detail narrower than itself.",
+      "bucket": "Fill (replace texture)",
+      "bucketTitle": "Arm the bucket, then click the ground: every cell painted with the clicked texture switches to the selected swatch",
+      "bucketArmedHint": "Bucket armed: click the ground to replace the clicked texture map-wide.",
+      "bucketDone": "Replaced {count} painted cells.",
+      "pickTexture": "Pick the texture to paint",
+      "galleryTitle": "Choose a ground texture",
+      "galleryHint": "Browse every texture, then Lock In the one you want to paint with.",
+      "galleryLockIn": "Lock In",
+      "galleryCurrent": "Current",
+      "groupBiomes": "Biomes",
+      "groupSwatches": "Your swatches",
+      "galleryCount": "{n} textures",
+      "alphaTitle": "Brush alpha",
+      "alphaNone": "None",
+      "alphaImport": "Import alpha",
+      "alphaImportTitle": "Load a grayscale image as a brush mask: white paints, black masks out (kept in this browser)",
+      "alphaImportFailed": "Could not read that image as a brush alpha.",
+      "alphaRemove": "Remove this imported alpha",
+      "autoTitle": "Auto textures",
+      "autoSlopeRock": "Rock on steep slopes",
+      "autoScree": "Rock rubble on cliffs (high graphics)",
+      "autoSnowCaps": "Snow-capped peaks",
+      "autoRim": "Mountains at the map edge",
+      "autoShoreSand": "Sand near the water",
+      "autoAllOff": "Paint only (turn all off)",
+      "autoAllOffTitle": "Switch every automatic rule off so nothing re-textures the ground by slope, height or shoreline. Your paint is then the only thing on it.",
+      "autoHint": "Automatic texturing rules, applied UNDER your paint: while one is on it keeps re-tinting the ground it owns, so a cliff you have painted goes back to rock. Uncheck one to remove it map-wide. New maps start with all of these off."
+    },
+    "map": {
+      "zoneTitle": "Zone map",
+      "worldTitle": "World map",
+      "showWorld": "Show full world",
+      "showZone": "Show this zone",
+      "usePainted": "Use painted map",
+      "useLiveTerrain": "Use live terrain",
+      "pinHint": "Click the map to place a teleport pin.",
+      "teleportToPin": "Teleport to pin",
+      "close": "Close"
+    },
+    "zoneTool": {
+      "title": "Named Locations",
+      "hint": "Drag a box on the ground, then name it: standing inside shows that name as the location in playtest.",
+      "namePrompt": "Location name",
+      "none": "No named locations yet.",
+      "deleteTitle": "Remove this location",
+      "hideBoxes": "Hide area boxes"
+    },
+    "objectMove": {
+      "title": "Gameplay Object",
+      "kindFarmBed": "Farm bed",
+      "kindPracticeDummy": "Practice dummy",
+      "kindGatherNode": "Gather node",
+      "kindDungeonDoor": "Dungeon door",
+      "position": "Position: {x}, {z}",
+      "moved": "Moved on this map.",
+      "original": "At its original spot.",
+      "hint": "Drag it, or nudge it with the arrow keys. The move applies to this map only and the object keeps its identity, so saved progress still finds it.",
+      "reset": "Reset to original spot"
+    },
+    "lightTool": {
+      "title": "Point Lights",
+      "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",
+      "none": "No lights yet.",
+      "color": "Color",
+      "intensity": "Intensity",
+      "range": "Range (yd)",
+      "height": "Height (yd)",
+      "deleteTitle": "Remove this light",
+      "capReached": "Light limit reached ({max}).",
+      "lightN": "Light {num}",
+      "selectTitle": "Select this light in the world (bulb badge enlarges; Delete removes it)"
+    },
+    "soundTool": {
+      "title": "Point Sounds",
+      "hint": "Click the ground to drop a looping sound emitter, then pick a clip and set its max volume and radius. The falloff sphere shows how far it carries; it plays spatially in playtest.",
+      "none": "No point sounds yet.",
+      "clip": "Sound effect",
+      "volume": "Max volume",
+      "radius": "Radius (yd)",
+      "height": "Height (yd)",
+      "deleteTitle": "Remove this sound",
+      "capReached": "Point sound limit reached ({max}).",
+      "soundN": "Sound {num}",
+      "selectTitle": "Select this sound in the world (badge enlarges; Delete removes it)"
+    },
+    "decalTool": {
+      "title": "Decals",
+      "hint": "Pick a decal, then click the ground to stamp it. Stamps drape over the terrain and only load when the camera is near, so a map can carry plenty. Click a stamp to select it; Delete removes it.",
+      "none": "No decals stamped yet.",
+      "library": "Decal library",
+      "libraryTitle": "Built-in decals that ship with the editor (original CC0 art). Pick one, then click the ground to stamp it.",
+      "importDecal": "Import decal image",
+      "importTitle": "Pick a PNG/WebP with transparency: it becomes a stampable decal (stored in this browser, and packed into map bundles)",
+      "imported": "Imported",
+      "importFailed": "Could not read that image.",
+      "importedDecal": "Imported \"{name}\".",
+      "size": "Size (yd)",
+      "rotation": "Rotation",
+      "aspect": "Stretch",
+      "opacity": "Opacity",
+      "glow": "Glow",
+      "tint": "Tint",
+      "sortOrder": "Draw over",
+      "randomRotate": "Random rotation per stamp",
+      "stamped": "Stamped \"{name}\".",
+      "removed": "Removed decal.",
+      "capReached": "Decal limit reached ({max}).",
+      "decalN": "Decal {num}",
+      "deleteTitle": "Remove this decal",
+      "selectTitle": "Select this decal in the world (Delete removes it)",
+      "pickFirst": "Pick a decal from the library first.",
+      "catArcane": "Arcane",
+      "catBurn": "Burns",
+      "catDamage": "Damage",
+      "catGore": "Gore",
+      "catNature": "Nature",
+      "catTracks": "Tracks",
+      "catMarker": "Markers"
+    },
+    "markerTool": {
+      "title": "AI Markers",
+      "hint": "Editor-only notes for AI quest/event generation (\"quest giver here\", \"chest here\"). Never shown in playtest.",
+      "place": "Place markers instead of moving the spawn",
+      "kind": "Marker type",
+      "npc": "NPC",
+      "object": "Interactable object",
+      "none": "No markers yet.",
+      "defaultName": "{kind} {num}",
+      "deleteTitle": "Remove this marker",
+      "capReached": "Marker limit reached ({max})."
+    },
+    "appearance": {
+      "title": "Appearance (shader)",
+      "tint": "Tint color",
+      "opacity": "Opacity",
+      "glow": "Glow color",
+      "glowStrength": "Glow strength",
+      "fire": "Fire effect (animated flame)",
+      "reset": "Reset appearance",
+      "hint": "Renders the same in playtest: tint recolors, opacity fades (ghosts), glow adds emissive light."
+    },
+    "fire": {
+      "title": "Asset fire effects",
+      "hint": "Add independent procedural fire sources, select one, then use the Move gizmo in the viewport to place it precisely on the model.",
+      "legacy": "Legacy single flame",
+      "customize": "Open full controls",
+      "add": "+ Add fire emitter",
+      "removeAll": "Remove all fire",
+      "emitter": "Fire {count}",
+      "preset": "Effect preset",
+      "enabled": "Emitter enabled",
+      "anchor": "Attach to",
+      "anchorBase": "Model base",
+      "anchorCenter": "Model center",
+      "anchorTop": "Model top",
+      "position": "Position",
+      "positionX": "Local X (yd)",
+      "positionY": "Local Y (yd)",
+      "positionZ": "Local Z (yd)",
+      "flameShape": "Flame shape",
+      "scale": "Overall scale",
+      "width": "Flame width",
+      "height": "Flame height",
+      "layers": "Flame layers",
+      "intensity": "Shader intensity",
+      "opacity": "Flame opacity",
+      "light": "Glow light",
+      "glow": "Glow intensity",
+      "glowRange": "Glow radius (yd)",
+      "smoke": "Smoke",
+      "smokeAmount": "Smoke amount",
+      "smokeScale": "Smoke scale",
+      "smokeRise": "Smoke rise",
+      "colorMotion": "Color & motion",
+      "hue": "Fire hue",
+      "saturation": "Saturation",
+      "speed": "Animation speed",
+      "turbulence": "Turbulence",
+      "flicker": "Flicker",
+      "embers": "Flying embers",
+      "blend": "Blend mode",
+      "blendAdditive": "Additive glow",
+      "blendAlpha": "Natural alpha",
+      "duplicate": "Duplicate emitter",
+      "remove": "Remove emitter",
+      "style": {
+        "torch": "Torch",
+        "bonfire": "Bonfire",
+        "wildfire": "Wildfire",
+        "soulfire": "Soul fire",
+        "embers": "Ember bed"
+      }
+    },
+    "sculpt": {
+      "hint": "Drag to raise the ground; tick the box to carve downward instead.",
+      "shapeTitle": "Brush Shape",
+      "hardness": "Brush hardness",
+      "alphaTitle": "Sculpt alpha",
+      "alphaNone": "Round",
+      "alphaHint": "Alphas shape the actual terrain surface and stay identical in editor and playtest.",
+      "lower": "Lower instead of raise",
+      "grab": "Grab / pull (snake hook)",
+      "grabHint": "Press to grab the ground under the brush, then drag and the terrain follows your cursor in any direction - up lifts it, down shoves it in, sideways slides it across the map, like pulling clay. One grab is one undo step. Brush size sets how wide a chunk you pull.",
+      "shiftHint": "Hold Shift while dragging to do the opposite (raise becomes lower, and back).",
+      "autoTex": "Auto texture by angle",
+      "autoTexHint": "Each stroke repaints the sculpted area by ground angle: one texture below the threshold, another above it (instant cliffs).",
+      "autoTexAngle": "Steep from (degrees)",
+      "autoTexFlat": "Flat ground texture",
+      "autoTexSteep": "Steep ground texture",
+      "autoTexNone": "Leave as is"
+    },
+    "materials": {
+      "title": "Materials",
+      "hint": "Pick a texture for each part of this model. Textures tile in world space, ignore the model UVs, and save with the map.",
+      "loading": "The model is still loading. Select it again in a moment to edit its materials.",
+      "original": "Original",
+      "texture": "Texture",
+      "tile": "Texture scale (yards per tile)",
+      "color": "Tint",
+      "reset": "Restore original"
     },
     "flatten": {
+      "style": {
+        "smooth": "Smooth",
+        "sharpen": "Sharpen",
+        "noise": "Noise",
+        "terrace": "Terrace"
+      },
+      "styleHint": {
+        "smooth": "Averages the ground under the brush - repeated passes melt bumps away.",
+        "sharpen": "The inverse of Smooth: ridges crest harder and gullies bite deeper with each pass.",
+        "noise": "Paints natural undulation across the whole brush: layered swells and dips with finer detail on top. One stroke keeps one pattern, so dragging builds rolling ground; stroke again to layer new detail.",
+        "terrace": "Pulls slopes into stepped ledges. Brush strength sets the step height."
+      },
+      "noiseSize": "Bump size (yards)",
+      "noiseRough": "Roughness",
+      "noiseHint": "Small bumps with high roughness read as rocky, broken ground; big bumps with low roughness roll like meadow hills. Brush strength sets how tall they stand.",
       "hint": "San Phẳng đưa mặt đất về độ cao dưới con trỏ tại thời điểm bắt đầu kéo.",
-      "hardEdge": "Cạnh cứng"
+      "hardEdge": "Cạnh cứng",
+      "smoothMode": "Smooth instead of flatten",
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "Level height (yards)",
+      "levelPlaceholder": "Drag start",
+      "levelClear": "Clear",
+      "levelHint": "Every drag levels the ground to this height. Right-click the ground to pick another.",
+      "levelHintNone": "Right-click the ground to lock its height, then drag anywhere to level to it. Empty: each drag levels to where it starts.",
+      "levelPicked": "Level locked at {height} yards."
+    },
+    "slope": {
+      "hint": "Right-click the ground where the slope should start. Then press where it should end and drag along the path: the ground eases into a smooth ramp between the two heights.",
+      "start": "Start height: {height} yards",
+      "noStart": "No start set yet. Right-click the ground to set one.",
+      "clearStart": "Clear start",
+      "needStart": "Right-click the ground first to set where the slope starts.",
+      "startPicked": "Slope start set at {height} yards."
+    },
+    "pond": {
+      "title": "Create a pond",
+      "add": "Add pond",
+      "radius": "Pond radius",
+      "depth": "Pond depth",
+      "hint": "Click the ground to dig a round pond and fill it with water. The circle includes the softly sloping bank. Undo removes the water and basin together.",
+      "invalid": "Cannot dig a pond on this ground. Choose another spot."
     },
     "water": {
       "title": "Mực Nước",
       "level": "Mực nước",
       "hint": "Đặt độ cao mặt nước cho toàn bản đồ, từ {min} đến {max} thước.",
-      "reset": "Đặt lại về mực dựng sẵn"
+      "reset": "Đặt lại về mực dựng sẵn",
+      "tintTitle": "Water tint",
+      "hue": "Hue",
+      "light": "Lightness",
+      "tintReset": "Reset tint",
+      "waterfallTitle": "Waterfalls",
+      "placeWaterfall": "Place waterfall",
+      "placeWaterfallTitle": "Arm the Place tool with an animated waterfall (click a cliff to drop it)",
+      "waterfallLabel": "Waterfall",
+      "waterfallHint": "An animated falling-water sheet with a foam pool. Scale it up a cliff with S or the gizmo; stretch just the height with the Y scale handle."
     },
     "place": {
       "title": "Đặt Vật Thể",
@@ -9298,6 +11124,102 @@ export const vi_VN: EnTranslations = {
       "chosen": "Đang đặt: {name}",
       "none": "Chọn một vật thể từ trình duyệt bên dưới, rồi nhấp xuống mặt đất để đặt nó."
     },
+    "collider": {
+      "title": "Collision Volumes",
+      "hint": "Pick a shape, then click the ground to drop it. Use Move, Rotate, and Scale (or the sliders below) to shape it.",
+      "shapeLabel": "Collider shape",
+      "box": "Box collider",
+      "sphere": "Sphere collider",
+      "plane": "Floor plane",
+      "wall": "Wall plane",
+      "width": "Width",
+      "height": "Height",
+      "depth": "Depth",
+      "diameter": "Diameter",
+      "floorOffset": "Floor height offset",
+      "sizeHint": "Dimensions are yards at scale 1; the Scale tool multiplies them.",
+      "playtestNote": "Volumes show green in the editor and are invisible in playtest: boxes and spheres block movement, floor planes raise the walkable ground.",
+      "hideVolumes": "Hide collision volumes",
+      "hideVolumesHint": "Hides the green volume overlays in the viewport (they still block in playtest)."
+    },
+    "foliageTool": {
+      "title": "Foliage Brush",
+      "hint": "Drag across the ground to scatter the enabled foliage inside the brush; each stroke is one undo step. Use Erase to remove pieces.",
+      "ambientTitle": "Existing map foliage",
+      "ambientHint": "Built-in trees and rocks are procedural and cannot be selected. Point the camera at an area, then convert this zone (recommended), the nearest batch, or the whole map.",
+      "makeZoneEditable": "Make THIS zone editable",
+      "makeZoneEditableHint": "Converts every tree and rock in the zone the camera is over into editable placements, the performance-safe way to edit a far area, one region at a time.",
+      "makeAmbientEditable": "Make nearby foliage editable",
+      "makeAllAmbientEditable": "Make ALL foliage editable",
+      "ambientAllHint": "Converting the whole map turns thousands of trees and rocks into individual placements, which uses more memory than the zone or batch options.",
+      "ambientEditableHint": "Ambient foliage is off. Every foliage piece painted with this brush can be selected, moved, rotated, scaled, or erased.",
+      "ambientConverted": "Made the {count} nearest foliage pieces editable.",
+      "ambientConvertedAll": "All ambient foliage ({count} pieces) is now editable.",
+      "ambientPartial": "Converted {count} pieces; raise the limit or convert again for the rest.",
+      "density": "Density",
+      "minScale": "Min size",
+      "maxScale": "Max size",
+      "grass": "Grass (animated)",
+      "grassHue": "Grass hue",
+      "grassLight": "Grass lightness",
+      "grassClump": "Clump size (strands)",
+      "grassPreview": "The color new grass will paint with",
+      "ferns": "Ferns and mushrooms",
+      "bushes": "Bushes",
+      "trees": "Trees",
+      "rocks": "Rocks",
+      "collide": "New foliage blocks movement",
+      "noneSelected": "Enable at least one foliage group to paint.",
+      "customTitle": "Custom brush asset",
+      "customHint": "Scatter your own asset instead of the built-in sets. Pick any model from the browser below, then brush as usual.",
+      "customPick": "Pick from asset browser",
+      "customChosen": "Brushing: {name}",
+      "customClear": "Back to built-in foliage",
+      "customNeedsPick": "Open the asset browser and pick an asset for the custom brush first."
+    },
+    "meshFixTool": {
+      "title": "Mesh Fix",
+      "hint": "Wireframe is on while this tool is active. Drag over the stretched terrain polys draped across a cave mouth (from outside or from inside the cave) to REMOVE them; every poly centred under the brush stops drawing. Draw-only: the ground you walk on is unchanged. One undo step per stroke.",
+      "restore": "Restore mode (bring removed polys back under the brush)",
+      "nudgeHint": "To MOVE a stretched poly instead of removing it, use Raise or Lower with a very small brush on its vertices.",
+      "count": "{n} removed spots",
+      "clear": "Restore everything",
+      "capReached": "Mesh Fix is full ({max} spots). Restore some before removing more.",
+      "miss": "Aim at the terrain mesh: nothing was under the cursor.",
+      "vertexMode": "Vertices mode (select and move single vertices)",
+      "vertexHint": "Every terrain vertex near the cursor shows as a small square; selected ones turn yellow. Click one to select it, drag a box to take several, Shift+click or Shift+drag to add, Ctrl/Cmd+click to toggle, Alt+click to drop. Then DRAG a selected vertex to move it up or down. Draw-only: the ground you walk on is unchanged.",
+      "vertexCount": "{sel} selected, {n} vertices moved",
+      "vertexReset": "Reset selected vertices",
+      "vertexClearSel": "Clear selection",
+      "vertexClearAll": "Reset every moved vertex"
+    },
+    "clutterTool": {
+      "title": "Clutter Brush",
+      "hint": "Drag across the ground to scatter the enabled clutter inside the brush; each stroke is one undo step. Pieces never block movement.",
+      "tierNote": "Clutter shows in game on High graphics and up; lower tiers skip it at no cost.",
+      "erase": "Erase mode (lift painted clutter under the brush)",
+      "density": "Density",
+      "minScale": "Min size",
+      "maxScale": "Max size",
+      "clumps": "Clumps (0 = even spread)",
+      "kindsTitle": "Clutter kinds",
+      "kinds": {
+        "tile_broken": "Cracked paving slabs",
+        "tile_shards": "Tile shards",
+        "pebbles": "Pebbles",
+        "stones": "Loose stones",
+        "letter": "Dropped letters",
+        "paper_scraps": "Crumpled paper",
+        "leaves": "Fallen leaves",
+        "straw": "Straw",
+        "splinters": "Wood splinters",
+        "pot_shards": "Broken pottery"
+      },
+      "noneSelected": "Enable at least one clutter kind to paint.",
+      "count": "{count} clutter stamps painted",
+      "clearAll": "Remove all painted clutter",
+      "capReached": "Clutter limit reached ({max} stamps); erase some to paint more."
+    },
     "blockerTool": {
       "title": "Tường Chắn",
       "hint": "Kéo dọc mặt đất để vẽ một bức tường vô hình mà người chơi không thể đi hay nhảy xuyên qua. Thả tay để đặt tường; tường ngắn hơn nửa thước sẽ bị loại bỏ.",
@@ -9305,6 +11227,7 @@ export const vi_VN: EnTranslations = {
     },
     "camp": {
       "title": "Trại Quái",
+      "chooseMob": "Choose a mob model",
       "mob": "Quái",
       "count": "Số lượng",
       "radius": "Bán kính",
@@ -9312,12 +11235,140 @@ export const vi_VN: EnTranslations = {
       "hint": "Nhấp vào khoảng đất trống để thêm một trại, hoặc nhấp vào trại có sẵn để chỉnh sửa.",
       "playtestNote": "Quái chỉ xuất hiện khi chơi thử, không bao giờ xuất hiện trong khung nhìn chỉnh sửa.",
       "selected": "Trại: {mob}",
-      "none": "Chưa chọn trại nào."
+      "none": "Chưa chọn trại nào.",
+      "catalogMeta": "{family} | Level {min}-{max}",
+      "statFamily": "Family: {value}",
+      "statAggro": "Aggro: {value} yd",
+      "statScale": "Scale: {value}",
+      "overrideLevels": "Override template levels",
+      "levelMin": "Minimum level",
+      "levelMax": "Maximum level",
+      "aiNotesPlaceholder": "Describe behavior, patrol logic, encounter pacing, or dialogue cues for the AI.",
+      "questNotesPlaceholder": "Explain how this camp should support objectives, rewards, or quest progression.",
+      "tagElite": "Elite",
+      "tagRare": "Rare",
+      "tagBoss": "Boss",
+      "tagCaster": "Caster",
+      "tagSupport": "Support",
+      "tagSummoner": "Summoner",
+      "tagEnrage": "Berserk",
+      "tagSwimmer": "Swimmer",
+      "tagStationary": "Fixed"
+    },
+    "authoring": {
+      "browseAll": "Browse all",
+      "search": "Search all models...",
+      "searchLabel": "Search catalog",
+      "filterLabel": "Filter catalog group",
+      "allGroups": "All",
+      "defaults": "Defaults",
+      "noResults": "No matching entries.",
+      "showing": "Showing {shown} of {total}. Refine the search to see the rest.",
+      "resultCount": "{count} entries",
+      "aiBrief": "AI and Quest Brief",
+      "aiNotes": "AI direction",
+      "questNotes": "Quest-building notes",
+      "vfxTitle": "Ambient VFX",
+      "vfxPreset": "Preset",
+      "vfxNone": "None",
+      "vfxArcane": "Arcane motes",
+      "vfxFire": "Fire embers",
+      "vfxFrost": "Frost shimmer",
+      "vfxHoly": "Holy glow",
+      "vfxNature": "Nature wisps",
+      "vfxShadow": "Shadow motes",
+      "vfxIntensity": "VFX intensity",
+      "vfxHint": "Pooled particles keep the effect lightweight in the editor and playtest."
+    },
+    "entityTool": {
+      "title": "NPCs and Mobs",
+      "hint": "Select an NPC to configure its rig, role, VFX, and AI brief. Select a mob to set its type, levels, stat modifiers, patrol, and respawn.",
+      "selected": "Selected: {name}",
+      "none": "Click a mob or NPC in the map view to select it.",
+      "facing": "Facing",
+      "oneMob": "1 mob",
+      "manyMobs": "{count} mobs",
+      "name": "Display name",
+      "titleField": "Title",
+      "role": "Story role",
+      "rolePlaceholder": "Quest giver, merchant, guard, trainer...",
+      "characterModel": "Rigged character",
+      "placeNpc": "Place NPC",
+      "chooseNpcModel": "Choose a character model",
+      "placeNpcHint": "{name} is ready. Click the terrain to place this NPC.",
+      "cancelPlacement": "Cancel placement",
+      "automaticModel": "Automatic template rig",
+      "automaticModelHint": "Use the character assigned by this NPC template.",
+      "aiNotesPlaceholder": "Describe personality, dialogue tone, schedules, reactions, and interaction rules.",
+      "questNotesPlaceholder": "Leave instructions for future AI-authored quests, objectives, and story beats.",
+      "categoryNpc": "NPCs",
+      "categoryPlayer": "Player rigs",
+      "categoryHumanoid": "Humanoids",
+      "categoryCreature": "Creatures",
+      "categoryForm": "Forms"
+    },
+    "mobTool": {
+      "hint": "Click a mob in the map view to edit its type, levels, stats, patrol, and respawn.",
+      "typeHeader": "Mob: {name}",
+      "typeHeaderMany": "Mob: {name} ({count} selected)",
+      "type": "Mob type",
+      "mixedType": "Mixed types",
+      "statLevels": "Template levels {min}-{max}",
+      "mixedHint": "The selected mobs differ. Values shown are the first one; edits apply to all of them.",
+      "overrideLevels": "Override level range",
+      "levelDefaultHint": "Using the template level range for this mob.",
+      "statsTitle": "Stat modifiers",
+      "statsHint": "Multipliers on the level-derived stats. Above 1 is a bonus, below 1 a penalty. Click a value to type an exact number.",
+      "statHealth": "Health",
+      "statDamage": "Damage",
+      "statArmor": "Armor",
+      "statMoveSpeed": "Move speed",
+      "statAttackSpeed": "Swing time",
+      "statScale": "Size",
+      "statDefault": "{value}x default",
+      "statBonus": "{value}x (+{percent}%)",
+      "statPenalty": "{value}x (-{percent}%)",
+      "statsReset": "Reset modifiers",
+      "respawnTitle": "Respawn",
+      "respawnDefault": "Default respawn speed",
+      "respawnDefaultHint": "Using the realm default for this mob (rares and bosses take longer).",
+      "respawnSeconds": "Respawn after",
+      "seconds": "{value}s",
+      "patrolTitle": "Patrol",
+      "patrolNone": "This mob wanders near its spawn point. Set a patrol to walk it along a path.",
+      "patrolNoneNpc": "This character stands where you placed it. Set a patrol to walk it along a path.",
+      "patrolSet": "Set patrol route",
+      "patrolEdit": "Edit patrol route",
+      "patrolClear": "Clear patrol",
+      "patrolPickHint": "Click the map to drop each waypoint in order. Double-click the last one, or press Enter, to finish.",
+      "patrolDraftPoints": "Waypoints placed: {count}",
+      "patrolPoints": "Patrolling {count} waypoints",
+      "patrolMode": "At the end of the path",
+      "patrolLoop": "Loop back to the start",
+      "patrolPingpong": "Turn around and walk back",
+      "patrolSpeed": "Walk speed",
+      "patrolWait": "Pause at each waypoint",
+      "patrolWaitHint": "The pause is stamped on every waypoint you place from now on.",
+      "patrolFinish": "Finish route",
+      "patrolUndoPoint": "Remove last point",
+      "patrolCancel": "Cancel",
+      "patrolNeedPoints": "Place at least two waypoints before finishing the route.",
+      "patrolFull": "A patrol route holds at most {max} waypoints.",
+      "patrolSaved": "Patrol set: {count} waypoints.",
+      "patrolRemoved": "Patrol cleared.",
+      "yardsPerSecond": "{value} yd/s",
+      "delete": "Delete mob",
+      "deleteMany": "Delete {count} mobs",
+      "deleted": "Deleted {count} mobs.",
+      "deleteNpc": "Delete character",
+      "deleteManyNpcs": "Delete {count} characters",
+      "deletedNpcs": "Deleted {count} characters."
     },
     "spawn": {
       "title": "Điểm Xuất Hiện",
       "hint": "Nhấp xuống mặt đất để đặt nơi chơi thử thả người chơi xuống.",
       "position": "Xuất hiện: {x}, {z}",
+      "area": "Spawn area: {width} x {height} yd",
       "unset": "Đang dùng vị trí bắt đầu dựng sẵn.",
       "clear": "Xóa điểm xuất hiện"
     },
@@ -9337,12 +11388,31 @@ export const vi_VN: EnTranslations = {
       "hint": "Nhấp vào một vật thể đã đặt để gỡ nó, hoặc nhấp vào nền đất đã điêu khắc để gỡ dấu mới nhất dưới con trỏ.",
       "blockerHint": "Nhấp gần một tường chắn sẽ gỡ bức tường đó thay vì thứ khác."
     },
+    "grassClearTool": {
+      "title": "Remove Grass",
+      "hint": "Click or drag to scrub away the procedural meadow grass, including the grass baked into the built-in world. Use a large brush to clear a wide area in one stroke.",
+      "restore": "Restore all grass"
+    },
     "selection": {
       "title": "Lựa Chọn",
+      "heightOffset": "Height offset (yards)",
+      "heightStep": "Step (yards)",
+      "raiseAsset": "Raise",
+      "lowerAsset": "Lower",
+      "heightHint": "Negative offsets sink assets below their base.",
       "none": "Chưa chọn gì. Hãy dùng công cụ Chọn và nhấp vào một vật thể đã đặt.",
+      "squareCollision": "Square collision (follows rotation)",
       "asset": "Vật thể: {name}",
       "x": "X",
+      "y": "Y",
       "z": "Z",
+      "multiCount": "{count} assets selected",
+      "selectAllOfAsset": "Select all of this asset ({count})",
+      "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
+      "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "Set to ground",
+      "setGroundTitle": "Seat the selected assets back on the terrain under them, removing any float or lift",
+      "snapGround": "Snap to ground when moving",
       "rotation": "Góc xoay",
       "scale": "Tỷ lệ",
       "collide": "Chặn di chuyển",
@@ -9350,12 +11420,73 @@ export const vi_VN: EnTranslations = {
       "radiusAuto": "Tự động",
       "radiusAutoTitle": "Đặt lại bán kính va chạm theo tỷ lệ vật thể",
       "radiusHint": "Tự động suy ra bán kính va chạm từ tỷ lệ vật thể; kéo thanh trượt để ghi đè.",
+      "collisionBaked": "Blocking with the baked model shape ({count} boxes hugging the mesh). Drag the radius slider to override with a simple circle; Auto restores the baked shape.",
+      "collisionCustom": "Custom footprint (circle/square) - overrides the baked model shape. Press Auto to restore it.",
       "footprints": "Hiện vùng va chạm",
+      "sway": "Wind sway",
+      "swayHint": "Sways this asset in the wind. On by default for plants. Applies to EVERY placement of this asset on the map, not just the selected one.",
+      "collisionTitle": "Collision",
+      "collisionType": "Collision type",
+      "collisionTypeBaked": "Baked hitboxes",
+      "collisionTypeBasic": "Basic (radius)",
+      "collisionTypeMesh": "True collision (heavy)",
+      "collisionTypeNone": "No collision",
+      "collisionEdited": "Custom hitboxes ({count} boxes). The sim blocks with exactly these.",
+      "hitboxEdit": "Edit hitboxes",
+      "hitboxDone": "Done editing",
+      "hitboxAdd": "Add hitbox",
+      "hitboxDelete": "Delete selected",
+      "hitboxReset": "Reset to baked",
+      "hitboxSelected": "{count} hitboxes selected",
+      "hitboxHint": "Click a hitbox to select it; Ctrl/Shift+click selects several. Use the Move, Rotate, and Scale tools (or the gizmo) to shape them like any other object. Delete removes the selected boxes; Esc leaves edit mode.",
+      "hitboxCap": "Hitbox limit reached ({max} per asset).",
+      "hitboxSavePreset": "Save as preset",
+      "hitboxClearPreset": "Clear saved preset",
+      "hitboxPresetSaved": "Hitbox preset saved for {name}. New placements copy these boxes.",
+      "hitboxPresetCleared": "Hitbox preset cleared.",
+      "hitboxPresetHint": "Presets live on this device: every future placement of this asset spawns with the saved hitboxes.",
+      "meshBaking": "Baking true collision from the model mesh...",
+      "meshBakeDone": "True collision ready ({count} boxes).",
+      "meshBakeFailed": "Could not bake true collision for this asset.",
+      "meshReady": "True collision active: a dense box set hugging the real model mesh.",
+      "meshHint": "True collision rebuilds the hitboxes from the actual model mesh (many small boxes). Expensive - keep it for edge cases; it bakes once per asset when selected.",
+      "collisionCopyAll": "Copy collision to all {name} ({count})",
+      "collisionCopyAllHint": "Gives every other {name} on the map the same collision type and shape, sized to each copy so a small one never gets a giant footprint.",
+      "collisionCopyConfirmTitle": "Copy collision to all {name}?",
+      "collisionCopyConfirmBody": "All {count} other {name} on the map take this collision type and shape, each sized to its own scale (a small copy gets a small footprint, never this one), replacing their own. Ctrl+Z reverts the whole copy.",
+      "collisionCopyConfirm": "Copy to all",
+      "collisionCopied": "Copied collision to {count} {name}.",
+      "scaleAllTitle": "Scale all copies",
+      "scaleMin": "Scale min",
+      "scaleMax": "Scale max",
+      "scaleAllButton": "Scale all {name} ({count})",
+      "scaleAllHint": "Rolls a random scale between min and max onto every copy of this asset (set min and max equal for a uniform scale).",
+      "scaleAllConfirmTitle": "Scale all {name}?",
+      "scaleAllConfirmBody": "Every one of the {count} {name} on the map (this one included) gets a random scale between {min} and {max}, replacing its current scale. Ctrl+Z reverts it.",
+      "scaleAllConfirm": "Scale all",
+      "scaleAllDone": "Scaled {count} {name}.",
       "duplicate": "Nhân bản",
       "delete": "Xóa",
+      "pieces": "Edit pieces ({count})",
+      "piecesHint": "Splits this Blender-built building into its kit pieces and shell, each its own placement to move, rotate, scale or delete. Ctrl+Z puts the building back together.",
+      "piecesDone": "Split into {count} pieces.",
+      "piecesCap": "Not enough placement room to split this building.",
+      "combine": "Combine ({count})",
+      "combineHint": "Joins the selection into one object. The pieces of a split building become the building again; anything else is grouped, so it picks, drags and deletes as one.",
+      "combineRejoined": "Joined back into {name}.",
+      "combineGrouped": "Grouped {count} placements.",
+      "combineNeedsTwo": "Select at least two placements to combine.",
+      "ungroup": "Ungroup ({count})",
+      "ungroupDone": "Ungrouped {count} placements.",
       "deleteHint": "Delete gỡ lựa chọn hiện tại; Ctrl+Z khôi phục lại.",
       "moveHint": "Di chuyển: kéo vật thể trên mặt đất trong chế độ 3D, hoặc dịch bằng phím mũi tên (0,5 thước, giữ Shift cho 2 thước).",
       "wheelHint": "Shift+lăn chuột xoay vật thể, Alt+lăn chuột chỉnh tỷ lệ, Ctrl+D nhân bản."
+    },
+    "transform": {
+      "moveHint": "Drag a gizmo arrow to move along that axis, or the yellow square to move freely. Arrow keys nudge.",
+      "rotateHint": "Drag a gizmo ring to rotate around that axis. Shift+scroll also rotates in 15 degree steps.",
+      "scaleHint": "Drag a gizmo axis handle to stretch that axis, or the yellow center cube to scale uniformly.",
+      "pickHint": "Click an asset to select it; the gizmo appears on the selection."
     },
     "marker": {
       "title": "Điểm Đánh Dấu",
@@ -9393,13 +11524,47 @@ export const vi_VN: EnTranslations = {
       "searchPlaceholder": "Tìm vật thể...",
       "empty": "Không có vật thể nào khớp.",
       "uploadedTab": "Đã Tải Lên",
+      "importedTab": "Imported",
+      "importedEmpty": "No imported models this session. Use Import Model to load a .glb or .gltf from this computer.",
+      "removeImported": "Remove imported model (this session only)",
       "uploadedEmpty": "Chưa có vật thể nào được tải lên. Dùng Tải Lên Vật Thể để thêm một mô hình GLB (tối đa 8 MiB).",
       "uploadedSignIn": "Đăng nhập từ trò chơi để tải lên và đặt các mô hình GLB của riêng bạn.",
       "uploadedLoadFailed": "Không thể tải các vật thể bạn đã tải lên.",
       "deleteAsset": "Xóa vật thể đã tải lên",
       "deleteAssetConfirm": "Xóa vật thể đã tải lên \"{name}\"? Các bản đồ đang dùng nó sẽ mất mô hình này.",
       "pick": "Đặt {name}",
+      "collisionMaster": "Collision Master: author this asset’s default collision",
       "categoryTab": "{category} ({count})",
+      "resizeHandle": "Drag to resize the asset browser",
+      "allTab": "All ({count})",
+      "favouritesTab": "Favourites ({count})",
+      "recentsTab": "Recent",
+      "favouritesEmpty": "No favourites yet. Click the star on any asset to keep it here.",
+      "recentsEmpty": "Nothing placed yet in this browser. Assets you place appear here.",
+      "favouriteAdd": "Add {name} to favourites",
+      "favouriteRemove": "Remove {name} from favourites",
+      "subcategoryAll": "All ({count})",
+      "subcategoryTab": "{name} ({count})",
+      "collision": {
+        "baked": "Collision: baked boxes (auto-generated shape)",
+        "authored": "Collision: authored in Collision Master",
+        "none": "Collision: none, placements block only by their soft circle, if any"
+      },
+      "subcategory": {
+        "buildings": "Buildings",
+        "props": "Props",
+        "nature": "Nature",
+        "environment": "Environment",
+        "structure": "Structure",
+        "furniture": "Furniture",
+        "containers": "Containers",
+        "lighting": "Lighting",
+        "decor": "Decor",
+        "other": "Other",
+        "enemies": "Enemies",
+        "players": "Players",
+        "modular": "Modular"
+      },
       "category": {
         "biome": "Quần Xã",
         "chars": "Nhân Vật",
@@ -9413,6 +11578,113 @@ export const vi_VN: EnTranslations = {
         "weapons": "Vũ Khí"
       }
     },
+    "collisionMaster": {
+      "title": "Collision Master",
+      "mapName": "Collision Master: {name}",
+      "assetLabel": "Authoring default collision for {name}.",
+      "hint": "Build this asset’s collision with the Selection panel below: pick the collision type, edit boxes with the gizmo (move / rotate / scale), add or delete boxes. Lock In saves it to the project as the asset’s default everywhere.",
+      "fromBake": "From bake",
+      "fromBakeTitle": "Start from the asset’s auto-baked voxel boxes",
+      "fittedBox": "Fitted box",
+      "fittedBoxTitle": "Start from one box fitted around the whole asset",
+      "singleBox": "Single box",
+      "singleBoxTitle": "Start from one plain box at the asset’s base",
+      "fromCylinder": "Start from cylinder",
+      "fromCylinderTitle": "Start from one editable cylinder around the asset base",
+      "fromClear": "Start from clear",
+      "fromClearTitle": "Remove every collision shape and begin with an empty scene",
+      "polySnap": "Poly snap brush",
+      "polySnapHint": "Drag across the model’s surface to lay a collision plane that hugs the geometry: the drag start/end set its length and yaw, the sampled heights its vertical band. Great for walls, roofs, and ramps.",
+      "devOnly": "Lock In writes to the project files, so it needs the local dev server (npm run dev).",
+      "lockIn": "Lock In",
+      "lockInTitle": "Save as this asset’s default collision (writes to the project) and return to your map",
+      "cancel": "Back to map",
+      "catalogOnly": "Collision Master works on catalogue assets. Imported models keep their import bake.",
+      "adopted": "Updated {count} placement(s) already in this map to use the collision you just authored.",
+      "copyEmpty": "No collision volumes to copy.",
+      "copied": "Copied {n} collision volume(s), paste with Ctrl+V (works across assets).",
+      "pasted": "Pasted {n} collision volume(s).",
+      "saveFailed": "Could not save your map before opening Collision Master.",
+      "stashOnly": "Browser storage is blocked, so the map is held in memory: you will return to it from Collision Master, but export it if you want a durable copy.",
+      "noBoxes": "No collision boxes to lock in. Add at least one box, or pick Basic/None.",
+      "meshUnsupported": "True Mesh is a per-map bake and cannot be a project default. Pick Baked, Basic, or None.",
+      "saveEndpointFailed": "Saving the default failed: {error}",
+      "saveUnreachable": "Could not reach the save endpoint (is the dev server running?). Your collision was downloaded as a file so nothing is lost; start \"npm run dev\" and Lock In again, or merge the file into data/asset_collision_overrides.json.",
+      "locked": "Locked in: {name} now uses this collision everywhere.",
+      "presetPromptTitle": "Save as preset too?",
+      "presetPromptBody": "Lock In already made this the default collision for {name} across the whole project, and every copy in your map now uses it. A preset goes one step further on this device only: each NEW placement of {name} spawns carrying these boxes as its own editable hitboxes, so you can tweak them per copy with Edit Hitboxes. Not needed for the collision to work.",
+      "presetPromptYes": "Save preset",
+      "presetPromptNo": "No thanks",
+      "presetPromptDontAsk": "Don't ask again (turn it back on under More > \"Ask about presets on Lock In\")",
+      "barLabel": "Collision modeling tools",
+      "modeObject": "Object",
+      "modeObjectTitle": "Object mode (Tab): move / rotate / scale whole volumes with the gizmo",
+      "modeVertex": "Vertex",
+      "modeVertexTitle": "Vertex select (Z): click a vertex and the gizmo moves ONLY that vertex; Ctrl+drag lassos several",
+      "modeEdge": "Edge",
+      "modeEdgeTitle": "Edge select (V): click an edge and the gizmo moves / rotates / scales its two vertices",
+      "modeFace": "Face",
+      "modeFaceTitle": "Face select (C): click a face and the gizmo moves / rotates / scales that face locally",
+      "addMenu": "Add",
+      "addMenuTitle": "Add a collision primitive: real triangulated solids (a cylinder is a true cylinder mesh)",
+      "primBox": "Box",
+      "primPlane": "Plane",
+      "primCylinder": "Cylinder",
+      "primSphere": "Sphere",
+      "primWedge": "Ramp",
+      "primTitle": "Add a {name} primitive to the collision set",
+      "polySnapShort": "Poly Snap",
+      "polyBuildShort": "Poly Build",
+      "polyBuildHint": "Poly Build: click-drag a face of the model to extrude it outward and hand-build shapes. Toggle off to orbit/select again.",
+      "polyBuildFail": "This model is at its detail limit, cannot extrude any further.",
+      "sculptTitle": "Dynamic mesh sculpt brush",
+      "sculptSettings": "Sculpt settings",
+      "sculptOff": "Sculpt: Off",
+      "sculptGrab": "Sculpt: Grab",
+      "sculptInflate": "Sculpt: Inflate",
+      "sculptDeflate": "Sculpt: Deflate",
+      "sculptSmooth": "Sculpt: Smooth",
+      "sculptPinch": "Sculpt: Pinch",
+      "sculptCrease": "Sculpt: Crease",
+      "sculptRelax": "Sculpt: Relax",
+      "sculptRadius": "Radius",
+      "sculptStrength": "Strength",
+      "sculptDetail": "Detail",
+      "dyntopo": "Dyntopo",
+      "dyntopoTitle": "Dynamic topology locally splits long edges and safely collapses short edges around the sculpt brush.",
+      "symmetry": "Symmetry",
+      "symmetryHint": "Mirror each sculpt stroke across the selected local X, Y, and Z axes.",
+      "loopCut": "Loop Cut",
+      "loopCutTitle": "Insert an edge loop: in Edge mode, pick an edge, then Loop Cut adds a parallel ring of edges around the shape (drag the new loop to slide it).",
+      "loopCutFail": "Pick a box edge in Edge mode first, loop cut needs a quad edge (not a cap/sphere).",
+      "weld": "Weld",
+      "weldTitle": "Merge the selected vertices at their center.",
+      "subdivide": "Subdivide",
+      "subdivideTitle": "Split every triangle into four shared-edge triangles for more modeling detail.",
+      "inset": "Inset",
+      "insetTitle": "Inset the selected face and create a connected border ring.",
+      "fill": "Fill",
+      "fillTitle": "Fill three or more selected boundary vertices with a new face.",
+      "mirror": "Mirror X",
+      "mirrorTitle": "Append a mirrored copy of the selected volume across its local X axis.",
+      "topologyFail": "That topology operation cannot be applied to the current selection.",
+      "rampToggle": "Walkable",
+      "rampToggleTitle": "Walkable ramp: the selected volume raises the walkable ground along its slope (the player walks up it) instead of blocking. Ramp primitives start walkable.",
+      "duplicate": "Dup",
+      "duplicateTitle": "Duplicate the selected boxes",
+      "delete": "Del",
+      "deleteTitle": "Delete the selected boxes",
+      "openFromSelection": "Collision Master",
+      "openFromSelectionTitle": "Author this asset’s DEFAULT collision in the Collision Master scene (saves to the project; your map auto-saves and you return here)",
+      "heroTitle": "Collision Master",
+      "heroStatus": "Asset collision: {mode}"
+    },
+    "importModel": {
+      "notModel": "Pick a .glb or .gltf file.",
+      "tooLarge": "That file is over the 64 MiB import limit.",
+      "imported": "Imported \"{name}\". It is kept for this session; re-import it after a reload.",
+      "failed": "Could not read that model file."
+    },
     "upload": {
       "notGlb": "Hãy chọn một tệp .glb.",
       "tooLarge": "Tệp đó vượt quá giới hạn 8 MiB.",
@@ -9424,15 +11696,21 @@ export const vi_VN: EnTranslations = {
     "openDrawer": {
       "title": "Mở Bản Đồ",
       "close": "Đóng",
+      "tabShipped": "Shipped Maps",
       "tabLocal": "Trình Duyệt Này",
       "tabMine": "Bản Đồ Máy Chủ Của Tôi",
       "tabPublic": "Bản Đồ Công Khai",
       "colName": "Tên",
+      "colType": "Type",
       "colUpdated": "Cập nhật",
       "colStatus": "Trạng thái",
       "statusPublic": "Công khai",
       "statusPrivate": "Riêng tư",
       "open": "Mở",
+      "openCopy": "Open Copy",
+      "typePublished": "Published to Game ({slug})",
+      "typeShippedPublished": "{group} · your published version",
+      "publishedUnreadable": "Could not read the published map \"{slug}\" from the dev server.",
       "fork": "Rẽ Nhánh",
       "publish": "Công Khai",
       "unpublish": "Hủy Công Khai",
@@ -9455,24 +11733,43 @@ export const vi_VN: EnTranslations = {
       "savedServer": "Đã lưu \"{name}\" lên máy chủ (v{version}).",
       "savedLocalOnly": "Đã lưu \"{name}\" vào trình duyệt này. Đăng nhập để lưu trực tuyến.",
       "saveFailedLocal": "Lưu cục bộ thất bại (bộ nhớ bị chặn).",
+      "openFailedLocal": "That save could not be read (corrupt or truncated). Its file may still import via More > Import if you exported a copy.",
       "opened": "Đã mở \"{name}\".",
+      "waterReapplied": "Water rebuilt from the current terrain.",
+      "shippedMapOpened": "Opened an editable copy of \"{name}\".",
+      "publishedMapOpened": "Opened your published \"{name}\": this is the version the game ships for that map.",
       "imported": "Đã nhập \"{name}\".",
       "importFailed": "Đã hủy nhập, hoặc tệp không phải là một bản đồ hợp lệ.",
+      "importMissingDeps": "{count} model/texture/skybox file(s) are missing, so parts of the map are blank. Re-import the .wocmap.zip bundle to include them.",
       "exported": "Đã tải xuống \"{name}\".",
+      "bundleExported": "Exported \"{name}\" with its models, textures, and skybox. Import the .wocmap.zip (not a loose .json) on the other computer.",
+      "exportBlockedMissingDeps": "Export blocked: {count} referenced model, texture, or skybox file(s) are missing from this browser. Restore them before exporting so the engine receives a complete map.",
+      "exportBlockedInvalid": "Export blocked because the map did not pass the engine compatibility check. Save a copy and review the latest edits before trying again.",
       "newMap": "Đã bắt đầu bản đồ mới từ thế giới dựng sẵn.",
+      "newFlatMap": "Blank map started.",
       "forked": "Đã rẽ nhánh thành \"{name}\". Giờ bạn đang chỉnh sửa bản sao của riêng mình.",
       "published": "Bản đồ đã được công khai. Giờ đây ai cũng có thể tìm thấy và rẽ nhánh nó.",
       "unpublished": "Đã hủy công khai bản đồ.",
       "deleted": "Đã xóa bản đồ.",
       "assetPlacedFirst": "Hãy chọn một vật thể trong trình duyệt trước.",
       "loading3d": "Đang tải thế giới...",
+      "loading3dAssets": "Loading assets...",
+      "loading3dEngine": "Starting the engine...",
+      "loading3dZone": "Building the world...",
       "playtestLaunch": "Đang khởi chạy chơi thử...",
       "playtestFailed": "Không thể bắt đầu chơi thử (bộ nhớ bị chặn).",
       "draftSaved": "Đã tự động lưu bản nháp.",
       "draftRestored": "Đã khôi phục bản nháp tự động lưu.",
       "autosaveFailed": "Tự động lưu thất bại (bộ nhớ trình duyệt đầy hoặc bị chặn). Hãy xuất bản đồ để giữ một bản dự phòng.",
       "terrainCapReached": "Đã chạm giới hạn chỉnh sửa địa hình ({max}). Các dấu điêu khắc dư không được thêm.",
+      "caveCapReached": "Cave limit reached ({max}). Delete or undo a cave first.",
+      "holeCapReached": "Hole limit reached ({max}). Delete or undo a hole first.",
       "placementCapReached": "Đã chạm giới hạn đặt vật thể ({max}). Các vật thể dư không được thêm.",
+      "entityCapReached": "The map entity limit was reached. Some copied NPCs or mobs were not pasted.",
+      "selectionCopied": "Copied {count} selected item(s).",
+      "selectionPasted": "Pasted {count} item(s).",
+      "selectionNothingToCopy": "Select an asset, NPC, or mob before copying.",
+      "selectionNothingToPaste": "Copy an asset, NPC, or mob before pasting.",
       "blockerCapReached": "Đã chạm giới hạn tường chắn ({max}). Bức tường mới không được thêm.",
       "campCapReached": "Đã đạt giới hạn Trại Quái ({max}). Trại mới không được thêm vào.",
       "autosaveOff": "Tự động lưu đã tắt: {reason} Hãy lưu thủ công, rồi bật lại."
@@ -9490,6 +11787,17 @@ export const vi_VN: EnTranslations = {
     "prompt": {
       "saveAsTitle": "Lưu Thành",
       "nameLabel": "Tên bản đồ mới"
+    },
+    "newMap": {
+      "title": "New Map",
+      "hint": "Pick a preset or set the size in yards. The map is bounded: terrain rim walls and invisible perimeter blockers keep playtest inside it.",
+      "width": "Width (yards)",
+      "height": "Height (yards)",
+      "scale": "Scale multiplier",
+      "interior": "Interior (60 x 60)",
+      "zone": "Zone (240 x 360)",
+      "openWorld": "Open World (360 x 1080)",
+      "create": "Create"
     },
     "serverError": {
       "invalid_map_name": "Tên bản đồ đó không được phép. Hãy dùng chữ cái, chữ số, dấu cách, dấu nháy đơn hoặc dấu gạch nối.",
@@ -9513,6 +11821,168 @@ export const vi_VN: EnTranslations = {
       "timeout": "Máy chủ phản hồi quá lâu. Hãy thử lại.",
       "unknown": "Đã có lỗi khi trao đổi với máy chủ."
     },
+    "lighting": {
+      "title": "Lighting",
+      "presetLabel": "Lighting preset",
+      "day": "Day",
+      "overcast": "Overcast",
+      "dusk": "Dusk",
+      "night": "Night",
+      "customHint": "Custom lighting (edited from a preset).",
+      "sun": "Sun intensity",
+      "ambient": "Ambient intensity",
+      "environment": "Sky ambience",
+      "azimuth": "Sun direction",
+      "elevation": "Sun height",
+      "nightFloor": "Night brightness",
+      "nightFloorHint": "How much daylight the deepest night keeps. 0 is the shipped night; around 0.35 stays readable and cool instead of murky.",
+      "caveLight": "Cave brightness",
+      "caveLightHint": "How dark carved cave walls go with depth. 0 is the shipped cave dark; around 0.4 keeps a big cavern readable by torchlight.",
+      "sunColor": "Sun color",
+      "skyColor": "Sky tint",
+      "hint": "Map lighting is saved and used by both the editor and playtest.",
+      "skyboxTitle": "Skybox",
+      "skyboxDefault": "Default sky",
+      "skybox_toon_day": "Toon Blue Sky",
+      "skybox_vale_day": "Vale Day HDR",
+      "skybox_marsh_overcast": "Marsh Overcast HDR",
+      "skybox_peaks_dawn": "Peaks Dawn HDR",
+      "skybox_hollow_dusk": "Hollow Dusk HDR",
+      "skybox_amber_sunset": "Amber Sunset HDR",
+      "skybox_ember_storm": "Ember Storm HDR",
+      "skybox_frost_twilight": "Frost Twilight HDR",
+      "skybox_fen_day": "Fen Day HDR",
+      "skybox_night": "Night HDR",
+      "skybox_nightbloom_dream": "Nightbloom Dream HDR",
+      "skybox_wraithwood_gloom": "Wraithwood Gloom HDR",
+      "skybox_vale_backdrop": "Vale Painted Backdrop",
+      "skybox_marsh_backdrop": "Marsh Painted Backdrop",
+      "skybox_peaks_backdrop": "Peaks Painted Backdrop",
+      "skybox_space_galaxy": "Space Galaxy",
+      "skyboxUpload": "Upload skybox...",
+      "skyboxCustomActive": "Custom skybox active.",
+      "skyboxHint": "Pick a bundled sky or upload a panoramic (equirectangular) image. Saved with the map - playtest shows it in-game.",
+      "skyboxImported": "Skybox imported.",
+      "skyboxImportFailed": "Could not import that image.",
+      "skyboxTooLarge": "Skybox image is too large (max 24 MB).",
+      "skyboxMissing": "That skybox is not stored in this browser anymore.",
+      "birdsTitle": "Birds",
+      "birds": "Birds in the sky",
+      "birdCount": "How many",
+      "birdFormation": "Fly in V formation",
+      "worldSpeedTitle": "World Speed",
+      "worldSpeed": "Animation speed",
+      "worldSpeedHint": "Speeds up or slows every ambient motion (water, fire, foliage sway, birds, weather). Cosmetic only; it never changes playtest gameplay or timing.",
+      "worldSpeedReset": "Reset to normal speed",
+      "zoneTitle": "Zone atmosphere",
+      "zoneHint": "Choose a zone, then give it its own lighting, skybox, and ambience speed.",
+      "zoneSelect": "Zone to edit",
+      "zoneReset": "Use map atmosphere"
+    },
+    "music": {
+      "title": "Music",
+      "hint": "Pick the soundtrack for the whole map, or drag boxes to give areas their own track. Playtest switches as you cross them.",
+      "zoneTrack": "Map track",
+      "default": "Auto (biome theme)",
+      "areasTitle": "Music areas",
+      "areaTrack": "Track for new areas",
+      "rowTrack": "Track for this area",
+      "dragHint": "Drag a box on the ground to add an area with the track above. Click an area to select it (Delete removes it). Smaller areas win where they overlap.",
+      "none": "No music areas yet.",
+      "areaN": "Area {num}",
+      "selectArea": "Select this area in the world (its box highlights; Delete removes it)",
+      "removeArea": "Remove this music area",
+      "areaCap": "Music area limit reached ({max}).",
+      "previewZone": "Now playing: {zone}",
+      "previewOff": "Area music stopped.",
+      "previewDisabled": "Music is switched off in Settings.",
+      "track": {
+        "town_eastbrook": "Town: Eastbrook (warm pastoral)",
+        "town_fenbridge": "Town: Fenbridge (old medieval)",
+        "town_highwatch": "Town: Highwatch (brisk march)",
+        "town_goldcrest": "Town: Goldcrest Harbor (trading port)",
+        "vale": "Vale (playful meadow)",
+        "vale_legacy": "Vale legacy (original theme)",
+        "marsh": "Marsh (croaky swamp)",
+        "peaks": "Peaks (heroic folk)",
+        "dungeon_hollow_crypt": "Dungeon: Hollow Crypt (skeletal dance)",
+        "dungeon_sunken_bastion": "Dungeon: Sunken Bastion (flooded fortress)",
+        "dungeon_gravewyrm_sanctum": "Dungeon: Gravewyrm Sanctum (boss route)"
+      }
+    },
+    "weather": {
+      "title": "Weather",
+      "showSnowfall": "Show snowfall",
+      "snowfallHint": "A Studio preview setting, remembered in this browser.",
+      "zoneTitle": "Weather in this zone",
+      "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
+      "auto": "Auto",
+      "clear": "Clear",
+      "rain": "Rain",
+      "snow": "Snow",
+      "blizzard": "Blizzard",
+      "sparkle": "Golden sparkles",
+      "intensity": "Intensity",
+      "cloudCover": "Cloud cover",
+      "cloudHeight": "Cloud height (yd)",
+      "cloudHint": "Low clouds hug the terrain and read as rolling ground fog.",
+      "aurora": "Aurora",
+      "auroraHint": "Curtains hang high over the camera wherever it goes: brightest at night, faint by day.",
+      "scheduleTitle": "Dynamic weather",
+      "scheduleWins": "A schedule is running: it overrides the fixed weather above.",
+      "stepMode": "Weather for this step",
+      "stepMinutes": "Minutes this step lasts",
+      "minutesShort": "min",
+      "removeStep": "Remove this step",
+      "addStep": "Add step",
+      "addStepTitle": "Cycle through the steps in order, each holding for its minutes, then repeat",
+      "scheduleHint": "Steps loop in order (Rain 5 min, then Clear 10 min, ...). Saves with the map and runs in playtest."
+    },
+    "camera": {
+      "title": "Camera",
+      "axisWidget": "Camera axis views",
+      "snapPositiveX": "View from positive X",
+      "snapNegativeX": "View from negative X",
+      "snapPositiveY": "View from above",
+      "snapNegativeY": "View from below",
+      "snapPositiveZ": "View from positive Z",
+      "snapNegativeZ": "View from negative Z",
+      "focus": "Focus selection (.)",
+      "focusTitle": "Move the orbit pivot onto the selected object so the camera revolves around it; with nothing selected, frame the whole map",
+      "freeFly": "Free-Fly (Shift+F)",
+      "freeFlyHint": "WASD moves, Q/E goes up and down, dragging looks around like first person, and the wheel sets the speed.",
+      "invertPan": "Invert camera",
+      "showBoundary": "Show map boundary walls",
+      "showPlayer": "Show playtest player",
+      "wireframe": "Wireframe mode",
+      "xray": "Transparent X-ray mode",
+      "speedTitle": "Movement speeds",
+      "moveSpeed": "WASD move speed",
+      "lookSpeed": "Mouse look speed",
+      "panSpeed": "Pan speed",
+      "speedHint": "How fast the viewport camera flies, looks, and pans. Editor only. In Free-Fly the mouse wheel is the throttle: it changes this move speed instead of zooming.",
+      "flySpeedSet": "Fly speed {value}x",
+      "resetSpeeds": "Reset speeds",
+      "perfTitle": "Performance overlay",
+      "perfShow": "Show overlay in the viewport",
+      "perfHint": "A live readout pinned to the viewport corner while you edit.",
+      "perfFps": "FPS",
+      "perfFrameMs": "Frame time (ms)",
+      "perfAssets": "Placed assets",
+      "perfTris": "Scene polygons",
+      "perfSelTris": "Selected polygons",
+      "perfTerrain": "Terrain edits",
+      "perfStreaming": "Terrain streaming",
+      "perfCoords": "World (x, z)",
+      "assetViewTitle": "Asset view distance",
+      "assetViewDistance": "Placed assets fade out at",
+      "assetViewMax": "As far as the fog",
+      "assetViewHint": "How far placed decor renders before it fades out and stops drawing, to save performance. Lower it to cull distant assets sooner; raise it to see farther. Saved with the map, so playtest matches.",
+      "visibilityTitle": "Terrain visibility",
+      "visibilityDistance": "Visible terrain distance",
+      "loadingHaze": "Loading haze",
+      "visibilityHint": "Original-detail terrain streams near the camera. Haze hides each zone until it is ready. Higher distances use more GPU and memory."
+    },
     "hints": {
       "nav3d": "Kéo để xoay quanh, lăn chuột để thu phóng. Trong khi kéo, WASD bay và Q/E đổi độ cao.",
       "nav2d": "Kéo để rê khung nhìn, lăn chuột để thu phóng."
@@ -9527,14 +11997,24 @@ export const vi_VN: EnTranslations = {
       "close": "Đóng",
       "tool": {
         "select": "Chọn vật thể đã đặt để di chuyển, xoay và chỉnh tỷ lệ; nhấp một điểm đánh dấu 2D để chỉnh sửa.",
+        "move": "Move the selected asset with the 3-axis gizmo arrows.",
+        "rotate": "Rotate the selected asset with the gizmo rings.",
+        "scale": "Scale the selected asset with the gizmo handles, per axis or uniformly.",
         "raise": "Nâng cao địa hình dưới cọ.",
         "lower": "Hạ thấp địa hình dưới cọ.",
         "smooth": "Làm mịn các gồ ghề về độ cao trung bình quanh đó.",
         "flatten": "San mặt đất về độ cao tại điểm bắt đầu kéo.",
+        "slope": "Right-click to set the start height, then drag from another height to lay a smooth ramp.",
+        "pond": "Click to dig a local pond with its own water surface.",
         "paint": "Tô lớp phủ quần xã đè lên mặc định của vùng.",
         "water": "Đặt mực nước cho toàn bản đồ.",
         "place": "Đặt vật thể từ danh mục hoặc đã tải lên xuống mặt đất.",
+        "foliage": "Brush-paint grass, bushes, trees, and rocks with size variation.",
+        "clutter": "Brush-paint ground clutter (broken tiles, pebbles, letters, leaves) that renders on High graphics and up.",
+        "meshfix": "Remove stretched leftover terrain polys around a cut or cave mouth, or restore them. Wireframe turns on while the tool is active.",
+        "tree": "Grow a fully customizable tree: trunk, branches, canopy volumes and leaves.",
         "blocker": "Kéo để tạo các bức tường vô hình chặn di chuyển khi chơi thử.",
+        "collider": "Drop box, sphere, or floor-plane collision volumes, invisible in playtest.",
         "camp": "Thêm và chỉnh sửa các trại quái xuất hiện khi chơi thử.",
         "spawn": "Đặt nơi chơi thử thả người chơi xuống.",
         "region": "Chọn theo khung địa hình và vật thể để sao chép và dán.",
@@ -9546,6 +12026,7 @@ export const vi_VN: EnTranslations = {
         "undo": "Ctrl+Z hoàn tác thay đổi gần nhất; Ctrl+Y hoặc Ctrl+Shift+Z làm lại.",
         "save": "Ctrl+S lưu bản đồ.",
         "duplicate": "Ctrl+D nhân bản vật thể đang chọn.",
+        "multiSelect": "Shift+click adds or removes assets. In the NPC and Mob tool, Ctrl+click selects multiple entities.",
         "nudge": "Phím mũi tên dịch vật thể đang chọn 0,5 thước; giữ Shift để dịch 2 thước.",
         "wheel": "Shift+lăn chuột xoay vật thể đang chọn; Alt+lăn chuột chỉnh tỷ lệ.",
         "delete": "Phím Delete gỡ vật thể hoặc trại đang chọn.",
@@ -9605,6 +12086,54 @@ export const vi_VN: EnTranslations = {
       "stage": "Khung nhìn bản đồ",
       "toasts": "Thông báo của trình chỉnh sửa",
       "dialog": "Hộp thoại trình chỉnh sửa"
+    },
+    "dungeon": {
+      "title": "Dungeon layout",
+      "collapse": "Fold",
+      "expand": "Expand",
+      "exit": "Back to map",
+      "hint": "Click selects (again cycles overlaps). Drag moves. Arrows nudge, Delete removes, Ctrl+Z undoes. Shift-drag pans, middle-drag orbits.",
+      "none": "Nothing selected. Click an outline on the floor plan.",
+      "addRoom": "Add room",
+      "addDoor": "Add door",
+      "addBarrier": "Add barrier",
+      "addOpening": "Add opening",
+      "addDecor": "Add decor",
+      "delete": "Delete",
+      "validate": "Validate",
+      "save": "Save to source",
+      "saved": "Layout written to src/sim/dungeon_layout.ts (dev server)",
+      "saveFailed": "Dev save endpoint unavailable; downloaded the layout instead",
+      "unsaved": "Unsaved layout changes",
+      "noIssues": "No issues found",
+      "kind": {
+        "room": "Room",
+        "door": "Door",
+        "barrier": "Barrier",
+        "opening": "Visual opening",
+        "decor": "Decor",
+        "dais": "Boss dais"
+      },
+      "field": {
+        "id": "Id",
+        "key": "Model",
+        "style": "Style",
+        "x0": "West edge (x0)",
+        "x1": "East edge (x1)",
+        "z0": "Near edge (z0)",
+        "z1": "Far edge (z1)",
+        "x": "X",
+        "z": "Z",
+        "y": "Height offset",
+        "yaw": "Yaw (radians)",
+        "hw": "Half width",
+        "hd": "Half depth",
+        "r": "Collision radius",
+        "scale": "Scale",
+        "scaleX": "Scale X",
+        "scaleZ": "Scale Z",
+        "innerScale": "Inner scale"
+      }
     }
   },
   "skinEvent": {
@@ -9747,10 +12276,174 @@ export const vi_VN: EnTranslations = {
     "realm": "Thế Giới",
     "newCharacter": "Nhân Vật Mới",
     "appearance": "Ngoại hình",
+    "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Tùy chỉnh",
     "body": "Cơ thể",
     "genderMale": "Nam",
     "genderFemale": "Nữ",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "Swept",
+        "long": "Long",
+        "mohawk": "Mohawk",
+        "quiff": "Cropped Quiff",
+        "undercut": "Undercut",
+        "topknot": "Topknot",
+        "shoulder": "Shoulder Length",
+        "bald": "Bald",
+        "waves": "Waves",
+        "ponytail": "High Ponytail",
+        "braid": "Braid",
+        "bob": "Bob",
+        "crown": "Braided Crown",
+        "twins": "Twin Braids",
+        "curls": "Curly Updo"
+      },
+      "beard": {
+        "none": "Clean Shaven",
+        "moustache": "Moustache",
+        "handlebar": "Handlebar",
+        "goatee": "Goatee",
+        "chin": "Chin Beard",
+        "boxed": "Boxed Beard",
+        "long": "Long Beard",
+        "chops": "Mutton Chops",
+        "chinstrap": "Chinstrap"
+      },
+      "nose": {
+        "default": "Classic",
+        "broad": "Broad",
+        "aquiline": "Aquiline",
+        "button": "Button",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "Classic",
+        "full": "Full",
+        "smirk": "Smirk",
+        "relaxed": "Relaxed",
+        "cupids_bow": "Cupid's Bow",
+        "narrow": "Narrow",
+        "thin": "Thin",
+        "rounded": "Rounded"
+      },
+      "brows": {
+        "default": "Classic",
+        "slim": "Slim",
+        "arched": "Arched",
+        "soft": "Soft",
+        "straight": "Straight",
+        "relaxed": "Relaxed",
+        "soft_arch": "Soft Arch",
+        "rounded": "Rounded"
+      },
+      "ears": {
+        "default": "Classic",
+        "large": "Large",
+        "pointed": "Pointed",
+        "round": "Round"
+      },
+      "eyes": {
+        "default": "Classic",
+        "almond": "Almond",
+        "hooded": "Hooded"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "Eyes and Brows",
+        "eyeColor": "Eye Color",
+        "hairstyle": "Hairstyle",
+        "facialHair": "Facial Hair",
+        "hairColor": "Hair Color",
+        "browColor": "Eyebrow Color",
+        "piercings": "Piercings"
+      },
+      "section": {
+        "hair": "Hairstyle",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "Brow Shape",
+        "ears": "Ears",
+        "eyes": "Eye Shape"
+      },
+      "slider": {
+        "eyeSpacing": "Eye Spacing",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "Brow Height",
+        "chinWidth": "Chin Width",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "Lobes",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "Nostril",
+        "septum": "Septum",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "Porcelain",
+        "ivory": "Ivory",
+        "rose": "Rose",
+        "peach": "Peach",
+        "fair": "Fair",
+        "beige": "Beige",
+        "sand": "Sand",
+        "honey": "Honey",
+        "olive": "Olive",
+        "caramel": "Caramel",
+        "tan": "Tan",
+        "bronze": "Bronze",
+        "chestnut": "Chestnut",
+        "umber": "Umber",
+        "mahogany": "Mahogany",
+        "ebony": "Ebony"
+      },
+      "eye": {
+        "brown": "Brown",
+        "darkBrown": "Dark Brown",
+        "hazel": "Hazel",
+        "amber": "Amber",
+        "green": "Green",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "Violet"
+      },
+      "hairColor": {
+        "platinum": "Platinum",
+        "blonde": "Blonde",
+        "golden": "Golden",
+        "copper": "Copper",
+        "red": "Red",
+        "auburn": "Auburn",
+        "lightBrown": "Light Brown",
+        "brown": "Brown",
+        "darkBrown": "Dark Brown",
+        "black": "Black",
+        "silver": "Silver",
+        "white": "White"
+      },
+      "matchHair": "Match Hair",
+      "resetDefault": "Reset to Default",
+      "customColorAria": "Pick a custom color",
+      "customSkinAria": "Pick a custom skin tone"
+    },
     "hair": "Tóc",
     "brows": "Lông mày",
     "skinTone": "Màu da",
@@ -11218,6 +13911,9 @@ export const vi_VN: EnTranslations = {
   "character": {
     "loading": "Đang tải...",
     "noneYet": "Chưa có nhân vật nào. Tạo một nhân vật bên dưới.",
+    "membershipRequired": "Renew your membership to play this character.",
+    "membershipSlots": "Unlock slots with a membership",
+    "emptySlot": "Available character slot",
     "levelClass": "Cấp {level} {className}",
     "inWorld": "trong thế giới",
     "takeOver": "Tiếp Quản",
@@ -11227,6 +13923,7 @@ export const vi_VN: EnTranslations = {
     "lockoutRaids": "Cuộc Đột Kích",
     "lockoutDungeons": "Hầm Ngục",
     "lockoutWorldBosses": "Giám Hộ Thế Giới",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "Thao tác này sẽ ngắt nhân vật khỏi phiên khác và đưa về đây. Tiếp tục?",
     "renameRequired": "cần đổi tên",
     "delete": "Xóa",
@@ -11811,6 +14508,7 @@ export const vi_VN: EnTranslations = {
       "deathRecapCauterized": "Bạn đã chết. Vết bỏng của Thiêu Đốt đã áp đảo bạn.",
       "respawn": "Bạn cảm thấy đã được nghỉ ngơi và hồi phục hoàn toàn.",
       "respawnKeeperToll": "Người Gìn Giữ Nhợt Nhạt đã hồi sinh bạn, nhưng bạn yếu đi vì nó: Phí Người Gìn Giữ làm suy giảm chỉ số của bạn cho đến khi nó biến mất.",
+      "moonbridgeBanner": "The Moonbridge Rises",
       "ignoringChat": "Đang bỏ qua tin nhắn từ {name}.",
       "noLongerIgnoring": "Không còn bỏ qua {name} nữa.",
       "playerNotNearby": "Người chơi đó không ở gần đây.",
@@ -12014,6 +14712,10 @@ export const vi_VN: EnTranslations = {
     "social": {
       "title": "Xã Hội",
       "friendsTab": "Bạn Bè",
+      "friendFirstPage": "First page",
+      "friendNextPage": "Next page",
+      "boundFriend": "Bound friend",
+      "boundFriendLink": "Bound friends are linked by their referral invitation.",
       "guildTab": "Bang Hội",
       "ignoreTab": "Phớt Lờ",
       "leaveParty": "Rời Tổ Đội",
@@ -12241,7 +14943,161 @@ export const vi_VN: EnTranslations = {
       "hoard_cast_screech": "Tiếng Kêu Điếc",
       "hoard_cast_mimic_bite": "Cắn Tham Lam",
       "hoard_cast_mimic_leap": "Bước Nhảy Tàn Phế",
-      "hoard_cast_coin_spit": "Phun Tiền Nguyền"
+      "hoard_cast_coin_spit": "Phun Tiền Nguyền",
+      "crypt_grave_bolt": "Grave Bolt",
+      "crypt_raise_bones": "Raise Bones",
+      "crypt_murder_call": "Murder Call",
+      "crypt_stone_shriek": "Stone Shriek",
+      "crypt_grave_cleave": "Grave Cleave",
+      "crypt_barrowflame_breath": "Barrowflame Breath",
+      "crypt_tail_lash": "Tail Lash",
+      "crypt_wing_gust": "Wing Gust",
+      "crypt_grave_rupture": "Grave Rupture",
+      "crypt_carrion_eye": "Carrion Eye",
+      "crypt_marrow_crush": "Marrow Crush",
+      "crypt_rimesilk_spit": "Rimesilk Spit",
+      "crypt_gravespark_volley": "Gravespark Volley",
+      "crypt_morthen_rite_wakes": "The Rite Wakes",
+      "crypt_morthen_rise": "Rise of the Gravecaller",
+      "crypt_morthen_proclaim": "Grave Proclamation",
+      "crypt_morthen_descend": "Descent",
+      "crypt_knellwyrm_arrive": "Descending from the Sky",
+      "crypt_knellwyrm_pyre_strafe": "Pyre Strafe",
+      "crypt_knellwyrm_strafe_run": "Strafing Run",
+      "crypt_knellwyrm_dread_bellow": "Dread Bellow",
+      "crypt_marrow_shovelful": "Shovelful",
+      "crypt_marrow_measure": "Measured for the Grave",
+      "crypt_marrow_burial_toll": "Burial Toll",
+      "crypt_marrow_gravediggers_blow": "Gravedigger's Blow",
+      "crypt_lady_brides_lament": "Bride's Lament",
+      "crypt_lady_frozen_embrace": "Frozen Embrace",
+      "crypt_lady_embrace_hold": "Frozen Embrace",
+      "crypt_lady_bridal_freeze": "Bridal Freeze",
+      "crypt_ilvane_dirge": "Dirge of the Hollow",
+      "crypt_ilvane_unbroken_dirge": "Unbroken Verse",
+      "crypt_ilvane_bone_organ": "Bone Organ",
+      "crypt_morthen_shadow_pulse": "Shadow Pulse",
+      "crypt_morthen_rite_of_the_unquiet": "Rite of the Unquiet",
+      "crypt_morthen_reap_the_unquiet": "Reap the Unquiet",
+      "kituse_crypt_relight_candle": "Relight the Candle",
+      "crypt_knellwyrm_knell_rise": "Burning Knell",
+      "crypt_knellwyrm_knell_mark": "Burning Knell",
+      "crypt_knellwyrm_knell_breath": "Burning Knell",
+      "crypt_knellwyrm_knell_land": "Burning Knell",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "ghost_captain_broadside": "Spectral Broadside",
+      "ghost_captain_anchor": "Cursed Anchor",
+      "ghost_captain_boarding": "Phantom Boarding",
+      "bastion_boathook": "Boathook Drag",
+      "bastion_fog_bank": "Fog Bank",
+      "bastion_brine_column": "Brine Column",
+      "bastion_loose_on_my_mark": "Loose on My Mark",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn",
+      "bastion_iron_cage": "Iron Cage",
+      "bastion_drowned_anchor_cast": "Drowned Anchor",
+      "bastion_shackle_pair": "Shackle Pair",
+      "bastion_shadowstep": "Shadow Crossing",
+      "bastion_reaping_scythe": "Reaping Scythe",
+      "bastion_veil_rise": "Fog Veil",
+      "bastion_veil_gather": "Gathering Fog",
+      "bastion_vael_rise": "Death Rises",
+      "bastion_vael_sink": "Into the Fog",
+      "bastion_hallowed_brine": "Hallowed Brine",
+      "bastion_rebounding_bulwark": "Rebounding Bulwark",
+      "bastion_tide_sentence": "Sentence of the Tide",
+      "bastion_oath_kneel": "Unbroken Oath",
+      "bastion_oath_vigil": "Unbroken Oath",
+      "temple_lullaby": "Lullaby",
+      "cantor_last_verse": "The Last Verse",
+      "temple_call_the_tide": "Call the Tide",
+      "temple_static_coil": "Static Coil",
+      "temple_snapper_snap": "Snap",
+      "temple_trident_sweep": "Trident Sweep",
+      "temple_sea_song": "Sea-Song",
+      "temple_tidal_slap": "Tidal Slap",
+      "temple_tide_breath": "Freezing Breath",
+      "temple_moonlight_lance": "Moonlight Lance",
+      "temple_prism_flare": "Prism Flare",
+      "temple_resonant_slam": "Resonant Slam",
+      "temple_moonwater_bolt": "Moonwater Bolt",
+      "temple_drowning_aria": "Drowning Aria",
+      "temple_mere_surge": "Mere Surge",
+      "temple_tideglass_fracture": "Tideglass Fracture",
+      "temple_undertow": "Undertow",
+      "temple_lunar_tide": "Lunar Tide",
+      "temple_skewering_trident": "Skewering Trident",
+      "temple_pale_mending": "Pale Mending",
+      "temple_glimmer_venom": "Glimmer Venom",
+      "temple_pearl_slam": "Tidal Wingbeat",
+      "temple_lightning_spit": "Lightning Spit",
+      "temple_crushing_torrent": "Crushing Torrent",
+      "temple_hydra_tsunami": "Tsunami",
+      "temple_ysolei_call": "Moonspawn Call",
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "temple_frostlocked_torrent": "Frostlocked Torrent",
+      "temple_venom_current": "Venom Current",
+      "temple_toxic_rime": "Toxic Rime",
+      "temple_beckoning_moon": "Beckoning Moon",
+      "temple_falling_moon": "Falling Moon",
+      "temple_prism_glare": "Prism Glare",
+      "temple_arcing_spark": "Arcing Spark",
+      "temple_call_of_the_shallows": "Call of the Shallows",
+      "wildheart_ancestral_sap": "Ancestral Sap",
+      "wildheart_plant_totem": "Plant Totem",
+      "wildheart_entangling_lash": "Entangling Lash",
+      "wildheart_saurian_tail_swipe": "Tail Swipe",
+      "wildheart_saurian_stomp": "Earthshaking Stomp",
+      "wildheart_quarry_mark": "Quarry Mark",
+      "wildheart_war_roar": "War Roar",
+      "wildheart_toad_hex": "Toad Hex",
+      "wildheart_rattling_dread": "Rattling Dread",
+      "wildheart_snaring_tongue": "Snaring Tongue",
+      "wildheart_beast_pit_quake": "Beast Pit Quake",
+      "wildheart_jaguar_heel": "Heel!",
+      "wildheart_gorgebloom_seed_rain": "Seed Rain",
+      "wildheart_gorgebloom_vine_lash": "Vine Lash",
+      "wildheart_gorgebloom_gorge": "Gorge",
+      "wildheart_zulgar_pulse": "Wildheart Pulse",
+      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt",
+      "sanctum_cinder_breath": "Cinder Breath",
+      "sanctum_warming_rite": "Warming Rite",
+      "sanctum_goad": "Goad",
+      "sanctum_plant_brazier": "Plant Soul Brazier",
+      "sanctum_ice_block_toss": "Ice Block Toss",
+      "sanctum_tusker_tusk_sweep": "Tusk Sweep",
+      "sanctum_tusker_trample": "Trample",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "Counterweight Lash",
+      "sanctum_branding_iron": "Branding Iron",
+      "sanctum_rime_breath": "Rime Breath",
+      "kituse_sanctum_topple_brazier": "Topple Brazier",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
+      "sanctum_korgath_maul_arc": "Maul Arc",
+      "sanctum_korgath_chain_flail": "Chain Flail",
+      "sanctum_korgath_threshold_charge": "Threshold Charge",
+      "sanctum_korgath_foremans_bellow": "Foreman's Bellow",
+      "sanctum_korgath_strain": "Strain",
+      "sanctum_korgath_stomp": "Shuddering Stomp",
+      "sanctum_goadsmith_rerivet": "Re-rivet",
+      "sanctum_velkhar_soulfire_trench": "Soulfire Trench",
+      "sanctum_velkhar_shadow_volley": "Shadow Volley",
+      "sanctum_korzul_break_free": "Break Free",
+      "sanctum_korzul_grave_breath": "Grave Breath",
+      "sanctum_korzul_tail_sweep": "Tail Sweep",
+      "sanctum_korzul_grave_inferno": "Grave Inferno",
+      "sanctum_korzul_wing_gale": "Wing Gale",
+      "sanctum_korzul_plunging_fire": "Plunging Fire",
+      "sanctum_korzul_crashing_descent": "Crashing Descent"
     }
   },
   "questUi": {
@@ -12309,6 +15165,8 @@ export const vi_VN: EnTranslations = {
       "rewards": "Phần Thưởng",
       "xpReward": "{xp} kinh nghiệm",
       "itemReward": "Vật phẩm thưởng:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Yêu Cầu Cấp {level}"
     },
@@ -12686,6 +15544,7 @@ export const vi_VN: EnTranslations = {
       "incomplete": "Nhiệm vụ đó chưa hoàn thành.",
       "giverMissing": "Người giao nhiệm vụ không ở gần đây.",
       "turnInMissing": "Nơi nộp nhiệm vụ không ở gần đây.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Quá xa.",
       "escortAway": "Người bạn cần hộ tống hiện không có ở đó. Họ sẽ trở lại sớm."
     }
@@ -12737,7 +15596,9 @@ export const vi_VN: EnTranslations = {
       "flask": "Bình thuốc",
       "scroll": "Cuộn giấy",
       "bag": "Túi",
-      "mount": "Thú Cưỡi"
+      "mount": "Thú Cưỡi",
+      "buddy": "Buddy",
+      "buddyCosmetic": "Buddy cosmetic"
     },
     "stats": {
       "armor": "Giáp",
@@ -12753,6 +15614,17 @@ export const vi_VN: EnTranslations = {
       "parry": "Đỡ Đòn"
     },
     "tooltip": {
+      "referralFullSet": "Equip all {pieces} friendship armor pieces to gain {percent}% more experience while in a party with {member}. Their membership must be active.",
+      "referralInviter": "the member who invited you",
+      "referralRetained": "Armor stats keep scaling even when you are not in a party with your inviter.",
+      "referralDormant": "Inactive: this account has not received friendship armor through a member referral.",
+      "membershipToken": "Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.",
+      "membershipAdaptive": "Stats and armor adapt to your class and specialization.",
+      "membershipScaling": "Item level matches your level. At level 20, this armor perfects at item level 25.",
+      "membershipPerfected": "Perfected: item level {level}.",
+      "membershipFullSet": "Equip all {pieces} membership armor pieces to gain {percent}% more experience. Requires an active membership.",
+      "membershipRequired": "Armor stats and set benefits stop when membership expires and return when you renew.",
+      "membershipDormant": "Inactive: renew your membership to restore armor stats and set benefits.",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Đang trang bị",
       "ifYouEquip": "Nếu bạn trang bị món này",
@@ -13052,6 +15924,10 @@ export const vi_VN: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "Courier",
+        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. It flies at 250% of normal running speed. Choose up to 24 stacks per trip. Membership is required to start a new trip."
+      },
       "sport_kick": {
         "name": "Đá Bóng",
         "description": "Đẩy bóng lăn sệt trên mặt đất về phía điểm ngắm."
@@ -15829,6 +18705,30 @@ export const vi_VN: EnTranslations = {
       "fenshadow_maul": {
         "name": "Búa Bóng Đầm Lầy"
       },
+      "foremans_barrowmaul": {
+        "name": "Búa Gò Mộ của Đốc Công"
+      },
+      "skerrits_shardpike": {
+        "name": "Giáo Mảnh của Skerrit"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Giáp Vai Gò Mộ"
+      },
+      "mirestone_stride": {
+        "name": "Bước Đá Đầm Lầy"
+      },
+      "foremans_wage_band": {
+        "name": "Nhẫn Tiền Công của Đốc Công"
+      },
+      "mirelight_locket": {
+        "name": "Mặt Dây Ánh Đầm Lầy"
+      },
+      "fenwright_grips": {
+        "name": "Bao Tay Thợ Đầm Lầy"
+      },
       "wildgrove_cinch": {
         "name": "Đai Lưng Rừng Hoang"
       },
@@ -16878,6 +19778,114 @@ export const vi_VN: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Đá Từ Trần"
+      },
+      "whistle_ember_fox": {
+        "name": "Ember Fox Whistle"
+      },
+      "whistle_moss_hare": {
+        "name": "Moss Hare Whistle"
+      },
+      "whistle_frog": {
+        "name": "Frog Whistle"
+      },
+      "whistle_crimson_claw_crab": {
+        "name": "Crimson Claw Crab Whistle"
+      },
+      "whistle_golden_sentinel": {
+        "name": "Golden Sentinel Whistle"
+      },
+      "whistle_nightfang": {
+        "name": "Nightfang Whistle"
+      },
+      "whistle_tuskhorn_boar": {
+        "name": "Tuskhorn Boar Whistle"
+      },
+      "whistle_emerald_wolf": {
+        "name": "Emerald Wolf Whistle"
+      },
+      "whistle_tiger": {
+        "name": "Tiger Whistle"
+      },
+      "whistle_cate_coin": {
+        "name": "Cate Coin Whistle"
+      },
+      "whistle_alon": {
+        "name": "Alon Whistle"
+      },
+      "whistle_trollface": {
+        "name": "Trollface Whistle"
+      },
+      "whistle_ansem": {
+        "name": "Ansem Whistle"
+      },
+      "whistle_triple_t": {
+        "name": "Triple T Whistle"
+      },
+      "whistle_kekius": {
+        "name": "Kekius Whistle"
+      },
+      "whistle_solbot": {
+        "name": "Solbot Whistle"
+      },
+      "whistle_frostfire": {
+        "name": "Frostfire Whistle"
+      },
+      "whistle_rocky": {
+        "name": "Rocky Whistle"
+      },
+      "whistle_proud_grunt": {
+        "name": "Proud Grunt Whistle"
+      },
+      "whistle_loot_goblin": {
+        "name": "Loot Goblin Whistle"
+      },
+      "whistle_penny_goldspark": {
+        "name": "Penny Goldspark Whistle"
+      },
+      "whistle_stag": {
+        "name": "Stag Whistle"
+      },
+      "whistle_alpaca": {
+        "name": "Alpaca Whistle"
+      },
+      "whistle_horse": {
+        "name": "Horse Whistle"
+      },
+      "whistle_sapling": {
+        "name": "Sapling Whistle"
+      },
+      "whistle_bull": {
+        "name": "Bull Whistle"
+      },
+      "whistle_spider": {
+        "name": "Spider Whistle"
+      },
+      "whistle_raptor": {
+        "name": "Raptor Whistle"
+      },
+      "whistle_skeleton": {
+        "name": "Skeleton Whistle"
+      },
+      "whistle_crystal_lich": {
+        "name": "Crystal Lich Whistle"
+      },
+      "whistle_forgemaw": {
+        "name": "Forgemaw The Molten Whistle"
+      },
+      "whistle_crystal_tide": {
+        "name": "Crystal Tide Whistle"
+      },
+      "whistle_phantom": {
+        "name": "Phantom Whistle"
+      },
+      "whistle_emberfall_phoenix": {
+        "name": "Emberfall Phoenix Whistle"
+      },
+      "charm_stag_acorn": {
+        "name": "Acorn Crown Charm"
+      },
+      "charm_stag_gilded": {
+        "name": "Gilded Charm"
       },
       "lastflame_core": {
         "name": "Lõi Ngọn Lửa Cuối Cùng"
@@ -18451,6 +21459,1521 @@ export const vi_VN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Trượng Chiến Vanguard"
       },
+      "brookwatch_robe": {
+        "name": "Brookwatch Robe"
+      },
+      "brookwatch_leggings": {
+        "name": "Brookwatch Leggings"
+      },
+      "brookwatch_slippers": {
+        "name": "Brookwatch Slippers"
+      },
+      "brookwatch_hood": {
+        "name": "Brookwatch Hood"
+      },
+      "brookwatch_gloves": {
+        "name": "Brookwatch Gloves"
+      },
+      "brookwatch_mantle": {
+        "name": "Brookwatch Mantle"
+      },
+      "brookwatch_sash": {
+        "name": "Brookwatch Sash"
+      },
+      "brookwatch_jerkin": {
+        "name": "Brookwatch Jerkin"
+      },
+      "brookwatch_breeches": {
+        "name": "Brookwatch Breeches"
+      },
+      "brookwatch_boots": {
+        "name": "Brookwatch Boots"
+      },
+      "brookwatch_cap": {
+        "name": "Brookwatch Cap"
+      },
+      "brookwatch_grips": {
+        "name": "Brookwatch Grips"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "Brookwatch Shoulderpads"
+      },
+      "brookwatch_belt": {
+        "name": "Brookwatch Belt"
+      },
+      "brookwatch_hauberk": {
+        "name": "Brookwatch Hauberk"
+      },
+      "brookwatch_legguards": {
+        "name": "Brookwatch Legguards"
+      },
+      "brookwatch_sabatons": {
+        "name": "Brookwatch Sabatons"
+      },
+      "brookwatch_helm": {
+        "name": "Brookwatch Helm"
+      },
+      "brookwatch_gauntlets": {
+        "name": "Brookwatch Gauntlets"
+      },
+      "brookwatch_pauldrons": {
+        "name": "Brookwatch Pauldrons"
+      },
+      "brookwatch_girdle": {
+        "name": "Brookwatch Girdle"
+      },
+      "brookwatch_chainmail": {
+        "name": "Brookwatch Chainmail"
+      },
+      "brookwatch_chausses": {
+        "name": "Brookwatch Chausses"
+      },
+      "brookwatch_greaves": {
+        "name": "Brookwatch Greaves"
+      },
+      "brookwatch_coif": {
+        "name": "Brookwatch Coif"
+      },
+      "brookwatch_handguards": {
+        "name": "Brookwatch Handguards"
+      },
+      "brookwatch_spaulders": {
+        "name": "Brookwatch Spaulders"
+      },
+      "brookwatch_cord": {
+        "name": "Brookwatch Cord"
+      },
+      "hedgerow_robe": {
+        "name": "Hedgerow Robe"
+      },
+      "hedgerow_leggings": {
+        "name": "Hedgerow Leggings"
+      },
+      "hedgerow_slippers": {
+        "name": "Hedgerow Slippers"
+      },
+      "hedgerow_hood": {
+        "name": "Hedgerow Hood"
+      },
+      "hedgerow_gloves": {
+        "name": "Hedgerow Gloves"
+      },
+      "hedgerow_mantle": {
+        "name": "Hedgerow Mantle"
+      },
+      "hedgerow_sash": {
+        "name": "Hedgerow Sash"
+      },
+      "hedgerow_jerkin": {
+        "name": "Hedgerow Jerkin"
+      },
+      "hedgerow_breeches": {
+        "name": "Hedgerow Breeches"
+      },
+      "hedgerow_boots": {
+        "name": "Hedgerow Boots"
+      },
+      "hedgerow_cap": {
+        "name": "Hedgerow Cap"
+      },
+      "hedgerow_grips": {
+        "name": "Hedgerow Grips"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "Hedgerow Shoulderpads"
+      },
+      "hedgerow_belt": {
+        "name": "Hedgerow Belt"
+      },
+      "hedgerow_hauberk": {
+        "name": "Hedgerow Hauberk"
+      },
+      "hedgerow_legguards": {
+        "name": "Hedgerow Legguards"
+      },
+      "hedgerow_sabatons": {
+        "name": "Hedgerow Sabatons"
+      },
+      "hedgerow_helm": {
+        "name": "Hedgerow Helm"
+      },
+      "hedgerow_gauntlets": {
+        "name": "Hedgerow Gauntlets"
+      },
+      "hedgerow_pauldrons": {
+        "name": "Hedgerow Pauldrons"
+      },
+      "hedgerow_girdle": {
+        "name": "Hedgerow Girdle"
+      },
+      "hedgerow_chainmail": {
+        "name": "Hedgerow Chainmail"
+      },
+      "hedgerow_chausses": {
+        "name": "Hedgerow Chausses"
+      },
+      "hedgerow_greaves": {
+        "name": "Hedgerow Greaves"
+      },
+      "hedgerow_coif": {
+        "name": "Hedgerow Coif"
+      },
+      "hedgerow_handguards": {
+        "name": "Hedgerow Handguards"
+      },
+      "hedgerow_spaulders": {
+        "name": "Hedgerow Spaulders"
+      },
+      "hedgerow_cord": {
+        "name": "Hedgerow Cord"
+      },
+      "bogwalker_robe": {
+        "name": "Bogwalker Robe"
+      },
+      "bogwalker_leggings": {
+        "name": "Bogwalker Leggings"
+      },
+      "bogwalker_slippers": {
+        "name": "Bogwalker Slippers"
+      },
+      "bogwalker_hood": {
+        "name": "Bogwalker Hood"
+      },
+      "bogwalker_gloves": {
+        "name": "Bogwalker Gloves"
+      },
+      "bogwalker_mantle": {
+        "name": "Bogwalker Mantle"
+      },
+      "bogwalker_sash": {
+        "name": "Bogwalker Sash"
+      },
+      "bogwalker_jerkin": {
+        "name": "Bogwalker Jerkin"
+      },
+      "bogwalker_breeches": {
+        "name": "Bogwalker Breeches"
+      },
+      "bogwalker_boots": {
+        "name": "Bogwalker Boots"
+      },
+      "bogwalker_cap": {
+        "name": "Bogwalker Cap"
+      },
+      "bogwalker_grips": {
+        "name": "Bogwalker Grips"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "Bogwalker Shoulderpads"
+      },
+      "bogwalker_belt": {
+        "name": "Bogwalker Belt"
+      },
+      "bogwalker_hauberk": {
+        "name": "Bogwalker Hauberk"
+      },
+      "bogwalker_legguards": {
+        "name": "Bogwalker Legguards"
+      },
+      "bogwalker_sabatons": {
+        "name": "Bogwalker Sabatons"
+      },
+      "bogwalker_helm": {
+        "name": "Bogwalker Helm"
+      },
+      "bogwalker_gauntlets": {
+        "name": "Bogwalker Gauntlets"
+      },
+      "bogwalker_pauldrons": {
+        "name": "Bogwalker Pauldrons"
+      },
+      "bogwalker_girdle": {
+        "name": "Bogwalker Girdle"
+      },
+      "bogwalker_chainmail": {
+        "name": "Bogwalker Chainmail"
+      },
+      "bogwalker_chausses": {
+        "name": "Bogwalker Chausses"
+      },
+      "bogwalker_greaves": {
+        "name": "Bogwalker Greaves"
+      },
+      "bogwalker_coif": {
+        "name": "Bogwalker Coif"
+      },
+      "bogwalker_handguards": {
+        "name": "Bogwalker Handguards"
+      },
+      "bogwalker_spaulders": {
+        "name": "Bogwalker Spaulders"
+      },
+      "bogwalker_cord": {
+        "name": "Bogwalker Cord"
+      },
+      "thornspire_robe": {
+        "name": "Thornspire Robe"
+      },
+      "thornspire_leggings": {
+        "name": "Thornspire Leggings"
+      },
+      "thornspire_slippers": {
+        "name": "Thornspire Slippers"
+      },
+      "thornspire_hood": {
+        "name": "Thornspire Hood"
+      },
+      "thornspire_gloves": {
+        "name": "Thornspire Gloves"
+      },
+      "thornspire_mantle": {
+        "name": "Thornspire Mantle"
+      },
+      "thornspire_sash": {
+        "name": "Thornspire Sash"
+      },
+      "thornspire_jerkin": {
+        "name": "Thornspire Jerkin"
+      },
+      "thornspire_breeches": {
+        "name": "Thornspire Breeches"
+      },
+      "thornspire_boots": {
+        "name": "Thornspire Boots"
+      },
+      "thornspire_cap": {
+        "name": "Thornspire Cap"
+      },
+      "thornspire_grips": {
+        "name": "Thornspire Grips"
+      },
+      "thornspire_shoulderpads": {
+        "name": "Thornspire Shoulderpads"
+      },
+      "thornspire_belt": {
+        "name": "Thornspire Belt"
+      },
+      "thornspire_hauberk": {
+        "name": "Thornspire Hauberk"
+      },
+      "thornspire_legguards": {
+        "name": "Thornspire Legguards"
+      },
+      "thornspire_sabatons": {
+        "name": "Thornspire Sabatons"
+      },
+      "thornspire_helm": {
+        "name": "Thornspire Helm"
+      },
+      "thornspire_gauntlets": {
+        "name": "Thornspire Gauntlets"
+      },
+      "thornspire_pauldrons": {
+        "name": "Thornspire Pauldrons"
+      },
+      "thornspire_girdle": {
+        "name": "Thornspire Girdle"
+      },
+      "thornspire_chainmail": {
+        "name": "Thornspire Chainmail"
+      },
+      "thornspire_chausses": {
+        "name": "Thornspire Chausses"
+      },
+      "thornspire_greaves": {
+        "name": "Thornspire Greaves"
+      },
+      "thornspire_coif": {
+        "name": "Thornspire Coif"
+      },
+      "thornspire_handguards": {
+        "name": "Thornspire Handguards"
+      },
+      "thornspire_spaulders": {
+        "name": "Thornspire Spaulders"
+      },
+      "thornspire_cord": {
+        "name": "Thornspire Cord"
+      },
+      "hollowveil_robe": {
+        "name": "Hollowveil Robe"
+      },
+      "hollowveil_leggings": {
+        "name": "Hollowveil Leggings"
+      },
+      "hollowveil_slippers": {
+        "name": "Hollowveil Slippers"
+      },
+      "hollowveil_hood": {
+        "name": "Hollowveil Hood"
+      },
+      "hollowveil_gloves": {
+        "name": "Hollowveil Gloves"
+      },
+      "hollowveil_mantle": {
+        "name": "Hollowveil Mantle"
+      },
+      "hollowveil_sash": {
+        "name": "Hollowveil Sash"
+      },
+      "hollowveil_jerkin": {
+        "name": "Hollowveil Jerkin"
+      },
+      "hollowveil_breeches": {
+        "name": "Hollowveil Breeches"
+      },
+      "hollowveil_boots": {
+        "name": "Hollowveil Boots"
+      },
+      "hollowveil_cap": {
+        "name": "Hollowveil Cap"
+      },
+      "hollowveil_grips": {
+        "name": "Hollowveil Grips"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "Hollowveil Shoulderpads"
+      },
+      "hollowveil_belt": {
+        "name": "Hollowveil Belt"
+      },
+      "hollowveil_hauberk": {
+        "name": "Hollowveil Hauberk"
+      },
+      "hollowveil_legguards": {
+        "name": "Hollowveil Legguards"
+      },
+      "hollowveil_sabatons": {
+        "name": "Hollowveil Sabatons"
+      },
+      "hollowveil_helm": {
+        "name": "Hollowveil Helm"
+      },
+      "hollowveil_gauntlets": {
+        "name": "Hollowveil Gauntlets"
+      },
+      "hollowveil_pauldrons": {
+        "name": "Hollowveil Pauldrons"
+      },
+      "hollowveil_girdle": {
+        "name": "Hollowveil Girdle"
+      },
+      "hollowveil_chainmail": {
+        "name": "Hollowveil Chainmail"
+      },
+      "hollowveil_chausses": {
+        "name": "Hollowveil Chausses"
+      },
+      "hollowveil_greaves": {
+        "name": "Hollowveil Greaves"
+      },
+      "hollowveil_coif": {
+        "name": "Hollowveil Coif"
+      },
+      "hollowveil_handguards": {
+        "name": "Hollowveil Handguards"
+      },
+      "hollowveil_spaulders": {
+        "name": "Hollowveil Spaulders"
+      },
+      "hollowveil_cord": {
+        "name": "Hollowveil Cord"
+      },
+      "trailwarden_robe": {
+        "name": "Trailwarden Robe"
+      },
+      "trailwarden_leggings": {
+        "name": "Trailwarden Leggings"
+      },
+      "trailwarden_slippers": {
+        "name": "Trailwarden Slippers"
+      },
+      "trailwarden_hood": {
+        "name": "Trailwarden Hood"
+      },
+      "trailwarden_gloves": {
+        "name": "Trailwarden Gloves"
+      },
+      "trailwarden_mantle": {
+        "name": "Trailwarden Mantle"
+      },
+      "trailwarden_sash": {
+        "name": "Trailwarden Sash"
+      },
+      "trailwarden_jerkin": {
+        "name": "Trailwarden Jerkin"
+      },
+      "trailwarden_breeches": {
+        "name": "Trailwarden Breeches"
+      },
+      "trailwarden_boots": {
+        "name": "Trailwarden Boots"
+      },
+      "trailwarden_cap": {
+        "name": "Trailwarden Cap"
+      },
+      "trailwarden_grips": {
+        "name": "Trailwarden Grips"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "Trailwarden Shoulderpads"
+      },
+      "trailwarden_belt": {
+        "name": "Trailwarden Belt"
+      },
+      "trailwarden_hauberk": {
+        "name": "Trailwarden Hauberk"
+      },
+      "trailwarden_legguards": {
+        "name": "Trailwarden Legguards"
+      },
+      "trailwarden_sabatons": {
+        "name": "Trailwarden Sabatons"
+      },
+      "trailwarden_helm": {
+        "name": "Trailwarden Helm"
+      },
+      "trailwarden_gauntlets": {
+        "name": "Trailwarden Gauntlets"
+      },
+      "trailwarden_pauldrons": {
+        "name": "Trailwarden Pauldrons"
+      },
+      "trailwarden_girdle": {
+        "name": "Trailwarden Girdle"
+      },
+      "trailwarden_chainmail": {
+        "name": "Trailwarden Chainmail"
+      },
+      "trailwarden_chausses": {
+        "name": "Trailwarden Chausses"
+      },
+      "trailwarden_greaves": {
+        "name": "Trailwarden Greaves"
+      },
+      "trailwarden_coif": {
+        "name": "Trailwarden Coif"
+      },
+      "trailwarden_handguards": {
+        "name": "Trailwarden Handguards"
+      },
+      "trailwarden_spaulders": {
+        "name": "Trailwarden Spaulders"
+      },
+      "trailwarden_cord": {
+        "name": "Trailwarden Cord"
+      },
+      "highgale_robe": {
+        "name": "Highgale Robe"
+      },
+      "highgale_leggings": {
+        "name": "Highgale Leggings"
+      },
+      "highgale_slippers": {
+        "name": "Highgale Slippers"
+      },
+      "highgale_hood": {
+        "name": "Highgale Hood"
+      },
+      "highgale_gloves": {
+        "name": "Highgale Gloves"
+      },
+      "highgale_mantle": {
+        "name": "Highgale Mantle"
+      },
+      "highgale_sash": {
+        "name": "Highgale Sash"
+      },
+      "highgale_jerkin": {
+        "name": "Highgale Jerkin"
+      },
+      "highgale_breeches": {
+        "name": "Highgale Breeches"
+      },
+      "highgale_boots": {
+        "name": "Highgale Boots"
+      },
+      "highgale_cap": {
+        "name": "Highgale Cap"
+      },
+      "highgale_grips": {
+        "name": "Highgale Grips"
+      },
+      "highgale_shoulderpads": {
+        "name": "Highgale Shoulderpads"
+      },
+      "highgale_belt": {
+        "name": "Highgale Belt"
+      },
+      "highgale_hauberk": {
+        "name": "Highgale Hauberk"
+      },
+      "highgale_legguards": {
+        "name": "Highgale Legguards"
+      },
+      "highgale_sabatons": {
+        "name": "Highgale Sabatons"
+      },
+      "highgale_helm": {
+        "name": "Highgale Helm"
+      },
+      "highgale_gauntlets": {
+        "name": "Highgale Gauntlets"
+      },
+      "highgale_pauldrons": {
+        "name": "Highgale Pauldrons"
+      },
+      "highgale_girdle": {
+        "name": "Highgale Girdle"
+      },
+      "highgale_chainmail": {
+        "name": "Highgale Chainmail"
+      },
+      "highgale_chausses": {
+        "name": "Highgale Chausses"
+      },
+      "highgale_greaves": {
+        "name": "Highgale Greaves"
+      },
+      "brookwatch_tunic": {
+        "name": "Brookwatch Tunic"
+      },
+      "brookwatch_legwraps": {
+        "name": "Brookwatch Legwraps"
+      },
+      "brookwatch_treads": {
+        "name": "Brookwatch Treads"
+      },
+      "brookwatch_headguard": {
+        "name": "Brookwatch Headguard"
+      },
+      "brookwatch_handwraps": {
+        "name": "Brookwatch Handwraps"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "Brookwatch Shoulderguards"
+      },
+      "brookwatch_waistguard": {
+        "name": "Brookwatch Waistguard"
+      },
+      "hedgerow_tunic": {
+        "name": "Hedgerow Tunic"
+      },
+      "hedgerow_legwraps": {
+        "name": "Hedgerow Legwraps"
+      },
+      "hedgerow_treads": {
+        "name": "Hedgerow Treads"
+      },
+      "hedgerow_headguard": {
+        "name": "Hedgerow Headguard"
+      },
+      "hedgerow_handwraps": {
+        "name": "Hedgerow Handwraps"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "Hedgerow Shoulderguards"
+      },
+      "hedgerow_waistguard": {
+        "name": "Hedgerow Waistguard"
+      },
+      "bogwalker_tunic": {
+        "name": "Bogwalker Tunic"
+      },
+      "bogwalker_legwraps": {
+        "name": "Bogwalker Legwraps"
+      },
+      "bogwalker_treads": {
+        "name": "Bogwalker Treads"
+      },
+      "bogwalker_headguard": {
+        "name": "Bogwalker Headguard"
+      },
+      "bogwalker_handwraps": {
+        "name": "Bogwalker Handwraps"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "Bogwalker Shoulderguards"
+      },
+      "bogwalker_waistguard": {
+        "name": "Bogwalker Waistguard"
+      },
+      "thornspire_tunic": {
+        "name": "Thornspire Tunic"
+      },
+      "thornspire_legwraps": {
+        "name": "Thornspire Legwraps"
+      },
+      "thornspire_treads": {
+        "name": "Thornspire Treads"
+      },
+      "thornspire_headguard": {
+        "name": "Thornspire Headguard"
+      },
+      "thornspire_handwraps": {
+        "name": "Thornspire Handwraps"
+      },
+      "thornspire_shoulderguards": {
+        "name": "Thornspire Shoulderguards"
+      },
+      "thornspire_waistguard": {
+        "name": "Thornspire Waistguard"
+      },
+      "hollowveil_tunic": {
+        "name": "Hollowveil Tunic"
+      },
+      "hollowveil_legwraps": {
+        "name": "Hollowveil Legwraps"
+      },
+      "hollowveil_treads": {
+        "name": "Hollowveil Treads"
+      },
+      "hollowveil_headguard": {
+        "name": "Hollowveil Headguard"
+      },
+      "hollowveil_handwraps": {
+        "name": "Hollowveil Handwraps"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "Hollowveil Shoulderguards"
+      },
+      "hollowveil_waistguard": {
+        "name": "Hollowveil Waistguard"
+      },
+      "trailwarden_tunic": {
+        "name": "Trailwarden Tunic"
+      },
+      "trailwarden_legwraps": {
+        "name": "Trailwarden Legwraps"
+      },
+      "trailwarden_treads": {
+        "name": "Trailwarden Treads"
+      },
+      "trailwarden_headguard": {
+        "name": "Trailwarden Headguard"
+      },
+      "trailwarden_handwraps": {
+        "name": "Trailwarden Handwraps"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "Trailwarden Shoulderguards"
+      },
+      "trailwarden_waistguard": {
+        "name": "Trailwarden Waistguard"
+      },
+      "highgale_tunic": {
+        "name": "Highgale Tunic"
+      },
+      "highgale_legwraps": {
+        "name": "Highgale Legwraps"
+      },
+      "highgale_treads": {
+        "name": "Highgale Treads"
+      },
+      "highgale_headguard": {
+        "name": "Highgale Headguard"
+      },
+      "highgale_handwraps": {
+        "name": "Highgale Handwraps"
+      },
+      "highgale_shoulderguards": {
+        "name": "Highgale Shoulderguards"
+      },
+      "highgale_waistguard": {
+        "name": "Highgale Waistguard"
+      },
+      "highgale_coif": {
+        "name": "Highgale Coif"
+      },
+      "highgale_handguards": {
+        "name": "Highgale Handguards"
+      },
+      "highgale_spaulders": {
+        "name": "Highgale Spaulders"
+      },
+      "highgale_cord": {
+        "name": "Highgale Cord"
+      },
+      "breakwater_mantle": {
+        "name": "Breakwater Mantle"
+      },
+      "breakwater_shoulderpads": {
+        "name": "Breakwater Shoulderpads"
+      },
+      "breakwater_spaulders": {
+        "name": "Breakwater Spaulders"
+      },
+      "gravebell_treads": {
+        "name": "Gravebell Treads"
+      },
+      "gravebell_greaves": {
+        "name": "Gravebell Greaves"
+      },
+      "cryptbound_tunic": {
+        "name": "Cryptbound Tunic"
+      },
+      "cryptbound_chainmail": {
+        "name": "Cryptbound Chainmail"
+      },
+      "oathbroken_leggings": {
+        "name": "Oathbroken Leggings"
+      },
+      "oathbroken_breeches": {
+        "name": "Oathbroken Breeches"
+      },
+      "oathbroken_legwraps": {
+        "name": "Oathbroken Legwraps"
+      },
+      "oathbroken_legguards": {
+        "name": "Oathbroken Legguards"
+      },
+      "oathbroken_chausses": {
+        "name": "Oathbroken Chausses"
+      },
+      "seamist_legwraps": {
+        "name": "Seamist Legwraps"
+      },
+      "seamist_chausses": {
+        "name": "Seamist Chausses"
+      },
+      "warmonger_treads": {
+        "name": "Warmonger Treads"
+      },
+      "warmonger_greaves": {
+        "name": "Warmonger Greaves"
+      },
+      "sparkglass_leggings": {
+        "name": "Sparkglass Leggings"
+      },
+      "sparkglass_breeches": {
+        "name": "Sparkglass Breeches"
+      },
+      "sparkglass_legwraps": {
+        "name": "Sparkglass Legwraps"
+      },
+      "sparkglass_legguards": {
+        "name": "Sparkglass Legguards"
+      },
+      "sparkglass_chausses": {
+        "name": "Sparkglass Chausses"
+      },
+      "stillhymn_treads": {
+        "name": "Stillhymn Treads"
+      },
+      "stillhymn_greaves": {
+        "name": "Stillhymn Greaves"
+      },
+      "pearlglow_headguard": {
+        "name": "Pearlglow Headguard"
+      },
+      "pearlglow_coif": {
+        "name": "Pearlglow Coif"
+      },
+      "sealkeeper_gloves": {
+        "name": "Sealkeeper Gloves"
+      },
+      "sealkeeper_grips": {
+        "name": "Sealkeeper Grips"
+      },
+      "sealkeeper_handwraps": {
+        "name": "Sealkeeper Handwraps"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "Sealkeeper Gauntlets"
+      },
+      "sealkeeper_handguards": {
+        "name": "Sealkeeper Handguards"
+      },
+      "fetterbound_leggings": {
+        "name": "Fetterbound Leggings"
+      },
+      "fetterbound_breeches": {
+        "name": "Fetterbound Breeches"
+      },
+      "fetterbound_legwraps": {
+        "name": "Fetterbound Legwraps"
+      },
+      "fetterbound_legguards": {
+        "name": "Fetterbound Legguards"
+      },
+      "fetterbound_chausses": {
+        "name": "Fetterbound Chausses"
+      },
+      "shroudcaller_tunic": {
+        "name": "Shroudcaller Tunic"
+      },
+      "shroudcaller_chainmail": {
+        "name": "Shroudcaller Chainmail"
+      },
+      "wyrmshadow_tunic": {
+        "name": "Wyrmshadow Tunic"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "Wyrmshadow Chainmail"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "Cinderbrood Shoulderpads"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "Cinderbrood Shoulderguards"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "Cinderbrood Pauldrons"
+      },
+      "hoarfrost_mantle": {
+        "name": "Hoarfrost Mantle"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "Hoarfrost Shoulderpads"
+      },
+      "hoarfrost_spaulders": {
+        "name": "Hoarfrost Spaulders"
+      },
+      "blackmere_mantle": {
+        "name": "Blackmere Mantle"
+      },
+      "blackmere_shoulderpads": {
+        "name": "Blackmere Shoulderpads"
+      },
+      "blackmere_shoulderguards": {
+        "name": "Blackmere Shoulderguards"
+      },
+      "blackmere_pauldrons": {
+        "name": "Blackmere Pauldrons"
+      },
+      "blackmere_spaulders": {
+        "name": "Blackmere Spaulders"
+      },
+      "reedhush_mantle": {
+        "name": "Reedhush Mantle"
+      },
+      "reedhush_shoulderpads": {
+        "name": "Reedhush Shoulderpads"
+      },
+      "reedhush_shoulderguards": {
+        "name": "Reedhush Shoulderguards"
+      },
+      "reedhush_pauldrons": {
+        "name": "Reedhush Pauldrons"
+      },
+      "reedhush_spaulders": {
+        "name": "Reedhush Spaulders"
+      },
+      "cairnking_mantle": {
+        "name": "Cairnking Mantle"
+      },
+      "cairnking_shoulderpads": {
+        "name": "Cairnking Shoulderpads"
+      },
+      "cairnking_shoulderguards": {
+        "name": "Cairnking Shoulderguards"
+      },
+      "cairnking_pauldrons": {
+        "name": "Cairnking Pauldrons"
+      },
+      "cairnking_spaulders": {
+        "name": "Cairnking Spaulders"
+      },
+      "palehunt_mantle": {
+        "name": "Palehunt Mantle"
+      },
+      "palehunt_shoulderpads": {
+        "name": "Palehunt Shoulderpads"
+      },
+      "palehunt_shoulderguards": {
+        "name": "Palehunt Shoulderguards"
+      },
+      "palehunt_pauldrons": {
+        "name": "Palehunt Pauldrons"
+      },
+      "palehunt_spaulders": {
+        "name": "Palehunt Spaulders"
+      },
+      "jadeshrine_mantle": {
+        "name": "Jadeshrine Mantle"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "Jadeshrine Shoulderpads"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "Jadeshrine Shoulderguards"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "Jadeshrine Pauldrons"
+      },
+      "jadeshrine_spaulders": {
+        "name": "Jadeshrine Spaulders"
+      },
+      "gildhedge_mantle": {
+        "name": "Gildhedge Mantle"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "Gildhedge Shoulderpads"
+      },
+      "gildhedge_spaulders": {
+        "name": "Gildhedge Spaulders"
+      },
+      "saltwrack_mantle": {
+        "name": "Saltwrack Mantle"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "Saltwrack Shoulderpads"
+      },
+      "saltwrack_spaulders": {
+        "name": "Saltwrack Spaulders"
+      },
+      "brookwatch_vest": {
+        "name": "Brookwatch Vest"
+      },
+      "brookwatch_trousers": {
+        "name": "Brookwatch Trousers"
+      },
+      "brookwatch_moccasins": {
+        "name": "Brookwatch Moccasins"
+      },
+      "brookwatch_cowl": {
+        "name": "Brookwatch Cowl"
+      },
+      "brookwatch_mitts": {
+        "name": "Brookwatch Mitts"
+      },
+      "brookwatch_epaulets": {
+        "name": "Brookwatch Epaulets"
+      },
+      "brookwatch_cinch": {
+        "name": "Brookwatch Cinch"
+      },
+      "hedgerow_vest": {
+        "name": "Hedgerow Vest"
+      },
+      "hedgerow_trousers": {
+        "name": "Hedgerow Trousers"
+      },
+      "hedgerow_moccasins": {
+        "name": "Hedgerow Moccasins"
+      },
+      "hedgerow_cowl": {
+        "name": "Hedgerow Cowl"
+      },
+      "hedgerow_mitts": {
+        "name": "Hedgerow Mitts"
+      },
+      "hedgerow_epaulets": {
+        "name": "Hedgerow Epaulets"
+      },
+      "hedgerow_cinch": {
+        "name": "Hedgerow Cinch"
+      },
+      "bogwalker_vest": {
+        "name": "Bogwalker Vest"
+      },
+      "bogwalker_trousers": {
+        "name": "Bogwalker Trousers"
+      },
+      "bogwalker_moccasins": {
+        "name": "Bogwalker Moccasins"
+      },
+      "bogwalker_cowl": {
+        "name": "Bogwalker Cowl"
+      },
+      "bogwalker_mitts": {
+        "name": "Bogwalker Mitts"
+      },
+      "bogwalker_epaulets": {
+        "name": "Bogwalker Epaulets"
+      },
+      "bogwalker_cinch": {
+        "name": "Bogwalker Cinch"
+      },
+      "thornspire_vest": {
+        "name": "Thornspire Vest"
+      },
+      "thornspire_trousers": {
+        "name": "Thornspire Trousers"
+      },
+      "thornspire_moccasins": {
+        "name": "Thornspire Moccasins"
+      },
+      "thornspire_cowl": {
+        "name": "Thornspire Cowl"
+      },
+      "thornspire_mitts": {
+        "name": "Thornspire Mitts"
+      },
+      "thornspire_epaulets": {
+        "name": "Thornspire Epaulets"
+      },
+      "thornspire_cinch": {
+        "name": "Thornspire Cinch"
+      },
+      "hollowveil_vest": {
+        "name": "Hollowveil Vest"
+      },
+      "hollowveil_trousers": {
+        "name": "Hollowveil Trousers"
+      },
+      "hollowveil_moccasins": {
+        "name": "Hollowveil Moccasins"
+      },
+      "hollowveil_cowl": {
+        "name": "Hollowveil Cowl"
+      },
+      "hollowveil_mitts": {
+        "name": "Hollowveil Mitts"
+      },
+      "hollowveil_epaulets": {
+        "name": "Hollowveil Epaulets"
+      },
+      "hollowveil_cinch": {
+        "name": "Hollowveil Cinch"
+      },
+      "trailwarden_vest": {
+        "name": "Trailwarden Vest"
+      },
+      "trailwarden_trousers": {
+        "name": "Trailwarden Trousers"
+      },
+      "trailwarden_moccasins": {
+        "name": "Trailwarden Moccasins"
+      },
+      "trailwarden_cowl": {
+        "name": "Trailwarden Cowl"
+      },
+      "trailwarden_mitts": {
+        "name": "Trailwarden Mitts"
+      },
+      "trailwarden_epaulets": {
+        "name": "Trailwarden Epaulets"
+      },
+      "trailwarden_cinch": {
+        "name": "Trailwarden Cinch"
+      },
+      "highgale_vest": {
+        "name": "Highgale Vest"
+      },
+      "highgale_trousers": {
+        "name": "Highgale Trousers"
+      },
+      "highgale_moccasins": {
+        "name": "Highgale Moccasins"
+      },
+      "highgale_cowl": {
+        "name": "Highgale Cowl"
+      },
+      "highgale_mitts": {
+        "name": "Highgale Mitts"
+      },
+      "highgale_epaulets": {
+        "name": "Highgale Epaulets"
+      },
+      "highgale_cinch": {
+        "name": "Highgale Cinch"
+      },
+      "breakwater_shoulderguards": {
+        "name": "Breakwater Shoulderguards"
+      },
+      "breakwater_pauldrons": {
+        "name": "Breakwater Pauldrons"
+      },
+      "breakwater_epaulets": {
+        "name": "Breakwater Epaulets"
+      },
+      "gravebell_moccasins": {
+        "name": "Gravebell Moccasins"
+      },
+      "oathbroken_trousers": {
+        "name": "Oathbroken Trousers"
+      },
+      "sparkglass_trousers": {
+        "name": "Sparkglass Trousers"
+      },
+      "stillhymn_moccasins": {
+        "name": "Stillhymn Moccasins"
+      },
+      "sealkeeper_mitts": {
+        "name": "Sealkeeper Mitts"
+      },
+      "fetterbound_trousers": {
+        "name": "Fetterbound Trousers"
+      },
+      "wyrmshadow_vest": {
+        "name": "Wyrmshadow Vest"
+      },
+      "cinderbrood_spaulders": {
+        "name": "Cinderbrood Spaulders"
+      },
+      "cinderbrood_epaulets": {
+        "name": "Cinderbrood Epaulets"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "Hoarfrost Shoulderguards"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "Hoarfrost Pauldrons"
+      },
+      "hoarfrost_epaulets": {
+        "name": "Hoarfrost Epaulets"
+      },
+      "blackmere_epaulets": {
+        "name": "Blackmere Epaulets"
+      },
+      "reedhush_epaulets": {
+        "name": "Reedhush Epaulets"
+      },
+      "cairnking_epaulets": {
+        "name": "Cairnking Epaulets"
+      },
+      "palehunt_epaulets": {
+        "name": "Palehunt Epaulets"
+      },
+      "jadeshrine_epaulets": {
+        "name": "Jadeshrine Epaulets"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "Gildhedge Shoulderguards"
+      },
+      "gildhedge_pauldrons": {
+        "name": "Gildhedge Pauldrons"
+      },
+      "gildhedge_epaulets": {
+        "name": "Gildhedge Epaulets"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "Saltwrack Shoulderguards"
+      },
+      "saltwrack_pauldrons": {
+        "name": "Saltwrack Pauldrons"
+      },
+      "saltwrack_epaulets": {
+        "name": "Saltwrack Epaulets"
+      },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
+      "gravedirt_treads": {
+        "name": "Gravedirt Treads"
+      },
+      "bellrope_girdle": {
+        "name": "Bellrope Girdle"
+      },
+      "sextons_spadehaft": {
+        "name": "Sexton's Spadehaft"
+      },
+      "rimesilk_mantle": {
+        "name": "Rimesilk Mantle"
+      },
+      "bonechill_carapace_vest": {
+        "name": "Bonechill Hauberk"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "Rime-Laced Leggings"
+      },
+      "rimeweb_fang": {
+        "name": "Bride's Icicle"
+      },
+      "cantors_cassock": {
+        "name": "Cantor's Cassock"
+      },
+      "choirward_leggings": {
+        "name": "Choirward Leggings"
+      },
+      "choristers_gloves": {
+        "name": "Chorister's Gloves"
+      },
+      "cantors_hymnal": {
+        "name": "Cantor's Hymnal"
+      },
+      "gravecallers_vestments": {
+        "name": "Gravecaller's Vestments"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "Unquiet Stalker's Hood"
+      },
+      "sextons_burial_spade": {
+        "name": "Sexton's Burial Spade"
+      },
+      "rimesilk_hood": {
+        "name": "Rimesilk Hood"
+      },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "Jailer's Iron Gauntlets"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "Turnkey's Keyring Belt"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "Turnkey's Lantern Cowl"
+      },
+      "conchplate_girdle": {
+        "name": "Conchplate Girdle"
+      },
+      "pale_chorus_leggings": {
+        "name": "Pale Chorus Leggings"
+      },
+      "refrain_silk_gloves": {
+        "name": "Refrain Silk Gloves"
+      },
+      "chorus_conch": {
+        "name": "Chorus Conch"
+      },
+      "tideglass_pauldrons": {
+        "name": "Tideglass Pauldrons"
+      },
+      "moonburn_treads": {
+        "name": "Moonburn Treads"
+      },
+      "prism_etched_cowl": {
+        "name": "Prism-Etched Cowl"
+      },
+      "tideglass_shiv": {
+        "name": "Tideglass Shiv"
+      },
+      "pale_chorus_vestment": {
+        "name": "Pale Chorus Vestment"
+      },
+      "tideglass_warmaul": {
+        "name": "Tideglass Warmaul"
+      },
+      "beastpit_warbelt": {
+        "name": "Beastpit Warbelt"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "Jaguar-Hide Jerkin"
+      },
+      "hexbone_handwraps": {
+        "name": "Hexbone Handwraps"
+      },
+      "rootbound_sabatons": {
+        "name": "Rootbound Sabatons"
+      },
+      "pollen_dusted_leggings": {
+        "name": "Pollen-Dusted Leggings"
+      },
+      "bloomsilk_cowl": {
+        "name": "Bloomsilk Cowl"
+      },
+      "falls_blessed_staff": {
+        "name": "Falls-Blessed Staff"
+      },
+      "fanglords_hide_mantle": {
+        "name": "Fanglord's Hide Mantle"
+      },
+      "thornroot_greathelm": {
+        "name": "Thorncrowned Greathelm"
+      },
+      "foremans_grips": {
+        "name": "Foreman's Grips"
+      },
+      "serac_stride_boots": {
+        "name": "Serac-Stride Boots"
+      },
+      "seal_rune_mantle": {
+        "name": "Seal-Rune Mantle"
+      },
+      "thawbound_legguards": {
+        "name": "Thawbound Legguards"
+      },
+      "pyre_tenders_hood": {
+        "name": "Pyre-Tender's Hood"
+      },
+      "meltwater_cord": {
+        "name": "Meltwater Cord"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "Hammer of the Open Lock"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "Vestments of the Waking Rite"
+      },
+      "spadeworn_gauntlets": {
+        "name": "Spadeworn Gauntlets"
+      },
+      "gravedirt_grips": {
+        "name": "Gravedirt Grips"
+      },
+      "bellrope_mitts": {
+        "name": "Bellrope Mitts"
+      },
+      "rimewreath_coif": {
+        "name": "Rimewreath Coif"
+      },
+      "rime_laced_hood": {
+        "name": "Rime-Laced Hood"
+      },
+      "lamenting_veil": {
+        "name": "Lamenting Veil"
+      },
+      "choirward_pauldrons": {
+        "name": "Choirward Pauldrons"
+      },
+      "choristers_spaulders": {
+        "name": "Chorister's Spaulders"
+      },
+      "cantors_stole": {
+        "name": "Cantor's Stole"
+      },
+      "knellbound_hauberk": {
+        "name": "Knellbound Hauberk"
+      },
+      "candlewatch_jerkin": {
+        "name": "Candlewatch Jerkin"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "Robe of the Unquiet Rite"
+      },
+      "gravecallers_rod": {
+        "name": "Gravecaller's Rod"
+      },
+      "portcullis_girdle": {
+        "name": "Portcullis Girdle"
+      },
+      "cellwatch_belt": {
+        "name": "Cellwatch Belt"
+      },
+      "lanternwick_sash": {
+        "name": "Lanternwick Sash"
+      },
+      "turnkeys_shank": {
+        "name": "Turnkey's Shank"
+      },
+      "gaolyard_jerkin": {
+        "name": "Gaolyard Jerkin"
+      },
+      "brinewarden_robe": {
+        "name": "Brinewarden Robe"
+      },
+      "fogbinders_rod": {
+        "name": "Fogbinder's Rod"
+      },
+      "conchplate_sabatons": {
+        "name": "Conchplate Sabatons"
+      },
+      "pale_chorus_slippers": {
+        "name": "Pale Chorus Slippers"
+      },
+      "tideglass_gauntlets": {
+        "name": "Tideglass Gauntlets"
+      },
+      "moonburn_grips": {
+        "name": "Moonburn Grips"
+      },
+      "prism_etched_handwraps": {
+        "name": "Prism-Etched Handwraps"
+      },
+      "mere_crested_helm": {
+        "name": "Mere-Crested Helm"
+      },
+      "mereskin_hood": {
+        "name": "Mereskin Hood"
+      },
+      "merewater_cowl": {
+        "name": "Merewater Cowl"
+      },
+      "merecleaver": {
+        "name": "Merecleaver"
+      },
+      "moonwrack_stave": {
+        "name": "Moonwrack Stave"
+      },
+      "membership_token": {
+        "name": "Membership Token (30 Days)"
+      },
+      "referral_satchel": {
+        "name": "Friendship Satchel"
+      },
+      "referral_hollow_charm": {
+        "name": "Oathkeeper's Heart"
+      },
+      "referral_fog_charm": {
+        "name": "Awakened Oathkeeper's Heart"
+      },
+      "reins_referral_tank": {
+        "name": "Friendship Tank Reins"
+      },
+      "reins_referral_raptor": {
+        "name": "Friendship Raptor Reins"
+      },
+      "referral_helmet": {
+        "name": "Friendship Helm"
+      },
+      "referral_shoulder": {
+        "name": "Friendship Pauldrons"
+      },
+      "referral_chest": {
+        "name": "Friendship Cuirass"
+      },
+      "referral_waist": {
+        "name": "Friendship Girdle"
+      },
+      "referral_legs": {
+        "name": "Friendship Legguards"
+      },
+      "referral_gloves": {
+        "name": "Friendship Gauntlets"
+      },
+      "referral_feet": {
+        "name": "Friendship Boots"
+      },
+      "membership_helmet": {
+        "name": "Membership Helm"
+      },
+      "membership_shoulder": {
+        "name": "Membership Pauldrons"
+      },
+      "membership_chest": {
+        "name": "Membership Cuirass"
+      },
+      "membership_waist": {
+        "name": "Membership Girdle"
+      },
+      "membership_legs": {
+        "name": "Membership Legguards"
+      },
+      "membership_gloves": {
+        "name": "Membership Gauntlets"
+      },
+      "membership_feet": {
+        "name": "Membership Boots"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -19306,6 +23829,24 @@ export const vi_VN: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Trái Tim Của Lò Thiêu"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
+      "fanglords_whistle": {
+        "name": "Fanglord's Whistle"
+      },
+      "gorgebloom_seedpod": {
+        "name": "Gorgebloom Seedpod"
+      },
+      "foremans_last_link": {
+        "name": "Foreman's Last Link"
+      },
+      "phial_of_the_tithe": {
+        "name": "Phial of the Tithe"
+      },
+      "quenchwater_flask": {
+        "name": "Quenchwater Flask"
+      },
       "rift_watchers_band": {
         "name": "Vòng Tay Người Canh Vực"
       },
@@ -19440,6 +23981,9 @@ export const vi_VN: EnTranslations = {
       "restless_bones": {
         "name": "Bộ Xương Bất An"
       },
+      "marrow_restless_bones": {
+        "name": "Restless Bones"
+      },
       "gorrak": {
         "name": "Gorrak Tàn Nhẫn"
       },
@@ -19557,6 +24101,75 @@ export const vi_VN: EnTranslations = {
       "morthen": {
         "name": "Morthen Kẻ Gọi Mộ"
       },
+      "ossuary_sentinel": {
+        "name": "Ossuary Sentinel"
+      },
+      "hollow_gravedigger": {
+        "name": "Hollow Gravedigger"
+      },
+      "rime_egg_sac": {
+        "name": "Rime Egg Sac"
+      },
+      "rimeweb_hatchling": {
+        "name": "Rimeweb Hatchling"
+      },
+      "rimeweb_spinner": {
+        "name": "Rimeweb Spinner"
+      },
+      "candlewright_acolyte": {
+        "name": "Candlewright Acolyte"
+      },
+      "hollow_chorister": {
+        "name": "Hollow Chorister"
+      },
+      "bound_soul": {
+        "name": "Bound Soul"
+      },
+      "rimeweb": {
+        "name": "Lady of the Bonechill"
+      },
+      "cantor_ilvane": {
+        "name": "Cantor Ilvane"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "Ossuary Warrior"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "Gravecaller Adept"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "Ossuary Cutthroat"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "Gravecaller Necromancer"
+      },
+      "crypt_bone_minion": {
+        "name": "Bone Minion"
+      },
+      "crypt_bone_brute": {
+        "name": "Bone Brute"
+      },
+      "crypt_bone_pile": {
+        "name": "Stirring Bones"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "Chapel Gargoyle"
+      },
+      "crypt_crow_caller": {
+        "name": "Crow Caller"
+      },
+      "crypt_carrion_crow": {
+        "name": "Carrion Crow"
+      },
+      "crypt_ossuary_drake": {
+        "name": "Ossuary Drake"
+      },
+      "crypt_knellwyrm": {
+        "name": "Knellwyrm"
+      },
+      "crypt_remembrance_candle": {
+        "name": "Remembrance Candle"
+      },
       "bastion_revenant": {
         "name": "Oán Linh Pháo Đài"
       },
@@ -19571,6 +24184,102 @@ export const vi_VN: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael Fogbinder"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Wreckbound Sailor"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "Shipwreck Captain"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
+      },
+      "bastion_gaol_cage": {
+        "name": "Iron Cage"
+      },
+      "bastion_drowned_anchor": {
+        "name": "Drowned Anchor"
+      },
+      "lagoon_snapper": {
+        "name": "Lagoon Snapper"
+      },
+      "ice_wraith": {
+        "name": "Ice Wraith"
+      },
+      "moonlit_siren": {
+        "name": "Moonlit Siren"
+      },
+      "tidewisp": {
+        "name": "Tidewisp"
+      },
+      "drowned_pilgrim": {
+        "name": "Drowned Pilgrim"
+      },
+      "mere_hydra_head_left": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_center": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_right": {
+        "name": "Mere Hydra"
+      },
+      "tideglass_colossus": {
+        "name": "Tideglass Colossus"
+      },
+      "tideglass_reflection": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_priest": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_mage": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_druid": {
+        "name": "Tideglass Reflection"
       },
       "sanctum_boneguard": {
         "name": "Vệ Xương Thánh Đường"
@@ -19725,8 +24434,26 @@ export const vi_VN: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Đỉnh Núi Thức Giấc"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Tinh Linh Bão Trỗi Dậy"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Ngựa chuồng"
@@ -20100,8 +24827,179 @@ export const vi_VN: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "Thuần Thú Sư Lãnh Chúa Nanh"
       },
+      "sunbone_totem_binder": {
+        "name": "Sunbone Totem-Binder"
+      },
+      "sunbone_totem": {
+        "name": "Sunbone Totem"
+      },
+      "sunbone_dread_totem": {
+        "name": "Sunbone Dread Totem"
+      },
+      "basin_raptor": {
+        "name": "Basin Raptor"
+      },
+      "spore_toad": {
+        "name": "Spore Toad"
+      },
+      "vine_lasher": {
+        "name": "Snarlvine Lasher"
+      },
+      "great_saurian": {
+        "name": "Great Saurian"
+      },
+      "howdah_hexcaller": {
+        "name": "Howdah Hexcaller"
+      },
+      "fanglord_jaguar": {
+        "name": "Fanglord's Great Jaguar"
+      },
+      "the_gorgebloom": {
+        "name": "The Gorgebloom"
+      },
       "wildheart_high_priest": {
         "name": "Zulgar, Tiếng Nói Của Vùng Trũng"
+      },
+      "broodsworn_thawcaller": {
+        "name": "Broodsworn Thawcaller"
+      },
+      "broodsworn_goadsmith": {
+        "name": "Broodsworn Goadsmith"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "Broodsworn Pyre-Tender"
+      },
+      "soul_brazier": {
+        "name": "Soul Brazier"
+      },
+      "rime_whelp": {
+        "name": "Rime Whelp"
+      },
+      "ogre_sledge_hauler": {
+        "name": "Ogre Sledge-Hauler"
+      },
+      "glacier_splinter": {
+        "name": "Glacier Splinter"
+      },
+      "sledge_tusker": {
+        "name": "Sledge Tusker"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "Hammer Shackle"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "Tongs Shackle"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "Anvil Shackle"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "Bellows Shackle"
+      },
+      "thorn_sprout": {
+        "name": "Thorn Sprout"
+      },
+      "buddy_ember_fox": {
+        "name": "Ember Fox"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "Emberfall Phoenix"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "Crimson Claw Crab"
+      },
+      "buddy_golden_sentinel": {
+        "name": "Golden Sentinel"
+      },
+      "buddy_nightfang": {
+        "name": "Nightfang"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "Tuskhorn Boar"
+      },
+      "buddy_emerald_wolf": {
+        "name": "Emerald Wolf"
+      },
+      "buddy_tiger": {
+        "name": "Tiger"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "Trollface"
+      },
+      "buddy_ansem": {
+        "name": "Ansem"
+      },
+      "buddy_triple_t": {
+        "name": "Triple T"
+      },
+      "buddy_kekius": {
+        "name": "Kekius"
+      },
+      "buddy_solbot": {
+        "name": "Solbot"
+      },
+      "buddy_frostfire": {
+        "name": "Frostfire"
+      },
+      "buddy_rocky": {
+        "name": "Rocky"
+      },
+      "buddy_proud_grunt": {
+        "name": "Proud Grunt"
+      },
+      "buddy_loot_goblin": {
+        "name": "Loot Goblin"
+      },
+      "buddy_penny_goldspark": {
+        "name": "Penny Goldspark"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "Alpaca"
+      },
+      "buddy_horse": {
+        "name": "Tug, the Warhorse"
+      },
+      "buddy_sapling": {
+        "name": "Sapling"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "Spider"
+      },
+      "buddy_raptor": {
+        "name": "Raptor"
+      },
+      "buddy_skeleton": {
+        "name": "Skeleton"
+      },
+      "buddy_crystal_lich": {
+        "name": "Crystal Lich"
+      },
+      "buddy_forgemaw": {
+        "name": "Forgemaw The Molten"
+      },
+      "buddy_crystal_tide": {
+        "name": "Crystal Tide"
+      },
+      "buddy_phantom": {
+        "name": "Phantom"
       },
       "ironvein_foreman": {
         "name": "Quản Đốc Mạch Sắt"
@@ -20376,6 +25274,16 @@ export const vi_VN: EnTranslations = {
         "title": "Vệ Quan của Fenbridge",
         "greeting": "Hãy dừng lại ở cổng, {className}. Vượt qua đám lau sậy kia, đầm lầy sẽ thay ta giết chóc."
       },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
+      },
       "brother_aldric_fen": {
         "name": "Tu Huynh Aldric",
         "title": "Tu Sĩ Thung Lũng",
@@ -20595,6 +25503,31 @@ export const vi_VN: EnTranslations = {
         "name": "Thủ Cảng Tamsin",
         "title": "Người Giữ Bến Tàu Wyrmwatch",
         "greeting": "Hãy bước vào từ bến tàu và sưởi ấm tay bạn. Chiếc tàu tại bến của chúng tôi đi lên bờ biển phía đông dài và quay trở lại. Phía tây xa, chiếc phà khác chạy giữa Eastbrook và Nightbloom. Bản đồ trên tường chỉ cả hai lộ trình. Hãy nghỉ ngơi bên lửa trước khi leo lên Wyrmwatch."
+      },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
+      "patron_amos_eelby": {
+        "name": "Amos Eelby",
+        "title": "Eel Fisher",
+        "greeting": "Pull up a bench, {className}. Grissel here swears the big eel under Fenbridge is a myth. I've had my hand on him twice. Twice! Slippery as a tax collector, and near as long as this bench."
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "Grissel Sedgeworth",
+        "title": "Peat Cutter",
+        "greeting": "Don't mind Amos. Forty years cutting peat and I've pulled more strange things out of this bog than he's pulled eels: boots, bones, a helmet with the head still worried about it. Warm yourself, the fire's free."
+      },
+      "patron_ned_oxley": {
+        "name": "Ned Oxley",
+        "title": "Drover",
+        "greeting": "Drove forty head down the causeway and lost two to the mire before Fenbridge. Maudie's ale is the only thing on this road that never lets a man down. Buy your own, mind."
+      },
+      "patron_hester_quillby": {
+        "name": "Hester Quillby",
+        "title": "Mapmaker",
+        "greeting": "Every map of this marsh I've ever bought was wrong within a season. The water moves the paths, and the paths move the water. So I draw my own, and I sit here where it's dry while the ink sets."
       },
       "reeve_ottoline": {
         "name": "Xã Trưởng Ottoline",
@@ -20821,6 +25754,11 @@ export const vi_VN: EnTranslations = {
         "title": "Bậc thầy của nhà bào chế thuốc",
         "greeting": "Đo hai lần và đổ một lần, {className}. Người bào chế thuốc không có kiên nhẫn với thuốc thử bị đổ."
       },
+      "steward_ansel_hale": {
+        "name": "Ansel Hale",
+        "title": "Steward of the Manor",
+        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
+      },
       "farmer_jessica": {
         "name": "Nông Dân Jessica",
         "title": "Người Trông Khu Vườn",
@@ -20890,6 +25828,11 @@ export const vi_VN: EnTranslations = {
         "name": "Huấn Luyện Viên Hale",
         "title": "Thầy Đấu Tập Bến Cảng",
         "greeting": "Hình nhân sau lưng ta chẳng bao giờ đánh trả và cũng chẳng bao giờ ngã, {className}. Điều đáng quan tâm là số liệu: Bảng Thống Kê Sát Thương ghi lại mọi đòn đánh bạn giáng lên nó. Chọn nó làm mục tiêu rồi mở bảng thống kê, ta sẽ chỉ tiếp cho bạn."
+      },
+      "cantor_laverock": {
+        "name": "Laverock",
+        "title": "Last Cantor of the Pale Choir",
+        "greeting": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -21114,6 +26057,52 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lệnh Tập Hợp Fenbridge"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -23298,6 +28287,12 @@ export const vi_VN: EnTranslations = {
           },
           "7": {
             "label": "Pháo Đài Chìm"
+          },
+          "8": {
+            "label": "Lãnh Địa Gò Mộ"
+          },
+          "9": {
+            "label": "Hố Sao Rơi"
           }
         }
       },
@@ -23655,6 +28650,39 @@ export const vi_VN: EnTranslations = {
             "label": "Vòng Khổ Luyện"
           }
         }
+      },
+      "goldcrest_harbor": {
+        "name": "Goldcrest Harbor",
+        "welcome": "Goldcrest Harbor, seat of the World Market. Every road, tide and ledger in the realm meets here.",
+        "pois": {
+          "0": {
+            "label": "The Grand Gate"
+          },
+          "1": {
+            "label": "Grand Plaza"
+          },
+          "2": {
+            "label": "The Goldcrest Exchange"
+          },
+          "3": {
+            "label": "Market Ward"
+          },
+          "4": {
+            "label": "Harbor Ward"
+          },
+          "5": {
+            "label": "Highcrown Citadel"
+          },
+          "6": {
+            "label": "The Lightspire"
+          },
+          "7": {
+            "label": "The Gold Light"
+          },
+          "8": {
+            "label": "The Golden Span"
+          }
+        }
       }
     },
     "dungeons": {
@@ -23931,6 +28959,16 @@ export const vi_VN: EnTranslations = {
         "sender": "Nhà Môi Giới Sàn Giao Dịch",
         "subject": "Món hàng bạn mua trên Sàn Giao Dịch",
         "body": "Giao dịch đã hoàn tất và món hàng giờ thuộc về bạn. Kiện hàng đính kèm chứa đúng vật phẩm bạn đã trả tiền, được ký quỹ giữ an toàn kể từ thời điểm được rao bán cho đến khi khoản thanh toán của bạn được xác nhận.\n\nBản ghi giao dịch này được lưu trong sổ cái của Sàn Giao Dịch.\n\n- Nhà Môi Giới Sàn Giao Dịch"
+      },
+      "membership_token_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Your membership token",
+        "body": "Your purchased token is enclosed. Redeem it to add 30 days of membership to your account, or trade it with another adventurer."
+      },
+      "membership_annual_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your annual membership mount",
+        "body": "Your annual membership payment is complete. Your tank mount key is enclosed. Keep the key in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required."
       },
       "woc_market_return": {
         "sender": "Nhà Môi Giới Sàn Giao Dịch",
@@ -24381,6 +29419,7 @@ export const vi_VN: EnTranslations = {
     "mailboxName": "Hòm Thư",
     "noticeboardName": "Bảng Thông Báo",
     "farmPatchName": "Luống Vườn",
-    "realmBuilderMonumentName": "Đài tưởng niệm người xây dựng vương quốc"
+    "realmBuilderMonumentName": "Đài tưởng niệm người xây dựng vương quốc",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

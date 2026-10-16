@@ -8,6 +8,7 @@
 // (charselect_hints.ts) names and times each roster row's lockouts through
 // the same two functions. Unit tested in tests/raid_lockout_format.test.ts.
 
+import { weeklyQuestIdFromLockout } from '../sim/quests/weekly_quest_lock';
 import { worldBossIdFromLockout } from '../sim/world_boss';
 import { dungeonDisplayName, tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
@@ -20,6 +21,9 @@ import { lockoutParts, lockoutShape } from './raid_lockout';
 export function raidLockoutDisplayName(id: string): string {
   const bossId = worldBossIdFromLockout(id);
   if (bossId !== null) return tEntity({ kind: 'mob', id: bossId, field: 'name' });
+  // A weekly quest turned in this week names as the quest (weekly_quest_lock.ts).
+  const questId = weeklyQuestIdFromLockout(id);
+  if (questId !== null) return tEntity({ kind: 'quest', id: questId, field: 'title' });
   if (id.endsWith(':heroic')) {
     return t('hudChrome.raidLockout.heroicName', {
       name: dungeonDisplayName(id.slice(0, -':heroic'.length)),

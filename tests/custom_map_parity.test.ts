@@ -76,9 +76,10 @@ describe('custom-map terrain seam', () => {
     expect(bank).toBeDefined();
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
-      assetId: '/models/props/fenbridge_crooked_reed_inn.glb',
-      x: -21.25,
-      z: 317,
+      // the painted tavern on the main street, stood grand (fenbridge_layout.ts)
+      assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
+      x: 13.55,
+      z: 298,
     });
     if (!bank || !fenbridgeInn) return;
 
@@ -137,11 +138,11 @@ describe('custom-map terrain seam', () => {
     ).toBe(false);
   });
 
-  it('does not leave invisible Fenbridge walls, jambs, or muster-board collision in custom worlds', () => {
+  it('does not leave invisible Fenbridge muster-board collision in custom worlds', () => {
+    // Fenbridge stands open: it has no palisade wing or gate jamb to leak into
+    // a custom world (the open ring is pinned in fenbridge_layout_suite), so
+    // its one civic solid outside the prop table is the muster board.
     const props = clonePropsWithoutEastbrookLayout(BUILTIN_WORLD.props);
-    const fenbridgeWallIds = new Set(FENBRIDGE_LAYOUT.wall.segments.map((segment) => segment.id));
-    expect((props.walls ?? []).some((wall) => fenbridgeWallIds.has(wall.id))).toBe(false);
-
     const customWorld: WorldContent = {
       ...BUILTIN_WORLD,
       roads: [],
@@ -149,12 +150,8 @@ describe('custom-map terrain seam', () => {
       services: undefined,
     };
     setActiveWorldContent(customWorld);
-    const wall = FENBRIDGE_LAYOUT.wall.segments[0].footprint;
-    const jamb = FENBRIDGE_LAYOUT.wall.gates[0].arch.jambs[0];
     const board = FENBRIDGE_LAYOUT.civic.musterBoard;
     expect(customWorld.services?.musterBoards).toBeUndefined();
-    expect(isBlocked(20_061, wall.center.x, wall.center.z, 0.2)).toBe(false);
-    expect(isBlocked(20_061, jamb.center.x, jamb.center.z, 0.2)).toBe(false);
     expect(isBlocked(20_061, board.position.x, board.position.z, 0.2)).toBe(false);
   });
 

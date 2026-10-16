@@ -77,12 +77,21 @@ const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   // file keep the exact aggregate just above the default.
   ['tests/ci_shard_plan.test.ts', 310_000],
   ['tests/discord_db_integration.test.ts', 420_000],
+  // The Mirefen tavern's whole-world build (the collider grid, the floor fold and the keeper
+  // spawn over a full Sim) carries three raised cases: 180_000 + 120_000 + 120_000 plus
+  // default-bounded rest, measured at 480_000 in all.
+  ['tests/mirefen_tavern.test.ts', 480_000],
   ['tests/dragonkin_whelp_litter.test.ts', 420_000],
   ['tests/druid_balance_probe.test.ts', 540_000],
   ['tests/emerald_deck_escape.test.ts', 540_000],
   ['tests/guild_bank_pg_integration.test.ts', 840_000],
   ['tests/nythraxis_matrix.test.ts', 1_200_000],
   ['tests/owned_class_balance_dps_probes.test.ts', 360_000],
+  // The Groveheart harness: its 60 s healing probe measured about 13 s alone
+  // and 17 s under vitest, too close to the 20 s default under a loaded full
+  // run, so it takes the long-sims 120 s budget beside the 300 s contract case:
+  // 120_000 + 300_000 = 420_000 (the same shape as the chronomancy targets).
+  ['tests/owned_class_balance_groveheart.test.ts', 420_000],
   // The shared PostgreSQL escrow fixture carries a 30s setup hook plus ten
   // independently bounded 30s cases. The exact row records that existing
   // parallelizable shape without promoting the suite into the measured lane.

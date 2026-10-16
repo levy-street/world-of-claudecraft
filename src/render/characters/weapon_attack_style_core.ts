@@ -7,7 +7,11 @@ export const SPIN_ATTACK_VISUAL_DURATION = 0.55;
 const ABILITY_ID_BY_NAME = new Map(
   Object.entries(ABILITIES).map(([abilityId, ability]) => [ability.name, abilityId]),
 );
-const LEGACY_ABILITY_ID_BY_NAME = new Map([['Drain Life', 'drain_life']]);
+const LEGACY_ABILITY_ID_BY_NAME = new Map([
+  ['Drain Life', 'drain_life'],
+  // This arrival payoff is labeled separately from Bloodhook's opening cue.
+  ['Bloodhook Re-entry', 'bloodhook'],
+]);
 const SPIN_ATTACK_ABILITIES = new Set(['whirlwind', 'bladestorm', 'dawnfall', 'cleave']);
 
 /** Damage events carry player-facing ability names. Normalize those names back

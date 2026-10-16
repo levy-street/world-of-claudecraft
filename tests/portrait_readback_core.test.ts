@@ -104,7 +104,7 @@ describe('flipUnpremultiplyInto', () => {
     expect([...dest]).toEqual([0, 0, 0, 0]);
   });
 
-  it('round-trips a 256-square buffer at the shipped portrait size', () => {
+  it('round-trips a full 256-square buffer (the largest whose row index fits one byte)', () => {
     const size = 256;
     const source = bottomUpRows(size, size, 255);
     const dest = new Uint8ClampedArray(portraitReadbackByteLength(size, size));

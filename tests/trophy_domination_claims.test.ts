@@ -216,6 +216,14 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
     // derivation the record defers to, so these four numbers are re-derived
     // here and never pasted from prose: a second row landing in the band reds
     // this arm instead of leaving the amendment quietly false.
+    // RE-DERIVED for the Mirefen world boss: the pool is 37 rows, not 34, and
+    // the high half is 27 rather than 24. Balgath adds three uncrafted pieces,
+    // all of them well above the 460 ceiling, so all three land in the high
+    // half and NONE of them lands in the band: loomshard_eye (neck, epic,
+    // 8,400), mirelight_locket (neck, rare, 1,200) and foremans_wage_band
+    // (ring, rare, 1,150). The honor count is untouched at 9, because none of
+    // the three is honor stock. The amendment's load-bearing claim is the
+    // one-row band below, and it still holds.
     const jewelry = pool((d) => d.kind === 'armor' && (d.slot === 'neck' || d.slot === 'ring'));
     // 34 to 40 and 24 to 30 at the wq-reputation merge: the six faction
     // quartermaster necks and rings (content/faction_vendors.ts) all sell above
@@ -227,9 +235,11 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
     // feature/buried-hoards: the fifteen Buried Hoard jewels (content/hoard_loot.ts,
     // five neck and ring bases at the rare, epic and legendary tiers) all sell
     // above 600 (4950, 11000, 15400) and none sits inside the band, same amendment.
-    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(62);
+    // 65 and 55 with the Mirefen world-boss branch's three jewels, all selling above
+    // 600 and none inside the band.
+    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(65);
     expect(jewelry.filter((d) => d.sellValue === 0).length, 'honor pieces at 0').toBe(9);
-    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(52);
+    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(55);
     // Exactly one row sits here, and the amended record names it.
     expect(
       jewelry.filter((d) => inBand(d, 25, 460)).map((d) => d.id),

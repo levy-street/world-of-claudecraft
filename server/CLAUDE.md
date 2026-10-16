@@ -70,6 +70,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `retention_sweep.ts` | the advisory-locked, self-clocked nightly sweep of batched per-table prunes; every table that grows without bound registers here (see Hot paths) |
 | `event_record_observers.ts` / `craft_roll_events.ts` / `craft_roll_events_db.ts` | the event drain's database RECORD arms (one sim event in, one fire-and-forget row out: the ftue_events quest/death rows and the `craft_roll_events` chance-based crafting outcome audit, a bounded FIFO writer over a pure schema+insert+prune module); a new "log this sim event to a table" need is a new arm here plus a `*_db.ts` sibling, never a block in game.ts |
 | `concurrent_indexes.ts` | post-boot `CREATE INDEX CONCURRENTLY` seam for new indexes on big live tables |
+| `interest_scope.ts` | who is inside whose interest: the radii and hysteresis, the same-slot battleground widening, and the world-boss LANDMARK widening (`MobTemplate.landmarkRange`, so a boss the client draws as a far sprite is actually sent from across the zone). One module because the question is answered at THREE points that must agree, the shared query's reach, the per-viewer cutoff and the per-entity limit, and widening one of the three alone is a silent no-op |
 | `realm_readout_memo.ts` / `event_frame.ts` / `interest_candidates.ts` | broadcast build-once seams: per-pass realm readout memo (rides `maybeRaw`), serialize-once event frames (sent via `sendRaw`), per-cell shared interest gathering (see Hot paths) |
 
 ## Invariants, YOU MUST keep these

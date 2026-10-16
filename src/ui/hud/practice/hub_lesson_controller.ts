@@ -47,6 +47,8 @@ import {
   HUB_TRAINING_DUMMY_POS,
 } from '../../../sim/content/practice_dummies';
 import { isOnProvingShore } from '../../../sim/content/proving_shore';
+import { getActiveWorldContent } from '../../../sim/data';
+import { practiceDummyPos } from '../../../sim/moved_objects';
 import { hubHealingAbilityId } from '../../../sim/tutorial/hub_healing_lesson';
 import { startingAttackFor } from '../../../sim/tutorial/starting_attack';
 import type { IWorld } from '../../../world_api';
@@ -145,10 +147,15 @@ const BUBBLE_VISIBLE_CLASS = 'hlc-bubble-visible';
  *  to Hale and standing at either dummy, tight enough that ordinary town
  *  play elsewhere (or Tutorial Island, excluded separately) never sees it. */
 const HUB_LESSON_RANGE = 45;
-const HUB_LESSON_CENTER = {
-  x: (HUB_TRAINING_DUMMY_POS.x + HUB_HEALING_DUMMY_POS.x) / 2,
-  z: (HUB_TRAINING_DUMMY_POS.z + HUB_HEALING_DUMMY_POS.z) / 2,
-};
+/** Midway between the two yard dummies, wherever this world stands them: a
+ *  Studio map can move either one (sim/moved_objects.ts), and the coach
+ *  follows the yard. The shipped marks otherwise. */
+export function hubLessonCenter(): { x: number; z: number } {
+  const moves = getActiveWorldContent().objectMoves;
+  const damage = practiceDummyPos(moves, HUB_TRAINING_DUMMY_ID, HUB_TRAINING_DUMMY_POS);
+  const healing = practiceDummyPos(moves, HUB_HEALING_DUMMY_ID, HUB_HEALING_DUMMY_POS);
+  return { x: (damage.x + healing.x) / 2, z: (damage.z + healing.z) / 2 };
+}
 
 function progressKey(world: IWorld): string {
   return `${HISTORY_KEY_PREFIX}_${world.cfg.playerClass}_${world.player.name}`;
@@ -297,7 +304,8 @@ export class HubLessonController {
     // runs its own separate coach), there is nothing to say and nothing
     // more expensive than one Math.hypot to find that out.
     const p = this.deps.world.player.pos;
-    const inRange = planar(p.x, p.z, HUB_LESSON_CENTER.x, HUB_LESSON_CENTER.z) <= HUB_LESSON_RANGE;
+    const center = hubLessonCenter();
+    const inRange = planar(p.x, p.z, center.x, center.z) <= HUB_LESSON_RANGE;
     if (!inRange || isOnProvingShore(p.x, p.z)) {
       this.bindHistoryListener(null);
       this.historyViewedKeyNow = null;

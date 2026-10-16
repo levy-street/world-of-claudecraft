@@ -8,6 +8,8 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { BUDDY_ART_PENDING_ITEM_IDS } from '../sim/content/buddies';
+import { HOLLOW_CRYPT_ART_PENDING_ITEM_IDS } from '../sim/content/hollow_crypt_items';
 import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
 import { SEASON2_SETS } from '../sim/content/pvp_honor_season2';
@@ -20,6 +22,7 @@ import { crestIconUrl } from './crest_icon_art';
 import { currencyImageUrl } from './currency_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { professionImageUrl } from './hud/professions/profession_art';
+import { ITEM_ART_PLACEHOLDERS } from './item_art_placeholders';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
 import { TRINKET_AURA_IMAGE_URLS } from './trinket_aura_art';
@@ -2527,6 +2530,23 @@ function r(
 }
 
 const ABILITY_RECIPES: Record<string, IconRecipe> = {
+  // The Shardpike bar's three verbs (src/ui/hud/shardpike/). Not real abilities, so the
+  // ability FALLBACK would normally paint them, and it derived three visually identical
+  // tiles from ids that differ only in their last word: a bar whose entire job is "which
+  // of these three do I press" showed the same glyph three times. Authored here instead,
+  // in the frost/ice pair the Barrowglass's own teal reads as.
+  //
+  // The pike is `staff` (the closest primitive to a shaft) in all three, so the family
+  // reads as one item, and the SECOND mark is the verb: a hand gripping it to brace, the
+  // eye it goes through to thrust, a cancel cross to ground it.
+  //
+  // All three now also ship PAINTED art (ABILITY_IMAGE_IDS below), so `abilityImageUrl`
+  // wins and these are the fallback path only. They stay for the reason `intervene`'s does:
+  // every ability owes an explicit, distinct recipe (tests/ability_icons.test.ts), and a
+  // painted file failing to load must still land on three different tiles.
+  lance_brace: r('frost', 'ice', ['staff', { p: 'hand', ...BR }], ['glow']),
+  lance_thrust: r('frost', 'ice', ['staff', { p: 'eye', ...TL }], ['sparkle']),
+  lance_release: r('frost', 'ice', ['staff', { p: 'cross', ...BR }]),
   // Talents 2.0 ground-targeted spells (each aimed AoE gets a distinct recipe;
   // grouped here so the family reads together, order within the map is cosmetic).
   flamestrike: r('fire', 'ember', ['meteor', { p: 'sunburst', ...BIG }], ['glow']),
@@ -3786,6 +3806,10 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // Physical-only damage-reduction buffs (Raised Guard's cut), mirroring
   // aura_buff_dr on the steel palette
   aura_buff_dr_phys: r('steel', 'steel', ['shield', { p: 'heart', ...TR }], ['glow']),
+  // The slumbering world boss in bed (src/sim/mob/slumber.ts): keyed by the bare aura id,
+  // which is how a dedicated per-aura recipe is found (hasAuraRecipe), so the frame reads
+  // "asleep" under a moon rather than the generic shield its buff_dr kind falls back to.
+  slumber: r('shadow', 'shadowPurple', ['moon'], ['glow']),
   // Breachmaker's source-scoped vulnerability debuff (kind 'vuln_source'), shown
   // on the target's debuff frame: a cracked guard struck by a blade
   aura_vuln_source: r('blood', 'earthBrown', ['sword', { p: 'sunburst', ...BR }], ['crack']),
@@ -4447,6 +4471,14 @@ const WARLOCK_TALENT_IMAGE_IDS = new Set<string>([
   'wlk_r20_curse_mastery',
 ]);
 export const ABILITY_IMAGE_IDS = new Set<string>([
+  // The Shardpike bar's three verbs (src/ui/hud/shardpike/). Painted rather than procedural
+  // because the player's entire job in this mechanic is choosing between these three under
+  // pressure, and three composited tiles built from the same primitives read as one tile at
+  // the 32px they are actually seen at. They are not class abilities, so `abilityImageUrl`
+  // maps them to their own folder below rather than deriving one from ABILITIES.
+  'lance_brace',
+  'lance_thrust',
+  'lance_release',
   // paladin (original project art for the overhaul and talent abilities, plus
   // the existing CraftPix premium "RPG Paladin skill icons" base set)
   'divine_ascension',
@@ -4984,6 +5016,11 @@ export const ABILITY_ART_PENDING = new Set<string>([
 export function abilityImageUrl(id: string): string | null {
   if (ABILITY_ART_PENDING.has(id)) return null;
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
+  // The Shardpike verbs first: they are quest-tool actions with no ABILITIES row at all, so
+  // every arm below would fall through to a class that does not own them.
+  if (id === 'lance_brace' || id === 'lance_thrust' || id === 'lance_release') {
+    return `${SKILL_ICON_DIR}/shardpike/${id}.webp`;
+  }
   if (PET_ACTION_IMAGE_IDS.has(id)) return `${SKILL_ICON_DIR}/pet/${id}.webp`;
   const cls =
     ABILITIES[id]?.class ??
@@ -5547,10 +5584,17 @@ export const ITEM_ART_PENDING = new Set<string>([
   // procedural icon stands in until then. The season weapons never park here:
   // an unpainted weapon already draws its procedural icon.
   ...SEASON2_SETS.flatMap((set) => set.itemIds),
+  // The Hollow Crypt rework's per-boss loot: EMPTY since its painted wave
+  // (hollow-crypt-icons-2026-10-03) landed; the seam stays for the next park.
+  ...HOLLOW_CRYPT_ART_PENDING_ITEM_IDS,
+  ...BUDDY_ART_PENDING_ITEM_IDS,
+  ...Object.keys(ITEM_ART_PLACEHOLDERS),
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
+  const placeholder = ITEM_ART_PLACEHOLDERS[id];
+  if (typeof placeholder === 'string') return `${ITEM_ICON_DIR}/${placeholder}.webp`;
   if (ITEM_ART_PENDING.has(id)) return null;
   return ITEM_IMAGE_IDS.has(id) || UI_ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
 }
@@ -5608,6 +5652,42 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'cmb_coinsack_caught',
   // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
   'exp_harbor_to_harbor',
+  // The Mirefen world boss pair: both are 'combat', so both fall back to the
+  // deed_cat_combat crest until their commissioned art lands.
+  'cmb_balgath',
+  'cmb_balgath_ten',
+  // The muster's pike drill (content/mirefen_muster_quests.ts), also a 'combat' crest.
+  'cmb_point_taken',
+  // The five-dungeon rework's encounter deeds (content/deeds.ts, appended in
+  // DEED_ORDER): the dungeon category crest until their paintings are commissioned.
+  'dgn_olen_buttress',
+  'dgn_ossick_moored',
+  'dgn_vael_beacon',
+  'dgn_turretback',
+  'dgn_selthe_pitch',
+  'dgn_colossus_mirror',
+  'dgn_ysolei_high_and_dry',
+  'dgn_mere_hydra',
+  'dgn_crypt_knellwyrm',
+  'dgn_turnkey_cage',
+  'dgn_beastmaster_apart',
+  'dgn_gorgebloom_clean',
+  'dgn_zulgar_uncaught',
+  'dgn_great_saurian',
+  'dgn_korgath_all_chains',
+  'dgn_korgath_still_bound',
+  'dgn_velkhar_cold',
+  'dgn_korzul_thin_ice',
+  'dgn_sledge_tusker',
+  // The Drowned Temple's lore guide deed (The Last Verse): the dungeon crest
+  // until its painting is commissioned.
+  'dgn_drowned_temple_cantor',
+  // The Hollow Crypt's wing-boss deeds: the dungeon crest until their paintings
+  // are commissioned.
+  'dgn_marrow_tidy',
+  'dgn_lady_nobody_hanging',
+  'dgn_ilvane_hush',
+  'dgn_morthen_candlelight',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

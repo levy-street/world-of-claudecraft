@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_gargoyle_woc.glb",
+      "out": "models/creatures/woc_crypt_gargoyle.glb",
+      "type": "character",
+      "keepClips": [
+        "Perch",
+        "Ready",
+        "Walk",
+        "Run",
+        "Awaken",
+        "Dive",
+        "DiveLand",
+        "ClawRake",
+        "ClawRake2",
+        "Screech",
+        "Hit",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tree Generator preview</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #0e1113; overflow: hidden; }
+      canvas { display: block; }
+      #hud {
+        position: fixed; left: 10px; top: 10px; z-index: 2;
+        font: 12px/1.5 ui-monospace, Menlo, monospace; color: #d8dee2;
+        background: rgba(0,0,0,.55); padding: 8px 10px; border-radius: 6px; white-space: pre;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="hud">loading…</div>
+    <script type="module" src="/dev/tree_preview.ts"></script>
+  </body>
+</html>

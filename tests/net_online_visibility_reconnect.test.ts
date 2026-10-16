@@ -411,7 +411,7 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
       world.onDisconnect = (reason) => {
         disconnected = reason;
       };
-      // Sit one below RECONNECT_MAX_ATTEMPTS (40 in src/net/online.ts): the
+      // Sit one below RECONNECT_MAX_ATTEMPTS (40 in src/net/reconnect_policy.ts): the
       // manual zombie close below burns the FINAL attempt and schedules the
       // last legitimate retry.
       (world as unknown as { reconnectAttempts: number }).reconnectAttempts = 39;
