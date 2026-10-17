@@ -210,7 +210,7 @@ export class StableAuraWireCache {
   }
 }
 
-function findProtectiveHourglass(auras: readonly Aura[]): Aura | null {
+export function findProtectiveHourglass(auras: readonly Aura[]): Aura | null {
   for (const aura of auras) {
     if (
       aura.id === 'temporal_hourglass' &&
@@ -224,7 +224,7 @@ function findProtectiveHourglass(auras: readonly Aura[]): Aura | null {
   return null;
 }
 
-function cooldownDeadline(
+export function cooldownDeadline(
   abilityId: string,
   remaining: number,
   simTime: number,

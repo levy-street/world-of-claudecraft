@@ -2243,6 +2243,8 @@ export const ja_JP: EnTranslations = {
       "showPetFrame": "自分のペットを表示",
       "showNameplateDots": "ネームプレートに自分のデバフを表示",
       "nameplateDotScale": "ネームプレートのデバフ表示サイズ",
+      "showNameplateCooldowns": "攻撃/防御トラッカー",
+      "nameplateCooldownScale": "攻撃/防御トラッカーのサイズ",
       "showTargetDots": "ターゲットデバフ一覧を表示",
       "showDefensivesTrack": "防御クールダウンを表示",
       "showSelfBuffTrack": "自分のバフを表示",

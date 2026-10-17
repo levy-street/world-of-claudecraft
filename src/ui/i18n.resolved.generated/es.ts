@@ -2243,6 +2243,8 @@ export const es: EnTranslations = {
       "showPetFrame": "Mostrar tu mascota",
       "showNameplateDots": "Mostrar mis puntos en las placas de identificación",
       "nameplateDotScale": "Tamaño del punto de la placa de identificación",
+      "showNameplateCooldowns": "Offensive/Defensive Tracker",
+      "nameplateCooldownScale": "Offensive/Defensive Tracker Size",
       "showTargetDots": "Mostrar puntos de destino",
       "showDefensivesTrack": "Mostrar enfriamientos defensivos",
       "showSelfBuffTrack": "Mostrar mis beneficios",

@@ -4,6 +4,7 @@
 // fragments. Moved out of the coordinator (the monolith ratchet: extract, then
 // lower); the caches themselves are still owned and refreshed by GameServer.
 
+import { MajorCooldownWireCache } from './major_cooldown_wire';
 import type { StableAuraWireCache } from './snapshot_timer_wire';
 
 // Per-entity wire fragments, refreshed lazily at most once per tick and
@@ -22,6 +23,9 @@ export interface EntityWireVariantCache {
   liteJson: string;
   fullAuraJson: string;
   liteAuraJson: string;
+  /** The enemy cooldown deadlines that share the stable aura channel and its
+   *  version (major_cooldown_wire.ts). Unused on the legacy variant. */
+  mcd: MajorCooldownWireCache;
 }
 
 export interface EntityWireCache {
@@ -67,6 +71,7 @@ export function emptyWireVariant(): EntityWireVariantCache {
     liteJson: '',
     fullAuraJson: '',
     liteAuraJson: '',
+    mcd: new MajorCooldownWireCache(),
   };
 }
 

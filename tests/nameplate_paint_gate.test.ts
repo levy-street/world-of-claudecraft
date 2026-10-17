@@ -68,6 +68,7 @@ function fields(overrides: Partial<NameplatePaintFields> = {}): NameplatePaintFi
     frame: '',
     comboPips: 0,
     dots: { slots: [], count: 0, scale: 1 },
+    cooldowns: { slots: [], count: 0, scale: 1 },
     aiLabel: '',
     cheaterLabel: '',
     devOutline: null,
@@ -154,6 +155,25 @@ describe('nameplate paint gate core', () => {
         },
       }),
     ],
+    [
+      'enemy cooldown row',
+      fields({
+        cooldowns: {
+          count: 1,
+          scale: 1,
+          slots: [
+            {
+              iconUrl: '/ui/skills/druid/barkskin.webp',
+              group: 'defensive',
+              active: true,
+              fraction: 0,
+              unit: 'seconds',
+              timeText: '11',
+            },
+          ],
+        },
+      }),
+    ],
     ['raid marker', fields({ raidMarkerUrl: 'data:image/png;base64,skull' })],
     ['overhead emote', fields({ emoteIconUrl: '/ui/emotes/emote-wave.png', emoteLabel: 'Wave' })],
     ['badge set', fields({ badges: [{ url: '/badge.webp', size: 15 }] })],
@@ -170,6 +190,25 @@ describe('nameplate paint gate core', () => {
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(false);
     badge.size = 24;
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
+  });
+
+  it('repaints when a cooldown slot flips from active to recharging in place', () => {
+    const gate = new NameplatePaintGate();
+    const slot = {
+      iconUrl: '/ui/skills/druid/barkskin.webp',
+      group: 'defensive',
+      active: true,
+      fraction: 0,
+      unit: 'seconds',
+      timeText: '2',
+    };
+    const f = fields({ cooldowns: { count: 1, scale: 1, slots: [slot] } });
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(false);
+    slot.active = false;
+    slot.fraction = 0.75;
+    slot.timeText = '45';
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
   });
 

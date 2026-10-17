@@ -387,6 +387,7 @@ import {
   graphicsPresetLabel,
   resolveGfxProfile,
 } from './render/gfx';
+import { setNameplateCooldownScale } from './render/nameplate_cooldown_scale';
 import { setNameplateDotScale } from './render/nameplate_dot_scale';
 import { hazardPaletteModeOf } from './render/nythraxis_hazard_palette_core';
 import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
@@ -1503,6 +1504,7 @@ async function startGame(
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
     setNameplateDotScale(settings.nameplateDotRenderScale());
+    setNameplateCooldownScale(settings.nameplateCooldownRenderScale());
     renderer.setWaterRipples(settings.get('waterRipples'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).
@@ -2514,6 +2516,12 @@ async function startGame(
       setNameplateDotScale(settings.nameplateDotRenderScale());
       return;
     }
+    if (key === 'showNameplateCooldowns' || key === 'nameplateCooldownScale') {
+      if (key === 'showNameplateCooldowns') settings.set(key, !!value);
+      else settings.set(key, Number(value));
+      setNameplateCooldownScale(settings.nameplateCooldownRenderScale());
+      return;
+    }
     if (key === 'invertLookY') {
       input.setInvertLookY(settings.set('invertLookY', !!value));
       return;
@@ -2715,6 +2723,7 @@ async function startGame(
     next.showOwnNameplate = settings.get('showOwnNameplate');
     next.showPlayerNameplates = settings.get('showPlayerNameplates');
     setNameplateDotScale(settings.nameplateDotRenderScale());
+    setNameplateCooldownScale(settings.nameplateCooldownRenderScale());
     next.reduceMotionSetting = settings.get('reduceMotion');
     next.setHazardPaletteMode(hazardPaletteModeOf(settings.get('colorblindMode')));
     next.setBrightness(settings.get('brightness'));

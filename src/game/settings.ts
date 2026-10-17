@@ -199,6 +199,10 @@ export const SETTING_RANGES = {
   // size measured too small to read at a glance (owner feedback). The renderer
   // sees this multiplied by the showNameplateDots toggle, so 0 means off.
   nameplateDotScale: { min: 1, max: 3, def: 1.5 },
+  // How large the enemy cooldown row draws above a hostile player's name, on the
+  // dot row's scale and for the same reason (a countdown read mid-fight): 100%
+  // is the floor and 150% the default. Folded with showNameplateCooldowns.
+  nameplateCooldownScale: { min: 1, max: 3, def: 1.5 },
   // Fades the HUD panels & windows as a whole; lets players see more of the
   // world behind their frames without hiding them entirely.
   hudOpacity: { min: 0.5, max: 1, def: 1 },
@@ -500,6 +504,12 @@ export const BOOL_SETTINGS = {
   // Class-agnostic (ownership plus isDebuffAura, never an ability list) and never
   // graphics-tier gated: these are timers a player acts on.
   showNameplateDots: { def: true },
+  // on by default: a hostile PLAYER's tracked cooldowns (src/sim/major_cooldowns.ts:
+  // the PvP medallion once used, then defensives, then offensives) as an icon row
+  // ABOVE their name, active buffs glowing and spent ones counting down. PvP
+  // information a player acts on (when to burst, when to save a defensive), so it
+  // is never graphics-tier gated.
+  showNameplateCooldowns: { def: true },
   // on by default: the Target dots frame (#target-dots), the multi-target tracker
   // listing every debuff YOU have out across every enemy in interest range, one
   // bar row each with a live countdown. Hidden entirely while you have no dots
@@ -813,6 +823,12 @@ export class Settings {
    */
   nameplateDotRenderScale(): number {
     return this.values.showNameplateDots ? this.values.nameplateDotScale : 0;
+  }
+
+  /** The enemy cooldown row's drawn SIZE, folded the way nameplateDotRenderScale
+   *  folds the dot row: 0 means "draw no row at all". */
+  nameplateCooldownRenderScale(): number {
+    return this.values.showNameplateCooldowns ? this.values.nameplateCooldownScale : 0;
   }
 
   /** Validate every value, apply the whole patch, then persist the settings blob once. */

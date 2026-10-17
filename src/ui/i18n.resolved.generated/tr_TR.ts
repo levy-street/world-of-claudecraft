@@ -2243,6 +2243,8 @@ export const tr_TR: EnTranslations = {
       "showPetFrame": "Yoldaşını Göster",
       "showNameplateDots": "İsim Plakalarındaki Noktalarımı Göster",
       "nameplateDotScale": "İsim Plakası Nokta Boyutu",
+      "showNameplateCooldowns": "Offensive/Defensive Tracker",
+      "nameplateCooldownScale": "Offensive/Defensive Tracker Size",
       "showTargetDots": "Hedef Noktaları Göster",
       "showDefensivesTrack": "Savunma Bekleme Sürelerini Göster",
       "showSelfBuffTrack": "Güçlendirmelerimi Göster",

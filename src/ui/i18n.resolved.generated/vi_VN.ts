@@ -2243,6 +2243,8 @@ export const vi_VN: EnTranslations = {
       "showPetFrame": "Hiện Thú Cưng Của Bạn",
       "showNameplateDots": "Hiển thị dấu chấm của tôi trên bảng tên",
       "nameplateDotScale": "Kích thước chấm bảng tên",
+      "showNameplateCooldowns": "Offensive/Defensive Tracker",
+      "nameplateCooldownScale": "Offensive/Defensive Tracker Size",
       "showTargetDots": "Hiển thị dấu chấm mục tiêu",
       "showDefensivesTrack": "Hiện thời gian hồi phòng thủ",
       "showSelfBuffTrack": "Hiện buff của tôi",

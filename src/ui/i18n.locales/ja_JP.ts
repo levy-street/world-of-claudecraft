@@ -13615,6 +13615,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',
   'hudChrome.options.showNameplateDots': 'ネームプレートに自分のデバフを表示',
   'hudChrome.options.nameplateDotScale': 'ネームプレートのデバフ表示サイズ',
+  'hudChrome.options.showNameplateCooldowns': '攻撃/防御トラッカー',
+  'hudChrome.options.nameplateCooldownScale': '攻撃/防御トラッカーのサイズ',
   'hudChrome.options.showTargetDots': 'ターゲットデバフ一覧を表示',
   'hudChrome.targetDots.title': 'ターゲットデバフ',
   'hudChrome.targetDots.overflow': '他に{count}件は非表示',

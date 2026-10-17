@@ -2243,6 +2243,8 @@ export const sv_SE: EnTranslations = {
       "showPetFrame": "Visa ditt djur",
       "showNameplateDots": "Visa mina prickar på namnskyltar",
       "nameplateDotScale": "Namnskylt Punktstorlek",
+      "showNameplateCooldowns": "Offensive/Defensive Tracker",
+      "nameplateCooldownScale": "Offensive/Defensive Tracker Size",
       "showTargetDots": "Visa målprickar",
       "showDefensivesTrack": "Visa defensiva nedkylningar",
       "showSelfBuffTrack": "Visa mina förstärkningar",

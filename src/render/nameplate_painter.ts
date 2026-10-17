@@ -44,6 +44,9 @@ import {
   type NameplateMarkerTone,
 } from './nameplate_canvas';
 import { COMBO_PIP_MAX } from './nameplate_combo';
+import { resolveNameplateCooldowns } from './nameplate_cooldown_resolve';
+import { nameplateCooldownScale as nameplateCooldownScaleSetting } from './nameplate_cooldown_scale';
+import { nameplateCooldownRowHeight } from './nameplate_cooldowns_core';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
 import { nameplateDotScale as nameplateDotScaleSetting } from './nameplate_dot_scale';
 import {
@@ -167,6 +170,10 @@ export interface NameplatePainterDeps {
    *  settings site. A player preference, never a graphics tier. Defaults to the
    *  live setting (nameplate_dot_scale.ts); injectable so a test can drive it. */
   nameplateDotScale?: () => number;
+  /** The enemy cooldown row's SIZE on hostile player plates, 0 meaning off (the
+   *  showNameplateCooldowns toggle folded with its slider, nameplate_cooldown_scale.ts).
+   *  A player preference, never a graphics tier; injectable so a test can drive it. */
+  nameplateCooldownScale?: () => number;
   isHostilePlayer: (e: Entity) => boolean;
 }
 
@@ -191,6 +198,7 @@ export class NameplatePainter {
   private readonly showOwnNameplate: () => boolean;
   private readonly showPlayerNameplates: () => boolean;
   private readonly nameplateDotScale: () => number;
+  private readonly nameplateCooldownScale: () => number;
   private readonly isHostilePlayer: (e: Entity) => boolean;
   private readonly surface: NameplateCanvasSurface;
   private readonly states = new Map<number, NameplateCanvasState>();
@@ -248,6 +256,7 @@ export class NameplatePainter {
     this.showOwnNameplate = deps.showOwnNameplate;
     this.showPlayerNameplates = deps.showPlayerNameplates;
     this.nameplateDotScale = deps.nameplateDotScale ?? nameplateDotScaleSetting;
+    this.nameplateCooldownScale = deps.nameplateCooldownScale ?? nameplateCooldownScaleSetting;
     this.isHostilePlayer = deps.isHostilePlayer;
     this.surface = new NameplateCanvasSurface(deps.layer);
   }
@@ -358,10 +367,12 @@ export class NameplatePainter {
       // dot row, which sits under the name row and therefore pushes the name row
       // and everything above it up by its own height. drawEmote already mirrors
       // that step; without this the anchor did not, so two dotted plates in a
-      // crowd overlapped without being nudged apart.
+      // crowd overlapped without being nudged apart. The enemy cooldown row sits
+      // above the name row, so it lifts the envelope by its own height too.
       const extraLift =
         nameplateHeraldryLift(state.border) +
-        nameplateDotRowHeight(state.dots.count, state.dots.scale);
+        nameplateDotRowHeight(state.dots.count, state.dots.scale) +
+        nameplateCooldownRowHeight(state.cooldowns);
       if (anchor) {
         anchor.id = id;
         anchor.sx = screenX;
@@ -524,6 +535,13 @@ export class NameplatePainter {
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
     state.hpFill = entity.hp / Math.max(1, entity.maxHp);
     this.resolveDots(state, entity, player);
+    // A hostile player's tracked cooldowns, on the same per-frame cadence as the dots.
+    resolveNameplateCooldowns(
+      state.cooldowns,
+      entity,
+      state.hostile,
+      this.nameplateCooldownScale(),
+    );
 
     const cast = castBarState(entity);
     state.castVisible = cast.visible;

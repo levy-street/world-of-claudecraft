@@ -241,6 +241,7 @@ import {
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
+import { agePeerMajorCooldowns, applyPeerMajorCooldownWire } from './peer_major_cooldown_wire';
 import { perfectingCommand } from './perfecting_command';
 import {
   perfectingInfoForMirror,
@@ -2575,6 +2576,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
     this.stableTimerTime = rawTime;
     this.refreshStableSelfTimers(rawTime);
+    agePeerMajorCooldowns(this.entities.values(), rawTime, this.playerId); // enemy cooldown row
     return { mode, time: rawTime };
   }
 
@@ -2896,22 +2898,20 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.aggroTargetId = w.aggro ?? null;
       e.forcedTargetId = w.ft ?? null;
       e.forcedTargetTimer = w.ftm ?? 0;
-      // Another entity's selected target (players/bots; mobs use aggro above). Powers
-      // the target-of-target frame for a player target. For the SELF record this is
-      // re-set authoritatively from `s.target` in the self-decode below (same value),
-      // and both writes route through the pending-target echo guard (countStale
-      // false here: the self-decode owns the budget decrement).
+      // Another entity's selected target (players/bots; mobs use aggro above): the ToT frame
+      // for a player target. The SELF record is re-set authoritatively from `s.target` in the
+      // self-decode below (same value); both writes route through the pending-target echo
+      // guard (countStale false here: the self-decode owns the budget decrement).
       if (w.id === this.playerId) this.applySelfTargetFromServer(e, w.tgt ?? null, false);
       else e.targetId = w.tgt ?? null;
       e.tappedById = w.tap ?? null;
       // corpse harvest claim: unconditional so a record without hcb (unclaimed,
       // or a respawn that cleared the claim) resets any stale mirrored pid
       e.harvestClaimedBy = typeof w.hcb === 'number' ? w.hcb : null;
-      // loot owner-lock lapse: flag present means lapsed (mirror as already
-      // counted down), absent means the lock still holds or never started;
-      // unconditional so a respawned record resets any stale lapse (same
-      // contract as hcb above). The server owns the countdown; the client only
-      // ever needs the boolean.
+      // loot owner-lock lapse: flag present means lapsed (mirror as already counted down),
+      // absent means the lock still holds or never started; unconditional so a respawned
+      // record resets any stale lapse (same contract as hcb above). The server owns the
+      // countdown; the client only ever needs the boolean.
       e.lootFfaTimer = w.ffa ? 0 : Infinity;
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';
@@ -2925,14 +2925,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // updates the existing Map in place: no per-entity Map churn at 20 Hz
       e.threat.clear();
       if (w.thr) for (const [tid, tv] of w.thr as [number, number][]) e.threat.set(tid, tv);
-      // The aura family decodes in its own sibling (src/net/aura_wire_decode.ts):
-      // the deadline-vs-remaining clock, the in-place fast path that keeps a
-      // steady aura set allocation-free at 20 Hz, and every presence-only
-      // marker's absent-means-cleared handling live there, in ONE place rather
-      // than duplicated across the update and rebuild paths.
+      // The aura family decodes in its own sibling (src/net/aura_wire_decode.ts): the
+      // deadline-vs-remaining clock, the in-place fast path that keeps a steady aura set
+      // allocation-free at 20 Hz, and every presence-only marker's absent-means-cleared
+      // handling live there, in ONE place rather than duplicated across both paths.
       const wireAuras = (Array.isArray(w.auras) ? w.auras : []) as ClientWireAura[];
       if (snapshotCarriesAuras(timerWire, w.auras)) {
         e.auras = applyAuraWire(e.auras, wireAuras, timerWire);
+        applyPeerMajorCooldownWire(e, w.mcd, timerWire.time ?? NaN, w.id === this.playerId);
       }
       e.loot = w.lootList ?? null;
       return e;

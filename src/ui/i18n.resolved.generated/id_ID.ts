@@ -2243,6 +2243,8 @@ export const id_ID: EnTranslations = {
       "showPetFrame": "Tampilkan Peliharaan Anda",
       "showNameplateDots": "Tunjukkan Titik Saya di Papan Nama",
       "nameplateDotScale": "Ukuran Titik Papan Nama",
+      "showNameplateCooldowns": "Offensive/Defensive Tracker",
+      "nameplateCooldownScale": "Offensive/Defensive Tracker Size",
       "showTargetDots": "Tampilkan Titik Target",
       "showDefensivesTrack": "Tampilkan Cooldown Pertahanan",
       "showSelfBuffTrack": "Tampilkan Buff-ku",

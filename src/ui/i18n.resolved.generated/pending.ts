@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "es_ES": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "fr_FR": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "fr_CA": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "de_DE": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "nl_NL": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "pl_PL": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "id_ID": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "tr_TR": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "sv_SE": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "vi_VN": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ],
+  "da_DK": [
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
+  ]
 };

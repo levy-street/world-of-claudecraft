@@ -2243,6 +2243,8 @@ export const pl_PL: EnTranslations = {
       "showPetFrame": "Pokaż swoje zwierzę",
       "showNameplateDots": "Pokaż moje kropki na tabliczkach znamionowych",
       "nameplateDotScale": "Rozmiar kropki na tabliczce znamionowej",
+      "showNameplateCooldowns": "Offensive/Defensive Tracker",
+      "nameplateCooldownScale": "Offensive/Defensive Tracker Size",
       "showTargetDots": "Pokaż kropki docelowe",
       "showDefensivesTrack": "Pokaż obronne czasy odnowienia",
       "showSelfBuffTrack": "Pokaż moje wzmocnienia",

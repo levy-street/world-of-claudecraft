@@ -1391,15 +1391,13 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     if (e.castTargetId !== null) out.castTgt = e.castTargetId;
     if (e.channeling) out.chan = 1;
   }
-  // Target/target-of-target swing-timer bar: the general (non-self) mirror of
-  // the self-only `swing` field above selfWireJson, gated on autoAttack so an
-  // idle entity costs nothing extra on the broadcast (same style as the
-  // castingAbility gate above it). No weapon-speed field rides with it: the
-  // client's targetSwingTimerState degrades gracefully to the raw swingTimer
-  // as its first-frame period guess, self-correcting at the next swing-reset
-  // edge, trading one swing's worth of first-frame fill accuracy for not
-  // adding a second field to every broadcast tick for every auto-attacking
-  // entity in interest range.
+  // Target/target-of-target swing-timer bar: the general (non-self) mirror of the self-only
+  // `swing` field above selfWireJson, gated on autoAttack so an idle entity costs nothing
+  // extra on the broadcast (same style as the castingAbility gate above it). No weapon-speed
+  // field rides with it: the client's targetSwingTimerState degrades gracefully to the raw
+  // swingTimer as its first-frame period guess, self-correcting at the next swing-reset
+  // edge, trading one swing's worth of first-frame fill accuracy for not adding a second
+  // field to every broadcast tick for every auto-attacking entity in interest range.
   if (e.autoAttack) out.swing = round2(e.swingTimer);
   // Mount summon/dismount transition, so every client can time the summon FX / call
   // pose and the self-extrapolator can root the local player in lockstep. Volatile
@@ -8260,9 +8258,11 @@ export class GameServer {
       variant.tick = this.sim.tickCount;
       if (stableTimerWire) {
         const aura = cache.auraCache.encode(e.auras, this.sim.time, e.dead);
+        // Enemy cooldown deadlines share the aura channel and its version (major_cooldown_wire.ts).
+        const mcd = variant.mcd.encode(e, this.sim.time, aura.revision);
         variant.dynJson = cache.baseDynJson;
         variant.dynVer = cache.baseDynVer;
-        variant.auraVer = aura.revision;
+        variant.auraVer = mcd.revision;
 
         const baseChanged =
           variant.builtIdVer !== cache.idVer || variant.builtDynVer !== variant.dynVer;
@@ -8272,7 +8272,7 @@ export class GameServer {
           variant.liteJson = liteEntityJson(e.id, variant.dynJson);
         }
         if (baseChanged || auraChanged) {
-          const dynWithAuras = jsonWithField(variant.dynJson, 'auras', aura.json);
+          const dynWithAuras = mcd.splice(jsonWithField(variant.dynJson, 'auras', aura.json));
           variant.fullAuraJson = fullEntityJson(e.id, cache.idJson, dynWithAuras);
           variant.liteAuraJson = liteEntityJson(e.id, dynWithAuras);
           if (this.perfDetailActive) this.bcStableSerializes++;

@@ -13573,6 +13573,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.stickyTarget': '지면 클릭 시 대상 유지',
   'hudChrome.options.showNameplateDots': '이름표에 내 디버프 표시',
   'hudChrome.options.nameplateDotScale': '이름표 디버프 아이콘 크기',
+  'hudChrome.options.showNameplateCooldowns': '공격/방어 추적기',
+  'hudChrome.options.nameplateCooldownScale': '공격/방어 추적기 크기',
   'hudChrome.options.showTargetDots': '대상 디버프 목록 표시',
   'hudChrome.targetDots.title': '대상 디버프',
   'hudChrome.targetDots.overflow': '{count}개 더 있음, 표시되지 않음',

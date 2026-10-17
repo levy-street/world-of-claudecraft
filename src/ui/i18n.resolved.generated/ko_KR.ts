@@ -2243,6 +2243,8 @@ export const ko_KR: EnTranslations = {
       "showPetFrame": "내 펫 표시",
       "showNameplateDots": "이름표에 내 디버프 표시",
       "nameplateDotScale": "이름표 디버프 아이콘 크기",
+      "showNameplateCooldowns": "공격/방어 추적기",
+      "nameplateCooldownScale": "공격/방어 추적기 크기",
       "showTargetDots": "대상 디버프 목록 표시",
       "showDefensivesTrack": "방어 재사용 대기시간 표시",
       "showSelfBuffTrack": "내 버프 표시",

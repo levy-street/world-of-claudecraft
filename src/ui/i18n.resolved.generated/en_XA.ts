@@ -2243,6 +2243,8 @@ export const en_XA: EnTranslations = {
       "showPetFrame": "[Šĥóŵ Ýóúŕ Þéţ]",
       "showNameplateDots": "[Šĥóŵ Ɱý Ðóţš óñ Ñáɱéþļáţéš]",
       "nameplateDotScale": "[Ñáɱéþļáţé Ðóţ Šížé]",
+      "showNameplateCooldowns": "[Óƒƒéñšíʋé/Ðéƒéñšíʋé Ţŕáçķéŕ]",
+      "nameplateCooldownScale": "[Óƒƒéñšíʋé/Ðéƒéñšíʋé Ţŕáçķéŕ Šížé]",
       "showTargetDots": "[Šĥóŵ Ţáŕĝéţ Ðóţš]",
       "showDefensivesTrack": "[Šĥóŵ Ðéƒéñšíʋé Çóóļðóŵñš]",
       "showSelfBuffTrack": "[Šĥóŵ Ɱý Ɓúƒƒš]",

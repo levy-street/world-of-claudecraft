@@ -51,6 +51,25 @@ export interface NameplatePaintDots {
   readonly scale: number;
 }
 
+/** One enemy-cooldown slot as the gate compares it
+ *  (nameplate_cooldowns_core.NameplateCooldownSlot). */
+export interface NameplatePaintCooldownSlot {
+  readonly iconUrl: string;
+  readonly group: string;
+  readonly active: boolean;
+  readonly fraction: number;
+  readonly unit: string;
+  readonly timeText: string;
+}
+
+/** The drawn enemy-cooldown plan as the gate compares it
+ *  (nameplate_cooldowns_core.NameplateCooldownsPlan). */
+export interface NameplatePaintCooldowns {
+  readonly slots: readonly NameplatePaintCooldownSlot[];
+  readonly count: number;
+  readonly scale: number;
+}
+
 /** Every field of a plate's canvas state the drawing code reads. Structural on
  *  purpose: nameplate_canvas.NameplateCanvasState satisfies it, and this module
  *  never imports that DOM-bound file. Adding a drawn field to the state means
@@ -83,6 +102,7 @@ export interface NameplatePaintFields {
   readonly frame: string;
   readonly comboPips: number;
   readonly dots: NameplatePaintDots;
+  readonly cooldowns: NameplatePaintCooldowns;
   readonly aiLabel: string;
   readonly cheaterLabel: string;
   readonly devOutline: string | null;
@@ -130,6 +150,14 @@ interface PlateRecord {
   dotRemaining: number[];
   dotDurations: number[];
   dotTimeTexts: string[];
+  cdCount: number;
+  cdScale: number;
+  cdIconUrls: string[];
+  cdGroups: string[];
+  cdActive: boolean[];
+  cdFractions: number[];
+  cdUnits: string[];
+  cdTimeTexts: string[];
   aiLabel: string;
   cheaterLabel: string;
   devOutline: string | null;
@@ -179,6 +207,24 @@ function dotsDiffer(record: PlateRecord, dots: NameplatePaintDots): boolean {
   return false;
 }
 
+function cooldownsDiffer(record: PlateRecord, cooldowns: NameplatePaintCooldowns): boolean {
+  if (record.cdCount !== cooldowns.count || record.cdScale !== cooldowns.scale) return true;
+  for (let i = 0; i < cooldowns.count; i++) {
+    const slot = cooldowns.slots[i];
+    if (
+      record.cdIconUrls[i] !== slot.iconUrl ||
+      record.cdGroups[i] !== slot.group ||
+      record.cdActive[i] !== slot.active ||
+      record.cdFractions[i] !== slot.fraction ||
+      record.cdUnits[i] !== slot.unit ||
+      record.cdTimeTexts[i] !== slot.timeText
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function plateDiffers(
   record: PlateRecord,
   sx: number,
@@ -215,6 +261,7 @@ function plateDiffers(
     record.frame !== f.frame ||
     record.comboPips !== f.comboPips ||
     dotsDiffer(record, f.dots) ||
+    cooldownsDiffer(record, f.cooldowns) ||
     record.aiLabel !== f.aiLabel ||
     record.cheaterLabel !== f.cheaterLabel ||
     record.devOutline !== f.devOutline ||
@@ -272,6 +319,17 @@ function writePlate(
     record.dotDurations[i] = slot.duration;
     record.dotTimeTexts[i] = slot.timeText;
   }
+  record.cdCount = f.cooldowns.count;
+  record.cdScale = f.cooldowns.scale;
+  for (let i = 0; i < f.cooldowns.count; i++) {
+    const slot = f.cooldowns.slots[i];
+    record.cdIconUrls[i] = slot.iconUrl;
+    record.cdGroups[i] = slot.group;
+    record.cdActive[i] = slot.active;
+    record.cdFractions[i] = slot.fraction;
+    record.cdUnits[i] = slot.unit;
+    record.cdTimeTexts[i] = slot.timeText;
+  }
   record.aiLabel = f.aiLabel;
   record.cheaterLabel = f.cheaterLabel;
   record.devOutline = f.devOutline;
@@ -328,6 +386,14 @@ function newRecord(): PlateRecord {
     dotRemaining: [],
     dotDurations: [],
     dotTimeTexts: [],
+    cdCount: -1,
+    cdScale: 1,
+    cdIconUrls: [],
+    cdGroups: [],
+    cdActive: [],
+    cdFractions: [],
+    cdUnits: [],
+    cdTimeTexts: [],
     aiLabel: '',
     cheaterLabel: '',
     devOutline: null,

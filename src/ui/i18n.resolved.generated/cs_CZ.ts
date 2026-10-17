@@ -2243,6 +2243,8 @@ export const cs_CZ: EnTranslations = {
       "showPetFrame": "Zobrazit tvého mazlíčka",
       "showNameplateDots": "Zobrazit moje tečky na jmenovkách",
       "nameplateDotScale": "Velikost bodu na jmenovce",
+      "showNameplateCooldowns": "Offensive/Defensive Tracker",
+      "nameplateCooldownScale": "Offensive/Defensive Tracker Size",
       "showTargetDots": "Zobrazit cílové body",
       "showDefensivesTrack": "Zobrazovat obranné cooldowny",
       "showSelfBuffTrack": "Zobrazovat moje bonusy",

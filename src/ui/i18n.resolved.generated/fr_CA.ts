@@ -2243,6 +2243,8 @@ export const fr_CA: EnTranslations = {
       "showPetFrame": "Afficher votre familier",
       "showNameplateDots": "Afficher mes points sur les plaques signalétiques",
       "nameplateDotScale": "Taille du point de la plaque signalétique",
+      "showNameplateCooldowns": "Offensive/Defensive Tracker",
+      "nameplateCooldownScale": "Offensive/Defensive Tracker Size",
       "showTargetDots": "Afficher les points cibles",
       "showDefensivesTrack": "Afficher les temps de recharge défensifs",
       "showSelfBuffTrack": "Afficher mes buffs",

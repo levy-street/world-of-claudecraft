@@ -918,6 +918,9 @@ const COMBAT_KEYS = [
   // directly under the toggle it sizes.
   'showNameplateDots',
   'nameplateDotScale',
+  // The enemy cooldown row on hostile player plates, its size slider under it.
+  'showNameplateCooldowns',
+  'nameplateCooldownScale',
   'showTargetDots',
   // The six aura tracks, in the order the descriptor table declares them, plus
   // the mode sub-option that rides with the utility track.

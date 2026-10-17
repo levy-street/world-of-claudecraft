@@ -12955,6 +12955,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.stickyTarget': '點擊地面時保留目標',
   'hudChrome.options.showNameplateDots': '在名條上顯示我的減益',
   'hudChrome.options.nameplateDotScale': '名條減益圖示大小',
+  'hudChrome.options.showNameplateCooldowns': '進攻/防禦追蹤器',
+  'hudChrome.options.nameplateCooldownScale': '進攻/防禦追蹤器大小',
   'hudChrome.options.showTargetDots': '顯示目標減益追蹤',
   'hudChrome.targetDots.title': '目標減益',
   'hudChrome.targetDots.overflow': '另有 {count} 個未顯示',

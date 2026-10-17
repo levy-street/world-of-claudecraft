@@ -1097,6 +1097,11 @@ export function buildInterfaceControls(
       // the plate-native size and the slider only grows it, to 300%. Percent is
       // the default slider format, so the readout says "150%".
       slider(s, 'nameplateDotScale', 'hudChrome.options.nameplateDotScale'),
+      // PvP: the offensive/defensive tracker, a hostile player's tracked cooldowns
+      // above their name, beside the dot tracker it mirrors, with its own size
+      // slider directly under the toggle (same 100% to 300% range).
+      boolToggle(s, 'showNameplateCooldowns', 'hudChrome.options.showNameplateCooldowns'),
+      slider(s, 'nameplateCooldownScale', 'hudChrome.options.nameplateCooldownScale'),
       boolToggle(s, 'showTargetDots', 'hudChrome.options.showTargetDots'),
       // The six aura tracks: bars of the auras YOU have out, each its own
       // movable frame and each opted into individually (all default off).
