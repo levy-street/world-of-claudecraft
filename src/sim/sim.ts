@@ -430,6 +430,7 @@ import {
 import { farmPatchesFor } from './moved_objects';
 import { savedGearFor } from './muster_pike';
 import * as nythraxisReadouts from './nythraxis_raid_readouts';
+import { offlineLeaderboardRows } from './offline_leaderboard';
 import {
   grantDevotionFromBlock,
   grantGroundAoEDevotionOnFirstHit,
@@ -678,6 +679,8 @@ import type { ResolvedAbility } from './resolved_ability';
 import { freshCounters, type RewardCounters } from './reward_counters';
 import { Rng } from './rng';
 import { resolveSavedPosExit } from './saved_pos_exit';
+import * as seasonalMod from './seasonal';
+import { seasonalSaveFragment } from './seasonal/seasonal_state';
 import * as seatingMod from './seating';
 import { persistedResource } from './serialize_resource';
 import { computeCharacterModifiers } from './set_bonus_mods';
@@ -927,7 +930,6 @@ import {
   swingMissChance,
   TICK_RATE,
   type Vec3,
-  virtualLevel,
   type WeaponSkinLoadout,
   type WeaponSkinType,
   type WorldContent,
@@ -1309,6 +1311,7 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 export interface PlayerMeta
   extends ReferralRewardState,
     worldQuestState.WorldQuestPlayerState,
+    seasonalMod.SeasonalPlayerState,
     HostArmourAuthority,
     lanceTrialMod.LancePlayerState {
   courier?: courierMod.CourierState;
@@ -2016,6 +2019,7 @@ export class Sim {
   bgMatches = new Map<number, bgMod.BgMatch>(); // pid -> shared match (all members)
   worldPvpBooks = worldPvpMod.newWorldPvpBooks(); // /pvp assist + DR books (live ctx view)
   hillState = hillMod.newHillState(); // King of the Hill: the standing hill (live ctx view)
+  seasonal = seasonalMod.freshSeasonalWorldState(); // host-fed event + /dev override (ctx view)
   readonly hillProbe: HillSpotProbe; // the hill's spot probe, bound in the ctor (pvp/hill_probe.ts)
   private bgBusySlots = new Set<number>();
   private nextBgMatchId = 1;
@@ -2810,6 +2814,7 @@ export class Sim {
       questLog: new Map(),
       questsDone: new Set(),
       ...worldQuestState.freshWorldQuestPlayerState(),
+      ...seasonalMod.freshSeasonalPlayerState(),
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
@@ -3184,6 +3189,7 @@ export class Sim {
         s.weeklyQuest,
         s.factionCurrencies,
       );
+      seasonalMod.restoreSeasonalState(meta, s.seasonal);
       // A rev reset zeroes COLLECT counts too, and those are derived state only
       // onInventoryChangedForQuests re-credits: re-sync once (inventory is already
       // restored above) so a migrated character holding the collect items is not
@@ -4019,6 +4025,7 @@ export class Sim {
       // above, so a character that never crafted a daily-gated recipe
       // serializes byte-identically to a pre-phase-07 save.
       ...craftDailySaveFragment(meta.craftDaily),
+      ...seasonalSaveFragment(meta),
       mailWelcomed: meta.mailWelcomed,
       guildLetterSent: meta.guildLetterSent,
       // All three written only when non-empty/true (zero-default
@@ -4582,33 +4589,7 @@ export class Sim {
   // XP. Online play overrides this with the cached, realm-scoped server query.
   // Paged through the same helper the server uses so both worlds behave alike.
   leaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<LeaderboardPage> {
-    const rows = [...this.players.values()]
-      .map((m) => {
-        const e = this.entities.get(m.entityId);
-        return e ? { meta: m, e } : null;
-      })
-      .filter((x): x is { meta: PlayerMeta; e: Entity } => x !== null)
-      .sort(
-        (a, b) =>
-          b.meta.lifetimeXp - a.meta.lifetimeXp ||
-          b.e.level - a.e.level ||
-          a.meta.name.localeCompare(b.meta.name),
-      )
-      .map(({ meta, e }, i) => ({
-        rank: i + 1,
-        name: meta.name,
-        cls: meta.cls,
-        level: e.level,
-        virtualLevel: virtualLevel(meta.lifetimeXp),
-        lifetimeXp: meta.lifetimeXp,
-        prestigeRank: meta.prestigeRank,
-        // the selected Book of Deeds title (a deed id), like the server fill
-        title: meta.activeTitle,
-        // The guild tag beside the name, read off the passive display field the
-        // host stamps (setPlayerGuild). Omitted rather than empty, like the server
-        // fill; offline that is always the case, since guilds are server-only.
-        ...(e.guild ? { guild: e.guild } : {}),
-      }));
+    const rows = offlineLeaderboardRows(this.players, this.entities); // offline_leaderboard.ts
     return Promise.resolve(paginateLeaderboard(rows, page, pageSize));
   }
   // Guilds are a server-only social system (they live in the server's social DB,
@@ -4702,6 +4683,15 @@ export class Sim {
   }
   abandonClueHunt(pid?: number): void {
     clueMod.abandonClueHunt(this.ctx, pid);
+  }
+  get activeSeasonalEvent(): string | null {
+    return seasonalMod.activeSeasonalEventOf(this.seasonal);
+  }
+  get trickOrTreatedToday(): readonly string[] {
+    return seasonalMod.knockedTodayView(this.primary, this.resetDay);
+  }
+  trickOrTreat(npcId: number, pid?: number): void {
+    seasonalMod.trickOrTreat(this.ctx, npcId, pid);
   }
   get treasureMap(): Readonly<TreasureMapProgress> | null {
     return this.primary.treasureMap;
@@ -5174,6 +5164,9 @@ export class Sim {
       },
       get hillState() {
         return sim.hillState;
+      },
+      get seasonal() {
+        return sim.seasonal;
       },
       get hillProbe() {
         return sim.hillProbe;
@@ -6174,6 +6167,7 @@ export class Sim {
     worldPvpMod.updateWorldPvp(this.ctx); // the /pvp clock, zone pass + books sweep; zero rng
     lap?.('worldPvp');
     hillMod.updateHill(this.ctx); // King of the Hill (pvp/hill.ts): spawns draw a PRIVATE rng
+    seasonalMod.updateSeasonal(this.ctx); // seasonal events + field boss (rng only in his pull)
     lap?.('hill');
     // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
     // matching on the sim clock), so appending it here cannot fork the draw order.

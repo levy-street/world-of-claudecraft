@@ -272,10 +272,11 @@ describe('the real work-order lifecycle through computeQuestState', () => {
     expect(questMarkerKind(workOrder, state, done, 'giver')).toBe('repeat');
   });
 
-  // Fourteen since the Mirefen muster's weekly (q_muster_trophy, weeklyReset).
-  it('every one of the fourteen repeatable quests classifies repeat once completed and offered', () => {
+  // Fourteen since the Mirefen muster's weekly (q_muster_trophy, weeklyReset), fifteen
+  // with Gourdlight Eve's daily rounds (q_gourdlight_rounds).
+  it('every one of the fifteen repeatable quests classifies repeat once completed and offered', () => {
     const repeatables = Object.values(QUESTS).filter((q) => q.repeatable);
-    expect(repeatables).toHaveLength(14);
+    expect(repeatables).toHaveLength(15);
     for (const q of repeatables) {
       expect(questMarkerKind(q, 'available', new Set([q.id]), 'giver'), q.id).toBe('repeat');
     }

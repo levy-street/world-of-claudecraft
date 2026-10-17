@@ -244,6 +244,11 @@ const MOB_IDS = [
   // The command camp's drill yard: the mallet man and the training effigy.
   'muster_drillmaster',
   'muster_effigy',
+  // Gourdlight Eve's field boss and his adds (content/gourdlight_eve_scarecrow.ts)
+  'gourdlight_thatchgrin',
+  'gourdlight_crow',
+  'gourdlight_strawling',
+  'gourdlight_swelling_gourd',
   // Ambient Highwatch Stables horse (zone 3)
   'stable_horse',
   // Procedural Rift creature pool (src/sim/content/rift/mobs.ts). Dev/endless
@@ -534,6 +539,7 @@ const NPC_IDS = [
   'patron_grissel_sedgeworth',
   'patron_ned_oxley',
   'patron_hester_quillby',
+  'gourdlight_keeper', // Gourdlight Eve's keeper (content/gourdlight_eve.ts), Eastbrook
   // Lanternmere, the Amberfall
   'reeve_ottoline',
   'waywatcher_sorrel',
@@ -849,6 +855,8 @@ const QUEST_IDS = [
   // the Eastbrook hub dummy lesson (content/practice_dummies.ts)
   'q_hub_know_your_numbers',
   'q_hub_healing_numbers',
+  // Gourdlight Eve's daily rounds (content/gourdlight_eve.ts)
+  'q_gourdlight_rounds',
 ] as const;
 
 const ZONE_IDS = [

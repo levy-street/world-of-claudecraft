@@ -1042,7 +1042,14 @@ const MONOLITHS: MonolithRow[] = [
     // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
     // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
     // merged tree. Exact count.
-    ceiling: 12393,
+    // LOWERED 12393 -> 12388 by Gourdlight Eve (feature/halloween-event): the canvas
+    // viewport measure moved to viewport_measure.ts, paying for the seasonal decor
+    // view's field, build and per-frame update, the trick fumes and the born helm bit.
+    // Exact count (wc -l after biome).
+    // LOWERED 12388 -> 12384 by Gourdlight Eve phase 2: the selection ring's hostility
+    // verdict moved to reaction.ts (isHostileSelectionTarget), paying for the field
+    // boss's fx layer (scarecrow_fx.ts) field, build, two routes, two updates and dispose.
+    ceiling: 12384,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1282,7 +1289,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11642 -> 11639 by the tavern's seats: standUp moved whole into seating.ts
     // (bound straight into the context and the motion deps), paying for the sitOnSeat and
     // resting delegates. Exact count.
-    ceiling: 11594,
+    // LOWERED 11594 -> 11585 by Gourdlight Eve (feature/halloween-event): the offline
+    // leaderboard's row build moved to offline_leaderboard.ts, paying for the seasonal
+    // ctx view, tick call, save/restore lines and the three IWorldSeasonal delegates.
+    // Exact count (wc -l after biome).
+    ceiling: 11585,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

@@ -197,8 +197,13 @@ describe('Carrion Glut', () => {
     const painter = readFileSync('src/render/sunken_bastion/bastion_trash_fx.ts', 'utf8');
     expect(painter).toMatch(/private readonly swell = new Map<number, number>\(\)/);
     // The renderer reads it through the dungeon visuals, O(1) per body.
+    // (composed with the other per-body swell in scarecrow_fx.ts entityDisplayScale)
     const renderer = readFileSync('src/render/renderer.ts', 'utf8');
-    expect(renderer).toContain('e.scale * (this.riftDeathZoneVisuals?.bodySwell(e.id) ?? 1)');
+    expect(renderer).toContain(
+      'entityDisplayScale(e, this.riftDeathZoneVisuals, this.scarecrowFx)',
+    );
+    const swells = readFileSync('src/render/scarecrow_fx.ts', 'utf8');
+    expect(swells).toContain('e.scale * (rift?.bodySwell(e.id) ?? 1)');
   });
 
   it('keeps the brine look on the crawler ring and drops the old second ring', () => {

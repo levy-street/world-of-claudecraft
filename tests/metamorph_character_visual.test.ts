@@ -158,10 +158,15 @@ describe('Metamorphosis character integration', () => {
     expect(source).toContain(
       'v.metamorphVisual?.setProxyShadow(shadowPlan.formProxy && active === v.metamorphVisual)',
     );
-    // The entity's own scale, times only the Bastion's fed-crawler swell (a
-    // per-body dungeon visual, 1 for every other body): no form scale.
+    // The entity's own scale, times only the per-body swells (the Bastion's
+    // fed crawler and Old Thatchgrin's Swelling Gourd, 1 for every other body),
+    // composed in scarecrow_fx.ts entityDisplayScale: no form scale.
     expect(source).toContain(
-      'const displayScale = e.scale * (this.riftDeathZoneVisuals?.bodySwell(e.id) ?? 1);',
+      'const displayScale = entityDisplayScale(e, this.riftDeathZoneVisuals, this.scarecrowFx);',
+    );
+    const swells = readFileSync(new URL('../src/render/scarecrow_fx.ts', import.meta.url), 'utf8');
+    expect(swells).toContain(
+      'return e.scale * (rift?.bodySwell(e.id) ?? 1) * scarecrow.bodySwell(e, e.id);',
     );
     expect(source).not.toContain('setMetamorph(');
     expect(source).not.toContain('LICH_FORM_SCALE');

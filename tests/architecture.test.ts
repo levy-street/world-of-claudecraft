@@ -296,6 +296,7 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_ley_fx_view.ts',
   'src/ui/world_quest_instructor_view.ts',
   'src/ui/quest_event_view.ts',
+  'src/ui/seasonal_event_view.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
   'src/ui/aura_strip_order_core.ts',
@@ -362,6 +363,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/trinket_slot_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/quest/clue_step_row_view.ts',
+  'src/ui/hud/quest/trick_or_treat_row_view.ts',
   'src/ui/hud/pet_bar_core.ts',
   'src/ui/hud/shardpike/shardpike_bar_view.ts',
   'src/ui/hud/shardpike/shardpike_prompt_view.ts',
@@ -841,6 +843,14 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/courier_visual_core.ts',
+  // the seasonal props' glow: dim by day, bright at night, a candle flicker
+  'src/render/seasonal_glow_core.ts',
+  // the strung seasonal garland's catenary and the spacing of its leaves and beads
+  'src/render/seasonal_garland_core.ts',
+  // Old Thatchgrin's gourd arc, burning-patch fade and timing (scarecrow_fx.ts).
+  'src/render/scarecrow_fx_core.ts',
+  // where the seasonal dressing's candlelight is: its halos and ground-light sites
+  'src/render/seasonal_glow_sites_core.ts',
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
@@ -1194,6 +1204,8 @@ const RENDER_PURE_CORES = [
   'src/render/frame_ms_stats_core.ts',
   'src/render/ability_vfx_core.ts',
   'src/render/characters/player_look_core.ts',
+  // who draws the worn seasonal pumpkin head and the helm it hides (seasonal/)
+  'src/render/characters/seasonal_head_core.ts',
   'src/render/characters/far_lod_reveal_core.ts',
   'src/render/characters/woc_parts_core.ts',
   'src/render/characters/woc_entry_core.ts',

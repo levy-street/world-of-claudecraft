@@ -703,7 +703,16 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
     // 322 with the Mirefen world-boss branch's three combat deeds, all pending.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, its 24 pending on the dungeon crest.
-    expect(DEED_ORDER).toHaveLength(346);
+    // 347 with Gourdlight Eve's feat (feat_gourdlight_guise), its crest painted
+    // (rendered from the shipped head, scripts/assets/gourdlight_eve/crest.py).
+    // 348 with its field boss's feat (feat_old_thatchgrin), its crest painted too.
+    // 351 with its three title-writ feats, their crests painted too.
+    expect(DEED_ORDER).toHaveLength(351);
+    expect(DEED_IMAGE_IDS.has('feat_title_hollow_grinned')).toBe(true);
+    expect(DEED_ART_PENDING.has('feat_gourdlight_guise')).toBe(false);
+    expect(DEED_ART_PENDING.has('feat_old_thatchgrin')).toBe(false);
+    expect(DEED_IMAGE_IDS.has('feat_old_thatchgrin')).toBe(true);
+    expect(DEED_IMAGE_IDS.has('feat_gourdlight_guise')).toBe(true);
     expect(DEED_ART_PENDING.has('cmb_point_taken')).toBe(true);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);

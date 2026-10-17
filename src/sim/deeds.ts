@@ -31,6 +31,7 @@ import { grantBuddy } from './buddies';
 import { BUDDY_DEED_REWARDS } from './content/buddy_sources';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { FARM_CROP_IDS } from './content/farm_crops';
+import { THATCHGRIN_ID } from './content/gourdlight_eve_scarecrow';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { REFERRAL_TITLE } from './content/referral_rewards';
 import { pointsSpent } from './content/talents';
@@ -1982,6 +1983,12 @@ export function onWorldBossKilledForDeeds(
   // Per-boss credit, matched on template id. An explicit branch per boss rather than a
   // table because the deeds differ in SHAPE: only Thunzharr has an unbroken-run deed, so a
   // table would carry optionals most bosses never use.
+  // Old Thatchgrin (Gourdlight Eve's field boss): his seasonal feat (feat_old_thatchgrin).
+  if (mob.templateId === THATCHGRIN_ID) {
+    for (const meta of contributors) bumpDeedStat(ctx, meta, 'thatchgrinKills', 1);
+    ctx.deedRuntime.encounters.delete(mob.id);
+    return;
+  }
   if (mob.templateId === BALGATH_ID) {
     for (const meta of contributors) {
       grantDeed(ctx, meta, 'cmb_balgath');

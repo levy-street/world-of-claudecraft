@@ -281,6 +281,9 @@ export class WocHeadDressing {
   /** Live with every wanted piece shown: the per-frame poll has nothing to do. */
   private settled = false;
   private helm = false;
+  /** A worn piece that replaces the whole head (the seasonal pumpkin): nothing of the
+   *  head draws while it stands, the pieces stay hung for the moment it comes off. */
+  private headless = false;
   /** `${source uuid}|${role}|${surface}|${reference}` -> this visual's wrapped clone. */
   private readonly wrapped = new Map<string, THREE.Material>();
   /** Every wrapped clone's uniforms, with the strength its colour writes carry
@@ -696,6 +699,15 @@ export class WocHeadDressing {
     return true;
   }
 
+  /** Draw no part of the head (a worn piece stands in for all of it). False when
+   *  nothing changed. */
+  setHeadless(headless: boolean): boolean {
+    if (headless === this.headless) return false;
+    this.headless = headless;
+    this.apply();
+    return true;
+  }
+
   /** Re-assert the head over a manifest part pass, and take off the body every hung piece
    *  the head neither draws nor wants any more. */
   apply(): void {
@@ -717,9 +729,10 @@ export class WocHeadDressing {
         );
     }
     const look = this.live ? this.drawnHead : null;
-    const want = look
-      ? new Set(wocHeadVisibleNodes(this.type, look, { helm: this.helm }))
-      : NOTHING;
+    const want =
+      look && !this.headless
+        ? new Set(wocHeadVisibleNodes(this.type, look, { helm: this.helm }))
+        : NOTHING;
     this.drawn.clear();
     for (const [name, node] of rig.pieces) {
       const on = want.has(name);

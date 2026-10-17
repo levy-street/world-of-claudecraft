@@ -18,6 +18,7 @@ import { itemNames, itemStrings } from './items';
 import { mergeEntities, mergeExtra, mergeStrings } from './merge';
 import { questStrings } from './quests';
 import { referralCardStrings } from './referral_cards';
+import { seasonalStrings } from './seasonal';
 import { shellStrings } from './shell';
 
 export { abilityStrings, classAbilityNames } from './abilities';
@@ -47,6 +48,7 @@ export { hudChromeStrings } from './hud_chrome';
 export { itemNames, itemStrings } from './items';
 export { mergeEntities, mergeExtra, mergeStrings } from './merge';
 export { questStrings } from './quests';
+export { seasonalStrings } from './seasonal';
 // Re-export the catalog public surface (every name the old i18n.en.ts exported).
 export { shellStrings } from './shell';
 
@@ -253,6 +255,8 @@ export const en = {
   apiError: apiErrorStrings,
   // Clue Scroll hunt titles and per-step riddles (src/ui/i18n.catalog/clues.ts).
   clues: clueStrings,
+  // Seasonal events: names, trick-or-treat lines, tricks (src/ui/i18n.catalog/seasonal.ts).
+  seasonal: seasonalStrings,
   // The dungeon lore guides' lines and dialog (src/ui/i18n.catalog/dungeon_guides.ts).
   dungeonGuide: dungeonGuideStrings,
   guide: guideStrings,

@@ -1,4 +1,5 @@
 import { livePlaytimeSeconds } from '../src/sim/playtime';
+import { knockedTodayView } from '../src/sim/seasonal';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import {
@@ -45,6 +46,11 @@ export function emitActivitySelfKeys(
   // delta gate drops it from every other tick; the sheet displays minutes at
   // most, so no read loses precision.
   emit('ptime', Math.floor(livePlaytimeSeconds(meta, sim.time) / 60) * 60);
+  // Seasonal events (src/sim/seasonal/): the running event (realm-wide, null when
+  // none) and this character's trick-or-treat knocks for the reset day. Both are
+  // tiny and change rarely, so the per-tick delta elides them almost always.
+  emit('season', sim.activeSeasonalEvent);
+  emit('tot', knockedTodayView(meta, sim.resetDay));
 }
 /** Per-viewer, unconditional snapshot suffix: absence is an explicit clear. */
 export { activePublicWorldQuestTracePids, PUBLIC_WORLD_QUEST_TRACE_RADIUS };

@@ -246,6 +246,8 @@ describe('content referential integrity', () => {
         else if (
           !ITEMS[itemId].buyValue &&
           !ITEMS[itemId].priceHonor &&
+          // a seasonal keeper's row is priced in the event's token (priceItem)
+          !((ITEMS[itemId].priceItem?.count ?? 0) > 0) &&
           !((FACTION_VENDOR_GATES[itemId]?.currencyCost ?? 0) > 0)
         )
           problems.push(`${npc.id}: vendor item ${itemId} has no purchase price`);

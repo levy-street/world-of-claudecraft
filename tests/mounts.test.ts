@@ -110,7 +110,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 
 describe('mount catalog', () => {
   it('keeps the horse first and appends the two referral milestone mounts', () => {
-    expect(MOUNT_KEYS).toHaveLength(13);
+    // 14 with Gourdlight Eve's event-bound Emberbristle Broom (a common-tier card).
+    expect(MOUNT_KEYS).toHaveLength(14);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.slice(-2)).toEqual(['referral_tank', 'referral_raptor']);
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -190,7 +191,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (
         isDeveloperMount(key) ||
         MEMBERSHIP_REWARD_MOUNTS.includes(key) ||
-        REFERRAL_REWARD_MOUNTS.includes(key)
+        REFERRAL_REWARD_MOUNTS.includes(key) ||
+        // EVENT-BOUND reins (ItemDef.seasonalEvent): swept from every container when
+        // their event closes (seasonal/seasonal_bound_items.ts), so a traded copy
+        // could outlive its event in a buyer's bags. Only the Emberbristle Broom.
+        item.seasonalEvent !== undefined
       ) {
         // Bound reins, for the same leak reason from different doors: a
         // developer-only mount has no player acquisition path, and the store
@@ -291,6 +296,23 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (MEMBERSHIP_REWARD_MOUNTS.includes(key)) continue; // paid receipt delivery, pinned below
       if (REFERRAL_REWARD_MOUNTS.includes(key)) continue; // transactional milestone delivery, referral_rewards.test.ts
       const itemId = mountItemId(key)!;
+      // SEASONAL FIELD-BOSS KEEPSAKE: the Emberbristle Broom is Old Thatchgrin's
+      // first-kill keepsake, a certain personal draw gated to characters who hold no
+      // copy (LootEntry.unlessOwned), and event-bound, so it cannot be farmed or kept
+      // past Gourdlight Eve. His is the ONE table it rides, he is a world boss (raid
+      // kill, personal loot, daily lockout), and it is no faster than the horse.
+      if (itemId === 'reins_emberbristle_broom') {
+        const holders = Object.values(MOBS).filter((m) => m.loot.some((l) => l.itemId === itemId));
+        expect(holders.map((m) => m.id)).toEqual(['gourdlight_thatchgrin']);
+        expect(holders[0].worldBoss).toBe(true);
+        const row = holders[0].loot.find((l) => l.itemId === itemId);
+        expect(row?.chance).toBe(1);
+        expect(row?.unlessOwned).toBe(true);
+        expect(row?.rollGroup).toBeUndefined();
+        expect(ITEMS[itemId].seasonalEvent).toBe('gourdlight_eve');
+        expect(MOUNTS[key].moveSpeedPct).toBe(MOUNTS.valorsteed.moveSpeedPct);
+        continue;
+      }
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity. The only mob tables a
       // mount may ride are the pinned world bosses', and there it is an ungrouped

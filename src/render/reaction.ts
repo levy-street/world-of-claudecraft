@@ -24,6 +24,22 @@ export function isOwnedPetHostile(
   return owner && owner.kind === 'player' ? isPlayerHostile(owner) : pet.hostile;
 }
 
+// The selection ring's verdict: a controlled pet inherits its owner's reaction (a
+// player's pet is hostile only in PvP), an uncontrolled mob keeps its own flag, and a
+// player takes the player-vs-player verdict. Moved out of renderer.ts verbatim.
+export function isHostileSelectionTarget(
+  target: Entity,
+  entities: Map<number, Entity>,
+  isPlayerHostile: (p: Entity) => boolean,
+): boolean {
+  if (target.kind === 'mob') {
+    return target.ownerId !== null
+      ? isOwnedPetHostile(target, entities, isPlayerHostile)
+      : target.hostile;
+  }
+  return isPlayerHostile(target);
+}
+
 // True when a mob is a friendly controlled pet (owned and not hostile to the
 // viewer) — the case that should get a friendly nameplate instead of the
 // level-difference "con" color.

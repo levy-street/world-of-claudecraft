@@ -2226,6 +2226,7 @@ export const ja_JP: EnTranslations = {
       "name_lanternback_troll": "ランタンバックのグルンボル",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
+      "name_emberbristle_broom": "エンバーブリッスルの箒",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -2244,7 +2245,8 @@ export const ja_JP: EnTranslations = {
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
       "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
-      "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
+      "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。",
+      "desc_emberbristle_broom": "オレンジのリボンを巻いた収穫の箒。地面から手のひらひとつ分浮かび、穂先から燠火をこぼす。ゴードライトの宵が終わると藁に戻って崩れ落ちる。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -4264,6 +4266,7 @@ export const ja_JP: EnTranslations = {
       "spellHaste": "呪文の詠唱速度が{pct}%上昇する",
       "sated": "別のグループ加速効果を受けられない",
       "cauterizeFatigue": "コーテライズは次の致死ダメージを防げない",
+      "seasonalCosmetic": "見た目のみ：戦闘に影響なし",
       "castShield": "ダメージで詠唱が中断または遅延しない",
       "dmgDone": "与えるダメージを{pct}%上昇させる",
       "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
@@ -7701,6 +7704,62 @@ export const ja_JP: EnTranslations = {
         "2": "風車があなたを海沿いの道へ送ったか。灯台には最後の秘密がひとつある。北西、小道のすぐ脇で、芝が切られて元に戻されている。そこを掘れ。"
       }
     }
+  },
+  "seasonal": {
+    "event": {
+      "gourdlight_eve": {
+        "name": "ゴードライトの宵"
+      }
+    },
+    "trickOrTreat": {
+      "row": "トリック・オア・トリート！",
+      "rowAria": "{name}に「トリック・オア・トリート」と言う",
+      "knockedHint": "今日はもうここの戸を叩いた。デイリーリセット後にまた開く。",
+      "treat": "{name}がお菓子をくれた。",
+      "trick": "{name}がいたずらをした：{trick}！",
+      "alreadyKnocked": "今日はもう{name}にお菓子をねだった。",
+      "notActive": "ゴードライトの宵は今は開催されていない。",
+      "tooFar": "もっと近づいて戸を叩こう。",
+      "treatFlash": {
+        "one": "トリート！ゴードライトの菓子 {count}個",
+        "few": "トリート！ゴードライトの菓子 {count}個",
+        "many": "トリート！ゴードライトの菓子 {count}個",
+        "other": "トリート！ゴードライトの菓子 {count}個"
+      },
+      "trickFlash": "トリック！{trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "コウモリ化",
+      "gourdlight_trick_skeleton": "カタカタ骨",
+      "gourdlight_trick_fumes": "緑の煙",
+      "gourdlight_trick_strawling": "藁人形の扮装",
+      "gourdlight_costume_skeleton": "スケルトンの仮装",
+      "gourdlight_costume_ghost": "ゴーストの仮装",
+      "gourdlight_costume_bat": "コウモリの仮装"
+    },
+    "pumpkinHead": {
+      "on": "彫りカボチャの頭をかぶった。",
+      "off": "彫りカボチャの頭を外した。"
+    },
+    "jarTrick": "壺がぽんと開いた：{trick}！",
+    "guise": "お守りがぱちぱちと鳴り、藁が体を這い上がる：{trick}！",
+    "costume": "薬を飲むと姿が変わった：{trick}！",
+    "titleGranted": "証書を読んだ。新しい称号を獲得：{title}。",
+    "titleKnown": "その称号はすでに持っているので、証書は手元に残る。",
+    "boundItemGone": "ゴードライトの宵が終わり、{item}は藁に戻って崩れ落ちた。",
+    "itemUse": {
+      "pumpkinHead": "使用：内側から灯る彫りカボチャを兜の上からかぶる・外す。ゴードライトの宵の間のみ。見た目のみ。",
+      "trickJar": "使用：数秒間、無害ないたずらをランダムに自分にかける。ゴードライトの宵の間のみ。見た目のみ。",
+      "pouch": "使用：開けるとゴードライトの菓子を{count}個受け取る。",
+      "strawlingCharm": "使用：{seconds}秒間、オールド・サッチグリンの藁人形の姿になる。戦闘中は使えず、ゴードライトの宵の間のみ。消費されない。見た目のみ。",
+      "sweet": "ゴードライトの宵の間にお菓子をねだって手に入る。イーストブルックのヘスター・ゴードウィックが見た目アイテムと交換してくれる。",
+      "costumeSkeleton": "使用：{minutes}分間、カタカタ鳴るスケルトンに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。",
+      "costumeGhost": "使用：{minutes}分間、漂うゴーストに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。",
+      "costumeBat": "使用：{minutes}分間、羽ばたくコウモリに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。",
+      "titleWrit": "使用：このキャラクターの称号{title}を獲得し、功績の書から付けられる。消費される。ゴードライトの宵の期間のみ。称号をすでに持っている場合は証書が残る。",
+      "broom": "オールド・サッチグリンの形見。ゴードライトの宵の間だけ存在し、イベントが終わると藁になって崩れる。"
+    },
+    "tokenPrice": "{item} ×{count}"
   },
   "dungeonGuide": {
     "drownedTemple": {
@@ -22914,6 +22973,45 @@ export const ja_JP: EnTranslations = {
       "moonwrack_stave": {
         "name": "ムーンラックの杖"
       },
+      "gourdlight_sweet": {
+        "name": "ゴードライトの菓子"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "ゴードライトのお菓子袋"
+      },
+      "carved_pumpkin_head": {
+        "name": "彫りカボチャの頭"
+      },
+      "jar_of_mischief": {
+        "name": "いたずらの壺"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "サッチグリンの菓子袋"
+      },
+      "strawling_charm": {
+        "name": "藁人形のお守り"
+      },
+      "rattlebone_draught": {
+        "name": "ガラガラ骨の薬"
+      },
+      "haunting_draught": {
+        "name": "さまよう霊の薬"
+      },
+      "batwing_draught": {
+        "name": "はばたきの薬"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "ゴードリットの証書"
+      },
+      "writ_of_the_trickster": {
+        "name": "トリックスターの証書"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "うつろな笑みの証書"
+      },
+      "reins_emberbristle_broom": {
+        "name": "エンバーブリッスルの箒"
+      },
       "membership_token": {
         "name": "メンバーシップトークン（30日）"
       },
@@ -24455,6 +24553,18 @@ export const ja_JP: EnTranslations = {
       "muster_effigy": {
         "name": "藁の監督"
       },
+      "gourdlight_thatchgrin": {
+        "name": "オールド・サッチグリン"
+      },
+      "gourdlight_crow": {
+        "name": "ゴードライトのカラス"
+      },
+      "gourdlight_strawling": {
+        "name": "藁人形"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "膨れ瓜"
+      },
       "stable_horse": {
         "name": "厩舎の馬"
       },
@@ -25528,6 +25638,11 @@ export const ja_JP: EnTranslations = {
         "name": "ヘスター・クウィルビー",
         "title": "地図職人",
         "greeting": "この湿地の地図は、買ったものがどれも一季節もたずに間違いになったわ。水が道を動かして、道が水を動かすの。だから自分で描いて、インクが乾くまで、ここの乾いた席に座っているのよ。"
+      },
+      "gourdlight_keeper": {
+        "name": "ヘスター・ゴードウィック",
+        "title": "ゴードライトの番人",
+        "greeting": "カボチャに火が灯り、ランタンも吊るされた。ゴードライトの宵が来たのね。イーストブルック、フェンブリッジ、ハイウォッチの町の人の戸を叩いて、あの言葉を言いなさい。トリック・オア・トリート。たいていはお菓子をくれるけど、いたずらをする人もいるわ。お菓子を持ってきてくれたら、身につけるものと交換してあげる。"
       },
       "reeve_ottoline": {
         "name": "代官オトリーヌ",
@@ -28145,6 +28260,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "治療用ダミーに有効な治療が当たった"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "ゴードライトの見回り",
+        "text": "ゴードライトの宵には、谷の子どもたちが家々を回るの。今年はあなたも一緒よ、{playerName}。私たちの町で五つの戸を叩いて、あの言葉を言って、何をもらえるか見てきて。終わったら戻ってきてね。",
+        "completion": "五つの戸を叩いて、指もちゃんと全部ある。はい、帰り道のお菓子袋よ。明日また来て。戸はまた開くから。",
+        "objectives": {
+          "0": {
+            "label": "叩いた戸"
           }
         }
       },

@@ -219,6 +219,9 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   // The weekly emissary's pick (src/sim/weekly_quests.ts), beside the world
   // quests it stands next to.
   'weeklyQuest',
+  // Seasonal events (src/sim/seasonal/): the day's trick-or-treat knocks and
+  // the worn pumpkin head; a bounded ledger (64 ids), never professions state.
+  'seasonal',
   'arenaRating',
   'arenaWins',
   'arenaLosses',
@@ -2009,9 +2012,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(state.bank).toEqual(baseline.bank);
     const bytes = Buffer.byteLength(JSON.stringify(state));
     const baselineBytes = Buffer.byteLength(JSON.stringify(baseline));
-    expect(baselineBytes).toBe(258370);
+    // +143 for Gourdlight Eve (feature/halloween-event): one questsDone id (22), one
+    // deed row feat_gourdlight_guise (37) and four discovered item ids (84).
+    expect(baselineBytes).toBe(258513);
     expect(bytes - baselineBytes).toBe(8284);
-    expect(bytes).toBe(266654);
+    expect(bytes).toBe(266797);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(

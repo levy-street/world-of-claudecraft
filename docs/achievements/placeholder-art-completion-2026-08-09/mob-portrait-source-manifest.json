@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c44a91132d9c04f0c46f9e477e01ad68affc8b1e77597105596ded10e94a211c",
+  "rendererFingerprint": "b63e6a5a01b3a7713dfadcbbbc5f4f4da67dd97de3273b769cdd934683ac37fe",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6341116,
-      "sha256": "5ef7b595b7d54a95c58721ae2a26e8a557b7679325a667cf7e493236be7324bc",
+      "bytes": 6423384,
+      "sha256": "00d4aaad45bca3a0be2fedb6283b7083de28060c6355f053f585150d3d3ca083",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 355,
+  "portraitCount": 359,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -4186,6 +4186,142 @@
         "path": "public/ui/mobs/gorrak.webp",
         "bytes": 2266,
         "sha256": "07be76497c6ea3dbc7cfa7936a056ccefec765247a0d2b04a77ce71daa98ff46"
+      }
+    },
+    {
+      "id": "gourdlight_crow",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_crow",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_crow.glb",
+          "path": "public/models/creatures/crypt_crow.glb",
+          "bytes": 87216,
+          "sha256": "448da36c47023500383b02fc77815211fe1681da10b6a0796960f540a7e460eb"
+        },
+        "idle": "Idle",
+        "height": 1.7,
+        "yaw": null,
+        "hover": 2.2,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "a730dd51566f4961fdf2175ba5bf99e814b58cdce6f348b17a044a70ef68c39f",
+      "output": {
+        "path": "public/ui/mobs/gourdlight_crow.webp",
+        "bytes": 1528,
+        "sha256": "c848089b7f1b6118969bbfa2e5256d0a63806acceb0e0fc0b3cc8c47a2589b82"
+      }
+    },
+    {
+      "id": "gourdlight_strawling",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_gourdlight_strawling",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/gourdlight_strawling.glb",
+          "path": "public/models/creatures/gourdlight_strawling.glb",
+          "bytes": 434256,
+          "sha256": "4508ac750c8e855ffa103da1333016f571d5580febf1eb02290bcd6180ca7fd0"
+        },
+        "idle": "Idle",
+        "height": 3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "da2dc2a8ea1ae3392c4f6432f0d0aae2796407792ca1e0c8278605fc54207f42",
+      "output": {
+        "path": "public/ui/mobs/gourdlight_strawling.webp",
+        "bytes": 2298,
+        "sha256": "9cdf289e1739eb31515ff870e7bfac8031d61e059380c3ba512b9db657d6ad2e"
+      }
+    },
+    {
+      "id": "gourdlight_swelling_gourd",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_gourdlight_swelling_gourd",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/gourdlight_swelling_gourd.glb",
+          "path": "public/models/creatures/gourdlight_swelling_gourd.glb",
+          "bytes": 60556,
+          "sha256": "e35ddcf2a610087a7117f400eaf9f084a95af4d1274a6f38c671e0da1f74068d"
+        },
+        "idle": "Idle",
+        "height": 3.9,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "a1f7edf168d920377b8d9aa1e576cba3e6b732805be1327f1d35fc73208c9dc0",
+      "output": {
+        "path": "public/ui/mobs/gourdlight_swelling_gourd.webp",
+        "bytes": 2502,
+        "sha256": "41bb450abfbe73fc5592ea84cb25d3fab7acbf105cb4d7bea63d6fe73142268f"
+      }
+    },
+    {
+      "id": "gourdlight_thatchgrin",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_gourdlight_thatchgrin",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/gourdlight_thatchgrin.glb",
+          "path": "public/models/creatures/gourdlight_thatchgrin.glb",
+          "bytes": 877420,
+          "sha256": "ebe7a0585bb7cf8a2fa826e7fbe84fe073580b6fb82d53c5f560362ea80d422b"
+        },
+        "idle": "Idle",
+        "height": 7.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "6bcb5ece8604c2ad93202206864494767e9222b365e142ba0b187dd152e10d5e",
+      "output": {
+        "path": "public/ui/mobs/gourdlight_thatchgrin.webp",
+        "bytes": 2870,
+        "sha256": "5ef0b199935f4e8956e275ffb4d04a07011ed3cf82d9c7631368205bd6a4333c"
       }
     },
     {

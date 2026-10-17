@@ -147,6 +147,15 @@ import {
   GALECREST_ZONE,
 } from './content/galecrest';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
+import {
+  GOURDLIGHT_EVE_ITEMS,
+  GOURDLIGHT_EVE_NPCS,
+  GOURDLIGHT_EVE_QUESTS,
+} from './content/gourdlight_eve';
+import {
+  GOURDLIGHT_SCARECROW_ITEMS,
+  GOURDLIGHT_SCARECROW_MOBS,
+} from './content/gourdlight_eve_scarecrow';
 import { GRAVEWYRM_SANCTUM_MOBS } from './content/gravewyrm_sanctum';
 import { GRAVEWYRM_SANCTUM_ITEMS } from './content/gravewyrm_sanctum_items';
 import {
@@ -466,6 +475,8 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   FACTION_VENDOR_ITEMS,
   HOARD_ITEMS,
   QUEST_LEVELING_GEAR_ITEMS,
+  GOURDLIGHT_EVE_ITEMS,
+  GOURDLIGHT_SCARECROW_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -509,6 +520,9 @@ export const MOBS: Record<string, MobTemplate> = {
   ...FARSHORE_MOBS,
   ...PROVING_SHORE_MOBS,
   ...WORLD_QUEST_MOBS,
+  // Gourdlight Eve's field boss and his adds (raised only while the event runs,
+  // seasonal/scarecrow.ts; in no camp and no world-boss slot). Appended last.
+  ...GOURDLIGHT_SCARECROW_MOBS,
 };
 
 // Heroic upgraded drop variants: generated from the base item + mob loot tables and
@@ -576,6 +590,9 @@ export const NPCS: Record<string, NpcDef> = {
   ...MIREFEN_TAVERN_NPCS,
   // Its seated patrons (content/mirefen_tavern_patrons.ts), dynamic singletons too.
   ...MIREFEN_TAVERN_PATRON_NPCS,
+  // Gourdlight Eve's keeper (content/gourdlight_eve.ts): a dynamic singleton under a
+  // reserved id, raised only while the event runs (seasonal/seasonal_tick.ts).
+  ...GOURDLIGHT_EVE_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -608,6 +625,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...PROVING_SHORE_QUESTS,
   ...IGNIVAR_RAID_LORE_QUESTS,
   ...HUB_PRACTICE_QUESTS,
+  ...GOURDLIGHT_EVE_QUESTS,
 };
 
 // The choose-one leveling gear rides on the quest records (QuestDef.choiceRewards),
@@ -636,6 +654,8 @@ export const QUEST_ORDER: string[] = [
   ...PROVING_SHORE_QUEST_ORDER,
   ...IGNIVAR_RAID_LORE_QUEST_ORDER,
   ...HUB_PRACTICE_QUEST_ORDER,
+  // the seasonal events' quests (open only while their event runs)
+  ...Object.keys(GOURDLIGHT_EVE_QUESTS),
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported

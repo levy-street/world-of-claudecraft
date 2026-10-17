@@ -2226,6 +2226,7 @@ export const zh_CN: EnTranslations = {
       "name_lanternback_troll": "提灯背者格伦博",
       "name_chimeglass_tortoise": "钟晶的托利弗",
       "name_rickshaw_mount": "白骨人力车",
+      "name_emberbristle_broom": "余烬鬃毛扫帚",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
@@ -2244,7 +2245,8 @@ export const zh_CN: EnTranslations = {
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
       "desc_lanternback_troll": "被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。",
       "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
-      "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。"
+      "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。",
+      "desc_emberbristle_broom": "一把系着橙色丝带的收获扫帚，悬浮在离地一掌高的地方，鬃毛不断洒落余烬。南瓜灯之夜结束时，它会化回一堆稻草。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
@@ -4264,6 +4266,7 @@ export const zh_CN: EnTranslations = {
       "spellHaste": "施法速度提高 {pct}%",
       "sated": "无法再获得团队急速效果",
       "cauterizeFatigue": "灸灼无法再次阻止致命伤害",
+      "seasonalCosmetic": "仅为外观：不影响战斗",
       "castShield": "施法不会因受到伤害而中断或延迟",
       "dmgDone": "造成的伤害提高 {pct}%",
       "dmgDoneReduce": "造成的伤害降低 {pct}%",
@@ -7701,6 +7704,62 @@ export const zh_CN: EnTranslations = {
         "2": "原来是磨坊把你一路送到了海岸路上。灯塔还藏着最后一个秘密：在它西北方，就在小路旁，草皮被切开又铺了回去。就在那里挖。"
       }
     }
+  },
+  "seasonal": {
+    "event": {
+      "gourdlight_eve": {
+        "name": "南瓜灯之夜"
+      }
+    },
+    "trickOrTreat": {
+      "row": "不给糖就捣蛋！",
+      "rowAria": "对{name}说“不给糖就捣蛋”",
+      "knockedHint": "你今天已经敲过这扇门了。每日重置后这扇门会再次打开。",
+      "treat": "{name}递给你一份糖果。",
+      "trick": "{name}对你恶作剧：{trick}！",
+      "alreadyKnocked": "你今天已经向{name}讨过糖了。",
+      "notActive": "南瓜灯之夜现在没有举行。",
+      "tooFar": "走近一点再敲门。",
+      "treatFlash": {
+        "one": "糖果！{count}颗南瓜灯糖",
+        "few": "糖果！{count}颗南瓜灯糖",
+        "many": "糖果！{count}颗南瓜灯糖",
+        "other": "糖果！{count}颗南瓜灯糖"
+      },
+      "trickFlash": "捣蛋！{trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "变成蝙蝠",
+      "gourdlight_trick_skeleton": "骨头咔咔",
+      "gourdlight_trick_fumes": "绿色烟雾",
+      "gourdlight_trick_strawling": "稻草人伪装",
+      "gourdlight_costume_skeleton": "骷髅装扮",
+      "gourdlight_costume_ghost": "幽灵装扮",
+      "gourdlight_costume_bat": "蝙蝠装扮"
+    },
+    "pumpkinHead": {
+      "on": "你戴上了雕刻南瓜头。",
+      "off": "你摘下了雕刻南瓜头。"
+    },
+    "jarTrick": "罐子砰地打开了：{trick}！",
+    "guise": "护符噼啪作响，稻草爬满了你的全身：{trick}！",
+    "costume": "你喝下药剂，模样变了：{trick}！",
+    "titleGranted": "你读完了令状。获得新头衔：{title}。",
+    "titleKnown": "你已经拥有这个头衔，令状留在你身上。",
+    "boundItemGone": "南瓜灯之夜结束了，你的{item}化回了稻草。",
+    "itemUse": {
+      "pumpkinHead": "使用：戴上或摘下一颗从内部点亮的雕刻南瓜，套在头盔之上。仅在南瓜灯之夜期间可用。纯外观。",
+      "trickJar": "使用：对你施加一个随机的无害恶作剧，持续数秒。仅在南瓜灯之夜期间可用。纯外观。",
+      "pouch": "使用：打开后获得{count}颗南瓜灯糖。",
+      "strawlingCharm": "使用：变成老稻草狞笑的稻草小人，持续{seconds}秒。战斗中无法使用，仅限南瓜灯之夜期间。不会消耗。仅外观。",
+      "sweet": "在南瓜灯之夜期间讨糖获得。东溪的赫丝特·葫芦芯会用外观物品交换它们。",
+      "costumeSkeleton": "使用：变成一具咔咔作响的骷髅，持续{minutes}分钟。使用后消耗。战斗中无法使用，进入战斗会结束效果。仅限南瓜灯之夜期间。纯外观。",
+      "costumeGhost": "使用：变成一个飘荡的幽灵，持续{minutes}分钟。使用后消耗。战斗中无法使用，进入战斗会结束效果。仅限南瓜灯之夜期间。纯外观。",
+      "costumeBat": "使用：变成一只扑腾的蝙蝠，持续{minutes}分钟。使用后消耗。战斗中无法使用，进入战斗会结束效果。仅限南瓜灯之夜期间。纯外观。",
+      "titleWrit": "使用：为这个角色获得头衔{title}，可在功绩之书中佩戴。使用后消耗。仅限南瓜灯之夜期间。如果你已拥有该头衔，令状会保留。",
+      "broom": "老稻草狞笑的纪念品。它只在南瓜灯之夜期间存在，活动结束时会化为稻草。"
+    },
+    "tokenPrice": "{count}个{item}"
   },
   "dungeonGuide": {
     "drownedTemple": {
@@ -22914,6 +22973,45 @@ export const zh_CN: EnTranslations = {
       "moonwrack_stave": {
         "name": "月殇法杖"
       },
+      "gourdlight_sweet": {
+        "name": "南瓜灯糖"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "南瓜灯糖果袋"
+      },
+      "carved_pumpkin_head": {
+        "name": "雕刻南瓜头"
+      },
+      "jar_of_mischief": {
+        "name": "恶作剧之罐"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "稻草狞笑的糖果袋"
+      },
+      "strawling_charm": {
+        "name": "稻草小人护符"
+      },
+      "rattlebone_draught": {
+        "name": "骨响药剂"
+      },
+      "haunting_draught": {
+        "name": "幽魂药剂"
+      },
+      "batwing_draught": {
+        "name": "振翅药剂"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "南瓜灯辉令状"
+      },
+      "writ_of_the_trickster": {
+        "name": "捣蛋鬼令状"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "空洞笑脸令状"
+      },
+      "reins_emberbristle_broom": {
+        "name": "余烬鬃毛扫帚"
+      },
       "membership_token": {
         "name": "会员代币（30天）"
       },
@@ -24455,6 +24553,18 @@ export const zh_CN: EnTranslations = {
       "muster_effigy": {
         "name": "稻草工头"
       },
+      "gourdlight_thatchgrin": {
+        "name": "老稻草狞笑"
+      },
+      "gourdlight_crow": {
+        "name": "南瓜灯乌鸦"
+      },
+      "gourdlight_strawling": {
+        "name": "稻草小人"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "膨胀巨瓜"
+      },
       "stable_horse": {
         "name": "厩马"
       },
@@ -25528,6 +25638,11 @@ export const zh_CN: EnTranslations = {
         "name": "赫丝特·奎尔比",
         "title": "制图师",
         "greeting": "我买过的每一张这片沼泽的地图，不出一季就不准了。水会挪动小路，小路又会挪动水。所以我自己画，趁墨迹未干，就坐在这儿干爽的地方。"
+      },
+      "gourdlight_keeper": {
+        "name": "赫丝特·葫芦芯",
+        "title": "南瓜灯守护者",
+        "greeting": "南瓜点亮了，灯笼也挂起来了，那一定是南瓜灯之夜到了。去敲东溪、芬桥和高望城镇民的门，说出那句话：不给糖就捣蛋。大多数人会给你一颗糖，少数人会对你恶作剧。把糖带给我，我会跟你换些可以穿戴的东西。"
       },
       "reeve_ottoline": {
         "name": "镇务官奥托琳",
@@ -28145,6 +28260,16 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "在治疗假人身上打出一次有效治疗"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "南瓜灯巡游",
+        "text": "每到南瓜灯之夜，谷地的孩子们都会挨家挨户巡游，今年你也加入他们吧，{playerName}。在我们的城镇里敲五扇门，说出那句话，看看你会得到什么。完成后回来找我。",
+        "completion": "敲了五扇门，手指还都在。拿着，这袋糖果让你在回家路上吃。明天再来，门会再次打开。",
+        "objectives": {
+          "0": {
+            "label": "已敲的门"
           }
         }
       },

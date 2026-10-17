@@ -24,6 +24,9 @@ export interface RendererPrewarmAndGroundFxOwner<T extends RendererDisposable> {
   // sweep: both had a terminal owner with no production caller.
   frozenOrbFx?: RendererDisposable;
   necromancyArmyPortalFx?: RendererDisposable;
+  /** Gourdlight Eve's city dressing (seasonal_decor.ts): its instance buffers and
+   *  merged ropes; the shared kit parts are not its to free. */
+  seasonalDecor?: RendererDisposable | null;
   /** The battleground copies this renderer built, by slot
    *  (battleground_views.ts). Each owns a field's terrain, its paint array
    *  texture, the placement instances, the decals and its share of the
@@ -50,6 +53,7 @@ export function disposeRendererPrewarmAndGroundFx(
   bestEffort(() => resources.farmPatchVisuals?.dispose());
   bestEffort(() => resources.frozenOrbFx?.dispose());
   bestEffort(() => resources.necromancyArmyPortalFx?.dispose());
+  bestEffort(() => resources.seasonalDecor?.dispose());
   // The live copies release themselves as the session resolves each offer;
   // this is the terminal drain for whatever the teardown catches standing.
   for (const view of resources.bgViews?.values() ?? []) bestEffort(() => view.dispose());

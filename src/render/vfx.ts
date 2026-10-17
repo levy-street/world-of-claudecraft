@@ -2169,6 +2169,32 @@ export class Vfx {
     );
   }
 
+  /** The Emberbristle Broom's trail (yaw = facing, forward = (sin yaw, cos yaw)): embers
+   *  shaken off its smouldering bristles, behind and a little below the rider, drifting
+   *  up and dying out; a slow trickle at rest, a sparkling stream on the move, now and
+   *  then a wisp of smoke. */
+  mountBroomSparks(at: THREE.Vector3, yaw: number, dt: number, moving: boolean): void {
+    if (!this.emitChance(moving ? 46 : 9, dt)) return;
+    const bx = -Math.sin(yaw);
+    const bz = -Math.cos(yaw);
+    const back = 1.9 + Math.random() * 0.6;
+    const drift = moving ? 1.6 : 0.3;
+    const smoke = Math.random() < 0.12;
+    this.spawn(
+      at.x + bx * back + (Math.random() - 0.5) * 0.55,
+      at.y + 0.55 + (Math.random() - 0.5) * 0.45,
+      at.z + bz * back + (Math.random() - 0.5) * 0.55,
+      bx * drift + (Math.random() - 0.5) * 0.5,
+      0.35 + Math.random() * 0.6,
+      bz * drift + (Math.random() - 0.5) * 0.5,
+      smoke ? 0x3a302a : Math.random() < 0.35 ? 0xffd27a : 0xff7a1e,
+      smoke ? 0.5 + Math.random() * 0.3 : 0.12 + Math.random() * 0.14,
+      smoke ? 1.2 + Math.random() * 0.6 : 0.55 + Math.random() * 0.5,
+      smoke ? -0.15 : 0.6,
+      smoke ? SPR.smoke : SPR.sparkle,
+    );
+  }
+
   /** Fluid-pool bubble: a small tinted puff that pops just above the surface. */
   fluidBubble(x: number, y: number, z: number, color: number, dt: number, rate: number): void {
     if (!this.emitChance(rate, dt)) return;

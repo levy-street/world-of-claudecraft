@@ -462,6 +462,11 @@ export type AuraKind =
   // no stat effect. While it rides, a target cannot benefit from another group haste
   // burst (aoeAllyHaste with exhaust), so the effects can never be chained.
   | 'sated'
+  // Seasonal cosmetics (src/sim/seasonal/): the worn pumpkin head and the
+  // trick-or-treat tricks. Pure presentation markers with NO sim effect at all:
+  // the client draws them (a head piece, a body swap, a smoke cloud), the sim
+  // only times them out and strips them when the event closes.
+  | 'seasonal_cosmetic'
   // Dusk Economy linger (rogue row, combat/rogue_talents.ts): a pure marker worn
   // for 6 sec after leaving Duskveil; while it rides, energy costs stay cut.
   | 'dusk_economy'
@@ -1103,7 +1108,15 @@ export type ItemUse =
   | { type: 'armorKit' }
   // A container: using it hands the owner its contents and consumes one unit
   // (src/sim/emissary_cache.ts owns the one container shipped so far).
-  | { type: 'container'; container: 'emissary_cache' };
+  | { type: 'container'; container: 'emissary_cache' | 'gourdlight_pouch' | 'thatchgrin_sack' }
+  // A seasonal event toy (src/sim/seasonal/seasonal_items.ts): the worn pumpkin
+  // head toggle and the Jar of Mischief. Refused while its event is closed.
+  | {
+      type: 'seasonal';
+      // costume: a ten-minute skeleton, ghost or bat body (content/gourdlight_eve.ts
+      // GOURDLIGHT_COSTUMES); titleWrit: grants its title Feat (GOURDLIGHT_TITLE_WRITS).
+      action: 'pumpkinHead' | 'trickJar' | 'strawlingCharm' | 'costume' | 'titleWrit';
+    };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -1211,6 +1224,15 @@ interface BaseItemDef {
   // Honor price for a Quartermaster purchase. An honor-only item omits
   // buyValue; both fields may coexist when a vendor charges both currencies.
   priceHonor?: number;
+  // Token price: a vendor that charges in an ITEM currency (a seasonal event's
+  // sweets) debits `count` copies of `itemId` from the buyer's bags per
+  // purchase (items.ts buyItem). Per-purchase like Honor, never stack-multiplied.
+  priceItem?: { itemId: string; count: number };
+  // EVENT-BOUND: the item exists only while this seasonal event runs. When the event is
+  // closed the seasonal tick sweeps it out of the owner's bags, bank and courier cargo
+  // (src/sim/seasonal/seasonal_bound_items.ts), at the close and again on the first tick
+  // a character spends in a closed world (a login after the event ended).
+  seasonalEvent?: string;
   use?: ItemUse;
   /**
    * A quest implement every class may equip, weapon-proficiency rules notwithstanding
@@ -2095,6 +2117,11 @@ export interface LootEntry {
   // source level and stats; listing it here must not promote it to the
   // bespoke heroic equipment tier or seed the higher-tier rift reward pool.
   preserveSourceTier?: true;
+  // WORLD-BOSS PERSONAL LOOT ONLY (world_boss.ts rollWorldBossLoot): a keepsake the
+  // contributor never gets twice. The entry is still ROLLED for everyone (the draw order
+  // stays a function of the roster), and the win is discarded for a contributor who
+  // already holds the item in bags, bank or courier cargo.
+  unlessOwned?: true;
   // WORLD-BOSS PERSONAL LOOT ONLY (world_boss.ts rollWorldBossLoot): the entry is
   // rolled only for a contributor whose level is at or below this. The locals' share
   // of a boss placed in their zone: gear a level-eight can wear, which the level-twenty
@@ -2189,6 +2216,10 @@ export interface MobTemplate {
   // who damaged it (gated to once per day per boss). The spawn schedule + location
   // live in src/sim/world_boss.ts; the loot roll runs through rollWorldBossLoot.
   worldBoss?: boolean;
+  // A seasonal event's field boss (src/sim/seasonal/scarecrow.ts): exists only while
+  // this event runs. A world boss in every rule above, except that his kill never
+  // counts toward the weekly world-boss quest (a seasonal window must not gate it).
+  seasonalEvent?: string;
   // Suppresses the per-mechanic combat-log barks ("<Name> unleashes <Mechanic>!"
   // and "<Name> becomes enraged!") for a mob whose only voice should be its
   // periodic zone-wide battle cry (a world boss). The mechanics still fire, with
@@ -4562,6 +4593,9 @@ export interface NpcDef {
   // The weekly emissary: talking to this NPC opens the weekly-quest window
   // (src/sim/weekly_quests.ts) instead of the gossip menu.
   weeklyEmissary?: boolean;
+  // A seasonal event's keeper (src/sim/seasonal/): her nameplate shows her own
+  // title rather than the role her small shop would otherwise classify as.
+  seasonalKeeper?: true;
   greeting: string;
   /** Authored patrol route; sanitized in map_doc sanitizeNpc. */
   route?: NpcRoute;
@@ -6672,6 +6706,14 @@ export interface QuestDef {
   // the turn-in writes a `weeklyquest:<id>` lockout (quests/weekly_quest_lock.ts) that
   // keeps the quest unavailable until the reset. Only meaningful with `repeatable`.
   weeklyReset?: boolean;
+  // Repeatable once per DAILY reset (the realm's daily boundary, ctx.raidResetMs):
+  // the same raidLockouts lock as weeklyReset, expiring at the next daily reset.
+  // Only meaningful with `repeatable`.
+  dailyReset?: boolean;
+  // Offered only while this seasonal event runs (src/sim/seasonal/). Folded into
+  // the repeat-blocked set both hosts already share (quest_commands.ts
+  // repeatBlockedQuestIds), so an event quest closes with its event everywhere.
+  seasonalEvent?: string;
   // Typed, server-authoritative profession transition applied only by the
   // validated turn-in path. The selected target is persisted on QuestProgress.
   // `pairId` (Professions 2.0): a per-pair attune quest pins its ONE
@@ -9327,6 +9369,33 @@ export type SimEvent = { pid?: number } & (
   /** `step` is the index of the step that just completed; `total` is steps.length. */
   | { type: 'clueHuntStep'; huntId: string; step: number; total: number }
   | { type: 'clueHuntDone'; huntId: string }
+  // Seasonal events (src/sim/seasonal/): ids and numbers only, the client
+  // composes every line. `npc` is the NPC TEMPLATE id; `trick` an aura id.
+  | {
+      type: 'seasonal';
+      what:
+        | 'treat'
+        | 'trick'
+        | 'alreadyKnocked'
+        | 'notActive'
+        | 'tooFar'
+        | 'pumpkinOn'
+        | 'pumpkinOff'
+        | 'jarTrick'
+        // the Strawling Charm (Old Thatchgrin's cosmetic) put its guise on the user
+        | 'guise'
+        // a costume draught put its body on the user (`trick` is the costume aura id)
+        | 'costume'
+        // a title writ granted its Feat (`trick` is the deed id), or was refused because
+        // the title is already earned
+        | 'titleGranted'
+        | 'titleKnown'
+        // an event-bound item was swept away because its event closed (`trick` = item id)
+        | 'boundItemGone';
+      npc?: string;
+      sweets?: number;
+      trick?: string;
+    }
   | { type: 'clueHuntAbandoned'; huntId: string }
   /** One id per grant (the Heroic Marks stack appears once) plus the copper paid. */
   | { type: 'clueCasketOpened'; itemIds: string[]; copper: number }
@@ -12589,7 +12658,10 @@ export type DeedStatKey =
   | 'legendariesForged'
   // Coinsack Scurriers caught in a Buried Hoard (rift/hoard_goblin.ts): bumped
   // for every player paid off one, feeding cmb_coinsack_caught.
-  | 'hoardGoblinKills';
+  | 'hoardGoblinKills'
+  // Old Thatchgrin slain (Gourdlight Eve's field boss, seasonal/scarecrow.ts): bumped
+  // for every contributor, feeding feat_old_thatchgrin.
+  | 'thatchgrinKills';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -12624,6 +12696,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'tutorialGraduations',
   'legendariesForged',
   'hoardGoblinKills',
+  'thatchgrinKills',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new

@@ -1,0 +1,20 @@
+{
+  "note": "Gourdlight Eve's field boss Old Thatchgrin, his strawling adds and his Swelling Gourd: three rigged, animated, vertex-coloured GLBs on one shared rig and clip set, from the deterministic Blender factories scripts/assets/gourdlight_eve/scarecrow.py (+ scarecrow_clips.py) and swelling_gourd.py, driven by export_scarecrow.mjs, which runs this spec. Texture-free (no KTX2 step), original work with no reference image.",
+  "items": [
+    {
+      "src": "tmp/asset_src/gourdlight_eve/gourdlight_thatchgrin.glb",
+      "out": "models/creatures/gourdlight_thatchgrin.glb",
+      "type": "character"
+    },
+    {
+      "src": "tmp/asset_src/gourdlight_eve/gourdlight_strawling.glb",
+      "out": "models/creatures/gourdlight_strawling.glb",
+      "type": "character"
+    },
+    {
+      "src": "tmp/asset_src/gourdlight_eve/gourdlight_swelling_gourd.glb",
+      "out": "models/creatures/gourdlight_swelling_gourd.glb",
+      "type": "character"
+    }
+  ]
+}

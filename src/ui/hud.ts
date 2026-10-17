@@ -887,6 +887,7 @@ import {
   MOTD_RESULT_KEYS,
 } from './result_code_keys';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
+import { seasonalItemTooltipLines } from './seasonal_item_tooltip';
 import { localizeServerText } from './server_i18n';
 import {
   localizeAuthoredYellSpeakerName,
@@ -6637,6 +6638,7 @@ export class Hud {
       html += recipePatternTooltipLines(item, this.sim.craftingIdentity);
     }
     html += feastTooltipLines(item);
+    html += seasonalItemTooltipLines(item); // seasonal event toys (seasonal_item_tooltip.ts)
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);
@@ -14695,6 +14697,7 @@ export class Hud {
           factions: this.sim.factions,
           factionCurrencies: this.sim.factionCurrencies,
           vendorFactionId: vendorFactionForNpc(npc.templateId),
+          inventory: this.sim.inventory, // token-priced rows (seasonal sweets)
         },
         this.vendorQtyMultiple,
       ),

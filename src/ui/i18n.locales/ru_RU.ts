@@ -22137,4 +22137,86 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Перед удалением этого персонажа перенесите все незакреплённые карточки с отметками на другого персонажа.',
   'apiError.character.referral_bond_pending':
     'Этому персонажу доставляется облигация подписки за приглашение друга. Повторите попытку удаления после завершения доставки.',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Только внешний вид: на бой не влияет',
+  'seasonal.event.gourdlight_eve.name': 'Ночь Тыквенных Огней',
+  'seasonal.trickOrTreat.row': 'Сладость или гадость!',
+  'seasonal.trickOrTreat.rowAria': 'Сказать {name}: «Сладость или гадость»',
+  'seasonal.trickOrTreat.knockedHint':
+    'Сегодня вы уже стучались сюда. Дверь откроется снова после ежедневного сброса.',
+  'seasonal.trickOrTreat.treat': '{name} угощает вас сладостью.',
+  'seasonal.trickOrTreat.trick': '{name} подшучивает над вами: {trick}!',
+  'seasonal.trickOrTreat.alreadyKnocked': 'Сегодня вы уже выпрашивали сладости у {name}.',
+  'seasonal.trickOrTreat.notActive': 'Ночь Тыквенных Огней сейчас не проходит.',
+  'seasonal.trickOrTreat.tooFar': 'Подойдите ближе, чтобы постучать.',
+  'seasonal.trickOrTreat.treatFlash.one': 'Сладость! {count} тыквенная конфета',
+  'seasonal.trickOrTreat.treatFlash.few': 'Сладость! {count} тыквенные конфеты',
+  'seasonal.trickOrTreat.treatFlash.many': 'Сладость! {count} тыквенных конфет',
+  'seasonal.trickOrTreat.treatFlash.other': 'Сладость! {count} тыквенной конфеты',
+  'seasonal.trickOrTreat.trickFlash': 'Гадость! {trick}',
+  'seasonal.tricks.gourdlight_trick_bat': 'Летучая мышь',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Гремящие кости',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Зелёный дым',
+  'seasonal.pumpkinHead.on': 'Вы надеваете резную тыквенную голову.',
+  'seasonal.pumpkinHead.off': 'Вы снимаете резную тыквенную голову.',
+  'seasonal.jarTrick': 'Банка с хлопком открывается: {trick}!',
+  'seasonal.itemUse.pumpkinHead':
+    'Использование: надеть или снять резную тыкву со светом внутри поверх шлема. Только во время Ночи Тыквенных Огней. Только внешний вид.',
+  'seasonal.itemUse.trickJar':
+    'Использование: на несколько секунд разыгрывает над вами случайную безобидную шутку. Только во время Ночи Тыквенных Огней. Только внешний вид.',
+  'seasonal.itemUse.pouch': 'Использование: откройте, чтобы получить тыквенные конфеты: {count}.',
+  'seasonal.itemUse.sweet':
+    'Выдаётся, когда вы выпрашиваете сладости в Ночь Тыквенных Огней. Хестер Тыквинс в Истбруке обменивает их на предметы внешнего вида.',
+  'seasonal.tokenPrice': '{item}: {count}',
+  'entities.items.gourdlight_sweet.name': 'Тыквенная конфета',
+  'entities.items.gourdlight_treat_pouch.name': 'Мешочек тыквенных сладостей',
+  'entities.items.carved_pumpkin_head.name': 'Резная тыквенная голова',
+  'entities.items.jar_of_mischief.name': 'Банка проказ',
+  'entities.npcs.gourdlight_keeper.name': 'Хестер Тыквинс',
+  'entities.npcs.gourdlight_keeper.title': 'Хранительница Тыквенных Огней',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'Тыквы зажжены, фонари развешаны, значит, пришла Ночь Тыквенных Огней. Стучитесь в двери горожан Истбрука, Фенбриджа и Хайуотча и говорите те самые слова: сладость или гадость. Большинство угостит вас конфетой, а кое-кто над вами подшутит. Приносите конфеты мне, и я обменяю их на что-нибудь из одежды.',
+  'entities.quests.q_gourdlight_rounds.title': 'Обход Тыквенных Огней',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Каждую Ночь Тыквенных Огней дети долины обходят дома, и в этом году вы с ними, {playerName}. Постучите в пять дверей наших городов, скажите те самые слова и посмотрите, что вам дадут. Когда закончите, возвращайтесь ко мне.',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Пять дверей, и все пальцы на месте. Держите мешочек сладостей на дорогу домой. Приходите завтра, двери откроются снова.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Двери, в которые вы постучали',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Облик соломенника',
+  'seasonal.guise': 'Оберег трещит, и солома ползёт по вам: {trick}!',
+  'seasonal.itemUse.strawlingCharm':
+    'Использование: превращает вас в соломенника Старого Соломозуба на {seconds} сек. Нельзя в бою, только во время Ночи Тыквенных Огней. Не расходуется. Только внешний вид.',
+  'entities.items.thatchgrin_sweet_sack.name': 'Мешок конфет Соломозуба',
+  'entities.items.strawling_charm.name': 'Оберег соломенника',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Старый Соломозуб',
+  'entities.mobs.gourdlight_crow.name': 'Ворона Тыквенных Огней',
+  'hudChrome.mounts.name_emberbristle_broom': 'Метла Тлеющей Щетины',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Метла для жатвы, перевязанная оранжевой лентой. Парит в ладони над землёй и роняет угли с прутьев. Когда Ночь Тыквенных Огней заканчивается, она рассыпается в солому.',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Костюм скелета',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Костюм призрака',
+  'seasonal.tricks.gourdlight_costume_bat': 'Костюм летучей мыши',
+  'seasonal.costume': 'Вы выпиваете зелье и меняетесь: {trick}!',
+  'seasonal.titleGranted': 'Вы прочли грамоту. Получено новое звание: {title}.',
+  'seasonal.titleKnown': 'У вас уже есть это звание, поэтому грамота остаётся у вас.',
+  'seasonal.boundItemGone':
+    'Ночь Тыквенных Огней закончилась, и ваш предмет «{item}» рассыпался в солому.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Использование: превращает в гремящего скелета на {minutes} мин. Расходуется. Нельзя использовать в бою, вступление в бой прерывает эффект. Только во время Ночи Тыквенных Огней. Только внешний вид.',
+  'seasonal.itemUse.costumeGhost':
+    'Использование: превращает в парящего призрака на {minutes} мин. Расходуется. Нельзя использовать в бою, вступление в бой прерывает эффект. Только во время Ночи Тыквенных Огней. Только внешний вид.',
+  'seasonal.itemUse.costumeBat':
+    'Использование: превращает в порхающую летучую мышь на {minutes} мин. Расходуется. Нельзя использовать в бою, вступление в бой прерывает эффект. Только во время Ночи Тыквенных Огней. Только внешний вид.',
+  'seasonal.itemUse.titleWrit':
+    'Использование: этот персонаж получает звание {title}, которое можно носить из Книги деяний. Расходуется. Только во время Ночи Тыквенных Огней. Если звание уже есть, грамота остаётся.',
+  'seasonal.itemUse.broom':
+    'Памятный трофей Старого Соломозуба. Существует только во время Ночи Тыквенных Огней и рассыпается в солому, когда праздник заканчивается.',
+  'entities.items.rattlebone_draught.name': 'Зелье гремящих костей',
+  'entities.items.haunting_draught.name': 'Зелье призрака',
+  'entities.items.batwing_draught.name': 'Зелье трепета крыльев',
+  'entities.items.writ_of_the_gourdlit.name': 'Грамота Тыквосветного',
+  'entities.items.writ_of_the_trickster.name': 'Грамота Проказника',
+  'entities.items.writ_of_the_hollow_grin.name': 'Грамота Пустой Ухмылки',
+  'entities.items.reins_emberbristle_broom.name': 'Метла Тлеющей Щетины',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Набухающая тыква',
+  'entities.mobs.gourdlight_strawling.name': 'Соломенник',
 };

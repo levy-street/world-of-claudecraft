@@ -38,7 +38,8 @@ export type QuestWorldCommand =
   | { cmd: 'clue_hunt_abandon' }
   | { cmd: 'lance_brace' }
   | { cmd: 'lance_thrust' }
-  | { cmd: 'lance_release' };
+  | { cmd: 'lance_release' }
+  | { cmd: 'trick_or_treat'; npcId: number };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {

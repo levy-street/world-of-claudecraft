@@ -33,6 +33,8 @@ import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { planGradeRemoval } from '../professions/material_grades';
 import { questFallbackGrants } from '../quest_fallback';
 import { emitReferralQuestEvidence } from '../referral_evidence';
+import { seasonalBlockedQuestIds } from '../seasonal/seasonal_quests';
+import { activeSeasonalEventOf } from '../seasonal/seasonal_state';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { hubHealingAbilityId } from '../tutorial/hub_healing_lesson';
@@ -165,8 +167,10 @@ export function repeatBlockedQuestIds(
     meta.questCadence.size > 0 ? cadenceBlockedKeys(meta.questCadence, ctx.tickCount) : [];
   const weekly =
     meta.raidLockouts.size > 0 ? weeklyLockedQuestIds(meta.raidLockouts, ctx.lockoutNowMs()) : [];
-  if (cadence.length === 0 && weekly.length === 0) return undefined;
-  return new Set([...cadence, ...weekly]);
+  // Seasonal quests close with their event (seasonal/seasonal_quests.ts).
+  const seasonal = seasonalBlockedQuestIds(activeSeasonalEventOf(ctx.seasonal));
+  if (cadence.length === 0 && weekly.length === 0 && seasonal.length === 0) return undefined;
+  return new Set([...cadence, ...weekly, ...seasonal]);
 }
 
 function questNpcFor(
@@ -535,10 +539,12 @@ export function turnInQuestCore(
   if (quest.repeatCadenceTicks && quest.repeatCadenceTicks > 0) {
     armCadence(meta.questCadence, questId, ctx.tickCount, quest.repeatCadenceTicks);
   }
-  // A weekly quest locks until the realm's weekly reset (weekly_quest_lock.ts).
-  if (quest.weeklyReset) {
+  // A weekly quest locks until the realm's weekly reset (weekly_quest_lock.ts); a
+  // daily one rides the same lock to the next daily reset.
+  if (quest.weeklyReset || quest.dailyReset) {
     const now = ctx.lockoutNowMs();
-    meta.raidLockouts.set(weeklyQuestLockoutId(questId), ctx.weeklyRaidResetMs(now));
+    const until = quest.dailyReset ? ctx.raidResetMs(now) : ctx.weeklyRaidResetMs(now);
+    meta.raidLockouts.set(weeklyQuestLockoutId(questId), until);
   }
   // A quest that unlocks a quest-gated ability (recall_the_fallen <-
   // q_rite_of_redemption) must surface it now: rebuild the known list (which reads

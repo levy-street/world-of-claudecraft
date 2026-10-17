@@ -12,6 +12,12 @@
 // The S3 guard in tests/localization_fixes.test.ts parses src/sim/sim.ts, enumerates
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
+import {
+  CARVED_PUMPKIN_HEAD_ID,
+  GOURDLIGHT_COSTUMES,
+  GOURDLIGHT_TRICKS,
+} from '../sim/content/gourdlight_eve';
+import { STRAWLING_GUISE } from '../sim/content/gourdlight_eve_scarecrow';
 import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import {
   FACTION_IDS,
@@ -1655,6 +1661,16 @@ const baseEnTable = {
   'mechanic.balgathMoltenFen': 'Molten Fen',
   // The meteor volley the eruption calls down (mob/boss_starwake_meteors.ts).
   'mechanic.balgathStarDebris': 'Star Debris',
+  // Old Thatchgrin's pumpkin rain and the burning stubble it leaves, his Swelling Gourd's
+  // fuse and burst, and the ward, reel and opening it puts on him
+  // (seasonal/scarecrow_kit.ts, scarecrow_swell.ts, content/gourdlight_eve_scarecrow.ts).
+  'mechanic.thatchgrinGourdfall': 'Gourdfall',
+  'mechanic.thatchgrinSmolderingChaff': 'Smoldering Chaff',
+  'mechanic.thatchgrinRipening': 'Ripening',
+  'mechanic.thatchgrinGourdBurst': 'Gourd Burst',
+  'mechanic.thatchgrinHarvestWard': 'Harvest Ward',
+  'mechanic.thatchgrinUprooted': 'Uprooted',
+  'mechanic.thatchgrinSplitRind': 'Split Rind',
   // The drill yard's effigy: its plank hide, and a player's own open window on it
   // (src/sim/muster_effigy.ts EFFIGY_WARD_NAME / EFFIGY_OPENED_NAME).
   'aura.effigyPlankHide': 'Plank Hide',
@@ -17914,6 +17930,15 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Wake of the Fallen Star': 'mechanic.balgathStarwake',
   'Molten Fen': 'mechanic.balgathMoltenFen',
   'Star Debris': 'mechanic.balgathStarDebris',
+  // Old Thatchgrin's kit; byte-identical to the THATCHGRIN_KIT names (rain, chaff, and
+  // the swell's fuse, burst, ward, stagger and exposed).
+  Gourdfall: 'mechanic.thatchgrinGourdfall',
+  'Smoldering Chaff': 'mechanic.thatchgrinSmolderingChaff',
+  Ripening: 'mechanic.thatchgrinRipening',
+  'Gourd Burst': 'mechanic.thatchgrinGourdBurst',
+  'Harvest Ward': 'mechanic.thatchgrinHarvestWard',
+  Uprooted: 'mechanic.thatchgrinUprooted',
+  'Split Rind': 'mechanic.thatchgrinSplitRind',
   // The Straw Foreman's plank hide and a player's window on it (muster_effigy.ts);
   // byte-identical to EFFIGY_WARD_NAME and EFFIGY_OPENED_NAME.
   'Plank Hide': 'aura.effigyPlankHide',
@@ -18631,7 +18656,22 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
   'Muster Standard': 'muster_standard',
 };
 
+// Gourdlight Eve's cosmetic auras (src/sim/seasonal/seasonal_cosmetics.ts): each trick
+// by its id's catalog name, the worn head by its item's name.
+const SEASONAL_TRICK_AURA_IDS: ReadonlyMap<string, string> = new Map([
+  ...GOURDLIGHT_TRICKS.map((trick): [string, string] => [trick.name, trick.id]),
+  // the Strawling Charm's look (Old Thatchgrin's cosmetic)
+  [STRAWLING_GUISE.name, STRAWLING_GUISE.id],
+  // the costume draughts' looks
+  ...GOURDLIGHT_COSTUMES.map((costume): [string, string] => [costume.name, costume.auraId]),
+]);
+
 export function localizeSimAuraName(name: string): string | null {
+  const trickId = SEASONAL_TRICK_AURA_IDS.get(name);
+  if (trickId) return t(`seasonal.tricks.${trickId}` as TranslationKey);
+  if (name === 'Carved Pumpkin Head') {
+    return tEntity({ kind: 'item', id: CARVED_PUMPKIN_HEAD_ID, field: 'name' });
+  }
   if (name === 'Friendship') return t('referralCards.friendshipAura');
   if (name === 'Protective Charm') return t('referralCards.protectiveCharm');
   const key = AURA_NAME_KEY[name];

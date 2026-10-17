@@ -1973,7 +1973,9 @@ export function handleDeath(
       rollBossBuddyDrops(ctx, e, worldBossContribs, null);
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
-      onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);
+      // A seasonal field boss never counts toward the weekly (a seasonal window must
+      // not gate a weekly quest): seasonal/scarecrow.ts.
+      if (!template?.seasonalEvent) onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);
       // The muster's weekly counts his kill for every contributor carrying it.
       creditMusterTrophyKill(ctx, e, worldBossContribs);
     }

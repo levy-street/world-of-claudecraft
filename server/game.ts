@@ -7795,6 +7795,9 @@ export class GameServer {
         sim.collectDelveChestLoot(msg.objectId, pid);
         break;
       }
+      case 'trick_or_treat': // the seasonal knock (src/sim/seasonal/trick_or_treat.ts)
+        if (typeof msg.npcId === 'number') sim.trickOrTreat(msg.npcId, pid);
+        break;
       // The Shardpike trial's three no-argument verbs (lance_wire.ts).
       case 'lance_brace':
       case 'lance_thrust':
@@ -8700,9 +8703,9 @@ export class GameServer {
       // every mount whose reins item sits in bags or bank. Its inputs are
       // meta.inventory (heavy-gated above) and meta.bank.inventory, which is
       // NOT itself behind this gate; the gating is safe anyway because the
-      // only writers of the bank inventory are the deposit and withdraw
-      // commands, and both are in HEAVY_SELF_CMDS, so every input change
-      // marks this session heavy dirty. The staggered modulo refresh is the
+      // deposit and withdraw commands are in HEAVY_SELF_CMDS and the one tick
+      // writer (the event-bound sweep, seasonal_bound_items.ts) bumps wireRev,
+      // so every input change re-sends this block. The staggered modulo refresh is the
       // backstop, with the known family caveat that broadcastSnapshots runs
       // outside the catch-up loop, so under sustained catch-up the stride
       // can skip a pid's modulo slot and the backstop stretches; the dirty

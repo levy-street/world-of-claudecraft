@@ -2372,6 +2372,7 @@ export const hudChromeStrings = {
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
+    name_emberbristle_broom: 'Emberbristle Broom',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -2403,6 +2404,8 @@ export const hudChromeStrings = {
       'A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.',
     desc_rickshaw_mount:
       'A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run.',
+    desc_emberbristle_broom:
+      'A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. It crumbles back to straw when Gourdlight Eve ends.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing
@@ -5496,6 +5499,8 @@ export const hudChromeStrings = {
     spellHaste: 'Increases spell casting speed by {pct}%',
     sated: 'Cannot benefit from another group haste effect',
     cauterizeFatigue: 'Cauterize cannot prevent another lethal hit',
+    // A seasonal event's look (src/sim/seasonal/): the pumpkin head and the tricks.
+    seasonalCosmetic: 'Cosmetic only: no effect on combat',
     castShield: 'Casting cannot be interrupted or delayed by damage',
     // wordy (M16): filled in the five non-Latin locales in this change.
     dmgDone: 'Increases damage dealt by {pct}%',

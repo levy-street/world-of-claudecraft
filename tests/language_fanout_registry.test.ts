@@ -494,9 +494,10 @@ const ANSWERED: readonly AnsweredSurface[] = [
       'lastGossipRowSig',
       'lastGuideState',
       'lastIntroHintVisible',
+      'lastTrickOrTreatSig',
     ],
     answer: 'this.questDialog.relocalize',
-    why: "the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it), and a dungeon guide's offer state (an enum, never text)",
+    why: "the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it), and a dungeon guide's offer state (an enum, never text), and the trick-or-treat row signature (the row's state enum from trick_or_treat_row_view.ts, never text)",
   },
   {
     file: 'hud/dungeon/dungeon_tracker_painter.ts',

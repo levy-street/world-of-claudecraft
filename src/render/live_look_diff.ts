@@ -14,6 +14,7 @@ import { isMechWearer } from '../sim/types';
 import { modularLookFor } from './characters';
 import { wocBodyScaleOf } from './characters/modular';
 import { modularLookChanged } from './characters/player_look_core';
+import { drawsSeasonalHead, effectiveHelmHidden } from './characters/seasonal_head_core';
 import type { WocHeadAppearanceInput } from './characters/woc_head_look_core';
 import { classBodyComposes } from './characters/woc_parts_core';
 
@@ -37,6 +38,7 @@ export interface WocDressable {
   ): boolean;
   setWocHeadLook?(app: WocHeadAppearanceInput): boolean;
   setBodyScale?(scale: number): boolean;
+  setSeasonalHead?(on: boolean): boolean;
 }
 
 /**
@@ -61,8 +63,10 @@ export interface WocDressable {
  * until the next real reassignment.
  */
 export function diffComposedLook(e: Entity, v: LiveLookView): void {
-  if (e.helmHidden !== v.helmHidden) {
-    v.helmHidden = e.helmHidden;
+  // The helm bit is the paperdoll eye OR a worn seasonal head (seasonal_head_core.ts).
+  const helmHidden = effectiveHelmHidden(e);
+  if (helmHidden !== v.helmHidden) {
+    v.helmHidden = helmHidden;
     if (!isMechWearer(e) && modularLookFor(e)) v.visualKey = null;
   }
   if (e.modularAppearance !== v.modularAppearance) {
@@ -98,7 +102,9 @@ export function diffWornArmor(e: Entity, visual: WocDressable): boolean {
   // Nythraxis court's vision of Captain Aldren rides the warrior def) keeps
   // the assembly's default kit rather than reading its empty slots as bare.
   if (e.kind !== 'player') return false;
-  const dressed = visual.setWocEquipment(e.equippedItems, e.helmHidden);
+  const dressed = visual.setWocEquipment(e.equippedItems, effectiveHelmHidden(e));
+  // the worn seasonal pumpkin head on the head bone (a flag flip; lazy first build)
+  visual.setSeasonalHead?.(drawsSeasonalHead(e));
   // the modular head: a reference compare per frame, a flag/uniform flip on change
   const head = visual.setWocHeadLook?.(e.modularAppearance) ?? false;
   // the body size: one read and a compare per frame, a pose-wrap scale on change

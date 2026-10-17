@@ -58,6 +58,7 @@
 //   transport.ts        IWorldTransport      the scheduled ferry's phase, ship pose, passenger bit
 //   world_pvp.ts        IWorldWorldPvp       the /pvp flag: self readout + raise/lower command
 //   seating.ts          IWorldSeating        sit on a piece of furniture by its seat id
+//   seasonal.ts         IWorldSeasonal       the running seasonal event + trick-or-treat
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -103,6 +104,7 @@ import type { IWorldQuests } from './world_api/quests';
 export type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from './world_api/quests';
 
 import type { IWorldReliquary } from './world_api/reliquary';
+import type { IWorldSeasonal } from './world_api/seasonal';
 import type { IWorldSeating } from './world_api/seating';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
@@ -514,7 +516,8 @@ export interface IWorld
     IWorldTransport,
     IWorldWorldPvp,
     IWorldBuddies,
-    IWorldSeating {}
+    IWorldSeating,
+    IWorldSeasonal {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -973,6 +976,8 @@ export const COMMAND_NAMES = [
   'referralCards',
   // Sit on a piece of furniture by its seat id (IWorldSeating.sitOnSeat).
   'sit_seat',
+  // Say trick or treat to an NPC (IWorldSeasonal.trickOrTreat; src/sim/seasonal/).
+  'trick_or_treat',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1067,7 +1072,8 @@ export type WorldFacet =
   | 'IWorldVehicles'
   | 'IWorldWorldPvp'
   | 'IWorldBuddies'
-  | 'IWorldSeating';
+  | 'IWorldSeating'
+  | 'IWorldSeasonal';
 
 export const COMMAND_FACETS = {
   weekly_reward_claim: 'IWorldBank',
@@ -1386,4 +1392,7 @@ export const COMMAND_FACETS = {
   dungeon_guide_answer: 'IWorldDungeons',
   // IWorldSeating: sit on a seat (the seats and who holds one are derived, untagged).
   sit_seat: 'IWorldSeating',
+  // IWorldSeasonal: the trick-or-treat knock (the event and the day's knocks are
+  // the `season` / `tot` self-delta mirrors, untagged).
+  trick_or_treat: 'IWorldSeasonal',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

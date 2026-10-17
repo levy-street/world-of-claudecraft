@@ -5810,6 +5810,7 @@ const ALL_DELTA_KEYS = [
   'rxp',
   'salv',
   'scb',
+  'season',
   'sh',
   'sp',
   'stats',
@@ -5817,6 +5818,7 @@ const ALL_DELTA_KEYS = [
   'tfocus',
   'tfpend',
   'tmap',
+  'tot',
   'trade',
   'tslot',
   'vault',
@@ -5950,11 +5952,13 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   rtype: 'resourceType',
   rxp: 'restedXp',
   salv: 'lastSalvageResult',
+  season: 'activeSeasonalEvent',
   sh: 'spellHaste',
   sp: 'spellPower',
   tfocus: 'townFocus',
   tfpend: 'townFocusPending',
   tmap: 'treasureMap',
+  tot: 'trickOrTreatedToday',
   tslot: 'toolEffectSlots',
   vault: 'vaultInfo',
   vehicle: 'vehicleSession',
@@ -6075,6 +6079,10 @@ function dirtyEveryDeltaField(): {
   meta.vault.upgrades = 2;
   // The weekly emissary's charge (wkq): held mid-week so the key rides non-null.
   meta.weeklyQuest = { questId: 'wk_dungeons', week: '2030-W01', count: 1, state: 'active' };
+  // Gourdlight Eve (season, tot): the event running and one knock on today's ledger.
+  sim.seasonal.devOverride = 'gourdlight_eve';
+  meta.seasonalDay = sim.resetDay;
+  meta.seasonalKnocked.add('gourdlight_keeper');
   // `cvault`: craftVaultStockFor is gated on the craft-draw context predicate,
   // not the banker. This harness player carries a live DELVE RUN (the drun
   // key's seeding below), which the gate refuses by design, so cvault's
@@ -7309,7 +7317,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 122 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 124 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
     // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
@@ -7373,8 +7381,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Mirefen world-boss branch's Shardpike self keys (lance, lrest, lguide): 119.
     // The buddy collection adds budOwn and budPend to the integration keys.
     // +1: the dungeon objectives tracker's dgrun (server/dungeon_run_wire.ts), for 122.
-    expect(ALL_DELTA_KEYS).toHaveLength(122);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(122);
+    // +2: Gourdlight Eve's seasonal self keys season and tot (server/quest_snapshot_wire.ts
+    // emitActivitySelfKeys), for 124.
+    expect(ALL_DELTA_KEYS).toHaveLength(124);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(124);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7549,7 +7559,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The courier's keys and the Shardpike trial's lance, lrest and lguide self emits make 119.
     // The buddy collection adds budOwn and budPend.
     // The dungeon run's dgrun (the game.ts maybeSerialized emit) makes 122.
-    expect(scraped.size).toBe(122);
+    // The seasonal season and tot keys (quest_snapshot_wire.ts) make 124.
+    expect(scraped.size).toBe(124);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

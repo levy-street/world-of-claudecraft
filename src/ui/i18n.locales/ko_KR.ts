@@ -21726,4 +21726,85 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 캐릭터를 삭제하기 전에 고정되지 않은 도장 카드를 모두 다른 캐릭터로 옮기세요.',
   'apiError.character.referral_bond_pending':
     '친구 초대 보상인 멤버십 증서를 이 캐릭터에게 지급 중입니다. 지급이 완료된 후 캐릭터 삭제를 다시 시도하세요.',
+  'hudChrome.auraEffect.seasonalCosmetic': '외형 전용: 전투에 영향 없음',
+  'seasonal.event.gourdlight_eve.name': '고드라이트 축제의 밤',
+  'seasonal.trickOrTreat.row': '과자 안 주면 장난칠 거야!',
+  'seasonal.trickOrTreat.rowAria': '{name}에게 "과자 안 주면 장난칠 거야"라고 말하기',
+  'seasonal.trickOrTreat.knockedHint':
+    '오늘은 이미 이 문을 두드렸습니다. 일일 초기화 후 다시 열립니다.',
+  'seasonal.trickOrTreat.treat': '{name}이(가) 과자를 건네줍니다.',
+  'seasonal.trickOrTreat.trick': '{name}이(가) 당신에게 장난을 칩니다: {trick}!',
+  'seasonal.trickOrTreat.alreadyKnocked': '오늘은 이미 {name}에게 과자를 받았습니다.',
+  'seasonal.trickOrTreat.notActive': '지금은 고드라이트 축제의 밤이 열리지 않습니다.',
+  'seasonal.trickOrTreat.tooFar': '문을 두드리려면 더 가까이 가세요.',
+  'seasonal.trickOrTreat.treatFlash.one': '과자! 고드라이트 사탕 {count}개',
+  'seasonal.trickOrTreat.treatFlash.few': '과자! 고드라이트 사탕 {count}개',
+  'seasonal.trickOrTreat.treatFlash.many': '과자! 고드라이트 사탕 {count}개',
+  'seasonal.trickOrTreat.treatFlash.other': '과자! 고드라이트 사탕 {count}개',
+  'seasonal.trickOrTreat.trickFlash': '장난! {trick}',
+  'seasonal.tricks.gourdlight_trick_bat': '박쥐 변신',
+  'seasonal.tricks.gourdlight_trick_skeleton': '덜그럭 뼈다귀',
+  'seasonal.tricks.gourdlight_trick_fumes': '초록 연기',
+  'seasonal.pumpkinHead.on': '조각한 호박 머리를 썼습니다.',
+  'seasonal.pumpkinHead.off': '조각한 호박 머리를 벗었습니다.',
+  'seasonal.jarTrick': '항아리가 펑 하고 열립니다: {trick}!',
+  'seasonal.itemUse.pumpkinHead':
+    '사용: 안에서 불이 밝혀진 조각 호박을 투구 위에 쓰거나 벗습니다. 고드라이트 축제의 밤 동안에만. 외형 전용.',
+  'seasonal.itemUse.trickJar':
+    '사용: 몇 초 동안 무해한 장난을 무작위로 자신에게 겁니다. 고드라이트 축제의 밤 동안에만. 외형 전용.',
+  'seasonal.itemUse.pouch': '사용: 열면 고드라이트 사탕 {count}개를 받습니다.',
+  'seasonal.itemUse.sweet':
+    '고드라이트 축제의 밤 동안 과자를 얻으러 다니며 받습니다. 이스트브룩의 헤스터 고드윅이 외형 아이템과 교환해 줍니다.',
+  'seasonal.tokenPrice': '{item} {count}개',
+  'entities.items.gourdlight_sweet.name': '고드라이트 사탕',
+  'entities.items.gourdlight_treat_pouch.name': '고드라이트 과자 주머니',
+  'entities.items.carved_pumpkin_head.name': '조각한 호박 머리',
+  'entities.items.jar_of_mischief.name': '장난의 항아리',
+  'entities.npcs.gourdlight_keeper.name': '헤스터 고드윅',
+  'entities.npcs.gourdlight_keeper.title': '고드라이트 관리인',
+  'entities.npcs.gourdlight_keeper.greeting':
+    '호박에 불이 켜지고 등불이 걸렸으니 고드라이트 축제의 밤이 온 게 틀림없어요. 이스트브룩, 펜브리지, 하이워치 마을 사람들의 문을 두드리고 그 말을 해 보세요. 과자 안 주면 장난칠 거야. 대부분은 사탕을 주겠지만, 몇몇은 장난을 칠 거예요. 사탕을 가져오면 몸에 걸칠 것과 바꿔 드릴게요.',
+  'entities.quests.q_gourdlight_rounds.title': '고드라이트 순회',
+  'entities.quests.q_gourdlight_rounds.text':
+    '고드라이트 축제의 밤마다 골짜기의 아이들이 집집마다 돌아다녀요. 올해는 당신도 함께해요, {playerName}. 우리 마을에서 문 다섯 개를 두드리고 그 말을 한 다음 무엇을 받는지 보세요. 끝나면 저에게 돌아오세요.',
+  'entities.quests.q_gourdlight_rounds.completion':
+    '문 다섯 개를 두드렸는데 손가락도 다 멀쩡하네요. 자, 집에 가는 길에 먹을 과자 주머니예요. 내일 또 오세요. 문은 다시 열리니까요.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': '두드린 문',
+  'seasonal.tricks.gourdlight_trick_strawling': '짚인형 변장',
+  'seasonal.guise': '부적이 타닥거리더니 짚이 몸을 타고 올라옵니다: {trick}!',
+  'seasonal.itemUse.strawlingCharm':
+    '사용: {seconds}초 동안 올드 대치그린의 짚인형으로 변합니다. 전투 중에는 사용할 수 없으며 고드라이트 축제의 밤 동안에만 사용할 수 있습니다. 소모되지 않습니다. 외형 전용.',
+  'entities.items.thatchgrin_sweet_sack.name': '대치그린의 사탕 자루',
+  'entities.items.strawling_charm.name': '짚인형 부적',
+  'entities.mobs.gourdlight_thatchgrin.name': '올드 대치그린',
+  'entities.mobs.gourdlight_crow.name': '고드라이트 까마귀',
+  'hudChrome.mounts.name_emberbristle_broom': '잉걸갈기 빗자루',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    '주황색 리본을 감은 수확용 빗자루. 땅에서 한 뼘 위에 떠서 솔 끝으로 불씨를 흩뿌린다. 고드라이트 축제의 밤이 끝나면 다시 짚으로 부서진다.',
+  'seasonal.tricks.gourdlight_costume_skeleton': '해골 분장',
+  'seasonal.tricks.gourdlight_costume_ghost': '유령 분장',
+  'seasonal.tricks.gourdlight_costume_bat': '박쥐 분장',
+  'seasonal.costume': '물약을 마시자 모습이 바뀝니다: {trick}!',
+  'seasonal.titleGranted': '증서를 읽었습니다. 새 칭호 획득: {title}.',
+  'seasonal.titleKnown': '이미 그 칭호를 가지고 있으므로 증서는 그대로 남습니다.',
+  'seasonal.boundItemGone': '고드라이트 축제의 밤이 끝나 {item}이(가) 다시 짚으로 부서졌습니다.',
+  'seasonal.itemUse.costumeSkeleton':
+    '사용: {minutes}분 동안 덜그럭거리는 해골로 변신합니다. 사용 시 소모됩니다. 전투 중에는 사용할 수 없으며 전투에 들어가면 해제됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 외형 전용.',
+  'seasonal.itemUse.costumeGhost':
+    '사용: {minutes}분 동안 떠도는 유령으로 변신합니다. 사용 시 소모됩니다. 전투 중에는 사용할 수 없으며 전투에 들어가면 해제됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 외형 전용.',
+  'seasonal.itemUse.costumeBat':
+    '사용: {minutes}분 동안 날갯짓하는 박쥐로 변신합니다. 사용 시 소모됩니다. 전투 중에는 사용할 수 없으며 전투에 들어가면 해제됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 외형 전용.',
+  'seasonal.itemUse.titleWrit':
+    '사용: 이 캐릭터의 칭호 {title}을(를) 획득하며, 업적의 서에서 착용할 수 있습니다. 사용 시 소모됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 이미 칭호가 있으면 증서가 남습니다.',
+  'seasonal.itemUse.broom':
+    '올드 대치그린의 기념품. 고드라이트 축제의 밤 동안에만 남아 있으며, 행사가 끝나면 짚으로 부서집니다.',
+  'entities.items.rattlebone_draught.name': '덜그럭뼈 물약',
+  'entities.items.haunting_draught.name': '떠도는 혼 물약',
+  'entities.items.batwing_draught.name': '날갯짓 물약',
+  'entities.items.writ_of_the_gourdlit.name': '고드릿의 증서',
+  'entities.items.writ_of_the_trickster.name': '장난꾼의 증서',
+  'entities.items.writ_of_the_hollow_grin.name': '텅 빈 미소의 증서',
+  'entities.items.reins_emberbristle_broom.name': '잉걸갈기 빗자루',
+  'entities.mobs.gourdlight_swelling_gourd.name': '부푸는 박',
+  'entities.mobs.gourdlight_strawling.name': '짚인형',
 };

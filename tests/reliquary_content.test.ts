@@ -485,7 +485,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Stave and five trinkets on the same page: 495 + 13 = 508.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 558.
     // Two referral reward mounts join Horizons.
-    expect(full).toEqual({ owned: 560, total: 560 });
+    // Gourdlight Eve: the Emberbristle Broom's mount slot and the three writ titles: 564.
+    expect(full).toEqual({ owned: 564, total: 564 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -520,7 +521,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
     // 466 + 13 with the Mirefen world boss page's relics, staff and trinkets: 479.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529.
-    expect(character).toEqual({ owned: 531, total: 531 });
+    // Gourdlight Eve's broom slot and three writ titles: 535.
+    expect(character).toEqual({ owned: 535, total: 535 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -586,7 +588,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
-    ).toBe(747); // plus two referral reward mounts
+      // + Gourdlight Eve's broom mount slot and its three writ titles: 751.
+    ).toBe(751); // plus two referral reward mounts
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -2305,8 +2308,27 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
       thunzharr_waking_peak: 'conquerors_thunzharr',
       balgath_cyclops: 'conquerors_balgath',
     };
+    // A world boss whose EVERY drop is a tool, or the reins of a mount the Horizons
+    // mount page already slots, has nothing a boss page would list (the token carve-out
+    // above): Gourdlight Eve's Old Thatchgrin pays event currency, a cosmetic toy and
+    // the Emberbristle Broom's reins, whose slot lives on horizons_mounts with his
+    // boss hint. Keyed on the drops, not on any flag, so a boss that drops even one
+    // piece of gear stays in the sweep, seasonal or not.
+    const pagedMountReins = (itemId: string) => {
+      const def = ITEMS[itemId];
+      return (
+        def?.kind === 'mount' && (RELIQUARY_HORIZON_MOUNTS as readonly string[]).includes(def.mount)
+      );
+    };
+    const nothingToPage = (m: (typeof MOBS)[string]) =>
+      m.loot.length > 0 &&
+      m.loot.every(
+        (e) =>
+          e.itemId !== undefined && (isRedemptionTokenId(e.itemId) || pagedMountReins(e.itemId)),
+      );
+    expect(nothingToPage(MOBS.gourdlight_thatchgrin)).toBe(true);
     const bossIds = Object.values(MOBS)
-      .filter((m) => m.worldBoss === true)
+      .filter((m) => m.worldBoss === true && !nothingToPage(m))
       .map((m) => m.id);
     // Keeps the worldBoss filter arm live (the repo's only world boss today).
     expect(bossIds).toContain('thunzharr_waking_peak');
@@ -3300,15 +3322,16 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // (the Viridian Valestrider's Champion reins, content/faction_vendors.ts) +
   // the WOC Store's annual membership tank reward; the one pending-ruling
   // absence resolves to nothing.
-  horizons_mounts: 14, // plus the referral-card reward activity
+  // + Old Thatchgrin, the Emberbristle Broom's one table.
+  horizons_mounts: 15, // plus the referral-card reward activity
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
   // Crucible raid's flawless title + the three faction standing Champion
   // titles + the Clue Scroll Treasure Hunter title + the Drowned Temple lore
-  // guide's Witness of the Choir.
-  horizons_titles: 50,
+  // guide's Witness of the Choir + Gourdlight Eve's three writ titles.
+  horizons_titles: 53,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.

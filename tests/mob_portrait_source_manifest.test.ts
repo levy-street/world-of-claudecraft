@@ -110,7 +110,8 @@ describe('mob portrait source manifest', () => {
     // muster_chaplain, muster_sergeant, muster_drillmaster, muster_effigy).
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 354.
     // The 2026-10-09 reviewed renderer receipt captures all 355 current rows.
-    expect(liveIds).toHaveLength(355);
+    // 359: Gourdlight Eve's field boss, his crow and strawling, and his Swelling Gourd.
+    expect(liveIds).toHaveLength(359);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

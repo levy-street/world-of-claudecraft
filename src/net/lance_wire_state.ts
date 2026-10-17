@@ -1,8 +1,8 @@
 // The Shardpike trial's ClientWorld mirror (the IWorldLanceTrial facet, online half),
 // moved out of online.ts under the monolith ratchet as one more link in the wire-state
-// base-class chain (QuestWorldWireState -> LanceWireState -> ReconWireState ->
-// ClientWorld). It owns the self view the server ships as the `lance`/`lrest`/`lguide`
-// delta keys (server/lance_wire.ts lanceSelfWire), the three no-argument verbs, and the
+// base-class chain (QuestWorldWireState -> LanceWireState -> SeasonalWireState ->
+// ReconWireState -> ClientWorld). It owns the self view the server ships as the
+// `lance`/`lrest`/`lguide` delta keys (server/lance_wire.ts lanceSelfWire), the three no-argument verbs, and the
 // world boss fight's per-entity bits off the dynamic wire block
 // (server/world_boss_wire.ts writeWorldBossWireFields).
 

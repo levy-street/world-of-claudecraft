@@ -20,6 +20,7 @@ import { junkSellableSlot } from '../../../sim/items';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import { bulkBuyQuantity, vendorCountForced } from '../../../sim/vendor_buy_stack';
 import { vendorStackSize } from '../../../sim/vendor_stack';
+import { type VendorTokenPrice, vendorTokenPrice } from '../../../sim/vendor_token_price';
 import { knownItemDef } from '../../known_item';
 
 /** The vendor window's selected purchase multiple (the 1x/5x/10x/custom
@@ -93,6 +94,9 @@ export interface VendorPrice {
     factionId: FactionId;
     amount: number;
   };
+  /** Token cost (ItemDef.priceItem, a seasonal event's sweets): `count` copies of
+   *  `itemId` from the bags, per purchase (sim/vendor_token_price.ts). */
+  token?: VendorTokenPrice;
 }
 
 export interface VendorBalances {
@@ -113,6 +117,8 @@ export interface VendorBalances {
   factionCurrencies?: Readonly<Record<FactionId, number>>;
   /** Faction ID if the current vendor is an allied faction quartermaster. */
   vendorFactionId?: FactionId;
+  /** The viewer's bags, for a token-priced row's advisory affordability. */
+  inventory?: readonly InvSlot[];
 }
 
 export interface VendorBuybackRow {
@@ -143,6 +149,13 @@ export interface VendorView {
   /** The selected control-row multiple this view was built for, so the
    *  painter renders the pressed state from the same source of truth. */
   multiple: VendorMultiple;
+}
+
+/** Copies of `itemId` across the given bag slots (0 without bags). */
+function heldCount(inventory: readonly InvSlot[] | undefined, itemId: string): number {
+  let n = 0;
+  for (const slot of inventory ?? []) if (slot.itemId === itemId) n += slot.count;
+  return n;
 }
 
 /**
@@ -180,15 +193,18 @@ export function buildVendorView(
           amount: factionGate.requirement.currencyCost,
         }
       : undefined;
+    const token = vendorTokenPrice(item);
     const price: VendorPrice = {
       copper: Math.max(0, item.buyValue ?? 0) * quantity,
       honor: Math.max(0, Math.floor(item.priceHonor ?? 0)),
       ...(factionMarks ? { factionMarks } : {}),
+      ...(token ? { token } : {}),
     };
     if (
       price.copper <= 0 &&
       price.honor <= 0 &&
-      (!price.factionMarks || price.factionMarks.amount <= 0)
+      (!price.factionMarks || price.factionMarks.amount <= 0) &&
+      !price.token
     ) {
       continue;
     }
@@ -204,6 +220,7 @@ export function buildVendorView(
       !item.soulbound &&
       price.honor <= 0 &&
       !price.factionMarks &&
+      !price.token &&
       unitCopper > 0 &&
       stackSizeOf(item) > 1;
     const bulkQuantity = bulkEligible
@@ -214,7 +231,7 @@ export function buildVendorView(
     // path would collapse back to 1. Eligible rows at a fixed multiple carry
     // the whole-count total and an affordability that TRACKS the selection;
     // at 'custom' they only flag that a click opens the capped prompt.
-    const countable = !vendorCountForced(item) && !price.factionMarks;
+    const countable = !vendorCountForced(item) && !price.factionMarks && !price.token;
     const countBuy =
       countable && multiple !== 'custom' && multiple > 1
         ? {
@@ -228,13 +245,17 @@ export function buildVendorView(
         ? (balances.factionCurrencies[factionMarks.factionId] ?? 0)
         : 0;
     const canAffordFaction = !factionMarks || playerFactionMarks >= factionMarks.amount;
+    const canAffordToken = !token || heldCount(balances.inventory, token.itemId) >= token.count;
     goods.push({
       itemId,
       item,
       price,
       quantity,
       affordable:
-        balances.copper >= price.copper && balances.honor >= price.honor && canAffordFaction,
+        balances.copper >= price.copper &&
+        balances.honor >= price.honor &&
+        canAffordFaction &&
+        canAffordToken,
       requirementUnmet: gate.locked || factionGate.locked,
       ...(gate.requirement ? { requirement: gate.requirement } : {}),
       ...(factionGate.requirement ? { factionRequirement: factionGate.requirement } : {}),

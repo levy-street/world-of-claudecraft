@@ -568,6 +568,8 @@ export function auraEffectDescriptor(
       return { key: `${KEY}.sated` };
     case 'cauterize_fatigue':
       return { key: `${KEY}.cauterizeFatigue` };
+    case 'seasonal_cosmetic':
+      return { key: `${KEY}.seasonalCosmetic` };
     case 'cast_shield':
       return { key: `${KEY}.castShield` };
     // Mage empowerment moments (owner playtest: every worn buff should read).
