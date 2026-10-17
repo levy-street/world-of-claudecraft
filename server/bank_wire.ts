@@ -24,6 +24,7 @@
 // admission preserves the fire-and-forget recorder for isolated callers until
 // every host supplies a character-owned outbox.
 import { bankPurchasedSlotsFor } from '../src/sim/bank';
+import { guildBankMemberWireView } from '../src/sim/guild_bank';
 import type { MaterialSourceTransferSelection } from '../src/sim/material_source_transfer_selection';
 import type { SimContext } from '../src/sim/sim_context';
 import { weeklyRewardInfoFor } from '../src/sim/weekly_rewards';
@@ -425,6 +426,9 @@ export function emitGuildAndWeeklySelfKeys(
   // departed members all read null. Not heavy-gated for the same reason as
   // bank: it can change from OTHER members' deposits, not just this
   // session's own commands.
-  emit('guildBank', sim.guildBankInfoFor(pid));
+  // The member-facing projection (tracked copies carry only their public
+  // history, no guid or character ids); the sim read itself stays full
+  // fidelity for the guild bank ledger.
+  emit('guildBank', guildBankMemberWireView(sim.guildBankInfoFor(pid)));
   emit('weeklyRewards', viewerPid === pid ? weeklyRewardInfoFor(sim.ctx, pid) : null);
 }

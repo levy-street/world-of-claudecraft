@@ -161,6 +161,11 @@ export interface Config {
   // attempt, server/craft_roll_events_db.ts) to keep. Same 0-keeps-forever
   // contract.
   readonly craftRollEventsRetentionDays: number;
+  // How many days an item_ledger row (one per tracked epic/legendary copy
+  // mint or change of hands, server/item_ledger_db.ts) is kept. The copy's
+  // own payload keeps its bounded provenance forever; this is the audit
+  // twin. Same 0-keeps-forever contract.
+  readonly itemLedgerRetentionDays: number;
   // How many days a CLOSED, fully-disposed $WOC Exchange listing (and, via
   // FK cascade, its bids and settlements) is kept. Sales are the permanent
   // provenance record and never prune. 0 keeps listings forever.
@@ -252,6 +257,10 @@ const DEFAULT_WORLD_QUEST_SCORES_RETENTION_DAYS = 365;
 // year keeps a whole item's walk auditable; the intake is one row per
 // eligible craft, far below ftue_events' per-character burst.
 const DEFAULT_CRAFT_ROLL_EVENTS_RETENTION_DAYS = 365;
+// item_ledger answers "who has held this legendary" for copies that live as
+// long as the realm; the intake is bounded by epic/legendary drop rates (a
+// few rows per player per week at most), so three years stays small.
+const DEFAULT_ITEM_LEDGER_RETENTION_DAYS = 1095;
 const DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS = 180;
 // Abandon rows are dead once outside every cooldown window (an hour); 30 days
 // keeps generous forensics for tuning the cooldown numbers.
@@ -495,6 +504,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     craftRollEventsRetentionDays: numberOr(
       env.CRAFT_ROLL_EVENTS_RETENTION_DAYS,
       DEFAULT_CRAFT_ROLL_EVENTS_RETENTION_DAYS,
+    ),
+    itemLedgerRetentionDays: numberOr(
+      env.ITEM_LEDGER_RETENTION_DAYS,
+      DEFAULT_ITEM_LEDGER_RETENTION_DAYS,
     ),
     chatViolationRetentionDays: numberOr(
       env.CHAT_VIOLATION_RETENTION_DAYS,

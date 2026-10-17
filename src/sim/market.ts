@@ -26,6 +26,7 @@ import {
   removeMatchingInstance,
   sanitizeEscrowSlot,
 } from './item_instance_transfer';
+import { publicProvenanceView } from './item_provenance';
 import { removeVendorSellUnits } from './items';
 import { collapseToLowestPerItem } from './market_collapse';
 import { planListingIds, playerListingIdFloor } from './market_listing_ids';
@@ -1424,6 +1425,12 @@ export class Market {
       // goods, so the full payload never crosses the wire. Conditional spread:
       // plain rows stay byte-identical (no `instance: undefined` key).
       ...(l.instance ? { instance: publicInstanceView(l.instance) } : {}),
+      // A tracked copy's history, so a buyer can weigh where it has been: the
+      // public projection only (names, dates, source, zone; never a character
+      // id, the parent guid, or the copy's own guid). A SIBLING of `instance`,
+      // never inside it: publicInstanceView feeds payload equality and its
+      // allowlist is pinned to the eqi wire, so the display trim stays as is.
+      ...(l.instance?.provenance ? { history: publicProvenanceView(l.instance.provenance) } : {}),
       ...(l.craftedRecipeId === undefined ? {} : { craftedRecipeId: l.craftedRecipeId }),
       ...(l.materialSources === undefined
         ? {}

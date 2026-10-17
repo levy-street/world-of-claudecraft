@@ -10,6 +10,7 @@
   import type { Built, PendingAction } from '../moderation_actions';
   import {
     RESTORE_ITEM_MAX_COUNT,
+    restoreDerivedFrom,
     restoreItem,
     restoreItemSummary,
     restoreSlot,
@@ -39,6 +40,11 @@
   let restoreKind = $state<'item' | 'slot' | null>(null);
   let itemId = $state('');
   let count = $state(1);
+  // Optional: the lost copy's item ID, so the restored copy is logged as
+  // derived from it in the item ledger.
+  let derivedFrom = $state('');
+  // The normalized id the request will carry ('' blank, null malformed).
+  let lostCopyId = $derived(restoreDerivedFrom(derivedFrom));
   let professionId = $state('');
   let effectId = $state('');
 
@@ -51,6 +57,7 @@
     restoreKind = null;
     itemId = '';
     count = 1;
+    derivedFrom = '';
     professionId = '';
     effectId = '';
   }
@@ -104,7 +111,9 @@
 
   async function confirmRestore(values: { reason: string }): Promise<void> {
     if (restoreKind === 'item') {
-      await submit(restoreItem(characterId, characterName, itemId, count, values.reason));
+      await submit(
+        restoreItem(characterId, characterName, itemId, count, values.reason, derivedFrom),
+      );
     } else if (restoreKind === 'slot') {
       await submit(restoreSlot(characterId, characterName, professionId, effectId, values.reason));
     }
@@ -117,6 +126,9 @@
     if (!itemId.trim()) return window.alert(restoreAlert('alert.itemIdRequired'));
     if (!Number.isInteger(count) || count < 1 || count > RESTORE_ITEM_MAX_COUNT) {
       return window.alert(restoreAlert('alert.restoreCountRange'));
+    }
+    if (lostCopyId === null) {
+      return window.alert(restoreAlert('alert.restoreDerivedFromInvalid'));
     }
     restoreKind = 'item';
   }
@@ -326,6 +338,16 @@
                   bind:value={count}
                 />
               </label>
+              <label>
+                <span>{t('profInspect.derivedFromLabel')}</span>
+                <input
+                  bind:value={derivedFrom}
+                  disabled={promptOpen}
+                  placeholder={t('profInspect.derivedFromPlaceholder')}
+                  spellcheck="false"
+                  autocomplete="off"
+                />
+              </label>
               <button class="btn-sm" disabled={promptOpen} onclick={openItemPrompt}>
                 {t('profInspect.restoreItemButton')}
               </button>
@@ -359,6 +381,9 @@
                 rows={[
                   { label: t('dialog.character'), value: characterName },
                   { label: t('dialog.item'), value: restoreItemSummary(itemId.trim(), count) },
+                  ...(lostCopyId
+                    ? [{ label: t('dialog.restoreDerivedFrom'), value: lostCopyId }]
+                    : []),
                 ]}
                 onConfirm={confirmRestore}
                 onCancel={() => (restoreKind = null)}

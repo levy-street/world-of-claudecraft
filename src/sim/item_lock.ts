@@ -92,11 +92,23 @@ export function countRawInSlots(
  *  this never falls through to a locked slot even as a last resort. Used on
  *  an arbitrary `InvSlot[]`: the real removal (a live `meta.inventory`) and
  *  the #2350 capacity scratch simulation share this one walk so the two can
- *  never disagree about which slots free up. */
-export function removeUnlockedFromSlots(inventory: InvSlot[], itemId: string, count: number): void {
+ *  never disagree about which slots free up.
+ *
+ *  Returns the payloads of the instanced units it removed, one entry per
+ *  emptied slot's payload (in removal order), so a consumer can write the
+ *  `consume` ledger row for a tracked copy it spent (item_tracking.ts). A
+ *  plain unit has no payload and contributes nothing; a material never
+ *  carries a tracked identity, so its arm returns none. Tracked copies are
+ *  one per slot, so a tracked payload is always returned exactly once. */
+export function removeUnlockedFromSlots(
+  inventory: InvSlot[],
+  itemId: string,
+  count: number,
+): ItemInstancePayload[] {
+  const removed: ItemInstancePayload[] = [];
   if (isMaterialItemId(itemId) && count > 0) {
     takeMaterialInventoryForHub(inventory, itemId, count);
-    return;
+    return removed;
   }
 
   let remaining = count;
@@ -106,8 +118,12 @@ export function removeUnlockedFromSlots(inventory: InvSlot[], itemId: string, co
     const take = Math.min(s.count, remaining);
     s.count -= take;
     remaining -= take;
-    if (s.count <= 0) inventory.splice(i, 1);
+    if (s.count <= 0) {
+      inventory.splice(i, 1);
+      if (s.instance) removed.push(s.instance);
+    }
   }
+  return removed;
 }
 
 /** The command body: lock or unlock the ONE bag slot the caller named, WHOLE

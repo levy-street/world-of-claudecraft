@@ -4,7 +4,7 @@
 // fragments. Moved out of the coordinator (the monolith ratchet: extract, then
 // lower); the caches themselves are still owned and refreshed by GameServer.
 
-import type { StableAuraWireCache } from './snapshot_timer_wire';
+import { jsonWithField, StableAuraWireCache } from './snapshot_timer_wire';
 
 // Per-entity wire fragments, refreshed lazily at most once per tick and
 // shared by every recipient. The version counters bump only when the
@@ -35,6 +35,10 @@ export interface EntityWireCache {
    *  has none). Immutable for the session, so it is minted on first use and
    *  spliced, never re-stringified. */
   appJson: string | null;
+  /** The worn tracked copies' public history (`eqh`, equipped_history_wire.ts),
+   *  serialized once per worn set and spliced like the look; held here so a
+   *  history-only change (an epic swapped for a twin copy) still re-splices. */
+  eqhJson: string | null;
   baseDynJson: string;
   idVer: number;
   baseDynVer: number;
@@ -51,6 +55,34 @@ export interface EntityWireView {
   liteJson: string;
   fullAuraJson: string;
   liteAuraJson: string;
+}
+
+export function emptyEntityWireCache(): EntityWireCache {
+  return {
+    tick: -1,
+    baseIdJson: '',
+    idJson: '',
+    appJson: null,
+    eqhJson: null,
+    baseDynJson: '',
+    idVer: 0,
+    baseDynVer: 0,
+    auraCache: new StableAuraWireCache(),
+    legacy: emptyWireVariant(),
+    stable: emptyWireVariant(),
+  };
+}
+
+/** The identity JSON a viewer receives: the diffed base plus the two heavy
+ *  fields serialized once per entity (the look, the worn history), each
+ *  spliced only when present so the keys stay sparse. */
+export function splicedIdentityJson(
+  baseIdJson: string,
+  appJson: string | null,
+  eqhJson: string | null,
+): string {
+  const withApp = appJson === null ? baseIdJson : jsonWithField(baseIdJson, 'app', appJson);
+  return eqhJson === null ? withApp : jsonWithField(withApp, 'eqh', eqhJson);
 }
 
 export function emptyWireVariant(): EntityWireVariantCache {

@@ -86,6 +86,14 @@ describe('admin route permission map', () => {
     );
     expect(permissionForAdminRoute('GET', '/admin/api/moderation/accounts/42/kick')).toBeNull();
     expect(permissionForAdminRoute('GET', '/admin/api/blocked-ips')).toBe('moderation.read');
+    // The tracked-item ledger reads (support surface); the per-guid row is a
+    // startsWith arm in the ladder, invisible to the scan above, so it is
+    // pinned here by hand.
+    expect(permissionForAdminRoute('GET', '/admin/api/item-ledger')).toBe('support.read');
+    expect(
+      permissionForAdminRoute('GET', '/admin/api/items/3f2504e0-4f89-41d3-9a0c-0305e82c3301'),
+    ).toBe('support.read');
+    expect(permissionForAdminRoute('GET', '/admin/api/items/not-a-guid')).toBeNull();
     expect(permissionForAdminRoute('GET', '/admin/api/moderation/history')).toBe('moderation.read');
     expect(permissionForAdminRoute('POST', '/admin/api/blocked-ips')).toBe('ipblocks.manage');
     expect(permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/ban')).toBe(

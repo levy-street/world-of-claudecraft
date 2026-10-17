@@ -27,6 +27,7 @@ import { bagPools, bagsFullError, fitsAll } from '../bags';
 import { ITEMS } from '../data';
 import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { itemFromHeroicRaid, itemFromRaid } from '../item_level';
+import { recordTrackedChange } from '../item_tracking';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Entity, type InvSlot, type ItemDef, isConsuming, SUNDER_CAST_ID } from '../types';
@@ -177,6 +178,17 @@ export function completeSunderCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     ctx.error(meta.entityId, 'You are not holding that item.');
     return;
   }
+  // The copy ends here: a tracked (epic or legendary) copy writes its final
+  // ledger row naming what it became. Emits only, draws no rng.
+  recordTrackedChange(
+    ctx,
+    meta,
+    itemId,
+    consumed.instance,
+    'consume',
+    'sunder',
+    SUNDERED_ESSENCE_ITEM_ID,
+  );
   const def = ITEMS[itemId];
   // silent + callerLogs: the sunder line below owns BOTH halves of the grant
   // feedback (the #2458 rule: a grant that stands its hub line down stands

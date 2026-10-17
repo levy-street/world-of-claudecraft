@@ -93,6 +93,7 @@ import {
 } from './guild_bank_receipt_db';
 import type { GuildBankSave, GuildBankWriteResult } from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
+import { ITEM_LEDGER_SCHEMA } from './item_ledger_db';
 import {
   advanceCustodyWatermarkIn,
   confirmBakedCustodyRefs,
@@ -1288,6 +1289,9 @@ export async function ensureSchema(): Promise<void> {
     // The chance-based crafting outcome audit (craft_roll_events). Same FK
     // shape as the progress logs, so it runs after SCHEMA; idempotent.
     await client.query(CRAFT_ROLL_EVENTS_SCHEMA);
+    // The tracked-item provenance ledger (item_ledger): FK-references
+    // accounts and characters like the audit logs above; idempotent.
+    await client.query(ITEM_LEDGER_SCHEMA);
     // First-touch signup attribution (one row per account, written at
     // registration). FK-references accounts(id), so it runs after SCHEMA.
     await client.query(ACCOUNT_ATTRIBUTION_SCHEMA);

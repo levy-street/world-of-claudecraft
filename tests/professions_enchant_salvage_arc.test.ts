@@ -668,9 +668,11 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     const RAID_EPIC = 'crownforged_dreadhelm';
     server.sim.ctx.addItemInstance(RAID_EPIC, { signer: 'KeepMe' }, st.pid);
     server.sim.addItem(RAID_EPIC, 1, st.pid);
+    // The ordinary copy is tracked (a guid, no signer), so pick it by signer.
     const plainIndex = serverInv(server, st.pid).findIndex(
-      (slot) => slot.itemId === RAID_EPIC && !slot.instance,
+      (slot) => slot.itemId === RAID_EPIC && slot.instance?.signer === undefined,
     );
+    expect(plainIndex).toBeGreaterThanOrEqual(0);
 
     cmd(server, st, { cmd: 'extract_essence', item: RAID_EPIC, slot: plainIndex });
     flushEnchantFamilyCast(server, st.pid);

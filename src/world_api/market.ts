@@ -10,7 +10,7 @@ import type {
 } from '../sim/market_query';
 import type { MarketSaleRecord } from '../sim/market_sale_log';
 import type { MaterialComposition } from '../sim/material_sources';
-import type { InvSlot, ItemInstancePayload } from '../sim/types';
+import type { InvSlot, ItemInstancePayload, ItemProvenance } from '../sim/types';
 
 // ---------------------------------------------------------------------------
 // The World Market (the Merchant's auction house). Listings are global and
@@ -30,6 +30,13 @@ export interface MarketListingView {
    *  allowlist (signer/enchant/rolled; never boundTo/bindOnTrade/charges): the
    *  tooltip's enchant line and maker's mark. Absent on plain listings. */
   instance?: ItemInstancePayload;
+  /** The listed tracked copy's history (docs/design/item-tracking.md), as
+   *  the public projection (publicProvenanceView: names, dates, source, zone;
+   *  no character id, no parent guid, never the copy's guid), for the row's
+   *  Item history door. A sibling of `instance`, never inside it, so the
+   *  display trim and every payload equality stay untouched. Absent on an
+   *  untracked or plain listing. */
+  history?: ItemProvenance;
   /** Recipe marker carried by a crafted listing. The client does not display the
    *  id, but Market Sweep needs the bit so it never offers a bulk action the
    *  server planner rejects. */

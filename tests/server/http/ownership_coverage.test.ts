@@ -112,13 +112,16 @@ const accountOwnedRoutes: RouteDef[] = apiRoutes.filter(
 // Substitute each :param segment with a concrete sample so ctx.path/url read as a
 // real request path. Load-bearing for the admin sweep: requireAdmin's central
 // permission gate resolves the route permission from the CONCRETE url pathname
-// (admin_routes.ts patterns), so :id must be numeric and :action a real enum
-// member, or the gate fail-closed-404s before the middleware under test runs.
+// (admin_routes.ts patterns), so :id must be numeric, :action a real enum
+// member and :guid a canonical UUID (the item ledger lookup), or the gate
+// fail-closed-404s before the middleware under test runs.
+const SAMPLE_GUID = '0f8fad5b-d9cb-469f-a165-70867728950e';
 function concretePath(path: string): string {
   return path
     .split('/')
     .map((segment) => {
       if (!segment.startsWith(':')) return segment;
+      if (segment === ':guid') return SAMPLE_GUID;
       return segment === ':action' ? 'suspend' : REQUESTED_ID;
     })
     .join('/');
@@ -456,7 +459,8 @@ describe('ownership coverage: operator-scope deny-by-default sweep', () => {
         method: route.method,
         url: concretePath(route.path),
         headers: { authorization: `Bearer ${VALID_TOKEN}` },
-        params: { id: 'not-a-number' },
+        // :guid rides the same malformed sample (requireAdminGuidTarget).
+        params: { id: 'not-a-number', guid: 'not-a-number' },
       });
       const { res, handler } = await runRouteWithErrors(route, ctx);
 

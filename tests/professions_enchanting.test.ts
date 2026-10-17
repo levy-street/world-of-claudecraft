@@ -1497,10 +1497,20 @@ describe('apply enchant to WORN gear (in place)', () => {
     for (const reagent of ENCHANTS[RING_ENCHANT].reagents) {
       sim.addItem(reagent.itemId, reagent.count, pid);
     }
+    // The ring is epic, so each copy was minted with its own tracked identity
+    // (item_tracking.ts): neither worn copy is payload-free, and the two are
+    // told apart by guid. The ring1 copy must come through byte-identical.
+    const ring1Before = structuredClone(meta.equipmentInstance.ring1);
+    const ring2Guid = meta.equipmentInstance.ring2?.guid;
+    expect(ring1Before?.guid).toBeDefined();
+    expect(ring2Guid).toBeDefined();
+    expect(ring1Before?.guid).not.toBe(ring2Guid);
 
     expect(resolveApplyEnchant(sim.ctx, pid, RING, RING_ENCHANT, 'ring2').ok).toBe(true);
     expect(meta.equipmentInstance.ring2?.enchant).toBe(RING_ENCHANT);
-    expect(meta.equipmentInstance.ring1).toBeUndefined();
+    expect(meta.equipmentInstance.ring2?.guid, 'ring2 enchanted in place').toBe(ring2Guid);
+    expect(meta.equipmentInstance.ring1, 'ring1 untouched').toEqual(ring1Before);
+    expect(meta.equipmentInstance.ring1?.enchant).toBeUndefined();
   });
 
   it('the applyEnchant command entry point forwards the slot and stashes the result', () => {

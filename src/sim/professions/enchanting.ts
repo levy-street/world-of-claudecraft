@@ -66,6 +66,8 @@ import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { requiredLevelFor } from '../item_level_req';
+import { isPlainCopy } from '../item_plain_copy';
+import { recordTrackedChange } from '../item_tracking';
 import {
   consumePlayerVaultStock,
   drawableCounterFor,
@@ -403,9 +405,13 @@ export function consumePreferredDisenchantVictim(
     if (slot.count <= 0) inventory.splice(index, 1);
     return { instance, craftedRecipeId };
   };
+  // Pass 1, the plain copies: payload-free, or carrying only a tracked
+  // identity (item_plain_copy.ts), since every epic or legendary copy now
+  // carries a guid and a walk that ranked it as special would destroy a
+  // Perfected copy while an ordinary one was held.
   for (let i = inventory.length - 1; i >= 0; i--) {
     const slot = inventory[i];
-    if (slot.itemId === itemId && !slot.instance) return consumeAt(i);
+    if (slot.itemId === itemId && isPlainCopy(slot.instance)) return consumeAt(i);
   }
   for (let i = inventory.length - 1; i >= 0; i--) {
     const slot = inventory[i];
@@ -533,6 +539,18 @@ export function resolveDisenchant(
     }
   }
   if (meta) {
+    // The item ledger's lineage row (item_tracking.ts): the disenchant ends
+    // the copy, so a tracked victim writes its `consume` row, naming the
+    // primary yield. Draw-free (the yield is already rolled above).
+    recordTrackedChange(
+      ctx,
+      meta,
+      itemId,
+      consumed?.instance,
+      'consume',
+      'disenchant',
+      `${materialItemId} x${count}`,
+    );
     // Quality-tiered gain: the disenchanted item's def quality is the input
     // tier. Crafted-provenance copies still yield materials, but they do not
     // teach enchanting, preventing a craft then disenchant loop from
@@ -1159,6 +1177,18 @@ function resolveApplyEnchantWorn(
   // identity-diff (server/game.ts identityFields + the cache.idJson compare)
   // picks up on the next snapshot: no extra dirty-marking is needed.
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  // The lineage row: the worn copy changed in place and kept its guid (both
+  // payload transforms clone it through), so it records a `modify` naming
+  // the enchant. Draw-free; an untracked copy records nothing.
+  recordTrackedChange(
+    ctx,
+    meta,
+    itemId,
+    meta.equipmentInstance[slot],
+    'modify',
+    'enchant',
+    enchantId,
+  );
   // Same skill gain as the bagged arm: the applied enchant's reagent-derived tier.
   grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
   return enchantSuccess(itemId, enchantId, vaultDraws);
@@ -1293,12 +1323,17 @@ function resolveReplaceEnchantBagged(
   // movement: this re-mints the player's OWN copy in place, the same reason
   // silent + callerLogs are set, so it is not a new acquisition for the
   // Reliquary tally either (re-enchanting a relic must not raise its count).
-  ctx.addItemInstance(itemId, replacedEnchantPayloadFor(consumed.instance, enchant), pid, 1, {
+  const replaced = replacedEnchantPayloadFor(consumed.instance, enchant);
+  ctx.addItemInstance(itemId, replaced, pid, 1, {
     silent: true,
     callerLogs: true,
     craftedRecipeId: consumed.craftedRecipeId,
     movement: true,
   });
+  // The lineage row: the re-grant above carried the copy's guid back to the
+  // same holder, so the hub recorded nothing; the enchant changed the copy in
+  // place, so it records a `modify` naming the new enchant. Draw-free.
+  recordTrackedChange(ctx, meta, itemId, replaced, 'modify', 'enchant', enchantId);
   // Quality-tiered gain: the applied enchant's reagent-derived tier, exactly
   // like the plain arms (also stamps the shared throttle).
   grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
@@ -1517,6 +1552,11 @@ export function resolveApplyEnchant(
     craftedRecipeId: consumed?.craftedRecipeId,
     movement: true,
   });
+  // The lineage row, the replace arm's rule: a tracked copy kept its guid
+  // through the same-holder re-grant, so the enchant is a `modify` on it (the
+  // Lucent Infusion included). A copy that had no guid yet was minted by the
+  // hub just now, and that mint row stands alone. Draw-free.
+  if (meta) recordTrackedChange(ctx, meta, itemId, merged, 'modify', 'enchant', enchantId);
   // Quality-tiered gain: the applied enchant's reagent-derived tier.
   if (meta) grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
   return enchantSuccess(itemId, enchantId, vaultDraws);

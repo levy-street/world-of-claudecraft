@@ -72,6 +72,7 @@ import {
 } from './hud/professions/enchant_apply_view';
 import { formatNumber, t } from './i18n';
 import type { TranslationKey } from './i18n.catalog';
+import { openItemHistoryDialog } from './item_history_dialog';
 import { itemNumber, itemStatName } from './item_instance_tooltip';
 import type { MaterialSourcesDialogOptions } from './material_sources_dialog';
 import { wornItemCellParts } from './worn_item_cell_view';
@@ -250,6 +251,13 @@ export class BagItemActionMenu {
         if (materialSelection === null) target.refuseNotHeld();
         else
           this.openMaterialPicker(def, itemId, materialSources, materialSelection, target.opener);
+      } else if (id === 'itemHistory' && instance?.provenance !== undefined) {
+        this.deps.ctxMenu.element().style.display = 'none';
+        openItemHistoryDialog({
+          itemName: itemDisplayName(def),
+          provenance: instance.provenance,
+          opener: target.opener,
+        });
       } else if (id === 'combine') {
         if (materialSelection === null) target.refuseNotHeld();
         else {

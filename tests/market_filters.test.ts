@@ -389,13 +389,24 @@ describe('World Market filters', () => {
     e.pos.y = groundHeight(e.pos.x, e.pos.z, sim.cfg.seed);
     e.prevPos = { ...e.pos };
     sim.addItem('pattern_forgefold_legguards', 1, seller);
-    sim.marketList('pattern_forgefold_legguards', 1, 100, seller);
+    // The shipped pattern is an epic one-per-slot def, so the bags hold it as
+    // a tracked copy (a guid plus provenance), and the sell form stages such a
+    // copy and lists it as ITSELF through marketListInstance (market_window's
+    // staged arm), so this drives that same path with the held payload.
+    const held = sim.players
+      .get(seller)
+      ?.inventory.find((s) => s.itemId === 'pattern_forgefold_legguards')?.instance;
+    if (!held?.guid) throw new Error('the held pattern is not a tracked copy');
+    sim.marketListInstance('pattern_forgefold_legguards', 100, held, seller);
     const listing = sim.marketListings.find((l) => l.itemId === 'pattern_forgefold_legguards');
     expect(listing, 'the pattern listing must land on the book').toBeDefined();
     sim.marketSearch(q({ itemType: 'pattern' }), seller);
     const info = sim.marketInfoFor(seller);
     expect(info?.itemType).toBe('pattern');
-    expect(info?.listings.some((l) => l.itemId === 'pattern_forgefold_legguards')).toBe(true);
+    const row = info?.listings.find((l) => l.itemId === 'pattern_forgefold_legguards');
+    expect(row).toBeDefined();
+    // The browse row is the public projection: the copy's guid stays private.
+    expect(row?.instance?.guid).toBeUndefined();
   });
 
   // The exhaustiveness tail in itemMatchesType is a tsc guard, and tsc is erased in

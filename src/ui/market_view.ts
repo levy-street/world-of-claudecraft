@@ -20,7 +20,8 @@
 
 import { ITEMS } from '../sim/data';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
-import type { ItemDef, ItemInstancePayload } from '../sim/types';
+import { isLoadableItemProvenance, publicProvenanceView } from '../sim/item_provenance';
+import type { ItemDef, ItemInstancePayload, ItemProvenance } from '../sim/types';
 import type { MarketInfo, MarketListingView } from '../world_api';
 import {
   MARKET_ARMOR_TYPE_FILTERS,
@@ -440,4 +441,19 @@ export interface MarketCollectIndicatorView {
  */
 export function marketCollectIndicatorView(pending: boolean): MarketCollectIndicatorView {
   return { visible: pending === true };
+}
+
+/**
+ * The record a browse row's Item history door shows for a listed tracked copy
+ * (MarketListingView.history), or null when the row offers none. The sim
+ * already ships the public projection; the row re-validates it against the
+ * persisted shape (isLoadableItemProvenance) and projects it again, so a
+ * version-skewed or malformed row never puts `undefined` into a history
+ * line and never carries a character id into the dialog.
+ */
+export function marketListingItemHistory(
+  listing: Pick<MarketListingView, 'history'>,
+): ItemProvenance | null {
+  const history: unknown = listing.history;
+  return isLoadableItemProvenance(history) ? publicProvenanceView(history) : null;
 }

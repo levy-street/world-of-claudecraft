@@ -40,6 +40,8 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isTransferLockedInstance, publicInstanceView } from './item_instance_transfer';
+import { publicProvenanceView } from './item_provenance';
+import { recordTrackedWithdrawal } from './item_tracking';
 import { materialItemIds } from './material_ids';
 import type { MaterialPayloadIdentity } from './material_payload_identity';
 import {
@@ -1244,6 +1246,7 @@ export function guildBankWithdraw(
   // Captured before the move: a whole-stack success splices the source slot out.
   const itemName =
     ITEMS[book.inventory[slotIndex].itemId]?.name ?? book.inventory[slotIndex].itemId;
+  const withdrawnGuid = book.inventory[slotIndex].instance?.guid;
   const result = moveBetweenContainers(
     book.inventory,
     slotIndex,
@@ -1265,6 +1268,10 @@ export function guildBankWithdraw(
   }
   if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
   ctx.onInventoryChangedForQuests(meta);
+  // A tracked copy leaving the guild's custody changes hands: record the
+  // withdrawing character on its owner chain (item_tracking.ts). The move
+  // bypasses the inventory hub, so the stamp lands here.
+  if (withdrawnGuid !== undefined) recordTrackedWithdrawal(ctx, meta, withdrawnGuid, 'guildBank');
   ctx.notice(meta.entityId, `You withdraw ${itemName} from the guild bank.`);
 }
 
@@ -1324,6 +1331,38 @@ function guildBankSlotView(slot: InvSlot): InvSlot {
     view.instance = publicInstanceView(view.instance);
   }
   return view;
+}
+
+/**
+ * The guild-wide WIRE view of a member snapshot (server/bank_wire.ts emits
+ * this, never guildBankInfoFor's own result): a tracked copy's history is
+ * readable by every member (the Item history door,
+ * docs/design/item-tracking.md), but only its public view (names, dates,
+ * sources), and the copy's guid and every character id stay off the
+ * guild-wide wire. Applied at the wire seam ONLY: guildBankInfoFor stays at
+ * full fidelity because the server's guild bank ledger diffs it
+ * (server/guild_bank_op_coordinator.ts, bank_ledger.ts diffGuildBankOp) and
+ * replays the deltas onto the durable book by whole-payload equality, so a
+ * projected read there would refuse every tracked withdraw and persist
+ * guid-less deposits. Withdraw is by slot index and never reads either field.
+ * Returns the input unchanged when no slot carries a tracked identity.
+ */
+export function guildBankMemberWireView(info: GuildBankInfo | null): GuildBankInfo | null {
+  if (!info?.slots.some((s) => s.instance?.guid !== undefined || s.instance?.provenance)) {
+    return info;
+  }
+  return {
+    ...info,
+    slots: info.slots.map((slot) => {
+      if (!slot.instance) return slot;
+      const { guid: _guid, provenance, ...rest } = slot.instance;
+      if (_guid === undefined && provenance === undefined) return slot;
+      return {
+        ...slot,
+        instance: provenance ? { ...rest, provenance: publicProvenanceView(provenance) } : rest,
+      };
+    }),
+  };
 }
 
 /** The proximity + membership gated guild bank snapshot the server's

@@ -34,6 +34,7 @@
 
 import { bagPools, countFit } from '../bags';
 import { ITEMS } from '../data';
+import { recordTrackedChange } from '../item_tracking';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -266,6 +267,11 @@ export function unbindItem(ctx: SimContext, itemId: string, pid?: number): Unbin
   meta.copper -= result.fee;
   if (slot.count === 1) {
     delete instance.boundTo;
+    // The item ledger's lineage row (item_tracking.ts): the bond came off in
+    // place and the copy keeps its guid, so it records a `modify`. Draw-free;
+    // an untracked copy records nothing. (A tracked def is one per slot, so
+    // the split arm below never holds one.)
+    recordTrackedChange(ctx, meta, itemId, instance, 'modify', 'unbind');
   } else {
     slot.count -= 1;
     const freed = cloneItemInstancePayload(instance);

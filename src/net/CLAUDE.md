@@ -44,7 +44,10 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
   `gbanklog` frame; the renderable-op vocabulary is a CLOSED allowlist deliberately
   restated on this side of the wire, so server-internal diagnostic ops could never render
   as guild history even from a regressed server), `account_cosmetics_wire.ts`
-  (`self.cosmetics`; malformed input yields all-empty defaults, never a throw).
+  (`self.cosmetics`; malformed input yields all-empty defaults, never a throw),
+  `equipped_instances_wire.ts` (a peer's worn copies for inspect: the `eqi` public
+  trim plus the `eqh` worn tracked-copy history, re-projected through
+  `publicProvenanceView` into the one `equippedInstances` mirror).
 - `guild_bank_log_mirror.ts`: the guild bank transaction history's client state machine
   (`GuildBankLogMirror`, behind `guildBankLog(kind)` / `guildBankLogOlder()`): the loaded
   pages for one filter kind, the per-TTL newest-window request gate, the older-page cursor,

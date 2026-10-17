@@ -474,6 +474,9 @@ const itemStringsEn = {
       orderClosed: 'That order is no longer open.',
       orderOwn: 'That is your own order. Cancel it to withdraw it.',
       orderNotYours: 'That is not your order.',
+      // A buy order for a tracked (epic or legendary, one-guid-per-copy) def:
+      // such copies only trade as their own listings, so no order could fill.
+      orderTrackedItem: 'The Merchant takes no orders for one-of-a-kind gear.',
     },
   },
 };

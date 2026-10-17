@@ -160,8 +160,8 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1012,
-      "state": "19c7d03c",
-      "events": "4a552fff",
+      "state": "8fc7f909",
+      "events": "e1e9bb91",
       "rng": {
         "draws": 3,
         "digest": "80e78b7c"
@@ -171,7 +171,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1012,
-      "state": "e217b8c7",
+      "state": "b1997daa",
       "events": "6cb80331",
       "rng": {
         "draws": 3,
@@ -182,7 +182,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1012,
-      "state": "bdda2254",
+      "state": "2bbe61a1",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -193,7 +193,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1012,
-      "state": "db918801",
+      "state": "fab28db8",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -204,7 +204,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1012,
-      "state": "44aeaf12",
+      "state": "c8535e63",
       "events": "8b39f370",
       "rng": {
         "draws": 72,
@@ -215,7 +215,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1012,
-      "state": "219e792a",
+      "state": "58d2835b",
       "events": "741638a5",
       "rng": {
         "draws": 153,
@@ -226,7 +226,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1012,
-      "state": "593af265",
+      "state": "680590fc",
       "events": "741638a5",
       "rng": {
         "draws": 241,
@@ -237,7 +237,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1012,
-      "state": "955666bc",
+      "state": "f7051b89",
       "events": "4487dd8a",
       "rng": {
         "draws": 329,
@@ -248,7 +248,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 1012,
-      "state": "b70920d3",
+      "state": "7da6bcb6",
       "events": "eddda54d",
       "rng": {
         "draws": 414,
@@ -259,7 +259,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1012,
-      "state": "c6b6fb84",
+      "state": "233a6051",
       "events": "741638a5",
       "rng": {
         "draws": 507,
@@ -270,7 +270,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 1012,
-      "state": "52a09a75",
+      "state": "857de78c",
       "events": "741638a5",
       "rng": {
         "draws": 605,
@@ -281,7 +281,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1012,
-      "state": "175757b4",
+      "state": "fd37e681",
       "events": "741638a5",
       "rng": {
         "draws": 688,
@@ -292,7 +292,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1012,
-      "state": "175757b4",
+      "state": "fd37e681",
       "events": "741638a5",
       "rng": {
         "draws": 688,
@@ -389,7 +389,44 @@
             "mainhand": "lunar_tide_greatstaff",
             "waist": "sash_of_the_sunken_court"
           },
-          "equipmentInstance": {},
+          "equipmentInstance": {
+            "gloves": {
+              "guid": "1c14ef4e-e864-8584-8e60-b23a5d40c9c8",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "legs": {
+              "guid": "1f96f357-9037-8939-8f61-b7ab2ce5ebe5",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "mainhand": {
+              "guid": "a409a4e6-0b87-89e4-816a-520a56e60980",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "waist": {
+              "guid": "4296e599-a973-8d3f-874a-35a5d958c393",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            }
+          },
           "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
@@ -584,7 +621,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1012,
-      "state": "175757b4",
+      "state": "fd37e681",
       "events": "741638a5",
       "rng": {
         "draws": 688,
@@ -681,7 +718,44 @@
             "mainhand": "lunar_tide_greatstaff",
             "waist": "sash_of_the_sunken_court"
           },
-          "equipmentInstance": {},
+          "equipmentInstance": {
+            "gloves": {
+              "guid": "1c14ef4e-e864-8584-8e60-b23a5d40c9c8",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "legs": {
+              "guid": "1f96f357-9037-8939-8f61-b7ab2ce5ebe5",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "mainhand": {
+              "guid": "a409a4e6-0b87-89e4-816a-520a56e60980",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "waist": {
+              "guid": "4296e599-a973-8d3f-874a-35a5d958c393",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            }
+          },
           "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},

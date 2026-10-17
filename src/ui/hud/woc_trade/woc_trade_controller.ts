@@ -27,6 +27,12 @@ import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
 import { formatDateTime, formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
+import { type ItemHistoryHolder, itemHistoryProvenanceFor } from '../../item_history_access_view';
+import {
+  appendItemHistoryActionAfter,
+  attachItemHistoryContextMenu,
+  closeItemHistoryDialogForOwner,
+} from '../../item_history_dialog';
 import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
 import {
@@ -1316,6 +1322,7 @@ export class WocTradeController {
     if (!info) {
       if (this.tradeWasOpen) {
         closeMaterialSourcesDialogForOwner(el);
+        closeItemHistoryDialogForOwner(el);
         // The adjust prompt cannot outlive its window: tear it down through
         // its own dismiss() (inert cleared), and clear inert once more as the
         // force-close backstop the prompt recipe asks every owner for.
@@ -1646,7 +1653,15 @@ export class WocTradeController {
       // in src/world_api/trade.ts), so the trade-slot tooltip reuses the exact
       // bag tooltip (item + per-instance enchant/masterwork/signature detail)
       // rather than any bespoke trade-only summary.
-      const attachTradeTooltips = (rows: NodeListOf<Element>, slots: InvSlot[]) => {
+      // A tracked copy on EITHER side also opens its Item history (right-click
+      // on the row, plus the visible button every layout shows beside a list
+      // row): the counterparty's copy reads the public projection
+      // (item_history_access_view.ts), so no character id reaches the dialog.
+      const attachTradeTooltips = (
+        rows: NodeListOf<Element>,
+        slots: InvSlot[],
+        holder: ItemHistoryHolder,
+      ) => {
         rows.forEach((row, i) => {
           const target = tradeRowTooltipTarget(slots, i);
           if (!target) return;
@@ -1655,6 +1670,9 @@ export class WocTradeController {
             this.itemTooltip(target.item, true, target.instance, target.materialSources),
           );
           const itemName = itemDisplayName(target.item);
+          const history = itemHistoryProvenanceFor(target.instance, holder);
+          attachItemHistoryContextMenu(rowElement, itemName, history);
+          appendItemHistoryActionAfter(rowElement, itemName, history, 'listRow');
           attachMaterialSourcesContextMenu(
             rowElement,
             itemName,
@@ -1672,10 +1690,12 @@ export class WocTradeController {
       attachTradeTooltips(
         el.querySelectorAll('.trade-col:first-child .trade-item'),
         info.myOffer.items,
+        'self',
       );
       attachTradeTooltips(
         el.querySelectorAll('.trade-col:last-child .trade-item'),
         info.theirOffer.items,
+        'other',
       );
       const goldInput = el.querySelector('#trade-g') as HTMLInputElement;
       const silverInput = el.querySelector('#trade-s') as HTMLInputElement;

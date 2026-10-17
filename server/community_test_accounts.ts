@@ -11,6 +11,7 @@
 // stats are exactly what endgame PvE testers should not be wearing (the
 // S-raid playtest ran in them), and one shared kit source cannot drift.
 
+import { randomUUID } from 'node:crypto';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import { ALL_CLASSES, ALL_EQUIP_SLOTS, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 import { validCharName } from './auth';
@@ -51,6 +52,7 @@ function templateStates(): ReadonlyMap<PlayerClass, CharacterState> {
     playerClass: 'warrior',
     noPlayer: true,
     lockoutNowMs: () => Date.now(),
+    mintItemGuid: randomUUID,
   });
   const templates = new Map<PlayerClass, CharacterState>();
   for (const cls of ALL_CLASSES) {

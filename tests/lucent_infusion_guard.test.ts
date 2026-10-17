@@ -28,6 +28,7 @@ import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
 import {
+  baggedEnchantVictim,
   evaluateApplyEnchantAdmission,
   holdsPerfectedTarget,
   isEnchantedInstance,
@@ -257,18 +258,24 @@ describe('holdsPerfectedTarget refuses every PLAIN copy (only the Perfecting wal
     expect(only.meta.inventory.filter((s) => s.itemId === CHEST_ITEM)).toHaveLength(before);
   });
 
-  it('a PLAIN copy shadows a newer Perfected one: the remover spends plain first', () => {
+  it('a LEGACY plain copy shadows a newer Perfected one: the remover spends plain first', () => {
     // The shape the first narrowing cut missed: removeEnchantableItem's first
     // pass takes a plain fungible copy whatever its index, so a Perfected copy
     // that is the NEWEST slot still is not the victim. A newest-copy peek
     // accepted here while the apply spent the plain copy.
+    // The hub now mints every epic copy with a tracked identity
+    // (item_tracking.ts), so a payload-free copy of this epic chest exists
+    // only as a pre-tracking save holds one (no load pass backfills it). It is
+    // placed the way that load leaves it, the slot alone, never through the
+    // hub.
     const shadowed = apexEnchanter(18);
-    shadowed.sim.addItem(CHEST_ITEM, 1, shadowed.pid);
+    shadowed.meta.inventory.push({ itemId: CHEST_ITEM, count: 1 });
     shadowed.sim.addItemInstance(CHEST_ITEM, { perfected: true }, shadowed.pid, 1);
     const slots = shadowed.meta.inventory.filter((s) => s.itemId === CHEST_ITEM);
     expect(slots).toHaveLength(2);
     expect(slots[0].instance).toBeUndefined();
     expect(slots[1].instance?.perfected).toBe(true);
+    expect(slots[1].instance?.guid, 'the newer copy came through the hub').toBeDefined();
     expect(holdsPerfectedTarget(shadowed.meta, CHEST_ITEM), 'the plain copy is the victim').toBe(
       false,
     );
@@ -277,6 +284,61 @@ describe('holdsPerfectedTarget refuses every PLAIN copy (only the Perfecting wal
     );
     // Nothing was spent: the plain copy and the stamped copy both survive.
     expect(shadowed.meta.inventory.filter((s) => s.itemId === CHEST_ITEM)).toHaveLength(2);
+  });
+
+  it('a tracked ORDINARY copy shadows an older Perfected one: holding a Perfected copy is not enough', () => {
+    // Every copy here carries a guid, so none is plain: the remover's
+    // instanced pass picks the newest unenchanted copy, the ordinary one. The
+    // guard must judge THAT copy, not the holding (a holding scan would read
+    // the older Perfected copy and license spending the ordinary one).
+    const held = apexEnchanter(23);
+    held.sim.addItemInstance(CHEST_ITEM, { perfected: true }, held.pid, 1);
+    held.sim.addItem(CHEST_ITEM, 1, held.pid);
+    const slots = held.meta.inventory.filter((s) => s.itemId === CHEST_ITEM);
+    expect(slots).toHaveLength(2);
+    expect(slots[0].instance?.perfected).toBe(true);
+    expect(slots[1].instance?.perfected).toBeUndefined();
+    const guids = slots.map((s) => s.instance?.guid);
+    expect(guids.every((g) => typeof g === 'string')).toBe(true);
+    expect(holdsPerfectedTarget(held.meta, CHEST_ITEM), 'the ordinary copy is the victim').toBe(
+      false,
+    );
+    expect(resolveApplyEnchant(held.sim.ctx, held.pid, CHEST_ITEM, INFUSION).reason).toBe(
+      'not_perfected',
+    );
+    // Nothing was spent or rewritten: both copies keep their guids and shape.
+    const after = held.meta.inventory.filter((s) => s.itemId === CHEST_ITEM);
+    expect(after.map((s) => s.instance?.guid)).toEqual(guids);
+    expect(after.every((s) => s.instance?.enchant === undefined)).toBe(true);
+  });
+
+  it('among tracked copies, the copy the guard judges IS the copy the apply enchants', () => {
+    // The agreement the narrowing exists for, held index-independently: with
+    // no plain copy left (every copy tracked), whichever copy the guard's
+    // victim read names, the live remover must enchant that same copy (by
+    // guid) and leave the other byte-identical. A non-gated Lucent enchant
+    // stands in so the apply runs whichever copy is the victim.
+    const both = apexEnchanter(24);
+    both.sim.addItem(CHEST_ITEM, 1, both.pid);
+    both.sim.addItemInstance(CHEST_ITEM, { perfected: true }, both.pid, 1);
+    const victimGuid = baggedEnchantVictim(both.meta.inventory, CHEST_ITEM)?.guid;
+    expect(victimGuid).toBeDefined();
+    const bystander = structuredClone(
+      both.meta.inventory.find((s) => s.itemId === CHEST_ITEM && s.instance?.guid !== victimGuid)
+        ?.instance,
+    );
+    expect(bystander?.guid).toBeDefined();
+    const applied = resolveApplyEnchant(both.sim.ctx, both.pid, CHEST_ITEM, APEX_CHEST);
+    expect(applied.ok, `apply: ${applied.reason}`).toBe(true);
+    const enchanted = both.meta.inventory.filter(
+      (s) => s.itemId === CHEST_ITEM && s.instance?.enchant === APEX_CHEST,
+    );
+    expect(enchanted.map((s) => s.instance?.guid)).toEqual([victimGuid]);
+    expect(
+      both.meta.inventory.find(
+        (s) => s.itemId === CHEST_ITEM && s.instance?.guid === bystander?.guid,
+      )?.instance,
+    ).toEqual(bystander);
   });
 
   it('an already-ENCHANTED Perfected copy is skipped for an ordinary one, unless the replace is confirmed', () => {

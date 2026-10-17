@@ -8,6 +8,7 @@
 
 import { dismissEntryOverlays } from './enter_offline_game.mjs';
 import { hoardTideReviewTargets } from './lib/pr_shot_hoard_tide.mjs';
+import { itemHistoryDoorTargets } from './lib/pr_shot_item_history.mjs';
 import { masterwroughtReviewTargets } from './lib/pr_shot_masterwrought.mjs';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1716,6 +1717,10 @@ export const TARGETS = [
     },
   },
   ...masterwroughtReviewTargets({
+    beforeLoad: lowGraphicsSeed,
+    dismissOverlays: dismissEntryOverlays,
+  }),
+  ...itemHistoryDoorTargets({
     beforeLoad: lowGraphicsSeed,
     dismissOverlays: dismissEntryOverlays,
   }),

@@ -59,6 +59,12 @@ import {
 } from './guild_bank_view';
 import { formatMoney, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import { itemHistoryProvenanceFor } from './item_history_access_view';
+import {
+  appendItemHistoryActionAfter,
+  attachItemHistoryContextMenu,
+  closeItemHistoryDialogForOwner,
+} from './item_history_dialog';
 import { cornerMarkHtml, INSTANCE_GLYPH_ARIA_KEYS, lockMarkHtml } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import { guildMaterialWithdrawSelection } from './material_source_storage_actions';
@@ -195,6 +201,10 @@ export class GuildBankTab {
    *  bank never starts on the log (and never refetches it unasked); the
    *  read-only edge detector resets with it so a reopening never announces. */
   resetView(): void {
+    // An Item history prompt opened from a guild cell is this pane's modal
+    // child: it closes when the pane resets (the window closing, or the pane
+    // vanishing under a kick), so it never floats over a pane that is gone.
+    closeItemHistoryDialogForOwner(this.deps.root());
     this.view = 'contents';
     this.logKind = 'all';
     this.logQuery = '';
@@ -566,6 +576,13 @@ export class GuildBankTab {
       const item = knownItemDef(ITEMS, slot.itemId);
       const itemName = item ? itemDisplayName(item) : slot.itemId;
       grid.appendChild(cell);
+      // Any member, read-only or not, may open a tracked copy's history: the
+      // guild's pooled copy is someone else's hand, so it reads the public
+      // projection (item_history_access_view.ts). A dormant slot already
+      // degraded to publicInstanceView carries no record and offers nothing.
+      const history = itemHistoryProvenanceFor(slot.instance, 'other');
+      attachItemHistoryContextMenu(cell, itemName, history);
+      appendItemHistoryActionAfter(cell, itemName, history, 'gridCell');
       appendMaterialSourcesActionAfter(
         cell,
         itemName,

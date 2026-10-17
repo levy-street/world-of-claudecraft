@@ -922,7 +922,14 @@ describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () 
     const slot = expectDefined(
       playerMeta(sim, a).inventory.find((s) => s.itemId === 'slagbreaker_helmet'),
     );
-    expect(slot.instance).toBeUndefined();
+    // No party-trade window. The helmet is an epic one-per-slot copy, so the
+    // bags mint its tracked identity; that identity is the WHOLE payload, so
+    // nothing else (a window, a binding) rode in with the solo pickup.
+    expect(slot.instance?.partyTrade).toBeUndefined();
+    const { guid, provenance, ...rest } = expectDefined(slot.instance);
+    expect(rest).toEqual({});
+    expect(guid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    expect(provenance).toMatchObject({ by: 'Solo' });
   });
 });
 

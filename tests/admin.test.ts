@@ -2783,7 +2783,7 @@ describe('admin api R35 professions tooling (LEGACY dispatch arm)', () => {
       detail: 'copper_mining_pick x2',
       reason: 'lost to a bug',
     });
-    expect(fakeGame.adminRestoreItem).toHaveBeenCalledWith(42, 'copper_mining_pick', 2);
+    expect(fakeGame.adminRestoreItem).toHaveBeenCalledWith(42, 'copper_mining_pick', 2, undefined);
     const auditOrder = vi.mocked(recordProfessionsRestore).mock.invocationCallOrder[0];
     const mintOrder = vi.mocked(fakeGame.adminRestoreItem).mock.invocationCallOrder[0];
     expect(auditOrder).toBeLessThan(mintOrder);

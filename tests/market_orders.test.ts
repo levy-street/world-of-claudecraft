@@ -7,6 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { bagPools, canGrantCopies } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
+import { isTrackedItemGrant } from '../src/sim/item_tracking';
 import { MARKET_CUT } from '../src/sim/market';
 import {
   MARKET_MAX_ORDERS,
@@ -209,6 +210,50 @@ describe('marketOrderPlace', () => {
     expect(errors(sim)).toEqual([
       'The Merchant will not broker quest items.',
       'That item cannot be listed on the World Market.',
+    ]);
+  });
+
+  it('refuses an order for one-of-a-kind (tracked) gear, takes no escrow, and still places a rare twin', () => {
+    // An epic one-per-slot def is tracked: every copy carries its own guid and
+    // trades only as its own instanced listing, so an order for it could never
+    // fill. The fixture is otherwise fully order-eligible (equipment, not
+    // quest, not soulbound, listable), so the tracked rule is the only arm that
+    // can refuse it; the rare twin with the same shape isolates quality as the
+    // deciding fact.
+    const eligible = (quality: string) =>
+      Object.values(ITEMS).find(
+        (d) =>
+          d.quality === quality &&
+          d.slot !== undefined &&
+          d.kind !== 'quest' &&
+          !d.soulbound &&
+          !d.noMarketList &&
+          (d.stackSize ?? 1) === 1,
+      );
+    const epic = eligible('epic');
+    const rare = eligible('rare');
+    if (!epic || !rare)
+      throw new Error('catalog lacks an order-eligible epic or rare equipment def');
+    expect(isTrackedItemGrant(epic)).toBe(true);
+    expect(isTrackedItemGrant(rare)).toBe(false);
+
+    const sim = makeWorld();
+    const buyer = player(sim, 'Buyer', 'mage', 1_000);
+    sim.events.length = 0;
+    const settled = sim.marketOrderPlace(epic.id, 1, 50, buyer);
+    expect(settled).toEqual([]);
+    expect(errors(sim)).toEqual(['The Merchant takes no orders for one-of-a-kind gear.']);
+    expect(playerOf(sim, buyer).copper).toBe(1_000);
+    expect(sim.marketOrders).toEqual([]);
+    expect(loot(sim, buyer)).toEqual([]);
+    expect(info(sim, buyer).myOrderCount).toBe(0);
+
+    sim.events.length = 0;
+    sim.marketOrderPlace(rare.id, 1, 50, buyer);
+    expect(errors(sim)).toEqual([]);
+    expect(playerOf(sim, buyer).copper).toBe(1_000 - 50);
+    expect(sim.marketOrders).toEqual([
+      expect.objectContaining({ itemId: rare.id, count: 1, unitPrice: 50 }),
     ]);
   });
 });

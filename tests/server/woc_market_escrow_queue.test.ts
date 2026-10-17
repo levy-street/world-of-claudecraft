@@ -300,10 +300,16 @@ async function createListing(rig: Rig) {
   // The step-up proof (B6/R1), minted devsig through the real issue path so
   // this suite keeps exercising the escrow queue, not the challenge ladder.
   const params = listingParams();
+  // The listing claims the copy the seller SEES (the bags UI posts the slot's
+  // payload): every epic one-per-slot copy is minted with a guid and a
+  // provenance record now, so a null claim would be a stale_copy refusal
+  // before the escrow queue this suite pins is ever reached.
+  const index = rig.itemIndex();
+  const expectInstance = requirePlayerMeta(rig).inventory[index]?.instance ?? null;
   const issue = await rig.service.issueStepUpChallenge(SELLER, {
     operation: 'create_listing',
     itemId: EPIC_ITEM,
-    expectInstance: null,
+    expectInstance,
     format: params.format,
     startCents: params.startCents,
     reserveCents: params.reserveCents,
@@ -315,7 +321,7 @@ async function createListing(rig: Rig) {
   return rig.service.createListing({
     account: SELLER,
     characterId: SELLER_CHAR,
-    itemRef: { index: rig.itemIndex(), itemId: EPIC_ITEM },
+    itemRef: { index, itemId: EPIC_ITEM, expectInstance },
     params,
     stepUp: {
       nonce: issue.challenge.nonce,

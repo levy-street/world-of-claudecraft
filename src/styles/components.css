@@ -22514,6 +22514,14 @@
     min-width: 0;
     width: 100%;
   }
+  /* An inspect paperdoll row (inspect_window.ts): the touch-layout Item
+     history button sits centered under the row it belongs to, inside the
+     column's own row rhythm, so the column never shifts sideways. */
+  .material-source-item-slot {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+  }
   .material-source-item-mail {
     display: inline-flex;
     align-items: stretch;
@@ -22545,6 +22553,43 @@
   }
   .material-sources-dialog .panel-title {
     flex: none;
+  }
+  /* The Item history prompt (item_history_dialog.ts): the sources dialog's
+     shell, with a plain read-only row list under the title. */
+  .item-history-dialog {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: min(420px, calc(100vw - 24px));
+    max-height: min(calc(66vh - 12px), 560px);
+    text-align: left;
+  }
+  .item-history-dialog .panel-title {
+    flex: none;
+  }
+  .item-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 2px 0 8px;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .item-history-row {
+    padding: 4px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--panel-base) 88%, var(--panel-edge));
+  }
+  .item-history-origin {
+    color: var(--gold);
+  }
+  .item-history-note {
+    border: none;
+    background: none;
+    color: var(--color-text-muted);
+    font-size: 12px;
   }
   .material-sources-summary {
     margin: 2px 0 8px;

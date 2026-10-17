@@ -35,6 +35,7 @@
 // no rng, no clock. Total on `unknown`, so a corrupt row can never throw
 // inside a character load.
 
+import { isItemGuid, isLoadableItemProvenance } from './item_provenance';
 import { isLoadablePartyTradeMarker } from './loot/bop_trade_window';
 import { isValidLootQuality } from './loot_quality/types';
 import { PERFECTING_RANKS } from './professions/perfecting';
@@ -247,6 +248,27 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
   const dropped: string[] = [];
   for (const key of keys) {
     const value = record[key];
+    // The tracked-copy pair (item_provenance.ts): the guid must be the one
+    // canonical UUID shape, and the provenance record is judged ATOMICALLY
+    // like partyTrade (one snapshot: a corrupt half drops the whole record,
+    // never a partial residue), under the same subtree JSON ceiling.
+    if (key === 'guid') {
+      if (!isItemGuid(value)) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
+    if (key === 'provenance') {
+      if (
+        !isLoadableItemProvenance(value) ||
+        savedJsonLength(value) > MAX_INSTANCE_SUBTREE_JSON_LENGTH
+      ) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
     if (key === 'lootQuality') {
       if (!isValidLootQuality(value)) {
         delete record[key];

@@ -181,6 +181,60 @@ describe('CharacterProfessionsModal', () => {
     });
   });
 
+  it('sends the lost copy item ID as derivedFrom and shows it in the confirm prompt', async () => {
+    const lost = '9b2e7c1a-5d34-4f6e-8a1b-2c3d4e5f6071';
+    grantPermissions();
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    await fireEvent.input(screen.getByPlaceholderText(t('profInspect.derivedFromPlaceholder')), {
+      target: { value: ` ${lost.toUpperCase()} ` },
+    });
+    await openItemPrompt('duskforged_warblade');
+    // The confirm row shows the normalized id the request will carry.
+    expect(screen.getByText(t('dialog.restoreDerivedFrom'))).toBeInTheDocument();
+    expect(screen.getByText(lost)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(t('profInspect.derivedFromPlaceholder'))).toBeDisabled();
+    await confirmPrompt('lost to issue 4305');
+    expect(apiPost).toHaveBeenCalledWith('/admin/api/moderation/characters/7/restore-item', {
+      itemId: 'duskforged_warblade',
+      count: 1,
+      derivedFrom: lost,
+      reason: 'lost to issue 4305',
+    });
+    // A confirmed restore clears the lineage field with the rest of the form.
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText(t('profInspect.derivedFromPlaceholder'))).toHaveValue(''),
+    );
+  });
+
+  it('refuses a malformed lost copy item ID BEFORE the confirm prompt opens', async () => {
+    grantPermissions();
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    await fireEvent.input(screen.getByPlaceholderText(t('profInspect.derivedFromPlaceholder')), {
+      target: { value: 'not-a-guid' },
+    });
+    await openItemPrompt('duskforged_warblade');
+    expect(screen.queryByRole('button', { name: t('dialog.confirm') })).not.toBeInTheDocument();
+    expect(alerts).toHaveBeenCalledWith(t('alert.restoreDerivedFromInvalid'));
+    expect(apiPost).not.toHaveBeenCalled();
+  });
+
+  it('shows no lineage row when the lost copy field is blank', async () => {
+    grantPermissions();
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    await openItemPrompt('wolf_fang');
+    expect(screen.getByRole('button', { name: t('dialog.confirm') })).toBeInTheDocument();
+    expect(screen.queryByText(t('dialog.restoreDerivedFrom'))).not.toBeInTheDocument();
+  });
+
   it('hides the GM restore section without the moderation.act permission', async () => {
     grantPermissions(['accounts.read']);
     render(CharacterProfessionsModal, {

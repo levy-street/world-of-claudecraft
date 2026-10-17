@@ -14,9 +14,12 @@
 // - death of a connected player -> progress_events.ts recordFtueDeath.
 // - craftRoll -> craft_roll_events.ts recordCraftRoll (craft_roll_events, the
 //   chance-based crafting outcome audit).
+// - itemTracked -> item_ledger.ts recordItemTracked (item_ledger, the
+//   tracked epic/legendary copy provenance ledger: mints and transfers).
 
 import type { Entity, SimEvent } from '../src/sim/types';
 import { type CraftRollWho, recordCraftRoll } from './craft_roll_events';
+import { recordItemTracked } from './item_ledger';
 import { recordFtueDeath, recordFtueQuest } from './progress_events';
 
 /** The session fields the record writers read (progress_events.ts
@@ -59,5 +62,10 @@ export function observeEventRecords<S extends EventRecordWho>(
   if (ev.type === 'craftRoll' && ev.pid !== undefined) {
     const s = clients.get(ev.pid);
     if (s) recordCraftRoll(s, ev);
+    return;
+  }
+  if (ev.type === 'itemTracked' && ev.pid !== undefined) {
+    const s = clients.get(ev.pid);
+    if (s) recordItemTracked(s, ev);
   }
 }

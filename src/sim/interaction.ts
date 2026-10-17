@@ -44,6 +44,7 @@ import { interactIgnivarRaidLore } from './ignivar_raid_lore';
 import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
+import { mobLootSource } from './loot/awarded_loot_hold';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -165,6 +166,7 @@ export function lootCorpse(
           meta.entityId,
           killSnapshotEligibility(ctx, mob),
           s.instance,
+          mobLootSource(mob),
         );
         s.count--;
         didLoot = true;
@@ -187,10 +189,17 @@ export function lootCorpse(
         bagsFull = true;
         continue;
       }
+      const lootOpts = { source: mobLootSource(mob) };
       if (s.instance) {
-        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId, s.count);
+        ctx.addItemInstance(
+          s.itemId,
+          cloneItemInstancePayload(s.instance),
+          meta.entityId,
+          s.count,
+          lootOpts,
+        );
       } else {
-        ctx.addItem(s.itemId, s.count, meta.entityId);
+        ctx.addItem(s.itemId, s.count, meta.entityId, lootOpts);
       }
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;

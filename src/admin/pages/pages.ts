@@ -27,6 +27,7 @@ export type AdminPage =
   | 'blocked-ips'
   | 'bug-reports'
   | 'unstuck-reports'
+  | 'item-tracking'
   | 'staff';
 
 export interface AdminNavItem {
@@ -129,6 +130,9 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     items: [
       { id: 'bug-reports', labelKey: 'nav.bugReports', permission: 'support.read' },
       { id: 'unstuck-reports', labelKey: 'nav.unstuckReports', permission: 'support.read' },
+      // The tracked epic/legendary item ledger (server/item_ledger_db.ts):
+      // a support read, beside the reports it answers.
+      { id: 'item-tracking', labelKey: 'nav.itemTracking', permission: 'support.read' },
     ],
   },
   {

@@ -49,7 +49,8 @@ export type BagItemNewActionId =
   | 'viewSources'
   | 'separateByGatherer'
   | 'takeChosenQuantity'
-  | 'combine';
+  | 'combine'
+  | 'itemHistory';
 export type BagItemContextActionId = 'default' | 'sellAll' | 'destroy' | BagItemNewActionId;
 
 export interface BagItemContextAction {
@@ -71,6 +72,7 @@ const NEW_ACTION_LABEL_KEY: Record<BagItemNewActionId, TranslationKey> = {
   separateByGatherer: 'hudChrome.itemMenu.separateByGatherer',
   takeChosenQuantity: 'hudChrome.itemMenu.takeChosenQuantity',
   combine: 'hudChrome.itemMenu.combine',
+  itemHistory: 'hudChrome.itemMenu.itemHistory',
 };
 
 /** The classic left-click verb for the default (first) menu row, so the menu's
@@ -114,6 +116,10 @@ export function bagItemNewActions(
     }
     out.push('combine');
   }
+  // A tracked epic/legendary copy (src/sim/item_tracking.ts) offers its
+  // history: the origin and every hand it passed through. The item ID itself
+  // never renders (item_history_view.ts).
+  if (instance?.provenance !== undefined) out.push('itemHistory');
   out.push(isItemLocked(instance) ? 'unlock' : 'lock');
   return out;
 }

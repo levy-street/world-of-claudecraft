@@ -91,6 +91,7 @@ import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
 import { resolveDropTargetAt } from './item_drop_hit_test';
+import { closeItemHistoryDialogForOwner } from './item_history_dialog';
 import {
   cornerMarkHtml,
   INSTANCE_GLYPH_ARIA_KEYS,
@@ -149,7 +150,10 @@ const BAG_PROMPT_SELECTOR =
 export function dismissBagPrompts(
   owner: HTMLElement | null = document.getElementById('bags'),
 ): void {
-  if (owner) closeMaterialSourcesDialogForOwner(owner);
+  if (owner) {
+    closeMaterialSourcesDialogForOwner(owner);
+    closeItemHistoryDialogForOwner(owner);
+  }
   // Through each prompt's own dismiss() (prompt_dialog.ts registry), so the
   // root a prompt made inert is cleared by the sweep, never left behind. The
   // selector names only prompts THIS window owns: the trade window's remove

@@ -74,7 +74,6 @@ import {
 import { riftFloorColliders } from '../sim/rift/rift_gen';
 import type { ResolvedAbility } from '../sim/sim';
 import {
-  cloneItemInstancePayload,
   type DeedStats,
   type DungeonDifficulty,
   type Entity,
@@ -217,6 +216,7 @@ import { pruneMissingEntities } from './despawn_grace';
 import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
 import { decodeEntityFlairWire } from './entity_flair_wire';
 import { reanchorDecision } from './entity_reanchor';
+import { decodeEquippedInstancesWire } from './equipped_instances_wire';
 import { applyGroundTelegraphSnapshot } from './ground_telegraph_wire';
 import { GuildBankLogMirror } from './guild_bank_log_mirror';
 import { decodeGuildBoardPage, emptyGuildBoardPage, guildBoardPath } from './guild_board_wire';
@@ -2685,16 +2685,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
         e.mountSkinId = w.msk ?? null; // worn mount skin cosmetic (render-only, like wsk)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
-        // Worn per-slot instance payloads (masterwork/enchant rolls), for the
-        // inspect window (terse `eqi`, sparse like `eq`: an absent key on a
-        // full record means no worn piece carries one, so it resets to {}).
-        // Deep-cloned per slot: a payload's own rolled.stats map must never
-        // alias wire-parsed JSON a later message could mutate.
-        e.equippedInstances = Object.fromEntries(
-          Object.entries((w.eqi ?? {}) as Record<string, ItemInstancePayload>).map(
-            ([slot, inst]) => [slot, cloneItemInstancePayload(inst)],
-          ),
-        );
+        // Worn per-slot public payloads (terse `eqi`) plus the worn tracked
+        // copies' public history (`eqh`), for the inspect window; both sparse
+        // like `eq` (see equipped_instances_wire.ts).
+        e.equippedInstances = decodeEquippedInstancesWire(w.eqi, w.eqh);
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
         // The authored modular look (identity-only: set at join, immutable for
         // the session). Untrusted wire JSON on purpose: every consumer runs

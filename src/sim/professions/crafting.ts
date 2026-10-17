@@ -99,6 +99,11 @@ import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
 import { isCommissionEligible } from './commission';
 import { craftCastDurationSec } from './craft_cast_duration';
+import {
+  craftLineageParent,
+  recordCraftReagentLineage,
+  type SpentReagentCopy,
+} from './craft_reagent_lineage';
 import { planCraftReagentDraw } from './craft_reagent_plan';
 import { isDisenchantable } from './enchanting';
 import { APEX_FEAST_CRAFT_MARK, isApexFeastRecipe } from './feast';
@@ -927,6 +932,10 @@ export function resolveCraftForRecipe(
   // always the plan's. If overlapping content ever lands, hoist the planner's
   // required values here instead of recomputing.
   const vaultDraws: GradeRemoval[] = [];
+  // The payload-bearing reagent copies this craft spends, for the tracked-item
+  // lineage (craft_reagent_lineage.ts): a spent epic or legendary copy writes
+  // its consume row, and a tracked output derives from it.
+  const spentCopies: SpentReagentCopy[] = [];
   recipe.reagents.forEach((reagent, i) => {
     const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
     if (required.selfSignedBonusApplied) selfSignedBonusApplied = true;
@@ -940,7 +949,9 @@ export function resolveCraftForRecipe(
     // ctx.removeItem already was for an unresolved pid.
     if (meta) {
       for (const take of plan.carried) {
-        removeUnlockedFromSlots(meta.inventory, take.itemId, take.count);
+        for (const instance of removeUnlockedFromSlots(meta.inventory, take.itemId, take.count)) {
+          spentCopies.push({ itemId: take.itemId, instance });
+        }
       }
     }
     // REACHABLE ONLY BY A BUG. consumePlayerVaultStock re-checks the row it is about
@@ -1095,6 +1106,16 @@ export function resolveCraftForRecipe(
       pid: meta.entityId,
     });
   }
+  // Tracked-output provenance, carried by every grant below and ignored by
+  // the hub for an untracked output: the source names this recipe even when
+  // the output carries no craft marker (craftedRecipeId above is set only for
+  // disenchant-tracked outputs, so a crafted epic tool used to read "world"),
+  // and an output made FROM a spent tracked reagent is minted as its derive.
+  const parentGuid = craftLineageParent(spentCopies);
+  const lineage = {
+    source: `craft:${recipe.id}`,
+    ...(parentGuid === undefined ? {} : { derivedFrom: parentGuid }),
+  };
   // Deterministic grant: every successful craft yields recipe.resultItemId.
   // #1149 signing rule preserved on the DEF quality: an output whose def is
   // rare-or-better is a signed instance so it carries an attribution target
@@ -1148,6 +1169,7 @@ export function resolveCraftForRecipe(
       silent: true,
       callerLogs: true,
       craftedRecipeId,
+      ...lineage,
     });
     if (recipe.resultCount > 1) {
       if (commissioned) {
@@ -1156,6 +1178,7 @@ export function resolveCraftForRecipe(
             silent: true,
             callerLogs: true,
             craftedRecipeId,
+            ...lineage,
           });
         }
       } else {
@@ -1183,6 +1206,7 @@ export function resolveCraftForRecipe(
       silent: true,
       callerLogs: true,
       craftedRecipeId,
+      ...lineage,
     });
     if (recipe.resultCount > 1) {
       if (commissioned) {
@@ -1191,6 +1215,7 @@ export function resolveCraftForRecipe(
             silent: true,
             callerLogs: true,
             craftedRecipeId,
+            ...lineage,
           });
         }
       } else {
@@ -1208,6 +1233,7 @@ export function resolveCraftForRecipe(
       silent: true,
       callerLogs: true,
       craftedRecipeId,
+      ...lineage,
     });
   } else if (commissioned) {
     for (let i = 0; i < recipe.resultCount; i++) {
@@ -1215,6 +1241,7 @@ export function resolveCraftForRecipe(
         silent: true,
         callerLogs: true,
         craftedRecipeId,
+        ...lineage,
       });
     }
   } else {
@@ -1222,8 +1249,11 @@ export function resolveCraftForRecipe(
       silent: true,
       callerLogs: true,
       craftedRecipeId,
+      ...lineage,
     });
   }
+  if (meta)
+    recordCraftReagentLineage(ctx, meta, recipe.id, recipe.resultItemId, spentCopies, parentGuid);
   if (meta) {
     // The #1129/#1148 gain doctrine (archetype ceiling alone zeroes, ordinary
     // curve off raw capability otherwise) lives in the shared

@@ -69,7 +69,7 @@ export function buyCrucibleVendorItem(ctx: SimContext, itemId: string, pid?: num
     return;
   }
   ctx.removeItem(entry.sigilId, 1, meta.entityId);
-  ctx.addItem(itemId, 1, meta.entityId);
+  ctx.addItem(itemId, 1, meta.entityId, { source: 'vendor' });
   // Feedback rides the 'vendor' event (the shop window re-renders), matching
   // buyHeroicVendorItem: no raw English log emitted from the sim.
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });

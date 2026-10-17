@@ -183,12 +183,19 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     sim.addItem(APEX_NECK, 1, pid);
     e.dead = true;
     const before = materialCounts(sim, pid);
+    // The apex piece is epic, so the hub minted it tracked: its only payload
+    // is the guid and provenance (item_tracking.ts). The refusal must leave
+    // that payload exactly as it was: no bind, no rank, no Perfecting field.
+    const payloadBefore = structuredClone(
+      meta.inventory.find((s) => s.itemId === APEX_NECK)?.instance,
+    );
+    expect(Object.keys(payloadBefore ?? {}).sort()).toEqual(['guid', 'provenance']);
     sim.drainEvents();
     const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK)));
     expect(errorsOf(sim)).toContain("You can't do that while dead.");
     expect(draws).toBe(0);
     expect(materialCounts(sim, pid)).toEqual(before);
-    expect(meta.inventory.find((s) => s.itemId === APEX_NECK)?.instance).toBeUndefined();
+    expect(meta.inventory.find((s) => s.itemId === APEX_NECK)?.instance).toEqual(payloadBefore);
   });
 
   it('a DIRECT headless call of resolvePerfectingAttempt hits the same dead gate (phase 18)', () => {
@@ -201,12 +208,18 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     e.dead = true;
     const ref = bagRefOf(meta, APEX_NECK);
     const before = materialCounts(sim, pid);
+    // The tracked identity is the copy's whole payload (the IWorld case above
+    // says why); the refusal must leave it byte-identical.
+    const payloadBefore = structuredClone(meta.inventory[ref.bag].instance);
+    expect(Object.keys(payloadBefore ?? {}).sort()).toEqual(['guid', 'provenance']);
     sim.drainEvents();
     const draws = drawsDuring(sim, () => resolvePerfectingAttempt(sim.ctx, pid, ref));
     expect(errorsOf(sim)).toEqual(["You can't do that while dead."]);
     expect(draws).toBe(0);
     expect(materialCounts(sim, pid)).toEqual(before);
-    expect(meta.inventory[ref.bag].instance, 'no bind, no track').toBeUndefined();
+    expect(meta.inventory[ref.bag].instance, 'no bind, no rank, no new track').toEqual(
+      payloadBefore,
+    );
   });
 
   it('an invalid ref denies with the noItem line, on every malformed shape', () => {

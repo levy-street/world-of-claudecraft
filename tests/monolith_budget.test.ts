@@ -1689,7 +1689,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED 9840 -> 9833 by the tracked-item inspect history: the per-entity
+    // wire cache literal moved to server/entity_wire_cache.ts
+    // (emptyEntityWireCache) and the identity splice to splicedIdentityJson,
+    // which also carries the new worn-history splice. Exact count, zero slack.
+    ceiling: 9833,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1868,7 +1872,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // LOWERED 5356 -> 5350 by the tracked-item inspect history: the worn-copy
+    // decode (eqi plus the new eqh) moved to src/net/equipped_instances_wire.ts.
+    // Exact count, zero slack.
+    ceiling: 5350,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

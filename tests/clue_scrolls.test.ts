@@ -676,7 +676,25 @@ describe('the dig step (using the scroll on the spot)', () => {
     expect(sim.countItem(TREASURE_CASKET_ITEM_ID)).toBe(1);
     expect(meta.wireRev).toBeGreaterThan(rev);
     // Emit order: the step, the casket receipt, done, then the standing receipt.
-    expect(evs.map((ev) => ev.type)).toEqual(['clueHuntStep', 'loot', 'clueHuntDone', 'loot']);
+    // The server-only ledger event the casket's guid mint emits is pinned on
+    // its own below, so this player-facing order stays decisive.
+    expect(evs.filter((ev) => ev.type !== 'itemTracked').map((ev) => ev.type)).toEqual([
+      'clueHuntStep',
+      'loot',
+      'clueHuntDone',
+      'loot',
+    ]);
+    // The casket is an epic one-per-slot copy, so the hand-over mints exactly
+    // one tracked copy, ahead of its loot receipt, and the bagged casket
+    // carries that guid.
+    const tracked = ofType(evs, 'itemTracked');
+    expect(tracked.map((ev) => [ev.kind, ev.itemId])).toEqual([['mint', TREASURE_CASKET_ITEM_ID]]);
+    expect(evs.findIndex((ev) => ev.type === 'itemTracked')).toBeLessThan(
+      evs.findIndex((ev) => ev.type === 'loot'),
+    );
+    expect(meta.inventory.find((s) => s.itemId === TREASURE_CASKET_ITEM_ID)?.instance?.guid).toBe(
+      tracked[0]?.guid,
+    );
     // The hunt digs in the Drakelands, so the automaton faction is paid, and
     // only it.
     expect(clueHuntFaction(TEST_HUNT)).toBe('automatons');

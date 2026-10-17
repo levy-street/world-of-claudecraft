@@ -41,6 +41,11 @@ import {
   t,
 } from './i18n';
 import {
+  appendItemHistoryActionAfter,
+  attachItemHistoryContextMenu,
+  closeItemHistoryDialogForOwner,
+} from './item_history_dialog';
+import {
   isHeroicItem,
   marketArmorBadge,
   marketArmorPips,
@@ -88,6 +93,7 @@ import {
   type MarketTab,
   marketCollectBadgeCount,
   marketFilterMenus,
+  marketListingItemHistory,
 } from './market_view';
 import {
   appendMaterialSourcesActionAfter,
@@ -256,6 +262,7 @@ export class MarketWindow {
     if (!this.opened) return;
     const root = this.deps.root();
     closeMaterialSourcesDialogForOwner(root);
+    closeItemHistoryDialogForOwner(root);
     this.opened = false;
     this.sellItemId = null;
     this.sellInstance = null;
@@ -985,6 +992,14 @@ export class MarketWindow {
         itemName,
         displayedSources,
         this.deps.openMaterialSources,
+      );
+      // A listed tracked copy's history (the public projection): right-click
+      // or the Context Menu key on the row, and a visible button beside it on
+      // every layout, the keyboard and touch door (a list row has the room).
+      const history = marketListingItemHistory(l);
+      attachItemHistoryContextMenu(row, itemName, history);
+      appendItemHistoryActionAfter(row, itemName, history, 'listRow')?.parentElement?.classList.add(
+        'material-source-item-market',
       );
     }
     if (page.pageCount > 1) {
