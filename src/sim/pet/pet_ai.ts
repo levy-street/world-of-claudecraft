@@ -47,7 +47,7 @@ import { lineOfSightClear } from '../colliders';
 import { packlordPetHasteMultiplier } from '../combat/hunter_packlord';
 import { hunterPetDamageMultiplier } from '../combat/hunter_shared';
 import { isMobSpellResisted } from '../combat/spell_resist';
-import { MOBS } from '../data';
+import { isDelvePos, MOBS } from '../data';
 import { isEvadingWildMob } from '../mob/evade_immunity';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { isTrivialTo } from '../mob/targeting';
@@ -333,7 +333,20 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   if (ctx.isRooted(pet)) return;
 
   const swim = ctx.mobCanSwim(MOBS[pet.templateId]);
+  // Inside a delve the A* only knows the delve's DEFAULT room order, not this run's
+  // seeded rooms or its doors, while the pet's movement collides with the real ones
+  // (delves/runs.ts delveRunForEntity). A route planned there can be walled off, so
+  // the pet heels in a straight line instead (as the delve companion and delve mobs
+  // do), sliding along the real walls, and sight is tested against the run's rooms.
+  const delveModules = isDelvePos(owner.pos.x)
+    ? ctx.delveRunForPlayer(owner.id)?.modules
+    : undefined;
   const recompute = (): void => {
+    if (delveModules) {
+      pet.petPath = [];
+      pet.petPathCooldown = PET_PATH_RECALC;
+      return;
+    }
     pet.petPath = findPlayerPath(
       ctx.cfg.seed,
       pet.pos,
@@ -373,7 +386,7 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
         pet.pos,
         owner.pos,
         BODY_RADIUS,
-        undefined,
+        delveModules,
         ctx.riftCollisionToken,
       ))
   ) {

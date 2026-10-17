@@ -31,6 +31,7 @@ import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
 import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
 import { guardAndReportPose, isPosFinite } from './finite_pose_guard';
+import { restorePetOnOwnerRevive } from './pet/pet_owner_revive';
 import { cancelCorpseHarvestForCorpse } from './professions/corpse_harvest_session';
 import { aurasSurvivingDeath } from './resurrection';
 import { isRiftEntranceTemplate } from './rift/vault_seed';
@@ -351,6 +352,9 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): boolean {
   run.deathsThisRun[pid] = deaths;
   if (deaths >= 2) {
     r.e.dead = false;
+    // Hand back the pet this death took before the eject, which then carries it
+    // out to the door beside its owner (delves/delve_pet.ts bringPetToOwner).
+    restorePetOnOwnerRevive(ctx, r.e);
     ctx.failDelveRun(run);
     return true;
   }
@@ -403,6 +407,10 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): boolean {
     if (run.companion) ctx.despawnDelveCompanion(run);
     ctx.spawnDelveCompanion(run, pid, delve.autoCompanionId);
   }
+  // The delve respawn is a resurrection like any other (spirit.ts reviveAt), so the
+  // pet the death took comes back beside its owner: hunter and warlock pets fight in
+  // delves (delves/delve_pet.ts). A no-op when the death took no pet.
+  restorePetOnOwnerRevive(ctx, p);
   ctx.emit({ type: 'respawn', pid });
   return true;
 }

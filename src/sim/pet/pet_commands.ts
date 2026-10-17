@@ -91,11 +91,17 @@ function templateHasPetSpecial(templateId: string): boolean {
   return !!template && (!!template.petChainPull || !!template.petRanged?.active);
 }
 
-// A live pet check fails while inside a delve even for owners with a valid
-// equipped pet (it is stowed for the run, see stowPetForDelve/restorePetFromDelveStash),
-// so the surfaced error must say why instead of implying the pet was lost.
-function noPetError(e: Entity, fallback = 'You have no pet.'): string {
-  return isDelvePos(e.pos.x) ? 'Pets are not allowed inside the delves.' : fallback;
+// A live pet check fails while inside a delve for owners whose pet is stowed for
+// the run (see stowPetForDelve/restorePetFromDelveStash), so the surfaced error
+// must say why instead of implying the pet was lost. A hunter's beast and a
+// warlock's demon are not stowed (delves/delve_pet.ts), so a petless one gets the
+// plain message.
+function petStowedInDelve(ctx: SimContext, e: Entity): boolean {
+  return isDelvePos(e.pos.x) && ctx.delvePetStash.has(e.id);
+}
+
+function noPetError(ctx: SimContext, e: Entity, fallback = 'You have no pet.'): string {
+  return petStowedInDelve(ctx, e) ? 'Pets are not allowed inside the delves.' : fallback;
 }
 
 // Encounter-authored movement locks freeze the owner's direct command surface too.
@@ -575,7 +581,7 @@ export function abandonPet(ctx: SimContext, pid?: number): void {
   if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   ctx.emit({ type: 'log', text: `You abandon ${pet.name}.`, color: '#f66', pid: r.e.id });
@@ -592,7 +598,7 @@ export function renamePet(ctx: SimContext, name: string, pid?: number): void {
   if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   const clean = cleanPetName(name);
@@ -617,7 +623,7 @@ export function revivePet(ctx: SimContext, pid?: number): void {
   if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   if (!pet.dead) {
@@ -659,7 +665,7 @@ export function petAttack(ctx: SimContext, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pets = combatCommandPetsOf(ctx, r.e.id);
   if (pets.length === 0) {
-    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
+    ctx.error(r.e.id, noPetError(ctx, r.e, 'You have no living pet.'));
     return;
   }
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
@@ -689,7 +695,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
+    ctx.error(r.e.id, noPetError(ctx, r.e, 'You have no living pet.'));
     return;
   }
   if (!petCanForceTaunt(pet.templateId)) return;
@@ -756,7 +762,7 @@ export function petSpecial(ctx: SimContext, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount;
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
+    ctx.error(r.e.id, noPetError(ctx, r.e, 'You have no living pet.'));
     return;
   }
   // Manual commands share the pet AI's control gate: a stunned demon cannot
@@ -785,7 +791,7 @@ export function feedPet(ctx: SimContext, itemId: string, pid?: number, slotIndex
   if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
+    ctx.error(r.e.id, noPetError(ctx, r.e, 'You have no living pet.'));
     return;
   }
   const item = ITEMS[itemId];
@@ -853,7 +859,7 @@ export function healPet(ctx: SimContext, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e, 'You have no living demon.'));
+    ctx.error(r.e.id, noPetError(ctx, r.e, 'You have no living demon.'));
     return;
   }
   if (pet.hp >= pet.maxHp) {
@@ -900,7 +906,7 @@ export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
   const deadPrimary = petOf(ctx, r.e.id, true);
   if (deadPrimary && !pets.some((pet) => pet.id === deadPrimary.id)) pets.push(deadPrimary);
   if (pets.length === 0) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   for (const pet of pets) {
@@ -931,7 +937,7 @@ export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number)
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   if (!petCanForceTaunt(pet.templateId)) {
@@ -956,7 +962,7 @@ export function setPetAutoWaterJet(ctx: SimContext, enabled: boolean, pid?: numb
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   if (!MOBS[pet.templateId]?.petRanged?.jet) {
@@ -978,7 +984,7 @@ export function setPetAutoSpecial(ctx: SimContext, enabled: boolean, pid?: numbe
   r.meta.lastActiveTick = ctx.tickCount;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   if (!templateHasPetSpecial(pet.templateId)) {

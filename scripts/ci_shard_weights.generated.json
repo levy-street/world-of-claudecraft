@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4817,
+    "files": 4818,
     "harvestedFiles": 3948,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
@@ -1231,6 +1231,17 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           769
+        ]
+      },
+      "tests/delve_pet.test.ts": {
+        "ms": 3749,
+        "method": "local-median",
+        "measured": "2026-10-17",
+        "reason": "new delve pet suite added on this branch; no CI harvest has measured it yet",
+        "runs": [
+          3849,
+          3720,
+          3749
         ]
       },
       "tests/deposit_all_status_text.test.ts": {
@@ -8851,6 +8862,7 @@
   "tests/delve_interior_tracker.test.ts": 12,
   "tests/delve_map.test.ts": 43,
   "tests/delve_map_painter.test.ts": 41,
+  "tests/delve_pet.test.ts": 3749,
   "tests/delve_quest_ui_layout.test.ts": 5,
   "tests/delve_render.test.ts": 98,
   "tests/delve_shop.test.ts": 2011,

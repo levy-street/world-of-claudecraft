@@ -48,7 +48,8 @@ import {
 } from '../delve_layout';
 import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
-import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { restorePetFromDelveStash } from '../pet/pet_commands';
+import { restorePetOnOwnerRevive } from '../pet/pet_owner_revive';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { delveExitDropZ } from '../prop_layout';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -70,6 +71,7 @@ import {
   type RiteIntensity,
   type Vec3,
 } from '../types';
+import { bringPetToOwner, stowPetUnlessKept } from './delve_pet';
 import {
   clearDrownedLitanyBossState,
   initDrownedLitanyBossState,
@@ -207,6 +209,13 @@ function ejectStaleDelveOccupants(ctx: SimContext, run: DelveRun, pids: readonly
 }
 
 export function delveRunForEntity(ctx: SimContext, e: Entity): DelveRun | null {
+  // A player's owned mob (a hunter's beast, a warlock's demon, a pet or guardian
+  // summoned inside the delve) walks its owner's run, so it collides with the same room walls and doors.
+  // It is never in run.mobIds, and the player lookup below keys on the entity's own
+  // id. The delve companion keeps its existing (unclamped) movement.
+  if (e.kind === 'mob' && e.ownerId !== null && !ctx.isDelveCompanionMob(e)) {
+    return delveRunForPlayer(ctx, e.ownerId);
+  }
   const byPlayer = delveRunForPlayer(ctx, e.id);
   if (byPlayer) return byPlayer;
   return delveRunForMob(ctx, e.id);
@@ -421,7 +430,7 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   } else {
     run.emptyFor = 0;
   }
-  stowPetForDelve(ctx, r.meta.entityId);
+  stowPetUnlessKept(ctx, r.meta.entityId);
   const entry = delveModuleEntry(ctx, run);
   const slotIndex = ctx.partyMembersForKey(key).length;
   const pos = delveMemberSpawnPos(ctx, entry, slotIndex);
@@ -436,6 +445,7 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   p.prevFacing = 0;
   p.targetId = null;
   p.autoAttack = false;
+  bringPetToOwner(ctx, r.meta.entityId);
   run.emptyFor = 0;
   // Whole-run roster watermark, taken after the teleport so the count includes
   // this player; it only ever grows for the life of the run.
@@ -471,6 +481,7 @@ export function leaveDelve(ctx: SimContext, pid?: number): void {
   settleTeleportArrival(p);
   p.targetId = null;
   p.autoAttack = false;
+  bringPetToOwner(ctx, r.meta.entityId);
   ctx.emit({ type: 'log', text: delve.leaveText, color: '#b9f', pid: r.meta.entityId });
 }
 
@@ -724,6 +735,7 @@ export function ejectToDelveDoor(
   const p = r.e;
   // A live free eject (nobody died) still displaces: end any session first.
   cancelProfessionSessionOnDisplacement(ctx, p);
+  const wasDead = p.dead;
   p.dead = false;
   const door = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.pos = delveMemberSpawnPos(ctx, door, slotIndex);
@@ -753,6 +765,10 @@ export function ejectToDelveDoor(
   p.inCombat = false;
   p.autoAttack = false;
   Object.assign(r.meta.moveInput, emptyMoveInput());
+  // Ejecting a dead member (a party run that fails while they lie dead) stands them
+  // back up, so it hands back the pet their death took, like every resurrection.
+  if (wasDead) restorePetOnOwnerRevive(ctx, p);
+  bringPetToOwner(ctx, pid);
 }
 
 export function failDelveRun(ctx: SimContext, run: DelveRun): void {
@@ -1162,6 +1178,7 @@ export function advanceDelveModule(ctx: SimContext, run: DelveRun): void {
     ctx.rebucket(p);
     p.facing = 0;
     p.prevFacing = 0;
+    bringPetToOwner(ctx, pid);
     ctx.emit({
       type: 'log',
       text: `You pass through the tombstone into ${modName}.`,

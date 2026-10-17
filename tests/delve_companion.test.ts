@@ -78,7 +78,7 @@ describe('delve companions', () => {
     expect(clear.x).toBeCloseTo(grave.pos.x + 20);
   });
 
-  it('stows hunter pet on enter and restores on leave', () => {
+  it('keeps the hunter pet on enter (alongside Tessa) and brings it back out on leave', () => {
     const sim = makeSim('hunter');
     sim.setPlayerLevel(10);
     const boar = [...sim.entities.values()].find(
@@ -88,12 +88,13 @@ describe('delve companions', () => {
     expect(sim.petOf(sim.playerId)?.templateId).toBe('wild_boar');
     teleport(sim, 0, 0);
     sim.enterDelve('collapsed_reliquary', 'normal');
-    expect(sim.petOf(sim.playerId)).toBeNull();
+    expect(sim.petOf(sim.playerId)?.templateId).toBe('wild_boar');
+    expect(sim.companionState?.companionId).toBe('companion_tessa');
     sim.leaveDelve();
     expect(sim.petOf(sim.playerId)?.templateId).toBe('wild_boar');
   });
 
-  it('serializes the stowed pet while in a delve (no pet loss on mid-delve disconnect/save)', () => {
+  it('serializes the hunter pet while in a delve (no pet loss on mid-delve disconnect/save)', () => {
     const sim = makeSim('hunter');
     sim.setPlayerLevel(10);
     const boar = [...sim.entities.values()].find(
@@ -102,10 +103,7 @@ describe('delve companions', () => {
     (sim as any).completeTame(sim.player, boar!);
     teleport(sim, 0, 0);
     sim.enterDelve('collapsed_reliquary', 'normal');
-    // The live pet is despawned (stowed) while inside the delve...
-    expect(sim.petOf(sim.playerId)).toBeNull();
-    // ...but a save taken right now (autosave / disconnect / shutdown saveAll) must
-    // still persist it from the stash, or the pet is lost when the character reloads.
+    // A save taken right now (autosave / disconnect / shutdown saveAll) persists it.
     const state = sim.serializeCharacter(sim.playerId)!;
     expect(state.pet?.templateId).toBe('wild_boar');
   });

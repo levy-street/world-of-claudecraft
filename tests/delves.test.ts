@@ -54,7 +54,7 @@ const DELVE_TEST_WORLD: WorldContent = {
   groundObjects: [],
 };
 
-function makeSim(cls: 'warrior' | 'warlock' = 'warrior', seed = 42) {
+function makeSim(cls: 'warrior' | 'warlock' | 'mage' = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true, world: DELVE_TEST_WORLD });
 }
 
@@ -448,26 +448,44 @@ describe('delve death rules', () => {
   });
 });
 
+// The frost mage's Water Elemental is the pet class still stowed for a delve run
+// (hunter beasts and warlock demons come along: tests/delve_pet.test.ts).
+function summonWaterElemental(sim: Sim) {
+  sim.setPlayerLevel(10);
+  (sim as any).summonPet(sim.player, 'water_elemental');
+  expect(sim.petOf(sim.playerId)?.templateId).toBe('water_elemental');
+}
+
 describe('delve pet stow', () => {
-  it('stows warlock demon on enter and restores on leave', () => {
+  it('keeps the warlock demon on enter and brings it back out on leave', () => {
     const sim = makeSim('warlock');
     sim.setPlayerLevel(10);
     castAndFinish(sim, 'summon_imp');
-    expect(sim.petOf(sim.playerId)).not.toBeNull();
+    const imp = sim.petOf(sim.playerId);
+    expect(imp).not.toBeNull();
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    expect(sim.petOf(sim.playerId)?.id).toBe(imp!.id);
+    sim.leaveDelve();
+    expect(sim.petOf(sim.playerId)?.id).toBe(imp!.id);
+    expect(sim.petOf(sim.playerId)?.templateId).toBe('emberkin');
+  });
+
+  it('stows the mage elemental on enter and restores it on leave', () => {
+    const sim = makeSim('mage');
+    summonWaterElemental(sim);
     const door = DELVES.collapsed_reliquary.doorPos;
     teleport(sim, door.x, door.z);
     sim.enterDelve('collapsed_reliquary', 'normal');
     expect(sim.petOf(sim.playerId)).toBeNull();
     sim.leaveDelve();
-    expect(sim.petOf(sim.playerId)).not.toBeNull();
-    expect(sim.petOf(sim.playerId)?.templateId).toBe('emberkin');
+    expect(sim.petOf(sim.playerId)?.templateId).toBe('water_elemental');
   });
 
   it('trying to summon a stowed pet inside a delve explains why, instead of "you have no pet"', () => {
-    const sim = makeSim('warlock');
-    sim.setPlayerLevel(10);
-    castAndFinish(sim, 'summon_imp');
-    expect(sim.petOf(sim.playerId)).not.toBeNull();
+    const sim = makeSim('mage');
+    summonWaterElemental(sim);
     const door = DELVES.collapsed_reliquary.doorPos;
     teleport(sim, door.x, door.z);
     sim.enterDelve('collapsed_reliquary', 'normal');
@@ -502,9 +520,8 @@ describe('delve pet stow', () => {
   });
 
   it('restorePetFromDelveStash keeps the stash entry if the owner entity is not yet registered', () => {
-    const sim = makeSim('warlock');
-    sim.setPlayerLevel(10);
-    castAndFinish(sim, 'summon_imp');
+    const sim = makeSim('mage');
+    summonWaterElemental(sim);
     const door = DELVES.collapsed_reliquary.doorPos;
     teleport(sim, door.x, door.z);
     sim.enterDelve('collapsed_reliquary', 'normal');

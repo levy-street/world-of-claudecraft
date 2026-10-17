@@ -4321,7 +4321,9 @@ export function runEffects(
         if (!pet) {
           ctx.error(
             p.id,
-            isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.',
+            isDelvePos(p.pos.x) && ctx.delvePetStash.has(p.id)
+              ? 'Pets are not allowed inside the delves.'
+              : 'You have no pet.',
           );
           break;
         }
