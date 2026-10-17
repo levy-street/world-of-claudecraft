@@ -121,7 +121,9 @@ export function buildWeeklyCommendation(world: WeeklyWorld): WeeklyCommendationV
   );
   return {
     heading: t('hudChrome.weekly.commendHeading'),
-    note: t('hudChrome.weekly.commendNote', {
+    // A pick carried past the reset says so in this same line, so the strip
+    // keeps its height (the cards above it have no room to give).
+    note: t(held.carried ? 'hudChrome.weekly.commendCarriedNote' : 'hudChrome.weekly.commendNote', {
       amount: whole(WEEKLY_QUEST_REWARD.commendationStanding),
     }),
     options,
@@ -142,7 +144,12 @@ function cardState(quest: WeeklyQuestDef, held: WeeklyQuestProgress | null): Wee
   return held.state === 'completed' ? 'completed' : 'active';
 }
 
-function buttonLabel(state: WeeklyQuestCardState, count: number, required: number): string {
+function buttonLabel(
+  state: WeeklyQuestCardState,
+  count: number,
+  required: number,
+  carried: boolean,
+): string {
   const tally = {
     count: formatNumber(count, { maximumFractionDigits: 0 }),
     required: formatNumber(required, { maximumFractionDigits: 0 }),
@@ -151,9 +158,10 @@ function buttonLabel(state: WeeklyQuestCardState, count: number, required: numbe
     case 'active':
       return t('hudChrome.weekly.inProgress', tally);
     case 'completed':
-      return t('hudChrome.weekly.completed');
+      return t(carried ? 'hudChrome.weekly.completedLastWeek' : 'hudChrome.weekly.completed');
     case 'locked':
-      return t('hudChrome.weekly.lockedThisWeek');
+      // A carried pick holds the cards only until its commendation is claimed.
+      return t(carried ? 'hudChrome.weekly.claimFirst' : 'hudChrome.weekly.lockedThisWeek');
     default:
       return t('hudChrome.weekly.choose');
   }
@@ -182,7 +190,7 @@ export function buildWeeklyQuestsView(world: WeeklyWorld, nowMs: number): Weekly
       art: `${WEEKLY_ART_DIR}/${quest.kind}.webp`,
       medal: `${WEEKLY_ART_DIR}/medal_${quest.kind}.webp`,
       state,
-      buttonLabel: buttonLabel(state, count, quest.count),
+      buttonLabel: buttonLabel(state, count, quest.count, held?.carried === true),
       count,
       required: quest.count,
     };

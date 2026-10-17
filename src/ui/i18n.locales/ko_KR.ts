@@ -18592,6 +18592,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.anyDifficulty': '난이도 무관',
   'hudChrome.weekly.choose': '퀘스트 선택',
   'hudChrome.weekly.inProgress': '진행 중 ({count}/{required})',
+  'hudChrome.weekly.completedLastWeek': '지난주 완료',
+  'hudChrome.weekly.claimFirst': '먼저 받으세요',
   'hudChrome.weekly.completed': '이번 주 완료',
   'hudChrome.weekly.lockedThisWeek': '이번 주 잠김',
   'hudChrome.weekly.footerPick':
@@ -18632,6 +18634,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.done': '주간 퀘스트 완료: {category}',
   'hudChrome.weekly.commendHeading': '사절의 표창',
   'hudChrome.weekly.commendNote': '선택한 진영 하나에 평판 {amount}, 주 1회.',
+  'hudChrome.weekly.commendCarriedNote':
+    '지난주 평판 {amount}을(를) 아직 받지 않았습니다. 받으면 새 임무를 고를 수 있습니다.',
   'hudChrome.weekly.commendClaimed': '이번 주 표창은 {faction}에게 돌아갔습니다.',
   'hudChrome.weekly.commendRewardLine': '선택한 진영과의 평판 {amount}',
   'hudChrome.reputation.standingGained': '{faction} 평판 +{amount}',

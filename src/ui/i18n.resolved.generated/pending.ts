@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "es_ES": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "fr_FR": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "fr_CA": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "de_DE": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "nl_NL": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "pl_PL": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "id_ID": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "tr_TR": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "sv_SE": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "vi_VN": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ],
+  "da_DK": [
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.completedLastWeek"
+  ]
 };

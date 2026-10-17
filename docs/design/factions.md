@@ -45,7 +45,14 @@ narrative's final names).
   receives the commendation through `awardFactionReputation`. One claim a
   week, recorded on the weekly pick (`commended`), so it rides the `wkq` self
   key and the character save; a faction with no headroom at the level cap is
-  refused and the choice stays open rather than being wasted.
+  refused and the choice stays open rather than being wasted. An unclaimed
+  commendation outlives the weekly reset (`resetWeeklyQuestIfNeeded` keeps a
+  finished, unclaimed pick and marks it `carried`, which the window reads to
+  word the cards as last week's): it waits in the window until redeemed, a new
+  charge cannot be taken until then, and redeeming it clears the old pick so
+  the current week's choice opens. It lapses at any check after the reset where
+  no faction has headroom at the owner's level, so it can never lock a
+  character out of the weekly.
 
 ## Tiers
 

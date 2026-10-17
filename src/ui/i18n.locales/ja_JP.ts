@@ -18631,6 +18631,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.anyDifficulty': '難易度は問わない',
   'hudChrome.weekly.choose': 'クエストを選ぶ',
   'hudChrome.weekly.inProgress': '進行中（{count}/{required}）',
+  'hudChrome.weekly.completedLastWeek': '先週に完了',
+  'hudChrome.weekly.claimFirst': '先に受け取る',
   'hudChrome.weekly.completed': '今週は完了',
   'hudChrome.weekly.lockedThisWeek': '今週はロック中',
   'hudChrome.weekly.footerPick':
@@ -18671,6 +18673,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.done': '週間クエスト完了：{category}',
   'hudChrome.weekly.commendHeading': '使者の推挙',
   'hudChrome.weekly.commendNote': '選んだ一つの勢力に評判{amount}、週に一度。',
+  'hudChrome.weekly.commendCarriedNote':
+    '先週の評判{amount}が未受領です。受け取ると新しい任務を選べます。',
   'hudChrome.weekly.commendClaimed': '今週の推挙は{faction}に贈られました。',
   'hudChrome.weekly.commendRewardLine': '選んだ勢力との評判{amount}',
   'hudChrome.reputation.standingGained': '{faction}の評判 +{amount}',

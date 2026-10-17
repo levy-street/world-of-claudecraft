@@ -18952,6 +18952,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.anyDifficulty': 'Любая сложность',
   'hudChrome.weekly.choose': 'Выбрать задание',
   'hudChrome.weekly.inProgress': 'В процессе ({count}/{required})',
+  'hudChrome.weekly.completedLastWeek': 'Выполнено на прошлой неделе',
+  'hudChrome.weekly.claimFirst': 'Сначала заберите награду',
   'hudChrome.weekly.completed': 'Выполнено на этой неделе',
   'hudChrome.weekly.lockedThisWeek': 'Закрыто на этой неделе',
   'hudChrome.weekly.footerPick':
@@ -18994,6 +18996,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.done': 'Еженедельное задание выполнено: {category}',
   'hudChrome.weekly.commendHeading': 'Рекомендация эмиссара',
   'hudChrome.weekly.commendNote': '{amount} репутации одной фракции на ваш выбор, раз в неделю.',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} репутации за прошлую неделю ещё не получено. Получите их, чтобы выбрать новое поручение.',
   'hudChrome.weekly.commendClaimed': 'Рекомендация этой недели досталась фракции {faction}.',
   'hudChrome.weekly.commendRewardLine': '{amount} репутации с фракцией на ваш выбор',
   'hudChrome.reputation.standingGained': 'Репутация с фракцией {faction}: +{amount}.',
