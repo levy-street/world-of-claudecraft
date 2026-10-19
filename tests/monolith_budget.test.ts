@@ -1042,7 +1042,18 @@ const MONOLITHS: MonolithRow[] = [
     // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
     // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
     // merged tree. Exact count.
-    ceiling: 12405,
+    // LOWERED 12393 -> 12388 by Gourdlight Eve (feature/halloween-event): the canvas
+    // viewport measure moved to viewport_measure.ts, paying for the seasonal decor
+    // view's field, build and per-frame update, the trick fumes and the born helm bit.
+    // Exact count (wc -l after biome).
+    // LOWERED 12388 -> 12384 by Gourdlight Eve phase 2: the selection ring's hostility
+    // verdict moved to reaction.ts (isHostileSelectionTarget), paying for the field
+    // boss's fx layer (scarecrow_fx.ts) field, build, two routes, two updates and dispose.
+    // LOWERED for Haunted Pumpkins: shared loot sparkles moved into
+    // ground_object_sparkle.ts, paying for the personal pumpkin view hooks.
+    // Merge of feature/v045-integration (genshin artstyle, ceiling 12405) into the
+    // Halloween branch: renderer.ts is unchanged by that side, exact merged count stands.
+    ceiling: 12369,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1282,7 +1293,20 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11642 -> 11639 by the tavern's seats: standUp moved whole into seating.ts
     // (bound straight into the context and the motion deps), paying for the sitOnSeat and
     // resting delegates. Exact count.
-    ceiling: 11594,
+    // LOWERED 11594 -> 11585 by Gourdlight Eve (feature/halloween-event): the offline
+    // leaderboard's row build moved to offline_leaderboard.ts, paying for the seasonal
+    // ctx view, tick call, save/restore lines and the three IWorldSeasonal delegates.
+    // Exact count (wc -l after biome).
+    // LOWERED for Haunted Pumpkins: character_calendar_save.ts owns the
+    // unchanged calendar-ledger save projection, including seasonal progress.
+    // LOWERED 11569 -> 11540 by Gourdlight Eve round 5: the right-click cancel command
+    // moved whole into combat/aura_cancel_command.ts, paying for the one-line puppet
+    // movement hook (seasonal/scarecrow_puppet.ts). Exact count (wc -l after biome).
+    // LOWERED 11540 -> 11511 by Gourdlight Eve round 12: the idle-mob throttle predicate
+    // moved whole into mob/idle_tick_skip.ts, so the night boss's unwatched bedtime
+    // (mob/slumber.ts settleUnwatchedSlumber) asks the same question the mob loop asks.
+    // Exact count (wc -l after biome).
+    ceiling: 11511,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -2379,7 +2403,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 2327 -> 2288 with the open Fenbridge: the palisade's
     // full-height wall arm and the gate-arch jamb block retired with the
     // ring. wc -l. Exact count.
-    ceiling: 2288,
+    // LOWERED 2288 -> 2286 with Gourdlight Eve's decor collision: the mine
+    // mound footprint moved to mine_mound.ts, paying for setColliderGateOpen's
+    // late-built gate (the decor set itself is seasonal_decor_colliders.ts).
+    // wc -l. Exact count.
+    ceiling: 2286,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

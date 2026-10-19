@@ -27,6 +27,12 @@ describe('vendorStackSize', () => {
     expect(vendorStackSize(item({ kind: 'elixir' }))).toBe(1);
   });
 
+  it('sells a token-priced food or drink one at a time (its price is per item)', () => {
+    const priceItem = { itemId: 'gourdlight_sweet', count: 3 };
+    expect(vendorStackSize(item({ kind: 'food', foodHp: 90, priceItem }))).toBe(1);
+    expect(vendorStackSize(item({ kind: 'drink', drinkMana: 60, priceItem }))).toBe(1);
+  });
+
   it('VENDOR_STACK_SIZE is the classic staple stack of 5', () => {
     expect(VENDOR_STACK_SIZE).toBe(5);
   });

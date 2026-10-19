@@ -1159,4 +1159,21 @@ export const table: DeedLocaleTable = {
     name: '현행범',
     desc: '묻힌 보물에서 동전자루 좀도둑이 금화를 들고 도망치기 전에 처치하세요.',
   },
+  feat_gourdlight_doorsteps: {
+    name: '모든 문간',
+    desc: '고드라이트 축제의 밤 동안 세 마을에서 노크에 응답하는 모든 주민에게 사탕 안 주면 장난칠 거야를 외친다.',
+  },
+  feat_gourdlight_errands: {
+    name: '헤스터의 심부름꾼',
+    desc: '헤스터 고드윅이 매일 바꿔 주는 고드라이트 축제의 밤 심부름을 각각 한 번 이상 끝낸다.',
+  },
+  feat_gourdlight_frights: {
+    name: '세 마을을 놀래키다',
+    desc: '헤스터의 워! 심부름에서 세 마을 각각의 주민 한 명을 놀래킨다.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: '고드라이트, 처음부터 끝까지',
+    desc: '고드라이트 축제의 밤을 모두 해낸다: 올드 대치그린을 쓰러뜨리고, 유령 호박을 모두 찾고, 헤스터의 심부름을 모두 끝내고, 모든 문을 두드리고, 세 마을 각각에서 주민을 놀래킨다.',
+    title: '호박에 맹세한 자',
+  },
 };

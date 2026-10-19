@@ -11,6 +11,7 @@ import { createDeedRuntime } from '../src/sim/deeds';
 import { freshMusterArmy } from '../src/sim/mirefen_muster';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
+import { freshSeasonalWorldState } from '../src/sim/seasonal';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { SpatialGrid } from '../src/sim/spatial';
@@ -353,6 +354,7 @@ function makeFakeHost() {
     bgMatches: new Map(),
     worldPvpDisabled: false,
     hillState: { active: null, window: 0, plan: null, attempts: 0, retryAt: 0, passTick: 0 },
+    seasonal: freshSeasonalWorldState(),
     hillProbe: { wet: () => false, steep: () => false, blocked: () => false, zoneIdAt: () => null },
     worldPvpBooks: {
       recentDamage: new Map(),

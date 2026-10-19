@@ -435,6 +435,21 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     },
     props: 'none',
   },
+  // Hester Gourdwick, Gourdlight Keeper (the autumn seasonal event's keeper):
+  // an older countrywoman, copper hair going grey, a harvest-weathered face.
+  gourdlight_keeper: {
+    cls: 'druid',
+    app: {
+      gender: 'female',
+      ...head('braid', 'none', 'relaxed', 'default', 'soft', 'full', 'default', 'lobes'),
+      ...skin(26, 0.34, 0.52),
+      ...hair(18, 0.58, 0.32),
+      ...eyes(36, 0.42, 0.3),
+      headShape: shape({ eyeSpacing: 0.1, eyeSize: 0.3, eyeTilt: -0.2, chinWidth: 0.7 }),
+      bodyScale: 1.02,
+    },
+    props: 'none',
+  },
   // Apothecary Lin, Herbalist.
   apothecary_lin: {
     cls: 'druid',

@@ -44,6 +44,9 @@ export interface GossipMenuContent {
    *  while his offer stands, the answer rows. Its own field so a guide, who
    *  has no quest and no stock, keeps the dialog open. */
   hasDungeonGuide: boolean;
+  /** The seasonal trick-or-treat row (trick_or_treat_row_view.ts): its own field
+   *  so a townsperson with nothing else to offer keeps the dialog open for it. */
+  hasTrickOrTreat?: boolean;
 }
 
 export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
@@ -61,6 +64,7 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasFarmer &&
     !content.hasWorldQuestBoard &&
     !content.hasClueStep &&
-    !content.hasDungeonGuide
+    !content.hasDungeonGuide &&
+    content.hasTrickOrTreat !== true
   );
 }

@@ -16,6 +16,7 @@ import {
   unionLegacyMilestones,
 } from './deeds';
 import { restoreReliquaryState, seedAccountLedgerSelf } from './reliquary';
+import { refillGourdlightMarks } from './seasonal/gourdlight_deed_marks';
 import type { CharacterState, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
@@ -71,6 +72,7 @@ export function restoreBookOfDeeds(meta: PlayerMeta, player: Entity, s: Characte
  */
 export function runBookOfDeedsJoinRetro(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   seedItemDiscovery(ctx, meta);
+  refillGourdlightMarks(meta);
   retroFallbackGrants(ctx, meta, player);
   evaluateDeedsFor(ctx, meta, player, true);
   ctx.deedDirtyPids.delete(player.id);

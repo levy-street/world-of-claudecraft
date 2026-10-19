@@ -300,8 +300,12 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // catch (2026-09-28 merge), also pending: still 289 painted. 322 with the
     // Mirefen world-boss branch's three combat deeds, all pending.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
-    expect(DEED_ORDER).toHaveLength(346);
-    expect(DEED_IMAGE_IDS.size).toBe(289);
+    // 347 with Gourdlight Eve's seasonal Feat, its crest painted: 290 painted.
+    // 348 with its field boss's Feat (feat_old_thatchgrin), painted too: 291.
+    // 351 with its three title-writ Feats, all painted: 294.
+    // 352 with the Haunted Pumpkin hunt's Feat (feat_pumpkin_hunter), painted: 295.
+    expect(DEED_ORDER).toHaveLength(352);
+    expect(DEED_IMAGE_IDS.size).toBe(295);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),

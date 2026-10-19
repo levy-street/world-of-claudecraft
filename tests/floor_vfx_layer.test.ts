@@ -382,6 +382,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
  * otherwise, so a floor mechanic cannot ship outside the ladder unnoticed.
  */
 const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
+  // the seasonal candle halos: camera-facing sprites at a candle's height, never on
+  // the floor (their ground pools take the floor ladder through floorVfxRenderOrder)
+  'src/render/seasonal_decor_lights.ts',
   // pooled ability VFX families that stand up from the ground
   'src/render/ability_vfx/flipbooks.ts',
   'src/render/ability_vfx/overlay_sprites.ts',

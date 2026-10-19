@@ -17,6 +17,7 @@ function anvilImpactHarness() {
   renderer.warlockMeteorFx = {};
   renderer.views = new Map();
   renderer.abilityVfx = { handleSpellfxAt: vi.fn().mockReturnValue(false) };
+  renderer.scarecrowFx = { handleSpellfxAt: vi.fn().mockReturnValue(false) };
   renderer.sim = { cfg: { seed: 42 } };
   renderer.vfx = { burst, burstLater };
   renderer.spawnAoeRing = spawnAoeRing;

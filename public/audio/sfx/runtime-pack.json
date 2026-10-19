@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "952a1d2cd5b5eafdbb8b85affc68f606d85c5ba6158305361b637db6a258b45e",
-  "catalogHash": "80c931114eb36491af099000800d712da876bc1732275906903c85e0f2d38f71",
+  "bundleId": "7b05f5a65124f3d9a0ef377280a0e2f70910dbce9c2d05c254602377e6592923",
+  "catalogHash": "26db9e6cb1fb2c103f1600e556a8adf590161b573e1f463d86421e5f70e97bc2",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -820,6 +820,18 @@
       "gain": 1.972423,
       "playbackRate": 1
     },
+    "gurglegreen_bubble_loop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/gurglegreen_bubble_loop.mp3?v=468c032afd98",
+          "bytes": 97846,
+          "sha256": "468c032afd98d18f19530a53c09dd86e0a9155c3f8d3850c13aebdd191f6fed1"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "hammer_of_justice": {
       "variants": [
         {
@@ -1024,6 +1036,18 @@
       "gain": 1.698244,
       "playbackRate": 1
     },
+    "impact_gourdfall": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_gourdfall.mp3?v=290c876bd9a8",
+          "bytes": 31391,
+          "sha256": "290c876bd9a83d4f5d42fa6f7dbe6417284ed21ee57e6311f7889c202458cd44"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "impact_holy": {
       "variants": [
         {
@@ -1120,6 +1144,18 @@
       "gain": 1.698244,
       "playbackRate": 1
     },
+    "impact_prank_pumpkin_splat": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_prank_pumpkin_splat.mp3?v=92cca71b3e05",
+          "bytes": 23240,
+          "sha256": "92cca71b3e05f80ed557f4a4dc94bba131ff5b03fd88f393e65da933d6cdac1a"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "impact_shadow": {
       "variants": [
         {
@@ -1130,6 +1166,18 @@
         }
       ],
       "gain": 1.678804,
+      "playbackRate": 1
+    },
+    "impact_swelling_gourd_burst": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_swelling_gourd_burst.mp3?v=22d856bdb1da",
+          "bytes": 63991,
+          "sha256": "22d856bdb1dae9ab31695ecbe88981073e91e72564f1b9a37316688e043a9bf6"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "impact_warrior_avatar_rise": {
@@ -4270,6 +4318,18 @@
       "gain": 1.678804,
       "playbackRate": 1
     },
+    "mount_idle_emberbristle_broom": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_idle_emberbristle_broom.mp3?v=37ff72477f0b",
+          "bytes": 73395,
+          "sha256": "37ff72477f0b36590161849de8132556e6dc38f7c468595959b756b120e94647"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "mount_idle_mech_bird": {
       "variants": [
         {
@@ -4473,6 +4533,18 @@
       ],
       "gain": 1,
       "playbackRate": 0.92
+    },
+    "mount_run_emberbristle_broom": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_emberbristle_broom.mp3?v=1648d8106f48",
+          "bytes": 15090,
+          "sha256": "1648d8106f48efe309004cd56aad6f33068c5526300f495b7232dc3029c8c651"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
     },
     "mount_run_goblin_rocket_sled": {
       "variants": [
@@ -5158,6 +5230,18 @@
       "gain": 1.717908,
       "playbackRate": 1
     },
+    "proj_gourdfall_whistle": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/proj_gourdfall_whistle.mp3?v=f5f9e6df5162",
+          "bytes": 24494,
+          "sha256": "f5f9e6df5162f643ca09bce4192ba73fb5fb2bf4186a92c05732f286c82f4995"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "proj_holy": {
       "variants": [
         {
@@ -5422,6 +5506,42 @@
       "gain": 2.660725,
       "playbackRate": 1
     },
+    "spell_gurglegreen_cauldron": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_gurglegreen_cauldron.mp3?v=db78288acaf6",
+          "bytes": 40168,
+          "sha256": "db78288acaf691587bd3742dc3ef1ff717963da36bbe83edf2b54728fecb7e63"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "spell_gurglegreen_quaff": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_gurglegreen_quaff.mp3?v=9e6c6f3ea2c3",
+          "bytes": 37660,
+          "sha256": "9e6c6f3ea2c366b6237301d58bf61703dc2a46d72af7f10191f5ce621e418973"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "spell_murmurwick_candle": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_murmurwick_candle.mp3?v=2b8e2c3d4bc1",
+          "bytes": 47064,
+          "sha256": "2b8e2c3d4bc103af1623409554bc83578f5c04fa6abd5554bd11a1c97f0651ad"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "spell_nova": {
       "variants": [
         {
@@ -5432,6 +5552,42 @@
         }
       ],
       "gain": 1.678804,
+      "playbackRate": 1
+    },
+    "spell_startled_bats": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_startled_bats.mp3?v=5da405af9cc4",
+          "bytes": 58976,
+          "sha256": "5da405af9cc44925db65a1bcc8db5845fa4cd9d4964e2fc5a0c9cfe0174841f3"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "spell_swelling_gourd_pulse": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_swelling_gourd_pulse.mp3?v=b9fcd3895f20",
+          "bytes": 16344,
+          "sha256": "b9fcd3895f2069dc5c666ad5de8dd6a4b28a829af2de9cd9508cc25bfd576e23"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "spell_wanderwisp_lantern": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_wanderwisp_lantern.mp3?v=5e8318607528",
+          "bytes": 54587,
+          "sha256": "5e83186075285d7847ff8a1e5047c849bc005d8f22e2a7c5cf47f45231dd14d0"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "stealth": {

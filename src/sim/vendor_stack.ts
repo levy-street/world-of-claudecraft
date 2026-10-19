@@ -19,8 +19,11 @@ export const VENDOR_STACK_SIZE = 5;
 /**
  * How many units one click on this vendor good yields. Food and drink come in a
  * stack of VENDOR_STACK_SIZE for the same listed price; everything else is one
- * unit per purchase.
+ * unit per purchase. A token-priced row (ItemDef.priceItem, a seasonal shop's
+ * sweets) is always one unit: its price is authored per item, never per stack
+ * (Gourdlight Eve's candies cost their sweets each).
  */
 export function vendorStackSize(def: ItemDef): number {
+  if (def.priceItem) return 1;
   return def.kind === 'food' || def.kind === 'drink' ? VENDOR_STACK_SIZE : 1;
 }

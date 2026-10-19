@@ -20354,6 +20354,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '身处开阔的淬火之水：移动速度降低{slow}%，每秒受到{damage}点灼烧伤害（英雄难度{heroic}点）。游向任意冰板或岸边。',
   'hudChrome.auraEffect.sanctum.shardFlare':
     '心之碎片闪耀：墓穴吐息每{breath}秒一次，振翼狂风每{gale}秒一次。',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    '老稻草狞笑正在操纵你。你无法行动：你会被带到最近的盟友身边，每{every}秒对其造成{min}到{max}点伤害（对{level}级盟友最多{mult}倍）。当你受到相当于最大生命值{pct}%的伤害，或被盟友驱散（魔法）时提前结束。',
   'hudChrome.auraEffect.wildheart.packBond':
     '伙伴靠近时受到的伤害降低{pct}%。将驯兽师和他的美洲豹拉开即可打破羁绊。',
   'hudChrome.auraEffect.wildheart.packBondFury': '伙伴靠近时造成的伤害提高{pct}%。',
@@ -20715,4 +20717,182 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '删除此角色前，请先将所有尚未锁定的集章卡转移至其他角色。',
   'apiError.character.referral_bond_pending':
     '一份推荐奖励会员契约正在发放给此角色。请在发放完成后再尝试删除此角色。',
+  'hudChrome.auraEffect.seasonalCosmetic': '仅为外观：不影响战斗',
+  'seasonal.event.gourdlight_eve.name': '南瓜灯之夜',
+  'seasonal.trickOrTreat.row': '不给糖就捣蛋！',
+  'seasonal.trickOrTreat.rowAria': '对{name}说“不给糖就捣蛋”',
+  'seasonal.trickOrTreat.knockedHint': '你今天已经敲过这扇门了。每日重置后这扇门会再次打开。',
+  'seasonal.trickOrTreat.treat': '{name}递给你一份糖果。',
+  'seasonal.trickOrTreat.trick': '{name}对你恶作剧：{trick}！',
+  'seasonal.trickOrTreat.alreadyKnocked': '你今天已经向{name}讨过糖了。',
+  'seasonal.trickOrTreat.notActive': '南瓜灯之夜现在没有举行。',
+  'seasonal.trickOrTreat.tooFar': '走近一点再敲门。',
+  'seasonal.trickOrTreat.treatFlash.one': '糖果！{count}颗南瓜灯糖',
+  'seasonal.trickOrTreat.treatFlash.few': '糖果！{count}颗南瓜灯糖',
+  'seasonal.trickOrTreat.treatFlash.many': '糖果！{count}颗南瓜灯糖',
+  'seasonal.trickOrTreat.treatFlash.other': '糖果！{count}颗南瓜灯糖',
+  'seasonal.trickOrTreat.trickFlash': '捣蛋！{trick}',
+  'seasonal.tricks.gourdlight_trick_bat': '变成蝙蝠',
+  'seasonal.tricks.gourdlight_trick_skeleton': '骨头咔咔',
+  'seasonal.tricks.gourdlight_trick_fumes': '绿色烟雾',
+  'seasonal.pumpkinHead.on': '你戴上了雕刻南瓜头。',
+  'seasonal.pumpkinHead.off': '你摘下了雕刻南瓜头。',
+  'seasonal.jarTrick': '罐子砰地打开了：{trick}！',
+  'seasonal.itemUse.pumpkinHead':
+    '使用：戴上或摘下一颗从内部点亮的雕刻南瓜，套在头盔之上。仅在南瓜灯之夜期间可用。纯外观。',
+  'seasonal.itemUse.trickJar':
+    '使用：对你施加一个随机的无害恶作剧，持续数秒。仅在南瓜灯之夜期间可用。纯外观。',
+  'seasonal.itemUse.pouch': '使用：打开后获得{count}颗南瓜灯糖。',
+  'seasonal.itemUse.sweet': '在南瓜灯之夜期间讨糖获得。东溪的赫丝特·葫芦芯会用外观物品交换它们。',
+  'seasonal.tokenPrice': '{count}个{item}',
+  'entities.items.gourdlight_sweet.name': '南瓜灯糖',
+  'entities.items.gourdlight_treat_pouch.name': '南瓜灯糖果袋',
+  'entities.items.carved_pumpkin_head.name': '雕刻南瓜头',
+  'entities.items.jar_of_mischief.name': '恶作剧之罐',
+  'entities.npcs.gourdlight_keeper.name': '赫丝特·葫芦芯',
+  'entities.npcs.gourdlight_keeper.title': '南瓜灯守护者',
+  'entities.npcs.gourdlight_keeper.greeting':
+    '南瓜点亮了，灯笼也挂起来了，那一定是南瓜灯之夜到了。去敲东溪、芬桥和高望城镇民的门，说出那句话：不给糖就捣蛋。大多数人会给你一颗糖，少数人会对你恶作剧。把糖带给我，我会跟你换些可以穿戴的东西。',
+  'entities.quests.q_gourdlight_rounds.title': '南瓜灯巡游',
+  'entities.quests.q_gourdlight_rounds.text':
+    '每到南瓜灯之夜，谷地的孩子们都会挨家挨户巡游，今年你也加入他们吧，{playerName}。在我们的城镇里敲五扇门，说出那句话，看看你会得到什么。完成后回来找我。',
+  'entities.quests.q_gourdlight_rounds.completion':
+    '敲了五扇门，手指还都在。拿着，这袋糖果让你在回家路上吃。明天再来，门会再次打开。',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': '已敲的门',
+  'seasonal.tricks.gourdlight_trick_strawling': '稻草人伪装',
+  'seasonal.guise': '护符噼啪作响，稻草爬满了你的全身：{trick}！',
+  'seasonal.itemUse.strawlingCharm':
+    '使用：变成老稻草狞笑的稻草小人，持续{seconds}秒。战斗中无法使用，仅限南瓜灯之夜期间。不会消耗。仅外观。',
+  'entities.items.thatchgrin_sweet_sack.name': '稻草狞笑的糖果袋',
+  'entities.items.strawling_charm.name': '稻草小人护符',
+  'entities.mobs.gourdlight_thatchgrin.name': '老稻草狞笑',
+  'entities.mobs.gourdlight_crow.name': '南瓜灯乌鸦',
+  'hudChrome.mounts.name_emberbristle_broom': '余烬鬃毛扫帚',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    '一把系着橙色丝带的收获扫帚，悬浮在离地一掌高的地方，鬃毛不断洒落余烬。南瓜灯之夜结束时，它会化回一堆稻草。',
+  'seasonal.tricks.gourdlight_costume_skeleton': '骷髅装扮',
+  'seasonal.tricks.gourdlight_costume_ghost': '幽灵装扮',
+  'seasonal.tricks.gourdlight_costume_bat': '蝙蝠装扮',
+  'seasonal.costume': '你喝下药剂，模样变了：{trick}！',
+  'seasonal.titleGranted': '你读完了令状。获得新头衔：{title}。',
+  'seasonal.titleKnown': '你已经拥有这个头衔，令状留在你身上。',
+  'seasonal.boundItemGone': '南瓜灯之夜结束了，你的{item}化回了稻草。',
+  'seasonal.itemUse.costumeSkeleton':
+    '使用：变成一具咔咔作响的骷髅，持续{minutes}分钟。使用后消耗。战斗中无法使用，进入战斗会结束效果。仅限南瓜灯之夜期间。纯外观。',
+  'seasonal.itemUse.costumeGhost':
+    '使用：变成一个飘荡的幽灵，持续{minutes}分钟。使用后消耗。战斗中无法使用，进入战斗会结束效果。仅限南瓜灯之夜期间。纯外观。',
+  'seasonal.itemUse.costumeBat':
+    '使用：变成一只扑腾的蝙蝠，持续{minutes}分钟。使用后消耗。战斗中无法使用，进入战斗会结束效果。仅限南瓜灯之夜期间。纯外观。',
+  'seasonal.itemUse.titleWrit':
+    '使用：为这个角色获得头衔{title}，可在功绩之书中佩戴。使用后消耗。仅限南瓜灯之夜期间。如果你已拥有该头衔，令状会保留。',
+  'seasonal.itemUse.sheaf':
+    '每天拾取老稻草狞笑的战利品时获得一个，直到你拥有余烬鬃毛扫帚为止。赫丝特·葫芦芯在东溪、芬桥和高望的摊位用{count}个交换扫帚。南瓜灯之夜结束时会化为稻草。',
+  'entities.items.rattlebone_draught.name': '骨响药剂',
+  'entities.items.haunting_draught.name': '幽魂药剂',
+  'entities.items.batwing_draught.name': '振翅药剂',
+  'entities.items.writ_of_the_gourdlit.name': '南瓜灯辉令状',
+  'entities.items.writ_of_the_trickster.name': '捣蛋鬼令状',
+  'entities.items.writ_of_the_hollow_grin.name': '空洞笑脸令状',
+  'entities.items.reins_emberbristle_broom.name': '余烬鬃毛扫帚',
+  'entities.items.emberwoven_sheaf.name': '余烬编织草束',
+  'entities.items.hearthroot_toffee.name': '炉根太妃糖',
+  'entities.items.gourdseed_brittle.name': '南瓜籽脆糖',
+  'entities.items.crabapple_chew.name': '海棠果软糖',
+  'entities.items.owlwatch_fudge.name': '鸮望台软糖',
+  'entities.items.lantern_mint_drop.name': '灯笼薄荷糖',
+  'entities.mobs.gourdlight_swelling_gourd.name': '膨胀巨瓜',
+  'entities.mobs.gourdlight_strawling.name': '稻草小人',
+  'seasonal.pumpkins.name': '闹鬼南瓜',
+  'seasonal.pumpkins.title': '闹鬼南瓜',
+  'seasonal.pumpkins.world': '世界',
+  'seasonal.pumpkins.found':
+    '你点亮了{zone}的一只闹鬼南瓜：{count}/{total}。获得南瓜灯糖：{sweets}。',
+  'seasonal.pumpkins.flash': '找到闹鬼南瓜！{count}/{total}',
+  'seasonal.itemSource.pumpkinHead':
+    '首次拾取野猪草甸外南瓜田里老稻草狞笑的战利品时掉落。没有商人出售。',
+  'entities.items.cursed_candle_stub.name': '诅咒蜡烛残头',
+  'entities.items.gourdlight_crow_feather.name': '南瓜灯乌鸦羽毛',
+  'entities.items.thatchgrin_patch_pumpkin.name': '南瓜田的南瓜',
+  'entities.quests.q_gourdlight_daily_patch.title': '南瓜田里的南瓜',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    '野猪草甸外，老稻草狞笑的南瓜田结满了南瓜，有一半都滚出了他的稻草圈，小心些就能够到。给我带五个来，{playerName}。离那个老稻草人远一点，他每一个都数着呢。',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    '五个圆滚滚的，一口都没被啃过。够整个谷地做馅饼了。拿着，辛苦费。',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': '南瓜田的南瓜',
+  'entities.quests.q_gourdlight_daily_boo.title': '哇！',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    '这几个镇子里，一整年都没人被好好吓过一回了，{playerName}。没有惊吓的南瓜灯之夜，不过是个冷夜罢了。穿上装扮，我的药剂哪种都行，要是你赢到了那颗南瓜头也可以。然后悄悄靠近三位镇民，冲他们大喊一声“哇！”',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    '三个？我在广场另一头都听见厨子把锅掉地上了。干得好。这是你的那份。',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': '被吓到的镇民',
+  'entities.quests.q_gourdlight_daily_wicks.title': '邪恶的烛芯',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    '有人在我们的路灯脚下放了燃着绿火的蜡烛。它们烧着却不融化，你一转身它们就低声细语。去掐灭六根吧，{playerName}，三个镇子哪里都行，把残头带回来给我。',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    '六个残头，冷得像霜。点火的人还得再加把劲才行。拿着这个，去洗洗手。',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': '掐灭的诅咒蜡烛',
+  'entities.quests.q_gourdlight_daily_towns.title': '每个镇子敲一扇门',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    '孩子们说，真正的南瓜灯行者会在天亮前把每个镇子的门都敲一遍。去证明他们说得对吧，{playerName}。在东溪、芬桥和高望各找一扇门说不给糖就捣蛋。路上的灯笼会为你照路。',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    '一夜跑了三个镇子！这份奖励你的靴子比你更配得上。',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': '在东溪敲过的门',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': '在芬桥敲过的门',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': '在高望敲过的门',
+  'entities.quests.q_gourdlight_daily_feathers.title': '为篝火取羽',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    '老稻草狞笑被逼急了，就会唤来乌鸦扑向敲打他稻草的人。它们的羽毛在炉火里会烧出绿焰，今晚的篝火我需要三根。去他的田里参加一场战斗，{playerName}，从他的乌鸦身上拔下羽毛。',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    '黑得像没有月亮的田野，已经带着烟味了。篝火一定很壮观。谢谢你。',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': '乌鸦羽毛',
+  'entities.quests.q_gourdlight_daily_baskets.title': '给邻居的篮子',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    '每年南瓜灯之夜，我都会给每个镇子的一位老朋友装一篮糖果，可我的膝盖大不如前了。替我送过去吧，{playerName}：东溪的Cook Marlow、芬桥的草药师Yara，还有高望的Loremaster Caddis。',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    '三篮都送到了，听说Marlow还哭了。他每次都哭。来，这一篮是你的。',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': '交给Cook Marlow的篮子',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label': '交给草药师Yara的篮子',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label': '交给Loremaster Caddis的篮子',
+  'seasonal.boo.row': '哇！',
+  'seasonal.boo.rowAria': '跳到{name}面前大喊一声哇',
+  'seasonal.boo.needsCostume':
+    '先穿上装扮：装扮药剂、蝙蝠或骷髅恶作剧、稻草小人护符，雕刻南瓜头，或咕嘟绿坩埚里一口变成地精的汤。',
+  'seasonal.boo.frightenedHint': '{name}还被你上次吓得心惊胆战。去找别人吧。',
+  'seasonal.boo.landed': '你跳到{name}面前大喊一声哇！对方尖叫一声，差点把东西全掉了。',
+  'seasonal.boo.flash': '哇！{name}被吓到了！',
+  'seasonal.boo.noCostume': '没穿装扮，{name}只是冲你笑。先换上一套吧。',
+  'seasonal.boo.already': '{name}今天已经被吓够了。',
+  'seasonal.boo.notOnErrand': '赫丝特今天没让你去吓唬谁。',
+  'entities.items.prankers_pumpkin.name': '捣蛋鬼的南瓜',
+  'entities.items.wanderwisp_lantern.name': '游荡鬼火提灯',
+  'entities.items.sack_of_startled_bats.name': '一袋受惊的蝙蝠',
+  'entities.items.murmurwick_candle.name': '低语烛芯蜡烛',
+  'seasonal.itemUse.toyPrank':
+    '使用：扔向{range}码内另一名可见的玩家。对方的头会变成发光的南瓜灯，持续{seconds}秒，对方可以右键点击取下。你们双方都不能处于战斗中，你也不能处于潜行状态。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后会从背包中消失。仅外观。',
+  'seasonal.itemUse.toyLantern':
+    '使用：把灯笼放在你面前。一个小幽灵会绕着你飘{seconds}秒。战斗中或潜行时无法使用。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后会从背包中消失。仅外观。',
+  'seasonal.itemUse.toyBats':
+    '使用：打开袋子。一群吱吱叫的蝙蝠冲出来，在你周围四散飞舞{seconds}秒。战斗中或潜行时无法使用。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后会从背包中消失。仅外观。',
+  'seasonal.toy.prank': '你扔出南瓜，啪地砸在了{name}身上！',
+  'seasonal.toy.lantern': '你放下提灯，一个小幽灵飘了出来陪着你。',
+  'seasonal.toy.bats': '你打开袋子，一群受惊的蝙蝠冲了出来！',
+  'seasonal.toy.pranked': '{name}把一个南瓜砸在了你头上！右键点击取下，或者骄傲地戴着吧。',
+  'seasonal.toy.prankedFlash': '被{name}捉弄了！',
+  'seasonal.toy.prankNeedsPlayer': '南瓜只能砸向另一名不在战斗中的玩家。',
+  'seasonal.toy.hidden': '先从阴影里出来：玩具会暴露你的位置。',
+  'entities.items.gurglegreen_cauldron.name': '咕嘟绿坩埚',
+  'seasonal.itemUse.toyCandleShadows':
+    '使用：在你面前点燃蜡烛。{seconds}秒内，烛火会在周围地面上投下猫、蝙蝠和女巫的舞动影子，附近所有人都能看到。战斗中或潜行时无法使用。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后从背包中消失。仅外观。',
+  'seasonal.itemUse.toyCauldron':
+    '使用：在你面前放下一口咕嘟冒泡的大坩埚。它会存在{standing}秒，任何喝下的玩家都会被绿色气泡包围，并在{seconds}秒内变成哥布林（身上的装扮会被替换）。战斗中或潜行时无法放置或饮用，进入战斗会结束哥布林形态。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后从背包中消失。仅外观。',
+  'seasonal.itemUse.broomSources':
+    '向赫丝特·葫芦芯用{count}个草束购买，或在你拾取老稻草狞笑战利品的当天极少数情况下由其掉落。骑乘需要骑术技能。仅在南瓜灯之夜期间存在，结束时会化为稻草。',
+  'seasonal.toy.candleShadows': '你点燃了蜡烛，影子开始在烛火周围起舞。',
+  'seasonal.toy.cauldron': '你放下坩埚，它开始咕嘟冒泡。',
+  'seasonal.toy.cauldronDrink': '你喝了一口坩埚里的东西，被绿色气泡包围，变成了一只哥布林！',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name}沉睡至夜幕降临。',
+  'hudChrome.auraEffect.slumberNight': '毫无生气地挂在木桩上，直到夜幕降临。无法被攻击。',
+  'seasonal.thatchgrin.poleBound': '缚于木桩',
+  'seasonal.thatchgrin.wakeYell': '夜幕降临南瓜田！谁敢踏进我的田地？',
+  'seasonal.thatchgrin.sleepYell': '太阳出来了。回到木桩上，继续看守。',
 };

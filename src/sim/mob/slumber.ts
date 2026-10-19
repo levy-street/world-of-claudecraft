@@ -24,6 +24,7 @@ import { isDaylightPhase } from '../day_night';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { type Aura, DT, dist2d, type Entity, type MobTemplate } from '../types';
+import { shouldSkipIdleMobTick } from './idle_tick_skip';
 import { highestThreatTarget } from './targeting';
 import { emitMobYell } from './yells';
 
@@ -41,10 +42,16 @@ type SlumberDef = NonNullable<MobTemplate['slumber']>;
  */
 export type SlumberTick = 'awake' | 'homing' | 'asleep' | 'rising';
 
-/** Night, for a slumbering template: a clocked host past sunset. Clockless is day. */
-function slumberNight(ctx: SimContext): boolean {
+/**
+ * Bedtime, for a slumbering template: a clocked host past sunset for a daytime boss
+ * (`awakeAt` absent or 'day'), or a clocked host with the sun up for a NIGHT boss
+ * (`awakeAt: 'night'`, Old Thatchgrin, who hangs on his pole by day). A clockless host
+ * never sleeps anyone: tests and the RL env keep the pre-cycle world either way.
+ */
+export function slumberBedtime(ctx: SimContext, def: SlumberDef): boolean {
   const phase = ctx.dayNightPhase();
-  return phase !== null && !isDaylightPhase(phase);
+  if (phase === null) return false;
+  return def.awakeAt === 'night' ? isDaylightPhase(phase) : !isDaylightPhase(phase);
 }
 
 /**
@@ -54,14 +61,7 @@ function slumberNight(ctx: SimContext): boolean {
 export function tickSlumber(ctx: SimContext, mob: Entity): SlumberTick {
   const def = MOBS[mob.templateId]?.slumber;
   if (!def) return 'awake';
-  const clockNight = slumberNight(ctx);
-  // A /dev hold (devWakeSlumber / devSleepSlumber below) outlasts the clock only until
-  // the clock agrees with it: woken at night he stays up until the day comes (and goes to
-  // bed at the NEXT dusk by the normal rule); put to bed by day he sleeps until the night
-  // comes (and wakes at the next dawn). Undefined for every mob no /dev ever touched.
-  if (mob.slumberDevHold === 'awake' && !clockNight) mob.slumberDevHold = undefined;
-  if (mob.slumberDevHold === 'asleep' && clockNight) mob.slumberDevHold = undefined;
-  const night = mob.slumberDevHold === undefined ? clockNight : mob.slumberDevHold === 'asleep';
+  const night = effectiveBedtime(ctx, mob, def);
   if (mob.asleep) {
     if (night) {
       holdAsleep(mob, def);
@@ -74,16 +74,7 @@ export function tickSlumber(ctx: SimContext, mob: Entity): SlumberTick {
   if (!night) return 'awake';
   // Night, and he is up. A running fight is fought to its end: the pull decides when
   // the day ends, not the clock. An evade walk home is already a walk home.
-  if (
-    mob.inCombat ||
-    mob.threat.size > 0 ||
-    mob.aiState === 'chase' ||
-    mob.aiState === 'attack' ||
-    mob.aiState === 'flee' ||
-    mob.aiState === 'evade'
-  ) {
-    return 'awake';
-  }
+  if (inAFight(mob)) return 'awake';
   // Idle after dark: walk home, and lie down once in bed.
   if (dist2d(mob.pos, mob.spawnPos) > def.bedRadius) {
     if (!ctx.isRooted(mob)) {
@@ -94,6 +85,63 @@ export function tickSlumber(ctx: SimContext, mob: Entity): SlumberTick {
   }
   fallAsleep(ctx, mob, def);
   return 'asleep';
+}
+
+/** Bedtime as this mob keeps it: the clock, unless a /dev hold still outlasts it. A
+ *  /dev hold (devWakeSlumber / devSleepSlumber below) outlasts the clock only until the
+ *  clock agrees with it: woken at night he stays up until the day comes (and goes to bed
+ *  at the NEXT dusk by the normal rule); put to bed by day he sleeps until the night
+ *  comes (and wakes at the next dawn). Undefined for every mob no /dev ever touched. */
+function effectiveBedtime(ctx: SimContext, mob: Entity, def: SlumberDef): boolean {
+  const clockNight = slumberBedtime(ctx, def);
+  if (mob.slumberDevHold === 'awake' && !clockNight) mob.slumberDevHold = undefined;
+  if (mob.slumberDevHold === 'asleep' && clockNight) mob.slumberDevHold = undefined;
+  return mob.slumberDevHold === undefined ? clockNight : mob.slumberDevHold === 'asleep';
+}
+
+/** A pull still running (or an evade walk home): the fight decides when the day ends. */
+function inAFight(mob: Entity): boolean {
+  return (
+    mob.inCombat ||
+    mob.threat.size > 0 ||
+    mob.aiState === 'chase' ||
+    mob.aiState === 'attack' ||
+    mob.aiState === 'flee' ||
+    mob.aiState === 'evade'
+  );
+}
+
+/**
+ * Bedtime with nobody watching. The live hosts throttle an idle, aura-less mob outside
+ * every player's interest radius (mob/idle_tick_skip.ts), and an awake sleeper has no
+ * aura, so the throttle would skip the very tick that sends him to bed: he would stay up
+ * until a player rode within the radius, and that player could catch him awake out of
+ * hours. A caller that ticks this one mob anyway (seasonal/scarecrow.ts, once a tick for
+ * Old Thatchgrin) hands his bedtime here: due, idle and unwatched, he is put straight
+ * onto his bed (the spawn spot and facing; nobody is near to see the step), with the
+ * same lie-down a watched dusk runs. Watched, or in a fight, this does nothing and the
+ * ordinary per-tick driver keeps the walk home. Asleep he carries the slumber aura, so
+ * the throttle never holds back a wake. Zero rng. True when he was put to bed.
+ * One recorded consequence: the throttle radius is a host knob, so with it off (tests,
+ * parity) a far boss still walks home at dawn, and with it on he is set on his bed at
+ * once; deterministic per host config, and his lie-down yell and realm notice come that
+ * many ticks sooner. The watched test reads his current spot, not his bed's.
+ */
+export function settleUnwatchedSlumber(ctx: SimContext, mob: Entity): boolean {
+  const def = MOBS[mob.templateId]?.slumber;
+  if (!def || mob.dead || mob.asleep) return false;
+  if (!effectiveBedtime(ctx, mob, def) || inAFight(mob)) return false;
+  if (!shouldSkipIdleMobTick(ctx, mob)) return false;
+  // (a rise the throttle left unfinished is simply over: fallAsleep zeroes it)
+  mob.pos = ctx.groundPos(mob.spawnPos.x, mob.spawnPos.z);
+  mob.prevPos = { ...mob.pos };
+  ctx.rebucket(mob);
+  if (mob.bedFacing !== undefined) {
+    mob.facing = mob.bedFacing;
+    mob.prevFacing = mob.bedFacing;
+  }
+  fallAsleep(ctx, mob, def);
+  return true;
 }
 
 /**
@@ -131,6 +179,17 @@ function rise(ctx: SimContext, mob: Entity): SlumberTick {
 
 function fallAsleep(ctx: SimContext, mob: Entity, def: SlumberDef): void {
   mob.asleep = true;
+  // A bed that is a fixed prop (his pole) takes him exactly: the spot and the facing he
+  // was raised with, so the body hangs on the post and never beside it.
+  if (def.snapToBed) {
+    mob.pos = ctx.groundPos(mob.spawnPos.x, mob.spawnPos.z);
+    mob.prevPos = { ...mob.pos };
+    ctx.rebucket(mob);
+    if (mob.bedFacing !== undefined) {
+      mob.facing = mob.bedFacing;
+      mob.prevFacing = mob.bedFacing;
+    }
+  }
   if (mob.slumberRise !== undefined) mob.slumberRise = 0;
   mob.hostile = false;
   mob.aiState = 'idle';
@@ -146,7 +205,14 @@ function fallAsleep(ctx: SimContext, mob: Entity, def: SlumberDef): void {
   // Anchorless log => broadcast to every connected player as a system notice, exactly
   // like the "rises over" spawn line; localized by the sim_i18n RULE matched on this
   // literal shape. It is the "he is gone for the night" the whole realm wants to know.
-  ctx.emit({ type: 'log', text: `${mob.name} sleeps until dawn.`, color: '#ffd100' });
+  ctx.emit({
+    type: 'log',
+    text:
+      def.awakeAt === 'night'
+        ? `${mob.name} sleeps until nightfall.`
+        : `${mob.name} sleeps until dawn.`,
+    color: '#ffd100',
+  });
 }
 
 /** Re-assert the sleeping invariants every tick (the aura is presentation of the state,
@@ -197,7 +263,23 @@ function slumberAura(mob: Entity, def: SlumberDef): Aura {
     permanent: true,
     sourceId: mob.id,
     school: 'physical',
+    // 1: a NIGHT sleeper (awakeAt 'night'): the frame's tooltip says "until nightfall"
+    ...(def.awakeAt === 'night' ? { value2: 1 } : {}),
   };
+}
+
+/**
+ * A sleeper raised while it is already his bedtime (Old Thatchgrin standing up in his
+ * field by day) starts ON his bed, asleep, with no lie-down yell or realm notice: he was
+ * never awake. The per-tick driver then holds the sleep and wakes him at his hour.
+ */
+export function spawnAsleepIfBedtime(ctx: SimContext, mob: Entity): void {
+  const def = MOBS[mob.templateId]?.slumber;
+  if (!def || !slumberBedtime(ctx, def)) return;
+  mob.asleep = true;
+  mob.hostile = false;
+  mob.aiState = 'idle';
+  holdAsleep(mob, def);
 }
 
 /**

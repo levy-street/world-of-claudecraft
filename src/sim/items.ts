@@ -106,6 +106,7 @@ import { placeMobileStationFromItem } from './professions/mobile_station';
 import { useRecipePatternItem } from './professions/pattern_items';
 import { refreshModsForEquipmentChange } from './progression/talents';
 import { useForgebreakerEmber } from './quests/forgebreaker_ember';
+import { openGourdlightPouch, openThatchgrinSack, useSeasonalItem } from './seasonal';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { usePassingStone } from './tutorial/death_lesson';
@@ -131,6 +132,7 @@ import {
   type VendorBuyOptions,
   vendorCountForced,
 } from './vendor_buy_stack';
+import { vendorTokenPrice } from './vendor_token_price';
 import { wispMazeActionsLocked } from './wisp_maze_action_lock';
 
 const VENDOR_BUYBACK_LIMIT = 12;
@@ -991,7 +993,14 @@ export function useItem(
   }
   if (p.dead) return;
   if (def.use?.type === 'container') {
-    openEmissaryCache(ctx, meta, consumeOneUnit);
+    if (def.use.container === 'gourdlight_pouch') openGourdlightPouch(ctx, meta, consumeOneUnit);
+    else if (def.use.container === 'thatchgrin_sack') openThatchgrinSack(ctx, meta, consumeOneUnit);
+    else openEmissaryCache(ctx, meta, consumeOneUnit);
+    return;
+  }
+  // Seasonal toys (seasonal/seasonal_items.ts): refused while the event is closed.
+  if (def.use?.type === 'seasonal') {
+    useSeasonalItem(ctx, meta, p, def.use.action, consumeOneUnit, def.id);
     return;
   }
   if (def.use?.type === 'throw') {
@@ -1383,7 +1392,12 @@ export function buyItem(
   const hasCopperPrice = copperUnitPrice > 0;
   const hasHonorPrice = honorPrice > 0;
   const hasFactionPrice = factionCurrencyCost > 0;
-  if (!def || (!freeVendor && !hasCopperPrice && !hasHonorPrice && !hasFactionPrice)) {
+  // Token price (ItemDef.priceItem, a seasonal event's sweets): per purchase.
+  const tokenPrice = vendorTokenPrice(def);
+  if (
+    !def ||
+    (!freeVendor && !hasCopperPrice && !hasHonorPrice && !hasFactionPrice && !tokenPrice)
+  ) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -1431,12 +1445,17 @@ export function buyItem(
   // (ridingTrained, purchased from Marla for 80g), a hard level-20 gate, and a
   // one-per-account ownership check (owning the reins item IS owning the mount).
   // Placed after the vendor stock/price checks, before payment.
+  // An EVENT-BOUND reins row (ItemDef.seasonalEvent: Hester's Emberbristle Broom, bought
+  // with the tokens a level-10 crowd earns at Old Thatchgrin) skips the riding and
+  // level-20 gates: it is a keepsake that leaves with its event, and riding it still
+  // needs the riding skill (mounts.ts). The one-copy ownership check always applies.
   if (def.kind === 'mount') {
-    if (!meta.ridingTrained) {
+    const eventKeepsake = !!def.seasonalEvent;
+    if (!eventKeepsake && !meta.ridingTrained) {
       ctx.error(meta.entityId, 'You must learn to ride first. Find a riding trainer.');
       return;
     }
-    if (p.level < 20) {
+    if (!eventKeepsake && p.level < 20) {
       ctx.error(meta.entityId, 'You must be level 20 to buy a mount.');
       return;
     }
@@ -1480,7 +1499,12 @@ export function buyItem(
   // every row; a valid one is force-1 there), so `count` here is always a
   // safe integer >= 1.
   const bulkEligible =
-    bulk && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount' && !def.soulbound;
+    bulk &&
+    hasCopperPrice &&
+    !hasHonorPrice &&
+    !tokenPrice &&
+    def.kind !== 'mount' &&
+    !def.soulbound;
   let qty: number;
   let copperCost: number;
   let honorCost: number;
@@ -1489,7 +1513,7 @@ export function buyItem(
     copperCost = freeVendor ? 0 : copperUnitPrice * qty;
     honorCost = freeVendor ? 0 : honorPrice;
   } else {
-    const appliedCount = vendorCountForced(def) ? 1 : count;
+    const appliedCount = vendorCountForced(def) || tokenPrice ? 1 : count;
     const totals = buyPurchaseTotals(
       def,
       freeVendor ? 0 : copperUnitPrice,
@@ -1520,11 +1544,17 @@ export function buyItem(
     ctx.error(meta.entityId, 'Not enough honor.');
     return;
   }
+  const tokenCost = tokenPrice && !freeVendor ? tokenPrice : null;
+  if (tokenCost && ctx.countItem(tokenCost.itemId, meta.entityId) < tokenCost.count) {
+    ctx.error(meta.entityId, 'You cannot afford that.');
+    return;
+  }
   if (buyBuddyOffer(ctx, meta.entityId, def, copperCost, honorCost)) return;
   if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
+  if (tokenCost) ctx.removeItem(tokenCost.itemId, tokenCost.count, meta.entityId);
   if (hasFactionPrice && requiredFaction && !freeVendor) {
     if (!meta.factionCurrencies) {
       meta.factionCurrencies = { rift_watch: 0, church_order: 0, automatons: 0 };

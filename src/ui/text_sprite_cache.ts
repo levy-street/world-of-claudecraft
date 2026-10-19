@@ -106,10 +106,10 @@ interface TextInk {
  *  store), a POI label 162x45 (29KB), a portal name 138x44 (24KB), the zone title
  *  154x49 (30KB), a quest-giver glyph 34x48 (6KB), a badge digit 12x20 (1KB). So
  *  the ordinary couple of dozen is around half a megabyte, the 1285-label
- *  pathological mix is about 23MB, and 1300 sprites all of them ally names,
+ *  pathological mix is about 23MB, and 1325 sprites all of them ally names,
  *  which nothing can actually ask for (it needs a 1,000-seat guild entirely
  *  online and plotted at once, the realm's whole concurrency target in one
- *  guild), would be 27MB: the same class as a handful of cached zone terrain
+ *  guild), would be about 28MB: the same class as a handful of cached zone terrain
  *  canvases, and the LRU trim is what keeps ordinary play nowhere near it.
  *  (385 was the worst case the realm grid brought, plus the phase 23 repeat
  *  glyph; the 900 on top is the guild roster ladder, which took the ally-name
@@ -117,8 +117,9 @@ interface TextInk {
  *  tests/text_sprite_cache.ts derives it from content.) */
 // 1300: the guild roster ladder (src/sim/guild_roster.ts) carried the derived
 // worst case from 385 to 1285; the next round step keeps a small content margin
-// (the test reddens again the day it is outgrown).
-export const TEXT_SPRITE_LIMIT = 1300;
+// (the test reddens again the day it is outgrown). 1325: Gourdlight Eve's rounds and
+// six dailies pushed the quest-count term past the 1300 margin (derived 1306).
+export const TEXT_SPRITE_LIMIT = 1325;
 
 // Slack around the measured ink on every side, so glyph antialiasing is never
 // clipped. The outline's own reach is added on top (see SPRITE_MITER_LIMIT).

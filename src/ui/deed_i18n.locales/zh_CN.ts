@@ -939,4 +939,21 @@ export const table: DeedLocaleTable = {
     name: '人赃俱获',
     desc: '在埋藏的宝藏中击杀钱袋窜贼，在它带着金币逃脱前。',
   },
+  feat_gourdlight_doorsteps: {
+    name: '家家门前',
+    desc: '在南瓜灯之夜期间，向三座城镇中每一位会应门的居民说“不给糖就捣蛋”。',
+  },
+  feat_gourdlight_errands: {
+    name: '赫丝特的跑腿',
+    desc: '赫丝特·葫芦芯每日轮换的南瓜灯之夜差事，每一项至少完成一次。',
+  },
+  feat_gourdlight_frights: {
+    name: '三镇惊魂',
+    desc: '在赫丝特的“哇！”差事中，分别吓唬三座城镇里的一位居民。',
+  },
+  feat_gourdlight_eve_complete: {
+    name: '南瓜灯之夜，从头到尾',
+    desc: '完整经历南瓜灯之夜：击败老稻草狞笑，找到所有闹鬼南瓜，完成赫丝特的每一项差事，敲遍每一扇门，并在三座城镇各吓唬一位居民。',
+    title: '南瓜誓约者',
+  },
 };

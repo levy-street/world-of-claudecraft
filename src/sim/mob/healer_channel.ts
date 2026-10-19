@@ -1,3 +1,4 @@
+import { THATCHGRIN_KIT } from '../content/gourdlight_eve_scarecrow';
 import { TEMPLE_BOSS_CAST_SCHOOLS } from '../encounters/drowned_temple/ids';
 import { ILVANE_CAST_SCHOOLS } from '../encounters/hollow_crypt/ilvane_ids';
 import {
@@ -30,6 +31,8 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: { school: 'fire' },
   [VARKHUL_CINDER_REPAIR_CAST_ID]: { school: 'fire' },
   [IGNIVAR_CINDER_LANCE_CAST_ID]: { school: 'fire' },
+  // Old Thatchgrin's Thatchbound bar (seasonal/scarecrow_puppet.ts): a kick fizzles it.
+  [THATCHGRIN_KIT.puppet.name]: { school: THATCHGRIN_KIT.puppet.school },
   // Buried Hoard control casts: a fear, stun, silence or hex a hoard mob casts
   // instead of landing instantly (src/sim/rift/hoard_control_casts.ts).
   ...HOARD_CONTROL_CAST_SCHOOLS,

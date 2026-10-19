@@ -173,6 +173,7 @@ import {
 import {
   addCharacterEffectAura,
   CHARACTER_EFFECT_RECKLESSNESS,
+  CHARACTER_EFFECT_SEASONAL_FUMES,
   CHARACTER_EFFECT_SOUL_REND,
   hasCharacterEffect,
 } from './character_effects_core';
@@ -236,6 +237,7 @@ import {
 } from './characters/form_visual_selection_core';
 import { visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
+import { effectiveHelmHidden } from './characters/seasonal_head_core';
 import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
@@ -451,9 +453,11 @@ import {
   storePooledObject as storeGroundObjectInPool,
   takeOrBuildGroundObject,
 } from './ground_object_pool';
+import { buildGroundObjectSparkle, groundObjectSparkleMaterial } from './ground_object_sparkle';
 import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
+import { buildHauntedPumpkin, syncHauntedPumpkin } from './haunted_pumpkin';
 import { usedJsHeapMb } from './heap_sample';
 import { buildHighwatchTownView, type HighwatchTownView } from './highwatch_town';
 import { HillRingVisuals } from './hill_ring';
@@ -704,7 +708,7 @@ import {
   syncRaidEncounterAnchorVisuals,
   syncRaidEncounterRigVisuals,
 } from './raid_encounter_visuals';
-import { isOwnedPetHostile } from './reaction';
+import { isHostileSelectionTarget } from './reaction';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import {
   RenderBudgetGovernor,
@@ -763,6 +767,7 @@ import { createRiftAwareGroundSampler } from './rift_ground_sample';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
+import { entityDisplayScale, ScarecrowFx } from './scarecrow_fx';
 import {
   captureSceneCensus,
   createHitchTracker,
@@ -776,6 +781,7 @@ import { sceneKeyLightUniform } from './scene_sampling';
 import * as sceneryDetail from './scenery_detail';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
+import { SeasonalDecor } from './seasonal_decor';
 import { applySeatAnim } from './seated_pose';
 import { drapeRingLocalY, reticleShownUnder, selectionRingScale } from './selection_ring';
 import {
@@ -806,7 +812,7 @@ import {
   shadowTexelWorldSize,
   snapShadowAnchor,
 } from './shadow_texel_snap_core';
-import { disposeUnsharedMeshResources, markSharedMaterial } from './shared_resource';
+import { disposeUnsharedMeshResources } from './shared_resource';
 import { shipShadowHold } from './ship_shadow_hold';
 import {
   buildSky,
@@ -853,7 +859,6 @@ import { refreshTextureAnisotropy } from './texture_anisotropy';
 import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { uploadDataTextureInChunks } from './texture_upload';
-import { sparkleTexture } from './textures';
 import {
   groundSpeedFromFrame,
   hasTravelFormAura,
@@ -886,6 +891,7 @@ import {
 } from './view_create_budget_core';
 import { ViewCreateRetryGate } from './view_create_retry';
 import { createViewVfxPoseFill } from './view_vfx_pose';
+import { measureCanvasViewport } from './viewport_measure';
 import {
   routeWarlockMeteorSpellfxAt,
   WarlockMeteorFx,
@@ -1110,7 +1116,6 @@ const SELECTION_RING_BOOST = 1.5;
 const SELECTION_RING_SPIN = 0.6; // rad/s, slow classic target-reticle rotation
 
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
-const SPARKLE_BOOST = 1.5;
 // Third-person camera obstruction is opacity-only. Anything registered as a
 // hideable crosses the eye-to-camera segment through the shared fade policy.
 // The requested chase-camera distance is never changed by scene geometry.
@@ -1719,6 +1724,7 @@ export class Renderer {
   private amberFeatures: AmberFeaturesView | null = null;
   private nightFeatures: NightFeaturesView | null = null;
   private streetlamps: StreetlampsView | null = null;
+  private seasonalDecor: SeasonalDecor | null = null; // seasonal_decor.ts (event-gated)
   private emberPools: EmberPoolsView | null = null;
   private campBraziers: CampBraziersView | null = null;
   private decorTorchFx: DecorTorchFxView | null = null;
@@ -1989,6 +1995,7 @@ export class Renderer {
   ) => void;
   private frozenOrbFx!: FrozenOrbFx;
   private worldBoss!: WorldBossLayer; // Balgath's fx, far sprites, ward badges
+  private scarecrowFx!: ScarecrowFx; // Gourdlight Eve's field boss (scarecrow_fx.ts)
   private mageGroundFx!: MageGroundFx;
   private varkhulForgestormVisuals?: VarkhulForgestormVisuals;
   private nythraxisMechanicVisuals?: NythraxisMechanicVisuals;
@@ -2342,7 +2349,7 @@ export class Renderer {
       showOwnNameplate: () => this.showOwnNameplate,
       showPlayerNameplates: () => this.showPlayerNameplates,
       showPetNames: () => this.showPetNames,
-      isHostilePlayer: (e) => this.isHostilePlayer(e),
+      isHostilePlayer: (e) => isPvpHostilePlayer(this.sim, e),
     });
 
     // Boot values match the vale/low presets; updateAmbience eases from here.
@@ -2825,6 +2832,8 @@ export class Renderer {
     // in submits draws; its point lights join the shared fire-light budget.
     this.streetlamps = buildStreetlamps(this.sim.cfg.seed);
     this.attachZoneFeature(this.streetlamps);
+    const seasonalEvent = () => this.sim.activeSeasonalEvent; // built on the event's first open
+    this.seasonalDecor = new SeasonalDecor(this.scene, this.sim.cfg.seed, seasonalEvent, this.worldCompileGate(), this.budgetLights);
     // Warm ground pools under nearby characters after dark. Camera-band sized
     // and rewritten every frame from the entity loop, so it is NOT a zone
     // feature: it is a pooled overlay the sync loop fills.
@@ -3140,6 +3149,7 @@ export class Renderer {
     const offsetVfxAnchor = createOffsetVfxAnchor(fillVfxPose);
     bd('scene-misc');
     this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor, this.groundSample, gate);
+    this.scarecrowFx = new ScarecrowFx(this.scene, this.vfx, (x, z) => groundHeight(x, z, this.sim.cfg.seed), () => this.sim.entities, (id) => this.sim.entities.get(id), gate, () => this.audioSink, (id, color, k) => { const v = this.views.get(id); if (!v) return; if (k > 0) this.activeVisual(v)?.setAuraGlow(color, k); else { v.visual?.setAuraGlow(color, 0); v.sheepVisual?.setAuraGlow(color, 0); } }, () => this.sim.cfg.seed);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
     this.farmPatchVisuals = new FarmPatchVisuals(
@@ -3485,22 +3495,7 @@ export class Renderer {
   }
 
   private measureViewport(): { width: number; height: number } {
-    const rect = this.webgl.domElement.getBoundingClientRect();
-    const stableMobileGameViewport =
-      document.body.classList.contains('game-active') &&
-      document.body.classList.contains('mobile-touch');
-    const vv = stableMobileGameViewport ? null : window.visualViewport;
-    const width = Math.round(
-      stableMobileGameViewport
-        ? rect.width || window.innerWidth
-        : (vv?.width ?? (rect.width || window.innerWidth)),
-    );
-    const height = Math.round(
-      stableMobileGameViewport
-        ? rect.height || window.innerHeight
-        : (vv?.height ?? (rect.height || window.innerHeight)),
-    );
-    return { width: Math.max(1, width), height: Math.max(1, height) };
+    return measureCanvasViewport(this.webgl.domElement); // viewport_measure.ts
   }
 
   private captureGlIdentity(): void {
@@ -5104,6 +5099,7 @@ export class Renderer {
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.worldBoss.fx.update(dt, this.reducedMotion(), this.sim.entities.values());
+    this.scarecrowFx.update(dt, this.reducedMotion());
     this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
@@ -7333,6 +7329,7 @@ export class Renderer {
           break;
         }
         if (ev.fx === 'windup') {
+          this.scarecrowFx.handleWindup(ev.sourceId, ev.ability);
           // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to
           // the clip's release pose. `ability` rides along so a mob one-shot
@@ -7507,6 +7504,7 @@ export class Renderer {
       case 'spellfxAt': {
         if (ev.fx === 'hoardDig') break;
         if (routeBalgathSpellfxAt(ev, this.worldBoss?.fx, () => this.sim.entities.values())) break;
+        if (this.scarecrowFx.handleSpellfxAt(ev)) break;
         if (ev.fx === 'soulTravel') {
           if (ev.targetId !== undefined) {
             const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
@@ -8021,6 +8019,11 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body;
+    } else if (e.kind === 'object' && e.templateId === 'ground_haunted_pumpkin') {
+      const built = buildHauntedPumpkin(this.sim, e);
+      if (!built) return;
+      body = objectMesh = built.group;
+      height = built.height;
     } else if (e.kind === 'object' && e.objectItemId === 'soulwell') {
       // Temporary Warlock party utility: bespoke procedural prop today, kept
       // behind buildSoulwell so a generated GLB can replace it later.
@@ -8050,19 +8053,8 @@ export class Renderer {
         e.templateId !== 'delve_locked_door' &&
         e.templateId !== 'delve_destructible_wall'
       ) {
-        if (!this.sparkleMat) {
-          this.sparkleMat = markSharedMaterial(
-            new THREE.SpriteMaterial({
-              map: sparkleTexture(),
-              transparent: true,
-              depthWrite: false,
-            }),
-          );
-          if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST);
-        }
-        sparkle = new THREE.Sprite(this.sparkleMat);
-        sparkle.scale.set(0.9, 0.9, 1);
-        sparkle.position.y = 1.35;
+        this.sparkleMat ??= groundObjectSparkleMaterial(this.lowGfx);
+        sparkle = buildGroundObjectSparkle(this.sparkleMat);
         group.add(sparkle);
       }
     } else if (
@@ -8101,19 +8093,8 @@ export class Renderer {
       if (result.reused) body.rotation.y = groundQuestObjectYaw(e.objectItemId ?? '', e.id);
       objectMesh = body;
       if (!e.objectItemId?.startsWith('forge_')) {
-        if (!this.sparkleMat) {
-          this.sparkleMat = markSharedMaterial(
-            new THREE.SpriteMaterial({
-              map: sparkleTexture(),
-              transparent: true,
-              depthWrite: false,
-            }),
-          );
-          if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST); // gold glint via bloom
-        }
-        sparkle = new THREE.Sprite(this.sparkleMat);
-        sparkle.scale.set(0.9, 0.9, 1);
-        sparkle.position.y = 1.35;
+        this.sparkleMat ??= groundObjectSparkleMaterial(this.lowGfx);
+        sparkle = buildGroundObjectSparkle(this.sparkleMat);
         group.add(sparkle);
       }
     } else {
@@ -8268,7 +8249,7 @@ export class Renderer {
       weaponStowed: false,
       // Born with the CURRENT bit: unlike the stow pose there is no transition
       // to replay, createCharacterVisual composed with it just now.
-      helmHidden: e.helmHidden,
+      helmHidden: effectiveHelmHidden(e),
       // Born with the CURRENT look, for the same reason: createCharacterVisual
       // composed with it just now, so there is nothing to reconcile yet.
       modularAppearance: e.modularAppearance,
@@ -8746,24 +8727,6 @@ export class Renderer {
   triggerHit(entityId: number): void {
     const v = this.views.get(entityId);
     if (v) this.activeVisual(v)?.playHit();
-  }
-
-  private isHostileSelectionTarget(target: Entity): boolean {
-    // A controlled pet inherits its owner's reaction (a player's pet is hostile
-    // only in PvP), so route mobs through the owner-aware helper; everything
-    // else falls back to the player-vs-player verdict.
-    if (target.kind === 'mob') {
-      return target.ownerId !== null
-        ? isOwnedPetHostile(target, this.sim.entities, (p) => this.isHostilePlayer(p))
-        : target.hostile;
-    }
-    return this.isHostilePlayer(target);
-  }
-
-  // The shared client verdict (src/ui/pvp_hostile_core.ts): duel, ranked
-  // arena, Thornhollow Fields, and the open-world /pvp flag pair rule.
-  private isHostilePlayer(target: Entity): boolean {
-    return isPvpHostilePlayer(this.sim, target);
   }
 
   // -------------------------------------------------------------------------
@@ -9948,7 +9911,7 @@ export class Renderer {
       const _stealthed = hasStealth;
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
       const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
-      const displayScale = e.scale * (this.riftDeathZoneVisuals?.bodySwell(e.id) ?? 1);
+      const displayScale = entityDisplayScale(e, this.riftDeathZoneVisuals, this.scarecrowFx);
       if (displayScale !== v.liveScale) {
         v.liveScale = displayScale;
         v.group.scale.setScalar(displayScale);
@@ -10197,6 +10160,8 @@ export class Renderer {
             }
           }
         }
+        if (vis && e.templateId === 'ground_haunted_pumpkin' && v.objectMesh)
+          syncHauntedPumpkin(v.objectMesh, this.sim, e, this.time, this.reducedMotion(), this.vfx);
         if (vis && e.objectItemId === 'soulwell' && v.objectMesh) {
           syncSoulwellVisual(v.objectMesh, this.time, e.id);
         }
@@ -11226,6 +11191,8 @@ export class Renderer {
             this.vfx.lichAura(e.id, dt, soulFragments);
           } else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
           else if (hasShadowform) this.vfx.gloam.wearer(e.id, active.gloamCue(), settled, d2, ay);
+          if (hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SEASONAL_FUMES))
+            this.vfx.fluidSmoke(ax, ay + 0.6, az, 0x7bdc4e, dt, 16); // a seasonal trick's fumes
           // orange worn-gear motes: STATIC-preset-gated sheddable prestige
           if (e.kind === 'player' && gfxTierAtLeast(GFX.effectsTier, 'medium')) {
             if (v.legendaryRegaliaRef !== e.equippedInstances) {
@@ -11349,7 +11316,13 @@ export class Renderer {
         }
         this.selectionRingTicks.rotation.y += dt * SELECTION_RING_SPIN; // slow reticle spin
         const ringMat = this.selectionRingMat;
-        ringMat.color.setHex(this.isHostileSelectionTarget(target) ? 0xcc2222 : 0xd4af37);
+        ringMat.color.setHex(
+          isHostileSelectionTarget(target, this.sim.entities, (p) =>
+            isPvpHostilePlayer(this.sim, p),
+          )
+            ? 0xcc2222
+            : 0xd4af37,
+        );
         if (!this.lowGfx) ringMat.color.multiplyScalar(SELECTION_RING_BOOST); // subtle bloom edge
         ringMat.opacity = 0.78 + 0.2 * Math.sin(this.time * 4.5); // gentle pulse
         this.selectionRing.visible = reticleShownUnder(tv.group, this.selectionRing);
@@ -11451,6 +11424,7 @@ export class Renderer {
     this.emberPools?.update(lampGlow, this.time);
     this.campBraziers?.update(lampGlow, this.time);
     this.decorTorchFx?.update(lampGlow, this.time);
+    this.seasonalDecor?.update(lampGlow, this.time, p.pos.x, p.pos.z, this.reducedMotion());
     // The night light field: every lamp and camp fire plus the nearby bodies
     // collected above, packed into the terrain shader's uniform slots. Indoors
     // the world clock does not govern the ground either, so the same fogState
@@ -11492,6 +11466,7 @@ export class Renderer {
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.worldBoss.fx.update(dt, this.reducedMotion(), this.sim.entities.values());
+    this.scarecrowFx.update(dt, this.reducedMotion());
     this.worldBoss.syncImpostors(
       this.webgl,
       this.sim.entities.values(),
@@ -12136,6 +12111,7 @@ export class Renderer {
     this.riftDeathZoneVisuals?.dispose();
     this.blobShadows?.dispose();
     this.worldBoss.dispose();
+    this.scarecrowFx.dispose();
     this.authoredLayers?.dispose();
     this.editor.dispose();
   }

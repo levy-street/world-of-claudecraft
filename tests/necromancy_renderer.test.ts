@@ -110,6 +110,7 @@ function makeHarness({
     necromancyGroundFx: { spawnDesecration: typeof desecration };
     necromancyArmyPortalFx: { spawn: typeof armyPortal };
     abilityVfx: typeof abilityVfx;
+    scarecrowFx: { handleSpellfxAt: ReturnType<typeof vi.fn> };
     tmpV: THREE.Vector3;
     tmpV2: THREE.Vector3;
     reducedMotion(): boolean;
@@ -148,6 +149,7 @@ function makeHarness({
   renderer.necromancyGroundFx = { spawnDesecration: desecration };
   renderer.necromancyArmyPortalFx = { spawn: armyPortal };
   renderer.abilityVfx = abilityVfx;
+  renderer.scarecrowFx = { handleSpellfxAt: vi.fn().mockReturnValue(false) };
   renderer.tmpV = new THREE.Vector3();
   renderer.tmpV2 = new THREE.Vector3();
   renderer.reducedMotion = () => reducedMotion;

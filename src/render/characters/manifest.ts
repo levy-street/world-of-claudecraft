@@ -211,6 +211,7 @@ import type { GlowPulseSet } from './glow_pulse_core';
 import { NPC_PROP_SET_IDS, type NpcLook, type NpcPropSet, npcLookFor } from './npc_looks';
 import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks';
 import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
+import { seasonalTrickLooks } from './seasonal_trick_looks';
 import type { SeatClipSet } from './seat_clips';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
@@ -1084,6 +1085,10 @@ const MOUNT_MECH_BIRD: ClipMap = {
 // breathing Idle: he looks about him, rears up to paw the air, and stamps his
 // front feet one at a time. Each ends back on the idle pose so the hand-off is
 // seamless.
+// The Emberbristle Broom ships Idle / Walk / Run only: a ridden broom never plays a
+// death (the summon strips on death first), so death holds Idle like the Mech Bird.
+const MOUNT_BROOM: ClipMap = { ...MOUNT_RIGGED, death: 'Idle' };
+
 const MOUNT_TORTOISE: ClipMap = {
   ...MOUNT_RIGGED,
   idleVariants: ['Idle_Look', 'Idle_Rear', 'Idle_Stamp', 'Idle_Groove'],
@@ -1148,6 +1153,65 @@ export const BALGATH_SCALE = 4.2;
  * about half of Balgath's 3.2 x 4.2. MUST match the file (prepareVisual normalizes by it).
  */
 export const MUSTER_EFFIGY_HEIGHT = 6.7;
+
+// Old Thatchgrin's clip map (scripts/assets/gourdlight_eve/scarecrow_clips.py); his
+// strawlings share the rig and keep their own map (STRAWLING, below). The two auto
+// swings rotate; his telegraphs play off the windup cue his kit emits
+// (seasonal/scarecrow_kit.ts): the throw's release lands at 1.0 s of its 2.2 s timeline
+// (he hurls a lit gourd at the sky and Gourdfall rains after it: the first pumpkin
+// lands at 2.4 s, so he is upright as they burst), and the summon peaks at 1.4 s,
+// the call's windup, as the adds land. Both play unscaled. The two auto swings are one
+// idea each at 30 fps: Swipe the flat reap (impact 0.66 s), Chop the overhead slam into
+// the ground (impact 0.78 s).
+const THATCHGRIN: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Swipe', 'Chop'],
+  attackByAbility: {
+    mob_thatchgrin_gourd: 'Throw',
+    mob_thatchgrin_summon: 'Summon',
+  },
+  attackTimeScaleByAbility: {
+    mob_thatchgrin_gourd: 1,
+    mob_thatchgrin_summon: 1,
+  },
+  hit: ['Hit'],
+  death: 'Death',
+  // Round 10: a NIGHT boss (mob/slumber.ts awakeAt 'night'). By day the sleep loop holds
+  // him strung up on his pole (scarecrow_fx.ts draws the post and crossbar behind him),
+  // and the wake one-shot plays once on the asleep-to-awake edge at nightfall: he tears
+  // himself off the bar, drops into the stubble at 1.9 s and rises by 3.0 s, inside the
+  // slumber's 3 s rise hold, so no first step skates the pose.
+  sleep: 'Pole',
+  wake: 'Awaken',
+};
+// A strawling's own clip map: the same gait, hit and death on the boss's rig, but its own
+// two unarmed swings, because it carries no scythe (owner note, 2026-10-18): Claw the
+// overhead double rake (impact 0.42 s), Lunge the pounce (impact 0.5 s), both at 30 fps.
+const STRAWLING: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Claw', 'Lunge'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+/** World heights: the boss nearly three players tall (HUMANOID_H 2.6), a strawling a head
+ *  taller than one. The Blender bodies are 5.1 m and 2.35 m; prepareVisual normalizes. */
+export const THATCHGRIN_HEIGHT = 7.4;
+export const STRAWLING_HEIGHT = 3.0;
+/** The Swelling Gourd stands half again a player's height at its rise (its 1.85 m model,
+ *  stem included); its fuse swells it further. */
+export const SWELLING_GOURD_HEIGHT = 3.9;
+// Gait references, from the authored cycles (scarecrow_clips.py gait_keys): the walk's
+// stakes swing 22 degrees over a 1.2 s cycle, two steps of 2 x 1.9 m x sin 22, so 2.37 m/s,
+// the run 30 degrees over 0.85 s, 4.47 m/s; times the normalize (7.4 / 5.1) for the boss,
+// the strawling's at its 0.46 build scale and 3.0 / 2.35 normalize.
+const THATCHGRIN_WALK_REF = 3.44;
+const THATCHGRIN_RUN_REF = 6.5;
+const STRAWLING_WALK_REF = 1.39;
+const STRAWLING_RUN_REF = 2.63;
 const BALGATH_WALK_REF = 4.05;
 const BALGATH_RUN_REF = 7.95;
 
@@ -3371,6 +3435,22 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 3.6,
     runRef: 10,
     lazyPreload: true,
+  },
+  // The Emberbristle Broom (Gourdlight Eve, scripts/assets/gourdlight_eve/broom.py): a
+  // hovering harvest broom, its clips only the secondary motion (the straw head swaying,
+  // the ribbon tails streaming, the lantern swinging), since the hover bob that carries
+  // the rider is the renderer's (mount_visuals.ts). `height` is its posed bbox (0.859 m
+  // of model, the stirrups and lantern under the handle to the crook's curl): 1.05 draws
+  // the whole broom 4.2 yd long, well over half again a player's height.
+  mount_emberbristle_broom: {
+    url: `${MOUNTS_DIR}/emberbristle_broom.glb`,
+    height: 1.05,
+    clips: MOUNT_BROOM,
+    walkRef: 4,
+    runRef: 11,
+    lazyPreload: true,
+    // its KTX2 BroomAtlas carries authored roughness and emissive embers
+    authoredAtlas: true,
   },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
   // its authored tread cadence at the reference ground speeds below.
@@ -6527,6 +6607,67 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0xa8a496,
     tintStrength: 0.06,
   },
+  // Old Thatchgrin, Gourdlight Eve's field boss, and his strawlings
+  // (content/gourdlight_eve_scarecrow.ts): Blender-built on ONE rig and ONE clip set
+  // (scripts/assets/gourdlight_eve/scarecrow.py + scarecrow_clips.py, shipped by
+  // export_scarecrow.mjs), pinned by tests/gourdlight_scarecrow_assets.test.ts.
+  mob_gourdlight_thatchgrin: {
+    url: `${CREATURES}/gourdlight_thatchgrin.glb`,
+    height: THATCHGRIN_HEIGHT,
+    clips: THATCHGRIN,
+    // The death collapses into straw on its authored timeline (the head rolls clear at
+    // 1.9 s): played as authored, not the shared 1.15x.
+    deathTimeScale: 1,
+    // The candle inside his carved head: the halo that makes the face read at range and
+    // gutters out with him. `GourdGlow` is the candle core itself. Offset MEASURED off the
+    // exported GLB (scripts/assets/balgath_cyclops/measure_eye.mjs, the pumpkin's glow core).
+    eyeGlow: {
+      bone: 'Head',
+      offset: [0, 0.23, -0.07],
+      color: 0xff7a1e,
+      radius: 0.13,
+      pulseHz: 0.6,
+      selfLitMaterial: 'GourdGlow',
+    },
+    walkRef: THATCHGRIN_WALK_REF,
+    runRef: THATCHGRIN_RUN_REF,
+  },
+  mob_gourdlight_strawling: {
+    url: `${CREATURES}/gourdlight_strawling.glb`,
+    height: STRAWLING_HEIGHT,
+    clips: STRAWLING,
+    deathTimeScale: 1.3,
+    eyeGlow: {
+      bone: 'Head',
+      // the ember eyes on the sack's front (scarecrow.py sack_front)
+      offset: [0, 0.144, 0.17],
+      color: 0xffa040,
+      radius: 0.05,
+      pulseHz: 1.1,
+      selfLitMaterial: 'ScarecrowGlow',
+    },
+    walkRef: STRAWLING_WALK_REF,
+    runRef: STRAWLING_RUN_REF,
+    // a scurrying little thing on short stakes: its gait has to spin far past 1x
+    runTimeScaleMax: 2.8,
+  },
+  // The Swelling Gourd (scripts/assets/gourdlight_eve/swelling_gourd.py), Old Thatchgrin's
+  // giant pumpkin add: well over a player's height before it even starts to swell (the
+  // renderer grows it over its fuse, scarecrow_fx.ts bodySwell), its candle lit like his.
+  mob_gourdlight_swelling_gourd: {
+    url: `${CREATURES}/gourdlight_swelling_gourd.glb`,
+    height: SWELLING_GOURD_HEIGHT,
+    clips: { idle: 'Idle', walk: 'Idle', run: 'Idle', attack: [], death: 'Death' },
+    deathTimeScale: 1,
+    eyeGlow: {
+      bone: 'Body',
+      offset: [0, 0.62, 0.0],
+      color: 0xff7a1e,
+      radius: 0.16,
+      pulseHz: 0.9,
+      selfLitMaterial: 'GourdGlow',
+    },
+  },
   npc_chronicler: {
     url: `${PLAYERS}/mage.glb`,
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
@@ -7858,6 +7999,8 @@ Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
 // The Gravewyrm Sanctum's three bosses (sanctum_boss_looks.ts).
 Object.assign(VISUALS, SANCTUM_BOSS_LOOKS);
+// Gourdlight Eve's trick bodies, the bat and the skeleton (seasonal_trick_looks.ts).
+Object.assign(VISUALS, seasonalTrickLooks(VISUALS));
 
 /** The composed-body variant of a class visual (every class has one). */
 export function modularVisualKey(cls: PlayerClass): string {
@@ -7965,6 +8108,11 @@ const MOB_KEYS: Record<string, string> = {
   // (no camp entry, no world-boss registration); they exist so the two silhouettes can
   // be compared in motion via ?boss=foreman|cyclops (src/game/boss_test_drive.ts).
   balgath_cyclops: 'mob_balgath_cyclops',
+  // Gourdlight Eve's field boss and his adds (the crows wear the crypt's carrion crow)
+  gourdlight_thatchgrin: 'mob_gourdlight_thatchgrin',
+  gourdlight_strawling: 'mob_gourdlight_strawling',
+  gourdlight_crow: 'mob_crypt_crow',
+  gourdlight_swelling_gourd: 'mob_gourdlight_swelling_gourd',
   drakemaw_broodlord: 'mob_dragonkin_broodlord',
   cindraleth_maw_matriarch: 'mob_dragonkin_matriarch',
   dragonkin_broodguard: 'mob_dragonkin_broodguard',

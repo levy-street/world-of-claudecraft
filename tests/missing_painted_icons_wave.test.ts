@@ -703,7 +703,31 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
     // 322 with the Mirefen world-boss branch's three combat deeds, all pending.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, its 24 pending on the dungeon crest.
-    expect(DEED_ORDER).toHaveLength(346);
+    // 347 with Gourdlight Eve's feat (feat_gourdlight_guise), its crest painted
+    // (rendered from the shipped head, scripts/assets/gourdlight_eve/crest.py).
+    // 348 with its field boss's feat (feat_old_thatchgrin), its crest painted too.
+    // 351 with its three title-writ feats, their crests painted too.
+    // 352 with the Haunted Pumpkin hunt's Feat (feat_pumpkin_hunter), its crest
+    // painted from the same Blender crest (crest.py --subject pumpkin_hunter).
+    // 356 with round 12's whole-event checklist, four crests painted the same way
+    // (crest.py --subject doorsteps|errands|frights|eve_complete).
+    expect(DEED_ORDER).toHaveLength(356);
+    for (const id of [
+      'feat_gourdlight_doorsteps',
+      'feat_gourdlight_errands',
+      'feat_gourdlight_frights',
+      'feat_gourdlight_eve_complete',
+    ]) {
+      expect(DEED_IMAGE_IDS.has(id), id).toBe(true);
+      expect(DEED_ART_PENDING.has(id), id).toBe(false);
+    }
+    expect(DEED_IMAGE_IDS.has('feat_pumpkin_hunter')).toBe(true);
+    expect(DEED_ART_PENDING.has('feat_pumpkin_hunter')).toBe(false);
+    expect(DEED_IMAGE_IDS.has('feat_title_hollow_grinned')).toBe(true);
+    expect(DEED_ART_PENDING.has('feat_gourdlight_guise')).toBe(false);
+    expect(DEED_ART_PENDING.has('feat_old_thatchgrin')).toBe(false);
+    expect(DEED_IMAGE_IDS.has('feat_old_thatchgrin')).toBe(true);
+    expect(DEED_IMAGE_IDS.has('feat_gourdlight_guise')).toBe(true);
     expect(DEED_ART_PENDING.has('cmb_point_taken')).toBe(true);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);

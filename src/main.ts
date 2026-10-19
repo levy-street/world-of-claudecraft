@@ -1779,7 +1779,7 @@ async function startGame(
       // that channel without the player retyping "/world" etc.
       const raw = chatInput.value;
       // dev-only chat interceptors (day/night scrub, the placer rig)
-      if (tryDevChatHooks(raw, { hud, renderer, world })) {
+      if (tryDevChatHooks(raw, { hud, renderer, world, offline: online == null })) {
         chatInput.value = '';
         closeChat();
         return;

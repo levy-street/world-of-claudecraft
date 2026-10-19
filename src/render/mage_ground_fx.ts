@@ -48,6 +48,7 @@ import {
   nythraxisGraveEruptionPalette,
 } from './nythraxis_hazard_palette_core';
 import { isNythraxisBindingSigil, NYTHRAXIS_SIGIL_PALETTE } from './nythraxis_sigil_core';
+import { thatchgrinRuneColor } from './scarecrow_fx_core';
 import { SCHOOL_COLORS } from './vfx';
 
 /** HSL lightness ceiling applied before a rune ring's additive brightening
@@ -1317,12 +1318,18 @@ export class MageGroundFx {
     // player's own cast the player band. Steps are the legacy order minus
     // one, the encounter band's rule, so the rung reads the same in both.
     const layer = runeCircleLayer(opts.ability);
-    const paletteKey = bindingSigil ? 'binding-sigil' : school;
+    // an encounter that wears its own rim (Old Thatchgrin's violet Gourdfall rings)
+    const encounterRim = thatchgrinRuneColor(opts.ability);
+    const paletteKey = bindingSigil
+      ? 'binding-sigil'
+      : encounterRim !== null
+        ? `rim-${encounterRim}`
+        : school;
     const schoolColor = capRingLightness(
       new THREE.Color(
         bindingSigil
           ? NYTHRAXIS_SIGIL_PALETTE.rim
-          : (SCHOOL_COLORS[school] ?? SCHOOL_COLORS.arcane),
+          : (encounterRim ?? SCHOOL_COLORS[school] ?? SCHOOL_COLORS.arcane),
       ),
     );
     const group = new THREE.Group();

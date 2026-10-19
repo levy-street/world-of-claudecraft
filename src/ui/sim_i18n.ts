@@ -12,6 +12,13 @@
 // The S3 guard in tests/localization_fixes.test.ts parses src/sim/sim.ts, enumerates
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
+import {
+  CARVED_PUMPKIN_HEAD_ID,
+  GOURDLIGHT_COSTUMES,
+  GOURDLIGHT_TOYS,
+  GOURDLIGHT_TRICKS,
+} from '../sim/content/gourdlight_eve';
+import { STRAWLING_GUISE, THATCHGRIN_SLUMBER } from '../sim/content/gourdlight_eve_scarecrow';
 import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import {
   FACTION_IDS,
@@ -1655,6 +1662,19 @@ const baseEnTable = {
   'mechanic.balgathMoltenFen': 'Molten Fen',
   // The meteor volley the eruption calls down (mob/boss_starwake_meteors.ts).
   'mechanic.balgathStarDebris': 'Star Debris',
+  // Old Thatchgrin's pumpkin rain and the burning stubble it leaves, his Swelling Gourd's
+  // fuse and burst, and the ward, reel and opening it puts on him
+  // (seasonal/scarecrow_kit.ts, scarecrow_swell.ts, content/gourdlight_eve_scarecrow.ts).
+  'mechanic.thatchgrinGourdfall': 'Gourdfall',
+  'mechanic.thatchgrinSmolderingChaff': 'Smoldering Chaff',
+  'mechanic.thatchgrinRipening': 'Ripening',
+  'mechanic.thatchgrinGourdBurst': 'Gourd Burst',
+  'mechanic.thatchgrinHarvestWard': 'Harvest Ward',
+  'mechanic.thatchgrinUprooted': 'Uprooted',
+  'mechanic.thatchgrinSplitRind': 'Split Rind',
+  // Thatchbound, his mind control, and the puppet's swing (seasonal/scarecrow_puppet.ts).
+  'mechanic.thatchgrinThatchbound': 'Thatchbound',
+  'mechanic.thatchgrinPuppetsFlail': "Puppet's Flail",
   // The drill yard's effigy: its plank hide, and a player's own open window on it
   // (src/sim/muster_effigy.ts EFFIGY_WARD_NAME / EFFIGY_OPENED_NAME).
   'aura.effigyPlankHide': 'Plank Hide',
@@ -17914,6 +17934,18 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Wake of the Fallen Star': 'mechanic.balgathStarwake',
   'Molten Fen': 'mechanic.balgathMoltenFen',
   'Star Debris': 'mechanic.balgathStarDebris',
+  // Old Thatchgrin's kit; byte-identical to the THATCHGRIN_KIT names (rain, chaff, and
+  // the swell's fuse, burst, ward, stagger and exposed).
+  Gourdfall: 'mechanic.thatchgrinGourdfall',
+  'Smoldering Chaff': 'mechanic.thatchgrinSmolderingChaff',
+  Ripening: 'mechanic.thatchgrinRipening',
+  'Gourd Burst': 'mechanic.thatchgrinGourdBurst',
+  'Harvest Ward': 'mechanic.thatchgrinHarvestWard',
+  Uprooted: 'mechanic.thatchgrinUprooted',
+  'Split Rind': 'mechanic.thatchgrinSplitRind',
+  // byte-identical to THATCHGRIN_KIT.puppet.name and .swing.name
+  Thatchbound: 'mechanic.thatchgrinThatchbound',
+  "Puppet's Flail": 'mechanic.thatchgrinPuppetsFlail',
   // The Straw Foreman's plank hide and a player's window on it (muster_effigy.ts);
   // byte-identical to EFFIGY_WARD_NAME and EFFIGY_OPENED_NAME.
   'Plank Hide': 'aura.effigyPlankHide',
@@ -18631,7 +18663,30 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
   'Muster Standard': 'muster_standard',
 };
 
+// Gourdlight Eve's cosmetic auras (src/sim/seasonal/seasonal_cosmetics.ts): each trick
+// by its id's catalog name, the worn head by its item's name.
+const SEASONAL_TRICK_AURA_IDS: ReadonlyMap<string, string> = new Map([
+  ...GOURDLIGHT_TRICKS.map((trick): [string, string] => [trick.name, trick.id]),
+  // the Strawling Charm's look (Old Thatchgrin's cosmetic)
+  [STRAWLING_GUISE.name, STRAWLING_GUISE.id],
+  // the costume draughts' looks
+  ...GOURDLIGHT_COSTUMES.map((costume): [string, string] => [costume.name, costume.auraId]),
+]);
+
+// Hester's toys' looks: each aura wears its toy's item name.
+const TOY_AURA_ITEM_IDS: ReadonlyMap<string, string> = new Map(
+  GOURDLIGHT_TOYS.map((toy): [string, string] => [toy.itemName, toy.itemId]),
+);
+
 export function localizeSimAuraName(name: string): string | null {
+  const trickId = SEASONAL_TRICK_AURA_IDS.get(name);
+  if (trickId) return t(`seasonal.tricks.${trickId}` as TranslationKey);
+  const toyItemId = TOY_AURA_ITEM_IDS.get(name);
+  if (toyItemId) return tEntity({ kind: 'item', id: toyItemId, field: 'name' });
+  if (name === 'Carved Pumpkin Head') {
+    return tEntity({ kind: 'item', id: CARVED_PUMPKIN_HEAD_ID, field: 'name' });
+  }
+  if (name === THATCHGRIN_SLUMBER.auraName) return t('seasonal.thatchgrin.poleBound');
   if (name === 'Friendship') return t('referralCards.friendshipAura');
   if (name === 'Protective Charm') return t('referralCards.protectiveCharm');
   const key = AURA_NAME_KEY[name];
@@ -21053,6 +21108,10 @@ const RULES: Rule[] = [
     build: (m) => t('hudChrome.worldBoss.sleep', { name: locMob(m[1]) }),
   },
   {
+    re: /^(.+) sleeps until nightfall\.$/,
+    build: (m) => t('hudChrome.worldBoss.sleepUntilNightfall', { name: locMob(m[1]) }),
+  },
+  {
     re: /^Fallen Captain Aldren yells, "None shall disturb the king's rest! For Thornpeak!"$/,
     build: () => tQuestExtra('aldrenYell', { name: locMob('Fallen Captain Aldren') }),
   },
@@ -22410,6 +22469,14 @@ export function localizeSimText(text: string): string | null {
   return null;
 }
 
+/** Old Thatchgrin's night-hours yells (content/gourdlight_eve_scarecrow.ts
+ *  THATCHGRIN_SLUMBER), keyed under seasonal.thatchgrin. */
+function localizeSeasonalYell(text: string): string | null {
+  if (text === THATCHGRIN_SLUMBER.wakeYell) return t('seasonal.thatchgrin.wakeYell');
+  if (text === THATCHGRIN_SLUMBER.sleepYell) return t('seasonal.thatchgrin.sleepYell');
+  return null;
+}
+
 export function localizeAuthoredYellText(
   text: string,
   speakerKind?: EntityKind,
@@ -22417,6 +22484,7 @@ export function localizeAuthoredYellText(
 ): string {
   if (speakerKind === 'player' || classId !== undefined) return text;
   return (
+    localizeSeasonalYell(text) ??
     localizeRiftBossYell(text) ??
     localizeWorldQuestFreightYell(text, getLanguage()) ??
     localizeSimText(text) ??

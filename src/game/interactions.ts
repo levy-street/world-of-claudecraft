@@ -1,3 +1,4 @@
+import { GURGLEGREEN_CAULDRON_ID } from '../sim/content/gourdlight_eve';
 import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
 import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
@@ -176,6 +177,8 @@ export function hoverCursorKind(
   if (e.kind === 'object' && e.templateId === MUSTER_RACK_TEMPLATE_ID && e.lootable) {
     return 'friendly';
   }
+  // A standing Gurglegreen Cauldron is there to be drunk from (seasonal/toy_cauldron.ts).
+  if (e.kind === 'object' && e.objectItemId === GURGLEGREEN_CAULDRON_ID) return 'friendly';
   if (e.kind === 'player' && e.id !== playerId) return 'friendly';
   void partyMemberIds;
   return 'default';

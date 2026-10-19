@@ -21370,6 +21370,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '열린 담금질 물속: 이동 속도가 {slow}% 감소하고 매초 {damage}의 피해(영웅 난이도 {heroic})로 불탑니다. 아무 얼음판이나 물가로 헤엄치십시오.',
   'hudChrome.auraEffect.sanctum.shardFlare':
     '심장 파편이 타오릅니다: 무덤 숨결이 {breath}초마다, 날개 돌풍이 {gale}초마다 옵니다.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    '올드 대치그린이 당신을 조종합니다. 행동할 수 없으며, 가장 가까운 아군에게 걸어가 {every}초마다 {min}~{max}의 피해를 줍니다 (레벨 {level} 아군에게는 최대 {mult}배). 최대 생명력의 {pct}%에 해당하는 피해를 받거나 아군이 해제하면 (마법) 일찍 끝납니다.',
   'hudChrome.auraEffect.wildheart.packBond':
     '짝이 가까이 있는 동안 받는 피해가 {pct}% 감소합니다. 야수조련사와 재규어를 떼어 놓으면 유대가 끊어집니다.',
   'hudChrome.auraEffect.wildheart.packBondFury':
@@ -21777,4 +21779,189 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 캐릭터를 삭제하기 전에 고정되지 않은 도장 카드를 모두 다른 캐릭터로 옮기세요.',
   'apiError.character.referral_bond_pending':
     '친구 초대 보상인 멤버십 증서를 이 캐릭터에게 지급 중입니다. 지급이 완료된 후 캐릭터 삭제를 다시 시도하세요.',
+  'hudChrome.auraEffect.seasonalCosmetic': '외형 전용: 전투에 영향 없음',
+  'seasonal.event.gourdlight_eve.name': '고드라이트 축제의 밤',
+  'seasonal.trickOrTreat.row': '과자 안 주면 장난칠 거야!',
+  'seasonal.trickOrTreat.rowAria': '{name}에게 "과자 안 주면 장난칠 거야"라고 말하기',
+  'seasonal.trickOrTreat.knockedHint':
+    '오늘은 이미 이 문을 두드렸습니다. 일일 초기화 후 다시 열립니다.',
+  'seasonal.trickOrTreat.treat': '{name}이(가) 과자를 건네줍니다.',
+  'seasonal.trickOrTreat.trick': '{name}이(가) 당신에게 장난을 칩니다: {trick}!',
+  'seasonal.trickOrTreat.alreadyKnocked': '오늘은 이미 {name}에게 과자를 받았습니다.',
+  'seasonal.trickOrTreat.notActive': '지금은 고드라이트 축제의 밤이 열리지 않습니다.',
+  'seasonal.trickOrTreat.tooFar': '문을 두드리려면 더 가까이 가세요.',
+  'seasonal.trickOrTreat.treatFlash.one': '과자! 고드라이트 사탕 {count}개',
+  'seasonal.trickOrTreat.treatFlash.few': '과자! 고드라이트 사탕 {count}개',
+  'seasonal.trickOrTreat.treatFlash.many': '과자! 고드라이트 사탕 {count}개',
+  'seasonal.trickOrTreat.treatFlash.other': '과자! 고드라이트 사탕 {count}개',
+  'seasonal.trickOrTreat.trickFlash': '장난! {trick}',
+  'seasonal.tricks.gourdlight_trick_bat': '박쥐 변신',
+  'seasonal.tricks.gourdlight_trick_skeleton': '덜그럭 뼈다귀',
+  'seasonal.tricks.gourdlight_trick_fumes': '초록 연기',
+  'seasonal.pumpkinHead.on': '조각한 호박 머리를 썼습니다.',
+  'seasonal.pumpkinHead.off': '조각한 호박 머리를 벗었습니다.',
+  'seasonal.jarTrick': '항아리가 펑 하고 열립니다: {trick}!',
+  'seasonal.itemUse.pumpkinHead':
+    '사용: 안에서 불이 밝혀진 조각 호박을 투구 위에 쓰거나 벗습니다. 고드라이트 축제의 밤 동안에만. 외형 전용.',
+  'seasonal.itemUse.trickJar':
+    '사용: 몇 초 동안 무해한 장난을 무작위로 자신에게 겁니다. 고드라이트 축제의 밤 동안에만. 외형 전용.',
+  'seasonal.itemUse.pouch': '사용: 열면 고드라이트 사탕 {count}개를 받습니다.',
+  'seasonal.itemUse.sweet':
+    '고드라이트 축제의 밤 동안 과자를 얻으러 다니며 받습니다. 이스트브룩의 헤스터 고드윅이 외형 아이템과 교환해 줍니다.',
+  'seasonal.tokenPrice': '{item} {count}개',
+  'entities.items.gourdlight_sweet.name': '고드라이트 사탕',
+  'entities.items.gourdlight_treat_pouch.name': '고드라이트 과자 주머니',
+  'entities.items.carved_pumpkin_head.name': '조각한 호박 머리',
+  'entities.items.jar_of_mischief.name': '장난의 항아리',
+  'entities.npcs.gourdlight_keeper.name': '헤스터 고드윅',
+  'entities.npcs.gourdlight_keeper.title': '고드라이트 관리인',
+  'entities.npcs.gourdlight_keeper.greeting':
+    '호박에 불이 켜지고 등불이 걸렸으니 고드라이트 축제의 밤이 온 게 틀림없어요. 이스트브룩, 펜브리지, 하이워치 마을 사람들의 문을 두드리고 그 말을 해 보세요. 과자 안 주면 장난칠 거야. 대부분은 사탕을 주겠지만, 몇몇은 장난을 칠 거예요. 사탕을 가져오면 몸에 걸칠 것과 바꿔 드릴게요.',
+  'entities.quests.q_gourdlight_rounds.title': '고드라이트 순회',
+  'entities.quests.q_gourdlight_rounds.text':
+    '고드라이트 축제의 밤마다 골짜기의 아이들이 집집마다 돌아다녀요. 올해는 당신도 함께해요, {playerName}. 우리 마을에서 문 다섯 개를 두드리고 그 말을 한 다음 무엇을 받는지 보세요. 끝나면 저에게 돌아오세요.',
+  'entities.quests.q_gourdlight_rounds.completion':
+    '문 다섯 개를 두드렸는데 손가락도 다 멀쩡하네요. 자, 집에 가는 길에 먹을 과자 주머니예요. 내일 또 오세요. 문은 다시 열리니까요.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': '두드린 문',
+  'seasonal.tricks.gourdlight_trick_strawling': '짚인형 변장',
+  'seasonal.guise': '부적이 타닥거리더니 짚이 몸을 타고 올라옵니다: {trick}!',
+  'seasonal.itemUse.strawlingCharm':
+    '사용: {seconds}초 동안 올드 대치그린의 짚인형으로 변합니다. 전투 중에는 사용할 수 없으며 고드라이트 축제의 밤 동안에만 사용할 수 있습니다. 소모되지 않습니다. 외형 전용.',
+  'entities.items.thatchgrin_sweet_sack.name': '대치그린의 사탕 자루',
+  'entities.items.strawling_charm.name': '짚인형 부적',
+  'entities.mobs.gourdlight_thatchgrin.name': '올드 대치그린',
+  'entities.mobs.gourdlight_crow.name': '고드라이트 까마귀',
+  'hudChrome.mounts.name_emberbristle_broom': '잉걸갈기 빗자루',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    '주황색 리본을 감은 수확용 빗자루. 땅에서 한 뼘 위에 떠서 솔 끝으로 불씨를 흩뿌린다. 고드라이트 축제의 밤이 끝나면 다시 짚으로 부서진다.',
+  'seasonal.tricks.gourdlight_costume_skeleton': '해골 분장',
+  'seasonal.tricks.gourdlight_costume_ghost': '유령 분장',
+  'seasonal.tricks.gourdlight_costume_bat': '박쥐 분장',
+  'seasonal.costume': '물약을 마시자 모습이 바뀝니다: {trick}!',
+  'seasonal.titleGranted': '증서를 읽었습니다. 새 칭호 획득: {title}.',
+  'seasonal.titleKnown': '이미 그 칭호를 가지고 있으므로 증서는 그대로 남습니다.',
+  'seasonal.boundItemGone': '고드라이트 축제의 밤이 끝나 {item}이(가) 다시 짚으로 부서졌습니다.',
+  'seasonal.itemUse.costumeSkeleton':
+    '사용: {minutes}분 동안 덜그럭거리는 해골로 변신합니다. 사용 시 소모됩니다. 전투 중에는 사용할 수 없으며 전투에 들어가면 해제됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 외형 전용.',
+  'seasonal.itemUse.costumeGhost':
+    '사용: {minutes}분 동안 떠도는 유령으로 변신합니다. 사용 시 소모됩니다. 전투 중에는 사용할 수 없으며 전투에 들어가면 해제됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 외형 전용.',
+  'seasonal.itemUse.costumeBat':
+    '사용: {minutes}분 동안 날갯짓하는 박쥐로 변신합니다. 사용 시 소모됩니다. 전투 중에는 사용할 수 없으며 전투에 들어가면 해제됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 외형 전용.',
+  'seasonal.itemUse.titleWrit':
+    '사용: 이 캐릭터의 칭호 {title}을(를) 획득하며, 업적의 서에서 착용할 수 있습니다. 사용 시 소모됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 이미 칭호가 있으면 증서가 남습니다.',
+  'seasonal.itemUse.sheaf':
+    '올드 대치그린을 처치하고 전리품을 챙기면 하루에 하나씩 받으며, 잉걸갈기 빗자루를 얻을 때까지 이어집니다. 헤스터 고드윅이 이스트브룩, 펜브리지, 하이워치의 노점에서 {count}개를 빗자루와 교환해 줍니다. 고드라이트 축제의 밤이 끝나면 짚으로 부서집니다.',
+  'entities.items.rattlebone_draught.name': '덜그럭뼈 물약',
+  'entities.items.haunting_draught.name': '떠도는 혼 물약',
+  'entities.items.batwing_draught.name': '날갯짓 물약',
+  'entities.items.writ_of_the_gourdlit.name': '고드릿의 증서',
+  'entities.items.writ_of_the_trickster.name': '장난꾼의 증서',
+  'entities.items.writ_of_the_hollow_grin.name': '텅 빈 미소의 증서',
+  'entities.items.reins_emberbristle_broom.name': '잉걸갈기 빗자루',
+  'entities.items.emberwoven_sheaf.name': '잉걸엮음 짚단',
+  'entities.items.hearthroot_toffee.name': '화로뿌리 토피',
+  'entities.items.gourdseed_brittle.name': '호박씨 브리틀',
+  'entities.items.crabapple_chew.name': '꽃사과 캐러멜',
+  'entities.items.owlwatch_fudge.name': '올빼미망루 퍼지',
+  'entities.items.lantern_mint_drop.name': '랜턴 박하사탕',
+  'entities.mobs.gourdlight_swelling_gourd.name': '부푸는 박',
+  'entities.mobs.gourdlight_strawling.name': '짚인형',
+  'seasonal.pumpkins.name': '유령 호박',
+  'seasonal.pumpkins.title': '유령 호박',
+  'seasonal.pumpkins.world': '세계',
+  'seasonal.pumpkins.found':
+    '{zone}의 유령 호박에 불을 밝혔습니다: {count}/{total}. 고드라이트 사탕 획득: {sweets}.',
+  'seasonal.pumpkins.flash': '유령 호박 발견! {count}/{total}',
+  'seasonal.itemSource.pumpkinHead':
+    '보어 메도 너머 호박밭의 올드 대치그린에게서 처음 전리품을 챙길 때 얻습니다. 상인은 팔지 않습니다.',
+  'entities.items.cursed_candle_stub.name': '저주받은 양초 토막',
+  'entities.items.gourdlight_crow_feather.name': '고드라이트 까마귀 깃털',
+  'entities.items.thatchgrin_patch_pumpkin.name': '밭 호박',
+  'entities.quests.q_gourdlight_daily_patch.title': '밭에서 굴러온 호박',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    '보어 메도 너머 올드 대치그린의 밭은 호박으로 가득한데, 절반은 그의 짚 울타리 밖으로 굴러 나와 조심하면 손이 닿아요. 다섯 개만 가져다줘요, {playerName}. 그 늙은 허수아비한테는 가까이 가지 말고요. 하나하나 다 세고 있거든요.',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    '동글동글한 게 다섯 개, 갉아먹은 자국도 없네요. 골짜기 사람들 다 먹을 파이가 되겠어요. 자, 수고비예요.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': '밭 호박',
+  'entities.quests.q_gourdlight_daily_boo.title': '워!',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    '이 마을들에선 일 년 내내 제대로 놀란 사람이 없어요, {playerName}. 깜짝 놀랄 일 없는 고드라이트 축제의 밤은 그냥 추운 밤일 뿐이죠. 분장을 해요. 내 물약이면 아무거나 되고, 그 호박 머리를 얻었다면 그것도 좋아요. 그리고 마을 사람 셋에게 몰래 다가가서 크게 워 하고 놀래 주세요.',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    '셋이나요? 광장 건너편에서 요리사가 냄비 떨어뜨리는 소리가 들렸어요. 잘했어요. 이건 당신 몫이에요.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': '놀란 마을 사람',
+  'entities.quests.q_gourdlight_daily_wicks.title': '사악한 심지',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    '누군가 가로등 발치에 초록 불꽃 양초를 놓고 다녀요. 녹지도 않고 타면서, 등을 돌리면 속삭인답니다. 세 마을 어디서든 여섯 개를 꺼 주고 토막을 가져다줘요, {playerName}.',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    '서리처럼 차가운 토막 여섯 개. 불을 붙인 자는 더 애써야겠네요. 이걸 받고, 손 좀 씻어요.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': '꺼 버린 저주받은 양초',
+  'entities.quests.q_gourdlight_daily_towns.title': '마을마다 문 하나씩',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    '아이들 말로는 진짜 고드라이트 순례자는 밤이 가기 전에 모든 마을에서 문을 두드린대요. 그 말이 맞다는 걸 보여줘요, {playerName}. 이스트브룩, 펜브리지, 하이워치에서 문 하나씩 두드리며 사탕을 달라고 외쳐요. 길가의 등불이 길을 밝혀 줄 거예요.',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    '하룻밤에 세 마을이라니! 이건 당신보다 당신 장화가 더 받을 자격이 있네요.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': '이스트브룩에서 두드린 문',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': '펜브리지에서 두드린 문',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': '하이워치에서 두드린 문',
+  'entities.quests.q_gourdlight_daily_feathers.title': '모닥불을 위한 깃털',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    '올드 대치그린은 궁지에 몰리면 자기 짚을 두들기는 자들에게 까마귀를 불러내요. 그 깃털은 화로에서 초록색으로 타는데, 오늘 밤 모닥불에 세 개가 필요해요. 그의 밭에서 싸움에 끼어서, {playerName}, 까마귀에게서 깃털을 뽑아 와요.',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    '달 없는 밭처럼 새까맣고, 벌써 연기 냄새가 나네요. 모닥불이 장관이겠어요. 고마워요.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': '까마귀 깃털',
+  'entities.quests.q_gourdlight_daily_baskets.title': '이웃에게 보내는 바구니',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    '고드라이트 축제의 밤마다 마을마다 오랜 친구에게 사탕 바구니를 채워 보내는데, 이제 무릎이 예전 같지 않아요. 대신 전해 줘요, {playerName}. 이스트브룩의 Cook Marlow, 펜브리지의 약초상 Yara, 그리고 하이워치의 Loremaster Caddis에게요.',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    '셋 다 전했군요. Marlow가 울었다면서요. 그 사람은 늘 울어요. 자, 당신 몫의 바구니예요.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Cook Marlow에게 전한 바구니',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label': '약초상 Yara에게 전한 바구니',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Loremaster Caddis에게 전한 바구니',
+  'seasonal.boo.row': '워!',
+  'seasonal.boo.rowAria': '{name} 앞으로 뛰어나가 워 하고 외치기',
+  'seasonal.boo.needsCostume':
+    '먼저 분장을 하세요: 분장 물약, 박쥐나 해골 장난, 짚인형 부적, 조각한 호박 머리, 또는 보글초록 가마솥의 고블린이 되는 한 모금.',
+  'seasonal.boo.frightenedHint':
+    '{name}은(는) 지난번 놀람에 아직도 움찔거립니다. 다른 사람을 찾아보세요.',
+  'seasonal.boo.landed':
+    '{name} 앞으로 뛰어나가 워! 하고 외쳤습니다. 비명을 지르며 들고 있던 걸 떨어뜨릴 뻔했습니다.',
+  'seasonal.boo.flash': '워! {name}이(가) 놀랐습니다!',
+  'seasonal.boo.noCostume': '분장 없이는 {name}이(가) 웃기만 합니다. 먼저 분장을 하세요.',
+  'seasonal.boo.already': '{name}은(는) 오늘 이미 충분히 놀랐습니다.',
+  'seasonal.boo.notOnErrand': '헤스터는 오늘 누구를 놀래 주라고 부탁하지 않았습니다.',
+  'entities.items.prankers_pumpkin.name': '장난꾸러기의 호박',
+  'entities.items.wanderwisp_lantern.name': '떠도는 도깨비불 등불',
+  'entities.items.sack_of_startled_bats.name': '놀란 박쥐 자루',
+  'entities.items.murmurwick_candle.name': '속삭이는 심지 양초',
+  'seasonal.itemUse.toyPrank':
+    '사용: {range}미터 이내의 보이는 다른 플레이어에게 던집니다. 대상의 머리가 {seconds}초 동안 빛나는 잭오랜턴이 되며, 대상은 우클릭으로 벗을 수 있습니다. 둘 다 전투 중이 아니어야 하며, 은신 중에는 사용할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 축제의 밤 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
+  'seasonal.itemUse.toyLantern':
+    '사용: 앞에 등불을 내려놓습니다. 작은 유령이 {seconds}초 동안 당신 주위를 맴돕니다. 전투 중이나 은신 중에는 사용할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 축제의 밤 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
+  'seasonal.itemUse.toyBats':
+    '사용: 자루를 엽니다. 찍찍거리는 박쥐 떼가 튀어나와 {seconds}초 동안 당신 주위로 흩어집니다. 전투 중이나 은신 중에는 사용할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 축제의 밤 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
+  'seasonal.toy.prank': '호박을 던졌습니다. {name}에게 철퍽 맞았습니다!',
+  'seasonal.toy.lantern': '등불을 내려놓자 작은 유령이 둥실 나와 곁을 지킵니다.',
+  'seasonal.toy.bats': '자루를 열자 놀란 박쥐 떼가 튀어나옵니다!',
+  'seasonal.toy.pranked':
+    '{name}이(가) 당신 머리에 호박을 던졌습니다! 오른쪽 클릭으로 벗거나, 당당하게 쓰고 다니세요.',
+  'seasonal.toy.prankedFlash': '{name}의 장난!',
+  'seasonal.toy.prankNeedsPlayer': '호박은 전투 중이 아닌 다른 플레이어에게만 맞습니다.',
+  'seasonal.toy.hidden': '먼저 그림자에서 나오세요. 장난감을 쓰면 위치가 드러납니다.',
+  'entities.items.gurglegreen_cauldron.name': '보글초록 가마솥',
+  'seasonal.itemUse.toyCandleShadows':
+    '사용: 앞에 양초를 켭니다. {seconds}초 동안 불꽃이 고양이, 박쥐, 마녀의 춤추는 그림자를 주위 땅에 드리우며, 근처의 모두가 볼 수 있습니다. 전투 중이나 은신 중에는 사용할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 전야 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
+  'seasonal.itemUse.toyCauldron':
+    '사용: 앞에 보글보글 끓는 커다란 가마솥을 내려놓습니다. 가마솥은 {standing}초 동안 그 자리에 있으며, 마시는 플레이어는 누구나 초록 거품에 휩싸여 {seconds}초 동안 고블린으로 변합니다(입고 있던 변장은 풀립니다). 내려놓기와 마시기 모두 전투 중이나 은신 중에는 할 수 없으며, 전투에 들어가면 고블린 변신이 풀립니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 전야 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
+  'seasonal.itemUse.broomSources':
+    '헤스터 고드윅에게서 엠버우븐 짚단 {count}개로 구입합니다. 드물게, 전리품을 챙긴 날 올드 대치그린이 떨어뜨리기도 합니다. 타려면 탈것 기술이 필요합니다. 고드라이트 전야 동안에만 존재하며, 이벤트가 끝나면 짚으로 부스러집니다.',
+  'seasonal.toy.candleShadows': '양초에 불을 붙이자, 불꽃 주위로 그림자들이 춤추기 시작합니다.',
+  'seasonal.toy.cauldron': '가마솥을 내려놓자, 보글보글 끓기 시작합니다.',
+  'seasonal.toy.cauldronDrink': '가마솥의 물약을 마시자, 초록 거품에 휩싸여 고블린으로 변했습니다!',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name}이(가) 해가 질 때까지 잠듭니다.',
+  'hudChrome.auraEffect.slumberNight':
+    '해가 질 때까지 기둥에 생기 없이 매달려 있습니다. 공격할 수 없습니다.',
+  'seasonal.thatchgrin.poleBound': '기둥에 묶임',
+  'seasonal.thatchgrin.wakeYell': '밭에 밤이 내린다! 누가 내 밭을 걷느냐?',
+  'seasonal.thatchgrin.sleepYell': '해가 떴군. 기둥으로 돌아가 다시 지켜봐야지.',
 };

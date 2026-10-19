@@ -36,6 +36,7 @@ import type { WorldPvpBooks } from './pvp/world_pvp';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
+import type { SeasonalWorldState } from './seasonal/seasonal_state';
 import type {
   ArenaMatch,
   ArenaQueueUnit,
@@ -293,6 +294,9 @@ export interface SimContextPrimitives {
   // King of the Hill (pvp/hill.ts): the standing hill, the schedule and the
   // hour's accruals, one live view like the books above (session-only).
   readonly hillState: HillState;
+  // The seasonal-event core (seasonal/): the host-fed active event, the /dev
+  // override and the open/close edge. One live view, mutated in place.
+  readonly seasonal: SeasonalWorldState;
   // The hill's spot probe, bound by the Sim (pvp/hill_probe.ts); tests bind fakes.
   readonly hillProbe: HillSpotProbe;
   // Resolved-match records the authoritative host drains post-tick
@@ -1482,6 +1486,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get hillState() {
       return host.hillState;
+    },
+    get seasonal() {
+      return host.seasonal;
     },
     get hillProbe() {
       return host.hillProbe;

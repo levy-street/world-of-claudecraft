@@ -84,10 +84,13 @@ describe('the day/night leaf', () => {
 });
 
 describe('the opt-in', () => {
-  it('is declared by the world boss and by nobody else', () => {
+  it('is declared by the world boss and the seasonal night boss, nobody else', () => {
     expect(MOBS[BALGATH]?.slumber).toBeDefined();
     const others = Object.entries(MOBS).filter(([id, m]) => id !== BALGATH && m.slumber);
-    expect(others.map(([id]) => id)).toEqual([]);
+    // Old Thatchgrin keeps NIGHT hours (round 10: tests/gourdlight_scarecrow_night.test.ts)
+    expect(others.map(([id]) => id)).toEqual(['gourdlight_thatchgrin']);
+    expect(MOBS.gourdlight_thatchgrin?.slumber?.awakeAt).toBe('night');
+    expect(MOBS[BALGATH]?.slumber?.awakeAt).toBeUndefined();
   });
 
   it('gives him a bed he can find and a voice the zone hears', () => {

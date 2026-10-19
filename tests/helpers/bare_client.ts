@@ -297,6 +297,9 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.selfLockouts = {};
   c.selfOwnedMounts = [];
   c.selfRidingTrained = false;
+  c.activeSeasonalEvent = null;
+  c.trickOrTreatedToday = Object.freeze([]);
+  c.hauntedPumpkinsFound = Object.freeze([]);
   // Callback-typed fields the first (regex-based) defaults sweep was blind
   // to: their annotations contain `=>`, which the scrape's annotation group
   // could not cross. The AST-based sweep sees them.

@@ -23,6 +23,10 @@ export const ZONE_STREAM_URLS: Record<MusicZone, string | null> = {
   town_fenbridge: '/audio/music/town_fenbridge.mp3?v=1a94215a28f8',
   town_highwatch: '/audio/music/town_highwatch.mp3?v=8daa06e91073',
   town_goldcrest: '/audio/music/town_goldcrest_1.mp3?v=0cf44456d0f5',
+  // Gourdlight Eve's town theme, "Lanterns on the Hollow Road" (music_theme_gourdlight.ts):
+  // rendered by scripts/render_music.mjs, one loop with its reverb tail wrapped onto
+  // its head, loudness-matched to the town cues (seasonal_music.ts plays it).
+  town_gourdlight: '/audio/music/town_gourdlight.mp3?v=6bb7b1562dd6',
   vale: '/audio/music/vale.mp3?v=d40a82892e1e',
   // The legacy vale cue has no dedicated remaster and is not routed by
   // musicZoneForLocation; the vale remaster stands in for completeness.

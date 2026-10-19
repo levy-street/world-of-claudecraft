@@ -1200,6 +1200,8 @@ export const VOICE_ALIAS = {
   // Maeve's designed voice as a ROLE match. Promote her to her own VOICE_PROMPTS entry, a
   // rounder, merrier marsh-country alto, once an ElevenLabs key is available.
   innkeeper_maudie: 'hearthkeeper_maeve',
+  // Gourdlight Eve's keeper: a warm townswoman at a festival, the hearthkeeper's register.
+  gourdlight_keeper: 'hearthkeeper_maeve',
   // The tavern's seated regulars (src/sim/content/mirefen_tavern_patrons.ts), ROLE matches
   // until each gets a voice of their own: the old eel fisher borrows Fisherman Brandt's
   // salt-cured rasp, the peat cutter Mother Sedge's marsh-country voice, the drover the

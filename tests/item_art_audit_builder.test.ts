@@ -852,6 +852,9 @@ describe('item-art audit builder', () => {
     // the sha/bytes straight from `--verify-only` on this tree.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1306 / 1324, re-minted on the merged tree.
     // Warfare Season 2: measured again with its four painted weapons, 1288 / 1306 on the release.
+    // 2066 / 2095 at the feature/v045-integration merge into feature/halloween-event:
+    // the integration's catalogue plus the 27 Gourdlight Eve event items, sha and bytes
+    // re-measured with `--verify-only` on the merged tree.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
       // Re-minted on the quests integration branch: the catalog carries the 15
@@ -878,11 +881,13 @@ describe('item-art audit builder', () => {
       // 2005 / 2034 on 42 sheet pages with the five-dungeon rework (PR 4352) on the v0.45.0
       // integration, re-measured.
       // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
-      catalogSha256: '432503f1b9cd93e304acec6fae601d6eda0b621a3be304351a5c709c0d1a5ee9',
-      catalogBytes: 1112221,
+      // 2043 / 2072 with Gourdlight Eve's four event items, re-measured the same way.
+      // 2045 / 2074 with Old Thatchgrin's two spoils, re-measured the same way.
+      catalogSha256: '2c6cdb73dbc9f807cc13c92727842baa6964b1e77b5bc253e212fe0d0a9862ff',
+      catalogBytes: 1126236,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2039,
-      liveItemCount: 2068,
+      catalogCount: 2066,
+      liveItemCount: 2095,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -900,7 +905,7 @@ describe('item-art audit builder', () => {
         identity: 44,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '2a34c06963c60cdff8a9ab277ab5b5b8264dfe4146edb7ca23a9220c2b4f6e3b',
+      shippingCatalogSha256: 'dafcd2dde2bb3f1e322dcc817d0acae5626bcfe739f8c2870cd021dc14323fe5',
       machineChecksPassed: true,
       verdict: null,
     });

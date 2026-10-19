@@ -280,6 +280,11 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'terrorspark_groundshaker',
   'referral_raptor',
   'referral_tank',
+  // Gourdlight Eve's Emberbristle Broom: Hester's, for five of Old Thatchgrin's daily
+  // Emberwoven Sheaves. Its reins are event-bound (swept when the event closes), so the
+  // slot reads owned only while Gourdlight Eve runs and drops back to unowned after,
+  // like any lost reins.
+  'emberbristle_broom',
 ] as const;
 
 // Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',
@@ -348,6 +353,9 @@ const MOUNT_SOURCES: Readonly<
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
   drakemaw_raptor: fromBoss('balgath_cyclops'),
+  // Hester sells it for five Emberwoven Sheaves (one per daily Old Thatchgrin kill), and
+  // since round 10 Old Thatchgrin himself rarely drops it on a daily looted kill.
+  emberbristle_broom: [fromVendor('gourdlight_keeper'), fromBoss('gourdlight_thatchgrin')],
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS
@@ -476,6 +484,16 @@ export const RELIQUARY_HORIZON_TITLES = [
   'exp_clue_ten_caskets',
   // The Drowned Temple lore guide's The Last Verse: Witness of the Choir.
   'dgn_drowned_temple_cantor',
+  // Gourdlight Eve's three title writs (Hester Gourdwick's stall): every non-hidden
+  // title deed pages here per the locked titles-page rule.
+  'feat_title_gourdlit',
+  'feat_title_trickster',
+  'feat_title_hollow_grinned',
+  // The Haunted Pumpkin hunt's completion title (the Hollow) pages here too, per the
+  // same locked titles-page rule (docs/design/reliquary.md, Locked decisions).
+  'feat_pumpkin_hunter',
+  // Gourdlight Eve's whole-event meta (round 12): the Gourdsworn, same locked rule.
+  'feat_gourdlight_eve_complete',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

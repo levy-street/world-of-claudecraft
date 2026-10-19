@@ -9,6 +9,15 @@
 // coloured back light for that model only.
 // Any model not listed renders exactly as before.
 export const STILL_FOCUS = {
+  // a strawling: whole-body it is a speck of sackcloth at 128px; framed on its stitched face
+  'models/creatures/gourdlight_strawling.glb': {
+    bone: 'Head',
+    radius: 0.24,
+    lift: -0.3,
+    yaw: 0.35,
+    // a warm key from the camera side, so the stitched grin reads on the dark sackcloth
+    rim: { color: 0xffd2a0, intensity: 2.4, from: [2, 3, 6] },
+  },
   'models/creatures/woc_crypt_morthen.glb': { bone: 'head', radius: 0.26, lift: -0.5, yaw: 0.6 },
   'models/creatures/woc_bastion_turnkey.glb': { bone: 'head', radius: 0.36, lift: -0.3 },
   // the Sledge Tusker: the soul lantern's post tops its bounds, so the top crop held only the

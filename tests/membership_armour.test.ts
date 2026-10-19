@@ -144,6 +144,10 @@ describe('membership armour', () => {
   it('refreshes an unchanged entitlement and expires it without traversing a grown bank', () => {
     const { sim, pid, meta } = member();
     sim.setPlayerLevel(20, pid);
+    // One tick first: a character's first tick runs the seasonal event-bound sweep
+    // (seasonal_bound_items.ts), which walks the bank ONCE per character per event
+    // change and never again on a quiet tick. Membership is what this pins.
+    sim.tick();
     meta.bank.inventory = new Proxy(
       Array.from({ length: 10000 }, () => ({ itemId: 'worn_sword', count: 1 })),
       {

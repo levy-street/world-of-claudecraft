@@ -2226,6 +2226,7 @@ export const vi_VN: EnTranslations = {
       "name_lanternback_troll": "Grumbol Lưng Đèn",
       "name_chimeglass_tortoise": "Tolliver chiếc cốc thủy tinh",
       "name_rickshaw_mount": "Xe kéo Buộc Xương",
+      "name_emberbristle_broom": "Emberbristle Broom",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
@@ -2244,7 +2245,8 @@ export const vi_VN: EnTranslations = {
       "desc_mech_bird": "Một con gà chiến đồng hồ được chế tạo bằng tay chạy nước rút trên các động cơ servo, phím lên dây cót vẫn quay.",
       "desc_lanternback_troll": "Một con quỷ đồi bị những người đốt đèn bẻ gãy ách, vác một chiếc ngai sắt trên vai với một chiếc đèn bão đang cháy trên hai tay.",
       "desc_chimeglass_tortoise": "Một con rùa bằng muối đã vượt qua ba thế hệ đoàn lữ hành. Những người thợ hàn mài cho anh ta một cặp kính từ kính bão và treo một chiếc chuông đồng vào cổ anh ta, để con đường nghe thấy anh ta từ rất lâu trước khi nó nhìn thấy anh ta.",
-      "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực."
+      "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực.",
+      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. It crumbles back to straw when Gourdlight Eve ends."
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
@@ -4171,6 +4173,9 @@ export const vi_VN: EnTranslations = {
       }
     },
     "auraEffect": {
+      "gourdlight": {
+        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+      },
       "wildheart": {
         "packBond": "Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.",
         "packBondFury": "Deals {pct}% more damage while its partner stands close.",
@@ -4264,6 +4269,7 @@ export const vi_VN: EnTranslations = {
       "spellHaste": "Tăng tốc độ thi triển phép thêm {pct}%",
       "sated": "Không thể hưởng thêm hiệu ứng tăng tốc nhóm khác",
       "cauterizeFatigue": "Thiêu Đốt không thể ngăn một đòn chí mạng khác",
+      "seasonalCosmetic": "Cosmetic only: no effect on combat",
       "castShield": "Việc niệm chú không thể bị ngắt quãng hoặc làm chậm bởi sát thương",
       "dmgDone": "Tăng sát thương gây ra lên {pct}%",
       "dmgDoneReduce": "Giảm sát thương gây ra đi {pct}%",
@@ -4411,6 +4417,7 @@ export const vi_VN: EnTranslations = {
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Giảm {pct}% toàn bộ sát thương nhận vào",
       "slumber": "Ngủ đến bình minh. Không thể bị tấn công và sẽ không thức giấc vì bất kỳ ai.",
+      "slumberNight": "Hangs lifeless on his pole until nightfall. Cannot be attacked.",
       "guardianWard": "Đòn chí mạng tiếp theo của kẻ địch thay vào đó hồi bạn lên {pct}% máu",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -4489,7 +4496,8 @@ export const vi_VN: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} trỗi dậy trên {zone}!",
       "wake": "{name} thức giấc trên {zone}!",
-      "sleep": "{name} ngủ đến bình minh."
+      "sleep": "{name} ngủ đến bình minh.",
+      "sleepUntilNightfall": "{name} sleeps until nightfall."
     },
     "auth": {
       "appleLoginCta": "Tiếp Tục với Apple",
@@ -7700,6 +7708,107 @@ export const vi_VN: EnTranslations = {
         "0": "Mủ thích hợp, những chiếc giường sẽ sống. Người xay cũ đã chôn cái gì đó trước khi anh ta rời đi. Cái xay của anh ta vẫn quay ở góc xa của những khu vườn. Đi và đứng cạnh nó.",
         "2": "Vậy là xay tạo hình khiến bạn đi xuống con đường bờ biển. Ngọn hải đăng giữ một bí mật cuối cùng: phía tây bắc của nó, chỉ dưới con đường, thảm cỏ đã bị cắt và xếp lại. Đào ở đó."
       }
+    }
+  },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Haunted Pumpkin",
+      "title": "Haunted Pumpkins",
+      "world": "World",
+      "progress": "{label}: {current}/{total}",
+      "found": "You light a Haunted Pumpkin in {zone}: {count}/{total}. Gourdlight Sweets received: {sweets}.",
+      "flash": "Haunted Pumpkin found! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Gourdlight Eve"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Trick or treat!",
+      "rowAria": "Say trick or treat to {name}",
+      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
+      "treat": "{name} hands you a treat.",
+      "trick": "{name} plays a trick on you: {trick}!",
+      "alreadyKnocked": "You already trick-or-treated {name} today.",
+      "notActive": "Gourdlight Eve is not running right now.",
+      "tooFar": "Step closer to knock.",
+      "treatFlash": {
+        "one": "Treat! {count} Gourdlight Sweet",
+        "few": "Treat! {count} Gourdlight Sweets",
+        "many": "Treat! {count} Gourdlight Sweets",
+        "other": "Treat! {count} Gourdlight Sweets"
+      },
+      "trickFlash": "Trick! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Batty",
+      "gourdlight_trick_skeleton": "Rattled Bones",
+      "gourdlight_trick_fumes": "Green Fumes",
+      "gourdlight_trick_strawling": "Strawling Guise",
+      "gourdlight_costume_skeleton": "Skeleton Costume",
+      "gourdlight_costume_ghost": "Ghost Costume",
+      "gourdlight_costume_bat": "Bat Costume"
+    },
+    "pumpkinHead": {
+      "on": "You put on the Carved Pumpkin Head.",
+      "off": "You take off the Carved Pumpkin Head."
+    },
+    "jarTrick": "The jar pops open: {trick}!",
+    "guise": "The charm crackles and the straw climbs over you: {trick}!",
+    "costume": "You drink the draught and change: {trick}!",
+    "titleGranted": "You read the writ. New title earned: {title}.",
+    "titleKnown": "You already hold that title, so you keep the writ.",
+    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
+    "itemUse": {
+      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Only during Gourdlight Eve. Cosmetic.",
+      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.",
+      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
+      "strawlingCharm": "Use: Become one of Old Thatchgrin's strawlings for {seconds} seconds. Not in combat, and only during Gourdlight Eve. Never consumed. Cosmetic.",
+      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick trades cosmetics for them at her stalls in Eastbrook, Fenbridge and Highwatch.",
+      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "toyPrank": "Use: Throw it at another visible player within {range} yards. Their head becomes a glowing jack-o'-lantern for {seconds} seconds, and they can right-click it off. Neither of you can be in combat, and you cannot be stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
+      "toyLantern": "Use: Set the lantern down in front of you. A small ghost circles you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
+      "toyBats": "Use: Open the sack. A squeaking swarm of bats bursts out and scatters around you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
+      "toyCandleShadows": "Use: Light the candle in front of you. For {seconds} seconds its flames throw dancing shadows of a cat, a bat and a witch onto the ground around it, for everyone nearby to see. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
+      "toyCauldron": "Use: Set a big bubbling cauldron down in front of you. It stands for {standing} seconds, and any player who drinks from it bursts in green bubbles and turns into a goblin for {seconds} seconds, replacing any costume they wear. Neither setting it down nor drinking works in combat or while stealthed, and entering combat ends the goblin form. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
+      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.",
+      "broomSources": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves, or, rarely, dropped by Old Thatchgrin on a day you loot him. Riding it requires the riding skill. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends.",
+      "sheaf": "Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Crumbles to straw when Gourdlight Eve ends."
+    },
+    "toy": {
+      "prank": "You throw the pumpkin. It splats onto {name}!",
+      "lantern": "You set the lantern down, and a little ghost drifts out to keep you company.",
+      "bats": "You open the sack, and a swarm of startled bats bursts out!",
+      "candleShadows": "You light the candle, and shadows begin to dance around its flames.",
+      "cauldron": "You set the cauldron down, and it starts to bubble.",
+      "cauldronDrink": "You drink from the cauldron, burst in green bubbles and turn into a goblin!",
+      "pranked": "{name} splats a pumpkin on your head! Right-click it off, or wear it proudly.",
+      "prankedFlash": "Pranked by {name}!",
+      "prankNeedsPlayer": "The pumpkin only splats on another player who is not in combat.",
+      "hidden": "Step out of the shadows first: a toy would give you away."
+    },
+    "itemSource": {
+      "pumpkinHead": "Dropped by Old Thatchgrin, in his pumpkin field past Boar Meadow, the first time you loot him. No vendor sells it."
+    },
+    "boo": {
+      "row": "Boo!",
+      "rowAria": "Leap out at {name} and shout boo",
+      "needsCostume": "Put on a costume first: a costume draught, a bat or skeleton trick, the Strawling Charm, the Carved Pumpkin Head or a goblin sip from the Gurglegreen Cauldron.",
+      "frightenedHint": "{name} is still jumpy from your last fright. Find someone else.",
+      "landed": "You leap out at {name} with a BOO! They shriek and nearly drop everything.",
+      "flash": "BOO! {name} is frightened!",
+      "noCostume": "Without a costume, {name} only laughs at you. Put one on first.",
+      "already": "{name} has had enough frights for one day.",
+      "notOnErrand": "Hester has not asked you to frighten anyone today."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Pole-Bound",
+      "wakeYell": "NIGHT falls on the patch! Who walks in MY field?",
+      "sleepYell": "Sun is up. Back on the post, back to watching."
     }
   },
   "dungeonGuide": {
@@ -22956,6 +23065,87 @@ export const vi_VN: EnTranslations = {
       "moonwrack_stave": {
         "name": "Moonwrack Stave"
       },
+      "gourdlight_sweet": {
+        "name": "Gourdlight Sweet"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Gourdlight Treat Pouch"
+      },
+      "carved_pumpkin_head": {
+        "name": "Carved Pumpkin Head"
+      },
+      "jar_of_mischief": {
+        "name": "Jar of Mischief"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Thatchgrin's Sweet Sack"
+      },
+      "strawling_charm": {
+        "name": "Strawling Charm"
+      },
+      "rattlebone_draught": {
+        "name": "Rattlebone Draught"
+      },
+      "haunting_draught": {
+        "name": "Haunting Draught"
+      },
+      "batwing_draught": {
+        "name": "Fluttering Draught"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Writ of the Gourdlit"
+      },
+      "writ_of_the_trickster": {
+        "name": "Writ of the Trickster"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Writ of the Hollow Grin"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Emberbristle Broom"
+      },
+      "hearthroot_toffee": {
+        "name": "Hearthroot Toffee"
+      },
+      "gourdseed_brittle": {
+        "name": "Gourdseed Brittle"
+      },
+      "crabapple_chew": {
+        "name": "Crabapple Chew"
+      },
+      "owlwatch_fudge": {
+        "name": "Owlwatch Fudge"
+      },
+      "lantern_mint_drop": {
+        "name": "Lantern Mint Drop"
+      },
+      "emberwoven_sheaf": {
+        "name": "Emberwoven Sheaf"
+      },
+      "prankers_pumpkin": {
+        "name": "Pranker's Pumpkin"
+      },
+      "wanderwisp_lantern": {
+        "name": "Wanderwisp Lantern"
+      },
+      "sack_of_startled_bats": {
+        "name": "Sack of Startled Bats"
+      },
+      "murmurwick_candle": {
+        "name": "Murmurwick Candle"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Gurglegreen Cauldron"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Patch Pumpkin"
+      },
+      "cursed_candle_stub": {
+        "name": "Cursed Candle Stub"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Gourdlight Crow Feather"
+      },
       "membership_token": {
         "name": "Membership Token (30 Days)"
       },
@@ -24497,6 +24687,18 @@ export const vi_VN: EnTranslations = {
       "muster_effigy": {
         "name": "Straw Foreman"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Old Thatchgrin"
+      },
+      "gourdlight_crow": {
+        "name": "Gourdlight Crow"
+      },
+      "gourdlight_strawling": {
+        "name": "Strawling"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Swelling Gourd"
+      },
       "stable_horse": {
         "name": "Ngựa chuồng"
       },
@@ -25570,6 +25772,11 @@ export const vi_VN: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Mapmaker",
         "greeting": "Every map of this marsh I've ever bought was wrong within a season. The water moves the paths, and the paths move the water. So I draw my own, and I sit here where it's dry while the ink sets."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Gourdlight Keeper",
+        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me, at any of my stalls, and I will trade you something to wear."
       },
       "reeve_ottoline": {
         "name": "Xã Trưởng Ottoline",
@@ -28187,6 +28394,88 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Hồi máu thực tế cho Hình Nhân Hồi Máu"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Gourdlight Rounds",
+        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
+        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "objectives": {
+          "0": {
+            "label": "Doors knocked on"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Pumpkins from the Patch",
+        "text": "Old Thatchgrin's patch past Boar Meadow is fat with pumpkins, and half of them have rolled out past his straw where a careful soul can reach them. Bring me five, {playerName}. Stay wide of the old scarecrow himself. He counts every one.",
+        "completion": "Five round ones, and not a bite out of any. That is pie for the whole Vale. Here, for your trouble.",
+        "objectives": {
+          "0": {
+            "label": "Patch Pumpkins"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Boo!",
+        "text": "Nobody in these towns has had a proper fright in a year, {playerName}, and a Gourdlight Eve without one is just a cold night. Put on a costume, any of mine will do, or that pumpkin head if you have earned one. Then creep up on three of the townsfolk and give them a good loud BOO.",
+        "completion": "Three of them? I heard the cook drop a pan from across the square. Well done. Here is your share.",
+        "objectives": {
+          "0": {
+            "label": "Townsfolk frightened"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Wicked Wicks",
+        "text": "Someone has been setting candles with green flames at the feet of our lamp posts. They burn without melting and they whisper when you turn your back. Snuff six of them for me, {playerName}, in any of the three towns, and bring me the stubs.",
+        "completion": "Six stubs, cold as frost. Whoever lit them will have to try harder than that. Take this, and wash your hands.",
+        "objectives": {
+          "0": {
+            "label": "Cursed candles snuffed"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "A Door in Every Town",
+        "text": "The children say a true Gourdlight walker knocks in every town before the night is out. Prove them right, {playerName}. Trick or treat at one door in Eastbrook, one in Fenbridge and one in Highwatch. The lanterns on the roads will light your way.",
+        "completion": "Three towns in one night! Your boots have earned this more than you have.",
+        "objectives": {
+          "0": {
+            "label": "A door knocked in Eastbrook"
+          },
+          "1": {
+            "label": "A door knocked in Fenbridge"
+          },
+          "2": {
+            "label": "A door knocked in Highwatch"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Feathers for the Fire",
+        "text": "When Old Thatchgrin is pressed, he calls his crows down on whoever is beating at his straw. Their feathers burn green in a hearth, and I need three for tonight's bonfire. Find a fight at his patch, {playerName}, and pluck them from his crows.",
+        "completion": "Black as a moonless field, and they smell of smoke already. The bonfire will be a sight. Thank you.",
+        "objectives": {
+          "0": {
+            "label": "Crow feathers"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Baskets for the Neighbours",
+        "text": "I fill a basket of sweets for an old friend in each town every Gourdlight Eve, and my knees are not what they were. Take them round for me, {playerName}: Cook Marlow in Eastbrook, Yara the herbalist in Fenbridge, and Loremaster Caddis up in Highwatch.",
+        "completion": "All three delivered, and I hear Marlow cried. He always cries. Here is a basket of your own.",
+        "objectives": {
+          "0": {
+            "label": "Basket left with Cook Marlow"
+          },
+          "1": {
+            "label": "Basket left with Yara the herbalist"
+          },
+          "2": {
+            "label": "Basket left with Loremaster Caddis"
           }
         }
       },

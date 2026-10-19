@@ -7,6 +7,7 @@ import {
   setLunarPhaseOverride,
 } from '../render/day_night_clock';
 import { phaseToCycleMs } from '../sim/day_night';
+import { parseServerTimeCommand } from '../sim/dev/day_night_override';
 
 /**
  * The UTC-anchored millisecond clock the OFFLINE sim's day/night cycle reads, honoring
@@ -64,17 +65,49 @@ export function parsePhaseArg(
   return Number.isFinite(n) ? ((n % 1) + 1) % 1 : null;
 }
 
+/**
+ * OFFLINE `/dev servertime <arg>`: the offline sim's clock IS the sky's override
+ * (offlineDayNightNowMs above), so there is one clock and this sets it, exactly as
+ * /daynight does. Left to the sim, the command would wrap the offline clock in a fixed
+ * offset that any later /daynight then shifted (the offset was anchored to the old
+ * reading), landing a /daynight night on DAY and leaving Old Thatchgrin on his pole under
+ * a midnight sky. Online the line is not touched here: it goes to the server, whose clock
+ * the sky does not share. Returns true when it consumed the line.
+ */
+function tryOfflineServerTime(raw: string, hud: DayNightDevHud): boolean {
+  const cmd = parseServerTimeCommand(raw.trim());
+  if (cmd === null) return false;
+  if (cmd === 'usage') {
+    hud.log('[dev] usage: /dev servertime day|night|dawn|dusk|<0..1>|auto', '#ffcf6a');
+    return true;
+  }
+  if (cmd.kind === 'auto') {
+    setDayNightPhaseOverride(null);
+    hud.log('[dev] offline world clock and sky back on real time', '#8fd0ff');
+  } else {
+    setDayNightPhaseOverride(cmd.phase);
+    hud.log(
+      `[dev] offline world clock and sky set to ${cmd.label} (phase ${cmd.phase.toFixed(2)}); /daynight moves the same clock`,
+      '#8fd0ff',
+    );
+  }
+  hud.refreshDayNightDial();
+  return true;
+}
+
 export function tryDayNightDevCommand(
   raw: string,
   hud: DayNightDevHud,
   devCommandsAvailable = import.meta.env.DEV,
+  offline = false,
 ): boolean {
-  const m = raw.trim().match(/^\/(?:dev\s+time|dev\s+daynight|daynight)\b\s*(.*)$/i);
-  if (!m) return false;
   // Dev builds or realms advertising ALLOW_DEV_COMMANDS=1 (dev/PBE) only: a
   // per-client phase override is brighter-night-for-me, which is banned on
   // production realms where devCommandsAvailable is false.
   if (!import.meta.env.DEV && !devCommandsAvailable) return false;
+  if (offline && tryOfflineServerTime(raw, hud)) return true;
+  const m = raw.trim().match(/^\/(?:dev\s+time|dev\s+daynight|daynight)\b\s*(.*)$/i);
+  if (!m) return false;
   const arg = m[1].trim().toLowerCase();
   if (!arg) {
     hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');

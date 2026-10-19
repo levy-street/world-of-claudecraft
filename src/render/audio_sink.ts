@@ -98,6 +98,15 @@ export interface AbilityAudioOpts {
 }
 
 export interface SpatialAudioSink {
+  /** One positional one-shot of a manifest clip (a render layer's own timed cue, e.g.
+   *  Gourdfall's whistle as a pumpkin starts to fall). Optional: silent without it. */
+  playAt?(
+    key: string,
+    x: number,
+    y: number,
+    z: number,
+    opts?: { gain?: number; cooldown?: number },
+  ): boolean;
   /** Every variant is decoded before a timed event claims audio ownership. */
   isBuffered?(key: string): boolean;
   preload?(key: string): void;

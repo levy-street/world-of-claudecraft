@@ -31,6 +31,8 @@ import { grantBuddy } from './buddies';
 import { BUDDY_DEED_REWARDS } from './content/buddy_sources';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { FARM_CROP_IDS } from './content/farm_crops';
+import { GOURDLIGHT_THATCHGRIN_MARK } from './content/gourdlight_eve_deeds';
+import { THATCHGRIN_ID } from './content/gourdlight_eve_scarecrow';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { REFERRAL_TITLE } from './content/referral_rewards';
 import { pointsSpent } from './content/talents';
@@ -1982,6 +1984,16 @@ export function onWorldBossKilledForDeeds(
   // Per-boss credit, matched on template id. An explicit branch per boss rather than a
   // table because the deeds differ in SHAPE: only Thunzharr has an unbroken-run deed, so a
   // table would carry optionals most bosses never use.
+  // Old Thatchgrin (Gourdlight Eve's field boss): his seasonal feat (feat_old_thatchgrin).
+  if (mob.templateId === THATCHGRIN_ID) {
+    for (const meta of contributors) {
+      bumpDeedStat(ctx, meta, 'thatchgrinKills', 1);
+      // the whole-event checklist's leaf (feat_gourdlight_eve_complete)
+      markVisited(ctx, meta, GOURDLIGHT_THATCHGRIN_MARK);
+    }
+    ctx.deedRuntime.encounters.delete(mob.id);
+    return;
+  }
   if (mob.templateId === BALGATH_ID) {
     for (const meta of contributors) {
       grantDeed(ctx, meta, 'cmb_balgath');
@@ -2325,4 +2337,9 @@ export const VISITED_MARK_NAMESPACES = [
   // at the destination. Registered so a save keeps a one-way crossing until
   // the return trip completes the deed.
   'ferry',
+  // Gourdlight Eve's whole-event checklist (content/gourdlight_eve_deeds.ts): knocks,
+  // frights per town, errands, the Thatchgrin kill and the pumpkin hunt, every id built
+  // from the event's own tables (seasonal/gourdlight_deed_marks.ts writes them).
+  // Registered so a save keeps a half-done checklist across sessions and editions.
+  'gourdlight',
 ] as const;

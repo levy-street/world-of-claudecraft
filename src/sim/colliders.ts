@@ -120,6 +120,7 @@ import { FENCE_END_PAD, FENCE_HALF_DEPTH, FENCE_RAIL_HEIGHT } from './fence_dims
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
 import { interiorCollidersNear, resolveInteriorAgainst } from './interior_collider_cells';
 import { interiorCollidersFor } from './interior_collider_sets';
+import { mineMoundFootprint } from './mine_mound';
 import { musterCampColliders, musterPocketSeals } from './muster_camp_colliders';
 import {
   benchDrawnHeight,
@@ -188,6 +189,7 @@ import { yumiMazeColliders } from './yumi_maze_layout';
 // from the same defs, so what you see is what you collide with.
 // Sim layer: no three.js imports.
 
+export * from './mine_mound';
 // Parkour heights (movement-blocking tops, mantle, standable support) live in
 // parkour_heights.ts; re-exported here so importers keep this path.
 export {
@@ -208,23 +210,6 @@ export { campCrateShape } from './prop_layout';
 
 function topY(seed: number, x: number, z: number, height: number): number {
   return groundHeight(x, z, seed) + height;
-}
-
-// default backward offset/radius for a mine's spoil mound behind the timber portal,
-// shared with the renderer (src/render/props.ts) so the two can't drift apart
-export const MINE_MOUND_DEFAULT_OFFSET = 3.4;
-export const MINE_MOUND_DEFAULT_RADIUS = 5;
-
-export function mineMoundFootprint(m: {
-  x: number;
-  z: number;
-  rot: number;
-  moundOffset?: number;
-  moundRadius?: number;
-}): { x: number; z: number; r: number } {
-  const r = m.moundRadius ?? MINE_MOUND_DEFAULT_RADIUS;
-  const mound = rotY(0, -(m.moundOffset ?? MINE_MOUND_DEFAULT_OFFSET), m.rot);
-  return { x: m.x + mound.x, z: m.z + mound.z, r };
 }
 
 // ---------------------------------------------------------------------------
@@ -1379,11 +1364,24 @@ function registerInCells(grid: ColliderGrid, c: Collider, remove = false): void 
  * decides it lives in transport_gates.ts; an unchanged gate, or a gate this
  * grid does not carry, is a no-op.
  */
-export function setColliderGateOpen(seed: number, gate: string, open: boolean): void {
+export function setColliderGateOpen(
+  seed: number,
+  gate: string,
+  open: boolean,
+  build?: () => Collider[],
+): void {
   // Never BUILD a grid just to set a gate (a Sim that never queries collision
   // would pay for a whole world): remember the wish, and gridFor applies it.
+  // A gate with a `build` (seasonal_decor_colliders.ts) is the exception: its first
+  // opening builds the grid, then its colliders LATE, so they exist only once opened.
   const content = getActiveWorldContent();
-  const grid = gridCaches.get(content)?.get(seed);
+  const grid = gridCaches.get(content)?.get(seed) ?? (build && open ? gridFor(seed) : undefined);
+  if (grid && build && open && !grid.gated.has(gate)) {
+    const late = build();
+    for (const c of late) assignLateGridIndex(grid, Object.assign(c, { gate }));
+    grid.gated.set(gate, late);
+    grid.closedGates.add(gate);
+  }
   if (!grid) {
     const wishes = pendingGateStates.get(content) ?? new Map<number, Map<string, boolean>>();
     pendingGateStates.set(content, wishes);

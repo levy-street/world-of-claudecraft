@@ -2226,6 +2226,7 @@ export const ja_JP: EnTranslations = {
       "name_lanternback_troll": "ランタンバックのグルンボル",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
+      "name_emberbristle_broom": "エンバーブリッスルの箒",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -2244,7 +2245,8 @@ export const ja_JP: EnTranslations = {
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
       "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
-      "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
+      "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。",
+      "desc_emberbristle_broom": "オレンジのリボンを巻いた収穫の箒。地面から手のひらひとつ分浮かび、穂先から燠火をこぼす。ゴードライトの宵が終わると藁に戻って崩れ落ちる。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -4171,6 +4173,9 @@ export const ja_JP: EnTranslations = {
       }
     },
     "auraEffect": {
+      "gourdlight": {
+        "thatchbound": "オールド・サッチグリンに操られています。行動できず、最も近い味方のもとへ歩かされ、{every}秒ごとに{min}から{max}のダメージを与えます（レベル{level}の味方には最大{mult}倍）。最大HPの{pct}%に相当するダメージを受けるか、味方に解呪（魔法）されると早めに解除されます。"
+      },
       "wildheart": {
         "packBond": "相棒が近くにいる間、受けるダメージが{pct}%減少する。獣使いとジャガーを引き離せば絆は切れる。",
         "packBondFury": "相棒が近くにいる間、与えるダメージが{pct}%増加する。",
@@ -4194,13 +4199,13 @@ export const ja_JP: EnTranslations = {
       "crypt": {
         "carrionEye": "戦闘中のすべてのカラスが{seconds}秒間あなたを狙う。タンクのもとへ走り、群れをまとめて倒そう。",
         "graniteSkin": "受けるダメージが{pct}%減少し、石は{every}秒ごとに厚くなる（最大{max}層）。スタンで砕け散り、{seconds}秒間受けるダメージが{cracked}%増加する。",
-        "measured": "これが切れると、立っている場所に開いた墓が崩れ落ち、{radius}ヤード以内の全員に{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。墓は戦闘中ずっと残るので、印は仲間から離れた墓地の端まで運ぶこと。",
+        "measured": "これが切れると、立っている場所に開いた墓が崩れ落ち、{radius}ヤード以内の全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。墓は戦闘中ずっと残るので、印は仲間から離れた墓地の端まで運ぶこと。",
         "graveDirt": "開いた墓の中に立っている：移動速度が{slow}%低下し、毎秒{damage}の闇ダメージ（ヒロイックでは{heroic}）。ヒロイックでは墓の中に{linger}秒留まると安らがぬ骨が這い出る。墓から出ること。",
         "dirtInEyes": "移動速度が{pct}%低下。ひとすくいの墓土は墓守マロウの前方にいる全員に当たる：背後に立つこと。",
         "blow": "受けるダメージが{pct}%上昇：1スタックごとに{per}%、現在{stacks}/{max}スタック。墓掘りの一撃のたびにスタックが増え、効果時間が{seconds}秒に戻る。",
         "graveVigor": "開いた墓の中に立っている間、攻撃速度が{pct}%上昇。墓から引き離すこと。",
         "tolling": "鐘の綱へ歩み寄り埋葬の鐘を鳴らしている間、ダメージを受けない。鳴らし終えると全員に{min}～{max}の闇ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、開いた墓すべてから安らがぬ骨が這い出る。",
-        "embraced": "貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。",
+        "embraced": "貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}から{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。",
         "lament": "花嫁の哀歌が終わると、灯った墓のランタンから{radius}ヤード以内にいない全員に{min}～{max}の冷気ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。ランタンが守るのは最も近い{cap}人だけで、その後は消えて次の哀歌を守れない。",
         "lingering": "次の花嫁の哀歌で受けるダメージが{pct}%増加：1スタックごとに{per}%、最大{max}スタック。次はランタンの光の中で受けること。",
         "slippery": "すべりやすい氷の上：速度は毎秒最大{grip}ヤード/秒しか変わらないため、走り出しが遅く、止まっても滑り続け、曲がると大きく膨らむ。氷から降りれば足場が戻る。",
@@ -4264,6 +4269,7 @@ export const ja_JP: EnTranslations = {
       "spellHaste": "呪文の詠唱速度が{pct}%上昇する",
       "sated": "別のグループ加速効果を受けられない",
       "cauterizeFatigue": "コーテライズは次の致死ダメージを防げない",
+      "seasonalCosmetic": "見た目のみ：戦闘に影響なし",
       "castShield": "ダメージで詠唱が中断または遅延しない",
       "dmgDone": "与えるダメージを{pct}%上昇させる",
       "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
@@ -4411,6 +4417,7 @@ export const ja_JP: EnTranslations = {
       "dodgeReduce": "回避率を{pct}%低下させる",
       "damageReduction": "受けるすべてのダメージを{pct}%軽減する",
       "slumber": "夜明けまで眠っている。攻撃できず、誰が来ても目を覚まさない。",
+      "slumberNight": "日が暮れるまで、生気なく柱に吊るされている。攻撃できない。",
       "guardianWard": "次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する",
       "armorFlat": "防御力を{value}低下させる",
       "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
@@ -4489,7 +4496,8 @@ export const ja_JP: EnTranslations = {
     "worldBoss": {
       "spawn": "{name}が{zone}にそびえ立つ！",
       "wake": "{name}が{zone}で目を覚ました！",
-      "sleep": "{name}は夜明けまで眠っている。"
+      "sleep": "{name}は夜明けまで眠っている。",
+      "sleepUntilNightfall": "{name}は日が暮れるまで眠っている。"
     },
     "auth": {
       "appleLoginCta": "Appleで続ける",
@@ -7700,6 +7708,107 @@ export const ja_JP: EnTranslations = {
         "0": "ちゃんとした堆肥だね、これで花壇は生き返る。昔の粉屋は去る前に何かを埋めていった。庭園の奥の隅で、あの風車はまだ回っている。そのそばに立ってごらん。",
         "2": "風車があなたを海沿いの道へ送ったか。灯台には最後の秘密がひとつある。北西、小道のすぐ脇で、芝が切られて元に戻されている。そこを掘れ。"
       }
+    }
+  },
+  "seasonal": {
+    "pumpkins": {
+      "name": "幽霊カボチャ",
+      "title": "幽霊カボチャ",
+      "world": "世界",
+      "progress": "{label}: {current}/{total}",
+      "found": "{zone}の幽霊カボチャに火を灯した：{count}/{total}。ゴードライトの菓子を受け取った：{sweets}。",
+      "flash": "幽霊カボチャを発見！{count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "ゴードライトの宵"
+      }
+    },
+    "trickOrTreat": {
+      "row": "トリック・オア・トリート！",
+      "rowAria": "{name}に「トリック・オア・トリート」と言う",
+      "knockedHint": "今日はもうここの戸を叩いた。デイリーリセット後にまた開く。",
+      "treat": "{name}がお菓子をくれた。",
+      "trick": "{name}がいたずらをした：{trick}！",
+      "alreadyKnocked": "今日はもう{name}にお菓子をねだった。",
+      "notActive": "ゴードライトの宵は今は開催されていない。",
+      "tooFar": "もっと近づいて戸を叩こう。",
+      "treatFlash": {
+        "one": "トリート！ゴードライトの菓子 {count}個",
+        "few": "トリート！ゴードライトの菓子 {count}個",
+        "many": "トリート！ゴードライトの菓子 {count}個",
+        "other": "トリート！ゴードライトの菓子 {count}個"
+      },
+      "trickFlash": "トリック！{trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "コウモリ化",
+      "gourdlight_trick_skeleton": "カタカタ骨",
+      "gourdlight_trick_fumes": "緑の煙",
+      "gourdlight_trick_strawling": "藁人形の扮装",
+      "gourdlight_costume_skeleton": "スケルトンの仮装",
+      "gourdlight_costume_ghost": "ゴーストの仮装",
+      "gourdlight_costume_bat": "コウモリの仮装"
+    },
+    "pumpkinHead": {
+      "on": "彫りカボチャの頭をかぶった。",
+      "off": "彫りカボチャの頭を外した。"
+    },
+    "jarTrick": "壺がぽんと開いた：{trick}！",
+    "guise": "お守りがぱちぱちと鳴り、藁が体を這い上がる：{trick}！",
+    "costume": "薬を飲むと姿が変わった：{trick}！",
+    "titleGranted": "証書を読んだ。新しい称号を獲得：{title}。",
+    "titleKnown": "その称号はすでに持っているので、証書は手元に残る。",
+    "boundItemGone": "ゴードライトの宵が終わり、{item}は藁に戻って崩れ落ちた。",
+    "itemUse": {
+      "pumpkinHead": "使用：内側から灯る彫りカボチャを兜の上からかぶる・外す。ゴードライトの宵の間のみ。見た目のみ。",
+      "trickJar": "使用：数秒間、無害ないたずらをランダムに自分にかける。ゴードライトの宵の間のみ。見た目のみ。",
+      "pouch": "使用：開けるとゴードライトの菓子を{count}個受け取る。",
+      "strawlingCharm": "使用：{seconds}秒間、オールド・サッチグリンの藁人形の姿になる。戦闘中は使えず、ゴードライトの宵の間のみ。消費されない。見た目のみ。",
+      "sweet": "ゴードライトの宵の間にお菓子をねだって手に入る。イーストブルックのヘスター・ゴードウィックが見た目アイテムと交換してくれる。",
+      "costumeSkeleton": "使用：{minutes}分間、カタカタ鳴るスケルトンに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。",
+      "costumeGhost": "使用：{minutes}分間、漂うゴーストに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。",
+      "costumeBat": "使用：{minutes}分間、羽ばたくコウモリに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。",
+      "toyPrank": "使用：{range}ヤード以内の見えている別のプレイヤーに投げつける。相手の頭が{seconds}秒間、光るジャック・オー・ランタンになり、相手は右クリックで外せる。どちらも戦闘中は使えず、ステルス中も使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。",
+      "toyLantern": "使用：目の前にランタンを置く。小さな幽霊が{seconds}秒間、あなたの周りを回る。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。",
+      "toyBats": "使用：袋を開ける。キーキー鳴くコウモリの群れが飛び出し、{seconds}秒間あなたの周りに散っていく。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。",
+      "toyCandleShadows": "使用：目の前でろうそくを灯す。{seconds}秒間、炎が猫、コウモリ、魔女の踊る影を周りの地面に映し、近くにいる全員に見える。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。",
+      "toyCauldron": "使用：目の前にぐつぐつ煮える大きな大鍋を置く。大鍋は{standing}秒間そこにあり、飲んだプレイヤーは誰でも緑の泡に包まれ、{seconds}秒間ゴブリンの姿になる（着ている仮装は解ける）。置くことも飲むことも、戦闘中とステルス中はできず、戦闘に入るとゴブリンの姿は解ける。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。",
+      "titleWrit": "使用：このキャラクターの称号{title}を獲得し、功績の書から付けられる。消費される。ゴードライトの宵の期間のみ。称号をすでに持っている場合は証書が残る。",
+      "broomSources": "ヘスター・ゴードウィックからエンバーウーブンの藁束{count}個で購入する。まれに、戦利品を受け取った日にオールド・サッチグリンが落とすこともある。乗るには騎乗スキルが必要。ゴードライトの宵の間だけ存在し、イベントが終わると藁になって崩れる。",
+      "sheaf": "オールド・サッチグリンを倒して戦利品を受け取るたび、1日に1つもらえる。エンバーブリッスルの箒を手に入れるまで続く。ヘスター・ゴードウィックがイーストブルック、フェンブリッジ、ハイウォッチの屋台で{count}個を箒と交換してくれる。ゴードライトの宵が終わると藁になって崩れる。"
+    },
+    "toy": {
+      "prank": "カボチャを投げた。{name}に命中してべちゃっと割れた！",
+      "lantern": "ランタンを置くと、小さな幽霊がふわりと出てきて付き添ってくれる。",
+      "bats": "袋を開けると、驚いたコウモリの群れが飛び出した！",
+      "candleShadows": "ろうそくを灯すと、炎の周りで影が踊り始めた。",
+      "cauldron": "大鍋を置くと、ぐつぐつと泡立ち始めた。",
+      "cauldronDrink": "大鍋の中身を飲むと、緑の泡に包まれてゴブリンの姿に変わった！",
+      "pranked": "{name}があなたの頭にカボチャをぶつけた！右クリックで外すか、堂々とかぶっていよう。",
+      "prankedFlash": "{name}のいたずら！",
+      "prankNeedsPlayer": "カボチャは戦闘中でない別のプレイヤーにしか当たらない。",
+      "hidden": "まず物陰から出よう。おもちゃを使えば居場所がばれてしまう。"
+    },
+    "itemSource": {
+      "pumpkinHead": "ボアメドウの先にあるカボチャ畑のオールド・サッチグリンから、初めて戦利品を受け取ったときに手に入る。商人は売っていない。"
+    },
+    "boo": {
+      "row": "わっ！",
+      "rowAria": "{name}の前に飛び出して「わっ！」と叫ぶ",
+      "needsCostume": "まず仮装をすること：仮装の薬、コウモリかガイコツのいたずら、藁人形のお守り、彫りカボチャの頭、またはぐつぐつ緑の大鍋のゴブリンになるひと口。",
+      "frightenedHint": "{name}はさっきの驚きでまだびくびくしている。別の人を探そう。",
+      "landed": "{name}の前に飛び出して「わっ！」と叫んだ！悲鳴を上げて、持ち物を落としそうになった。",
+      "flash": "わっ！{name}が驚いた！",
+      "noCostume": "仮装なしでは、{name}は笑うだけだ。まず仮装をしよう。",
+      "already": "{name}は今日はもう十分に驚かされた。",
+      "notOnErrand": "今日はヘスターから誰かを驚かせる頼みを受けていない。"
+    },
+    "tokenPrice": "{item} ×{count}",
+    "thatchgrin": {
+      "poleBound": "柱縛り",
+      "wakeYell": "夜が畑に降りたぞ！ わしの畑を歩くのは誰だ？",
+      "sleepYell": "日が昇った。柱に戻って、また見張りだ。"
     }
   },
   "dungeonGuide": {
@@ -22956,6 +23065,87 @@ export const ja_JP: EnTranslations = {
       "moonwrack_stave": {
         "name": "ムーンラックの杖"
       },
+      "gourdlight_sweet": {
+        "name": "ゴードライトの菓子"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "ゴードライトのお菓子袋"
+      },
+      "carved_pumpkin_head": {
+        "name": "彫りカボチャの頭"
+      },
+      "jar_of_mischief": {
+        "name": "いたずらの壺"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "サッチグリンの菓子袋"
+      },
+      "strawling_charm": {
+        "name": "藁人形のお守り"
+      },
+      "rattlebone_draught": {
+        "name": "ガラガラ骨の薬"
+      },
+      "haunting_draught": {
+        "name": "さまよう霊の薬"
+      },
+      "batwing_draught": {
+        "name": "はばたきの薬"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "ゴードリットの証書"
+      },
+      "writ_of_the_trickster": {
+        "name": "トリックスターの証書"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "うつろな笑みの証書"
+      },
+      "reins_emberbristle_broom": {
+        "name": "エンバーブリッスルの箒"
+      },
+      "hearthroot_toffee": {
+        "name": "炉根のトフィー"
+      },
+      "gourdseed_brittle": {
+        "name": "かぼちゃの種のブリトル"
+      },
+      "crabapple_chew": {
+        "name": "姫りんごのチュウ"
+      },
+      "owlwatch_fudge": {
+        "name": "フクロウ見張りのファッジ"
+      },
+      "lantern_mint_drop": {
+        "name": "ランタンミントドロップ"
+      },
+      "emberwoven_sheaf": {
+        "name": "エンバーウーブンの藁束"
+      },
+      "prankers_pumpkin": {
+        "name": "いたずら者のカボチャ"
+      },
+      "wanderwisp_lantern": {
+        "name": "さまよう鬼火のランタン"
+      },
+      "sack_of_startled_bats": {
+        "name": "驚いたコウモリの袋"
+      },
+      "murmurwick_candle": {
+        "name": "ささやき芯のろうそく"
+      },
+      "gurglegreen_cauldron": {
+        "name": "ぐつぐつ緑の大鍋"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "畑のカボチャ"
+      },
+      "cursed_candle_stub": {
+        "name": "呪われたろうそくの燃えさし"
+      },
+      "gourdlight_crow_feather": {
+        "name": "ゴードライトのカラスの羽根"
+      },
       "membership_token": {
         "name": "メンバーシップトークン（30日）"
       },
@@ -24497,6 +24687,18 @@ export const ja_JP: EnTranslations = {
       "muster_effigy": {
         "name": "藁の監督"
       },
+      "gourdlight_thatchgrin": {
+        "name": "オールド・サッチグリン"
+      },
+      "gourdlight_crow": {
+        "name": "ゴードライトのカラス"
+      },
+      "gourdlight_strawling": {
+        "name": "藁人形"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "膨れ瓜"
+      },
       "stable_horse": {
         "name": "厩舎の馬"
       },
@@ -25570,6 +25772,11 @@ export const ja_JP: EnTranslations = {
         "name": "ヘスター・クウィルビー",
         "title": "地図職人",
         "greeting": "この湿地の地図は、買ったものがどれも一季節もたずに間違いになったわ。水が道を動かして、道が水を動かすの。だから自分で描いて、インクが乾くまで、ここの乾いた席に座っているのよ。"
+      },
+      "gourdlight_keeper": {
+        "name": "ヘスター・ゴードウィック",
+        "title": "ゴードライトの番人",
+        "greeting": "カボチャに火が灯り、ランタンも吊るされた。ゴードライトの宵が来たのね。イーストブルック、フェンブリッジ、ハイウォッチの町の人の戸を叩いて、あの言葉を言いなさい。トリック・オア・トリート。たいていはお菓子をくれるけど、いたずらをする人もいるわ。お菓子を持ってきてくれたら、身につけるものと交換してあげる。"
       },
       "reeve_ottoline": {
         "name": "代官オトリーヌ",
@@ -28187,6 +28394,88 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "治療用ダミーに有効な治療が当たった"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "ゴードライトの見回り",
+        "text": "ゴードライトの宵には、谷の子どもたちが家々を回るの。今年はあなたも一緒よ、{playerName}。私たちの町で五つの戸を叩いて、あの言葉を言って、何をもらえるか見てきて。終わったら戻ってきてね。",
+        "completion": "五つの戸を叩いて、指もちゃんと全部ある。はい、帰り道のお菓子袋よ。明日また来て。戸はまた開くから。",
+        "objectives": {
+          "0": {
+            "label": "叩いた戸"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "畑のカボチャ",
+        "text": "ボアメドウの先にあるオールド・サッチグリンの畑はカボチャで実っていて、半分は藁の囲いの外まで転がり出ているの。気をつければ手が届くわ。五つ持ってきて、{playerName}。あの年寄りのかかし本人には近づかないこと。一つ残らず数えているから。",
+        "completion": "丸いのが五つ、かじられた跡もなし。谷じゅうのパイになるわ。はい、手間賃よ。",
+        "objectives": {
+          "0": {
+            "label": "畑のカボチャ"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "わっ！",
+        "text": "この町の誰も、この一年ちゃんと驚かされていないのよ、{playerName}。驚きのないゴードライトの宵なんて、ただの寒い夜。仮装をしてちょうだい。私の薬ならどれでもいいし、手に入れたならあのカボチャ頭でもいいわ。それから町の人三人に忍び寄って、大きな声で「わっ！」と驚かせてきて。",
+        "completion": "三人も？広場の向こうから料理人が鍋を落とす音が聞こえたわ。よくやったわね。はい、あなたの分よ。",
+        "objectives": {
+          "0": {
+            "label": "驚かせた町の人"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "呪われた灯芯",
+        "text": "誰かが街灯の足もとに緑の炎のろうそくを置いていくの。溶けもせずに燃えて、背を向けるとささやくのよ。三つの町のどこでもいいから六本吹き消して、燃えさしを持ってきて、{playerName}。",
+        "completion": "燃えさしが六本、霜みたいに冷たい。火をつけた誰かさんは、もっと頑張らないとね。これを受け取って、手を洗ってきなさい。",
+        "objectives": {
+          "0": {
+            "label": "吹き消した呪われたろうそく"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "どの町でも一つの戸を",
+        "text": "本物のゴードライトの歩き手は、夜が明ける前にすべての町で戸を叩くものだって子どもたちは言うの。それを証明してきて、{playerName}。イーストブルック、フェンブリッジ、ハイウォッチでそれぞれ一つの戸でトリック・オア・トリートを。道のランタンが行く手を照らしてくれるわ。",
+        "completion": "一晩で三つの町！あなたより、あなたのブーツのほうがこれにふさわしいわね。",
+        "objectives": {
+          "0": {
+            "label": "イーストブルックで叩いた戸"
+          },
+          "1": {
+            "label": "フェンブリッジで叩いた戸"
+          },
+          "2": {
+            "label": "ハイウォッチで叩いた戸"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "焚き火のための羽根",
+        "text": "オールド・サッチグリンは追い詰められると、藁を叩く者にカラスを呼び寄せるの。その羽根は炉で緑に燃えて、今夜の焚き火に三枚いるのよ。畑で戦いに加わって、{playerName}、カラスから羽根をむしってきて。",
+        "completion": "月のない畑みたいに真っ黒で、もう煙の匂いがする。焚き火が見ものになるわ。ありがとう。",
+        "objectives": {
+          "0": {
+            "label": "カラスの羽根"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "ご近所へのかご",
+        "text": "ゴードライトの宵には毎年、町ごとに古い友達へお菓子のかごを詰めるの。でも膝がもう昔ほどじゃなくてね。代わりに届けて、{playerName}。イーストブルックのCook Marlow、フェンブリッジの薬草師Yara、そしてハイウォッチのLoremaster Caddisへ。",
+        "completion": "三つとも届いたのね。Marlowは泣いたって聞いたわ。あの人はいつも泣くの。はい、あなたにも一かご。",
+        "objectives": {
+          "0": {
+            "label": "Cook Marlowに届けたかご"
+          },
+          "1": {
+            "label": "薬草師Yaraに届けたかご"
+          },
+          "2": {
+            "label": "Loremaster Caddisに届けたかご"
           }
         }
       },
