@@ -146,6 +146,11 @@ describe('skin event preview host sizing', () => {
     expect(Number(getComputedStyle(layer).zIndex)).toBeGreaterThan(
       Number(getComputedStyle(canvas).zIndex) || 0,
     );
+    // The drag hint stays over both the canvas and the stand-in.
+    const hint = stage.querySelector<HTMLElement>('.se-preview-hint');
+    expect(Number(hint ? getComputedStyle(hint).zIndex : Number.NaN)).toBeGreaterThan(
+      Number(getComputedStyle(layer).zIndex),
+    );
     // The crest is centred in the host, not clipped below the canvas.
     const img = layer.querySelector('img');
     const imgRect = img?.getBoundingClientRect();

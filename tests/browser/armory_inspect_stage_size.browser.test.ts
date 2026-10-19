@@ -3,7 +3,7 @@ import { page } from 'vitest/browser';
 import type { PreviewAppearance } from '../../src/render/characters/preview_appearance';
 import { MOUNT_SKIN_IDS } from '../../src/sim/content/mount_skins';
 import { WEAPON_SKIN_LIST } from '../../src/sim/content/weapon_skins';
-import { ArmoryInspect } from '../../src/ui/armory_inspect';
+import { ArmoryInspect, armoryPreviewParkingSize } from '../../src/ui/armory_inspect';
 import { MountInspect } from '../../src/ui/mount_inspect_controller';
 import { mountInspectRow } from '../../src/ui/mount_inspect_view';
 import type { ArmorySkinRow } from '../../src/ui/woc_store_view';
@@ -159,6 +159,50 @@ describe('inspect stage sizing', () => {
       const canvasRect = canvas.getBoundingClientRect();
       expect(canvasRect.width).toBeCloseTo(stageRect.width, 0);
       expect(canvasRect.height).toBeCloseTo(stageRect.height, 0);
+    },
+  );
+
+  // The Armory renderer is built in an off-screen parking host sized by
+  // armoryPreviewParkingSize, so the first card click must open the stage at
+  // exactly that size or every composer target resizes on that click. The
+  // first skin's codex is shorter than the stage, so its row height comes from
+  // the stage alone.
+  it.each([
+    { width: 1280, height: 900, touch: false },
+    { width: 900, height: 700, touch: false },
+    { width: 1280, height: 450, touch: false },
+    { width: 844, height: 390, touch: true },
+  ])(
+    'opens the Armory stage at its parked size at $width x $height (touch $touch)',
+    async ({ width, height, touch }) => {
+      await page.viewport(width, height);
+      if (touch) document.body.className = 'mobile-touch game-active';
+      setViewportVars(1);
+      const { stage } = openStage('armory');
+      const parked = armoryPreviewParkingSize(width, height, touch);
+      expect(stage.clientHeight).toBe(parked.height);
+      expect(Math.abs(stage.clientWidth - parked.width)).toBeLessThanOrEqual(1);
+    },
+  );
+
+  // The out-of-flow canvas must not cover the scene and mode toggles drawn
+  // over it: a press on a toggle reaches the toggle.
+  it.each(['armory', 'mount'] as const)(
+    'keeps the %s stage toggles above the canvas',
+    async (panel) => {
+      await page.viewport(1280, 900);
+      setViewportVars(1);
+      const { stage } = openStage(panel);
+      const buttons = stage.querySelectorAll<HTMLButtonElement>('.armory-inspect-controls button');
+      expect(buttons.length).toBeGreaterThan(0);
+      for (const button of buttons) {
+        const rect = button.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+        );
+        expect(hit === button || button.contains(hit)).toBe(true);
+      }
     },
   );
 });
