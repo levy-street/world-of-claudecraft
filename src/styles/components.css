@@ -4564,7 +4564,13 @@
     min-height: 380px;
     background: #070d14;
   }
+  /* Out of flow, so the drawing buffer can never size the stage: the Armory and
+     mount previews re-size the buffer FROM the stage on every resize, and in
+     flow its aspect and pixel ratio set the auto grid row's height.
+     tests/browser/armory_inspect_stage_size.browser.test.ts. */
   .armory-inspect-stage canvas {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
