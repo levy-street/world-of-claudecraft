@@ -1662,9 +1662,10 @@ export interface ItemInstancePayload {
    *  bounded chain of later holders the hub appends on every grant that
    *  changes hands (`movement` grants to a different character). Stamped
    *  beside `guid` and judged atomically on load. The full record is
-   *  owner-only; other players read its publicProvenanceView, shipped beside
-   *  the payload (a market row's `history`, the inspect `eqh` key) and never
-   *  inside the public trims, so no payload equality moves. */
+   *  owner-only; other players read its publicProvenanceView: beside the
+   *  payload on a market row (`history`) and the inspect `eqh` key, inside
+   *  the slot on the guild bank member wire (guildBankMemberWireView), never
+   *  inside publicInstanceView, so no payload equality moves. */
   provenance?: ItemProvenance;
   /** Permanent enemy-drop quality, independent of rarity, enchants and upgrades. */
   lootQuality?: LootQualityDescriptor;

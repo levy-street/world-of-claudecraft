@@ -10,7 +10,7 @@
 // Pure decisions (a UI_PURE_CORES member): no DOM, no host reads. The
 // item_history_dialog.ts affordance helpers are the thin DOM consumer.
 
-import { publicProvenanceView } from '../sim/item_provenance';
+import { isLoadableItemProvenance, publicProvenanceView } from '../sim/item_provenance';
 import type { ItemInstancePayload, ItemProvenance } from '../sim/types';
 
 /** Whose copy the viewer is looking at: their own (`self`), or one another
@@ -26,7 +26,10 @@ export function itemHistoryProvenanceFor(
   holder: ItemHistoryHolder,
 ): ItemProvenance | null {
   const provenance = instance?.provenance;
-  if (provenance === undefined) return null;
+  // A counterparty's payload arrives off the wire: judge it by the load
+  // bound before projecting, so a malformed record offers no door rather than
+  // throwing mid-render (the market and inspect decoders guard the same way).
+  if (provenance === undefined || !isLoadableItemProvenance(provenance)) return null;
   return holder === 'self' ? provenance : publicProvenanceView(provenance);
 }
 

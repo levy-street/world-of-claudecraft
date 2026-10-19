@@ -107,6 +107,34 @@ describe('classifyDiff', () => {
     }
   });
 
+  it('maps the item history door core to its four surfaces, low preset, touch legs where the door differs', () => {
+    const specific = classifyDiff(['src/ui/item_history_access_view.ts']).specific;
+    const legs = Object.fromEntries(
+      specific
+        .filter((t: { key: string }) => t.key.startsWith('item-history-'))
+        .map((t: { key: string; variants: { key: string }[] }) => [
+          t.key,
+          t.variants.map((v) => v.key),
+        ]),
+    );
+    expect(legs).toEqual({
+      'item-history-trade': ['desktop', 'dialog'],
+      'item-history-guild-bank': ['desktop', 'mobile'],
+      'item-history-market': ['desktop', 'dialog', 'mobile'],
+      'item-history-inspect': ['desktop', 'mobile'],
+    });
+    for (const target of specific.filter((t: { key: string }) =>
+      t.key.startsWith('item-history-'),
+    )) {
+      for (const variant of target.variants) {
+        expect(typeof variant.beforeLoad, `${target.key}/${variant.key}`).toBe('function');
+        expect(variant.mobile === true, `${target.key}/${variant.key}`).toBe(
+          variant.key === 'mobile',
+        );
+      }
+    }
+  });
+
   it('maps the Hide Interface core to its shown/hidden desktop legs', () => {
     const plan = classifyDiff(['src/ui/interface_visibility_core.ts']);
     expect(plan.isVisual).toBe(true);

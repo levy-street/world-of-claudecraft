@@ -67,6 +67,7 @@ import {
   appendItemHistoryActionAfter,
   attachItemHistoryContextMenu,
   closeItemHistoryDialogForOwner,
+  openItemHistoryDialog,
 } from './item_history_dialog';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, type ModularLook, portraitChipHtml } from './portrait_chip';
@@ -345,6 +346,17 @@ export class InspectWindow {
     if (!cell.item || history === null) return;
     const name = wornItemCellParts(cell.item, cell.instance).name;
     row.tabIndex = 0;
+    // A focus stop must do something on every keyboard: Enter and Space open
+    // the history too (no Context Menu key on a Mac keyboard), and the row
+    // announces what it opens.
+    row.setAttribute('role', 'button');
+    row.setAttribute('aria-haspopup', 'dialog');
+    row.setAttribute('aria-label', t('hudChrome.itemHistory.openAria', { item: name }));
+    row.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      openItemHistoryDialog({ itemName: name, provenance: history, opener: row });
+    });
     attachItemHistoryContextMenu(row, name, history);
     appendItemHistoryActionAfter(row, name, history, 'gridCell');
   }

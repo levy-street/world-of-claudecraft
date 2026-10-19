@@ -35,6 +35,7 @@ import {
   type GuildRank,
   guildBankCapacity,
   guildBankDeltaIdentityKey,
+  guildBankMemberWireView,
   guildBankNextExpansionPrice,
   guildBankPipeRefusal,
   guildBankRungsBought,
@@ -1717,7 +1718,21 @@ describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
     expect(book(sim).inventory[0].instance?.signer).toBe('Ana');
   });
 
-  it('ships a tracked copy with its public history only: no guid, no character ids', () => {
+  it('keeps a tracked copy at full fidelity in the read the guild bank ledger diffs', () => {
+    // server/guild_bank_op_coordinator.ts diffs guildBankInfoFor before and
+    // after every op and replays the deltas onto the durable book by
+    // whole-payload equality: a projected read here would refuse every
+    // tracked withdraw and persist guid-less deposits.
+    const sim = makeOfficerSim();
+    const instance = {
+      guid: '0f8fad5b-d9cb-469f-a165-70867728950e',
+      provenance: { at: 1_000, by: 'Ana', byId: 11, source: 'mob:forest_wolf' },
+    };
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance });
+    expect(sim.guildBankInfoFor(sim.playerId)?.slots[0].instance).toEqual(instance);
+  });
+
+  it('ships a tracked copy over the member wire with its public history only', () => {
     const sim = makeOfficerSim();
     const guid = '0f8fad5b-d9cb-469f-a165-70867728950e';
     const parent = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
@@ -1739,7 +1754,7 @@ describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
         },
       },
     });
-    const slot = sim.guildBankInfoFor(sim.playerId)?.slots[0];
+    const slot = guildBankMemberWireView(sim.guildBankInfoFor(sim.playerId))?.slots[0];
     expect(slot?.instance).toEqual({
       signer: 'Ana',
       provenance: {
@@ -1754,6 +1769,14 @@ describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
     // The live book keeps the full record for the next withdrawer.
     expect(book(sim).inventory[0].instance?.guid).toBe(guid);
     expect(book(sim).inventory[0].instance?.provenance?.byId).toBe(11);
+  });
+
+  it('passes a snapshot with no tracked copy through the member wire untouched', () => {
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } });
+    const info = sim.guildBankInfoFor(sim.playerId);
+    expect(guildBankMemberWireView(info)).toBe(info);
+    expect(guildBankMemberWireView(null)).toBeNull();
   });
 
   it('reports a null nextExpansionPrice once the ladder is exhausted', () => {

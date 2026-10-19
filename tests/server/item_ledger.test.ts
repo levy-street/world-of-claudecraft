@@ -198,10 +198,15 @@ describe('item_ledger_db', () => {
     occurredAtMs: 1_700_000_000_000,
   };
 
-  it('declares an idempotent schema with the guid and character indexes', () => {
+  it('declares an idempotent schema with the guid, character and account indexes', () => {
     expect(ITEM_LEDGER_SCHEMA).toContain('CREATE TABLE IF NOT EXISTS item_ledger');
     expect(ITEM_LEDGER_SCHEMA).toContain('item_ledger_guid');
     expect(ITEM_LEDGER_SCHEMA).toContain('item_ledger_character');
+    // The ON DELETE SET NULL account_id foreign key needs its own index, or an
+    // account delete scans the whole multi-year ledger.
+    expect(ITEM_LEDGER_SCHEMA.replace(/\s+/g, ' ')).toContain(
+      'CREATE INDEX IF NOT EXISTS item_ledger_account ON item_ledger(account_id) WHERE account_id IS NOT NULL;',
+    );
     // The lifecycle columns are nullable (a mint or transfer row leaves them
     // empty), never NOT NULL.
     expect(ITEM_LEDGER_SCHEMA).toMatch(/\n\s*detail TEXT,\n/);

@@ -55,6 +55,11 @@ CREATE INDEX IF NOT EXISTS item_ledger_created
   ON item_ledger(created_at ASC, id ASC);
 CREATE INDEX IF NOT EXISTS item_ledger_character
   ON item_ledger(character_id, id) WHERE character_id IS NOT NULL;
+-- account_id is ON DELETE SET NULL on a table kept for years: without this
+-- index an account delete scans the whole ledger to null its rows (every
+-- other account_id foreign key in server/db.ts is indexed for the same reason).
+CREATE INDEX IF NOT EXISTS item_ledger_account
+  ON item_ledger(account_id) WHERE account_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS item_ledger_item
   ON item_ledger(item_id, id);
 `;

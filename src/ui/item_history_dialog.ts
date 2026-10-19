@@ -227,6 +227,7 @@ export function appendItemHistoryActionAfter(
   wrapper.className = 'material-source-item';
   if (element.classList.contains('bank-item')) wrapper.classList.add('material-source-item-cell');
   if (element.classList.contains('trade-item')) wrapper.classList.add('material-source-item-trade');
+  if (element.classList.contains('equip-slot')) wrapper.classList.add('material-source-item-slot');
   parent.insertBefore(wrapper, element);
   wrapper.append(element, button);
   return button;

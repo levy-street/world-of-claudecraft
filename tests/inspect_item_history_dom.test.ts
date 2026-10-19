@@ -136,12 +136,30 @@ describe('inspect window: Item history on a worn tracked copy', () => {
     expect(root.querySelector('.item-history-action')).toBeNull();
   });
 
+  it('opens the history from the keyboard with Enter on the focusable row', () => {
+    const root = openWith(peer());
+    const tracked = slotRow(root, 'Duskforged Warblade');
+    const plain = slotRow(root, 'Ritual Vestments');
+    expect(tracked.getAttribute('role')).toBe('button');
+    expect(tracked.getAttribute('aria-label')).toBe('Item history for Duskforged Warblade');
+    expect(plain.hasAttribute('role')).toBe(false);
+    const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+    tracked.dispatchEvent(enter);
+    expect(enter.defaultPrevented).toBe(true);
+    const dialog = document.getElementById('item-history-dialog');
+    expect(dialog?.textContent).toContain('Duskforged Warblade: history');
+    expect(dialog?.innerHTML).not.toContain(GUID);
+  });
+
   it('adds the visible button beneath the tracked row on a touch layout', () => {
     document.body.classList.add('mobile-touch');
     const root = openWith(peer());
     const buttons = root.querySelectorAll<HTMLButtonElement>('.item-history-action');
     expect(buttons).toHaveLength(1);
     expect(buttons[0].parentElement?.contains(slotRow(root, 'Duskforged Warblade'))).toBe(true);
+    // The paperdoll-slot modifier centers the button under its row instead of
+    // letting a bare wrapper push it to the column's left edge.
+    expect(buttons[0].parentElement?.classList.contains('material-source-item-slot')).toBe(true);
     buttons[0].click();
     expect(document.getElementById('item-history-dialog')?.textContent).toContain(
       'Quest reward to Alice on ',

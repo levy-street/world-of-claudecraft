@@ -22514,6 +22514,14 @@
     min-width: 0;
     width: 100%;
   }
+  /* An inspect paperdoll row (inspect_window.ts): the touch-layout Item
+     history button sits centered under the row it belongs to, inside the
+     column's own row rhythm, so the column never shifts sideways. */
+  .material-source-item-slot {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+  }
   .material-source-item-mail {
     display: inline-flex;
     align-items: stretch;
