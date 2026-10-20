@@ -16188,7 +16188,7 @@ export const zh_TW: EnTranslations = {
       },
       "mass_barrier": {
         "name": "群體屏障",
-        "description": "為你與 30 公尺內至多 4 名附近盟友施加護盾，每個護盾吸收 130 點傷害，持續 60 秒。（法師天賦）"
+        "description": "為你與 30 公尺內至多 4 名附近盟友施加護盾，每個護盾吸收 {damage} 點傷害，持續 15 秒。（法師天賦）"
       },
       "overload": {
         "name": "超載",

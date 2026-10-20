@@ -16188,7 +16188,7 @@ export const sv_SE: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Massbarriär",
-        "description": "Skyddar dig och upp till 4 närliggande allierade inom 30 m; varje barriär absorberar 130 skada i 60 sek. (magikertalang)"
+        "description": "Skyddar dig och upp till 4 närliggande allierade inom 30 m; varje barriär absorberar {damage} skada i 15 sek. (magikertalang)"
       },
       "overload": {
         "name": "Överbelastning",

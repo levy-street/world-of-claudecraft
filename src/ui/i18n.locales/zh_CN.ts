@@ -13565,7 +13565,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '被动：你的法术暴击会灼烧目标，在 6 秒内造成相当于该次伤害 30% 的伤害，可叠加。（火焰精通）',
   'entities.abilities.mass_barrier.name': '群体屏障',
   'entities.abilities.mass_barrier.description':
-    '为你和 30 米内至多 4 名附近盟友施加护盾，每个护盾吸收 130 点伤害，持续 60 秒。（法师天赋）',
+    '为你和 30 米内至多 4 名附近盟友施加护盾，每个护盾吸收 {damage} 点伤害，持续 15 秒。（法师天赋）',
   'entities.abilities.overload.name': '超载',
   'entities.abilities.overload.description':
     '你的下一个法术效果提高 40%，但法力消耗提高 50%。持续 10 秒。（法师天赋）',

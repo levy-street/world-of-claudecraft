@@ -14483,7 +14483,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Passiv: kritiske træffere med dine besværgelser brænder målet for 30% af den påførte skade over 6 sek. og kan stables. (Ildbeherskelse)',
   'entities.abilities.mass_barrier.name': 'Massebarriere',
   'entities.abilities.mass_barrier.description':
-    'Beskytter dig og op til 4 nærliggende allierede inden for 30 m; hver barriere absorberer 130 skade i 60 sek. (magikertalent)',
+    'Beskytter dig og op til 4 nærliggende allierede inden for 30 m; hver barriere absorberer {damage} skade i 15 sek. (magikertalent)',
   'entities.abilities.overload.name': 'Overbelastning',
   'entities.abilities.overload.description':
     'Din næste besværgelse forstærkes med 40%, men koster 50% mere mana. Varer i 10 sek. (magikertalent)',

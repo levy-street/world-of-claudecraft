@@ -9866,7 +9866,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Passif : les coups critiques de vos sorts brûlent la cible et infligent 30% des dégâts causés en 6 s, avec cumul. (Maîtrise du Feu)',
   'entities.abilities.mass_barrier.name': 'Barrière de masse',
   'entities.abilities.mass_barrier.description':
-    "Vous protège ainsi que jusqu'à 4 alliés proches dans un rayon de 30 m, chaque bouclier absorbant 130 points de dégâts pendant 60 s. (Talent de mage)",
+    "Vous protège ainsi que jusqu'à 4 alliés proches dans un rayon de 30 m, chaque bouclier absorbant {damage} points de dégâts pendant 15 s. (Talent de mage)",
   'entities.abilities.overload.name': 'Surcharge',
   'entities.abilities.overload.description':
     'Votre prochain sort est amplifié de 40%, mais coûte 50% de mana supplémentaire. Dure 10 s. (Talent de mage)',

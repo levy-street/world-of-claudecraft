@@ -16188,7 +16188,7 @@ export const fr_FR: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Barrière de masse",
-        "description": "Vous protège ainsi que jusqu'à 4 alliés proches dans un rayon de 30 m, chaque bouclier absorbant 130 points de dégâts pendant 60 s. (Talent de mage)"
+        "description": "Vous protège ainsi que jusqu'à 4 alliés proches dans un rayon de 30 m, chaque bouclier absorbant {damage} points de dégâts pendant 15 s. (Talent de mage)"
       },
       "overload": {
         "name": "Surcharge",

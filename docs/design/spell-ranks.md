@@ -216,7 +216,7 @@ pinned by `tests/paladin_progression.test.ts`; the current design is
 | shadow_word_pain | 1 | 4 | 25 | inst | dot 30/18s (6×5) |
 | | **2** | **10** | 38 | inst | dot **54/18s** (6×9) |
 | | **3** | **16** | 55 | inst | dot **84/18s** (6×14) |
-| power_word_shield | 1 | 6 | 45 | inst, 6cd | absorb 48/30s |
+| power_word_shield | 1 | 6 | 45 | inst, 6cd | absorb 48/30s + 10% Spell Power (every rank) |
 | | **2** | **12** | 70 | inst, 6cd | absorb **90** |
 | | **3** | **18** | 100 | inst, 6cd | absorb **145** |
 | renew | 1 | 8 | 30 | inst | hot 45/15s (5×9) |

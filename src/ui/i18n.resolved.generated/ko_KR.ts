@@ -16188,7 +16188,7 @@ export const ko_KR: EnTranslations = {
       },
       "mass_barrier": {
         "name": "대규모 방벽",
-        "description": "자신과 30미터 내에 있는 가까운 아군 최대 4명에게 각각 130의 피해를 흡수하는 보호막을 60초 동안 부여합니다. (마법사 특성)"
+        "description": "자신과 30미터 내에 있는 가까운 아군 최대 4명에게 각각 {damage}의 피해를 흡수하는 보호막을 15초 동안 부여합니다. (마법사 특성)"
       },
       "overload": {
         "name": "과부하",

@@ -14651,7 +14651,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Pasif: büyülerinin kritik vuruşları hedefi 6 sn. boyunca verilen hasarın %30 kadarı için yakar ve birikir. (Ateş ustalığı)',
   'entities.abilities.mass_barrier.name': 'Toplu Bariyer',
   'entities.abilities.mass_barrier.description':
-    'Seni ve 30 m içindeki en fazla 4 yakındaki müttefiki korur; her bariyer 60 sn. boyunca 130 hasarı soğurur. (büyücü yeteneği)',
+    'Seni ve 30 m içindeki en fazla 4 yakındaki müttefiki korur; her bariyer 15 sn. boyunca {damage} hasarı soğurur. (büyücü yeteneği)',
   'entities.abilities.overload.name': 'Aşırı Yük',
   'entities.abilities.overload.description':
     'Sonraki büyün %40 güçlenir, ancak %50 daha fazla mana harcar. 10 sn. sürer. (büyücü yeteneği)',

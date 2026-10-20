@@ -16188,7 +16188,7 @@ export const es_ES: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Barrera colectiva",
-        "description": "Otorga un escudo a ti y a un máximo de 4 aliados cercanos en 30 m; cada uno absorbe 130 de daño durante 60 s. (Talento de mago)"
+        "description": "Otorga un escudo a ti y a un máximo de 4 aliados cercanos en 30 m; cada uno absorbe {damage} de daño durante 15 s. (Talento de mago)"
       },
       "overload": {
         "name": "Potenciación",

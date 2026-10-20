@@ -217,7 +217,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Pasivo: los críticos de tus hechizos prenden al objetivo y le infligen un 40% del daño causado a lo largo de 6 s; el efecto se acumula. (Maestría de Fuego)',
   'entities.abilities.mass_barrier.name': 'Barrera colectiva',
   'entities.abilities.mass_barrier.description':
-    'Otorga un escudo a ti y a un máximo de 4 aliados cercanos en 30 m; cada uno absorbe 130 de daño durante 60 s. (Talento de mago)',
+    'Otorga un escudo a ti y a un máximo de 4 aliados cercanos en 30 m; cada uno absorbe {damage} de daño durante 15 s. (Talento de mago)',
   'entities.abilities.overload.name': 'Potenciación',
   'entities.abilities.overload.description':
     'Potencia tu siguiente hechizo un 40%, pero aumenta su coste de maná un 50%. Permanece 10 s. (Talento de mago)',

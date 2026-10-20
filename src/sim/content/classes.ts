@@ -633,6 +633,12 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
 
 const MAGE_PERSONAL_BARRIER_SPELL_POWER_COEFF = 0.5;
 const MAGE_TEMPORAL_BARRIER_SPELL_POWER_COEFF = 0.25;
+// Psalm of Warding: the classic 0.10 shield coefficient on every rank, read off
+// the caster's healPower (Spell Power + Healing Power) through absorbBonus.
+export const PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF = 0.1;
+// Mass Barrier (mage row-17 raid cooldown): the same per-target coefficient as
+// Temporal Barrier, applied to every shielded ally from the caster's healPower.
+export const MAGE_MASS_BARRIER_SPELL_POWER_COEFF = 0.25;
 
 export const ABILITIES: Record<string, AbilityDef> = {
   courier: COURIER_ABILITY,
@@ -4474,25 +4480,53 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'absorb', amount: 48, duration: 30 }],
+    effects: [
+      {
+        type: 'absorb',
+        amount: 48,
+        duration: 30,
+        spellPowerCoeff: PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF,
+      },
+    ],
     ranks: [
       {
         rank: 2,
         level: 12,
         cost: 70,
-        effects: [{ type: 'absorb', amount: 90, duration: 30 }],
+        effects: [
+          {
+            type: 'absorb',
+            amount: 90,
+            duration: 30,
+            spellPowerCoeff: PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF,
+          },
+        ],
       },
       {
         rank: 3,
         level: 18,
         cost: 100,
-        effects: [{ type: 'absorb', amount: 145, duration: 30 }],
+        effects: [
+          {
+            type: 'absorb',
+            amount: 145,
+            duration: 30,
+            spellPowerCoeff: PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF,
+          },
+        ],
       },
       {
         rank: 4,
         level: 20,
         cost: 130,
-        effects: [{ type: 'absorb', amount: 210, duration: 30 }],
+        effects: [
+          {
+            type: 'absorb',
+            amount: 210,
+            duration: 30,
+            spellPowerCoeff: PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF,
+          },
+        ],
       },
     ],
     description:
@@ -8487,14 +8521,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'aoeAllyAbsorb',
-        amount: 130,
-        duration: 60,
+        // Raid cooldown (owner 2026-10-20): a short, large shield sized to cover
+        // one normal boss hit, scaling with healPower like Temporal Barrier.
+        amount: 250,
+        duration: 15,
         radius: 30,
         maxTargets: 5,
+        spellPowerCoeff: MAGE_MASS_BARRIER_SPELL_POWER_COEFF,
       },
     ],
     description:
-      'Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
+      'Shields you and up to 4 nearby allies within 30 yd, each absorbing $d damage for 15 sec. (Mage talent)',
   },
   overload: {
     id: 'overload',
@@ -8987,6 +9024,11 @@ function scaleEffect(
             ? undefined
             : Math.round(eff.casterMaxHpPct * healMult * absorbMult * 10_000) / 10_000,
       };
+    case 'aoeAllyAbsorb':
+      // Mass Barrier's per-target base takes the same talent heal and global
+      // absorb multipliers as a single-target shield; the healPower rider the
+      // dispatch adds uses the identical product (effect_dispatch.ts).
+      return { ...eff, amount: Math.round(eff.amount * healMult * absorbMult + flat) };
     // Only the buff kinds whose value is a flat MAGNITUDE (armor, attack power, a flat
     // primary stat, spell power, thorns damage) scale with a damage-power mod. Every
     // other selfBuff/buffTarget kind is a rate, multiplier, percent, or a locked

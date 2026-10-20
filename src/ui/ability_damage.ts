@@ -137,6 +137,8 @@ export function abilityDamageBonus(
       // Power, no AP scale-down) to every direct heal in effect_dispatch.
       return directHealBonus(scaling.healPower, res.castTime, false, out.healing);
     case 'absorb':
+    case 'aoeAllyAbsorb':
+      // Mass Barrier adds the same caster-side rider to each shielded ally.
       return absorbBonus(scaling.healPower, eff.spellPowerCoeff ?? 0, out.absorb);
     case 'hot': {
       // A HoT that rides a direct heal (Regrowth) does NOT scale in combat (the
@@ -288,7 +290,11 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
 export function abilitySecondaryEffect(res: ResolvedAbility): AbilityEffect | undefined {
   return res.effects.find(
     (eff) =>
-      eff.type === 'dot' || eff.type === 'hot' || eff.type === 'absorb' || eff.type === 'imbue',
+      eff.type === 'dot' ||
+      eff.type === 'hot' ||
+      eff.type === 'absorb' ||
+      eff.type === 'aoeAllyAbsorb' ||
+      eff.type === 'imbue',
   );
 }
 

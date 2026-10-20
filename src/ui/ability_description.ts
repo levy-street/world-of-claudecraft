@@ -182,6 +182,8 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       return secondary.casterMaxHpPct === undefined
         ? formatAbilityNumber(secondary.amount) + suffix(secondary)
         : formatAbilityNumber(secondary.casterMaxHpPct * 100);
+    case 'aoeAllyAbsorb':
+      return formatAbilityNumber(secondary.amount) + suffix(secondary);
     case 'imbue':
       return formatAbilityImbueDamage(secondary);
     default:

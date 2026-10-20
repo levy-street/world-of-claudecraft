@@ -16188,7 +16188,7 @@ export const de_DE: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Massenbarriere",
-        "description": "Schützt Euch und bis zu 4 Verbündete im Umkreis von 30 m; jeder Schild absorbiert 60 Sek. lang 130 Schaden. (Magiertalent)"
+        "description": "Schützt Euch und bis zu 4 Verbündete im Umkreis von 30 m; jeder Schild absorbiert 15 Sek. lang {damage} Schaden. (Magiertalent)"
       },
       "overload": {
         "name": "Überladung",

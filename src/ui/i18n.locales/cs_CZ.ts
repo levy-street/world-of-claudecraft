@@ -14646,7 +14646,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Pasivní: kritické zásahy tvých kouzel spalují cíl za 30 % způsobeného poškození během 6 s a účinek se sčítá. (mistrovství Ohně)',
   'entities.abilities.mass_barrier.name': 'Hromadná bariéra',
   'entities.abilities.mass_barrier.description':
-    'Ochrání tebe a až 4 blízké spojence v dosahu 30 m; každá bariéra pohltí 130 bodů poškození po dobu 60 s. (mágovský talent)',
+    'Ochrání tebe a až 4 blízké spojence v dosahu 30 m; každá bariéra pohltí {damage} bodů poškození po dobu 15 s. (mágovský talent)',
   'entities.abilities.overload.name': 'Přetížení',
   'entities.abilities.overload.description':
     'Tvoje příští kouzlo je posíleno o 40 %, ale stojí o 50 % více many. Trvá 10 s. (mágovský talent)',

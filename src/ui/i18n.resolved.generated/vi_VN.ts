@@ -16188,7 +16188,7 @@ export const vi_VN: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Lá Chắn Hàng Loạt",
-        "description": "Che chắn cho bạn và tối đa 4 đồng minh ở gần trong phạm vi 30 m; mỗi lá chắn hấp thụ 130 sát thương trong 60 giây. (tài năng pháp sư)"
+        "description": "Che chắn cho bạn và tối đa 4 đồng minh ở gần trong phạm vi 30 m; mỗi lá chắn hấp thụ {damage} sát thương trong 15 giây. (tài năng pháp sư)"
       },
       "overload": {
         "name": "Quá Tải",

@@ -16188,7 +16188,7 @@ export const cs_CZ: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Hromadná bariéra",
-        "description": "Ochrání tebe a až 4 blízké spojence v dosahu 30 m; každá bariéra pohltí 130 bodů poškození po dobu 60 s. (mágovský talent)"
+        "description": "Ochrání tebe a až 4 blízké spojence v dosahu 30 m; každá bariéra pohltí {damage} bodů poškození po dobu 15 s. (mágovský talent)"
       },
       "overload": {
         "name": "Přetížení",

@@ -16188,7 +16188,7 @@ export const it_IT: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Barriera di massa",
-        "description": "Protegge te e fino a 4 alleati vicini entro 30 m; ogni scudo assorbe 130 danni per 60 s. (Talento del mago)"
+        "description": "Protegge te e fino a 4 alleati vicini entro 30 m; ogni scudo assorbe {damage} danni per 15 s. (Talento del mago)"
       },
       "overload": {
         "name": "Sovraccarico",

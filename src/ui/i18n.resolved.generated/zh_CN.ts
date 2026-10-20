@@ -16188,7 +16188,7 @@ export const zh_CN: EnTranslations = {
       },
       "mass_barrier": {
         "name": "群体屏障",
-        "description": "为你和 30 米内至多 4 名附近盟友施加护盾，每个护盾吸收 130 点伤害，持续 60 秒。（法师天赋）"
+        "description": "为你和 30 米内至多 4 名附近盟友施加护盾，每个护盾吸收 {damage} 点伤害，持续 15 秒。（法师天赋）"
       },
       "overload": {
         "name": "超载",

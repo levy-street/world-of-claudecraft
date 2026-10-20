@@ -16188,7 +16188,7 @@ export const pl_PL: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Masowa bariera",
-        "description": "Osłania ciebie i maksymalnie 4 pobliskich sojuszników w promieniu 30 m; każda bariera pochłania 130 obrażeń przez 60 sek. (talent maga)"
+        "description": "Osłania ciebie i maksymalnie 4 pobliskich sojuszników w promieniu 30 m; każda bariera pochłania {damage} obrażeń przez 15 sek. (talent maga)"
       },
       "overload": {
         "name": "Przeciążenie",

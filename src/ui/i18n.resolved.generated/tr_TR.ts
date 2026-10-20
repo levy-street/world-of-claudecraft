@@ -16188,7 +16188,7 @@ export const tr_TR: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Toplu Bariyer",
-        "description": "Seni ve 30 m içindeki en fazla 4 yakındaki müttefiki korur; her bariyer 60 sn. boyunca 130 hasarı soğurur. (büyücü yeteneği)"
+        "description": "Seni ve 30 m içindeki en fazla 4 yakındaki müttefiki korur; her bariyer 15 sn. boyunca {damage} hasarı soğurur. (büyücü yeteneği)"
       },
       "overload": {
         "name": "Aşırı Yük",

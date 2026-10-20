@@ -16188,7 +16188,7 @@ export const en: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Mass Barrier",
-        "description": "Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)"
+        "description": "Shields you and up to 4 nearby allies within 30 yd, each absorbing {damage} damage for 15 sec. (Mage talent)"
       },
       "overload": {
         "name": "Overload",

@@ -14574,7 +14574,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nội tại: đòn chí mạng từ phép của bạn đốt mục tiêu với 30% sát thương đã gây ra trong 6 giây và có thể cộng dồn. (tinh thông Lửa)',
   'entities.abilities.mass_barrier.name': 'Lá Chắn Hàng Loạt',
   'entities.abilities.mass_barrier.description':
-    'Che chắn cho bạn và tối đa 4 đồng minh ở gần trong phạm vi 30 m; mỗi lá chắn hấp thụ 130 sát thương trong 60 giây. (tài năng pháp sư)',
+    'Che chắn cho bạn và tối đa 4 đồng minh ở gần trong phạm vi 30 m; mỗi lá chắn hấp thụ {damage} sát thương trong 15 giây. (tài năng pháp sư)',
   'entities.abilities.overload.name': 'Quá Tải',
   'entities.abilities.overload.description':
     'Phép tiếp theo của bạn được khuếch đại 40% nhưng tốn thêm 50% mana. Kéo dài 10 giây. (tài năng pháp sư)',

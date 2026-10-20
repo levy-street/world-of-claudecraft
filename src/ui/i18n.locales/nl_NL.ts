@@ -14644,7 +14644,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Passief: kritieke treffers van je spreuken verbranden het doelwit voor 30% van de toegebrachte schade gedurende 6 sec. en stapelen. (Vuurmeesterschap)',
   'entities.abilities.mass_barrier.name': 'Massabarrière',
   'entities.abilities.mass_barrier.description':
-    'Beschermt jou en maximaal 4 nabije bondgenoten binnen 30 m; elke barrière absorbeert 130 schade gedurende 60 sec. (magiërstalent)',
+    'Beschermt jou en maximaal 4 nabije bondgenoten binnen 30 m; elke barrière absorbeert {damage} schade gedurende 15 sec. (magiërstalent)',
   'entities.abilities.overload.name': 'Overbelasting',
   'entities.abilities.overload.description':
     'Je volgende spreuk wordt met 40% versterkt, maar kost 50% meer mana. Duurt 10 sec. (magiërstalent)',

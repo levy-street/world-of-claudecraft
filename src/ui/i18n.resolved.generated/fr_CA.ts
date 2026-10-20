@@ -16188,7 +16188,7 @@ export const fr_CA: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Bouclier collectif",
-        "description": "Pose un bouclier sur toi et sur un maximum de 4 alliés proches dans un rayon de 30 m; chacun absorbe 130 points de dégâts pendant 60 s. (Talent de mage)"
+        "description": "Pose un bouclier sur toi et sur un maximum de 4 alliés proches dans un rayon de 30 m; chacun absorbe {damage} points de dégâts pendant 15 s. (Talent de mage)"
       },
       "overload": {
         "name": "Surpuissance",

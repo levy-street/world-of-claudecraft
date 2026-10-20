@@ -9210,7 +9210,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Passivo: os acertos críticos das suas magias queimam o alvo, causando 30% do dano provocado ao longo de 6 s; acumula. (Maestria de Fogo)',
   'entities.abilities.mass_barrier.name': 'Barreira em Massa',
   'entities.abilities.mass_barrier.description':
-    'Protege você e até 4 aliados próximos em um raio de 30 m; cada escudo absorve 130 de dano por 60 s. (Talento de mago)',
+    'Protege você e até 4 aliados próximos em um raio de 30 m; cada escudo absorve {damage} de dano por 15 s. (Talento de mago)',
   'entities.abilities.overload.name': 'Sobrecarga',
   'entities.abilities.overload.description':
     'Sua próxima magia é amplificada em 40%, mas custa 50% mais mana. Dura 10 s. (Talento de mago)',

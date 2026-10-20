@@ -369,7 +369,7 @@ const classAbilityNamesEn = {
       [
         'mass_barrier',
         'Mass Barrier',
-        'Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
+        'Shields you and up to 4 nearby allies within 30 yd, each absorbing {damage} damage for 15 sec. (Mage talent)',
       ],
       [
         'overload',

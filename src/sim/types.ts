@@ -4204,6 +4204,9 @@ export type AbilityEffect =
       // When set, only the NEAREST this many friendlies in radius are shielded (the
       // caster included, distance 0). Absent = every friendly in radius.
       maxTargets?: number;
+      // Optional healPower coefficient: absorbBonus is computed ONCE per cast from
+      // the caster and added to every recipient's shield. Absent = flat amount.
+      spellPowerCoeff?: number;
     }
   // Greater Invisibility (mage choice row): strips up to `removeDotCount`
   // damage-over-time auras, vanishes for `duration`, then applies `drValue`

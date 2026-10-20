@@ -16188,7 +16188,7 @@ export const id_ID: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Penghalang Massal",
-        "description": "Melindungi dirimu dan hingga 4 sekutu di dekatmu dalam jarak 30 m; masing-masing menyerap 130 kerusakan selama 60 dtk. (talenta mage)"
+        "description": "Melindungi dirimu dan hingga 4 sekutu di dekatmu dalam jarak 30 m; masing-masing menyerap {damage} kerusakan selama 15 dtk. (talenta mage)"
       },
       "overload": {
         "name": "Beban Berlebih",

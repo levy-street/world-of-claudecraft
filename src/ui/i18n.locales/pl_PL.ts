@@ -14895,7 +14895,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Bierne: trafienia krytyczne twoich zaklęć podpalają cel, zadając 30% zadanych obrażeń przez 6 sek.; efekt się kumuluje. (mistrzostwo Ognia)',
   'entities.abilities.mass_barrier.name': 'Masowa bariera',
   'entities.abilities.mass_barrier.description':
-    'Osłania ciebie i maksymalnie 4 pobliskich sojuszników w promieniu 30 m; każda bariera pochłania 130 obrażeń przez 60 sek. (talent maga)',
+    'Osłania ciebie i maksymalnie 4 pobliskich sojuszników w promieniu 30 m; każda bariera pochłania {damage} obrażeń przez 15 sek. (talent maga)',
   'entities.abilities.overload.name': 'Przeciążenie',
   'entities.abilities.overload.description':
     'Twoje następne zaklęcie jest wzmocnione o 40%, ale kosztuje o 50% więcej many. Trwa 10 sek. (talent maga)',

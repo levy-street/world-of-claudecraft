@@ -9329,7 +9329,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Passiv: Kritische Treffer Eurer Zauber verbrennen das Ziel und verursachen im Verlauf von 6 Sek. 30% des verursachten Schadens; stapelbar. (Feuermeisterschaft)',
   'entities.abilities.mass_barrier.name': 'Massenbarriere',
   'entities.abilities.mass_barrier.description':
-    'Schützt Euch und bis zu 4 Verbündete im Umkreis von 30 m; jeder Schild absorbiert 60 Sek. lang 130 Schaden. (Magiertalent)',
+    'Schützt Euch und bis zu 4 Verbündete im Umkreis von 30 m; jeder Schild absorbiert 15 Sek. lang {damage} Schaden. (Magiertalent)',
   'entities.abilities.overload.name': 'Überladung',
   'entities.abilities.overload.description':
     'Euer nächster Zauber wird um 40% verstärkt, kostet aber 50% mehr Mana. Hält 10 Sek. lang an. (Magiertalent)',

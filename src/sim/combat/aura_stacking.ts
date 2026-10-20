@@ -39,7 +39,8 @@ export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new S
   'emboldening_roar_crit',
   'mark_of_the_wild',
   // Mass Barrier (mage aoeAllyAbsorb): two mages must not stack two separate
-  // 130-absorb shields on a shared ally; the later cast replaces the first.
+  // absorb shields on a shared ally; the later cast replaces the first (its
+  // value is that caster's, since the shield scales with the caster healPower).
   'mass_barrier',
   // Nature's Fury (druid buff_spellcrit pulse): two druids in the same party
   // pulsing onto a shared ally must not double the 3% spell-crit bonus.

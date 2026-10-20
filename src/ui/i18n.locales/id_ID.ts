@@ -14671,7 +14671,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pasif: serangan kritis mantramu membakar target sebesar 30% kerusakan yang ditimbulkan selama 6 dtk. dan dapat bertumpuk. (penguasaan Api)',
   'entities.abilities.mass_barrier.name': 'Penghalang Massal',
   'entities.abilities.mass_barrier.description':
-    'Melindungi dirimu dan hingga 4 sekutu di dekatmu dalam jarak 30 m; masing-masing menyerap 130 kerusakan selama 60 dtk. (talenta mage)',
+    'Melindungi dirimu dan hingga 4 sekutu di dekatmu dalam jarak 30 m; masing-masing menyerap {damage} kerusakan selama 15 dtk. (talenta mage)',
   'entities.abilities.overload.name': 'Beban Berlebih',
   'entities.abilities.overload.description':
     'Mantra berikutnya diperkuat sebesar 40%, tetapi membutuhkan 50% lebih banyak mana. Berlangsung 10 dtk. (talenta mage)',

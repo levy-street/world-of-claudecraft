@@ -122,10 +122,10 @@ export function directHealBonus(
 
 // Flat bonus added to an absorb shield with an explicitly authored coefficient.
 // Shields without a coefficient remain fixed by rank.
-// NOTE: deliberately NOT scaled by HEALING_SP_SCALE. The only shields with an
-// authored coefficient are the mage personal barriers (damage-class
-// survivability, not healing); the healer shield (Psalm of Warding) carries no
-// coefficient and scales through its rank amounts instead.
+// NOTE: deliberately NOT scaled by HEALING_SP_SCALE. Every shield with an
+// authored coefficient (the mage personal barriers, Temporal Barrier, Psalm of
+// Warding, and the group Mass Barrier) reads the caster's healPower straight
+// through this helper, so an absorb never shares the direct-heal budget.
 // `mult` is the resolved talent/mastery absorb multiplier (`talent_hit_mult.ts`
 // healMult times the absorbPct global), same reasoning as `directHitBonus`.
 export function absorbBonus(spellPower: number, coefficient: number, mult = 1): number {

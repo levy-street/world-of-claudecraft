@@ -16188,7 +16188,7 @@ export const nl_NL: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Massabarrière",
-        "description": "Beschermt jou en maximaal 4 nabije bondgenoten binnen 30 m; elke barrière absorbeert 130 schade gedurende 60 sec. (magiërstalent)"
+        "description": "Beschermt jou en maximaal 4 nabije bondgenoten binnen 30 m; elke barrière absorbeert {damage} schade gedurende 15 sec. (magiërstalent)"
       },
       "overload": {
         "name": "Overbelasting",

@@ -9290,7 +9290,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Passivo: i colpi critici delle tue magie incendiano il bersaglio, infliggendo il 30% dei danni causati nell'arco di 6 s; si accumula. (Maestria del Fuoco)",
   'entities.abilities.mass_barrier.name': 'Barriera di massa',
   'entities.abilities.mass_barrier.description':
-    'Protegge te e fino a 4 alleati vicini entro 30 m; ogni scudo assorbe 130 danni per 60 s. (Talento del mago)',
+    'Protegge te e fino a 4 alleati vicini entro 30 m; ogni scudo assorbe {damage} danni per 15 s. (Talento del mago)',
   'entities.abilities.overload.name': 'Sovraccarico',
   'entities.abilities.overload.description':
     'La tua prossima magia viene amplificata del 40%, ma costa il 50% di mana in più. Dura 10 s. (Talento del mago)',

@@ -16188,7 +16188,7 @@ export const pt_BR: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Barreira em Massa",
-        "description": "Protege você e até 4 aliados próximos em um raio de 30 m; cada escudo absorve 130 de dano por 60 s. (Talento de mago)"
+        "description": "Protege você e até 4 aliados próximos em um raio de 30 m; cada escudo absorve {damage} de dano por 15 s. (Talento de mago)"
       },
       "overload": {
         "name": "Sobrecarga",

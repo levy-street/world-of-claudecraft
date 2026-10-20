@@ -16188,7 +16188,7 @@ export const da_DK: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Massebarriere",
-        "description": "Beskytter dig og op til 4 nærliggende allierede inden for 30 m; hver barriere absorberer 130 skade i 60 sek. (magikertalent)"
+        "description": "Beskytter dig og op til 4 nærliggende allierede inden for 30 m; hver barriere absorberer {damage} skade i 15 sek. (magikertalent)"
       },
       "overload": {
         "name": "Overbelastning",

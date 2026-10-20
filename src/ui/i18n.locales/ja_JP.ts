@@ -14242,7 +14242,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'パッシブ：呪文のクリティカルが対象を燃焼させ、与えたダメージの30%を6秒かけて与えます。効果は累積します。（火のマスタリー）',
   'entities.abilities.mass_barrier.name': 'マスバリア',
   'entities.abilities.mass_barrier.description':
-    '自身と30メートル以内にいる近くの味方最大4人に、それぞれ130ダメージを吸収するシールドを60秒間付与します。（メイジタレント）',
+    '自身と30メートル以内にいる近くの味方最大4人に、それぞれ{damage}ダメージを吸収するシールドを15秒間付与します。（メイジタレント）',
   'entities.abilities.overload.name': 'オーバーロード',
   'entities.abilities.overload.description':
     '次の呪文の効果が40%増幅されますが、マナ消費が50%増加します。10秒間持続します。（メイジタレント）',
