@@ -1,0 +1,11 @@
+# Runs the self-update daily. Enable with:
+#   systemctl enable --now woc-autoupdate.timer
+[Unit]
+Description=Daily World of ClaudeCraft self-update
+
+[Timer]
+OnCalendar=*-*-* 04:00:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target
