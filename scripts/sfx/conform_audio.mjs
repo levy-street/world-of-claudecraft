@@ -2,7 +2,7 @@
 // generator, and Studio publisher can all use this module without importing a
 // command with top-level side effects.
 
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFile, execFileSync, spawn, spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { renameSync, rmSync } from 'node:fs';
 import { basename, dirname, extname, join } from 'node:path';
@@ -30,25 +30,52 @@ export const SFX_AUDIO_EXTENSIONS = new Set([
   '.m4a',
 ]);
 
+const MAX_TOOL_OUTPUT = 16 * 1024 * 1024;
+const EBUR128_FILTER = 'ebur128=peak=true';
+
+function toolError(binary, detail) {
+  return new Error(String(detail).trim() || `${basename(binary)} failed`);
+}
+
 function run(binary, args, options = {}) {
   try {
     return execFileSync(binary, args, {
       encoding: 'utf8',
-      maxBuffer: 16 * 1024 * 1024,
+      maxBuffer: MAX_TOOL_OUTPUT,
       stdio: ['ignore', options.capture ? 'pipe' : 'ignore', options.capture ? 'pipe' : 'ignore'],
     });
   } catch (error) {
-    const detail = String(error?.stderr ?? error?.message ?? error).trim();
-    throw new Error(detail || `${basename(binary)} failed`);
+    throw toolError(binary, error?.stderr ?? error?.message ?? error);
   }
 }
 
-export function probeSfxAudio(file, ffprobePath) {
-  const output = run(
-    ffprobePath,
-    ['-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', file],
-    { capture: true },
-  );
+// Async twin of run(..., { capture: true }) for callers that inspect many files
+// at once: process creation dominates a short probe (about 25 ms per spawn on
+// Windows), so serial spawnSync calls, not the analysis, set the wall clock.
+// A tool that exits nonzero fails with the same message as run(); a binary that
+// cannot start (ENOENT, EACCES) has no stderr, so both report Node's own launch
+// error, which names spawn here and spawnSync there.
+function runCaptureAsync(binary, args) {
+  return new Promise((resolve, reject) => {
+    const child = execFile(
+      binary,
+      args,
+      { encoding: 'utf8', maxBuffer: MAX_TOOL_OUTPUT },
+      (error, stdout, stderr) => {
+        if (!error) return resolve(stdout);
+        reject(toolError(binary, typeof error.code === 'string' ? error.message : stderr));
+      },
+    );
+    // run() gives the tool no stdin; close it so nothing can wait on input.
+    child.stdin?.end();
+  });
+}
+
+function probeArgs(file) {
+  return ['-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', file];
+}
+
+function parseSfxProbe(output, file) {
   const info = JSON.parse(output);
   const stream = info.streams?.find((value) => value.codec_type === 'audio');
   const duration = Number.parseFloat(info.format?.duration ?? '0');
@@ -71,12 +98,20 @@ export function probeSfxAudio(file, ffprobePath) {
   };
 }
 
+export function probeSfxAudio(file, ffprobePath) {
+  return parseSfxProbe(run(ffprobePath, probeArgs(file), { capture: true }), file);
+}
+
+function reportArgs(file, filter) {
+  return ['-hide_banner', '-nostdin', '-i', file, '-af', filter, '-f', 'null', '-'];
+}
+
 function captureFfmpegReport(file, filter, ffmpegPath) {
-  const result = spawnSync(
-    ffmpegPath,
-    ['-hide_banner', '-nostdin', '-i', file, '-af', filter, '-f', 'null', '-'],
-    { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, stdio: ['ignore', 'ignore', 'pipe'] },
-  );
+  const result = spawnSync(ffmpegPath, reportArgs(file, filter), {
+    encoding: 'utf8',
+    maxBuffer: MAX_TOOL_OUTPUT,
+    stdio: ['ignore', 'ignore', 'pipe'],
+  });
   if (result.error) throw result.error;
   if (result.status !== 0) {
     throw new Error(String(result.stderr || `${basename(ffmpegPath)} failed`).trim());
@@ -84,8 +119,35 @@ function captureFfmpegReport(file, filter, ffmpegPath) {
   return String(result.stderr ?? '');
 }
 
-export function measureSfxTruePeakDb(file, ffmpegPath) {
-  const report = captureFfmpegReport(file, 'ebur128=peak=true', ffmpegPath);
+function captureFfmpegReportAsync(file, filter, ffmpegPath) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(ffmpegPath, reportArgs(file, filter), {
+      stdio: ['ignore', 'ignore', 'pipe'],
+    });
+    let stderr = '';
+    let stderrBytes = 0;
+    let overflow = null;
+    child.stderr.setEncoding('utf8');
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk;
+      stderrBytes += Buffer.byteLength(chunk);
+      if (!overflow && stderrBytes > MAX_TOOL_OUTPUT) {
+        overflow = new Error(`${basename(ffmpegPath)} stderr maxBuffer length exceeded`);
+        child.kill();
+      }
+    });
+    child.on('error', reject);
+    child.on('close', (status) => {
+      if (overflow) return reject(overflow);
+      if (status !== 0) {
+        return reject(new Error(String(stderr || `${basename(ffmpegPath)} failed`).trim()));
+      }
+      resolve(stderr);
+    });
+  });
+}
+
+function parseSfxTruePeakDb(report, file) {
   const match = report.match(/True peak:\s*Peak:\s*(-?inf|[-+]?(?:\d+(?:\.\d*)?|\.\d+))\s*dBFS/i);
   if (!match || match[1].toLowerCase() === '-inf') {
     throw new Error(`ebur128 true-peak parse failed for ${basename(file)}`);
@@ -93,14 +155,30 @@ export function measureSfxTruePeakDb(file, ffmpegPath) {
   return Number.parseFloat(match[1]);
 }
 
-export function measureSfxLufs(file, ffmpegPath) {
-  const report = captureFfmpegReport(file, 'ebur128=peak=true', ffmpegPath);
+function parseSfxLufs(report, file) {
   const matches = [...report.matchAll(/I:\s*(-?inf|[-\d.]+)\s*LUFS/gi)];
   const value = matches.at(-1)?.[1];
   if (!value || value.toLowerCase() === '-inf') {
     throw new Error(`ebur128 parse failed for ${basename(file)}`);
   }
   return Number.parseFloat(value);
+}
+
+export function measureSfxTruePeakDb(file, ffmpegPath) {
+  return parseSfxTruePeakDb(captureFfmpegReport(file, EBUR128_FILTER, ffmpegPath), file);
+}
+
+export function measureSfxLufs(file, ffmpegPath) {
+  return parseSfxLufs(captureFfmpegReport(file, EBUR128_FILTER, ffmpegPath), file);
+}
+
+// measureSfxTruePeakDb and measureSfxLufs run the identical ebur128 pass, so a
+// caller that needs both parses one report instead of decoding the file twice.
+// LUFS parses first, the order the two separate passes used to run in.
+export function measureSfxLoudness(file, ffmpegPath) {
+  const report = captureFfmpegReport(file, EBUR128_FILTER, ffmpegPath);
+  const lufs = parseSfxLufs(report, file);
+  return { lufs, truePeakDb: parseSfxTruePeakDb(report, file) };
 }
 
 // MP3 encoding can push a clip's TRUE peak (the oversampled, post-decode
@@ -229,17 +307,15 @@ export function conformSfxAudio({
         channels,
       });
       run(ffmpegPath, plan.args);
-      const measuredOutput =
-        normBranch === 'peak'
-          ? measureSfxTruePeakDb(temporary, ffmpegPath)
-          : measureSfxLufs(temporary, ffmpegPath);
       // The LUFS branch's pre-encode limiter cannot see MP3's own inter-sample
       // overshoot, so the loudness convergence loop must independently verify
       // the ACTUAL post-encode true peak on every attempt: peak safety is a
       // hard ceiling that wins over hitting the loudness target exactly (a
       // clip landing a little under TARGET_LUFS is fine; one that clips is not).
-      const measuredPeakDb =
-        normBranch === 'lufs' ? measureSfxTruePeakDb(temporary, ffmpegPath) : measuredOutput;
+      // Both figures come from the one ebur128 report.
+      const loudness = normBranch === 'lufs' ? measureSfxLoudness(temporary, ffmpegPath) : null;
+      const measuredOutput = loudness ? loudness.lufs : measureSfxTruePeakDb(temporary, ffmpegPath);
+      const measuredPeakDb = loudness ? loudness.truePeakDb : measuredOutput;
       const peakOver = normBranch === 'lufs' ? measuredPeakDb - TARGET_PEAK_DBFS : 0;
       const error = target - measuredOutput;
       attempts.push({ gainDb: filterNumber(gainDb), measuredOutput, measuredPeakDb, error });
@@ -355,30 +431,53 @@ function conformCustomMaster({ inputFile, outputFile, duration, ffmpegPath, peak
   }
 }
 
-export function inspectSfxConformance(file, { ffmpegPath, ffprobePath, preserveLoudness = false }) {
-  const stats = probeSfxAudio(file, ffprobePath);
+function classifyProbe(file, stats, preserveLoudness) {
   const extension = extname(file);
   const isLossless = LOSSLESS_EXTENSIONS.has(extension.toLowerCase());
   const isMp3 = extension === '.mp3' && stats.codec.toLowerCase() === 'mp3';
-  const preliminary = classify({ ...stats, isLossless, isMp3, preserveLoudness });
-  if (preliminary.reject) {
-    return { ...stats, isLossless, isMp3, ...preliminary, peakDb: null, lufs: null };
-  }
+  const facts = { ...stats, isLossless, isMp3 };
+  return { facts, preliminary: classify({ ...facts, preserveLoudness }) };
+}
+
+function rejectedInspection(facts, preliminary) {
+  return { ...facts, ...preliminary, peakDb: null, lufs: null };
+}
+
+function measuredInspection(file, facts, preliminary, report, preserveLoudness) {
   // Measured for BOTH branches: the lufs branch's own loudness figure cannot
   // reveal a true-peak overshoot (see classify's peak check above), so a
   // LUFS-target file needs its real peak measured too, not just its LUFS.
   // LUFS is measured for a preserveLoudness file too (not to re-target it,
   // classify() never does that for preserveLoudness): the wrong-branch
   // fingerprint check below needs the real value to compare against
-  // TARGET_LUFS.
-  const peakDb = measureSfxTruePeakDb(file, ffmpegPath);
-  const lufs = preliminary.normBranch === 'lufs' ? measureSfxLufs(file, ffmpegPath) : null;
+  // TARGET_LUFS. Both figures come from the one ebur128 report.
+  const peakDb = parseSfxTruePeakDb(report, file);
+  const lufs = preliminary.normBranch === 'lufs' ? parseSfxLufs(report, file) : null;
   return {
-    ...stats,
-    isLossless,
-    isMp3,
+    ...facts,
     peakDb,
     lufs,
-    ...classify({ ...stats, isLossless, isMp3, peakDb, lufs, preserveLoudness }),
+    ...classify({ ...facts, peakDb, lufs, preserveLoudness }),
   };
+}
+
+export function inspectSfxConformance(file, { ffmpegPath, ffprobePath, preserveLoudness = false }) {
+  const stats = probeSfxAudio(file, ffprobePath);
+  const { facts, preliminary } = classifyProbe(file, stats, preserveLoudness);
+  if (preliminary.reject) return rejectedInspection(facts, preliminary);
+  const report = captureFfmpegReport(file, EBUR128_FILTER, ffmpegPath);
+  return measuredInspection(file, facts, preliminary, report, preserveLoudness);
+}
+
+/** Same verdict as inspectSfxConformance through non-blocking spawns, so a
+ *  caller can inspect many files concurrently. */
+export async function inspectSfxConformanceAsync(
+  file,
+  { ffmpegPath, ffprobePath, preserveLoudness = false },
+) {
+  const stats = parseSfxProbe(await runCaptureAsync(ffprobePath, probeArgs(file)), file);
+  const { facts, preliminary } = classifyProbe(file, stats, preserveLoudness);
+  if (preliminary.reject) return rejectedInspection(facts, preliminary);
+  const report = await captureFfmpegReportAsync(file, EBUR128_FILTER, ffmpegPath);
+  return measuredInspection(file, facts, preliminary, report, preserveLoudness);
 }
