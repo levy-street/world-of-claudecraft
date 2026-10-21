@@ -317,7 +317,10 @@ describe('Discord bot healthcheck probe, executed', () => {
     expect(isHeartbeatFresh(Date.now() - (win + 5000), Date.now(), win)).toBe(false);
   });
 
-  it('answers unhealthy when the heartbeat path cannot be statted (a denied parent directory)', () => {
+  it('answers unhealthy when the heartbeat path cannot be statted (a denied parent directory)', ({
+    skip,
+  }) => {
+    skip(process.platform === 'win32', 'chmod cannot deny a directory on Windows');
     // "Unreadable" needs precision: stat needs no read permission on the FILE, so
     // a chmod-000 stamp still reads healthy while fresh, and correctly so (mtime
     // is the only evidence the probe needs, and a stamp the bot cannot WRITE goes

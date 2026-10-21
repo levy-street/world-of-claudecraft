@@ -14,12 +14,19 @@
 // count 1 (it removes only fresh, unused accounts that cannot hold live
 // tokens or cached moderation rows).
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { stripComments } from '../helpers/strip_comments';
 
 const SERVER_DIR = fileURLToPath(new URL('../../server', import.meta.url));
+/** A walked file relative to server/, in the forward-slash form the pins use
+ *  (the walk yields native separators, backslashes on Windows). */
+const serverRel = (file: string): string =>
+  file
+    .slice(SERVER_DIR.length + 1)
+    .split(sep)
+    .join('/');
 
 /** Recursive .ts walk (the shared-walk rule: subdirectories are in scope so a
  *  writer moved under server/http/ or a new domain dir cannot escape). */
@@ -186,7 +193,7 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
       ).toEqual([]);
       if (inScope.length === 0) continue;
       const spans = functionSpans(src);
-      const rel = file.slice(SERVER_DIR.length + 1);
+      const rel = serverRel(file);
       for (const site of inScope) {
         totalInScope += 1;
         const span = spans.find((s) => site.index >= s.start && site.index < s.end);
@@ -286,9 +293,7 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
     // never-used account (the provision race loser): it cannot hold a live
     // token or a cached moderation row, so no bust is owed. Any SECOND hard
     // delete of accounts rows must land here and make its own case.
-    expect(deletes.map((d) => d.file.slice(SERVER_DIR.length + 1))).toEqual([
-      'federated_auth_db.ts',
-    ]);
+    expect(deletes.map((d) => serverRel(d.file))).toEqual(['federated_auth_db.ts']);
   });
 
   it('bans interpolated table names, and reds guard-table statements with interpolated fragments', () => {
@@ -367,7 +372,7 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
     // must never appear here.
     const importers = files
       .filter((f) => /from '\.{1,2}\/woc_auth_guard_cache'/.test(sources.get(f) ?? ''))
-      .map((f) => f.slice(SERVER_DIR.length + 1))
+      .map(serverRel)
       .sort();
     expect(importers).toEqual([
       'chat_filter_db.ts',
@@ -381,10 +386,7 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
     // import escapes the equality above.
     for (const file of files) {
       const src = sources.get(file) ?? '';
-      if (
-        src.includes('woc_auth_guard_cache') &&
-        !importers.includes(file.slice(SERVER_DIR.length + 1))
-      ) {
+      if (src.includes('woc_auth_guard_cache') && !importers.includes(serverRel(file))) {
         expect.fail(`${file} references woc_auth_guard_cache outside the pinned import set`);
       }
     }

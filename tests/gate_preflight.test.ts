@@ -1,8 +1,9 @@
 import { EventEmitter } from 'node:events';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { GATE_SHELL, writeFakeCommand } from './helpers/fake_command';
 
 // checkAudioTooling reads FFMPEG_PATH/FFPROBE_PATH from scripts/sfx/ffmpeg_paths.mjs
 // at MODULE EVALUATION time (resolved once from process.env.WOC_FFMPEG_PATH /
@@ -32,7 +33,11 @@ describe('checkAudioTooling', () => {
       vi.resetModules();
       const { checkAudioTooling } = await import('../scripts/lib/gate_preflight.mjs');
 
-      const result = await checkAudioTooling({ label: 'gate', shell: false, env: { PATH: dir } });
+      const result = await checkAudioTooling({
+        label: 'gate',
+        shell: GATE_SHELL,
+        env: { PATH: dir },
+      });
 
       expect(result).toContain('missing required SFX audio tooling: ffmpeg, ffprobe');
     });
@@ -40,14 +45,17 @@ describe('checkAudioTooling', () => {
 
   it('reports null when both tools run', async () => {
     await withFixtureDir(async (dir) => {
-      const okTool = join(dir, 'ok-tool');
-      writeFileSync(okTool, '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+      const okTool = writeFakeCommand(dir, 'ok-tool');
       vi.stubEnv('WOC_FFMPEG_PATH', okTool);
       vi.stubEnv('WOC_FFPROBE_PATH', okTool);
       vi.resetModules();
       const { checkAudioTooling } = await import('../scripts/lib/gate_preflight.mjs');
 
-      const result = await checkAudioTooling({ label: 'gate', shell: false, env: { PATH: dir } });
+      const result = await checkAudioTooling({
+        label: 'gate',
+        shell: GATE_SHELL,
+        env: { PATH: dir },
+      });
 
       expect(result).toBeNull();
     });
@@ -57,14 +65,17 @@ describe('checkAudioTooling', () => {
     await withFixtureDir(async (dir) => {
       // ffmpeg missing, ffprobe present: both must still be reported/checked
       // independently (Promise.all over both promises, not a bail on the first).
-      const okTool = join(dir, 'ok-tool');
-      writeFileSync(okTool, '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+      const okTool = writeFakeCommand(dir, 'ok-tool');
       vi.stubEnv('WOC_FFMPEG_PATH', '/nonexistent/woc-preflight/ffmpeg');
       vi.stubEnv('WOC_FFPROBE_PATH', okTool);
       vi.resetModules();
       const { checkAudioTooling } = await import('../scripts/lib/gate_preflight.mjs');
 
-      const result = await checkAudioTooling({ label: 'gate', shell: false, env: { PATH: dir } });
+      const result = await checkAudioTooling({
+        label: 'gate',
+        shell: GATE_SHELL,
+        env: { PATH: dir },
+      });
 
       // Only ffmpeg failed, so it alone is named in the missing-tools list
       // (the reinstall guidance text mentions ffprobe regardless, so assert

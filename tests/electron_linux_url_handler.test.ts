@@ -830,7 +830,11 @@ describe('registerLinuxUrlHandler', () => {
   });
 });
 
-describe('installDesktopEntry against a REAL filesystem', () => {
+// Skipped on Windows: the module does POSIX path math (it only ever runs on Linux), and a
+// Windows temp dir is not an absolute POSIX XDG_DATA_HOME.
+const describeOnPosix = process.platform === 'win32' ? describe.skip : describe;
+
+describeOnPosix('installDesktopEntry against a REAL filesystem', () => {
   // Everything above injects fs, so the production default layer (desktopEntryDir from
   // XDG_DATA_HOME, real mkdir/write/rename) is otherwise never executed. This exercises it end
   // to end with only the subprocesses faked.

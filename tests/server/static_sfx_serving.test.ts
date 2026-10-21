@@ -138,7 +138,11 @@ describe('versioned static SFX serving', () => {
     expect(tooLarge.body.toString('utf8')).toBe('SFX asset changed during integrity verification');
   });
 
-  it('fails closed if the pathname is replaced while its snapshot is being read', () => {
+  it('fails closed if the pathname is replaced while its snapshot is being read', ({ skip }) => {
+    skip(
+      process.platform === 'win32',
+      'Windows refuses to rename over an open file, so this race cannot happen there',
+    );
     const asset = join(blobsRoot, 'replacement-race.mp3');
     const pendingReplacement = join(blobsRoot, 'replacement-race.pending');
     writeFileSync(asset, 'original bytes');

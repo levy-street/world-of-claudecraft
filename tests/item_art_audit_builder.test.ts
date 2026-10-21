@@ -17,6 +17,9 @@ import {
   renderItemArtAuditPreview,
   updateItemArtAuditVerdict,
 } from '../scripts/lib/item_art_audit.mjs';
+import { releaseSharpFileHandles } from './helpers/sharp_file_handles';
+
+releaseSharpFileHandles();
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temporaryRoots: string[] = [];

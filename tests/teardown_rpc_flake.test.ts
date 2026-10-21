@@ -4,6 +4,7 @@ import {
   TEARDOWN_RPC_MESSAGE,
   TEARDOWN_RPC_TAIL_BYTES,
 } from '../scripts/lib/teardown_rpc_flake.mjs';
+import { VITEST_CLI } from './helpers/vitest_cli';
 
 // The ONE sanctioned known-flake signature (CI/CD performance packet, Phase
 // 6): every test passed, exit 1 from the vitest worker-teardown RPC race.
@@ -201,7 +202,12 @@ describe('real vitest output (the one external assumption)', () => {
     const repoRoot = path.join(__dirname, '..');
     const dir = await mkdtemp(path.join(tmpdir(), 'teardown-rpc-real-'));
     try {
-      await symlink(path.join(repoRoot, 'node_modules'), path.join(dir, 'node_modules'));
+      // A junction on Windows, where a plain symlink needs Developer Mode.
+      await symlink(
+        path.join(repoRoot, 'node_modules'),
+        path.join(dir, 'node_modules'),
+        'junction',
+      );
       const leak =
         "import { it } from 'vitest';\n" +
         "it('passes', () => {});\n" +
@@ -218,7 +224,7 @@ describe('real vitest output (the one external assumption)', () => {
         '});\n';
       await writeFile(path.join(dir, 'leak.test.mjs'), leak);
       const run = (file: string) =>
-        spawnSync('npx', ['--no-install', 'vitest', 'run', '--root', dir, file], {
+        spawnSync(process.execPath, [VITEST_CLI, 'run', '--root', dir, file], {
           cwd: repoRoot,
           encoding: 'utf8',
           env: { ...process.env, CI: 'true', GITHUB_ACTIONS: 'true' },

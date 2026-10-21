@@ -8,7 +8,9 @@ const {
   writeFileSync: nodeWriteFileSync,
 } = require('node:fs');
 const nodeOs = require('node:os');
-const nodePath = require('node:path');
+// Every path here is a Linux XDG path, so the math is POSIX wherever this module is
+// evaluated (on Linux this is the same module `node:path` returns).
+const nodePath = require('node:path').posix;
 
 // Make the worldofclaudecraft:// deep link resolvable on Linux, which is what carries the
 // Discord login code back from the OS browser into the shell (main.cjs handleDeepLink).

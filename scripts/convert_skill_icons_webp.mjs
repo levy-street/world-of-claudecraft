@@ -164,7 +164,7 @@ function removeCommittedTemp(file, recoveryDir, restorePath) {
     runFsPhase('recovery-mkdir', () => mkdirSync(recoveryDir, { recursive: true }));
     const recoveryFile = path.join(recoveryDir, path.basename(file));
     runFsPhase('recovery-move', () => renameSync(file, recoveryFile));
-    return `${messageOf(lastError)}; preserved at ${path.relative(root, recoveryFile)}`;
+    return `${messageOf(lastError)}; preserved at ${path.relative(root, recoveryFile).split(path.sep).join('/')}`;
   } catch (error) {
     return `${messageOf(lastError)}; recovery move failed: ${messageOf(error)}`;
   }

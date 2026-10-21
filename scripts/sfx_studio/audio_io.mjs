@@ -18,7 +18,7 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
-import { basename, dirname, extname, join, resolve } from 'node:path';
+import { basename, dirname, extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { conformSfxAudio, inspectSfxConformance } from '../sfx/conform_audio.mjs';
 import { FFMPEG_PATH, FFPROBE_PATH } from '../sfx/ffmpeg_paths.mjs';
@@ -92,7 +92,8 @@ let mutationTail = Promise.resolve();
 function ensurePlainDirectory(path, parent) {
   const parentReal = realpathSync(parent);
   const lexical = resolve(parentReal, basename(path));
-  if (!lexical.startsWith(`${parentReal}/`)) throw new Error('studio directory escapes its root');
+  if (!lexical.startsWith(`${parentReal}${sep}`))
+    throw new Error('studio directory escapes its root');
   if (existsSync(lexical)) {
     const stat = lstatSync(lexical);
     if (stat.isSymbolicLink() || !stat.isDirectory()) {
@@ -102,7 +103,7 @@ function ensurePlainDirectory(path, parent) {
     mkdirSync(lexical);
   }
   const target = realpathSync(lexical);
-  if (!target.startsWith(`${parentReal}/`) || target !== lexical) {
+  if (!target.startsWith(`${parentReal}${sep}`) || target !== lexical) {
     throw new Error(`studio directory escapes its root: ${lexical}`);
   }
   return target;
@@ -116,7 +117,7 @@ function existingPlainDirectory(path, parent) {
     throw new Error(`path is not a plain directory: ${lexical}`);
   }
   const target = realpathSync(lexical);
-  if (!target.startsWith(`${parentReal}/`) || target !== lexical) {
+  if (!target.startsWith(`${parentReal}${sep}`) || target !== lexical) {
     throw new Error(`directory escapes its root: ${lexical}`);
   }
   return target;
@@ -147,14 +148,14 @@ function safeKeyDirectory(section, key) {
 function safeRegularFile(root, name) {
   const rootReal = realpathSync(root);
   const lexical = resolve(rootReal, name);
-  if (!lexical.startsWith(`${rootReal}/`) || !existsSync(lexical)) {
+  if (!lexical.startsWith(`${rootReal}${sep}`) || !existsSync(lexical)) {
     throw new Error('studio file is missing or outside its root');
   }
   const entry = lstatSync(lexical);
   if (entry.isSymbolicLink() || !entry.isFile())
     throw new Error('studio file is not a regular file');
   const target = realpathSync(lexical);
-  if (!target.startsWith(`${rootReal}/`) || target !== lexical) {
+  if (!target.startsWith(`${rootReal}${sep}`) || target !== lexical) {
     throw new Error('studio file escapes its root');
   }
   return target;

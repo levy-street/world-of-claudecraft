@@ -425,14 +425,26 @@ describe('BatchSpool', () => {
     const oldest = await spool.peekOldest();
     expect(oldest?.data[0]).toBe(7);
 
-    const broken = new BatchSpool('/dev/null/not-a-dir', 10_000, createParseCounters());
+    // A directory path under a regular FILE can never be created, on any platform
+    // (/dev/null/... maps to a creatable C:\dev\null on Windows).
+    const broken = new BatchSpool(
+      path.join(dir, 'README.txt', 'not-a-dir'),
+      10_000,
+      createParseCounters(),
+    );
     await expect(broken.append(Buffer.alloc(4))).resolves.toBeUndefined();
     expect(await broken.peekOldest()).toBeNull();
   });
 });
 
 describe('BatchSpool review pins', () => {
-  test('a failed unlink never moves byte accounting, so the cap keeps bounding disk', async () => {
+  test('a failed unlink never moves byte accounting, so the cap keeps bounding disk', async ({
+    skip,
+  }) => {
+    skip(
+      process.platform === 'win32',
+      'a read-only directory mode does not block unlink on Windows',
+    );
     const counters = createParseCounters();
     const dir = tempSpoolDir();
     const spool = new BatchSpool(dir, 10_000, counters);

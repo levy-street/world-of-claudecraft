@@ -3,6 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { delimiter, join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { writeFakeCommand } from './helpers/fake_command';
 
 // `npm ls --depth=0 --json` reads only the local package.json + node_modules
 // metadata (no registry hit), so a throwaway fixture directory reproduces every
@@ -136,8 +137,7 @@ describe('dependency-sync gate preflight', () => {
         JSON.stringify({ name: 'fixture', version: '1.0.0' }),
       );
       const fakeNpmDir = mkdtempSync(join(tmpdir(), 'woc-depsync-fakenpm-'));
-      const fakeNpm = join(fakeNpmDir, 'npm');
-      writeFileSync(fakeNpm, '#!/bin/sh\necho "not json at all"\nexit 1\n', { mode: 0o755 });
+      writeFakeCommand(fakeNpmDir, 'npm', { stdout: 'not json at all', exitCode: 1 });
       try {
         const result = spawnSync(process.execPath, [GATE_SCRIPT], {
           cwd: dir,

@@ -415,7 +415,9 @@ describe('ci-stall-rerun.yml shape', () => {
   });
 });
 
-describe('driver wiring', () => {
+// Skipped on Windows: the stub gh is an extensionless bash script, which Windows
+// cannot spawn as a command (the driver itself only runs on ubuntu-latest).
+describe.skipIf(process.platform === 'win32')('driver wiring', () => {
   // The driver is fail-closed glue; prove the wiring end to end against a
   // stub gh: it reads the live run, maps jobs and annotations, consults the
   // core, and POSTs rerun-failed-jobs exactly once, or not at all. The

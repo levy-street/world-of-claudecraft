@@ -942,7 +942,10 @@ describe('the cross-clock-base save assumption', () => {
         else if (entry.name.endsWith('.ts')) {
           const content = fs.readFileSync(p, 'utf8');
           if (/\.serializeCharacter\(/.test(content)) {
-            callers.set(path.relative(path.join(__dirname, '..'), p), content);
+            callers.set(
+              path.relative(path.join(__dirname, '..'), p).split(path.sep).join('/'),
+              content,
+            );
           }
         }
       }

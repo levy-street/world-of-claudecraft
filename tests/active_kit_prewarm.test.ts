@@ -1,4 +1,5 @@
 import { readdirSync, readFileSync } from 'node:fs';
+import { sep } from 'node:path';
 import * as THREE from 'three';
 import { expect, it, vi } from 'vitest';
 import {
@@ -252,7 +253,9 @@ it('leaves out only the shockwave sheet, which no cast draws', () => {
     if (!file.endsWith('.ts')) continue;
     const source = readFileSync(new URL(file, root), 'utf8');
     for (const match of source.matchAll(/(?:bakedAt|spawn)\??\.?\(\s*'shockwave'/g))
-      drawers.push(`${file}:${source.slice(0, match.index).split('\n').length}`);
+      drawers.push(
+        `${file.split(sep).join('/')}:${source.slice(0, match.index).split('\n').length}`,
+      );
   }
   expect(drawers).toHaveLength(1);
   expect(drawers[0]).toMatch(/^ability_vfx\/fx\.ts:/);

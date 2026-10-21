@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { BASH } from './helpers/posix_shell';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative: string) => fs.readFileSync(path.join(root, relative), 'utf8');
@@ -69,7 +70,7 @@ describe('Codex project configuration', () => {
       fs.writeFileSync(agent, 'name = "clean"\n');
 
       const run = (active: boolean) =>
-        spawnSync('bash', [path.join(fixture, '.codex/hooks/qa-stop.sh')], {
+        spawnSync(BASH, [path.join(fixture, '.codex/hooks/qa-stop.sh')], {
           cwd: fixture,
           input: JSON.stringify({ stop_hook_active: active }),
           encoding: 'utf8',

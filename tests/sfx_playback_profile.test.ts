@@ -95,8 +95,10 @@ describe('SFX runtime playback profile', () => {
 
     const gainFirst = readFileSync(join(root, SFX_GAIN_MAP_PATH), 'utf8');
     const speedFirst = readFileSync(join(root, SFX_SPEED_MAP_PATH), 'utf8');
-    expect(statSync(join(root, SFX_GAIN_MAP_PATH)).mode & 0o777).toBe(0o644);
-    expect(statSync(join(root, SFX_SPEED_MAP_PATH)).mode & 0o777).toBe(0o644);
+    // Windows keeps only a read-only flag, so a writable 0o644 file reads back as 0o666 there.
+    const writtenMode = process.platform === 'win32' ? 0o666 : 0o644;
+    expect(statSync(join(root, SFX_GAIN_MAP_PATH)).mode & 0o777).toBe(writtenMode);
+    expect(statSync(join(root, SFX_SPEED_MAP_PATH)).mode & 0o777).toBe(writtenMode);
     writeSfxPlaybackProfile(root, rawProfile);
     expect(readFileSync(join(root, SFX_GAIN_MAP_PATH), 'utf8')).toBe(gainFirst);
     expect(readFileSync(join(root, SFX_SPEED_MAP_PATH), 'utf8')).toBe(speedFirst);
